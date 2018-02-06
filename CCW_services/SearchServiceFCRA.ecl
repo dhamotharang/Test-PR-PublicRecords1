@@ -11,6 +11,7 @@
 import CCW_services, iesp, AutoStandardI, FCRA , FFD;
 
 EXPORT SearchServiceFCRA := MACRO
+ #onwarning(4207, ignore);
 	#constant('NoDeepDive', true);
 	
 	rec_in := iesp.concealedweapon_fcra.t_FcraWeaponSearchRequest;
