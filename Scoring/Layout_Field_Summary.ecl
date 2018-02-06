@@ -1,0 +1,35 @@
+﻿export Layout_Field_Summary := record
+	unsigned emtpyaccount := 0;
+	unsigned emptyfirst := 0;
+	unsigned emptylast := 0;
+	unsigned emptyaddr := 0;
+	unsigned emptycity := 0;
+	unsigned emptystate := 0;
+	unsigned emptyzip := 0;
+	unsigned emptyhphone := 0;
+	unsigned emptysocs := 0;
+	unsigned emptydob := 0;
+	unsigned emptywphone := 0;
+	unsigned emptydrlc := 0;
+	unsigned emptydrlcstate := 0;
+	unsigned duplicateSSNs := 0;
+	unsigned duplicatePhones := 0;
+	unsigned duplicateAccounts := 0;
+	unsigned invalidphone := 0;
+	unsigned validbusinessphone := 0;
+	unsigned validresidentialphone := 0;
+	unsigned validphoneunknown := 0;
+	unsigned phoneval_invalidformat := 0;
+	unsigned notriskyphone := 0;
+	unsigned cellphone := 0;
+	unsigned pager := 0;
+	unsigned pcs := 0;
+	unsigned othernonpots := 0;
+	unsigned disconnnect := 0;
+	unsigned highriskphone := 0;
+	unsigned phonerisk_invalidformat := 0;
+	unsigned goodphonezip := 0;
+	unsigned phonezipmismatch := 0;
+	unsigned phonezip_invalidformat := 0;
+	// todo:  add the rest of the fields to summarize
+end;

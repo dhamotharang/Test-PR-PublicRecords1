@@ -1,0 +1,30 @@
+﻿import risk_indicators;
+
+export Layout_NPTO_Soapcall := record
+string	tribcode;  
+string	account;  
+string	first;  
+string	middleini;  
+string	last;  
+string	addr;  
+string	city;  
+string	state;  
+string	zip;  
+string	hphone;  
+string	socs;  
+string	dob;  
+string	wphone;  
+string	income;  
+string	drlc;  
+string	drlcstate;  
+string	balance;  
+string	chargeoffdate;  
+string	formerlast;  
+string	email;  
+string	cmpy;
+integer	DPPAPurpose;
+integer	GLBPurpose; 
+integer	HistoryDateYYYYMM;
+boolean	runSeed;  
+dataset(risk_indicators.Layout_Gateways_In) gateways;
+end;

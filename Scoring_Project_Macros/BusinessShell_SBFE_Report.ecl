@@ -3,12 +3,11 @@
 #OPTION('AllowAutoSwitchQueue', true);
 #option('allowedClusters', 'thor50_dev02,thor50_dev');
 
-
 import ut;
 import std;
 import scoring_project;
-import deurlein_jon; 
-import Scoring_Project_Macros, Scoring_Project_DailyTracking;
+
+import Scoring_Project_Macros, Scoring_Project_DailyTracking, Scoring_QA_New_Bins;
 
 dt := ut.getdate;
 

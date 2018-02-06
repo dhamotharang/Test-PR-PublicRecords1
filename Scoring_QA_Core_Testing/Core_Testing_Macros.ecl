@@ -3,7 +3,7 @@ EXPORT Core_Testing_Macros (STRING neutralroxieIP, STRING fcra_roxieIP, INTEGER 
 
 
 
-IMPORT sghatti, RiskWise, ut, STD, data_services, Scoring_Project_Macros, Gateway, Risk_Indicators, models, RiskProcessing, scoring_project_pip, Scoring_Project_ISS, zz_bkarnatz; 
+IMPORT sghatti, RiskWise, ut, STD, data_services, Scoring_Project_Macros, Gateway, Risk_Indicators, models, RiskProcessing, scoring_project_pip, Scoring_Project_ISS; 
 
 
 Timeout := 120;
@@ -292,7 +292,7 @@ AddressShell:=Scoring_Project_ISS.AddressShell_Attributes_V1_BATCH_Macro(neutral
 
 BusinessShell:=Scoring_Project_ISS.BusinessShell_Attributes_V2_XML_Macro(roxieIP, gateway_ip,no_of_threads,Timeout,Retry_time,BusinessShell_Attributes_V2_XML_Generic_infile,BusinessShell_Attributes_V2_XML_Generic_outfile,no_of_recs_to_run);
 
-PhoneShell := zz_bkarnatz.PhoneShell_Macro(roxieIP, gateway_ip, no_of_threads,Timeout,Retry_time,PhoneShell_infile_name,PhoneShell_outfile_name,no_of_recs_to_run_2);
+PhoneShell := Scoring_QA_Core_Testing.PhoneShell_Macro(roxieIP, gateway_ip, no_of_threads,Timeout,Retry_time,PhoneShell_infile_name,PhoneShell_outfile_name,no_of_recs_to_run_2);
 
 // ****************************************************************************************************************
 
