@@ -23,5 +23,5 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	    //IF(DebugMode,      OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations')));								 
    	// IF(DebugMode,      OUTPUT(CHOOSEN(BusnDataWithOperLocGeoRisk, 100),     NAMED('BusnDataWithOperLocGeoRisk')));												 
 
-	RETURN AddOperatingLocToReport;
+	RETURN AddOperatingInfoToReport;
 END;

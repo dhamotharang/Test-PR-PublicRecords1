@@ -79,7 +79,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 			
 		
  //***This section is for Operating Information  ***//
-	AddOperInformationToReport   :=  BusnData;
+	AddOperInformationToReport   :=  UpdateReportingSourcesInReport;  
 
 																													
 													 

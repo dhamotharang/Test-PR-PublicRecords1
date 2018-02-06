@@ -41,13 +41,18 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED2 watercraftCount;
   END;
 	
-	EXPORT ListOfBusSourceLayout := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+ EXPORT BusSourceLayout := RECORD
 		STRING sourceName;
 		STRING source;
 		STRING sourceType;
 		UNSIGNED4 firstReported;
 		UNSIGNED4 lastReported;
+	END;
+	
+	
+	EXPORT ListOfBusSourceLayout := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		BusSourceLayout;   
 	END;
 
 
