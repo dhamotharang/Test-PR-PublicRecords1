@@ -12,8 +12,9 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(BusnData);
 	
 	//***This section is for Operating Information  ***//
-	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
-
+	//AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
+	
+  AddOperatingInfoToReport  := AddOperatingLocToReport; 
 																													
 													 
 	// ********************

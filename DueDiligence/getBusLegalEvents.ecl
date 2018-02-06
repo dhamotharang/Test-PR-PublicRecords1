@@ -28,7 +28,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ The results will come back this layout:                                            ------
 	// ------  DueDiligence.LayoutsInternal.RelatedParty                                         ------
 	// ------  
-  UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(SimpleBusinessExecutives, ReportIsRequested, Debugmode, isFCRA);
+ // UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(SimpleBusinessExecutives, ReportIsRequested, Debugmode, isFCRA);
   // ------ with the derogatory events found in the previous function                          ------
 	// ------ The results will come back this layout:                                            ------
 	// ------ DueDiligence.layouts.Busn_Internal                                                 ------
@@ -138,14 +138,14 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 								                                                           // LEFT.party.evictionsCnt,
 																																					                             // RIGHT.party.evictionsCnt);
 								 
-															SELF.party.category9 := LEFT.party.category9 OR RIGHT.party.category9;
-															SELF.party.category8 := LEFT.party.category8 OR RIGHT.party.category8;
-															SELF.party.category7 := LEFT.party.category7 OR RIGHT.party.category7;
-															SELF.party.category6 := LEFT.party.category6 OR RIGHT.party.category6;
-															SELF.party.category5 := LEFT.party.category5 OR RIGHT.party.category5;
-															SELF.party.category4 := LEFT.party.category4 OR RIGHT.party.category4;
-															SELF.party.category3 := LEFT.party.category3 OR RIGHT.party.category3;
-															SELF.party.category2 := LEFT.party.category2 OR RIGHT.party.category2;
+															// SELF.party.category9 := LEFT.party.category9 OR RIGHT.party.category9;
+															// SELF.party.category8 := LEFT.party.category8 OR RIGHT.party.category8;
+															// SELF.party.category7 := LEFT.party.category7 OR RIGHT.party.category7;
+															// SELF.party.category6 := LEFT.party.category6 OR RIGHT.party.category6;
+															// SELF.party.category5 := LEFT.party.category5 OR RIGHT.party.category5;
+															// SELF.party.category4 := LEFT.party.category4 OR RIGHT.party.category4;
+															// SELF.party.category3 := LEFT.party.category3 OR RIGHT.party.category3;
+															// SELF.party.category2 := LEFT.party.category2 OR RIGHT.party.category2;
 															
 								 
 															SELF := LEFT;));

@@ -138,7 +138,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		LEFT OUTER);
 																		
 	
-	getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);																	
+	//getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);																	
 	//getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);	
 	getExecResidency   := addExecs;
 
@@ -166,7 +166,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																								
 
 
-	RETURN getExecResidency;
+	//RETURN getExecResidency;
 
 	RETURN getExecResidency;
 
