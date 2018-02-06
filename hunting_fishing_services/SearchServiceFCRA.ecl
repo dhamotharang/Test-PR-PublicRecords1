@@ -12,7 +12,7 @@
 import iesp, AutoStandardI, FCRA, STD;
 
 export SearchServiceFCRA := macro
-
+  #onwarning(4207, ignore);
 		#constant('NoDeepDive', true);
 		// Get XML input 
 		rec_in := iesp.huntingfishing_fcra.t_FcraHuntFishSearchRequest;

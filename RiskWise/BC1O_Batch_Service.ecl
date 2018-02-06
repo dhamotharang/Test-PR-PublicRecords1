@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Custom Business Application Screening">
 	<part name="tribcode" type="xsd:string"/> 
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -14,6 +14,7 @@
 import gateway;
 export BC1O_Batch_Service := MACRO
 
+#onwarning(4207, ignore);
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('GLBPurpose',RiskWise.permittedUse.fraudGLBA);

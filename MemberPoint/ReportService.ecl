@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService"> 
 	<part name="MemberPointReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -9,7 +9,7 @@
 import iesp, AutoStandardI,Royalty;
 
 EXPORT ReportService := MACRO
-
+ #onwarning(4207, warning);
 	//b. Receive input 
 	rec_in := iesp.memberpointreport.t_MemberPointReportRequest;
 
