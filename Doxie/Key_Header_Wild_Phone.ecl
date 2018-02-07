@@ -1,4 +1,4 @@
-import autokey, doxie_build, header, gong, ut;
+﻿import autokey, doxie_build, header, gong, ut, Gong_Neustar;
 
 //t := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
 //  Bug 12065, use blocked data filter on header instead of raw data
@@ -16,7 +16,7 @@ header_phone_recs := table(t((integer)phone<>0),phone_rec);;
 
 hhid := Header.File_HHID_Current(ver = 1);
 gong_did := gong.File_Gong_Did(did != 0);
-gong_hhid := Gong.Gong_HHID(hhid != 0);
+gong_hhid := Gong_Neustar.File_Gong_HHID(hhid != 0);
 
 typeof(gong_did) get_did(hhid ri, gong_hhid le) :=
 TRANSFORM
