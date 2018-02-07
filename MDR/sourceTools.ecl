@@ -45,7 +45,6 @@ MODULE
 	export src_AlloyMedia_consumer			 := 'AO';
 	export src_AlloyMedia_student_list	 :=	'AY';
 	export src_American_Students_List    := 'SL';
-	export src_OKC_Students_List         := 'S1';
 	export src_AMIDIR                    := 'ML';  // American Medical Info Directory
 	export src_AMS                       := 'SJ';  // Advantage Management Solutions
 	export src_Bair_Analytics            := 'B+';  // Bair Analytics agency-reported relational data dump
@@ -1482,7 +1481,6 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_AlloyMedia_consumer			 :=	[src_AlloyMedia_consumer			 ];
 	export set_AlloyMedia_student_list	 :=	[src_AlloyMedia_student_list	 ];
 	export set_American_Students_List    := [src_American_Students_List    ];
-	export set_OKC_Students_List         := [src_OKC_Students_List         ];
 	export set_AMIDIR                    := [src_AMIDIR                    ];
 	export set_AMS                       := [src_AMS                       ];
 	export set_Bair_Analytics            := [src_Bair_Analytics            ];
@@ -1980,7 +1978,6 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsAK_Perm_Fund               (string  sr) := sr               in set_AK_Perm_Fund               ;
 	export SourceIsALC                        (string  sr) := sr               in set_ALC                        ;
 	export SourceIsAmerican_Students_List     (string  sr) := sr               in set_American_Students_List     ;
-	export SourceIsOKC_Students_List          (string  sr) := sr               in set_OKC_Students_List          ;
 	export SourceIsAMIDIR                     (string  sr) := sr               in set_AMIDIR                     ;
 	export SourceIsAMS                        (string  sr) := sr               in set_AMS                        ;
 	export SourceIsATF                        (string  sr) := sr               in set_atf                        ;
@@ -2509,7 +2506,6 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_AK_Perm_Fund              ,'AK Perm Fund'                                              }
 		,{src_ALC                       ,'American List Counsel'                                     }
 		,{src_American_Students_List    ,'American Students List'                                    }
-		,{src_OKC_Students_List         ,'OKC Students List'                                         }
 		,{src_AlloyMedia_student_list		,'Alloy Media Student Directory'														 }
 		,{src_AlloyMedia_consumer				,'Alloy Media Opt-in Consumer non-directory'								 }
 		,{src_AMIDIR                    ,'Medical Information Directory'                             }
@@ -3010,7 +3006,6 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_AK_Perm_Fund              => 'AK Perm Fund'                                         
 		,src_ALC                       => 'American List Counsel'                                         
 		,src_American_Students_List    => 'American Students List'                               
-		,src_OKC_Students_List         => 'OKC Students List'                               
 		,src_AlloyMedia_student_list	 =>	'Alloy Media Student Directory'												
 		,src_AlloyMedia_Consumer			 =>	'Alloy Media Opt-in Consumer non-directory'												
 		,src_AMIDIR                    => 'Medical Information Directory'                        

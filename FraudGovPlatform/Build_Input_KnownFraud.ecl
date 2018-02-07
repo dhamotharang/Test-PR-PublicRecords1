@@ -1,125 +1,62 @@
-IMPORT tools,STD, FraudGovPlatform_Validation;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut;
 EXPORT Build_Input_KnownFraud(
 	 string		pversion
 ) :=
 module
 
-	SHARED fn_dedup(infile , inputs):=FUNCTIONMACRO
-			// rollup by Customer_Name + Customer_Account_Number + Customer_State + 
-			//           Customer_Agency_Vertical_Type + Customer_Program + First_name + 
-			//           Last_Name + SSN + Date_of_Birth + customer_event_id, 
-			// keep most recent filedate 
-			
-			in_srt:=sort(inputs
-						,Customer_Name
-						,Customer_Account_Number
-						,Customer_State
-						,Customer_Agency_Vertical_Type
-						,Customer_Program
-						,First_name
-						,Last_Name
-						,SSN
-						,DOB
-						,customer_event_id
-						,-FileDate
-						,-FileTime
-						,local
-						);
-
-			infile tr(in_srt l, in_srt r) :=transform
-				self:=l;
-			end;
-
-			in_ddp:=rollup(in_srt,tr(left,right)
-																				,Customer_Name
-																				,Customer_Account_Number
-																				,Customer_State
-																				,Customer_Agency_Vertical_Type
-																				,Customer_Program
-																				,First_name
-																				,Last_Name
-																				,SSN
-																				,DOB
-																				,customer_event_id
-																				,local
-																				);
-
-			return in_ddp;
+	SHARED fn_dedup(inputs):=FUNCTIONMACRO
+		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
+		in_ddp:=rollup(in_srt,
+								TRANSFORM(Layouts.Input.KnownFraud,SELF := LEFT; SELF := []),
+								RECORD,
+								EXCEPT ProcessDate,
+								LOCAL);	
+		return in_ddp;
 	ENDMACRO;
-
-	SHARED Sprayed_KnownFraud := Files(pversion).Sprayed.KnownFraud;
-
 	
-		Layouts.Input.KnownFraud tr(Sprayed_KnownFraud l) := transform
-			self.FileName := l.fn;
+	Sprayed_KnownFraud := Files(pversion).Sprayed.KnownFraud;
 
-			sub:=stringlib.stringfind(l.fn,'20',1);
-			sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
-			self.ProcessDate := (unsigned)pversion;
-			FileDate := (unsigned)l.fn[sub..sub+7];
-			FileTime := l.fn[sub2..sub2+5];
-			self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
-			self.FileTime :=map(
-															FileTime in ['0000.a','0000.s','0000.o','0000.n'] =>'999999'
-															,FileTime ='5527.a' =>'195527'
-															,FileTime ='1911.a' =>'091911'
-															,FileTime ='0359.s' =>'140359'
-															,FileTime ='2744.s' =>'102744'
-															,FileTime ='0033.o' =>'140033'
-															,FileTime ='1935.o' =>'111935'
-															,FileTime
-															);
-			self:=l;
-			self:=[];
-		end;
+	Layouts.Input.KnownFraud tr(Sprayed_KnownFraud l) := transform
+		sub:=stringlib.stringfind(l.fn,'20',1);
+		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
+		FileDate := (unsigned)l.fn[sub..sub+7];
+		FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
+		self.FileName := l.fn;
+		self.ProcessDate := (unsigned)pversion;
+		self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
+		self.FileTime :=FileTime;
+		self:=l;
+		self:=[];
+	end;
 
 	f1:=project(Sprayed_KnownFraud,tr(left));
 
-	f1_bypass:=f1
-			(	 Customer_Name=''
-			or Customer_Account_Number=''
-			or Customer_State=''
-			or Customer_Agency_Vertical_Type=''
-			or Customer_Program=''
-			or First_name=''
-			or Last_Name=''
-			or SSN=''
-			or Physical_Address_1=''
-			or City=''
-			or State=''
-			or Zip=''
-			or Mailing_Address_1=''
-			or Mailing_City=''
-			or Mailing_State=''
-			or Mailing_Zip=''
-			or DOB=''
+	f1_errors:=f1
+			(	 
+						Client_ID												=''
+				or		Customer_County 									=''
+				or 	(LexID = 0 and Full_Name = '' and (First_name = '' or Last_Name=''))
+				or 	(SSN = '' and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+				or 	(Physical_Address_1='' and City=''	and State='' and Zip='')
+				or 	(Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
+				or 	(Customer_Agency_Vertical_Type 		in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
+				or 	(Customer_Program 							in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
 			);
 
-	f1_bypass_dedup:=fn_dedup(f1_bypass, files().Input.ByPassed_KnownFraud.sprayed + f1_bypass);
-	
+	NotInMbs := join(f1,
+							FraudShared.Files().Input.MBS.sprayed(status = 1)
+										,left.client_id =(string)right.gc_id
+										and left.Customer_State = right.customer_state
+										and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
+										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
+										// and left.customer_county = right.customer_county
+										TRANSFORM(Layouts.Input.KnownFraud,SELF := LEFT),LEFT ONLY);
+	//Exclude Errors
+	f1_bypass_dedup := fn_dedup(files().Input.ByPassed_KnownFraud.sprayed + (f1_errors + NotInMbs));	
 	Build_Bypass_Records :=  OUTPUT(f1_bypass_dedup,,Filenames().Input.ByPassed_KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
-	f1_valid := 	f1(	 Customer_Name<>''
-										,Customer_Account_Number<>''
-										,Customer_State<>''
-										,Customer_Agency_Vertical_Type<>''
-										,Customer_Program<>''
-										,First_name<>''
-										,Last_Name<>''
-										,SSN<>''
-										,Physical_Address_1<>''
-										,City<>''
-										,State<>''
-										,Zip<>''
-										,Mailing_Address_1<>''
-										,Mailing_City<>''
-										,Mailing_State<>''
-										,Mailing_Zip<>''
-										,DOB<>''
-									);	
-									
-	f1_dedup:=fn_dedup(f1_valid, files().Input.KnownFraud.sprayed + f1_valid);
-
+	//Move only Valid Records
+	f1_dedup := fn_dedup(files().Input.KnownFraud.sprayed + (f1 - f1_errors - NotInMbs));
 	Build_Input_File :=  OUTPUT(f1_dedup,,Filenames().Input.KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
 	Promote_Input_File := 
@@ -156,12 +93,15 @@ module
 		);
 		
 // Return
-	export build_prepped :=
-		 sequential(
-			 Build_Input_File
-			,Build_Bypass_Records 
-			,Promote_Input_File
+	export build_prepped := 
+		if(	STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::knownfraud') > 0, 
+			 sequential(
+				 Build_Input_File
+				,Build_Bypass_Records 
+				,Promote_Input_File
+			)		
 		);
+
 		
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)

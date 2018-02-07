@@ -25,8 +25,8 @@ EXPORT ProfileTemplate:=  output(profile_header + project(dedup(sort(CleanStats,
 																																	 self := left)) ,, Filename, csv(separator(','),terminator('\r\n'),quote('"'),maxlength(65535)), compressed, overwrite, named('ProfileTemplate'+FileType)); 	
 
 //	Scrubs Alerts
-SHARED profile_alerts_header := dataset([{'Profile','Rule Name','Description','Enabled','Default','Order','Code','Severity','Pass Percentage','Percentage Error - Relative to previous (Min)','Percentage Error - Relative to previous (Max)','ScrubsAlertsPerRelToPopulationMin','Change To/From Zero'},
-																  {pProfileName,'Default','','true','true','0','','','','-10','20','','false'}], layouts.ProfileAlertsTemplateLayout);
+SHARED profile_alerts_header := dataset([{'Profile','Rule Name','Description','Enabled','Default','Order','Code','Severity','Pass Percentage','Percentage Error - Relative to previous (Min)','Percentage Error - Relative to previous (Max)','Change To/From Zero'},
+																  {pProfileName,'Default','','true','true','0','','','','-10','20','false'}], layouts.ProfileAlertsTemplateLayout);
 EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sort(CleanStats, ruledesc, -rulepcnt), ruledesc),
 																																	 transform(layouts.ProfileAlertsTemplateLayout,
 																																	 self.Profile := pProfileName;
@@ -40,7 +40,7 @@ EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sor
 																																	 self.Pass_Percentage := if(STD.Str.find(self.Rule_Name,':POP',1)=0 and STD.Str.find(self.Rule_Name,':SUMMARY',1)=0,(string) (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00),'');
 																																	 self.Percentage_Error_Min	:=	'',
 																																	 self.Percentage_Error_Max	:=	'',
-																																	 self.ScrubsAlertsPerRelToPopulationMin	:=	'',
+																																	 // self.ScrubsAlertsPerRelToPopulationMin	:=	'', Currently in Testing
 																																	 self.Change_To_From_Zero	:=	'',
 																																	 self := left)) ,, Filename, csv(separator(','),terminator('\r\n'),quote('"'),maxlength(65535)), compressed, overwrite, named('ProfileAlertsTemplate'+FileType)); 	
 											
@@ -64,7 +64,7 @@ output(RemoveBlankRules),
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStats(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
-																																		 ,std.system.job.target()),named(pProfileName+'_Submission'+CustomTag)));
+																																		 ,std.system.job.target())));
 																																		 
 																																		 
 

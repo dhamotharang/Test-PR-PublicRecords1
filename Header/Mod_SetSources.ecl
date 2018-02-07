@@ -1,4 +1,4 @@
-﻿import
+import
 			ut
 			,PromoteSupers
 			,ak_perm_fund
@@ -23,7 +23,6 @@
 			,LiensV2
 			,ln_propertyv2
 			,american_student_list
-      ,OKC_Student_List
 			,votersv2
 			,certegy
 			,ExperianCred
@@ -143,10 +142,6 @@ EXPORT Mod_SetSources(boolean pFastHeader=false,string ver='default') := module
 	WP := targus.consumer_as_Source(,true);
 	Mac_output(WP,SFname+'_WP',seq_WP);
 	EXPORT sequence_WP:=seq_WP;
-
-	S1 := OKC_Student_List.OKC_Student_List_as_source(,true);
-	Mac_output(S1,SFname+'_S1',seq_S1);
-	EXPORT sequence_S1:=seq_S1;
 
 	SL := american_student_list.asl_as_Source(,true);
 	Mac_output(SL,SFname+'_SL',seq_SL);
