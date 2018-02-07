@@ -75,7 +75,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																	SELF := LEFT),
 											 LEFT OUTER);
 	
-	//get credit sources
+	//get credit sources ('ER', 'Q3', 'RR')
 	sortCreditSrc := SORT(busHeaderFilt(source IN DueDiligence.Constants.CREDIT_SOURCES), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
 	rollCreditSrc := ROLLUP(sortCreditSrc,
 													LEFT.seq = RIGHT.seq AND
@@ -90,13 +90,15 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			
 	projectCreditSrc := PROJECT(rollCreditSrc, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.LayoutsInternalReport.BusSourceLayout) bureauSources},
 																												SELF.bureauSources := DATASET([TRANSFORM(DueDiligence.LayoutsInternalReport.BusSourceLayout,
-																																																	SELF.source := LEFT.source;
+																																																	SELF.source        := LEFT.source;
 																																																	SELF.firstReported := LEFT.dt_first_seen;
-																																																	SELF.lastReported := LEFT.dt_last_seen;
+																																																	SELF.lastReported  := LEFT.dt_last_seen;
 																																																	SELF := [];)])[1];
 																												SELF := LEFT;));
 																																																	
-	rollProjectCreditSrc := ROLLUP(projectCreditSrc,
+	//***Sort the projectCreditSrc results to keep all rows for a LINKID together before you perform the ROLLUP***
+	sortprojectCreditSrc := SORT(projectCreditSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	rollProjectCreditSrc := ROLLUP(sortprojectCreditSrc,
 																	LEFT.seq = RIGHT.seq AND
 																	LEFT.ultID = RIGHT.ultID AND
 																	LEFT.orgID = RIGHT.orgID AND
@@ -111,7 +113,8 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																		SELF.creditSrcCnt := COUNT(RIGHT.bureauSources);
+																		SELF.creditSrcCnt     := COUNT(RIGHT.bureauSources);
+																		SELF.bureauReporting  := RIGHT.bureauSources;                   //***added by Laure
 																		SELF := LEFT),
 													LEFT OUTER);
 
@@ -367,8 +370,9 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(creditSrcTable, NAMED('creditSrcTable'));
 	// OUTPUT(sortCreditSrc, NAMED('sortCreditSrc'));
 	// OUTPUT(rollCreditSrc, NAMED('rollCreditSrc'));
-	// OUTPUT(projectCreditSrc, NAMED('projectCreditSrc'));
+	OUTPUT(projectCreditSrc, NAMED('projectCreditSrc'));
 	// OUTPUT(rollProjectCreditSrc, NAMED('rollProjectCreditSrc'));
+	OUTPUT(addCreditSrcCnt, NAMED('addCreditSrcCnt'));
 	// OUTPUT(addShellSrcCnt, NAMED('addShellSrcCnt'));
 	// OUTPUT(shellSrcTable, NAMED('shellSrcTable'));
 	// OUTPUT(rollShellSrc, NAMED('rollShellSrc'));

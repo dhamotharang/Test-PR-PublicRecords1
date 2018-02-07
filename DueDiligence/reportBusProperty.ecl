@@ -103,7 +103,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 																								                                            /* position 5 through 6 = MM */  
 																								 SELF.PurchaseDetails.PurchaseDate.Month := (unsigned2)le.SaleDate[5..6];
 																								                                            /* position 6 through 8 = DD  */  
-																								 SELF.PurchaseDetails.PurchaseDate.Day   := (unsigned2)le.SaleDate[6..8];
+																								 SELF.PurchaseDetails.PurchaseDate.Day   := (unsigned2)le.SaleDate[7..8];
 																								 SELF.PurchaseDetails.LengthofOwnership  := le.lengthOfOwnership;
 																								 SELF.MostRecentTax.TaxPrice        := le.TaxAssdValue;          //* check this field?  
 																								 SELF.MostRecentTax.TaxYear.Year    := (integer)le.TaxYear;

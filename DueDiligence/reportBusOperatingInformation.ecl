@@ -3,13 +3,13 @@
 EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 													 boolean DebugMode = FALSE
 											     ) := FUNCTION
-													 
-
-
+//****************************Begining of Bureau Reporting ***************************************************************************
+		// ------                                                                                            ------
+		// ------  bureauReporting is a nested DATASET within the Business Internal layout - the BusnData    ------
+		// ------  so don't be confused by the LEFT.bureauReporting - this data will come in on the RIGHT    ------
+		// ------  convert this into a flat/simple dataset before populating the report                      ------
+		// ------                                                                                            ------
 		
-		// ***bureauReporting is a nested DATASET within the Business Internal layout - the BusnData    ***//
-		// *** so don't be confused by the LEFT.bureauReporting - this data will come in on the RIGHT
-		// ***convert this into a flat/simple dataset before populating the report                      ***//
 	 ListOfBusSources := NORMALIZE(BusnData, LEFT.bureauReporting, TRANSFORM(DueDiligence.LayoutsInternalReport.ListOfBusSourceLayout,
                              /*  start by getting all of the operating locations from the Parent  */  																														
 																												 SELF.seq                       := LEFT.seq;
@@ -20,13 +20,6 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 																													SELF                           := RIGHT;
 																													SELF                           := [];)); 
 																													
-	// -----
-	// -----  If you have to go and pull more data for the Reporting sources - now is the time
-	// -----
-	
-	
-	
-	
 	// ------                                                                       ------
  // ------ define the ChildDataset                                               ------
 	// ------                                                                       ------
@@ -35,19 +28,21 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	 DATASET(iesp.duediligencereport.t_DDRReportingSources) ReportingBureausChild;
 	END;
 	
-	
 	// ------                                                                        ------
  // ------ populate the ChildDataset  with the list of Reporting Bureaus         ------
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer burSeq) := TRANSFORM  
-																															SELF.SourceName                       := le.sourceName;                      
+	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
+																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
-																															//***first reported                   
-																															//***last reported
-																														 //SELF                                 := le;
-			                            SELF                                 := [];
+																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY
+																															SELF.FirstReported.Month              := (unsigned2)le.firstreported[5..6];  //MM
+																															SELF.FirstReported.Day                := (unsigned2)le.firstreported[7..8];  //DD
+																															SELF.LastReported.Year                := (unsigned4)le.lastreported[1..4];
+																															SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
+																															SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
+			                            SELF                                  := [];
 				                     END;  
 	 
 
@@ -64,7 +59,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ created child dataset on the RIGHT.                                    ------
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusReportBureauDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfBureauReporting       := +1;
+												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfBureauReporting       := le.creditSrcCnt; 
 									
 														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
 																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingBureaus     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingBureaus  + ri.ReportingBureausChild;
@@ -75,7 +70,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	UpdateReportingSourcesInReport := DENORMALIZE(BusnData, BusReportBureauDataset,
 	                                            LEFT.seq = RIGHT.seq, 
 											                                 CreateNestedData(Left, Right, Counter));  
-		
+	//**********************************End of Bureau Reporting**********************************************************************************************************************	
 			
 		
  //***This section is for Operating Information  ***//
