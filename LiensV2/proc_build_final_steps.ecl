@@ -1,4 +1,4 @@
-
+﻿
 export proc_build_final_steps(filedate)
  :=
   macro
@@ -18,7 +18,7 @@ export proc_build_final_steps(filedate)
 		new_records_sample_for_qa
 		,zRunStatsReference
 		,Stats_For_DR
-		,getretval
+		// ,getretval
 		
 		
 	) : WHEN(event('Yogurt:LIENS BASE BUILD COMPLETE','*'), count(1));
