@@ -2,12 +2,15 @@
 
 EXPORT DueDiligence_Service := MACRO
 
-			requestName := 'DueDiligenceReportRequest';
+			requestName := 'DueDiligenceAttributeRequest';
+			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeRequest;
+			
+			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeResponse;
 	
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
 			
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(iesp.duediligencereport.t_DueDiligenceReportRequest, requestName, FALSE);
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, 'BOTH');
 			
 			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
 			
@@ -22,7 +25,7 @@ EXPORT DueDiligence_Service := MACRO
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
 			
-			finalInd := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.INDIVIDUAL,
+			finalInd := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
 																																DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
 																					
 		
@@ -36,7 +39,7 @@ EXPORT DueDiligence_Service := MACRO
 			busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
 			
-			finalBus := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.BUSINESS,
+			finalBus := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
 																															  DueDiligence.Constants.STRING_FALSE, busIndex, busIndexHits, requestedVersion);
 
 
