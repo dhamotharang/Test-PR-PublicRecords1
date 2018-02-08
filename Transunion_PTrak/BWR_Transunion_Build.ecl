@@ -37,7 +37,7 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 	SEQUENTIAL(
 	   Proc_Spray_Update
 	  ,Proc_Clean_Address
-	   Proc_DID
+	   ,Proc_DID
 	   ,proc_promonitor
 	   ,Proc_delete_persist
 	   ,Proc_clear_superfiles
