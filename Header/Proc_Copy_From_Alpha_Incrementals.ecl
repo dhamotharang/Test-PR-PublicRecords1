@@ -8,11 +8,11 @@ SHARED ifname(string sf) := nothor(STD.File.SuperFileContents(sf)[1].name);
 // construct key names per cluster and type (kNm)        
 SHARED fName(string mid, string kNm) := '~thor_data400::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
 SHARED fName4(string mid, string kNm) := '~thor400_44::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
-SHARED fName6(string mid, string kNm) := '~thor400_60::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
+SHARED fName6(string mid, string kNm) := '~thor400_66::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
 
 // Construct the incremental superfile per cluster
 SHARED currLgInc(string KNm) := '~'+ifname(fName('inc',kNm));
-SHARED currLgInc6(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'thor400_60');
+SHARED currLgInc6(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'thor400_66');
 
 
 // Get the version date for the incrementals from one of the incremental superfiles in Alpharetta
@@ -58,7 +58,7 @@ EXPORT copy_from_alpha := function
     
     // copy files to the respective cluster
     fc(string f1, string f2):= if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true));
-    fc6(string f1, string f2):= if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_60',f2,,,,,true,true,,true));
+    fc6(string f1, string f2):= if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_66',f2,,,,,true,true,,true));
     // fc(string f1, string f2):= STD.File.Copy('~'+f1,'thor400_sta01',f2,aDali,,,,true,,true);
 
     // incremental key prefix
@@ -206,10 +206,12 @@ SHARED orbit_update_entries(string createORupdate) := function
  
 end;
 // run on hthor
-EXPORT Refresh_copy :=  if(true,//not ok_to_copy,output('No copy. see outputs'),
+EXPORT Refresh_copy :=  if(
+                        // true,
+                        not ok_to_copy,output('No copy. see outputs'),
                         sequential(
-            // copy_from_alpha,
-            // update_inc_superfiles()
+            copy_from_alpha,
+            update_inc_superfiles(),
             udops,
             orbit_update_entries('create'),
             orbit_update_entries('update'),
