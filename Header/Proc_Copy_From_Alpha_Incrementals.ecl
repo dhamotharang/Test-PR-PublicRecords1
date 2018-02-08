@@ -1,14 +1,15 @@
 ﻿IMPORT STD,_control,ut,PRTE2_Header,Orbit3,dops,data_services;
 
-EXPORT Proc_copy_From_Alpha_Incrementals := MODULE
+// use test_copy=TRUE to take no action, and just run the report on what action would take place.
+EXPORT Proc_copy_From_Alpha_Incrementals(boolean test_copy=false) := MODULE
 
 // generic function to get the FIRST subfie in the super
 SHARED ifname(string sf) := nothor(STD.File.SuperFileContents(sf)[1].name);
 
 // construct key names per cluster and type (kNm)        
-SHARED fName(string mid, string kNm) := '~thor_data400::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
-SHARED fName4(string mid, string kNm) := '~thor400_44::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
-SHARED fName6(string mid, string kNm) := '~thor400_66::key::insuranceheader_xlink::'+mid+'::did::'+kNm;
+SHARED fName(string mid, string kNm) := '~thor_data400::key::insuranceheader_xlink::'+mid+kNm;
+SHARED fName4(string mid, string kNm) := '~thor400_44::key::insuranceheader_xlink::'+mid+kNm;
+SHARED fName6(string mid, string kNm) := '~thor400_66::key::insuranceheader_xlink::'+mid+kNm;
 
 // Construct the incremental superfile per cluster
 SHARED currLgInc(string KNm) := '~'+ifname(fName('inc',kNm));
@@ -57,42 +58,48 @@ EXPORT copy_from_alpha := function
     get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
     
     // copy files to the respective cluster
-    fc(string f1, string f2):= if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true));
-    fc6(string f1, string f2):= if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_66',f2,,,,,true,true,,true));
-    // fc(string f1, string f2):= STD.File.Copy('~'+f1,'thor400_sta01',f2,aDali,,,,true,,true);
+    fc(string f1, string f2):= sequential(
+           output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+           if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
+
+    fc6(string f1, string f2):= sequential(
+            output(dataset([{f1,'thor400_66',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+            if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_66',f2,,,,,true,true,,true))));
 
     // incremental key prefix
-    aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::did::';
+    aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
 
      _Control.fSubmitNewWorkunit(ecl1,std.system.job.target()) // creates blank segmentation did_ind key
     
-    ,fc(get_alogical(aPref+'refs::address') ,fName(filedate, 'refs::address'))
-    ,fc(get_alogical(aPref+'refs::dln')     ,fName(filedate, 'refs::dln'))
-    ,fc(get_alogical(aPref+'refs::dob')     ,fName(filedate, 'refs::dob'))
-    ,fc(get_alogical(aPref+'refs::lfz')     ,fName(filedate, 'refs::lfz'))
-    ,fc(get_alogical(aPref+'refs::name')    ,fName(filedate, 'refs::name'))
-    ,fc(get_alogical(aPref+'refs::ph')      ,fName(filedate, 'refs::ph'))
-    ,fc(get_alogical(aPref+'refs::relative'),fName(filedate, 'refs::relative'))
-    ,fc(get_alogical(aPref+'refs::ssn')     ,fName(filedate, 'refs::ssn'))
-    ,fc(get_alogical(aPref+'refs::ssn4')    ,fName(filedate, 'refs::ssn4'))
-    ,fc(get_alogical(aPref+'refs::zip_pr')  ,fName(filedate, 'refs::zip_pr'))
-    ,fc(get_alogical(aPref+'sup::rid')     ,fName(filedate, 'sup::rid'))
+    ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedate, '::did::refs::address'))
+    ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedate, '::did::refs::dln'))
+    ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedate, '::did::refs::dob'))
+    ,fc(get_alogical(aPref+'did::refs::lfz')     ,fName(filedate, '::did::refs::lfz'))
+    ,fc(get_alogical(aPref+'did::refs::name')    ,fName(filedate, '::did::refs::name'))
+    ,fc(get_alogical(aPref+'did::refs::ph')      ,fName(filedate, '::did::refs::ph'))
+    ,fc(get_alogical(aPref+'did::refs::relative'),fName(filedate, '::did::refs::relative'))
+    ,fc(get_alogical(aPref+'did::refs::ssn')     ,fName(filedate, '::did::refs::ssn'))
+    ,fc(get_alogical(aPref+'did::refs::ssn4')    ,fName(filedate, '::did::refs::ssn4'))
+    ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedate, '::did::refs::zip_pr'))
+    ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedate, '::did::sup::rid'))
+    ,fc(get_alogical(aPref+'header')             ,fName(filedate, '::idl'))
     
     //copy to other clusters
-    ,fc6(fName(filedate, 'refs::address') ,fName6(filedate, 'refs::address'))
-    ,fc6(fName(filedate, 'refs::dln')     ,fName6(filedate, 'refs::dln'))
-    ,fc6(fName(filedate, 'refs::dob')     ,fName6(filedate, 'refs::dob'))
-    ,fc6(fName(filedate, 'refs::lfz')     ,fName6(filedate, 'refs::lfz'))
-    ,fc6(fName(filedate, 'refs::name')    ,fName6(filedate, 'refs::name'))
-    ,fc6(fName(filedate, 'refs::ph')      ,fName6(filedate, 'refs::ph'))
-    ,fc6(fName(filedate, 'refs::relative'),fName6(filedate, 'refs::relative'))
-    ,fc6(fName(filedate, 'refs::ssn')     ,fName6(filedate, 'refs::ssn'))
-    ,fc6(fName(filedate, 'refs::ssn4')    ,fName6(filedate, 'refs::ssn4'))
-    ,fc6(fName(filedate, 'refs::zip_pr')  ,fName6(filedate, 'refs::zip_pr'))
-    ,fc6(fName(filedate, 'sup::rid')       ,fName6(filedate, 'sup::rid '))
+    ,fc6(fName(filedate, '::did::refs::address') ,fName6(filedate, '::did::refs::address'))
+    ,fc6(fName(filedate, '::did::refs::dln')     ,fName6(filedate, '::did::refs::dln'))
+    ,fc6(fName(filedate, '::did::refs::dob')     ,fName6(filedate, '::did::refs::dob'))
+    ,fc6(fName(filedate, '::did::refs::lfz')     ,fName6(filedate, '::did::refs::lfz'))
+    ,fc6(fName(filedate, '::did::refs::name')    ,fName6(filedate, '::did::refs::name'))
+    ,fc6(fName(filedate, '::did::refs::ph')      ,fName6(filedate, '::did::refs::ph'))
+    ,fc6(fName(filedate, '::did::refs::relative'),fName6(filedate, '::did::refs::relative'))
+    ,fc6(fName(filedate, '::did::refs::ssn')     ,fName6(filedate, '::did::refs::ssn'))
+    ,fc6(fName(filedate, '::did::refs::ssn4')    ,fName6(filedate, '::did::refs::ssn4'))
+    ,fc6(fName(filedate, '::did::refs::zip_pr')  ,fName6(filedate, '::did::refs::zip_pr'))
+    ,fc6(fName(filedate, '::did::sup::rid')      ,fName6(filedate, '::did::sup::rid'))
+    ,fc6(fName(filedate, '::idl')                ,fName6(filedate, '::idl'))
     
     );
 
@@ -101,31 +108,47 @@ return copy_incremental_keys;
 END;
 
 SHARED updateSupers(string kNm,boolean skipIncSFupdate=false):= sequential(
-
-           std.file.startsuperfiletransaction(),
-                      
-           // remove the previous incrementals from the monthly regular lab key qa superfiles
-           if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
-              std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          ),
-
-           if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
-              std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          ),
-
-           if(count(std.file.LogicalFileSuperOwners(currLgInc6(kNm))('~'+name=fName6('qa' ,kNm)))>0,
-              std.file.RemoveSuperFile          (fName6('qa' ,kNm),currLgInc6(kNm))          ),
-
-           // We add both to make sure the monthly
-           // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
-           if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
-           if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
-           if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(fileDate,kNm))),
-           if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName6(fileDate,kNm))),
            
-           // Add the new incrementals to the monthly regular lab keys qa superfiles
-           std.file.AddSuperFile             (fName('qa' ,kNm),fName(filedate,kNm)),
-           std.file.AddSuperFile             (fName4('qa',kNm),fName(filedate,kNm)),
-           std.file.AddSuperFile             (fName6('qa',kNm),fName6(filedate,kNm)),
-           std.file.finishsuperfiletransaction()
+              output(dataset([{'remove',fName('qa' ,kNm),currLgInc(kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'remove',fName4('qa' ,kNm),currLgInc(kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'remove',fName6('qa' ,kNm),currLgInc6(kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              
+              output(dataset([{'remove',fName('inc',kNm),''}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'clear ',fName('inc',kNm),''}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName('inc',kNm),fName(fileDate,kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName('inc',kNm),fName6(fileDate,kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              
+              output(dataset([{'add   ',fName('qa' ,kNm),fName(filedate,kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedate,kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName6('qa' ,kNm),fName6(filedate,kNm)}],{string action, string f1, string f2}),named('action_report'),extend);
+                      
+              if(~test_copy, sequential(
+               std.file.startsuperfiletransaction(),
+                          
+               // remove the previous incrementals from the monthly regular lab key qa superfiles
+               if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
+                  std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          ),
+
+               if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
+                  std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          ),
+
+               if(count(std.file.LogicalFileSuperOwners(currLgInc6(kNm))('~'+name=fName6('qa' ,kNm)))>0,
+                  std.file.RemoveSuperFile          (fName6('qa' ,kNm),currLgInc6(kNm))          ),
+                  
+                  
+               // We add both to make sure the monthly
+               // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
+               if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
+               if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
+               if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(fileDate,kNm))),
+               if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName6(fileDate,kNm))),
+               
+               // Add the new incrementals to the monthly regular lab keys qa superfiles
+               std.file.AddSuperFile             (fName('qa' ,kNm),fName(filedate,kNm)),
+               std.file.AddSuperFile             (fName4('qa',kNm),fName(filedate,kNm)),
+               std.file.AddSuperFile             (fName6('qa',kNm),fName6(filedate,kNm)),
+               std.file.finishsuperfiletransaction()
+              ))
           );
 
 // Remove incrementals from 'qa', update 'inc' superfiles and add new incrementals to the 'qa' superfiles
@@ -133,17 +156,18 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false) := function
 
     return sequential(
 
-     updateSupers('refs::address',skipIncSFupdate)
-    ,updateSupers('refs::dln',skipIncSFupdate)
-    ,updateSupers('refs::dob',skipIncSFupdate)
-    ,updateSupers('refs::lfz',skipIncSFupdate)
-    ,updateSupers('refs::name',skipIncSFupdate)
-    ,updateSupers('refs::ph',skipIncSFupdate)
-    ,updateSupers('refs::relative',skipIncSFupdate)
-    ,updateSupers('refs::ssn',skipIncSFupdate)
-    ,updateSupers('refs::ssn4',skipIncSFupdate)
-    ,updateSupers('refs::zip_pr',skipIncSFupdate)
-    ,updateSupers('sup::rid',skipIncSFupdate)
+     updateSupers('::did::refs::address',skipIncSFupdate)
+    ,updateSupers('::did::refs::dln',skipIncSFupdate)
+    ,updateSupers('::did::refs::dob',skipIncSFupdate)
+    ,updateSupers('::did::refs::lfz',skipIncSFupdate)
+    ,updateSupers('::did::refs::name',skipIncSFupdate)
+    ,updateSupers('::did::refs::ph',skipIncSFupdate)
+    ,updateSupers('::did::refs::relative',skipIncSFupdate)
+    ,updateSupers('::did::refs::ssn',skipIncSFupdate)
+    ,updateSupers('::did::refs::ssn4',skipIncSFupdate)
+    ,updateSupers('::did::refs::zip_pr',skipIncSFupdate)
+    ,updateSupers('::did::sup::rid',skipIncSFupdate)
+    ,updateSupers('::header',skipIncSFupdate)
     
     );
 end;
@@ -207,15 +231,15 @@ SHARED orbit_update_entries(string createORupdate) := function
 end;
 // run on hthor
 EXPORT Refresh_copy :=  if(
-                        // true,
-                        not ok_to_copy,output('No copy. see outputs'),
+                            ~test_copy AND ~ok_to_copy,output('No copy. see outputs'),
                         sequential(
             copy_from_alpha,
             update_inc_superfiles(),
-            udops,
-            orbit_update_entries('create'),
-            orbit_update_entries('update'),
-            _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland')
-
+            if(~test_copy, sequential(
+                udops,
+                orbit_update_entries('create'),
+                orbit_update_entries('update'),
+                _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland')
+            ))
 ));
 END;
