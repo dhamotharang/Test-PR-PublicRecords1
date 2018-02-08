@@ -152,9 +152,7 @@ END;
 
 
 AddinputBack 	:= join(indata, SlimOutBridger, 
-												left.seq = right.blockid, //and  
-											 //(left.fullname = right.ResponseFullName or
-												//(left.firstname = right.entityrecords[1].matches[1].entity.EntityDetails.name.first and left.lastname = right.entityrecords[1].matches[1].entity.EntityDetails.name.last)),
+												left.seq = right.blockid,
 												Addinput(LEFT,RIGHT, counter));
 																							 
 AddinputBackErr := if(count(ErrorRecs) > 0, AddinputBack + SlimOutBridgerError, AddinputBack);   

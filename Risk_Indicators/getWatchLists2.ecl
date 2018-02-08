@@ -186,18 +186,17 @@ pj3 := join(inl, patRolled, left.seq = right.seq,
 
 //*************OFAC VERSION 4 = XG5 BRIDGER SEARCH LOGIC *****************************
 
-OFAC_XG5.Layout.InputLayout XG5prep(inForm le) := TRANSFORM
-
-	search_string := IF(le.name_unparsed<>'',
-												le.name_unparsed,
-												TRIM(le.name_first)+' '+TRIM(le.name_middle)+' '+TRIM(le.name_last));
+OFAC_XG5.Layout.InputLayout XG5prep(inForm le) := TRANSFORM										
 	SELF.seq := le.seq;
 	self.acctno := le.acctno;
-	SELF.FullName := TRIM(search_string,LEFT,RIGHT);
+	self.firstName := trim(le.name_first);
+	self.middleName := trim(le.name_middle);
+	self.lastName := trim(le.name_last);
+	SELF.FullName := IF( le.name_first != '' OR le.name_last != '', '', TRIM(le.name_unparsed,LEFT,RIGHT) );
 		dobTemp := if(le.dob = '', '', le.dob[5..6] + '/' + le.dob[7..8] + '/' + le.dob[1..4]);
 	SELF.DOB := dobTemp;
 	SELF.country := le.country;
-	SELF.searchType := if(trim(search_string) = '', 'E', le.search_type);  // E search type means there is no value in the search string do not call gateway
+	SELF.searchType := if(trim(le.name_first + le.name_middle + le.name_last + le.name_unparsed, ALL) = '', 'E', le.search_type);  // E search type means there is no value in the search string do not call gateway
 	SELF := [];
 	
 END;
@@ -276,7 +275,6 @@ END;
  // *****************XG5 END
  
 WLResults := if(ofac_version = 4, group(AddXG5back,seq), pj3);			
-		
 
 RETURN WLResults;
 
