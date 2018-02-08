@@ -3,12 +3,15 @@
 
 EXPORT DueDiligence_PersonRptService := MACRO
 
-			requestName := 'DueDiligenceReportRequest';
+			requestName := 'DueDiligenceAttributeRequest';
+			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeRequest;
+			
+			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeResponse;
 			
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
 	
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(iesp.duediligencereport.t_DueDiligenceReportRequest, requestName, TRUE);
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.INDIVIDUAL);
 			
 			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
 			
@@ -23,7 +26,7 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
 			
-			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.INDIVIDUAL,
+			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
 																																DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
 
 
