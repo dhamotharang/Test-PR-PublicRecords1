@@ -35,8 +35,8 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 								
 	strata_rep := Transunion_PTrak.strata(update_filedate);
 	SEQUENTIAL(
-	  // Proc_Spray_Update
-	 //  ,Proc_Clean_Address
+	   Proc_Spray_Update
+	  ,Proc_Clean_Address
 	   Proc_DID
 	   ,proc_promonitor
 	   ,Proc_delete_persist
