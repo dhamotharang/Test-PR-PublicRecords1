@@ -5,7 +5,8 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 											     ) := FUNCTION
 //****************************Begining of Bureau Reporting ***************************************************************************
 		// ------                                                                                            ------
-		// ------  bureauReporting is a nested DATASET within the Business Internal layout - the BusnData    ------
+		// ------  In the getBusHeader the bureaus reporting information on this  business is collected.     ------
+		// ------  The bureauReporting is a nested DATASET within the Business Internal layout - the BusnData ------
 		// ------  so don't be confused by the LEFT.bureauReporting - this data will come in on the RIGHT    ------
 		// ------  convert this into a flat/simple dataset before populating the report                      ------
 		// ------                                                                                            ------
@@ -71,6 +72,11 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	                                            LEFT.seq = RIGHT.seq, 
 											                                 CreateNestedData(Left, Right, Counter));  
 	//**********************************End of Bureau Reporting**********************************************************************************************************************	
+		
+		
+	
+	//**********************************End of Other Business Shell Reporting**********************************************************************************************************************	
+			
 			
 		
  //***This section is for Operating Information  ***//
