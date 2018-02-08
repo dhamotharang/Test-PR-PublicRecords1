@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Procedure that takes the two Acquireweb input files, joins them together and
 // determines the AID and DID information
 
@@ -49,6 +49,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF.date_vendor_last_reported  := version;
     SELF.date_first_seen            := if(STD.Str.Contains(L.IndExportDate,'-',true),std.str.filter(L.IndExportDate,'0123456789'),ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.IndExportDate));
     SELF.date_last_seen             := SELF.date_first_seen;
+		SELF.current_rec								:= true;
     SELF.clean_prim_range           := L.aidwork_acecache.prim_range;
     SELF.clean_predir               := L.aidwork_acecache.predir;
     SELF.clean_prim_name            := L.aidwork_acecache.prim_name;
@@ -104,7 +105,8 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 
   // merge the new data with the existing basefile.  Then roll it up on the
   // email and name fields, keeping the pertinent first and last date information
-  mergeddata:=SORT(new_acquireweb_data+Acquireweb_Email.files.file_Acquireweb_Base,email,clean_fname,clean_mname,clean_lname);
+	prev_base := project(Acquireweb_Email.files.file_Acquireweb_Base, transform(layouts.layout_Acquireweb_Base, SELF.current_rec := false, SELF := LEFT));
+  mergeddata:=SORT(new_acquireweb_data+prev_base,email,clean_fname,clean_mname,clean_lname);
   Acquireweb_Email.layouts.layout_Acquireweb_Base rollitup(Acquireweb_Email.layouts.layout_Acquireweb_Base L,Acquireweb_Email.layouts.layout_Acquireweb_Base R):=TRANSFORM
     SELF.date_first_seen:=IF(L.date_first_seen<R.date_first_seen,L.date_first_seen,R.date_first_seen);
     SELF.date_last_seen:=IF(L.date_last_seen>R.date_last_seen,L.date_last_seen,R.date_last_seen);
