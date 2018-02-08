@@ -1032,6 +1032,7 @@
 		export string KEYWORD_MYRMP									:= '720';
 		export string KEYWORD_INMCA_DD2							:= '721';
 		export string KEYWORD_INMCA_SC							:= '722';
+		export string KEYWORD_PHPNP									:= '723';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
