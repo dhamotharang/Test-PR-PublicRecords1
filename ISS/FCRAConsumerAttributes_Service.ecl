@@ -321,8 +321,9 @@ export FCRAConsumerAttributes_Service := MACRO
   clamTestSeeds := ISS.CAR_Test_Seed_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);
 	clamOrSeed(unsigned1 bsversion) := if( TestDataEnabled, group(clamTestSeeds, seq), finalClam(bsversion));										
 
-	bsversion := MAX(attributesIn, attributesIn.bsversion);
-
+ attributesInSorted := sort(attributesIn, -bsversion);	
+	bsversion := attributesInSorted[1].bsversion;	 
+	
 	clamAndSeed := clamOrSeed(bsversion);
 	
 
