@@ -33,9 +33,30 @@
 		
 		file_in := PROJECT(dBatchIn , into(LEFT));
 	 //append did
-  Didville.MAC_DidAppend(file_in, file_w_did, true, '');
+  Didville.MAC_DidAppend(file_in, file_w_did, false, '');
 	
-	 dDids_adl := JOIN(dBatchIn, file_w_did,
+	// getting the highest scored lexid's for each seq
+	 l_w_maxscore := record
+	 
+	 didville.layout_did_outbatch;
+	 boolean ishighestscored_DID := false; 
+	 unsigned max_score := 0;
+	 
+	 end;
+	  
+	 Dids_w_highscore := GROUP(DEDUP(SORT(PROJECT(file_w_did, l_w_maxscore), seq, -score), seq, did), seq);
+	 
+	 l_w_maxscore iteratedid(l_w_maxscore le, l_w_maxscore Ri, integer cnt) := TRANSFORM
+	
+	   SELF.max_score := If(cnt = 1 , ri.score, le.score);
+	   SELF.ishighestscored_DID := cnt = 1 OR le.max_score = ri.score;
+	   SELF := ri;
+	
+	 END;
+	 
+	dDids_iterate := ITERATE(Dids_w_highscore, iteratedid(LEFT, RIGHT, COUNTER));
+	
+	 dDids_adl := JOIN(dBatchIn, dDids_iterate(ishighestscored_DID),
 			LEFT.seq = RIGHT.seq,
 			TRANSFORM(lBatchInDID,
 				SELF.acctno		:= LEFT.acctno,
@@ -63,6 +84,6 @@
 				SELF.did_count 	:= RIGHT.did_count,
 				SELF						:= LEFT),
 			LEFT OUTER,ALL);
-			
+	
 		RETURN dWithDIDs;
 END;

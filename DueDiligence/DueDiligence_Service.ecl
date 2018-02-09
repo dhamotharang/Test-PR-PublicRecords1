@@ -2,12 +2,15 @@
 
 EXPORT DueDiligence_Service := MACRO
 
-	UNSIGNED1 NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 19;
-	UNSIGNED1 NUMBER_OF_BUSINESS_ATTRIBUTES := 23;
-
-	//The following macro defines the field sequence on WsECL page of query.
- WSInput.MAC_DueDiligence_Service();
+			requestName := 'DueDiligenceAttributeRequest';
+			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeRequest;
+			
+			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeResponse;
 	
+			//The following macro defines the field sequence on WsECL page of query.
+			WSInput.MAC_DueDiligence_Service(requestName);
+	
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, 'BOTH');
 	//Get debugging indicator
 	debugIndicator := FALSE : STORED('debugMode');
 	intermediates := FALSE : STORED('intermediateVariables');
@@ -156,6 +159,8 @@ EXPORT DueDiligence_Service := MACRO
 	consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, includeReport, displayAttributeText, debugIndicator);
 		
 		
+			finalInd := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
+																																DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
 	
 	
 	
@@ -212,15 +217,8 @@ EXPORT DueDiligence_Service := MACRO
 	indIndex := NORMALIZE(UNGROUP(consumerResults), NUMBER_OF_INDIVIDUAL_ATTRIBUTES, createIndIndex(LEFT, COUNTER));
 	indIndexHits := NORMALIZE(consumerResults, NUMBER_OF_INDIVIDUAL_ATTRIBUTES, createIndHit(LEFT, COUNTER));
 	
-	iesp.duediligencereport.t_DueDiligenceReportResponse IntoConsumerAttributes(layout_acctseq le, DueDiligence.Layouts.Indv_Internal ri ) := TRANSFORM
-    	SELF.result.uniqueID := (STRING)ri.individual.did;
-			SELF.Result.InputEcho := le.reportBy;	
-			SELF.Result.AttributeGroup.attributes :=  indIndex;
-			SELF.Result.AttributeGroup.AttributeLevelHits := indIndexHits;
-			SELF.Result.AttributeGroup.Name := requestedVersion;
-		  SELF := le;
-			SELF := [];
-	END;
+			finalBus := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
+																															  DueDiligence.Constants.STRING_FALSE, busIndex, busIndexHits, requestedVersion);
 	
 	IndAttributes := JOIN(wseq, consumerResults,
 													 LEFT.seq = RIGHT.seq,
@@ -358,4 +356,3 @@ ENDMACRO;
 	<part name="debugmode" sequence="7" type="xsd:boolean"/>
 	<part name="intermediatevariables" sequence="8" type="xsd:boolean"/>
 </message>
-*/

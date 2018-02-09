@@ -20,7 +20,7 @@
 import FaaV2_PilotServices, iesp, AutoStandardI, fcra, FFD;
 
 export SearchServiceFCRA := macro
-
+  #onwarning(4207, ignore);
   #constant('NoDeepDive', true);
   
   rec_in := iesp.faapilot_fcra.t_FCRAPilotSearchRequest;
@@ -60,8 +60,7 @@ export SearchServiceFCRA := macro
    
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(pilot_res.Records, results, iesp.faapilot_fcra.t_fcraPilotSearchResponse);
      
-  FFD.MAC.AppendConsumerStatements(results, results_with_statements, pilot_res.Statements, iesp.faapilot_fcra.t_fcraPilotSearchResponse);
-  FFD.MAC.AppendConsumerAlerts(results_with_statements, results_out, pilot_res.ConsumerAlerts, iesp.faapilot_fcra.t_fcraPilotSearchResponse);                                               
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_out, pilot_res.Statements, pilot_res.ConsumerAlerts, iesp.faapilot_fcra.t_fcraPilotSearchResponse);                                               
    
   output(results_out, named('Results'));      
   

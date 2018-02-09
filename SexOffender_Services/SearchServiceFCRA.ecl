@@ -66,6 +66,7 @@ import AutoStandardI, iesp, ut, Address, FFD;
 
 export SearchServiceFCRA := macro
 
+  #onwarning(4207, ignore);
   boolean isFCRA := true;
   #constant('NoDeepDive', true);
   #constant('DidOnly', true); // for picklist
@@ -143,8 +144,7 @@ export SearchServiceFCRA := macro
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.records, results, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse,
                                              Records, false, RecordCount, SearchAroundInput, dsSearchAround);
   
-  FFD.MAC.AppendConsumerStatements(results, results_with_cs, tempresults.Statements, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
-  FFD.MAC.AppendConsumerAlerts(results_with_cs, out_results, tempresults.ConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, tempresults.Statements, tempresults.ConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
                                              
   output(out_results,named('Results'));
 

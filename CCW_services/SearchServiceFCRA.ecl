@@ -11,6 +11,7 @@
 import CCW_services, iesp, AutoStandardI, FCRA , FFD;
 
 EXPORT SearchServiceFCRA := MACRO
+ #onwarning(4207, ignore);
 	#constant('NoDeepDive', true);
 	
 	rec_in := iesp.concealedweapon_fcra.t_FcraWeaponSearchRequest;
@@ -49,8 +50,7 @@ EXPORT SearchServiceFCRA := MACRO
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ccwresults.Records, results, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	
 	
-  FFD.MAC.AppendConsumerStatements(results, results_with_statements, ccwresults.Statements, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
-  FFD.MAC.AppendConsumerAlerts(results_with_statements, results_final, ccwresults.ConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_final, ccwresults.Statements, ccwresults.ConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
 	
 	output(results_final, named('Results'));
 	 

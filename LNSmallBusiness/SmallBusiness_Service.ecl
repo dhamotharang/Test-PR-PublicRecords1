@@ -131,7 +131,7 @@ SmallBusinessRiskRequest XML:
 
 import iesp, Risk_Indicators, Risk_Reporting, Address, Inquiry_AccLogs;
 export SmallBusiness_Service := macro
-
+ #onwarning(4207, ignore);
 	// Can't have duplicate definitions of Stored with different default values, 
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);

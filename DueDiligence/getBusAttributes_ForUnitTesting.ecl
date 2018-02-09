@@ -56,7 +56,7 @@ EXPORT getBusAttributes_ForUnitTesting(DATASET(DueDiligence.Layouts.CleanedData)
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	
-	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options, debugMode);   
+	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
 
 	 
 
@@ -83,7 +83,7 @@ EXPORT getBusAttributes_ForUnitTesting(DATASET(DueDiligence.Layouts.CleanedData)
 
 	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
 
-	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts, debugMode),
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
                                 /* ELSE */
 																                addCounts);
 
