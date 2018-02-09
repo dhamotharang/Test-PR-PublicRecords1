@@ -2,7 +2,6 @@ IMPORT misc, ut, address, lib_stringlib, STD;
 
 EXPORT Proc_Build_VendorSrc(STRING pVersion) := FUNCTION
 
-	OldData							:= Misc.Files_VendorSrc(pVersion).OldData;
 	PrevBase						:= Misc.Files_VendorSrc(pVersion).Combined_Base;
 	NewBank							:= Misc.Files_VendorSrc(pVersion).Bankruptcy;
 	NewLien							:= Misc.Files_VendorSrc(pVersion).Lien;
@@ -321,7 +320,7 @@ EXPORT Proc_Build_VendorSrc(STRING pVersion) := FUNCTION
 		STRING	record_type;									// does not get lost.
 	END;
 
-	HistOldData	:= project ((OldData + PrevBase(input_file_id not in ['PROFLIC','MARI'])),
+	HistOldData	:= project ((PrevBase(input_file_id not in ['PROFLIC','MARI'])),
 														transform({temp_layout},
 															SELF.record_type := 'H',
 															SELF	:= LEFT));

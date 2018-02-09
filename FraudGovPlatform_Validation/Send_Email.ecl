@@ -1,4 +1,4 @@
-export Send_Email(string filedate='',string st='',string fn='', string ut=''):= module
+﻿export Send_Email(string filedate='',string st='',string fn='', string ut=''):= module
 
 	shared UpSt:=stringlib.stringtouppercase(st);
 	shared UpType:=stringlib.stringtouppercase(ut);
@@ -78,31 +78,41 @@ export Send_Email(string filedate='',string st='',string fn='', string ut=''):= 
 								,FraudGovfilesupport
 								);
 
-	export FileValidationReport
+	export FileValidationReport(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType).Validation
 								,'FraudGov Contributory File Validation Report'
-								,InputFileValidationReport(fn).BODY
+								,InputFileValidationReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
 								,FraudGovfilesupport
 								);
 
-	export InvalidDelimiterError
+	export InvalidDelimiterError(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType).Validation
 								,'FraudGov Contributory File Validation Report'
-								,InvalidDelimiterErrorReport(fn).BODY
+								,InvalidDelimiterErrorReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
 								,FraudGovfilesupport
 								);
 
-	export InvalidNumberOfColumns
+	export InvalidNumberOfColumns(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType).Validation
 								,'FraudGov Contributory File Validation Report'
-								,InvalidNumberOfColumnsReport(fn).BODY
+								,InvalidNumberOfColumnsReport(fn,pSeparator,pTerminator).BODY
+								,
+								,
+								,FraudGovfilesupport
+								);
+								
+	export FileValidationMbsReport(string pSeparator, string pTerminator)
+						:= fileservices.sendemail(
+								Mailing_List(UpSt,UpType).Validation
+								,'FraudGov Contributory File Validation Report'
+								,InputFileMbsValidationReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
 								,FraudGovfilesupport
