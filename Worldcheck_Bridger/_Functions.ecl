@@ -1134,6 +1134,7 @@
 				trim(kword, left, right) = 'MYRMP' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYRMP,
 				trim(kword, left, right) = 'INMCA-DD2' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMCA_DD2,
 				trim(kword, left, right) = 'INMCA-SC' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMCA_SC,
+				trim(kword, left, right) = 'PHPNP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPNP,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

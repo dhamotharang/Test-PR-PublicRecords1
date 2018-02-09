@@ -1,5 +1,6 @@
 ﻿import text_search,ln_propertyv2,roxiekeybuild;
 
+//DF-20926 - Build boolean keys with dummy assessment base file w/ 1 record when PropertyV2 delta build creates an empty assessment base file.
 MAC_Setup_InputFile(isFast, useDummyFile):= FUNCTIONMACRO
 
 	#UNIQUENAME(Layout_Property_A_Extract)
@@ -95,4 +96,4 @@ EXPORT Proc_Build_Boolean_Keys(string filedate, boolean isFast) := FUNCTION
 									);
 	return retval;
 	
-	END;
+	END; 
