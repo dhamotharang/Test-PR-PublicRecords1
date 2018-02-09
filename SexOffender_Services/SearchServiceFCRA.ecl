@@ -66,6 +66,7 @@ import AutoStandardI, iesp, ut, Address, FFD;
 
 export SearchServiceFCRA := macro
 
+  #onwarning(4207, ignore);
   boolean isFCRA := true;
   #constant('NoDeepDive', true);
   #constant('DidOnly', true); // for picklist

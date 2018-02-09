@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IngenixProviderReportRequest">
 	<part name="DID" type="xsd:string"/>
   <part name="ProviderID" type="xsd:unsignedInt" required="1"/>
@@ -161,6 +161,7 @@
 import AutoStandardI,ingenix_natlprof,Prof_licensev2_services,doxie_files,doxie,iesp,PersonReports, address,Healthcare_Header_Services,ut;
 
 export Report_Service := macro
+ #onwarning(4207, ignore);
 	myConst := Healthcare_Header_Services.Constants;
 	// get XML input 
 	rec_in := iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportRequest;

@@ -41,7 +41,7 @@
 
 IMPORT  Risk_Reporting, gateway, risk_indicators, Inquiry_AccLogs, STD;
 export RiskwiseMainBC1O := MACRO
-
+#onwarning(4207, ignore);
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('GLBPurpose',RiskWise.permittedUse.fraudGLBA);
