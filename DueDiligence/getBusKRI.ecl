@@ -390,7 +390,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 			
 		
 		
-		/* BUSINESS MATCH LEVEL  */  																																																	 
+		 /* BUSINESS MATCH LEVEL  */  																																																	 
 		 BusMatchLevel_Flag9 := If (le.weight < 80, 'T','F');                            /* Index value of 9 was set */
 		 BusMatchLevel_Flag8 := IF (le.weight BETWEEN 80 AND 84, 'T','F');               /* Index value of 8 was set */
 		 BusMatchLevel_Flag7 := IF (le.weight BETWEEN 85 AND 89, 'T','F');               /* Index value of 7 was set */
@@ -419,7 +419,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		
-			/* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
+		 /* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
 		 BusLegalCriminal_Flag9 := If (le.BEOevidenceOfCurrentIncarceration
 		                               OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
 		 BusLegalCriminal_Flag8 := IF (le.BEOevidenceOfFelonyConvictionInLastNYR, 'T','F');           /* Index value of 8 was set */
@@ -458,7 +458,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		
-/* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
+		 /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
 		 BusLegalTraffInfr_Flag9 := If (le.BEOevidenceOf3TrafficNYR,               'T','F');           /* Index value of 9 was set */
 		 BusLegalTraffInfr_Flag8 := IF (le.BEOevidenceOf2TrafficNYR,               'T','F');           /* Index value of 8 was set */
 		 BusLegalTraffInfr_Flag7 := IF (le.BEOevidenceOf3InfractionsNYR,           'T','F');           /* Index value of 7 was set */
@@ -468,15 +468,15 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalTraffInfr_Flag3 := IF (le.BEOevidenceOf3InfractionsOlderNYR,      'T','F');           /* Index value of 3 was set */
 		 BusLegalTraffInfr_Flag2 := IF (le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 2 was set */
 		 BusLegalTraffInfr_Flag1 := If (~le.BEOevidenceOf3TrafficNYR
-		                           AND ~le.BEOevidenceOf2TrafficNYR
-															              AND ~le.BEOevidenceOf3InfractionsNYR
-															              AND ~le.BEOevidenceOf2InfractionsNYR
-															              AND ~le.BEOevidenceOf3TrafficOlderNYR
-															              AND ~le.BEOevidenceOf2TrafficOlderNYR
-															              AND ~le.BEOevidenceOf3InfractionsOlderNYR
-															              AND ~le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 1 was set */
+																			AND ~le.BEOevidenceOf2TrafficNYR
+																			AND ~le.BEOevidenceOf3InfractionsNYR
+																			AND ~le.BEOevidenceOf2InfractionsNYR
+																			AND ~le.BEOevidenceOf3TrafficOlderNYR
+																			AND ~le.BEOevidenceOf2TrafficOlderNYR
+																			AND ~le.BEOevidenceOf3InfractionsOlderNYR
+																			AND ~le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 1 was set */
 		 
-		 BusLegalTraffInfr_Flag_Concat :=  BusLegalTraffInfr_Flag9 +
+		 BusLegalTraffInfr_Flag_Concat := BusLegalTraffInfr_Flag9 +
 																			BusLegalTraffInfr_Flag8 +
 																			BusLegalTraffInfr_Flag7 +
 																			BusLegalTraffInfr_Flag6 +
@@ -493,38 +493,38 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 self.BusLegalTraffInfr        := (STRING)(10 - STD.Str.Find(BusLegalTraffInfr_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */ /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
 	
 	
-	/* BUSINESS LEGAL EVENTS - CIVIL (LIENS, JUDGEMENTS and EVICTIONS) */ 
-	  totalBusCivilCount     := le.Business.liensUnreleasedCntInThePastNYR + le.Business.evictionsCntInThePastNYR;
+		 /* BUSINESS LEGAL EVENTS - CIVIL (LIENS, JUDGEMENTS and EVICTIONS) */ 
+		 totalBusCivilCount := le.Business.liensUnreleasedCntInThePastNYR + le.Business.evictionsCntInThePastNYR;
 		 BusLegalCivil_Flag9 := IF(totalBusCivilCount >= 10, 'T','F');    
 		 BusLegalCivil_Flag8 := IF(totalBusCivilCount BETWEEN 5 AND 9, 'T','F');   											
 		 BusLegalCivil_Flag7 := IF(totalBusCivilCount BETWEEN 3 AND 4, 'T','F');    										
 		 BusLegalCivil_Flag6 := IF(totalBusCivilCount BETWEEN 1 AND 2, 'T','F'); 
 			
-			totalBusCivilCountOlder := le.Business.liensUnreleasedCnt - le.Business.liensUnreleasedCntInThePastNYR;  													
+		 totalBusCivilCountOlder := le.Business.liensUnreleasedCntOVNYR + le.Business.evictionsCntOVNYR;  													
 		 BusLegalCivil_Flag5 := IF(totalBusCivilCountOlder >= 10, 'T','F');
 		 BusLegalCivil_Flag4 := IF(totalBusCivilCountOlder BETWEEN 5 AND 9, 'T','F'); 						
 		 BusLegalCivil_Flag3 := IF(totalBusCivilCountOlder BETWEEN 3 AND 4, 'T','F'); 										
 		 BusLegalCivil_Flag2 := IF(totalBusCivilCountOlder BETWEEN 1 AND 2, 'T','F'); 
 		 
 		 BusLegalCivil_Flag1 := IF(BusLegalCivil_Flag9 = 'F' 
-		                           AND BusLegalCivil_Flag8 = 'F' 
-															              AND BusLegalCivil_Flag7 = 'F' 
-															              AND BusLegalCivil_Flag6 = 'F'
-															              AND BusLegalCivil_Flag5 = 'F' 
-															              AND BusLegalCivil_Flag4 = 'F' 
-															              AND BusLegalCivil_Flag3 = 'F'
-															              AND BusLegalCivil_Flag2 = 'F', 'T','F');   /* Index value of 1 was set */
+																AND BusLegalCivil_Flag8 = 'F' 
+																AND BusLegalCivil_Flag7 = 'F' 
+																AND BusLegalCivil_Flag6 = 'F'
+																AND BusLegalCivil_Flag5 = 'F' 
+																AND BusLegalCivil_Flag4 = 'F' 
+																AND BusLegalCivil_Flag3 = 'F'
+																AND BusLegalCivil_Flag2 = 'F', 'T','F');   /* Index value of 1 was set */
 		 
-		 BusLegalCivil_Flag_Concat :=  BusLegalCivil_Flag9 +
-																																	BusLegalCivil_Flag8 +
-																																	BusLegalCivil_Flag7 +
-																																	BusLegalCivil_Flag6 +
-																																	BusLegalCivil_Flag5 +
-																																	BusLegalCivil_Flag4 +
-																																	BusLegalCivil_Flag3 +
-																																	BusLegalCivil_Flag2 +
-																																	BusLegalCivil_Flag1;
-		 
+		 BusLegalCivil_Flag_Concat := BusLegalCivil_Flag9 +
+																	BusLegalCivil_Flag8 +
+																	BusLegalCivil_Flag7 +
+																	BusLegalCivil_Flag6 +
+																	BusLegalCivil_Flag5 +
+																	BusLegalCivil_Flag4 +
+																	BusLegalCivil_Flag3 +
+																	BusLegalCivil_Flag2 +
+																	BusLegalCivil_Flag1;
+
 		 BusLegalCivil_Flag0 := IF(STD.Str.Find(BusLegalCivil_Flag_Concat, 'T', 1) = 0, 'T', 'F');       /* Insufficient information reported on the business */
 		 BusLegalCivil_Flag_final := BusLegalCivil_Flag_Concat + BusLegalCivil_Flag0; 
 		
