@@ -151,6 +151,23 @@ EXPORT mac_ListTop3Linkids := MACRO
     'Busn_info.BIP_IDS.UltID.LinkID, Busn_info.BIP_IDS.OrgID.LinkID, Busn_info.BIP_IDS.SeleID.LinkID'
 ENDMACRO;
 
+
+EXPORT mac_JOINLinkids_BusInternal := MACRO
+     'LEFT.seq                             = RIGHT.seq AND '   +
+					'LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultID AND ' +
+					'LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.orgID AND ' + 
+					'LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID'
+ENDMACRO;
+
+
+EXPORT mac_JOINLinkids_Results := MACRO
+     'LEFT.seq     = RIGHT.seq AND '   +
+					'LEFT.ultID   = RIGHT.ultID AND ' +
+					'LEFT.orgID   = RIGHT.orgID AND ' +
+					'LEFT.seleID  = RIGHT.seleID' 
+ENDMACRO;
+
+
 EXPORT mac_calculate_evictions := MACRO
      'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES))'
 ENDMACRO; 
