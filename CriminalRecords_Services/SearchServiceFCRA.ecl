@@ -43,7 +43,7 @@
 import iesp, AutoStandardI, STD;
 
 export SearchServiceFCRA := MACRO
- #onwarning(4207, ignore);
+#onwarning(4207, ignore);
 
 	boolean isFCRA := true;
 	#constant('NoDeepDive', true);
@@ -86,8 +86,7 @@ export SearchServiceFCRA := MACRO
 
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(crim_records, results_pre, iesp.criminal_fcra.t_FcraCriminalSearchResponse);
 
-	FFD.MAC.AppendConsumerStatements(results_pre, results_with_cs, crim_all.Statements, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
-	FFD.MAC.AppendConsumerAlerts(results_with_cs, results, crim_all.ConsumerAlerts, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
+	FFD.MAC.AppendConsumerAlertsAndStatements(results_pre, results, crim_all.Statements, crim_all.ConsumerAlerts, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
 	
 	output(results, named('Results'), all);																	 															
 																 															
