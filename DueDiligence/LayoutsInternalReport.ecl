@@ -89,4 +89,22 @@ EXPORT LayoutsInternalReport := MODULE
 	 DueDiligence.Layouts.BusOperLocationLayout ReportOfOperatingLocs;
 	END;
 	
+	
+	EXPORT BusCorpFilingsSlimLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		  STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
+	   STRING20  FilingType;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp In name type desc.  (example is LEGAL)
+	   STRING20  FilingStatus;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp status desc (example is ACTIVE)
+	   UNSIGNED4 FilingDate;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing date 
+	   UNSIGNED4 IncorporationDate;                            //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc date 
+	   STRING30  FilingNumber;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp sos charter nbr
+	   STRING2   IncorporationState;                             //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
+	END;
+	
+	
+	EXPORT ReportingOfSOSFilingsChildLayout     :=  RECORD 
+	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+	  DATASET(iesp.duediligencereport.t_DDRSOSFiling) BusSOSFilingsChild;   
+ END;	
+	
 END;

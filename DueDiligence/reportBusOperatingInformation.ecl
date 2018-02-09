@@ -34,7 +34,8 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
+	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, 
+	                              SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
 																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
 																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY

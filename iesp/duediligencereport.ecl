@@ -245,7 +245,7 @@ end;
 	// dataset(t_DDRSOSActions) SOSActions {xpath('SOSActions/SOSAction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxActions)};
 // end;
 
-//*****begind temporary layout for SOS Filing
+//*****begin temporary layout for SOS Filing
 export t_DDRSOSFiling := record
 	//integer2 ActiveCount {xpath('ActiveCount')};
 	//integer2 OtherCount {xpath('OtherCount')};
