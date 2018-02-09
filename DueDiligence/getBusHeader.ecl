@@ -358,7 +358,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(indata, NAMED('indata'));
 	// OUTPUT(busHeaderRaw, NAMED('busHeaderRaw'));
 	// OUTPUT(busHeaderSeq, NAMED('busHeaderSeq'));
-	OUTPUT(busHeaderFilt, NAMED('busHeaderFilt'));
+	// OUTPUT(busHeaderFilt, NAMED('busHeaderFilt'));
 	
 	// OUTPUT(rollForDates, NAMED('rollForDates'));
 	// OUTPUT(sortByDates, NAMED('sortByDates'));
@@ -376,8 +376,8 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(sortBusHdrAddr, NAMED('sortBusHdrAddr'));
 	// OUTPUT(dedupSortBusHdrAddr, NAMED('dedupSortBusHdrAddr'));
 	// OUTPUT(filterAddr, NAMED('filterAddr'));
-	 OUTPUT(hdrAddrProject, NAMED('hdrAddrProject'));
-	 OUTPUT(addHdrAddrCount, NAMED('addHdrAddrCount'));
+	 // OUTPUT(hdrAddrProject, NAMED('hdrAddrProject'));
+	 // OUTPUT(addHdrAddrCount, NAMED('addHdrAddrCount'));
 	
 	// OUTPUT(sortByLastSeen, NAMED('sortByLastSeen'));
 	// OUTPUT(rollForStructure, NAMED('rollForStructure'));
@@ -409,7 +409,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(uniquePowsDedup, NAMED('uniquePowsDedup'));
 	
 	// OUTPUT(notFoundInHeader, NAMED('notFoundInHeader'));	
-	 OUTPUT(addNotFound, NAMED('addNotFound'));	
+	 // OUTPUT(addNotFound, NAMED('addNotFound'));	
 
 	
 	
