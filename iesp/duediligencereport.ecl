@@ -237,13 +237,29 @@ export t_DDRSICNAIC := record
 	boolean Automotive {xpath('Automotive')};
 end;
 		
-export t_SOSFiling := record
+// export t_SOSFiling := record
+	// string SOSFilingStatus {xpath('SOSFilingStatus')};
+	// iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
+	// string SOSIncorporationState {xpath('SOSIncorporationState')};
+	// iesp.share.t_Date SOSLastUpdated {xpath('SOSLastUpdated')};
+	// dataset(t_DDRSOSActions) SOSActions {xpath('SOSActions/SOSAction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxActions)};
+// end;
+
+//*****begin temporary layout for SOS Filing
+export t_DDRSOSFiling := record
+	//integer2 ActiveCount {xpath('ActiveCount')};
+	//integer2 OtherCount {xpath('OtherCount')};
+	string BusinessName {xpath('BusinessName')};
+	string FilingType {xpath('FilingType')};
 	string SOSFilingStatus {xpath('SOSFilingStatus')};
+	iesp.share.t_Date FilingDate {xpath('FilingDate')};
+	string FilingNumber {xpath('FilingNumber')};
 	iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
 	string SOSIncorporationState {xpath('SOSIncorporationState')};
 	iesp.share.t_Date SOSLastUpdated {xpath('SOSLastUpdated')};
 	dataset(t_DDRSOSActions) SOSActions {xpath('SOSActions/SOSAction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxActions)};
 end;
+//***end of temporary code for SOS Filing 
 		
 export t_DDRBusinessOperatingInformation := record
 	iesp.share.t_Date FirstReported {xpath('FirstReported')};
@@ -253,7 +269,9 @@ export t_DDRBusinessOperatingInformation := record
 	boolean RegisteredBusiness {xpath('RegisteredBusiness')};
 	integer2 NumberOfSourcesReporting {xpath('NumberOfSourcesReporting')};
 	dataset(t_DDRReportingSources) ReportingSources {xpath('ReportingSources/ReportingSource'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxReportingSources)};
-	dataset(t_SOSFiling) SOSFilingStatuses {xpath('SOSFilingStatuses/SOSFilingStatus'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSOSFilingStatuses)};
+	/*  */ integer2 SOSActiveCount {xpath('SOSActiveCount')};
+	/*  */ integer2 SOSOtherCount {xpath('SOSOtherCount')};
+	/*  */ dataset(t_DDRSOSFiling) SOSFilingStatuses {xpath('SOSFilingStatuses/SOSFilingStatus'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSOSFilingStatuses)};
 	dataset(t_DDRSICNAIC) SICNAICs {xpath('SICNAICs/SICNAIC'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSICNAICs)};
 	dataset(t_DDRComponentsOfBusiness) BusinessNameVariations {xpath('BusinessNameVariations/Variation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
 	string FEIN {xpath('FEIN')};

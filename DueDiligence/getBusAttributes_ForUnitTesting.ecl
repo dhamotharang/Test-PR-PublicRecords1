@@ -1,14 +1,11 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿//***Use this in your BWR for Unit Testing****
+IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
- //*** Under the 3 service framework - the Attributes Only Service will always pass a report flag of FALSE.  
-	//*** The Business Report Service will pass a report flag of TRUE. 
-	
-EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
-																								Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-																								BIPV2.mod_sources.iParams linkingOptions,
-																								BOOLEAN includeReport = FALSE,
-																								BOOLEAN displayAttributeText = FALSE,
-																								BOOLEAN debugMode = FALSE) := FUNCTION
+EXPORT getBusAttributes_ForUnitTesting(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
+												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+												BIPV2.mod_sources.iParams linkingOptions,
+												BOOLEAN includeReport = FALSE,
+												BOOLEAN debugMode = FALSE) := FUNCTION
 
 
 	// ------                                                                                     ------
@@ -43,6 +40,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get attribute data for individuals related to the inquired business
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
+	//***FOR TESTING - pass the debugmode = TRUE ***
 	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
 	
 
@@ -58,7 +56,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	
-	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
+	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options, debugMode);   
 
 	 
 
@@ -73,37 +71,37 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	addrRisk := DueDiligence.getBusAddrData(busSOS, options);  //must be called after getBusSOSDetail & getBusRegistration
 	
 	busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail
-	
-	busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
-
+	//******FOR TESTING ONLY - BEGIN
+	//busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
+  //******FOR TESTING ONLY - END
 
 	//temp code to remove after dataset size selected
-	addCounts := PROJECT(busSicNaic, TRANSFORM(RECORDOF(LEFT),
+	addCounts := PROJECT(busAsInd, TRANSFORM(RECORDOF(LEFT),
 																										SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
 																										SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
-																										SELF.execCount := COUNT(LEFT.execs);
 																										SELF := LEFT;));
 
- 
- 	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
-	
-	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
+	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
+
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts, debugMode),
                                 /* ELSE */
 																                addCounts);
 
+
 	//Populate the index for the customer
-	busKRI := DueDiligence.getBusKRI(addCounts + inquiredBusNoBIP);
+	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);
 
 	
 	
 	
-	/*debugging section */   
-	IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
-	IF(debugMode, OUTPUT(inquiredBusWithBIP, NAMED('inquiredBusWithBIP')));
-	IF(debugMode, OUTPUT(inquiredBusNoBIP, NAMED('inquiredBusNoBIP')));
+	/*debugging section */
+	OUTPUT(debugMode, NAMED('DEBUGMODE'));  
+	//IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
+	//IF(debugMode, OUTPUT(inquiredBusWithBIP, NAMED('inquiredBusWithBIP')));
+ //	IF(debugMode, OUTPUT(inquiredBusNoBIP, NAMED('inquiredBusNoBIP')));
 	
-	IF(debugMode, OUTPUT(busBestData, NAMED('busBestData')));	
-	IF(debugMode, OUTPUT(linkedBus, NAMED('linkedBus')));	
+//	IF(debugMode, OUTPUT(busBestData, NAMED('busBestData')));	
+//	IF(debugMode, OUTPUT(linkedBus, NAMED('linkedBus')));	
 	IF(debugMode, OUTPUT(busExecs, NAMED('busExecs')));
 	IF(debugMode, OUTPUT(relatedBus, NAMED('relatedBus')));
 
@@ -120,11 +118,12 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
 	IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));
 	
-	IF(debugMode, OUTPUT(addrRisk, NAMED('addrRisk')));
+	//IF(debugMode, OUTPUT(addrRisk, NAMED('addrRisk')));
 	IF(debugMode, OUTPUT(busAsInd, NAMED('busAsInd')));
-	IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
+//	IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
 	
 	IF(debugMode, OUTPUT(busKRI, NAMED('busKRI')));
+	
 
 
 	RETURN busKRI;
