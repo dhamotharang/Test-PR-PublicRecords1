@@ -21,35 +21,14 @@
 // inloc - location to run
 // updateflag - 'F' - Full replace; 'D' - Delta Update; 'DR' - Delta Replace
 //							Note: Use Delta Replace when you are replacing a delta version with another delta.
-// tagdelta = allows users to pass "previous/already existing" delta version to tag to the new 
-//						"full" version that is pass in uversion parameter
-//	Example: DOPS.updateversion('ABCKeys','20170516','abc@lexisnexis.com',,'N',,,,,,'F','20170514')
 
-import STD,dops;
-export updateversion(string l_datasetname,string l_uversion,string l_email_t,
-string l_auto_pkg = 'N',string l_inenvment = '',string l_isboolready = 'Y',
-string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_indaliip = '',string l_includeboolean = 'Y', 
-string l_updateflag = 'F',
-string l_tagdelta = '',
-string l_dopsenv = dops.constants.dopsenvironment) := function
-
-	// trim all string variables when a value is passed from a deprecated function/macro
-	// the values are being padded with space
-	string owner := if (length(trim(l_email_t)) < 100,trim(l_email_t), trim(l_email_t)[1..99]);
-	string datasetname := trim(l_datasetname);
-	string uversion := trim(l_uversion);
-	string email_t := trim(l_email_t);
-	string auto_pkg := trim(l_auto_pkg);
-	string inenvment := trim(l_inenvment);
-	string isboolready := trim(l_isprodready);
-	string isprodready := trim(l_isprodready);
-	string inloc := trim(l_inloc);
-	string indaliip := trim(l_indaliip);
-	string includeboolean := trim(l_includeboolean);
-	string updateflag := trim(l_updateflag);
-	string tagdelta := trim(l_tagdelta);
-	string dopsenv := trim(l_dopsenv);
-	string subjectprefixstring := if (dopsenv = 'dev', '**WARNING UPDATING DOPS DEV DB**','');
+import STD,_Control,dops;
+export UpdateDev196Version(string datasetname,string uversion,string email_t,
+string auto_pkg = 'N',string inenvment = '',string isboolready = 'Y',
+string isprodready = 'N',string inloc = 'B',string indaliip = '',string includeboolean = 'Y', 
+string updateflag = 'F',
+string tagdelta = '',
+string dopsenv = dops.constants.dopsenvironment) := function
 
 	emailme_function(string email_t,string datasetname,string cversion, string uversion,
 					string emailmessage) := function
@@ -63,12 +42,9 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 		
 		return fileservices.sendemail(
 												email_t,
-												subjectprefixstring + datasetname + ' DOPS UPDATE ' + newcversion, 
+												datasetname + ' DOPS UPDATE ' + newcversion, 
 												'Dataset: ' + datasetname + '\n' +
-												'Version: ' + uversion + '\n' +
-												'Workunit: ' + WORKUNIT + '\n' +
-												'HPCC Build Owner/User: ' + dops.constants.jobowner + '\n\n' +
-												'DOPS ENVIRONMENT: ' + dopsenv + if (dopsenv = 'dev', '. Updating DOPS DEV DB because the ECL code is running on dev, dops.constants.daliip is pointing to dev dali.', '') + '\n\n' +
+												'Version: ' + uversion + '\n\n' +
 												newemailmessage
 										);
 	end;
@@ -76,7 +52,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 	
 	// email_success := emailme_function(email_t,datasetname,'SUCCESS:'+uversion,uversion,'Build Version updated in Dops');
 	// email_failure := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,failmessage);
-	invalid_date := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today()+':'+inenvment,uversion,'Invalid Build Version');
+	invalid_date := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Invalid Build Version');
 	
 	// update_failed := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dops Update failed, Contact Anantha.Venkatachalam@lexisnexis.com');
 	// zero_rows := emailme_function(email_t,datasetname,'ALERT:'+(string8)STD.Date.Today(),uversion,'No Updates, Invalid dataset name or Same Build version?');
@@ -89,7 +65,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 		string dsname{xpath('dsname')} := datasetname;
 		string dversion{xpath('dversion')} := uversion;
 		string ddatetime{xpath('ddatetime')} := (STRING8)Std.Date.Today()+Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S');
-		string updatedby{xpath('updatedby')} := owner;
+		string updatedby{xpath('updatedby')} := thorlib.jobowner();
 		string pushtoprod{xpath('pushtoprod')} := auto_pkg;
 		string loc{xpath('loc')} := inloc;
 		string envment{xpath('envment')} := inenvment;
@@ -107,13 +83,13 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 	
 	soapresults := SOAPCALL(
 				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H','')),
-				'iUpdateVersion',
+				'UpdateDev196Version',
 				InputRec,
 				outrec,
-				xpath('iUpdateVersionResponse/iUpdateVersionResult'),
+				xpath('UpdateDev196VersionResponse/UpdateDev196VersionResult'),
 				NAMESPACE('http://lexisnexis.com/'),
 				LITERAL,
-				SOAPACTION('http://lexisnexis.com/iUpdateVersion'));
+				SOAPACTION('http://lexisnexis.com/UpdateDev196Version'));
 
 	codeval := emailme_function(email_t,datasetname,soapresults.Code+':'+uversion,uversion,soapresults.description);
 
@@ -121,13 +97,12 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 
 	missingkeys := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Missing Keys:' + builtkeys);
 
-	invaliddaliip := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dali IP Mismatch: lib_thorlib.thorlib.daliServers() = ' + dops.constants.daliip + ' does not match with ' + dops.constants.devdaliip + ' or ' + dops.constants.proddaliip);
 								
-	return if(dops.constants.dopsenvironment <> 'na'
-							,if (builtkeys <> ''
-									,missingkeys
-									,if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date))
-							,invaliddaliip);
+	return //if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
+							if (builtkeys <> '',
+									missingkeys,
+									if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date));/*,
+											output('Not a Prod environment'));												*/	
 
 	
 end;
