@@ -5,7 +5,6 @@
 			Risk_Indicators.Key_Sic_Description
 			Codes.Key_NAICS
 */
-
 EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData) := FUNCTION
 
 
@@ -28,7 +27,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 	naicsOnly := industryRisk(NAICCode <> DueDiligence.Constants.EMPTY);
 																																		
 	//get descriptions
- sicDescriptions := JOIN(sicOnly, Risk_Indicators.Key_Sic_Description,
+	sicDescriptions := JOIN(sicOnly, Risk_Indicators.Key_Sic_Description,
 													LEFT.formattedSicCode = RIGHT.sic_code,
 													TRANSFORM(RECORDOF(LEFT),	
 																		SELF.codeDescription := RIGHT.sic_description; // get desc from key
@@ -107,8 +106,68 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 												
 
 
+	//calculate best sic and naics - taken from Business_Risk_BIP.Business_Shell_Function
+	getBestSicOrNaic(ds, sicNaicFieldName) := FUNCTIONMACRO
+		
+		sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen); //record count??
+		rollCodes := ROLLUP(sortSources,
+												LEFT.seq = RIGHT.seq AND
+												LEFT.ultID = RIGHT.ultID AND
+												LEFT.orgID = RIGHT.orgID AND
+												LEFT.seleID = RIGHT.seleID AND
+												LEFT.source = RIGHT.source AND
+												LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
+												TRANSFORM(RECORDOF(LEFT),
+																	SELF.dateFirstSeen := IF(LEFT.dateFirstSeen > 0 AND RIGHT.dateFirstSeen > 0, MIN(LEFT.dateFirstSeen, RIGHT.dateFirstSeen), MAX(LEFT.dateFirstSeen, RIGHT.dateFirstSeen));
+																	SELF.dateLastSeen := MAX(LEFT.dateLastSeen, RIGHT.dateLastSeen);
+																	SELF := LEFT;));
+																
+		prepBestSicNaic := SORT(rollCodes(isPrimary), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -(source = 'DF'), -(source = 'ER'), -(source = 'Y'), -(source = 'OS'), -(source = 'BR'), -(source = 'FH'), -(source = 'C#'), -(source = 'DN'), -dateLastSeen, -dateFirstSeen); //record count??
+		
+		//grab the 1st row for each inquired business - for which we determined best sic/naic
+		bestSicNaic := DEDUP(prepBestSicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+		
+		RETURN bestSicNaic;
+	ENDMACRO;
 
 
+	bestSic := getBestSicOrNaic(sicDescriptions, sicCode);
+	bestNaic := getBestSicOrNaic(naicDiscriptions, naicCode);
+	
+	//a max of 2 rows - 1 row for each best needs to be rolled up to 1 row to join to the report
+	//need another discription field - existing codeDescription will be for sic, discription2 will be for naics
+	newBestSicNaic := PROJECT(bestSic+bestNaic, TRANSFORM({RECORDOF(LEFT), STRING codeDescription2},
+																												SELF.codeDescription := IF(LEFT.sicCode = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, LEFT.codeDescription);
+																												SELF.codeDescription2 := IF(LEFT.naicCode = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, LEFT.codeDescription);
+																												SELF := LEFT;));
+	
+	sortBest := SORT(newBestSicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	rollBest := ROLLUP(sortBest,
+											LEFT.seq = RIGHT.seq AND
+											LEFT.ultID = RIGHT.ultID AND
+											LEFT.orgID = RIGHT.orgID AND
+											LEFT.seleID = RIGHT.seleID,
+											TRANSFORM(RECORDOF(LEFT),
+																SELF.sicCode := MAX(LEFT.sicCode, RIGHT.sicCode);
+																SELF.codeDescription := MAX(LEFT.codeDescription, RIGHT.codeDescription);
+																SELF.codeDescription2 := MAX(LEFT.codeDescription2, RIGHT.codeDescription2);
+																SELF.naicCode := MAX(LEFT.naicCode, RIGHT.naicCode);
+																SELF := LEFT;));
+																
+	//add best sic and naic to the report
+	addBestSicNaic := JOIN(addIndustryToReport, rollBest,
+													LEFT.seq = RIGHT.seq AND
+													LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
+													LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
+													LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
+													TRANSFORM(DueDiligence.layouts.Busn_Internal,
+																		SELF.businessReport.businessInformation.NaicsCode := RIGHT.naicCode;
+																		SELF.businessReport.businessInformation.NaicsDescription := RIGHT.codeDescription2;
+																		SELF.businessReport.businessInformation.SicCode := RIGHT.sicCode;
+																		SELF.businessReport.businessInformation.SicDescription := RIGHT.codeDescription;
+																		SELF := LEFT),
+													LEFT OUTER);
+	
 
 	// OUTPUT(industryRisk, NAMED('industryRisk'));
 	// OUTPUT(sicOnly, NAMED('sicOnly'));
@@ -118,11 +177,17 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 	// OUTPUT(joinedCodes, NAMED('joinedCodes'));
 	// OUTPUT(sortCodes, NAMED('sortCodes'));
 
-
 	// OUTPUT(industryRiskChild, NAMED('industryRiskChild'));
 	// OUTPUT(addIndustryToReport, NAMED('addIndustryToReport'));
 	
+	// OUTPUT(bestSic, NAMED('bestSic'));
+	// OUTPUT(bestNaic, NAMED('bestNaic'));
+	// OUTPUT(newBestSicNaic, NAMED('newBestSicNaic'));
+	// OUTPUT(sortBest, NAMED('sortBest'));
+	// OUTPUT(rollBest, NAMED('rollBest'));
+	// OUTPUT(addBestSicNaic, NAMED('addBestSicNaic'));
 	
-	RETURN addIndustryToReport;
+	
+	RETURN addBestSicNaic;
 
 END;   

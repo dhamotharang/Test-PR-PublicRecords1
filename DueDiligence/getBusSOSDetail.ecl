@@ -111,8 +111,8 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	addBusnLocCnt := DueDiligence.CommonBusiness.AddOperatingLocations(corpAddrProject, addEverFiled, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
 																						
 	//retrieve SIC and NAIC codes with dates
-	outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allCorpSicNaic := outCorpSic + outCorpNaic;
 	sortCorpRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addBusnLocCnt, allCorpSicNaic);
