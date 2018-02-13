@@ -1,7 +1,7 @@
-/*2017-06-03T01:15:16Z (Judy Tao)
+﻿/*2017-06-03T01:15:16Z (Judy Tao)
 DF-19364
 */
-import _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
+import _control, Doxie, PromoteSupers, RoxieKeyBuild, dops, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
 
 EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 
@@ -59,7 +59,7 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update DOps Page///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	dopsUpdate 		:= Roxiekeybuild.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
+	dopsUpdate 		:= dops.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
 	 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update Orbit///////////////////////////////////////////////////////////////////////////////////////////////

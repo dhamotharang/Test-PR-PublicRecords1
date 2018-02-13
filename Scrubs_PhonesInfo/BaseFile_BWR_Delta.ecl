@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Delta - Finding the Delta of Two Files - SALT V3.8.0');
+#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Delta - Finding the Delta of Two Files - SALT V3.8.2');
 IMPORT Scrubs_PhonesInfo,SALT38;
 d := Scrubs_PhonesInfo.BaseFile_Delta(File1,File2); // Instantiate delta module
 OUTPUT(d.DifferenceSummary,NAMED('Summary'),ALL);
