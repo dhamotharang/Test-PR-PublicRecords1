@@ -735,12 +735,12 @@ EXPORT Common := MODULE
 	EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION
 		
 		execOffenses := NORMALIZE(relatedParty, LEFT.party.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
-																																																																															SELF.ultID := LEFT.UltID;
-																																																																															SELF.orgID := LEFT.OrgID;
-																																																																															SELF.seleID := LEFT.SeleID;
-																																																																															SELF.offense := RIGHT;
-																																																																															SELF := LEFT;
-																																																																															SELF := [];));	
+																																								SELF.ultID := LEFT.UltID;
+																																								SELF.orgID := LEFT.OrgID;
+																																								SELF.seleID := LEFT.SeleID;
+																																								SELF.offense := RIGHT;
+																																								SELF := LEFT;
+																																								SELF := [];));	
 																													
 		RETURN execOffenses;
 	END;

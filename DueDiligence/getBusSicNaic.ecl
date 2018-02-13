@@ -373,11 +373,11 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(allCodes, NAMED('sn_allCodes'));
 	// OUTPUT(uniqueIndustriesSort, NAMED('sn_uniqueIndustriesSort'));
 	// OUTPUT(uniqueIndustries, NAMED('sn_uniqueIndustries'));
-	OUTPUT(addIndustry, NAMED('addIndustry'));
+	// OUTPUT(addIndustry, NAMED('addIndustry'));
 	// OUTPUT(dedupUniqueCodes, NAMED('sn_dedupUniqueCodes'));
-	OUTPUT(rollUniqueCodes, NAMED('sn_rollUniqueCodes'));
-	OUTPUT(addUniqueSicNaics, NAMED('sn_addUniqueSicNaics'));
-	OUTPUT(addReport, NAMED('sn_addReport'));
+	// OUTPUT(rollUniqueCodes, NAMED('sn_rollUniqueCodes'));
+	// OUTPUT(addUniqueSicNaics, NAMED('sn_addUniqueSicNaics'));
+	// OUTPUT(addReport, NAMED('sn_addReport'));
 	
 	
 

@@ -190,7 +190,9 @@ EXPORT CommonBusiness := MODULE
 		
 		results := IF(IsSicField, filterSic, filterNaic);
 
-	RETURN results;
+		RETURN results;
+	
+	ENDMACRO;
 	
 	EXPORT GetCleanBIPShell(DATASET(DueDiligence.Layouts.CleanedData) cleanInput) := FUNCTION
 
@@ -509,9 +511,7 @@ EXPORT CommonBusiness := MODULE
 																						SELF.SOSAddrLocationCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, RIGHT.addrCount, LEFT.SOSAddrLocationCount);
 																						SELF.operatingLocations := RIGHT.locAddrs[1..DueDiligence.Constants.MAX_OPERATING_LOCATIONS];
 																						SELF := LEFT;),
-																	LEFT OUTER);
-																	
-	//OUTPUT(rollAddr, NAMED('rollAddr'));																
+																	LEFT OUTER);														
 																	
 		RETURN addOperatingLocations;
 	END;

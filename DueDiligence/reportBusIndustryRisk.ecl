@@ -5,6 +5,7 @@
 			Risk_Indicators.Key_Sic_Description
 			Codes.Key_NAICS
 */
+
 EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData) := FUNCTION
 
 

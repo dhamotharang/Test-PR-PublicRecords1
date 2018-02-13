@@ -1,8 +1,8 @@
 ﻿
-
-EXPORT RegularExpressions(STRING textToSearch) := MODULE
+EXPORT RegularExpressions(STRING textToSearch, STRING offenseScore) := MODULE
 
 		SHARED trimTextToSearch := TRIM(textToSearch, LEFT, RIGHT);
+		SHARED offenseScoreIsTraffic := TRIM(offenseScore, LEFT, RIGHT) = DueDiligence.Constants.TRAFFIC;
 		
 		//List of expressions
 		SHARED EXPRESSION_CORRUPT_BRIBE := '^(?=.*(CORRUPT|BRIB))(?!.*(DISTRIBUTE|MINOR)).*';
@@ -10,12 +10,12 @@ EXPORT RegularExpressions(STRING textToSearch) := MODULE
 		SHARED EXPRESSION_ORGANIZED_CRIME := '^(?=.*(ORG))(?=.*(CRIM|THEFT))(?!.*(FORG|RETAIL)).*'; 
 		SHARED EXPRESSION_TERROR := '^(?=.*(TERROR(?!IZE)))(?!.*(KIDNAP)).*';
 		SHARED EXPRESSION_FRAUD := '((DE)?FRAUD)';
-		SHARED EXPRESSION_ID_THEFT := '((\\b(?=(ID(ENTITY)?))[\\w]*\\b)+(\\b(?=.*(TH(E)?FT|FRAUD|ST(EA)?L))[\\w]*\\b)+).*$';   
+		SHARED EXPRESSION_ID_THEFT := '^(?=.*\\b(ID(ENTITY)?)\\b)(?=.*\\b(THE?FT|FRAUD|ST(EA)?L)).*$';  	//'((\\b(?=(ID(ENTITY)?))[\\w]*\\b)+(\\b(?=.*(TH(E)?FT|FRAUD|ST(EA)?L))[\\w]*\\b)+).*$';   
 		SHARED EXPRESSION_COUNTERFEIT := '(COUNTER)';
 		SHARED EXPRESSION_CHECK_FRAUD := '((CHECK|CHK|CHEC)|((WORTH|BAD|FRA|BOGUS).*(CK)))';
 		SHARED EXPRESSION_FORGERY := '(FORGE)';
 		SHARED EXPRESSION_EMBEZZLEMENT := '(EMBEZ)';
-		SHARED EXPRESSION_FALSE_PRETENSES := '((PRETENS)|(FAL|FLS)[\\s]*(PRET))';
+		SHARED EXPRESSION_FALSE_PRETENSES := '((\\b(?=(FAL|FLS)))[\\w]*\\b(?=.*(PRET)))|(PRETENs)'; 	//'((PRETENS)|(FAL|FLS)[\\s]*(PRET))';
 		SHARED EXPRESSION_INTERCEPT_COMMUNICATION := '^((?=.*(INTERCEPT))(?!.*(CABLE))).*';
 		SHARED EXPRESSION_WIRE := '^(?=.*(WIRE))(?!.*(COP(PER)?|ELECTRICAL|PIPE|THEFT|DAMAG|CELL|FRAUD|STEAL)).*';
 		SHARED EXPRESSION_INSIDER_TRADING := '(?=.*(DEC|TRADE|MARK))(?=.*(PRAC)).*$';
@@ -57,14 +57,14 @@ EXPORT RegularExpressions(STRING textToSearch) := MODULE
 		SHARED EXPRESSION_RAPE := '^(?=.*(RAPE))(?!.*(STAT)).*';  
 		SHARED EXPRESSION_MOLESTATION := '(MOLEST)';
 
-		SHARED EXPRESSION_AGGRAVATED_ASSAULT_OR_BATTERY := '(?!.*(SEX|sx))(((AGG).*(ASS|BATT|BTRY|ASLT))|(A[\\s]?&[\\s]?B))';  
+		SHARED EXPRESSION_AGGRAVATED_ASSAULT_OR_BATTERY := '(?!.*(SE?X))(((AGG).*(\\bASS|\\bBATT|\\bBTRY|\\bASLT))|(A[\\s]?&[\\s]?B))';			//'(?!.*(SEX|sx))(((AGG).*(ASS|BATT|BTRY|ASLT))|(A[\\s]?&[\\s]?B))';  
 		SHARED EXPRESSION_ASSAULT_WITH_DEADLY_WEAPON := '((ASS).*(DEAD|DANG|WEAP))';
 		SHARED EXPRESSION_ASSAULT := '(?!.*(ASSIST))(\\b((AS((S)|(LT)){1,2}))|BATT|BTRY)';
 		SHARED EXPRESSION_DOMESTIC_VIOLENCE := '(?=.*(DOMESTIC))(?!.*(ANI|SECURITIES|DOMESTICALLY|FOWL|FISH|GAME)).*$';
 		SHARED EXPRESSION_ANIMAL_FIGHTING := '((ANIMA).*(FIGHT))';
 		SHARED EXPRESSION_STALKING_HARASSMENT := '(STALK|HARAS)';
 		SHARED EXPRESSION_CYBER_STALKING := '(CYBER)';
-		SHARED EXPRESSION_VIOLATE_RESTRAINING_ORDER := '((?=(\\bRESTRAIN|\\bPRO)).*(\\bORD))|((?=\\bCIV).*(\\bPRO))';  
+		SHARED EXPRESSION_VIOLATE_RESTRAINING_ORDER := '(((?=.*(\\b(RESTRAIN|PRO)))(?=.*\\bORD))|((?=.*\\bCIV)(?=.*\\bPRO))).*';   // '((?=(\\bRESTRAIN|\\bPRO)).*(\\bORD))|((?=\\bCIV).*(\\bPRO))';  
 		SHARED EXPRESSION_RESISTING_ARREST := '^(?=.*(\\bRESIST|\\bESCAPE|\\bELUDE|\\bFLEE))(?!.*(SEX|RAPE|MV|DWI|DUI|INTOX|DNA)).*'; 
 		SHARED EXPRESSION_PROPERTY_DESTRUCTION := '(?=.*(DESTRU|DESTROY))(?!.*(DEV|ANIM)).*';  
 		SHARED EXPRESSION_VANDALISM := '(?=(\\bVAND)).*';  
@@ -80,7 +80,7 @@ EXPORT RegularExpressions(STRING textToSearch) := MODULE
 		SHARED EXPRESSION_DUI := '(DWI|DUI|((DRIV).*(UND)))';
 		SHARED EXPRESSION_TRESPASSING := '(TRES)';
 		SHARED EXPRESSION_DISORDERLY_CONDUCT := '((DISOR).*(CON))';
-		SHARED EXPRESSION_PUBLIC_INTOXICATION := '((PUB).*(INTOX|CONSU))';
+		SHARED EXPRESSION_PUBLIC_INTOXICATION := '(?=.*(\\b(INTOX|CONSU)))(?=.*\\bPUB).*';		//'((PUB).*(INTOX|CONSU))';
 		
 		//Common routine to determine if the text contains the definition of the expression
 		SHARED doesTextContainExpression(STRING expression) := FUNCTION
@@ -110,7 +110,7 @@ EXPORT RegularExpressions(STRING textToSearch) := MODULE
 		EXPORT foundHijacking := doesTextContainExpression(EXPRESSION_HIJACKING);
 		EXPORT foundChopShop := doesTextContainExpression(EXPRESSION_CHOP_SHOP);
 		
-		EXPORT foundTraffickingOrSmuggling := doesTextContainExpression(EXPRESSION_TRAFFICKING_SMUGGLING);
+		EXPORT foundTraffickingOrSmuggling := IF(offenseScoreIsTraffic, FALSE, doesTextContainExpression(EXPRESSION_TRAFFICKING_SMUGGLING));
 		EXPORT foundExplosives := doesTextContainExpression(EXPRESSION_EXPOSIVES);
 		EXPORT foundWeapons := doesTextContainExpression(EXPRESSION_WEAPONS_OFFENSES);
 		EXPORT foundDrugs := doesTextContainExpression(EXPRESSION_DRUG_OFFENSES);
