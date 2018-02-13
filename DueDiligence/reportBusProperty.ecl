@@ -79,6 +79,9 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 																	SELF := LEFT),
 																	LEFT OUTER);
 												
+	//group slimmed dataset by seq and linkIDs so counter can count per grouping
+	groupSlimBusnOwnedProperty := GROUP(SlimBusnOwnedProperty, PropertyReportData.seq, PropertyReportData.UltID, PropertyReportData.OrgID, PropertyReportData.SeleID );
+	
 	// ------                                                                                    ------
  // ------ define the ChildDataset of Property                                                ------
 	// ------                                                                                    ------
@@ -90,7 +93,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
  // ------                                                                                    ------
  // ------ format the Slim Property into the ChildDataset layout of Property                  ------
 	// ------                                                                                    ------	 
-	iesp.duediligencereport.t_DDRProperty    FormatTheListOfProperty(RECORDOF(SlimBusnOwnedProperty) le, Integer PropertySeq) := TRANSFORM 
+	iesp.duediligencereport.t_DDRProperty    FormatTheListOfProperty(RECORDOF(groupSlimBusnOwnedProperty) le, Integer PropertySeq) := TRANSFORM 
                          SELF.Sequence                      := PropertySeq;
  	                       SELF.OwnerOccupied                 := MAP(
 																								                                            le.OwnerOccupied = 'Y'   => 'Y',
@@ -138,7 +141,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 	 
 	  
 	PropertyChildDataset  :=   
-		PROJECT(SlimBusnOwnedProperty,
+		PROJECT(groupSlimBusnOwnedProperty,
 			TRANSFORM(PropertyChildDatasetLayout,
 				SELF.seq             := LEFT.PropertyReportData.seq,
 				SELF.PropChild       := PROJECT(LEFT, FormatTheListOfProperty(LEFT, COUNTER)))); 

@@ -264,12 +264,13 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
  BusSOSFilingsSlim   := PROJECT (corpFilingsFilt, TRANSFORM(DueDiligence.LayoutsInternalReport.BusCorpFilingsSlimLayout,
                                  SELF.BusinessName        := LEFT.corp_legal_name;
-																                 SELF.FilingType          := LEFT.corp_ln_name_type_desc;
+																                 SELF.FilingType          := LEFT.corp_filing_desc;
 																								         SELF.FilingStatus        := LEFT.corp_status_desc; 
-																												     SELF.FilingDate          := LEFT.corp_filing_date;                    //*** is this always zero?
+																												     SELF.FilingDate          := LEFT.corp_filing_date;                    //*** Zeros if the business was not file with Sec. Of State (SOS).
 																												     SELF.IncorporationDate   := (integer)LEFT.corp_inc_date;
-																														   SELF.FilingNumber        := LEFT.corp_sos_charter_nbr;
+																														   SELF.FilingNumber        := LEFT.corp_filing_reference_nbr;
 																															  SELF.IncorporationState  := LEFT.corp_inc_state;
+																																 SELF.LastSeenDate        := IF(LEFT.dt_last_seen > 0, LEFT.dt_last_seen, LEFT.dt_vendor_last_reported);      //**** This dt_last_seen has been cleaned
 																															  SELF                     := LEFT;));   
  
 	UpdateBusnSOSWithReport  := IF(includeReportData, 
@@ -284,7 +285,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(allBusinesses, NAMED('allBusinesses'));
 	// OUTPUT(corpFilingsRaw, NAMED('corpFilingsRaw'));
 	// OUTPUT(corpFilingsSeq, NAMED('corpFilingsSeq'));
-	OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
+	//OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
 
 	// OUTPUT(incDateSort, NAMED('incDateSort'));
 	// OUTPUT(incDateDedup, NAMED('incDateDedup'));
@@ -294,7 +295,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
 	
 	
-	OUTPUT(projectDates, NAMED('projectDates'));
+	//OUTPUT(projectDates, NAMED('projectDates'));
 	// OUTPUT(lastSeenSort, NAMED('lastSeenSort'));
 	// OUTPUT(rollLastSeen, NAMED('rollLastSeen'));
 	// OUTPUT(addSosStatusDates, NAMED('addSosStatusDates'));
@@ -309,8 +310,8 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	// OUTPUT(addAgents, NAMED('addAgentsSOS'));
 	
-	OUTPUT(BusSOSFilingsSlim, NAMED('BusSOSFilingsSlim'));
-	OUTPUT(UpdateBusnSOSWithReport, NAMED('UpdateBusnSOSWithReport'));
+	//OUTPUT(BusSOSFilingsSlim, NAMED('BusSOSFilingsSlim'));
+	//OUTPUT(UpdateBusnSOSWithReport, NAMED('UpdateBusnSOSWithReport'));
 	
 	
 		
