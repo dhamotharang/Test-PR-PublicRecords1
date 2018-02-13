@@ -221,7 +221,7 @@ run_inputs_set := _control.fSubmitNewWorkunit(
                                                 '#workunit(\'name\',\'Header_Input_Set\');\n'
                                                +'Header.Inputs_Set();'
                                              
-                                             ,'thor400_44');
+                                             ,'thor400_44_eclcc');
 no_update := project(wk_ut.get_DS_Result(workunit,'input_did_NOT_make_prod_yet',recReport),
                      {LEFT.roxie_package_name,LEFT.current_prod_roxie_version,
                                               LEFT.pre_reset_header_building,LEFT.logical_file_name});
