@@ -84,6 +84,7 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 																																																						
 																								typeLevel_2 := expression.foundShoplifting OR
 																																expression.foundAlienOffenses OR
+																																expression.foundTrafficOffenses OR
 																																expression.foundDUI OR
 																																expression.foundTrespassing OR
 																																expression.foundDisorderlyConduct OR
