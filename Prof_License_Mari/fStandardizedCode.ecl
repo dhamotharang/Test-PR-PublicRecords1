@@ -55,7 +55,6 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																			'U' => 'UNKNOWN',
 																			'F' => 'EXAMINATION-FEDERAL',
 																			'X' => 'RECIPROCITY-FEDERAL',
-																			'5' => 'IA RULE 5.3', // valid for IA professional records only
 																			'');
 
 			SELF.DISP_TYPE_DESC			:= CASE(TRIM(le.DISP_TYPE_CD),

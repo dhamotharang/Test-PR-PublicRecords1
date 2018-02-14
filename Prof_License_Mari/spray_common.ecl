@@ -1,4 +1,4 @@
-﻿// spray file from source to destination, create super file in sprayed directory, and link the sprayed file to the super file 
+// spray file from source to destination, create super file in sprayed directory, and link the sprayed file to the super file 
 //#workunit('name','Spray Common');
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 
@@ -17,7 +17,6 @@ EXPORT spray_common := MODULE
 																						map(delim='comma'=>',',
 																								delim='tab'=>'\\t',
 																								delim='percent' =>'%',
-																								delim='semi' => ';',
 																								''),
 																						'\r\n',
 																						'',

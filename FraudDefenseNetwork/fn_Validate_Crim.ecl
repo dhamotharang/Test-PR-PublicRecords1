@@ -1,4 +1,4 @@
-﻿import dops;
+import dops;
 EXPORT fn_Validate_Crim(string filedate) := module 
 #OPTION('outputlimit',100);
 
@@ -9,11 +9,8 @@ cert_version 		:= dops.GetBuildVersion('DOCKeys','B','N','C'); // cert
 
 ds := dataset('~thor_data400::fdn::crim_version',{string version},thor,opt);
 
-ds1 := ds( version = cert_version );
 
-
-
-certAndProdVersionsAreTheSame := (prod_version=cert_version) and (count(ds1) = 0) ;
+certAndProdVersionsAreTheSame := if ( count(ds) > 0 , (prod_version=cert_version) and (cert_version not in Set(ds,version)) , (prod_version=cert_version)) ;
 
 
 build_crim := FraudDefenseNetwork.Build_Base_TextMinedCrim(filedate,,true).all;

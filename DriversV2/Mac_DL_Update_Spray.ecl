@@ -150,7 +150,7 @@ macro
  							 'MA' => output(DriversV2.Cleaned_DL_MA(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),							 
                //New Layout for ME DL includes medical certification data               
 							 'ME_MEDCERT' => output(DriversV2.Cleaned_DL_ME(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),
-						   'MI' => output(DriversV2.Cleaned_DL_MI(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite,__compressed__),
+						   'MI' => output(DriversV2.Cleaned_DL_MI(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),
 						   'MN' => output(DriversV2.Cleaned_DL_MN(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),
 							 'NC' => output(DriversV2.Cleaned_DL_NC(process_dte, filedate,file_type),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),
 							 'NC_CHG' => output(DriversV2.Cleaned_DL_NC(process_dte, filedate,file_type),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite),

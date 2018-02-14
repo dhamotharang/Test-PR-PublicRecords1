@@ -1,4 +1,4 @@
-﻿import dops;
+import dops;
 
 EXPORT fn_Validate_OIG (string filedate) := module 
 #OPTION('outputlimit',100);
@@ -12,10 +12,7 @@ cert_version 		:= dops.GetBuildVersion('OIGKeys','B','N','C'); // cert
 ds := dataset('~thor_data400::fdn::oig_version',{string version},thor,opt);
 
 
-ds1 := ds( version = cert_version );
- 
-
-certAndProdVersionsAreTheSame := (prod_version=cert_version) and (count(ds1) = 0)  ;
+certAndProdVersionsAreTheSame := if ( count(ds) > 0 , (prod_version=cert_version) and (cert_version not in Set(ds,version)) , (prod_version=cert_version)) ;
 
 
 build_oig := FraudDefenseNetwork.Build_Base_OIG(filedate,,true).all;

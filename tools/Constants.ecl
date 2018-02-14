@@ -1,4 +1,4 @@
-﻿import tools,ut;
+import tools,ut;
 export Constants(
 
 	 string					pDatasetName
@@ -8,7 +8,6 @@ export Constants(
 	,boolean				pIsTesting						= Tools._Constants.IsDataland
 	,set of string1	pAutokey_Skipset			= []
 	,string					pAutokey_typestr			= ''
-  ,boolean        pAdd_Eclcc            = false
 
 ) :=
 module, virtual
@@ -39,7 +38,7 @@ module, virtual
 	export statsTemplate					:= lTemplate('stats');
 	export OldFileTemplate				:= lOldTemplate('base'	);
 	export max_record_size				:= pMaxRecordSize				;
-	export Groupname							:= tools.fun_Groupname(pGroupname,,pAdd_Eclcc);
+	export Groupname							:= tools.fun_Groupname(pGroupname);
 	export autokey_buildskipset 	:= pAutokey_Skipset;
 	export ak_skipSet							:= pAutokey_Skipset;
 	export ak_typeStr							:= pAutokey_typestr;

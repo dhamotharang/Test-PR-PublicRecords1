@@ -1,5 +1,3 @@
-﻿//Branch_Git_CodeReview_dev and smyana_branch-2/13/2018 Test
-//**********************$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 /*
 	Franchisee - Frandx:
 	

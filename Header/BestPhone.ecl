@@ -1,8 +1,8 @@
-﻿/*2017-02-28T19:57:11Z (Wendy Ma)
+/*2017-02-28T19:57:11Z (Wendy Ma)
 DF-18485
 */
 // Best phone ... per the header data
-import gong,ut,watchdog,Gong_Neustar;
+import gong,ut,watchdog;
 
 export bestphone(string build_type = '') := function
 
@@ -35,7 +35,7 @@ hi := record
 
 h := table(hin,hi);
 
-g := Gong_Neustar.File_Gong_full (name_last<>'');
+g := gong.File_Gong_full(name_last<>'');
 
 gi := record
   unsigned8 gp := (unsigned8)g.phone10%dig8;

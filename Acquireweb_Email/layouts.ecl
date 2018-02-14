@@ -1,4 +1,4 @@
-﻿EXPORT layouts := MODULE
+EXPORT layouts := MODULE
   IMPORT AID;
 
 	EXPORT layout_Acquireweb_Email_Individuals:=RECORD
@@ -17,8 +17,8 @@
 	END;
 
 	EXPORT layout_Acquireweb_Email_Emails:=RECORD
-		STRING	emailid;
 		STRING	AWID_Email;
+		STRING	emailid;
 		STRING	email;
 		STRING	ACTIVECODE;
 		STRING	EmailExportDate;
@@ -87,6 +87,5 @@
 		STRING8 date_last_seen;
 		STRING8 date_vendor_first_reported;
 		STRING8 date_vendor_last_reported;
-		BOOLEAN current_rec;
 	END;
 END;

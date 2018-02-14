@@ -43,7 +43,7 @@ string Severity := '';
 string Pass_Percentage;
 string Percentage_Error_Min := '';
 string Percentage_Error_Max := '';
-// string ScrubsAlertsPerRelToPopulationMin := ''; Currently in Testing
+string ScrubsAlertsPerRelToPopulationMin := '';
 string Change_To_From_Zero := '';
 end;
 

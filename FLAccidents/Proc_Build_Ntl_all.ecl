@@ -1,4 +1,4 @@
-﻿//Bug # 64084 -- Added promonitor extract 
+//Bug # 64084 -- Added promonitor extract 
 import RoxieKeybuild,ut,FLAccidents_Ecrash;
 export Proc_Build_Ntl_all(string filedate):= function
 
@@ -8,8 +8,7 @@ Spray_NtlCrash := FLAccidents.FLNTLCrash_Spray(false) : success(FileServices.sen
 
 
 build_all := sequential(
-                 ConcatNationalInputfiles
-                 ,Spray_NtlCrash
+                 Spray_NtlCrash
 			          ,FLAccidents_Ecrash.map_basefile_inquiry(filedate)
 			          ,notify('NTLCRU INQ BASE COMPLETE','*')
                  ,build_inq

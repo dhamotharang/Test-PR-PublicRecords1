@@ -35,7 +35,7 @@ export layouts_NMLS0900 := module
 			integer 	BRANCH_NMLS_ID,
 			string500 REGULATOR,
 			string150 DBA,
-			string21	NAME_TYPE,
+			string10	NAME_TYPE,
 	END;
 
 	export  Business := 
@@ -51,10 +51,6 @@ export layouts_NMLS0900 := module
 			string500	FEDREGULATOR,
 			string20	FEDSTATUS,
 			string50	BUSINESS_STRUCTURE,
-			string10 FISCALYEAREND,     //New field
-			string50 FORMEDIN,         //New field 
-			string10 DATEFORMED,         //New field
-			string4 STOCKSYMBOL,       //DF-12096
 	END;
 
 export Business_Lic := 
