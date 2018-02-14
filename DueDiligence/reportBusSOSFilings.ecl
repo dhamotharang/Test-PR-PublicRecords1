@@ -5,7 +5,7 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 											                       ) := FUNCTION
 		
 		
-		
+	// ------ Should these records be sorted/deduped at the full 	
 		
 	// ------                                                                        ------
  // ------ populate the ChildDataset  with the list of Reporting Bureaus         ------
@@ -19,13 +19,12 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																															SELF.SOSFilingStatus                  := le.FilingStatus;
 																															SELF.FilingNumber                     := le.FilingNumber;
 																															SELF.SOSIncorporationState            := le.IncorporationState; 
-																															SELF.FilingDate.Year                  := (unsigned4)le.FilingDate[1..4];  //YYYY
-																														 SELF.FilingDate.Month                 := (unsigned2)le.FilingDate[5..6];  //MM
-																															SELF.FilingDate.Day                   := (unsigned2)le.FilingDate[7..8];  //DD
-																															//SELF.FilingDate.Year                  := (unsigned4)le.FilingDate[1..4];
-																															// SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
-																															// SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
-																															//                                    
+																															SELF.FilingDate.Year                  := (unsigned4)le.FilingDate[1..4];     //** YYYY
+																														 SELF.FilingDate.Month                 := (unsigned2)le.FilingDate[5..6];     //** MM
+																															SELF.FilingDate.Day                   := (unsigned2)le.FilingDate[7..8];     //** DD
+																															SELF.SOSLastUpdated.Year              := (unsigned4)le.LastSeenDate[1..4];   //** YYYY
+																															SELF.SOSLastUpdated.Month             := (unsigned2)le.LastSeenDate[5..6];   //** MM
+																															SELF.SOSLastUpdated.Day               := (unsigned2)le.LastSeenDate[7..8];   //** DD 
 			                            SELF                                  := [];
 				                     END;  
 	 

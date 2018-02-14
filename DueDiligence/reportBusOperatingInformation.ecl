@@ -72,9 +72,9 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	UpdateBureauSourcesInReport := DENORMALIZE(BusnData, BusReportBureauDataset,
 	                                            LEFT.seq = RIGHT.seq, 
 											                                 CreateNestedData(Left, Right, Counter));  
-	//**********************************End of Bureau Reporting Sources*************************************************************************	
+	//**********************************End of Credit Bureau Reporting Sources*********************************************************************	
 	
-	//****************************Begining of Business Shell Sources ***************************************************************************
+	//****************************Begining of Non-Credit Bureau Sources ***************************************************************************
 		// ------                                                                                            ------
 		// ------  In the getBusHeader the business Shell reporting information on this  business is collected. ---
 		// ------  The Bus Shell data is a nested DATASET within the Business Internal layout - the BusnData ------
@@ -131,7 +131,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ created child dataset on the RIGHT.                                    ------
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedBSData(UpdateBureauSourcesInReport le, BusShellSourceDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfSourcesReporting       := le.shellHdrSrcCnt; 
+												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfSourcesReporting       := le.nonCreditSrcCnt; 
 									
 														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
 																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingSources     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingSources  + ri.BusShellSourceChild;
@@ -144,7 +144,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 											                                 CreateNestedBSData(Left, Right, Counter));  	
 		
 	
-	//**********************************End of Other Business Shell Reporting**********************************************************************************************************************	
+	//**********************************End of NON-Credit Sources Reporting**********************************************************************************************************************	
 			
 			
 		

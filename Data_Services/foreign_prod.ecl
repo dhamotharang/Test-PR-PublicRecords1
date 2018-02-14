@@ -1,2 +1,2 @@
-import _control;
+﻿import _control;
 export foreign_prod := '~';

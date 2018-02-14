@@ -1,4 +1,4 @@
-﻿IMPORT iesp, DueDiligence;
+﻿IMPORT iesp, DueDiligence, BIPv2;
 
 EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											   //Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -21,10 +21,6 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 																													SELF                           := RIGHT;
 																													SELF                           := [];)); 
 																													
-	
- 	
-	
- 
  // ------                                                                                     ------
 	// ------ Convert the listOfOperatingLocations into the layout                                ------  
 	// ------    expected by the Common.getGeographicRisk                                         ------
@@ -34,10 +30,6 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 			TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
 			 /* populate the Geographic internal record with address data from the List of Operating Locations  */ 
 						  SELF.seq             := LEFT.seq;
-					//***BEGIN FOR TESTING ONLY ****    *** FORCE IN SOME HIFCA 
-					//   SELF.state           := 'FL';  
-					//	  SELF.county          := '111';   
-					//***END   FOR TESTING ONLY ****
 				    SELF                 := LEFT;
 						  SELF                 := []));  //***all other fields can be empty
 	
@@ -47,8 +39,10 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	// ------                                                                                   ------
 	AddressOperLocGeoRisk   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses, true);  
 	
-	
-	
+	// ------                                                                                   ------
+	// ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------
+	// ------                                                                                   ------
+	groupAddressOperLocGeoRisk := GROUP(AddressOperLocGeoRisk, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	
 	// ------                                                                       ------
  // ------ define the ChildDataset                                               ------
@@ -63,8 +57,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRBusinessAddressRisk  FormatTheListOfOperLoc(AddressOperLocGeoRisk le, Integer OperLocSeq) := TRANSFORM
-	                                                            
+	iesp.duediligencereport.t_DDRBusinessAddressRisk  FormatTheListOfOperLoc(groupAddressOperLocGeoRisk le, Integer OperLocSeq) := TRANSFORM
 																															                              SELF.Sequence                         := OperLocSeq;                      
 																																														               SELF.Address.StreetNumber             := le.prim_range;
 																																																					        SELF.Address.StreetPreDirection       := le.predir;
@@ -105,7 +98,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 
 
 	BusOperLocChildDataset  :=   
-	PROJECT(AddressOperLocGeoRisk,                                  //*** Using this input dataset - these addresses have the geo risk populated  
+	PROJECT(groupAddressOperLocGeoRisk,                                  //*** Using this input dataset - these addresses have the geo risk populated  
 			TRANSFORM(BusOperLocChildDatasetLayout,                       //*** format the data according to this layout.
 				SELF.seq                    := LEFT.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
 				SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER)))); 
@@ -118,7 +111,6 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusOperLocChildDataset ri, Integer BOLCount) := TRANSFORM
 												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessLocations.OperatingLocationCount       := le.hdAddrCount;
-									
 														   //***                                                                                        OperatingLocations is the NESTED CHILD DATASET  
 																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessLocations.OperatingLocations     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessLocations.OperatingLocations  + ri.BusOperLocRiskChild;
 																	SELF := le;

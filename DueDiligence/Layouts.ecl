@@ -666,12 +666,13 @@ EXPORT BusOperLocationLayout := RECORD
 		UNSIGNED4		filingDate;	
 		/*BusPublicRecordAgeRange*/ 	
 		UNSIGNED4 	busnHdrDtFirstSeen;											          //populated in DueDiligence.getBusHeader
-		UNSIGNED3 	srcCount;																               //populated in DueDiligence.getBusHeader
+		UNSIGNED3 	srcCount;																               //populated in DueDiligence.getBusHeader  This is a count of ALL Sources
+		UNSIGNED3  nonCreditSrcCnt;                         //populated in DueDiligence.getBusHeader  This is a count of ALL Sources minus the Credit Bureaus
 		DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_SOURCES)};
 		/*BusValidityRisk*/
 		UNSIGNED2 	sosAddrLocationCount;										         //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED2 	hdAddrCount;														              //populated in DueDiligence.getBusHeader 
-		UNSIGNED2 	creditSrcCnt;														             //populated in DueDiligence.getBusHeader
+		UNSIGNED2 	creditSrcCnt;														             //populated in DueDiligence.getBusHeader  This is a count of Credit Bureaus
 		BOOLEAN     noFein;																	               //populated in DueDiligence.getBusHeader			
 		BOOLEAN     busRegHit;															              //populated in DueDiligence.getBusRegistration
 		DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
