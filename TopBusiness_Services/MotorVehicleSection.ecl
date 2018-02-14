@@ -1,4 +1,4 @@
-/* TBD:
+﻿/* TBD:
    1. Research/resolve open issues, search on "???"
 */
 IMPORT AutoStandardI, BIPV2, Codes, iesp, MDR, VehicleV2;
@@ -222,7 +222,7 @@ EXPORT MotorVehicleSection := MODULE;
 	// vehiclev2 "party" key with linkids to get all the party/title/registration info 
 	// to be output on the report.
 	ds_mvrparty_keyrecs := join(ds_linkids_keyrecs_tobe_used,
-	                            VehicleV2.Key_Vehicle_Party_Key_Linkids,
+	                            VehicleV2.Key_Vehicle_Party_Key,
 		                            keyed(left.vehicle_key  = right.vehicle_key   and
 														         left.iteration_key = right.iteration_key and
 														         left.sequence_key  = right.sequence_key //???
