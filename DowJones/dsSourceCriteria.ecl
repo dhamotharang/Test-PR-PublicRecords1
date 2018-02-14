@@ -1526,6 +1526,19 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2017/2260 Libya List','1512'},
 {'EU List of Non-cooperative Jurisdictions For Tax Purposes','1513'},
 {'OFAC - Global Magnitsky Human Rights Accountability Act','1514'},
-{'Taiwan Financial Supervisory Commission Insurance Bureau Bulletin Board List','1515'}
-
+{'Taiwan Financial Supervisory Commission Insurance Bureau Bulletin Board List','1515'},
+{'EC (CFSP) 2018/132 Libya List','1516'},
+{'EC (CFSP) 2018/141 Tunisia List','1517'},
+{'EC (CFSP) 2018/16 Democratic People\'s Republic of Korea List','1518'},
+{'EC (CFSP) 2018/89 Democratic People\'s Republic of Korea List','1519'},
+{'EC (CFSP) 2018/90 Venezuela List','1520'},
+{'EC 2018/12 Democratic People\'s Republic of Korea List','1521'},
+{'EC 2018/126 Libya List','1522'},
+{'EC 2018/137 Tunisia List','1523'},
+{U'EC 2018/50 ISIL (D\'esh) and Al-Qaida List','1524'},
+{'EC 2018/87 Democratic People\'s Republic of Korea List','1525'},
+{'EC 2018/88 Venezuela List','1526'},
+{'MOJ (Taiwan) Anti-Money Laundering and Counter Terrorist Financing List','1527'},
+{'Vessels - EC (CFSP) 2018/58 Democratic People\'s Republic of Korea List','1528'},
+{'Vessels - EC 2018/53 Democratic People\'s Republic of Korea List','1529'}
 ],r);
