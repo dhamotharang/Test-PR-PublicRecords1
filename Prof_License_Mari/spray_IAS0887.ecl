@@ -1,11 +1,12 @@
-﻿//Iowa Real Estate Professionals License File
+//Iowa Real Estate Professionals License File
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 
 EXPORT spray_IAS0887(string filedate) := MODULE
 
 	SHARED STRING7 code						:= 'IAS0887';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';
-	SHARED superfile_rel 					:= destination + 'sprayed::' + 'rle';
+  SHARED superfile_rel 					:= destination + 'sprayed::' + 'rle';
+	
 
 clear_super
 	:=
@@ -21,7 +22,7 @@ TransformFile_rel(string filename) := FUNCTION
 	sprayed_file	:= destination + filedate + '::' + StringLib.StringToLowerCase(newname)+ '.raw';
 	
 	dsraw := dataset(sprayed_file,
-										Prof_License_Mari.Layout_IAS0887.real_estate,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\n','\r\n'])));
+										Prof_License_Mari.Layout_IAS0887.real_estate,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\r','\r\n'])));
 					
 	ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_IAS0887.Common,SELF.ln_filedate := filedate; 
 																																				 SELF := LEFT; 

@@ -1,12 +1,11 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT38;
-EXPORT BaseFile_GenerationMod := MODULE(SALT38.iGenerationMod)
- 
+EXPORT BaseFile_GenerationMod := MODULE
+
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.2';
+  EXPORT salt_VERSION := 'V3.8.0';
   EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
- 
+
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_PhonesInfo';
   EXPORT spc_NAMESCOPE := 'BaseFile';
@@ -14,22 +13,10 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT38.iGenerationMod)
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
-  EXPORT spc_CONFIG := 'Config';
-  EXPORT spc_FILEPREFIX := 'In_';
-  EXPORT spc_FILENAME := 'PhonesInfo';
-  EXPORT spc_INGESTSTATUS := '';
-  EXPORT spc_HAS_TWOSTEP := FALSE;
-  EXPORT spc_HAS_PARTITION := FALSE;
-  EXPORT spc_HAS_FIELDTYPES := TRUE;
-  EXPORT spc_HAS_INCREMENTAL := FALSE;
-  EXPORT spc_HAS_ASOF := FALSE;
-  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
-  EXPORT spc_HAS_SUPERFILES := FALSE;
- 
+
   // The entire spec file
   EXPORT spcString :=
-    'options:-gh\n'
-    + 'MODULE:Scrubs_PhonesInfo\n'
+    'MODULE:Scrubs_PhonesInfo\n'
     + 'FILENAME:PhonesInfo\n'
     + 'NAMESCOPE:BaseFile\n'
     + '\n'
@@ -59,7 +46,7 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT38.iGenerationMod)
     + 'FIELD:reply_code:LIKE(Invalid_Num):TYPE(STRING3):0,0\n'
     + 'FIELD:local_routing_number:LIKE(Invalid_Num):TYPE(STRING10):0,0\n'
     + 'FIELD:account_owner:LIKE(Invalid_Char):TYPE(STRING6):0,0\n'
-    + 'FIELD:carrier_name:TYPE(STRING60):0,0\n'
+    + 'FIELD:carrier_name:LIKE(Invalid_Char):TYPE(STRING60):0,0\n'
     + 'FIELD:carrier_category:LIKE(Invalid_Char):TYPE(STRING10):0,0\n'
     + 'FIELD:local_area_transport_area:LIKE(Invalid_Num):TYPE(STRING5):0,0\n'
     + 'FIELD:point_code:TYPE(STRING10):0,0\n'
@@ -105,9 +92,9 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT38.iGenerationMod)
     + 'FIELD:call_forward_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:caller_id:LIKE(Invalid_Char):TYPE(STRING15):0,0\n'
     ;
- 
+
   // Structured values
   EXPORT linkpaths := DATASET([
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
- 
+
 END;

@@ -11,7 +11,6 @@ export _Constants(
 		,pGroupname						:= '66' //use thor400_60 by default for the BIP build
 		,pMaxRecordSize				:= 4096
 		,pIsTesting						:= Tools._Constants.IsDataland
-    ,pAdd_Eclcc           := true
 	))
 	
 end;

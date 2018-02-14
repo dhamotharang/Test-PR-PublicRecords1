@@ -1,9 +1,9 @@
-﻿IMPORT FraudGovPlatform,STD;
-EXPORT InputFileValidationReport(string fname, string pSeparator, string pTerminator):=module
+IMPORT FraudGovPlatform,STD;
+EXPORT InputFileValidationReport(string fname):=module
 
-rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([pSeparator]),quote(''),terminator(pTerminator))));
-dAllRecords := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).ValidationResults:independent;
-RecWithErrors := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).RecordsRejected:independent;
+rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator(['~|~']),quote(''),terminator('~<EOL>~'))));
+dAllRecords := Mod_Stats.ValidateInputFields(fname).ValidationResults:independent;
+RecWithErrors := Mod_Stats.ValidateInputFields(fname).RecordsRejected:independent;
 output(dAllRecords);
 treshld_:=Mod_Sets.threshld;
 
@@ -26,9 +26,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 								,self.TextLine	:=(string7)left.FileState
 															+ (string20)regexfind('([0-9])\\w+',fname, 0)
 															+ (string8)left.seq
-															+ Map(stringlib.stringtouppercase((string35)left.field[1..34]) ='SSN'	=>'SSN:LEXID:DRIVERSLICENSE'
-																	 ,stringlib.stringtouppercase((string35)left.field[1..34]) ='CITY' => 'ADDRESS'
-																	 ,(string35)left.field[1..34])
+															+ (string35)left.field[1..34]
 															+ (string20)left.value[1..19]
 															+ (string10)left.err
 															+ (string10)left.err_cnt
@@ -108,13 +106,20 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 										+ 'E003 = ERROR - INVALID STATE\n'
 										+ 'E004 = ERROR - INVALID VERTICAL TYPE\n'
 										+ 'E005 = ERROR - INVALID PROGRAM\n'
-										+ 'E006 = ERROR - NO IDENTIFICATION PROVIDED (SSN, LEXID, DRIVER LICENSE)\n'						
+										+ 'E006 = ERROR - NO IDENTIFICATION PROVIDED (SSN, LEXID, DRIVER LICENSE)\n'
 										+ '\n'
-										+ 'W002 = WARNING - INVALID ADDRESS\n'													
+										+ 'W001 = WARNING - INVALID SSN\n'
+										+ 'W002 = WARNING - INVALID PHONE NUMBER\n'
+										+ 'W003 = WARNING - INVALID DATE\n'
+										+ 'W004 = WARNING - INVALID ZIP CODE\n'
+										+ 'W005 = WARNING - INVALID STATE\n'										
+										+ 'W006 = WARNING - INVALID ADDRESS TYPE\n'
+										
+										
 										
 										;
 
-EXPORT BODY := if(regexfind('inquirylog',fname,nocase),regexreplace('\\_[a-z0-9]*',fname,'',nocase),fname)
+EXPORT BODY := fname
 						+'\n\n'+ HeaderLine1
 						+'\n'+ HeaderLine2
 						+'\n'+ HeaderLine3

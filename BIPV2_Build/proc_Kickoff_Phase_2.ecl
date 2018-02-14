@@ -1,5 +1,5 @@
 ﻿import BizLinkFull;
-import BIPV2_Testing,wk_ut,tools,_Control;
+import BIPV2_Testing,wk_ut,tools;
 
 EXPORT proc_Kickoff_Phase_2(
    pversion               
@@ -22,7 +22,6 @@ EXPORT proc_Kickoff_Phase_2(
 ) := 
 functionmacro
 
-  import _Control;
   ecl		  := '#workunit(\'name\',\'BIPV2_Build.proc_Build_Phase_2 @version@ ' + pUniqueOutput + '\');\n#workunit(\'priority\',\'high\');\n' 
   // + 'output(\'<a href="http://' + wk_ut._Constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
   + 'BIPV2_Build.proc_Build_Phase_2('
@@ -41,7 +40,7 @@ functionmacro
   + ',@pSkipSeleidRelative@\n'
   + ');';
   
-  cluster := _Control.Config.LocalHthor;//(tools._constants.IsDataland ,'infinband_hthor'  ,'hthor');// tools.fun_Groupname('20',false);
+  cluster := if(tools._constants.IsDataland ,'infinband_hthor'  ,'hthor');// tools.fun_Groupname('20',false);
   
   fbool(boolean pinput) := if(pinput = true,'true','false');
   

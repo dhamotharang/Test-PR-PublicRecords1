@@ -1,10 +1,6 @@
-﻿import _Control,tools,STD,FraudGovPlatform;
+import _Control,tools,STD,FraudGovPlatform;
 
-EXPORT SprayAndQualifyInput(string version,
-	string ip = FraudGovPlatform_Validation.Constants.LandingZoneServer,
-	string rootDir = FraudGovPlatform_Validation.Constants.LandingZonePathBase, 
-	string destinationGroup = if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30')) := function
-
+EXPORT SprayAndQualifyInput(string version,string ip,string rootDir, string destinationGroup) := function
 
 ready    := rootDir+'ready/';
 done     := rootDir+'done/';
@@ -13,7 +9,7 @@ spraying := rootDir+'spraying/';
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, ready, '*.dat')):independent;
 dsFileListSorted := sort(dsFileList,modified);
-fname	:=dsFileListSorted[1].Name:independent;
+fname:=dsFileListSorted[1].Name:independent;
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := map(
 						 STD.Str.Contains( fname, 'IdentityData'	, true	) => 'IDENTITYDATA'
@@ -45,7 +41,7 @@ SprayIt:=sequential(
 						,nothor(FileServices.SprayVariable(
 							 IP //sourceIP 
 							,spraying + fname //sourcepath 
-							,5000000000//maxrecordsize 
+							,//maxrecordsize 
 							,//srcCSVseparator 
 							,'~<EOL>~,\n'//srcCSVterminator 
 							,//srcCSVquote 
@@ -61,20 +57,21 @@ SprayIt:=sequential(
 						);	
 								
 // Validate delimiters
-ValidateDelimiter :=Mod_stats.ValidateDelimiter(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
+ValidateDelimiter :=Mod_stats.ValidateDelimiter(fname).ValidationResults;
 InvalidDelimiterFound 		:=exists(ValidateDelimiter(err='F1'));
 
 // Validate number of Columns
-ValidateColumns 	:=Mod_stats.ValidateNumberOfColumns(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
+ValidateColumns 	:=Mod_stats.ValidateNumberOfColumns(fname).ValidationResults;
 InvalidNumberOfColumnsFound :=exists(ValidateColumns(err='F2'));
 
 // ValidateInputFields
 																										
 treshld_  		:=	Mod_Sets.threshld;							
-FileStats			:=	Mod_Stats.ValidateInputFields(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
-RecWithErrors := 	Mod_Stats.ValidateInputFields(fname,mod_sets.validDelimiter, mod_sets.validTerminators).RecordsRejected;
+FileStats			:=	Mod_Stats.ValidateInputFields(fname).ValidationResults;
+RecWithErrors := 	Mod_Stats.ValidateInputFields(fname).RecordsRejected;
 
-ExcessiveInvalidRecordsFound:= exists(FileStats(err[1]='E',RecWithErrors/RecordsTotal>treshld_));
+ExcessiveInvalidRecordsFound:=exists(FileStats(err[1]='E',RecWithErrors/RecordsTotal>treshld_));
+
 					
 MoveToPass:=sequential(
 										 output('File '+fname+' content accepted',named('File_content_accepted'))
@@ -83,7 +80,7 @@ MoveToPass:=sequential(
 													 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
 													,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
 										 )
-										,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators)
+										,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport
 						);
 															
 MoveToReject:=sequential(
@@ -91,24 +88,22 @@ MoveToReject:=sequential(
 											,MoveSprayingToError
 											,map(
 														 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
-														,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
-											 ));	
-											 
+														,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed))
+											 );											
 							
 ReportExcessiveInvalidRecords := 	sequential (
 										  MoveToReject
-										 ,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators)
+										 ,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport
 								);
 
-								
 ReportInvalidDelimiter := sequential (
 				 MoveToReject
-				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators)
+				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidDelimiterError
 		);
 
 ReportInvalidNumberOfColumns := sequential (				
 				 MoveToReject
-				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators)
+				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns
 		);
 
 ReportEmptyFile := sequential (

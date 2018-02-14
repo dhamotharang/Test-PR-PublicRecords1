@@ -27,16 +27,7 @@ module
 		
 	shared trimids(string pid) := trim(pid,left,right);
 	
-	// -- ZOOM vendor_id's that will be filtered from Business contacts and PAW files for the below bug tickets.
-	// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
-	// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
-	// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
-	// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
-	// -- JIRA - DF-20268 - ZOOM Paw record to be removed
-	// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
-	// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
-	// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
-	// -- JIRA - DF-21021 - Wrongly Linked Zoom Record-LexID 257274842 Consumer Advocacy
+	// -- ZOOM vendor_id's that will be filtered from Business contacts and PAW files.
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -49,8 +40,7 @@ module
 																'1149525038   C37536530',
 																'1665485437   C37536530',
 																'2083107149    C107741806',
-																'2061716462    C344399990',
-																'3941486       C275579153'
+																'2061716462    C344399990'
 															 ];
 	
 	export Input :=
@@ -180,12 +170,7 @@ module
 												and l.fein					= 430915544 
 												;				
 				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
-				filter_DF8591 := trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159
-												;				
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 :=	mdr.sourcetools.SourceIsDunn_Bradstreet(l.source) 
-													and trim(l.vendor_id) = '140700316'	and l.phone	= 7707819312
-													and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
+				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 
 												;				
 				// JIRA: DF-20009 - Remove FEIN 32-0153283 from BDID 004315292869 Carriage House
 				filterbugDF20009 := trimids(l.vl_id) in ['12-M17000000132'] 
@@ -212,7 +197,7 @@ module
 				self.geo_lat			:= if(filterbug24219,'29.756396'	,l.geo_lat				);
 				self.geo_long			:= if(filterbug24219,'-095.364044',l.geo_long				);
 				self.phone				:= map(	 filterbug24219 => 7135126200
-																	,filterbug25304 or filterbug71237 or filter_DF8591 or filter_DF21083 => 0																	
+																	,filterbug25304 or filterbug71237 or filter_DF8591 => 0																	
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
@@ -401,7 +386,14 @@ module
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
 				// -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
 				or  (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P'])
-				// -- ZOOM vendor_id's will be filtered from Business contacts and PAW files as per bug tickets listed above.
+				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA - DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -409,8 +401,6 @@ module
 				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 				// -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
 				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
-				// -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -453,21 +443,16 @@ module
 												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
 												and l.company_fein = 320153283
 												;
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 :=	mdr.sourcetools.SourceIsDunn_Bradstreet(l.source) 
-													and trim(l.vendor_id) = '140700316'	and (l.phone	= 7707819312 or l.company_phone = 7707819312)
-													and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-												;
 
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
 				
 				self.phone					:= map(	 (filterbug25304 and l.phone = 2127938763)				
-																		or filterbug71237 or filter_DF21083 => 0					
+																		or filterbug71237 => 0					
 																	,phone				
 																);
 				self.company_phone	:= map(	 (filterbug25304 and l.company_phone = 2127938763)
-																		or filterbug71237 or filter_DF21083 => 0					
+																		or filterbug71237 => 0					
 																	,company_phone				
 																);
 				// -- Bug: 63323 - Address report returns error when address begins with percentage sign
@@ -669,12 +654,6 @@ module
 				
 				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
 				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 ;
-				
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 :=	mdr.sourcetools.SourceIsDunn_Bradstreet(l.source) 
-													and trim(l.vendor_id) = '140700316'	and l.phone	= 7707819312
-													and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-												;	
 
 				phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				// -- Bug: 63323 - Address report returns error when address begins with percentage sign
@@ -694,7 +673,7 @@ module
 				self.geo_lat			:= if(filterbug24219,'29.756396'	,l.geo_lat				);
 				self.geo_long			:= if(filterbug24219,'-095.364044',l.geo_long				);
 				self.phone				:= map(	 filterbug24219 => 7135126200
-																	,filterbug25304 or filterbug71237 or filter_DF8591 or filter_DF21083 => 0					
+																	,filterbug25304 or filterbug71237 or filter_DF8591 => 0					
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
@@ -935,7 +914,14 @@ module
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
 				// -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
 				or  (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P'])
-				// -- ZOOM vendor_id's will be filtered from Business contacts and PAW files as per bug tickets listed above.
+				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -943,8 +929,6 @@ module
 				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 				// -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
 				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
-				// -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1013,12 +997,6 @@ module
 												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
 												and l.company_fein = 320153283
 												;
-			
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 :=	mdr.sourcetools.SourceIsDunn_Bradstreet(l.source) 
-													and trim(l.vendor_id) = '140700316'	and (l.phone	= 7707819312 or l.company_phone = 7707819312)
-													and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-												;
 				
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
@@ -1030,11 +1008,11 @@ module
 				self.prim_name					:= prim_name				;
 				self.company_prim_name	:= company_prim_name;
 				self.phone					:= map(	 (filterbug25304 and l.phone = 2127938763)				
-																		or filterbug71237 or filter_DF21083 => 0					
+																		or filterbug71237 => 0					
 																	,phone				
 																);
 				self.company_phone	:= map(	 (filterbug25304 and l.company_phone = 2127938763)
-																		or filterbug71237 or filterbug36622 or filter_DF21083 => 0					
+																		or filterbug71237 or filterbug36622 => 0					
 																	,company_phone				
 																);
 
@@ -1526,7 +1504,14 @@ module
 				(	mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
 			or // -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
 				(	pInput.did = 1510111650	or (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P']))
-			or // -- ZOOM vendor_id's will be filtered from Business contacts and PAW files as per bug tickets listed above.
+			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -1534,8 +1519,6 @@ module
 				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 			or // -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
 				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
-			or // -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
-			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -1544,10 +1527,6 @@ module
 			transform
 
 				filterbug30999 						:=	l.company_fein in  setbadfeins;
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 						:=	(l.company_phone	= 7707819312 or l.phone = 7707819312)
-																			and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-																			;	
 				self.prim_range						:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_range						);
 				self.predir								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.predir								);
 				self.prim_name						:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_name						);
@@ -1570,8 +1549,8 @@ module
 				self.company_sec_range		:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.company_sec_range		);
 				self.company_zip					:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_zip					);
 				self.company_zip4					:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_zip4					);
-				self.phone								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source) or filter_DF21083	,0	,l.phone								);
-				self.company_phone				:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source) or filter_DF21083	,0	,l.company_phone				);
+				self.phone								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.phone								);
+				self.company_phone				:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_phone				);
 				self.rawaid								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.rawaid								);
 				self.company_rawaid				:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_rawaid				);
 				self.company_fein					:= 	if(filterbug30999,0	,l.company_fein						);
@@ -2035,7 +2014,14 @@ module
 				(	mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
 			or // -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
 				(	pInput.did = 1510111650	or (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P']))
-			or // -- ZOOM vendor_id's will be filtered from Business contacts and PAW files as per bug tickets listed above.
+			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -2043,18 +2029,12 @@ module
 				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 			or // -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
 				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and trim(pInput.phone) = '6123046073')
-			or // -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
-			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = '07503' and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
 			
 			paw.layout.Employment_Out  filterDNBAddressPhone(paw.layout.Employment_Out l) := 
 			transform
-				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
-				filter_DF21083 						:= ((unsigned)l.company_phone	= 7707819312 or (unsigned)l.phone = 7707819312)
-																			and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-																			;	
 				self.prim_range						:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_range						);
 				self.predir								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.predir								);
 				self.prim_name						:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_name						);
@@ -2079,8 +2059,8 @@ module
 				self.company_zip4					:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.company_zip4					);
 				self.rawaid								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.rawaid								);
 				self.company_rawaid				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_rawaid				);
-				self.phone								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.phone								);
-				self.company_phone				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.company_phone				);
+				self.phone								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.phone								);
+				self.company_phone				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.company_phone				);
 				self 											:= l;                                              
 			end;
 			

@@ -41,42 +41,37 @@ EXPORT fSpray_And_Append_New(STRING lzFilePath, STRING fileVersion) := FUNCTION
 																			 Files.Input_Prefix, 
 																		   Files.New_Slim_Suffix, 
 																			 fileVersion, buildNewFileSlim, 3);
-
-	PickOne(STRING s1, STRING s2) := IF(TRIM(s1,left,right)<>'',s1,s2);
 	
 	// Expand the slim dataset to include default columns
 	NewDataExpanded							:= PROJECT(Datasets.New_Slim, 
 																					TRANSFORM(Layouts.Base, 
 																										SELF.persistent_record_id := COUNTER;
 																										
-																										bestHullNumber 	:= PickOne(LEFT.hull_number_Main, LEFT.hull_number_cg);
-																										bestSourceCode 	:= PickOne(LEFT.source_code_Main, LEFT.source_code_CG);
-																										bestHistoryFlag 	:= PickOne(LEFT.history_flag_Main, LEFT.history_flag_Search);
+																										bestHullNumber 	:= IF(LEFT.hull_number_Main<>'', LEFT.hull_number_Main, LEFT.hull_number_cg);
+																										bestSourceCode 	:= IF(LEFT.source_code_Main<>'', LEFT.source_code_Main, LEFT.source_code_CG);
+																										bestHistoryFlag 	:= IF(LEFT.history_flag_Main<>'', LEFT.history_flag_Main, LEFT.history_flag_Search);
 																										today 							:= PRTE2_Common.Constants.TodayString; 
 																										isValidLastReport := LEFT.date_vendor_last_reported<>'' AND STD.Date.IsValidDate((UNSIGNED4) LEFT.date_vendor_last_reported);
 																										bestTodayDate			:= IF(isValidLastReport, LEFT.date_vendor_last_reported, today);
 																										todayLess30				:= ut.date_math(bestTodayDate,-30);
 																										todayLess60				:= ut.date_math(bestTodayDate,-60);
-																										todayLess50				:= ut.date_math(bestTodayDate,-50);																										
 																										todayL30Plus3y		:= ut.date_add('3Y', todayLess30);
-																										BestRegistrationDate := PickOne(LEFT.registration_date, todayLess30);
-																										BestRegistrationExpire := PickOne(LEFT.registration_expiration_date, todayL30Plus3y);
-																										
-																										SELF.Watercraft_key	:= PickOne(LEFT.Watercraft_key, bestHullNumber);
-																										SELF.sequence_key	:= BestRegistrationExpire;		// Data team doesn't fill this
-																										SELF.history_flag_Search	:= PickOne(LEFT.history_flag_Search, bestHistoryFlag);
-																										// SELF.history_flag_Main	:= PickOne(LEFT.history_flag_Main, bestHistoryFlag);
+																																									
+																										SELF.Watercraft_key	:= IF(LEFT.Watercraft_key <> '', LEFT.Watercraft_key, bestHullNumber);
+																										SELF.sequence_key	:= IF(LEFT.sequence_key <> '', LEFT.sequence_key, bestTodayDate);
+																										SELF.history_flag_Search	:= IF(LEFT.history_flag_Search <> '', LEFT.history_flag_Search, bestHistoryFlag);
+																										// SELF.history_flag_Main	:= IF(LEFT.history_flag_Main <> '', LEFT.history_flag_Main, bestHistoryFlag);
 																										SELF.Source_code  	:= bestSourceCode; 
 																										SELF.history_flag 	:= bestHistoryFlag;
 																										SELF.Hull_number  	:= bestHullNumber;
 																										SELF.source_code_CG	:= bestSourceCode;
 																										SELF.source_code_Search	:= bestSourceCode;
-																										SELF.date_first_seen := PickOne(LEFT.date_first_seen, todayLess60);
-																										SELF.date_last_seen := PickOne(LEFT.date_last_seen, BestRegistrationDate);
-																										SELF.registration_date := BestRegistrationDate;
-																										SELF.registration_expiration_date := BestRegistrationExpire;
-																										SELF.date_vendor_first_reported := PickOne(LEFT.date_vendor_first_reported, todayLess50);
-																										SELF.date_vendor_last_reported := PickOne(LEFT.date_vendor_last_reported, bestTodayDate);
+																										SELF.date_first_seen := todayLess60;
+																										SELF.date_last_seen := todayLess60;
+																										SELF.registration_date := todayLess30;
+																										SELF.registration_expiration_date := todayLess30;
+																										SELF.date_vendor_first_reported := todayL30Plus3y;
+																										SELF.date_vendor_last_reported := bestTodayDate;
 																										
 																										//TODO JAN 2018 - noticed that the DIDs in the old data aren't real - someday fix DIDs
 																										SELF.did_score := IF(TRIM(LEFT.did,left,right)<>'','97','');
@@ -87,15 +82,15 @@ EXPORT fSpray_And_Append_New(STRING lzFilePath, STRING fileVersion) := FUNCTION
 																										SELF.orig_name 		:= origNameCalc;
 																										//Clean name for new records only
 																										// Boca build overwrites all name clean fields when it does a name clean using orig_name, but do it so base file sees it too
-																										cleanedName 				:= Address.CleanPersonFML73_fields(origNameCalc);
-																										SELF.title						:= IF(trim(LEFT.orig_fein) = '',cleanedName.title,'');
-																										SELF.fname						:= IF(trim(LEFT.orig_fein) = '',cleanedName.fname,'');
-																										SELF.mname						:= IF(trim(LEFT.orig_fein) = '',cleanedName.mname,'');
-																										SELF.lname						:= IF(trim(LEFT.orig_fein) = '',cleanedName.lname,'');
-																										SELF.name_suffix		:= IF(trim(LEFT.orig_fein) = '',cleanedName.name_suffix,'');
+																										cleanedName 								:= Address.CleanPersonFML73_fields(origNameCalc);
+																										SELF.title							:= IF(trim(LEFT.orig_fein) = '',cleanedName.title,'');
+																										SELF.fname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.fname,'');
+																										SELF.mname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.mname,'');
+																										SELF.lname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.lname,'');
+																										SELF.name_suffix				:= IF(trim(LEFT.orig_fein) = '',cleanedName.name_suffix,'');
 																										SELF.name_cleaning_score:= IF(trim(LEFT.orig_fein) = '',cleanedName.name_score,'');
 																										// should never happen but may as well...
-																										self.company_name	:= IF(trim(LEFT.orig_fein) != '', origNameCalc,'');
+																										self.company_name				:= IF(trim(LEFT.orig_fein) != '', origNameCalc,'');
 
 																										// Data folks will be filling orig_address fields so populate the clean fields.
 																										origAddressLine	:= PRTE2_Common.Functions.appendIF(LEFT.orig_address_1,LEFT.orig_address_2);
