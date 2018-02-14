@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, BIPV2_Build, BankruptcyV3, DeathV2_Services, LiensV2, 
+﻿IMPORT AutoStandardI, BIPV2, BIPV2_Build, BankruptcyV3, DeathV2_Services, LiensV2, 
        iesp, LN_PropertyV2, MDR, Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft;
 
 EXPORT AssociateSection := MODULE;
@@ -317,7 +317,7 @@ EXPORT AssociateSection := MODULE;
 	  BIPV2.IDlayouts.l_header_ids; 
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
-	  recordof(VehicleV2.Key_Vehicle_Party_Key_Linkids) - BIPV2.IDlayouts.l_header_ids;
+	  recordof(VehicleV2.Key_Vehicle_Party_Key) - BIPV2.IDlayouts.l_header_ids;
 	  BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	end;
 
@@ -325,7 +325,7 @@ EXPORT AssociateSection := MODULE;
 	// the "party" data for the vehicle_key/iteration_key(s?) involved to output on the report.
   ds_mvr_linkids_keyrecs_plusparty :=
 	                   join(ds_mvr_linkids_keyrecs_deduped,
-	                        VehicleV2.Key_Vehicle_Party_Key_Linkids(), 
+	                        VehicleV2.Key_Vehicle_Party_Key, 
 		                         keyed(left.vehicle_key   = right.vehicle_key   and
 									                 left.iteration_key = right.iteration_key and
                                    left.sequence_key  = right.sequence_key)
