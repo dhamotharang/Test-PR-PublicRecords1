@@ -1,5 +1,4 @@
-﻿// *******WIP**************WIP**************WIP**************WIP**************WIP**************WIP**************WIP*******
-/* ********************************************************************************************
+﻿/* ********************************************************************************************
 PRTE2_Header_Ins.fn_generate_relation_base
 MUST SWITCH TO THE NEW BOCA BUSINESS CASE BUILD PROCESSES - FOR NOW MUST KEEP THE SAME FILE NAMES
 NOTE: We only need file info here for 
