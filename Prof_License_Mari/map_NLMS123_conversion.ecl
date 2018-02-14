@@ -33,11 +33,13 @@ SprayFiles := Prof_License_Mari.spray_NMLS(process_dte).NMLS_SprayFiles;
 
 // Branch ***********************************************************
 temp_branch := Prof_License_Mari.files_NMLS0900.branch(branch_nmls_id != 0);
-branch := temp_branch;
+ut.CleanFields(temp_branch,cln_branch);
+branch := cln_branch;
 
 // Branch DBA *******************************************************
 temp_dba_branch := Prof_License_Mari.files_NMLS0900.branch_dba;
-dba_branch := temp_dba_branch;
+ut.CleanFields(temp_dba_branch,cln_dba_branch);
+dba_branch := cln_dba_branch;
 
 // Branch License ***************************************************
 temp_branch_lic := Prof_License_Mari.files_NMLS0900.branch_lic;
@@ -61,16 +63,18 @@ temp_branlic_dedup_2 := DEDUP(temp_branlic_sorted_1,LEFT.BRANCH_NMLS_ID = RIGHT.
 																						LEFT.LICENSE_NBR = RIGHT.LICENSE_NBR AND
 																						LEFT.LICENSE_TYPE = RIGHT.LICENSE_TYPE,
 													   RIGHT);
-														 
-branch_lic := temp_branlic_dedup_2;
+ut.CleanFields(temp_branlic_dedup_2,cln_branlic_dedup_2);														 
+branch_lic := cln_branlic_dedup_2;
 
 // Business *********************************************************
 temp_business := Prof_License_Mari.files_NMLS0900.business(COMPANY_NMLS_ID != 0);
-business := temp_business;
+ut.CleanFields(temp_business, clean_business);
+business := clean_business;
 
 // Business DBA *****************************************************
 temp_dba_business := Prof_License_Mari.files_NMLS0900.business_dba;
-dba_business := temp_dba_business;
+ut.CleanFields(temp_dba_business, clean_business_dba);
+dba_business := clean_business_dba;
 
 // Business License *************************************************
 temp_business_lic := Prof_License_Mari.files_NMLS0900.business_lic;
@@ -93,8 +97,9 @@ temp_buslic_dedup_2 := DEDUP(temp_buslic_sorted_1,LEFT.COMPANY_NMLS_ID = RIGHT.C
 																						LEFT.LICENSE_NBR = RIGHT.LICENSE_NBR AND
 																						LEFT.LICENSE_TYPE = RIGHT.LICENSE_TYPE,
 													   RIGHT);
-														 
-business_lic := temp_buslic_dedup_2;
+
+ut.CleanFields(temp_buslic_dedup_2,cln_buslic_dedup_2);														 
+business_lic := cln_buslic_dedup_2;
 
 
 // Individual *******************************************************
@@ -293,6 +298,10 @@ rRaw_Common_layout := RECORD
 	STRING20	FEDSTATUS;
 	STRING50	BUSINESS_STRUCTURE;
 	STRING60	SITE_LOCATION;
+	STRING10 FISCALYEAREND,     //NEW FIELD
+	STRING50 FORMEDIN,         //NEW FIELD 
+	STRING10 DATEFORMED,         //NEW FIELD
+	STRING4 STOCKSYMBOL,       //DF-12096
 END;
 
 //TRANSFORM Company file to common layout
@@ -306,7 +315,7 @@ rRaw_Common_layout 	trans_Comp_Common(ds_company_dba L) := TRANSFORM
 	SELF := [];	
 END;
 
-ds_Comp_Common := PROJECT(ds_company_dba, trans_comp_Common(LEFT)) : PERSIST('~thor_data400::persist::nmls::co_intermediate');;
+ds_Comp_Common := PROJECT(ds_company_dba, trans_comp_Common(LEFT)) : PERSIST('~thor_data400::persist::nmls::co_intermediate');
 
 //TRANSFORM Branch file to common layout
 rRaw_Common_layout 	trans_Branch_Common(ds_branch_dba L) := TRANSFORM
@@ -546,7 +555,7 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	SELF.ORIG_ISSUE_DTE  := Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ORIG_ISSUE_DATE);
 	SELF.CURR_ISSUE_DTE  := Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EFFECTIVE_DATE);
 	SELF.RENEWAL_DTE		 := ut.CleanSpacesAndUpper(pInput.RENEW_THRU);
-	
+	SELF.INST_BEG_DTE  := IF(TRIM(pInput.DATEFORMED) <> '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.DATEFORMED),'17530101');
 //initialize raw_license_status from raw data
 	tempRawStatus 					:= ut.CleanSpacesAndUpper(pInput.STATUS);
 	SELF.RAW_LICENSE_STATUS := tempRawStatus;
@@ -725,7 +734,15 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	//Federal Regulating Agency			
 	SELF.AGENCY_STATUS	:= ut.CleanSpacesAndUpper(pInput.fedstatus);
 	SELF.FEDERAL_REGULATOR := ut.CleanSpacesAndUpper(pInput.FEDREGULATOR); 
+	TrimStockSymbol := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.StockSymbol),'"');
+ ValidStockSymbol := MAP(TrimStockSymbol = 'NONE' => '',
+                         TrimStockSymbol = 'N/A' => '',
+												             TrimStockSymbol = 'NA' => '',
+                         TrimStockSymbol);	
 	
+	SELF.PROVNOTE_2 := IF(TRIM(pInput.FiscalYearEnd) <> '','FISCAL YEAR END: ' + ut.CleanSpacesAndUpper(pInput.FiscalYearEnd) + ';','')  + 
+	                   IF(TRIM(pInput.FormedIn) <> '','FORMED IN: ' + ut.CleanSpacesAndUpper(pInput.FormedIn) + ';','') + 
+										          IF(ValidStockSymbol <> '','STOCK SYMBOL: ' + TrimStockSymbol,'');
 		
 /* fields used to create mltreckey key ato handke multiple dba's:
 	license number
