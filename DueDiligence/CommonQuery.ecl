@@ -81,10 +81,7 @@ EXPORT CommonQuery := MODULE
 				#STORED('DPPAPurpose', Business_Risk_BIP.Constants.Default_DPPA);
 				#STORED('GLBPurpose',  Business_Risk_BIP.Constants.Default_GLBA);
 				
-				UNSIGNED1 dppaPurpose_stored := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
-				UNSIGNED1 glbPurpose_stored := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
-
-
+				
 				//Get debugging indicator
 				debugIndicator := FALSE : STORED('debugMode');
 				intermediates := FALSE : STORED('intermediateVariables');
@@ -99,12 +96,14 @@ EXPORT CommonQuery := MODULE
 				search := GLOBAL(firstRow.reportBy);
 				
 				//get outer band data - to use if customer data is not populated
+				UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
+				UNSIGNED1 outerBandGLBPurpose := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
 				outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('HistoryDateYYYYMMDD');
 				
 				drm	:= IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
 				dpm	:= IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
-				dppa := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, dppaPurpose_stored);
-				glba := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, glbPurpose_stored);	
+				dppa := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
+				glba := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);	
 				
 				requestedVersion := TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest));
 				includeReport := requestedReport;

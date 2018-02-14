@@ -118,7 +118,7 @@ export t_DDRProperty := record
 	t_DDRTaxAssessmentValues MostRecentTax {xpath('MostRecentTax')};
 	t_DDRAreaRisk AreaRisk {xpath('AreaRisk')};
 	t_DDRCountyCityRisk CountyRisk {xpath('CountyRisk')};
-	dataset(t_DDRTenant) ResidentTennants {xpath('ResidentTennants/ResidentTennant'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTennants)};
+	dataset(t_DDRTenant) ResidentTennants {xpath('ResidentTennants/ResidentTennant'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTenants)};
 end;
 		
 export t_DDRAircraft := record

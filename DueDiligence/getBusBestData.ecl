@@ -87,24 +87,6 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 															SELF.busn_info.address.err_stat := IF(LEFT.fullinputaddressprovided, cleanBus.address.err_stat, bestBus.addr_status);
 															SELF.busn_info.address.geo_blk := IF(LEFT.fullinputaddressprovided, cleanBus.address.geo_blk, bestBus.geo_block);
 															
-															//populate report with best data - may need to revisit, but something to pass to web
-															SELF.businessReport.businessInformation.bestFEIN := IF(includeReport, bestBus.fein, DueDiligence.Constants.EMPTY);
-															SELF.businessReport.businessInformation.bestAddress := IF(includeReport, DATASET([TRANSFORM(iesp.share.t_Address,
-																																																								SELF.StreetAddress1 := bestBus.streetAddress1;
-																																																								SELF.StreetAddress2 := bestBus.streetAddress2;
-																																																								// SELF.StreetNumber := bestBus.prim_range;
-																																																								// SELF.StreetPreDirection := bestBus.predir;
-																																																								// SELF.StreetName := bestBus.prim_name;
-																																																								// SELF.StreetSuffix := bestBus.addr_suffix;
-																																																								// SELF.StreetPostDirection := bestBus.postdir;
-																																																								// SELF.UnitDesignation := bestBus.unit_desig;
-																																																								// SELF.UnitNumber := bestBus.sec_range;
-																																																								SELF.City := bestBus.city;
-																																																								SELF.State := bestBus.state;
-																																																								SELF.Zip5 := bestBus.zip5;
-																																																								SELF.Zip4 := bestBus.zip4;
-																																																								SELF := [];)]),
-																																																			 DATASET([], iesp.share.t_Address))[1];
 															SELF  := LEFT;),
 										LEFT OUTER);
 										

@@ -204,7 +204,6 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	hdrAddrProject := PROJECT(dedupSortBusHdrAddr, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
 																														SELF.addrCount := 1;
 																													 SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
-																														//SELF.addressList := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Address,
 																																																			SELF.county:= LEFT.fips_county;
 																																																			SELF.city := LEFT.v_city_name;
 																																																			SELF.state := LEFT.st;
@@ -241,18 +240,18 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	//retrieve SIC and NAIC codes with dates
 	//SIC
-	outSic1 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_sic_code1, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_sic_code2, TRUE, FALSE, dt_first_seen, dt_last_seen);
-	outSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_sic_code3, TRUE, FALSE, dt_first_seen, dt_last_seen);
-	outSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_sic_code4, TRUE, FALSE, dt_first_seen, dt_last_seen);
-	outSic5 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_sic_code5, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic1 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_sic_code1, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_sic_code2, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_sic_code3, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_sic_code4, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic5 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_sic_code5, TRUE, FALSE, dt_first_seen, dt_last_seen);
 
 	// NAIC
-	outNaic1 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_naics_code1, FALSE, TRUE, dt_first_seen, dt_last_seen);
-	outNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_naics_code2, FALSE, FALSE, dt_first_seen, dt_last_seen);
-	outNaic3 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_naics_code3, FALSE, FALSE, dt_first_seen, dt_last_seen);
-	outNaic4 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_naics_code4, FALSE, FALSE, dt_first_seen, dt_last_seen);
-	outNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic1 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_naics_code1, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_naics_code2, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic3 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_naics_code3, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic4 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_naics_code4, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(busHeaderFilt, source, DueDiligence.Constants.EMPTY, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen);
 	
 	allSicNaic := outSic1 + outSic2 + outSic3 + outSic4 + outSic5 + outNaic1 + outNaic2 + outNaic3 + outNaic4 + outNaic5;
 	sortRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addStructure, allSicNaic);

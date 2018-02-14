@@ -324,6 +324,7 @@ EXPORT LinkIDs := RECORD
 		STRING5 NAICIndustry;
 		STRING7 NAICRiskLevel;
 		BOOLEAN IsPrimary;
+		STRING3 source;
 	END;
 	
 	EXPORT SicNaicRiskLayout := RECORD
@@ -554,18 +555,7 @@ EXPORT BusOperLocationLayout := RECORD
 		BOOLEAN blastPilot;
 		BOOLEAN other;
 	END;
-	
-	EXPORT LegalEventTypes := RECORD
-		BOOLEAN category9;
-		BOOLEAN category8;
-		BOOLEAN category7;
-		BOOLEAN category6;
-		BOOLEAN category5;
-		BOOLEAN category4;
-		BOOLEAN category3;
-		BOOLEAN category2;
-		STRING2 eventTypescore;
-	END;
+
 	
 	EXPORT SlimIndividual := RECORD
 		UNSIGNED6 did;
@@ -582,7 +572,8 @@ EXPORT BusOperLocationLayout := RECORD
 		SlimIndividual;
 		STRING2 usResidencyScore;
 		STRING10 usResidencyFlags;
-		LegalEventTypes;
+		STRING2 legalEventTypeScore;
+		STRING10 legalEventTypeFlags;
 		DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
