@@ -15,10 +15,10 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::ZipCitySt','~thor_dat
 ut.mac_sk_move_v2('~thor_data400::key::ZipCitySt', 'Q',mv_a_key_qa2, 2);
 
 //DOPs update, QA Sample, STRATA, E-Mail
-UpdateRoxiePage         := Roxiekeybuild.updateversion('CityStZipKeys',filedate,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com,john.freibaum@lexisnexis.com',,'N|F|BN');
+UpdateRoxiePage         := Roxiekeybuild.updateversion('CityStZipKeys',filedate,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|F|BN');
 sample_citystatezip 		:= CityStateZip_Sample;
 STRATA                  := STRATA_City_State_Zip;
-send_email              := fileservices.sendemail('Randy.Reyes@lexisnexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com; Abednego.Escobal@lexisnexisrisk.com; john.freibaum@lexisnexis.com; Michael.Gould@lexisnexis.com','City State Zip','\nCity State Zip file received on ' + filedate);
+send_email              := fileservices.sendemail('Randy.Reyes@lexisnexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com; Abednego.Escobal@lexisnexisrisk.com','City State Zip','\nCity State Zip file received on ' + filedate);
 orbit_update 						:= sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem('CityStateZip',filedate,'N')
 																																	,Orbit3.proc_Orbit3_CreateBuild_AddItem('CityStateZip',filedate,'F'));
 
