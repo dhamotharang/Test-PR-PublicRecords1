@@ -1021,13 +1021,19 @@
 		export string KEYWORD_NPCIAA								:= '709';
 		export string KEYWORD_EDES									:= '710';
 		export string KEYWORD_KRFSS									:= '711';
-		export string KEYWORD_PKPPMWT									:= '712';
-		export string KEYWORD_BRPRORJ									:= '713';
-		export string KEYWORD_USFHFA									:= '714';
-		export string KEYWORD_OFAC_GLOMAG								:= '715';
-		export string KEYWORD_USCFPB									:= '716';
+		export string KEYWORD_PKPPMWT								:= '712';
+		export string KEYWORD_BRPRORJ								:= '713';
+		export string KEYWORD_USFHFA								:= '714';
+		export string KEYWORD_OFAC_GLOMAG						:= '715';
+		export string KEYWORD_USCFPB								:= '716';
 		export string KEYWORD_TWMOJ									:= '717';
 		export string KEYWORD_EU_VE									:= '718';
+		export string KEYWORD_RSSRE_DIR4_WC					:= '719';
+		export string KEYWORD_MYRMP									:= '720';
+		export string KEYWORD_INMCA_DD2							:= '721';
+		export string KEYWORD_INMCA_SC							:= '722';
+		export string KEYWORD_PHPNP									:= '723';
+		export string KEYWORD_EUNCJ_TAX							:= '724';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

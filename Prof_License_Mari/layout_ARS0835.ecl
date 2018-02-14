@@ -7,11 +7,12 @@ EXPORT layout_ARS0835 := MODULE
 	STRING30   LastName,
 	STRING10   Suffix,
 	STRING100  FullName,
-	STRING100  Company,
-	//Address1-2 are added back in 20160602
-	// STRING50   Address1,
-	// STRING50   Address2,
-	// STRING50   Address3,   //city, state, zip
+
+	//Address1-3 and company are added back in 20180202-- re-introduced
+	STRING50   Address1,
+	STRING50   Address2,    
+	STRING50   Address3,   //city, state, zip
+	STRING100  Company,	
 	STRING50   FirmAddress1,
 	STRING50   FirmAddress2,
 	STRING30   FirmCity,

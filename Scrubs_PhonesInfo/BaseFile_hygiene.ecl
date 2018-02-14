@@ -1,6 +1,6 @@
 ﻿IMPORT SALT38,STD;
 EXPORT BaseFile_hygiene(dataset(BaseFile_layout_PhonesInfo) h) := MODULE
-
+ 
 //A simple summary record
 EXPORT Summary(SALT38.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
@@ -230,7 +230,7 @@ EXPORT Summary(SALT38.Str30Type  txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
-
+ 
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
@@ -319,12 +319,11 @@ SHARED FldIds := DATASET([{1,'reference_id'}
       ,{53,'call_forward_dt'}
       ,{54,'caller_id'}],SALT38.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT38.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
-
+ 
 EXPORT SrcProfiles := SALT38.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
-
+ 
 EXPORT Correlations := SALT38.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
-
-
+ 
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -397,7 +396,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := BaseFile_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Unknown','Invalid_Source','Invalid_Date','Invalid_Date','Invalid_Phone','Invalid_Phone_Type','Invalid_Num','Invalid_Num','Invalid_Char','Invalid_Char','Invalid_Char','Invalid_Num','Unknown','Invalid_Num','Invalid_Dial_Type','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_ISO2','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Future_Date','Unknown','Invalid_Zero_Three','Invalid_Zero_Three','Invalid_Num','Invalid_Char','Invalid_Num_In_Service','Invalid_YN','Invalid_YN','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Deact','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_YN','Invalid_YN','Invalid_Date','Invalid_Char');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Unknown','Invalid_Source','Invalid_Date','Invalid_Date','Invalid_Phone','Invalid_Phone_Type','Invalid_Num','Invalid_Num','Invalid_Char','Unknown','Invalid_Char','Invalid_Num','Unknown','Invalid_Num','Invalid_Dial_Type','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_ISO2','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Future_Date','Unknown','Invalid_Zero_Three','Invalid_Zero_Three','Invalid_Num','Invalid_Char','Invalid_Num_In_Service','Invalid_YN','Invalid_YN','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Deact','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_YN','Invalid_YN','Invalid_Date','Invalid_Char');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,BaseFile_Fields.InValidMessage_reference_id(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_source(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_dt_first_reported(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_dt_last_reported(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_phone(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_phonetype(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_reply_code(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_local_routing_number(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_account_owner(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_carrier_name(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_carrier_category(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_local_area_transport_area(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_point_code(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_country_code(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_dial_type(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_routing_code(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_porting_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_porting_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_country_abbr(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_vendor_first_reported_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_vendor_first_reported_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_vendor_last_reported_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_vendor_last_reported_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_port_start_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_port_start_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_port_end_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_port_end_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_remove_port_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_is_ported(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_serv(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_line(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_spid(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_operator_fullname(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_number_in_service(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_high_risk_indicator(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_prepaid(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_phone_swap(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_swap_start_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_swap_start_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_swap_end_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_swap_end_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_deact_code(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_deact_start_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_deact_start_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_deact_end_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_deact_end_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_react_start_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_react_start_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_react_end_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_react_end_time(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_is_deact(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_is_react(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_call_forward_dt(TotalErrors.ErrorNum),BaseFile_Fields.InValidMessage_caller_id(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
@@ -406,13 +405,13 @@ EXPORT ValidityErrors := ValErr;
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
-
+ 
   SALT38.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_PhonesInfo, BaseFile_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
-
+ 
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT38.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
   allProfiles_Standard := IF(doAllProfiles, SALT38.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
-
+ 
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;
 END;
