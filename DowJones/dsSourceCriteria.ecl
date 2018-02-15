@@ -1535,7 +1535,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/12 Democratic People\'s Republic of Korea List','1521'},
 {'EC 2018/126 Libya List','1522'},
 {'EC 2018/137 Tunisia List','1523'},
-{U'EC 2018/50 ISIL (D\'esh) and Al-Qaida List','1524'},
+{'EC 2018/50 ISIL (Da\'esh) and Al-Qaida List','1524'},
 {'EC 2018/87 Democratic People\'s Republic of Korea List','1525'},
 {'EC 2018/88 Venezuela List','1526'},
 {'MOJ (Taiwan) Anti-Money Laundering and Counter Terrorist Financing List','1527'},
