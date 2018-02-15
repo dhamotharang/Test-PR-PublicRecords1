@@ -231,10 +231,10 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 		
 	// OUTPUT(updatewithBusinessExecutivesWithLiens, NAMED('updatewithBusinessExecutivesWithLiens'));
 	// OUTPUT(UpdateBusinessExecutivesCriminalOffense, NAMED('UpdateBusinessExecutivesCriminalOffense'));
-	OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
-	OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
-	OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
-	OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
+	// OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
+	// OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
+	// OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
+	// OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
 	
  
 	RETURN UpdateInquiredBusinessWithDerog;
