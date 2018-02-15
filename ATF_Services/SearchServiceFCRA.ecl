@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 
 	<part name="DID"                 type="xsd:string"/>
@@ -48,13 +48,14 @@ EXPORT SearchServiceFCRA := MACRO
 			Export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 			export unsigned1 non_subject_suppression := nonSS;
 			export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);	
+			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);	
 		end;
 		
 		atf_recs := ATF_Services.SearchService_Records.search(tempmod, true);
 
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(atf_recs.Records, results, iesp.firearm_fcra.t_FcraFirearmSearchResponse);
 																
-		FFD.MAC.AppendConsumerStatements(results, results_new, atf_recs.Statements, iesp.firearm_fcra.t_FcraFirearmSearchResponse);	 
+		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_new, atf_recs.Statements, atf_recs.ConsumerAlerts, iesp.firearm_fcra.t_FcraFirearmSearchResponse);	 
 		
 		output(results_new, named('Results'));	
 		

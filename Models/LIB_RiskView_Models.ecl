@@ -28,7 +28,7 @@ EXPORT LIB_RiskView_Models (
 	// EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVS1706_0_0(BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVS1706_0_2(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -188,7 +188,8 @@ that is sent INTO calcindex for ECL.
 											'RVG1706_1' => UNGROUP(Models.RVG1706_1_0(BocaShell)),		
 											'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell, isPreScreenPurpose)),	
 											'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell, isPreScreenPurpose)),	
-											'RVS1706_0' => UNGROUP(Models.RVS1706_0_0(BocaShell)),	
+											//'RVS1706_0' => UNGROUP(Models.RVS1706_0_0(BocaShell)),	
+											'RVS1706_0' => UNGROUP(Models.RVS1706_0_2(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

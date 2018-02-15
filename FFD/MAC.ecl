@@ -1,7 +1,10 @@
 ﻿EXPORT MAC := MODULE
 
-	EXPORT AppendConsumerStatements(__inf, __outf, __statements, __lout, __csf = 'ConsumerStatements') := MACRO
-		__outf := PROJECT(__inf, transform(__lout, self.__csf := __statements, self := left, self:=[]));
+	EXPORT AppendConsumerAlertsAndStatements(__inf, __outf, __statements, __alerts, __lout, __csf = 'ConsumerStatements', __caf = 'ConsumerAlerts') := MACRO
+		__outf := PROJECT(__inf, transform(__lout, 
+                                        self.__caf := __alerts, 
+                                        self.__csf := __statements, 
+                                        self := left, self:=[]));
 	ENDMACRO;
 	
 	EXPORT PrepareResultRecord(__results, __outrec, __statements, __alerts, __lout) := MACRO
@@ -27,29 +30,26 @@
 		__outrec := ROW ({__results, __statements}, %__res_layout%);		
 	ENDMACRO;
 	
-	EXPORT ApplyConsumerAlertsBatch(__inf, __outf, __alert_pc) := MACRO		
+	EXPORT ApplyConsumerAlertsBatch(__inf, __outf, __alert_flags, __lout) := MACRO		
 		#uniquename(xf_apply_alerts);
-		__lout %xf_apply_alerts%( RECORDOF(__inf) l, FFD.Layouts.AlertIndicatorBatch r ) := 
+		__lout %xf_apply_alerts%( RECORDOF(__inf) l, FFD.Layouts.ConsumerFlagsBatch r ) := 
 		TRANSFORM, SKIP(r.suppress_records)																				 
 			SELF.acctno := IF((UNSIGNED)l.acctno <> 0, l.acctno, r.acctno);
 			SELF := r.consumer_flags;
 			SELF := l;
 		END;			
 		#uniquename(__res_ftr);
-		%__res_ftr% := JOIN(__inf, __alert_pc,
+		%__res_ftr% := JOIN(__inf, __alert_flags,
 				LEFT.acctno = RIGHT.acctno, 
 				%xf_apply_alerts%(LEFT, RIGHT), 
-				FULL OUTER, KEEP(1), LIMIT(0));
+				FULL OUTER, LIMIT(0));
     
     // now we add single record per account for all cases where we had to skip all records due to suppression
-		__outf := PROJECT( __alert_pc(suppress_records),
-				TRANSFORM(RECORDOF(__inf), SELF.acctno:=LEFT.acctno, SELF := r.consumer_flags, SELF :=[]) // put alert flags here
+		__outf := PROJECT( __alert_flags(suppress_records),
+				TRANSFORM(__lout, SELF.acctno:=LEFT.acctno, SELF := LEFT.consumer_flags, SELF :=[]) // put alert flags here
 				) + %__res_ftr%;
 	ENDMACRO;
 
-	EXPORT AppendConsumerAlerts(__inf, __outf, __alerts, __lout, __caf = 'ConsumerAlerts') := MACRO
-		__outf := PROJECT(__inf, transform(__lout, self.__caf := __alerts, self := left, self:=[]));
-	ENDMACRO;
 	
 	
 END;

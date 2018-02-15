@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportServiceFCRA">
 
 	<!-- User Section -->
@@ -10,6 +10,7 @@
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"          type="xsd:byte"/>
 	<part name="DPPAPurpose"         type="xsd:byte"/>
+	<part name="FCRAPurpose"         type="xsd:string"/>
 	<part name="SSNMask" 							type="xsd:string"/>
   <part name="MaxWaitSeconds"      type="xsd:integer"/>
 	
@@ -58,6 +59,7 @@ export ReportServiceFCRA := macro
 		export boolean	AllowGraphicDescription	:= false	: stored('AllowGraphicDescription');
 		export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(glbMod,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 	end;
 
 	temp := SexOffender_Services.ReportRecords.fcra_val(tempmod);
@@ -65,7 +67,7 @@ export ReportServiceFCRA := macro
  	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(temp.Records, results, 
                   iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse, SexualOffenses, true);
  // transform to FCRA FFD layout
-  FFD.MAC.AppendConsumerStatements(results, out_results, temp.Statements, iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse);
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, temp.Statements, temp.ConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse);
 
   output(out_results,named('Results'));
 

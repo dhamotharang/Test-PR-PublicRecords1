@@ -75,10 +75,10 @@
 	<part name="DateofApplication" type="xsd:string"/>
 	<part name="TimeofApplication" type="xsd:string"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
+  <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
-
 
 import Address, Risk_Indicators, Riskwise, ut, seed_files, doxie, Risk_Reporting, Inquiry_AccLogs, STD;
 
@@ -163,10 +163,13 @@ export FraudAdvisor_Service := MACRO
 		'OtherApplicationIdentifier3',
 		'DateofApplication',
 		'TimeofApplication',
-		'OutcomeTrackingOptOut'
+		'OutcomeTrackingOptOut',
+		'SuppressCompromisedDLs'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
+
+
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -251,7 +254,7 @@ integer2  dobradius0        := 2       	: stored('DOBRadius');
 unsigned1 RedFlag_version 	:= 0 				: stored('RedFlag_version');
 string 	 	DataRestriction 	:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string	 	DataPermission 		:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-boolean   Test_Data_Enabled := false   	: stored('TestDataEnabled');
+boolean   Test_Data_Enabled := false  		: stored('TestDataEnabled');
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
 
 
@@ -271,6 +274,7 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 
 string20  Model              := ''    : stored('Model');
 boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
+boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -324,13 +328,14 @@ fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_
 // The ‘fraudpoint3_models’ set are the FraudPoint 3.0 flagship models only.
 fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'];
 
-fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1'];
+fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0'];
 
 // The ‘custom_models’ set are all possible models and so add any new model name to this set.  The model requested must be in this set or the query will return an “Invalid model” error. 
 custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5609_2', 'fp3710_9', 'fp1109_0', 'fp1109_9', 'fp31203_1', 'fp31105_1',
 									'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1',
 									'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
-									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1'];
+									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
+                  'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0'];
 
 // The ‘bill_to_ship_to_models’ set are models that use the new second input address that was introduced in Fraudpoint 3.0.
 bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
@@ -348,9 +353,16 @@ model_name1 := if( (model_lc='' or model_lc in custom_models OR isWFS34) AND inv
 
 InvalidFP3GLBRequest := model_name1 in fraudpoint3_models and ~glb_ok; 
 
+// Bureau Fraud Flags Models needs to be requested on it's own with no other scores/attributes.
+InvalidFraudFlagsRequest := model_lc = 'fp1712_0' AND 
+														(EXISTS(attributesIn(stringlib.stringtolowercase(name)<>'')) OR
+														includeriskindices = TRUE OR
+														redflag_version > 0);
+														
 // model_name := if(InvalidGreenDotRequest = false, model_name1, error('Invalid parameter input combination for fp31310_2 or fp1509_2'));
-model_name := map(InvalidGreenDotRequest = true	=>  error('Invalid parameter input combination for fp31310_2 or fp1509_2'),
-									InvalidFP3GLBRequest = true		=>  error('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'),
+model_name := map(InvalidGreenDotRequest = true		=> error('Invalid parameter input combination for fp31310_2 or fp1509_2'),
+									InvalidFP3GLBRequest = true			=> error('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'),
+									InvalidFraudFlagsRequest = true => error('Invalid product input combination for fp1712_0'),
 																										model_name1 );
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
@@ -547,7 +559,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 // new options for fp attributes 2.0
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
-
+  model_name IN ['fp1712_0'] => 53,
 	model_name IN ['fp1706_1'] => 52,
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
 		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1'] => 51, 
@@ -630,12 +642,13 @@ ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := l
 ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
 
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_name);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_name, suppressCompromisedDLs);
 // search for test seeds
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);																						
 // choose either test seed or real
 pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));			
 //pick_attr := ungroup(attributes);			
+
 
 
 checkBoolean(boolean x) := if(x, '1', '0');									
@@ -1236,6 +1249,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => 'IDVerSSNDriversLicense',
 		c=	224 => 'SourceVehicleRegistration',
 		c=	225 => 'SourceDriversLicense',
+		c= 	226 => 'IdentityDriversLicenseComp',
 		'INVALID'
 		);
 									 
@@ -1466,6 +1480,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => le.version201.IDVerSSNDriversLicense,
 		c=	224 => le.version201.SourceVehicleRegistration,
 		c=	225 => le.version201.SourceDriversLicense,
+		c= 	226 => le.version201.IdentityDriversLicenseComp,
 		''
 		);
 END;
@@ -1689,7 +1704,10 @@ END;
 name_pairs :=  normalize(pick_attr, 162, intoVersion1(left, counter));
 v1 := project(name_pairs, transform(layout_attribute, self.attribute := left));
 
-v2attributeCount := if( doAttributesVersion201 , 225, 217);
+v2attributeCount := map( 
+doAttributesVersion201 and SuppressCompromisedDLs => 226,
+doAttributesVersion201 => 225,
+												 217);
 v2_name_pairs :=  normalize(pick_attr, v2attributeCount, intoVersion2(left, counter));
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
 		
@@ -1741,6 +1759,8 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
 	self := [];
 END;
 attributeOut := project(pick_attr, formAttributeGroup(left));
+
+
 
 // Get the models
 ret := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);
@@ -1921,6 +1941,7 @@ ret_fraudpoint3 := case( model_name,
 	'fp1706_1' => Models.FP1706_1_0( ungroup(clam), 6),
 	'fp1609_2' => Models.FP1609_2_0( ungroup(clam), 6),
 	'fp1607_1' => Models.FP1607_1_0( ungroup(clam), 6),
+  'fp1712_0' => Models.FP1712_0_0( ungroup(clam), 1), // Fraud flags model -- only one risk indicator is returned.
 	dataset( [], Models.Layouts.layout_fp1109 )
 );
 
@@ -2106,6 +2127,7 @@ TRANSFORM
 		'fp1706_1' => Risk_Indicators.BillingIndex.FP1706_1,
 		'fp1609_2' => Risk_Indicators.BillingIndex.FP1609_2,
 		'fp1607_1' => Risk_Indicators.BillingIndex.FP1607_1,
+		'fp1712_0' => Risk_Indicators.BillingIndex.FP1712_0,
 		''
 	);
 
@@ -2135,6 +2157,7 @@ TRANSFORM
 													model_name = 'fp1706_1'	=> 'FraudPointFP1706_1',
 													model_name = 'fp1609_2'	=> 'FraudPointFP1609_2',
 													model_name = 'fp1607_1'	=> 'FraudPointFP1607_1',
+													model_name = 'fp1712_0'	=> 'FraudPointFP1712_0',
 																												 'FraudPoint');	
 	self.scores := project(le, form_fp3score(left));
 

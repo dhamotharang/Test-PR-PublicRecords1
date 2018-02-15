@@ -66,6 +66,7 @@
   
   <!-- Consumer Person Context -->
   <part name="FFDOptionsMask" 	      type="xsd:string"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
     
 </message>
 */
@@ -94,6 +95,7 @@ export MDSearchServiceFCRA() := macro
   //  Fill FCRA.iRules
 	iRulesParams := module (FCRA.iRules)
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
   end;
 	
 	// Generate the full report

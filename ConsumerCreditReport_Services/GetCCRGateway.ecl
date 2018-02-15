@@ -60,6 +60,7 @@ EXPORT GetCCRGateway (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_
 			R.AccountNumber='' => ConsumerCreditReport_Services.Constants.SOAP_ERROR_CCR,
 			R._Header.Exceptions);
 		SELF.ConsumerStatements:=L.ConsumerStatements;
+		SELF.ConsumerAlerts:=L.ConsumerAlerts;
 		SELF:=R;
 	END;
 

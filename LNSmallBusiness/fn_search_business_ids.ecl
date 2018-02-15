@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, LNSmallBusiness;
+﻿IMPORT AutoStandardI, BIPV2, LNSmallBusiness;
 
 EXPORT fn_search_business_ids(DATASET(LNSmallBusiness.BIP_Layouts.Input) input,
 															UNSIGNED1	DPPA_Purpose,
@@ -9,9 +9,17 @@ EXPORT fn_search_business_ids(DATASET(LNSmallBusiness.BIP_Layouts.Input) input,
 
 	global_mod := AutoStandardI.GlobalModule();
 
+
+
+businessData := project(input, transform(LNSmallBusiness.BIP_Layouts.Input,
+
+  leftData := dataset([transform(LNSmallBusiness.BIP_Layouts.Input, self := left;)]);
+
 	SmallBizCombined_inmod := 
 			 MODULE (PROJECT(global_mod ,LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams, OPT));
-				 EXPORT DATASET(LNSmallBusiness.BIP_Layouts.Input) ds_SBA_Input := input;
+				 EXPORT DATASET(LNSmallBusiness.BIP_Layouts.Input) ds_SBA_Input := 
+				      leftData
+						 ;
 				 EXPORT UNSIGNED1 DPPAPurpose         := DPPA_Purpose; 
 				 EXPORT UNSIGNED1 GLBAPurpose         := GLBA_Purpose;
 				 EXPORT STRING    DataRestrictionMask := DataRestrictionMask;
@@ -23,14 +31,20 @@ EXPORT fn_search_business_ids(DATASET(LNSmallBusiness.BIP_Layouts.Input) input,
 				 EXPORT STRING32  ApplicationType     := global_mod.ApplicationType;
 				 EXPORT STRING1   FetchLevel 					:= BIPV2.IDconstants.Fetch_Level_SELEID;  //to change based on input, currently only accounting for seleid
 				END;
-				
 
-	ds_SBA_Input_withID := 
-				MAP(input[1].SeleID != 0  
-												=> LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID),
-						 input);
+      selecheck :=
+			   map(left.seleid != 0
+			        => LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID),
+							   leftData);
+						
+						resultcheck :=
+						map(BestInfoNeeded = LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID
+             and selecheck[1].seleid != 0 => selecheck,
+		        leftData);
+						
+						self := resultcheck[1];
+    ));		 
 						 
-						 
-	RETURN ds_SBA_Input_withID;					 
+	RETURN businessData;	
 
 END;

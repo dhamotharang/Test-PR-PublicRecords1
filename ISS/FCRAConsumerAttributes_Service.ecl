@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FCRAConsumerAttributes_Service">
 	<part name="FCRAConsumerAttributesReportRequest" type="tns:XmlDataSet" cols="110" rows="50" />
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="25"/>
@@ -112,7 +112,7 @@ FCRAConsumerAttributesReportRequest XML:
 import risk_indicators, ut, iesp, address, riskwise, seed_files, gateway, Consumerstatement;
 
 export FCRAConsumerAttributes_Service := MACRO
-
+ #onwarning(4207, ignore);
 
 	// Get XML input 
 	ds_in    		:= dataset([], iesp.fcraconsumerattributesreport.t_FCRAConsumerAttributesReportRequest)  	: stored('FCRAConsumerAttributesReportRequest', few);
@@ -321,8 +321,9 @@ export FCRAConsumerAttributes_Service := MACRO
   clamTestSeeds := ISS.CAR_Test_Seed_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);
 	clamOrSeed(unsigned1 bsversion) := if( TestDataEnabled, group(clamTestSeeds, seq), finalClam(bsversion));										
 
-	bsversion := MAX(attributesIn, attributesIn.bsversion);
-
+ attributesInSorted := sort(attributesIn, -bsversion);	
+	bsversion := attributesInSorted[1].bsversion;	 
+	
 	clamAndSeed := clamOrSeed(bsversion);
 	
 

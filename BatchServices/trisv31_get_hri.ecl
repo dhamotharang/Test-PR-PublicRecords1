@@ -93,7 +93,10 @@
   // concatenate the 2 normed datasets together keeping only non-blank codes
   // and then filter to only keep the TRISv3.2 acceptable codes
   ds_norm_concat  := ds_iid_wHRI_norm(hri != '') + ds_fp_res_in_norm(hri != '');
-  ds_norm_cc_filt := ds_norm_concat(hri IN ACCEPTABLE_HRI_CODES);
+	
+	//TRISv3.2.1 req 4.1.4 - Remove 'S5' from acceptable HRI coder
+	//This needs to be removed explicitly because we might get this code passed in by the batch process
+  ds_norm_cc_filt := ds_norm_concat(hri IN ACCEPTABLE_HRI_CODES AND hri != 'S5');
   
   // sort (TRISv3.2 alt sort order) & dedup to eliminate any duplicate hri codes
   ds_hri_sort_dd := dedup(sort(ds_norm_cc_filt,
@@ -101,7 +104,7 @@
                                -(hri = '71'),-(hri = 'MO'),-(hri = 'IS'),-(hri = '72'),
                                -(hri = 'RS'),-(hri = '03'),-(hri = 'QE'),-(hri = 'BO'),
                                -(hri = 'QA'),-(hri = 'QD'),-(hri = '11'),-(hri = '14'),
-                               -(hri = 'S2'),-(hri = 'S1'),-(hri = 'S5'),
+                               -(hri = 'S2'),-(hri = 'S1'),
                                -desc),
                           acctno, hri);
 

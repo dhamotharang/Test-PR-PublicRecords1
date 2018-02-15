@@ -12,25 +12,29 @@ s_ids := marriage_divorce_v2_Services.MDSearchService_ids(,ldid,isFCRA);
 ids := dedup( project( s_ids, transform(marriage_divorce_v2_Services.layouts.expanded_id,self.search_did := ldid, self:=left)  ), all);
 
 ds_best := project(ids,transform(doxie.layout_best,self.did := left.search_did,self:=left,self:=[]));
-ds_flags := FCRA.GetFlagFile (ds_best);
 
 //FCRA FFD
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_params.FFDOptionsMask);
 
 dsDIDs := dataset([{FFD.Constants.SingleSearchAcctno,ldid}], FFD.Layouts.DidBatch);
 
-pc_recs := if(isFCRA, FFD.FetchPersonContext(dsDIDs, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.Marriage_Divorce));  
+pc_recs := if(isFCRA, FFD.FetchPersonContext(dsDIDs, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.Marriage_Divorce, in_params.FFDOptionsMask));  
 
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
-// 4) Send the slim PersonContext  	
+ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs));
+
+// Send the slim PersonContext  	
 // retrieve results
 rpen := marriage_divorce_v2_Services.MDRaw.wide_view.by_id(ids, NSS_val, isFCRA, ds_flags, slim_pc_recs, in_params.FFDOptionsMask);
+
+suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
 
 statement_output := if(IsFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(PC_Recs), 
 														FFD.Constants.BlankConsumerStatements);
 
- //statements_out :=dataset([],iesp.share_fcra.t_ConsumerStatement);
+consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+
 // prepend deep dive status, and shift deep dives to the bottom of the results
 rdd := join(
 	rpen, dedup(sort(s_ids, record_id, if(isDeepDive, 1, 0)), record_id),
@@ -44,10 +48,12 @@ rsrt := sort(
 );
 final_d	:= dedup(rsrt, except record_id);
 
+results := if(suppress_results_due_alerts, dataset([],Marriage_Divorce_v2_Services.Layouts.result.wide), final_d);
+
 // output(rpen,named('rpen'));
 // output(final_d,named('final_d'));
 
-FFD.MAC.PrepareResultRecord(final_d, results_combined, statement_output, FFD.Constants.BlankConsumerAlerts, Marriage_Divorce_v2_Services.Layouts.result.wide);
+FFD.MAC.PrepareResultRecord(results, results_combined, statement_output, consumer_alerts, Marriage_Divorce_v2_Services.Layouts.result.wide);
 
 return results_combined;
 

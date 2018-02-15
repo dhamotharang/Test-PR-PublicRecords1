@@ -1,14 +1,30 @@
 ﻿IMPORT FFD, PersonContext, Gateway, STD;
 
+  int_rec := RECORD
+    INTEGER number;
+  END;
+      
+  CovertSetStr2Int (SET OF STRING inl_set) := FUNCTION
+      total_words := COUNT(inl_set);
+
+      inl_ds := DATASET(total_words,
+											TRANSFORM(int_rec, SELF.number := (INTEGER) inl_set[COUNTER]));
+      set_out := SET(inl_ds, number);                
+    RETURN set_out;
+  END;
+  
   ExpandPersonContext (DATASET(PersonContext.Layouts.Layout_PCResponseRec) pc_in) := FUNCTION
   // for some record types Content field contains additional data which need to be moved to expanded layout 
 
     FFD.Layouts.PersonContextBatch xform_alerts (PersonContext.Layouts.Layout_PCResponseRec le) := TRANSFORM
     
-      consumer_phone := IF(le.RecordType = FFD.Constants.RecordType.FA, STD.Str.CleanSpaces(le.Content), ''); // the phone provided by consumer for verification purposes in case of Fraud Alert
+      clean_phone:= REGEXFIND('\\(?\\d{3}\\)?\\-?\\d{3}\\-?\\d{4}', STD.Str.Filter(le.Content,'0123456789-()'), 0);  // looking for 10 digit phone number with optional '()-' characters
+      consumer_phone := IF(le.RecordType = FFD.Constants.RecordType.FA AND REGEXFIND('\\d+',le.Content), clean_phone, ''); // the phone provided by consumer for verification purposes in case of Fraud Alert
+      inl_set := IF(le.RecordType = FFD.Constants.RecordType.SF, STD.Str.SplitWords(STD.Str.CleanSpaces(le.Content), ','), []);
       LH_flag := IF(le.RecordType = FFD.Constants.RecordType.LH, STD.Str.CleanSpaces(le.Content), ''); // Expected values in content field: SP (Suppress Product), SA (Suppress All), Empty for no suppression
+
       SELF.suppress_for_legal_hold := LH_flag = PersonContext.Constants.LegalFlag.SuppressProduct OR LH_flag = PersonContext.Constants.LegalFlag.SuppressAll;
-      SELF.set_FCRA_purpose := IF(le.RecordType = FFD.Constants.RecordType.SF, STD.Str.SplitWords(STD.Str.CleanSpaces(le.Content), ','), []);
+      SELF.set_FCRA_purpose := CovertSetStr2Int(inl_set);
       SELF.Content := CASE(le.RecordType, 
                             FFD.Constants.RecordType.IT => FFD.Constants.AlertMessage.IDTheftMessage,
                             FFD.Constants.RecordType.LH => '', //FFD.Constants.AlertMessage.LegalHoldMessage,

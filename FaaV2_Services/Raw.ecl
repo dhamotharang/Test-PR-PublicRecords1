@@ -1,4 +1,4 @@
-import doxie, doxie_cbrs, faa, suppress, fcra, census_data, FFD;
+﻿import doxie, doxie_cbrs, faa, suppress, fcra, census_data, FFD;
 
 export Raw := module
 		export faav2_services.Layouts.aircraftNumberPlus byDIDs(dataset(doxie.layout_references) in_dids,boolean isFCRA=false) := function		
@@ -129,10 +129,10 @@ export Raw := module
 			aircraft_infoover := aircraft_info_added_1 + aircraft_infoover_added ;						
 		
 			//---------------------------------------FCRA FFD----------------------------------------------------------------	
-			FaaV2_Services.Layouts.aircraft_full xformAircraftDetail ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed) 
-			self.detail.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
-			self.detail.isDisputed := r.isDisputed,
+			FaaV2_Services.Layouts.aircraft_full xformAircraftDetail ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform
+			self.detail.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+			self.detail.isDisputed := ShowDisputedRecords and r.isDisputed;
+			self.detail := if(ShowDisputedRecords or ~r.isDisputed,L.detail);
 			self := L;
 			end;
 											
@@ -180,10 +180,10 @@ export Raw := module
 			aircraft_engineover_info := aircraft_engine_info_added_1 + aircraft_engineover_info_added ;
 			
 			//---------------------------------------FCRA FFD----------------------------------------------------------------	
-			FaaV2_Services.Layouts.aircraft_full xformAircraft ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-			  skip(~ShowDisputedRecords and r.isDisputed) 
+			FaaV2_Services.Layouts.aircraft_full xformAircraft ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform
 			    self.engine.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
-					self.engine.isDisputed := r.isDisputed,
+					self.engine.isDisputed := ShowDisputedRecords and r.isDisputed;
+					self.engine := if(ShowDisputedRecords or ~r.isDisputed,L.engine);
 					self := L;
 			end;
 	

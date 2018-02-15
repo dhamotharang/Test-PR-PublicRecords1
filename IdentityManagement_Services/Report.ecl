@@ -3,25 +3,32 @@
  ** Function gathers output from various requested services and returns them packed nicely into a dataset record.
 ***/
 
-IMPORT doxie, iesp;
+IMPORT doxie, iesp, IdentityManagement_Services, ut;
 
 EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Services.IParam._report param) := FUNCTION
 
 	out_rec := iesp.identitymanagementreport.t_IdentityManagementReportIndividual;
 
-	// DID should be at most one 
+	// DID should be at most one
   did := dids[1].did;
 
 	pers := IdentityManagement_Services.report_records(dids, param);
 
-	//Personal record 
+	//Check for compromised DL if the input flag is true.
+	glbOk := ut.PermissionTools.GLB.ok(param.GLBPurpose);
+	dppaOk := ut.PermissionTools.DPPA.ok(param.DPPAPurpose);
+
+	isDLCompromised := param.SuppressCompromisedDLs AND
+		IdentityManagement_Services.CompromisedDL.fn_CheckForMatch_ByDid(did, dppaOk, glbOk);
+
+	//Personal record
 	p_person         := pers.person_report;
 
 	//DL
-	p_drivers        := pers.driver_licenses_v2;
-	
+	p_drivers					:= if(~isDLCompromised, pers.driver_licenses_v2);
+
 	//Ins DL
-	p_insurance_dl		:= pers.insurance_dl;
+	p_insurance_dl		:= if(~isDLCompromised, pers.insurance_dl);
 
 	//Historical Phones
 	p_histphones     := CHOOSEN(pers.hist_phones, iesp.constants.IDM.MaxHistoricalPhones);
@@ -52,25 +59,25 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
 
 	//People At Work (PAW)
 	p_paw 					 := CHOOSEN(pers.peopleatwork, iesp.constants.IDM.MaxPeopleAtWork);
-	
+
 	//Corporate Affiliations (corp)
 	p_corp 					 := CHOOSEN(pers.corpaffiliation, iesp.constants.IDM.MaxPeopleAtWork);
-	
+
 	//Vehicles From Gateways
 	p_veh_gtways 		 := IF (param.include_realtimevehicle, CHOOSEN(pers.veh_gateways, iesp.constants.IDM.MaxVehicles));
 
 	//Emails
 	p_emails				 := CHOOSEN(pers.emails, iesp.constants.IDM.MaxEmails);
-	
+
 	//Transactions / Chase Data
 	p_transactions 	 := CHOOSEN(pers.transactions, iesp.constants.IDM.MaxTransactions);
 
 	//Professional Licenses
 	p_proflicense 	 := CHOOSEN(pers.proflicense, iesp.constants.IDM.MaxProfLicenses);
-	
+
 	// Internet Domain Names
 	p_domain_names		:= CHOOSEN(pers.domain_names, iesp.Constants.INTERNETDOMAIN_MAX_COUNT_SEARCH_RESPONSE_RECORDS);
-	
+
   //Combine all of them together
   out_rec Format () := TRANSFORM
     SELF.UniqueId 							:= (String)did;
@@ -93,9 +100,10 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
 		SELF.ProfessionalLicenses		:= IF (param.include_professionallicenses, p_proflicense);
 		SELF.InternetDomains				:= IF (param.include_InternetDomains, p_domain_names);
 		SELF.InsuranceDriverLicenses:= IF (param.include_InsuranceDL, p_insurance_dl);
+		SELF.SuppressCompromisedDLIndicator  := isDLCompromised;
   END;
 
   individual := DATASET([Format ()]);
-	
+
 	RETURN individual;
 END;

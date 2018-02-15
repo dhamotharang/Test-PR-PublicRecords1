@@ -1,4 +1,4 @@
-﻿IMPORT Address,Autokey_batch,BatchServices,Doxie,header,iesp,MDR,NID,Phones,PhoneFinder_Services,std,ut;
+﻿IMPORT Address,Autokey_batch,Doxie,iesp,MDR,NID,Phones,PhoneFinder_Services,std,ut;
 
 pfLayouts     := PhoneFinder_Services.Layouts;
 lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -173,46 +173,6 @@ MODULE
 																																0 => 'NOT FORWARDED',
 																																1 => 'FORWARDED',
 																																'');
-																																
-	// Obtain a set of dids for each batch input record. Return only acctno and did. ( 1 acctno --> M dids )
-	EXPORT GetDIDsBatch(DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn) :=
-	FUNCTION
-		
-		dDidsAcctno_pre 	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, PhoneFinder_Services.Constants.MaxDIDs,  false); // to prune oldssns
-		
-		dDidsAcctno       := dDidsAcctno_pre(did > 0, did < header.constants.QH_start_rid); 
-	
-		// Rollup the dids dataset returned with each acctno to count the dids
-		lBatchInDID tRollDids(doxie.layout_references_acctno le, dataset(doxie.layout_references_acctno) allRows) :=
-		TRANSFORM
-			SELF.did_count := COUNT(allRows);
-			SELF.orig_did	 := 0; //assigned later on
-			SELF           := le;
-		END;
-		dCounts := ROLLUP(GROUP(SORT(dDidsAcctno, acctno), acctno),
-			GROUP,
-			tRollDids(LEFT, ROWS(LEFT)));
-		
-		dDidsWithCount			:= JOIN(dDidsAcctno, dCounts,
-			LEFT.acctno = RIGHT.acctno,
-			TRANSFORM(lBatchInDID,
-				SELF.did_count 	:= RIGHT.did_count,
-				SELF.orig_did 	:= LEFT.did,
-				SELF						:= LEFT),
-			LEFT OUTER,ALL);
-			
-		dWithDIDs			:= JOIN(dBatchIn, dDidsWithCount,
-			LEFT.acctno = RIGHT.acctno,
-			TRANSFORM(lBatchInDID,
-				SELF.orig_did		:= RIGHT.orig_did,
-				SELF.did				:= RIGHT.did,
-				SELF.did_count 	:= RIGHT.did_count,
-				SELF						:= LEFT),
-			LEFT OUTER,ALL);	
-			
-		RETURN dWithDIDs;
-	END;
-	
 	// Best info
 	EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
 	FUNCTION
@@ -455,7 +415,7 @@ MODULE
 		
 		dFormat2DIDReady := PROJECT(dInNoDIDs,tFormat2DIDReady(LEFT));
 		
-		dGetDIDs := GetDIDsBatch(dFormat2DIDReady)(did_count = 1); //Filter out records which got multiple DIDs
+		dGetDIDs := PhoneFinder_Services.GetDIDs(dFormat2DIDReady)(did_count = 1); //Filter out records which got multiple DIDs
 		
 		lFinal tAppendDID(dInUppercase le,dGetDIDs ri) :=
 		TRANSFORM
@@ -580,7 +540,18 @@ MODULE
 														tOverwriteWithTU(LEFT,RIGHT),
 														LEFT OUTER,
 														LIMIT(0),KEEP(1));
-			dPhoneDetail := IF(EXISTS(dPhoneRollup),dPhoneDetail_,dPrimaryPhoneDetail);
+														
+			// To preserve Qsent PVS(type flag P ) records
+			dTUPhonesOnly := JOIN(dPrimaryPhoneDetail, dPhoneDetail_, 
+			                     LEFT.acctno = RIGHT.acctno and 
+													           LEFT.phone  = RIGHT.phone, 
+																		      TRANSFORM(lpf.PhoneFinder.PhoneSlim,
+																					   SELF.coc_description   := PhoneFinder_Services.Functions.ServiceClassDesc((INTEGER)LEFT.ServiceClass),
+																						  SELF := LEFT),
+																		      LEFT ONLY);
+			
+		 dAllPhonesDetail_ := dPhoneDetail_ + dTUPhonesOnly;
+		 dPhoneDetail := IF(EXISTS(dPhoneRollup),dAllPhonesDetail_,dPrimaryPhoneDetail);
 		
 		lpf.PhoneFinder.PhoneIesp tFormat2IespPhone(lpf.PhoneFinder.PhoneSlim pInput) :=
 		TRANSFORM
@@ -682,7 +653,9 @@ MODULE
    			OUTPUT(dPhoneSort,NAMED('dPhoneSort_Primary'),EXTEND);
    			OUTPUT(dPhoneRollup,NAMED('dPhoneRollup_Primary'),EXTEND);			
    			OUTPUT(dPrimaryPhoneDetail,NAMED('dPrimaryPhoneDetail_Primary'),EXTEND);
-   			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);				
+   			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);		
+					 OUTPUT(dTUPhonesOnly,NAMED('dTUPhonesOnly'),EXTEND);				
+   			OUTPUT(dAllPhonesDetail_,NAMED('dAllPhonesDetail_'),EXTEND);			
    			OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
       OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
 			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);

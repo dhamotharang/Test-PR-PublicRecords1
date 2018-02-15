@@ -28,6 +28,7 @@
   
   <!-- Full File Disclosure -->	
   <part name="FFDOptionsMask" 	      type="xsd:string"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
     
 </message>
 */

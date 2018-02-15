@@ -28,14 +28,12 @@ base := patriot.Search_Base_Function(in_data,ofaconly_value,r_threshold_score,fa
 
 
 OFAC_XG5.Layout.InputLayout XG5prep(in_data le) := TRANSFORM
-
-	search_string := 	IF(le.name_unparsed<>'',
-												le.name_unparsed,
-												TRIM(le.name_first)+' '+TRIM(le.name_middle)+' '+TRIM(le.name_last));
-												// Code will change here
 	SELF.seq := le.seq;
 	self.acctno := le.acctno;
-	SELF.FullName := TRIM(search_string,LEFT,RIGHT);
+	self.firstName := trim(le.name_first);
+	self.middleName := trim(le.name_middle);
+	self.lastName := trim(le.name_last);
+	SELF.FullName := IF( le.name_first != '' OR le.name_last != '', '', TRIM(le.name_unparsed,LEFT,RIGHT) );
 	dobTemp := if(le.dob = '', '', le.dob[5..6] + '/' + le.dob[7..8] + '/' + le.dob[1..4]);
 	SELF.DOB := dobTemp;
 	SELF.country := le.country;

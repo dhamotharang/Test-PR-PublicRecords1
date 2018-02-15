@@ -17,6 +17,7 @@ EXPORT Layouts := MODULE
 		STRING20 orig_acctno;
 		Batchshare.Layouts.ShareErrors;
 		Risk_Indicators.Layouts.tmp_ConsumerStatements;
+  DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts := DATASET([],iesp.share_fcra.t_ConsumerAlert);
 	END;
 
 	EXPORT ccrResp := RECORD

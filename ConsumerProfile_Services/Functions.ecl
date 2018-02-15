@@ -181,9 +181,21 @@ EXPORT Functions := MODULE
 	
 	//Alert Dataset
 	export getAlertDataset(string alertCode) := function
-		return dataset([{alertCode, FCRA.Constants.ALERT_DESCRIPTION(alertCode),''}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
+		return dataset([{alertCode, FCRA.Constants.getAlertDescription(alertCode),
+                    FCRA.Constants.getAlertMessage(alertCode)}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
 	end;
 	
+	//Extract Alerts from PersonContext
+  export checkForAlertsFromPC(dataset(FFD.Layouts.PersonContextBatch) pc_recs, boolean isSuppressedResult = false) := function
+  
+    pc_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, isSuppressedResult);
+    return project(pc_alerts, transform(iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert, 
+                    self.Code := left.Code,
+                    self.Message := left.Message,
+                    self.description := FCRA.Constants.getAlertDescription(left.Code)));
+    
+  end;
+  
 	//Extract Alerts from input
 	export checkForAlertsFromInput(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportBy in_rec,
 																 ConsumerProfile_Services.IParam.options in_param) := function

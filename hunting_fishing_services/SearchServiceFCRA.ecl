@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 
 	<part name="DID"              type="xsd:string"/>
@@ -12,6 +12,7 @@
 import iesp, AutoStandardI, FCRA, STD;
 
 export SearchServiceFCRA := macro
+  #onwarning(4207, ignore);
 		#constant('NoDeepDive', true);
 		// Get XML input 
 		rec_in := iesp.huntingfishing_fcra.t_FcraHuntFishSearchRequest;
@@ -42,15 +43,14 @@ export SearchServiceFCRA := macro
 			export string14 did := rdid;
 			export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 			export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 		end;
 		tempresults := hunting_fishing_services.Search_Records.val(tempmod, true);
 
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.Records, results, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse, Records, false);
 																																	
-		results_new := project(results,transform(iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse,
-																								self.ConsumerStatements := tempresults.Statements,
-																								self := left));
-																
+		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_new, tempresults.Statements, tempresults.ConsumerAlerts, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse);
+
 		output(results_new, named('Results'));
 
 endmacro;

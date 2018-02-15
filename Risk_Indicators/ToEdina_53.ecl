@@ -138,6 +138,15 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 		
 		// new shell 2.5 fields
 		self.isFCRA := if(isFCRA,'1','0');
+		
+		//blank out new Cross Industry score and reason codes until fixes to the model are in - 12/6/2017
+		self.rv_scores.crossindv5 := '';
+		self.rv_scores.reason1cv5 := '';
+		self.rv_scores.reason2cv5 := '';
+		self.rv_scores.reason3cv5 := '';
+		self.rv_scores.reason4cv5 := '';
+		self.rv_scores.reason5cv5 := '';
+
 		self.rv_scores := if( isFCRA, le.rv_scores); // riskview not populated in non-fcra
 		self.fd_scores := if(~isFCRA, le.fd_scores); // fraud defender not populated in fcra
 		////////////
@@ -380,17 +389,88 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 		self.velocity_counters.addrs_per_ssn_created_6months := if(isFCRA, 0, le.velocity_counters.addrs_per_ssn_created_6months );			
 		self.velocity_counters.phones_per_addr_created_6months := if(isFCRA, 0, le.velocity_counters.phones_per_addr_created_6months );
 		self.velocity_counters.adls_per_phone_created_6months := if(isFCRA, 0, le.velocity_counters.adls_per_phone_created_6months );
+		self.acc_logs.inq_peradl_count_day := if(isFCRA, 0, le.acc_logs.inq_peradl_count_day );
+		self.acc_logs.inq_peradl_count_week := if(isFCRA, 0, le.acc_logs.inq_peradl_count_week );
+		self.acc_logs.inq_ssnsperadl_count_day := if(isFCRA, 0, le.acc_logs.inq_ssnsperadl_count_day );
+		self.acc_logs.inq_ssnsperadl_count_week := if(isFCRA, 0, le.acc_logs.inq_ssnsperadl_count_week );
+		self.acc_logs.inq_addrsperadl_count_day := if(isFCRA, 0, le.acc_logs.inq_addrsperadl_count_day );
+		self.acc_logs.inq_addrsperadl_count_week := if(isFCRA, 0, le.acc_logs.inq_addrsperadl_count_week );
+		self.acc_logs.inq_lnamesperadl_count_day := if(isFCRA, 0, le.acc_logs.inq_lnamesperadl_count_day );
+		self.acc_logs.inq_lnamesperadl_count_week  := if(isFCRA, 0, le.acc_logs.inq_lnamesperadl_count_week  );
+		self.acc_logs.inq_fnamesperadl_count_day  := if(isFCRA, 0, le.acc_logs.inq_fnamesperadl_count_day  );
+		self.acc_logs.inq_fnamesperadl_count_week  := if(isFCRA, 0, le.acc_logs.inq_fnamesperadl_count_week  );
+		self.acc_logs.inq_phonesperadl_count_day  := if(isFCRA, 0, le.acc_logs.inq_phonesperadl_count_day  );
+		self.acc_logs.inq_phonesperadl_count_week  := if(isFCRA, 0, le.acc_logs.inq_phonesperadl_count_week  );
+		self.acc_logs.inq_dobsperadl_count_day  := if(isFCRA, 0, le.acc_logs.inq_dobsperadl_count_day  );
+		self.acc_logs.inq_dobsperadl_count_week  := if(isFCRA, 0, le.acc_logs.inq_dobsperadl_count_week  );
 		self.acc_logs.inquiryPerSSN := if(isFCRA, 0, le.acc_logs.inquiryPerSSN );
+		self.acc_logs.inq_perssn_count_day := if(isFCRA, 0, le.acc_logs.inq_perssn_count_day );
+		self.acc_logs.inq_perssn_count_week := if(isFCRA, 0, le.acc_logs.inq_perssn_count_week );
+		self.acc_logs.inq_perssn_count01 := if(isFCRA, 0, le.acc_logs.inq_perssn_count01 );
+		self.acc_logs.inq_perssn_count03 := if(isFCRA, 0, le.acc_logs.inq_perssn_count03 );
+		self.acc_logs.inq_perssn_count06 := if(isFCRA, 0, le.acc_logs.inq_perssn_count06 );
 		self.acc_logs.inquiryADLsPerSSN := if(isFCRA, 0, le.acc_logs.inquiryADLsPerSSN );
+		self.acc_logs.inq_adlsperssn_count_day := if(isFCRA, 0, le.acc_logs.inq_adlsperssn_count_day );
+		self.acc_logs.inq_adlsperssn_count_week := if(isFCRA, 0, le.acc_logs.inq_adlsperssn_count_week );
+		self.acc_logs.inq_adlsperssn_count01 := if(isFCRA, 0, le.acc_logs.inq_adlsperssn_count01 );
+		self.acc_logs.inq_adlsperssn_count03 := if(isFCRA, 0, le.acc_logs.inq_adlsperssn_count03 );
+		self.acc_logs.inq_adlsperssn_count06 := if(isFCRA, 0, le.acc_logs.inq_adlsperssn_count06 );
 		self.acc_logs.inquiryLNamesPerSSN := if(isFCRA, 0, le.acc_logs.inquiryLNamesPerSSN );
+		self.acc_logs.inq_lnamesperssn_count_day := if(isFCRA, 0, le.acc_logs.inq_lnamesperssn_count_day );
+		self.acc_logs.inq_lnamesperssn_count_week := if(isFCRA, 0, le.acc_logs.inq_lnamesperssn_count_week );
+		self.acc_logs.inq_lnamesperssn_count01 := if(isFCRA, 0, le.acc_logs.inq_lnamesperssn_count01 );
+		self.acc_logs.inq_lnamesperssn_count03 := if(isFCRA, 0, le.acc_logs.inq_lnamesperssn_count03 );
+		self.acc_logs.inq_lnamesperssn_count06 := if(isFCRA, 0, le.acc_logs.inq_lnamesperssn_count06 );
 		self.acc_logs.inquiryAddrsPerSSN := if(isFCRA, 0, le.acc_logs.inquiryAddrsPerSSN );
+		self.acc_logs.inq_addrsperssn_count_day := if(isFCRA, 0, le.acc_logs.inq_addrsperssn_count_day );
+		self.acc_logs.inq_addrsperssn_count_week := if(isFCRA, 0, le.acc_logs.inq_addrsperssn_count_week );
+		self.acc_logs.inq_addrsperssn_count01 := if(isFCRA, 0, le.acc_logs.inq_addrsperssn_count01 );
+		self.acc_logs.inq_addrsperssn_count03 := if(isFCRA, 0, le.acc_logs.inq_addrsperssn_count03 );
+		self.acc_logs.inq_addrsperssn_count06 := if(isFCRA, 0, le.acc_logs.inq_addrsperssn_count06 );
 		self.acc_logs.inquiryDOBsPerSSN := if(isFCRA, 0, le.acc_logs.inquiryDOBsPerSSN );
+		self.acc_logs.inq_dobsperssn_count_day := if(isFCRA, 0, le.acc_logs.inq_dobsperssn_count_day );
+		self.acc_logs.inq_dobsperssn_count_week := if(isFCRA, 0, le.acc_logs.inq_dobsperssn_count_week );
+		self.acc_logs.inq_dobsperssn_count01 := if(isFCRA, 0, le.acc_logs.inq_dobsperssn_count01 );
+		self.acc_logs.inq_dobsperssn_count03 := if(isFCRA, 0, le.acc_logs.inq_dobsperssn_count03 );
+		self.acc_logs.inq_dobsperssn_count06 := if(isFCRA, 0, le.acc_logs.inq_dobsperssn_count06 );
 		self.acc_logs.inquiryPerAddr := if(isFCRA, 0, le.acc_logs.inquiryPerAddr );
+		self.acc_logs.inq_peraddr_count_day := if(isFCRA, 0, le.acc_logs.inq_peraddr_count_day );
+		self.acc_logs.inq_peraddr_count_week := if(isFCRA, 0, le.acc_logs.inq_peraddr_count_week );
+		self.acc_logs.inq_peraddr_count01 := if(isFCRA, 0, le.acc_logs.inq_peraddr_count01 );
+		self.acc_logs.inq_peraddr_count03 := if(isFCRA, 0, le.acc_logs.inq_peraddr_count03 );
+		self.acc_logs.inq_peraddr_count06 := if(isFCRA, 0, le.acc_logs.inq_peraddr_count06 );
 		self.acc_logs.inquiryADLsPerAddr := if(isFCRA, 0, le.acc_logs.inquiryADLsPerAddr );
+		self.acc_logs.inq_adlsperaddr_count_day := if(isFCRA, 0, le.acc_logs.inq_adlsperaddr_count_day );
+		self.acc_logs.inq_adlsperaddr_count_week := if(isFCRA, 0, le.acc_logs.inq_adlsperaddr_count_week );
+		self.acc_logs.inq_adlsperaddr_count01 := if(isFCRA, 0, le.acc_logs.inq_adlsperaddr_count01 );
+		self.acc_logs.inq_adlsperaddr_count03 := if(isFCRA, 0, le.acc_logs.inq_adlsperaddr_count03 );
+		self.acc_logs.inq_adlsperaddr_count06 := if(isFCRA, 0, le.acc_logs.inq_adlsperaddr_count06 );
 		self.acc_logs.inquiryLNamesPerAddr := if(isFCRA, 0, le.acc_logs.inquiryLNamesPerAddr );
+		self.acc_logs.inq_lnamesperaddr_count_day := if(isFCRA, 0, le.acc_logs.inq_lnamesperaddr_count_day );
+		self.acc_logs.inq_lnamesperaddr_count_week := if(isFCRA, 0, le.acc_logs.inq_lnamesperaddr_count_week );
+		self.acc_logs.inq_lnamesperaddr_count01 := if(isFCRA, 0, le.acc_logs.inq_lnamesperaddr_count01 );
+		self.acc_logs.inq_lnamesperaddr_count03 := if(isFCRA, 0, le.acc_logs.inq_lnamesperaddr_count03 );
+		self.acc_logs.inq_lnamesperaddr_count06 := if(isFCRA, 0, le.acc_logs.inq_lnamesperaddr_count06 );
 		self.acc_logs.inquirySSNsPerAddr := if(isFCRA, 0, le.acc_logs.inquirySSNsPerAddr );
+		self.acc_logs.inq_ssnsperaddr_count_day := if(isFCRA, 0, le.acc_logs.inq_ssnsperaddr_count_day );
+		self.acc_logs.inq_ssnsperaddr_count_week := if(isFCRA, 0, le.acc_logs.inq_ssnsperaddr_count_week );
+		self.acc_logs.inq_ssnsperaddr_count01 := if(isFCRA, 0, le.acc_logs.inq_ssnsperaddr_count01 );
+		self.acc_logs.inq_ssnsperaddr_count03 := if(isFCRA, 0, le.acc_logs.inq_ssnsperaddr_count03 );
+		self.acc_logs.inq_ssnsperaddr_count06 := if(isFCRA, 0, le.acc_logs.inq_ssnsperaddr_count06 );
 		self.acc_logs.inquiryPerPhone := if(isFCRA, 0, le.acc_logs.inquiryPerPhone );
+		self.acc_logs.inq_perphone_count_day := if(isFCRA, 0, le.acc_logs.inq_perphone_count_day );
+		self.acc_logs.inq_perphone_count_week := if(isFCRA, 0, le.acc_logs.inq_perphone_count_week );
+		self.acc_logs.inq_perphone_count01 := if(isFCRA, 0, le.acc_logs.inq_perphone_count01 );
+		self.acc_logs.inq_perphone_count03 := if(isFCRA, 0, le.acc_logs.inq_perphone_count03 );
+		self.acc_logs.inq_perphone_count06 := if(isFCRA, 0, le.acc_logs.inq_perphone_count06 );
 		self.acc_logs.inquiryADLsPerPhone := if(isFCRA, 0, le.acc_logs.inquiryADLsPerPhone );	
+		self.acc_logs.inq_adlsperphone_count_day := if(isFCRA, 0, le.acc_logs.inq_adlsperphone_count_day );	
+		self.acc_logs.inq_adlsperphone_count_week := if(isFCRA, 0, le.acc_logs.inq_adlsperphone_count_week );	
+		self.acc_logs.inq_adlsperphone_count01 := if(isFCRA, 0, le.acc_logs.inq_adlsperphone_count01 );	
+		self.acc_logs.inq_adlsperphone_count03 := if(isFCRA, 0, le.acc_logs.inq_adlsperphone_count03 );	
+		self.acc_logs.inq_adlsperphone_count06 := if(isFCRA, 0, le.acc_logs.inq_adlsperphone_count06 );	
+		self.acc_logs.inq_emailsperadl_count_day := if(isFCRA, 0, le.acc_logs.inq_emailsperadl_count_day );	
+		self.acc_logs.inq_emailsperadl_count_week := if(isFCRA, 0, le.acc_logs.inq_emailsperadl_count_week );	
 		self.acc_logs.inquiryADLsPerEmail := if(isFCRA, 0, le.acc_logs.inquiryADLsPerEmail );	
 		self.acc_logs.inquiries.countday:= if(isFCRA, 0, le.acc_logs.inquiries.countday);
 		self.acc_logs.auto.countday:= if(isFCRA, 0, le.acc_logs.auto.countday);
@@ -480,7 +560,7 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.velocity_counters.adls_per_bestphone_created_6months := le.best_flags.adls_per_bestphone_c6;
 	self.acc_logs := le.best_flags; // transfer the rest of the best_flags into the acc_logs section, everything in risk_indicators.layouts.layout_best_pii_inquiries
 
-	//new Correlation Risk Summary fields for 5.3
+	//New for 5.3
 	self.corr_risk_summary.corrssnname_sources := le.header_summary.corrssnname_sources;
 	self.corr_risk_summary.corrssnname_firstseen := le.header_summary.corrssnname_firstseen;
 	self.corr_risk_summary.corrssnname_lastseen := le.header_summary.corrssnname_lastseen;
@@ -522,7 +602,6 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.corr_risk_summary.corrdobphone_lastseen := le.header_summary.corrdobphone_lastseen;
 	// self.corr_risk_summary.corrdobphone_source_cnt := le.header_summary.corrdobphone_source_cnt;
 	
-	//new credit derived performance fields for BS 5.3 (offset history date counters)
 	self.credit_derived_perf.acc_logs_collection_count12_6mos				:= le.acc_logs.collection.count12_6mos;
 	self.credit_derived_perf.acc_logs_collection_count12_12mos			:= le.acc_logs.collection.count12_12mos; 
 	self.credit_derived_perf.acc_logs_collection_count12_24mos			:= le.acc_logs.collection.count12_24mos; 
@@ -548,91 +627,23 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.credit_derived_perf.archive_date_12mo											:= le.archive_date_12mo;	
 	self.credit_derived_perf.archive_date_24mo											:= le.archive_date_24mo;
 
-	//new Inquiry PII tumblings counters for BS 5.3
-	self.inq_PII_tumblings.inq_ssnsperadl_1subs						:= le.acc_logs.inq_ssnsperadl_1subs;
-	self.inq_PII_tumblings.inq_phnsperadl_1subs						:= le.acc_logs.inq_phnsperadl_1subs;
-	self.inq_PII_tumblings.inq_primrangesperadl_1subs			:= le.acc_logs.inq_primrangesperadl_1subs;
-	self.inq_PII_tumblings.inq_dobsperadl_1subs						:= le.acc_logs.inq_dobsperadl_1subs;
-	self.inq_PII_tumblings.inq_fnamesperadl_1subs					:= le.acc_logs.inq_fnamesperadl_1subs;
-	self.inq_PII_tumblings.inq_lnamesperadl_1subs					:= le.acc_logs.inq_lnamesperadl_1subs;
-	self.inq_PII_tumblings.inq_dobsperadl_daysubs					:= le.acc_logs.inq_dobsperadl_daysubs;
-	self.inq_PII_tumblings.inq_dobsperadl_mosubs					:= le.acc_logs.inq_dobsperadl_mosubs;
-	self.inq_PII_tumblings.inq_dobsperadl_yrsubs					:= le.acc_logs.inq_dobsperadl_yrsubs;
-	self.inq_PII_tumblings.inq_ssnsperadl_1dig						:= le.acc_logs.inq_ssnsperadl_1dig;
-	self.inq_PII_tumblings.inq_phnsperadl_1dig						:= le.acc_logs.inq_phnsperadl_1dig;
-	self.inq_PII_tumblings.inq_primrangesperadl_1dig			:= le.acc_logs.inq_primrangesperadl_1dig;
-	self.inq_PII_tumblings.inq_dobsperadl_1dig						:= le.acc_logs.inq_dobsperadl_1dig;
-	self.inq_PII_tumblings.inq_primrangesperssn_1dig			:= le.acc_logs.inq_primrangesperssn_1dig;
-	self.inq_PII_tumblings.inq_dobsperssn_1dig						:= le.acc_logs.inq_dobsperssn_1dig;
-	self.inq_PII_tumblings.inq_ssnsperaddr_1dig						:= le.acc_logs.inq_ssnsperaddr_1dig;
-
 	self.swappedNames := le.iid.swappedNames;
 
-	//new Inquiry PII corroboration counters for BS 5.3
-	self.inq_PII_corroboration.inq_corrnameaddr						:= le.acc_logs.inq_corrnameaddr;
-	self.inq_PII_corroboration.inq_corrnameaddr_adl				:= le.acc_logs.inq_corrnameaddr_adl;
-	self.inq_PII_corroboration.inq_corrnamessn						:= le.acc_logs.inq_corrnamessn;
-	self.inq_PII_corroboration.inq_corrnamessn_adl				:= le.acc_logs.inq_corrnamessn_adl;
-	self.inq_PII_corroboration.inq_corrnamephone					:= le.acc_logs.inq_corrnamephone;
-	self.inq_PII_corroboration.inq_corrnamephone_adl			:= le.acc_logs.inq_corrnamephone_adl;
-	self.inq_PII_corroboration.inq_corraddrssn						:= le.acc_logs.inq_corraddrssn;
-	self.inq_PII_corroboration.inq_corraddrssn_adl				:= le.acc_logs.inq_corraddrssn_adl;
-	self.inq_PII_corroboration.inq_corrdobaddr						:= le.acc_logs.inq_corrdobaddr;
-	self.inq_PII_corroboration.inq_corrdobaddr_adl				:= le.acc_logs.inq_corrdobaddr_adl;
-	self.inq_PII_corroboration.inq_corraddrphone					:= le.acc_logs.inq_corraddrphone;
-	self.inq_PII_corroboration.inq_corraddrphone_adl			:= le.acc_logs.inq_corraddrphone_adl;
-	self.inq_PII_corroboration.inq_corrdobssn							:= le.acc_logs.inq_corrdobssn;
-	self.inq_PII_corroboration.inq_corrdobssn_adl					:= le.acc_logs.inq_corrdobssn_adl;
-	self.inq_PII_corroboration.inq_corrphonessn						:= le.acc_logs.inq_corrphonessn;
-	self.inq_PII_corroboration.inq_corrphonessn_adl				:= le.acc_logs.inq_corrphonessn_adl;
-	self.inq_PII_corroboration.inq_corrdobphone						:= le.acc_logs.inq_corrdobphone;
-	self.inq_PII_corroboration.inq_corrdobphone_adl				:= le.acc_logs.inq_corrdobphone_adl;
-	self.inq_PII_corroboration.inq_corrnameaddrssn				:= le.acc_logs.inq_corrnameaddrssn;
-	self.inq_PII_corroboration.inq_corrnameaddrssn_adl		:= le.acc_logs.inq_corrnameaddrssn_adl;
-	self.inq_PII_corroboration.inq_corrnamephonessn				:= le.acc_logs.inq_corrnamephonessn;
-	self.inq_PII_corroboration.inq_corrnamephonessn_adl		:= le.acc_logs.inq_corrnamephonessn_adl;
-	self.inq_PII_corroboration.inq_corrnameaddrphnssn			:= le.acc_logs.inq_corrnameaddrphnssn;
-	self.inq_PII_corroboration.inq_corrnameaddrphnssn_adl	:= le.acc_logs.inq_corrnameaddrphnssn_adl;
+	self.BJL.liens_unrel_total_amount84				:= le.liens.liens_unrel_total_amount84;
+	self.BJL.liens_unrel_total_amount					:= le.liens.liens_unrel_total_amount;
+	self.BJL.liens_rel_total_amount84					:= le.liens.liens_rel_total_amount84;
+	self.BJL.liens_rel_total_amount						:= le.liens.liens_rel_total_amount;
+	self.attributes.attr_eviction_count84			:= le.BJL.eviction_count84; 
 
-	//MS-110
-	self.BRM_Derogs.liens_unreleased_count84				:= le.BJL.liens_unreleased_count84;
-	self.BRM_Derogs.liens_released_count84					:= le.BJL.liens_released_count84;
-	self.BRM_Derogs.filing_count120									:= le.BJL.filing_count120;
-	self.BRM_Derogs.liens_last_unrel_date84					:= le.BJL.liens_last_unrel_date84;
-	self.BRM_Derogs.liens_last_rel_date84						:= le.BJL.liens_last_rel_date84;
-	self.BRM_Derogs.liens_unrel_total_amount84			:= le.liens.liens_unrel_total_amount84;
-	self.BRM_Derogs.liens_unrel_total_amount				:= le.liens.liens_unrel_total_amount;
-	self.BRM_Derogs.liens_rel_total_amount84				:= le.liens.liens_rel_total_amount84;
-	self.BRM_Derogs.liens_rel_total_amount					:= le.liens.liens_rel_total_amount;
-	self.BRM_Derogs.bk_dismissed_historical_cnt120	:= le.BJL.bk_dismissed_historical_cnt120;
-	self.BRM_Derogs.bk_disposed_historical_cnt120		:= le.BJL.bk_disposed_historical_cnt120;
-	self.BRM_Derogs.attr_eviction_count84						:= le.BJL.eviction_count84; 
-
-	//MS-159
-	self.bus_addr_only_curr			:= le.Address_Verification.bus_addr_only_curr;
-	self.bus_addr_only					:= le.Address_Verification.bus_addr_only;
-
-	//MS-71
-	self.BIP_Header							:= le.BIP_Header;
+	self.bus_addr_only_curr										:= le.Address_Verification.bus_addr_only_curr;
+	self.bus_addr_only												:= le.Address_Verification.bus_addr_only;
 	
-	//MS-158
-	self.bus_property_owned_total					:= le.Address_Verification.bus_owned.property_total;
-	self.bus_property_owned_assess_total	:= le.Address_Verification.bus_owned.property_owned_assessed_total;
-	self.bus_property_owned_assess_count	:= le.Address_Verification.bus_owned.property_owned_assessed_count;
-	self.bus_property_sold_total					:= le.Address_Verification.bus_sold.property_total;
-	self.bus_property_sold_assess_total		:= le.Address_Verification.bus_sold.property_owned_assessed_total;
-	self.bus_property_sold_assess_count		:= le.Address_Verification.bus_sold.property_owned_assessed_count;
-
-	//MS-167
-	self.Eqfx_FraudFlags				:= le.Eqfx_FraudFlags;
-
-	//MS-178
-	self.crossindv5 := le.rv_scores.crossindv5;
-	self.reason1cv5 := le.rv_scores.reason1cv5;
-	self.reason2cv5 := le.rv_scores.reason2cv5;
-	self.reason3cv5 := le.rv_scores.reason3cv5;
-	self.reason4cv5 := le.rv_scores.reason4cv5;
-	self.reason5cv5 := le.rv_scores.reason5cv5;
+	self.bus_property_owned_total							:= le.Address_Verification.bus_owned.property_total;
+	self.bus_property_owned_assess_total			:= le.Address_Verification.bus_owned.property_owned_assessed_total;
+	self.bus_property_owned_assess_count			:= le.Address_Verification.bus_owned.property_owned_assessed_count;
+	self.bus_property_sold_total							:= le.Address_Verification.bus_sold.property_total;
+	self.bus_property_sold_assess_total				:= le.Address_Verification.bus_sold.property_owned_assessed_total;
+	self.bus_property_sold_assess_count				:= le.Address_Verification.bus_sold.property_owned_assessed_count;
 
 	self := le;
 

@@ -1766,7 +1766,7 @@ AllowedSourcesSet :=
 			), 
 			Source );
 
-withBIP_Header := Risk_Indicators.Boca_Shell_BIP_Header(finalOffset, Options, linkingOptions, AllowedSourcesSet, isFCRA); 
+withBIP_Header := Risk_Indicators.Boca_Shell_BIP_Header(finalOffset, Options, linkingOptions, AllowedSourcesSet, isFCRA, BSVersion); 
 
 withEquifaxFraudFlags := Risk_Indicators.Boca_Shell_Equifax_FraudFlags(group(withBIP_Header, seq), isFCRA); 
 
