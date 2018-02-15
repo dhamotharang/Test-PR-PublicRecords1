@@ -114,21 +114,21 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																																																					LEFT.party.ConvictedInfractions2I_Ever,
 																																																					RIGHT.party.ConvictedInfractions2I_Ever);  
 
-																											SELF.eventTypeCategory9 := LEFT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory9 := LEFT.eventTypeCategory9 OR 
 																																								 RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory8 := LEFT.party.legalEventTypeFlags[2] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory8 := LEFT.eventTypeCategory8 OR 
 																																								 RIGHT.party.legalEventTypeFlags[2] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory7 := LEFT.party.legalEventTypeFlags[3] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory7 := LEFT.eventTypeCategory7 OR 
 																																								 RIGHT.party.legalEventTypeFlags[3] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory6 := LEFT.party.legalEventTypeFlags[4] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory6 := LEFT.eventTypeCategory6 OR 
 																																								 RIGHT.party.legalEventTypeFlags[4] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory5 := LEFT.party.legalEventTypeFlags[5] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory5 := LEFT.eventTypeCategory5 OR 
 																																								 RIGHT.party.legalEventTypeFlags[5] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory4 := LEFT.party.legalEventTypeFlags[6] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory4 := LEFT.eventTypeCategory4 OR 
 																																								 RIGHT.party.legalEventTypeFlags[6] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory3 := LEFT.party.legalEventTypeFlags[7] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory3 := LEFT.eventTypeCategory3 OR 
 																																								 RIGHT.party.legalEventTypeFlags[7] = DueDiligence.Constants.T_INDICATOR;
-																											SELF.eventTypeCategory2 := LEFT.party.legalEventTypeFlags[8] = DueDiligence.Constants.T_INDICATOR OR 
+																											SELF.eventTypeCategory2 := LEFT.eventTypeCategory2 OR 
 																																								 RIGHT.party.legalEventTypeFlags[8] = DueDiligence.Constants.T_INDICATOR;
 																																															 
 																											SELF := LEFT;));
@@ -231,10 +231,10 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 		
 	// OUTPUT(updatewithBusinessExecutivesWithLiens, NAMED('updatewithBusinessExecutivesWithLiens'));
 	// OUTPUT(UpdateBusinessExecutivesCriminalOffense, NAMED('UpdateBusinessExecutivesCriminalOffense'));
-	// OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
-	// OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
-	// OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
-	// OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
+	OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
+	OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
+	OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
+	OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
 	
  
 	RETURN UpdateInquiredBusinessWithDerog;
