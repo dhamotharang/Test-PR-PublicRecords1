@@ -23,117 +23,94 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		
 		parents := DueDiligence.CommonIndividual.getParents(inData);																																																							
 		allInd := parents + inData;
-
-				
-		keyHeader := JOIN(allInd, doxie.Key_Header, 
-																				KEYED(LEFT.individual.did = RIGHT.s_did) AND
-																				RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
-																				LEFT.historyDate > RIGHT.dt_first_seen AND	
-																				(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
-																				(header.isPreGLB(RIGHT) OR glb_ok) AND 
-																				(~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
-																				~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
-																				TRANSFORM(DueDiligence.LayoutsInternal.IndSlimHeader, 
-																									SELF.seq := LEFT.seq;
-																									SELF.inquiredDID := LEFT.inquiredDID;
-																									SELF.did := LEFT.individual.did;
-																									SELF.indvType := LEFT.indvType;
-																									SELF.historydate := LEFT.historyDate;
-																									SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
-																									SELF.dateLastSeen := IF(RIGHT.dt_last_seen = 0, RIGHT.dt_vendor_last_reported, RIGHT.dt_last_seen);
-																									SELF.addr_suffix := RIGHT.suffix;
-																									SELF.city := RIGHT.city_name;
-																									SELF.state := RIGHT.st;
-																									SELF.zip5 := RIGHT.zip;
-																									SELF.firstName := RIGHT.fname;
-																									SELF.middleName := RIGHT.mname;
-																									SELF.lastName := RIGHT.lname;
-																									SELF.suffix := RIGHT.name_suffix;
-																									SELF := RIGHT;
-																									SELF := [];),  
-																				LEFT OUTER, 
-																				ATMOST(RiskWise.max_atmost), 
-																				KEEP(DueDiligence.Constants.MAX_ATMOST_150));
-
-															
-		quickHeader := JOIN(allInd, header_quick.key_DID,
-																						KEYED(LEFT.individual.did = RIGHT.did) AND
-																						RIGHT.src NOT IN risk_indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
-																						LEFT.historyDate > RIGHT.dt_first_seen AND
-																						(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
-																						(header.isPreGLB(RIGHT) OR glb_ok) AND
-																						(~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
-																						~risk_indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st),
-																						TRANSFORM(DueDiligence.LayoutsInternal.IndSlimHeader, 
-																											SELF.seq := LEFT.seq;
-																											SELF.inquiredDID := LEFT.inquiredDID;
-																											SELF.did := LEFT.individual.did;
-																											SELF.indvType := LEFT.indvType;
-																											SELF.historyDate := LEFT.historyDate;
-																											SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
-																											SELF.dateLastSeen := IF(RIGHT.dt_last_seen = 0, RIGHT.dt_vendor_last_reported, RIGHT.dt_last_seen);
-																											SELF.addr_suffix := RIGHT.suffix;
-																											SELF.city := RIGHT.city_name;
-																											SELF.state := RIGHT.st;
-																											SELF.zip5 := RIGHT.zip;
-																											SELF.firstName := RIGHT.fname;
-																											SELF.middleName := RIGHT.mname;
-																											SELF.lastName := RIGHT.lname;
-																											SELF.suffix := RIGHT.name_suffix;
-																											SELF := RIGHT;
-																											SELF := [];),  
-																						LEFT OUTER,
-																						ATMOST(ut.limits.HEADER_PER_DID), 
-																						KEEP(DueDiligence.Constants.MAX_ATMOST_100));	
-												
-		allHeader :=  quickHeader + keyHeader;
-		realHeader := IF(dataRestrictionMask[risk_indicators.iid_constants.posEquifaxRestriction] = risk_indicators.iid_constants.sTrue, allHeader(src NOT IN DueDiligence.Constants.EQUIFAX_SOURCES), allheader);
 		
+		getHeaderData(key, didField, atmostValue, keepValue) := FUNCTIONMACRO
+				results := JOIN(allInd, key, 
+												KEYED(LEFT.individual.did = RIGHT.didField) AND
+												RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(dataRestrictionMask, isFCRA) AND 
+												(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
+												(header.isPreGLB(RIGHT) OR glb_ok) AND 
+												(~mdr.Source_is_DPPA(RIGHT.src) OR (dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), dppa, RIGHT.src))) AND 
+												~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
+												TRANSFORM(DueDiligence.LayoutsInternal.IndSlimHeader, 
+																	SELF.seq := LEFT.seq;
+																	SELF.inquiredDID := LEFT.inquiredDID;
+																	SELF.did := LEFT.individual.did;
+																	SELF.indvType := LEFT.indvType;
+																	SELF.historydate := LEFT.historyDate;
+																	SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
+																	SELF.dateLastSeen := IF(RIGHT.dt_last_seen = 0, RIGHT.dt_vendor_last_reported, RIGHT.dt_last_seen);
+																	SELF.addr_suffix := RIGHT.suffix;
+																	SELF.city := RIGHT.city_name;
+																	SELF.state := RIGHT.st;
+																	SELF.zip5 := RIGHT.zip;
+																	SELF.firstName := RIGHT.fname;
+																	SELF.middleName := RIGHT.mname;
+																	SELF.lastName := RIGHT.lname;
+																	SELF.suffix := RIGHT.name_suffix;
+																	SELF := RIGHT;
+																	SELF := [];),  
+												LEFT OUTER, 
+												ATMOST(atmostValue), 
+												KEEP(keepValue));
+												
+			RETURN results;		
+		ENDMACRO;
+		
+		
+		keyHeader := getHeaderData(doxie.Key_Header, s_did, ut.limits.HEADER_PER_DID, DueDiligence.Constants.MAX_ATMOST_150);									
+		quickHeader := getHeaderData(header_quick.key_DID, did, RiskWise.max_atmost, DueDiligence.Constants.MAX_ATMOST_100);
+												
+		realHeader :=  quickHeader + keyHeader;
+
 		headerCleanDates := DueDiligence.Common.CleanDatasetDateFields(realHeader, 'dateFirstSeen, dateLastSeen');
+		
+		//filter out records after our history date
+		filterHeader := DueDiligence.Common.FilterRecordsSingleDate(headerCleanDates, dateFirstSeen);
 
 
 		//sort header data to grab the first seen date for a given inquired did
-		sortHeaderDateFirstSeen := SORT(headerCleanDates(dateFirstSeen <> 0), seq, did, dateFirstSeen);
+		sortHeaderDateFirstSeen := SORT(filterHeader(dateFirstSeen <> 0), seq, did, dateFirstSeen);
 		dedupHeaderDateFirstSeen := DEDUP(sortHeaderDateFirstSeen, seq, did);
 		
 		addDateFirstReported := JOIN(inData, dedupHeaderDateFirstSeen,
-																															LEFT.seq = RIGHT.seq AND
-																															LEFT.individual.did = RIGHT.did,
-																															TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																																				SELF.firstReportedDate := RIGHT.dateFirstSeen;
-																																				SELF := LEFT;),
-																															LEFT OUTER);
+																	LEFT.seq = RIGHT.seq AND
+																	LEFT.individual.did = RIGHT.did,
+																	TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+																						SELF.firstReportedDate := RIGHT.dateFirstSeen;
+																						SELF := LEFT;),
+																	LEFT OUTER);
 
 		//determine if there was a voter source for an individual
-		voterSources := headerCleanDates(src = MDR.sourceTools.src_Voters_v2);
+		voterSources := filterHeader(src = MDR.sourceTools.src_Voters_v2);
 		
 		sortVoterSources := SORT(voterSources, seq, did);
 		dedupVoterSources := DEDUP(sortVoterSources, seq, did);
 		
 		projectVoterSources := PROJECT(dedupVoterSources, TRANSFORM({RECORDOF(LEFT), BOOLEAN indVoterSource, BOOLEAN parentVoterSource},
-																																																																SELF.indVoterSource := LEFT.indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL;
-																																																																SELF.parentVoterSource := LEFT.indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT;
-																																																																SELF := LEFT;));
+																																	SELF.indVoterSource := LEFT.indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL;
+																																	SELF.parentVoterSource := LEFT.indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT;
+																																	SELF := LEFT;));
 																																																																
 		rollVoterSources := ROLLUP(SORT(projectVoterSources, seq, inquiredDID, indvType),
-																														LEFT.seq = RIGHT.seq AND
-																														LEFT.inquiredDID = RIGHT.inquiredDID,
-																														TRANSFORM(RECORDOF(LEFT),
-																																									SELF.indVoterSource := LEFT.indVoterSource OR RIGHT.indVoterSource;
-																																									SELF.parentVoterSource := LEFT.parentVoterSource OR RIGHT.parentVoterSource;
-																																									SELF := LEFT;));																																																														
+																LEFT.seq = RIGHT.seq AND
+																LEFT.inquiredDID = RIGHT.inquiredDID,
+																TRANSFORM(RECORDOF(LEFT),
+																					SELF.indVoterSource := LEFT.indVoterSource OR RIGHT.indVoterSource;
+																					SELF.parentVoterSource := LEFT.parentVoterSource OR RIGHT.parentVoterSource;
+																					SELF := LEFT;));																																																														
 		
 		addRegVoter := JOIN(addDateFirstReported, rollVoterSources,
-																						LEFT.seq = RIGHT.seq AND
-																						LEFT.individual.did = RIGHT.did,
-																						TRANSFORM(RECORDOF(LEFT),
-																																		SELF.registeredVoter := RIGHT.indVoterSource;
-																																		SELF.atleastOneParentIsRegisteredVoter := RIGHT.parentVoterSource;
-																																		SELF := LEFT;),
-																						LEFT OUTER);
+												LEFT.seq = RIGHT.seq AND
+												LEFT.individual.did = RIGHT.did,
+												TRANSFORM(RECORDOF(LEFT),
+																	SELF.registeredVoter := RIGHT.indVoterSource;
+																	SELF.atleastOneParentIsRegisteredVoter := RIGHT.parentVoterSource;
+																	SELF := LEFT;),
+												LEFT OUTER);
 		
 		//sort and dedup addresses based on state (we only need to know state)
-		sortStates := SORT(headerCleanDates(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL), seq, inquiredDID, state);
+		sortStates := SORT(filterHeader(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL), seq, inquiredDID, state);
 		dedupStates := DEDUP(sortStates, seq, inquiredDID, state);
 		
 		//determine if the voter info has state coverage for the inquired individual
@@ -146,21 +123,20 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 																									LEFT OUTER,
 																									ATMOST(1));
 																					
-
 		rollStateVoterInfo := ROLLUP(SORT(stateVoterInfo, seq, did),
-																																LEFT.seq = RIGHT.seq AND
-																																LEFT.did = RIGHT.did,
-																																TRANSFORM(RECORDOF(LEFT),
-																																											SELF.stateVoterInfoAvailable := LEFT.stateVoterInfoAvailable OR RIGHT.stateVoterInfoAvailable;
-																																											SELF := LEFT;));
+																	LEFT.seq = RIGHT.seq AND
+																	LEFT.did = RIGHT.did,
+																	TRANSFORM(RECORDOF(LEFT),
+																						SELF.stateVoterInfoAvailable := LEFT.stateVoterInfoAvailable OR RIGHT.stateVoterInfoAvailable;
+																						SELF := LEFT;));
 																					
 		addIndStateVoter := JOIN(addRegVoter, rollStateVoterInfo,
-																						LEFT.seq = RIGHT.seq AND
-																						LEFT.individual.did = RIGHT.did,
-																						TRANSFORM(RECORDOF(LEFT),
-																																		SELF.stateVotingSourceAvailable := RIGHT.stateVoterInfoAvailable;
-																																		SELF := LEFT;),
-																						LEFT OUTER);
+															LEFT.seq = RIGHT.seq AND
+															LEFT.individual.did = RIGHT.did,
+															TRANSFORM(RECORDOF(LEFT),
+																				SELF.stateVotingSourceAvailable := RIGHT.stateVoterInfoAvailable;
+																				SELF := LEFT;),
+															LEFT OUTER);
 																					
 
 																																					
@@ -171,10 +147,10 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		// output(keyHeader, named('keyHeader'));
 		// output(quickHeader, named('quickHeader'));
 		// output(allInd, named('allInd_header'));
-		// output(allHeader, named('allHeader'));
 		// output(realHeader, named('realHeader'));
 		
 		// output(headerCleanDates, named('headerCleanDates'));
+		// output(filterHeader, named('filterHeader'));
 		
 		// output(voterSources, named('voterSources'));
 		// output(sortHeaderDateFirstSeen, named('sortHeaderDateFirstSeen'));
