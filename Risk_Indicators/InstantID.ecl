@@ -1,7 +1,4 @@
-﻿/*2016-05-21T00:38:47Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:50:17Z
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="InstantID">
 	<part name="_LoginID" type="xsd:string"/>
 	<part name="AccountNumber" type="xsd:string"/>
@@ -100,6 +97,7 @@ Automated reinstate from 2016-05-19T17:50:17Z
 	<part name="IIDVersionOverride" type="xsd:boolean"/>
 	<part name="IncludeDPBC" type="xsd:boolean"/>
 	<part name="EnableEmergingID" type="xsd:boolean"/>
+	<part name="AllowEmergingID" type="xsd:boolean"/>
 	<part name="NameInputOrder" type="xsd:string"/>
 	<part name="outcometrackingoptout" type="xsd:boolean"/>
  </message>
@@ -207,6 +205,7 @@ export InstantID := MACRO
 		'IIDVersionOverride',
 		'IncludeDPBC',
 		'EnableEmergingID',
+		'AllowEmergingID',
 		'NameInputOrder',
 		'outcometrackingoptout'
 	));
