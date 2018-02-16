@@ -519,16 +519,18 @@ EXPORT LinkIDs := RECORD
 		UNSIGNED4 lastReported;
 	END;
 	
-EXPORT BusOperLocationLayout := RECORD
-  Address;
+	EXPORT BusOperLocationLayout := RECORD
+	 Address;
 	 GeographicRiskLayout;  
+	 BOOLEAN cmra;
+	 BOOLEAN vacant;
 	END;	
 	
 	
 	EXPORT BusReportDetails        := RECORD
 	DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
 	DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_SOURCES)};
- DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+	DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
 	//***add additional datasets as needed here ****
 	//STRING BusinessReportName;
 	END;
@@ -654,14 +656,14 @@ EXPORT BusOperLocationLayout := RECORD
 		unsigned2 	CountOwnProp;                           //populated in DueDiligence.getBusProperty - 
 		/* BusAssetOwnWatercraft */ 
 		unsigned2 	WatercraftCount;                        //populated in DueDiligence.getBusWatercraft 
-		unsigned2  Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
+		unsigned2  	Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
 		/* BusAssetOwnAircraft */
 		unsigned2 	AircraftCount;                          //populated in DueDiligence.getBusAircraft 
 		/* BusAssetOwnVehicle */
 		unsigned2 	VehicleCount;                           //populated in DueDiligence.getBusVehicle
-		unsigned6  VehicleBaseValue;
+		unsigned6  	VehicleBaseValue;
 		/*BusSOSAgeRange*/  
-		UNSIGNED4  sosIncorporationDate;										         //populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4  	sosIncorporationDate;										         //populated in DueDiligence.getBusSOSDetail
 		BOOLEAN   	noSOSFilingEver;												            //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED4		filingDate;	
 		/*BusPublicRecordAgeRange*/ 	

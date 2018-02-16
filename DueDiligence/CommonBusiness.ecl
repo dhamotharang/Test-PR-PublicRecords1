@@ -327,6 +327,19 @@ EXPORT CommonBusiness := MODULE
 		RETURN agent;
 	END;
 	
+	EXPORT getOperatingLocations(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
+		
+		locations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, RECORDOF(RIGHT)},
+																																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																																						SELF := RIGHT;
+																																						SELF := LEFT;
+																																						SELF := [];));
+		
+		RETURN locations;
+	END;
+	
 	// ******************************************************************************************************** //
 	// Replace/Overlay the Executives info on the Business Internal with the updatedExec information collected  //
 	// ******************************************************************************************************** // 
@@ -514,6 +527,57 @@ EXPORT CommonBusiness := MODULE
 																	LEFT OUTER);														
 																	
 		RETURN addOperatingLocations;
+	END;
+	
+	EXPORT getOperatingLocationAsInquired(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
+		opLocations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																																							SELF.busn_info.address := RIGHT;
+																																							SELF.seq := LEFT.seq;
+																																							SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																																							SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																																							SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																																							SELF.historyDate := LEFT.historydate;
+																																							SELF.relatedDegree := DueDiligence.Constants.OPERATING_LOCATION;
+																																							SELF := [];));
+																				
+		RETURN opLocations;
+	END;
+	
+	EXPORT getRegisteredAgentAsInquired(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
+		agents := NORMALIZE(inquiredBus, LEFT.registeredagents, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																																			SELF.seq := LEFT.seq;
+																																			SELF.historyDate := LEFT.historyDate;
+																																			SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																																			SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																																			SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																																			SELF.Busn_info.BIP_IDS.ProxID.LinkID := LEFT.Busn_info.BIP_IDS.ProxID.LinkID;
+																																			SELF.Busn_info.BIP_IDS.PowID.LinkID := LEFT.Busn_info.BIP_IDS.PowID.LinkID;
+																																			SELF.relatedDegree := DueDiligence.Constants.REGISTERED_AGENT;
+																																			SELF.Busn_info.address.prim_range := RIGHT.prim_range;
+																																			SELF.Busn_info.address.predir := RIGHT.predir;
+																																			SELF.Busn_info.address.prim_name := RIGHT.prim_name;
+																																			SELF.Busn_info.address.addr_suffix := RIGHT.addr_suffix;
+																																			SELF.Busn_info.address.postdir := RIGHT.postdir;
+																																			SELF.Busn_info.address.unit_desig := RIGHT.unit_desig;
+																																			SELF.Busn_info.address.sec_range := RIGHT.sec_range;
+																																			SELF.Busn_info.address.city := RIGHT.city;
+																																			SELF.Busn_info.address.state := RIGHT.state;
+																																			SELF.Busn_info.address.zip5 := RIGHT.zip5;
+																																			SELF.Busn_info.address.zip4 := RIGHT.zip4;
+																																			SELF.setUniquePowIDs := LEFT.setUniquePowIDs;
+																																			SELF.atleastOneAgentSameAddrAsBus := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
+																																																						LEFT.busn_info.address.predir = RIGHT.predir AND
+																																																						LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
+																																																						LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
+																																																						LEFT.busn_info.address.postdir = RIGHT.postdir AND
+																																																						LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
+																																																						LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
+																																																						LEFT.busn_info.address.city = RIGHT.city AND
+																																																						LEFT.busn_info.address.state = RIGHT.state AND
+																																																						LEFT.busn_info.address.zip5 = RIGHT.zip5;
+																																			SELF := []));
+																																	
+		RETURN agents;	
 	END;
 	
 END;
