@@ -1,8 +1,7 @@
-﻿/*2016-03-22T01:30:53Z (Michele Walklin)
-for review
-*/
-import iesp, Risk_Indicators, Fingerprint, ut, Gateway, codes, iesp;
+﻿import iesp, Risk_Indicators, Fingerprint, ut, Gateway, codes, iesp;
 
+// Note: this function assumes that the OFACversion has been checked and is 4 or greater, and that
+// include_ofac is TRUE.
 export OFACXG5call (DATASET(OFAC_XG5.Layout.InputLayout) indata, 
 														boolean ofaconly_value = false,
 														integer threshold_value = OFAC_XG5.Constants.DEF_THRESHOLD,
@@ -16,15 +15,25 @@ DBNames_rec := ofac_xg5.Constants.DBNames_rec;
 
 watchlists_requested := project (watchlists_original, transform (iesp.share.t_StringArrayItem,
                                                                  Self.value := StringLib.StringToUpperCase (Left.value))); 
-customWLset := OFAC_XG5.GetSearchFiles(watchlists_requested);
 
-fileToSearch := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => customWLset,
-										include_ofac and include_additional_watchlists => OFAC_XG5.Constants.WCOFACNames + OFAC_XG5.Constants.WCOAddtnlFiles,
-										include_ofac and include_additional_watchlists = false => OFAC_XG5.Constants.WCOFACNames + customWLset,
-										include_ofac=false and include_additional_watchlists => OFAC_XG5.Constants.WCOAddtnlFiles,
-										ofaconly_value = true => OFAC_XG5.Constants.WCOFACNames + customWLset,
-										OFAC_XG5.Constants.WCOFACNames);
+customWLset     := OFAC_XG5.GetSearchFiles(watchlists_requested);
+has_customWLset := COUNT(customWLset) > 0;
 
+getALL := ('ALL' IN SET(watchlists_original, value)) AND ('ALLV4' NOT IN SET(watchlists_original, value)); 
+      
+fileToSearch := 
+    map(
+      include_additional_watchlists AND getALL => OFAC_XG5.Constants.WCOAddtnlFiles_ALL,
+      include_additional_watchlists            => OFAC_XG5.Constants.WCOAddtnlFiles_ALLV4,
+      has_customWLset AND include_ofac         => customWLset + OFAC_XG5.Constants.WCOFACNames,
+      has_customWLset AND NOT include_ofac AND ofaconly_value => customWLset + OFAC_XG5.Constants.WCOFACNames,
+      has_customWLset AND NOT include_ofac AND NOT ofaconly_value => customWLset,
+      NOT has_customWLset AND include_ofac AND NOT ofaconly_value => OFAC_XG5.Constants.WCOFACNames,
+      ofaconly_value                           => OFAC_XG5.Constants.WCOFACNames,
+      NOT has_customWLset AND NOT include_ofac AND NOT ofaconly_value => customWLset, // which in this case would be empty 
+      OFAC_XG5.Constants.WCOFACNames // default value
+    );
+    
 fileToSearchDedup := dedup(sort(fileToSearch, dbname), dbname);
 													
 gateway_cfg  := gateways(Gateway.Configuration.IsBridgerwlc(servicename))[1];
@@ -52,14 +61,7 @@ iesp.WsSearchCore.t_SearchRequest into_req(Risk_Indicators.iid_constants.ds_Reco
 	self.Input.BlockID  := 1;	
 	SELF.Input.EntityRecords := project(indata, transform(iesp.WsSearchCore.t_InputEntityRecord,			
 			self.id  						:=  left.seq;
-			FullNameMerged := TRIM(left.firstName)+' '+TRIM(left.middleName, LEFT, RIGHT)+' '+TRIM(left.lastName);
-			self.name.First 			:=  if (left.searchtype = 'I' and trim(left.firstName) <> '', trim(left.firstName), ''); 
-			self.name.Middle 			:= if (left.searchtype = 'I' and trim(left.middleName) <> '', trim(left.middleName), '');
-			self.name.Last 			:=  if (left.searchtype = 'I' and trim(left.lastName) <> '' , trim(left.lastName), '');
-			self.name.Full 			:=  map( left.searchtype in ['N', 'B'] and trim(left.fullName) <> ''  => trim(left.fullName),
-																														left.searchtype in ['N', 'B'] and FullNameMerged <> '' => FullNameMerged,
-																									     left.searchtype = 'I' and FullNameMerged = ''          => trim(left.fullName),
-																									                                                               trim(left.fullName));
+			self.name.Full 			:=  left.fullName;  //if(isIndiv,le.FullName, le.company_name);	full name is required per Rajeev
 			self.EntityType 		:= trim(MAP(left.searchType  in ['N']  => 'Business', 
 																			left.searchType  in [ 'I'] => 'Individual',
 																			left.searchType  in [ 'B'] => 'Unknown',
@@ -123,8 +125,7 @@ EntityRecords := 	NONErrorRecs[1].SearchResult.EntityRecords;
 
 OFAC_XG5.Layout.SearchResultsSlimmed PrepResponse(EntityRecords le, integer C) := TRANSFORM
 			self.BlockID	:= le.InputRecord.ID;
-			MergedInputRecordName := TRIM(le.InputRecord.name.first)+' '+TRIM(le.InputRecord.name.middle, LEFT, RIGHT)+' '+TRIM(le.InputRecord.name.last);
-      self.ResponseFullName := if(MergedInputRecordName = '', le.InputRecord.name.full, MergedInputRecordName);
+      self.ResponseFullName := le.InputRecord.name.full;
 			self.EntityRecords := le;
 			self := le;
 			self := [];
@@ -150,9 +151,9 @@ OFAC_XG5.Layout.SearchResultsSlimmed Addinput(indata le, SlimOutBridger ri, inte
 			self := ri;
 END;		
 
-
-AddinputBack 	:= join(indata, SlimOutBridger, 
-												left.seq = right.blockid,
+AddinputBack 		:= join(indata, SlimOutBridger, 
+												left.seq = right.blockid and
+												left.fullname = right.ResponseFullName ,
 												Addinput(LEFT,RIGHT, counter));
 																							 
 AddinputBackErr := if(count(ErrorRecs) > 0, AddinputBack + SlimOutBridgerError, AddinputBack);   
@@ -161,7 +162,7 @@ addentityseq := project(AddinputBackErr,
 												transform(OFAC_XG5.Layout.SearchResultsSlimmed, 
 													self.EntityRecSeq := counter, 
 													self := left));           	
-	
+
 // output(dob_radius, named('Call_dob_radius'), overwrite);
 // output(indata, named('Call_indata'), overwrite);
 // output(gateways, named('gateways'), overwrite);
@@ -178,7 +179,7 @@ addentityseq := project(AddinputBackErr,
 // output(AddinputBack, named('Call_AddinputBack'), overwrite);
 // output(AddinputBackErr, named('Call_AddinputBackErr'), overwrite);
 // output(addentityseq, named('Call_addentityseq'), overwrite);
-		
+
 return addentityseq;			
 
 									

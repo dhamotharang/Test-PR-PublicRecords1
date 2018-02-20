@@ -152,10 +152,7 @@ string8 DateofApplication := '' : stored('DateofApplication');
 string8 TimeofApplication := '' : stored('TimeofApplication');
 
 boolean IncludeDPBC := false : stored('IncludeDPBC');
-boolean EnableEmergingID_temp := false : stored('EnableEmergingID');
-BOOLEAN allowemergingid := FALSE : STORED('allowemergingid');
-EnableEmergingID := allowemergingid or EnableEmergingID_temp; // part of RR-12092, check either the allowEmergingid tag or EnableEmergingID
-
+boolean EnableEmergingID := false : stored('EnableEmergingID');
 boolean IsIdentifier2 := false : stored('IsIdentifier2');
 temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
@@ -172,6 +169,8 @@ boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeCLoverride := false : stored('IncludeCLoverride');
 boolean SearchSicNAICSCodes := false : STORED('SearchSicNAICSCodes');
 
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 // DOB options
 DOBMatchOptions_in := dataset([], risk_indicators.layouts.Layout_DOB_Match_Options) : STORED('DOBMatchOptions',few);
@@ -638,8 +637,7 @@ TRANSFORM
 	self.InstantIDVersion := (string)actualIIDVersion;
 
 	//new for Emerging Identities
-	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
-	self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity
+	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
 	isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 	self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																						le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one
@@ -814,7 +812,9 @@ END;
 scores_out := IF(count(model_url(url<>''))>0,riskwise.ScoreController(model_url(url<>''),PROJECT(ungroup(d),scoredata(LEFT))));
 
 models.layouts.Layout_Score_IID_wFP limit_scores( models.layouts.Layout_Score_FP le ) := TRANSFORM
-  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2', 'FP1610_1', 'FP1610_2', 'FP1611_1'], 6, 4); // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
+  num_reasons := if( modelname in ['FP1109_0','FP1109_9', 'FP1310_1', 'FP1401_1', 'FP1307_1', 'FP31310_2', 'FP1307_2', 'FP1404_1', 'FP1407_1', 
+																																			'FP1407_2', 'FP1403_2', 'FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9', 'FP1509_2', 'FP1510_2',
+																																			'FP1610_1', 'FP1610_2', 'FP1611_1'], 6, 4); // FP version 2 and forward will get 6 reason codes, otherwise 4 like they used to
 	self.reason_codes := choosen( le.reason_codes, num_reasons ); 
   self.risk_indices := if(includeRiskIndices or modelname in ['FP31310_2', 'FP1610_1', 'FP1610_2', 'FP1611_1'], 
                           dataset([{'StolenIdentityIndex', le.StolenIdentityIndex},
