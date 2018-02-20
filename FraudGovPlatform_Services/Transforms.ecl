@@ -3,7 +3,7 @@
 
 EXPORT Transforms := MODULE
 
-	EXPORT iesp.fraudgovplatform.t_FraudGovDeceased xform_deceased(DeathV2_Services.Layouts.BatchOut l) := TRANSFORM
+	EXPORT iesp.fraudgovreport.t_FraudGovDeceased xform_deceased(DeathV2_Services.Layouts.BatchOut l) := TRANSFORM
 
 		SELF.SSN := l.ssn;
 		SELF.Name := iesp.ECL2ESP.SetName(l.fname, l.mname, l.lname, l.name_suffix,'');
@@ -17,7 +17,7 @@ EXPORT Transforms := MODULE
 		SELF.Source := l.death_rec_src;
 	END;
 	
-	EXPORT iesp.fraudgovplatform.t_FraudGovOffense xform_offenses(CriminalRecords_BatchService.Layouts.Batch_Out l, 
+	EXPORT iesp.fraudgovreport.t_FraudGovOffense xform_offenses(CriminalRecords_BatchService.Layouts.Batch_Out l, 
 																																INTEGER c) := TRANSFORM
 		SELF.OffenseDescription := CHOOSE(c, l.court_desc_1, l.court_desc_2, l.court_desc_3, l.court_desc_4, 
 																																				l.court_desc_5, l.court_desc_6);
@@ -32,7 +32,7 @@ EXPORT Transforms := MODULE
 																																																											 
 	END;
 	
-	EXPORT iesp.fraudgovplatform.t_FraudGovCriminal xform_criminal(CriminalRecords_BatchService.Layouts.Batch_Out l,
+	EXPORT iesp.fraudgovreport.t_FraudGovCriminal xform_criminal(CriminalRecords_BatchService.Layouts.Batch_Out l,
 																																 INTEGER c) := TRANSFORM
 		
 		SELF.MatchType := l.match_type;
@@ -50,7 +50,7 @@ EXPORT Transforms := MODULE
 		SELF.DataSource := l.datasource;
 		
 		//****************************************************************
-		iesp.fraudgovplatform.t_FraudGovCase xform_cases() := TRANSFORM
+		iesp.fraudgovreport.t_FraudGovCase xform_cases() := TRANSFORM
 																																																	
 				SELF.County := CHOOSE(c, l.cty_conv_1, l.cty_conv_2, l.cty_conv_3, l.cty_conv_4, l.cty_conv_5, l.cty_conv_6);
 				SELF.SentenceDate := iesp.ecl2esp.toDatestring8(CHOOSE(c, l.stc_dt_1, l.stc_dt_2, l.stc_dt_3, l.stc_dt_4,
@@ -67,7 +67,7 @@ EXPORT Transforms := MODULE
 		self := [];
 	END;
 	
-	EXPORT iesp.fraudgovplatform.t_FraudGovGlobalWatchlist xform_global_watchlist(Patriot.layout_batch_out l,
+	EXPORT iesp.fraudgovreport.t_FraudGovGlobalWatchlist xform_global_watchlist(Patriot.layout_batch_out l,
 																																								INTEGER c) := TRANSFORM
 																																																					
 		SELF.HitNum := l.HitNum;
@@ -96,24 +96,24 @@ EXPORT Transforms := MODULE
 			SELF.seq := 0;
 	END;
 
-	EXPORT iesp.fraudgovplatform.t_FraudGovRedFlag xform_red_flag(FraudGovPlatform_Services.Layouts.combined_layouts l) := TRANSFORM		
+	EXPORT iesp.fraudgovreport.t_FraudGovRedFlag xform_red_flag(FraudGovPlatform_Services.Layouts.combined_layouts l) := TRANSFORM		
 		
-		SELF.AddressDiscrepancyCodes := PROJECT(l.address_discrepancy_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SuspiciousDocumentsCodes := PROJECT(l.suspicious_documents_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SuspiciousAddressCodes := PROJECT(l.suspicious_address_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SuspiciousSSNCodes := PROJECT(l.suspicious_ssn_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SuspiciousDOBCodes := PROJECT(l.suspicious_dob_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.HighRiskAddressCodes := PROJECT(l.high_risk_address_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SuspiciousPhoneCodes := PROJECT(l.suspicious_phone_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.SSNMultipleLastCodes := PROJECT(l.ssn_multiple_last_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.MissingInputCodes := PROJECT(l.missing_input_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.FraudAlertCodes := PROJECT(l.fraud_alert_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.CreditFreezeCodes := PROJECT(l.credit_freeze_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
-		SELF.IdentityTheftCodes := PROJECT(l.identity_theft_codes, iesp.fraudgovplatform.t_FraudGovIndDescPlusSequence);
+		SELF.AddressDiscrepancyCodes := PROJECT(l.address_discrepancy_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SuspiciousDocumentsCodes := PROJECT(l.suspicious_documents_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SuspiciousAddressCodes := PROJECT(l.suspicious_address_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SuspiciousSSNCodes := PROJECT(l.suspicious_ssn_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SuspiciousDOBCodes := PROJECT(l.suspicious_dob_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.HighRiskAddressCodes := PROJECT(l.high_risk_address_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SuspiciousPhoneCodes := PROJECT(l.suspicious_phone_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.SSNMultipleLastCodes := PROJECT(l.ssn_multiple_last_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.MissingInputCodes := PROJECT(l.missing_input_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.FraudAlertCodes := PROJECT(l.fraud_alert_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.CreditFreezeCodes := PROJECT(l.credit_freeze_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
+		SELF.IdentityTheftCodes := PROJECT(l.identity_theft_codes, iesp.fraudgovreport.t_FraudGovIndDescPlusSequence);
 
 	END;
 	
-	EXPORT iesp.fraudgovplatform.t_FraudGovVelocityCount xform_velocities(FraudGovPlatform_Services.Layouts.velocities l) := TRANSFORM		
+	EXPORT iesp.fraudgovreport.t_FraudGovVelocityCount xform_velocities(FraudGovPlatform_Services.Layouts.velocities l) := TRANSFORM		
 		
 		SELF.FoundCount := l.foundCnt;
 		SELF.Description := l.description;
