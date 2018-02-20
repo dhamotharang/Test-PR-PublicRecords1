@@ -35,9 +35,9 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	oshaFilt := DueDiligence.Common.FilterRecordsSingleDate(oshaCleanDate, inspection_opening_date);
 	
 	//retrieve SIC and NAIC codes with dates
-	outOshaSic := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, sic_code, TRUE, TRUE, inspection_opening_date, inspection_close_date);
-	outOshaNaic := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, naics_code, FALSE, TRUE, inspection_opening_date, inspection_close_date);
-	outOshaNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, naics_secondary_code, FALSE, FALSE, inspection_opening_date, inspection_close_date);
+	outOshaSic := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_OSHA, sic_code, TRUE, TRUE, inspection_opening_date, inspection_close_date);
+	outOshaNaic := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_OSHA, naics_code, FALSE, TRUE, inspection_opening_date, inspection_close_date);
+	outOshaNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(oshaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_OSHA, naics_secondary_code, FALSE, FALSE, inspection_opening_date, inspection_close_date);
 	
 	allOshaSicNaic := outOshaSic + outOshaNaic + outOshaNaic2;
 	sortOshaRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(indata, allOshaSicNaic);
@@ -72,10 +72,10 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	ebrFilt := DueDiligence.Common.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
 	
 	//retrieve SIC and NAIC codes with dates
-	outEbrSic := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, sic_1_code, TRUE, TRUE, date_first_seen, date_last_seen);
-	outEbrSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, sic_2_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, sic_3_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, sic_4_code, TRUE, FALSE, date_first_seen, date_last_seen);
+	outEbrSic := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_1_code, TRUE, TRUE, date_first_seen, date_last_seen);
+	outEbrSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_2_code, TRUE, FALSE, date_first_seen, date_last_seen);
+	outEbrSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_3_code, TRUE, FALSE, date_first_seen, date_last_seen);
+	outEbrSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_4_code, TRUE, FALSE, date_first_seen, date_last_seen);
 	
 	
 	allEbrSicNaic := outEbrSic + outEbrSic2 + outEbrSic3 + outEbrSic4;
@@ -112,28 +112,28 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	//retrieve SIC and NAIC codes with dates
 	//SIC
-	outDcaSic := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic1, TRUE, TRUE, date_first_seen, date_last_seen);
-	outDcaSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic2, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic3, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic4, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic5 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic5, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic6 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic6, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic7 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic7, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic8 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic8, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic9 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic9, TRUE, FALSE, date_first_seen, date_last_seen);
-	outDcaSic10 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.sic10, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic1, TRUE, TRUE, date_first_seen, date_last_seen);
+	outDcaSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic2, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic3, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic4, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic5 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic5, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic6 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic6, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic7 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic7, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic8 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic8, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic9 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic9, TRUE, FALSE, date_first_seen, date_last_seen);
+	outDcaSic10 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.sic10, TRUE, FALSE, date_first_seen, date_last_seen);
 	
 	//NAICS
-	outDcaNaic := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics1, FALSE, TRUE, date_first_seen, date_last_seen);
-	outDcaNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics2, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics3, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics4, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics5, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic6 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics6, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic7 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics7, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic8 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics8, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic9 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics9, FALSE, FALSE, date_first_seen, date_last_seen);
-	outDcaNaic10 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, rawfields.naics10, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics1, FALSE, TRUE, date_first_seen, date_last_seen);
+	outDcaNaic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics2, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics3, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics4, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic5 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics5, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic6 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics6, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic7 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics7, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic8 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics8, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic9 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics9, FALSE, FALSE, date_first_seen, date_last_seen);
+	outDcaNaic10 := DueDiligence.CommonBusiness.getSicNaicCodes(dcaFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_DCA, rawfields.naics10, FALSE, FALSE, date_first_seen, date_last_seen);
 	
 	allDcaSicNaic := outDcaSic + outDcaSic2 + outDcaSic3 + outDcaSic4 + outDcaSic5 + outDcaSic6 + outDcaSic7 + outDcaSic8 +
 									 outDcaSic9 + outDcaSic10 + outDcaNaic + outDcaNaic2 + outDcaNaic3 + outDcaNaic4 + outDcaNaic5 + outDcaNaic6 +
@@ -170,7 +170,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	fbnFilt := DueDiligence.Common.FilterRecords(fbnDateClean, dt_first_seen, dt_vendor_first_reported);
 	
 	//retrieve SIC and NAIC codes with dates
-	outFbnSic := DueDiligence.CommonBusiness.getSicNaicCodes(fbnFilt, sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outFbnSic := DueDiligence.CommonBusiness.getSicNaicCodes(fbnFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_FICTICIOUS_BUSINESS, sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
 	
 	sortFbnRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addDcaSicNaic, outFbnSic);
 		
@@ -210,12 +210,12 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	dsWithEndDate := PROJECT(ypFiltRec, TRANSFORM(tempLayout, SELF := LEFT; SELF := [];));
 	
 	// retrieve SIC and NAIC codes with dates
-	outYpSic := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, sic_code, TRUE, TRUE, pub_date, lastSeen);
-	outYpSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, sic2, TRUE, FALSE, pub_date, lastSeen);
-	outYpSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, sic3, TRUE, FALSE, pub_date, lastSeen);
-	outYpSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, sic4, TRUE, FALSE, pub_date, lastSeen);
+	outYpSic := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_YELLOW_PAGES, sic_code, TRUE, TRUE, pub_date, lastSeen);
+	outYpSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_YELLOW_PAGES, sic2, TRUE, FALSE, pub_date, lastSeen);
+	outYpSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_YELLOW_PAGES, sic3, TRUE, FALSE, pub_date, lastSeen);
+	outYpSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_YELLOW_PAGES, sic4, TRUE, FALSE, pub_date, lastSeen);
 	
-	outYpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, naics_code, FALSE, TRUE, pub_date, lastSeen);
+	outYpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(dsWithEndDate, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_YELLOW_PAGES, naics_code, FALSE, TRUE, pub_date, lastSeen);
 	
 	allYpSicNaic := outYpSic + outYpSic2 + outYpSic3 + outYpSic4 + outYpNaic;
 	sortYpRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addFbnSicNaic, outYpSic);
@@ -248,7 +248,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	calBusFilt := DueDiligence.Common.FilterRecordsSingleDate(calBusCleanDate, dt_first_seen);
 	
 	//retrieve SIC and NAIC codes with dates
-	outCalBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(calBusFilt, naics_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outCalBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(calBusFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_CAL_BUSINESS, naics_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	sortCalBusRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addYpSicNaic, outCalBusNaic);
 		
 	addCalBusSicNaic := JOIN(addYpSicNaic, sortCalBusRollSicNaic,
@@ -313,12 +313,6 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF.otherHighRiskIndustExists := LEFT.otherHighRiskIndustExists OR RIGHT.otherHighRiskIndustExists;
 																				SELF.moderateRiskIndustExists := LEFT.moderateRiskIndustExists OR RIGHT.moderateRiskIndustExists;
 																				SELF.lowRiskIndustExists := LEFT.lowRiskIndustExists OR RIGHT.lowRiskIndustExists;
-																				
-																				sicFound := RIGHT.sicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.sicCodes, RIGHT.sicCodes, 1) = DueDiligence.Constants.NUMERIC_ZERO;	
-																				naicFound := RIGHT.naicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.naicCodes, RIGHT.naicCodes, 1) = DueDiligence.Constants.NUMERIC_ZERO;	
-																				
-																				SELF.sicCodes := IF(sicFound, IF(LEFT.sicCodes = DueDiligence.Constants.EMPTY, RIGHT.sicCodes, TRIM(LEFT.sicCodes) + ', ' + RIGHT.sicCodes), LEFT.sicCodes);
-																				SELF.naicCodes := IF(naicFound, IF(LEFT.naicCodes = DueDiligence.Constants.EMPTY, RIGHT.naicCodes, TRIM(LEFT.naicCodes) + ', ' + RIGHT.naicCodes), LEFT.naicCodes);
 																				SELF := LEFT;));
 																				
 	addIndustry := JOIN(addYpSicNaic, uniqueIndustries,
@@ -337,23 +331,53 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																SELF.sicNaicRisk.otherHighRiskIndustExists := RIGHT.otherHighRiskIndustExists;
 																SELF.sicNaicRisk.moderateRiskIndustExists := RIGHT.moderateRiskIndustExists;
 																SELF.sicNaicRisk.lowRiskIndustExists := RIGHT.lowRiskIndustExists;
-																SELF.sicNaicRisk.sicCodes := RIGHT.sicCodes;
-																SELF.sicNaicRisk.naicCodes := RIGHT.naicCodes;
+																// SELF.sicNaicRisk.sicCodes := RIGHT.sicCodes;
+																// SELF.sicNaicRisk.naicCodes := RIGHT.naicCodes;
 																SELF := LEFT;),
 											LEFT OUTER);
 	
 											
-	addReport := IF(includeReportData, DueDiligence.reportBusIndustryRisk(addIndustry), addIndustry);
+	//grab unique sic and naic codes - regardless of source
+	dedupUniqueCodes := DEDUP(uniqueIndustriesSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), sicCode, naicCode);
+	
+	rollUniqueCodes := ROLLUP(dedupUniqueCodes, 
+															LEFT.seq = RIGHT.seq AND
+															LEFT.ultID = RIGHT.ultID AND
+															LEFT.orgID = RIGHT.orgID AND
+															LEFT.seleID = RIGHT.seleID,
+															TRANSFORM(DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout,
+																				SELF.sicCodes := IF(RIGHT.sicCodes = DueDiligence.Constants.EMPTY, LEFT.sicCodes, TRIM(LEFT.sicCodes) + ', ' + RIGHT.sicCodes);
+																				SELF.naicCodes := IF(RIGHT.naicCodes = DueDiligence.Constants.EMPTY, LEFT.naicCodes, TRIM(LEFT.naicCodes) + ', ' + RIGHT.naicCodes);
+																				SELF := LEFT;));
+																				
+	addUniqueSicNaics := JOIN(addIndustry, rollUniqueCodes,
+														LEFT.seq = RIGHT.seq AND
+														LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																			SELF.sicNaicRisk.sicCodes := RIGHT.sicCodes;
+																			SELF.sicNaicRisk.naicCodes := RIGHT.naicCodes;
+																			SELF := LEFT;),
+														LEFT OUTER);
+											
+	addReport := IF(includeReportData, DueDiligence.reportBusIndustryRisk(addUniqueSicNaics), addUniqueSicNaics);
 
+
+
+	// OUTPUT(indata, NAMED('indata'));
 	// OUTPUT(ebr5600Raw, NAMED('ebr5600Raw'));
 	// OUTPUT(ebr5600RawSeq, NAMED('ebr5600RawSeq'));
 	// OUTPUT(allYpSicNaic, NAMED('allYpSicNaic'));
 	// OUTPUT(sortYpRollSicNaic, NAMED('sortYpRollSicNaic'));
-	// OUTPUT(allCodes, NAMED('allCodes'));
-	// OUTPUT(uniqueIndustriesSort, NAMED('uniqueIndustriesSort'));
-	// OUTPUT(uniqueIndustries, NAMED('uniqueIndustries'));
+	// OUTPUT(allCodes, NAMED('sn_allCodes'));
+	// OUTPUT(uniqueIndustriesSort, NAMED('sn_uniqueIndustriesSort'));
+	// OUTPUT(uniqueIndustries, NAMED('sn_uniqueIndustries'));
 	// OUTPUT(addIndustry, NAMED('addIndustry'));
-	// OUTPUT(addReport, NAMED('addReport'));
+	// OUTPUT(dedupUniqueCodes, NAMED('sn_dedupUniqueCodes'));
+	// OUTPUT(rollUniqueCodes, NAMED('sn_rollUniqueCodes'));
+	// OUTPUT(addUniqueSicNaics, NAMED('sn_addUniqueSicNaics'));
+	// OUTPUT(addReport, NAMED('sn_addReport'));
 	
 	
 

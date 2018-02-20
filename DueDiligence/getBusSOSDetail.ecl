@@ -77,7 +77,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	corpAddrProject := PROJECT(corpAddrLocDedup, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
 																													SELF.addrCount := 1;
-																													SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Address,
+																													SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
 																																																		SELF.prim_range:= LEFT.corp_addr1_prim_range;
 																																																		SELF.predir:= LEFT.corp_addr1_predir;
 																																																		SELF.prim_name:= LEFT.corp_addr1_prim_name;
@@ -111,8 +111,8 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	addBusnLocCnt := DueDiligence.CommonBusiness.AddOperatingLocations(corpAddrProject, addEverFiled, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
 																						
 	//retrieve SIC and NAIC codes with dates
-	outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allCorpSicNaic := outCorpSic + outCorpNaic;
 	sortCorpRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addBusnLocCnt, allCorpSicNaic);
@@ -257,6 +257,26 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											
 	addAgents := DueDiligence.CommonBusiness.AddAgents(projectSosAgent, addIncLooseLaws); 			
 	
+  // ------                                                                                    ------   
+	 // ------ START BUILDING SECTIONS of the REPORT  - pass a slimmed down version of the        ------
+	 // ------ of the corpFilingsFilt                                                             ------
+	 // ------                                                                                    ------ 
+ BusSOSFilingsSlim   := PROJECT (corpFilingsFilt, TRANSFORM(DueDiligence.LayoutsInternalReport.BusCorpFilingsSlimLayout,
+                                 SELF.BusinessName        := LEFT.corp_legal_name;
+																                 SELF.FilingType          := LEFT.corp_filing_desc;
+																								         SELF.FilingStatus        := LEFT.corp_status_desc; 
+																												     SELF.FilingDate          := LEFT.corp_filing_date;                    //*** Zeros if the business was not file with Sec. Of State (SOS).
+																												  SELF.IncorporationDate := (INTEGER)LEFT.corp_inc_date;
+																														   SELF.FilingNumber        := LEFT.corp_filing_reference_nbr;
+																															  SELF.IncorporationState  := LEFT.corp_inc_state;
+																																 SELF.LastSeenDate        := IF(LEFT.dt_last_seen > 0, LEFT.dt_last_seen, LEFT.dt_vendor_last_reported);      //**** This dt_last_seen has been cleaned
+																															  SELF                     := LEFT;));   
+ 
+	UpdateBusnSOSWithReport  := IF(includeReportData, 
+	                                     DueDiligence.reportBusSOSFilings(addAgents, BusSOSFilingsSlim),   
+																			             /* ELSE */ 
+																			                   addAgents); 
+	
 	
 
 	// OUTPUT(indata, NAMED('indata'));
@@ -264,7 +284,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(allBusinesses, NAMED('allBusinesses'));
 	// OUTPUT(corpFilingsRaw, NAMED('corpFilingsRaw'));
 	// OUTPUT(corpFilingsSeq, NAMED('corpFilingsSeq'));
-	// OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
+	//OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
 
 	// OUTPUT(incDateSort, NAMED('incDateSort'));
 	// OUTPUT(incDateDedup, NAMED('incDateDedup'));
@@ -274,7 +294,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
 	
 	
-	// OUTPUT(projectDates, NAMED('projectDates'));
+	//OUTPUT(projectDates, NAMED('projectDates'));
 	// OUTPUT(lastSeenSort, NAMED('lastSeenSort'));
 	// OUTPUT(rollLastSeen, NAMED('rollLastSeen'));
 	// OUTPUT(addSosStatusDates, NAMED('addSosStatusDates'));
@@ -289,9 +309,12 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	// OUTPUT(addAgents, NAMED('addAgentsSOS'));
 	
+	//OUTPUT(BusSOSFilingsSlim, NAMED('BusSOSFilingsSlim'));
+	//OUTPUT(UpdateBusnSOSWithReport, NAMED('UpdateBusnSOSWithReport'));
+	
 	
 		
-	RETURN addAgents;
+	RETURN UpdateBusnSOSWithReport;
 END;
 
 

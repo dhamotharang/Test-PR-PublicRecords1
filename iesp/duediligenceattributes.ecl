@@ -18,18 +18,18 @@ export t_DDRAttributesResult := record
 	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
 end;
 		
-export t_DueDiligenceAttributeResponse := record
+export t_DueDiligenceAttributesResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	t_DDRAttributesResult Result {xpath('Result')};
 end;
 		
-export t_DueDiligenceAttributeRequest := record (iesp.share.t_BaseRequest)
+export t_DueDiligenceAttributesRequest := record (iesp.share.t_BaseRequest)
 	iesp.duediligenceshared.t_DDRAttributesOptions Options {xpath('Options')};
 	t_DDRAttributesReportBy ReportBy {xpath('ReportBy')};
 end;
 		
-export t_DueDiligenceAttributeResponseEx := record
-	t_DueDiligenceAttributeResponse response {xpath('response')};
+export t_DueDiligenceAttributesResponseEx := record
+	t_DueDiligenceAttributesResponse response {xpath('response')};
 end;
 		
 

@@ -1,11 +1,14 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
+ //*** Under the 3 service framework - the Attributes Only Service will always pass a report flag of FALSE.  
+	//*** The Business Report Service will pass a report flag of TRUE. 
+	
 EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
-												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-												BIPV2.mod_sources.iParams linkingOptions,
-												BOOLEAN includeReport = FALSE,
-												BOOLEAN displayAttributeText = FALSE,
-												BOOLEAN debugMode = FALSE) := FUNCTION
+																								Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+																								BIPV2.mod_sources.iParams linkingOptions,
+																								BOOLEAN includeReport = FALSE,
+																								BOOLEAN displayAttributeText = FALSE,
+																								BOOLEAN debugMode = FALSE) := FUNCTION
 
 
 	// ------                                                                                     ------
@@ -78,15 +81,19 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	addCounts := PROJECT(busSicNaic, TRANSFORM(RECORDOF(LEFT),
 																										SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
 																										SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
+																										SELF.execCount := COUNT(LEFT.execs);
 																										SELF := LEFT;));
 
-
+ 
+ 	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
+	
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
+                                /* ELSE */
+																                addCounts);
 
 	//Populate the index for the customer
-	busKRI := DueDiligence.getBusKRI(addCounts + inquiredBusNoBIP);
+	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);
 
-	
-	
 	
 	/*debugging section */   
 	IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
@@ -114,6 +121,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(addrRisk, NAMED('addrRisk')));
 	IF(debugMode, OUTPUT(busAsInd, NAMED('busAsInd')));
 	IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
+	IF(debugMode, OUTPUT(AddBusinessDataForReport, NAMED('AddBusinessDataForReport')));
 	
 	IF(debugMode, OUTPUT(busKRI, NAMED('busKRI')));
 
