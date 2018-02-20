@@ -7,7 +7,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 											   ) := FUNCTION
 
 	
-	//***partyOffenses is a nested DATASET within the Input Business Executives Criminal Offense  ***//
+ //*** add logic here to shorten the list of offenses that are added to the report ****//	
 	 BEOCriminalOffensesInternal := NORMALIZE(InputBusnCriminal, LEFT.execs.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.BEOCriminalReportingOFOffenses,
                              /*  start by getting all of the criminal offenses from the Parent (RIGHT) */  																														
 																												 SELF.seq                  := LEFT.seq;

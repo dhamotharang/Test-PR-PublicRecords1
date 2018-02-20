@@ -2,7 +2,6 @@
 
 EXPORT Constants := MODULE
 
-
 EXPORT VERSION_3 := 3;
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
@@ -25,12 +24,18 @@ EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
 EXPORT DEFAULT_DPPA := 3;
 EXPORT DEFAULT_GLBA := 5;
 
+EXPORT DEFAULT_BS_VERSION := 50;
+EXPORT DEFAULT_BS_OPTIONS := 0;
+EXPORT DEFAULT_IS_FCRA := FALSE;
+
 EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 19;
 EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 23;
 
 EXPORT STRING_TRUE := 'TRUE';
 EXPORT STRING_FALSE := 'FALSE';
 
+EXPORT T_INDICATOR := 'T';
+EXPORT F_INDICATOR := 'F';
 
 
 EXPORT NAME_TYPE := 'D'; 
@@ -152,6 +157,23 @@ EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFF
 EXPORT mac_ListTop3Linkids := MACRO
     'Busn_info.BIP_IDS.UltID.LinkID, Busn_info.BIP_IDS.OrgID.LinkID, Busn_info.BIP_IDS.SeleID.LinkID'
 ENDMACRO;
+
+
+EXPORT mac_JOINLinkids_BusInternal := MACRO
+					'LEFT.seq = RIGHT.seq AND '   +
+					'LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultID AND ' +
+					'LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.orgID AND ' + 
+					'LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID'
+ENDMACRO;
+
+
+EXPORT mac_JOINLinkids_Results := MACRO
+					'LEFT.seq = RIGHT.seq AND '   +
+					'LEFT.ultID = RIGHT.ultID AND ' +
+					'LEFT.orgID = RIGHT.orgID AND ' +
+					'LEFT.seleID = RIGHT.seleID' 
+ENDMACRO;
+
 
 EXPORT mac_calculate_evictions := MACRO
      'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES))'

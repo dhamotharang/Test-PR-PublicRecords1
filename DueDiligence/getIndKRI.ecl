@@ -1,6 +1,6 @@
-﻿IMPORT DueDiligence;
+﻿IMPORT DueDiligence, STD, ut;
 
-EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION;
+EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 	//individual not found
 	STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
 	STRING2 INVALID_INDIVIDUAL_SCORE := '-1';
@@ -9,8 +9,17 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 	withDIDs := indivs(individual.did <> DueDiligence.Constants.NUMERIC_ZERO);
 	noDIDs := indivs(individual.did = DueDiligence.Constants.NUMERIC_ZERO);
 	
-	DueDiligence.Layouts.Indv_Internal IndvKRIs(indivs le) := TRANSFORM
+	DueDiligence.Layouts.Indv_Internal IndvKRIs(DueDiligence.Layouts.Indv_Internal le) := TRANSFORM
+		
+		/* PERSON US RESIDENCY */ 
+		usResidency := DueDiligence.getIndKRIResidency(le);
+		
+		SELF.PerUSResidency_Flag := usResidency.value;
+		SELF.PerUSResidency  := usResidency.name;
+		
 
+		
+		
 		SELF := le;
 	END;
 
@@ -47,8 +56,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							// SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerIdentityRisk_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerUSResidency := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerUSResidency_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerUSResidency := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerUSResidency_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerMatchLevel := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerMatchLevel_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerAssociatesIndex := INVALID_INDIVIDUAL_SCORE;

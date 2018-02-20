@@ -70,7 +70,8 @@ EXPORT CommonBusiness := MODULE
 	EXPORT rollSicNaicBySeqAndBIP(inquiredBusiness, inputDataset) := FUNCTIONMACRO
 		//grab existing SIC and NAIC codes from the inquired business
 		normSicNaics := NORMALIZE(inquiredBusiness, LEFT.SicNaicSources, TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED4 DateFirstSeen,
-																																														UNSIGNED4 DateLastSeen, STRING10 NAICCode, STRING10 SICCode, BOOLEAN IsPrimary},
+																																														UNSIGNED4 DateLastSeen, STRING10 NAICCode, STRING10 SICCode, BOOLEAN IsPrimary, STRING3 source},
+																																								SELF.seq := LEFT.seq;
 																																								SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																																								SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																																								SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
@@ -89,7 +90,8 @@ EXPORT CommonBusiness := MODULE
 															LEFT.orgID = RIGHT.orgID AND
 															LEFT.seleID = RIGHT.seleID AND
 															LEFT.SICCode = RIGHT.SICCode AND
-															LEFT.NAICCode = RIGHT.NAICCode,
+															LEFT.NAICCode = RIGHT.NAICCode AND
+															LEFT.source = RIGHT.source,
 															TRANSFORM({RECORDOF(LEFT)},
 																				SELF.DateFirstSeen := IF(LEFT.DateFirstSeen = 0, RIGHT.DateFirstSeen, MIN(LEFT.DateFirstSeen, RIGHT.DateFirstSeen));
 																				SELF.DateLastSeen := MAX(LEFT.DateLastSeen, RIGHT.DateLastSeen);
@@ -166,20 +168,21 @@ EXPORT CommonBusiness := MODULE
 												TRANSFORM(DueDiligence.LayoutsInternal.SicNaicLayout,
 																	SELF.sources := LEFT.sources + RIGHT.sources;
 																	SELF := LEFT;));
-
+	
 		RETURN finalRoll;
 
 	ENDMACRO;
 	
-	
-	EXPORT getSicNaicCodes(InDataset, SicNaicsField, IsSicField, PrimaryField, DateFirstSeenName, DateLastSeenName) := FUNCTIONMACRO
+	//either sourceFieldName or sourceName field should be populated
+	EXPORT getSicNaicCodes(InDataset, SourceFieldName, SourceName, SicNaicsField, IsSicField, PrimaryField, DateFirstSeenName, DateLastSeenName) := FUNCTIONMACRO
 	
 		temp := TABLE(InDataset,{seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()),
 														 UNSIGNED4 DateFirstSeen := MIN(GROUP, DateFirstSeenName),
 														 UNSIGNED4 DateLastSeen := MAX(GROUP, DateLastSeenName),
 														 STRING10 NAICCode := IF(IsSicField, DueDiligence.Constants.EMPTY, (STRING)SicNaicsField),
 														 STRING10 SICCode := IF(IsSicField, (STRING)SicNaicsField, DueDiligence.Constants.EMPTY),
-														 BOOLEAN IsPrimary := PrimaryField },
+														 BOOLEAN IsPrimary := PrimaryField,
+														 STRING3 Source := IF(SourceName = DueDiligence.Constants.EMPTY, SourceFieldName, SourceName)},
 									seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField);
 													 
 		filterSic := temp(SICCode <> DueDiligence.Constants.EMPTY);
@@ -188,7 +191,7 @@ EXPORT CommonBusiness := MODULE
 		results := IF(IsSicField, filterSic, filterNaic);
 
 		RETURN results;
-
+	
 	ENDMACRO;
 	
 	EXPORT GetCleanBIPShell(DATASET(DueDiligence.Layouts.CleanedData) cleanInput) := FUNCTION
@@ -460,10 +463,11 @@ EXPORT CommonBusiness := MODULE
 																											
 		existingAddrs := NORMALIZE(inquiredBus, LEFT.operatingLocations,
 																	TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
+																	     SELF.seq   := LEFT.seq;
 																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
+																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
 																																									SELF := RIGHT;
 																																									SELF := [];)])[1];
 																						SELF := LEFT;
@@ -507,8 +511,7 @@ EXPORT CommonBusiness := MODULE
 																						SELF.SOSAddrLocationCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, RIGHT.addrCount, LEFT.SOSAddrLocationCount);
 																						SELF.operatingLocations := RIGHT.locAddrs[1..DueDiligence.Constants.MAX_OPERATING_LOCATIONS];
 																						SELF := LEFT;),
-																	LEFT OUTER);
-																	
+																	LEFT OUTER);														
 																	
 		RETURN addOperatingLocations;
 	END;

@@ -42,8 +42,8 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 												LEFT OUTER);
 												
 	//retrieve SIC and NAIC codes with dates
-	outRegBusSic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, RawFields.SIC, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outRegBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, RawFields.NAICS, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outRegBusSic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_REGISTRATION, RawFields.SIC, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outRegBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_REGISTRATION, RawFields.NAICS, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allRegBusSicNaic := outRegBusSic + outRegBusNaic;
 	sortRegBusRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addRegBusHit, allRegBusSicNaic);
