@@ -57,8 +57,10 @@ EXPORT Raw := module
 
 		ds_sofr_input :=	PROJECT(ds_input(DeceasedMatchCode = '' AND
 										Incarcerated_Flag != '1'), SexOffender_Services.Layouts.batch_in);
+		SOFR_batch_params		:= MODULE(PROJECT(configData, SexOffender_Services.IParam.batch_params, opt)) END;
+
 		//Find Sex Offender Hits	
-		ds_sofr_batch_output := SexOffender_Services.batch_records(configData, 
+		ds_sofr_batch_output := SexOffender_Services.batch_records(SOFR_batch_params, 
 					ds_sofr_input, isFCRA);		
 					
 		ds_sofr_batch_recs := ds_sofr_batch_output.records;

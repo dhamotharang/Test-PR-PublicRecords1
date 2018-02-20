@@ -63,18 +63,20 @@ EXPORT Layouts := MODULE
 
   
 	EXPORT ConsumerFlags := RECORD
-    STRING1 security_freeze := '';
-    STRING1 security_fraud_alert := '';
-    STRING1 identity_theft := '';
-    STRING1 legal_flag := '';
-    STRING1 has_consumer_statement := '';
+    STRING1 alert_security_freeze {xpath('alert_security_freeze')} := '';
+    STRING1 alert_security_fraud {xpath('alert_security_fraud')} := '';
+    STRING1 alert_identity_theft {xpath('alert_identity_theft')} := '';
+    STRING1 alert_legal_flag {xpath('alert_legal_flag')} := '';
+    STRING1 alert_cnsmr_statement {xpath('alert_cnsmr_statement')} := ''; 
   END;
-  
+
 	EXPORT ConsumerFlagsBatch := RECORD
 	  STRING20 		acctno := '0';
     STRING20		UniqueId;	//ie, LexId
     BOOLEAN     suppress_records := FALSE; 
-    ConsumerFlags  consumer_flags;
+    ConsumerFlags  consumer_flags;  
+		BOOLEAN has_record_statement := FALSE;  // keeping for internal use to set alert_cnsmr_statement later
+		BOOLEAN has_consumer_statement := FALSE;  // keeping for internal use to set alert_cnsmr_statement later
   END;
   
   

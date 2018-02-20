@@ -8,6 +8,8 @@ EXPORT Constants := MODULE
 	EXPORT BlankConsumerAlerts := DATASET([], iesp.share_fcra.t_ConsumerAlert);	
 	EXPORT BlankPersonContextBatchSlim := DATASET([], FFD.Layouts.PersonContextBatchSlim);
 
+  EXPORT STRING1 subject_has_alert := 'Y';
+
 /*  -- RecordTypes --
   CS - common consumer level statement
   DR - disputed record indicator

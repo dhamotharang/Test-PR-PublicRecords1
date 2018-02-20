@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, Doxie, BatchServices, Suppress,	BatchShare, FCRA, FFD;
+﻿IMPORT Autokey_batch, Doxie, BatchServices, Suppress,	BatchShare, FCRA, FFD;
 
 /* STRATEGY: Since it appears likely that more than one batch service may make use of 
    SexPredator data, this attribute/module will fetch Offenders and their concomitant
@@ -28,11 +28,11 @@ IMPORT Autokey_batch, Doxie, BatchServices, Suppress,	BatchShare, FCRA, FFD;
 
 rec_offender_plus_acctno := SexOffender_Services.Layouts.rec_offender_plus_acctno;
 
-EXPORT batch_records(BatchShare.IParam.BatchParams configData,
-										 dataset(SexOffender_Services.Layouts.batch_in) ds_batch_in, 
+EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
+										 DATASET(SexOffender_Services.Layouts.batch_in) ds_batch_in, 
 										 BOOLEAN isFCRA = FALSE,
-										 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-									   integer8 inFFDOptionsMask = 0):= MODULE
+										 DATASET (FFD.Layouts.PersonContextBatch) pc_recs = DATASET ([],FFD.Layouts.PersonContextBatch)
+										 ):= MODULE
 
 		ds_batch_in_common 	:= PROJECT(ds_batch_in, Autokey_batch.Layouts.rec_inBatchMaster);		
 														 
@@ -46,13 +46,17 @@ EXPORT batch_records(BatchShare.IParam.BatchParams configData,
 		acctNos := IF(isFCRA, fromDID, fromAK + fromDID);
 		SHARED acctNos_final := DEDUP(SORT(acctNos, acctno, seisint_primary_key, isDeepDive), acctno, seisint_primary_key);
 		
+		// Slim down the PersonContext
+		SHARED slim_pc_recs := if(isFCRA, FFD.SlimPersonContext(pc_recs));
+		
 		// overrides for FCRA
 		ds_best  := PROJECT(ds_batch_in(did <> 0),TRANSFORM(doxie.layout_best,SELF.did:=LEFT.did, SELF:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
-		SHARED ds_flags := IF(isFCRA, FCRA.GetFlagFile (ds_best)); //this is for more than one person
+		SHARED ds_flags := IF(isFCRA, FFD.GetFlagFile (ds_best, pc_recs)); //this is for more than one person
 	
+	  SHARED alert_flags := IF(isFCRA, FFD.ConsumerFlag.getAlertIndicators(pc_recs, configData.FCRAPurpose, configData.FFDOptionsMask));
 	
 		// 3. Get raw offenders records
-		ds_offenders_raw := SexOffender_Services.Raw.batch_view.GetOffendersRecs(acctNos_final, isFCRA, ds_flags, slim_pc_recs, inFFDOptionsMask);
+		ds_offenders_raw := SexOffender_Services.Raw.batch_view.GetOffendersRecs(acctNos_final, isFCRA, ds_flags, slim_pc_recs, configData.FFDOptionsMask);
 		
 		// 4. Remove restricted records via DID & SSN pulling and suppression.
 		appType := configData.applicationType;	  
@@ -66,11 +70,13 @@ EXPORT batch_records(BatchShare.IParam.BatchParams configData,
 														LEFT ONLY);
 		
 		//offenders that were not pulled
-		SHARED ds_offenders := JOIN(ds_offenders_raw, DEDUP(SORT(ds_recs_pulled, seisint_primary_key), seisint_primary_key),
+		ds_offenders_pre := JOIN(ds_offenders_raw, DEDUP(SORT(ds_recs_pulled, seisint_primary_key), seisint_primary_key),
 																 LEFT.seisint_primary_key = RIGHT.seisint_primary_key,
 																 TRANSFORM(LEFT),
 																 LEFT ONLY);
 																					 
+    SHARED ds_offenders := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_offenders_pre, alert_flags, StatementIds, SexOffender_Services.Layouts.rec_offender_plus_acctno),
+	                            ds_offenders_pre);
 		// 5. Penalize offenders.	
 		ds_batch_in_undrscr := PROJECT(ds_batch_in, BatchServices.transforms.SexOffenderCPS.xfm_prepend_underscore(LEFT));	
 		ds_offenders_with_penalty := JOIN(ds_batch_in_undrscr, ds_offenders, 
@@ -84,7 +90,7 @@ EXPORT batch_records(BatchShare.IParam.BatchParams configData,
 		// 6. Get Offenses/Convictions using found offenders seising_primary key.
 		ds_acctnos_sspks := PROJECT(ds_offenders, SexOffender_Services.Layouts.lookup_id_rec);
 		ds_acctnos_sspks_deduped := DEDUP(SORT(ds_acctnos_sspks, acctno, seisint_primary_key), acctno, seisint_primary_key); //TODO: check if this is needed...	
-	  ds_offenses := SexOffender_Services.Raw.batch_view.GetOffensesRecs(ds_acctnos_sspks_deduped, isFCRA, ds_flags, slim_pc_recs, inFFDOptionsMask);
+	  ds_offenses := SexOffender_Services.Raw.batch_view.GetOffensesRecs(ds_acctnos_sspks_deduped, isFCRA, ds_flags, slim_pc_recs, configData.FFDOptionsMask);
 		
 		// 7. Expose exportable attributes.
 	
@@ -98,9 +104,12 @@ EXPORT batch_records(BatchShare.IParam.BatchParams configData,
 																	 LEFT.acctno = RIGHT.acctno AND
 																	 LEFT.seisint_primary_key = RIGHT.seisint_primary_key,
 																	 SexOffender_Services.batch_make_flat(LEFT, RIGHT, COUNTER) );	
+ 
+    ds_records_with_alerts := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_records, alert_flags, Statements, SexOffender_Services.Layouts.batch_out_pre),
+	                            ds_records);
 		//	sequence the records								 
 		
-		SHARED sequenced_out := PROJECT(ds_records, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
+		SHARED sequenced_out := PROJECT(ds_records_with_alerts, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 		EXPORT records := 	PROJECT(sequenced_out, SexOffender_Services.Layouts.batch_out);			// projecting to batch layout
 		
 		// get statements 
@@ -109,6 +118,10 @@ EXPORT batch_records(BatchShare.IParam.BatchParams configData,
 																								 SELF.SequenceNumber := LEFT.SequenceNumber,
 																								 SELF := RIGHT));
 																								 
-		EXPORT FFD_Statements := sd_out;  // FCRA FFD statements
+		consumer_statements  := IF(isFCRA, FFD.prepareConsumerStatementsBatch(sd_out, pc_recs, configData.FFDOptionsMask));  // FCRA FFD statements
+    consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+    consumer_statements_alerts := consumer_statements + consumer_alerts;
+
+		EXPORT FFD_Statements := consumer_statements_alerts;  // FCRA FFD statements
 					 
 END;

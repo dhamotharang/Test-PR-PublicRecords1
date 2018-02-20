@@ -1,4 +1,4 @@
-import BatchShare, Corrections, doxie, doxie_files, FFD;
+﻿import BatchShare, Corrections, doxie, doxie_files, FFD;
 
 export Layouts := MODULE
 	shared offender_key 	:= recordof(doxie_files.Key_Offenders_OffenderKey());
@@ -54,6 +54,7 @@ export Layouts := MODULE
 		typeof(Corrections.Layout_Offender.lname) INCR_lname;
 		BatchShare.Layouts.ShareErrors;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
+		FFD.Layouts.ConsumerFlags;
 	END;
 	
 	export batch_pii_out_pre := RECORD(batch_pii_out)
@@ -519,6 +520,7 @@ export Layouts := MODULE
 		BatchShare.Layouts.ShareErrors;
 		STRING20 sdid;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
+		FFD.Layouts.ConsumerFlags;
   END;
 	
 	EXPORT batch_out_pre := RECORD	

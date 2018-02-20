@@ -1,4 +1,4 @@
-IMPORT AutokeyI, AutoStandardI, FCRA;
+﻿IMPORT AutokeyI, AutoStandardI, BatchShare, FCRA;
 
 EXPORT IParam := MODULE
 	
@@ -56,6 +56,9 @@ EXPORT IParam := MODULE
 		export boolean AllowGraphicDescription := false;
 		export boolean Include_BestAddress := false;
 		export string32 ApplicationType := '';
+	end;
+
+	export batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)
 	end;
 	
 END;

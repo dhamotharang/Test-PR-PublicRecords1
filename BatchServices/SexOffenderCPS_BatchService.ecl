@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SexOffenderCPS_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -18,7 +18,7 @@ IMPORT BatchShare, SexOffender_Services;
 EXPORT SexOffenderCPS_BatchService(useCannedRecs = false) := 
 	MACRO
 		gm := AutoStandardI.GlobalModule();	
-		batch_params := module (BatchShare.IParam.getBatchParams())
+		batch_params := module (project (BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt))
 			export applicationType 	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		end;
 		

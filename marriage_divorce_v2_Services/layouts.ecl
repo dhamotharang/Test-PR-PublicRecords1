@@ -1,4 +1,4 @@
-
+﻿
 // NOTE: At the beginning of the M&D rewrite, we implemented a separate
 //       MDSearchService and MDReportService.  Later a decision was made
 //       to have only a single service, but you'll still see "narrow"
@@ -277,6 +277,7 @@ export layouts := module
 		marriage_divorce2_1;
     BatchShare.layouts.ShareErrors;
 		batch_out_search.SequenceNumber;
+		FFD.Layouts.ConsumerFlags;
 	END;
 	
 	export batch_out_pre := record(batch_out)
