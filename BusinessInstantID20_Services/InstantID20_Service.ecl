@@ -10,7 +10,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -98,6 +98,9 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
 
+  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
+
 		// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
 			EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
@@ -142,7 +145,14 @@ EXPORT InstantID20_Service() := MACRO
 				)
 			);	
 													
-		// 6. Intermediate logging. - no longer exists for this query
+		// 6. Intermediate logging.
+		intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_BIID20) : STORED('Intermediate_Log');
+		
+		// Note: All intermediate logs must have the following name schema:
+		//    o  Starts with 'LOG_' (Upper case is important!!)
+		//    o  Middle part is the database name, in this case: 'log__mbs'
+		//    o  Must end with '_intermediate__log'
+		OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));		
 
 		// 7. Calculate Royalties. For SBFE...:		
 		ds_SBFEData := 
@@ -245,7 +255,7 @@ EXPORT InstantID20_Service() := MACRO
 		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
-		IF(~DisableOutcomeTracking and NOT _TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
 	// DEBUGs:
 	// OUTPUT( ds_Input, NAMED('Input') );
