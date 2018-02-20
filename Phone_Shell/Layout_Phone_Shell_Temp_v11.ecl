@@ -1,6 +1,7 @@
-﻿IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
+﻿// This is a static layout for us to use RiskWise.shortcuts.validation_phone_shell95k_41
+IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
 
-EXPORT Layout_Phone_Shell := MODULE
+EXPORT Layout_Phone_Shell_Temp_v11 := MODULE
 
 EXPORT Layout_Boca_Shell_Plus := RECORD
 	Risk_Indicators.Layout_Boca_Shell;
@@ -49,8 +50,7 @@ EXPORT Input := RECORD
 	
 	STRING10 HomePhone := '';
 	STRING10 WorkPhone := '';
-	
-	BOOLEAN ExperianGatewayEnabled := FALSE;
+
 	BOOLEAN TargusGatewayEnabled := FALSE;
 	BOOLEAN TransUnionGatewayEnabled := FALSE;
 	BOOLEAN InsuranceGatewayEnabled := FALSE;
@@ -73,7 +73,6 @@ EXPORT Layout_Phone_Shell_Input_Echo := RECORD
 	STRING9		in_SSN									:= '';
 	STRING10	in_Phone10							:= '';
 	STRING10	in_WPhone10							:= '';
-	BOOLEAN		in_EXPGW_Enabled				:= FALSE;
 	BOOLEAN		in_TargusGW_Enabled			:= FALSE;
 	BOOLEAN		in_TUGW_Enabled					:= FALSE;
 	BOOLEAN		in_INSGW_Enabled				:= FALSE;
@@ -83,8 +82,6 @@ END;
 
 EXPORT Layout_Subject_Level := RECORD
 	INTEGER1 Subject_SSN_Mismatch 						:= -1;
-	UNSIGNED1 Experian_Num_Duplicate 					:= 0;
-	UNSIGNED1 Experian_Num_Insufficient_Score	:= 0;
 END;
 
 EXPORT Layout_Sources := RECORD
@@ -257,14 +254,6 @@ EXPORT Layout_Internal_Corroboration := RECORD
 	STRING15 Internal_Verification_Match_Types := '';
 END;
 
-EXPORT Layout_Experian_File_One_Verification := RECORD
-	BOOLEAN Experian_Verified := FALSE;
-	STRING1 Experian_Type := '';
-	STRING1 Experian_Source := '';
-	STRING8 Experian_Last_Update := '';
-	STRING3 Experian_Phone_Score_V1 := '';
-END;
-
 EXPORT Layout_EDA_Characteristics := RECORD
 	STRING1 EDA_Omit_Locality := '';
 	UNSIGNED8 EDA_DID := 0;
@@ -318,7 +307,6 @@ EXPORT Layout_EDA_Characteristics := RECORD
 END;
 
 EXPORT Layout_Royalties := RECORD
-	UNSIGNED1 Metronet_Royalty := 0; // Experian Gateway Called
 	UNSIGNED1 TargusComprehensive_Royalty := 0; // Targus Gateway Called
 	UNSIGNED1 QSentCIS_Royalty := 0; // Trans Union Gateway Called
 	UNSIGNED1 LastResortPhones_Royalty := 0; // Phones Plus Phones Of Last Resort Used
@@ -345,7 +333,6 @@ EXPORT Layout_Phone_Shell_Plus := RECORD
 	Layout_Phone_Feedback									Phone_Feedback;
 	Layout_Inquiries											Inquiries;
 	Layout_Internal_Corroboration					Internal_Corroboration;
-	Layout_Experian_File_One_Verification	Experian_File_One_Verification;
 	Layout_EDA_Characteristics						EDA_Characteristics;
 	Layout_Royalties											Royalties;
 	Layout_Bureau												Bureau;	
@@ -354,7 +341,7 @@ END;
 
 EXPORT Phone_Shell_Layout := RECORD
 	Layout_Phone_Shell_Plus - Raw_Input - Clean_Input - Clam Phone_Shell;
-	Risk_Indicators.Layout_Boca_Shell Boca_Shell;
+	Risk_Indicators.Layout_Boca_Shell - LnJ_datasets Boca_Shell;
 END;
 
 END;
