@@ -1,4 +1,4 @@
-import BatchShare,FFD;
+﻿import BatchShare,FFD;
 EXPORT layout_Property_Batch_out := 
 	RECORD
 
@@ -669,5 +669,5 @@ etc.
 		UNSIGNED6 borrower_2_empid				 := 0;
 		UNSIGNED6 borrower_2_dotid				 := 0;
 		STRING9   borrower_2_ssn           := '';			
-			
+		FFD.Layouts.ConsumerFlags;	
 	END;

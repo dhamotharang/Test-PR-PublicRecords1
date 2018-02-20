@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchServiceFCRA">
   <part name="batch_in"    type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="DPPAPurpose" type="xsd:byte"/>
@@ -6,6 +6,7 @@
   <part name="MaxResults"  type="xsd:unsignedInt"/>
 	<part name="ApplicationType" type="xsd:string"/>
 	<part name="FFDOptionsMask" type="xsd:string"/>
+	<part name="FCRAPurpose" type="xsd:string"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
 */
@@ -21,6 +22,7 @@ EXPORT BatchServiceFCRA() := MACRO
 		export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
 		unsigned2 MaxResults_val := 50 : stored('MaxResults');
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
 	end;
 	
 	// run input through some standard procedures

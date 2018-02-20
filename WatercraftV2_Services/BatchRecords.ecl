@@ -1,4 +1,4 @@
-IMPORT  doxie, Autokey_batch, FCRA, FFD, suppress, STD, WatercraftV2_Services;
+﻿IMPORT  doxie, Autokey_batch, FCRA, FFD, suppress, STD, WatercraftV2_Services;
 
 // Constants
 STRING BLNK := '';
@@ -7,9 +7,10 @@ STRING CURRENT_IND_STR := 'CURRENT';
 toUpper(STRING input) := STD.Str.ToUpperCase(TRIM(input, LEFT, RIGHT));
 
 EXPORT BatchRecords(WatercraftV2_Services.Interfaces.batch_params configData, 
-										dataset(WatercraftV2_Services.Layouts.batch_in) clean_in, 
-										boolean isFCRA = false,
-										dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+										DATASET(WatercraftV2_Services.Layouts.batch_in) clean_in, 
+										BOOLEAN isFCRA = false,
+										DATASET(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
+										DATASET(FCRA.Layout_override_flag) ds_flags = DATASET([], FCRA.Layout_override_flag)
 										) := FUNCTION
 										
 	ds_batch_in_common 	:= project(clean_in, Autokey_batch.Layouts.rec_inBatchMaster);	
@@ -26,10 +27,6 @@ EXPORT BatchRecords(WatercraftV2_Services.Interfaces.batch_params configData,
 		// if isFCRA skip autokey search
 	acctNos := if(isFCRA, fromDID, fromAK + fromDID + fromLinkid);
 	acctNos_final := dedup(sort(acctNos, acctno, watercraft_key, sequence_key), acctno, watercraft_key, sequence_key);
-	
-	// overrides - For FCRA we only use DID to get overrides.
-	ds_best  := project(clean_in,transform(doxie.layout_best,self.did:=left.did, self:=[]));
-	ds_flags := if(isFCRA, FCRA.GetFlagFile(ds_best));
 	
 	// Get watercraft based on watercraft ids obtained
 	in_watercraftkeys := PROJECT(acctNos_final, TRANSFORM(WatercraftV2_Services.Layouts.search_watercraftkey,

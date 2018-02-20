@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BkReport_BatchServiceFCRA">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -16,6 +16,7 @@
 
 	<part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
 	<part name="FFDOptionsMask"   	  type="xsd:string"/>
+	<part name="FCRAPurpose"   	  type="xsd:string"/>
 	
 	<part name="Use_FixCase"		  type="xsd:boolean"/>	
 	
@@ -47,6 +48,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
 		BOOLEAN suppress_withdrawn_bankruptcy	:= FALSE 	: STORED('SuppressWithdrawnBankruptcy');
 		STRING32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 		INTEGER8 inFFDOptionsMask := FFD.FFDMask.Get(inApplicationType := application_type);
+  INTEGER inFCRAPurpose := FCRA.FCRAPurpose.Get();
 		
 		// Return all records if either all the booleans are true, or all are false. The reason is 
 		// because it's common to run a batch job without checking any parties and yet expect the 
@@ -162,7 +164,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
                                                                     TRUE, FALSE, in_ssn_mask, 
 																																		suppress_withdrawn_bankruptcy);
 		//*************FCRA FFD
-		res := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_recs, inFFDOptionsMask);
+		res := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_recs, inFFDOptionsMask, inFCRAPurpose);
 		
    	results_pre  := sort(res.records, acctno);
    	consumer_statements  := sort(res.statements, acctno);

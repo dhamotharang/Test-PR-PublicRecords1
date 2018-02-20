@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch_ServiceFCRA">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
@@ -8,6 +8,7 @@
   <part name="ApplicationType" type="xsd:string"/>
   <part name="MaxResults" type="xsd:unsignedInt"/>
 	<part name="FFDOptionsMask" 	      type="xsd:string"/>
+	<part name="FCRAPurpose" 	      type="xsd:string"/>
   <part name="NonSubjectSuppression" type="xsd:unsignedInt" default="2"/> <!-- [1,2,3] -->
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
@@ -18,10 +19,9 @@
            -2: co-owners are blanked and lname is overriden with value "FCRA Restricted"<br/>
            -3: co-owners are suppressed<p/>
            The default behavior for NonSubjectSuppression is 2.*/
-/*--USES-- ut.input_xslt */
 
 
-IMPORT BatchShare, marriage_divorce_v2_Services, Suppress, Gateway, ut,FFD,STD;
+IMPORT BatchShare, marriage_divorce_v2_Services, Suppress, Gateway, ut,FFD,STD, FCRA;
 
 EXPORT Batch_ServiceFCRA () := MACRO
   boolean IsFCRA := true;
@@ -38,6 +38,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
     export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
     export integer1 non_subject_suppression := nss;
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer  FCRAPurpose := FCRA.FCRAPurpose.Get();
   end;
   
   // run input through some standard procedures
