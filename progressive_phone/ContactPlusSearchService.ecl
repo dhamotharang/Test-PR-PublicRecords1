@@ -4,7 +4,6 @@
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
-	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
 	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
 	<part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
 	<part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
@@ -91,7 +90,6 @@ EXPORT ContactPlusSearchService := MACRO
     #stored('EMAIL', search_by.email);
 		#stored('DedupePhones', search_by.DedupeInfo.phones );
 		#stored('ExcludeDeadContacts', ~first_row.options.IncludeDeadContacts );
-		#stored('DedupAgainstInputPhones', first_row.options.DedupeAgainstInputPhones );
 		#stored('KeepSamePhoneInDiffLevels', first_row.options.KeepSamePhoneInDiffLevels );
 	
 		#stored('IncludePhonesFeedback', first_row.options.IncludePhonesFeedback );
@@ -136,11 +134,7 @@ EXPORT ContactPlusSearchService := MACRO
 		#stored('ExcludeNonCellPhonesPlusData', ~first_row.options.IncludeNonCellPhonesPlusData );
 		#stored('StrictAPSXMatch', first_row.options.StrictAPSXMatch );
 		#stored('ReturnScore', first_row.options.ReturnScore );
-		
-		#stored('UseMetronet', first_row.options.UseMetronet );
-		#stored('Confirmation_GoToGateway', first_row.options.GoToGateway );
-		#stored('MetronetLimit', first_row.options.MetronetLimit );
-		
+				
 		#stored('UsePremiumSource_A', first_row.options.UsePremiumSourceA );
 		#stored('PremiumSource_A_limit', first_row.options.PremiumSourceLimitA );
 		
@@ -165,10 +159,7 @@ EXPORT ContactPlusSearchService := MACRO
 		boolean IncludeLastResort := false : STORED('IncludeLastResort');
 	  boolean ReturnAddressesSeenInLast24Mos := first_row.options.ReturnAddressesSeenInLast24Mos;
 
-		boolean UseMetronetGateway := false : STORED('UseMetronet');
-		boolean Confirmation_GoToGateway:= false : STORED ('Confirmation_GoToGateway'); //force metronet gateway hit even if we have the phone in house
-		INTEGER metronetLimit := 0 : STORED('MetronetLimit');
-
+		
 		boolean UsePremiumSource_A:= false : STORED ('UsePremiumSource_A'); //equifax
 		integer PremiumSource_A_limit:= 0 : STORED ('PremiumSource_A_limit');
 
@@ -341,9 +332,7 @@ EXPORT ContactPlusSearchService := MACRO
 																																,
 																																,
 																																,
-																																UseMetronetGateway,
 																																,
-																																metronetLimit,
 																																scoreModel,
 																																MaxNumAssociate,
 																																MaxNumAssociateOther,
@@ -353,22 +342,19 @@ EXPORT ContactPlusSearchService := MACRO
 																																MaxNumSpouse,
 																																MaxNumSubject,
 																																MaxNumNeighbor,
-																																Confirmation_GoToGateway,
 																																UsePremiumSource_A,
 																																PremiumSource_A_limit)), progressive_phone.layout_progressive_online_out);
 		
 		//mainly to filter out results for CP_V3 to ensure that we track EQX and LR royalties on the final output only unlike metronet
 		v_enum       := progressive_phone.Constants.Running_Version;
-		version      := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel,UseMetronetGateway,UsePremiumSource_A);
+		version      := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel, UsePremiumSource_A);
 		tempresults1 := if(version = v_enum.CP_V3, ungroup(progressive_phone.HelperFunctions.FN_FilterPerScore(f_out)), f_out);
 		
 		Royalty.MAC_RoyaltyLastResort(tempresults1, lastresort_royalties, vendor, subj_phone10);
-	
-		Royalty.MAC_RoyaltyMetronet(f_out, metronet_royalties, subj_phone_type_new, MDR.sourceTools.src_Metronet_Gateway);
-		
+				
 		Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(tempresults1, equifax_royalties, subj_phone_type_new, MDR.sourceTools.src_EQUIFAX);
 		
-		royalties := lastresort_royalties + metronet_royalties + equifax_royalties;
+		royalties := lastresort_royalties + equifax_royalties;
 		output(royalties,named('RoyaltySet'));
 		
 		PhonesFeedback_Services.Mac_Append_Feedback(tempresults1,did,subj_phone10,f_out_w_fb);
@@ -379,7 +365,7 @@ EXPORT ContactPlusSearchService := MACRO
 										 SkipPhonesScoring => sort(finalout,sort_order,sort_order_internal), 
 									   sort(finalout, -phone_score));
 
-	  tempresults2 := iesp.transform_progressive_phones(sort_rslt, ShowPhoneScore, scoreModel, UseMetronetGateway, UsePremiumSource_A);
+	  tempresults2 := iesp.transform_progressive_phones(sort_rslt, ShowPhoneScore, scoreModel, UsePremiumSource_A);
  
     iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults2, Results, iesp.contactPlus.t_ContactPlusSearchResponse, Records, false,,ContactPlus,contactPlus[1]);
 		//output('WithNewPLSources');

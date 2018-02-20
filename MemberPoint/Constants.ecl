@@ -1,4 +1,4 @@
-IMPORT MemberPoint;
+﻿IMPORT MemberPoint;
 
 	export Constants := module
 	
@@ -128,7 +128,6 @@ IMPORT MemberPoint;
 			EXPORT INTEGER MaxPhoneCount:= 3;
 			EXPORT BOOLEAN ReturnScore:= TRUE;
 			EXPORT BOOLEAN StrictAPSX:= FALSE;
-			EXPORT BOOLEAN UseMetronet:= FALSE;
 		end;
 			
 		export unsigned SubjectAdultScore := 100; // between 0-100

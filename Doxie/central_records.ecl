@@ -105,7 +105,7 @@ email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_e
 // Premium Phones
 dedup_phones:=dataset(dedupPremiumPhones,doxie.premium_phone.phone_rec)+
 project(phpl,transform(doxie.premium_phone.phone_rec,self.phone:=left.phoneno));
-prph := if(Include_PremiumPhones_val,doxie.premium_phone.get_records(dids,dedup_phones,gateway.configuration.get(),global_mod.DataRestrictionMask,true,true));
+prph := if(Include_PremiumPhones_val,doxie.premium_phone.get_records(dids,dedup_phones,gateway.configuration.get(),global_mod.DataRestrictionMask,true));
 
 // Business Instant ID - input verification and to get business name and address
 // TODO: hide into header_field_declare along with other selectors

@@ -1,4 +1,4 @@
-IMPORT Gateway,Suppress;
+﻿IMPORT Gateway,Suppress;
 
 lBatchIn := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lFinal   := PhoneFinder_Services.Layouts.PhoneFinder.Final;
@@ -28,7 +28,6 @@ FUNCTION
 	
 	psMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.ReportParams,OPT))
 		EXPORT BOOLEAN UseQSent      := FALSE;
-		EXPORT BOOLEAN UseMetronet   := FALSE;
 		EXPORT BOOLEAN UseTargus     := FALSE;
 		EXPORT BOOLEAN UseLastResort := FALSE;
 	END;

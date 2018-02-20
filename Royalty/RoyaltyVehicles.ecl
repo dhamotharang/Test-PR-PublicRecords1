@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie;
 EXPORT RoyaltyVehicles := module
 
 	export RTV_RoyaltyType 		:= if(doxie.DataPermission.use_Polk, Royalty.Constants.RoyaltyType.POLK, Royalty.Constants.RoyaltyType.EXPERIAN);

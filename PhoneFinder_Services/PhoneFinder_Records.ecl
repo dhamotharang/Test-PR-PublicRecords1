@@ -146,7 +146,6 @@ MODULE
   dResultsDedupQSent := dResultsDedup + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
       	
   Royalty.MAC_RoyaltyLastResort(dResultsDedup,dRoyaltyLR);
-  Royalty.MAC_RoyaltyMetronet(dResultsDedup,dRoyaltyMetronet,subj_phone_type_new,MDR.sourceTools.src_Metronet_Gateway);
   Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(dResultsDedup,dRoyaltyEquifax,subj_phone_type_new,MDR.sourceTools.src_EQUIFAX);
   Royalty.MAC_RoyaltyQSENT(dResultsDedupQSent,dRoyaltyQSent,TRUE,TRUE); 
   dRoyaltyTargus := Royalty.RoyaltyTargus.GetOnlineRoyalties(dResultsDedup,,,TRUE, FALSE, FALSE, FALSE);
@@ -156,7 +155,6 @@ MODULE
   EXPORT dRoyalties := 
       		if(inMod.UseLastResort, dRoyaltyLR) + 
       		if(inMod.UseInHouseQSent or inMod.UseQSent, dRoyaltyQSent) + 
-      		if(inMod.UseMetronet, dRoyaltyMetronet) + 
       		if(inMod.UseTargus, dRoyaltyTargus) + 
       		if(inMod.UseEquifax, dRoyaltyEquifax) + 
       		if(inMod.UseAccuData_ocn, dRoyaltyAccOCN)+
