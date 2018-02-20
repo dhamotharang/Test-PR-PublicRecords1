@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT HCP1206_0_0 (DATASET(Risk_Indicators.Layout_Provider_Scoring.Clam_Plus_Healthcare) combinedShells, UNSIGNED1 numberOfReasonCodes = 4) := FUNCTION
 
@@ -1531,7 +1531,7 @@ EXPORT HCP1206_0_0 (DATASET(Risk_Indicators.Layout_Provider_Scoring.Clam_Plus_He
 	 *             Model Input Variable Assignments              *
 	 ************************************************************* */
 	 // Boca Shell Fields
-		archive_date	 := IF(le.BocaShell.historydate = 999999, (INTEGER)(((STRING)ut.GetDate)[1..6]), (INTEGER)(((STRING)le.BocaShell.historydate)[1..6]));
+		archive_date	 := IF(le.BocaShell.historydate = 999999, (INTEGER)(((STRING)Std.Date.Today())[1..6]), (INTEGER)(((STRING)le.BocaShell.historydate)[1..6]));
 		header_first_seen	 := le.BocaShell.ssn_verification.header_first_seen;
 		date_last_seen	 := le.BocaShell.bjl.date_last_seen;
 		ver_sources	 := le.BocaShell.header_summary.ver_sources;
@@ -2294,7 +2294,7 @@ EXPORT HCP1206_0_0 (DATASET(Risk_Indicators.Layout_Provider_Scoring.Clam_Plus_He
 		if(sas_date = NULL, NULL, (integer)((ut.DateFrom_DaysSince1900(sas_date + ut.DaysSince1900('1960', '1', '1')))[1..4]));
 	
 	sysdate := map(
-	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.BocaShell.historydate=999999, (string)ut.getdate, (string6)le.BocaShell.historydate+'01')),
+	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.BocaShell.historydate=999999, (STRING)Std.Date.Today(), (string6)le.BocaShell.historydate+'01')),
 	    length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 	                                                           NULL);
 	

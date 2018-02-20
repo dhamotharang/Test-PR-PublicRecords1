@@ -1,4 +1,4 @@
-import ut, models;
+import ut, models, std;
 
 EXPORT getEconomicTrajectory(GROUPED DATASET (Layout_Boca_Shell) clam) := function
 
@@ -52,7 +52,7 @@ EXPORT getEconomicTrajectory(GROUPED DATASET (Layout_Boca_Shell) clam) := functi
 	Prev_Addr_avm_med_geo12 := le.avm.address_history_2.avm_median_geo12_level; //                  AVM: Median AVM for Census Block
   
 	addrs_5yr := le.Other_Address_Info.addrs_last_5years;
-	archive_date                     := if( le.historydate=999999, (unsigned3)ut.getdate[1..6], le.historydate );
+	archive_date                     := if( le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate );
 	NULL := -999999999;
 	_reported_dob := models.common.sas_date((string)(le.reported_dob));
 	sysdate := models.common.sas_date((string)(archive_date));

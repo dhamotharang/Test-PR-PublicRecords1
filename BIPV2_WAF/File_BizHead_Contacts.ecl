@@ -6,7 +6,7 @@ layoutOrigFile :=
   record
 	  BIPV2.IDlayouts.l_xlink_ids; 
     BIPV2.Layout_Business_Linking_Full;
-		boolean executive_ind:='';
+		boolean executive_ind:=FALSE;
 		integer executive_ind_order:=0;
   end;
 	

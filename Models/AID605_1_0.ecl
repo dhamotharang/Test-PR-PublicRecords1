@@ -38,20 +38,20 @@ export AID605_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 
 			/* Distance Address to Phone */
-			distance_c := if( le.phone_verification.distance = 9999, -1, ut.imin2( le.phone_verification.distance, 20 ) );
+			distance_c := if( le.phone_verification.distance = 9999, -1, Min( le.phone_verification.distance, 20 ) );
 			distance_cl := ln( distance_c + 2 );
 
 
 		/* Derogs */
-		     //lien_recent_un := ut.imin2(2, le.bjl.liens_recent_unreleased_count);
-			//lien_hist_un := ut.imin2(2, le.bjl.liens_historical_unreleased_count);
-			//lien_recent_rel := ut.imin2(2, le.bjl.liens_recent_released_count);
-			//lien_hist_rel := ut.imin2(2, le.bjl.liens_historical_released_count);
+		     //lien_recent_un := Min(2, le.bjl.liens_recent_unreleased_count);
+			//lien_hist_un := Min(2, le.bjl.liens_historical_unreleased_count);
+			//lien_recent_rel := Min(2, le.bjl.liens_recent_released_count);
+			//lien_hist_rel := Min(2, le.bjl.liens_historical_released_count);
 
 			unreleased_level := map(
 				le.bjl.liens_recent_unreleased_count = 0 and le.bjl.liens_historical_unreleased_count = 0 => 0,
 				le.bjl.liens_recent_unreleased_count = 0 and le.bjl.liens_historical_unreleased_count > 0 => 1,
-				ut.imin2( le.bjl.liens_recent_unreleased_count, 3 ) + 1
+				Min( le.bjl.liens_recent_unreleased_count, 3 ) + 1
 			);
 
 			unreleased_level_m := map(

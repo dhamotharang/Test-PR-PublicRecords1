@@ -1,4 +1,4 @@
-import doxie, iesp, ut, risk_indicators, suppress;
+import doxie, iesp, ut, risk_indicators, suppress, std;
 
 export getProfLic(dataset(identifier2.layout_Identifier2) indata, 
 	boolean Include_proflic_Data=false,
@@ -15,7 +15,7 @@ export getProfLic(dataset(identifier2.layout_Identifier2) indata,
 
 	// if the termination date is not populated, don't filter it out
 	goodOne := t_Provider_r(exists(licenseInfos(
-		(integer)ut.GetDate < ID2Common.fromESDLDate(terminationDate)
+		(integer)Std.Date.Today() < ID2Common.fromESDLDate(terminationDate)
 		or terminationDate.year=0
 		))
 	);

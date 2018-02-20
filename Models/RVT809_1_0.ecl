@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, ut, riskwisefcra;
+import riskwise, risk_indicators, ut, riskwisefcra, std;
 
 export RVT809_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				boolean isCalifornia = false,
@@ -159,7 +159,7 @@ end;
 		liens_historical_unreleased_ct   := le.bjl.liens_historical_unreleased_count;
 		liens_historical_released_count  := le.bjl.liens_historical_released_count;
 		criminal_count                   := le.bjl.criminal_count;
-		archive_date                     := if(le.historydate=999999, (unsigned3)ut.getdate[1..6], le.historydate);
+		archive_date                     := if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 
 		input_dob_match_level            := le.dobmatchlevel;
 		liens_recent_unreleased_count    := le.bjl.liens_recent_unreleased_count;
@@ -176,8 +176,8 @@ end;
 			(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
 
-		archive_yr := (string)archive_date[1..4];
-		archive_mo := (string)archive_date[5..6];
+		archive_yr := ((STRING)archive_date)[1..4];
+		archive_mo := ((STRING)archive_date)[5..6];
 
 		today := ut.DaysSince1900(archive_yr, archive_mo, '01');//) - ut.DaysSince1900('1960', '01', '01'));
 
@@ -208,8 +208,8 @@ end;
 
 
 		in_date := ut.DaysSince1900(
-			adl_eq_first_seen[1..4],
-			if( adl_eq_first_seen[5..6]='00', '01', adl_eq_first_seen[5..6] ),
+			((STRING)adl_eq_first_seen)[1..4],
+			if( ((STRING)adl_eq_first_seen)[5..6]='00', '01', ((STRING)adl_eq_first_seen)[5..6] ),
 			'01'//adl_eq_first_seen[7..8]
 		);
 

@@ -394,7 +394,7 @@ risk_indicators.layout_input into(d l) := transform
 	self.score := if(self.did<>0, 100, 0);
 	self.ssn := IF(socs_value='000000000','',socs_value);	// blank out social if it is all 0's
 	self.dob := dob_val;
-	self.age := if (age_value = 0 and (integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), (string3)age_value);
+	self.age := if (age_value = 0 and (integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), (string3)age_value);
 	self.phone10 := hphone_value;
 	self.wphone10 := wphone_value;
 	

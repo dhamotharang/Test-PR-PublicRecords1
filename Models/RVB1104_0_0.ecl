@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVB1104_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean xmlPreScreenOptOut ) := FUNCTION
 
@@ -1107,7 +1107,7 @@ export RVB1104_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 
 		sysdate := map(
-			trim((string)archive_date, LEFT, RIGHT) = '999999'  => Models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+			trim((string)archive_date, LEFT, RIGHT) = '999999'  => Models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
 			length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 																   NULL);
 

@@ -1,4 +1,4 @@
-import risk_indicators, ut, mdr, aml;
+import risk_indicators, ut, mdr, aml, std;
 
 
 EXPORT AMLAttributesMaster(Risk_Indicators.Layout_BocaShell_Neutral AMLin)
@@ -15,7 +15,7 @@ shared	capMax := '9999999999';
 	
 shared 	ageDate := (unsigned4)Risk_Indicators.iid_constants.myGetDate(AMLin.historydate); 						
 shared unsigned3 fixYYYY00( unsigned YYYYMM ) := if( YYYYMM > 0 and YYYYMM % 100 = 0, YYYYMM + 1, YYYYMM );
-shared	sysdate := if(AMLin.historydate <> 999999, (integer)((string)AMLin.historydate[1..6]), (integer)(ut.GetDate[1..6]));
+shared	sysdate := if(AMLin.historydate <> 999999, (integer)(((string)AMLin.historydate)[1..6]), (integer)(((STRING)Std.Date.Today())[1..6]));
 shared	subjectFirstSeen := fixYYYY00(ut.Min2(AMLin.ssn_verification.header_first_seen, AMLin.ssn_verification.credit_first_seen));
 shared	noSSNinput     := not AMLin.input_validation.ssn;
 shared	checkBoolean(boolean x) := if(x, '1', '0');
@@ -97,9 +97,9 @@ export	string2	SSNProblems	:= map(noSSNInput 								=> '-1',  // not input
 								Risk_Indicators.rcSet.isCodeRS(AMLin.shell_input.ssn, AMLin.iid.socsvalflag, AMLin.iid.socllowissue, AMLin.iid.socsRCISflag)	=> '1', // randomized ssn (RS)
 								'0');  // valid
 
-shared 	under21 := AMLin.inferred_age < 21 OR (ut.GetAgeI_asOf(AMLin.reported_dob, (unsigned)ageDate)) < 21;	
+shared 	under21 := AMLin.inferred_age < 21 OR (ut.Age(AMLin.reported_dob, (unsigned)ageDate)) < 21;	
 export	string3	BestReportedAge(boolean isPrescreen)	:= if(AMLin.reported_dob=0 OR (isPrescreen AND under21), '-1', 
-																															capS((string)ut.GetAgeI_asOf(AMLin.reported_dob, ageDate), capZero, cap150) );
+																															capS((string)ut.Age(AMLin.reported_dob, ageDate), capZero, cap150) );
 
 export	string1	WatercraftOwner	:= checkboolean(AMLin.watercraft.watercraft_count>0);
 

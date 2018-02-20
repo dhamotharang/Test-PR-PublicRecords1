@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVA711_0_0(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -130,7 +130,7 @@ end;
 
 
 		/* !!! change scoring year to system year when scoring !!! */
-		scoring_year := if( archive_date = 999999, (INTEGER)ut.GetDate[1..4], (INTEGER)archive_date[1..4] );
+		scoring_year := if( archive_date = 999999, (INTEGER)((STRING)Std.Date.Today())[1..4], (INTEGER)((STRING)archive_date)[1..4] );
 
 
 		/* updated vermod */

@@ -1,9 +1,9 @@
-export mRawHandlers
+﻿export mRawHandlers
  :=
   module
-		import lib_StringLib, lib_FileServices, ut, lib_ThorLib;
+		import lib_StringLib, lib_FileServices, ut, lib_ThorLib, std;
 
-		shared	lCurrentDate	:=	ut.GetDate : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+		shared	lCurrentDate	:=	(STRING8)Std.Date.Today() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
 
 		/*************************************************************************************
 		** Prepend UID (as field AIDWork_RecordID) to original dataset for later joining

@@ -1,4 +1,4 @@
-import easi, risk_indicators, riskwise, ut;
+import easi, risk_indicators, riskwise, ut, std;
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -434,8 +434,8 @@ export FP31203_1_0( dataset(bs_with_ip) clam, string inputfluxgrade ) := FUNCTIO
       (source[1..length(target)+1] = target + delim) OR
       (StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
-    sysdate_1 := models.common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01'));
-    sysdate   := models.common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01'));
+    sysdate_1 := models.common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01'));
+    sysdate   := models.common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01'));
 
     r1 := .1371;
 

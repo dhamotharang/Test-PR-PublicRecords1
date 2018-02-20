@@ -76,7 +76,7 @@ withBusHeader := join(AMLAddr, bha,
 						keyed(left.prim_name=right.prim_name) and
 						keyed(right.prim_range=left.prim_range) and
 						keyed(right.sec_range=left.sec_range) and
-						(unsigned)(right.dt_first_seen[1..6]) < left.historydate,
+						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate,
 			      transform(Layout_AMLAddr, self.bdid := (string)right.bdid, self := left, self := []), 
 						atmost(1000),
 						keep(1),

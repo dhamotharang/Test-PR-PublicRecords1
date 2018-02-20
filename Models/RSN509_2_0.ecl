@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, riskwise;
+import ut, Risk_Indicators, riskwise, std;
 
 export RSN509_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(riskwise.Layout_IT1O_model_in) rsn_prep) := FUNCTION
 
@@ -8,7 +8,7 @@ models.Layout_ModelOut doModel(clam le, rsn_prep rt) := TRANSFORM
 			   string dcd_match_code_1, string chargeoff_amount
 			   */
 			   
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.historydate <> 999999, (integer)(((STRING)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	address_confirmed := if(trim(StringLib.StringToUpperCase(rt.addr_type_a)) = 'C', true,false);
 	address_updated := if(trim(StringLib.StringToUpperCase(rt.addr_type_a)) = 'U', true,false);
@@ -60,7 +60,7 @@ models.Layout_ModelOut doModel(clam le, rsn_prep rt) := TRANSFORM
 				 5);	// added this myself so it syntax checks
 				 
 	add1_year_first_seen1 := le.address_verification.input_address_information.date_first_seen;
-	add1_year_first_seen := (integer)(add1_year_first_seen1[1..4]);
+	add1_year_first_seen := (integer)(((STRING)add1_year_first_seen1)[1..4]);
 	
 	lres2 := map(add1_year_first_seen = 0 => 0,
 			   (sysyear - add1_year_first_seen) >= 16 => 3,

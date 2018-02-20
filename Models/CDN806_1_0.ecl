@@ -1,4 +1,4 @@
-import easi, ut, address, riskwise, risk_indicators;
+import easi, ut, address, riskwise, risk_indicators, std;
 
 export CDN806_1_0(
 	grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
@@ -99,7 +99,7 @@ export CDN806_1_0(
 		ssns_per_adl          :=  le.bill_to_out.velocity_counters.ssns_per_adl;
 		adls_per_addr_c6      :=  le.bill_to_out.velocity_counters.adls_per_addr_created_6months;
 		wealth_index          :=  le.bill_to_out.wealth_indicator;
-		archive_date          :=  if(le.bill_to_out.historydate <> 999999, (string)le.bill_to_out.historydate, ut.GetDate); // same value as used in cdn606_1_0
+		archive_date          :=  if(le.bill_to_out.historydate <> 999999, (string)le.bill_to_out.historydate, (STRING)Std.Date.Today()); // same value as used in cdn606_1_0
 		in_state              :=  le.Bill_to_Out.shell_input.in_state;
 
 
@@ -439,7 +439,7 @@ export CDN806_1_0(
 							   vb_prop_tree = 7 => 0.0203080792,
 							   vb_prop_tree = 9 => 0.0079606263,
 												   0.006031216);
-		v_s_add1_year_firstSeen := (integer)(add1_date_first_seen_s[1..4]);
+		v_s_add1_year_firstSeen := (integer)(((STRING)add1_date_first_seen_s)[1..4]);
 		v_s_lres_years :=  if(v_s_add1_year_firstseen in [0], -999, (scoring_year_s - v_s_add1_year_firstseen));
 		vs_s_lres_i :=  map(v_s_lres_years < 0   => 0,
 							v_s_lres_years <= 2  => 1,
@@ -449,7 +449,7 @@ export CDN806_1_0(
 							  vs_s_lres_i = 1 => 0.0975489714,
 							  vs_s_lres_i = 2 => 0.0638974647,
 												 0.045583239);
-		v_add1_year_firstSeen := (integer)(add1_date_first_seen[1..4]);
+		v_add1_year_firstSeen := (integer)(((STRING)add1_date_first_seen)[1..4]);
 		v_lres_years :=  if(v_add1_year_firstseen in [0], -999, (scoring_year - v_add1_year_firstseen));
 		vb_lres_i :=  map(v_lres_years < 0  => 0,
 						  v_lres_years <= 0 => 1,

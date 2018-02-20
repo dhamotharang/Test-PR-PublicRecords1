@@ -1,4 +1,4 @@
-import risk_indicators, ut;
+import risk_indicators, ut, std;
 
 export RVR1104_2_0( grouped dataset( risk_indicators.Layout_Boca_Shell ) clam, boolean isCalifornia, boolean xmlPreScreenOptOut) := FUNCTION
 
@@ -455,7 +455,7 @@ export RVR1104_2_0( grouped dataset( risk_indicators.Layout_Boca_Shell ) clam, b
 		INTEGER year(integer sas_date) :=
 			if(sas_date = NULL, NULL, (integer)((ut.DateFrom_DaysSince1900(sas_date + ut.DaysSince1900('1960', '1', '1')))[1..4]));
 
-		sysdate := models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+		sysdate := models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 		num_els_popd_1 := sum((integer)lnamepop, (integer)addrpop, (integer)(real)ssnlength = 9, (integer)dobpop, (integer)hphnpop);
 

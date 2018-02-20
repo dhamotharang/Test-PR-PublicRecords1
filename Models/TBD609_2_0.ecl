@@ -1,4 +1,4 @@
-import address, ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import address, ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export TBD609_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) inputclam, boolean OFAC, boolean inCalif) := 
 
@@ -12,7 +12,7 @@ clam := project(inputclam,
 			
 Layout_ModelOut doModel(clam le) := TRANSFORM
 	
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]) + 1, (integer)(ut.GetDate[1..4]) + 1);
+	sysyear := IF(le.historydate <> 999999, (integer)(((STRING)le.historydate)[1..4]) + 1, (integer)(((STRING)Std.Date.Today())[1..4]) + 1);
 		
 	verlst_p := if(le.iid.nap_summary in [2,5,7,8,9,11,12], 1,0);
 	veradd_p := if(le.iid.nap_summary in [3,5,6,8,10,11,12], 1,0);
@@ -55,10 +55,10 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 						NaProp_Tree = 0 => 0,
 						0);
 
-	time_on_header_years := (sysyear - (integer)(le.ssn_verification.header_first_seen[1..4]));
+	time_on_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_first_seen)[1..4]));
 
     
-     time_since_header_years := (sysyear - (integer)(le.ssn_verification.header_last_seen[1..4]));
+     time_since_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_last_seen)[1..4]));
 
     							
 	lien_unrel_flag := if(le.bjl.liens_historical_unreleased_count = 0, 0, 1);
@@ -110,7 +110,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
      dobver := if(le.name_verification.dob_score <= 40, 0, 1);
 	
-	today := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.historydate <> 999999, ((STRING)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
 

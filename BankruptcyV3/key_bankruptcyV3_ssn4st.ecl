@@ -1,8 +1,8 @@
-import ut,fcra, BankruptcyV2;
+import ut,fcra, BankruptcyV2, std;
 
 //last 4 digits of SSN, DEBTORS ONLY index
 export key_bankruptcyV3_ssn4st(boolean isFCRA = false) := function
-	todaysdate := ut.GetDate;
+	todaysdate := (STRING8)Std.Date.Today();
 	
 	base_recs := BankruptcyV2.file_bankruptcy_search_v3;
 	get_recs := base_recs(name_type ='D' AND 

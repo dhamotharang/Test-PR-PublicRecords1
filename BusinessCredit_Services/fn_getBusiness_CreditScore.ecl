@@ -1,4 +1,4 @@
-﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut;
+﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut, std;
 
 EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,
 																		DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,
@@ -151,7 +151,7 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 	_curr_Scores	:= PROJECT(model_results , score_trans(LEFT));
 
 	iesp.businesscreditreport.t_BusinessCreditScoring trans_CurrScores() := TRANSFORM
-		SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8(ut.GetDate),
+		SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8((STRING8)Std.Date.Today()),
 		SELF.CurrentPriorFlag 						:= LNSmallBusiness.Constants.CURRENT_FLAG,
 		SELF.Scores 											:= PROJECT(_curr_Scores , TRANSFORM(LEFT)), 
 		SELF															:= [];

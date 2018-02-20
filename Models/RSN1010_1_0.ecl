@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, EASI;
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, EASI, std;
 
 EXPORT rsn1010_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, DATASET(Models.Layout_RecoverScore_Batch_Input) recoverScoreBatchIn) := FUNCTION
 
@@ -543,7 +543,7 @@ EXPORT rsn1010_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, DAT
 	inferred_age                     := le.inferred_age;
 	reported_dob                     := le.reported_dob;
 	addr_stability                   := le.mobility_indicator;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *
@@ -551,7 +551,7 @@ EXPORT rsn1010_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, DAT
 	 NULL := -999999999;
 
 	sysdate := map(
-	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => Common.SAS_Date((STRING)if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01')),
+	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => Common.SAS_Date((STRING)if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
 	    length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 	                                                           NULL);
 	

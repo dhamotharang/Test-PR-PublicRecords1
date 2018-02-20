@@ -1,4 +1,4 @@
-import doxie,data_services;
+import doxie,ut, data_services;
 
 in_sh := watercraft.File_Base_Search_Dev;
 in_cg := watercraft.File_Base_Coastguard_Dev;
@@ -33,5 +33,7 @@ cg_slim_vld := join(cg_slim_dst2, in_sh_dep,
 				check_search(left),local);
 
 export key_watercraft_offnum := 
-       index(cg_slim_vld,{official_number},{state_origin,watercraft_key,sequence_key},
-            data_services.foreign_prod+'thor_data400::key::watercraft_offnum_'+doxie.Version_SuperKey);
+       index(cg_slim_vld,
+             {official_number},
+             {state_origin,watercraft_key,sequence_key},
+             data_services.data_location.prefix() + 'thor_data400::key::watercraft_offnum_'+doxie.Version_SuperKey);

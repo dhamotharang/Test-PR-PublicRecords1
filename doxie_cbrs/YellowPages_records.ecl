@@ -1,4 +1,5 @@
-import YellowPages, doxie, business_header,ut,doxie_cbrs_raw;
+import YellowPages, doxie, business_header,ut,doxie_cbrs_raw, std;
+
 doxie_cbrs.mac_Selection_Declare()
 
 export YellowPages_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
@@ -10,7 +11,7 @@ krec := record
 	string8 pub_date_decode;
 end;
 
-unsigned4 thisyear := (unsigned4)(ut.GetDate[1..4]);
+unsigned4 thisyear := (unsigned4)(((STRING)Std.Date.Today())[1..4]);
 
 string8 checkflip(string6 dt) := 
 	if(abs(thisyear - (unsigned4)(dt[1..4])) < abs(thisyear - (unsigned4)(dt[3..6])),

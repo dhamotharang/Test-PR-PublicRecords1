@@ -28,7 +28,7 @@ EXPORT MAC_getTNTValue(infile,
               dtlastseenfield = 'dt_last_seen'
               ) := macro
     
-		import doxie, Doxie_Raw, gong, ut, DID_Add;
+		import doxie, Doxie_Raw, gong, ut, DID_Add, std;
 		
     //1. Check best records to determine if best address    
     #uniquename(trans_best)
@@ -75,7 +75,7 @@ EXPORT MAC_getTNTValue(infile,
     infile %checkgDID%(%results_best% le, %final_did% ri) := transform
       self.tntfield := map(ri.did != '' AND le.tntfield = 'C' => 'B', //Bullseye - is currently the 'best' address and is a DID match to the gong file
              le.tntfield = 'C' => 'C',
-             ri.did != '' AND ut.DaysApart(le.dtlastseenfield+'00', ut.GetDate) < 31*6 => 'P', //Probable - is not currently the best address, but is did verified with a dtlastseenfield within 6 months
+             ri.did != '' AND ut.DaysApart(le.dtlastseenfield+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P', //Probable - is not currently the best address, but is did verified with a dtlastseenfield within 6 months
              le.tntfield);
       SELF := le;
     END;
@@ -87,7 +87,7 @@ EXPORT MAC_getTNTValue(infile,
                LEFT.primrangefield=RIGHT.prim_range) OR
                (RIGHT.prim_name='' AND RIGHT.prim_range='' AND LEFT.zipfield=RIGHT.z5 AND
                 (LEFT.tntfield='C' OR 
-                (ut.DaysApart(LEFT.dtlastseenfield+'00', ut.GetDate) < ut.DaysInNYears(1))))),
+                (ut.DaysApart(LEFT.dtlastseenfield+'00', (STRING8)Std.Date.Today()) < ut.DaysInNYears(1))))),
                         %checkgDID%(LEFT, RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL);
                         
     //3. Check for HHID match to the Gong file
@@ -112,7 +112,7 @@ EXPORT MAC_getTNTValue(infile,
       self.tntfield := MAP(le.tntfield = 'B' => 'B',
              ri.hhid != 0 AND le.tntfield = 'C' => 'V', //Verified - is currently the best address and is a HHID match to the gong file
              le.tntfield = 'C' => 'C',
-             ri.hhid != 0 AND ut.DaysApart(le.dtlastseenfield+'00', ut.GetDate) < 31*6 => 'P', //Probable - is not currently the best address, but is hhid verified with a dtlastseenfield within 6 months
+             ri.hhid != 0 AND ut.DaysApart(le.dtlastseenfield+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P', //Probable - is not currently the best address, but is hhid verified with a dtlastseenfield within 6 months
              le.tntfield = 'P' => 'P',
              ri.hhid != 0 => 'R', //Relative - is not currently the best address, and has a dtlastseenfield > 6 months but is HHID verified
              le.tntfield);

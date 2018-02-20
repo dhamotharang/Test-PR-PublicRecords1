@@ -1,13 +1,13 @@
 /*2011-12-05T16:50:49Z (Giri_Prod Rajulapalli)
 
 */
-import header,ut;
+import header,ut, Data_Services;
 
 export ATF_as_Source(dataset(atf.layout_firearms_explosives_out_bid) pATF = dataset([],atf.layout_firearms_explosives_out_Bid), boolean pForHeaderBuild=false)
  :=
   function
 	dSourceData	:=	if(pForHeaderBuild,
-					   dataset(ut.foreign_prod+'~thor_data400::Base::atfHeader_Building',atf.layout_firearms_explosives_out_Bid,flat),
+					   dataset(data_services.data_location.prefix() + 'thor_data400::Base::atfHeader_Building',atf.layout_firearms_explosives_out_Bid,flat),
 					   pATF
 					  );
 

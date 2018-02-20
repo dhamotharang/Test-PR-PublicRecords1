@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVR803_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -69,7 +69,7 @@ end;
 		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 		/***********/
 		
-		arcdate := if( archive_date = 999999, ut.GetDate, (STRING)archive_date );
+		arcdate := if( archive_date = 999999, (STRING)Std.Date.Today(), (STRING)archive_date );
 		year := (INTEGER)arcdate[1..4];		
 	            
 		// Process vermod code

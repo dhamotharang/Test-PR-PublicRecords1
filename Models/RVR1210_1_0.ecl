@@ -1,6 +1,6 @@
 //DM Services - Custom 4.0 RV Score
 
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVR1210_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -227,7 +227,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 // sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
 
 sysdate := map(
-    trim((string)le.historydate, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+    trim((string)le.historydate, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01')),
     length(trim((string)le.historydate, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)le.historydate, LEFT))[1..4], (trim((string)le.historydate, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
                                                            NULL);
 iv_truedid := truedid;

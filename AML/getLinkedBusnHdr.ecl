@@ -27,8 +27,14 @@ LnkBusnHeadRec := join(DDBusnIds, BusnHeader,
 															self.seq := left.seq,
 															self.bdid := left.bdid,
 															self.historydate := left.historydate,
-															self.dt_first_seen := if((unsigned)right.dt_first_seen[1..6]>0 and ((unsigned)right.dt_first_seen[7..8]=0 or trim(right.dt_first_seen[7..8])=''), (unsigned)((string)right.dt_first_seen[1..6]+'01'), right.dt_first_seen), 											
-															self.dt_last_seen := if((unsigned)right.dt_last_seen[1..6]>0 and ((unsigned)right.dt_last_seen[7..8]=0 or trim(right.dt_last_seen[7..8])=''), (unsigned)((string)right.dt_last_seen[1..6]+'01'), right.dt_last_seen), 
+															self.dt_first_seen := if((unsigned)((STRING)right.dt_first_seen)[1..6]>0 AND 
+															                         ((unsigned)((STRING)right.dt_first_seen)[7..8]=0 or trim(((STRING)right.dt_first_seen)[7..8])=''), 
+															                              (unsigned)(((STRING)right.dt_first_seen)[1..6]+'01'), 
+															                              right.dt_first_seen), 											
+															self.dt_last_seen :=  if((unsigned)((STRING)right.dt_last_seen)[1..6]>0 AND 
+															                         ((unsigned)((STRING)right.dt_last_seen)[7..8]=0 or trim(((STRING)right.dt_last_seen)[7..8])=''), 
+															                              (unsigned)(((STRING)right.dt_last_seen)[1..6]+'01'), 
+															                              right.dt_last_seen), 
                               SELF.source := right.source),															
 										atmost(Keyed(right.bdid=left.Bdid), Business_Risk_BIP.Constants.Limit_BusHeader), keep(10000),
 										left outer);

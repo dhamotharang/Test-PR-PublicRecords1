@@ -1,4 +1,4 @@
-IMPORT ut;
+IMPORT ut, header;
 
 // If allowPlus4=TRUE, this function will allow SSNs such as *****1234, 9876, 000003456
 // If allowPlus4=FALSE, all invalid SSN's will be removed.
@@ -10,7 +10,7 @@ EXPORT fn_clean_death_ssn(STRING9 in_ssn, BOOLEAN allowPlus4=TRUE) := FUNCTION
 	// If we are allowing LAST4, Replace characters with zero and make length 9 digits
 	my_ssn	:=	IF(allowPlus4,INTFORMAT((UNSIGNED)(REGEXREPLACE('[^0-9]',TRIM(in_ssn,ALL),'0')),9,1),in_ssn);
 		
-	BOOLEAN	is_invalid_length		:= ut.ssn_length(my_ssn) <> 9;
+	BOOLEAN	is_invalid_length		:= header.ssn_length(my_ssn) <> 9;
 	BOOLEAN	is_not_numeric			:= ~(ut.isNumeric(my_ssn));
 	BOOLEAN	is_invalid_ssn			:= my_ssn IN set_invalid_ssn;
 	BOOLEAN	is_666							:= my_ssn[1..3]='666';

@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, easi, lib_date, ut;
+import risk_indicators, riskwise, easi, lib_date, ut, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 nugen := true;
@@ -56,7 +56,7 @@ export FP3904_1_0( dataset(risk_indicators.Layout_Boca_Shell) clam, integer num_
 		historical_count                :=  le.vehicles.historical_count;
 		wealth_index                    :=  trim(le.wealth_indicator);
 		inferred_dob                    :=  le.reported_dob;
-		archive_date                    :=  if(le.historydate = 999999, ut.GetDate, (string)le.historydate);
+		archive_date                    :=  if(le.historydate = 999999, (STRING)Std.Date.Today(), (string)le.historydate);
 		truedid 	 			        :=  le.truedid;
 
 		c_cartheft                      :=  ri.cartheft;

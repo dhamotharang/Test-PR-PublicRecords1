@@ -89,7 +89,7 @@ Layouts.BusnLayoutV2 intoOutLayout(bdidAdded l, bdidbest r) := transform
 	self.Bestphonescore	 := Risk_Indicators.PhoneScore(r.best_phone, l.phone10);
 	self.Bestfeinscore 	 := r.verify_best_fein;
 	self.Bestaddrscore 	 := r.verify_best_address;
-	myGetDate := if(l.historydate = 999999, ut.GetDate[1..6], l.historydate[1..6]);
+	myGetDate := if(l.historydate = 999999, ((STRING)Std.Date.Today())[1..6], ((STRING)l.historydate)[1..6]);
 	self.historydate := (integer)myGetDate;
 	clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(r.best_addr1, r.best_city, r.best_state, r.best_zip);
 		self.prim_range      := if(l.prim_name = '', clean_a2[1..10], l.prim_range);

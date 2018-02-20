@@ -1,4 +1,4 @@
-import autokeyi,doxie,ut,AutoheaderV2;
+import autokeyi,doxie,ut,AutoheaderV2, Data_Services;
 
 export fetch_zipPRLname (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 
@@ -7,7 +7,7 @@ export fetch_zipPRLname (dataset (AutoheaderV2.layouts.search) ds_search, intege
   boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;
 
   tempmod := module (autokeyi.FetchI_Indv_ZipPRLname.old.params.full)
-    export autokey_keyname_root := ut.foreign_prod+'thor_data400::key::header.';
+    export autokey_keyname_root := data_services.data_location.prefix() + 'thor_data400::key::header.';
     export noFail := false;
     export lname_value := _row.tname.lname;
     export fname_value := _row.tname.fname;

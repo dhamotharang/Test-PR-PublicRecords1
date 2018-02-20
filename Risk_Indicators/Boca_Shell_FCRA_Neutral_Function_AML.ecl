@@ -94,12 +94,12 @@ TRANSFORM
 	SELF.SSN_Verification.credit_sourced := le.eqfssocscount;
 	SELF.SSN_Verification.tu_sourced := le.tusocscount;	
 	en_eq_first_seen := ut.min2(le.adl_en_first_seen, le.adl_eqfs_first_seen);
-	en_eq_last_seen := ut.max2(le.adl_en_last_seen, le.adl_eqfs_last_seen);
+	en_eq_last_seen := Max(le.adl_en_last_seen, le.adl_eqfs_last_seen);
 	SELF.SSN_Verification.credit_first_seen := en_eq_first_seen;
 	SELF.SSN_Verification.credit_last_seen := en_eq_last_seen;
 	SELF.SSN_Verification.header_count := le.socscount;
 	SELF.SSN_Verification.header_first_seen := ut.Min2(le.adl_other_first_seen, en_eq_first_seen);
-	SELF.SSN_Verification.header_last_seen := ut.max2(le.adl_other_last_seen, en_eq_last_seen);
+	SELF.SSN_Verification.header_last_seen := Max(le.adl_other_last_seen, en_eq_last_seen);
 	
 	
 	SELF.SSN_Verification.voter_sourced := le.emsocscount;
@@ -119,7 +119,7 @@ TRANSFORM
 	
 	SELF.SSN_Verification.Validation.dob_mismatch := IF(le.socsdobflag<>'1',0,
 													(INTEGER)(le.dob[1..4]) - 
-															(INTEGER)(SELF.SSN_Verification.Validation.high_issue_date[1..4]));
+															(INTEGER)(((STRING)SELF.SSN_Verification.Validation.high_issue_date)[1..4]));
 	SELF.SSN_Verification.Validation.inputsocscharflag := le.inputsocscharflag;
 	SELF.SSN_Verification.Validation.inputsocscode := le.inputsocscode;
 															
@@ -235,7 +235,7 @@ TRANSFORM
 	// multiple lnames according to lnames associated with ssn
 	SELF.Name_Verification.lname_change_date := (unsigned3)le.altearly_date;
 	SELF.Name_Verification.lname_prev_change_date := (unsigned3)le.altearly_date2;
-	SELF.Name_Verification.source_count := ut.imin2(le.firstcount,le.lastcount);
+	SELF.Name_Verification.source_count := Min(le.firstcount,le.lastcount);
 	SELF.Name_Verification.fname_credit_sourced := le.eqfsfirstcount;
 	SELF.Name_Verification.lname_credit_sourced := le.eqfslastcount;
 	SELF.Name_Verification.fname_tu_sourced := le.tufirstcount;
@@ -256,7 +256,7 @@ TRANSFORM
 	SELF.Name_Verification.lname_voter_sourced := le.emlastcount;
 	SELF.Name_Verification.fname_utility_sourced := le.utiliaddr_firstcount>0;
 	SELF.Name_Verification.lname_utility_sourced := le.utiliaddr_lastcount>0;
-	SELF.Name_Verification.age := ut.GetAgeI_asOf((unsigned)le.verdob, (unsigned)risk_indicators.iid_constants.myGetDate(le.historydate));
+	SELF.Name_Verification.age := ut.Age((unsigned)le.verdob, (unsigned)risk_indicators.iid_constants.myGetDate(le.historydate));
 	SELF.Name_Verification.dob_score := le.dobscore;
 	SELF.Name_Verification.newest_lname := le.last_from_did;
 	SELF.Name_Verification.newest_lname_dt_first_seen := le.newest_lname_dt_first_seen;
@@ -438,7 +438,7 @@ TRANSFORM
 	
 	
 	
-	SELF.Other_Address_Info.max_lres := ut.max2(ut.max2(self.lres, self.lres2), self.lres3);
+	SELF.Other_Address_Info.max_lres := Max(Max(self.lres, self.lres2), self.lres3);
 	SELF.Other_Address_Info.avg_lres := (self.lres + self.lres2 + self.lres3) / ((integer)(boolean)self.lres + (integer)(boolean)self.lres2 + (integer)(boolean)self.lres3);// this does not take into account real 0's
 	SELF.Other_Address_Info.addrs_last_5years := le.addrs_last_5years;
 	SELF.Other_Address_Info.addrs_last_10years := le.addrs_last_10years;
@@ -490,17 +490,17 @@ TRANSFORM
 	SELF.Address_Verification.distance_in_2_h1:= 
 				IF(SELF.Address_Verification.Input_Address_Information.zip5='' 
 						OR SELF.Address_Verification.Address_History_1.zip5='', 9999,
-								ut.imin2((INTEGER) ut.zip_Dist(SELF.Address_Verification.Input_Address_Information.zip5,
+								Min((INTEGER) ut.zip_Dist(SELF.Address_Verification.Input_Address_Information.zip5,
 													SELF.Address_Verification.Address_History_1.zip5), 9998));
 	SELF.Address_Verification.distance_in_2_h2 := 
 				IF(SELF.Address_Verification.Input_Address_Information.zip5='' 
 						OR SELF.Address_Verification.Address_History_2.zip5='', 9999,
-								ut.imin2((INTEGER) ut.zip_Dist(SELF.Address_Verification.Input_Address_Information.zip5,
+								Min((INTEGER) ut.zip_Dist(SELF.Address_Verification.Input_Address_Information.zip5,
 													SELF.Address_Verification.Address_History_2.zip5), 9998));
 	SELF.Address_Verification.distance_h1_2_h2 := 
 				IF(SELF.Address_Verification.Address_History_1.zip5=''
 						OR SELF.Address_Verification.Address_History_2.zip5='', 9999, 
-								ut.imin2((INTEGER) ut.zip_Dist(SELF.Address_Verification.Address_History_1.zip5,
+								Min((INTEGER) ut.zip_Dist(SELF.Address_Verification.Address_History_1.zip5,
 													SELF.Address_Verification.Address_History_2.zip5), 9998));
 
   SELF.ConsumerFlags.corrected_flag := (StringLib.StringFind (le.src, 'CO', 1) != 0) OR
@@ -692,7 +692,7 @@ relatives_slim := record
 end;
 																									
 ds_max := choosen(doxie.key_max_dt_last_seen, 1);
-hdr_max_dt_last_seen := if(isFCRA, '0', ds_max[1].max_date_last_seen[1..6]+'01' );
+hdr_max_dt_last_seen := if(isFCRA, '0', ((STRING)ds_max[1].max_date_last_seen)[1..6]+'01' );
 // this is the same as iid_constants.myGetDate with the exception of using hdr_max_dt_last_seen instead of ut.GetDate
 relative_myGetDate(unsigned3 history_date) := IF(history_date=999999,hdr_max_dt_last_seen,iid_constants.full_history_date(history_date));		
 																							
@@ -712,7 +712,7 @@ TRANSFORM
 	SELF.state := ri.st;
 	SELF.county := ri.county;
 	SELF.geo_blk := ri.geo_blk;
-	SELF.age := ut.GetAgeI(ri.dob);
+	SELF.age := ut.Age(ri.dob);
 	SELF.dt_first_seen := ri.dt_first_seen;
 	SELF.dt_last_seen := ri.dt_last_seen;
 	SELF := le;
@@ -742,7 +742,7 @@ relatives_slim rollme(relatives_slim le, relatives_slim ri) :=
 TRANSFORM
 	SELF.dt_first_seen := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
 	SELF.dt_last_seen := ut.Min2(le.dt_last_seen,ri.dt_last_seen);
-	SELF.age := ut.max2(le.age, ri.age);
+	SELF.age := Max(le.age, ri.age);
 	SELF.relatives_at_input_address := le.relatives_at_input_address+
 																					if(le.did<>ri.did,ri.relatives_at_input_address,0);
 	SELF := le;

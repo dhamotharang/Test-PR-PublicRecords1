@@ -1,4 +1,4 @@
-import easi, Models, risk_indicators, riskwise, ut;
+import easi, Models, risk_indicators, riskwise, ut, std;
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -557,7 +557,7 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01'));
+sysdate := common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01'));
 
 ssnpop := ssnlength = 9;
 

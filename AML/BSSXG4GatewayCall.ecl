@@ -49,7 +49,7 @@ SHARED OFACSources := [		'US-OFAC Foreign Sanctions Evaders List',
 			
 			iesp.gateway_bridgerxg5.t_SearchCoreRequest into_req(indata le) := transform
 
-        SELF.Config.DataFiles := project(ut.ds_oneRecord, transform(iesp.gateway_bridgerxg5.t_ConfigDataFile,
+        SELF.Config.DataFiles := project(dataset([{1}], {unsigned a}), transform(iesp.gateway_bridgerxg5.t_ConfigDataFile,
 							self.Name  := WCFullDBName;
 							self.MinScore  := MinScore;
 							self := [];
@@ -63,7 +63,7 @@ SHARED OFACSources := [		'US-OFAC Foreign Sanctions Evaders List',
 				self.config.MatchOptions.ScoreAddress := IncludeAddrinScoreLift;
 				self.config.ConflictOptions.DOBTolerance := DOBToleranceYrs;
 				self.Input.BlockID  := le.seq;	
-				SELF.Input.EntityRecords := project(ut.ds_oneRecord, transform(iesp.gateway_bridgerxg5.t_InputEntityRecord,			
+				SELF.Input.EntityRecords := project(dataset([{1}], {unsigned a}), transform(iesp.gateway_bridgerxg5.t_InputEntityRecord,			
 																							self.id  :=  le.seq;
 																							self.name.First := if(le.did <>  0, le.firstName, '');
 																							self.name.Middle := if(le.did <>  0,le.middleName, '');
@@ -72,7 +72,7 @@ SHARED OFACSources := [		'US-OFAC Foreign Sanctions Evaders List',
 																							self.EntityType := if(le.did <> 0 and le.bdid = 0, 'Individual', 'Business');  // value required - 'Unknown' is an option
 																							self.EFTInfo._Type := 'None';   // value equired
 																							self.gender := 'Unknown';  //value equired
-																							SELF.Addresses := project(ut.ds_oneRecord, transform(iesp.gateway_bridgerxg5.t_InputAddress,																			
+																							SELF.Addresses := project(dataset([{1}], {unsigned a}), transform(iesp.gateway_bridgerxg5.t_InputAddress,																			
 																																															self.Country := 'United States';   // defaulted because Country is not in cleaned address
 																																															self.StateProvinceDistrict := ut.St2Name(le.state);
 																																															self._type := 'Current';    //values['None','Current','Mailing','Previous','Unknown','']
@@ -87,11 +87,11 @@ SHARED OFACSources := [		'US-OFAC Foreign Sanctions Evaders List',
 																																															self.PostalCode := le.z5;
 																																															self := [];));
 																							
-																							self.AdditionalInformation := if(le.did <> 0 and le.dob <> '' and le.dob <> '0', project(ut.ds_oneRecord, transform(iesp.gateway_bridgerxg5.t_InputAdditionalInfo,             
+																							self.AdditionalInformation := if(le.did <> 0 and le.dob <> '' and le.dob <> '0', project(dataset([{1}], {unsigned a}), transform(iesp.gateway_bridgerxg5.t_InputAdditionalInfo,             
 																																											 self._Type  := 'DOB';
 																																											 self.Value  :=  le.DOB;
 																																											 self := [];)), 
-																																							project(ut.ds_oneRecord, transform(iesp.gateway_bridgerxg5.t_InputAdditionalInfo,             
+																																							project(dataset([{1}], {unsigned a}), transform(iesp.gateway_bridgerxg5.t_InputAdditionalInfo,             
 																																											 self._Type  := 'None';
 																																											 self := [];))),
 																							

@@ -42,10 +42,10 @@ import prof_licensev2_services;
 
 Export Prof_LicenseSearchService := MACRO
 
-	#constant('SearchIgnoresAddressOnly',true)
-	#constant('getBdidsbyExecutive',FALSE)
-	#Constant('SetRepAddr',TRUE)
-	#stored('SetRepAddrBit',4)
+	#constant('SearchIgnoresAddressOnly',true);
+	#constant('getBdidsbyExecutive',FALSE);
+	#Constant('SetRepAddr',TRUE);
+	#stored('SetRepAddrBit',4);
   
 	input_params := AutoStandardI.GlobalModule();
 	tempmod := module(project(input_params,prof_licensev2_services.profLicSearch.params,opt))

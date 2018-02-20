@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 export find_dob_match(string8 ldob,unsigned2 Age=0,string8 rdob_1,string8 rdob_2,string8 rdob_3,string8 rdob_4,string8 rdob_5,string8 rdob_6,string8 rdob_7,string8 rdob_8,
 											string8 rdob_9,string8 rdob_10,unsigned2 dob_radius=-1):= FUNCTION 
@@ -6,7 +6,7 @@ export find_dob_match(string8 ldob,unsigned2 Age=0,string8 rdob_1,string8 rdob_2
 
 	Ok_numerically(string8 L) :=Ut.isNumeric(L) and (integer) L[1..4] <> 0;
 	matching(string8 L, string8 R,unsigned2 Age) := Ok_numerically(R) 
-				and  ((Age > 0 and abs(Age - ut.getAge(R)) <= dob_radius) or
+				and  ((Age > 0 and abs(Age - ut.Age((UNSIGNED)R)) <= dob_radius) or
 						 (Ok_numerically(L) and abs((integer)L[1..4]-(integer)R[1..4]) <= dob_radius));
   match_1  := matching(ldob,rdob_1,Age);
 	match_2  := matching(ldob,rdob_2,Age);

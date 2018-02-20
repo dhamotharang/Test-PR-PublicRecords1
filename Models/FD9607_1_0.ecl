@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise, daybatchpcnsr;
+import ut, risk_indicators, RiskWise, daybatchpcnsr, std;
 
 export FD9607_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean isStudent, boolean other_watchlists = false) := 
 
@@ -47,7 +47,7 @@ pcnsr := rollup(pcnsr2, true, countLast(left,right));
 
 Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 
-	sysyear := if(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	
 	// STUDENTS MODEL
@@ -60,11 +60,11 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				     le.address_verification.input_address_information.isbestmatch and le.iid.nas_summary >= 0 and le.iid.nap_summary = 1 => 0,
 				     3);
 					
-	add1_year_first_seen1 := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
+	add1_year_first_seen1 := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
 	add1_year_first_seen := if(add1_year_first_seen1 < 1900, -99, add1_year_first_seen1);
 
 	lres_years_st1 := if(add1_year_first_seen = -99, -99, sysyear - add1_year_first_seen);
-	lres_years_st := if(lres_years_st1 <> -99, ut.imin2(lres_years_st1, 7), -99);
+	lres_years_st := if(lres_years_st1 <> -99, Min(lres_years_st1, 7), -99);
 
 	lres_code_st := map(lres_years_st = -99 => 0,
 					lres_years_st = 0 => 0,
@@ -72,7 +72,7 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 					2);
 
 
-	time_on_bureau_years_st := if(le.ssn_verification.credit_first_seen <> 0, ut.imin2((sysyear - (integer)le.ssn_verification.credit_first_seen[1..4]), 24), 0);
+	time_on_bureau_years_st := if(le.ssn_verification.credit_first_seen <> 0, Min((sysyear - (integer)((STRING)le.ssn_verification.credit_first_seen)[1..4]), 24), 0);
 
 	time_on_bureau_code_st := map(time_on_bureau_years_st <= 0 => 0,
 							time_on_bureau_years_st <= 2 => 1,
@@ -124,7 +124,7 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				    naproptree_st = 5 and ~property_owner_st => 6,
 				    7);
 				    
-	principal_count_st := if(le.principalCount <> 0, ut.max2(ut.imin2(le.principalCount, 6), 2), 3.5); 	// can principal count be a decimal?
+	principal_count_st := if(le.principalCount <> 0, Max(Min(le.principalCount, 6), 2), 3.5); 	// can principal count be a decimal?
 	
 	
 	apt_flag := trim(le.address_validation.dwelling_type) <> '';		// is this correct?
@@ -145,14 +145,14 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				    
 				    
 	add1_census_income_st := if((integer)le.address_verification.input_address_information.census_income <> 0,
-															ut.imin2(ut.max2((integer)le.address_verification.input_address_information.census_income, 30000), 75000), 30000);
+															Min(Max((integer)le.address_verification.input_address_information.census_income, 30000), 75000), 30000);
 	
 	add1_census_education_st := if((integer)le.address_verification.input_address_information.census_education <> 0, 
-															ut.imin2(ut.max2((integer)le.address_verification.input_address_information.census_education, 9), 17), 9.5);
+															Min(Max((integer)le.address_verification.input_address_information.census_education, 9), 17), 9.5);
 															
 															
-	lien_recent_un_st := ut.imin2(1, le.bjl.liens_recent_unreleased_count);
-	lien_hist_un_st := ut.imin2(1, le.bjl.liens_historical_unreleased_count);
+	lien_recent_un_st := Min(1, le.bjl.liens_recent_unreleased_count);
+	lien_hist_un_st := Min(1, le.bjl.liens_historical_unreleased_count);
 
 	lienflag_st := map(lien_recent_un_st > 0 and lien_hist_un_st >= 0 => 1,
 				    lien_recent_un_st >= 0 and lien_hist_un_st > 0 => 2,
@@ -226,17 +226,17 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				    
 				    
 	add1_census_income_ns := if((integer)le.address_verification.input_address_information.census_income <> 0,
-																ut.imin2(ut.max2((integer)le.address_verification.input_address_information.census_income, 18000), 85000), 30000);
+																Min(Max((integer)le.address_verification.input_address_information.census_income, 18000), 85000), 30000);
 																
 																
-	lien_hist_un_ns := ut.imin2(1, le.bjl.liens_historical_unreleased_count);
-	lien_hist_rel_ns := ut.imin2(1, le.bjl.liens_historical_released_count);
+	lien_hist_un_ns := Min(1, le.bjl.liens_historical_unreleased_count);
+	lien_hist_rel_ns := Min(1, le.bjl.liens_historical_released_count);
 
 	lienflag_ns := (lien_hist_un_ns = 1 or lien_hist_rel_ns = 1);		
 	
 	
 	
-	today := if(le.historydate <> 999999, (string)le.historydate[1..6], ut.GetDate);
+	today := if(le.historydate <> 999999, ((string)le.historydate)[1..6], (STRING)Std.Date.Today());
 	appdate := ut.DaysSince1900(today[1..4], today[5..6], '15');
 	
 	dob_m := (integer)(le.shell_input.dob[5..6]);
@@ -248,12 +248,12 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 
 	age := if(le.name_verification.age = 0, -99, le.name_verification.age);
 
-	age_diff_ns := if(input_age <> -99 and age <> -99, ut.max2(ut.imin2(input_age - age, 10), -10), -99);
+	age_diff_ns := if(input_age <> -99 and age <> -99, Max(Min(input_age - age, 10), -10), -99);
 	age_diff_ns_flag := age_diff_ns not in [0,1];
 
 	input_age2 := if(input_age = -99 and age <> -99, age, input_age);  // override the null input age if the age was found from verification, 
 													       // just to be used in agediff_ssn calculation
-	high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+	high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 	ssnage := sysyear - high_issue_dateyr;
 	agediff_ssn := input_age2 - ssnage;
 
@@ -271,7 +271,7 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				   4);
 				   
 				   
-	current_count_ns := ut.imin2(le.vehicles.current_count, 4);		// is this what current count means
+	current_count_ns := Min(le.vehicles.current_count, 4);		// is this what current count means
 	
 	
 	sm_nonstudents_score1 := 4.5960653001
@@ -301,7 +301,7 @@ Layout_ModelOut doModel(pcnsr le) := TRANSFORM
 				   sm_final_score <= 694 => 80,
 				   90);
 				   
-	FD10to50 := ut.imin2(FD9607_1_0, 50); /* cap at 50 */
+	FD10to50 := Min(FD9607_1_0, 50); /* cap at 50 */
 
 	FD3digit := map(sm_final_score < 250 => 250,
 				 sm_final_score > 999 => 999,

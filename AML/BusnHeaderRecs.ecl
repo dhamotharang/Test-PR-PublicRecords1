@@ -14,8 +14,14 @@ BusnHeadRec := join(BusnIn(OrigBdid!=0), BusnHeader,
                     transform({recordof(BusnHeader), unsigned4 seq, unsigned4	historydate }, 
 										self.seq:=left.seq, 
 										self.historydate := left.historydate,
-                    self.dt_first_seen := if((unsigned)right.dt_first_seen[1..6]>0 and ((unsigned)right.dt_first_seen[7..8]=0 or trim(right.dt_first_seen[7..8])=''), (unsigned)((string)right.dt_first_seen[1..6]+'01'), right.dt_first_seen), 											
-										self.dt_last_seen := if((unsigned)right.dt_last_seen[1..6]>0 and ((unsigned)right.dt_last_seen[7..8]=0 or trim(right.dt_last_seen[7..8])=''), (unsigned)((string)right.dt_last_seen[1..6]+'01'), right.dt_last_seen), 
+                    self.dt_first_seen := if((unsigned)((STRING)right.dt_first_seen)[1..6]>0 and 
+                                             ((unsigned)((STRING)right.dt_first_seen)[7..8]=0 or trim(((STRING)right.dt_first_seen)[7..8])=''), 
+                                                  (unsigned)(((string)right.dt_first_seen)[1..6]+'01'), 
+                                                  right.dt_first_seen), 											
+										self.dt_last_seen := if((unsigned)((STRING)right.dt_last_seen)[1..6]>0 and 
+										                        ((unsigned)((STRING)right.dt_last_seen)[7..8]=0 or trim(((STRING)right.dt_last_seen)[7..8])=''), 
+										                             (unsigned)(((STRING)right.dt_last_seen)[1..6]+'01'), 
+										                             right.dt_last_seen), 
 										self := right), 
 										atmost(Keyed(right.bdid=left.OrigBdid),Business_Risk_BIP.Constants.Limit_BusHeader), keep(10000),
 										left outer);

@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 export RVT1204_1( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE) := FUNCTION
 
@@ -308,7 +308,7 @@ export RVT1204_1( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLE
 	inferred_age                     := le.inferred_age;
 	reported_dob                     := le.reported_dob;
 	estimated_income                 := le.estimated_income;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *

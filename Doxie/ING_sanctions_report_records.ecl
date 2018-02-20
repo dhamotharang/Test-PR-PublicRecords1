@@ -13,7 +13,7 @@ string typeGSA2 := 'EXCLUDED/DELETED';
 sanctions_ids_raw := dataset(sanction_id_set, {unsigned6 sanction_id});
 // peal off Header Sanction ID's and process them
 sanctions_ids_hdr := sanctions_ids_raw(sanction_id > 1000000);
-getHdrIDs_fromSanctionID := dedup(project(sanctions_ids_hdr,transform(recordof(sanctions_ids_hdr),self.sanction_id:=(integer)left.sanction_id[1..(length((string)left.sanction_id)-3)])),all);
+getHdrIDs_fromSanctionID := dedup(project(sanctions_ids_hdr,transform(recordof(sanctions_ids_hdr),self.sanction_id:=(integer)((STRING)left.sanction_id)[1..(length((string)left.sanction_id)-3)])),all);
 // Get header records for this Sanction
 newlayout  := Healthcare_Header_Services.Layouts.autokeyInput;
 ds:=project(getHdrIDs_fromSanctionID, transform(newlayout,

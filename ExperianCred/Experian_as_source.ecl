@@ -1,4 +1,4 @@
-import ut,header;
+﻿import ut,header, data_services;
 
 export Experian_as_source(dataset(ExperianCred.Layouts.Layout_Out) pExperian = dataset([],ExperianCred.Layouts.Layout_Out), boolean pForHeaderBuild=false, boolean pFastHeader = false)
  :=
@@ -9,7 +9,7 @@ export Experian_as_source(dataset(ExperianCred.Layouts.Layout_Out) pExperian = d
 						 )
 						 ;
 				  
-	dSourceData0 := if (pFastHeader, dSourceData0_(ut.DaysApart(ut.GetDate, date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceData0_);
+	dSourceData0 := if (pFastHeader, dSourceData0_(ut.DaysApart(Data_Services.Data_location.person_header, ((STRING)date_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceData0_);
 
     ExperianCred.Layouts.Layout_Out_old  ref(dSourceData0 l) := transform 
 	self.Orig_Address_date :=  l.Orig_Address_Create_Date ;  

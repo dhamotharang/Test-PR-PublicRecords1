@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra;
+import risk_indicators, ut, riskwise, riskwisefcra, std;
 
 export RVB711_0_0(
 	dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -103,7 +103,7 @@ temp	doModel( clam le ) := TRANSFORM
 		liens_recent_unreleased_count   :=  le.bjl.liens_recent_unreleased_count;
 		liens_historical_unreleased_ct  :=  le.bjl.liens_historical_unreleased_count;
 		criminal_count                  :=  le.bjl.criminal_count;
-		archive_date                    :=  if(le.historydate=999999,(unsigned3)ut.GetDate[1..6],le.historydate);
+		archive_date                    :=  if(le.historydate=999999,(unsigned3)((STRING)Std.Date.Today())[1..6],le.historydate);
 
 
 		/* HELPERS */
@@ -464,7 +464,7 @@ temp	doModel( clam le ) := TRANSFORM
 
 		/*********** low_issue_age2  **************/
 		low_issue_date := (INTEGER)rc_ssnlowissue;
-		low_issue_year := (INTEGER)low_issue_date[1..4];
+		low_issue_year := (INTEGER)((STRING)low_issue_date)[1..4];
 
 		low_issue_age  := year - low_issue_year;
 		low_issue_age2 := map(

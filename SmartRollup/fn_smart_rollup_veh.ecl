@@ -12,7 +12,7 @@ export fn_smart_rollup_veh(dataset(iesp.motorvehicle.t_MotorVehicleReport2Record
 		fRegDate := INTFORMAT(l.Registrants[1].RegistrationInfo.FirstDate.Year,4,1) + 
 								INTFORMAT(l.Registrants[1].RegistrationInfo.FirstDate.Month,2,1) + 
 								INTFORMAT(l.Registrants[1].RegistrationInfo.FirstDate.Day,2,1);
-		self.LengthOfOwnership := IF(self.current_prior = iesp.Constants.SMART.CURRENT,(string) ut.GetAgeI((INTEGER)fRegDate),'');	
+		self.LengthOfOwnership := IF(self.current_prior = iesp.Constants.SMART.CURRENT,(string) ut.Age((INTEGER)fRegDate),'');	
 		self := l;
 		// self := [];
 	end;

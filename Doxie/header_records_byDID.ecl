@@ -1,4 +1,4 @@
-import doxie, ut, header, infutor, STD;
+import doxie, ut, header, infutor, STD, NID;
 
 // Formerly the contents of doxie.header_records;  Allows for the passing of a dataset of DIDs,
 // rather than calling doxie\get_dids
@@ -167,7 +167,7 @@ TRANSFORM
 END;
 f3 := JOIN(f2, headerCleaned, LEFT.did=0 AND
 											(LEFT.fname=RIGHT.fname) AND
-											ut.Firstname_Match(LEFT.mname,RIGHT.mname)>0 AND
+											NID.FirstName_Match(LEFT.mname,RIGHT.mname)>0 AND
 											(LEFT.lname=RIGHT.lname) AND
 											(LEFT.prim_range=RIGHT.prim_range) AND
 											(LEFT.prim_name=RIGHT.prim_name) AND

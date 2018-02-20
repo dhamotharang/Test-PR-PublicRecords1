@@ -129,8 +129,8 @@ MODULE
 			string25  			owner_addr_city := '';
 			string2   			owner_addr_st 	:= '';
 			string10   			owner_addr_zip 	:= '';
-			unsigned3				owner_dt_first_seen := '';
-			unsigned3				owner_dt_last_seen 	:= '';
+			unsigned3				owner_dt_first_seen := 0;
+			unsigned3				owner_dt_last_seen 	:= 0;
 		END;
 		EXPORT Working_Property := record
 			batch_in_ready;

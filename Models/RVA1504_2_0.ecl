@@ -1,4 +1,4 @@
-IMPORT Models, UT, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT Models, UT, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT RVA1504_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -133,7 +133,7 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 rv_f03_input_add_not_most_rec := if(not(truedid and add_input_pop), '', (string)(integer)rc_input_addr_not_most_recent);
 

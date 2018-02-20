@@ -1,4 +1,4 @@
-import  AutoStandardI, doxie, iesp, DriversV2,DriversV2_Services,Suppress, ut, standard;
+import  AutoStandardI, doxie, iesp, DriversV2,DriversV2_Services,Suppress, ut, standard, std;
 
 export getDls(dataset(identifier2.layout_Identifier2) indata, boolean Include_DL_Data=false, 
 							string6 ssnMask='', unsigned1 dob_mask_value=Suppress.Constants.DateMask.NONE, unsigned1 dlMask=0 ) := function 
@@ -55,7 +55,7 @@ export getDls(dataset(identifier2.layout_Identifier2) indata, boolean Include_DL
 	validRecs := sort(validRecsMasked, -expirationDate);
 	expiredDate := ID2Common.fromESDLdate(validRecs[1].expirationDate);
 
-	expiredDL := (integer)ut.GetDate > expiredDate;
+	expiredDL := (integer)Std.Date.Today() > expiredDate;
 	iesp.driverlicense2.t_DLSearch2Record finalOutput(dl_rec L) := TRANSFORM
 		self.AlsoFound := 0;
 		self := L;

@@ -387,7 +387,7 @@ EXPORT functions := MODULE
       self.phpl_carrier_state := r.st;
       self.sort_order := phone_type_score(l.subj_phone_type);
       // the sort_order_internal from a Phones Plus source should only be used if the Include flag is true.  Relatives(43) should be oredered by the rank.
-      self.sort_order_internal := if ((string)l.sub_rule_number[1] = '6' and l.subj_phone_type <> '43' and ~inMod.IncludeCellFirstForPP,0,l.sort_order_internal);
+      self.sort_order_internal := if (((string)l.sub_rule_number)[1] = '6' and l.subj_phone_type <> '43' and ~inMod.IncludeCellFirstForPP,0,l.sort_order_internal);
       self := l;
     end;						
 

@@ -32,9 +32,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		SELF.use := ri.bus_intel.use;
 		SELF.productCode := ri.search_info.product_code;
 		
-		inquiryDate := Phone_Shell.Common.parseDate(TRIM(ri.search_info.datetime[1..8]), TRUE);
+		inquiryDate := Phone_Shell.Common.parseDate(TRIM(((STRING)ri.search_info.datetime)[1..8]), TRUE);
 		todaysDate := Phone_Shell.Common.parseDate((string) STD.Date.Today(), TRUE);
-		inquiryMonths := IF(TRIM(inquiryDate) <> '', ut.MonthsApart_YYYYMMDD(inquiryDate, todaysDate), -1);
+		inquiryMonths := IF(TRIM(inquiryDate) <> '', Std.Date.MonthsBetween((INTEGER)inquiryDate, (INTEGER)todaysDate), -1);
 		
 		sameADL := le.Clean_Input.DID = ri.person_q.appended_adl;
 			

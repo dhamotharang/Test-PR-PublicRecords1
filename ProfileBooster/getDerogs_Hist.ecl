@@ -54,7 +54,7 @@ bankrupt_added := if(onThor, bankrupt_added_thor, ungroup(bankrupt_added_roxie))
 layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRANSFORM
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
 	SELF.BJL.bankrupt := ri.case_number<>'';
-	date_last_seen := ut.max2((INTEGER)ri.date_filed, if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));// only use disposition date if it is not in the future
+	date_last_seen := max((INTEGER)ri.date_filed, if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));// only use disposition date if it is not in the future
 	SELF.BJL.date_last_seen := date_last_seen;
 	SELF.BJL.filing_type := ri.filing_type;
 	SELF.BJL.disposition := ri.disposition;
@@ -74,7 +74,7 @@ layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRAN
 	SELF.BJL.bk_count36 := (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(3), le.historydate);
 	SELF.BJL.bk_count60 := (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(5), le.historydate);
   SELF.BJL.bk_chapter := ri.chapter;
-	SELF.bk_disp_date := ut.max2((INTEGER)ri.date_filed, 
+	SELF.bk_disp_date := max((INTEGER)ri.date_filed, 
 			if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));
 	SELF := le;
 END;
@@ -487,96 +487,96 @@ layout_extended roll_liens(layout_extended le, layout_extended ri) := TRANSFORM
 	SELF.BJL.eviction_count36 := le.BJL.eviction_count36 + IF(sameLien,0,ri.BJL.eviction_count36);
 	SELF.BJL.eviction_count60 := le.BJL.eviction_count60 + IF(sameLien,0,ri.BJL.eviction_count60);
 	
-	SELF.BJL.last_eviction_date := ut.max2(le.BJL.last_eviction_date,ri.BJL.last_eviction_date);
+	SELF.BJL.last_eviction_date := max(le.BJL.last_eviction_date,ri.BJL.last_eviction_date);
 	
 	self.liens.liens_unreleased_civil_judgment.count := le.liens.liens_unreleased_civil_judgment.count + IF(sameLien and le.liens.liens_unreleased_civil_judgment.count>0,0,ri.liens.liens_unreleased_civil_judgment.count);
 	self.liens.liens_unreleased_civil_judgment.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_civil_judgment.earliest_filing_date,ri.liens.liens_unreleased_civil_judgment.earliest_filing_date);
-	self.liens.liens_unreleased_civil_judgment.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_civil_judgment.most_recent_filing_date,ri.liens.liens_unreleased_civil_judgment.most_recent_filing_date);
+	self.liens.liens_unreleased_civil_judgment.most_recent_filing_date := max(le.liens.liens_unreleased_civil_judgment.most_recent_filing_date,ri.liens.liens_unreleased_civil_judgment.most_recent_filing_date);
 	self.liens.liens_unreleased_civil_judgment.total_amount := le.liens.liens_unreleased_civil_judgment.total_amount + IF(sameLien and le.liens.liens_unreleased_civil_judgment.total_amount>0,0,ri.liens.liens_unreleased_civil_judgment.total_amount);
 	
 	self.liens.liens_released_civil_judgment.count := le.liens.liens_released_civil_judgment.count + IF(sameLien and le.liens.liens_released_civil_judgment.count>0,0,ri.liens.liens_released_civil_judgment.count);
 	self.liens.liens_released_civil_judgment.earliest_filing_date := ut.Min2(le.liens.liens_released_civil_judgment.earliest_filing_date,ri.liens.liens_released_civil_judgment.earliest_filing_date);
-	self.liens.liens_released_civil_judgment.most_recent_filing_date := ut.max2(le.liens.liens_released_civil_judgment.most_recent_filing_date,ri.liens.liens_released_civil_judgment.most_recent_filing_date);
+	self.liens.liens_released_civil_judgment.most_recent_filing_date := max(le.liens.liens_released_civil_judgment.most_recent_filing_date,ri.liens.liens_released_civil_judgment.most_recent_filing_date);
 	self.liens.liens_released_civil_judgment.total_amount := le.liens.liens_released_civil_judgment.total_amount + IF(sameLien and le.liens.liens_released_civil_judgment.total_amount>0,0,ri.liens.liens_released_civil_judgment.total_amount);
 	
 	self.liens.liens_unreleased_federal_tax.count := le.liens.liens_unreleased_federal_tax.count + IF(sameLien and le.liens.liens_unreleased_federal_tax.count>0,0,ri.liens.liens_unreleased_federal_tax.count);
 	self.liens.liens_unreleased_federal_tax.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_federal_tax.earliest_filing_date,ri.liens.liens_unreleased_federal_tax.earliest_filing_date);
-	self.liens.liens_unreleased_federal_tax.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_federal_tax.most_recent_filing_date,ri.liens.liens_unreleased_federal_tax.most_recent_filing_date);
+	self.liens.liens_unreleased_federal_tax.most_recent_filing_date := max(le.liens.liens_unreleased_federal_tax.most_recent_filing_date,ri.liens.liens_unreleased_federal_tax.most_recent_filing_date);
 	self.liens.liens_unreleased_federal_tax.total_amount := le.liens.liens_unreleased_federal_tax.total_amount + IF(sameLien and le.liens.liens_unreleased_federal_tax.total_amount>0,0,ri.liens.liens_unreleased_federal_tax.total_amount);
 	
 	self.liens.liens_released_federal_tax.count := le.liens.liens_released_federal_tax.count + IF(sameLien and le.liens.liens_released_federal_tax.count>0,0,ri.liens.liens_released_federal_tax.count);
 	self.liens.liens_released_federal_tax.earliest_filing_date := ut.Min2(le.liens.liens_released_federal_tax.earliest_filing_date,ri.liens.liens_released_federal_tax.earliest_filing_date);
-	self.liens.liens_released_federal_tax.most_recent_filing_date := ut.max2(le.liens.liens_released_federal_tax.most_recent_filing_date,ri.liens.liens_released_federal_tax.most_recent_filing_date);
+	self.liens.liens_released_federal_tax.most_recent_filing_date := max(le.liens.liens_released_federal_tax.most_recent_filing_date,ri.liens.liens_released_federal_tax.most_recent_filing_date);
 	self.liens.liens_released_federal_tax.total_amount := le.liens.liens_released_federal_tax.total_amount + IF(sameLien and le.liens.liens_released_federal_tax.total_amount>0,0,ri.liens.liens_released_federal_tax.total_amount);
 	
 	self.liens.liens_unreleased_foreclosure.count := le.liens.liens_unreleased_foreclosure.count + IF(sameLien and le.liens.liens_unreleased_foreclosure.count>0,0,ri.liens.liens_unreleased_foreclosure.count);
 	self.liens.liens_unreleased_foreclosure.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_foreclosure.earliest_filing_date,ri.liens.liens_unreleased_foreclosure.earliest_filing_date);
-	self.liens.liens_unreleased_foreclosure.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_foreclosure.most_recent_filing_date,ri.liens.liens_unreleased_foreclosure.most_recent_filing_date);
+	self.liens.liens_unreleased_foreclosure.most_recent_filing_date := max(le.liens.liens_unreleased_foreclosure.most_recent_filing_date,ri.liens.liens_unreleased_foreclosure.most_recent_filing_date);
 	self.liens.liens_unreleased_foreclosure.total_amount := le.liens.liens_unreleased_foreclosure.total_amount + IF(sameLien and le.liens.liens_unreleased_foreclosure.total_amount>0,0,ri.liens.liens_unreleased_foreclosure.total_amount);
 	
 	self.liens.liens_released_foreclosure.count := le.liens.liens_released_foreclosure.count + IF(sameLien and le.liens.liens_released_foreclosure.count>0,0,ri.liens.liens_released_foreclosure.count);
 	self.liens.liens_released_foreclosure.earliest_filing_date := ut.Min2(le.liens.liens_released_foreclosure.earliest_filing_date,ri.liens.liens_released_foreclosure.earliest_filing_date);
-	self.liens.liens_released_foreclosure.most_recent_filing_date := ut.max2(le.liens.liens_released_foreclosure.most_recent_filing_date,ri.liens.liens_released_foreclosure.most_recent_filing_date);
+	self.liens.liens_released_foreclosure.most_recent_filing_date := max(le.liens.liens_released_foreclosure.most_recent_filing_date,ri.liens.liens_released_foreclosure.most_recent_filing_date);
 	self.liens.liens_released_foreclosure.total_amount := le.liens.liens_released_foreclosure.total_amount + IF(sameLien and le.liens.liens_released_foreclosure.total_amount>0,0,ri.liens.liens_released_foreclosure.total_amount);
 	
 	self.liens.liens_unreleased_landlord_tenant.count := le.liens.liens_unreleased_landlord_tenant.count + IF(sameLien and le.liens.liens_unreleased_landlord_tenant.count>0,0,ri.liens.liens_unreleased_landlord_tenant.count);
 	self.liens.liens_unreleased_landlord_tenant.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_landlord_tenant.earliest_filing_date,ri.liens.liens_unreleased_landlord_tenant.earliest_filing_date);
-	self.liens.liens_unreleased_landlord_tenant.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_landlord_tenant.most_recent_filing_date,ri.liens.liens_unreleased_landlord_tenant.most_recent_filing_date);
+	self.liens.liens_unreleased_landlord_tenant.most_recent_filing_date := max(le.liens.liens_unreleased_landlord_tenant.most_recent_filing_date,ri.liens.liens_unreleased_landlord_tenant.most_recent_filing_date);
 	self.liens.liens_unreleased_landlord_tenant.total_amount := le.liens.liens_unreleased_landlord_tenant.total_amount + IF(sameLien and le.liens.liens_unreleased_landlord_tenant.total_amount>0,0,ri.liens.liens_unreleased_landlord_tenant.total_amount);
 	
 	self.liens.liens_released_landlord_tenant.count := le.liens.liens_released_landlord_tenant.count + IF(sameLien and le.liens.liens_released_landlord_tenant.count>0,0,ri.liens.liens_released_landlord_tenant.count);
 	self.liens.liens_released_landlord_tenant.earliest_filing_date := ut.Min2(le.liens.liens_released_landlord_tenant.earliest_filing_date,ri.liens.liens_released_landlord_tenant.earliest_filing_date);
-	self.liens.liens_released_landlord_tenant.most_recent_filing_date := ut.max2(le.liens.liens_released_landlord_tenant.most_recent_filing_date,ri.liens.liens_released_landlord_tenant.most_recent_filing_date);
+	self.liens.liens_released_landlord_tenant.most_recent_filing_date := max(le.liens.liens_released_landlord_tenant.most_recent_filing_date,ri.liens.liens_released_landlord_tenant.most_recent_filing_date);
 	self.liens.liens_released_landlord_tenant.total_amount := le.liens.liens_released_landlord_tenant.total_amount + IF(sameLien and le.liens.liens_released_landlord_tenant.total_amount>0,0,ri.liens.liens_released_landlord_tenant.total_amount);
 	
 	self.liens.liens_unreleased_lispendens.count := le.liens.liens_unreleased_lispendens.count + IF(sameLien and le.liens.liens_unreleased_lispendens.count>0,0,ri.liens.liens_unreleased_lispendens.count);
 	self.liens.liens_unreleased_lispendens.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_lispendens.earliest_filing_date,ri.liens.liens_unreleased_lispendens.earliest_filing_date);
-	self.liens.liens_unreleased_lispendens.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_lispendens.most_recent_filing_date,ri.liens.liens_unreleased_lispendens.most_recent_filing_date);
+	self.liens.liens_unreleased_lispendens.most_recent_filing_date := max(le.liens.liens_unreleased_lispendens.most_recent_filing_date,ri.liens.liens_unreleased_lispendens.most_recent_filing_date);
 	self.liens.liens_unreleased_lispendens.total_amount := le.liens.liens_unreleased_lispendens.total_amount + IF(sameLien and le.liens.liens_unreleased_lispendens.total_amount>0,0,ri.liens.liens_unreleased_lispendens.total_amount);
 	
 	self.liens.liens_released_lispendens.count := le.liens.liens_released_lispendens.count + IF(sameLien and le.liens.liens_released_lispendens.count>0,0,ri.liens.liens_released_lispendens.count);
 	self.liens.liens_released_lispendens.earliest_filing_date := ut.Min2(le.liens.liens_released_lispendens.earliest_filing_date,ri.liens.liens_released_lispendens.earliest_filing_date);
-	self.liens.liens_released_lispendens.most_recent_filing_date := ut.max2(le.liens.liens_released_lispendens.most_recent_filing_date,ri.liens.liens_released_lispendens.most_recent_filing_date);
+	self.liens.liens_released_lispendens.most_recent_filing_date := max(le.liens.liens_released_lispendens.most_recent_filing_date,ri.liens.liens_released_lispendens.most_recent_filing_date);
 	self.liens.liens_released_lispendens.total_amount := le.liens.liens_released_lispendens.total_amount + IF(sameLien and le.liens.liens_released_lispendens.total_amount>0,0,ri.liens.liens_released_lispendens.total_amount);
 	
 	self.liens.liens_unreleased_other_lj.count := le.liens.liens_unreleased_other_lj.count + IF(sameLien and le.liens.liens_unreleased_other_lj.count>0,0,ri.liens.liens_unreleased_other_lj.count);
 	self.liens.liens_unreleased_other_lj.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_other_lj.earliest_filing_date,ri.liens.liens_unreleased_other_lj.earliest_filing_date);
-	self.liens.liens_unreleased_other_lj.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_other_lj.most_recent_filing_date,ri.liens.liens_unreleased_other_lj.most_recent_filing_date);
+	self.liens.liens_unreleased_other_lj.most_recent_filing_date := max(le.liens.liens_unreleased_other_lj.most_recent_filing_date,ri.liens.liens_unreleased_other_lj.most_recent_filing_date);
 	self.liens.liens_unreleased_other_lj.total_amount := le.liens.liens_unreleased_other_lj.total_amount + IF(sameLien and le.liens.liens_unreleased_other_lj.total_amount>0,0,ri.liens.liens_unreleased_other_lj.total_amount);
 	
 	self.liens.liens_released_other_lj.count := le.liens.liens_released_other_lj.count + IF(sameLien and le.liens.liens_released_other_lj.count>0,0,ri.liens.liens_released_other_lj.count);
 	self.liens.liens_released_other_lj.earliest_filing_date := ut.Min2(le.liens.liens_released_other_lj.earliest_filing_date,ri.liens.liens_released_other_lj.earliest_filing_date);
-	self.liens.liens_released_other_lj.most_recent_filing_date := ut.max2(le.liens.liens_released_other_lj.most_recent_filing_date,ri.liens.liens_released_other_lj.most_recent_filing_date);
+	self.liens.liens_released_other_lj.most_recent_filing_date := max(le.liens.liens_released_other_lj.most_recent_filing_date,ri.liens.liens_released_other_lj.most_recent_filing_date);
 	self.liens.liens_released_other_lj.total_amount := le.liens.liens_released_other_lj.total_amount + IF(sameLien and le.liens.liens_released_other_lj.total_amount>0,0,ri.liens.liens_released_other_lj.total_amount);
 	
 	self.liens.liens_unreleased_other_tax.count := le.liens.liens_unreleased_other_tax.count + IF(sameLien and le.liens.liens_unreleased_other_tax.count>0,0,ri.liens.liens_unreleased_other_tax.count);
 	self.liens.liens_unreleased_other_tax.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_other_tax.earliest_filing_date,ri.liens.liens_unreleased_other_tax.earliest_filing_date);
-	self.liens.liens_unreleased_other_tax.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_other_tax.most_recent_filing_date,ri.liens.liens_unreleased_other_tax.most_recent_filing_date);
+	self.liens.liens_unreleased_other_tax.most_recent_filing_date := max(le.liens.liens_unreleased_other_tax.most_recent_filing_date,ri.liens.liens_unreleased_other_tax.most_recent_filing_date);
 	self.liens.liens_unreleased_other_tax.total_amount := le.liens.liens_unreleased_other_tax.total_amount + IF(sameLien and le.liens.liens_unreleased_other_tax.total_amount>0,0,ri.liens.liens_unreleased_other_tax.total_amount);
 	
 	self.liens.liens_released_other_tax.count := le.liens.liens_released_other_tax.count + IF(sameLien and le.liens.liens_released_other_tax.count>0,0,ri.liens.liens_released_other_tax.count);
 	self.liens.liens_released_other_tax.earliest_filing_date := ut.Min2(le.liens.liens_released_other_tax.earliest_filing_date,ri.liens.liens_released_other_tax.earliest_filing_date);
-	self.liens.liens_released_other_tax.most_recent_filing_date := ut.max2(le.liens.liens_released_other_tax.most_recent_filing_date,ri.liens.liens_released_other_tax.most_recent_filing_date);
+	self.liens.liens_released_other_tax.most_recent_filing_date := max(le.liens.liens_released_other_tax.most_recent_filing_date,ri.liens.liens_released_other_tax.most_recent_filing_date);
 	self.liens.liens_released_other_tax.total_amount := le.liens.liens_released_other_tax.total_amount + IF(sameLien and le.liens.liens_released_other_tax.total_amount>0,0,ri.liens.liens_released_other_tax.total_amount);
 	
 	self.liens.liens_unreleased_small_claims.count := le.liens.liens_unreleased_small_claims.count + IF(sameLien and le.liens.liens_unreleased_small_claims.count>0,0,ri.liens.liens_unreleased_small_claims.count);
 	self.liens.liens_unreleased_small_claims.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_small_claims.earliest_filing_date,ri.liens.liens_unreleased_small_claims.earliest_filing_date);
-	self.liens.liens_unreleased_small_claims.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_small_claims.most_recent_filing_date,ri.liens.liens_unreleased_small_claims.most_recent_filing_date);
+	self.liens.liens_unreleased_small_claims.most_recent_filing_date := max(le.liens.liens_unreleased_small_claims.most_recent_filing_date,ri.liens.liens_unreleased_small_claims.most_recent_filing_date);
 	self.liens.liens_unreleased_small_claims.total_amount := le.liens.liens_unreleased_small_claims.total_amount + IF(sameLien and le.liens.liens_unreleased_small_claims.total_amount>0,0,ri.liens.liens_unreleased_small_claims.total_amount);
 	
 	self.liens.liens_released_small_claims.count := le.liens.liens_released_small_claims.count + IF(sameLien and le.liens.liens_released_small_claims.count>0,0,ri.liens.liens_released_small_claims.count);
 	self.liens.liens_released_small_claims.earliest_filing_date := ut.Min2(le.liens.liens_released_small_claims.earliest_filing_date,ri.liens.liens_released_small_claims.earliest_filing_date);
-	self.liens.liens_released_small_claims.most_recent_filing_date := ut.max2(le.liens.liens_released_small_claims.most_recent_filing_date,ri.liens.liens_released_small_claims.most_recent_filing_date);
+	self.liens.liens_released_small_claims.most_recent_filing_date := max(le.liens.liens_released_small_claims.most_recent_filing_date,ri.liens.liens_released_small_claims.most_recent_filing_date);
 	self.liens.liens_released_small_claims.total_amount := le.liens.liens_released_small_claims.total_amount + IF(sameLien and le.liens.liens_released_small_claims.total_amount>0,0,ri.liens.liens_released_small_claims.total_amount);
 	
 	self.liens.liens_unreleased_suits.count := le.liens.liens_unreleased_suits.count + IF(sameLien and le.liens.liens_unreleased_suits.count>0,0,ri.liens.liens_unreleased_suits.count);
 	self.liens.liens_unreleased_suits.earliest_filing_date := ut.Min2(le.liens.liens_unreleased_suits.earliest_filing_date,ri.liens.liens_unreleased_suits.earliest_filing_date);
-	self.liens.liens_unreleased_suits.most_recent_filing_date := ut.max2(le.liens.liens_unreleased_suits.most_recent_filing_date,ri.liens.liens_unreleased_suits.most_recent_filing_date);
+	self.liens.liens_unreleased_suits.most_recent_filing_date := max(le.liens.liens_unreleased_suits.most_recent_filing_date,ri.liens.liens_unreleased_suits.most_recent_filing_date);
 	self.liens.liens_unreleased_suits.total_amount := le.liens.liens_unreleased_suits.total_amount + IF(sameLien and le.liens.liens_unreleased_suits.total_amount>0,0,ri.liens.liens_unreleased_suits.total_amount);
 	
 	self.liens.liens_released_suits.count := le.liens.liens_released_suits.count + IF(sameLien and le.liens.liens_released_suits.count>0,0,ri.liens.liens_released_suits.count);
 	self.liens.liens_released_suits.earliest_filing_date := ut.Min2(le.liens.liens_released_suits.earliest_filing_date,ri.liens.liens_released_suits.earliest_filing_date);
-	self.liens.liens_released_suits.most_recent_filing_date := ut.max2(le.liens.liens_released_suits.most_recent_filing_date,ri.liens.liens_released_suits.most_recent_filing_date);
+	self.liens.liens_released_suits.most_recent_filing_date := max(le.liens.liens_released_suits.most_recent_filing_date,ri.liens.liens_released_suits.most_recent_filing_date);
 	self.liens.liens_released_suits.total_amount := le.liens.liens_released_suits.total_amount + IF(sameLien and le.liens.liens_released_suits.total_amount>0,0,ri.liens.liens_released_suits.total_amount);
 	
 	
@@ -655,10 +655,10 @@ TRANSFORM
 	self.bjl.criminal_count24 := le.bjl.criminal_count24+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.criminal_count24);
 	self.bjl.criminal_count36 := le.bjl.criminal_count36+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.criminal_count36);
 	self.bjl.criminal_count60 := le.bjl.criminal_count60+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.criminal_count60);
-	self.bjl.last_criminal_date := ut.max2(le.bjl.last_criminal_date,ri.bjl.last_criminal_date);
-	self.bjl.last_felony_date := ut.max2(le.bjl.last_felony_date,ri.bjl.last_felony_date);
+	self.bjl.last_criminal_date := max(le.bjl.last_criminal_date,ri.bjl.last_criminal_date);
+	self.bjl.last_felony_date := max(le.bjl.last_felony_date,ri.bjl.last_felony_date);
 	self.bjl.felony_count := le.bjl.felony_count+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.felony_count);
-	self.bjl.last_nonfelony_criminal_date := ut.max2(le.bjl.last_nonfelony_criminal_date,ri.bjl.last_nonfelony_criminal_date);
+	self.bjl.last_nonfelony_criminal_date := max(le.bjl.last_nonfelony_criminal_date,ri.bjl.last_nonfelony_criminal_date);
 	self.bjl.nonfelony_criminal_count := le.bjl.nonfelony_criminal_count+IF(le.crim_case_num=ri.crim_case_num and le.bjl.nonfelony_criminal_count > 0,0,ri.bjl.nonfelony_criminal_count);
 	self.bjl.nonfelony_criminal_count12 := le.bjl.nonfelony_criminal_count12+IF(le.crim_case_num=ri.crim_case_num and le.bjl.nonfelony_criminal_count12 > 0,0,ri.bjl.nonfelony_criminal_count12);
 	SELF := ri;
@@ -677,7 +677,7 @@ TRANSFORM
 	self.bjl.arrests_count24 := le.bjl.arrests_count24+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.arrests_count24);
 	self.bjl.arrests_count36 := le.bjl.arrests_count36+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.arrests_count36);
 	self.bjl.arrests_count60 := le.bjl.arrests_count60+IF(le.crim_case_num=ri.crim_case_num,0,ri.bjl.arrests_count60);
-	self.bjl.date_last_arrest := ut.max2(le.bjl.date_last_arrest,ri.bjl.date_last_arrest);
+	self.bjl.date_last_arrest := max(le.bjl.date_last_arrest,ri.bjl.date_last_arrest);
 	SELF := ri;
 END;
 

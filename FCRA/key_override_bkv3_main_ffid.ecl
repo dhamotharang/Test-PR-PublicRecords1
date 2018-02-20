@@ -1,4 +1,4 @@
-import bankruptcyv2, address, ut, data_services;
+import bankruptcyv2, address, ut, data_services, std;
 
 kfMain	 := dataset(data_services.foreign_prod + 'thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.Layout_Override_bk_filing,flat);
 
@@ -15,7 +15,7 @@ layout_main_ffid_v3 toV3Main(FCRA.Layout_Override_bk_filing input) := transform
 																trim(input.trustee_st,left,right) + ' ' +
 																trim(input.trustee_zip),left,right));	
 	self.tmsid				:=	'BK' + input.court_code + input.case_number;
-	self.process_date		:=	ut.getdate;
+	self.process_date		:=	(STRING8)Std.Date.Today();
 	self.trusteeName 		:= 	input.trustee_name;
 	self.trusteePhone 		:= 	input.trustee_phone;
 	self.trusteeAddress 	:= 	input.trustee_address1;

@@ -37,8 +37,8 @@ wInfutor := join(ids_wide, InfutorCID.Key_Infutor_DID,
 									
 Layout_Infutor rollInfutor(Layout_Infutor le, Layout_Infutor ri) := transform
 	self.infutor_date_first_seen := ut.min2(le.infutor_date_first_seen, ri.infutor_date_first_seen);
-	self.infutor_date_last_seen := ut.max2(le.infutor_date_last_seen, ri.infutor_date_last_seen);	
-	self.infutor_nap := ut.max2(le.infutor_nap, ri.infutor_nap);
+	self.infutor_date_last_seen := max(le.infutor_date_last_seen, ri.infutor_date_last_seen);	
+	self.infutor_nap := max(le.infutor_nap, ri.infutor_nap);
 	
 	self := le;
 end;

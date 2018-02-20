@@ -1,7 +1,7 @@
 /* Modeling group is calling this model TBN509_0_1 as it is the second version with score caps added. We are keeping the 
 		original name TBN509_0_0  */
 
-import ut, risk_indicators, address, RiskWise;
+import ut, risk_indicators, address, RiskWise, std;
 
 export TBN509_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true) := 
 FUNCTION
@@ -9,7 +9,7 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := transform
 
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	contrary_phone := if(le.iid.nap_summary = 1, 1,0);
 	
@@ -76,7 +76,7 @@ Layout_ModelOut doModel(clam le) := transform
 						NaProp_Tree = 0 => 0,
 						0);
 
-	time_on_header_years := (sysyear - (integer)(le.ssn_verification.header_first_seen[1..4]));
+	time_on_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_first_seen)[1..4]));
 
      time_on_header_code := map(time_on_header_years <= 5 or time_on_header_years = sysyear => 0,
 						  time_on_header_years <= 15 => 1,
@@ -84,7 +84,7 @@ Layout_ModelOut doModel(clam le) := transform
 						  3);
 
 
-     time_since_header_years := (sysyear - (integer)(le.ssn_verification.header_last_seen[1..4]));
+     time_since_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_last_seen)[1..4]));
 
      time_since_header_code := map(time_since_header_years >= 4 => 2,
 							time_since_header_years >= 2 => 1,

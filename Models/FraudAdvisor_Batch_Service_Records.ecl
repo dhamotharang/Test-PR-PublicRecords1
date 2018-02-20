@@ -67,7 +67,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			self.seq := le.seq;	
 			self.ssn := IF(le.ssn='000000000','',le.ssn);	// blank out social if it is all 0's
 			self.dob := dob_val;
-			self.age := if ((integer)Le.age = 0 and (integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), (Le.age));
+			self.age := if ((integer)Le.age = 0 and (integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), (Le.age));
 			
 			self.phone10 := le.Home_Phone;
 			self.wphone10 := le.Work_Phone;

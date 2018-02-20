@@ -7,7 +7,7 @@
 /* Returns the following score - RVG903                                             */
 /************************************************************************************/
 
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVG903_1_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -66,7 +66,7 @@ export RVG903_1_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 
      inferred_dob                    := le.reported_dob; //473     Pre-Calc'd Inferred DOB (YYYYMMDD)
 
-		 archive_date										 := if(999999=le.historydate, (unsigned4)ut.GetDate[1..8], le.historydate);
+		 archive_date										 := if(999999=le.historydate, (unsigned4)((STRING)Std.Date.Today())[1..8], le.historydate);
 
 
  /************************************************************************************/
@@ -79,14 +79,14 @@ export RVG903_1_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 		
   /* Dates */
 
-			 sysdate := mdy((integer)archive_date[5..6], if(le.historydate=999999, (integer)archive_date[7..8], 1), (integer)archive_date[1..4]);
+			 sysdate := mdy((integer)((STRING)archive_date)[5..6], if(le.historydate=999999, (integer)((STRING)archive_date)[7..8], 1), (integer)((STRING)archive_date)[1..4]);
 			 sysyear := (integer)archive_date[1..4];
 
 
-			 inferred_dob_8 := mdy(min(12,max(1,(integer)inferred_dob[5..6])),1,(integer)inferred_dob[1..4]) +
-                              min(31,max(1,(integer)inferred_dob[7..8])) - 1;
+			 inferred_dob_8 := mdy(min(12,max(1,(integer)((STRING)inferred_dob)[5..6])),1,(integer)((STRING)inferred_dob)[1..4]) +
+                              min(31,max(1,(integer)((STRING)inferred_dob)[7..8])) - 1;
 															
-			 inferred_dob_6 := mdy(min(12,max(1,(integer)inferred_dob[5..6])),1,(integer)inferred_dob[1..4]);
+			 inferred_dob_6 := mdy(min(12,max(1,(integer)((STRING)inferred_dob)[5..6])),1,(integer)((STRING)inferred_dob)[1..4]);
 
 			 inferred_dob2 := Map(length(trim((string)inferred_dob)) = 8 => inferred_dob_8,
 														length(trim((string)inferred_dob)) = 6 => inferred_dob_6,

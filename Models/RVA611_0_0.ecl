@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -323,7 +323,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 			ssninval := le.input_validation.ssn and ~le.ssn_verification.validation.valid;
 			ssndead  := le.input_validation.ssn and le.ssn_verification.validation.deceased;
 			
-			high_issue_dateyr	:= (INTEGER)(le.ssn_verification.validation.high_issue_date[1..4]);
+			high_issue_dateyr	:= (INTEGER)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 			dob_year			:= (INTEGER)(le.shell_input.dob[1..4]);
 			year_diff			:= high_issue_dateyr - dob_year;
 
@@ -363,7 +363,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 			dob_y := (INTEGER)le.shell_input.dob[1..4];
 
-			sysyear := if(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+			sysyear := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]) );
 
 			input_age := sysyear - dob_y;
 
@@ -374,7 +374,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 		/* SSN age alternative */
 
 
-			low_issue_year := (INTEGER)(le.ssn_verification.validation.low_issue_date[1..4]);
+			low_issue_year := (INTEGER)(((STRING)le.ssn_verification.validation.low_issue_date)[1..4]);
 
 			age_ssn_issue := sysyear - low_issue_year;
 
@@ -410,7 +410,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 		/*lres*/
 
-			add1_year_first_seen := (INTEGER)(le.address_verification.input_address_information.date_first_seen[1..4]);
+			add1_year_first_seen := (INTEGER)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
 			lres_yearsa := sysyear - add1_year_first_seen;
 			yfseen_pop := not( lres_yearsa > 1000 );
 
@@ -437,7 +437,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 			 
 			 
 			 
-			secondseendate1a := (INTEGER)(le.address_verification.address_history_1.date_first_seen[1..4]);
+			secondseendate1a := (INTEGER)(((STRING)le.address_verification.address_history_1.date_first_seen)[1..4]);
 			secondseendate1 := if( secondseendate1a = 0, 10000, secondseendate1a ); // there was a if fsd1 =. check here, too, so this could be a trouble spot
 
 
@@ -453,7 +453,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 			 
 			 
 			 
-			thirdseendate1a := (INTEGER)(le.address_verification.address_history_2.date_first_seen[1..4]);
+			thirdseendate1a := (INTEGER)(((STRING)le.address_verification.address_history_2.date_first_seen)[1..4]);
 			thirdseendate1 := if( thirdseendate1a = 0, 10000, thirdseendate1a ); // there was a if fsd1 =. check here, too, so this could be a trouble spot
 
 

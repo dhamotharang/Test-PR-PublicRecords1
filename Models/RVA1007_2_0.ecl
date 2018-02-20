@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut;
+IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut, std;
 	
 EXPORT RVA1007_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -573,7 +573,7 @@ END;
 	************************************************************ */
 NULL := -999999999;
 
-sysdate := common.sas_date(if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 Common.findw(rc_sources, 'L2', ' ,', 'I', source_tot_L2, 'bool');
 

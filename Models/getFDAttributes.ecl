@@ -1,10 +1,4 @@
-﻿/*2016-04-14T00:44:44Z (mark seubert)
-RR10222 Rolling back code to previous release
-*/
-/*2015-08-28T02:52:26Z (Kenneth Hill_prod)
-188007 - FP 201 attr change to RV5
-*/
-import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services;
+﻿import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam, 
 	grouped DATASET(Risk_Indicators.Layout_Output) iid, 
@@ -125,7 +119,7 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	
 	
 	getPreviousMonth(unsigned histdate) := FUNCTION
-			rollBack := trim((string)(histdate)[5..6])='01';
+			rollBack := trim(((string)histdate)[5..6])='01';
 			histYear := if(rollBack, (unsigned)((trim((string)histdate)[1..4]))-1, (unsigned)(trim((string)histdate)[1..4]));
 			histMonth := if(rollBack, 12, (unsigned)((trim((string)histdate)[5..6]))-1);
 			return (unsigned)(intformat(histYear,4,1) + intformat(histMonth,2,1));
@@ -152,16 +146,16 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 
 	// Identity Authentication Attributes
 	self.version1.SSNFirstSeen := ut.Min2(le.ssn_verification.header_first_seen, le.ssn_verification.credit_first_seen);
-	last_seen := ut.max2(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
+	last_seen := max(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
 	self.version1.DateLastSeen := checkDate6(last_seen);
-	today := ut.GetDate;
-	sysdate := if(le.historydate <> 999999, (integer)((string)le.historydate[1..6]), (integer)(today[1..6]));
+	today := (STRING8)Std.Date.Today();
+	sysdate := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..6]), (integer)(today[1..6]));
 	self.version1.isRecentUpdate := (sysdate - last_seen) < 100;
 	// I moved numSources down below the calculation for current address
 	self.version1.isPhoneFullNameMatch := le.iid.nap_summary in [9,12];
 	self.version1.isPhoneLastNameMatch := le.iid.nap_summary in [7,9,11,12];
-	ageDate := if(le.historydate <> 999999, (unsigned)((string)le.historydate[1..6]+'31'), (unsigned)today);
-	self.version1.inferredAge := ut.GetAgeI_asOf(le.reported_dob, ageDate);
+	ageDate := if(le.historydate <> 999999, (unsigned)(((string)le.historydate)[1..6]+'31'), (unsigned)today);
+	self.version1.inferredAge := ut.Age(le.reported_dob, ageDate);
 	self.version1.isSSNInvalid := ~le.SSN_Verification.Validation.valid;
 	self.version1.isPhoneInvalid := le.iid.phonetype <> '1' and le.shell_input.phone10 <> '';
 	self.version1.isAddrInvalid := le.iid.addrvalflag='N' and ((le.shell_input.in_StreetAddress<>'' and le.shell_input.in_City<>'' and 
@@ -1081,7 +1075,7 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
     _add2_date_first_seen := models.common.sas_date((string)add2_date_first_seen);
     _add2_date_last_seen  := models.common.sas_date((string)add2_date_last_seen );
 
-    sysdate := models.common.sas_date( if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01'));
     
     mos_add1_date_first_seen := (integer)((sysdate-_add1_date_first_seen)/(365.25/12));
     mos_add1_date_last_seen  := (integer)((sysdate-_add1_date_last_seen )/(365.25/12));

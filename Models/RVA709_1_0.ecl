@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVA709_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -159,10 +159,10 @@ export RVA709_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 		/*   Velocity/SSN Probs   */
 		/*------------------------*/
 
-		today := if( le.historydate=999999, ut.GetDate, (string)le.historydate[1..6]+'01' );
+		today := if( le.historydate=999999, (STRING)Std.Date.Today(), ((STRING)le.historydate)[1..6]+'01' );
 		today1900 := ut.DaysSince1900( today[1..4], today[5..6], today[7..8] );
 		birth1900 := ut.DaysSince1900( in_dob[1..4], in_dob[5..6], in_dob[7..8] );
-		li1900    := ut.DaysSince1900( rc_ssnlowissue[1..4], rc_ssnlowissue[5..6], rc_ssnlowissue[7..8] );
+		li1900    := ut.DaysSince1900( ((STRING)rc_ssnlowissue)[1..4], ((STRING)rc_ssnlowissue)[5..6], ((STRING)rc_ssnlowissue)[7..8] );
 		
 		age_calc := map
 		(

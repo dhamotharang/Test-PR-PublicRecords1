@@ -280,7 +280,7 @@ export Occurrence := module
 		l_tmp toCnt(l_tmp L, l_tmp R) := transform
 			self.occurrences		:= L.occurrences + R.occurrences;
 			self.dt_first_seen	:= ut.min2(L.dt_first_seen, R.dt_first_seen);
-			self.dt_last_seen		:= ut.max2(L.dt_last_seen, R.dt_last_seen);
+			self.dt_last_seen		:= Max(L.dt_last_seen, R.dt_last_seen);
 			self := L;
 		end;
 		cnt := rollup(sort(tmp, datum, src), toCnt(left,right), datum, src);
@@ -291,7 +291,7 @@ export Occurrence := module
 		l_tmp toMerged(l_tmp L, l_tmp R) := transform
 			self.occurrences		:= if(L.src in versioned_sources, L.occurrences, L.occurrences + R.occurrences);
 			self.dt_first_seen	:= ut.min2(L.dt_first_seen, R.dt_first_seen);
-			self.dt_last_seen		:= ut.max2(L.dt_last_seen, R.dt_last_seen);
+			self.dt_last_seen		:= Max(L.dt_last_seen, R.dt_last_seen);
 			self := L;
 		end;
 		cnt_s		:= sort(cnt, datum, src_desc, -occurrences, src, record);
@@ -367,7 +367,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtor_records(exists(addresses(st<>'' or z5<>''))));
 			self.hasPhone				:= false; // STUB - v1/v2 mismatch
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
 		
 		ds_bkv2 := project(base.bk_V2_child, transform(l_in,
@@ -379,7 +379,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtors(exists(addresses(orig_st<>'' or orig_zip5<>''))));
 			self.hasPhone				:= exists(left.debtors(exists(phones)));
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
 		
 		ds_lien := project(base.lien_child, transform(l_in,
@@ -392,7 +392,7 @@ export Occurrence := module
 			self.hasPhone				:= false; // STUB - v1/v2 mismatch
 			dt_filing						:= ut.NormDate((unsigned)left.filing_date);
 			self.dt_first_seen	:= dt_filing;
-			self.dt_last_seen		:= ut.max2(dt_filing, ut.NormDate((unsigned)left.release_date));
+			self.dt_last_seen		:= Max(dt_filing, ut.NormDate((unsigned)left.release_date));
 		));
 		
 		ds_lienv2 := project(base.lien_V2_child, transform(l_in,
@@ -661,7 +661,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtors(exists(addresses))) or exists(left.secureds(exists(addresses)));
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
 		));
 		
 		ds_corpAffil := project(base.corpaffil_child, transform(l_in,
@@ -702,7 +702,7 @@ export Occurrence := module
 			d1 := ut.NormDate((unsigned)left.RegDate);
 			d2 := ut.NormDate((unsigned)left.LastDateVote);
 			self.dt_first_seen	:= ut.Min2(d1,d2);
-			self.dt_last_seen		:= ut.Max2(d1,d2);
+			self.dt_last_seen		:= Max(d1,d2);
 		));
 		
 		ds_whois := project(base.whois_child, transform(l_in,
@@ -1073,7 +1073,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtor_records(exists(addresses(st<>'' or z5<>''))));
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
 		
 		ds_bkv2 := project(base.bankruptcy_v2, transform(l_in,
@@ -1084,7 +1084,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtors(exists(addresses(orig_st<>'' or orig_zip5<>''))));
 			self.hasPhone				:= exists(left.debtors(exists(phones)));
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
 
 		ds_ucc := project(base.uccs, transform(l_in,
@@ -1106,7 +1106,7 @@ export Occurrence := module
 			self.hasAddr				:= exists(left.debtors(exists(addresses))) or exists(left.secureds(exists(addresses)));  // assignees PP addrs & creditors pp addrs ???
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
-			self.dt_last_seen		:= ut.max2( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
+			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
 		));
 		
 		ds_lien := project(base.liens_judgments, transform(l_in,
@@ -1118,7 +1118,7 @@ export Occurrence := module
 			self.hasPhone				:= false;
 			dt_filing						:= ut.NormDate((unsigned)left.filing_date);
 			self.dt_first_seen	:= dt_filing;
-			self.dt_last_seen		:= ut.max2(dt_filing, ut.NormDate((unsigned)left.release_date));
+			self.dt_last_seen		:= Max(dt_filing, ut.NormDate((unsigned)left.release_date));
 		));
 
 		ds_lienv2 := project(base.liens_judgments_v2, transform(l_in,

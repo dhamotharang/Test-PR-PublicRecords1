@@ -1,4 +1,4 @@
-import easi, ut, address, riskwise, risk_indicators;
+import easi, ut, address, riskwise, risk_indicators, std;
 
 export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam, 
 		dataset(RiskWise.Layout_CD2I) indata,
@@ -112,7 +112,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 			add3_naprop            := le.Bill_to_Out.address_verification.address_history_2.naprop;
 			telcordia_type         := le.Bill_to_Out.phone_verification.telcordia_type;
 			phone_zip_mismatch     := le.Bill_to_Out.phone_verification.phone_zip_mismatch;
-			archive_date           := if(le.bill_to_out.historydate <> 999999, (integer)(string)le.bill_to_out.historydate[1..4], (integer)(ut.GetDate[1..4])); // same value as used in cdn606_1_0
+			archive_date           := if(le.bill_to_out.historydate <> 999999, (integer)((string)le.bill_to_out.historydate)[1..4], (integer)(((STRING)Std.Date.Today())[1..4])); // same value as used in cdn606_1_0
 
 
 			in_state_s             := le.Ship_to_Out.shell_input.in_state;
@@ -130,7 +130,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 			add3_naprop_s          := le.Ship_to_Out.address_verification.address_history_2.naprop;
 			telcordia_type_s       := le.Ship_to_Out.phone_verification.telcordia_type;
 			phone_zip_mismatch_s   := le.Ship_to_Out.phone_verification.phone_zip_mismatch;
-			archive_date_s         := if(le.ship_to_out.historydate <> 999999, (integer)(string)le.ship_to_out.historydate[1..4], (integer)(ut.GetDate[1..4])); // same value as used in cdn606_1_0
+			archive_date_s         := if(le.ship_to_out.historydate <> 999999, (integer)((string)le.ship_to_out.historydate)[1..4], (integer)(((STRING)Std.Date.Today())[1..4])); // same value as used in cdn606_1_0
 
 
 			C_MED_HHINC            := (INTEGER)ri.easi.MED_HHINC;
@@ -473,11 +473,11 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 			0
 		);
 
-		v_add1_year_firstSeen := (INTEGER)add1_date_first_seen[1..4];
+		v_add1_year_firstSeen := (INTEGER)((STRING)add1_date_first_seen)[1..4];
 		v_lres_years := if(v_add1_year_firstSeen = 0, -999, (archive_date - v_add1_year_firstSeen));
 
 
-		v_s_add1_year_firstSeen := (INTEGER)add1_date_first_seen_s[1..4];
+		v_s_add1_year_firstSeen := (INTEGER)((STRING)add1_date_first_seen_s)[1..4];
 		v_s_lres_years := if(v_s_add1_year_firstSeen = 0, -999, (archive_date_s - v_s_add1_year_firstSeen) );
 
 		vs_s_naprop_tree := map(
@@ -904,7 +904,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 
 
 		vb_C_FAMMAR_p  := if(c_families = 0, -1, floor((REAL)C_FAMMAR_P/5)*5);
-		vb_C_FAMMAR_p2 := if( isMissing(C_FAMMAR_P) or (integer)C_FAMMAR_P<0, 75, ut.min2(85,ut.max2(20,floor((real)C_FAMMAR_P/10)*10)));
+		vb_C_FAMMAR_p2 := if( isMissing(C_FAMMAR_P) or (integer)C_FAMMAR_P<0, 75, ut.min2(85, Max(20,floor((real)C_FAMMAR_P/10)*10)));
 
 		vb_C_FAMMAR_P2_m := case( vb_C_FAMMAR_P2,
 			20 => 0.03037383,
@@ -1047,7 +1047,7 @@ export CDN707_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) cla
 		odds  := 0.0059373;
 
 		CDN707_1_0a := round(point*(log(phat/(1-phat)) - log(odds))/log(2) + base);
-		CDN707_1_0  := ut.max2(250,ut.min2(999,CDN707_1_0a));
+		CDN707_1_0  := Max(250,ut.min2(999,CDN707_1_0a));
 
 
 		self.score := (STRING)cdn707_1_0;

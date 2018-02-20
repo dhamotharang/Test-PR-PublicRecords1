@@ -1,4 +1,4 @@
-import doxie_build, ut, header, doxie, header_services;
+﻿import doxie_build, ut, header, doxie, header_services, data_services;
 export Key_DID_SSN_Date(boolean IsFCRA = false) := function
 
 Suppression_Layout 	:= header_services.Supplemental_Data.layout_in;
@@ -7,7 +7,7 @@ slim_rec := RECORD
 	unsigned6 did;
 	qstring9 ssn;
 	unsigned3 best_date := 0;
-	data16 hval := 0;
+	data16 hval := (data16)0;
 
 END;
 
@@ -39,8 +39,8 @@ temp := Project(dsd_header,add_hval(LEFT));
 dsd := JOIN(temp, supp_list,LEFT.hval=RIGHT.hval,GetRightJoinInfo(LEFT),LEFT ONLY);
 
 file_prefix := if (IsFCRA, 
-                     ut.Data_Location.Person_header+'thor_data400::key::fcra::header.did.ssn.date_',
-                     ut.Data_Location.Person_header+'thor_data400::key::header.did.ssn.date_');
+                     Data_Services.Data_location.person_header+'thor_data400::key::fcra::header.did.ssn.date_',
+                     Data_Services.Data_location.person_header+'thor_data400::key::header.did.ssn.date_');
 										
 return index(dsd,{did,ssn},{best_date}, file_prefix + doxie.Version_SuperKey);
 

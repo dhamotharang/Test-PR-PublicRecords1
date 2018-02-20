@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, BizLinkFull, Business_Header, Business_Risk_BIP, Cortera, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT;
+﻿IMPORT Address, BIPV2, BizLinkFull, Business_Header, Business_Risk_BIP, Cortera, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT, std;
 
 EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig, 
 															 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -170,7 +170,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep_DateOfBirth := RiskWise.CleanDOB(le.Rep_DateOfBirth);
 		RepPhone10 := RiskWise.CleanPhone(le.Rep_Phone10);
 		SELF.Clean_Input.Rep_Phone10 := RepPhone10;
-		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
+		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
 		SELF.Clean_Input.Rep_DLNumber := RiskWise.CleanDL_Num(le.Rep_DLNumber);
 		SELF.Clean_Input.Rep_DLState := StringLib.StringToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep_Email := StringLib.StringToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
@@ -222,7 +222,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep2_DateOfBirth := RiskWise.CleanDOB(le.Rep2_DateOfBirth);
 		Rep2Phone10 := RiskWise.CleanPhone(le.Rep2_Phone10);
 		SELF.Clean_Input.Rep2_Phone10 := Rep2Phone10;
-		SELF.Clean_Input.Rep2_Age := IF((INTEGER)le.Rep2_Age = 0 AND (INTEGER)le.Rep2_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep2_DateOfBirth), (le.Rep2_Age));
+		SELF.Clean_Input.Rep2_Age := IF((INTEGER)le.Rep2_Age = 0 AND (INTEGER)le.Rep2_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep2_DateOfBirth), (le.Rep2_Age));
 		SELF.Clean_Input.Rep2_DLNumber := RiskWise.CleanDL_Num(le.Rep2_DLNumber);
 		SELF.Clean_Input.Rep2_DLState := StringLib.StringToUpperCase(TRIM(le.Rep2_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep2_Email := StringLib.StringToUpperCase(TRIM(le.Rep2_Email, LEFT, RIGHT));
@@ -274,7 +274,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep3_DateOfBirth := RiskWise.CleanDOB(le.Rep3_DateOfBirth);
 		Rep3Phone10 := RiskWise.CleanPhone(le.Rep3_Phone10);
 		SELF.Clean_Input.Rep3_Phone10 := Rep3Phone10;
-		SELF.Clean_Input.Rep3_Age := IF((INTEGER)le.Rep3_Age = 0 AND (INTEGER)le.Rep3_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep3_DateOfBirth), (le.Rep3_Age));
+		SELF.Clean_Input.Rep3_Age := IF((INTEGER)le.Rep3_Age = 0 AND (INTEGER)le.Rep3_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep3_DateOfBirth), (le.Rep3_Age));
 		SELF.Clean_Input.Rep3_DLNumber := RiskWise.CleanDL_Num(le.Rep3_DLNumber);
 		SELF.Clean_Input.Rep3_DLState := StringLib.StringToUpperCase(TRIM(le.Rep3_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep3_Email := StringLib.StringToUpperCase(TRIM(le.Rep3_Email, LEFT, RIGHT));
@@ -327,7 +327,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep4_DateOfBirth := RiskWise.CleanDOB(le.Rep4_DateOfBirth);
 		Rep4Phone10 := RiskWise.CleanPhone(le.Rep4_Phone10);
 		SELF.Clean_Input.Rep4_Phone10 := Rep4Phone10;
-		SELF.Clean_Input.Rep4_Age := IF((INTEGER)le.Rep4_Age = 0 AND (INTEGER)le.Rep4_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep4_DateOfBirth), (le.Rep4_Age));
+		SELF.Clean_Input.Rep4_Age := IF((INTEGER)le.Rep4_Age = 0 AND (INTEGER)le.Rep4_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep4_DateOfBirth), (le.Rep4_Age));
 		SELF.Clean_Input.Rep4_DLNumber := RiskWise.CleanDL_Num(le.Rep4_DLNumber);
 		SELF.Clean_Input.Rep4_DLState := StringLib.StringToUpperCase(TRIM(le.Rep4_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep4_Email := StringLib.StringToUpperCase(TRIM(le.Rep4_Email, LEFT, RIGHT));
@@ -379,7 +379,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep5_DateOfBirth := RiskWise.CleanDOB(le.Rep5_DateOfBirth);
 		Rep5Phone10 := RiskWise.CleanPhone(le.Rep5_Phone10);
 		SELF.Clean_Input.Rep5_Phone10 := Rep5Phone10;
-		SELF.Clean_Input.Rep5_Age := IF((INTEGER)le.Rep5_Age = 0 AND (INTEGER)le.Rep5_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep5_DateOfBirth), (le.Rep5_Age));
+		SELF.Clean_Input.Rep5_Age := IF((INTEGER)le.Rep5_Age = 0 AND (INTEGER)le.Rep5_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep5_DateOfBirth), (le.Rep5_Age));
 		SELF.Clean_Input.Rep5_DLNumber := RiskWise.CleanDL_Num(le.Rep5_DLNumber);
 		SELF.Clean_Input.Rep5_DLState := StringLib.StringToUpperCase(TRIM(le.Rep5_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep5_Email := StringLib.StringToUpperCase(TRIM(le.Rep5_Email, LEFT, RIGHT));
@@ -4115,7 +4115,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Firmographic.FirmEmployeeCountMostRecent := FirmEmployeeCountMostRecent;
 		SELF.Firmographic.FirmEmployeeRangeCountMostRecent := checkVersion((STRING)Business_Risk_BIP.Common.getEmployeeRangeIndex((INTEGER)FirmEmployeeCountMostRecent), Business_Risk_BIP.Constants.BusShellVersion_v30);
 
-		SELF.Firmographic.BusObservedAge := IF(DateFirstSeen = Business_Risk_BIP.Constants.MissingDate, '-1', (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(DateFirstSeen, Business_Risk_BIP.Common.todaysDate(ut.GetDate, le.Clean_Input.HistoryDate)) / 365.25), -1, 110));
+		SELF.Firmographic.BusObservedAge := IF(DateFirstSeen = Business_Risk_BIP.Constants.MissingDate, 
+		     '-1', 
+		     (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(DateFirstSeen, Business_Risk_BIP.Common.todaysDate((STRING8)Std.Date.Today(), le.Clean_Input.HistoryDate)) / 365.25), -1, 110)
+		);
+		
 		// To choose the best SIC/NAIC we are going with a waterfall source selection - the first source in this list is the SIC/NAIC we choose.  Adding dates/record counts to ensure we don't have some sort of magical indeterminate code..
 		// DCA (DF), Experian EBR (ER), YellowPages (Y), OSHAIR (OS), BusReg (BR), FBN (FH), CalBus (C#), DNBDMI (DN)
 		BestSIC := SORT((SICSources (IsPrimary = TRUE)), -(Source = 'DF'), -(Source = 'ER'), -(Source = 'Y'), -(Source = 'OS'), -(Source = 'BR'), -(Source = 'FH'), -(Source = 'C#'), -(Source = 'DN'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1];
@@ -4601,7 +4605,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.sourcedatelastseenlistID := Business_Risk_BIP.Common.convertDelimited(SeqSourcesLinkIds, DateLastSeen, Business_Risk_BIP.Constants.FieldDelimiter);
 		SELF.Verification.SourceIDDateLastSeenList := calculateValueFor._SourceIDDateLastSeenList(SeqSourcesLinkIds);
 
-		SELF.Firmographic.busobservedageID := IF(SourceFirstSeenID = Business_Risk_BIP.Constants.MissingDate, '-1', (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(SourceFirstSeenID, Business_Risk_BIP.Common.todaysDate(ut.GetDate, le.Clean_Input.HistoryDate)) / 365.25), -1, 110));
+		SELF.Firmographic.busobservedageID := IF(SourceFirstSeenID = Business_Risk_BIP.Constants.MissingDate, 
+		     '-1', 
+         (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(SourceFirstSeenID, Business_Risk_BIP.Common.todaysDate((STRING8)Std.Date.Today(), le.Clean_Input.HistoryDate)) / 365.25), -1, 110)
+    );
+		                                         
 		PhoneIDSources := le.PhoneSources(source NOT IN [gong_src, MDR.sourceTools.set_Phones_Plus]) + le.PhoneIDSources;
 		GroupedPhoneIDSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, PhoneIDSources);
 		UniquePhoneIDSources := ROLLUP(SORT(GroupedPhoneIDSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');

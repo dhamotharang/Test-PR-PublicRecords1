@@ -1,6 +1,6 @@
 // RVA1309_1: SFG Finance
 
-import risk_indicators, riskwise, riskwisefcra, ut; 
+import risk_indicators, riskwise, riskwisefcra, ut, std; 
 
 export RVA1309_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -343,7 +343,7 @@ export RVA1309_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, 
 
 	ver_src_li := ver_src_li_pos > 0;
 
-	sysdate := Models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+	sysdate := Models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 	iv_vp003_phn_invalid := map(
 			not(hphnpop)                                                    => NULL,

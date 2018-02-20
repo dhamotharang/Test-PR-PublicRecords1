@@ -208,8 +208,8 @@ export Boca_Shell_BtSt_Address(grouped dataset(Risk_Indicators.layout_ciid_btst_
 		minLastSeen := if(sameAddress, min(l.date_last_seen, r.date_last_seen), 0);
 		maxFirstSeen := if(sameAddress, max(l.date_first_seen, r.date_first_seen), 0);
 	//can't use ut.MonthsApart as they don't want ABS done on it
-		lres := ((integer)minLastSeen[1..4] - (integer)maxFirstSeen[1..4]) * 12 + 
-							((integer)minLastSeen[5..6] - (integer)maxFirstSeen[5..6]);			
+		lres := ((integer)((STRING)minLastSeen)[1..4] - (integer)((STRING)maxFirstSeen)[1..4]) * 12 + 
+							((integer)((STRING)minLastSeen)[5..6] - (integer)((STRING)maxFirstSeen)[5..6]);			
 		self.btst_lres_in_common := if(sameAddress and (integer) minLastSeen > 0 and 
 			(integer) maxFirstSeen > 0 and lres > 0, lres, 0);	
 		self := l;
