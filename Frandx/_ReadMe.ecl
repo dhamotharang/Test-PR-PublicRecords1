@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 ﻿/* Giri
 
+=======
+﻿//Branch_Git_CodeReview_dev and smyana_branch-2/13/2018 Test
+//**********************$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+/*
+>>>>>>> 45d671ac84e9cda3e4f38d43e40c6e8d3ad1393a
 	Franchisee - Frandx:
 	
 		Overview: FRANdata (Franchise Business Intelligence) provides the business Franchisee data. 
