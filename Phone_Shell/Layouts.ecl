@@ -1,4 +1,4 @@
-IMPORT Doxie_Raw, Progressive_Phone, Phone_Shell, Risk_Indicators, RiskWise, UT;
+﻿IMPORT Doxie_Raw, Progressive_Phone, Phone_Shell, Risk_Indicators, RiskWise, UT;
 
 EXPORT Layouts := MODULE
 	EXPORT layout_Title := RECORD
@@ -50,4 +50,13 @@ EXPORT Layouts := MODULE
 		STRING25 City := '';
 		STRING2 State := '';
 	END;
+
+	EXPORT	Bureau_Phones := record
+		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus.Clean_Input.Seq;
+		UNSIGNED8 DID	;
+		STRING8 Bureau_Last_Update;
+		STRING10 Gathered_Phone;
+		BOOLEAN Bureau_Verified;
+	END;	
+	
 END;

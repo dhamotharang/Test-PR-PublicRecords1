@@ -1,11 +1,11 @@
-﻿/*
+﻿/* Version 11
 	This function takes in the Phone Shell and converts it into a layout that the Modeling team can use.
 	SAS has limits to field names and lengths, so this is why we must convert the layout specially for them.
  */
 IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT;
 
-EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout) Shell, STRING50 DataRestrictionMask) := FUNCTION
-	Phone_Shell.Layout_Modeling_Shell toShell(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout le) := TRANSFORM
+EXPORT Phone_Shell.Layout_Modeling_Shell_v11 To_Modeling_Shell_v11(DATASET(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout) Shell, STRING50 DataRestrictionMask) := FUNCTION
+	Phone_Shell.Layout_Modeling_Shell_v11 toShell(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout le) := TRANSFORM
 		isFCRA := FALSE; // The Phone Shell is Non-FCRA Only
 		
 		// Phone Shell Fields
@@ -19,14 +19,12 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		SELF.ps_in_DOB := le.Phone_Shell.Input_Echo.in_DOB;
 		SELF.ps_SSNLength := (string) length(trim(le.Phone_Shell.Input_Echo.in_SSN));
 		SELF.in_ph10 := le.Phone_Shell.Input_Echo.in_Phone10;
-		SELF.in_EXPGW_Enabled := FALSE;
 		SELF.in_TargusGW_Enabled := le.Phone_Shell.Input_Echo.in_TargusGW_Enabled;
 		SELF.in_TUGW_Enabled := le.Phone_Shell.Input_Echo.in_TUGW_Enabled;
 		SELF.in_InsGW_Enabled := le.Phone_Shell.Input_Echo.in_InsGW_Enabled;
 		SELF.in_Processing_Date := le.Phone_Shell.Input_Echo.in_Processing_Date;
+		SELF.in_Burea_Enabled := le.Phone_Shell.Input_Echo.in_Burea_Enabled;
 		SELF.Subject_SSN_Mismatch := le.Phone_Shell.Subject_Level.Subject_SSN_Mismatch;
-		SELF.Exp_Num_Duplicate := 0;
-		SELF.Exp_Num_Insufficient_Score := 0;
 		SELF.Gathered_Ph := le.Phone_Shell.Gathered_Phone;
 		SELF.Source_List := le.Phone_Shell.Sources.Source_List;
 		SELF.Source_List_Last_Seen := le.Phone_Shell.Sources.Source_List_Last_Seen;
@@ -174,13 +172,8 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		SELF.Internal_ver_First_Seen := le.Phone_Shell.Internal_Corroboration.Internal_Verification_First_Seen;
 		SELF.Internal_ver_Last_Seen := le.Phone_Shell.Internal_Corroboration.Internal_Verification_Last_Seen;
 		SELF.Internal_ver_Match_Types := le.Phone_Shell.Internal_Corroboration.Internal_Verification_Match_Types;
-		//Experian is removed and replaced with Equifax/Bureau data
-		SELF.Exp_Verified := le.Phone_Shell.Bureau.Bureau_Verified;
-		SELF.Exp_Type := ''; //no longer exists because Experian is gone
-		SELF.Exp_Source := '';//no longer exists because Experian is gone
-		SELF.Exp_Last_Update := le.Phone_Shell.Bureau.Bureau_Last_Update;
-		SELF.Exp_ph_Score_V1 := '';//no longer exists because Experian is gone
-
+		SELF.Bureau_Verified := le.Phone_Shell.Bureau.Bureau_Verified;
+		SELF.Bureau_Last_Update := le.Phone_Shell.Bureau.Bureau_Last_Update;
 		SELF.EDA_Omit_Locality := le.Phone_Shell.EDA_Characteristics.EDA_Omit_Locality;
 		SELF.EDA_DID := le.Phone_Shell.EDA_Characteristics.EDA_DID;
 		SELF.EDA_HHID := le.Phone_Shell.EDA_Characteristics.EDA_HHID;
