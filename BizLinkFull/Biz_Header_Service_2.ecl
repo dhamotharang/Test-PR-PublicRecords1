@@ -135,7 +135,7 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 sSortFlag:=IF(bHSort,'T','_');
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
-Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,FALSE
+Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,TRUE
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
   ,(TYPEOF(Template.sele_proxid))Input_sele_proxid
   ,(TYPEOF(Template.org_proxid))Input_org_proxid
