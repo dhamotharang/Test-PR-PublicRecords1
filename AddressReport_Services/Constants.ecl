@@ -1,4 +1,5 @@
-import ut,iesp;
+import ut,iesp, std;
+
 export Constants := MODULE
 		export unsigned2 get_min(unsigned c1, unsigned c2_in):=function
 			c2:=if(c2_in=0,c1,c2_in);
@@ -52,7 +53,7 @@ export Constants := MODULE
 			return 'Maximum ' + cnt + ' ' + sdataset + ' returned.';
 		end;	
 	
-		shared unsigned TODAY_YYYYMM 								:= (INTEGER)ut.GetDate DIV 100;
+		shared unsigned TODAY_YYYYMM 								:= (INTEGER)Std.Date.Today() DIV 100;
 		shared unsigned ONE_YEAR     								:= 100;
 		export THRESHOLD_DATE_FOR_CURRENT_RESIDENCY := (TODAY_YYYYMM - ONE_YEAR);
 		export THRESHOLD_DATE_FOR_CURRENT_BUSINESS 	:= (TODAY_YYYYMM - ONE_YEAR);

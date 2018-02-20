@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi;
+import risk_indicators, ut, easi, std;
 
 export IEN1006_0_1( grouped dataset(risk_indicators.layout_boca_shell) clam, dataset(easi.layout_census) census ) := FUNCTION
 
@@ -448,7 +448,7 @@ export IEN1006_0_1( grouped dataset(risk_indicators.layout_boca_shell) clam, dat
 			(pk_dist_a2toa3 * 2915.40756) +
 			(pk_rc_disthphoneaddr * 4620.15356);
 
-		sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01')),
+		sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01')),
 						length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 																			   NULL);
 

@@ -254,7 +254,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	#STORED('DataPermissionMask' ,Business_Risk_BIP.Constants.Default_DataPermissionMask);
 	#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 	#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
-	#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass)
+	#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
 
 	requestIn := DATASET([], iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest) : STORED('SmallBusinessAnalyticsRequest', FEW);
  firstRow  := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
@@ -405,8 +405,10 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																																																								SELF.OptionValue := LEFT.OptionValue));
 	
 	Gateways 											 := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
+
+	emptyRecord := dataset([{1}], {unsigned a});
 	
-	LNSmallBusiness.BIP_Layouts.Input intoInputLayout(ut.ds_oneRecord le) := TRANSFORM
+	LNSmallBusiness.BIP_Layouts.Input intoInputLayout(emptyRecord le) := TRANSFORM
 		SELF.AcctNo := AcctNo;
 		SELF.HistoryDateYYYYMM := HistoryDateYYYYMM;
 		SELF.HistoryDate := HistoryDate;
@@ -483,7 +485,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		
 		SELF := [];
 	END;
-	Input := PROJECT(ut.ds_oneRecord, intoInputLayout(LEFT));
+	Input := PROJECT(dataset([{1}], {unsigned a}), intoInputLayout(LEFT));
 	
 	/* *************************************
 	 *            Validate Input:          *

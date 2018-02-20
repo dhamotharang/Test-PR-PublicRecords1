@@ -1,10 +1,10 @@
-import	header,ln_property,ln_mortgage,ut,_control,mdr;
+import	header,ln_property,ln_mortgage,ut,_control,mdr, std;
 
 export	ln_propertyv2_as_source(boolean pFastHeader = false)	:=	module
 						
 //same filter used in v1						
 shared dLNPropertySearch		:=	if(pFastHeader
-																				,LN_PropertyV2.File_Search_DID(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)
+																				,LN_PropertyV2.File_Search_DID(ut.DaysApart((STRING8)Std.Date.Today(), ((STRING)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)
 																				,dataset('~thor_data400::base::ln_propv2srchheader_building',ln_propertyv2.Layout_DID_Out,flat)
 																				)
 																				(did < (unsigned6)ln_property.irs_dummy_cutoff and source_code not in ['SO','OS'])
@@ -226,7 +226,7 @@ p4_sort	:=	sort(p4_dist,src,vendor_id,fname,mname,lname,name_suffix,prim_range,p
 
 r_layout_new_records_strings t_rollup(p4_sort le, p4_dist ri)	:=	transform
  self.dt_first_seen           	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
- self.dt_last_seen            	:=	ut.Max2(le.dt_first_seen,ri.dt_first_seen);
+ self.dt_last_seen            	:=	Max(le.dt_first_seen,ri.dt_first_seen);
  self.dt_vendor_first_reported	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
  self.dt_vendor_last_reported 	:=	self.dt_last_seen;
  self.dt_nonglb_last_seen     	:=	self.dt_last_seen;
@@ -288,7 +288,7 @@ end;
 
 fp_rollup_new_records	:=	project(p_rollup,t_map_to_newf_records(left));
 				  
-fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_property_as_header');
+fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart((STRING8)Std.Date.Today(), ((STRING)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_property_as_header');
 	
 export ln_propertyv2_as_fheader	:=	fp_rollup_filt
                                    (

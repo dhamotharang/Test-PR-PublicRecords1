@@ -1,4 +1,4 @@
-import address, risk_indicators, ut;
+import address, risk_indicators, ut, std;
 
 //Hedonic Files
 isFCRA := false;
@@ -53,15 +53,15 @@ layout_Hedonics addNeighborhoodHedonics(Prop_Address_Prep_V4 l) := TRANSFORM
 		self.geolink := clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
 		self.ave_occupant_owned := if(l.occupant_owned,1,0);
 		self.cnt_occupant_owned := if(l.occupant_owned,1,0);
-	 	self.ave_building_age := if(l.built_date !=0,(integer)ut.getdate[1..4] - (integer)l.built_date, 0);
+	 	self.ave_building_age := if(l.built_date !=0,(integer)((STRING)Std.Date.Today())[1..4] - (integer)l.built_date, 0);
 		self.cnt_building_age := if(l.built_date !=0,1,0);
 	 	self.ave_purchase_amount := l.purchase_amount;
 		self.cnt_purchase_amount := if(l.purchase_amount !=0,1,0);
-		self.ave_purchase_age := if(l.purchase_date !=0,(integer)ut.getdate[1..4] - (integer)l.purchase_date, 0);
+		self.ave_purchase_age := if(l.purchase_date !=0,(integer)((STRING)Std.Date.Today())[1..4] - (integer)l.purchase_date, 0);
 		self.cnt_purchase_age := if(l.purchase_date !=0,1,0);
 		self.ave_mortgage_amount := l.mortgage_amount;
 		self.cnt_mortgage_amount := if(l.mortgage_amount !=0,1,0);
-		self.ave_mortgage_age := if(l.mortgage_date !=0,(integer)ut.getdate[1..4] - (integer)l.mortgage_date, 0);
+		self.ave_mortgage_age := if(l.mortgage_date !=0,(integer)((STRING)Std.Date.Today())[1..4] - (integer)l.mortgage_date, 0);
 		self.cnt_mortgage_age := if(l.mortgage_date !=0,1,0);
 	 	self.ave_assessed_amount := l.assessed_amount;
 		self.cnt_assessed_amount := if(l.assessed_amount !=0,1,0);

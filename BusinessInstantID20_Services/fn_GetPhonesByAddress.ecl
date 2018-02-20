@@ -141,11 +141,11 @@ EXPORT fn_GetPhonesByAddress( DATASET(BusinessInstantID20_Services.layouts.Input
 					(
 						(
 							LENGTH((STRING)LEFT.historydate) = 6 AND 
-							(UNSIGNED3)(RIGHT.dt_first_seen[1..6]) < LEFT.historydate
+							(UNSIGNED3)(((STRING)RIGHT.dt_first_seen)[1..6]) < LEFT.historydate
 						) OR
 						(
 							LENGTH((STRING)LEFT.historydate) >= 8 AND 
-							(UNSIGNED4)(RIGHT.dt_first_seen) < (UNSIGNED4)((STRING)LEFT.historydate[1..8])
+							(UNSIGNED4)(RIGHT.dt_first_seen) < (UNSIGNED4)(((STRING)LEFT.historydate)[1..8])
 						)
 					),
 					TRANSFORM(RIGHT),

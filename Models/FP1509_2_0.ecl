@@ -1,4 +1,4 @@
-import easi, Models, risk_indicators, riskwise, ut;
+import easi, Models, risk_indicators, riskwise, ut, std;
 
 // this model accepts a billtoshipto clam, the shipto fields are only used for the shipto lat and long.  
 // shipto lat and long are coming from the retailer's zipcode
@@ -1266,7 +1266,7 @@ END;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := __common__( models.common.sas_date(if(le.Bill_To_Out.historydate=999999, (string)ut.getdate, (string6)le.Bill_To_Out.historydate+'01')) );
+sysdate := __common__( models.common.sas_date(if(le.Bill_To_Out.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.Bill_To_Out.historydate+'01')) );
 
 num_inp_lat := __common__( StringLib.StringFilterOut(out_lat_s, '<>') );
 

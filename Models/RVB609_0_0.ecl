@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVB609_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := 
 
@@ -22,7 +22,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 						 le.address_verification.input_address_information.source_count);
 
      source_count_sum2 := source_count2 + add1_source_count2;
-     source_count_sum := ut.imin2(source_count_sum2, 7);
+     source_count_sum := min(source_count_sum2, 7);
 	
 	
 	add1IsBestMatch := le.address_verification.input_address_information.isbestmatch;
@@ -212,11 +212,11 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
     
 
-     add1_year_first_seen := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
-	sysyear := if(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+     add1_year_first_seen := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
+     sysyear := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
      
-	lres_yearsa := sysyear - add1_year_first_seen;
-	lres_years := if(lres_yearsa > 1000, -1, if(lres_yearsa > 30, 30, lres_yearsa));
+     lres_yearsa := sysyear - add1_year_first_seen;
+     lres_years := if(lres_yearsa > 1000, -1, if(lres_yearsa > 30, 30, lres_yearsa));
 
 
 	/* AVG Lres */
@@ -227,14 +227,14 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
      yfseen_pop1 := if(lres_yearsb > 1000 or lres_yearsb = -1, 0, 1);
 
 
-     secondseendate := (integer)(le.address_verification.address_history_1.date_first_seen[1..4]);
+     secondseendate := (integer)(((STRING)le.address_verification.address_history_1.date_first_seen)[1..4]);
      secondseendate2 := if(secondseendate = 0, 10000, secondseendate);
      lres_yearsc := abs(add1_year_first_seen - secondseendate2);
      lres_years2 := if(lres_yearsc > 1000, -1, if(lres_yearsc > 100, 100, lres_yearsc));
      yfseen_pop2 := if(lres_yearsc > 1000 or lres_yearsc = -1, 0, 1);
 
 
-     thirdseendate := (integer)(le.address_verification.address_history_2.date_first_seen[1..4]);
+     thirdseendate := (integer)(((STRING)le.address_verification.address_history_2.date_first_seen)[1..4]);
      thirdseendate3 := if(thirdseendate = 0, 10000, thirdseendate);
      lres_yearsd := abs(secondseendate - thirdseendate3);
      lres_years3 := if(lres_yearsd > 1000, -1, if(lres_yearsd > 100, 100, lres_yearsd));
@@ -306,7 +306,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	ssninval := ~le.ssn_verification.validation.valid and le.input_validation.ssn;
 	ssndead := le.input_validation.ssn and le.ssn_verification.validation.deceased;
 
-	high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+	high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 	dob_year := (integer)(le.shell_input.dob[1..4]);
 	year_diff := high_issue_dateyr - dob_year;
 
@@ -351,7 +351,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 				   
 				   
 
-     low_issue_age := sysyear - (integer)(le.ssn_verification.validation.low_issue_date[1..4]);
+     low_issue_age := sysyear - (integer)(((STRING)le.ssn_verification.validation.low_issue_date)[1..4]);
 
 
      low_issue_age2 := map(low_issue_age < 3 => 3,

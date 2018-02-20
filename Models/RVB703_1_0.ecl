@@ -161,10 +161,10 @@ export RVB703_1_0( grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, bool
 
         //DEROG INFORMATION
 
-		lien_recent_un  := ut.imin2(3, liens_recent_unreleased_count);
-		lien_hist_un    := ut.imin2(3, liens_historical_unreleased_ct   );
-		lien_recent_rel := ut.imin2(1, liens_recent_released_count      );
-		lien_hist_rel   := ut.imin2(1, liens_historical_released_count  );
+		lien_recent_un  := Min(3, liens_recent_unreleased_count);
+		lien_hist_un    := Min(3, liens_historical_unreleased_ct   );
+		lien_recent_rel := Min(1, liens_recent_released_count      );
+		lien_hist_rel   := Min(1, liens_historical_released_count  );
 
 		lienflag := map(
 			lien_recent_un  > 2 => 6,

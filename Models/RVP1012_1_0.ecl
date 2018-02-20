@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVP1012_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
@@ -241,7 +241,7 @@ export RVP1012_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) :=
     prof_license_category            := le.professional_license.plcategory;
     wealth_index                     := le.wealth_indicator;
     input_dob_match_level            := le.dobmatchlevel;
-    archive_date                     := if(999999=le.historydate, (unsigned3)ut.getdate[1..6], le.historydate);
+    archive_date                     := if(999999=le.historydate, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 
 
     NULL := -999999999;

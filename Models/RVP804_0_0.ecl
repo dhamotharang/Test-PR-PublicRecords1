@@ -15,7 +15,7 @@
 ************************************************************************************
 */
 
-import risk_indicators, ut;
+import risk_indicators, ut, std;
 
 export RVP804_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -149,7 +149,7 @@ end;
 		watercraft_count								:=	le.watercraft.watercraft_count;
 		ams_file_type										:=	trim(le.student.file_type);
 		prof_license_flag               :=  le.professional_license.professional_license_flag;
-		archive_date										:= if(le.historydate=999999, (unsigned3)ut.getDate[1..6], le.historydate);
+		archive_date										:= if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 
 
 //  ************************************************************************************
@@ -158,8 +158,8 @@ end;
 
 		// common variables
 		isThinFileModel := StringLib.StringFind(StringLib.StringToUpperCase(rc_sources),'EQ', 1) >= 1;
-		sysyear := (integer)archive_date[1..4];
-		sysmth  := (integer)archive_date[5..7];
+		sysyear := (integer)((STRING)archive_date)[1..4];
+		sysmth  := (integer)((STRING)archive_date)[5..7];
 		dwelling_type := rc_dwelltype;
 		error_codes := out_addr_status;		
 		
@@ -259,8 +259,8 @@ end;
 		
 		pos_sec_ver_flag3 := sum( source_W_tot, source_AM_tot, prof_license_flag2 );	
 		
-		since_add1_date_first_seen_a := sysyear - (integer)add1_date_first_seen[1..4];
-		since_add2_date_first_seen_a := sysyear - (integer)add2_date_first_seen[1..4];
+		since_add1_date_first_seen_a := sysyear - (integer)((STRING)add1_date_first_seen)[1..4];
+		since_add2_date_first_seen_a := sysyear - (integer)((STRING)add2_date_first_seen)[1..4];
 
 		since_add1_date_first_seen := if(since_add1_date_first_seen_a > 2000, -9999, since_add1_date_first_seen_a);
 		since_add2_date_first_seen := if(since_add2_date_first_seen_a > 2000, -9999, since_add2_date_first_seen_a);
@@ -467,21 +467,21 @@ end;
  /* Time Since */
 
 
-			mth_since_adl_EQ_first_seen := if((integer)adl_EQ_first_seen[5..6] > 0 and (integer)adl_EQ_first_seen[1..4] > 0,
+			mth_since_adl_EQ_first_seen := if((integer)((STRING)adl_EQ_first_seen)[5..6] > 0 and (integer)((STRING)adl_EQ_first_seen)[1..4] > 0,
 																			round((ut.DaysApart((string4)sysyear+(string2)sysmth+'01', 
-																				adl_EQ_first_seen[1..4] + adl_EQ_first_seen[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
+																				((STRING)adl_EQ_first_seen)[1..4] + ((STRING)adl_EQ_first_seen)[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
 			
-			mth_since_adl_PR_first_seen := if((integer)adl_PR_first_seen[5..6] > 0 and (integer)adl_PR_first_seen[1..4] > 0,
+			mth_since_adl_PR_first_seen := if((integer)((STRING)adl_PR_first_seen)[5..6] > 0 and (integer)((STRING)adl_PR_first_seen)[1..4] > 0,
 																			round((ut.DaysApart((string4)sysyear+(string2)sysmth+'01', 
-																				adl_PR_first_seen[1..4] + adl_PR_first_seen[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
+																				((STRING)adl_PR_first_seen)[1..4] + ((STRING)adl_PR_first_seen)[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
 																			
-			mth_since_adl_V_first_seen  := if((integer)adl_V_first_seen[5..6] > 0 and (integer)adl_V_first_seen[1..4] > 0,
+			mth_since_adl_V_first_seen  := if((integer)((STRING)adl_V_first_seen)[5..6] > 0 and (integer)((STRING)adl_V_first_seen)[1..4] > 0,
 																			round((ut.DaysApart((string4)sysyear+(string2)sysmth+'01', 
-																				adl_V_first_seen[1..4] + adl_V_first_seen[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
+																				((STRING)adl_V_first_seen)[1..4] + ((STRING)adl_V_first_seen)[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
 
-			mth_since_adl_EM_first_seen := if((integer)adl_EM_first_seen[5..6] > 0 and (integer)adl_EM_first_seen[1..4] > 0,
+			mth_since_adl_EM_first_seen := if((integer)((STRING)adl_EM_first_seen)[5..6] > 0 and (integer)((STRING)adl_EM_first_seen)[1..4] > 0,
 																			round((ut.DaysApart((string4)sysyear+(string2)sysmth+'01', 
-																				adl_EM_first_seen[1..4] + adl_EM_first_seen[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
+																				((STRING)adl_EM_first_seen)[1..4] + ((STRING)adl_EM_first_seen)[5..6] + '01')) * ( 12 / 365.25 )), -9999 /*NULL*/);					
 																			
 																			
 
@@ -1374,7 +1374,7 @@ end;
 
 	/* Property */
 
-			add1_purchase_year := (integer)(string)add1_purchase_date[1..4];
+			add1_purchase_year := (integer)((string)add1_purchase_date)[1..4];
 
 			since_add1_purchase_tmp := (sysyear - add1_purchase_year);
 

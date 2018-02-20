@@ -1,4 +1,4 @@
-/*2013-03-20T18:24:25Z (Charles Morton)
+﻿/*2013-03-20T18:24:25Z (Charles Morton)
 
 */
 // Files -- Define, build, and reference DOT base file(s)
@@ -15,7 +15,7 @@
 // might be less fuzzy on address and name for internally linking the dots.
 // 
 // Then comes the legal id(lgid), which arises out of specific relationships of dots that
-// we cluster together.  Each legal entity in lexisnexis would have it’s own lgid.
+// we cluster together.  Each legal entity in lexisnexis would have itâ€™s own lgid.
 // 
 // Then, the division id(BDL?) which is clusters of lgids(so, another spc file with lgid as
 // the id and different relationships based on LNCA).  For the lexis hierarchy, this would
@@ -28,7 +28,7 @@
 // --------------------------------------------------------------------------------------------
 
 
-import Business_DOT, ut, AID, AID_Build, mdr, BIPV2, BIPV2_Company_Names;
+import Business_DOT, ut, AID, AID_Build, mdr, BIPV2, BIPV2_Company_Names, Data_Services;
 
 export Files := module
 
@@ -49,7 +49,7 @@ export Files := module
 
 	// Prod data - not versioned
 	shared l_as_linking		:= BIPV2.Layout_Business_Linking_Full;
-	export ds_as_linking	:= dataset(ut.foreign_prod+'thor_data400::persist::BIPV2::BL_Init', l_as_linking, thor);
+	export ds_as_linking	:= dataset(data_services.data_location.prefix() + 'thor_data400::persist::BIPV2::BL_Init', l_as_linking, thor);
 	
 	export city_samp(ds_in, st_field, city_field) := macro
 		ds_in(
@@ -441,7 +441,7 @@ export Files := module
 	shared preview_samp := ds_src8;
 	
 	// base files ripped from prod - generally this is now better than recomputing the derived fields in Dataland
-	shared f_prodbase					:= ut.foreign_prod+'thor_data400::bipv2_dotid::base';
+	shared f_prodbase					:= Data_Services.data_location.prefix()+'thor_data400::bipv2_dotid::base';
 	export ds_prodbase				:= dataset(f_prodbase, l_dot, thor);
 	export ds_prodbase_samp		:= city_samp(ds_prodbase, st, v_city_name);
 	export ds_prodbase_samp2	:= ds_prodbase(st in ['OH','FL']);

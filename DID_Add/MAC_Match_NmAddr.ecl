@@ -53,8 +53,8 @@ integer %min4% (integer l1, integer l2, integer l3, integer l4) := %min2%(%min2%
 							%min4%(
 								r.fl_nosec_count,
 								IF (l.sec_range_field=r.sec_range and r.fl_sec_count<>0, r.fl_sec_count, 999 ),
-								%min2%(IF (DidVille.fn_midmatch(l.mname_field,r.mname) and ut.Translate_Suffix(l.suffix_field) = ut.Translate_Suffix(r.name_suffix) and r.fmls_nosec_count<>0, r.fmls_nosec_count, 999 ),
-								       IF (DidVille.fn_midmatch(l.mname_field,r.mname) and ut.Translate_Suffix(l.suffix_field) = ut.Translate_Suffix(r.name_suffix) and l.sec_range_field=r.sec_range and r.fmls_sec_count<>0, r.fmls_sec_count, 999 )),
+								%min2%(IF (DidVille.fn_midmatch(l.mname_field,r.mname) and ut.fGetSuffix(l.suffix_field) = ut.fGetSuffix(r.name_suffix) and r.fmls_nosec_count<>0, r.fmls_nosec_count, 999 ),
+								       IF (DidVille.fn_midmatch(l.mname_field,r.mname) and ut.fGetSuffix(l.suffix_field) = ut.fGetSuffix(r.name_suffix) and l.sec_range_field=r.sec_range and r.fmls_sec_count<>0, r.fmls_sec_count, 999 )),
 								if (r.fl_pz_count = 1, r.fl_pz_count,999)
 								)))
 				* if(datalib.preferredfirstNew(l.fname_field,Header_Slimsort.Constants.UsePFNew) = r.fname or r.did = 0, 1, 0.98) * if(l.zip_field != r.zip,.95,1) //rem pf(r)

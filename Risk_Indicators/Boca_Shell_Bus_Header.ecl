@@ -1,4 +1,4 @@
-/*2014-12-03T01:11:33Z (David Schlangen)
+﻿/*2014-12-03T01:11:33Z (David Schlangen)
 change for bug 165691
 */
 import ut, business_risk, did_add;
@@ -37,7 +37,7 @@ temp_rec add_business_header(Risk_Indicators.Layout_Boca_Shell  le, bha rt) := t
 						h_dt_first_seen + '01', 
 						h_dt_first_seen);
 		self.years_since_first_seen := if(nomatch, 0, 
-																		ut.GetAgeI_asOf((unsigned)dt_first_seen, 
+																		ut.Age((unsigned)dt_first_seen, 
 																										(unsigned)today) );, 
 		fnamematch := risk_indicators.iid_constants.g( business_risk.CnameScore(le.shell_input.fname, rt.company_name) );
 		lnamematch := risk_indicators.iid_constants.g( business_risk.CnameScore(le.shell_input.lname, rt.company_name) );
@@ -105,7 +105,7 @@ temp_rec add_business_header(Risk_Indicators.Layout_Boca_Shell  le, bha rt) := t
 
 		// limit some of these fields to just the time period of when the subject lived there, bug 165691
 		valid_business_header := bsversion < 50 or ((unsigned)rt.dt_first_seen<>0 and
-							(unsigned)(rt.dt_first_seen[1..6]) between le.address_verification.input_address_information.date_first_seen and 
+							(unsigned)(((STRING)rt.dt_first_seen)[1..6]) between le.address_verification.input_address_information.date_first_seen and 
 																													le.address_verification.input_address_information.date_last_seen);
 																													
 		self.bus_hdr_source_category_code := map(bus_hdr_source='' or ~valid_business_header => '',
@@ -162,7 +162,7 @@ with_business_header := join(clam_pre_bus_header, bha,
 						keyed(left.shell_input.prim_name=right.prim_name) and
 						keyed(right.prim_range=left.shell_input.prim_range) and
 						keyed(right.sec_range=left.shell_input.sec_range) and
-						(unsigned)(right.dt_first_seen[1..6]) < left.historydate,
+						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate,
 			 add_business_header(left, right), atmost(10000),
 						keep(1000),
 			 left outer);
@@ -213,9 +213,9 @@ temp_rec2 roll_bus(temp_rec2 le, temp_rec2 rt) := transform
 	self.bus_sources_record_cnt := trim(le.bus_sources_record_cnt) + rt.bus_sources_record_cnt +',';
 	self.bus_sources := trim(le.bus_sources) + rt.bus_sources +',';
 	self.bus_sources_first_seen_dates := trim(le.bus_sources_first_seen_dates) + rt.bus_sources_first_seen_dates +',';
-	self.bus_name_match := ut.max2(le.bus_name_match, rt.bus_name_match);
-	self.bus_ssn_match := ut.max2(le.bus_ssn_match,rt.bus_ssn_match);
-	self.bus_phone_match := ut.max2(le.bus_phone_match, rt.bus_phone_match);
+	self.bus_name_match := max(le.bus_name_match, rt.bus_name_match);
+	self.bus_ssn_match := max(le.bus_ssn_match,rt.bus_ssn_match);
+	self.bus_phone_match := max(le.bus_phone_match, rt.bus_phone_match);
 
 	self := rt;
 end;

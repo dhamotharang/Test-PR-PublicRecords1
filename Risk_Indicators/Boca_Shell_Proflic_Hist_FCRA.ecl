@@ -146,7 +146,7 @@ end;
 // rollup now by did, source_st and license_number instead of proflic_source and proflic_key
 license_recs_dates:= project(license_recs(professional_license_flag = true), transform(PL_Plus_temp, 
 	self.tmp_MostRecent := if(LENGTH(trim((string8) left.date_most_recent)) < 8 and left.date_most_recent != 0,
-		(unsigned)	((string) left.date_most_recent[1..6] + '01'), left.date_most_recent), self := left));
+		(unsigned)	(((STRING)left.date_most_recent)[1..6] + '01'), left.date_most_recent), self := left));
 	
 Sorted_licenses := sort(license_recs_dates, seq, did, -license_number_cleaned, source_st,
 		-tmp_MostRecent, -proflic_count);

@@ -1,11 +1,11 @@
-import lib_stringlib, _Control, ut, lib_DataLib; //, LIB_Word; //IDL_Header,
+﻿import lib_stringlib, _Control, ut, lib_DataLib, Data_Services; //, LIB_Word; //IDL_Header,
 /*************
 This module is used by the name repository to look up likely first and last names
 *************/
 EXPORT NameTester := MODULE
 
 //shared dsWordTokens := WordTokens;
-shared dsWordTokens := DATASET(MAP(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => ut.foreign_prod, '') + '~thor::nid::aux::businesstokens',Layout_Weighted_Tokens, THOR);
+shared dsWordTokens := DATASET(MAP(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => Data_Services.data_location.prefix(), '') + '~thor::nid::aux::businesstokens',Layout_Weighted_Tokens, THOR);
 // shared dsWordTokens := DATASET('~thor::nid::aux::businesstokens',Layout_Weighted_Tokens, THOR);
 
 // business words						
@@ -33,7 +33,7 @@ export boolean IsInConjuctives(string s) :=
 				TokenManagement.FindToken(conjunctives, s);                                                                                                     
 
 shared dataland := '~thor40_241::';	//		'~thor40_241::;	//'~thor200_144::';
-shared cluster :=  map(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => ut.foreign_prod + 'thor_data400::',
+shared cluster :=  map(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => data_services.data_location.prefix() + 'thor_data400::',
 									     _Control.ThisEnvironment.name='Dataland' => dataland,
 											 '~thor_data400::');
 // shared cluster :=  IF(Thorlib.Daliservers()='10.173.11.12:7070',ut.foreign_prod + '~thor_data400::',IF(_Control.ThisEnvironment.name='Dataland', dataland,'~thor_data400::'));
@@ -65,7 +65,7 @@ export file_fnames := DEDUP(
 							name);
 					
 //shared dsFirstNames := Firstnames;
-shared dsFirstNames := DATASET(MAP(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => ut.foreign_prod, '') + '~thor::nid::aux::firstnames',{string20 name, string1 gender},THOR);
+shared dsFirstNames := DATASET(MAP(Thorlib.Daliservers() in ['10.173.231.12:7070', '10.173.11.12:7070'] => data_services.data_location.prefix(), '') + '~thor::nid::aux::firstnames',{string20 name, string1 gender},THOR);
 // shared dsFirstNames := DATASET('~thor::nid::aux::firstnames',{string20 name, string1 gender},THOR);
 
 fnames := SET(file_fnames, name) + SET(dsFirstNames, name);	

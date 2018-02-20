@@ -7,8 +7,8 @@ layouts.layout_Impulse_Email_Did_Key	tBasetoKey(layouts.layout_Impulse_Email_fin
 		TRANSFORM
 			self.AID											:=	(unsigned4)(string)pInput.RawAID;
 			self.ProcessDate							:=	pInput.file_date[1..6];
-			self.DateVendorFirstReported	:=	(unsigned3)(string)pInput.DateVendorFirstReported[1..6];
-			self.DateVendorLastReported		:=	(unsigned3)(string)pInput.DateVendorLastReported[1..6];
+			self.DateVendorFirstReported	:=	(unsigned3)((string)pInput.DateVendorFirstReported)[1..6];
+			self.DateVendorLastReported		:=	(unsigned3)((string)pInput.DateVendorLastReported)[1..6];
 			self.cln_PRIM_RANGE						:=	pInput.prim_range;
 			self.cln_PRIM_NAME						:=	pInput.prim_name;
 			self.cln_SEC_RANGE						:=	pInput.sec_range;

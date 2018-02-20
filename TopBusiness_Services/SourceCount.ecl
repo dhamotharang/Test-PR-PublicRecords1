@@ -72,7 +72,7 @@ EXPORT SourceCount(
 			l_tmp toCnt(l_tmp L, l_tmp R) := TRANSFORM
 				SELF.occurrences		:= L.occurrences + R.occurrences;
 				SELF.dt_first_seen	:= ut.min2(L.dt_first_seen, R.dt_first_seen);
-				SELF.dt_last_seen		:= ut.max2(L.dt_last_seen, R.dt_last_seen);
+				SELF.dt_last_seen		:= Max(L.dt_last_seen, R.dt_last_seen);
 				SELF := L;
 			END;
 			cnt := rollup(sort(tmp, cat_type, src), toCnt(LEFT,RIGHT), cat_type, src);
@@ -81,7 +81,7 @@ EXPORT SourceCount(
 			l_tmp toMerged(l_tmp L, l_tmp R) := TRANSFORM
 				SELF.occurrences		:= L.occurrences + R.occurrences;
 				SELF.dt_first_seen	:= ut.min2(L.dt_first_seen, R.dt_first_seen);
-				SELF.dt_last_seen		:= ut.max2(L.dt_last_seen, R.dt_last_seen);
+				SELF.dt_last_seen		:= Max(L.dt_last_seen, R.dt_last_seen);
 				SELF := L;
 			END;
 			cnt_s		:= sort(cnt, cat_type, src_desc, -occurrences, src, RECORD);

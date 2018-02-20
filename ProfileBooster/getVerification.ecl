@@ -1,4 +1,4 @@
-import Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, address, AID_Build;
+﻿import Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, address, AID_Build;
 
 EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell, boolean onThor=false) := FUNCTION
 
@@ -255,7 +255,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		SELF.address_history_seq	:= address_history_seq;
 		SELF.hdr_date_first_seen	:= ri.date_first_seen;
 		SELF.hdr_date_last_seen		:= ri.date_last_seen;
-		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart((string)le.historyDate,(string)ri.date_first_seen[1..6]), nines);
+		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart((string)le.historyDate,((string)ri.date_first_seen)[1..6]), nines);
 		SELF 											:= le;
 	END;
 	
@@ -424,14 +424,14 @@ address_rank_key := header.key_addr_hist(isFCRA);
 	addr_stats := record
 		seq := d_addr.seq;
 		did := d_addr.did;
-		addr_ct := count(group);
-		addr_ct_last30days :=  count(group, d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	// same or greater dt first seen than build date
-		addr_ct_last90days :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < 60 ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_c6 :=          count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < risk_indicators.iid_constants.fiveMonths ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last1year :=   count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < risk_indicators.iid_constants.elevenMonths ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last2years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < risk_indicators.iid_constants.twentythreeMonths ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last3years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < risk_indicators.iid_constants.thirtyfiveMonths ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	
-		addr_ct_last5years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, d_addr.dt_first_seen[1..6]+'31') < risk_indicators.iid_constants.fiftynineMonths ) or d_addr.dt_first_seen[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
+		addr_ct := count(group); 
+		addr_ct_last30days :=  count(group, (((STRING)d_addr.dt_first_seen)[1..6])+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	// same or greater dt first seen than build date
+		addr_ct_last90days :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < 60 ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
+		addr_ct_c6 :=          count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiveMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
+		addr_ct_last1year :=   count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.elevenMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
+		addr_ct_last2years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.twentythreeMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
+		addr_ct_last3years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.thirtyfiveMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	
+		addr_ct_last5years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiftynineMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
 	end;
 	
 	addr_counts := table(d_addr, addr_stats, seq, did, local);
@@ -452,13 +452,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		seq := d_last.seq;
 		did := d_last.did;
 		lname_ct :=    count(group);
-		lname_ct30 :=  count(group, d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	// same or greater dt first seen than build date
-		lname_ct90 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < 60 ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct180 := count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < Risk_Indicators.iid_constants.fiveMonths ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct12 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < Risk_Indicators.iid_constants.elevenMonths ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct24 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < Risk_Indicators.iid_constants.twentythreeMonths ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct36 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < Risk_Indicators.iid_constants.thirtyfiveMonths ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	
-		lname_ct60 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, d_last.dt_first_seen[1..6]+'31') < Risk_Indicators.iid_constants.fiftynineMonths ) or d_last.dt_first_seen[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
+		lname_ct30 :=  count(group, ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	// same or greater dt first seen than build date
+		lname_ct90 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < 60 ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
+		lname_ct180 := count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.fiveMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
+		lname_ct12 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.elevenMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
+		lname_ct24 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.twentythreeMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
+		lname_ct36 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.thirtyfiveMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	
+		lname_ct60 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.fiftynineMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
 	END;
 	
 	lname_counts := table(d_last, lname_stats, seq, did, local);

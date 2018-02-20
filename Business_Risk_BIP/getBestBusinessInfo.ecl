@@ -150,7 +150,7 @@
 	
 	PropertyAssessments := JOIN(DEDUP(SORT(property_by_address, Seq, Fares_ID), Seq, Fares_ID), KASF, 
 															KEYED(LEFT.Fares_ID = RIGHT.LN_Fares_ID) 
-															AND (unsigned3)right.proc_date[1..6] <= left.historydate
+															AND (unsigned3)((STRING)right.proc_date)[1..6] <= left.historydate
 															AND (unsigned3)right.recording_date[1..6] <= left.historydate,
 															get_Assessements(LEFT,RIGHT),
 															ATMOST(keyed(LEFT.fares_id=RIGHT.ln_fares_id),Business_Risk_BIP.Constants.Limit_Assessments));

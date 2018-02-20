@@ -253,7 +253,7 @@ EXPORT BankruptcySource_Records (
 			self.hasAddr 	:= exists(L.debtors(exists(addresses(st <>'' or zip <>''))));
 		  self.hasPhone := exists(L.debtors(exists(phones(phone <>''))));
 			self.dt_first_seen := ut.NormDate((unsigned)L.orig_filing_date);
-			self.dt_last_seen := ut.max2(ut.NormDate((unsigned)L.disposed_date),ut.NormDate((unsigned)L.reopen_date));
+			self.dt_last_seen := max(ut.NormDate((unsigned)L.disposed_date),ut.NormDate((unsigned)L.reopen_date));
 			self := [];
 	END;
 		

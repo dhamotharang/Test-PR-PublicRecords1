@@ -1,9 +1,9 @@
-import ut, risk_indicators, gong, header_services ;
+﻿import ut, risk_indicators, gong, header_services, header ;
 
 ut.mac_suppress_by_phonetype(File_Gong_History_FullEx,phone10,st,histGong_out,true,did);
 
 /* Swap City Names - V City provides a better quality of names - Bug 42318 */
-ut.Mac_Apply_Title(histGong_out, name_prefix, name_first, name_middle, temp_apply_title) ;
+header.Mac_Apply_Title(histGong_out, name_prefix, name_first, name_middle, temp_apply_title) ;
 
 trSwapCityNames := project(temp_apply_title, 
 											transform(recordof(histGong_out),

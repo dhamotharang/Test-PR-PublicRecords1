@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 RVG_DEBUG := FALSE;
 
 export RVG904_1_0( dataset(risk_indicators.layout_boca_shell) clam, boolean isCalifornia ) := FUNCTION
@@ -101,7 +101,7 @@ export RVG904_1_0( dataset(risk_indicators.layout_boca_shell) clam, boolean isCa
 		rc_hrisksic                     :=  (INTEGER)le.iid.hrisksic;
 
 		inferred_dob                    :=  le.reported_dob;
-		archive_date                    :=  if( le.historydate=999999, (unsigned3)ut.GetDate[1..6], le.historydate );
+		archive_date                    :=  if( le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate );
 
 		/************************************************************************************/
 		/* Code Starts Here		                                                           */
@@ -230,8 +230,8 @@ export RVG904_1_0( dataset(risk_indicators.layout_boca_shell) clam, boolean isCa
 		* 	the month.                                            *
 		***********************************************************/
 
-		curr_date := ut.DaysSince1900( archive_date[1..4], archive_date[5..6], '01' );
-		infer_date := if( length((string)inferred_dob) >= 6, ut.DaysSince1900( inferred_dob[1..4], inferred_dob[5..6], '01' ), NULL );
+		curr_date := ut.DaysSince1900( ((STRING)archive_date)[1..4], ((STRING)archive_date)[5..6], '01' );
+		infer_date := if( length((string)inferred_dob) >= 6, ut.DaysSince1900( ((STRING)inferred_dob)[1..4], ((STRING)inferred_dob)[5..6], '01' ), NULL );
 
 
 		dob := ut.DaysSince1900( in_dob[1..4], (string4)max( 1, (integer4)in_dob[5..6]), '01' );

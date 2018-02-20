@@ -17,7 +17,7 @@ end;
 slim_rec tnormalize(get_recs L, integer cnt) := transform
 
 self.DL_number := choose(cnt, L.orig_DL_number, L.Append_DL_number);
-	age := ut.getage(l.orig_dob);
+	age := ut.age((INTEGER)l.orig_dob);
 self.is_minor := if(age=0 or age>=18,FALSE,TRUE);
 self := L;
 

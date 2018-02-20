@@ -32,7 +32,7 @@ module
 	  unsigned8 rid:=0;
     BIPV2.IDlayouts.l_xlink_ids; 
     contacts_sources;
-		boolean executive_ind:='';
+		boolean executive_ind:=FALSE;
 		integer executive_ind_order:=0;
   end;
   

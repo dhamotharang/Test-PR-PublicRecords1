@@ -75,7 +75,7 @@ end;
 		self.seq := (unsigned6) r.acctno;
 		self.Bill_To_Out := l.Bill_To_Output;
 		self.Ship_To_Out := l.Ship_To_Output;
-		self.dt_first_seen := r.dt_first_seen[1..6];
+		self.dt_first_seen := ((STRING)r.dt_first_seen)[1..6];
 		self.company_status_derived := r.company_status_derived;
 		self := [];
 	end;
@@ -91,7 +91,7 @@ end;
 			keep(riskwise.max_atmost), left outer);
 	bt_with_bus_addr := join(bus_input(Bill_To_Output.seq != 0), bt_with_bus_addr_jnd,
 			(unsigned6) LEFT.Bill_To_Output.seq = (unsigned6) RIGHT.seq and	
-		right.dt_first_seen < left.bill_to_output.historydate[1..6] and 
+		right.dt_first_seen < ((STRING)left.bill_to_output.historydate)[1..6] and 
 			trim(StringLib.StringToUpperCase(right.company_status_derived)) = Risk_Indicators.iid_constants.ActiveText,
 		transform(right), left outer);
 		
@@ -126,7 +126,7 @@ end;
 			
 	st_with_bus_addr := join(bus_input(Ship_To_Output.seq != 0), st_with_bus_addr_jnd,
 			(unsigned6) LEFT.Ship_To_Output.seq = (unsigned6) RIGHT.seq and	
-		right.dt_first_seen < left.Ship_To_Output.historydate[1..6] and 
+		right.dt_first_seen < ((STRING)left.Ship_To_Output.historydate)[1..6] and 
 			trim(StringLib.StringToUpperCase(right.company_status_derived)) = Risk_Indicators.iid_constants.ActiveText,
 		transform(right), left outer);
 		

@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, TopBusiness_Services, ut;
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, TopBusiness_Services, ut, std;
 
 EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inmod, 
 																DATASET(doxie.layout_references) ds_individualOwnerOnlyDids,
@@ -167,7 +167,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
 													cycle_end_date);
 	
-	y_trades_HistoryRecsFiltered := y_trades_HistoryRecs(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ut.GetDate[1..6]);
+	y_trades_HistoryRecsFiltered := y_trades_HistoryRecs(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ((STRING8)Std.Date.Today())[1..6]);
 
 	iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory trans_y_paymenthistory (y_trades_HistoryRecs L ) := TRANSFORM
 
@@ -282,7 +282,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 										#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()));
 
 	z_trades_HistoryRecs := DEDUP(SORT(z_trades , UltID, OrgID, SeleID, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date),
-														cycle_end_date)(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ut.GetDate[1..6]);
+														cycle_end_date)(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and Cycle_end_date < ((STRING8)Std.Date.Today())[1..6]);
 
 	Z_AccDetail_temp  := RECORD
 		iesp.businesscreditreport.t_BusinessCreditAccountDetails RelatedAccountDetails;

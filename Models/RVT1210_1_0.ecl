@@ -1,7 +1,7 @@
 /*2013-02-06T19:50:29Z (Kevin Huls)
 Per Lea - tightened code around 9D reason code so it is not returned so often.  Also added check to return score '000' if reason code 35 is returned.
 */
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVT1210_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE ) := FUNCTION
 
@@ -210,7 +210,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 //It appears the convertor did not map sysdate appropriately.  Replacing the above line with the below standard code. 
 
 sysdate := map(
-    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
     length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
                                                            NULL);
 

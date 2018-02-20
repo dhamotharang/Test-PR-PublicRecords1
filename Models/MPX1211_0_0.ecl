@@ -1,7 +1,7 @@
 /*Now (cmandan)
 Text In Open Window
 */
-import risk_indicators, ut, riskwise;
+import risk_indicators, ut, riskwise, std;
 
 export MPX1211_0_0( dataset(risk_indicators.layout_boca_shell) clam ) := FUNCTION
 
@@ -78,10 +78,10 @@ export MPX1211_0_0( dataset(risk_indicators.layout_boca_shell) clam ) := FUNCTIO
 		attr_num_proflic_exp90					 :=	le.professional_license.expire_count90;
 		
 		//Attributes from Attributes_Master
-		history_date := if( le.historydate=999999, ut.getdate[1..6], (string6)le.historydate );
+		history_date := if( le.historydate=999999, ((STRING)Std.Date.Today())[1..6], (string6)le.historydate );
 		NULL := -1;
-		getMonths( unsigned date ) := if(date=0, NULL, max(0,((integer)history_date[1..4] - (integer)date[1..4])*12
-																			+ (integer)history_date[5..6] - (integer)date[5..6]));		
+		getMonths( unsigned date ) := if(date=0, NULL, max(0,((integer)history_date[1..4] - (integer)((STRING)date)[1..4])*12
+																			+ (integer)history_date[5..6] - (integer)((STRING)date)[5..6]));		
 		
 		attr 														 := Models.Attributes_Master(le,true);
 		SSNAddrCount										 := (integer)attr.SSNAddrCount;

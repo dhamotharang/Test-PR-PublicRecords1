@@ -1,4 +1,4 @@
-import risk_indicators, easi, riskwise, ut;
+import risk_indicators, easi, riskwise, ut, std;
 
 export CDN908_1_0(
 	grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
@@ -369,7 +369,7 @@ export CDN908_1_0(
 		rel_homeover500_count            := le.bill_to_out.relatives.relative_homeover500_count;
 		rel_educationover12_count        := le.bill_to_out.relatives.relative_educationover12_count;
 		inferred_dob                     := le.bill_to_out.reported_dob;
-		archive_date                     := if(le.bill_to_out.historydate=999999, (unsigned)ut.getdate, le.bill_to_out.historydate);
+		archive_date                     := if(le.bill_to_out.historydate=999999, (unsigned)Std.Date.Today(), le.bill_to_out.historydate);
 		C_FAMMAR_P                       := le.easi.fammar_p;
 		c_assault                        := le.easi.assault;
 		c_burglary                       := le.easi.burglary;
@@ -776,18 +776,18 @@ export CDN908_1_0(
 
 	
 	inferred_dob2 := map(
-		length((string)inferred_dob)=8 and (integer)((string)inferred_dob[1..4])>=1800 =>
-	    ut.DaysSince1900((string)inferred_dob[1..4], (string)min(12,max(1,(integer)((string)inferred_dob[5..6]))), '01') +min(31,max(1, (integer)((string)(inferred_dob)[7..8])))-1,
-		length((string)inferred_dob)=6 and (integer)((string)inferred_dob[1..4])>=1800 =>
-			ut.DaysSince1900((string)inferred_dob[1..4], (string)min(12,max(1,(integer)((string)inferred_dob[5..6]))), '01'),
+		length((string)inferred_dob)=8 and (integer)(((string)inferred_dob)[1..4])>=1800 =>
+	    ut.DaysSince1900(((string)inferred_dob)[1..4], (string)min(12,max(1,(integer)(((string)inferred_dob)[5..6]))), '01') +min(31,max(1, (integer)(((string)inferred_dob)[7..8])))-1,
+		length((string)inferred_dob)=6 and (integer)(((string)inferred_dob)[1..4])>=1800 =>
+			ut.DaysSince1900(((string)inferred_dob)[1..4], (string)min(12,max(1,(integer)(((string)inferred_dob)[5..6]))), '01'),
 		NULL
 	);
 		
 	inferred_dob_s2 := map(
-		length((string)inferred_dob_s)=8 and (integer)((string)inferred_dob_s[1..4])>=1800 =>
-	    ut.DaysSince1900((string)inferred_dob_s[1..4], (string)min(12,max(1,(integer)((string)inferred_dob_s[5..6]))), '01') +min(31,max(1, (integer)inferred_dob_s[7..8]))-1,
-		length((string)inferred_dob_s)=6 and (integer)((string)inferred_dob_s[1..4])>=1800 =>
-			ut.DaysSince1900((string)inferred_dob_s[1..4], (string)min(12,max(1,(integer)((string)inferred_dob_s[5..6]))), '01'),
+		length((string)inferred_dob_s)=8 and (integer)(((string)inferred_dob_s)[1..4])>=1800 =>
+	    ut.DaysSince1900(((string)inferred_dob_s)[1..4], (string)min(12,max(1,(integer)(((string)inferred_dob_s)[5..6]))), '01') + min(31,max(1, (integer)((STRING)inferred_dob_s)[7..8]))-1,
+		length((string)inferred_dob_s)=6 and (integer)(((string)inferred_dob_s)[1..4])>=1800 =>
+			ut.DaysSince1900(((string)inferred_dob_s)[1..4], (string)min(12,max(1,(integer)(((string)inferred_dob_s)[5..6]))), '01'),
 		NULL
 	);
 	
@@ -795,8 +795,8 @@ export CDN908_1_0(
 	inferred_date_s := inferred_dob_s2;
 
 
-	scoring_date    := ut.DaysSince1900(archive_date[1..4],   archive_date[5..6],   '01');
-	scoring_date_s  := ut.DaysSince1900(archive_date_s[1..4], archive_date_s[5..6], '01');
+	scoring_date    := ut.DaysSince1900(((STRING)archive_date)[1..4],  ((STRING)archive_date)[5..6],   '01');
+	scoring_date_s  := ut.DaysSince1900(((STRING)archive_date_s)[1..4], ((STRING)archive_date_s)[5..6], '01');
 
 
 	inferred_age := map(

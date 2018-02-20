@@ -1,10 +1,10 @@
-import ut;
+import ut, data_services;
 
 /* Recreation of MBS on thor. New Files uploaded daily. 1 version of file saved in fathered super.  */
 
 export File_MBS := module
 
-export File := dataset(ut.foreign_logs + 'thor10_11::out::inquiry_acclogs::file_mbs', Inquiry_Acclogs.Layout_MBS, thor);
+export File := dataset(Data_Services.foreign_logs + 'thor10_11::out::inquiry_acclogs::file_mbs', Inquiry_Acclogs.Layout_MBS, thor);
 
 export CreateFile(string param_version = ut.GetDate) := function
 

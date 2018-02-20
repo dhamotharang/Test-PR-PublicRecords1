@@ -32,7 +32,7 @@ boolean lexIDOnlyOnInput := false; //for RV 50 models
 isFCRA := if(model_environment=2, true, false); 
 
 riskview.layouts.Layout_Custom_Inputs intoCustomInput(clam le) := TRANSFORM
-		customInputs := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview_share.t_ModelOptionRV,
+		customInputs := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.riskview_share.t_ModelOptionRV,
 					self.OptionName:= 'tuln_channel';
 					self.OptionValue := '';
 					SELF := []))[1];

@@ -104,7 +104,7 @@ end;
 l_hist_thin toHistThin(f_search L) := transform
 	self.ln_fares_id	:= L.ln_fares_id;
 	self.dt_seen			:= L.dt_first_seen*100;
-	self.owners				:= project(ut.ds_oneRecord, toOwnerThin(L));
+	self.owners				:= project(dataset([{1}], {unsigned a}), toOwnerThin(L));
 end;
 
 l_owner_full toOwnerFull(f_search L) := transform
@@ -127,8 +127,8 @@ l_work toWork(f_search L) := transform
 	self.current									:= false;
 	
 	// Available in search data
-	self.hist											:= project(ut.ds_oneRecord, toHistThin(L));
-	self.cur_owners								:= project(ut.ds_oneRecord, toOwnerFull(L));
+	self.hist											:= project(dataset([{1}], {unsigned a}), toHistThin(L));
+	self.cur_owners								:= project(dataset([{1}], {unsigned a}), toOwnerFull(L));
 	self.rawaid										:= L.append_rawaid;
 	self.addr_suffix							:= L.suffix;
 	self.zip5											:= L.zip;
@@ -506,7 +506,7 @@ ds_norm2 := normalize(ds_norm1, left.owners, toNorm2(left,right));
 l_id rollDid(l_id L, l_id R) := transform
 	self.current				:=	L.current or R.current; // if any record is the latest, then we're the current owner
 	self.dt_first_seen	:=	ut.min2(L.dt_first_seen,	R.dt_first_seen);
-	self.dt_last_seen		:=	ut.max2(L.dt_last_seen,	R.dt_last_seen);
+	self.dt_last_seen		:=	Max(L.dt_last_seen,	R.dt_last_seen);
 	self								:=	L;
 end;
 

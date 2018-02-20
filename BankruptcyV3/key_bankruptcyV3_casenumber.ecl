@@ -1,7 +1,7 @@
-import BankruptcyV2, fcra, Doxie, ut;
+import BankruptcyV2, fcra, Doxie, ut, std;
 
 export key_bankruptcyV3_casenumber(boolean isFCRA = false) := function
-  todaysdate := ut.GetDate;
+  todaysdate := (STRING8)Std.Date.Today();
 	get_recs := BankruptcyV2.file_bankruptcy_main_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 
 	slim_rec := record

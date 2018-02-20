@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export TRD605_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := 
 
@@ -28,7 +28,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 					    1);
 					    
 	
-	today := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.historydate <> 999999, ((STRING)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
      dob_m := (integer)(le.shell_input.dob[5..6]);
@@ -190,7 +190,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 	TRD6053a := if( TRD6053 > 650, TRD6053-60, TRD6053 ); // the override score, unbounded
 	TRD6053b := if( ~override, TRD6053, // when not overridden, use the already calculated score
-			ut.imin2( 650, ut.max2( 600, TRD6053a) ) ); // the override score, bound within [600,650]
+			Min( 650, Max( 600, TRD6053a) ) ); // the override score, bound within [600,650]
 
 
 	TRD6054 := map(le.ssn_verification.validation.deceased and TRD6053b > 625 => 625,

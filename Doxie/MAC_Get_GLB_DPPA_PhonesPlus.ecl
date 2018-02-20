@@ -1,4 +1,4 @@
-
+﻿
 //this function should be called after doxie.MAC_Header_Field_Declare 
 export MAC_Get_GLB_DPPA_PhonesPlus(dids_in, 
                                    cell_out, 
@@ -57,7 +57,8 @@ end;
 			   	  %get_by_did%(right), LIMIT(ut.limits.PHONE_PER_PERSON,SKIP));
 
 #uniquename(fake_dids)				    				    
-%fake_dids% := autokey.get_dids(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::phonesplusv2_',autokey_skipset,,autokey_fetch_nofail);
+
+%fake_dids% := autokey.get_dids(Data_Services.Data_location.Prefix() + 'thor_data400::key::phonesplusv2_',autokey_skipset,,autokey_fetch_nofail);
 
 #uniquename(fake_dids_ext)
 %fake_dids_ext% := project(choosen(Phonesplus_v2.Key_Phonesplus_Companyname(

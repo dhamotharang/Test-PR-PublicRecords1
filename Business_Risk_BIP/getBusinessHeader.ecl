@@ -102,7 +102,7 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	tempContactsLayout getContactInfo(BusinessHeaderUniqueContactDIDs le, getBestContactInfo ri) := TRANSFORM
 		SELF.Seq := le.Seq;
-		SELF.ContactDIDs := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutContacts,
+		SELF.ContactDIDs := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(Business_Risk_BIP.Layouts.LayoutContacts,
 																												ContactAddress := Risk_Indicators.MOD_AddressClean.street_address('', ri.Prim_Range, ri.Predir, ri.Prim_Name, ri.Suffix, ri.Postdir, ri.Unit_Desig, ri.Sec_Range);
 																		ContactCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(ContactAddress, ri.City_Name, ri.St, ri.Zip);											
 																		cleanedContactAddress := Address.CleanFields(ContactCleanAddr);

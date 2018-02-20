@@ -93,9 +93,9 @@ corp_sort_all := ungroup(sort(corprecs,seq, bdid, -LastSeenDate));
 
 
 corprec2 rollStatus(corp_sort_all le, corp_sort_all ri) := transform  // change IFs to max  todo  ut fuction for min to exclude zero
-	self.lastReinstatDate := ut.max2(le.lastReinstatDate, ri.lastReinstatDate);
-	self.lastDissolvedDate := ut.max2(le.lastDissolvedDate, ri.lastDissolvedDate);
-	self.LastSeenDate := ut.max2(le.LastSeenDate, ri.LastSeenDate);
+	self.lastReinstatDate := Max(le.lastReinstatDate, ri.lastReinstatDate);
+	self.lastDissolvedDate := Max(le.lastDissolvedDate, ri.lastDissolvedDate);
+	self.LastSeenDate := Max(le.LastSeenDate, ri.LastSeenDate);
 	self.FirstSeenDate := ut.Min2(le.FirstSeenDate, ri.FirstSeenDate);
 	self := le;
 end;

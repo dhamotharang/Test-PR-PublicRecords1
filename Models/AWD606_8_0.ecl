@@ -18,11 +18,11 @@ Layout_ModelOut tweak_score(clam le, awd605 ri) := TRANSFORM
 	ssnprior := if('03' in rc3set, 1, 0);
 	
 						
-	awd606_8 := if(~le.input_validation.address and ~le.input_validation.homephone and le.ssn_verification.validation.valid, ut.imin2(775, awd606), awd606);
+	awd606_8 := if(~le.input_validation.address and ~le.input_validation.homephone and le.ssn_verification.validation.valid, Min(775, awd606), awd606);
 
-	awdScore1 := if(ssnprior = 1 or (~le.ssn_verification.validation.valid and trim(le.shell_input.ssn) <> ''), ut.imin2(630, awd606_8), awd606_8);
+	awdScore1 := if(ssnprior = 1 or (~le.ssn_verification.validation.valid and trim(le.shell_input.ssn) <> ''), Min(630, awd606_8), awd606_8);
 
-	awdScore2 := if(le.address_validation.corrections or le.ssn_verification.validation.deceased, ut.imin2(298, awdScore1), awdScore1);
+	awdScore2 := if(le.address_validation.corrections or le.ssn_verification.validation.deceased, Min(298, awdScore1), awdScore1);
 
 	awd606_8_0 := map(
 					 le.rhode_island_insufficient_verification => 222,

@@ -1,4 +1,4 @@
-import _control, tools,ut;
+import _control, tools,ut, data_services;
 
 export _Dataset(
 
@@ -10,8 +10,8 @@ module
 	export IsDataland 					:= Tools._Constants.IsDataland;
 	
 	export foreign_environment := if(IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,data_services.foreign_prod
+																	,data_services.foreign_dataland
 																);
 												
 	export Name										:= 'POEsFromUtilities'		;

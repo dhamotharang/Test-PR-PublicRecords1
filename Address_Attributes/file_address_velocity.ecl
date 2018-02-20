@@ -3,7 +3,7 @@ import address_attributes, AddrFraud, doxie, doxie_build, header, ut;
 //consolidate header down to individual addresses
 	// head := doxie.header_pre_keybuild;
 	head := doxie_build.file_header_building;
-	earliest := Address_Attributes.Constants.YearsAgo(8)[1..6];
+	earliest := ((STRING)Address_Attributes.Constants.YearsAgo(8))[1..6];
 	head_valid := head(
 		dt_first_seen != 0,
 		dt_last_seen > (unsigned3)earliest,

@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 raw_sanc_did_file := Ingenix_NatlProf.Basefile_Sanctions;
 				
@@ -19,7 +19,7 @@ base_srt roll_it(base_srt l, base_srt r) := transform
 	self.prov_clean_fname := if(l.prov_clean_fname = '', r.prov_clean_fname, l.prov_clean_fname);
 	self.prov_clean_mname := if(l.prov_clean_mname = '', r.prov_clean_mname, l.prov_clean_mname);
 	self.prov_clean_lname := if(l.prov_clean_lname = '', r.prov_clean_lname, l.prov_clean_lname);
-	self.prov_clean_name_suffix := if(l.prov_clean_name_suffix = '' or ut.Translate_Suffix(l.prov_clean_name_suffix)=r.prov_clean_name_suffix, 
+	self.prov_clean_name_suffix := if(l.prov_clean_name_suffix = '' or ut.fGetSuffix(l.prov_clean_name_suffix)=r.prov_clean_name_suffix, 
 	                                  r.prov_clean_name_suffix, 
 							    l.prov_clean_name_suffix);
 							    
@@ -72,16 +72,16 @@ base_srt roll_it(base_srt l, base_srt r) := transform
 	self.SANC_UPDTE := if(l.SANC_UPDTE_form='', r.SANC_UPDTE, l.SANC_UPDTE);
 	
 	self.date_first_reported := (string8)ut.EarliestDate((integer)l.date_first_reported, (integer)r.date_first_reported);
-	self.date_last_reported := (string8)ut.LatestDate((integer)l.date_last_reported, (integer)r.date_last_reported);
+	self.date_last_reported := (string8)Max((integer)l.date_last_reported, (integer)r.date_last_reported);
 	
 	self.SANC_REINDTE_form := if(l.SANC_REINDTE_form='', r.SANC_REINDTE_form, l.SANC_REINDTE_form);
 	self.SANC_REINDTE := if(l.SANC_REINDTE_form='', r.SANC_REINDTE, l.SANC_REINDTE);
 	self.SANC_FAB := if(l.SANC_FAB='', r.SANC_FAB, l.SANC_FAB);
 	self.SANC_UNAMB_IND := if(l.SANC_UNAMB_IND='', r.SANC_UNAMB_IND, l.SANC_UNAMB_IND);
 	
-     self.process_date := (string8)ut.LatestDate((integer)l.process_date, (integer)r.process_date);
+  self.process_date := (string8)Max((integer)l.process_date, (integer)r.process_date);
 	self.date_first_seen := (string8)ut.EarliestDate((integer)l.date_first_seen, (integer)r.date_first_seen);
-	self.date_last_seen := (string8)ut.LatestDate((integer)l.date_last_seen, (integer)r.date_last_seen);
+	self.date_last_seen := (string8)Max((integer)l.date_last_seen, (integer)r.date_last_seen);
 
 	self := l;
 end;

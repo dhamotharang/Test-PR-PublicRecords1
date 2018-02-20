@@ -1,4 +1,4 @@
-import ut,header;
+﻿import header, data_services;
 
 dHeader  :=table(header.file_headers(ssn<>''),{ssn,did,rid});
 dSnapShot:=header.file_ssn_snapshot(ssn<>'');
@@ -22,4 +22,4 @@ dSyncd2:=join(distribute(dHeader2,hash(frid))
 
 records := dedup(sort(dSyncd1+dSyncd2,record),record);
 
-export Key_legacy_ssn := INDEX(records, {records},ut.Data_Location.Person_header + 'thor_data400::key::header.legacy_ssn_' + doxie.version_superkey,opt);
+export Key_legacy_ssn := INDEX(records, {records}, Data_Services.Data_location.person_header + 'thor_data400::key::header.legacy_ssn_' + doxie.version_superkey,opt);

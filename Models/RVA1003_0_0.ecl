@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut=false ) := FUNCTION
 
@@ -724,14 +724,14 @@ export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 		transDate_mo(indate,today,outvar) := MACRO;
 			#uniquename(indate2)
 			%indate2% := map(
-				length(trim((string)indate))=8 and (integer)indate[1..4] >= 1800 =>
-					models.common.sas_date( indate[1..4]
-						+ intformat(min(12,max(1,(integer)indate[5..6] )),2,1)
+				length(trim((string)indate))=8 and (integer)((STRING)indate)[1..4] >= 1800 =>
+					models.common.sas_date( ((STRING)indate)[1..4]
+						+ intformat(min(12,max(1,(integer)((STRING)indate)[5..6] )),2,1)
 						+ '01'
-					) + min(31,max(1,(integer)indate[7..8])) - 1,
-				length(trim((string)indate))=6 and (integer)indate[1..4] >= 1800 =>
-					models.common.sas_date( indate[1..4]
-						+ intformat(min(12,max(1,(integer)indate[5..6])),2,1)
+					) + min(31,max(1,(integer)((STRING)indate)[7..8])) - 1,
+				length(trim((string)indate))=6 and (integer)((STRING)indate)[1..4] >= 1800 =>
+					models.common.sas_date( ((STRING)indate)[1..4]
+						+ intformat(min(12,max(1,(integer)((STRING)indate)[5..6])),2,1)
 						+ '01'
 					),
 				models.common.null
@@ -902,7 +902,7 @@ export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 			(pk_dist_a2toa3 * 2915.40756) +
 			(pk_rc_disthphoneaddr * 4620.15356);
 
-		sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date((string)if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01')),
+		sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date((string)if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01')),
 						length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 																			   NULL);
 
@@ -997,7 +997,7 @@ export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		pred_inc :=  if((integer)predicted_inc_high < 60000, (predicted_inc_low - 2000), (predicted_inc_high - 2000));
 
-		archive_date_fixed := if(archive_date=999999, ut.getdate[1..6], (string6)archive_date);
+		archive_date_fixed := if(archive_date=999999, ((STRING)Std.Date.Today())[1..6], (string6)archive_date);
 		today := (ut.DaysSince1900(((string)archive_date_fixed)[1..4], ((string)archive_date_fixed)[5..6], (string)01) - ut.DaysSince1900('1960', '1', '1'));
 
 		add1_land_use_code_2byte := (add1_land_use_code)[1..2];

@@ -3,7 +3,7 @@
 
 IMPORT Address, ADVO, AutoKey, AutoStandardI, Codes, DeathV2_Services, Drivers, Doxie, Email_Data, Gong, Header, Header_Quick, 
 			 IESP, LN_PropertyV2, MDR, PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
-			 VerificationOfOccupancy, WatchDog, census_data, Relationship;
+			 VerificationOfOccupancy, WatchDog, census_data, Relationship, std;
 
 EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) ShellResults,
 									DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) AttributesResults,
@@ -21,7 +21,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		EXPORT STRING DataRestrictionMask := DataRestrictionMask;  
 	END;		
 	Experian_Permitted := DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] <> Risk_Indicators.iid_constants.sTrue;
-	TodaysDate := IF(ShellResults[1].HistoryDate = 999999, UT.GetDate, ((STRING)ShellResults[1].HistoryDate)[1..6] + '01');
+	TodaysDate := IF(ShellResults[1].HistoryDate = 999999, (STRING)Std.Date.Today(), ((STRING)ShellResults[1].HistoryDate)[1..6] + '01');
 									
 	// ****************************************************************
 	// *  Set SmartLinx Param Logic (PersonReports.SmartLinxReport)   *
@@ -101,8 +101,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		SELF.Zip := le.Z5;
 		SELF.Zip4 := le.Zip4;
 		SELF.DL_number := le.DL_Number;
-  	SELF.Age := IF((INTEGER)le.DOB <= 0, 0, ut.GetAgeI((INTEGER)le.DOB));
-		SELF.Run_Date := IF(le.historydate = 999999, (INTEGER)ut.GetDate, (INTEGER)(((STRING)le.historydate) + '01'));
+  	SELF.Age := IF((INTEGER)le.DOB <= 0, 0, ut.Age((INTEGER)le.DOB));
+		SELF.Run_Date := IF(le.historydate = 999999, (INTEGER)Std.Date.Today(), (INTEGER)(((STRING)le.historydate) + '01'));
 		
 		// These are calculated in followup Joins.  Rather than calling multiple unnecessary joins found in Doxie.Best_Records (SmartLinx uses this)
 		// I am choosing to pull out just the joins needed to gather these two fields.
@@ -174,7 +174,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 			myDOB := IF((INTEGER)ri.DOB <> 0, (STRING)ri.DOB, le.DOB);
 			SELF.DOB := myDOB;
 			// Calculate the Age based on "As-Of" date, assuming the date of birth is before the as-of date
-			SELF.Age := IF((INTEGER)myDOB > 0 AND (INTEGER)myDOB <= (INTEGER)TodaysDate, ut.GetAgeI_asOf((INTEGER)myDOB, (INTEGER)TodaysDate), 
+			SELF.Age := IF((INTEGER)myDOB > 0 AND (INTEGER)myDOB <= (INTEGER)TodaysDate, ut.Age((INTEGER)myDOB, (INTEGER)TodaysDate), 
 																					0);
 	END;
 	
@@ -354,8 +354,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 			withinRange := RI.DT_First_Seen <> 0 AND RI.DT_First_Seen <= LE.historydate;  // Check the history date
 
 			// Header dates only contain YYYYMM, the [1..6] just ensures that some rogue date doesn't impact our MIN/MAX of dates in the rollup below
-			SELF.DateFirstSeen 	:= (STRING)ri.DT_First_Seen[1..6];
-			SELF.DateLastSeen 	:= (STRING)ri.DT_Last_Seen[1..6];
+			SELF.DateFirstSeen 	:= ((STRING)ri.DT_First_Seen)[1..6];
+			SELF.DateLastSeen 	:= ((STRING)ri.DT_Last_Seen)[1..6];
 			SELF.SourceCount 		:= if(withinRange, 1, 0); // Count header recs that match the target address and are prior to "AsOf" date
 		END;
 	ENDMACRO;
@@ -424,9 +424,9 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	// *     2. Properties owned by the subject at the "AsOf" date    *
 	// ****************************************************************
 // Go determine the properties the input subject owns - if running with 'AsOf' date, need properties owned at that date as well
-	todaysDate2			:= (integer)ut.GetDate[1..6];
+	todaysDate2			:= (integer)((STRING)Std.Date.Today())[1..6];
 	historyDate			:= (integer)shellResults[1].historyDate; 
-	archiveMode			:= (string)historydate[1..4] < (string)todaysdate2[1..4];  //if running "AsOf" a prior year, set indicator
+	archiveMode			:= ((string)historydate)[1..4] < ((string)todaysdate2)[1..4];  //if running "AsOf" a prior year, set indicator
 	
 //go get owned properties for our subject using the historydate on the transaction (could be today's date or an archive date)
 	propOwners	:= VerificationOfOccupancy.getPropOwnership(ShellResults, fares_ok); 
@@ -904,7 +904,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 		// Comes from the "Get Emails for the DID" section above
 		Emails := DEDUP(SORT(emailData, Address), Address);
 		
-		Summary := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.verificationofoccupancy.t_VOOSummary, 
+		Summary := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.verificationofoccupancy.t_VOOSummary, 
 													SELF.UniqueID := (STRING)ShellResults[1].DID;
 													fullName := IF(bestSubjectData[1].Title <> '', bestSubjectData[1].Title + ' ', '') +
 																			IF(bestSubjectData[1].FName <> '', bestSubjectData[1].FName + ' ', '') +
@@ -995,7 +995,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													SELF.To := DATASET([{(INTEGER)(LEFT.DateLastSeen[1..4]), (INTEGER)(LEFT.DateLastSeen[5..6]), (INTEGER)(LEFT.DateLastSeen[7..8])}], iesp.share.t_Date)[1];
 													SELF := []));
 		
-		PhoneAndUtility := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.verificationofoccupancy.t_VOOPhoneAndUtility, 
+		PhoneAndUtility := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.verificationofoccupancy.t_VOOPhoneAndUtility, 
 													SELF.TargetRecords := CHOOSEN(TargetRecords, iesp.Constants.VOO.MaxSupport);
 													SELF.SubjectRecords := CHOOSEN(SubjectRecords, iesp.Constants.VOO.MaxSupport);
 													SELF := []))[1];
@@ -1012,7 +1012,7 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 													SELF := []));
 		
 		// Combine it all together
-		Report := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.verificationofoccupancy.t_VOOReport, 
+		Report := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.verificationofoccupancy.t_VOOReport, 
 													SELF.Summary := Summary;
 													SELF.TargetSummary := TargetSummary;
 													SELF.Sources := CHOOSEN(Sources, iesp.Constants.VOO.MaxSupport);

@@ -173,8 +173,8 @@ EXPORT get_PostBeneficiaryFraud_Attributes(GROUPED DATASET(R_I.Layout_Boca_Shell
 		  CASE(CAaddrChooser,
 		    0 => '',
 			  1 => ((STRING)le.clam.address_verification.input_address_information.date_last_seen)[1..6],
-				2 => ((STRING)le.clam.address_verification.address_history_1.date_last_seen[1..6]),
-				((STRING)le.clam.address_verification.address_history_2.date_last_seen[1..6]));
+				2 => (((STRING)le.clam.address_verification.address_history_1.date_last_seen)[1..6]),
+				(((STRING)le.clam.address_verification.address_history_2.date_last_seen)[1..6]));
 				
 		SELF.CA_Date_Last_Seen := CA_Date_Last_Seen;
 		

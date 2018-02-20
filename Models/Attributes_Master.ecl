@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview;
+﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std;
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -34,7 +34,7 @@ shared cap10Byte := '9999999999';
 // common functions
 // ==============================================================================================================
 shared	getPreviousMonth(unsigned histdate) := FUNCTION
-			rollBack := trim((string)(histdate)[5..6]) in ['00','01'];
+			rollBack := trim(((string)histdate)[5..6]) in ['00','01'];
 			histYear := if(rollBack, (unsigned)((trim((string)histdate)[1..4]))-1, (unsigned)(trim((string)histdate)[1..4]));
 			histMonth := if(rollBack, 12, (unsigned)((trim((string)histdate)[5..6]))-1);
 			return (unsigned)(intformat(histYear,4,1) + intformat(histMonth,2,1));
@@ -69,11 +69,11 @@ shared	noDOBinput     := not clam.input_validation.dateofbirth;
 shared	noNAMEinput     := not (clam.input_validation.firstname and clam.input_validation.lastname);
 shared	noLASTNAMEinput     := not clam.input_validation.lastname;
 
-shared	sysdate := if(clam.historydate <> 999999, (integer)((string)clam.historydate[1..6]), (integer)(ut.GetDate[1..6]));
+shared	sysdate := if(clam.historydate <> 999999, (integer)(((string)clam.historydate)[1..6]), (integer)(((STRING)Std.Date.Today())[1..6]));
 shared 	ageDate := (unsigned4)Risk_Indicators.iid_constants.myGetDate(clam.historydate);  
-shared 	under21 := clam.inferred_age < 21 OR (ut.GetAgeI_asOf(clam.reported_dob, (unsigned)ageDate)) < 21;	
+shared 	under21 := clam.inferred_age < 21 OR (ut.Age(clam.reported_dob, (unsigned)ageDate)) < 21;	
 shared	subjectFirstSeen := fixYYYY00(ut.Min2(clam.ssn_verification.header_first_seen, clam.ssn_verification.credit_first_seen));
-shared	subjectLastSeen := fixYYYY00(checkDate6(ut.max2(clam.ssn_verification.header_last_seen, clam.ssn_verification.credit_last_seen)));
+shared	subjectLastSeen := fixYYYY00(checkDate6(max(clam.ssn_verification.header_last_seen, clam.ssn_verification.credit_last_seen)));
 
 shared	IAdateFirstSeen := fixYYYY00(clam.address_verification.input_address_information.date_first_seen);
 shared	AH1dateFirstSeen := fixYYYY00(clam.address_verification.address_history_1.date_first_seen);
@@ -252,7 +252,7 @@ export	string3	InferredMinimumAge(boolean isPrescreen)	:= if(clam.inferred_age=0
 																															capS((string)clam.inferred_age, capZero, cap150) );
 
 export	string3	BestReportedAge(boolean isPrescreen)	:= if(clam.reported_dob=0 OR (isPrescreen AND under21), '-1', 
-																															capS((string)ut.GetAgeI_asOf(clam.reported_dob, ageDate), capZero, cap150) );
+																															capS((string)ut.Age(clam.reported_dob, ageDate), capZero, cap150) );
 
 export string3 SubjectSSNCount               := capS((string)clam.velocity_counters.ssns_per_adl, capZero, cap255);
 export string3 SubjectAddrCount              := capS((string)clam.velocity_counters.addrs_per_adl, capZero, cap255);
@@ -278,7 +278,7 @@ export string2 PhoneListedDifferent := map(
 );	
 
 export	string3	SSNAgeDeceased	:= if(clam.ssn_verification.Validation.deceasedDate=0 or clam.ssn_verification.Validation.deceasedDate>agedate, '-1', 
-																			capS((string)ut.GetAgeI_asOf(clam.ssn_verification.Validation.deceasedDate, ageDate), capZero, cap960) );
+																			capS((string)ut.Age(clam.ssn_verification.Validation.deceasedDate, ageDate), capZero, cap960) );
 
 // this one will only be a valid attribute until June 2012, after that we won't be able to tell anymore.																
 export	string2	SSNRecent	:= map(noSSNInput => '-1',
@@ -827,13 +827,13 @@ export	string10	PropOwnedTaxTotal	:= capS((string)clam.address_verification.owne
 export	string3	PropOwnedHistoricalCount	:= capS((string)(clam.address_verification.owned.property_total + clam.address_verification.sold.property_total + clam.address_verification.ambiguous.property_total), capZero, cap255);
 
 	shared	date_first_purchase := if(clam.other_address_info.date_first_purchase>ageDate, 0, 
-															if((string)clam.other_address_info.date_first_purchase[5..6]='00',
-																(unsigned)((string)clam.other_address_info.date_first_purchase[1..4]+'01'+(string)clam.other_address_info.date_first_purchase[7..8]),
+															if( ((string)clam.other_address_info.date_first_purchase)[5..6]='00',
+																(unsigned)(((string)clam.other_address_info.date_first_purchase)[1..4]+'01'+ ((string)clam.other_address_info.date_first_purchase)[7..8]),
 																clam.other_address_info.date_first_purchase));
 																
 	shared	date_most_recent_purchase := if(clam.other_address_info.date_most_recent_purchase>ageDate, 0, 
-																		if((string)clam.other_address_info.date_most_recent_purchase[5..6]='00',
-																			(unsigned)((string)clam.other_address_info.date_most_recent_purchase[1..4]+'01'+(string)clam.other_address_info.date_most_recent_purchase[7..8]),
+																		if(((string)clam.other_address_info.date_most_recent_purchase)[5..6]='00',
+																			(unsigned)(((string)clam.other_address_info.date_most_recent_purchase)[1..4]+'01'+((string)clam.other_address_info.date_most_recent_purchase)[7..8]),
 																			clam.other_address_info.date_most_recent_purchase));
 																			
 	shared	date_first_sale := if(clam.other_address_info.date_first_sale>ageDate, 0, clam.other_address_info.date_first_sale);										 	
@@ -2375,7 +2375,7 @@ shared date_last_derog_5 := max(
 
 	shared bankruptcy_age_v5  := Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)bans_date_last_seen, (string)sysdate, true);
 
-shared	crim_sysdate := if(clam.historydate <> 999999, (integer)((string)clam.historydate[1..6]), (integer)(clam.crim_build_date[1..6]));
+shared	crim_sysdate := if(clam.historydate <> 999999, (integer)(((string)clam.historydate)[1..6]), (integer)(clam.crim_build_date[1..6]));
 
 shared date_last_crim_v5 := max(
 	clam.bjl.last_criminal_date,
@@ -2392,7 +2392,7 @@ shared date_last_derog_v5_noncrim := max(
 // had to break these 2 up so we're calculating the age of crim from build date instead of the current system date
 shared age_last_crim_v5 := Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)date_last_crim_v5, (string)crim_sysdate, true);
 shared age_last_derog_noncrim_v5 := Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)date_last_derog_v5_noncrim, (string)sysdate, true);
-shared Derog_age_v5_temp := ut.imin2(age_last_crim_v5, age_last_derog_noncrim_v5);
+shared Derog_age_v5_temp := min(age_last_crim_v5, age_last_derog_noncrim_v5);
 // patch the age back to 12 months if derogcount12month is > 0
 shared Derog_age_v5 := if((unsigned)derogCount12Month>0 and derog_age_v5_temp=13, 12, derog_age_v5_temp) ;
 

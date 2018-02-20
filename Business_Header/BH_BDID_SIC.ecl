@@ -1,4 +1,4 @@
-import Corp2, DNB_dmi, YellowPages, Busreg, Edgar, Vickers, infousa, ut, versioncontrol,paw, dnb_feinv2,mdr;
+import Corp2, DNB_dmi, YellowPages, Busreg, Edgar, Vickers, infousa, ut, versioncontrol,paw, dnb_feinv2,mdr, std;
 
 use_prod 	:= versioncontrol._Flags.IsDataland;
 layYpBase 	:= YellowPages.Layout_YellowPages_Base_V2_Bip;
@@ -235,7 +235,7 @@ sic_combined := corp_sic_dedup + dnb_sic_dedup + yp_sic_dedup + busreg_sic_dedup
 sic_filtered := Business_Header.Filters.BHBDIDSIC(sic_combined,pInactiveCorps,pBhVersion);
 
 	sic_filtered2				:= if(pShouldFilter = true, sic_filtered, sic_combined)(bdid <> 0, length(trim(sic_code)) = 8) ;
-	eight_years_ago 		:= (unsigned4)((string)((unsigned)ut.GetDate[1..4] - 8) + ut.GetDate[5..]);
+	eight_years_ago 		:= (unsigned4)((string)((unsigned)((STRING8)Std.Date.Today())[1..4] - 8) + ((STRING8)Std.Date.Today())[5..]);
 	sic_deduped					:= dedup(sort(sic_filtered2, source,sic_code, bdid,-dt_last_seen), source,sic_code, bdid,all)(dt_last_seen > eight_years_ago);
 	
 	sic_proj						:= project(sic_deduped, transform(layout_sic_code, self := left));

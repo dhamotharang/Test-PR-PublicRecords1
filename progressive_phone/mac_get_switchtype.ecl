@@ -1,12 +1,12 @@
-export mac_get_switchtype(f_in, f_out, useNeustar=false ) := macro
-import risk_indicators,CellPhone;
+﻿export mac_get_switchtype(f_in, f_out, useNeustar=false ) := macro
+import risk_indicators,CellPhone, data_services;
 
 #uniquename(f_base)
 %f_base% := DATASET([],Risk_Indicators.Layout_Telcordia_tds);
 
 #uniquename(telcordia_tds_key)
 %telcordia_tds_key% := INDEX(%f_base%,{npa,nxx},{%f_base%},
-                             ut.foreign_prod + 'thor_data400::key::telcordia_tds_' + doxie.Version_SuperKey);
+                             data_services.Data_location.prefix() + 'thor_data400::key::telcordia_tds_' + doxie.Version_SuperKey);
 
 #uniquename(toll_free_set)
 %toll_free_set% := ['800','811','822','833','844','855','866','877','888','899'];

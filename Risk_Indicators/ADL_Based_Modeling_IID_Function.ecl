@@ -379,7 +379,7 @@ risk_indicators.layout_input map_bob(temp le) := transform
 		(isFCRA or le.adl_dob=1) AND DoAddressAppend = FALSE;  // leave the logic as is for non-fcra, always overwrite the DOB for Riskview prescreen score, bug 40366
 	dob := if(update_dob, le.verdob, le.dob); 				// append dob from adl search if original dob was blank
 	self.dob := dob;
-	self.age := if ((integer)le.age=0 and (integer)dob != 0, (STRING3)ut.GetAgeI((integer)dob), le.age);
+	self.age := if ((integer)le.age=0 and (integer)dob != 0, (STRING3)ut.Age((integer)dob), le.age);
 	
 	// when updating the phone, could have come from gong or header,
 	// use the gong phone number first.  if that's empty, return the phone found on the header record.

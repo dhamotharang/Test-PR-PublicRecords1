@@ -1,6 +1,6 @@
 IMPORT Address, AutoHeaderI, autokey, autokeyb2, AutokeyI, AutoStandardI, CNLD_Practitioner,  
        CNLD_Practitioner_Services, DEA, doxie, doxie_files, HEADER, iesp, Ingenix_natlprof, 
-       NCPDP, NPPES, ut, watchdog;
+       NCPDP, NPPES, ut, watchdog, std;
        
 // The CNLD gennum = PractitionerID = DID in Ingenix and NCPDP
 
@@ -768,7 +768,7 @@ EXPORT Practitioner_Search_Service_Records :=
                                                        LEFT.source = RIGHT.source AND LEFT.AddrRank >  RIGHT.AddrRank      => RIGHT,
                                                        LEFT.source = SearchPoint_Services.Constants.ingenixSourceRank AND RIGHT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND LEFT.AddrRank <= 10        => LEFT,
                                                        LEFT.source = SearchPoint_Services.Constants.ingenixSourceRank AND RIGHT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND LEFT.AddrRank > 10 AND 
-                                                       ((((INTEGER)ut.GetDate - (INTEGER)RIGHT.dt_last_seen ) /100) <= 2 ) => RIGHT,  // date is within three months 
+                                                       ((((INTEGER)Std.Date.Today() - (INTEGER)RIGHT.dt_last_seen ) /100) <= 2 ) => RIGHT,  // date is within three months 
                                                        LEFT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND RIGHT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND 
                                                        LEFT.dt_last_seen < RIGHT.dt_last_seen                              => LEFT,
                                                        LEFT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND RIGHT.source = SearchPoint_Services.Constants.ncpdpSourceRank AND 

@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, MDR, SAM, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, SAM, UT, std;
 
 EXPORT getGovernmentDebarred(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -25,9 +25,9 @@ EXPORT getGovernmentDebarred(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 														TermDate := IF(StringLib.StringToLowerCase(LEFT.TerminationDate) = 'indefinite', '99999999', Business_Risk_BIP.Common.checkInvalidDate(LEFT.TerminationDate, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate));
 														SELF.TerminationDate := TermDate;
 														// If this is a realtime transaction, check that the Termination Date comes in the future (Otherwise this debarred hit has been terminated and shouldn't count)
-														SELF.GovernmentDebarredHit := IF(((STRING)LEFT.HistoryDate = Business_Risk_BIP.Constants.NinesDate AND (INTEGER)ut.GetDate <= (INTEGER)TermDate) OR
+														SELF.GovernmentDebarredHit := IF(((STRING)LEFT.HistoryDate = Business_Risk_BIP.Constants.NinesDate AND Std.Date.Today() <= (INTEGER)TermDate) OR
 														// If this is a historical transaction, check that the Termination Date hasn't already passed 
-																											((STRING)LEFT.HistoryDate <> Business_Risk_BIP.Constants.NinesDate AND(INTEGER)(LEFT.HistoryDate[1..6]) <= (INTEGER)(TermDate[1..6])),
+																											((STRING)LEFT.HistoryDate <> Business_Risk_BIP.Constants.NinesDate AND(INTEGER)(((STRING)LEFT.HistoryDate)[1..6]) <= (INTEGER)(TermDate[1..6])),
 																									TRUE, // Gov Debarred
 																									FALSE); // Not Gov Debarred
 														SELF := LEFT));

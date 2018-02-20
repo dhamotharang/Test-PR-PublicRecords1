@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT rvd1110_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN PreScreenOptOut = FALSE) := FUNCTION
 
@@ -270,7 +270,7 @@ EXPORT rvd1110_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	input_dob_match_level            := le.dobmatchlevel;
 	inferred_age                     := le.inferred_age;
 	reported_dob                     := le.reported_dob;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *
@@ -290,7 +290,7 @@ EXPORT rvd1110_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	
 	sysdate := Common.SAS_Date((STRING)(archive_date));
 	
-	fullarchivedate := (STRING)IF(le.historydate = 999999, (INTEGER)ut.GetDate, (INTEGER)(archive_date + '01'));
+	fullarchivedate := (STRING)IF(le.historydate = 999999, (INTEGER)Std.Date.Today(), (INTEGER)(archive_date + '01'));
 
 	fullarchivedatesas := Models.Common.SAS_Date(fullarchivedate);
 
@@ -421,7 +421,7 @@ EXPORT rvd1110_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	
 	/* ** START SAS CHANGES 11/03/11 ***/
 		ssn_lowissuedate := MAP(
-																rc_ssnlowissue > 0 => Common.SAS_Date((STRING)rc_ssnlowissue[1..4] + '0101'),
+																rc_ssnlowissue > 0 => Common.SAS_Date(((STRING)rc_ssnlowissue)[1..4] + '0101'),
 																												NULL
 													);
 													

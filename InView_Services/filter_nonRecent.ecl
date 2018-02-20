@@ -1,8 +1,8 @@
-import doxie_cbrs, ut, uccv2_services;
+import doxie_cbrs, ut, uccv2_services, std;
 
 export filter_nonRecent(dataset(doxie_cbrs.layout_report) in_recs) := FUNCTION
 
-cur_date := ut.GetDate;
+cur_date := (STRING8)Std.Date.Today();
 recent_limit := ut.DaysInNYears(7) - 30;   			// 6 years, 11 months
 lien_recent_limit := ut.DaysInNYears(7) - 90;   // 6 years, 9 months
 ca_unpaid_limit := ut.DaysInNYears(10);

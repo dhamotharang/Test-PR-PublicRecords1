@@ -1,7 +1,7 @@
 /*2010-09-09T20:45:34Z (Adam Shirey)
 Returning iesp.intermediate_log.t_IntermediateLogRecord for customer support tool
 */
-import address, ut, Risk_Indicators, LN_PropertyV2, ADVO, AddrFraud, Property, iesp, models;
+import address, ut, Risk_Indicators, LN_PropertyV2, ADVO, AddrFraud, Property, iesp, models, std;
  
 //Data sources
 export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],Foreclosure_Vacancy.Layouts.in_data), boolean isRenewal = FALSE) := MODULE
@@ -177,7 +177,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 	//Count Foreclosure records in last 12 months
 	layouts.Foreclosure add12MoForeclosures(Find_Foreclosure_By_Addr l) := TRANSFORM
 		tmp_data_date := if(l.filing_date >= l.recording_date, l.filing_date, l.recording_date);
-		fc_populate := if(tmp_data_date <> '' and ut.DaysApart(ut.getDate , tmp_data_date) < 365, 1, 0);
+		fc_populate := if(tmp_data_date <> '' and ut.DaysApart((STRING)Std.Date.Today() , tmp_data_date) < 365, 1, 0);
 		
 		self.fc_found_12mo := (STRING)fc_populate;
 		self.CP_DATA_DATE := tmp_data_date;								 
@@ -288,7 +288,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 			joinForeclosures(left, right), Left Outer);
 	
 		//Remove all foreclosures older than 12 months
-		Foreclosure_Results := Foreclosure_Pre_Results(ut.DaysApart(ut.getDate , cp_data_date) < 365);
+		Foreclosure_Results := Foreclosure_Pre_Results(ut.DaysApart((STRING)Std.Date.Today() , cp_data_date) < 365);
 	
 		//Build results
 		//Batch--------------------------------------------------------------

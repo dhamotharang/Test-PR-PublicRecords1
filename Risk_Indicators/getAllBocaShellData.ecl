@@ -21,7 +21,7 @@ EXPORT getAllBocaShellData (
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	// if the record is default_history_date or same month as today's date, run production_realtime_mode
 	production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
-														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);		
+														or iid[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);		
 	
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;

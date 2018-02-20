@@ -61,7 +61,7 @@ layout_PropertyRecordPlus join_address(p_address L, KPA R) := transform
 	self.applicant_sale_found := self.applicant_sold;
 	self.applicant_buy_found := self.applicant_owned;
 	// naprop should be 0 on outer side of join.
-	self.naprop := if (R.prim_name = '', 0, ut.max2(calc_napprop(buyer_fname_match, buyer_lname_match, true), calc_napprop(seller_fname_match, seller_lname_match, true))); 
+	self.naprop := if (R.prim_name = '', 0, Max(calc_napprop(buyer_fname_match, buyer_lname_match, true), calc_napprop(seller_fname_match, seller_lname_match, true))); 
 	self.AD := R.AD;
 	self.purchase_date := R.purchase_date;
 	self.built_date := R.built_date;
@@ -238,7 +238,7 @@ together := group(sort(ungroup(by_addr + by_did), seq, prim_range, prim_name, se
 
 
 together roll_result(together Le, together Ri) := transform
-	SELF.NAPROP := ut.max2(le.naprop,ri.naprop);
+	SELF.NAPROP := Max(le.naprop,ri.naprop);
 	SELF.AD := MAP(le.AD = '' => ri.AD,
 				ri.AD = '' => le.AD,
 				le.AD <> ri.AD => 'M', 
@@ -272,7 +272,7 @@ together roll_result(together Le, together Ri) := transform
 	self.purchase_date := choose(purchasePicker, 	Le.purchase_date,
 																								ri.purchase_date,
 																								le.purchase_date);
-	self.purchase_amount := choose(purchasePicker, 	ut.max2(Le.purchase_amount, Ri.purchase_amount),
+	self.purchase_amount := choose(purchasePicker, 	Max(Le.purchase_amount, Ri.purchase_amount),
 																									ri.purchase_amount,
 																									le.purchase_amount);
 	
@@ -317,7 +317,7 @@ together roll_result(together Le, together Ri) := transform
 												3);	// use the left one
 	nonblank(string a, string b) := if(b='', a, b);	// return the populated one, or if both populated then the right one																	
 																		
-	SELF.mortgage_amount := choose(mortgagePicker, ut.max2(le.mortgage_amount,ri.mortgage_amount),
+	SELF.mortgage_amount := choose(mortgagePicker, Max(le.mortgage_amount,ri.mortgage_amount),
 																								 ri.mortgage_amount,
 																								 le.mortgage_amount);
 	SELF.mortgage_date := choose(mortgagePicker, le.mortgage_date,
@@ -346,31 +346,31 @@ together roll_result(together Le, together Ri) := transform
 	self.standardized_land_use_code := choose(assessPicker, nonblank(le.standardized_land_use_code, ri.standardized_land_use_code),
 																													ri.standardized_land_use_code,
 																													le.standardized_land_use_code);
-	self.building_area := choose(assessPicker, 	ut.max2(le.building_area, ri.building_area),
+	self.building_area := choose(assessPicker, 	Max(le.building_area, ri.building_area),
 																							ri.building_area,
 																							le.building_area);
-	self.no_of_buildings := choose(assessPicker, 	ut.max2(le.no_of_buildings, ri.no_of_buildings),
+	self.no_of_buildings := choose(assessPicker, 	Max(le.no_of_buildings, ri.no_of_buildings),
 																								ri.no_of_buildings,
 																								le.no_of_buildings);
-	self.no_of_stories := choose(assessPicker, 	ut.max2(le.no_of_stories, ri.no_of_stories),
+	self.no_of_stories := choose(assessPicker, 	Max(le.no_of_stories, ri.no_of_stories),
 																							ri.no_of_stories,
 																							le.no_of_stories);
-	self.no_of_rooms := choose(assessPicker, 	ut.max2(le.no_of_rooms, ri.no_of_rooms),
+	self.no_of_rooms := choose(assessPicker, 	Max(le.no_of_rooms, ri.no_of_rooms),
 																						ri.no_of_rooms,
 																						le.no_of_rooms);
-	self.no_of_bedrooms := choose(assessPicker, ut.max2(le.no_of_bedrooms, ri.no_of_bedrooms),
+	self.no_of_bedrooms := choose(assessPicker, Max(le.no_of_bedrooms, ri.no_of_bedrooms),
 																							ri.no_of_bedrooms,
 																							le.no_of_bedrooms);
-	self.no_of_baths := choose(assessPicker, 	ut.max2(le.no_of_baths, ri.no_of_baths),
+	self.no_of_baths := choose(assessPicker, 	Max(le.no_of_baths, ri.no_of_baths),
 																						ri.no_of_baths,
 																						le.no_of_baths);
-	self.no_of_partial_baths := choose(assessPicker, 	ut.max2(le.no_of_partial_baths, ri.no_of_partial_baths),
+	self.no_of_partial_baths := choose(assessPicker, 	Max(le.no_of_partial_baths, ri.no_of_partial_baths),
 																										ri.no_of_partial_baths,
 																										le.no_of_partial_baths);
 	self.garage_type_code := choose(assessPicker, nonblank(le.garage_type_code, ri.garage_type_code),
 																								ri.garage_type_code,
 																								le.garage_type_code);
-	self.parking_no_of_cars := choose(assessPicker, ut.max2(le.parking_no_of_cars, ri.parking_no_of_cars),
+	self.parking_no_of_cars := choose(assessPicker, Max(le.parking_no_of_cars, ri.parking_no_of_cars),
 																									ri.parking_no_of_cars,
 																									le.parking_no_of_cars);
 	self.style_code := choose(assessPicker, nonblank(le.style_code, ri.style_code),
@@ -379,11 +379,11 @@ together roll_result(together Le, together Ri) := transform
 	self.assessed_value_year := choose(assessPicker, 	le.assessed_value_year,
 																										ri.assessed_value_year,
 																										le.assessed_value_year);	
-	self.assessed_amount := choose(assessPicker, 	ut.max2(le.assessed_amount,ri.assessed_amount),
+	self.assessed_amount := choose(assessPicker, 	Max(le.assessed_amount,ri.assessed_amount),
 																								ri.assessed_amount,
 																								le.assessed_amount);	
 	
-	self.assessed_total_value := choose(assessPicker, 	ut.max2(le.assessed_total_value,ri.assessed_total_value),
+	self.assessed_total_value := choose(assessPicker, 	Max(le.assessed_total_value,ri.assessed_total_value),
 																								ri.assessed_total_value,
 																								le.assessed_total_value);	
 	SELF := le;
@@ -404,11 +404,11 @@ applicantByDidRecs roll_didResult(applicantByDidRecs Le, applicantByDidRecs Ri) 
 	
 	// SELF.sale_date_by_did := calculated in the address rollup, the did checking is done in getallbocashelldata
 	
-	SELF.sale_date1 := choose(sale1Picker, 	ut.max2(le.sale_date1,ri.sale_date1),
+	SELF.sale_date1 := choose(sale1Picker, 	Max(le.sale_date1,ri.sale_date1),
 																					ri.sale_date1,
 																					le.sale_date1);
 	
-	self.sale_price1 := choose(sale1Picker, ut.max2(le.sale_price1,ri.sale_price1),
+	self.sale_price1 := choose(sale1Picker, Max(le.sale_price1,ri.sale_price1),
 																					ri.sale_price1,
 																					le.sale_price1);
 		
@@ -418,11 +418,11 @@ applicantByDidRecs roll_didResult(applicantByDidRecs Le, applicantByDidRecs Ri) 
 	
 	// SELF.purchase_date_by_did := calculated in the address rollup, the did checking is done in getallbocashelldata
 	
-	SELF.prev_purch_date1 := choose(prevPicker, ut.max2(le.prev_purch_date1,ri.prev_purch_date1),
+	SELF.prev_purch_date1 := choose(prevPicker, Max(le.prev_purch_date1,ri.prev_purch_date1),
 																							ri.prev_purch_date1,
 																							le.prev_purch_date1);
 										 
-	self.prev_purch_price1 := choose(prevPicker, ut.max2(le.prev_purch_price1,ri.prev_purch_price1),
+	self.prev_purch_price1 := choose(prevPicker, Max(le.prev_purch_price1,ri.prev_purch_price1),
 																							 ri.prev_purch_price1,
 																							 le.prev_purch_price1);
 																					
@@ -432,10 +432,10 @@ applicantByDidRecs roll_didResult(applicantByDidRecs Le, applicantByDidRecs Ri) 
 										 ri.sale_date2 > le.sale_date2 => 2, // use the right one
 										 3);	// use the left one			
 										 
-	SELF.sale_date2 := choose(sale2Picker, 	ut.max2(le.sale_date2,ri.sale_date2),
+	SELF.sale_date2 := choose(sale2Picker, 	Max(le.sale_date2,ri.sale_date2),
 																					ri.sale_date2,
 																					le.sale_date2);
-	self.sale_price2 := choose(sale2Picker, ut.max2(le.sale_price2, ri.sale_price2),
+	self.sale_price2 := choose(sale2Picker, Max(le.sale_price2, ri.sale_price2),
 																					ri.sale_price2,
 																					le.sale_price2);
 																					
@@ -443,10 +443,10 @@ applicantByDidRecs roll_didResult(applicantByDidRecs Le, applicantByDidRecs Ri) 
 										 ri.prev_purch_date2 > le.prev_purch_date2 => 2, // use the right one
 										 3);	// use the left one																				
 	
-	SELF.prev_purch_date2 := choose(prevPicker2, 	ut.max2(le.prev_purch_date2,ri.prev_purch_date2),
+	SELF.prev_purch_date2 := choose(prevPicker2, 	Max(le.prev_purch_date2,ri.prev_purch_date2),
 																								ri.prev_purch_date2,
 																								le.prev_purch_date2); 
-	self.prev_purch_price2 := choose(prevPicker2, ut.max2(le.prev_purch_price2,ri.prev_purch_price2),
+	self.prev_purch_price2 := choose(prevPicker2, Max(le.prev_purch_price2,ri.prev_purch_price2),
 																								ri.prev_purch_price2,
 																								le.prev_purch_price2);																						 
 																							 

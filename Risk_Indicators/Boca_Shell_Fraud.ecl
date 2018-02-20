@@ -94,7 +94,7 @@ suspicious_identities := join(suspicious_header,dids_with_suspicious_ssns,
 		self.did := if(left.did=0, right.did, left.did);
 		self.historydate := if(left.did=0, right.historydate, left.historydate);
 		self.bureau_only := left.did<>0 and left.bureau_records=left.total_records;
-		firstseen31 := left.first_seen[1..6]+'31';
+		firstseen31 := ((STRING)left.first_seen)[1..6]+'31';
 		self.bureau_only_last_1month := left.did<>0 and left.bureau_records=left.total_records and 
 			iid_constants.checkdays(iid_constants.full_history_date(left.historydate),firstseen31,30, left.historydate);
 		self.bureau_only_last_6months := left.did<>0 and left.bureau_records=left.total_records and 

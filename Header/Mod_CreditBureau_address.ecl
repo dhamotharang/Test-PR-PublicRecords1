@@ -397,7 +397,7 @@ export flagged_nlr_addresses := i8;
 i8eq1:=group(sort(group(files.prepped_nlr(src='EQ')),src,vendor_id,curr_addr[1..7],prev_addr1[1..7],prev_addr2[1..7],prev_addr3[1..7],prev_addr4[1..7],prev_addr5[1..7],prev_addr6[1..7],prev_addr7[1..7],local),src,vendor_id);
 i8eq:=rollup(i8eq1,transform(layouts.prepped_nlr
 				,self.dt_vendor_first_reported:=(string)ut.min2((unsigned)left.dt_vendor_first_reported,(unsigned)right.dt_vendor_first_reported)
-				,self.dt_vendor_last_reported:=(string)ut.max2((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
+				,self.dt_vendor_last_reported:=(string)max((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
 				,self.nlr0:=min(left.nlr0,right.nlr0)
 				,self.nlr1:=min(left.nlr1,right.nlr1)
 				,self.nlr2:=min(left.nlr2,right.nlr2)

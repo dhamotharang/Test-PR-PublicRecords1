@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut;
+IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, std;
 
 EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linkids)) linkid_recs) := MODULE
 	
@@ -15,7 +15,7 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 	SHARED fn_getLatestReleaseDateTime(INTEGER HistoryDateTime) :=
 		FUNCTION
 			
-			hist_date_time := IF( ((STRING)HistoryDateTime)[1..6] = '999999', (INTEGER)ut.GetDate, HistoryDateTime );
+			hist_date_time := IF( ((STRING)HistoryDateTime)[1..6] = '999999', (INTEGER)Std.Date.Today(), HistoryDateTime );
 			
 			len := LENGTH((STRING)hist_date_time);
 			
@@ -214,7 +214,7 @@ EXPORT GLUE_fdc_append(DATASET(RECORDOF(Business_Credit_KEL.File_SBFE_temp.linki
 				MAP(
 					le.HistoryDateTime > 0 => (INTEGER)((STRING)fn_getLatestReleaseDateTime(le.HistoryDateTime))[1..8],
 					le.HistoryDate     > 0 => (INTEGER)((STRING)fn_getLatestReleaseDateTime(le.HistoryDate))[1..8],
-					/* default.........: */   (INTEGER)((STRING)fn_getLatestReleaseDateTime((INTEGER)ut.GetDate))[1..8]
+					/* default.........: */   (INTEGER)((STRING)fn_getLatestReleaseDateTime((INTEGER)Std.Date.Today()))[1..8]
 				);
 	END;
 

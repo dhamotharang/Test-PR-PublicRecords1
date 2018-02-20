@@ -1,7 +1,7 @@
 // ================================================================================
 // ===== RETURNS FDIC Member Source Docs and Count Info 
 // ================================================================================
-IMPORT BIPV2, govdata, iesp, ut, mdr;
+IMPORT BIPV2, govdata, iesp, ut, mdr, std;
 
 EXPORT FDICSource_Records (
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
@@ -52,7 +52,7 @@ EXPORT FDICSource_Records (
 			                  L.stcnty<>'' or L.zip<>'' or
 												L.st<>''     or L.zip5<>'');
 		  self.hasPhone := false;
-			self.dt_first_seen := ut.NormDate((unsigned)ut.convertdate(L.insdate,'%Y-%m-%d'));
+			self.dt_first_seen := ut.NormDate((unsigned) Std.Date.ConvertDateFormat(L.insdate,'%Y-%m-%d'));
 			self.dt_last_seen := ut.NormDate((unsigned)L.process_date);
 			self := [];
 	END;

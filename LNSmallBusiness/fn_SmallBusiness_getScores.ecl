@@ -63,13 +63,13 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 			SELF.seq := c; // input seq is overwritten. abandon all hope, ye who enter here.
 			historydate := IF(le.HistoryDateTime = 0,
 												risk_indicators.iid_constants.default_history_date,
-												(UNSIGNED)((STRING)le.HistoryDateTime[1..6]));
-			SELF.historydate := IF(le.historyDateTime > 0,(UNSIGNED)((STRING)le.historyDateTime[1..6]), historydate);								
+												(UNSIGNED)(((STRING)le.HistoryDateTime)[1..6]));
+			SELF.historydate := IF(le.historyDateTime > 0,(UNSIGNED)(((STRING)le.historyDateTime)[1..6]), historydate);								
 			SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp((STRING)le.historydateTime, historydate);							
 			SELF.ssn := le.Rep_SSN;
 			SELF.dob := le.Rep_DateOfBirth;
 			SELF.age := IF((INTEGER)le.Rep_Age = 0 and (INTEGER)le.Rep_DateOfBirth != 0,
-							(STRING3)ut.GetAgeI_asOf((UNSIGNED)le.Rep_DateOfBirth, (UNSIGNED)risk_indicators.iid_constants.myGetDate(historydate)), 
+							(STRING3)ut.Age((UNSIGNED)le.Rep_DateOfBirth, (UNSIGNED)risk_indicators.iid_constants.myGetDate(historydate)), 
 							(STRING)((INTEGER)le.Rep_Age));
 			SELF.phone10  := le.Rep_Phone10;
 			

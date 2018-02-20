@@ -1,4 +1,5 @@
-import header,BankruptcyV2, ut;
+import header,BankruptcyV2, ut, std;
+
 export BKv3_as_source(dataset(BankruptcyV2.layout_bankruptcy_search_v3_supp) pBK_Search = dataset([],BankruptcyV2.layout_bankruptcy_search_v3_supp),
 					dataset(bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp) pBK_Main = dataset([],bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp),
 					boolean pForHeaderBuild=false,
@@ -22,7 +23,7 @@ export BKv3_as_source(dataset(BankruptcyV2.layout_bankruptcy_search_v3_supp) pBK
 								;
 							  
 	  
-	dSourceMainData := 	if (pFastHeader, dSourceMainData_(ut.DaysApart(ut.GetDate, (string)date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceMainData_);
+	dSourceMainData := 	if (pFastHeader, dSourceMainData_(ut.DaysApart((STRING8)Std.Date.Today(), (string)date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceMainData_);
 	
 
 	f_search := distribute(dSourceSearchData(case_number[1..3] <> '449'),hash(case_number,court_code));

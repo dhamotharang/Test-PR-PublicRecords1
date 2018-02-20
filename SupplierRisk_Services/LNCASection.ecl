@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, DCAV2, BIPV2, iesp, MDR, TopBusiness_Services, ut;
+﻿IMPORT AutoStandardI, DCAV2, BIPV2, iesp, MDR, TopBusiness_Services, ut, std;
 
 EXPORT LNCASection := MODULE
 
@@ -421,12 +421,12 @@ EXPORT LNCASection := MODULE
 			SELF.Assets := (INTEGER) l.assets;
 			SELF.Liabilities := (INTEGER) l.Liabilities;
 			SELF.NetWorth := (INTEGER) l.Net_Worth_;
-			SELF.FiscalYearEnd := iesp.ECL2ESP.toDatestring8((string) ut.Date_MMDDYY_I2_V2(l.FYE));
+			SELF.FiscalYearEnd := iesp.ECL2ESP.toDatestring8((string) Std.Date.FromStringToDate(l.FYE, '%m%d%y'));
 			SELF.NumberOfEmployees := (INTEGER) l.EMP_NUM;
 			SELF.Imports := l.Import_orig;
 			SELF.Exports := l.Export_orig;
 			SELF.BusinessDescription := l.Bus_Desc;
-			
+      
 			SELF.SICCodes := PROJECT(CHOOSEN(l.siccodes,iesp.constants.LNCA.MaxSICCodes),
 																	TRANSFORM(iesp.lncafirmographics.t_lncaSICCode,
 																				SELF.code := (INTEGER)LEFT.code, SELF := LEFT));

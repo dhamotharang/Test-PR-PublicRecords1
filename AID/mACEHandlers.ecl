@@ -1,9 +1,9 @@
 export mACEHandlers
  :=
   module
-		import lib_StringLib, lib_FileServices, lib_addrclean, ut, lib_ThorLib;
+		import lib_StringLib, lib_FileServices, lib_addrclean, ut, lib_ThorLib, std;
 
-		shared	lCurrentDate	:=	ut.GetDate : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+		shared	lCurrentDate	:=	(STRING8)Std.Date.Today() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
 
 		/**************************************************************************************/
 		export	Layouts.rACEStruct	fACEStructRecordFromString182(string182 pACEAddress182)

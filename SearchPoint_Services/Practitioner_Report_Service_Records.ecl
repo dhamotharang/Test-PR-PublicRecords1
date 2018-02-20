@@ -1,6 +1,6 @@
 IMPORT Address, AutoHeaderI, AutoStandardI, BankruptcyV3, CNLD_Practitioner, 
        CNLD_Practitioner_Services, DEA, doxie, doxie_files, iesp, Ingenix_natlprof, LiensV2, NCPDP, 
-       NPPES, ut;
+       NPPES, ut, std;
 
 
 /* NOTE:  CNLD: ChoicePoint National Licensure Database -- Data vendor/provider
@@ -242,9 +242,9 @@ EXPORT Practitioner_Report_Service_Records :=
                             SELF.Status         := MAP( LEFT.licstatdesc = 'A'                    =>  'ACTIVE',
                                                         LEFT.licstatdesc = 'I'                    =>  'INACTIVE',
                                                         (STRING)LEFT.st_lic_num_exp != '' AND 
-                                                        (STRING)LEFT.st_lic_num_exp <= ut.GetDate  =>   'INACTIVE',
+                                                        (STRING)LEFT.st_lic_num_exp <= (STRING)Std.Date.Today()  =>   'INACTIVE',
                                                         (STRING)LEFT.st_lic_num_exp != '' AND 
-                                                        (STRING)LEFT.st_lic_num_exp > ut.GetDate =>   'ACTIVE',
+                                                        (STRING)LEFT.st_lic_num_exp > (STRING)Std.Date.Today() =>   'ACTIVE',
                                                                                                        LEFT.licstatdesc 
                                                        );
                             SELF._Type          := LEFT.st_lic_type;
@@ -505,7 +505,7 @@ EXPORT Practitioner_Report_Service_Records :=
                          SELF.State          := RIGHT.licensestate;
                          SELF.Status         := IF( RIGHT.termination_date = '',
                                                     '',
-                                                    IF( (STRING)RIGHT.termination_date < ut.GetDate,
+                                                    IF( (STRING)RIGHT.termination_date < (STRING)Std.Date.Today(),
                                                         'INACTIVE',
                                                         'ACTIVE'
                                                       )

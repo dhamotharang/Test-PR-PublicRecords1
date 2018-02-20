@@ -1,8 +1,8 @@
-import BankruptcyV2, fcra, Doxie, ut;
+import BankruptcyV2, fcra, Doxie, ut, std;
 
 export key_bankruptcyv3_search_full_bip(boolean isFCRA=false) := function
 
-  todaysdate := ut.GetDate;
+  todaysdate := (STRING8)Std.Date.Today();
 	get_recs := BankruptcyV2.file_bankruptcy_search_v3_bip(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 
 	BankruptcyV2.layout_bankruptcy_search_v3_supp_bip tformat(BankruptcyV2.file_bankruptcy_search_v3_supp_bip L) := transform

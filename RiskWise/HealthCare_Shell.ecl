@@ -1,5 +1,5 @@
 import Address, doxie, liensv2, CriminalRecords_Services, risk_indicators, doxie_files, sexoffender;
-import ingenix_natlprof, Prof_LicenseV2, models, ut, GSA, Business_Header, Business_Risk, Relationship;
+import ingenix_natlprof, Prof_LicenseV2, models, ut, GSA, Business_Header, Business_Risk, Relationship, std;
 
 EXPORT HealthCare_Shell(dataset(Risk_Indicators.Layout_Provider_Scoring.Clam_Plus) clam ) := FUNCTION
 	NULL := -999999999;
@@ -121,7 +121,7 @@ inputKey := PROJECT(withEverything, TRANSFORM(keyLayout,
 																											SELF.relativesbdids_corpaffil := LEFT.relativesbdids_corpaffil));
 
 Layout_HealthCare_Shell_Plus joinBackToClam(clam le, keyLayout ri) := TRANSFORM
-  SELF.sysdate := models.common.sas_date( if(le.historydate IN [999999, 0], ut.getdate, (string)le.historydate+'01'));
+  SELF.sysdate := models.common.sas_date( if(le.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.historydate+'01'));
 	SELF.input_ssn := TRIM(le.shell_input.ssn);
 	
   SELF.clam := le;
@@ -158,7 +158,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		self.LastRenewalDate_Year := '';
 		self.Lic_State            := ri.licensestate;
 		self.MedLicProfLic_hit    := true;
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		sas_ExpDate := models.Common.sas_date(trim(ri.termination_date));
 		mth_expiration_date := ROUNDUP((sysdate-sas_ExpDate)/30.5);
 		Expired_Flag := map(
@@ -199,7 +199,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		self.LastRenewalDate_Year := trim(ri.last_renewal_date)[1..4];
 		self.Lic_State            := trim(ri.st);
 		self.MedLicProfLic_hit    := true;
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		sas_ExpDate := models.Common.sas_date(trim(ri.expiration_date));
 		mth_expiration_date := ROUNDUP((sysdate-sas_ExpDate)/30.5);
 		Expired_Flag := map(
@@ -240,7 +240,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		self.LastRenewalDate_Year := trim(ri.last_renewal_date)[1..4];
 		self.Lic_State            := trim(ri.st);
 		self.MedLicProfLic_hit    := true;
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		sas_ExpDate := models.Common.sas_date(trim(ri.expiration_date));
 		mth_expiration_date := ROUNDUP((sysdate-sas_ExpDate)/30.5);
 		Expired_Flag := map(
@@ -311,7 +311,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 	rolledMLPL := rollup( allMLPLRecs, LEFT.seq = RIGHT.seq, rollMLPL(LEFT, RIGHT));
 	
 	Layout_HealthCare_Shell_Plus finishMLPL( Layout_HealthCare_Shell_Plus_MedLic le ) := TRANSFORM
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		RenewalExpirationYearMin := strMin(le.ExpirationDate_Year, le.LastRenewalDate_Year);
 		Overall_Year_Min := IF(le.IssueDate_Year = (STRING)NULL OR RenewalExpirationYearMin = (STRING)NULL, (STRING)NULL, strMin(le.IssueDate_Year, RenewalExpirationYearMin));
     Overall_Year_Min_sas := (integer)models.common.sas_date(Overall_Year_Min);
@@ -352,7 +352,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
     self.seq := le.seq;
     self.provider_type := le.provider_type;
 		self.SexOffender_Hit := true;
-		sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+		sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		sex_conviction_dt := models.common.sas_date(ri.conviction_date);
 		mth_sex_conviction_dt := IF(sysdate = NULL OR sex_conviction_dt = NULL, NULL, ROUNDUP((sysdate - sex_conviction_dt)/30.5));
 
@@ -474,7 +474,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		filing_date1 := IF(filing_date1Temp = NULL, filing_date2Temp, filing_date1Temp);
 		filing_date2 := IF(filing_date2Temp = NULL, filing_date1Temp, filing_date2Temp);
 
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		
 		mth_filing_date1 := if(sysdate = NULL OR filing_date1 = null, null, ROUNDUP((sysdate - filing_date1)/30.5));
 		mth_filing_date2 := if(sysdate = NULL OR filing_date2 = null, null, ROUNDUP((sysdate - filing_date2)/30.5));
@@ -679,7 +679,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		
     sanc_sancdte_ymd := models.common.sas_date( ri.sanc_sancdte_form );
     sanc_reindte_ymd := models.common.sas_date( ri.sanc_reindte_form );
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		
 		mth_sanc_sancdte_ymd := if(sysdate = NULL OR sanc_sancdte_ymd = NULL, NULL, ROUNDUP((sysdate-sanc_sancdte_ymd)/30.5));
 		mth_sanc_reindte_ymd := if(sysdate = NULL OR sanc_reindte_ymd = NULL, NULL, ROUNDUP((sysdate-sanc_reindte_ymd)/30.5));
@@ -1072,7 +1072,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 
 		Action_DT := models.common.sas_date(ri.ActionDate);
 		Term_DT   := models.common.sas_date(TerminationDate);
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		
 		mth_Action_DT := if(sysdate = NULL OR action_dt = NULL, NULL, ROUNDUP((sysdate-Action_DT)/30.5));
 		// If the term date is indefinite then this should always be a current record
@@ -1127,7 +1127,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 
 		Action_DT := models.common.sas_date(ri.ActionDate);
 		Term_DT   := models.common.sas_date(TerminationDate);
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		
 		mth_Action_DT := if(sysdate = NULL OR action_dt = NULL, null, ROUNDUP((sysdate-Action_DT)/30.5));
 		// If the term date is indefinite then this should always be a current record
@@ -1609,7 +1609,7 @@ healthcare_in := JOIN(clam, inputKey, LEFT.seq = RIGHT.seq, joinBackToClam(LEFT,
 		self.seq := le.seq;
 		self.provider_type := le.provider_type;
     
-    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], ut.getdate, (string)le.clam.historydate+'01'));
+    sysdate := models.common.sas_date( if(le.clam.historydate IN [999999, 0], (STRING8)Std.Date.Today(), (string)le.clam.historydate+'01'));
 		sasStc_Date := IF(le.stc_date <> -1, Models.common.sas_date((STRING)le.stc_date), NULL);
 		mth_stc_date := if(sysdate = NULL OR sasStc_Date = NULL, NULL, ROUNDUP((sysdate - sasStc_Date) / 30.5));
 		

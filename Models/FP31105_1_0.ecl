@@ -1,4 +1,4 @@
-IMPORT ut, EASI, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, EASI, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 BocaShell_With_IP := RECORD
 	Risk_Indicators.Layout_Boca_Shell bs;
@@ -242,7 +242,7 @@ EXPORT fp31105_1_0 (DATASET(BocaShell_With_IP) clam, INTEGER num_reasons = 6, BO
 	ams_college_tier                 := le.bs.student.college_tier;
 	prof_license_flag                := le.bs.professional_license.professional_license_flag;
 	estimated_income                 := le.bs.estimated_income;
-	archive_date                     := IF(le.bs.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.bs.historydate[1..6]);
+	archive_date                     := IF(le.bs.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.bs.historydate)[1..6]);
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *
@@ -255,7 +255,7 @@ EXPORT fp31105_1_0 (DATASET(BocaShell_With_IP) clam, INTEGER num_reasons = 6, BO
 		if(sas_date = NULL, NULL, (integer)((ut.DateFrom_DaysSince1900(sas_date + ut.DaysSince1900('1960', '1', '1')))[1..4]));
 	
 	sysdate := map(
-	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => Common.SAS_Date((STRING)if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01')),
+	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => Common.SAS_Date((STRING)if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01')),
 	    length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 	                                                           NULL);
 	
@@ -454,7 +454,7 @@ EXPORT fp31105_1_0 (DATASET(BocaShell_With_IP) clam, INTEGER num_reasons = 6, BO
 	
 	point := -40;
 	
-	phat := exp(logit) / (1 + exp(logit));
+	phat := exp((REAL)logit) / (1 + exp((REAL)logit));
 	
 	fp3710 := truncate(point * (ln(phat / (1 - phat)) - ln(odds)) / ln(2) + base);
 	
@@ -465,7 +465,7 @@ EXPORT fp31105_1_0 (DATASET(BocaShell_With_IP) clam, INTEGER num_reasons = 6, BO
 	ssnhighissue_yr := map(
 	    trim((STRING)rc_ssnhighissue) = '' => NULL,
 	    rc_ssnhighissue = 0                => NULL,
-	                                    (UNSIGNED)TRIM((string)rc_ssnhighissue[1..4]));
+	                                    (UNSIGNED)TRIM(((string)rc_ssnhighissue)[1..4]));
 	
 	dob_yr := map(
 	    trim(in_dob) = '' 				=> NULL,

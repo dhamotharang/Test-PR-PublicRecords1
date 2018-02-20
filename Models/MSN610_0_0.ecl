@@ -1,4 +1,4 @@
-import ut, risk_indicators, EASI;
+import ut, risk_indicators, EASI, std;
 
 export MSN610_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, unsigned3 history_date) := 
 
@@ -179,8 +179,8 @@ Layout_ModelOut doModel(results le) := TRANSFORM
 	
 	/* AVG Lres */
 	
-	add1_year_first_seen := (integer)(le.bs.address_verification.input_address_information.date_first_seen[1..4]);
-	sysyear := if(history_date <> 999999, (integer)((string)history_date[1..4]), (integer)(ut.GetDate[1..4]));
+	add1_year_first_seen := (integer)(((STRING)le.bs.address_verification.input_address_information.date_first_seen)[1..4]);
+	sysyear := if(history_date <> 999999, (integer)(((string)history_date)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 
      firstseendate1 := if(add1_year_first_seen = 0, 10000, add1_year_first_seen);
      lres_yearsb := abs(sysyear - firstseendate1);
@@ -188,14 +188,14 @@ Layout_ModelOut doModel(results le) := TRANSFORM
      yfseen_pop1 := if(lres_yearsb > 1000, 0, 1);
 
 
-     secondseendate := (integer)(le.bs.address_verification.address_history_1.date_first_seen[1..4]);
+     secondseendate := (integer)(((STRING)le.bs.address_verification.address_history_1.date_first_seen)[1..4]);
      secondseendate2 := if(secondseendate = 0, 10000, secondseendate);
      lres_yearsc := abs(firstseendate1 - secondseendate2);
      lres_years2 := if(lres_yearsc > 1000, -1, if(lres_yearsc > 100, 100, lres_yearsc));
      yfseen_pop2 := if(lres_yearsc > 1000, 0, 1);
 
 
-     thirdseendate := (integer)(le.bs.address_verification.address_history_2.date_first_seen[1..4]);
+     thirdseendate := (integer)(((STRING)le.bs.address_verification.address_history_2.date_first_seen)[1..4]);
      thirdseendate3 := if(thirdseendate = 0, 10000, thirdseendate);
      lres_yearsd := abs(secondseendate2 - thirdseendate3);
      lres_years3 := if(lres_yearsd > 1000, -1, if(lres_yearsd > 100, 100, lres_yearsd));

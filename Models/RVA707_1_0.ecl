@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -77,7 +77,7 @@ export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 		mymin( a, b ) := MACRO if( a < b, a, b ) ENDMACRO;
 		
 		// today := if(history_date <> 999999, (integer)((string)history_date[1..4]), (integer)(ut.GetDate[1..4]));
-		today := if(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+		today := if(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 
 
 		isbestmatch := map
@@ -147,7 +147,7 @@ export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 		today1900 := ut.DaysSince1900( today[1..4], today[5..6], today[7..8] );
 		birth1900 := ut.DaysSince1900( in_dob[1..4], in_dob[5..6], in_dob[7..8] );
-		li1900    := ut.DaysSince1900( low_issue_date[1..4], low_issue_date[5..6], low_issue_date[7..8] );
+		li1900    := ut.DaysSince1900( ((STRING)low_issue_date)[1..4], ((STRING)low_issue_date)[5..6], ((STRING)low_issue_date)[7..8] );
 		
 		age_calc := map
 		(
@@ -163,7 +163,7 @@ export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 
 		dob_sas_undef := (INTEGER)in_dob = 0; // for sas: dob_sas = .
-		age_low_issue_date := if( dob_sas_undef OR low_issue_date = 0 OR (string)low_issue_date[1..4]=in_dob[1..4], -1, (INTEGER)((li1900 - birth1900)/365.25) );
+		age_low_issue_date := if( dob_sas_undef OR low_issue_date = 0 OR ((string)low_issue_date)[1..4]=in_dob[1..4], -1, (INTEGER)((li1900 - birth1900)/365.25) );
 		age_low_issue_date2 := if( age_low_issue_date < 0, 18, mymin(age_low_issue_date,35) );
 
 		rc_disthphoneaddr_0 := (rc_disthphoneaddr > 0);

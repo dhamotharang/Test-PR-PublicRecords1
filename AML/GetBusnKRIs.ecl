@@ -1,4 +1,6 @@
-IMPORT UT;
+﻿IMPORT UT, std;
+
+todays_date := (string) STD.Date.Today();
 
 EXPORT GetBusnKRIs(DATASET(Layouts.BusnLayoutV2) BusnBDIDs) := FUNCTION
 
@@ -93,13 +95,13 @@ Layouts.BusnLayoutV2  BusnKRIs(BusnBDIDs le)  := TRANSFORM
 																	
 	self.BusStabilityRisk  := Map(
 																 le.LastDissolvedDate <> 0 and le.lastReinstatDate = 0 												    => '9', 
-																 	round((ut.DaysApart((string)le.lastReinstatDate, ut.GetDate)) / 30) <= 12
+																 	round((ut.DaysApart((string)le.lastReinstatDate, todays_date)) / 30) <= 12
 																	and le.lastReinstatDate <> 0 																								    => '8',
 														 			le.LastCorpStatus = 'I' 																								          => '7',
 
 																	le.addressChangeSOS	or 	le.contactChangeSOS	or le.BusnNameChangeSOS	or
 																	(le.FirstSeenInputAddr <> 0 and
-																	ut.DaysApart((string)le.FirstSeenInputAddr, ut.GetDate)  <= 90)							    => '6',	
+																	ut.DaysApart((string)le.FirstSeenInputAddr, todays_date)  <= 90)							    => '6',	
 																	le.ExecSNNMatch 			                                                            => '5',
 																	(max(le.SOSAddrLocationCount, le.HDAddrCount) between 1 and 3) 
 																	 and (max(le.CorpStateCount,le.HDStateCount) = 1 ) 														=> '4',	
@@ -152,7 +154,7 @@ Layouts.BusnLayoutV2  BusnKRIs(BusnBDIDs le)  := TRANSFORM
 																		trim(le.busnType) = 'LIMITED LIABILITY PARTNERSHIP'								=>  '2',
 																	trim(le.busnType) = ''																								=>  '1',
 																	'0');																	
-	SOSAge := ut.DaysApart((string)le.SOSFirstReported, ut.GetDate);
+	SOSAge := ut.DaysApart((string)le.SOSFirstReported, todays_date);
 	self.BusSOSAgeRange  := Map(
 																le.NoSOSFiling									  													=> '9',
 																SOSAge < ut.DaysInNYears(1) and ~le.NoSOSFiling   					=> '8',
@@ -164,7 +166,7 @@ Layouts.BusnLayoutV2  BusnKRIs(BusnBDIDs le)  := TRANSFORM
 																~le.NoSOSFiling and	 SOSAge < ut.DaysInNYears(10)  					=>  '2',
 																~le.NoSOSFiling and	SOSAge >=  ut.DaysInNYears(10)	 				=>  '1',
 																	'0');
-	HDRAge := ut.DaysApart((string)le.BusnHdrDtFirstSeen, ut.GetDate);
+	HDRAge := ut.DaysApart((string)le.BusnHdrDtFirstSeen, todays_date);
 	self.BusPublicRecordAgeRange  := Map(
 																			  le.srcCount = 0 																											=> '9', 
 																			 HDRAge < ut.DaysInNYears(1)and le.srcCount > 1		
