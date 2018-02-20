@@ -102,8 +102,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 																	L.z5          = addr_rec.z5)             and
 															  (L.prim_range <> '' or L.prim_name <> '');
 		
-		boolean isInputFullNameMatch := L.name_first = ssn_rec.fname AND
-																		L.name_last = ssn_rec.lname;
+		boolean isInputFullNameMatch := L.name_first = ssn_rec.best_fname AND
+																		L.name_last = ssn_rec.best_lname;
 		
 		boolean hasInputAddrInHistory := StringLib.StringContains(addr_rec.matchcodes, 'A', TRUE) or 
 		                                                          addr_rec.hasInputAddr;
@@ -117,8 +117,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 		// req. 4.1.23		-- TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic, and 4.1.3 fill in best field if not match to input
 		self.Address_Confidence := addr_rec.conf_flag;
 
-		self.best_fname := if(take_best_name, ssn_rec.fname, '');
-		self.best_lname := if(take_best_name, ssn_rec.lname, '');
+		self.best_fname := if(take_best_name, ssn_rec.best_fname, '');
+		self.best_lname := if(take_best_name, ssn_rec.best_lname, '');
 		self.best_addr1 := if(take_best, Address.Addr1FromComponents(addr_rec.prim_range, 
 		                                                             addr_rec.predir, 
 																																 addr_rec.prim_name, 

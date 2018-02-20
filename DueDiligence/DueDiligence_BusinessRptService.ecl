@@ -3,12 +3,16 @@
 
 EXPORT DueDiligence_BusinessRptService := MACRO
 	
-			requestName := 'DueDiligenceReportRequest';
+			requestName := 'DueDiligenceBusinessReportRequest';
+			requestLayout := iesp.duediligencebusinessreport.t_DueDiligenceBusinessReportRequest;
+			
+			requestResponseLayout := iesp.duediligencebusinessreport.t_DueDiligenceBusinessReportResponse;
+			
 			
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
 			
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(iesp.duediligencereport.t_DueDiligenceReportRequest, requestName, TRUE);
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.BUSINESS);
 			
 			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
 			
@@ -25,8 +29,8 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 			busnIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
 			
-			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.BUSINESS,
-																																																										DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion);
+			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
+																															DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion);
 
 
 			output(final, NAMED('Results')); //This is the customer facing output    

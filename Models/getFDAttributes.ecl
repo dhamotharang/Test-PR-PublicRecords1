@@ -1,16 +1,17 @@
-/*2016-04-14T00:44:44Z (mark seubert)
+﻿/*2016-04-14T00:44:44Z (mark seubert)
 RR10222 Rolling back code to previous release
 */
 /*2015-08-28T02:52:26Z (Kenneth Hill_prod)
 188007 - FP 201 attr change to RV5
 */
-import address, Easi, Risk_Indicators, Riskwise, ut;
+import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam, 
 	grouped DATASET(Risk_Indicators.Layout_Output) iid, 
 	string30 account_value,
 	dataset(riskwise.Layout_IP2O) ips,
-	string model_name=''
+	string model_name='',
+	boolean suppressCompromisedDLs=false
 	) := FUNCTION
 
 
@@ -885,6 +886,18 @@ self.version201.SourceDriversLicense := map(le.did=0 => '-1',
 																					(le.iid_out.insurance_dl_used)																													=> '2',
 																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 				=> '1',
 																					'0');
+																					
+// if the option to SuppressCompromisedDLs is set to true, check the last name and SSN against the equifax compromised DL key
+DL_is_compromised := if(SuppressCompromisedDLs, 
+	IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(le.shell_input.lname, le.shell_input.ssn),
+	false);
+
+self.version201.IdentityDriversLicenseComp := map(
+	le.truedid=false => '-1',  // no identity found
+	(integer)le.shell_input.ssn=0 => '0',  // SSN not provided
+	DL_is_compromised => '2',  //  A Driver’s License associated to the identity potentially compromised
+	'1');  // no known issues
+	
 	self := [];
 END;
 

@@ -25,8 +25,9 @@ MODULE
   dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
 			
 		// DIDs	
-	 dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
-	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput, true) + PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput));				
+	dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
+	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone = ''), true) + 
+											           PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone != '')));							
 																																														
 	
 	PhoneFinder_Services.Layouts.BatchInAppendAcctno tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,

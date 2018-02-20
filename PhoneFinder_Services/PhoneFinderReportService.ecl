@@ -107,7 +107,7 @@ MACRO
 														AutoStandardI.InterfaceTranslator.lname_val.val(searchMod),
 														cleanName.lname);
 		SELF.name_suffix := cleanName.name_suffix;
-		SELF.z5          := cleanAddr.zip;
+		SELF.z5          := IF(cleanAddr.zip != '', cleanAddr.zip, searchMod.Zip);
 		SELF.ssn         := IF( AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod),
 														searchMod.SSN);

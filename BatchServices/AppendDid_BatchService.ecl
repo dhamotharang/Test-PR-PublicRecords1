@@ -1,11 +1,9 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchServices.AppendDid_BatchService">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="Appends" type="xsd:string"/>
   <part name="Verify" type="xsd:string"/>
   <part name="Fuzzies" type="xsd:string"/>
-  <part name="Lookups" type="xsd:boolean"/>
-  <part name="LivingSits" type="xsd:boolean"/>
   <part name="Deduped" type="xsd:boolean"/>
   <part name="AppendThreshold" type="xsd:string"/>
   <part name="GLBData" type="xsd:boolean"/>
@@ -26,13 +24,11 @@ export AppendDid_BatchService := macro
 string120 append_l := '' 		  : stored('Appends');
 string120 verify_l := '' 		  : stored('Verify');
 string120 fuzzy_l := '' 			: stored('Fuzzies');
-boolean   lookups := false 		: stored('Lookups');
-boolean   livingSits := false     : stored('LivingSits');
 boolean   dedup_results := true 	: stored('Deduped');
 string3   thresh_val := '' 		    : stored('AppendThreshold');
-boolean   GLB := false 			      : stored('GLBData');
+boolean   GLBData := false 			      : stored('GLBData');
 boolean   patriotproc := false   	: stored('PatriotProcess');
-unsigned1 glb_purpose_value  := 0 : stored('GLBPurpose');
+unsigned1 glb_purpose_value  := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 boolean   include_minors := false   : stored('IncludeMinors');
 unsigned1 soap_xadl_version_value := 0 : stored('xADLVersion');			
 
@@ -43,10 +39,10 @@ string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(pro
 // majority of first and last names are populated during record retreival
 UseNonBlankKey := TRUE;
 
-appends := stringlib.stringtouppercase(append_l);
-verify := stringlib.stringtouppercase(verify_l);
+appends := std.str.ToUpperCase(append_l);
+verify := std.str.ToUpperCase(verify_l);
 thresh_num := (unsigned2)thresh_val;
-fuzzy := stringlib.stringtouppercase(fuzzy_l);
+fuzzy := std.str.ToUpperCase(fuzzy_l);
 
 ds_batchIn := dataset([],BatchServices.AppendDid_BatchService_Layouts.layout_did_InbatchWithAcctno) : stored('batch_in');
 
@@ -58,10 +54,8 @@ ds_batchResults := BatchServices.AppendDID_BatchService_Records.search(ds_batchI
   fuzzy,
   dedup_results,
 	thresh_num,
-	GLB,
-	patriotproc,
-	lookups,
-	livingSits,
+	GLBdata,
+	patriotproc,	
 	glb_purpose_value,
 	Include_minors,
 	useNonBlankKey,
@@ -77,9 +71,6 @@ BatchShare.MAC_RestoreAcctno(ds_batchInProcessed,ds_batchResults,results);
 
 //output(ds_batchResults, named('ds_batchResults'));
 
-// output(isLabData1, named('isLabData1'));
-// output(res, named('res'));
-//output(res,named('Result'));
 output(results, named('Results'));
 
 endmacro;

@@ -29,7 +29,8 @@ real threshold_val_temp := 0 : STORED('Threshold');
 													threshold_val_temp);
 
 boolean ofac_only_value := false : STORED('OfacOnly');
-string20 search_type := 'BOTH' : STORED('search_type');
+string20 search_type_temp := '' : STORED('search_type');
+search_type := if(trim(search_type_temp) = '', 'BOTH', search_type_temp);
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE: stored('IncludeOfac');
 boolean exclude_aka := FALSE: stored('ExcludeAllAKA');
