@@ -158,7 +158,6 @@ MODULE
  PhoneFinder_Services.Layouts.PhoneFinder.BatchOut tPopulateRoyalty(PhoneFinder_Services.Layouts.PhoneFinder.BatchOut le,PhoneFinder_Services.Layouts.PhoneFinder.Final ri) :=
  TRANSFORM
    		BOOLEAN vLastResortExists := ri.vendor_id = MDR.sourceTools.src_wired_Assets_Royalty;
-   		BOOLEAN vMetronetExists   := ri.subj_phone_type_new = MDR.sourceTools.src_Metronet_Gateway;
    		BOOLEAN vQSentExists      := ri.vendor_id = MDR.sourceTools.src_Inhouse_QSent;
    		BOOLEAN vQSentIQ411Exists := ri.typeflag = Phones.Constants.TypeFlag.DataSource_iQ411;
    		BOOLEAN vQSentPVSExists   := ri.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
@@ -169,8 +168,7 @@ MODULE
    		
    		SELF.royalty_type_1 := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_type_1);
    		SELF.royalty_src_1  := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_src_1);
-   		SELF.royalty_type_2 := IF(vMetronetExists,Royalty.Constants.RoyaltyType.METRONET,le.royalty_type_2);
-   		SELF.royalty_src_2  := IF(vMetronetExists,MDR.sourceTools.src_Metronet_Gateway,le.royalty_src_2);
+   		// royalty_src_2 is Metronet, removed it as a part of Experian Removal Project
    		SELF.royalty_type_3 := IF(vQSentExists,Royalty.Constants.RoyaltyType.QSENT,le.royalty_type_3);
    		SELF.royalty_src_3  := IF(vQSentExists,MDR.sourceTools.src_Inhouse_QSent,le.royalty_src_3);
    		SELF.royalty_type_4 := IF(vQSentIQ411Exists,Royalty.Constants.RoyaltyType.QSENT_IQ411,le.royalty_type_4);
@@ -201,7 +199,6 @@ MODULE
  // Calculate royalties by acctno
  dRoyaltiesLastResort 	:= Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, phone);
  dResultsDedupMNR			:= dedup(sort(dResultsDedup, acctno, subj_phone_type_new), acctno, subj_phone_type_new); // to match the counters calculated in the denormalize step above
- dRoyaltiesMetronet 		:= Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupMNR, subj_phone_type_new);
  dResultsDedupQSentR		:= dedup(sort(dResultsDedupQSent, acctno, vendor_id, typeflag), acctno, vendor_id, typeflag); // to match the counters calculated in the denormalize step above
  dRoyaltiesQSent 			:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupQSentR, vendor_id, typeflag);
  dRoyaltiesTargus 			:= Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, targustype);
@@ -213,7 +210,6 @@ MODULE
  dRoyaltiesByAcctno := 
    		if(inMod.UseLastResort, dRoyaltiesLastResort) + 
    		if(inMod.UseInHouseQSent or inMod.UseQSent, dRoyaltiesQSent) + 
-   		if(inMod.UseMetronet, dRoyaltiesMetronet) + 
    		if(inMod.UseTargus, dRoyaltiesTargus) +	
    		if(inMod.UseEquifax, dRoyaltiesEquifax) +	
    		if(inMod.UseAccudata_OCN, dRoyaltiesAccudata_ocn) +	 //accudata_ocn

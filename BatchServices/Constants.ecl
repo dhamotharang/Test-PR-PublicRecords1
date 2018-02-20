@@ -168,12 +168,7 @@ EXPORT Constants := MODULE
 		
 	END;
 	
-	EXPORT ProgressivePhone :=
-	MODULE
-		EXPORT DefaultMetronetScoreThreshold := 632;
-	END;
-
-  EXPORT TRISv3 := MODULE
+	EXPORT TRISv3 := MODULE
 
 		EXPORT Correctional_Institution := '9223';
 		EXPORT Data_Type_1 := '1';

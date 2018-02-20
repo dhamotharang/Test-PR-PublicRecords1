@@ -20,9 +20,7 @@ EXPORT fn_progressivePhone := MODULE
 																											 progphone_mod.type_a_with_did,
 																											 progphone_mod.useNeustar,
 																											 progphone_mod.default_sx_match_limit,
-																											 progphone_mod.callMetronet,
 																											 progphone_mod.isPFR,
-																											 progphone_mod.metronetLimit,
 																											 progphone_mod.ScoreModel,
 																											 progphone_mod.MaxNumAssociate,
 																											 progphone_mod.MaxNumAssociateOther,
@@ -32,7 +30,6 @@ EXPORT fn_progressivePhone := MODULE
 																											 progphone_mod.MaxNumSpouse,
 																											 progphone_mod.MaxNumSubject,
 																											 progphone_mod.MaxNumNeighbor,
-																											 progphone_mod.Confirmation_GoToGateway,
 																											 progphone_mod.UsePremiumSource_A,
 																											 progphone_mod.PremiumSource_A_limit,
 																											 progphone_mod.RunRelocation),progPhoneLayout);

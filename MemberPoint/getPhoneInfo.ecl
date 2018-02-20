@@ -1,4 +1,4 @@
-import progressive_phone,addrbest,Gateway;
+﻿import progressive_phone,addrbest,Gateway;
 
 /*
 Run the minor through WFV7 and only return a confirmed phone. 
@@ -33,8 +33,6 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 				));
 
 		gateways_in := Gateway.Configuration.Get();
-		BOOLEAN callMetronet := BParams.UseMetronet;
-		INTEGER metronetLimit := 0;
 		//WFP v7 only.  Returns the input phone along with any other selected countTypes.
 		BOOLEAN includeInputPhone := TRUE; 
 		BOOLEAN ReturnScore := BParams.ReturnScore;
@@ -88,9 +86,7 @@ EXPORT getPhoneInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, MemberPo
 																											 ,
 																											 ,
 																											 ,
-																											 callMetronet,
 																											 ,
-																											 metronetLimit,
 																											 scoreModel,
 																											 MaxNumAssociate,
 																											 MaxNumAssociateOther,

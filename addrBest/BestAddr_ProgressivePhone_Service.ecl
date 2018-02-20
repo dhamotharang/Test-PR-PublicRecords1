@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BestAddress and Progressive Phones Batch_Service">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DateLastSeen"		type="xsd:string"/>	
@@ -65,9 +65,7 @@
 	<part name="DLMask"	type="xsd:string"/>
   <part name="SkipPhoneScoring" type="xsd:boolean"/>
   <part name="ReturnScore" type="xsd:boolean"/>
-  <part name="UseMetronet" type="xsd:boolean"/>
-  <part name="MetronetLimit" type="xsd:integer"/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
   <part name="Phone_Score_Model" type="xsd:string"/>
   <part name="MaxNumAssociate" type="xsd:unsignedInt"/>
 	<part name="MaxNumAssociateOther" type="xsd:unsignedInt"/>
@@ -181,8 +179,6 @@ export BestAddr_ProgressivePhone_Service := macro
  WSInput.MAC_AddrBest_bestaddr_progressivephone_service();
 
 gateways_in := Gateway.Configuration.Get();
-boolean callMetronet := false : stored('UseMetronet');
-integer metronetLimit := 0: stored('MetronetLimit');
 
 //WFP v7 only.  Returns the input phone along with any other selected countTypes.
 BOOLEAN includeInputPhone := FALSE : STORED('IncludeInputPhone'); 
@@ -230,9 +226,7 @@ ProgressivePhones := AddrBest.Progressive_phone_common(f_in_progressive_phone,
 																											 ,
 																											 ,
 																											 ,
-																											 callMetronet,
 																											 ,
-																											 metronetLimit,
 																											 scoreModel,
 																											 MaxNumAssociate,
 																											 MaxNumAssociateOther,
@@ -275,19 +269,8 @@ both := if (include_deceased_date, project(AddrBest.functions.fn_addDeceased(bot
 
 out_recs := sort(project(both,out_rec),acctno,ind,cnt);
 
-results := progressive_phone.FN_BatchFinalAssignments(out_recs, out_rec, callMetronet);
+results := progressive_phone.FN_BatchFinalAssignments(out_recs, out_rec);
 
-// ROYALTIES
-boolean ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
-dRoyaltiesByAcctno	:= if(callMetronet, Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(f_in_raw, 
-																																													out_recs,
-																																													,
-																																													,
-																																													acctno));
-																																													
-dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);	
-
-output(dRoyalties,named('RoyaltySet'));
 output(results, named('Results'));	
 
 endmacro;

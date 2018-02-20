@@ -1,11 +1,10 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Progressive_Phone_Batch_With_Details_Service" wuTimeout="300000">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DPPAPurpose" type="xsd:unsignedInt"/>
   <part name="GLBPurpose" type="xsd:unsignedInt"/>
   <part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
-  <part name="DedupAgainstInputPhones" type="xsd:boolean"/>
-	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
+  	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
   <part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
   <part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
   <part name="CountType3_Ap_PROGRESSIVEADDRESSSEARCH" type="xsd:unsignedInt"/>
@@ -48,9 +47,7 @@
   <part name="SkipPhoneScoring" type="xsd:boolean"/>
   <part name="ReturnScore" type="xsd:boolean"/>
 	<part name="QSentV2_SearchType" type="xsd:string"/>
-  <part name="UseMetronet" type="xsd:boolean"/>
-  <part name="MetronetLimit" type="xsd:integer"/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
 	<part name="Gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
   <part name="Phone_Score_Model" type="xsd:string"/>
   <part name="MaxNumAssociate" type="xsd:unsignedInt"/>
@@ -131,9 +128,7 @@ import progressive_phone, didville, risk_indicators, ut, addrbest, doxie, header
 export progressive_phone_batch_with_details_service := macro
 
   gateways_in := Gateway.Configuration.Get();
-	boolean callMetronet := false : STORED('UseMetronet');
-  integer metronetLimit := 0 : STORED('MetronetLimit');
-	
+		
 	// Options for phone_shell WFP v7
 	STRING25 scoreModel		 				:= ''		: STORED('Phone_Score_Model');
 
@@ -155,9 +150,7 @@ export progressive_phone_batch_with_details_service := macro
 																											, 
 																											, 
 																											,  
-																											callMetronet, 
 																											, 
-																											metronetLimit,  
 																											scoreModel,
 																											MaxNumAssociate,
 																											MaxNumAssociateOther,
@@ -209,14 +202,13 @@ export progressive_phone_batch_with_details_service := macro
 
 	// BATCH RESULTS
 	ut.mac_TrimFields(results, 'results', results_trimmed);
-	results_final := progressive_phone.FN_BatchFinalAssignments(results_trimmed, progressive_phone.layout_progressive_phone_batch_with_details_out, callMetronet);
+	results_final := progressive_phone.FN_BatchFinalAssignments(results_trimmed, progressive_phone.layout_progressive_phone_batch_with_details_out);
 	
 	// ROYALTIES
 	boolean ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
 	ds_qsroyalties 			:= dedup(sort(results,acctno,royalty_type),acctno,royalty_type); // only one royalty count per accnt no per type.. royalties are per request
 	dRoyaltiesQSent 		:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(f_in_raw, ds_qsroyalties,,,,acctno);
-	dRoyaltiesMetronet 	:= Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(f_in_raw, results_trimmed,,,acctno); 	
-	dRoyaltiesByAcctno 	:= dRoyaltiesQSent + if(callMetronet, dRoyaltiesMetronet);
+	dRoyaltiesByAcctno 	:= dRoyaltiesQSent;
 	dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
 	
 	output(dRoyalties,named('RoyaltySet'));

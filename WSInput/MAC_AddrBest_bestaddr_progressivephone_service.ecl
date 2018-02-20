@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for AddrBest.BestAddr_ProgressivePhone_Service
+﻿// This service created to add Web Service fields for AddrBest.BestAddr_ProgressivePhone_Service
 
 EXPORT MAC_AddrBest_bestaddr_progressivephone_service := MACRO
 
@@ -71,8 +71,6 @@ EXPORT MAC_AddrBest_bestaddr_progressivephone_service := MACRO
                     'IncludeLastResort',
                     'SkipPhoneScoring',
                     'ReturnScore',
-                    'UseMetronet',
-                    'MetronetLimit',
                     'ReturnDetailedRoyalties',	
                     'Phone_Score_Model',
 										'MaxRecordsToReturn',
