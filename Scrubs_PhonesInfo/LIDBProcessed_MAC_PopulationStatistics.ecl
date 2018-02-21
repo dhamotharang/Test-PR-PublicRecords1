@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT LIDBProcessed_MAC_PopulationStatistics(infile,Ref='',Input_reference_id = '',Input_dt_first_reported = '',Input_dt_last_reported = '',Input_phone = '',Input_reply_code = '',Input_local_routing_number = '',Input_account_owner = '',Input_carrier_name = '',Input_carrier_category = '',Input_local_area_transport_area = '',Input_point_code = '',Input_serv = '',Input_line = '',Input_spid = '',Input_operator_fullname = '',Input_activation_dt = '',Input_number_in_service = '',Input_high_risk_indicator = '',Input_prepaid = '',OutFile) := MACRO
-  IMPORT SALT310,Scrubs_PhonesInfo;
+  IMPORT SALT39,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT310.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

@@ -1,4 +1,4 @@
-﻿IMPORT SALT310,STD;
+﻿IMPORT SALT39,STD;
 EXPORT In_Port_Daily_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -25,16 +25,16 @@ EXPORT In_Port_Daily_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(In_Port_Daily_Layout_PhonesInfo) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.action_code_Invalid := In_Port_Daily_Fields.InValid_action_code((SALT310.StrType)le.action_code);
-    SELF.country_code_Invalid := In_Port_Daily_Fields.InValid_country_code((SALT310.StrType)le.country_code);
-    SELF.phone_Invalid := In_Port_Daily_Fields.InValid_phone((SALT310.StrType)le.phone);
-    SELF.dial_type_Invalid := In_Port_Daily_Fields.InValid_dial_type((SALT310.StrType)le.dial_type);
-    SELF.spid_Invalid := In_Port_Daily_Fields.InValid_spid((SALT310.StrType)le.spid);
-    SELF.service_type_Invalid := In_Port_Daily_Fields.InValid_service_type((SALT310.StrType)le.service_type);
-    SELF.routing_code_Invalid := In_Port_Daily_Fields.InValid_routing_code((SALT310.StrType)le.routing_code);
-    SELF.porting_dt_Invalid := In_Port_Daily_Fields.InValid_porting_dt((SALT310.StrType)le.porting_dt);
-    SELF.country_abbr_Invalid := In_Port_Daily_Fields.InValid_country_abbr((SALT310.StrType)le.country_abbr);
-    SELF.filename_Invalid := In_Port_Daily_Fields.InValid_filename((SALT310.StrType)le.filename);
+    SELF.action_code_Invalid := In_Port_Daily_Fields.InValid_action_code((SALT39.StrType)le.action_code);
+    SELF.country_code_Invalid := In_Port_Daily_Fields.InValid_country_code((SALT39.StrType)le.country_code);
+    SELF.phone_Invalid := In_Port_Daily_Fields.InValid_phone((SALT39.StrType)le.phone);
+    SELF.dial_type_Invalid := In_Port_Daily_Fields.InValid_dial_type((SALT39.StrType)le.dial_type);
+    SELF.spid_Invalid := In_Port_Daily_Fields.InValid_spid((SALT39.StrType)le.spid);
+    SELF.service_type_Invalid := In_Port_Daily_Fields.InValid_service_type((SALT39.StrType)le.service_type);
+    SELF.routing_code_Invalid := In_Port_Daily_Fields.InValid_routing_code((SALT39.StrType)le.routing_code);
+    SELF.porting_dt_Invalid := In_Port_Daily_Fields.InValid_porting_dt((SALT39.StrType)le.porting_dt);
+    SELF.country_abbr_Invalid := In_Port_Daily_Fields.InValid_country_abbr((SALT39.StrType)le.country_abbr);
+    SELF.filename_Invalid := In_Port_Daily_Fields.InValid_filename((SALT39.StrType)le.filename);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -97,8 +97,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT310.StrType ErrorMessage;
-    SALT310.StrType FieldContents;
+    SALT39.StrType ErrorMessage;
+    SALT39.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -117,7 +117,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.filename_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'action_code','country_code','phone','dial_type','spid','service_type','routing_code','porting_dt','country_abbr','filename','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_Action_Code','Invalid_Num','Invalid_Num','Invalid_DCT','Invalid_Num','Invalid_TOS','Invalid_Num_Blank','Invalid_Port_Date','Invalid_ISO2','Invalid_Filename','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT310.StrType)le.action_code,(SALT310.StrType)le.country_code,(SALT310.StrType)le.phone,(SALT310.StrType)le.dial_type,(SALT310.StrType)le.spid,(SALT310.StrType)le.service_type,(SALT310.StrType)le.routing_code,(SALT310.StrType)le.porting_dt,(SALT310.StrType)le.country_abbr,(SALT310.StrType)le.filename,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.action_code,(SALT39.StrType)le.country_code,(SALT39.StrType)le.phone,(SALT39.StrType)le.dial_type,(SALT39.StrType)le.spid,(SALT39.StrType)le.service_type,(SALT39.StrType)le.routing_code,(SALT39.StrType)le.porting_dt,(SALT39.StrType)le.country_abbr,(SALT39.StrType)le.filename,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,10,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -125,7 +125,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(In_Port_Daily_Layout_PhonesInfo) prevDS = DATASET([], In_Port_Daily_Layout_PhonesInfo), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT310.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -207,12 +207,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT310.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT310.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -227,7 +227,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT310.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -269,7 +269,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,10,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT310.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -294,12 +294,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(In_Port_Daily_Layout_PhonesInfo) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT310.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT310.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, In_Port_Daily_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, In_Port_Daily_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -310,10 +310,10 @@ EXPORT StandardStats(DATASET(In_Port_Daily_Layout_PhonesInfo) inFile, BOOLEAN do
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT310.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT310.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

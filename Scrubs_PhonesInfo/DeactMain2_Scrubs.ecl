@@ -1,12 +1,12 @@
-﻿IMPORT SALT310,STD;
+﻿IMPORT SALT39,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT DeactMain2_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 18;
-  EXPORT NumRulesFromFieldType := 18;
+  EXPORT NumRules := 17;
+  EXPORT NumRulesFromFieldType := 17;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 18;
+  EXPORT NumFieldsWithRules := 17;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(DeactMain2_Layout_Phonesinfo)
@@ -19,7 +19,6 @@ EXPORT DeactMain2_Scrubs := MODULE
     UNSIGNED1 filedate_Invalid;
     UNSIGNED1 swap_start_dt_Invalid;
     UNSIGNED1 swap_end_dt_Invalid;
-    UNSIGNED1 deact_code_Invalid;
     UNSIGNED1 deact_start_dt_Invalid;
     UNSIGNED1 deact_end_dt_Invalid;
     UNSIGNED1 react_start_dt_Invalid;
@@ -34,30 +33,29 @@ EXPORT DeactMain2_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(DeactMain2_Layout_Phonesinfo) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.groupid_Invalid := DeactMain2_Fields.InValid_groupid((SALT310.StrType)le.groupid);
-    SELF.vendor_first_reported_dt_Invalid := DeactMain2_Fields.InValid_vendor_first_reported_dt((SALT310.StrType)le.vendor_first_reported_dt);
-    SELF.vendor_last_reported_dt_Invalid := DeactMain2_Fields.InValid_vendor_last_reported_dt((SALT310.StrType)le.vendor_last_reported_dt);
-    SELF.timestamp_Invalid := DeactMain2_Fields.InValid_timestamp((SALT310.StrType)le.timestamp);
-    SELF.phone_Invalid := DeactMain2_Fields.InValid_phone((SALT310.StrType)le.phone);
-    SELF.phone_swap_Invalid := DeactMain2_Fields.InValid_phone_swap((SALT310.StrType)le.phone_swap);
-    SELF.filedate_Invalid := DeactMain2_Fields.InValid_filedate((SALT310.StrType)le.filedate);
-    SELF.swap_start_dt_Invalid := DeactMain2_Fields.InValid_swap_start_dt((SALT310.StrType)le.swap_start_dt);
-    SELF.swap_end_dt_Invalid := DeactMain2_Fields.InValid_swap_end_dt((SALT310.StrType)le.swap_end_dt);
-    SELF.deact_code_Invalid := DeactMain2_Fields.InValid_deact_code((SALT310.StrType)le.deact_code);
-    SELF.deact_start_dt_Invalid := DeactMain2_Fields.InValid_deact_start_dt((SALT310.StrType)le.deact_start_dt);
-    SELF.deact_end_dt_Invalid := DeactMain2_Fields.InValid_deact_end_dt((SALT310.StrType)le.deact_end_dt);
-    SELF.react_start_dt_Invalid := DeactMain2_Fields.InValid_react_start_dt((SALT310.StrType)le.react_start_dt);
-    SELF.react_end_dt_Invalid := DeactMain2_Fields.InValid_react_end_dt((SALT310.StrType)le.react_end_dt);
-    SELF.is_react_Invalid := DeactMain2_Fields.InValid_is_react((SALT310.StrType)le.is_react);
-    SELF.is_deact_Invalid := DeactMain2_Fields.InValid_is_deact((SALT310.StrType)le.is_deact);
-    SELF.porting_dt_Invalid := DeactMain2_Fields.InValid_porting_dt((SALT310.StrType)le.porting_dt);
-    SELF.days_apart_Invalid := DeactMain2_Fields.InValid_days_apart((SALT310.StrType)le.days_apart);
+    SELF.groupid_Invalid := DeactMain2_Fields.InValid_groupid((SALT39.StrType)le.groupid);
+    SELF.vendor_first_reported_dt_Invalid := DeactMain2_Fields.InValid_vendor_first_reported_dt((SALT39.StrType)le.vendor_first_reported_dt);
+    SELF.vendor_last_reported_dt_Invalid := DeactMain2_Fields.InValid_vendor_last_reported_dt((SALT39.StrType)le.vendor_last_reported_dt);
+    SELF.timestamp_Invalid := DeactMain2_Fields.InValid_timestamp((SALT39.StrType)le.timestamp);
+    SELF.phone_Invalid := DeactMain2_Fields.InValid_phone((SALT39.StrType)le.phone);
+    SELF.phone_swap_Invalid := DeactMain2_Fields.InValid_phone_swap((SALT39.StrType)le.phone_swap);
+    SELF.filedate_Invalid := DeactMain2_Fields.InValid_filedate((SALT39.StrType)le.filedate);
+    SELF.swap_start_dt_Invalid := DeactMain2_Fields.InValid_swap_start_dt((SALT39.StrType)le.swap_start_dt);
+    SELF.swap_end_dt_Invalid := DeactMain2_Fields.InValid_swap_end_dt((SALT39.StrType)le.swap_end_dt);
+    SELF.deact_start_dt_Invalid := DeactMain2_Fields.InValid_deact_start_dt((SALT39.StrType)le.deact_start_dt);
+    SELF.deact_end_dt_Invalid := DeactMain2_Fields.InValid_deact_end_dt((SALT39.StrType)le.deact_end_dt);
+    SELF.react_start_dt_Invalid := DeactMain2_Fields.InValid_react_start_dt((SALT39.StrType)le.react_start_dt);
+    SELF.react_end_dt_Invalid := DeactMain2_Fields.InValid_react_end_dt((SALT39.StrType)le.react_end_dt);
+    SELF.is_react_Invalid := DeactMain2_Fields.InValid_is_react((SALT39.StrType)le.is_react);
+    SELF.is_deact_Invalid := DeactMain2_Fields.InValid_is_deact((SALT39.StrType)le.is_deact);
+    SELF.porting_dt_Invalid := DeactMain2_Fields.InValid_porting_dt((SALT39.StrType)le.porting_dt);
+    SELF.days_apart_Invalid := DeactMain2_Fields.InValid_days_apart((SALT39.StrType)le.days_apart);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),DeactMain2_Layout_Phonesinfo);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.groupid_Invalid << 0 ) + ( le.vendor_first_reported_dt_Invalid << 1 ) + ( le.vendor_last_reported_dt_Invalid << 2 ) + ( le.timestamp_Invalid << 3 ) + ( le.phone_Invalid << 4 ) + ( le.phone_swap_Invalid << 5 ) + ( le.filedate_Invalid << 6 ) + ( le.swap_start_dt_Invalid << 7 ) + ( le.swap_end_dt_Invalid << 8 ) + ( le.deact_code_Invalid << 9 ) + ( le.deact_start_dt_Invalid << 10 ) + ( le.deact_end_dt_Invalid << 11 ) + ( le.react_start_dt_Invalid << 12 ) + ( le.react_end_dt_Invalid << 13 ) + ( le.is_react_Invalid << 14 ) + ( le.is_deact_Invalid << 15 ) + ( le.porting_dt_Invalid << 16 ) + ( le.days_apart_Invalid << 17 );
+    SELF.ScrubsBits1 := ( le.groupid_Invalid << 0 ) + ( le.vendor_first_reported_dt_Invalid << 1 ) + ( le.vendor_last_reported_dt_Invalid << 2 ) + ( le.timestamp_Invalid << 3 ) + ( le.phone_Invalid << 4 ) + ( le.phone_swap_Invalid << 5 ) + ( le.filedate_Invalid << 6 ) + ( le.swap_start_dt_Invalid << 7 ) + ( le.swap_end_dt_Invalid << 8 ) + ( le.deact_start_dt_Invalid << 9 ) + ( le.deact_end_dt_Invalid << 10 ) + ( le.react_start_dt_Invalid << 11 ) + ( le.react_end_dt_Invalid << 12 ) + ( le.is_react_Invalid << 13 ) + ( le.is_deact_Invalid << 14 ) + ( le.porting_dt_Invalid << 15 ) + ( le.days_apart_Invalid << 16 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -75,15 +73,14 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.filedate_Invalid := (le.ScrubsBits1 >> 6) & 1;
     SELF.swap_start_dt_Invalid := (le.ScrubsBits1 >> 7) & 1;
     SELF.swap_end_dt_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.deact_code_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.deact_start_dt_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.deact_end_dt_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.react_start_dt_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.react_end_dt_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.is_react_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.is_deact_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.porting_dt_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.days_apart_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.deact_start_dt_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.deact_end_dt_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.react_start_dt_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.react_end_dt_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.is_react_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.is_deact_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.porting_dt_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.days_apart_Invalid := (le.ScrubsBits1 >> 16) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -101,7 +98,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     filedate_CUSTOM_ErrorCount := COUNT(GROUP,h.filedate_Invalid=1);
     swap_start_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.swap_start_dt_Invalid=1);
     swap_end_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.swap_end_dt_Invalid=1);
-    deact_code_ENUM_ErrorCount := COUNT(GROUP,h.deact_code_Invalid=1);
     deact_start_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.deact_start_dt_Invalid=1);
     deact_end_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.deact_end_dt_Invalid=1);
     react_start_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.react_start_dt_Invalid=1);
@@ -110,7 +106,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     is_deact_ENUM_ErrorCount := COUNT(GROUP,h.is_deact_Invalid=1);
     porting_dt_CUSTOM_ErrorCount := COUNT(GROUP,h.porting_dt_Invalid=1);
     days_apart_ALLOW_ErrorCount := COUNT(GROUP,h.days_apart_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.groupid_Invalid > 0 OR h.vendor_first_reported_dt_Invalid > 0 OR h.vendor_last_reported_dt_Invalid > 0 OR h.timestamp_Invalid > 0 OR h.phone_Invalid > 0 OR h.phone_swap_Invalid > 0 OR h.filedate_Invalid > 0 OR h.swap_start_dt_Invalid > 0 OR h.swap_end_dt_Invalid > 0 OR h.deact_code_Invalid > 0 OR h.deact_start_dt_Invalid > 0 OR h.deact_end_dt_Invalid > 0 OR h.react_start_dt_Invalid > 0 OR h.react_end_dt_Invalid > 0 OR h.is_react_Invalid > 0 OR h.is_deact_Invalid > 0 OR h.porting_dt_Invalid > 0 OR h.days_apart_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.groupid_Invalid > 0 OR h.vendor_first_reported_dt_Invalid > 0 OR h.vendor_last_reported_dt_Invalid > 0 OR h.timestamp_Invalid > 0 OR h.phone_Invalid > 0 OR h.phone_swap_Invalid > 0 OR h.filedate_Invalid > 0 OR h.swap_start_dt_Invalid > 0 OR h.swap_end_dt_Invalid > 0 OR h.deact_start_dt_Invalid > 0 OR h.deact_end_dt_Invalid > 0 OR h.react_start_dt_Invalid > 0 OR h.react_end_dt_Invalid > 0 OR h.is_react_Invalid > 0 OR h.is_deact_Invalid > 0 OR h.porting_dt_Invalid > 0 OR h.days_apart_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -118,9 +114,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.groupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendor_first_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vendor_last_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timestamp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_swap_ALLOW_ErrorCount > 0, 1, 0) + IF(le.filedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.deact_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_react_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_deact_ENUM_ErrorCount > 0, 1, 0) + IF(le.porting_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.days_apart_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.groupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendor_first_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vendor_last_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timestamp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_swap_ALLOW_ErrorCount > 0, 1, 0) + IF(le.filedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_react_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_deact_ENUM_ErrorCount > 0, 1, 0) + IF(le.porting_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.days_apart_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.groupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendor_first_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vendor_last_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timestamp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_swap_ALLOW_ErrorCount > 0, 1, 0) + IF(le.filedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.deact_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_react_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_deact_ENUM_ErrorCount > 0, 1, 0) + IF(le.porting_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.days_apart_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.groupid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.vendor_first_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vendor_last_reported_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timestamp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_swap_ALLOW_ErrorCount > 0, 1, 0) + IF(le.filedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.swap_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deact_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_start_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.react_end_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_react_ENUM_ErrorCount > 0, 1, 0) + IF(le.is_deact_ENUM_ErrorCount > 0, 1, 0) + IF(le.porting_dt_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.days_apart_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -130,13 +126,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT310.StrType ErrorMessage;
-    SALT310.StrType FieldContents;
+    SALT39.StrType ErrorMessage;
+    SALT39.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.groupid_Invalid,le.vendor_first_reported_dt_Invalid,le.vendor_last_reported_dt_Invalid,le.timestamp_Invalid,le.phone_Invalid,le.phone_swap_Invalid,le.filedate_Invalid,le.swap_start_dt_Invalid,le.swap_end_dt_Invalid,le.deact_code_Invalid,le.deact_start_dt_Invalid,le.deact_end_dt_Invalid,le.react_start_dt_Invalid,le.react_end_dt_Invalid,le.is_react_Invalid,le.is_deact_Invalid,le.porting_dt_Invalid,le.days_apart_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,DeactMain2_Fields.InvalidMessage_groupid(le.groupid_Invalid),DeactMain2_Fields.InvalidMessage_vendor_first_reported_dt(le.vendor_first_reported_dt_Invalid),DeactMain2_Fields.InvalidMessage_vendor_last_reported_dt(le.vendor_last_reported_dt_Invalid),DeactMain2_Fields.InvalidMessage_timestamp(le.timestamp_Invalid),DeactMain2_Fields.InvalidMessage_phone(le.phone_Invalid),DeactMain2_Fields.InvalidMessage_phone_swap(le.phone_swap_Invalid),DeactMain2_Fields.InvalidMessage_filedate(le.filedate_Invalid),DeactMain2_Fields.InvalidMessage_swap_start_dt(le.swap_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_swap_end_dt(le.swap_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_deact_code(le.deact_code_Invalid),DeactMain2_Fields.InvalidMessage_deact_start_dt(le.deact_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_deact_end_dt(le.deact_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_react_start_dt(le.react_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_react_end_dt(le.react_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_is_react(le.is_react_Invalid),DeactMain2_Fields.InvalidMessage_is_deact(le.is_deact_Invalid),DeactMain2_Fields.InvalidMessage_porting_dt(le.porting_dt_Invalid),DeactMain2_Fields.InvalidMessage_days_apart(le.days_apart_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.groupid_Invalid,le.vendor_first_reported_dt_Invalid,le.vendor_last_reported_dt_Invalid,le.timestamp_Invalid,le.phone_Invalid,le.phone_swap_Invalid,le.filedate_Invalid,le.swap_start_dt_Invalid,le.swap_end_dt_Invalid,le.deact_start_dt_Invalid,le.deact_end_dt_Invalid,le.react_start_dt_Invalid,le.react_end_dt_Invalid,le.is_react_Invalid,le.is_deact_Invalid,le.porting_dt_Invalid,le.days_apart_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,DeactMain2_Fields.InvalidMessage_groupid(le.groupid_Invalid),DeactMain2_Fields.InvalidMessage_vendor_first_reported_dt(le.vendor_first_reported_dt_Invalid),DeactMain2_Fields.InvalidMessage_vendor_last_reported_dt(le.vendor_last_reported_dt_Invalid),DeactMain2_Fields.InvalidMessage_timestamp(le.timestamp_Invalid),DeactMain2_Fields.InvalidMessage_phone(le.phone_Invalid),DeactMain2_Fields.InvalidMessage_phone_swap(le.phone_swap_Invalid),DeactMain2_Fields.InvalidMessage_filedate(le.filedate_Invalid),DeactMain2_Fields.InvalidMessage_swap_start_dt(le.swap_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_swap_end_dt(le.swap_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_deact_start_dt(le.deact_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_deact_end_dt(le.deact_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_react_start_dt(le.react_start_dt_Invalid),DeactMain2_Fields.InvalidMessage_react_end_dt(le.react_end_dt_Invalid),DeactMain2_Fields.InvalidMessage_is_react(le.is_react_Invalid),DeactMain2_Fields.InvalidMessage_is_deact(le.is_deact_Invalid),DeactMain2_Fields.InvalidMessage_porting_dt(le.porting_dt_Invalid),DeactMain2_Fields.InvalidMessage_days_apart(le.days_apart_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.groupid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.vendor_first_reported_dt_Invalid,'CUSTOM','UNKNOWN')
@@ -147,7 +143,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.filedate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.swap_start_dt_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.swap_end_dt_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.deact_code_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.deact_start_dt_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.deact_end_dt_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.react_start_dt_Invalid,'CUSTOM','UNKNOWN')
@@ -156,17 +151,17 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.is_deact_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.porting_dt_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.days_apart_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','timestamp','phone','phone_swap','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','days_apart','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_Num','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Num','Invalid_Num','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_DeactCode','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_YN','Invalid_YN','Invalid_Date','Invalid_Num','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT310.StrType)le.groupid,(SALT310.StrType)le.vendor_first_reported_dt,(SALT310.StrType)le.vendor_last_reported_dt,(SALT310.StrType)le.timestamp,(SALT310.StrType)le.phone,(SALT310.StrType)le.phone_swap,(SALT310.StrType)le.filedate,(SALT310.StrType)le.swap_start_dt,(SALT310.StrType)le.swap_end_dt,(SALT310.StrType)le.deact_code,(SALT310.StrType)le.deact_start_dt,(SALT310.StrType)le.deact_end_dt,(SALT310.StrType)le.react_start_dt,(SALT310.StrType)le.react_end_dt,(SALT310.StrType)le.is_react,(SALT310.StrType)le.is_deact,(SALT310.StrType)le.porting_dt,(SALT310.StrType)le.days_apart,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','timestamp','phone','phone_swap','filedate','swap_start_dt','swap_end_dt','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','days_apart','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_Num','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Num','Invalid_Num','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_YN','Invalid_YN','Invalid_Date','Invalid_Num','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.groupid,(SALT39.StrType)le.vendor_first_reported_dt,(SALT39.StrType)le.vendor_last_reported_dt,(SALT39.StrType)le.timestamp,(SALT39.StrType)le.phone,(SALT39.StrType)le.phone_swap,(SALT39.StrType)le.filedate,(SALT39.StrType)le.swap_start_dt,(SALT39.StrType)le.swap_end_dt,(SALT39.StrType)le.deact_start_dt,(SALT39.StrType)le.deact_end_dt,(SALT39.StrType)le.react_start_dt,(SALT39.StrType)le.react_end_dt,(SALT39.StrType)le.is_react,(SALT39.StrType)le.is_deact,(SALT39.StrType)le.porting_dt,(SALT39.StrType)le.days_apart,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,18,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(DeactMain2_Layout_Phonesinfo) prevDS = DATASET([], DeactMain2_Layout_Phonesinfo), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT310.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -180,7 +175,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'filedate:Invalid_Date:CUSTOM'
           ,'swap_start_dt:Invalid_Date:CUSTOM'
           ,'swap_end_dt:Invalid_Date:CUSTOM'
-          ,'deact_code:Invalid_DeactCode:ENUM'
           ,'deact_start_dt:Invalid_Date:CUSTOM'
           ,'deact_end_dt:Invalid_Date:CUSTOM'
           ,'react_start_dt:Invalid_Date:CUSTOM'
@@ -206,7 +200,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,DeactMain2_Fields.InvalidMessage_filedate(1)
           ,DeactMain2_Fields.InvalidMessage_swap_start_dt(1)
           ,DeactMain2_Fields.InvalidMessage_swap_end_dt(1)
-          ,DeactMain2_Fields.InvalidMessage_deact_code(1)
           ,DeactMain2_Fields.InvalidMessage_deact_start_dt(1)
           ,DeactMain2_Fields.InvalidMessage_deact_end_dt(1)
           ,DeactMain2_Fields.InvalidMessage_react_start_dt(1)
@@ -232,7 +225,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.filedate_CUSTOM_ErrorCount
           ,le.swap_start_dt_CUSTOM_ErrorCount
           ,le.swap_end_dt_CUSTOM_ErrorCount
-          ,le.deact_code_ENUM_ErrorCount
           ,le.deact_start_dt_CUSTOM_ErrorCount
           ,le.deact_end_dt_CUSTOM_ErrorCount
           ,le.react_start_dt_CUSTOM_ErrorCount
@@ -258,7 +250,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.filedate_CUSTOM_ErrorCount
           ,le.swap_start_dt_CUSTOM_ErrorCount
           ,le.swap_end_dt_CUSTOM_ErrorCount
-          ,le.deact_code_ENUM_ErrorCount
           ,le.deact_start_dt_CUSTOM_ErrorCount
           ,le.deact_end_dt_CUSTOM_ErrorCount
           ,le.react_start_dt_CUSTOM_ErrorCount
@@ -280,12 +271,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT310.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT310.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -300,7 +291,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT310.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -378,7 +369,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,22,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT310.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -403,12 +394,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(DeactMain2_Layout_Phonesinfo) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT310.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT310.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Phonesinfo, DeactMain2_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_Phonesinfo, DeactMain2_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -419,10 +410,10 @@ EXPORT StandardStats(DATASET(DeactMain2_Layout_Phonesinfo) inFile, BOOLEAN doErr
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT310.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT310.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

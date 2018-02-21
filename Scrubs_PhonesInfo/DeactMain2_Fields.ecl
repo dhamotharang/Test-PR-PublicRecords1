@@ -1,137 +1,131 @@
-﻿IMPORT SALT310;
+﻿IMPORT SALT39;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT DeactMain2_Fields := MODULE
  
 EXPORT NumFields := 22;
  
 // Processing for each FieldType
-EXPORT SALT310.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Num','Invalid_DeactCode','Invalid_YN','Invalid_Date');
-EXPORT FieldTypeNum(SALT310.StrType fn) := CASE(fn,'Invalid_Num' => 1,'Invalid_DeactCode' => 2,'Invalid_YN' => 3,'Invalid_Date' => 4,0);
+EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Num','Invalid_YN','Invalid_Date');
+EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Num' => 1,'Invalid_YN' => 2,'Invalid_Date' => 3,0);
  
-EXPORT MakeFT_Invalid_Num(SALT310.StrType s0) := FUNCTION
-  s1 := SALT310.stringfilter(s0,'-0213456789'); // Only allow valid symbols
+EXPORT MakeFT_Invalid_Num(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'-0213456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num(SALT310.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT310.StringFilter(s,'-0213456789'))));
-EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT310.HygieneErrors.NotInChars('-0213456789'),SALT310.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'-0213456789'))));
+EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('-0213456789'),SALT39.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_DeactCode(SALT310.StrType s0) := FUNCTION
+EXPORT MakeFT_Invalid_YN(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_DeactCode(SALT310.StrType s) := WHICH(((SALT310.StrType) s) NOT IN ['DE','DE']);
-EXPORT InValidMessageFT_Invalid_DeactCode(UNSIGNED1 wh) := CHOOSE(wh,SALT310.HygieneErrors.NotInEnum('DE|DE'),SALT310.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_YN(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['Y','N']);
+EXPORT InValidMessageFT_Invalid_YN(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('Y|N'),SALT39.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_YN(SALT310.StrType s0) := FUNCTION
+EXPORT MakeFT_Invalid_Date(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_YN(SALT310.StrType s) := WHICH(((SALT310.StrType) s) NOT IN ['Y','N']);
-EXPORT InValidMessageFT_Invalid_YN(UNSIGNED1 wh) := CHOOSE(wh,SALT310.HygieneErrors.NotInEnum('Y|N'),SALT310.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Date(SALT39.StrType s) := WHICH(~Scrubs.fn_valid_date(s,'future')>0);
+EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT39.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_Date(SALT310.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_Invalid_Date(SALT310.StrType s) := WHICH(~Scrubs.fn_valid_date(s,'future')>0);
-EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT310.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT310.HygieneErrors.Good);
- 
-EXPORT SALT310.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
-EXPORT SALT310.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
-EXPORT FieldNum(SALT310.StrType fn) := CASE(fn,'groupid' => 0,'vendor_first_reported_dt' => 1,'vendor_last_reported_dt' => 2,'action_code' => 3,'timestamp' => 4,'phone' => 5,'phone_swap' => 6,'filename' => 7,'carrier_name' => 8,'filedate' => 9,'swap_start_dt' => 10,'swap_end_dt' => 11,'deact_code' => 12,'deact_start_dt' => 13,'deact_end_dt' => 14,'react_start_dt' => 15,'react_end_dt' => 16,'is_react' => 17,'is_deact' => 18,'porting_dt' => 19,'pk_carrier_name' => 20,'days_apart' => 21,0);
-EXPORT SET OF SALT310.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['ALLOW'],['ALLOW'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],[],['ALLOW'],[]);
+EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
+EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
+EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'groupid' => 0,'vendor_first_reported_dt' => 1,'vendor_last_reported_dt' => 2,'action_code' => 3,'timestamp' => 4,'phone' => 5,'phone_swap' => 6,'filename' => 7,'carrier_name' => 8,'filedate' => 9,'swap_start_dt' => 10,'swap_end_dt' => 11,'deact_code' => 12,'deact_start_dt' => 13,'deact_end_dt' => 14,'react_start_dt' => 15,'react_end_dt' => 16,'is_react' => 17,'is_deact' => 18,'porting_dt' => 19,'pk_carrier_name' => 20,'days_apart' => 21,0);
+EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['ALLOW'],['ALLOW'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],[],['ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_groupid(SALT310.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_groupid(SALT310.StrType s) := InValidFT_Invalid_Num(s);
+EXPORT Make_groupid(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_groupid(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_groupid(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
  
-EXPORT Make_vendor_first_reported_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_vendor_first_reported_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_vendor_first_reported_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_vendor_first_reported_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_vendor_first_reported_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_vendor_last_reported_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_vendor_last_reported_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_vendor_last_reported_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_vendor_last_reported_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_vendor_last_reported_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_action_code(SALT310.StrType s0) := s0;
-EXPORT InValid_action_code(SALT310.StrType s) := 0;
+EXPORT Make_action_code(SALT39.StrType s0) := s0;
+EXPORT InValid_action_code(SALT39.StrType s) := 0;
 EXPORT InValidMessage_action_code(UNSIGNED1 wh) := '';
  
-EXPORT Make_timestamp(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_timestamp(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_timestamp(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_timestamp(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_timestamp(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_phone(SALT310.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_phone(SALT310.StrType s) := InValidFT_Invalid_Num(s);
+EXPORT Make_phone(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_phone(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_phone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
  
-EXPORT Make_phone_swap(SALT310.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_phone_swap(SALT310.StrType s) := InValidFT_Invalid_Num(s);
+EXPORT Make_phone_swap(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_phone_swap(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_phone_swap(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
  
-EXPORT Make_filename(SALT310.StrType s0) := s0;
-EXPORT InValid_filename(SALT310.StrType s) := 0;
+EXPORT Make_filename(SALT39.StrType s0) := s0;
+EXPORT InValid_filename(SALT39.StrType s) := 0;
 EXPORT InValidMessage_filename(UNSIGNED1 wh) := '';
  
-EXPORT Make_carrier_name(SALT310.StrType s0) := s0;
-EXPORT InValid_carrier_name(SALT310.StrType s) := 0;
+EXPORT Make_carrier_name(SALT39.StrType s0) := s0;
+EXPORT InValid_carrier_name(SALT39.StrType s) := 0;
 EXPORT InValidMessage_carrier_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_filedate(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_filedate(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_filedate(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_filedate(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_filedate(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_swap_start_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_swap_start_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_swap_start_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_swap_start_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_swap_start_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_swap_end_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_swap_end_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_swap_end_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_swap_end_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_swap_end_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_deact_code(SALT310.StrType s0) := MakeFT_Invalid_DeactCode(s0);
-EXPORT InValid_deact_code(SALT310.StrType s) := InValidFT_Invalid_DeactCode(s);
-EXPORT InValidMessage_deact_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_DeactCode(wh);
+EXPORT Make_deact_code(SALT39.StrType s0) := s0;
+EXPORT InValid_deact_code(SALT39.StrType s) := 0;
+EXPORT InValidMessage_deact_code(UNSIGNED1 wh) := '';
  
-EXPORT Make_deact_start_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_deact_start_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_deact_start_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_deact_start_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_deact_start_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_deact_end_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_deact_end_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_deact_end_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_deact_end_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_deact_end_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_react_start_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_react_start_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_react_start_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_react_start_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_react_start_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_react_end_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_react_end_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_react_end_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_react_end_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_react_end_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_is_react(SALT310.StrType s0) := MakeFT_Invalid_YN(s0);
-EXPORT InValid_is_react(SALT310.StrType s) := InValidFT_Invalid_YN(s);
+EXPORT Make_is_react(SALT39.StrType s0) := MakeFT_Invalid_YN(s0);
+EXPORT InValid_is_react(SALT39.StrType s) := InValidFT_Invalid_YN(s);
 EXPORT InValidMessage_is_react(UNSIGNED1 wh) := InValidMessageFT_Invalid_YN(wh);
  
-EXPORT Make_is_deact(SALT310.StrType s0) := MakeFT_Invalid_YN(s0);
-EXPORT InValid_is_deact(SALT310.StrType s) := InValidFT_Invalid_YN(s);
+EXPORT Make_is_deact(SALT39.StrType s0) := MakeFT_Invalid_YN(s0);
+EXPORT InValid_is_deact(SALT39.StrType s) := InValidFT_Invalid_YN(s);
 EXPORT InValidMessage_is_deact(UNSIGNED1 wh) := InValidMessageFT_Invalid_YN(wh);
  
-EXPORT Make_porting_dt(SALT310.StrType s0) := MakeFT_Invalid_Date(s0);
-EXPORT InValid_porting_dt(SALT310.StrType s) := InValidFT_Invalid_Date(s);
+EXPORT Make_porting_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
+EXPORT InValid_porting_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_porting_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_pk_carrier_name(SALT310.StrType s0) := s0;
-EXPORT InValid_pk_carrier_name(SALT310.StrType s) := 0;
+EXPORT Make_pk_carrier_name(SALT39.StrType s0) := s0;
+EXPORT InValid_pk_carrier_name(SALT39.StrType s) := 0;
 EXPORT InValidMessage_pk_carrier_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_days_apart(SALT310.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_days_apart(SALT310.StrType s) := InValidFT_Invalid_Num(s);
+EXPORT Make_days_apart(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_days_apart(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_days_apart(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT310,Scrubs_Phonesinfo;
+  IMPORT SALT39,Scrubs_Phonesinfo;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -173,7 +167,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_pk_carrier_name;
     BOOLEAN Diff_days_apart;
     UNSIGNED Num_Diffs;
-    SALT310.StrType Val {MAXLENGTH(1024)};
+    SALT39.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -199,7 +193,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_porting_dt := le.porting_dt <> ri.porting_dt;
     SELF.Diff_pk_carrier_name := le.pk_carrier_name <> ri.pk_carrier_name;
     SELF.Diff_days_apart := le.days_apart <> ri.days_apart;
-    SELF.Val := (SALT310.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT39.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_groupid,1,0)+ IF( SELF.Diff_vendor_first_reported_dt,1,0)+ IF( SELF.Diff_vendor_last_reported_dt,1,0)+ IF( SELF.Diff_action_code,1,0)+ IF( SELF.Diff_timestamp,1,0)+ IF( SELF.Diff_phone,1,0)+ IF( SELF.Diff_phone_swap,1,0)+ IF( SELF.Diff_filename,1,0)+ IF( SELF.Diff_carrier_name,1,0)+ IF( SELF.Diff_filedate,1,0)+ IF( SELF.Diff_swap_start_dt,1,0)+ IF( SELF.Diff_swap_end_dt,1,0)+ IF( SELF.Diff_deact_code,1,0)+ IF( SELF.Diff_deact_start_dt,1,0)+ IF( SELF.Diff_deact_end_dt,1,0)+ IF( SELF.Diff_react_start_dt,1,0)+ IF( SELF.Diff_react_end_dt,1,0)+ IF( SELF.Diff_is_react,1,0)+ IF( SELF.Diff_is_deact,1,0)+ IF( SELF.Diff_porting_dt,1,0)+ IF( SELF.Diff_pk_carrier_name,1,0)+ IF( SELF.Diff_days_apart,1,0);
   END;
 // Now need to remove bad pivots from comparison

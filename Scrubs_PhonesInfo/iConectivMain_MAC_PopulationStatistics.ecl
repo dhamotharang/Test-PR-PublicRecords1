@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT iConectivMain_MAC_PopulationStatistics(infile,Ref='',Input_country_code = '',Input_phone = '',Input_dial_type = '',Input_spid = '',Input_service_provider = '',Input_service_type = '',Input_routing_code = '',Input_porting_dt = '',Input_country_abbr = '',Input_filename = '',Input_file_dt_time = '',Input_vendor_first_reported_dt = '',Input_vendor_last_reported_dt = '',Input_port_start_dt = '',Input_port_end_dt = '',Input_remove_port_dt = '',Input_is_ported = '',OutFile) := MACRO
-  IMPORT SALT310,Scrubs_PhonesInfo;
+  IMPORT SALT39,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT310.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

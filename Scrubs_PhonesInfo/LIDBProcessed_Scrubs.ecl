@@ -1,4 +1,4 @@
-﻿IMPORT SALT310,STD;
+﻿IMPORT SALT39,STD;
 EXPORT LIDBProcessed_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -32,23 +32,23 @@ EXPORT LIDBProcessed_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(LIDBProcessed_Layout_PhonesInfo) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.reference_id_Invalid := LIDBProcessed_Fields.InValid_reference_id((SALT310.StrType)le.reference_id);
-    SELF.dt_first_reported_Invalid := LIDBProcessed_Fields.InValid_dt_first_reported((SALT310.StrType)le.dt_first_reported);
-    SELF.dt_last_reported_Invalid := LIDBProcessed_Fields.InValid_dt_last_reported((SALT310.StrType)le.dt_last_reported);
-    SELF.phone_Invalid := LIDBProcessed_Fields.InValid_phone((SALT310.StrType)le.phone);
-    SELF.reply_code_Invalid := LIDBProcessed_Fields.InValid_reply_code((SALT310.StrType)le.reply_code);
-    SELF.local_routing_number_Invalid := LIDBProcessed_Fields.InValid_local_routing_number((SALT310.StrType)le.local_routing_number);
-    SELF.account_owner_Invalid := LIDBProcessed_Fields.InValid_account_owner((SALT310.StrType)le.account_owner);
-    SELF.carrier_name_Invalid := LIDBProcessed_Fields.InValid_carrier_name((SALT310.StrType)le.carrier_name);
-    SELF.carrier_category_Invalid := LIDBProcessed_Fields.InValid_carrier_category((SALT310.StrType)le.carrier_category);
-    SELF.serv_Invalid := LIDBProcessed_Fields.InValid_serv((SALT310.StrType)le.serv);
-    SELF.line_Invalid := LIDBProcessed_Fields.InValid_line((SALT310.StrType)le.line);
-    SELF.spid_Invalid := LIDBProcessed_Fields.InValid_spid((SALT310.StrType)le.spid);
-    SELF.operator_fullname_Invalid := LIDBProcessed_Fields.InValid_operator_fullname((SALT310.StrType)le.operator_fullname);
-    SELF.activation_dt_Invalid := LIDBProcessed_Fields.InValid_activation_dt((SALT310.StrType)le.activation_dt);
-    SELF.number_in_service_Invalid := LIDBProcessed_Fields.InValid_number_in_service((SALT310.StrType)le.number_in_service);
-    SELF.high_risk_indicator_Invalid := LIDBProcessed_Fields.InValid_high_risk_indicator((SALT310.StrType)le.high_risk_indicator);
-    SELF.prepaid_Invalid := LIDBProcessed_Fields.InValid_prepaid((SALT310.StrType)le.prepaid);
+    SELF.reference_id_Invalid := LIDBProcessed_Fields.InValid_reference_id((SALT39.StrType)le.reference_id);
+    SELF.dt_first_reported_Invalid := LIDBProcessed_Fields.InValid_dt_first_reported((SALT39.StrType)le.dt_first_reported);
+    SELF.dt_last_reported_Invalid := LIDBProcessed_Fields.InValid_dt_last_reported((SALT39.StrType)le.dt_last_reported);
+    SELF.phone_Invalid := LIDBProcessed_Fields.InValid_phone((SALT39.StrType)le.phone);
+    SELF.reply_code_Invalid := LIDBProcessed_Fields.InValid_reply_code((SALT39.StrType)le.reply_code);
+    SELF.local_routing_number_Invalid := LIDBProcessed_Fields.InValid_local_routing_number((SALT39.StrType)le.local_routing_number);
+    SELF.account_owner_Invalid := LIDBProcessed_Fields.InValid_account_owner((SALT39.StrType)le.account_owner);
+    SELF.carrier_name_Invalid := LIDBProcessed_Fields.InValid_carrier_name((SALT39.StrType)le.carrier_name);
+    SELF.carrier_category_Invalid := LIDBProcessed_Fields.InValid_carrier_category((SALT39.StrType)le.carrier_category);
+    SELF.serv_Invalid := LIDBProcessed_Fields.InValid_serv((SALT39.StrType)le.serv);
+    SELF.line_Invalid := LIDBProcessed_Fields.InValid_line((SALT39.StrType)le.line);
+    SELF.spid_Invalid := LIDBProcessed_Fields.InValid_spid((SALT39.StrType)le.spid);
+    SELF.operator_fullname_Invalid := LIDBProcessed_Fields.InValid_operator_fullname((SALT39.StrType)le.operator_fullname);
+    SELF.activation_dt_Invalid := LIDBProcessed_Fields.InValid_activation_dt((SALT39.StrType)le.activation_dt);
+    SELF.number_in_service_Invalid := LIDBProcessed_Fields.InValid_number_in_service((SALT39.StrType)le.number_in_service);
+    SELF.high_risk_indicator_Invalid := LIDBProcessed_Fields.InValid_high_risk_indicator((SALT39.StrType)le.high_risk_indicator);
+    SELF.prepaid_Invalid := LIDBProcessed_Fields.InValid_prepaid((SALT39.StrType)le.prepaid);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -125,8 +125,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT310.StrType ErrorMessage;
-    SALT310.StrType FieldContents;
+    SALT39.StrType ErrorMessage;
+    SALT39.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -152,7 +152,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.prepaid_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'reference_id','dt_first_reported','dt_last_reported','phone','reply_code','local_routing_number','account_owner','carrier_name','carrier_category','serv','line','spid','operator_fullname','activation_dt','number_in_service','high_risk_indicator','prepaid','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_RefID','Invalid_Num','Invalid_Num','Invalid_Num','Invalid_Num','Invalid_Num','Invalid_AccOwn','Invalid_Char','Invalid_Char','Invalid_Line_Serv','Invalid_Line_Serv','Invalid_Num','Invalid_Char','Invalid_Num','Invalid_Num_In_Service','Invalid_Binary','Invalid_Binary','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT310.StrType)le.reference_id,(SALT310.StrType)le.dt_first_reported,(SALT310.StrType)le.dt_last_reported,(SALT310.StrType)le.phone,(SALT310.StrType)le.reply_code,(SALT310.StrType)le.local_routing_number,(SALT310.StrType)le.account_owner,(SALT310.StrType)le.carrier_name,(SALT310.StrType)le.carrier_category,(SALT310.StrType)le.serv,(SALT310.StrType)le.line,(SALT310.StrType)le.spid,(SALT310.StrType)le.operator_fullname,(SALT310.StrType)le.activation_dt,(SALT310.StrType)le.number_in_service,(SALT310.StrType)le.high_risk_indicator,(SALT310.StrType)le.prepaid,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.reference_id,(SALT39.StrType)le.dt_first_reported,(SALT39.StrType)le.dt_last_reported,(SALT39.StrType)le.phone,(SALT39.StrType)le.reply_code,(SALT39.StrType)le.local_routing_number,(SALT39.StrType)le.account_owner,(SALT39.StrType)le.carrier_name,(SALT39.StrType)le.carrier_category,(SALT39.StrType)le.serv,(SALT39.StrType)le.line,(SALT39.StrType)le.spid,(SALT39.StrType)le.operator_fullname,(SALT39.StrType)le.activation_dt,(SALT39.StrType)le.number_in_service,(SALT39.StrType)le.high_risk_indicator,(SALT39.StrType)le.prepaid,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -160,7 +160,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(LIDBProcessed_Layout_PhonesInfo) prevDS = DATASET([], LIDBProcessed_Layout_PhonesInfo), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT310.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -270,12 +270,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT310.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT310.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -290,7 +290,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT310.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -359,7 +359,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,19,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT310.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -384,12 +384,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(LIDBProcessed_Layout_PhonesInfo) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT310.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT310.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, LIDBProcessed_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, LIDBProcessed_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -400,10 +400,10 @@ EXPORT StandardStats(DATASET(LIDBProcessed_Layout_PhonesInfo) inFile, BOOLEAN do
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT310.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT310.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

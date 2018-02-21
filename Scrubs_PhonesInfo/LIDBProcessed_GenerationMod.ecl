@@ -1,10 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT310;
-EXPORT LIDBProcessed_GenerationMod := MODULE(SALT310.iGenerationMod)
+IMPORT SALT39;
+EXPORT LIDBProcessed_GenerationMod := MODULE(SALT39.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.10.1';
-  EXPORT salt_MODULE := 'SALT310'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.9.0';
+  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
@@ -38,7 +38,7 @@ EXPORT LIDBProcessed_GenerationMod := MODULE(SALT310.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'options:-gh\n'
+    'options:-gh \n'
     + 'MODULE:Scrubs_PhonesInfo\n'
     + 'FILENAME:PhonesInfo\n'
     + 'NAMESCOPE:LIDBProcessed\n'

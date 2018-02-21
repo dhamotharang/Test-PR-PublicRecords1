@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT DeactMain2_MAC_PopulationStatistics(infile,Ref='',Input_groupid = '',Input_vendor_first_reported_dt = '',Input_vendor_last_reported_dt = '',Input_action_code = '',Input_timestamp = '',Input_phone = '',Input_phone_swap = '',Input_filename = '',Input_carrier_name = '',Input_filedate = '',Input_swap_start_dt = '',Input_swap_end_dt = '',Input_deact_code = '',Input_deact_start_dt = '',Input_deact_end_dt = '',Input_react_start_dt = '',Input_react_end_dt = '',Input_is_react = '',Input_is_deact = '',Input_porting_dt = '',Input_pk_carrier_name = '',Input_days_apart = '',OutFile) := MACRO
-  IMPORT SALT310,Scrubs_Phonesinfo;
+  IMPORT SALT39,Scrubs_Phonesinfo;
   #uniquename(of)
   %of% := RECORD
-    SALT310.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

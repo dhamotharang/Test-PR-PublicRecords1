@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT LIDBCurrent_MAC_PopulationStatistics(infile,Ref='',Input_reference_id = '',Input_phone = '',OutFile) := MACRO
-  IMPORT SALT310,Scrubs_PhonesInfo;
+  IMPORT SALT39,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT310.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

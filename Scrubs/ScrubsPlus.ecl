@@ -2,10 +2,10 @@
 C:\Users\dittda01\AppData\Roaming\HPCC Systems\eclide\ddittman_prod\Dataland\Scrubs\ScrubsPlus\2017-08-30T13_57_38Z.ecl
 */
 
-
+IMPORT tools,std,ut;
 
 EXPORT ScrubsPlus(DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false)	:=	FUNCTIONMACRO 
-import SALT310;
+
 	folder						:=	#EXPAND(ScrubsModule);
 	inName						:=	IF(TRIM(ScopeName,ALL)<>'',TRIM(ScopeName,ALL)+'_In_'+DatasetName,'In_'+DatasetName);
 	inFile						:=	folder.#EXPAND(inName);
@@ -28,9 +28,9 @@ import SALT310;
 	if(count(infile)=0,sequential(output('No Records Found in '+scopename,named('No_Record_Alert_'+Prefix)),
 																if(EmailList<>'',fileservices.sendEmail(emailList,'No Records Found in '+scopename,'No Records Found in '+scopename))));
 	
-	Orbit_stats					:=	project(U.OrbitStats(),transform(SALT310.ScrubsOrbitLayout,Self.rulepcnt:=(decimal5_2)Left.rulepcnt;Self:=Left)); 
+	Orbit_stats					:=	U.OrbitStats(); 
 	OrbitReport					:=	output(Orbit_stats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReport'));
-	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStatsPost310(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'));
+	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'));
 	NumRules						:=	Count(Orbit_stats);
 	NumFailedRules			:=	Count(Orbit_Stats(rulecnt>0));
 	TotalRecs						:=	Count(N.ExpandedInFile);
@@ -142,7 +142,7 @@ import SALT310;
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 	
-	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
+	SubmitStats						:=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
 	SuperFile:='~thor_data400::ScrubsPlus::log';
 	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+ScrubsProfileName;
 	

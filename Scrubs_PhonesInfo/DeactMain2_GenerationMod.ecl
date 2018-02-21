@@ -1,10 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT310;
-EXPORT DeactMain2_GenerationMod := MODULE(SALT310.iGenerationMod)
+IMPORT SALT39;
+EXPORT DeactMain2_GenerationMod := MODULE(SALT39.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.10.1';
-  EXPORT salt_MODULE := 'SALT310'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.9.0';
+  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
@@ -44,7 +44,6 @@ EXPORT DeactMain2_GenerationMod := MODULE(SALT310.iGenerationMod)
     + 'NAMESCOPE:DeactMain2\n'
     + '\n'
     + 'FIELDTYPE:Invalid_Num:ALLOW(-0213456789)\n'
-    + 'FIELDTYPE:Invalid_DeactCode:ENUM(DE|DE)\n'
     + 'FIELDTYPE:Invalid_YN:ENUM(Y|N)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0,\'future\')\n'
     + '\n'
@@ -61,7 +60,7 @@ EXPORT DeactMain2_GenerationMod := MODULE(SALT310.iGenerationMod)
     + 'FIELD:filedate:LIKE(Invalid_Date):TYPE(STRING):0,0\n'
     + 'FIELD:swap_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:swap_end_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
-    + 'FIELD:deact_code:LIKE(Invalid_DeactCode):TYPE(STRING2):0,0\n'
+    + 'FIELD:deact_code:TYPE(STRING2):0,0\n'
     + 'FIELD:deact_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:deact_end_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:react_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
