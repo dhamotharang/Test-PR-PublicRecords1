@@ -1,8 +1,8 @@
 ﻿IMPORT	ut, AID, AID_Support, DID_Add, address, NID, STD, PromoteSupers,
 							PRTE2, Anchor; //using a cleaning functions in these repositories;
 #workunit('name', 'RealSource Email Build');
-#constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
-#STORED('did_add_force','thor');
+// #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+// #STORED('did_add_force','thor');
 				
 EXPORT proc_build_base(STRING8 version) := FUNCTION
 
@@ -39,7 +39,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 		self := pInput;
 	END;
 
-	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT));
+	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT))(TRIM(EMAIL) <> ''); //removes invalid records
 	
 	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' OR
 																																	STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0);
