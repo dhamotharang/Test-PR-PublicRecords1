@@ -19,7 +19,7 @@
 		export String40 QSent			:= 'qsent';								// active, as of 07/24/2012		
 		export String40 QSentV2		:= 'qsentv2';							// active, as of 07/24/2012
 		export String40 Targus		:= 'targus';							// active, as of 07/24/2012
-		// export String40 Metronet	:= 'metronet';						// active, as of 07/24/2012
+		export String40 Metronet	:= 'metronet';						// active, as of 07/24/2012
 		export String40 AccuDataOCN		:= 'accudata_ocn';						// active as of 5/2017
 		
 		// Vehicles
