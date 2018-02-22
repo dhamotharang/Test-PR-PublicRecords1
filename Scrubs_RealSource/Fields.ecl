@@ -4,8 +4,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 15;
  
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alnum','invalid_date','invalid_name','invalid_zip','invalid_state','invalid_phone','invalid_ip');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alnum' => 2,'invalid_date' => 3,'invalid_name' => 4,'invalid_zip' => 5,'invalid_state' => 6,'invalid_phone' => 7,'invalid_ip' => 8,0);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alnum','invalid_date','invalid_name','invalid_suffix','invalid_zip','invalid_state','invalid_phone','invalid_ip');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alnum' => 2,'invalid_date' => 3,'invalid_name' => 4,'invalid_suffix' => 5,'invalid_zip' => 6,'invalid_state' => 7,'invalid_phone' => 8,'invalid_ip' => 9,0);
  
 EXPORT MakeFT_invalid_alpha(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.,'); // Only allow valid symbols
@@ -16,12 +16,12 @@ EXPORT InValidFT_invalid_alpha(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGT
 EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.,'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alnum(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.\\/_'); // Only allow valid symbols
-  s2 := SALT38.stringcleanspaces( SALT38.stringsubstituteout(s1,' -#.\\/_',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.,\\/_'); // Only allow valid symbols
+  s2 := SALT38.stringcleanspaces( SALT38.stringsubstituteout(s1,' -#.,\\/_',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_alnum(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.\\/_'))),~(LENGTH(TRIM(s)) >= 0));
-EXPORT InValidMessageFT_invalid_alnum(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.\\/_'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alnum(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.,\\/_'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_alnum(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.,\\/_'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'0123456789-'); // Only allow valid symbols
@@ -38,6 +38,14 @@ EXPORT MakeFT_invalid_name(SALT38.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_invalid_name(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.()\'&_`/'))),~(LENGTH(TRIM(s)) >= 0));
 EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.()\'&_`/'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_suffix(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`/'); // Only allow valid symbols
+  s2 := SALT38.stringcleanspaces( SALT38.stringsubstituteout(s1,' -.()\'&_`/',' ') ); // Insert spaces but avoid doubles
+  RETURN  s2;
+END;
+EXPORT InValidFT_invalid_suffix(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`/'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_suffix(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`/'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_zip(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -88,9 +96,9 @@ EXPORT Make_lastname(SALT38.StrType s0) := MakeFT_invalid_name(s0);
 EXPORT InValid_lastname(SALT38.StrType s) := InValidFT_invalid_name(s);
 EXPORT InValidMessage_lastname(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
  
-EXPORT Make_suffix(SALT38.StrType s0) := MakeFT_invalid_name(s0);
-EXPORT InValid_suffix(SALT38.StrType s) := InValidFT_invalid_name(s);
-EXPORT InValidMessage_suffix(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
+EXPORT Make_suffix(SALT38.StrType s0) := MakeFT_invalid_suffix(s0);
+EXPORT InValid_suffix(SALT38.StrType s) := InValidFT_invalid_suffix(s);
+EXPORT InValidMessage_suffix(UNSIGNED1 wh) := InValidMessageFT_invalid_suffix(wh);
  
 EXPORT Make_address(SALT38.StrType s0) := MakeFT_invalid_alnum(s0);
 EXPORT InValid_address(SALT38.StrType s) := InValidFT_invalid_alnum(s);
