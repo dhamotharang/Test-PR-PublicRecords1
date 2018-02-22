@@ -1127,6 +1127,15 @@
 				trim(kword, left, right) = 'BRPRORJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRPRORJ,
 				trim(kword, left, right) = 'USFHFA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USFHFA,
 				trim(kword, left, right) = 'OFAC-GLOMAG' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_GLOMAG,
+				trim(kword, left, right) = 'USCFPB' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCFPB,
+				trim(kword, left, right) = 'TWMOJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ,
+				trim(kword, left, right) = 'EU-VE' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_VE,
+				trim(kword, left, right) = 'RSSRE-DIR4-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR4_WC,
+				trim(kword, left, right) = 'MYRMP' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYRMP,
+				trim(kword, left, right) = 'INMCA-DD2' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMCA_DD2,
+				trim(kword, left, right) = 'INMCA-SC' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMCA_SC,
+				trim(kword, left, right) = 'PHPNP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPNP,
+				trim(kword, left, right) = 'EUNCJ-TAX' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUNCJ_TAX,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

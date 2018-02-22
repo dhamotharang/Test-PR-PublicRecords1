@@ -1,4 +1,4 @@
-IMPORT Corp2, _validate, Address,Tools, _control, versioncontrol, ut, lib_stringlib, Corp2_Raw_GA, Scrubs, Scrubs_Corp2_Mapping_GA_Main, Scrubs_Corp2_Mapping_GA_Event, std;
+﻿IMPORT Corp2, _validate, Address,Tools, _control, versioncontrol, ut, lib_stringlib, Corp2_Raw_GA, Scrubs, Scrubs_Corp2_Mapping_GA_Main, Scrubs_Corp2_Mapping_GA_Event, std;
 
 EXPORT GA 	:= MODULE
 
@@ -7,7 +7,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		state_origin	   := 'GA';
 		state_fips	 	   := '13';	
 		state_desc	 	   := 'GEORGIA';
-		ds_AddressIn   	 := DEDUP(SORT(DISTRIBUTE(Corp2_Raw_GA.Files(filedate,pUseProd).Input.Address((STRING)(INTEGER)BizEntityId <> '0'),HASH(BizEntityId)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;		
+	  ds_AddressIn   	 := DEDUP(SORT(DISTRIBUTE(Corp2_Raw_GA.Files(filedate,pUseProd).Input.Address((STRING)(INTEGER)BizEntityId <> '0'),HASH(BizEntityId)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;		
 		ds_CorporationIn := DEDUP(SORT(DISTRIBUTE(Corp2_Raw_GA.Files(filedate,pUseProd).Input.Corporation.logical((STRING)(INTEGER)BizEntityId <> '0'),HASH(BizEntityId)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;		
 		ds_FilingIn   	 := DEDUP(SORT(DISTRIBUTE(Corp2_Raw_GA.Files(filedate,pUseProd).Input.Filing.logical((STRING)(INTEGER)BizEntityId <> '0'),HASH(BizEntityId)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;		
 		ds_OfficerIn   	 := DEDUP(SORT(DISTRIBUTE(Corp2_Raw_GA.Files(filedate,pUseProd).Input.Officer.logical(ControlNumber NOT IN ['0','']),HASH(ControlNumber)),RECORD,LOCAL),RECORD, EXCEPT FileNumber,LOCAL) : INDEPENDENT;		
@@ -66,7 +66,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		// Map the CORP data to the MAIN layout
 		//********************************************************************
 		Corp2_Mapping.LayoutsCommon.Main corpTransform_bus(Corp2_Raw_GA.Layouts.TempCorpAddrAgentLayoutIn l, INTEGER C):= TRANSFORM,
-		SKIP(corp2.t2u(l.BusinessName) = '' OR corp2.t2u(l.ControlNumber) IN ['0',''])
+		SKIP(corp2.t2u(l.BusinessName) = '' OR corp2.t2u(l.ControlNumber) IN ['0',''] OR corp2.t2u(l.ControlNumber[1..2])='AD' OR corp2.t2u(l.ControlNumber[1..3])='CTS' OR corp2.t2u(l.ControlNumber[1..4])='CTSD')
 
 			SELF.dt_vendor_first_reported		 	:= (INTEGER)fileDate;
 			SELF.dt_vendor_last_reported		 	:= (INTEGER)fileDate;
@@ -95,8 +95,8 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 			                                         Corp2_Mapping.fValidateDate(l.EndDate).GeneralDate <> '' => 'EXPIRATION DATE',
 																							 '');
 			SELF.corp_inc_state								:= state_origin;
-			SELF.corp_forgn_state_cd				  := IF(corp2.t2u(l.ForeignState) NOT IN [state_origin,''],Corp2_Raw_GA.Functions.StateCode(l.ForeignState),'');
-			SELF.corp_forgn_state_desc 				:= IF(corp2.t2u(l.ForeignState) NOT IN [state_origin,''],Corp2_Raw_GA.Functions.StateDesc(l.ForeignState),'');
+			SELF.corp_forgn_state_cd				  := IF(corp2.t2u(l.ForeignState) NOT IN [state_origin,state_desc,''],Corp2_Raw_GA.Functions.StateCode(l.ForeignState),'');
+			SELF.corp_forgn_state_desc 				:= IF(corp2.t2u(l.ForeignState) NOT IN [state_origin,state_desc,''],Corp2_Raw_GA.Functions.StateDesc(l.ForeignState),'');
 			SELF.corp_country_of_formation    := Corp2_Raw_GA.Functions.CountryDesc(l.ForeignCountry);
 			EffDate                           := Corp2_Mapping.fValidateDate(l.EffectiveDate).PastDate;
 			ForDateOfOrg                      := Corp2_Mapping.fValidateDate(l.ForeignDateOfOrganization).PastDate;
@@ -156,7 +156,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		// Note: The ds_OfficerIn is 11 times larger than the ds_CorpDist
 		//			 file and is therefore on the left side of the join.		
 		//********************************************************************
-  	ds_CorpDist	:= DISTRIBUTE(ds_CorporationIn(ControlNumber not in ['0','']),HASH(ControlNumber)) : INDEPENDENT;
+  	ds_CorpDist	:= DISTRIBUTE(ds_CorporationIn(ControlNumber not in ['0',''] OR corp2.t2u(ControlNumber[1..2])='AD' OR corp2.t2u(ControlNumber[1..3])='CTS' OR corp2.t2u(ControlNumber[1..4])='CTSD'),HASH(ControlNumber)) : INDEPENDENT;
 	 
   	ds_corpOfficers          := JOIN(ds_OfficerIn,ds_CorpDist,
 																		corp2.t2u(LEFT.ControlNumber) = corp2.t2u(RIGHT.ControlNumber),
@@ -209,16 +209,17 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		//***********************************************************************
 	  // Map the STOCK data by joining the CORPORATION file with the STOCK file
 	  //***********************************************************************
-	  ds_corpStock          := JOIN(ds_CorporationIn ,ds_StockIn ,
-															  	corp2.t2u(LEFT.BizEntityId) = corp2.t2u(RIGHT.BizEntityId) ,
-																  TRANSFORM(Corp2_Raw_GA.Layouts.TempCorpStockLayoutIn,SELF:=LEFT;SELF:=RIGHT;),INNER,LOCAL): INDEPENDENT;
+	  ds_corpStock         := JOIN(ds_CorporationIn ,ds_StockIn ,
+															   corp2.t2u(LEFT.BizEntityId) = corp2.t2u(RIGHT.BizEntityId) ,
+																 TRANSFORM(Corp2_Raw_GA.Layouts.TempCorpStockLayoutIn,SELF:=LEFT;SELF:=RIGHT;),INNER,LOCAL): INDEPENDENT;
 													 
    	//***********************************************************************
    	//Filter Corp records which do not have valid stock info! 			
 		//***********************************************************************
     ds_ValidCorpStock    := ds_corpStock(StockType <> '' OR Quantity <> '' OR ShareValue <> '');	
 
-		corp2_Mapping.LayoutsCommon.stock  StockTransform(Corp2_Raw_GA.Layouts.TempCorpStockLayoutIn  l):= TRANSFORM	
+		corp2_Mapping.LayoutsCommon.stock  StockTransform(Corp2_Raw_GA.Layouts.TempCorpStockLayoutIn  l):= TRANSFORM,
+    SKIP(corp2.t2u(l.ControlNumber[1..2])='AD' OR corp2.t2u(l.ControlNumber[1..3])='CTS' OR corp2.t2u(l.ControlNumber[1..4])='CTSD')	
 		
 			SELF.corp_process_date		:= fileDate;	
 			SELF.corp_key							:= state_fips+'-' + corp2.t2u(l.BizEntityId + l.ControlNumber);
@@ -232,14 +233,15 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 			
 		END;	
 		
-		MapStock        := DEDUP(SORT(PROJECT(ds_ValidCorpStock,StockTransform(LEFT)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;
+		MapStock        := DEDUP(SORT(PROJECT(ds_ValidCorpStock,StockTransform(LEFT)),RECORD,LOCAL),RECORD,LOCAL): INDEPENDENT; 
 
 
     //*************************************************************************
 	  // Map the EVENTS data by joining the CORPORATION file with the FILING file
 	  //*************************************************************************
 		corp2_Mapping.LayoutsCommon.Events   EventFilingTransform(Corp2_Raw_GA.Layouts.filingLayoutIn l):= TRANSFORM,
-		SKIP(corp2.t2u(l.Description) IN ['ANNUAL REGISTRATION','AMENDED ANNUAL REGISTRATION',''] OR corp2.t2u(l.ControlNumber) IN ['0',''])
+		SKIP(corp2.t2u(l.Description) IN ['ANNUAL REGISTRATION','AMENDED ANNUAL REGISTRATION',''] OR corp2.t2u(l.ControlNumber) IN ['0',''] OR 
+				 corp2.t2u(l.ControlNumber[1..2])='AD' OR corp2.t2u(l.ControlNumber[1..3])='CTS' OR corp2.t2u(l.ControlNumber[1..4])='CTSD')
 			SELF.corp_process_date					:= fileDate;																																																					
 			SELF.corp_key										:= state_fips + '-' + corp2.t2u(l.BizEntityId + l.ControlNumber);
 			SELF.corp_sos_charter_nbr      	:= corp2.t2u(l.ControlNumber);
@@ -260,7 +262,8 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 	  // Map the AR data by joining the CORPORATION file with the FILING file
 	  //**********************************************************************
 		corp2_Mapping.LayoutsCommon.AR ARTransform(Corp2_Raw_GA.Layouts.filingLayoutIn l):= TRANSFORM,
-		SKIP(corp2.t2u(l.Description) NOT IN ['ANNUAL REGISTRATION','AMENDED ANNUAL REGISTRATION'] OR corp2.t2u(l.ControlNumber) IN ['0',''])
+		SKIP(corp2.t2u(l.Description) NOT IN ['ANNUAL REGISTRATION','AMENDED ANNUAL REGISTRATION'] OR corp2.t2u(l.ControlNumber) IN ['0',''] OR
+         corp2.t2u(l.ControlNumber[1..2])='AD' OR corp2.t2u(l.ControlNumber[1..3])='CTS' OR corp2.t2u(l.ControlNumber[1..4])='CTSD')
 			SELF.corp_process_date		:= fileDate;
 			SELF.corp_key							:= state_fips + '-' + corp2.t2u(l.BizEntityId + l.ControlNumber);
 			SELF.corp_sos_charter_nbr := corp2.t2u(l.ControlNumber);
@@ -273,7 +276,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 			
 		END;
 		
-		MapAR  := DEDUP(SORT(PROJECT(ds_FilingIn,ARTransform(LEFT)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;		
+		MapAR  := DEDUP(SORT(PROJECT(ds_FilingIn,ARTransform(LEFT)),RECORD,LOCAL),RECORD,LOCAL) : INDEPENDENT;	
 		
 	//********************************************************************
   // SCRUB MAIN
@@ -286,9 +289,9 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		Main_U := Main_S.FromExpanded(Main_N.ExpandedInFile); 	// Pass the expanded error flags into the Expanded module
 
 		//Outputs reports
-		Main_ErrorSummary					:= OUTPUT(Main_U.SummaryStats, NAMED('Main_ErrorSummary_GA'));
-		Main_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Main_U.AllErrors, 1000), NAMED('Main_ScrubErrorReport_GA'));
-		Main_SomeErrorValues			:= OUTPUT(CHOOSEN(Main_U.BadValues, 1000), NAMED('Main_SomeErrorValues_GA'));
+		Main_ErrorSummary					:= OUTPUT(Main_U.SummaryStats, NAMED('Main_ErrorSummary_GA'+filedate));
+		Main_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Main_U.AllErrors, 1000), NAMED('Main_ScrubErrorReport_GA'+filedate));
+		Main_SomeErrorValues			:= OUTPUT(CHOOSEN(Main_U.BadValues, 1000), NAMED('Main_SomeErrorValues_GA'+filedate));
 		Main_IsScrubErrors		 		:= IF(COUNT(Main_U.AllErrors)<> 0,TRUE,FALSE);
 
 		// Orbit Stats
@@ -341,6 +344,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																												corp_for_profit_ind_Invalid						<> 0 OR
 																												corp_ra_phone_number_Invalid					<> 0 OR
 																												corp_agent_assign_date_Invalid				<> 0 OR
+																												corp_orig_org_structure_desc_Invalid 	<> 0 OR
 																												recordorigin_Invalid 									<> 0
 																											);
 																																											
@@ -371,6 +375,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																												corp_for_profit_ind_Invalid						= 0 AND
 																												corp_ra_phone_number_Invalid					= 0 AND
 																												corp_agent_assign_date_Invalid				= 0 AND
+																												corp_orig_org_structure_desc_Invalid 	= 0 AND
 																												recordorigin_Invalid 									= 0
 																											);
 																												
@@ -392,7 +397,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																										,OUTPUT(Main_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::main_GA',__COMPRESSED__)
 																										)
 																								)
-																							,OUTPUT(Main_ScrubsWithExamples, ALL, NAMED('CorpMainGAScrubsReportWithExamples'))
+																							,OUTPUT(Main_ScrubsWithExamples, ALL, NAMED('CorpMainGAScrubsReportWithExamples'+filedate))
 																							,IF(COUNT(Main_ScrubsAlert) > 0, Main_MailFile, OUTPUT('CORP2_MAPPING.GA - No "MAIN" Corp Scrubs Alerts'))
 																							,Main_ErrorSummary
 																							,Main_ScrubErrorReport
@@ -410,9 +415,9 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		Event_U := Event_S.FromExpanded(Event_N.ExpandedInFile); 		// Pass the expanded error flags into the Expanded module
 		
 		//Outputs reports
-		Event_ErrorSummary				:= OUTPUT(Event_U.SummaryStats, NAMED('Event_ErrorSummary_GA'));
-		Event_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Event_U.AllErrors, 1000), NAMED('Event_ScrubErrorReport_GA'));
-		Event_SomeErrorValues			:= OUTPUT(CHOOSEN(Event_U.BadValues, 1000), NAMED('Event_SomeErrorValues_GA'));
+		Event_ErrorSummary				:= OUTPUT(Event_U.SummaryStats, NAMED('Event_ErrorSummary_GA'+filedate));
+		Event_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Event_U.AllErrors, 1000), NAMED('Event_ScrubErrorReport_GA'+filedate));
+		Event_SomeErrorValues			:= OUTPUT(CHOOSEN(Event_U.BadValues, 1000), NAMED('Event_SomeErrorValues_GA'+filedate));
 		Event_IsScrubErrors		 		:= IF(COUNT(Event_U.AllErrors)<> 0,TRUE,FALSE);
 
 		// Orbit Stats
@@ -421,11 +426,11 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		Event_CreateBitMaps				:= OUTPUT(Event_N.BitmapInfile,,'~thor_data::corp_GA_event_scrubs_bits',OVERWRITE,COMPRESSED);	//long term storage
 		Event_TranslateBitMap			:= OUTPUT(Event_T);
 		//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').ProfileAlertsTemplate;
+		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').SubmitStats;
+		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').SubmitStats;
 
-		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').CompareToProfile_with_Examples;
+		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').CompareToProfile_with_Examples;
 	
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -472,7 +477,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																									 ,OUTPUT(Event_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_GA',__COMPRESSED__)
 																									)
 																								)
-																						 ,OUTPUT(Event_ScrubsWithExamples, ALL, NAMED('CorpEventGAScrubsReportWithExamples'))
+																						 ,OUTPUT(Event_ScrubsWithExamples, ALL, NAMED('CorpEventGAScrubsReportWithExamples'+filedate))
 																						 ,IF(COUNT(Event_ScrubsAlert) > 0, Event_MailFile, OUTPUT('CORP2_MAPPING.GA - No "EVENT" Corp Scrubs Alerts'))
 																						 ,Event_ErrorSummary
 																						 ,Event_ScrubErrorReport

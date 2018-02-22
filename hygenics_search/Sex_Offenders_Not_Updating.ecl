@@ -5,13 +5,12 @@ export SO_By_Key :=
 'C2NV',  // Do Not Remove This Entry
 'C2MS',
 'C2PR',
-'C2KS',
 'C2HI'
 ];
 
 export SO_By_Source := 
 ['OR_SEX_OFFENDER_REGI',
- 'CO_SOTAR_SOR',
+ //'CO_SOTAR_SOR',
  'AL_COUSHATTA_TRIBES_',
  'CHEYENNE_RIVER_SIOUX',
  'ESTRN_BAND_OF_CHEROK',

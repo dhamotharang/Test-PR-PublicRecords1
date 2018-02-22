@@ -1,4 +1,4 @@
-import ut, did_add,data_services, std;
+﻿import ut, did_add,data_services, std;
 
 /* ///////////////////////// Case Connect, BatchR3 (ProdR3 Monitoring), Score and Attribute Outcome,
 //////////////////////////// Deconfliction (part of case connect), and Inquiry History  
@@ -13,6 +13,10 @@ EXPORT FN_FileMoves := MODULE
 		EXPORT isSunday := ut.weekday((unsigned6)pDate[1..8]) = 'SUNDAY';
 		
 		SHARED pDateTime := ut.GetTimeDate() : INDEPENDENT;
+		
+		SHARED FS := fileservices;		
+		
+		SHARED emails := 'John.Freibaum@lexisnexisrisk.com, Cecelie.Reid@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com';
 
 		EXPORT CaseConnect() := FUNCTION
 
@@ -268,6 +272,48 @@ EXPORT FN_FileMoves := MODULE
 						emailSend);
 						
 		END;
+		
+		EXPORT R3Monitoring(boolean isFCRA = false) := FUNCTION
+				
+						datetime 	:= stringlib.stringfilter(pDateTime, '0123456789');
+						prefix := if(isFCRA, '~thor10_231', '~thor100_21');
+						
+						baseR3_SF := data_services.foreign_R3 + 'thor_10_219::base::account_monitoring::prod::' + if(isFCRA, 'fcra', 'nonfcra') + '::inquirytracking';
+						baseR3_SF_Content := nothor(FS.superfilecontents(baseR3_SF));
+
+						dsNonFcraR3 	:= dataset(baseR3_SF, inquiry_acclogs.LAYOUT_ProdR3, thor);
+						dsFcraR3 				:= inquiry_acclogs.Proc_Prod_R3Monitoring.File_Monitoring_FCRA;
+						
+						dsR3 := if(isFCRA
+																	,project(dsFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
+																	,project(dsNonFcraR3, transform({inquiry_acclogs.LAYOUT_ProdR3, string source}, self.source := 'PROD', self := left;))
+																);
+
+						emailcontents := workunit + ' - ' + if(count(baseR3_SF_Content) > 0, 'PROD', '');
+						emailsubject  := if(isFCRA, 'FCRA ', 'NonFCRA ') + 'BatchR3 Logs Output (ProdR3 Monitoring) - ' + datetime;
+						
+						R3_in := prefix + '::in::'+datetime+'_Prod::batchr3';
+						R3_Contents_in := prefix + '::base::account_monitoring::inquirytracking_'+datetime+'_Prod_contents';
+						
+						R3_Content_SF_name := prefix + '::in::BatchR3_acclogs_contents';
+						
+		RETURN sequential(
+						if(isSunday,FS.clearsuperfile(R3_Content_SF_name, true));
+						if(count(baseR3_SF_Content) > 0 and ~exists(FS.LogicalFileList(prefix + '::in::'+datetime[1..8]+'*_Prod::batchr3',true,false)),
+							sequential(
+									output(dsR3,, R3_in, overwrite, __compressed__),
+									output(baseR3_SF_Content,,R3_Contents_in,overwrite, __compressed__),
+									if(isFCRA
+										,nothor(FS.addsuperfile(prefix + '::in::prodr3_acclogs_preprocess', R3_in))
+										,nothor(FS.addsuperfile(prefix + '::in::BatchR3_acclogs_preprocess', R3_in))
+										),
+									nothor(FS.addsuperfile(R3_Content_SF_name, R3_Contents_in)),
+									FS.sendemail(emails, emailsubject, emailcontents)
+								),
+							OUTPUT('No New Files',NAMED('ProdR3Files'))							
+							));
+						
+	END;
 
 
 END;

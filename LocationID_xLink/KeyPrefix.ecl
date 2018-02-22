@@ -1,0 +1,1 @@
+﻿export KeyPrefix := 'thor_data400';

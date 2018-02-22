@@ -99,7 +99,7 @@ EXPORT key_ecrashv2_reportid := INDEX(files.ds_reportid, {report_id}, {Super_rep
 
 EXPORT Key_eCrashv2_reportlinkId := INDEX(files_addl.ds_reportLinkID, {reportlinkid}, {files_addl.ds_reportLinkID}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::ReportLinkId');
 
-EXPORT key_ecrashv2_photoid 	:= INDEX(Files.ds_photoid, {Super_report_id,Document_id}, {Files.ds_photoid}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::PhotoId');
+EXPORT key_ecrashv2_photoid 	:= INDEX(Files.ds_photoid, {Super_report_id,Document_id,Report_Type}, {Files.ds_photoid}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::PhotoId');
 	
 	
 //Use key_EcrashV2_accnbrv1 as input	

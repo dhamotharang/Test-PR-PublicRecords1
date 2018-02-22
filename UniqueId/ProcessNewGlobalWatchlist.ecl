@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 new0 := DISTRIBUTE(UniqueId.Files.new);
 prev := DISTRIBUTE(UniqueId.Files.current,HASH(WatchListName,type,reason_listed,reference_id)) : INDEPENDENT;			
 newseed := MAX(prev, UniqueId.GetMaxLNid(Entity_Unique_id));
@@ -12,7 +12,7 @@ n_noid := COUNT(new);
 withid := new2b(Entity_Unique_Id<>'');
 n_withid := COUNT(withid);
 ToUpper(unicode s) := Std.Uni.ToUpperCase(s);
-fixItUp(unicode s) := Std.Uni.FindReplace(Std.Uni.FindReplace(s, U'Â¶', U'||'), U'Â§', U'|');
+fixItUp(unicode s) := Std.Uni.FindReplace(Std.Uni.FindReplace(s, U'¶', U'||'), U'§', U'|');
 
 // these are records that have not changed
 common := JOIN(new,prev,

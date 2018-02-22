@@ -1,6 +1,6 @@
-EXPORT Spray_SC(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_SC(dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_Control;
+import VersionControl,_Control,lib_thorlib;
 
 
 	string		pServer			:= _Control.IPAddress.bctlpedata11 ;
@@ -8,7 +8,7 @@ import VersionControl,_Control;
 	                                             lictype = 'psychology' => '/data/hds_4/prolic/sc/psychology/'+infile(ftype = 'psychology')[1].fdate,
 																							 '/data/hds_4/prolic/sc/social_workers/'+infile(ftype = 'social_worker')[1].fdate
 																							 );
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 
 
