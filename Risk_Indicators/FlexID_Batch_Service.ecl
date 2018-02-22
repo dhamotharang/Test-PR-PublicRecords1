@@ -633,7 +633,8 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.insurance_dl_used := le.insurance_dl_used;
 	
 	//new for Emerging Identities
-	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+	self.EmergingID := if(isEmergingID, true, false);  	
 	VerSecRange := IF(le.combo_addrcount>0, le.combo_sec_range, '');
 	isReasonCodeSR	:= exists(RiskIndicators(hri='SR')); //check if reason code 'SR' is set
 	SELF.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one

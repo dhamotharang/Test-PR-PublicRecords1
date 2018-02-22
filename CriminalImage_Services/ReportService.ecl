@@ -10,7 +10,9 @@ import iesp;
 */
 import iesp,doxie;
 
-EXPORT ReportService := MACRO;
+EXPORT ReportService := MACRO
+	#onwarning(4207, ignore);
+	
 	rec_in		:= iesp.criminalimagereport.t_CriminalImageReportRequest;
 	ds_in			:= dataset([], rec_in) : STORED('CriminalImageReportRequest', few);
 	first_row	:= ds_in[1] : INDEPENDENT;

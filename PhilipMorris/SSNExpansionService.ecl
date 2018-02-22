@@ -51,7 +51,8 @@
 import iesp;
 
 export SSNExpansionService := MACRO
-
+	#onwarning(4207, ignore);
+	
 	#constant('IncludeMinors',true);
 	#constant('DataRestrictionMask','1    0');
 	

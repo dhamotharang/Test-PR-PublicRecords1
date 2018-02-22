@@ -104,6 +104,7 @@ Returns Results from all the available Jurisdiction.
 import AutoStandardI, FAP_StateWide, Doxie;
 
 EXPORT FAP_SearchService := MACRO
+#onwarning(4207, ignore);
 
 #OPTION ('optimizeProjects', FALSE);
 #CONSTANT('UsingKeepSSNs',TRUE);

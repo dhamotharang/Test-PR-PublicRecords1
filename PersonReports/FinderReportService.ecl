@@ -53,6 +53,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, Relationship;
 
 EXPORT FinderReportService () := MACRO
+#onwarning(4207, ignore);
 
 //The following macro defines the field sequence on WsECL page of query. 
 WSInput.MAC_PersonReports_FinderReportService();
