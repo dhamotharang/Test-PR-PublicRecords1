@@ -45,7 +45,6 @@
 											'SuppressBlankNameAddress',											
 											'TUGatewayPhoneticMatch',
 											'UseDateSort',
-											'UseMetronet',
 											'UseQSENTV2',
 											'ExcludeBusiness',
 											'ExcludeCurrentGong',

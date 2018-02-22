@@ -45,8 +45,8 @@ license_recs := join(ids_only, key_did,
 Layout_PL_Plus roll_licenses(Layout_PL_Plus le, Layout_PL_Plus rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
 	self.proflic_count := le.proflic_count+IF(le.prolic_key=rt.prolic_key,0,rt.proflic_count);
-	self.date_most_recent := ut.max2(le.date_most_recent,rt.date_most_recent);
-	self.expiration_date := ut.max2(le.expiration_date,rt.expiration_date);
+	self.date_most_recent := Max(le.date_most_recent,rt.date_most_recent);
+	self.expiration_date := Max(le.expiration_date,rt.expiration_date);
 	self.license_type := if(le.license_type<>'', trim(le.license_type), trim(rt.license_type));	// keep the most current license type;
 	self.HRProfLicProv := if(le.HRProfLicProv, le.HRProfLicProv, rt.HRProfLicProv);
 	self := rt;

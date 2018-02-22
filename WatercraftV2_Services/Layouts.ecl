@@ -1,4 +1,4 @@
-import BatchShare, Doxie, doxie_crs, Watercraft, ut, FFD, BIPV2;
+﻿import BatchShare, Doxie, doxie_crs, Watercraft, ut, FFD, BIPV2;
 
 EXPORT Layouts := MODULE
 	
@@ -457,6 +457,7 @@ EXPORT Layouts := MODULE
 		unsigned2 penalt := 0;
     Batchshare.layouts.ShareErrors;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
+		FFD.Layouts.ConsumerFlags;
   end;
 	
 	export batch_out_pre :=record(batch_out)

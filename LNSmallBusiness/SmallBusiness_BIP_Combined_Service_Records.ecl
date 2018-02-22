@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit_Scoring, Business_Risk_BIP, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, ut;
+﻿IMPORT BIPV2, Business_Credit_Scoring, Business_Risk_BIP, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, ut, std;
 
 EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod ) := 
   FUNCTION
@@ -319,7 +319,7 @@ ds_newModels;
 		
     iesp.businesscreditreport.t_BusinessCreditScoring xfm_CurrScores_toIESP_Layout() := 
       TRANSFORM
-        SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8(ut.GetDate),
+        SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8((STRING8)Std.Date.Today()),
         SELF.CurrentPriorFlag 						:= LNSmallBusiness.Constants.CURRENT_FLAG,
         SELF.Scores 											:= PROJECT(_curr_Scores , TRANSFORM(LEFT)), 
         SELF															:= [];

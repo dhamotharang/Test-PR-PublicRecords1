@@ -1,4 +1,4 @@
-import LN_PropertyV2_Services, iesp, doxie, riskwise, risk_indicators, ut, LN_PropertyV2;
+﻿import LN_PropertyV2_Services, iesp, doxie, riskwise, risk_indicators, ut, LN_PropertyV2, std;
 
 export getProperty(dataset(identifier2.layout_Identifier2) indata, 
 								boolean owned_any_property=false,
@@ -136,11 +136,11 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		everOwned      := le.isAddressMatch and le.isOwner
 			and (
 				Ever_Owned_Input_Property_InPastNumberOfYears = 0
-				or ut.GetAgeI_asOF( MAP(
+				or ut.Age( MAP(
 					le.dt_vendor_last_reported < iesp.constants.identifier2c.yearOnly      => le.dt_vendor_last_reported * 10000,
 					le.dt_vendor_last_reported < iesp.constants.identifier2c.yearMonthOnly => le.dt_vendor_last_reported * 100,
 					le.dt_vendor_last_reported),
-					(integer)ut.GetDate) < Ever_Owned_Input_Property_InPastNumberOfYears
+					Std.Date.Today()) < Ever_Owned_Input_Property_InPastNumberOfYears
 				)
 		;
 
@@ -205,11 +205,11 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		everOwned      := le.isAddressMatch and le.isOwner
 			and (
 				Ever_Owned_Input_Property_InPastNumberOfYears = 0
-				or ut.GetAgeI_asOF( MAP(
+				or ut.Age( MAP(
 					le.dt_vendor_last_reported < iesp.constants.identifier2c.yearOnly      => le.dt_vendor_last_reported * 10000,
 					le.dt_vendor_last_reported < iesp.constants.identifier2c.yearMonthOnly => le.dt_vendor_last_reported * 100,
 					le.dt_vendor_last_reported),
-					(integer)ut.GetDate) < Ever_Owned_Input_Property_InPastNumberOfYears
+					(integer)Std.Date.Today()) < Ever_Owned_Input_Property_InPastNumberOfYears
 				)
 		;
 		

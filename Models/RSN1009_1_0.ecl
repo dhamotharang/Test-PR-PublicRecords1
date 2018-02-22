@@ -1,4 +1,4 @@
-import easi, risk_indicators, riskwise, ut;
+import easi, risk_indicators, riskwise, ut, std;
 
 export RSN1009_1_0( grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam	) := FUNCTION
 
@@ -478,7 +478,7 @@ export RSN1009_1_0( grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam	) :=
 		wealth_index                     := le.wealth_indicator;
 		addr_stability                   := le.mobility_indicator;
 		estimated_income                 := le.estimated_income;
-		archive_date                     := if(999999=le.historydate, ut.GetDate[1..6], (string6)le.historydate );
+		archive_date                     := if(999999=le.historydate, ((STRING)Std.Date.Today())[1..6], (string6)le.historydate );
 
 
 		c_ab_av_edu                      := trim(ri.ab_av_edu);

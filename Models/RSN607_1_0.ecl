@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, easi, ut;
+import riskwise, risk_indicators, easi, ut, std;
 
 export RSN607_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -34,7 +34,7 @@ with_rs_batchin := join(clam, recoverscore_batchin, left.seq=right.seq, add_rs(l
 		bk_disp_code_1 := le.bk_disp_code_1;
 		dcd_match_code_1 := le.dcd_match_code_1;
 		
-		archive_date           :=  if(le.historydate = 999999, ut.GetDate, (string)le.historydate);
+		archive_date           :=  if(le.historydate = 999999, (STRING8)Std.Date.Today(), (string)le.historydate);
 		in_dob                 :=  le.shell_input.dob;
 		nas_summary            :=  le.iid.nas_summary;
 		nap_summary            :=  le.iid.nap_summary;
@@ -66,7 +66,7 @@ with_rs_batchin := join(clam, recoverscore_batchin, left.seq=right.seq, add_rs(l
 		// ----------------------------------------------------------------------------------------------------
 		// address index variables
 		// ----------------------------------------------------------------------------------------------------
-		sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+		sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 
 		dwelling_type         :=  trim(le.address_validation.dwelling_type);
 		hr_address            := (integer)le.address_validation.hr_address;
@@ -225,7 +225,7 @@ with_rs_batchin := join(clam, recoverscore_batchin, left.seq=right.seq, add_rs(l
 		/********************************************************************************************************/
 
 		/******************************  logic:  naprop ***************************************************/
-		add1_year_first_seen := (integer)(add1_date_first_seen[1..4]);
+		add1_year_first_seen := (integer)(((STRING)add1_date_first_seen)[1..4]);
 
 
 		add1_dot := (integer)(add1_year_first_seen < 1900 );
@@ -664,7 +664,7 @@ with_rs_batchin := join(clam, recoverscore_batchin, left.seq=right.seq, add_rs(l
 
 		/*   lifestress           */
 
-		lname_change_year := (integer)lname_change_date[1..4];
+		lname_change_year := (integer)((STRING)lname_change_date)[1..4];
 
 		recent_name_change := (integer)(sysyear-lname_change_year < 3 );
 

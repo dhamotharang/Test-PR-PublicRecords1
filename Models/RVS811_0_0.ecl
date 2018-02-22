@@ -1,4 +1,4 @@
-import ut, risk_indicators, Business_Risk, Easi, RiskWise, address, LNSmallBusiness, iesp;
+import ut, risk_indicators, Business_Risk, Easi, RiskWise, address, LNSmallBusiness, iesp, std;
 
 export RVS811_0_0(
 	dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -142,7 +142,7 @@ export RVS811_0_0(
 		cnt_if                        := le.br.prs.cnt_if;
 		CURRT1SRC4                    := le.br.prs.CURRT1SRC4;
 
-		history_date	              := if( le.bs.historydate=999999, ut.GetDate[1..6], (string6)le.bs.historydate);
+		history_date	              := if( le.bs.historydate=999999, ((STRING)Std.Date.Today())[1..6], (string6)le.bs.historydate);
 
 
 		 /************************************************************************************

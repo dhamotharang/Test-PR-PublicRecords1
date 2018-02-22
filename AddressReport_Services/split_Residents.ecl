@@ -49,7 +49,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       self.name_suffix := if (R.name_suffix ='UNK','',R.name_suffix);
       self.prim_name   := if (R.src in ['DE', 'DS'],'',R.prim_name);
       self.dod:=(string) R.dod;
-      self.age := if (R.dob = 0, 0, ut.GetAge ((string8) R.dob));
+      self.age := if (R.dob = 0, 0, ut.Age(R.dob));
 			self.addr_dt_first_seen := R.dt_first_seen;
 			self.addr_dt_last_seen	:= R.dt_last_seen;
       self := R;
@@ -114,7 +114,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       d_death := (unsigned) r.dod8;
       Self.Identity.DOD := iesp.ECL2ESP.toDatestring8 (r.dod8);
       Self.Identity.DeathVerificationCode := r.vorp_code; //death_code in header index
-      Self.Identity.AgeAtDeath := if (d_death = 0 or L.Identity.age = 0, 0, ut.GetAgeI_asOf (d_birth, d_death));
+      Self.Identity.AgeAtDeath := if (d_death = 0 or L.Identity.age = 0, 0, ut.Age (d_birth, d_death));
       Self.Identity.DeathCounty := R.county_name;
       Self.Identity.DeathState := R.state;
 			self.Identity.Deceased := if (r.l_did != 0  , 'Y','N');

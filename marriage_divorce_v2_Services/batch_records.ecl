@@ -1,4 +1,4 @@
-import doxie, marriage_divorce_v2_Services, BatchServices, marriage_divorce_v2, Autokey_batch, AutokeyB2, FCRA,FFD,ut,STD;
+﻿import doxie, marriage_divorce_v2_Services, BatchServices, marriage_divorce_v2, Autokey_batch, AutokeyB2, FCRA,FFD,ut,STD;
 
 // md := marriage_divorce_v2_Services;
 
@@ -50,15 +50,17 @@ export batch_records (marriage_divorce_v2_Services.input.batch_params configData
 
 
   // -------- get row records --------
-  ds_best := project(fcra_dids,transform(doxie.layout_best,self.did:=left.did,self:=[]));
-  ds_flags := FCRA.GetFlagFile (ds_best);
-
 	//FCRA FFD  	
 	pc_dids := project(fcra_dids, FFD.Layouts.DidBatch); 
 	
-	pc_recs := if(isFCRA, FFD.FetchPersonContext(pc_dids, configData.gateways, FFD.Constants.DataGroupSet.Marriage_Divorce));
+	pc_recs := if(isFCRA, FFD.FetchPersonContext(pc_dids, configData.gateways, FFD.Constants.DataGroupSet.Marriage_Divorce, configData.FFDOptionsMask));
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 	
+  ds_best := project(fcra_dids,transform(doxie.layout_best,self.did:=left.did,self:=[]));
+  ds_flags := FFD.GetFlagFile (ds_best, pc_recs);
+
+	alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs, configData.FCRAPurpose, configData.FFDOptionsMask);
+
 	ds_raw := marriage_divorce_v2_Services.MDRaw.batch_view.by_id (ids, configData.non_subject_suppression, 
 																																 IsFCRA, ds_flags, slim_pc_recs, configData.FFDOptionsMask);
 
@@ -109,8 +111,11 @@ export batch_records (marriage_divorce_v2_Services.input.batch_params configData
 												 FilterByDate (Left, Right),
 												 keep (1), limit (0));
 											  
-	sequenced_out := project(filtered_out, TRANSFORM(marriage_divorce_v2_Services.layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
-	recs_out := project(sequenced_out,marriage_divorce_v2_Services.layouts.batch_out);	
+  recs_fltr_with_alerts := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(filtered_out, alert_flags, Statements, Marriage_divorce_v2_Services.Layouts.batch_out_pre),
+	                            filtered_out);
+
+	sequenced_out := PROJECT(recs_fltr_with_alerts, TRANSFORM(marriage_divorce_v2_Services.layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
+	recs_out := PROJECT(sequenced_out, Marriage_divorce_v2_Services.layouts.batch_out);	
 	
 	consumer_statements := NORMALIZE(sequenced_out, LEFT.Statements, 
 		TRANSFORM(FFD.Layouts.ConsumerStatementBatch, 
@@ -120,10 +125,11 @@ export batch_records (marriage_divorce_v2_Services.input.batch_params configData
 			
 	// append the actual contents of each consumer statement		
 	consumer_statements_prep := IF(IsFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));	
+  consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	// store both records and statements under a single record structure
-	FFD.MAC.PrepareResultRecordBatch(recs_out, record_out, consumer_statements_prep, marriage_divorce_v2_Services.layouts.batch_out);		
-	
+	FFD.MAC.PrepareResultRecordBatch(recs_out, record_out, consumer_statements_alerts, marriage_divorce_v2_Services.layouts.batch_out);		
 	RETURN record_out;
 
 end;

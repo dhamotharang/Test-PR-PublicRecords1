@@ -1,7 +1,7 @@
-import BankruptcyV2, fcra, Doxie, ut;
+import BankruptcyV2, fcra, Doxie, ut, std;
 
 export key_bankruptcyV3_did(boolean isFCRA = false) := function
-  todaysdate := ut.GetDate;
+  todaysdate := (STRING8)Std.Date.Today();
 	// MW: might need to change "process_date" as filtering date
 	get_party_recs 	:= BankruptcyV2.file_bankruptcy_search_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 

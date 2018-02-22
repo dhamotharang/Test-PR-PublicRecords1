@@ -1,13 +1,4 @@
-﻿/*2016-05-23T23:45:58Z (Kevin Huls)
-RQ-12730 EMerging Identities: fix syntax error populating UniqueID
-*/
-/*2016-05-19T21:10:22Z (Kevin Huls)
-RQ-12730: Emerging Identities - per code review - blank out DID if fake
-*/
-/*2016-05-19T17:47:55Z (Kevin Huls)
-RQ-12730: Emerging Identities
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FlexID (aka IID Model)">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -372,6 +363,9 @@ isUtility := StringLib.StringToUpperCase(IndustryClassVal)='UTILI';
 DobRadiusUse := if(UseDobFilter,DobRadius,-1);
 NumReasons := if(IncludeAllRiskIndicators, 20, risk_indicators.iid_constants.DefaultNumCodes);
 DOBMatchOptions := dataset([{DOBMatchType, DOBMatchYearRadius}], risk_indicators.layouts.Layout_DOB_Match_Options);
+
+IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 //Check to see if the FP model requested requires a valid GLB 
 FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail

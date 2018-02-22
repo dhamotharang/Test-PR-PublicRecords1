@@ -1,4 +1,4 @@
-import ut;
+import ut, std;
 export Validate_SSN(STRING9 ssn, STRING8 dob) :=
 MODULE
 
@@ -14,7 +14,7 @@ MODULE
 			'212099999', '219099998', '219099999', '306302348', '308125070', '468288779', '549241889', '987654320'
 		];
 	export isDobEmpty := (LENGTH(StringLib.StringFilter(dob,'0123456789'))<>8) OR invalid;
-	export isDobInvalid := (dob[1..2]>'20' or (dob[1..2]<'19')) or (dob[1..4]>ut.GetDate) or
+	export isDobInvalid := (dob[1..2]>'20' or (dob[1..2]<'19')) or (dob[1..4]>(STRING8)Std.Date.Today()) or
 					    dob[5..6]>'12' or dob[5..6]='00' or dob[7..8]>'31' or dob[7..8]='00';
 	
 	// Based on ssn tables

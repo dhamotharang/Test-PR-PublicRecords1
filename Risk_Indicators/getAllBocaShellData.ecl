@@ -21,7 +21,7 @@ EXPORT getAllBocaShellData (
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	// if the record is default_history_date or same month as today's date, run production_realtime_mode
 	production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
-														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);		
+														or iid[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);		
 	
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -171,7 +171,7 @@ EXPORT getAllBocaShellData (
 	
 	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
 	prop_with_advo_roxie := join(pre_ADVO, if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history),  //join to appropriate FCRA/nonFCRA key
-					left.zip5 != '' and 
+			left.zip5 != '' and 
 					left.prim_range != '' and
 					keyed(left.zip5 = right.zip) and
 					keyed(left.prim_range = right.prim_range) and
@@ -1596,7 +1596,7 @@ bsdata41 := if(isFCRA, rhode_island_patch, with_DNM_PreScreen);
 
 // nonfcra 5.0 data only
 insurance_phones_rolled := Risk_Indicators.Boca_Shell_Insurance_Phones(ids_wide(~isrelat));
-experian_phones_rolled := Risk_Indicators.Boca_Shell_Experian_Phones(ids_wide(~isrelat), isFCRA, glb, DataRestriction );
+bureau_phones_rolled := Risk_Indicators.Boca_Shell_Bureau_Phones(ids_wide(~isrelat));
 
 with_insurance_phones := join(bsdata41, insurance_phones_rolled, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell, 
@@ -1604,14 +1604,15 @@ with_insurance_phones := join(bsdata41, insurance_phones_rolled, left.seq=right.
 		self.insurance_phones_summary := right;
 		self := left), left outer, keep(1), parallel);
 		
-with_experian_phone_verification := join(with_insurance_phones, experian_phones_rolled, left.seq=right.seq,
+with_bureau_phone_verification := join(with_insurance_phones, bureau_phones_rolled, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell, 
 		self.seq := left.seq,
-		self.Experian_Phone_Verification := right.Experian_Phone_Verification;
+		self.Experian_Phone_Verification := right.phone_ver_bureau;
+		self.phone_ver_bureau := right.phone_ver_bureau;
 		self := left), left outer, keep(1), parallel);										
 
 // everything in shell 5.0 up to this point is non-fcra only.  if isFCRA, start with bsdata41
-shell50_branch1 := if(isFCRA, group(bsdata41, seq), group(with_experian_phone_verification, seq));
+shell50_branch1 := if(isFCRA, group(bsdata41, seq), group(with_bureau_phone_verification, seq));
 
 with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA);		
 with_source_profile := risk_indicators.getSourceProfile(with_college_attendance);		

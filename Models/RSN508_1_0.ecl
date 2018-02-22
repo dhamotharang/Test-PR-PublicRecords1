@@ -1,5 +1,5 @@
 // MANN BRACKEN
-import ut, risk_indicators, address;
+import ut, risk_indicators, address, std;
 
 export RSN508_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -89,10 +89,10 @@ Layout_RecoverScore doModel(clam le, recoverscore_batchin rt) := TRANSFORM
 
 	// lres 
 
-     sysyear := (integer)(ut.GetDate[1..4]);
+     sysyear := (integer)(((STRING)Std.Date.Today())[1..4]);
 
      add1_year_first_seen1 := le.address_verification.input_address_information.date_first_seen;
-	add1_year_first_seen := (integer)(add1_year_first_seen1[1..4]);
+	add1_year_first_seen := (integer)(((STRING)add1_year_first_seen1)[1..4]);
 
      lres := IF((sysyear - add1_year_first_seen) >= 6, 1, 0);
 

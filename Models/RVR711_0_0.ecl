@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVR711_0_0(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -106,7 +106,7 @@ end;
 
 
 
-		arcdate := if( archive_date = 999999, ut.GetDate, (STRING)archive_date );
+		arcdate := if( archive_date = 999999, (STRING8)Std.Date.Today(), (STRING)archive_date );
 		year := (INTEGER)arcdate[1..4];
 
 		ssn479 := nas_summary in [4,7,9];

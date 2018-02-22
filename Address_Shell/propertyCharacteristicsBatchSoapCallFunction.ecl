@@ -1,4 +1,4 @@
-IMPORT iesp, InsuranceContext_iesp, ut, PropertyCharacteristics_Services, Gateway;
+﻿IMPORT iesp, InsuranceContext_iesp, ut, PropertyCharacteristics_Services, Gateway;
 
 EXPORT propertyCharacteristicsBatchSoapCallFunction (DATASET(Address_Shell.layouts.address_shell_input) input, UNSIGNED1 propertyInformationAttributesVersion, DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
 /* ************************************************************
@@ -15,8 +15,10 @@ EXPORT propertyCharacteristicsBatchSoapCallFunction (DATASET(Address_Shell.layou
 	  SELF := [];
 		END;
 
+	emptyRecord := dataset([{1}], {unsigned a});
+	
 	Address_Shell.layouts.PC_Soap_In
-	intoPropertyCharacteristicBatchRequest(ut.ds_oneRecord le) := TRANSFORM
+	intoPropertyCharacteristicBatchRequest(emptyRecord le) := TRANSFORM
 		BatchIn := PROJECT(input, createBatchIn(LEFT));
 		SELF.batch_in := BatchIn;
 		SELF.includeconfidencefactors := 1;
@@ -26,7 +28,7 @@ EXPORT propertyCharacteristicsBatchSoapCallFunction (DATASET(Address_Shell.layou
 		SELF := [];
 		END;
 
-	reportServiceRequest := PROJECT(ut.ds_oneRecord,
+	reportServiceRequest := PROJECT(dataset([{1}], {unsigned a}),
 	intoPropertyCharacteristicBatchRequest(LEFT));
 
 	// Address_Shell.layouts.PC_Soap_In intoPropertyCharacteristicBatchRequest(Address_Shell.layouts.address_shell_input le) := TRANSFORM

@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi, riskwise;
+import risk_indicators, ut, easi, riskwise, std;
 
 bs_with_ip :=  record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -374,7 +374,7 @@ INTEGER year(integer sas_date) :=
 // initial transformations
 
 sysdate :=  __common__( map(
-    trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01')),
+    trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01')),
     length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
                                                            NULL));
 

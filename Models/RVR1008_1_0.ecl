@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT RVR1008_1_0(GROUPED DATASET(risk_indicators.layout_boca_shell) clam, BOOLEAN inCalif=FALSE, BOOLEAN PreScreenOptOut=FALSE) := FUNCTION
 
@@ -582,7 +582,7 @@ EXPORT RVR1008_1_0(GROUPED DATASET(risk_indicators.layout_boca_shell) clam, BOOL
 	wealth_index                     := le.wealth_indicator;
 	input_dob_match_level            := le.dobmatchlevel;
 	addr_stability                   := le.mobility_indicator;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate, le.historydate);
+	archive_date                     := IF(le.historydate = 999999, (STRING)Std.Date.Today(), (STRING)le.historydate);
 
 /* ***********************************************************
 	*                   Generated ECL                          *

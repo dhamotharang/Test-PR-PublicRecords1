@@ -1,5 +1,5 @@
 // Rossman & Co 
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVC1307_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -195,7 +195,7 @@ export RVC1307_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 		(source[1..length(target)+1] = target + delim) OR
 		(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
-	sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+	sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 	email_src_im := Models.Common.findw_cpp(email_source_list, 'IM' , ' ,', 'E') > 0;
 

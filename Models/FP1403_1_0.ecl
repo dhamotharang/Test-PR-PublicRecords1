@@ -1,5 +1,5 @@
 
-import risk_indicators, riskwise, ut, easi;
+import risk_indicators, riskwise, ut, easi, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -306,7 +306,7 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 ver_src_ds := Models.Common.findw_cpp(ver_sources, 'DS' , ', ', 'E') > 0;
 

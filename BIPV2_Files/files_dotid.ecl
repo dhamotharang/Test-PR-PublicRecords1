@@ -1,4 +1,4 @@
-IMPORT BIPV2,std;
+IMPORT BIPV2,std, Data_Services;
 EXPORT files_dotid(string p_DotModule = 'bipv2_dotid') := module
 	/*----------------- Reduced layout for internal use only -----------------*/
 	EXPORT l_DOTID := RECORD
@@ -62,7 +62,7 @@ EXPORT files_dotid(string p_DotModule = 'bipv2_dotid') := module
 	EXPORT DS_GRANDFATHER		:= DATASET(FILE_GRANDFATHER,	BIPV2.CommonBase.Layout, THOR, OPT);
 	
 	IMPORT ut, _Control;
-	SHARED FILE_BASE_PROD		:= ut.foreign_prod+FILE_BASE[2..];
+	SHARED FILE_BASE_PROD		:= Data_Services.foreign_prod+FILE_BASE[2..];
 	EXPORT DS_BASE_PROD			:= DATASET(FILE_BASE_PROD, BIPV2.CommonBase.Layout_Static, THOR, OPT) : PERSIST('~persist::prod::bipv2_dotid::base');
 	
   import tools;

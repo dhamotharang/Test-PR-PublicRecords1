@@ -1,4 +1,4 @@
-import Models, Risk_Indicators, ut;
+import Models, Risk_Indicators, ut, std;
 
 
 EXPORT getSourceProfile (GROUPED DATASET (Layout_Boca_Shell) clam) := FUNCTION;
@@ -27,7 +27,7 @@ Layout_Boca_Shell  GetSrcProfile(clam le) := TRANSFORM
 
 NULL := -999999999;
 
-sysdate := models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := models.common.sas_date(if(le.historydate=999999, (string)Std.Date.Today(), (string6)le.historydate+'01'));
 
 Add_Input_NAProp := le.address_verification.input_address_information.naprop; 
 truedid := le.truedid;

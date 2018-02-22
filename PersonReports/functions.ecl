@@ -1,4 +1,4 @@
-IMPORT iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports;
+﻿IMPORT iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports, std;
 
 /*
   boolean IncludeMotorVehicleV1 {xpath('IncludeMotorVehicleV1')};//hidden[internal]
@@ -385,7 +385,7 @@ EXPORT functions := MODULE
       // 3. joined back to original input adresses (TODO: check if this can be avoided by using left outer in 1)
 
       PersonReports.layouts.rec_wide GetPhones (doxie.layout_comp_addresses L, PersonReports.layouts.phones_rec R) := transform
-        boolean date_matched := (L.dt_last_seen = 0 or ut.GetAgeI (L.dt_last_seen * 100) < 5); //2a - not positive about the zero here, but want to be conservative to start
+        boolean date_matched := (L.dt_last_seen = 0 or ut.Age(L.dt_last_seen * 100) < 5); //2a - not positive about the zero here, but want to be conservative to start
 
         boolean IsNameMatched := (ut.StringSimilar100 (L.lname, R.lname) <= 30) or
                                  ut.isNamePart (R.lname, trim (L.lname), true) or
@@ -533,7 +533,7 @@ HISTORICAL addresses (so far subject's only, no last name)
         // (including spouses having different last names), relatives (who used to live at this address at some point).
         // To avoid verification of non-current addresses, "recency" must be used.
         phones_verificators := R.phones(sequence_verified = L.address_seq_no or 
-                                (is_subject_verified and (ut.DaysApart (ut.GetDate, L.dt_last_seen + '00') < in_params.address_recency_days)));
+                                (is_subject_verified and (ut.DaysApart ((STRING)Std.Date.Today(), L.dt_last_seen + '00') < in_params.address_recency_days)));
         Self.Verified := R.IsVerified and exists (phones_verificators);
 
         // there can be duplicates -- for example, spouses with the same last name
@@ -610,7 +610,7 @@ HISTORICAL addresses (so far subject's only, no last name)
 
   END;
 
-  export unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.GetAge((string8) dob),0);
+  export unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.Age(dob),0);
 
 //  export layouts.identity_slim GetDeadInfo (layouts.identity_slim L, doxie.key_death_masterV2_DID R):= transform
   export PersonReports.layouts.identity_slim GetDeadInfo (PersonReports.layouts.identity_slim L, doxie_crs.layout_deathfile_records R):= transform
@@ -621,7 +621,7 @@ HISTORICAL addresses (so far subject's only, no last name)
         u_doD := (unsigned) r.dod8;
         Self.DOD := iesp.ECL2ESP.toDatestring8 (r.dod8);
         Self.DeathVerificationCode := r.vorp_code; //death_code in header index
-        Self.AgeAtDeath := if (u_doD = 0 or L.age = 0, 0, ut.GetAgeI_asOf (u_doB, u_doD));
+        Self.AgeAtDeath := if (u_doD = 0 or L.age = 0, 0, ut.Age (u_doB, u_doD));
         Self.DeathCounty := R.county_name;
         Self.DeathState := R.state;
         self.Deceased := if ( r.did != '', 'Y','N');
@@ -705,7 +705,7 @@ shared layout_names_HRI := record
                               left.mname=right.mname and left.ssn=right.ssn or right.ssn='' and
                               (left.dob=right.dob or right.dob=0 or
                               (right.dob % 100 =0 and
-                              (string)left.dob[1..6]=(string)right.dob[1..6])));
+                              ((string)left.dob)[1..6]=((string)right.dob)[1..6])));
 
     iesp.share.t_SSNInfoEx FormatSSN (doxie_crs.layout_ssn_records L) := TRANSFORM
       Self.SSN := L.ssn;

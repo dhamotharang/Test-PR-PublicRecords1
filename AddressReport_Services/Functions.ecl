@@ -2,7 +2,8 @@ IMPORT eMerges, iesp,DriversV2_Services,ut,
 				LiensV2_Services,LN_PropertyV2_Services, AutoStandardI,
 				CriminalRecords_Services, SexOffender_Services,hunting_fishing_services,
 				CCW_Services, doxie,VehicleV2_Services,doxie_cbrs, LN_PropertyV2,
-				Gateway, BatchServices, Address, Doxie_Raw;
+				Gateway, BatchServices, Address, Doxie_Raw, std;
+				
 EXPORT Functions := MODULE
 /////////////////////////////////////////////////
 	
@@ -719,7 +720,7 @@ export getRTPhones(dataset(AddressReport_Services.layouts.residents_final_out) i
 	end;
 	//flatten results to filter and get hriPhone and timezone
 	rtp_out 	:= NORMALIZE(gw_recs,LEFT.gw_results, flat_recs(LEFT, RIGHT));
-	rtp_filt	:= sort(dedup(sort(rtp_out(ut.DaysApart(dt_last_seen, ut.GetDate) < AddressReport_Services.Constants.DAYS_IN_YEAR), 
+	rtp_filt	:= sort(dedup(sort(rtp_out(ut.DaysApart(dt_last_seen, (STRING)Std.Date.Today()) < AddressReport_Services.Constants.DAYS_IN_YEAR), 
 															 rec_no, phone, -dt_last_seen), 
 													rec_no, phone), 
 										rec_no, -dt_last_seen);

@@ -1,10 +1,10 @@
-import ut, risk_indicators, riskwise, riskwisefcra;
+import ut, risk_indicators, riskwise, riskwisefcra, std;
 
 export AWD605_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := FUNCTION
 
 Layout_ModelOut doModel(clam le) := TRANSFORM
 
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	neither_best_match := if(~le.address_verification.input_address_information.isbestmatch and ~le.address_verification.address_history_1.isbestmatch, 1, 0);
 	
@@ -86,7 +86,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 				  0);
 
 
-	today := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
      dob_m := (integer)(le.shell_input.dob[5..6]);
@@ -111,7 +111,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 							0);
 
 
-     time_on_header_years := (sysyear - (integer)(le.ssn_verification.header_first_seen[1..4]));
+     time_on_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_first_seen)[1..4]));
 
 	time_on_header_code := map(time_on_header_years <= 5 or time_on_header_years = sysyear => 0,
 						  time_on_header_years <= 15 => 1,

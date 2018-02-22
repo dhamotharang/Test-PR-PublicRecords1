@@ -69,11 +69,11 @@ END;
 
 distanceZipLayout CalcDist(SDMoversZip le) := TRANSFORM
 	SELF.Move1_dist:= IF(le.addr1_zip='' 	OR le.addr2_zip='', 9999,
-								ut.imin2((INTEGER) ut.zip_Dist(le.addr1_zip, le.addr2_zip), 9998));	
+								Min((INTEGER) ut.zip_Dist(le.addr1_zip, le.addr2_zip), 9998));	
 	SELF.Move2_dist:= IF(le.addr2_zip='' OR le.addr3_zip='', 9999,
-								ut.imin2((INTEGER) ut.zip_Dist(le.addr2_zip, le.addr3_zip), 9998));
+								Min((INTEGER) ut.zip_Dist(le.addr2_zip, le.addr3_zip), 9998));
 	SELF.Move3_dist:= IF(le.addr3_zip='' OR le.addr4_zip='', 9999,
-								ut.imin2((INTEGER) ut.zip_Dist(le.addr3_zip, le.addr4_zip), 9998));
+								Min((INTEGER) ut.zip_Dist(le.addr3_zip, le.addr4_zip), 9998));
 
 
   Self := le;

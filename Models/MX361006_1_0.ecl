@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, ut, RiskWise;
+IMPORT Risk_Indicators, ut, RiskWise, std;
 
 EXPORT MX361006_1_0( DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
@@ -109,7 +109,7 @@ EXPORT MX361006_1_0( DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTI
 		adl_V_last_seen                  := le.source_verification.adl_V_last_seen;
 		adl_EM_last_seen                 := le.source_verification.adl_EM_last_seen;
 		adl_W_last_seen                  := le.source_verification.adl_W_last_seen;
-		history_date                     := if( le.historydate=999999, ut.getdate[1..6], (STRING6)le.historydate );
+		history_date                     := if( le.historydate=999999, ((STRING)Std.Date.Today())[1..6], (STRING6)le.historydate );
 		is_fcra                          := true; // this is an FCRA model. added this to keep the 'unscorable' section as close to original sas as possible.
 		truedid                          := le.truedid;
 		nas_summary                      := le.iid.nas_summary;
@@ -148,9 +148,9 @@ EXPORT MX361006_1_0( DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTI
 		/* CREATE 'INPUT' VALUES USED BY THE MODEL */
 		NULL := -999999999;
 		
-		getMonths( UNSIGNED date ) := if(date=0, NULL, max(0,((INTEGER)history_date[1..4] - (INTEGER)date[1..4])*12
-		                           + (INTEGER)history_date[5..6] - (INTEGER)date[5..6]));
-		getYears( UNSIGNED date ) := if(date=0, NULL, max(0,(INTEGER)history_date[1..4] - (INTEGER)date[1..4]));
+		getMonths( UNSIGNED date ) := if(date=0, NULL, max(0,((INTEGER)history_date[1..4] - (INTEGER)((STRING)date)[1..4])*12
+		                           + (INTEGER)history_date[5..6] - (INTEGER)((STRING)date)[5..6]));
+		getYears( UNSIGNED date ) := if(date=0, NULL, max(0,(INTEGER)history_date[1..4] - (INTEGER)((STRING)date)[1..4]));
 				
 		add2_avm_recording_mn            := getMonths((UNSIGNED)add2_avm_recording_date);
 		CALastSaleDate_mn                := getMonths(CALastSaleDate);

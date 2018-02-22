@@ -1,4 +1,4 @@
-// replacement for Progressive_Phone.experian_phone_soapcall.
+﻿// replacement for Progressive_Phone.experian_phone_soapcall.
 
 IMPORT iesp, progressive_phone, Gateway, Royalty;
 prog_layout := progressive_phone.layout_progressive_phones;
@@ -9,9 +9,9 @@ EXPORT SoapCall_Metronet(DATASET(prog_layout.layout_exp_multiple_phones) phone_r
 												 INTEGER retries = 1,
 												 INTEGER MaxCountLast3Digits = iesp.Constants.MaxCountLast3Digits) := FUNCTION
 												 
-	gateway_URL := gateway_cfg.url;
+	gateway_URL := [];
 	inputSeq := PROJECT(phone_request, TRANSFORM(prog_layout.layout_exp_multiple_phones, SELF.seq := IF((INTEGER)LEFT.seq > 0, LEFT.seq, (STRING)COUNTER); SELF := LEFT));
-  vMakeGWCall := TRIM(gateway_URL) <> '' AND COUNT(inputSeq) > 0;
+ vMakeGWCall := False;
 	
 	
   iesp.share.t_StringArrayItem getDigits(prog_layout.Phone_Last3Digits le) := TRANSFORM

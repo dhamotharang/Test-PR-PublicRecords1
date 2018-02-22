@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 // this model needs to use the original V1 reason code set like 2x69 does, defaulting useRCSetV2 to false
 export RVT1006_1_0(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean useRcSetV2 = false ) := FUNCTION
@@ -332,7 +332,7 @@ export RVT1006_1_0(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, bool
 		inferred_age                     := le.inferred_age;
 		reported_dob                     := le.reported_dob;
 		addr_stability                   := le.mobility_indicator;
-		archive_date                     := if(le.historydate=999999, (unsigned3)ut.getdate[1..6], le.historydate);
+		archive_date                     := if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 
 		null := models.common.null;
 

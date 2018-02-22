@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Possible_Incarceration_Indicator_Batch_ServiceFCRA" wuTimeout="300000">
 	<part name="Return_DOC_Name" type="xsd:boolean"/>
 	<part name="Return_SSN" type="xsd:boolean"/>
@@ -6,6 +6,7 @@
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="FFDOptionsMask" type="xsd:string"/>
+	<part name="FCRAPurpose" type="xsd:string"/>
 	<part name="batch_in"             type="tns:XmlDataSet" cols="70" rows="25"/>	
 	<part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
@@ -26,15 +27,17 @@ EXPORT Possible_Incarceration_Indicator_Batch_ServiceFCRA() := MACRO
 		export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
 		export applicationType 	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
 	end;
 		
 	// run input through some standard procedures
 	BatchShare.MAC_SequenceInput(ds_xml_in, ds_sequenced);
 	BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_batch_in);	
-		
+	
+	
 	// append DID (a soap call to Picklist service)
 	BatchShare.MAC_AppendPicklistDID (ds_batch_in, ds_batch_did, pii_batch_params, IsFCRA);	
-	
+		
 	crim_out:= CriminalRecords_BatchService.Possible_Incarceration_Indicator_Batch_Service_Records(pii_batch_params, ds_batch_did, isFCRA);
   ds_batch_out := crim_out.Records;
 	statements 	 := crim_out.Statements;

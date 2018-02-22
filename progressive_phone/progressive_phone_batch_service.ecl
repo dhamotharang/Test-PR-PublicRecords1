@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Progressive_Phone_Batch_Service" wuTimeout="300000">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DPPAPurpose" type="xsd:unsignedInt"/>
@@ -64,9 +64,6 @@
 	<part name="Match_LinkID" type="xsd:boolean"/>
   <part name="SkipPhoneScoring" type="xsd:boolean"/>
   <part name="ReturnScore" type="xsd:boolean"/>
-  <part name="UseMetronet" type="xsd:boolean"/>
-  <part name="Confirmation_GoToGateway" type="xsd:boolean"/>
-  <part name="MetronetLimit" type="xds:integer"/>
   <part name="UsePremiumSource_A" type="xsd:boolean"/>
   <part name="PremiumSource_A_limit" type="xds:integer"/>
 	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
@@ -129,9 +126,6 @@ export progressive_phone_batch_service := macro
 	
 gateways_in := Gateway.Configuration.Get();
 boolean IncludeLastResort := false : STORED ('IncludeLastResort');
-boolean callMetronet := false : STORED('UseMetronet');
-boolean Confirmation_GoToGateway:= false : STORED ('Confirmation_GoToGateway'); //used to force metronet gateway hit even if we have the phone in house
-integer metronetLimit := 0 : STORED('MetronetLimit');
 
 boolean UsePremiumSource_A:= false : STORED ('UsePremiumSource_A'); //equifax
 integer PremiumSource_A_limit:= 0 : STORED ('PremiumSource_A_limit');//max of 3 equifax phones can be returned
@@ -168,9 +162,7 @@ _f_out := UNGROUP(addrbest.Progressive_phone_common(f_in_raw,
 																										, 
 																										, 
 																										, 
-																										callMetronet, 
 																										, 
-																										metronetLimit,
 																										scoreModel,
 																										MaxNumAssociate,
 																										MaxNumAssociateOther,
@@ -180,7 +172,6 @@ _f_out := UNGROUP(addrbest.Progressive_phone_common(f_in_raw,
 																									  MaxNumSpouse,
 																										MaxNumSubject,
 																										MaxNumNeighbor,
-																										Confirmation_GoToGateway,
 																										UsePremiumSource_A,
 																										PremiumSource_A_limit, 
 																										RunRelocation));	
@@ -203,14 +194,13 @@ f_out_temp_1 := MAP(scoreModel <> '' =>  GROUP(SORTED(_f_out, phone_score), phon
 									  scoreModel = '' AND SkipPhoneScoring => GROUP(SORTED(_f_out, sort_order), sort_order),
 										GROUP(SORTED(_f_out, phone_score), phone_score));
 										
-results_1 := progressive_phone.FN_BatchFinalAssignments(f_out_temp_1, progressive_phone.layout_progressive_phone_common, callMetronet, UsePremiumSource_A, scoreModel);
+results_1 := progressive_phone.FN_BatchFinalAssignments(f_out_temp_1, progressive_phone.layout_progressive_phone_common, UsePremiumSource_A, scoreModel);
 
 // ROYALTIES
 boolean ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
 dRoyaltiesByAcctno_LastResort := if(IncludeLastResort, Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(f_in_raw_unfixed, results_1, vendor, acctno, acctno));
-dRoyaltiesByAcctno_METRONET := if(callMetronet, Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(f_in_raw_unfixed, _f_out,,,acctno));
 dRoyaltiesByAcctno_EQUIFAX := if(UsePremiumSource_A, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(f_in_raw_unfixed, results_1,,,acctno));
-dRoyaltiesByAcctno := dRoyaltiesByAcctno_LastResort + dRoyaltiesByAcctno_METRONET + dRoyaltiesByAcctno_EQUIFAX;
+dRoyaltiesByAcctno := dRoyaltiesByAcctno_LastResort + dRoyaltiesByAcctno_EQUIFAX;
 dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
 
 today := (string) STD.Date.Today();

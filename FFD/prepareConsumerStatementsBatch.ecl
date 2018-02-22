@@ -1,4 +1,4 @@
-IMPORT FFD;
+﻿IMPORT FFD;
 
 EXPORT  prepareConsumerStatementsBatch (DATASET (FFD.layouts.ConsumerStatementBatch) out,
                                         DATASET (FFD.layouts.PersonContextBatch) ds_pc,
@@ -12,13 +12,13 @@ EXPORT  prepareConsumerStatementsBatch (DATASET (FFD.layouts.ConsumerStatementBa
   //      this code can be significantly simplified 
 
   // Gather all the DRs , RS  and CS 
-  PersonContext_RS := ds_pc (RecordType = FFD.Constants.RecordType.RS);
-  PersonContext_DR := ds_pc (RecordType = FFD.Constants.RecordType.DR);
-  PersonContext_CS := ds_pc (RecordType = FFD.Constants.RecordType.CS);
+  PersonContext_RS := ds_pc (RecordType IN FFD.Constants.RecordType.StatementRecordLevel);
+  PersonContext_DR := ds_pc (RecordType = FFD.Constants.RecordType.DR);  // disputes
+  PersonContext_CS := ds_pc (RecordType IN FFD.Constants.RecordType.StatementConsumerLevel);
   
   // Classify all the out into DR and RS
-  out_RS := out(RecordType = FFD.Constants.RecordType.RS);
-  out_DR := out(RecordType = FFD.Constants.RecordType.DR); 
+  out_RS := out(RecordType IN FFD.Constants.RecordType.StatementRecordLevel);
+  out_DR := out(RecordType = FFD.Constants.RecordType.DR);  // disputes
 
   // Figure out which DRs & RS to output & project to output format.
   Rstatements := JOIN (out_RS, PersonContext_RS,

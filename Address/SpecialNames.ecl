@@ -1,6 +1,6 @@
 export SpecialNames := MODULE
 
-import ut, EASI, lib_StringLib, _Control;
+import ut, EASI, lib_StringLib, _Control, Data_Services;
                                                               
 
 // builders, condos, holdings
@@ -1375,7 +1375,7 @@ export boolean IsGreekLetter(string s) := s in GreekAlphabet;
 /*
 boolean IsValidFips(string s) := REGEXFIND('[0-9]{3}', s);
 County_Code_Names := 
-	DATASET(ut.foreign_prod+'thor_data400::in::fips_to_counties', Property.Layout_County_Code_Names, THOR)
+	DATASET(data_services.data_location.prefix() + 'thor_data400::in::fips_to_counties', Property.Layout_County_Code_Names, THOR)
 	(IsValidFips(fips_county_code));
 
 export counties := SET(PROJECT(

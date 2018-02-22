@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi;
+import risk_indicators, ut, easi, std;
 
 export IE912_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := FUNCTION
 	IE_DEBUG := false;
@@ -335,7 +335,7 @@ export IE912_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := F
 			(pk_dist_a2toa3 * 2915.40756) +
 			(pk_rc_disthphoneaddr * 4620.15356);
 
-		sysdate :=  map(archive_date = 999999  => Common.sas_date( ut.GetDate ),
+		sysdate :=  map(archive_date = 999999  => Common.sas_date( (STRING)Std.Date.Today() ),
 						length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], '1') - ut.DaysSince1900('1960', '1', '1')),
 																			   NULL);
 

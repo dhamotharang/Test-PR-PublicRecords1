@@ -93,6 +93,7 @@ EXPORT getIndDID(DATASET(DueDiligence.Layouts.CleanedData) cleanedData,
 																																	indv := cleaned.individual;
 																																	addr := indv.address;
 																																	
+																																	SELF.inquiredDID := RIGHT.did;
 																																	SELF.individual.did := RIGHT.did;
 																																	SELF.individual.score := RIGHT.score;
 																																	SELF.individual.ssn := indv.ssn;

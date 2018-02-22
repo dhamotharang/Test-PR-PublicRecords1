@@ -143,7 +143,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
  pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind.suppress_records);  // alerts coming from Person Context
 	clam_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromClam(clam[1], in_param);  // alerts coming from indices
 	cs_alert := ConsumerProfile_Services.Functions.getAlertDataset(FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT);
-	boolean has_consumer_statement := exists(consumer_statement) or pc_alert_ind.consumer_flags.has_consumer_statement<>'';
+	boolean has_consumer_statement := exists(consumer_statement) or pc_alert_ind.has_consumer_statement or (pc_alert_ind.has_record_statement and ~pc_alert_ind.suppress_records);
 	
 	alerts_pre := if(insufficient_input, input_alert, 
 								if(~in_param.test_data_enabled, clam_alerts + if(has_consumer_statement, cs_alert)));

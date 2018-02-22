@@ -105,6 +105,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	                        /* Where */  
 			                    keyed(left.vehicle_key = right.vehicle_key),
 													getVehicleDetails(left,right,counter),
+													    ATMOST(1000),
 																	LEFT OUTER);
 																	
 	// ------                                       -----																

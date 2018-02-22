@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, easi;
+import risk_indicators, ut, riskwise, easi, std;
 
 export RSN1108_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := FUNCTION
 	RSN_DEBUG := false;
@@ -233,7 +233,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 
 
 sysdate := map(
-    trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+    trim((string)archive_date, LEFT, RIGHT) = '999999'  => models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
     length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
                                                            NULL);
 

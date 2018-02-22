@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, UT, RiskWise;
+IMPORT Risk_Indicators, UT, RiskWise, std;
 
 EXPORT MNC21106_0_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, UNSIGNED3 history_date = 999999) := FUNCTION
 
@@ -463,7 +463,7 @@ EXPORT MNC21106_0_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, UNSIGNED3 
 	add3_applicant_sold              := le.address_verification.address_history_2.applicant_sold;
 	add3_family_owned                := le.address_verification.address_history_2.family_owned;
 	
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 	
 	/* ***********************************************************
 	 *  RiskView Attributes - Taken from Models.getRVAttributes  *

@@ -158,7 +158,7 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 	UNSIGNED1 DPPAPurp := 0 : STORED('DPPAPurpose');
 	UNSIGNED1 GLBPurp := 8 : STORED('GLBPurpose');
 	STRING50 DRestrictionMask := Risk_Indicators.iid_constants.default_DataRestriction : STORED('DataRestrictionMask');
-	emptyRecord := ut.ds_oneRecord;
+	emptyRecord := dataset([{1}], {unsigned a});
 	HistoryDate := 999999; // Realtime Only
 	gateway := Gateway.Constants.void_gateway;
 	Risk_Indicators.Layout_Provider_Scoring.Input sequenceInput(emptyRecord le, UNSIGNED6 seqCounter) := TRANSFORM

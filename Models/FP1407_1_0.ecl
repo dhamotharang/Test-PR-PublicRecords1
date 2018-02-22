@@ -3,7 +3,7 @@ FP1404,FP1407 turn off debugging
 */
 //Axcess Financial - custom Fraudpoint model FP1407_1 WNLI (Why not lease it)
 
-import risk_indicators, riskwise, ut, easi;
+import risk_indicators, riskwise, ut, easi, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -548,7 +548,7 @@ NULL :=__common__( -999999999);
 
 INTEGER contains_i( string haystack, string needle ) :=__common__( (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0));
 
-sysdate :=__common__( common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')));
+sysdate :=__common__( common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')));
 
 ssnpop :=__common__( ssnlength > 0);
 

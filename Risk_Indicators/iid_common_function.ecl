@@ -22,7 +22,7 @@ FUNCTION
 
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 production_realtime_mode := with_did[1].historydate=risk_indicators.iid_constants.default_history_date
-														or with_did[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);		
+														or with_did[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate)[1..6];
 														
 with_ADLVelocity := risk_indicators.Boca_Shell_ADL(with_DID, isFCRA, dppa, DataRestriction, onThor);	// real time BocaShell 2 and 3 stuff
 

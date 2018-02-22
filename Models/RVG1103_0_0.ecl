@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVG1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean xmlPreScreenOptOut ) := FUNCTION
 
@@ -845,7 +845,7 @@ export RVG1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 
 		sysdate := map(
-			trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, ut.getdate, le.historydate+'01')),
+			trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), le.historydate+'01')),
 			length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], '1') - ut.DaysSince1900('1960', '1', '1')),
 																   NULL);
 		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);

@@ -1,4 +1,4 @@
-import iesp, ut;
+import iesp, ut, std;
 
 export ValidationFunctions() := MODULE
 
@@ -428,7 +428,7 @@ export PassportValidation(string passport, string DOB, string gender) := FUNCTIO
 																							 (unsigned)month in [4,6,9,11] => (unsigned)day between 1 and 30,
 																							 (unsigned)day between 1 and 29);
 	isExpire := stringlib.stringfilterout(pptrim[66..71],'0123456789')='' and // check all numeric
-							(unsigned)('20'+pptrim[66..71]) >= (unsigned)ut.GetDate and 	// check date greater than today
+							(unsigned)('20'+pptrim[66..71]) >= (unsigned)Std.Date.Today() and 	// check date greater than today
 							(unsigned1)pptrim[68..69] between 1 and 12 and correctDays(pptrim[68..69], pptrim[70..71]); // check reasonable dates
 
 	field66 := fieldvalue(pptrim[66]);
@@ -582,7 +582,7 @@ export VisaValidation(string visa, string DOB, string gender) := FUNCTION
 																							 (unsigned)month in [4,6,9,11] => (unsigned)day between 1 and 30,
 																							 (unsigned)day between 1 and 29);
 	isExpire := stringlib.stringfilterout(Vtrim[66..71],'0123456789')='' and // check all numeric
-							(unsigned)('20'+Vtrim[66..71]) >= (unsigned)ut.GetDate and 	// check date greater than today
+							(unsigned)('20'+Vtrim[66..71]) >= (unsigned)Std.Date.Today() and 	// check date greater than today
 							(unsigned1)Vtrim[68..69] between 1 and 12 and correctDays(Vtrim[68..69], Vtrim[70..71]); // check reasonable dates
 
 	field66 := fieldvalue(Vtrim[66]);

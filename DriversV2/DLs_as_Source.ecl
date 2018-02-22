@@ -1,4 +1,4 @@
-import header,ut, Drivers, header_services;
+import header,ut, Drivers, header_services, std;
 
 export DLs_as_Source(dataset(driversv2.Layout_Base_withAID) pDLs = dataset([],driversv2.Layout_Base_withAID), boolean pForHeaderBuild=false, boolean pFastHeader = false)
  :=
@@ -9,7 +9,7 @@ export DLs_as_Source(dataset(driversv2.Layout_Base_withAID) pDLs = dataset([],dr
 						 ,pDLs)
 						 (trim(source_code,left,right)<>'CY' and  trim(orig_state,left,right)<>'NE')
 					  ;
-	dSourceData := if (pFastHeader, dSourceData_(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceData_);
+	dSourceData := if (pFastHeader, dSourceData_(ut.DaysApart((STRING8)Std.Date.Today(), ((STRING)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceData_);
 
 	rec := RECORD
 		driversv2.Layout_Base_withAID;	

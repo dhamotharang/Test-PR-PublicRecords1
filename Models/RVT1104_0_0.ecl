@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 ds_layout := {STRING rc, REAL value};
 
@@ -875,7 +875,7 @@ dataset(ds_layout) rcs_override;
 
 		NULL := -999999999;
 
-		archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+		archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 
 		sysdate := models.common.sas_date((string)(archive_date));
 

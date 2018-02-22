@@ -1,4 +1,4 @@
-import gong;
+import gong, std;
 
 export mac_get_gong_by_phone(f_in, f_out, use_gong_flag) := macro
 	
@@ -28,7 +28,7 @@ phonesplus_batch.layout_phonesplus_reverse_common %gong2Pretty%(f_in l,
 	SELF.caption_text := r.caption_text;
 	SELF.bdid := r.bdid;
 	SELF.dt_first_seen := r.dt_first_seen;
-	SELF.dt_last_seen := ut.GetDate;
+	SELF.dt_last_seen := (STRING8)Std.Date.Today();
 	SELF.TNT := 'V';
 	self.ConfidenceScore := 30;
 	self.Activeflag := 'Y';

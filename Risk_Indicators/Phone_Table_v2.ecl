@@ -1,4 +1,4 @@
-import business_header,header,gong,fcra, ut;
+import business_header,header,gong,fcra, ut, std;
 
 EXPORT Phone_Table_v2 (boolean isFCRA = false, boolean gongFilter=false) := FUNCTION
 
@@ -43,7 +43,7 @@ rec slimg(gong.File_History_Full_Prepped_for_Keys le) := TRANSFORM
 	self := [];
 END;
 
-sysdate := ut.GetDate[1..6] + '31';
+sysdate := ((STRING8)Std.Date.Today())[1..6] + '31';
 allowedBellIdForFCRA := ['LSS','LSI','LSP'];	// cjs
 
 //good_phns := gong.File_Gong_History_Full(goodphone(phone10));
@@ -69,7 +69,7 @@ d_did := TABLE(good_phns_distr(did<>0), did_slim, phone10, did, LOCAL);
 did_stats := record
 	d_did.phone10;
 	did_ct := count(group);
-	did_ct_c6 := count(group, ut.DaysApart(sysdate, d_did.dt_first_seen[1..6]+'31') < 183);
+	did_ct_c6 := count(group, ut.DaysApart(sysdate, ((STRING)d_did.dt_first_seen)[1..6]+'31') < 183);
 end;
 did_counts := table(d_did, did_stats, phone10, local);
 

@@ -1,8 +1,9 @@
-import ut;
+import ut, std;
+
 string4 guessyear(string2 yr, integer yearOU) := 
 	if((integer)yr < yearOU, '20' + yr, '19' + yr);
 	
-unsigned4 thisyear := (unsigned4)(ut.GetDate[1..4]);
+unsigned4 thisyear := (unsigned4)(((STRING)Std.Date.Today())[1..4]);
 
 checkflip(string8 dt) := 
 	if(abs(thisyear - (unsigned4)(dt[1..4])) < abs(thisyear - (unsigned4)(dt[5..8])),

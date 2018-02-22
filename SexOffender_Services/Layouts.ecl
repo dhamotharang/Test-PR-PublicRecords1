@@ -1,4 +1,4 @@
-import Address, BatchShare, SexOffender, iesp, FFD;
+﻿import Address, BatchShare, SexOffender, iesp, FFD;
 	
 export Layouts := MODULE
 	shared spk_key_rec := recordof(SexOffender.Key_SexOffender_SPK ());
@@ -70,6 +70,7 @@ export Layouts := MODULE
 		BOOLEAN isDeepDive := FALSE;
 		UNSIGNED3 penalt := 0;
 		FFD.Layouts.CommonRawRecordElements; //FCRA FFD BATCH
+		FFD.Layouts.ConsumerFlags; //FCRA FFD BATCH
 	END;
 	
 
@@ -209,6 +210,7 @@ export Layouts := MODULE
 		
 		Batchshare.layouts.ShareErrors;
 		unsigned SequenceNumber :=0;  // FCRA FFD
+		FFD.Layouts.ConsumerFlags;
 	END;
   EXPORT batch_out_pre := RECORD(batch_out)            //FCRA FFD
 	  DATASET (FFD.Layouts.ConsumerStatementBatch) statements;

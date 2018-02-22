@@ -228,7 +228,7 @@ EXPORT Person_records_functions := Module
 	EXPORT relative_summary(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		r := relative_records(header.constants.checkRNA,dids);
 
-		unsigned1 t_age := if(r.dob=0,0,ut.GetAgeI(r.dob));
+		unsigned1 t_age := if(r.dob=0,0,ut.Age(r.dob));
 		re := record
 			unsigned1 depth := min(group,r.depth);
 			r.p2_sort;
@@ -373,7 +373,7 @@ EXPORT Person_records_functions := Module
 
 		//add the age
 		doxie_crs.layout_comp_names addage(rt l) := transform
-			self.age := if ( l.dob = 0, 0, ut.GetAgeI(l.dob) );
+			self.age := if ( l.dob = 0, 0, ut.Age(l.dob) );
 			self := l;
 		end;
 
@@ -566,7 +566,7 @@ EXPORT Person_records_functions := Module
 			string30 comment := '';
 			boolean likely_fragment := false;
 			unsigned4 dob := max(group, them_all.date_ob);
-			unsigned1 age := ut.GetAgeI(max(group, them_all.date_ob));
+			unsigned1 age := ut.Age(max(group, them_all.date_ob));
 			boolean legacy_ssn := false; //for potentially randomized SSNs defines if SSN-DID pair was seen before
 			end;
 

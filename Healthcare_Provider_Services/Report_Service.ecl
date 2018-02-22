@@ -189,7 +189,7 @@ export Report_Service := macro
 	//Defaults requested by Kathy B. for use in the Individual and Business Identifier searches
 	#STORED('OFACOnly',True);
 	#STORED('OFACVersion',1);
-	#STORED('GlobalWatchListThreshold',.84)
+	#STORED('GlobalWatchListThreshold',.84);
 	#STORED('RedFlag_Version',1);
 	#STORED('DOBRadius',2);
 	testCompany := request.ReportBy2.CompanyName <> '';

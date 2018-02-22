@@ -158,7 +158,7 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 												left.zip = right.zip5,
 												transform(recordof(res_rec), 
 													addr_phones := right.results((left.sec_range='' or sec_range = left.sec_range) and 
-																												(dt_last_seen='' or ut.GetAgeI((integer)dt_last_seen * 100) < 5));
+																												(dt_last_seen='' or ut.Age((integer)dt_last_seen * 100) < 5));
 													self.phone_address	:= addr_phones[1].phone,
 													self := left),
 												left outer,

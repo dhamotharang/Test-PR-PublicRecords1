@@ -2,10 +2,10 @@
 
 EXPORT DueDiligence_Service := MACRO
 
-			requestName := 'DueDiligenceAttributeRequest';
-			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeRequest;
+			requestName := 'DueDiligenceAttributesRequest';
+			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
 			
-			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributeResponse;
+			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
 	
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);

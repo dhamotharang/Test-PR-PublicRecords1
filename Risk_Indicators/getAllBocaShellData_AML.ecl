@@ -20,7 +20,7 @@ EXPORT getAllBocaShellData_AML (
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 // if the record is default_history_date or same month as today's date, run production_realtime_mode
 production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
-														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);		
+														or iid[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);		
 	
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -300,7 +300,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 		dt_first_purchased := if( (le.other_address_info.date_first_purchase!=0 and le.other_address_info.date_first_purchase <= ri.purchase_date_by_did) or ri.purchase_date_by_did=0, 
 																											le.other_address_info.date_first_purchase, ri.purchase_date_by_did);
 		self.other_address_info.date_first_purchase := if(isApplicant, dt_first_purchased, le.other_address_info.date_first_purchase);
-		dt_most_recent_purchase := ut.max2(le.other_address_info.date_most_recent_purchase,ri.purchase_date_by_did);
+		dt_most_recent_purchase := Max(le.other_address_info.date_most_recent_purchase,ri.purchase_date_by_did);
 		self.other_address_info.date_most_recent_purchase := if(isApplicant, dt_most_recent_purchase, le.other_address_info.date_most_recent_purchase);
 		
 		myGetDate := iid_constants.myGetDate(le.historydate);
@@ -318,7 +318,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 		dt_first_sale := if(le.other_address_info.date_first_sale=0 or le.other_address_info.date_first_sale > ri.sale_date_by_did, ri.sale_date_by_did, le.other_address_info.date_first_sale);
 		self.other_address_info.date_first_sale := if(isApplicant, dt_first_sale, le.other_address_info.date_first_sale);
 
-		dt_most_recent_sale := ut.max2(le.other_address_info.date_most_recent_sale,ri.sale_date_by_did);
+		dt_most_recent_sale := Max(le.other_address_info.date_most_recent_sale,ri.sale_date_by_did);
 		self.other_address_info.date_most_recent_sale := if(isApplicant, dt_most_recent_sale, le.other_address_info.date_most_recent_sale);
 		
 		// use the sale date by did field to amtch the date most recent sale field (using this field should imply that the sale date is for the DID, so no additonal checking should need to be done)
@@ -811,7 +811,7 @@ bsplus roll_relatives(bsplus le, bsplus ri) := TRANSFORM
 	
 	self.total_number_derogs := if(le.bjl_populated, le.total_number_derogs, ri.total_number_derogs);
 	
-	date_last_derog := if(le.bjl_populated, ut.max2(ut.max2(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen), 0);
+	date_last_derog := if(le.bjl_populated, Max(Max(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen), 0);
 	self.date_last_derog := date_last_derog;
 	
 	SELF := le;

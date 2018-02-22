@@ -1,5 +1,5 @@
 // WFS4 Model
-import Risk_Indicators, easi, riskwise, ut;
+import Risk_Indicators, easi, riskwise, ut, std;
 
 export AIN801_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, string5 grade) := function
 
@@ -56,7 +56,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 // ******************* Model Code Starts Here ****************
 	log_offset := 2.8785184905;  
 
-	_scoring_date := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate[1..6] + '01');
+	_scoring_date := IF(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', ((STRING)Std.Date.Today())[1..6] + '01');
 	today1900 := ut.DaysSince1900(_scoring_date[1..4], _scoring_date[5..6], _scoring_date[7..8]);
 	
 	// use the following age code so that age is rounded instead of actual age 
@@ -67,8 +67,8 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 	birthdt := if(le.shell_input.dob = '', 0, ut.DaysSince1900(byr, bmn, bdy));
 	_in_age := if(birthdt = 0, 0, round((today1900 - birthdt)/365));
 		
-	adl_EQ_yr := adl_EQ_first_seen[1..4];
-	adl_EQ_mn := adl_EQ_first_seen[5..6];
+	adl_EQ_yr := ((STRING)adl_EQ_first_seen)[1..4];
+	adl_EQ_mn := ((STRING)adl_EQ_first_seen)[5..6];
 	adl_EQ_dy := '01';    	    
 	adl_EQ_first_seen_days_since1900 := if(adl_EQ_first_seen=0, 0, ut.DaysSince1900(adl_EQ_yr, adl_EQ_mn, adl_EQ_dy));
 	_adl_EQ_first_seen_years := if(length(trim((string)adl_EQ_first_seen))<> 6, 
@@ -107,7 +107,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 										age > 0 => age,
 										18 );
 										
-	age_combo_18_45 := ut.imin2( ut.max2(age_combo,18), 45 );
+	age_combo_18_45 := Min( Max(age_combo,18), 45 );
 
 	ams_level := map(ams_college_code in [1,2,4] =>  2,
 									 ams_file_type in ['H','M'] => 1,
@@ -142,7 +142,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 											addrs_per_adl_c6 >= 2 =>  1,
 											0 );
 	vel_c6_prob2 := vel_c6_prob + phones_per_addr_2plus;
-	vel_prob := ut.imin2(  (ssns_per_addr_10plus + adls_per_ssn_3plus + ssns_per_adl_4plus + phones_per_addr_2plus),3);
+	vel_prob := Min(  (ssns_per_addr_10plus + adls_per_ssn_3plus + ssns_per_adl_4plus + phones_per_addr_2plus),3);
 
 	// ******************/
 	// *** Derogs  ***/
@@ -152,7 +152,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 	// this is what the model has coded, but it's odd that they're only counting dismissed bankruptcy in derogs
 	bk_dism := if(disposition[1..4]='DISM', 1, 0);  
 	
-	liens_rec_unr_3 := ut.imin2(liens_recent_unreleased_count,3);
+	liens_rec_unr_3 := Min(liens_recent_unreleased_count,3);
 	liens_unr := if(liens_rec_unr_3=0 and liens_historical_unreleased_ct > 0 , 0.5, liens_rec_unr_3);
 	
 	liens_rel := map(liens_recent_released_count > 0 => 2,
@@ -170,7 +170,7 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 									 rc_dwelltype = 'A'  => 2,
 									 rc_addrvalflag = 'N' => 1,
 									 0 );
-	addprob := if(rc_cityzipflag='1', ut.imin2(addprob1 + 1,3), addprob1);
+	addprob := if(rc_cityzipflag='1', Min(addprob1 + 1,3), addprob1);
 
 	notpots := if(telcordia_type not in ['00','50','51','52','54'], 1, 0);
 
@@ -206,11 +206,11 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 
 	dob_v := if(combo_dobscore between 90 and 100, 1, 0);
 
-	_source_addrpos3 := ut.imin2(_source_addrpos,3);
+	_source_addrpos3 := Min(_source_addrpos,3);
 
 	_adl_EQ_first_seen_years_25 := if(_adl_EQ_first_seen_years < 0, 
 																	4.5,
-																	ut.imin2(_adl_EQ_first_seen_years,25) );
+																	Min(_adl_EQ_first_seen_years,25) );
 																		
 	// ****************** code to mean: verx ******************/
 	verx_l := map( verx = 1 => 0.3878148596, 
@@ -295,16 +295,16 @@ Layout_ModelOut doModel(clam le, Easi.Key_Easi_Census rt ) := transform
 	phn_unverified := if(nap_summary in [0,1,2,3,5,8] and hphnpop=1, 1, 0);
 
 	ain801_disaster_overrides := 
-		map(nas_summary in [0,1,2,3,4,7,9] and nap_summary in [0,1,2,3,4,7,9] => ut.imin2(ln_only_score,599), 
-				nas_summary in [0,1,2,3,5,8] => ut.imin2(ln_only_score,609), 
-				rc_hriskphoneflag = '6' and hphnpop = 1 => ut.imin2(ln_only_score,609), 
-				rc_addrcommflag = '2' or rc_dwelltype = 'E' => ut.imin2(ln_only_score,615), 
-				rc_addrvalflag = 'N' => ut.imin2(ln_only_score,616), 
-				adlperssn_count >= 4 => ut.imin2(ln_only_score,617), 
-				nas_summary in [0,1,2,3,4,5,6,7,8,9] => ut.imin2(ln_only_score,618), 
-				phn_unverified = 1 and rc_hriskphoneflag = '5' => ut.imin2(ln_only_score,619), 
-				phn_unverified = 1 and notpots = 1 => ut.imin2(ln_only_score,628), 
-				phn_unverified = 1 and rc_phonezipflag = '1' => ut.imin2(ln_only_score,629),
+		map(nas_summary in [0,1,2,3,4,7,9] and nap_summary in [0,1,2,3,4,7,9] => Min(ln_only_score,599), 
+				nas_summary in [0,1,2,3,5,8] => Min(ln_only_score,609), 
+				rc_hriskphoneflag = '6' and hphnpop = 1 => Min(ln_only_score,609), 
+				rc_addrcommflag = '2' or rc_dwelltype = 'E' => Min(ln_only_score,615), 
+				rc_addrvalflag = 'N' => Min(ln_only_score,616), 
+				adlperssn_count >= 4 => Min(ln_only_score,617), 
+				nas_summary in [0,1,2,3,4,5,6,7,8,9] => Min(ln_only_score,618), 
+				phn_unverified = 1 and rc_hriskphoneflag = '5' => Min(ln_only_score,619), 
+				phn_unverified = 1 and notpots = 1 => Min(ln_only_score,628), 
+				phn_unverified = 1 and rc_phonezipflag = '1' => Min(ln_only_score,629),
 				ln_only_score > 999 => 999,
 				ln_only_score < 250 => 250,
 				ln_only_score);

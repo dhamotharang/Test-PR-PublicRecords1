@@ -58,7 +58,6 @@ MODULE
 	// Waterfall phones constants
 	EXPORT WFConstants :=
 	MODULE
-		EXPORT UNSIGNED1 MetronetLimit			 := 3;
 		EXPORT UNSIGNED1 MaxPhones 					 := 6;
 		EXPORT UNSIGNED1 MaxSubjects         := 5;
 		EXPORT UNSIGNED1 MaxPremiumSource    := 3; 

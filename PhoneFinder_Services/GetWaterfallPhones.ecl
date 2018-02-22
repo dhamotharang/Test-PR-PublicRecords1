@@ -32,8 +32,7 @@ FUNCTION
 	END;
 	
 	qSentV2Gateway := dGateways(inMod.useQSent and Gateway.Configuration.isQsentV2(servicename))[1];
-	metronetGateway:= dGateways(inMod.useMetronet and Gateway.Configuration.isMetronet(servicename))[1];
-	
+		
 	BOOLEAN isWaterfallphonesearch := inMod.useWaterfallv6 OR isPhoneExists;
 	
  Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
@@ -51,10 +50,10 @@ FUNCTION
 	dFormat2ProgressivePhone := PROJECT(dIn,tFormat2ProgressivePhone(LEFT));	
 	WFConstants := PhoneFinder_Services.Constants.WFConstants;				
 	 // sending in lexid only as the input to WF in a PII search
-	dWaterfallPIISearch 	:= AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,DATASET(metronetGateway),,,TRUE,inMod.UseMetronet,
-															TRUE,WFConstants.MetronetLimit,progressive_phone.Constants.WFP_V8_CP_V3_MODEL_NAMES[2],,,,,,,
-															WFConstants.MaxSubjects,,,inMod.UseEquifax,WFConstants.MaxPremiumSource);																										
-	dWaterfallPhoneSearch := AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,DATASET(metronetGateway),,,TRUE,inMod.UseMetronet,TRUE);
+	dWaterfallPIISearch 	:= AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,,,TRUE,
+															TRUE,,progressive_phone.Constants.WFP_V8_CP_V3_MODEL_NAMES[2],,,,,,,
+															WFConstants.MaxSubjects,,inMod.UseEquifax,WFConstants.MaxPremiumSource);																										
+	dWaterfallPhoneSearch := AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,,,TRUE, TRUE);
 	
 	dWaterfallPhones := IF(isWaterfallphonesearch,dWaterfallPhoneSearch,dWaterfallPIISearch);
 	

@@ -60,7 +60,7 @@
 </pre>
 */
 
-IMPORT iesp,address,ut,PersonReports,AutoStandardI;
+IMPORT iesp,address,PersonReports,AutoStandardI, std;
 
 EXPORT ReportService := MACRO
 	#CONSTANT('IncludeMinors',TRUE);
@@ -141,7 +141,7 @@ EXPORT ReportService := MACRO
 		SELF._Header := iesp.ECL2ESP.GetHeaderRow();
 		SELF.Messages := [];
 		SELF.UserInput := rptBy;
-		SELF.RunDate := iesp.ECL2ESP.toDate((INTEGER)ut.GetDate);
+		SELF.RunDate := iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 		SELF.SSNResults := GLOBAL(hdrSum.SSNResults);
 		SELF.NameSSNResults := GLOBAL(hdrSum.NameSSNResults);
 		SELF.NameDOBResults := GLOBAL(hdrSum.NameDOBResults);
@@ -158,7 +158,7 @@ EXPORT ReportService := MACRO
 		SELF._Header := iesp.ECL2ESP.GetHeaderRow();
 		SELF.Messages := [];
 		SELF.UserInput := Project(l,PublicProfileServices.TestData_ReportBy.xformRptBy(left));
-		SELF.RunDate := iesp.ECL2ESP.toDate((INTEGER)ut.GetDate);
+		SELF.RunDate := iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 		SELF.SSNResults := PublicProfileServices.TestData_HeaderSummary.getSSNResults(l);
 		SELF.NameSSNResults := PublicProfileServices.TestData_HeaderSummary.getNameSSNResults(l);
 		SELF.NameDOBResults := PublicProfileServices.TestData_HeaderSummary.getNameDOBResults(l);

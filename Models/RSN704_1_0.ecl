@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, easi;
+import ut, Risk_Indicators, RiskWise, easi, std;
 
 export RSN704_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -67,7 +67,7 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 							nap_nas_level + 2);
 							
 	// handle the null values in SAS as -999 in ECL						
-	today := if(le.historyDate = 999999, ut.GetDate, (string)le.historyDate);
+	today := if(le.historyDate = 999999, (STRING)Std.Date.Today(), (string)le.historyDate);
 	archive_year := (integer)today[1..4];
 	dob_year := (integer)le.shell_input.dob[1..4];
 	input_age1 := archive_year - dob_year;
@@ -86,7 +86,7 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 							ssnage_high <= 17 => 1,
 							0);
 							
-	agediff_input := if(age <> -999 and input_age <> -999, ut.iMin2(ut.max2(age-input_age, -5), 2), -999);
+	agediff_input := if(age <> -999 and input_age <> -999, Min(Max(age-input_age, -5), 2), -999);
 
 	agediff_input_level := map(agediff_input = -5 => 3,
 								agediff_input = 2 => 2,
@@ -94,7 +94,7 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 								
 	agediff_high := age_cbe - ssnage_high;
 	
-	agediff_high2 := if(age_cbe <> -999 and ssnage_high <> -999, ut.iMin2(ut.max2(agediff_high, -10), 30), -999);
+	agediff_high2 := if(age_cbe <> -999 and ssnage_high <> -999, Min(max(agediff_high, -10), 30), -999);
 	
 	agediff_high_flag := if(agediff_high2 >= 30, 1, 0);
 	
@@ -115,15 +115,15 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 	bk_year := (integer)le.bjl.date_last_seen[1..4];
 	bk_discharged := if(stringlib.stringfind(Stringlib.StringToUpperCase(le.bjl.disposition), 'DISCHARGE', 1) > 0, 1, 0);
 	
-	lien_recent_un := ut.imin2(2, le.bjl.liens_recent_unreleased_count);
-	lien_hist_un := ut.imin2(2, le.bjl.liens_historical_unreleased_count);
+	lien_recent_un := Min(2, le.bjl.liens_recent_unreleased_count);
+	lien_hist_un := Min(2, le.bjl.liens_historical_unreleased_count);
 	
 	lien_level := map(lien_recent_un  =  0 and lien_hist_un  =  0 => 0,
 						lien_recent_un >=  0 and lien_hist_un <=  1 => 1,
 						lien_recent_un  =  0 and lien_hist_un  =  2 => 1,
 						2);
 	
-	criminal_count_cbe := ut.imin2(le.bjl.criminal_count, 3);
+	criminal_count_cbe := Min(le.bjl.criminal_count, 3);
 	
 	crimlien := map(lien_level  =  0 and criminal_count_cbe  =  0 => 0,
 					lien_level  =  1 and criminal_count_cbe  =  0 => 1,
@@ -149,8 +149,8 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 
 	
 	rel_ind := if(le.relatives.relative_count > 0, 1, 0);
-	rel_criminal_count_cbe2 := ut.imin2(le.relatives.relative_criminal_count, 2);
-	rel_prop_owned_count_cbe := ut.imin2(le.relatives.owned.relatives_property_count, 1);
+	rel_criminal_count_cbe2 := Min(le.relatives.relative_criminal_count, 2);
+	rel_prop_owned_count_cbe := Min(le.relatives.owned.relatives_property_count, 1);
 	
 	rel_level := map(rel_ind  =  0 and rel_prop_owned_count_cbe >=  0 and rel_criminal_count_cbe2 >=  0 => 0,
 					 rel_ind  =  1 and rel_prop_owned_count_cbe  =  0 and rel_criminal_count_cbe2 >=  0 => 1,
@@ -175,10 +175,10 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 					  rel_level  =  4 and rel_educ_level <=  1 => 4,
 					  5);
 	lncd := le.name_verification.lname_change_date;				  
-	yrs_since_lname_change := if(lncd = 0, -999, ut.imin2(11, archive_year-(integer)lncd[1..4]));
+	yrs_since_lname_change := if(lncd = 0, -999, Min(11, archive_year-(integer)((STRING)lncd)[1..4]));
 	
 	lnpcd := le.name_verification.lname_prev_change_date;				  
-	yrs_since_prev_lname_change := if(lnpcd = 0, -999, ut.imin2(10, archive_year-(integer)lnpcd[1..4]));
+	yrs_since_prev_lname_change := if(lnpcd = 0, -999, Min(10, archive_year-(integer)((STRING)lnpcd)[1..4]));
 	
 	lname_change_ind := if(yrs_since_lname_change <> -999, 1, 0);
 	prev_lname_change_ind := if(yrs_since_prev_lname_change <> -999, 1, 0);

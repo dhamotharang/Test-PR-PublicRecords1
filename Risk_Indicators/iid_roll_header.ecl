@@ -255,7 +255,14 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 										AND iid_constants.tscore(r.socsscore)>=iid_constants.tscore(l.socsscore);
   self.versocs   := IF(foundbetterssn, r.versocs, ssnbyscore);
   self.socsscore := IF(foundbetterssn, r.socsscore, bestbyscore);
-  self.socsvalid := IF(foundbetterssn, r.socsvalid, valbyscore);
+  socsvalid := IF(foundbetterssn, r.socsvalid, valbyscore);
+	// found during emerging identities testing that we want to keep a socsvalid that is populated over one that isn't.  
+	// quick header records are usually blank for socsvalid and show up first in the sort because of their dates
+	self.socsvalid := MAP(socsvalid not in risk_indicators.iid_constants.set_valid_ssn_codes and 
+											 r.socsvalid in risk_indicators.iid_constants.set_valid_ssn_codes and 
+											 r.ssn_from_did=l.ssn_from_did => r.socsvalid,
+											 socsvalid ='' and r.socsvalid<>'' and r.ssn_from_did=l.ssn_from_did => r.socsvalid,
+											 socsvalid);
   self.ssn       := IF(foundbetterssn, r.ssn, l.ssn);
 	self.ssnLookupFlag       := IF(foundbetterssn, r.ssnLookupFlag, l.ssnLookupFlag);
 		

@@ -79,7 +79,7 @@ IMPORT VehicleV2, Doxie, Doxie_Build, data_services, ut;
 		SELF.st								:= L.Append_Clean_Address.st;
 		SELF.zip4							:= L.Append_Clean_Address.zip4;
 		SELF.reg_expire_date 	:= (UNSIGNED6) L.reg_latest_expiration_date;
-		age 									:= ut.getage(l.orig_dob);
+		age 									:= ut.age((INTEGER)l.orig_dob);
 		SELF.is_minor 				:= if(age=0 or age>=18,FALSE,TRUE);
 		SELF 									:= l;
 	END;	 

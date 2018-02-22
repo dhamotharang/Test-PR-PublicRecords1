@@ -1,10 +1,10 @@
-import risk_indicators, ut, mdr, easi, riskwise, aml;
+import risk_indicators, ut, mdr, easi, riskwise, aml, STD;
 
 EXPORT AMLBusnAttributesMaster(Layouts.AMLBusnAssocLayout AMLin)   := MODULE
 
 shared	checkBoolean(boolean x) := if(x, '1', '0');
 export  string1 SubjectOnFile := if(AMLin.bdid > 0, '1', '0');
-shared	sysdate := if(AMLin.historydate <> 999999, (integer)((string)AMLin.historydate[1..6]), (integer)(ut.GetDate[1..6]));	
+shared	sysdate := if(AMLin.historydate <> 999999, (integer)(((string)AMLin.historydate)[1..6]), (integer)(((STRING)Std.Date.Today())[1..6]));	
 
 isPrescreen := False;
 

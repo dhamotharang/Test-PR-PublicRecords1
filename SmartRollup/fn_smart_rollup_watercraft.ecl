@@ -16,7 +16,7 @@ export fn_smart_rollup_watercraft(dataset(iesp.watercraft.t_WaterCraftReport2Rec
 		fPurchDate := INTFORMAT(l.Description.PurchaseDate.Year,4,1) + 
 									INTFORMAT(l.Description.PurchaseDate.Month,2,1) + 
 									INTFORMAT(l.Description.PurchaseDate.Day,2,1);	
-		self.LengthOfOwnership := IF(self.current_prior = iesp.Constants.SMART.CURRENT,(string) ut.GetAgeI((INTEGER) fPurchDate),'');
+		self.LengthOfOwnership := IF(self.current_prior = iesp.Constants.SMART.CURRENT,(string) ut.Age((INTEGER) fPurchDate),'');
 	  self := l;
 		self := [];
 	end;

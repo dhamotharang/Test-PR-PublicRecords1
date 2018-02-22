@@ -1,10 +1,10 @@
-/*2011-07-06T18:43:20Z (Chris Albee_prod)
+﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
 IMPORT BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
 			 Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
-			 hygenics_crim, business_header_ss, Experian_Phones, PhonesInfo, BIPV2_Best, 
+			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring;
 EXPORT product_files := MODULE
 
@@ -873,26 +873,6 @@ EXPORT product_files := MODULE
 
 		EXPORT telcordia_tds := DISTRIBUTE(telcordia_tds_undist,
 																			 HASH64(npa, nxx, tb)) : PERSIST('acctmon::phone::telcordia_tds');
-																			 
-		// Experian Gateway Phones
-		SHARED rec_experian_phones_slim := RECORD
-			Experian_Phones.Layouts.base.did;
-			Experian_Phones.Layouts.base.Phone_digits;
-			Experian_Phones.Layouts.base.Encrypted_Experian_PIN; 
-		END;
-		
-		EXPORT experian_phones_keyfilename_raw := 'thor_data400::key::experian_phones::'+doxie.Version_SuperKey+'::did_digits';
-		EXPORT experian_phones_keyfilename     := AccountMonitoring.constants.DATA_LOCATION + experian_phones_keyfilename_raw;
-
-		SHARED experian_phones_undist := INDEX(Experian_Phones.Key_Did_Digits, 
-																					 experian_phones_keyfilename);
-																					 
-		SHARED experian_phones_dist := DISTRIBUTE(PROJECT(experian_phones_undist, rec_experian_phones_slim),
-																				      HASH64(did, Phone_digits));
-
-		EXPORT experian_phones := DEDUP(SORT(experian_phones_dist, record, local), record, local) : PERSIST('acctmon::phone::experian_phones');
-		
-		
 	END; // Phone module
 	
 	EXPORT property := MODULE

@@ -1,4 +1,4 @@
-import header,ut,header_quick,doxie;
+import header,ut,header_quick,doxie, data_services;
 
 src_rec := record
 	unsigned6 rid;
@@ -33,6 +33,6 @@ Fheader     := dedup(sort(table(fqh,rid_rec2),record,record));
 
 rid_records	:=	if(pCombo,pDataset,if(pFastHeader,Fheader,rid_records0));
 
-return INDEX(rid_records, {rid_records}, ut.Data_Location.Person_header+'thor_data400::key::header.rid'+if(pCombo,'',header.SF_suffix(pFastHeader))+'_' + doxie.Version_SuperKey, OPT);
+return INDEX(rid_records, {rid_records}, Data_Services.Data_location.person_header+'thor_data400::key::header.rid'+if(pCombo,'',header.SF_suffix(pFastHeader))+'_' + doxie.Version_SuperKey, OPT);
 
 end;

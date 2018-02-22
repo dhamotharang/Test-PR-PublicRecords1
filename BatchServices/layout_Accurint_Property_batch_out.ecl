@@ -1,4 +1,4 @@
-import batchShare, FFD;
+﻿import batchShare, FFD;
 EXPORT layout_Accurint_Property_batch_out := 
 	RECORD
 
@@ -49,6 +49,7 @@ EXPORT layout_Accurint_Property_batch_out :=
 		STRING8   recording_date     := '';
 		STRING250 legal_description  := '';
 		
+		FFD.Layouts.ConsumerFlags;
 	END;
 	
 /*

@@ -136,7 +136,7 @@ pre_Assessments_added := JOIN(distribute(df3,hash(own_fares_id)),
 proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := TRANSFORM
   SELF.own_fares_id := IF (addFares, ri.own_fares_id, le.own_fares_id); // changed only in final roll-up! 
 
-	SELF.NAPROP := ut.max2(le.naprop,ri.naprop);
+	SELF.NAPROP := max(le.naprop,ri.naprop);
 	SELF.AD := IF(le.AD<>ri.AD, 'M', le.AD);
 	self.occupant_owned := Le.occupant_owned or Ri.occupant_owned;
 	self.applicant_owned := le.applicant_owned or Ri.applicant_owned;
@@ -150,7 +150,7 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 	self.purchase_date := choose(purchasePicker, 	Le.purchase_date,
 																								ri.purchase_date,
 																								le.purchase_date);
-	self.purchase_amount := choose(purchasePicker, 	ut.max2(Le.purchase_amount, Ri.purchase_amount),
+	self.purchase_amount := choose(purchasePicker, 	max(Le.purchase_amount, Ri.purchase_amount),
 																									ri.purchase_amount,
 																									le.purchase_amount);
 
@@ -161,14 +161,14 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 										 3);	// use the left one
 										 
 	
-	SELF.sale_date_by_did := choose(sale1Picker, ut.max2(le.sale_date_by_did,ri.sale_date_by_did),
+	SELF.sale_date_by_did := choose(sale1Picker, max(le.sale_date_by_did,ri.sale_date_by_did),
 																											 ri.sale_date_by_did,
 																											 le.sale_date_by_did);
-	SELF.sale_date1 := choose(sale1Picker, ut.max2(le.sale_date1,ri.sale_date1),
+	SELF.sale_date1 := choose(sale1Picker, max(le.sale_date1,ri.sale_date1),
 																											 ri.sale_date1,
 																											 le.sale_date1);
 	
-	self.sale_price1 := choose(sale1Picker, ut.max2(le.sale_price1,ri.sale_price1),
+	self.sale_price1 := choose(sale1Picker, max(le.sale_price1,ri.sale_price1),
 																									ri.sale_price1,
 																									le.sale_price1);
 		
@@ -176,14 +176,14 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 										 ri.purchase_date_by_did > le.purchase_date_by_did => 2, // use the right one
 										 3);	// use the left one
 	
-	SELF.purchase_date_by_did := choose(prevPicker, ut.max2(le.purchase_date_by_did,ri.purchase_date_by_did),
+	SELF.purchase_date_by_did := choose(prevPicker, max(le.purchase_date_by_did,ri.purchase_date_by_did),
 																														ri.purchase_date_by_did,
 																														le.purchase_date_by_did);
-	SELF.prev_purch_date1 := choose(prevPicker, ut.max2(le.prev_purch_date1,ri.prev_purch_date1),
+	SELF.prev_purch_date1 := choose(prevPicker, max(le.prev_purch_date1,ri.prev_purch_date1),
 																														ri.prev_purch_date1,
 																														le.prev_purch_date1);
 										 
-	self.prev_purch_price1 := choose(prevPicker, ut.max2(le.prev_purch_price1,ri.prev_purch_price1),
+	self.prev_purch_price1 := choose(prevPicker, max(le.prev_purch_price1,ri.prev_purch_price1),
 																											 ri.prev_purch_price1,
 																											 le.prev_purch_price1);
 																							
@@ -196,7 +196,7 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 												
 	nonblank(string a, string b) := if(b='', a, b);	// return the populated one, or if both populated then the right one
 												
-	SELF.mortgage_amount := choose(mortgagePicker, ut.max2(le.mortgage_amount,ri.mortgage_amount),
+	SELF.mortgage_amount := choose(mortgagePicker, max(le.mortgage_amount,ri.mortgage_amount),
 																								 ri.mortgage_amount,
 																								 le.mortgage_amount);
 	SELF.mortgage_date := choose(mortgagePicker, le.mortgage_date,
@@ -228,31 +228,31 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 	self.standardized_land_use_code := choose(assessPicker, nonblank(le.standardized_land_use_code, ri.standardized_land_use_code),
 																													ri.standardized_land_use_code,
 																													le.standardized_land_use_code);
-	self.building_area := choose(assessPicker, 	ut.max2(le.building_area, ri.building_area),
+	self.building_area := choose(assessPicker, 	max(le.building_area, ri.building_area),
 																							ri.building_area,
 																							le.building_area);
-	self.no_of_buildings := choose(assessPicker, 	ut.max2(le.no_of_buildings, ri.no_of_buildings),
+	self.no_of_buildings := choose(assessPicker, 	max(le.no_of_buildings, ri.no_of_buildings),
 																								ri.no_of_buildings,
 																								le.no_of_buildings);
-	self.no_of_stories := choose(assessPicker, 	ut.max2(le.no_of_stories, ri.no_of_stories),
+	self.no_of_stories := choose(assessPicker, 	max(le.no_of_stories, ri.no_of_stories),
 																							ri.no_of_stories,
 																							le.no_of_stories);
-	self.no_of_rooms := choose(assessPicker, 	ut.max2(le.no_of_rooms, ri.no_of_rooms),
+	self.no_of_rooms := choose(assessPicker, 	max(le.no_of_rooms, ri.no_of_rooms),
 																						ri.no_of_rooms,
 																						le.no_of_rooms);
-	self.no_of_bedrooms := choose(assessPicker, ut.max2(le.no_of_bedrooms, ri.no_of_bedrooms),
+	self.no_of_bedrooms := choose(assessPicker, max(le.no_of_bedrooms, ri.no_of_bedrooms),
 																							ri.no_of_bedrooms,
 																							le.no_of_bedrooms);
-	self.no_of_baths := choose(assessPicker, 	ut.max2(le.no_of_baths, ri.no_of_baths),
+	self.no_of_baths := choose(assessPicker, 	max(le.no_of_baths, ri.no_of_baths),
 																						ri.no_of_baths,
 																						le.no_of_baths);
-	self.no_of_partial_baths := choose(assessPicker, 	ut.max2(le.no_of_partial_baths, ri.no_of_partial_baths),
+	self.no_of_partial_baths := choose(assessPicker, 	max(le.no_of_partial_baths, ri.no_of_partial_baths),
 																										ri.no_of_partial_baths,
 																										le.no_of_partial_baths);
 	self.garage_type_code := choose(assessPicker, nonblank(le.garage_type_code, ri.garage_type_code),
 																								ri.garage_type_code,
 																								le.garage_type_code);
-	self.parking_no_of_cars := choose(assessPicker, ut.max2(le.parking_no_of_cars, ri.parking_no_of_cars),
+	self.parking_no_of_cars := choose(assessPicker, max(le.parking_no_of_cars, ri.parking_no_of_cars),
 																									ri.parking_no_of_cars,
 																									le.parking_no_of_cars);
 	self.style_code := choose(assessPicker, nonblank(le.style_code, ri.style_code),
@@ -261,11 +261,11 @@ proprec roll_prop_searched(proprec le, proprec ri, boolean addFares = FALSE) := 
 	self.assessed_value_year := choose(assessPicker, 	le.assessed_value_year,
 																										ri.assessed_value_year,
 																										le.assessed_value_year);	
-	self.assessed_amount := choose(assessPicker, 	ut.max2(le.assessed_amount,ri.assessed_amount),
+	self.assessed_amount := choose(assessPicker, 	max(le.assessed_amount,ri.assessed_amount),
 																								ri.assessed_amount,
 																								le.assessed_amount);
 	
-	self.assessed_total_value := choose(assessPicker, 	ut.max2(le.assessed_total_value,ri.assessed_total_value),
+	self.assessed_total_value := choose(assessPicker, 	max(le.assessed_total_value,ri.assessed_total_value),
 																								ri.assessed_total_value,
 																								le.assessed_total_value);
 
@@ -297,7 +297,7 @@ proprec add_deeds(proprec le, ln_propertyv2.File_Deed Ri) := TRANSFORM
 	self.purchase_date := choose(purchasePicker, 	le.purchase_date,
 																								deedPurchaseDate,
 																								le.purchase_date);
-	self.purchase_amount := choose(purchasePicker, 	ut.max2(le.purchase_amount, (unsigned)ri.sales_price),
+	self.purchase_amount := choose(purchasePicker, 	max(le.purchase_amount, (unsigned)ri.sales_price),
 																									(unsigned)ri.sales_price,
 																									le.purchase_amount);
 	
@@ -337,12 +337,12 @@ proprec add_deeds(proprec le, ln_propertyv2.File_Deed Ri) := TRANSFORM
 												deedMortgageDate > le.purchase_date => 2, // use the right one
 												3);	// use the left one												
 	
-	SELF.mortgage_date := choose(mortgagePicker, 	ut.max2(deedMortgageDate, le.purchase_date),	// choosing between recording/sale date from assessment and recording/contract date from deed.... taking the most recent
+	SELF.mortgage_date := choose(mortgagePicker, 	max(deedMortgageDate, le.purchase_date),	// choosing between recording/sale date from assessment and recording/contract date from deed.... taking the most recent
 																								deedMortgageDate,
 																								le.purchase_date);		
 	
 	
-	SELF.mortgage_amount := choose(mortgagePicker, 	ut.max2(le.mortgage_amount,(INTEGER)ri.first_td_loan_amount),
+	SELF.mortgage_amount := choose(mortgagePicker, 	max(le.mortgage_amount,(INTEGER)ri.first_td_loan_amount),
 																									(INTEGER)ri.first_td_loan_amount,
 																									le.mortgage_amount);
 																									
@@ -366,11 +366,11 @@ proprec add_deeds(proprec le, ln_propertyv2.File_Deed Ri) := TRANSFORM
 	self.first_td_due_date := ri.first_td_due_date;	
 	
 	// distressed sale fields
-	self.sale_price1 := if(le.applicant_sold, choose(purchasePicker, 	ut.max2(le.sale_price1,(unsigned)ri.sales_price),
+	self.sale_price1 := if(le.applicant_sold, choose(purchasePicker, 	max(le.sale_price1,(unsigned)ri.sales_price),
 																																		(unsigned)ri.sales_price,
 																																		le.sale_price1),
 																						le.sale_price1);	// if Seller Property
-	self.prev_purch_price1 := if(le.applicant_owned, choose(purchasePicker, ut.max2(le.prev_purch_price1,(unsigned)ri.sales_price),
+	self.prev_purch_price1 := if(le.applicant_owned, choose(purchasePicker, max(le.prev_purch_price1,(unsigned)ri.sales_price),
 																																					(unsigned)ri.sales_price,
 																																					le.prev_purch_price1),
 																										le.prev_purch_price1);

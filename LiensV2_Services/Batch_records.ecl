@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, AutokeyB2_batch, BatchServices, Doxie, 
+﻿IMPORT Autokey_batch, AutokeyB2_batch, BatchServices, Doxie, 
        FCRA, FFD, LiensV2, LiensV2_Services, ut,
        Suppress;
        
@@ -18,7 +18,8 @@ IMPORT Autokey_batch, AutokeyB2_batch, BatchServices, Doxie,
 EXPORT Batch_records(DATASET(LiensV2_Services.Batch_Layouts.batch_in) ds_batch_in,
 										 LiensV2_Services.IParam.batch_params configData,
 										 BOOLEAN isFCRA = FALSE,
-										 DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = DATASET([],FFD.Layouts.PersonContextBatchSlim)
+										 DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+										 DATASET(FCRA.Layout_override_flag) ds_flags = DATASET([], FCRA.Layout_override_flag)
 										 ) := 
 	FUNCTION
 
@@ -70,10 +71,6 @@ EXPORT Batch_records(DATASET(LiensV2_Services.Batch_Layouts.batch_in) ds_batch_i
 		acctNos_final := DEDUP(SORT(acctNos, acctno, tmsid), acctno, tmsid);
 		acctNos_grp   := GROUP(project(dedup(sort(acctNos_final, tmsid), tmsid), LiensV2_Services.layout_TMSID), acctno);		//retrieving raw records does not take acctno into account
 		
-		// overrides for FCRA
-		ds_best  := project(ds_batch_in,transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
-		ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best)); //this is for more than one person
-
 
 		// 8. Get raw records
 		ds_JL_recs_raw := LiensV2_Services.liens_raw.report_view.by_tmsid_batch(acctNos_grp,,isFCRA,,,,

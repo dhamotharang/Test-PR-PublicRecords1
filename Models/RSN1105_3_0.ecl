@@ -1,4 +1,4 @@
-IMPORT ut, EASI, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, EASI, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT rsn1105_3_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -135,7 +135,7 @@ EXPORT rsn1105_3_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := 
 	input_dob_age                    := le.shell_input.age;
 	inferred_age                     := le.inferred_age;
 	reported_dob                     := le.reported_dob;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)((STRING)le.historydate[1..6]));
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)(((STRING)le.historydate)[1..6]));
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *

@@ -1,24 +1,18 @@
-/*2016-10-06T01:21:49Z (Vladimir Myullyari)
-RR-10668 (warnings)
-*/
-IMPORT Address, Gateway, Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT, STD;
+﻿IMPORT Address, Gateway, Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT, STD;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (DATASET(Phone_Shell.Layout_Phone_Shell.Input) Input,
 																																							 DATASET(Gateway.Layouts.Config) Gateways = DATASET([], Gateway.Layouts.Config),
 																																							 UNSIGNED1 GLBPurpose = 0,
-																																						 	 UNSIGNED1 DPPAPurpose = 0,
-																																						 	 STRING50 DataRestrictionMask = Phone_Shell.Constants.default_DataRestriction,
-																																						 	 STRING50 DataPermissionMask = Phone_Shell.Constants.Default_DataPermission,
-																																						 	 UNSIGNED1 PhoneRestrictionMaskTemp = Phone_Shell.Constants.PRM.AllPhones,
-																																							 UNSIGNED3 ExperianScoreThreshold = 632, 
-																																							 UNSIGNED1 ExperianMaxMetronetPhones = 3, 
-																																							 BOOLEAN ExperianAllowBatchUse = FALSE,
-																																						 	 UNSIGNED3 MaxPhones = Phone_Shell.Constants.Default_MaxPhones,
-																																						 	 UNSIGNED3 InsuranceVerificationAgeLimit = Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit,
+																																						 	UNSIGNED1 DPPAPurpose = 0,
+																																						 	STRING50 DataRestrictionMask = Phone_Shell.Constants.default_DataRestriction,
+																																						 	STRING50 DataPermissionMask = Phone_Shell.Constants.Default_DataPermission,
+																																						 	UNSIGNED1 PhoneRestrictionMaskTemp = Phone_Shell.Constants.PRM.AllPhones,
+																																						 	UNSIGNED3 MaxPhones = Phone_Shell.Constants.Default_MaxPhones,
+																																						 	UNSIGNED3 InsuranceVerificationAgeLimit = Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit,
 																																							 UNSIGNED2 BocaShellVersion = 41,
-																																						 	 STRING2 SPIIAccessLevel = Phone_Shell.Constants.Default_SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
-																																						 	 STRING30 VerticalMarket = '', // Example: 'Receivables Management' restricts certain Gateways
-																																						 	 STRING30 IndustryClass = '', // Example: 'UTILI' restricts the Utility Data Search
+																																						 	STRING2 SPIIAccessLevel = Phone_Shell.Constants.Default_SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
+																																						 	STRING30 VerticalMarket = '', // Example: 'Receivables Management' restricts certain Gateways
+																																						 	STRING30 IndustryClass = '', // Example: 'UTILI' restricts the Utility Data Search
 																																							 INTEGER RelocationsMaxDaysBefore = Relocations.wdtg.default_daysBefore, 
 																																							 INTEGER RelocationsMaxDaysAfter = Relocations.wdtg.default_daysAfter, 
 																																							 INTEGER RelocationsTargetRadius = Relocations.wdtg.default_radius,
@@ -40,13 +34,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																							 INTEGER ofac_version = 1,
 																																							 REAL4 watchlist_threshold = 0.84,
 																																							 INTEGER dob_radius = -1,
-																																						 	 BOOLEAN TestAccount = FALSE, // Indicates if TestAccounts should be enforced for Gateways
-																																						 	 BOOLEAN Batch = FALSE, // Indicates if this is a Batch transaction (FALSE = realtime)
+																																						 	BOOLEAN TestAccount = FALSE, // Indicates if TestAccounts should be enforced for Gateways
+																																						 	BOOLEAN Batch = FALSE, // Indicates if this is a Batch transaction (FALSE = realtime)
 																																							 UNSIGNED2 SX_Match_Restriction_Limit = 10, // By default return a MAX of 10 Extended Skip Trace Phones
 																																							 BOOLEAN Strict_APSX = FALSE, // By default don't enforce strict Extended Skip Trace matching
 																																							 BOOLEAN BlankOutDuplicatePhones = FALSE,
-																																							 BOOLEAN DedupAgainstInputPhones = FALSE,
-																																							 BOOLEAN Confirmation_GoToGateway = FALSE,
 																																							 BOOLEAN UsePremiumSource_A = FALSE,
 																																							 BOOLEAN RunRelocation = FALSE) := FUNCTION
 
@@ -79,12 +71,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 		SELF.Input_Echo.in_SSN 							:= le.SSN;
 		SELF.Input_Echo.in_Phone10 					:= le.HomePhone;
 		SELF.Input_Echo.in_WPhone10 				:= le.WorkPhone;
-		SELF.Input_Echo.in_EXPGW_Enabled 		:= le.ExperianGatewayEnabled;
 		SELF.Input_Echo.in_TargusGW_Enabled := le.TargusGatewayEnabled;
 		SELF.Input_Echo.in_TUGW_Enabled 		:= le.TransUnionGatewayEnabled;
 		SELF.Input_Echo.in_INSGW_Enabled 		:= le.InsuranceGatewayEnabled;
 		SELF.Input_Echo.in_Processing_Date 	:= (string) Std.Date.Today();
-		
+		SELF.Input_Echo.in_Burea_Enabled				:= UsePremiumSource_A;			
 		SELF.Clean_Input.seq 						:= seqCounter;
 		SELF.Clean_Input.did						:= le.DID;
 		SELF.Clean_Input.AcctNo				 	:= le.AcctNo;
@@ -125,12 +116,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 		SELF.Clean_Input.Age						:= IF((INTEGER)le.DateOfBirth != 0,	(STRING3)ut.Age ((UNSIGNED)le.DateOfBirth, (UNSIGNED)risk_indicators.iid_constants.myGetDate(999999)), StringLib.StringFilter(le.Age, '0123456789'));
 		SELF.Clean_Input.HomePhone			:= StringLib.StringFilter(le.HomePhone, '0123456789');
 		SELF.Clean_Input.WorkPhone			:= StringLib.StringFilter(le.WorkPhone, '0123456789');
-		
-		SELF.Clean_Input.ExperianGatewayEnabled				:= le.ExperianGatewayEnabled;
+
 		SELF.Clean_Input.TargusGatewayEnabled					:= le.TargusGatewayEnabled;
 		SELF.Clean_Input.TransUnionGatewayEnabled			:= le.TransUnionGatewayEnabled;
 		SELF.Clean_Input.InsuranceGatewayEnabled			:= le.InsuranceGatewayEnabled;
-		
 		SELF.Raw_Input.seq 							:= seqCounter;
 		SELF.Raw_Input.did							:= le.DID;
 		SELF.Raw_Input 									:= le;
@@ -247,9 +236,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	/* ************************************************************************
 	 *  Gather universe of Phone Shell Phones                                 *
 	 ************************************************************************ */
-	withPhones := Phone_Shell.Gather_Phones(withBocaShell, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, ExperianScoreThreshold, ExperianMaxMetronetPhones, ExperianAllowBatchUse, MaxPhones, InsuranceVerificationAgeLimit,
+	withPhones := Phone_Shell.Gather_Phones(withBocaShell, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, MaxPhones, InsuranceVerificationAgeLimit,
 																					SPIIAccessLevel, VerticalMarket, IndustryClass, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, IncludeLastResort, IncludePhonesFeedback, TestAccount, Batch, SX_Match_Restriction_Limit, Strict_APSX, 
-																					BlankOutDuplicatePhones, DedupAgainstInputPhones, Confirmation_GoToGateway,
+																					BlankOutDuplicatePhones, 
 																					UsePremiumSource_A, RunRelocation);
 
 	/* ************************************************************************

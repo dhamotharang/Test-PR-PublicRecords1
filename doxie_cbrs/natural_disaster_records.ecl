@@ -1,4 +1,4 @@
-IMPORT NaturalDisaster_Readiness,ut,iesp;
+IMPORT NaturalDisaster_Readiness,ut,iesp, std;
 /* Attribute to return information if a company is certified to assist during natural disasters */
 	
 doxie_cbrs.mac_Selection_Declare() 
@@ -35,9 +35,9 @@ MODULE
 					function and then roll up the records into children via a group Rollup. */
 							
 	natdis_work_rec xfm_iso_recs(recordof(natdis_recs_dedup) l, INTEGER cnt) := TRANSFORM
-			IReference := dataset(ut.Stringsplit(l.ISO_Committee_Reference, ';'), {STRING iso_ref});
-			ITitle := dataset(ut.Stringsplit(l.ISO_Committee_Title, ';'), {STRING iso_title});
-			IType := dataset(ut.Stringsplit(l.ISO_Committee_Type, ';'), {STRING iso_type});
+			IReference := dataset(Std.Str.SplitWords(l.ISO_Committee_Reference, ';'), {STRING iso_ref});
+			ITitle := dataset(Std.Str.SplitWords(l.ISO_Committee_Title, ';'), {STRING iso_title});
+			IType := dataset(Std.Str.SplitWords(l.ISO_Committee_Type, ';'), {STRING iso_type});
 			SELF.iso_reference := IReference[cnt].iso_ref;
 			SELF.iso_title := ITitle[cnt].iso_title;
 			SELF.iso_type := IType[cnt].iso_type;

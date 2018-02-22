@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise;
+import risk_indicators, ut, riskwise, std;
 
 export MV361006_0_0( dataset(risk_indicators.layout_boca_shell) clam ) := FUNCTION
 
@@ -136,17 +136,17 @@ export MV361006_0_0( dataset(risk_indicators.layout_boca_shell) clam ) := FUNCTI
 		/******************************************************************/
 		/* CREATE 'INPUT' VALUES USED BY THE MODEL */
 		fulldate := (unsigned4)((STRING6)le.historyDate+'01');
-		history_date := if( le.historydate=999999, ut.getdate[1..6], (string6)le.historydate );
+		history_date := if( le.historydate=999999, ((STRING)Std.Date.Today())[1..6], (string6)le.historydate );
 		NULL := -999999999;
 		checkDt( unsigned3 dls ) := if( dls=0, -NULL, dls );
-		getMonths( unsigned date ) := if(date=0, NULL, max(0,((integer)history_date[1..4] - (integer)date[1..4])*12
-		                           + (integer)history_date[5..6] - (integer)date[5..6]));
-		getYears( unsigned date ) := if(date=0, NULL, max(0,(integer)history_date[1..4] - (integer)date[1..4]));
+		getMonths( unsigned date ) := if(date=0, NULL, max(0,((integer)history_date[1..4] - (integer)((STRING)date)[1..4])*12
+		                           + (integer)history_date[5..6] - (integer)((STRING)date)[5..6]));
+		getYears( unsigned date ) := if(date=0, NULL, max(0,(integer)((STRING)history_date)[1..4] - (integer)((STRING)date)[1..4]));
 		
 		/* RISKVIEW ATTRIBUTES */
 		is_Issued3       := ((integer)history_date - (INTEGER)(le.iid.socllowissue[1..6])) < 300;
 
-	  date_derog       := ut.max2(ut.max2(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
+	  date_derog       := Max(Max(le.bjl.last_criminal_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
 	  date_last_derog  := if(date_derog>fullDate, 0, date_derog);	
 		mos_last_derog   := getMonths(date_last_derog);
 		earliest_date_last_seen := min(

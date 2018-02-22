@@ -1,4 +1,4 @@
-import ut, models;
+import ut, models, std;
 
 EXPORT getBSTSEconomicTrajectory(GROUPED DATASET (Risk_Indicators.Layout_boca_shell) clam) := function
 
@@ -99,7 +99,7 @@ EXPORT getBSTSEconomicTrajectory(GROUPED DATASET (Risk_Indicators.Layout_boca_sh
 	BT__Addr_avm_med_geo12 := le.BT_Addr_avm_med_geo12; //                  AVM: Median AVM for Census Block
   
 	addrs_5yr := le.ST_addrs_5yr;
-	archive_date                     := if( le.historydate=999999, (unsigned3)ut.getdate[1..6], le.historydate );
+	archive_date                     := if( le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate );
 	NULL := -999999999;
 	_reported_dob := models.common.sas_date((string)(le.reported_dob));
 	sysdate := models.common.sas_date((string)(archive_date));

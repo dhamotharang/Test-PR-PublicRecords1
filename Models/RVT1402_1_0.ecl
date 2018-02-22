@@ -1,4 +1,4 @@
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT;
+IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
 
 EXPORT RVT1402_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia) := FUNCTION
 
@@ -293,7 +293,7 @@ EXPORT RVT1402_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 		(source[1..length(target)+1] = target + delim) OR
 		(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim));
 	
-	sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+	sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 	
 	iv_db001_bankruptcy := map(
 	    not(truedid or ssnlength > 0)                                                                                               => '                 ',

@@ -203,7 +203,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			// to choose the version they want to use.  This version cannot be lower than the lowest allowed version unless the override tag is set to true, in which case
 			// the customer can choose any version and if no version is passed in, it will be considered version 0.
 			actualIIDVersion := map((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-															IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
+															IIDVersionOverride = false => min(max((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 															(unsigned)IIDversion); // they can override, give them whatever they asked for
 			
 			if(actualIIDVersion = 99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));																			
@@ -324,7 +324,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			//   o   If the AuthRep doesn't come with an address, use the Business address.
 			//   o   Assumes that the HistoryDate has been cleaned/set already
 			risk_indicators.layout_input into_rep(layout_temp le) := transform
-				HistoryDate := (UNSIGNED3)((STRING)le.HistoryDate[1..6]);
+				HistoryDate := (UNSIGNED3)(((STRING)le.HistoryDate)[1..6]);
 				useBusAddr := le.Prim_Name = '';
 				
 				self.seq			        := le.Seq;
@@ -741,7 +741,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.InstantIDVersion := (string)actualIIDVersion;
 
 				//new for Emerging Identities
-				self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+				isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+				self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity	
 				isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 				self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																									le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one
@@ -801,7 +802,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			student_params := project(model_url(StringLib.StringToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
 			student_boolean := student_params[1].value='1';
 
-			ModelRequests1 := project(ut.ds_oneRecord, 
+			ModelRequests1 := project(dataset([{1}], {unsigned a}), 
 				transform(models.layouts.Layout_Model_Request_In, 
 					self.ModelName := 'customfa_service',
 					self.ModelOptions := project(model_url[1].parameters, transform(Models.Layouts.Layout_Model_Options,

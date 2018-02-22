@@ -6,7 +6,7 @@ import doxie_build, ut, header, gong, risk_indicators,doxie, data_services;
 	head := doxie_build.file_header_building;
 // #end
 
-earliest := Constants.YearsAgo(8)[1..6];
+earliest := ((STRING)Constants.YearsAgo(8))[1..6];
 
 head_valid := head(
 	dt_first_seen != 0,

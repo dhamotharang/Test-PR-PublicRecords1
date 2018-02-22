@@ -243,13 +243,13 @@ EXPORT Records := MODULE
 		// FILTER HEADER RECORDS BY INPUT SSN AND DOB YYYYMM
 		SoHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSSNOnly),did),ssn=rptByMod.ssn),true);
 		NsHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSSN),did),ssn=rptByMod.ssn),true);
-		NdHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDOB),did),dob[1..6]=rptByMod.dob[1..6]));
+		NdHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDOB),did),((STRING)dob)[1..6]=((STRING)rptByMod.dob)[1..6]));
 		NaHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameAddr),did)));
 		AoHdr  := HeaderSummaryFilter(currentResidentsOnly(rptByMod,hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setAddrOnly),did))));
-		NsdHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnDob) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
+    NsdHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnDob) ,did), ssn=rptByMod.ssn, ((STRING)dob)[1..6]=((STRING)rptByMod.dob)[1..6]), true);
 		NsaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnAddr),did),ssn=rptByMod.ssn),true);
-		NdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDobAddr),did),dob[1..6]=rptByMod.dob[1..6]));
-		SdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSsnDobAddr) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
+		NdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDobAddr),did),((STRING)dob)[1..6]=((STRING)rptByMod.dob)[1..6]));
+		SdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSsnDobAddr) ,did),ssn=rptByMod.ssn,((STRING)dob)[1..6]=((STRING)rptByMod.dob)[1..6]),true);
 
 		hdrFilt := SoHdr+NsHdr+NdHdr+NaHdr+AoHdr+NsdHdr+NsaHdr+NdaHdr+SdaHdr;
 		cntSsnDob := PublicProfileServices.Functions.cntUnqSsnDob(hdrFilt);

@@ -1,5 +1,5 @@
 //project: 4287 - 4.1 Shell
-import risk_indicators, riskwise, ut, easi;
+import risk_indicators, riskwise, ut, easi, std;
 
 bs_with_ip :=  record
 	risk_indicators.Layout_Boca_Shell bs;
@@ -259,7 +259,7 @@ export FP1307_2_0( dataset(bs_with_ip) clam_ip,  integer1 num_reasons, boolean c
 
 	NULL := __common__( -999999999);
 
-	sysdate := __common__( common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01')));
+	sysdate := __common__( common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01')));
 
 	iv_vp002_phn_disconnected := __common__( map(
 			not(hphnpop)                                                             => ' ',

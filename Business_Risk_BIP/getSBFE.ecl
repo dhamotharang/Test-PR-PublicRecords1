@@ -1,4 +1,4 @@
-/*2016-11-15T02:48:01Z (aleksandar tomovic)
+﻿/*2016-11-15T02:48:01Z (aleksandar tomovic)
 corrected as per code review 
 */
 IMPORT BIPV2, Business_Credit, Business_Risk_BIP, MDR, ut, Business_Credit_KEL, risk_indicators, DID_Add, Business_Risk, STD;
@@ -148,7 +148,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								NameMatched 																		=> (STRING)ri.dt_first_seen,
 																																																	 '');
 		SELF.SBFE.SBFENameMatchDateLastSeen := MAP(NOT NamePopulated 																=> '-99',
-																								NameMatched 																		=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								NameMatched 																		=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 		
 		
@@ -161,7 +161,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								AddressMatched 																	=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEAddrMatchDateLastSeen := MAP(NOT AddressPopulated 														=> '-99',
-																								AddressMatched 																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								AddressMatched 																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 		
 		
@@ -175,7 +175,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																								 PhoneMatched 																	=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEPhoneMatchDateLastSeen := MAP(NOT PhonePopulated 															=> '-99',
-																								 PhoneMatched  																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																								 PhoneMatched  																	=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');																																																
 																																																			
 		SELF.SBFE.SBFEVerBusInputPhoneAddr := MAP(PhoneMatched AND AddressMatched	AND NameMatched		=> '2',
@@ -192,7 +192,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																							 FEINMatched 																			=> (STRING)ri.dt_first_seen, 
 																																																	 '');
 		SELF.SBFE.SBFEFEINMatchDateLastSeen := MAP(NOT FEINPopulated 																=> '-99',
-																							 FEINMatched 																			=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)le.Clean_Input.HistoryDateTime[1..8]),
+																							 FEINMatched 																			=> Business_Risk_BIP.Common.checkInvalidDate((STRING)ri.dt_last_seen, '0', (UNSIGNED)((STRING)le.Clean_Input.HistoryDateTime)[1..8]),
 																																																	 '');
 
 																																																			 
@@ -509,7 +509,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		JOIN(SBFEPersonVerificationRolled, SBFE_data, 
 			LEFT.seq = RIGHT.UID,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-				dateToday := IF((STRING)(LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', (UNSIGNED)StringLib.getDateYYYYMMDD(), (UNSIGNED4)(((STRING)LEFT.Clean_Input.HistoryDateTime + '01')[1..8]));
+				dateToday := IF(((STRING)LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', (UNSIGNED)StringLib.getDateYYYYMMDD(), (UNSIGNED4)((((STRING)LEFT.Clean_Input.HistoryDateTime) + '01')[1..8]));
 
 				SBFENameMatchDateFirstSeen := IF(LEFT.SBFE.SBFENameMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFENameMatchDateFirstSeen);
 				SELF.SBFE.SBFENameMatchDateFirstSeen := SBFENameMatchDateFirstSeen;

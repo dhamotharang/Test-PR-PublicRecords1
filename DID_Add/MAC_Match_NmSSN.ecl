@@ -25,10 +25,10 @@ typeof(infile) %ssn_tra%(infile l, %ca% r) := transform
 				   datalib.preferredfirstNew(l.fname_field, Header_Slimsort.Constants.UsePFNew)=r.fname and
 				   datalib.preferredfirstNew(l.mname_field, Header_Slimsort.Constants.UsePFNew)=r.mname and
 				   l.lname_field=r.lname and
-				   ut.Translate_Suffix(l.suffix_field)=ut.Translate_Suffix(r.name_suffix) and r.ssn_fullname_dids <>0 => r.ssn_fullname_dids,
+				   ut.fGetSuffix(l.suffix_field)=ut.fGetSuffix(r.name_suffix) and r.ssn_fullname_dids <>0 => r.ssn_fullname_dids,
 				   datalib.preferredfirstNew(l.fname_field, Header_Slimsort.Constants.UsePFNew)=r.fname and
 				   l.lname_field=r.lname and
-				   ut.Translate_Suffix(l.suffix_field)=ut.Translate_Suffix(r.name_suffix) and r.ssn_fname_suffix_dids<>0=> r.ssn_fname_suffix_dids,
+				   ut.fGetSuffix(l.suffix_field)=ut.fGetSuffix(r.name_suffix) and r.ssn_fname_suffix_dids<>0=> r.ssn_fname_suffix_dids,
 				   datalib.preferredfirstNew(l.fname_field, Header_Slimsort.Constants.UsePFNew)=r.fname and r.ssn_fname_dids<>0=> 
 							r.ssn_fname_dids * if(r.ssn_fname_dids = 1 and r.ssn_dids > 1, 1.01, 1),  //this bit of multiplication allows us to score a max of 99 when only ssn+fname, and thus we attempt other joins downstream
 				   r.ssn_dids)); 

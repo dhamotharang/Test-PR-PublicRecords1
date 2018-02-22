@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, ut;
+import risk_indicators, riskwise, ut, std;
 
 export identify_opt_outs(dataset(risk_indicators.layout_input) indata, boolean onThor=false) := function
 
@@ -10,7 +10,7 @@ end;
 // only consider a matching record a true hit if the following criteria are met
 // otherwise act as the record didn't match at all
 valid_hit(string1 opt_back_in, string1 permanent_flag, string8 date_yyyymmdd) := function
-	today := ut.GetDate;
+	today := (STRING8)Std.Date.Today();
 	hit := opt_back_in='N' and
 				 ( permanent_flag='Y' or (permanent_flag='N' and ut.DaysApart(today,date_yyyymmdd) < ut.DaysInNYears(5)) );
 	return hit;				

@@ -1,6 +1,6 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,watchdog,suppress,enclarity;
+import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,watchdog,suppress,enclarity, std;
 export Functions_Validation := Module
-		shared currentDate := (string)ut.GetDate;
+		shared currentDate := (STRING8)Std.Date.Today();
 		EXPORT checkCurrentLicense(iesp.share.t_Date inputValue) := FUNCTION
 			licDate:= iesp.ECL2ESP.t_DateToString8(inputValue);
 			RETURN licDate>=currentDate;

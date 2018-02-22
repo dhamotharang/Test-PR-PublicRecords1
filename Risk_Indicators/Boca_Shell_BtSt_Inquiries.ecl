@@ -287,7 +287,7 @@ export Boca_Shell_BtSt_Inquiries(
 	//deltabase_URL := if(bsversion >= 50 and clam_pre_Inquiries[1].historydate=999999 and ~isFCRA, deltabase_check, '');
 	deltabase_URL := if(ungrpd_input[1].bill_to_output.historydate=999999, gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url, '');
 	
-	DeltabaseGateway := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_Name; 
+	DeltabaseGateway := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_Name; 
 																																							 SELF.URL := deltabase_URL;
 																																							 SELF := []));
 	btst_deltaBase_did_results := Inquiry_Deltabase.Search_DID(joint_delta_input, 

@@ -1,4 +1,4 @@
-IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
+﻿IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
 
 EXPORT Layout_Phone_Shell := MODULE
 
@@ -78,6 +78,7 @@ EXPORT Layout_Phone_Shell_Input_Echo := RECORD
 	BOOLEAN		in_TUGW_Enabled					:= FALSE;
 	BOOLEAN		in_INSGW_Enabled				:= FALSE;
 	STRING8		in_Processing_Date			:= '';
+	BOOLEAN  in_Burea_Enabled				 := FALSE;
 END;
 
 EXPORT Layout_Subject_Level := RECORD
@@ -324,6 +325,11 @@ EXPORT Layout_Royalties := RECORD
 	UNSIGNED1 EFXDataMart_Royalty := 0; //Equifax 
 END;
 
+EXPORT Layout_Bureau := RECORD
+	BOOLEAN Bureau_Verified := FALSE;
+	STRING8 Bureau_Last_Update := '';
+END;
+
 EXPORT Layout_Phone_Shell_Plus := RECORD
 	UNSIGNED8 Unique_Record_Sequence 			:= 0; // This is internal, used to help keep the individual records straightened out
 	UNSIGNED8 DID													:= 0;
@@ -342,6 +348,7 @@ EXPORT Layout_Phone_Shell_Plus := RECORD
 	Layout_Experian_File_One_Verification	Experian_File_One_Verification;
 	Layout_EDA_Characteristics						EDA_Characteristics;
 	Layout_Royalties											Royalties;
+	Layout_Bureau												Bureau;	
 	Layout_Boca_Shell_Plus								Clam;					// This field is removed from the final layout below
 END;
 

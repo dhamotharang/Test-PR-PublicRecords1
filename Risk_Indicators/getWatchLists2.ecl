@@ -1,4 +1,4 @@
-﻿import Address, GlobalWatchLists, GlobalWatchLists_Services, iesp, Patriot, riskwise, ut, OFAC_XG5, Gateway;
+﻿import Address, GlobalWatchLists, GlobalWatchLists_Services, iesp, Patriot, riskwise, ut, OFAC_XG5, Gateway, std;
 
 export getWatchLists2(GROUPED DATASET(Layout_Output) inl, boolean ofac_only = false, boolean skip_company_search = false,unsigned1 ofac_version=1,
 				boolean include_ofac =FALSE, boolean include_additional_watchlists=FALSE,real global_watchlist_threshold=0.00,integer2 dob_radius = -1, 
@@ -24,7 +24,15 @@ TRANSFORM
 	SELF.name_unparsed := IF(isCo,le.employer_name,'');
 	SELF.country := IF(isPerson,stringlib.stringtouppercase(le.in_country),'');
 	SELF.search_type := IF(isPerson,'I','B');
-	yob := if(le.dob='' and le.age<>'', if((unsigned)le.age = 0, '',(string)((unsigned)(ut.GetDate[1..4])-(unsigned)le.age) + '0000'), '');
+  
+	yob := if(le.dob='' and le.age<>'', 
+             if((unsigned)le.age = 0, 
+                    '',
+                    (string)((unsigned)((STRING)Std.Date.Today())[1..4] - (unsigned)le.age) + '0000'
+             ), 
+             ''
+        );
+        
 	SELF.dob := IF(isPerson and le.dob<>'', le.dob, yob);
 	SELF.acctNo := '';
 END;

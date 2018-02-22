@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, RiskWiseFCRA;
+import ut, risk_indicators, address, RiskWise, RiskWiseFCRA, std;
 
 export FD5609_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := 
 
@@ -7,7 +7,7 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := TRANSFORM
 
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	
 	best_match_level := MAP(le.address_verification.input_address_information.isbestmatch => 2,
@@ -94,7 +94,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	ssninval := ~le.ssn_verification.validation.valid;
 	ssndead := le.ssn_verification.validation.deceased;
 	
-	high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+	high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
      ssnage := sysyear - high_issue_dateyr;
 	
 	hr_address_n := le.address_validation.hr_address;
@@ -144,7 +144,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	/* Bureau / Time on Bureau */
 	
 	cred_fs_pop := le.ssn_verification.credit_first_seen = 0;
-	time_on_bureau_years := if(cred_fs_pop, -1, sysyear - (integer)(le.ssn_verification.credit_first_seen[1..4]));
+	time_on_bureau_years := if(cred_fs_pop, -1, sysyear - (integer)(((STRING)le.ssn_verification.credit_first_seen)[1..4]));
 
      time_on_bureau_jpmc_code := map(time_on_bureau_years = -1 or time_on_bureau_years = sysyear => 4,
 							  time_on_bureau_years <= 3  => 0,
@@ -162,7 +162,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	
 	/* Age */
 
-	today := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
      dob_m := (integer)(le.shell_input.dob[5..6]);

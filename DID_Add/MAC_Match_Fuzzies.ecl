@@ -84,7 +84,7 @@ end;
 	
 	IF(ut.NZEQ(Opt1a, Opt1b) AND ut.NZEQ(Opt2a, Opt2b) AND ut.NZEQ(Opt3a, Opt3b),
 		
-		ut.imin4(IF(%FullName%(%tf%(fname1), %tf%(fname2)) AND 
+		min(IF(%FullName%(%tf%(fname1), %tf%(fname2)) AND 
 					%FullName%(%tf%(mname1), %tf%(mname2)),			count1, 65535),
 				 IF(%FullName%(%tf%(fname1), %tf%(fname2)) AND 
 					ut.NBEQ(%tf%(mname1)[1], %tf%(mname2)[1]),		count2, 65535),
@@ -99,10 +99,10 @@ end;
 %MatchRec% %joiner%(%MatchingDistribute%  L, Header_Slimsort.Layout_Name_Age_Zip_SSN4 R) :=
 TRANSFORM
 		integer4 localscore := 
-ut.max2(
+max(
 10000 div 
-	ut.imin2(
-	ut.imin4(
+	min(
+	min(
 // *********** By All Three Fields *****************
 #if('G' in matchset AND 'Z' in matchset AND '4' in matchset)
 		// age, zip5 and ssn4
@@ -139,7 +139,7 @@ ut.max2(
 #end
 		),
 
-	ut.imin4(
+	min(
 // *********** By Just One Field *****************
 		// age
 #if('G' in matchset)

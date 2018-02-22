@@ -92,7 +92,7 @@ party_norm  := normalize(party_plate_norm(reg_previous_license_state != '' or st
 reverse_lic_plate_rec tformat(party_norm L) := transform
 self.state_origin := L.state;
 self.is_current := l.orig_name_type in ['4','5'] and l.history='';
-	age := ut.getage(l.orig_dob);
+	age := ut.age((INTEGER)l.orig_dob);
 self.is_minor := if(age=0 or age>=18,FALSE,TRUE);
 self.date :=(unsigned4) map(l.Reg_Latest_Effective_Date<>''=>l.Reg_Latest_Effective_Date,
 								l.Reg_Latest_Expiration_Date<>''=>l.Reg_Latest_Expiration_Date,

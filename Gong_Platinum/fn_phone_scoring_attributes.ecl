@@ -1,4 +1,5 @@
-import ut, watchdog,Gong_v2, gong;
+import ut, watchdog,Gong_v2, gong, std;
+
 EXPORT fn_phone_scoring_attributes (dataset(recordof(Gong_v2.layout_gongMaster)) gong_m) := function
 
 ScoringRecord := RECORD
@@ -57,15 +58,15 @@ end;
 
 all_phones := sort(project(gong_m_with_phone (did > 0), 
 						   transform(temp_ly2,
-						             self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, ut.GetDate), left.dt_first_seen),
+						             self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, (STRING8)Std.Date.Today()), left.dt_first_seen),
 									 self := left)) , 
 				did, phone10);
 
 
 recordof(temp_ly2 ) t_rollup(all_phones le, all_phones ri) := transform
  self.dt_first_seen := (string) ut.Min2((unsigned)le.dt_first_seen, (unsigned)ri.dt_first_seen);
- self.dt_last_seen :=  (string) ut.Max2((unsigned)le.dt_last_seen, (unsigned)ri.dt_last_seen);
- self.days_in_service := ut.DaysApart(if(self.dt_last_seen <> '', self.dt_last_seen, ut.GetDate), self.dt_first_seen);
+ self.dt_last_seen :=  (string) Max((unsigned)le.dt_last_seen, (unsigned)ri.dt_last_seen);
+ self.days_in_service := ut.DaysApart(if(self.dt_last_seen <> '', self.dt_last_seen, (STRING8)Std.Date.Today()), self.dt_first_seen);
  self.is_discon_15_days:= if(self.days_in_service <= 15, true, false);
  self.is_discon_30_days:=if(self.days_in_service <= 30, true, false);
  self.is_discon_60_days:=if(self.days_in_service <= 60, true, false);
@@ -132,7 +133,7 @@ end;
 
 curr_discon_phones := group(sort(project(current_in_hist_all (did > 0), 
 						   transform(temp_ly4,
-						             self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, ut.GetDate), left.dt_first_seen),
+						             self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, (STRING8)Std.Date.Today()), left.dt_first_seen),
 									 self.has_cur_discon_15_days := if(self.days_in_service <= 15, true, false),
 									 self.has_cur_discon_30_days := if(self.days_in_service <= 30, true, false),
 									 self.has_cur_discon_60_days := if(self.days_in_service <= 60, true, false),
@@ -177,13 +178,13 @@ phone_level_att := project(num_phone_owners_hist_tb,transform(LayoutScoringAttri
 																										self.num_phone_owners_cur := left.cnt,
 																										self := left)) +
 									 project(gong_h_ph_first_phone, transform(LayoutScoringAttributes.Phone_level,
-																									self.days_phone_first_seen := ut.DaysApart(ut.GetDate, left.dt_first_seen),
+																									self.days_phone_first_seen := ut.DaysApart((STRING8)Std.Date.Today(), left.dt_first_seen),
 																									self := left));
 									 
 LayoutScoringAttributes.Phone_level t_rollup_by_phone(phone_level_att le, phone_level_att ri) := transform
-self.num_phone_owners_hist := ut.max2(le.num_phone_owners_hist,ri.num_phone_owners_hist);
-self.num_phone_owners_cur := ut.max2(le.num_phone_owners_cur,ri.num_phone_owners_cur);
-self.days_phone_first_seen := ut.max2(le.days_phone_first_seen,ri.days_phone_first_seen);
+self.num_phone_owners_hist := Max(le.num_phone_owners_hist,ri.num_phone_owners_hist);
+self.num_phone_owners_cur := Max(le.num_phone_owners_cur,ri.num_phone_owners_cur);
+self.days_phone_first_seen := Max(le.days_phone_first_seen,ri.days_phone_first_seen);
 self := ri;
 end;
 
@@ -196,7 +197,7 @@ append_phone_level := join(distribute(gong_m (phone10 <> ''), hash(phone10)),
 											distribute(phone_level_att_r, hash(phone10)),
 											 left.phone10 = right.phone10,
 											 transform(ScoringRecord, 
-																	self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, ut.GetDate), left.dt_first_seen);
+																	self.days_in_service := ut.DaysApart(if(left.dt_last_seen <> '', left.dt_last_seen, (STRING8)Std.Date.Today()), left.dt_first_seen);
 																	self.phone10 := left.phone10,
 																	self := right, 
 																	self := left),
@@ -216,24 +217,24 @@ did_level_att := project(num_phones_indiv_tb, transform(LayoutScoringAttributes.
 																							self := left)) +
 									 project(connected_indiv_tbl, LayoutScoringAttributes.Did_level)+
 									 project(gong_h_ph_first_indiv, transform(LayoutScoringAttributes.Did_level,
-																							self.days_indiv_first_seen := ut.DaysApart(ut.GetDate, left.dt_first_seen),
+																							self.days_indiv_first_seen := ut.DaysApart((STRING8)Std.Date.Today(), left.dt_first_seen),
 																							self := left));
 
 
 LayoutScoringAttributes.Did_level t_rollup_by_Did(did_level_att le, did_level_att ri) := transform
-self.num_phones_indiv := ut.max2(le.num_phones_indiv , ri.num_phones_indiv);
-self.num_phones_connected_indiv := ut.max2(le.num_phones_connected_indiv , ri.num_phones_connected_indiv);
-self.num_phones_discon_indiv := ut.max2(le.num_phones_discon_indiv, ri. num_phones_discon_indiv );
-self.avg_days_connected_indiv  := ut.max2(le.avg_days_connected_indiv, ri.avg_days_connected_indiv);
-self.min_days_connected_indiv  := ut.max2(le.min_days_connected_indiv, ri.min_days_connected_indiv);
-self.max_days_connected_indiv := ut.max2(le.max_days_connected_indiv, ri.max_days_connected_indiv );
-self.is_discon_15_days := (boolean)ut.max2((unsigned)le.is_discon_15_days, (unsigned)ri.is_discon_15_days); 
-self.is_discon_30_days := (boolean)ut.max2((unsigned)le.is_discon_30_days, (unsigned)ri.is_discon_30_days);
-self.is_discon_60_days := (boolean)ut.max2((unsigned)le.is_discon_60_days, (unsigned)ri.is_discon_60_days);
-self.is_discon_90_days := (boolean)ut.max2((unsigned)le.is_discon_90_days, (unsigned)ri.is_discon_90_days);
-self.is_discon_180_days := (boolean)ut.max2((unsigned)le.is_discon_180_days, (unsigned)ri.is_discon_180_days);
-self.is_discon_360_days := (boolean)ut.max2((unsigned)le.is_discon_360_days, (unsigned)ri.is_discon_360_days);
-self.days_indiv_first_seen := ut.max2(le.days_indiv_first_seen, ri.days_indiv_first_seen);
+self.num_phones_indiv := Max(le.num_phones_indiv , ri.num_phones_indiv);
+self.num_phones_connected_indiv := Max(le.num_phones_connected_indiv , ri.num_phones_connected_indiv);
+self.num_phones_discon_indiv := Max(le.num_phones_discon_indiv, ri. num_phones_discon_indiv );
+self.avg_days_connected_indiv  := Max(le.avg_days_connected_indiv, ri.avg_days_connected_indiv);
+self.min_days_connected_indiv  := Max(le.min_days_connected_indiv, ri.min_days_connected_indiv);
+self.max_days_connected_indiv := Max(le.max_days_connected_indiv, ri.max_days_connected_indiv );
+self.is_discon_15_days := (boolean)Max((unsigned)le.is_discon_15_days, (unsigned)ri.is_discon_15_days); 
+self.is_discon_30_days := (boolean)Max((unsigned)le.is_discon_30_days, (unsigned)ri.is_discon_30_days);
+self.is_discon_60_days := (boolean)Max((unsigned)le.is_discon_60_days, (unsigned)ri.is_discon_60_days);
+self.is_discon_90_days := (boolean)Max((unsigned)le.is_discon_90_days, (unsigned)ri.is_discon_90_days);
+self.is_discon_180_days := (boolean)Max((unsigned)le.is_discon_180_days, (unsigned)ri.is_discon_180_days);
+self.is_discon_360_days := (boolean)Max((unsigned)le.is_discon_360_days, (unsigned)ri.is_discon_360_days);
+self.days_indiv_first_seen := Max(le.days_indiv_first_seen, ri.days_indiv_first_seen);
 self := ri;
 end;
 
@@ -258,7 +259,7 @@ append_did_level := join(distribute(append_phone_level (did > 0), hash(did)),
 //Append watchdog
 ScoringRecord append_wd(append_did_level le, watchdog.File_Best ri) := transform
 self.address_match_best := if(ri.did > 0 , true, le.address_match_best);
-self.months_addr_last_seen := (unsigned) if(ri.addr_dt_last_seen > 0, (ut.DaysApart(ut.GetDate, (string)(ri.addr_dt_last_seen + '01') [..8])/30), 0);
+self.months_addr_last_seen := (unsigned) if(ri.addr_dt_last_seen > 0, (ut.DaysApart((STRING8)Std.Date.Today(), (string)(ri.addr_dt_last_seen + '01') [..8])/30), 0);
 self := le;
 end;
 
@@ -274,7 +275,7 @@ all_recs_did_level := append_best + append_phone_level (did = 0);
 
 //Append at phone, did level
 phone_did_level_att := project(gong_h_ph_first_indiv_with_phone,transform(LayoutScoringAttributes.Phone_Did_level,
-																																self.days_indiv_first_seen_with_phone := ut.DaysApart(ut.GetDate, left.dt_first_seen),
+																																self.days_indiv_first_seen_with_phone := ut.DaysApart((STRING8)Std.Date.Today(), left.dt_first_seen),
 																																self := left)) + 
 									 project(current_in_hist, transform(LayoutScoringAttributes.Phone_Did_level,
 																											self.is_current_in_hist := if(left.phone10 <> '', true, false),
@@ -284,18 +285,18 @@ phone_did_level_att := project(gong_h_ph_first_indiv_with_phone,transform(Layout
 
 
 LayoutScoringAttributes.Phone_Did_level t_rollup_by_Phone_Did(phone_did_level_att le, phone_did_level_att ri) := transform
-self.num_interrupts_cur := ut.max2(le.num_interrupts_cur, ri.num_interrupts_cur);
-self.avg_days_interrupt := ut.max2(le.avg_days_interrupt, ri.avg_days_interrupt);
-self.min_days_interrupt  := ut.max2(le.min_days_interrupt, ri.min_days_interrupt);
-self.max_days_interrupt  := ut.max2(le.max_days_interrupt, ri.max_days_interrupt );
-self.has_cur_discon_15_days := (boolean)ut.max2((unsigned)le.has_cur_discon_15_days, (unsigned)ri.has_cur_discon_15_days); 
-self.has_cur_discon_30_days := (boolean)ut.max2((unsigned)le.has_cur_discon_30_days, (unsigned)ri.has_cur_discon_30_days);
-self.has_cur_discon_60_days := (boolean)ut.max2((unsigned)le.has_cur_discon_60_days, (unsigned)ri.has_cur_discon_60_days);
-self.has_cur_discon_90_days := (boolean)ut.max2((unsigned)le.has_cur_discon_90_days, (unsigned)ri.has_cur_discon_90_days);
-self.has_cur_discon_180_days := (boolean)ut.max2((unsigned)le.has_cur_discon_180_days, (unsigned)ri.has_cur_discon_180_days);
-self.has_cur_discon_360_days := (boolean)ut.max2((unsigned)le.has_cur_discon_360_days, (unsigned)ri.has_cur_discon_360_days);
-self.days_indiv_first_seen_with_phone := ut.max2(le.days_indiv_first_seen_with_phone, ri.days_indiv_first_seen_with_phone);
-self.is_current_in_hist := (boolean)ut.max2((unsigned)le.is_current_in_hist, (unsigned)ri.is_current_in_hist);
+self.num_interrupts_cur := Max(le.num_interrupts_cur, ri.num_interrupts_cur);
+self.avg_days_interrupt := Max(le.avg_days_interrupt, ri.avg_days_interrupt);
+self.min_days_interrupt  := Max(le.min_days_interrupt, ri.min_days_interrupt);
+self.max_days_interrupt  := Max(le.max_days_interrupt, ri.max_days_interrupt );
+self.has_cur_discon_15_days := (boolean)Max((unsigned)le.has_cur_discon_15_days, (unsigned)ri.has_cur_discon_15_days); 
+self.has_cur_discon_30_days := (boolean)Max((unsigned)le.has_cur_discon_30_days, (unsigned)ri.has_cur_discon_30_days);
+self.has_cur_discon_60_days := (boolean)Max((unsigned)le.has_cur_discon_60_days, (unsigned)ri.has_cur_discon_60_days);
+self.has_cur_discon_90_days := (boolean)Max((unsigned)le.has_cur_discon_90_days, (unsigned)ri.has_cur_discon_90_days);
+self.has_cur_discon_180_days := (boolean)Max((unsigned)le.has_cur_discon_180_days, (unsigned)ri.has_cur_discon_180_days);
+self.has_cur_discon_360_days := (boolean)Max((unsigned)le.has_cur_discon_360_days, (unsigned)ri.has_cur_discon_360_days);
+self.days_indiv_first_seen_with_phone := Max(le.days_indiv_first_seen_with_phone, ri.days_indiv_first_seen_with_phone);
+self.is_current_in_hist := (boolean)Max((unsigned)le.is_current_in_hist, (unsigned)ri.is_current_in_hist);
 self := ri;
 end;
 
@@ -326,8 +327,8 @@ addr_level_att := project(num_phones_connected_addr_tb,transform(LayoutScoringAt
 																											self := left));
 
 LayoutScoringAttributes.Address_level t_rollup_by_Address(addr_level_att le, addr_level_att ri) := transform
-self.num_phones_connected_addr:= ut.max2(le.num_phones_connected_addr, ri.num_phones_connected_addr);
-self.num_phones_discon_addr:= ut.max2(le.num_phones_discon_addr, ri.num_phones_discon_addr);
+self.num_phones_connected_addr:= Max(le.num_phones_connected_addr, ri.num_phones_connected_addr);
+self.num_phones_discon_addr:= Max(le.num_phones_discon_addr, ri.num_phones_discon_addr);
 self := ri;
 end;
 
@@ -355,8 +356,8 @@ hhid_level_att := project(num_phones_connected_hhid_tb, transform(LayoutScoringA
 																											self := left));
 
 LayoutScoringAttributes.hhid_level t_rollup_by_hhid(hhid_level_att le,hhid_level_att ri) := transform
-self.num_phones_connected_hhid:= ut.max2(le.num_phones_connected_hhid, ri.num_phones_connected_hhid);
-self.num_phones_discon_hhid:= ut.max2(le.num_phones_discon_hhid, ri.num_phones_discon_hhid);
+self.num_phones_connected_hhid:= Max(le.num_phones_connected_hhid, ri.num_phones_connected_hhid);
+self.num_phones_discon_hhid:= Max(le.num_phones_discon_hhid, ri.num_phones_discon_hhid);
 self := ri;
 end;
 

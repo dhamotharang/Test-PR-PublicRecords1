@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise, RiskWiseFCRA;
+import ut, risk_indicators, RiskWise, RiskWiseFCRA, std;
 
 export FD3510_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true, 
 			   boolean isFCRA=false, boolean inCalif=false, boolean fdReasonsWith38=false, boolean nugen=false, boolean other_watchlists = false) := 
@@ -8,7 +8,7 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := TRANSFORM
 
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	
 	best_match_level := MAP(le.address_verification.input_address_information.isbestmatch => 2,
@@ -75,7 +75,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
      ssndead := (integer)le.ssn_verification.validation.deceased;
 
 
-     high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+     high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 
      ssnage := sysyear - high_issue_dateyr;
 
@@ -121,8 +121,8 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 
 
-     time_on_header_years := sysyear - (integer)(le.ssn_verification.header_first_seen[1..4]);
-     time_since_header_years := sysyear - (integer)(le.ssn_verification.header_last_seen[1..4]);
+     time_on_header_years := sysyear - (integer)(((STRING)le.ssn_verification.header_first_seen)[1..4]);
+     time_since_header_years := sysyear - (integer)(((STRING)le.ssn_verification.header_last_seen)[1..4]);
 
 
      time_since_header_code := map(time_since_header_years >= 14 => 3,
@@ -171,7 +171,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 					0.0984615385);
 
 
-	today := IF(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING8)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
      dob_m := (integer)(le.shell_input.dob[5..6]);
@@ -209,7 +209,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 
 
-     lname_change_year := (integer)(le.name_verification.lname_change_date[1..4]);
+     lname_change_year := (integer)(((STRING)le.name_verification.lname_change_date)[1..4]);
      recent_name_change_jpmc := if(sysyear - lname_change_year < 10, 1,0);
 	
 	

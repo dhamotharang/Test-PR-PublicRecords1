@@ -1,4 +1,4 @@
-IMPORT BatchShare, MemberPoint, Std, progressive_phone;
+﻿IMPORT BatchShare, MemberPoint, Std, progressive_phone;
 
 	MPD:= MemberPoint.Constants.Defaults;
 
@@ -100,7 +100,6 @@ IMPORT BatchShare, MemberPoint, Std, progressive_phone;
 			EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount;
 			EXPORT BOOLEAN ReturnScore:= MPD.ReturnScore;
 			EXPORT BOOLEAN StrictAPSX:= MPD.StrictAPSX;
-			EXPORT BOOLEAN UseMetronet:= MPD.UseMetronet;
 		end;
 
 		// **************************************************************************************
@@ -211,7 +210,6 @@ IMPORT BatchShare, MemberPoint, Std, progressive_phone;
 				EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount : STORED('MaxPhoneCount');
 				EXPORT BOOLEAN ReturnScore:= MPD.ReturnScore : STORED('ReturnScore');
 				EXPORT BOOLEAN StrictAPSX:= MPD.StrictAPSX : STORED('StrictAPSXMatch');
-				EXPORT BOOLEAN UseMetronet:= MPD.UseMetronet : STORED('UseMetronet');
 			END;
 			RETURN in_mod;
 		END;

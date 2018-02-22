@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVC1301_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -188,7 +188,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 	(source[1..length(target)+1] = target + delim) OR
 	(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 iv_pots_phone := (telcordia_type in ['00', '50', '51', '52', '54']);
 

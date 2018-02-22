@@ -334,13 +334,13 @@ export phones_base :=
 	project(gh(phone10<>''), 
 		transform(phones_base_layout, self.src := 'GH', self.zip := left.z5, self.dt_first_seen := (unsigned)left.dt_first_seen[1..6], self.dt_last_seen := (unsigned)left.dt_last_seen[1..6], self := left)) +
 	project(wp(phone_number<>''), 
-		transform(phones_base_layout, self.src := 'WP', self.phone10 := left.phone_number,  self.dt_first_seen := (unsigned)left.dt_first_seen[1..6], self.dt_last_seen := (unsigned)left.dt_last_seen[1..6], 
+		transform(phones_base_layout, self.src := 'WP', self.phone10 := left.phone_number,  self.dt_first_seen := (unsigned)((STRING)left.dt_first_seen)[1..6], self.dt_last_seen := (unsigned)((STRING)left.dt_last_seen)[1..6], 
 			self.name_first := left.fname, self.name_last := left.lname, self := left)) +
 	project(ir(phone<>''), 
-		transform(phones_base_layout, self.src := 'IR', self.phone10 := left.phone,   self.dt_first_seen := (unsigned)left.dt_first_seen[1..6], self.dt_last_seen := (unsigned)left.dt_last_seen[1..6], 
+		transform(phones_base_layout, self.src := 'IR', self.phone10 := left.phone,   self.dt_first_seen := (unsigned)((STRING)left.dt_first_seen)[1..6], self.dt_last_seen := (unsigned)((STRING)left.dt_last_seen)[1..6], 
 			self.name_first := left.fname, self.name_last := left.lname, self := left)) + 
 	project(u(phone<>''), 
-		transform(phones_base_layout, self.src := 'UT', self.phone10 := left.phone,  self.dt_first_seen := (unsigned)left.date_first_seen[1..6], self.dt_last_seen := 0,  
+		transform(phones_base_layout, self.src := 'UT', self.phone10 := left.phone,  self.dt_first_seen := (unsigned)((STRING)left.date_first_seen)[1..6], self.dt_last_seen := 0,  
 			self.name_first := left.fname, self.name_last := left.lname, self := left));	
 	
 phone_addr_base := distribute(phones_base(trim(phone10)<>'' and trim(prim_name)<>'' and trim(zip)<>''), hash(phone10, prim_name, zip));

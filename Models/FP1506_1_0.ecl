@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, easi, Models;
+import risk_indicators, riskwise, riskwisefcra, ut, easi, Models, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -662,7 +662,7 @@ export FP1506_1_0(dataset(risk_indicators.Layout_Boca_Shell) clam,
 
 NULL := -999999999;
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 r_d31_bk_chapter_n := map(
     not(truedid)                                 => '',

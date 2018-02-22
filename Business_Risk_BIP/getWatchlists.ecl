@@ -1,4 +1,6 @@
-IMPORT BIPV2, Business_Risk, Business_Risk_BIP, MDR, UT;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, MDR, UT;
+
+emptyRecord := dataset([{1}], {unsigned a});
 
 EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -27,7 +29,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	Business_Risk_BIP.Layouts.Shell combineResults(Business_Risk_BIP.Layouts.Shell le, Business_Risk.Layout_Output ri) := TRANSFORM
 		// Rather than keeping the funky flat layout - move it all into a dataset structure
-		watchlist1 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist1 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 1;
 													SELF.Watchlist_Table := ri.Watchlist_Table;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number;
@@ -41,7 +43,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName;
 													SELF.Watchlist_LName := ri.Watchlist_LName;
 													SELF := []));
-		watchlist2 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist2 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 2;
 													SELF.Watchlist_Table := ri.Watchlist_Table_2;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_2;
@@ -55,7 +57,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName_2;
 													SELF.Watchlist_LName := ri.Watchlist_LName_2;
 													SELF := []));
-		watchlist3 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist3 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 3;
 													SELF.Watchlist_Table := ri.Watchlist_Table_3;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_3;
@@ -69,7 +71,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName_3;
 													SELF.Watchlist_LName := ri.Watchlist_LName_3;
 													SELF := []));
-		watchlist4 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist4 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 4;
 													SELF.Watchlist_Table := ri.Watchlist_Table_4;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_4;
@@ -83,7 +85,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName_4;
 													SELF.Watchlist_LName := ri.Watchlist_LName_4;
 													SELF := []));
-		watchlist5 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist5 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 5;
 													SELF.Watchlist_Table := ri.Watchlist_Table_5;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_5;
@@ -97,7 +99,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName_5;
 													SELF.Watchlist_LName := ri.Watchlist_LName_5;
 													SELF := []));
-		watchlist6 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist6 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 6;
 													SELF.Watchlist_Table := ri.Watchlist_Table_6;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_6;
@@ -111,7 +113,7 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													SELF.Watchlist_FName := ri.Watchlist_FName_6;
 													SELF.Watchlist_LName := ri.Watchlist_LName_6;
 													SELF := []));
-		watchlist7 := PROJECT(ut.ds_oneRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
+		watchlist7 := PROJECT(emptyRecord, TRANSFORM(Business_Risk_BIP.Layouts.LayoutWatchlist,
 													SELF.Watchlist_Seq := 7;
 													SELF.Watchlist_Table := ri.Watchlist_Table_7;
 													SELF.Watchlist_Record_Number := ri.Watchlist_Record_Number_7;

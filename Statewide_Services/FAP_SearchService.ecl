@@ -105,8 +105,8 @@ import AutoStandardI, FAP_StateWide, Doxie;
 
 EXPORT FAP_SearchService := MACRO
 
-#OPTION ('optimizeProjects', FALSE)
-#CONSTANT('UsingKeepSSNs',TRUE)
+#OPTION ('optimizeProjects', FALSE);
+#CONSTANT('UsingKeepSSNs',TRUE);
 #STORED('PenaltThreshold', 10);
 
 	unsigned8	MaxResults_val					:= 2000		: stored('MaxResults');

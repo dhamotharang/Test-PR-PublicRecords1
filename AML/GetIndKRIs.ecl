@@ -1,10 +1,10 @@
-IMPORT UT;
+IMPORT UT, std;
 
 EXPORT GetIndKRIs (  DATASET(Layouts.LayoutAMLShellV2) Indivs
 													 ) := FUNCTION;
 
 //version 2   - 
-sysdate := if(Indivs[1].historydate <> 999999, (integer)((string)Indivs[1].historydate[1..6]), (integer)(ut.GetDate[1..6]));
+sysdate := if(Indivs[1].historydate <> 999999, (integer)(((string)Indivs[1].historydate)[1..6]), (integer)(((STRING)Std.Date.Today())[1..6]));
 
 Layouts.LayoutAMLShellV2  IndivKRIs(Indivs le)  := TRANSFORM
   

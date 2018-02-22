@@ -1,4 +1,4 @@
-import header, doxie_build,ut,mdr;
+import header, doxie_build, ut, mdr, data_services;
 
 f := doxie_build.file_fcra_header_building(trim(prim_name)<>'', trim(zip)<>'');
 
@@ -30,10 +30,7 @@ slim_dedup  := DEDUP(SORT(slim_f,record),record);
 
 export Key_FCRA_Header_Address := 
        index(slim_dedup,
-             {prim_name,
-		    zip, 
-		    prim_range, 
-		    sec_range},
-{slim_dedup},
-		ut.Data_Location.Person_header+   'thor_data400::key::fcra::header_address_' + doxie.Version_SuperKey);
+             {prim_name, zip, prim_range, sec_range},
+             {slim_dedup},
+		         Data_Services.Data_location.person_header + 'thor_data400::key::fcra::header_address_' + doxie.Version_SuperKey);
 	

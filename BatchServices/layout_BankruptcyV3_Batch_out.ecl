@@ -1,4 +1,4 @@
-IMPORT BankruptcyV3_Services, BankruptcyV3, BIPV2;
+﻿IMPORT BankruptcyV3_Services, BankruptcyV3, BIPV2, FFD;
 
 
 export layout_BankruptcyV3_Batch_out := RECORD
@@ -335,4 +335,5 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING30				comment_5_desc;
 	STRING8					comment_6_fdate;
 	STRING30				comment_6_desc;
+	FFD.Layouts.ConsumerFlags;
 END;
