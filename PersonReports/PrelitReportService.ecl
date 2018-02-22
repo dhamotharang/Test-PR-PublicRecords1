@@ -42,6 +42,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI;
 
 EXPORT PrelitReportService () := MACRO
+#onwarning(4207, ignore);
 
 //The following macro defines the field sequence on WsECL page of query. 
 WSInput.MAC_PersonReports_PrelitReportService();

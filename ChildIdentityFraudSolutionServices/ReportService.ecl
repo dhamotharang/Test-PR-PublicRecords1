@@ -9,7 +9,7 @@
 import iesp, AutoStandardI;
 
 EXPORT ReportService := MACRO
-
+	#onwarning(4207, ignore);
 	//b. Receive input 
 	rec_in := iesp.childidentityfraudreport.t_ChildIdentityFraudReportRequest;
 
