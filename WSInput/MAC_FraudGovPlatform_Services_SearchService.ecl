@@ -12,7 +12,7 @@
 										'SSNMask',
 										/*---- FDN Fields .----*/
 										'GlobalCompanyId',
-										'IndustryType',
+										'IndustryTypeName',
 										'ProductCode',
 										/*---- Other Fields .----*/
 										/*---- ESDL Request Field ----*/

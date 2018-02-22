@@ -16,15 +16,16 @@ EXPORT SearchService() := MACRO
 	Options 			:= GLOBAL (first_row.Options);
 	FraudGovUser	:= GLOBAL (first_row.FraudGovUser);
 	iesp.ECL2ESP.SetInputBaseRequest(first_row);
-
-	#STORED('GlobalCompanyId',	FraudGovUser.GlobalCompanyId);
-	#STORED('IndustryType',	FraudGovUser.IndustryType);
+	
+	#STORED('GlobalCompanyId', FraudGovUser.GlobalCompanyId);
+	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
 	#STORED('ProductCode',FraudGovUser.ProductCode);
+	#STORED('FraudPlatform', Options.Platform);
 
 	// **************************************************************************************
 	//Checking that gc_id, industry type, and product code have some values - they are required.
 	IF(FraudGovUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
-	IF(FraudGovUser.IndustryType = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
+	IF(FraudGovUser.IndustryTypeName = '', FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
 	IF(FraudGovUser.ProductCode = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_PRODUCT_CODE));
 	// **************************************************************************************
 
