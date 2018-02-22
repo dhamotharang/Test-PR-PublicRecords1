@@ -180,7 +180,7 @@ business_header.layout_biz_search.result_dateRange
 					 business_header.layout_biz_search.result_dateRange r) := transform
 								
         self.firstSeenDate := ut.min2(le.firstSeenDate, r.firstSeenDate);
-				self.lastSeenDate := ut.max2(le.lastSeenDate, r.lastSeenDate);
+				self.lastSeenDate := Max(le.lastSeenDate, r.lastSeenDate);
 				self := r;
 		end;														 
 

@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise;
+import ut, risk_indicators, RiskWise, std;
 
 export AIN509_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true, boolean useTweak=true) := 
 
@@ -7,8 +7,8 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := TRANSFORM
 	
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
-	today := if(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)((STRING)Std.Date.Today())[1..4]);
+	today := if(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING8)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 	
 	
@@ -139,7 +139,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	
 	/* SSN Problem */
 	
-	high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+	high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 	
 	ssnage := sysyear - high_issue_dateyr;
 	
@@ -169,7 +169,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	
 	/* Lrescode */
 	
-	add1_year_first_seen := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
+	add1_year_first_seen := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
 	
 	lres_years := if(add1_year_first_seen = 0, 0,(sysyear - add1_year_first_seen));
 	

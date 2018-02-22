@@ -1,4 +1,4 @@
-import doxie_cbrs, ut;
+﻿import doxie_cbrs, ut;
 
 export industry_information_records_trimmed(dataset(doxie_cbrs.layout_references) bdids) := 
 MODULE
@@ -70,7 +70,7 @@ END;
 // this transform/rollup will remove any duplicate sic code descriptions that have same sic code but are
 // all uppercase in the description.
 //											 
-lowercaseAlphabet := stringlib.stringtolowercase(ut.alphabet);
+lowercaseAlphabet := stringlib.stringtolowercase('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 ii_rec   xform_transform(ii_rec l, ii_rec r) := TRANSFORM
   stringOfLittleCharsLeft :=  stringlib.stringfilter(l.sic_descriptions,lowercaseAlphabet);

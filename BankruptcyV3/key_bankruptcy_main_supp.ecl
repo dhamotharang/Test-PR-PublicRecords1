@@ -1,7 +1,7 @@
-import ut,BankruptcyV2,fcra;
+import ut,BankruptcyV2,fcra, std;
 
 export key_bankruptcy_main_supp(boolean isFCRA = false) := function
-  todaysdate := ut.GetDate;
+  todaysdate := (STRING8)Std.Date.Today();
 	get_recs :=  BankruptcyV2.file_bankruptcy_main_v3_supplemented(~isFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));;
 
 layout_slim := record

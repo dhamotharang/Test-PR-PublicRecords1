@@ -59,6 +59,17 @@
 			EXPORT SSN_FRAGMENT := 'FULL_SSN';
   END;
 	
+	EXPORT RECORD_TYPE_ELEMENT_SET := [	Fragment_Types.SSN_FRAGMENT, 
+																			Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT,
+																			Fragment_Types.PHONE_FRAGMENT,
+																			Fragment_Types.NAME_FRAGMENT,
+																			Fragment_Types.MAILING_ADDRESS_FRAGMENT,
+																			Fragment_Types.IP_ADDRESS_FRAGMENT,
+																			Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
+																			Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
+																			Fragment_Types.DEVICE_ID_FRAGMENT
+																		];
+	
 	EXPORT Contribution_Types := MODULE
 			EXPORT ACTIVITY_REASON := 'ACTIVITY_REASON';
 			EXPORT AGENCY_STATE := 'CUSTOMER_STATE';
@@ -187,7 +198,7 @@
 			PROBABLE = 2,
 			PROVEN = 5);
 			
-		EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
+	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
 
 	EXPORT IS_DEBUG := FALSE; 
 	

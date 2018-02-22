@@ -60,8 +60,8 @@ EXPORT EBRSource_Records(
 	// NOTE: Pass yy<100 and delta<100 or craziness ensues
   unsigned Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function	  
 		nowdate := Std.Date.Today();
-	  high	:= (unsigned)nowdate[1..4] + delta;
-	  test	:= yy + ((unsigned)nowdate[1..2]*100);
+	  high	:= (unsigned)((STRING)nowdate)[1..4] + delta;
+	  test	:= yy + ((unsigned)((STRING)nowdate)[1..2]*100);
 	  yyyy	:= if(test<=high, test, test-100);
 	
 	  return yyyy;

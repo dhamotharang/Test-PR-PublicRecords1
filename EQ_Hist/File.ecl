@@ -1,8 +1,9 @@
-import ut;
+import ut, data_services;
+
 export File := module
-	export raw_608 := dataset(ut.foreign_prod+'~thor_data400::in::quickhdr_raw_history_608',Layout.old_raw,THOR);
-	export raw_567 := dataset(ut.foreign_prod+'~thor_data400::in::quickhdr_raw_history',Layout.current_raw,THOR);
-	export raw_rf  := dataset(ut.foreign_prod+'~thor_data400::in::quickhdr_raw_history_rf',Layout.raw_rf,THOR);
+	export raw_608 := dataset(data_services.foreign_prod+'~thor_data400::in::quickhdr_raw_history_608',Layout.old_raw,THOR);
+	export raw_567 := dataset(data_services.foreign_prod+'~thor_data400::in::quickhdr_raw_history',Layout.current_raw,THOR);
+	export raw_rf  := dataset(data_services.foreign_prod+'~thor_data400::in::quickhdr_raw_history_rf',Layout.raw_rf,THOR);
 	// export raw_rf  :=
   // dataset([
     // {'20090217', '        ', '        ', 'ANDREW         ', 'DALE           ', 'MITCHELL                 ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', '101 W MARKET ST                                          ', 'COLUMBIA CITY       ', 'IN', '46725', '012004', '                                                         ', '                    ', '  ', '     ', '      ', '                                                         ', '                    ', '  ', '     ', '      ', '         ', '?Ý¬?ÉCë\t         ', ' ', '        ', '          ', '                                   ', '                                   ', '                                   ', '                                   ', '                                   ', '      ', '      ', '      ', '      ', '      ', '      '}, 
@@ -16,7 +17,7 @@ export File := module
     // {'20090217', '        ', '        ', 'LOREN          ', 'D              ', 'MILLER                   ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', 'PO BOX 126                                               ', 'MONROE              ', 'SD', '57047', '022004', '                                                         ', '                    ', '  ', '     ', '      ', '                                                         ', '                    ', '  ', '     ', '      ', '         ', '?Ý¯qã?4?f         ', ' ', '        ', '          ', '                                   ', '                                   ', '                                   ', '                                   ', '                                   ', '      ', '      ', '      ', '      ', '      ', '      '}, 
     // {'20090217', '        ', '        ', 'SALVATORE      ', 'N              ', 'VALLETTO                 ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', '               ', '               ', '                         ', '  ', '5428 HAVEN CT APT B                                      ', 'WILLOUGHBY          ', 'OH', '44094', '022004', '                                                         ', '                    ', '  ', '     ', '      ', '                                                         ', '                    ', '  ', '     ', '      ', '277827392', '?Ý{-a´eºe         ', ' ', '        ', '          ', '                                   ', '                                   ', '                                   ', '                                   ', '                                   ', '      ', '      ', '      ', '      ', '      ', '      '}
 		// ], Layout.raw_rf);
-	export base    := dataset(ut.foreign_prod+'~thor_data400::base::equifax_history',Layout.base,THOR);
+	export base    := dataset(data_services.foreign_prod+'~thor_data400::base::equifax_history',Layout.base,THOR);
 	export create_superfiles:=parallel(
 		if(~FileServices.SuperFileExists('~thor_data400::base::equifax_history'),fileservices.createsuperfile('~thor_data400::base::equifax_history'))
 		,if(~FileServices.SuperFileExists('~thor_data400::base::equifax_history_building'),fileservices.createsuperfile('~thor_data400::base::equifax_history_building'))

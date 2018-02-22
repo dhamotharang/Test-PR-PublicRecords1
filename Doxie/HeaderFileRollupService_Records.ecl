@@ -12,7 +12,7 @@ EXPORT HeaderFileRollupService_Records :=
 			dedup_phones   := PROJECT(childPhoneRecs,TRANSFORM(doxie.premium_phone.phone_rec,SELF.phone:=LEFT.phone));
 
 			results := PROJECT(rolledRecsIn[1].Results,TRANSFORM(doxie.Layout_Rollup.KeyRec_Seq,
-				SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,DRM,TRUE,TRUE);
+				SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,DRM,TRUE);
 				SELF:=LEFT));
 
 			doxie.Layout_Rollup.header_rolled rolledRecsOut() := TRANSFORM

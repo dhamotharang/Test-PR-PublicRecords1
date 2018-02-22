@@ -13,7 +13,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, eAuth;
 
 EXPORT EAuthService () := MACRO
-
+#onwarning(4207, ignore);
 #option ('globalAutoHoist', false);
 // for use in outdated code
 

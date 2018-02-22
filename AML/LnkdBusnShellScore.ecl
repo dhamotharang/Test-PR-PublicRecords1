@@ -1,4 +1,4 @@
-IMPORT ut;
+IMPORT ut, std;
 
 EXPORT LnkdBusnShellScore(DATASET(Layouts.BusnExecsLayoutV2) BDIDsIn) := FUNCTION
 
@@ -61,8 +61,8 @@ ShellScoreSlimLayout  GetPoints(BDIDsIn le) := TRANSFORM
 	self.AddrLooseIncorpInd    := if(le.busAddrCntLooseIncorp, 'J', '');
 	self.BusaddrNoFeinInd      := if(le.BusAddrCntnoFein, 'K', '');
 	self.AgedShelfInd        := if(le.SOSFirstReported <> 0 and
-																					((round((ut.DaysApart((string)le.SOSFirstReported, ut.GetDate)) / 30) >= 24 and
-																					round((ut.DaysApart((string)le.BusnHdrDtFirstNonCredit, ut.GetDate)) / 30) < 24 and
+																					((round((ut.DaysApart((string)le.SOSFirstReported, (STRING)Std.Date.Today())) / 30) >= 24 and
+																					round((ut.DaysApart((string)le.BusnHdrDtFirstNonCredit, (STRING)Std.Date.Today())) / 30) < 24 and
 																					round((ut.DaysApart((string)le.BusnHdrDtFirstNonCredit, (string)le.SOSFirstReported)) / 30) >= 24)
 																					or le.srcCount = 0), 'L', '');
 	

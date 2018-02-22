@@ -395,7 +395,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 						dppa_ok AND
 			      // Since ut.MonthsApart uses the absolute value, we don't want to accidentally chop off
 			      // any records where the expriration date is in the future... hence the next AND condition.
-			      IF( (UNSIGNED3)((RIGHT.expiration_date)[1..6]) > LEFT.max_date, 
+			      IF( (UNSIGNED3)(((STRING)RIGHT.expiration_date)[1..6]) > LEFT.max_date, 
 			         TRUE,
 							 ToYYYYMM(RIGHT.expiration_date) BETWEEN LEFT.min_date AND LEFT.max_date
 						) AND
@@ -1335,7 +1335,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 
     SOFR_batch_in := PROJECT(current_result, xfm_to_batch_input(LEFT));
 		
-		SOFR_batch_params		:= BatchShare.IParam.getBatchParams();
+		SOFR_batch_params		:= MODULE(PROJECT(BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt)) END;
 		SOFR_module_return 	:= SexOffender_Services.batch_records(SOFR_batch_params, SOFR_batch_in);
 		
 		offenders := SOFR_module_return.offenders;		

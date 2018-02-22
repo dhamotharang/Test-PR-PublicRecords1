@@ -1,17 +1,17 @@
-import	ut;
+import	ut, std;
 
 dVehiclePartyBase	:=	VehicleV2.Files.Base.Party_BIP;
 
 ConvertYYYYMMToNumberOfMonths(integer	pInput)	:= 
-	 (((integer)(pInput[1..4])*12)	+	((integer)(pInput[5..6])));
+	 (((integer)( ((STRING)pInput)[1..4])*12)	+	((integer)( ((STRING)pInput)[5..6]) ));
 	 
 VehicleV2.Layout_Base.Party_Base_BIP	tReformat2Bldg(dVehiclePartyBase	pInput)	:=
 transform
-	self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)ut.GetDate) - ConvertYYYYMMToNumberOfMonths((integer)pInput.orig_DOB) > 180, pInput.orig_DOB ,'');
-	self.Date_First_Seen					:=	(unsigned3)pInput.Date_First_Seen[1..6];
-	self.Date_Last_Seen						:=	(unsigned3)pInput.Date_Last_Seen[1..6];
-	self.Date_Vendor_First_Reported			:=	(unsigned3)pInput.Date_Vendor_First_Reported[1..6];
-	self.Date_Vendor_Last_Reported			:=	(unsigned3)pInput.Date_Vendor_Last_Reported[1..6];
+	self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)Std.Date.Today()) - ConvertYYYYMMToNumberOfMonths((integer)pInput.orig_DOB) > 180, pInput.orig_DOB ,'');
+	self.Date_First_Seen					:=	(unsigned3)((STRING)pInput.Date_First_Seen)[1..6];
+	self.Date_Last_Seen						:=	(unsigned3)((STRING)pInput.Date_Last_Seen)[1..6];
+	self.Date_Vendor_First_Reported			:=	(unsigned3)((STRING)pInput.Date_Vendor_First_Reported)[1..6];
+	self.Date_Vendor_Last_Reported			:=	(unsigned3)((STRING)pInput.Date_Vendor_Last_Reported)[1..6];
 	self.append_clean_name.title			:=	pInput.title;                                                                                                                      
 	self.append_clean_name.fname			:=	pInput.fname;                                                                                                                      
 	self.append_clean_name.mname			:=	pInput.mname;                                                                                                                      

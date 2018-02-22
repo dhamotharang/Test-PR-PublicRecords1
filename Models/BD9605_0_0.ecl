@@ -1,4 +1,4 @@
-import ut, risk_indicators, Business_Risk, Easi, RiskWise, address;
+import ut, risk_indicators, Business_Risk, Easi, RiskWise, address, std;
 
 export BD9605_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Business_Risk.Layout_Output) biid, dataset(riskwise.Layout_BusReasons_Input) orig_input,  
 			 boolean OFAC, string tribcode='', boolean nugen=false, boolean other_watchlists = false) := FUNCTION
@@ -86,7 +86,7 @@ working_layout doModel(withCensusb le, riskwise.Layout_BusReasons_Input rt) := t
 
 	sysyear := IF(le.bs.historydate <> 999999, (integer)((string)le.bs.historydate[1..4]), (integer)(ut.GetDate[1..4]));
 	
-	today := IF(le.bs.historydate <> 999999, (string)le.bs.historydate[1..6] + '01', ut.GetDate);
+	today := IF(le.bs.historydate <> 999999, ((string)le.bs.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);	
 	
 	
@@ -283,7 +283,7 @@ working_layout doModel(withCensusb le, riskwise.Layout_BusReasons_Input rt) := t
 	phonematchcompany_flag := if(le.br.phonematchcompany = le.br.company_name, 1, 0);
 	
 	sum_bname1 := bestcompanyname_flag + cnamematch_flag + feinmatchcompany1_flag + phonematchcompany_flag;
-	sum_addr1 := ut.imin2((addrmatch_flag + feinmatchaddr1_flag + bestaddr_flag + phonematchaddr_flag), 3);
+	sum_addr1 := Min((addrmatch_flag + feinmatchaddr1_flag + bestaddr_flag + phonematchaddr_flag), 3);
 	sum_addr := if(sum_addr1 = 1, 2, sum_addr1);
 	sum_bname := if(sum_bname1 = 1, 2, sum_bname1);
 	

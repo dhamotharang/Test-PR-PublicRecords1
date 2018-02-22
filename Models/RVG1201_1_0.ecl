@@ -1,4 +1,4 @@
-import ut, riskwise, risk_indicators, riskwisefcra;
+import ut, riskwise, risk_indicators, riskwisefcra, std;
 
 export RVG1201_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut ) := FUNCTION
 
@@ -244,7 +244,7 @@ export RVG1201_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-		sysdate := models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+		sysdate := models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 		ver_src_ba_pos := Models.common.findw_cpp(ver_sources, 'BA' , '  ,', 'ie');
 

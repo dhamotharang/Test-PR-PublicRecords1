@@ -1,4 +1,4 @@
-import ut, risk_indicators, RiskWise;
+import ut, risk_indicators, RiskWise, std;
 
 export CDN604_0_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam, boolean OFAC, boolean useBillTo=false) := 
 
@@ -7,7 +7,7 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := transform
 
-	sysyear := IF(le.bill_to_out.historydate <> 999999, (integer)((string)le.bill_to_out.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	sysyear := IF(le.bill_to_out.historydate <> 999999, (integer)(((string)le.bill_to_out.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 	
 	
 	// ShipTo
@@ -107,7 +107,7 @@ Layout_ModelOut doModel(clam le) := transform
 				    
 				    
 	add1_year_first_seen1 := le.Bill_To_Out.address_verification.input_address_information.date_first_seen;
-	add1_year_first_seen := (integer)(add1_year_first_seen1[1..4]);
+	add1_year_first_seen := (integer)(((STRING)add1_year_first_seen1)[1..4]);
 	
 	lres := sysyear - add1_year_first_seen;
 	lres_years := IF(lres > 100, 0, lres);
@@ -288,7 +288,7 @@ Layout_ModelOut doModel(clam le) := transform
 
 
      add1_year_first_seen1_s := le.Ship_To_Out.address_verification.input_address_information.date_first_seen;
-	add1_year_first_seen_s := (integer)(add1_year_first_seen1_s[1..4]);
+	add1_year_first_seen_s := (integer)(((STRING)add1_year_first_seen1_s)[1..4]);
 	
 	lres_s := sysyear - add1_year_first_seen_s;
 	lres_years_s := IF(lres_s > 100, 0, lres_s);

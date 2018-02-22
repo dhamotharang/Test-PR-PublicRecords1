@@ -7,7 +7,7 @@ additional healthcare account detection
 /*2014-05-08T02:36:59Z (cecelie guyton_logs)
 sub market and other translation changes
 */
-import doxie, ut, risk_indicators;
+import doxie, ut, risk_indicators, data_services;
 
 EXPORT File_FCRA_Inquiry_Billgroups_DID() := INLINE MODULE
 
@@ -111,6 +111,6 @@ did_table := table(did_billgroups_table, {
 
 EXPORT create_file := did_table;
 
-EXPORT file := DATASET(ut.foreign_fcra_logs + 'thor20_21::out::inquiry_acclogs::fcra::Inquiry_Billgroups_DID', RECORDOF(create_file), THOR);
+EXPORT file := DATASET(Data_Services.foreign_fcra_logs + 'thor20_21::out::inquiry_acclogs::fcra::Inquiry_Billgroups_DID', RECORDOF(create_file), THOR);
 
 END;

@@ -1,4 +1,4 @@
-import Healthcare_Header_Services, Healthcare_Lookups,Healthcare_Shared,doxie,iesp,DidVille,Business_Header_SS,Healthcare_Provider_Services,Healthcare_Services,BatchServices,AutoStandardI,ut,HealthCareFacility,HealthCareProvider,Enclarity_Facility_Sanctions,std;
+﻿import Healthcare_Header_Services, Healthcare_Lookups,Healthcare_Shared,doxie,iesp,DidVille,Business_Header_SS,Healthcare_Provider_Services,Healthcare_Services,BatchServices,AutoStandardI,ut,HealthCareFacility,HealthCareProvider,Enclarity_Facility_Sanctions,std;
 
 EXPORT Transforms := MODULE
 	shared legacyLayout := doxie.ingenix_provider_module;
@@ -2922,7 +2922,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.facilitytype := allRows(facilitytype<>'')[1].facilitytype;
 		self.organizationtype := allRows(organizationtype<>'')[1].organizationtype;
 		//Handle Status
-		currentDate := (string)ut.GetDate;
+		currentDate := (string)Std.Date.Today();
 		statusDeceased := exists(allRows(status='D'));
 		statusRetired := exists(allRows(status='R'));
 		statusActive := exists(allRows(status='A')); 

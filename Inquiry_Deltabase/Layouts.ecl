@@ -133,7 +133,7 @@ EXPORT Layouts := MODULE
 	END;
 	EXPORT Input_Deltabase_Transaction_ID := RECORD
 		UNSIGNED8 Seq := 0;
-		STRING50 Transaction_ID := 0;
+		STRING50 Transaction_ID := '';
 	END;
 	
 	EXPORT Function_Descriptions := RECORD

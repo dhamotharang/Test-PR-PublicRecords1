@@ -216,7 +216,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
                                left.did != 0 and
 														   keyed(hash32((unsigned6)left.did)=right.hash32_did) and
 		                  			   keyed(left.did = right.did) and	//at build time, key contains only minors
-					                     ut.GetAgeI(right.dob) < 18,	     //check age since a few will turn 18 between builds
+					                     ut.Age(right.dob) < 18,	     //check age since a few will turn 18 between builds
 					                     strip_minors(left, right), left outer, keep(1));
 
  

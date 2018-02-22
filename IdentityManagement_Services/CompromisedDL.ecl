@@ -30,13 +30,4 @@ EXPORT CompromisedDL := MODULE
 
     END;
 
-    //This uses the watchdog best to determine what last name and SSN to use for hashing.
-    EXPORT boolean fn_CheckForMatch_ByDid(integer didVal, boolean includeDPPA = false, boolean includeGLB = false) := FUNCTION
-        ds := DATASET([{didVal}],{integer did});
-        doxie.mac_best_records(ds, did, dsBestInfo, includeDPPA, includeGLB);
-
-        RETURN fn_CheckForMatch(dsBestInfo[1].lname, dsBestInfo[1].ssn);
-
-    END;
-
 END;

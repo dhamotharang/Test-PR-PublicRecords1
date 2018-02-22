@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, ut, riskwisefcra;
+import riskwise, risk_indicators, ut, riskwisefcra, std;
 
 export RVT711_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				  boolean isCalifornia = false) :=
@@ -61,7 +61,7 @@ FUNCTION
 		liens_recent_unreleased_count    := le.bjl.liens_recent_unreleased_count;
 		liens_historical_unreleased_ct   := le.bjl.liens_historical_unreleased_count;
 		criminal_count                   := le.bjl.criminal_count;
-		archive_date 					 					 := if(le.historydate=999999, (unsigned3)ut.getDate[1..6], le.historydate);
+		archive_date 					 					 := if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 
 		add1_lres 						 					 := le.lres; //archive_date - le.address_verification.input_address_information.date_first_seen;
 																				
@@ -468,7 +468,7 @@ FUNCTION
 
 
 		_adl_EQ_first_seen_age := if(length(trim(in_dob))=8 and length(trim((string)adl_EQ_first_seen))=6, 
-									 (integer)adl_EQ_first_seen[1..4] - (integer)in_dob[1..4], 9999); 
+									 (integer)((STRING)adl_EQ_first_seen)[1..4] - (integer)((STRING)in_dob)[1..4], 9999); 
 		
 		
 		_adl_EQ_first_seen_age_i := Map(_adl_EQ_first_seen_age = 9999 => 5,

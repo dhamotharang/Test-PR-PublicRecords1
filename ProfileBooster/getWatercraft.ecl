@@ -1,4 +1,4 @@
-IMPORT Watercraft, RiskWise, ut;
+IMPORT Watercraft, RiskWise, ut, std;
 
 EXPORT getWatercraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
 
@@ -41,7 +41,7 @@ ProfileBooster.Layouts.Layout_PB_Slim_watercraft  getWCDetails(WatercraftKeys le
 														ri.history_flag ='E' => 'Expired',
 														ri.history_flag ='H' => 'Historical', 
 														'');
-	runningCurrent 				:= (string)ut.getDate[1..6] = (string)le.historyDate;
+	runningCurrent 				:= ((STRING)Std.Date.Today())[1..6] = (string)le.historyDate;
 	self.watercraftCount 	:= if(~runningCurrent, 1, if(ri.history_flag = '', 1, 0)); //this may change based on data team's answer
 	monthsAgo 						:= ut.MonthsApart((string6)le.historyDate,(string6)ri.date_first_seen);
 	self.months_first_reg := monthsAgo;

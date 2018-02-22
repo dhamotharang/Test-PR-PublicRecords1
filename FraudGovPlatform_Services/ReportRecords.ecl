@@ -17,11 +17,11 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		END;
 
 		SHARED all_knownfrauds_slimmed := TABLE(all_knownfrauds, knownfraud_temp_rec);
-		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, TRANSFORM(iesp.fraudgovplatform.t_FraudGovKnownRisk,
+		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, TRANSFORM(iesp.fraudgovreport.t_FraudGovKnownRisk,
 																																					SELF.KnownRiskCount := LEFT.KnownRiskCount,
 																																					SELF.KnownRiskReasons := CHOOSEN(LEFT.KnownRiskReasons, MaxKnownFrauds)));
 
-    iesp.fraudgovplatform.t_FraudGovRecord xform_response() := TRANSFORM
+    iesp.fraudgovreport.t_FraudGovRecord xform_response() := TRANSFORM
       SELF.RiskScore := ds_batch[1].risk_score;
       SELF.RiskLevel := ds_batch[1].risk_level;
       SELF.IdentityResolved := ds_batch[1].identity_resolved;

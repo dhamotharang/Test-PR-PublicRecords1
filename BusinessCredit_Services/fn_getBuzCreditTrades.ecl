@@ -5,7 +5,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs
 														  ) := MODULE
 
-	SHARED todaysDate := ut.GetDate;
+	SHARED todaysDate := (STRING8)Std.Date.Today();
   // calculate the date one year  
   SHARED unsigned_DateOneYearAgo := (unsigned)todaysDate - 10000;
   

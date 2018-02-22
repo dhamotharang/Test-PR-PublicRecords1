@@ -6,9 +6,10 @@ export GenericFiles := module
  SHARED AssignDocID(STRING pGenericInFileName,
                     STRING4 pHeaderRecType,
 										INTEGER pSrc) := FUNCTION
-	 SHARED fdef(STRING pFile) := DATASET(pGenericInFileName,
-                                          RedBooks.Layouts.Vendor.Generic_in,
-								          THOR);
+										
+   fdef(STRING pFile) := DATASET(pGenericInFileName,
+                                 RedBooks.Layouts.Vendor.Generic_in,
+                                 THOR);
 	  	  
  	 _Generic_In := fdef(pGenericInFileName);
 	 _Generic := PROJECT(_Generic_in,TRANSFORM(Layouts.Vendor.Generic, self.DocID := 0; self := LEFT;));

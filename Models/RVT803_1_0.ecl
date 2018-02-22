@@ -9,7 +9,7 @@ remove references to riskview fields in boca shell which are not actually calcul
  *******************************************************************************************************
 */
 
-import riskwise, risk_indicators, ut, riskwisefcra;
+import riskwise, risk_indicators, ut, riskwisefcra, std;
 
 export RVT803_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				  boolean isCalifornia = false) :=
@@ -38,7 +38,7 @@ FUNCTION
 	
 		
 		// variables
-		archive_date 											 := if(le.historydate=999999, (unsigned3)ut.getDate[1..6], le.historydate);
+		archive_date 											 := if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
     liens_recent_unreleased_count      := le.bjl.liens_recent_unreleased_count;       		// #369    NUM OF UNRELEASED LIENS IN LAST 2 YEARS
     liens_historical_unreleased_ct     := le.bjl.liens_historical_unreleased_count;   		// #370    NUM OF UNRELEASED LIENS EVER
     liens_recent_released_count        := le.bjl.liens_recent_released_count;         		// #371    NUM OF RELEASED LIENS IN LAST 2 YEARS

@@ -1581,7 +1581,7 @@ END;
 																																																																																																							 '6: Other');
 /* ADDED TO SUPPORT S1 - S4 */
 
-	sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+	sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 	// sysdate := common.sas_date('20160503');
 	// sysdate := common.sas_date('20150501');
 	

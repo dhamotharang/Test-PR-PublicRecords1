@@ -1,4 +1,4 @@
-﻿IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, Business_Risk_BIP;
+﻿IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, Business_Risk_BIP, std;
 
 EXPORT SBOM1601_0_0 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell /*, other parameters?? */) := FUNCTION
 
@@ -713,9 +713,9 @@ source_v2 := __common__( Models.Common.findw_cpp(ver_src_list, 'V2' ,  , '') > 0
 
 source_wk := __common__( Models.Common.findw_cpp(ver_src_list, 'WK' ,  , '') > 0 ) ;
 
-sysdate := __common__( common.sas_date(if(history_date=999999 or history_date = 0, (string)ut.getdate, (string6)history_date+'01')) ) ;
+sysdate := __common__( common.sas_date(if(history_date=999999 or history_date = 0, (STRING)Std.Date.Today(), (string6)history_date+'01')) ) ;
 
-sysdate_days := __common__( common.sas_date(if((string)history_datetime[1..6]='999999' or history_datetime = 0, (string)ut.getdate, (string)history_datetime)) ) ;
+sysdate_days := __common__( common.sas_date(if(((string)history_datetime)[1..6]='999999' or history_datetime = 0, (string)Std.Date.Today(), (string)history_datetime)) ) ;
 
 _ver_src_id_br_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BR' , '  ,', 'ie') ) ;
 

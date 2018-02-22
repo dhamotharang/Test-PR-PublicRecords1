@@ -1,6 +1,6 @@
 //Epic Loan Systems custom payment score.  Note - uses 'returncode' and 'pay_frequency' fields from the customer file as variables.
 
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVC1210_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE, STRING retcode, STRING payfreq ) := FUNCTION
 
@@ -208,7 +208,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 	(source[1..length(target)+1] = target + delim) OR
 	(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 iv_add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
 

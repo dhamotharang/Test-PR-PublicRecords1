@@ -1,7 +1,9 @@
+import std;
+
 integer find_year(integer days1) := ((INTEGER)(days1 / 365.25)) + 1900;
 integer MonthsDays(integer days2) := ROUNDUP(days2 - ((find_year(days2) - 1901) * 365.25 + 365));
 
-integer months(integer days3) := if(~leapYear(find_year(days3)),
+integer months(integer days3) := if(~Std.Date.IsLeapYear(find_year(days3)),
 which(MonthsDays(days3)<32,MonthsDays(days3)<60,MonthsDays(days3)<91,MonthsDays(days3)<121,
 		MonthsDays(days3)<152,MonthsDays(days3)<182,MonthsDays(days3)<213,MonthsDays(days3)<244,
 		MonthsDays(days3)<274,MonthsDays(days3)<305,MonthsDays(days3)<335 ,true),
@@ -10,7 +12,7 @@ which(MonthsDays(days3)<32,MonthsDays(days3)<61,MonthsDays(days3)<92,MonthsDays(
 		MonthsDays(days3)<275,MonthsDays(days3)<306,MonthsDays(days3)<336 ,true));
 
 
-integer days_in(integer days4) := monthsDays(days4) - if(leapYear(find_year(days4)) and months(days4)>2,1,0) -
+integer days_in(integer days4) := monthsDays(days4) - if(Std.Date.IsLeapYear(find_year(days4)) and months(days4)>2,1,0) -
  map(months(days4)=1=>0,
 	 months(days4)=2=>31,
 	 months(days4)=3=>59,

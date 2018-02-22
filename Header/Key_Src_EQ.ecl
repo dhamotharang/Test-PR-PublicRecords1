@@ -1,4 +1,4 @@
-import ut,eq_hist;
+import ut,eq_hist, data_services;
 
 src_rec:=header.layout_header_in;
 
@@ -14,7 +14,7 @@ EQ_as_source := if(pCombo,pDataset
 
 mac_key_src(EQ_as_source,header.layout_eq_src, 
 						eq_child, 
-						ut.Data_Location.Person_header+'thor_data400::key::eq_src_index'+if(pCombo,'',SF_suffix(pFastHeader))+'_',id)
+						Data_Services.Data_location.person_header+'thor_data400::key::eq_src_index'+if(pCombo,'',SF_suffix(pFastHeader))+'_',id)
 						
 return id;
 end;

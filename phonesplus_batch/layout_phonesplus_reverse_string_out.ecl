@@ -39,7 +39,7 @@ export layout_phonesplus_reverse_string_out := record
 		string2    TargusType := '';
 		string1    confirmed_flag := '';
 	  string3    ConfidenceScore;
-    string5    cell_type := 1; 
+    string5    cell_type := '1'; 
     string30   new_type := '';
     string120  listed_name_targus; 
    	string4    timezone;

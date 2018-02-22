@@ -1,4 +1,4 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build;
+import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, std;
 
 head := doxie_build.file_header_building; 
 
@@ -169,7 +169,7 @@ TRANSFORM
 									ri.name_first, ri.name_middle, ri.name_last));
 	SELF.TNT := MAP(ri.did != 0 AND le.TNT = 'C' => 'B',
 				 le.TNT = 'C' => 'C',
-				 ri.did != 0 AND ut.DaysApart(le.dt_last_seen+'00', ut.GetDate) < 31*6 => 'P',
+				 ri.did != 0 AND ut.DaysApart(le.dt_last_seen+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P',
 				 le.TNT);
 	SELF := le;
 END;
@@ -187,7 +187,7 @@ TRANSFORM
 	SELF.TNT := MAP(le.TNT = 'B' => 'B',
 				 ri.hhid != 0 AND le.TNT = 'C' => 'V',
 				 le.TNT = 'C' => 'C',
-				 ri.hhid != 0 AND ut.DaysApart(le.dt_last_seen+'00', ut.GetDate) < 31*6 => 'P',
+				 ri.hhid != 0 AND ut.DaysApart(le.dt_last_seen+'00', (STRING8)Std.Date.Today()) < 31*6 => 'P',
 				 le.TNT = 'P' => 'P',
 				 ri.hhid != 0 => 'R',
 				 le.TNT);
@@ -199,7 +199,7 @@ with_gong := JOIN(DISTRIBUTE(gongByDID(hhid != 0), HASH(hhid)),
 
 xxHead_Layout keepBestTNT(xxHead_Layout le, xxHead_Layout ri) :=
 TRANSFORM
-	SELF.dod := IF(le.dod = 0, ri.dod, ut.max2(le.dod, ri.dod));
+	SELF.dod := IF(le.dod = 0, ri.dod, max(le.dod, ri.dod));
 	SELF.death_code := IF(le.dod = 0, ri.death_code,
 						IF(le.dod >= ri.dod, le.death_code, ri.death_code));	
 	SELF.listed_name := IF(le.listed_phone != '', le.listed_name, ri.listed_name);

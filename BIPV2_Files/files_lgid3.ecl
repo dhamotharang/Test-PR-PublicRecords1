@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+IMPORT BIPV2, Data_Services;
 EXPORT files_lgid3 := MODULE
 	/*----------------- Reduced layout for internal use only -----------------*/
 	EXPORT Layout_LGID3 := RECORD
@@ -71,10 +71,10 @@ EXPORT files_lgid3 := MODULE
 	EXPORT DS_GRANDFATHER		:= DATASET(FILE_GRANDFATHER, BIPV2.CommonBase.Layout, THOR, OPT);
 	
 	IMPORT ut;
-	SHARED FILE_BASE_PROD		:= ut.foreign_prod+FILE_BASE[2..];
+	SHARED FILE_BASE_PROD		:= Data_Services.foreign_prod+FILE_BASE[2..];
 	EXPORT DS_BASE_PROD			:= DATASET(FILE_BASE_PROD, BIPV2.CommonBase.Layout_Static, THOR, OPT);
 	
-	SHARED FILE_BUILDING_PROD		:= ut.foreign_prod+FILE_BUILDING[2..];
+	SHARED FILE_BUILDING_PROD		:= Data_Services.foreign_prod+FILE_BUILDING[2..];
 	EXPORT DS_BUILDING_PROD			:= DATASET(FILE_BUILDING_PROD, BIPV2.CommonBase.Layout_Static, THOR, OPT);
 	
 	/*----------------- LGID3 - SALT Files ------------------------------------------ */

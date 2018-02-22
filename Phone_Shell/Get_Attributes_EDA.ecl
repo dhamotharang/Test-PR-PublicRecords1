@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  *        This function gathers the EDA_Characteristics attributes.	      *
  ************************************************************************ */
 
@@ -101,7 +101,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Address_Match_Best := IF(TRIM(ri.prim_range) = TRIM(bestPrimRange) AND TRIM(ri.prim_name) = TRIM(bestPrimName) AND
 																											 TRIM(ri.suffix) = TRIM(bestSuffix) AND TRIM(ri.p_city_name) = TRIM(bestCity) AND TRIM(ri.st) = TRIM(bestState) AND
 																											 TRIM(ri.z5) = TRIM(bestZip[1..5]), TRUE, FALSE);
-		monthsLast := ut.monthsApart_YYYYMMDD(todays_date, ri.dt_last_seen, TRUE);
+		monthsLast := Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen);
 		SELF.EDA_Characteristics.EDA_Months_Addr_Last_Seen := IF(TRIM(ri.prim_range) = TRIM(le.Clean_Input.Prim_Range) AND TRIM(ri.prim_name) = TRIM(le.Clean_Input.Prim_Name) AND
 																											 TRIM(ri.suffix) = TRIM(le.Clean_Input.Addr_Suffix) AND TRIM(ri.p_city_name) = TRIM(le.Clean_Input.City) AND TRIM(ri.st) = TRIM(le.Clean_Input.State) AND
 																											 TRIM(ri.z5) = TRIM(le.Clean_Input.Zip5), monthsLast, 0); // Take the MIN in the rollup below
@@ -184,7 +184,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Has_Cur_Discon_180_Days := IF(daysConnected >= 0 AND daysConnected <= 180, TRUE, FALSE);
 		SELF.EDA_Characteristics.EDA_Has_Cur_Discon_360_Days := IF(daysConnected >= 0 AND daysConnected <= 360, TRUE, FALSE);
 		SELF.EDA_Characteristics.EDA_Days_Phone_First_Seen := days; // Take the MAX in the rollup below
-		monthsLast := ut.monthsApart_YYYYMMDD(todays_date, ri.dt_last_seen, TRUE);
+		monthsLast := Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen);
 		SELF.EDA_Characteristics.EDA_Months_Addr_Last_Seen := IF(TRIM(ri.prim_range) = TRIM(le.Clean_Input.Prim_Range) AND TRIM(ri.prim_name) = TRIM(le.Clean_Input.Prim_Name) AND
 																											 TRIM(ri.suffix) = TRIM(le.Clean_Input.Addr_Suffix) AND TRIM(ri.p_city_name) = TRIM(le.Clean_Input.City) AND TRIM(ri.st) = TRIM(le.Clean_Input.State) AND
 																											 TRIM(ri.z5) = TRIM(le.Clean_Input.Zip5), monthsLast, 0); // Take the MIN in the rollup below

@@ -75,13 +75,15 @@
 /*--INFO-- InView Business Report */	
 	
 export InViewReportService := MACRO
+#onwarning(4207, ignore);
+
 #option ('globalAutoHoist', false);
 #option ('spotCSE', false);
-#stored('useSupergroup',true)
+#stored('useSupergroup',true);
 #stored('useLevels',true);
-#stored('isDayBR',true) 
-#stored('IncludeMultipleSecured',true)
-#stored('ReturnRolledDebtors',true)
+#stored('isDayBR',true); 
+#stored('IncludeMultipleSecured',true);
+#stored('ReturnRolledDebtors',true);
 #constant('ExcludeBlankAddresses', true);
 #constant('IncludeParentCompany', false);
 #constant('SSNMask', 'ALL');

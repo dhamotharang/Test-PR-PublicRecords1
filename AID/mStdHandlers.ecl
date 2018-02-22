@@ -1,9 +1,9 @@
 export mStdHandlers
  :=
   module
-		import lib_StringLib, lib_FileServices, ut, lib_ThorLib;
+		import lib_StringLib, lib_FileServices, ut, lib_ThorLib, std;
 
-		shared	lCurrentDate	:=	ut.GetDate : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+		shared	lCurrentDate	:=	(STRING8)Std.Date.Today() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
 
 		/**************************************************************************************
 		 ** Append Std Cache record from records in RawCache with StdAID

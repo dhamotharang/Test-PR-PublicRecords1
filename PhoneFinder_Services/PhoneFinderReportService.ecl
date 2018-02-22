@@ -181,7 +181,6 @@ MACRO
 		                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate,
 		                                                                                                  PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];
 		EXPORT BOOLEAN   UseTargus          		:= ~doxie.DataRestriction.PhoneFinderTargus and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
-		EXPORT BOOLEAN   UseMetronet         		:= FALSE;
 		EXPORT BOOLEAN   UseEquifax         		:= ~doxie.DataRestriction.EquifaxPhoneMart and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
 		EXPORT BOOLEAN   useWaterfallv6					:= FALSE : STORED('useWaterfallv6');	// internal
 		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 

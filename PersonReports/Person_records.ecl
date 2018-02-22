@@ -74,7 +74,7 @@ all_dids_pre :=  if(IsFCRA ,all_dids_pre_fcra ,all_dids_pre_reg );
 dids_owners := dedup (sort (all_dids_pre, did, ~is_subject), did);
 
 doxie_crs.layout_deathfile_records GetDeadRecords (rec_did_owner L, doxie.key_death_masterV2_ssa_DID R) := transform
-  self.age_at_death := ut.GetAgeI_asOf((unsigned8)R.dob8,(unsigned8)R.dod8);
+  self.age_at_death := ut.Age((unsigned8)R.dob8,(unsigned8)R.dod8);
   self.did := (string)((integer)(R.did));
   self := R;
 end;

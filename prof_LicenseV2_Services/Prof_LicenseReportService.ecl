@@ -46,7 +46,7 @@ export Prof_LicenseReportService := MACRO
 		shared is_prov := incl_prov0 and (first_two = 'PR' or did_value<> 0 or license_number <> '');
 		shared is_prof := incl_prof_lic0 and (first_two = 'PL' or did_value<> 0 or bdid_value <> 0 or license_number <> '');
 		export set of unsigned6 	Sanc_id_set := if(is_sanc,[unique_id_num],[]);
-		export unsigned6  ProviderId := if(is_sanc and unique_id_num > 100000000,(integer)(unique_id_num[1..(length((string)unique_id_num)-3)]),unique_id_num);
+		export unsigned6  ProviderId := if(is_sanc and unique_id_num > 100000000,(integer)(((STRING)unique_id_num)[1..(length((string)unique_id_num)-3)]),unique_id_num);
 		export unsigned6  prolic_seq_num := if(is_prof,unique_id_num,0);
 		export boolean include_prof_lic := is_prof;
 		export boolean include_sanc := is_sanc or incl_sanc0;

@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, lib_date;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, lib_date, std;
 
 export FP3905_1_0(dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -140,7 +140,7 @@ end;
 	wealth_index                     := (integer)le.wealth_indicator;
 	inferred_dob                     := le.reported_dob;
 	archive_date                     := if(le.historydate=risk_indicators.iid_constants.default_history_date, 
-																						(unsigned)ut.GetDate, 
+																						(unsigned)Std.Date.Today(), 
 																						(unsigned)risk_indicators.iid_constants.full_history_date(le.historydate) );
 	c_child                          := rt.child;
 	c_fammar_p                       := rt.fammar_p;
@@ -351,7 +351,7 @@ adls_per_phone_c6_c_m :=  map(adls_per_phone_c6_c = 0 => 0.2946590696,
 
 
 // curr_date := (Lib_Date.DaysSince1900((integer)((string)archive_date)[1..4], (integer)((string)archive_date)[5..6], 1) - Lib_Date.DaysSince1900(1960, 1, 1));
-curr_date := (Lib_Date.DaysSince1900((integer)((string)archive_date)[1..4], (integer)((string)archive_date)[5..6], (integer)((string)archive_date[7..8])) - Lib_Date.DaysSince1900(1960, 1, 1));
+curr_date := (Lib_Date.DaysSince1900((integer)((string)archive_date)[1..4], (integer)((string)archive_date)[5..6], (integer)(((string)archive_date)[7..8])) - Lib_Date.DaysSince1900(1960, 1, 1));
 
 add1_date :=  if(length((string)add1_date_first_seen) = 6, (Lib_Date.DaysSince1900((integer)((string)add1_date_first_seen)[1..4], (integer)max((integer)((string)add1_date_first_seen)[5..6], 1), 1) - Lib_Date.DaysSince1900(1960, 1, 1)), NULL);
 
@@ -365,7 +365,7 @@ av_yrs_since_seen1_2 :=  if(add1_date=null, 1, av_yrs_since_seen1);
 
 av_yrs_since_seen1_rt := sqrt(av_yrs_since_seen1_2);
 
-infer_date :=  Lib_Date.DaysSince1900((integer)((string)inferred_dob)[1..4], (integer)max((integer)((string)inferred_dob)[5..6], 1), (integer)((string)inferred_dob[7..8])) - Lib_Date.DaysSince1900(1960, 1, 1);
+infer_date :=  Lib_Date.DaysSince1900((integer)((string)inferred_dob)[1..4], (integer)max((integer)((string)inferred_dob)[5..6], 1), (integer)(((string)inferred_dob)[7..8])) - Lib_Date.DaysSince1900(1960, 1, 1);
 
 dob := Lib_Date.DaysSince1900((integer)in_dob[1..4], max((integer)in_dob[5..6], 1), (integer)in_dob[7..8]) - Lib_Date.DaysSince1900(1960, 1, 1);
 

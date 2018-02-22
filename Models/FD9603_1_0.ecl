@@ -1,4 +1,4 @@
-import risk_indicators, ut;
+import risk_indicators, ut, std;
 
 export FD9603_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC=true) :=
 
@@ -26,8 +26,8 @@ Models.Layout_ModelOut tweak_score(fd3510 le, clam rt) := transform
 	ssninval := if(~rt.ssn_verification.validation.valid, 1,0);
 	ssndead := (integer)rt.ssn_verification.validation.deceased;
 	
-	sysyear := IF(rt.historydate <> 999999, (integer)((string)rt.historydate[1..4]), (integer)(ut.GetDate[1..4]));
-	high_issue_dateyr := (integer)(rt.ssn_verification.validation.high_issue_date[1..4]);
+	sysyear := IF(rt.historydate <> 999999, (integer)(((string)rt.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
+	high_issue_dateyr := (integer)(((STRING)rt.ssn_verification.validation.high_issue_date)[1..4]);
      ssnage := sysyear - high_issue_dateyr;
 	ssnprior_fa := if(ssnage <= 16, 1,0);
 	

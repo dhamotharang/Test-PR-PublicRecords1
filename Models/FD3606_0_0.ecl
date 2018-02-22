@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, std;
 
 export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(easi.layout_census) easi_census, 
 			  boolean OFAC=true, boolean isFCRA=false, boolean inCalif=false, boolean fdReasonsWith38=false, boolean nugen=false) := FUNCTION
@@ -150,9 +150,9 @@ export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 				0	// values of 0, 1, and 2
 			);
 
-			add1_year_first_seen := (INTEGER)(add1_date_first_seen[1..4]);
+			add1_year_first_seen := (INTEGER)((STRING)add1_date_first_seen)[1..4];
 
-			sysyear := if(le.bs.historydate <> 999999, (integer)((string)le.bs.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+			sysyear := if(le.bs.historydate <> 999999, (integer)(((string)le.bs.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 
 			lres_years_a := ( sysyear - add1_year_first_seen );
 			lres_years := if( lres_years_a > 100, 0, lres_years_a );
@@ -167,7 +167,7 @@ export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 			ssndead := deceased;
 
 
-			high_issue_dateyr := (INTEGER)(high_issue_date[1..4]);
+			high_issue_dateyr := (INTEGER)(((STRING)high_issue_date)[1..4]);
 
 			ssnage := sysyear - high_issue_dateyr;
 
@@ -214,8 +214,8 @@ export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 
 		/* Bureau / Time on Bureau */
 
-			time_on_header_years    := sysyear - (INTEGER)(header_first_seen[1..4]);
-			time_since_header_years := sysyear - (INTEGER)(header_last_seen[1..4]);
+			time_on_header_years    := sysyear - (INTEGER)(((STRING)header_first_seen)[1..4]);
+			time_since_header_years := sysyear - (INTEGER)(((STRING)header_last_seen)[1..4]);
 
 			time_since_header_code := map(
 				time_since_header_years >= 14	=> 3,
@@ -275,7 +275,7 @@ export FD3606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 			dob_m   := in_dob[5..6];
 			dob_d   := in_dob[7..8];
 			
-			today := if( le.bs.historydate != 999999, (string)le.bs.historydate[1..6] + '01', ut.GetDate );
+			today := if( le.bs.historydate != 999999, ((string)le.bs.historydate)[1..6] + '01', (STRING8)Std.Date.Today() );
 			today1900 := ut.DaysSince1900( today[1..4], today[5..6], today[7..8] );
 			
 			bd1900 := if( (INTEGER)dob_m > 0 and (INTEGER)dob_d > 0,

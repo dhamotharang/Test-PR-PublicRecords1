@@ -1,5 +1,4 @@
-
-IMPORT Foreclosure_Vacancy, Property, ut;
+IMPORT Foreclosure_Vacancy, Property, ut, std;
 
 EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in) ds_xml_in = DATASET([],Foreclosure_Services.Layouts.layout_batch_in)) := 
 	FUNCTION
@@ -83,7 +82,7 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 
 		ALL_OTHER_DEED_TYPES        :=  'D';
 		
-		TODAY       := ut.GetDate;
+		TODAY       := (STRING8)Std.Date.Today();
 
 		layout_final_batch_plus := RECORD
 			Foreclosure_Services.Layouts.Final_Batch;

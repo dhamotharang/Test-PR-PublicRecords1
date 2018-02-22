@@ -81,7 +81,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	
 	
 	// new stuff for this model is below
-	verx_retail_ae := ut.imin2(verx_retail3, 6);
+	verx_retail_ae := Min(verx_retail3, 6);
 
 	verx_retail_ae_l := map(verx_retail_ae = 1 => -0.39803013,
 					    verx_retail_ae = 2 => -0.60109801,
@@ -90,7 +90,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 					    verx_retail_ae = 5 => -0.945245984,
 					    -1.324221932);
 
-	adlperssn_count_ae := ut.imin2(le.ssn_verification.adlperssn_count, 3);
+	adlperssn_count_ae := Min(le.ssn_verification.adlperssn_count, 3);
 
 
 	adlperssn_count_ae_l := map(adlperssn_count_ae = 0 => -1.333012995,
@@ -141,7 +141,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 	trd60910a := if( trd60910 > 650, trd60910-60, trd60910 ); // the override score, unbounded
 	trd60910b := if( ~override, trd60910, // when not overridden, use the already calculated score
-			ut.imin2( 650, ut.max2( 600, trd60910a ) ) ); // the override score, bound within [600,650]
+			Min( 650, Max( 600, trd60910a ) ) ); // the override score, bound within [600,650]
 
 
 	trd60911 := map(le.ssn_verification.validation.deceased and trd60910b > 625 => 625,

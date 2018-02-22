@@ -1,4 +1,4 @@
-﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
+import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
 
 doxie.MAC_Header_Field_Declare (true); // is FCRA
 // reads: dppa_ok, glb_ok, probation_override_value, no_scrub, IsFCRA, ssn_mask_value, dl_mask_value
@@ -158,7 +158,7 @@ doxie_crs.layout_best_information AppendBest (rec_header L) := transform
   _dod := dear.dt_first_deceased;
   Self.dod := if (_deceased, (qstring) _dod, '');
 	Self.deceased := if (_deceased, 'Y', 'N');
-	self.age := if ( l.dob = 0, 0, ut.GetAgeI(l.dob) );
+	self.age := if ( l.dob = 0, 0, ut.Age(l.dob) );
   Self := L;
 end;
 best_append := project (best_header, AppendBest (Left));
@@ -306,7 +306,7 @@ p_sum ssn_aggr_tra(ssn_people l, dataset(ssn_people) name_recs) := transform
   self.comment := '';
   self.likely_fragment := false;
   self.dob := max(name_recs, date_ob);
-  self.age := ut.GetAgeI(max(name_recs, date_ob));
+  self.age := ut.Age(max(name_recs, date_ob));
   self.legacy_ssn := false; //for potentially randomized SSNs defines if SSN-DID pair was seen before	
 	self.statementids := normalize(name_recs, left.statementids, transform(FFD.Layouts.StatementIdRec, self := right)),
 	self.isdisputed := exists(name_recs(isdisputed))
@@ -543,7 +543,7 @@ r := rollup( ta, left.did = right.did and left.fname=right.fname and ut.lead_con
 
 //add the age
 doxie_crs.layout_comp_names addage(rt l) := transform
-	self.age := if ( l.dob = 0, 0, ut.GetAgeI(l.dob) );
+	self.age := if ( l.dob = 0, 0, ut.Age(l.dob) );
 	self := l;
 end;
 

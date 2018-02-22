@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI,DeathV2_Services,Didville,Doxie,Doxie_Raw,Experian_Phones,Gateway,Suppress,ut;
+﻿IMPORT AutoStandardI,DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress,ut;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -16,7 +16,6 @@ FUNCTION
 	// Experian File One and Waterfall process
 	wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.ReportParams,OPT))
 		EXPORT BOOLEAN UseQSent      := FALSE;
-		EXPORT BOOLEAN UseMetronet   := FALSE;
 		EXPORT BOOLEAN UseLastResort := FALSE;
 	END;
 	
@@ -29,8 +28,11 @@ FUNCTION
 	
 	lFinal tWFIdentity(dWFPhonesFilter_ pInput) :=
 	TRANSFORM
-		SELF.acctno       := pInput.acctno;
-		SELF.did          := pInput.batch_in.did;
+		SELF.acctno        := pInput.acctno;
+		SELF.did           := pInput.batch_in.did;
+		SELF.phone         := pInput.phone; // populating phone and dates
+		SELF.dt_first_seen := pInput.dt_first_seen;
+		SELF.dt_last_seen  := pInput.dt_last_seen;
 		SELF.penalt       := 0;
 		SELF.src          := pInput.src;
 		SELF.vendor_id    := pInput.vendor_id;
@@ -40,39 +42,15 @@ FUNCTION
 	END;
 	
 	dWFPhonesFilter := PROJECT(dWFPhonesFilter_,tWFIdentity(LEFT));
+				
+	dWFDedup := DEDUP(SORT(dWFPhonesFilter,acctno,did),acctno,did);
 	
-	// Join to Experian File One
-	dExperianPhones := JOIN(dIn,
-													Experian_Phones.Key_Did_Digits,
-													KEYED(LEFT.did = RIGHT.did) and
-													KEYED(LEFT.homephone[8..10] = RIGHT.Phone_digits) and
-													RIGHT.rec_type != 'SP',
-													KEEP(1),LIMIT(0)
-													);
-	
-	lFinal tFormatExperian(dExperianPhones pInput) :=
-	TRANSFORM
-		SELF.acctno       := pInput.acctno;
-		SELF.phone        := pInput.homephone;
-		SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.ExpFileOne;
-		SELF.batch_in     := pInput;
-		SELF              := [];
-	END;
-	
-	dFormatExperianPhones := PROJECT(dExperianPhones,tFormatExperian(LEFT));
-	
-	// Append best info for waterfall and experian file one records
-	dWFExperianCombined := dWFPhonesFilter +
-													IF(ut.PermissionTools.glb.OK(inMod.GLBPurpose) and ~Doxie.DataRestriction.ExperianPhones,dFormatExperianPhones);
-	
-	dWFExperianCombinedDedup := DEDUP(SORT(dWFExperianCombined,acctno,did),acctno,did);
-	
-	dWFExperianDIDs := DEDUP(SORT(PROJECT(dWFExperianCombinedDedup,doxie.layout_references),did),did);
+	dWFDIDs := DEDUP(SORT(PROJECT(dWFDedup,doxie.layout_references),did),did);
 	
 	// Best information
-	dWFExperianBestInfo := Doxie.best_records(dWFExperianDIDs,includeDOD:=true);
+	dWFBestInfo := Doxie.best_records(dWFDIDs,includeDOD:=true);
 	
-	lFinal tAppendBestInfo(dWFExperianCombinedDedup le,dWFExperianBestInfo ri) :=
+	lFinal tAppendBestInfo(dWFDedup le,dWFBestInfo ri) :=
 	TRANSFORM
 		SELF.acctno := le.acctno;
 		SELF.phone  := le.phone;
@@ -81,22 +59,22 @@ FUNCTION
 		SELF        := le;
 	END;
 	
-	dWFExperianAppendBest := JOIN(dWFExperianCombinedDedup,
-																dWFExperianBestInfo,
+	dWFAppendBest := JOIN(dWFDedup,
+																dWFBestInfo,
 																LEFT.did = RIGHT.did,
 																tAppendBestInfo(LEFT,RIGHT),
 																LEFT OUTER,
 																LIMIT(1,SKIP));
 	
 	// Add WF/Experian records to records searched by phone only if there is a match on the phone number
-	dWFExperianOnly := JOIN(dResultsByPhone,
-													dWFExperianAppendBest,
+	dWFOnly := JOIN(dResultsByPhone,
+													dWFAppendBest,
 													LEFT.acctno = RIGHT.acctno and
 													LEFT.did    = RIGHT.did,
 													TRANSFORM(RIGHT),
 													RIGHT ONLY);
 	
-	dAll := dResultsByPhone + dWFExperianOnly;
+	dAll := dResultsByPhone + dWFOnly;
 	
 	// Append DIDs
 	dAppendDIDs := PhoneFinder_Services.Functions.AppendDIDs(dAll);
@@ -163,14 +141,7 @@ FUNCTION
 		OUTPUT(dResultsByPhone,NAMED('dResultsByPhone'));
 		OUTPUT(wfMod);
 		OUTPUT(dWaterfallPhonesByDID,NAMED('dWaterfallPhonesByDID'));
-		OUTPUT(dExperianPhones,NAMED('dExperianPhones'));
-		OUTPUT(dFormatExperianPhones,NAMED('dFormatExperianPhones'));
-		OUTPUT(dWFExperianCombined,NAMED('dWFExperianCombined'));
-		OUTPUT(dWFExperianCombinedDedup,NAMED('dWFExperianCombinedDedup'));
-		OUTPUT(dWFExperianDIDs,NAMED('dWFExperianDIDs'));
-		OUTPUT(dWFExperianBestInfo,NAMED('dWFExperianBestInfo'));
-		OUTPUT(dWFExperianAppendBest,NAMED('dWFExperianAppendBest'));
-		OUTPUT(dWFExperianOnly,NAMED('dWFExperianOnly'));
+		OUTPUT(dWFPhonesFilter,NAMED('dWFPhonesFilter'));
 		OUTPUT(dAll,NAMED('dAll'));
 		OUTPUT(dAppendDIDs,NAMED('dAppendDIDs'));
 		OUTPUT(dAppendDIDs_w_new_seq,NAMED('dAppendDIDs_w_new_seq'));

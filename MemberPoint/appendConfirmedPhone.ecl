@@ -1,4 +1,4 @@
-import progressive_phone,addrbest,STD,address;
+﻿import progressive_phone,addrbest,STD,address;
 
 EXPORT appendConfirmedPhone (dataset(MemberPoint.Layouts.BatchInter) MinorsOnly, MemberPoint.IParam.BatchParams BParams,boolean isMinor  = true) 
 																																																			:= function
@@ -58,8 +58,7 @@ EXPORT appendConfirmedPhone (dataset(MemberPoint.Layouts.BatchInter) MinorsOnly,
 		end;
 
 		dsPhones := addrbest.Progressive_phone_common( PhoneBatchIn,
-      PhoneParams,     ,     ,     ,     ,     ,     ,     ,     ,
-      BParams.Phones_Score_Model,     ,    ,    ,    ,    ,    ,    ,   ); 	
+      PhoneParams,     ,     ,     ,     ,     ,     , BParams.Phones_Score_Model); 	
 		
 			MemberPoint.Layouts.BatchOut  
 									xformMinors(MemberPoint.Layouts.BatchInter L , recordof(dsPhones) R ) := transform

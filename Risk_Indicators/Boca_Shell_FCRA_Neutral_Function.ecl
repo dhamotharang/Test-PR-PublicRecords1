@@ -886,7 +886,7 @@ suspicious_identities_realtime := if(onThor, suspicious_identities_realtime_thor
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 // if the record is default_history_date or same month as today, run production_realtime_mode
 production_realtime_mode := relative_adls[1].historydate=risk_indicators.iid_constants.default_history_date or
-	relative_adls[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);	suspicious_identities := if(production_realtime_mode, ungroup(suspicious_identities_realtime), suspicious_identities_hist);
+	relative_adls[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);	suspicious_identities := if(production_realtime_mode, ungroup(suspicious_identities_realtime), suspicious_identities_hist);
 
 relatives_with_suspcious_ids := join(idroll_slim, suspicious_identities, 
 															left.did=right.did, 

@@ -13,7 +13,7 @@ rec := record
 end;
 
 rec get_minor(slim_party l):=transform
-	age := ut.getage(l.orig_dob);
+	age := ut.Age((INTEGER)l.orig_dob);
 	self.is_minor := if(age=0 or age>=18,FALSE,TRUE);
 	self := l;
 end;

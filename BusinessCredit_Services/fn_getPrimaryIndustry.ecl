@@ -62,7 +62,7 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 	
 	slim_layout rollSICNAICSource(slim_layout L, slim_layout R) := TRANSFORM
 		SELF.dt_first_seen	:=	ut.min2((INTEGER)L.dt_first_seen ,(INTEGER)R.dt_first_seen);
-		SELF.dt_last_seen		:=	ut.max2((INTEGER)L.dt_last_seen, (INTEGER)R.dt_last_seen);
+		SELF.dt_last_seen		:=	Max((INTEGER)L.dt_last_seen, (INTEGER)R.dt_last_seen);
 		SELF.RecordCount		:=	L.RecordCount + 1;
 		SELF								:=	L;
 	END;

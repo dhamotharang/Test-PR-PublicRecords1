@@ -34,7 +34,7 @@ EXPORT PD_SBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		SELF.acct_no := HASH(le.sbfe_contributor_number, le.contract_account_number, le.account_type_reported);
 		load_datetime := ri.prod_date + ri.prod_time;
 		load_Date := MAP(le.version < Business_Risk_BIP.Constants.FirstSBFELoadDate	 																									=> (STRING)le.dt_first_seen,
-														(INTEGER)load_datetime=0 and (STRING)le.HistoryDateTime[1..6] = Business_Risk_BIP.Constants.NinesDate	=> (STRING)le.dt_first_seen,
+														(INTEGER)load_datetime=0 and ((STRING)le.HistoryDateTime)[1..6] = Business_Risk_BIP.Constants.NinesDate	=> (STRING)le.dt_first_seen,
 																																																																			load_datetime);
     SELF.load_date := load_date;
 		SELF.load_dateYYYYMMDD := load_date[1..8];

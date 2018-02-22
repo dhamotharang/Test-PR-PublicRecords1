@@ -1,4 +1,4 @@
-IMPORT iesp, doxie, phonesplus_v2, progressive_phone, risk_indicators, didville, person_models,
+﻿IMPORT iesp, doxie, phonesplus_v2, progressive_phone, risk_indicators, didville, person_models,
   ut, MDR, batchservices, NID, DeathV2_Services, Gateway, Phone_Shell, STD, AutoStandardI;
   
 
@@ -108,10 +108,8 @@ EXPORT functions := MODULE
                                   BOOLEAN type_a_with_did = FALSE,
                                   BOOLEAN useNeustar = TRUE,
                                   BOOLEAN default_sx_match_limit = FALSE,
-                                  BOOLEAN callMetronet = FALSE,
-                                  BOOLEAN isPFR = FALSE,
-                                  INTEGER metronetLimit = 0,
-																	BOOLEAN Confirmation_GoToGateway = FALSE) := FUNCTION
+                                  BOOLEAN isPFR = FALSE
+                                  ) := FUNCTION
 
     doxie.MAC_Header_Field_Declare()
     doxie.MAC_Selection_Declare()	
@@ -387,7 +385,7 @@ EXPORT functions := MODULE
       self.phpl_carrier_state := r.st;
       self.sort_order := phone_type_score(l.subj_phone_type);
       // the sort_order_internal from a Phones Plus source should only be used if the Include flag is true.  Relatives(43) should be oredered by the rank.
-      self.sort_order_internal := if ((string)l.sub_rule_number[1] = '6' and l.subj_phone_type <> '43' and ~inMod.IncludeCellFirstForPP,0,l.sort_order_internal);
+      self.sort_order_internal := if (((string)l.sub_rule_number)[1] = '6' and l.subj_phone_type <> '43' and ~inMod.IncludeCellFirstForPP,0,l.sort_order_internal);
       self := l;
     end;						
 
@@ -492,87 +490,17 @@ EXPORT functions := MODULE
     f_out_final_scored_temp := progressive_phone.phones_score_model_v1(final_matched_noScore_nogateway, 
                                                                        f_with_did, 
                                                                        GLB_Purpose, 
-                                                                       Doxie.DataRestriction.fixed_DRM);
+																																																																							Doxie.DataRestriction.fixed_DRM);
 
-    #if(MODEL_DEBUG = false)
-    // Grab the phones that we need to hit the Metronet (Experian) Gateway to get
-    metronetGateway_cfg := gateways_in(Gateway.Configuration.IsMetronet(servicename))[1];
-    metronetGatewayURL := metronetGateway_cfg.url;
- 
-		//all 3 digit phones that can be retrieved from gateway which we did not find in-house ( only one per account_no)
-		f_out_experian_phones_unfilt := IF(callMetronet and metronetGatewayURL <> '',
-                                f_out_final_scored_temp(subj_phone_type_new = MDR.sourceTools.src_Metronet_Gateway),
-                                DATASET([], Progressive_Phone.layout_experian_phones));	
-    
-		//these were not provided on input ( thus ok to retrieve )
-    f_out_experian_phones_deduphist := JOIN(f_out_experian_phones_unfilt, f_phone_in_hist, 
-                                    left.acctno = right.acctno and	left.Phone_Last3Digits = right.phone10[8..10],
-                                    TRANSFORM(Progressive_Phone.layout_experian_phones, SELF := LEFT),
-                                    LEFT ONLY);
-																		
-	  // store input phones that match the experian file that we would normally request but the customer wants to keep them long enough to 
-		// preserve the ranking of phones long enough to blank them out  
-		fakeExperianHits :=	JOIN(f_out_experian_phones_unfilt, f_phone_in_hist, 
-                                    left.acctno = right.acctno and	left.Phone_Last3Digits = right.phone10[8..10],
-                                    TRANSFORM(prog_layout.layout_exp_multiple_phones,
-																		SELF.subj_phone10 := RIGHT.phone10,
-																		SELF := LEFT,
-																		self := []));		
-																	
-    //removed if(inMod.DedupInputPhones or inMod.BlankOutDuplicatePhones check to comply with expected behavior
-		//where we donâ€™t hit the metronet gateway if the last 3 digits of the phone entered by the user exists in our in house Experian file -
-		//Experian_Phones.Key_Did_Digits - this check is done in phones_score_model_v1 above.
-    f_out_experian_phones := if(~Confirmation_GoToGateway ,f_out_experian_phones_deduphist,f_out_experian_phones_unfilt);
-    
-    // Grab all other phones
-    inhouse_phones := f_out_final_scored_temp (subj_phone_type_new <> MDR.sourceTools.src_Metronet_Gateway);
-
-
-    prog_layout.layout_exp_multiple_phones getMultipleExpPhones(Progressive_Phone.layout_experian_phones le) := transform
-      self.Phones_Last3Digits := CHOOSEN(dataset([{(le.Phone_Last3Digits)}], prog_layout.Phone_Last3Digits), iesp.Constants.MaxCountLast3Digits);
-      self := le;
-    end;
-
-    experian_mult_phones := project(f_out_experian_phones, getMultipleExpPhones(left));
-
-    f_out_gateway := if(exists(experian_mult_phones) and callMetronet,
-                        Gateway.SoapCall_Metronet(experian_mult_phones, metronetGateway_cfg));
-
-    // There might be some Metronet Phones we couldn't find (Rare, but can happen), filter those phones out
-    f_out_gateway_filtered := f_out_gateway (TRIM(subj_phone10) <> '') + if(~Confirmation_GoToGateway,fakeExperianHits);
-
-    f_out_gateway_grouped := (GROUP(SORT(f_out_gateway_filtered, acctno), acctno));
-
-    f_out_gateway_filtered_limited := IF(metronetLimit <> 0 AND callMetronet, TOPN(f_out_gateway_grouped, metronetLimit, acctno), f_out_gateway_grouped);
-
-    progressive_phone.layout_experian_phones getTelcordia(prog_layout.layout_exp_multiple_phones le, Risk_Indicators.Key_Telcordia_tpm ri) := TRANSFORM
-      // If found on Telcordia use the updated information - if not continue to use the gateway info
-      SELF.phpl_carrier_city := IF(TRIM(ri.city) <> '', ri.city, le.phpl_carrier_city);
-      SELF.phpl_carrier_state := IF(TRIM(ri.st) <> '', ri.st, le.phpl_carrier_state);
-      SELF.phpl_phone_carrier := IF(TRIM(ri.ocn) <> '', ri.ocn, le.phpl_phone_carrier);
-      SELF := le;
-    END;
-    f_out_gateway_telcordia := JOIN(f_out_gateway_filtered_limited, Risk_Indicators.Key_Telcordia_tpm, 
-                                    KEYED(LEFT.subj_phone10[1..3] = RIGHT.npa) AND 
-                                    KEYED(LEFT.subj_phone10[4..6] = RIGHT.nxx) AND
-                                    KEYED(RIGHT.tb IN [LEFT.subj_phone10[7]]), 
-                                    getTelcordia(LEFT, RIGHT), LEFT OUTER, KEEP(1), LIMIT(0));
-
-    // Combine the LN Phones with the Metronet Phones
-    f_out_combo := inhouse_phones + f_out_gateway_telcordia;
-    #else
-    inhouse_phones := f_out_final_scored_temp (subj_phone_type_new <> MDR.sourceTools.src_Metronet_Gateway);
-    f_out_combo := inhouse_phones; // When debugging is turned on skip the gateway call
-    #end
-
+        		
     #if(MODEL_DEBUG)
     layout_progressive_phone_common_plus := RECORD
       // Progressive_Phone.layout_progressive_phone_common;
       Progressive_Phone.Common.Layout_Debug_v1; // Keep the attributes around!
     END;
-    f_out_final_temp := PROJECT(f_out_combo, TRANSFORM(layout_progressive_phone_common_plus, SELF := LEFT));
+    f_out_final_temp := PROJECT(f_out_final_scored_temp, TRANSFORM(layout_progressive_phone_common_plus, SELF := LEFT));
     #else
-    f_out_final_temp := PROJECT(f_out_combo, TRANSFORM(Progressive_Phone.layout_progressive_phone_common, SELF := LEFT));
+    f_out_final_temp := PROJECT(f_out_final_scored_temp, TRANSFORM(Progressive_Phone.layout_progressive_phone_common, SELF := LEFT));
     #end
 
     // dedup now if we did skipped it earlier.
@@ -622,13 +550,9 @@ EXPORT functions := MODULE
                                 left.acctno = right.acctno and
                                 left.subj_name_dual = right.subj_name_dual,transform(LEFT),keep(1),all);
 														
-    f_out_scored_temp_2 := f_out_scored_temp_1 + f_out_final_temp(subj_phone_type_new=MDR.sourceTools.src_Metronet_Gateway);
-		f_out_scored_temp_3 := dedupHistPhones(f_phone_in_hist, f_out_scored_temp_2, inMod);
-   	f_out_scored_temp := project(f_out_scored_temp_3,transform(recordof(f_out_scored_temp_3),
-															self.subj_phone_type_new := if(left.subj_phone10='' and left.subj_phone_type_new = MDR.sourceTools.src_Metronet_Gateway,
-																														progressive_phone.Constants.input_found_inFileOne, left.subj_phone_type_new),
-																	self := left));
-    f_out_scored := TopN(group(f_out_scored_temp, acctno, all), inMod.MaxPhoneCount, 
+    f_out_scored_temp_2 := f_out_scored_temp_1 + f_out_final_temp;
+			 f_out_scored_temp_3 := dedupHistPhones(f_phone_in_hist, f_out_scored_temp_2, inMod);
+   	f_out_scored := TopN(group(f_out_scored_temp_3, acctno, all), inMod.MaxPhoneCount, 
                   acctno, -phone_score, sort_order, sort_order_internal, -subj_date_last, subj_name_dual, subj_phone10,-did, subj_date_first);
 
     #if(MODEL_DEBUG)
@@ -653,8 +577,6 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                       DATASET(iesp.share.t_StringArrayItem) f_dedup_phones = DATASET([],iesp.share.t_StringArrayItem),
                       DATASET(Gateway.Layouts.Config) Gateways_In = DATASET([], Gateway.Layouts.Config),
                       DATASET(histphones_layout) f_phone_in_hist = DATASET([], histphones_layout),
-                      BOOLEAN callMetronet = FALSE,
-                      INTEGER metronetLimit = 0,
                       UNSIGNED2 MaxNumAssociate = 0,
                       UNSIGNED2 MaxNumAssociateOther = 0,
                       UNSIGNED2 MaxNumFamilyOther = 0,
@@ -663,12 +585,11 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                       UNSIGNED2 MaxNumSpouse = 0,
                       UNSIGNED2 MaxNumSubject = 0,
                       UNSIGNED2 MaxNumNeighbor = 0,
-											STRING    modelName = '',
-											BOOLEAN Confirmation_GoToGateway = FALSE,
-											BOOLEAN UsePremiumSource_A = FALSE,
+																						STRING    modelName = '',
+																				  BOOLEAN UsePremiumSource_A = FALSE,
                       INTEGER PremiumSource_A_limit = 0,
                       v_enum version = v_enum.WFP_V8, 
-											BOOLEAN RunRelocation = FALSE) := FUNCTION
+																						BOOLEAN RunRelocation = FALSE) := FUNCTION
 
     doxie.MAC_Header_Field_Declare()
     doxie.MAC_Selection_Declare()	
@@ -688,17 +609,13 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       SELF.Prim_Name 								:= le.prim_name;
       SELF.Addr_Suffix 							:= le.suffix;
       SELF.Postdir 									:= le.postdir;
-			SELF.Unit_Desig								:= le.unit_desig;
+						SELF.Unit_Desig								:= le.unit_desig;
       SELF.Sec_Range 								:= le.sec_range;
       SELF.zip4											:= le.z4;
       SELF.Zip5 										:= le.z5;
       SELF.SSN 											:= le.ssn;
       SELF.DateOfBirth 							:= le.dob;
       SELF.HomePhone 								:= le.phoneno;
-      // the ExperianGatewayEnabled flag turns the metronet gateway on/off for individual records in a batch in 
-      // phone shell...setting it to TRUE or FALSE here based on the callMetronet flag (used for the entire batch)
-      // since ECL has no requirement as of WFP v7 to turn it on/off for individual records.
-      SELF.ExperianGatewayEnabled 	:= callMetronet;
       SELF.TransUnionGatewayEnabled := FALSE;
       SELF.TargusGatewayEnabled := FALSE;
       SELF.InsuranceGatewayEnabled := TRUE; // this is not a GW, its a key, thus it gives a slight scoring boost
@@ -728,8 +645,6 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                                             Doxie.DataPermission.permission_mask,
                                                             ,
                                                             ,
-                                                            metronetLimit,
-                                                            callMetronet,	
                                                             ,
                                                             ,
                                                             ,
@@ -743,18 +658,12 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                                             IncludePhonesFeedback, 
 																														Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
 																														BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
-																														DedupAgainstInputPhones := inMod.DedupInputPhones,
-																														Confirmation_GoToGateway := Confirmation_GoToGateway,
 																														UsePremiumSource_A := UsePremiumSource_A,
 																														RunRelocation := RunRelocation);
     
     // SCORE THE PHONES
-    //If we are hitting the Metronet/Experian GW, we purposely pass in a threshold score of 0 to ensure that all phones are returned regardless of their score and we
-    //will filter them per the Phone_Shell.Constants.Default_PhoneScore_v3 after tracking metronet royalties since we want to ensure the metronet phones get tracked even
-    //if they are not returned in the final output since the metronet GW is hit in the above Phone_Shell_Function and we need to track those hits.
-    scoreThreshold := if(callMetronet, 0, Phone_Shell.Constants.Default_PhoneScore);
-		model_results  := if(version = v_enum.CP_V3,
-															Phone_Shell.PhoneScore_cp3_v2(phones_with_attrs,scoreThreshold),
+    model_results  := if(version = v_enum.CP_V3,
+															Phone_Shell.PhoneScore_cp3_v2(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
 															Phone_Shell.PhoneScore_wf8_v2(phones_with_attrs));//v_enum.WFP_V8
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
@@ -934,15 +843,10 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       SELF.subj_phone_transient_flag := IF((BOOLEAN)le.phone_shell.Raw_Phone_Characteristics.Phone_High_Risk,'Y', 'N');
       SELF.subj_timezone_match_flag := IF((BOOLEAN)le.phone_shell.Raw_Phone_Characteristics.phone_timezone_match, 'Y', 'N');
 			
-      /* Check to see if we hit the Metronet Gateway - if so set the source to src_Metronet_Gateway.
-				 If we didn't hit the Gateway, check to see if EXP was still returned for this phone-
-			   if so, this is a Fake Metronet Gateway hit, set it to XX so that batch doesn't count it as a royalty hit.
-			   Else, check for EQUIFAX datasource*/
+			   //Check for EQUIFAX datasource
       SET OF STRING phone_shell_source_code_elems := Std.Str.SplitWords(le.phone_shell.sources.source_list,',');
-			SELF.subj_phone_type_new := MAP(le.phone_shell.Royalties.metronet_royalty > 0    => MDR.sourceTools.src_Metronet_Gateway,
-																		  'EXP' IN phone_shell_source_code_elems           => progressive_phone.Constants.input_found_inFileOne,
-																		  le.phone_shell.Royalties.efxdatamart_royalty > 0 => MDR.sourceTools.src_Equifax,
-																		 rSource.source_code);													 
+						SELF.subj_phone_type_new := IF(le.phone_shell.Royalties.efxdatamart_royalty > 0, MDR.sourceTools.src_Equifax,
+																																			rSource.source_code);													 
 																
       SELF.vendor := IF(le.phone_shell.Royalties.lastresortphones_royalty > 0, MDR.sourceTools.src_wired_Assets_Royalty, '');              
       // temp field used for filtering recs later			
@@ -992,16 +896,13 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 												
 	  phones_out1_Gr := GROUP(SORT(UNGROUP(phones_out1), acctno, -(INTEGER)phone_score, -subj_date_last, subj_phone10,-did, subj_date_first), acctno);
     phones_out1_TN := TOPN(phones_out1_Gr,inMod.MaxPhoneCount, acctno, -(INTEGER)phone_score, -subj_date_last, subj_phone10,-did, subj_date_first);
-		
-		// if we hit the metronet GW, we need to track royalties so we will do the MaxPhoneCount TOPN after royalty tracking									
-		phones_out_temp_ := IF(callMetronet, phones_out1_Gr, phones_out1_TN);
-												
+														
 		// output(phones_with_attrs,named('Function_PHONE_SHELL_RESULTS')); 
 		// output(model_results,named('Function_SCORING_RESULTS')); 
 		// output(phones_out1_Gr,named('phones_out1_Gr')); 
 		// output(phones_out1_TN,named('phones_out1_TN')); 												
 												
-		RETURN PROJECT(phones_out_temp_, progressive_phone.layout_progressive_phone_common);
+		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);
 
   END;
 

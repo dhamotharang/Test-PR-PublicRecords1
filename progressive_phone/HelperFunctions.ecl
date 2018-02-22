@@ -1,19 +1,18 @@
-IMPORT MDR,progressive_phone,Phone_Shell;
+﻿IMPORT MDR,progressive_phone,Phone_Shell;
 
 EXPORT HelperFunctions := MODULE
 
 	//Function to determine which version of WaterFall phones/ contact plus is running
-	EXPORT FN_GetVersion(STRING25 scoreModel='',boolean callMetronet=false,boolean UsePremiumSource_A=false):= FUNCTION
-	  //Note that metronet is an actual GW that we pay for each hit regardless of the phone being returned in final output or not,
+	EXPORT FN_GetVersion(STRING25 scoreModel='', boolean UsePremiumSource_A=false):= FUNCTION
+	  
 		//However, PremiumSource_A (Equifax) is a flat file (not a gateway) so we pay per phones displayed in output and not phones accessed.
 		PPC := progressive_phone.Constants;
-		CallExternalSources := callMetronet or UsePremiumSource_A;
 		Score_Model_Name := StringLib.StringToUpperCase(scoreModel);
 		// Running_Version := ENUM(UNSIGNED1,CP_V1=1,CP_V3=2,WFP_V6=3,WFP_V8=4);
-		v := MAP(Score_Model_Name IN PPC.WFP_V8_CP_V3_MODEL_NAMES and ~CallExternalSources => PPC.Running_Version.WFP_V8,
-						 Score_Model_Name IN PPC.WFP_V8_CP_V3_MODEL_NAMES and  CallExternalSources => PPC.Running_Version.CP_V3,
-						 Score_Model_Name = ''                            and ~CallExternalSources => PPC.Running_Version.WFP_V6,
-						 Score_Model_Name = ''                            and  CallExternalSources => PPC.Running_Version.CP_V1,0);
+		v := MAP(Score_Model_Name IN PPC.WFP_V8_CP_V3_MODEL_NAMES and ~UsePremiumSource_A => PPC.Running_Version.WFP_V8,
+						 Score_Model_Name IN PPC.WFP_V8_CP_V3_MODEL_NAMES and  UsePremiumSource_A => PPC.Running_Version.CP_V3,
+						 Score_Model_Name = ''                            and ~UsePremiumSource_A => PPC.Running_Version.WFP_V6,
+						 Score_Model_Name = ''                            and  UsePremiumSource_A => PPC.Running_Version.CP_V1,0);
 		RETURN v;
 	END;
 	

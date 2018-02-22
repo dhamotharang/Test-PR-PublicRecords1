@@ -7,7 +7,7 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 			SHARED Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(RECORDOF(ds_input) le) := TRANSFORM
 				SELF.Seq                 := le.Seq;
 				SELF.AcctNo              := le.AcctNo;
-				SELF.HistoryDate         := (UNSIGNED3)((STRING12)le.HistoryDate[1..6]);
+				SELF.HistoryDate         := (UNSIGNED3)(((STRING12)le.HistoryDate)[1..6]);
 				SELF.HistoryDateTime     := le.HistoryDate;
 				SELF.CompanyName         := le.CompanyName;
 				SELF.AltCompanyName      := le.AltCompanyName;

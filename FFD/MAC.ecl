@@ -30,26 +30,42 @@
 		__outrec := ROW ({__results, __statements}, %__res_layout%);		
 	ENDMACRO;
 	
-	EXPORT ApplyConsumerAlertsBatch(__inf, __outf, __alert_flags, __lout) := MACRO		
-		#uniquename(xf_apply_alerts);
-		__lout %xf_apply_alerts%( RECORDOF(__inf) l, FFD.Layouts.ConsumerFlagsBatch r ) := 
+	EXPORT ApplyConsumerAlertsBatch(__inf, __alert_flags, __statementids, __lout, LexidField='') := FUNCTIONMACRO		
+
+		__lout xf_apply_alerts( RECORDOF(__inf) l, FFD.Layouts.ConsumerFlagsBatch r ) := 
 		TRANSFORM, SKIP(r.suppress_records)																				 
 			SELF.acctno := IF((UNSIGNED)l.acctno <> 0, l.acctno, r.acctno);
+			// in batch we filter consumer statements to keep only referencing actual results. Person context may contain more record level statements than what is returned. Alert flag is set only if statements are returned
+			SELF.alert_cnsmr_statement := IF(r.has_consumer_statement OR EXISTS(l.__statementids(RecordType IN FFD.Constants.RecordType.StatementRecordLevel)), FFD.Constants.subject_has_alert, '');
 			SELF := r.consumer_flags;
+			 #if(#TEXT(LexidField)<>'')
+					SELF.LexidField	:= IF((UNSIGNED)l.LexidField <> 0, l.LexidField, r.UniqueID); 
+				#end
 			SELF := l;
 		END;			
-		#uniquename(__res_ftr);
-		%__res_ftr% := JOIN(__inf, __alert_flags,
+
+		__res_ftr := JOIN(__inf, __alert_flags,
+			#if(#TEXT(LexidField)<>'')
+					(UNSIGNED) LEFT.LexidField	= (UNSIGNED) RIGHT.UniqueID  AND 
+				#end
 				LEFT.acctno = RIGHT.acctno, 
-				%xf_apply_alerts%(LEFT, RIGHT), 
+				xf_apply_alerts(LEFT, RIGHT), 
 				FULL OUTER, LIMIT(0));
     
     // now we add single record per account for all cases where we had to skip all records due to suppression
-		__outf := PROJECT( __alert_flags(suppress_records),
-				TRANSFORM(__lout, SELF.acctno:=LEFT.acctno, SELF := LEFT.consumer_flags, SELF :=[]) // put alert flags here
-				) + %__res_ftr%;
+		__rec_suppr := PROJECT( __alert_flags(suppress_records),
+				TRANSFORM(__lout, SELF.acctno:=LEFT.acctno, 
+			 #if(#TEXT(LexidField)<>'')
+					SELF.LexidField	:= LEFT.UniqueID, 
+				#end
+				SELF.alert_cnsmr_statement := IF(LEFT.has_consumer_statement, FFD.Constants.subject_has_alert, ''),
+				SELF := LEFT.consumer_flags,  // put other alert flags here
+				SELF :=[]) 
+				); 
+				
+		__outf := __rec_suppr + __res_ftr;
+				
+		RETURN __outf;
 	ENDMACRO;
 
-	
-	
 END;

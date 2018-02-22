@@ -1,4 +1,4 @@
-﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data;
+﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data, std;
 
 EXPORT phone_noreconn_records(phone_noreconn_param.searchParams inMod) := module
 																																							
@@ -91,7 +91,7 @@ doxie.layout_pp_raw_common gong2Pretty(gong_recs le) := TRANSFORM
 	SELF.caption_text := le.caption_text;
 	SELF.bdid := le.bdid;
 	SELF.dt_first_seen := le.dt_first_seen;
-	SELF.dt_last_seen := ut.GetDate;
+	SELF.dt_last_seen := (STRING8)Std.Date.Today();
 	SELF.TNT := 'V';
 	self.ConfidenceScore := 30;
 	self.Activeflag := 'Y';

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="JudgmentsAndLiens_BatchServiceFCRA">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -16,6 +16,7 @@
 	<part name="NonSubjectSuppression" type="xsd:unsignedInt" default="2"/> <!-- [1,2,3] -->
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<part name="FFDOptionsMask" type="xsd:string"/>
+	<part name="FCRAPurpose" type="xsd:string"/>
 
 </message>
 */
@@ -34,6 +35,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		
 		// FFD				 
 		INTEGER8 inFFDOptionsMask := FFD.FFDMask.Get();				
+		INTEGER inFCRAPurpose := FCRA.FCRAPurpose.Get();				
 	
 		BOOLEAN isFCRA := TRUE;		
 		gw_config := Gateway.Configuration.Get();
@@ -75,6 +77,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 			EXPORT INTEGER1 non_subject_suppression 					:= nss;
 			EXPORT applicationType 														:= AutoStandardI.InterfaceTranslator.application_type_val.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
 			EXPORT INTEGER8 FFDOptionsMask 								    := inFFDOptionsMask;
+			EXPORT INTEGER  FCRAPurpose    								    := inFCRAPurpose;
 		END;
 		
 		BatchShare.MAC_SequenceInput(ds_xml_in, ds_batch_in);
@@ -85,11 +88,15 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		//FCRA FFD 
 		dids := PROJECT(ds_batch_did, FFD.Layouts.DidBatch); 
 
-		pc_recs := IF(isFCRA, FFD.FetchPersonContext(dids, gw_config, FFD.Constants.DataGroupSet.Liens));
+		pc_recs := IF(isFCRA, FFD.FetchPersonContext(dids, gw_config, FFD.Constants.DataGroupSet.Liens, inFFDOptionsMask));
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 		
+		// overrides for FCRA
+		ds_best  := project(ds_batch_did,transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
+		ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs)); //this is for more than one person
+
 		// Search for J&L records by party.
-		ds_batch_out := LiensV2_Services.Batch_records(ds_batch_did, jl_batch_params, isFCRA, slim_pc_recs);
+		ds_batch_out := LiensV2_Services.Batch_records(ds_batch_did, jl_batch_params, isFCRA, slim_pc_recs, ds_flags);
 		
 		// Restore original acctno and format to output layout.	
 		BatchShare.MAC_RestoreAcctno(ds_batch_in, ds_batch_out, ds_batch_ready);
@@ -97,19 +104,24 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		
 		ds_JL_recs_flat_pre := PROJECT(ds_batch_ready, LiensV2_Services.fcra_batch_make_flat(LEFT,COUNTER));
 				
-		ds_statements := NORMALIZE (ds_JL_recs_flat_pre, LEFT.statements, 
+	  alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs_ready, inFCRAPurpose, inFFDOptionsMask);
+	  ds_JL_recs_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_JL_recs_flat_pre, alert_flags, statements, LiensV2_Services.Batch_Layouts.fcra_batch_out_pre);
+
+		ds_statements := NORMALIZE (ds_JL_recs_flat_with_alerts, LEFT.statements, 
 			TRANSFORM (FFD.Layouts.ConsumerStatementBatch, SELF := RIGHT));
 			
 		// consumer statements dataset contains information about disputed records as well as Statements.
-		ds_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs_ready, inFFDOptionsMask);
+		consumer_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs_ready, inFFDOptionsMask);
+    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs_ready);                                               
+    consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 		
-		ds_JL_recs_flat := PROJECT(ds_JL_recs_flat_pre,LiensV2_Services.Batch_Layouts.fcra_batch_out);
+		ds_JL_recs_flat := PROJECT(ds_JL_recs_flat_with_alerts,LiensV2_Services.Batch_Layouts.fcra_batch_out);
 				
 		pre_result := SORT(ds_JL_recs_flat, acctno, penalt, -orig_filing_date, -release_Date, filing_jurisdiction, orig_filing_number);
 		
 		ut.mac_TrimFields(pre_result, 'pre_result', result);
 		
 		OUTPUT(result, NAMED('Results'));
-		OUTPUT(ds_statements_prep, NAMED('CSDResults'));
+		OUTPUT(consumer_statements_alerts, NAMED('CSDResults'));
 		
 ENDMACRO;	

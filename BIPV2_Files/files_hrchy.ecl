@@ -1,4 +1,4 @@
-import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, ut,tools;
+import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, ut,tools, Data_Services;
 
 
 EXPORT files_HRCHY := module
@@ -233,8 +233,8 @@ shared headrec2 := RECORD
 
 
 	// index (perhaps temporary) for proxids that need hrchy patching between data builds
-	new := dataset( ut.foreign_prod+'thor_data400::bipv2_hrchy::base::20130330::data',headrec2, thor);
-	old := dataset( ut.foreign_prod+'thor_data400::bipv2_hrchy::base::20130212::datab',headrec2, thor);
+	new := dataset( Data_Services.foreign_prod+'thor_data400::bipv2_hrchy::base::20130330::data',headrec2, thor);
+	old := dataset( Data_Services.foreign_prod+'thor_data400::bipv2_hrchy::base::20130212::datab',headrec2, thor);
 
 	newd := dedup(new, proxid, all);
 	oldd := dedup(old, proxid, all);

@@ -1,4 +1,4 @@
-﻿import iesp, AutoStandardI, ut, doxie, suppress,American_student_list,American_student_services, standard,codes,risk_indicators,American_Student_Services,lib_stringlib;
+﻿import iesp, AutoStandardI, ut, doxie, suppress,American_student_list,American_student_services, standard,codes,risk_indicators,American_Student_Services,lib_stringlib, std;
 
 export Functions := MODULE
 
@@ -79,7 +79,7 @@ export Functions := MODULE
 	END;
 	
 	Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-		now		:= ut.GetDate;
+		now		:= (STRING8)Std.Date.Today();
 		high	:= (unsigned)now[1..4] + delta;
 		test	:= yy + ((unsigned)now[1..2]*100);
 		yyyy	:= if(test<=high, test, test-100);
@@ -181,7 +181,7 @@ export Functions := MODULE
 	 
 	 // this isnt' in prod repository yet..  ut.date_yy_to_YYYY, so i'll just use it locally for now 
 	Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-		now		:= ut.GetDate;
+		now		:= (STRING8)Std.Date.Today();
 		high	:= (unsigned)now[1..4] + delta;
 		test	:= yy + ((unsigned)now[1..2]*100);
 		yyyy	:= if(test<=high, test, test-100);
@@ -203,7 +203,7 @@ export Functions := MODULE
 	 highSchool_info xform_hs_info(highRecs L) := transform
 		self.attended_hs := 'Y';
 		self.highschool_year := (string) Date_YY_to_YYYY((integer)L.class); 
-		self.yearsSinceHighSchool := (string)ut.GetAge((string)self.highschool_year +'0601');
+		self.yearsSinceHighSchool := (string)ut.Age((INTEGER)((string)self.highschool_year +'0601'));
 		self := L;
 		self := [];
 	 end;
@@ -405,7 +405,7 @@ EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 	                        American_Student_Services.IParam.reportParams aInputData, boolean onlyCurrent = true) := FUNCTION		
 														 // this isnt' in prod repository yet..  ut.date_yy_to_YYYY, so i'll just use it locally for now 
 	  Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-		  now		:= ut.GetDate;
+		  now		:= (STRING8)Std.Date.Today();
 		  high	:= (unsigned)now[1..4] + delta;
 		  test	:= yy + ((unsigned)now[1..2]*100);
 		  yyyy	:= if(test<=high, test, test-100);

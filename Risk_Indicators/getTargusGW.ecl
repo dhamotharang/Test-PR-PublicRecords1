@@ -1,4 +1,4 @@
-import targus, address, riskwise, ut, gateway,Phones;
+import targus, address, riskwise, ut, gateway,Phones, std;
 
 export getTargusGW(DATASET(Layout_Input) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb) := function
 
@@ -43,7 +43,7 @@ riskwise.Layout_Dirs_Phone tran(indata le, gateway_result rt) := transform
 
 	history_mode := le.historydate<>risk_indicators.iid_constants.default_history_date and le.historydate<>0;
 	history_date := risk_indicators.iid_constants.MonthRollback((STRING6)le.historydate, 1); // last/first seen is history date minus 1 month so it won't be filtered
-	effective_date := if(history_mode, (STRING6)history_date+'01', ut.GetDate);
+	effective_date := if(history_mode, (STRING6)history_date+'01', (STRING8)Std.Date.Today());
 	
 	self.targusgatewayused := if(rt.response.header.queryid!='',true, skip);
 	self.targustype := if(hitPDE,Phones.Constants.TargusType.PhoneDataExpress, Phones.Constants.TargusType.NameVerification); 

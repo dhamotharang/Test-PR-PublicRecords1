@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut;
+import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVP1503_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -31,7 +31,7 @@ export RVP1503_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := 
 
 NULL := -999999999;
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 bureau_adl_eq_fseen_pos := Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E');
 

@@ -1,4 +1,4 @@
-import AutoKeyI, ut;
+﻿import AutoKeyI, ut, std;
 
 export STR_Constants := 
 MODULE
@@ -13,7 +13,7 @@ MODULE
 		EXPORT INTEGER   MAXRESULTS_PER_ACCT	:= 50;
     EXPORT INTEGER	 NAME_MATCH_THRESHOLD := 2; // 0-100%, 1-90%, 2-80%	
 		EXPORT UNSIGNED2 SHORT_TERM_THRESHOLD	:= 180; // days
-		EXPORT INTEGER 	 THRESHOLD_FOR_CURRENT_RESIDENCY	:= ((INTEGER)ut.GetDate DIV 100 - 100); // 1 year 
+		EXPORT INTEGER 	 THRESHOLD_FOR_CURRENT_RESIDENCY	:= (Std.Date.Today() DIV 100 - 100); // 1 year 
 	
 	END;
 

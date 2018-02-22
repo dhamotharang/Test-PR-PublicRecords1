@@ -1,4 +1,5 @@
-﻿import ut,MDR;
+﻿import ut, MDR, std;
+
 EXPORT Constants := MODULE
 	
 	EXPORT PROPERTY_MAX_RESULTS_PER_ACCT 	:= 20;
@@ -113,7 +114,7 @@ EXPORT Constants := MODULE
 		
 	END;
 	export Residents := Module
-		export integer TODAY_YYYYMM 								:= (INTEGER)ut.GetDate DIV 100;
+		export integer TODAY_YYYYMM 								:= Std.Date.Today() DIV 100;
 		export integer ONE_YEAR     								:= 100;
 		export ThresholdDateForCurrentResidency := (TODAY_YYYYMM - (ONE_YEAR * 10));
 	END;
@@ -167,12 +168,7 @@ EXPORT Constants := MODULE
 		
 	END;
 	
-	EXPORT ProgressivePhone :=
-	MODULE
-		EXPORT DefaultMetronetScoreThreshold := 632;
-	END;
-
-  EXPORT TRISv3 := MODULE
+	EXPORT TRISv3 := MODULE
 
 		EXPORT Correctional_Institution := '9223';
 		EXPORT Data_Type_1 := '1';

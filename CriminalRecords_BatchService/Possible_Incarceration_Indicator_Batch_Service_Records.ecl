@@ -1,4 +1,4 @@
-IMPORT CriminalRecords_Services, Autokey_batch, Address, doxie, FCRA, FFD;
+﻿IMPORT CriminalRecords_Services, Autokey_batch, Address, doxie, FCRA, FFD;
 
 Layout_PII_In := CriminalRecords_BatchService.Layouts.batch_pii_in;
 Layout_PII_Out := CriminalRecords_BatchService.Layouts.batch_pii_out;
@@ -48,7 +48,6 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	
 	// overrides for FCRA
 	ds_best  := project(ds_batch_in(did <> 0),transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
-	ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best)); //this is for more than one person
 	
 	//FCRA FFD  
 	dids := project(ds_batch_in(did <> 0),FFD.Layouts.DidBatch); 
@@ -58,9 +57,13 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 		FFD.Constants.DataGroups.PUNISHMENT,  
 		FFD.Constants.DataGroups.PERSON
 		];
-	pc_recs := if(isFCRA, FFD.FetchPersonContext(dids, configData.gateways, data_groups));																								 
+	pc_recs := if(isFCRA, FFD.FetchPersonContext(dids, configData.gateways, data_groups, configData.FFDOptionsMask));																								 
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 			
+	ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs)); //this is for more than one person
+
+	alert_flags := if(isFCRA, FFD.ConsumerFlag.getAlertIndicators(pc_recs, configData.FCRAPurpose, configData.FFDOptionsMask));
+
 	// Fetch all punishment records and set incarceration flags accordingly.
 	Layout_PII_Temp := RECORD
 		 CriminalRecords_BatchService.Layouts.batch_pii_out_pre;
@@ -172,8 +175,12 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	rslt_ungrp := ungroup(dedup(rslt_grp, 
 															trim(RIGHT.match_type) != '' and StringLib.StringContains(trim(LEFT.match_type), trim(RIGHT.match_type), true),
 															ALL));
-	rslt := sort(rslt_ungrp,acctno,Incarceration_Flag,INCR_state_origin,INCR_doc_num,INCR_dob,event_dt,punishment_type,sent_length,sent_length_desc,cur_stat_inm,cur_stat_inm_desc,cur_loc_inm,cur_sec_class_dt,cur_loc_sec,gain_time,gain_time_eff_dt,latest_adm_dt,sch_rel_dt,act_rel_dt,ctl_rel_dt,presump_par_rel_dt,match_type,-INCR_ssn,INCR_fname,INCR_lname);
+	rslt_srt := sort(rslt_ungrp,acctno,Incarceration_Flag,INCR_state_origin,INCR_doc_num,INCR_dob,event_dt,punishment_type,sent_length,sent_length_desc,cur_stat_inm,cur_stat_inm_desc,cur_loc_inm,cur_sec_class_dt,cur_loc_sec,gain_time,gain_time_eff_dt,latest_adm_dt,sch_rel_dt,act_rel_dt,ctl_rel_dt,presump_par_rel_dt,match_type,-INCR_ssn,INCR_fname,INCR_lname);
 															
+  //FFD 
+  rslt := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(rslt_srt, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_pii_out_pre),
+	            rslt_srt);
+
 	sequenced_out := PROJECT(rslt, TRANSFORM(CriminalRecords_BatchService.Layouts.batch_pii_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 	out := project(sequenced_out,CriminalRecords_BatchService.Layouts.batch_pii_out);
 	
@@ -184,8 +191,10 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 			SELF := RIGHT));
 													 
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));	
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 
-	FFD.MAC.PrepareResultRecordBatch(out, record_out, consumer_statements_prep, CriminalRecords_BatchService.Layouts.batch_pii_out);	
+	FFD.MAC.PrepareResultRecordBatch(out, record_out, consumer_statements_alerts, CriminalRecords_BatchService.Layouts.batch_pii_out);	
 	
 	return record_out;	
 

@@ -1,4 +1,4 @@
-IMPORT AutoStandardI,Address,ut;
+IMPORT AutoStandardI,Address,ut, std;
 
 EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) inputData,UNSIGNED1 Operation,Boolean GatewayNameMatch = False,Boolean Is_UseDate = False) := FUNCTION
 
@@ -94,7 +94,7 @@ EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) in
 	// RR ticket #127542 - Gateways return historical records as well hence hardcoded Is_Current Flag modified.
 	Batch_Layout.RealTime_OutLayout gatewayJoin(Batch_Layout.RealTime_InLayout L, layoutAcctNoRpt R) := TRANSFORM
 		reg_1 := R.registrants[1];
-		SELF.is_current := IF(reg_1.reg_latest_expiration_date >= ut.GetDate,TRUE,FALSE);
+		SELF.is_current := IF((INTEGER)reg_1.reg_latest_expiration_date >= (INTEGER)Std.Date.Today(),TRUE,FALSE);
 		SELF.reg_license_plate_type_desc := reg_1.reg_license_plate_type_desc;
 		SELF.reg_license_state := reg_1.reg_license_state;
 		SELF.reg_latest_effective_date := reg_1.reg_latest_effective_date;

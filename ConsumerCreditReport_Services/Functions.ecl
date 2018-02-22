@@ -122,7 +122,7 @@ EXPORT Functions := MODULE
 			SELF.ConsumerStatements:=IF(R.suppress_records,L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), 
                                L.ConsumerStatements);
 			// filtering out consumer statement alert in case of suppression of results and no consumer level statements on file for subject
-			SELF.ConsumerAlerts:=IF(R.consumer_flags.has_consumer_statement<>'', L.ConsumerAlerts, L.ConsumerAlerts(Code<>FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT));
+			SELF.ConsumerAlerts:=IF(R.has_consumer_statement OR (R.has_record_statement AND ~R.suppress_records), L.ConsumerAlerts, L.ConsumerAlerts(Code<>FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT));
 			SELF:=L;
 		END;
 

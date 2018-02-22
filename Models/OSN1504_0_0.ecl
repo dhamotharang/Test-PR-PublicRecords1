@@ -1,5 +1,5 @@
 //laure fischer is using this as an example//
-IMPORT EASI, ut, RiskWise, Risk_Indicators;
+IMPORT EASI, ut, RiskWise, Risk_Indicators, std;
 
 EXPORT osn1504_0_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,  
 										DATASET(RiskWise.Layout_CD2I) indata,
@@ -1917,7 +1917,7 @@ NULL := __common__(-999999999);
 
 INTEGER contains_i( string haystack, string needle ) := (real)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (string)ut.getdate, (string6)le.bs.Bill_To_Out.historydate + '01'));
+sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.Bill_To_Out.historydate + '01'));
 
 rel_st_addr_is_bt_bus_addr_w := __common__(map(
     st_addr_is_bt_business_addr = NULL => 0.00000,

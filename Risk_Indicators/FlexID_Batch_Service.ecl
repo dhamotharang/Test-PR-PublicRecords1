@@ -1,13 +1,4 @@
-﻿/*2016-05-23T23:45:58Z (Kevin Huls)
-RQ-12730 EMerging Identities: fix syntax error populating UniqueID
-*/
-/*2016-05-19T21:10:22Z (Kevin Huls)
-RQ-12730: Emerging Identities - per code review - blank out DID if fake
-*/
-/*2016-05-19T17:47:55Z (Kevin Huls)
-RQ-12730: Emerging Identities
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FlexID (aka IID Model)">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="33"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -373,6 +364,9 @@ DobRadiusUse := if(UseDobFilter,DobRadius,-1);
 NumReasons := if(IncludeAllRiskIndicators, 20, risk_indicators.iid_constants.DefaultNumCodes);
 DOBMatchOptions := dataset([{DOBMatchType, DOBMatchYearRadius}], risk_indicators.layouts.Layout_DOB_Match_Options);
 
+IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
+
 //Check to see if the FP model requested requires a valid GLB 
 FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
 glb_ok 	:= Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA);
@@ -639,7 +633,8 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.insurance_dl_used := le.insurance_dl_used;
 	
 	//new for Emerging Identities
-	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+	self.EmergingID := if(isEmergingID, true, false);  	
 	VerSecRange := IF(le.combo_addrcount>0, le.combo_sec_range, '');
 	isReasonCodeSR	:= exists(RiskIndicators(hri='SR')); //check if reason code 'SR' is set
 	SELF.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one

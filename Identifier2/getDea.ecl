@@ -1,4 +1,4 @@
-import doxie, iesp, deaV2_Services, ut, suppress, dea, riskwise;
+import doxie, iesp, deaV2_Services, ut, suppress, dea, riskwise, std;
 
 t_deaLayout := iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record;
 t_deaChildren := iesp.deacontrolledsubstance.t_DEAControlledSubstanceRecord;
@@ -33,7 +33,7 @@ export getDea(dataset(identifier2.layout_Identifier2) indata, boolean Include_De
 		self.isExactLast  := not input.Exact_Last_Name_Match  or ri.lname=le.lname;
 		self.isExactFirst := not input.Exact_First_Name_Match or ri.fname=le.fname;
 
-		self.isExpired := ri.expiration_date < ut.GetDate;
+		self.isExpired := ri.expiration_date < (STRING)Std.Date.Today();
 
 		self.ctrl.SSN            := ri.best_ssn;
 		self.ctrl.CompanyName    := ri.cname;
@@ -95,7 +95,7 @@ export getDea(dataset(identifier2.layout_Identifier2) indata, boolean Include_De
 
 	identifier2.layout_Identifier2 finalFormat( hasRecord le ) := TRANSFORM
 		found   := exists( le.DEALicense.ControlledSubstanceRecord.ControlledSubstancesInfo );
-		notExpired := exists( le.DEALicense.ControlledSubstanceRecord.ControlledSubstancesInfo( ID2Common.fromESDLDate( ExpirationDate ) <= (integer)ut.GetDate ) );
+		notExpired := exists( le.DEALicense.ControlledSubstanceRecord.ControlledSubstancesInfo( ID2Common.fromESDLDate( ExpirationDate ) <= (integer)Std.Date.Today() ) );
 
 		self.DEALicense.RiskIndicators := MAP(
 			not found  => dataset([iesp.ECL2ESP.setRiskIndicator('DN',Identifier2.getRiskStatusDesc('DN'))], iesp.share.t_RiskIndicator),

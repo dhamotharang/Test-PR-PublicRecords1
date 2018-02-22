@@ -8,22 +8,22 @@ IMPORT BatchShare,FraudShared_Services,iesp,WSInput;
 
 EXPORT ReportService() := MACRO
 
-	//The following macro defines the field sequence on WsECL page of query. 
+	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
 	
-	rec_in 			:= iesp.fraudgovplatform.t_FraudGovReportRequest;
-	ds_in 			 := DATASET ([], rec_in) : STORED ('FraudGovReportRequest', FEW);
-	first_row := ds_in[1] : independent;
-	ReportBy 	:= GLOBAL (first_row.reportBy);
-	Options 		:= GLOBAL (first_row.Options);
-	FDNUser			:= GLOBAL (first_row.FDNUser);
+	rec_in 				:= iesp.fraudgovreport.t_FraudGovReportRequest;
+	ds_in 			 	:= DATASET ([], rec_in) : STORED ('FraudGovReportRequest', FEW);
+	first_row 		:= ds_in[1] : independent;
+	ReportBy 			:= GLOBAL (first_row.reportBy);
+	Options 			:= GLOBAL (first_row.Options);
+	FraudGovUser	:= GLOBAL (first_row.FraudGovUser);
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
-	
+
 	// **************************************************************************************
 	//Checking that gc_id, industry type, and product code have some values - they are required.
-	IF(FDNUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
-	IF(FDNUser.IndustryType = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
-	IF(FDNUser.ProductCode = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_PRODUCT_CODE));
+	IF(FraudGovUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
+	IF(FraudGovUser.IndustryTypeName = '', FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
+	IF(FraudGovUser.ProductCode = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_PRODUCT_CODE));
 	// **************************************************************************************
 	
 	MaxVelocities := MAP(	Options.IsOnline and Options.MaxVelocities > 0 => MIN(Options.MaxVelocities, iesp.Constants.FraudGov.MAX_COUNT_VELOCITY),
@@ -38,9 +38,9 @@ EXPORT ReportService() := MACRO
 
 	#STORED('AppendBest', Options.AppendBest);
 	#STORED('DIDScoreThreshold', Options.DIDScoreThreshold);
-	#STORED('GlobalCompanyId',	FDNUser.GlobalCompanyId);
-	#STORED('IndustryType',	FDNUser.IndustryType);
-	#STORED('ProductCode',FDNUser.ProductCode);
+	#STORED('GlobalCompanyId',	FraudGovUser.GlobalCompanyId);
+	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
+	#STORED('ProductCode',FraudGovUser.ProductCode);
 	#STORED('AgencyVerticalType', Options.AgencyVerticalType);
 	#STORED('AgencyCounty',  Options.AgencyCounty);
 	#STORED('AgencyState',  Options.AgencyState);
@@ -48,7 +48,7 @@ EXPORT ReportService() := MACRO
 	#STORED('MaxVelocities', MaxVelocities);
 	#STORED('MaxKnownFrauds', MaxKnownFrauds);
 
-	GetReportModule(iesp.fraudgovplatform.t_FraudGovReportBy reportBy) := FUNCTION
+	GetReportModule(iesp.fraudgovreport.t_FraudGovReportBy reportBy) := FUNCTION
 		FraudShared_Services.Layouts.BatchIn_rec xform_batch_in() := TRANSFORM
 			SELF.ssn := reportBy.SSN;
 			SELF.dob := iesp.ECL2ESP.t_DateToString8(reportBy.DOB);
@@ -116,7 +116,7 @@ EXPORT ReportService() := MACRO
 	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds);
 	
 	//Final iESP Form Conversion
-	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp.esdl_out, results, iesp.fraudgovplatform.t_FraudGovReportResponse);
+	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
 																																											 
 	// Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(tmp);
 	

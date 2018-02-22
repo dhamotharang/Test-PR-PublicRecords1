@@ -1,4 +1,4 @@
-import autokey,utilfile,doxie_raw,Census_Data, ut;
+import autokey,utilfile,doxie_raw,Census_Data, ut, data_services;
 
 export Fetch_Utility_Daily(
 	Dataset(doxie.layout_references_hh) indids = dataset([], doxie.layout_references_hh),
@@ -20,7 +20,7 @@ TRANSFORM
 	SELF.includedByHHID := false;
 END;
 skipset := ['-'] + autokey_skipset;
-fake_fetch := JOIN(autokey.get_dids(ut.foreign_prod+'thor_data400::key::utility::daily.',skipset,false),
+fake_fetch := JOIN(autokey.get_dids(data_services.foreign_prod+'thor_data400::key::utility::daily.',skipset,false),
 				           UtilFile.Key_Util_Daily_FDID, keyed(left.did=right.fdid) and 
 									 (not ApplyBpsFilter or doxie.bpssearch_filter.rec_OK(
 												right.ssn, right.lname,right.fname,right.mname,

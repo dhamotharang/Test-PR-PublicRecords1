@@ -1,7 +1,4 @@
-﻿/*2016-05-21T00:39:26Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:50:17Z
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="InstantIdBatch">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -132,7 +129,7 @@ Automated reinstate from 2016-05-19T17:50:17Z
 </pre>
 */
 
-import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI;
+import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI, OFAC_XG5;
 
 export InstantID_Batch := macro
 
@@ -271,6 +268,9 @@ if(Include_PMLC_Watchlist, dataset([{patriot.constants.wlPMLC}], iesp.share.t_St
 if(Include_PMLJ_Watchlist, dataset([{patriot.constants.wlPMLJ}], iesp.share.t_StringArrayItem));
 
 watchlists_request := dWL(value<>'');
+
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');
@@ -763,7 +763,8 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.InstantIDVersion := (string)actualIIDVersion;	
 	
 	//new for Emerging Identities
-	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+	self.EmergingID := if(isEmergingID, true, false); 	
 	isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 	self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																						le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one

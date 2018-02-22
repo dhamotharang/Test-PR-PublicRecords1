@@ -22,7 +22,7 @@ EXPORT rec_SearchInput := record
   UNSIGNED3 zip_radius_miles := 0;
   STRING sic_code := '';            //this is a straight post filter when nonblank - but this is unlikely to meet requirements
   UNSIGNED results_limit:=0;
-  STRING inSeleid:=0;
+  STRING inSeleid:='0';
   BOOLEAN allow7DigitMatch:=FALSE;
   STRING contact_ssn:='';
   UNSIGNED contact_did:=0;
@@ -114,7 +114,7 @@ SHARED output_unsuppressed:=JOIN(SALTOutput2,SearchInputc,
     SELF := LEFT;
     SELF := RIGHT;
 ));
-BIPV2_Suppression.mac_contacts(output_unsuppressed, output_clean, output_dirty,,,fname, lname)
+BIPV2_Suppression.mac_contacts(output_unsuppressed, output_clean, output_dirty,,,fname, lname);
 SHARED Outfile2 := output_clean;
 EXPORT RecordIn2 := rec_SearchInput;
 EXPORT RecordOut2 := outrec2;

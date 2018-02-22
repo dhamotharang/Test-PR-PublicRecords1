@@ -41,7 +41,7 @@ end;
 layout setinputSanc(integer cnt):=transform
 	isLegacySanction := sanc_set[cnt]<10000000;
 	self.acctno := '1';
-	self.providerid:=if(isLegacySanction,sanc_set[cnt],(integer)sanc_set[cnt][1..length((String)sanc_set[cnt])-3]);
+	self.providerid:=if(isLegacySanction,sanc_set[cnt],(integer)((STRING)sanc_set[cnt])[1..length((String)sanc_set[cnt])-3]);
 	self.providerSRC:=if(isLegacySanction,'S','H');
 	self:=[]
 end;

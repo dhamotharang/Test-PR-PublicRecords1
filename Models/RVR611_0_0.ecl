@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -212,7 +212,7 @@ export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 
 		/* SSNPrior */
-		high_issue_dateyr := (INTEGER)(high_issue_date[1..4]);
+		high_issue_dateyr := (INTEGER)(((STRING)high_issue_date)[1..4]);
 		dob_year := (INTEGER)(in_dob[1..4]);
 		year_diff := high_issue_dateyr - dob_year;
 		ssnprior := ssnpop and ( high_issue_dateyr > 0 and dob_year > 0 and ( year_diff between -100 and 2 ) );
@@ -234,9 +234,9 @@ export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 
 		/* Age */
 		dob_y := (INTEGER)(in_dob[1..4]);
-		low_issue_year := (INTEGER)(low_issue_date[1..4]);
+		low_issue_year := (INTEGER)(((STRING)low_issue_date)[1..4]);
 
-		sysyear := if(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+		sysyear := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
 
 
 		age_dob := sysyear - dob_y;

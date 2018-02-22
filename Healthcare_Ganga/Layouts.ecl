@@ -35,12 +35,12 @@ EXPORT Layouts := MODULE
 		string48  Email := '';
 		string255 Description := '';
 		string20	BusinessType := '';
-		unsigned2	StartYear := '';
-		unsigned4	TotalEmployees := '';
+		unsigned2	StartYear := 0;
+		unsigned4	TotalEmployees := 0;
 		string20 	Sales	:= '';
 		string4 	SicCode := '';
 		string255	SicDesc := '';
-		unsigned4 dt_last_seen := '';
+		unsigned4 dt_last_seen := 0;
 		WarningsOutput;
 	END;
 	

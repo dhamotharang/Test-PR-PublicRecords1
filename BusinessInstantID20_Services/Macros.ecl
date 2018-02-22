@@ -247,7 +247,7 @@
 		#STORED('DataPermissionMask' ,Business_Risk_BIP.Constants.Default_DataPermissionMask);
 		#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 		#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
-		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass)
+		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
 		#STORED('OFAC_Version'       ,2);
 		#STORED('Global_Watchlist_Threshold',Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold);
 

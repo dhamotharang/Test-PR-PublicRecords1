@@ -1,10 +1,10 @@
-import ut, header, business_header;
+﻿import ut, header, business_header, std;
 util := util_as_source;
 
 // add 4 months to a yyyymm date, correctly adjusting year
 unsigned3 add4(unsigned3 dt) := if ((dt+4) % 100 > 12, dt + 104 - 12, dt+4);
 
-unsigned3 todaydate := (unsigned3)((integer)ut.GetDate div 100);
+unsigned3 todaydate := (unsigned3)((integer)Std.Date.Today() div 100);
 
 // will be used to adjust date last seens -- if d_first_seen+4 < today, use dfs+4, else today
 // not defining a condition to handle an incoming value of 0 would return a value of 4
@@ -16,7 +16,7 @@ unsigned3 lesser(unsigned3 dt2) := if(dt2=0,
 
 header.Layout_New_Records into(util L) := transform
 
-    boolean future_dt := l.date_first_seen>ut.getdate;
+    boolean future_dt := l.date_first_seen>(STRING8)Std.Date.Today();
 	
 	self.did := 0;
 	self.rid := 0;

@@ -7,7 +7,7 @@ EXPORT dataset(MemberPoint.Layouts.BatchInter)  makeClassifiedBatchInter(dataset
 // // M might become 'D' in the future There should be no blanks
 
 					MemberPoint.Layouts.BatchInter	xform(MemberPoint.Layouts.BatchIn L ) := transform
-								age := ut.GetAgeI((integer)L.dob);
+								age := ut.Age((integer)L.dob);
 								isMinor := (L.dob <> '') and (age < MemberPoint.Constants.AdultAgeStart); 
 								LN_search_name_type := map( Not isMinor => MemberPoint.Constants.LNSearchNameType.Adult,
 																						isMinor and L.guardian_name_first <> '' => MemberPoint.Constants.LNSearchNameType.Guardian,

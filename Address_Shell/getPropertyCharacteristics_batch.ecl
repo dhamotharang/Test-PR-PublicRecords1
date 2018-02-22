@@ -323,7 +323,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics_batch.PropertyCharacteristics
 		interestrate := IF(keepLeft(le.CF2_interestratetypecode, ri.CF2_interestratetypecode), leMortgage.interestrate, riMortgage.interestrate);
 		interestratetypecode := IF(keepLeft(le.CF2_interestratetypecode, ri.CF2_interestratetypecode), leMortgage.interestratetypecode, riMortgage.interestratetypecode);
 		
-		SELF.mortgages := PROJECT(ut.ds_oneRecord, TRANSFORM(Address_Shell.Layouts.MortgageRecordReport,
+		SELF.mortgages := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(Address_Shell.Layouts.MortgageRecordReport,
 																													SELF.mortgagecompanyname := mortgagecompanyname;
 																													SELF.mortgagetype := mortgagetype;
 																													SELF.mortgagetypedesc := mortgagetypedesc;

@@ -29,7 +29,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	iesp.smartlinxreport.t_SLRBestInfo  additionalBest() := transform
 	 	self.ssn := if (param.smart_rollup and best_rec.valid_ssn='G',SmartRollup.fn_smart_getSsnMetadata(best_rec.did,best_rec.ssn,best_rec.valid_ssn,globals.IncludeHRI)[1]);
 		self.age := best_rec.age;
-		self.ageAtDeath := ut.GetAgeI_asOf(iesp.ECL2ESP.DateToInteger(best_rec_esdl.dob),iesp.ECL2ESP.DateToInteger(best_rec_esdl.dod));
+		self.ageAtDeath := ut.Age(iesp.ECL2ESP.DateToInteger(best_rec_esdl.dob),iesp.ECL2ESP.DateToInteger(best_rec_esdl.dod));
 		self.addressCDS := SmartRollup.fn_smart_getAddrMetadata.address(best_rec,doBadSecRange)[1];  // add additional data to best section for smartlinx 
     phones2use := choosen(SmartRollup.fn_smart_getPhonesPlusMetadata.byDid(best_rec, param),iesp.Constants.BR.MaxPhonesPlus);
 		self.PhonesV2 := phones2use;

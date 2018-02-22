@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Phone_Shell_Service" wuTimeout="300000">
 	<part name="AcctNo" type="xsd:string"/>
 	<part name="DID" type="xsd:integer"/>
@@ -33,13 +33,9 @@
   <part name="DataPermissionMask" type="xsd:string"/>
 	<part name="Phone_Restriction_Mask" type="xsd:integer"/>
 	<part name="EnableTargusGateway" type="xsd:boolean"/>
-	<part name="EnableExperianGateway" type="xsd:boolean"/>
 	<part name="EnableTransUnionGateway" type="xsd:boolean"/>
 	<part name="EnableInsuranceGateway" type="xsd:boolean"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
-	<part name="ExperianScoreThreshold" type="xsd:integer"/>
-	<part name="ExperianMaxMetronetPhones" type="xsd:integer"/>
-	<part name="ExperianAllowBatchUse" type="xsd:boolean"/>
 	<part name="MaxNumberOfPhones" type="xsd:integer"/>
 	<part name="InsuranceVerificationAgeLimit" type="xsd:integer"/>
 	<part name="SPIIAccessLevel" type="xsd:string"/>
@@ -72,10 +68,8 @@
 	<part name="BocaShell_DOB_Radius" type="xsd:integer"/>
 	<part name="BocaShell_Watchlist_Threshold" type="xsd:string"/>
 	<part name="BlankOutDuplicatePhones" type="xsd:boolean"/>
-	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
   <part name="Phone_Score_Model" type="xsd:string"/>
 
-	<part name="Confirmation_GoToGateway" type="xsd:boolean"/>
 	<part name="UsePremiumSource_A" type="xsd:boolean"/>
 	<part name="PremiumSource_A_limit" type="xsd:integer"/>
 	<part name="RunRelocation" type="xsd:boolean"/>
@@ -115,7 +109,6 @@
     &lt;Age&gt;&lt;/Age&gt;
     &lt;HomePhone&gt;&lt;/HomePhone&gt;
     &lt;WorkPhone&gt;&lt;/WorkPhone&gt;
-    &lt;ExperianGatewayEnabled&gt;0&lt;/ExperianGatewayEnabled&gt;
     &lt;TargusGatewayEnabled&gt;0&lt;/TargusGatewayEnabled&gt;
     &lt;TransUnionGatewayEnabled&gt;0&lt;/TransUnionGatewayEnabled&gt;
     &lt;InsuranceGatewayEnabled&gt;0&lt;/InsuranceGatewayEnabled&gt;
@@ -132,10 +125,6 @@
 &lt;row&gt;
   &lt;servicename&gt;targus&lt;/servicename&gt;
   &lt;url&gt;http://username:password@URL/WsGateway&lt;/url&gt;
-&lt;/row&gt;
-&lt;row&gt;
-  &lt;servicename&gt;metronet&lt;/servicename&gt;
-  &lt;url&gt;http://username:password@URL/WsGateway?ver_=1.043&lt;/url&gt;
 &lt;/row&gt;
 &lt;/Gateways&gt;
 </pre>
@@ -182,13 +171,9 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 'DataPermissionMask',
                 'Phone_Restriction_Mask',
                 'EnableTargusGateway',
-                'EnableExperianGateway',
                 'EnableTransUnionGateway',
                 'EnableInsuranceGateway',
                 'Gateways',
-                'ExperianScoreThreshold',
-                'ExperianMaxMetronetPhones',
-                'ExperianAllowBatchUse',
                 'MaxNumberOfPhones',
                 'InsuranceVerificationAgeLimit',
                 'SPIIAccessLevel',
@@ -220,13 +205,11 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 'BocaShell_DOB_Radius',
                 'BocaShell_Watchlist_Threshold',
                 'BlankOutDuplicatePhones',
-                'DedupAgainstInputPhones',
-                'Phone_Score_Model',
-                'Confirmation_GoToGateway',
+                 'Phone_Score_Model',
                 'UsePremiumSource_A',
                 'PremiumSource_A_limit',
                 'Batch_Input',
-								'RunRelocation'
+																'RunRelocation'
                 ));
 
 
@@ -260,15 +243,11 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	STRING3 Age 																		:= '' : STORED('Age_In');
 	STRING10 HomePhone 															:= '' : STORED('HomePhone_In');
 	STRING10 WorkPhone 															:= '' : STORED('WorkPhone_In');
-	BOOLEAN EnableExperianGateway 									:= FALSE : STORED('EnableExperianGateway');
 	BOOLEAN EnableTargusGateway 										:= FALSE : STORED('EnableTargusGateway');
 	BOOLEAN EnableTransUnionGateway 								:= FALSE : STORED('EnableTransUnionGateway');
 	BOOLEAN EnableInsuranceGateway 									:= FALSE : STORED('EnableInsuranceGateway');
 	DATASET(Phone_Shell.Layout_Phone_Shell.Input) Batch_In := DATASET([], Phone_Shell.Layout_Phone_Shell.Input) : STORED('Batch_Input');
 	Gateways 																				:= Gateway.Configuration.Get();
-	UNSIGNED3 ExperianScoreThreshold								:= 632 : STORED('ExperianScoreThreshold');
-	UNSIGNED1 ExperianMaxMetronetPhones							:= Phone_Shell.Constants.maxEXP_Phones : STORED('ExperianMaxMetronetPhones');
-	BOOLEAN ExperianAllowBatchUse										:= FALSE : STORED('ExperianAllowBatchUse');
 	UNSIGNED1 GLBPurpose                            := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPAPurpose 													:= 0 : STORED('DPPAPurpose');
 	STRING DataRestrictionMask 										  := Phone_Shell.constants.default_DataRestriction : STORED('DataRestrictionMask');
@@ -310,14 +289,15 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	REAL4 BocaShell_Watchlist_Threshold 						:= 0.84 : STORED('BocaShell_Watchlist_Threshold');
 	STRING25 Phone_Score_Model_Temp									:= '' : STORED('Phone_Score_Model');
 	BOOLEAN BlankOutDuplicatePhones									:= FALSE :STORED('BlankOutDuplicatePhones');
-	BOOLEAN DedupAgainstInputPhones									:= FALSE :STORED('DedupAgainstInputPhones');
 	
 	BOOLEAN UsePremiumSource_A											:= FALSE :STORED('UsePremiumSource_A');
 	INTEGER PremiumSource_A_limit										:= Phone_Shell.Constants.maxEQP_Phones :STORED('PremiumSource_A_limit');
-	BOOLEAN Confirmation_GoToGateway								:= FALSE :STORED('Confirmation_GoToGateway');
   BOOLEAN RunRelocation														:= FALSE :STORED('RunRelocation');
 	Phone_Score_Model := StringLib.StringToUpperCase(Phone_Score_Model_Temp);
 
+	//ensure that the user selects Equifax(phonemart data) and that the DRM is not set
+	allowPremiumSource_A:= UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
+ 
 	/* ************************************************************************
 	 *  Combine the Service Inputs - Supports both Batch and Realtime         *
 	 ************************************************************************ */
@@ -349,11 +329,9 @@ EXPORT Phone_Shell_Service() := FUNCTION
 		SELF.Age := Age;
 		SELF.HomePhone := HomePhone;
 		SELF.WorkPhone := WorkPhone;
-		SELF.ExperianGatewayEnabled := EnableExperianGateway;
 		SELF.TargusGatewayEnabled := EnableTargusGateway;
 		SELF.TransUnionGatewayEnabled := EnableTransUnionGateway;
 		SELF.InsuranceGatewayEnabled := EnableInsuranceGateway;
-		
 		SELF := [];
 	END;
 	realtimeTemp := DATASET ([batchifyRealtime()]);
@@ -365,44 +343,36 @@ EXPORT Phone_Shell_Service() := FUNCTION
 														Zip5 <> '' OR Zip4 <> '' OR SSN <> '' OR DateOfBirth <> '' OR Age <> '' OR HomePhone <> '' OR WorkPhone <> '');
 	
 	Phone_Shell.Layout_Phone_Shell.Input batchSettings(Phone_Shell.Layout_Phone_Shell.Input le) := TRANSFORM
-		SELF.ExperianGatewayEnabled := le.ExperianGatewayEnabled OR EnableExperianGateway;
 		SELF.TargusGatewayEnabled := le.TargusGatewayEnabled OR EnableTargusGateway;
 		SELF.TransUnionGatewayEnabled := le.TransUnionGatewayEnabled OR EnableTransUnionGateway;
 		SELF.InsuranceGatewayEnabled := le.InsuranceGatewayEnabled OR EnableInsuranceGateway;
-		
 		SELF := le;
 	END;
 	batch := PROJECT(Batch_In, batchSettings(LEFT));
 	
 	// Combine Realtime and Batch Inputs - this allows the service to run in either realtime OR batch mode.  If both realtime and batch fields are filled in the realtime fields simply get added to the batch input
-	input := DEDUP(SORT(realtime + batch, AcctNo, FullName, FirstName, MiddleName, LastName, TitleName, SuffixName, StreetAddress1, StreetAddress2, City, State, Zip, Prim_Range, Predir, Prim_Name, Addr_Suffix, Postdir, Unit_Desig, Sec_Range, Zip5, Zip4, SSN, DateOfBirth, Age, HomePhone, WorkPhone, ExperianGatewayEnabled, TransUnionGatewayEnabled, InsuranceGatewayEnabled),
-																				AcctNo, FullName, FirstName, MiddleName, LastName, TitleName, SuffixName, StreetAddress1, StreetAddress2, City, State, Zip, Prim_Range, Predir, Prim_Name, Addr_Suffix, Postdir, Unit_Desig, Sec_Range, Zip5, Zip4, SSN, DateOfBirth, Age, HomePhone, WorkPhone, ExperianGatewayEnabled, TransUnionGatewayEnabled, InsuranceGatewayEnabled);
+	input := DEDUP(SORT(realtime + batch, AcctNo, FullName, FirstName, MiddleName, LastName, TitleName, SuffixName, StreetAddress1, StreetAddress2, City, State, Zip, Prim_Range, Predir, Prim_Name, Addr_Suffix, Postdir, Unit_Desig, Sec_Range, Zip5, Zip4, SSN, DateOfBirth, Age, HomePhone, 
+																						WorkPhone, TransUnionGatewayEnabled, InsuranceGatewayEnabled),
+																				AcctNo, FullName, FirstName, MiddleName, LastName, TitleName, SuffixName, StreetAddress1, StreetAddress2, City, State, Zip, Prim_Range, Predir, Prim_Name, Addr_Suffix, Postdir, Unit_Desig, Sec_Range, Zip5, Zip4, SSN, DateOfBirth, Age, HomePhone, WorkPhone, 
+																						TransUnionGatewayEnabled, InsuranceGatewayEnabled);
 
 	/* ************************************************************************
 	 *  Get the Phone Shell Results                                           *
 	 ************************************************************************ */
-	//ensure that the user selects Equifax(phonemart data) and that the DRM is not set
-	allowPremiumSource_A:= UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
- 
-	
-	ExperianMaxMetronetPhones_max := if(ExperianMaxMetronetPhones > Phone_Shell.Constants.maxEXP_Phones, Phone_Shell.Constants.maxEXP_Phones, ExperianMaxMetronetPhones);
-	
 	results := Phone_Shell.Phone_Shell_Function(input, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, 
-																							ExperianScoreThreshold, ExperianMaxMetronetPhones_max, ExperianAllowBatchUse, 
 																							MaxPhones, InsuranceVerificationAgeLimit, BocaShell_Version, SPIIAccessLevel, VerticalMarket, IndustryClass,
 																							RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, IncludeLastResort, IncludePhonesFeedback, 
 																							BocaShell_IncludeRelatives, BocaShell_IncludeDL, BocaShell_IncludeVehicle, BocaShell_IncludeDerog,
 																							BocaShell_OFAC_Only, BocaShell_ExcludeWatchlists, BocaShell_Include_OFAC, BocaShell_Include_AdditionalWatchlists,
 																							BocaShell_DoScore, BocaShell_SuppressNearDups, BocaShell_Require2Elements, BocaShell_AppendBest,
 																							BocaShell_OFAC_Version, BocaShell_Watchlist_Threshold, BocaShell_DOB_Radius,
-																							EnforceTestAccounts, EXISTS(batch), SX_Match_Restriction_Limit, Strict_APSX, BlankOutDuplicatePhones, DedupAgainstInputPhones, 	
-																							Confirmation_GoToGateway, UsePremiumSource_A, RunRelocation);
-	//since we have EnableExperianGateway at record level we are just using an exist down below for the models
-	// to be called. If batch has 1 using gateway and one not a the batch level they will all go against the gateway.
+																							EnforceTestAccounts, EXISTS(batch), SX_Match_Restriction_Limit, Strict_APSX, BlankOutDuplicatePhones,  	
+																							UsePremiumSource_A, RunRelocation);
+	//If batch has 1 using gateway and one not a the batch level they will all go against the gateway.
 	//As we don't have a way to call the gateway at the record level. It's at the dataset level.
 
 	model_results := MAP(Phone_Score_Model not in ['PHONESCORE_V2','COLLECTIONSCORE_V3'] => results,	// If no models called, just return the shell and attributes
-											 EnableExperianGateway or EXISTS(input(EnableExperianGateway = TRUE)) or allowPremiumSource_A   => Phone_Shell.PhoneScore_cp3_v2(results, Score_Threshold), 
+											 allowPremiumSource_A   => Phone_Shell.PhoneScore_cp3_v2(results, Score_Threshold), 
 											 Phone_Shell.PhoneScore_wf8_v2(results, Score_Threshold)); 
 
 	//need to limit the Equifax hits ...do here as we now have the equifax hits scored....want highest scores to be in the limit

@@ -92,10 +92,8 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 																                addCounts);
 
 	//Populate the index for the customer
-	busKRI := DueDiligence.getBusKRI(addCounts + inquiredBusNoBIP);
+	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);
 
-	
-	
 	
 	/*debugging section */   
 	IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
@@ -123,6 +121,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(addrRisk, NAMED('addrRisk')));
 	IF(debugMode, OUTPUT(busAsInd, NAMED('busAsInd')));
 	IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
+	IF(debugMode, OUTPUT(AddBusinessDataForReport, NAMED('AddBusinessDataForReport')));
 	
 	IF(debugMode, OUTPUT(busKRI, NAMED('busKRI')));
 

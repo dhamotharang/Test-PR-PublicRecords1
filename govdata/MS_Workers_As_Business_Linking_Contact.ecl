@@ -1,4 +1,4 @@
-IMPORT BIPV2, ut, mdr, _Validate;
+IMPORT BIPV2, ut, mdr, _Validate, header;
 
 EXPORT MS_Workers_As_Business_Linking_Contact (
 	  DATASET(govdata.Layout_MS_Workers_Comp_base) pBase  = govdata.File_MS_Workers_Comp_BDID) := FUNCTION
@@ -34,7 +34,7 @@ EXPORT MS_Workers_As_Business_Linking_Contact (
 				SELF.contact_name.mname          := l.claim_name_middle;
 				SELF.contact_name.lname          := l.claim_name_last;
 				SELF.contact_name.name_suffix		 := l.claim_name_suffix;
-				SELF.contact_ssn                 := IF(ut.ssn_length(l.claimant_ssn) = 9, l.claimant_ssn, '');
+				SELF.contact_ssn                 := IF(header.ssn_length(l.claimant_ssn) = 9, l.claimant_ssn, '');
 				// SELF.contact_email               := l.email_address;
 				// SELF.contact_phone               := (STRING)l.phone;
 				SELF 							   						 := l;

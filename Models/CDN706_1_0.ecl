@@ -1,4 +1,4 @@
-import riskwise, ut, address, risk_indicators;
+import riskwise, ut, address, risk_indicators, std;
 
 export CDN706_1_0(dataset(riskwise.layouts.cdn706_variables) model_variables) := FUNCTION		
 
@@ -149,7 +149,7 @@ riskwise.layouts.cdn706_variables do_model(model_variables le) := transform
 	
 	V_bobj_risk := if(le.indata.addr_status[2]<>'0' or le.indata.addr_status2[2]<>'0', 1, 0);
 	
-	v_orderamt := ut.imin2(4000, if(le.indata.orderamt='', 4000, (integer)le.indata.orderamt));
+	v_orderamt := Min(4000, if(le.indata.orderamt='', 4000, (integer)le.indata.orderamt));
 	
 	_avs := stringlib.stringtouppercase(le.indata.avscode);
 	
@@ -234,7 +234,7 @@ riskwise.layouts.cdn706_variables do_model(model_variables le) := transform
 	
 	v_laptop := if(prodcode='2',1,0);
 	
-	scoring_date := ut.GetDate;
+	scoring_date := (STRING8)Std.Date.Today();
 
 	v_firstorderdate := trim(le.indata.orderdate);
 	v_account_tenure_mon := ( ut.DaysApart(scoring_date,v_firstorderdate) ) / 30.5;

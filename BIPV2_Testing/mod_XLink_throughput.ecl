@@ -1,4 +1,4 @@
-import Tools,bipv2,Business_Header_SS,ut;
+import Tools,bipv2,Business_Header_SS, Data_Services;
 EXPORT mod_XLink_throughput := 
 MODULE
 
@@ -9,7 +9,7 @@ if the infile disappears, its easy enough to build a new one (code commented out
 strCount := 'fiftymillion';
 
 h := if(Tools._Constants.IsDataland, bipv2.CommonBase.ds_prod, bipv2.CommonBase.DS_CLEAN);
-c := dataset(ut.foreign_dataland + 'thor_data400::bipv2.xlink_latency_test_infile_'+strCount, recordof(h), thor);
+c := dataset(Data_Services.foreign_dataland + 'thor_data400::bipv2.xlink_latency_test_infile_'+strCount, recordof(h), thor);
 
 
 // tenmillion := 10000000; //W20140107-113214-5

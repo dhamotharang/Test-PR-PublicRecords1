@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra;
+import risk_indicators, ut, riskwise, riskwisefcra, std;
 
 export RVB705_1_0(
 	dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean isCalifornia ) := FUNCTION
@@ -60,7 +60,7 @@ export RVB705_1_0(
 		
 		// VERIFICATION
 			avgTmp := (add1_source_count + add2_source_count + add3_source_count) / 3;
-			avg_add_source_count := ut.imin2( 5, round(avgTmp) );
+			avg_add_source_count := Min( 5, round(avgTmp) );
 			pnotpots             := telcordia_type not in ['00', '50', '51', '52', '54'];
 
 			phone_prob := map(
@@ -114,9 +114,9 @@ export RVB705_1_0(
 		// END ADDRESS
 
 		// DATE CALCULATIONS
-			today   := if(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+			today   := if(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 			today1900 := ut.DaysSince1900( today[1..4], today[5..6], today[7..8] );
-			li1900    := ut.DaysSince1900( low_issue_date[1..4], low_issue_date[5..6], low_issue_date[7..8] );
+			li1900    := ut.DaysSince1900( ((STRING)low_issue_date)[1..4], ((STRING)low_issue_date)[5..6], ((STRING)low_issue_date)[7..8] );
 			birth1900 := ut.DaysSince1900( in_dob[1..4], in_dob[5..6], in_dob[7..8] );
 		
 			// AGE
@@ -127,12 +127,12 @@ export RVB705_1_0(
 						(INTEGER)in_dob = 0                         => -1,
 						(INTEGER)((today1900 - birth1900)/365.25)
 				);
-				age_calc2 := ut.max2(ut.imin2(age_calc,65),20);
+				age_calc2 := Max(Min(age_calc,65),20);
 				
 				
 			// LOW ISSUE
 				age_low_issue_date := if( dob_sas_undef OR low_issue_date = 0, -1, (INTEGER)((li1900 - birth1900)/365.25) );
-				age_low_issue_date2 := if( age_low_issue_date < 0, -2, ut.imin2(age_low_issue_date,30) );
+				age_low_issue_date2 := if( age_low_issue_date < 0, -2, Min(age_low_issue_date,30) );
 
 				old_at_issue := age_low_issue_date2 >= 19;
 		// END DATE CALCS
@@ -179,7 +179,7 @@ export RVB705_1_0(
 		// END PROPERTY
 				
 		// DEROGS
-			criminal_ind := ut.imin2(criminal_count,1);
+			criminal_ind := Min(criminal_count,1);
 
 			bk_summary2 := map(
 				disposition = '' => 0,
@@ -246,11 +246,11 @@ export RVB705_1_0(
 			phat := outest1;
 			RVB705_1_0a := (INTEGER)(point*(log(phat/(1-phat)) - log(odds))/log(2) + base);
 
-			RVB705_1_0b := ut.imin2(RVB705_1_0a, 900);
-			RVB705_1_0c := ut.max2(RVB705_1_0b, 501);
+			RVB705_1_0b := Min(RVB705_1_0a, 900);
+			RVB705_1_0c := Max(RVB705_1_0b, 501);
 			override := deceased or (ssnpop and not ssn_valid) or phn_corrections or corrections or (age between 1 and 17);
 			
-			RVB705_1_0 := if( override, ut.imin2( 610, RVB705_1_0c ), RVB705_1_0c );
+			RVB705_1_0 := if( override, Min( 610, RVB705_1_0c ), RVB705_1_0c );
 		// END CALC SCORE
 		
 		// self.score := intformat(RVB705_1_0,3,1);

@@ -44,7 +44,6 @@ export rollCorrRiskSummary(dataset(Risk_Indicators.Layouts.common_layout) summar
 					 left.src in ['FC','FS','UC','US','GC','GS','PC','PS','MS','AS'] 	=> 'C',  	// Criminal
 					 left.src IN ['MI','MA'] 																					=> 'XX', 	// won't count these
 					 left.src IN ['FA', 'FP', 'FB', 'LP', 'LA'] 											=> 'P',		// property source
-					 left.src IN ['EM','E1','E2','E3','E4'] 													=> 'EM', 
 					 left.src IN ['QH','WH'] 																					=> 'EQ',	// set quickheader to EQ
 					 left.src = 'AY' 																									=> 'SL',	// treat alloy as american student
 					 left.src IN MDR.sourceTools.set_Death 														=> 'DE',	// set all new death sources to DE

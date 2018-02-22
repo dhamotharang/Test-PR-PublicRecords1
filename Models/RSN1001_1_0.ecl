@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, easi, riskwise;
+import ut, Risk_Indicators, easi, riskwise, std;
 
 // custom recover score for GRC
 export RSN1001_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam) := function
@@ -240,7 +240,7 @@ export RSN1001_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam) := f
 		prof_license_flag                := le.professional_license.professional_license_flag;
 		input_dob_age                    := le.shell_input.age;
 		inferred_age                     := le.inferred_age;
-		archive_date                     := if(le.historydate=999999, ut.getdate[1..6], (string6)le.historydate);
+		archive_date                     := if(le.historydate=999999, ((STRING)Std.Date.Today())[1..6], (string6)le.historydate);
 
 		c_inc_200k_p                     := trim(rt.in200K_p);
 		c_inc_201k_p                     := trim(rt.in201K_p);

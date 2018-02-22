@@ -1,4 +1,4 @@
-import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, CriminalRecords_BatchService, 
+﻿import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, CriminalRecords_BatchService, 
        doxie, AddrBest, LiensV2_Services, paw_services, DidVille, prof_LicenseV2_Services, FaaV2_Services,
 			 SexOffender_Services, WatercraftV2_Services, Foreclosure_Services, LN_PropertyV2_Services, Suppress,
 			 risk_indicators, BatchDatasets, riskwise, BIPV2, Royalty, DeathV2_Services, STD;
@@ -312,7 +312,7 @@ shared BatchParams		:= IParam.getBatchParams();
 																							self.acctno := left.acctno,
 																							self.ssn := left.ssn,
 																							self := [] ));
-		 SOF_BatchParams := module(project(BatchParams,BatchShare.IParam.BatchParams,opt))
+		 SOF_BatchParams := module(project(BatchParams,SexOffender_Services.IParam.batch_params, opt))
 		 end;
 		
 		 dsSOF := SexOffender_Services.batch_records(SOF_BatchParams,SOF_BatchIn);

@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, easi, std;
 
 
 export FP5812_1_0(
@@ -94,7 +94,7 @@ export FP5812_1_0(
 		
 		// Even though this is not an FCRA model we are using felony  (BUG 31550)
 		criminal_count                   :=  le.bs.bjl.felony_count;
-		rel_criminal_count               :=  ut.imin2(le.bs.relatives.relative_felony_count, 1);
+		rel_criminal_count               :=  Min(le.bs.relatives.relative_felony_count, 1);
 		rel_prop_owned_count             :=  le.bs.relatives.owned.relatives_property_count;
 		rel_prop_owned_purchase_total    :=  le.bs.relatives.owned.relatives_property_owned_purchase_total;
 		rel_prop_sold_purchase_total     :=  le.bs.relatives.sold.relatives_property_owned_purchase_total;
@@ -156,7 +156,7 @@ export FP5812_1_0(
 		
 		
 		
-		sysyear := if( archive_date=999999, (integer)ut.GetDate[1..4], archive_date/100 );
+		sysyear := if( archive_date=999999, (integer)((STRING)Std.Date.Today())[1..4], archive_date/100 );
 		phone_zip_mismatch := (integer)((INTEGER)rc_phonezipflag=1);
 		disconnected := (integer)((INTEGER)rc_hriskphoneflag=5);
 		deceased := (integer)(rc_decsflag);

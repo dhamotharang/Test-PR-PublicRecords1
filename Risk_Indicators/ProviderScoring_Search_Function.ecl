@@ -29,7 +29,7 @@ EXPORT ProviderScoring_Search_Function (DATASET(Risk_Indicators.Layout_Provider_
 		SELF.historydate := histDate;
 		SELF.ssn := le.ssn;
 		SELF.dob := le.DateOfBirth;
-		SELF.age := if ((integer)le.DateOfBirth != 0,	(STRING3)ut.GetAgeI_asOf((unsigned)le.DateOfBirth, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), '0');
+		SELF.age := if ((integer)le.DateOfBirth != 0,	(STRING3)ut.Age((unsigned)le.DateOfBirth, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), '0');
 
 		cleaned_name := address.CleanPerson73(le.Provider_Full_Name);
 		BOOLEAN valid_cleaned := le.Provider_Full_Name <> '';

@@ -1,4 +1,5 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
+
 export RVA1008_2_0(dataset(risk_indicators.Layout_Boca_Shell) clam,boolean isCalifornia) := FUNCTION	
 	
 	
@@ -440,7 +441,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 	// (StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 	models.Common.findw_cpp( source,  target,  delim) > 0;
 
-sysdate := Models.common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := Models.common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 _in_dob := Models.common.sas_date((string)(in_dob));
 

@@ -1,7 +1,7 @@
 /* Modeling group is calling this model AID606_0_1 as it is the second version with score caps added. We are keeping the 
 		original name AID606_0_0.  */
 
-import ut, risk_indicators, RiskWise, RiskWiseFCRA;
+import ut, risk_indicators, RiskWise, RiskWiseFCRA, std;
 
 export AID606_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean inCalif) := 
 
@@ -10,8 +10,8 @@ FUNCTION
 
 Layout_ModelOut doModel(clam le) := TRANSFORM
 
-	sysyear := IF(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
-	today := if(le.historydate <> 999999, (string)le.historydate[1..6] + '01', ut.GetDate);
+	sysyear := IF(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
+	today := if(le.historydate <> 999999, ((string)le.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 
 
@@ -22,7 +22,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 	agevar := if(birthdt = 0, 0, (integer)((today1900 - birthdt)/365.25));
 	
 	// new code
-	low_issue_dateyr := (integer)((string)le.ssn_verification.validation.low_issue_date[1..4]);
+	low_issue_dateyr := (integer)(((string)le.ssn_verification.validation.low_issue_date)[1..4]);
 	ssnage_low := if(low_issue_dateyr = 0, 0, sysyear - low_issue_dateyr);
 	
 	agevar3 := map(birthdt = 0 and ssnage_low <> 0 => ssnage_low,
@@ -51,14 +51,14 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 	/* Criminal */
 
-     crimx := ut.imin2(1, le.bjl.criminal_count);
+     crimx := Min(1, le.bjl.criminal_count);
 
 	/* lien  */
 
-     lien_recent_un := ut.imin2(2, le.bjl.liens_recent_unreleased_count);
-     lien_hist_un := ut.imin2(2, le.bjl.liens_historical_unreleased_count);
-     lien_recent_rel := ut.imin2(2, le.bjl.liens_recent_released_count);
-     lien_hist_rel := ut.imin2(2, le.bjl.liens_historical_released_count);
+     lien_recent_un := Min(2, le.bjl.liens_recent_unreleased_count);
+     lien_hist_un := Min(2, le.bjl.liens_historical_unreleased_count);
+     lien_recent_rel := Min(2, le.bjl.liens_recent_released_count);
+     lien_hist_rel := Min(2, le.bjl.liens_historical_released_count);
 
      lienflagm := map(lien_recent_un = 2 => 0.0506520,
 				  lien_recent_un = 1 => 0.0506520,
@@ -95,7 +95,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 	/* SSN Problem */
 
-     high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+     high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 
      ssnage := sysyear - high_issue_dateyr;
 
@@ -140,9 +140,9 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 	/* ver_len */
 
-     add1_year_first_seen := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
+     add1_year_first_seen := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
 
-     lres_years := if(add1_year_first_seen = 0, 0, ut.imin2((sysyear - add1_year_first_seen), 25));
+     lres_years := if(add1_year_first_seen = 0, 0, Min((sysyear - add1_year_first_seen), 25));
 
      recent_mover := if(lres_years <= 2, 1, 0);
 
@@ -156,7 +156,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
      cred_fs_pop := if(le.ssn_verification.credit_first_seen = 0, 1, 0);
 
-     time_on_bureau_years := if(cred_fs_pop = 1, -1, sysyear - (integer)(le.ssn_verification.credit_first_seen[1..4]));
+     time_on_bureau_years := if(cred_fs_pop = 1, -1, sysyear - (integer)(((STRING)le.ssn_verification.credit_first_seen)[1..4]) );
 
      credit_history := if(((integer)le.name_verification.fname_credit_sourced + (integer)le.name_verification.lname_credit_sourced + 
 							(integer)le.address_verification.input_address_information.credit_sourced) = 0 and ((integer)le.name_verification.fname_tu_sourced +

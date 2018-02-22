@@ -633,7 +633,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                        SELF.seq                     := LEFT.seq;
                        SELF.NameSources             := RIGHT.NameSources;
                        SELF.AddressVerSources       := RIGHT.AddressVerSources;
-											 SELF.BestAddresSSources			:= RIGHT.BestAddressSources;
+                       SELF.BestAddresSSources			:= RIGHT.BestAddressSources;
                        SELF.PhoneSources            := RIGHT.PhoneSources;
                        SELF.Sources                 := LEFT.Sources;
                        SELF := LEFT,
@@ -642,12 +642,16 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                                   
   withUtil := JOIN(withPhonesPlus, UtilAttrsStatsSources, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+                       SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount  := RIGHT.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount,
+                       SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount2 := RIGHT.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount2,
+                       SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount3 := RIGHT.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount3,
+                       SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount4 := RIGHT.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount4,
+                       SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount5 := RIGHT.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount5,
                        SELF.NameSources             := LEFT.NameSources + RIGHT.NameSources,
                        SELF.AddressVerSources       := LEFT.AddressVerSources + RIGHT.AddressVerSources,
-											 SELF.BestAddressSources			:= RIGHT.BestAddressSources,
+                       SELF.BestAddressSources			   := RIGHT.BestAddressSources,
                        SELF.PhoneSources            := LEFT.PhoneSources + RIGHT.PhoneSources,
 																							SELF.Sources                 := LEFT.Sources + RIGHT.Sources,
-                       SELF := RIGHT,
 																							SELF := LEFT,
                        SELF := []),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);

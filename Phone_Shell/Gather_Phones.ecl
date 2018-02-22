@@ -1,4 +1,4 @@
-IMPORT Gateway, Phone_Shell, RiskWise;
+﻿IMPORT Gateway, Phone_Shell, RiskWise, PhoneMart;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) Input,
 																																						 DATASET(Gateway.Layouts.Config) Gateways,
@@ -7,9 +7,6 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 																																						 STRING50 DataRestrictionMask,
 																																						 STRING50 DataPermissionMask,
 																																						 UNSIGNED1 PhoneRestrictionMask,
-																																						 UNSIGNED3 ExperianScoreThreshold, 
-																																						 UNSIGNED1 ExperianMaxMetronetPhones, 
-																																						 BOOLEAN ExperianAllowBatchUse,
 																																						 UNSIGNED3 MaxPhones,
 																																						 UNSIGNED3 InsuranceVerificationAgeLimit,
 																																						 STRING2 SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
@@ -25,8 +22,6 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 																																						 UNSIGNED2 SX_Match_Restriction_Limit = 10, // By default return a MAX of 10 Extended Skip Trace Phones
 																																						 BOOLEAN Strict_APSX = FALSE, // By default don't enforce strict Extended Skip Trace matching
 																																						 BOOLEAN BlankOutDuplicatePhones = FALSE,
-																																						 BOOLEAN DedupAgainstInputPhones = FALSE,
-																																						 BOOLEAN Confirmation_GoToGateway = FALSE,
 																																						 BOOLEAN UsePremiumSource_A = FALSE, 
 																																						 BOOLEAN RunRelocation = FALSE) := FUNCTION
 	/* ******************************************************************************
@@ -35,7 +30,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 ** together.  It is intended that these functions run in parallel to help     **
 	 ** with performance.                                                          **
 	 ********************************************************************************
-	 ** Searches: CoResident, EDA, Experian, Infutor, Parent, People At Work,      **
+	 ** Searches: CoResident, EDA, Infutor, Parent, People At Work,      **
 	 **   Phones Feedback, Phones Plus, Relative Close Proximity, Relocation,      **
 	 **   Spouse, Targus PDE, TransUnion and Utility.                              **
 	 ********************************************************************************
@@ -74,7 +69,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 Neighbors := Phone_Shell.Search_Neighbors(Input, PhoneRestrictionMask, DataRestrictionMask, GLBPurpose, DPPAPurpose);
 	 
 	 /* ***************************************************************
-		* 		Gateway Searches - NOTE: Experian comes after Combined		*
+		* 		Gateway Searches *
 	  *************************************************************** */	 
 	 Targus := Phone_Shell.Search_Gateway_Targus(Input, Gateways, DPPAPurpose, GLBPurpose, PhoneRestrictionMask);
 	 
@@ -97,20 +92,38 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 								Utility (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '') + 
 								SkipTrace (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '') + 
 								Neighbors (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '') + 
-								/* Gateways - The Experian Gateway gets special handling */
+								/* Gateways */
 								Targus (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '') + 
 								TransUnion (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
-	//get Equifax data
-	 Equifax := Phone_Shell.Search_Equifax(Input, Combined, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A);
-	 CombinedToSendToExperian := combined + Equifax (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
+		//get Equifax data
+		//We don't need to check DRM 24 for this because we are not exposing the phone, just verifying it.
+		WithPhoneMart := JOIN(Input, PhoneMart.key_phonemart_did, 
+							LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.l_DID) and RIGHT.phone != '',
+								TRANSFORM(Phone_Shell.Layouts.Bureau_Phones, 
+											self.seq := left.Clean_Input.Seq;
+											self.did := (UNSIGNED8) left.did;
+											SELF.Bureau_Last_Update := TRIM((string)RIGHT.DT_LAST_SEEN);
+											SELF.Bureau_Verified := TRUE; // We have a hit on Equifax, this number is verified
+											SELF.Gathered_Phone := RIGHT.phone),
+											KEEP(500), ATMOST(RiskWise.max_atmost));
+			WithPhoneMartDate_srted := DEDUP(SORT(WithPhoneMart, Seq, did, Gathered_Phone, -(integer) Bureau_Last_Update),
+								Seq, Did, Gathered_Phone);							
+	
+		WithPhoneMartDate := JOIN(WithPhoneMartDate_srted, Combined, 
+							LEFT.Seq = RIGHT.Clean_Input.Seq AND 
+							(UNSIGNED8) LEFT.DID = (UNSIGNED8) RIGHT.DID AND
+							LEFT.Gathered_phone = RIGHT.Gathered_phone,
+									TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, 
+											SELF.Bureau.Bureau_Last_Update := TRIM((string) left.Bureau_Last_Update);
+											SELF.Bureau.Bureau_Verified := left.Bureau_Verified;
+											SELF.Experian_File_One_Verification.Experian_Verified := left.Bureau_Verified; //for sake of existing model
+											SELF.Experian_File_One_Verification.Experian_Last_Update := TRIM((string) left.Bureau_Last_Update); //for sake of existing model
+											SELF := RIGHT),
+											RIGHT OUTER);	
+	 Equifax := Phone_Shell.Search_Equifax(Input, WithPhoneMartDate, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A);
+	 Combined_data := WithPhoneMartDate + Equifax (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
 		
-	 // Experian is special - only search the Gateway for unique phones that we don't already have
-	 
-   Experian := Phone_Shell.Search_Gateway_Experian(Input, CombinedToSendToExperian, Gateways, DPPAPurpose, GLBPurpose, DataRestrictionMask, Batch, 
-																									 PhoneRestrictionMask, ExperianScoreThreshold, ExperianMaxMetronetPhones, ExperianAllowBatchUse, 
-																									 BlankOutDuplicatePhones, DedupAgainstInputPhones, Confirmation_GoToGateway, UsePremiumSource_A);
-								
-	 withExperian := Experian (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
+	 ValidCombined := Combined_data (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
 	
 	 Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus cleanData(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le) := TRANSFORM
 			// If the first seen date comes after the last seen date it is likely that information wasn't populated, use the last seen date as the first seen date
@@ -119,7 +132,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 			SELF := le;
 	 END;
 	 
-	 cleanedCombined := PROJECT(withExperian, cleanData(LEFT));
+	 cleanedCombined := PROJECT(ValidCombined, cleanData(LEFT));
 		
 	 SortedNumbers := SORT(cleanedCombined, Clean_Input.seq, Gathered_Phone, Sources.Source_List);
 	 
@@ -208,7 +221,6 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 			SELF.EDA_Characteristics.EDA_is_discon_360_days := le.EDA_Characteristics.EDA_is_discon_360_days OR ri.EDA_Characteristics.EDA_is_discon_360_days;
 		
 			// Make sure to appropriately track all of the Royalties
-			SELF.Royalties.Metronet_Royalty := le.Royalties.Metronet_Royalty + ri.Royalties.Metronet_Royalty;
 			SELF.Royalties.TargusComprehensive_Royalty := le.Royalties.TargusComprehensive_Royalty + ri.Royalties.TargusComprehensive_Royalty;
 			SELF.Royalties.QSentCIS_Royalty := le.Royalties.QSentCIS_Royalty + ri.Royalties.QSentCIS_Royalty;
 			SELF.Royalties.LastResortPhones_Royalty := le.Royalties.LastResortPhones_Royalty + ri.Royalties.LastResortPhones_Royalty;
@@ -256,19 +268,15 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 // OUTPUT(CHOOSEN(Parent (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Parent'));
 	 // OUTPUT(CHOOSEN(RelativeCloseProximity (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('RelativeCloseProximity'));
 	 // OUTPUT(CHOOSEN(CoResident (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('CoResident'));
-	 // OUTPUT(CHOOSEN(Experian (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Experian'));
 	 // OUTPUT(CHOOSEN(Targus (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Targus'));
 	 // OUTPUT(CHOOSEN(TransUnion (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('TransUnion'));
 	 // OUTPUT(CHOOSEN(Combined, MaxPhones), NAMED('Combined'));
 	 // OUTPUT(CHOOSEN(cleanedCombined, MaxPhones), NAMED('cleanedCombined'));
-	 // OUTPUT(CHOOSEN(withExperian, MaxPhones), NAMED('withExperian'));
 	 // OUTPUT(CHOOSEN(SortedNumbers, MaxPhones), NAMED('SortedNumbers'));
 	 // OUTPUT(CHOOSEN(combinedNumbers, MaxPhones), NAMED('combinedNumbers'));
 	 // OUTPUT(CHOOSEN(Sequenced, MaxPhones), NAMED('Sequenced'));
-	 // OUTPUT(withExperian, NAMED('withExperian'));
 	 // OUTPUT(DataRestrictionMask,NAMED('DataRestrictionMask')); 
 	 // OUTPUT(UsePremiumSource_A,NAMED('UsePremiumSource_A')); 
-	 //  OUTPUT(CombinedToSendToExperian, NAMED('CombinedToSendToExperian'));
 	 /* ***************************************************************
 		* 									Return Final Result 												*
 	  *************************************************************** */

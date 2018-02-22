@@ -9,7 +9,7 @@
  * Return Shipto_Score                                                              *
  ************************************************************************************/
 
-import easi, ut, address, riskwise, business_risk, risk_indicators;
+import easi, ut, address, riskwise, business_risk, risk_indicators, std;
 
 export CDN810_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 									dataset(RiskWise.Layout_CD2I) indata,
@@ -174,7 +174,7 @@ FUNCTION
 		watercraft_count 	 	        := le.bs.Bill_To_Out.watercraft.watercraft_count;																	// Field #427 	Number of Watercraft Currently Owned
 		inferred_dob 	 		          := le.bs.Bill_To_Out.reported_dob;																								// Field #454 	Pre-Calcd Inferred DOB (YYYYMMDD)
 		archive_date           := if(le.bs.bill_to_out.historydate=999999, 
-																	(integer)(ut.GetDate), 
+																	(integer)(Std.Date.Today()), 
 																	(integer)risk_indicators.iid_constants.full_history_date(le.bs.bill_to_out.historydate) ); 
 																	// corrected the selection of the archive date
 																	// in realtime transactions, most people were getting high scores because everyone appeared older than they are,
@@ -790,7 +790,7 @@ FUNCTION
 		
 			INTEGER mdy( integer month, integer day, integer year ) := ut.DaysSince1900( (string4)year, (string2)month, '01' ) + (day - 1);			
 			
-			system_date_days := mdy((integer)systemdate[5..6], (integer)systemdate[7..8], (integer)systemdate[1..4]);			
+			system_date_days := mdy((integer)((STRING)systemdate)[5..6], (integer)((STRING)systemdate)[7..8], (integer)((STRING)systemdate)[1..4]);			
 
 			create_date_days := mdy((integer)Customer_Create_date[5..6], (integer)Customer_Create_date[7..8], (integer)Customer_Create_date[1..4]);
 			
@@ -885,10 +885,10 @@ FUNCTION
 
 	/*** AGE *** SHIPTO VAR ONLY ***/
 		
-			inferred_dob_date_days_billto := mdy((integer)inferred_dob[5..6], (integer)inferred_dob[7..8], (integer)inferred_dob[1..4]);
+			inferred_dob_date_days_billto := mdy((integer)((STRING)inferred_dob)[5..6], (integer)((STRING)inferred_dob)[7..8], (integer)((STRING)inferred_dob)[1..4]);
 			days_since_dob_billto := system_date_days - inferred_dob_date_days_billto; 
 			
-			inferred_dob_date_days_shipto := mdy((integer)inferred_dob_s[5..6], (integer)inferred_dob_s[7..8], (integer)inferred_dob_s[1..4]);
+			inferred_dob_date_days_shipto := mdy((integer)((STRING)inferred_dob_s)[5..6], (integer)((STRING)inferred_dob_s)[7..8], (integer)((STRING)inferred_dob_s)[1..4]);
 			days_since_dob_shipto := system_date_days - inferred_dob_date_days_shipto; 
 																			
 			

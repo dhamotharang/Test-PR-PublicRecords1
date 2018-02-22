@@ -2,7 +2,7 @@
 fixed the reason code S69 to S65
 */
 
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT;
+IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
 
 EXPORT RVB1503_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -746,7 +746,7 @@ Layout_Debug := RECORD
 //               sysdate := common.sas_date('20150501');	
 //===   for round 2 validation set the sysdate to the archive date
 //========================================================================================  
-       sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+       sysdate := common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01'));
  
 //==============================================================
 //=             Based on the information collected above       =

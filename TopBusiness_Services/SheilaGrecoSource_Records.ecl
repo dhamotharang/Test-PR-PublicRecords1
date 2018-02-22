@@ -2,7 +2,7 @@
 // ====== RETURNS SHEILA GRECO DATA FOR A MAINCOMPANYID IN ESP-COMPLIANT WAY. =====
 // ================================================================================
 //
-import Sheila_Greco, iesp, BIPV2, ut, codes;
+import Sheila_Greco, iesp, BIPV2, ut, codes, std;
 
 export SheilaGrecoSource_Records(
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
@@ -53,7 +53,7 @@ export SheilaGrecoSource_Records(
 															L.rawfields.address1,L.rawfields.address2);
 															
 			// Create a dataset of siccodes by splitting on comma.	
-			sic_dset := DATASET([ut.StringSplit(L.rawfields.siccode,',')],{string siccode});
+			sic_dset := DATASET([Std.Str.SplitWords(L.rawfields.siccode,',')],{string siccode});
 			//Only output sic codes that are valid (length of 4).
 			self.Sics := PROJECT(CHOOSEN(sic_dset(length(siccode)=4),iesp.Constants.DCA.MAX_SICS),TRANSFORM(iesp.rollupbizreport.t_SicCode,
 																							SELF.Sic := LEFT.siccode,
@@ -61,7 +61,7 @@ export SheilaGrecoSource_Records(
 																							SELF := []));
 			
 			// Create a datatset of competitors by splitting on comma
-			competitor_dset := DATASET([ut.StringSplit(L.rawfields.competitors,',')],{string competitor});
+			competitor_dset := DATASET([Std.Str.SplitWords(L.rawfields.competitors,',')],{string competitor});
 			self.Competitors := PROJECT(CHOOSEN(competitor_dset,iesp.Constants.DCA.MAX_COMPETITORS),TRANSFORM(iesp.share.t_StringArrayItem,
 																							SELF.value := LEFT.competitor,
 																							SELF := []));

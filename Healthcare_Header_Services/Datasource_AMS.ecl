@@ -1,8 +1,8 @@
-import doxie,doxie_files,AutoStandardI,Ingenix_NatlProf,ams,AMS_Services,Prof_LicenseV2_Services,iesp,address,ut;
+import doxie,doxie_files,AutoStandardI,Ingenix_NatlProf,ams,AMS_Services,Prof_LicenseV2_Services,iesp,address,ut, std;
 EXPORT Datasource_AMS := Module
 	//The following is to allow for a small amount of history to be held and otherwise get rid of the rest of the Ingenix data.
 	monthsBack := Constants.MAX_AMS_HISTORY;
-	theDate:=ut.GetDate;
+	theDate:=(STRING8)Std.Date.Today();
 	theYear := (integer)theDate[1..4];
 	theMonth := (integer)theDate[5..6];
 	theDay := theDate[7..8];

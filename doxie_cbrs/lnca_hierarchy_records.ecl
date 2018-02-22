@@ -1,4 +1,4 @@
-IMPORT DCAV2,ut,iesp;
+﻿IMPORT DCAV2,ut,iesp;
 /* This module will accept a record set a bdids and use the first one to create the entire hierarchy of
 the passed bdid. The logic will first find the ulitmate parent of the bdid, and then drill down from the highest
 point and capture all of the companies under the ultimate parent. 
@@ -40,7 +40,7 @@ MODULE
 	full_HierRec := RECORD
 			STRING9					enterprise_num;
 			STRING9 				parent_enterprise_number;
-			STRING2					child_level := 0;
+			STRING2					child_level := '0';
 			INTEGER 				grpLevel := 0;
 			UNSIGNED1				numPrecEndTags := 0;
 			BOOLEAN					lastRec := FALSE;

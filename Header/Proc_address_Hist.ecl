@@ -46,7 +46,7 @@ join_all_p := project(join_all_dis
 
 r tr(r l,r r) := transform
 	self.dt_first_seen:=ut.Min2(l.dt_first_seen,r.dt_first_seen);
-	self.dt_last_seen:=ut.max2(l.dt_last_seen,r.dt_last_seen);
+	self.dt_last_seen:=max(l.dt_last_seen,r.dt_last_seen);
 	self:=l;
 end;
 

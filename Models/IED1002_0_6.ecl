@@ -1,5 +1,5 @@
 //used by FCRA only
-import risk_indicators, ut, easi;
+import risk_indicators, ut, easi, std;
 
 export IED1002_0_6( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, unsigned1 BSversion=2) := FUNCTION
 	IE_DEBUG := FALSE;
@@ -263,7 +263,7 @@ export IED1002_0_6( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, uns
 			(pk_rc_disthphoneaddr * 4620.15356);
 
 	sysdate := map(
-			trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+			trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (string)Std.Date.Today(), (string6)le.historydate+'01')),
 			length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 																														 NULL);
 

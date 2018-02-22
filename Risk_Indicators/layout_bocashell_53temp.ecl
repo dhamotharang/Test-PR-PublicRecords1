@@ -2223,7 +2223,7 @@ EXPORT layout_bocashell_53temp := RECORD
   layoutamlattributesv1 amlattributes;
   layout_hhid_summary hhid_summary;
   layout_insurance_phones_verification insurance_phones_summary;
-  string2 experian_phone_verification;
+  string2 phone_ver_bureau ;
   boolean attended_college;
   decimal4_1 source_profile;
   integer8 source_profile_index;
