@@ -540,7 +540,18 @@ MODULE
 														tOverwriteWithTU(LEFT,RIGHT),
 														LEFT OUTER,
 														LIMIT(0),KEEP(1));
-			dPhoneDetail := IF(EXISTS(dPhoneRollup),dPhoneDetail_,dPrimaryPhoneDetail);
+														
+			// To preserve Qsent PVS(type flag P ) records
+			dTUPhonesOnly := JOIN(dPrimaryPhoneDetail, dPhoneDetail_, 
+			                     LEFT.acctno = RIGHT.acctno and 
+													           LEFT.phone  = RIGHT.phone, 
+																		      TRANSFORM(lpf.PhoneFinder.PhoneSlim,
+																					   SELF.coc_description   := PhoneFinder_Services.Functions.ServiceClassDesc((INTEGER)LEFT.ServiceClass),
+																						  SELF := LEFT),
+																		      LEFT ONLY);
+			
+		 dAllPhonesDetail_ := dPhoneDetail_ + dTUPhonesOnly;
+		 dPhoneDetail := IF(EXISTS(dPhoneRollup),dAllPhonesDetail_,dPrimaryPhoneDetail);
 		
 		lpf.PhoneFinder.PhoneIesp tFormat2IespPhone(lpf.PhoneFinder.PhoneSlim pInput) :=
 		TRANSFORM
@@ -642,7 +653,9 @@ MODULE
    			OUTPUT(dPhoneSort,NAMED('dPhoneSort_Primary'),EXTEND);
    			OUTPUT(dPhoneRollup,NAMED('dPhoneRollup_Primary'),EXTEND);			
    			OUTPUT(dPrimaryPhoneDetail,NAMED('dPrimaryPhoneDetail_Primary'),EXTEND);
-   			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);				
+   			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);		
+					 OUTPUT(dTUPhonesOnly,NAMED('dTUPhonesOnly'),EXTEND);				
+   			OUTPUT(dAllPhonesDetail_,NAMED('dAllPhonesDetail_'),EXTEND);			
    			OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
       OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
 			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);

@@ -7,6 +7,7 @@
 	<part name="scores" type="tns:XmlDataSet" cols="110" rows="10"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="allowemergingid" type="xsd:boolean"/>
  </message>
 */
 /*--HELP-- 
@@ -179,6 +180,7 @@ export FlexID_Service := MACRO
 	string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
 	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
+	BOOLEAN allowemergingid := FALSE : STORED('allowemergingid');
 	
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
@@ -290,7 +292,9 @@ export FlexID_Service := MACRO
 	#stored ('LastSeenThreshold',LastSeenThreshold);
 	#stored ('DisallowInsurancePhoneHeaderGateway',options.DisAllowInsurancePhoneHeaderGateway);
 	#stored ('InstantIDVersion',options.InstantIDVersion);
-	#stored ('EnableEmergingID',options.EnableEmergingID);
+	
+	emergingID_checks := allowemergingid or options.EnableEmergingID;
+	#stored ('EnableEmergingID', emergingID_checks);
 	#stored ('NameInputOrder',options.NameInputOrder);
 	// #stored ('IIDVersionOverride',options.IIDVersionOverride);	// now out of band, so should just work in ciid
 	boolean FromFlexID := TRUE;

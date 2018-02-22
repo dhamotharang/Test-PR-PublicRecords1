@@ -75,10 +75,10 @@
 	<part name="DateofApplication" type="xsd:string"/>
 	<part name="TimeofApplication" type="xsd:string"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
+  <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
-
 
 import Address, Risk_Indicators, Riskwise, ut, seed_files, doxie, Risk_Reporting, Inquiry_AccLogs, STD;
 
@@ -163,10 +163,13 @@ export FraudAdvisor_Service := MACRO
 		'OtherApplicationIdentifier3',
 		'DateofApplication',
 		'TimeofApplication',
-		'OutcomeTrackingOptOut'
+		'OutcomeTrackingOptOut',
+		'SuppressCompromisedDLs'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
+
+
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -271,6 +274,7 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 
 string20  Model              := ''    : stored('Model');
 boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
+boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -638,12 +642,13 @@ ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := l
 ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
 
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_name);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_name, suppressCompromisedDLs);
 // search for test seeds
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);																						
 // choose either test seed or real
 pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));			
 //pick_attr := ungroup(attributes);			
+
 
 
 checkBoolean(boolean x) := if(x, '1', '0');									
@@ -1244,6 +1249,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => 'IDVerSSNDriversLicense',
 		c=	224 => 'SourceVehicleRegistration',
 		c=	225 => 'SourceDriversLicense',
+		c= 	226 => 'IdentityDriversLicenseComp',
 		'INVALID'
 		);
 									 
@@ -1474,6 +1480,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => le.version201.IDVerSSNDriversLicense,
 		c=	224 => le.version201.SourceVehicleRegistration,
 		c=	225 => le.version201.SourceDriversLicense,
+		c= 	226 => le.version201.IdentityDriversLicenseComp,
 		''
 		);
 END;
@@ -1697,7 +1704,10 @@ END;
 name_pairs :=  normalize(pick_attr, 162, intoVersion1(left, counter));
 v1 := project(name_pairs, transform(layout_attribute, self.attribute := left));
 
-v2attributeCount := if( doAttributesVersion201 , 225, 217);
+v2attributeCount := map( 
+doAttributesVersion201 and SuppressCompromisedDLs => 226,
+doAttributesVersion201 => 225,
+												 217);
 v2_name_pairs :=  normalize(pick_attr, v2attributeCount, intoVersion2(left, counter));
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
 		
@@ -1749,6 +1759,8 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
 	self := [];
 END;
 attributeOut := project(pick_attr, formAttributeGroup(left));
+
+
 
 // Get the models
 ret := Models.FD3510_0_0(clam, ofacSearching, isFCRA, inCalif, fdReasonsWith38, nugen, addtl_watchlists);

@@ -84,8 +84,7 @@ export ReportService_Records := module
     
     consumer_statements := consumer_statements_all(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
     
-    FFD.MAC.AppendConsumerStatements(result, results_with_cs, consumer_statements, iesp.criminal_fcra.t_FcraCriminalReportResponse);
-	   FFD.MAC.AppendConsumerAlerts(results_with_cs, result_all, consumer_alerts, iesp.criminal_fcra.t_FcraCriminalReportResponse);	
+	  FFD.MAC.AppendConsumerAlertsAndStatements(result, result_all, consumer_statements, consumer_alerts, iesp.criminal_fcra.t_FcraCriminalReportResponse);	
         
     iesp.criminal_fcra.t_FcraCriminalReportResponse null_xform() := TRANSFORM
       self._Header     := iesp.ECL2ESP.GetHeaderRow();

@@ -6,7 +6,8 @@ export PickListSoapcall := MODULE
   shared make_soapcall (dataset (Gateway.layouts.config) gateways, 
                         dataset (iesp.person_picklist.t_PersonPickListRequest) request,
                         boolean unique_only, 
-                        boolean call_gateway
+                        boolean call_gateway,
+                        boolean no_fail
   ) := function
 
     res := if (call_gateway, doxie.get_remote_picklist (request , gateways));
@@ -24,26 +25,35 @@ export PickListSoapcall := MODULE
                 unique_only and (cnt >1) => 203,
                 unique_only and (cnt =0) => 10,
                 0);
-    if (call_gateway and err != 0, FAIL (err,  'picklist: ' + doxie.ErrorCodes(err)));
+    if (call_gateway and ~no_fail and err != 0, FAIL (err,  'picklist: ' + doxie.ErrorCodes(err)));
 		
-    return if (call_gateway and err = 0, res);
+    res_err := if (call_gateway and no_fail,
+			project(res, transform(iesp.person_picklist.t_PersonPickListResponse,
+				self._Header.Status := err;
+				self._Header.Message := if (err > 0, doxie.ErrorCodes(err), '');
+				self._Header := left._header; 
+				self := left)));	
+
+    return if (call_gateway and err = 0, res, res_err);
   end;
 
 
   export esdl (dataset (Gateway.layouts.config) gateways, 
                dataset (iesp.person_picklist.t_PersonPickListRequest) request,
                boolean unique_only = true, // fail if too many or none DIDs found
-               boolean call_gateway = true // a workaround to prevent inadvertent gateway
+               boolean call_gateway = true, // a workaround to prevent inadvertent gateway
+               boolean no_fail = false // return error code instead of failing
   ) := function
 
-    return make_soapcall (gateways, request, unique_only, call_gateway);
+    return make_soapcall (gateways, request, unique_only, call_gateway, no_fail);
   end;
 
 
   // this call should be generally avoided: only for non-esdl services
   export non_esdl (dataset (Gateway.layouts.config) gateways,
                    boolean unique_only = true, // fail if too many or none DIDs found
-                   boolean call_gateway = true // a workaround to prevent inadvertent gateway
+                   boolean call_gateway = true, // a workaround to prevent inadvertent gateway
+                   boolean no_fail = false // return error code instead of failing
   ) := function
 
     gm := AutoStandardI.GlobalModule ();
@@ -91,7 +101,7 @@ export PickListSoapcall := MODULE
     end;
     //TODO: create request from the flat SOAP input
     request := dataset ([SetLegacyRequest ()]);
-    return make_soapcall (gateways, request, unique_only, call_gateway);
+    return make_soapcall (gateways, request, unique_only, call_gateway, no_fail);
   end;
   
 END;

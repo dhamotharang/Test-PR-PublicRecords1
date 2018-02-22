@@ -30,7 +30,7 @@ with_ssn_name_summary := join(rolled_header, Risk_Indicators.Correlation_Risk.ke
 		self.header_summary.ssn_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrssnname_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
+		self.header_summary.corrssnname_sources := if(BSversion <= 51, '', trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', ''));
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrssnname_firstseen := if(BSversion <= 51, '', trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', ''));
@@ -51,7 +51,7 @@ with_ssn_addr_summary := join(with_ssn_name_summary, Risk_Indicators.Correlation
 		self.header_summary.ssn_addr_source_count := count(rolledSummary);
 		setSources 			 := set(rolledSummary,src);
 		stringSources 	 := STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrssnaddr_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
+		self.header_summary.corrssnaddr_sources := if(BSversion <= 51, '', trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', ''));
 		setFirstSeen  	 := set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen  := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrssnaddr_firstseen := if(BSversion <= 51, '', trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', ''));
@@ -73,7 +73,7 @@ with_addr_name_summary := join(with_ssn_addr_summary, Risk_Indicators.Correlatio
 		self.header_summary.addr_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corraddrname_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
+		self.header_summary.corraddrname_sources := if(BSversion <= 51, '', trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', ''));
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corraddrname_firstseen := if(BSversion <= 51, '', trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', ''));
@@ -104,7 +104,7 @@ with_phone_addr_header_summary := join(with_phone_addr_summary, Risk_Indicators.
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corraddrphone_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
+		self.header_summary.corraddrphone_sources := if(BSversion <= 51, '', trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', ''));
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corraddrphone_firstseen := if(BSversion <= 51, '', trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', ''));
@@ -135,7 +135,7 @@ with_phone_lname_header_summary := join(with_phone_lname_summary, Risk_Indicator
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrphonelastname_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
+		self.header_summary.corrphonelastname_sources := if(BSversion <= 51, '', trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', ''));
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrphonelastname_firstseen := if(BSversion <= 51, '', trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', ''));
@@ -155,7 +155,7 @@ with_name_dob_summary := join(with_phone_lname_header_summary, Risk_Indicators.C
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrnamedob_sources := trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', '');
+		self.header_summary.corrnamedob_sources := trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', '');
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrnamedob_firstseen := trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', '');
@@ -176,7 +176,7 @@ with_addr_dob_summary := join(with_name_dob_summary, Risk_Indicators.Correlation
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corraddrdob_sources := trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', '');
+		self.header_summary.corraddrdob_sources := trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', '');
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corraddrdob_firstseen := trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', '');
@@ -196,7 +196,7 @@ with_ssn_dob_summary := join(with_addr_dob_summary, Risk_Indicators.Correlation_
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrssndob_sources := trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', '');
+		self.header_summary.corrssndob_sources := trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', '');
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrssndob_firstseen := trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', '');
@@ -216,7 +216,7 @@ with_ssn_phone_summary := join(with_ssn_dob_summary, Risk_Indicators.Correlation
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrssnphone_sources := trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', '');
+		self.header_summary.corrssnphone_sources := trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', '');
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrssnphone_firstseen := trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', '');
@@ -236,7 +236,7 @@ with_correlation_summary52 := join(with_ssn_phone_summary, Risk_Indicators.Corre
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
-		self.header_summary.corrdobphone_sources := trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', '');
+		self.header_summary.corrdobphone_sources := trim(stringSources, left) + if(trim(stringSources, left, right) <> '', ',', '');
 		setFirstSeen  	:= set(rolledSummary,(string)dt_first_seen);
 		stringFirstSeen := STD.Str.CombineWords(setFirstSeen, ',');
 		self.header_summary.corrdobphone_firstseen := trim(stringFirstSeen, left, right) + if(trim(stringFirstSeen, left, right) <> '', ',', '');

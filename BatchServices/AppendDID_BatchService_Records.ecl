@@ -1,4 +1,4 @@
-Import Batchservices, DidVille, risk_indicators, suppress, ut;
+﻿Import Batchservices, DidVille, risk_indicators, suppress, ut, AutoStandardI, STD;
 EXPORT APPendDID_batchService_Records := MODULE
 	EXPORT Search(DATASET (  BatchServices.AppendDid_BatchService_Layouts.Layout_did_inBatchWithAcctnoBatchShare) Ds_batchInProcessed,
 												 STRING120 Appends,
@@ -6,10 +6,8 @@ EXPORT APPendDID_batchService_Records := MODULE
 												 STRING120 fuzzy,
 												 boolean 	 dedup_results,
 												 unsigned2 thresh_num,																														
-												 boolean   GLB,
-												 boolean 	 patriotproc,
-												 boolean 	 lookups,
-												 Boolean 	 livingsits,	
+												 boolean   GLB_data,
+												 boolean 	 patriotproc,												
 												 unsigned1 glb_purpose_value,											
 												 boolean 	 Include_minors,
 												 boolean 	 useNonBlankKey,
@@ -21,14 +19,27 @@ EXPORT APPendDID_batchService_Records := MODULE
 recs := PROJECT(Ds_batchInProcessed,
                TRANSFORM(DidVille.Layout_Did_OutBatch,							    
 							    SELF.seq :=  (unsigned4) LEFT.acctno;
-									SELF.SSN :=  stringlib.stringfilter(LEFT.ssn,'0123456789');
+									SELF.SSN :=  std.str.filter(LEFT.ssn,'0123456789');
 									SELF := LEFT));
 											
 IndustryClass := ut.IndustryClass.Get();
+
+params_mod := module(AutoStandardI.PermissionI_Tools.params)
+	export boolean 	 AllowAll 					 := false;
+	export boolean 	 AllowGLB     			 := false;
+	export boolean 	 AllowDPPA 					 := false;
+	export unsigned1 DPPAPurpose         := 0;
+	export unsigned1 GLBPurpose 				 := glb_purpose_value;
+	export boolean   IncludeMinors       := include_minors;
+END;
+
+GLB := AutoStandardI.PermissionI_Tools.val(params_mod).glb.ok(glb_purpose_value) OR GLB_data;
+hhidplus := std.str.find(appends,'HHID_PLUS',1)<>0;
+edabest := std.str.find(appends,'BEST_EDA',1)<>0;
 // call common did function here.
 res1TMP := didville.did_service_common_function(recs, appends, verify, fuzzy, dedup_results, 
-                                            thresh_num, GLB, patriotproc, lookups, 
-																						livingSits, false, false, glb_purpose_value, 
+                                            thresh_num, GLB, patriotproc, false, 
+																						false, hhidplus, edabest, glb_purpose_value, 
 																						include_minors,,UseNonBlankKey, appType, soap_xadl_version_value,
 																						IndustryClass_val := IndustryClass
 																						);																																												

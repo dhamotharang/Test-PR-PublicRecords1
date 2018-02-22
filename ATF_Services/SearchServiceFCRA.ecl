@@ -55,8 +55,7 @@ EXPORT SearchServiceFCRA := MACRO
 
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(atf_recs.Records, results, iesp.firearm_fcra.t_FcraFirearmSearchResponse);
 																
-		FFD.MAC.AppendConsumerStatements(results, results_with_cs, atf_recs.Statements, iesp.firearm_fcra.t_FcraFirearmSearchResponse);	 
-		FFD.MAC.AppendConsumerAlerts(results_with_cs, results_new, atf_recs.ConsumerAlerts, iesp.firearm_fcra.t_FcraFirearmSearchResponse);	 
+		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_new, atf_recs.Statements, atf_recs.ConsumerAlerts, iesp.firearm_fcra.t_FcraFirearmSearchResponse);	 
 		
 		output(results_new, named('Results'));	
 		

@@ -1,7 +1,10 @@
 ﻿EXPORT MAC := MODULE
 
-	EXPORT AppendConsumerStatements(__inf, __outf, __statements, __lout, __csf = 'ConsumerStatements') := MACRO
-		__outf := PROJECT(__inf, transform(__lout, self.__csf := __statements, self := left, self:=[]));
+	EXPORT AppendConsumerAlertsAndStatements(__inf, __outf, __statements, __alerts, __lout, __csf = 'ConsumerStatements', __caf = 'ConsumerAlerts') := MACRO
+		__outf := PROJECT(__inf, transform(__lout, 
+                                        self.__caf := __alerts, 
+                                        self.__csf := __statements, 
+                                        self := left, self:=[]));
 	ENDMACRO;
 	
 	EXPORT PrepareResultRecord(__results, __outrec, __statements, __alerts, __lout) := MACRO
@@ -47,9 +50,6 @@
 				) + %__res_ftr%;
 	ENDMACRO;
 
-	EXPORT AppendConsumerAlerts(__inf, __outf, __alerts, __lout, __caf = 'ConsumerAlerts') := MACRO
-		__outf := PROJECT(__inf, transform(__lout, self.__caf := __alerts, self := left, self:=[]));
-	ENDMACRO;
 	
 	
 END;

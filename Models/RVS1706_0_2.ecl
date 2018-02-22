@@ -18733,7 +18733,7 @@ rc_dataset := DATASET([
     ], ds_layout)(value > 0);
 
 //*************************************************************************************//
-// IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
+// IMPORTANT NOTE:  Select ONLY reason codes with an RCValue >0 .  I'll leave the 
 //   implementation of this to the Engineer
 //*************************************************************************************//
 
@@ -18821,7 +18821,7 @@ reasonsOverrides := MAP(
 													rvs1706_0_2 = 900 => DATASET([{'00'}], HRILayout),
 																							 DATASET([], HRILayout)
 													);
-reasons := DATASET([{rc1}, {rc2}, {rc3}, {rc4}, {rc4}], HRILayout);
+reasons := DATASET([{rc1}, {rc2}, {rc3}, {rc4}, {rc5}], HRILayout);
 // If we have score overrides use them, else use the normal reason codes
 reasonsFinalTemp := IF(ut.Exists2(reasonsOverrides), 
 										reasonsOverrides, 

@@ -162,18 +162,17 @@ wl_hits := ITERATE(s,iter(LEFT,RIGHT));
 skipWatchlist := ((ofac_version = 4 and Include_Ofac=FALSE and Include_Additional_Watchlists=FALSE and count(watchlists_requested)=0));
 gateways	:= if(ofac_version <> 4 or skipWatchlist, dataset([],Gateway.Layouts.Config), Gateway.Configuration.Get());
 
-OFAC_XG5.Layout.InputLayout XG5prep(in_data le) := TRANSFORM
-
-	search_string := 	IF(le.name_unparsed<>'',
-												le.name_unparsed,
-												TRIM(le.name_first)+' '+TRIM(le.name_middle)+' '+TRIM(le.name_last));
+OFAC_XG5.Layout.InputLayout XG5prep(in_data le) := TRANSFORM											
 	SELF.seq := if(le.seq = 0, (unsigned4)le.acctno, le.seq);
 	self.acctno := le.acctno;
-	SELF.FullName := TRIM(search_string,LEFT,RIGHT);
+	self.firstName := trim(le.name_first);
+	self.middleName := trim(le.name_middle);
+	self.lastName := trim(le.name_last);
+	SELF.FullName := IF( le.name_first != '' OR le.name_last != '', '', TRIM(le.name_unparsed,LEFT,RIGHT) );
 	dobTemp := if(le.dob = '', '', le.dob[5..6] + '/' + le.dob[7..8] + '/' + le.dob[1..4]); //Bridger needs DOB in mm/dd/yyyy
 	SELF.DOB := dobTemp;	
 	SELF.country := le.country;
-	SELF.searchType := le.search_type;
+	SELF.searchType := globalwatchlists.translate_SearchType(le.search_type); 
 	SELF := [];
 	
 END;
