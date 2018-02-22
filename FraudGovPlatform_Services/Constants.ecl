@@ -66,6 +66,7 @@
 																			Fragment_Types.MAILING_ADDRESS_FRAGMENT,
 																			Fragment_Types.IP_ADDRESS_FRAGMENT,
 																			Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
+																			Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
 																			Fragment_Types.DEVICE_ID_FRAGMENT
 																		];
 	
