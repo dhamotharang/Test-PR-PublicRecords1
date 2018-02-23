@@ -145,15 +145,15 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																									SELF.BEOevidenceOfPreviousIncarceration             := IF(RIGHT.party.EverIncarcer,        TRUE, FALSE),  
 																									SELF.BEOevidenceOfCurrentIncarceration              := IF(RIGHT.party.CurrIncarcer,        TRUE, FALSE),  
 																									SELF.BEOevidenceOfCurrentParole                     := IF(RIGHT.party.CurrParole,          TRUE, FALSE),
-																									/*   This will be used in Level 8 of busLegalCriminal attribute  */  
+																									/*   This will be used in Level 8 of BusLegalStateCriminal attribute  */  
 																									SELF.BEOevidenceOfFelonyConvictionInLastNYR         := IF(RIGHT.party.ConvictedFelonyCount4F_NYR > 0, TRUE, FALSE), 
-																									/*   This will be used in Level 7 of busLegalCriminal attribute  */
+																									/*   This will be used in Level 7 of BusLegalStateCriminal attribute  */
 																									SELF.BEOevidenceOfFelonyConvictionOlderNYR          := IF(RIGHT.party.ConvictedFelonyCount4F_OVNYR > 0, TRUE, FALSE), 
-																									/*   This will be used in Level 5 of busLegalCriminal attribute  */  
+																									/*   This will be used in Level 5 of BusLegalStateCriminal attribute  */  
 																									SELF.BEOevidenceOfUncatagorizedConvictionInLastNYR  := IF(RIGHT.party.ConvictedUnknownCount4U_NYR > 0, TRUE, FALSE), 
-																									/*   This will be used in Level 4 of busLegalCriminal attribute  */ 
+																									/*   This will be used in Level 4 of BusLegalStateCriminal attribute  */ 
 																									SELF.BEOevidenceOfMisdeameanorConvictionInLastNYR   := IF(RIGHT.party.ConvictedMisdemeanorCount4M_NYR > 0, TRUE, FALSE),
-																									/*   This will be used in Level 3 of busLegalCriminal attribute */ 
+																									/*   This will be used in Level 3 of BusLegalStateCriminal attribute */ 
 																									SELF.BEOevidenceOfUncatagorizedConvictionOlderNYR   := IF(RIGHT.party.ConvictedUnknownCount4U_OVNYR > 0, TRUE, FALSE),
 																									SELF.BEOevidenceOfMisdeameanorConvictionOlderNYR    := IF(RIGHT.party.ConvictedMisdemeanorCount4M_OVNYR > 0, TRUE, FALSE),  
 																									//***************************************************************************************************

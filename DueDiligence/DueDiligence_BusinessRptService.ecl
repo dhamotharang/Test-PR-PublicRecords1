@@ -14,9 +14,9 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 			
 			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.BUSINESS);
 			
-			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
+			validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa);
 			
-			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
+			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE), DueDiligence.Constants.BUSINESS);
 			
 			cleanData := DueDiligence.Common.GetCleanData(validatedRequest(validRequest));
 

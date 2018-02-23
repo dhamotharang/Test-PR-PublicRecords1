@@ -177,16 +177,16 @@ EXPORT LinkIDs := RECORD
 		STRING10 BusShellShelf_Flag;
 		STRING2 BusMatchLevel;
 		STRING10 BusMatchLevel_Flag;
-		STRING2 BusLegalCriminal;
-		STRING10 BusLegalCriminal_Flag;
+		STRING2 BusLegalStateCriminal;
+		STRING10 BusLegalStateCriminal_Flag;
+    STRING2 BusLegalFederalCriminal;
+    STRING10 BusLegalFederalCriminal_Flag;
 		STRING2 BusLegalCivil;
 		STRING10 BusLegalCivil_Flag;
 		STRING2 BusLegalTraffInfr;
 		STRING10 BusLegalTraffInfr_Flag;
 		STRING2 BusLegalTypes;
 		STRING10 BusLegalTypes_Flag;
-		STRING4 BusHighRiskNewsProfiles;
-		STRING10 BusHighRiskNewsProfiles_Flag;
 		STRING2 BusLinkedBusFootprint;
 		STRING10 BusLinkedBusFootprint_Flag;
 		STRING2 BusLinkedBusIndex;
@@ -304,8 +304,8 @@ EXPORT LinkIDs := RECORD
 		STRING10 BusLegalEvents_Flags;
 		STRING2 BusLegalEventsFelonyType;
 		STRING10 BusLegalEventsFelonyType_Flags;
-		STRING2 BusHighRiskNewsProfiles;
-		STRING10 BusHighRiskNewsProfiles_Flags;
+		STRING2 BusHighRiskNewsProfiles;  //TO BE REMOVED WITH BATCH CHANGES
+		STRING10 BusHighRiskNewsProfiles_Flags;  //TO BE REMOVED WITH BATCH CHANGES
 		STRING2 BusLinkedBusRisk;
 		STRING10 BusLinkedBusRisk_Flags;
 		STRING2 BusExecOfficersRisk;
