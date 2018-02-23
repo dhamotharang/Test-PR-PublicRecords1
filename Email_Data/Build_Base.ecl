@@ -1,4 +1,4 @@
-export Build_Base(version) := module
+﻿export Build_Base(version) := module
 //-------Concatenate all Email sources in a common layout-
 #option('multiplePersistInstances',FALSE);
 
