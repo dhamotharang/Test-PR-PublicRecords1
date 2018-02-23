@@ -75,6 +75,8 @@
 /*--INFO-- InView Business Report */	
 	
 export InViewReportService := MACRO
+#onwarning(4207, ignore);
+
 #option ('globalAutoHoist', false);
 #option ('spotCSE', false);
 #stored('useSupergroup',true);

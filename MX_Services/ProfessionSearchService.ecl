@@ -33,7 +33,8 @@ import AutoStandardI, iesp;
 // Used by Accurint->International->Professional Certification Search.
 //	- formerly known as International Professional License Search (ProfLicenseSearchService)
 export ProfessionSearchService := MACRO
-
+	#onwarning(4207, ignore);
+	
 	ds_in := DATASET ([], iesp.internationalprofcert.t_InternationalProfCertificationSearchRequest) : STORED('InternationalProfCertificationSearchRequest', FEW);
 	first_row := ds_in[1] : INDEPENDENT;
 	iesp.ECL2ESP.SetInputBaseRequest(first_row);
