@@ -504,112 +504,8 @@ EXPORT CommonQuery := MODULE
 												
 				RETURN businessFlags;
 		END;
-		
-		EXPORT temp_transformDataTo(dataIn, toLayout) := FUNCTIONMACRO
-				RETURN PROJECT(dataIn, TRANSFORM(toLayout,
-																					SELF := LEFT;
-																					SELF := [];));
-		ENDMACRO;
-		
-		EXPORT temp_transformBusReport(busResults, reportLayout, busIndicator, includeReport) := FUNCTIONMACRO
-		
-			#if(busIndicator = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE)
-				busReport := PROJECT(busResults, TRANSFORM({UNSIGNED seq, reportLayout},
-																										
-																										//ECONOMIC
-																										property := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnership;
-																										aircraft := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnership;
-																										watercraft := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.WatercraftOwnership;
-																										vehicle := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.MotorVehicleOwnership;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Property := PROJECT(property, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessPropertyOwnership,
-																																																																														SELF.properties := PROJECT(LEFT.Properties, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessProperty,
-																																																																																																				SELF.ownership := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.PurchaseDetails, iesp.duediligenceshared.t_DDROwnershipDetails);
-																																																																																																				SELF.assessment := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.MostRecentTax, iesp.duediligenceshared.t_DDRTaxAssessmentValues);
-																																																																																																				SELF.AreaRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.AreaRisk, iesp.duediligenceshared.t_DDRAreaRisk);
-																																																																																																				SELF.CountyCityRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.CountyRisk, iesp.duediligenceshared.t_DDRAreaRisk);
-																																																																																																				SELF := LEFT;
-																																																																																																				SELF := [];));
-																																																																														SELF := LEFT;
-																																																																														SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Aircraft := PROJECT(aircraft, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessAircraftOwnership,
-																																																																													SELF.Aircrafts := PROJECT(LEFT.Aircrafts, TRANSFORM(iesp.duediligenceshared.t_DDRAircraft,
-																																																																																																							SELF.YearMakeModel := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Aircraft, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																							SELF.Aircraft := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);
-																																																																																																							SELF.AdditionalDetails := DueDiligence.CommonQuery.temp_transformDataTo(LEFT._Type, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																							SELF := LEFT;
-																																																																																																							SELF := [];));
-																																																																													SELF := LEFT;
-																																																																													SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Watercraft := PROJECT(watercraft, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessWatercraftOwnership,
-																																																																															SELF.Watercrafts := PROJECT(LEFT.Watercrafts, TRANSFORM(iesp.duediligenceshared.t_DDRWatercraft,
-																																																																																																						SELF.YearMakeModel := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Watercraft, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																						SELF.VesselType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VesselType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																						SELF.Title := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Title, iesp.duediligenceshared.t_DDRTitleInfo);
-																																																																																																						SELF.Registration := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Registration, iesp.duediligenceshared.t_DDRRegistration);
-																																																																																																						SELF.VINNumber := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);																																																																																																							
-																																																																																																						SELF := LEFT;
-																																																																																																						SELF := [];));
-																																																																															SELF := LEFT;
-																																																																															SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.MotorVehicle := PROJECT(vehicle, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessMotorVehicleOwnership,
-																																																																														SELF.MotorVehicles := PROJECT(LEFT.MotorVehicles, TRANSFORM(iesp.duediligenceshared.t_DDRMotorVehicle,
-																																																																																																												SELF.Vehicle := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Vehicle, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																												SELF.LicensePlateType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.LicensePlateType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																												SELF.ClassType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ClassType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																												SELF.MotorVehicle := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);																																																																																																							
-																																																																																																												SELF.Title := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Title, iesp.duediligenceshared.t_DDRTitleInfo);
-																																																																																																												SELF.Registration := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Registration, iesp.duediligenceshared.t_DDRRegistration);
-																																																																																																												SELF := LEFT;
-																																																																																																												SELF := [];));
-																																																																														SELF := LEFT;
-																																																																														SELF := [];));
-																										//OPERATING
-																										location := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessLocations;
-																										information := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation;
-																										shellShelf := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.ShellShelfCharacteristics;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations := PROJECT(location, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessOperatingLocations,
-																																																																																		SELF.OperatingLocations := PROJECT(LEFT.OperatingLocations, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk,
-																																																																																																																						SELF.CountyCityRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.CountyCityRisk, iesp.duediligenceshared.t_DDRCountyCityRisk);
-																																																																																																																						SELF.AreaRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.AreaRisk, iesp.duediligenceshared.t_DDRCountyCityRisk);
-																																																																																																																						SELF := LEFT;
-																																																																																																																						SELF := [];));
-																																																																																		SELF := LEFT;
-																																																																																		SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation := PROJECT(information, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessOperatingInformation,
-																																																																																				SELF.ReportingBureaus := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ReportingBureaus, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																				SELF.ReportingSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ReportingSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																				SELF.SOSFilingStatuses := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.SOSFilingStatuses, iesp.duediligencebusinessreport.t_DDRSOSFiling);
-																																																																																				SELF.SICNAICs := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.SICNAICs, iesp.duediligencebusinessreport.t_DDRSICNAIC);
-																																																																																				SELF := LEFT;
-																																																																																				SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.ShellShelfCharacteristics := PROJECT(shellShelf, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessShellShelfCharacteristics,
-																																																																																							SELF.BureauSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.BureauSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF.GovernmentSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.GovernmentSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF.UtilitySources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.UtilitySources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF := LEFT;
-																																																																																							SELF := [];));
 
 
-																										//LEAGAL
-																										legal := LEFT.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary := DueDiligence.CommonQuery.temp_transformDataTo(legal, iesp.duediligenceshared.t_DDRLegalSummary);
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions := DueDiligence.CommonQuery.temp_transformDataTo(legal.PossibleLiensJudgmentsEvictions, iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions);
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents := DueDiligence.CommonQuery.temp_transformDataTo(legal.PossibleLegalEvents, iesp.duediligenceshared.t_DDRLegalEventCriminal);
-																										
-																										SELF := LEFT;
-																										SELF := [];));
-			#else
-				busReport := PROJECT(busResults, TRANSFORM({UNSIGNED seq, reportLayout},
-																											SELF.seq := LEFT.seq;
-																											SELF := [];));
-			#end
-			
-			RETURN busReport;
-		ENDMACRO;
-		
 		EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion) := FUNCTIONMACRO
 				
 				returnData := JOIN(inputWithSeq, results, 
@@ -635,22 +531,8 @@ EXPORT CommonQuery := MODULE
 																															
 																															
 																			SELF := LEFT;
-																			SELF := [];));
+																			SELF := [];));																																		
 				
-				//temp code to transform report data until later sprint to make over to new layouts - so to be removed
-				newReport := DueDiligence.CommonQuery.temp_transformBusReport(results, iespLayout, indvOrBus, includeReport);
-				
-				tempReturn := JOIN(returnData, newReport,
-														LEFT.seq = RIGHT.seq,
-														TRANSFORM(iespLayout,
-																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE,
-																															'SELF.result.BusinessReport.BusinessAttributeDetails := RIGHT.result.BusinessReport.BusinessAttributeDetails;',
-																															DueDiligence.Constants.EMPTY))
-																			SELF := LEFT;),
-														LEFT OUTER);
-																																										
-				
-				// RETURN returnData;
-				RETURN tempReturn;		//TMEP
+				RETURN returnData;
 		ENDMACRO;
 END;

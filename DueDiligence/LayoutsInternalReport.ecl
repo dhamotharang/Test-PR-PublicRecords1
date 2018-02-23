@@ -30,7 +30,7 @@ EXPORT LayoutsInternalReport := MODULE
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 		STRING30 watercraftKey;		//used to get watercraft details
 	  STRING30 sequenceKey;			//used to get watercraft details
-		STRING2 stateOrigin;				//used to get watercraft details
+		STRING2 stateOrigin;			//used to get watercraft details
 		YearMakeModel;
 		STRING		vesselType;
 		UNSIGNED2 vesselLengthFeet;
@@ -70,17 +70,17 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	EXPORT BusAircraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		DATASET(iesp.duediligencereport.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAircraft)};
+		DATASET(iesp.duediligenceshared.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAircraft)};
 	END;
 	
 	EXPORT BusWatercraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		DATASET(iesp.duediligencereport.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxWatercraft)};
+		DATASET(iesp.duediligenceshared.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxWatercraft)};
 	END;
 	
 	EXPORT BusIndustryRiskChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+		DATASET(iesp.duediligencebusinessreport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
 	
 	
@@ -105,7 +105,7 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	EXPORT ReportingOfSOSFilingsChildLayout     :=  RECORD 
 	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-	  DATASET(iesp.duediligencereport.t_DDRSOSFiling) BusSOSFilingsChild;   
+	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
 	
 END;

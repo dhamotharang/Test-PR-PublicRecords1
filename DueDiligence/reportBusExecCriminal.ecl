@@ -2,9 +2,8 @@
 IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
 
 EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBusnCriminal, 
-											   DATASET(DueDiligence.LayoutsInternal.RelatedParty) InputBusinessExecutivesCriminalOffense,
-											   boolean DebugMode = FALSE
-											   ) := FUNCTION
+                             DATASET(DueDiligence.LayoutsInternal.RelatedParty) InputBusinessExecutivesCriminalOffense,
+                             boolean DebugMode = FALSE) := FUNCTION
 
 	
  //*** add logic here to shorten the list of offenses that are added to the report ****//	
@@ -25,15 +24,15 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	// ------                                                                       ------
 	BusExecCriminalChildDatasetLayout    := RECORD
 	 unsigned2                      seq;                                      //*  This is the seqence number of the parent  
-	 DATASET(iesp.duediligencereport.t_DDRLegalEventRecords) BusExecCriminalChild;
+	 DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal) BusExecCriminalChild;
 	END;
 	 
 	// ------                                                                       ------
- // ------ populate the ChildDataset  with the list of OFFENSES                  ------
- // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
- // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
+  // ------ populate the ChildDataset  with the list of OFFENSES                  ------
+  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
+  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRLegalEventRecords  FormatTheListOfOffenses(BEOCriminalOffensesInternal le, Integer OffenseSeq) := TRANSFORM
+	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(BEOCriminalOffensesInternal le, Integer OffenseSeq) := TRANSFORM
 	                                                             /*  pick up the Name and address for this DID  */  
 																															                              //SELF.seq                      := le.ReportOfOffenses.seq;  
 																							                                      SELF.CaseNumber               := le.ReportOfOffenses.caseNum;    
@@ -89,24 +88,22 @@ BusExecCriminalChildDataset  :=
 	
 	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(InputBusnCriminal le, BusExecCriminalChildDataset ri, Integer BLCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfEvictions                 := le.Business.evictionsCnt;
-												     SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfJudgmentsLeans            := le.Business.liensUnreleasedCnt;
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfFelonyConvictions         := le.Business.ConvictedFelonyCount4F_Ever;
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfFelonyNonConvictions      := le.Business.NonConvictedFelonyCount3F_EVER;
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfMisdemeanorConvictions    := le.Business.ConvictedMisdemeanorCount4M_Ever;  
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfMisdemeanorNonConcivtions := le.Business.NonConvictedMisdemeanorCount3M_EVER;  
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfTrafficConvictions        := le.Business.ConvictedTraffic2T_Ever;   
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfTrafficNonConvictions     := 0;    //***we did not collect this information ***// 
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfInfractionConvictions     := le.Business.ConvictedInfractions2I_Ever;   
-														   SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfInfractionNonConvictions  := 0;    //***
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfUnknownConvictions        := le.Business.ConvictedUnknownCount4U_Ever; 
-														   //SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfUnknownNonConvictions     := le.Business.NonConvictedUnknownCount3U_EVER;  
-                  
-															 
-														   //***                                                                       PossibleLegalEvents is a DATASET   
-																 SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.PossibleLegalEvents     := le.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.PossibleLegalEvents  + ri.BusExecCriminalChild;
-																	SELF := le;
-				  											END; 
+       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfEvictions                 := le.Business.evictionsCnt;
+       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens            := le.Business.liensUnreleasedCnt;
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyConvictions         := le.Business.ConvictedFelonyCount4F_Ever;
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyNonConvictions      := le.Business.NonConvictedFelonyCount3F_EVER;
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorConvictions    := le.Business.ConvictedMisdemeanorCount4M_Ever;  
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorNonConcivtions := le.Business.NonConvictedMisdemeanorCount3M_EVER;  
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficConvictions        := le.Business.ConvictedTraffic2T_Ever;   
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficNonConvictions     := 0;    //***we did not collect this information ***// 
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionConvictions     := le.Business.ConvictedInfractions2I_Ever;   
+       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := 0;    //***
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownConvictions        := le.Business.ConvictedUnknownCount4U_Ever; 
+       //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownNonConvictions     := le.Business.NonConvictedUnknownCount3U_EVER;  
+
+       SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents     := le.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents  + ri.BusExecCriminalChild;
+       SELF := le;
+  END; 
 																	
 	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
 	UpdateBusnExecsCriminalWithReport := DENORMALIZE(InputBusnCriminal, BusExecCriminalChildDataset,

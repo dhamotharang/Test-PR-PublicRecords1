@@ -58,7 +58,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 	
 	//transform to limit the number of data in our dataset
 	DueDiligence.LayoutsInternalReport.BusIndustryRiskChildren getReportChildren(DueDiligence.LayoutsInternal.SlimSicNaicLayout snuil, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxSICNAICs)
-		SELF.industryRisk := PROJECT(snuil, TRANSFORM(iesp.duediligencereport.t_DDRSICNAIC,
+		SELF.industryRisk := PROJECT(snuil, TRANSFORM(iesp.duediligencebusinessreport.t_DDRSICNAIC,
 																									SELF.sicCode := LEFT.sicCode;
 																									SELF.naicsCode := LEFT.naicCode;
 																									SELF.description := LEFT.codeDescription;
@@ -102,7 +102,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 																			LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
 																			LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
 																			TRANSFORM(DueDiligence.layouts.Busn_Internal,
-																								SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SICNAICs := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SICNAICs + RIGHT.industryrisk;
+																								SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SICNAICs := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SICNAICs + RIGHT.industryrisk;
 																								SELF := LEFT;));
 												
 

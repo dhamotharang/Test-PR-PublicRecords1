@@ -812,7 +812,7 @@ EXPORT LinkIDs := RECORD
 
 		BusAttributes;
 		BusReportDetails;
-		iesp.duediligencereport.t_DDRBusinessReport BusinessReport;
+    iesp.duediligencebusinessreport.t_DDRBusinessReport BusinessReport;
 	END;
 
 END;
