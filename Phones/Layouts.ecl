@@ -204,10 +204,10 @@ MODULE
 			string5		source;
 			string		error_desc;
 			boolean 	dialable;
-			string10	phone_line_type_desc;
-			string10	phone_serv_type_desc;
-			string30 carrier_city;
-			string2 carrier_state;
+			string1		phone_line_type_desc;
+			string1		phone_serv_type_desc;
+			string30 	carrier_city;
+			string2 	carrier_state;
 		END;
 
 	END;
