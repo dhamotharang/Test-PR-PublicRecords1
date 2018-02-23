@@ -61,7 +61,14 @@ iesp.WsSearchCore.t_SearchRequest into_req(Risk_Indicators.iid_constants.ds_Reco
 	self.Input.BlockID  := 1;	
 	SELF.Input.EntityRecords := project(indata, transform(iesp.WsSearchCore.t_InputEntityRecord,			
 			self.id  						:=  left.seq;
-			self.name.Full 			:=  left.fullName;  //if(isIndiv,le.FullName, le.company_name);	full name is required per Rajeev
+			FullNameMerged := TRIM(left.firstName)+' '+TRIM(left.middleName, LEFT, RIGHT)+' '+TRIM(left.lastName);
+			self.name.First 			:=  if (left.searchtype = 'I' and trim(left.firstName) <> '', trim(left.firstName), ''); 
+			self.name.Middle 			:= if (left.searchtype = 'I' and trim(left.middleName) <> '', trim(left.middleName), '');
+			self.name.Last 			:=  if (left.searchtype = 'I' and trim(left.lastName) <> '' , trim(left.lastName), '');
+			self.name.Full 			:=  map( left.searchtype in ['N', 'B'] and trim(left.fullName) <> ''  => trim(left.fullName),
+																														left.searchtype in ['N', 'B'] and FullNameMerged <> '' => FullNameMerged,
+																									     left.searchtype = 'I' and FullNameMerged = ''          => trim(left.fullName),
+																									                                                               trim(left.fullName));
 			self.EntityType 		:= trim(MAP(left.searchType  in ['N']  => 'Business', 
 																			left.searchType  in [ 'I'] => 'Individual',
 																			left.searchType  in [ 'B'] => 'Unknown',
@@ -125,7 +132,8 @@ EntityRecords := 	NONErrorRecs[1].SearchResult.EntityRecords;
 
 OFAC_XG5.Layout.SearchResultsSlimmed PrepResponse(EntityRecords le, integer C) := TRANSFORM
 			self.BlockID	:= le.InputRecord.ID;
-      self.ResponseFullName := le.InputRecord.name.full;
+			MergedInputRecordName := TRIM(le.InputRecord.name.first)+' '+TRIM(le.InputRecord.name.middle, LEFT, RIGHT)+' '+TRIM(le.InputRecord.name.last);
+      self.ResponseFullName := if(MergedInputRecordName = '', le.InputRecord.name.full, MergedInputRecordName);
 			self.EntityRecords := le;
 			self := le;
 			self := [];
@@ -151,9 +159,9 @@ OFAC_XG5.Layout.SearchResultsSlimmed Addinput(indata le, SlimOutBridger ri, inte
 			self := ri;
 END;		
 
-AddinputBack 		:= join(indata, SlimOutBridger, 
-												left.seq = right.blockid and
-												left.fullname = right.ResponseFullName ,
+
+AddinputBack 	:= join(indata, SlimOutBridger, 
+												left.seq = right.blockid,
 												Addinput(LEFT,RIGHT, counter));
 																							 
 AddinputBackErr := if(count(ErrorRecs) > 0, AddinputBack + SlimOutBridgerError, AddinputBack);   
@@ -162,7 +170,7 @@ addentityseq := project(AddinputBackErr,
 												transform(OFAC_XG5.Layout.SearchResultsSlimmed, 
 													self.EntityRecSeq := counter, 
 													self := left));           	
-
+	
 // output(dob_radius, named('Call_dob_radius'), overwrite);
 // output(indata, named('Call_indata'), overwrite);
 // output(gateways, named('gateways'), overwrite);
@@ -179,7 +187,7 @@ addentityseq := project(AddinputBackErr,
 // output(AddinputBack, named('Call_AddinputBack'), overwrite);
 // output(AddinputBackErr, named('Call_AddinputBackErr'), overwrite);
 // output(addentityseq, named('Call_addentityseq'), overwrite);
-
+		
 return addentityseq;			
 
 									
