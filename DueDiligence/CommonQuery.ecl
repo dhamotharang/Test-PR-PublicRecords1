@@ -160,8 +160,8 @@ EXPORT CommonQuery := MODULE
 																											
 																											BOOLEAN LexIDPopulated := LEFT.individual.lexID <> DueDiligence.Constants.EMPTY;
 																											BOOLEAN SeleIDPopulated := LEFT.business.lexID <> DueDiligence.Constants.EMPTY;
-																											BOOLEAN ValidGLB := Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
-																											BOOLEAN ValidDPPA := Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
+																											BOOLEAN ValidGLB := (glbPurpose BETWEEN 0 AND 7) OR glbPurpose = 11 OR glbPurpose = 12;
+																											BOOLEAN ValidDPPA := dppaPurpose BETWEEN 0 AND 7;
 																											
 																											BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
                                                                                       (IndSSNPopulated OR 
