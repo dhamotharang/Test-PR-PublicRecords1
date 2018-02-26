@@ -2,7 +2,7 @@
 
 Export WI 	:= Module
 
-	Export Update(String filedate, string version, boolean pShouldSpray = Corp2_mapping._Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = True) := Function
+	Export Update(String filedate, string version, boolean pShouldSpray = Corp2_mapping._Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) := Function
 		
 		state_origin			:= 'WI';
 		state_fips	 			:= '55';	
