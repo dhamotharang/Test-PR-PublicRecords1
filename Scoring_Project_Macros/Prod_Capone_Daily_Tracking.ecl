@@ -5,7 +5,7 @@ import ut;
 import std, Scoring_Project, ashirey,Scoring_Project_Macros, Scoring_Project_PIP;
 
 dt := ut.getdate;
-decimal19_2 thresh := 0.25;
+decimal19_2 thresh := 0.01;
 
 
 ds_curr := dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
@@ -401,7 +401,7 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
-		final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com; nathan.koubsky@lexisnexis.com; Joseph.Nassar@lexisnexis.com; Apaar.Sinha@lexisnexisrisk.com; Benjamin.Karnatz@lexisnexis.com; Matthew.Ludewig@lexisnexisrisk.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
+		final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com; nathan.koubsky@lexisnexis.com; Apaar.Sinha@lexisnexisrisk.com; Benjamin.Karnatz@lexisnexis.com; Matthew.Ludewig@lexisnexisrisk.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
 		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com', 'TEST...Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
 									// WHEN(CRON('0 11 * * *')), //run at 6:00 AM
 									// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 4.1 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
