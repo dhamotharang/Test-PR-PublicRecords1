@@ -4,7 +4,8 @@ FILENAME:Phonesinfo
 NAMESCOPE:DeactMain2
 
 FIELDTYPE:Invalid_Num:ALLOW(-0213456789)
-FIELDTYPE:Invalid_YN:ENUM(Y|N)
+FIELDTYPE:Invalid_DeactCode:ENUM(DE|DE)
+FIELDTYPE:Invalid_YN:ENUM(Y|N|P)
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0,'future')
 
 
@@ -20,7 +21,7 @@ FIELD:carrier_name:TYPE(STRING60):0,0
 FIELD:filedate:LIKE(Invalid_Date):TYPE(STRING):0,0
 FIELD:swap_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0
 FIELD:swap_end_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0
-FIELD:deact_code:TYPE(STRING2):0,0
+FIELD:deact_code:LIKE(Invalid_DeactCode):TYPE(STRING2):0,0
 FIELD:deact_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0
 FIELD:deact_end_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0
 FIELD:react_start_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0

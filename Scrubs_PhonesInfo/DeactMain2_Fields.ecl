@@ -5,8 +5,8 @@ EXPORT DeactMain2_Fields := MODULE
 EXPORT NumFields := 22;
  
 // Processing for each FieldType
-EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Num','Invalid_YN','Invalid_Date');
-EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Num' => 1,'Invalid_YN' => 2,'Invalid_Date' => 3,0);
+EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Num','Invalid_DeactCode','Invalid_YN','Invalid_Date');
+EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Num' => 1,'Invalid_DeactCode' => 2,'Invalid_YN' => 3,'Invalid_Date' => 4,0);
  
 EXPORT MakeFT_Invalid_Num(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'-0213456789'); // Only allow valid symbols
@@ -15,11 +15,17 @@ END;
 EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'-0213456789'))));
 EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('-0213456789'),SALT39.HygieneErrors.Good);
  
+EXPORT MakeFT_Invalid_DeactCode(SALT39.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_Invalid_DeactCode(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['DE','DE']);
+EXPORT InValidMessageFT_Invalid_DeactCode(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('DE|DE'),SALT39.HygieneErrors.Good);
+ 
 EXPORT MakeFT_Invalid_YN(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_YN(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['Y','N']);
-EXPORT InValidMessageFT_Invalid_YN(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('Y|N'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_YN(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['Y','N','P']);
+EXPORT InValidMessageFT_Invalid_YN(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('Y|N|P'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Date(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
@@ -30,7 +36,7 @@ EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneEr
 EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
 EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'groupid','vendor_first_reported_dt','vendor_last_reported_dt','action_code','timestamp','phone','phone_swap','filename','carrier_name','filedate','swap_start_dt','swap_end_dt','deact_code','deact_start_dt','deact_end_dt','react_start_dt','react_end_dt','is_react','is_deact','porting_dt','pk_carrier_name','days_apart');
 EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'groupid' => 0,'vendor_first_reported_dt' => 1,'vendor_last_reported_dt' => 2,'action_code' => 3,'timestamp' => 4,'phone' => 5,'phone_swap' => 6,'filename' => 7,'carrier_name' => 8,'filedate' => 9,'swap_start_dt' => 10,'swap_end_dt' => 11,'deact_code' => 12,'deact_start_dt' => 13,'deact_end_dt' => 14,'react_start_dt' => 15,'react_end_dt' => 16,'is_react' => 17,'is_deact' => 18,'porting_dt' => 19,'pk_carrier_name' => 20,'days_apart' => 21,0);
-EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['ALLOW'],['ALLOW'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],[],['ALLOW'],[]);
+EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['ALLOW'],['ALLOW'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],[],['ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -83,9 +89,9 @@ EXPORT Make_swap_end_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
 EXPORT InValid_swap_end_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
 EXPORT InValidMessage_swap_end_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Date(wh);
  
-EXPORT Make_deact_code(SALT39.StrType s0) := s0;
-EXPORT InValid_deact_code(SALT39.StrType s) := 0;
-EXPORT InValidMessage_deact_code(UNSIGNED1 wh) := '';
+EXPORT Make_deact_code(SALT39.StrType s0) := MakeFT_Invalid_DeactCode(s0);
+EXPORT InValid_deact_code(SALT39.StrType s) := InValidFT_Invalid_DeactCode(s);
+EXPORT InValidMessage_deact_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_DeactCode(wh);
  
 EXPORT Make_deact_start_dt(SALT39.StrType s0) := MakeFT_Invalid_Date(s0);
 EXPORT InValid_deact_start_dt(SALT39.StrType s) := InValidFT_Invalid_Date(s);
