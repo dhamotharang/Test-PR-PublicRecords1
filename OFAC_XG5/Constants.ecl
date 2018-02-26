@@ -186,19 +186,19 @@ export AKAType (INTEGER ID) :=
 
  export WCOAddtnlFiles_ALL := WCOFACNames + 
         dataset([{'BANK OF ENGLAND CONSOLIDATED LIST.BDF'},
-            {'BUREAU OF INDUSTRY AND SECURITY.BDF '},
+            {'BUREAU OF INDUSTRY AND SECURITY.BDF'},
             {'CHIEFS OF STATE AND FOREIGN CABINET MEMBERS.BDF'},
             {'COMMODITY FUTURES TRADING COMMISSION SANCTIONS.BDF'},
-            {'DTC DEBARRED PARTIES.BDF '},
+            {'DTC DEBARRED PARTIES.BDF'},
             {'EU CONSOLIDATED LIST.BDF'},
             {'FBI TOP TEN MOST WANTED.BDF'},
-            {'FOREIGN AGENTS REGISTRATIONS.BDF '},
+            {'FOREIGN AGENTS REGISTRATIONS.BDF'},
             {'HM TREASURY SANCTIONS.CDF'},
             {'OSFI CONSOLIDATED LIST.BDF'},
             {'OSFI COUNTRY.CDF'},
             {'TERRORIST EXCLUSION LIST.BDF'},
             {'UN CONSOLIDATED LIST.BDF'},
-            {'UNAUTHORIZED BANKS.BDF '},
+            {'UNAUTHORIZED BANKS.BDF'},
             {'WORLD BANK INELIGIBLE FIRMS.BDF'}												
 												], DBNames_rec);
 
