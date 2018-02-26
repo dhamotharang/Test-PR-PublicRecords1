@@ -38,25 +38,26 @@ zDoPopulationStats := Strata;
 
 built := sequential(
 					spray_it,
-          consolidate_them,
+		            consolidate_them,
+#IF (IsFullUpdate = false)
 					spray_deletes,
 					TransunionCred
-					,zDoPopulationStats
 					//Archive processed files in history
 					,add_deletes
 					,delete_deletes
 					,FileServices.StartSuperFileTransaction()
-#IF (IsFullUpdate = false)
 					,FileServices.AddSuperFile(Superfile_List.updates_history_compressed,Superfile_List.updates_father,,true)
 					,FileServices.ClearSuperFile(Superfile_List.updates_father)
 					,FileServices.AddSuperFile(Superfile_List.updates_father,Superfile_List.updates,,true)
 					,FileServices.ClearSuperFile(Superfile_List.updates)
 					,FileServices.FinishSuperFileTransaction()
 #ELSE
+				    ,FileServices.StartSuperFileTransaction()
 					,FileServices.AddSuperFile(Superfile_List.load_father,Superfile_List.load,,true)
 					,FileServices.ClearSuperFile(Superfile_List.load)
-#END
 					,FileServices.FinishSuperFileTransaction()
+#END
+					,zDoPopulationStats
 					,Orbit3.Proc_Orbit3_CreateBuild_npf(version,'TransunionCred')
 					);
 
