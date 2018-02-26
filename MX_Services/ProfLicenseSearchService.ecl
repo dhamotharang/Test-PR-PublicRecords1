@@ -35,7 +35,8 @@ import AutoStandardI, iesp;
 // ***		Note: keeping this version for backward compatibility.
 // ***************************************************************************************
 export ProfLicenseSearchService := MACRO
-
+	#onwarning(4207, ignore);
+	
 	ds_in_v1 	:= DATASET ([], iesp.internationalproflicense.t_InternationalProfessionalLicenseSearchRequest) : STORED('InternationalProfessionalLicenseSearchRequest', FEW);
 	ds_in			:= project(ds_in_v1, iesp.internationalprofcert.t_InternationalProfCertificationSearchRequest);	
 	first_row := ds_in[1] : INDEPENDENT;

@@ -11,8 +11,8 @@
 										'IndustryClass',
 										'SSNMask',
 										/*---- FDN Fields .----*/
-										'GlobalCompanyId', // Same as Agency
-										'IndustryType',	//Same as Agecy Program
+										'GlobalCompanyId',
+										'IndustryTypeName',
 										'ProductCode',
 										/*---- Other Fields .----*/
 										'AgencyCounty',

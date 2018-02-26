@@ -482,5 +482,15 @@ Export MbsVelocityRules	:= Record
 		string20		timeUnit;
 		string  		description;
 End;
+
+Export MbsFdnIndType	:= Record
+	string255  description ;  
+	unsigned6  ind_type ; 
+	unsigned3  status ; 
+	string20   date_added; 
+	string30   user_added; 
+	string20   date_changed; 
+	string30   user_changed; 
+End;
 		
 end;

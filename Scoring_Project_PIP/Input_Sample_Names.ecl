@@ -48,7 +48,8 @@ export IV_Attributes_infile := '~scoring_project::in::riskview_xml_generic_v3_v4
 
 
 //**************Non FCRA Input Samples Names****************************
-Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20160912';
+// Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20160912';
+Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20180226';
 
 // export BC10_Scores_Chase_BNK4_infile := '~Scoring_Project::in::BC1O_XML_Chase_bnk4_20141110';
 // export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20160525';

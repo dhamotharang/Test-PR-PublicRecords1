@@ -19,7 +19,7 @@
 import ECRulings, iesp, AutoStandardI, ut;
 
 EXPORT SearchService := MACRO
-
+    #onwarning(4207, ignore);
     rec_in := iesp.ecRuling.t_ecRulingsSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('ECRulingsSearchRequest', FEW);
 	  first_row := ds_in[1] : independent;

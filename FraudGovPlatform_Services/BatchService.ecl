@@ -10,7 +10,7 @@
 	
 	<!-- FDN Related Options -->
 	<part name="GlobalCompanyId"	type="xsd:unsigned6"/>	
-	<part name="IndustryType"	type="xsd:unsigned2"/>	
+	<part name="IndustryTypeName"	type="xsd:string"/>
 	<part name="ProductCode"	type="xsd:unsigned6"/>
 
 	<!-- Other Options -->
