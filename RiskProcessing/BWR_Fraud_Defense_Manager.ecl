@@ -1,4 +1,4 @@
-#workunit('name', 'Fraud Defense Manager');
+﻿#workunit('name', 'Fraud Defense Manager');
 
 IMPORT Gateway, iesp, RiskWise, Risk_Indicators, Suspicious_Fraud_LN, UT;
 
@@ -24,7 +24,7 @@ IMPORT Gateway, iesp, RiskWise, Risk_Indicators, Suspicious_Fraud_LN, UT;
  // roxieIP := RiskWise.shortcuts.Dev194; // Development Roxie 194
  // roxieIP := RiskWise.shortcuts.D4; // Development Roxie - One Way #4
  // roxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging 128 Roxie
- roxieIP := RiskWise.shortcuts.prod_batch_neutral; // Production Batch Roxie
+ roxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie; // Production Batch Roxie
  
  inputFile := ut.foreign_dataland + 'bpahl::out::inquiry_acclogs::inquiry_test::identity_fraud::internal_w20140227-151602';
  

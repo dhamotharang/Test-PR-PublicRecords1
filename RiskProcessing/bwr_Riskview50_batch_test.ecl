@@ -48,7 +48,7 @@ layout_input := RECORD
 //====================================================
 // Neutral service ip
 // neutral_roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
-neutral_roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;  
+neutral_roxie_IP := RiskWise.Shortcuts.prod_batch_analytics_roxie;  
 
 // FCRA service settings
 bs_service := 'RiskView.Batch_Service';
