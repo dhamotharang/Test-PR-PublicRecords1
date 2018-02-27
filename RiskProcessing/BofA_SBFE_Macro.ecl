@@ -1,4 +1,4 @@
-EXPORT BofA_SBFE_Macro(file_part) := functionmacro
+﻿EXPORT BofA_SBFE_Macro(file_part) := functionmacro
 
 /* RiskProcessing.BWR_Small_Business_Analytics_SBFE */
 
@@ -22,7 +22,7 @@ recordsToRun := 0;
 eyeball      := 10;
 threads      := 2;
 
-RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
 // RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194

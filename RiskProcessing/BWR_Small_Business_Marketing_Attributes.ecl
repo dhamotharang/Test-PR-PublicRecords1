@@ -1,7 +1,7 @@
-#workunit('name','Small Business Marketing Attributes');
+﻿#workunit('name','Small Business Marketing Attributes');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise, UT;
+IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise;
 /* ********************************************************************
  *                               OPTIONS                              *
  **********************************************************************
@@ -10,73 +10,130 @@ IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise, UT;
  * threads: Number of parallel threads to run. Set to 1 - 30.         *
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
-recordsToRun := 100000;
-eyeball := 50;
+ 
+recordsToRun := 0;
+eyeball      := 10;
+threads      := 2;
 
-threads := 2;
-RoxieIP := RiskWise.shortcuts.Dev194; // Development Roxie 194
-version := '.9';
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 
+//RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
+// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+// RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
+// RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
+
+ 
 inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
-outputFile := '~tgertken::out::small_business_marketing_2';
+outputFile := '~tgertken::out::sba4m_' + thorlib.wuid();
 
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
 histDateYYYYMM := 0;
-histDate 			 := 0;
+histDate       := 0;
+
+//To process real time use this
+//histDateYYYYMM := 999999;
+//histDate       := 999999999999;
+
+dataRestrictionMask_val := '0000000000000000000000000';
+dataPermissionMask_val  := '00000000000000000000'; 			// SBFE Not included: All 0's
+
+GLBA := '0';
+DPPA := '0';
 
 
-// Uncomment the attribute groups below that you wish to have returned
 AttributesRequested := 
-		DATASET([{'SmallBusinessAttrV1'}], iesp.share.t_StringArrayItem) + 
-		// DATASET([{'SBFEAttrV1'}], iesp.share.t_StringArrayItem) + 
+		DATASET([{LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME}], iesp.share.t_StringArrayItem) + 
 		DATASET([], iesp.share.t_StringArrayItem);
 		
 
-// Uncomment the models below that you wish to have returned
-ModelsRequested :=
-		// DATASET([{'SBA9999_9'}], iesp.share.t_StringArrayItem) +
-		// DATASET([{'SBFE9999_9'}], iesp.share.t_StringArrayItem) +
-		DATASET([], iesp.share.t_StringArrayItem);
+ModelsRequested := DATASET([], iesp.share.t_StringArrayItem);
 
 /* **************************************
  *         MAIN SCRIPT CODE             *
  ****************************************/
-bus_in := record
-     string30  AccountNumber := '';
-		 string100 AlternateCompanyName := '';
-		 string16  BusinessIPAddress := '';
-		 string8	 NAICCode;
+bus_in := RECORD
+		 string30  AccountNumber := '';
      string100 CompanyName := '';
+     string100 AlternateCompanyName := '';
      string50  Addr := '';
      string30  City := '';
      string2   State := '';
      string9   Zip := '';
      string10  BusinessPhone := '';
-     string9   TaxIdNumber := '';	 
-		 string8	 SICCode;
+     string9   TaxIdNumber := '';
+     string16  BusinessIPAddress := '';
      string15  Representativefirstname := '';
-	   string15  RepresentativeMiddleName := '';
+     string15  RepresentativeMiddleName := '';
      string20  Representativelastname := '';
-	   string5   RepresentativeNameSuffix := '';
+     string5   RepresentativeNameSuffix := '';
      string50  RepresentativeAddr := '';
      string30  RepresentativeCity := '';
      string2   RepresentativeState := '';
      string9   RepresentativeZip := '';
      string9   RepresentativeSSN := '';
      string8   RepresentativeDOB := '';
-	   string3   RepresentativeAge := '';
+     string3   RepresentativeAge := '';
      string20  RepresentativeDLNumber := '';
      string2   RepresentativeDLState := '';
-	   string10  RepresentativeHomePhone := '';
+     string10  RepresentativeHomePhone := '';
      string50  RepresentativeEmailAddress := '';
-	   string20  RepresentativeFormerLastName := '';
-	   integer   historydate;
+     string20  RepresentativeFormerLastName := '';
+     integer   historydate;
+     string8   SICCode;
+     string8   NAICCode;
+
 end;
+
 
 f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
                           CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
+													
+// Now run the SmallBusinessMarketing attributes
+SmallBusinessMarketingoutput := RECORD
+	iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingResponse;
+	STRING ErrorCode;
+END;
 
-OUTPUT(CHOOSEN(f, eyeball), NAMED('Sample_Raw_Input'));
+f_with_seq_nonFiltered := PROJECT(f, TRANSFORM({UNSIGNED seq, RECORDOF(LEFT)}, SELF.seq := COUNTER, SELF := LEFT));	
+// f_with_seq_nonFiltered := f_with_seq_nonFiltered33(seq in [42, 11448, 	14587, 	33589]);
+//f_with_seq_nonFiltered has everything
+//f_with_seq_Filtered has valid company input
+f_with_seq_Filtered := f_with_seq_nonFiltered(
+											(TRIM(CompanyName) <> '' AND TRIM(Addr) <> '' AND TRIM(Zip) <> '') or
+										 (TRIM(CompanyName) <> '' AND TRIM(Addr) <> '' AND TRIM(City) <> '' AND TRIM(State) <> ''));
+//f_with_seq_Filtered_R has valid fname and last	OR everything is empty	then we can keep those records				 
+f_with_seq_Filtered_Rep := f_with_seq_Filtered(
+						(TRIM(Representativefirstname) <> '' and TRIM(Representativelastname) <> '') OR 
+						(TRIM(Representativefirstname) = '' and TRIM(Representativelastname) = '' and 
+							TRIM(RepresentativeSSN) ='' and TRIM(RepresentativeDOB) = '' and 
+							TRIM(RepresentativeAddr) = '' and TRIM(RepresentativeCity) ='' and TRIM(RepresentativeState) = ''
+							and TRIM(RepresentativeZip) = '' and TRIM(RepresentativeHomePhone) = '' and 
+							TRIM(RepresentativeDLNumber)= ''));
+// output(f_with_seq_nonFiltered, named('f_with_seq_nonFiltered'));
+// output(f_with_seq_Filtered, named('f_with_seq_Filtered'));
+//output(f_with_seq_Filtered_R, named('f_with_seq_Filtered_R'));
+// output(f_with_seq_Filtered_Rep, named('f_with_seq_Filtered_Rep'));
+
+//Get records that are failing input validations that can be put back into this data set that can
+//be put into the input iesp layout so they can be added with good input to track the insufficient input
+inSufficientInput_bad := JOIN(f_with_seq_nonFiltered, f_with_seq_Filtered_Rep,
+	LEFT.Seq = RIGHT.seq,
+	transform(left), left only);
+//get records that are failing input validationes that can be put back into the output layout
+//so they can be added with the good outputs to track the insufficient inputs
+inSufficientInput := JOIN(f_with_seq_nonFiltered, f_with_seq_Filtered_Rep,
+	LEFT.Seq = RIGHT.seq,
+	TRANSFORM(SmallBusinessMarketingoutput,
+			self.Result.InputEcho.seq := (string) left.seq;
+		// self.ErrorCode := 'Please input the minimum required fields';
+		self.ErrorCode := '0 ReceivedRoxieException: (Please input the minimum required fields:Option 1: Company Name, Street Address, Zip OR Option 2: Company Name, Street Address, City, State OR Option 3: Business LexID (SELEID))';
+		self := [];
+	), 
+	LEFT ONLY);
+OUTPUT(choosen(inSufficientInput, eyeball), named('inSufficientInput'));
+		
+f_with_seq := f_with_seq_Filtered_Rep;
+OUTPUT(CHOOSEN(f_with_seq, eyeball), NAMED('Sample_Raw_Input'));
 
 layout_soap := RECORD
 	STRING Seq;// Forcing this into the layout so that we have something to join the attribute results by to get the account number back
@@ -89,171 +146,159 @@ layout_soap := RECORD
 	UNSIGNED6 HistoryDate;
 	UNSIGNED1 OFAC_Version;
 	UNSIGNED1 LinkSearchLevel;
-	UNSIGNED1 MarketingMode;
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	BOOLEAN OutcomeTrackingOptOut;
-	UNSIGNED1 DppaPurpose; 
-	UNSIGNED1 GLBPurpose;
 END;
 
-layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
-	u := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User, 
-			SELF.AccountNumber := le.accountnumber; 
-			// SELF.DLPurpose := '1'; 
-			// SELF.GLBPurpose := '1'; 
-			// SELF.DataRestrictionMask := '0000000000000000000000000'; 
-			// SELF.DataPermissionMask := '0000000000000'; 
-			SELF := []));
-	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMOptions, 
-			SELF.AttributesVersionRequest := AttributesRequested; 
-			SELF.IncludeModels.Names := ModelsRequested; 
-			SELF := []));
-	c := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMCompany, 
-			SELF.CompanyName := le.CompanyName; 
-			SELF.AlternateCompanyName := le.AlternateCompanyName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := le.Addr; 
-						SELF.City := le.City; 
-						SELF.State := le.State; 
-						SELF.Zip5 := le.Zip[1..5]; 
-						SELF.Zip4 := le.Zip[6..9]; 
-						SELF := []))[1];
-			SELF.Phone := le.BusinessPhone;
-			SELF.FaxNumber := '';
-			SELF.FEIN := le.TaxIdNumber;
-			SELF.SICCode := le.SICCode;
-			SELF.NAICCode := le.NAICCode;
-			SELF.BusinessStructure := '';
-			SELF.YearsInBusiness := '';
-			SELF.BusinessStartDate := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.YearlyRevenue := '';
-			SELF := []));
-	a1 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := le.Representativefirstname; 
-						SELF.Middle := le.RepresentativeMiddleName; 
-						SELF.Last := le.Representativelastname; 
-						SELF.Suffix := le.RepresentativeNameSuffix; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := le.RepresentativeFormerLastName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := le.RepresentativeAddr; 
-						SELF.City := le.RepresentativeCity; 
-						SELF.State := le.RepresentativeState; 
-						SELF.Zip5 := le.RepresentativeZip[1..5]; 
-						SELF.Zip4 := le.RepresentativeZip[6..9]; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
-						SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
-						SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
-						SELF := []))[1]; 
-			SELF.Age := le.RepresentativeAge; 
-			SELF.SSN := le.RepresentativeSSN; 
-			SELF.Phone := le.RepresentativeHomePhone; 
-			SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
-			SELF.DriverLicenseState := le.RepresentativeDLState; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a2 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := ''; 
-						SELF.Middle := ''; 
-						SELF.Last := ''; 
-						SELF.Suffix := ''; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := ''; 
-						SELF.City := ''; 
-						SELF.State := ''; 
-						SELF.Zip5 := ''; 
-						SELF.Zip4 := ''; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.Age := ''; 
-			SELF.SSN := ''; 
-			SELF.Phone := ''; 
-			SELF.DriverLicenseNumber := ''; 
-			SELF.DriverLicenseState := ''; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a3 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := ''; 
-						SELF.Middle := ''; 
-						SELF.Last := ''; 
-						SELF.Suffix := ''; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := ''; 
-						SELF.City := ''; 
-						SELF.State := ''; 
-						SELF.Zip5 := ''; 
-						SELF.Zip4 := ''; 
-						SELF := []))[1]; 
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.Age := ''; 
-			SELF.SSN := ''; 
-			SELF.Phone := ''; 
-			SELF.DriverLicenseNumber := ''; 
-			SELF.DriverLicenseState := ''; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
+layout_soap transform_input_request(f_with_seq le) := TRANSFORM
+	u := DATASET([TRANSFORM(iesp.share.t_User, 
+															SELF.AccountNumber := le.accountnumber; 
+															SELF.DLPurpose := DPPA; 
+															SELF.GLBPurpose := GLBA; 
+															SELF.DataRestrictionMask := dataRestrictionMask_val; 
+															SELF.DataPermissionMask := dataPermissionMask_val; 
+															SELF := [])]);
+	o := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMOptions, 
+															SELF.AttributesVersionRequest := AttributesRequested; 
+															SELF.IncludeModels.Names := ModelsRequested; 
+															SELF := [])]);
+	c := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMCompany, 
+															SELF.CompanyName := le.CompanyName; 
+															SELF.AlternateCompanyName := le.AlternateCompanyName; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := le.Addr; 
+																																		SELF.City := le.City; 
+																																		SELF.State := le.State; 
+																																		SELF.Zip5 := le.Zip[1..5]; 
+																																		SELF.Zip4 := le.Zip[6..9]; 
+																																		SELF := [])])[1];
+															SELF.Phone := le.BusinessPhone;
+															SELF.FaxNumber := '';
+															SELF.FEIN := le.TaxIdNumber;
+															SELF.SICCode := le.SICCode;
+															SELF.NAICCode := le.NAICCode;
+															SELF.BusinessStructure := '';
+															SELF.YearsInBusiness := '';
+															SELF.YearlyRevenue := '';
+															SELF.BusinessStartDate := DATASET([TRANSFORM(iesp.share.t_Date, SELF := [];)])[1];
+															SELF.BusinessIds := DATASET([TRANSFORM(iesp.share.t_BusinessIdentity,
+																																				//	SELF.SeleID := 19290761;
+																																					SELF := [])])[1];
+															SELF := [])]);
+	a1 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := le.Representativefirstname; 
+																																SELF.Middle := le.RepresentativeMiddleName; 
+																																SELF.Last := le.Representativelastname; 
+																																SELF.Suffix := le.RepresentativeNameSuffix; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																	SELF.StreetAddress1 := le.RepresentativeAddr; 
+																																	SELF.City := le.RepresentativeCity; 
+																																	SELF.State := le.RepresentativeState; 
+																																	SELF.Zip5 := le.RepresentativeZip[1..5]; 
+																																	SELF.Zip4 := le.RepresentativeZip[6..9]; 
+																																	SELF := [])])[1];
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
+																																SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
+																																SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
+																																SELF := [])])[1]; 
+															SELF.Age := le.RepresentativeAge; 
+															SELF.SSN := le.RepresentativeSSN; 
+															SELF.Phone := le.RepresentativeHomePhone; 
+															SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
+															SELF.DriverLicenseState := le.RepresentativeDLState; 
+															SELF.BusinessTitle := '';
+															SELF := [])]);
+	a2 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := ''; 
+																																SELF.Middle := ''; 
+																																SELF.Last := ''; 
+																																SELF.Suffix := ''; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := ''; 
+																																		SELF.City := ''; 
+																																		SELF.State := ''; 
+																																		SELF.Zip5 := ''; 
+																																		SELF.Zip4 := ''; 
+																																		SELF := [])])[1];
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)'';
+																																SELF.Month := (INTEGER)'';
+																																SELF.Day := (INTEGER)'';
+																																SELF := [])])[1]; 
+															SELF.Age := ''; 
+															SELF.SSN := ''; 
+															SELF.Phone := ''; 
+															SELF.DriverLicenseNumber := ''; 
+															SELF.DriverLicenseState := ''; 
+															SELF.BusinessTitle := ''; 
+															SELF := [])]);
+	a3 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := ''; 
+																																SELF.Middle := ''; 
+																																SELF.Last := ''; 
+																																SELF.Suffix := ''; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := ''; 
+																																		SELF.City := ''; 
+																																		SELF.State := ''; 
+																																		SELF.Zip5 := ''; 
+																																		SELF.Zip4 := ''; 
+																																		SELF := [])])[1]; 
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)'';
+																																SELF.Month := (INTEGER)'';
+																																SELF.Day := (INTEGER)'';
+																																SELF := [])])[1]; 
+															SELF.Age := ''; 
+															SELF.SSN := ''; 
+															SELF.Phone := ''; 
+															SELF.DriverLicenseNumber := ''; 
+															SELF.DriverLicenseState := ''; 
+															SELF.BusinessTitle := ''; 
+															SELF := [])]);
 
-s := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMSearchBy, SELF.Seq := (STRING)ctr; 
+	s := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMSearchBy, SELF.Seq := (STRING)le.seq; 
    																																										 SELF.Company := c[1]; 
    																																										 SELF.AuthorizedRep1 := a1[1]; 
    																																										 SELF.AuthorizedRep2 := a2[1]; 
    																																										 SELF.AuthorizedRep3 := a3[1]; 
-   																																										 SELF := []));
+   																																										 SELF := [])]);
 
 																																										 
-r := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingRequest, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := []));
+	r := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingRequest, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := [])]);
+	
 	SELF.SmallBusinessMarketingRequest := r[1];
 
-	SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)(STRING)le.historydate[1..6], histDateYYYYMM);
+	SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)(((STRING)le.historydate)[1..6]), histDateYYYYMM);
 	SELF.HistoryDate       := IF(histDate       = 0, le.historydate, histDate); // Input file doesn't have any other history date field besides historydateyyyymm.	
+	
 	SELF.OFAC_Version := 3;
 	SELF.LinkSearchLevel := 0;
 	SELF.AllowedSources := '';
 	SELF.Global_Watchlist_Threshold := 0.84;
 	SELF.OutcomeTrackingOptOut := TRUE; // Turn off SCOUT logging
 	
-	SELF.DppaPurpose := 1; 
-	SELF.GLBPurpose := 1; 
-	// SELF.DataRestrictionMask := '0000000000000000000000000'; 
-	// SELF.DataPermissionMask := '0000000000000'; 
-
-	SELF.Seq := (STRING)ctr;
+	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;
 	
 	SELF := [];
 END;
 
-SmallBusinessMarketing_input := DISTRIBUTE(PROJECT(f, transform_input_request(LEFT, COUNTER)), RANDOM());
+SmallBusinessMarketing_input := DISTRIBUTE(PROJECT(f_with_seq, transform_input_request(LEFT)), RANDOM());
+insufficientSoap_input := DISTRIBUTE(PROJECT(inSufficientInput_bad, transform_input_request(LEFT)), RANDOM());
 
 OUTPUT(CHOOSEN(SmallBusinessMarketing_input, eyeball), NAMED('SmallBusinessMarketing_input'));
-
-// Now run the SmallBusinessMarketing attributes
-SmallBusinessMarketingoutput := RECORD
-	iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingResponse;
-	STRING ErrorCode;
-END;
 
 SmallBusinessMarketingoutput myFail(SmallBusinessMarketing_input le) := TRANSFORM
 	SELF.ErrorCode := StringLib.StringFilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
@@ -262,26 +307,74 @@ SmallBusinessMarketingoutput myFail(SmallBusinessMarketing_input le) := TRANSFOR
 	SELF := [];
 END;
 
+			
 SmallBusinessMarketing_attributes := 
 				SOAPCALL(SmallBusinessMarketing_input, 
 				RoxieIP,
-				'LNSmallBusiness.SmallBusiness_Marketing_Service' + version, 
+				'lnsmallbusiness.smallbusiness_marketing_service', 
 				{SmallBusinessMarketing_input}, 
 				DATASET(SmallBusinessMarketingoutput),
         RETRY(5), TIMEOUT(500),
-				XPATH('LNSmallBusiness.SmallBusiness_Marketing_Service' + version + 'Response/Results/Result/Dataset[@name=\'Results\']/Row'),
+				// XPATH('lnsmallbusiness.smallbusiness_marketing_serviceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-				
-Passed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) = '');
-Failed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) <> '');
+
+
+// Records that completed having a MinInputErrorCode shall be kept in the "Passed"
+// dataset. However, we still need to display them.
+MinInputErrorCode := 'Please input the minimum required fields';
+
+
+// ----------[ PASSED RECORDS ]----------				
+Passed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) = '' OR Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) > 0) + inSufficientInput;
+
+records_having_MinInputErrorCode := Passed(Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) > 0);
+OUTPUT( records_having_MinInputErrorCode, NAMED('MinimumInputErrorCode_recs'), ALL );
+
+// ----------[ FAILED RECORDS ]----------
+records_having_other_ErrorCode := SmallBusinessMarketing_attributes(TRIM(ErrorCode) != '' AND Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) = 0);
+OUTPUT( records_having_other_ErrorCode, NAMED('OtherErrorCode_recs'), ALL );
+
+
+ds_input_dist := DISTRIBUTE(f_with_seq, HASH64(seq)) : INDEPENDENT;
+
+records_having_other_ErrorCode_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(records_having_other_ErrorCode, HASH64((UNSIGNED)Result.InputEcho.Seq)),
+		LEFT.seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq,
+		TRANSFORM(LEFT),
+		KEEP(1),
+		INNER, LOCAL
+	);
+
+// Grab any dropped records, i.e. those records not returned by the Roxie. These
+// get tossed into the "Failed" dataset also.
+dropped_records_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(SmallBusinessMarketing_attributes, HASH64((UNSIGNED)Result.InputEcho.Seq)),
+		LEFT.seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq,
+		TRANSFORM(LEFT),
+		LEFT ONLY, LOCAL
+	);
+
+Failed := records_having_other_ErrorCode_as_input + dropped_records_as_input;
+
+
+SBAMFailed_Inputs := SORT( Failed, AccountNumber );
+
+
+OUTPUT(CHOOSEN(SmallBusinessMarketing_attributes, eyeball), NAMED('SmallBusinessMarketing_results'));
 				
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessMarketing_Results_Passed'));
 OUTPUT(CHOOSEN(Failed, eyeball), NAMED('SmallBusinessMarketing_Errors'));
+OUTPUT(CHOOSEN(dropped_records_as_input, eyeball), NAMED('SmallBusinessMarketing_Dropped_Records'));
 OUTPUT(COUNT(Passed), NAMED('SmallBusinessMarketing_Total_Passed'));
 OUTPUT(COUNT(Failed), NAMED('SmallBusinessMarketing_Total_Errors'));
+OUTPUT(COUNT(dropped_records_as_input), NAMED('SmallBusinessMarketing_Total_Dropped') );
 
 // Now transform the attributes and scores into a flat layout
 layout_flat_v1 := RECORD
+		UNSIGNED6 seq;
 		STRING30 AccountNumber;
 		UNSIGNED3 HistoryDateYYYYMM;
 		STRING120 Bus_Company_Name;
@@ -575,9 +668,8 @@ layout_flat_v1 := RECORD
 		STRING200 ErrorCode;
 END;
 
-getValue(DATASET(iesp.share.t_NameValuePair) AttributeResults, STRING AttributeName) := AttributeResults (StringLib.StringToLowerCase(Name) = StringLib.StringToLowerCase(AttributeName))[1].Value;
-
 layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFORM
+	SELF.seq := (UNSIGNED)le.seq;
 	SELF.AccountNumber := le.AccountNumber;
 	SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM;
 	SELF.Bus_Company_Name := ri.Result.InputEcho.Company.CompanyName;
@@ -586,208 +678,208 @@ layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFO
 	SELF.SeleID := ri.Result.BusinessID.SeleID;
 	SELF.OrgID := ri.Result.BusinessID.OrgID;
 	SELF.UltID := ri.Result.BusinessID.UltID;
-	V1AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = 'smallbusinessattrv1')[1].Attributes;
+	V1AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = StringLib.StringToLowerCase(LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME))[1].Attributes;
 	// Attributes Section
-	SELF.InputCheckBusName := getValue(V1AttributeResults, 'InputCheckBusName');
-	SELF.InputCheckBusAltName := getValue(V1AttributeResults, 'InputCheckBusAltName');
-	SELF.InputCheckBusAddr := getValue(V1AttributeResults, 'InputCheckBusAddr');
-	SELF.InputCheckBusCity := getValue(V1AttributeResults, 'InputCheckBusCity');
-	SELF.InputCheckBusState := getValue(V1AttributeResults, 'InputCheckBusState');
-	SELF.InputCheckBusZip := getValue(V1AttributeResults, 'InputCheckBusZip');
-	SELF.InputCheckBusFEIN := getValue(V1AttributeResults, 'InputCheckBusFEIN');
-	SELF.InputCheckBusPhone := getValue(V1AttributeResults, 'InputCheckBusPhone');
-	SELF.InputCheckBusSIC := getValue(V1AttributeResults, 'InputCheckBusSIC');
-	SELF.InputCheckBusNAICS := getValue(V1AttributeResults, 'InputCheckBusNAICS');
-	SELF.InputCheckBusStructure := getValue(V1AttributeResults, 'InputCheckBusStructure');
-	SELF.InputCheckBusAge := getValue(V1AttributeResults, 'InputCheckBusAge');
-	SELF.InputCheckBusStartDate := getValue(V1AttributeResults, 'InputCheckBusStartDate');
-	SELF.InputCheckBusAnnualRevenue := getValue(V1AttributeResults, 'InputCheckBusAnnualRevenue');
-	SELF.InputCheckBusFax := getValue(V1AttributeResults, 'InputCheckBusFax');
-	SELF.InputCheckAuthRepFirstName := getValue(V1AttributeResults, 'InputCheckAuthRepFirstName');
-	SELF.InputCheckAuthRepLastName := getValue(V1AttributeResults, 'InputCheckAuthRepLastName');
-	SELF.InputCheckAuthRepMiddleName := getValue(V1AttributeResults, 'InputCheckAuthRepMiddleName');
-	SELF.InputCheckAuthRepAddr := getValue(V1AttributeResults, 'InputCheckAuthRepAddr');
-	SELF.InputCheckAuthRepCity := getValue(V1AttributeResults, 'InputCheckAuthRepCity');
-	SELF.InputCheckAuthRepState := getValue(V1AttributeResults, 'InputCheckAuthRepState');
-	SELF.InputCheckAuthRepZip := getValue(V1AttributeResults, 'InputCheckAuthRepZip');
-	SELF.InputCheckAuthRepSSN := getValue(V1AttributeResults, 'InputCheckAuthRepSSN');
-	SELF.InputCheckAuthRepPhone := getValue(V1AttributeResults, 'InputCheckAuthRepPhone');
-	SELF.InputCheckAuthRepDOB := getValue(V1AttributeResults, 'InputCheckAuthRepDOB');
-	SELF.InputCheckAuthRepAge := getValue(V1AttributeResults, 'InputCheckAuthRepAge');
-	SELF.InputCheckAuthRepTitle := getValue(V1AttributeResults, 'InputCheckAuthRepTitle');
-	SELF.InputCheckAuthRepDL := getValue(V1AttributeResults, 'InputCheckAuthRepDL');
-	SELF.InputCheckAuthRepDLState := getValue(V1AttributeResults, 'InputCheckAuthRepDLState');
-	SELF.InputCheckAuthRep2FirstName := getValue(V1AttributeResults, 'InputCheckAuthRep2FirstName');
-	SELF.InputCheckAuthRep2LastName := getValue(V1AttributeResults, 'InputCheckAuthRep2LastName');
-	SELF.InputCheckAuthRep2MiddleName := getValue(V1AttributeResults, 'InputCheckAuthRep2MiddleName');
-	SELF.InputCheckAuthRep2Addr := getValue(V1AttributeResults, 'InputCheckAuthRep2Addr');
-	SELF.InputCheckAuthRep2City := getValue(V1AttributeResults, 'InputCheckAuthRep2City');
-	SELF.InputCheckAuthRep2State := getValue(V1AttributeResults, 'InputCheckAuthRep2State');
-	SELF.InputCheckAuthRep2Zip := getValue(V1AttributeResults, 'InputCheckAuthRep2Zip');
-	SELF.InputCheckAuthRep2SSN := getValue(V1AttributeResults, 'InputCheckAuthRep2SSN');
-	SELF.InputCheckAuthRep2Phone := getValue(V1AttributeResults, 'InputCheckAuthRep2Phone');
-	SELF.InputCheckAuthRep2DOB := getValue(V1AttributeResults, 'InputCheckAuthRep2DOB');
-	SELF.InputCheckAuthRep2Age := getValue(V1AttributeResults, 'InputCheckAuthRep2Age');
-	SELF.InputCheckAuthRep2Title := getValue(V1AttributeResults, 'InputCheckAuthRep2Title');
-	SELF.InputCheckAuthRep2DL := getValue(V1AttributeResults, 'InputCheckAuthRep2DL');
-	SELF.InputCheckAuthRep2DLState := getValue(V1AttributeResults, 'InputCheckAuthRep2DLState');
-	SELF.InputCheckAuthRep3FirstName := getValue(V1AttributeResults, 'InputCheckAuthRep3FirstName');
-	SELF.InputCheckAuthRep3LastName := getValue(V1AttributeResults, 'InputCheckAuthRep3LastName');
-	SELF.InputCheckAuthRep3MiddleName := getValue(V1AttributeResults, 'InputCheckAuthRep3MiddleName');
-	SELF.InputCheckAuthRep3Addr := getValue(V1AttributeResults, 'InputCheckAuthRep3Addr');
-	SELF.InputCheckAuthRep3City := getValue(V1AttributeResults, 'InputCheckAuthRep3City');
-	SELF.InputCheckAuthRep3State := getValue(V1AttributeResults, 'InputCheckAuthRep3State');
-	SELF.InputCheckAuthRep3Zip := getValue(V1AttributeResults, 'InputCheckAuthRep3Zip');
-	SELF.InputCheckAuthRep3SSN := getValue(V1AttributeResults, 'InputCheckAuthRep3SSN');
-	SELF.InputCheckAuthRep3Phone := getValue(V1AttributeResults, 'InputCheckAuthRep3Phone');
-	SELF.InputCheckAuthRep3DOB := getValue(V1AttributeResults, 'InputCheckAuthRep3DOB');
-	SELF.InputCheckAuthRep3Age := getValue(V1AttributeResults, 'InputCheckAuthRep3Age');
-	SELF.InputCheckAuthRep3Title := getValue(V1AttributeResults, 'InputCheckAuthRep3Title');
-	SELF.InputCheckAuthRep3DL := getValue(V1AttributeResults, 'InputCheckAuthRep3DL');
-	SELF.InputCheckAuthRep3DLState := getValue(V1AttributeResults, 'InputCheckAuthRep3DLState');
-	SELF.VerificationBusInputName := getValue(V1AttributeResults, 'VerificationBusInputName');
-	SELF.VerificationBusInputAddr := getValue(V1AttributeResults, 'VerificationBusInputAddr');
-	SELF.VerificationBusInputPhone := getValue(V1AttributeResults, 'VerificationBusInputPhone');
-	SELF.VerificationBusInputFEIN := getValue(V1AttributeResults, 'VerificationBusInputFEIN');
-	SELF.VerificationBusInputIndustry := getValue(V1AttributeResults, 'VerificationBusInputIndustry');
-	SELF.BusinessRecordTimeOldest := getValue(V1AttributeResults, 'BusinessRecordTimeOldest');
-	SELF.BusinessRecordTimeNewest := getValue(V1AttributeResults, 'BusinessRecordTimeNewest');
-	SELF.BusinessRecordUpdated12Month := getValue(V1AttributeResults, 'BusinessRecordUpdated12Month');
-	SELF.BusinessActivity03Month := getValue(V1AttributeResults, 'BusinessActivity03Month');
-	SELF.BusinessActivity06Month := getValue(V1AttributeResults, 'BusinessActivity06Month');
-	SELF.BusinessActivity12Month := getValue(V1AttributeResults, 'BusinessActivity12Month');
-	SELF.BusinessAddrCount := getValue(V1AttributeResults, 'BusinessAddrCount');
-	SELF.FirmAgeEstablished := getValue(V1AttributeResults, 'FirmAgeEstablished');
-	SELF.FirmSICCode := getValue(V1AttributeResults, 'FirmSICCode');
-	SELF.FirmNAICSCode := getValue(V1AttributeResults, 'FirmNAICSCode');
-	SELF.FirmEmployeeCount := getValue(V1AttributeResults, 'FirmEmployeeCount');
-	SELF.FirmReportedSales := getValue(V1AttributeResults, 'FirmReportedSales');
-	SELF.FirmReportedEarnings := getValue(V1AttributeResults, 'FirmReportedEarnings');
-	SELF.FirmIRSRetirementPlan := getValue(V1AttributeResults, 'FirmIRSRetirementPlan');
-	SELF.FirmNonProfit := getValue(V1AttributeResults, 'FirmNonProfit');
-	SELF.OrgLocationCount := getValue(V1AttributeResults, 'OrgLocationCount');
-	SELF.OrgRelatedCount := getValue(V1AttributeResults, 'OrgRelatedCount');
-	SELF.OrgParentCompany := getValue(V1AttributeResults, 'OrgParentCompany');
-	SELF.OrgLegalEntityCount := getValue(V1AttributeResults, 'OrgLegalEntityCount');
-	SELF.OrgAddrLegalEntityCount := getValue(V1AttributeResults, 'OrgAddrLegalEntityCount');
-	SELF.OrgSingleLocation := getValue(V1AttributeResults, 'OrgSingleLocation');
-	SELF.SOSTimeIncorporation := getValue(V1AttributeResults, 'SOSTimeIncorporation');
-	SELF.SOSTimeAgentChange := getValue(V1AttributeResults, 'SOSTimeAgentChange');
-	SELF.SOSEverDefunct := getValue(V1AttributeResults, 'SOSEverDefunct');
-	SELF.SOSStateCount := getValue(V1AttributeResults, 'SOSStateCount');
-	SELF.SOSForeignStateFlag := getValue(V1AttributeResults, 'SOSForeignStateFlag');
-	SELF.BankruptcyCount := getValue(V1AttributeResults, 'BankruptcyCount');
-	SELF.BankruptcyCount12Month := getValue(V1AttributeResults, 'BankruptcyCount12Month');
-	SELF.BankruptcyCount24Month := getValue(V1AttributeResults, 'BankruptcyCount24Month');
-	SELF.BankruptcyChapter := getValue(V1AttributeResults, 'BankruptcyChapter');
-	SELF.BankruptcyTimeNewest := getValue(V1AttributeResults, 'BankruptcyTimeNewest');
-	SELF.LienCount := getValue(V1AttributeResults, 'LienCount');
-	SELF.LienCount12Month := getValue(V1AttributeResults, 'LienCount12Month');
-	SELF.LienCount24Month := getValue(V1AttributeResults, 'LienCount24Month');
-	SELF.LienType := getValue(V1AttributeResults, 'LienType');
-	SELF.LienTimeNewest := getValue(V1AttributeResults, 'LienTimeNewest');
-	SELF.LienTimeOldest := getValue(V1AttributeResults, 'LienTimeOldest');
-	SELF.LienDollarTotal := getValue(V1AttributeResults, 'LienDollarTotal');
-	SELF.JudgmentCount := getValue(V1AttributeResults, 'JudgmentCount');
-	SELF.JudgmentCount12Month := getValue(V1AttributeResults, 'JudgmentCount12Month');
-	SELF.JudgmentCount24Month := getValue(V1AttributeResults, 'JudgmentCount24Month');
-	SELF.JudgmentType := getValue(V1AttributeResults, 'JudgmentType');
-	SELF.JudgmentTimeNewest := getValue(V1AttributeResults, 'JudgmentTimeNewest');
-	SELF.JudgmentTimeOldest := getValue(V1AttributeResults, 'JudgmentTimeOldest');
-	SELF.JudgmentDollarTotal := getValue(V1AttributeResults, 'JudgmentDollarTotal');
-	SELF.LienJudgmentDollarTotal := getValue(V1AttributeResults, 'LienJudgmentDollarTotal');
-	SELF.AssetPropertyCount := getValue(V1AttributeResults, 'AssetPropertyCount');
-	SELF.AssetPropertyStateCount := getValue(V1AttributeResults, 'AssetPropertyStateCount');
-	SELF.AssetPropertyLotSizeTotal := getValue(V1AttributeResults, 'AssetPropertyLotSizeTotal');
-	SELF.AssetPropertyAssessedTotal := getValue(V1AttributeResults, 'AssetPropertyAssessedTotal');
-	SELF.AssetPropertySqFootageTotal := getValue(V1AttributeResults, 'AssetPropertySqFootageTotal');
-	SELF.AssetAircraftCount := getValue(V1AttributeResults, 'AssetAircraftCount');
-	SELF.AssetWatercraftCount := getValue(V1AttributeResults, 'AssetWatercraftCount');
-	SELF.UCCCount := getValue(V1AttributeResults, 'UCCCount');
-	SELF.UCCTimeNewest := getValue(V1AttributeResults, 'UCCTimeNewest');
-	SELF.UCCTimeOldest := getValue(V1AttributeResults, 'UCCTimeOldest');
-	SELF.GovernmentDebarred := getValue(V1AttributeResults, 'GovernmentDebarred');
-	SELF.InquiryHighRisk12Month := getValue(V1AttributeResults, 'InquiryHighRisk12Month');
-	SELF.InquiryHighRisk03Month := getValue(V1AttributeResults, 'InquiryHighRisk03Month');
-	SELF.InquiryCredit12Month := getValue(V1AttributeResults, 'InquiryCredit12Month');
-	SELF.InquiryCredit03Month := getValue(V1AttributeResults, 'InquiryCredit03Month');
-	SELF.Inquiry12Month := getValue(V1AttributeResults, 'Inquiry12Month');
-	SELF.Inquiry03Month := getValue(V1AttributeResults, 'Inquiry03Month');
-	SELF.InquiryConsumerAddress := getValue(V1AttributeResults, 'InquiryConsumerAddress');
-	SELF.InquiryConsumerPhone := getValue(V1AttributeResults, 'InquiryConsumerPhone');
-	SELF.InquiryConsumerAddressSSN := getValue(V1AttributeResults, 'InquiryConsumerAddressSSN');
-	SELF.BusExecLinkAuthRepNameOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRepNameOnFile');
-	SELF.BusExecLinkAuthRepAddrOnFile	 := getValue(V1AttributeResults, 'BusExecLinkAuthRepAddrOnFile');
-	SELF.BusExecLinkAuthRepSSNOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRepSSNOnFile');
-	SELF.BusExecLinkAuthRepPhoneOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRepPhoneOnFile');
-	SELF.BusExecLinkBusNameAuthRepFirst := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRepFirst');
-	SELF.BusExecLinkBusNameAuthRepLast := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRepLast');
-	SELF.BusExecLinkBusNameAuthRepFull := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRepFull');
-	SELF.BusExecLinkAuthRepSSNBusFEIN := getValue(V1AttributeResults, 'BusExecLinkAuthRepSSNBusFEIN');
-	SELF.BusExecLinkPropertyOverlapCount := getValue(V1AttributeResults, 'BusExecLinkPropertyOverlapCount');
-	SELF.BusExecLinkBusAddrAuthRepOwned := getValue(V1AttributeResults, 'BusExecLinkBusAddrAuthRepOwned');
-	SELF.BusExecLinkUtilityOverlapCount := getValue(V1AttributeResults, 'BusExecLinkUtilityOverlapCount');
-	SELF.BusExecLinkInquiryOverlapCount := getValue(V1AttributeResults, 'BusExecLinkInquiryOverlapCount');
-	SELF.BusExecLinkAuthRepAddrBusAddr := getValue(V1AttributeResults, 'BusExecLinkAuthRepAddrBusAddr');
-	SELF.BusExecLinkAuthRepPhoneBusPhone := getValue(V1AttributeResults, 'BusExecLinkAuthRepPhoneBusPhone');
-	SELF.BusExecLinkAuthRep2NameOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep2NameOnFile');
-	SELF.BusExecLinkAuthRep2AddrOnFile		 := getValue(V1AttributeResults, 'BusExecLinkAuthRep2AddrOnFile');
-	SELF.BusExecLinkAuthRep2PhoneOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep2PhoneOnFile');
-	SELF.BusExecLinkAuthRep2SSNOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep2SSNOnFile');
-	SELF.BusExecLinkBusNameAuthRep2First := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep2First');
-	SELF.BusExecLinkBusNameAuthRep2Last := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep2Last');
-	SELF.BusExecLinkBusNameAuthRep2Full := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep2Full');
-	SELF.BusExecLinkAuthRep2SSNBusFEIN := getValue(V1AttributeResults, 'BusExecLinkAuthRep2SSNBusFEIN');
-	SELF.BusExecLinkPropertyOverlapCount2 := getValue(V1AttributeResults, 'BusExecLinkPropertyOverlapCount2');
-	SELF.BusExecLinkBusAddrAuthRep2Owned := getValue(V1AttributeResults, 'BusExecLinkBusAddrAuthRep2Owned');
-	SELF.BusExecLinkUtilityOverlapCount2 := getValue(V1AttributeResults, 'BusExecLinkUtilityOverlapCount2');
-	SELF.BusExecLinkInquiryOverlapCount2 := getValue(V1AttributeResults, 'BusExecLinkInquiryOverlapCount2');
-	SELF.BusExecLinkAuthRep2AddrBusAddr := getValue(V1AttributeResults, 'BusExecLinkAuthRep2AddrBusAddr');
-	SELF.BusExecLinkAuthRep2PhoneBusPhone := getValue(V1AttributeResults, 'BusExecLinkAuthRep2PhoneBusPhone');
-	SELF.BusExecLinkAuthRep3NameOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep3NameOnFile');
-	SELF.BusExecLinkAuthRep3AddrOnFile		 := getValue(V1AttributeResults, 'BusExecLinkAuthRep3AddrOnFile');
-	SELF.BusExecLinkAuthRep3PhoneOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep3PhoneOnFile');
-	SELF.BusExecLinkAuthRep3SSNOnFile := getValue(V1AttributeResults, 'BusExecLinkAuthRep3SSNOnFile');
-	SELF.BusExecLinkBusNameAuthRep3First := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep3First');
-	SELF.BusExecLinkBusNameAuthRep3Last := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep3Last');
-	SELF.BusExecLinkBusNameAuthRep3Full := getValue(V1AttributeResults, 'BusExecLinkBusNameAuthRep3Full');
-	SELF.BusExecLinkAuthRep3SSNBusFein := getValue(V1AttributeResults, 'BusExecLinkAuthRep3SSNBusFein');
-	SELF.BusExecLinkPropertyOverlapCount3 := getValue(V1AttributeResults, 'BusExecLinkPropertyOverlapCount3');
-	SELF.BusExecLinkBusAddrAuthRep3Owned := getValue(V1AttributeResults, 'BusExecLinkBusAddrAuthRep3Owned');
-	SELF.BusExecLinkUtilityOverlapCount3 := getValue(V1AttributeResults, 'BusExecLinkUtilityOverlapCount3');
-	SELF.BusExecLinkInquiryOverlapCount3 := getValue(V1AttributeResults, 'BusExecLinkInquiryOverlapCount3');
-	SELF.BusExecLinkAuthRep3AddrBusAddr := getValue(V1AttributeResults, 'BusExecLinkAuthRep3AddrBusAddr');
-	SELF.BusExecLinkAuthRep3PhoneBusPhone := getValue(V1AttributeResults, 'BusExecLinkAuthRep3PhoneBusPhone');
-	SELF.BusFEINPersonOverlap := getValue(V1AttributeResults, 'BusFEINPersonOverlap');
-	SELF.BusFEINPersonAddrOverlap := getValue(V1AttributeResults, 'BusFEINPersonAddrOverlap');
-	SELF.BusFEINPersonPhoneOverlap := getValue(V1AttributeResults, 'BusFEINPersonPhoneOverlap');
-	SELF.BusAddrPersonNameOverlap := getValue(V1AttributeResults, 'BusAddrPersonNameOverlap');
-	SELF.InputAddrConsumerCount := getValue(V1AttributeResults, 'InputAddrConsumerCount');
-	SELF.InputAddrSourceCount := getValue(V1AttributeResults, 'InputAddrSourceCount');
-	SELF.InputAddrType := getValue(V1AttributeResults, 'InputAddrType');
-	SELF.InputAddrBusinessOwned := getValue(V1AttributeResults, 'InputAddrBusinessOwned');
-	SELF.InputAddrLotSize := getValue(V1AttributeResults, 'InputAddrLotSize');
-	SELF.InputAddrAssessedTotal := getValue(V1AttributeResults, 'InputAddrAssessedTotal');
-	SELF.InputAddrSqFootage := getValue(V1AttributeResults, 'InputAddrSqFootage');
-	SELF.InputPhoneProblems := getValue(V1AttributeResults, 'InputPhoneProblems');
-	SELF.InputPhoneEntityCount := getValue(V1AttributeResults, 'InputPhoneEntityCount');
-	SELF.InputPhoneMobile := getValue(V1AttributeResults, 'InputPhoneMobile');
-	SELF.AssociateCount := getValue(V1AttributeResults, 'AssociateCount');
-	SELF.AssociateHighCrimeAddrCount := getValue(V1AttributeResults, 'AssociateHighCrimeAddrCount');
-	SELF.AssociateFelonyCount := getValue(V1AttributeResults, 'AssociateFelonyCount');
-	SELF.AssociateCountWithFelony := getValue(V1AttributeResults, 'AssociateCountWithFelony');
-	SELF.AssociateBankruptCount := getValue(V1AttributeResults, 'AssociateBankruptCount');
-	SELF.AssociateCountWithBankruptcy := getValue(V1AttributeResults, 'AssociateCountWithBankruptcy');
-	SELF.AssociateBankrupt1YearCount := getValue(V1AttributeResults, 'AssociateBankrupt1YearCount');
-	SELF.AssociateLienCount := getValue(V1AttributeResults, 'AssociateLienCount');
-	SELF.AssociateCountWithLien := getValue(V1AttributeResults, 'AssociateCountWithLien');
-	SELF.AssociateJudgmentCount := getValue(V1AttributeResults, 'AssociateJudgmentCount');
-	SELF.AssociateCountWithJudgment := getValue(V1AttributeResults, 'AssociateCountWithJudgment');
-	SELF.AssociateHighRiskAddrCount := getValue(V1AttributeResults, 'AssociateHighRiskAddrCount');
-	SELF.AssociateWatchlistCount := getValue(V1AttributeResults, 'AssociateWatchlistCount');
-	SELF.AssociateBusinessCount := getValue(V1AttributeResults, 'AssociateBusinessCount');
-	SELF.AssociateCityCount := getValue(V1AttributeResults, 'AssociateCityCount');
-	SELF.AssociateCountyCount := getValue(V1AttributeResults, 'AssociateCountyCount');
+	SELF.InputCheckBusName := V1AttributeResults[1].value;
+	SELF.InputCheckBusAltName := V1AttributeResults[2].value;
+	SELF.InputCheckBusAddr := V1AttributeResults[3].value;
+	SELF.InputCheckBusCity := V1AttributeResults[4].value;
+	SELF.InputCheckBusState := V1AttributeResults[5].value;
+	SELF.InputCheckBusZip := V1AttributeResults[6].value;
+	SELF.InputCheckBusFEIN := V1AttributeResults[7].value;
+	SELF.InputCheckBusPhone := V1AttributeResults[8].value;
+	SELF.InputCheckBusSIC := V1AttributeResults[9].value;
+	SELF.InputCheckBusNAICS := V1AttributeResults[10].value;
+	SELF.InputCheckBusStructure := V1AttributeResults[11].value;
+	SELF.InputCheckBusAge := V1AttributeResults[12].value;
+	SELF.InputCheckBusStartDate := V1AttributeResults[13].value;
+	SELF.InputCheckBusAnnualRevenue := V1AttributeResults[14].value;
+	SELF.InputCheckBusFax := V1AttributeResults[15].value;
+	SELF.InputCheckAuthRepFirstName := V1AttributeResults[16].value;
+	SELF.InputCheckAuthRepLastName := V1AttributeResults[17].value;
+	SELF.InputCheckAuthRepMiddleName := V1AttributeResults[18].value;
+	SELF.InputCheckAuthRepAddr := V1AttributeResults[19].value;
+	SELF.InputCheckAuthRepCity := V1AttributeResults[20].value;
+	SELF.InputCheckAuthRepState := V1AttributeResults[21].value;
+	SELF.InputCheckAuthRepZip := V1AttributeResults[22].value;
+	SELF.InputCheckAuthRepSSN := V1AttributeResults[23].value;
+	SELF.InputCheckAuthRepPhone := V1AttributeResults[24].value;
+	SELF.InputCheckAuthRepDOB := V1AttributeResults[25].value;
+	SELF.InputCheckAuthRepAge := V1AttributeResults[26].value;
+	SELF.InputCheckAuthRepTitle := V1AttributeResults[27].value;
+	SELF.InputCheckAuthRepDL := V1AttributeResults[28].value;
+	SELF.InputCheckAuthRepDLState := V1AttributeResults[29].value;
+	SELF.InputCheckAuthRep2FirstName := V1AttributeResults[30].value;
+	SELF.InputCheckAuthRep2LastName := V1AttributeResults[31].value;
+	SELF.InputCheckAuthRep2MiddleName := V1AttributeResults[32].value;
+	SELF.InputCheckAuthRep2Addr := V1AttributeResults[33].value;
+	SELF.InputCheckAuthRep2City := V1AttributeResults[34].value;
+	SELF.InputCheckAuthRep2State := V1AttributeResults[35].value;
+	SELF.InputCheckAuthRep2Zip := V1AttributeResults[36].value;
+	SELF.InputCheckAuthRep2SSN := V1AttributeResults[37].value;
+	SELF.InputCheckAuthRep2Phone := V1AttributeResults[38].value;
+	SELF.InputCheckAuthRep2DOB := V1AttributeResults[39].value;
+	SELF.InputCheckAuthRep2Age := V1AttributeResults[40].value;
+	SELF.InputCheckAuthRep2Title := V1AttributeResults[41].value;
+	SELF.InputCheckAuthRep2DL := V1AttributeResults[42].value;
+	SELF.InputCheckAuthRep2DLState := V1AttributeResults[43].value;
+	SELF.InputCheckAuthRep3FirstName := V1AttributeResults[44].value;
+	SELF.InputCheckAuthRep3LastName := V1AttributeResults[45].value;
+	SELF.InputCheckAuthRep3MiddleName := V1AttributeResults[46].value;
+	SELF.InputCheckAuthRep3Addr := V1AttributeResults[47].value;
+	SELF.InputCheckAuthRep3City := V1AttributeResults[48].value;
+	SELF.InputCheckAuthRep3State := V1AttributeResults[49].value;
+	SELF.InputCheckAuthRep3Zip := V1AttributeResults[50].value;
+	SELF.InputCheckAuthRep3SSN := V1AttributeResults[51].value;
+	SELF.InputCheckAuthRep3Phone := V1AttributeResults[52].value;
+	SELF.InputCheckAuthRep3DOB := V1AttributeResults[53].value;
+	SELF.InputCheckAuthRep3Age := V1AttributeResults[54].value;
+	SELF.InputCheckAuthRep3Title := V1AttributeResults[55].value;
+	SELF.InputCheckAuthRep3DL := V1AttributeResults[56].value;
+	SELF.InputCheckAuthRep3DLState := V1AttributeResults[57].value;
+	SELF.VerificationBusInputName := V1AttributeResults[58].value;
+	SELF.VerificationBusInputAddr := V1AttributeResults[59].value;
+	SELF.VerificationBusInputPhone := V1AttributeResults[60].value;
+	SELF.VerificationBusInputFEIN := V1AttributeResults[61].value;
+	SELF.VerificationBusInputIndustry := V1AttributeResults[62].value;
+	SELF.BusinessRecordTimeOldest := V1AttributeResults[63].value;
+	SELF.BusinessRecordTimeNewest := V1AttributeResults[64].value;
+	SELF.BusinessRecordUpdated12Month := V1AttributeResults[65].value;
+	SELF.BusinessActivity03Month := V1AttributeResults[66].value;
+	SELF.BusinessActivity06Month := V1AttributeResults[67].value;
+	SELF.BusinessActivity12Month := V1AttributeResults[68].value;
+	SELF.BusinessAddrCount := V1AttributeResults[69].value;
+	SELF.FirmAgeEstablished := V1AttributeResults[70].value;
+	SELF.FirmSICCode := V1AttributeResults[71].value;
+	SELF.FirmNAICSCode := V1AttributeResults[72].value;
+	SELF.FirmEmployeeCount := V1AttributeResults[73].value;
+	SELF.FirmReportedSales := V1AttributeResults[74].value;
+	SELF.FirmReportedEarnings := V1AttributeResults[75].value;
+	SELF.FirmIRSRetirementPlan := V1AttributeResults[76].value;
+	SELF.FirmNonProfit := V1AttributeResults[77].value;
+	SELF.OrgLocationCount := V1AttributeResults[78].value;
+	SELF.OrgRelatedCount := V1AttributeResults[79].value;
+	SELF.OrgParentCompany := V1AttributeResults[80].value;
+	SELF.OrgLegalEntityCount := V1AttributeResults[81].value;
+	SELF.OrgAddrLegalEntityCount := V1AttributeResults[82].value;
+	SELF.OrgSingleLocation := V1AttributeResults[83].value;
+	SELF.SOSTimeIncorporation := V1AttributeResults[84].value;
+	SELF.SOSTimeAgentChange := V1AttributeResults[85].value;
+	SELF.SOSEverDefunct := V1AttributeResults[86].value;
+	SELF.SOSStateCount := V1AttributeResults[87].value;
+	SELF.SOSForeignStateFlag := V1AttributeResults[88].value;
+	SELF.BankruptcyCount := V1AttributeResults[89].value;
+	SELF.BankruptcyCount12Month := V1AttributeResults[90].value;
+	SELF.BankruptcyCount24Month := V1AttributeResults[91].value;
+	SELF.BankruptcyChapter := V1AttributeResults[92].value;
+	SELF.BankruptcyTimeNewest := V1AttributeResults[93].value;
+	SELF.LienCount := V1AttributeResults[94].value;
+	SELF.LienCount12Month := V1AttributeResults[95].value;
+	SELF.LienCount24Month := V1AttributeResults[96].value;
+	SELF.LienType := V1AttributeResults[97].value;
+	SELF.LienTimeNewest := V1AttributeResults[98].value;
+	SELF.LienTimeOldest := V1AttributeResults[99].value;
+	SELF.LienDollarTotal := V1AttributeResults[100].value;
+	SELF.JudgmentCount := V1AttributeResults[101].value;
+	SELF.JudgmentCount12Month := V1AttributeResults[102].value;
+	SELF.JudgmentCount24Month := V1AttributeResults[103].value;
+	SELF.JudgmentType := V1AttributeResults[104].value;
+	SELF.JudgmentTimeNewest := V1AttributeResults[105].value;
+	SELF.JudgmentTimeOldest := V1AttributeResults[106].value;
+	SELF.JudgmentDollarTotal := V1AttributeResults[107].value;
+	SELF.LienJudgmentDollarTotal := V1AttributeResults[108].value;
+	SELF.AssetPropertyCount := V1AttributeResults[109].value;
+	SELF.AssetPropertyStateCount := V1AttributeResults[110].value;
+	SELF.AssetPropertyLotSizeTotal := V1AttributeResults[111].value;
+	SELF.AssetPropertyAssessedTotal := V1AttributeResults[112].value;
+	SELF.AssetPropertySqFootageTotal := V1AttributeResults[113].value;
+	SELF.AssetAircraftCount := V1AttributeResults[114].value;
+	SELF.AssetWatercraftCount := V1AttributeResults[115].value;
+	SELF.UCCCount := V1AttributeResults[116].value;
+	SELF.UCCTimeNewest := V1AttributeResults[117].value;
+	SELF.UCCTimeOldest := V1AttributeResults[118].value;
+	SELF.GovernmentDebarred := V1AttributeResults[119].value;
+	SELF.InquiryHighRisk12Month := V1AttributeResults[120].value;
+	SELF.InquiryHighRisk03Month := V1AttributeResults[121].value;
+	SELF.InquiryCredit12Month := V1AttributeResults[122].value;
+	SELF.InquiryCredit03Month := V1AttributeResults[123].value;
+	SELF.Inquiry12Month := V1AttributeResults[124].value;
+	SELF.Inquiry03Month := V1AttributeResults[125].value;
+	SELF.InquiryConsumerAddress := V1AttributeResults[126].value;
+	SELF.InquiryConsumerPhone := V1AttributeResults[127].value;
+	SELF.InquiryConsumerAddressSSN := V1AttributeResults[128].value;
+	SELF.BusExecLinkAuthRepNameOnFile := V1AttributeResults[129].value;
+	SELF.BusExecLinkAuthRepAddrOnFile:= V1AttributeResults[130].value;
+	SELF.BusExecLinkAuthRepSSNOnFile := V1AttributeResults[131].value;
+	SELF.BusExecLinkAuthRepPhoneOnFile := V1AttributeResults[132].value;
+	SELF.BusExecLinkBusNameAuthRepFirst := V1AttributeResults[133].value;
+	SELF.BusExecLinkBusNameAuthRepLast := V1AttributeResults[134].value;
+	SELF.BusExecLinkBusNameAuthRepFull := V1AttributeResults[135].value;
+	SELF.BusExecLinkAuthRepSSNBusFEIN := V1AttributeResults[136].value;
+	SELF.BusExecLinkPropertyOverlapCount := V1AttributeResults[137].value;
+	SELF.BusExecLinkBusAddrAuthRepOwned := V1AttributeResults[138].value;
+	SELF.BusExecLinkUtilityOverlapCount := V1AttributeResults[139].value;
+	SELF.BusExecLinkInquiryOverlapCount := V1AttributeResults[140].value;
+	SELF.BusExecLinkAuthRepAddrBusAddr := V1AttributeResults[141].value;
+	SELF.BusExecLinkAuthRepPhoneBusPhone := V1AttributeResults[142].value;
+	SELF.BusExecLinkAuthRep2NameOnFile := V1AttributeResults[143].value;
+	SELF.BusExecLinkAuthRep2AddrOnFile:= V1AttributeResults[144].value;
+	SELF.BusExecLinkAuthRep2PhoneOnFile := V1AttributeResults[145].value;
+	SELF.BusExecLinkAuthRep2SSNOnFile := V1AttributeResults[146].value;
+	SELF.BusExecLinkBusNameAuthRep2First := V1AttributeResults[147].value;
+	SELF.BusExecLinkBusNameAuthRep2Last := V1AttributeResults[148].value;
+	SELF.BusExecLinkBusNameAuthRep2Full := V1AttributeResults[149].value;
+	SELF.BusExecLinkAuthRep2SSNBusFEIN := V1AttributeResults[150].value;
+	SELF.BusExecLinkPropertyOverlapCount2 := V1AttributeResults[151].value;
+	SELF.BusExecLinkBusAddrAuthRep2Owned := V1AttributeResults[152].value;
+	SELF.BusExecLinkUtilityOverlapCount2 := V1AttributeResults[153].value;
+	SELF.BusExecLinkInquiryOverlapCount2 := V1AttributeResults[154].value;
+	SELF.BusExecLinkAuthRep2AddrBusAddr := V1AttributeResults[155].value;
+	SELF.BusExecLinkAuthRep2PhoneBusPhone := V1AttributeResults[156].value;
+	SELF.BusExecLinkAuthRep3NameOnFile := V1AttributeResults[157].value;
+	SELF.BusExecLinkAuthRep3AddrOnFile:= V1AttributeResults[158].value;
+	SELF.BusExecLinkAuthRep3PhoneOnFile := V1AttributeResults[159].value;
+	SELF.BusExecLinkAuthRep3SSNOnFile := V1AttributeResults[160].value;
+	SELF.BusExecLinkBusNameAuthRep3First := V1AttributeResults[161].value;
+	SELF.BusExecLinkBusNameAuthRep3Last := V1AttributeResults[162].value;
+	SELF.BusExecLinkBusNameAuthRep3Full := V1AttributeResults[163].value;
+	SELF.BusExecLinkAuthRep3SSNBusFein := V1AttributeResults[164].value;
+	SELF.BusExecLinkPropertyOverlapCount3 := V1AttributeResults[165].value;
+	SELF.BusExecLinkBusAddrAuthRep3Owned := V1AttributeResults[166].value;
+	SELF.BusExecLinkUtilityOverlapCount3 := V1AttributeResults[167].value;
+	SELF.BusExecLinkInquiryOverlapCount3 := V1AttributeResults[168].value;
+	SELF.BusExecLinkAuthRep3AddrBusAddr := V1AttributeResults[169].value;
+	SELF.BusExecLinkAuthRep3PhoneBusPhone := V1AttributeResults[170].value;
+	SELF.BusFEINPersonOverlap := V1AttributeResults[171].value;
+	SELF.BusFEINPersonAddrOverlap := V1AttributeResults[172].value;
+	SELF.BusFEINPersonPhoneOverlap := V1AttributeResults[173].value;
+	SELF.BusAddrPersonNameOverlap := V1AttributeResults[174].value;
+	SELF.InputAddrConsumerCount := V1AttributeResults[175].value;
+	SELF.InputAddrSourceCount := V1AttributeResults[176].value;
+	SELF.InputAddrType := V1AttributeResults[177].value;
+	SELF.InputAddrBusinessOwned := V1AttributeResults[178].value;
+	SELF.InputAddrLotSize := V1AttributeResults[179].value;
+	SELF.InputAddrAssessedTotal := V1AttributeResults[180].value;
+	SELF.InputAddrSqFootage := V1AttributeResults[181].value;
+	SELF.InputPhoneProblems := V1AttributeResults[182].value;
+	SELF.InputPhoneEntityCount := V1AttributeResults[183].value;
+	SELF.InputPhoneMobile := V1AttributeResults[184].value;
+	SELF.AssociateCount := V1AttributeResults[185].value;
+	SELF.AssociateHighCrimeAddrCount := V1AttributeResults[186].value;
+	SELF.AssociateFelonyCount := V1AttributeResults[187].value;
+	SELF.AssociateCountWithFelony := V1AttributeResults[188].value;
+	SELF.AssociateBankruptCount := V1AttributeResults[189].value;
+	SELF.AssociateCountWithBankruptcy := V1AttributeResults[190].value;
+	SELF.AssociateBankrupt1YearCount := V1AttributeResults[191].value;
+	SELF.AssociateLienCount := V1AttributeResults[192].value;
+	SELF.AssociateCountWithLien := V1AttributeResults[193].value;
+	SELF.AssociateJudgmentCount := V1AttributeResults[194].value;
+	SELF.AssociateCountWithJudgment := V1AttributeResults[195].value;
+	SELF.AssociateHighRiskAddrCount := V1AttributeResults[196].value;
+	SELF.AssociateWatchlistCount := V1AttributeResults[197].value;
+	SELF.AssociateBusinessCount := V1AttributeResults[198].value;
+	SELF.AssociateCityCount := V1AttributeResults[199].value;
+	SELF.AssociateCountyCount := V1AttributeResults[200].value;
 	// SBA Supports up to a max of 10 model scores
 	Model1 := ri.Result.Models[1];
 	SELF.Model1Name := Model1.Name;
@@ -882,9 +974,16 @@ layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFO
 	SELF.ErrorCode := ri.ErrorCode;
 END;
 
-flatResults := JOIN(SmallBusinessMarketing_input, (Passed + Failed), LEFT.Seq = RIGHT.Result.InputEcho.Seq, flatten_v1(LEFT, RIGHT), KEEP(1), ATMOST(10));
+flatResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessMarketing_input+ insufficientSoap_input, 
+	HASH64((UNSIGNED)seq)), 
+	DISTRIBUTE((Passed), HASH64((UNSIGNED)Result.InputEcho.Seq)), 
+	(UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq, 
+	flatten_v1(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL), seq);
+flatResults := PROJECT(flatResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
+
+failedResults := PROJECT(SBAMFailed_Inputs, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
 OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
 OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
 OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-
+OUTPUT(failedResults,, outputFile + '_failed_records', CSV(QUOTE('"')), OVERWRITE);
