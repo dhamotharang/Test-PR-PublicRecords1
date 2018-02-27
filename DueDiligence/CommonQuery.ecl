@@ -362,16 +362,16 @@ EXPORT CommonQuery := MODULE
 				
 				options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 							// Clean up the Options and make sure that defaults are enforced
-							EXPORT UNSIGNED1	DPPA_Purpose := dppa;
-							EXPORT UNSIGNED1	GLBA_Purpose := glba;
+							EXPORT UNSIGNED1 DPPA_Purpose := dppa;
+							EXPORT UNSIGNED1 GLBA_Purpose := glba;
 							EXPORT STRING50 DataRestrictionMask	:= TRIM(drm);
 							EXPORT STRING50 DataPermissionMask	:= TRIM(dpm);
 							EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(IF(TRIM(userIn.IndustryClass) <> DueDiligence.Constants.EMPTY, userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
-							EXPORT UNSIGNED1	LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
-							EXPORT UNSIGNED1	BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
-							EXPORT UNSIGNED1	MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
+							EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
+							EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
+							EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
 							EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
-							EXPORT UNSIGNED1	BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
+							EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
 				END;
 
 				linkingOptions := MODULE(BIPV2.mod_sources.iParams)
@@ -379,8 +379,8 @@ EXPORT CommonQuery := MODULE
 							EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 							EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 							EXPORT BOOLEAN AllowAll := IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE);
-							EXPORT BOOLEAN AllowGLB := TRUE; //This already passed validation
-							EXPORT BOOLEAN AllowDPPA := TRUE; //This already passed validation
+							EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE);
+							EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE);
 							EXPORT UNSIGNED1 DPPAPurpose := Options.DPPA_Purpose;
 							EXPORT UNSIGNED1 GLBPurpose := Options.GLBA_Purpose;
 							EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
