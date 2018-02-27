@@ -789,53 +789,8 @@ EXPORT phones_score_model_v1 (DATASET(progressive_phone.layout_progressive_phone
 #else
 	phonesScored := PROJECT(modelInput, doModel(LEFT));
 #end
-	
-	totalPhonesScored := COUNT(phonesScored);
-	
-	//flat file has bumped score.
-	#if(MODEL_DEBUG)
-	layout_progressive_phone_common_plus getSubjects(in_batch_rec le, layout_progressive_phone_common_plus ri) := TRANSFORM
-	#else
-	progressive_phone.layout_progressive_phone_common getSubjects(in_batch_rec le, progressive_phone.layout_progressive_phone_common ri) := TRANSFORM
-	#end
-		SELF.AcctNo := le.AcctNo;
-		SELF.DID := le.DID;
 		
-		// If we have the DID information from the right, use the right, otherwise this is a unique phone not found
-		// in the waterfall phones process
-		useRight := le.DID = ri.DID;
-		
-		SELF.ssn := IF(useRight, ri.SSN, le.SSN);
-		SELF.subj_phone10 := IF(useRight, ri.subj_phone10, ''); // le.Phone10
-		SELF.subj_first := IF(useRight, ri.subj_first, le.FName);
-		SELF.subj_middle := IF(useRight, ri.subj_middle, le.MName);
-		SELF.subj_last := IF(useRight, ri.subj_last, le.LName);
-		
-		SELF.st := IF(useRight, ri.st, le.st);
-		SELF.zip5 := IF(useRight, ri.zip5, le.z5);
-		SELF.p_city_name := IF(useRight, ri.p_city_name, le.p_city_name);
-		SELF.prim_range := IF(useRight, ri.prim_range, le.prim_range);
-		SELF.predir := IF(useRight, ri.predir, le.predir);
-		SELF.prim_name := IF(useRight, ri.prim_name, le.prim_name);
-		SELF.addr_suffix := IF(useRight, ri.addr_suffix, le.addr_suffix);
-		SELF.postdir := IF(useRight, ri.postdir, le.postdir);
-		SELF.unit_desig := IF(useRight, ri.unit_desig, le.unit_desig);
-		SELF.sec_range := IF(useRight, ri.sec_range, le.sec_range);
-		
-		// Since we are only using the input DIDs, this should always be the subject phone
-		SELF.subj_phone_relationship := 'Subject';
-		
-		#if(MODEL_DEBUG)
-		SELF := ri; // Keep the potential attributes around
-		#end
-		SELF := [];
-	END;
-	
-	// Keep only the phonesScored that match input DID since SUBJECT doesn't always mean input subject.  It's possible the waterfall phones 
-	// process didn't find any phones for the input DID either - so we need to keep the left outer DIDs.
-	subjectPhones := JOIN(inputDIDsBest, phonesScored, LEFT.AcctNo = RIGHT.AcctNo AND LEFT.DID = RIGHT.DID, getSubjects(LEFT, RIGHT), LEFT OUTER, ATMOST(RiskWise.max_atmost), KEEP(totalPhonesScored));
-			
-	final_out := ungroup(dedup(sort(group(subjectPhones,acctno,subj_phone_type_new,subj_phone10,all),-phone_score),acctno,subj_phone_type_new,subj_phone10));
+	final_out := ungroup(dedup(sort(group(phonesScored,acctno,subj_phone_type_new,subj_phone10,all),-phone_score),acctno,subj_phone_type_new,subj_phone10));
 	// this is attempting to dedup phones so that there is only copy of a specific phone coming from a specific level for one acctno
 	//  And we want to keep the record with the highest score.
 

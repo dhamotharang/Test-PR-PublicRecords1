@@ -550,9 +550,8 @@ EXPORT functions := MODULE
                                 left.acctno = right.acctno and
                                 left.subj_name_dual = right.subj_name_dual,transform(LEFT),keep(1),all);
 														
-    f_out_scored_temp_2 := f_out_scored_temp_1 + f_out_final_temp;
-			 f_out_scored_temp_3 := dedupHistPhones(f_phone_in_hist, f_out_scored_temp_2, inMod);
-   	f_out_scored := TopN(group(f_out_scored_temp_3, acctno, all), inMod.MaxPhoneCount, 
+    f_out_scored_temp_2 := dedupHistPhones(f_phone_in_hist, f_out_scored_temp_1, inMod);
+   	f_out_scored := TopN(group(f_out_scored_temp_2, acctno, all), inMod.MaxPhoneCount, 
                   acctno, -phone_score, sort_order, sort_order_internal, -subj_date_last, subj_name_dual, subj_phone10,-did, subj_date_first);
 
     #if(MODEL_DEBUG)
