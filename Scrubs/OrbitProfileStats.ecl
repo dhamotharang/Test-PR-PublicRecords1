@@ -58,7 +58,7 @@ Export CompareToProfile_with_examples 	 := join(CleanStats, RemoveBlankRules, tr
 																				 self := right));
 
 EXPORT CompareToProfile_for_Orbit := dedup(sort(CompareToProfile_with_examples, Sourcecode, RuleName), Sourcecode, RuleName);
-EXPORT SubmitStats :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag,thor,all,expire(2)),
+EXPORT SubmitStats :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate,thor,all,expire(2)),
 output(RemoveBlankRules),
 																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Build Scrubs - '+pProfileName+'\');\r\n'+
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
