@@ -29,11 +29,11 @@ EXPORT InValidFT_Invalid_Letter(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_Invalid_Letter(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ -./abcdefghijklmnopqrstuvwxyz'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Char(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&'); // Only allow valid symbols
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&\''); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Char(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&'))));
-EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Char(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&\''))));
+EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,().&\''),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_RuledAgainstCode(SALT39.StrType s0) := FUNCTION
   RETURN  s0;

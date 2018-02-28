@@ -46,7 +46,7 @@ EXPORT Party_GenerationMod := MODULE(SALT39.iGenerationMod)
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789 -)\n'
     + 'FIELDTYPE:Invalid_Letter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -./abcdefghijklmnopqrstuvwxyz)\n'
-    + 'FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,\\(\\).&)\n'
+    + 'FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -*,\\(\\).&\')\n'
     + 'FIELDTYPE:Invalid_RuledAgainstCode:ENUM(P|A|F|O|D|B|)\n'
     + 'FIELDTYPE:Invalid_EntityNMFormat:ENUM(L|F|U)\n'
     + 'FIELDTYPE:Invalid_Entity1TypeCode:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ):Lengths(0,2)\n'
