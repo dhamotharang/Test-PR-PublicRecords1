@@ -38,7 +38,7 @@ EXPORT Daily_Raw_Wireless_to_Wireline_GenerationMod := MODULE(SALT39.iGeneration
  
   // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-gh \n'
+    'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_PhonesInfo\n'
     + 'FILENAME:PhonesInfo\n'
     + 'NAMESCOPE:Daily_Raw_Wireless_to_Wireline\n'
