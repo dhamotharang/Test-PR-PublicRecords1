@@ -228,8 +228,7 @@ EXPORT Functions := MODULE
 								 uc_s = 'LIMITED PARTNERSHIP' 					=> uc_s,
 								 uc_s = 'LP 1988 ACT'										=> uc_s,
 								 uc_s = 'FOREIGN NAME' 									=> '',
-								 uc_s = 'FOREIGN REGISTERED NAME' 			=> '',
-								 
+								 uc_s = 'FOREIGN REGISTERED NAME' 			=> '',								 
 								 '**|'+uc_s
 								);
 		END;

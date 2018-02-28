@@ -219,7 +219,7 @@
 			self.corp_state_origin								:= state_origin;			
 			self.corp_process_date								:= fileDate;
 			self.corp_sos_charter_nbr							:= corp2.t2u(l.control_no);
-			self.stock_shares_issued              := if(corp2.t2u(l.common_shares) not in ['08/19/2010', '02/06/2001' ],corp2.t2u(l.common_shares),''); //per CI :dates for shares are errors
+			self.stock_shares_issued              := if(corp2.t2u(l.common_shares) not in ['02/06/2001', '08/19/2010'],corp2.t2u(l.common_shares),''); //per CI :dates for shares are errors
 			self.stock_type												:= 'COMMON';
       self                                  := [];
 		end;
