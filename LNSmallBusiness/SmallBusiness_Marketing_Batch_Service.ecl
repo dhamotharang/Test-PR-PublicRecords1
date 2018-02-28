@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="SmallBusiness_Marketing_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -119,8 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, Phones, Royalty, OFAC_XG5;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, Phones, Royalty;
 
 EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -178,9 +177,6 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 	UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
-
-	IF( OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
-		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	BOOLEAN  ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
 	

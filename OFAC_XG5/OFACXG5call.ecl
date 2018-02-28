@@ -1,7 +1,8 @@
-﻿import iesp, Risk_Indicators, Fingerprint, ut, Gateway, codes, iesp;
+﻿/*2016-03-22T01:30:53Z (Michele Walklin)
+for review
+*/
+import iesp, Risk_Indicators, Fingerprint, ut, Gateway, codes, iesp;
 
-// Note: this function assumes that the OFACversion has been checked and is 4 or greater, and that
-// include_ofac is TRUE.
 export OFACXG5call (DATASET(OFAC_XG5.Layout.InputLayout) indata, 
 														boolean ofaconly_value = false,
 														integer threshold_value = OFAC_XG5.Constants.DEF_THRESHOLD,
@@ -15,25 +16,15 @@ DBNames_rec := ofac_xg5.Constants.DBNames_rec;
 
 watchlists_requested := project (watchlists_original, transform (iesp.share.t_StringArrayItem,
                                                                  Self.value := StringLib.StringToUpperCase (Left.value))); 
+customWLset := OFAC_XG5.GetSearchFiles(watchlists_requested);
 
-customWLset     := OFAC_XG5.GetSearchFiles(watchlists_requested);
-has_customWLset := COUNT(customWLset) > 0;
+fileToSearch := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => customWLset,
+										include_ofac and include_additional_watchlists => OFAC_XG5.Constants.WCOFACNames + OFAC_XG5.Constants.WCOAddtnlFiles,
+										include_ofac and include_additional_watchlists = false => OFAC_XG5.Constants.WCOFACNames + customWLset,
+										include_ofac=false and include_additional_watchlists => OFAC_XG5.Constants.WCOAddtnlFiles,
+										ofaconly_value = true => OFAC_XG5.Constants.WCOFACNames + customWLset,
+										OFAC_XG5.Constants.WCOFACNames);
 
-getALL := ('ALL' IN SET(watchlists_original, value)) AND ('ALLV4' NOT IN SET(watchlists_original, value)); 
-      
-fileToSearch := 
-    map(
-      include_additional_watchlists AND getALL => OFAC_XG5.Constants.WCOAddtnlFiles_ALL,
-      include_additional_watchlists            => OFAC_XG5.Constants.WCOAddtnlFiles_ALLV4,
-      has_customWLset AND include_ofac         => customWLset + OFAC_XG5.Constants.WCOFACNames,
-      has_customWLset AND NOT include_ofac AND ofaconly_value => customWLset + OFAC_XG5.Constants.WCOFACNames,
-      has_customWLset AND NOT include_ofac AND NOT ofaconly_value => customWLset,
-      NOT has_customWLset AND include_ofac AND NOT ofaconly_value => OFAC_XG5.Constants.WCOFACNames,
-      ofaconly_value                           => OFAC_XG5.Constants.WCOFACNames,
-      NOT has_customWLset AND NOT include_ofac AND NOT ofaconly_value => customWLset, // which in this case would be empty 
-      OFAC_XG5.Constants.WCOFACNames // default value
-    );
-    
 fileToSearchDedup := dedup(sort(fileToSearch, dbname), dbname);
 													
 gateway_cfg  := gateways(Gateway.Configuration.IsBridgerwlc(servicename))[1];
