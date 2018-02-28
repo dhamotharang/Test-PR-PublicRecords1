@@ -114,7 +114,7 @@
 */
 
 export InstantID_Batch_Service() := macro
-import doxie, address, AutoStandardI, OFAC_XG5;
+import doxie, address, AutoStandardI,OFAC_XG5;
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
@@ -227,9 +227,7 @@ watchlists_request := dWL(value<>'');
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 
-IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
-    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
-    
+
 ret := Business_Risk.InstantID_Batch_Service_records(//risk_indicators.Layout_Gateways_In  
 																gateways_in,
                                 // business_risk.Layout_Input_Moxie_2 

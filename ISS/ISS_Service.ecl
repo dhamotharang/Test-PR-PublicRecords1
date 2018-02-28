@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="ISS_Service">
 	<part name="InsuranceScoringServiceRequest" type="tns:XmlDataSet" cols="80" rows="50" />
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
@@ -113,7 +113,7 @@ ISSServiceRequest XML:
 
 export ISS_Service := MACRO
 
-	import risk_indicators, ut, iesp, address, seed_files, models, dma, doxie, riskwise, gateway, OFAC_XG5;
+	import risk_indicators, ut, iesp, address, seed_files, models, dma, doxie, riskwise, gateway;
 
 	// Get XML input 
 	ds_in    	:= dataset([], iesp.issservice.t_InsuranceScoringServiceRequest)  	: stored('InsuranceScoringServiceRequest', few);
@@ -328,8 +328,7 @@ export ISS_Service := MACRO
 	unsigned4 EverOccupant_StartDate  := 99999999;
 	unsigned1 AppendBest := 1;	// search the best file
 
-IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
-    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
+
 
 	iid := risk_indicators.InstantID_Function(iid_prep, 
 															gateways, 
