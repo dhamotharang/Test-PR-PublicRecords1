@@ -10,7 +10,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -97,9 +97,6 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
-
-  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
-      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 		// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
@@ -260,4 +257,3 @@ EXPORT InstantID20_Service() := MACRO
 	OUTPUT( results_iesp, NAMED('Results') );
 
 ENDMACRO;
-

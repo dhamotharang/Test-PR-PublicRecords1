@@ -213,7 +213,7 @@ SmallBusinessAnalyticsRequest XML:
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
 IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, Phones, Risk_Indicators, Risk_Reporting, RiskWise,
-			 Royalty, Suspicious_Fraud_LN, UT, Models, Inquiry_AccLogs, STD, OFAC_XG5;
+			 Royalty, Suspicious_Fraud_LN, UT, Royalty, Models, Inquiry_AccLogs, STD;
 
 EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	/* ************************************************************************
@@ -397,9 +397,6 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING32 TestDataTableName		 := users.TestDataTableName;
 	BOOLEAN IncludeTargusGateway   := FALSE : STORED('IncludeTargusGateway');
 	BOOLEAN RunTargusGateway       := FALSE : STORED('RunTargusGatewayAnywayForTesting');
-
-	IF( OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
-		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 	
 	// SmallBusinessAttrV1 (etc) is a valid input
 	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
