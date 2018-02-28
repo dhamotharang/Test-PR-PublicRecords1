@@ -1,4 +1,4 @@
-﻿IMPORT iesp, header, watercraft, BankruptcyV2, american_student_list, AlloyMedia_student_list,
+IMPORT iesp, header, watercraft, BankruptcyV2, american_student_list, AlloyMedia_student_list,
 				Prof_LicenseV2, Impulse_Email, iBehavior, risk_indicators;
 
 EXPORT bwr_LayoutsJuli := module
@@ -235,6 +235,15 @@ export layout_riskview5_no_juli := record
 	string3 Telecommunications_reason3;
 	string3 Telecommunications_reason4;
 	string3 Telecommunications_reason5;
+
+	string3 Crossindustry_Index;
+	string30 Crossindustry_Score_Name := '';
+	string3 Crossindustry_score;
+	string3 Crossindustry_reason1;
+	string3 Crossindustry_reason2;
+	string3 Crossindustry_reason3;
+	string3 Crossindustry_reason4;
+	string3 Crossindustry_reason5;
 	
 	string3 Custom_Index;
 	string30 Custom_Score_Name := '';
