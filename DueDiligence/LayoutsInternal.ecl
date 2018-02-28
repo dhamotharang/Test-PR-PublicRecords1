@@ -77,14 +77,6 @@ EXPORT LayoutsInternal := MODULE
 		InternalBIPIDsLayout;
 		UNSIGNED4	  historydate;
 		DueDiligence.Layouts.RelatedParty party;
-		BOOLEAN eventTypeCategory9;
-		BOOLEAN eventTypeCategory8;
-		BOOLEAN eventTypeCategory7;
-		BOOLEAN eventTypeCategory6;
-		BOOLEAN eventTypeCategory5;
-		BOOLEAN eventTypeCategory4;
-		BOOLEAN eventTypeCategory3;
-		BOOLEAN eventTypeCategory2;
 	END;
 	
 	EXPORT PartyLicenses := RECORD

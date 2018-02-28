@@ -419,7 +419,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		
-		 /* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
+		 /* BUSINESS LEGAL EVENTS - CRIMINAL STATE */  																																																	 
 		 BusLegalStateCriminal_Flag9 := If (le.BEOevidenceOfCurrentIncarceration
 		                               OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
 		 BusLegalStateCriminal_Flag8 := IF (le.BEOevidenceOfFelonyConvictionInLastNYR, 'T','F');           /* Index value of 8 was set */
@@ -541,7 +541,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		legalEventTypeFlag4 := IF(le.atleastOneBEOInCategory4, 'T', 'F');
 		legalEventTypeFlag3 := IF(le.atleastOneBEOInCategory3, 'T', 'F');
 		legalEventTypeFlag2 := IF(le.atleastOneBEOInCategory2, 'T', 'F');
-		legalEventTypeFlag1 := IF(le.BEOsHaveNoConvictionsOrCategoryHits, 'T', 'F');
+		legalEventTypeFlag1 := IF(le.BEOsHaveNoConvictionsOrCategoryHits OR le.execCount = 0, 'T', 'F');
 												
 		legalEventTypeConcat := legalEventTypeFlag9 + legalEventTypeFlag8 + legalEventTypeFlag7 + legalEventTypeFlag6 + legalEventTypeFlag5 + legalEventTypeFlag4 + legalEventTypeFlag3 + legalEventTypeFlag2 + legalEventTypeFlag1;
 		legalEventTypeFlag0 := IF(STD.Str.Find(legalEventTypeConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate
