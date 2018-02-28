@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="BusinessInstantID20_Batch_Service">
 	<part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="25"/>
 	<!-- Option Fields --> 
@@ -97,7 +97,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Patriot, Risk_Indicators, Royalty, STD;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Patriot, Risk_Indicators, Royalty, STD;
 
 EXPORT InstantID20_Batch_Service() := MACRO
 
@@ -300,9 +300,6 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE              := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
-
-  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
-      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 		// 5. Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These 
 		// parameters should be global so figure them out here and pass around appropriately.
