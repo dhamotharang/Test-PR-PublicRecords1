@@ -419,7 +419,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		
-		 /* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
+		 /* BUSINESS LEGAL EVENTS - CRIMINAL STATE */  																																																	 
 		 BusLegalStateCriminal_Flag9 := If (le.BEOevidenceOfCurrentIncarceration
 		                               OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
 		 BusLegalStateCriminal_Flag8 := IF (le.BEOevidenceOfFelonyConvictionInLastNYR, 'T','F');           /* Index value of 8 was set */
