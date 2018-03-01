@@ -1,4 +1,4 @@
-import ut, models;
+﻿import ut, models;
 
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 
@@ -233,7 +233,8 @@ export isCodeAS(BOOLEAN IsShiptoBilltoDifferent) := IsShiptoBilltoDifferent;
 
 export isCodeEA(INTEGER email_verification):=email_verification in [0, 1, 2, 3];         
 
-export isCodeEI(UNSIGNED6 DID):= DID = Risk_Indicators.iid_constants.EmailFakeIds;         
+export isCodeEI(UNSIGNED6 DID, unsigned1 socsverlevel, string socsvalid):= DID = Risk_Indicators.iid_constants.EmailFakeIds or
+	(socsverlevel in [1,4,6,7,9,10,11,12] and socsvalid not in risk_indicators.iid_constants.set_valid_ssn_codes);         
 
 export isCodeIA(string ipAddr, boolean hit) := ipAddr <> '' and ~hit;
 

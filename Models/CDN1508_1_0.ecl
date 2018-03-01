@@ -2034,7 +2034,7 @@ STRING getEmailDomain(STRING input, STRING delimiters = './@') := FUNCTION
 	RETURN Std.Str.GetNthWord(ReplaceDelim, lWordNum);
 END;
 
-sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (string)ut.getdate, (string6)le.bs.Bill_To_Out.historydate+'01'));
+sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.Bill_To_Out.historydate+'01'));
 // sysdate := common.sas_date('20160525');
 	
 pf_pmt_type := map(

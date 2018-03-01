@@ -1,4 +1,4 @@
-﻿import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers;
+﻿import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
 	
 	inputParams := project(AutoStandardI.GlobalModule(),input.params,opt);
 	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
@@ -190,7 +190,7 @@
 			
 		// Instant Verify requires that date first seen and date last seen be '0' for randomized socials.  
 		// If the SSN date first seen AND last seen match the randomized ssn date logic, this should be a randomized SSN.
-		randomizedSSN := le.ssa_date_first = '20110625' AND le.ssa_date_last = IF(history_date = 999999, ut.getDate, history_date + '01');
+		randomizedSSN := le.ssa_date_first = '20110625' AND le.ssa_date_last = IF(history_date = 999999, (STRING)Std.Date.Today(), history_date + '01');
 		SELF.ssa_date_first := IF(randomizedSSN, '0', le.ssa_date_first);
 		SELF.ssa_date_last := IF(randomizedSSN, '0', le.ssa_date_last);
 		SELF.valid_ssn := IF(randomizedSSN, '', le.valid_ssn);

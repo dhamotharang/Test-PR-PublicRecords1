@@ -425,7 +425,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxMatchSummaries     		 	:= 20;
     export unsigned2 MaxNewsProfiles       		 	:= 20;
     export unsigned2 MaxProperties         			:= 20;
-    export unsigned2 MaxTennants	         			:= 20;
+    export unsigned2 MaxTenants	         				:= 20;
     export unsigned2 MaxAircraft         				:= 20;
     export unsigned2 MaxWatercraft         			:= 20;
     export unsigned2 MaxVehicles         				:= 20;
@@ -568,10 +568,11 @@ EXPORT Constants := MODULE
   end;
 	
 	export FraudGov := MODULE
-	 export unsigned2 MAX_COUNT_PAYLOAD := 1000;
+		export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
+		export unsigned2 MAX_COUNT_PAYLOAD := 1000;
 		export unsigned2 MAX_COUNT_VELOCITY := 1000;
 		export unsigned2 MAX_COUNT_KNOWN_RISK := 1000;
-	 export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
+		export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
 		export unsigned2 MAX_COUNT_OFFENSES := 6;
 		export unsigned2 MAX_COUNT_CRIMINAL_CASES := 6;
 		export unsigned2 MAX_COUNT_REMARKS := 30;

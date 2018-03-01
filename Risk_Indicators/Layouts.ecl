@@ -1774,29 +1774,29 @@ end;
 //MS-123: new BIP header verification fields
 export layout_BIP_Header_info_54 := record
 	integer     bus_ver_sources_total := 0;
-	qstring100 	bus_ver_sources := 0;
-	qstring200 	bus_ver_sources_first_seen := 0;
-	qstring200 	bus_ver_sources_last_seen := 0;
+	qstring100 	bus_ver_sources := '';
+	qstring200 	bus_ver_sources_first_seen := '';
+	qstring200 	bus_ver_sources_last_seen := '';
 	integer    	bus_fname_ver_sources_total := 0;
-	qstring100 	bus_fname_ver_sources := 0;
-	qstring200 	bus_fname_ver_sources_first_seen := 0;
-	qstring200 	bus_fname_ver_sources_last_seen := 0;
+	qstring100 	bus_fname_ver_sources := '';
+	qstring200 	bus_fname_ver_sources_first_seen := '';
+	qstring200 	bus_fname_ver_sources_last_seen := '';
 	integer    	bus_lname_ver_sources_total := 0;
-	qstring100 	bus_lname_ver_sources := 0;
-	qstring200 	bus_lname_ver_sources_first_seen := 0;
-	qstring200 	bus_lname_ver_sources_last_seen := 0;
+	qstring100 	bus_lname_ver_sources := '';
+	qstring200 	bus_lname_ver_sources_first_seen := '';
+	qstring200 	bus_lname_ver_sources_last_seen := '';
 	integer    	bus_addr_ver_sources_total := 0;
-	qstring100 	bus_addr_ver_sources := 0;
-	qstring200 	bus_addr_ver_sources_first_seen	 := 0;
-	qstring200 	bus_addr_ver_sources_last_seen		 := 0;
+	qstring100 	bus_addr_ver_sources := '';
+	qstring200 	bus_addr_ver_sources_first_seen	 := '';
+	qstring200 	bus_addr_ver_sources_last_seen		 := '';
 	integer    	bus_ssn_ver_sources_total		 := 0;
-	qstring100 	bus_ssn_ver_sources		 := 0;
-	qstring200 	bus_ssn_ver_sources_first_seen		 := 0;
-	qstring200 	bus_ssn_ver_sources_last_seen		 := 0;
+	qstring100 	bus_ssn_ver_sources		 := '';
+	qstring200 	bus_ssn_ver_sources_first_seen		 := '';
+	qstring200 	bus_ssn_ver_sources_last_seen		 := '';
 	integer   	bus_phone_ver_sources_total		 := 0;
-	qstring100 	bus_phone_ver_sources		 := 0;
-	qstring200 	bus_phone_ver_sources_first_seen		 := 0;
-	qstring200 	bus_phone_ver_sources_last_seen		 := 0;
+	qstring100 	bus_phone_ver_sources		 := '';
+	qstring200 	bus_phone_ver_sources_first_seen		 := '';
+	qstring200 	bus_phone_ver_sources_last_seen		 := '';
 end;
 
 //MS-167: new Equifax Fraud Flags fields

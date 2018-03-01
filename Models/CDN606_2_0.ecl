@@ -1,4 +1,4 @@
-import ut, risk_indicators, address, RiskWise, Business_Risk;
+import ut, risk_indicators, address, RiskWise, Business_Risk, std;
 
 export CDN606_2_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam, dataset(RiskWise.Layout_CD2I) indata, boolean IBICID, boolean isBusiness, dataset(business_risk.layout_biid_btst_output) biid ) := 
 
@@ -9,7 +9,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 	consumer := ri.ordertype = '1';
 	shipto_order := (integer)le.eddo.addrscore < 80;
 	
-	today := if(le.bill_to_out.historydate <> 999999, (string)le.bill_to_out.historydate[1..6] + '01', ut.GetDate);
+	today := if(le.bill_to_out.historydate <> 999999, ((string)le.bill_to_out.historydate)[1..6] + '01', (STRING)Std.Date.Today());
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 	
 
@@ -96,9 +96,9 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 						   avs_match_level_bm = 1 => -3.068707814,
 						   -4.327873964);
 
-	dpo_c_bm := if(dpo = -99, 750, ut.imin2(dpo, 5000));
+	dpo_c_bm := if(dpo = -99, 750, Min(dpo, 5000));
 
-	days_since_first_bm := if(ri.orderdate <> '', ut.max2(ut.imin2(days_since_first, 34), 0), -99);
+	days_since_first_bm := if(ri.orderdate <> '', Max(Min(days_since_first, 34), 0), -99);
 
 	existing_cust_bm := days_since_first_bm > 30;
 
@@ -201,12 +201,12 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/******************************  census ***************************************************/
 	add1_census_income2_bm := if((integer)le.bill_to_out.address_verification.input_address_information.census_income<>0, 
-															ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_income, 20000), 150000), 37500);
+															Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_income, 20000), 150000), 37500);
 
 	add1_census_income2_bm_log := log(add1_census_income2_bm + 1) / .434294481903;
 
 	/******************************  naprop ***************************************************/
-	property_owned_total_bm_c := ut.imin2(le.bill_to_out.address_verification.owned.property_total, 10);
+	property_owned_total_bm_c := Min(le.bill_to_out.address_verification.owned.property_total, 10);
 
 	naproptree_bm := map(le.bill_to_out.address_verification.input_address_information.naprop  = 4 and le.bill_to_out.address_verification.address_history_1.naprop >= 2 => 1,
 					 le.bill_to_out.address_verification.input_address_information.naprop >= 2 and le.bill_to_out.address_verification.address_history_1.naprop  = 4 => 1,
@@ -224,7 +224,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 	/********************************************************************************************************/
 
 	/******************************  rel  ***************************************************/
-	rel_count_bm := ut.imin2(le.bill_to_out.relatives.owned.relatives_property_count, 30);                     
+	rel_count_bm := Min(le.bill_to_out.relatives.owned.relatives_property_count, 30);                     
 
 	rel_dist_bm := map(rel_count_bm = 0 => 1000,
 				    le.bill_to_out.relatives.relative_within25miles_count > 0 => 25,
@@ -262,7 +262,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
      base := 720;
      odds := .0476;
      point := -20;
-     cbd_billto_score3 := ut.imin2((integer)(point*(log(cbd_billto_score2/(1-cbd_billto_score2)) - log(odds))/log(2) + base), 999);
+     cbd_billto_score3 := Min((integer)(point*(log(cbd_billto_score2/(1-cbd_billto_score2)) - log(odds))/log(2) + base), 999);
 	cbd_billto_score := if(cbd_billto_score3 < 250, 250, cbd_billto_score3);
 	
 	/********************************************************************************************************
@@ -272,9 +272,9 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 	/******************************  customer data  ***************************************************/
 	avs_match_level2_sm := if(AVS_match or AVS_zip_match or AVS_partial_match, 1, 2); 
 
-	noitemsord_c_sm := ut.imin2((integer)ri.numitems, 3);
+	noitemsord_c_sm := Min((integer)ri.numitems, 3);
 
-	dpo_c_sm := if(dpo = -99, 400, ut.imin2(dpo, 3000));
+	dpo_c_sm := if(dpo = -99, 400, Min(dpo, 3000));
 
 	cvv2match_sm := map(ccresp = 'M' => 1,
 					ccresp in ['P','S','','NULL'] => 0,
@@ -295,7 +295,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	desktop_sm :=  if(ri.prodcode='' or (integer)ri.prodcode = 0, 1, 0);
 
-	days_since_first_sm := if(ri.orderdate <> '', ut.max2(ut.imin2(days_since_first, 40), 30), -99);
+	days_since_first_sm := if(ri.orderdate <> '', Max(Min(days_since_first, 40), 30), -99);
 
 	existing_cust_sm := days_since_first_sm > 30;
 
@@ -442,18 +442,18 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/******************************  census Ship To ***************************************************/
 	add1_census_age2_s_sm := if((integer)le.ship_to_out.address_verification.input_address_information.census_age<>0, 
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_age, 18), 65), 37);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_age, 18), 65), 37);
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_income2_s_sm := if((integer)le.ship_to_out.address_verification.input_address_information.census_income<>0, 
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_income, 20000), 200000), 70000);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_income, 20000), 200000), 70000);
 
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_education2_s_sm := if((integer)le.ship_to_out.address_verification.input_address_information.census_education<>0, 
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_education, 9), 16), 14);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_education, 9), 16), 14);
 	/********************************************************************************************************/
 
 	/********************************************************************************/
@@ -532,7 +532,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
      
      cbd_shipto_score2 := (exp(cbd_shipto_score1)) / (1+exp(cbd_shipto_score1));
 
-	cbd_shipto_score3 := ut.imin2((integer)(point*(log(cbd_shipto_score2/(1-cbd_shipto_score2)) - log(odds))/log(2) + base), 999);
+	cbd_shipto_score3 := Min((integer)(point*(log(cbd_shipto_score2/(1-cbd_shipto_score2)) - log(odds))/log(2) + base), 999);
 	cbd_shipto_score := if(cbd_shipto_score3 < 250, 250, cbd_shipto_score3);
 	
 	
@@ -552,13 +552,13 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	acquisition_phone_bus := if((integer)ri.channel = 2, 1, 0);
 
-	noitemsord_bus_c := ut.imin2((integer)ri.numitems, 4);
+	noitemsord_bus_c := Min((integer)ri.numitems, 4);
 
 	cvv2match_bus := map(ccresp = 'M' => 1,
 					 ccresp in ['P','S','','NULL'] => 0,
 					 -1);
 
-	days_since_first_bus := if(ri.orderdate <> '', ut.max2(ut.imin2(days_since_first, 34), 0), -99);
+	days_since_first_bus := if(ri.orderdate <> '', Max(Min(days_since_first, 34), 0), -99);
 
 	existing_cust_bus := days_since_first >= 30;
 
@@ -657,18 +657,18 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/********************************************************************************/
 	add1_census_home_value2_bus := if((integer)le.bill_to_out.address_verification.input_address_information.census_home_value<>0, 
-													ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_home_value, 100000), 350000), 250000);
+													Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_home_value, 100000), 350000), 250000);
 
 	/********************************************************************************************************/
 
 	/******************************  census Ship To ***************************************************/
 	add1_census_age2_s_bus := if((integer)le.ship_to_out.address_verification.input_address_information.census_age<>0, 
-													ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_age, 28), 55), 35);
+													Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_age, 28), 55), 35);
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_education2_s_bus := if((integer)le.ship_to_out.address_verification.input_address_information.census_education<>0, 
-													ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_education, 11), 17), 12.5);
+													Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_education, 11), 17), 12.5);
 	/********************************************************************************************************/
 
 	/******************************  score code ***************************************************/
@@ -692,7 +692,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 	
 	cbd_business_score2 := (exp(cbd_business_score1)) / (1+exp(cbd_business_score1));
 	
-	cbd_business_score3 := ut.imin2((integer)(point*(log(cbd_business_score2/(1-cbd_business_score2)) - log(odds))/log(2) + base), 999);
+	cbd_business_score3 := Min((integer)(point*(log(cbd_business_score2/(1-cbd_business_score2)) - log(odds))/log(2) + base), 999);
 	cbd_business_score := if(cbd_business_score3 < 250, 250, cbd_business_score3);
 
 	cbd_score := map(consumer and shipto_order => cbd_shipto_score,
@@ -765,21 +765,21 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/****************************** census ***************************************************/
 	add1_census_age_bt_con := if((integer)le.bill_to_out.address_verification.input_address_information.census_age<>0, 
-													ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_age, 18), 35), 35);
+													Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_age, 18), 35), 35);
 
 	census_age_bt_con_flag2 := add1_census_age_bt_con > 31;
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_income_bt_con := if((integer)le.bill_to_out.address_verification.input_address_information.census_income<>0, 
-													ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_income, 10000), 70000), 35000);
+													Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_income, 10000), 70000), 35000);
 
 	add1_census_income_bt_con_ln := log(add1_census_income_bt_con + 1) / .434294481903;
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_education_bt_con := if((integer)le.bill_to_out.address_verification.input_address_information.census_education<>0, 
-													ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_education, 10), 14), 13.5);
+													Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_education, 10), 14), 13.5);
 	/********************************************************************************************************/
 
 	/******************************  misc ***************************************************/
@@ -846,12 +846,12 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/****************************** census ***************************************************/
 	add1_census_age_bt_bus := if((integer)le.bill_to_out.address_verification.input_address_information.census_age<>0, 
-														ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_age, 30), 55), 35);
+														Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_age, 30), 55), 35);
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_education_bt_bus := if((integer)le.bill_to_out.address_verification.input_address_information.census_education<>0, 
-														ut.imin2(ut.max2((integer)le.bill_to_out.address_verification.input_address_information.census_education, 10), 17), 14);
+														Min(Max((integer)le.bill_to_out.address_verification.input_address_information.census_education, 10), 17), 14);
 	/********************************************************************************************************/
 
 	billto_score_bus1 := -0.072535073
@@ -973,18 +973,18 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/****************************** census Ship To ***************************************************/
 	add1_census_age_s_st_con := if((integer)le.ship_to_out.address_verification.input_address_information.census_age<>0,
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_age, 18), 65), 37);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_age, 18), 65), 37);
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_income_s_st_con := if((integer)le.ship_to_out.address_verification.input_address_information.census_income<>0, 
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_income, 20000), 200000), 70000);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_income, 20000), 200000), 70000);
 	add1_census_income_s_st_con_ln := log(add1_census_income_s_st_con + 1) / .434294481903;
 	/********************************************************************************/
 
 	/********************************************************************************/
 	add1_census_education_s_st_con := if((integer)le.ship_to_out.address_verification.input_address_information.census_education<>0, 
-														ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_education, 9), 16), 14);
+														Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_education, 9), 16), 14);
 	/********************************************************************************************************/
 
 	shipto_score_con1 := 12.86998428
@@ -997,7 +997,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 					   + add1_census_education_s_st_con  * -0.227878279;
 	
 	shipto_score_con2 := (exp(shipto_score_con1)) / (1+exp(shipto_score_con1));
-	shipto_score_con3 := ut.imin2((integer)(point*(log(shipto_score_con2/(1-shipto_score_con2)) - log(odds))/log(2) + base), 999);
+	shipto_score_con3 := Min((integer)(point*(log(shipto_score_con2/(1-shipto_score_con2)) - log(odds))/log(2) + base), 999);
 	shipto_score_con := if(shipto_score_con3 < 250, 250, shipto_score_con3);
 
 	/***********************************************************************************************************
@@ -1027,7 +1027,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 
 	/********************************************************************************/
 	add1_census_income_s_st_bus := if((integer)le.ship_to_out.address_verification.input_address_information.census_income<>0, 
-													ut.imin2(ut.max2((integer)le.ship_to_out.address_verification.input_address_information.census_income, 25000), 90000), 50000);
+													Min(Max((integer)le.ship_to_out.address_verification.input_address_information.census_income, 25000), 90000), 50000);
 	/********************************************************************************/
 	shipto_score_bus1 := -5.590477754
 					   + verx_s2_st_bus_m  * 81.509242351
@@ -1035,7 +1035,7 @@ models.Layout_ModelOut doModel(clam le, indata ri) := TRANSFORM
 					   + add1_census_income_s_st_bus  * -0.000020135;
 	
 	shipto_score_bus2 := (exp(shipto_score_bus1)) / (1+exp(shipto_score_bus1));
-	shipto_score_bus3 := ut.imin2((integer)(point*(log(shipto_score_bus2/(1-shipto_score_bus2)) - log(odds))/log(2) + base), 999);
+	shipto_score_bus3 := Min((integer)(point*(log(shipto_score_bus2/(1-shipto_score_bus2)) - log(odds))/log(2) + base), 999);
 	shipto_score_bus := if(shipto_score_bus3 < 250, 250, shipto_score_bus3);
 	
 	shipto_score := if(consumer, shipto_score_con, shipto_score_bus);

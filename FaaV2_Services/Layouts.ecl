@@ -1,4 +1,4 @@
-IMPORT faa, iesp, BatchShare, doxie, BIPV2, FFD, doxie_crs;
+﻿IMPORT faa, iesp, BatchShare, doxie, BIPV2, FFD, doxie_crs;
   
 EXPORT Layouts := MODULE
   
@@ -202,6 +202,7 @@ EXPORT Layouts := MODULE
     batch_raw;
     Batchshare.layouts.ShareErrors;
     unsigned SequenceNumber := 0;
+		FFD.Layouts.ConsumerFlags;
   END;    
   
   EXPORT batch_out_pre := RECORD(batch_out)

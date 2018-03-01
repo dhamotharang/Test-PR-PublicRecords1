@@ -1,8 +1,8 @@
-import ut, risk_indicators;
+import ut, risk_indicators, std;
 
 export RecoverScore_Collection_Indices(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
-	sysyear := (integer)(ut.GetDate[1..4]);
+	sysyear := (integer)(((STRING)Std.Date.Today())[1..4]);
 
 	Layout_RecoverScore doIndices( clam le, recoverscore_batchin rt ) := TRANSFORM
 		// map these variables from batchin since they're not passed individually anymore
@@ -17,7 +17,7 @@ export RecoverScore_Collection_Indices(grouped dataset(Risk_Indicators.Layout_Bo
 		********************************/
 
 		add1_year_first_seen1 := le.address_verification.input_address_information.date_first_seen;
-		add1_year_first_seen := (integer)(add1_year_first_seen1[1..4]);
+		add1_year_first_seen := (integer)(((STRING)add1_year_first_seen1)[1..4]);
 		
 		
 		lres_year := sysyear - add1_year_first_seen;
@@ -38,7 +38,7 @@ export RecoverScore_Collection_Indices(grouped dataset(Risk_Indicators.Layout_Bo
 						  0);
 
 
-		add1_source_count2 := ut.max2( ut.imin2(le.address_verification.input_address_information.source_count,6) - 3,0);
+		add1_source_count2 := Max( Min(le.address_verification.input_address_information.source_count,6) - 3,0);
 		aptflag := if(trim(StringLib.StringToUpperCase(le.address_validation.dwelling_type)) = 'A', 1,0);
 		add_index_m := -2.723092932
 					   + address_ver_sc  * 0.2720249163
@@ -287,7 +287,7 @@ export RecoverScore_Collection_Indices(grouped dataset(Risk_Indicators.Layout_Bo
 		//   lifestress           
 		
 		lname_change_year1 := le.name_verification.lname_change_date;
-		lname_change_year := (integer)(lname_change_year1[1..4]);
+		lname_change_year := (integer)(((STRING)lname_change_year1)[1..4]);
 		
 		recent_name_change := if(sysyear - lname_change_year < 3, 1,0);
 		

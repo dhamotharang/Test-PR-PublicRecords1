@@ -75,7 +75,7 @@ END;
     SELF.phonetype := risk_indicators.PRIIPhoneRiskFlag('').telcordiaPhoneType(ri.dial_ind, ri.point_id);
 		ALLzips  := project(ri.zipcodes, transform(FlatZipLayout,
 																					SELF.ZipDist:= IF(le.Clean_Input.Zip5 = '' 	OR LEFT.zip ='', 9999,
-																								ut.imin2((INTEGER) ut.zip_Dist(le.Clean_Input.Zip5, LEFT.zip), 9998));	));		
+																								min((INTEGER) ut.zip_Dist(le.Clean_Input.Zip5, LEFT.zip), 9998));	));		
 		SortedDist := sort(ALLzips(zipdist <>0),ZipDist);
 		SELF.Zipdistance := SortedDist[1].ZipDist;
 		SELF := le.Clean_input;

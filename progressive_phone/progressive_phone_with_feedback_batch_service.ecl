@@ -1,13 +1,9 @@
-/*2013-11-20T05:31:00Z (Lorraine Hill)
-
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Progressive_Phone_With_Feedback_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
-	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
 	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
 	<part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
 	<part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
@@ -54,9 +50,6 @@
   <part name="Blankout_Linetype_U_UNKNOWN_OTHER" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>	
   <part name="DataPermissionMask" type="xsd:string"/>
-  <part name="UseMetronet" type="xsd:boolean"/>
-  <part name="Confirmation_GoToGateway" type="xsd:boolean"/>
-  <part name="MetronetLimit" type="xds:integer"/>
   <part name="UsePremiumSource_A" type="xsd:boolean"/>
   <part name="PremiumSource_A_limit" type="xds:integer"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
@@ -121,9 +114,6 @@ EXPORT progressive_phone_with_feedback_batch_service := MACRO
 	f_in_raw := DATASET([], progressive_phone.layout_progressive_batch_in) : STORED('batch_in', FEW);
 	
 	boolean IncludeLastResort := false : STORED ('IncludeLastResort');
-	boolean UseMetronet := false : STORED('UseMetronet');
-	boolean Confirmation_GoToGateway:= false : STORED ('Confirmation_GoToGateway'); //force metronet gateway hit even if we have the phone in house
-	integer metronetLimit := 0: STORED('MetronetLimit');
 	gateways_in := Gateway.Configuration.Get();
 	
 	boolean UsePremiumSource_A:= false : STORED ('UsePremiumSource_A'); //equifax
@@ -158,7 +148,6 @@ EXPORT progressive_phone_with_feedback_batch_service := MACRO
 	 END;
 	
 	boolean isD2C := ut.IndustryClass.is_Knowx;
-	callMetronet := if(isD2C,false , UseMetronet);
 	callEquifax := if(isD2C, false, UsePremiumSource_A);
 
 	wf_without_fb_recs := addrbest.Progressive_phone_common(f_in_raw, 
@@ -168,9 +157,7 @@ EXPORT progressive_phone_with_feedback_batch_service := MACRO
 																													, 
 																													, 
 																													, 
-																													callMetronet,
 																													, 
-																													metronetLimit, 
 																													scoreModel,
 																													MaxNumAssociate,
 																													MaxNumAssociateOther,
@@ -180,7 +167,6 @@ EXPORT progressive_phone_with_feedback_batch_service := MACRO
 																													MaxNumSpouse,
 																													MaxNumSubject,
 																													MaxNumNeighbor,
-																													Confirmation_GoToGateway,
 																													callEquifax,
 																													PremiumSource_A_limit);		
 
@@ -197,14 +183,13 @@ EXPORT progressive_phone_with_feedback_batch_service := MACRO
 
 	ut.mac_TrimFields(wf_with_blanking, 'wf_with_blanking', result_trimmed);
 
-	results_1 := progressive_phone.FN_BatchFinalAssignments(result_trimmed,progressive_phone.layout_progressive_batch_out_with_fb,callMetronet,callEquifax,scoreModel);	
+	results_1 := progressive_phone.FN_BatchFinalAssignments(result_trimmed,progressive_phone.layout_progressive_batch_out_with_fb, callEquifax, scoreModel);	
 			
 	// ROYALTIES
 	boolean ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
 	dRoyaltiesByAcctno_LastResort := if(IncludeLastResort, Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(f_in_raw, results_1, vendor, acctno, acctno));
-  dRoyaltiesByAcctno_METRONET := if(callMetronet, Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(f_in_raw, result_trimmed,,,acctno));
-	dRoyaltiesByAcctno_EQUIFAX := if(callEquifax, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(f_in_raw, results_1,,,acctno));
-  dRoyaltiesByAcctno := dRoyaltiesByAcctno_LastResort + dRoyaltiesByAcctno_METRONET + dRoyaltiesByAcctno_EQUIFAX;
+ dRoyaltiesByAcctno_EQUIFAX := if(callEquifax, Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(f_in_raw, results_1,,,acctno));
+ dRoyaltiesByAcctno := dRoyaltiesByAcctno_LastResort + dRoyaltiesByAcctno_EQUIFAX;
 	dRoyalties 				 := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
 	
 	//We need to ensure that if return score is false, we blank out the score right before returning the results since prior logic depends on the score being present

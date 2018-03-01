@@ -65,10 +65,10 @@ EXPORT Profile_Report_Service := MACRO
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Profile_Report_Service();
 		
-		#option('spotThroughAggregate', 0)
-		#constant('useSupergroup',true)
-		#stored('useSupergroupPropertyAddress',false)
-		#constant('AlwaysCompute',true)
+		#option('spotThroughAggregate', 0);
+		#constant('useSupergroup',true);
+		#stored('useSupergroupPropertyAddress',false);
+		#constant('AlwaysCompute',true);
 		#constant('useLevels',true);
 		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 

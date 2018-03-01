@@ -1,4 +1,4 @@
-IMPORT ut,lib_stringlib;
+﻿IMPORT std;
 
 export DOBTools(unsigned8 Dob_val_in = 0) := 
 MODULE
@@ -32,7 +32,7 @@ export find_day := DOB_val % 100;
 
 export IsValidMonth := (find_month > 0) and (find_month < 13);
 
-shared leap_adjust := IF (find_month = 2 and ut.LeapYear (year_in), 1, 0);
+shared leap_adjust := IF (find_month = 2 and Std.Date.IsLeapYear(year_in), 1, 0);
 export IsValidDay := IsValidMonth and
                      (find_day > 0) and (find_day <= days_in_months [find_month] + leap_adjust);
 

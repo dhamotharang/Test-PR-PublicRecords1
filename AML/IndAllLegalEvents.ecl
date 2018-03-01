@@ -1,4 +1,4 @@
-Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2;
+Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std;
 
 
 
@@ -55,7 +55,7 @@ GetOrigDIDs := join(idsIN, RollSOff, left.seq = right.seq and  left.origdid = ri
 
 VerificationOfOccupancy.Layouts.Layout_VOOShell GetVOOLayout(idsDedup le, Integer C) := TRANSFORM
   self.seq := c;
-	self.historydate := IF(le.historyDate = 999999, (integer)UT.GETDATE[1..6], LE.HISTORYDATE);
+	self.historydate := IF(le.historyDate = 999999, (integer)((STRING)Std.Date.Today())[1..6], LE.HISTORYDATE);
 	self.score := le.seq;
 	self.did := le.did;
 	self := le;
@@ -116,7 +116,7 @@ END;
 //Join target DIDs to offender key and set incarceration flag if "currently incarcerated" flag is on - pick up offender keys also
 	CriminalHistLayout get_offenderKeys(idsDedup l, offenderKey r) := transform
 		self.seq    				:= l.seq;
-		self.historydate  	:= IF(l.historyDate = 999999, (integer)UT.GETDATE[1..6], l.historyDate);
+		self.historydate  	:= IF(l.historyDate = 999999, (integer)((STRING)Std.Date.Today())[1..6], l.historyDate);
 		self.DID           	:= l.did;
 		self.origdid        := l.origdid;
 		self.origbdid       := l.origbdid;

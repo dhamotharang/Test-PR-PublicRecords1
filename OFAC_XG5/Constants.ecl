@@ -236,7 +236,7 @@ EXPORT PtyKeyPrefix (STRING Sourcename, string ENTITYTYPE = '') :=
 												 Sourcename = 'OSFI CONSOLIDATED LIST.BDF' and ENTITYTYPE = '2'	=> 'OCI', 
 												 Sourcename = 'OSFI CONSOLIDATED LIST.BDF' and ENTITYTYPE <> '2'		=> 'OCE', 
 												 Sourcename = 'PRIMARY MONEY LAUNDERING CONCERN.BDF'	=> 'PMLC'	,									
-												 Sourcename =  'PRIMARY MONEY LAUNDERING CONCERN â€“ JURISDICTIONS.CDF'   => 'PRMLJ',												
+												 Sourcename =  'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS.CDF'   => 'PRMLJ',												
 												 Sourcename = 'UNAUTHORIZED BANKS.BDF'		=>  'OCC'		,								
 												 Sourcename =  'UN CONSOLIDATED LIST.BDF'	and ENTITYTYPE = '2'	=>  'AQI',  // 'AQO''BRO' 'BROW'										
 												 Sourcename =  'UN CONSOLIDATED LIST.BDF'	and ENTITYTYPE <> '2' 	=>  'AQO',  // 'AQO''BRO' 'BROW'										
@@ -269,7 +269,7 @@ EXPORT CountryKey (string country) :=
 												trim(country) = 'COOK ISLANDS'	=>	'13',
 												trim(country) = 'COTE D`IVOIRE'	=>	'14',
 												trim(country) = 'CYPRUS'	=>	'15',
-												trim(country) = 'DEMOCRATIC PEOPLEâ€™S REPUBLIC OF KOREA'	=>	'16',
+												trim(country) = 'DEMOCRATIC PEOPLE\'S REPUBLIC OF KOREA'	=>	'16',
 												trim(country) = 'ERITREA'	=>	'17',
 												trim(country) = 'GIBRALTAR'	=>	'18',
 												trim(country) = 'GUERNSEY'	=>	'19',

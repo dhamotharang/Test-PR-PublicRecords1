@@ -1,4 +1,4 @@
-IMPORT progressive_phone, iesp, Gateway;
+﻿IMPORT progressive_phone, iesp, Gateway;
 
 EXPORT Progressive_phone_common(DATASET(progressive_phone.layout_progressive_batch_in) rs_in_raw,
       progressive_phone.iParam.Batch inMod = progressive_phone.waterfall_phones_options,
@@ -7,9 +7,7 @@ EXPORT Progressive_phone_common(DATASET(progressive_phone.layout_progressive_bat
       BOOLEAN type_a_with_did = FALSE,
       BOOLEAN useNeustar = TRUE,
       BOOLEAN default_sx_match_limit = FALSE,
-      BOOLEAN callMetronet = FALSE,
       BOOLEAN isPFR = FALSe,
-      INTEGER metronetLimit = 0,
       STRING25 scoreModel = '',
       UNSIGNED2 MaxNumAssociate = 0,
       UNSIGNED2 MaxNumAssociateOther = 0,
@@ -19,14 +17,13 @@ EXPORT Progressive_phone_common(DATASET(progressive_phone.layout_progressive_bat
       UNSIGNED2 MaxNumSpouse = 0,
       UNSIGNED2 MaxNumSubject = 0,
       UNSIGNED2 MaxNumNeighbor = 0,
-			BOOLEAN Confirmation_GoToGateway = FALSE,
-			BOOLEAN UsePremiumSource_A = FALSE,
+				BOOLEAN UsePremiumSource_A = FALSE,
 			INTEGER PremiumSource_A_limit = 0, 
 			BOOLEAN RunRelocation = FALSE) := FUNCTION
  
   rs_phone_in_hist := progressive_phone.functions.GetInputHistPhones(rs_in_raw, rs_dedup_phones);
 	//get the running version of waterfall phones / Contact plus
-	version := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel,callMetronet,UsePremiumSource_A);
+	version := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel, UsePremiumSource_A);
   v_enum  := progressive_phone.Constants.Running_Version;
 	rs_unblanked_phone := IF (version = v_enum.WFP_V6 OR version = v_enum.CP_V1,
       progressive_phone.functions.getPhonesV1(//Waterfall Phones Version 6 / Contact Plus version 1
@@ -38,18 +35,13 @@ EXPORT Progressive_phone_common(DATASET(progressive_phone.layout_progressive_bat
           type_a_with_did,
           useNeustar,
           default_sx_match_limit,
-          callMetronet,
-          isPFR,
-          metronetLimit,
-					Confirmation_GoToGateway),
+          isPFR),
       progressive_phone.functions.getPhonesV3(//Waterfall Phones Version 8 / Contact Plus version 3
 					rs_in_raw,
           inMod,
           rs_dedup_phones,
           Gateways_In,
           rs_phone_in_hist,
-          callMetronet,
-          metronetLimit,
           MaxNumAssociate,
           MaxNumAssociateOther,
           MaxNumFamilyOther,
@@ -59,7 +51,6 @@ EXPORT Progressive_phone_common(DATASET(progressive_phone.layout_progressive_bat
           MaxNumSubject,
           MaxNumNeighbor,
 					scoreModel,
-					Confirmation_GoToGateway,
 					UsePremiumSource_A,
 					PremiumSource_A_limit,
 					version, 

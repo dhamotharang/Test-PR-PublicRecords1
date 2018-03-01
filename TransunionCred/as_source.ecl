@@ -1,4 +1,4 @@
-import ut,header;
+import ut,header, std;
 
 export as_source(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean pForHeaderBuild=false,boolean pFastHeader= false)
  :=
@@ -9,7 +9,7 @@ export as_source(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean
 										)
 										;
 	
-	dSourceData := if (pFastHeader, dSourceData_(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= 60) , dSourceData_);
+	dSourceData := if (pFastHeader, dSourceData_(ut.DaysApart((STRING8)Std.Date.Today(), ((STRING)dt_vendor_last_reported)[..6] + '01') <= 60) , dSourceData_);
 
 	src_rec := record
 	 header.Layout_Source_ID;

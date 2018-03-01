@@ -1,4 +1,4 @@
-import ut,idl_header,doxie;
+import ut,idl_header,doxie, data_services;
 
 f := dataset(idl_header.name_count_file, idl_header.layout_name_count, flat);
 
@@ -16,4 +16,4 @@ END;
 final := PROJECT(f, defineNames(LEFT));
 
 
-EXPORT Key_NameFrequency := index(final, {name}, {final}, ut.Data_Location.Person_header +'thor_data400::key::ri::name_frequency_' + Doxie.Version_SuperKey);
+EXPORT Key_NameFrequency := index(final, {name}, {final}, Data_Services.Data_location.person_header +'thor_data400::key::ri::name_frequency_' + Doxie.Version_SuperKey);

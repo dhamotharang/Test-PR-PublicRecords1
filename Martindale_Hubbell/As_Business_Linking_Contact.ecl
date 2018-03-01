@@ -72,10 +72,10 @@ EXPORT As_Business_Linking_Contact (
                                                 BIPV2.Layout_Business_Linking_Full R) := TRANSFORM
 		  SELF.dt_first_seen               := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 					                                ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-		  SELF.dt_last_seen                := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
+		  SELF.dt_last_seen                := Max(L.dt_last_seen,R.dt_last_seen);
 		  SELF.dt_vendor_first_reported    := ut.EarliestDate(ut.EarliestDate(L.dt_vendor_first_reported,R.dt_vendor_first_reported),
 					                                ut.EarliestDate(L.dt_vendor_last_reported,R.dt_vendor_last_reported));
-		  SELF.dt_vendor_last_reported     := ut.LatestDate(L.dt_vendor_last_reported,R.dt_vendor_last_reported);
+		  SELF.dt_vendor_last_reported     := Max(L.dt_vendor_last_reported,R.dt_vendor_last_reported);
 		  SELF.company_address.prim_range  := IF(L.company_address.prim_range  <> '', L.company_address.prim_range,  R.company_address.prim_range);
 			SELF.company_address.predir      := IF(L.company_address.predir      <> '', L.company_address.predir,      R.company_address.predir);
 			SELF.company_address.prim_name   := IF(L.company_address.prim_name   <> '', L.company_address.prim_name,   R.company_address.prim_name);

@@ -1,8 +1,8 @@
-import BankruptcyV2, fcra, Doxie, ut;
+import BankruptcyV2, fcra, Doxie, ut, std;
 
 export key_bankruptcyV3_main_full(boolean isFCRA = false) := function
 
-  todaysdate := ut.GetDate;
+  todaysdate := (STRING8)Std.Date.Today();
 
 	get_recs := project(BankruptcyV2.file_bankruptcy_main_v3(~isFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed)), bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs);
 

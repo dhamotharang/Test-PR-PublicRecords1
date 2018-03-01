@@ -73,7 +73,7 @@ export Configuration := module
 	export IsQSent			(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.QSent;
 	export IsQSentV2		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.QSentV2;
 	export IsTargus			(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Targus;
-	export IsMetronet		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Metronet;
+	export IsMetronet		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Metronet; 
 	export IsAccuDataOCN(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.AccuDataOCN; // accudata_ocn 
 	export IsPolk				(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Polk;
 	export IsExperian		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Experian;

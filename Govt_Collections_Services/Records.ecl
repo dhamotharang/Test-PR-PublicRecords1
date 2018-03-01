@@ -55,8 +55,8 @@ EXPORT Records := MODULE
 		//    (new version Req. 4.1.12) ...and finally check InstantID.  
 		ds_processed_recs := Govt_Collections_Services.fn_checkInstantIDRecs(ds_property_recs, in_mod);
 
-		today := ut.GetDate;
-		dayToAdd := IF(ut.LeapYear((INTEGER2)today[3..4]), 1, 0);
+		today := (STRING8)Std.Date.Today();
+		dayToAdd := IF(Std.Date.IsLeapYear((INTEGER2)today[3..4]), 1, 0);
 				
 		// 3. Calculate and assign Confidence Scores. Display Best address data only if it's
 		// different from the input address. 

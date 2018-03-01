@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="Property_BatchServiceFCRA">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
@@ -39,6 +39,7 @@
 	<part name="PenaltThreshold" type="xsd:unsignedInt"/>
 	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
 	<part name="FFDOptionsMask" 	      type="xsd:string"/>	
+	<part name="FCRAPurpose"      type="xsd:string"/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
 */

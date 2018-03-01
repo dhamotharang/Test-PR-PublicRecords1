@@ -1,5 +1,5 @@
-IMPORT AutoStandardI, didville, did_add, doxie, header_slimsort, NID, Models, ut, Phonesplus_v2,
-			Gong_Platinum, Experian_Phones, Risk_Indicators, RiskWise, watchdog, MDR, BatchServices,
+﻿IMPORT AutoStandardI, didville, did_add, doxie, header_slimsort, NID, Models, ut, Phonesplus_v2,
+			Gong_Platinum, Risk_Indicators, RiskWise, watchdog, MDR, BatchServices,
       STD;
 
 in_batch_rec := RECORD
@@ -12,8 +12,8 @@ EXPORT phones_score_model_v1 (DATASET(progressive_phone.layout_progressive_phone
 															DATASET(in_batch_rec) inputDIDs,
 															INTEGER GLBPurpose = 0,
 															STRING50 Data_Restriction_Mask = Risk_Indicators.iid_constants.default_DataRestriction,
-															BOOLEAN isPFR = FALSE,
-															INTEGER MetronetScoreThreshold = BatchServices.Constants.ProgressivePhone.DefaultMetronetScoreThreshold) := FUNCTION
+															BOOLEAN isPFR = FALSE
+															) := FUNCTION
 
 	// Set the following to TRUE to return Attributes
 	MODEL_DEBUG := Progressive_Phone.Common.Model_Debug;
@@ -779,12 +779,7 @@ EXPORT phones_score_model_v1 (DATASET(progressive_phone.layout_progressive_phone
  * the phone_score transform.                                            *
  *************************************************************************/
  #if(MODEL_DEBUG)
-	layout_experian_phones_plus := RECORD
-		progressive_phone.layout_experian_phones;
-		Progressive_Phone.Common.Layout_Debug_v1 - progressive_phone.layout_progressive_phone_common; // Keep the attributes around!
-	END;
-
-	layout_progressive_phone_common_plus := RECORD
+		layout_progressive_phone_common_plus := RECORD
 		// progressive_phone.layout_progressive_phone_common;
 		Progressive_Phone.Common.Layout_Debug_v1; // Keep the attributes around!
 	END;
@@ -794,191 +789,8 @@ EXPORT phones_score_model_v1 (DATASET(progressive_phone.layout_progressive_phone
 #else
 	phonesScored := PROJECT(modelInput, doModel(LEFT));
 #end
-	
-	totalPhonesScored := COUNT(phonesScored);
-	
-/* ***********************************************************************
- * Once the phones have been scored they must be run through Experian    *
- * phone logic.  Batch can only use the flat file to increase found      *
- * phone scores - they cannot at this time call the gateway for unique   *
- * phones.                                                               *
- *************************************************************************/
- 
-	// We only want to boost the score or look for unique phones that match the input DID
-	didsIn := PROJECT(DEDUP(SORT(inputDIDsBest, AcctNo, DID), AcctNo, DID), 
-				TRANSFORM(progressive_phone.layout_experian_phones,
-					SELF.DID := LEFT.DID,
-					SELF.AcctNo := LEFT.AcctNo,
-					self.subj_first := left.fname,
-          self.subj_middle := left.mname,
-          self.subj_last := left.lname, 
-					SELF := []));
-	
-	// tempExperian
-	progressive_phone.layout_experian_phones getExperian(progressive_phone.layout_experian_phones le, Experian_Phones.Key_Did_Digits ri) := TRANSFORM
-		SELF.AcctNo := le.AcctNo;
-		SELF.DID := if(ri.PIN_did <> 0 , ri.PIN_did, le.DID);
-		SELF.ExperianPIN := ri.Encrypted_Experian_PIN;
-		SELF.Phone_Last3Digits := ri.Phone_digits;
-		SELF.phone_score := (STRING)ri.score;
-		self.subj_last := if(ri.PIN_lname<>'' ,ri.PIN_lname,if( ri.rec_type <> 'SP',le.subj_last,''));
-		self.subj_first := if(ri.PIN_lname<>'',ri.PIN_fname,if( ri.rec_type <> 'SP',le.subj_first,''));
-		self.subj_middle := if(ri.PIN_lname<>'' ,ri.PIN_mname,if( ri.rec_type <> 'SP',le.subj_middle,''));
-		self.subj_phone_relationship := if(ri.rec_type <> 'SP', 'Subject', 'Spouse');
-		self := [];
-	END;
-	experianPhones := JOIN(didsIn, Experian_Phones.Key_Did_Digits, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID), getExperian(LEFT, RIGHT), LEFT OUTER, ATMOST(RiskWise.max_atmost), KEEP(ut.limits.PHONE_PER_PERSON));
-
-	#if(MODEL_DEBUG)
-	layout_experian_phones_plus grabExperian(layout_progressive_phone_common_plus le, experianPhones ri) := TRANSFORM
-	#else
-	progressive_phone.layout_experian_phones grabExperian(progressive_phone.layout_progressive_phone_common le, experianPhones ri) := TRANSFORM
-	#end
-		// Only augment phones that we were previously able to score
-		keeper := le.phone_score <> '100';
 		
-		// Save the unique experian info
-		SELF.ExperianPIN := IF(keeper, ri.ExperianPIN, ''); 
-		SELF.Phone_Last3Digits := IF(keeper, ri.Phone_Last3Digits, '');
-		
-		// Existing LN phone found on Experian gateway - Augment the score by 30.
-		SELF.phone_score := IF(le.subj_phone10[8..10] = ri.Phone_Last3Digits AND keeper, (STRING)((UNSIGNED)le.phone_score + 30), le.phone_score);
-		
-		SELF := le;
-	END;
-	flatFile := JOIN(phonesScored, experianPhones, LEFT.DID <> 0 AND TRIM(LEFT.subj_phone10) <> '' AND LEFT.AcctNo = RIGHT.AcctNo AND
-																								 LEFT.DID = RIGHT.DID AND LEFT.subj_phone10[8..10] = RIGHT.Phone_Last3Digits, 
-																grabExperian(LEFT, RIGHT), LEFT OUTER, LIMIT(RiskWise.max_atmost, SKIP), KEEP(totalPhonesScored));
-	//flat file has bumped score.
-	#if(MODEL_DEBUG)
-	layout_progressive_phone_common_plus getSubjects(in_batch_rec le, layout_progressive_phone_common_plus ri) := TRANSFORM
-	#else
-	progressive_phone.layout_progressive_phone_common getSubjects(in_batch_rec le, progressive_phone.layout_progressive_phone_common ri) := TRANSFORM
-	#end
-		SELF.AcctNo := le.AcctNo;
-		SELF.DID := le.DID;
-		
-		// If we have the DID information from the right, use the right, otherwise this is a unique phone not found
-		// in the waterfall phones process
-		useRight := le.DID = ri.DID;
-		
-		SELF.ssn := IF(useRight, ri.SSN, le.SSN);
-		SELF.subj_phone10 := IF(useRight, ri.subj_phone10, ''); // le.Phone10
-		SELF.subj_first := IF(useRight, ri.subj_first, le.FName);
-		SELF.subj_middle := IF(useRight, ri.subj_middle, le.MName);
-		SELF.subj_last := IF(useRight, ri.subj_last, le.LName);
-		
-		SELF.st := IF(useRight, ri.st, le.st);
-		SELF.zip5 := IF(useRight, ri.zip5, le.z5);
-		SELF.p_city_name := IF(useRight, ri.p_city_name, le.p_city_name);
-		SELF.prim_range := IF(useRight, ri.prim_range, le.prim_range);
-		SELF.predir := IF(useRight, ri.predir, le.predir);
-		SELF.prim_name := IF(useRight, ri.prim_name, le.prim_name);
-		SELF.addr_suffix := IF(useRight, ri.addr_suffix, le.addr_suffix);
-		SELF.postdir := IF(useRight, ri.postdir, le.postdir);
-		SELF.unit_desig := IF(useRight, ri.unit_desig, le.unit_desig);
-		SELF.sec_range := IF(useRight, ri.sec_range, le.sec_range);
-		
-		// Since we are only using the input DIDs, this should always be the subject phone
-		SELF.subj_phone_relationship := 'Subject';
-		
-		#if(MODEL_DEBUG)
-		SELF := ri; // Keep the potential attributes around
-		#end
-		SELF := [];
-	END;
-	
-	// Keep only the phonesScored that match input DID since SUBJECT doesn't always mean input subject.  It's possible the waterfall phones 
-	// process didn't find any phones for the input DID either - so we need to keep the left outer DIDs.
-	subjectPhones := JOIN(inputDIDsBest, phonesScored, LEFT.AcctNo = RIGHT.AcctNo AND LEFT.DID = RIGHT.DID, getSubjects(LEFT, RIGHT), LEFT OUTER, ATMOST(RiskWise.max_atmost), KEEP(totalPhonesScored));
-	
-	#if(MODEL_DEBUG)
-	layout_experian_phones_plus grabUnique(progressive_phone.layout_experian_phones le) := TRANSFORM
-	#else
- 	layout_experian_phones grabUnique(progressive_phone.layout_experian_phones le) := TRANSFORM
-	#end
-   		// Flat file information
-   		SELF.ExperianPin := le.ExperianPIN;
-   		SELF.Phone_Last3Digits := le.Phone_Last3Digits;
-   		SELF.Phone_Score := le.Phone_Score;
-   		SELF.DID := le.DID;
-   		SELF.AcctNo := le.AcctNo;
-   		
-   		 // Need to get this from the gateway
-   		SELF.subj_phone10 := '';
-   		SELF.switch_type := '';
-   		SELF.subj_date_last := '';
-   		
-   		 // Mark this as an Experian (Metronet) Gateway phone - this is for royalty tracking purposes
-   		SELF.subj_phone_type_new := MDR.sourceTools.src_Metronet_Gateway;
-   		SELF.phpl_phone_carrier := '';
-   		
-   		// Blank unknown info since we are getting this information from the gateway
-   		SELF.matches := TRUE;
-   		SELF.match_name := FALSE;
-   		SELF.match_street_address := FALSE;
-   		SELF.match_city := FALSE;
-   		SELF.match_state := FALSE;
-   		SELF.match_zip := FALSE;
-   		SELF.match_ssn := FALSE;
-   		SELF.match_did := TRUE;
-   		SELF.matchcodes := '';
-   		SELF.subj_phone_type := '';
-   		SELF.subj_date_first := '';
-   		SELF.phpl_phones_plus_type := '';
-   		SELF.phpl_carrier_city := '';
-   		SELF.phpl_carrier_state := '';
-   		SELF.sort_order_internal := 0;
-   		SELF.sort_order := 0;
-   		SELF.sub_rule_number := 0;
-   		SELF.dup_phone_flag := 'N';
-   		SELF.vendor := '';
-   
-   		// The rest of the information fill in best we can
-   		SELF := le;
-			#if(MODEL_DEBUG)
-			SELF := [];
-			#end
-   	END;
-
-    // The compiler stopped liking the ATMOST condition when the experianPhonesFilt filter was
-		// part of the uniqueExperianTemp JOIN condition.
-		experianPhonesFilt := experianPhones(DID <> 0 AND TRIM(Phone_Last3Digits) <> '');
- 
-		// we are not checking for RIGHT.DID = LEFT.DID because the spouse might have the same 3 digit phone but a different DID based on the join above to create experianPhones
-	  uniqueExperianTemp := JOIN(experianPhonesFilt, subjectPhones,
-															 LEFT.AcctNo = RIGHT.AcctNo AND LEFT.Phone_Last3Digits = RIGHT.subj_phone10[8..10],
-															 grabUnique(LEFT), LEFT ONLY, 
-															 ATMOST(ut.limits.PHONE_PER_PERSON));
-		
-	// Keep the highest scoring Experian Phone per Account Number
-	// We only want unique experian phones that score at or above 630.  Don't make a gateway call for anything less than that
-	#if(MODEL_DEBUG)
-	layout_experian_phones_plus keepBest(layout_experian_phones_plus le, layout_experian_phones_plus ri) := TRANSFORM
-	#else
-	progressive_phone.layout_experian_phones keepBest(progressive_phone.layout_experian_phones le, progressive_phone.layout_experian_phones ri) := TRANSFORM
-	#end
-		SELF := IF((UNSIGNED)le.phone_score > (UNSIGNED)ri.phone_score, le, ri);
-	END;
-	
-	// Return all the experian records which will be used to hit the metronet gateway
-	uniqueExperian := ROLLUP(uniqueExperianTemp((UNSIGNED)Phone_Score >= MetronetScoreThreshold),
-													LEFT.AcctNo = RIGHT.AcctNo, keepBest(LEFT, RIGHT));
-	
-	combo := flatFile + uniqueExperian;
-	
-	// Only allow the use of the Experian Flat File if there is a GLB Permissible Purpose and if the use of Experian Data is not restricted
-	#if(MODEL_DEBUG)
-	phonesScoredExperian := PROJECT(phonesScored, TRANSFORM(layout_experian_phones_plus, SELF := LEFT));
-	#else
-	phonesScoredExperian := PROJECT(phonesScored, TRANSFORM(Progressive_Phone.layout_experian_phones, SELF := LEFT));
-	#end
-	// REMOVE PFR AND USE EXPERIAN-----------------------
-	final := MAP(~isPFR and ut.PermissionTools.glb.OK(GLBPurpose) AND ~Doxie.DataRestriction.isECHRestricted(Data_Restriction_Mask) => combo,
-								isPFR and ut.PermissionTools.glb.OK(GLBPurpose) AND ~Doxie.DataRestriction.ExperianPhones => combo,
-								phonesScoredExperian);
-	
-	final_out := ungroup(dedup(sort(group(final,acctno,subj_phone_type_new,subj_phone10,all),-phone_score),acctno,subj_phone_type_new,subj_phone10));
+	final_out := ungroup(dedup(sort(group(phonesScored,acctno,subj_phone_type_new,subj_phone10,all),-phone_score),acctno,subj_phone_type_new,subj_phone10));
 	// this is attempting to dedup phones so that there is only copy of a specific phone coming from a specific level for one acctno
 	//  And we want to keep the record with the highest score.
 

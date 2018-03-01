@@ -1,4 +1,5 @@
-import ut, Risk_Indicators;
+import ut, Risk_Indicators, std;
+
 // eltman
 export RSN604_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -16,8 +17,8 @@ Layout_RecoverScore doModel(clam le, recoverscore_batchin rt) := TRANSFORM
 	bk_disp_code_1 := models.getBansDispCode(le.bjl.date_last_seen, le.bjl.disposition, rt.bankruptcy);
 	
 // recover score calcuations
-  sysyear := (integer)(ut.GetDate[1..4]);
-	today := ut.GetDate;
+  sysyear := (integer)(((STRING)Std.Date.Today())[1..4]);
+	today := (STRING8)Std.Date.Today();
 	
 	today1900 := ut.DaysSince1900(today[1..4], today[5..6], today[7..8]);
 	co_dt := if(trim(chargeoffdate)='', 0, ut.DaysSince1900(chargeoffDate[1..4], chargeoffDate[5..6], chargeoffDate[7..8]));
@@ -29,11 +30,11 @@ Layout_RecoverScore doModel(clam le, recoverscore_batchin rt) := TRANSFORM
 		
 	CVI10 := IF(le.iid.cvi=10, 1, 0);
 	
-	add1_fst_seen_yr := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
-	add1_lst_seen_yr := (integer)(le.address_verification.input_address_information.date_last_seen[1..4]);
-	add2_pur_yr      := (integer)(le.address_verification.address_history_1.purchase_date[1..4]);
-	add3_pur_yr      := (integer)(le.address_verification.address_history_2.purchase_date[1..4]);
-	add3_built_yr    := (integer)(le.address_verification.address_history_2.built_date[1..4]);
+	add1_fst_seen_yr := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
+	add1_lst_seen_yr := (integer)(((STRING)le.address_verification.input_address_information.date_last_seen)[1..4]);
+	add2_pur_yr      := (integer)(((STRING)le.address_verification.address_history_1.purchase_date)[1..4]);
+	add3_pur_yr      := (integer)(((STRING)le.address_verification.address_history_2.purchase_date)[1..4]);
+	add3_built_yr    := (integer)(((STRING)le.address_verification.address_history_2.built_date)[1..4]);
 
 	add1_livtime_1 := if(add1_lst_seen_yr > 0, add1_lst_seen_yr - add1_fst_seen_yr, -999);
 	add2_rec_buy := if(add2_pur_yr > 0, sysyear - add2_pur_yr, -999);
@@ -45,13 +46,13 @@ Layout_RecoverScore doModel(clam le, recoverscore_batchin rt) := TRANSFORM
 	birthdt := if(le.shell_input.dob='', 0, ut.DaysSince1900(byr, bmn, bdy));
 	in_age := if(birthdt=0, 0, (integer)((today1900 - birthdt)/365.25));
 	
-	agevar := ut.max2(in_age, (integer)le.name_verification.age);  /* if customer supplied dob is missing, use BocaShell age*/
+	agevar := Max(in_age, (integer)le.name_verification.age);  /* if customer supplied dob is missing, use BocaShell age*/
 	age_temp := if(in_age > 10, in_age, agevar);
 	agevar2 := map( age_temp < 15 => 25,
 				 age_temp > 50 => 50,
 				 age_temp);
 								   
-	high_issue_dateyr := (integer)le.ssn_verification.validation.high_issue_date[1..4];
+	high_issue_dateyr := (integer)((STRING)le.ssn_verification.validation.high_issue_date)[1..4];
 	ssnage := sysyear - high_issue_dateyr;
 	agediff := agevar2 - ssnage;
 	
@@ -112,10 +113,10 @@ Layout_RecoverScore doModel(clam le, recoverscore_batchin rt) := TRANSFORM
 				  1 );
 				 
 			
-	add1_year_first_seen := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
+	add1_year_first_seen := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
 	lres_years := if(sysyear - add1_year_first_seen > 100, 0, sysyear - add1_year_first_seen);
-     recent_mover := if(sysyear - add1_year_first_seen <= 1, 1, 0);
-	lname_change_year := (integer)(le.name_verification.lname_change_date[1..4]);
+  recent_mover := if(sysyear - add1_year_first_seen <= 1, 1, 0);
+	lname_change_year := (integer)(((STRING)le.name_verification.lname_change_date)[1..4]);
 	recent_name_change := if(sysyear - lname_change_year < 3, 1, 0);
 	
 	aptflag := if(le.address_validation.dwelling_type='A', 1, 0);

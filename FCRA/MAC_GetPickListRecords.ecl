@@ -1,5 +1,4 @@
-EXPORT MAC_GetPickListRecords(request_in, 
-															picklist_out) := macro
+EXPORT MAC_GetPickListRecords(request_in, picklist_out, no_fail = false) := macro
 import Gateway;
                               
 	gateways := Gateway.Configuration.Get();
@@ -30,7 +29,7 @@ import Gateway;
 	%picklist_request% := project (if(%did% !=0, %legacy_request%, request_in), %SetPickListInput% (Left));
 
 	// 2. FCRA.PickListSoapcall contract guarantees that no soap call will be made if we have DID or UniqueID in the input
-	picklist_out := FCRA.PickListSoapcall.esdl (gateways, %picklist_request%);
+	picklist_out := FCRA.PickListSoapcall.esdl (gateways, %picklist_request%, no_fail);
 	//------------------------------------------------------------------------------------
 		
 endmacro;

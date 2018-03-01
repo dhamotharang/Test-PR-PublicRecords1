@@ -1,4 +1,4 @@
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT;
+IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
 
 EXPORT RVG1511_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -157,7 +157,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 	(source[1..length(target)+1] = target + delim) OR
 	(StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 iv_rv5_unscorable_1 := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and (Integer)TrueDID = 0, '1', '0');
 

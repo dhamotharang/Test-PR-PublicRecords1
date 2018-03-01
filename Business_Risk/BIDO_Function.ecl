@@ -1,4 +1,4 @@
-import risk_indicators, models, seed_files, riskwise, ut, address, gateway, Royalty, MDR;
+import risk_indicators, models, seed_files, riskwise, ut, address, gateway, Royalty, MDR, std;
 
 export BIDO_Function(string4 tribcode, boolean test_data_enabled, string addr, string city, string state, string zip,
 						dataset(business_risk.Layout_Output) biid, 
@@ -73,8 +73,8 @@ riskwise.Layout_BusReasons_Input into_orig_input(biid le) := transform
 	self.orig_wphone := le.phone10;
 	self.telcoPhoneType := le.TelcordiaPhoneType;
 	
-	bans_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
-	lien_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	bans_current := if(((integer)(((STRING)Std.Date.Today())[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	lien_current := if(((integer)(((STRING)Std.Date.Today())[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
 	self.cmpy_bans :=  map(le.fein='' or (le.company_name='' and addr='') => '3',
 											  le.bkbdidflag and le.lienbdidflag and bans_current and lien_current => '5',
 										       le.bkbdidflag and bans_current => '2', 

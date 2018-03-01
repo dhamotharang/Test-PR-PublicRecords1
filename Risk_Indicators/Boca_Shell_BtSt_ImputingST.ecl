@@ -155,9 +155,9 @@ export Boca_Shell_BtSt_ImputingST(DATASET(Risk_Indicators.Layout_CIID_BtSt_In) B
 					DataRestriction
 				 ) = FALSE 
 				 AND RIGHT.did > 0 //saw that sometimes the key has a did of 0
-				 and (unsigned3) RIGHT.datelastseen[1..6] < (unsigned3) left.historydate
+				 and (unsigned3) ((STRING)RIGHT.datelastseen)[1..6] < (unsigned3) left.historydate
 				 	and ValidDaysApart(risk_indicators.iid_constants.mygetdate(LEFT.historydate), 
-					if((string6) RIGHT.datelastseen[5..6] = '00', (string4) RIGHT.datelastseen[1..4] + '0101', 
+					if(((string6) RIGHT.datelastseen)[5..6] = '00', ((string4) RIGHT.datelastseen)[1..4] + '0101', 
 					(string6) RIGHT.datelastseen + '01')) < ut.DaysInNYears(1),
 				TRANSFORM(tmp_dids, 
 											SELF.SEQ := LEFT.seq, 

@@ -1,13 +1,13 @@
 export Persons := MODULE
 
-import lib_stringlib, _Control, ut, NID, LIB_Word; //IDL_Header, 
+import lib_stringlib, _Control, ut, NID, LIB_Word, Data_Services; //IDL_Header, 
 
 rec := RECORD
 	string20	name;
 END;                                                                                                       
 
 shared dataland := '~thor40_241::';	//		'~thor40_241::;	//'~thor200_144::';
-shared cluster :=  IF(Thorlib.Daliservers()='10.173.231.12:7070',ut.foreign_prod + '~thor_data400::',IF(_Control.ThisEnvironment.name='Dataland', dataland,'~thor_data400::'));
+shared cluster :=  IF(Thorlib.Daliservers()='10.173.231.12:7070',data_services.data_location.prefix() + 'thor_data400::',IF(_Control.ThisEnvironment.name='Dataland', dataland,'~thor_data400::'));
 //shared cluster :=  IF(_Control.ThisEnvironment.name='Dataland', '~thor400_88::', '~thor_data400::');
 
 export filename_fnames		:= cluster + 'base::nid::firstnames';

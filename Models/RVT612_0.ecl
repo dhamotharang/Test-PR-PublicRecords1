@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVT612_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := 
 
@@ -263,8 +263,8 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 /* LRES */
 
 
-	add1_year_first_seen := (integer)(le.address_verification.input_address_information.date_first_seen[1..4]);
-	sysyear := if(le.historydate <> 999999, (integer)((string)le.historydate[1..4]), (integer)(ut.GetDate[1..4]));
+	add1_year_first_seen := (integer)(((STRING)le.address_verification.input_address_information.date_first_seen)[1..4]);
+	sysyear := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..4]), (integer)(((STRING)Std.Date.Today())[1..4]));
      
 	lres_yearsa := sysyear - add1_year_first_seen;
 	lres_yearsb := if(lres_yearsa > 1000, -1, if(lres_yearsa > 30, 30, lres_yearsa));
@@ -345,7 +345,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
         
 
      /* SSNPrior */
-	high_issue_dateyr := (integer)(le.ssn_verification.validation.high_issue_date[1..4]);
+	high_issue_dateyr := (integer)(((STRING)le.ssn_verification.validation.high_issue_date)[1..4]);
 	dob_year := (integer)(le.shell_input.dob[1..4]);
 	year_diff := high_issue_dateyr - dob_year;
 
@@ -383,7 +383,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 /* AGE             */
 
-	low_issue_year := (integer)(le.ssn_verification.validation.low_issue_date[1..4]);
+	low_issue_year := (integer)(((STRING)le.ssn_verification.validation.low_issue_date)[1..4]);
 
      age_dob := sysyear - dob_year;
      age_ssn_issue := sysyear - low_issue_year;
@@ -403,7 +403,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 /* BUREAU          */
 	
-	time_on_header_years := (sysyear - (integer)(le.ssn_verification.header_first_seen[1..4]));
+	time_on_header_years := (sysyear - (integer)(((STRING)le.ssn_verification.header_first_seen)[1..4]));
 
      time_on_header_years2 := map(time_on_header_years > 1000 => -1,
 						    time_on_header_years > 17 => 17,

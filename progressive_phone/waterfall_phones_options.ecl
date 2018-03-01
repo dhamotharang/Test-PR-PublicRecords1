@@ -1,12 +1,8 @@
-/*2013-11-21T00:24:56Z (Lorraine Hill)
-
-*/
-IMPORT AutoStandardI;
+﻿IMPORT AutoStandardI;
 
 EXPORT waterfall_phones_options := MODULE(PROJECT(AutoStandardI.GlobalModule(),progressive_phone.iParam.Batch,OPT))
 	EXPORT BOOLEAN ExcludeDeadContacts       := TRUE  : STORED('ExcludeDeadContacts');
 	EXPORT BOOLEAN SkipPhoneScoring          := FALSE : STORED('SkipPhoneScoring');
-	EXPORT BOOLEAN DedupInputPhones          := FALSE : STORED('DedupAgainstInputPhones');
 	EXPORT BOOLEAN KeepAllPhones             := FALSE : STORED('KeepSamePhoneInDiffLevels');
 	EXPORT BOOLEAN DedupOutputPhones         := IF(~SkipPhoneScoring,FALSE,NOT KeepAllPhones); // We need to keep all phones from all WF levels in order to run the model
 	EXPORT BOOLEAN BlankOutDuplicatePhones   := FALSE : STORED('BlankOutDuplicatePhones');

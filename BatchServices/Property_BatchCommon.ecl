@@ -1,4 +1,4 @@
-IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2,BatchShare,ut,Gateway,FFD;
+﻿IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2,BatchShare,ut,Gateway,FFD, FCRA;
 
 rec_batch_in_plus_date_filter := LN_PropertyV2_Services.layouts.batch_in_plus_date_filter;
 
@@ -24,6 +24,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		
 			// FFD				 
 		INTEGER8 inFFDOptionsMask := FFD.FFDMask.Get();
+		INTEGER8 inFCRAPurpose := FCRA.FCRAPurpose.Get();
 		BOOLEAN ShowConsumerStatements := isFCRA AND FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 		gw_config := Gateway.Configuration.Get();
 		
@@ -75,8 +76,11 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		ds_dids := project(ds_batch_in,FFD.Layouts.DidBatch);
 			
 		// b) Call the person context		
-		pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gw_config, FFD.Constants.DataGroupSet.Property));
+		pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gw_config, FFD.Constants.DataGroupSet.Property, inFFDOptionsMask));
 
+  alert_flags := if(isFCRA, FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDOptionsMask));
+	
+	
 		// c) Slim down the PersonContext				 
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 		
@@ -329,14 +333,18 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 											
 		ds_all_sort := sort(ds_all,fid_type_desc,-LN_PropertyV2.fn_strip_pnum(assess_apna_or_pin_number),-LN_PropertyV2.fn_strip_pnum(deed_apnt_or_pin_number),-sortby_date,vendor_source_flag,acctno);
 		
-				ds_flat_property_recs := sort(
+				ds_flat_sorted_recs := sort(
                               if(skip_dedup,
 		                           ds_all_sort,
 															 dedup(ds_all_sort,fid_type_desc,LN_PropertyV2.fn_strip_pnum(assess_apna_or_pin_number),LN_PropertyV2.fn_strip_pnum(deed_apnt_or_pin_number),sortby_date,acctno)
 															)
 														 ,acctno);
 
-		one := p.ds_property_recs;
+  // data maybe suppressed due to alerts
+  ds_flat_property_recs := if(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_flat_sorted_recs, alert_flags, StatementsAndDisputes, BatchServices.layout_Property_Batch_out_pre),
+	                             ds_flat_sorted_recs);
+
+		//one := p.ds_property_recs;
 		// two := p.ds_all_fares_ids;
 		// three := p.ds_property_output;
 		// four := p.ds_fids;
@@ -366,8 +374,10 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		
 	// consumer statements dataset contains information about disputed records as well as Statements.
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask));
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 
-	BatchShare.MAC_RestoreAcctno(ds_ready, consumer_statements_prep, consumer_statements_acctno,false,false);
+	BatchShare.MAC_RestoreAcctno(ds_ready, consumer_statements_alerts, consumer_statements_acctno,false,false);
 	
  	BatchShare.MAC_RestoreAcctno(ds_ready, ds_flat_property_recs, ds_batch_ready);	
 	Pre_results := ds_batch_ready;

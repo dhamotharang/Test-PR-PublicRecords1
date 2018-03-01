@@ -321,7 +321,9 @@ EXPORT ProdData() := FUNCTION
 	 *              Create the Appropriate Library Interface                  *
 	 ************************************************************************ */
 	// NOTE: If you change this you MUST redeploy the Library as the interface has changed.
-	Business_Risk_BIP.Layouts.Input grabInput(ut.ds_oneRecord le, UNSIGNED1 c) := TRANSFORM
+	emptyRecord := dataset([{1}], {unsigned a});
+	
+	Business_Risk_BIP.Layouts.Input grabInput(emptyRecord le, UNSIGNED1 c) := TRANSFORM
 		SELF.Seq := c;
 		SELF.AcctNo := (STRING)c;
 		SELF.CompanyName := CompanyName;
@@ -391,12 +393,12 @@ EXPORT ProdData() := FUNCTION
 		SELF.Rep_Email := Rep_Email;
 		SELF.Rep_LexID := Rep_LexID;
 		
-		SELF.HistoryDate := (UNSIGNED3)((STRING12)HistoryDate[1..6]);
+		SELF.HistoryDate := (UNSIGNED3)(((STRING12)HistoryDate)[1..6]);
 		SELF.HistoryDateTime := HistoryDate;
 		SELF := [];
 	END;
 	
-	Input := PROJECT(ut.ds_oneRecord, grabInput(LEFT, COUNTER));
+	Input := PROJECT(dataset([{1}], {unsigned a}), grabInput(LEFT, COUNTER));
 	
 	options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 		// Clean up the Options and make sure that defaults are enforced
@@ -586,7 +588,7 @@ EXPORT ProdData() := FUNCTION
 		SELF.Clean_Input.Rep_DateOfBirth := RiskWise.CleanDOB(le.Rep_DateOfBirth);
 		RepPhone10 := RiskWise.CleanPhone(le.Rep_Phone10);
 		SELF.Clean_Input.Rep_Phone10 := RepPhone10;
-		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.GetAgeI((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
+		SELF.Clean_Input.Rep_Age := IF((INTEGER)le.Rep_Age = 0 AND (INTEGER)le.Rep_DateOfBirth != 0, (STRING3)ut.Age((INTEGER)le.Rep_DateOfBirth), (le.Rep_Age));
 		SELF.Clean_Input.Rep_DLNumber := RiskWise.CleanDL_Num(le.Rep_DLNumber);
 		SELF.Clean_Input.Rep_DLState := StringLib.StringToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep_Email := StringLib.StringToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));

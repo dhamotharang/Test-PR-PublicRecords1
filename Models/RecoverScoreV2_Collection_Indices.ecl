@@ -1,9 +1,9 @@
-import ut, risk_indicators;
+import ut, risk_indicators, std;
 
 export RecoverScoreV2_Collection_Indices(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
-	sysyear := (integer)(ut.GetDate[1..4]);
+	sysyear := (integer)(((STRING)Std.Date.Today())[1..4]);
 
 
 	Layout_RecoverScore doIndices( clam le ) := TRANSFORM
@@ -116,7 +116,7 @@ export RecoverScoreV2_Collection_Indices(
 		watercraft_count								:=  le.watercraft.watercraft_count;
 		ams_file_type										:=  le.student.file_type;
 		prof_license_flag               :=  (INTEGER)le.professional_license.professional_license_flag;
-		archive_date										:=  if(le.historydate=999999, (unsigned3)ut.getDate[1..6], le.historydate);			
+		archive_date										:=  if(le.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);			
 
  /************************************************************************************/
  /* Fields from ADL Append Process                                                   */

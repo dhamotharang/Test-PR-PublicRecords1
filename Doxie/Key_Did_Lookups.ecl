@@ -1,4 +1,4 @@
-import header, ut;
+import header, ut, data_services;
 
 res1 := lookups;
 res2 := header.LivingSituation;
@@ -45,4 +45,4 @@ end;
 
 res := join(res1,res2,left.did = right.did,into(Left,right),full outer,hash);
 
-export Key_Did_Lookups := index(res,{res},ut.Data_Location.Person_header + 'thor_data400::key::header_lookups_' + version_superkey);
+export Key_Did_Lookups := index(res,{res},Data_Services.Data_location.person_header + 'thor_data400::key::header_lookups_' + version_superkey);

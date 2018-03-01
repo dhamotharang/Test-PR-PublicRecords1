@@ -46,8 +46,7 @@
  	 <part name="IncludeLastResort" type="xsd:boolean"/>
  	 <part name="UseDateSort" type="xsd:boolean"/>
 	 <part name="IncludeDeadContacts" type="xsd:boolean"/>
-   <part name="UseMetronet" type="xsd:boolean"/>
-	 <part name="ScoreThreshold" 		type="xsd:unsignedInt"/>
+   <part name="ScoreThreshold" 		type="xsd:unsignedInt"/>
 	 <part name="IncludeMinors" type="xsd:boolean"/>
 	 <part name="ExcludeResidence" type="xsd:boolean"/>
 	 <part name="ExcludeBusiness" type="xsd:boolean"/>
@@ -77,7 +76,6 @@ EXPORT phone_noreconn_search := MACRO
 
 	shared prog_phone := progressive_phone.layout_progressive_phones;
 	boolean call_PVS := false : STORED('IncludeRealTimePhones');
-	boolean use_Metronet := false : STORED('UseMetronet');
 	boolean excludeResidence := false : stored('ExcludeResidence');
 	boolean excludeBusiness := false : stored('ExcludeBusiness');
 	boolean excludeLandlines := false : stored('ExcludeLandlines');	
@@ -174,7 +172,7 @@ EXPORT phone_noreconn_search := MACRO
 						 (tcompany_name !='' AND taddr_value != '' AND tst != '' AND(tcity_name !='' OR srchMod.Zip !=''));
 
 
-	// do not call the gateway with all criteria
+	// do not call the gateway with all criteria 
 	in_mod1 := MODULE(PROJECT(globalmod, BatchServices.RealTimePhones_Params.params, OPT))
 		export string15 phone     := phone_value;
 		export string200 addr     := addr_value;
@@ -244,96 +242,8 @@ EXPORT phone_noreconn_search := MACRO
 									 
 	/*--- Back to code ---*/
 	cmp_res2 := if(srchMod.IncludeRealTimePhones, res_wdid, cmp_res_seq);
-
-	//Get Experian recs
-	Experian_Phones.Layouts.base getExperianBase(Experian_Phones.Key_Did_Digits ri) := transform
-		self.DID										:= ri.DID;
-		self.Encrypted_Experian_PIN := ri.Encrypted_Experian_PIN;
-		self.Phone_digits						:= ri.Phone_digits;
-		self.score 									:= ri.score;
-		self.pin_lname 							:= if(ri.PIN_lname <>'',ri.PIN_lname,
-																			if(srchMod.LastName <> '',srchMod.LastName,''));
-		self.pin_fname 							:= if(ri.PIN_fname <>'',ri.PIN_fname,
-																			if(srchMod.FirstName <> '',srchMod.FirstName,''));
-		self.pin_mname							:= if(ri.PIN_mname <>'',ri.PIN_mname,
-																			if(srchMod.MiddleName <> '',srchMod.MiddleName,''));
-		self												:= ri;
-		self 												:= [];
-	end;
-
-	//Filter out experian records with phone numbers already contained in other in-house
-	//records.  Go to the gateway only if there are in-house experian records with phone 
-	//numbers not contained in any other files.		
-
-	exp0 := join(filteredDids, Experian_Phones.Key_Did_Digits, 
-							 keyed(left.did = right.did) AND right.rec_type <> 'SP', 
-								getExperianBase(right), inner, limit(100));
-
-	exp1 := join(exp0,cmp_res2, 
-						left.Phone_digits = right.phone[LENGTH(TRIM(right.phone))-2..LENGTH(TRIM(right.phone))], 
-						transform(left), left only);
-
-	//We want only records matching the subject (not spouse)	
-	exp2 := topn(exp1, 1, -score);
-
-	// progressive_phone.layout_experian_phones getExperianPhones(Experian_Phones.Layouts.base le) := transform
-	prog_phone.layout_exp_multiple_phones getExperianPhones(Experian_Phones.Layouts.base le) := transform
-		self.DID 									:= le.DID;
-		self.ExperianPIN 					:= le.Encrypted_Experian_PIN;
-		self.Phones_Last3Digits   := CHOOSEN(DATASET([{(STRING3)le.Phone_digits}],
-																	prog_phone.Phone_Last3Digits), iesp.Constants.MaxCountLast3Digits);
-		self.phone_score 					:= (string3)le.score;
-		self.subj_last 						:= le.pin_lname;
-		self.subj_first 					:= le.pin_fname;
-		self.subj_middle 					:= le.pin_mname;
-		self.subj_phone_type_new	:= MDR.sourceTools.src_Metronet_Gateway;
-		self 											:= [];
-	end;																	
-
-	//transform the experian in-house recs into the layout expected by the metronet gateway.
-	exp3 := project(exp2, getExperianPhones(LEFT));
-									
-	metronetGateway_cfg := gateways_in(Gateway.Configuration.IsMetronet(servicename))[1];
-
-	metronetGatewayURL := metronetGateway_cfg.url;
-
-	ExperianFlatFileOK := ut.PermissionTools.glb.OK(srchMod.GLBPurpose) AND ~Doxie.DataRestriction.ExperianPhones;
-	MetronetOK := use_Metronet and ExperianFlatFileOK;
-
-	out_metronet_gateway := if(MetronetOK and count(filteredDids) = 1 and trim(metronetGatewayURL) <> '',
-														Gateway.SoapCall_Metronet(exp3, metronetGateway_cfg),
-														dataset([], prog_phone.layout_exp_multiple_phones ));
-														
-	// If more than one 10 digit phone number is returned from the gateway with the same last three digits,
-	// use up to two of them.  	
-					
-	exp4 := CHOOSEN(out_metronet_gateway, 2);
-
-	Doxie_Raw.PhonesPlus_Layouts.t_PhoneplusSearchResponse exp2PhonePlus(prog_phone.layout_exp_multiple_phones le) := transform
-		self.did 					:= (string15)le.did;
-		self.phone				:= le.subj_phone10;
-		self.Carrier_Name := le.phpl_phone_carrier;  //Original Carrier Name?  e.g. Sprint	
-		self.vendor_id    := le.subj_phone_type_new;
-		self.fname				:= le.subj_first;
-		self.mname 				:= le.subj_middle;
-		self.lname 				:= le.subj_last;
-		self.name_suffix	:= le.subj_suffix;	
-		self.city_name 		:= le.p_city_name;
-		self.zip 					:= le.zip5;	
-		self.SSN					:= le.ssn;
-		self 							:= le;
-		self 							:= [];
-	end;
-			
-	exp5 := project(exp4, exp2PhonePlus(left));
-
-	n := count(cmp_res2);
-
-	exp_seq := project(exp5, transform(seq_rec, self.seq := counter+n, self := left));
-
-	cmp_res3 := cmp_res2 + exp_seq;
-
-	dids_for_best_in	:= dedup(sort(project(cmp_res3(did<>''),transform(doxie.layout_references,self.did := (integer)left.did) ),did),did);
+	
+	dids_for_best_in	:= dedup(sort(project(cmp_res2(did<>''),transform(doxie.layout_references,self.did := (integer)left.did) ),did),did);
 
 	doxie.mac_best_records(dids_for_best_in,did,outfile,dppa_ok,glb_ok,,doxie.DataRestriction.fixed_DRM);
 
@@ -346,7 +256,7 @@ EXPORT phone_noreconn_search := MACRO
 		unsigned6 hhid;
 	end;
 
-	cmp_res3_whhid := join(cmp_res3, did_hhid_key, 
+	cmp_res3_whhid := join(cmp_res2, did_hhid_key, 
 										keyed((integer)left.did = right.did), 
 										transform(infile_rec_hhid, self.hhid := right.hhid_relat, self := left), 
 										left outer, atmost(ut.limits.HHID_PER_PERSON));
@@ -367,7 +277,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	cmp_res4 := if(srchMod.IncludeRealTimePhones, 
 								project(cmp_res_wtnt_roll, seq_rec),
-								cmp_res3);			
+								cmp_res2);			
 
 	/*--- Yellow Flag Codes ---*/
 	yellow_codes := ['2265', '2325', '2310', '2210', '2230', '2290', '2215', '2220', '2320', '2345', '2225'];
@@ -521,7 +431,7 @@ EXPORT phone_noreconn_search := MACRO
   
 	// ** START *** mods for Reverse Search Plus to filter on dt_last/first_seen added here
 	// **** these modifications to use datefirstseen and datelastseen will not
-	// **** apply to any records returned from any of the 3 targus/metronet/qsent gateway calls
+	// **** apply to any records returned from any of the 3 targus/qsent gateway calls
 	// the vendor_id = TG is targus and vendor_id = MN is metronet and typeflag = I or P is qsentv2 data
 	//
 	dt_first_seenValueTrimmed := trim((string) (srchMod.datefirstseen),left,right);
@@ -598,13 +508,11 @@ EXPORT phone_noreconn_search := MACRO
 	Royalty.MAC_RoyaltyLastResort(results,lastresort_royalties)
 	targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(results,,,trackPDE:=phoneOnlySearch,trackWCS:=doxie.DataPermission.use_confirm, trackVE:=~phoneOnlySearch);
 	Royalty.MAC_RoyaltyQSENT(results, qsent_royalties, use_qt, call_PVS and use_PVS)						
-	Royalty.MAC_RoyaltyMetronet(results, metronet_royalties, vendor_id, MDR.sourceTools.src_Metronet_Gateway);	
-
+	
 	royalties := dataset([], Royalty.Layouts.Royalty)  
 								 + if(use_tg and ~call_PVS, targus_royalties)  
 								 + qsent_royalties
-								 + if (use_LR, lastresort_royalties)
-								 + if(use_Metronet, metronet_royalties);
+								 + if (use_LR, lastresort_royalties);
 
 	out_royal := output(royalties,named('RoyaltySet'));
 
@@ -655,7 +563,7 @@ EXPORT phone_noreconn_search := MACRO
 	// output(resultsPreFB,named('resultsPreFB'));
 
 	if(~batch_friendly, 
-		 if(use_tg or use_qt or call_PVS or use_LR or use_metronet, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
+		 if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
 
 ENDMACRO;
 // doxie.phone_noreconn_search();

@@ -73,7 +73,10 @@ BusnHeadRec := join(AssocBusn(bdid!=0), BusnHeader,
 															self.bdid := left.bdid,
 															self.historydate :=  left.historydate,
 															self.AssocBdid := left.AssocBdid,
-															self.dt_first_seen := if((unsigned)right.dt_first_seen[1..6]>0 and ((unsigned)right.dt_first_seen[7..8]=0 or trim(right.dt_first_seen[7..8])=''), (unsigned)((string)right.dt_first_seen[1..6]+'01'), right.dt_first_seen), 											
+															self.dt_first_seen := if((unsigned)((STRING)right.dt_first_seen)[1..6]>0 and 
+															                         ((unsigned)((STRING)right.dt_first_seen)[7..8]=0 or trim(((STRING)right.dt_first_seen)[7..8])=''), 
+															                              (unsigned)(((string)right.dt_first_seen)[1..6]+'01'), 
+															                              right.dt_first_seen), 											
 															self := right),
 										atmost(Keyed(right.Bdid = left.AssocBdid), RiskWise.max_atmost), left outer);
 										
@@ -694,7 +697,7 @@ DIDContDD := dedup(sort(DIDContacts, seq,assocBdid,did), seq,assocBdid,did);
 
 Risk_indicators.layouts.layout_derogs_input  GetDerogs(DIDContDD le) := TRANSFORM
    self.seq := le.seq;
-	  self.historydate := (unsigned3)(string)le.historydate[1..6];
+	 self.historydate := (unsigned3)((string)le.historydate)[1..6];
 	 self.did  := le.did;
 	 self.isrelat := true;
 	 self := [];
@@ -948,7 +951,7 @@ END;
 DIDContHdr :=   join(DIDContDD, doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
-														RIGHT.dt_first_seen < (unsigned3)(string)left.historydate[1..6] AND
+														RIGHT.dt_first_seen < (unsigned3)((string)left.historydate)[1..6] AND
 														(header.isPreGLB(RIGHT) OR glb_ok) AND
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
 															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
@@ -972,7 +975,7 @@ PrepHdrSIC := join(DIDContHdrDS,risk_indicators.key_HRI_Address_To_SIC,
 				keyed(left.sec_range=right.sec_range) AND 
 				trim(right.sic_code)='2225' and
 				// check date
-				right.dt_first_seen < (unsigned3)(string)left.historydate[1..6],
+				right.dt_first_seen < (unsigned3)((string)left.historydate)[1..6],
 				getSICCode(left,right),left outer,
 				ATMOST(keyed(left.zip5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and
 					  keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and

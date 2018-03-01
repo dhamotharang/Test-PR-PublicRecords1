@@ -1,5 +1,5 @@
 
-import census_data, ut;
+import census_data, ut, Data_Services;
 
 export File_OFHEO(string8 history_date) := function
 
@@ -20,7 +20,7 @@ ofheo_layout := record
 end;
 
 //make sure we get the most current copy loaded into production, possibly name it just in::avm_ofheo and overwrite it each quarter so this code doesn't have to change at all
-f_raw := dataset(ut.foreign_prod + 'thor_data400::in::avm_ofheo', ofheo_raw_layout, csv);									
+f_raw := dataset(data_services.data_location.prefix() + 'thor_data400::in::avm_ofheo', ofheo_raw_layout, csv);									
 
 w_fips1 := join(f_raw, census_data.File_Fips2County, 
 							left.state=right.state_code,

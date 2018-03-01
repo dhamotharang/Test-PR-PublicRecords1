@@ -763,7 +763,8 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.InstantIDVersion := (string)actualIIDVersion;	
 	
 	//new for Emerging Identities
-	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+	self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity	
 	isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 	self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																						le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one

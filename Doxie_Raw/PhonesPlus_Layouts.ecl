@@ -156,7 +156,7 @@ export PhonesPlus_Layouts := MODULE
 		String ListingType {xpath('ListingType')};
 	  String ListingName {xpath('ListingName')};
 		iesp.share.t_date ListingCreationDate {xpath('ListingCreationDate')};
-		iesp.share.t_date ListingTransactionDate := '';
+		iesp.share.t_date ListingTransactionDate;
 		String NonPublished  {xpath('NonPublished')};
 		String PrivacyIndicator  {xpath('PrivacyIndicator')};
 		t_QSentCISOperatingCompany_out OperatingCompany;

@@ -20,7 +20,7 @@ temprec := record
 	boolean dirty;
 end;
 
-ccname(string s) := stringlib.stringfilter(s, ut.alphabet + '&#$@ 1234567890')[1..10];//filter out all but these for the match
+ccname(string s) := stringlib.stringfilter(s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '&#$@ 1234567890')[1..10];//filter out all but these for the match
 
 j :=
 join(

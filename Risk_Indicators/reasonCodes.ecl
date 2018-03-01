@@ -15,7 +15,7 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCode50(layout.hriskaddrflag, layout.hrisksic, layout.hriskphoneflag, layout.hrisksicphone),DATASET([{'50',risk_indicators.getHRIDesc('50')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode06(layout.socsvalflag, layout.ssn),DATASET([{'06',risk_indicators.getHRIDesc('06')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeIS(layout.ssn, layout.socsvalflag, layout.socllowissue, layout.socsRCISflag),DATASET([{'IS',risk_indicators.getHRIDesc('IS')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCodeEI(layout.DID) AND (rc_settings[1].EnableEmergingID),DATASET([{'EI',risk_indicators.getHRIDesc('EI')}],risk_indicators.Layout_Desc)) &
+	IF(Risk_Indicators.rcSet.isCodeEI(layout.DID, layout.socsverlevel, layout.socsvalid) AND (rc_settings[1].EnableEmergingID),DATASET([{'EI',risk_indicators.getHRIDesc('EI')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeIT(layout.ssn),DATASET([{'IT',risk_indicators.getHRIDesc('IT')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeWL(layout.watchlist_table, layout.watchlist_record_number),DATASET([{'WL',risk_indicators.getHRIDesc('WL')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode19(layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),DATASET([{'19',risk_indicators.getHRIDesc('19')}],risk_indicators.Layout_Desc)) &

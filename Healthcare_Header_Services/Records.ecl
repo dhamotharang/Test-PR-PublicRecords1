@@ -1,4 +1,4 @@
-﻿import doxie,iesp,ut,AutoStandardI,Address,Ingenix_NatlProf,Healthcare_Services;
+﻿import doxie,iesp,ut,AutoStandardI,Address,Ingenix_NatlProf,Healthcare_Services,std;
 EXPORT Records := module
 	Layouts.common_runtime_config buildRunTimeConfig():=transform
 		self.cfg_Version := 1;
@@ -346,9 +346,9 @@ EXPORT Records := module
 		line2:=if(inputCriteria.City <>'' or inputCriteria.State <>'' or inputCriteria.Zip <>'',tmpCity+' '+inputCriteria.state+' '+inputCriteria.zip,splitRaw2);
 		clnAddr := Address.CleanFields(Address.GetCleanAddress(splitRaw1,line2,address.Components.Country.US).str_addr);
 		//Check Last Name to see if it is compound and possibly messed up by cleaner.
-		cityArray := DATASET(ut.StringSplit(inputCriteria.City, ' '), layouts.BusName_WordRec);
+		cityArray := DATASET(Std.Str.SplitWords(inputCriteria.City, ' '), layouts.BusName_WordRec);
 		cityArrayCnt := Count(cityArray(length(word)<4));//If we have a city less than 3 character it has to be an an abbreviation
-		lastArray := DATASET(ut.StringSplit(inputCriteria.LastName, ' '), layouts.BusName_WordRec);
+		lastArray := DATASET(Std.Str.SplitWords(inputCriteria.LastName, ' '), layouts.BusName_WordRec);
 		lastArrayCnt := Count(lastArray(length(word)>2));
 		middlenameEmpty := inputCriteria.MiddleName = '';
 		newlastname := if(middlenameEmpty and lastArrayCnt > 1,lastArray[2].word,inputCriteria.LastName);

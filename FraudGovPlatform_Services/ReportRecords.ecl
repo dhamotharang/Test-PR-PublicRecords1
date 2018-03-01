@@ -1,13 +1,14 @@
-﻿IMPORT FraudShared_Services, iesp;
+﻿IMPORT FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
 										 INTEGER MaxVelocities,
-										 INTEGER MaxKnownFrauds) := FUNCTION
+										 INTEGER MaxKnownFrauds) := MODULE
                 
-		ds_batch := FraudGovPlatform_Services.BatchRecords(ds_batch_in, batch_params);
+		SHARED ds_batch := FraudGovPlatform_Services.BatchRecords(ds_batch_in, batch_params);
 		
-		all_knownfrauds := FraudGovPlatform_Services.Functions.getKnownFrauds(ds_batch);
+		SHARED all_knownfrauds := FraudGovPlatform_Services.Functions.getKnownFrauds(ds_batch);
+		SHARED fdn_knownfrauds := all_knownfrauds(event_type = 'FDN');
 		
 		//Getting all the known frauds
 		knownfraud_temp_rec := RECORD
@@ -15,12 +16,12 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 				DATASET(iesp.share.t_StringArrayItem) KnownRiskReasons := PROJECT(all_knownfrauds, TRANSFORM({iesp.share.t_StringArrayItem}, SELF.value := LEFT.known_risk_reason));
 		END;
 
-		all_knownfrauds_slimmed := TABLE(all_knownfrauds, knownfraud_temp_rec);
-		all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, TRANSFORM(iesp.fraudgovplatform.t_FraudGovKnownRisk,
+		SHARED all_knownfrauds_slimmed := TABLE(all_knownfrauds, knownfraud_temp_rec);
+		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, TRANSFORM(iesp.fraudgovreport.t_FraudGovKnownRisk,
 																																					SELF.KnownRiskCount := LEFT.KnownRiskCount,
 																																					SELF.KnownRiskReasons := CHOOSEN(LEFT.KnownRiskReasons, MaxKnownFrauds)));
 
-    iesp.fraudgovplatform.t_FraudGovRecord xform_response() := TRANSFORM
+    iesp.fraudgovreport.t_FraudGovRecord xform_response() := TRANSFORM
       SELF.RiskScore := ds_batch[1].risk_score;
       SELF.RiskLevel := ds_batch[1].risk_level;
       SELF.IdentityResolved := ds_batch[1].identity_resolved;
@@ -46,8 +47,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		// output(MaxKnownFrauds, named('MaxKnownFrauds'));
 		// output(all_knownfrauds_final, named('all_knownfrauds_final'));
 		
-		esdl_out := DATASET([xform_response()]);
-                                                                                                                                                               
-   RETURN esdl_out;
-	 
+		EXPORT esdl_out := DATASET([xform_response()]);
+		EXPORT ds_royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(fdn_knownfrauds, true);
 END;

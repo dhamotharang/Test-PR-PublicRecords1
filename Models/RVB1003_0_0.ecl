@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVB1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut=false ) := FUNCTION
 
@@ -2130,11 +2130,11 @@ NULL := -999999999;
 INTEGER year(integer sas_date) :=
 	if(sas_date = NULL, NULL, (integer)((ut.DateFrom_DaysSince1900(sas_date + ut.DaysSince1900('1960', '1', '1')))[1..4]));
 
-sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01')),
+sysdate :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01')),
                 length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
                                                                        NULL);
 
-sysyear :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => year(common.sas_date(if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01'))),
+sysyear :=  map(trim((string)archive_date, LEFT, RIGHT) = '999999'  => year(common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01'))),
                 length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (integer)(trim((string)archive_date, LEFT))[1..4],
                                                                        NULL);
 

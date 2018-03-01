@@ -1,6 +1,6 @@
 // RVT1307_3_0: AT & T - //FCRA 4.1 Modeling Shell ****************************************************************
 
-import risk_indicators, riskwise, riskwisefcra, ut, models; 
+import risk_indicators, riskwise, riskwisefcra, ut, models, std; 
 
 export RVT1307_3_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -408,7 +408,7 @@ _msa := map(
                                                                  'STATE: ' + trim(out_st, LEFT, RIGHT)
     );
 
-	sysdate := common.sas_date(if(archive_date=999999, (string)ut.getdate, (string6)archive_date+'01'));
+	sysdate := common.sas_date(if(archive_date=999999, (STRING)Std.Date.Today(), (string6)archive_date+'01'));
 	
 	iv_pots_phone := (telcordia_type in ['00', '50', '51', '52', '54']);
 

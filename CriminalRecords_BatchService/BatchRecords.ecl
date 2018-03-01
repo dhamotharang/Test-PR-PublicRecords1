@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, doxie, hygenics_crim, FCRA, FFD, Suppress, ut;
+﻿IMPORT Autokey_batch, doxie, CriminalRecords_BatchService, FCRA, FFD, Suppress, ut;
 
 export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData,
 										 dataset(CriminalRecords_BatchService.Layouts.batch_in) ds_batch_in,
@@ -9,70 +9,10 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 	ds_batch_in_common 	:= project(ds_batch_in, Autokey_batch.Layouts.rec_inBatchMaster);		
 	boolean is_cnsmr := configData.IndustryClass = ut.IndustryClass.Knowx_IC; 		
 
-  // Examine each of the 42 Include* input option and set on it's corresponding offense_category bit value
-  unsigned8 bit_arson          := if(configData.IncludeArson,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Arson),0);
-  unsigned8 bit_assaultagg     := if(configData.IncludeAssaultAgg,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_aggr),0);
-  unsigned8 bit_assaultother   := if(configData.IncludeAssaultOther,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_other),0);
-  unsigned8 bit_badchecks      := if(configData.IncludeBadChecks,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_BadChecks),0);
-  unsigned8 bit_bribery        := if(configData.IncludeBribery,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Bribery),0);
-  unsigned8 bit_burglarycomm   := if(configData.IncludeBurglaryComm,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_comm),0);
-  unsigned8 bit_burglaryres    := if(configData.IncludeBurglaryRes,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_res),0);
-  unsigned8 bit_burglaryveh    := if(configData.IncludeBurglaryVeh,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_veh),0);
-  unsigned8 bit_computer       := if(configData.IncludeComputer,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Computer_Crimes),0);
-  unsigned8 bit_counterfeit    := if(configData.IncludeCounterfeit,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Counterfeiting_Forgery),0);
-  unsigned8 bit_curloivag      := if(configData.IncludeCurLoiVag,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_CurfewLoiteringVagrancyVio),0);
-  unsigned8 bit_vandalism      := if(configData.IncludeVandalism,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Destruction_Damage_Vandalism),0);
-  unsigned8 bit_disorderly     := if(configData.IncludeDisorderly,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_DisorderlyConduct),0);
-  unsigned8 bit_dui            := if(configData.IncludeDUI,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_DrivingUndertheInfluence),0);
-  unsigned8 bit_drug           := if(configData.IncludeDrug,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Drug_Narcotic),0);
-  unsigned8 bit_drunk          := if(configData.IncludeDrunk,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Drunkenness),0);
-  unsigned8 bit_familyoff      := if(configData.IncludeFamilyOff,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_FamilyOffenses),0);
-  unsigned8 bit_fraud          := if(configData.IncludeFraud,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Fraud),0);
-  unsigned8 bit_gambling       := if(configData.IncludeGambling,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Gambling),0);
-  unsigned8 bit_homicide       := if(configData.IncludeHomicide,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Homicide),0);
-  unsigned8 bit_humantraff     := if(configData.IncludeHumanTraff,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Human_Trafficking),0);
-  unsigned8 bit_idtheft        := if(configData.IncludeIdTheft,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Identity_Theft),0);
-  unsigned8 bit_kidnapping     := if(configData.IncludeKidnapping,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Kidnapping_Abduction),0);
-  unsigned8 bit_liquorlaw      := if(configData.IncludeLiquorLaw,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_LiquorLawViolations),0);
-  unsigned8 bit_mvtheft        := if(configData.IncludeMVTheft,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Motor_Vehicle_Theft),0);
-  unsigned8 bit_peepingtom     := if(configData.IncludePeepingTom,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_PeepingTom),0);
-  unsigned8 bit_pornography    := if(configData.IncludePornography,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Pornography),0);
-  unsigned8 bit_prostitution   := if(configData.IncludeProstitution,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Prostitution),0);
-  unsigned8 bit_restrianing    := if(configData.IncludeRestraining,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Restraining_Order_Violations),0);
-  unsigned8 bit_robberycomm    := if(configData.IncludeRobberyComm,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Robbery_comm),0);
-  unsigned8 bit_robberyres     := if(configData.IncludeRobberyRes,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Robbery_res),0);
-  unsigned8 bit_soforce        := if(configData.IncludeSOForce,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_SexOffensesForcible),0);
-  unsigned8 bit_sononforce     := if(configData.IncludeSONonForce,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_SexOffensesNon_forcible),0);
-  unsigned8 bit_shoplift       := if(configData.IncludeShoplift,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Shoplifting),0);
-  unsigned8 bit_stolenprop     := if(configData.IncludeStolenProp,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Stolen_Property_Offenses_Fence),0);
-  unsigned8 bit_terrorist      := if(configData.IncludeTerrorist,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Terrorist_Threats),0);
-  unsigned8 bit_theft          := if(configData.IncludeTheft,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Theft),0);
-  unsigned8 bit_traffic        := if(configData.IncludeTraffic,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Traffic),0);
-  unsigned8 bit_trespass       := if(configData.IncludeTrespass,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_TrespassofRealProperty),0);
-  unsigned8 bit_weaponlaw      := if(configData.IncludeWeaponLaw,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Weapon_Law_Violations),0);
-  unsigned8 bit_other          := if(configData.IncludeOther,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),0);
-  unsigned8 bit_cannotclassify := if(configData.IncludeCannotClassify,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified),0);
-
-  // Once all Include***s are checked & bit_***s are set, do a bitwise "OR" on all the individual 
-	// values to create a bitmap representing all of the requested ones.
-  unsigned8 bitmap_all_includes := bit_arson        | bit_assaultagg   | bit_assaultother  | 
-                                   bit_badchecks    | bit_bribery      | bit_burglarycomm  |
-                                   bit_burglaryres  | bit_burglaryveh  | bit_computer      | 
-																	 bit_counterfeit  | bit_curloivag    | bit_vandalism     | 
-																	 bit_disorderly   | bit_dui          | bit_drug          | 
-																	 bit_drunk        | bit_familyoff    | bit_fraud         | 
-																	 bit_gambling     | bit_homicide     | bit_humantraff    | 
-                                   bit_idtheft      | bit_kidnapping   | bit_liquorlaw     | 
-                                   bit_mvtheft      | bit_peepingtom   | bit_pornography   | 
-                                   bit_prostitution | bit_restrianing  | bit_robberycomm   | 
-                                   bit_robberyres   | bit_soforce      | bit_sononforce    | 
-                                   bit_shoplift     | bit_stolenprop   | bit_terrorist     | 
-                                   bit_theft        | bit_traffic      | bit_trespass      | 
-                                   bit_weaponlaw    | bit_other        | bit_cannotclassify;
-
+  unsigned8 bitmap_all_includes := CriminalRecords_BatchService.Functions.Bitmap_all_includes(configData);
+	
 	// flagfiles for FCRA
 	ds_best  := project(ds_batch_in(did <> 0),transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
-	ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best)); //this is for more than one person
 	
 	// FCRA FFD  	
 	boolean do_skipPersonContextCall :=  ~isFCRA or SkipPersonContextCall;
@@ -80,11 +20,16 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 	dids := project(ds_batch_in(did <> 0),FFD.Layouts.DidBatch); 	
 				
 	pc_recs :=  if(do_skipPersonContextCall, in_pc_recs(datagroup in FFD.Constants.DataGroupSet.Criminal), 
-	                       FFD.FetchPersonContext(dids, configData.gateways, FFD.Constants.DataGroupSet.Criminal));
+	                       FFD.FetchPersonContext(dids, configData.gateways, FFD.Constants.DataGroupSet.Criminal, configData.FFDOptionsMask));
 	
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 	
-	// 1. Search via AutoKey	
+	ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs)); //this is for more than one person
+	
+	alert_flags := if(isFCRA, FFD.ConsumerFlag.getAlertIndicators(pc_recs, configData.FCRAPurpose, configData.FFDOptionsMask));
+
+	
+// 1. Search via AutoKey	
 	fromAK := CriminalRecords_BatchService.BatchIds.Ids.AutokeyIds(ds_batch_in_common);
 		
 	// 2. Search via DID and DID Lookup
@@ -151,20 +96,18 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
   Suppress.MAC_Suppress(out_pruned,pruned_did,configData.ApplicationType,Suppress.Constants.LinkTypes.DID,did);
   Suppress.MAC_Suppress(pruned_did,results_np,configData.ApplicationType,Suppress.Constants.LinkTypes.SSN,ssn);
 	
-	results_all := TOPN(GROUP(SORT(results_np, acctno, pty_typ), acctno), configData.MaxResults, acctno, -process_date);
 
   // Start of 06/13/2017 offense categories filtering enhancement?
-	results_out_raw := PROJECT(results_all, CriminalRecords_BatchService.Layouts.batch_out);
 
   // If any individual offense categories were requested, filter output to only include the records
 	// that contain any of the requested offense categories.
-  results_out := if(not configdata.IncludeAtLeast1Offense,
+  results_out_fltr := if(not configdata.IncludeAtLeast1Offense,
 	                  // if no individual offense category was requested, return all records
-                    results_out_raw, 
+                    results_np, 
                     // else do a bitwise "AND" of all the requested Include***s bitmap against 
 										// each of the 6 occurrences of offense_category_* (bitmap) on each record.
 					          // If any resulting values are not = to zero, that rec will be returned.
-	                  results_out_raw(bitmap_all_includes & offense_category_1 != 0 or 
+	                  results_np(bitmap_all_includes & offense_category_1 != 0 or 
                                     bitmap_all_includes & offense_category_2 != 0 or 
                                     bitmap_all_includes & offense_category_3 != 0 or 
                                     bitmap_all_includes & offense_category_4 != 0 or 
@@ -172,7 +115,14 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
                                     bitmap_all_includes & offense_category_6 != 0));
   // end of 06/13/2017 offense categories enhancement
 	
-	consumer_statements := NORMALIZE(UNGROUP(results_all), LEFT.StatementsAndDisputes, 
+	results_all := UNGROUP(TOPN(GROUP(SORT(results_out_fltr, acctno, pty_typ), acctno), configData.MaxResults, acctno, -process_date));
+
+  //FFD   - records maybe suppressed due to alerts
+  results_out_raw := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(results_all, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_out_pre),
+	                       results_all);
+	
+	
+	consumer_statements := NORMALIZE(results_out_raw, LEFT.StatementsAndDisputes, 
 		TRANSFORM (FFD.Layouts.ConsumerStatementBatch, 
 			SELF.Acctno := left.Acctno,
 			SELF.SequenceNumber := left.SequenceNumber,
@@ -180,9 +130,13 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 
 	// append the actual contents of each consumer statement
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
+	
+	results_out := PROJECT(results_out_raw, CriminalRecords_BatchService.Layouts.batch_out);
 	
 	// store both records and statements under a single record structure
-	FFD.MAC.PrepareResultRecordBatch(results_out, record_out, consumer_statements_prep, CriminalRecords_BatchService.Layouts.batch_out);	
+	FFD.MAC.PrepareResultRecordBatch(results_out, record_out, consumer_statements_alerts, CriminalRecords_BatchService.Layouts.batch_out);	
 
 
   // Uncomment as needed for debugging

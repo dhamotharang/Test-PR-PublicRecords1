@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, ut, easi;
+import risk_indicators, riskwise, ut, easi, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -232,7 +232,7 @@ dist_conn_mail_ip := __common__( if((Real)dist_mail_ip = Null, Null, if(mobile_i
 
 dist_conn_retail_mail := __common__( if((Real)dist_retail_mail = Null, Null, if(mobile_ip = 1, (Real)dist_retail_mail + 100000, (Real)dist_retail_mail)) ) ;
 
-sysdate := __common__( common.sas_date(if(le.bs.historydate=999999, (string)ut.getdate, (string6)le.bs.historydate+'01')) ) ;
+sysdate := __common__( common.sas_date(if(le.bs.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.historydate+'01')) ) ;
 
 iv_pots_phone := __common__( (telcordia_type in ['00', '50', '51', '52', '54']) ) ;
 

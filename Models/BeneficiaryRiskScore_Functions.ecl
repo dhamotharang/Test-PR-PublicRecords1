@@ -1,6 +1,6 @@
 
 IMPORT Address, AutoStandardI, BatchShare, Doxie, Gateway, Models, Risk_Indicators, Riskwise, ut, VehicleV2, 
-VehicleV2_Services;
+VehicleV2_Services, std;
 
 EXPORT BeneficiaryRiskScore_Functions := MODULE
 	
@@ -393,7 +393,7 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 			SELF.age              := 
 					IF(
 						le.age_value = 0 AND (INTEGER)le.dob_value != 0, 
-						(STRING3)ut.GetAgeI_asOf((UNSIGNED)le.dob_value, (UNSIGNED)risk_indicators.iid_constants.myGetDate(le.history_date)), 
+						(STRING3)ut.Age((UNSIGNED)le.dob_value, (UNSIGNED)risk_indicators.iid_constants.myGetDate(le.history_date)), 
 						(STRING3)le.age_value
 					);
 			SELF.dl_number        := le.dl_number;
@@ -793,7 +793,7 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 				UNSIGNED3 historydate;
 				STRING30 Vehicle_Key;   
 				STRING25 vin;
-				UNSIGNED3 ttl_earliest_issue_date := ''; 
+				UNSIGNED3 ttl_earliest_issue_date := 0; 
 			END;
 
 			layout_owners_slim get_owner_info(layout_owners le) := TRANSFORM
@@ -846,7 +846,7 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 						SELF.historydate := 
 								IF( 
 									LEFT.historydate IN [ 0,999999 ] OR pbfSvcOptions.Include_Real_Time_Motor_Vehicle2, 
-									(UNSIGNED3)ut.GetDate[1..6], 
+									(UNSIGNED3)(((STRING)Std.Date.Today())[1..6]), 
 									LEFT.historydate 
 								),
 						SELF.ttl_earliest_issue_date := 

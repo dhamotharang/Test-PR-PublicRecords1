@@ -3,7 +3,7 @@
  * -Switch_Type adapted from Progressive_Phone.Mac_Get_Switchtype         *
  ************************************************************************ */
 
-IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT;
+IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT, data_services;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw_Phone (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
 	/* ************************************************************************
@@ -88,7 +88,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw
 	/* ************************************************************************
 	 *  Get Phone Debt Settlement Information																	*
 	 ************************************************************************ */
-	debtSettlementKey := AutokeyB2.Key_Phone(ut.foreign_prod + 'thor_data400::key::Debt_Settlement::qa::autokey::');
+	debtSettlementKey := AutokeyB2.Key_Phone(data_services.foreign_prod + 'thor_data400::key::Debt_Settlement::qa::autokey::');
 
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getDebtSettlement(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, debtSettlementKey ri) := TRANSFORM
 		// We have a hit on the debt settlement key

@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi;
+import risk_indicators, ut, easi, std;
 
 export CSN1007_0_0( dataset(Risk_Indicators.collection_shell_mod.collection_shell_layout_full) cclam ) := FUNCTION
 
@@ -2378,11 +2378,11 @@ Integer csn1007_2;
 		INTEGER year(integer sas_date) :=
 			if(sas_date = NULL, NULL, (integer)((ut.DateFrom_DaysSince1900(sas_date + ut.DaysSince1900('1960', '1', '1')))[1..4]));
 
-		sysdate :=  map(trim((string)archive_date) = '999999'  => models.common.sas_date((string)if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01')),
+		sysdate :=  map(trim((string)archive_date) = '999999'  => models.common.sas_date((string)if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
 						length(trim((string)archive_date)) = 6 => (ut.DaysSince1900((trim((string)archive_date))[1..4], (trim((string)archive_date))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 																			   NULL);
 
-		sysyear :=  map(trim((string)archive_date) = '999999'  => year(models.common.sas_date((string)if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01'))),
+		sysyear :=  map(trim((string)archive_date) = '999999'  => year(models.common.sas_date((string)if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'))),
 						length(trim((string)archive_date)) = 6 => (real)(trim((string)archive_date))[1..4],
 																			   NULL);
 		rc_correct_dob2 := models.common.sas_date((string)rc_correct_dob);

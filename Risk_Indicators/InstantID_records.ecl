@@ -152,7 +152,10 @@ string8 DateofApplication := '' : stored('DateofApplication');
 string8 TimeofApplication := '' : stored('TimeofApplication');
 
 boolean IncludeDPBC := false : stored('IncludeDPBC');
-boolean EnableEmergingID := false : stored('EnableEmergingID');
+boolean EnableEmergingID_temp := false : stored('EnableEmergingID');
+BOOLEAN allowemergingid := FALSE : STORED('allowemergingid');
+EnableEmergingID := allowemergingid or EnableEmergingID_temp; // part of RR-12092, check either the allowEmergingid tag or EnableEmergingID
+
 boolean IsIdentifier2 := false : stored('IsIdentifier2');
 temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
@@ -635,7 +638,8 @@ TRANSFORM
 	self.InstantIDVersion := (string)actualIIDVersion;
 
 	//new for Emerging Identities
-	self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
+	isEmergingID := Risk_Indicators.rcSet.isCodeEI(le.DID, le.socsverlevel, le.socsvalid) AND EnableEmergingID;
+	self.EmergingID := if(isEmergingID, true, false);  //a fake DID indicates an Emerging Identity
 	isReasonCodeSR	:= exists(reasons_with_seq(hri='SR')); //check if reason code 'SR' is set
 	self.AddressSecondaryRangeMismatch := map(le.sec_range = '' and isReasonCodeSR															=> 'D',	 //no input sec range, but our data has one
 																						le.sec_range <> '' and ~isReasonCodeSR and self.versecrange = ''	=> 'I',	 //input sec range, but our data does not have one

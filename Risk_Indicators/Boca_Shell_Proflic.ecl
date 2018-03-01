@@ -175,7 +175,7 @@ PL_Plus_temp roll_licenses(PL_Plus_temp le, PL_Plus_temp rt) := transform
 end;
 license_recs_dates:= project(license_recs(professional_license_flag = true), transform(PL_Plus_temp, 
 	self.tmp_MostRecent := if(LENGTH(trim((string8) left.date_most_recent)) < 8 and left.date_most_recent != 0,
-		(unsigned)	((string) left.date_most_recent[1..6] + '01'), left.date_most_recent), self := left));
+		(unsigned)	(((string)left.date_most_recent)[1..6] + '01'), left.date_most_recent), self := left));
 	
 sorted_licenses := group(sort(license_recs_dates, seq, did, -license_number_cleaned, source_st,
 	-tmp_MostRecent, -proflic_count,-PLcategory, record), seq);

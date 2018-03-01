@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, UCCv2, UCCv2_Services, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, UCCv2, UCCv2_Services, UT, std;
 
 EXPORT getUCC(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -140,7 +140,7 @@ EXPORT getUCC(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   
 	withUCCData := JOIN(withUCC, UCCDataRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																							TodaysDate := Business_Risk_BIP.Common.todaysDate(ut.GetDate, LEFT.Clean_Input.HistoryDate);
+																							TodaysDate := Business_Risk_BIP.Common.todaysDate((STRING8)Std.Date.Today(), LEFT.Clean_Input.HistoryDate);
 																							SortedUCC  := SORT(RIGHT.UCC_Record, -Date, FilingStatus, -FilingType);
 																							newestUCC  := Business_Risk_BIP.Common.checkInvalidDate(TOPN(SortedUCC ((INTEGER)Date > 0), 1, -Date)[1].Date, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);
 																							oldestUCC  := Business_Risk_BIP.Common.checkInvalidDate(TOPN(SortedUCC ((INTEGER)Date > 0), 1, Date)[1].Date, Business_Risk_BIP.Constants.MissingDate, LEFT.Clean_Input.HistoryDate);

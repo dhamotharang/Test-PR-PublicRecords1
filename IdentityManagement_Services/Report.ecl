@@ -13,13 +13,10 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
   did := dids[1].did;
 
 	pers := IdentityManagement_Services.report_records(dids, param);
-
-	//Check for compromised DL if the input flag is true.
-	glbOk := ut.PermissionTools.GLB.ok(param.GLBPurpose);
-	dppaOk := ut.PermissionTools.DPPA.ok(param.DPPAPurpose);
+	bestPerson := pers.person_report[1];
 
 	isDLCompromised := param.SuppressCompromisedDLs AND
-		IdentityManagement_Services.CompromisedDL.fn_CheckForMatch_ByDid(did, dppaOk, glbOk);
+		IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(bestPerson.Name.Last, bestPerson.SSNInfo.SSN);
 
 	//Personal record
 	p_person         := pers.person_report;

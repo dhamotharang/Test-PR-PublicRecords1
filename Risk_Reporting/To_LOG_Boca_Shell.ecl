@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, ut;
+IMPORT Risk_Indicators, ut, std;
 
 EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell To_LOG_Boca_Shell (
 																				GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) Boca_Shell,
@@ -29,7 +29,7 @@ EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell To_LOG_Boca_Shell (
 	Risk_Reporting.Layouts.LOG_Boca_Shell_Record FormatIntermediate() := TRANSFORM
 		SELF.transaction_id := ''; // Set by the ESP
 		SELF.product_id := Product_ID;
-		SELF.date_added := ut.getDate + ut.getTime(); // Current date
+		SELF.date_added := (STRING8)Std.Date.Today() + ut.getTime(); // Current date
 		SELF.process_type := (STRING4)Process_Type; //0 = Undetermined, 1 = Request, 2 for Response, 3 = Context, 4 = Internal
 		SELF.processing_time := '000.000'; // Set by the ESP
 		SELF.source_code := '';

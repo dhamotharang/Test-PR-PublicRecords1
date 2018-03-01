@@ -1,4 +1,4 @@
-EXPORT Constants := MODULE
+﻿EXPORT Constants := MODULE
 	// Phone Restriction Mask - Controls which types of phones can be returned
 	EXPORT PRM := ENUM(AllPhones = 0,
 										SubjectDIDOnly = 1,
@@ -16,16 +16,12 @@ EXPORT Constants := MODULE
 	
 	EXPORT maxEQP_Phones := 3;
 	
-	EXPORT maxEXP_Phones := 3;
-	
 	EXPORT Default_DataPermission := '000000000000000'; // Currently 9 bits - see AutoStandardI.DataPermissionI for bit definitions, by default don't turn any on
 
 	EXPORT default_DataRestriction := '000001000100110000000000'; 
 
 	EXPORT Default_InsuranceVerificationAgeLimit := 730; // In days (2 Years)
 
-	EXPORT Default_ExperianPhoneScoreLimit := 632; // Minimum phone score needed to call the Experian Gateway
-	
 	EXPORT Default_SPIIAccessLevel := ''; // Should have 5A or 5B to use TransUnion Gateway
 	
 	EXPORT HeaderSearchDate := 1826; // 5 Years (Including 1 extra day for leap years) since this is the oldest phone search (EDAHistory)

@@ -39,9 +39,7 @@ MODULE
     EXPORT BOOLEAN 	 type_a_with_did 						:= FALSE;
     EXPORT BOOLEAN 	 useNeustar 								:= FALSE;
     EXPORT BOOLEAN 	 default_sx_match_limit 		:= FALSE;
-    EXPORT BOOLEAN 	 callMetronet 							:= FALSE;
     EXPORT BOOLEAN 	 isPFR 											:= FALSE;
-    EXPORT INTEGER 	 metronetLimit 							:= 0;
     EXPORT STRING    ScoreModel             		:= '';
     EXPORT UNSIGNED1 MaxNumAssociate            := 0;
 		EXPORT UNSIGNED1 MaxNumAssociateOther       := 0;
@@ -52,7 +50,6 @@ MODULE
 		EXPORT UNSIGNED1 MaxNumSubject            	:= 0;
 		EXPORT UNSIGNED1 MaxNumNeighbor            	:= 0;
 		EXPORT BOOLEAN	 ReturnPhoneScore						:= FALSE;
-		EXPORT BOOLEAN 	 Confirmation_GoToGateway 	:= FALSE;
 		EXPORT BOOLEAN 	 UsePremiumSource_A 				:= FALSE;
 		EXPORT INTEGER 	 PremiumSource_A_limit 			:= 0; 
 		EXPORT BOOLEAN 	 RunRelocation 							:= FALSE;

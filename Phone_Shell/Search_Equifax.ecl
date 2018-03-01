@@ -1,4 +1,4 @@
-/* ****************************************************************************
+﻿/* ****************************************************************************
  * This function searches the Equifax Key.	  												        *
  * This key is only searched if the Data restriction mask (24) is not set *
  * and the UsePremiumSource_A is set to true.
@@ -18,7 +18,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getEquiFax(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhoneMart.key_phonemart_did ri) := TRANSFORM
 		SELF.Gathered_Phone := ri.phone;
 		
-		// Equifax doesn't return names/dob, we can attempt to match the c and DID that were on the Experian flat file used to get the Experian PIN above
+		// Equifax doesn't return names/dob, we can attempt to match the c and DID 
 		 matchCode := Phone_Shell.Common.generateMatchcode(le.Clean_Input.FirstName, le.Clean_Input.LastName, le.Clean_Input.StreetAddress1, 
 		 le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Addr_Suffix, le.Clean_Input.City, le.Clean_Input.State, 
 		 le.Clean_Input.Zip5, le.Clean_Input.DateOfBirth, le.Clean_Input.SSN, le.DID, le.Clean_Input.HomePhone, le.Clean_Input.WorkPhone, 
@@ -28,7 +28,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 		SELF.Sources.Source_List := IF(EquifaxAllowed and Phone_Shell.Common.PhoneRestrictionMaskOK(PhoneRestrictionMask, matchcode, le.Clean_Input.LastName, '', isGatewayResult := FALSE), 'EQP', '');	
 		SELF.Sources.Source_List_First_Seen := Phone_Shell.Common.parseDate((STRING)ri.dt_first_seen);
 		SELF.Sources.Source_List_Last_Seen := Phone_Shell.Common.parseDate((STRING)ri.dt_last_seen);
-	  SELF.Sources.Source_Owner_DID := (string) ri.DID;
+	 SELF.Sources.Source_Owner_DID := (string) ri.DID;
 		SELF.Sources.Source_Owner_Name_First 	:=  ri.Fname; 
 		SELF.Sources.Source_Owner_Name_Middle := ri.Mname;
 		SELF.Sources.Source_Owner_Name_Last 	:=  ri.Lname;
@@ -39,6 +39,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 		SELF.Raw_Phone_Characteristics.Phone_Subject_Title := 'Subject';
 		SELF.Raw_Phone_Characteristics.Phone_Match_Code := matchCode; 
 		SELF.Royalties.EFXDataMart_Royalty := IF(ri.phone <> '', 1, 0);
+		SELF.Bureau.Bureau_Last_Update := TRIM((string)ri.DT_LAST_SEEN);
+		SELF.Bureau.Bureau_Verified := TRUE;
+		SELF.Experian_File_One_Verification.Experian_Verified := TRUE; //populating for sake of existing model
+		SELF.Experian_File_One_Verification.Experian_Last_Update := TRIM((string)ri.DT_LAST_SEEN);//populating for sake of existing model
 		SELF := le;
 
 	END;

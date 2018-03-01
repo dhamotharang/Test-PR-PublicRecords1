@@ -137,7 +137,7 @@ Integer	 fp1706_1_0;
 
 NULL := -999999999;
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 banko_flag := __common__(map(
     not(truedid)                => NULL,

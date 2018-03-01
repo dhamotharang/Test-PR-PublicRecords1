@@ -1,4 +1,4 @@
-import iesp, Risk_Indicators, Fingerprint, ut, Gateway;
+import iesp, Risk_Indicators, Fingerprint, ut, Gateway, std;
 
 /*
 This information is required on transactions...
@@ -58,10 +58,10 @@ export AMLNegNewsRequest( DATASET(AMLNegNewsInput) iin, boolean enableNews) := F
 			iesp.gateway_news.t_NewsSearchRequest into_inq(AMLNegNewsInput L, string securityToken) := transform
 				dateConvert(string d) := d[1..4] + '-' + d[5..6] + '-' + d[7..8];	
 
-				historydate := if( L.historydate >= 999999, ut.getDate, (string)(L.historydate) + '01');
+				historydate := if( L.historydate >= 999999, (STRING)Std.Date.Today(), (string)(L.historydate) + '01');
 				self.query := L.query;
 
-				useDate := historyDate != ut.GetDate;
+				useDate := historyDate != (STRING)Std.Date.Today();
 				sourceId := if( useDate, '8399', '140560'); // if we are running history use 8339 for source.
 				self.SourceInfo.SourceIdList := dataset([{sourceId}],iesp.share.t_StringArrayItem);
 				self.SearchOptions.DateRestriction.StartDate := if(useDate, dateConvert(ut.getDateOffset(-2*365,historydate)), '');
@@ -93,7 +93,7 @@ export AMLNegNewsRequest( DATASET(AMLNegNewsInput) iin, boolean enableNews) := F
 		
 		AMLNegNewsOutput newsTransform(AMLNegNewsInput L, iesp.gateway_news.t_NewsSearchResponseEx R) := TRANSFORM
 				
-				historydate := if( L.historydate >= 999999, ut.getDate, (string)(L.historydate) + '01');
+				historydate := if( L.historydate >= 999999, (STRING)Std.Date.Today(), (string)(L.historydate) + '01');
 				
 				self.seq := L.seq; //(integer)R.response._header.QueryId;
 				self.n_status := R.response._header.status;

@@ -1,4 +1,4 @@
-import business_header_ss,ut, lib_fileservices, header_services,codes;
+import business_header_ss,ut, lib_fileservices, header_services,codes, Data_Services;
 
 bh_base := Business_Header.filters.bases.business_header_best(Files().Base.Business_Headers.built);
 codesV3 := codes.Key_Codes_V3;
@@ -143,4 +143,4 @@ EXPORT Key_BH_Best_KnowX := INDEX(
 	f_best_blanksource_unique, 
 	{bdid},
 	{f_best_blanksource_unique},
-	ut.foreign_prod+'thor_data400::key::business_header.Best_Knowx_' + business_header_ss.key_version );
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Best_Knowx_' + business_header_ss.key_version );

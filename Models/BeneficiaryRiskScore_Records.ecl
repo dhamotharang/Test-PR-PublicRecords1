@@ -241,7 +241,7 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 						SELF.value_greater_than_threshold_count := 
 							COUNT( ri.vehicles( (UNSIGNED)base_price > (UNSIGNED)le.mvr_vehicle_threshold ) );
 						SELF.registrations_less_than_20yrs_count := 
-							COUNT( ri.vehicles( ut.MonthsApart(hist_date, earliest_registration_date[1..6]) <= 240));
+							COUNT( ri.vehicles( ut.MonthsApart(hist_date, ((STRING)earliest_registration_date)[1..6]) <= 240));
 						SELF.registration_count := reg_count;
 						SELF.commercial_registration_count := COUNT(ri.vehicles(is_commercial));
 						SELF.registration_count_difference := reg_count - le.number_of_mvr;			

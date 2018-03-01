@@ -1,10 +1,10 @@
-import MDR,progressive_phone,Royalty;
-export FN_BatchFinalAssignments(infile, outlayout, callMetronet=false, UsePremiumSource_A=false, scoreModel='\'\'') := functionmacro
+﻿import MDR,progressive_phone,Royalty;
+export FN_BatchFinalAssignments(infile, outlayout, UsePremiumSource_A=false, scoreModel='\'\'') := functionmacro
 
 //get the running version of waterfall phones / Contact plus
 pHF         := progressive_phone.HelperFunctions;
 PPC         := progressive_phone.Constants;
-version     := pHF.FN_GetVersion(scoreModel,callMetronet,UsePremiumSource_A);
+version     := pHF.FN_GetVersion(scoreModel, UsePremiumSource_A);
 versionName := pHF.FN_GetVersionName(version);
 v_enum      := PPC.Running_Version;
 
@@ -18,8 +18,7 @@ outlayout into_out(infile l, integer i) := transform
 	self.subj_phone_type_new := if(l.subj_phone_type_new IN PPC.Premium_Source_Set, PPC.premium, l.subj_phone_type_new);
 	
 // Add royalty_type field for batch. Batch is not yet able to handle Royalty_Set.
-	self.royalty_type := map(l.subj_phone_type_new = MDR.sourceTools.src_Metronet_Gateway => Royalty.Constants.RoyaltyType.METRONET,
-                           l.subj_phone_type_new = MDR.sourceTools.src_Equifax          => Royalty.Constants.RoyaltyType.EFX_DATA_MART,
+	self.royalty_type := map( l.subj_phone_type_new = MDR.sourceTools.src_Equifax          => Royalty.Constants.RoyaltyType.EFX_DATA_MART,
                            l.vendor in Royalty.Constants.LastResortRoyalty              => Royalty.Constants.RoyaltyType.LAST_RESORT,
                            l.royalty_type);  
 														

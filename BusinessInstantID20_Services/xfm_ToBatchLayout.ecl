@@ -10,7 +10,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				// Record identifiers
 				SELF.seq := le.InputEcho.seq;
 				SELF.acctno := le.InputEcho.acctno;
-				SELF.HistoryDate := IF( (STRING)(le.InputEcho.HistoryDate)[1..6] = '999999', 0, le.InputEcho.HistoryDate );
+				SELF.HistoryDate := IF( ((STRING)le.InputEcho.HistoryDate)[1..6] = '999999', 0, le.InputEcho.HistoryDate );
 				SELF.transaction_id := le.InputEcho.transaction_id;
 				SELF.NumberValidAuthRepsInput := le.InputEcho.NumberValidAuthRepsInput;
 				

@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, easi;
+import ut, Risk_Indicators, RiskWise, easi, std;
 
 export RSN912_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -167,7 +167,7 @@ export RSN912_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, datas
 		current_count                    := le.vehicles.current_count;
 		historical_count                 := le.vehicles.historical_count;
 		inferred_dob                     := le.reported_dob;
-		archive_date                     := if( le.historydate=999999, ut.getdate[1..6], (string6)le.historydate );
+		archive_date                     := if( le.historydate=999999, ((STRING)Std.Date.Today())[1..6], (string6)le.historydate );
 		C_BORN_USA                       := ri.born_usa;
 		C_SPAN_LANG                      := ri.span_lang;
 		Curr_Debt_Amt                    := le.cus_chargeoff_amt;

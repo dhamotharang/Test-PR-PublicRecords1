@@ -53,7 +53,7 @@ EXPORT fn_smart_aml_properties(dataset(iesp.smartlinxreport.t_SLRPropertyAssessm
 			SELF.unique_prop_id := unique_property_id(l.PropertyAddress.StreetNumber,l.PropertyAddress.StreetName);
 			SELF.OwnerOccupiedIndicator := isOwnerOccupied(l);
 			saleDate := INTFORMAT(l.SaleDate.Year,4,1) + INTFORMAT(l.SaleDate.Month,2,1) + INTFORMAT(l.SaleDate.Day,2,1);
-			SELF.LengthOfOwnership := (STRING) ut.GetAgeI((INTEGER)saleDate);
+			SELF.LengthOfOwnership := (STRING) ut.Age((INTEGER)saleDate);
 			SELF := l;
 			self := [];
 	END;

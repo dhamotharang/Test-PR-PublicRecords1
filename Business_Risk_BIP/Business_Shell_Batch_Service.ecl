@@ -62,7 +62,7 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	DATASET(Business_Risk_BIP.Layouts.Input) Input_pre := DATASET([], Business_Risk_BIP.Layouts.Input) : STORED('Batch_In');
 	
 	// Allow for a longer HistoryDate format (e.g. YYYYMMDD, YYYYMMDDTTTT), which are preserved in full in historydatetime.
-	Input := PROJECT(Input_pre, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF.HistoryDate := (UNSIGNED3)((STRING12)LEFT.HistoryDate[1..6]), SELF.HistoryDateTime := LEFT.HistoryDate, SELF := LEFT));
+	Input := PROJECT(Input_pre, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF.HistoryDate := (UNSIGNED3)(((STRING12)LEFT.HistoryDate)[1..6]), SELF.HistoryDateTime := LEFT.HistoryDate, SELF := LEFT));
 
 	// Option Fields
 	UNSIGNED1	DPPA_Purpose         := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPA_Purpose');

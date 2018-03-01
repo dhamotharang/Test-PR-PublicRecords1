@@ -4,7 +4,7 @@ b := watchdog.File_Best;
 
 pcr := record
   b.did;
-  unsigned1 age := ut.GetAgeI(b.dob);
+  unsigned1 age := ut.Age(b.dob);
   string1   gender := datalib.gender(trim(b.fname));
   end;
 

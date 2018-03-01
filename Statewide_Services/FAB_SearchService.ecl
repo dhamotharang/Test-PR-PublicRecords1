@@ -87,7 +87,7 @@ IMPORT doxie, FAB_Statewide, FAP_Statewide;
 
 EXPORT FAB_SearchService() := MACRO
 
-	#OPTION ('optimizeProjects', FALSE)
+	#OPTION ('optimizeProjects', FALSE);
 	
 	#STORED('PenaltThreshold', 10);
 	#Stored('IsBdid',TRUE);

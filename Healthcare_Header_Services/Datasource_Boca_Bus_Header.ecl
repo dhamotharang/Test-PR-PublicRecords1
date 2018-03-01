@@ -1,7 +1,7 @@
 import BatchServices,Business_Header,ut,BIPV2,std;
 EXPORT Datasource_Boca_Bus_Header := Module
 	// Recode to hit BIP Header...
-	Shared CurrentYYMM := (string)ut.GetDate[1..6];
+	Shared CurrentYYMM := ((STRING8)Std.Date.Today())[1..6];
 	Export get_BIP_Records (dataset(Layouts.autokeyInput) input) := function
 		//Project input into Bip format
 		recFmt := BIPV2.IDfunctions.rec_SearchInput;
@@ -37,7 +37,7 @@ EXPORT Datasource_Boca_Bus_Header := Module
 		BipRawAddressLimit := join(input,rawRecsAddress(company_name<>''), left.acctno=right.acctno, transform(recordof(rawRecsAddress), self := right),keep(Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0));
 		rawRecsAddressMatch := Join(BipRawAddressLimit,BipAddressInput, left.acctno=right.acctno, transform(recordof(rawRecsAddress), 
 																								setThreshold := if(right.bipExactFound,Constants.BUS_NAME_BIPMATCH_ADDR_THRESHOLD,Constants.BUS_NAME_BIPMATCH_THRESHOLD);
-																								RecordYYMM:=left.dt_last_seen[1..6];
+																								RecordYYMM:=((STRING)left.dt_last_seen)[1..6];
 																								RecordAge := ut.MonthsApart(CurrentYYMM,RecordYYMM);
 																								keepRec := Functions.CompareBusinessNameConfidence(left.company_name,right.comp_name)> setThreshold and RecordAge < 24;
 																								self.company_name := if(keepRec,left.company_name,skip);

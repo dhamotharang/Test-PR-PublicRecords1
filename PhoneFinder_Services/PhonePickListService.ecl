@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PhonePickListService">
 	<part name="Phone" type="xsd:string"/>
 	<separator />
@@ -68,7 +68,6 @@ MACRO
 		EXPORT BOOLEAN   UseInHouseQSent     := doxie.DataPermission.use_QSent;
 		EXPORT BOOLEAN   UseQSent            := FALSE;
 		EXPORT BOOLEAN   UseTargus           := FALSE;
-		EXPORT BOOLEAN   UseMetronet         := FALSE;
 		EXPORT BOOLEAN   IsPhone7Search      := TRUE;
 	END;
 	

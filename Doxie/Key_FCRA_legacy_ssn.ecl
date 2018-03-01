@@ -1,4 +1,4 @@
-import ut,header,mdr;
+import ut,header,mdr, data_services;
 
 dSyncd1:=header.fn_FCRA_sync_legacy_ssn;
 
@@ -14,4 +14,4 @@ dSyncd2:=join(distribute(dHeader2(src in mdr.sourceTools.set_scoring_FCRA),hash(
 
 records := dedup(sort(distribute(dSyncd1+dSyncd2,hash(did)),record,local),record,local);
 
-export Key_FCRA_legacy_ssn := INDEX(records((unsigned)ssn>0), {records},ut.Data_Location.Person_header + 'thor_data400::key::FCRA::header.legacy_ssn_' + doxie.version_superkey,opt);
+export Key_FCRA_legacy_ssn := INDEX(records((unsigned)ssn>0), {records}, Data_Services.Data_location.person_header + 'thor_data400::key::FCRA::header.legacy_ssn_' + doxie.version_superkey,opt);

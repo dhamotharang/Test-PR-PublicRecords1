@@ -76,7 +76,7 @@ transform(layout_gong,
 // bocashell 3 gong field rollups
 Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_ADL_dt_first_seen_full := (string)ut.Min2((unsigned)le.gong_did.gong_ADL_dt_first_seen_full, (unsigned)ri.gong_did.gong_ADL_dt_first_seen_full);
-	self.gong_did.gong_ADL_dt_last_seen_full := (string)ut.max2 ((unsigned)le.gong_did.gong_ADL_dt_last_seen_full, (unsigned)ri.gong_did.gong_ADL_dt_last_seen_full);
+	self.gong_did.gong_ADL_dt_last_seen_full := (string)max ((unsigned)le.gong_did.gong_ADL_dt_last_seen_full, (unsigned)ri.gong_did.gong_ADL_dt_last_seen_full);
 	self.gong_did.gong_did_phone_ct := le.gong_did.gong_did_phone_ct + if(le.gongPhone=ri.gongPhone, 0, ri.gong_did.gong_did_phone_ct);
 	self.phones_on_file := if(le.gongPhone=ri.gongPhone, le.phones_on_file, trim(le.phones_on_file) + ri.phones_on_file + ',');
 	self.phones_on_file_created12months := if(le.gongPhone=ri.gongPhone, 
@@ -144,7 +144,7 @@ invalid_phone_stats := record
 	did := d_phone.did;
 	seq := d_phone.seq;
 	invalid_phone_ct := count(group);
-	invalid_phone_ct_c6 := count(group, ut.DaysApart(risk_indicators.iid_constants.myGetDate(d_phone.historydate), d_phone.dt_first_seen[1..6]+'31') < 183);
+	invalid_phone_ct_c6 := count(group, ut.DaysApart(risk_indicators.iid_constants.myGetDate(d_phone.historydate), ((STRING)d_phone.dt_first_seen)[1..6]+'31') < 183);
 end;
 invalid_phone_counts := table(d_phone, invalid_phone_stats, seq, did);
 

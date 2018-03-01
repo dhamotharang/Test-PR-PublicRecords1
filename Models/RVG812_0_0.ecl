@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
 
 export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -84,7 +84,7 @@ export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 		felony_count                    :=  le.bjl.felony_count;
 		prof_license_flag               :=  (INTEGER)le.professional_license.professional_license_flag;
 		addr_stability                  :=  le.mobility_indicator;
-		archive_date                    :=  if(999999=le.historydate, (unsigned3)ut.GetDate[1..6], le.historydate);
+		archive_date                    :=  if(999999=le.historydate, (unsigned3)((STRING)Std.Date.Today())[1..6], le.historydate);
 		
 		
 		rc_lnamessnmatch2               :=  le.iid.lastssnmatch2;
@@ -93,7 +93,7 @@ export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 
 		INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-		sysyear := archive_date[1..4];
+		sysyear := ((STRING)archive_date)[1..4];
 
 		usps_deliverable :=  if(rc_addrvalflag = 'V', 1, 0);
 
@@ -466,7 +466,7 @@ export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 
 		felony_flag :=  if(felony_count > 0, 1, 0);
 
-		mth_since_crim := ut.DaysApart( (string8)criminal_last_date, archive_date[1..6]+'01' ) * (12 / 365.25);
+		mth_since_crim := ut.DaysApart( (string8)criminal_last_date, ((STRING8)archive_date)[1..6]+'01' ) * (12 / 365.25);
 
 		yr_since_crim :=  if(criminal_last_date = 0, -9, truncate((mth_since_crim / 12)));
 

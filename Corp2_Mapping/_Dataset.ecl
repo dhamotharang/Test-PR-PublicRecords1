@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, versioncontrol, ut, data_services;
 
 export _Dataset(
 
@@ -8,8 +8,8 @@ export _Dataset(
 module
 
 	export foreign_environment := if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,data_services.foreign_prod
+																	,data_services.foreign_dataland
 																);
 												
 	export Name										:= 'Corp2'		;
@@ -18,7 +18,7 @@ module
 																			,'~thor_data400::'
 																		);
 	export foreign_prod := if(VersionControl._Flags.IsDataland
-													,ut.foreign_prod
+													,Data_Services.foreign_prod
 													,'~'
 												);
 	export thor_cluster_Persists	:= thor_cluster_Files		;

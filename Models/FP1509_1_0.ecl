@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, easi, Models;
+import risk_indicators, riskwise, riskwisefcra, ut, easi, Models, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -105,7 +105,7 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 rv_s65_ssn_deceased := map(
     not(truedid or (integer)ssnlength > 0)                                          => ' ',

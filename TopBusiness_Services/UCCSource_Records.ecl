@@ -190,7 +190,7 @@ EXPORT UCCSource_Records (
 											 exists(L.secureds(exists(addresses(orig_address1<>'' or orig_address2 <>''))));
 		  self.hasPhone := false;
 			self.dt_first_seen := ut.NormDate((unsigned)L.orig_filing_date);
-			self.dt_last_seen := ut.max2(ut.NormDate((unsigned)L.orig_filing_date),ut.NormDate((unsigned)L.cmnt_effective_date));
+			self.dt_last_seen := max(ut.NormDate((unsigned)L.orig_filing_date),ut.NormDate((unsigned)L.cmnt_effective_date));
 			self := [];
 	END;
 	

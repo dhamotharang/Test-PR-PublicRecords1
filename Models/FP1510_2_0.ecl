@@ -1,7 +1,7 @@
 /*2016-02-03T22:28:38Z ()
 Sandboxed
 */
-import easi, Models, risk_indicators, riskwise, ut;
+import easi, Models, risk_indicators, riskwise, ut, std;
 
 blank_ip := dataset( [{0}], riskwise.Layout_IP2O )[1];
 
@@ -1193,7 +1193,7 @@ export FP1510_2_0(dataset(risk_indicators.Layout_Boca_Shell) clam,
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string)le.historydate));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string)le.historydate));
 
 r_s65_ssn_prior_dob_i := __common__( map(
     not((integer)ssnlength > 0 and dobpop)            => NULL,

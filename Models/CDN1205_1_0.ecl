@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, Risk_Indicators, business_risk, easi;
+IMPORT ut, RiskWise, Risk_Indicators, business_risk, easi, std;
 
 export CDN1205_1_0(grouped dataset(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 									dataset(RiskWise.Layout_CD2I) indata,
@@ -757,7 +757,7 @@ FUNCTION
 	paw_source_count                 := le.bs.Bill_To_Out.employment.source_ct;
 	infutor_nap                      := le.bs.Bill_To_Out.infutor_phone.infutor_nap;
 	wealth_index                     := le.bs.Bill_To_Out.wealth_indicator;
-	archive_date                     := IF(le.bs.Bill_To_Out.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.bs.Bill_To_Out.historydate[1..6]);
+	archive_date                     := IF(le.bs.Bill_To_Out.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.bs.Bill_To_Out.historydate)[1..6]);
 	did_s                            := le.bs.Ship_To_Out.did;
 	truedid_s                        := le.bs.Ship_To_Out.truedid;
 	out_unit_desig_s                 := le.bs.Ship_To_Out.shell_input.unit_desig;

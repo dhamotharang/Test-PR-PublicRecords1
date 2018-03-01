@@ -1,10 +1,10 @@
-IMPORT Risk_Indicators, ut, Models;
+IMPORT Risk_Indicators, ut, Models, std;
 
 EXPORT Business_Attributes_Master(Risk_Indicators.Layout_Boca_Shell clam) := MODULE
  /* *************************************
 	*    Shared Intermediate Variables    *
 	*************************************** */
-	SHARED sysdate := IF(clam.historydate <> 999999, (INTEGER)((STRING)clam.historydate[1..6]), (INTEGER)(ut.GetDate[1..6]));
+	SHARED sysdate := IF(clam.historydate <> 999999, (INTEGER)(((STRING)clam.historydate)[1..6]), (INTEGER)( ((STRING8)Std.Date.Today())[1..6]));
 	
 	SHARED reported_age := TRUNCATE(((sysdate - Models.Common.SAS_Date((STRING)clam.reported_dob)) / 365.25));
 	

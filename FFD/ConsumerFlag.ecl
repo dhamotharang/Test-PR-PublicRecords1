@@ -36,9 +36,9 @@ EXPORT ConsumerFlag := MODULE
     RETURN consumer_alerts;
   END;
 
-  STRING1 subject_has_alert := 'Y';
+  STRING1 subject_has_alert := FFD.Constants.subject_has_alert;
   
-  FFD.layouts.ConsumerFlagsBatch  xf_prepare_alerts(FFD.Layouts.PersonContextBatch re,
+  FFD.layouts.ConsumerFlagsBatch xf_prepare_alerts(FFD.Layouts.PersonContextBatch re,
                                                     INTEGER purpose, BOOLEAN suppressIT) := TRANSFORM
       is_security_fraud_alert := re.RecordType = FFD.Constants.RecordType.FA;
       is_security_freeze := re.RecordType = FFD.Constants.RecordType.SF;
@@ -51,25 +51,27 @@ EXPORT ConsumerFlag := MODULE
                              OR (is_security_freeze AND purpose IN permissible_purpose_list)
                              OR (is_identity_theft AND suppressIT);
       SELF.suppress_records := suppress_due_alerts;                       
-      SELF.consumer_flags.has_consumer_statement := IF((~suppress_due_alerts AND re.RecordType IN FFD.Constants.RecordType.StatementRecordLevel) 
-                                                        OR re.RecordType IN FFD.Constants.RecordType.StatementConsumerLevel, subject_has_alert,'');
-      SELF.consumer_flags.security_freeze := IF(is_security_freeze, subject_has_alert,'');
-      SELF.consumer_flags.security_fraud_alert := IF(is_security_fraud_alert, subject_has_alert,'');
-      SELF.consumer_flags.identity_theft := IF(is_identity_theft, subject_has_alert,'');
-      SELF.consumer_flags.legal_flag := IF(re.RecordType = FFD.Constants.RecordType.LH, PersonContext.Constants.LegalFlag.Hold,'');
+      SELF.has_record_statement := re.RecordType IN FFD.Constants.RecordType.StatementRecordLevel;                       
+      SELF.has_consumer_statement := re.RecordType IN FFD.Constants.RecordType.StatementConsumerLevel;                       
+      SELF.consumer_flags.alert_security_freeze := IF(is_security_freeze, subject_has_alert,'');
+      SELF.consumer_flags.alert_security_fraud := IF(is_security_fraud_alert, subject_has_alert,'');
+      SELF.consumer_flags.alert_identity_theft := IF(is_identity_theft, subject_has_alert,'');
+      SELF.consumer_flags.alert_legal_flag := IF(re.RecordType = FFD.Constants.RecordType.LH, PersonContext.Constants.LegalFlag.Hold,'');
+      SELF.consumer_flags.alert_cnsmr_statement := '';  // this will be set later
   END;
     
-  FFD.layouts.ConsumerFlagsBatch  xf_roll_alerts(FFD.Layouts.ConsumerFlagsBatch le, 
-                                                FFD.Layouts.ConsumerFlagsBatch ri) := TRANSFORM
+  FFD.layouts.ConsumerFlagsBatch  xf_roll_alerts(FFD.layouts.ConsumerFlagsBatch le, FFD.layouts.ConsumerFlagsBatch ri) := TRANSFORM
       SELF.acctno := le.acctno;
       SELF.UniqueID := le.UniqueID;
       SELF.suppress_records := le.suppress_records OR ri.suppress_records;
-                             
-      SELF.consumer_flags.has_consumer_statement := IF(le.consumer_flags.has_consumer_statement<>'',le.consumer_flags.has_consumer_statement, ri.consumer_flags.has_consumer_statement);
-      SELF.consumer_flags.security_freeze := IF(le.consumer_flags.security_freeze<>'',le.consumer_flags.security_freeze, ri.consumer_flags.security_freeze);
-      SELF.consumer_flags.security_fraud_alert := IF(le.consumer_flags.security_fraud_alert<>'',le.consumer_flags.security_fraud_alert, ri.consumer_flags.security_fraud_alert);
-      SELF.consumer_flags.identity_theft := IF(le.consumer_flags.identity_theft<>'',le.consumer_flags.identity_theft, ri.consumer_flags.identity_theft);
-      SELF.consumer_flags.legal_flag := IF(le.consumer_flags.legal_flag<>'',le.consumer_flags.legal_flag, ri.consumer_flags.legal_flag);
+      SELF.has_record_statement := le.has_record_statement OR ri.has_record_statement;
+      SELF.has_consumer_statement := le.has_consumer_statement OR ri.has_consumer_statement;
+      // keeping consumer level statement flag separately from record level statement flag till final batch application                       
+      SELF.consumer_flags.alert_cnsmr_statement := '';  // this will be used by batch and set later
+      SELF.consumer_flags.alert_security_freeze := IF(le.consumer_flags.alert_security_freeze<>'',le.consumer_flags.alert_security_freeze, ri.consumer_flags.alert_security_freeze);
+      SELF.consumer_flags.alert_security_fraud := IF(le.consumer_flags.alert_security_fraud<>'',le.consumer_flags.alert_security_fraud, ri.consumer_flags.alert_security_fraud);
+      SELF.consumer_flags.alert_identity_theft := IF(le.consumer_flags.alert_identity_theft<>'',le.consumer_flags.alert_identity_theft, ri.consumer_flags.alert_identity_theft);
+      SELF.consumer_flags.alert_legal_flag := IF(le.consumer_flags.alert_legal_flag<>'',le.consumer_flags.alert_legal_flag, ri.consumer_flags.alert_legal_flag);
   END;
     
   EXPORT getAlertIndicators (DATASET (FFD.Layouts.PersonContextBatch) PersonContext,
@@ -88,6 +90,7 @@ EXPORT ConsumerFlag := MODULE
                        
     rolled_alerts := ROLLUP(srt_alerts, LEFT.acctno = RIGHT.acctno AND LEFT.UniqueID = RIGHT.UniqueID, 
                            xf_roll_alerts(LEFT,RIGHT));
+
     RETURN rolled_alerts;                       
  END;                          
 END;

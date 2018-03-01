@@ -19,7 +19,7 @@ export fn_ADLSegmentation(dataset(header.Layout_Header) f_, boolean isFCRA = FAL
 	// Just get all DIDs
 	f roller(f le,f ri) :=
 	TRANSFORM
-		SELF.dt_last_seen := ut.max2(le.dt_last_seen,ri.dt_last_seen);
+		SELF.dt_last_seen := max(le.dt_last_seen,ri.dt_last_seen);
 		SELF.dt_first_seen := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
 		SELF.ssn := IF(le.ssn<>'',le.ssn,ri.ssn);
 		SELF.jflag2 := IF(le.jflag2<>'',le.jflag2,ri.jflag2);

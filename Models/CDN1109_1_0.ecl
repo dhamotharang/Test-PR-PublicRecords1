@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -742,7 +742,7 @@ EXPORT cdn1109_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) c
 	ams_college_type                 := le.bs.Bill_To_Out.student.college_type;
 	prof_license_flag                := le.bs.Bill_To_Out.professional_license.professional_license_flag;
 	addr_stability_v2                := le.bs.Bill_To_Out.addr_stability;
-	archive_date                     := IF(le.bs.Bill_To_Out.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.bs.Bill_To_Out.historydate[1..6]);	
+	archive_date                     := IF(le.bs.Bill_To_Out.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.bs.Bill_To_Out.historydate)[1..6]);	
 	
 	// Bill To EASI Fields
 	C_BORN_USA                       := le.census.easi.born_usa;

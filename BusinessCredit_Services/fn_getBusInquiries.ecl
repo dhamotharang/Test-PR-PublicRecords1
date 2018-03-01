@@ -1,4 +1,6 @@
-﻿IMPORT BIPV2, BusinessCredit_Services, iesp, Inquiry_AccLogs, ut;
+﻿IMPORT BIPV2, BusinessCredit_Services, iesp, Inquiry_AccLogs, ut, std;
+
+todays_date := (string) STD.Date.Today();
 
 EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
 
@@ -23,10 +25,10 @@ EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) :
 	Inquiries_Recs := RECORD
 		Inquiries_Slim.IndustryName;
 		unsigned2 TotalInquiryCount		:= COUNT(GROUP);
-		unsigned2 InquiryCount03Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.ONE_MONTH , ut.GetDate));
-		unsigned2 InquiryCount06Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.SIX_MONTHS , ut.GetDate));
-		unsigned2 InquiryCount09Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.NINE_MONTHS , ut.GetDate));
-		unsigned2 InquiryCount12Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.ONE_YEAR , ut.GetDate));
+		unsigned2 InquiryCount03Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.ONE_MONTH , todays_date));
+		unsigned2 InquiryCount06Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.SIX_MONTHS , todays_date));
+		unsigned2 InquiryCount09Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.NINE_MONTHS , todays_date));
+		unsigned2 InquiryCount12Month := COUNT(GROUP, Inquiries_Slim.InquiryDate >= ut.getDateOffset(BusinessCredit_Services.Constants.ONE_YEAR , todays_date));
 	END;
 
 	Inquiries_count	:= TABLE(Inquiries_Slim,Inquiries_Recs,IndustryName);

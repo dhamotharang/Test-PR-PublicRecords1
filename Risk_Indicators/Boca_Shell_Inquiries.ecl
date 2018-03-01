@@ -90,7 +90,7 @@ deltabase_Name := gateways(servicename = Gateway.Constants.ServiceName.DeltaInqu
 
 //MS-160
 deltabase_URL := if(bsversion >= 50 and 
-( clam_pre_Inquiries[1].historydate=999999 or clam_pre_Inquiries [1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]) )
+( clam_pre_Inquiries[1].historydate=999999 or clam_pre_Inquiries [1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]) )
 and ~isFCRA, deltabase_check, '');
 
 DeltabaseGateway := DATASET ([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_Name;

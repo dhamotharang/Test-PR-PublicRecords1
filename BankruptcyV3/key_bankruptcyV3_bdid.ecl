@@ -1,7 +1,7 @@
-import bankruptcyv2, fcra, Doxie, ut;
+import bankruptcyv2, fcra, Doxie, ut, std;
 
 export key_bankruptcyv3_bdid(boolean isFCRA = false) := function
-	todaysdate := ut.GetDate;
+	todaysdate := (STRING8)Std.Date.Today();
 	get_recs := BankruptcyV2.file_bankruptcy_search_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 
 	slim_party := table(get_recs((unsigned6)bdid != 0), {	get_recs.bdid,

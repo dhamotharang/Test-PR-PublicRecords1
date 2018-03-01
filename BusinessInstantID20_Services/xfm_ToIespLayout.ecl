@@ -1072,12 +1072,12 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.Address.PostalCode						:= '';
 					SELF.Address.StateCityZip					:= '';		
 					SELF.Phone 												:= chron_le.phone;
-					SELF.DateFirstSeen.Year						:= (INTEGER)chron_le.dt_first_seen[1..4];
-					SELF.DateFirstSeen.Month					:= (INTEGER)chron_le.dt_first_seen[5..6];
-					SELF.DateFirstSeen.Day						:= (INTEGER)chron_le.dt_first_seen[7..8];
-					SELF.DateLastSeen.Year						:= (INTEGER)chron_le.dt_last_seen[1..4];
-					SELF.DateLastSeen.Month						:= (INTEGER)chron_le.dt_last_seen[5..6];
-					SELF.DateLastSeen.Day							:= (INTEGER)chron_le.dt_last_seen[7..8];
+					SELF.DateFirstSeen.Year						:= (INTEGER)((STRING)chron_le.dt_first_seen)[1..4];
+					SELF.DateFirstSeen.Month					:= (INTEGER)((STRING)chron_le.dt_first_seen)[5..6];
+					SELF.DateFirstSeen.Day						:= (INTEGER)((STRING)chron_le.dt_first_seen)[7..8];
+					SELF.DateLastSeen.Year						:= (INTEGER)((STRING)chron_le.dt_last_seen)[1..4];
+					SELF.DateLastSeen.Month						:= (INTEGER)((STRING)chron_le.dt_last_seen)[5..6];
+					SELF.DateLastSeen.Day							:= (INTEGER)((STRING)chron_le.dt_last_seen)[7..8];
 					SELF.IsBestAddress								:= chron_le.isBestMatch;
 				END;
 	
@@ -1120,7 +1120,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.Address.City								 := le.Watchlist_city;
 					SELF.Address.State							 := le.Watchlist_state;
 					SELF.Address.Zip5								 := le.Watchlist_zip[1..5];
-					SELF.Address.Zip4								 := le.Watchlist_zip[6..9];
+					SELF.Address.Zip4								 := '';
 					SELF.Address.County							 := '';
 					SELF.Address.PostalCode					 := '';
 					SELF.Address.StateCityZip				 := '';
@@ -1155,7 +1155,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.Address.City								 := gwl_le.Watchlist_city;
 					SELF.Address.State							 := gwl_le.Watchlist_state;
 					SELF.Address.Zip5								 := gwl_le.Watchlist_zip[1..5];
-					SELF.Address.Zip4								 := gwl_le.Watchlist_zip[6..9];
+					SELF.Address.Zip4								 := '';
 					SELF.Address.County							 := '';
 					SELF.Address.PostalCode					 := '';
 					SELF.Address.StateCityZip				 := '';

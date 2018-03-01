@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, easi;
+import ut, Risk_Indicators, RiskWise, easi, std;
 
 export RSN803_2_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
 									dataset(riskwise.Layout_SkipTrace) skiptrace) := 
@@ -31,9 +31,9 @@ Layout_RecoverScore doModel(temp_fields le, skiptrace rt) := TRANSFORM
 	string1 rc_ssnvalflag := le.iid.socsvalflag;
 	integer ssnlength := (integer)le.input_validation.ssn_length;
 	integer hphnpop := if(le.input_validation.homephone, 1, 0);
-	today := ut.GetDate;
-	ageDate := if(le.historydate <> 999999, (unsigned)((string)le.historydate[1..6]+'31'), (unsigned)today);
-	integer age := ut.GetAgeI_asOf(le.reported_dob, ageDate);
+	today := (STRING8)Std.Date.Today();
+	ageDate := if(le.historydate <> 999999, (unsigned)(((string)le.historydate)[1..6]+'31'), (unsigned)today);
+	integer age := ut.Age(le.reported_dob, ageDate);
 	integer add1_isbestmatch := if(le.address_verification.input_address_information.isbestmatch, 1, 0);
 	integer add1_naprop := le.address_verification.input_address_information.naprop;
 	integer property_owned_total := le.address_verification.owned.property_total;
@@ -76,7 +76,7 @@ Layout_RecoverScore doModel(temp_fields le, skiptrace rt) := TRANSFORM
 															liens_recent_unreleased_count>0 or liens_historical_unreleased_ct>0 => 5,
 															3);
 	
-	rel_criminal_total_3 := ut.imin2(rel_criminal_total,3);
+	rel_criminal_total_3 := Min(rel_criminal_total,3);
 	
 	dwell_status := map( rc_dwelltype = ' ' => 5,
 											 rc_dwelltype = 'A'	=> 3,
@@ -89,7 +89,7 @@ Layout_RecoverScore doModel(temp_fields le, skiptrace rt) := TRANSFORM
 	c_fammar_p_a := if(c_fammar_p_a1 = 0, 100, c_fammar_p_a1);
 	
 	age1 := if(age = 0, 45, age);
-	age_a := ut.max2( ut.imin2(age1,50), 21);
+	age_a := Max( Min(age1,50), 21);
 	
 	no_addrs_per_adl_c6_i :=  if(addrs_per_adl_c6 = 0, 1, 0);
 	

@@ -1060,7 +1060,7 @@ STRING	SuspiciousActivityIndex;
 	
 	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 	
-	sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+	sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 	// sysdate := common.sas_date('20150501');
 	
 	k_inf_nothing_found_i := (infutor_nap in [0]);

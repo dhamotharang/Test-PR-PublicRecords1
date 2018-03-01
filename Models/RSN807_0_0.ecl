@@ -1,4 +1,4 @@
-import Risk_Indicators;
+import Risk_Indicators, std;
 
 import ut, Risk_Indicators, RiskWise, easi;
 
@@ -142,7 +142,7 @@ export RSN807_0_0(
 		watercraft_count								:=  le.bs.watercraft.watercraft_count;
 		ams_file_type										:=  le.bs.student.file_type;
 		prof_license_flag               :=  (INTEGER)le.bs.professional_license.professional_license_flag;
-		archive_date										:=  if(le.bs.historydate=999999, (unsigned3)ut.getDate[1..6], le.bs.historydate);	
+		archive_date										:=  if(le.bs.historydate=999999, (unsigned3)((STRING)Std.Date.Today())[1..6], le.bs.historydate);	
 		
 		
  /************************************************************************************/
@@ -251,8 +251,8 @@ export RSN807_0_0(
 		add3_months_residence := if(add3_dt_first_seen_age >= 0, (integer)((arch_date_age - add3_dt_first_seen_age) / 30.5), -9999);	
 		
 		
-    ty   := ((integer)(string)archive_date[1..4])+0;
-    tm_2 := if( ((integer)(string)archive_date[5..6]) = 0, 1, ((integer)(string)archive_date[5..6])+0);
+    ty   := ((integer)((string)archive_date)[1..4])+0;
+    tm_2 := if( ((integer)((string)archive_date)[5..6]) = 0, 1, ((integer)((string)archive_date)[5..6])+0);
     td   := 1;
 
  
@@ -284,7 +284,7 @@ export RSN807_0_0(
 
 		prop := ((property_owned_total > 0) OR (property_sold_total > 0));
 
-		property_source := ((string)(integer)naprop[1] + ((string)source[1] + (string)(integer)prop[1]));
+		property_source := ((string)(integer)naprop + ((string)source + (string)(integer)prop));
 
 		property_source_m :=  Map(property_source = '010' => 0.3051536336,
 															property_source = '011'=> 0.2693920335,
@@ -297,7 +297,7 @@ export RSN807_0_0(
     property_owned_total_b := min(property_owned_total,2);
     property_sold_total_b := min(property_sold_total,2);
    
-	  property_owned_sold := property_owned_total_b[1] + property_sold_total_b[1];
+	  property_owned_sold := ((STRING)property_owned_total_b)[1] + ((STRING)property_sold_total_b)[1];
 
 		property_owned_sold_m := Map(property_owned_sold = '00' => 0.3119822658,
 																 property_owned_sold = '01' => 0.2333637192,
@@ -1096,8 +1096,8 @@ export RSN807_0_0(
 		bureau_sources_count := eq_count + tu_count;
 		total_count := nonbureau_sources_count + bureau_sources_count + pr_count;		
 
-    fy4 := (integer)adl_EQ_first_seen[1..4];
-    fm4 := (integer)adl_EQ_first_seen[5..6];
+    fy4 := (integer)((STRING)adl_EQ_first_seen)[1..4];
+    fm4 := (integer)((STRING)adl_EQ_first_seen)[5..6];
 
 		fd4 := 1;
 
@@ -1108,9 +1108,9 @@ export RSN807_0_0(
 										(integer)((mdy(tm_2, td, ty) - mdy(fm4_2, fd4, fy4)) / 365.25),
 										0);
 
-		fy5 := (integer)adl_tu_first_seen[1..4];
+		fy5 := (integer)((STRING)adl_tu_first_seen)[1..4];
 
-		fm5 := (integer)adl_tu_first_seen[5..6];
+		fm5 := (integer)((STRING)adl_tu_first_seen)[5..6];
 
 		fd5 := 1;
 
@@ -1121,9 +1121,9 @@ export RSN807_0_0(
 										(integer)((mdy(tm_2, td, ty) - mdy(fm5_2, fd5, fy5)) / 365.25),
 										0);
 
-		fy6 := (integer)adl_dl_first_seen[1..4];
+		fy6 := (integer)((STRING)adl_dl_first_seen)[1..4];
 
-		fm6 := (integer)adl_dl_first_seen[5..6];
+		fm6 := (integer)((STRING)adl_dl_first_seen)[5..6];
 
 		fd6 := 1;
 
@@ -1134,9 +1134,9 @@ export RSN807_0_0(
 										(integer)((mdy(tm_2, td, ty) - mdy(fm6_2, fd6, fy6)) / 365.25),
 										0);
 
-		fy7 := (integer)adl_pr_first_seen[1..4];
+		fy7 := (integer)((STRING)adl_pr_first_seen)[1..4];
 
-		fm7 := (integer)adl_pr_first_seen[5..6];
+		fm7 := (integer)((STRING)adl_pr_first_seen)[5..6];
 
 		fd7 := 1;
 
@@ -1147,9 +1147,9 @@ export RSN807_0_0(
 										(integer)((mdy(tm_2, td, ty) - mdy(fm7_2, fd7, fy7)) / 365.25),
 										0);
 
-		fy8 := (integer)adl_v_first_seen[1..4];
+		fy8 := (integer)((STRING)adl_v_first_seen)[1..4];
 
-		fm8 := (integer)adl_v_first_seen[5..6];
+		fm8 := (integer)((STRING)adl_v_first_seen)[5..6];
 
 		fd8 := 1;
 
@@ -1160,9 +1160,9 @@ export RSN807_0_0(
 									(integer)((mdy(tm_2, td, ty) - mdy(fm8_2, fd8, fy8)) / 365.25),
 									0);
 
-		fy9 := (integer)adl_em_first_seen[1..4];
+		fy9 := (integer)((STRING)adl_em_first_seen)[1..4];
 
-		fm9 := (integer)adl_em_first_seen[5..6];
+		fm9 := (integer)((STRING)adl_em_first_seen)[5..6];
 
 		fd9 := 1;
 
@@ -1173,9 +1173,9 @@ export RSN807_0_0(
 									 (integer)((mdy(tm_2, td, ty) - mdy(fm9_2, fd9, fy9)) / 365.25),
 									 0);
 
-		fy10 := (integer)adl_w_first_seen[1..4];
+		fy10 := (integer)((STRING)adl_w_first_seen)[1..4];
 
-		fm10 := (integer)adl_w_first_seen[5..6];
+		fm10 := (integer)((STRING)adl_w_first_seen)[5..6];
 
 		fd10 := 1;
 

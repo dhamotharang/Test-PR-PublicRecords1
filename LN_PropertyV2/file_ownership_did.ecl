@@ -266,7 +266,7 @@ ds_curr	:=	ungroup(iterate(ds_prop,transform(l_own,self.current:=((counter=1) or
 l_own toRoll(l_own L,l_own R)	:=	transform
 	self.current				:=	L.current or R.current;			// if any record is the latest,then we're the current owner
 	self.dt_first_seen	:=	ut.min2(L.dt_first_seen,	R.dt_first_seen);
-	self.dt_last_seen		:=	ut.max2(L.dt_last_seen,	R.dt_last_seen);
+	self.dt_last_seen		:=	max(L.dt_last_seen,	R.dt_last_seen);
 	self.hist						:=	if((count(L.hist)=LN_PropertyV2.Constants.maxRecsByOwnership),L.hist,L.hist&R.hist);
 	self								:=	L;
 end;

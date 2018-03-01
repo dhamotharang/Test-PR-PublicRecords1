@@ -1,5 +1,4 @@
-
-IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut;
+IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut, std;
 	
 EXPORT RVA1007_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -242,7 +241,7 @@ END;
 	************************************************************ */
 NULL := -999999999;
 
-sysdate := common.sas_date(if(le.historydate=999999, ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
 phn_pots := (telcordia_type in ['00', '50', '51', '52', '54']);
 

@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi, riskwise;
+import risk_indicators, ut, easi, riskwise, std;
 
 MSN_DEBUG := false;
 
@@ -381,7 +381,7 @@ export MSN1106_0_0( grouped dataset(risk_indicators.layout_boca_shell) clam ) :=
 
 		NULL := -999999999;
 
-		sysdate := if( archive_date=999999, ut.GetDate[1..6], (string6)archive_date );
+		sysdate := if( archive_date=999999, ((STRING)Std.Date.Today())[1..6], (string6)archive_date );
 		today := (ut.DaysSince1900(((string)sysdate)[1..4], ((string)sysdate)[5..6], (string)01) - ut.DaysSince1900('1960', '1', '1'));
 
 		tot_fr_pos := Models.Common.findw_cpp(ver_sources, 'FR' , ' ,', 'ie');

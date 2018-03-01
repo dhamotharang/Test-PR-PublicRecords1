@@ -593,7 +593,7 @@ risk_indicators.layout_input into_rep(df l) := transform
 	
 	self.ssn := ssn_val;
 	self.dob := dob_val;
-	self.age := if (Rep_Age = 0 and (integer)dob_val != 0, (STRING3)ut.GetAgeI((integer)dob_val), (string3)Rep_Age);
+	self.age := if (Rep_Age = 0 and (integer)dob_val != 0, (STRING3)ut.Age((integer)dob_val), (string3)Rep_Age);
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
 	

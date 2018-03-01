@@ -71,7 +71,7 @@ relatives_slim get_relat_info(idsOnly le, doxie.Key_Header ri) := TRANSFORM
 	SELF.state := ri.st;
 	SELF.county := ri.county;
 	SELF.geo_blk := ri.geo_blk;
-	SELF.age := ut.GetAgeI(ri.dob);
+	SELF.age := ut.Age(ri.dob);
 	SELF.dt_first_seen := ri.dt_first_seen;
 	SELF.dt_last_seen :=  ri.dt_last_seen;
 	SELF.sources := ri.src;
@@ -105,7 +105,7 @@ relatheader :=  JOIN(idsOnly, doxie.Key_Header,
 relatHeaderADDRSrt := dedup(sort(relatheader,seq, did, prim_name, prim_range, addr_suffix, zip5, -dt_first_seen), seq, did, prim_name, prim_range, addr_suffix, zip5);
 
 relatives_slim getAddrCount(relatHeaderADDRSrt le) := TRANSFORM
-     fsDate31 := le.dt_first_seen[1..6]+'31';
+     fsDate31 := ((STRING)le.dt_first_seen)[1..6]+'31';
 		 myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		 self.addrs_last36 :=  if(Risk_indicators.iid_constants.checkdays(myGetDate,fsDate31,Risk_indicators.iid_constants.threeyears, le.historydate), 1, 0);
 	   self.addrs_last_5years :=  if(Risk_indicators.iid_constants.checkdays(myGetDate,fsDate31,Risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0);
@@ -216,7 +216,7 @@ AddIncarcertion := join(AddVoterInfo, relatHdrSIC,
 HdrAddrMoveSrt := dedup(sort(relatheader(dt_first_seen<>0),seq, did, -dt_last_seen, dt_first_seen), seq, did);
 
 relatives_slim  recentMove(HdrAddrMoveSrt le)  := TRANSFORM
-    fsDate31 := le.dt_first_seen[1..6]+'31';
+    fsDate31 := ((STRING)le.dt_first_seen)[1..6]+'31';
 		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		self.LastMoveOvrYr    :=  if(Risk_indicators.iid_constants.checkdays(myGetDate,fsDate31,Risk_indicators.iid_constants.oneyear, le.historydate), 0, 1);
 		self := le;

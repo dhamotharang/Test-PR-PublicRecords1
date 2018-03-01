@@ -2,7 +2,7 @@
 
 */
 import Business_Risk, Business_Header_SS, ut, Business_Header, did_add, BankruptcyV2, BankruptcyV3,liensv2,
-			RiskWise, YellowPages, Risk_indicators, corp2, LN_PropertyV2, ADVO, BusReg, doxie, EASI, Address_Attributes, drivers, mdr, header;
+			RiskWise, YellowPages, Risk_indicators, corp2, LN_PropertyV2, ADVO, BusReg, doxie, EASI, Address_Attributes, drivers, mdr, header, std;
 
 EXPORT AMLBusinessShellFunction(DATASET(Business_Risk.Layout_Input) indata, 
 																																		string50 DataRestriction,
@@ -87,7 +87,7 @@ Layouts.AMLBusnAssocLayout intoOutLayout(bdidAdded l, bdidbest r) := transform
 	self.Bestphonescore	 := Risk_Indicators.PhoneScore(r.best_phone, l.phone10);
 	self.Bestfeinscore 	 := r.verify_best_fein;
 	self.Bestaddrscore 	 := r.verify_best_address;
-	myGetDate := if(l.historydate = 999999, ut.GetDate, Risk_indicators.iid_constants.full_history_date(l.historydate));
+	myGetDate := if(l.historydate = 999999, (STRING)Std.Date.Today(), Risk_indicators.iid_constants.full_history_date(l.historydate));
 	self.historydate := (integer)myGetDate;
 clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(r.best_addr1, r.best_city, r.best_state, r.best_zip);
 		self.prim_range      := if(l.prim_name = '', clean_a2[1..10], l.prim_range);
@@ -309,8 +309,14 @@ BusnHeadRec := join(bestrecs_init(bdid!=0), BusnHeader,
                     transform({recordof(BusnHeader), unsigned4 seq, unsigned4	historydate }, 
 										self.seq:=left.seq, 
 										self.historydate := left.historydate,
-                    self.dt_first_seen := if((unsigned)right.dt_first_seen[1..6]>0 and ((unsigned)right.dt_first_seen[7..8]=0 or trim(right.dt_first_seen[7..8])=''), (unsigned)((string)right.dt_first_seen[1..6]+'01'), right.dt_first_seen), 											
-										self.dt_last_seen := if((unsigned)right.dt_last_seen[1..6]>0 and ((unsigned)right.dt_last_seen[7..8]=0 or trim(right.dt_last_seen[7..8])=''), (unsigned)((string)right.dt_last_seen[1..6]+'01'), right.dt_last_seen), 
+                    self.dt_first_seen := if((unsigned)((STRING)right.dt_first_seen)[1..6]>0 and 
+                                             ((unsigned)((STRING)right.dt_first_seen)[7..8]=0 or trim(((STRING)right.dt_first_seen)[7..8])=''), 
+                                                  (unsigned)(((string)right.dt_first_seen)[1..6]+'01'), 
+                                                  right.dt_first_seen), 											
+										self.dt_last_seen := if((unsigned)((STRING)right.dt_last_seen)[1..6]>0 and 
+										                        ((unsigned)((STRING)right.dt_last_seen)[7..8]=0 or trim(((STRING)right.dt_last_seen)[7..8])=''), 
+										                             (unsigned)(((string)right.dt_last_seen)[1..6]+'01'), 
+										                             right.dt_last_seen), 
 										self := right), keep(150),
 										atmost(Keyed(right.bdid=left.bdid), RiskWise.max_atmost),
 										left outer);
@@ -1001,7 +1007,7 @@ END;
 DIDContHdr :=   join(DIDContDD, doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
-														RIGHT.dt_first_seen < (unsigned3)(string)left.historydate[1..6] AND
+														RIGHT.dt_first_seen < (unsigned3)((string)left.historydate)[1..6] AND
 														(header.isPreGLB(RIGHT) OR glb_ok) AND
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
 															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
@@ -1025,7 +1031,7 @@ PrepHdrSIC := join(DIDContHdrDS,risk_indicators.key_HRI_Address_To_SIC,
 				keyed(left.sec_range=right.sec_range) AND 
 				trim(right.sic_code)='2225' and
 				// check date
-				right.dt_first_seen < (unsigned3)(string)left.historydate[1..6],
+				right.dt_first_seen < (unsigned3)((string)left.historydate)[1..6],
 				getSICCode(left,right),left outer,
 				ATMOST(keyed(left.zip5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and
 					  keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
@@ -1083,7 +1089,7 @@ AddIncarceration :=  join(wBKs, BusnIncarRolled,
 
 Risk_indicators.layouts.layout_derogs_input  GetDerogs(DIDContDD le) := TRANSFORM
    self.seq := le.seq;
-	 self.historydate := (unsigned3)(string)le.historydate[1..6];
+	 self.historydate := (unsigned3)((string)le.historydate)[1..6];
 	 self.did  := le.did;
 	 self.isrelat := true;
 	 self := [];

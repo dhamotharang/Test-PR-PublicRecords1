@@ -1,4 +1,4 @@
-import header,ut,vehlic,data_services;
+import header,ut,vehlic, std, data_services;
 
 export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	dataset([],VehicleV2.Layout_Base_Main),
 														dataset(VehicleV2.Layout_Base.Party_bip)	pVehicleSearch	=	dataset([],VehicleV2.Layout_Base.Party_bip),
@@ -21,7 +21,7 @@ export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	d
 													(Orig_Vehicle_Type_Code != 'VS')
 													;
 	
-	dSourceDatasearch     := if (pFastHeader, dSourceDatasearch_(ut.DaysApart(ut.GetDate, date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceDatasearch_);							
+	dSourceDatasearch     := if (pFastHeader, dSourceDatasearch_(ut.DaysApart((STRING8)Std.Date.Today(), ((STRING)date_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceDatasearch_);							
 								
 								
 	dis_srch	:=	distribute(dSourceDatasearch,hash(state_origin,vehicle_key,iteration_key,source_code));
@@ -33,14 +33,14 @@ export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	d
 	end;
 
 	
-	ConvertYYYYMMToNumberOfMonths(integer	pInput)	:=	(((integer)(pInput[1..4])*12)	+	((integer)(pInput[5..6])));
+	ConvertYYYYMMToNumberOfMonths(integer	pInput)	:=	(((integer)(((STRING)pInput)[1..4])*12)	+	((integer)(((STRING)pInput)[5..6])));
 	 
 	src_rec	getall(dis_srch L,dis_main R)	:=	transform
-		self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)ut.GetDate) - ConvertYYYYMMToNumberOfMonths((integer)L.orig_DOB) > 180, L.orig_DOB ,'');
-		self.Date_First_Seen									:=	(unsigned3)L.Date_First_Seen[1..6];
-		self.Date_Last_Seen										:=	(unsigned3)L.Date_Last_Seen[1..6];
-		self.Date_Vendor_First_Reported				:=	(unsigned3)L.Date_Vendor_First_Reported[1..6];
-		self.Date_Vendor_Last_Reported				:=	(unsigned3)L.Date_Vendor_Last_Reported[1..6];
+		self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)Std.Date.Today()) - ConvertYYYYMMToNumberOfMonths((integer)L.orig_DOB) > 180, L.orig_DOB ,'');
+		self.Date_First_Seen									:=	(unsigned3)((STRING)L.Date_First_Seen)[1..6];
+		self.Date_Last_Seen										:=	(unsigned3)((STRING)L.Date_Last_Seen)[1..6];
+		self.Date_Vendor_First_Reported				:=	(unsigned3)((STRING)L.Date_Vendor_First_Reported)[1..6];
+		self.Date_Vendor_Last_Reported				:=	(unsigned3)((STRING)L.Date_Vendor_Last_Reported)[1..6];
 		self.append_clean_name.title					:=	L.title;                                                                                                                      
 		self.append_clean_name.fname					:=	L.fname;                                                                                                                      
 		self.append_clean_name.mname					:=	L.mname;                                                                                                                      

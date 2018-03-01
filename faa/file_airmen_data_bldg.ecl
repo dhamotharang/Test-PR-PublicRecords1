@@ -1,6 +1,6 @@
-import ut, header_services, faa;
+import ut, header_services, faa, data_services;
 
-ds := dataset(ut.foreign_prod+'~thor_data400::base::faa_airmen_building',faa.layout_airmen_data_out,flat);
+ds := dataset(data_services.foreign_prod+'~thor_data400::base::faa_airmen_building',faa.layout_airmen_data_out,flat);
 
 header_services.Supplemental_Data.mac_verify('file_faa_inj.thor',faa.layout_airmen_data_out,attr);
  

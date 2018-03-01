@@ -1,4 +1,4 @@
-IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT EASI, Business_Risk, ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT cdn1506_1_0 (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,
 										DATASET(Models.Layout_CD_CustomModelInputs) customInputs,
@@ -2074,7 +2074,7 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (string)ut.getdate, (string6)le.bs.Bill_To_Out.historydate+'01'));
+sysdate := common.sas_date(if(le.bs.Bill_To_Out.historydate=999999, (STRING)Std.Date.Today(), (string6)le.bs.Bill_To_Out.historydate+'01'));
 
 
 pf_ship_mode := map(

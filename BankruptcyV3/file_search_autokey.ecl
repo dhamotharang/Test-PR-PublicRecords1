@@ -1,7 +1,7 @@
-import standard, ut, doxie,address, fcra;
+import standard, ut, doxie,address, fcra, std;
 
 export file_search_autokey := function
-	todaysdate := ut.GetDate;
+	todaysdate := (STRING8)Std.Date.Today();
 	d1 :=  file_bankruptcy_search_keybuild(fcra.bankrupt_is_ok (todaysdate,date_filed));
 
 	rec := record

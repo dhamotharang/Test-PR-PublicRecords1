@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, easi, riskwise;
+import ut, Risk_Indicators, easi, riskwise, std;
 
 export RSN704_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Models.Layout_RecoverScore_Batch_Input) recoverscore_batchin) := function
 
@@ -19,7 +19,7 @@ with_rs_batchin := join(clam, recoverscore_batchin, left.seq=right.seq, add_rs(l
 
 Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRANSFORM 
 
-	sysyear := (integer)(ut.GetDate[1..4]);
+	sysyear := (integer)(((STRING)Std.Date.Today())[1..4]);
 	
 	addr_type_a := le.addr_type_a;
 	addr_confidence_a := le.addr_confidence_a;
@@ -95,7 +95,7 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
   
   	// handle the null values in SAS as -999 in ECL						
 	age := if(le.name_verification.age=0 or le.name_verification.age > 100, -999, le.name_verification.age);
-	age2 := if(age<>-999, ut.imin2(age, 83), 52);
+	age2 := if(age<>-999, Min(age, 83), 52);
 	age2_abs := abs(age2-39);
 	
 	high_issue_dateyr1 := (integer)(le.ssn_verification.validation.high_issue_date/10000);
@@ -112,8 +112,8 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 				   ssninval  =  1 and agediff_high_flag  =  1 => 1,
 				   2);
   
-  	lien_hist_un := ut.imin2(3, le.bjl.liens_historical_unreleased_count);
-	lien_hist_rel := ut.imin2(1, le.bjl.liens_historical_released_count);
+  	lien_hist_un := Min(3, le.bjl.liens_historical_unreleased_count);
+	lien_hist_rel := Min(1, le.bjl.liens_historical_released_count);
 	
 	lienprob := map(lien_hist_un  = 0 and lien_hist_rel  = 0 => 0, 
 					lien_hist_un  = 0 and lien_hist_rel  = 1 => 1, 
@@ -149,16 +149,16 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 							 add1_naprop = 1 and add1_isbestmatch  = 1 => 1,
 							 0);
 	
-	rel_criminal_count_cap3 := ut.imin2(le.relatives.relative_criminal_count, 3);
+	rel_criminal_count_cap3 := Min(le.relatives.relative_criminal_count, 3);
 
 	lname_change_year_s := (string)le.name_verification.lname_change_date;
 	yrs_since_lname_change := if(le.name_verification.lname_change_date=0, 7.5, 
-									ut.imin2(sysyear - (integer)lname_change_year_s[1..4], 11));
+									Min(sysyear - (integer)lname_change_year_s[1..4], 11));
 
 	census_missing := if(rt.geolink='', 1, 0);
 	
 	census_ed := (integer)le.address_verification.input_address_information.census_education;
-	add1_census_education := if(census_ed=0, 10, ut.imin2(ut.max2(census_ed,9), 17));
+	add1_census_education := if(census_ed=0, 10, Min(Max(census_ed,9), 17));
 
 	addr_a_level2_l := map(addr_a_level2 = 1 => -4.083171262, 
 						   addr_a_level2 = 2 => -3.857595359, 
@@ -241,7 +241,7 @@ Layout_RecoverScore doModel(with_rs_batchin le, easi.Key_Easi_Census rt) := TRAN
 	point :=  50;
 
 	recover_cred2 := (integer)(point*(log(phat/(1-phat)) - log(odds))/log(2) + base);
-	recover_cred := ut.imin2(ut.max2(recover_cred2, 250), 999);
+	recover_cred := Min(Max(recover_cred2, 250), 999);
 
 	
 	SELF.recover_score := intformat(recover_cred,3,1);

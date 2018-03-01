@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, Patriot, did_add;
+import ut, Business_Header, Business_Header_SS, Patriot, did_add, std;
 
 bdid_stats := Business_Risk.BDID_Table;
 
@@ -155,7 +155,7 @@ self.best_addr1 :=
 			os(r.prim_name) +
 			os(r.addr_suffix) +
 			os(r.postdir) +
-				if(ut.tails(r.prim_name, os(r.unit_desig) + os(r.sec_range)),
+				if(Std.Str.EndsWith(r.prim_name, os(r.unit_desig) + os(r.sec_range)),
 					'',
 					os(r.unit_desig) + os(r.sec_range));
 

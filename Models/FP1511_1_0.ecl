@@ -1,4 +1,5 @@
-IMPORT Models, Risk_Indicators, RiskWise, RiskView, UT, EASI;
+IMPORT Models, Risk_Indicators, RiskWise, RiskView, UT, EASI, std;
+
 //==============================
 //=== MoneyLion Custom Model ===
 //==============================
@@ -160,7 +161,7 @@ EXPORT FP1511_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam,
 //       sysdate := common.sas_date('20150501');	 
 //===   for round 2 validation set the sysdate to the archive date
 //========================================================================================
-  sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+  sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
   rv_d32_criminal_count := if(not(truedid), NULL, min(if(criminal_count = NULL, -NULL, criminal_count), 999));
 

@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, easi;
+import ut, Risk_Indicators, RiskWise, easi, std;
 
 export RSN804_1_0(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -31,11 +31,11 @@ export RSN804_1_0(
 		rc_hriskphoneflag               :=  le.iid.hriskphoneflag;
 		rc_phonezipflag                 :=  le.iid.phonezipflag;
 		lname_sources                   :=  StringLib.StringToUppercase(trim(le.Source_Verification.lastnamesources));
-		today                           :=  ut.GetDate;
+		today                           :=  (STRING8)Std.Date.Today();
 		sysyear                         :=  (INTEGER)today[1..4];
-		ageDate                         :=  if(le.historydate <> 999999, (unsigned)((string)le.historydate[1..6]+'31'), (unsigned)today);
+		ageDate                         :=  if(le.historydate <> 999999, (unsigned)(((string)le.historydate)[1..6]+'31'), (unsigned)today);
 
-		age                             :=  ut.GetAgeI_asOf(le.reported_dob, ageDate);
+		age                             :=  ut.Age(le.reported_dob, ageDate);
 		add1_house_number_match         :=  (integer)le.Address_Verification.Input_Address_Information.house_number_match;
 		add1_isbestmatch                :=  (integer)le.address_verification.input_address_information.isbestmatch;
 		add1_pop                        :=  (integer)le.input_validation.address;

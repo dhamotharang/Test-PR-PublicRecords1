@@ -1,4 +1,4 @@
-IMPORT BatchShare, BIPV2, doxie_cbrs, FFD;
+﻿IMPORT BatchShare, BIPV2, doxie_cbrs, FFD;
       
 
 EXPORT Batch_Layouts := MODULE
@@ -613,6 +613,7 @@ EXPORT Batch_Layouts := MODULE
 	
 	export fcra_batch_out := record(batch_out)
 		integer SequenceNumber := 0;
+		FFD.Layouts.ConsumerFlags;
 	 end;
 
   // to assemble statements from all entities in the record in one place	

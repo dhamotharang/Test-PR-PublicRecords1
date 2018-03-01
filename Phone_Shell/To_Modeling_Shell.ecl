@@ -1,4 +1,4 @@
-/*
+﻿/*
 	This function takes in the Phone Shell and converts it into a layout that the Modeling team can use.
 	SAS has limits to field names and lengths, so this is why we must convert the layout specially for them.
  */
@@ -10,6 +10,7 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		
 		// Phone Shell Fields
 		SELF.AcctNo := le.Phone_Shell.Input_Echo.AcctNo;
+		SELF.AccountNumber := le.Phone_Shell.Input_Echo.AcctNo;
 		SELF.ps_in_Fname := le.Phone_Shell.Input_Echo.in_Fname;
 		SELF.ps_in_StreetAddress := le.Phone_Shell.Input_Echo.in_StreetAddress;
 		SELF.ps_in_City := le.Phone_Shell.Input_Echo.in_City;
@@ -18,14 +19,14 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		SELF.ps_in_DOB := le.Phone_Shell.Input_Echo.in_DOB;
 		SELF.ps_SSNLength := (string) length(trim(le.Phone_Shell.Input_Echo.in_SSN));
 		SELF.in_ph10 := le.Phone_Shell.Input_Echo.in_Phone10;
-		SELF.in_EXPGW_Enabled := le.Phone_Shell.Input_Echo.in_EXPGW_Enabled;
+		SELF.in_EXPGW_Enabled := FALSE;
 		SELF.in_TargusGW_Enabled := le.Phone_Shell.Input_Echo.in_TargusGW_Enabled;
 		SELF.in_TUGW_Enabled := le.Phone_Shell.Input_Echo.in_TUGW_Enabled;
 		SELF.in_InsGW_Enabled := le.Phone_Shell.Input_Echo.in_InsGW_Enabled;
 		SELF.in_Processing_Date := le.Phone_Shell.Input_Echo.in_Processing_Date;
 		SELF.Subject_SSN_Mismatch := le.Phone_Shell.Subject_Level.Subject_SSN_Mismatch;
-		SELF.Exp_Num_Duplicate := le.Phone_Shell.Subject_Level.Experian_Num_Duplicate;
-		SELF.Exp_Num_Insufficient_Score := le.Phone_Shell.Subject_Level.Experian_Num_Insufficient_Score;
+		SELF.Exp_Num_Duplicate := 0;
+		SELF.Exp_Num_Insufficient_Score := 0;
 		SELF.Gathered_Ph := le.Phone_Shell.Gathered_Phone;
 		SELF.Source_List := le.Phone_Shell.Sources.Source_List;
 		SELF.Source_List_Last_Seen := le.Phone_Shell.Sources.Source_List_Last_Seen;
@@ -173,11 +174,13 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		SELF.Internal_ver_First_Seen := le.Phone_Shell.Internal_Corroboration.Internal_Verification_First_Seen;
 		SELF.Internal_ver_Last_Seen := le.Phone_Shell.Internal_Corroboration.Internal_Verification_Last_Seen;
 		SELF.Internal_ver_Match_Types := le.Phone_Shell.Internal_Corroboration.Internal_Verification_Match_Types;
-		SELF.Exp_Verified := le.Phone_Shell.Experian_File_One_Verification.Experian_Verified;
-		SELF.Exp_Type := le.Phone_Shell.Experian_File_One_Verification.Experian_Type;
-		SELF.Exp_Source := le.Phone_Shell.Experian_File_One_Verification.Experian_Source;
-		SELF.Exp_Last_Update := le.Phone_Shell.Experian_File_One_Verification.Experian_Last_Update;
-		SELF.Exp_ph_Score_V1 := le.Phone_Shell.Experian_File_One_Verification.Experian_Phone_Score_V1;
+		//Experian is removed and replaced with Equifax/Bureau data
+		SELF.Exp_Verified := le.Phone_Shell.Bureau.Bureau_Verified;
+		SELF.Exp_Type := ''; //no longer exists because Experian is gone
+		SELF.Exp_Source := '';//no longer exists because Experian is gone
+		SELF.Exp_Last_Update := le.Phone_Shell.Bureau.Bureau_Last_Update;
+		SELF.Exp_ph_Score_V1 := '';//no longer exists because Experian is gone
+
 		SELF.EDA_Omit_Locality := le.Phone_Shell.EDA_Characteristics.EDA_Omit_Locality;
 		SELF.EDA_DID := le.Phone_Shell.EDA_Characteristics.EDA_DID;
 		SELF.EDA_HHID := le.Phone_Shell.EDA_Characteristics.EDA_HHID;

@@ -1,9 +1,9 @@
-import progressive_phone,iesp,MDR,Royalty;
+﻿import progressive_phone,iesp,MDR,Royalty;
 export transform_progressive_phones(dataset(progressive_phone.layout_progressive_online_out) ppi,
- BOOLEAN ShowPhoneScore = FALSE, STRING scoreModel='', BOOLEAN callMetronet=false, BOOLEAN UsePremiumSource_A=false) := function
+ BOOLEAN ShowPhoneScore = FALSE, STRING scoreModel='', BOOLEAN UsePremiumSource_A=false) := function
 
 //get the running version of waterfall phones / Contact plus
-version := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel,callMetronet,UsePremiumSource_A);
+version := progressive_phone.HelperFunctions.FN_GetVersion(scoreModel, UsePremiumSource_A);
 versionName := progressive_phone.HelperFunctions.FN_GetVersionName(version);
 PPC := progressive_phone.Constants;
 

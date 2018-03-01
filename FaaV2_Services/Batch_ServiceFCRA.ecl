@@ -1,17 +1,18 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch_ServiceFCRA">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
 	<part name="GLBPurpose" type="xsd:byte"/>
 	<part name="DataRestrictionMask" type="xsd:string" default="000000000000000000000000" size="24"/>
 	<part name="DataPermissionMask" type="xsd:string" default="111111111111111111111111" size="24"/>
+	<part name="FFDOptionsMask"      type="xsd:string"/>
+	<part name="FCRAPurpose"      type="xsd:string"/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
 */
 /*--INFO-- This service returns aircraft registrations batch records with FCRA restrictions. */
-/*--USES-- ut.input_xslt */
 
-import gateway, BatchShare, Suppress;
+import BatchShare;
 
 export Batch_ServiceFCRA () := MACRO
 	boolean IsFCRA := true;

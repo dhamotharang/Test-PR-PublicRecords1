@@ -76,7 +76,7 @@ license_recs := ungroup(license_recs_original) + ungroup(mari_recs);
 										
 ProfileBooster.Layouts.Layout_PB_Slim_profLic roll_licenses(ProfileBooster.Layouts.Layout_PB_Slim_profLic le, ProfileBooster.Layouts.Layout_PB_Slim_profLic rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
-	self.proflic_count := ut.max2(le.proflic_count, rt.proflic_count);
+	self.proflic_count := Max(le.proflic_count, rt.proflic_count);
 	self.license_type := if(le.license_type<>'', le.license_type, rt.license_type);	// keep the most current license type
 	self := rt;
 end;

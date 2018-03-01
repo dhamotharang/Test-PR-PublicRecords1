@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
 
 EXPORT rvc1110_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia, BOOLEAN xmlPreScreenOptOut) := FUNCTION
 
@@ -438,7 +438,7 @@ EXPORT rvc1110_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isC
 	input_dob_match_level            := le.dobmatchlevel;
 	inferred_age                     := le.inferred_age;
 	estimated_income_2                 := le.estimated_income;
-	archive_date                     := IF(le.historydate = 999999, (INTEGER)ut.GetDate[1..6], (INTEGER)le.historydate[1..6]);
+	archive_date                     := IF(le.historydate = 999999, (INTEGER)((STRING)Std.Date.Today())[1..6], (INTEGER)((STRING)le.historydate)[1..6]);
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *
@@ -457,7 +457,7 @@ EXPORT rvc1110_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isC
 	
 	
 	sysdate := map(
-	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01')),
+	    trim((string)archive_date, LEFT, RIGHT) = '999999'  => common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01')),
 	    length(trim((string)archive_date, LEFT, RIGHT)) = 6 => (ut.DaysSince1900((trim((string)archive_date, LEFT))[1..4], (trim((string)archive_date, LEFT))[5..6], (string)1) - ut.DaysSince1900('1960', '1', '1')),
 	                                                           NULL);
 	

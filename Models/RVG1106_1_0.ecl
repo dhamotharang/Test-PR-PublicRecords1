@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise;
+import risk_indicators, ut, riskwisefcra, riskwise, std;
 
 export RVG1106_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut ) := FUNCTION
 
@@ -385,7 +385,7 @@ export RVG1106_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 		input_dob_match_level            := le.dobmatchlevel;
 		inferred_age                     := le.inferred_age;
 		reported_dob                     := le.reported_dob;
-		archive_date                     := if( le.historydate=999999, ut.getdate, (string6)le.historydate + '01');
+		archive_date                     := if( le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate + '01');
 
 
 
