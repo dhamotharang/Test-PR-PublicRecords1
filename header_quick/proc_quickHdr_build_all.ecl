@@ -1,8 +1,8 @@
 ﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers;
-export proc_quickHdr_build_all (string sourceIP, string filedate) := function
+export proc_quickHdr_build_all (string sourceIP) := function
    
 
-                                                 
+   SHARED filedate:=header.Sourcedata_month.v_eq_as_of_date;                                      
    EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
 
         FileName:= fileservices.GetSuperFileSubName(superfile,1);

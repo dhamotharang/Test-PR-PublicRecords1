@@ -1,4 +1,4 @@
-
+﻿
 IMPORT AccountMonitoring, Phonesplus_v2, gong, ut, watchdog, header, utilfile, 
        header_quick, NID, Paw, Risk_Indicators;
 
@@ -45,8 +45,7 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 			   base_phone_layout;
 			   STRING8 date_last_seen;
 			   STRING1 phone_type_code;
-				 string15 Encrypted_Experian_PIN;
-		   END;
+				END;
 		
 		/////////////////
 		// type TA -- ES
@@ -453,23 +452,8 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 					SELF                    := LEFT),
 				LEFT OUTER, LOCAL);	
 				
-		//Experian Phones Gateway
-		key_experian_phones := DISTRIBUTED(product_files.phone.experian_phones, HASH64(did, Phone_digits));
-		temp_add_conv_to_cell_flag_redist := DISTRIBUTE(temp_add_conv_to_cell_flag, HASH64(did, phone[8..10]));
-		
-		temp_add_experian_pin := 
-			JOIN(
-				temp_add_conv_to_cell_flag_redist, 
-				key_experian_phones,
-				LEFT.did = RIGHT.did AND
-				LEFT.phone[8..10] = RIGHT.Phone_digits,
-				TRANSFORM(
-					temp_layout,
-					SELF.Encrypted_Experian_PIN := RIGHT.Encrypted_Experian_PIN,
-					SELF                    		:= LEFT),
-				LEFT OUTER, LOCAL);
-				
-		temp_all_recombine := temp_add_experian_pin + temp_add_phone_type_non_10_U;
+						
+		temp_all_recombine := temp_add_conv_to_cell_flag + temp_add_phone_type_non_10_U;
 		
 		// Now, create a hash value from only those fields we're interested in (these 
 		// are the ones in the temporary layout).
@@ -484,8 +468,7 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 				        SELF.timestamp    := '',
 				        SELF.product_mask := AccountMonitoring.Constants.pm_phone,
 				        SELF.hash_value   := HASH64(LEFT.phone,
-                                            LEFT.phone_type_code,
-																						LEFT.Encrypted_Experian_PIN
+                                            LEFT.phone_type_code																					
 																						),
                     SELF := LEFT));
 		
@@ -507,7 +490,6 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
 
 		// output(choosen(temp_project_portfolio_phone_only,5000),named('temp_project_portfolio_phone_only'));
 		// output(choosen(temp_redist_again,5000),named('temp_redist_again'));
-		// output(choosen(temp_add_experian_pin,5000),named('temp_add_experian_pin'));
 	
 		RETURN temp_rolled_hashes;
 
