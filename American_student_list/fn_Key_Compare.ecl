@@ -29,6 +29,6 @@ String	HISTORICAL_FLAG;
 end;
 
 // n_File_Compare(datasetName,fileType,Version,OldFile,NewFile,ImportantFields='',IgnoreFields='', DistributeFields = '',useImportant=false,useIgnore=false,useDistribute=false) := functionmacro
-return file_compare.Fn_File_Compare(PulledOldKey,PulledNewKey,ImportantRecord,IgnoreRecord,ImportantRecord,true,true,true,true,'American_Student_List','Non-FCRA Key', Version);
+return file_compare.Fn_File_Compare(PulledOldKey,PulledNewKey,ImportantRecord,IgnoreRecord,ImportantRecord,true,true,true,true,'American_Student_List','Non_FCRA_Key', Version);
 
 end;

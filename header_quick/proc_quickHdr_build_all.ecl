@@ -1,8 +1,8 @@
 ﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers;
-export proc_quickHdr_build_all (string sourceIP, string filedate) := function
+export proc_quickHdr_build_all (string sourceIP) := function
    
 
-                                                 
+   SHARED filedate:=header.Sourcedata_month.v_eq_as_of_date;                                      
    EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
 
         FileName:= fileservices.GetSuperFileSubName(superfile,1);
@@ -21,7 +21,7 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
                                     ,fail('Superfiles are not in sync!'));
 	
 	destinationGroup	:= _control.TargetGroup.Thor400_44;
-	recordSize				:= 567;
+	recordSize				:= 600;
   sprayIP           := header_quick._config.sprayIP(sourceIP);
                                                      
 	weeklyFileName		:= FileServices.remotedirectory(sprayIP,header_quick._config.sourcePath,'WEEKLY_HEADER_*.DAT',false)(size != 0 )[1].name;

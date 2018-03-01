@@ -222,8 +222,10 @@
 'KV', // OKLAHOMA_CARTER_COUNTY_ARRESTS                                                                      
 'KW', // OKLAHOMA_COMANCHE_COUNTY_ARRESTS                                                                    
 'KX', // OKLAHOMA_OSAGE_COUNTY_ARRESTS                                                                       
+'KZ', // OREGON_CLACKAMAS_COUNTY_ARRESTS                                                                     
 'LB', // LOUISIANA_ST_TAMMANY_COUNTY                                                                         
 'LC', // OREGON_DESCHUTES_COUNTY_ARRESTS                                                                     
+'LD', // OREGON_DOUGLAS_COUNTY_ARRESTS                                                                       
 'LE', // OREGON_JACKSON_COUNTY_ARRESTS                                                                       
 'LG', // OREGON_LANE_COUNTY_ARRESTS                                                                          
 'LH', // OREGON_LINCOLN_COUNTY_ARRESTS                                                                       
@@ -309,6 +311,7 @@
 'QN', // COLORADO_DENVER_COUNTY                                                                              
 'QR', // OHIO_SANDUSKY_COUNTY                                                                                
 'QS', // OHIO_MEDINA_COUNTY                                                                                  
+'QU', // OHIO_HAMILTON_COUNTY                                                                                
 'QV', // OHIO_ADAMS_COMMON_PLEAS_COURT                                                                       
 'QW', // OHIO_ADAMS_COUNTY_COURT                                                                             
 'QX', // CALIFORNIA_BUTTE_COUNTY                                                                             
@@ -412,8 +415,7 @@
 'ZX', // SOUTH_CAROLINA_COLLETON_COUNTY_SUMMARY_COURTS                                                       
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
-
-                                                     
+                                            
 
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
@@ -634,7 +636,6 @@
 'W0316', // ARIZONA_TOLLESON_CW                                                                                 
 'W0317', // ARIZONA_WICKENBURG_CW                                                                               
 'W0318', // OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                                                            
-
 
 
 ////////////////////////////////////////////////////////

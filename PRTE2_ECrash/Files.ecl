@@ -32,7 +32,7 @@ EXPORT base_ecrash9 	:= DATASET(Constants.base_prefix_ecrash+ '9', layouts.base_
 /*************************************************************************************************/
 // Ecrash0 Key
 pflc0 := project(base_ecrash0, transform(layouts.key_ecrash0,
-																				self.report_code			:= 'FA';
+																				self.report_code			:= 'EA';
 																				self.report_category	:= 'AUTO REPORT';
 																				self.report_code_desc	:= 'AUTO ACCIDENT';
 																				self.accident_nbr     := left.accident_nbr;
@@ -48,7 +48,7 @@ EXPORT ds_ecrash0 := dedup(pflc0 + pntl0 + pinq0, record, all);
 
 // Ecrash1 Key
 pflc1 := project(base_ecrash1, transform(layouts.key_ecrash1,
-																				self.report_code			:= 'FA';
+																				self.report_code			:= 'EA';
 																				self.report_category	:= 'AUTO REPORT';
 																				self.report_code_desc	:= 'AUTO ACCIDENT';
 																				self.accident_nbr     := left.accident_nbr;
@@ -62,7 +62,7 @@ EXPORT ds_ecrash1 := dedup(pflc1,all);
 
 // Ecrash2v Key
 Layouts.key_ecrashv2 	xpndrecs2v(base_ecrash2v L, base_ecrash0 R) := transform
-self.report_code						:= 'FA';
+self.report_code						:= 'EA';
 self.report_category				:= 'AUTO REPORT';
 self.report_code_desc				:= 'AUTO ACCIDENT';
 self.vehicle_incident_city	:= if(L.accident_nbr= R.accident_nbr,R.city_town_name,'');
@@ -85,7 +85,7 @@ EXPORT ds_ecrash2v := join(distribute(base_ecrash2v,hash(accident_nbr)),
 
 // Ecrash3V Key
 EXPORT ds_ecrash3v := project(base_ecrash3v, transform(layouts.key_ecrash3v,
-																												 self.report_code				:= 'FA';
+																												 self.report_code				:= 'EA';
 																												 self.report_category		:= 'AUTO REPORT';
 																												 self.report_code_desc	:= 'AUTO ACCIDENT';
 																												 self.accident_nbr 			:= left.accident_nbr;
@@ -99,7 +99,7 @@ EXPORT ds_ecrash3v := project(base_ecrash3v, transform(layouts.key_ecrash3v,
 
 // Ecrash5 Key
 pflc5:= project(base_ecrash5, transform(Layouts.key_ecrash5,
-																				self.report_code			:= 'FA';
+																				self.report_code			:= 'EA';
 																				self.report_category	:= 'AUTO REPORT';
 																				self.report_code_desc	:= 'AUTO ACCIDENT';
 																				self.accident_nbr 		:= left.accident_nbr;
@@ -112,7 +112,7 @@ EXPORT ds_ecrash5 := dedup(pflc5,all);
 
 // Ecrash6 Key
 pflc6:= project(base_ecrash6, transform(layouts.key_ecrash6,
-																				self.report_code			:= 'FA';
+																				self.report_code			:= 'EA';
 																				self.report_category	:= 'AUTO REPORT';
 																				self.report_code_desc	:= 'AUTO ACCIDENT';
 																				self.accident_nbr 		:= left.accident_nbr;
@@ -129,7 +129,7 @@ EXPORT ds_ecrash6 := dedup(pflc6,all);
 
 // Ecrash7 Key
 pflc7:= project(base_ecrash7, transform(Layouts.key_ecrash7,
-																				self.report_code			:= 'FA';
+																				self.report_code			:= 'EA';
 																				self.report_category	:= 'AUTO REPORT';
 																				self.report_code_desc	:= 'AUTO ACCIDENT';
 																				self.accident_nbr			:= left.accident_nbr;
@@ -142,7 +142,7 @@ EXPORT ds_ecrash7  := dedup(pflc7,all);
 
 //Ecrash8 Key
 pflc8:= project(base_ecrash8, transform(layouts.key_ecrash8,
-																				self.report_code				:= 'FA';
+																				self.report_code				:= 'EA';
 																				self.report_category		:= 'AUTO REPORT';
 																				self.report_code_desc		:= 'AUTO ACCIDENT';
 																				self.accident_nbr 			:= left.accident_nbr;

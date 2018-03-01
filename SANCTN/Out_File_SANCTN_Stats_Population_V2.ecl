@@ -1,4 +1,4 @@
-EXPORT Out_File_SANCTN_Stats_Population_V2 (pIncident_v2
+﻿EXPORT Out_File_SANCTN_Stats_Population_V2 (pIncident_v2
 																						,pParty_v2
 																						,pRebuttal_v2
 																						,pLicense_v2
@@ -107,32 +107,35 @@ end;
     dpbc_CountNonBlank                          := sum(group,if(pParty_v2.dpbc<>'',1,0));
     chk_digit_CountNonBlank                     := sum(group,if(pParty_v2.chk_digit<>'',1,0));
     err_stat_CountNonBlank                      := sum(group,if(pParty_v2.err_stat<>'',1,0));
-		dba_name_CountNonBlank											:= sum(group,if(pParty_v2.dba_name <>'',1,0));
-		contact_name_CountNonBlank									:= sum(group,if(pParty_v2.contact_name <>'',1,0));
-		UltID_CountNonZero													:= sum(group,if(pParty_v2.UltID <>0,1,0));
-		OrgID_CountNonZero													:= sum(group,if(pParty_v2.OrgID <>0,1,0));
-		SELEID_CountNonZero												  := sum(group,if(pParty_v2.SELEID <>0,1,0));
-		ProxID_CountNonZero												  := sum(group,if(pParty_v2.ProxID <>0,1,0));
-		POWID_CountNonZero													:= sum(group,if(pParty_v2.POWID <>0,1,0));
-		EmpID_CountNonZero													:= sum(group,if(pParty_v2.EmpID <>0,1,0));
-		DotID_CountNonZero													:= sum(group,if(pParty_v2.DotID <>0,1,0));
-		UltScore_CountNonZero												:= sum(group,if(pParty_v2.UltScore <>0,1,0));
-		OrgScore_CountNonZero												:= sum(group,if(pParty_v2.OrgScore <>0,1,0));
-		SELEScore_CountNonZero											:= sum(group,if(pParty_v2.SELEScore <>0,1,0));
-		ProxScore_CountNonZero											:= sum(group,if(pParty_v2.ProxScore <>0,1,0));
-		POWScore_CountNonZero												:= sum(group,if(pParty_v2.POWScore <>0,1,0));
-		EmpScore_CountNonZero												:= sum(group,if(pParty_v2.EmpScore <>0,1,0));
-		DotScore_CountNonZero												:= sum(group,if(pParty_v2.DotScore <>0,1,0));
-		UltWeight_CountNonZero											:= sum(group,if(pParty_v2.UltWeight <>0,1,0));
-		OrgWeight_CountNonZero											:= sum(group,if(pParty_v2.OrgWeight <>0,1,0));
-		SELEWeight_CountNonZero											:= sum(group,if(pParty_v2.SELEWeight <>0,1,0));
-		ProxWeight_CountNonZero											:= sum(group,if(pParty_v2.ProxWeight <>0,1,0));
-		POWWeight_CountNonZero											:= sum(group,if(pParty_v2.POWWeight <>0,1,0));
-		EmpWeight_CountNonZero											:= sum(group,if(pParty_v2.EmpWeight <>0,1,0));
-		DotWeight_CountNonZero											:= sum(group,if(pParty_v2.DotWeight <>0,1,0));
-		SOURCE_REC_ID_CountNonZero									:= sum(group,if(pParty_v2.SOURCE_REC_ID <>0,1,0));
+				UltID_CountNonZero																										:= sum(group,if(pParty_v2.UltID <>0,1,0));
+				OrgID_CountNonZero																										:= sum(group,if(pParty_v2.OrgID <>0,1,0));
+				SELEID_CountNonZero												  											:= sum(group,if(pParty_v2.SELEID <>0,1,0));
+				ProxID_CountNonZero												  											:= sum(group,if(pParty_v2.ProxID <>0,1,0));
+				POWID_CountNonZero																										:= sum(group,if(pParty_v2.POWID <>0,1,0));
+				EmpID_CountNonZero																										:= sum(group,if(pParty_v2.EmpID <>0,1,0));
+				DotID_CountNonZero																										:= sum(group,if(pParty_v2.DotID <>0,1,0));
+				UltScore_CountNonZero																							:= sum(group,if(pParty_v2.UltScore <>0,1,0));
+				OrgScore_CountNonZero																							:= sum(group,if(pParty_v2.OrgScore <>0,1,0));
+				SELEScore_CountNonZero																						:= sum(group,if(pParty_v2.SELEScore <>0,1,0));
+				ProxScore_CountNonZero																						:= sum(group,if(pParty_v2.ProxScore <>0,1,0));
+				POWScore_CountNonZero																							:= sum(group,if(pParty_v2.POWScore <>0,1,0));
+				EmpScore_CountNonZero																							:= sum(group,if(pParty_v2.EmpScore <>0,1,0));
+				DotScore_CountNonZero																							:= sum(group,if(pParty_v2.DotScore <>0,1,0));
+				UltWeight_CountNonZero																						:= sum(group,if(pParty_v2.UltWeight <>0,1,0));
+				OrgWeight_CountNonZero																						:= sum(group,if(pParty_v2.OrgWeight <>0,1,0));
+				SELEWeight_CountNonZero																					:= sum(group,if(pParty_v2.SELEWeight <>0,1,0));
+				ProxWeight_CountNonZero																					:= sum(group,if(pParty_v2.ProxWeight <>0,1,0));
+				POWWeight_CountNonZero																						:= sum(group,if(pParty_v2.POWWeight <>0,1,0));
+				EmpWeight_CountNonZero																						:= sum(group,if(pParty_v2.EmpWeight <>0,1,0));
+				DotWeight_CountNonZero																						:= sum(group,if(pParty_v2.DotWeight <>0,1,0));
+				SOURCE_REC_ID_CountNonZero																		:= sum(group,if(pParty_v2.SOURCE_REC_ID <>0,1,0));
+				DID_CountNonZero																												:= sum(group,if(pParty_v2.DID <>0,1,0));
+				BDID_CountNonZero																											:= sum(group,if(pParty_v2.BDID <>0,1,0));
+				SSN_APPENDED_CountNonBlank																		:= sum(group,if(pParty_v2.SSN_APPENDED <>'',1,0));
+				dba_name_CountNonBlank																						:= sum(group,if(pParty_v2.dba_name <>'',1,0));
+				contact_name_CountNonBlank																		:= sum(group,if(pParty_v2.contact_name <>'',1,0));
+				ENH_DID_SRC_CountNonBlank																			:= sum(group,if(pParty_v2.ENH_DID_SRC <>'',1,0));
 end;
-
 
 %rPopulationStats_SANCTN_Rebuttal_v2% := record
     pRebuttal_v2.BATCH_NUMBER;

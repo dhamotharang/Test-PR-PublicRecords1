@@ -17,7 +17,7 @@ EXPORT BuildAttributesScrubsReport(DATASET(cortera.Layout_Attributes) F, string 
 		orbitStats := U.OrbitStats();
 
 		submitStats :=
-			Scrubs.OrbitProfileStats('Scrubs_cortera_attributes_in','ScrubsAlerts',orbitStats,version,'Cortera').SubmitStats 
+			Scrubs.OrbitProfileStats('Scrubs_cortera_attributes_in2','ScrubsAlerts',orbitStats,version,'Cortera').SubmitStats 
 									: FAILURE(OUTPUT('Could not update Orbit with Scrubs'));
 		return SEQUENTIAL(
 				ErrorSummary,
