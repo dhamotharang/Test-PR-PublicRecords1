@@ -495,17 +495,19 @@ EXPORT LinkIDs := RECORD
 		STRING12    buildgeolink;
 		STRING3	    EasiTotCrime;
 		STRING      CityState;
-		string1   	 AddressVacancyInd;                      //is not being populated?????
-		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.getBusGeographicRisk
-		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.getBusGeographicRisk
-		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.getBusGeographicRisk
-		boolean     CityBorderStation;                      //populated in DueDiligence.getBusGeographicRisk
-		boolean     CityFerryCrossing;                      //populated in DueDiligence.getBusGeographicRisk
-		boolean     CityRailStation;                        //populated in DueDiligence.getBusGeographicRisk
-		boolean     HIDTA;                                  //populated in DueDiligence.getBusGeographicRisk
-		boolean     HIFCA;                                  //populated in DueDiligence.getBusGeographicRisk
-		boolean     HighFelonNeighborhood;                  //populated in DueDiligence.getBusGeographicRisk
-		boolean     HRBusPct;                               //populated in DueDiligence.getBusGeographicRisk
+    STRING5     FipsCode;  
+    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk       
+		string1   	AddressVacancyInd;                      //is not being populated?????
+		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
+		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
+		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
+		boolean     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
+		boolean     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
+		boolean     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
+		boolean     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
+		boolean     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
+		boolean     HighFelonNeighborhood;                  //populated in ???
+		boolean     HRBusPct;                               //populated in ???
 	END;  	
 	
  

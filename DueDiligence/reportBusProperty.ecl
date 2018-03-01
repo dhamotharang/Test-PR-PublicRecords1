@@ -44,7 +44,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
   // ------ Determine the Geographic Risk for the Inquired Business                           ------
 	// ------     The results are in DueDiligence.layoutsInternal.GeographicLayout              ------
 	// ------                                                                                   ------
-	AddressPropertyOwnedRisk   := DueDiligence.Common.getGeographicRisk(ListOfPropertyAddresses, true);  
+	AddressPropertyOwnedRisk   := DueDiligence.Common.getGeographicRisk(ListOfPropertyAddresses);  
 	
 	// ------                                                                                    ------	
 	// ----- Add the Geographic Risk to Property Slim Record                                     ------
@@ -71,6 +71,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 																	SELF.HIFCA                        := RIGHT.HIFCA,
 																	SELF.HighFelonNeighborhood        := RIGHT.HighFelonNeighborhood,
 																	SELF.HRBusPct                     := RIGHT.HRBusPct,
+                                  SELF.CountyName                   := RIGHT.CountyName,
 																	/*  pass everything else from the LEFT    */  
 																	SELF := LEFT),
 																	LEFT OUTER);

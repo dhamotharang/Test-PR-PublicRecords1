@@ -120,7 +120,7 @@ EXPORT LayoutsInternal := MODULE
    string5   zip;
    string4   zip4;
 	  STRING5   County;
-		 STRING20  countyName;
+		 //STRING20  countyName;
 		 string7   geo_blk;
 		 DueDiligence.Layouts.GeographicRiskLayout;
   END;					

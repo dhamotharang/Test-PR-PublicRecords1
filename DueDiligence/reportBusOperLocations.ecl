@@ -1,4 +1,4 @@
-﻿IMPORT iesp, DueDiligence, BIPv2;
+﻿IMPORT iesp, DueDiligence, BIPv2, Census_Data, iesp;
 
 EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
                               boolean DebugMode = FALSE
@@ -28,19 +28,27 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 			TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
 			 /* populate the Geographic internal record with address data from the List of Operating Locations  */ 
 						  SELF.seq             := LEFT.seq;
-				    SELF                 := LEFT;
+				      SELF                 := LEFT;
 						  SELF                 := []));  //***all other fields can be empty
 	
 	
 	// ------                                                                                   ------
   // ------ Determine the Geographic Risk for the Inquired Business                           ------
 	// ------                                                                                   ------
-	AddressOperLocGeoRisk   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses, true);  
+	GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses);  
+  
+  // ------                                                                                                              ------
+  // ------ Use the Census Macro to fill in the county_name - pass the result set as input,                              ------
+  // ------ the field name that contains the state,                                                                      ------ 
+  // ------ the field name that contains the 3 digit fips(county) and the field name of the county name.                 ------
+  // ------ the name of the output result set                                                                            ------
+  // ------                                                                                                              ------
+	//Census_Data.MAC_Fips2County_Keyed(GeographicRiskResults, state, Fipscode, countyName, AddressOperLocGeoRiskCounty);
 	
 	// ------                                                                                   ------
 	// ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------
 	// ------                                                                                   ------
-	groupAddressOperLocGeoRisk := GROUP(AddressOperLocGeoRisk, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	groupAddressOperLocGeoRisk := GROUP(GeographicRiskResults, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	
 	// ------                                                                       ------
   // ------ define the ChildDataset                                               ------
@@ -55,7 +63,8 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
   // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
   // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk  FormatTheListOfOperLoc(groupAddressOperLocGeoRisk le, Integer OperLocSeq) := TRANSFORM
+	iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk  FormatTheListOfOperLoc(groupAddressOperLocGeoRisk le, Integer OperLocSeq) := TRANSFORM,
+                                                            SKIP(OperLocSeq > iesp.constants.DDRAttributesConst.MaxOperatingLocations)
                SELF.Sequence                         := OperLocSeq;                      
                SELF.Address.StreetNumber             := le.prim_range;
                SELF.Address.StreetPreDirection       := le.predir;
@@ -74,11 +83,11 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
                SELF.Address.PostalCode               := le.zip5 + le.zip4;
                SELF.Address.StateCityZip             := le.state + le.city + le.state;
                /*  County Risk  */  
-               SELF.CountyCityRisk.CountyName        := 'ZZCOUNTYNAME';
+               SELF.CountyCityRisk.CountyName                                :=  le.CountyName;
                SELF.CountyCityRisk.BordersForeignJurisdiction                :=  le.CountyBordersForgeinJur;
                SELF.CountyCityRisk.BordersOceanWithin150ForeignJurisdiction  :=  le.CountyBorderOceanForgJur;
                /*  City Risk    */  
-               SELF.CountyCityRisk.AccessThroughBorderStation                :=  le.CityBorderStation; 
+               SELF.CountyCityRisk.AccessThroughBorderStation                 :=  le.CityBorderStation; 
                SELF.CountyCityRisk.AccessThroughRailCrossing                  :=  le.CityRailStation;
                SELF.CountyCityRisk.AccessThroughFerryCrossing                 :=  le.CityFerryCrossing;
                /*  Area Risk    */
@@ -96,9 +105,9 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 
 
 	BusOperLocChildDataset  :=   
-	PROJECT(groupAddressOperLocGeoRisk,                                  //*** Using this input dataset - these addresses have the geo risk populated  
+	PROJECT(groupAddressOperLocGeoRisk,                                //*** Using this input dataset - these addresses have the geo risk populated  
 			TRANSFORM(BusOperLocChildDatasetLayout,                       //*** format the data according to this layout.
-				SELF.seq                    := LEFT.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
+				SELF.seq                    := LEFT.seq,                    //*** This is the sequence number of the Inquired Business (or the Parent)
 				SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER)))); 
 				       
 
@@ -108,11 +117,11 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
  // ------ created child dataset on the RIGHT.                                    ------
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusOperLocChildDataset ri, Integer BOLCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount       := le.hdAddrCount;
+												    SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := le.hdAddrCount;
 														   //***                                                                                        OperatingLocations is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + ri.BusOperLocRiskChild;
-																	SELF := le;
-				  											END; 
+														SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + ri.BusOperLocRiskChild;
+														SELF := le;
+				  									END; 
 																	
 	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
 	UpdateBusnOperLocWithReport := DENORMALIZE(BusnData, BusOperLocChildDataset,
@@ -127,9 +136,10 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	//   DEBUGGING OUTPUTS
 	// *********************
 
-	    IF(DebugMode,      OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations')));
+	   IF(DebugMode,      OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations')));
    	 IF(DebugMode,      OUTPUT(CHOOSEN(ListOfOperAddresses, 100),       NAMED('ListOfOperAddresses')));												 
-   	 IF(DebugMode,      OUTPUT(CHOOSEN(AddressOperLocGeoRisk, 100),     NAMED('AddressOperLocGeoRisk')));												 
+   	 IF(DebugMode,      OUTPUT(CHOOSEN(GeographicRiskResults, 100),     NAMED('GeographicRiskResults')));												 
+   	 //IF(DebugMode,      OUTPUT(CHOOSEN(AddressOperLocGeoRiskCounty, 100),     NAMED('AddressOperLocGeoRiskCounty')));												 
    	 IF(DebugMode,      OUTPUT(CHOOSEN(BusOperLocChildDataset, 100),     NAMED('BusOperLocChildDataset')));												 
    	 IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBusnOperLocWithReport, 100),     NAMED('UpdateBusnOperLocWithReport')));												 
    	// IF(DebugMode,      OUTPUT(CHOOSEN(BusnDataWithOperLocGeoRisk, 100),     NAMED('BusnDataWithOperLocGeoRisk')));												 
