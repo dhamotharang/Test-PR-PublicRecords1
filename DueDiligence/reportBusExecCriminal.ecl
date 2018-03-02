@@ -6,17 +6,15 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                              boolean DebugMode = FALSE) := FUNCTION
 
 	
- //*** add logic here to shorten the list of offenses that are added to the report ****//	
+ //*** add logic here to SORT the list of offenses that are added to the report so that only the oldest ones are truncated  ****//	
 	 BEOCriminalOffensesInternal := NORMALIZE(InputBusnCriminal, LEFT.execs.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.BEOCriminalReportingOFOffenses,
                              /*  start by getting all of the criminal offenses from the Parent (RIGHT) */  																														
-																												 SELF.seq                  := LEFT.seq;
-																													SELF.ultID                := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																													SELF.orgID                := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																													SELF.seleID               := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																													SELF.ReportOfOffenses     := RIGHT;
-																												
-																												//	SELF                     := LEFT;            //***Populate all of the fields from party nested DATASET
-																													SELF                     := [];)); 
+																												SELF.seq                  := LEFT.seq;
+																												SELF.ultID                := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																												SELF.orgID                := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																												SELF.seleID               := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																												SELF.ReportOfOffenses     := RIGHT;
+																												SELF                      := [];)); 
 	  
 	 													
 	
@@ -27,40 +25,44 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	// ------                                                                       ------
 	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(BEOCriminalOffensesInternal le, Integer OffenseCount) := TRANSFORM,
 	                                                 SKIP(OffenseCount > iesp.constants.DDRAttributesConst.MaxLegalEvents)         
-																							               SELF.CaseNumber               := le.ReportOfOffenses.caseNum;    
-																							               SELF.OffenseScore             := le.ReportOfOffenses.offenseScore;
-																														 SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.ReportOfOffenses.offenseScore);  
-																														 SELF.OffenseLevel             := le.ReportOfOffenses.criminalOffenderLevel;
-																														 SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.ReportOfOffenses.criminalOffenderLevel);
-                                                             SELF.Conviction               := le.ReportOfOffenses.convictionFlag;
-                                                             SELF.TrafficRelated           := le.ReportOfOffenses.trafficFlag;
-                                                             SELF.CourtType                := le.ReportOfOffenses.courtType;
-                                                             SELF.CaseTypeDescription      := le.ReportOfOffenses.caseTypeDesc; 
-                                                             SELF.ArrestLevelDescription   := 'ZZZNEED MAPPINGC';
-                                                             SELF.CourtStatute             := le.ReportOfOffenses.courtStatute;
-                                                             SELF.CourtStatuteDescription  := le.ReportOfOffenses.courtStatuteDesc; 
-                                                             SELF.Charge                   := le.ReportOfOffenses.Charge;
-                                                             SELF.NumberOfCounts           := '0';  
-                                                             SELF.DispositionDescription1  := 'XXX';
-                                                             SELF.DispositionDescription2  := 'XXXXXXX';
-                                                             SELF.ProbationSentence        := 'XXX XXX'; 
-                                                             SELF.Incarceration            := IF(le.ReportOfOffenses.Ever_incarc_offenders = 'Y', TRUE, FALSE);  
-                                                                                                 //le.ReportOfOffenses.Ever_incarc_offenses  = 'Y'  OR
-                                                                                                 //le.ReportOfOffenses.Ever_incarc_punishments 'Y', TRUE, FALSE);  
-                                                             SELF.CurrentIncarceration     := IF(le.ReportOfOffenses.Curr_incarc_offenders = 'Y', TRUE, FALSE); 
-                                                                                                 //le.ReportOfOffenses.Curr_incarc_offenses  = 'Y'  OR
-                                                                                                 //le.ReportOfOffenses.Curr_incarc_punishments 'Y', TRUE, FALSE);
-                                                             SELF.CurrentParole            := FALSE;
-                                                             SELF.CurrentProbation         := FALSE;
-                                                             SELF.EarliestOffenseDate.Year := (Integer)le.ReportOfOffenses.earliestOffenseDate[1..4];
-                                                             SELF.EarliestOffenseDate.Month := (Integer)le.ReportOfOffenses.earliestOffenseDate[5..6];
-                                                             SELF.EarliestOffenseDate.Day  := (Integer)le.ReportOfOffenses.earliestOffenseDate[7..8];
+																							     SELF.CaseNumber               := le.ReportOfOffenses.caseNum;    
+																							     SELF.OffenseScore             := le.ReportOfOffenses.offenseScore;
+																								   SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.ReportOfOffenses.offenseScore);  
+																									 SELF.OffenseLevel             := le.ReportOfOffenses.criminalOffenderLevel;
+																									 SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.ReportOfOffenses.criminalOffenderLevel);
+                                                   SELF.Conviction               := le.ReportOfOffenses.convictionFlag;
+                                                   SELF.TrafficRelated           := le.ReportOfOffenses.trafficFlag;
+                                                   SELF.CourtType                := le.ReportOfOffenses.courtType;
+                                                   SELF.CaseTypeDescription      := le.ReportOfOffenses.caseTypeDesc; 
+                                                   SELF.ArrestLevelDescription   := le.ReportOfOffenses.arr_off_lev_mapped;
+                                                   SELF.CourtStatute             := le.ReportOfOffenses.courtStatute;
+                                                   SELF.CourtStatuteDescription  := le.ReportOfOffenses.courtStatuteDesc; 
+                                                   SELF.Charge                   := le.ReportOfOffenses.Charge;
+                                                   SELF.NumberOfCounts           := le.ReportOfOffenses.num_of_counts;  
+                                                   SELF.DispositionDescription1  := le.ReportOfOffenses.courtDispDesc1;
+                                                   SELF.DispositionDescription2  := le.ReportOfOffenses.courtDispDesc2;
+                                                   SELF.ProbationSentence        := 'ZZZ'; 
+                                                   SELF.Incarceration            := MAP(
+                                                                                        le.ReportOfOffenses.Ever_incarc_offenders =   'Y'  => TRUE, 
+                                                                                        le.ReportOfOffenses.Ever_incarc_offenses  =   'Y'  => TRUE,
+                                                                                        le.ReportOfOffenses.Ever_incarc_punishments = 'Y'  => TRUE, 
+                                                                                                                                              FALSE);  
+                                                   SELF.CurrentIncarceration     := MAP(
+                                                                                        le.ReportOfOffenses.Curr_incarc_offenders = 'Y'    => TRUE,
+                                                                                        le.ReportOfOffenses.Curr_incarc_offenses  = 'Y'    => TRUE,
+                                                                                        le.ReportOfOffenses.Curr_incarc_punishments = 'Y'  => TRUE, 
+                                                                                                                                              FALSE);
+                                                   SELF.CurrentParole            := IF(le.ReportOfOffenses.Curr_parole_flag = 'Y', TRUE, FALSE);
+                                                   SELF.CurrentProbation         := FALSE;
+                                                   SELF.EarliestOffenseDate.Year := (Integer)le.ReportOfOffenses.earliestOffenseDate[1..4];
+                                                   SELF.EarliestOffenseDate.Month := (Integer)le.ReportOfOffenses.earliestOffenseDate[5..6];
+                                                   SELF.EarliestOffenseDate.Day  := (Integer)le.ReportOfOffenses.earliestOffenseDate[7..8];
 
-                                                             SELF.OffenseDate.Year         := (Integer)le.ReportOfOffenses.offenseDate[1..4];
-                                                             SELF.OffenseDate.Month        := (Integer)le.ReportOfOffenses.offenseDate[5..6];
-                                                             SELF.OffenseDate.Day          := (Integer)le.ReportOfOffenses.offenseDate[7..8];
-			                                                       SELF                          := [];
-																							      END;  
+                                                   SELF.OffenseDate.Year         := (Integer)le.ReportOfOffenses.offenseDate[1..4];
+                                                   SELF.OffenseDate.Month        := (Integer)le.ReportOfOffenses.offenseDate[5..6];
+                                                   SELF.OffenseDate.Day          := (Integer)le.ReportOfOffenses.offenseDate[7..8];
+			                                             SELF                          := [];
+																               END;  
 	 
 	  
 BusExecCriminalChildDataset  :=   
