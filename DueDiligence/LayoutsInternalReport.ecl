@@ -65,7 +65,13 @@ EXPORT LayoutsInternalReport := MODULE
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
   DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense ReportOfOffenses;  
   END;
-
+  // ------                                                                       ------
+  // ------ define the internal ChildDataset for the   report                     ------
+	// ------                                                                       ------
+	EXPORT ReportingofBEOCriminalChildDatasetLayout    := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent  
+	 DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal) BusExecCriminalChild;
+	END;
 
 	
 	EXPORT BusAircraftReportChildren := RECORD

@@ -87,7 +87,15 @@ EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
 EXPORT UNKNOWN                  := 'U';  
-EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ];  
+EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ]; 
+// ---- 
+// ---- Offense Score Descriptions 
+// ----
+EXPORT TEXT_FELONY              := 'FELONY';
+EXPORT TEXT_MISDEMEANOR         := 'MISDEMEANOR';
+EXPORT TEXT_INFRACTION          := 'INFRACTION';
+EXPORT TEXT_TRAFFIC             := 'TRAFFIC';
+EXPORT TEXT_UNKNOWN             := 'UNKNOWN';       
  
 
 // ---- 
@@ -97,7 +105,13 @@ EXPORT NONTRAFFIC_CONVICTED     := '4';
 EXPORT NONTRAFFIC_NOT_CONVICTED := '3';
 EXPORT TRAFFIC_CONVICTED        := '2';
 EXPORT TRAFFIC_NOT_CONVICTED    := '1';
-
+// ---- 
+// ---- Offense Level Descriptions 
+// ----
+EXPORT TEXT_NONTRAFFIC_CONVICTED     := 'NONTRAFFIC CONVICTED';
+EXPORT TEXT_NONTRAFFIC_NOT_CONVICTED := 'NONTRAFFIC NOT CONVICTED';
+EXPORT TEXT_TRAFFIC_CONVICTED        := 'TRAFFIC CONVICTED';
+EXPORT TEXT_TRAFFIC_NOT_CONVICTED    := 'TRAFFIC NOT CONVICTED';
 
 // ---- 
 // ---- constants used in the Liens processing
