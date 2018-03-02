@@ -1,6 +1,5 @@
 ﻿IMPORT MDR, risk_indicators;
 
-
 EXPORT Constants := MODULE
 
 EXPORT VERSION_3 := 3;
