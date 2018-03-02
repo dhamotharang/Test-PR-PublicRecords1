@@ -19,27 +19,19 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 																													SELF                     := [];)); 
 	  
 	 													
-	// ------                                                                       ------
- // ------ define the ChildDataset                                               ------
-	// ------                                                                       ------
-	BusExecCriminalChildDatasetLayout    := RECORD
-	 unsigned2                      seq;                                      //*  This is the seqence number of the parent  
-	 DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal) BusExecCriminalChild;
-	END;
-	 
+	
 	// ------                                                                       ------
   // ------ populate the ChildDataset  with the list of OFFENSES                  ------
   // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
   // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(BEOCriminalOffensesInternal le, Integer OffenseSeq) := TRANSFORM
-	                                                             /*  pick up the Name and address for this DID  */  
-																															                              //SELF.seq                      := le.ReportOfOffenses.seq;  
-																							                                      SELF.CaseNumber               := le.ReportOfOffenses.caseNum;    
-																							                                      SELF.OffenseScore             := le.ReportOfOffenses.offenseScore;
-																																										                   SELF.OffenseScoreDescription  := 'ZZZNEED MAPPINGA';
-																																						                       SELF.OffenseLevel             := le.ReportOfOffenses.criminalOffenderLevel;
-																																						                       SELF.OffenseLevelDescription  := 'ZZZNEED MAPPINGB';
+	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(BEOCriminalOffensesInternal le, Integer OffenseCount) := TRANSFORM,
+	                                                 SKIP(OffenseCount > iesp.constants.DDRAttributesConst.MaxLegalEvents)         
+																							               SELF.CaseNumber               := le.ReportOfOffenses.caseNum;    
+																							               SELF.OffenseScore             := le.ReportOfOffenses.offenseScore;
+																														 SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.ReportOfOffenses.offenseScore);  
+																														 SELF.OffenseLevel             := le.ReportOfOffenses.criminalOffenderLevel;
+																														 SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.ReportOfOffenses.criminalOffenderLevel);
                                                              SELF.Conviction               := le.ReportOfOffenses.convictionFlag;
                                                              SELF.TrafficRelated           := le.ReportOfOffenses.trafficFlag;
                                                              SELF.CourtType                := le.ReportOfOffenses.courtType;
@@ -67,22 +59,17 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                              SELF.OffenseDate.Year         := (Integer)le.ReportOfOffenses.offenseDate[1..4];
                                                              SELF.OffenseDate.Month        := (Integer)le.ReportOfOffenses.offenseDate[5..6];
                                                              SELF.OffenseDate.Day          := (Integer)le.ReportOfOffenses.offenseDate[7..8];
-
-																																																	            //SELF.CaseNumber      := execs.partyoffenses
-			                                                          SELF                := [];
-																							                                   END;  
+			                                                       SELF                          := [];
+																							      END;  
 	 
 	  
 BusExecCriminalChildDataset  :=   
-	PROJECT(BEOCriminalOffensesInternal,                                  //***Using this input dataset  
-			TRANSFORM(BusExecCriminalChildDatasetLayout,                        //***format the data according to this layout.
-				SELF.seq                    := LEFT.seq,                           //***This is the sequence number of the Inquired Business (or the Parent)
+	PROJECT(BEOCriminalOffensesInternal,                                                        //***Using this input dataset  
+			TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingofBEOCriminalChildDatasetLayout,  //***format the data according to this layout.
+				#EXPAND (DueDiligence.Constants.mac_TRANSFORMLinkids())                               //***This is the sequence number and LINKID of the Inquired Business (or the Parent)
 				SELF.BusExecCriminalChild   := PROJECT(LEFT, FormatTheListOfOffenses(LEFT, COUNTER)))); 
 				       
 			
-		
-		
-		
 			
 			
 	

@@ -745,6 +745,42 @@ EXPORT Common := MODULE
 																																								SELF := [];));	
 																													
 		RETURN execOffenses;
-	END;
+	END;   //*** END OF FUNCTION
+  
+  // ------                                                                                              ------ 
+  // ------ Convert the 1 character offense score to a description to be used for the report             ------
+  // ------                                                                                              ------
+  EXPORT getOffenseScoreDescription(STRING1 offensescore) := FUNCTION
+
+		returnOffenseScoreDescription :=    
+				 MAP(
+							offenseScore = DueDiligence.Constants.FELONY                          	=> DueDiligence.Constants.TEXT_FELONY,      
+							offenseScore = DueDiligence.Constants.MISDEMEANOR                       => DueDiligence.Constants.TEXT_MISDEMEANOR,
+							offenseScore = DueDiligence.Constants.INFRACTION                        => DueDiligence.Constants.TEXT_INFRACTION,
+							offenseScore = DueDiligence.Constants.TRAFFIC                           => DueDiligence.Constants.TEXT_TRAFFIC,
+							offenseScore = DueDiligence.Constants.UNKNOWN                           => DueDiligence.Constants.TEXT_UNKNOWN,																		
+                                                                                         DueDiligence.Constants.TEXT_UNKNOWN); // default
+						
+		RETURN returnOffenseScoreDescription;
+	END;    //*** END OF FUNCTION
 	
+  // ------                                                                                              ------ 
+  // ------ Convert the 1 character offender level to a description to be used for the report            ------
+  // ------                                                                                              ------
+  EXPORT getOffenseLevelDescription(STRING1 criminalOffenderLevel) := FUNCTION
+
+		returnOffenseLevelDescription :=    
+				 MAP(
+							criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED     => DueDiligence.Constants.TEXT_NONTRAFFIC_CONVICTED,      
+							criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED => DueDiligence.Constants.TEXT_NONTRAFFIC_NOT_CONVICTED,
+							criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED        => DueDiligence.Constants.TEXT_TRAFFIC_CONVICTED,
+							criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_NOT_CONVICTED    => DueDiligence.Constants.TEXT_TRAFFIC_NOT_CONVICTED,
+                                                                                         DueDiligence.Constants.TEXT_UNKNOWN); // default
+						
+		RETURN returnOffenseLevelDescription;
+	END;    //*** END OF FUNCTION 
+  
+  
+  
+  
 END;
