@@ -1,5 +1,5 @@
 ﻿/*--SOAP--
-<message name="Did_Batch_Service">
+<message name="Did_Batch_Service_v2">
   <part name="did_batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="Appends" type="xsd:string"/>
   <part name="Verify" type="xsd:string"/>
@@ -22,14 +22,11 @@
 
 import AutoStandardI, ut;
 
-export DID_Batch_Service := macro
+// moving this code from DidVille.DID_Batch_Service due to layout change limitation (service is called through roxie pipe)
+export DID_Batch_Service_v2 := macro
 
-inf_v1 := dataset([], DidVille.Layout_Did_InBatch_v1) : stored('did_batch_in',few);
-inf := project(inf_v1, transform(DidVille.Layout_Did_InBatch, SELF := LEFT;));
-
+inf := dataset([], DidVille.Layout_Did_InBatch) : stored('did_batch_in',few);
 recs := DidVille.DID_Batch_Service_Records(inf);
-recs_v1 := project(recs, transform(DidVille.Layout_Did_OutBatch_v1, SELF := LEFT;)); 
-
-output(recs_v1,named('Result'));
+output(recs,named('Result'));
 
 endmacro;

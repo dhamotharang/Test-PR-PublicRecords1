@@ -1,4 +1,4 @@
-export Layout_Did_InBatchRaw := record
+﻿export Layout_Did_InBatchRaw := record
     qstring10 acctno;
 	STRING12 did;
 	qSTRING9  ssn;
@@ -20,6 +20,8 @@ export Layout_Did_InBatchRaw := record
 	qSTRING2  st;
 	qSTRING5  z5;
 	qSTRING4  zip4;
+	QSTRING25 dl_nbr := ''; 
+	QSTRING2  dl_state := '';
   end;
 
  
