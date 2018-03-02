@@ -1136,6 +1136,7 @@
 				trim(kword, left, right) = 'INMCA-SC' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMCA_SC,
 				trim(kword, left, right) = 'PHPNP' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPNP,
 				trim(kword, left, right) = 'EUNCJ-TAX' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUNCJ_TAX,
+				trim(kword, left, right) = 'USCG-PV' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCG_PV,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
