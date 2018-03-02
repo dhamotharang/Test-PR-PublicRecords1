@@ -52,16 +52,17 @@ EXPORT Layouts := MODULE
 	EXPORT BatchOut := RECORD
 		STRING20 acctno;
 		UNSIGNED seq;
-		STRING20 	AppendedDID;
-		STRING20 	AppendedFirstName;
-		STRING20 	AppendedMiddleName;
-		STRING20 	AppendedSurname;
-		STRING10 	phone;
+		STRING20 AppendedDID;
+		STRING20 AppendedFirstName;
+		STRING20 AppendedMiddleName;
+		STRING20 AppendedSurname;
+		BOOLEAN		validatedName;	//internal - to identify gateway confirmation.	
+		STRING10 phone;
 		STRING120	AppendedCompanyName;
 		STRING120	AppendedListingName;
 		STRING10	AppendedStreetNumber;
-		STRING2  	AppendedPreDirectional;
-		STRING28 	AppendedStreetName;
+		STRING2  AppendedPreDirectional;
+		STRING28 AppendedStreetName;
 		STRING4		AppendedStreetSuffix;
 		STRING2		AppendedPostDirectional;
 		STRING10	AppendedUnitDesignator;
@@ -70,8 +71,8 @@ EXPORT Layouts := MODULE
 		STRING2		AppendedStateCode;
 		STRING5		AppendedZipCode;
 		STRING4		AppendedZipCodeExtension;
-		STRING10	AppendedPhoneLineType;
-		STRING10	AppendedPhoneServiceType;
+		STRING1		AppendedPhoneLineType;
+		STRING1		AppendedPhoneServiceType;
 		STRING15	AppendedRecordType;
 		UNSIGNED4	AppendedFirstDate;
 		UNSIGNED4	AppendedLastDate;

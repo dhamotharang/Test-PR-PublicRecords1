@@ -1,6 +1,6 @@
-﻿IMPORT Autokey_batch,BatchServices,doxie, Gateway,iesp,MDR,std;
+﻿IMPORT DidVille,doxie, Gateway,iesp,MDR,Phones,std;
 EXPORT GetAccuData_CallerName(DATASET(Phones.Layouts.PhoneAcctno) inPhones, 
-																DATASET(Gateway.Layouts.Config) gateways) := FUNCTION
+																DATASET(Gateway.Layouts.Config) gateways,STRING32 ApplicationType='',UNSIGNED1 GLBPurpose=0,UNSIGNED1 DPPAPurpose=0) := FUNCTION
 	uniquePhones := DEDUP(SORT(inPhones,phone,acctno),phone);		
 	gateway_cfg := gateways(Gateway.Configuration.IsAccuDataCNAM(servicename))[1];
 	dsAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(uniquePhones,gateway_cfg,~Doxie.DataRestriction.AccuData);
@@ -12,8 +12,8 @@ EXPORT GetAccuData_CallerName(DATASET(Phones.Layouts.PhoneAcctno) inPhones,
 									 l.response.AccudataReport.ErrorMessage=''; 
 									 
 		callerName	:= STD.Str.ToUpperCase(l.response.AccudataReport.Reply.CallingName);
-		SELF.name_first := IF(isAvailable, STD.Str.GetNthWord(callerName,2),'');
-		SELF.name_last := IF(isAvailable, STD.Str.GetNthWord(callerName,1),'');
+		SELF.fname := IF(isAvailable, STD.Str.GetNthWord(callerName,2),'');
+		SELF.lname := IF(isAvailable, STD.Str.GetNthWord(callerName,1),'');
 		SELF.listingName := callerName;
 		SELF.privateFlag := l.response.AccudataReport.Reply.PresentationIndicator;
 		SELF.availabilityIndicator := l.response.AccudataReport.Reply.AvailabilityIndicator; //preserved for additional use
@@ -26,15 +26,15 @@ EXPORT GetAccuData_CallerName(DATASET(Phones.Layouts.PhoneAcctno) inPhones,
 	END;
 	dsCallerIDs := PROJECT(dsAccuDataCNAM, resolveCallerID(LEFT)); 
 	// need to send in additional info to get DID - future release
-/*	dsPossibleIndividuals:=PROJECT(dsCallerIDs(name_first<>'' AND name_last<>''),TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster,SELF.acctno:=LEFT.acctno,SELF.homephone:=LEFT.phone,SELF:=LEFT,SELF:=[]));
-	dsPhonewDIDs := BatchServices.Functions.fn_find_dids_and_append_to_acctno(dsPossibleIndividuals,2);
-	dsCountDids := TABLE( dsPhonewDIDs, {dsPhonewDIDs.acctno,dsPhonewDIDs.did, did_count := COUNT(GROUP)}, acctno );//doxie.layout_references_acctno
-	CallerIDwDIDs			:= JOIN(dsCallerIDs, dsCountDids(did_count=1),
-														LEFT.acctno = (STRING)RIGHT.acctno,
-														TRANSFORM(Phones.Layouts.AccuDataCNAM,
-															SELF.did 				:= LEFT.did,
-															SELF						:= LEFT),
-														LEFT OUTER,ALL);*/
+	dsPossibleIndividuals:=PROJECT(dsCallerIDs(fname<>'' AND lname<>''),TRANSFORM(DidVille.Layout_Did_OutBatch,SELF.seq:=(INTEGER)LEFT.acctno,SELF.phone10:=LEFT.phone,SELF:=LEFT,SELF:=[]));
+	dsPhonewDIDs := Phones.Functions.GetDIDs(dsPossibleIndividuals,ApplicationType,GLBPurpose,DPPAPurpose);
+	CallerIDwDIDs			:= JOIN(dsCallerIDs, dsPhonewDIDs,
+															LEFT.acctno = (STRING)RIGHT.seq,
+															TRANSFORM(Phones.Layouts.AccuDataCNAM,
+																SELF.did 	:= LEFT.did,
+																SELF						:= LEFT),
+															LEFT OUTER,ALL);
+																									
 	#IF(Phones.Constants.Debug.AccuDataCNAM)															
 		OUTPUT(dsCallerIDs,NAMED('dsCallerIDs'));
 	#END	

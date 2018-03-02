@@ -1,14 +1,21 @@
-﻿IMPORT Autokey_batch,BatchServices,Gateway,MDR, Phones, PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
+﻿IMPORT DidVille,BatchServices,Gateway,MDR, Phones, PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 																		PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
 	Functions := PhoneOwnership.Functions;
 	Constants := PhoneOwnership.Constants;
 	today := STD.Date.Today();
-	//get unknown DIDs
-	dsBatch := PROJECT(ds_batch_in(did=0),TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster,SELF.homephone := LEFT.phone_number,SELF.z5 := LEFT.zip,SELF:=LEFT,SELF:=[]));
-	dsBatchwDIDs := Functions.GetDIDs(dsBatch);
+	//get unknown DIDs - using best DID
+	dsBatch := PROJECT(ds_batch_in(did=0),TRANSFORM(DidVille.Layout_Did_OutBatch,
+																											SELF.fname:=LEFT.name_first,
+																											SELF.mname:=LEFT.name_middle,							
+																											SELF.seq:=(UNSIGNED)LEFT.acctno,							
+																											SELF.lname:=LEFT.name_last,
+																											SELF.phone10 := LEFT.phone_number,
+																											SELF.z5 := LEFT.zip,
+																											SELF:=LEFT,SELF:=[]));
+	dsBatchwDIDs := Phones.Functions.GetDIDs(dsBatch,inMod.ApplicationType,inMod.GLBPurpose,inMod.DPPAPurpose);
 	dsBatchwInput := JOIN(ds_batch_in,dsBatchwDIDs, 
-												LEFT.acctno = RIGHT.acctno,
+												LEFT.acctno = (STRING)RIGHT.seq,
 												TRANSFORM(PhoneOwnership.Layouts.PhonesCommon,
 																	SELF.acctno := LEFT.acctno;
 																	SELF.did := IF(LEFT.did=0,RIGHT.did,LEFT.did);
@@ -46,9 +53,9 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.dob := (STRING)l.dob;
 		SELF.AppendedTelcoName := r.operator_name; //carrier or operator?
 		SELF.PrepaidPhoneFlag := (BOOLEAN)r.prepaid; //newly added to PhoneAttribute layout
-		status := MAP(disconnectDate > 0 AND portedDate > 0 AND  ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)<=7 => Constants.DisconnectStatus.UNDETERMINED,
-																	disconnectDate > 0 AND (portedDate = 0 OR (portedDate > 0 AND ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)>7)) => Constants.DisconnectStatus.DISCONNECTED,
-																	Constants.DisconnectStatus.UNKNOWN);
+		status := MAP(  disconnectDate > 0 AND portedDate > 0 AND  ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)<=7 => Constants.DisconnectStatus.UNDETERMINED,
+						disconnectDate > 0 AND (portedDate = 0 OR (portedDate > 0 AND ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)>7)) => Constants.DisconnectStatus.DISCONNECTED,
+						Constants.DisconnectStatus.UNKNOWN);
 		SELF.disconnect_status := status;
 		SELF.ph_poss_disconnect_date := disconnectDate;
 		SELF.ph_ported_date := portedDate;
@@ -56,8 +63,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.new_phone_number_from_swap := IF(swapDate>0,r.new_phone_number_from_swap,'');
 		//mark all reported invalid numbers
 		badNumber := STD.Str.ToLowerCase(trim(r.error_desc)) = Constants.BAD_NUMBER AND status = Constants.DisconnectStatus.UNKNOWN;
-		SELF.AppendedPhoneLineType := IF(badNumber,Phones.Constants.PhoneServiceType.Other,Phones.Functions.LineServiceTypeDesc((INTEGER)r.phone_line_type));
-		SELF.AppendedPhoneServiceType := IF(badNumber,Phones.Constants.PhoneServiceType.Other,Phones.Functions.LineServiceTypeDesc((INTEGER)r.phone_serv_type));
+		SELF.AppendedPhoneLineType := IF(badNumber,'',r.phone_line_type_desc);
+		SELF.AppendedPhoneServiceType := IF(badNumber,'',r.phone_line_type_desc);
 		SELF.AppendedFirstDate := IF(badNumber,today,r.event_date); // check these date with effective date?????? - POSSIBLE FUTURE UPDATE
 		SELF.AppendedLastDate := today;		
 		SELF.LexisNexisMatchCode := IF(badNumber,Constants.LNMatch.INVALID,'');
@@ -80,7 +87,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 
 	//***************Get REAB identities for Zumigo and to compare with callerID from AccuData **************************************************
 	dsBatchwREAB := PhoneOwnership.GetREAB(dsBatchwBestInfo,inMod);//use dsBatchwBestInfo alternate name record in sequencing	
-	// *************************Zumigo to be added later***********************//	
+	// *************************Zumigo to be added later************************//	
 /*	dsZumigoRequest :=IF(inMod.useZumigo, PROJECT(dsBatchwREAB,TRANSFORM(Phones.Layouts.ZumigoIdentity.subjectVerificationRequest,
 																																							SELF.acctno:= LEFT.acctno,
 																																							SELF.sequence_number:= LEFT.seq,
@@ -126,20 +133,20 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 
 	//******************Get CallerID for PREMIUM and later unresolved Ultimate********************************
 	dsPhones:= PROJECT(dsPhonesMetadataByEffectiveDate(LexisNexisMatchCode != Constants.LNMatch.INVALID),TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.acctno:=LEFT.acctno, SELF.phone:=LEFT.phone)); //avoid sending identified invalid numbers
-	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways),
+	dsAccuData := IF(EXISTS(dsPhones) AND inMod.useAccudataCNAM,Phones.GetAccuData_CallerName(dsPhones,inMod.gateways,inMod.ApplicationType,inMod.GLBPurpose,inMod.DPPAPurpose),
 													DATASET([],Phones.Layouts.AccuDataCNAM));	
 	
 	PhoneOwnership.Layouts.BatchOut formatCNAM(Phones.Layouts.AccuDataCNAM l):= TRANSFORM
 		validCNAMResponse := l.listingname<>'' AND l.listingname<>'ERROR';
-		nameIsAvailable := l.availabilityindicator = 0 AND validCNAMResponse AND l.privateflag = 0;
 		SELF.AppendedListingName := IF(validCNAMResponse,l.listingname,'');
 		SELF.AppendedLastDate := IF(validCNAMResponse,today,0);			
 		SELF.source_category := IF(validCNAMResponse,Constants.CNAM,'');
 		//report error results and mark any reported bad numbers not caught by ATT LIDB gateway.
 		SELF.error_desc := IF(l.listingname='ERROR', 'CNAM: '+ l.error_desc,'');	
 		SELF.AppendedDID := (STRING)l.did;
-		SELF.AppendedFirstName := l.name_first;
-		SELF.AppendedSurname := l.name_last;
+		SELF.AppendedFirstName := l.fname;
+		SELF.AppendedSurname := l.lname;
+		SELF.validatedName := l.availabilityindicator = 0 AND validCNAMResponse AND l.privateflag = 0;
 		badNumber := STD.Str.ToLowerCase(l.error_desc) = 'missingorinvalidbtn';
 		SELF.subj2own_relationship := IF(badNumber,Constants.Relationship.INVALID,'');
 		SELF.LexisNexisMatchCode := IF(badNumber,Constants.LNMatch.INVALID,'');	
@@ -152,23 +159,24 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 
 	PhoneOwnership.Layouts.BatchOut appendCNAM(PhoneOwnership.Layouts.BatchOut l,PhoneOwnership.Layouts.BatchOut r):= TRANSFORM
 		inputNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,r.AppendedFirstName,r.AppendedSurname);
-		nameMatch := IF(inputNameMatch,Constants.LNMatch.NAME,'');
+		fullNameMatch := inputNameMatch = Constants.NameMatch.FIRSTLAST; 
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
 		SELF.AppendedFirstName := r.AppendedFirstName;
 		SELF.AppendedSurname := r.AppendedSurname;
+		SELF.validatedName := r.validatedName;
 		SELF.AppendedListingName := r.AppendedListingName;
 		SELF.AppendedLastDate := MAX(l.AppendedLastDate,r.AppendedLastDate);			
 		SELF.source_category := l.source_category + r.source_category;
 		SELF.error_desc := l.error_desc + r.error_desc;	
 		SELF.subj2own_relationship := IF(r.subj2own_relationship='',l.subj2own_relationship,r.subj2own_relationship);
-		SELF.LexisNexisMatchCode := MAP(inputNameMatch => nameMatch,
-																		r.LexisNexisMatchCode<>'' => r.LexisNexisMatchCode,
-																		l.LexisNexisMatchCode);
-		SELF.reason_codes := MAP(inputNameMatch => Constants.Reason_Codes.MATCH,
-														 r.LexisNexisMatchCode<>'' => r.reason_codes,
-														 l.reason_codes);
-		SELF.ownership_index := MAP(inputNameMatch => Constants.Ownership.enumIndex.HIGH,
+		SELF.LexisNexisMatchCode := MAP(inputNameMatch > Constants.NameMatch.NONE => Constants.LNMatch.NAME,
+										r.LexisNexisMatchCode<>'' => r.LexisNexisMatchCode,
+										l.LexisNexisMatchCode);
+		SELF.reason_codes := MAP(fullNameMatch => Constants.Reason_Codes.MATCH,
+								r.LexisNexisMatchCode<>'' => r.reason_codes,
+								l.reason_codes);
+		SELF.ownership_index := MAP(fullNameMatch => Constants.Ownership.enumIndex.HIGH,
 																r.LexisNexisMatchCode <>'' => r.ownership_index,
 																l.ownership_index);
 		SELF := l;
@@ -189,6 +197,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedFirstName := IF(blankName,r.fname,l.AppendedFirstName);
 		SELF.AppendedMiddleName := IF(blankName,r.mname,l.AppendedMiddleName);
 		SELF.AppendedSurname := IF(blankName,r.lname,l.AppendedSurname);
+		SELF.validatedName := IF(NOT blankName,l.validatedName,FALSE);		
 		SELF.AppendedCompanyName := r.companyname;
 		SELF.AppendedStreetNumber := r.prim_range;
 		SELF.AppendedPreDirectional := r.predir;
@@ -202,10 +211,12 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedZipCode := r.zip;
 		SELF.AppendedZipCodeExtension := r.zip4;
 		SELF.AppendedRecordType := IF(r.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,'');
+		inNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,r.fname,r.lname);
+		fullNameMatch := inNameMatch = Constants.NameMatch.FIRSTLAST; 	
 		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR //accounting for name match from accudata results - LexisNexisMatchCode
-										Functions.evaluateNameMatch(l.name_first,l.name_last,r.fname,r.lname),Constants.LNMatch.NAME,'');
-		recordMatch := Functions.evaluateNameMatch(l.AppendedFirstName,l.AppendedSurname,r.fname,r.lname);								
-		SELF.subj2own_relationship := MAP(nameMatch<>'' => Constants.Relationship.SUBJECT,
+										inNameMatch > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
+		recordMatch := Functions.evaluateNameMatch(l.AppendedFirstName,l.AppendedSurname,r.fname,r.lname) = Constants.NameMatch.FIRSTLAST;								
+		SELF.subj2own_relationship := MAP(fullNameMatch => Constants.Relationship.SUBJECT,
 																			r.subj2own_relationship='' => Constants.Relationship.NONE,
 																			l.subj2own_relationship='' => r.subj2own_relationship,
 																			l.subj2own_relationship);										
@@ -220,13 +231,15 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 																																						Risk_Indicators.AddrScore.citystate_score(l.p_city_name,l.st,r.city_name,r.st,''))),
 																																						Constants.LNMatch.ADDRESS,'');
 		phoneMatch := IF(nameMatch<> '' OR relationalMatch <> '',Constants.LNMatch.PHONE,'');
-		SELF.LexisNexisMatchCode := IF(l.LexisNexisMatchCode = Constants.LNMatch.INVALID, Constants.LNMatch.INVALID, nameMatch + relationalMatch + addressMatch + phoneMatch);			
+		SELF.LexisNexisMatchCode := MAP(l.LexisNexisMatchCode = Constants.LNMatch.INVALID => Constants.LNMatch.INVALID, 
+																		l.validatedname => nameMatch + relationalMatch + addressMatch + phoneMatch,
+																		relationalMatch);			
 		ownership := MAP(l.ownership_index!=Constants.Ownership.enumIndex.UNDETERMINED => l.ownership_index,
-										 nameMatch<>'' AND l.subj2own_relationship=Constants.Relationship.SUBJECT => Constants.Ownership.enumIndex.HIGH,
+										 fullNameMatch AND l.subj2own_relationship=Constants.Relationship.SUBJECT => Constants.Ownership.enumIndex.HIGH,
 										 recordMatch AND r.titleno > 0 => Constants.Ownership.enumIndex.MEDIUM_HIGH,
 										 recordMatch AND l.subj2own_relationship = Constants.Relationship.RELATIVE => Constants.Ownership.enumIndex.MEDIUM,
 										 l.AppendedSurname='' OR l.AppendedFirstName='' => Constants.Ownership.enumIndex.UNDETERMINED,
-										 nameMatch='' AND NOT recordMatch AND l.AppendedListingName<>'' => Constants.Ownership.enumIndex.LOW,
+										 NOT fullNameMatch AND NOT recordMatch AND l.AppendedListingName<>'' => Constants.Ownership.enumIndex.LOW,
 										 l.ownership_index);
 		SELF.ownership_index := ownership;
 		SELF.ownership_likelihood := Functions.getOwnershipValue(ownership);
@@ -259,12 +272,13 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	// Note that ownership is defined by accudata or data match with input - this will be replaced with a scoring model later.
 	PhoneOwnership.Layouts.BatchOut appendLNData(PhoneOwnership.Layouts.BatchOut l, Phones.Layouts.PhoneIdentity r) := TRANSFORM
 		match := r.phone <> '';
-		recordNameMatch := match AND Functions.evaluateNameMatch(l.AppendedFirstName,l.AppendedSurname,r.fname,r.lname);
-		inputNameMatch :=	match AND Functions.evaluateNameMatch(l.name_first,l.name_last,r.fname,r.lname);
+		recordNameMatch := match AND Functions.evaluateNameMatch(l.AppendedFirstName,l.AppendedSurname,r.fname,r.lname) = Constants.NameMatch.FIRSTLAST;
+		inNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,r.fname,r.lname);
+		inputNameMatch :=	match AND inNameMatch  = Constants.NameMatch.FIRSTLAST;
 		blankName := (l.AppendedFirstName ='' AND l.AppendedSurname='') OR l.AppendedListingName='';
-		noCallerName:= match AND l.AppendedListingName='';
+		noCallerName:= match AND (l.AppendedListingName='' OR NOT l.validatedname);
 		// internalPhoneMatch := match AND blankName;// (OR nameMatch='');
-		noOwner := NOT match AND blankName; //(OR inMod.search_level = Constants.SearchLevel.BASIC);
+		noOwner := NOT match AND (blankName OR NOT l.validatedname); //(OR inMod.search_level = Constants.SearchLevel.BASIC);
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
 		SELF.AppendedDID := IF(noOwner OR noCallerName,(STRING)r.did,l.AppendedDID);
@@ -272,6 +286,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedMiddleName := IF(noOwner OR noCallerName,r.mname,l.AppendedMiddleName);
 		SELF.AppendedSurname := IF(noOwner OR noCallerName,r.lname,l.AppendedSurname);
 		SELF.AppendedListingName := IF(noCallerName,r.listed_name,l.AppendedListingName);
+		SELF.validatedName := l.validatedName OR match;	
 		SELF.AppendedFirstDate := ut.Min2(l.AppendedFirstDate,(UNSIGNED)r.dt_first_seen);
 		SELF.AppendedLastDate := MAX((UNSIGNED)r.dt_last_seen,l.AppendedLastDate);
 		SELF.AppendedCompanyName := IF(match,r.companyname,'');
@@ -286,7 +301,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedStateCode := IF(match,r.st,'');
 		SELF.AppendedZipCode := IF(match,r.zip,'');
 		SELF.AppendedZipCodeExtension := IF(match,r.zip4,'');
-		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR inputNameMatch,Constants.LNMatch.NAME,'');
+		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR inNameMatch > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
 		//********************evaluate data match for LexisNexisMatchCode*******************************************
 		containsLexID 	 := STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.LEXID,FALSE);
 		containsRelative := STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,FALSE);
@@ -324,16 +339,18 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		//********************determine phone Ownership*******************************************
 		ownershipSetByGateway := l.ownership_index != Constants.Ownership.enumIndex.UNDETERMINED;
 		SELF.subj2own_relationship := MAP(ownershipSetByGateway => l.subj2own_relationship,
-																			badNumber => Constants.Relationship.INVALID, 
-																			noOwner => Constants.Relationship.NONE,
-																			NOT recordNameMatch AND NOT inputNameMatch => '',
-																			l.subj2own_relationship);
+											sameDID => Constants.Relationship.SUBJECT,
+											badNumber => Constants.Relationship.INVALID, 
+											noOwner => Constants.Relationship.NONE,
+											NOT recordNameMatch AND NOT inputNameMatch => Constants.Relationship.NONE,
+											l.subj2own_relationship);
 		isDisconnected := l.disconnect_status = Constants.DisconnectStatus.DISCONNECTED;
 		isCloseRelative := l.subj2own_relationship NOT IN ['',Constants.Relationship.INVALID,Constants.Relationship.RELATIVE,Constants.Relationship.SUBJECT,Constants.Relationship.NONE];
 		SELF.reason_codes := MAP(badNumber => Constants.Reason_Codes.INVALID_NUMBER,
 														isDisconnected AND l.reason_codes<>'' => l.reason_codes + Constants.Reason_Codes.DISCONNECTED,
 														Functions.GetReasonCodes(nameMatch<>'' OR sameDID,noOwner,l.disconnect_status = Constants.DisconnectStatus.DISCONNECTED) );	
 		ownership := MAP(ownershipSetByGateway => l.ownership_index,
+											sameDID => Constants.Ownership.enumIndex.HIGH,
 											(recordNameMatch OR inputNameMatch) AND l.subj2own_relationship=Constants.Relationship.SUBJECT => Constants.Ownership.enumIndex.HIGH,
 											(recordNameMatch OR inputNameMatch) AND isCloseRelative => Constants.Ownership.enumIndex.MEDIUM_HIGH,
 											(recordNameMatch OR inputNameMatch) AND l.subj2own_relationship = Constants.Relationship.RELATIVE => Constants.Ownership.enumIndex.MEDIUM,
@@ -355,17 +372,26 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 															 Functions.fuzzyString(LEFT.AppendedSurname) = Functions.fuzzyString(RIGHT.lname)) OR
 															(LEFT.AppendedListingName <> '' AND Functions.fuzzyString(LEFT.AppendedListingName) = Functions.fuzzyString(RIGHT.companyname))),
 															appendLNData(LEFT,RIGHT),
-															LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));		
+															LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));	
+	noRelation := 	DEDUP(SORT(dsLNData,acctno,phone,appendeddid,appendedfirstname,appendedfirstname,appendedlistingname,record),
+							acctno,phone,appendeddid,appendedfirstname,appendedfirstname,appendedlistingname);												
+	dsDefaultLNData := JOIN(noRelation,dsLNIdentities,
+					LEFT.phone=RIGHT.phone AND
+					NOT LEFT.validatedname AND LEFT.AppendedFirstName ='' AND LEFT.AppendedSurname ='',
+					appendLNData(LEFT,RIGHT),
+					LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));		
+															
 	//result record count will always be one per acctno for this release.
-	dsPhoneResults := UNGROUP(TOPN(GROUP(SORT(dsLNData,acctno),acctno),inMod.MaxIdentityCount,acctno,ownership_index=Constants.Ownership.enumIndex.UNDETERMINED,-ownership_index,reason_codes,seq)); 
+	dsPhoneResults := UNGROUP(TOPN(GROUP(SORT(dsLNData+dsDefaultLNData,acctno),acctno),inMod.MaxIdentityCount,acctno,-validatedname,ownership_index=Constants.Ownership.enumIndex.UNDETERMINED,-ownership_index,reason_codes,seq)); 
 	
 	PhoneOwnership.Layouts.BatchOut UpdateUnknownRelationships (PhoneOwnership.Layouts.BatchOut l):= TRANSFORM
 		availableListingName := l.AppendedListingName <>'';
 		names := STD.Str.SplitWords(l.AppendedListingName,' ');
-		inputNameMatch :=	Functions.evaluateNameMatch(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname);
+		inNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname);
+		FullNameMatch :=	inNameMatch = Constants.NameMatch.FIRSTLAST;
 		listingMatch := availableListingName AND (l.AppendedFirstName IN names) AND (l.AppendedSurname IN names);
-		// inputNameMatch := NOT availableListingName AND inputMatch;
-		ownershipPossible := listingMatch OR inputNameMatch;
+		inputMatch := FullNameMatch OR l.ownership_index > Constants.Ownership.enumIndex.UNDETERMINED;
+		ownershipPossible := listingMatch OR inputMatch;
 		SELF.AppendedDID := IF(ownershipPossible,l.AppendedDID,'');
 		SELF.AppendedFirstName := IF(ownershipPossible,l.AppendedFirstName,'');
 		SELF.AppendedMiddleName := IF(ownershipPossible,l.AppendedMiddleName,'');
@@ -382,15 +408,23 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedStateCode := IF(ownershipPossible,l.AppendedStateCode,'');
 		SELF.AppendedZipCode := IF(ownershipPossible,l.AppendedZipCode,'');		
 		SELF.AppendedZipCodeExtension := IF(ownershipPossible,l.AppendedZipCodeExtension,'');		
-		SELF.LexisNexisMatchCode := MAP(inputNameMatch => l.LexisNexisMatchCode,
+		SELF.LexisNexisMatchCode := MAP(l.validatedName  => TRIM(l.LexisNexisMatchCode,ALL),
 																		l.LexisNexisMatchCode = Constants.LNMatch.INVALID => Constants.LNMatch.INVALID,
 																		l.AppendedPhoneLineType = 'WIRELESS' => Constants.LNMatch.CELL,
 																		l.AppendedRecordType = Constants.LNMatch.BUSINESS => Constants.LNMatch.BUSINESS,
 																		l.AppendedRecordType <> Constants.LNMatch.BUSINESS => Constants.LNMatch.NON_CELL_CONSUMER,
 																		'');	
-		SELF.ownership_index := IF(ownershipPossible OR l.ownership_index = Constants.Ownership.enumIndex.INVALID, l.ownership_index,Constants.Ownership.enumIndex.UNDETERMINED);																		
-		SELF.ownership_likelihood := IF(ownershipPossible OR l.ownership_likelihood = Constants.Ownership.INVALID, STD.Str.CleanSpaces(l.ownership_likelihood), Constants.Ownership.UNDETERMINED);	
-		SELF.subj2own_relationship := IF(ownershipPossible OR l.subj2own_relationship = Constants.Relationship.INVALID, l.subj2own_relationship,Constants.Relationship.NONE);																			
+		// SELF.ownership_index := IF(ownershipPossible OR l.ownership_index = Constants.Ownership.enumIndex.INVALID, l.ownership_index,Constants.Ownership.enumIndex.UNDETERMINED);																		
+		SELF.ownership_index := MAP(FullNameMatch => Constants.Ownership.enumIndex.HIGH,
+																ownershipPossible OR l.ownership_index = Constants.Ownership.enumIndex.INVALID =>  l.ownership_index, 
+																Constants.Ownership.enumIndex.UNDETERMINED);																		
+		SELF.ownership_likelihood := MAP(FullNameMatch => Constants.Ownership.HIGH,
+																		 ownershipPossible OR l.ownership_likelihood = Constants.Ownership.INVALID => l.ownership_likelihood, 
+																		 Constants.Ownership.UNDETERMINED);	
+		SELF.subj2own_relationship := MAP(FullNameMatch => Constants.Relationship.SUBJECT,
+											ownershipPossible OR l.subj2own_relationship = Constants.Relationship.INVALID => l.subj2own_relationship,
+											NOT l.validatedName => Constants.Relationship.NO_IDENTITY,
+											Constants.Relationship.NONE);																			
 		SELF:=l;
 	END;
 	dsPhonesFinal := PROJECT(dsPhoneResults,UpdateUnknownRelationships(LEFT));
@@ -445,6 +479,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		OUTPUT(dsPhoneswREAB,NAMED('dsPhoneswREAB'));		
 		OUTPUT(dsLNIdentities,NAMED('dsLNIdentities'));
 		OUTPUT(dsLNData,NAMED('dsLNData'));
+		OUTPUT(dsDefaultLNData,NAMED('dsDefaultLNData'));
 		OUTPUT(dsPhoneResults,NAMED('dsPhoneResults'));
 		OUTPUT(dsPhonesFinal,NAMED('dsPhonesFinal'));
 		// OUTPUT(dsContactRisk,NAMED('dsContactRisk'));
