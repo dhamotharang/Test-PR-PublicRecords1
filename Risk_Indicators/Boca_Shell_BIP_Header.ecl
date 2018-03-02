@@ -100,7 +100,7 @@ string6 ninesDate := '999999';
 	
 		
 	// Sort business header records by SeleID
-	SortedBusinessHeader := SORT(BusinessHeaderExpanded, UniqueID, SeleID);
+	SortedBusinessHeader := SORT(UNGROUP(BusinessHeaderExpanded), UniqueID, SeleID);
 	
 	// Rollup business header records to calculate counts and dates within unique SeleID
   layoutExpanded rollBusinessHeader(layoutExpanded le, layoutExpanded ri) := transform
@@ -562,31 +562,38 @@ string6 ninesDate := '999999';
 			self := left));
 		
 	FinalBIP := map(isFCRA                    => FCRADefaults,
-                 BSVersion >= 5.4          => withBIPHeaderVerification, //this is new for BS 5.4
+                 BSVersion >= 54           => withBIPHeaderVerification, //this is new for BS 5.4
                                               WithSOSFilings);	
  
-	// FinalBIP := wSOSFilings;	
-
 
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(CHOOSEN(CorpFilings_raw, 33), NAMED('CorpFilings_raw'));	
-	// OUTPUT(CHOOSEN(CorpFilings_Seq, 33), NAMED('CorpFilings_Seq'));	
-	// OUTPUT(CHOOSEN(kFetchErrorCodes, 33), NAMED('kFetchErrorCodes'));	
-	// OUTPUT(CHOOSEN(CorpFilings_withSrcCode, 33), NAMED('CorpFilings_withSrcCode'));	
-	// OUTPUT(CHOOSEN(CorpFilings_recs, 33), NAMED('CorpFilings_recs'));	
-	// OUTPUT(CHOOSEN(SortedCorpFilings, 33), NAMED('SortedCorpFilings'));	
-	// OUTPUT(CHOOSEN(RolledCorpFilings, 33), NAMED('RolledCorpFilings'));	
-	// OUTPUT(CHOOSEN(RolledSOSFilings, 33), NAMED('RolledSOSFilings'));	
-	// OUTPUT(CHOOSEN(WithSOSFilings, 33), NAMED('WithSOSFilings'));	
-	// OUTPUT(CHOOSEN(BusinessHeaderSeq, 300), NAMED('BusinessHeaderSeq'));	
-	// OUTPUT(CHOOSEN(BusinessHeader, 300), NAMED('BusinessHeader'));	
-	// OUTPUT(CHOOSEN(BusinessHeaderVerification, 300), NAMED('BusinessHeaderVerification'));	
-	// OUTPUT(CHOOSEN(BusinessHeaderVerificationRolled, 300), NAMED('BusinessHeaderVerificationRolled'));	
-	// OUTPUT(CHOOSEN(withBIPHeaderVerification, 300), NAMED('withBIPHeaderVerification'));	
+	// OUTPUT(CHOOSEN(For_FEIN_Search, 33), NAMED('For_FEIN_Search'));	
+	// OUTPUT(CHOOSEN(FEIN_results_w_acct, 33), NAMED('FEIN_results_w_acct'));	
+	// OUTPUT(CHOOSEN(UniqueRawFEINMatches, 33), NAMED('UniqueRawFEINMatches'));	
+	// OUTPUT(COUNT(BusinessHeaderRaw), NAMED('BusinessHeaderRawCount'));	
+	// OUTPUT(COUNT(BusinessHeaderSeq), NAMED('BusinessHeaderSeq'));	
+	// OUTPUT(COUNT(BusinessHeader), NAMED('BusinessHeader'));	
+	// OUTPUT(COUNT(BusinessHeaderExpanded), NAMED('BusinessHeaderExpanded'));	
+	// OUTPUT(CHOOSEN(SortedBusinessHeader, 25), NAMED('SortedBusinessHeader'));	
+	// OUTPUT(COUNT(SortedBusinessHeader), NAMED('SortedBusinessHeaderCount'));	
+	// OUTPUT(CHOOSEN(RolledBusinessHeader, 100), NAMED('RolledBusinessHeader'));	
+	// OUTPUT(COUNT(RolledBusinessHeader), NAMED('RolledBusinessHeaderCount'));	
+	// OUTPUT(COUNT(withBusinessHeader), NAMED('withBusinessHeader'));	
+	// OUTPUT(COUNT(LinkIDs), NAMED('LinkIDs'));	
+	// OUTPUT(COUNT(CorpFilings_raw), NAMED('CorpFilings_raw'));	
+	// OUTPUT(COUNT(CorpFilings_seq), NAMED('CorpFilings_seq'));	
+	// OUTPUT(COUNT(CorpFilings_withSrcCode), NAMED('CorpFilings_withSrcCode'));	
+	// OUTPUT(COUNT(CorpFilings_recs), NAMED('CorpFilings_recs'));	
+	// OUTPUT(COUNT(SortedCorpFilings), NAMED('SortedCorpFilings'));	
+	// OUTPUT(COUNT(RolledCorpFilings), NAMED('RolledCorpFilings'));	
+	// OUTPUT(COUNT(RolledSOSFilings), NAMED('RolledSOSFilings'));	
+	// OUTPUT(COUNT(withSOSFilings), NAMED('withSOSFilingsCount'));	
+	// OUTPUT(COUNT(BusinessHeaderVerification), NAMED('BusinessHeaderVerificationCount'));	
+	// OUTPUT(COUNT(BusinessHeaderVerificationRolled), NAMED('BusinessHeaderVerificationRolledCount'));	
+	// OUTPUT(COUNT(withBIPHeaderVerification), NAMED('withBIPHeaderVerificationCount'));	
 
-	// RETURN BusinessHeaderVerification;
 	RETURN FinalBIP;
 	
 END;													
