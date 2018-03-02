@@ -1,11 +1,11 @@
-﻿IMPORT BIPV2,Gong,Header,Phones,phonesplus_batch,ut;
+﻿IMPORT BIPV2,Gong,Header,MDR,Phones,phonesplus_batch,ut;
 EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 													UNSIGNED1 GLBPurpose = 0,
 													UNSIGNED1 DPPAPurpose = 0,
 													STRING DataRestrictionMask = '',
 													STRING Industryclass = '') := FUNCTION
-	dsUniquePhones := DEDUP(SORT(dsPhones,phone),phone);													
-	// landlines
+	dsUniquePhones := DEDUP(SORT(dsPhones,phone,acctno),phone);													
+	//landlines
 	dsGong := JOIN(dsUniquePhones,Gong.key_history_phone,
 											KEYED(LEFT.phone[4..10] = RIGHT.p7) AND 
 											KEYED(LEFT.phone[1..3] = RIGHT.p3) AND
@@ -53,7 +53,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 																										SELF:=LEFT,SELF:=[]));
 	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.																		
 	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).data2_;	
-	dsBips := DEDUP(dsBipData2(source<>'D'),all); //filter out Dunn's records, should only be used for linking
+	dsBips := DEDUP(dsBipData2(source<>MDR.SourceTools.src_Dunn_Bradstreet),all); //filter out Dunn's records, should only be used for linking
 
 	layout_rawRec:=RECORDOF(dsBips);
 
