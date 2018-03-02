@@ -102,7 +102,7 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.Address_Verification.address_history_2.N_ave_no_of_baths_count := le.addr_risk_summary3.N_ave_no_of_baths_count ;	
 	
 	self.phone_verification.Insurance_Phone_Verification := le.insurance_phones_summary.Insurance_Phone_Verification;
-	self.phone_verification.phone_ver_bureau  := le.phone_ver_bureau ;
+	self.phone_verification.Experian_Phone_Verification := le.Experian_Phone_Verification;
 	self.student.attended_college := le.attended_college;	
 // end of shell 5.0 new content	
 	
