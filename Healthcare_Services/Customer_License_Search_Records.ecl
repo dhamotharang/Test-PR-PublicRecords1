@@ -1,4 +1,4 @@
-Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
+Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes,HealthCare_Provider_Header_AsHeader;
 EXPORT Customer_License_Search_Records := module
 	Shared myLayouts := Healthcare_Services.Customer_License_Search_Layouts;
 	Shared myConst := Healthcare_Services.Customer_License_Search_Constants;
@@ -77,8 +77,8 @@ EXPORT Customer_License_Search_Records := module
 	end;
 	//Search By License or License+State and apply a name only penalty as the addresses are likely out of date.
 	Export get_recs_by_License (dataset(myLayouts.autokeyInput) input):= function
-		rawData:= dedup(sort(join(input, MMCP.Keys().LicenseNumber.qa,
-																	 Keyed(left.License_Number=right.License_Number) and 
+    		rawData:= dedup(sort(join(input, MMCP.Keys().LicenseNumber.qa,
+																	 Keyed( left.License_Number =right.License_Number) and 
 																	 (integer)left.CustomerID=right.customer_id,
 																	 transform(myLayouts.LayoutOutput,self.acctno:=left.acctno;self:=right,self:=[]),
 																	 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record);
@@ -169,7 +169,10 @@ EXPORT Customer_License_Search_Records := module
 	End;
 
 	Export RecordsBatch(dataset(myLayouts.autokeyInput) inRecs, unsigned2 maxPenalty) := function
-		recs := Records(inRecs,maxPenalty);
+   	clean_in_recs:=	project(inRecs,transform(myLayouts.autokeyInput,
+		                                    self.license_number:=HealthCare_Provider_Header_AsHeader.Utils.CleanLicenseNumber(left.license_number);
+																				self:=left;));
+		recs := Records(clean_in_recs,maxPenalty);
 		recs_fmt := project(recs,transform(myLayouts.LayoutOutput_batch, 
 															self.cln_fname:=left.clean_name.fname;
 															self.cln_mname:=left.clean_name.mname;
@@ -186,6 +189,6 @@ EXPORT Customer_License_Search_Records := module
 															self.cln_st:=left.clean_company_address.st;
 															self.cln_zip:=left.clean_company_address.zip;
 															self:=left;));
-		return recs_fmt;
+ 	return recs_fmt;
 	End;
 end;
