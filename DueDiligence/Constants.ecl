@@ -1,5 +1,6 @@
 ﻿IMPORT MDR, risk_indicators;
 
+
 EXPORT Constants := MODULE
 
 EXPORT VERSION_3 := 3;
@@ -174,6 +175,15 @@ EXPORT mac_JOINLinkids_Results := MACRO
 					'LEFT.ultID = RIGHT.ultID AND ' +
 					'LEFT.orgID = RIGHT.orgID AND ' +
 					'LEFT.seleID = RIGHT.seleID' 
+ENDMACRO;
+
+EXPORT mac_TRANSFORMLinkids := MACRO
+				'SELF.seq                    := LEFT.seq; '    +           //*** This is the sequence number of the Inquired Business (or the Parent)
+				'SELF.ultid                  := LEFT.ultid; '  +
+				'SELF.orgid                  := LEFT.orgid; '  +
+				'SELF.seleid                 := LEFT.seleid; ' +
+				'SELF.proxid                 := LEFT.proxid; ' +
+				'SELF.powid                  := LEFT.powid; '
 ENDMACRO;
 
 
