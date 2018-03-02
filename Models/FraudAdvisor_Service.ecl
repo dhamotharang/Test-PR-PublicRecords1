@@ -256,7 +256,7 @@ string 	 	DataRestriction 	:= risk_indicators.iid_constants.default_DataRestrict
 string	 	DataPermission 		:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 boolean   Test_Data_Enabled := false  		: stored('TestDataEnabled');
 string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
-
+ 
 
 // these new fields were asked to be added for fp 2.0, but we're not using them yet other than echoing them back
 string16 Channel                     := '' : stored('Channel');
@@ -275,6 +275,8 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 string20  Model              := ''    : stored('Model');
 boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
+
+
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -362,7 +364,8 @@ InvalidFraudFlagsRequest := model_lc = 'fp1712_0' AND
 // model_name := if(InvalidGreenDotRequest = false, model_name1, error('Invalid parameter input combination for fp31310_2 or fp1509_2'));
 model_name := map(InvalidGreenDotRequest = true		=> error('Invalid parameter input combination for fp31310_2 or fp1509_2'),
 									InvalidFP3GLBRequest = true			=> error('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'),
-									InvalidFraudFlagsRequest = true => error('Invalid product input combination for fp1712_0'),
+							 	InvalidFraudFlagsRequest = true => error('invalid product option combination'),
+								
 																										model_name1 );
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
@@ -642,11 +645,13 @@ ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := l
 ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
 
 // Get the attributes
+
 attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_name, suppressCompromisedDLs);
-// search for test seeds
-attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);																						
+// search for test seeds																					
+attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);																																										
 // choose either test seed or real
-pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));			
+pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));	
+
 //pick_attr := ungroup(attributes);			
 
 
