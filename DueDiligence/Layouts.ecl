@@ -529,6 +529,17 @@ EXPORT LinkIDs := RECORD
 	 BOOLEAN cmra;
 	 BOOLEAN vacant;
 	END;	
+  
+  EXPORT BusinessLegalSummary := RECORD 
+    UNSIGNED3   BusFelonyConviction_4F;
+    UNSIGNED3   BusFelonyNonConviction_3F;
+    UNSIGNED3   BusMisdemeanorConviction_4M;
+    UNSIGNED3   BusMisdemeanorNonConviction_3M;
+    UNSIGNED3   BusUnknownConviction_4U;
+    UNSIGNED3   BusUnknownNonConviction_3U;
+    UNSIGNED3   BusTrafficConvictions_2T;
+    UNSIGNED3   BusTrafficNonConvictions_1T;  //under review??
+  END;
 	
 	
 	EXPORT BusReportDetails        := RECORD
@@ -536,8 +547,7 @@ EXPORT LinkIDs := RECORD
     DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_SOURCES)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
-    //***add additional datasets as needed here ****
-    //STRING BusinessReportName;
+    BusinessLegalSummary;
 	END;
 	
 	EXPORT Positions := RECORD
