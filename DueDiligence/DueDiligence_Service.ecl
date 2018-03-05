@@ -55,7 +55,7 @@ EXPORT DueDiligence_Service := MACRO
 			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
                                   consumerResults, 
-                                  usinessResults), NAMED('finalResults')));              //This is for debug mode
+                                  businessResults), NAMED('finalResults')));              //This is for debug mode
 
 
 ENDMACRO;
