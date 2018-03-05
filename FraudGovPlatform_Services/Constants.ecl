@@ -15,10 +15,10 @@
   //FraudGovPlatform_Services.BatchService related
   EXPORT MAX_RECS_ON_JOIN    := 1000;
   EXPORT MAX_REQUIRED_INPUTS := 100;
-  EXPORT PRODUCT_INCLUDE_CODE_ALL := 1; //There are many other codes in data_file
-	EXPORT STRING FRAUD_PLATFORM := 'FraudGov';
-	EXPORT INTEGER MAX_VELOCITIES := 3;		
-	EXPORT INTEGER MAX_KNOWN_FRAUDS := 5;
+		EXPORT PRODUCT_INCLUDE_CODE_ALL := 1; //There are many other codes in data_file
+		EXPORT STRING FRAUD_PLATFORM := 'FraudGov';
+		EXPORT INTEGER MAX_VELOCITIES := 3;		
+		EXPORT INTEGER MAX_KNOWN_FRAUDS := 5;
     
   // GOV FDN id key classification_Permissible_use_access.file_type field possible data values
   EXPORT FileTypeCodes  := MODULE
@@ -200,6 +200,21 @@
 			
 	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
 
+	EXPORT CIID_DESC := MODULE
+			EXPORT NAS_0 := 'This identity could not be located in public records';
+			EXPORT NAS_1 := 'The SSN is not associated with input name and address in public records';
+			EXPORT NAP_0 := 'This name-address-phone combination could not be located in public records';
+   EXPORT NAP_1 := 'The Phone is not associated with input name and address in public records';
+			EXPORT CVI_00 := 'This identity could not be located in public records or may be associated with a different person';
+			EXPORT CVI_10 := 'This identity could not be verified in public records or may be associated with a different person';
+			EXPORT CVI_20 := 'This identity could not be verified in public records or may be associated with a different person';
+	END;
+
 	EXPORT IS_DEBUG := FALSE; 
+	
+	EXPORT ofac := TRUE;
+	EXPORT lowestAllowedVersion := 1;	
+	EXPORT	maxAllowedVersion := 1;	
+	EXPORT IsInstantID := TRUE;
 	
 END;
