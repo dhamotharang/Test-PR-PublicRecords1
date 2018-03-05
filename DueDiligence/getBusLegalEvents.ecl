@@ -82,7 +82,10 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																																																					 RIGHT.party.ConvictedInfractions2I_OVNYR);
 																										 
 																											SELF.party.ConvictedInfractions2I_NYR         := MAX(LEFT.party.ConvictedInfractions2I_NYR,
-																																																					 RIGHT.party.ConvictedInfractions2I_NYR);  
+																																																					 RIGHT.party.ConvictedInfractions2I_NYR); 
+                                                                                                           
+                                                      SELF.party.noevidenceofconvictedstatecrim     := LEFT.party.noevidenceofconvictedstatecrim OR RIGHT.party.noevidenceofconvictedstatecrim;
+                                                      SELF.party.noEvidenceOfTrafficOrInfraction     := LEFT.party.noEvidenceOfTrafficOrInfraction OR RIGHT.party.noEvidenceOfTrafficOrInfraction;
 
 																											SELF.party.legalEventTypeFlags := IF(LEFT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR OR 
                                                                                            RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
@@ -132,8 +135,10 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																									/*   This will be used in Level 3 of BusLegalStateCriminal attribute */ 
 																									SELF.BEOevidenceOfUncatagorizedConvictionOlderNYR   := IF(RIGHT.party.ConvictedUnknownCount4U_OVNYR > 0, TRUE, FALSE),
 																									SELF.BEOevidenceOfMisdeameanorConvictionOlderNYR    := IF(RIGHT.party.ConvictedMisdemeanorCount4M_OVNYR > 0, TRUE, FALSE),  
-																									//***************************************************************************************************
-																										/* These are all of the evidence flags used in the TRAFFIC and INFRACTIONS ATTRIBUTE  */ 
+																									SELF.BEONoEvidenceOfStateCriminal                   := RIGHT.party.noEvidenceOfConvictedStateCrim,  
+																									
+                                                  //***************************************************************************************************
+																									/* These are all of the evidence flags used in the TRAFFIC and INFRACTIONS ATTRIBUTE  */ 
 																									//***************************************************************************************************
 																									/*  This will be used in Level 9 of busTrafficInfractions attribute  */   
 																									SELF.BEOevidenceOf3TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR >= 3, TRUE, FALSE), 
@@ -151,6 +156,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																									SELF.BEOevidenceOf3InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR >= 3, TRUE, FALSE),
 																									/*  This will be used in Level 2 of busTrafficInfractions attribute  */
 																									SELF.BEOevidenceOf2InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR < 3, TRUE,  FALSE),
+																									SELF.BEONoEvidenceOfTrafficOrInfraction              := RIGHT.party.noEvidenceOfTrafficOrInfraction,
 																										
 																									//legal event type
                                                   SELF.atleastOneBEOInCategory9 := RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR;
@@ -204,10 +210,11 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 		
 
 	// OUTPUT(UpdateBusinessExecutivesCriminalOffense, NAMED('UpdateBusinessExecutivesCriminalOffense'));
+  // OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
 	// OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
 	// OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
 	// OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
-	// OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
+	
 	
  
 	RETURN UpdateInquiredBusinessWithDerog;

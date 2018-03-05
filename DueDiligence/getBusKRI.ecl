@@ -421,7 +421,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		 /* BUSINESS LEGAL EVENTS - CRIMINAL STATE */  																																																	 
 		 BusLegalStateCriminal_Flag9 := If (le.BEOevidenceOfCurrentIncarceration
-		                               OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
+                                        OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
 		 BusLegalStateCriminal_Flag8 := IF (le.BEOevidenceOfFelonyConvictionInLastNYR, 'T','F');           /* Index value of 8 was set */
 		 BusLegalStateCriminal_Flag7 := IF (le.BEOevidenceOfFelonyConvictionOlderNYR,  'T','F');           /* Index value of 7 was set */
 		 BusLegalStateCriminal_Flag6 := IF (le.BEOevidenceOfPreviousIncarceration,     'T','F');           /* Index value of 6 was set */
@@ -429,15 +429,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalStateCriminal_Flag4 := IF (le.BEOevidenceOfMisdeameanorConvictionInLastNYR,  'T','F');    /* Index value of 4 was set */
 		 BusLegalStateCriminal_Flag3 := IF (le.BEOevidenceOfUncatagorizedConvictionOlderNYR,  'T','F');    /* Index value of 3 was set */
 		 BusLegalStateCriminal_Flag2 := IF (le.BEOevidenceOfMisdeameanorConvictionOlderNYR,   'T','F');    /* Index value of 2 was set */
-		 BusLegalStateCriminal_Flag1 := If (~le.BEOevidenceOfCurrentIncarceration
-		                           AND ~le.BEOevidenceOfCurrentParole
-															 AND ~le.BEOevidenceOfFelonyConvictionInLastNYR
-															 AND ~le.BEOevidenceOfFelonyConvictionOlderNYR
-															 AND ~le.BEOevidenceOfPreviousIncarceration
-															 AND ~le.BEOevidenceOfUncatagorizedConvictionInLastNYR
-															 AND ~le.BEOevidenceOfMisdeameanorConvictionInLastNYR
-															 AND ~le.BEOevidenceOfUncatagorizedConvictionOlderNYR
-															 AND ~le.BEOevidenceOfMisdeameanorConvictionOlderNYR,  'T','F');    /* Index value of 1 was set */
+		 BusLegalStateCriminal_Flag1 := IF (le.BEONoEvidenceOfStateCriminal OR le.execCount = 0,  'T','F');    /* Index value of 1 was set */
 		 
 		 BusLegalStateCriminal_Flag_Concat :=  BusLegalStateCriminal_Flag9 +
 																			BusLegalStateCriminal_Flag8 +
@@ -459,7 +451,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		 /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
-		 BusLegalTraffInfr_Flag9 := If (le.BEOevidenceOf3TrafficNYR,               'T','F');           /* Index value of 9 was set */
+		 BusLegalTraffInfr_Flag9 := IF (le.BEOevidenceOf3TrafficNYR,               'T','F');           /* Index value of 9 was set */
 		 BusLegalTraffInfr_Flag8 := IF (le.BEOevidenceOf2TrafficNYR,               'T','F');           /* Index value of 8 was set */
 		 BusLegalTraffInfr_Flag7 := IF (le.BEOevidenceOf3InfractionsNYR,           'T','F');           /* Index value of 7 was set */
 		 BusLegalTraffInfr_Flag6 := IF (le.BEOevidenceOf2InfractionsNYR,           'T','F');           /* Index value of 6 was set */
@@ -467,14 +459,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalTraffInfr_Flag4 := IF (le.BEOevidenceOf2TrafficOlderNYR,          'T','F');           /* Index value of 4 was set */
 		 BusLegalTraffInfr_Flag3 := IF (le.BEOevidenceOf3InfractionsOlderNYR,      'T','F');           /* Index value of 3 was set */
 		 BusLegalTraffInfr_Flag2 := IF (le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 2 was set */
-		 BusLegalTraffInfr_Flag1 := If (~le.BEOevidenceOf3TrafficNYR
-																			AND ~le.BEOevidenceOf2TrafficNYR
-																			AND ~le.BEOevidenceOf3InfractionsNYR
-																			AND ~le.BEOevidenceOf2InfractionsNYR
-																			AND ~le.BEOevidenceOf3TrafficOlderNYR
-																			AND ~le.BEOevidenceOf2TrafficOlderNYR
-																			AND ~le.BEOevidenceOf3InfractionsOlderNYR
-																			AND ~le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 1 was set */
+		 BusLegalTraffInfr_Flag1 := IF (le.BEONoEvidenceOfTrafficOrInfraction OR le.execCount = 0,      'T','F');           /* Index value of 1 was set */
 		 
 		 BusLegalTraffInfr_Flag_Concat := BusLegalTraffInfr_Flag9 +
 																			BusLegalTraffInfr_Flag8 +

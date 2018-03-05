@@ -35,6 +35,28 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
 
 
+  //get date vendor first reported - to be used to calc established date for report
+  vendorFirstReported := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_vendor_first_reported);
+  
+  rollVendorDates := ROLLUP(vendorFirstReported(dt_vendor_first_reported > 0), 
+													LEFT.seq = RIGHT.seq AND
+													LEFT.ultID = RIGHT.ultID AND
+													LEFT.orgID = RIGHT.orgID AND
+													LEFT.seleID = RIGHT.seleID,
+													TRANSFORM({RECORDOF(busHeaderFilt)},
+																		SELF.dt_vendor_first_reported := MIN(LEFT.dt_vendor_first_reported, RIGHT.dt_vendor_first_reported);
+																		SELF := LEFT;));
+                                    
+  addVenderFirstSeen := JOIN(indata, rollVendorDates,
+                              LEFT.seq = RIGHT.seq AND
+                              LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+                              LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+                              LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+                              TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                        SELF.dateVendorFirstReported := RIGHT.dt_vendor_first_reported;
+                                        SELF := LEFT;),
+                              LEFT OUTER);
+
 	//get date first seen and date last seen
 	sortByDates := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen, dt_last_seen);
 		
@@ -48,16 +70,16 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
 																		SELF := LEFT;));
 	
-	addBusHdrDtSeen := JOIN(indata, rollForDates,
-																LEFT.seq = RIGHT.seq AND
-																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
-																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																					SELF.BusnHdrDtFirstSeen := RIGHT.dt_first_seen;
-																					SELF.BusnHdrDtLastSeen := right.dt_last_seen,
-																					SELF := LEFT;),
-																LEFT OUTER);
+	addBusHdrDtSeen := JOIN(addVenderFirstSeen, rollForDates,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+                          LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+                          LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+                          TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                    SELF.BusnHdrDtFirstSeen := RIGHT.dt_first_seen;
+                                    SELF.BusnHdrDtLastSeen := right.dt_last_seen,
+                                    SELF := LEFT;),
+                          LEFT OUTER);
 	
 	//get ALL populated sources
 	dedupSortBusHeaderSource := DEDUP(SORT(busHeaderFilt(source != DueDiligence.Constants.EMPTY), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source),
@@ -416,17 +438,20 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(busHeaderRaw, NAMED('busHeaderRaw'));
 	// OUTPUT(busHeaderSeq, NAMED('busHeaderSeq'));
 	// OUTPUT(busHeaderFilt, NAMED('busHeaderFilt'));
-	
+  
+  // OUTPUT(vendorFirstReported, NAMED('vendorFirstReported'));
+  // OUTPUT(rollVendorDates, NAMED('rollVendorDates'));
 	// OUTPUT(rollForDates, NAMED('rollForDates'));
 	// OUTPUT(sortByDates, NAMED('sortByDates'));
 	// OUTPUT(addBusHdrDtSeen, NAMED('addBusHdrDtSeen'));
+  
 	// OUTPUT(hdrSrcTable, NAMED('hdrSrcTable'));
 	// OUTPUT(creditSrcTable, NAMED('creditSrcTable'));
 	// OUTPUT(sortCreditSrc, NAMED('sortCreditSrc'));
 	// OUTPUT(rollCreditSrc, NAMED('rollCreditSrc'));
-	//OUTPUT(projectCreditSrc, NAMED('projectCreditSrc'));
+	// OUTPUT(projectCreditSrc, NAMED('projectCreditSrc'));
 	// OUTPUT(rollProjectCreditSrc, NAMED('rollProjectCreditSrc'));
-//	OUTPUT(addCreditSrcCnt, NAMED('addCreditSrcCnt'));
+  // OUTPUT(addCreditSrcCnt, NAMED('addCreditSrcCnt'));
 	
 	//OUTPUT(addShellSrcCnt, NAMED('addShellSrcCnt'));
 	// OUTPUT(shellSrcTable, NAMED('shellSrcTable'));
@@ -435,8 +460,8 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(sortBusHdrAddr, NAMED('sortBusHdrAddr'));
 	// OUTPUT(dedupSortBusHdrAddr, NAMED('dedupSortBusHdrAddr'));
 	// OUTPUT(filterAddr, NAMED('filterAddr'));
-	 // OUTPUT(hdrAddrProject, NAMED('hdrAddrProject'));
-	 // OUTPUT(addHdrAddrCount, NAMED('addHdrAddrCount'));
+	// OUTPUT(hdrAddrProject, NAMED('hdrAddrProject'));
+	// OUTPUT(addHdrAddrCount, NAMED('addHdrAddrCount'));
 	
 	// OUTPUT(sortByLastSeen, NAMED('sortByLastSeen'));
 	// OUTPUT(rollForStructure, NAMED('rollForStructure'));
@@ -468,7 +493,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(uniquePowsDedup, NAMED('uniquePowsDedup'));
 	
 	// OUTPUT(notFoundInHeader, NAMED('notFoundInHeader'));	
-	 // OUTPUT(addNotFound, NAMED('addNotFound'));	
+	// OUTPUT(addNotFound, NAMED('addNotFound'));	
 
 	
 	
