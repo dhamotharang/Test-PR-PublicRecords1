@@ -1035,6 +1035,8 @@
 		export string KEYWORD_PHPNP									:= '723';
 		export string KEYWORD_EUNCJ_TAX							:= '724';
 		export string KEYWORD_USCG_PV								:= '725';
+		export string KEYWORD_AIFSC									:= '726';
+		export string KEYWORD_CRSUGESE							:= '727';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
