@@ -1,5 +1,5 @@
-/* before calling this, set a stored variable as below, with one of 3 values:
-	dev = 40way dev roxie (windows)
+﻿/* before calling this, set a stored variable as below, with one of 3 values:
+﻿	dev = 40way dev roxie (windows)
 	10way = 10way dev roxie (linux)
 	lin_prod = 100way production roxie (linux)
 
@@ -21,8 +21,7 @@ export Mac_Match_Fast_Roxie(infile,outfile,verify='\'BEST_ALL\'',appends='\'BEST
 #uniquename(roxres)
 #uniquename(vip)
 string8 %vip% := '' : stored('roxie_regression_system');
-
-%roxres% := PIPE(DISTRIBUTE(infile,RANDOM() % 50), 'roxiepipe -iw '+%insize%+' -t 3 -ow '+%outsize%+' -b 1000 -mr 2 -q "<didville.did_batch_service  format=\'raw\'>'+%options%+'<did_batch_in id=\'id\' format=\'raw\'></did_batch_in></didville.did_batch_service>" -h ' + did_add.roxie_ip + ' -vip -r Result', DidVille.Layout_Did_OutBatch);
+%roxres% := PIPE(DISTRIBUTE(infile,RANDOM() % 50), 'roxiepipe -iw '+%insize%+' -t 1 -ow '+%outsize%+' -b 100 -mr 2 -q "<didville.did_batch_service_v2  format=\'raw\'>'+%options%+'<did_batch_in id=\'id\' format=\'raw\'></did_batch_in></didville.did_batch_service_v2>" -h ' + did_add.roxie_ip + ' -vip -r Result', DidVille.Layout_Did_OutBatch);
 
 outfile := %roxres%;
 //'10.150.193.1-100:9876'
