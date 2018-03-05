@@ -1,4 +1,4 @@
-IMPORT InsuranceContext_iesp,iesp;
+﻿IMPORT InsuranceContext_iesp,iesp;
 EXPORT Results := MODULE,VIRTUAL
   SHARED RCToMessage(SET OF STRING5 rc) := FUNCTION
 // The real version of this needs to be done carefully and quickly. Consider a dictionary (and don't forget ONCE in roxie world)
@@ -25,6 +25,7 @@ EXPORT Results := MODULE,VIRTUAL
 	EXPORT NVPair := iesp.share.t_NameValuePair;
 	EXPORT AttrLayout := RECORD
   	 BaseLayout;
+		 STRING								 ScoreCard := ''; // The name of the scorecard used for a multi-scorecardmodel
 		 DATASET(NVPair)			 Attributes{MAXCOUNT(500)};
 	END;
 	EXPORT Attr() := DATASET([],AttrLayout);
