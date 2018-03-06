@@ -1,8 +1,9 @@
-﻿Import Data_Services, doxie,FLAccidents;
+﻿Import Data_Services, doxie,FLAccidents, STD;
 
 // eCrash & CRU Reports
 EcrashAndCru := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and  
-                                                       (work_type_id in ['2','3'] or ( (work_type_id in ['0','1']  and trim(report_type_id,all) in ['A','DE'])) ) ); 
+                                                       (work_type_id in ['2','3'] or ( (work_type_id in ['0','1']  and 
+																											 (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'))) ) ); 
 // CRU Inq/Natational Accident Reports
 Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.out(report_code not in ['EA','TM','TF']);
 				
