@@ -18,8 +18,8 @@ EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErr
 EXPORT MakeFT_Invalid_DeactCode(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_DeactCode(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['DE','SU']);
-EXPORT InValidMessageFT_Invalid_DeactCode(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('DE|SU'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_DeactCode(SALT39.StrType s) := WHICH(((SALT39.StrType) s) NOT IN ['DE','SU','']);
+EXPORT InValidMessageFT_Invalid_DeactCode(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInEnum('DE|SU|'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_YN(SALT39.StrType s0) := FUNCTION
   RETURN  s0;
