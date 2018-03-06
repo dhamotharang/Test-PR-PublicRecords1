@@ -1,9 +1,10 @@
-export createAsHeaderStats(ds, 
+﻿export createAsHeaderStats(ds, 
                            pBuildName, 
                            pBuildSubSet, 
 						   pVersionName, 
 						   pEmailNotifyList, 
-						   rOut
+						   rOut,
+							 pOmit_Output_To_Screen=false
 						  ) := macro
 
 import header, ngadl;
@@ -68,7 +69,7 @@ strata.createXMLStats(%tStats%, pBuildName, pBuildSubSet, pVersionName, pEmailNo
 #uniquename(dNGADL_as_header_hygiene)
 
 %dNGADL_as_header_hygiene% :=     ngadl.hygiene(project(ds,ngadl.layout_header)).validityerrors;
-strata.createXMLStats(%dNGADL_as_header_hygiene%, pBuildName, pBuildSubSet, pVersionName, pEmailNotifyList, %zAsHeaderOut2%, 'AsHeader', 'NGADL_Hygiene')  
+strata.createXMLStats(%dNGADL_as_header_hygiene%, pBuildName, pBuildSubSet, pVersionName, pEmailNotifyList, %zAsHeaderOut2%, 'AsHeader', 'NGADL_Hygiene',,,pOmit_Output_To_Screen)  
 
 rOut   :=     parallel(%zAsHeaderOut1%,%zAsHeaderOut2%);
 
