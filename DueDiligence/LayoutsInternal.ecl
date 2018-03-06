@@ -172,7 +172,9 @@ EXPORT common_layout_liens_judgments := RECORD
 	 STRING50 tmsid;
   UNSIGNED4	HistoryDate;
 		UNSIGNED4 DateToUse; 
-		UNSIGNED3 NumOfDaysAgo;   
+		UNSIGNED3 NumOfDaysAgo; 
+    STRING20 filing_number;                      //***all these fields are from:  liensV2.key_liens_main_ID
+    STRING20 filing_jurisdiction;             
 		STRING8  date_first_seen;
 		STRING8  date_last_seen;
 		STRING1  eviction;
@@ -182,7 +184,9 @@ EXPORT common_layout_liens_judgments := RECORD
 		STRING8  release_date;
 		STRING8  lapse_date;
 		STRING30 filing_status;
+    STRING25 agency;
 		STRING2  agency_state;
+    STRING25 agency_county; 
 END;
 
 

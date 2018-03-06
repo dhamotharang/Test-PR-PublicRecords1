@@ -113,5 +113,14 @@ EXPORT LayoutsInternalReport := MODULE
 	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
+ 
+ 
+  // ------                                                                      ------
+  // ------ define the ChildDataset  For Business Liens                          ------
+	// ------                                                                      ------
+ EXPORT	BusLiensChildDatasetLayout    := RECORD
+	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
+	END;
 	
 END;
