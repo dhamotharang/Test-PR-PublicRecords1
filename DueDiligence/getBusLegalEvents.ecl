@@ -154,19 +154,19 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																									/*  This will be used in Level 9 of busTrafficInfractions attribute  */   
 																									SELF.BEOevidenceOf3TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR >= 3, TRUE, FALSE), 
 																									/*  This will be used in Level 8 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR < 3, TRUE, FALSE),
+																									SELF.BEOevidenceOf2TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR BETWEEN 1 AND 2, TRUE, FALSE),
 																									/*  This will be used in Level 7 of busTrafficInfractions attribute  */
 																									SELF.BEOevidenceOf3InfractionsNYR                   := IF(RIGHT.party.ConvictedInfractions2I_NYR >= 3,  TRUE, FALSE),
 																									/*  This will be used in Level 6 of busTrafficInfractions attribute  */     
-																									SELF.BEOevidenceOf2InfractionsNYR                    := IF(RIGHT.party.ConvictedInfractions2I_NYR < 3, TRUE, FALSE),
+																									SELF.BEOevidenceOf2InfractionsNYR                    := IF(RIGHT.party.ConvictedInfractions2I_NYR BETWEEN 1 AND 2, TRUE, FALSE),
 																									/*  This will be used in Level 5 of busTrafficInfractions attribute  */  
 																									SELF.BEOevidenceOf3TrafficOlderNYR                   := IF(RIGHT.party.ConvictedTraffic2T_OVNYR >= 3, TRUE, FALSE),   
 																									/*  This will be used in Level 4 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2TrafficOlderNYR                   := IF(RIGHT.party.ConvictedTraffic2T_OVNYR < 3, TRUE,  FALSE),
+																									SELF.BEOevidenceOf2TrafficOlderNYR                   := IF(RIGHT.party.ConvictedTraffic2T_OVNYR BETWEEN 1 AND 2, TRUE,  FALSE),
 																									/*  This will be used in Level 3 of busTrafficInfractions attribute  */
 																									SELF.BEOevidenceOf3InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR >= 3, TRUE, FALSE),
 																									/*  This will be used in Level 2 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR < 3, TRUE,  FALSE),
+																									SELF.BEOevidenceOf2InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR BETWEEN 1 AND 2, TRUE,  FALSE),
 																									SELF.BEONoEvidenceOfTrafficOrInfraction              := RIGHT.party.noEvidenceOfTrafficOrInfraction,
                                                   
                                                   //count if a BEO has ever had
