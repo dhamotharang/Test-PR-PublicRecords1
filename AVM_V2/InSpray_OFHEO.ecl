@@ -1,10 +1,10 @@
-import	lib_fileservices,_control;
+﻿import	lib_fileservices,_control;
 
 export	InSpray_OFHEO(string	pVersionDate,string filename,string quarter,string year)	:=
 function
 	vSourceIP					:=	_control.IPAddress.bctlpedata10;
 	vSourcePath				:=	'/data/thor_back5/fares/faresV2/ofheo/in';
-	vTargetGrp				:=	'thor400_20';
+	vTargetGrp				:=	'thor400_44';
 	vFilePrefix				:=	'~thor_data400::in::avm_ofheo'	;
 	vtargetfile       := vFilePrefix	+	'_' + year + '_' + quarter;
 	
