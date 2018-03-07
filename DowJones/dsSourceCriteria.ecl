@@ -1556,7 +1556,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/256 ISIL (Da\'esh) and Al-Qaida List','1542'},
 {'EC 2018/281 ISIL (Da\'esh) and Al-Qaida List','1543'},
 {'EC 2018/282 Syria List','1544'},
-{'Sanctioned Suppliers and Contractors of Mexico – Fined','1545'},
-{'Sanctioned Suppliers and Contractors of Mexico – Fined and Debarred','1546'},
+{U'Sanctioned Suppliers and Contractors of Mexico – Fined','1545'},
+{U'Sanctioned Suppliers and Contractors of Mexico – Fined and Debarred','1546'},
 {'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List','1547'}
 ],r);
