@@ -1,4 +1,4 @@
-/* ********************************************************
+﻿/* ********************************************************
 ***********************************************************
 ** This is a snapshot of the Boca Shell as of 8/25/2012  **
 ** -- Contains up to Shell 4.1                           **
@@ -176,7 +176,7 @@ RECORD
 	string2 reason5 := '';
 	string2 reason6 := '';
 	
-	unsigned1 DIDCount := 0;	// - The total number of DID’s found	
+	unsigned1 DIDCount := 0;	// - The total number of DIDs found	
 	unsigned6 DID2 := 0;	// - The second DID returned from the DID Append
 	unsigned6 DID3 := 0;	// - The third DID returned from the DID Append
 
