@@ -1,4 +1,4 @@
-Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes,HealthCare_Provider_Header_AsHeader;
+﻿Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
 EXPORT Customer_License_Search_Records := module
 	Shared myLayouts := Healthcare_Services.Customer_License_Search_Layouts;
 	Shared myConst := Healthcare_Services.Customer_License_Search_Constants;
@@ -167,10 +167,24 @@ EXPORT Customer_License_Search_Records := module
 		final := sort(dedupBestRecords,(integer)acctno,penalt,License_Number);
 		return final;
 	End;
-
+	
+	
+	EXPORT NonAlphaNumChar	:= '[^A-Za-z0-9]';
+	EXPORT setBogusLicense := ['390200000X','WC1','35NULL','34NULL','LARN00000',
+	                           'INPROCESS','NOTAPPLICABLE','APPLIEDFOR','PENDING',
+	                           '0','00','000','0000','00000','000000','0000000','00000000','000000000',
+														 'NOLICNUMBER','NR','NULL','NA','NONE',
+														 'TEMPORARY','STUDENT','UNKNOWN','TEMP','RESIDENT','OPT'];
+														 
+EXPORT CleanLicenseNumber(STRING lic_in) := FUNCTION
+		toUpper						:= TRIM(StringLib.StringToUpperCase(lic_in), ALL);
+		removeNonAlphaNum := REGEXREPLACE(NonAlphaNumChar, toUpper, '');
+		RETURN IF(removeNonAlphaNum IN setBogusLicense, '', removeNonAlphaNum);
+	END;
+	
 	Export RecordsBatch(dataset(myLayouts.autokeyInput) inRecs, unsigned2 maxPenalty) := function
    	clean_in_recs:=	project(inRecs,transform(myLayouts.autokeyInput,
-		                                    self.license_number:=HealthCare_Provider_Header_AsHeader.Utils.CleanLicenseNumber(left.license_number);
+		                                    self.license_number:=CleanLicenseNumber(left.license_number);
 		                                    self:=left;));
 		recs := Records(clean_in_recs,maxPenalty);
 		recs_fmt := project(recs,transform(myLayouts.LayoutOutput_batch, 
