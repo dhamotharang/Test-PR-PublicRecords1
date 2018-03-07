@@ -16,6 +16,7 @@ SetDali := [
 export Prefix(string serviceName='NoNameGiven') := function
 	return	trim(case (trim(servicename),
 	              'person_slimsorts' 	=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
+															,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
 																					, ''),	
 								'person_xADL2'     	=> '',
 								'LAB_xLink' 				=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
