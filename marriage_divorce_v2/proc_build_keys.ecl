@@ -56,7 +56,7 @@ build_keys := sequential(
 
 build_autokeys := marriage_divorce_v2.proc_build_autokeys(filedate);
 
-return sequential(build_keys/*,build_autokeys*/);
+return sequential(build_keys,build_autokeys);
 
 end;
 
