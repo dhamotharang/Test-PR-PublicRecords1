@@ -94,7 +94,7 @@ FUNCTION
 				self := right;
 				self := []
 			),
-			left outer, limit(0),keep(ConsumerDisclosure.Constants.Limits.MaxBKParties)); // left outer?
+			limit(0),keep(ConsumerDisclosure.Constants.Limits.MaxBKParties)); // left outer?
 
 	bk_debtors := dedup(sort(bk_search_raw, tmsid, court_code, case_number, -inputIsDebtor), tmsid, court_code, case_number);		
   
@@ -122,8 +122,8 @@ FUNCTION
 					self.record_ids.RecId1 := right.tmsid;
 					self.record_ids.RecId2 := right.name_type;
 					self.record_ids.RecId3 := right.did;
-					self := left;
 					self := right;
+					self := left;
 					self:=[]
 					),
 			left outer, keep(FCRA.compliance.MAX_OVERRIDE_limit), limit(0)); // any bk with more than 100 parties? if so, keep(100) may be a problem.
@@ -227,8 +227,8 @@ FUNCTION
           // for overrides sometimes same flag_file_id is used for whole cluster of bk records including main and search, so we cannot rely on record_id for overrides from flag file
 				  self.combined_record_id := if(right.tmsid<>'', right.tmsid[3..], left.record_id); // main record id = court_code + case_number
 					self.record_ids.RecId1 := right.tmsid;
-					self := left;
 					self := right;
+					self := left;
 					self:=[]),
 				left outer, keep(FCRA.compliance.MAX_OVERRIDE_limit), limit(0)); 
 	

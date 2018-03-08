@@ -1,11 +1,11 @@
 ﻿EXPORT RoyaltyEquifaxEVS := module
 
-	EXPORT GetOnlineRoyaltiesVOE () :=
+	EXPORT GetOnlineRoyaltiesVOE (boolean gotData) :=
 					dataset(
 						[{
 							Royalty.Constants.RoyaltyCode.EFX_TWN_VOE_GW, 
 							Royalty.Constants.RoyaltyType.EFX_TWN_VOE_GW, 
-							1, 
+							if(gotData,1,0), 
 							0
 						}], 
 						Royalty.Layouts.Royalty
@@ -13,12 +13,12 @@
 					
 		
 		
-		EXPORT GetOnlineRoyaltiesVOI () := 
+		EXPORT GetOnlineRoyaltiesVOI (boolean gotData) := 
 					dataset(
 						[{
 							Royalty.Constants.RoyaltyCode.EFX_TWN_VOI_GW, 
 							Royalty.Constants.RoyaltyType.EFX_TWN_VOI_GW, 
-							1, 
+							if(gotData,1,0), 
 							0
 						}], 
 						Royalty.Layouts.Royalty

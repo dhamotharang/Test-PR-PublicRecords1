@@ -19,9 +19,17 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 
 		//Get PII from Equifax
 		dsResponseData := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.TsVTwnSelectRs.TsVResponseData;
-
-		EquifaxStatusCode :=  OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Code;
-		EquifaxStatusMessage := OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Message;
+		
+		//Error codes are sent in 2 places. 
+		SignonMsgs_StatusCode :=  OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Code;		
+		SignonMsgs_StatusMessage := OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Message;		
+		
+		TsVTwnSelectTrnRs_StatusCode :=  OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.Status.Code;		
+		TsVTwnSelectTrnRs_StatusMessage := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.Status.Message;				
+		useSignon := trim(SignonMsgs_StatusCode,LEFT,RIGHT) <> '0'; 				
+		
+		EquifaxStatusCode := if(useSignon,SignonMsgs_StatusCode,TsVTwnSelectTrnRs_StatusCode);		
+		EquifaxStatusMessage := if(useSignon,SignonMsgs_StatusMessage,TsVTwnSelectTrnRs_StatusMessage);
 
 		isEquifaxSentData :=  trim(EquifaxStatusCode,LEFT,RIGHT) = '0';
 		isEquifaxSentError := ~isEquifaxSentData;
@@ -54,28 +62,28 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		isFoundOutputDid := OutputDID <> 0;
 
 		//Query Status Code
-		StatusCode := map(	isEquifaxSentError => 4,
-												~isFoundInputDid => 1,
+		StatusCode := map(	~isFoundInputDid => 1,
+												isEquifaxSentError => 4,
 												~isFoundOutputDid => 2,
 												(isFoundInputDid and isFoundOutputDid and InputDid <> OutputDid) => 3, 
 												(InputDid = OutputDid) and isFoundInputDid = true => 0,
 											5);
 									
-		//Return only success & Equifax Failure 
-		isReturnResults := StatusCode = 0 or StatusCode = 4;
-
-		GatewayResponse := if(isReturnResults,OutputFromEquifax);
+    isSuccess := StatusCode = 0 ;
+		
+		//Return data only for success 
+		GatewayResponse := if(isSuccess,OutputFromEquifax);
 
 		//Fetch Consumer Level Statements
-		boolean isShowConsumerStatements := isFoundInputDid and FFD.FFDMask.isShowConsumerStatements(InputParams.FFDOptionsMask);	 
+		boolean isShowConsumerStatements := isSuccess  and FFD.FFDMask.isShowConsumerStatements(InputParams.FFDOptionsMask);	 
 		ConsumerStatements := if(isShowConsumerStatements, 
 												    WorkforceSolutionServices.functions.fetchConsumerStatementsForDID(InputDid, gateways));
 
 		//Calculate Royalty
+		royal_out_voe := if(makeGatewayCall,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOE(isEquifaxSentData));
+		royal_out_voi := if(makeGatewayCall,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOI(isEquifaxSentData));	 
 
-		royal_out_voe := if(isEquifaxSentData,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOE());
-		royal_out_voi := if(isEquifaxSentData,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOI());	 
-
+		//Return Royalty almost aslways		
 		Royalties  :=  if(InputParams.IncludeIncome,royal_out_voi,royal_out_voe);
 
 

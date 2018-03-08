@@ -1,4 +1,4 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, Risk_Indicators, STD, ut;
+﻿IMPORT BatchShare, CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, Risk_Indicators, STD, ut;
 
 EXPORT Functions := MODULE
 	
@@ -215,11 +215,11 @@ EXPORT Functions := MODULE
 		
 		//CIID
 		CIID_rec := RECORD
-			STRING acctno;
-			STRING NAP_Summary;
-			STRING NAS_Summary;
-			STRING CVI;
-			STRING desc //hri;
+			BatchShare.Layouts.ShareAcct;
+			STRING3 NAP_Summary;
+			STRING3 NAS_Summary;
+			STRING3 CVI;
+			STRING100 desc //hri;
 		END;
 		
 		CIID_rec xnorm_hri(FraudGovPlatform_Services.Layouts.Layout_InstandID_NuGenExt L, 
@@ -359,7 +359,9 @@ EXPORT Functions := MODULE
 			SELF := L;
 		END;
 		
-		ds_results := DENORMALIZE(pre_ds_results, ds_knownFraud,
+		ds_knownFraud_sorted := SORT(ds_knownFraud, acctno, -event_date,RECORD);
+		
+		ds_results := DENORMALIZE(pre_ds_results, ds_knownFraud_sorted,
 															LEFT.acctno = RIGHT.acctno,
 															GROUP,
 															xfm_batchout(LEFT, ROWS(RIGHT)));
