@@ -1,24 +1,9 @@
 ﻿ IMPORT Address, AutoStandardI, Business_Risk, codes, iesp, CriminalRecords_BatchService, DeathV2_Services, 
-			 doxie, FraudDefenseNetwork_Services, FraudShared_Services, Gateway, IntlIID, patriot, risk_indicators, 
-			 riskwise, ut;
+							 doxie, FraudDefenseNetwork_Services, FraudShared_Services, Gateway, IntlIID, patriot, risk_indicators, 
+							 riskwise, ut;
 
 EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 
-	SHARED	boolean IIDVersionOverride := FALSE	: STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
-	SHARED	string1 IIDVersion := '0' : STORED('InstantIDVersion');	// this is passed in by the customer, if nothing passed in, then 0
-	SHARED	boolean EnableEmergingID := FALSE : stored('EnableEmergingID');
-
-	SHARED	unsigned1 lowestAllowedVersion := FraudGovPlatform_Services.Constants.lowestAllowedVersion;	// lowest allowed version according to product, unless the IIDVersionOveride is true
-	SHARED	unsigned1 maxAllowedVersion := FraudGovPlatform_Services.Constants.lowestAllowedVersion;	// maximum allowed version as of 1/28/2014
-
-	SHARED	actualIIDVersion := MAP((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-																	IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
-																	(unsigned)IIDversion); // they can override, give them whatever they asked for
-	SHARED  boolean IsInstantID := FraudGovPlatform_Services.Constants.IsInstantID;
-	SHARED	reasoncode_settings := DATASET([{IsInstantID, actualIIDVersion, EnableEmergingID}],riskwise.layouts.reasoncode_settings);
-	SHARED boolean IsPOBoxCompliant := false : STORED('PoBoxCompliance');
-	SHARED actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
-	
 	EXPORT GetDeath(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
 									
 		death_batch_params := DeathV2_Services.IParam.getBatchParams();		
@@ -75,16 +60,13 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	SHARED GetInstantIDIn(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
 
-			unsigned3 history_date := 999999 : STORED('HistoryDateYYYYMM');			
-			string3 NameInputOrder := '' : STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
-			
 			ds_instantID_pre := getInstantIDPre(ds_batch_in);
 			
 			risk_indicators.Layout_Input into(ds_instantID_pre le) := TRANSFORM
-				historydate := if(le.HistoryDateYYYYMM=0, history_date, le.HistoryDateYYYYMM);
+				historydate := if(le.HistoryDateYYYYMM=0, batch_params.history_date, le.HistoryDateYYYYMM);
 				
 				SELF.historydate := if(le.historyDateTimeStamp<>'',(unsigned)le.historyDateTimeStamp[1..6], historydate);
-				SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp, historydate);
+				SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp,historydate);
 				// clean up input
 				dob_val := riskwise.cleandob(le.dob);
 				dl_num_clean := riskwise.cleanDL_num(le.dl_number);
@@ -98,8 +80,8 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 				SELF.wphone10 := le.Work_Phone;
 
 				cleaned_name := Stringlib.StringToUppercase(
-													MAP(TRIM(Stringlib.StringToUppercase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
-															TRIM(Stringlib.StringToUppercase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
+													MAP(TRIM(Stringlib.StringToUppercase(batch_params.NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
+															TRIM(Stringlib.StringToUppercase(batch_params.NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
 																																													 Address.CleanPerson73(le.UnParsedFullName)));
 				
 				boolean valid_cleaned := le.UnParsedFullName <> '';
@@ -157,18 +139,14 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	EXPORT GetInstantIDRaw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
 	
-		boolean	IncludeTargus := TRUE	: STORED('Targus');	
-		boolean IncludeTargus3220 := FALSE : STORED('IncludeTargusE3220');
-		boolean ln_branded_value := FALSE : STORED('LnBranded');
-		
 		ds_instantID_in := getInstantIDIn(ds_batch_in);
 	
 		Gateway.Layouts.Config gw_switch(batch_params.gateways le) := TRANSFORM
-			SELF.servicename := MAP(IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
-															IncludeTargus3220 AND le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
+			SELF.servicename := MAP(batch_params.IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
+															batch_params.IncludeTargus3220 AND le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
 															le.servicename);
-			SELF.url := MAP(IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
-											IncludeTargus3220 AND le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
+			SELF.url := MAP(batch_params.IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
+											batch_params.IncludeTargus3220 AND le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
 											le.url); 
 			SELF := le;
 		END;
@@ -179,7 +157,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			
 				ds_instantID_out := Risk_Indicators.InstantID_Function(ds_instantID_in, gateways, batch_params.DPPAPurpose,  
 																															 batch_params.GLBPurpose, batch_params.IndustryClass='UTILI', 
-																															 ln_branded_value);
+																															 batch_params.ln_branded_value);
 																													 																								 
 		RETURN ds_instantID_out;
 
@@ -188,19 +166,6 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	EXPORT GetCIID(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 																GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
 
-		boolean IncludeDPBC := false 							: STORED('IncludeDPBC');
-		boolean IncludeMIoverride := false					: STORED('IncludeMIoverride');
-		boolean IncludeDOBinCVI := false						: STORED('IncludeDOBInCVI');
-		boolean IncludeDriverLicenseInCVI := false	: STORED('IncludeDriverLicenseInCVI');
-		boolean DisableInquiriesInCVI := false			: STORED('DisableInquiriesInCVI');
-		
-		boolean IncludeDLverification := false : stored('IncludeDLverification');
-		boolean IncludeMSoverride := false : stored('IncludeMSoverride');
-		boolean IncludeCLoverride := false : stored('IncludeCLoverride');
-		boolean   IncludeAllRiskIndicators := false	: stored('IncludeAllRiskIndicators');
-		unsigned1 NumReturnCodes := if(IncludeAllRiskIndicators, 20, risk_indicators.iid_constants.DefaultNumCodes);
-		boolean OFAC := FraudGovPlatform_Services.Constants.ofac;
-	
 		ds_instantID_pre := getInstantIDPre(ds_batch_in);
 		
 		FraudGovPlatform_Services.Layouts.Layout_InstandID_NuGenExt format_out(ds_instantIDRaw le, ds_instantID_pre R) := TRANSFORM
@@ -218,8 +183,8 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			// clean the verified address to get the delivery point barcode information from the cleaner
 			clean_ver_address := risk_indicators.MOD_AddressClean.clean_addr( veraddr, le.combo_city, le.combo_state, le.combo_zip ) ;
 			// don't reference the clean fields unless the option to IncludeDPBC is turned on
-			ver_zip5 := if(IncludeDPBC, clean_ver_address[117..121], le.combo_zip[1..5]);
-			ver_zip4 := if(IncludeDPBC, clean_ver_address[122..125], le.combo_zip[6..9]);
+			ver_zip5 := if(batch_params.IncludeDPBC, clean_ver_address[117..121], le.combo_zip[1..5]);
+			ver_zip4 := if(batch_params.IncludeDPBC, clean_ver_address[122..125], le.combo_zip[6..9]);
 			// delivery point barcode = zip5 + zip5 + barcode + check_digit
 			ver_dpbc := ver_zip5 + ver_zip4 + clean_ver_address[136..138];  // include the 2 character code and 1 character check_digit
 			
@@ -236,7 +201,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			SELF.verstate := IF(le.combo_addrcount>0, le.combo_state, '');
 			SELF.verzip := IF(le.combo_addrcount>0, ver_zip5, '');
 			SELF.verzip4 := IF(le.combo_addrcount>0, ver_zip4, '');
-			self.verDPBC := if(le.combo_addrcount>0 and IncludeDPBC and ver_zip4<>'', ver_DPBC, '');
+			self.verDPBC := if(le.combo_addrcount>0 and batch_params.IncludeDPBC and ver_zip4<>'', ver_DPBC, '');
 			self.vercounty := if(le.combo_addrcount>0, le.combo_county, '');
 
 			SELF.verdob := IF(le.combo_dobcount>0, le.combo_dob, '');
@@ -317,35 +282,35 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			// clean the chrono address1 to get the delivery point barcode information from the cleaner
 			clean_chrono_address1 := risk_indicators.MOD_AddressClean.clean_addr( addr1, le.chronocity, le.chronostate, le.chronozip ) ;
 			// don't reference the clean fields unless the option to IncludeDPBC is turned on
-			chrono_zipz5_1 := if(IncludeDPBC, clean_chrono_address1[117..121], le.chronozip);
-			chrono_zip4_1 := if(IncludeDPBC, clean_chrono_address1[122..125], le.chronozip4);
+			chrono_zipz5_1 := if(batch_params.IncludeDPBC, clean_chrono_address1[117..121], le.chronozip);
+			chrono_zip4_1 := if(batch_params.IncludeDPBC, clean_chrono_address1[122..125], le.chronozip4);
 			// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
-			chrono1_dpbc := if(IncludeDPBC and chrono_zip4_1<>'', chrono_zipz5_1 + chrono_zip4_1 + clean_chrono_address1[136..138], '');  // include the 2 character code and 1 character check_digit
+			chrono1_dpbc := if(batch_params.IncludeDPBC and chrono_zip4_1<>'', chrono_zipz5_1 + chrono_zip4_1 + clean_chrono_address1[136..138], '');  // include the 2 character code and 1 character check_digit
 			
 			
 			// clean the chrono address2 to get the delivery point barcode information from the cleaner
 			clean_chrono_address2 := risk_indicators.MOD_AddressClean.clean_addr( addr2, le.chronocity2, le.chronostate2, le.chronozip2 ) ;
 			// don't reference the clean fields unless the option to IncludeDPBC is turned on
-			chrono_zipz5_2 := if(IncludeDPBC, clean_chrono_address2[117..121], le.chronozip2);
-			chrono_zip4_2 := if(IncludeDPBC, clean_chrono_address2[122..125], le.chronozip4_2);
+			chrono_zipz5_2 := if(batch_params.IncludeDPBC, clean_chrono_address2[117..121], le.chronozip2);
+			chrono_zip4_2 := if(batch_params.IncludeDPBC, clean_chrono_address2[122..125], le.chronozip4_2);
 			// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
-			chrono2_dpbc := if(IncludeDPBC and chrono_zip4_2<>'',chrono_zipz5_2 + chrono_zip4_2 + clean_chrono_address2[136..138], '');  // include the 2 character code and 1 character check_digit
+			chrono2_dpbc := if(batch_params.IncludeDPBC and chrono_zip4_2<>'',chrono_zipz5_2 + chrono_zip4_2 + clean_chrono_address2[136..138], '');  // include the 2 character code and 1 character check_digit
 			
 			// clean the chrono address3 to get the delivery point barcode information from the cleaner
 			clean_chrono_address3 := risk_indicators.MOD_AddressClean.clean_addr( addr3, le.chronocity3, le.chronostate3, le.chronozip3 ) ;
 			// don't reference the clean fields unless the option to IncludeDPBC is turned on
-			chrono_zipz5_3 := if(IncludeDPBC, clean_chrono_address3[117..121], le.chronozip3);
-			chrono_zip4_3 := if(IncludeDPBC, clean_chrono_address3[122..125], le.chronozip4_3);
+			chrono_zipz5_3 := if(batch_params.IncludeDPBC, clean_chrono_address3[117..121], le.chronozip3);
+			chrono_zip4_3 := if(batch_params.IncludeDPBC, clean_chrono_address3[122..125], le.chronozip4_3);
 			// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
-			chrono3_dpbc := if(IncludeDPBC and chrono_zip4_3<>'',chrono_zipz5_3 + chrono_zip4_3 + clean_chrono_address3[136..138], '');  // include the 2 character code and 1 character check_digit
+			chrono3_dpbc := if(batch_params.IncludeDPBC and chrono_zip4_3<>'',chrono_zipz5_3 + chrono_zip4_3 + clean_chrono_address3[136..138], '');  // include the 2 character code and 1 character check_digit
 			
 			
 			Chronology := DATASET([{1, addr1, le.chronoprim_range, le.chronopredir, le.chronoprim_name, le.chronosuffix, le.chronopostdir, le.chronounit_desig, le.chronosec_range, 
-												le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, le.chronodate_last, le.chronoaddr_isbest, if(IncludeDPBC,chrono1_dpbc,'')},
+												le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, le.chronodate_last, le.chronoaddr_isbest, if(batch_params.IncludeDPBC,chrono1_dpbc,'')},
 											{2, addr2, le.chronoprim_range2, le.chronopredir2, le.chronoprim_name2, le.chronosuffix2, le.chronopostdir2, le.chronounit_desig2, le.chronosec_range2, 
-													le.chronocity2, le.chronostate2, le.chronozip2, le.chronozip4_2, le.chronophone2, le.chronodate_first2, le.chronodate_last2, le.chronoaddr_isbest2, if(IncludeDPBC,chrono2_dpbc,'')},
+													le.chronocity2, le.chronostate2, le.chronozip2, le.chronozip4_2, le.chronophone2, le.chronodate_first2, le.chronodate_last2, le.chronoaddr_isbest2, if(batch_params.IncludeDPBC,chrono2_dpbc,'')},
 											{3, addr3, le.chronoprim_range3, le.chronopredir3, le.chronoprim_name3, le.chronosuffix3, le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3, 
-													le.chronocity3, le.chronostate3, le.chronozip3, le.chronozip4_3, le.chronophone3, le.chronodate_first3, le.chronodate_last3, le.chronoaddr_isbest3, if(IncludeDPBC,chrono3_dpbc,'')}], 
+													le.chronocity3, le.chronostate3, le.chronozip3, le.chronozip4_3, le.chronophone3, le.chronodate_first3, le.chronodate_last3, le.chronoaddr_isbest3, if(batch_params.IncludeDPBC,chrono3_dpbc,'')}], 
 											Risk_Indicators.Layout_AddressHistory);
 			self.chronology := chronology(Address<>'');
 			
@@ -354,36 +319,17 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 											{le.altfirst3,le.altlast3,le.altlast_date3}], Risk_Indicators.Layout_LastNames), 
 										dataset([], Risk_Indicators.Layout_LastNames));
 
-			SELF.Watchlist_Table := le.watchlist_table;
-			SELF.Watchlist_program :=le.watchlist_program;
-			SELF.Watchlist_Record_Number := le.Watchlist_Record_Number;
-			SELF.Watchlist_fname := le.Watchlist_fname;
-			SELF.Watchlist_lname := le.Watchlist_lname;
-			SELF.Watchlist_address := le.Watchlist_address;
-			SELF.WatchlistPrimRange := le.WatchlistPrimRange;
-			SELF.WatchlistPreDir := le.WatchlistPreDir;
-			SELF.WatchlistPrimName := le.WatchlistPrimName;
-			SELF.WatchlistAddrSuffix := le.WatchlistAddrSuffix;
-			SELF.WatchlistPostDir := le.WatchlistPostDir;
-			SELF.WatchlistUnitDesignation := le.WatchlistUnitDesignation;
-			SELF.WatchlistSecRange := le.WatchlistSecRange;
-			SELF.Watchlist_city := le.Watchlist_city;
-			SELF.Watchlist_state := le.Watchlist_state;
-			SELF.Watchlist_zip := le.Watchlist_zip;
-			SELF.Watchlist_contry := le.Watchlist_contry;
-			SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
-
-			SELF.fua := risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/);
+			SELF.fua := risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := batch_params.actioncode_settings /*, rc*/);
 			
-			cvi_temp := if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,
-																														OFAC),	
+			cvi_temp := if(batch_params.actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,
+																														batch_params.OFAC),	
 																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,
-																														OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-			isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-			SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-									IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-									IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
-									IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and actualIIDVersion=1 => '10',
+																														batch_params.OFAC, batch_params.IncludeDOBinCVI, batch_params.IncludeDriverLicenseInCVI));
+			isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and batch_params.actualIIDVersion=1;
+			SELF.CVI := map(batch_params.IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
+									batch_params.IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
+									batch_params.IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10',
+									batch_params.IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 and batch_params.actualIIDVersion=1 => '10',
 									isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
 									cvi_temp);
 			
@@ -420,7 +366,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			self.watchlists := watchlists_with_seq;
 
 			// add a sequence number to the reason codes for sorting in XML
-			risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), reasons_with_seq);
+			risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, batch_params.NumReturnCodes, batch_params.reasoncode_settings), reasons_with_seq);
 			self.ri := reasons_with_seq;
 				
 			passportline := r.PassportUpperLine + r.PassportLowerLine;
@@ -428,13 +374,13 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			
 			self.dobmatchlevel := le.dobmatchlevel;
 			
-			self.SSNFoundForLexID := le.bestssn<>'' and actualIIDVersion=1;	// is this correct?
-			self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
-			self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
+			self.SSNFoundForLexID := le.bestssn<>'' and batch_params.actualIIDVersion=1;	// is this correct?
+			self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and batch_params.actualIIDVersion=1;
+			self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and batch_params.actualIIDVersion=1;
 			
 			self.cviCustomScore := '';	// new field for future use
 			
-			self.InstantIDVersion := (string)actualIIDVersion;	
+			self.InstantIDVersion := (string)batch_params.actualIIDVersion;	
 			
 			//new for Emerging Identities
 			self.EmergingID := if(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, true, false);  //a fake DID indicates an Emerging Identity
@@ -455,7 +401,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 
 		ds_ciid_out := join(ds_instantIDRaw, ds_instantID_pre, left.seq = right.seq, format_out(LEFT, RIGHT));
 
-		IF(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
+		IF(batch_params.actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
 		RETURN ds_ciid_out;
 								
@@ -463,31 +409,25 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	EXPORT GetRedFlags(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 																				GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
-	
-		unsigned1 RedFlag_version := 1 : STORED('RedFlag_version');		
 		
-		// red_flags_ret := IF(RedFlag_version<>0, risk_indicators.Red_Flags_Function(GROUP(ds_instantIDRaw, seq), reasoncode_settings), 
-		red_flags_ret := IF(RedFlag_version<>0, risk_indicators.Red_Flags_Function(ds_instantIDRaw, reasoncode_settings), 
+		red_flags_ret := IF(batch_params.RedFlag_version<>0, risk_indicators.Red_Flags_Function(ds_instantIDRaw, batch_params.reasoncode_settings), 
 													DATASET([], FraudGovPlatform_Services.Layouts.combined_layouts) );
 		
-		IF(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
+		IF(batch_params.actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
 		RETURN red_flags_ret;
 								
 	END;
 	
- 	EXPORT GetGlobalWatchlist(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
-														
-		string20 search_type := 'BOTH' : STORED('search_type');
+ 	EXPORT GetGlobalWatchlist(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION						
 
 		patriot.Layout_batch_in xform_in(ds_batch_in le) := TRANSFORM
-			//SELF.seq := C;
 			SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
 			SELF.name_middle := Stringlib.StringToUpperCase(le.name_middle);
 			SELF.name_last := Stringlib.StringToUpperCase(le.name_last);
 			SELF.name_unparsed := '';
 			SELF.country := '';
-			SELF.search_type := Stringlib.StringToUpperCase(search_type);
+			SELF.search_type := Stringlib.StringToUpperCase(batch_params.search_type);
 			SELF.dob := le.dob;	
 			SELF := le;
 		END;
