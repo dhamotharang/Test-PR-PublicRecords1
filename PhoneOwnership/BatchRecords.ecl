@@ -64,7 +64,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		//mark all reported invalid numbers
 		badNumber := STD.Str.ToLowerCase(trim(r.error_desc)) = Constants.BAD_NUMBER AND status = Constants.DisconnectStatus.UNKNOWN;
 		SELF.AppendedPhoneLineType := IF(badNumber,'',r.phone_line_type_desc);
-		SELF.AppendedPhoneServiceType := IF(badNumber,'',r.phone_line_type_desc);
+		SELF.AppendedPhoneServiceType := IF(badNumber,'',r.phone_serv_type_desc);
 		SELF.AppendedFirstDate := IF(badNumber,today,r.event_date); // check these date with effective date?????? - POSSIBLE FUTURE UPDATE
 		SELF.AppendedLastDate := today;		
 		SELF.LexisNexisMatchCode := IF(badNumber,Constants.LNMatch.INVALID,'');
@@ -326,10 +326,10 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		
 		phoneMatch := IF(includeEntity,Constants.LNMatch.PHONE,'');
 		businessMatch := IF(r.ActiveFlag='A' AND (r.companyname<>'' OR r.seleid > 0 OR r.bdid > 0),Constants.LNMatch.BUSINESS,'');
-		noEntityMatch := MAP(NOT includeEntity AND l.AppendedPhoneLineType = 'WIRELESS' => Constants.LNMatch.CELL,
-											 NOT includeEntity AND l.AppendedPhoneLineType <> 'WIRELESS' AND businessMatch <> '' => Constants.LNMatch.BUSINESS,
-											 NOT includeEntity AND l.AppendedPhoneLineType <> 'WIRELESS' AND businessMatch = '' => Constants.LNMatch.NON_CELL_CONSUMER,
-											 '');
+		noEntityMatch := MAP(NOT includeEntity AND l.AppendedPhoneLineType = Phones.Constants.PhoneServiceType.Wireless[1] => Constants.LNMatch.CELL,
+							NOT includeEntity AND l.AppendedPhoneLineType <> Phones.Constants.PhoneServiceType.Wireless[1] AND businessMatch <> '' => Constants.LNMatch.BUSINESS,
+							NOT includeEntity AND l.AppendedPhoneLineType <> Phones.Constants.PhoneServiceType.Wireless[1] AND businessMatch = '' => Constants.LNMatch.NON_CELL_CONSUMER,
+							'');
 		// subjectMatch := match AND((l.did > 0 AND l.did IN [(UNSIGNED)l.AppendedDID,r.did]) OR (l.name_first IN [r.fname,l.AppendedFirstName] AND l.name_last IN [r.lname,l.AppendedSurname])) AND
 										// l.subj2own_relationship = Constants.Relationship.SUBJECT;
 		badNumber := l.LexisNexisMatchCode=Constants.LNMatch.INVALID;
@@ -410,7 +410,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedZipCodeExtension := IF(ownershipPossible,l.AppendedZipCodeExtension,'');		
 		SELF.LexisNexisMatchCode := MAP(l.validatedName  => TRIM(l.LexisNexisMatchCode,ALL),
 																		l.LexisNexisMatchCode = Constants.LNMatch.INVALID => Constants.LNMatch.INVALID,
-																		l.AppendedPhoneLineType = 'WIRELESS' => Constants.LNMatch.CELL,
+																		l.AppendedPhoneLineType = Phones.Constants.PhoneServiceType.Wireless[1] => Constants.LNMatch.CELL,
 																		l.AppendedRecordType = Constants.LNMatch.BUSINESS => Constants.LNMatch.BUSINESS,
 																		l.AppendedRecordType <> Constants.LNMatch.BUSINESS => Constants.LNMatch.NON_CELL_CONSUMER,
 																		'');	
