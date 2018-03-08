@@ -13,8 +13,6 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT CommonGeographicLayout   := RECORD
 		DueDiligence.Layouts.BusOperLocationLayout;
-	 // DueDiligence.Layouts.Address;
-	 // DueDiligence.Layouts.GeographicRiskLayout;
 	END;
 	
 	

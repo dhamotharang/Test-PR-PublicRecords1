@@ -591,6 +591,8 @@ EXPORT LinkIDs := RECORD
 		STRING10 usResidencyFlags;
 		STRING2 legalEventTypeScore;
 		STRING10 legalEventTypeFlags;
+    STRING2 trafficInfractionScore;
+    STRING10 trafficInfractionFlags;
     DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
@@ -621,9 +623,9 @@ EXPORT LinkIDs := RECORD
 		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			//populated in DueDiligence.getIndRelatives
 		Indv_Input indvRawInput;
 		Indv_Input	indvCleanInput;
-		STRING2				indvType;                         					      //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
+		STRING2				indvType;                         					    //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
 		/*PerUSResidency*/
-		UNSIGNED4 	firstReportedDate;															    //populated in DueDiligence.getIndHeader
+		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
 		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader
 		BOOLEAN			stateVotingSourceAvailable;										    //populated in DueDiligence.getIndHeader
 		BOOLEAN			hasSSN;																				    //populated in DueDiligecne.getIndSSNData
@@ -635,7 +637,7 @@ EXPORT LinkIDs := RECORD
 		BOOLEAN			atleastOneParentHasITIN;											    //populated in DueDiligecne.getIndSSNData
 		BOOLEAN			atleastOneParentHasImmigrantSSN;							    //populated in DueDiligecne.getIndSSNData
 		BOOLEAN			atleastOneParentIsRegisteredVoter;					      //populated in DueDiligence.getIndHeader
-		UNSIGNED4		mostRecentParentSSNIssuanceDate;							      //populated in DueDiligecne.getIndSSNData
+		UNSIGNED4		mostRecentParentSSNIssuanceDate;							    //populated in DueDiligecne.getIndSSNData
 		/*PerLegalEventType*/
 		BOOLEAN			atleastOneCategory9;
 		BOOLEAN			atleastOneCategory8;
@@ -645,8 +647,18 @@ EXPORT LinkIDs := RECORD
 		BOOLEAN			atleastOneCategory4;
 		BOOLEAN			atleastOneCategory3;
 		BOOLEAN			atleastOneCategory2;
-		BOOLEAN			noConvictionsOrCategoryHit;
-		
+		// BOOLEAN			noConvictionsOrCategoryHit;
+    /*PerLegalTrafficInfractions*/
+    BOOLEAN     threePlusTrafConvictPast3Yrs;
+    BOOLEAN     twoOrLessTrafConvictPast3Yrs;
+    BOOLEAN     threePlusInfractConvictPast3Yrs;
+    BOOLEAN     twoOrLessInfractConvictPast3Yrs;
+    BOOLEAN     threePlusTrafConvictOver3Yrs;
+    BOOLEAN     twoOrLessTrafConvictOver3Yrs;
+    BOOLEAN     threePlusInfractConvictOver3Yrs;
+    BOOLEAN     twoOrLessInfractConvictOver3Yrs;
+    // BOOLEAN     noTrafficOrInfractions;
+	
 		PerAttributes;
 	END;
 

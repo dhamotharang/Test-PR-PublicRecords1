@@ -96,29 +96,12 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                       SELF.party.NonConvictedUnknownCount3U_EVER := LEFT.party.NonConvictedUnknownCount3U_EVER + RIGHT.party.NonConvictedUnknownCount3U_EVER;
                                                       SELF.party.NonConvictedMisdemeanorCount3M_EVER := LEFT.party.NonConvictedMisdemeanorCount3M_EVER + RIGHT.party.NonConvictedMisdemeanorCount3M_EVER;
                                                       
+                                                      //rollup to the business for the traffic and infractions of the BEOs
+                                                      SELF.party.trafficInfractionFlags := DueDiligence.Common.RollFlags(party.trafficInfractionFlags);
+                                                      SELF.party.trafficInfractionScore := MAX(LEFT.party.trafficInfractionScore, RIGHT.party.trafficInfractionScore);
 
                                                       //rollup to the business for the legal event types of the BEOs
-																											SELF.party.legalEventTypeFlags := IF(LEFT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[2] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[2] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[3] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[3] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[4] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[4] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[5] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[5] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[6] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[6] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[7] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[7] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[8] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[8] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[9] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[9] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
-                                                                                        IF(LEFT.party.legalEventTypeFlags[10] = DueDiligence.Constants.T_INDICATOR OR 
-                                                                                           RIGHT.party.legalEventTypeFlags[10] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-
+																											SELF.party.legalEventTypeFlags := DueDiligence.Common.RollFlags(party.legalEventTypeFlags);
                                                       SELF.party.legalEventTypeScore := MAX(LEFT.party.legalEventTypeScore, RIGHT.party.legalEventTypeScore);   
 																																															 
 																											SELF := LEFT;));
@@ -151,23 +134,15 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                   //***************************************************************************************************
 																									/* These are all of the evidence flags used in the TRAFFIC and INFRACTIONS ATTRIBUTE  */ 
 																									//***************************************************************************************************
-																									/*  This will be used in Level 9 of busTrafficInfractions attribute  */   
-																									SELF.BEOevidenceOf3TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR >= 3, TRUE, FALSE), 
-																									/*  This will be used in Level 8 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2TrafficNYR                       := IF(RIGHT.party.ConvictedTraffic2T_NYR BETWEEN 1 AND 2, TRUE, FALSE),
-																									/*  This will be used in Level 7 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf3InfractionsNYR                   := IF(RIGHT.party.ConvictedInfractions2I_NYR >= 3,  TRUE, FALSE),
-																									/*  This will be used in Level 6 of busTrafficInfractions attribute  */     
-																									SELF.BEOevidenceOf2InfractionsNYR                    := IF(RIGHT.party.ConvictedInfractions2I_NYR BETWEEN 1 AND 2, TRUE, FALSE),
-																									/*  This will be used in Level 5 of busTrafficInfractions attribute  */  
-																									SELF.BEOevidenceOf3TrafficOlderNYR                   := IF(RIGHT.party.ConvictedTraffic2T_OVNYR >= 3, TRUE, FALSE),   
-																									/*  This will be used in Level 4 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2TrafficOlderNYR                   := IF(RIGHT.party.ConvictedTraffic2T_OVNYR BETWEEN 1 AND 2, TRUE,  FALSE),
-																									/*  This will be used in Level 3 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf3InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR >= 3, TRUE, FALSE),
-																									/*  This will be used in Level 2 of busTrafficInfractions attribute  */
-																									SELF.BEOevidenceOf2InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR BETWEEN 1 AND 2, TRUE,  FALSE),
-																									SELF.BEONoEvidenceOfTrafficOrInfraction              := RIGHT.party.noEvidenceOfTrafficOrInfraction,
+																									SELF.BEOevidenceOf3TrafficNYR                       := RIGHT.party.trafficInfractionFlags[1] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf2TrafficNYR                       := RIGHT.party.trafficInfractionFlags[2] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf3InfractionsNYR                   := RIGHT.party.trafficInfractionFlags[3] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf2InfractionsNYR                   := RIGHT.party.trafficInfractionFlags[4] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf3TrafficOlderNYR                  := RIGHT.party.trafficInfractionFlags[5] = DueDiligence.Constants.T_INDICATOR;   
+																									SELF.BEOevidenceOf2TrafficOlderNYR                  := RIGHT.party.trafficInfractionFlags[6] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf3InfractionsOlderNYR              := RIGHT.party.trafficInfractionFlags[7] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEOevidenceOf2InfractionsOlderNYR              := RIGHT.party.trafficInfractionFlags[8] = DueDiligence.Constants.T_INDICATOR; 
+																									SELF.BEONoEvidenceOfTrafficOrInfraction             := RIGHT.party.trafficInfractionFlags[9] = DueDiligence.Constants.T_INDICATOR; 
                                                   
                                                   //count if a BEO has ever had
                                                   SELF.BusFelonyConviction_4F := RIGHT.party.ConvictedFelonyCount4F_Ever;
@@ -177,7 +152,6 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                   SELF.BusUnknownConviction_4U := RIGHT.party.ConvictedUnknownCount4U_Ever;
                                                   SELF.BusUnknownNonConviction_3U := RIGHT.party.NonConvictedUnknownCount3U_EVER;
                                                   SELF.BusTrafficConvictions_2T := RIGHT.party.ConvictedTraffic2T_Ever;
-                                                  // SELF.BusTrafficNonConvictions_1T := RIGHT.party.?? Under review
 																										
 																									//legal event type
                                                   SELF.atleastOneBEOInCategory9 := RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR;

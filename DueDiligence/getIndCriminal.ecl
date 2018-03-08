@@ -269,7 +269,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   // ------ Sort the offenses in offender_key sequence so that we can roll up the data         ------ 
 	// ------ to the offense and case number                                                     ------
 	// ------                                                                                    ------	
-  OffenseDataSorted  :=  sort(OffenseRiskCalculateAge, seq, did, offender_key, caseNum, -criminalOffenderLevel);                               //criminalOffenderLevel 4's should show up at the top
+  OffenseDataSorted  :=  sort(OffenseRiskCalculateAge, seq, did, offender_key, caseNum, -criminalOffenderLevel, earliestOffenseDate);                               //criminalOffenderLevel 4's should show up at the top
 	
   
 	// ------                                                                                    ------
@@ -293,9 +293,23 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                          /* These are all evidence that indicates if the DID is currently on Parole */   
                                          SELF.curr_parole_flag           := IF(LEFT.curr_parole_flag        = 'Y', LEFT.curr_parole_flag,        RIGHT.curr_parole_flag);
                                          SELF.Curr_parole_Punishments    := IF(LEFT.Curr_parole_Punishments = 'Y', LEFT.Curr_parole_Punishments, RIGHT.Curr_parole_Punishments);
+                                         SELF.earliestOffenseDate        := IF((INTEGER)LEFT.earliestOffenseDate = 0, MAX(LEFT.earliestOffenseDate, RIGHT.earliestOffenseDate), MIN(LEFT.earliestOffenseDate, RIGHT.earliestOffenseDate));
                                          /* Pass all remaining fields forward from the LEFT */  
                                          SELF                            := LEFT;));	
   	
+  
+   projectOffenses := PROJECT(offenseDataRolled, TRANSFORM({UNSIGNED seq, UNSIGNED6 did, DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) offenses},
+                                                            SELF.offenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense,
+                                                                                                SELF := LEFT;)]);
+                                                            SELF := LEFT;)); 
+                                                            
+   rollPersonOffenses := ROLLUP(SORT(projectOffenses, seq, did),
+                                LEFT.seq = RIGHT.seq AND
+                                LEFT.did = RIGHT.did,
+                                TRANSFORM(RECORDOF(LEFT),
+                                           SELF.offenses := LEFT.offenses + RIGHT.offenses;
+                                           SELF := LEFT;));
+  
   // ------                                                             ------
   // ------  Summarize the Data up to the DID/Individual                ------
   // ------                                                             ------
@@ -304,235 +318,136 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   // ------  and used in conjunction with offenseScore to indicate      ------
   // ------   the type of offenses                                      ------
   // ------   (F = FELONY, M = MISDEMEANOR, T = TRAFFIC, I = INFRACTIONS -----
-  // ------                                                             ------
-  calcTotals := PROJECT(OffenseDataRolled, TRANSFORM({UNSIGNED4 seq, UNSIGNED6 did, UNSIGNED4 HistoryDate, UNSIGNED4 DateToUse, UNSIGNED2 TotalEverIncarcerations, 
-                                                                      UNSIGNED2 TotalCurrentIncarcerations, UNSIGNED2 TotalCurrentParoles, UNSIGNED2 TotalConvictedFelonies4F_OVERNYR, 
-                                                                      UNSIGNED2 TotalConvictedFelonies4F_NY, UNSIGNED2 TotalConvictedFelonies4F_EVER, 
-                                                                      UNSIGNED2 TotalConvictedUnknowns4U_OVERNYR, UNSIGNED2 TotalConvictedUnknowns4U_NY, 
-                                                                      UNSIGNED2 TotalConvictedFelonies4U_EVER, UNSIGNED2 TotalConvictedMisdemeanor4M_OVERNYR, 
-                                                                      UNSIGNED2 TotalConvictedMisdemeanor4M_NY, UNSIGNED2 TotalConvictedMisdemeanor4M_EVER, 
-                                                                      UNSIGNED2 TotalNonConvictedFelonies3F_OVERNYR, UNSIGNED2 TotalNonConvictedFelonies3F_NY, 
-                                                                      UNSIGNED2 TotalNonConvictedFelonies3F_EVER, UNSIGNED2 TotalNonConvictedUnknowns3U_OVERNYR, 
-                                                                      UNSIGNED2 TotalNonConvictedUnknowns3U_NY, UNSIGNED2 TotalNonConvictedUnknowns3U_EVER, 
-                                                                      UNSIGNED2 TotalNonConvictedMisdemeanor3M_OVERNYR, UNSIGNED2 TotalNonConvictedMisdemeanor3M_NY, 
-                                                                      UNSIGNED2 TotalNonConvictedMisdemeanor3M_EVER, UNSIGNED2 TotalConvictedTraffic2T_OVERNYR, 
-                                                                      UNSIGNED2 TotalConvictedTraffic2T_NY, UNSIGNED2 TotalConvictedTraffic2T_EVER, 
-                                                                      UNSIGNED2 TotalConvictedInfractions2I_OVERNYR, UNSIGNED2 TotalConvictedInfractions2I_NY, 
-                                                                      UNSIGNED2 TotalConvictedInfractions2I_EVER, UNSIGNED2 TotalOffensesThisDID, 
-                                                                      UNSIGNED2 TotalHitsStateCrim, UNSIGNED2 TotalHitsTrafficInfraction},
-                                                                      
-                                                      SELF.TotalEverIncarcerations := (INTEGER)(LEFT.Ever_incarc_offenses  = DueDiligence.Constants.YES OR
-                                                                                                LEFT.Ever_incarc_offenders = DueDiligence.Constants.YES OR
-                                                                                                LEFT.Ever_incarc_Punishments = DueDiligence.Constants.YES); 
-                                                                                                
-                                                      SELF.TotalCurrentIncarcerations := (INTEGER)(LEFT.Curr_incarc_offenses  = DueDiligence.Constants.YES OR
-                                                                                                   LEFT.Curr_incarc_offenders  = DueDiligence.Constants.YES OR
-                                                                                                   LEFT.Curr_incarc_Punishments = DueDiligence.Constants.YES);
-                                                                                                   
-                                                      SELF.TotalCurrentParoles := (INTEGER)(LEFT.curr_parole_flag = DueDiligence.Constants.YES OR
-                                                                                            LEFT.Curr_parole_Punishments = DueDiligence.Constants.YES);
-                                                      
-                                                      SELF.TotalConvictedFelonies4F_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.FELONY, '>');
-                                                      SELF.TotalConvictedFelonies4F_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.FELONY, '<=');                                               
-                                                      SELF.TotalConvictedFelonies4F_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.FELONY, DueDiligence.Constants.EMPTY);
-                                                                                                      
-                                                      SELF.TotalConvictedUnknowns4U_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, '>');
-                                                      SELF.TotalConvictedUnknowns4U_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, '<=');
-                                                      SELF.TotalConvictedFelonies4U_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, DueDiligence.Constants.EMPTY);
-                                                                                                      
-                                                      SELF.TotalConvictedMisdemeanor4M_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.MISDEMEANOR, '>');
-                                                      SELF.TotalConvictedMisdemeanor4M_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.MISDEMEANOR, '<=');
-                                                      SELF.TotalConvictedMisdemeanor4M_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.EMPTY);
-                                                                                                       
-                                                      SELF.TotalNonConvictedFelonies3F_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.FELONY, '>');
-                                                      SELF.TotalNonConvictedFelonies3F_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.FELONY, '<=');
-                                                      SELF.TotalNonConvictedFelonies3F_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.FELONY, DueDiligence.Constants.EMPTY);
-                                                      
-                                                      SELF.TotalNonConvictedUnknowns3U_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, '>');
-                                                      SELF.TotalNonConvictedUnknowns3U_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, '<=');
-                                                      SELF.TotalNonConvictedUnknowns3U_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.UNKNOWN_OFFENSES, DueDiligence.Constants.EMPTY);
-                                                      
-                                                      SELF.TotalNonConvictedMisdemeanor3M_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.MISDEMEANOR, '>');
-                                                      SELF.TotalNonConvictedMisdemeanor3M_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.MISDEMEANOR, '<=');
-                                                      SELF.TotalNonConvictedMisdemeanor3M_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.EMPTY);
-                                                      
-                                                      SELF.TotalConvictedTraffic2T_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, '>');
-                                                      SELF.TotalConvictedTraffic2T_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, '<=');
-                                                      SELF.TotalConvictedTraffic2T_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.EMPTY);
-                                                      
-                                                      SELF.TotalConvictedInfractions2I_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, '>');
-                                                      SELF.TotalConvictedInfractions2I_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, '<=');
-                                                      SELF.TotalConvictedInfractions2I_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, DueDiligence.Constants.EMPTY);
-                                                      
-                                                      SELF.TotalOffensesThisDID := 1;
-                                                      SELF.TotalHitsStateCrim := (INTEGER)(SELF.TotalCurrentIncarcerations > 0 OR SELF.TotalCurrentParoles > 0 OR 
-                                                                                  SELF.TotalConvictedFelonies4F_NY > 0 OR
-                                                                                  SELF.TotalConvictedFelonies4F_OVERNYR > 0 OR
-                                                                                  SELF.TotalEverIncarcerations > 0 OR
-                                                                                  SELF.TotalConvictedUnknowns4U_NY >  0 OR
-                                                                                  SELF.TotalConvictedMisdemeanor4M_NY > 0 OR
-                                                                                  SELF.TotalConvictedUnknowns4U_OVERNYR > 0 OR
-                                                                                  SELF.TotalConvictedMisdemeanor4M_OVERNYR > 0);
-                                                                                  
-                                                      SELF.TotalHitsTrafficInfraction := (INTEGER)(SELF.TotalConvictedTraffic2T_NY > 0 OR
-                                                                                                   SELF.TotalConvictedInfractions2I_NY > 0 OR
-                                                                                                   SELF.TotalConvictedTraffic2T_OVERNYR > 0 OR
-                                                                                                   SELF.TotalConvictedInfractions2I_OVERNYR > 0);                           
-                                                      
-                                                      SELF := LEFT;
+  // ------                                                             ------ 
+	allPartyOffenses    :=  DueDiligence.subFunctions.ProcessOffenses(Individuals, OffenseDataRolled); 
+
+  indivResults := PROJECT(allPartyOffenses, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                                      SELF.seq := LEFT.seq;
+                                                      SELF.inquiredDID := LEFT.did;
+                                                      SELF.threePlusTrafConvictPast3Yrs := LEFT.TotalConvictedTraffic2T_NY >= 3;
+                                                      SELF.twoOrLessTrafConvictPast3Yrs := LEFT.TotalConvictedTraffic2T_NY BETWEEN 1 AND 2;
+                                                      SELF.threePlusInfractConvictPast3Yrs := LEFT.TotalConvictedInfractions2I_NY >= 3;
+                                                      SELF.twoOrLessInfractConvictPast3Yrs := LEFT.TotalConvictedInfractions2I_NY BETWEEN 1 AND 2;
+                                                      SELF.threePlusTrafConvictOver3Yrs := LEFT.TotalConvictedTraffic2T_OVERNYR >= 3;
+                                                      SELF.twoOrLessTrafConvictOver3Yrs := LEFT.TotalConvictedTraffic2T_OVERNYR BETWEEN 1 AND 2;
+                                                      SELF.threePlusInfractConvictOver3Yrs := LEFT.TotalConvictedInfractions2I_OVERNYR >= 3;
+                                                      SELF.twoOrLessInfractConvictOver3Yrs := LEFT.TotalConvictedInfractions2I_OVERNYR BETWEEN 1 AND 2;
                                                       SELF := [];));
   
-  rollTotals := ROLLUP(calcTotals,
+  
+  offenseCalcs := JOIN(indivResults, allPartyOffenses,
                         LEFT.seq = RIGHT.seq AND
-                        LEFT.did = RIGHT.did,
-                        TRANSFORM(RECORDOF(LEFT),
-                                    
-                                   SELF.TotalEverIncarcerations := LEFT.TotalEverIncarcerations + RIGHT.TotalEverIncarcerations;
-                                   SELF.TotalCurrentIncarcerations := LEFT.TotalCurrentIncarcerations + RIGHT.TotalCurrentIncarcerations;
-                                   SELF.TotalCurrentParoles := LEFT.TotalCurrentParoles + RIGHT.TotalCurrentParoles;
-                                   
-                                   SELF.TotalConvictedFelonies4F_OVERNYR := LEFT.TotalConvictedFelonies4F_OVERNYR + RIGHT.TotalConvictedFelonies4F_OVERNYR;
-                                   SELF.TotalConvictedFelonies4F_NY := LEFT.TotalConvictedFelonies4F_NY + RIGHT.TotalConvictedFelonies4F_NY;                                               
-                                   SELF.TotalConvictedFelonies4F_EVER := LEFT.TotalConvictedFelonies4F_EVER + RIGHT.TotalConvictedFelonies4F_EVER;
-                                                                                   
-                                   SELF.TotalConvictedUnknowns4U_OVERNYR := LEFT.TotalConvictedUnknowns4U_OVERNYR + RIGHT.TotalConvictedUnknowns4U_OVERNYR;
-                                   SELF.TotalConvictedUnknowns4U_NY := LEFT.TotalConvictedUnknowns4U_NY + RIGHT.TotalConvictedUnknowns4U_NY;
-                                   SELF.TotalConvictedFelonies4U_EVER := LEFT.TotalConvictedFelonies4U_EVER + RIGHT.TotalConvictedFelonies4U_EVER;
-                                                                                   
-                                   SELF.TotalConvictedMisdemeanor4M_OVERNYR := LEFT.TotalConvictedMisdemeanor4M_OVERNYR + RIGHT.TotalConvictedMisdemeanor4M_OVERNYR;
-                                   SELF.TotalConvictedMisdemeanor4M_NY := LEFT.TotalConvictedMisdemeanor4M_NY + RIGHT.TotalConvictedMisdemeanor4M_NY;
-                                   SELF.TotalConvictedMisdemeanor4M_EVER := LEFT.TotalConvictedMisdemeanor4M_EVER + RIGHT.TotalConvictedMisdemeanor4M_EVER;
-                                                                                    
-                                   SELF.TotalNonConvictedFelonies3F_OVERNYR := LEFT.TotalNonConvictedFelonies3F_OVERNYR + RIGHT.TotalNonConvictedFelonies3F_OVERNYR;
-                                   SELF.TotalNonConvictedFelonies3F_NY := LEFT.TotalNonConvictedFelonies3F_NY + RIGHT.TotalNonConvictedFelonies3F_NY;
-                                   SELF.TotalNonConvictedFelonies3F_EVER := LEFT.TotalNonConvictedFelonies3F_EVER + RIGHT.TotalNonConvictedFelonies3F_EVER;
-                                   
-                                   SELF.TotalNonConvictedUnknowns3U_OVERNYR := LEFT.TotalNonConvictedUnknowns3U_OVERNYR + RIGHT.TotalNonConvictedUnknowns3U_OVERNYR;
-                                   SELF.TotalNonConvictedUnknowns3U_NY := LEFT.TotalNonConvictedUnknowns3U_NY + RIGHT.TotalNonConvictedUnknowns3U_NY;
-                                   SELF.TotalNonConvictedUnknowns3U_EVER := LEFT.TotalNonConvictedUnknowns3U_EVER + RIGHT.TotalNonConvictedUnknowns3U_EVER;
-                                   
-                                   SELF.TotalNonConvictedMisdemeanor3M_OVERNYR := LEFT.TotalNonConvictedMisdemeanor3M_OVERNYR + RIGHT.TotalNonConvictedMisdemeanor3M_OVERNYR;
-                                   SELF.TotalNonConvictedMisdemeanor3M_NY := LEFT.TotalNonConvictedMisdemeanor3M_NY + RIGHT.TotalNonConvictedMisdemeanor3M_NY;
-                                   SELF.TotalNonConvictedMisdemeanor3M_EVER := LEFT.TotalNonConvictedMisdemeanor3M_EVER + RIGHT.TotalNonConvictedMisdemeanor3M_EVER;
-                                   
-                                   SELF.TotalConvictedTraffic2T_OVERNYR := LEFT.TotalConvictedTraffic2T_OVERNYR + RIGHT.TotalConvictedTraffic2T_OVERNYR;
-                                   SELF.TotalConvictedTraffic2T_NY := LEFT.TotalConvictedTraffic2T_NY + RIGHT.TotalConvictedTraffic2T_NY;
-                                   SELF.TotalConvictedTraffic2T_EVER := LEFT.TotalConvictedTraffic2T_EVER + RIGHT.TotalConvictedTraffic2T_EVER;
-                                   
-                                   SELF.TotalConvictedInfractions2I_OVERNYR := LEFT.TotalConvictedInfractions2I_OVERNYR + RIGHT.TotalConvictedInfractions2I_OVERNYR;
-                                   SELF.TotalConvictedInfractions2I_NY := LEFT.TotalConvictedInfractions2I_NY + RIGHT.TotalConvictedInfractions2I_NY;
-                                   SELF.TotalConvictedInfractions2I_EVER := LEFT.TotalConvictedInfractions2I_EVER + RIGHT.TotalConvictedInfractions2I_EVER;
-                                   
-                                   SELF.TotalOffensesThisDID := LEFT.TotalOffensesThisDID + RIGHT.TotalOffensesThisDID;
-                                   SELF.TotalHitsStateCrim := LEFT.TotalHitsStateCrim + RIGHT.TotalHitsStateCrim;
-                                   SELF.TotalHitsTrafficInfraction := LEFT.TotalHitsTrafficInfraction + RIGHT.TotalHitsTrafficInfraction;
-                                   
-                                   SELF := LEFT;));
+                        LEFT.inquiredDID = RIGHT.did,
+                        TRANSFORM({UNSIGNED4 seq, UNSIGNED6 did, DueDiligence.LayoutsInternal.RelatedParty},
+                                  SELF.party.EverIncarcer                           := RIGHT.TotalEverIncarcerations > 0, 
+                                  SELF.party.CurrParole                             := RIGHT.TotalCurrentParoles > 0, 
+                                  SELF.party.CurrIncarcer                           := RIGHT.TotalCurrentIncarcerations > 0, 
+                                  
+                                  SELF.party.ConvictedFelonyCount4F_Ever            := RIGHT.TotalConvictedFelonies4F_EVER,
+                                  SELF.party.ConvictedFelonyCount4F_OVNYR           := RIGHT.TotalConvictedFelonies4F_OVERNYR,
+                                  SELF.party.ConvictedFelonyCount4F_NYR             := RIGHT.TotalConvictedFelonies4F_NY,
+                                  
+                                  SELF.party.ConvictedUnknownCount4U_Ever           := RIGHT.TotalConvictedFelonies4U_EVER,
+                                  SELF.party.ConvictedUnknownCount4U_OVNYR          := RIGHT.TotalConvictedUnknowns4U_OVERNYR,
+                                  SELF.party.ConvictedUnknownCount4U_NYR            := RIGHT.TotalConvictedUnknowns4U_NY,
+                                  
+                                  SELF.party.ConvictedMisdemeanorCount4M_Ever       := RIGHT.TotalConvictedMisdemeanor4M_EVER,
+                                  SELF.party.ConvictedMisdemeanorCount4M_OVNYR      := RIGHT.TotalConvictedMisdemeanor4M_OVERNYR,
+                                  SELF.party.ConvictedMisdemeanorCount4M_NYR        := RIGHT.TotalConvictedMisdemeanor4M_NY,
+                                  
+                                  SELF.party.NonConvictedFelonyCount3f_Ever         := RIGHT.TotalNonConvictedFelonies3F_EVER,
+                                  SELF.party.NonConvictedFelonyCount3F_OVNYR        := RIGHT.TotalNonConvictedFelonies3F_OVERNYR,
+                                  SELF.party.NonConvictedFelonyCount3F_NYR          := RIGHT.TotalNonConvictedFelonies3F_NY,
+                                  
+                                  SELF.party.NonConvictedUnknownCount3U_EVER        := RIGHT.TotalNonConvictedUnknowns3U_EVER,														
+                                  SELF.party.NonConvictedUnknownCount3U_OVNYR       := RIGHT.TotalNonConvictedUnknowns3U_OVERNYR,
+                                  SELF.party.NonConvictedUnknownCount3U_NYR         := RIGHT.TotalNonConvictedUnknowns3U_NY,
+                                  
+                                  SELF.party.NonConvictedMisdemeanorCount3M_EVER    := RIGHT.TotalNonConvictedMisdemeanor3M_EVER,
+                                  SELF.party.NonConvictedMisdemeanorCount3M_OVNYR   := RIGHT.TotalNonConvictedMisdemeanor3M_OVERNYR,
+                                  SELF.party.NonConvictedMisdemeanorCount3M_NYR     := RIGHT.TotalNonConvictedMisdemeanor3M_NY,
+                                  
+                                  SELF.party.ConvictedTraffic2T_Ever                := RIGHT.TotalConvictedTraffic2T_EVER,
+                                  SELF.party.ConvictedTraffic2T_OVNYR               := RIGHT.TotalConvictedTraffic2T_OVERNYR,
+                                  SELF.party.ConvictedTraffic2T_NYR                 := RIGHT.TotalConvictedTraffic2T_NY,
+                                  
+                                  SELF.party.ConvictedInfractions2I_Ever            := RIGHT.TotalConvictedInfractions2I_EVER,
+                                  SELF.party.ConvictedInfractions2I_OVNYR           := RIGHT.TotalConvictedInfractions2I_OVERNYR,
+                                  SELF.party.ConvictedInfractions2I_NYR             := RIGHT.TotalConvictedInfractions2I_NY,
+                                  
+                                  SELF.party.ALLOffensesForThisDID                  := RIGHT.TotalOffensesThisDID,
+                                  SELF.party.noEvidenceOfConvictedStateCrim         := RIGHT.TotalHitsStateCrim = 0;
+                                  SELF.party.noEvidenceOfTrafficOrInfraction        := RIGHT.TotalHitsTrafficInfraction = 0; 
+                                  
+                                  trafInfrac := DueDiligence.getIndKRILegalTrafficInfraction(LEFT);
+                                  SELF.party.trafficInfractionScore := trafInfrac.name;
+                                  SELF.party.trafficInfractionFlags := trafInfrac.value;
+                                  
+                                  SELF := RIGHT;
+                                  SELF := [];));
+          
   
-	// SummaryOffensesFelony    :=  DueDiligence.subFunctions.ProcessOffenses(OffenseDataRolled);  
-																
-	// ------                                                                                    ------
-	// ------ Do the final join back to the businessExecutives input                             ------ 
-  // ------ with the criminal offenses found for these executives                              ------
-	// ------                                                                                    ------ 	
-  AddCriminalOffenses := JOIN(Individuals, rollTotals,
-                              LEFT.seq       = RIGHT.seq AND
-                              LEFT.party.did = RIGHT.did,
-                              TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
-                                        /*  If the curr_incar_flag was set to yes on any of the offenses it was counted and rolled up to the DID */  
-                                        SELF.party.EverIncarcer                           := IF(RIGHT.TotalEverIncarcerations > 0, true, false), 
-                                        SELF.party.CurrParole                             := IF(RIGHT.TotalCurrentParoles > 0, true, false), 
-                                        SELF.party.CurrIncarcer                           := IF(RIGHT.TotalCurrentIncarcerations > 0, true, false), 
-                                        
-                                        SELF.party.ConvictedFelonyCount4F_Ever            := RIGHT.TotalConvictedFelonies4F_EVER,
-                                        SELF.party.ConvictedFelonyCount4F_OVNYR           := RIGHT.TotalConvictedFelonies4F_OVERNYR,
-                                        SELF.party.ConvictedFelonyCount4F_NYR             := RIGHT.TotalConvictedFelonies4F_NY,
-                                        
-                                        SELF.party.ConvictedUnknownCount4U_Ever           := RIGHT.TotalConvictedFelonies4U_EVER,
-                                        SELF.party.ConvictedUnknownCount4U_OVNYR          := RIGHT.TotalConvictedUnknowns4U_OVERNYR,
-                                        SELF.party.ConvictedUnknownCount4U_NYR            := RIGHT.TotalConvictedUnknowns4U_NY,
-                                        
-                                        SELF.party.ConvictedMisdemeanorCount4M_Ever       := RIGHT.TotalConvictedMisdemeanor4M_EVER,
-                                        SELF.party.ConvictedMisdemeanorCount4M_OVNYR      := RIGHT.TotalConvictedMisdemeanor4M_OVERNYR,
-                                        SELF.party.ConvictedMisdemeanorCount4M_NYR        := RIGHT.TotalConvictedMisdemeanor4M_NY,
-                                        
-                                        SELF.party.NonConvictedFelonyCount3f_Ever         := RIGHT.TotalNonConvictedFelonies3F_EVER,
-                                        SELF.party.NonConvictedFelonyCount3F_OVNYR        := RIGHT.TotalNonConvictedFelonies3F_OVERNYR,
-                                        SELF.party.NonConvictedFelonyCount3F_NYR          := RIGHT.TotalNonConvictedFelonies3F_NY,
-                                        
-                                        SELF.party.NonConvictedUnknownCount3U_EVER        := RIGHT.TotalNonConvictedUnknowns3U_EVER,														
-                                        SELF.party.NonConvictedUnknownCount3U_OVNYR       := RIGHT.TotalNonConvictedUnknowns3U_OVERNYR,
-                                        SELF.party.NonConvictedUnknownCount3U_NYR         := RIGHT.TotalNonConvictedUnknowns3U_NY,
-                                        
-                                        SELF.party.NonConvictedMisdemeanorCount3M_EVER    := RIGHT.TotalNonConvictedMisdemeanor3M_EVER,
-                                        SELF.party.NonConvictedMisdemeanorCount3M_OVNYR   := RIGHT.TotalNonConvictedMisdemeanor3M_OVERNYR,
-                                        SELF.party.NonConvictedMisdemeanorCount3M_NYR     := RIGHT.TotalNonConvictedMisdemeanor3M_NY,
-                                        
-                                        SELF.party.ConvictedTraffic2T_Ever                := RIGHT.TotalConvictedTraffic2T_EVER,
-                                        SELF.party.ConvictedTraffic2T_OVNYR               := RIGHT.TotalConvictedTraffic2T_OVERNYR,
-                                        SELF.party.ConvictedTraffic2T_NYR                 := RIGHT.TotalConvictedTraffic2T_NY,
-                                        
-                                        SELF.party.ConvictedInfractions2I_Ever            := RIGHT.TotalConvictedInfractions2I_EVER,
-                                        SELF.party.ConvictedInfractions2I_OVNYR           := RIGHT.TotalConvictedInfractions2I_OVERNYR,
-                                        SELF.party.ConvictedInfractions2I_NYR             := RIGHT.TotalConvictedInfractions2I_NY,
-                                        
-                                        SELF.party.ALLOffensesForThisDID                  := RIGHT.TotalOffensesThisDID,
-                                        SELF.party.noEvidenceOfConvictedStateCrim         := RIGHT.TotalHitsStateCrim = 0;
-                                        SELF.party.noEvidenceOfTrafficOrInfraction         := RIGHT.TotalHitsTrafficInfraction = 0;
-                                        self := left),
-                              left outer);
-	
+  popRelatedParty := JOIN(offenseCalcs, rollPersonOffenses,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.did = RIGHT.did,
+                          TRANSFORM(RECORDOF(LEFT),
+                                      SELF.party.partyOffenses := RIGHT.offenses;
+                                      SELF := LEFT;),
+                          LEFT OUTER);
+                          
+  popAllParties := JOIN(Individuals, popRelatedParty,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.party.did = RIGHT.did,
+                          TRANSFORM(RECORDOF(LEFT),
+                                     SELF.party.partyOffenses := RIGHT.party.partyOffenses;
+                                     
+                                     SELF.party.EverIncarcer := RIGHT.party.EverIncarcer;
+                                     SELF.party.CurrParole := RIGHT.party.CurrParole; 
+                                     SELF.party.CurrIncarcer := RIGHT.party.CurrIncarcer; 
+                                      
+                                     SELF.party.ConvictedFelonyCount4F_Ever := RIGHT.party.ConvictedFelonyCount4F_Ever;
+                                     SELF.party.ConvictedFelonyCount4F_OVNYR := RIGHT.party.ConvictedFelonyCount4F_OVNYR;
+                                     SELF.party.ConvictedFelonyCount4F_NYR := RIGHT.party.ConvictedFelonyCount4F_NYR;
+                                     
+                                     SELF.party.ConvictedUnknownCount4U_Ever := RIGHT.party.ConvictedUnknownCount4U_Ever;
+                                     SELF.party.ConvictedUnknownCount4U_OVNYR := RIGHT.party.ConvictedUnknownCount4U_OVNYR;
+                                     SELF.party.ConvictedUnknownCount4U_NYR := RIGHT.party.ConvictedUnknownCount4U_NYR;
+                                     
+                                     SELF.party.ConvictedMisdemeanorCount4M_Ever := RIGHT.party.ConvictedMisdemeanorCount4M_Ever;
+                                     SELF.party.ConvictedMisdemeanorCount4M_OVNYR := RIGHT.party.ConvictedMisdemeanorCount4M_OVNYR;
+                                     SELF.party.ConvictedMisdemeanorCount4M_NYR := RIGHT.party.ConvictedMisdemeanorCount4M_NYR;
+                                     
+                                     SELF.party.NonConvictedFelonyCount3f_Ever := RIGHT.party.NonConvictedFelonyCount3f_Ever;
+                                     SELF.party.NonConvictedFelonyCount3F_OVNYR := RIGHT.party.NonConvictedFelonyCount3F_OVNYR;
+                                     SELF.party.NonConvictedFelonyCount3F_NYR := RIGHT.party.NonConvictedFelonyCount3F_NYR;
+                                     
+                                     SELF.party.NonConvictedUnknownCount3U_EVER := RIGHT.party.NonConvictedUnknownCount3U_EVER;														
+                                     SELF.party.NonConvictedUnknownCount3U_OVNYR := RIGHT.party.NonConvictedUnknownCount3U_OVNYR;
+                                     SELF.party.NonConvictedUnknownCount3U_NYR := RIGHT.party.NonConvictedUnknownCount3U_NYR;
+                                     
+                                     SELF.party.NonConvictedMisdemeanorCount3M_EVER := RIGHT.party.NonConvictedMisdemeanorCount3M_EVER;
+                                     SELF.party.NonConvictedMisdemeanorCount3M_OVNYR := RIGHT.party.NonConvictedMisdemeanorCount3M_OVNYR;
+                                     SELF.party.NonConvictedMisdemeanorCount3M_NYR := RIGHT.party.NonConvictedMisdemeanorCount3M_NYR;
+                                     
+                                     SELF.party.ConvictedTraffic2T_Ever := RIGHT.party.ConvictedTraffic2T_Ever;
+                                     SELF.party.ConvictedTraffic2T_OVNYR := RIGHT.party.ConvictedTraffic2T_OVNYR;
+                                     SELF.party.ConvictedTraffic2T_NYR := RIGHT.party.ConvictedTraffic2T_NYR;
+                                     
+                                     SELF.party.ConvictedInfractions2I_Ever := RIGHT.party.ConvictedInfractions2I_Ever;
+                                     SELF.party.ConvictedInfractions2I_OVNYR := RIGHT.party.ConvictedInfractions2I_OVNYR;
+                                     SELF.party.ConvictedInfractions2I_NYR := RIGHT.party.ConvictedInfractions2I_NYR;
+                                     
+                                     SELF.party.ALLOffensesForThisDID := RIGHT.party.ALLOffensesForThisDID;
+                                     SELF.party.noEvidenceOfConvictedStateCrim := RIGHT.party.noEvidenceOfConvictedStateCrim;
+                                     SELF.party.noEvidenceOfTrafficOrInfraction := RIGHT.party.noEvidenceOfTrafficOrInfraction; 
+                                     
+                                     SELF.party.trafficInfractionScore := RIGHT.party.trafficInfractionScore;
+                                     SELF.party.trafficInfractionFlags := RIGHT.party.trafficInfractionFlags;
+                                     SELF := LEFT;),
+                          LEFT OUTER);
   
-	
-	
-	// -----                                   ----
-	// ----- FOR SPECIAL VALIDATION            ----
-	// ----- Convert the list into             ----
-	// -----  a DATASET this will              ----
-	// ----- allow me to INSERT the entire     ----	
-  // ----- DATASET as a WHOLE to create      ----
-  // ----- a CHILD DATASET of OFFENSES for   ----
-  // ----- each DID in the Related Parties   ----
-  // -----                                   ---- 
-   DIDOffensesPreSort  := PROJECT(OffenseDataRolled, 
-	                                 TRANSFORM(DueDiligence.LayoutsInternal.CriminalDATASETLayout,
-                                              SELF.DIDOffenses := PROJECT(LEFT, 
-                                                                          TRANSFORM(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense,
-                                                                                    SELF.earliestOffenseDate   := (STRING8)LEFT.earliestOffenseDate,
-																																				            SELF                       := LEFT;));
-																		          SELF := LEFT;));
-																			
-	// -----                             ----
-	// ----- FOR SPECIAL VALIDATION      ----
-	// ----- SORT the newly created      ----
-	// -----  DATASET of Offenses in     ----
-	// -----  seq and DID sequences      ----																															
-	DIDOffensesSorted    := SORT(DIDOffensesPreSort, seq, did);
-	rollcriminaloffenses := ROLLUP(DIDOffensesSorted,
-                                  LEFT.seq = RIGHT.seq AND  
-                                  LEFT.did = RIGHT.did,  
-                                  TRANSFORM(DueDiligence.LayoutsInternal.CriminalDATASETLayout,
-                                            SELF.DIDOffenses := LEFT.DIDOffenses + RIGHT.DIDOffenses;
-                                            SELF := LEFT;));
-																																			
-	// -----                             ----
-	// ----- FOR SPECIAL VALIDATION      ----
-  // ----- Using a DENORMALIZE to JOIN ----
-  // -----  and
-	// ----- INSERT the DATASET into     ----
-	// -----  a PARENT - in this case    ----
-	// -----  Related Party              ----															
-	addCriminalToRelatedParty := DENORMALIZE(AddCriminalOffenses, rollcriminaloffenses,
-                                            LEFT.seq = RIGHT.seq   AND
-                                            LEFT.party.did = RIGHT.did,   
-                                            TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
-                                                      SELF.party.partyOffenses := RIGHT.DIDOffenses;
-                                                      SELF := LEFT;));
-																				
-																				
-																				
-																				
-	
+  
+ 
 									
 	// ********************
 	//   DEBUGGING OUTPUTS
@@ -547,13 +462,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 	IF(DebugMode,     OUTPUT(CHOOSEN(OffenseRiskFiltered, 150),                  NAMED('OffenseRiskFiltered')));    	
 	IF(DebugMode,     OUTPUT(CHOOSEN(OffenseRiskCalculateAge, 150),              NAMED('OffenseRiskCalculateAge')));    	
 	IF(DebugMode,     OUTPUT(CHOOSEN(OffenseDataRolled, 150),                    NAMED('OffenseDataRolled')));    	
-	// IF(DebugMode,     OUTPUT(CHOOSEN(SummaryOffensesFelony, 150),                NAMED('SummaryOffensesFelony')));    	
-	IF(DebugMode,     OUTPUT(CHOOSEN(AddCriminalOffenses, 150),                   NAMED('AddCriminalOffenses')));    	
-	IF(DebugMode,     OUTPUT(CHOOSEN(DIDOffensesPreSort, 150),                   NAMED('DIDOffensesPreSort')));    	
-	IF(DebugMode,     OUTPUT(CHOOSEN(DIDOffensesSorted, 150),                   NAMED('DIDOffensesSorted')));    	
-	IF(DebugMode,     OUTPUT(CHOOSEN(rollcriminaloffenses, 150),                   NAMED('rollcriminaloffenses')));    	
-	IF(DebugMode,     OUTPUT(CHOOSEN(addCriminalToRelatedParty, 150),                   NAMED('addCriminalToRelatedParty')));
-  
+	
   
   
   // OUTPUT(StartBuildingOffenderData, NAMED('StartBuildingOffenderData'));
@@ -563,16 +472,20 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   // OUTPUT(WithOffendersRiskData, NAMED('WithOffendersRiskData'));
   // OUTPUT(WithCourtOffenseData, NAMED('WithCourtOffenseData'));
   // OUTPUT(OffenseRiskCalculateAge, NAMED('OffenseRiskCalculateAge'));
+  // OUTPUT(OffenseDataSorted, NAMED('OffenseDataSorted'));
   // OUTPUT(OffenseDataRolled, NAMED('OffenseDataRolled'));
-  // OUTPUT(AddCriminalOffenses, NAMED('AddCriminalOffenses'));
-  // OUTPUT(DIDOffensesPreSort, NAMED('DIDOffensesPreSort'));
-  // OUTPUT(DIDOffensesSorted, NAMED('DIDOffensesSorted'));
-  // OUTPUT(rollcriminaloffenses, NAMED('rollcriminaloffenses'));
-  // OUTPUT(addCriminalToRelatedParty, NAMED('addCriminalToRelatedParty'));
-  
-  // OUTPUT(calcTotals, NAMED('calcTotals'));
-  // OUTPUT(rollTotals, NAMED('rollTotals'));
+  // OUTPUT(projectOffenses, NAMED('projectOffenses'));
+  // OUTPUT(rollPersonOffenses, NAMED('rollPersonOffenses'));
 
-  RETURN addCriminalToRelatedParty;
+  // OUTPUT(allPartyOffenses, NAMED('allPartyOffenses'));
+  // OUTPUT(indivResults, NAMED('indivResults'));
+  
+  // OUTPUT(offenseCalcs, NAMED('offenseCalcs'));
+  // OUTPUT(popRelatedParty, NAMED('popRelatedParty'));
+  // OUTPUT(popAllParties, NAMED('popAllParties'));
+
+
+
+  RETURN popAllParties;
 
 END;

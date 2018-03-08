@@ -781,6 +781,29 @@ EXPORT Common := MODULE
 	END;    //*** END OF FUNCTION 
   
   
-  
+  EXPORT RollFlags(fieldName) := FUNCTIONMACRO
+    rollMe := IF(LEFT.fieldName[1] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[1] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[2] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[2] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[3] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[3] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[4] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[4] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[5] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[5] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[6] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[6] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[7] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[7] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[8] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[8] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[9] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[9] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[10] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[10] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+     RETURN rollMe;
+  ENDMACRO;
   
 END;
