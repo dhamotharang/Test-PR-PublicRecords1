@@ -59,20 +59,48 @@ EXPORT LayoutsInternalReport := MODULE
 
 
 
+ EXPORT BEOPositionLayout := RECORD
+  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+  unsigned6 did;   
+  DueDiligence.Layouts.Positions;  
+  END;
+
+
 
 
  EXPORT BEOCriminalReportingOFOffenses := RECORD
-  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
-  DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense ReportOfOffenses;  
+  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+  integer2 numberOfCriminalEvents;
+  DueDiligence.Layouts.RelatedParty;  
   END;
-  // ------                                                                       ------
-  // ------ define the internal ChildDataset for the   report                     ------
-	// ------                                                                       ------
+  
+  // ------                                                                            ------
+  // ------ define a simple list of BEO's with Criminal Events                         ------
+  // ------                                                                            ------ 
+  EXPORT SimpleListOfBEOWithCriminalLayout := RECORD
+   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+   DueDiligence.Layouts.SlimIndividual;
+   integer2 numberOfCriminalEvents;   
+  END;
+  
+  // ------                                                                            ------
+  // ------ define the internal GrandChildDataset for the Legal Events section  report ------
+	// ------   these list just the offenses and nothing about the person charged        ------
 	EXPORT ReportingofBEOCriminalChildDatasetLayout    := RECORD
 	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent  
-	 DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal) BusExecCriminalChild;
+	 iesp.duediligenceshared.t_DDRLegalEventIndividual ExecutiveOfficer {xpath('ExecutiveOfficer')};
+	 string ExecTitle {xpath('ExecTitle')};
+   unsigned6 did;   
+   DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal)  BusExecCriminalChild;
 	END;
-
+  // ------                                                                       ------
+  // ------ define the internal ChildDataset for the Legal Events section report  ------
+	// ------                                                                       ------
+	EXPORT ReportingofBEOWithCrimChildDatasetLayout    := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;     //*  This is the LINKID number of the parent 
+   unsigned6 did; 
+	 DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents)  BusExecWithCriminalEventsChild;
+	END;
 	
 	EXPORT BusAircraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
@@ -114,6 +142,13 @@ EXPORT LayoutsInternalReport := MODULE
 	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
  
+  // ------                                                                      ------
+  // ------ define the ChildDataset  For Debtors                                 ------
+	// ------                                                                      ------
+ EXPORT	BusLiensDebtorsCreditorsChildDatasetLayout    := RECORD
+	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	  DATASET(iesp.duediligenceshared.t_DDRCreditorDebtor) BusLiensDebtorCreditorChild;
+	END; 
  
   // ------                                                                      ------
   // ------ define the ChildDataset  For Business Liens                          ------

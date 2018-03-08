@@ -194,18 +194,6 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																				LEFT OUTER);
 		
 		
-	// -----                                                                                     ----- 
-	// ----- If the report is requested by the XML Service (not allowed by Batch)                -----
-	// ----- THEN add the BEO Criminal data to that section of the report.                       -----
-	// ----- ELSE just leave the reporting sections empty                                        -----
-	// -----   The AddCriminalOffenses is in Business Internal layout                            -----
-	// -----   The OffensesToListButLimited is a subset of all the offenses when there are       -----
-	// -----   more than 20 offenses.  
-	// -----                                                                                     -----
-	UpdateBusnExecCriminalWithReport  := IF(ReportIsRequested, 
-																					DueDiligence.reportBusExecCriminal(UpdateBusnWithEvidenceOfCrim, getBEOLegalEventType, DebugMode),
-																				  /* ELSE */ 
-																				  UpdateBusnWithEvidenceOfCrim); 
 	
 
 	// -----                                                                                     ------
@@ -213,7 +201,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ The results will come back this layout:                                            ------
 	// ------      DueDiligence.layouts.Busn_Internal                                            ------
 	// ------                                                                                    ------  
-	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(UpdateBusnExecCriminalWithReport, options, linkingOptions, ReportIsRequested, DebugMode); 
+	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(UpdateBusnWithEvidenceOfCrim, options, linkingOptions, ReportIsRequested, DebugMode); 
 	   
 	// ********************
 	//   DEBUGGING OUTPUTS

@@ -6,10 +6,16 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 													 boolean DebugMode = FALSE
 											     ) := FUNCTION
 													 
-													 
-		
+
+  //***add logic to populate the Established Date to the Business Information Section of the report
+	//***Report established date logic : IF(sosIncorporationDate > 0, sosIncorporationDate, dateVendorFirstReported)
+ 
+	//UpdateBusnExecsCriminalSection    := DueDiligence.reportBusExecutiveOfficers(BusnData, DebugMode);
+	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DebugMode);
+																				   																			  
+
  //***This section is for Operating Locations  ***//
-	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(BusnData, DebugMode);
+	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(UpdateBusnExecCriminalWithReport, DebugMode);
 	
 	//***This section is for Operating Information  ***//
 	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);

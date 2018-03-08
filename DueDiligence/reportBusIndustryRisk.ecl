@@ -75,7 +75,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 																									SELF.moneyServiceBusiness := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS OR
 																																									LEFT.naicIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS, TRUE, FALSE);
 																									
-																									SELF.nonBankFinancialInstituion := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS OR
+																									SELF.nonBankFinancialInstitution := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS OR
 																																												LEFT.naicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS, TRUE, FALSE);
 																									
 																									SELF.casinoOrGamblingRelated := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING OR

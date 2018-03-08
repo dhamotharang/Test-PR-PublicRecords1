@@ -4,16 +4,7 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) BusinessLiens_unreleased,
 											   boolean DebugMode = FALSE) := FUNCTION
 
-	 
-	 													
-	// ------                                                                       ------
-  // ------ define the ChildDataset                                               ------
-	// ------                                                                       ------
-//	BusLiensChildDatasetLayout    := RECORD
-//	  unsigned2 seq;                                                        //*  This is the seqence number of the parent  
-//	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
-//	END;
-	 
+
 	// ------                                                                       ------
   // ------ populate the ChildDataset                                             ------
   // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
@@ -55,7 +46,6 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(UpdateBusnLiens le, BusLiensChildDataset ri, Integer BLCount) := TRANSFORM
          SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens  := BLCount,
-         //SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnerShip.TaxAssessedValue      := le.PropTaxValue,
          SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions := le.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions  + ri.BusLiensChild;
          SELF := le;
    END; 
@@ -66,6 +56,11 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 												                       CreateNestedData(Left, Right, Counter));  
 		
 	
+  //****Add Debtor and creditors to the report
+  
+  
+  
+  
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
