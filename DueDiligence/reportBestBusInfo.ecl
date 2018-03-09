@@ -42,6 +42,8 @@ EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
                                                                                                                   SELF.State := LEFT.state;
                                                                                                                   SELF.Zip5 := LEFT.zip5;
                                                                                                                   SELF.Zip4 := LEFT.zip4;
+                                                                                                                  SELF.PostalCode := LEFT.zip5 + LEFT.zip4;
+                                                                                                                  SELF.StateCityZip := LEFT.state + TRIM(LEFT.city) + LEFT.zip5;
                                                                                                                   SELF := [];));
 																										SELF := [];));
 																																																	
