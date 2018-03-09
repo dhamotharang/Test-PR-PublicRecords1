@@ -36,15 +36,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
    // ------ Determine the Geographic Risk for the Inquired Business                           ------
    // ------                                                                                   ------
    GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses);  
-  
-   // ------                                                                                                              ------
-   // ------ Use the Census Macro to fill in the county_name - pass the result set as input,                              ------
-   // ------ the field name that contains the state,                                                                      ------ 
-   // ------ the field name that contains the 3 digit fips(county) and the field name of the county name.                 ------
-   // ------ the name of the output result set                                                                            ------
-   // ------                                                                                                              ------
-	 //Census_Data.MAC_Fips2County_Keyed(GeographicRiskResults, state, Fipscode, countyName, AddressOperLocGeoRiskCounty);
-	
+
 	 // ------                                                                                   ------
 	 // ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------
 	 // ------                                                                                   ------
