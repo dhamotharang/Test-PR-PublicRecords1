@@ -490,26 +490,24 @@ EXPORT CommonBusiness := MODULE
 		
 		//grab all unique addresses
 		sortAllAddrs := SORT(allAddrs, seq, ultID, locaddrs[1].prim_range, locaddrs[1].prim_name, locaddrs[1].zip5, -locaddrs[1].dateLastSeen);
-		dedupAllAddrs := DEDUP(sortAllAddrs, seq, ultID, locaddrs[1].prim_range, locaddrs[1].prim_name, locaddrs[1].zip5);
-		
+
 		//make sure our counts get added from the passed in call - those added to the inquired business counts would be 0
-		addCounts := JOIN(dedupAllAddrs, locations,
+    addCounts := ROLLUP(sortAllAddrs, 
 												LEFT.seq = RIGHT.seq AND
 												LEFT.ultID = RIGHT.ultID AND
 												LEFT.locaddrs[1].prim_range = RIGHT.locaddrs[1].prim_range AND
 												LEFT.locaddrs[1].prim_name = RIGHT.locaddrs[1].prim_name AND
 												LEFT.locaddrs[1].zip5 = RIGHT.locaddrs[1].zip5,
 												TRANSFORM(RECORDOF(LEFT),
-																	SELF.addrCount := RIGHT.addrCount;
-																	SELF := LEFT;),
-												LEFT OUTER);
+																	SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
+																	SELF := LEFT;));
 												
 		sortCounts := SORT(addCounts, seq, ultID, -locaddrs[1].dateLastSeen);
-		
-		rollAddr := ROLLUP(sortCounts,
+    
+    rollAddr := ROLLUP(sortCounts,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.ultID = RIGHT.ultID,
-												TRANSFORM({RECORDOF(sortAllAddrs)},
+												TRANSFORM({RECORDOF(LEFT)},
 																	SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
 																	SELF.locAddrs := LEFT.locAddrs + RIGHT.locAddrs;
 																	SELF := LEFT;));
@@ -524,60 +522,69 @@ EXPORT CommonBusiness := MODULE
 																						SELF.SOSAddrLocationCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, RIGHT.addrCount, LEFT.SOSAddrLocationCount);
 																						SELF.operatingLocations := RIGHT.locAddrs[1..DueDiligence.Constants.MAX_OPERATING_LOCATIONS];
 																						SELF := LEFT;),
-																	LEFT OUTER);														
-																	
+																	LEFT OUTER);	
+															
 		RETURN addOperatingLocations;
 	END;
+
 	
-	EXPORT getOperatingLocationAsInquired(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
-		opLocations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																																							SELF.busn_info.address := RIGHT;
-																																							SELF.seq := LEFT.seq;
-																																							SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																																							SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																																							SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																																							SELF.historyDate := LEFT.historydate;
-																																							SELF.relatedDegree := DueDiligence.Constants.OPERATING_LOCATION;
-																																							SELF := [];));
-																				
-		RETURN opLocations;
-	END;
-	
-	EXPORT getRegisteredAgentAsInquired(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
-		agents := NORMALIZE(inquiredBus, LEFT.registeredagents, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																																			SELF.seq := LEFT.seq;
-																																			SELF.historyDate := LEFT.historyDate;
-																																			SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																																			SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																																			SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																																			SELF.Busn_info.BIP_IDS.ProxID.LinkID := LEFT.Busn_info.BIP_IDS.ProxID.LinkID;
-																																			SELF.Busn_info.BIP_IDS.PowID.LinkID := LEFT.Busn_info.BIP_IDS.PowID.LinkID;
-																																			SELF.relatedDegree := DueDiligence.Constants.REGISTERED_AGENT;
-																																			SELF.Busn_info.address.prim_range := RIGHT.prim_range;
-																																			SELF.Busn_info.address.predir := RIGHT.predir;
-																																			SELF.Busn_info.address.prim_name := RIGHT.prim_name;
-																																			SELF.Busn_info.address.addr_suffix := RIGHT.addr_suffix;
-																																			SELF.Busn_info.address.postdir := RIGHT.postdir;
-																																			SELF.Busn_info.address.unit_desig := RIGHT.unit_desig;
-																																			SELF.Busn_info.address.sec_range := RIGHT.sec_range;
-																																			SELF.Busn_info.address.city := RIGHT.city;
-																																			SELF.Busn_info.address.state := RIGHT.state;
-																																			SELF.Busn_info.address.zip5 := RIGHT.zip5;
-																																			SELF.Busn_info.address.zip4 := RIGHT.zip4;
-																																			SELF.setUniquePowIDs := LEFT.setUniquePowIDs;
-																																			SELF.atleastOneAgentSameAddrAsBus := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
-																																																						LEFT.busn_info.address.predir = RIGHT.predir AND
-																																																						LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
-																																																						LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
-																																																						LEFT.busn_info.address.postdir = RIGHT.postdir AND
-																																																						LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
-																																																						LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
-																																																						LEFT.busn_info.address.city = RIGHT.city AND
-																																																						LEFT.busn_info.address.state = RIGHT.state AND
-																																																						LEFT.busn_info.address.zip5 = RIGHT.zip5;
-																																			SELF := []));
+	EXPORT GetChildAsInquired(inquiredBus, dsNameFromInquired, relationshipToInquired) := FUNCTIONMACRO
+		newInquired := NORMALIZE(inquiredBus, LEFT.dsNameFromInquired, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                                              SELF.seq := LEFT.seq;
+                                                                              SELF.historyDate := LEFT.historyDate;
+                                                                              SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.ProxID.LinkID := LEFT.Busn_info.BIP_IDS.ProxID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.PowID.LinkID := LEFT.Busn_info.BIP_IDS.PowID.LinkID;
+                                                                              SELF.relatedDegree := relationshipToInquired;
+                                                                              SELF.Busn_info.address.prim_range := RIGHT.prim_range;
+                                                                              SELF.Busn_info.address.predir := RIGHT.predir;
+                                                                              SELF.Busn_info.address.prim_name := RIGHT.prim_name;
+                                                                              SELF.Busn_info.address.addr_suffix := RIGHT.addr_suffix;
+                                                                              SELF.Busn_info.address.postdir := RIGHT.postdir;
+                                                                              SELF.Busn_info.address.unit_desig := RIGHT.unit_desig;
+                                                                              SELF.Busn_info.address.sec_range := RIGHT.sec_range;
+                                                                              SELF.Busn_info.address.city := RIGHT.city;
+                                                                              SELF.Busn_info.address.state := RIGHT.state;
+                                                                              SELF.Busn_info.address.zip5 := RIGHT.zip5;
+                                                                              SELF.Busn_info.address.zip4 := RIGHT.zip4;
+                                                                              SELF.setUniquePowIDs := LEFT.setUniquePowIDs;
+                                                                              SELF.atleastOneAgentSameAddrAsBus := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
+                                                                                                                    LEFT.busn_info.address.predir = RIGHT.predir AND
+                                                                                                                    LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
+                                                                                                                    LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
+                                                                                                                    LEFT.busn_info.address.postdir = RIGHT.postdir AND
+                                                                                                                    LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
+                                                                                                                    LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
+                                                                                                                    LEFT.busn_info.address.city = RIGHT.city AND
+                                                                                                                    LEFT.busn_info.address.state = RIGHT.state AND
+                                                                                                                    LEFT.busn_info.address.zip5 = RIGHT.zip5;
+                                                                              SELF := []));
 																																	
-		RETURN agents;	
-	END;
+		RETURN newInquired;	
+	ENDMACRO;
+  
+  EXPORT ReaddOperatingLocations(inquiredBusDS, operatingLocationDS, operatingLocationDSFieldName) := FUNCTIONMACRO
+   
+    //rollup the operating location to the inquired business level to add back
+    rollOpLocations := ROLLUP(operatingLocationDS,
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                              TRANSFORM({RECORDOF(LEFT)},
+                                          SELF.operatingLocationDSFieldName := LEFT.operatingLocationDSFieldName + RIGHT.operatingLocationDSFieldName;
+                                          SELF := LEFT));
+    
+                        
+    //reAdd operating locations
+    readdOperatingLocation := JOIN(inquiredBusDS, rollOpLocations,
+                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                              SELF.operatingLocations := RIGHT.operatingLocationDSFieldName;
+                                              SELF := LEFT;),
+                                    LEFT OUTER);
+                                    
+    RETURN readdOperatingLocation;                                
+
+  ENDMACRO;
 	
 END;

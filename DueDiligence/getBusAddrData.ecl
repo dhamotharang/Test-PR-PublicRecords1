@@ -46,7 +46,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
 										
 	//first start by grabing the registered agents
-	allAgents := DueDiligence.CommonBusiness.getRegisteredAgentAsInquired(inData);
+	allAgents := DueDiligence.CommonBusiness.getChildAsInquired(inData, registeredagents, DueDiligence.Constants.REGISTERED_AGENT);
 
 	sortAgents := SORT(allAgents, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids()));
 	
@@ -69,9 +69,12 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																						SELF.atleastOneAgentSameAddrAsBus := RIGHT.atleastOneAgentSameAddrAsBus;
 																						SELF := LEFT;),
 																	LEFT OUTER);
+                                  
+  //get the operating locations
+  operatingLocations := DueDiligence.CommonBusiness.getChildAsInquired(inData, operatingLocations, DueDiligence.Constants.OPERATING_LOCATION);
 	
-	//add the registered agents to the input
-	allParties := inData + allAgents;
+	//add the registered agents and operating locations to the input
+	allParties := inData + allAgents + operatingLocations;
 	
 	addrRaw := JOIN(allParties, Address_Attributes.key_AML_addr, 
 									KEYED(TRIM(LEFT.busn_info.address.zip5) = RIGHT.zip) AND
@@ -101,6 +104,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	
 	filteredInquiredBus := addrDataFiltRecs(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE);
 	filteredRegisteredAgents := addrDataFiltRecs(partyIndicator = DueDiligence.Constants.REGISTERED_AGENT);
+	filteredOperatingLocations := addrDataFiltRecs(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION);
 	
 	//determine company org structure
 	structures := PROJECT(filteredInquiredBus, TRANSFORM({RECORDOF(LEFT)},
@@ -124,20 +128,21 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
 									
 	//determine if business is operating from a private post, mail drop, remailer, storage facility or undeliverable secondary range										
-	operatingMailingAddr := PROJECT(filteredInquiredBus, TRANSFORM({BOOLEAN privatePost, BOOLEAN mailDrop, BOOLEAN remailer, BOOLEAN storageFacility, BOOLEAN undelSecRange, BOOLEAN isVacant, BOOLEAN incLooseState, RECORDOF(LEFT)},
-																																	SELF.privatePost := LEFT.priv_post > 0;
-																																	SELF.mailDrop := LEFT.drop > 0;
-																																	SELF.remailer := LEFT.potential_remail;
-																																	SELF.storageFacility := LEFT.storage > 0;
-																																	SELF.undelSecRange := LEFT.undel_sec > 0;
-																																	SELF.isVacant := LEFT.vacant_cnt > 0;
-																																	SELF.incLooseState := LEFT.inc_st_loose_cnt > 0;
-																																	SELF := LEFT;));
+	operatingMailingAddr := PROJECT(filteredInquiredBus + filteredOperatingLocations, TRANSFORM({BOOLEAN privatePost, BOOLEAN mailDrop, BOOLEAN remailer, BOOLEAN storageFacility, BOOLEAN undelSecRange, BOOLEAN isVacant, BOOLEAN incLooseState, RECORDOF(LEFT)},
+                                                                                              SELF.privatePost := LEFT.priv_post > 0;
+                                                                                              SELF.mailDrop := LEFT.drop > 0;
+                                                                                              SELF.remailer := LEFT.potential_remail;
+                                                                                              SELF.storageFacility := LEFT.storage > 0;
+                                                                                              SELF.undelSecRange := LEFT.undel_sec > 0;
+                                                                                              SELF.isVacant := LEFT.vacant_cnt > 0;
+                                                                                              SELF.incLooseState := LEFT.inc_st_loose_cnt > 0;
+                                                                                              SELF := LEFT;));
 																															
-	sortOperatingMailingAddr := SORT(operatingMailingAddr, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	sortOperatingMailingAddr := SORT(operatingMailingAddr, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator);
 	
 	rollOperatingMailingAddr := ROLLUP(sortOperatingMailingAddr,
-																			#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+																			#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                                      LEFT.partyIndicator = RIGHT.partyIndicator,
 																			TRANSFORM({RECORDOF(LEFT)},
 																								SELF.privatePost := LEFT.privatePost OR RIGHT.privatePost;
 																								SELF.mailDrop := LEFT.mailDrop OR RIGHT.mailDrop;
@@ -148,7 +153,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																								SELF.incLooseState := LEFT.incLooseState OR RIGHT.incLooseState;
 																								SELF := LEFT;));
 
-	addOperatingMailingAddr := JOIN(addAddrStructure, rollOperatingMailingAddr,
+	addOperatingMailingAddr := JOIN(addAddrStructure, rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
 																	#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																	TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																						SELF.privatePostExists := RIGHT.privatePost;
@@ -160,6 +165,21 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																						SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.incLooseState;
 																						SELF := LEFT;),
 																	LEFT OUTER);
+                                  
+  //add the vancancy to the operating locations
+	initialOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(addOperatingMailingAddr);
+	addOpLocVancancy := JOIN(initialOpLocations, rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+												TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+																	SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
+                                                                          SELF.vacant := RIGHT.vacant;
+                                                                          SELF := LEFT;)]);
+																	SELF := LEFT;),
+												LEFT OUTER);
+	
+										
+	//reAdd operating locations
+	addOperatingLocation := DueDiligence.CommonBusiness.readdOperatingLocations(addOperatingMailingAddr, addOpLocVancancy, opLocations);                                
 
 
 	//determine if registered agent address contains a NIS or business incubator
@@ -178,7 +198,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																		SELF := LEFT));
 																
 	
-	addAgentInfo := JOIN(addOperatingMailingAddr, rollRaAgent,
+	addAgentInfo := JOIN(addOperatingLocation, rollRaAgent,
 												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 												TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																	SELF.agentShelfBusn := RIGHT.foundIncubator;
@@ -189,7 +209,6 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
 
 	//determine high risk sic code based on address - for both inquired business and operating locations
-	operatingLocations := DueDiligence.CommonBusiness.getOperatingLocationAsInquired(inData);
 	highRiskBus := inData + operatingLocations;
 	
 	hraSicRaw := JOIN(highRiskBus, risk_indicators.key_HRI_Address_To_SIC,
@@ -236,7 +255,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 													
 													
 	//add the cmra to the operating locations
-	originalOpLocations := DueDiligence.CommonBusiness.getOperatingLocations(inData);
+	originalOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(addAddrSicData);
 	addOpLocCMRA := JOIN(originalOpLocations, addrSicDataTrans(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
 												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 												LEFT.zip5 = RIGHT.z5 AND
@@ -249,25 +268,14 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 												TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
 																	SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
 																																							SELF.cmra := RIGHT.cmrasiccode;
-																																							SELF := LEFT;)])[1];
+																																							SELF := LEFT;)]);
 																	SELF := LEFT;),
 												LEFT OUTER);
 	
-	//rollup the operating location to the inquired business level to add back
-	rollOpLocations := ROLLUP(addOpLocCMRA,
-														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-														TRANSFORM({RECORDOF(LEFT)},
-																				SELF.opLocations := LEFT.opLocations + RIGHT.opLocations;
-																				SELF := LEFT));
-	
-											
+										
 	//reAdd operating locations
-	readdOperatingLocation := JOIN(addAddrSicData, rollOpLocations,
-																	#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-																	TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																						SELF.operatingLocations := RIGHT.opLocations;
-																						SELF := LEFT;),
-																	LEFT OUTER);
+	readdOperatingLocation := DueDiligence.CommonBusiness.ReaddOperatingLocations(addAddrSicData, addOpLocCMRA, opLocations);
+
 
 
 
@@ -290,6 +298,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	
 	// OUTPUT(filteredInquiredBus, NAMED('filteredInquiredBus'));
 	// OUTPUT(filteredRegisteredAgents, NAMED('filteredRegisteredAgents'));
+	// OUTPUT(filteredOperatingLocations, NAMED('filteredOperatingLocations'));
 	
 	// OUTPUT(structures, NAMED('structures'));
 	// OUTPUT(sortStructures, NAMED('sortStructures'));
@@ -299,6 +308,9 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	// OUTPUT(operatingMailingAddr, NAMED('operatingMailingAddr'));
 	// OUTPUT(rollOperatingMailingAddr, NAMED('rollOperatingMailingAddr'));
 	// OUTPUT(addOperatingMailingAddr, NAMED('addOperatingMailingAddr'));
+	// OUTPUT(initialOpLocations, NAMED('initialOpLocations'));
+	// OUTPUT(addOpLocVancancy, NAMED('addOpLocVancancy'));
+	// OUTPUT(addOperatingLocation, NAMED('addOperatingLocation'));
 	
 	// OUTPUT(raInfo, NAMED('raInfo'));
 	// OUTPUT(rollRaAgent, NAMED('rollRaAgent'));

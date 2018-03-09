@@ -528,6 +528,7 @@ EXPORT LinkIDs := RECORD
 	 GeographicRiskLayout;  
 	 BOOLEAN cmra;
 	 BOOLEAN vacant;
+   STRING1 addressType;
 	END;	
   
   EXPORT BusinessLegalSummary := RECORD 
