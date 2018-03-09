@@ -57,39 +57,46 @@ EXPORT LayoutsInternalReport := MODULE
 
 
 
-
-
  EXPORT BEOPositionLayout := RECORD
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
   unsigned6 did;   
-  DueDiligence.Layouts.Positions;  
+  DueDiligence.Layouts.Positions;
+  DueDiligence.Layouts.SlimIndividual;
+  DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) BEOOffenses;  
   END;
 
-
-
-
+ 
+// ------                                                                             ------
+// ------    define an intermediate layout to hold information about these executives ------ 
+// ------    that have criminal activity                                              ------
+// ------    this list has executives and all of it's child datasets including party  ------
+// ------    offenses
+// ------    ********************************************************************     ------
  EXPORT BEOCriminalReportingOFOffenses := RECORD
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
   integer2 numberOfCriminalEvents;
-  DueDiligence.Layouts.RelatedParty;  
+  string20 mostRecentTitle;
+  DueDiligence.Layouts.RelatedParty;     //***there is a DATASET of party offenses, positions and titles
   END;
   
   // ------                                                                            ------
   // ------ define a simple list of BEO's with Criminal Events                         ------
-  // ------                                                                            ------ 
-  EXPORT SimpleListOfBEOWithCriminalLayout := RECORD
-   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
-   DueDiligence.Layouts.SlimIndividual;
-   integer2 numberOfCriminalEvents;   
+  // ------ ********************************************************                   ------ 
+  EXPORT FlatListOfBEOWithCriminalLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+    DueDiligence.Layouts.SlimIndividual;
+    string20 mostRecentTitle;
+    DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense;   
   END;
   
   // ------                                                                            ------
   // ------ define the internal GrandChildDataset for the Legal Events section  report ------
 	// ------   these list just the offenses and nothing about the person charged        ------
+  // ------   *********************************************************************    ------
 	EXPORT ReportingofBEOCriminalChildDatasetLayout    := RECORD
 	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent  
-	 iesp.duediligenceshared.t_DDRLegalEventIndividual ExecutiveOfficer {xpath('ExecutiveOfficer')};
-	 string ExecTitle {xpath('ExecTitle')};
+	 iesp.duediligenceshared.t_DDRLegalEventIndividual;
+	 string ExecTitle;
    unsigned6 did;   
    DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal)  BusExecCriminalChild;
 	END;

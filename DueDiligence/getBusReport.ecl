@@ -13,7 +13,7 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
  													   																			  
     
   //Add the established date to business information
-  getEstablishDate := PROJECT(BusnData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.share.t_Date estDate},
+  getEstablishDate := PROJECT(UpdateBusnExecCriminalWithReport, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.share.t_Date estDate},
                                                     SELF.seq := LEFT.seq;
 																										SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
 																										SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
