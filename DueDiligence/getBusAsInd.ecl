@@ -50,11 +50,8 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
 	advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
 																									
-	rollAdvo := ROLLUP(advoDedup, 
-											LEFT.seq = RIGHT.seq AND
-											LEFT.ultID = RIGHT.ultID AND
-											LEFT.orgID = RIGHT.orgID AND
-											LEFT.seleID = RIGHT.seleID AND
+	rollAdvo := ROLLUP(advoDedup,
+                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                       LEFT.partyIndicator = RIGHT.partyIndicator, 
 											TRANSFORM(RECORDOF(LEFT),
 																SELF.Residential_or_Business_Ind := IF(LEFT.Residential_or_Business_Ind = DueDiligence.Constants.EMPTY, RIGHT.Residential_or_Business_Ind, LEFT.Residential_or_Business_Ind);
@@ -77,10 +74,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 																
 	addResidentialAddr := JOIN(addOperatingLocation, rollAdvo(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
-															LEFT.seq = RIGHT.seq AND
-															LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-															LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-															LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+															#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),	
 															TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																				SELF.residentialAddr := RIGHT.Residential_or_Business_Ind;
 																				SELF.busIsSOHO := LEFT.busIsSOHO OR (RIGHT.Residential_or_Business_Ind = 'A' AND LEFT.SOSIncorporationDate > 0);
@@ -129,10 +123,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 																	
 	uniqueDIDs := ROLLUP(SORT(feinSsn_dids, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), 
-												LEFT.seq = RIGHT.seq AND 
-												LEFT.ultID = RIGHT.ultID AND
-												LEFT.orgID = RIGHT.orgID AND
-												LEFT.seleID = RIGHT.seleID AND
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 												LEFT.did = RIGHT.did,
 												TRANSFORM({RECORDOF(LEFT)},
 																		SELF.feinMatched := LEFT.feinMatched OR RIGHT.feinMatched;
@@ -198,20 +189,14 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// Determine counts by Seq
 	consumerHeaderDidCounts := ROLLUP(SORT(consumerHeaderDidStats, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
-																		LEFT.seq = RIGHT.seq AND
-																		LEFT.ultID = RIGHT.ultID AND
-																		LEFT.orgID = RIGHT.orgID AND
-																		LEFT.seleID = RIGHT.seleID, 
+																		#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
 																		TRANSFORM(RECORDOF(LEFT),
 																							SELF.busFEINLinkedPersonAddr := MAX(LEFT.busFEINLinkedPersonAddr, RIGHT.busFEINLinkedPersonAddr);
 																							SELF.feinPersonNameMatch := MAX(LEFT.feinPersonNameMatch, RIGHT.feinPersonNameMatch);
 																							SELF := LEFT));
 																							
 	addFeinMatchNameAddr := JOIN(addResidentialAddr, consumerHeaderDidCounts,
-																LEFT.seq = RIGHT.seq AND
-																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+																#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																					SELF.feinIsSSN := LEFT.feinIsSSN OR (RIGHT.feinPersonNameMatch > DueDiligence.Constants.NUMERIC_ZERO OR RIGHT.busFEINLinkedPersonAddr > DueDiligence.Constants.NUMERIC_ZERO);
 																					SELF.personNameSSN := RIGHT.feinPersonNameMatch;

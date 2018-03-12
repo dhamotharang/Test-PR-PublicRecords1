@@ -56,10 +56,7 @@ EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
     
     
 		addBusInfo := 	JOIN(inData, bestWithCounty,
-                          LEFT.seq = RIGHT.seq AND
-                          LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
-                          LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
-                          LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.seleID,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                           TRANSFORM(DueDiligence.layouts.Busn_Internal,
                                     SELF.businessReport.businessInformation.bestAddress.county := RIGHT.bestCounty;
                                     SELF.businessReport.businessInformation := RIGHT;                                   
