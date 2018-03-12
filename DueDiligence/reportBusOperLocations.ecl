@@ -33,7 +33,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	
 	
    // ------                                                                                   ------
-   // ------ Determine the Geographic Risk for the Inquired Business                           ------
+   // ------ Determine the Geographic Risk for the Inquired Business and operating locations   ------
    // ------                                                                                   ------
    GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses);  
 
@@ -100,7 +100,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
    UpdateBusnOperLocWithReport := DENORMALIZE(BusnData, BusOperLocChildDataset,
 	                                           LEFT.seq = RIGHT.seq, 
 											                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := LEFT.hdAddrCount;
+                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := COUNT(LEFT.operatingLocations);
                                                         //OperatingLocations is the NESTED CHILD DATASET  
                                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations     := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
                                                         SELF := LEFT;));  
