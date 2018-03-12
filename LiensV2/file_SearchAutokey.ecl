@@ -1,8 +1,18 @@
-import standard, ut, doxie; 
+﻿import standard, ut, doxie, codes; 
+
+rOutLiensMain	:=	RECORD
+	liensv2.Layout_liens_main_module.layout_liens_main;
+	STRING2		Filing_Type_ID		:=	'';
+	STRING8		Collection_Date	:=	'';
+	STRING45	CaseLinkID						:=	'';
+	STRING50 TMSID_old							:=	'';
+	STRING50 RMSID_old							:=	'';
+	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
+END;
 
 export file_SearchAutokey(
 	dataset(LiensV2.Layout_liens_party) party_files = dataset([],LiensV2.Layout_liens_party),
-	dataset(LiensV2.Layout_liens_main_module.layout_liens_main) main_files = dataset([],LiensV2.Layout_liens_main_module.layout_liens_main)
+	dataset(rOutLiensMain) main_files = dataset([],rOutLiensMain)
 	) :=
 FUNCTION
 
@@ -14,8 +24,8 @@ strec := record
 end;
 
 strec mftra(main_files l) := transform
-	self.st := map(ut.valid_st(l.filing_jurisdiction) => l.filing_jurisdiction,
-				   ut.valid_st(l.filing_state) => 		 l.filing_state,
+	self.st := map(codes.valid_st(l.filing_jurisdiction) => l.filing_jurisdiction,
+				   codes.valid_st(l.filing_state) => 		 l.filing_state,
 				   '');
 	self := l;
 end;
