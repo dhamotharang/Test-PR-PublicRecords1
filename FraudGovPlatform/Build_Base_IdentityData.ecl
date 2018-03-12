@@ -20,7 +20,7 @@ module
 						self.dt_vendor_first_reported				:= (unsigned) l.ProcessDate; 
 						self.Unique_Id										:= 0; 
 					  self.source_rec_id								:= 0;																	
-						// add  address and name prep 
+						// add  address and name prep -- new change
 					  self.current											:= 'C' ; 
 						cleanperson73										:= Address.cleanperson73(l.full_name);
 						self.cleaned_name.title						:= ut.CleanSpacesAndUpper(cleanperson73[1..5]); 
