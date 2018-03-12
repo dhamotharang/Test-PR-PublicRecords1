@@ -1,9 +1,19 @@
-import autokeyb2;
+﻿import autokeyb2;
+
+rOutLiensMain	:=	RECORD
+	liensv2.Layout_liens_main_module.layout_liens_main;
+	STRING2		Filing_Type_ID		:=	'';
+	STRING8		Collection_Date	:=	'';
+	STRING45	CaseLinkID						:=	'';
+	STRING50 TMSID_old							:=	'';
+	STRING50 RMSID_old							:=	'';
+	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
+END;
 
 export proc_autokeybuild(
 	string filedate, 
 	dataset(LiensV2.Layout_liens_party) party_files,
-	dataset(LiensV2.Layout_liens_main_module.layout_liens_main) main_files
+	dataset(rOutLiensMain) main_files
 	) :=
 FUNCTION
 

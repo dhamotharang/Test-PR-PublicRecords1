@@ -58,9 +58,12 @@ Export CompareToProfile_with_examples 	 := join(CleanStats, RemoveBlankRules, tr
 																				 self := right));
 
 EXPORT CompareToProfile_for_Orbit := dedup(sort(CompareToProfile_with_examples, Sourcecode, RuleName), Sourcecode, RuleName);
+Shared SearchPattern:='^dataopsowner:([^ ]*) ';
+Shared PulledName:=regexfind(SearchPattern,STD.System.Job.Name(),0);
+
 EXPORT SubmitStats :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate,thor,all,expire(2)),
 output(RemoveBlankRules),
-																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Build Scrubs - '+pProfileName+'\');\r\n'+
+																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\''+PulledName+' Build Scrubs - '+pProfileName+'\');\r\n'+
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStats(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'

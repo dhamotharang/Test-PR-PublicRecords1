@@ -1,4 +1,4 @@
-/*2015-11-16T20:58:47Z (Srilatha Katukuri)
+﻿/*2015-11-16T20:58:47Z (Srilatha Katukuri)
 #193680 - CR323
 */
 /*2015-07-24T21:31:44Z (Srilatha Katukuri)
@@ -11,11 +11,12 @@
 /*2015-02-11T00:44:35Z (Ayeesha Kayttala)
 bug# 173256 - code review 
 */
-Import Data_Services, doxie,FLAccidents;
+Import Data_Services, doxie,FLAccidents, STD;
 
  // Allowing only EA agency and iyetek
  
-in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and 
+																											(trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
                             														
 // parsing 40 char reportnumber 
 slim := record 

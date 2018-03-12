@@ -158,8 +158,26 @@ Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens
 
 self := left)); 
 
+rOutLiensMain	:=	RECORD
+	liensv2.Layout_liens_main_module.layout_liens_main;
+	STRING2		Filing_Type_ID		:=	'';
+	STRING8		Collection_Date	:=	'';
+	STRING45	CaseLinkID						:=	'';
+	STRING50 TMSID_old							:=	'';
+	STRING50 RMSID_old							:=	'';
+	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
+END;
+
+
 export file_liens_main := project(Main_puid, 
-						transform(liensv2.Layout_liens_main_module.layout_liens_main, 
-						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, ''),
-						self := left)) :INDEPENDENT;
+						transform(rOutLiensMain, 
+							SELF.Filing_Type_ID			:=	IF(left.tmsid[1..2]='HG',left.rmsid[LENGTH(TRIM(left.rmsid,LEFT,RIGHT))-1..],'');
+							SELF.Collection_Date		:=	IF(left.tmsid[1..2]='HG',MAX(left.orig_filing_date,left.release_date),'');
+							SELF.CaseLinkID							:=	'';
+							SELF.TMSID_old								:=	LEFT.tmsid;
+							SELF.RMSID_old								:=	LEFT.rmsid;
+							SELF.CaseLinkID_Prop_Flag	:=	FALSE;
+ 						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, '');
+	 					self := left
+						)) :INDEPENDENT;
 						
