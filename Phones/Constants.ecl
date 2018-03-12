@@ -2,7 +2,10 @@
 IMPORT MDR;
 EXPORT Constants :=
 MODULE
-		EXPORT UNSIGNED  MAX_RECORDS := 10000;
+	EXPORT UNSIGNED  MAX_RECORDS := 10000;
+	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2; 
+  // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above 
+	// the line".  The text is derived from decoding the "rules" field by using 
   // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above
 	// the line".  The text is derived from decoding the "rules" field by using
 	// Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap.
@@ -111,7 +114,7 @@ MODULE
 		EXPORT Other				  	:= 'O'; //restrictions and/or special services not defined by other SSC
 		EXPORT Radio				  	:= 'R'; //Two-way Conventional Mobile Radio - pre-cellphone technology
 		EXPORT MiscServices			:= 'S'; //Miscellaneous Services - non-500 PCS, Voice Mail, etc.
-		EXPORT Time				  		:= 'T'; //Time of day announcement
+		EXPORT Time				  		:= 'T'; //Time of day announcement
 		EXPORT VOIP					  	:= 'V'; //Internet Protocol Voice Enabled Services
 		EXPORT Weather			  	:= 'W'; //Weather announcement
 		EXPORT Exchange			  	:= 'X'; //Local Exchange - LEC IntraLATA special billing option on a LATA-wide basis

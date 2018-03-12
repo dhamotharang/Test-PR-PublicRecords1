@@ -1,4 +1,4 @@
-#workunit('name','FCRA Bocashell 4.1 Process');
+﻿#workunit('name','FCRA Bocashell 4.1 Process');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -16,11 +16,12 @@ IMPORT Risk_Indicators, RiskWise;
 unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
-string DataRestrictionMask := '10000100010001'; // to restrict fares, experian, transunion and experian FCRA 
+string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name :=  '~tfuerstenberg::in::wellsfargo_2377_app_in';
-outfile_name := '~tsteil::out::fcrashell4_ibehavior_wellsfargo_hist_' + thorlib.wuid();	// this will output your work unit number in your filename;
+outfile_name := '~tsteil::out::fcras41_' + thorlib.wuid();	// this will output your work unit number in your filename;
 
 //==================  input file layout  ========================
 layout_input := RECORD
@@ -52,7 +53,7 @@ layout_input := RECORD
 //=============  Service settings ====================
 //====================================================
 // Neutral service ip
-roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
+roxie_IP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
 // roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
 
 
@@ -72,8 +73,8 @@ roxieIP := RiskWise.Shortcuts.prod_batch_fcra; 		// FCRAbatch Roxie
 ds_in := dataset (infile_name, layout_input, csv(quote('"')));
 // ds_in1 := dataset (infile_name, layout_input, csv(quote('"')));
 // ds_in := ds_in1(Account in ['67769','67775','67776','67778','67786','67790','67792','67801','67803','67805','67808']);
-
 //=================
+output(count(ds_in));
 
 ds_input := IF (record_limit = 0, ds_in, CHOOSEN (ds_in, record_limit));
 OUTPUT (choosen(ds_input, eyeball), NAMED ('input'));
@@ -93,13 +94,15 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
  
 //this is left for convenience: history date from the input file may be overwritten here
 	 // self.historydateyyyymm := 201001;
-	 
+  SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];
+	
 // the following 2 lines will allow you add a Day field of '01' to a ChoicePoint 6 byte DOB.
 	// patched_dob := le.dateofbirth[1..6] + '01';
 	// self.DateOfBirth := if(trim(le.dateofbirth)='', '', patched_dob);
 
   self.IncludeScore := true;
 	SELF.datarestrictionmask := datarestrictionmask;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 41;		
 	SELF := le;
 	SELF := [];
@@ -111,15 +114,8 @@ output(choosen(p_f, eyeball), named('BSInput'));
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 		
-
-ox := RECORD
-	unsigned8 time_ms := 0;
-	STRING30 AccountNumber;
-	risk_indicators.Layout_Boca_Shell;
-	STRING200 errorcode;
-END;
 	
-ox getold(s le, l ri) :=	TRANSFORM
+riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM
   SELF.AccountNumber := ri.old_account_number;
   SELF := le;
 END;
@@ -137,7 +133,7 @@ OUTPUT (res_err, , outfile_name + '_err', CSV(QUOTE('"')), overwrite);
 // the conversion portion-----------------------------------------------------------------------
 
 	
-f := dataset(outfile_name, ox, csv(quote('"'), maxlength(20000)));
+f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(20000)));
 output(choosen(f, eyeball), named('infile'));
 
 

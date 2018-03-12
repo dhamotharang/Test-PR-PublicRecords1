@@ -1,4 +1,4 @@
-#workunit('name','fcrashell_baselines');
+﻿#workunit('name','fcrashell_baselines');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -52,7 +52,7 @@ layout_input := RECORD
 //=============  Service settings ====================
 //====================================================
 // Neutral service ip
-// roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
+// roxie_IP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
 roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
 
 // FCRA service settings

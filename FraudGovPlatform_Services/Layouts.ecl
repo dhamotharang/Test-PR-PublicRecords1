@@ -1,4 +1,5 @@
-﻿IMPORT BatchShare, CriminalRecords_BatchService, DeathV2_Services,FraudShared, FraudShared_Services, patriot, risk_indicators, riskwise;
+﻿IMPORT BatchShare, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, patriot, risk_indicators, 
+			 riskwise, royalty;
 
 EXPORT Layouts := MODULE
 
@@ -27,40 +28,47 @@ EXPORT Layouts := MODULE
 			riskwise.layouts.red_flags_batch_layout;
 	END;	
 
-	EXPORT BatchOut_rec := RECORD // This is Final Batch Output. 
-			UNSIGNED4 seq; 
-			BatchShare.Layouts.ShareAcct;              
-			BatchOut_risk;
-			UNSIGNED4 identity_activities_cnt := 0;
-			UNSIGNED2 velocity_exceeded_cnt := 0;
-			STRING100 velocity_exceeded_reason1;
-			STRING100 velocity_exceeded_reason2;
-			STRING100 velocity_exceeded_reason3;
+  EXPORT BatchOut_rec := RECORD  // This is Final Batch Output.
+    UNSIGNED4 seq; 
+    BatchShare.Layouts.ShareAcct;              
+    BatchOut_risk;
+    UNSIGNED4 identity_activities_cnt := 0;
+    UNSIGNED2 velocity_exceeded_cnt := 0;
+    STRING100 velocity_exceeded_reason1;
+    STRING100 velocity_exceeded_reason2;
+    STRING100 velocity_exceeded_reason3;
+    
+		 unsigned4 known_risks_cnt := 0;            
+    string100 known_risk_reason1 := '';
+    string100 known_risk_reason2 := '';
+    string100 known_risk_reason3 := '';
+    string100 Known_risk_reason4 := '';
+    string100 Known_risk_reason5 := '';				
+  END;
+	
+	EXPORT Layout_InstandID_NuGenExt := record
+			risk_indicators.Layout_InstandID_NuGen;
+			Royalty.RoyaltyNetAcuity.IPData.Royalty_NAG;
+			boolean insurance_dl_used;
+	end;
 
-			UNSIGNED4 known_risks_cnt := 0;            
-			STRING100 known_risk_reason1 := '';
-			STRING100 known_risk_reason2 := '';
-			STRING100 known_risk_reason3 := '';
-			STRING100 Known_risk_reason4 := '';
-			STRING100 Known_risk_reason5 := '';				
-	END;
-
-	SHARED Batch_out_pre_rec := RECORD
+ SHARED Batch_out_pre_rec := RECORD
 			BatchOut_risk;    
-			BatchShare.Layouts.ShareAcct;
-			FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
-			DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
-			DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
-			DATASET(combined_layouts) childRecs_RedFlag;
-			DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
-			DATASET(Patriot.layout_batch_out) childRecs_Patriot;
-			DATASET(Velocities) childRecs_Velocities;
-	END;
-
+   BatchShare.Layouts.ShareAcct;
+   FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
+   DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
+   DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
+   DATASET(combined_layouts) childRecs_RedFlag;
+		 DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
+   DATASET(Patriot.layout_batch_out) childRecs_Patriot;
+		 DATASET(Layout_InstandID_NuGenExt) childRecs_ciid;
+   DATASET(Velocities) childRecs_Velocities;
+  END;
+	
 	EXPORT Batch_out_pre_w_raw := RECORD
-			Batch_out_pre_rec;
-			DATASET(KnownFrauds_rec) childRecs_KnownFrauds_raw;
-	END;
+		Batch_out_pre_rec;
+		DATASET(KnownFrauds_rec) childRecs_KnownFrauds_raw;
+  END;
 
 	EXPORT red_flag_in := RECORD
 			risk_indicators.Layout_Batch_In;
@@ -140,5 +148,24 @@ EXPORT Layouts := MODULE
 			UNSIGNED seq := 0;
 			red_flag_desc;
 			INTEGER category_weight;
+	END;
+	
+	EXPORT instantId_in := RECORD
+	 BatchShare.Layouts.ShareAcct;
+	 Risk_Indicators.Layout_Input;
+		STRING10 home_phone;
+		STRING10 work_phone;
+		STRING100 street_addr;
+		UNSIGNED3 HistoryDateYYYYMM;
+		STRING UnparsedFullName;
+		STRING20 name_first;
+		STRING20 name_middle;
+		STRING20 name_last;
+		STRING5  name_suffix;
+		STRING25 ip_addr;
+		STRING50 email;
+		STRING PassportUpperLine;
+		STRING PassportLowerLine;
+		STRING gender;
 	END;
 END;

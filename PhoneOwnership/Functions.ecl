@@ -20,23 +20,26 @@ EXPORT Functions := MODULE
 	
 	EXPORT STRING getOwnershipValue(UNSIGNED ownershipIndex) := FUNCTION
 		RETURN CASE(ownershipIndex,
-								5 => PhoneOwnership.Constants.Ownership.HIGH,
-								4 => PhoneOwnership.Constants.Ownership.MEDIUM_HIGH,
-								3 => PhoneOwnership.Constants.Ownership.MEDIUM,
-								2 => PhoneOwnership.Constants.Ownership.UNDETERMINED,
-								1 => PhoneOwnership.Constants.Ownership.LOW,
-								0 => PhoneOwnership.Constants.Ownership.INVALID,
-								PhoneOwnership.Constants.Ownership.UNDETERMINED);														
-	END;	
+								5 => 'HIGH', //PhoneOwnership.Constants.Ownership.HIGH,
+								4 => 'MEDIUM_HIGH', //PhoneOwnership.Constants.Ownership.MEDIUM_HIGH,
+								3 => 'MEDIUM', //PhoneOwnership.Constants.Ownership.MEDIUM,
+								2 => 'UNDETERMINED', //PhoneOwnership.Constants.Ownership.UNDETERMINED,
+								1 => 'LOW', //PhoneOwnership.Constants.Ownership.LOW,
+								0 => 'INVALID', //PhoneOwnership.Constants.Ownership.INVALID,
+								'UNDETERMINED'); //PhoneOwnership.Constants.Ownership.UNDETERMINED));													
+	END;		
 	
 	EXPORT fuzzyString(STRING str) := FUNCTION
 		RETURN STD.Metaphone.Primary(str);
 	END;
 
 	EXPORT evaluateNameMatch(STRING InputFName,STRING InputLName,STRING ResultFName,STRING ResultLName) := FUNCTION	
-			RETURN  InputFName<>'' AND InputLName<>'' AND
-							fuzzyString(InputFName) = fuzzyString(ResultFName) AND 
-							fuzzyString(InputLName) = fuzzyString(ResultLName);
+			RETURN  MAP(InputFName<>'' AND InputLName<>'' AND
+									fuzzyString(InputFName) = fuzzyString(ResultFName) AND 
+									fuzzyString(InputLName) = fuzzyString(ResultLName) => PhoneOwnership.Constants.NameMatch.FIRSTLAST,
+								(InputFName != '' AND fuzzyString(InputFName) = fuzzyString(ResultFName)) OR 
+								(InputLName != '' AND fuzzyString(InputLName) = fuzzyString(ResultLName)) => PhoneOwnership.Constants.NameMatch.PARTIAL,
+								PhoneOwnership.Constants.NameMatch.NONE);	
 	END;
 	
 	EXPORT getReasonCodes(BOOLEAN subject, BOOLEAN noOwner, BOOLEAN disconnected) := FUNCTION
@@ -48,24 +51,6 @@ EXPORT Functions := MODULE
 		
 		RETURN STD.STr.RemoveSuffix(reason,',');
 	
-	END;
-	// dids for each batch input.
-	EXPORT GetDIDs(DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn) := FUNCTION
-		
-		dDIDsbyAcctno	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, 2); 		
-		countDids := TABLE( dDIDsbyAcctno, {dDIDsbyAcctno.acctno,dDIDsbyAcctno.did, did_count := COUNT(GROUP)}, acctno );//doxie.layout_references_acctno
-		
-		dBatchInwDID	:= JOIN(dBatchIn, countDids(did_count=1),
-													LEFT.acctno = RIGHT.acctno,
-													TRANSFORM(PhoneOwnership.Layouts.PhonesCommon,
-														SELF.did				:= RIGHT.did,
-														SELF.dob				:= (INTEGER)LEFT.dob,
-														SELF						:= LEFT,
-														SELF:=[]),
-													LEFT OUTER,ALL);	
-		// OUTPUT(dBatchIn,NAMED('dBatchIn_didRequest'));
-		// OUTPUT(dDIDsbyAcctno,NAMED('dDIDsbyAcctno'));
-		RETURN dBatchInwDID;
 	END;
 	
 	// Best info

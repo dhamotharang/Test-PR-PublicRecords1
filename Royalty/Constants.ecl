@@ -1,4 +1,6 @@
-﻿﻿import MDR, codes;
+﻿
+import MDR, codes;
+
 
 EXPORT Constants := module
 	
@@ -71,16 +73,16 @@ EXPORT Constants := module
 		export unsigned2 ZUMIGO_IDENTITY:= 601;		
 		export unsigned2 ATT_IAP_DQ_IRS	:= 611;	 
 		export unsigned2 EFX_CCR        := 620;
+		export unsigned2 EFX_TWN_VOE   	:= 621;
+		export unsigned2 EFX_TWN_VOI   	:= 622;
 		export unsigned2 EFX_ATTR       := 625;
+		export unsigned2 EFX_TWN_VOE_GW := 626;
+		export unsigned2 EFX_TWN_VOI_GW := 627; 
 		export unsigned2 FDNCORR   := 650;
 		export unsigned2 ACCUITY_BANK_ROUTING := 690;
 		export unsigned2 CORTERA_FILE := 701;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
 		export unsigned2 ACCUDATA_OCN_LNP   := 712;
-		export unsigned2 EQUIFAX_EVS_VOE   := 713;
-		export unsigned2 EQUIFAX_EVS_VOI   := 714;
-
-	
 	end;		
 	
 	export RoyaltyType := module	
@@ -153,14 +155,16 @@ EXPORT Constants := module
 		export ZUMIGO_IDENTITY:= _TYPE(RoyaltyCode.ZUMIGO_IDENTITY);
 		export ATT_IAP_DQ_IRS	:= _TYPE(RoyaltyCode.ATT_IAP_DQ_IRS);
 		export EFX_CCR        := _TYPE(RoyaltyCode.EFX_CCR);
+		export EFX_TWN_VOE		:= _TYPE(RoyaltyCode.EFX_TWN_VOE);  
+		export EFX_TWN_VOI		:= _TYPE(RoyaltyCode.EFX_TWN_VOI); 
 		export EFX_ATTR       := _TYPE(RoyaltyCode.EFX_ATTR);
-		export FDNCORR					:= _TYPE(RoyaltyCode.FDNCORR);  
+		export EFX_TWN_VOE_GW := _TYPE(RoyaltyCode.EFX_TWN_VOE_GW);  
+		export EFX_TWN_VOI_GW := _TYPE(RoyaltyCode.EFX_TWN_VOI_GW); 
+		export FDNCORR				:= _TYPE(RoyaltyCode.FDNCORR);  
 		export ACCUITY_BANK_ROUTING			:= _TYPE(RoyaltyCode.ACCUITY_BANK_ROUTING);
 		export CORTERA_FILE			:= _TYPE(RoyaltyCode.CORTERA_FILE);
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2); 
 		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);
-		export EQUIFAX_EVS_VOE					:= _TYPE(RoyaltyCode.EQUIFAX_EVS_VOE);  
-		export EQUIFAX_EVS_VOI					:= _TYPE(RoyaltyCode.EQUIFAX_EVS_VOI); 
 	end;
 	
 	// *** DO NOT USE: TO BE DEPRECATED AND DELETED once batch can handle RoyaltySet dataset.

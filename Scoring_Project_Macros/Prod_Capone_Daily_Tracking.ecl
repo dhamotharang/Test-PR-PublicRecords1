@@ -2,10 +2,10 @@
 //Capone has migrated to RV v5 as of 3/24 - oked by product.
 
 import ut;
-import std, Scoring_Project, ashirey,Scoring_Project_Macros, zz_bbraaten2;
+import std, Scoring_Project, ashirey,Scoring_Project_Macros, Scoring_Project_PIP;
 
 dt := ut.getdate;
-decimal19_2 thresh := 0.25;
+decimal19_2 thresh := 0.01;
 
 
 ds_curr := dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
@@ -26,7 +26,7 @@ ds_prev := dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layout
 clean_prev := ds_prev(errorcode = '');
 clean_curr := ds_curr(errorcode = '');
 
-ds_results2 := zz_bbraaten2.Compare_dsets_macro_email(clean_prev, clean_curr, ['acctno'], thresh);
+ds_results2 := Scoring_Project_PIP.Compare_dsets_macro_email(clean_prev, clean_curr, ['acctno'], thresh);
 
 re_filter2 := ds_results2(field <> 'time_ms');
 
@@ -165,7 +165,7 @@ nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Glob
 clean_prev_nonfcra := nonfcra_ds_prev(errorcode = '');
 clean_curr_nonfcra := nonfcra_ds_curr(errorcode = '');
 
-ds_results2_nonfcra := zz_bbraaten2.Compare_dsets_macro_email(clean_prev_nonfcra, clean_curr_nonfcra, ['acctno'], thresh);
+ds_results2_nonfcra := Scoring_Project_PIP.Compare_dsets_macro_email(clean_prev_nonfcra, clean_curr_nonfcra, ['acctno'], thresh);
 
 re_filter2_nonfcra := ds_results2_nonfcra(field <> 'time_ms');
 
@@ -231,7 +231,7 @@ nonfcra_ds_prev_arch := dataset('~'+ nonfcra_p_file_name_arch, scoring_project_M
 nonfcra_clean_prev := nonfcra_ds_prev_arch(errorcode = '');
 nonfcra_clean_curr := nonfcra_ds_curr_arch(errorcode = '');
 
-nonfcra_ds_results2 := zz_bbraaten2.Compare_dsets_macro_email(nonfcra_clean_prev, nonfcra_clean_curr, ['acctno'], thresh);
+nonfcra_ds_results2 := Scoring_Project_PIP.Compare_dsets_macro_email(nonfcra_clean_prev, nonfcra_clean_curr, ['acctno'], thresh);
 
 re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> 'seq');
 
@@ -401,7 +401,7 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
-		final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com; nathan.koubsky@lexisnexis.com; Joseph.Nassar@lexisnexis.com; Apaar.Sinha@lexisnexisrisk.com; Benjamin.Karnatz@lexisnexis.com; Matthew.Ludewig@lexisnexisrisk.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
+		final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com; nathan.koubsky@lexisnexis.com; Apaar.Sinha@lexisnexisrisk.com; Benjamin.Karnatz@lexisnexis.com; Matthew.Ludewig@lexisnexisrisk.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
 		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com', 'TEST...Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
 									// WHEN(CRON('0 11 * * *')), //run at 6:00 AM
 									// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 4.1 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));

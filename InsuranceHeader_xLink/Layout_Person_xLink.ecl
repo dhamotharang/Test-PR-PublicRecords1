@@ -1,4 +1,4 @@
-EXPORT Layout_Person_xLink := record
+﻿EXPORT Layout_Person_xLink := record
 				unsigned6   did;
 				unsigned2   new_score := 0;
 				string9     ssn;				
@@ -15,4 +15,6 @@ EXPORT Layout_Person_xLink := record
 				string5     zip;
 				string10    phone;
 				unsigned6   UniqueID;
+				string25    dl_nbr;
+				string2     dl_state;
 END;

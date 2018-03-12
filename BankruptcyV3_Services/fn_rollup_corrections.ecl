@@ -1,4 +1,4 @@
-import AutoStandardI, bankruptcyv3, bankruptcyv3_services, codes, 
+﻿import AutoStandardI, bankruptcyv3, bankruptcyv3_services, codes, 
        doxie, doxie_cbrs;
 
 export fn_rollup_corrections(
@@ -87,6 +87,7 @@ export fn_rollup_corrections(
 																							 ,''),
 						self.matched_party.parsed_party := IF(DisplayMatchedParty_value,LEFT),
 						self.matched_party.address :=  IF(DisplayMatchedParty_value,LEFT),
+						self.matched_party.did := left.did,
 						self := left,
 						self := []));
 			
@@ -109,6 +110,7 @@ export fn_rollup_corrections(
 						self.matched_party.party_type := if(dmp, right.matched_party.party_type,''),
 						self.matched_party.parsed_party := if(dmp, right.matched_party.parsed_party),
 						self.matched_party.address := if(dmp, right.matched_party.address);
+						self.matched_party.did := if(dmp, right.matched_party.did, ''),
 						self := left
 						),
 					left outer);

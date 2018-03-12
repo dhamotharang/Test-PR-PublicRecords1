@@ -1,6 +1,6 @@
 ﻿EXPORT test_riskview_v5_c1_attr_report (route,current_dt,previous_dt) := functionmacro
 
-import Scoring_Project_Macros, deurlein_Jon, scoring_project_pip, Scoring_QA_New_Bins;
+import Scoring_Project_Macros,  scoring_project_pip, Scoring_QA_New_Bins;
 
 // previous_dt := '20160803';
 // Current_dt := '20160804';
