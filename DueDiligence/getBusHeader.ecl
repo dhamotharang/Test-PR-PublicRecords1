@@ -264,7 +264,10 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	dedupTopMatch := DEDUP(sortTopMatch, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids()));
 
 	addAddrFirstSeen := JOIN(addSicNaic, dedupTopMatch,
-														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+														LEFT.seq = RIGHT.seq AND
+														LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
+														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
+														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.Busn_info.BIP_IDS.SeleID.LinkID,
 														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																			SELF.firstReportedAtInputAddress := RIGHT.dateFirstSeen;
 																			SELF.inputAddressVerified := LEFT.inputAddressProvided AND LEFT.fullInputAddressProvided AND RIGHT.inputAddrMatch;
