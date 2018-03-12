@@ -57,5 +57,4 @@
 	+	'|WRIT - LIST OF CREDITORS'
 	+	'|WRIT - MISCELLANEOUS'
 	+	'|WRIT OF ATTACHMENT'
-	+	')'
-	;
+	+	')';
