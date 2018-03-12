@@ -1,63 +1,69 @@
-import liensv2,ut;
+﻿import liensv2,ut,LiensV2_preprocess;
 
 liensv2.Layout_liens_main_module.layout_liens_main forkey(LiensV2.layout_liens_main_module_for_hogan.layout_liens_main l) :=
-transform
-self := l;
-end;
+TRANSFORM
+	//	Clear release_date for Hogan records with filing_type_desc=CORRECTED FEDERAL TAX LIEN
+	SELF.release_date	:=	IF(
+													l.filing_type_desc	=	LiensV2_preprocess.Code_lkps.HG_FileType('CF')	AND
+													l.rmsid[1..3]	=	'HGR',
+													'',l.release_date
+												);
+	SELF							:=	l;
+END;
 
 HOGAN_main := project(LiensV2.file_Hogan_main, forkey(left));
 
-pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID)
-                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID)
-            + LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID)), 
+pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID())), 
 						transform({liensv2.Layout_liens_main_module.layout_liens_main }, 
- self.tmsid :=  ut.fnTrim2Upper(left.tmsid ), 
- self.rmsid :=  ut.fnTrim2Upper(left.rmsid ),
- self. record_code  :=  ut.fnTrim2Upper(left.record_code ),
- self.date_vendor_removed :=  ut.fnTrim2Upper(left.date_vendor_removed ),
- self.filing_jurisdiction :=  ut.fnTrim2Upper(left.filing_jurisdiction ),
- self.filing_state :=  ut.fnTrim2Upper(left.filing_state ),
- self.orig_filing_number:=  ut.fnTrim2Upper(left.orig_filing_number ) ,
- self.orig_filing_type :=  ut.fnTrim2Upper(left.orig_filing_type ),
- self.orig_filing_date :=  ut.fnTrim2Upper(left.orig_filing_date ),
- self.orig_filing_time :=  ut.fnTrim2Upper(left.orig_filing_time ),
- self.case_number  :=  ut.fnTrim2Upper(left.case_number ) ,
- self.filing_number :=  ut.fnTrim2Upper(left.filing_number ),
- self.filing_type_desc :=  ut.fnTrim2Upper(left.filing_type_desc ),
- self.filing_date :=  ut.fnTrim2Upper(left.filing_date ),
- self.filing_time :=  ut.fnTrim2Upper(left.filing_time ),
- self.vendor_entry_date :=  ut.fnTrim2Upper(left.vendor_entry_date ),
- self.judge :=  ut.fnTrim2Upper(left.judge ),
- self.case_title:=  ut.fnTrim2Upper(left.case_title ) ,
- self.filing_book :=  ut.fnTrim2Upper(left.filing_book ),
- self.filing_page :=  ut.fnTrim2Upper(left.filing_page ),
- self.release_date :=  ut.fnTrim2Upper(left.release_date ),
- self.amount:=  ut.fnTrim2Upper(left.amount ) ,
- self.eviction:=  ut.fnTrim2Upper(left.eviction ) ,
- self.satisifaction_type :=  ut.fnTrim2Upper(left.satisifaction_type ),
- self.judg_satisfied_date :=  ut.fnTrim2Upper(left.judg_satisfied_date ),
- self.judg_vacated_date :=  ut.fnTrim2Upper(left.judg_vacated_date ),
- self.tax_code :=  ut.fnTrim2Upper(left.tax_code ),
- self.irs_serial_number:=  ut.fnTrim2Upper(left.irs_serial_number ) ,
- self.effective_date :=  ut.fnTrim2Upper(left.effective_date ),
- self.lapse_date :=  ut.fnTrim2Upper(left.lapse_date ),
- self.accident_date:=  ut.fnTrim2Upper(left.accident_date ) ,
- self.sherrif_indc:=  ut.fnTrim2Upper(left.sherrif_indc ) ,
- self.expiration_date :=  ut.fnTrim2Upper(left.expiration_date ),
- self.agency :=  ut.fnTrim2Upper(left.agency ),
- self.agency_city:=  ut.fnTrim2Upper(left.agency_city ) ,
- self.agency_state :=  ut.fnTrim2Upper(left.agency_state ),
- self.agency_county:=  ut.fnTrim2Upper(left.agency_county ) ,
- self.legal_lot :=  ut.fnTrim2Upper(left.legal_lot ),
- self.legal_block:=  ut.fnTrim2Upper(left.legal_block ) ,
- self.legal_borough:=  ut.fnTrim2Upper(left.legal_borough ) ,
- self.certificate_number:=  ut.fnTrim2Upper(left.certificate_number ), self := left)); 
+ self.tmsid :=  ut.CleanSpacesAndUpper(left.tmsid ), 
+ self.rmsid :=  ut.CleanSpacesAndUpper(left.rmsid ),
+ self. record_code  :=  ut.CleanSpacesAndUpper(left.record_code ),
+ self.date_vendor_removed :=  ut.CleanSpacesAndUpper(left.date_vendor_removed ),
+ self.filing_jurisdiction :=  ut.CleanSpacesAndUpper(left.filing_jurisdiction ),
+ self.filing_state :=  ut.CleanSpacesAndUpper(left.filing_state ),
+ self.orig_filing_number:=  ut.CleanSpacesAndUpper(left.orig_filing_number ) ,
+ self.orig_filing_type :=  ut.CleanSpacesAndUpper(left.orig_filing_type ),
+ self.orig_filing_date :=  ut.CleanSpacesAndUpper(left.orig_filing_date ),
+ self.orig_filing_time :=  ut.CleanSpacesAndUpper(left.orig_filing_time ),
+ self.case_number  :=  ut.CleanSpacesAndUpper(left.case_number ) ,
+ self.filing_number :=  ut.CleanSpacesAndUpper(left.filing_number ),
+ self.filing_type_desc :=  ut.CleanSpacesAndUpper(left.filing_type_desc ),
+ self.filing_date :=  ut.CleanSpacesAndUpper(left.filing_date ),
+ self.filing_time :=  ut.CleanSpacesAndUpper(left.filing_time ),
+ self.vendor_entry_date :=  ut.CleanSpacesAndUpper(left.vendor_entry_date ),
+ self.judge :=  ut.CleanSpacesAndUpper(left.judge ),
+ self.case_title:=  ut.CleanSpacesAndUpper(left.case_title ) ,
+ self.filing_book :=  ut.CleanSpacesAndUpper(left.filing_book ),
+ self.filing_page :=  ut.CleanSpacesAndUpper(left.filing_page ),
+ self.release_date :=  ut.CleanSpacesAndUpper(left.release_date ),
+ self.amount:=  ut.CleanSpacesAndUpper(left.amount ) ,
+ self.eviction:=  ut.CleanSpacesAndUpper(left.eviction ) ,
+ self.satisifaction_type :=  ut.CleanSpacesAndUpper(left.satisifaction_type ),
+ self.judg_satisfied_date :=  ut.CleanSpacesAndUpper(left.judg_satisfied_date ),
+ self.judg_vacated_date :=  ut.CleanSpacesAndUpper(left.judg_vacated_date ),
+ self.tax_code :=  ut.CleanSpacesAndUpper(left.tax_code ),
+ self.irs_serial_number:=  ut.CleanSpacesAndUpper(left.irs_serial_number ) ,
+ self.effective_date :=  ut.CleanSpacesAndUpper(left.effective_date ),
+ self.lapse_date :=  ut.CleanSpacesAndUpper(left.lapse_date ),
+ self.accident_date:=  ut.CleanSpacesAndUpper(left.accident_date ) ,
+ self.sherrif_indc:=  ut.CleanSpacesAndUpper(left.sherrif_indc ) ,
+ self.expiration_date :=  ut.CleanSpacesAndUpper(left.expiration_date ),
+ self.agency :=  ut.CleanSpacesAndUpper(left.agency ),
+ self.agency_city:=  ut.CleanSpacesAndUpper(left.agency_city ) ,
+ self.agency_state :=  ut.CleanSpacesAndUpper(left.agency_state ),
+ self.agency_county:=  ut.CleanSpacesAndUpper(left.agency_county ) ,
+ self.legal_lot :=  ut.CleanSpacesAndUpper(left.legal_lot ),
+ self.legal_block:=  ut.CleanSpacesAndUpper(left.legal_block ) ,
+ self.legal_borough:=  ut.CleanSpacesAndUpper(left.legal_borough ) ,
+ self.certificate_number:=  ut.CleanSpacesAndUpper(left.certificate_number ), self := left)); 
  
 pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsid)), 
  tmsid,
@@ -100,7 +106,9 @@ pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsi
  legal_lot ,
  legal_block ,
  legal_borough ,
- certificate_number ,filing_status[1].filing_status,filing_status[1].filing_status_desc,-process_date,local),record, except process_date,local); 
+ certificate_number ,
+ bCBFlag,
+ filing_status[1].filing_status,filing_status[1].filing_status_desc,-process_date,local),record, except process_date,local); 
 
 //Add persistent record id 
 Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens_main_module.layout_liens_main} ,
@@ -150,7 +158,26 @@ Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens
 
 self := left)); 
 
+rOutLiensMain	:=	RECORD
+	liensv2.Layout_liens_main_module.layout_liens_main;
+	STRING2		Filing_Type_ID		:=	'';
+	STRING8		Collection_Date	:=	'';
+	STRING45	CaseLinkID						:=	'';
+	STRING50 TMSID_old							:=	'';
+	STRING50 RMSID_old							:=	'';
+	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
+END;
+
+
 export file_liens_main := project(Main_puid, 
-						transform(liensv2.Layout_liens_main_module.layout_liens_main, 
-						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, ''),
-						self := left))(NOT regexfind('CAALAC1',tmsid)):persist('~thor_data400::Liens::main::PUID');
+						transform(rOutLiensMain, 
+							SELF.Filing_Type_ID			:=	IF(left.tmsid[1..2]='HG',left.rmsid[LENGTH(TRIM(left.rmsid,LEFT,RIGHT))-1..],'');
+							SELF.Collection_Date		:=	IF(left.tmsid[1..2]='HG',MAX(left.orig_filing_date,left.release_date),'');
+							SELF.CaseLinkID							:=	'';
+							SELF.TMSID_old								:=	LEFT.tmsid;
+							SELF.RMSID_old								:=	LEFT.rmsid;
+							SELF.CaseLinkID_Prop_Flag	:=	FALSE;
+ 						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, '');
+	 					self := left
+						)) :INDEPENDENT;
+						
