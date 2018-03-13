@@ -200,34 +200,30 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                   SELF                        := LEFT;
                                                   SELF                        := []));  
 			
-			
-	
-	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
-	  DueDiligence.Layouts.Busn_Internal CreateNestedData(InputBusnCriminal le, BEOExecutiveCriminalEvents ri, Integer BLCount) := TRANSFORM
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfEvictions                 := le.Business.evictionsCnt;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens            := le.Business.liensUnreleasedCnt;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyConvictions         := le.BusFelonyConviction_4F;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyNonConvictions      := le.BusFelonyNonConviction_3F;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorConvictions    := le.BusMisdemeanorConviction_4M;  
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorNonConcivtions := le.BusMisdemeanorNonConviction_3M;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownConvictions        := le.BusUnknownConviction_4U; 
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownNonConvictions     := le.BusUnknownNonConviction_3U;
-         
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficConvictions        := le.BusTrafficConviction_2T;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficNonConvictions     := le.BusTrafficNonConviction_1T;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionConvictions     := le.BusInfractionConviction_2I; 
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := le.BusInfractionNonConviction_1I;
-     
-       //*** This is now moving the Criminal Activity which is a DATASET of Executive and each Executive contains a DATASET of criminal offenses  **//
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents      := le.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents  + ri.CriminalActivity;
-       //SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents     := ri.BusExecCriminalChild;
-       SELF := le;
-  END; 
+
 																	
-	 /* perform the DENORMALIZE (join) by Link ID                                 */   															 															
+	/* perform the DENORMALIZE (join) by Link ID                                 */   															 															
 	UpdateBusnExecsCriminalWithReport := DENORMALIZE(InputBusnCriminal, BEOExecutiveCriminalEvents,
-	                                            #EXPAND (DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
-											                                 CreateNestedData(Left, Right, Counter));  
+                                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                                                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfEvictions                 := LEFT.Business.evictionsCnt;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens            := LEFT.Business.liensUnreleasedCnt;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyConvictions         := LEFT.BusFelonyConviction_4F;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyNonConvictions      := LEFT.BusFelonyNonConviction_3F;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorConvictions    := LEFT.BusMisdemeanorConviction_4M;  
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorNonConcivtions := LEFT.BusMisdemeanorNonConviction_3M;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownConvictions        := LEFT.BusUnknownConviction_4U; 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownNonConvictions     := LEFT.BusUnknownNonConviction_3U;
+                                                                 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficConvictions        := LEFT.BusTrafficConviction_2T;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficNonConvictions     := LEFT.BusTrafficNonConviction_1T;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionConvictions     := LEFT.BusInfractionConviction_2I; 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := LEFT.BusInfractionNonConviction_1I;
+                                                             
+                                                               //*** This is now moving the Criminal Activity which is a DATASET of Executive and each Executive contains a DATASET of criminal offenses  **//
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents      := LEFT.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents  + RIGHT.CriminalActivity;
+                                                               
+                                                               SELF := LEFT;));  
 		
 	
 	// ********************
