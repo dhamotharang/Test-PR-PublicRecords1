@@ -163,7 +163,6 @@ join_rebuttal := join(dist_file_rebuttal,
 											dist_file_rebuttal_father,
 											LEFT.BATCH_NUMBER = RIGHT.BATCH_NUMBER AND
 											LEFT.INCIDENT_NUMBER = RIGHT.INCIDENT_NUMBER AND
-											LEFT.PARTY_NUMBER  = RIGHT.PARTY_NUMBER AND
 											LEFT.ORDER_NUMBER  = RIGHT.ORDER_NUMBER AND  
 											LEFT.PARTY_TEXT  = RIGHT.PARTY_TEXT 
 											,tx_rebuttal(LEFT,RIGHT),
