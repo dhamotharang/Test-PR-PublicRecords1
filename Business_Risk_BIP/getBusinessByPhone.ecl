@@ -39,7 +39,7 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	UniqueRawPhoneMatches := DEDUP(SORT(Phone_results_w_acct, UniqueID, UltID, OrgID, SeleID, ProxID, PowID),	UniqueID, UltID, OrgID, SeleID, ProxID, PowID);
 	
 	
-	BusinessHeaderRawPhone := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawPhoneMatches,
+	BusinessHeaderRawPhone1 := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawPhoneMatches,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.PowID), // Search at most restrictive level since we already know the full BIP ID set of the FEIN match
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -47,7 +47,10 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses);
-											
+
+	// clean up the business header before doing anything else
+  Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawPhone1, BusinessHeaderRawPhone);	
+	
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(BusinessHeaderRawPhone, Shell, BusinessHeaderPhoneSeq);
 	

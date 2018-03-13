@@ -46,9 +46,9 @@
       
 			prepDIDAppend := NORMALIZE( Shell, 6, prepForDIDAppend(LEFT,COUNTER) );
       
-   prepDIDAppend_valid := prepDIDAppend(LName != '' OR (STRING)seq[2] = '6'); // When we are searching using BII, no LName is required like it is when searching by reps.
-		
-			DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend,
+			prepDIDAppend_valid := prepDIDAppend(trim(Phone10) <> '' or trim(DOB) <>'' or trim(ssn) <>'' or trim(Z5)<>'');  // try putting this filter in place so we don't send 30 records into DIDappend
+			
+			DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend_valid,
 																												Options.DPPA_Purpose,
 																												Options.GLBA_Purpose,
 																												FALSE, // isFCRA
