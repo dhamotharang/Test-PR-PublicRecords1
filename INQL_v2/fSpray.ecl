@@ -1,108 +1,98 @@
-import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools;
+﻿import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools;
 
-pDate 			:= (string8)std.date.today():INDEPENDENT;
-file_types 	:= ['bridger','riskwise','banko_batch','banko','batch','custom','InquiryTracking','delta_shell','deconfliction','transaction','accounting_log','accurint'];
+	pDate := (string8)std.date.today():INDEPENDENT;
 
-rFileDef := record
-	string 	LogicalFile;	
-	string5 Separate;
-	DATASET(FsLogicalFileNameRecord) SuperFiles;
-end;
+	rFileDef := record
+		string 	LogicalFile;	
+		string5 Separate;
+		DATASET(FsLogicalFileNameRecord) SuperFiles;
+	end;
 
-GetFileDetails(string pFileType, string pPrefix) := function
-	rgxName 	:= '[0-9-]{4,}';
-	pVersion 	:= stringlib.stringfilterout(regexfind(rgxName, pFileType, 0), '-');
-	version 	:= if(pVersion = '', pDate, pVersion);
-	
-	LogicalFile := map(
-									regexfind(file_types[1],pFileType) 	=> pPrefix + '::in::'+version+'::bridger_acclog',
-									regexfind(file_types[2],pFileType)	=> pPrefix + '::in::'+version+'::riskwise_acclog',
-									regexfind(file_types[3],pFileType) 	=> pPrefix + '::in::'+version+'::banko_batch_acclog',
-									regexfind(file_types[4],pFileType) 	=> pPrefix + '::in::'+version+'::banko_acclog',
-									regexfind(file_types[5],pFileType) 	=> pPrefix + '::in::'+version+'::batch_acclog',
-									regexfind(file_types[6],pFileType) 	=> pPrefix + '::in::'+version+'::custom_acclog',
-									regexfind(file_types[7],pFileType) 	=> pPrefix + '::in::'+version+'::idm_bls_acclog',									
-									regexfind(file_types[8],pFileType) 	=> pPrefix + '::in::'+version+'::sba_acclogs',
-									regexfind(file_types[9],pFileType)  => pPrefix + '::in::mbs::'+version+'::deconfliction',
-									regexfind(file_types[10],pFileType) => pPrefix + '::in::mbs::'+version+'::transaction_desc',
-									regexfind(file_types[11],pFileType) => pPrefix + '::in::'+version+'::accurint_acclogs',
-									regexfind(file_types[12],pFileType) => pPrefix + '::in::'+version+'::accurint_acclog',
-									'');
-	
-	Superfile := map(
-									regexfind(file_types[1],pFileType) 	=> pPrefix + '::in::bridger_acclogs_preprocess',
-									regexfind(file_types[2],pFileType) 	=> pPrefix + '::in::riskwise_acclogs_preprocess',
-									regexfind(file_types[3],pFileType) 	=> pPrefix + '::in::banko_batch_acclogs_preprocess',
-									regexfind(file_types[4],pFileType) 	=> pPrefix + '::in::banko_acclogs_preprocess',									
-									regexfind(file_types[5],pFileType) 	=> pPrefix + '::in::batch_acclogs_preprocess',
-									regexfind(file_types[6],pFileType) 	=> pPrefix + '::in::custom_acclogs_preprocess',
-									regexfind(file_types[7],pFileType) 	=> pPrefix + '::in::idm_bls_acclogs_preprocess',
-									regexfind(file_types[8],pFileType) 	=> pPrefix + '::in::sba_acclogs_preprocess', 
-									regexfind(file_types[9],pFileType)  => pPrefix + '::in::mbs::deconfliction',
-									regexfind(file_types[10],pFileType) => pPrefix + '::in::transaction_desc',									
-									regexfind(file_types[11],pFileType) => pPrefix + '::in::accurint_acclogs_preprocess',
-									regexfind(file_types[12],pFileType) => pPrefix + '::in::accurint_acclogs_preprocess',
-									'');
-	Separate := map(
-									regexfind(file_types[1],pFileType) 	=> '\t',
-									regexfind(file_types[2],pFileType) 	=> '~~',
-									regexfind(file_types[3],pFileType) 	=> '|',
-									regexfind(file_types[4],pFileType) 	=> '~~',									
-									regexfind(file_types[5],pFileType) 	=> '|',
-									regexfind(file_types[6],pFileType) 	=> '~~',
-									regexfind(file_types[7],pFileType) 	=> ',',
-									regexfind(file_types[8],pFileType) 	=> '~~',
-									regexfind(file_types[9],pFileType)  => '~~',
-									regexfind(file_types[10],pFileType) => '~~',
-									regexfind(file_types[11],pFileType) => '~~',
-									regexfind(file_types[12],pFileType) => '~~',
-									'');
-	
-	sf_accurint_cc 	:= pPrefix + '::in::accurint_acclogs_cc';
-	sf_accurint_sl 	:= pPrefix + '::in::accurint_acclogs_sl';
-	sf_accurint_fdn	:= '~thor_data400::in::fdn::sprayed::glb5';	
-	sf_riskwise_sl 	:= pPrefix + '::in::riskwise_acclogs_sl';
-	sf_custom_sl 		:= pPrefix + '::in::custom_acclogs_sl';
-													
-	SuperFiles := if(regexfind(file_types[12],pFileType)
-									,dataset([{sf_accurint_cc}, {sf_accurint_sl}, {sf_accurint_fdn}], FsLogicalFileNameRecord)
-									,if(regexfind(file_types[2],pFileType)
-										,dataset([{sf_riskwise_sl}], FsLogicalFileNameRecord)
-										,if(regexfind(file_types[6],pFileType)
-											,dataset([{sf_custom_sl}], FsLogicalFileNameRecord)
-											)
-										)
-									)
-									+
+	GetFileDetails(string pFileType, boolean fcra = false) := function
+		rgxName 	:= '[0-9-]{4,}';
+		pVersion 	:= stringlib.stringfilterout(regexfind(rgxName, pFileType, 0), '-');
+		version 	:= if(pVersion = '', pDate, pVersion);
+		
+		LogicalFile := map(
+										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).bridger,
+										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType)		=> INQL_v2.LogicalFile_List(fcra, version).riskwise,
+										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).banko,
+										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).batch,
+										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).custom,
+										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).idm,									
+										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).sba,
+										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> INQL_v2.LogicalFile_List(fcra, version).deconfliction,
+										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).transaction,
+										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).accurint,
+										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).accurint,
+										'');
+		
+		Superfile := map(
+										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> INQL_v2.Superfile_List(fcra).bridger,
+										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType) 	=> INQL_v2.Superfile_List(fcra).riskwise,
+										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> INQL_v2.Superfile_List(fcra).banko,
+										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> INQL_v2.Superfile_List(fcra).batch,
+										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> INQL_v2.Superfile_List(fcra).custom,
+										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> INQL_v2.Superfile_List(fcra).idm,
+										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> INQL_v2.Superfile_List(fcra).sba,
+										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> INQL_v2.Superfile_List(fcra).deconfliction,
+										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> INQL_v2.Superfile_List(fcra).transaction,
+										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> INQL_v2.Superfile_List(fcra).accurint,
+										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> INQL_v2.Superfile_List(fcra).accurint,
+										'');
+		Separate := map(
+										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> '\t',
+										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType) 	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> '~~',									
+										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> '|',
+										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> ',',
+										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> '~~',
+										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> '~~',
+										'');
+		
+		sf_accurint_cc 	:= INQL_v2.Superfile_List(fcra).accurint_cc;
+		sf_accurint_sl 	:= INQL_v2.Superfile_List(fcra).accurint_sl;
+		sf_accurint_fdn	:= INQL_v2.Superfile_List(fcra).accurint_fdn;
+		sf_riskwise_sl 	:= INQL_v2.Superfile_List(fcra).riskwise_sl;
+		sf_custom_sl 		:= INQL_v2.Superfile_List(fcra).custom_sl;
+														
+		SuperFiles := map(
+										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) => dataset([{sf_accurint_cc}, {sf_accurint_sl}, {sf_accurint_fdn}], FsLogicalFileNameRecord)
+									 ,regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType)  => dataset([{sf_riskwise_sl}], FsLogicalFileNameRecord)
+									 ,regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType)  => dataset([{sf_custom_sl}], FsLogicalFileNameRecord)
+									 ,dataset([], FsLogicalFileNameRecord)
+									 )
+										+
 									dataset([{Superfile}], FsLogicalFileNameRecord);
-										
-	ds := dataset([{LogicalFile, Separate, SuperFiles}], rFileDef);
-	return ds;	
-end;
+											
+		ds := dataset([{LogicalFile, Separate, SuperFiles}], rFileDef);
+		return ds;	
+	end;
 
 export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := function
 	
-	pServerIP		:= _control.IPAddress.bctlpedata10;
-	pGroupName	:= if(~fcra, 'thor120_50_a','thor35_21');
-	pPrefix			:= if(~fcra, '~thor100_21','~thor10_231');
-	directory 	:= '/data/inquiry_data_01/spraying';	
+	pGroupName	:= INQL_v2._Constants.GROUPNAME;
 	
 	tools.Layout_Sprays.Info xForm(filelist L) := transform
 			self:=row(
 								{	 
-								 pServerIP												
-								,directory                             
-								,L.name                                          
-								,0  
-								,GetFileDetails(L.name, pPrefix)[1].LogicalFile
-								,GetFileDetails(L.name, pPrefix)[1].Superfiles//[{GetFileDetails(L.name, pPrefix)[1].Superfile}]
+								 INQL_v2._Constants.LZ						
+								,INQL_v2._Constants.sprayingDir                           
+								,L.name                                      
+								,0
+								,GetFileDetails(L.name, fcra)[1].LogicalFile
+								,GetFileDetails(L.name, fcra)[1].Superfiles
 								,pGroupName                                                
 								,''                                                    
 								,''                                                            
 								,'VARIABLE'                                                         
 								,''
 								,''
-								,GetFileDetails(L.name, pPrefix)[1].Separate
+								,GetFileDetails(L.name, fcra)[1].Separate
 								,''               //'\\n,\\r\\n'
 								,','                     //''
 								,true
@@ -112,7 +102,15 @@ export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := fun
 	end;
 	
 	FilesToSpray:=project(filelist, xForm(left));
-	spray := VersionControl.fSprayInputFiles(FilesToSpray);
+	spray := sequential(
+						VersionControl.fSprayInputFiles(FilesToSpray(regexfind('transaction_desc', thor_filename_template))
+																												,pShouldClearSuperfileFirst:= true
+																												,pSplitEmails:=false
+																												,pShouldSprayZeroByteFiles:=false
+																												,pShouldSprayMultipleFilesAs1:=false
+																												,pVersion:='')
+					 ,VersionControl.fSprayInputFiles(FilesToSpray(~regexfind('transaction', thor_filename_template)))
+						);
 	
 	return spray;
 	

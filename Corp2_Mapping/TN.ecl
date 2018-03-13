@@ -1,4 +1,4 @@
- import corp2,corp2_raw_tn,scrubs,scrubs_corp2_mapping_tn_ar,scrubs_corp2_mapping_tn_main,
+﻿ import corp2,corp2_raw_tn,scrubs,scrubs_corp2_mapping_tn_ar,scrubs_corp2_mapping_tn_main,
 				scrubs_corp2_mapping_tn_stock,std,tools,ut,versioncontrol;
  
  export TN := module;  
@@ -219,7 +219,7 @@
 			self.corp_state_origin								:= state_origin;			
 			self.corp_process_date								:= fileDate;
 			self.corp_sos_charter_nbr							:= corp2.t2u(l.control_no);
-			self.stock_shares_issued              := corp2.t2u(l.common_shares);
+			self.stock_shares_issued              := if(corp2.t2u(l.common_shares) not in ['02/06/2001', '08/19/2010'],corp2.t2u(l.common_shares),''); //per CI :dates for shares are errors
 			self.stock_type												:= 'COMMON';
       self                                  := [];
 		end;

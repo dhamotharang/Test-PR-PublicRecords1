@@ -61,7 +61,8 @@ export Mac_dedup_header (infile, ofile, sffx='\'\'') := macro
 
 	#uniquename(t_rollup)
 	{infile} %t_rollup%(infile l, infile r) := transform
-		self.rec_type  := if ( l.rec_type='' or (l.dt_last_seen<r.dt_last_seen and l.dt_last_seen>0), r.rec_type, l.rec_type );
+		self.rec_type  := if ( l.rec_type='' or (l.dt_last_seen<r.dt_last_seen and l.dt_last_seen>0)
+											 or (l.dt_last_seen=r.dt_last_seen and r.rec_type<l.rec_type), r.rec_type, l.rec_type );
 		self.vendor_id                := map(Header.Vendor_Id_Null(l.vendor_id) => r.vendor_id
 																					,Header.Vendor_Id_Null(r.vendor_id) => l.vendor_id
 																					,l.dt_vendor_last_reported > r.dt_vendor_last_reported => l.vendor_id

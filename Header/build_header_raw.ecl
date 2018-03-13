@@ -60,8 +60,7 @@ s4:=if ( fileservices.getsuperfilesubname(built,1) <> fileservices.getsuperfiles
 				);
 
 full_ := sequential(
-									Header.fn_blanked_pii(filedate)
-									,s1
+									 s1
 									,nothor(s2)
 									,nothor(s3)
 									,nothor(s4)
@@ -81,6 +80,8 @@ updateLatest := sequential(
                 fileservices.addsuperfile(header.File_header_raw_latest.fileName,
                                             if(incremental,basenamei, basename)+'_'+filedate));
                                             
-return sequential(if(incremental,incremental_,full_), updateLatest);
+return sequential( Header.fn_blanked_pii(filedate)
+				  ,if(incremental,incremental_,full_)
+				  ,updateLatest);
 
 end;
