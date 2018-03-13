@@ -19,7 +19,8 @@ EXPORT subFunctions := MODULE
                                                                        UNSIGNED2 TotalConvictedTraffic2T_NY, UNSIGNED2 TotalConvictedTraffic2T_EVER, 
                                                                        UNSIGNED2 TotalConvictedInfractions2I_OVERNYR, UNSIGNED2 TotalConvictedInfractions2I_NY, 
                                                                        UNSIGNED2 TotalConvictedInfractions2I_EVER, UNSIGNED2 TotalOffensesThisDID, 
-                                                                       UNSIGNED2 TotalHitsStateCrim, UNSIGNED2 TotalHitsTrafficInfraction},
+                                                                       UNSIGNED2 TotalNonConvictedTraffic1T_EVER, UNSIGNED2 TotalNonConvictedInfraction1I_EVER,
+                                                                       UNSIGNED2 TotalHitsStateCrim, UNSIGNED2 TotalHitsConvictedTrafficInfraction},
                                                                       
                                                       SELF.TotalEverIncarcerations := (INTEGER)(LEFT.Ever_incarc_offenses  = DueDiligence.Constants.YES OR
                                                                                                 LEFT.Ever_incarc_offenders = DueDiligence.Constants.YES OR
@@ -56,6 +57,7 @@ EXPORT subFunctions := MODULE
                                                       SELF.TotalNonConvictedMisdemeanor3M_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.MISDEMEANOR, '<=');
                                                       SELF.TotalNonConvictedMisdemeanor3M_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED, DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.EMPTY);
                                                       
+                                                      //Traffic & Infraction Information
                                                       SELF.TotalConvictedTraffic2T_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, '>');
                                                       SELF.TotalConvictedTraffic2T_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, '<=');
                                                       SELF.TotalConvictedTraffic2T_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.EMPTY);
@@ -63,6 +65,9 @@ EXPORT subFunctions := MODULE
                                                       SELF.TotalConvictedInfractions2I_OVERNYR := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, '>');
                                                       SELF.TotalConvictedInfractions2I_NY := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, '<=');
                                                       SELF.TotalConvictedInfractions2I_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_CONVICTED, DueDiligence.Constants.INFRACTION, DueDiligence.Constants.EMPTY);
+                                                      
+                                                      SELF.TotalNonConvictedTraffic1T_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_NOT_CONVICTED, DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.EMPTY);
+                                                      SELF.TotalNonConvictedInfraction1I_EVER := DueDiligence.CommonIndividual.calcCrimData(LEFT, DueDiligence.Constants.TRAFFIC_NOT_CONVICTED, DueDiligence.Constants.INFRACTION, DueDiligence.Constants.EMPTY);
                                                       
                                                       SELF.TotalOffensesThisDID := 1;
                                                       SELF.TotalHitsStateCrim := (INTEGER)(SELF.TotalCurrentIncarcerations > 0 OR SELF.TotalCurrentParoles > 0 OR 
@@ -74,7 +79,7 @@ EXPORT subFunctions := MODULE
                                                                                            SELF.TotalConvictedUnknowns4U_OVERNYR > 0 OR
                                                                                            SELF.TotalConvictedMisdemeanor4M_OVERNYR > 0);
                                                                                   
-                                                      SELF.TotalHitsTrafficInfraction := (INTEGER)(SELF.TotalConvictedTraffic2T_NY > 0 OR
+                                                      SELF.TotalHitsConvictedTrafficInfraction := (INTEGER)(SELF.TotalConvictedTraffic2T_NY > 0 OR
                                                                                                    SELF.TotalConvictedInfractions2I_NY > 0 OR
                                                                                                    SELF.TotalConvictedTraffic2T_OVERNYR > 0 OR
                                                                                                    SELF.TotalConvictedInfractions2I_OVERNYR > 0);                           
@@ -125,9 +130,12 @@ EXPORT subFunctions := MODULE
                                      SELF.TotalConvictedInfractions2I_NY := LEFT.TotalConvictedInfractions2I_NY + RIGHT.TotalConvictedInfractions2I_NY;
                                      SELF.TotalConvictedInfractions2I_EVER := LEFT.TotalConvictedInfractions2I_EVER + RIGHT.TotalConvictedInfractions2I_EVER;
                                      
+                                     SELF.TotalNonConvictedTraffic1T_EVER := LEFT.TotalNonConvictedTraffic1T_EVER + RIGHT.TotalNonConvictedTraffic1T_EVER;
+                                     SELF.TotalNonConvictedInfraction1I_EVER := LEFT.TotalNonConvictedInfraction1I_EVER + RIGHT.TotalNonConvictedInfraction1I_EVER;
+                                     
                                      SELF.TotalOffensesThisDID := LEFT.TotalOffensesThisDID + RIGHT.TotalOffensesThisDID;
                                      SELF.TotalHitsStateCrim := LEFT.TotalHitsStateCrim + RIGHT.TotalHitsStateCrim;
-                                     SELF.TotalHitsTrafficInfraction := LEFT.TotalHitsTrafficInfraction + RIGHT.TotalHitsTrafficInfraction;
+                                     SELF.TotalHitsConvictedTrafficInfraction := LEFT.TotalHitsConvictedTrafficInfraction + RIGHT.TotalHitsConvictedTrafficInfraction;
                                      
                                      SELF := LEFT;));
                                      
@@ -138,11 +146,11 @@ EXPORT subFunctions := MODULE
                                     SELF.seq := LEFT.seq;
                                     SELF.did := LEFT.party.did;
                                     SELF := RIGHT;
-                                    // SELF := LEFT.party;
                                     SELF := [];),
                           LEFT OUTER);
      
      
+    
     RETURN addAllParties;
 	END;
 

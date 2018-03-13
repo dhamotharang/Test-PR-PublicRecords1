@@ -90,19 +90,19 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 
 
 	 BusOperLocChildDataset  := PROJECT(groupAddressOperLocGeoRisk,  //Using this input dataset - these addresses have the geo risk populated  
-                                      TRANSFORM({UNSIGNED4 seq, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
-                                                SELF.seq                    := LEFT.seq,                    //*** This is the sequence number of the Inquired Business (or the Parent)
-                                                SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER)))); 
+                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
+                                                SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER));
+                                                SELF := LEFT;)); 
 				       
 
 															
 	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
    UpdateBusnOperLocWithReport := DENORMALIZE(BusnData, BusOperLocChildDataset,
-	                                           LEFT.seq = RIGHT.seq, 
+	                                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 											                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := COUNT(LEFT.operatingLocations);
                                                         //OperatingLocations is the NESTED CHILD DATASET  
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations     := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
+                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
                                                         SELF := LEFT;));  
 		
 		

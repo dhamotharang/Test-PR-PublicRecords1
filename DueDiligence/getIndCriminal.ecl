@@ -375,9 +375,12 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                   SELF.party.ConvictedInfractions2I_OVNYR           := RIGHT.TotalConvictedInfractions2I_OVERNYR,
                                   SELF.party.ConvictedInfractions2I_NYR             := RIGHT.TotalConvictedInfractions2I_NY,
                                   
+                                  SELF.party.NonConvictedTraffic1T_Ever             := RIGHT.TotalNonConvictedTraffic1T_EVER,
+                                  SELF.party.NonConvictedInfraction1I_Ever          := RIGHT.TotalNonConvictedInfraction1I_EVER,
+                                  
                                   SELF.party.ALLOffensesForThisDID                  := RIGHT.TotalOffensesThisDID,
                                   SELF.party.noEvidenceOfConvictedStateCrim         := RIGHT.TotalHitsStateCrim = 0;
-                                  SELF.party.noEvidenceOfTrafficOrInfraction        := RIGHT.TotalHitsTrafficInfraction = 0; 
+                                  SELF.party.noEvidenceOfTrafficOrInfraction        := RIGHT.TotalHitsConvictedTrafficInfraction = 0; 
                                   
                                   trafInfrac := DueDiligence.getIndKRILegalTrafficInfraction(LEFT);
                                   SELF.party.trafficInfractionScore := trafInfrac.name;
@@ -436,6 +439,9 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                      SELF.party.ConvictedInfractions2I_Ever := RIGHT.party.ConvictedInfractions2I_Ever;
                                      SELF.party.ConvictedInfractions2I_OVNYR := RIGHT.party.ConvictedInfractions2I_OVNYR;
                                      SELF.party.ConvictedInfractions2I_NYR := RIGHT.party.ConvictedInfractions2I_NYR;
+                                     
+                                     SELF.party.NonConvictedTraffic1T_Ever := RIGHT.party.NonConvictedTraffic1T_Ever;
+                                     SELF.party.NonConvictedInfraction1I_Ever := RIGHT.party.NonConvictedInfraction1I_Ever;
                                      
                                      SELF.party.ALLOffensesForThisDID := RIGHT.party.ALLOffensesForThisDID;
                                      SELF.party.noEvidenceOfConvictedStateCrim := RIGHT.party.noEvidenceOfConvictedStateCrim;
