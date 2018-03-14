@@ -9,7 +9,7 @@ export fun_Groupname(
 	
 	 string		pHint					= ''
 	,boolean	pForMacroUse	= false 
-	,boolean  pUseGit       = false
+	,boolean  pUseGit       = true
 ) :=
 function
 

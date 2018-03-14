@@ -83,7 +83,7 @@ export OrbitLogLayout	:=	record
 			STRING    ruledesc;
 			STRING    ErrorMessage;
 			UNSIGNED8 rulecnt;
-			UNSIGNED1 rulepcnt;
+			Unsigned1 rulepcnt;
 			STRING1   rejectwarning := '';
 			Salt35.StrType rawcodemissing := '';
 			UNSIGNED1 rawcodemissingcnt := 0;

@@ -69,7 +69,7 @@ export proc_build_keys(string filedate) := MODULE
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie_files.key_minors               ,kpn+'minors'                                         ,kpn+filedate+'::minors'                                       ,k53);
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_Header_DA                  ,kpn+'da'                                             ,kpn+filedate+'::da'                                           ,k54);
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_Header_DTS_FnameSmall      ,phd+'fname_small'                                    ,phd+filedate+'::fname_small'                                  ,k55);
-    RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Relationship.key_relatives_v3        ,kpn+'relatives_v3'                                   ,kpn+filedate+'::relatives_v3'                                 ,k82);
+    RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_relatives_v3        ,kpn+'relatives_v3'                                   ,kpn+filedate+'::relatives_v3'                                 ,k82);
 
     SHARED build_keys := parallel(    k02,k03,k04,k05,k06,k07,k08,k09,k10,k11,k12,k13,k14,k15,k16,k17,k18,k19,k20,
                                   k21,k22,k23,k24,k25,k26,k27,k28,k29,k30,k31,k32,k33,k34,k35,k36,k37,k38,k39,k40,
