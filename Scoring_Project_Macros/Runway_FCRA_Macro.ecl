@@ -1,6 +1,6 @@
 ﻿EXPORT Runway_FCRA_Macro( bs_version, neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= functionmacro
 
-IMPORT Risk_Indicators, ut, models, Scoring_Project_Macros;
+IMPORT Risk_Indicators, ut, models, Scoring_Project_Macros, zz_bbraaten2;
 
 unsigned8 no_of_records := records_ToRun;
 integer retry := retry;
