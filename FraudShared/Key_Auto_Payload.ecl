@@ -69,7 +69,7 @@ address_cleaner := RECORD
    layout_clean182_fips clean_address;
   END;
 
-r:=RECORD
+r :=RECORD
   unsigned6 fakeid;
   unsigned8 record_id;
   string12 customer_id;
@@ -88,7 +88,7 @@ r:=RECORD
   string75 event_type_1;
   string75 event_type_2;
   string75 event_type_3;
-  unsigned8 household_id;
+  string20 household_id;
   string250 reason_description;
   string25 investigation_referral_case_id;
   string8 investigation_referral_date_opened;
