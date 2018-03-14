@@ -42,8 +42,8 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 
  // ------                                                                                   ------
  // ------ Determine the Geographic Risk for the Inquired Business                           ------
-	// ------                                                                                   ------
-	AddressBusnGeoRisk   := DueDiligence.Common.getGeographicRisk(ListOfAddresses, true);  
+	// ------                                                                                  ------
+	AddressBusnGeoRisk   := DueDiligence.Common.getGeographicRisk(ListOfAddresses);  
 
  // ------                                                                                    ------
  // ------ add the Geographic Risk to Busn_Internal layout.                                   ------
@@ -67,6 +67,7 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 																	SELF.HIDTA                     := RIGHT.HIDTA;
 																	SELF.HIFCA                     := RIGHT.HIFCA;
 																	SELF.HighFelonNeighborhood     := RIGHT.HighFelonNeighborhood;
+                                  SELF.CountyName                := RIGHT.CountyName;  
 																	/*  Populate the rest of the Business Internal from the LEFT             */
 																	SELF := LEFT),
 																	LEFT OUTER);

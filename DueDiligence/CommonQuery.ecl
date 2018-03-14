@@ -74,7 +74,7 @@ EXPORT CommonQuery := MODULE
 				RETURN bus_in;
 		ENDMACRO;
 		
-		EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, busIndIndicator) := MACRO
+		EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, serviceRequested) := MACRO
 				
 				// Can't have duplicate definitions of Stored with different default values, 
 				// so add the default to #stored to eliminate the assignment of a default value.
@@ -105,7 +105,13 @@ EXPORT CommonQuery := MODULE
 				dppa := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
 				glba := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);	
 				
-				requestedVersion := TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest));
+        //since the initial version can be defaulted, default options for person and business reports only attributes need to be requested
+        defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)),
+                              serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
+                              serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
+                              DueDiligence.Constants.EMPTY);
+                              
+				requestedVersion := defaultVersion;
 				includeReport := requestedReport;
 				displayAttributeText := optionsIn.displayText;
 				
@@ -119,8 +125,8 @@ EXPORT CommonQuery := MODULE
 																					version := requestedVersion;
 																					reportBy := LEFT.reportBy;
 																					
-																					populatedInd := DueDiligence.CommonQuery.PopulateIndividualFromRequest(reportBy, LEFT.user.accountNumber, busIndIndicator);
-																					populatedBus := DueDiligence.CommonQuery.PopulateBusinessFromRequest(reportBy, LEFT.user.accountNumber, busIndIndicator);
+																					populatedInd := DueDiligence.CommonQuery.PopulateIndividualFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
+																					populatedBus := DueDiligence.CommonQuery.PopulateBusinessFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
 																					
 																					
 																					useHistDate := (UNSIGNED4)(INTFORMAT(LEFT.options.HistoryDate.Year, 4, 1) + INTFORMAT(LEFT.options.HistoryDate.Month, 2, 1) + INTFORMAT(LEFT.options.HistoryDate.Day, 2, 1));
@@ -154,18 +160,18 @@ EXPORT CommonQuery := MODULE
 																											
 																											BOOLEAN LexIDPopulated := LEFT.individual.lexID <> DueDiligence.Constants.EMPTY;
 																											BOOLEAN SeleIDPopulated := LEFT.business.lexID <> DueDiligence.Constants.EMPTY;
-																											BOOLEAN ValidGLB := Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
-																											BOOLEAN ValidDPPA := Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
+																											BOOLEAN ValidGLB := (glbPurpose BETWEEN 0 AND 7) OR glbPurpose = 11 OR glbPurpose = 12;
+																											BOOLEAN ValidDPPA := dppaPurpose BETWEEN 0 AND 7;
 																											
 																											BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
-																																																									(IndSSNPopulated OR 
-																																																									(IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
-																																																							OR LexIDPopulated;
+                                                                                      (IndSSNPopulated OR 
+                                                                                      (IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
+                                                                                  OR LexIDPopulated;
 																											
 																											BOOLEAN ValidBusiness := (BusNamePopulated AND
-																																																							(BusTaxIDPopulated OR
-																																																							(BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
-																																																					OR SeleIDPopulated;
+                                                                                    (BusTaxIDPopulated OR
+                                                                                    (BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
+                                                                                OR SeleIDPopulated;
 																																								
 																											BOOLEAN ValidIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
 																											BOOLEAN ValidBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
@@ -186,10 +192,15 @@ EXPORT CommonQuery := MODULE
 		END;
 		
 		
-		EXPORT mac_FailOnError(invalidRequests) := MACRO
+		EXPORT mac_FailOnError(invalidRequests, requestedService) := MACRO
 				//update the error message if the version was incorrect
 				updateVersionMessage := PROJECT(invalidRequests, TRANSFORM(DueDiligence.Layouts.Input,
-																																		versionReq := ': ' + DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3;
+        
+                                                                    validVersions := MAP(requestedService = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
+                                                                                         requestedService = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
+                                                                                         DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3);
+                                                            
+																																		versionReq := ': ' + validVersions;
 																																		SELF.errorMessage := IF(LEFT.errorMessage = DueDiligence.Constants.VALIDATION_INVALID_VERSION, TRIM(LEFT.errorMessage) + versionReq, LEFT.errorMessage);
 																																		SELF := LEFT;));
 
@@ -351,16 +362,16 @@ EXPORT CommonQuery := MODULE
 				
 				options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 							// Clean up the Options and make sure that defaults are enforced
-							EXPORT UNSIGNED1	DPPA_Purpose := dppa;
-							EXPORT UNSIGNED1	GLBA_Purpose := glba;
+							EXPORT UNSIGNED1 DPPA_Purpose := dppa;
+							EXPORT UNSIGNED1 GLBA_Purpose := glba;
 							EXPORT STRING50 DataRestrictionMask	:= TRIM(drm);
 							EXPORT STRING50 DataPermissionMask	:= TRIM(dpm);
 							EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(IF(TRIM(userIn.IndustryClass) <> DueDiligence.Constants.EMPTY, userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
-							EXPORT UNSIGNED1	LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
-							EXPORT UNSIGNED1	BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
-							EXPORT UNSIGNED1	MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
+							EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
+							EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
+							EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
 							EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
-							EXPORT UNSIGNED1	BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
+							EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
 				END;
 
 				linkingOptions := MODULE(BIPV2.mod_sources.iParams)
@@ -368,8 +379,8 @@ EXPORT CommonQuery := MODULE
 							EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 							EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 							EXPORT BOOLEAN AllowAll := IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE);
-							EXPORT BOOLEAN AllowGLB := TRUE; //This already passed validation
-							EXPORT BOOLEAN AllowDPPA := TRUE; //This already passed validation
+							EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE);
+							EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE);
 							EXPORT UNSIGNED1 DPPAPurpose := Options.DPPA_Purpose;
 							EXPORT UNSIGNED1 GLBPurpose := Options.GLBA_Purpose;
 							EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
@@ -440,8 +451,8 @@ EXPORT CommonQuery := MODULE
 		
 		
 		EXPORT GetBusinessAttributes(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
-		
-				businessAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+        
+        businessAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																																			SELF := CASE(COUNTER,
 																																										1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty),
 																																										2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft),
@@ -457,13 +468,13 @@ EXPORT CommonQuery := MODULE
 																																										12 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange', LEFT.BusPublicRecordAgeRange),
 																																										13 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
 																																										14 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
-																																										15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal', LEFT.BusLegalCriminal),
-																																										16 => DueDiligence.Common.createNVPair('BusLegalCivil', LEFT.BusLegalCivil),
-																																										17 => DueDiligence.Common.createNVPair('BusLegalTraffInfr', LEFT.BusLegalTraffInfr),
-																																										18 => DueDiligence.Common.createNVPair('BusLegalTypes', LEFT.BusLegalTypes),
-																																										19 => DueDiligence.Common.createNVPair('BusHighRiskNewsProfiles', LEFT.BusHighRiskNewsProfiles),
+																																										15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal', LEFT.BusLegalStateCriminal),
+																																										16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal', LEFT.BusLegalFederalCriminal),
+																																										17 => DueDiligence.Common.createNVPair('BusLegalCivil', LEFT.BusLegalCivil),
+																																										18 => DueDiligence.Common.createNVPair('BusLegalTraffInfr', LEFT.BusLegalTraffInfr),
+																																										19 => DueDiligence.Common.createNVPair('BusLegalTypes', LEFT.BusLegalTypes),
 																																										20 => DueDiligence.Common.createNVPair('BusLinkedBusFootprint', LEFT.BusLinkedBusFootprint),
-																																										21 => DueDiligence.Common.createNVPair('BusLinkedBusIndex', LEFT.BusLinkedBusIndex),
+																																										21 => DueDiligence.Common.createNVPair('BusLinkedBusBEO', LEFT.BusLinkedBusIndex),
 																																										22 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
 																																										23 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
 																																													DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
@@ -475,7 +486,7 @@ EXPORT CommonQuery := MODULE
 		
 		EXPORT GetBusinessAttributeFlags(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
 			
-			businessFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+      businessFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																													SELF := CASE(COUNTER,
 																																				1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag),
 																																				2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag),
@@ -491,125 +502,21 @@ EXPORT CommonQuery := MODULE
 																																				12 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange_Flag', LEFT.BusPublicRecordAgeRange_Flag),
 																																				13 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
 																																				14 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
-																																				15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal_Flag', LEFT.BusLegalCriminal_Flag),
-																																				16 => DueDiligence.Common.createNVPair('BusLegalCivil_Flag', LEFT.BusLegalCivil_Flag),
-																																				17 => DueDiligence.Common.createNVPair('BusLegalTraffInfr_Flag', LEFT.BusLegalTraffInfr_Flag),
-																																				18 => DueDiligence.Common.createNVPair('BusLegalTypes_Flag', LEFT.BusLegalTypes_Flag),
-																																				19 => DueDiligence.Common.createNVPair('BusHighRiskNewsProfiles_Flag', LEFT.BusHighRiskNewsProfiles_Flag),
+																																				15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal_Flag', LEFT.BusLegalStateCriminal_Flag),
+																																				16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal_Flag', LEFT.BusLegalFederalCriminal_Flag),
+																																				17 => DueDiligence.Common.createNVPair('BusLegalCivil_Flag', LEFT.BusLegalCivil_Flag),
+																																				18 => DueDiligence.Common.createNVPair('BusLegalTraffInfr_Flag', LEFT.BusLegalTraffInfr_Flag),
+																																				19 => DueDiligence.Common.createNVPair('BusLegalTypes_Flag', LEFT.BusLegalTypes_Flag),
 																																				20 => DueDiligence.Common.createNVPair('BusLinkedBusFootprint_Flag', LEFT.BusLinkedBusFootprint_Flag),
-																																				21 => DueDiligence.Common.createNVPair('BusLinkedBusIndex_Flag', LEFT.BusLinkedBusIndex_Flag),
+																																				21 => DueDiligence.Common.createNVPair('BusLinkedBusBEO_Flag', LEFT.BusLinkedBusIndex_Flag),
 																																				22 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
 																																				23 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
 																																							DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 												
 				RETURN businessFlags;
 		END;
-		
-		EXPORT temp_transformDataTo(dataIn, toLayout) := FUNCTIONMACRO
-				RETURN PROJECT(dataIn, TRANSFORM(toLayout,
-																					SELF := LEFT;
-																					SELF := [];));
-		ENDMACRO;
-		
-		EXPORT temp_transformBusReport(busResults, reportLayout, busIndicator, includeReport) := FUNCTIONMACRO
-		
-			#if(busIndicator = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE)
-				busReport := PROJECT(busResults, TRANSFORM({UNSIGNED seq, reportLayout},
-																										
-																										//ECONOMIC
-																										property := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnership;
-																										aircraft := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnership;
-																										watercraft := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.WatercraftOwnership;
-																										vehicle := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.MotorVehicleOwnership;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Property := PROJECT(property, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessPropertyOwnership,
-																																																																														SELF.properties := PROJECT(LEFT.Properties, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessProperty,
-																																																																																																				SELF.ownership := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.PurchaseDetails, iesp.duediligenceshared.t_DDROwnershipDetails);
-																																																																																																				SELF.assessment := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.MostRecentTax, iesp.duediligenceshared.t_DDRTaxAssessmentValues);
-																																																																																																				SELF.AreaRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.AreaRisk, iesp.duediligenceshared.t_DDRAreaRisk);
-																																																																																																				SELF.CountyCityRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.CountyRisk, iesp.duediligenceshared.t_DDRAreaRisk);
-																																																																																																				SELF := LEFT;
-																																																																																																				SELF := [];));
-																																																																														SELF := LEFT;
-																																																																														SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Aircraft := PROJECT(aircraft, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessAircraftOwnership,
-																																																																													SELF.Aircrafts := PROJECT(LEFT.Aircrafts, TRANSFORM(iesp.duediligenceshared.t_DDRAircraft,
-																																																																																																							SELF.YearMakeModel := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Aircraft, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																							SELF.Aircraft := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);
-																																																																																																							SELF.AdditionalDetails := DueDiligence.CommonQuery.temp_transformDataTo(LEFT._Type, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																							SELF := LEFT;
-																																																																																																							SELF := [];));
-																																																																													SELF := LEFT;
-																																																																													SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.Watercraft := PROJECT(watercraft, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessWatercraftOwnership,
-																																																																															SELF.Watercrafts := PROJECT(LEFT.Watercrafts, TRANSFORM(iesp.duediligenceshared.t_DDRWatercraft,
-																																																																																																						SELF.YearMakeModel := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Watercraft, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																						SELF.VesselType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VesselType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																						SELF.Title := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Title, iesp.duediligenceshared.t_DDRTitleInfo);
-																																																																																																						SELF.Registration := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Registration, iesp.duediligenceshared.t_DDRRegistration);
-																																																																																																						SELF.VINNumber := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);																																																																																																							
-																																																																																																						SELF := LEFT;
-																																																																																																						SELF := [];));
-																																																																															SELF := LEFT;
-																																																																															SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Economic.MotorVehicle := PROJECT(vehicle, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessMotorVehicleOwnership,
-																																																																														SELF.MotorVehicles := PROJECT(LEFT.MotorVehicles, TRANSFORM(iesp.duediligenceshared.t_DDRMotorVehicle,
-																																																																																																												SELF.Vehicle := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Vehicle, iesp.duediligenceshared.t_DDRYearMakeModel);
-																																																																																																												SELF.LicensePlateType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.LicensePlateType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																												SELF.ClassType := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ClassType, iesp.duediligenceshared.t_DDRAdditionalDetails);
-																																																																																																												SELF.MotorVehicle := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.VIN, iesp.duediligenceshared.t_DDRVINNumber);																																																																																																							
-																																																																																																												SELF.Title := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Title, iesp.duediligenceshared.t_DDRTitleInfo);
-																																																																																																												SELF.Registration := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.Registration, iesp.duediligenceshared.t_DDRRegistration);
-																																																																																																												SELF := LEFT;
-																																																																																																												SELF := [];));
-																																																																														SELF := LEFT;
-																																																																														SELF := [];));
-																										//OPERATING
-																										location := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessLocations;
-																										information := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation;
-																										shellShelf := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.ShellShelfCharacteristics;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations := PROJECT(location, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessOperatingLocations,
-																																																																																		SELF.OperatingLocations := PROJECT(LEFT.OperatingLocations, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk,
-																																																																																																																						SELF.CountyCityRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.CountyCityRisk, iesp.duediligenceshared.t_DDRCountyCityRisk);
-																																																																																																																						SELF.AreaRisk := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.AreaRisk, iesp.duediligenceshared.t_DDRCountyCityRisk);
-																																																																																																																						SELF := LEFT;
-																																																																																																																						SELF := [];));
-																																																																																		SELF := LEFT;
-																																																																																		SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation := PROJECT(information, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessOperatingInformation,
-																																																																																				SELF.ReportingBureaus := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ReportingBureaus, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																				SELF.ReportingSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.ReportingSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																				SELF.SOSFilingStatuses := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.SOSFilingStatuses, iesp.duediligencebusinessreport.t_DDRSOSFiling);
-																																																																																				SELF.SICNAICs := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.SICNAICs, iesp.duediligencebusinessreport.t_DDRSICNAIC);
-																																																																																				SELF := LEFT;
-																																																																																				SELF := [];));
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Operating.ShellShelfCharacteristics := PROJECT(shellShelf, TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessShellShelfCharacteristics,
-																																																																																							SELF.BureauSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.BureauSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF.GovernmentSources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.GovernmentSources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF.UtilitySources := DueDiligence.CommonQuery.temp_transformDataTo(LEFT.UtilitySources, iesp.duediligencebusinessreport.t_DDRReportingSources);
-																																																																																							SELF := LEFT;
-																																																																																							SELF := [];));
 
 
-																										//LEAGAL
-																										legal := LEFT.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails;
-																										
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary := DueDiligence.CommonQuery.temp_transformDataTo(legal, iesp.duediligenceshared.t_DDRLegalSummary);
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions := DueDiligence.CommonQuery.temp_transformDataTo(legal.PossibleLiensJudgmentsEvictions, iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions);
-																										SELF.result.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents := DueDiligence.CommonQuery.temp_transformDataTo(legal.PossibleLegalEvents, iesp.duediligenceshared.t_DDRLegalEventCriminal);
-																										
-																										SELF := LEFT;
-																										SELF := [];));
-			#else
-				busReport := PROJECT(busResults, TRANSFORM({UNSIGNED seq, reportLayout},
-																											SELF.seq := LEFT.seq;
-																											SELF := [];));
-			#end
-			
-			RETURN busReport;
-		ENDMACRO;
-		
 		EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion) := FUNCTIONMACRO
 				
 				returnData := JOIN(inputWithSeq, results, 
@@ -635,22 +542,8 @@ EXPORT CommonQuery := MODULE
 																															
 																															
 																			SELF := LEFT;
-																			SELF := [];));
+																			SELF := [];));																																		
 				
-				//temp code to transform report data until later sprint to make over to new layouts - so to be removed
-				newReport := DueDiligence.CommonQuery.temp_transformBusReport(results, iespLayout, indvOrBus, includeReport);
-				
-				tempReturn := JOIN(returnData, newReport,
-														LEFT.seq = RIGHT.seq,
-														TRANSFORM(iespLayout,
-																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE,
-																															'SELF.result.BusinessReport.BusinessAttributeDetails := RIGHT.result.BusinessReport.BusinessAttributeDetails;',
-																															DueDiligence.Constants.EMPTY))
-																			SELF := LEFT;),
-														LEFT OUTER);
-																																										
-				
-				// RETURN returnData;
-				RETURN tempReturn;		//TMEP
+				RETURN returnData;
 		ENDMACRO;
 END;
