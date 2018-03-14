@@ -11,8 +11,14 @@
 EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 
+  //grab the operating locations
+  operatingLocations := DueDiligence.CommonBusiness.GetChildAsInquired(indata, operatingLocations, DueDiligence.Constants.OPERATING_LOCATION);
+  
+  //add operating locations and the inquired business together
+  partiesToCheck := indata + operatingLocations;
+
 	/*Taken from Business_Risk_BIP.getBusinessHeader*/
-	withAdvoRaw := JOIN(indata, Advo.Key_Addr1_history,
+	withAdvoRaw := JOIN(partiesToCheck, Advo.Key_Addr1_history,
 											LEFT.Busn_info.address.zip5 != DueDiligence.Constants.EMPTY AND 
 											LEFT.Busn_info.address.prim_range != DueDiligence.Constants.EMPTY AND
 											KEYED(LEFT.Busn_info.address.zip5 = RIGHT.zip) AND
@@ -22,7 +28,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											KEYED(LEFT.Busn_info.address.predir = RIGHT.predir) AND
 											KEYED(LEFT.Busn_info.address.postdir = RIGHT.postdir) AND
 											KEYED(LEFT.Busn_info.address.sec_range = RIGHT.sec_range),
-											TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, RECORDOF(RIGHT), INTEGER advoDtfirstseen},
+											TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, STRING2 partyIndicator, UNSIGNED4 historyDate, RECORDOF(RIGHT), INTEGER advoDtfirstseen},
 																	SELF.Residential_or_Business_Ind := RIGHT.Residential_or_Business_Ind;
 																	SELF.advoDtfirstseen := (INTEGER)RIGHT.date_first_seen;
 																	SELF.seq := LEFT.seq;
@@ -30,6 +36,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																	SELF.orgID := LEFT.Busn_info.BIP_IDs.OrgID.LinkID;
 																	SELF.seleID := LEFT.Busn_info.BIP_IDs.SeleID.LinkID;
 																	SELF.historyDate := LEFT.historyDate;
+                                  SELF.partyIndicator := LEFT.relatedDegree;
 																	SELF := RIGHT;
 																	SELF := [];), 
 											LEFT OUTER, ATMOST(DueDiligence.Constants.MAX_ATMOST_100));
@@ -40,23 +47,34 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// Filter out records after our history date.
 	advoFilt := DueDiligence.Common.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
 																	
-	advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
-	advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
+	advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
+	advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
 																									
-	rollAdvo := ROLLUP(advoDedup, 
-											LEFT.seq = RIGHT.seq AND
-											LEFT.ultID = RIGHT.ultID AND
-											LEFT.orgID = RIGHT.orgID AND
-											LEFT.seleID = RIGHT.seleID, 
+	rollAdvo := ROLLUP(advoDedup,
+                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                      LEFT.partyIndicator = RIGHT.partyIndicator, 
 											TRANSFORM(RECORDOF(LEFT),
 																SELF.Residential_or_Business_Ind := IF(LEFT.Residential_or_Business_Ind = DueDiligence.Constants.EMPTY, RIGHT.Residential_or_Business_Ind, LEFT.Residential_or_Business_Ind);
 																SELF := LEFT;));
+                                
+  //add the address type to the operating locations
+	initialOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(indata);
+	addOpLocAddrType := JOIN(initialOpLocations, rollAdvo(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
+                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                            TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+                                      SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
+                                                                              SELF.addressType := RIGHT.Residential_or_Business_Ind;
+                                                                              SELF := LEFT;)]);
+                                      SELF := LEFT;),
+                            LEFT OUTER);
+	
+										
+	//reAdd operating locations
+	addOperatingLocation := DueDiligence.CommonBusiness.readdOperatingLocations(indata, addOpLocAddrType, opLocations);                                
+
 																
-	addResidentialAddr := JOIN(indata, rollAdvo,
-															LEFT.seq = RIGHT.seq AND
-															LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-															LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-															LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+	addResidentialAddr := JOIN(addOperatingLocation, rollAdvo(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
+															#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),	
 															TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																				SELF.residentialAddr := RIGHT.Residential_or_Business_Ind;
 																				SELF.busIsSOHO := LEFT.busIsSOHO OR (RIGHT.Residential_or_Business_Ind = 'A' AND LEFT.SOSIncorporationDate > 0);
@@ -105,10 +123,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 																	
 	uniqueDIDs := ROLLUP(SORT(feinSsn_dids, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), 
-												LEFT.seq = RIGHT.seq AND 
-												LEFT.ultID = RIGHT.ultID AND
-												LEFT.orgID = RIGHT.orgID AND
-												LEFT.seleID = RIGHT.seleID AND
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 												LEFT.did = RIGHT.did,
 												TRANSFORM({RECORDOF(LEFT)},
 																		SELF.feinMatched := LEFT.feinMatched OR RIGHT.feinMatched;
@@ -174,20 +189,14 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// Determine counts by Seq
 	consumerHeaderDidCounts := ROLLUP(SORT(consumerHeaderDidStats, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
-																		LEFT.seq = RIGHT.seq AND
-																		LEFT.ultID = RIGHT.ultID AND
-																		LEFT.orgID = RIGHT.orgID AND
-																		LEFT.seleID = RIGHT.seleID, 
+																		#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
 																		TRANSFORM(RECORDOF(LEFT),
 																							SELF.busFEINLinkedPersonAddr := MAX(LEFT.busFEINLinkedPersonAddr, RIGHT.busFEINLinkedPersonAddr);
 																							SELF.feinPersonNameMatch := MAX(LEFT.feinPersonNameMatch, RIGHT.feinPersonNameMatch);
 																							SELF := LEFT));
 																							
 	addFeinMatchNameAddr := JOIN(addResidentialAddr, consumerHeaderDidCounts,
-																LEFT.seq = RIGHT.seq AND
-																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+																#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																					SELF.feinIsSSN := LEFT.feinIsSSN OR (RIGHT.feinPersonNameMatch > DueDiligence.Constants.NUMERIC_ZERO OR RIGHT.busFEINLinkedPersonAddr > DueDiligence.Constants.NUMERIC_ZERO);
 																					SELF.personNameSSN := RIGHT.feinPersonNameMatch;
@@ -231,7 +240,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	
 	// OUTPUT(indata, NAMED('indata'));
-	// OUTPUT(dedupInData, NAMED('dedupInData'));
+	// OUTPUT(partiesToCheck, NAMED('partiesToCheck'));
 	
 	// OUTPUT(withAdvoRaw, NAMED('withAdvoRaw'));
 	// OUTPUT(advoFiltRecs, NAMED('advoFiltRecs'));
@@ -239,7 +248,11 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(advoOnInputAddrSort, NAMED('advoOnInputAddrSort'));
 	// OUTPUT(advoDedup, NAMED('advoDedup'));
 	// OUTPUT(rollAdvo, NAMED('rollAdvo'));
-	// OUTPUT(addResidentialAddr, NAMED('addResidentialAddr'));
+  
+	// OUTPUT(initialOpLocations, NAMED('initialOpLocations'));
+	// OUTPUT(addOpLocAddrType, NAMED('addOpLocAddrType'));
+	// OUTPUT(addOperatingLocation, NAMED('addOperatingLocation'));
+  // OUTPUT(addResidentialAddr, NAMED('addResidentialAddr'));
 	
 	// OUTPUT(feinSsn_dids, NAMED('feinSsn_dids'));
 	// OUTPUT(uniqueDIDs, NAMED('uniqueDIDs'));

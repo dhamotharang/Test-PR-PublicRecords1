@@ -7,8 +7,10 @@ EXPORT VERSION_3 := 3;
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
 
+//request type
 EXPORT INDIVIDUAL := 'INDIVIDUAL';
 EXPORT BUSINESS := 'BUSINESS';
+EXPORT ATTRIBUTES := 'ATTRIBUTE';
 
 EXPORT VALID_IND_ATTRIBUTE_VERSIONS := [IND_REQ_ATTRIBUTE_V3];
 EXPORT VALID_BUS_ATTRIBUTE_VERSIONS := [BUS_REQ_ATTRIBUTE_V3];
@@ -63,6 +65,7 @@ EXPORT MAX_PARENTS := 5;
 EXPORT MAX_OPERATING_LOCATIONS := 500;
 EXPORT MAX_SOURCES := 100;
 EXPORT MAX_BUREAUS := 100;
+EXPORT MAX_DEBTORS_CREDITORS := 10;
 
 
 EXPORT EMPTY := '';
@@ -85,7 +88,15 @@ EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
 EXPORT UNKNOWN                  := 'U';  
-EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ];  
+EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ]; 
+// ---- 
+// ---- Offense Score Descriptions 
+// ----
+EXPORT TEXT_FELONY              := 'FELONY';
+EXPORT TEXT_MISDEMEANOR         := 'MISDEMEANOR';
+EXPORT TEXT_INFRACTION          := 'INFRACTION';
+EXPORT TEXT_TRAFFIC             := 'TRAFFIC';
+EXPORT TEXT_UNKNOWN             := 'UNKNOWN';       
  
 
 // ---- 
@@ -95,7 +106,13 @@ EXPORT NONTRAFFIC_CONVICTED     := '4';
 EXPORT NONTRAFFIC_NOT_CONVICTED := '3';
 EXPORT TRAFFIC_CONVICTED        := '2';
 EXPORT TRAFFIC_NOT_CONVICTED    := '1';
-
+// ---- 
+// ---- Offense Level Descriptions 
+// ----
+EXPORT TEXT_NONTRAFFIC_CONVICTED     := 'NONTRAFFIC CONVICTED';
+EXPORT TEXT_NONTRAFFIC_NOT_CONVICTED := 'NONTRAFFIC NOT CONVICTED';
+EXPORT TEXT_TRAFFIC_CONVICTED        := 'TRAFFIC CONVICTED';
+EXPORT TEXT_TRAFFIC_NOT_CONVICTED    := 'TRAFFIC NOT CONVICTED';
 
 // ---- 
 // ---- constants used in the Liens processing
@@ -174,6 +191,15 @@ EXPORT mac_JOINLinkids_Results := MACRO
 					'LEFT.seleID = RIGHT.seleID' 
 ENDMACRO;
 
+EXPORT mac_TRANSFORMLinkids := MACRO
+				'SELF.seq                    := LEFT.seq; '    +           //*** This is the sequence number of the Inquired Business (or the Parent)
+				'SELF.ultid                  := LEFT.ultid; '  +
+				'SELF.orgid                  := LEFT.orgid; '  +
+				'SELF.seleid                 := LEFT.seleid; ' +
+				'SELF.proxid                 := LEFT.proxid; ' +
+				'SELF.powid                  := LEFT.powid; '
+ENDMACRO;
+
 
 EXPORT mac_calculate_evictions := MACRO
      'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES))'
@@ -217,6 +243,7 @@ EXPORT INQUIRED_BUSINESS_DEGREE := 'IB';
 EXPORT INQUIRED_BUSINESS_EXEC_DEGREE := 'IE';
 EXPORT LINKED_BUSINESS_DEGREE := 'LB';
 EXPORT LINKED_BUSINESS_EXEC_DEGREE := 'LE';
+EXPORT OPERATING_LOCATION := 'OL';
 EXPORT REGISTERED_AGENT := 'RA';
 EXPORT RELATED_BUSINESS_DEGREE := 'RB';
 

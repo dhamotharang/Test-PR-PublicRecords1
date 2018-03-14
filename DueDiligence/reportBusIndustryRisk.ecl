@@ -58,7 +58,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 	
 	//transform to limit the number of data in our dataset
 	DueDiligence.LayoutsInternalReport.BusIndustryRiskChildren getReportChildren(DueDiligence.LayoutsInternal.SlimSicNaicLayout snuil, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxSICNAICs)
-		SELF.industryRisk := PROJECT(snuil, TRANSFORM(iesp.duediligencereport.t_DDRSICNAIC,
+		SELF.industryRisk := PROJECT(snuil, TRANSFORM(iesp.duediligencebusinessreport.t_DDRSICNAIC,
 																									SELF.sicCode := LEFT.sicCode;
 																									SELF.naicsCode := LEFT.naicCode;
 																									SELF.description := LEFT.codeDescription;
@@ -75,7 +75,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 																									SELF.moneyServiceBusiness := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS OR
 																																									LEFT.naicIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS, TRUE, FALSE);
 																									
-																									SELF.nonBankFinancialInstituion := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS OR
+																									SELF.nonBankFinancialInstitution := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS OR
 																																												LEFT.naicIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS, TRUE, FALSE);
 																									
 																									SELF.casinoOrGamblingRelated := IF(LEFT.sicIndustry = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING OR
@@ -97,12 +97,9 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 																									
 	
 	addIndustryToReport := DENORMALIZE(inData, industryRiskChild,
-																			LEFT.seq = RIGHT.seq AND
-																			LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
-																			LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
-																			LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
+																			#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																			TRANSFORM(DueDiligence.layouts.Busn_Internal,
-																								SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SICNAICs := LEFT.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SICNAICs + RIGHT.industryrisk;
+																								SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SICNAICs := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SICNAICs + RIGHT.industryrisk;
 																								SELF := LEFT;));
 												
 
@@ -112,10 +109,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 		
 		sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen); //record count??
 		rollCodes := ROLLUP(sortSources,
-												LEFT.seq = RIGHT.seq AND
-												LEFT.ultID = RIGHT.ultID AND
-												LEFT.orgID = RIGHT.orgID AND
-												LEFT.seleID = RIGHT.seleID AND
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 												LEFT.source = RIGHT.source AND
 												LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
 												TRANSFORM(RECORDOF(LEFT),
@@ -144,10 +138,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 	
 	sortBest := SORT(newBestSicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	rollBest := ROLLUP(sortBest,
-											LEFT.seq = RIGHT.seq AND
-											LEFT.ultID = RIGHT.ultID AND
-											LEFT.orgID = RIGHT.orgID AND
-											LEFT.seleID = RIGHT.seleID,
+											#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 											TRANSFORM(RECORDOF(LEFT),
 																SELF.sicCode := MAX(LEFT.sicCode, RIGHT.sicCode);
 																SELF.codeDescription := MAX(LEFT.codeDescription, RIGHT.codeDescription);
@@ -157,10 +148,7 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 																
 	//add best sic and naic to the report
 	addBestSicNaic := JOIN(addIndustryToReport, rollBest,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
-													LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.layouts.Busn_Internal,
 																		SELF.businessReport.businessInformation.NaicsCode := RIGHT.naicCode;
 																		SELF.businessReport.businessInformation.NaicsDescription := RIGHT.codeDescription2;
