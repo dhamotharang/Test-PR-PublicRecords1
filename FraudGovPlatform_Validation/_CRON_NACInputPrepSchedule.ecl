@@ -1,19 +1,20 @@
-﻿import _Control;
+﻿import _Control, NAC;
 
-every_10_min := '*/10 0-23 * * *';
-IP:=Constants.LandingZoneServer;
-RootDir := Constants.MBSLandingZonePathBase;
+every_day := '0 5 * * *';
+IP			:= NAC.Constants.LandingZoneServer;
+RootDir	:= NAC.Constants.LandingZonePathBase + '/msh/done/';
+
 ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov MBS Input Prep\';\n'
++'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Input Prep\'\n'
++' 	 ,\'FraudGov NAC Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -24,19 +25,18 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudShared.SprayMBSFiles(\''+IP+'\',\''+RootDir+'\',pVersion := version))\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version,\''+IP+'\',\''+RootDir+'\',\''+ThorName+'\'))\n'
 +'	);\n'
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov NAC Input Prep Schedule');
 
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(every_10_min))
+
+if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
+			: WHEN(CRON(every_day))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Input Prep SCHEDULE failure'
-																			,Constants.NOC_MSG
+																			,'FraudGov NAC Input Prep SCHEDULE failure'
+																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
-																			
-																

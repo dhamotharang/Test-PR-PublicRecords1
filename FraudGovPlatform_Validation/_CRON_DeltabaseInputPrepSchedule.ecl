@@ -1,19 +1,21 @@
 ﻿import _Control;
 
-every_10_min := '*/10 0-23 * * *';
-IP:=Constants.LandingZoneServer;
-RootDir := Constants.MBSLandingZonePathBase;
+every_day := '0 5 * * *';
+IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+RootDir := Constants.InqLogLandingZonePathBase;
+
 ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov MBS Input Prep\';\n'
++'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
++'wuname := \'FraudGov Deltabase Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Input Prep\'\n'
++' 	 ,\'FraudGov Deltabase Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -24,19 +26,18 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudShared.SprayMBSFiles(\''+IP+'\',\''+RootDir+'\',pVersion := version))\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyDeltabase(version,\''+IP+'\',\''+RootDir+'\',\''+ThorName+'\'))\n'
 +'	);\n'
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov Deltabase Input Prep Schedule');
 
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
+// if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
 if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(every_10_min))
+			: WHEN(CRON(every_day))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Input Prep SCHEDULE failure'
+																			,'FraudGov Deltabase Input Prep SCHEDULE failure'
 																			,Constants.NOC_MSG
 																			));
-																			
-																
