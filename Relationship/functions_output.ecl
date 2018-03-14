@@ -170,6 +170,12 @@
 																	couccRec := left.rels(rel_type = Constants.coucc)[1];
 																	self.coucc_score 							:= couccRec.score;
 																	self.coucc_cnt 								:= couccRec.cnt;
+																	coclueRec := left.rels(rel_type = Constants.coclue)[1];
+																	self.coclue_score := coclueRec.score;
+																	self.coclue_cnt   := coclueRec.cnt;
+																	coccRec := left.rels(rel_type = Constants.cocc)[1];
+																	self.cocc_score   := coccRec.score;
+																	self.cocc_cnt     := coccRec.cnt;
 																	self := left;
 																 ));
 		return relOut;
