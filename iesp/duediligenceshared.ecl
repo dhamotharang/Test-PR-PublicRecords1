@@ -188,8 +188,8 @@ export t_DDRLiensJudgmentsEvictions := record
 	string Agency {xpath('Agency')};
 	string2 AgencyState {xpath('AgencyState')};
 	string AgencyCounty {xpath('AgencyCounty')};
+	dataset(t_DDRCreditorDebtor) Debtors {xpath('Debtors/Debtor'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxDebtors)};
 	dataset(t_DDRCreditorDebtor) Creditors {xpath('Creditors/Creditor'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxCreditors)};
-	dataset(t_DDRCreditorDebtor) Debtor {xpath('Debtor/Debtors'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxCreditors)};
 end;
 		
 export t_DDRProfessionalLicenses := record
