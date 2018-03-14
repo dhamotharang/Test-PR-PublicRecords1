@@ -1,4 +1,4 @@
-IMPORT paw, riskwise, ut, risk_indicators, AML, MDR;
+﻿IMPORT paw, riskwise, ut, risk_indicators, AML, MDR;
 
 export getBusnAssoc( DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim,
 													 boolean onthor) := FUNCTION;
@@ -42,7 +42,7 @@ ProfileBooster.Layouts.Layout_PB_Slim_PAW append_paw_details(with_contactID le, 
 	self.dt_first_seen := rt.dt_first_seen;
 	self.dt_last_seen := rt.dt_last_seen;											
 	self.OccBusinessAssociation := if(rt.contact_id <> 0, 1, 0);
-	monthsAgo := ut.MonthsApart((string)le.historyDate,rt.dt_first_seen[1..6]);
+	monthsAgo := ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],rt.dt_first_seen[1..6]);
 	self.OccBusinessAssociationTime := monthsAgo;	
 	titleRank := AML.AMLTitleRank(rt.company_title);
 	self.OccBusinessTitleLeadership := if(titleRank <= 3, 2, 1);											
