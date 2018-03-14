@@ -1,12 +1,12 @@
 ﻿EXPORT BocaShell_41_Prod_Tracking_DailyReport := FUNCTION
 
 import ut;
-import std, Scoring_Project, ashirey,Scoring_Project_Macros;
+import std, Scoring_Project, ashirey,Scoring_Project_Macros, zz_bbraaten2;
 
 dt := ut.getdate;
 decimal19_2 thresh := 1.25;
 
-tag:=ut.foreign_prod;
+tag:=ut.foreign_prod_boca;
 // Layout3 := zz_bbraaten2.Boca_41_Non_Cert_lay_new;   //NonFCRA
 
 
