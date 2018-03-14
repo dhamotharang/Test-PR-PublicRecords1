@@ -1426,6 +1426,13 @@ string3 RVG1706_1_0_reason2 := '';
 string3 RVG1706_1_0_reason3 := '';
 string3 RVG1706_1_0_reason4 := '';
 
+String3 RVG1610_1_0_score := '';
+string3 RVG1610_1_0_reason1 := '';
+string3 RVG1610_1_0_reason2 := '';
+string3 RVG1610_1_0_reason3 := '';
+string3 RVG1610_1_0_reason4 := '';
+string3 RVG1610_1_0_reason5 := '';
+
 String3 RVP804_0_0_score := '';
 string2 RVP804_0_0_reason1 := '';
 
@@ -1544,10 +1551,10 @@ string2 RVS811_0_0_reason3 := '';
 string2 RVS811_0_0_reason4 := '';
 
 String3 RVS1706_0_score := '';
-string2 RVS1706_0_reason1 := '';
-string2 RVS1706_0_reason2 := '';
-string2 RVS1706_0_reason3 := '';
-string2 RVS1706_0_reason4 := '';
+string3 RVS1706_0_reason1 := '';
+string3 RVS1706_0_reason2 := '';
+string3 RVS1706_0_reason3 := '';
+string3 RVS1706_0_reason4 := '';
 
 
 String3 RVT1003_0_0_score := '';

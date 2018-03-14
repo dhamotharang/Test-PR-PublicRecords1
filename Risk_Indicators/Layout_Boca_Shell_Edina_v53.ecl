@@ -547,7 +547,7 @@ Layout_Phone_Verification := RECORD
 	UNSIGNED1 recent_disconnects;
 	Layout_Gong_DID 		Gong_DID;
 	string2 Insurance_Phone_Verification;
-	string2 phone_ver_bureau;
+	string2 Experian_Phone_Verification;
 END;	
 
 Layout_SSN_Information := RECORD

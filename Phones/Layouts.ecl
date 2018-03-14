@@ -100,12 +100,13 @@ MODULE
 	EXPORT ZumigoIdentity := MODULE
 		EXPORT subjectName := RECORD
 			UNSIGNED6 lexid;
-			STRING20 nameType;
-			STRING20 first_name;
-			STRING20 last_name;
+			STRING20 	nameType;
+			STRING20 	first_name;
+			STRING20 	middle_name;
+			STRING20 	last_name;		
 		END;
-
-		business := RECORD
+		
+		SHARED business := RECORD
 			UNSIGNED6 busult_id;
 			UNSIGNED6 busorg_id;
 			UNSIGNED6 bussele_id;
@@ -115,12 +116,11 @@ MODULE
 			UNSIGNED6 busdot_id;
 			STRING120 business_name;
 		END;
-
-		address := RECORD
+		
+		EXPORT address := RECORD
 			STRING20 	addressType;
 			BatchServices.Layouts.layout_batch_common_address;
 		END;
-
 		EXPORT subjectVerificationRequest := RECORD
 			STRING	 	acctno;
 			UNSIGNED1 sequence_number;
@@ -137,7 +137,15 @@ MODULE
 			iesp.zumigo_identity.t_ZIdNameToVerify Name;
 			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
 		END;
-
+		
+		EXPORT zOutEmail := RECORD
+			STRING TransactionId;
+			UNSIGNED6 lexid;
+			STRING FirstName;
+			STRING LastName;
+			STRING Email;
+			UNSIGNED Email_rec_key ;
+		END;		
 		EXPORT zOut := RECORD
 			STRING acctno:='';
 			UNSIGNED1 sequence_number :=0 ;
@@ -154,8 +162,8 @@ MODULE
 		STRING20 acctno;
 		UNSIGNED6 did;
 		STRING2 source;
-		STRING20 name_first;
-		STRING20 name_last;
+		STRING20 fname;
+		STRING20 lname;
 		STRING listingName;
 		STRING10 phone;
 		UNSIGNED1 privateFlag;
@@ -204,10 +212,10 @@ MODULE
 			string5		source;
 			string		error_desc;
 			boolean 	dialable;
-			string10	phone_line_type_desc;
-			string10	phone_serv_type_desc;
-			string30 carrier_city;
-			string2 carrier_state;
+			string1		phone_line_type_desc;
+			string1		phone_serv_type_desc;
+			string30 	carrier_city;
+			string2 	carrier_state;
 		END;
 
 	END;

@@ -22,7 +22,7 @@
 /*--INFO-- This service returns likely ownership for phone based on CallerID and/or Relative/Employer/Business Associations.
 */
 
-IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,Royalty,ut,WSInput;
+IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,STD,Royalty,ut,WSInput;
 
 EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') := 
 	MACRO
@@ -38,7 +38,7 @@ EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') :=
 		
 		//********************Check if recs meet minimum input requirements*********/
 		RECORDOF(ds_batch_in) checkValidity(RECORDOF(ds_batch_in) l) := TRANSFORM
-			SELF.err_search := IF(l.phone_number='' OR l.name_first='' OR l.name_last='',AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT,0); 
+			SELF.err_search := IF(LENGTH(STD.Str.Filter(l.phone_number,'0123456789'))<> 10 OR l.name_first='' OR l.name_last='',AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT,0); 
 			SELF := l;
 			SELF := [];
 		END;

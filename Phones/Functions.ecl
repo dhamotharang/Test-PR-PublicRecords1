@@ -1,4 +1,4 @@
-﻿IMPORT Drivers,MDR,Phones,Phonesplus_v2,STD,ut;
+﻿IMPORT DidVille,Drivers,MDR,Phonesplus_v2,STD,ut;
 
 EXPORT Functions :=
 MODULE
@@ -408,7 +408,19 @@ MODULE
 		1 => Phones.Constants.PhoneServiceType.Wireless,
 		2 => Phones.Constants.PhoneServiceType.VoIP,
 		Phones.Constants.PhoneServiceType.Other);
-
+	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, STRING32 ApplicationType='',UNSIGNED1 GLBPurpose,UNSIGNED1 DPPAPurpose) := FUNCTION
+		
+		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn,appType := ApplicationType,glb_purpose_value:=GLBPurpose,dppa_purpose_value:=DPPAPurpose);
+			
+		dBatchInwDID	:= JOIN(dBatchIn, dDIDsbyAcctno,
+																							LEFT.seq = RIGHT.seq,
+																							TRANSFORM(DidVille.Layout_Did_OutBatch,
+																								SELF.did		:= RIGHT.did,
+																								SELF						:= LEFT,
+																								SELF:=[]),
+																							LEFT OUTER,ALL);	
+		RETURN dBatchInwDID;
+	END;
 	//Taken from PhonesInfo._Functions. Spoke with Ricardo about this, decided it's best to seperate it to avoid :PERSIST
 	EXPORT STRING StandardName(string name):= FUNCTION
 		stdName := STD.Str.Filter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');

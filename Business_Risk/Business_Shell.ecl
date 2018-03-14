@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Business Shell">
 	<part name="seq" type="xsd:integer"/>
 	<part name="AccountNumber" type="xsd:string"/>
@@ -31,6 +31,11 @@
 	<part name="GLBPurpose" type="xsd:byte"/> 
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="PoBoxCompliance" type="xsd:boolean"/>	
+  <part name="OfacOnly" type="xsd:boolean"/>
+  <part name="GlobalWatchlistThreshold" type="xsd:real"/>
+  <part name="OFACversion" type="xsd:unsignedInt"/>
+  <part name="IncludeOfac" type="xsd:boolean"/>
+  <part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="ExcludeWatchLists" type="xsd:boolean"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
@@ -80,6 +85,11 @@ export Business_Shell := macro
 	'GLBPurpose', 
 	'HistoryDateYYYYMM',
 	'PoBoxCompliance',
+	'OfacOnly',
+	'OFACversion',
+	'IncludeOfac',
+	'IncludeAdditionalWatchLists',
+	'GlobalWatchlistThreshold',	
 	'ExcludeWatchLists',
 	'DataRestrictionMask',
 	'DataPermissionMask',
@@ -116,9 +126,14 @@ unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned1	dppa			:= riskwise.permittedUse.fraudDPPA  : stored('DppaPurpose');
 unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean IsPOBoxCompliant := false : STORED('PoBoxCompliance');
+boolean ofac_only := false : STORED('OfacOnly');
+unsigned1 ofac_version       := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 boolean	ExcludeWatchLists  := false   : stored('ExcludeWatchLists');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+real Global_WatchList_Threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 gateways := Gateway.Configuration.Get();
 unsigned1 AppendBest := 1;	// search best file
 
@@ -200,7 +215,7 @@ end;
 indata := project(df,into_input(LEFT));
 
 biid := business_risk.InstantID_Function(indata, gateways, false, dppa, glb, false, false, '', 
-											ExcludeWatchLists, IsPOBoxCompliant:=IsPOBoxCompliant, DataRestriction := DataRestriction,
+											ExcludeWatchLists, ofac_only,ofac_version, include_ofac, include_additional_watchlists, Global_WatchList_Threshold, IsPOBoxCompliant:=IsPOBoxCompliant, DataRestriction := DataRestriction,
 											in_append_best:=AppendBest, DataPermission := DataPermission);
 
 bus_shell := business_risk.Business_Shell_Function(biid, glb);

@@ -223,6 +223,8 @@ export Master := dataset(
       {'ROYALTY', 'EFX_TWN_EI',                       '623', 'G', '' , 'Equifax TWN Employment Indicator'},	
       {'ROYALTY', 'EFX_TWN_EI_ENH',                   '624', 'G', '' , 'Equifax TWN Enhanced Employment Indicator'},
 			{'ROYALTY', 'EFX_ATTR',                         '625', 'G', '' , 'Equifax Data Attributes model 5391'},
+			{'ROYALTY', 'EFX_TWN_VOE_GW',                   '626', 'G', '' , 'Equifax TWN Verification of Employment Online'},
+			{'ROYALTY', 'EFX_TWN_VOI_GW',                   '627', 'G', '' , 'Equifax TWN Verification of Income Online'},
 			{'ROYALTY', 'DMD',                              '640', 'I', '' , 'Health Care Practitioner email addresses'},
 			{'ROYALTY', 'FDNCORR',                          '650', 'I', '' , 'LexisNexis internal FDN logging'},
 			{'ROYALTY', 'DHC',                              '660', 'I', '' , 'DHC affiliations dataset'},

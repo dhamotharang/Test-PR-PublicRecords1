@@ -35,24 +35,21 @@ EXPORT Report_Service() := MACRO
 		// From batch - Initialize batch param values now that ESP param values have been loaded.
 		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
     
-    // Global module
-    globalMod := AutoStandardI.GlobalModule();
-    
-    // Attempt to derive an SSN from the given DID value that may be provided on input to this service
-    // interface.
-    dids := DATASET ([{icrReportBy.uniqueid}], doxie.layout_references);
-    ds_header := doxie.central_header (dids, false, false, true);
-    
-    // Use the unmasked SSN regardless of SSN mask setting because we are using this SSN internally in
-    // our search criteria.
-    ssn_by_did := ds_header.best_information_children[1].ssn_unmasked;
+   // Global module
+   globalMod := AutoStandardI.GlobalModule();
 
-    // Setup some values that will be passed into the Records attribute call later.
+   // Attempt to derive an SSN from the given DID value that may be provided on input to this service
+   // interface Use the unmasked SSN regardless of SSN mask setting because we are using this SSN 
+   // internally in our search criteria.
+   rec := SSNBest_Services.Raw.Get_All(DATASET([{'', icrReportBy.uniqueid}], {STRING best_ssn, INTEGER did}), dataset([{}]));
+   ssn_by_did := rec.subject[1].ssn;
+
+   // Setup some values that will be passed into the Records attribute call later.
 		in_ssn_mask := globalMod.SSNMask;
 		is_GLB_fail := NOT ut.glb_ok(globalMod.GLBPurpose);
 		is_DRM_fail := Doxie.DataRestriction.isECHRestricted(globalMod.DataRestrictionMask); 
 
-    // Build the batch record with the appropriate values transliterated from the ESP Report By inputs.
+   // Build the batch record with the appropriate values transliterated from the ESP Report By inputs.
 		ds_xml_in := 
       PROJECT(
         DATASET([icrRequest], iesp.identity_contact_resolution.t_IdentityContactResolutionReportRequest),

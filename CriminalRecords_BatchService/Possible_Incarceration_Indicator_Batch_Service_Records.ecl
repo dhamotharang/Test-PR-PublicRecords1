@@ -167,10 +167,12 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	OffenderPNameSSN_Rollup_FName := fn_OffenderPNameSSN_Rollup(sort(OffenderPNameSSN_Rollup_LName, ofk, pfirst, lname, ssn, ssn_appended));
 	OffenderPNameSSN := sort(project(OffenderPNameSSN_Rollup_FName, recordof(OffenderPNameSSN_Temp)), ofk, -process_date, -ssn, -ssn_appended);
 	
-	rslt_tmp := if(is_Return_DOC_Name or is_Return_SSN,
-								JOIN(punishments_inc, OffenderPNameSSN, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(KeepN), LEFT OUTER),
-								JOIN(punishments_inc, OffenderPNameSSN_Temp, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(1), LEFT OUTER));
+	// Change for RR-12139
 	
+	rslt_tmp := if(is_Return_DOC_Name or is_Return_SSN,
+								JOIN(punishments_inc, OffenderPNameSSN, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(KeepN)),
+								JOIN(punishments_inc, OffenderPNameSSN_Temp, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(1)));
+								
 	rslt_grp := group(sort(rslt_tmp,except match_type),except match_type);
 	rslt_ungrp := ungroup(dedup(rslt_grp, 
 															trim(RIGHT.match_type) != '' and StringLib.StringContains(trim(LEFT.match_type), trim(RIGHT.match_type), true),
