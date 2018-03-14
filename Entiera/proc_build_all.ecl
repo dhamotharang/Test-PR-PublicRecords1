@@ -1,7 +1,7 @@
 ﻿import _Control, _Validate, ut, Orbit3;
 export Proc_Build_all(string pVersion) := function
 
-#workunit('name','Entiera Build');
+#workunit('name','Yogurt:Entiera Build' + pVersion);
 
 //spray file
 /*

@@ -1,4 +1,4 @@
-/*2017-01-30T23:55:59Z (Robert Berger)
+﻿/*2017-01-30T23:55:59Z (Robert Berger)
 DF-18353
 */
 import ut,LN_PropertyV2_Fast, Codes, LN_PropertyV2, _validate, dops, std, data_services;
@@ -22,10 +22,12 @@ shared okc_deed_fname      	:= data_services.Data_location.Prefix('NONAMEGIVEN')
 shared okc_deed_repl_fname 	:= data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::okc::deed_repl_archive';
 shared okc_mrtg_fname      	:= data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::okc::mortgage_archive';
 shared okc_mrtg_repl_fname 	:= data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::okc::mortgage_repl_archive';
-shared bk_assess_new_fname 	:= data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::assessment::newcty';
+
+//*DF-21489
+/*shared bk_assess_new_fname 	:= data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::assessment::newcty';
 shared bk_as_repl_new_fname := data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::assessment_repl::newcty';
 shared bk_deed_new_fname 	  := data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::deed::newcty';
-shared bk_mrtg_new_fname 	  := data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::mortgage::newcty';
+shared bk_mrtg_new_fname 	  := data_services.Data_location.Prefix('NONAMEGIVEN')+'thor_data::in::ln_propertyv2::raw::bk::mortgage::newcty';*/
 
 //******************************* logical files info ********************************************
 shared okc_currency_report := dedup(SORT(LN_PropertyV2_Fast.Files_Vendor_Rpts.currencyreport_bk,
@@ -97,11 +99,11 @@ shared file_info := sort(nothor(addTofileinfo(frs_assess_fname)+
 																addTofileinfo(okc_deed_fname)+
 																addTofileinfo(okc_deed_repl_fname)+
 																addTofileinfo(okc_mrtg_fname)+
-																addTofileinfo(okc_mrtg_repl_fname)+
+																addTofileinfo(okc_mrtg_repl_fname)/*+
 																addTofileinfo(bk_assess_new_fname)+
 																addTofileinfo(bk_as_repl_new_fname)+
 																addTofileinfo(bk_deed_new_fname)+
-																addTofileinfo(bk_mrtg_new_fname)),logicalFileName) : persist('~thor_data::persist::propertyv2::file_info');
+																addTofileinfo(bk_mrtg_new_fname)*/),logicalFileName) : persist('~thor_data::persist::propertyv2::file_info');
 
 superinfolayout := record
  string superType;
@@ -187,8 +189,8 @@ shared newfipsassess:= set(LN_PropertyV2_Fast.File_New_BK_Counties_Temp.assessor
 
 //********************************** Deed Input Files *******************************************
 raw_bk_deed_1o			:= dataset(bk_deed_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_deed), thor);
-raw_bk_deed_1n			:= dataset(bk_deed_new_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_deed), thor)(FIPSCountyCode in newfipsdeeds);
-raw_bk_deed_1				:= dedup(raw_bk_deed_1o+raw_bk_deed_1n,record,all);
+//raw_bk_deed_1n			:= dataset(bk_deed_new_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_deed), thor)(FIPSCountyCode in newfipsdeeds);
+raw_bk_deed_1				:= dedup(raw_bk_deed_1o,record,all);
 raw_bk_deed_2				:= project(raw_bk_deed_1,transform({recordof(LN_PropertyV2_Fast.Files.raw.bk_deed), 
 																												string8 filedate, string7 source, string8 file_pdate:='', string8 file_prod_date:='', 
 																												string5 file_build_type:='', string8 file_start_process_date:='', string8 file_end_process_date:=''},
@@ -235,8 +237,8 @@ shared raw_okc_deed	:= join(raw_okc_deed_3(file_pdate<>''),dops_history,left.fil
 														LEFT OUTER,MANY LOOKUP,few);
 
 raw_bk_mrtg_1o			:= dataset(bk_mrtg_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_mortgage), thor);
-raw_bk_mrtg_1n			:= dataset(bk_mrtg_new_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_mortgage), thor)(FIPSCode in newfipssam);
-raw_bk_mrtg_1				:= dedup(raw_bk_mrtg_1o+raw_bk_mrtg_1n,record,all);
+//raw_bk_mrtg_1n			:= dataset(bk_mrtg_new_fname, recordof(LN_PropertyV2_Fast.Files.raw.bk_mortgage), thor)(FIPSCode in newfipssam);
+raw_bk_mrtg_1				:= dedup(raw_bk_mrtg_1o,record,all);
 raw_bk_mrtg_2				:= project(raw_bk_mrtg_1, transform({recordof(LN_PropertyV2_Fast.Files.raw.bk_mortgage), 
 																													string8 filedate, string7 source, string8 file_pdate:='', string8 file_prod_date:='', 
 																													string5 file_build_type:='', string8 file_start_process_date:='', string8 file_end_process_date:=''},
@@ -478,12 +480,12 @@ shared raw_deed_slim  := raw_deed_slim_frs + raw_deed_slim_bk + raw_mrtg_slim_bk
 
 //************************ Assessment files ********************************
 	bk_assesso 			    	:= dataset(bk_assess_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment), thor, OPT);
-	bk_assessn     				:= dataset(bk_assess_new_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment), thor, OPT)(fIPS_Code_State_County in newfipsassess);
-	shared bk_assess			:= dedup(bk_assesso+bk_assessn,record,all);
+	//bk_assessn     				:= dataset(bk_assess_new_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment), thor, OPT)(fIPS_Code_State_County in newfipsassess);
+	shared bk_assess			:= dedup(bk_assesso,record,all);
 
 	bk_assess_replo				:= dataset(bk_assess_repl_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment_repl), thor, OPT);
-	bk_assess_repln				:= dataset(bk_as_repl_new_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment_repl), thor, OPT)(fIPS_Code_State_County in newfipsassess);
-	shared bk_assess_repl := dedup(bk_assess_replo+bk_assess_repln,record,all);
+//	bk_assess_repln				:= dataset(bk_as_repl_new_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment_repl), thor, OPT)(fIPS_Code_State_County in newfipsassess);
+	shared bk_assess_repl := dedup(bk_assess_replo,record,all);
 
 	shared okc_assess     := dedup(dataset(okc_assess_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment), thor, OPT),record,all);
 	shared okc_assess_repl:= dedup(dataset(okc_assess_repl_fname,recordof(LN_PropertyV2_Fast.Files.raw.bk_assessment_repl), thor, OPT),record,all);
