@@ -1201,11 +1201,11 @@ EXPORT Constants := MODULE
   export MV := MODULE 
     // ideally, those should refer to VehicleV2_Services.Constant values...
     export unsigned1 MaxCountGateways := 2;
-    export unsigned1 MaxCountOwners := 10;
-    export unsigned1 MaxCountRegistrants := 10;
-    export unsigned1 MaxCountLienHolders := 10;
-    export unsigned1 MaxCountLessees := 10;
-    export unsigned1 MaxCountLessors := 10;
+    export unsigned1 MaxCountOwners := 4;
+    export unsigned1 MaxCountRegistrants := 2;
+    export unsigned1 MaxCountLienHolders := 3;
+    export unsigned1 MaxCountLessees := 3;
+    export unsigned1 MaxCountLessors := 3;
 		export unsigned1 MaxCountBrands := 5;
 		export UNSIGNED1 MaxCountMakes := 4;
 		export UNSIGNED1 MaxCountModels := 4;
