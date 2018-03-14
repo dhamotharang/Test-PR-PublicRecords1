@@ -1,4 +1,4 @@
-IMPORT LNSmallBusiness, Business_Risk_BIP, Risk_Indicators, ut, std;
+﻿IMPORT LNSmallBusiness, Business_Risk_BIP, Risk_Indicators, ut;
 
 EXPORT Risk_Reporting.Layouts.LOG_Business_Shell To_LOG_Business_Shell (
 																				DATASET(LNSmallBusiness.BIP_Layouts.Business_Shell_Plus_Scores_Layout) Business_Shell_plus_Scores,
@@ -30,7 +30,7 @@ EXPORT Risk_Reporting.Layouts.LOG_Business_Shell To_LOG_Business_Shell (
 	Risk_Reporting.Layouts.LOG_Business_Shell_Record FormatIntermediate() := TRANSFORM
 		SELF.transaction_id := ''; // Set by the ESP
 		SELF.product_id := Product_ID;
-		SELF.date_added := (STRING8)Std.Date.Today() + ut.getTime(); // Current date
+		SELF.date_added := ut.getDate + ut.getTime(); // Current date
 		SELF.process_type := (STRING4)Process_Type; //0 = Undetermined, 1 = Request, 2 for Response, 3 = Context, 4 = Internal
 		SELF.processing_time := '000.000'; // Set by the ESP
 		SELF.source_code := '';

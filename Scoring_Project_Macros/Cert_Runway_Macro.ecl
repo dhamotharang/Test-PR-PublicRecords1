@@ -2,7 +2,7 @@
 EXPORT Cert_Runway_Macro := FUNCTION
 
 
-import ut,STD, Scoring_Project_Macros, Scoring_Project_DailyTracking, zz_bbraaten2;
+import ut,STD, Scoring_Project_Macros, Scoring_Project_DailyTracking;
 
  dt := ut.getdate;
  // dt := '20150428';

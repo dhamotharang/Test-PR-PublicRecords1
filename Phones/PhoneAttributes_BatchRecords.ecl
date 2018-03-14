@@ -99,14 +99,19 @@ EXPORT PhoneAttributes_BatchRecords(
 			,MAX(allrows_rec,allrows_rec.swapped_phone_number_date)); // swaps also produces a disconnected phone
 		SELF.ported_date :=	MAX(L.ported_date, MAX(allrows_rec, allrows_rec.ported_date));
 		SELF.line_type_last_seen :=	MAX(L.line_type_last_seen, MAX(allrows_rec, allrows_rec.line_type_last_seen));
-		SELF.phone_serv_type :=	MAX(L.phone_serv_type, MAX(allrows_rec, allrows_rec.phone_serv_type));
-		SELF.phone_line_type :=	MAX(L.phone_line_type, MAX(allrows_rec, allrows_rec.phone_line_type));
+
+		//Check if the line/serv type is blank, if it is we use the latest record with a value in that field.
+		//Since the dataset is already sorted by -event_date we just have to filter it and take the first entry.
+		//In the event that the filtered dataset is empty it will pass forward a blank string.
+		SELF.phone_serv_type :=	IF(L.phone_serv_type = '', allrows_rec(phone_serv_type <> '')[1].phone_serv_type, L.phone_serv_type);
+		SELF.phone_line_type :=	IF(L.phone_line_type = '', allrows_rec(phone_line_type <> '')[1].phone_line_type, L.phone_line_type);
+
 		SELF.swapped_phone_number_date := MAX(L.swapped_phone_number_date, MAX(allrows_rec, allrows_rec.swapped_phone_number_date));
 		SELF.new_phone_number_from_swap	:= MAX(L.new_phone_number_from_swap, MAX(allrows_rec, allrows_rec.new_phone_number_from_swap));
 		SELF.suspended_date	:= MAX(L.suspended_date, MAX(allrows_rec, allrows_rec.suspended_date));
 		SELF.reactivated_date := MAX(L.reactivated_date, MAX(allrows_rec, allrows_rec.reactivated_date));
-		SELF.phone_line_type_desc := IF(SELF.phone_line_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_line_type));
-		SELF.phone_serv_type_desc := IF(SELF.phone_serv_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_serv_type));
+		SELF.phone_line_type_desc := IF(SELF.phone_line_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_line_type)[1]);
+		SELF.phone_serv_type_desc := IF(SELF.phone_serv_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_serv_type)[1]);
 		SELF := 	L;
 	END;
 

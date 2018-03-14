@@ -33,18 +33,10 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	
 	
    // ------                                                                                   ------
-   // ------ Determine the Geographic Risk for the Inquired Business                           ------
+   // ------ Determine the Geographic Risk for the Inquired Business and operating locations   ------
    // ------                                                                                   ------
    GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses);  
-  
-   // ------                                                                                                              ------
-   // ------ Use the Census Macro to fill in the county_name - pass the result set as input,                              ------
-   // ------ the field name that contains the state,                                                                      ------ 
-   // ------ the field name that contains the 3 digit fips(county) and the field name of the county name.                 ------
-   // ------ the name of the output result set                                                                            ------
-   // ------                                                                                                              ------
-	 //Census_Data.MAC_Fips2County_Keyed(GeographicRiskResults, state, Fipscode, countyName, AddressOperLocGeoRiskCounty);
-	
+
 	 // ------                                                                                   ------
 	 // ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------
 	 // ------                                                                                   ------
@@ -98,19 +90,19 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 
 
 	 BusOperLocChildDataset  := PROJECT(groupAddressOperLocGeoRisk,  //Using this input dataset - these addresses have the geo risk populated  
-                                      TRANSFORM({UNSIGNED4 seq, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
-                                                SELF.seq                    := LEFT.seq,                    //*** This is the sequence number of the Inquired Business (or the Parent)
-                                                SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER)))); 
+                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
+                                                SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER));
+                                                SELF := LEFT;)); 
 				       
 
 															
 	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
    UpdateBusnOperLocWithReport := DENORMALIZE(BusnData, BusOperLocChildDataset,
-	                                           LEFT.seq = RIGHT.seq, 
+	                                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 											                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := LEFT.hdAddrCount;
+                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := COUNT(LEFT.operatingLocations);
                                                         //OperatingLocations is the NESTED CHILD DATASET  
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations     := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
+                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
                                                         SELF := LEFT;));  
 		
 		

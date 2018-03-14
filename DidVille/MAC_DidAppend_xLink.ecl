@@ -1,4 +1,4 @@
-/* **************************** 
+﻿/* **************************** 
 PLEASE DO NOT CALL THIS MACRO DIRECTLY.  
 THIS SHOULD BE ACCESSED ONLY VIA DIDVILLE.MAC_DIDAPPEND
 PLEASE CALL DIDVILLE.MAC_DIDAPPEND
@@ -23,9 +23,9 @@ import ut, Email_Data, IDLExternalLinking, InsuranceHeader_xLink;
 #uniquename(file_out_xlink)				
 IDLExternalLinking.mac_xlinking_on_roxie(%file_in_xadl2%, did ,name_suffix ,fname ,mname ,lname ,
 																, ,prim_name, prim_range, sec_range, city, state, 
-																		zip, ssn, DOB, phone,  , ,
+																		zip, ssn, DOB, phone,  dl_state, dl_nbr,
 																		%file_out_xlink%,  30,3, true)																		
-
+ 
 
 // only return the dids by email when the email address is the only thing provided in the search.		
 // when xADL2 is updated to use email as an input, this join should be removed.	

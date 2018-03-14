@@ -1,4 +1,4 @@
-﻿/*2017-05-24T17:14:51Z (Andrea Koenen)
+/*2017-05-24T17:14:51Z (Andrea Koenen)
 checkin in changes to keep insufficient hits on stream and sort output by order on input
 */
 //*to run Juli - make IncludeLNJReport uncommented and set to true
@@ -48,7 +48,7 @@ layout_input := RECORD
 //====================================================
 // Neutral service ip
 // neutral_roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
-neutral_roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;  
+neutral_roxie_IP := RiskWise.Shortcuts.prod_batch_analytics_roxie;  
 
 // FCRA service settings
 bs_service := 'RiskView.Batch_Service';
@@ -94,7 +94,7 @@ soap_inrec := record
 	string IntendedPurpose;
 	string AttributesVersionRequest;
 	string Auto_model_name;
-	string CrossIndustry_name;
+	string Crossindustry_model_name;
 	string Bankcard_model_name;
 	string Short_term_lending_model_name;
 	string Telecommunications_model_name;
@@ -140,7 +140,7 @@ soap_inrec t_f(ds_input le, integer c) := transform
 	//end LnJReport options (Juli options)
 	// plugging in the flagship scores initially
 	self.Auto_model_name := 'RVA1503_0';
-	self.crossIndustry_name := 'RVS1706_0';
+	self.crossIndustry_model_name := 'RVS1706_0';
 	self.Bankcard_model_name := 'RVB1503_0';
 	self.Short_term_lending_model_name := 'RVG1502_0';
 	self.Telecommunications_model_name := 'RVT1503_0';

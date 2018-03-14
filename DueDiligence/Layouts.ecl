@@ -429,10 +429,13 @@ EXPORT LinkIDs := RECORD
 		unsigned2   ConvictedTraffic2T_OVNYR;                           //*** Convicted Traffic Violations over 3 years
 		unsigned2   ConvictedTraffic2T_NYR;                             //*** Convicted Traffic Violations in the past 3 years
 		unsigned2   ConvictedTraffic2T_Ever;                            //*** Convicted Traffic Violations EVER
-	/*  CONVICTED INFRACTIONS VIOLATIONS */    
+    /*  CONVICTED INFRACTIONS VIOLATIONS */    
 		unsigned2   ConvictedInfractions2I_OVNYR;                       //*** Convicted Infractions over 3 years
 		unsigned2   ConvictedInfractions2I_NYR;                         //*** Convicted Infractions in the past 3 years
 		unsigned2   ConvictedInfractions2I_Ever;                        //*** Convicted Infractions EVER
+    //Non Convicted traffic and infractions ever
+    UNSIGNED2   NonConvictedTraffic1T_Ever;
+    UNSIGNED2   NonConvictedInfraction1I_Ever;    
   END;  
 	
 	EXPORT CivilOffensesCounts := RECORD                               
@@ -538,8 +541,10 @@ EXPORT LinkIDs := RECORD
     UNSIGNED3   BusMisdemeanorNonConviction_3M;
     UNSIGNED3   BusUnknownConviction_4U;
     UNSIGNED3   BusUnknownNonConviction_3U;
-    UNSIGNED3   BusTrafficConvictions_2T;
-    UNSIGNED3   BusTrafficNonConvictions_1T;  //under review??
+    UNSIGNED3   BusTrafficConviction_2T;
+    UNSIGNED3   BusTrafficNonConviction_1T; 
+    UNSIGNED3   BusInfractionConviction_2I;
+    UNSIGNED3   BusInfractionNonConviction_1I;
   END;
 	
 	

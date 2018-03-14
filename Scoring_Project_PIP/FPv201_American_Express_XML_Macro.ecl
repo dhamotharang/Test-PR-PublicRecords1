@@ -1,7 +1,7 @@
 ﻿EXPORT FPv201_American_Express_XML_Macro (roxie_ip, Gateway_dummy, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= FUNCTIONMACRO
 
 
-IMPORT ut, Risk_Indicators, riskwise, models, RiskProcessing, Scoring_Project_PIP, gateway,sghatti,Scoring_Project_Macros;
+IMPORT ut, Risk_Indicators, riskwise, models, RiskProcessing, Scoring_Project_PIP, gateway,Scoring_Project_Macros;
 	
 	unsigned8 no_of_records := records_ToRun;
 		unsigned1 eyeball := 10;

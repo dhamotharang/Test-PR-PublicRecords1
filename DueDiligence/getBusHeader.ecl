@@ -39,19 +39,13 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
   vendorFirstReported := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_vendor_first_reported);
   
   rollVendorDates := ROLLUP(vendorFirstReported(dt_vendor_first_reported > 0), 
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 													TRANSFORM({RECORDOF(busHeaderFilt)},
 																		SELF.dt_vendor_first_reported := MIN(LEFT.dt_vendor_first_reported, RIGHT.dt_vendor_first_reported);
 																		SELF := LEFT;));
                                     
   addVenderFirstSeen := JOIN(indata, rollVendorDates,
-                              LEFT.seq = RIGHT.seq AND
-                              LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-                              LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                              LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                               TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                         SELF.dateVendorFirstReported := RIGHT.dt_vendor_first_reported;
                                         SELF := LEFT;),
@@ -61,20 +55,14 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	sortByDates := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen, dt_last_seen);
 		
 	rollForDates := ROLLUP(sortByDates, 
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 													TRANSFORM({RECORDOF(busHeaderFilt)},
 																		SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
 																		SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
 																		SELF := LEFT;));
 	
 	addBusHdrDtSeen := JOIN(addVenderFirstSeen, rollForDates,
-                          LEFT.seq = RIGHT.seq AND
-                          LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-                          LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                          LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                           TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                     SELF.BusnHdrDtFirstSeen := RIGHT.dt_first_seen;
                                     SELF.BusnHdrDtLastSeen := right.dt_last_seen,
@@ -88,10 +76,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	hdrSrcTable := TABLE(dedupSortBusHeaderSource, {seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), srcCount := COUNT(GROUP)}, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	
 	addHdrSrcCnt := JOIN(addBusHdrDtSeen, hdrSrcTable,
-											 LEFT.seq = RIGHT.seq AND
-											 LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-											 LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-											 LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+											 #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 											 TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																	SELF.srcCount := RIGHT.srcCount;
 																	SELF := LEFT),
@@ -102,10 +87,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 		sortNONCreditSrc := SORT(busHeaderFilt(source NOT IN DueDiligence.Constants.CREDIT_SOURCES), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
 	//Do the ROLLUP of NON-CREDIT SOURCES 
 	 rollNONCreditSrc := ROLLUP(sortNONCreditSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID AND
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 													LEFT.source = RIGHT.source,
 													TRANSFORM({RECORDOF(sortNONCreditSrc)},
 																			SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
@@ -124,20 +106,14 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	 /*  Sort the DATASET of NON-CREDIT Sources  to keep all rows for a LINKID together before you perform the ROLLUP   */  
 	sortProjectNONCreditSrc := SORT(projectNONCreditSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	rollProjectNONCreditSrc := ROLLUP(sortProjectNONCreditSrc,
-																	LEFT.seq    = RIGHT.seq AND
-																	LEFT.ultID  = RIGHT.ultID AND
-																	LEFT.orgID  = RIGHT.orgID AND
-																	LEFT.seleID = RIGHT.seleID,
+																	#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 																	TRANSFORM({RECORDOF(projectNONCreditSrc)},
 																							SELF.sourcesReporting := LEFT.sourcesReporting + RIGHT.sourcesReporting;
 																							SELF := LEFT));
  
  /*  Insert the DATASET of NON-CREDIT Sources (rollProjectNONCreditSrc) into the Busn_Internal record (addCreditSrcCnt)  */  
 	addNONCreditSrcCnt := JOIN(addHdrSrcCnt, rollProjectNONCreditSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.nonCreditSrcCnt     := COUNT(RIGHT.sourcesReporting);
 																		SELF.sourcesReporting    := RIGHT.sourcesReporting;                    
@@ -148,10 +124,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	//get the list of credit/bureau sources ('ER', 'Q3', 'RR')
 	sortCreditSrc := SORT(busHeaderFilt(source IN DueDiligence.Constants.CREDIT_SOURCES), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
 	rollCreditSrc := ROLLUP(sortCreditSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID AND
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 													LEFT.source = RIGHT.source,
 													TRANSFORM({RECORDOF(sortCreditSrc)},
 																			SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
@@ -170,20 +143,14 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	/*  Sort the Credit/Bureau Source DATASET to keep all rows for a LINKID together before you perform the ROLLUP  */
 	sortprojectCreditSrc := SORT(projectCreditSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	rollProjectCreditSrc := ROLLUP(sortprojectCreditSrc,
-																	LEFT.seq = RIGHT.seq AND
-																	LEFT.ultID = RIGHT.ultID AND
-																	LEFT.orgID = RIGHT.orgID AND
-																	LEFT.seleID = RIGHT.seleID,
+																	#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 																	TRANSFORM({RECORDOF(projectCreditSrc)},
 																							SELF.bureauSources := LEFT.bureauSources + RIGHT.bureauSources;
 																							SELF := LEFT));
  
  /*  Insert the DATASET of Credit/bureau Sources into the Busn_Internal record   */  
 	addCreditSrcCnt := JOIN(addNONCreditSrcCnt, rollProjectCreditSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.creditSrcCnt     := COUNT(RIGHT.bureauSources);
 																		SELF.bureauReporting  := RIGHT.bureauSources;                    
@@ -197,19 +164,13 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	sortShellSrc := SORT(shellSrcTable, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));	
 	rollShellSrc := ROLLUP(sortShellSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 													TRANSFORM({RECORDOF(sortShellSrc)},
 																			SELF.shellSrcCnt := LEFT.shellSrcCnt + RIGHT.shellSrcCnt;
 																			SELF := LEFT));
 																			
 	addShellSrcCnt := JOIN(addCreditSrcCnt, rollShellSrc,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.shellHdrSrcCnt := RIGHT.shellSrcCnt;
 																		SELF := LEFT),
@@ -242,19 +203,13 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	sortByLastSeen := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dt_last_seen);
 
 	rollForStructure := ROLLUP(sortByLastSeen,
-															LEFT.seq = RIGHT.seq AND
-															LEFT.ultID = RIGHT.ultID AND
-															LEFT.orgID = RIGHT.orgID AND
-															LEFT.seleID = RIGHT.seleID,
+															#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 															TRANSFORM({RECORDOF(busHeaderFilt)},
 																				SELF.company_org_structure_derived := IF(LEFT.company_org_structure_derived = DueDiligence.Constants.EMPTY, RIGHT.company_org_structure_derived, LEFT.company_org_structure_derived);
 																				SELF := LEFT;));
 
 	addStructure := JOIN(addHdrAddrCount, rollForStructure,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																			SELF.hdBusnType := RIGHT.company_org_structure_derived;
 																			SELF := LEFT;),
@@ -279,10 +234,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	sortRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addStructure, allSicNaic);
 		
 	addSicNaic := JOIN(addStructure, sortRollSicNaic,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																			SELF.SicNaicSources := RIGHT.sources;
 																			SELF := LEFT;),
@@ -295,10 +247,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 															prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, v_city_name, st, zip, zip4);
 	
 	findMatchAddr := JOIN(indata, dedupFirstSeenAddr,
-												LEFT.seq = RIGHT.seq AND
-												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-												LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 												TRANSFORM({BOOLEAN inputAddrMatch, UNSIGNED addressScore, UNSIGNED dateFirstSeen, RECORDOF(LEFT)},
 																	addrScore := DueDiligence.Common.getAddressScore(LEFT.busn_info.address.prim_range,
 																																										LEFT.busn_info.address.prim_name,
@@ -328,23 +277,17 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	//determine if the business has no fein
 	sortFein := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	rollFein := ROLLUP(sortFein, 
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID,
-													TRANSFORM({RECORDOF(sortFein)},
-																		SELF.company_fein := (STRING)MAX((UNSIGNED)LEFT.company_fein, (UNSIGNED)RIGHT.company_fein);
-																		SELF := LEFT;));
+                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                      TRANSFORM({RECORDOF(sortFein)},
+                                SELF.company_fein := (STRING)MAX((UNSIGNED)LEFT.company_fein, (UNSIGNED)RIGHT.company_fein);
+                                SELF := LEFT;));
 																		
 	addNoFein := JOIN(addAddrFirstSeen, rollFein,
-											LEFT.seq = RIGHT.seq AND
-											LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-											LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-											LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-											TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																SELF.NoFein := (UNSIGNED)RIGHT.company_fein = DueDiligence.Constants.NUMERIC_ZERO AND LEFT.busn_info.fein = DueDiligence.Constants.EMPTY;
-																SELF := LEFT;),
-											LEFT OUTER);
+                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                              SELF.NoFein := (UNSIGNED)RIGHT.company_fein = DueDiligence.Constants.NUMERIC_ZERO AND LEFT.busn_info.fein = DueDiligence.Constants.EMPTY;
+                              SELF := LEFT;),
+                    LEFT OUTER);
 											
 	//is the business incorporated in a state with loose incorporation laws
 	projectLooseLaws := PROJECT(busHeaderFilt, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState}, 
@@ -354,19 +297,13 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	
 	rollLooseLaws := ROLLUP(sortLooseLaws,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 													TRANSFORM({RECORDOF(LEFT)},
 																			SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
 																			SELF := LEFT;));
 																			
 	addIncLooseLaws := JOIN(addNoFein, rollLooseLaws,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
 																		SELF := LEFT;),
@@ -377,10 +314,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	nonCreditFirstSeenDedup := DEDUP(nonCreditFrstSeenSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
 	addNonCreditFirstSeen := JOIN(addIncLooseLaws, nonCreditFirstSeenDedup,
-																LEFT.seq = RIGHT.seq AND
-																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+																#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																			SELF.busnHdrDtFirstSeenNonCredit := RIGHT.dt_first_seen;
 																			SELF := LEFT;),
@@ -397,20 +331,14 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	uniquePowsDedup := DEDUP(uniquePowsPro, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
 	addUniquePows := JOIN(addNonCreditFirstSeen, uniquePowsDedup,
-								LEFT.seq = RIGHT.seq AND
-								LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-								LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-								LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-								TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-											SELF.setUniquePowIDs := RIGHT.upows;
-											SELF := LEFT;),
-								LEFT OUTER);
+                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                        TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                              SELF.setUniquePowIDs := RIGHT.upows;
+                              SELF := LEFT;),
+                        LEFT OUTER);
 
 	notFoundInHeader := JOIN(addUniquePows, busHeaderFilt,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 														TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, BOOLEAN notFound},
 																			SELF.seq := LEFT.seq;
 																			SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
@@ -421,10 +349,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 														LEFT ONLY);
 														
 	addNotFound := JOIN(addUniquePows, notFoundInHeader,
-											LEFT.seq = RIGHT.seq AND
-											LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-											LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-											LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+											#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 											TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 														SELF.notFoundInHeader := RIGHT.notFound;
 														SELF := LEFT;),

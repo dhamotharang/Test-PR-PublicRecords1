@@ -24,7 +24,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
   //****Normalize the PartyOffenses within FilterdBEOResults ***//
   
    ListOfExecutivesTitle := NORMALIZE(FilterdBEOResults, LEFT.positions, TRANSFORM(DueDiligence.LayoutsInternalReport.BEOPositionLayout,
-                             /*  then get all of the titles held by this executive   */  																														
+                                                        /*  then get all of the titles held by this executive   */  																														
 																												SELF.seq                    := LEFT.seq;                //*** This is the sequence number of the Inquired Business (or the Parent)
 				                                                SELF.ultid                  := LEFT.ultid;  
 				                                                SELF.orgid                  := LEFT.orgid;  
@@ -40,19 +40,17 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
   
   LatestExecutiveTitles := SORT(ListOfExecutivesTitle, seq, ultid, orgid, seleid, did, -lastSeen);                             															 															
 	DedupExecutiveTitles := ROLLUP(LatestExecutiveTitles,
-                             #EXPAND (DueDiligence.Constants.mac_JOINLinkids_Results())
-                               AND
-                              LEFT.did = RIGHT.did,
-											            TRANSFORM(RECORDOF (LEFT),
-                                    SELF    := LEFT));
+                                  #EXPAND (DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                                  LEFT.did = RIGHT.did,
+                                  TRANSFORM(RECORDOF(LEFT),
+                                            SELF    := LEFT));
   
   // ------                                                                         ------
   // ------      Add the latest title next to the executive Name                    ------
   // ------     And carry the offenses forward                                      ------
   // ------                                                                         ------
    ExecutivesWithTitles := JOIN(FilterdBEOResults, DedupExecutiveTitles,
-                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results())
-                             AND
+                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                             LEFT.did = RIGHT.did,
                             TRANSFORM(RECORDOF(LEFT),
                                       //*** pick up the Title from the RIGHT ***//
@@ -79,44 +77,44 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	// ------                                                                       ------
 	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(ListOfExecutivesAndOffenses le, Integer OffenseCount) := TRANSFORM,
 	                                        SKIP(OffenseCount > iesp.constants.DDRAttributesConst.MaxLegalEvents)         
-																							     SELF.CaseNumber               := le.caseNum;    
-																							     SELF.OffenseScore             := le.offenseScore;
-																								   SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.offenseScore);  
-																									 SELF.OffenseLevel             := le.criminalOffenderLevel;
-																									 SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.criminalOffenderLevel);
-                                                   SELF.Conviction               := le.convictionFlag;
-                                                   SELF.TrafficRelated           := le.trafficFlag;
-                                                   SELF.CourtType                := le.courtType;
-                                                   SELF.CaseTypeDescription      := le.caseTypeDesc; 
-                                                   SELF.ArrestLevelDescription   := le.arr_off_lev_mapped;
-                                                   SELF.CourtStatute             := le.courtStatute;
-                                                   SELF.CourtStatuteDescription  := le.courtStatuteDesc; 
-                                                   SELF.Charge                   := le.Charge;
-                                                   SELF.NumberOfCounts           := le.num_of_counts;  
-                                                   SELF.DispositionDescription1  := le.courtDispDesc1;
-                                                   SELF.DispositionDescription2  := le.courtDispDesc2;
-                                                   SELF.ProbationSentence        := le.sent_probation; 
-                                                   SELF.Incarceration            := MAP(
-                                                                                        le.Ever_incarc_offenders =   'Y'  => TRUE, 
-                                                                                        le.Ever_incarc_offenses  =   'Y'  => TRUE,
-                                                                                        le.Ever_incarc_punishments = 'Y'  => TRUE, 
-                                                                                                                             FALSE);  
-                                                   SELF.CurrentIncarceration     := MAP(
-                                                                                        le.Curr_incarc_offenders = 'Y'    => TRUE,
-                                                                                        le.Curr_incarc_offenses  = 'Y'    => TRUE,
-                                                                                        le.Curr_incarc_punishments = 'Y'  => TRUE, 
-                                                                                                                             FALSE);
-                                                   SELF.CurrentParole            := IF(le.Curr_parole_flag = 'Y', TRUE, FALSE);
-                                                   SELF.CurrentProbation         := FALSE;
-                                                   SELF.EarliestOffenseDate.Year := (Integer)le.earliestOffenseDate[1..4];
-                                                   SELF.EarliestOffenseDate.Month := (Integer)le.earliestOffenseDate[5..6];
-                                                   SELF.EarliestOffenseDate.Day  := (Integer)le.earliestOffenseDate[7..8];
+         SELF.CaseNumber               := le.caseNum;    
+         SELF.OffenseScore             := le.offenseScore;
+         SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.offenseScore);  
+         SELF.OffenseLevel             := le.criminalOffenderLevel;
+         SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.criminalOffenderLevel);
+         SELF.Conviction               := le.convictionFlag;
+         SELF.TrafficRelated           := le.trafficFlag;
+         SELF.CourtType                := le.courtType;
+         SELF.CaseTypeDescription      := le.caseTypeDesc; 
+         SELF.ArrestLevelDescription   := le.arr_off_lev_mapped;
+         SELF.CourtStatute             := le.courtStatute;
+         SELF.CourtStatuteDescription  := le.courtStatuteDesc; 
+         SELF.Charge                   := le.Charge;
+         SELF.NumberOfCounts           := le.num_of_counts;  
+         SELF.DispositionDescription1  := le.courtDispDesc1;
+         SELF.DispositionDescription2  := le.courtDispDesc2;
+         SELF.ProbationSentence        := le.sent_probation; 
+         SELF.Incarceration            := MAP(
+                                              le.Ever_incarc_offenders =   'Y'  => TRUE, 
+                                              le.Ever_incarc_offenses  =   'Y'  => TRUE,
+                                              le.Ever_incarc_punishments = 'Y'  => TRUE, 
+                                                                                   FALSE);  
+         SELF.CurrentIncarceration     := MAP(
+                                              le.Curr_incarc_offenders = 'Y'    => TRUE,
+                                              le.Curr_incarc_offenses  = 'Y'    => TRUE,
+                                              le.Curr_incarc_punishments = 'Y'  => TRUE, 
+                                                                                   FALSE);
+         SELF.CurrentParole            := IF(le.Curr_parole_flag = 'Y', TRUE, FALSE);
+         SELF.CurrentProbation         := FALSE;
+         SELF.EarliestOffenseDate.Year := (Integer)le.earliestOffenseDate[1..4];
+         SELF.EarliestOffenseDate.Month := (Integer)le.earliestOffenseDate[5..6];
+         SELF.EarliestOffenseDate.Day  := (Integer)le.earliestOffenseDate[7..8];
 
-                                                   SELF.OffenseDate.Year         := (Integer)le.offenseDate[1..4];
-                                                   SELF.OffenseDate.Month        := (Integer)le.offenseDate[5..6];
-                                                   SELF.OffenseDate.Day          := (Integer)le.offenseDate[7..8];
-			                                             SELF                          := [];
-																               END;  
+         SELF.OffenseDate.Year         := (Integer)le.offenseDate[1..4];
+         SELF.OffenseDate.Month        := (Integer)le.offenseDate[5..6];
+         SELF.OffenseDate.Day          := (Integer)le.offenseDate[7..8];
+         SELF                          := [];
+	END;  
 	 
 	  
   BusExecCriminalChildDataset  :=   
@@ -155,20 +153,20 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
           SELF.BusExecCriminalChild   := PROJECT(LEFT, FormatTheListOfOffenses(LEFT, COUNTER)))); 
 				       
     																
-	 // /* perform the ROLLUP by LINKID And DID                                   */   															 															
-	RollupCriminalOffense := ROLLUP(BusExecCriminalChildDataset,
-                                  #EXPAND (DueDiligence.Constants.mac_JOINLinkids_Results())
-                                  AND
+	//perform the ROLLUP by LINKID And DID
+  sortCrimOffense := SORT(BusExecCriminalChildDataset, seq, ultid, orgid, seleid, did);
+	RollupCriminalOffense := ROLLUP(sortCrimOffense,
+                                  #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                                   LEFT.did = RIGHT.did,
 											            TRANSFORM(RECORDOF (LEFT),
-                                    SELF.BusExecCriminalChild  := LEFT.BusExecCriminalChild  + RIGHT.BusExecCriminalChild,
-                                    SELF                       := LEFT));
+                                            SELF.BusExecCriminalChild  := LEFT.BusExecCriminalChild  + RIGHT.BusExecCriminalChild,
+                                            SELF                       := LEFT));
                                     
   BEOExecutiveCriminalEvents  := PROJECT(RollupCriminalOffense,
-                                  // *  Create a dataset of Executives and a child dataset of offenses for this BEO  //
-                                 TRANSFORM({DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents) CriminalActivity, UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID},
-                                  // *  Create a dataset of criminal activity that can be in moved as entire block to the report *//   
-                                    SELF.CriminalActivity  := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents,
+                                        // *  Create a dataset of Executives and a child dataset of offenses for this BEO  //
+                                        TRANSFORM({DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents) CriminalActivity, UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID},
+                                                  // *  Create a dataset of criminal activity that can be in moved as entire block to the report *//   
+                                                  SELF.CriminalActivity  := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents,
                                                               /* First move the DataSet of Criminal Offenses for this Executive */ 
                                                                  SELF.CriminalEvents         := LEFT.BusExecCriminalChild,
                                                               /* Now move the Name and Address of each Executive with criminal history */
@@ -198,38 +196,34 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                                  SELF.ExecTitle                               := LEFT.ExecTitle,
                                                                  SELF                                         := LEFT, 
                                                                  SELF                                         := [])]),
-                                    /* continue to populate the LINK IDs */  
-                                    SELF                        := LEFT;
-                                    SELF                        := []));  
+                                                  /* continue to populate the LINK IDs */  
+                                                  SELF                        := LEFT;
+                                                  SELF                        := []));  
 			
-			
-	
-	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
-	  DueDiligence.Layouts.Busn_Internal CreateNestedData(InputBusnCriminal le, BEOExecutiveCriminalEvents ri, Integer BLCount) := TRANSFORM
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfEvictions                 := le.Business.evictionsCnt;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens            := le.Business.liensUnreleasedCnt;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyConvictions         := le.BusFelonyConviction_4F;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyNonConvictions      := le.BusFelonyNonConviction_3F;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorConvictions    := le.BusMisdemeanorConviction_4M;  
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorNonConcivtions := le.BusMisdemeanorNonConviction_3M;  
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficConvictions        := le.BusTrafficConvictions_2T;
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownConvictions        := le.BusUnknownConviction_4U; 
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownNonConvictions     := le.BusUnknownNonConviction_3U; 
-       //*** need to add logic in the getIndCriminal ***  They were not used in the attribute so they were overlooked ***
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficNonConvictions     := 0;    //***we did not collect this information ***// 
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionConvictions     := 0;    //***we did not collect this information   
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := 0;    //***we did not collec this information
-     
-       //*** This is now moving the Criminal Activity which is a DATASET of Executive and each Executive contains a DATASET of criminal offenses  **//
-       SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents      := le.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents  + ri.CriminalActivity;
-       //SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents     := ri.BusExecCriminalChild;
-       SELF := le;
-  END; 
+
 																	
-	 /* perform the DENORMALIZE (join) by Link ID                                 */   															 															
+	/* perform the DENORMALIZE (join) by Link ID                                 */   															 															
 	UpdateBusnExecsCriminalWithReport := DENORMALIZE(InputBusnCriminal, BEOExecutiveCriminalEvents,
-	                                            #EXPAND (DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
-											                                 CreateNestedData(Left, Right, Counter));  
+                                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                                                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfEvictions                 := LEFT.Business.evictionsCnt;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfJudgmentsLiens            := LEFT.Business.liensUnreleasedCnt;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyConvictions         := LEFT.BusFelonyConviction_4F;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfFelonyNonConvictions      := LEFT.BusFelonyNonConviction_3F;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorConvictions    := LEFT.BusMisdemeanorConviction_4M;  
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfMisdemeanorNonConcivtions := LEFT.BusMisdemeanorNonConviction_3M;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownConvictions        := LEFT.BusUnknownConviction_4U; 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfUnknownNonConvictions     := LEFT.BusUnknownNonConviction_3U;
+                                                                 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficConvictions        := LEFT.BusTrafficConviction_2T;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfTrafficNonConvictions     := LEFT.BusTrafficNonConviction_1T;
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionConvictions     := LEFT.BusInfractionConviction_2I; 
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := LEFT.BusInfractionNonConviction_1I;
+                                                             
+                                                               //*** This is now moving the Criminal Activity which is a DATASET of Executive and each Executive contains a DATASET of criminal offenses  **//
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents      := LEFT.BusinessReport.BusinessAttributeDetails.Legal.PossibleLegalEvents  + RIGHT.CriminalActivity;
+                                                               
+                                                               SELF := LEFT;));  
 		
 	
 	// ********************
@@ -247,7 +241,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	  IF(DebugMode,     OUTPUT(CHOOSEN(RollupCriminalOffense,                   100),  NAMED('RollupCriminalOffense')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(BEOExecutiveCriminalEvents,              100),  NAMED('BEOExecutiveCriminalEvents')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusnExecsCriminalWithReport,       100),  NAMED('UpdateBusnExecsCriminalWithReport')));
-	 
+
 	 
 		Return UpdateBusnExecsCriminalWithReport;
 		

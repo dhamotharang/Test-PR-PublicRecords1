@@ -1,8 +1,8 @@
-﻿IMPORT DueDiligence, iesp;
+﻿IMPORT Census_Data, codes, DueDiligence, iesp;
 
 EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
 
-		projectESPBusInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.duediligencebusinessreport.t_DDRBusinessInformation},
+		projectESPBusInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.duediligencebusinessreport.t_DDRBusinessInformation, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
 																										SELF.seq := LEFT.seq;
 																										SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
 																										SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
@@ -45,21 +45,27 @@ EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
                                                                                                                   SELF.PostalCode := LEFT.zip5 + LEFT.zip4;
                                                                                                                   SELF.StateCityZip := LEFT.state + TRIM(LEFT.city) + LEFT.zip5;
                                                                                                                   SELF := [];));
+                                                                                                                  
+                                                    SELF.bestFipsCode := codes.st2FipsCode(StringLib.StringToUpperCase(LEFT.busn_info.address.state)) + LEFT.busn_info.address.county;
+                                                    SELF.bestState := LEFT.busn_info.address.state;
 																										SELF := [];));
 																																																	
-																																																	
-		addBusInfo := 	JOIN(inData, projectESPBusInfo,
-                          LEFT.seq = RIGHT.seq AND
-                          LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
-                          LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
-                          LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.seleID,
+		
+    
+    Census_Data.MAC_Fips2County_Keyed(projectESPBusInfo, bestState, bestFipsCode, bestCounty, bestWithCounty);
+    
+    
+		addBusInfo := 	JOIN(inData, bestWithCounty,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                           TRANSFORM(DueDiligence.layouts.Busn_Internal,
-                                    SELF.businessReport.businessInformation := RIGHT;
+                                    SELF.businessReport.businessInformation.bestAddress.county := RIGHT.bestCounty;
+                                    SELF.businessReport.businessInformation := RIGHT;                                   
                                     SELF := LEFT;));
 
 
 
 		// OUTPUT(projectESPBusInfo, NAMED('projectESPBusInfo'));
+		// OUTPUT(bestWithCounty, NAMED('bestWithCounty'));
 		// OUTPUT(addBusInfo, NAMED('addBusInfo'));
 
 		RETURN addBusInfo;

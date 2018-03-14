@@ -36,10 +36,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 
 	//**********************roll the BEO legal info up to inquired business  		
 	rolledExecutiveCriminalOffense := ROLLUP(SORT(getBEOLegalEventType, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
-																						LEFT.seq = RIGHT.seq AND
-																						LEFT.ultID = RIGHT.ultID AND
-																						LEFT.orgID = RIGHT.orgID AND
-																						LEFT.seleID = RIGHT.seleID,
+																						#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 																						TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
 																											//rollup to the business for the state criminal data of the BEOs
 																											SELF.party.EverIncarcer                       := LEFT.party.EverIncarcer OR RIGHT.party.EverIncarcer;
@@ -87,6 +84,9 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                       //rollup to the business the counts of state crimial and trafic ever of the BEOs
                                                       SELF.party.ConvictedTraffic2T_Ever := LEFT.party.ConvictedTraffic2T_Ever + RIGHT.party.ConvictedTraffic2T_Ever;
                                                       SELF.party.ConvictedInfractions2I_Ever := LEFT.party.ConvictedInfractions2I_Ever + RIGHT.party.ConvictedInfractions2I_Ever;
+                                                      
+                                                      SELF.party.NonConvictedTraffic1T_Ever := LEFT.party.NonConvictedTraffic1T_Ever + RIGHT.party.NonConvictedTraffic1T_Ever;
+                                                      SELF.party.NonConvictedInfraction1I_Ever := LEFT.party.NonConvictedInfraction1I_Ever + RIGHT.party.NonConvictedInfraction1I_Ever;
 
                                                       SELF.party.ConvictedFelonyCount4F_Ever := LEFT.party.ConvictedFelonyCount4F_Ever + RIGHT.party.ConvictedFelonyCount4F_Ever;
                                                       SELF.party.ConvictedUnknownCount4U_Ever := LEFT.party.ConvictedUnknownCount4U_Ever + RIGHT.party.ConvictedUnknownCount4U_Ever;
@@ -107,10 +107,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																											SELF := LEFT;));
 	
 	UpdateBusnWithEvidenceOfCrim := JOIN(UpdateBusnExecsWithDerog, rolledExecutiveCriminalOffense,
-																				LEFT.seq = RIGHT.seq AND
-																				LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																				LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																				LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
+																				#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																				TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																								  //***************************************************************************************************
 																									/* These are all of the evidence flags used in the CRIMINAL ATTRIBUTE  */ 
@@ -151,7 +148,10 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                   SELF.BusMisdemeanorNonConviction_3M := RIGHT.party.NonConvictedMisdemeanorCount3M_EVER;
                                                   SELF.BusUnknownConviction_4U := RIGHT.party.ConvictedUnknownCount4U_Ever;
                                                   SELF.BusUnknownNonConviction_3U := RIGHT.party.NonConvictedUnknownCount3U_EVER;
-                                                  SELF.BusTrafficConvictions_2T := RIGHT.party.ConvictedTraffic2T_Ever;
+                                                  SELF.BusTrafficConviction_2T := RIGHT.party.ConvictedTraffic2T_Ever;
+                                                  SELF.BusTrafficNonConviction_1T := RIGHT.party.NonConvictedTraffic1T_Ever; 
+                                                  SELF.BusInfractionConviction_2I := RIGHT.party.ConvictedInfractions2I_Ever;
+                                                  SELF.BusInfractionNonConviction_1I := RIGHT.party.NonConvictedInfraction1I_Ever;
 																										
 																									//legal event type
                                                   SELF.atleastOneBEOInCategory9 := RIGHT.party.legalEventTypeFlags[1] = DueDiligence.Constants.T_INDICATOR;

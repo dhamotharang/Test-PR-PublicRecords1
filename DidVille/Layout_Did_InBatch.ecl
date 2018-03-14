@@ -1,4 +1,4 @@
-export Layout_Did_InBatch := record
+﻿export Layout_Did_InBatch := record
     unsigned4 seq;
 	qSTRING9  ssn;
 	qSTRING8  dob;
@@ -20,4 +20,6 @@ export Layout_Did_InBatch := record
 	qSTRING5  z5;
 	qSTRING4  zip4;
   QSTRING120 email:='';  
+	qSTRING25 dl_nbr:=''; 	
+	qSTRING2  dl_state:='';
   end;

@@ -1,7 +1,7 @@
 ﻿// EXPORT Runway_Macro_Join_Cert := 'todo';
 EXPORT Runway_Macro_Join_Cert(dt) := functionmacro
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, zz_Koubsky, Scoring_Project_Macros, ut, zz_bbraaten2;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT,  Scoring_Project_Macros, ut;
 
 // Test settings
 unsigned8 records_ToRun := 50000;

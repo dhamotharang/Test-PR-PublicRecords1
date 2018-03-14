@@ -1,4 +1,4 @@
-Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
+﻿Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
 EXPORT Customer_License_Search_Records := module
 	Shared myLayouts := Healthcare_Services.Customer_License_Search_Layouts;
 	Shared myConst := Healthcare_Services.Customer_License_Search_Constants;
@@ -77,8 +77,8 @@ EXPORT Customer_License_Search_Records := module
 	end;
 	//Search By License or License+State and apply a name only penalty as the addresses are likely out of date.
 	Export get_recs_by_License (dataset(myLayouts.autokeyInput) input):= function
-		rawData:= dedup(sort(join(input, MMCP.Keys().LicenseNumber.qa,
-																	 Keyed(left.License_Number=right.License_Number) and 
+    		rawData:= dedup(sort(join(input, MMCP.Keys().LicenseNumber.qa,
+																	 Keyed( left.License_Number =right.License_Number) and 
 																	 (integer)left.CustomerID=right.customer_id,
 																	 transform(myLayouts.LayoutOutput,self.acctno:=left.acctno;self:=right,self:=[]),
 																	 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record);
@@ -167,9 +167,26 @@ EXPORT Customer_License_Search_Records := module
 		final := sort(dedupBestRecords,(integer)acctno,penalt,License_Number);
 		return final;
 	End;
-
+	
+	
+	EXPORT NonAlphaNumChar	:= '[^A-Za-z0-9]';
+	EXPORT setBogusLicense := ['390200000X','WC1','35NULL','34NULL','LARN00000',
+	                           'INPROCESS','NOTAPPLICABLE','APPLIEDFOR','PENDING',
+	                           '0','00','000','0000','00000','000000','0000000','00000000','000000000',
+														 'NOLICNUMBER','NR','NULL','NA','NONE',
+														 'TEMPORARY','STUDENT','UNKNOWN','TEMP','RESIDENT','OPT'];
+														 
+EXPORT CleanLicenseNumber(STRING lic_in) := FUNCTION
+		toUpper						:= TRIM(StringLib.StringToUpperCase(lic_in), ALL);
+		removeNonAlphaNum := REGEXREPLACE(NonAlphaNumChar, toUpper, '');
+		RETURN IF(removeNonAlphaNum IN setBogusLicense, '', removeNonAlphaNum);
+	END;
+	
 	Export RecordsBatch(dataset(myLayouts.autokeyInput) inRecs, unsigned2 maxPenalty) := function
-		recs := Records(inRecs,maxPenalty);
+   	clean_in_recs:=	project(inRecs,transform(myLayouts.autokeyInput,
+		                                    self.license_number:=CleanLicenseNumber(left.license_number);
+		                                    self:=left;));
+		recs := Records(clean_in_recs,maxPenalty);
 		recs_fmt := project(recs,transform(myLayouts.LayoutOutput_batch, 
 															self.cln_fname:=left.clean_name.fname;
 															self.cln_mname:=left.clean_name.mname;
@@ -186,6 +203,6 @@ EXPORT Customer_License_Search_Records := module
 															self.cln_st:=left.clean_company_address.st;
 															self.cln_zip:=left.clean_company_address.zip;
 															self:=left;));
-		return recs_fmt;
+ 	return recs_fmt;
 	End;
 end;

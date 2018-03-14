@@ -19,6 +19,12 @@
 	END;	
 	
 	EXPORT UseCaseValues := ['OTPCFD','IdentityFraud','TCPA','GeoLocation'];
+		EXPORT STRING INVALID := 'Invalid';
+		EXPORT STRING LOW := 'Low';
+		EXPORT STRING UNDETERMINED := 'Undetermined';		
+		EXPORT STRING MEDIUM := 'Medium';
+		EXPORT STRING MEDIUM_HIGH := 'Medium High';
+		EXPORT STRING HIGH := 'High';	
 	EXPORT Ownership := MODULE
 		EXPORT STRING INVALID := 'Invalid';
 		EXPORT STRING LOW := 'Low';
@@ -28,12 +34,18 @@
 		EXPORT STRING HIGH := 'High';	
 		EXPORT enumIndex := ENUM(INVALID=0,LOW,UNDETERMINED,MEDIUM,MEDIUM_HIGH,HIGH);	
 	END;		
+	EXPORT NameMatch := MODULE
+		EXPORT UNSIGNED FIRSTLAST := 2;
+		EXPORT UNSIGNED PARTIAL := 1;
+		EXPORT UNSIGNED NONE := 0;
+	END;
 	EXPORT Relationship := MODULE
 		EXPORT STRING EMPLOYER := 'Possible Employer';
 		EXPORT STRING BUSINESS := 'Possible Business Affliation';
 		EXPORT STRING SUBJECT  := 'Possible Subject';
 		EXPORT STRING RELATIVE := 'Possible Relative';
 		EXPORT STRING NONE 		 := 'No Relationship Found';
+		EXPORT STRING NO_IDENTITY := 'Owner Identity Unavailable ';
 		EXPORT STRING INVALID  := 'Number Invalid';
 	END;	
 	EXPORT BUSINESS_RELATIONS := [Relationship.EMPLOYER,Relationship.BUSINESS];
@@ -59,7 +71,7 @@
 	// Debug
 	EXPORT Debug :=
 	MODULE
-		EXPORT Main := FALSE;
+		EXPORT Main := FALSE; 
 		EXPORT REAB := FALSE;
 	END;
 
