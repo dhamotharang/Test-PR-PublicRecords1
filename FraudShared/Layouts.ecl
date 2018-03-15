@@ -338,7 +338,7 @@ export Main         :=
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	unsigned8 				Household_ID;
+	string20 					Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -354,7 +354,7 @@ export Main         :=
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -419,7 +419,7 @@ export Main         :=
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string10					MAC_Address;
+	string25					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
@@ -533,7 +533,7 @@ export keybuild
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	unsigned8 				Household_ID;
+	string20 					Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -549,7 +549,7 @@ export keybuild
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -614,7 +614,7 @@ export keybuild
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string10					MAC_Address;
+	string25					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
