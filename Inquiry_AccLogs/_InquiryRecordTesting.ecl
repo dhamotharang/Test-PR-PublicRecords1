@@ -75,6 +75,7 @@ export WatchDog_PersonData(set of string pVertical = [''], set of string pIndust
 
 wu_ := if(paramwu_ <> '', paramwu_, workunit);
 
+// added inquiry_acclogs.Key_Inquiry_DID_Update to the input 
 filtDates := (PULL(inquiry_acclogs.Key_Inquiry_DID) + pull(inquiry_acclogs.Key_Inquiry_DID_Update)) (search_info.datetime[1..8] between start_date and end_date);
 
 filtADL := filtdates(person_q.appended_adl > 0);
