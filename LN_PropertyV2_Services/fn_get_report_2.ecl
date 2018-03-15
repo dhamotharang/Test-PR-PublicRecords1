@@ -1,4 +1,4 @@
-IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra;
+﻿IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
 l_fid		:= LN_PropertyV2_Services.layouts.fid;
@@ -51,7 +51,7 @@ export dataset(l_out) fn_get_report_2(
 	// Apply suppression.
 	fids2_roxie := 
 		JOIN(
-			fids1, suppress.Key_New_Suppression, 
+			fids1, suppress.Key_New_Suppression(), 
 			keyed(right.product in suppress_set) and
 			keyed(right.linking_type = '') and keyed (right.Linking_ID = '') and
 			keyed(right.document_type = Suppress.Constants.DocTypes.FaresID) and
@@ -68,7 +68,7 @@ export dataset(l_out) fn_get_report_2(
 	// Suppress records (fids) and parties based on DID and SSN
 	suppressed_dids := 
 		JOIN(
-			parties_extraRaw, suppress.Key_New_Suppression,
+			parties_extraRaw, suppress.Key_New_Suppression(),
 			// prevent suppressing records where IDs are blank or contain zeros only
 			((integer) left.did != 0) and
 			keyed(right.product in suppress_set) and
@@ -91,7 +91,7 @@ export dataset(l_out) fn_get_report_2(
 
 	suppressed_ssns := 
 		JOIN(
-			parties_extraRaw, suppress.Key_New_Suppression,
+			parties_extraRaw, suppress.Key_New_Suppression(),
 			// prevent suppressing records where IDs are blank or contain zeros only
 			((integer) left.app_ssn != 0) and
 			keyed(right.product in suppress_set) and
