@@ -3,7 +3,6 @@
 /*
 	Following Keys being used:
 			Corp2.Key_LinkIDs.Corp.kfetch2
-			Corp2.keys().cont.CorpKey.qa
 */
 
 EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
@@ -257,25 +256,29 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											
 	addAgents := DueDiligence.CommonBusiness.AddAgents(projectSosAgent, addIncLooseLaws); 			
 	
-  // ------                                                                                    ------   
-	 // ------ START BUILDING SECTIONS of the REPORT  - pass a slimmed down version of the        ------
-	 // ------ of the corpFilingsFilt                                                             ------
-	 // ------                                                                                    ------ 
- BusSOSFilingsSlim   := PROJECT (corpFilingsFilt, TRANSFORM(DueDiligence.LayoutsInternalReport.BusCorpFilingsSlimLayout,
-                                 SELF.BusinessName        := LEFT.corp_legal_name;
-																                 SELF.FilingType          := LEFT.corp_filing_desc;
-																								         SELF.FilingStatus        := LEFT.corp_status_desc; 
-																												     SELF.FilingDate          := LEFT.corp_filing_date;                    //*** Zeros if the business was not file with Sec. Of State (SOS).
-																												  SELF.IncorporationDate := (INTEGER)LEFT.corp_inc_date;
-																														   SELF.FilingNumber        := LEFT.corp_filing_reference_nbr;
-																															  SELF.IncorporationState  := LEFT.corp_inc_state;
-																																 SELF.LastSeenDate        := IF(LEFT.dt_last_seen > 0, LEFT.dt_last_seen, LEFT.dt_vendor_last_reported);      //**** This dt_last_seen has been cleaned
-																															  SELF                     := LEFT;));   
+
+  // ------ START BUILDING SECTIONS of the REPORT  - pass a slimmed down version of the corpFilingsFilt
+  busSOSFilingsSlim   := PROJECT(corpFilingsFilt, TRANSFORM(DueDiligence.LayoutsInternalReport.BusCorpFilingsSlimLayout,
+                                                             corpStatusDescUC := STD.Str.ToUpperCase(LEFT.corp_status_desc);
+                                                             tempActiveFilingStatus := MAP(business_header.is_ActiveCorp(LEFT.record_type, LEFT.corp_status_cd, LEFT.corp_status_desc) => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                                                                                           STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                                                                                           DueDiligence.Constants.COPR_STATUS_OTHER);
+                                                                                           
+                                                             SELF.isActive            := tempActiveFilingStatus = DueDiligence.Constants.CORP_STATUS_ACTIVE;                             
+                                                             SELF.BusinessName        := LEFT.corp_legal_name;
+                                                             SELF.FilingType          := LEFT.corp_filing_desc;
+                                                             SELF.FilingStatus        := LEFT.corp_status_desc; 
+                                                             SELF.FilingDate          := LEFT.corp_filing_date;   //*** Zeros if the business was not file with Sec. Of State (SOS).
+                                                             SELF.IncorporationDate := (INTEGER)LEFT.corp_inc_date;
+                                                             SELF.FilingNumber        := LEFT.corp_filing_reference_nbr;
+                                                             SELF.IncorporationState  := LEFT.corp_inc_state;
+                                                             SELF.LastSeenDate        := IF(LEFT.dt_last_seen > 0, LEFT.dt_last_seen, LEFT.dt_vendor_last_reported);      //**** This dt_last_seen has been cleaned
+                                                             SELF                     := LEFT;));   
  
-	UpdateBusnSOSWithReport  := IF(includeReportData, 
-	                                     DueDiligence.reportBusSOSFilings(addAgents, BusSOSFilingsSlim),   
-																			             /* ELSE */ 
-																			                   addAgents); 
+	updateBusnSOSWithReport  := IF(includeReportData, 
+                                   DueDiligence.reportBusSOSFilings(addAgents, busSOSFilingsSlim),   
+                                   /* ELSE */ 
+                                   addAgents); 
 	
 	
 
@@ -284,7 +287,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(allBusinesses, NAMED('allBusinesses'));
 	// OUTPUT(corpFilingsRaw, NAMED('corpFilingsRaw'));
 	// OUTPUT(corpFilingsSeq, NAMED('corpFilingsSeq'));
-	//OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
+	// OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
 
 	// OUTPUT(incDateSort, NAMED('incDateSort'));
 	// OUTPUT(incDateDedup, NAMED('incDateDedup'));
@@ -294,7 +297,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
 	
 	
-	//OUTPUT(projectDates, NAMED('projectDates'));
+	// OUTPUT(projectDates, NAMED('projectDates'));
 	// OUTPUT(lastSeenSort, NAMED('lastSeenSort'));
 	// OUTPUT(rollLastSeen, NAMED('rollLastSeen'));
 	// OUTPUT(addSosStatusDates, NAMED('addSosStatusDates'));
@@ -309,12 +312,11 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	// OUTPUT(addAgents, NAMED('addAgentsSOS'));
 	
-	//OUTPUT(BusSOSFilingsSlim, NAMED('BusSOSFilingsSlim'));
-	//OUTPUT(UpdateBusnSOSWithReport, NAMED('UpdateBusnSOSWithReport'));
-	
+	// OUTPUT(busSOSFilingsSlim, NAMED('busSOSFilingsSlim'));
+	// OUTPUT(updateBusnSOSWithReport, NAMED('updateBusnSOSWithReport'));	
 	
 		
-	RETURN UpdateBusnSOSWithReport;
+	RETURN updateBusnSOSWithReport;
 END;
 
 
