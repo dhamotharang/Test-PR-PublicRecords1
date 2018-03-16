@@ -1,4 +1,4 @@
-﻿import _control, std, ut;
+import _control, std, ut;
 
 EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
 
@@ -22,7 +22,7 @@ EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
 																																																						'~thor_data400::base::phones::disconnect_gh_main_delete'], '~thor_data400::base::phones::disconnect_gh_main_'+version, true);																						
 
 //Send Build Status	
-	emailProduct							:= ';jeffery.dix@lexisnexisrisk.com; barbara.gress@lexisnexisrisk.com; tracy.l.smith@lexisnexisrisk.com';
+	emailProduct							:= ';jeffrey.dix@lexisnexisrisk.com; barbara.gress@lexisnexisrisk.com; tracy.l.smith@lexisnexisrisk.com';
 	emailDOps										:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
 	emailDev											:= ';judy.tao@lexisnexisrisk.com';
 	
