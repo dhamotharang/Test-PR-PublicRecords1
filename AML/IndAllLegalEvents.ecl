@@ -1,4 +1,4 @@
-Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std;
+﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std;
 
 
 
@@ -316,8 +316,22 @@ CriminalLayout  rollCrimCounts(CrimCountSort le, CrimCountSort ri) := TRANSFORM
 	
 	SELF := le;
 END;
+
+rollCrimCaseNum := ROLLUP(CrimCountSort,
+													LEFT.seq = RIGHT.seq AND
+													LEFT.origdid = RIGHT.origdid AND
+													LEFT.did = RIGHT.did AND
+													LEFT.crim_case_num = RIGHT.crim_case_num,
+													TRANSFORM(RECORDOF(LEFT),
+																		SELF.FelonyCount3yr := (INTEGER)(LEFT.FelonyCount3yr > 0 or RIGHT.FelonyCount3yr > 0);
+																		SELF.FelonyCount := (INTEGER)(LEFT.FelonyCount > 0 or RIGHT.FelonyCount > 0);
+																		SELF.FelonyCount1yr := (INTEGER)(LEFT.FelonyCount1yr > 0 or RIGHT.FelonyCount1yr > 0);
+																		SELF.nonfelonycriminalCount := (INTEGER)(LEFT.nonfelonycriminalCount > 0 or RIGHT.nonfelonycriminalCount > 0);
+																		SELF.nonfelonycriminalcount12 := (INTEGER)(LEFT.nonfelonycriminalcount12 > 0 or RIGHT.nonfelonycriminalcount12 > 0);
+																		SELF.earliest_offense_date := if(LEFT.earliest_offense_date > RIGHT.earliest_offense_date, LEFT.earliest_offense_date, RIGHT.earliest_offense_date);
+																		SELF := LEFT;));
 							
-rolledCrimCounts :=  rollup(CrimCountSort, left.seq = right.seq and left.origdid = right.origdid and left.did = right.did,
+rolledCrimCounts :=  rollup(rollCrimCaseNum, left.seq = right.seq and left.origdid = right.origdid and left.did = right.did,
 														rollCrimCounts(left,right));				
 							
 AddCrimcounts := join(addCurrIncar, rolledCrimCounts, 
@@ -460,6 +474,7 @@ AddLiens := join(AddCrimcounts, liens_rolled,
 // output(addCurrIncar, named('addCurrIncarAML'), overwrite);
 // output(CrimCounts, named('CrimCountsAML'), overwrite, all);
 // output(CrimCountSort, named('CrimCountSort'), overwrite, all);
+// output(rollCrimCaseNum, named('rollCrimCaseNum'), overwrite, all);
 // output(rolledCrimCounts, named('rolledCrimCounts'), overwrite);
 // output(AddCrimcounts, named('AddCrimcounts'), overwrite);
 // output(liens_added, named('liens_added'), overwrite);
