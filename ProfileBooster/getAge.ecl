@@ -1,10 +1,10 @@
-IMPORT Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
+﻿IMPORT Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
 
 EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onThor) := FUNCTION
 
 //search header by DID to pick up DOB and calculate age and also append HHID to each rec	
 	ProfileBooster.Layouts.Layout_PB_Slim_header getHeader(PBslim le, Doxie.Key_Header ri) := transform
-		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob));
+		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
 		self.age						:= age;		
 		self.HHID						:= ri.HHID;
 		self.dt_first_seen	:= ri.dt_first_seen;
@@ -29,7 +29,8 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 	withHeader := if(onThor, withHeader_thor, withHeader_roxie);
 
 	ProfileBooster.Layouts.Layout_PB_Slim_header getQHeader(PBslim le, header_quick.key_DID ri) := transform
-		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob));
+		// age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob));
+		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
 		self.age						:= age;				
 		self.HHID						:= 0;	//quick header does not have HHID so just default to 0	
 		self.dt_first_seen	:= ri.dt_first_seen;

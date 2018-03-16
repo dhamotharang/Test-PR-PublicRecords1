@@ -25,8 +25,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.did 		:= (integer)l.LexId;
 		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
 		self.seq 		:= l.seq;
-		validdate 	:= Doxie.DOBTools((l.HistoryDate * 100) + 1).IsValidDOB; //expand to YYYYMMDD format by tacking on 01 as day
-		self.historydate := if(not validdate, (integer)todaysdate[1..6], (integer)l.HistoryDate); 
+		self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
 		self.ssn 		:= l.ssn;
 		dob_val 		:= riskwise.cleandob(l.dob);
 		dob 				:= dob_val;
@@ -107,9 +106,9 @@ AID.MacAppendFromRaw_2Line(	aid_prepped,
 Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := TRANSFORM
 		self.did 		:= (integer)l.LexId;
 		self.score := if((integer)l.lexid<>0, 100, 0);  // hard code the DID score if DID is passed in on input
-		self.seq 		:= l.seq;
-		validdate 	:= Doxie.DOBTools((l.HistoryDate * 100) + 1).IsValidDOB; //expand to YYYYMMDD format by tacking on 01 as day
-		self.historydate := if(not validdate, (integer)todaysdate[1..6], (integer)l.HistoryDate); 
+		self.seq 		:= l.seq;   
+    self.HistoryDate 	:= if(l.historydate=0, risk_indicators.iid_constants.default_history_date, l.HistoryDate);
+
 		self.ssn 		:= l.ssn;
 		dob_val 		:= riskwise.cleandob(l.dob);
 		dob 				:= dob_val;
@@ -248,7 +247,8 @@ donotmail_key := dma.key_DNM_Name_Address;
 		self.marital_status	:= ri.marital_status;
 		self.gender					:= ri.gender;
 		self.DOB						:= if(le.DOB = '', ri.DOB, le.DOB);
-		self.ProspectAge		:= if(le.ProspectAge <> 0, le.ProspectAge, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.DOB));
+    historydate := risk_indicators.iid_constants.myGetDate(le.historydate)[1..6]; 
+		self.ProspectAge		:= if(le.ProspectAge <> 0, le.ProspectAge, risk_indicators.years_apart((unsigned)HistoryDate, (unsigned)ri.DOB));
 		self 								:= le;
 	END;
 	
@@ -413,7 +413,7 @@ end;
 		
 	dedupHH 	 	:= dedup(sort(ageRecs(rec_type=ProfileBooster.Constants.recType.Relative), seq, HHID), seq, HHID); 
 
-	tRelaHHcnt 	:= table(dedupHH, {seq, HHID, RelaHHcnt := count(group)}, seq); //count number of unique HHIDs within relative recs
+	tRelaHHcnt 	:= table(dedupHH, {seq, RelaHHcnt := count(group)}, seq); //count number of unique HHIDs within relative recs
 	tRelaIncome := table(ageRecs(rec_type=ProfileBooster.Constants.recType.Relative and med_hhinc <> 0), {seq, RelaIncome := ave(group, med_hhinc)}, seq);
 	
 	withAge := join(uniqueDIDs, ageRecs,  
@@ -445,8 +445,8 @@ end;
 												left.seq = right.seq and
 												left.did2 = right.did2,
 												transform(ProfileBooster.Layouts.Layout_PB_Shell,
-																	within4Years											:= right.student_college_code = '4' and ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.student_date_first_seen,true) < 49;
-																	within2Years											:= right.student_college_code = '2' and ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.student_date_first_seen,true) < 25;
+																	within4Years											:= right.student_college_code = '4' and ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.student_date_first_seen,true) < 49;
+																	within2Years											:= right.student_college_code = '2' and ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.student_date_first_seen,true) < 25;
 																	self.ProspectCollegeAttending			:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect and (within4Years or within2Years), '1', '0');
 																	self.ProspectCollegeAttended			:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect and right.student_date_first_seen <> '', '1', '0');
 																	self.ProspectCollegeProgramType		:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect, 
@@ -581,11 +581,11 @@ end;
 																	totalCourtRecs12Mo	:= sum(right.BJL.bk_count12, right.BJL.eviction_count12, right.BJL.criminal_count12, 
 																														 right.BJL.liens_unreleased_count12, right.BJL.nonfelony_criminal_count12); 
 																	self.CrtRecCnt12Mo	:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect, totalCourtRecs12Mo, 0);
-																	lastFelony	 := if(right.BJL.last_felony_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.BJL.last_felony_date,true), nines);
-																	lastCrime		 := if(right.BJL.last_nonfelony_criminal_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.BJL.last_nonfelony_criminal_date,true), nines);
-																	lastLien		 := if((integer)right.BJL.last_liens_unreleased_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',right.BJL.last_liens_unreleased_date,true), nines);
-																	lastBankrupt := if(right.BJL.date_last_seen <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.BJL.date_last_seen,true), nines);
-																	lastEviction := if(right.BJL.last_eviction_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD((string)left.historyDate+'01',(string)right.BJL.last_eviction_date,true), nines);
+																	lastFelony	 := if(right.BJL.last_felony_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.BJL.last_felony_date,true), nines);
+																	lastCrime		 := if(right.BJL.last_nonfelony_criminal_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.BJL.last_nonfelony_criminal_date,true), nines);
+																	lastLien		 := if((integer)right.BJL.last_liens_unreleased_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),right.BJL.last_liens_unreleased_date,true), nines);
+																	lastBankrupt := if(right.BJL.date_last_seen <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.BJL.date_last_seen,true), nines);
+																	lastEviction := if(right.BJL.last_eviction_date <> 0, ProfileBooster.Common.MonthsApart_YYYYMMDD(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.BJL.last_eviction_date,true), nines);
 																	lastCourtRec := min(lastFelony,lastCrime,lastLien,lastBankrupt,lastEviction); 
 																	
 																	self.CrtRecTimeNewest	:= if(left.rec_type=ProfileBooster.Constants.recType.Prospect, lastCourtRec, 0);
@@ -844,7 +844,7 @@ ProfileBooster.Layouts.Layout_PB_Shell append_property(ProfileBooster.Layouts.La
 		self.PropCurrOwnedCnt							:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and rt.property_status_applicant = 'O', 1, 0);
 		self.PropCurrOwnedAssessedTtl			:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and rt.property_status_applicant = 'O', rt.assessed_amount, 0);
 		validsaledate := Doxie.DOBTools(rt.sale_date_by_did).IsValidDOB;
-		monthsSinceSold 									:= if(~validsaledate, nines, min(ProfileBooster.Common.MonthsApart_YYYYMMDD((string)rt.sale_date_by_did,(string)le.HistoryDate,true),960));
+		monthsSinceSold 									:= if(~validsaledate, nines, min(ProfileBooster.Common.MonthsApart_YYYYMMDD((string)rt.sale_date_by_did,risk_indicators.iid_constants.myGetDate(le.historydate),true),960));
 		self.PropTimeLastSale							:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and validsaledate, monthsSinceSold, nines);
 		self.PropEverOwnedCnt							:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and rt.property_status_applicant in ['O','S'], 1, 0);
 		self.PropEverSoldCnt							:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and rt.property_status_applicant = 'S', 1, 0);
@@ -854,7 +854,7 @@ ProfileBooster.Layouts.Layout_PB_Shell append_property(ProfileBooster.Layouts.La
 														 '0', 
 														 trim((string)(decimal4_2)min(salePrice / rt.purchase_amount, 99.0)));
 		validpurchasedate := Doxie.DOBTools(rt.purchase_date_by_did).IsValidDOB;
-		monthsSincePurchased							:= if(~validpurchasedate, 0, min(ProfileBooster.Common.MonthsApart_YYYYMMDD((string)rt.purchase_date_by_did,(string)le.HistoryDate,true),960));
+		monthsSincePurchased							:= if(~validpurchasedate, 0, min(ProfileBooster.Common.MonthsApart_YYYYMMDD((string)rt.purchase_date_by_did,risk_indicators.iid_constants.myGetDate(le.historydate),true),960));
 		self.PropPurchaseCnt12Mo					:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect and monthsSincePurchased <> 0 and monthsSincePurchased <= 12, 1, 0);
 		self.LifeEvTimeFirstAssetPurchase	:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect, max(le.LifeEvTimeFirstAssetPurchase, monthsSincePurchased), le.LifeEvTimeFirstAssetPurchase);
 		self.LifeEvTimeLastAssetPurchase	:= if(le.rec_type=ProfileBooster.Constants.recType.Prospect, 

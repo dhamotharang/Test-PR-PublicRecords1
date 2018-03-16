@@ -89,9 +89,12 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		self.socsscore 				:= Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);		
 		self.dt_first_seen 		:= ri.dt_first_seen;
-		self.dt_last_seen			:= if(ri.dt_last_seen > le.HistoryDate, le.HistoryDate, ri.dt_last_seen);
+    
+    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+    historydate := (unsigned)fullhistorydate[1..6];
+		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob);
+		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
 		self.title						:= ri.title;	
 		self.HHID							:= ri.HHID;
 		self.hdr_prim_range		:= ri.prim_range;
@@ -145,10 +148,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		self.socsscore 				:= Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);		
 		self.dt_first_seen 		:= ri.dt_first_seen;
-		self.dt_last_seen			:= if(ri.dt_last_seen > le.HistoryDate, le.HistoryDate, ri.dt_last_seen);
+    
+    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+    historydate := (unsigned)fullhistorydate[1..6];
+		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob);
-		self.title						:= ri.title;
+		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
+   	self.title						:= ri.title;
 		self.hdr_prim_range		:= ri.prim_range;
 		self.hdr_predir				:= ri.predir;
 		self.hdr_prim_name		:= ri.prim_name;
@@ -226,6 +232,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		self.title				:= ri.title;					
 		self.HHID					:= ri.HHID;		
 		self.VerifiedCurrResMatchIndex	:= ri.VerifiedCurrResMatchIndex;
+    self.historydate := (unsigned)risk_indicators.iid_constants.myGetDate(le.historydate)[1..6];
 		self 							:= le;
 	END;
 	
@@ -255,7 +262,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		SELF.address_history_seq	:= address_history_seq;
 		SELF.hdr_date_first_seen	:= ri.date_first_seen;
 		SELF.hdr_date_last_seen		:= ri.date_last_seen;
-		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart((string)le.historyDate,((string)ri.date_first_seen)[1..6]), nines);
+		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],((string)ri.date_first_seen)[1..6]), nines);
 		SELF 											:= le;
 	END;
 	
@@ -418,7 +425,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 	dt_last_seen := MAX(GROUP,hf_slim.dt_last_seen);
 	END;
 	
-	d_addr := TABLE(hf_slim(TRIM(hdr_addr1)<>''), addr_slim, seq, did, hdr_addr1, LOCAL);
+	d_addr := TABLE(hf_slim(TRIM(hdr_addr1)<>''), addr_slim, seq, did, historydate, hdr_addr1, LOCAL);
 	
 // use the build start date as today and adjust the timeframes
 	addr_stats := record
@@ -445,7 +452,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		dt_last_seen := MAX(GROUP,hf_slim.dt_last_seen);
 	END;
 	
-	d_last := TABLE(hf_slim(TRIM(hdr_lname)<>''), lname_slim, seq, did, hdr_lname, LOCAL);
+	d_last := TABLE(hf_slim(TRIM(hdr_lname)<>''), lname_slim, seq, did, historydate, hdr_lname, LOCAL);
 
 	// use the build start date as today and adjust the timeframes
 	lname_stats := record

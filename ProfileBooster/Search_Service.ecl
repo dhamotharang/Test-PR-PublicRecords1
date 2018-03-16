@@ -44,11 +44,7 @@ EXPORT Search_Service := MACRO
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
 	HistoryDateYYYYMM 						:= StringLib.StringToUpperCase(optionsIn.HistoryDateYYYYMM);
-	todaysdate										:= ut.GetDate;
 	HistoryDateInput							:= if(HistoryDateYYYYMM <> '', HistoryDateYYYYMM, outOfBandHistoryDate);	
-	HistoryDateFull								:= HistoryDateInput+'01';
-	validdate := Doxie.DOBTools((integer)HistoryDateFull).IsValidDOB;	
-	historydate 									:= if(validdate, (integer)HistoryDateInput, (integer)todaysdate[1..6]); 
 	
 	STRING50 outOfBandDataRestriction   := AutoStandardI.GlobalModule().DataRestrictionMask;
 	// Check to see if the default from GlobalModule() is used, if so overwrite it to our default data restriction.  Our default doesn't include spaces.
@@ -108,7 +104,7 @@ EXPORT Search_Service := MACRO
 
 	ProfileBooster.Layouts.Layout_PB_In into(wseq l) := TRANSFORM
 		self.seq 									:= l.seq;
-		self.HistoryDate 					:= HistoryDate;
+		self.HistoryDate 					:= if((unsigned)HistoryDateInput=0, risk_indicators.iid_constants.default_history_date, (unsigned)HistoryDateInput);
 		self.ssn 									:= l.SearchBy.ssn;
 		self.dob 									:= l.SearchBy.dob.year + intformat((integer1)l.SearchBy.dob.month, 2, 1) + intformat((integer1)l.SearchBy.dob.day, 2, 1);
 		self.Name_Full 						:= fullname;
