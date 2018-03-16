@@ -16,7 +16,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::new_suppression::fcra
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::new_suppression::@version@::link_type_link_id','Q',mv_qa);
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::new_suppression::fcra::@version@::link_type_link_id','Q',mv_qa_fcra);
 
-update_dops 					:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'N|B');
+update_dops 					:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'N|F|B');
 update_dops_fcra := dops.updateversion('FCRA_SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'F');
 update_idops 				:= dops.updateversion('SuppressionKeys',pVersion,'christopher.brodeur@lexisnexisrisk.com',,'N',,,'A');
 
