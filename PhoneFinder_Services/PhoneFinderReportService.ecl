@@ -211,6 +211,8 @@ MACRO
 		EXPORT STRING3 	 ProductCode                        := pfUser.ProductCode: STORED('ProductCode');
 		EXPORT STRING8	 BillingId                          := pfUser.BillingId: STORED('BillingId');
 		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
+		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
+		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
 	END;
 
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch,reportMod,

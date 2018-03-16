@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_Batch,BatchShare,Doxie,Gateway,iesp,MDR,Phones,PhonesInfo,Royalty,Suppress,ut;
+﻿IMPORT Autokey_Batch,BatchShare,Doxie,Gateway,iesp,MDR,Phones,Royalty,Suppress;
 
 EXPORT PhoneFinder_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dIn,
 														PhoneFinder_Services.iParam.ReportParams         inMod,
@@ -58,9 +58,13 @@ MODULE
 	dPhoneSearchResults := IF(EXISTS(dInPhone),PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways));
 
 	// Waterfall process when only PII is provided
-	dWaterfallResults := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
+	dWaterfallResults_pre := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
 
+ dWaterfall_LimitOtherPhones := TOPN(dWaterfallResults_pre(~isPrimaryPhone),inMod.MaxOtherPhones,acctno,-phone_score);	
 
+ dWaterfallResults  := dWaterfallResults_pre(isPrimaryPhone) + dWaterfall_LimitOtherPhones;
+
+	
 	SHARED dSearchRecs_pre		     := IF(vPhoneBlank,dWaterfallResults,dPhoneSearchResults);
 
 	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
@@ -82,11 +86,11 @@ MODULE
  SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
 
 	ds_in_accu := IF(IsPhoneRiskAssessment,
-	                 project(dedup(sort(dSearchRecs, acctno), acctno),
-									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
-									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
+	                 PROJECT(DEDUP(SORT(dSearchRecs, acctno), acctno),
+									 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
+									 PROJECT(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
-  AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
+  AccuDataGateway := IF(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
    	                                                                                       AccuDataGateway[1]);		   
   dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
