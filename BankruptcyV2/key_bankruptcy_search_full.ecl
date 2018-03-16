@@ -1,4 +1,4 @@
-import fcra, Doxie, ut, BIPV2;
+﻿import fcra, Doxie, ut, BIPV2,dops;
 
 export key_bankruptcy_search_full(boolean isFCRA=false) := function
 
@@ -16,8 +16,8 @@ layout_bankruptcy_search_linkids tformat(get_recs L) := transform
 		self.tax_id := if(L.tax_id <> '',  L.tax_id, L.app_tax_id);
 		self := L;
 	end;
-
-	get_recs_ssn := project(get_recs, tformat(left));
+FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
+	get_recs_ssn := project(FCRATest, tformat(left));
 
 	dist_id 	:= distribute(get_recs_ssn, hash(TMSID));
 	sort_id 	:= sort(dist_id, TMSID, -process_Date, local);

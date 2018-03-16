@@ -1,11 +1,11 @@
-import BankruptcyV2, fcra, Doxie, ut;
+﻿import BankruptcyV2, fcra, Doxie, ut,dops;
 
 export key_bankruptcyV3_did(boolean isFCRA = false) := function
   todaysdate := ut.GetDate;
 	// MW: might need to change "process_date" as filtering date
 	get_party_recs 	:= BankruptcyV2.file_bankruptcy_search_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
-
-	slim_party 		:= table(get_party_recs((unsigned6)did != 0), {	get_party_recs.did,
+	FCRATest:=if(isFCRA,get_party_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_party_recs);
+	slim_party 		:= table(FCRATest((unsigned6)did != 0), {	get_party_recs.did,
 																	get_party_recs.tmsid,
 																	get_party_recs.court_code,
 																	get_party_recs.case_number

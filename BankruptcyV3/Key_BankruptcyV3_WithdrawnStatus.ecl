@@ -1,9 +1,10 @@
-IMPORT	BankruptcyV3,	BankruptcyV2,	FCRA,	STD;
+﻿IMPORT	BankruptcyV3,	BankruptcyV2,	FCRA,	STD,dops;
 EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
 																					BOOLEAN	pUseProd	=	FALSE,
 																					BOOLEAN	isFCRA		=	FALSE)	:=	FUNCTION
 	//	Only include records that have been WITHDRAWN
 	dWithdrawnStatus					:=	File_BankruptcyV3_WithdrawnStatus(,pUseProd).wsBase(WithdrawnID<>'');
+	
 	dWithdrawnStatusDedup			:=	DEDUP(SORT(DISTRIBUTE(dWithdrawnStatus,
 																	HASH(	TMSID,CaseID,DefendantID)),
 																				TMSID,CaseID,DefendantID,-LastUpdatedDate,LOCAL),
@@ -12,6 +13,7 @@ EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Tod
 	dWithdrawnStatusSlim			:=	PROJECT(dWithdrawnStatusDedup,Layout_BankruptcyV3_WithdrawnStatus.wsKey);
   pTodaysDate						:=	(STRING8)Std.Date.Today();
 	dBKSearchLinkIDs			:=	BankruptcyV2.file_bankruptcy_search_v3_bip(~IsFCRA OR FCRA.bankrupt_is_ok(pTodaysDate,process_date));
+	FCRATest:=if(isFCRA,dBKSearchLinkIDs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),dBKSearchLinkIDs);
 	dBKSearchLinkIDsDist	:=	DEDUP(SORT(DISTRIBUTE(dBKSearchLinkIDs(name_type='D' AND debtor_type='P'),	// D=Debtor, P=Primary
 																	HASH(	TMSID,CaseID,DefendantID)),
 																				TMSID,CaseID,DefendantID,-(UNSIGNED)did,LOCAL),

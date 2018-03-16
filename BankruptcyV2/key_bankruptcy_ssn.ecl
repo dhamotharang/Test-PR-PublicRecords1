@@ -1,4 +1,4 @@
-import Doxie, ut, fcra;
+﻿import Doxie, ut, fcra,dops;
 
 export key_bankruptcy_ssn(boolean isFCRA = false) := function
 	todaysdate := ut.GetDate;
@@ -13,8 +13,8 @@ export key_bankruptcy_ssn(boolean isFCRA = false) := function
 		self.ssn := if((unsigned6)L.ssn <> 0,L.ssn, L.app_ssn);
 		self := L;
 	end;
-
-	slim_party := project(get_recs,treformatssn(left));
+FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
+	slim_party := project(FCRATest,treformatssn(left));
 	slim_dist   := distribute(slim_party(ssn <> ''), hash(tmsid, ssn));
 	slim_sort   := sort(slim_dist, tmsid,  ssn, local);
 	slim_dedup  := dedup(slim_sort, tmsid, ssn, local);
