@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, MDR;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR;
 
 EXPORT PD_Business_Header(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound, 
 									DATASET(BIPV2.IDlayouts.l_xlink_ids2) kFetchLinkIDs, 
@@ -8,7 +8,7 @@ EXPORT PD_Business_Header(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// --------------- Business Header ----------------
-	BusinessHeaderRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(kFetchLinkIDs,
+	BusinessHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(kFetchLinkIDs,
 																						 kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -16,6 +16,9 @@ EXPORT PD_Business_Header(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses);
+	// clean up the business header before doing anything else
+	Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRaw1, BusinessHeaderRaw);	
+		
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(BusinessHeaderRaw, LinkIDsFound, BusinessHeaderSeq);
 	

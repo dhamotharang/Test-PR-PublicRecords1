@@ -17,7 +17,7 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// For other transactions, we search at UltID level to accurately calculate UltID-based attributes.
 	LSL := IF(~Options.IsBIID20, Business_Risk_BIP.Constants.LinkSearch.UltID, Options.LinkSearchLevel);
 	
-	BusinessHeaderUltRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	BusinessHeaderUltRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(LSL),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -25,6 +25,10 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses);
+																							
+		// clean up the business header before doing anything else
+  Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderUltRaw1, BusinessHeaderUltRaw);	
+	
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(BusinessHeaderUltRaw, Shell, BusinessHeaderUltSeq);
 	
