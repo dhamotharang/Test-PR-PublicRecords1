@@ -29,9 +29,12 @@ EXPORT SearchService_records (unsigned6 search_did=0,integer1
     // 3) Slim down the PersonContext         
     slim_pc_recs := FFD.SlimPersonContext(pc_recs);
     
+    ds_best := project(ds_dids, transform(doxie.layout_best, self.did := left.did, self:=[]));
+    ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
+	
     suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
 
-    results_0 := LN_PropertyV2_Services.resultFmt.narrow_view.get_by_sid(ids_1,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask);
+    results_0 := LN_PropertyV2_Services.resultFmt.narrow_view.get_by_sid(ids_1,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags);
 
     // Robustness Score Sorting
     results_srt := if(LN_PropertyV2_Services.input.RobustnessScoreSorting,sort(results_0,-key_robustness_score,-total_robustness_score),results_0);

@@ -1,11 +1,12 @@
-import doxie,doxie_raw,drivers,header,sexoffender,ut,STD,FFD;
+﻿import doxie,doxie_raw,drivers,header,sexoffender,ut,STD,FFD, FCRA;
 
 //fetch sexoffender records by did or by sid
 export SexOffender_Search_People_Records (
   DATASET (doxie.layout_best) ds_best  = DATASET ([], doxie.layout_best),
   boolean IsFCRA = false,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-	integer8 inFFDOptionsMask = 0
+	integer8 inFFDOptionsMask = 0,
+	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 	) := function
 	
 doxie.MAC_Selection_Declare(); // Law_Enforcement
@@ -26,7 +27,7 @@ string5 in_zip := if(zip_value_cleaned<>'', zip_value_cleaned, city_zip_value);
 fetchedlocal := doxie_raw.SexOffender_People_Raw(dids,did_value,
 		sid_value,uid_value,includeExtra,dateVal,dppa_purpose,glb_purpose, application_type_value, ssn_mask_value, in_zip,
 		Maxresults_val, ssn_value, is_zip_only_search or SearchAroundAddress_value, IsFCRA,
-		slim_pc_recs, inFFDOptionsMask);
+		slim_pc_recs, inFFDOptionsMask, ds_flags);
 
 key_enh := SexOffender.Key_SexOffender_SPK_Enh (IsFCRA);
 

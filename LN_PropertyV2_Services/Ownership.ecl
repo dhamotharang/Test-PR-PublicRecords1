@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Property Ownership
 
 	This module implements the core runtime interface for property ownership,
@@ -76,7 +76,7 @@ export Ownership := module
 		dataset(doxie.Layout_Comp_Addresses)	subject_addrs,
 		dataset(doxie.layout_NameDID)					subject_names,
 		string32 appType = LN_PropertyV2_Services.input.appType,
-		boolean isFCRA = false,
+		boolean isFCRA = false,  // only used at nonFCRA side -> FCRA side is not fully supported
 		boolean IncludePriorProperties = LN_PropertyV2_Services.input.incPrior,
 		boolean UseCurrentlyOwnedProperty = LN_PropertyV2_Services.input.useCurr,
 		boolean IncludePropertySellerData = LN_PropertyV2_Services.input.incSeller

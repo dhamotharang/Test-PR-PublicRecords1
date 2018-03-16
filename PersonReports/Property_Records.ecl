@@ -258,7 +258,7 @@ EXPORT property_records (
 
   crs_prop := LN_PropertyV2_Services.CRS_records (csa_addresses, csa_names, in_params.applicationtype, 
 																									 in_params.non_subject_suppression, isFCRA,
-																									 slim_pc_recs, in_params.FFDOptionsMask);
+																									 slim_pc_recs, in_params.FFDOptionsMask, flagfile);
   shared base_property := crs_prop (in_params.use_nonsubjectproperty or owned,
                                         ~in_params.use_currentlyownedproperty or current_record='Y');
     
@@ -299,7 +299,7 @@ EXPORT property_records (
   // get the fids
 	export fids := LN_PropertyV2_Services.Raw.get_fids_from_dids (dids,isFCRA);
 	export all_records := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(fids,,,in_params.non_subject_suppression,
-																																								isFCRA,slim_pc_recs,in_params.FFDOptionsMask);
+																																								isFCRA,slim_pc_recs,in_params.FFDOptionsMask, flagfile);
                             // (in_params.use_nonsubjectproperty or owned,
                              // ~in_params.use_currentlyownedproperty or current_record='Y');
 
