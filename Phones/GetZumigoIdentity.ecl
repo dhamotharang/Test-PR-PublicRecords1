@@ -7,17 +7,16 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 													STRING DataRestrictionMask = '') := FUNCTION
 	
 	Phones.Layouts.ZumigoIdentity.zIn prepZumigoInput (Phones.Layouts.ZumigoIdentity.subjectVerificationRequest l):= TRANSFORM
-		//NameAddressValidation service should include phone with name(s) and address(es) pair.
-		isValidNameAddrRequest := l.phone<>'' AND l.first_name<>'' AND l.last_name<>'' AND l.prim_name<>'' AND l.p_city_name<>'' AND l.st<>'' AND l.z5<>'';
+	
 		//preserve the acctno and seq for each record sent to Zumigo. This will be group by phone number across multiple account to avoid duplicate calls for the same phone.
 		acctSeqPrefix := l.acctno + '|'+ l.sequence_number + '|';
 		SELF.acctno := l.acctno;
 		SELF.sequence_number := l.sequence_number;
 		SELF.MobileDeviceNumber := l.phone;
-		SELF.Name.NameType := IF(isValidNameAddrRequest,acctSeqPrefix + l.NameType,'');
+		SELF.Name.NameType := IF(inMod.NameAddressValidation,acctSeqPrefix + l.NameType,'');
 		SELF.Name.FirstName := l.first_name;
 		SELF.Name.LastName := l.last_name;
-		SELF.Address.AddressType := IF(isValidNameAddrRequest,acctSeqPrefix + l.AddressType,'');
+		SELF.Address.AddressType := IF(inMod.NameAddressValidation,acctSeqPrefix + l.AddressType,'');
 		SELF.Address.AddressLine1 := Address.Addr1FromComponents(l.prim_range, l.predir, l.prim_name,
 																											 l.addr_suffix, l.postdir, '', l.sec_range);
 		SELF.Address.City := l.p_city_name;
@@ -26,8 +25,8 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF:=[];
 	END;
 	zumIn := PROJECT(inRecs,prepZumigoInput(LEFT));
-	// all records going to Zumigo must have a MobileDeviceNumber or populated name and address type based on transform above.
-	validZumigoRequests := GROUP(SORT(zumIn((MobileDeviceNumber<>'' AND NOT inMod.NameAddressValidation) OR (Name.NameType <>'' AND Address.AddressType <>'' AND inMod.NameAddressValidation)),MobileDeviceNumber), MobileDeviceNumber);
+	// all records going to Zumigo must have a MobileDeviceNumber.
+	validZumigoRequests := GROUP(SORT(zumIn((MobileDeviceNumber<>'')),MobileDeviceNumber), MobileDeviceNumber);
 
 	iesp.zumigo_identity.t_ZIdIdentitySearch rollInput (Phones.Layouts.ZumigoIdentity.zIn l, DATASET(Phones.Layouts.ZumigoIdentity.zIn) r):= TRANSFORM
 		SELF.MobileDeviceNumber := l.MobileDeviceNumber;
