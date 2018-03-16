@@ -1,4 +1,4 @@
-import suppress, LN_PropertyV2_Services, FCRA, FFD;
+﻿import suppress, LN_PropertyV2_Services, FCRA, FFD;
 EXPORT resultFmt := module
 
 	// NOTE: In most of the other rewrites, this sort of code was included
@@ -67,9 +67,10 @@ EXPORT resultFmt := module
 			boolean isFCRA = false,
 			BOOLEAN skipPenaltyFilter = FALSE,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 		) := function
-			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,skipPenaltyFilter,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask);
+			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,skipPenaltyFilter,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask, ds_flags);
 			xform(tmp, results, l_tmp, l_widest, l_assess_widest, l_deeds_widest);
 		  return results;
 		end;
@@ -82,9 +83,10 @@ EXPORT resultFmt := module
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 			) := function
-		  return get_by_sid(Raw.get_sids_from_fids(in_fids),inMaxProperties,inTrimBySortBy,nonSS,isFCRA,,slim_pc_recs,inFFDOptionsMask);
+		  return get_by_sid(LN_PropertyV2_Services.Raw.get_sids_from_fids(in_fids),inMaxProperties,inTrimBySortBy,nonSS,isFCRA,,slim_pc_recs,inFFDOptionsMask, ds_flags);
 		end;
 		
 	  // ...using DID as the lookup mechanism
@@ -93,9 +95,10 @@ EXPORT resultFmt := module
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 		) := function
-		  return get_by_fid(Raw.get_fids_from_dids(in_dids,isFCRA),,,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask);
+		  return get_by_fid(LN_PropertyV2_Services.Raw.get_fids_from_dids(in_dids,isFCRA),,,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask, ds_flags);
 		end;
 		
 	end; // widest_view
@@ -110,9 +113,10 @@ EXPORT resultFmt := module
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 		) := function
-			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask);
+			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags);
 			xform(tmp, results, l_tmp, l_wider, l_assess_wider, l_deeds_wider);
 		  return results;
 		end;
@@ -121,14 +125,14 @@ EXPORT resultFmt := module
 	  export dataset(l_wider) get_by_fid(
 			dataset(l_fid) in_fids
 		) := function
-		  return get_by_sid(Raw.get_sids_from_fids(in_fids));
+		  return get_by_sid(LN_PropertyV2_Services.Raw.get_sids_from_fids(in_fids));
 		end;
 		
 	  // ...using DID as the lookup mechanism
 	  export dataset(l_wider) get_by_did(
 			dataset(l_did) in_dids
 		) := function
-		  return get_by_fid(Raw.get_fids_from_dids(in_dids));
+		  return get_by_fid(LN_PropertyV2_Services.Raw.get_fids_from_dids(in_dids));
 		end;
 		
 	end; // wider_view
@@ -141,9 +145,10 @@ EXPORT resultFmt := module
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 		) := FUNCTION
-			    tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,,,nonSS,isFCRA, slim_pc_recs, inFFDOptionsMask);
+			    tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,,,nonSS,isFCRA, slim_pc_recs, inFFDOptionsMask, ds_flags);
 			    xform(tmp, results, l_tmp, l_narrow, l_assess_narrow, l_deeds_narrow);
 		      return results;
 		end;
@@ -152,18 +157,18 @@ EXPORT resultFmt := module
 	  export dataset(l_narrow) get_by_fid(
 			dataset(l_fid) in_fids,
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
-			boolean isFCRA = false
+			boolean isFCRA = false  //used with default, FCRA side is not fully supported
 		) := function
-		  return get_by_sid(Raw.get_sids_from_fids(in_fids,isFCRA),nonSS,isFCRA);
+		  return get_by_sid(LN_PropertyV2_Services.Raw.get_sids_from_fids(in_fids,isFCRA),nonSS,isFCRA);
 		end;
 		
 	  // ...using DID as the lookup mechanism
 	  export dataset(l_narrow) get_by_did(
 			dataset(l_did) in_dids,
 			integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
-			boolean isFCRA = false
+			boolean isFCRA = false //used with default, FCRA side is not fully supported
 		) := function
-		  return get_by_fid(Raw.get_fids_from_dids(in_dids,isFCRA),nonSS,isFCRA);
+		  return get_by_fid(LN_PropertyV2_Services.Raw.get_fids_from_dids(in_dids,isFCRA),nonSS,isFCRA);
 		end;
 		
 	end; // narrow_view

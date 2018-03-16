@@ -1,4 +1,4 @@
-import sexoffender,doxie_build,autokey,ut,doxie,suppress, sexoffender_Services, FCRA, lib_ziplib, Data_Services,FFD;
+﻿import sexoffender,doxie_build,autokey,ut,doxie,suppress, sexoffender_Services, FCRA, lib_ziplib, Data_Services,FFD;
 
 export SexOffender_People_Raw(
 			dataset(Doxie.layout_references) dids,
@@ -17,7 +17,8 @@ export SexOffender_People_Raw(
 			boolean zip_only_search_flag = false,
 			boolean IsFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			integer8 inFFDOptionsMask = 0,
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 ) := FUNCTION
 
 //keys
@@ -102,9 +103,6 @@ sid_recs := project(sid_chooser, transform(sexOffender_Services.Layouts.search,
 																					self.seisint_primary_key := left.spk, 
 																					self := [])); //isDeepDive
 
-// overrides for FCRA
-ds_best  := project(sid_mapped,transform(doxie.layout_best,self.did:=left.did, self:=[])); //using sid_mapped since it has did if available. For FCRA we only use DID to get overrides.
-ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best)); //this could potentially be for more than one person....
 
 fetchedLocal := SexOffender_Services.Raw.getRawOffenders(sid_recs, application_type_value,isFCRA, ds_flags, slim_pc_recs, inFFDOptionsMask);
 doxie.layout_sexoffender_searchperson get_full_rec(SexOffender_Services.Layouts.raw_rec ri) :=

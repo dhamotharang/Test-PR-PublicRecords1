@@ -1,4 +1,4 @@
-IMPORT AutokeyB2, Autokey_batch, Doxie, LN_PropertyV2, LN_PropertyV2_Services, Suppress, 
+﻿IMPORT AutokeyB2, Autokey_batch, Doxie, LN_PropertyV2, LN_PropertyV2_Services, Suppress, 
 			BIPV2, BatchServices, FCRA, FFD, Gateway;
 
 /* 
@@ -38,7 +38,8 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 																							boolean isFCRA=false,
 																							STRING BIPFetchLevel = 'S',
 																							dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-																							integer8 inFFDOptionsMask = 0) := 
+																							integer8 inFFDOptionsMask = 0,
+																							dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile) := 
 	MODULE
 
 		// Below Exports used by BatchServices.Property_BatchCommon
@@ -160,7 +161,7 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 		ds_prep_fids_for_raw := DEDUP(SORT(PROJECT(ds_outpl_slim_filtered, LN_PropertyV2_Services.layouts.fid),ln_fares_id,search_did),ln_fares_id,search_did);
 		
 		 
-		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,inFFDOptionsMask )(fid_type != '');
+		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags)(fid_type != '');
 		//Apply Party Type filter (return only parties requested by subscriber) and 
 		//tax data filter (return only records where assessment.standardized_land_use_code[1] is not misc. category of 0.
 		PT := LN_PropertyV2.Constants.PARTY_TYPE;

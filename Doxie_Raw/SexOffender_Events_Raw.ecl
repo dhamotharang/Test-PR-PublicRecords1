@@ -1,4 +1,4 @@
-import sexoffender_Services,doxie, ut, FCRA, FFD;
+﻿import sexoffender_Services,doxie, ut, FCRA, FFD;
 
 export SexOffender_Events_Raw(
 		dataset(doxie.layout_sexoffender_searchperson) persons,
@@ -8,13 +8,12 @@ export SexOffender_Events_Raw(
 		unsigned1 glb_purpose = 0,
 		string32 application_type = '',
 		boolean IsFCRA = false,
-		DATASET (doxie.layout_best) ds_best  = DATASET ([], doxie.layout_best),
+	  dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
 		dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 	integer8 inFFDOptionsMask = 0
 ) := FUNCTION
 
 in_sspks := project(persons, sexOffender_Services.Layouts.search);
-ds_flags := if (IsFCRA, FCRA.GetFlagFile(ds_best), fcra.compliance.blank_flagfile);
 raw_offenses := SexOffender_Services.Raw.GetRawOffenses(in_sspks, isFCRA, ds_flags, slim_pc_recs, inFFDOptionsMask);
 
 dbase := project(persons, doxie.layout_sexoffender_searchevents);

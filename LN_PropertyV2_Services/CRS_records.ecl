@@ -1,4 +1,4 @@
-import doxie, doxie_ln, ut, NID, suppress, FFD, LN_PropertyV2_Services;
+﻿import doxie, doxie_ln, ut, NID, suppress, FFD, FCRA, LN_PropertyV2_Services;
 
 l_fidPlus				:= { LN_PropertyV2_Services.layouts.fid; string1 source_code_1; };
 l_assess_wider	:= LN_PropertyV2_Services.layouts.assess.result.wider;
@@ -15,7 +15,8 @@ export dataset(l_out) CRS_records(
 	integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 	boolean IsFCRA = false,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-	integer8 inFFDOptionsMask = 0
+	integer8 inFFDOptionsMask = 0,
+	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 	):=
 FUNCTION
 
@@ -41,7 +42,7 @@ sids := project(prop_ids, transform(LN_PropertyV2_Services.layouts.search_fid, s
 
 
 // assimilate those fids and retrieve results for all those records
-tmp				:= LN_PropertyV2_Services.fn_get_report( sids, true, , , nonSS, isFCRA, slim_pc_recs, inFFDOptionsMask);
+tmp				:= LN_PropertyV2_Services.fn_get_report( sids, true, , , nonSS, isFCRA, slim_pc_recs, inFFDOptionsMask, ds_flags);
 tmp_did		:= tmp(ln_fares_id in ownedSet);
 tmp_addr	:= tmp(ln_fares_id not in ownedSet);
 

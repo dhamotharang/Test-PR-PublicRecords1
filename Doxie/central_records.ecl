@@ -7,7 +7,8 @@ export central_records(boolean IsFCRA, string1 in_party_type,
                        dataset (doxie.layout_central_header) header_data,
 											 integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 											 dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim, 											 
-											 integer8 inFFDMask = 0
+											 integer8 inFFDMask = 0,
+											 dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 											 ) := 
 FUNCTION
 
@@ -25,9 +26,6 @@ dids := project (besr, doxie.layout_references); //dids has no more than 1 recor
 
 // contains global input parameters
 global_mod := AutoStandardI.GlobalModule (IsFCRA);
-
-// corrections on FCRA side require using overrides flag file
-ds_flags := if (IsFCRA, FCRA.GetFlagFile (besr), fcra.compliance.blank_flagfile);
 
 // Individual single-source data (use version, include, etc. selectors here)
 PatA := if(IncludePatriot_val,doxie.CompPatriotSearch);
