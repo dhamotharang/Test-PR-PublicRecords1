@@ -1,10 +1,7 @@
 ﻿IMPORT _control,std,ut;
 EXPORT _config := MODULE
 
-    EXPORT sprayIP(string sourceIP) := map(
-                                            sourceIP = 'bctlpedata10' => _control.IPAddress.bctlpedata10,
-                                            sourceIP
-                                    );    
+    EXPORT sprayIP(string sourceIP = _control.IPAddress.bctlpedata10);
     
     EXPORT sourcePath          := '/data/data_lib_2_hus2/efx_hdrs/in/';
     EXPORT monthly_files       := 'MONTHLY_HEADER_*.DAT';
@@ -32,7 +29,7 @@ EXPORT _config := MODULE
     
     
     // v_version
-    EXPORT set_v_version := if(isNewEquifaxMonthlyFile('bctlpedata10.risk.regn.net'),
+    EXPORT set_v_version := if(isNewEquifaxMonthlyFile(_control.IPAddress.bctlpedata10),
                                  sequential(
                                      output(dataset([{newEquifaxMothlyHeaderDate}],{string v_version}),,v_version_file_name+'_'+workunit),
                                      std.file.startsuperfiletransaction(),
@@ -45,7 +42,7 @@ EXPORT _config := MODULE
                                  
     // v_eq_as_of_date
     
-    EXPORT set_v_eq_as_of_date := if(isNewEquifaxWeeklyFile('bctlpedata10.risk.regn.net'),
+    EXPORT set_v_eq_as_of_date := if(isNewEquifaxWeeklyFile(_control.IPAddress.bctlpedata10),
                                     sequential(
                                          output(dataset([{newEquifaxWeeklyHeaderDate}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
                                          std.file.startsuperfiletransaction(),

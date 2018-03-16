@@ -1,6 +1,6 @@
-EXPORT BWR_VendorSrc_BuildAll(version) := MACRO
+﻿EXPORT BWR_VendorSrc_BuildAll(version) := MACRO
 
-#WORKUNIT('name','VendorSrc load ' + version);
+#WORKUNIT('name','Yogurt:VendorSrc load ' + version);
 
 DoBuild := Misc.fBuild_All_VendorSrc(version);
 
