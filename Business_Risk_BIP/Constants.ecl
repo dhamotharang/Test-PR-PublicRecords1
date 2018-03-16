@@ -37,7 +37,8 @@ EXPORT Constants := MODULE
 	EXPORT Default_Watchlists_Requested := DATASET([], iesp.Share.t_StringArrayItem);
 	EXPORT Default_Gateways_Requested   := DATASET([], Gateway.Layouts.Config);
 	EXPORT Default_IndustryClass				:= ''; // UTILI indicates a Utility company, and Utility data must be blanked out
-	
+	EXPORT STRING6 Default_SSNMask      := '';
+  
 	EXPORT Default_BusShellVersion			:= 21; // Default Business Shell Version is v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
 	EXPORT BusShellVersion_v20					:= 20; // Business Shell v2.0: Original business shell and original SBFE attributes
 	EXPORT BusShellVersion_v21					:= 21; // Business Shell v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
