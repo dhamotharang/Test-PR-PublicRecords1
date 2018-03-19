@@ -62,13 +62,13 @@ import doxie, liensv2_services, Text_Search, bankruptcyv2_Services;
 
 export BLJSearchService() := macro
     doxie.MAC_Header_Field_Declare(false);
-	#constant('getBdidsbyExecutive',FALSE)
-	#constant('SearchGoodSSNOnly',true)
-	#constant('SearchIgnoresAddressOnly',true)
-	#constant('DisplayMatchedParty',true)
-	#constant('isFCRA', false)
-	#stored('ScoreThreshold',10)
-	#stored('PenaltThreshold',10)
+	#constant('getBdidsbyExecutive',FALSE);
+	#constant('SearchGoodSSNOnly',true);
+	#constant('SearchIgnoresAddressOnly',true);
+	#constant('DisplayMatchedParty',true);
+	#constant('isFCRA', false);
+	#stored('ScoreThreshold',10);
+	#stored('PenaltThreshold',10);
 		
 	boolean Include_Bankruptcies := false : stored('IncludeBankruptcies');
   boolean Include_LiensJudgments := false : stored('IncludeLiensJudgments');

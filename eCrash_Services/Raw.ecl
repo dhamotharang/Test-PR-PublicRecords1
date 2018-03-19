@@ -732,7 +732,7 @@ EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		  transformed_delta_pen_recs := eCrash_Services.Functions.dedupReportRecordsFromParties(delta_associated_reports);
 			
 			//OUTPUT(transformed_delta_pen_recs,named('transformed_delta_pen_recs_count'));
-			end_date := ut.GetDate;	
+			end_date := (STRING8)Std.Date.Today();	
 
 			start_date := ut.date_math(end_date,-365);
 			

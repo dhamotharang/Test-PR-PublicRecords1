@@ -115,11 +115,11 @@ export Functions := module
 			 self.Address.StateCityZip  := '',
 			 self.Verified           := false, 
 			 self.stateName          := l.st,
-			 self.DateFirstSeen.Year := (integer4) l.dt_first_seen[1..4];
-			 self.DateFirstSeen.Month:= (integer2) l.dt_first_seen[5..6];
+			 self.DateFirstSeen.Year := (integer4)((STRING)l.dt_first_seen)[1..4];
+			 self.DateFirstSeen.Month:= (integer2)((STRING)l.dt_first_seen)[5..6];
 			 self.DateFirstSeen.Day  := 0;
-			 self.DateLastSeen.Year  := (integer4) l.dt_last_seen[1..4];
-			 self.DateLastSeen.Month := (integer2) l.dt_last_seen[5..6];
+			 self.DateLastSeen.Year  := (integer4)((STRING)l.dt_last_seen)[1..4];
+			 self.DateLastSeen.Month := (integer2)((STRING)l.dt_last_seen)[5..6];
 			 self.DatelastSeen.Day   := 0;
 			    			 
 			 self.StateSearch.Code  := l.StCode,
@@ -294,11 +294,11 @@ export Functions := module
 																		self.Address.StateCityZip := '',
 																		self.Verified             := false;
 																		self.StateName            := ut.St2Name(l.st),
-																		self.DateFirstSeen.Year  := (integer4) l.dt_first_seen[1..4];
-																		self.DateFirstSeen.Month := (integer2) l.dt_first_seen[5..6];
+																		self.DateFirstSeen.Year  := (integer4)((STRING)l.dt_first_seen)[1..4];
+																		self.DateFirstSeen.Month := (integer2)((STRING)l.dt_first_seen)[5..6];
 																		self.DateFirstSeen.Day   := 0;
-																		self.DateLastSeen.Year   := (integer4) l.dt_last_seen[1..4];
-																		self.DateLastSeen.Month  := (integer2) l.dt_last_seen[5..6];
+																		self.DateLastSeen.Year   := (integer4)((STRING)l.dt_last_seen)[1..4];
+																		self.DateLastSeen.Month  := (integer2)((STRING)l.dt_last_seen)[5..6];
 																		self.DateLastSeen.Day    := 0;																								
 															end;
         

@@ -36,8 +36,8 @@
 
 EXPORT FCCSearchService := MACRO
 
-#constant('SearchIgnoresAddressOnly',true)
-#stored('PenaltThreshold',10)
+#constant('SearchIgnoresAddressOnly',true);
+#stored('PenaltThreshold',10);
 rpen := FCC_Services.FCCSearchService_records;
 Text_Search.MAC_Append_ExternalKey(rpen, rpen2, INTFORMAT(l.fcc_seq,15,1));
 output(rpen2, named('Results'));

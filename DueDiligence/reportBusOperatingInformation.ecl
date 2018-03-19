@@ -38,12 +38,12 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	                              SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
 																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)le.firstreported[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)le.firstreported[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)le.lastreported[1..4];
-																															SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
+																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
+																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
+																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
+																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
+																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
+																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
 			                            SELF                                  := [];
 				                     END;  
 	 
@@ -108,12 +108,12 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfBusShellSource(ListOfBusSources le, Integer BSSourceCount) := TRANSFORM, SKIP(BSSourceCount > iesp.constants.DDRAttributesConst.MaxReportingSources)
 																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)le.firstreported[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)le.firstreported[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)le.lastreported[1..4];
-																															SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
+																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
+																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
+																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
+																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
+																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
+																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
 			                            SELF                                  := [];
 				                     END;  
 	 

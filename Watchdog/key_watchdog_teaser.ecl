@@ -37,7 +37,7 @@ END;
 
 newrec xform(wdog_dist l, hdr_ambig r) := TRANSFORM
 	// remove minors
-	self.did := IF(l.dob = 0 or ut.GetAgeI(l.dob) >= 18, l.did, SKIP);
+	self.did := IF(l.dob = 0 or ut.Age(l.dob) >= 18, l.did, SKIP);
 	self.pfname := datalib.preferredFirstNew(l.fname, true);
 	self := l;
 END;

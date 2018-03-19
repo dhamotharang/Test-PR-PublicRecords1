@@ -35,9 +35,9 @@
 EXPORT DEASearchService := MACRO
 
 
-#constant('SearchGoodSSNOnly',true)
-#constant('SearchIgnoresAddressOnly',true)
-#constant('getBdidsbyExecutive',FALSE)
+#constant('SearchGoodSSNOnly',true);
+#constant('SearchIgnoresAddressOnly',true);
+#constant('getBdidsbyExecutive',FALSE);
 
   EXPORT DEA_params := MODULE(DEAV2_Services.Interfaces.search_params)
 			String9 Reg_Number                         := '' : STORED('RegistrationNumber');	

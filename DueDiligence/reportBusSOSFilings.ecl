@@ -19,12 +19,12 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																															SELF.SOSFilingStatus                  := le.FilingStatus;
 																															SELF.FilingNumber                     := le.FilingNumber;
 																															SELF.SOSIncorporationState            := le.IncorporationState; 
-																															SELF.FilingDate.Year                  := (unsigned4)le.FilingDate[1..4];     //** YYYY
-																														 SELF.FilingDate.Month                 := (unsigned2)le.FilingDate[5..6];     //** MM
-																															SELF.FilingDate.Day                   := (unsigned2)le.FilingDate[7..8];     //** DD
-																															SELF.SOSLastUpdated.Year              := (unsigned4)le.LastSeenDate[1..4];   //** YYYY
-																															SELF.SOSLastUpdated.Month             := (unsigned2)le.LastSeenDate[5..6];   //** MM
-																															SELF.SOSLastUpdated.Day               := (unsigned2)le.LastSeenDate[7..8];   //** DD 
+																															SELF.FilingDate.Year                  := (unsigned4)((STRING)le.FilingDate)[1..4];     //** YYYY
+																														 SELF.FilingDate.Month                 := (unsigned2)((STRING)le.FilingDate)[5..6];     //** MM
+																															SELF.FilingDate.Day                   := (unsigned2)((STRING)le.FilingDate)[7..8];     //** DD
+																															SELF.SOSLastUpdated.Year              := (unsigned4)((STRING)le.LastSeenDate)[1..4];   //** YYYY
+																															SELF.SOSLastUpdated.Month             := (unsigned2)((STRING)le.LastSeenDate)[5..6];   //** MM
+																															SELF.SOSLastUpdated.Day               := (unsigned2)((STRING)le.LastSeenDate)[7..8];   //** DD 
 			                            SELF                                  := [];
 				                     END;  
 	 
