@@ -181,6 +181,8 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   addAssociatedNames := JOIN(UpdateBOTHSourcesInReport, rollNames,
                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := LEFT.busn_info.fein;
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEINIsSSN := LEFT.feinIsSSN;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.name;
                                         SELF := LEFT;),
                              LEFT OUTER);
