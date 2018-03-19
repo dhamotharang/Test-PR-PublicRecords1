@@ -12,7 +12,7 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRSOSFiling  FormatTheListOfSOSFilings(BusSOSFilingsSlim le, Integer FilingCount) := TRANSFORM, 
+	iesp.duediligencebusinessreport.t_DDRSOSFiling  FormatTheListOfSOSFilings(BusSOSFilingsSlim le, Integer FilingCount) := TRANSFORM, 
 	                              SKIP(FilingCount > iesp.constants.DDRAttributesConst.MaxSOSFilingStatuses)
 																															SELF.BusinessName                     := le.BusinessName;                      
 																															SELF.FilingType                       := le.FilingType;
@@ -30,14 +30,9 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 
 
 	BusSOSFilingDataset  :=   
-	PROJECT(BusSOSFilingsSlim,                                                                       //*** Using this input dataset - these sources will get moved to the reporting section 
-			TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingOfSOSFilingsChildLayout,                 //*** format the data according to this layout.
-				SELF.seq                    := LEFT.seq;                                                     //*** This is the sequence number of the Inquired Business (or the Parent)
-				SELF.ultid                  := LEFT.ultid;
-				SELF.orgid                  := LEFT.orgid;
-				SELF.seleid                 := LEFT.seleid;
-				SELF.proxid                 := LEFT.proxid;
-				SELF.powid                  := LEFT.powid;
+	PROJECT(BusSOSFilingsSlim,                                                               //*** Using this input dataset - these sources will get moved to the reporting section 
+			TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingOfSOSFilingsChildLayout,       //*** format the data according to this layout.
+				#EXPAND (DueDiligence.Constants.mac_TRANSFORMLinkids())                            //***This is the sequence number and LINKID of the Inquired Business (or the Parent)
 				SELF.BusSOSFilingsChild  := PROJECT(LEFT, FormatTheListOfSOSFilings(LEFT, COUNTER)))); 
 				       
 		
@@ -48,7 +43,7 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusSOSFilingDataset ri, Integer SOSCount) := TRANSFORM
 														   //***                                                                                          SOSFilingStatuses is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SOSFilingStatuses     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.SOSFilingStatuses  + ri.BusSOSFilingsChild;
+																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSFilingStatuses     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSFilingStatuses  + ri.BusSOSFilingsChild;
 																	SELF := le;
 				  											END; 
 																	
