@@ -157,7 +157,7 @@ export get_NeighborhoodReport(DATASET(Address_Attributes.Layouts.address_in) ind
 		self.DOB.Year		:=(integer)l.DOB[1..4];
 		self.DOB.Month	:=(integer)l.DOB[5..6];
 		self.DOB.Day		:=(integer)l.DOB[7..8];
-		self.Age				:=(integer)ut.GetAgeI((unsigned8)l.dob);
+		self.Age				:=(integer)ut.Age((unsigned8)l.dob);
 		self.Race				:=l.race;
 		self.Ethnicity	:=l.ethnicity;
 		self.Sex				:=l.sex;

@@ -269,7 +269,7 @@ TRANSFORM
 		yob_value=0 or ri.dob=0, 
 		255,
 		IF(
-			(STRING4)yob_value=ri.dob[1..4],
+			(STRING4)yob_value=((STRING)ri.dob)[1..4],
 			100,
 			0
 		)
@@ -294,7 +294,7 @@ TRANSFORM
 			=>100,
 		zip_value[1]=le.zip 
 			=>(90-2*ut.StringSimilar(prange_value,(string)le.prim_range)),
-			ut.max2(0, 100-ut.zip_Dist(input_zip,(string5)le.zip))
+			max(0, 100-ut.zip_Dist(input_zip,(string5)le.zip))
 	);
 	
 	SELF.score_any_name := 
@@ -314,7 +314,7 @@ TRANSFORM
 		(yob_value=0 or ri.dob=0) and le.yob=0, 
 		255,
 		IF(
-			(STRING4)yob_value=ri.dob[1..4] or le.yob<>0,
+			(STRING4)yob_value=((STRING)ri.dob)[1..4] or le.yob<>0,
 			100,
 			0
 		)
@@ -380,8 +380,8 @@ Didville.Layout_Did_Numeric_Out.Out_Rec append_best_addr_score(j2 li,best_addr_r
 			=>100,
 		input_zip=ri.zip 
 			=>(90-2*ut.StringSimilar(prange_value,ri.prim_range)),
-			ut.max2(0, 100-ut.zip_Dist(input_zip,ri.zip)));
-	SELF.score_any_addr := ut.max2(li.score_any_addr,self.verify_best_address);
+			max(0, 100-ut.zip_Dist(input_zip,ri.zip)));
+	SELF.score_any_addr := max(li.score_any_addr,self.verify_best_address);
 	SELF := li;
 END;
 
@@ -393,7 +393,7 @@ if(
 	exists(key_res),
 	j3, 
 	project( //for the case that we have no results and want to just return the inputs
-		ut.ds_oneRecord,
+		dataset([{1}], {unsigned a}),
 		transform(
 			Didville.Layout_Did_Numeric_Out.Out_Rec,
 			self.ssn4 := input_ssn4, 

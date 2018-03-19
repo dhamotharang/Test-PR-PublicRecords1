@@ -48,9 +48,9 @@
 export Wildcard_Search := MACRO
 
 string8 agerlow := '': stored('agelow');
-#stored('agelower',agerlow)
+#stored('agelower',agerlow);
 string8 agerhigh :=  '': stored('agehigh');
-#stored('agehigher',agerhigh) 
+#stored('agehigher',agerhigh);
 
 vehicle_wildcard.MAC_Field_Declare()
 

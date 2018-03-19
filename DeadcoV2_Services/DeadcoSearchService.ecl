@@ -35,9 +35,9 @@
 
 
 EXPORT DeadcoSearchService := MACRO
-#constant('SearchIgnoresAddressOnly',false)
-#stored('ScoreThreshold', 10)
-#stored('PenaltThreshold', 10) //this is redundant (same value default is used later), but more clear
+#constant('SearchIgnoresAddressOnly',false);
+#stored('ScoreThreshold', 10);
+#stored('PenaltThreshold', 10); //this is redundant (same value default is used later), but more clear
 
 OUTPUT (DeadcoV2_Services.search_records, named('Results'));
 

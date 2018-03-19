@@ -1,15 +1,14 @@
-import AddressReport_Services;
-IMPORT AddrBest, iesp, ut, Census_Data, NID, doxie, header, header_quick, utilfile;
+import AddressReport_Services, AddrBest, iesp, ut, Census_Data, NID, doxie, header, header_quick, utilfile, std;
 
 EXPORT AddressSummaryService_Functions := MODULE
 	// Helper Functions
-	SHARED ut_get_date_YYYYMM := ut.getdate[1..6];
+	SHARED ut_get_date_YYYYMM := ((STRING8)Std.Date.Today())[1..6];
 	SHARED name_regex(string in_name_part) := REGEXREPLACE('\\W', in_name_part, ' ');
 	SHARED upper_case(string in_ToUpper) := StringLib.StringToUpperCase(in_ToUpper);
 	SHARED trim_all(string in_trim_all) := TRIM(upper_case(in_trim_all), ALL);
 	SHARED trim_lr(string in_trim_lr) := TRIM(upper_case(in_trim_lr), LEFT, RIGHT);
 	SHARED pref_fname(string in_fname) := NID.PreferredFirstNew(in_fname, true);
-	SHARED split_lname(string in_lname, integer in_section) := ut.StringSplit(in_lname)[in_section];
+	SHARED split_lname(string in_lname, integer in_section) := Std.Str.SplitWords(in_lname, ' ')[in_section];
 
 	EXPORT fnVerifiedName(integer in_did, string in_fname, string in_mname, string in_lname, string in_name_suffix,
 							 string in_prim_range, string in_predir, string in_prim_name, string in_suffix, 
@@ -27,7 +26,7 @@ EXPORT AddressSummaryService_Functions := MODULE
 
 		// util header helper functions (from DidVille.All_recs)
 		unsigned3 add4(unsigned3 dt) := if ((dt+4) % 100 > 12, dt + 104 - 12, dt+4);
-		unsigned3 todaydate := (unsigned3)((integer)ut.GetDate div 100);
+		unsigned3 todaydate := (unsigned3)((integer)Std.Date.Today() div 100);
 		unsigned3 lesser(unsigned3 dt2) := if (add4(dt2) < todaydate, add4(dt2),todaydate);
 
 		// search header files by did

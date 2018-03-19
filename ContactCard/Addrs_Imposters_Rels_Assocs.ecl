@@ -1,4 +1,4 @@
-// This code is left as it is, since it is used by ContactCard service. For future development use PersonReports.Person_records
+﻿// This code is left as it is, since it is used by ContactCard service. For future development use PersonReports.Person_records
 // Attribute Information: Fetches Imposters, AKAs, and Subject_Information for ContactCard ReportService.
 
 import ut, doxie, suppress, codes, driversv2_services, watchdog, risk_indicators, DeathV2_Services,
@@ -24,14 +24,14 @@ shared sslr := doxie.SSN_Lookups;
 ssn_per := dedup(sort(doxie.ssn_persons(),record,except dt_first_seen,dt_last_seen),record,except dt_first_seen,dt_last_seen);
 proj_ssn_per := project(ssn_per,transform(layout_comp_names_w_title,
 																					self.dob := left.date_ob,
-																					self.age := if(left.date_ob<>0,ut.GetAge((string8) left.date_ob),0),
+																					self.age := if(left.date_ob<>0,ut.Age(left.date_ob),0),
 																					self.address_seq_no := 0;
 																					self := left));
 // Used by Imposters and AKAs section.
 shared pre_subj_names := dedup(sort
 													(proj_ssn_per ,fname,lname,mname,-dob,-ssn),
 													left.fname=right.fname and left.lname=right.lname and left.mname=right.mname and
-													(left.dob=right.dob or right.dob=0 or ((integer)((string)right.dob[7..8])=0 and (string)left.dob[1..6]=(string)right.dob[1..6] )) and
+													(left.dob=right.dob or right.dob=0 or ((integer)(((string)right.dob)[7..8])=0 and ((string)left.dob)[1..6]=((string)right.dob)[1..6] )) and
 													(left.ssn=right.ssn or right.ssn=''));
 
 // Start Formatting drivers
@@ -52,9 +52,9 @@ PersonReports.layouts.dl get_license_info(dlsr l):=transform
 		self.name_last := l.lname;
 		self.name_prefix := l.title;
 		self.age := l.age;
-		self.dob.year :=(unsigned2) l.dob[1..4];
-		self.dob.month :=(unsigned1) l.dob[5..6];
-		self.dob.day := (unsigned1) l.dob[7..8];
+		self.dob.year :=(unsigned2)((STRING)l.dob)[1..4];
+		self.dob.month :=(unsigned1)((STRING)l.dob)[5..6];
+		self.dob.day := (unsigned1)((STRING)l.dob)[7..8];
 		self.street_number := l.prim_range;
 		self.street_name := l.prim_name;
 		self.street_suffix := l.suffix;
@@ -66,12 +66,12 @@ PersonReports.layouts.dl get_license_info(dlsr l):=transform
 		self.sex := l.sex_flag;
 		self.race := l.race;
 		self.license_type := l.license_type_name;
-		self.expiration_date.year :=(unsigned2) l.expiration_date[1..4];
-		self.expiration_date.month :=(unsigned1) l.expiration_date[5..6];
-		self.expiration_date.day := (unsigned1)l.expiration_date[7..8];
-		self.lic_issue_date.year :=(unsigned2) l.lic_issue_date[1..4];
-		self.lic_issue_date.month :=(unsigned1) l.lic_issue_date[5..6];
-		self.lic_issue_date.day :=(unsigned1)l.lic_issue_date[7..8];
+		self.expiration_date.year :=(unsigned2)((STRING)l.expiration_date)[1..4];
+		self.expiration_date.month :=(unsigned1)((STRING)l.expiration_date)[5..6];
+		self.expiration_date.day := (unsigned1)((STRING)l.expiration_date)[7..8];
+		self.lic_issue_date.year :=(unsigned2)((STRING)l.lic_issue_date)[1..4];
+		self.lic_issue_date.month :=(unsigned1)((STRING)l.lic_issue_date)[5..6];
+		self.lic_issue_date.day :=(unsigned1)((STRING)l.lic_issue_date)[7..8];
 		self.state_name := codes.GENERAL.state_long(l.st);
 		self.dl_number := l.dl_number;
 		self.height := l.height;
@@ -116,12 +116,12 @@ shared with_ssn_info_w_title add_issuance_w_title(layout_comp_names_w_title l,ss
 	self.title := l.title;
 	self.ssn_valid := yesNo(r.valid);
 	self.ssn_issued_location := r.ssn_issue_place;
-	self.ssn_issued_start_date.year :=(unsigned2) r.ssn_issue_early[1..4];
-	self.ssn_issued_start_date.month :=(unsigned1) r.ssn_issue_early[5..6];
-	self.ssn_issued_start_date.day :=(unsigned1) r.ssn_issue_early[7..8];
-	self.ssn_issued_end_date.year :=(unsigned2) r.ssn_issue_last[1..4];
-	self.ssn_issued_end_date.month :=(unsigned1) r.ssn_issue_last[5..6];
-	self.ssn_issued_end_date.day := (unsigned1)r.ssn_issue_last[7..8];
+	self.ssn_issued_start_date.year :=(unsigned2)((STRING) r.ssn_issue_early)[1..4];
+	self.ssn_issued_start_date.month :=(unsigned1)((STRING) r.ssn_issue_early)[5..6];
+	self.ssn_issued_start_date.day :=(unsigned1)((STRING) r.ssn_issue_early)[7..8];
+	self.ssn_issued_end_date.year :=(unsigned2)((STRING) r.ssn_issue_last)[1..4];
+	self.ssn_issued_end_date.month :=(unsigned1)((STRING) r.ssn_issue_last)[5..6];
+	self.ssn_issued_end_date.day := (unsigned1)((STRING) r.ssn_issue_last)[7..8];
 	self := l;
 	self := [];
 END;	
@@ -159,7 +159,7 @@ shared get_id() := macro
 	self.name.first := l.fname;
 	self.name.middle := l.mname;
 	self.name.last := l.lname;
-	self.age_at_death := if(l.dod<>0 and l.age<>0, l.age - ut.getAge((string8)l.dod),0);
+	self.age_at_death := if(l.dod<>0 and l.age<>0, l.age - ut.Age(l.dod),0);
 	self.ssn_issued_start_date := l.ssn_issued_start_date;
 	self.ssn_issued_end_date := l.ssn_issued_end_date;
 	self.ssn_valid := l.ssn_valid;
@@ -180,13 +180,13 @@ with_ssn_info add_issuance_imposters(ssn_info l):=transform
 	self.ssn_valid := yesNo(l.valid);
 	self.ssn_issued_location := l.ssn_issue_place;
 	self.ssn_issued_start_date := project(l,transform(personReports.Layouts.date.ymd, 
-																				self.year		:=(integer)left.ssn_issue_early[1..4],
-																				self.month	:=(integer)left.ssn_issue_early[5..6],
-																				self.day		:=(integer)left.ssn_issue_early[7..8]));
+																				self.year		:=(integer)((STRING)left.ssn_issue_early)[1..4],
+																				self.month	:=(integer)((STRING)left.ssn_issue_early)[5..6],
+																				self.day		:=(integer)((STRING)left.ssn_issue_early)[7..8]));
 	self.ssn_issued_end_date := project(l,transform(personReports.Layouts.date.ymd, 
-																				self.year 	:=(integer)left.ssn_issue_last[1..4],
-																				self.month	:=(integer)left.ssn_issue_last[5..6],
-																				self.day 		:=(integer)left.ssn_issue_last[7..8]));
+																				self.year 	:=(integer)((STRING)left.ssn_issue_last)[1..4],
+																				self.month	:=(integer)((STRING)left.ssn_issue_last)[5..6],
+																				self.day 		:=(integer)((STRING)left.ssn_issue_last)[7..8]));
 	self := l;
 	self := [];
 END;

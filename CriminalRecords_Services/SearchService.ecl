@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CriminalRecords::SearchService">
 
 	<!-- Keyed Fields -->
@@ -49,7 +49,7 @@
 */
 /*--INFO-- This service pulls from the Criminal Offenders file.*/
 
-import iesp, AutoStandardI;
+import iesp, AutoStandardI, std;
 
 export SearchService := MACRO
 
@@ -87,8 +87,8 @@ export SearchService := MACRO
     export string8 	  CaseFilingEndDate    := iesp.ECL2ESP.t_DateToString8(search_by.CaseFilingDateRange.EndDate);
 	end;
 
-	is_valid_dateinput := (tempmod.CaseFilingStartDate = '' or ut.ValidDate(tempmod.CaseFilingStartDate)) 
-		                      and (tempmod.CaseFilingEndDate = '' or ut.ValidDate(tempmod.CaseFilingEndDate));
+	is_valid_dateinput := (tempmod.CaseFilingStartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.CaseFilingStartDate)) 
+		                      and (tempmod.CaseFilingEndDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.CaseFilingEndDate));
 		
   IF(~is_valid_dateinput, FAIL('An error occurred while running CriminalRecords_Services.SearchService: invalid input dates.') );
 

@@ -59,7 +59,7 @@ EXPORT SearchService := MACRO
   #stored ('RegistrationNumber', search_by.DEARegistrationNumber);
   #stored ('SSN', search_by.SSN);
   #stored ('CompanyName', search_by.CompanyName);
-  #stored ('DID',search_by.UniqueId)
+  #stored ('DID',search_by.UniqueId);
   input_params := AutoStandardI.GlobalModule();
 			
 	tempmod := module(project(input_params,DEA_Services.Records.params,opt))  

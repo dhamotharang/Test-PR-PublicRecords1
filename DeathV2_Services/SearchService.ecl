@@ -40,10 +40,10 @@
 
 
 export SearchService() := macro
-	#constant('SearchGoodSSNOnly',true)
-	#constant('SearchIgnoresAddressOnly',true)
-	#stored('ScoreThreshold',10)
-	#stored('PenaltThreshold',10)
+	#constant('SearchGoodSSNOnly',true);
+	#constant('SearchIgnoresAddressOnly',true);
+	#stored('ScoreThreshold',10);
+	#stored('PenaltThreshold',10);
 
 	// output(DeathV2_Services.Search_records, named('Results'));
 

@@ -50,7 +50,7 @@ iesp.ECL2ESP.SetInputName(report_by.Name);
 #stored('OffenderKey', report_by.OffenderId);
 #stored('IncludeAllCriminalRecords', report_opt.IncludeAllCriminalRecords);
 #stored('IncludeSexualOffenses', report_opt.IncludeSexualOffenses);
-#stored ('DID',report_by.UniqueId)
+#stored ('DID',report_by.UniqueId);
 // used only for SOAP testing
 input_params := AutoStandardI.GlobalModule();
 tempmod := module(project(input_params,CriminalRecords_Services.IParam.report,opt))
