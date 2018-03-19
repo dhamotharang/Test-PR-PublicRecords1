@@ -15,8 +15,8 @@ export UCCRaw := module
 	
 	// Gets RMSIDs from DIDs
 	// FCRA: this function is for producing internal IDs, no overrides required
-	export get_rmsids_from_dids(dataset(doxie.layout_references) in_dids,string1 in_party_type = '', boolean IsFCRA = false) := function
-	  key := uccv2.key_did_w_Type (IsFCRA);
+	export get_rmsids_from_dids(dataset(doxie.layout_references) in_dids,string1 in_party_type = '') := function
+	  key := uccv2.key_did_w_Type ();
 		res := join(dedup(sort(in_dids,did),did),key,
 		            keyed(left.did = right.did) and
 								keyed(in_party_type='' or right.party_type=in_party_type),
@@ -70,10 +70,9 @@ export UCCRaw := module
 	// Note: TMSID suppressions not done here. They are being done in the report section
 	// and is the responsibility of the caller to suppress them if not using the standard functions
 	export get_tmsids_from_dids(dataset(doxie.layout_references) in_dids,
-															string1 in_party_type = '',
-															boolean IsFCRA = false
+															string1 in_party_type = ''
 															) := function
-		key := uccv2.key_did_w_Type (IsFCRA);
+		key := uccv2.key_did_w_Type ();
 		res := join(dedup(sort(in_dids,did),did),key,
 								keyed(left.did = right.did) and
 								keyed(in_party_type='' or right.party_type=in_party_type),
@@ -197,26 +196,18 @@ export UCCRaw := module
 	  // ...using TMSIDs as the lookup mechanism.
 		export by_tmsid(
 			dataset(UCCv2_services.layout_tmsid) in_tmsids,
-			string in_ssn_mask_type = '',
-			boolean IsFCRA = false,
-			dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-			dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			integer8 inFFDOptionsMask = 0
+			string in_ssn_mask_type = ''
 		) := function
-		  return UCCv2_services.fn_getUCC_tmsid (in_tmsids, in_ssn_mask_type, IsFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
+		  return UCCv2_services.fn_getUCC_tmsid (in_tmsids, in_ssn_mask_type);
 		end;
 
 	  // ...using DIDs as the lookup mechanism.
 	  export by_did(dataset(doxie.layout_references) in_dids,
 		              string in_ssn_mask_type = '',
-									string1 in_party_type = '',
-									boolean IsFCRA = false,
-									dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-									dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-									integer8 inFFDOptionsMask = 0
+									string1 in_party_type = ''
 		) := function
-			tmsids := get_tmsids_from_dids(in_dids,in_party_type,IsFCRA);
-			res := by_tmsid(tmsids,in_ssn_mask_type, IsFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
+			tmsids := get_tmsids_from_dids(in_dids,in_party_type);
+			res := by_tmsid(tmsids,in_ssn_mask_type);
 		  return res;
 		end;
 

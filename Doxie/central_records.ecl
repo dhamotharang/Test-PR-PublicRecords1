@@ -37,7 +37,7 @@ rtvDids := if(IncludeRTVeh_val, dids, dataset ([0], doxie.layout_references)); /
 rtvr := if(IncludeRTVeh_val,doxie.Comp_RealTime_Vehicles(rtvDids).do);  
 
 uccr := if(Include_UCCFilings_val and UccVersion in [0,1], doxie.UCC_legacy_records(dids, ssn_mask_value, in_party_type));
-uccr2:= if(Include_UCCFilings_val and UccVersion in [0,2], doxie.UCC_v2_Records(dids, ssn_mask_value, in_party_type, IsFCRA, ds_flags (file_id = FCRA.FILE_ID.UCC), slim_pc_recs, inFFDMask));
+uccr2:= if(Include_UCCFilings_val and UccVersion in [0,2], doxie.UCC_v2_Records(dids, ssn_mask_value, in_party_type));
 precorr := doxie.corp_affiliations_records(dids);
 corr := if(Include_CorporateAffiliations_val, precorr);
 empl := if(Include_PeopleAtWork_val, doxie.employment_records (dids));
@@ -142,15 +142,15 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.FBNSearch_children                 := IF (~IsFCRA,global(fbnr));
   // UCC V1 should be phased out, so we won't return it on FCRA side
   self.ucc_children                       := IF (~IsFCRA, global(uccr));
-  self.uccv2_children               := global(uccr2);
+  self.uccv2_children                     := IF (~IsFCRA, global(uccr2));
   self.corporate_affiliations_children    := IF (~IsFCRA, global(corr));
-  self.property_children            := global(prop);
+  self.property_children                  := global(prop);
   self.propertyV2_children                := IF (~IsFCRA, global(prop2));
   self.voter_children                     := IF (~IsFCRA, global(votr));
   self.voterv2_children                   := IF (~IsFCRA, global(votr2));
 
   self.concealed_weapon_licenses_children := global(ccwr);
-  self.professional_licenses_children := global(plrr);
+  self.professional_licenses_children     := global(plrr);
   self.sanction_children                  := IF (~IsFCRA, global(sanc));
   self.provider_children                  := IF (~IsFCRA, global(prov)); 
   self.utility_children                   := IF (~IsFCRA, global(util)); 
@@ -159,15 +159,15 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.pilot_licenses_children            := global(pilr);
   self.pilot_certificates_children        := global(cerr);
   self.pilot_aircraft_children            := global(faar);
-  self.bankruptcies_children        := global(bkrr);
+  self.bankruptcies_children              := global(bkrr);
   self.bankruptcies_v2_children           := IF (~IsFCRA, global(bkrr2));
-  self.bankruptcies_v3_children     := global(bkrr3);
+  self.bankruptcies_v3_children           := global(bkrr3);
   // liens V1 should be phased out, so we won't return it on FCRA side
   self.liens_judgements_children          := IF (~IsFCRA, global(lier));
-  self.liens_judgements_v2_children := global(lier2);
+  self.liens_judgements_v2_children       := global(lier2);
   self.dea_children                       := IF (~IsFCRA, global(derr));
   self.deaV2_children                     := IF (~IsFCRA, global(derr2));
-  self.watercraft_children          := global(wtcr);
+  self.watercraft_children                := global(wtcr);
   self.netdomain_children                 := IF (check_cond, global(idom));
   self.employment_children                := IF (check_cond, global(empl));
   self.fl_crash_children                  := IF (~IsFCRA, global(flcr));
