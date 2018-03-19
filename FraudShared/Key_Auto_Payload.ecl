@@ -102,7 +102,7 @@ r :=RECORD
   string10 mitigated_amount;
   string20 external_referral_or_casenumber;
   string5 fraud_point_score;
-  unsigned6 customer_person_id;
+  string20 customer_person_id;
   string50 raw_title;
   string100 raw_first_name;
   string60 raw_middle_name;

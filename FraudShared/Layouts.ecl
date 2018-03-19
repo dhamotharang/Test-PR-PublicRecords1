@@ -354,7 +354,7 @@ export Main         :=
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -549,7 +549,7 @@ export keybuild
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
