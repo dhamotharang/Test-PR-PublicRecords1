@@ -1,7 +1,8 @@
-EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
+﻿EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
 																			,piConectPort   // iConectiv Daily Port File
 																			,pLIDB					// LIDB File
 																			,pDisc		// Disconnect Daily File
+																			,pGHDisc 	//Gong History Disconnect Daily File
 																			,pPhonesMeta 		// PhonesMetadata File	
 																			,pCarrRef				// Carrier Reference File
 																			,pVersion       // Version of Strat Stats
@@ -25,6 +26,10 @@ import Strata, PhonesInfo, ut;
 	#uniquename(rPopulationStats_piDisconnect);
 	#uniquename(dPopulationStats_piDisconnect);
 	#uniquename(zRunDisconnectStats);
+	
+	#uniquename(rPopulationStats_pGHDisc);
+	#uniquename(dPopulationStats_pGHDisc);
+	#uniquename(zRunGHDisconnectStats);
 
 	#uniquename(rPopulationStats_pPhonesMeta);
 	#uniquename(dPopulationStats_pPhonesMeta);
@@ -135,6 +140,34 @@ import Strata, PhonesInfo, ut;
 
 	%dPopulationStats_piDisconnect% := table(pDisconnect, %rPopulationStats_piDisconnect%, carrier_name, few);
 	strata.createXMLStats(%dPopulationStats_piDisconnect%,'PhonesMetadata', 'Disconnect2Phones', pVersion, '', %zRunDisconnectStats%);	
+
+	//Gong History Disconnect File Population Stats	
+	%rPopulationStats_pGHDisc% := record												
+			countGroup                           		:= count(group);
+			pGHDisc.is_deact;
+			pGHDisc.is_react;
+			vendor_first_reported_dt_CountNonZero 	:= sum(group, if(pGHDisc.vendor_first_reported_dt<>0, 1, 0));
+			vendor_last_reported_dt_CountNonZero 		:= sum(group, if(pGHDisc.vendor_last_reported_dt<>0, 1, 0));
+			action_code_CountNonBlank 													:= sum(group, if(pGHDisc.action_code<>'', 1, 0));
+			timestamp_CountNonBlank 															:= sum(group, if(pGHDisc.timestamp<>'', 1, 0));
+			phone_CountNonBlank 																			:= sum(group, if(pGHDisc.phone<>'', 1, 0));
+			phone_swap_CountNonBlank 														:= sum(group, if(pGHDisc.phone_swap<>'', 1, 0));
+			filename_CountNonBlank 																:= sum(group, if(pGHDisc.filename<>'', 1, 0));
+			filedate_CountNonBlank 																:= sum(group, if(pGHDisc.filedate<>'', 1, 0));
+			swap_start_dt_CountNonZero 												:= sum(group, if(pGHDisc.swap_start_dt<>0, 1, 0));
+			swap_end_dt_CountNonZero 														:= sum(group, if(pGHDisc.swap_end_dt<>0, 1, 0));
+			deact_code_CountNonBlank 														:= sum(group, if(pGHDisc.deact_code<>'', 1, 0));
+			deact_start_dt_CountNonZero 											:= sum(group, if(pGHDisc.deact_start_dt<>0, 1, 0));
+			deact_end_dt_CountNonZero 													:= sum(group, if(pGHDisc.deact_end_dt<>0, 1, 0));
+			react_start_dt_CountNonZero 											:= sum(group, if(pGHDisc.react_start_dt<>0, 1, 0));
+			react_end_dt_CountNonZero 													:= sum(group, if(pGHDisc.react_end_dt<>0, 1, 0));
+			is_deact_CountNonZero 																	:= sum(group, if(pGHDisc.is_deact<>'', 1, 0));
+			is_react_CountNonZero 																	:= sum(group, if(pGHDisc.is_react<>'', 1, 0));
+			porting_dt_CountNonZero 															:= sum(group, if(pGHDisc.porting_dt<>0, 1, 0));
+		end;
+
+	%dPopulationStats_pGHDisc% := table(pGHDisc, %rPopulationStats_pGHDisc%, is_deact, is_react, few);
+	strata.createXMLStats(%dPopulationStats_pGHDisc%,'PhonesMetadata', 'GHDisconnectPhones', pVersion, '', %zRunGHDisconnectStats%);	
 	
 	//PhonesMetadata File Population Stats
 		%rPopulationStats_pPhonesMeta% := record
@@ -285,6 +318,6 @@ import Strata, PhonesInfo, ut;
 	%dPopulationStats_pCarrRef% := table(pCarrRef, %rPopulationStats_pCarrRef%, serv, line, few);
 	strata.createXMLStats(%dPopulationStats_pCarrRef%, 'PhonesMetadata', 'CarrierReference2', pVersion, '', %zRunCarrRefStats%);
 	
-	zOut := parallel(%zRunTCPAPortStats%, %zRuniConectPortStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
+	zOut := parallel(%zRunTCPAPortStats%, %zRuniConectPortStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunGHDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
 
 ENDMACRO;

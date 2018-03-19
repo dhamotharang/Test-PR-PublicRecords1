@@ -5,26 +5,42 @@
 				
 EXPORT proc_build_base(STRING version) := FUNCTION
 	
-	dsBase					:= Anchor.Files.base_out;
+	dsBase			:= Anchor.Files.base_out;
 	IngestPrep	:= Anchor.prep_ingest_file;
 
 	ingestMod		:= Anchor.Ingest(,,dsBase,IngestPrep);
-	new_base			:= ingestMod.AllRecords_NoTag;
+	new_base		:= ingestMod.AllRecords;
 	
-	NID.Mac_CleanParsedNames(new_base, FileClnName, 
+	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
+	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
+	PopCurrentRec	:= Project(new_base, TRANSFORM(Anchor.Layouts.Base, self.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE); self := LEFT; SELF:= [];));
+	
+	NID.Mac_CleanParsedNames(PopCurrentRec, FileClnName, 
 													firstname:=FirstName, lastname:=LastName, middlename := clean_mname, namesuffix := clean_name_suffix
-													,includeInRepository:=true, normalizeDualNames:=true);
+													,includeInRepository:=true, normalizeDualNames:=true, useV2 := true);
 	
-
-	InputFileClnName	:= Project(FileClnName, TRANSFORM(Anchor.Layouts.Base,
-																																										self.clean_title				:=	left.cln_title;
-																																										self.clean_fname				:=	left.cln_fname;
-																																										self.clean_mname				:=	left.cln_mname;
-																																										self.clean_lname				:=	left.cln_lname;
-																																										self.clean_name_suffix	:=	left.cln_suffix;
-																																										self.clean_cname				:= IF(trim(self.clean_fname) = '' and trim(self.clean_lname) = '',
-																																																																			STD.Str.CleanSpaces(left.FirstName+' '+left.LastName), '');
-																																										SELF := LEFT));
+	//Name flags
+	person_flags := ['P', 'D'];
+	business_flags := ['B'];
+	InvName_flags	:= ['I'];
+	
+	//output invalid names to send to source for review
+	InvalidName := FileClnName(nametype IN InvName_flags OR (nametype = 'U' AND trim(cln_fname) = '' AND TRIM(cln_lname) = '' AND ~REGEXFIND('TRUST',fullname)));
+	pToRawLayout	:= PROJECT(InvalidName, Anchor.Layouts.Raw);
+	OUTPUT(pToRawLayout,,'~thor_data400::out::Anchor_invalid_names_'+version, OVERWRITE, __COMPRESSED__);
+	OUTPUT(COUNT(InvalidName),NAMED('TotalInvalidRecords_'+version));
+	
+	InputFileClnName	:= Project(FileClnName(nametype != 'I'), TRANSFORM(Anchor.Layouts.Base,
+																																			BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
+																																													(LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != ''); 
+																																			SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
+																																			SELF.clean_fname				:=	IF(IsName, LEFT.cln_fname, '');
+																																			SELF.clean_mname				:=	IF(IsName, LEFT.cln_mname, '');
+																																			SELF.clean_lname				:=	IF(IsName, LEFT.cln_lname, '');
+																																			SELF.clean_name_suffix	:=	IF(IsName, LEFT.cln_suffix, '');
+																																			SELF.clean_cname				:=  IF(LEFT.nametype IN business_flags OR (LEFT.nametype = 'U' AND NOT IsName),
+																																																		STD.Str.CleanSpaces(LEFT.FirstName+' '+LEFT.LastName), '');
+																																			SELF := LEFT));
 																										
 		//AID process
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
@@ -48,7 +64,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 																											rsCleanAID, lAIDFlags);	
 	
 	Anchor.Layouts.Base tProjectClean(rsCleanAID pInput) := TRANSFORM
-	   SELF.prim_range           := pInput.aidwork_acecache.prim_range;
+	  SELF.prim_range           := pInput.aidwork_acecache.prim_range;
     SELF.predir               := pInput.aidwork_acecache.predir;
     SELF.prim_name            := pInput.aidwork_acecache.prim_name;
     SELF.addr_suffix          := pInput.aidwork_acecache.addr_suffix;
