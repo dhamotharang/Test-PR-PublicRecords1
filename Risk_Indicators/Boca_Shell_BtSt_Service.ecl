@@ -1,4 +1,4 @@
-//add changes to output order type
+﻿//add changes to output order type
 
 
 /*--SOAP--
@@ -54,6 +54,10 @@
 	<part name="HistoryDateTimeStamp" type="xsd:string"/>
 	<part name="IncludeScore" type="xsd:boolean"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DeviceProvider1" type="xsd:string"/> //KountScore
 	<part name="DeviceProvider2" type="xsd:string"/> //TmxScore
@@ -123,6 +127,10 @@ export Boca_Shell_BtSt_Service := macro
 	'HistoryDateTimeStamp',
 	'IncludeScore',
 	'RetainInputDID',
+	'OFACversion',
+	'IncludeOfac',
+	'IncludeAdditionalWatchLists',
+	'GlobalWatchlistThreshold',
 	'gateways',
 	'DeviceProvider1',
 	'DeviceProvider2',
@@ -183,6 +191,10 @@ unsigned3 history_date := 999999	: stored('HistoryDateYYYYMM');
 string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');  // new for shell 5.0
 boolean   doScore := false				: stored('IncludeScore');	// allow user to turn on RV and FD scores for realtime runs
 boolean   RetainInputDID := false				: stored('RetainInputDID');	
+real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 /* Gateways */
 string20 DeviceProvider1_value := ''			          : stored('DeviceProvider1');
 string20  DeviceProvider2_value := ''       				  : stored('DeviceProvider2');
@@ -196,8 +208,10 @@ gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := if(Gateway.Configuration.IsNetAcuity(le.servicename) or le.servicename='veris' or 
-			(version >= 50 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.DeltaInquiry]), le.url,  ''); //netacuity will be the only gateway we use in the bocashell processing, default to no gateway call			 
+	self.url := map(Gateway.Configuration.IsNetAcuity(le.servicename) or le.servicename='veris' => le.url,
+                  version >= 50 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.DeltaInquiry] => le.url, //netacuity will be the only gateway we use in the bocashell processing, default to no gateway call
+                  le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                  '');
 	self := le;
 end;
 
@@ -331,10 +345,10 @@ from_BIID := false;
 isFCRA := false;
 excludeWatchlists := false;
 from_IT1O := false;
-ofac_version := 1;
-include_ofac := false;
-include_additional_watchlists := false;
-global_watchlist_threshold := .84;
+//ofac_version := 1;
+//include_ofac := false;
+//include_additional_watchlists := false;
+//global_watchlist_threshold := .84;
 dob_radius := -1;
 
 includeRelativeInfo := true;

@@ -1,7 +1,13 @@
-import ut, address, business_risk, Risk_Indicators, Models, gateway, Royalty, MDR;
+﻿import ut, address, business_risk, Risk_Indicators, Models, gateway, Royalty, MDR;
 
 export SDBO_Function(dataset(Layout_SD5I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,  
-				 boolean isUtility=false, boolean ln_branded=false, string4 tribcode,
+				 boolean isUtility=false, 
+         boolean ln_branded=false, 
+         string4 tribcode,
+         unsigned1 ofac_version = 1,
+         boolean include_ofac = false,
+         boolean include_additional_watchlists = false,
+         real global_watchlist_threshold = 0.84, 
 				 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 				 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := FUNCTION
 
@@ -127,7 +133,7 @@ biid_prep := project(indata,into_biid_in(LEFT));
 
 boolean hasbdids := false;
 boolean ExcludeWatchLists := false;
-boolean OFAC := tribcode != 'ex41';   //Set OFAC to false is tribcode = ex41 per bug 33454.
+boolean ofac_only := tribcode != 'ex41';   //Set OFAC to false is tribcode = ex41 per bug 33454.
 BOOLEAN suppressNearDups := true;
 boolean require2Ele:= true;
 boolean from_BIID := false;
@@ -135,14 +141,30 @@ boolean isFCRA := false;
 boolean fdReasonsWith38 := true; // all SDBO products should be using fdReasonCodesWith38 instead of just fdReasonCodes
 boolean inCalif:=false;
 
+isbridgerservicename := count( gateways(ServiceName = 'bridgerwlc') ) > 0;
+         
+_ofac_version := 
+  map( 
+    ofac_version = 4 => 4,
+    tribcode in ['b2b4'] => 3, 
+    1 );
+    
+_include_ofac := 
+  map(
+    ofac_version = 4 and include_ofac = true => true,
+    tribcode in ['b2b4'] => true, 
+    false );
+    
+_include_additional_watchlists := if(ofac_version = 4 and include_additional_watchlists, true, false);
 
-ofac_version := if(tribcode in ['b2b4'], 3, 1);
-include_ofac := if(tribcode in ['b2b4'], true, false);
-include_additional_watchlists := false;
-watchlist_threshold := if(tribcode in ['b2b4'], 0.85, 0.84);
+_global_watchlist_threshold :=
+  map(
+    ofac_version = 4 and include_ofac => 0.85,
+    tribcode in ['b2b4'] => 0.85, 
+    global_watchlist_threshold);
 
-biid_res := business_risk.InstantID_Function(biid_prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,tribcode,ExcludeWatchLists,ofac,
-								ofac_version,include_ofac,include_additional_watchlists, watchlist_threshold,datarestriction:=datarestriction,datapermission:=datapermission);				
+biid_res := business_risk.InstantID_Function(biid_prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,tribcode,ExcludeWatchLists,ofac_only,
+								_ofac_version,_include_ofac,_include_additional_watchlists, _global_watchlist_threshold, datarestriction:=datarestriction, datapermission:=datapermission);				
 
 dbus_Royalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');
 
@@ -253,7 +275,7 @@ risk_indicators.layout_input into_iid_prep(indata le) := TRANSFORM
 END;
 iid_prep := project(indata, into_iid_prep(left));
 
-iid_res := Risk_Indicators.InstantID_Function(iid_prep, gateways, dppa, glb, isUtility, ln_branded, ofac, 
+iid_res := Risk_Indicators.InstantID_Function(iid_prep, gateways, dppa, glb, isUtility, ln_branded, ofac_only, 
 									suppressNearDups, require2Ele, from_BIID, isFCRA, in_DataRestriction:=DataRestriction,
 									in_DataPermission:=DataPermission);
 
@@ -505,14 +527,14 @@ emptyclam := group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq);
 origInput := project(mapped_results, TRANSFORM(Layout_BusReasons_Input, self := left));
 
 // for ex24, replace the consumer fraud defender score with business defender combined model... so instead of passing empty clam, pass in the full clam
-fraudDefenderScore := map(tribcode in ['b2b2','b2bz','b2b4','b2bc','ex41','ex98'] => Models.FD5603_2_0(clam, OFAC, isFCRA, inCalif, fdReasonsWith38), 
-							tribcode='ex24' => Models.BD5605_1_0(clam, biid, origInput, OFAC, nugen:=true),  // set nugen = true so the combined reason code set logic is applied
+fraudDefenderScore := map(tribcode in ['b2b2','b2bz','b2b4','b2bc','ex41','ex98'] => Models.FD5603_2_0(clam, ofac_only, isFCRA, inCalif, fdReasonsWith38), 
+							tribcode='ex24' => Models.BD5605_1_0(clam, biid, origInput, ofac_only, nugen:=true),  // set nugen = true so the combined reason code set logic is applied
 							dataset([],Models.Layout_ModelOut));
 
-businessDefenderScore := map(tribcode in ['b2b2','b2bc','ex24'] => Models.BD5605_1_0(emptyclam, biid, origInput, OFAC),
-								tribcode in ['b2bz', 'b2b4'] => Models.BD5605_3_0(emptyclam, biid, origInput, OFAC), 
-								tribcode in ['ex41'] => Models.BD5605_2_0(emptyclam, biid, origInput, OFAC), 
-								tribcode in ['ex98'] => Models.BD9605_1_0(emptyclam, biid, origInput, OFAC),
+businessDefenderScore := map(tribcode in ['b2b2','b2bc','ex24'] => Models.BD5605_1_0(emptyclam, biid, origInput, ofac_only),
+								tribcode in ['b2bz', 'b2b4'] => Models.BD5605_3_0(emptyclam, biid, origInput, ofac_only), 
+								tribcode in ['ex41'] => Models.BD5605_2_0(emptyclam, biid, origInput, ofac_only), 
+								tribcode in ['ex98'] => Models.BD9605_1_0(emptyclam, biid, origInput, ofac_only),
 								dataset([],Models.Layout_ModelOut));
 
 //ex41 and ex98 are exceptions to the rule.  the business score always goes in score field, and score3 is blank.

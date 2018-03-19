@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SDBOBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -7,6 +7,10 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -35,11 +39,16 @@ string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission 
 batchin := dataset([],riskwise.Layout_SDBO_Batchin) : stored('batch_in', few);
 gateways_in := Gateway.Configuration.Get();
 tribcode := StringLib.StringToLowerCase(tribcode_value);
+real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode='b2bz' and le.servicename in ['targus', 'attus'] => le.url,  //b2bz uses targus gateway and attus gateway
 				 tribcode in ['b2b2','ex24','ex41','ex98'] and le.servicename='targus' => le.url,  // these use the targus gateway
+         tribcode in ['b2b2','b2bc','ex24','ex98','b2b4'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
 				 ''); // default to no gateway call			 
 	self := le;
 end;
@@ -99,7 +108,8 @@ end;
 
 f := project(batchin, addseq(LEFT,COUNTER));
 
-ret := RiskWise.SDBO_Function(f, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, tribcode, DataRestriction, DataPermission);
+ret := RiskWise.SDBO_Function(f, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, tribcode, ofac_version, include_ofac, include_additional_watchlists, 
+                              global_watchlist_threshold, DataRestriction, DataPermission);
 
 output(ret, named('Results'));
 
