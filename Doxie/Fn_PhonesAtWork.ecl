@@ -1,4 +1,4 @@
-import doxie, business_header, ut, doxie_raw, contactcard;
+import doxie, business_header, ut, doxie_raw, contactcard, std;
 
 export Fn_PhonesAtWork(
 	dataset(doxie.layout_references) in_dids,
@@ -27,7 +27,7 @@ END;
 
 
 paw := project(pawraw(
-						recencyInDays = 0 or ut.DaysApart(dt_last_seen, ut.GetDate) <= recencyInDays),  
+						recencyInDays = 0 or ut.DaysApart(dt_last_seen, (STRING8)Std.Date.Today()) <= recencyInDays),  
 						get_paw(LEFT));
 						
 midrec form_paw_phones(paw le) :=

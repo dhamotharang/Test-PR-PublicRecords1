@@ -80,7 +80,7 @@ export Did_Score() := FUNCTION
 	end;
 
 	score_w_src w_header(header_recs0 l):=transform
-		self.score_any_addr := ut.max2(if((unsigned3) l.zip in zip_value,9,0), 100-(10*doxie.FN_Tra_Penalty_Addr(l.predir,l.prim_range,l.prim_name,l.suffix,
+		self.score_any_addr := max(if((unsigned3) l.zip in zip_value,9,0), 100-(10*doxie.FN_Tra_Penalty_Addr(l.predir,l.prim_range,l.prim_name,l.suffix,
 			l.postdir, l.sec_range,l.city_name,l.st,l.zip)));
 			self.src := l.src;
 		self := [];
@@ -148,9 +148,9 @@ export Did_Score() := FUNCTION
 			find_day := 	doxie.DOBTools(temp_dob_val).find_day;
 
 		self.score_best_dob := if((integer) l.dob=0 or ri.dob=0, 255,
-														if(find_year =(integer) ri.dob[1..4] or find_year=0,50,0) +
-														if(find_month = (integer) ri.dob[5..6] or find_month=0,30,0) +
-														if(find_day = (integer) ri.dob[7..8] or find_day=0,20,0));
+														if(find_year =(integer)((STRING)ri.dob)[1..4] or find_year=0,50,0) +
+														if(find_month = (integer)((STRING)ri.dob)[5..6] or find_month=0,30,0) +
+														if(find_day = (integer)((STRING)ri.dob)[7..8] or find_day=0,20,0));
 		self.score_any_addr	:= l.score_any_addr;
 		self.score := l.score;
 		self.did := l.did;
@@ -164,7 +164,7 @@ export Did_Score() := FUNCTION
 
 
 	didville.layout_Did_Score w_best_addr(j0 l,best_addr_rec r):=transform
-		self.score_best_addr := if(r.did=0,255, ut.max2(if((unsigned3) r.zip in zip_value,9,0), 100-(10*doxie.FN_Tra_Penalty_Addr(r.predir,r.prim_range,r.prim_name,r.suffix,
+		self.score_best_addr := if(r.did=0,255, max(if((unsigned3) r.zip in zip_value,9,0), 100-(10*doxie.FN_Tra_Penalty_Addr(r.predir,r.prim_range,r.prim_name,r.suffix,
 			r.postdir, r.sec_range,r.city_name,r.st,r.zip))));
 		self.score_any_addr := header_addr_score;
 		self.score_credit_addr := credit_addr_score;

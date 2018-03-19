@@ -6,7 +6,7 @@ import RiskView_Attributes_Reports;
 import Scoring_Project_Macros,scoring_project_pip,Scoring_Project_DailyTracking, scoring_QA;
 
 import ut,std;
-import RiskView_Attributes_Reports;
+import RiskView_Attributes_Reports,zz_bbraaten2;
 
 	a:= ut.GetDate;
 	

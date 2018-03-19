@@ -48,18 +48,22 @@ pc_recs := FFD.FetchPersonContext(in_pc, gateways,, inFFDMask);
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
 suppress_results_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1].suppress_records;
+
+// create pseudo-best record only to get flag records; more realistic best is calculated later
+ds_flags := FFD.GetFlagFile (PROJECT (dids, TRANSFORM (doxie.layout_best, SELF.did := LEFT.did, SELF := [])),
+                             pc_recs);
 // FFD - END
 
 boolean verify_did := false : stored ('VerifyUniqueID');
 // NB: this call may throw an error if DID found cannot be verified against input criteria
-ds_header := doxie.central_header (dids, IsFCRA, verify_did, false, slim_pc_recs, inFFDMask); // only one row at most
+ds_header := doxie.central_header (dids, IsFCRA, verify_did, false, slim_pc_recs, inFFDMask, ds_flags); // only one row at most
 
 fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
 boolean isCollections := application_type_value IN AutoStandardI.Constants.COLLECTION_TYPES;
 nss_default := if(fcra_subj_only or isCollections, Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription, Suppress.Constants.NonSubjectSuppression.doNothing);
 nss := ut.GetNonSubjectSuppression(nss_default);
 
-cent := doxie.central_records (IsFCRA, '', ds_header, nss, slim_pc_recs, inFFDMask); //party-type=''
+cent := doxie.central_records (IsFCRA, '', ds_header, nss, slim_pc_recs, inFFDMask, ds_flags); //party-type=''
 
 // get DIDs calculated on a neutral side (same as in central records)
 besr := normalize (choosen (cent, 1), left.best_information_children, transform(right));
@@ -84,7 +88,7 @@ end;
 crmr := CriminalRecords_Services.ReportService_Records.val(tempmod, IsFCRA, pc_recs);
 docr2 := IF (Include_CriminalRecords_val, crmr[1].CriminalRecords);
 
-so_rec := doxie.SexOffender_Search_Records(besr, isFCRA, slim_pc_recs, inFFDMask);
+so_rec := doxie.SexOffender_Search_Records(besr, isFCRA, slim_pc_recs, inFFDMask, ds_flags);
 soff := if(Include_SexualOffenses_val, dedup(sort(so_rec,seisint_primary_key),seisint_primary_key));
 
 doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform

@@ -729,7 +729,7 @@ EXPORT Datasource_SelectFile := MODULE
 		//Handle Jr/Sr problems
 		sancs_by_sid_filtered:=join(input,dedup(sancs_by_sid_filter1,record,all),left.acctno=right.acctno,transform(Healthcare_Header_Services.layouts.layout_LegacySanctions,
 																										skipRec := (integer)left.dob > 0 and (integer)right.SANC_DOB > 0 and
-																																			(ut.LatestDate((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4]) - 
+																																			(Max((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4]) - 
 																																			ut.EarliestDate((integer)left.DOB[1..4],(integer)right.SANC_DOB[1..4])) > 13;
 																										self.providerid:=if(skipRec or 
 																																				(left.providersrc = Healthcare_Header_Services.Constants.SRC_SANC and (integer)left.providerid <> (integer)right.sanc_id),

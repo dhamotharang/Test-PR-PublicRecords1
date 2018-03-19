@@ -1,4 +1,4 @@
-import doxie,ut,header,address,mdr;
+﻿import doxie,ut,header,address,mdr,std;
 
 export BestAddress := MODULE
 
@@ -30,7 +30,7 @@ flag_rec := record
 end;
 
 flag_rec assignedDates(en Le) := transform
-self.dt_last_seen := ((integer)(ut.GetDate[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported,le.dt_last_seen))/3;
+self.dt_last_seen := ((integer)(((STRING8)Std.Date.Today())[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported,le.dt_last_seen))/3;
 self.dt_first_seen := if(le.dt_first_seen=0,le.dt_vendor_first_reported,le.dt_first_seen);
 self.unit_desig := if(le.sec_range='','',le.unit_desig);
 self.addr_dt_last_seen := (unsigned3)le.dt_last_seen;
@@ -56,7 +56,7 @@ string5 input_zip,string10 prange_value, unsigned1 fi_value, unsigned1 li_value)
 // Keep addresses in the last three months or daily utility records since they appear to often have the correct
 // address, even if the record date is an unreliable indicator
 mac_date (ds,ds_out) := Macro
-ds_out :=ds(ut.DaysApart(dt_last_seen+'30', ut.GetDate) < 31*3 or src='DU');
+ds_out :=ds(ut.DaysApart(dt_last_seen+'30', (STRING8)Std.Date.Today()) < 31*3 or src='DU');
 EndMacro;
 
 

@@ -1,4 +1,4 @@
-import didville, address, ut, gong, Marketing_Best;
+﻿import didville, address, ut, gong, Marketing_Best;
 
 Loadxml('<FOO/>');
 
@@ -212,27 +212,29 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 	
 	outf6 := rollup(outf5, true, Roll_EDA(LEFT,RIGHT));
 
+  boolean Chr2Bool(string1 chr) := chr='Y' or chr='1';
+
 	outf6 get_dlb(outf6 L, Marketing_Best.key_equifax_DID R) := transform
 		self.age := R.age_1;
 		self.gender := R.gender_1;
-		self.outdoors_dimension_household := ut.Chr2Bool(R.outdoors_dimension_household);
-		self.athletic_dimension_household := ut.Chr2Bool(R.athletic_dimension_household);
-		self.fitness_dimension_household 	:= ut.Chr2Bool(R.fitness_dimension_household);
-		self.domestic_dimension_household := ut.Chr2Bool(R.domestic_dimension_household);
-		self.good_life_dimension_household := ut.Chr2Bool(R.good_life_dimension_household);
-		self.cultural_dimension_household := ut.Chr2Bool(R.cultural_dimension_household);
-		self.blue_chip_dimension_household := ut.Chr2Bool(R.blue_chip_dimension_household);
-		self.do_it_yourself_dimension_household := ut.Chr2Bool(R.do_it_yourself_dimension_household);
-		self.technology_dimension_household := ut.Chr2Bool(R.technology_dimension_household);
-		self.credit_card_usage_miscellaneous := ut.Chr2Bool(R.credit_card_usage_miscellaneous);
-		self.credit_card_usage_standard_retail := ut.Chr2Bool(R.credit_card_usage_standard_retail);
-		self.credit_card_usage_standard_specialty_card := ut.Chr2Bool(R.credit_card_usage_standard_specialty_card);
-		self.credit_card_usage_upscale_retail := ut.Chr2Bool(R.credit_card_usage_upscale_retail);
-		self.credit_card_usage_upscale_spec_retail := ut.Chr2Bool(R.credit_card_usage_upscale_spec_retail);
-		self.credit_card_usage_bank_card := ut.Chr2Bool(R.credit_card_usage_bank_card);
-		self.credit_card_usage_oil_gas_card := ut.Chr2Bool(R.credit_card_usage_oil__gas_card);
-		self.credit_card_usage_Finance_Co_Card :=	ut.Chr2Bool(R.credit_card_usage_Finance_Co_Card);
-		self.credit_card_usage_Travel_Entertainment := ut.Chr2Bool(R.credit_card_usage_Travel__Entertainment);
+		self.outdoors_dimension_household := Chr2Bool(R.outdoors_dimension_household);
+		self.athletic_dimension_household := Chr2Bool(R.athletic_dimension_household);
+		self.fitness_dimension_household 	:= Chr2Bool(R.fitness_dimension_household);
+		self.domestic_dimension_household := Chr2Bool(R.domestic_dimension_household);
+		self.good_life_dimension_household := Chr2Bool(R.good_life_dimension_household);
+		self.cultural_dimension_household := Chr2Bool(R.cultural_dimension_household);
+		self.blue_chip_dimension_household := Chr2Bool(R.blue_chip_dimension_household);
+		self.do_it_yourself_dimension_household := Chr2Bool(R.do_it_yourself_dimension_household);
+		self.technology_dimension_household := Chr2Bool(R.technology_dimension_household);
+		self.credit_card_usage_miscellaneous := Chr2Bool(R.credit_card_usage_miscellaneous);
+		self.credit_card_usage_standard_retail := Chr2Bool(R.credit_card_usage_standard_retail);
+		self.credit_card_usage_standard_specialty_card := Chr2Bool(R.credit_card_usage_standard_specialty_card);
+		self.credit_card_usage_upscale_retail := Chr2Bool(R.credit_card_usage_upscale_retail);
+		self.credit_card_usage_upscale_spec_retail := Chr2Bool(R.credit_card_usage_upscale_spec_retail);
+		self.credit_card_usage_bank_card := Chr2Bool(R.credit_card_usage_bank_card);
+		self.credit_card_usage_oil_gas_card := Chr2Bool(R.credit_card_usage_oil__gas_card);
+		self.credit_card_usage_Finance_Co_Card :=	Chr2Bool(R.credit_card_usage_Finance_Co_Card);
+		self.credit_card_usage_Travel_Entertainment := Chr2Bool(R.credit_card_usage_Travel__Entertainment);
 		self := R;
 		self := L;
 	end;

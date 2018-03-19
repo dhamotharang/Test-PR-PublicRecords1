@@ -36,7 +36,7 @@
 */
 /*--INFO-- Returns GSA Excluded Parties / Verifications Search records.*/
 
-import iesp, AutoStandardI, doxie;
+import iesp, AutoStandardI, doxie, std;
 
 export SearchService := macro
 
@@ -59,8 +59,8 @@ export SearchService := macro
 	  StartDate  := iesp.ECL2ESP.t_DateToString8(search_by.ActionDateRange.StartDate);
 		EndDate    := iesp.ECL2ESP.t_DateToString8(search_by.ActionDateRange.EndDate);
 		
-		is_valid_dateinput := (StartDate = '' or ut.ValidDate(StartDate)) 
-		                      and (EndDate = '' or ut.ValidDate(EndDate));
+		is_valid_dateinput := (StartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)StartDate)) 
+		                      and (EndDate = '' or STD.DATE.IsValidDate((UNSIGNED)EndDate));
 		
     IF(~is_valid_dateinput, FAIL('An error occurred while running GSA_Services.SearchService: invalid input dates.') );
 

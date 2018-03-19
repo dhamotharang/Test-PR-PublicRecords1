@@ -280,8 +280,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			// sometimes we get a 0 first seen or last seen date.  If that's the
 			// case, use the non-zero date in both positions.  In either case, we
 			// discard the day portion of the date.
-			year(dtstr) := (INTEGER) dtstr[1..4];
-			month(dtstr) := (INTEGER) dtstr[5..6];
+			year(dtstr) := (INTEGER)((STRING) dtstr)[1..4];
+			month(dtstr) := (INTEGER)((STRING) dtstr)[5..6];
 
 			SELF.DateFirstSeen.year := if (L.dt_first_seen <> 0, year(L.dt_first_seen), year(L.dt_last_seen));
 			SELF.DateFirstSeen.month := if (L.dt_first_seen <> 0, month(L.dt_first_seen), month(L.dt_last_seen));

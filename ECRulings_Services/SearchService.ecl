@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 
 	<!-- COMPLIANCE SETTINGS -->
@@ -16,7 +16,7 @@
 /*--INFO-- Returns European Commission (EC) Ruling records.*/
 
 
-import ECRulings, iesp, AutoStandardI, ut;
+import ECRulings, iesp, AutoStandardI, std;
 
 EXPORT SearchService := MACRO
     #onwarning(4207, ignore);
@@ -41,8 +41,8 @@ EXPORT SearchService := MACRO
       export string8 	 DecisionEndDate    := iesp.ECL2ESP.t_DateToString8(search_by.DecisionDateRange.EndDate);
 		end;
 		
-		is_valid_dateinput := (tempmod.DecisionStartDate = '' or ut.ValidDate(tempmod.DecisionStartDate)) 
-		                       and (tempmod.DecisionEndDate = '' or ut.ValidDate(tempmod.DecisionEndDate));
+		is_valid_dateinput := (tempmod.DecisionStartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.DecisionStartDate)) 
+		                       and (tempmod.DecisionEndDate = '' or STD.DATE.IsValidDate((UNSIGNED4)tempmod.DecisionEndDate));
 		
 		IF(~is_valid_dateinput, FAIL('An error occurred while running ECRulings_Services.SearchService: invalid input dates.') );
 

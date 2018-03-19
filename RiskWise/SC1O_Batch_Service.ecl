@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SC1OBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -7,6 +7,10 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -28,17 +32,24 @@ unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
 
 batchin := dataset([],riskwise.Layout_SD1I_BatchIn)			: stored('batch_in',few);
+real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 gateways_in := Gateway.Configuration.Get();
 tribcode := StringLib.StringToLowerCase(tribcode_value);
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
 productSet := ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex73','ex90','ex91','ex94','ex95','sc51','2x01'];
 
 targusGatewaySet := ['ex05'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := if(tribcode in targusGatewaySet and le.servicename = 'targus', le.url,  ''); // default to no gateway call			 
+	self.url := map(tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway 
+  	              tribcode in ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex90','ex91','ex94','ex95','sc51','2x01'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                  ''); // default to no gateway call
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
@@ -109,7 +120,8 @@ RiskWise.Layout_SD1I addseq(batchin le, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-almost_final := RiskWise.SC1O_Function(f, gateways, glb, dppa, tribCode, datarestriction, datapermission);
+almost_final := RiskWise.SC1O_Function(f, gateways, glb, dppa, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
+                                       global_watchlist_threshold, datarestriction, datapermission);
 final := project(almost_final, RiskWise.Layout_SC1O);
 
 ret := if(tribCode in productSet, final, dataset([],RiskWise.Layout_SC1O));

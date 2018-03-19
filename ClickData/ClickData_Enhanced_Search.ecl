@@ -1,4 +1,4 @@
-import didville, ut, AutoStandardI, AutoHeaderI, address, doxie, AutoheaderV2;
+﻿import didville, ut, AutoStandardI, AutoHeaderI, address, doxie, AutoheaderV2;
 
 export ClickData_Enhanced_Search(dataset(didville.layout_did_outbatch) df2,
 																		dataset(didville.layout_did_outbatch) hits,
@@ -110,7 +110,7 @@ export ClickData_Enhanced_Search(dataset(didville.layout_did_outbatch) df2,
 		
 				
 		//Calculate age high and age low
-		currentAge(string dob) := ut.GetAge(dob);
+		currentAge(string dob) := ut.Age((UNSIGNED4)dob);
 		getAgeHigh(string dob) := currentAge(dob) + 2;
 		getAgeLow(string dob)  := currentAge(dob) - 2;
 		

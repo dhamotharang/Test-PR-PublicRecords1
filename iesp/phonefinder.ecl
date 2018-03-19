@@ -50,6 +50,8 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IncludeOtherPhoneRiskIndicators {xpath('IncludeOtherPhoneRiskIndicators')};
 	string LineIdentityUseCase {xpath('LineIdentityUseCase')};//hidden[internal]
 	integer LineIdentityConsentLevel {xpath('LineIdentityConsentLevel')};//hidden[internal]
+	integer MaxOtherPhones {xpath('MaxOtherPhones')};
+	integer MaxIdentities {xpath('MaxIdentities')};
 end;
 		
 export t_SpoofCommon := record

@@ -51,7 +51,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	UniqueRawAddressMatches := DEDUP(SORT(Address_results_w_acct, UniqueID, UltID, OrgID, SeleID, ProxID, PowID),	UniqueID, UltID, OrgID, SeleID, ProxID, PowID);
 	
 	
-	BusinessHeaderRawAddress := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawAddressMatches,
+	BusinessHeaderRawAddress1 := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawAddressMatches,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.Default), // Search at most restrictive level since we already know the full BIP ID set of the FEIN match
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -59,6 +59,9 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses);
+																							
+	// clean up the business header before doing anything else
+  Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawAddress1, BusinessHeaderRawAddress);																							
 											
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(BusinessHeaderRawAddress, Shell, BusinessHeaderAddressSeq);

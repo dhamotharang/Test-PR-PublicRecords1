@@ -6,7 +6,7 @@ import patriot, ut;
 
 export LoadPlugins := macro
 
-in_data := group(project(ut.ds_oneRecord, 
+in_data := group(project(dataset([{1}], {unsigned a}), 
 	transform(patriot.Layout_batch_in,
 	self.seq := 1;
 	self.name_first := 'DANIEL';

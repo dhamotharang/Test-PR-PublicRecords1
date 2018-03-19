@@ -15,7 +15,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	allBusinesses := indata + linkedBus;	
 	
-	busHeaderRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(allBusinesses),
+	busHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(allBusinesses),
 																							Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -25,6 +25,9 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							Options.KeepLargeBusinesses)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 														
 	
+	// clean up the business header before doing anything else
+	Business_Risk_BIP.Common.mac_slim_header(busHeaderRaw1, busHeaderRaw);	
+		
 	// Add back our Seq numbers.
 	busHeaderSeq := DueDiligence.CommonBusiness.AppendSeq(busHeaderRaw, indata, TRUE);
 	

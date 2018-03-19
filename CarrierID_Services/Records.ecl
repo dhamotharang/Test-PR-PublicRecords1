@@ -180,7 +180,7 @@ export Records(IParam.searchrecords in_mod) := function
 						 self.found_by_deep_dive := le.found_by_deep_dive;
 						 self.nneq_linkid        := ut.nneq_int(le.did,in_mod.did);
 						 self.nneq_dl            := ut.nneq(le.driver_license_nbr,in_mod.driverlicensenumber);
-						 self.nneq_dob           := ut.nneq(le.dob[1..4],(string)if(in_mod.dob=0,'',in_mod.dob[1..4]));
+						 self.nneq_dob           := ut.nneq(le.dob[1..4],(string)if(in_mod.dob=0,'',((STRING)in_mod.dob)[1..4]));
 						 self.penalt             := le.penalt;
 						 
 						 //while we differentiate national accident keyed vs inquiry records in the data

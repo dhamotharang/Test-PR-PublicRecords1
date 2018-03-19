@@ -150,6 +150,11 @@ EXPORT BIP_Layouts := MODULE
 		STRING200 Rep_3_Custom_Field_5;
 	END;
 	
+ EXPORT InputWSeq := RECORD
+  Input;
+  UNSIGNED4 Seq;
+ END;
+ 
 	EXPORT Version1Attributes := RECORD
 		STRING1 InputCheckBusName;
 		STRING1 InputCheckBusAltName;

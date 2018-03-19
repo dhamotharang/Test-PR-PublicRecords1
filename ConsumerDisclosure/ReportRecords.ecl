@@ -52,7 +52,6 @@ FUNCTION
 	property_by_residence_recs := property_recs(~isOwnedBySubject);
 	thrive_recs := IF(in_mod.IncludeThrive, ConsumerDisclosure.RawThrive.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
 	so_recs := IF(in_mod.IncludeOffenders, ConsumerDisclosure.RawOffender.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	ucc_recs := IF(in_mod.IncludeUCC, ConsumerDisclosure.RawUCC.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
 	watercraft_recs := IF(in_mod.IncludeWatercraft, ConsumerDisclosure.RawWatercraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
 
 	optout_recs := IF(in_mod.IncludeOptOut, ConsumerDisclosure.RawOptOut.GetData(in_dids));
@@ -90,7 +89,6 @@ FUNCTION
 		SELF.SSN := PROJECT(ssn_recs(isHeaderSource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
 		SELF.SSNFromInquiries := PROJECT(ssn_recs(isInquirySource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
 		SELF.Thrive := PROJECT(thrive_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceThriveData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
-		SELF.UCC := PROJECT(ucc_recs, ConsumerDisclosure.Transforms.xformUCCData(LEFT));
 		SELF.Watercraft := PROJECT(watercraft_recs, ConsumerDisclosure.Transforms.xformWatercraftData(LEFT));
 		SELF.PersonContext := PROJECT(pc_recs, iesp.fcradataservice.t_FcraDataServicePersonContextRecord); // --> maybe this should be the raw records as returned from person context instead?
 		SELF:=[];

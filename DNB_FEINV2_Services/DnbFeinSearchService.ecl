@@ -30,9 +30,9 @@
 export DnbFeinSearchService(
 	) :=
 		macro
-		#constant('SearchIgnoresAddressOnly',true)
-		#stored('ScoreThreshold',10)
-		#stored('PenaltThreshold',10)
+		#constant('SearchIgnoresAddressOnly',true);
+		#stored('ScoreThreshold',10);
+		#stored('PenaltThreshold',10);
 
 		rpen := DNB_FEINv2_Services.raw.search_view();
 		Text_Search.MAC_Append_ExternalKey(rpen, rpen2, l.tmsid);

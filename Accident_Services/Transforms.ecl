@@ -1,11 +1,11 @@
-IMPORT Address,FLAccidents_eCrash,Codes,iesp,Suppress,Accident_services;
+﻿IMPORT Address,FLAccidents_eCrash,Codes,iesp,Suppress,Accident_services;
 
 EXPORT Transforms := MODULE
 
 	// Key_eCrash0 (Accident Location/DOT Info)
 	EXPORT Accident_services.Layouts.accRptRecWithAccNbr reportRecord(Accident_services.Layouts.report L,FLAccidents_eCrash.Key_eCrash0 R) := TRANSFORM
 		SELF.accident_nbr      := L.accident_nbr;
-		SELF.AccidentDate      := iesp.ECL2ESP.toDate ((INTEGER4)R.accident_date);
+		SELF.AccidentDate      := iesp.ECL2ESP.toDatestring8 ((String8)R.accident_date);
 		SELF.DhsmvVehicleCrash := R.dhsmv_veh_crash_ind;
 		SELF.FormType          := R.form_type;
 		SELF.UpdateNumber      := R.update_nbr;
@@ -108,7 +108,7 @@ EXPORT Transforms := MODULE
 		SELF.Investigation.InvestigationAgent.AgentDepartmentName := R.dept_name;
 		SELF.Investigation.InvestMaede         := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','INVEST_MAEDE','',R.invest_maede);
 		SELF.Investigation.InvestComplete      := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','INVEST_COMPLETE','',R.invest_complete);
-		SELF.Investigation.SearchDate          := iesp.ECL2ESP.toDate ((INTEGER4)R.report_date);
+		SELF.Investigation.SearchDate          := iesp.ECL2ESP.toDatestring8 ((String8)R.report_date);
 		SELF.Investigation.PhotosTaken         := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','PHOTOS_TAKEN','',R.photos_taken);
 		SELF.Investigation.PhotosTakenWhom     := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','PHOTOS_TAKEN_WHOM','',R.photos_taken_whom);
 		SELF.Investigation.FirstAidName        := R.first_aid_name;
@@ -367,7 +367,7 @@ EXPORT Transforms := MODULE
 		SELF.TagState            := L.tagnbr_st;
 		SELF.AccidentNumber      := L.l_accnbr;
 		SELF.AccidentState       := L.vehicle_incident_st;
-		SELF.AccidentDate        := iesp.ECL2ESP.toDate((INTEGER4)L.accident_date);
+		SELF.AccidentDate        := iesp.ECL2ESP.toDatestring8((String8)L.accident_date);
 		SELF.GenerateReport      := L.vehicle_incident_st IN Constants.Report_States;
 		SELF._penalty            := L.penalt;
 		SELF.AlsoFound           := L.isDeepDive;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FraudAdvisor Batch Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="IncludeVersion1" type="xsd:boolean"/>
@@ -54,6 +54,7 @@
       &lt;Sec_Range&gt;&lt;/Sec_Range&gt;
       &lt;Age&gt;&lt;/Age&gt;
       &lt;ip_addr&gt;&lt;/ip_addr&gt;
+      &lt;email&gt;&lt;/email&gt;
       &lt;HistoryDateYYYYMM&gt;&lt;/HistoryDateYYYYMM&gt;
    &lt;/row&gt;
 &lt;/dataset&gt;
@@ -100,7 +101,8 @@ gateways := Gateway.Configuration.Get();
 
 
 wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways);
-
+ // output(wModel, NAMED('Results'));
+//coment out everthing below  if in validation 
 results := PROJECT(wModel, models.Layout_FD_Batch_Out);
 output(results, NAMED('Results'));
 
