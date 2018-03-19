@@ -165,5 +165,10 @@ EXPORT LayoutsInternalReport := MODULE
 	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
 	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
 	END;
+  
+  EXPORT BusOpInfoAssociatedNamesByFein := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	  DATASET(iesp.share.t_Name) name;
+  END;
 	
 END;

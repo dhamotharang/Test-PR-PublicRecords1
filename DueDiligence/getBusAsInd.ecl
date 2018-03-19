@@ -142,12 +142,14 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
 																(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE) AND Drivers.State_DPPA_OK(Header.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
-																TRANSFORM({STRING dt_first_seen, INTEGER feinPersonAddrOverlap, UNSIGNED feinPersonNameMatchLevel, RECORDOF(LEFT)},
+																TRANSFORM({STRING dt_first_seen, INTEGER feinPersonAddrOverlap, UNSIGNED feinPersonNameMatchLevel, STRING fname,
+                                                                 STRING mname, STRING lname, STRING name_suffix, STRING dt_last_seen, RECORDOF(LEFT)},
 																					
 																					isBusinessRecord := LEFT.feinMatched;
 																					feinMatched := (INTEGER)LEFT.fein > 0 AND LEFT.fein = RIGHT.ssn AND isBusinessRecord;
 																					
 																					SELF.dt_first_seen := IF(RIGHT.dt_first_seen > 0, (STRING)RIGHT.dt_first_seen, (STRING)RIGHT.dt_vendor_first_reported);
+																					SELF.dt_last_seen := IF(RIGHT.dt_last_seen > 0, (STRING)RIGHT.dt_last_seen, (STRING)RIGHT.dt_vendor_last_reported);
 																					
 																					fNameHit := feinMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName(LEFT.companyName, RIGHT.fname);
 																					lNameHit := feinMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName(LEFT.companyName, RIGHT.lname);
@@ -171,12 +173,13 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																																																				 
 																					SELF.feinPersonNameMatchLevel := IF((INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND nameSimilar AND feinMatched, 1, DueDiligence.Constants.NUMERIC_ZERO);																																						 
 																					
+                                          SELF := RIGHT;
 																					SELF := LEFT;
 																					SELF := [];),
 																ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
-	consumerHeaderCleanRecs := DueDiligence.Common.CleanDatasetDateFields(consumerHeaderDidRaw, 'dt_first_seen');
+	consumerHeaderCleanRecs := DueDiligence.Common.CleanDatasetDateFields(consumerHeaderDidRaw, 'dt_first_seen, dt_last_seen');
 	
 	// Filter out records after our history date.
 	consumerHeaderDidFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(consumerHeaderCleanRecs, dt_first_seen);
@@ -186,7 +189,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																															 busFEINLinkedPersonAddr := MAX(GROUP, feinPersonAddrOverlap),
 																															 feinPersonNameMatch := MAX(GROUP, feinPersonNameMatchLevel)},
 																	seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
-	
+
 	// Determine counts by Seq
 	consumerHeaderDidCounts := ROLLUP(SORT(consumerHeaderDidStats, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
 																		#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
@@ -205,14 +208,63 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																														(RIGHT.busFEINLinkedPersonAddr = 2 OR RIGHT.feinPersonNameMatch = 1) AND LEFT.SOSIncorporationDate > DueDiligence.Constants.NUMERIC_ZERO;
 																					SELF := LEFT;),
 																LEFT OUTER);
-																
+                                
+  //sort individuals
+  sortConsumerHeader := SORT(consumerHeaderDidFiltRecs, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -dt_last_seen);  
+  
+  rollupIndvForNames := ROLLUP(sortConsumerHeader,
+                               #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                               LEFT.did = RIGHT.did,
+                               TRANSFORM(RECORDOF(LEFT),
+                                          SELF := LEFT;));
+
+  
+  //sort and limit the number of names
+  sortAndGroupNames := GROUP(SORT(rollupIndvForNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dt_last_seen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));  
+ 
+ 
+  DueDiligence.LayoutsInternal.MultipleNames getMaxNames(sortAndGroupNames sagn, INTEGER cnt) := TRANSFORM, SKIP(cnt > DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)
+    SELF.nameAndDate := DATASET([TRANSFORM(DueDiligence.Layouts.LayoutAgent,
+                                            SELF.firstName := sagn.fname;
+                                            SELF.middleName := sagn.mname;
+                                            SELF.lastName := sagn.lname;
+                                            SELF.suffix := sagn.name_suffix;
+                                            SELF.dateLastSeen := sagn.dt_last_seen;
+                                            SELF := [])]);
+    SELF := sagn;
+    SELF := [];
+  
+  END;
+ 
+ 
+  //reformat to add max individuals
+  formatNames := PROJECT(sortAndGroupNames, getMaxNames(LEFT, COUNTER));
+
+	
+  //combine names for the same inquired business															
+  rollIndvFormatNames := ROLLUP(SORT(formatNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),
+                                 #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                                 TRANSFORM(RECORDOF(LEFT),
+                                            SELF.nameAndDate := LEFT.nameAndDate + RIGHT.nameAndDate;
+                                            SELF := LEFT;));
+                                            
+  //add names that share the same fein
+  addNamesByFein := JOIN(addFeinMatchNameAddr, rollIndvFormatNames,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                          TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                    SELF.namesAssocWithFein := RIGHT.nameAndDate;
+                                    SELF := LEFT;),
+                          LEFT OUTER);
+                                
+                                
+                                
 	//check if the fein is an SSN by address
 	checkFeinIsSSN := JOIN(indata, Business_Risk.Key_SSN_Address,
 													LEFT.busn_info.address.prim_name != DueDiligence.Constants.EMPTY and
 													KEYED(LEFT.busn_info.fein = RIGHT.ssn) and
 													KEYED(LEFT.busn_info.address.prim_name = RIGHT.prim_name),
 													TRANSFORM({BOOLEAN isSSN, RECORDOF(DueDiligence.Layouts.Busn_Internal)},
-																		SELF.isSSN := IF(LEFT.busn_info.fein = DueDiligence.Constants.EMPTY, FALSE, IF(LEFT.busn_info.fein = RIGHT.ssn, TRUE, FALSE));
+																		SELF.isSSN := IF(LEFT.busn_info.fein = DueDiligence.Constants.EMPTY, FALSE, LEFT.busn_info.fein = RIGHT.ssn);
 																		SELF := LEFT;),
 													LEFT OUTER, KEEP(100));
 													
@@ -225,7 +277,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF.isSSN := LEFT.isSSN OR RIGHT.isSSN;
 																		SELF := LEFT;));
 													
-	addFeinAsSSN := JOIN(addFeinMatchNameAddr, rollFeinCheck,
+	addFeinAsSSN := JOIN(addNamesByFein, rollFeinCheck,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
 												LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
@@ -259,6 +311,12 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(consumerHeaderDidRaw, NAMED('consumerHeaderDidRaw'));
 	// OUTPUT(consumerHeaderDidFiltRecs, NAMED('consumerHeaderDidFiltRecs'));
 	// OUTPUT(consumerHeaderDidStats, NAMED('consumerHeaderDidStats'));
+	// OUTPUT(sortConsumerHeader, NAMED('sortConsumerHeader'));
+	// OUTPUT(rollupIndvForNames, NAMED('rollupIndvForNames'));
+	// OUTPUT(sortAndGroupNames, NAMED('sortAndGroupNames'));
+	// OUTPUT(formatNames, NAMED('formatNames'));
+	// OUTPUT(rollIndvFormatNames, NAMED('rollIndvFormatNames'));
+	// OUTPUT(addNamesByFein, NAMED('addNamesByFein'));
 	// OUTPUT(consumerHeaderDidCounts, NAMED('consumerHeaderDidCounts'));
 	// OUTPUT(addFeinMatchNameAddr, NAMED('addFeinMatchNameAddr'));
 	

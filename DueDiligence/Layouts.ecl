@@ -548,12 +548,21 @@ EXPORT LinkIDs := RECORD
   END;
 	
 	
+	EXPORT LayoutAgent := RECORD
+		UNSIGNED4 dateFirstSeen;
+		UNSIGNED4 dateLastSeen;
+		STRING4 source;
+		Name;
+		Address;
+	END;
+	
 	EXPORT BusReportDetails        := RECORD
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_SOURCES)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
     BusinessLegalSummary;
+    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
 	END;
 	
 	EXPORT Positions := RECORD
@@ -607,14 +616,6 @@ EXPORT LinkIDs := RECORD
 		DATASET(CriminalOffenseLayout_by_DIDOffense) partyOffenses;    //***these are listed at the offense level for each DID
 	END;
 
-	
-	EXPORT LayoutAgent := RECORD
-		UNSIGNED4 dateFirstSeen;
-		UNSIGNED4 dateLastSeen;
-		STRING4 source;
-		Name;
-		Address;
-	END;
 	
 	EXPORT Indv_Internal := Record
 		UNSIGNED4	 seq := 0;
