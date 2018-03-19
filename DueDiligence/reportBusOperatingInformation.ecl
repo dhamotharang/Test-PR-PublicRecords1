@@ -184,6 +184,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := LEFT.busn_info.fein;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEINIsSSN := LEFT.feinIsSSN;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.name;
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.OperatesOutOfAHomeOffice := LEFT.busIsSOHO;
                                         SELF := LEFT;),
                              LEFT OUTER);
 
