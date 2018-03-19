@@ -4,10 +4,7 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 																	
 		offenses := DueDiligence.Common.getRelatedPartyOffenses(inData);
 		
-		//filter out those who have convictions
-		//convictedParties := offenses(offense.convictionflag = DueDiligence.Constants.YES OR offense.criminaloffenderlevel IN [DueDiligence.Constants.NONTRAFFIC_CONVICTED, DueDiligence.Constants.TRAFFIC_CONVICTED]);
-
-		eventTypes := PROJECT(offenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, BOOLEAN hitLevel9, BOOLEAN hitLevel8, BOOLEAN hitLevel7, 
+    eventTypes := PROJECT(offenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, BOOLEAN hitLevel9, BOOLEAN hitLevel8, BOOLEAN hitLevel7, 
 																															BOOLEAN hitLevel6, BOOLEAN hitLevel5, BOOLEAN hitLevel4, BOOLEAN hitLevel3, BOOLEAN hitLevel2},
 																																															
 																								expression := DueDiligence.RegularExpressions(LEFT.offense.charge, LEFT.offense.offenseScore);

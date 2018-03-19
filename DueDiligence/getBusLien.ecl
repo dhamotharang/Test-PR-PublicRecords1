@@ -4,8 +4,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,           //***search level options set to SELEID
 											 BIPV2.mod_sources.iParams linkingOptions,                     //***These are all your DRM, GLBA, DPPA options
 											 boolean ReportIsRequested = FALSE, 
-											 boolean DebugMode = FALSE
-											 //SET OF STRING2 AllowedSourcesSet) 
+											 boolean DebugMode = FALSE 
 											 )  := FUNCTION
 
 	// ------                                                                             ------
@@ -66,20 +65,26 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				SELF.liensJudgment.UltID                 := LEFT.ultID,
 				SELF.liensJudgment.OrgID                 := LEFT.orgID,
 				SELF.liensJudgment.SeleID                := LEFT.seleID,		
-				SELF.HistoryDate			                      := LEFT.HistoryDate,
+				SELF.HistoryDate			                   := LEFT.HistoryDate,
 				/* Essentially this is today's date if history date is all 9's OR the history date itself */   
 				SELF.DateToUse                           := DueDiligence.Common.GetMyDate(LEFT.HistoryDate),
 				SELF.date_first_seen                     := (STRING)LEFT.date_first_seen,
 				SELF.date_last_seen                      := (STRING)LEFT.date_last_seen,
 				/* populate the data from RIGHT     */   
+        SELF.filing_jurisdiction                 := RIGHT.filing_jurisdiction,
+        SELF.filing_number                       := RIGHT.filing_number,
 				SELF.filing_type_desc                    := RIGHT.filing_type_desc,
 				SELF.filing_status                       := RIGHT.filing_status[1].filing_status_desc,
+        SELF.agency                              := RIGHT.agency,
+        SELF.agency_state                        := RIGHT.agency_state,
+        SELF.agency_county                       := RIGHT.agency_county,
 				/* represent Amounts in whole dollars.*/ 
 				SELF.amount                              := (STRING11)(TRUNCATE(((REAL)RIGHT.amount))),
 				/*   make sure the release date is BEFORE the History Date   */   
-				SELF.release_date                        := MAP(((INTEGER)RIGHT.release_date) <= LEFT.HistoryDate	   => RIGHT.release_date,
-																		                                  ((INTEGER)LEFT.date_last_seen) <= LEFT.HistoryDate	  => (STRING)LEFT.date_last_seen,
-																																																                                                            Business_Risk_BIP.Constants.MissingDate),
+				SELF.release_date                        := MAP(
+                                                        ((INTEGER)RIGHT.release_date) <= LEFT.HistoryDate	   => RIGHT.release_date,
+																		                    ((INTEGER)LEFT.date_last_seen) <= LEFT.HistoryDate	 => (STRING)LEFT.date_last_seen,
+																																																                Business_Risk_BIP.Constants.MissingDate),
 				SELF := RIGHT,
 				SELF := []
 			       ),    /*  END the TRANSFORM  */  
@@ -126,22 +131,23 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				SELF.liensJudgment.proxid       := LEFT.liensJudgment.proxid,
 				SELF.liensJudgment.powid        := LEFT.liensJudgment.powid,
 				
-				SELF.HistoryDate			             := LEFT.HistoryDate,
+				SELF.HistoryDate			          := LEFT.HistoryDate,
 				SELF.DateToUse                  := LEFT.DateToUse,
 				SELF.NumOfDaysAgo               := 0,    /* The number of days will be calculated after the rollup  */  
+        SELF.filing_number              := IF(LEFT.filing_number != DueDiligence.Constants.EMPTY, LEFT.filing_number, RIGHT.filing_number), 
 				SELF.date_first_seen            := IF( LEFT.date_first_seen != DueDiligence.Constants.EMPTY AND LEFT.date_first_seen < RIGHT.date_first_seen, 
 				                                       LEFT.date_first_seen, 
-																							                    RIGHT.date_first_seen ),
+																							 RIGHT.date_first_seen ),
 				SELF.date_last_seen             := IF( LEFT.date_last_seen  != DueDiligence.Constants.EMPTY AND LEFT.date_last_seen > RIGHT.date_last_seen, 
 				                                       LEFT.date_last_seen, 
-																							                    RIGHT.date_last_seen ),
+																							 RIGHT.date_last_seen ),
 				SELF.tmsid                      := RIGHT.tmsid,
 				SELF.eviction                   := MAP( LEFT.eviction = DueDiligence.Constants.EMPTY  => LEFT.eviction, 
 				                                        RIGHT.eviction = DueDiligence.Constants.EMPTY => RIGHT.eviction, 
 																								                                                                     LEFT.eviction ),
 				SELF.orig_filing_date           := IF( LEFT.orig_filing_date != DueDiligence.Constants.EMPTY AND (LEFT.orig_filing_date < RIGHT.orig_filing_date OR RIGHT.orig_filing_date = DueDiligence.Constants.EMPTY), 
 				                                       LEFT.orig_filing_date,       
-																							                    RIGHT.orig_filing_date ),    
+																							 RIGHT.orig_filing_date ),    
 				SELF.filing_type_desc           := IF( LEFT.filing_type_desc != DueDiligence.Constants.EMPTY, LEFT.filing_type_desc, RIGHT.filing_type_desc ),
 				SELF.amount                     := IF( LEFT.amount != DueDiligence.Constants.ZERO, LEFT.amount, RIGHT.amount ), 
 				   //***Only keep the release date if it is prior to the history date
@@ -149,8 +155,11 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				                                   AND ((INTEGER)LEFT.release_date[1..6]) <= LEFT.HistoryDate, LEFT.release_date, RIGHT.release_date ), 
 				SELF.lapse_date                 := IF( LEFT.lapse_date != DueDiligence.Constants.EMPTY AND LEFT.lapse_date > RIGHT.lapse_date, 
 				                                       LEFT.lapse_date, 
-																							                   RIGHT.lapse_date ),
-				SELF.agency_state               := IF( LEFT.agency_state != DueDiligence.Constants.EMPTY, LEFT.agency_state, RIGHT.agency_state ),
+																							 RIGHT.lapse_date ),
+				SELF.agency                     := IF( LEFT.agency        != DueDiligence.Constants.EMPTY, LEFT.agency, RIGHT.agency),
+				SELF.agency_state               := IF( LEFT.agency_state  != DueDiligence.Constants.EMPTY, LEFT.agency_state, RIGHT.agency_state),
+				SELF.agency_county              := IF( LEFT.agency_county != DueDiligence.Constants.EMPTY, LEFT.agency_county, RIGHT.agency_county),
+				SELF.filing_jurisdiction        := IF( LEFT.filing_jurisdiction != DueDiligence.Constants.EMPTY, LEFT.filing_jurisdiction, RIGHT.filing_jurisdiction),
 				SELF.filing_status              := IF(TRIM(RIGHT.filing_status) != DueDiligence.Constants.EMPTY, RIGHT.filing_status, LEFT.filing_status ),
 			)
 		);
