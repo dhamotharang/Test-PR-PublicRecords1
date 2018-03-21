@@ -36,7 +36,7 @@ string6 ninesDate := '999999';
 	UniqueRawFEINMatches := DEDUP(SORT(FEIN_results_w_acct, UniqueID, UltID, OrgID, SeleID, ProxID, PowID),	UniqueID, UltID, OrgID, SeleID, ProxID, PowID);
 	
 	
-	BusinessHeaderRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawFEINMatches,
+	BusinessHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawFEINMatches,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID), 
 																							integerZero, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -45,6 +45,9 @@ string6 ninesDate := '999999';
 																							TRUE, /* bypassContactSuppression */
 																							Options.KeepLargeBusinesses);
 											
+	// clean up the business header before doing anything else
+	Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRaw1, BusinessHeaderRaw);	
+		
 	// Add back our Seq numbers
 	BusinessHeaderSeq := JOIN(BusinessHeaderRaw, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength},
 										SELF.Seq := RIGHT.Seq;

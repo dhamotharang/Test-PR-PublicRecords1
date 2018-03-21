@@ -25,9 +25,9 @@
 
 export EbrSearchService() := macro
 
-#constant('getBdidsbyExecutive',FALSE)
-#stored('ScoreThreshold',10)
-#stored('PenaltThreshold',10)
+#constant('getBdidsbyExecutive',FALSE);
+#stored('ScoreThreshold',10);
+#stored('PenaltThreshold',10);
 
 output(EBR_Services.search, named('Results'));
 

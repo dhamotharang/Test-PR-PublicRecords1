@@ -1,4 +1,4 @@
-import doxie, did_add, ut, riskwise, address, gateway, watchdog;
+﻿import doxie, did_add, ut, riskwise, address, gateway, watchdog;
 
 // this function will first append the BEST fname, lname, phone and ssn
 // then perform the necessary searching and counting logic to calculate velocity counters for each of those elements
@@ -39,24 +39,24 @@ withBest_FCRA := if(datarestrictionmask[risk_indicators.iid_constants.posEquifax
 withBest := if(isFCRA, withBest_FCRA, group(withBest_nonfcra, seq));
 
 risk_indicators.Layout_Boca_Shell set_match_flags(risk_indicators.Layout_Boca_Shell le) := transform
-	self.best_flags.input_fname_isbestmatch := map(trim(le.shell_input.fname)='' => '-3',
+	self.best_flags.input_fname_isbestmatch := map(le.truedid=false => '-1',
 																								 le.best_flags.fname='' => '-2',
-																								 le.truedid=false => '-1',
+																								 trim(le.shell_input.fname)='' => '-3',
 																								 risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.shell_input.fname, le.best_flags.fname) ) => '1',
 																								 '0');
-	self.best_flags.input_lname_isbestmatch := map(trim(le.shell_input.lname)='' => '-3',
+	self.best_flags.input_lname_isbestmatch := map(le.truedid=false => '-1',
 																								 le.best_flags.lname='' => '-2',
-																								 le.truedid=false => '-1',
+																								 trim(le.shell_input.lname)='' => '-3',
 																								 risk_indicators.iid_constants.g(risk_indicators.LnameScore(le.shell_input.lname, le.best_flags.lname) ) => '1',
 																								 '0');
-	self.best_flags.input_phone_isbestmatch := map(trim(le.shell_input.phone10)='' => '-3',
+	self.best_flags.input_phone_isbestmatch := map(le.truedid=false => '-1',
 																								 le.best_flags.phone='' => '-2',
-																								 le.truedid=false => '-1',
+																								 trim(le.shell_input.phone10)='' => '-3',
 																								 risk_indicators.iid_constants.gn(risk_indicators.phonescore(le.shell_input.phone10, le.best_flags.phone) ) => '1',
 																								 '0');
-	self.best_flags.input_ssn_isbestmatch := map(trim(le.shell_input.ssn)='' => '-3',
+	self.best_flags.input_ssn_isbestmatch := map(le.truedid=false => '-1',
 																								 le.best_flags.ssn='' => '-2',
-																								 le.truedid=false => '-1',
+																								 trim(le.shell_input.ssn)='' => '-3',
 																								 risk_indicators.iid_constants.gn(did_add.ssn_match_score(le.shell_input.ssn, le.best_flags.ssn, LENGTH(TRIM(le.shell_input.ssn))=4) ) => '1',
 																								 '0');
 	self := le;																							 
@@ -173,12 +173,22 @@ with_best_flags := join(with_best_inquiries, IID_best_flags, left.seq=right.seq,
 		self := left;  // take everything else from the left
 		));
 
-		
-							
-// ticket RQ-13363, they want all fields blanked out if the truedid=false
+		  
+// ticket RQ-13363, they want all fields blanked out if the truedid=false. per MS-184, don't blank out some fields as they need to return special values for "not found" conditions.
 with_best_flags_final := project(with_best_flags, 
 	transform(risk_indicators.Layout_Boca_Shell, 
-		self.best_flags := if(left.truedid, left.best_flags); 
+		self.best_flags.input_fname_isbestmatch := left.best_flags.input_fname_isbestmatch; //for the 'isbestmatch' fields, keep the value we calculated above (don't blank out)
+		self.best_flags.input_lname_isbestmatch := left.best_flags.input_lname_isbestmatch; 
+		self.best_flags.input_phone_isbestmatch := left.best_flags.input_phone_isbestmatch; 
+		self.best_flags.input_ssn_isbestmatch   := left.best_flags.input_ssn_isbestmatch; 
+		self.best_flags.best_phone_phonetype    := if(left.best_flags.input_phone_isbestmatch in ['-1','-2','-3'], 'Z', left.best_flags.best_phone_phonetype); 
+		self.best_flags.best_phone_phoneval     := if(left.best_flags.input_phone_isbestmatch in ['-1','-2','-3'], '6', left.best_flags.best_phone_phoneval); 
+		self.best_flags.best_phone_phonezip     := if(left.best_flags.input_phone_isbestmatch in ['-1','-2','-3'], '5', left.best_flags.best_phone_phonezip); 
+		self.best_flags.best_ssn_decsflag       := if(left.best_flags.input_ssn_isbestmatch in ['-1','-2','-3'], '2', left.best_flags.best_ssn_decsflag); 
+		self.best_flags.best_ssn_ssndobflag     := if(left.best_flags.input_ssn_isbestmatch in ['-1','-2','-3'], '3', left.best_flags.best_ssn_ssndobflag); 
+		self.best_flags.best_ssn_valid          := if(left.best_flags.input_ssn_isbestmatch in ['-1','-2','-3'], '7', left.best_flags.best_ssn_valid); 
+		self.best_flags.curraddr_hriskaddrflag  := if(left.truedid, left.best_flags.curraddr_hriskaddrflag, '5'); 
+		self.best_flags                         := if(left.truedid, left.best_flags); //all other fields get blanked out if 'trueDID' is false
 		self := left));
 		
 							

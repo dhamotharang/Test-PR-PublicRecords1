@@ -1,4 +1,4 @@
-IMPORT ut,eAuth;
+﻿IMPORT eAuth,std;
 
 EXPORT fake_files := MODULE
 
@@ -490,7 +490,7 @@ EXPORT fake_files := MODULE
   ], {string make_model {maxlength (32)}});
 
   // last 15 years
-  shared integer year := (integer) (ut.GetDate[1..4]); // YYYYMMDD
+  shared integer year := (integer) (((STRING8)Std.Date.Today())[1..4]); // YYYYMMDD
   shared layout_years := {integer year_make};
 
   shared layout_years GetYears (unsigned1 years_num) := function

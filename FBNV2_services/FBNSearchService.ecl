@@ -58,7 +58,7 @@
 
 
 export FBNSearchService() := macro
-	#constant('getBdidsbyExecutive',FALSE)
+	#constant('getBdidsbyExecutive',FALSE);
 
 	// output(FBNV2_Services.FBNV2_records, named('Results'));
 

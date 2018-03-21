@@ -1,4 +1,4 @@
-IMPORT faa, RiskWise, ut, Risk_Indicators;
+﻿IMPORT faa, RiskWise, ut, Risk_Indicators;
 
 EXPORT getAircraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
 
@@ -29,7 +29,7 @@ ACDetailsKey := faa.key_aircraft_id(false);
 
 ProfileBooster.Layouts.Layout_PB_Slim_aircraft	addAircraftDetails(ACIds le, ACDetailsKey ri) := transform
 			self.aircraftCount := if(ri.current_flag = 'A' and trim(le.n_number)!='',	1, 0);
-			monthsAgo 						:= ut.MonthsApart((string6)le.historyDate,(string6)ri.date_first_seen);
+			monthsAgo 						:= ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],(string6)ri.date_first_seen);
 			self.months_first_reg := monthsAgo;
 			self.months_last_reg  := monthsAgo;					
 			self := le;

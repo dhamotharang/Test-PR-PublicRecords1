@@ -21,6 +21,10 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="runSeed" type="xsd:boolean"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -59,6 +63,10 @@ export RiskWiseMainIDPO := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'runSeed',
+	'OFACversion',
+	'IncludeOfac',
+	'IncludeAdditionalWatchLists',
+	'GlobalWatchlistThreshold',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -105,6 +113,10 @@ unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false : stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string10 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+unsigned1 ofac_version       := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
@@ -117,6 +129,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url,  // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url,  // targus gateway
+         tribcode in ['idp1'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
 				 ''); // default to no gateway call			 
 	self := le;
 end;
@@ -190,10 +203,10 @@ from_BIID := false;
 isFCRA := false;
 ExcludeWatchLists := false;
 from_IT1O := false;
-ofac_version := 1;
-include_ofac := false;
-include_additional_watchlists := false;
-global_watchlist_threshold := .84;
+// ofac_version := 1;
+// include_ofac := false;
+// include_additional_watchlists := false;
+// global_watchlist_threshold := .84;
 dob_radius := -1;
 BSversion := 1;
 runSSNCodes := true;

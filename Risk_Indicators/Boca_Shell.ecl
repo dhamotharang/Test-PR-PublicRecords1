@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BocaShell" wuTimeout="300000">
 	<part name="AccountNumber" type="xsd:string"/>
 	<part name="FirstName" type="xsd:string"/>
@@ -37,6 +37,10 @@
 	<part name="DID" type="xsd:string"/>
 	<part name="LastSeenThreshold" type="xsd:string"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
  </message>
 */
@@ -83,6 +87,10 @@ export Boca_Shell := MACRO
 	'DID',
 	'LastSeenThreshold',
 	'RetainInputDID',
+	'OFACversion',
+	'IncludeOfac',
+	'IncludeAdditionalWatchLists',
+	'GlobalWatchlistThreshold',
 	'gateways'));
 
 string30 account_value := '' 		: stored('AccountNumber');
@@ -133,6 +141,11 @@ string50 DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 unsigned3 LastSeenThresholdIn := 0 : stored('LastSeenThreshold');
 boolean RetainInputDID := false : stored('RetainInputDID');  // to be used by modeling team for R&D purpose
+
+real watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
+boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 
 rec := record
   unsigned4 seq;
@@ -208,7 +221,10 @@ gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := if(bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry], le.url,  ''); // insurance phones gateway allowed if shell version 50 or higher
+	self.url := map(bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
+                 le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                  '');
+          
 self := le;
 end;
 
@@ -226,10 +242,10 @@ require2ele := false;
 from_biid := false;
 excludeWatchlists := false;
 from_IT1O := false;
-ofac_version := 1;
-include_ofac := false;
-include_additional_watchlists := false;
-watchlist_threshold := 0.84;
+//ofac_version := 1;
+//include_ofac := false;
+//include_additional_watchlists := false;
+//watchlist_threshold := 0.84;
 dob_radius := -1;
 includeRelativeInfo := true;
 includeDLInfo := true;

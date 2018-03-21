@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp, ut;
+﻿IMPORT DueDiligence, iesp, STD, ut;
 
 EXPORT CommonIndividual := MODULE
 	

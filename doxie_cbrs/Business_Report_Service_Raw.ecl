@@ -101,10 +101,10 @@ EXPORT Business_Report_Service_Raw := MACRO
 
 		#option ('globalAutoHoist', false);
 		#option ('spotCSE', false);
-		#stored('useSupergroup',true)
-		#stored('isDayBR',true) 
-		#stored('IncludeMultipleSecured',true)
-		#stored('ReturnRolledDebtors',true)
+		#stored('useSupergroup',true);
+		#stored('isDayBR',true);
+		#stored('IncludeMultipleSecured',true);
+		#stored('ReturnRolledDebtors',true);
 
 		// inclusion/exclusion
 		Include_Occurrences := false : stored('IncludeOccurrences');

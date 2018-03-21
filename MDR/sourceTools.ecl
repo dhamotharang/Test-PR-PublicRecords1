@@ -801,8 +801,14 @@ MODULE
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer, src_InfutorNare];
 		
+	//Email sources for Email_BatchService	
 	export set_digital_email_cookie_matching := [
-		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
+		src_Impulse										,src_Wired_Assets_Email 	 ,src_AlloyMedia_consumer        ,src_InfutorNare,
+  src_MediaOne         ,src_Thrive_LT            ,src_Thrive_PD                  ,src_SalesChannel];	
+	//Email sources for MemberPoint.BatchService	
+	export set_digital_email_cookie_matching_Memberpt := [
+		src_Impulse										,src_Wired_Assets_Email					,src_AlloyMedia_consumer,
+		src_InfutorNare];	
 
 	export set_email_flat := [
 		src_Wired_Assets_Email				,src_Impulse										,src_thrive_lt								, src_thrive_pd		
@@ -3285,7 +3291,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_POS                       => 'Provider of Services'       				
 		,src_Professional_License      => 'Professional License'                                 
 	  ,src_PSS									     => 'Phone Status Service'                                  		
-		,src_Redbooks                  => 'Redbooks International Advertisers'                   
+	 ,src_Redbooks                  => 'Redbooks International Advertisers'                   
 		,src_SalesChannel							 => 'Sales Channel'																				
 		,src_CA_Sales_Tax              => 'California Sales Tax'                                 
 		,src_IA_Sales_Tax              => 'Iowa Sales Tax'                                       

@@ -1,4 +1,4 @@
-import RiskWise, Business_Header, Gong, ut, business_header_ss, mdr;
+﻿import RiskWise, Gong, ut, business_header_ss, mdr, std;
 
 export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb) := FUNCTION
 
@@ -7,6 +7,8 @@ export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 gl
 
 // then, do the rollup and counts for all the fields that those tables have
 // if the source doesn't have a history date, like yellow pages for example, use the current data
+
+todays_date := (STRING8)Std.Date.Today();
 
 layout_out := record
 	unsigned4  seq := 0;
@@ -116,7 +118,7 @@ bh := join(biid, kbh,
 				 left.bdid!=0 and 
 				  keyed(left.bdid=right.bdid) and 
 					ut.PermissionTools.glb.SrcOk(glb, right.source, right.dt_first_seen) and
-				 (unsigned)right.dt_first_seen[1..6] < left.historydate, 
+				 (unsigned)((STRING)right.dt_first_seen)[1..6] < left.historydate, 
 				 transform(recordof(kbh), self := right),
 				 ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1000));
 
@@ -222,19 +224,19 @@ bh_stat := table(bh, layout_bh_stat, bdid);
 
 // Check for date in last 6 months
 boolean CheckDateLast6Mos(unsigned4 date) := if(date <> 0,
-                                             ut.DaysApart((string8)intformat(date, 8, 1), ut.GetDate) <= 183,
+                                             ut.DaysApart((string8)intformat(date, 8, 1), todays_date) <= 183,
 											 false);
 
 // Check for date in last year					
 boolean CheckDateLastYr(unsigned4 date) := if(date <> 0,
-                                             ut.DaysApart((string8)intformat(date, 8, 1), ut.GetDate) <= 365,
+                                             ut.DaysApart((string8)intformat(date, 8, 1), todays_date) <= 365,
 											 false);
 
 // Current Year with offset
-unsigned2 CurrentYearOffset(integer1 offset) := (integer)(ut.GetDate[1..4]) + offset;
+unsigned2 CurrentYearOffset(integer1 offset) := (integer)(todays_date[1..4]) + offset;
 
 // Current End of Year with offset											 
-unsigned4 CurrentYearEndOffset(integer1 offset) :=  (((integer)(ut.GetDate[1..4]) + offset) * 10000) + 1231;
+unsigned4 CurrentYearEndOffset(integer1 offset) :=  (((integer)(todays_date[1..4]) + offset) * 10000) + 1231;
 
 layout_out_final := record
 	layout_out - historydate;
@@ -280,7 +282,7 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 	self.gong_yp_cnt := if(r.cnt_gb>0,1,0) + if(r.cnt_gg>0,1,0) + if(r.cnt_y>0,1,0);
 	
 	// this section of the transform is from BDID_risk_table InitBDIDRiskTable
-		self.PRScore_date := if(l.historydate=999999, (unsigned4)ut.getDate, (unsigned4)((string)l.historydate + '01') );
+		self.PRScore_date := if(l.historydate=999999, (unsigned4)todays_date, (unsigned4)((string)l.historydate + '01') );
 		busregf := if(r.cnt_BR > 0, 1, 0);
 		self.busreg_flag := busregf;
 		

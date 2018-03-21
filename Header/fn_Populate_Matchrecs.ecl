@@ -12,7 +12,7 @@ export fn_Populate_Matchrecs (
 layout_matchcandidates %intof%(inf le) := transform
   self.fname := if(skipPreferredFirst, le.fname, datalib.PreferredFirstNew(le.fname, new_version));
   self.mname := if(skipPreferredFirst, le.mname, datalib.PreferredFirstNew(le.mname, new_version));
-  self.name_suffix := ut.Translate_Suffix(le.name_suffix);
+  self.name_suffix := ut.fGetSuffix(le.name_suffix);
 	SELF.head_cnt := 1;
 	self.prim_range_fraction := regexfind(' [0-9]/[0-9]$',trim(le.prim_range));
   self := le;

@@ -1,7 +1,7 @@
-Import Data_Services, Business_Header, doxie, risk_indicators, ut;
+Import Data_Services, Business_Header, doxie, risk_indicators, std;
 
 //constants
-string 	today := ut.GetDate;
+string 	today := (STRING8)Std.Date.Today();
 string	two_years := (string)((integer)today[1..4] - 1);
 integer	year_filter := (integer)(two_years + '0000');
 

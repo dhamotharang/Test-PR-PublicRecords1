@@ -84,8 +84,11 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		// c) Slim down the PersonContext				 
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 		
+    ds_best := project(ds_batch_in, transform(doxie.layout_best, self.did := left.did, self:=[]));
+    ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
+
 		p := BatchServices.Property_BatchService_Records(ds_batch_in, record_types, party_type, nSS, isFCRA, 
-																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask);
+																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags);
 		 
 		// obtain the match codes from the soap inputs.
 		boolean nameMatch_value :=    p.NameMatch_value;

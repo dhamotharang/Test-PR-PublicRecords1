@@ -112,6 +112,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 // ********************
 	 //   DEBUGGING OUTPUTS
 	 // *********************
+   IF(DebugMode,      OUTPUT(BusnData,                                NAMED('BusnDatainto')));
    IF(DebugMode,      OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations')));
    IF(DebugMode,      OUTPUT(CHOOSEN(ListOfOperAddresses, 100),       NAMED('ListOfOperAddresses')));												 
    IF(DebugMode,      OUTPUT(CHOOSEN(GeographicRiskResults, 100),     NAMED('GeographicRiskResults')));																		 

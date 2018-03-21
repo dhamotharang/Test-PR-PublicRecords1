@@ -1,4 +1,4 @@
-export Mac_Match_NmDayobZip(infile,outfil,
+﻿export Mac_Match_NmDayobZip(infile,outfil,
 					did_field,score_field,
 					fname_field,mname_field,lname_field,suffix_field,dob_field,zip_field,
 					state_field,use_fuzzy = 'true',bool_indiv_score = 'false',
@@ -28,7 +28,10 @@ export Mac_Match_NmDayobZip(infile,outfil,
 end;
 
 %dob_alph_rec% %into_dob_alph%(infile L) := transform
-	self.alphinit := ut.alphinit2(datalib.preferredFirstNew(L.fname_field,Header_Slimsort.Constants.UsePFNew)[1],L.lname_field[1]);
+  firstString := datalib.preferredFirstNew(L.fname_field,Header_Slimsort.Constants.UsePFNew)[1];
+  lastString := L.lname_field[1];
+	self.alphinit := if(firstString < lastString, firstString + lastString, lastString + firstString);
+  
 	self := L;
 end;
 

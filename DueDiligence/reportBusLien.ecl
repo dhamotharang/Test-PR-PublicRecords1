@@ -23,7 +23,6 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
                                                     #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                                                     TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                                                //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := LEFT.BusInfractionNonConviction_1I;
-                                                             
                                                                //*** This is now moving the  **//
                                                                SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions      := LEFT.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions  + RIGHT.LIENACTIVITY;
                                                                

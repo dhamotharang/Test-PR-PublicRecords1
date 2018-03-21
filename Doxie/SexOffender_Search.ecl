@@ -74,7 +74,7 @@ doxie.Layout_SexOffender_NameScore get_name_score(F le) := transform
 												 datalib.namematch(le.fname,le.mname,le.lname,fname_val,mname_val,lname_val));
 	SELF.Alternate_Address_Search_Results := le.addresses;
 	self.name := [];
-	self.addr_score := ut.imin2(IF(~EXISTS(le.addresses),10,MIN(le.addresses,IF(alt_type='H',10,addrScore))), 
+	self.addr_score := min(IF(~EXISTS(le.addresses),10,MIN(le.addresses,IF(alt_type='H',10,addrScore))), 
 															doxie.FN_Tra_Penalty_Addr(le.predir,le.prim_range,
 																							 le.prim_name,le.addr_suffix,
 																							 le.postdir,le.sec_range,
@@ -123,7 +123,7 @@ FinalN get_best_name(FinalN l, f_best_name r) := transform
      self.mname       := r.mname;
      self.name_suffix := r.name_suffix;
      self.name_type   := r.name_type;
-		 self.age         := (string)ut.GetAgeI((integer)l.dob);
+		 self.age         := (string)ut.Age((integer)l.dob);
 	   self             := l;
 end;
 
