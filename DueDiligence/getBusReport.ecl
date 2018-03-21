@@ -26,7 +26,7 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                     SELF.estDate.day := (UNSIGNED)date[7..8];
                                                     SELF := [];));
                                                     
-  addEstablishDate := JOIN(BusnData, getEstablishDate,
+  addEstablishDate := JOIN(UpdateBusnExecCriminalWithReport, getEstablishDate,
                             #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                             TRANSFORM(RECORDOF(LEFT),
                                       SELF.businessReport.businessInformation.EstablishedDate := RIGHT.estDate;
@@ -46,6 +46,8 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// *********************
 
 	  IF(DebugMode,      OUTPUT(UpdateBusnExecCriminalWithReport,           NAMED('UpdateBusnExecCriminalWithReport')));								 
+   	IF(DebugMode,      OUTPUT(CHOOSEN(addEstablishDate, 100),             NAMED('AddOperatingLocToReport')));		
+   	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingLocToReport, 100),     NAMED('AddOperatingLocToReportout')));		
    	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingInfoToReport, 100),     NAMED('AddOperatingInfoToReport')));		
     
     

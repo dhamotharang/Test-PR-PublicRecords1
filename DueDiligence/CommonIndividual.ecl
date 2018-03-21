@@ -26,12 +26,12 @@ EXPORT CommonIndividual := MODULE
 	EXPORT getParents(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredInd) := FUNCTION
 		
 		parents := NORMALIZE(inquiredInd, LEFT.parents, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-                                                              SELF.seq := LEFT.seq;
-                                                              SELF.inquiredDID := LEFT.individual.did;
-                                                              SELF.historyDate := LEFT.historyDate;
-                                                              SELF.individual := RIGHT;
-                                                              SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT;
-                                                              SELF := [];));
+																																																												SELF.seq := LEFT.seq;
+																																																												SELF.inquiredDID := LEFT.individual.did;
+																																																												SELF.historyDate := LEFT.historyDate;
+																																																												SELF.individual := RIGHT;
+																																																												SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT;
+																																																												SELF := [];));
 		
 		RETURN parents;
 	END;

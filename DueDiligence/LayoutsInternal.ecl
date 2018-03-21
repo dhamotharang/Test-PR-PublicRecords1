@@ -211,9 +211,13 @@ END;
 	
 	EXPORT layout_liens_judgments := RECORD
 		InternalBIPIDsLayout  liensJudgment;
+    unsigned6 	did;
 		common_layout_liens_judgments;   
 	END;
 
+//------                                      ------
+//------  Populated with Liens and Judgements ------
+//------                                      ------
 	EXPORT 	layout_liens_judgments_categorized := RECORD
 		layout_liens_judgments;
 		plus_category_liens_judgments;
