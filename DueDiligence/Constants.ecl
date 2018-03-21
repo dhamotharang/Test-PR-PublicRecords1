@@ -40,7 +40,10 @@ EXPORT T_INDICATOR := 'T';
 EXPORT F_INDICATOR := 'F';
 
 
-EXPORT NAME_TYPE := 'D'; 
+EXPORT DEBTOR := 'D'; 
+EXPORT CREDITOR := 'C';
+EXPORT PARTY_SET := ['D', 'C'];  
+
 EXPORT YEARS_TO_LOOK_BACK  := 3;  
 
 /*  Use position 3 through 5 to build the 3 digit county from the 5 digit FIPS code    */  

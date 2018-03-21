@@ -165,4 +165,30 @@ EXPORT LayoutsInternalReport := MODULE
 	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
 	END;
 	
+  // ------                                                                      ------
+  // ------ define the Flat      Dataset  For Debtors                            ------
+	// ------                                                                      ------
+ EXPORT	BusLiensDebtorsCreditorsFlatLayout    := RECORD
+	  DueDiligence.LayoutsInternal.layout_liens_judgments_categorized;
+		//unsigned6 did;
+    STRING50  rmsid;
+    STRING1   NameType;                   // D = Debtor   C = Creditor
+    STRING20  TaxID;
+    STRING8   party_date_first_seen;
+		STRING8   party_date_last_seen;
+	  iesp.duediligenceshared.t_DDRCreditorDebtor;  
+	END; 
+  
+  // ------                                                                     ------
+  // ------ define the internal Dataset for the Liens section  report           ------
+  // ------                                                                     ------
+	EXPORT ReportingofLiensDebtorChildDatasetLayout    := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent 
+   unsigned6 did;  
+   STRING50 tmsid;
+   UNSIGNED4	HistoryDate;
+   STRING1    NameType;                   // D = Debtor   C = Creditor
+	 iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions;  
+	END; 
+  
 END;

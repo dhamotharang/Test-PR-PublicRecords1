@@ -130,7 +130,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				SELF.liensJudgment.SeleID       := LEFT.liensJudgment.SeleID,
 				SELF.liensJudgment.proxid       := LEFT.liensJudgment.proxid,
 				SELF.liensJudgment.powid        := LEFT.liensJudgment.powid,
-				
+				SELF.did                        := 0,    /*  This is always zero for all of our business logic  */   
 				SELF.HistoryDate			          := LEFT.HistoryDate,
 				SELF.DateToUse                  := LEFT.DateToUse,
 				SELF.NumOfDaysAgo               := 0,    /* The number of days will be calculated after the rollup  */  
@@ -233,21 +233,15 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																	SELF := LEFT),
 																	LEFT OUTER);
 
-	 // -----                                                                                     ----- 
-	 // ------ Limit the number of records for each business listed in the report                 ------
-	 // ------ Start by sorting them in seleid sequence and getting the records  with the         ------
-	 // ------ most recent filed and largest dollar amount                                        ------
-	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
-	 // ------                                                                                    ------
-	 BusinessLiensUnreleasedButLimted   := dedup(sort(BusinessLiens_unreleased,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
+	  
 	 // ----- If the report is requested by the XML Service (not allowed by Batch)                -----
 	 // ----- THEN add the liens and judgement data to that section of the report.                -----
 	 // ----- ELSE just leave the reporting sections empty                                        -----
 	 // -----                                                                                     -----
 	UpdateBusnLiensWithReport  := IF(ReportIsRequested, 
-	                                     DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiensUnreleasedButLimted, DebugMode),
+	                                     DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiens_unreleased, DebugMode),
 																			             /* ELSE */ 
-																			                   Update_BusnLiens); 
+																			 Update_BusnLiens); 
 		
 	
 	// *********************
