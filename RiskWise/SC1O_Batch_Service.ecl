@@ -7,10 +7,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
-	<part name="IncludeOfac" type="xsd:boolean"/>
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -32,10 +29,7 @@ unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
 
 batchin := dataset([],riskwise.Layout_SD1I_BatchIn)			: stored('batch_in',few);
-real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
-unsigned1 ofac_version      := 1        : stored('OFACVersion');
-boolean   include_ofac       := false    : stored('IncludeOfac');
-boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 tribcode := StringLib.StringToLowerCase(tribcode_value);
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
@@ -44,6 +38,11 @@ string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission :
 productSet := ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex73','ex90','ex91','ex94','ex95','sc51','2x01'];
 
 targusGatewaySet := ['ex05'];
+
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -54,6 +53,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 RiskWise.Layout_SD1I addseq(batchin le, integer C) := transform
 	self.seq := C;
