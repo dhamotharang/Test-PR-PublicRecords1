@@ -84,6 +84,12 @@ EXPORT LayoutsInternal := MODULE
 		DueDiligence.Layouts.Licenses license;
 	END;
 
+  
+  EXPORT MultipleNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.LayoutAgent) nameAndDate {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+  END;
+
 
 
 //------                                      ------
