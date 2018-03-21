@@ -357,9 +357,36 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 														SELF.notFoundInHeader := RIGHT.notFound;
 														SELF := LEFT;),
 											LEFT OUTER);
-		
-
-	
+                      
+  //get additional names of business (DBA - Doing Business As)
+  sortUniqueDBA := SORT(busHeaderFilt(dba_name <> DueDiligence.Constants.EMPTY), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dba_name, -dt_last_seen);
+  dedupUniqueDBA := DEDUP(sortUniqueDBA, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dba_name);
+  
+  //get max number of uniqueDBAs
+  DueDiligence.LayoutsInternal.MultipleCompanyNames getMaxDBA(dedupUniqueDBA dudba, INTEGER dbaCount) := TRANSFORM, SKIP(dbaCount > DueDiligence.Constants.MAX_DBA_NAMES)
+    SELF.companyNameAndLastSeen := PROJECT(dudba, TRANSFORM(DueDiligence.Layouts.DD_CompanyNames,
+                                                            SELF.Name := LEFT.dba_name;
+                                                            SELF.LinkCount := LEFT.dt_last_seen;
+                                                            SELF := [];));
+    SELF := dudba;
+    SELF := [];   
+  END;
+                  
+	mostRecentDBAs := GROUP(SORT(dedupUniqueDBA, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dt_last_seen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));	
+  maxUniqueDBA := PROJECT(mostRecentDBAs, getMaxDBA(LEFT, COUNTER));
+  
+  rollUniqueDBAs := ROLLUP(UNGROUP(maxUniqueDBA),
+                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+													 TRANSFORM({RECORDOF(LEFT)},
+                                      SELF.companyNameAndLastSeen := LEFT.companyNameAndLastSeen + RIGHT.companyNameAndLastSeen;
+                                      SELF := LEFT));
+  
+	addDBAs := JOIN(addNotFound, rollUniqueDBAs,
+											#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+											TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+														SELF.companyDBA := RIGHT.companyNameAndLastSeen;
+														SELF := LEFT;),
+											LEFT OUTER);
 																		
 
 	// OUTPUT(indata, NAMED('indata'));
@@ -422,12 +449,18 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// OUTPUT(notFoundInHeader, NAMED('notFoundInHeader'));	
 	// OUTPUT(addNotFound, NAMED('addNotFound'));	
+  
+	// OUTPUT(sortUniqueDBA, NAMED('sortUniqueDBA'));	
+	// OUTPUT(dedupUniqueDBA, NAMED('dedupUniqueDBA'));	
+	// OUTPUT(maxUniqueDBA, NAMED('maxUniqueDBA'));	
+	// OUTPUT(rollUniqueDBAs, NAMED('rollUniqueDBAs'));	
+	// OUTPUT(addDBAs, NAMED('addDBAs'));	
 
 	
 	
 
 	
-	RETURN 	addNotFound;										
+	RETURN addDBAs;										
 											
 END;
 										
