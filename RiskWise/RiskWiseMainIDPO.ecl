@@ -21,10 +21,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="runSeed" type="xsd:boolean"/>
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
-	<part name="IncludeOfac" type="xsd:boolean"/>
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -64,9 +61,6 @@ export RiskWiseMainIDPO := MACRO
 	'DataPermissionMask',
 	'runSeed',
 	'OFACversion',
-	'IncludeOfac',
-	'IncludeAdditionalWatchLists',
-	'GlobalWatchlistThreshold',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -113,10 +107,7 @@ unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false : stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string10 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-unsigned1 ofac_version       := 1        : stored('OFACVersion');
-boolean   include_ofac       := false    : stored('IncludeOfac');
-boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
-real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
+unsigned1 ofac_version_       := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
@@ -203,10 +194,10 @@ from_BIID := false;
 isFCRA := false;
 ExcludeWatchLists := false;
 from_IT1O := false;
-// ofac_version := 1;
-// include_ofac := false;
-// include_additional_watchlists := false;
-// global_watchlist_threshold := .84;
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 dob_radius := -1;
 BSversion := 1;
 runSSNCodes := true;
@@ -214,6 +205,8 @@ runBestAddrCheck := true;
 runChronoPhoneLookup := true;
 runAreaCodeSplitSearch := true;
 allowCellPhones := true;
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2Ele,
 																					from_BIID, isFCRA, ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold,
