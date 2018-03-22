@@ -1,4 +1,4 @@
-import _control, tools, ut;
+﻿import _control, tools, ut, Orbit3;
 
 export Build_All( 
 	 string		pversion
@@ -13,6 +13,7 @@ export Build_All(
 	,dataset(Layouts.Base						)		pBaseFile				= Files().base.qa	
 ) :=
 function	
+ orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Crash Carrier',(string)pversion,'N');
 	full_build :=
 	sequential(
 		 Create_Supers
@@ -23,6 +24,7 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
+		,orbit_update
 		
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	
