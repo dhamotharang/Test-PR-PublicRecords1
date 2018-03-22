@@ -564,6 +564,7 @@ EXPORT LinkIDs := RECORD
     BusinessLegalSummary;
     DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+    STRING parentCompanyName;
 	END;
 	
 	EXPORT Positions := RECORD

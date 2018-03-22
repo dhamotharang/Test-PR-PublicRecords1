@@ -230,10 +230,16 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   
   
   
+  //add 'loose' data to the report
+  addMiscInfo := PROJECT(addDBANames, TRANSFORM(RECORDOF(LEFT),
+                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ParentCompany := LEFT.parentCompanyName;
+                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.StructureType := IF(LEFT.hdBusnType = DueDiligence.Constants.EMPTY, LEFT.adrBusnType, LEFT.hdBusnType);
+                                                SELF := LEFT;));
+  
   
   
   //***This section is for Operating Information  ***//
-	AddOperInformationToReport   :=  addDBANames;  
+	AddOperInformationToReport   :=  addMiscInfo;  
 
 																													
 													 
@@ -255,6 +261,8 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   // OUTPUT(maxDBANames, NAMED('maxDBANames'));
   // OUTPUT(rollDBANames, NAMED('rollDBANames'));
   // OUTPUT(addDBANames, NAMED('addDBANames'));
+  
+  // OUTPUT(addMiscInfo, NAMED('addMiscInfo'));
 
 	RETURN AddOperInformationToReport;
 END;
