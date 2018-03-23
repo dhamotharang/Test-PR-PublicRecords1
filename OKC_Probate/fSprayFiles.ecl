@@ -9,7 +9,7 @@ EXPORT fSprayFiles(
 
 	 STRING		pVersionDate	=	(STRING)STD.Date.Today()
 	,string		pServer			=	OKC_Probate.Constants(pVersionDate).serverIP
-	,string		pDir				=	OKC_Probate.Constants(pVersionDate).Directory
+	,string		pDir				=	OKC_Probate.Constants(pVersionDate).Directory + pVersionDate
 	,STRING		pFilename			=	'*csv'
 	,string		pGroupName	=	_Dataset().groupname
 	,boolean	pIsTesting	= FALSE

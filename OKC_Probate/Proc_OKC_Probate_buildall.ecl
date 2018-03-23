@@ -1,8 +1,8 @@
-﻿IMPORT OKC_Probate, Scrubs_OKC_Probate,	BuildLogger, VersionControl, STD;
+﻿IMPORT OKC_Probate, BuildLogger, VersionControl, STD;
 EXPORT Proc_OKC_Probate_buildall(
 		STRING		pVersion					=	(STRING)STD.Date.Today()
 		,STRING		pServerIP			=	OKC_Probate.Constants(pVersion).serverIP
-		,STRING		pDirectory		=	OKC_Probate.Constants(pVersion).Directory
+		,STRING		pDirectory		=	OKC_Probate.Constants(pVersion).Directory + pVersion
 		,STRING		pFilename			=	'*csv'
 		,STRING		pGroupName		=	_Dataset().groupname
 		,BOOLEAN	pIsTesting		=	FALSE
@@ -46,12 +46,12 @@ EXPORT Proc_OKC_Probate_buildall(
 					FAILURE(Send_Emails(pversion).BuildFailure);
 
 	//	Scrubs (Which require ORBIT)
-	EXPORT	ScrubsReports	:=	
-	IF(VersionControl.IsValidVersion(pVersion)
-		,Scrubs_OKC_Probate.PostBuildScrubs(pVersion)
-		,OUTPUT('No Valid version parameter passed, skipping OKC_Probate.Proc_OKC_Probate_buildall().ScrubsReports')
-	) : SUCCESS(Send_Emails(pversion,pBuildMessage:='OKC Probate Scrubs are complete').BuildMessage),
-					FAILURE(Send_Emails(pversion).BuildFailure);
+	// EXPORT	ScrubsReports	:=	
+	// IF(VersionControl.IsValidVersion(pVersion)
+		// ,Scrubs_OKC_Probate.PostBuildScrubs(pVersion)
+		// ,OUTPUT('No Valid version parameter passed, skipping OKC_Probate.Proc_OKC_Probate_buildall().ScrubsReports')
+	// ) : SUCCESS(Send_Emails(pversion,pBuildMessage:='OKC Probate Scrubs are complete').BuildMessage),
+					// FAILURE(Send_Emails(pversion).BuildFailure);
 	
 	EXPORT	All	:=
 	IF(VersionControl.IsValidVersion(pversion)

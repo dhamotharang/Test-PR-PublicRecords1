@@ -22,6 +22,8 @@ EXPORT map_probate_to_V3(STRING pVersion	=	(STRING)STD.Date.Today()) := FUNCTION
 	END;
 	
 	layout_probate_did	tAddPID(ds_probate_dedup	pInput)	:=	TRANSFORM
+		SELF.dob	:=	IF((UNSIGNED)pInput.dob<=19000101,'00000000',pInput.dob);
+		SELF.dod	:=	IF((UNSIGNED)pInput.dod<=19000101,'00000000',pInput.dod);
 		SELF.persistent_record_ID	:=	HASH32(	
 																																							TRIM(pInput.DebtorFirstName,LEFT,RIGHT)+
 																																							TRIM(pInput.DebtorLastName,LEFT,RIGHT)+
