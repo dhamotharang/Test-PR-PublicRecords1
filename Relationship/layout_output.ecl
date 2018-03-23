@@ -51,6 +51,10 @@ export iter := RECORD
   integer2 comarriagedivorce_cnt;
   integer2 coucc_score;
   integer2 coucc_cnt;
+  integer2 coclue_score;
+  integer2 coclue_cnt;
+  integer2 cocc_score;
+  integer2 cocc_cnt;
   integer2 lname_score;
   integer2 phone_score;
   integer2 dl_nbr_score;
