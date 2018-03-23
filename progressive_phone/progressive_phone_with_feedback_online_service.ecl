@@ -4,6 +4,7 @@
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
+	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
 	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
 	<part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
 	<part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
@@ -187,6 +188,7 @@ EXPORT progressive_phone_with_feedback_online_service := MACRO
 		#stored('DID', search_by.UniqueId);
 		#stored('DedupePhones', search_by.DedupeInfo.phones );
 		#stored('ExcludeDeadContacts', ~first_row.options.IncludeDeadContacts );
+		#stored('DedupAgainstInputPhones', first_row.options.DedupeAgainstInputPhones );
 		#stored('KeepSamePhoneInDiffLevels', first_row.options.KeepSamePhoneInDiffLevels );
 		#stored('IncludePhonesFeedback', first_row.options.IncludePhonesFeedback );
 		#stored('IncludeLastResort', first_row.options.IncludeLastResort );

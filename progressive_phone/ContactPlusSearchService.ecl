@@ -4,6 +4,7 @@
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
+	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
 	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
 	<part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
 	<part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
@@ -90,6 +91,7 @@ EXPORT ContactPlusSearchService := MACRO
     #stored('EMAIL', search_by.email);
 		#stored('DedupePhones', search_by.DedupeInfo.phones );
 		#stored('ExcludeDeadContacts', ~first_row.options.IncludeDeadContacts );
+		#stored('DedupAgainstInputPhones', first_row.options.DedupeAgainstInputPhones );
 		#stored('KeepSamePhoneInDiffLevels', first_row.options.KeepSamePhoneInDiffLevels );
 	
 		#stored('IncludePhonesFeedback', first_row.options.IncludePhonesFeedback );
@@ -371,6 +373,7 @@ EXPORT ContactPlusSearchService := MACRO
 		//output('WithNewPLSources');
 		// output(presRecs_ready, named('presRecs_ready'));
 		// output(ta1_tmp, named('ta1_tmp'));
+
 		output(Results,named('Results'));
 ENDMACRO;
 // progressive_phone.ContactPlusSearchService();
