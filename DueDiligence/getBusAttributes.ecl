@@ -43,7 +43,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get attribute data for individuals related to the inquired business
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
-	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport, debugmode); 
+	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
 	
 
 
@@ -87,7 +87,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
  
  	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
 	
-	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts, debugmode),
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
                                 /* ELSE */
 																                addCounts);
 
