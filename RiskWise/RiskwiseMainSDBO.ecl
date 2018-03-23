@@ -67,10 +67,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
-	<part name="IncludeOfac" type="xsd:boolean"/>
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -154,10 +151,7 @@ export RiskwiseMainSDBO := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
-  'GlobalWatchlistThreshold',
 	'OFACversion',
-	'IncludeOfac',
-	'IncludeAdditionalWatchLists',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -251,15 +245,17 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
 boolean   isUtility := false;
 boolean   ln_branded := false;
-real global_watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
-unsigned1 ofac_version      := 1        : stored('OFACVersion');
-boolean   include_ofac       := false    : stored('IncludeOfac');
-boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 boolean   suppressNearDups := true;
 boolean   require2Ele := true;
 
 tribcode := StringLib.StringToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['ex24', 'ex98'];
+
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	self.servicename := le.servicename;
@@ -271,6 +267,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 END;
 gateways := project(gateways_in, gw_switch(left));
 
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 d := dataset([{0}],RiskWise.Layout_SD5I);
 

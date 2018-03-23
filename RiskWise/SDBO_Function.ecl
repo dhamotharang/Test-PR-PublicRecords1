@@ -147,15 +147,15 @@ _ofac_version :=
   map( 
     ofac_version = 4 => 4,
     tribcode in ['b2b4'] => 3, 
-    1 );
+    ofac_version);
     
 _include_ofac := 
   map(
-    ofac_version = 4 and include_ofac = true => true,
+    ofac_version in [2, 3, 4] => true,
     tribcode in ['b2b4'] => true, 
     false );
     
-_include_additional_watchlists := if(ofac_version = 4 and include_additional_watchlists, true, false);
+_include_additional_watchlists := include_additional_watchlists;
 
 _global_watchlist_threshold :=
   map(
