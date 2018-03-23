@@ -38,9 +38,10 @@ EXPORT getVerificationDataFromEquifax(dataset(iesp.employment_verification_fcra.
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.platform := left.signonreq.platform,
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.intermediary := left.signonreq.intermediary,
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.enduser := left.signonreq.enduser,
-							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.firstname := [],
+							isRhodeIsland := trim(left.ReportBy.employercode)<> '' or trim(left.ReportBy.employername) <> '';
+							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.firstname := if(isRhodeIsland,left.ReportBy.firstname,''),
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.middlename := [],
-							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.lastname := [],
+							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.lastname :=  if(isRhodeIsland,left.ReportBy.lastname,''),
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.salarykey := [],
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.templatename := [],
 

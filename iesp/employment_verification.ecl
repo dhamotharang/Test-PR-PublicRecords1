@@ -226,7 +226,7 @@ export t_VerificationOfEmploymentRecord := record
 end;
 		
 export t_VerificationOfEmploymentSelectRecord := record
-	dataset(t_VerificationOfEmploymentRecord) VerificationOfEmploymentRecordData {xpath('VerificationOfEmploymentRecordData/VerificationOfEmploymentRecord'), MAXCOUNT(2)};
+	dataset(t_VerificationOfEmploymentRecord) VerificationOfEmploymentRecordData {xpath('VerificationOfEmploymentRecordData/VerificationOfEmploymentRecord'), MAXCOUNT(20)};
 end;
 		
 export t_VerificationOfEmploymentResp := record
