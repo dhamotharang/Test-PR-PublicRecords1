@@ -7,9 +7,9 @@ export key_bankruptcy_did(boolean isFCRA = false) := function
 	
 	FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
 
-	slim_party := table(FCRATest((unsigned6)did != 0), {get_recs.did,
-                              get_recs.tmsid,
-															get_recs.court_code,get_recs.case_number});
+	slim_party := table(FCRATest((unsigned6)did != 0), {FCRATest.did,
+                              FCRATest.tmsid,
+															FCRATest.court_code,FCRATest.case_number});
 
 	slim_dist   := distribute(slim_party, hash(tmsid,court_code,case_number, did));
 	slim_sort   := sort(slim_dist, tmsid,court_code,case_number, did, local);

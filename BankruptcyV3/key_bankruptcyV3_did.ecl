@@ -4,20 +4,20 @@ export key_bankruptcyV3_did(boolean isFCRA = false) := function
   todaysdate := ut.GetDate;
 	// MW: might need to change "process_date" as filtering date
 	get_party_recs 	:= BankruptcyV2.file_bankruptcy_search_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
-	FCRATest:=if(isFCRA,get_party_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_party_recs);
-	slim_party 		:= table(FCRATest((unsigned6)did != 0), {	get_party_recs.did,
-																	get_party_recs.tmsid,
-																	get_party_recs.court_code,
-																	get_party_recs.case_number
+	FCRATestParty:=if(isFCRA,get_party_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_party_recs);
+	slim_party 		:= table(FCRATestParty((unsigned6)did != 0), {	get_party_recs.did,
+																	FCRATestParty.tmsid,
+																	FCRATestParty.court_code,
+																	FCRATestParty.case_number
 																	}
 																	);
 														
 	get_main_recs := BankruptcyV2.file_bankruptcy_main_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
-
-	slim_main := table(get_main_recs((unsigned6)did != 0), {get_main_recs.did,
-															get_main_recs.tmsid,
-															get_main_recs.court_code,
-															get_main_recs.case_number
+FCRATestMain:=if(isFCRA,get_main_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_main_recs);
+	slim_main := table(FCRATestMain((unsigned6)did != 0), {FCRATestMain.did,
+															FCRATestMain.tmsid,
+															FCRATestMain.court_code,
+															FCRATestMain.case_number
 															}
 															);		
 															

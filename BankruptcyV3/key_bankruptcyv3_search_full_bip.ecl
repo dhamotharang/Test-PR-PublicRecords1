@@ -5,7 +5,7 @@ export key_bankruptcyv3_search_full_bip(boolean isFCRA=false) := function
   todaysdate := ut.GetDate;
 	get_recs := BankruptcyV2.file_bankruptcy_search_v3_bip(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
-	BankruptcyV2.layout_bankruptcy_search_v3_supp_bip tformat(BankruptcyV2.file_bankruptcy_search_v3_supp_bip L) := transform
+	BankruptcyV2.layout_bankruptcy_search_v3_supp_bip tformat(FCRATest L) := transform
 		self.ssn := if(L.ssn <> '',  L.ssn, L.app_ssn);
 		self.tax_id := if(L.tax_id <> '',  L.tax_id, L.app_tax_id);
 		self := L;

@@ -11,14 +11,14 @@ export key_bankruptcyV3_ssn(boolean isFCRA = false) := function
 		string50 	tmsid;
 	end;
 
-	temp_rec treformatssnparty(BankruptcyV2.file_bankruptcy_search_v3 L) := transform
+	temp_rec treformatssnparty(FCRATest_party L) := transform
 		self.ssn := if((unsigned6)L.ssn <> 0,L.ssn, L.app_ssn);
 		self := L;
 	end;
 
 	slim_party := project(FCRATest_party,treformatssnparty(left));
 	
-	temp_rec treformatssnmain(BankruptcyV2.file_bankruptcy_main_v3 L) := transform
+	temp_rec treformatssnmain(FCRATest_main L) := transform
 		self.ssn 	:= L.app_ssn;
 		self 		:= L;
 	end;

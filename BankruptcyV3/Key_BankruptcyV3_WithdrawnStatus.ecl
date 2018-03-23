@@ -14,7 +14,7 @@ EXPORT	Key_BankruptcyV3_WithdrawnStatus(	STRING	pVersion	=	(STRING8)Std.Date.Tod
   pTodaysDate						:=	(STRING8)Std.Date.Today();
 	dBKSearchLinkIDs			:=	BankruptcyV2.file_bankruptcy_search_v3_bip(~IsFCRA OR FCRA.bankrupt_is_ok(pTodaysDate,process_date));
 	FCRATest:=if(isFCRA,dBKSearchLinkIDs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),dBKSearchLinkIDs);
-	dBKSearchLinkIDsDist	:=	DEDUP(SORT(DISTRIBUTE(dBKSearchLinkIDs(name_type='D' AND debtor_type='P'),	// D=Debtor, P=Primary
+	dBKSearchLinkIDsDist	:=	DEDUP(SORT(DISTRIBUTE(FCRATest(name_type='D' AND debtor_type='P'),	// D=Debtor, P=Primary
 																	HASH(	TMSID,CaseID,DefendantID)),
 																				TMSID,CaseID,DefendantID,-(UNSIGNED)did,LOCAL),
 																				TMSID,CaseID,DefendantID,LOCAL);

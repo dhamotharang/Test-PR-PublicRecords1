@@ -14,7 +14,7 @@ export key_bankruptcyV3_ssn4st(boolean isFCRA = false) := function
 		string2   state;
 		string150 lname;      //will contain company name if lname is blank.
 		string50  fname;
-		get_recs.tmsid;
+		FCRATest.tmsid;
 	end;
 
 	temp_rec treformatssn(FCRATest L) := transform

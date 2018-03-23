@@ -5,10 +5,10 @@ export key_bankruptcyV3_casenumber(boolean isFCRA = false) := function
 	get_recs := BankruptcyV2.file_bankruptcy_main_v3(~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed));
 	FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
 	slim_rec := record
-		get_recs.tmsid;
-		get_recs.court_code;
-		get_recs.orig_case_number;
-		get_recs.case_number;
+		FCRATest.tmsid;
+		FCRATest.court_code;
+		FCRATest.orig_case_number;
+		FCRATest.case_number;
 		string2 filing_state ;
 	end;
 
