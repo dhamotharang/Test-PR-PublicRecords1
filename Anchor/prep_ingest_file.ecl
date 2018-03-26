@@ -35,6 +35,7 @@ EXPORT prep_ingest_file := FUNCTION
 			self.persistent_record_id 			:= HASH64(TRIM(pInput.FirstName)
 																								+TRIM(pInput.LastName)
 																								+TRIM(pInput.DOB)
+																								+TRIM(self.Address_1)
 																								+TRIM(pInput.City)
 																								+TRIM(pInput.State)
 																								+TRIM(pInput.ZipCode)

@@ -1,4 +1,4 @@
-export layout_liens_main_temp := record
+﻿export layout_liens_main_temp := record
 
 string50 tmsid;
 string50 rmsid;
@@ -47,5 +47,12 @@ string certificate_number := '';
 BOOLEAN	bCBFlag	:=	FALSE;
 string filing_status := '';
 string filing_status_desc := '';
+STRING8	DOB	:=	'';
+string2 Filing_Type_ID	:= '';
+STRING8	Collection_Date	:=	'';
+STRING45	CaseLinkID	:=	'';
+string50 TMSID_old	:=	'';
+string50 RMSID_old	:=	'';
+BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
 
 end;

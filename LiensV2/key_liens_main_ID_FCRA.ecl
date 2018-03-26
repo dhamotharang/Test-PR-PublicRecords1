@@ -1,5 +1,4 @@
-﻿// file_liens_fcra_main
-IMPORT Data_Services, liensv2, Doxie;
+﻿IMPORT Data_Services, liensv2, Doxie;
 
 dFCRAMain				:=	LiensV2.file_liens_fcra_main;
 dFCRAMainDist		:=	SORT(DISTRIBUTE(dFCRAMain,
