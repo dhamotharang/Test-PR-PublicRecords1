@@ -1,7 +1,8 @@
 ﻿
-IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
+IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data, Suppress;
 
 EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBusnCriminal, 
+                             string6 DD_SSNMask,
                              boolean DebugMode = FALSE) := FUNCTION
 
   
@@ -69,13 +70,19 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                         SELF.did                    := LEFT.did; 
 																												SELF                        := RIGHT;  //***get the party offenses from the RIGHT
                                                         SELF                        := LEFT;   //***get name and address from the LEFT
-																												SELF                        := [];));                                                      												
+																												SELF                        := [];)); 
+  
+  // ------                                                                                                   ------
+  // ------ pass the input file and the name of the output file, and name of the ssn field and the name of the -----
+  // ------ dl_field(driver's license field) in this case is '' and the boolean flags for isassn and isadl     -----
+  // ------                                                                                                   ------
+  Suppress.MAC_Mask(ListOfExecutivesAndOffenses, MaskSSNInThisListOfExecutives, ssn, '', true, false,,,,DD_SSNMask);
 	// ------                                                                       ------
   // ------ populate the ChildDataset  with the list of OFFENSES                  ------
   // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
   // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(ListOfExecutivesAndOffenses le, Integer OffenseCount) := TRANSFORM,
+	iesp.duediligenceshared.t_DDRLegalEventCriminal  FormatTheListOfOffenses(MaskSSNInThisListOfExecutives le, Integer OffenseCount) := TRANSFORM,
 	                                        SKIP(OffenseCount > iesp.constants.DDRAttributesConst.MaxLegalEvents)         
          SELF.CaseNumber               := le.caseNum;    
          SELF.OffenseScore             := le.offenseScore;
@@ -118,7 +125,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	 
 	  
   BusExecCriminalChildDataset  :=   
-	  PROJECT(ListOfExecutivesAndOffenses,                                                        //***Using this input dataset  
+	  PROJECT(MaskSSNInThisListOfExecutives,                                                        //***Using this input dataset  
 			  TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingofBEOCriminalChildDatasetLayout,  //***format the data according to this layout.
 				  #EXPAND (DueDiligence.Constants.mac_TRANSFORMLinkids())                               //***This is the sequence number and LINKID of the Inquired Business (or the Parent)
           SELF.did                    := LEFT.did,
@@ -143,10 +150,10 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
           SELF.Address.Zip4            := LEFT.zip4,
           SELF.Address.County          := LEFT.county,                     //***This is the 3 digit FIPS code - convert this to CountyName 
           SELF.Address.PostalCode      := LEFT.zip5 + LEFT.zip4,                             
-          SELF.Address.StateCityZip    := '',                              //***Fix this in SRPINT10
+          SELF.Address.StateCityZip    := '',                              //***Fix this in SPRINT10
           SELF.lexid                  := (string)LEFT.did,
           SELF.ExecTitle              := LEFT.mostRecentTitle,
-          SELF.SSN                    := LEFT.ssn,
+          SELF.SSN                    := LEFT.ssn,                         //***Add SSN MASKING in SPRINT10
           SELF.DOB.Year                  := (unsigned4)LEFT.DOB[1..4],     //** YYYY
 					SELF.DOB.Month                 := (unsigned2)LEFT.DOB[5..6],     //** MM
 					SELF.DOB.Day                   := (unsigned2)LEFT.DOB[7..8],     //** DD
@@ -237,6 +244,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	  IF(DebugMode,     OUTPUT(CHOOSEN(DedupExecutiveTitles,                   100),  NAMED('DedupExecutiveTitles')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(ExecutivesWithTitles,                   100),  NAMED('ExecutivesWithTitles')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(ListOfExecutivesAndOffenses,             100),  NAMED('ListOfExecutivesAndOffenses')));
+	  IF(DebugMode,     OUTPUT(CHOOSEN(MaskSSNInThisListOfExecutives,           100),  NAMED('MaskSSNInThisListOfExecutives')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(BusExecCriminalChildDataset,             100),  NAMED('BusExecCriminalChildDataset')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(RollupCriminalOffense,                   100),  NAMED('RollupCriminalOffense')));
 	  IF(DebugMode,     OUTPUT(CHOOSEN(BEOExecutiveCriminalEvents,              100),  NAMED('BEOExecutiveCriminalEvents')));

@@ -8,7 +8,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 																								BIPV2.mod_sources.iParams linkingOptions,
 																								BOOLEAN includeReport = FALSE,
 																								BOOLEAN displayAttributeText = FALSE,
-																								BOOLEAN debugMode = FALSE) := FUNCTION
+                                                string6 DD_SSNMask = '',
+                                                BOOLEAN debugMode = FALSE
+                                                ) := FUNCTION
 
 
 	// ------                                                                                     ------
@@ -87,9 +89,10 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
  
  	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
 	
-	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
-                                /* ELSE */
-																                addCounts);
+	AddBusinessDataForReport   :=  IF(includeReport, 
+                                   DueDiligence.getBusReport(addCounts, DD_SSNMask),
+                              /* ELSE */
+																   addCounts);
 
 	//Populate the index for the customer
 	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);

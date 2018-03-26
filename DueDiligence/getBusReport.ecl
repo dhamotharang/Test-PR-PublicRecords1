@@ -3,13 +3,14 @@
 EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											   //Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 													 //BOOLEAN includeReportData,
+                           string6 DD_SSNMask,
 													 boolean DebugMode = FALSE
 											     ) := FUNCTION
 													 
 
 
   //UpdateBusnExecsCriminalSection    := DueDiligence.reportBusExecutiveOfficers(BusnData, DebugMode);
-	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DebugMode);
+	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DD_SSNMask, DebugMode);
  													   																			  
     
   //Add the established date to business information

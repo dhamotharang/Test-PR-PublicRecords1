@@ -55,7 +55,7 @@ EXPORT DueDiligence_Service := MACRO
 			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(businessResults, NAMED('busResults')));                   //This is for debug mode 
 			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode
-
+      IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask')));
 
 ENDMACRO;
 
