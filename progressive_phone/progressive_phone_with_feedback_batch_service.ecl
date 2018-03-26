@@ -4,6 +4,7 @@
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
 	<part name="GLBPurpose" type="xsd:unsignedInt"/>
 	<part name="KeepSamePhoneInDiffLevels" type="xsd:boolean"/>
+	<part name="DedupAgainstInputPhones" type="xsd:boolean"/>
 	<part name="MaxPhoneCount" type="xsd:unsignedInt"/>
 	<part name="CountType1_Es_EDASEARCH" type="xsd:unsignedInt"/>
 	<part name="CountType2_Se_SKIPTRACESEARCH" type="xsd:unsignedInt"/>
