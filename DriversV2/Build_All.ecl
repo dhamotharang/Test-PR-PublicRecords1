@@ -3,7 +3,7 @@
 export Build_All(
 
 	 string															pversion
-	,string															pDirectory			= '/data/dl_data/drvlic/bin/isBuildRunning.lck'
+	,string															pDirectory			= '/data/dl_data/drvlic/logs/isBuildRunning.lck'
 	,string															pServerIP				= _control.IPAddress.bctlpedata10
 ) :=
 function
