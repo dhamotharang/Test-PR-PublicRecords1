@@ -7,7 +7,7 @@ IMPORT PRTE2_Common;
 
 dateString	:= PRTE2_Common.Constants.TodayString + '';
 //***** Alter Values in here *******************************************
-desprayName 			:= 'WatercraftV3_base_Dev_'+dateString+'.csv';
+desprayName 			:= 'WatercraftV3_AfterAdds_'+dateString+'.csv';
 ExportDS						:= PRTE2_WaterCraft_Ins.Datasets.All_Slim_Internal;		// saved in internal file in slim layout
 // desprayName 			:= 'WatercraftV3_base_Prod_'+dateString+'.csv';
 // ExportDS						:= PRTE2_WaterCraft_Ins.Datasets.All_Slim_Internal_Prod;		// saved in internal file in slim layout

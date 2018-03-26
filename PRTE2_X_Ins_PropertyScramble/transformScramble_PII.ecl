@@ -1,0 +1,55 @@
+﻿Layout2 	:= Layouts_PII.PII_XRef_Layout2;
+
+EXPORT Layout2 transformScramble_PII (Layout2 L,Layout2 R) := TRANSFORM
+		appendSpaceIf(STRING base, STRING appnd) := IF(appnd='',base,base+' '+appnd);
+		replaceIfNotBlank(STRING base, STRING replaceIf) := IF(base='', base, replaceIf);
+
+			SELF.BaseRec := R.BaseRec;
+			SELF.MatchRec := L.BaseRec;
+			SELF.XRec1 := R.XRec1;
+			SELF.XRec2 := R.XRec2;
+			SELF.fname := R.fname;
+			SELF.mname := R.mname;
+			SELF.lname := R.lname;
+			SELF.SSN := R.SSN;
+			SELF.dob := R.dob;
+			SELF.i_address := R.i_address;
+			SELF.apt := R.apt;
+			SELF.p_city_name := R.p_city_name;
+			SELF.st := R.st;
+			SELF.zip := R.zip;
+			SELF.prim_range := R.prim_range;
+			SELF.predir := R.predir;
+			SELF.prim_name := R.prim_name;
+			SELF.addr_suffix := R.addr_suffix;
+			SELF.postdir := R.postdir;
+			SELF.unit_desig := R.unit_desig;
+			SELF.sec_range := R.sec_range;
+			SELF.i_streetaddr1 := R.i_streetaddr1;
+			SELF.i_streetaddr2 := R.i_streetaddr2;
+			SELF.i_city1 := R.i_city1;
+			SELF.i_state1 := R.i_state1;
+			SELF.zip5 := R.zip5;
+			SELF.zip4 := R.zip4;
+			SELF.county := R.county;
+			SELF.i_postalcd := R.i_postalcd;
+			SELF.i_stcityzip	 := R.i_stcityzip;
+			SELF.CensusTract := R.CensusTract;
+			SELF.Latitude := R.Latitude;
+			SELF.Longitude := R.Longitude;
+			SELF.LivingAreaSF := R.LivingAreaSF;
+			SELF.Stories := R.Stories;
+			SELF.Bedrooms := R.Bedrooms;
+			SELF.Baths := R.Baths;
+			SELF.Units := R.Units;
+			SELF.Rooms := R.Rooms;
+			SELF.FullBaths := R.FullBaths;
+			SELF.HalfBaths := R.HalfBaths;
+			SELF.BuildingAreaSF := R.BuildingAreaSF;
+			SELF.GroundFloorAreaSF := R.GroundFloorAreaSF;
+			SELF.BasementAreaSF := R.BasementAreaSF;
+			SELF.GarageAreaSF := R.GarageAreaSF;
+			SELF  := L;
+			SELF  := [];
+
+END;

@@ -1,7 +1,9 @@
-// PRTE2_PropertyInfo_Ins.Layouts
+﻿/* *****************************************************************************************
+ PRTE2_PropertyInfo_Ins.Layouts
 // Some of these were copied from layouts with other names all clustered in PRTE.Layouts or PRTE2.Layouts
 // 2015 - removed the now obsolete "Gateway" and editable_spreadsheet layouts
-
+TEMP_ADDRESS_WORKAROUND WHEN DATA3 IS DONE THERE WILL BE CHANGES HERE
+***************************************************************************************** */
 IMPORT PRTE2,PRTE_CSV,PRTE, ut, PropertyCharacteristics;
 
 EXPORT Layouts := MODULE

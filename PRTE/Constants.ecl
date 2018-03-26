@@ -1,0 +1,3 @@
+﻿export Constants	:=
+module
+end;

@@ -1,4 +1,4 @@
-// WIP
+﻿// WIP
 /* *********************************************************************************************
 PRTE2_LNProperty_Ins.Files
 
@@ -18,7 +18,7 @@ EXPORT Files := MODULE
 	EXPORT SPRAY_PREFIX_NAME    		:= '~prct::SPRAY::LNProperty';
 	EXPORT IN_PREFIX_NAME						:= '~prct::IN'+LNProperty_MODULE_SUFFIX+'::';					// CSV Sprayed Thor file
 	EXPORT BASE_PREFIX_NAME					:= '~prct::BASE'+LNProperty_MODULE_SUFFIX+'::';				// Processed Spray file to final Base
-	
+
 	// ---------- File Spraying names and references ------------------------------------------------
 	EXPORT FILE_SPRAY_NAME					:= SPRAY_PREFIX_NAME + '::CSV::'+ALP_BASE_NAME+ '_' + ThorLib.Wuid();
 	EXPORT ALP_SPRAY_DS							:= DATASET(FILE_SPRAY_NAME, Layouts_V2.LN_spreadsheet,
@@ -35,6 +35,7 @@ EXPORT Files := MODULE
 	EXPORT ALP_IN_SF_DS						:= DATASET(ALP_IN_SF_NAME, Layouts_V2.LN_spreadsheet, THOR);
 
 	//---------------- We then need one base file for final base to hand the build -------------------
+	// 							New_Base_Name		:= '~prct::BASE::LNPropertyV2_Alpha::alpha_base';
 	EXPORT ALP_LNP_SF_NAME					:= BASE_PREFIX_NAME + ALP_BASE_NAME;
 	EXPORT ALP_LNP_SF_DS						:= DATASET(ALP_LNP_SF_NAME, Layouts_V2.layout_LNP_V2_expanded_payload, THOR);
 	// PRTE2_LNProperty.Files reads our base via the above PRTE2_LNProperty_Ins.Files.ALP_LNP_SF_DS
@@ -42,7 +43,7 @@ EXPORT Files := MODULE
 
 	// Prod version of the files are just for easy CustTest desprays from DEV (without having to login to prod)
 	EXPORT ALP_LNP_SF_NAME_Prod			:= Add_Foreign_prod(ALP_LNP_SF_NAME);
-	EXPORT ALP_LNP_SF_DS_Prod				:= DATASET(ALP_LNP_SF_NAME_Prod, Layouts_V2.LN_spreadsheet, THOR);
+	EXPORT ALP_LNP_SF_DS_Prod				:= DATASET(ALP_LNP_SF_NAME_Prod, Layouts_V2.layout_LNP_V2_expanded_payload, THOR);
 
 	// Reference just for research
 	EXPORT CODES_V3_SF_NAME := Add_Foreign_prod('thor_data400::base::codes_v3');

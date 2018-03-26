@@ -1,0 +1,1346 @@
+﻿// Danny thinks this appears to be OBSOLETE - and now handled by the CopyMissingKeys line in BWR_LNPropertyV2_Build_Keys
+// HOWEVER ...
+// 1/31/2014 - Reviewed the key file names to confirm they existed in Keys attribute, some do NOT. 
+//    so, I removed dups and left the ones that are not represented in the main build.
+//    so this file is now much smaller than it was and it appears to touch file names that aren't mentioned in our build.
+// ?????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+// NO IDEA WHAT THESE "OTHER" KEYS ARE AND WHY THEY AREN'T IN THE MAIN BUILD EXCEPT MAYBE THEY ARE STATIC, NEVER CHANGING???
+// 2/4/2014 - ON SECOND THOUGHT ...
+// I think CopyMissingKeys takes all keys in the DOPS records and does a copy, so yeah! We would not have to find the names
+//  anywhere in the code here...  this probably *IS* therefore obsolete like Danny thought.
+
+//* BWR_Other_Keys - Create additiona LN_Property Misc Keys
+#workunit('name','PRCT LNPropertyKeys Other Misc');
+string filedate := '20130523';
+
+arecord7:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned1 source_count;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  unsigned4 assessed_amount;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  string20 fname;
+  string20 lname;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord7),{did},{dataset([],arecord7)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::did.ownership',update);
+
+addr :=RECORD
+   string10 prim_range;
+   string2 predir;
+   string28 prim_name;
+   string4 addr_suffix;
+   string2 postdir;
+   string10 unit_desig;
+   string8 sec_range;
+   string25 v_city_name;
+   string2 st;
+   string5 zip5;
+   string4 zip4;
+   string2 addr_rec_type;
+   string2 fips_state;
+   string3 fips_county;
+   string10 geo_lat;
+   string11 geo_long;
+   string4 cbsa;
+   string7 geo_blk;
+   string1 geo_match;
+   string4 err_stat;
+  END;
+
+name :=RECORD
+   string5 title;
+   string20 fname;
+   string20 mname;
+   string20 lname;
+   string5 name_suffix;
+   string3 name_score;
+  END;
+
+arecord29:= 
+RECORD
+  unsigned2 src;
+  unsigned6 doc;
+  string12 ln_fares_id;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord29),{src,doc},{dataset([],arecord29)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::doc.fares_id',update);
+arecord30:= 
+RECORD
+  integer1 f;
+  string segname{maxLength(128)};
+  unsigned1 segtype;
+  set of unsigned2 seglist{maxCount(64)};
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord30),{f},{dataset([],arecord30)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::xseglist',update);
+arecord31:= 
+RECORD
+  unsigned2 src;
+  unsigned6 doc;
+  string12 ln_fares_id;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord31),{src,doc},{dataset([],arecord31)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::doc.fares_id',update);
+arecord32:= 
+RECORD
+  integer1 f;
+  string segname{maxLength(128)};
+  unsigned1 segtype;
+  set of unsigned2 seglist{maxCount(64)};
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord32),{f},{dataset([],arecord32)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::xseglist',update);
+
+layout_name :=RECORD
+   qstring20 fname;
+   qstring20 lname;
+  END;
+
+unsigned2 max_embedded := 100;
+
+layout_fares :=RECORD
+   string12 ln_fare_id;
+  END;
+
+arecord34:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  unsigned4 assessed_amount;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(Layout_Name) buyers{maxCount(max_embedded)};
+  DATASET(Layout_Name) sellers{maxCount(max_embedded)};
+  DATASET(layout_fares) fares{maxCount(max_embedded)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord34),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord34)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addr.full',update);
+arecord35:= 
+RECORD
+  unsigned1 typ;
+  unsigned4 nominal;
+  unsigned2 lseg;
+  unsigned2 part;
+  unsigned2 src;
+  unsigned6 doc;
+  unsigned2 seg;
+  unsigned4 kwp;
+  unsigned2 wip;
+  unsigned4 suffix;
+  unsigned2 sect;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord35),{typ,nominal,lseg,part,src,doc,seg,kwp,wip,suffix},{dataset([],arecord35)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::nidx3',update);
+arecord36:= 
+RECORD
+  unsigned1 typ;
+  unsigned4 nominal;
+  unsigned2 lseg;
+  unsigned2 part;
+  unsigned2 src;
+  unsigned6 doc;
+  unsigned2 seg;
+  unsigned4 kwp;
+  unsigned2 wip;
+  unsigned4 suffix;
+  unsigned2 sect;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord36),{typ,nominal,lseg,part,src,doc,seg,kwp,wip,suffix},{dataset([],arecord36)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::nidx3',update);
+arecord37:= 
+RECORD
+  integer1 f;
+  unsigned8 maxdocfreq;
+  unsigned8 maxfreq;
+  integer8 meandocsize;
+  integer8 uniquenominals;
+  integer8 doccount;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord37),{f},{dataset([],arecord37)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::xdstat2',update);
+arecord38:= 
+RECORD
+  integer1 f;
+  unsigned8 maxdocfreq;
+  unsigned8 maxfreq;
+  integer8 meandocsize;
+  integer8 uniquenominals;
+  integer8 doccount;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord38),{f},{dataset([],arecord38)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::xdstat2',update);
+string text_search__externalkey := string{maxLength(255)};
+
+arecord39:= 
+RECORD
+  unsigned8 hashkey;
+  unsigned2 part;
+  unsigned2 src;
+  unsigned6 doc;
+  text_search__externalkey externalkey;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord39),{hashkey,part,src,doc},{dataset([],arecord39)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::exkeyi',update);
+// string text_search__externalkey := string{maxLength(255)};
+
+arecord40:= 
+RECORD
+  unsigned8 hashkey;
+  unsigned2 part;
+  unsigned2 src;
+  unsigned6 doc;
+  text_search__externalkey externalkey;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord40),{hashkey,part,src,doc},{dataset([],arecord40)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::exkeyi',update);
+// string text_search__externalkey := string{maxLength(255)};
+
+arecord41:= 
+RECORD
+  unsigned2 src;
+  unsigned6 doc;
+  text_search__externalkey externalkey;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord41),{src,doc},{dataset([],arecord41)},'keyname'),'~prte::key::ln_propertyv2::deeds::'  + filedate + '::exkeyo',update);
+arecord42:= 
+RECORD
+  string20 word;
+  unsigned4 nominal;
+  unsigned4 suffix;
+  unsigned8 freq;
+  unsigned8 docfreq;
+  unsigned1 typ;
+  string128 fullword;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord42),{word,nominal,suffix,freq,docfreq},{dataset([],arecord42)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::dictindx3',update);
+arecord43:= 
+RECORD
+  string20 word;
+  unsigned4 nominal;
+  unsigned4 suffix;
+  unsigned8 freq;
+  unsigned8 docfreq;
+  unsigned1 typ;
+  string128 fullword;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord43),{word,nominal,suffix,freq,docfreq},{dataset([],arecord43)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::dtldictx',update);
+arecord44:= 
+RECORD
+  string20 word;
+  unsigned4 nominal;
+  unsigned4 suffix;
+  unsigned8 freq;
+  unsigned8 docfreq;
+  unsigned1 typ;
+  string128 fullword;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord44),{word,nominal,suffix,freq,docfreq},{dataset([],arecord44)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::dictindx3',update);
+arecord45:= 
+RECORD
+  string20 word;
+  unsigned4 nominal;
+  unsigned4 suffix;
+  unsigned8 freq;
+  unsigned8 docfreq;
+  unsigned1 typ;
+  string128 fullword;
+  unsigned8 fpos;
+ END;
+buildindex(index(dataset([],arecord45),{word,nominal,suffix,freq,docfreq},{dataset([],arecord45)},'keyname'),'~prte::key::ln_propertyv2::deeds::' + filedate + '::dtldictx',update);
+// string text_search__externalkey := string{maxLength(255)};
+
+arecord46:= 
+RECORD
+  unsigned2 src;
+  unsigned6 doc;
+  text_search__externalkey externalkey;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord46),{src,doc},{dataset([],arecord46)},'keyname'),'~prte::key::ln_propertyv2::assessment::' + filedate + '::exkeyo',update);
+arecord47:= 
+RECORD
+  string5 zip;
+  string11 loan_amount;
+  string8 loan_date;
+  string12 ln_fares_id;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord47),{zip,loan_amount,loan_date},{dataset([],arecord47)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::deed.zip_loanamt',update);
+layout_name2 :=RECORD
+   qstring20 fname;
+   qstring20 lname;
+  END;
+
+unsigned2 max_embedded2 := 100;
+
+layout_fares2 :=RECORD
+   string12 ln_fare_id;
+  END;
+
+arecord48:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(Layout_Name2) buyers{maxCount(max_embedded2)};
+  DATASET(Layout_Name2) sellers{maxCount(max_embedded2)};
+  DATASET(layout_fares2) fares{maxCount(max_embedded2)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord48),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord48)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addr.full_v2',update);
+arecord49:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned4 unit_count;
+  decimal5_2 geo12_fc_index;
+  decimal5_2 geo11_fc_index;
+  decimal5_2 fips_fc_index;
+  unsigned1 source_count;
+  string50 sources;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  unsigned4 purchase_date_by_did;
+  unsigned4 sale_date_by_did;
+  unsigned8 sale_price1;
+  unsigned8 sale_date1;
+  unsigned8 prev_purch_price1;
+  unsigned8 prev_purch_date1;
+  unsigned8 sale_price2;
+  unsigned8 sale_date2;
+  unsigned8 prev_purch_price2;
+  unsigned8 prev_purch_date2;
+  string20 fname;
+  string20 lname;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord49),{did},{dataset([],arecord49)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::did.ownership_v2',update);
+arecord50:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned4 unit_count;
+  decimal5_2 geo12_fc_index;
+  decimal5_2 geo11_fc_index;
+  decimal5_2 fips_fc_index;
+  unsigned1 source_count;
+  string50 sources;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  unsigned4 purchase_date_by_did;
+  unsigned4 sale_date_by_did;
+  unsigned8 sale_price1;
+  unsigned8 sale_date1;
+  unsigned8 prev_purch_price1;
+  unsigned8 prev_purch_date1;
+  unsigned8 sale_price2;
+  unsigned8 sale_date2;
+  unsigned8 prev_purch_price2;
+  unsigned8 prev_purch_date2;
+  string20 fname;
+  string20 lname;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord50),{did},{dataset([],arecord50)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::did.ownership_v2_no_fares',update);
+arecord51:= 
+RECORD
+  string5 zip;
+  string4 tax_year;
+  integer8 avg_tax;
+  integer8 avg_value;
+ END;
+buildindex(index(dataset([],arecord51),{zip,tax_year,avg_tax},{dataset([],arecord51)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::tax_summary',update);
+arecord52:= 
+RECORD
+  string12 ln_fares_id;
+  string45 apnt_or_pin_number;
+  string1 buyer_or_seller;
+  string2 name_seq;
+  string80 name;
+  string2 id_code;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord52),{ln_fares_id},{dataset([],arecord52)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addlnames.fid',update);
+
+arecord53:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(Layout_Name2) buyers{maxCount(max_embedded2)};
+  DATASET(Layout_Name2) sellers{maxCount(max_embedded2)};
+  DATASET(layout_fares2) fares{maxCount(max_embedded2)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord53),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord53)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addr.full_v2_no_fares',update);
+
+arecord54:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(Layout_Name2) buyers{maxCount(max_embedded2)};
+  DATASET(Layout_Name2) sellers{maxCount(max_embedded2)};
+  DATASET(layout_fares2) fares{maxCount(max_embedded2)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord54),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord54)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addr.full_v4',update);
+
+arecord55:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(Layout_Name2) buyers{maxCount(max_embedded2)};
+  DATASET(Layout_Name2) sellers{maxCount(max_embedded2)};
+  DATASET(layout_fares2) fares{maxCount(max_embedded2)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord55),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord55)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::addr.full_v4_no_fares',update);
+arecord56:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned4 unit_count;
+  decimal5_2 geo12_fc_index;
+  decimal5_2 geo11_fc_index;
+  decimal5_2 fips_fc_index;
+  unsigned1 source_count;
+  string50 sources;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string4 standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string3 garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string5 style_code;
+  string4 assessed_value_year;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string10 lat;
+  string11 long;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  unsigned4 purchase_date_by_did;
+  unsigned4 sale_date_by_did;
+  unsigned8 sale_price1;
+  unsigned8 sale_date1;
+  unsigned8 prev_purch_price1;
+  unsigned8 prev_purch_date1;
+  unsigned8 sale_price2;
+  unsigned8 sale_date2;
+  unsigned8 prev_purch_price2;
+  unsigned8 prev_purch_date2;
+  string20 fname;
+  string20 lname;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord56),{did},{dataset([],arecord56)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::did.ownership_v4',update);
+arecord57:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned4 unit_count;
+  decimal5_2 geo12_fc_index;
+  decimal5_2 geo11_fc_index;
+  decimal5_2 fips_fc_index;
+  unsigned1 source_count;
+  string50 sources;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string4 standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string3 garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string5 style_code;
+  string4 assessed_value_year;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string10 lat;
+  string11 long;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  unsigned4 purchase_date_by_did;
+  unsigned4 sale_date_by_did;
+  unsigned8 sale_price1;
+  unsigned8 sale_date1;
+  unsigned8 prev_purch_price1;
+  unsigned8 prev_purch_date1;
+  unsigned8 sale_price2;
+  unsigned8 sale_date2;
+  unsigned8 prev_purch_price2;
+  unsigned8 prev_purch_date2;
+  string20 fname;
+  string20 lname;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord57),{did},{dataset([],arecord57)},'keyname'),'~prte::key::ln_propertyv2::' + filedate + '::did.ownership_v4_no_fares',update);
+
+
+arecord1a:= 
+RECORD
+  string12 ln_fares_id;
+  string45 apnt_or_pin_number;
+  string1 buyer_or_seller;
+  string2 name_seq;
+  string80 name;
+  string2 id_code;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord1a),{ln_fares_id},{dataset([],arecord1a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::addlnames.fid',update);
+
+arecord8a:= 
+RECORD
+  unsigned8 s_did;
+  string1 source_code_2;
+  string12 ln_fares_id;
+  string2 source_code;
+  string20 lname;
+  string20 fname;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 suffix;
+  string2 postdir;
+  string8 sec_range;
+  string2 st;
+  string25 p_city_name;
+  string5 zip;
+  string5 county;
+  string7 geo_blk;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord8a),{s_did,source_code_2},{dataset([],arecord8a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::search_did',update);
+arecord9a:= 
+RECORD
+  string12 ln_fares_id;
+  unsigned8 proc_date;
+  string1 vendor_source_flag;
+  string18 county_name;
+  string45 apnt_or_pin_number;
+  string1 buyer_or_borrower_ind;
+  string80 name1;
+  string80 name2;
+  string70 mailing_street;
+  string6 mailing_unit_number;
+  string51 mailing_csz;
+  string80 seller1;
+  string80 seller2;
+  string70 seller_mailing_full_street_address;
+  string6 seller_mailing_address_unit_number;
+  string51 seller_mailing_address_citystatezip;
+  string70 property_full_street_address;
+  string6 property_address_unit_number;
+  string51 property_address_citystatezip;
+  string30 legal_city_municipality_township;
+  string50 legal_subdivision_name;
+  string100 legal_brief_description;
+  string8 contract_date;
+  string8 recording_date;
+  string10 recorder_book_number;
+  string10 recorder_page_number;
+  string11 sales_price;
+  string1 sales_price_code;
+  string11 first_td_loan_amount;
+  string4 assessment_match_land_use_code;
+  string5 first_td_loan_type_code;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord9a),{ln_fares_id,proc_date},{dataset([],arecord9a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::deedv2.fid',update);
+layout_name3 :=RECORD
+   qstring20 fname;
+   qstring20 lname;
+  END;
+
+unsigned2 max_embedded3 := 100;
+
+layout_fares3 :=RECORD
+   string12 ln_fare_id;
+  END;
+
+arecord10a:= 
+RECORD
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string5 zip;
+  string4 suffix;
+  string2 predir;
+  string2 postdir;
+  unsigned1 roll_count;
+  string1 ad;
+  boolean occupant_owned;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string style_code;
+  string4 assessed_value_year;
+  string12 ln_fares_id;
+  string10 unit_desig;
+  string25 p_city_name;
+  string2 st;
+  string4 zip4;
+  string3 county;
+  string7 geo_blk;
+  DATASET(layout_name3) buyers{maxcount(max_embedded3)};
+  DATASET(layout_name3) sellers{maxcount(max_embedded3)};
+  DATASET(layout_fares3) fares{maxcount(max_embedded3)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord10a),{prim_range,prim_name,sec_range,zip,suffix,predir,postdir},{dataset([],arecord10a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::addr.full_v4',update);
+
+arecord11a:= 
+RECORD
+  unsigned6 did;
+  string1 ad;
+  boolean isrelat;
+  unsigned4 seq;
+  string1 property_status_applicant;
+  string1 property_status_family;
+  unsigned1 property_count;
+  unsigned1 property_total;
+  unsigned5 property_owned_purchase_total;
+  unsigned2 property_owned_purchase_count;
+  unsigned5 property_owned_assessed_total;
+  unsigned2 property_owned_assessed_count;
+  unsigned3 address_score;
+  boolean house_number_match;
+  boolean isbestmatch;
+  unsigned4 unit_count;
+  decimal5_2 geo12_fc_index;
+  decimal5_2 geo11_fc_index;
+  decimal5_2 fips_fc_index;
+  unsigned1 source_count;
+  string50 sources;
+  boolean credit_sourced;
+  boolean eda_sourced;
+  boolean dl_sourced;
+  boolean voter_sourced;
+  boolean utility_sourced;
+  boolean applicant_owned;
+  boolean occupant_owned;
+  boolean family_owned;
+  boolean family_sold;
+  boolean applicant_sold;
+  boolean family_sale_found;
+  boolean family_buy_found;
+  boolean applicant_sale_found;
+  boolean applicant_buy_found;
+  unsigned1 naprop;
+  unsigned4 purchase_date;
+  unsigned4 built_date;
+  unsigned4 purchase_amount;
+  unsigned4 mortgage_amount;
+  unsigned4 mortgage_date;
+  string5 mortgage_type;
+  string4 type_financing;
+  string8 first_td_due_date;
+  unsigned4 assessed_amount;
+  unsigned4 assessed_total_value;
+  unsigned4 date_first_seen;
+  unsigned4 date_last_seen;
+  string4 standardized_land_use_code;
+  unsigned8 building_area;
+  unsigned8 no_of_buildings;
+  unsigned8 no_of_stories;
+  unsigned8 no_of_rooms;
+  unsigned8 no_of_bedrooms;
+  unsigned8 no_of_baths;
+  unsigned8 no_of_partial_baths;
+  string3 garage_type_code;
+  unsigned8 parking_no_of_cars;
+  string5 style_code;
+  string4 assessed_value_year;
+  boolean hr_address;
+  string100 hr_company;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 city_name;
+  string2 st;
+  string5 zip5;
+  string3 county;
+  string7 geo_blk;
+  string10 lat;
+  string11 long;
+  string5 census_age;
+  string9 census_income;
+  string9 census_home_value;
+  string5 census_education;
+  boolean full_match;
+  boolean census_loose;
+  string1 datasrce;
+  unsigned4 purchase_date_by_did;
+  unsigned4 sale_date_by_did;
+  unsigned8 sale_price1;
+  unsigned8 sale_date1;
+  unsigned8 prev_purch_price1;
+  unsigned8 prev_purch_date1;
+  unsigned8 sale_price2;
+  unsigned8 sale_date2;
+  unsigned8 prev_purch_price2;
+  unsigned8 prev_purch_date2;
+  string20 fname;
+  string20 lname;
+  DATASET(layout_fares2) fares;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord11a),{did},{dataset([],arecord11a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::did.ownership_v4',update);
+
+integer8 ln_propertyv2__constants__maxrecsbyownership := 100;
+
+l_hist :=RECORD
+   unsigned4 dt_seen;
+   string12 ln_fares_id;
+   unsigned6 owner_did;
+  END;
+
+arecord14a:= 
+RECORD
+  unsigned6 did;
+  boolean current;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  DATASET(l_hist) hist{maxcount(ln_propertyv2__constants__maxrecsbyownership)};
+  string20 fname;
+  string20 lname;
+  string5 fips_code;
+  string45 unformatted_apn;
+  string2 orig_state;
+  string30 orig_county;
+  string250 legal_brief_description;
+  unsigned8 rawaid;
+  unsigned8 aceaid;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  string4 zip4;
+  string4 cart;
+  string1 cr_sort_sz;
+  string4 lot;
+  string1 lot_order;
+  string2 dbpc;
+  string1 chk_digit;
+  string2 rec_type;
+  string5 county;
+  string10 geo_lat;
+  string11 geo_long;
+  string4 msa;
+  string7 geo_blk;
+  string1 geo_match;
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord14a),{did,current},{dataset([],arecord14a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::ownership.did',update);
+integer8 ln_propertyv2__mod_ownership__max_owners := 10;
+
+integer8 ln_propertyv2__mod_ownership__max_hist := 100;
+
+l_owner_thin :=RECORD
+    unsigned6 did;
+    unsigned1 which_orig;
+    boolean isbdid;
+   END;
+
+l_hist_thin :=RECORD
+   string12 ln_fares_id;
+   unsigned4 dt_seen;
+   DATASET(l_owner_thin) owners{maxcount(ln_propertyv2__mod_ownership__max_owners)};
+  END;
+
+arecord15a:= 
+RECORD
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string8 sec_range;
+  string5 zip5;
+  unsigned8 rawaid;
+  unsigned8 aceaid;
+  string5 fips_code;
+  string45 unformatted_apn;
+  DATASET(l_hist_thin) hist{maxcount(ln_propertyv2__mod_ownership__max_hist)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord15a),{prim_range,predir,prim_name,addr_suffix,postdir,sec_range,zip5},{dataset([],arecord15a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::ownership_addr',update);
+
+
+
+
+arecord16a:= 
+RECORD
+  unsigned6 did;
+  boolean current;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  string5 fips_code;
+  string45 unformatted_apn;
+  unsigned8 rawaid;
+  unsigned8 aceaid;
+  DATASET(l_hist_thin) hist{maxcount(ln_propertyv2__mod_ownership__max_hist)};
+  unsigned8 __internal_fpos__;
+ END;
+buildindex(index(dataset([],arecord16a),{did,current},{dataset([],arecord16a)},'keyname'),'~prte::key::ln_propertyv2::fcra::' + filedate + '::ownership_did',update);
