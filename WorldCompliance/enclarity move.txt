@@ -1,4 +1,0 @@
-yes please submit a ticket to dataopslinuxadmin to migrate your scripts over to prod and let us try it from there
-because they have a process that we are unable to control
-and they response is super slow
-*their
