@@ -604,7 +604,8 @@ MODULE
 		,src_Death_CT									 ,src_Death_FL									,src_Death_GA										,src_Death_KY
 		,src_Death_MA									 ,src_Death_ME									,src_Death_MI										,src_Death_MN
 		,src_Death_MT									 ,src_Death_NC									,src_Death_NV										,src_Death_OH
-		,src_Death_VA									 ,src_Death_Restricted					/*,src_Death_Obituary					,src_Infutor_Watercraft*/
+		,src_Death_VA									 ,src_Death_Restricted					,src_OKC_Probate					
+		/*,src_Death_Obituary					,src_Infutor_Watercraft*/
 	];
 
   // Old/pre-BIP(before June 10, 2014) Business Header
@@ -714,7 +715,7 @@ MODULE
 		 src_Death_Master	,src_Death_State	,src_Death_Tributes	,src_Death_CA		,src_Death_CT		,src_Death_FL
 		 ,src_Death_GA	  ,src_Death_KY			,src_Death_MA				,src_Death_ME		,src_Death_MI		,src_Death_MN
 		 ,src_Death_MT	  ,src_Death_NC			,src_Death_NV				,src_Death_OH		,src_Death_VA		,src_Death_Obituary
-		 ,src_Death_Restricted
+		 ,src_Death_Restricted, src_OKC_Probate
 	];
 
 	export set_Marriage_Divorce           := [
@@ -935,6 +936,7 @@ MODULE
 		,src_Death_GA									 ,src_Death_KY									,src_Death_MA									 ,src_Death_ME
 		,src_Death_MI									 ,src_Death_MN									,src_Death_MT									 ,src_Death_NC
 		,src_Death_NV									 ,src_Death_OH                  ,src_Death_VA									 ,src_Dummy_Records2
+		,src_OKC_Probate
 	/*,src_Death_Obituary					 ,src_Infutor_Watercraft*/
 	];
 
@@ -1119,8 +1121,9 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Death_CT									 ,src_Death_FL									,src_Death_GA									 ,src_Death_KY
 		,src_Death_MA									 ,src_Death_ME									,src_Death_MI									 ,src_Death_MN
 		,src_Death_MT									 ,src_Death_NC									,src_Death_NV									 ,src_Death_OH
-		,src_Death_VA									 ,src_Dummy_Records2						,src_Infutor_Watercraft				 ,src_InfutorNarc
-		,src_Infutor_Veh							 ,src_Infutor_Motorcycle_Veh		,src_Death_Obituary						 ,src_Death_Restricted
+		,src_Death_VA									 ,src_OKC_Probate 							,src_Dummy_Records2						 ,src_Infutor_Watercraft				 
+		,src_InfutorNarc               ,src_Infutor_Veh							  ,src_Infutor_Motorcycle_Veh		 ,src_Death_Obituary						 
+		,src_Death_Restricted
 	];
 
 	export set_NonUpdatingSrc             := [
@@ -1221,7 +1224,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Death_FL									 ,src_Death_GA									,src_Death_KY									 ,src_Death_MA
 		,src_Death_ME									 ,src_Death_MI									,src_Death_MN									 ,src_Death_MT
 		,src_Death_NC									 ,src_Death_NV									,src_Death_OH									 ,src_Death_VA
-		,src_Death_Restricted					 ,src_NM_Watercraft							/*,src_Death_Obituary					 ,src_Infutor_Watercraft*/
+		,src_Death_Restricted					 ,src_NM_Watercraft							,src_OKC_Probate
+		/*,src_Death_Obituary					 ,src_Infutor_Watercraft*/
 	];
 
   // POE = Place of Employment, now known as WorkPlace Locator
@@ -1759,6 +1763,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_One_Click_Data            := [src_One_Click_Data            ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
 	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
+	export set_OKC_Probate							 :=	[src_OKC_Probate  						 ];
 	export set_OKC_Student_List					 				:= [src_OKC_Student_List					 ];
 	export set_PBSA			                 := [src_PBSA 			               ];
 	export set_Pcnsr		                 := [src_Pcnsr			               ];
@@ -2282,6 +2287,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
 	export SourceIsNonUpdatingSrc             (string  sr) := sr               in set_NonUpdatingSrc             ;
 	export SourceIsOIG                        (string  sr) := sr               in set_OIG           	           ;
+  export SourceIsOKC_Probate                (string  sr) := sr               in set_OKC_Probate		             ;	
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
 	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
@@ -2796,6 +2802,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
+    ,{src_OKC_Probate               ,'OKC Probate'                                               }
 		,{src_OKC_Student_List          ,'OKC Student List'                                          }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
@@ -3300,7 +3307,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
-		,src_OKC_Student_List					 				=> 'OKC Student List'
+    ,src_OKC_Probate               => 'OKC Probate' 
+		,src_OKC_Student_List					 => 'OKC Student List'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
 		,src_PBSA	                     => 'United States Postal Service'                   		 	

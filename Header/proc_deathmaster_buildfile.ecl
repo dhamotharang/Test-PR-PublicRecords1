@@ -1,4 +1,4 @@
-import did_add,header_slimsort,address,ut,didville,death_master,Obituaries,mdr,header ,RoxieKeyBuild;
+﻿import did_add,header_slimsort,address,ut,didville,death_master,Obituaries,mdr,header ,RoxieKeyBuild, OKC_Probate;
 
 export proc_deathmaster_buildfile(string	filedate)	:= function
 //	Force the build to link DIDs on THOR
@@ -147,7 +147,7 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 	// Convert to death master plus common DID layout
 	Death_Master.Layouts.DeathHeaderSource	tConvert2Common(dDeathDeletes_dedup	pInput)	:=
 	transform
-		dCleanName	:=	Address.CleanPersonFML73_fields(ut.fnTrim2Upper(pInput.fname+' '+pInput.mname+' '+pInput.lname)).CleanNameRecord;
+		dCleanName	:=	Address.CleanPersonFML73_fields(ut.CleanSpacesAndUpper(pInput.fname+' '+pInput.mname+' '+pInput.lname)).CleanNameRecord;
 		
 		self.lname							:=	dCleanName.lname;
 		self.fname							:=	dCleanName.fname;
@@ -160,7 +160,7 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 		// Convert from MMDDYYYY to YYYYMMDD
 		SELF.dob8								:=	pInput.dob8[5..8]+pInput.dob8[1..2]+pInput.dob8[3..4];
 		SELF.dod8								:=	pInput.dod8[5..8]+pInput.dod8[1..2]+pInput.dod8[3..4];
-		self.zip5								:=	if(ut.fnTrim2Upper(pInput.zip_lastres) != '',pInput.zip_lastres,pInput.zip_lastpayment);
+		self.zip5								:=	if(ut.CleanSpacesAndUpper(pInput.zip_lastres) != '',pInput.zip_lastres,pInput.zip_lastpayment);
 		self.src								:=	'DE';
 		self										:=	pInput;
 		self										:=	[];
@@ -274,6 +274,7 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 																							left.did						=	right.did							AND
 																							left.state_death_id	=	right.state_death_id,
 																						tSSANonGLB(left,right),
+																						LOCAL,
 																						LOOKUP
 																					);
 	
@@ -296,6 +297,9 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 	// Get Enclarity
 	dEnclarityDeathMasterDIDV3	:=	Death_Master.File_EnclarityToV3;
 	
+  // Get OKC Probate
+	dOKC_ProbateDIDV3	          :=	OKC_Probate.Files().file_deathmasterv3 ;
+	
 	// Combine all the death records
 	dCombineDeathMasterDIDV3	:=	dSSADeathMasterDIDV3PopulateStateZip			+	// SSA records with state and zip propagated from credit bureaus
 																dSSADeathMasterDIDV3((unsigned)did	=	0)	+	// SSA records with did = 0
@@ -303,7 +307,8 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 																dStateDeathMasterDIDV3										+	// State death records
 																dCBDeathMasterDIDV3Only										+	// Credit bureau death records
 																dObitsDeathMasterDIDV3										+	// Tributes/obituary records with src = 'TR' & src = 'OB'
-																dEnclarityDeathMasterDIDV3									// Enclarity death records
+																dEnclarityDeathMasterDIDV3								+	// Enclarity death records
+																dOKC_ProbateDIDV3((unsigned)did>0)                           // OKC Probate records
 																;
 
 	
