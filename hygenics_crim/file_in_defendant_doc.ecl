@@ -1,4 +1,4 @@
-import data_services, lib_date,ut;
+﻿import data_services, lib_date,ut;
 
 defendant_file     :=  dataset(data_services.foreign_prod+ 'thor_200::in::crim::hd::doc_defendant',
 														layout_in_defendant,
@@ -8,9 +8,16 @@ defendant_crimwise :=  dataset(data_services.foreign_prod+'thor_200::in::crim::h
 														CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))
 														(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID');
 
-proj_def_cw           := Project(defendant_crimwise,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_CW'; self := left;));
+proj_def_cw        := Project(defendant_crimwise,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_CW'; self := left;));
 
-file_in_defendant_all := defendant_file(name<>'AKA')+ proj_def_cw;
+defendant_IE       := dataset(data_services.foreign_prod+'thor_200::in::crim::hd::doc_defendant_ie', hygenics_crim.layout_in_defendant,
+														CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))
+														(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and nametype<>'B' and name not in ['UNKNOWN', 'RESTRICTED', 'EXPUNGED', 'EXPUNGED EXPUNGED', 'NONAME'] and regexfind('[0-9][0-9]+', name[1..2], 0)='') ;
+
+proj_def_IE        := Project(defendant_IE,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
+
+
+file_in_defendant_all := defendant_file(name<>'AKA')+ proj_def_cw+proj_def_IE;
 // return arrests only and exclude bad sources from HD.
 //Added 60 Day Restriction to INDIANA Sourced Data///////////////////////////////////////////////////////////////////
 

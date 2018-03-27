@@ -2702,8 +2702,49 @@ map(
  psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT_CW                           ' => 'W0319',
  //AOC                                                                                 
  psourcename = 'KANSAS_OFFENDER_REGISTRY_CW                                            ' => 'W0320',
- '');                                                                                                               
-                                                                                                        
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/************************************************CRIMWISE***************************************************************/
+//AOC IE data
+ psourcename = 'HI_State_Judiciary_Administrative_Office_of_Courts                     ' => 'I0001', 
+ psourcename = 'IL_State_Police_Murderer_and_Violent_Offender_against_Youth_Registry   ' => 'I0002',
+ psourcename = 'IN_Administrator_of_Courts_(Web)                                       ' => 'I0003',
+ psourcename = 'MD_Administrative_Office_of_Courts_District_Courts                     ' => 'I0004',
+ psourcename = 'ND_District_and_Municipal_Courts                                       ' => 'I0005',
+ psourcename = 'RI_District_and_Superior_Courts                                        ' => 'I0006',
+ psourcename = 'WI_Administrative_Office_of_Courts(CF)                                 ' => 'I0007',
+ psourcename = 'WI_Administrative_Office_of_Courts(CM)                                 ' => 'I0008',
+ psourcename = 'WI_Administrative_Office_of_Courts(CT)                                 ' => 'I0009',   
+   
+//County IE data
+ psourcename = 'CA_Colusa_Superior_Court                                               ' => 'I0010',
+ psourcename = 'CA_Kern_Superior_Court                                                 ' => 'I0011',
+ psourcename = 'CA_Los_Angeles_Superior_Court                                          ' => 'I0012',
+ psourcename = 'CA_Sacramento_Superior_Court_Web                                       ' => 'I0013',
+ psourcename = 'CA_San_Bernardino_Superior_Court                                       ' => 'I0014',
+ psourcename = 'CO_Denver_County_Court                                                 ' => 'I0015',
+ psourcename = 'FL_Martin_Circuit_and_County_Court                                     ' => 'I0016',
+ psourcename = 'FL_Sarasota_Circuit_Court                                              ' => 'I0017',
+ psourcename = 'GA_Fayette_Superior_Court                                              ' => 'I0018',
+ psourcename = 'GA_Fulton_Superior_Court                                               ' => 'I0019',
+ psourcename = 'GA_Richmond_State_Court                                                ' => 'I0020',
+ psourcename = 'IL_Kane_Circuit_Court                                                  ' => 'I0021',
+ psourcename = 'NV_Clark_Justice_Courts                                                ' => 'I0022',
+ psourcename = 'OH_Fairfield_Municipal_Court                                           ' => 'I0023',
+ psourcename = 'OH_Franklin_Court_of_Common_Pleas                                      ' => 'I0024',
+ psourcename = 'SC_Jasper_Summary_Court                                                ' => 'I0025',
+ psourcename = 'TN_Davidson_General_Sessions_Court                                     ' => 'I0026',
+ psourcename = 'TX_El_Paso_County_Courts                                               ' => 'I0027',
+ psourcename = 'TX_Kaufman_Justice_of_the_Peace                                        ' => 'I0028',   
+                                                                                            
+//DOC IE data                                                                           
+ psourcename = 'CO_Department_of_Corrections                                           ' => 'I0029',
+ psourcename = 'NY_Department_of_Corrections_Released                                  ' => 'I0030',
+ psourcename = 'UT_Department_of_Corrections                                           ' => 'I0031',         
+ psourcename = 'US_Federal_Bureau_of_Prisons_Federal_Inmate_Registry                   ' => 'I0032',
+                                                                                        
+ '');                                                                            											
+
  return vendor;                                                                                       
 end;                                                                                   
                                                                                        
