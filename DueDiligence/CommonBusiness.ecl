@@ -317,10 +317,21 @@ EXPORT CommonBusiness := MODULE
 	EXPORT getRegisteredAgents(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 		
 		agent := NORMALIZE(inquiredBus, LEFT.registeredAgents, TRANSFORM(DueDiligence.LayoutsInternal.Agent,
-																																			SELF.agent := RIGHT;
+																																			SELF.agent.addressMatchesInquiredBusiness := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
+                                                                                                                    LEFT.busn_info.address.predir = RIGHT.predir AND
+                                                                                                                    LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
+                                                                                                                    LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
+                                                                                                                    LEFT.busn_info.address.postdir = RIGHT.postdir AND
+                                                                                                                    LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
+                                                                                                                    LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
+                                                                                                                    LEFT.busn_info.address.city = RIGHT.city AND
+                                                                                                                    LEFT.busn_info.address.state = RIGHT.state AND
+                                                                                                                    LEFT.busn_info.address.zip5 = RIGHT.zip5;
+                                                                      SELF.agent := RIGHT;
 																																			SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																																			SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																																			SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                      
 																																			SELF := LEFT;
 																																			SELF := [];));
 		
@@ -565,6 +576,7 @@ EXPORT CommonBusiness := MODULE
 		RETURN newInquired;	
 	ENDMACRO;
   
+  
   EXPORT ReaddOperatingLocations(inquiredBusDS, operatingLocationDS, operatingLocationDSFieldName) := FUNCTIONMACRO
    
     //rollup the operating location to the inquired business level to add back
@@ -585,6 +597,21 @@ EXPORT CommonBusiness := MODULE
                                     
     RETURN readdOperatingLocation;                                
 
+  ENDMACRO;
+
+  
+  EXPORT GetSOSStatuses(sosRecord) := FUNCTIONMACRO
+     corpStatusDescUC := STD.Str.ToUpperCase(sosRecord.corp_status_desc);
+     filingStatus := MAP(business_header.is_ActiveCorp(sosRecord.record_type, sosRecord.corp_status_cd, sosRecord.corp_status_desc) => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'INACTIVE', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_INACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'DISSOLV', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+                          STD.Str.Find(CorpStatusDescUC, 'DISSOLUTION', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+                          STD.Str.Find(CorpStatusDescUC, 'REINSTAT', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_REINSTATE,
+                          STD.Str.Find(CorpStatusDescUC, 'SUSPEN', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_SUSPEND,
+                          DueDiligence.Constants.COPR_STATUS_OTHER);
+                                    
+     RETURN filingStatus;
   ENDMACRO;
 	
 END;

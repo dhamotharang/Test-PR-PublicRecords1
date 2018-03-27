@@ -72,7 +72,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	
 	/*attributes that must be called after other attributes*/
-	addrRisk := DueDiligence.getBusAddrData(busSOS, options);  //must be called after getBusSOSDetail & getBusRegistration
+	addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
 	
 	busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail & getBusHeader
 	

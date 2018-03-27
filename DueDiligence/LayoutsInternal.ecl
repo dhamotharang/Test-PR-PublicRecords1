@@ -58,6 +58,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT Agent := RECORD
 		InternalBIPIDsLayout;
+    UNSIGNED4	  historydate;
 		DueDiligence.Layouts.LayoutAgent agent;
 	END;
 	
@@ -90,6 +91,10 @@ EXPORT LayoutsInternal := MODULE
     DATASET(DueDiligence.Layouts.LayoutAgent) nameAndDate {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
   END;
 
+  EXPORT MultipleCompanyNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.DD_CompanyNames) companyNameAndLastSeen {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+  END;
 
 
 //------                                      ------

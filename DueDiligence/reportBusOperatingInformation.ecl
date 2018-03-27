@@ -187,11 +187,60 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.OperatesOutOfAHomeOffice := LEFT.busIsSOHO;
                                         SELF := LEFT;),
                              LEFT OUTER);
+                             
+                             
+                             
+  //retrieve all the doing business as variations (DBAs)
+  dbaNames := NORMALIZE(BusnData, LEFT.companyDBA, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, STRING companyName, UNSIGNED4 dateLastSeen},
+                                                              SELF.seq := LEFT.seq;
+                                                              SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                              SELF.orgID := LEFT.Busn_info.BIP_IDS.orgID.LinkID;
+                                                              SELF.seleID := LEFT.Busn_info.BIP_IDS.seleID.LinkID;
+                                                              SELF.companyName := RIGHT.Name;
+                                                              SELF.dateLastSeen := RIGHT.LinkCount; //using this field to hold date last seen
+                                                              SELF := [];));
 
+  
+  //get max DBAs to return
+  sortDBANames := GROUP(SORT(dbaNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+  
+  DueDiligence.LayoutsInternalReport.BusOpInfoDBANames getMaxDBAs(sortDBANames sdban, INTEGER dbaCount) := TRANSFORM, SKIP(dbaCount > iesp.constants.DDRAttributesConst.MaxBusinesses)
+    SELF.businessNames := PROJECT(sdban, TRANSFORM(iesp.duediligencebusinessreport.t_DDRComponentsOfBusiness,
+                                                      SELF.name := LEFT.companyName;
+                                                      SELF := [];));
+                                                      
+    SELF := sdban;
+    SELF := [];
+  END;
+  
+  maxDBANames := PROJECT(sortDBANames, getMaxDBAs(LEFT, COUNTER));
+  
+  rollDBANames := ROLLUP(maxDBANames,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
+                          TRANSFORM(RECORDOF(LEFT),
+                                    SELF.businessNames := LEFT.businessNames + RIGHT.businessNames;
+                                    SELF := LEFT));
+  
+  addDBANames := JOIN(addAssociatedNames, rollDBANames,
+                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                       TRANSFORM(RECORDOF(LEFT),
+                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.BusinessNameVariations := RIGHT.businessNames;
+                                  SELF := LEFT;),
+                       LEFT OUTER);
+  
+  
+  
+  //add 'loose' data to the report
+  addMiscInfo := PROJECT(addDBANames, TRANSFORM(RECORDOF(LEFT),
+                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ParentCompany := LEFT.parentCompanyName;
+                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.StructureType := IF(LEFT.hdBusnType = DueDiligence.Constants.EMPTY, LEFT.adrBusnType, LEFT.hdBusnType);
+                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.RegisteredBusiness := LEFT.busRegHit;
+                                                SELF := LEFT;));
+  
   
   
   //***This section is for Operating Information  ***//
-	AddOperInformationToReport   :=  addAssociatedNames;  
+	AddOperInformationToReport   :=  addMiscInfo;  
 
 																													
 													 
@@ -199,15 +248,22 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	//   DEBUGGING OUTPUTS
 	// *********************
 
-	    IF(DebugMode,      OUTPUT(ListOfBusSources,                NAMED('ListOfBusSources')));								 
-	    IF(DebugMode,      OUTPUT(BusReportBureauDataset,          NAMED('BusReportBureauDataset')));								 
-   	 IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBOTHSourcesInReport, 100),     NAMED('UpdateBOTHSourcesInReport')));												 
+   IF(DebugMode,      OUTPUT(ListOfBusSources,                NAMED('ListOfBusSources')));								 
+   IF(DebugMode,      OUTPUT(BusReportBureauDataset,          NAMED('BusReportBureauDataset')));								 
+   IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBOTHSourcesInReport, 100),     NAMED('UpdateBOTHSourcesInReport')));												 
 
   // OUTPUT(assocNames, NAMED('assocNames'));
   // OUTPUT(sortGroupAssocNames, NAMED('sortGroupAssocNames'));
   // OUTPUT(limitedNames, NAMED('limitedNames'));
   // OUTPUT(rollNames, NAMED('rollNames'));
   // OUTPUT(addAssociatedNames, NAMED('addAssociatedNames'));
+  
+  // OUTPUT(dbaNames, NAMED('dbaNames'));
+  // OUTPUT(maxDBANames, NAMED('maxDBANames'));
+  // OUTPUT(rollDBANames, NAMED('rollDBANames'));
+  // OUTPUT(addDBANames, NAMED('addDBANames'));
+  
+  // OUTPUT(addMiscInfo, NAMED('addMiscInfo'));
 
 	RETURN AddOperInformationToReport;
 END;

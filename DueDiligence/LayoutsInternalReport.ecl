@@ -133,6 +133,8 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	EXPORT BusCorpFilingsSlimLayout := RECORD
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    UNSIGNED4	  historydate;
+    // STRING    CorpKey;
 		STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
 	  STRING20  FilingType;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing desc.   
     BOOLEAN   isActive;
@@ -142,6 +144,7 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED4 LastSeenDate;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - 
 	  STRING30  FilingNumber;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing reference nbr
 	  STRING2   IncorporationState;                           //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
+    // STRING    OrgStructure;
 	END;
 	
 	
@@ -170,6 +173,16 @@ EXPORT LayoutsInternalReport := MODULE
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
 	  DATASET(iesp.share.t_Name) name;
   END;
+  
+  EXPORT BusOpInfoDBANames := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DATASET(iesp.duediligencebusinessreport.t_DDRComponentsOfBusiness) businessNames {MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
+  END;
+  
+  EXPORT BusRegisteredAgents := RECORD
+		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+	END;
 	
   // ------                                                                      ------
   // ------ define the Flat      Dataset  For Debtors                            ------

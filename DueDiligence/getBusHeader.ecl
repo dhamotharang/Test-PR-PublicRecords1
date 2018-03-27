@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD;
+﻿IMPORT BIPV2, BIPV2_Best, Business_Risk_BIP, DueDiligence, STD;
 
 /*
 	Following Keys being used: 
@@ -357,10 +357,15 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 														SELF.notFoundInHeader := RIGHT.notFound;
 														SELF := LEFT;),
 											LEFT OUTER);
-		
-
-	
+                      
+                      
+  //If report is requested retrieve data for report only                    
+  addAdditionalHeaderReportData := IF(includeReportData, DueDiligence.getBusHeaderReportData(busHeaderFilt, addNotFound, options, linkingOptions), addNotFound);            
+                      
+ 
 																		
+
+
 
 	// OUTPUT(indata, NAMED('indata'));
 	// OUTPUT(busHeaderRaw, NAMED('busHeaderRaw'));
@@ -422,12 +427,15 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// OUTPUT(notFoundInHeader, NAMED('notFoundInHeader'));	
 	// OUTPUT(addNotFound, NAMED('addNotFound'));	
+	// OUTPUT(addAdditionalHeaderReportData, NAMED('addAdditionalHeaderReportData'));	
+  
+	
 
 	
 	
 
 	
-	RETURN 	addNotFound;										
+	RETURN addAdditionalHeaderReportData;										
 											
 END;
 										

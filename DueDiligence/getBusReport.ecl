@@ -1,6 +1,9 @@
-﻿IMPORT iesp, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, iesp, DueDiligence;
 
 EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
+                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                            BIPV2.mod_sources.iParams linkingOptions,
+                            boolean DebugMode = FALSE) := FUNCTION
 											   //Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 													 //BOOLEAN includeReportData,
                            string6 DD_SSNMask,
@@ -8,8 +11,6 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 											     ) := FUNCTION
 													 
 
-
-  //UpdateBusnExecsCriminalSection    := DueDiligence.reportBusExecutiveOfficers(BusnData, DebugMode);
 	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DD_SSNMask, DebugMode);
  													   																			  
     
@@ -31,7 +32,8 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                             #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                             TRANSFORM(RECORDOF(LEFT),
                                       SELF.businessReport.businessInformation.EstablishedDate := RIGHT.estDate;
-                                      SELF := LEFT;));
+                                      SELF := LEFT;),
+                            LEFT OUTER);
 		
   //***This section is for Operating Locations  ***//
 	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(addEstablishDate, DebugMode);
@@ -40,10 +42,13 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
 	
   	
+  addRegisteredAgents := DueDiligence.reportBusRegisteredAgents(AddOperatingInfoToReport, options, linkingOptions);
 																													
 													 
 	// ********************
 	//   DEBUGGING OUTPUTS
+	// *********************
+
 	// *********************
 
 	  IF(DebugMode,      OUTPUT(UpdateBusnExecCriminalWithReport,           NAMED('UpdateBusnExecCriminalWithReport')));								 
@@ -54,5 +59,6 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
     
   // OUTPUT(addEstablishDate, NAMED('addEstablishDate'));  
 
-	RETURN AddOperatingInfoToReport;
+
+	RETURN addRegisteredAgents;
 END;

@@ -554,6 +554,10 @@ EXPORT LinkIDs := RECORD
 		STRING4 source;
 		Name;
 		Address;
+    BOOLEAN addressMatchesInquiredBusiness;
+    UNSIGNED4 numberOfBusinessesAtAddress;
+    UNSIGNED4 numberOfBusinessesWithNoFein;
+    UNSIGNED4 numberOfBusinssesIncWithLooseIncLaws;
 	END;
 	
 	EXPORT BusReportDetails        := RECORD
@@ -563,6 +567,8 @@ EXPORT LinkIDs := RECORD
     UNSIGNED4 dateVendorFirstReported;
     BusinessLegalSummary;
     DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+    DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+    STRING parentCompanyName;
 	END;
 	
 	EXPORT Positions := RECORD
