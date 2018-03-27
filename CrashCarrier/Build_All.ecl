@@ -4,7 +4,7 @@ export Build_All(
 	 string		pversion
 	,string		pDirectory				= '/data/hds_180/CrashCarrier/data/'+ pversion
 	,string		pServerIP					= _control.IPAddress.bctlpedata11
-	,string		pFilename					= _Dataset().Name+'*txt'
+	,string		pFilename					= _Dataset().pName+'*txt'
 	,string		pGroupName				= _Constants().groupname
 	,boolean	pUseOtherEnviron	= false
 	,boolean	pIsTesting				= false
