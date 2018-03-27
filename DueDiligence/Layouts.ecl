@@ -554,6 +554,10 @@ EXPORT LinkIDs := RECORD
 		STRING4 source;
 		Name;
 		Address;
+    BOOLEAN addressMatchesInquiredBusiness;
+    UNSIGNED4 numberOfBusinessesAtAddress;
+    UNSIGNED4 numberOfBusinessesWithNoFein;
+    UNSIGNED4 numberOfBusinssesIncWithLooseIncLaws;
 	END;
 	
 	EXPORT BusReportDetails        := RECORD

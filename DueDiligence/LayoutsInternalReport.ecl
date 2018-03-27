@@ -144,6 +144,7 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED4 LastSeenDate;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - 
 	  STRING30  FilingNumber;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing reference nbr
 	  STRING2   IncorporationState;                           //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
+    // STRING    OrgStructure;
 	END;
 	
 	
@@ -175,8 +176,13 @@ EXPORT LayoutsInternalReport := MODULE
   
   EXPORT BusOpInfoDBANames := RECORD
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-    DATASET(iesp.duediligencebusinessreport.t_DDRComponentsOfBusiness) businessNames;
+    DATASET(iesp.duediligencebusinessreport.t_DDRComponentsOfBusiness) businessNames {MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
   END;
+  
+  EXPORT BusRegisteredAgents := RECORD
+		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+	END;
 	
   // ------                                                                      ------
   // ------ define the Flat      Dataset  For Debtors                            ------

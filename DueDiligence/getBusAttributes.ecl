@@ -70,7 +70,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	
 	/*attributes that must be called after other attributes*/
-	addrRisk := DueDiligence.getBusAddrData(busSOS, options);  //must be called after getBusSOSDetail & getBusRegistration
+	addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
 	
 	busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail & getBusHeader
 	
@@ -87,9 +87,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
  
  	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
 	
-	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
-                                /* ELSE */
-																                addCounts);
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts, options, linkingOptions),
+                                                  /* ELSE */
+                                                  addCounts);
 
 	//Populate the index for the customer
 	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);

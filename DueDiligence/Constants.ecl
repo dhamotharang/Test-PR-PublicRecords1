@@ -570,7 +570,7 @@ EXPORT CMPTYP_LIMITED_PARTNERSHIP := 'LIMITED PARTNERSHIP';
 EXPORT CMPTYP_LIMITED_LIABILITY_CORP := 'LIMITED LIABILITY CORPORATION';
 EXPORT CMPTYP_LIMITED_LIABILITY_PARTNERSHIP := 'LIMITED LIABILITY PARTNERSHIP';
 
-EXPORT EXCLUDE_SOURCES := [MDR.SourceTools.src_Dunn_Bradstreet]; //['D']
+EXPORT EXCLUDE_SOURCES := [MDR.SourceTools.src_Dunn_Bradstreet, MDR.SourceTools.src_Business_Credit, MDR.SourceTools.src_Dunn_Bradstreet_Fein]; //['D', 'BC', 'DN']
 
 EXPORT CREDIT_SOURCES := [MDR.SourceTools.src_EBR, MDR.SourceTools.src_Experian_CRDB, MDR.SourceTools.src_Cortera];  //['ER', 'Q3', 'RR']
 EXPORT BUS_SHELL_SOURCES := [MDR.SourceTools.src_BBB_Member, MDR.SourceTools.src_Yellow_Pages, MDR.SourceTools.src_Gong_Business, MDR.SourceTools.src_Gong_Government, MDR.SourceTools.src_Utilities];  //['BM', 'Y', 'GB', 'GG', 'UT']

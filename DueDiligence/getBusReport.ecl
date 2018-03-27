@@ -1,10 +1,9 @@
-﻿IMPORT iesp, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, iesp, DueDiligence;
 
-EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
-											   //Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-													 //BOOLEAN includeReportData,
-													 boolean DebugMode = FALSE
-											     ) := FUNCTION
+EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
+                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                            BIPV2.mod_sources.iParams linkingOptions,
+                            boolean DebugMode = FALSE) := FUNCTION
 													 
 
 
@@ -30,13 +29,17 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                             #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                             TRANSFORM(RECORDOF(LEFT),
                                       SELF.businessReport.businessInformation.EstablishedDate := RIGHT.estDate;
-                                      SELF := LEFT;));
+                                      SELF := LEFT;),
+                            LEFT OUTER);
 		
   //***This section is for Operating Locations  ***//
 	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(addEstablishDate, DebugMode);
 
 	//***This section is for Operating Information  ***//
 	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
+  
+  //add registered agents
+  addRegisteredAgents := DueDiligence.reportBusRegisteredAgents(AddOperatingInfoToReport, options, linkingOptions);
 	
   	
 																													
@@ -52,6 +55,7 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
     
     
   // OUTPUT(addEstablishDate, NAMED('addEstablishDate'));  
+  // OUTPUT(addRegisteredAgents, NAMED('addRegisteredAgents'));  
 
-	RETURN AddOperatingInfoToReport;
+	RETURN addRegisteredAgents;
 END;

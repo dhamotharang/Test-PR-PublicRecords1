@@ -58,6 +58,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT Agent := RECORD
 		InternalBIPIDsLayout;
+    UNSIGNED4	  historydate;
 		DueDiligence.Layouts.LayoutAgent agent;
 	END;
 	
