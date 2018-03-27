@@ -1,4 +1,5 @@
-//* NEW_proc_build_autokeys 
+﻿//* NEW_proc_build_autokeys 
+// Feb 2015 - I believe all of the Foreclosure build stuff in PRTE2 is obsolete - see PRTE2_Foreclosure module instead
 
 IMPORT PRTE2,AutoKeyB2,ut, roxiekeybuild,PRTE_CSV;
 export NEW_Proc_Build_Autokeys(string filedate) := MODULE

@@ -1,0 +1,5 @@
+﻿IMPORT PRTE2_Liens_Ins_DataPrep;
+
+OUTPUT(PRTE2_Liens_Ins_DataPrep.U_Production_Files.Tmp_Prod_SF_Main_DS0);
+OUTPUT(PRTE2_Liens_Ins_DataPrep.U_Production_Files.Tmp_Prod_SF_Main_DS);
+OUTPUT(PRTE2_Liens_Ins_DataPrep.U_Production_Files.Tmp_Prod_SF_Party_DS);

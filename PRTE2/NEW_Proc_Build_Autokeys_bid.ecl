@@ -1,4 +1,6 @@
-//* NEW_Proc_Build_Autokeys_bid :
+﻿//* NEW_Proc_Build_Autokeys_bid :
+// Feb 2015 - I believe all of the Foreclosure build stuff in PRTE2 is obsolete - see PRTE2_Foreclosure module instead
+
 IMPORT PRTE2,AutoKeyB2,ut, roxiekeybuild, Data_Services,Doxie;
 
 

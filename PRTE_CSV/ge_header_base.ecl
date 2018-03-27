@@ -1,4 +1,4 @@
-import address,ut,lib_addrclean, PRTE2, PRTE2_Common;
+﻿import address,ut,lib_addrclean,  PRTE2_Common;
 
 export ge_header_base := module
 
@@ -126,12 +126,18 @@ export ge_header_base := module
 	// **************************** Alpharetta Customer Test data additions  ***************************
 	// *************************************************************************************************
 
+	// ===================================================================================================
+	// ============================ SHOULD BE DEAD CODE NEEDING CLEANUP ==================================
+	// ================== Foreclosure is DEAD, less sure about LNP =======================================
+	// ===================================================================================================
+
 	Lindas300Foreclosure_file_on_lz := PRTE2_Common.Cross_Module_Files.Lindas300Foreclosure_file_on_lz;
 	Brads50kForeclosure_file_on_lz := PRTE2_Common.Cross_Module_Files.Brads50kForeclosure_file_on_lz;
 	// ===================================================================================================
 	// LCAIN300 - USE THIS IF WE WANT TO KEEP LINDA's 300 test records at first. Else use just Brad50k
 	// EXPORT Foreclosure_file_on_lz := Brads50kForeclosure_file_on_lz + Lindas300Foreclosure_file_on_lz;
 	EXPORT Foreclosure_file_on_lz := Brads50kForeclosure_file_on_lz;
+	// ***** Above Still referenced in PRTE.Get_Header_Base (Commented out) and Common.Cross_Module_Files and PRTE.Scramble
 	// ===================================================================================================
 	
 	Lindas300LNP_DS_on_lz		:= PRTE2_Common.Cross_Module_Files.Lindas300LNP_DS_on_lz;
@@ -141,12 +147,21 @@ export ge_header_base := module
 	// HOWEVER - LNP data was never used in the build by Linda's code, so the 300 were never placed into the header file
 	// EXPORT LNProperty_file_on_lz := Brads50kLNP_DS_on_lz + Lindas300LNP_DS_on_lz;
 	EXPORT LNProperty_file_on_lz := Brads50kLNP_DS_on_lz;
+	// ***** Above Still referenced in PRTE.Get_Header_Base (Commented out) and here
 	// ===================================================================================================
+	// ===================================================================================================
+	// ======================== END OF SHOULD BE DEAD CODE NEEDING CLEANUP ===============================
+	// ===================================================================================================
+	
+	// ===================================================================================================
+	// ================== These two EXPORTS are active to get header linking =============================
 	// ===================================================================================================
 	AlphaDIDsHeaderBaseName := PRTE2_Common.Cross_Module_Files.AlphaDIDsHeaderBaseName;
 	EXPORT AlphaDIDsHeaderDS := DATASET(AlphaDIDsHeaderBaseName,layout_payload,THOR);	//smaller, faster DID Lookups, no relationships
+	// Used in data builds to tie DIDs to other data: PRTE2_LNProperty.Get_payload, PRTE2_LNProperty_Ins.Get_payload
 	AlphaFinalHeaderName := PRTE2_Common.Cross_Module_Files.AlphaFinalHeaderBaseName;
 	EXPORT AlphaFinalHeaderDS := DATASET(AlphaFinalHeaderName,layout_payload-rtitle,THOR);		//DIDs plus relationships
+	// Use in Header build PRTE.Get_Header_Base, PRTE.Get_payload, and in a PRTE2_Common.Cross_Module_Files comment
 	// ===================================================================================================
 
 	// Danny's file ???  Any purpose for this file ???  It was commented out in Linda's last version

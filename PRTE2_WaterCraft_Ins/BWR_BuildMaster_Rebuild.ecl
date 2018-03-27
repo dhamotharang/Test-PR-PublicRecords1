@@ -9,7 +9,7 @@ IMPORT * FROM PRTE2_WaterCraft_Ins;
 
 fileVersion	:= PRTE2_Common.Constants.TodayString + 'd';
 
-FileName := 'WatercraftV3_base_Prod_20180119.csv';
+FileName := 'WatercraftV3_AfterAdds_20180215.csv';
 LZPath := PRTE2_WaterCraft_Ins.Constants.SourcePathForCSV;
 LZFullPath := LZPath + FileName;
 Constants := PRTE2_WaterCraft_Ins.Constants;

@@ -1,6 +1,7 @@
-//*===================================================================================*//
+﻿//*===================================================================================*//
 //* PRTE2_LNProperty.Get_payload
 //  JOIN the LNProperty files, For LN_Property, join the current files into an expanded payload record
+// NOTE: THIS WILL CHANGE UNLESS OUR CSV CONTINUES TO BE WHAT IS CALLED ALP_IN_SF_DS
 //*===================================================================================*// 
 IMPORT PRTE2, PRTE_CSV, PRTE, ut,NID,Doxie,address,_control,PRTE,iesp,ut,Doxie,address,STD,NID,AutoKeyB2,autokey,AutoKeyI;
 

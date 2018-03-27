@@ -57,6 +57,7 @@ EXPORT Cross_Module_Files := MODULE
 	EXPORT PhonesPlus_MODULE_SUFFIX		:= '::phonesplus_Alpha';	// DF-20535 restored version of Boca code
 	// EXPORT PhonesPlus_MODULE_SUFFIX		:= '::phonesplus';			// to use the reference here for the name.
 	EXPORT PhonesPlus_Full_Prefix			:= MASTER_BASE_PREFIX + PhonesPlus_MODULE_SUFFIX;
+	// prct::BASE::ct::phonesplus_Alpha
 	EXPORT PhonesPlus_Base_SF_Name		:= PhonesPlus_Full_Prefix + '::qa::' + PhonesPlus_Suffix_Name;
 	// ------------------------------ Phones Plus ----------------------------------------------
 	
