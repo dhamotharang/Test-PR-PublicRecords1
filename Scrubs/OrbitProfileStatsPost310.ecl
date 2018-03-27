@@ -1,8 +1,7 @@
-﻿import Salt35, Orbit3SOA, ut,_control,std,salt311;
-EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt35.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt35.ScrubsOrbitLayout), string versionDate = '', string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
+﻿import Salt311, Orbit3SOA, ut,_control,std;
+EXPORT OrbitProfileStatsPost310 (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt311.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt311.ScrubsOrbitLayout), string versionDate = '', string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
 	ut.CleanFields(ScrubsStats,ScrubsStatsClean);
-	Commonlayout:=project(ScrubsStatsClean,transform(salt311.ScrubsOrbitLayout,Self.rulepcnt:=(decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);self:=left;));
-Shared CleanStats:=Commonlayout;	
+Shared CleanStats:=ScrubsStatsClean;	
 EXPORT GetProfile:= Orbit3SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
 				DefaultPass:=GetProfile(Name='Default')[1].PassPercentage;
 				DefaultConversion	:=	project(GetProfile,Transform(Scrubs.Layouts.OrbitLayoutStep1,
@@ -65,7 +64,7 @@ Shared PulledName:=regexfind(SearchPattern,STD.System.Job.Name(),0);
 EXPORT SubmitStats :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate,thor,all,expire(2)),
 output(RemoveBlankRules),
 																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\''+PulledName+' Build Scrubs - '+pProfileName+'\');\r\n'+
-																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate+'\',SALT311.ScrubsOrbitLayout,thor);\r\n'+
+																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate+'\',Salt311.ScrubsOrbitLayout,thor);\r\n'+
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStatsPost310(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
 																																		 ,std.system.job.target())));
@@ -73,7 +72,7 @@ output(RemoveBlankRules),
 																																		 
 
 EXPORT SummaryStats := dedup(sort(project(CleanStats,
-																					transform(SALT311.ScrubsOrbitLayout and not [rejectwarning, rawcodemissing, rawcodemissingcnt],
+																					transform(Salt311.ScrubsOrbitLayout and not [rejectwarning, rawcodemissing, rawcodemissingcnt],
 																					self := left)), sourcecode, ruledesc), sourcecode, ruledesc);
 
 END;
