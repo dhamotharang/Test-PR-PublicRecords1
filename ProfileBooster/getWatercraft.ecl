@@ -43,7 +43,7 @@ ProfileBooster.Layouts.Layout_PB_Slim_watercraft  getWCDetails(WatercraftKeys le
 														'');
 	runningCurrent 				:= le.historyDate=risk_indicators.iid_constants.default_history_date;
 	self.watercraftCount 	:= if(~runningCurrent, 1, if(ri.history_flag = '', 1, 0)); //this may change based on data team's answer
-	monthsAgo 						:= ut.MonthsApart((string6)le.historyDate,(string6)ri.date_first_seen);
+	monthsAgo 						:= ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],(string6)ri.date_first_seen);
 	self.months_first_reg := monthsAgo;
 	self.months_last_reg  := monthsAgo;		
 	self.state_origin := le.state_origin;
