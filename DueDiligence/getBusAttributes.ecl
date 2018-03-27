@@ -90,7 +90,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
  	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
 	
 	AddBusinessDataForReport   :=  IF(includeReport, 
-                                   DueDiligence.getBusReport(addCounts, DD_SSNMask),
+                                   DueDiligence.getBusReport(addCounts, options, linkingOptions, DD_SSNMask),
                               /* ELSE */
 																   addCounts);
 

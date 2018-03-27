@@ -3,12 +3,9 @@
 EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
                             Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                             BIPV2.mod_sources.iParams linkingOptions,
-                            boolean DebugMode = FALSE) := FUNCTION
-											   //Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-													 //BOOLEAN includeReportData,
-                           string6 DD_SSNMask,
-													 boolean DebugMode = FALSE
-											     ) := FUNCTION
+                            string6 DD_SSNMask,
+													  boolean DebugMode = FALSE
+											      ) := FUNCTION
 													 
 
 	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DD_SSNMask, DebugMode);
