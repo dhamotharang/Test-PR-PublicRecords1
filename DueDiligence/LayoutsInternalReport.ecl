@@ -134,7 +134,7 @@ EXPORT LayoutsInternalReport := MODULE
 	EXPORT BusCorpFilingsSlimLayout := RECORD
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
     UNSIGNED4	  historydate;
-    STRING    CorpKey;
+    // STRING    CorpKey;
 		STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
 	  STRING20  FilingType;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing desc.   
     BOOLEAN   isActive;
