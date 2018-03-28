@@ -33,13 +33,16 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                             LEFT OUTER);
 		
   //***This section is for Operating Locations  ***//
-	AddOperatingLocToReport   :=  DueDiligence.reportBusOperLocations(addEstablishDate, DebugMode);
+	AddOperatingLocToReport    :=  DueDiligence.reportBusOperLocations(addEstablishDate, DebugMode);
 
 	//***This section is for Operating Information  ***//
 	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
 	
-  	
-  addRegisteredAgents := DueDiligence.reportBusRegisteredAgents(AddOperatingInfoToReport, options, linkingOptions);
+  //***This section is for Registered Agents  ***//	
+  addRegisteredAgents        := DueDiligence.reportBusRegisteredAgents(AddOperatingInfoToReport, options, linkingOptions);
+  
+  //***This section is for Best Business Information ***//	
+  addReportData              := DueDiligence.reportBestBusInfo(addRegisteredAgents);   	
 																													
 													 
 	// ********************
@@ -52,10 +55,11 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
    	IF(DebugMode,      OUTPUT(CHOOSEN(addEstablishDate, 100),             NAMED('AddOperatingLocToReport')));		
    	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingLocToReport, 100),     NAMED('AddOperatingLocToReportout')));		
    	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingInfoToReport, 100),     NAMED('AddOperatingInfoToReport')));		
+   	IF(DebugMode,      OUTPUT(CHOOSEN(addReportData, 100),                NAMED('addReportData')));		
     
     
   // OUTPUT(addEstablishDate, NAMED('addEstablishDate'));  
 
 
-	RETURN addRegisteredAgents;
+	RETURN addReportData;
 END;
