@@ -1,151 +1,32 @@
 ﻿IMPORT BIPv2, iesp, DueDiligence;
 
 EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
-													 boolean DebugMode = FALSE
-											     ) := FUNCTION
-//****************************Begining of Bureau Reporting ***************************************************************************
-		// ------                                                                                            ------
-		// ------  In the getBusHeader the bureaus reporting information on this  business is collected.     ------
-		// ------  The bureauReporting is a nested DATASET within the Business Internal layout - the BusnData ------
-		// ------  so don't be confused by the LEFT.bureauReporting - this data will come in on the RIGHT    ------
-		// ------  convert this into a flat/simple dataset before populating the report                      ------
-		// ------                                                                                            ------
-		
-	 ListOfBusSources := NORMALIZE(BusnData, LEFT.bureauReporting, TRANSFORM(DueDiligence.LayoutsInternalReport.ListOfBusSourceLayout,
-                             /*  start by extracting the child dataset from the Parent  */  																														
-																												 SELF.seq                       := LEFT.seq;
-																													SELF.ultID                     := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																													SELF.orgID                     := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																													SELF.seleID                    := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																													/*  now get the rest of the data from child dataset */   
-																													SELF                           := RIGHT;
-																													SELF                           := [];)); 
-																													
-	// ------                                                                       ------
- // ------ define the ChildDataset                                               ------
-	// ------                                                                       ------
-	ReportingBureausChildDatasetLayout    := RECORD
-	 unsigned2                      seq;                                           //*  This is the seqence number of the parent   
-	 DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) ReportingBureausChild;
-	END;
+                                             boolean DebugMode = FALSE) := FUNCTION
+                                             
+  //****************************Begining of Bureau Reporting****************************
+  bureauSources := DueDiligence.CommonBusiness.GetMaxSources(BusnData, bureauReporting, iesp.constants.DDRAttributesConst.MaxReportingBureaus);
+  
+  addBureauSources := JOIN(BusnData, bureauSources,
+                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                            TRANSFORM(RECORDOF(LEFT),
+                                      SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfBureauReporting := COUNT(LEFT.bureauReporting);
+                                      SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus := RIGHT.sources;
+                                      SELF := LEFT;),
+                            LEFT OUTER);
+                           
+ 
 	
-	// ------                                                                        ------
- // ------ populate the ChildDataset  with the list of Reporting Bureaus         ------
- // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
- // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
-	// ------                                                                       ------
-	iesp.duediligencebusinessreport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, 
-	                              SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
-																															SELF.SourceName                       := le.source;                      
-																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
-																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
-			                            SELF                                  := [];
-				                     END;  
-	 
-
-	BusReportBureauDataset  :=   
-	PROJECT(ListOfBusSources,                                       //*** Using this input dataset - these sources will get moved to the reporting section 
-			TRANSFORM(ReportingBureausChildDatasetLayout,                 //*** format the data according to this layout.
-				SELF.seq                    := LEFT.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
-				SELF.ReportingBureausChild   := PROJECT(LEFT, FormatTheListOfRepBur(LEFT, COUNTER)))); 
-				       
-
- // ------                                                                        ------
- // ------ define the TRANSFORM used by the DENORMALIZE FUNCTION                  ------
- // ------ that is bringing the parent (BusnData) on the LEFT and the newly       ------
- // ------ created child dataset on the RIGHT.                                    ------
-	// ------                                                                        ------
-	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusReportBureauDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfBureauReporting       := le.creditSrcCnt; 
-									
-														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus  + ri.ReportingBureausChild;
-																	SELF := le;
-				  											END; 
-																	
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-	UpdateBureauSourcesInReport := DENORMALIZE(BusnData, BusReportBureauDataset,
-	                                            LEFT.seq = RIGHT.seq, 
-											                                 CreateNestedData(Left, Right, Counter));  
-	//**********************************End of Credit Bureau Reporting Sources*********************************************************************	
+	//****************************Begining of Non-Credit Bureau Sources****************************
+	nonBureauSources := DueDiligence.CommonBusiness.GetMaxSources(BusnData, sourcesReporting, iesp.constants.DDRAttributesConst.MaxReportingSources);
+  
+  addNonBureauSources := JOIN(addBureauSources, nonBureauSources,
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfSourcesReporting := COUNT(LEFT.sourcesReporting);
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingSources := RIGHT.sources;
+                                        SELF := LEFT;),
+                              LEFT OUTER);	                                             
 	
-	//****************************Begining of Non-Credit Bureau Sources ***************************************************************************
-		// ------                                                                                            ------
-		// ------  In the getBusHeader the business Shell reporting information on this  business is collected. ---
-		// ------  The Bus Shell data is a nested DATASET within the Business Internal layout - the BusnData ------
-		// ------  so don't be confused by the LEFT.sourcesReporting - this data will come in on the RIGHT    ------
-		// ------  convert this into a flat/simple dataset before populating the report                      ------
-		// ------                                                                                            ------
-		
-	 ListOfBusShellSources := NORMALIZE(UpdateBureauSourcesInReport, LEFT.sourcesReporting, TRANSFORM(DueDiligence.LayoutsInternalReport.ListOfBusSourceLayout,
-	                            /*  start by extracting the child dataset from the Parent  */ 
-																												 SELF.seq                       := LEFT.seq;
-																													SELF.ultID                     := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																													SELF.orgID                     := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																													SELF.seleID                    := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																													/*  now get the rest of the data from child dataset */   
-																													SELF                           := RIGHT;
-																													SELF                           := [];)); 
-																													
-	// ------                                                                       ------
- // ------ define the ChildDataset                                               ------
-	// ------                                                                       ------
-	BusinessShellChildDatasetLayout    := RECORD
-	 unsigned2                      seq;                                           //*  This is the seqence number of the parent   
-	 DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) BusShellSourceChild;
-	END;
-	
-	// ------                                                                        ------
- // ------ populate the ChildDataset  with the list of Reporting Bureaus         ------
- // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
- // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
-	// ------                                                                       ------
-	iesp.duediligencebusinessreport.t_DDRReportingSources  FormatTheListOfBusShellSource(ListOfBusSources le, Integer BSSourceCount) := TRANSFORM, SKIP(BSSourceCount > iesp.constants.DDRAttributesConst.MaxReportingSources)
-																															SELF.SourceName                       := le.source;                      
-																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
-																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
-			                            SELF                                  := [];
-				                     END;  
-	 
-
-	BusShellSourceDataset  :=   
-	PROJECT(ListOfBusShellSources,                                  //*** Using this input dataset - these sources will get moved to the reporting section 
-			TRANSFORM(BusinessShellChildDatasetLayout,                    //*** format the data according to this layout.
-				SELF.seq                    := LEFT.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
-				SELF.BusShellSourceChild   := PROJECT(LEFT, FormatTheListOfBusShellSource(LEFT, COUNTER)))); 
-				       
-
- // ------                                                                        ------
- // ------ define the TRANSFORM used by the DENORMALIZE FUNCTION                  ------
- // ------ that is bringing the parent (BusnData) on the LEFT and the newly       ------
- // ------ created child dataset on the RIGHT.                                    ------
-	// ------                                                                        ------
-	  DueDiligence.Layouts.Busn_Internal CreateNestedBSData(UpdateBureauSourcesInReport le, BusShellSourceDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfSourcesReporting       := le.nonCreditSrcCnt; 
-									
-														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingSources     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingSources  + ri.BusShellSourceChild;
-																	SELF := le;
-				  											END; 
-																	
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-	UpdateBOTHSourcesInReport := DENORMALIZE(UpdateBureauSourcesInReport, BusShellSourceDataset,
-	                                            LEFT.seq = RIGHT.seq, 
-											                                 CreateNestedBSData(Left, Right, Counter));  	
-		
-	
-	//**********************************End of NON-Credit Sources Reporting**********************************************************************************************************************	
-			
 	
   //retrieve all names associated with the fein
   assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.Name, UNSIGNED4 dateLastSeen},
@@ -178,7 +59,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                                 SELF.name := LEFT.name + RIGHT.name;
                                 SELF := LEFT));
   
-  addAssociatedNames := JOIN(UpdateBOTHSourcesInReport, rollNames,
+  addAssociatedNames := JOIN(addNonBureauSources, rollNames,
                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                              TRANSFORM(RECORDOF(LEFT),
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := LEFT.busn_info.fein;
@@ -247,11 +128,9 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-
-   IF(DebugMode,      OUTPUT(ListOfBusSources,                NAMED('ListOfBusSources')));								 
-   IF(DebugMode,      OUTPUT(BusReportBureauDataset,          NAMED('BusReportBureauDataset')));								 
-   IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBOTHSourcesInReport, 100),     NAMED('UpdateBOTHSourcesInReport')));												 
-
+  // OUTPUT(bureauSources, NAMED('bureauSources'));
+  // OUTPUT(nonBureauSources, NAMED('nonBureauSources'));
+  
   // OUTPUT(assocNames, NAMED('assocNames'));
   // OUTPUT(sortGroupAssocNames, NAMED('sortGroupAssocNames'));
   // OUTPUT(limitedNames, NAMED('limitedNames'));

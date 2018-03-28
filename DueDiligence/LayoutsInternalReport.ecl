@@ -40,19 +40,12 @@ EXPORT LayoutsInternalReport := MODULE
 		VinTitleAndRegistration;
 		UNSIGNED2 watercraftCount;
   END;
-	
- EXPORT BusSourceLayout := RECORD
-		STRING sourceName;
-		STRING source;
-		STRING sourceType;
-		UNSIGNED4 firstReported;
-		UNSIGNED4 lastReported;
-	END;
+
 	
 	
 	EXPORT ListOfBusSourceLayout := RECORD
 	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		BusSourceLayout;   
+   DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) sources;
 	END;
 
 

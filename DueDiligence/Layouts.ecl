@@ -519,8 +519,8 @@ EXPORT LinkIDs := RECORD
 	
 	
 	EXPORT BusSourceLayout := RECORD
-		STRING sourceName;
 		STRING source;
+    STRING sourceName;
 		STRING sourceType;
 		UNSIGNED4 firstReported;
 		UNSIGNED4 lastReported;
@@ -562,7 +562,8 @@ EXPORT LinkIDs := RECORD
 	
 	EXPORT BusReportDetails        := RECORD
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
-    DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_SOURCES)};
+    BOOLEAN headerSourceContainsE5;
+    DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
     BusinessLegalSummary;
@@ -709,7 +710,6 @@ EXPORT LinkIDs := RECORD
 		/*BusPublicRecordAgeRange*/ 	
 		UNSIGNED4 	busnHdrDtFirstSeen;											            //populated in DueDiligence.getBusHeader
 		UNSIGNED3 	srcCount;																            //populated in DueDiligence.getBusHeader  This is a count of ALL Sources
-		UNSIGNED3   nonCreditSrcCnt;                                    //populated in DueDiligence.getBusHeader  This is a count of ALL Sources minus the Credit Bureaus
 		/*BusValidityRisk*/
 		UNSIGNED2 	sosAddrLocationCount;										            //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED2 	hdAddrCount;														            //populated in DueDiligence.getBusHeader 

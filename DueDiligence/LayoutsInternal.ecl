@@ -95,6 +95,11 @@ EXPORT LayoutsInternal := MODULE
     InternalBIPIDsLayout;
     DATASET(DueDiligence.Layouts.DD_CompanyNames) companyNameAndLastSeen {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
   END;
+  
+  EXPORT SourceLayout := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.BusSourceLayout) sources;
+  END;
 
 
 //------                                      ------
