@@ -24,7 +24,7 @@ matchset := ['A','D','S'];
 
 did_add.MAC_Match_Flex
 	(dl_file_seq_src, matchset,						//see above
-	 ssn, dob, fname, mname, lname, name_suffix, 
+	 ssn_safe, dob, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip5, st, JUNK,
 	 DID,
 	 src_rec, 
@@ -33,7 +33,6 @@ did_add.MAC_Match_Flex
 	 res,true,src)
 
 DriversV2.Layout_Base_withAID lFieldTransform(src_rec l) := TRANSFORM
-self.ssn_safe := l.ssn;
 self.restrictions_delimited := if(l.restrictions_delimited <> '',
 								  l.restrictions_delimited,
 								  l.Restrictions[1] + 
