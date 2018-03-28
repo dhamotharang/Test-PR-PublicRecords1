@@ -1,4 +1,4 @@
-// Fetches header data for a person: addresses, names, relatives, etc. Input [dids] has no more than one record.
+﻿// Fetches header data for a person: addresses, names, relatives, etc. Input [dids] has no more than one record.
 IMPORT doxie, doxie_crs, suppress, fcra, header, AID_Build, Relationship, Advo, FFD;
 
 EXPORT central_header (DATASET (doxie.layout_references) dids,
@@ -6,7 +6,8 @@ EXPORT central_header (DATASET (doxie.layout_references) dids,
 											 boolean VerifyUniqueID = false,
 											 boolean in_getSSNBest = false,
 											 dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = dataset([], FFD.Layouts.PersonContextBatchSlim), 											 
-											 integer8 inFFDOptionsMask = 0
+											 integer8 inFFDOptionsMask = 0,
+											 dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 											 ) := FUNCTION
 
 boolean includeGeoLocation := false : stored('IncludeGeoLocation');
@@ -37,9 +38,6 @@ besr_pre := project(best_full,
 
 // TODO: It looks like there's no reliable way to fetch flag records by SSN in the FCRA context:
 //   consider just taking it from the input, if any.
-
-// create pseudo-best record only to get flag records; more realistic best is calculated later
-ds_flags := FCRA.GetFlagFile (PROJECT (dids, TRANSFORM (doxie.layout_best, SELF.did := LEFT.did, SELF := [])));
 
 // FCRA header data -- based on the DIDs fetched from the neutral site.
 // All FCRA-relevant corrections are applied inside

@@ -1,5 +1,4 @@
-import BatchServices;
-import iesp, BatchServices;
+﻿import iesp, BatchServices;
 EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE, 
 									MemberPoint.IParam.BatchParams InputParams) := function
 
@@ -30,10 +29,10 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 				EXPORT boolean useDMEmailSourcesOnly := false	: stored('UseDMEmailSourcesOnly');
 		END;
 	
-		modEmail := BatchServices.Email_BatchService_Records(EmailBatchParams,EmailBatchIn,false);
+	//Added flag to identify call from Memberpoint service
+		modEmail := BatchServices.Email_BatchService_Records(EmailBatchParams,EmailBatchIn,false,emailforMemberpoint := True);
 		sortedRecs:= SORT(modEmail.Recs, acctno, orig_email);
 		dedupedRecs:= DEDUP(sortedRecs,acctno,orig_email);
-
 		EmailRecs := dedupedRecs;
 		EmailRoyalties := modEmail.dRoyalties;
 

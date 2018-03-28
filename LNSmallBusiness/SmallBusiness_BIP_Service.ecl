@@ -255,7 +255,8 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 	#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
 	#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
-
+	#STORED('SSNMask'            ,Business_Risk_BIP.Constants.Default_SSNMask);
+  
 	requestIn := DATASET([], iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest) : STORED('SmallBusinessAnalyticsRequest', FEW);
  firstRow  := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
 	search    := GLOBAL(firstRow.SearchBy);
@@ -302,6 +303,12 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	
 	STRING30 AcctNo := users.AccountNumber;
 	// Business Input Information
+ UNSIGNED6 PowID := search.Company.BusinessIds.PowID;
+ UNSIGNED6 ProxID := search.Company.BusinessIds.ProxID;
+ UNSIGNED6 SeleID := search.Company.BusinessIds.SeleID;
+ UNSIGNED6 OrgID := search.Company.BusinessIds.OrgID;
+ UNSIGNED6 UltID := search.Company.BusinessIds.UltID;
+        
 	STRING120 Bus_Company_Name := search.Company.CompanyName;
 	STRING120 Bus_Doing_Business_As := search.Company.AlternateCompanyName;
 	STRING120 Bus_Street_Address1 := IF(search.Company.Address.StreetAddress1 = '', Address.Addr1FromComponents(search.Company.Address.StreetNumber, search.Company.Address.StreetPreDirection, search.Company.Address.StreetName, search.Company.Address.StreetSuffix, search.Company.Address.StreetPostDirection, search.Company.Address.UnitDesignation, search.Company.Address.UnitNumber),
@@ -339,6 +346,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING25 Rep_1_DL_Number := search.AuthorizedRep1.DriverLicenseNumber;
 	STRING2 Rep_1_DL_State := search.AuthorizedRep1.DriverLicenseState;
 	STRING Rep_1_Business_Title := search.AuthorizedRep1.BusinessTitle;
+ STRING12 Rep_1_LexID := search.AuthorizedRep1.UniqueId; 
 	// Authorized Representative 2 Input Information
 	STRING120 Rep_2_Full_Name := search.AuthorizedRep2.Name.Full;
 	STRING20 Rep_2_First_Name := search.AuthorizedRep2.Name.First;
@@ -359,6 +367,8 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING25 Rep_2_DL_Number := search.AuthorizedRep2.DriverLicenseNumber;
 	STRING2 Rep_2_DL_State := search.AuthorizedRep2.DriverLicenseState;
 	STRING Rep_2_Business_Title := search.AuthorizedRep2.BusinessTitle;
+ STRING12 Rep_2_LexID := search.AuthorizedRep2.UniqueId; 
+  
 	// Authorized Representative 3 Input Information
 	STRING120 Rep_3_Full_Name := search.AuthorizedRep3.Name.Full;
 	STRING20 Rep_3_First_Name := search.AuthorizedRep3.Name.First;
@@ -379,6 +389,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING25 Rep_3_DL_Number := search.AuthorizedRep3.DriverLicenseNumber;
 	STRING2 Rep_3_DL_State := search.AuthorizedRep3.DriverLicenseState;
 	STRING Rep_3_Business_Title := search.AuthorizedRep3.BusinessTitle;
+ STRING12 Rep_3_LexID := search.AuthorizedRep3.UniqueId; 
 	// Option Fields
 	UNSIGNED3 HistoryDateYYYYMM		 := 0 : STORED('HistoryDateYYYYMM');
 	UNSIGNED6 HistoryDate          := 0 : STORED('HistoryDate');
@@ -410,6 +421,11 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	
 	LNSmallBusiness.BIP_Layouts.Input intoInputLayout(emptyRecord le) := TRANSFORM
 		SELF.AcctNo := AcctNo;
+  SELF.UltID := UltID;
+  SELF.OrgID := OrgID;
+  SELF.SeleID := SeleID;
+  SELF.ProxID := ProxID;
+  SELF.PowID := PowID;
 		SELF.HistoryDateYYYYMM := HistoryDateYYYYMM;
 		SELF.HistoryDate := HistoryDate;
 		SELF.Bus_Company_Name := Bus_Company_Name;
@@ -446,6 +462,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Rep_1_DL_Number := Rep_1_DL_Number;
 		SELF.Rep_1_DL_State := Rep_1_DL_State;
 		SELF.Rep_1_Business_Title := Rep_1_Business_Title;
+  SELF.Rep_1_LexID := (UNSIGNED)Rep_1_Lexid;  
 		SELF.Rep_2_Full_Name := Rep_2_Full_Name;
 		SELF.Rep_2_First_Name := Rep_2_First_Name;
 		SELF.Rep_2_Middle_Name := Rep_2_Middle_Name;
@@ -464,6 +481,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Rep_2_DL_Number := Rep_2_DL_Number;
 		SELF.Rep_2_DL_State := Rep_2_DL_State;
 		SELF.Rep_2_Business_Title := Rep_2_Business_Title;
+  SELF.Rep_2_LexID := (UNSIGNED)Rep_2_LexID;  
 		SELF.Rep_3_Full_Name := Rep_3_Full_Name;
 		SELF.Rep_3_First_Name := Rep_3_First_Name;
 		SELF.Rep_3_Middle_Name := Rep_3_Middle_Name;
@@ -482,21 +500,24 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Rep_3_DL_Number := Rep_3_DL_Number;
 		SELF.Rep_3_DL_State := Rep_3_DL_State;
 		SELF.Rep_3_Business_Title := Rep_3_Business_Title;
-		
+		SELF.Rep_3_LexID := (UNSIGNED)Rep_3_LexID;
 		SELF := [];
 	END;
 	Input := PROJECT(dataset([{1}], {unsigned a}), intoInputLayout(LEFT));
 	
+  SBA_20_Request := (UNSIGNED)AttributesRequested(AttributeGroup[1..18] = 'SMALLBUSINESSATTRV')[1].AttributeGroup[19..] >= 2; // Any new models/attribute groups running business shell 3.0 or higher should be added here.
 	/* *************************************
 	 *            Validate Input:          *
    *************************************** */
 	MinimumInputMetForOption1 := TRIM(Bus_Company_Name) <> '' AND TRIM(Bus_Street_Address1) <> '' AND TRIM(Bus_Zip) <> '';
 	MinimumInputMetForOption2 := TRIM(Bus_Company_Name) <> '' AND TRIM(Bus_Street_Address1) <> '' AND TRIM(Bus_City) <> '' AND TRIM(Bus_State) <> '';
+ MinimumInputMetForOption3 := SeleID <> 0 AND SBA_20_Request; // SeleID only is a valid input in SBA 2.0 and above. 
 	// Authorized Rep information is not required on input, however if provided at a minimum First and Last Name must be populated
 	MinimumInputMetForAuthorizedRep := (TRIM(Rep_1_Full_Name) <> '' OR TRIM(Rep_2_Full_Name) <> '' OR TRIM(Rep_3_Full_Name) <> '') OR // The full name was populated for one of the Auth Rep fields
 																		 (TRIM(Rep_1_First_Name) <> '' AND TRIM(Rep_1_Last_Name) <> '') OR // Both First and Last were populated
 																		 (TRIM(Rep_2_First_Name) <> '' AND TRIM(Rep_2_Last_Name) <> '') OR
 																		 (TRIM(Rep_3_First_Name) <> '' AND TRIM(Rep_3_Last_Name) <> '') OR
+                   (SBA_20_Request AND ((UNSIGNED)Rep_1_LexID > 0 OR (UNSIGNED)Rep_2_LexID > 0 OR (UNSIGNED)Rep_3_LexID > 0)) OR
 																		  // No Auth rep information was passed in
 																		 (TRIM(Rep_1_Full_Name) = '' AND TRIM(Rep_1_First_Name) = '' AND TRIM(Rep_1_Last_Name) = '' AND
 																		  TRIM(Rep_2_Full_Name) = '' AND TRIM(Rep_2_First_Name) = '' AND TRIM(Rep_2_Last_Name) = '' AND
@@ -523,8 +544,8 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
   
   BlendedModelRequested := EXISTS(ModelsRequested(ModelName IN SET(LNSmallBusiness.Constants.DATASET_MODELS.BLENDED_ALL, ModelName)));
 	
-	IF((MinimumInputMetForOption1 = FALSE AND MinimumInputMetForOption2 = FALSE) OR // Minimum Business Inputs not met
-		 ((MinimumInputMetForOption1 = TRUE OR MinimumInputMetForOption2 = TRUE) AND MinimumInputMetForAuthorizedRep = FALSE) OR // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
+	IF((MinimumInputMetForOption1 = FALSE AND MinimumInputMetForOption2 = FALSE AND MinimumInputMetForOption3=FALSE) OR // Minimum Business Inputs not met
+		 ((MinimumInputMetForOption1 = TRUE OR MinimumInputMetForOption2 = TRUE OR MinimumInputMetForOption3=TRUE) AND MinimumInputMetForAuthorizedRep = FALSE) OR // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
 		 (BlendedModelRequested AND AuthorizedRepNotInput = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption1 = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption2 = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption3 = FALSE),
 		FAIL('Please input the minimum required fields:\nOption 1: Company Name, Street Address, Zip\nOR\nOption 2: Company Name, Street Address, City, State'));
 	
@@ -551,8 +572,9 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																														IncludeTargusGateway,
 																														RunTargusGateway, /* for testing purposes only */
 																														LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Service,
-                                                            CorteraRetrotest,
-																														ds_CorteraRetrotestRecsRaw
+                              CorteraRetrotest,
+																														ds_CorteraRetrotestRecsRaw,
+                              AppendBestsFromLexIDs := SBA_20_Request
 																														);
 
 	SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );

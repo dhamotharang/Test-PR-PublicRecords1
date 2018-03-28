@@ -12,8 +12,7 @@ EXPORT LayoutsInternal := MODULE
 	END; 
 	
 	EXPORT CommonGeographicLayout   := RECORD
-	 DueDiligence.Layouts.Address;
-	 DueDiligence.Layouts.GeographicRiskLayout;
+		DueDiligence.Layouts.BusOperLocationLayout;
 	END;
 	
 	
@@ -76,14 +75,6 @@ EXPORT LayoutsInternal := MODULE
 		InternalBIPIDsLayout;
 		UNSIGNED4	  historydate;
 		DueDiligence.Layouts.RelatedParty party;
-		BOOLEAN eventTypeCategory9;
-		BOOLEAN eventTypeCategory8;
-		BOOLEAN eventTypeCategory7;
-		BOOLEAN eventTypeCategory6;
-		BOOLEAN eventTypeCategory5;
-		BOOLEAN eventTypeCategory4;
-		BOOLEAN eventTypeCategory3;
-		BOOLEAN eventTypeCategory2;
 	END;
 	
 	EXPORT PartyLicenses := RECORD
@@ -127,7 +118,7 @@ EXPORT LayoutsInternal := MODULE
    string5   zip;
    string4   zip4;
 	  STRING5   County;
-		 STRING20  countyName;
+		 //STRING20  countyName;
 		 string7   geo_blk;
 		 DueDiligence.Layouts.GeographicRiskLayout;
   END;					
@@ -179,7 +170,9 @@ EXPORT common_layout_liens_judgments := RECORD
 	 STRING50 tmsid;
   UNSIGNED4	HistoryDate;
 		UNSIGNED4 DateToUse; 
-		UNSIGNED3 NumOfDaysAgo;   
+		UNSIGNED3 NumOfDaysAgo; 
+    STRING20 filing_number;                      //***all these fields are from:  liensV2.key_liens_main_ID
+    STRING20 filing_jurisdiction;             
 		STRING8  date_first_seen;
 		STRING8  date_last_seen;
 		STRING1  eviction;
@@ -189,7 +182,9 @@ EXPORT common_layout_liens_judgments := RECORD
 		STRING8  release_date;
 		STRING8  lapse_date;
 		STRING30 filing_status;
+    STRING25 agency;
 		STRING2  agency_state;
+    STRING25 agency_county; 
 END;
 
 

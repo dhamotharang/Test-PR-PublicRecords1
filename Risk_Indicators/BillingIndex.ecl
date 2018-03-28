@@ -184,6 +184,7 @@ export BillingIndex := MODULE
 		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
 		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)	
 		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)	
+		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100)	
 	
 END;
 

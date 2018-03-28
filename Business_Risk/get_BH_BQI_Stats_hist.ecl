@@ -1,4 +1,4 @@
-IMPORT Gong, Header, DNB, IRS5500, Corp, Business_Header, Business_Header_SS, ut, riskwise;
+﻿IMPORT Gong, Header, DNB, IRS5500, Corp, Business_Header, Business_Header_SS, ut, riskwise;
 
 export get_BH_BQI_Stats_hist(dataset(Business_Risk.Layout_Output) biid) := FUNCTION
 
@@ -43,7 +43,7 @@ bh := join(bdid_best_data, business_risk.Key_Business_Header_Address,
 					keyed(right.prim_name=left.prim_name) and 
 					keyed(right.prim_range=left.prim_range) and
 					keyed(right.sec_range in ['', left.sec_range]) and
-					(unsigned)right.dt_first_seen[1..6] <= left.historydate,
+					(unsigned)((STRING)right.dt_first_seen)[1..6] <= left.historydate,
 					transform(bh_temp,
 									self := right,
 									self.historydate := left.historydate),

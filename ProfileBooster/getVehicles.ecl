@@ -1,4 +1,4 @@
-﻿IMPORT Drivers, VehicleV2, RiskWise, ut, MDR;
+﻿IMPORT Drivers, VehicleV2, RiskWise, ut, MDR, risk_indicators;
 
 EXPORT getVehicles(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
 
@@ -32,7 +32,7 @@ ProfileBooster.Layouts.Layout_PB_Slim_vehicles  add_party(vehRecs le, vehPartyKe
 	// self.totalCount		 		:= if(ri.Sequence_Key<>'' AND ri.history='', 1, 0); 
 	self.totalCount		 		:= if(ri.Sequence_Key<>'', 1, 0); 
   src_first_date    		:= if((integer)ri.src_first_date <> 0, ri.src_first_date, (string)ri.date_first_seen);
-	monthsAgo 						:= ut.MonthsApart((STRING6)le.historyDate,(string6)src_first_date);
+	monthsAgo 						:= ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],(string6)src_first_date);
 	self.months_first_reg := monthsAgo;
 	self.months_last_reg  := monthsAgo;		
 	self.state_origin := le.state_origin;

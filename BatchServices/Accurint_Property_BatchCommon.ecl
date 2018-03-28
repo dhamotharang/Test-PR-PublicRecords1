@@ -73,7 +73,10 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     // c) Slim down the PersonContext         
     slim_pc_recs := FFD.SlimPersonContext(pc_recs);
     
-    p_mod := BatchServices.Property_BatchService_Records(ds_ready, record_types, party_type, nss, isFCRA, , slim_pc_recs, inFFDOptionsMask);
+    ds_best := project(ds_ready, transform(doxie.layout_best, self.did := left.did, self:=[]));
+    ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
+
+    p_mod := BatchServices.Property_BatchService_Records(ds_ready, record_types, party_type, nss, isFCRA, , slim_pc_recs, inFFDOptionsMask, ds_flags);
     
     // Get the top N records for each acctno here. Note: we DON'T want to just get the top N ln_fares_ids for
     // each acctno and then match those against the property records, because many of those ln_fares_ids might be 

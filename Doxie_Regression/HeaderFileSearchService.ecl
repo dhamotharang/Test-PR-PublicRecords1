@@ -76,7 +76,7 @@ PrettyLayout := record
   outf.lname;
   string5    name_suffix := IF( outf.name_suffix[1]='U','',outf.name_suffix );
   outf.dob;
-  unsigned1 age      := ut.GetAgeI(outf.dob);
+  unsigned1 age      := ut.Age(outf.dob);
   unsigned4 dod      := IF(outf.src in ['DE', 'DS'], (unsigned4)stringlib.stringfilter(outf.prim_name, '0123456789'), 0);
   unsigned1 dead_age := IF(outf.src in ['DE', 'DS'] and outf.prim_name<>'', ((unsigned4)stringlib.stringfilter(outf.prim_name, '0123456789') - outf.dob) div 10000, 0);
   outf.ssn;
@@ -122,7 +122,7 @@ ta2_best := doxie.best_records(ta2_dids);
 
 PrettyLayout add_value(ta2 le, ta2_best ri) := transform
   self.dob := if (le.dob=0,ri.dob,le.dob);
-  self.age := if(le.age=0,ut.GetAgeI(ri.dob),le.age);
+  self.age := if(le.age=0,ut.Age(ri.dob),le.age);
   self.ssn := if ((unsigned8)le.ssn=0,ri.ssn,le.ssn);
   self.valid_ssn := if ((unsigned8)le.ssn=0 and (unsigned8)ri.ssn<>0,'M',le.valid_ssn);
   self := le;

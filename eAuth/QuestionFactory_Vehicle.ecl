@@ -1,4 +1,4 @@
-IMPORT iesp, ut, VehicleV2_Services;
+﻿IMPORT iesp, VehicleV2_Services, std;
 
 out_rec := layouts.question_ext;
 ds_blank := dataset ([], out_rec);
@@ -213,7 +213,7 @@ export QuestionFactory_Vehicle := MODULE
 	
     real_year  := iesp.ECL2ESP.toDate ((unsigned4) ds_correct[1].owners[1].Ttl_Latest_Issue_Date).Year;
     real_month := iesp.ECL2ESP.toDate ((unsigned4) ds_correct[1].owners[1].Ttl_Latest_Issue_Date).Month;
-    currentYear := (unsigned)(ut.getDate [1..4]);
+    currentYear := (unsigned)(((STRING8)Std.Date.Today())[1..4]);
     month_Name:= Functions.months_set [real_month];
     ds_correct_rec := dataset ([{month_Name + ' ' + (string4) real_year, true}], iesp.eauth.t_Answer);
 

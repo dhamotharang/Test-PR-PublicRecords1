@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FCRAData_service"  wuTimeout="300000">
 	<part name="AlphaNumericInput" type="xsd:boolean" default="false" description=" Defines whether the input is from VRU (numeric only) or non-numeric"/>
 	<part name="IncludeAllHeaderResults" type="xsd:boolean" description="If checked, header results will not be deduped (for QA testing)"/>
@@ -1236,10 +1236,6 @@ IF (VRU_ok, OUTPUT (ccw_recs, NAMED ('concealed_weapons')));
 
 huntfish_recs := RiskWiseFCRA._HuntingFishing_data (dids, ds_flagfile).hunting_fishing;
 IF (VRU_ok, OUTPUT (huntfish_recs, NAMED ('hunting_fishing_license')));
-
-ucc := RiskWiseFCRA._UCC_data (dids, ds_flagfile (file_id in [FCRA.FILE_ID.UCC, FCRA.FILE_ID.UCC_PARTY]));
-IF (VRU_ok, OUTPUT (ucc.main, named ('ucc_main')));
-IF (VRU_ok, OUTPUT (ucc.party, named ('ucc_party')));
 
 atf_recs := RiskWiseFCRA._ATF_data (dids, ds_flagfile (file_id = FCRA.FILE_ID.ATF), nss);
 IF (VRU_ok, OUTPUT (atf_recs.atf, named ('ATF')));

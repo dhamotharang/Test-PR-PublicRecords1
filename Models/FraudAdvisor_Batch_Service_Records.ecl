@@ -17,12 +17,14 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
-		fraudpoint3_custom_models := ['fp1702_2','fp1702_1'];
+		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1'];
 
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
-
-		bsVersion := MAP( model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
+  
+		bsVersion := MAP( 
+    model_name IN ['fp1508_1'] => 53, // bs 53
+    model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
 		                                 'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
 											model_name IN ['fp1210_1', 'fp1307_2', 'fp1409_2'] => 41, 
 											doVersion2 or model_name in fraudpoint2_models	=> 4,
@@ -44,7 +46,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		// new options for fp attributes 2.0
 		IncludeDLverification := doVersion2 ;
 		unsigned8 BSOptions := if(doVersion2 or model_name in ['fp1210_1','fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 
-		                                                       'fp3fdn1505_9','fp1702_2','fp1702_1'], 
+		                                                       'fp3fdn1505_9','fp1702_2','fp1702_1','fp1508_1'], 
 			risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary +
 			risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
 			risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
@@ -111,6 +113,8 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			
 			self.dl_number := stringlib.stringtouppercase(dl_num_clean);
 			self.dl_state := stringlib.stringtouppercase(le.dl_state);
+			//self.email_address := stringlib.stringtouppercase(le.email);
+			self.email_address := le.email;
 			
 			self.ip_address := le.ip_addr;
 			self.historydate := if(le.historydateyyyymm=0, 999999, le.historydateyyyymm);
@@ -143,7 +147,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		boolean   doRelatives := true;
 		boolean   doDL := false;
 		boolean   doVehicle := MAP(
-																model_name IN ['fp31105_1','fp1702_2','fp1702_1'] or doVersion2 => TRUE,
+																model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1'] or doVersion2 => TRUE,
 																															 FALSE
 															 );
 		boolean   doDerogs := true;
@@ -663,13 +667,15 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		
 		
 
-	// model_temp := Models.FP1702_2_0(ungroup (clam ),6); 	// For validation only...hard code 
+	// model_temp := Models.FP1508_1_0(ungroup (clam ),6); 	// For validation only...hard code 
+
+
 // RETURN MODEL_temp ;	
 
 
 
 	//the model here and comment out rest of code
-		// output(model_temp);
+	//	output(model_temp);
 
 		model_temp := map(
 			model_name = 'fp3710_0' 	=> Models.FP3710_0_0( clam_ip ),
@@ -711,6 +717,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			'fp3fdn1505_0'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, false), 
 			'fp31505_9' 		=> Models.FP31505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
 			'fp3fdn1505_9'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
+			'fp1508_1'	=> Models.fp1508_1_0( ungroup(clam), 6),
 												 dataset( [], Models.Layouts.layout_fp1109 )
 		);
 		
@@ -741,6 +748,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 					model_name='fp3fdn1505_9' => Risk_Indicators.BillingIndex.FP3FDN1505_9,
 					model_name='fp1702_2' => Risk_Indicators.BillingIndex.fp1702_2,
 					model_name='fp1702_1' => Risk_Indicators.BillingIndex.fp1702_1,
+					model_name='fp1508_1' => Risk_Indicators.BillingIndex.fp1508_1,
 					''
 				),
 				
@@ -753,13 +761,14 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 					model_name IN ['fp3fdn1505_9'] 																													=> 'FraudPointFP3FDN1505_9',
 					model_name IN ['fp1702_2'] 																													    => 'FraudPointfp1702_2',
 					model_name IN ['fp1702_1'] 																													    => 'FraudPointfp1702_1',
+					model_name IN ['fp1508_1'] 																													    => 'FraudPointfp1508_1',
 					''
 				),
 				
 				self.scorename1 := map(
 					model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
 												 'fp1409_2', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9',
-												 'fp1702_2','fp1702_1'] 		=> '0 to 999',
+												 'fp1702_2','fp1702_1','fp1508_1'] 		=> '0 to 999',
 					''
 				),
 				self.reason1 := right.ri[1].hri,  
@@ -792,6 +801,5 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 	// OUTPUT( wAcctNo, NAMED('wAcctNo') );
 	
 	return wmodel;
-
 
 end;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SD1OBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -7,6 +7,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -26,6 +27,7 @@ tribCode := StringLib.StringToLowerCase(tribCode_value);
 unsigned1 dppa := RiskWise.permittedUse.fraudDPPA 			: stored('DPPAPurpose');
 unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],riskwise.Layout_SD1I_BatchIn)			: stored('batch_in',few);
@@ -35,13 +37,21 @@ productSet := ['ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','s
 
 targusGatewaySet := ['ex03','ex22','ex70','sd01','cb61'];
 
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
+
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := if(tribcode in targusGatewaySet and le.servicename = 'targus', le.url,  ''); // default to no gateway call			 
+	self.url := map(tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
+                 tribcode in ['ex02','ex03','ex06','ex07','ex08','ex09','ex10','ex22','ex70','sd50','2x08','2x10'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                 ''); // default to no gateway call
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
 
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 RiskWise.Layout_SD1I addseq(batchin le, integer C) := transform
 	self.seq := C;
@@ -108,7 +118,8 @@ RiskWise.Layout_SD1I addseq(batchin le, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-ret := if(tribCode in productSet, RiskWise.SD1O_Function(f, gateways, glb, dppa, tribCode,datarestriction, DataPermission), dataset([],RiskWise.Layout_SD1O));
+ret := if(tribCode in productSet, RiskWise.SD1O_Function(f, gateways, glb, dppa, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
+                                                         global_watchlist_threshold, datarestriction, DataPermission), dataset([],RiskWise.Layout_SD1O));
 
 output(ret, named('Results'));
 

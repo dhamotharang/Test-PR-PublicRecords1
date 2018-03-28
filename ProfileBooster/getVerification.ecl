@@ -89,9 +89,12 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		self.socsscore 				:= Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);		
 		self.dt_first_seen 		:= ri.dt_first_seen;
-		self.dt_last_seen			:= if(ri.dt_last_seen > le.HistoryDate, le.HistoryDate, ri.dt_last_seen);
+    
+    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+    historydate := (unsigned)fullhistorydate[1..6];
+		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob);
+		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
 		self.title						:= ri.title;	
 		self.HHID							:= ri.HHID;
 		self.hdr_prim_range		:= ri.prim_range;
@@ -145,10 +148,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		self.socsscore 				:= Risk_Indicators.PhoneScore(le.ssn, ri.ssn);
 		self.socscount 				:= (integer)Risk_Indicators.iid_constants.gn(self.socsscore);		
 		self.dt_first_seen 		:= ri.dt_first_seen;
-		self.dt_last_seen			:= if(ri.dt_last_seen > le.HistoryDate, le.HistoryDate, ri.dt_last_seen);
+    
+    fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+    historydate := (unsigned)fullhistorydate[1..6];
+		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
 		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob);
-		self.title						:= ri.title;
+		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
+   	self.title						:= ri.title;
 		self.hdr_prim_range		:= ri.prim_range;
 		self.hdr_predir				:= ri.predir;
 		self.hdr_prim_name		:= ri.prim_name;
@@ -255,7 +261,7 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		SELF.address_history_seq	:= address_history_seq;
 		SELF.hdr_date_first_seen	:= ri.date_first_seen;
 		SELF.hdr_date_last_seen		:= ri.date_last_seen;
-		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart((string)le.historyDate,((string)ri.date_first_seen)[1..6]), nines);
+		SELF.LifeEvTimeLastMove		:= if(ri.date_first_seen <> 0, ut.MonthsApart(risk_indicators.iid_constants.myGetDate(le.historydate)[1..6],((string)ri.date_first_seen)[1..6]), nines);
 		SELF 											:= le;
 	END;
 	
@@ -407,8 +413,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		allHeader.dt_last_seen;
 	END;
 
-	hf_slim := DISTRIBUTE(table(allHeader, hdr_slim), did);
-	
+	hf_slim := DISTRIBUTE(
+    project(allHeader, 
+      transform(hdr_slim, 
+        self.historydate := (unsigned)(risk_indicators.iid_constants.myGetDate(left.historydate)[1..6]) ;
+        self := left)), 
+        did);
+
 	addr_slim := RECORD
 	hf_slim.seq;
 	hf_slim.did;
@@ -418,20 +429,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 	dt_last_seen := MAX(GROUP,hf_slim.dt_last_seen);
 	END;
 	
-	d_addr := TABLE(hf_slim(TRIM(hdr_addr1)<>''), addr_slim, seq, did, hdr_addr1, LOCAL);
+	d_addr := TABLE(hf_slim(TRIM(hdr_addr1)<>''), addr_slim, seq, did, historydate, hdr_addr1, LOCAL);
 	
 // use the build start date as today and adjust the timeframes
 	addr_stats := record
 		seq := d_addr.seq;
 		did := d_addr.did;
 		addr_ct := count(group); 
-		addr_ct_last30days :=  count(group, (((STRING)d_addr.dt_first_seen)[1..6])+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	// same or greater dt first seen than build date
-		addr_ct_last90days :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < 60 ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_c6 :=          count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiveMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last1year :=   count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.elevenMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last2years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.twentythreeMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
-		addr_ct_last3years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.thirtyfiveMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);	
-		addr_ct_last5years :=  count(group, ( ut.DaysApart((string)d_addr.HistoryDate, ((STRING)d_addr.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiftynineMonths ) or ((STRING)d_addr.dt_first_seen)[1..6]+'31' >= (string)d_addr.HistoryDate and d_addr.dt_first_seen<>999999);
 	end;
 	
 	addr_counts := table(d_addr, addr_stats, seq, did, local);
@@ -445,20 +449,14 @@ address_rank_key := header.key_addr_hist(isFCRA);
 		dt_last_seen := MAX(GROUP,hf_slim.dt_last_seen);
 	END;
 	
-	d_last := TABLE(hf_slim(TRIM(hdr_lname)<>''), lname_slim, seq, did, hdr_lname, LOCAL);
+	d_last := TABLE(hf_slim(TRIM(hdr_lname)<>''), lname_slim, seq, did, historydate, hdr_lname, LOCAL);
 
 	// use the build start date as today and adjust the timeframes
 	lname_stats := record
 		seq := d_last.seq;
 		did := d_last.did;
 		lname_ct :=    count(group);
-		lname_ct30 :=  count(group, ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	// same or greater dt first seen than build date
-		lname_ct90 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < 60 ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct180 := count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.fiveMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
 		lname_ct12 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.elevenMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct24 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.twentythreeMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
-		lname_ct36 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.thirtyfiveMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);	
-		lname_ct60 :=  count(group, ( ut.DaysApart((string)d_last.HistoryDate, ((STRING)d_last.dt_first_seen)[1..6]+'31') < Risk_Indicators.iid_constants.fiftynineMonths ) or ((STRING)d_last.dt_first_seen)[1..6]+'31' >= (string)d_last.HistoryDate and d_last.dt_first_seen<>999999);
 	END;
 	
 	lname_counts := table(d_last, lname_stats, seq, did, local);

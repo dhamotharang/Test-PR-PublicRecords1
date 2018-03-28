@@ -56,7 +56,7 @@ EXPORT DLSearchService() := MACRO
 
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_DriversVTSA_Services_DLSearchService();
-	#constant('NoDeepDive',true)
+	#constant('NoDeepDive',true);
 
 	// compute results
   raw := DriversvTSA_Services.DLSearchService_records;

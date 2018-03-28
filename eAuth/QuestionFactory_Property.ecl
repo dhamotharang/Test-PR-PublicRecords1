@@ -1,4 +1,4 @@
-IMPORT iesp, ut;
+﻿IMPORT iesp, std;
 
 out_rec := layouts.question_ext;
 ds_blank := dataset ([], out_rec);
@@ -262,7 +262,7 @@ export QuestionFactory_Property := MODULE
     f_yearbuilt := prop_row.YearBuilt;
     boolean IsSufficient := valid_input and exists (prop_valid) and (trim (prop_addr) != '');
 
-    currentYear := (unsigned)(ut.getDate [1..4]);
+    currentYear := (unsigned)(((STRING8)Std.Date.Today())[1..4]);
 
     // something to feed to normalize
     fake_line := dataset ([{'', false}], iesp.eauth.t_Answer);

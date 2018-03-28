@@ -67,6 +67,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -150,6 +151,7 @@ export RiskwiseMainSDBO := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
+	'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -243,22 +245,29 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
 boolean   isUtility := false;
 boolean   ln_branded := false;
-boolean   ofac_only := true;
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 boolean   suppressNearDups := true;
 boolean   require2Ele := true;
 
 tribcode := StringLib.StringToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['ex24', 'ex98'];
 
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
+
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	self.servicename := le.servicename;
 	self.url := map(tribcode='b2bz' and le.servicename in ['targus', 'attus'] => le.url,  //b2bz uses targus gateway and attus gateway
 				 tribcode in ['b2b2','ex24','ex41','ex98'] and le.servicename='targus' => le.url,  // these use the targus gateway
+         tribcode in ['b2b2','b2bc','ex24','ex98','b2b4'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
 				 ''); // default to no gateway call			 
 	self := le;
 END;
 gateways := project(gateways_in, gw_switch(left));
 
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 d := dataset([{0}],RiskWise.Layout_SD5I);
 
@@ -336,7 +345,8 @@ final_seed := if(runSeed_value, riskwise.seedSDBO(tribcode, socs_value, account_
 				
 ret := if(tribcode in ['b2b2', 'b2bz', 'b2bc', 'ex24', 'ex41', 'ex98', 'b2b4'], 
 		if(count(final_seed)>0 and runSeed_value, final_seed, 
-		RiskWise.SDBO_Function(f, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, tribcode,DataRestriction, DataPermission)),
+		RiskWise.SDBO_Function(f, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, tribcode, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold, 
+                           DataRestriction, DataPermission)),
 		dataset([{0,'', account_value}], riskwise.Layout_SDBO));
 
 dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');

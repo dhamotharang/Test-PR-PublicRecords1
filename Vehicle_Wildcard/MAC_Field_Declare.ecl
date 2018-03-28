@@ -1,5 +1,5 @@
-export MAC_Field_Declare := MACRO
-import VehicleV2_Services;
+﻿export MAC_Field_Declare := MACRO
+import VehicleV2_Services, ut;
 // We can't call Doxie.MAC_Header_Field_Declare because of a conflict with the type of the "Zip"
 // input, so we need to recreate (with small changes) a few of its entries here...
 string30	vin_val									:= ''			: stored('VIN');
@@ -130,12 +130,12 @@ integer modelYearEnd_use := (INTEGER)_modelYearEnd : STORED('modelYearEnd_use');
 STRING8 _ageRangeStart := '' : stored('AgeLower');
 integer ageRangeStart_ := IF(LENGTH(TRIM(_ageRangeStart)) < 4, 
 								(INTEGER)_ageRangeStart,
-								(INTEGER)ut.GetAge(_ageRangeStart));
+								(INTEGER)ut.Age((UNSIGNED4)_ageRangeStart));
 
 STRING8 _ageRangeEnd := '' : stored('AgeHigher');
 integer ageRangeEnd_ := IF(LENGTH(TRIM(_ageRangeEnd)) < 4,
 							  (INTEGER)_ageRangeEnd,
-							  (INTEGER)ut.GetAge(_ageRangeEnd));
+							  (INTEGER)ut.Age((UNSIGNED)_ageRangeEnd));
 
 integer ageRangeStart_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeStart_, ageRangeEnd_) : stored('ageRangeStart_use'); 
 integer ageRangeEnd_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeEnd_, ageRangeStart_) : stored('ageRangeEnd_use');

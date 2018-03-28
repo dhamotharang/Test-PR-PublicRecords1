@@ -1,5 +1,5 @@
-import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,ut,PhonesFeedback_Services,
-       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard;
+﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
+       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
@@ -8,7 +8,7 @@ doxie.MAC_Selection_Declare()
 
 con := ContactCard.constants;
 rec := ContactCard.layouts;
-std := ContactCard.storeds;
+storeds := ContactCard.storeds;
 
 export FinderRecords( 
 	dataset(doxie.layout_references) dids
@@ -18,7 +18,7 @@ MODULE
 shared subjectDIDs 	:= 	dids;
 shared subjectDID 		:= 	max(subjectDIDs, did);
 
-shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(ut.GetDate[1..4]);
+shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING)Std.Date.Today())[1..4]);
 
 //***** GET THE RELATIVES 
 //	depth is input to service and defaults to 1 by #stored('RelativeDepth',con.default_RelativeDepth) in ContactCard.ReportService,
@@ -30,7 +30,7 @@ shared allrel := Doxie_Raw.relative_raw(dids,dateVal,dppa_purpose,glb_purpose,ss
 // rel is the group that i will actually consider relatives in the final output
 // there are some refs to allrel because we use them to figure out some of the relationships						
 // note that depth>1 is allowed if newEnough 
-shared rel := allrel(depth=1 or newEnough((unsigned2)(recent_cohabit[1..4])));
+shared rel := allrel(depth=1 or newEnough((unsigned2)(((STRING)recent_cohabit)[1..4])));
 
 // this just removes the deceased
 shared relassocdids := join(rel, doxie.key_death_masterv2_ssa_did,
@@ -313,7 +313,7 @@ pa_ddp := ungroup(dedup(sort(group(sort(phoneaddr_cln, contact.did, phone.phone)
 														 if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen),
 												true));
 
-//***** KEEP STD.PHONESPERPERSON PHONES PER PERSON	
+//***** KEEP storeds.PHONESPERPERSON PHONES PER PERSON	
 rank_apt(boolean aptOff,typeof(wgong.listing_name) listing_name) :=
 	map(not aptOff => 0,
 			aptOff     => map(exists(con.ds_AptWords(stringlib.StringFind(listing_name, trim(word), 1) > 0)) => 1,
@@ -321,7 +321,7 @@ rank_apt(boolean aptOff,typeof(wgong.listing_name) listing_name) :=
 			0);
 
 pa_srt := dedup(sort(pa_ddp, contact.did, if(length(trim(phone.phone)) = 10, 0, 1), doxie.tnt_score(addr.tnt), -addr.dt_last_seen, rank_apt(phone.apartmentoffice,phone.listing_name), ut.StringSimilar100(phone.listing_name, contact.lname), ut.StringSimilar100(phone.listing_name, contact.fname)),
-								 contact.did, keep(std.PhonesPerPerson));
+								 contact.did, keep(storeds.PhonesPerPerson));
 
 
 boolean NoVerifiedHomeAddresses := not exists(pa_srt(addr.verified and contact.did = subjectDID));
@@ -329,7 +329,7 @@ boolean NoVerifiedHomeAddresses := not exists(pa_srt(addr.verified and contact.d
 //***** PHONES + 
 checkRNA := header.constants.checkRNA;
 ipp := Include_PhonesPlus_val;
-ipprna := std.IncludePhonesPlus_for_RNA;
+ipprna := storeds.IncludePhonesPlus_for_RNA;
 
 //get PP data for input subject only:
 ophones := if(ipp, moxie_phonesplus_server.phonesplus_did_records(dids(ipp), con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,con.min_PhonesPlusConfidencescore,true).w_timezoneSeenDt);
@@ -345,7 +345,7 @@ ophones_rna_grpd := group(dedup(sort(ophones_rna,did,phoneno,-last_seen,-first_s
 ophones_rna_chsn := topn(ophones_rna_grpd,con.max_phonesplus,did,-last_seen,record);
 
 // for neighbors we pull addresses from header, for others from Phones+
-// Instead of populating the cell phone address in the neighborâ€™s address results, populate the address used to identify person as a neighbor of the subject (based on up to 3-month-old addresses from header).
+// Instead of populating the cell phone address in the neighbors address results, populate the address used to identify person as a neighbor of the subject (based on up to 3-month-old addresses from header).
 oph_rna := join(ungroup(ophones_rna_chsn),nbrAddrDIDs, (unsigned6)left.did=right.did, transform(rec.contact_phone_addr_rec_ext, 
 												 self.phone.phone := left.phoneno,
 												 self.phone.listing_name := left.listed_name,
@@ -395,7 +395,7 @@ wphones_chsn := join(wphones_chsn1,head_roll2,
 
 //***** RELO PHONES
 relo_chsn := if(con.IncludeRelocation and NoVerifiedHomeAddresses and not SubjectIsDeceased, 
-							  choosen(Relocations.wdtg.get_gong_by_did(subjectDID,,std.targetRadius,std.maxDaysBefore,std.maxDaysAfter), con.max_Relocation));
+							  choosen(Relocations.wdtg.get_gong_by_did(subjectDID,,storeds.targetRadius,storeds.maxDaysBefore,storeds.maxDaysAfter), con.max_Relocation));
 
 
 //***** POPULATE PRIORITY AND REACHME	
@@ -532,7 +532,7 @@ ut.getTimeZone(wb_w_tzone,addr.phone,addr.timezone,wb_w_tzone2)
 ut.getTimeZone(wb_w_tzone2,addr.listed_phone,addr.listed_timezone,wb_w_tzones)
 
 //***** SORT AND ROLLUP
-fr_srt_w_tzone := sort(wb_w_tzones(priority <= con.priority_subject or priority = con.priority_WorkPhone or phone.phone <> '' or std.IncludeNonSubjectPhonelessAddresses), 
+fr_srt_w_tzone := sort(wb_w_tzones(priority <= con.priority_subject or priority = con.priority_WorkPhone or phone.phone <> '' or storeds.IncludeNonSubjectPhonelessAddresses), 
 							 addr.prim_range, addr.prim_name, addr.zip, 
 							 -if(priority in con.set_restricted_for_rollup, 10 + priority, priority), //push them to the bottom, so "thru family" may merge into "at home", etc.
 							 contact.did,

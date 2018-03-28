@@ -127,8 +127,9 @@ EXPORT SmallBusiness_BIP_20_Batch_Service() := FUNCTION
 																														DisableIntermediateShellLogging := TRUE /* Always Turn Off Intermediate Shell Logging in Batch */,
 																														IncludeTargusGateway := IncludeTargusGateway,
 																														RunTargusGateway := RunTargusGateway, /* for testing purposes only */
-																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Batch_Service
-																														);
+																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Batch_Service,
+																														AppendBestsFromLexIDs := TRUE                         
+);
 
 	SBA_Results := PROJECT( SBA_Results_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
 

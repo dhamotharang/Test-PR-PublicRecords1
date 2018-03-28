@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FocusSearchService">
   <part name="FocusSearch" type="xsd:string" rows="7" cols="40" />
   <part name="FocusDocIDs" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -45,9 +45,9 @@ info := Text_Search.FileName_Info_Instance(stem, srcType, qual);
 // Define alert info
 AlertInfo := Text_Search.Alert_Info.SetAlertParams(con.dateSegName,con.alertSWDays,'',isAlert);
 
-fdocs1 := project(in_corpkeys, TRANSFORM(Text_Search.Layout_ExternalKey, SELF.ExternalKey := LEFT.corp_key));
-fdocs2 := project(in_corpkeys, TRANSFORM(Text_Search.Layout_ExternalKey,SELF := LEFT));
-fdocs := DEDUP(SORT(fdocs1+fdocs2(ExternalKey != ''),ExternalKey),ExternalKey);
+fdocs1 := project(in_corpkeys(corp_key != ''), TRANSFORM(Text_Search.Layout_ExternalKey, SELF.ExternalKey := LEFT.corp_key));
+fdocs2 := project(in_corpkeys(ExternalKey != ''), TRANSFORM(Text_Search.Layout_ExternalKey,SELF := LEFT));
+fdocs := DEDUP(SORT(fdocs1+fdocs2,ExternalKey),ExternalKey);
 	
 fs := Text_Search.Focus_Search_Module(info,focusString,TRUE,,,MaxDocs,,,fdocs,AlertInfo);
 

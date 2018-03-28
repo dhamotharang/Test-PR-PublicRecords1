@@ -26,7 +26,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	// ------                                                                       ------
 	ReportingBureausChildDatasetLayout    := RECORD
 	 unsigned2                      seq;                                           //*  This is the seqence number of the parent   
-	 DATASET(iesp.duediligencereport.t_DDRReportingSources) ReportingBureausChild;
+	 DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) ReportingBureausChild;
 	END;
 	
 	// ------                                                                        ------
@@ -34,16 +34,16 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, 
+	iesp.duediligencebusinessreport.t_DDRReportingSources  FormatTheListOfRepBur(ListOfBusSources le, Integer bureauCount) := TRANSFORM, 
 	                              SKIP(bureauCount > iesp.constants.DDRAttributesConst.MaxReportingBureaus)
 																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)le.firstreported[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)le.firstreported[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)le.lastreported[1..4];
-																															SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
+																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
+																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
+																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
+																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
+																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
+																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
 			                            SELF                                  := [];
 				                     END;  
 	 
@@ -61,10 +61,10 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ created child dataset on the RIGHT.                                    ------
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedData(BusnData le, BusReportBureauDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfBureauReporting       := le.creditSrcCnt; 
+												     SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfBureauReporting       := le.creditSrcCnt; 
 									
 														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingBureaus     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingBureaus  + ri.ReportingBureausChild;
+																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus  + ri.ReportingBureausChild;
 																	SELF := le;
 				  											END; 
 																	
@@ -97,7 +97,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	// ------                                                                       ------
 	BusinessShellChildDatasetLayout    := RECORD
 	 unsigned2                      seq;                                           //*  This is the seqence number of the parent   
-	 DATASET(iesp.duediligencereport.t_DDRReportingSources) BusShellSourceChild;
+	 DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) BusShellSourceChild;
 	END;
 	
 	// ------                                                                        ------
@@ -105,15 +105,15 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
  // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
 	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRReportingSources  FormatTheListOfBusShellSource(ListOfBusSources le, Integer BSSourceCount) := TRANSFORM, SKIP(BSSourceCount > iesp.constants.DDRAttributesConst.MaxReportingSources)
+	iesp.duediligencebusinessreport.t_DDRReportingSources  FormatTheListOfBusShellSource(ListOfBusSources le, Integer BSSourceCount) := TRANSFORM, SKIP(BSSourceCount > iesp.constants.DDRAttributesConst.MaxReportingSources)
 																															SELF.SourceName                       := le.source;                      
 																															SELF.SourceType                       := le.sourceType;
-																															SELF.FirstReported.Year               := (unsigned4)le.firstreported[1..4];  //YYYY
-																															SELF.FirstReported.Month              := (unsigned2)le.firstreported[5..6];  //MM
-																															SELF.FirstReported.Day                := (unsigned2)le.firstreported[7..8];  //DD
-																															SELF.LastReported.Year                := (unsigned4)le.lastreported[1..4];
-																															SELF.LastReported.Month               := (unsigned2)le.lastreported[5..6];
-																															SELF.LastReported.Day                 := (unsigned2)le.lastreported[7..8]; 
+																															SELF.FirstReported.Year               := (unsigned4)((STRING)le.firstreported)[1..4];  //YYYY
+																															SELF.FirstReported.Month              := (unsigned2)((STRING)le.firstreported)[5..6];  //MM
+																															SELF.FirstReported.Day                := (unsigned2)((STRING)le.firstreported)[7..8];  //DD
+																															SELF.LastReported.Year                := (unsigned4)((STRING)le.lastreported)[1..4];
+																															SELF.LastReported.Month               := (unsigned2)((STRING)le.lastreported)[5..6];
+																															SELF.LastReported.Day                 := (unsigned2)((STRING)le.lastreported)[7..8]; 
 			                            SELF                                  := [];
 				                     END;  
 	 
@@ -131,10 +131,10 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
  // ------ created child dataset on the RIGHT.                                    ------
 	// ------                                                                        ------
 	  DueDiligence.Layouts.Busn_Internal CreateNestedBSData(UpdateBureauSourcesInReport le, BusShellSourceDataset ri, Integer BRBCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.NumberOfSourcesReporting       := le.nonCreditSrcCnt; 
+												     SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfSourcesReporting       := le.nonCreditSrcCnt; 
 									
 														   //***                                                                                          ReportingBureaus is the NESTED CHILD DATASET  
-																 SELF.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingSources     := le.BusinessReport.BusinessAttributeDetails.OperatingAttributeDataDetails.BusinessInformation.ReportingSources  + ri.BusShellSourceChild;
+																 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingSources     := le.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingSources  + ri.BusShellSourceChild;
 																	SELF := le;
 				  											END; 
 																	

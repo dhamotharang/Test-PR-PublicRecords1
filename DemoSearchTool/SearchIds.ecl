@@ -31,10 +31,12 @@ EXPORT SearchIds :=
       FUNCTION
 
         // The indexes created for this project were built as one part indexes and contain only  a small
-        // amount of PRTE data. Hence, even with multiple keyed fields, performance shouldn't be an issue.    
+        // amount of PRTE data. Hence, even with multiple keyed fields, performance shouldn't be an issue. 
+        // Due to a key issue, the isFCRA for legacy biz isn't being used and all Legacy Biz key joins  
+        // going forward will be for FCRA = FALSE (3/2018)
         ds_LegacyIds :=     
           JOIN(ds_in, DemoSearchTool.Keys.businesses_bdid,
-               KEYED(LEFT.isFCRA = RIGHT.isFCRA AND
+               KEYED(RIGHT.isFCRA = FALSE AND
                      DemoSearchTool.Macros.mac_JoinBizKeys()),
                TRANSFORM(DemoSearchTool.Layouts.Ids_rec,
                          SELF.BDID  := RIGHT.BDID,
@@ -44,7 +46,6 @@ EXPORT SearchIds :=
 
         RETURN ds_LegacyIds; 
       END;
-
 
     EXPORT fn_getBipOnlyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in ) := 
       FUNCTION
@@ -65,7 +66,6 @@ EXPORT SearchIds :=
         RETURN ds_BipIds;
       END;
     
-
       EXPORT fn_getDtcOnlyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in) := 
         FUNCTION
             
@@ -83,7 +83,6 @@ EXPORT SearchIds :=
           RETURN  ds_DtcKeyIds;   
         END;
        
-
       EXPORT fn_getPeopleOnlyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in ) := 
           FUNCTION
           
@@ -101,7 +100,6 @@ EXPORT SearchIds :=
                 
           RETURN  ds_PeoplekeyIds;   
         END;           
-
 
       // get DTC IDs for joining with Legacy IDs later
       EXPORT fn_getDtcForLegacyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in) := 
@@ -128,7 +126,6 @@ EXPORT SearchIds :=
           RETURN  ds_DtcKeyIds;   
         END;
        
-
       // get People IDs for joining with Legacy IDs later
       EXPORT fn_getPeopleForLegacyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in) := 
           FUNCTION
@@ -155,7 +152,6 @@ EXPORT SearchIds :=
           RETURN  ds_PeoplekeyIds;   
         END;  
         
-
       // get DTC IDs for joining with BIP IDs later
       EXPORT fn_getDtcForBipIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in) := 
         FUNCTION
@@ -183,7 +179,6 @@ EXPORT SearchIds :=
           RETURN  ds_DtcKeyIds;   
         END;
        
-
       // get People IDs for joining with BIP IDs later
       EXPORT fn_getPeopleForBipIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in ) := 
           FUNCTION
@@ -210,8 +205,7 @@ EXPORT SearchIds :=
                 
           RETURN  ds_PeoplekeyIds;   
         END;  
- 
-    
+
     // get Legacy Business IDs for combined search after the 
     // DIDs (and bdid child dataset) has been gleaned from the person/DTC key
     EXPORT fn_getCombinedLegacyIds(DATASET(DemoSearchTool.Layouts.combinedTemp_rec) ds_PerIdsWithBizCounts) := 
@@ -235,10 +229,12 @@ EXPORT SearchIds :=
 
         // The indexes created for this project were built as one part indexes and contain only  a small
         // amount of PRTE data. Hence, even with multiple keyed fields, performance shouldn't be an issue.    
+        // Due to a key issue, the isFCRA for legacy biz isn't being used and all Legacy Biz key joins  
+        // going forward will be for FCRA = FALSE (3/2018)
         ds_combinedBdidIds := 
           JOIN(ds_perIds_withBizCountsBdid_norm, DemoSearchTool.Keys.combined_biz_bdid, 
             KEYED(LEFT.bdid = RIGHT.bdid AND
-                  LEFT.isFCRA = RIGHT.isFCRA AND 
+                  RIGHT.isFCRA = FALSE AND 
                   DemoSearchTool.Macros.mac_JoinBizKeys()),
                   TRANSFORM(DemoSearchTool.Layouts.Ids_rec,
                             SELF.BDID   := RIGHT.BDID,
@@ -249,7 +245,6 @@ EXPORT SearchIds :=
 
         RETURN ds_combinedBdidIds;
       END;
- 
 
     // get BIP Business IDs for combined search after the 
     // DIDs (and LinkIds child dataset) has been gleaned from the person/DTC key
