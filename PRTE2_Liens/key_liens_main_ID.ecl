@@ -63,13 +63,25 @@ END;
 get_recs_newLayout			:=	PROJECT(get_recs,
 															TRANSFORM(new_layout_liens_main,
 																SELF.bCBFlag	:=	FALSE;
-																SELF					:=	LEFT;
+															  Self.Filing_Type_ID  :=       '';
+                                Self.Collection_Date :=       '';
+                                Self.CaseLinkID      :=       '';
+                                Self.TMSID_old       :=       '';
+                                Self.RMSID_old       :=       '';
+                                Self.CaseLinkID_Prop_Flag :=  FALSE;
+																SELF			          	:=	LEFT;
 															)
 														);
 get_recs_newLayout_FCRA	:=	PROJECT(get_recs,
 															TRANSFORM(new_layout_liens_main,
 																SELF.bCBFlag	:=	TRUE;
-																SELF					:=	LEFT;
+																Self.Filing_Type_ID  :=       '';
+                                Self.Collection_Date :=       '';
+                                Self.CaseLinkID      :=       '';
+                                Self.TMSID_old       :=       '';
+                                Self.RMSID_old       :=       '';
+                                Self.CaseLinkID_Prop_Flag :=  FALSE;
+																SELF					       :=	LEFT;
 															)
 														);
 														
