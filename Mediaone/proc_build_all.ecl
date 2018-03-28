@@ -1,7 +1,7 @@
 IMPORT _control,ut,RoxieKeyBuild;
 
 EXPORT proc_build_all(STRING version,STRING torun='ALL') := FUNCTION
-  #workunit('name', 'Mediaone build')
+  #workunit('name', 'Yogurt: Mediaone build')
 	
   ut.mac_sf_buildprocess(Mediaone.proc_build_base(version),'~thor::base::mediaone',buildnewbasefile,3,,true);
 	
