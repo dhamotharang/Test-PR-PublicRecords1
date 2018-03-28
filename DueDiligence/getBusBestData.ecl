@@ -91,7 +91,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 										LEFT OUTER);
 										
 										
-	addReportData := IF(includeReport, DueDiligence.reportBestBusInfo(bestData), bestData);							
+	//addReportData := IF(includeReport, DueDiligence.reportBestBusInfo(bestData), bestData);							
 	
 
 	// OUTPUT(busInfo, NAMED('busInfo'));
@@ -102,6 +102,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	// OUTPUT(addReportData, NAMED('addReportData'));
 	
 
-	RETURN addReportData;
+	//RETURN addReportData;
+	RETURN bestData;
 	
 END;
