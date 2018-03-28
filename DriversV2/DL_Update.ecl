@@ -3,8 +3,9 @@
 //EXPORT DL_Update := 'todo';
 
 dNonExperianDLs := 	DriversV2.File_DL_Input_Mappers  //* All DL states mapped to a common layout (DriversV2.Layout_DL_Extended) - AS_DL_Mappers
-									+	DriversV2.File_DL_Extended(source_code not in ['AX','CY']) // filtering experian & Certegy records from the base, so they get added back again. 
-									+ project(DriversV2.File_DL_Restricted, transform(DriversV2.Layout_DL_Extended,self :=left));			
+										// filtering experian & Certegy records from the base, so they get added back again. And blanking the appended ssn's for base records
+									+	project(DriversV2.File_DL_Extended(source_code not in ['AX','CY']), transform(DriversV2.Layout_DL_Extended, self.ssn := '', self :=left)) 
+									+ project(DriversV2.File_DL_Restricted, transform(DriversV2.Layout_DL_Extended, self.ssn = '', self :=left));			
  
  
 // Adding in Experian records below!
@@ -210,7 +211,7 @@ dCombinedDLs_w_province := project(dCombinedDLs2, trfTOFixProvince(left));
 dist := distribute(dCombinedDLs_w_province, hash(orig_state, dl_number));
 srtd := sort(dist,orig_state,dl_number,name,addr1,city,state,zip,dob,race,sex_flag,license_type,
     attention_flag,dod,restrictions,orig_expiration_date,orig_issue_date,lic_issue_date,
-    expiration_date,active_date,inactive_date,lic_endorsement,motorcycle_code,ssn,age,
+    expiration_date,active_date,inactive_date,lic_endorsement,motorcycle_code,ssn_safe,age,
     privacy_flag,driver_edu_code,dup_lic_count,rcd_stat_flag,height,hair_color,eye_color,weight,
     oos_previous_dl_number,oos_previous_st,status,issuance,address_change,name_change,dob_change,
     sex_change,old_dl_number,dl_key_number, 
@@ -289,7 +290,7 @@ ddpd := rollup(srtd,
     left.inactive_date = right.inactive_date and
     left.lic_endorsement = right.lic_endorsement and
     left.motorcycle_code = right.motorcycle_code and
-    left.ssn = right.ssn and
+    left.safe_ssn = right.safe_ssn and
     left.age = right.age and
     left.privacy_flag = right.privacy_flag and
     left.driver_edu_code = right.driver_edu_code and
@@ -344,10 +345,10 @@ res := iterate(rlup_same_grp,make_hist(left,right) ) + ddpd(history = 'E') + Cer
 
 dis_res := distribute(group(res), hash64(orig_state, source_code, name, addr1, city, state, zip, dob, dl_number));
 
-srt_dis_res := sort(dis_res, orig_state, source_code, did,  history, name, addr1, city, state, zip, province, county, postal_code,
+srt_dis_res := sort(dis_res, orig_state, source_code, history, name, addr1, city, state, zip, province, county, postal_code,
                     dob, race, sex_flag, license_class, license_type, moxie_license_type, attention_flag, dod, restrictions, restrictions_delimited,
 					orig_expiration_date, orig_issue_date, lic_issue_date, expiration_date, active_date, inactive_date, lic_endorsement,
-					motorcycle_code, dl_number, ssn, ssn_safe, age, privacy_flag, driver_edu_code, dup_lic_count, rcd_stat_flag, height, 
+					motorcycle_code, dl_number, ssn_safe, age, privacy_flag, driver_edu_code, dup_lic_count, rcd_stat_flag, height, 
 					hair_color, eye_color, weight, oos_previous_dl_number, oos_previous_st, title, fname, mname, lname, name_suffix, cleaning_score,
 					addr_fix_flag, prim_range, predir, prim_name, suffix, postdir, unit_desig, sec_range, p_city_name, v_city_name, st, zip5, zip4,
 	                cart, cr_sort_sz, lot, lot_order, dpbc, chk_digit, rec_type, ace_fips_st, county, geo_lat, geo_long, msa, geo_blk, geo_match,

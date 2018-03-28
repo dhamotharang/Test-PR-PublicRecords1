@@ -60,7 +60,7 @@ export OH_as_DL (dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned) in_file):
 	  self.zip              				:= le.pigzip[1..5];
 	  self.dob              				:= (unsigned8)le.pidd01;
 	  self.dod              				:= le.piddod;
-	  self.ssn              				:= Map_Signed_Field(le.pinss4);
+	  self.ssn_safe              		:= Map_Signed_Field(le.pinss4); //** vendor provided ssn is mapped to ssn_safe fields
 	  self.sex_flag         				:= le.picsex;
 	  self.hair_color       				:= le.pichcl;
 	  self.eye_color        				:= le.picecl;
