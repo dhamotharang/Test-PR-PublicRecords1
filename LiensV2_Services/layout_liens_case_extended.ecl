@@ -8,4 +8,6 @@ export layout_liens_case_extended := RECORD
 	typeof(BatchShare.Layouts.ShareAcct.acctno) acctno := '';
 	string agency_state :='';   // bug 34534 -- needed for additional jurisdictional filtering
 	Boolean bcbflag := false;
+	string case_link_id := '';
+	unsigned case_link_priority := 0;
 end;

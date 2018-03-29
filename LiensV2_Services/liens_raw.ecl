@@ -312,13 +312,14 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided) := function
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided, 
+										boolean rollup_by_case_link = false) := function
 			
 			tmsidsgrpd	:=	group(sort(in_tmsids,acctno,tmsid),acctno);
 		
 		  return liensv2_services.fn_get_liens_tmsid(tmsidsgrpd,in_ssn_mask_type,IsFCRA,in_filing_jurisdiction, 
 																								  person_filter_id,return_multiple_pages,appType,includeCriminalIndicators,
-																									ds_slim_pc,inFFDOptionsMask,FCRAPurpose);
+																									ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
 		end;	
 		
 	  // Returns the liens data in the report summary view using TMSIDs as a lookup mechanism.
@@ -332,11 +333,12 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function						
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided, 
+										boolean rollup_by_case_link = false ) := function						
 			return ungroup(by_tmsid_batch(group(sorted(in_tmsids, acctno), acctno),in_ssn_mask_type,
 			                                IsFCRA,in_filing_jurisdiction,person_filter_id, 
 											                return_multiple_pages,appType,includeCriminalIndicators, 
-											                ds_slim_pc,inFFDOptionsMask,FCRAPurpose));
+											                ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
 		end;	
  	
    	  // Batch - Returns the liens data in the report summary view using DIDs as a lookup mechanism.
@@ -348,10 +350,11 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
 									  integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided, 
+										boolean rollup_by_case_link = false ) := function
    		  return by_tmsid_batch(get_tmsids_from_dids_batch(in_dids, IsFCRA, in_party_type),
 				                        in_ssn_mask_type,IsFCRA,'','',false,appType,includeCriminalIndicators,
-																ds_slim_pc,inFFDOptionsMask,FCRAPurpose);
+										ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
    		end;
 
 	
@@ -364,11 +367,12 @@ export liens_raw := module
                   boolean includeCriminalIndicators=false,
 									DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
 									integer8 inFFDOptionsMask = 0,
-									integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function
+									integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided, 
+									boolean rollup_by_case_link = false ) := function
       ds_batch := group(sorted(project(in_dids, doxie.layout_references_acctno), acctno), acctno);
 		  return ungroup(by_did_batch(ds_batch,in_ssn_mask_type,IsFCRA,in_party_type,
 			                              appType,includeCriminalIndicators,ds_slim_pc,
-																	  inFFDOptionsMask,FCRAPurpose));
+										  inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
 		end;
 	
 		
@@ -380,9 +384,10 @@ export liens_raw := module
 									 string32 appType,
                    boolean includeCriminalIndicators=false,
 									 DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
-									 integer8 inFFDOptionsMask = 0) := function
+									 integer8 inFFDOptionsMask = 0, 
+									 boolean rollup_by_case_link = false) := function
 		  return by_tmsid(get_tmsids_from_bdids(in_bdids,in_limit,in_party_type),in_ssn_mask_type,false,'','',
-			                            false,appType,includeCriminalIndicators,ds_slim_pc,inFFDOptionsMask);
+			              false,appType,includeCriminalIndicators,ds_slim_pc,inFFDOptionsMask,,rollup_by_case_link);
 		end;
 		
 	end;
