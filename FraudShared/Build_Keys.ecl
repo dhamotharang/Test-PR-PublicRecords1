@@ -46,6 +46,7 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.BankRoutingNumber.New'								,BuildBankRoutingNumberKey					);
 	tools.mac_WriteIndex('TheKeys.Main.BankName.New'												,BuildBankNameKey										);
 	tools.mac_WriteIndex('TheKeys.Main.Isp.New'															,BuildIspKey												);
+	tools.mac_WriteIndex('TheKeys.Main.IPRange.New'													,BuildIPRangeKey										);
 	
 	VersionControl.macBuildNewLogicalKeyWithName(Get_Key_LinkIds.Key	,keynames(pversion,false).Main.LinkIds.new, BuildLinkIdsKey);
 													  
@@ -89,6 +90,7 @@ export Build_Keys(
 			,If(Platform.Source = 'FraudGov'  ,BuildBankRoutingNumberKey)
 			,If(Platform.Source = 'FraudGov'  ,BuildBankNameKey)
 			,If(Platform.Source = 'FraudGov'  ,BuildIspKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildIPRangeKey)
 		 )
 		,Promote(pversion).buildfiles.New2Built
 	);
