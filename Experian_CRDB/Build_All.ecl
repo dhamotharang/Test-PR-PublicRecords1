@@ -1,4 +1,4 @@
-﻿import ut, VersionControl, tools, _control, Orbit3;
+﻿import ut, VersionControl, tools, _control, Orbit3, Scrubs, std, Scrubs_Experian_CRDB;
 
 export Build_All(  string													fileDate
                   ,string													pversion
@@ -16,7 +16,8 @@ export Build_All(  string													fileDate
 													 ,Promote().Inputfiles.using2used
 													 ,Promote().Buildfiles.Built2QA
 													 ,QA_Record_Samples()
-													 ,Orbit3.proc_Orbit3_CreateBuild ('Experian_CRDB',pversion,'N');
+													 ,Orbit3.proc_Orbit3_CreateBuild ('Experian_CRDB',pversion,'N')
+													 ,Scrubs.ScrubsPlus('Experian_CRDB','Scrubs_Experian_CRDB','Scrubs_Experian_CRDB_Base', 'Base', pVersion,Experian_CRDB.Email_Notification_Lists().Stats,false)
 												  ) : success(Send_Emails(pversion,,not pIsTesting).Roxie),
 														  failure(send_emails(pversion,,not pIsTesting).buildfailure);
 													
