@@ -5,7 +5,7 @@
 dNonExperianDLs := 	DriversV2.File_DL_Input_Mappers  //* All DL states mapped to a common layout (DriversV2.Layout_DL_Extended) - AS_DL_Mappers
 										// filtering experian & Certegy records from the base, so they get added back again. And blanking the appended ssn's for base records
 									+	project(DriversV2.File_DL_Extended(source_code not in ['AX','CY']), transform(DriversV2.Layout_DL_Extended, self.ssn := '', self :=left)) 
-									+ project(DriversV2.File_DL_Restricted, transform(DriversV2.Layout_DL_Extended, self.ssn = '', self :=left));			
+									+ project(DriversV2.File_DL_Restricted, transform(DriversV2.Layout_DL_Extended, self.ssn := '', self :=left));			
  
  
 // Adding in Experian records below!
@@ -290,7 +290,7 @@ ddpd := rollup(srtd,
     left.inactive_date = right.inactive_date and
     left.lic_endorsement = right.lic_endorsement and
     left.motorcycle_code = right.motorcycle_code and
-    left.safe_ssn = right.safe_ssn and
+    left.ssn_safe = right.ssn_safe and
     left.age = right.age and
     left.privacy_flag = right.privacy_flag and
     left.driver_edu_code = right.driver_edu_code and
