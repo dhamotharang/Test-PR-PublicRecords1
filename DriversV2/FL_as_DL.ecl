@@ -40,6 +40,7 @@ DriversV2.Layout_DL_Extended from_upd(upd le) := transform
   self.mname                    := if (trim(le.mname,left,right) in bad_names + bad_mnames, '', le.mname);
   self.attention_flag           := trim(le.attention_flag, left, right);
   self.issuance                 := '';
+	self.ssn_safe                 := trim(le.ssn, left, right); //** vendor provided ssn is mapped to ssn_safe fields
   self                          := le;
 end;
 
