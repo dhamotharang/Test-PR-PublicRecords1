@@ -44,7 +44,7 @@
 					
 					BusinessInstantID20_Services.Macros.mac_AppendAddrData() // cleaned
 					
-					SELF.SSN                := IF(LENGTH(_Clean_SSN) != 9 OR (INTEGER)_Clean_SSN <= 0, '', _Clean_SSN); // Filter out SSN's that aren't 9-Bytes, or are repeating 0's
+					SELF.SSN                := IF(LENGTH(_Clean_SSN) NOT IN [4, 9] OR (INTEGER)_Clean_SSN <= 0, '', _Clean_SSN); // Filter out SSN's that aren't 4 or 9-Bytes, or are repeating 0's
 					SELF.DateOfBirth        := _Clean_dob;
 					SELF.Age                := _Clean_age;
 					SELF.DLNumber           := _Clean_dl_num;
