@@ -18,19 +18,28 @@ export Keys(
 					Layouts_Key.Main;
 					string20 Bank_Routing_Number; 		
 					end;
-											
-	Shared BaseMain_HostUser 							:= Project(pFileKeybuild
+					
+	shared  layout_iprange :=record,maxlength(60000) //only used for ip range indexing & will not be part of shared layout. GRP-446
+					Layouts_Key.Main;
+					unsigned1	octet1;
+					unsigned1	octet2;
+					unsigned1	octet3;
+					unsigned1	octet4;
+					end;										
+	
+	shared BaseMain           						:= Project(pFileKeybuild, Transform(Layouts_key.Main
+																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
+																									,self.customer_person_id :=(unsigned6)left.customer_person_id ////temporary fix until new layouts released to keys 03/16/2018.
+																									,self					:=left)
+																									);
+																									
+	Shared BaseMain_HostUser 							:= Project(BaseMain
 																						,Transform(layout_hostuser 
 																							,self.hash64_host		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,1))),0)
 																							,self.hash64_user		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,2))),0)
 																							,self:=left)
 																							);
-																
-  shared BaseMain           						:= Project(pFileKeybuild, Transform(Layouts_key.Main
-																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
-																									,self					:=left)
-																									);
-																									
+																																								
   shared BaseMain_RoutingNumber					:= dedup(table(Normalize(BaseMain(Bank_Routing_Number_1<>'' or Bank_Routing_Number_2<>'')
 																									,2
 																									,Transform(layout_bankrouting
@@ -45,7 +54,7 @@ export Keys(
 																											,self:=left)
 																											,left outer),all); 		
   																												
-	Export BankNames_JSON									:= Dedup(Table(BaseMain_BankNamePrep(Bank_Name<>''),{Bank_Name},few),all); 																																	
+	Export BankNames_JSON									:= Dedup(Table(BaseMain_BankNamePrep(Bank_Name<>''),{Bank_Name},few),all); 	//Json file for webteam GRP_518																																
 	
 	//ISP Begin
 	
@@ -71,10 +80,28 @@ export Keys(
 																								,self.isp :=trim(left.isp_name,left,right)
 																								,self:=right),right outer,local);
   
-	Export Isp_JSON												:= Table(BaseIsp_FromIPKey,{Isp},Isp,few,merge);												
+	Shared BaseMain_IspPrep								:= Project(BaseIsp_Tbl(isp<>'') + BaseIsp_FromIPKey(isp<>''), Transform(recordof(BaseIsp_Tbl)-[ip_address],self:=left));
+	
+	Export Isp_JSON												:= Table(BaseMain_IspPrep,{Isp},Isp,few,merge);	//Json file for webteam GRP_519										
 																									
 // ISP End
 
+//Ip Range Begin 
+
+ layout_iprange triprange(BaseMain l) := transform
+				octets := Std.Str.SplitWords(l.ip_address,'.');
+				self.octet1	:= (unsigned1)octets[1];
+				self.octet2	:= (unsigned1)octets[2];
+				self.octet3	:= (unsigned1)octets[3];
+				self.octet4	:= (unsigned1)octets[4];
+				self:=l;
+			end;	
+	
+	shared BaseMain_IPRangePrep						:= Project(BaseMain(Ip_address<>'',IP_address<>'0.0.0.0'),triprange(left));
+
+// Ip Range End
+
+	
 	shared pFileKeyFDNMasterID     				:= File_FDNMasterIDBuild.FDNMasterID;
   shared pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
 	shared pFileKeyFDNMasterIDIndTypIncl 	:= File_FDNMasterIDBuild.FdnmasterIdIndTypIncl;
@@ -104,7 +131,8 @@ export Keys(
 	shared BaseMain_AmountPaid						:= BaseMain(Amount_Paid != '');
 	shared BaseMain_BankRoutingNumber			:= BaseMain_RoutingNumber(Bank_Routing_Number != '');
 	shared BaseMain_BankName							:= BaseMain_BankNamePrep(Bank_Name != '');
-	shared BaseMain_ISP										:= Project(BaseIsp_Tbl(isp<>'') + BaseIsp_FromIPKey(isp<>''), Transform(recordof(BaseIsp_Tbl)-[ip_address],self:=left));
+	shared BaseMain_ISP										:= BaseMain_IspPrep;
+	shared BaseMain_IPRange								:= BaseMain_IPRangePrep;
 	shared BaseMain_CustomerProgram				:= BaseMain(classification_permissible_use_access.ind_type_description != '');
 	shared MbsIndTypExclusion      				:= project(Files().Input.MbsIndtypeExclusion.Sprayed,FraudShared.Layouts_Key.MbsindtypeExclusion)(status=1);  
 	shared MbsProdutInclude        				:= project(Files().Input.MbsProductInclude.Sprayed,FraudShared.Layouts_Key.MbsProductInclude)(status=1);  
@@ -143,6 +171,7 @@ export Keys(
 	tools.mac_FilesIndex('BaseMain_BankRoutingNumber,{Bank_Routing_Number , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankRoutingNumber,BankRoutingNumber);		
 	tools.mac_FilesIndex('BaseMain_BankName,{Bank_Name , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankName,BankName);		
 	tools.mac_FilesIndex('BaseMain_ISP,{isp , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Isp,Isp);		
+	tools.mac_FilesIndex('BaseMain_IPRange,{octet1, octet2, octet3, octet4, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IPRange,IPRange);		
 	// MBS exclusions 
 	tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
 	tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);

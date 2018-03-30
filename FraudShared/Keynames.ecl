@@ -49,6 +49,7 @@ module
 		export BankRoutingNumber				:= tools.mod_FilenamesBuild(lTemplate('BankRoutingNumber'),pversion);
 		export BankName									:= tools.mod_FilenamesBuild(lTemplate('BankName'),pversion);
 		export ISP											:= tools.mod_FilenamesBuild(lTemplate('ISP'),pversion);
+		export IPRange									:= tools.mod_FilenamesBuild(lTemplate('IPRange'),pversion);
 				
 			
 		export dAll_filenames :=
@@ -88,7 +89,8 @@ module
 				If(Platform.Source = 'FraudGov'  ,AmountPaid.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'	 ,BankRoutingNumber.dAll_filenames) +
 				If(Platform.Source = 'FraudGov'	 ,BankName.dAll_filenames) +
-				If(Platform.Source = 'FraudGov'	 ,ISP.dAll_filenames);
+				If(Platform.Source = 'FraudGov'	 ,ISP.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'	 ,IPRange.dAll_filenames);
 		end;
 	
 		
