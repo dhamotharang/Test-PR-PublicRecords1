@@ -30,11 +30,11 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	
   //retrieve all names associated with the fein
   assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.Name, UNSIGNED4 dateLastSeen},
+                                                                        SELF.seq := LEFT.seq;
                                                                         SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                         SELF.orgID := LEFT.Busn_info.BIP_IDS.orgID.LinkID;
                                                                         SELF.seleID := LEFT.Busn_info.BIP_IDS.seleID.LinkID;
                                                                         SELF := RIGHT;
-                                                                        SELF := LEFT;
                                                                         SELF := [];));
 	
 	sortGroupAssocNames := GROUP(SORT(assocNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
@@ -51,7 +51,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
     SELF := [];
   END;
   
-  limitedNames := SORT(PROJECT(sortGroupAssocNames, getMaxAssociatedNamesByFein(LEFT, COUNTER)), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+  limitedNames := SORT(UNGROUP(PROJECT(sortGroupAssocNames, getMaxAssociatedNamesByFein(LEFT, COUNTER))), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
   
   rollNames := ROLLUP(limitedNames,
                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
@@ -94,7 +94,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
     SELF := [];
   END;
   
-  maxDBANames := PROJECT(sortDBANames, getMaxDBAs(LEFT, COUNTER));
+  maxDBANames := SORT(PROJECT(sortDBANames, getMaxDBAs(LEFT, COUNTER)), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
   
   rollDBANames := ROLLUP(maxDBANames,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 

@@ -1,5 +1,4 @@
-﻿
-IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data, Suppress;
+﻿IMPORT DueDiligence, iesp, Suppress;
 
 EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBusnCriminal, 
                              string6 DD_SSNMask,
@@ -141,7 +140,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
           SELF.Address.StreetSuffix   := LEFT.addr_suffix,
           SELF.Address.StreetPostDirection := LEFT.postdir,
           SELF.Address.UnitDesignation := LEFT.unit_desig,
-          SELF.Address.UnitNumber      := LEFT.sec_range,                   //***Does sec_range map to Unit Number?????
+          SELF.Address.UnitNumber      := LEFT.sec_range,     
           SELF.Address.StreetAddress1  := LEFT.streetAddress1,
           SELF.Address.StreetAddress2  := LEFT.streetAddress2,
           SELF.Address.City            := LEFT.city,
@@ -150,10 +149,10 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
           SELF.Address.Zip4            := LEFT.zip4,
           SELF.Address.County          := LEFT.county,                     //***This is the 3 digit FIPS code - convert this to CountyName 
           SELF.Address.PostalCode      := LEFT.zip5 + LEFT.zip4,                             
-          SELF.Address.StateCityZip    := '',                              //***Fix this in SPRINT10
+          SELF.Address.StateCityZip    := TRIM(LEFT.state) + TRIM(LEFT.city) + TRIM(LEFT.zip5),                              
           SELF.lexid                  := (string)LEFT.did,
           SELF.ExecTitle              := LEFT.mostRecentTitle,
-          SELF.SSN                    := LEFT.ssn,                         //***Add SSN MASKING in SPRINT10
+          SELF.SSN                    := LEFT.ssn, 
           SELF.DOB.Year                  := (unsigned4)LEFT.DOB[1..4],     //** YYYY
 					SELF.DOB.Month                 := (unsigned2)LEFT.DOB[5..6],     //** MM
 					SELF.DOB.Day                   := (unsigned2)LEFT.DOB[7..8],     //** DD

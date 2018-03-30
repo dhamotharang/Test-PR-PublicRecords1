@@ -615,7 +615,7 @@ EXPORT CommonBusiness := MODULE
   ENDMACRO;
   
   EXPORT AddHeaderSources(bureauData, inquiredBus, inquiredBusFieldToPopulate) := FUNCTIONMACRO
-      
+  
      sortSrc := SORT(bureauData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
      rollSrc := ROLLUP(sortSrc,
                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
@@ -660,7 +660,7 @@ EXPORT CommonBusiness := MODULE
                                      SELF.inquiredBusFieldToPopulate := RIGHT.sources;                 
                                      SELF := LEFT),
                            LEFT OUTER);
-                           
+
      RETURN addHeaderSrc;   
   ENDMACRO;
   
@@ -693,7 +693,7 @@ EXPORT CommonBusiness := MODULE
      END;  
 	 
     
-		sources := PROJECT(groupSources, getMaxSources(LEFT, COUNTER));
+		sources := UNGROUP(PROJECT(groupSources, getMaxSources(LEFT, COUNTER)));
     
     sortSources := SORT(sources, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
     rollSources := ROLLUP(sortSources,

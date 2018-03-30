@@ -127,7 +127,7 @@ EXPORT LayoutsInternalReport := MODULE
 	EXPORT BusCorpFilingsSlimLayout := RECORD
     DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
     UNSIGNED4	  historydate;
-    // STRING    CorpKey;
+    STRING    CorpKey;
 		STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
 	  STRING20  FilingType;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing desc.   
     BOOLEAN   isActive;
@@ -137,12 +137,13 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED4 LastSeenDate;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - 
 	  STRING30  FilingNumber;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing reference nbr
 	  STRING2   IncorporationState;                           //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
-    // STRING    OrgStructure;
+    STRING    OrgStructure;
 	END;
 	
 	
 	EXPORT ReportingOfSOSFilingsChildLayout     :=  RECORD 
 	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    STRING corpKey;
 	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
  

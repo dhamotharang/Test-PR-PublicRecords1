@@ -1,10 +1,10 @@
-﻿IMPORT BIPv2, DueDiligence,  iesp;
+﻿IMPORT BIPv2, DueDiligence, iesp;
 
 EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											     DATASET(DueDiligence.LayoutsInternalReport.BusCorpFilingsSlimLayout) BusSOSFilingsSlim) := FUNCTION
 		
 
-  sortFilings := SORT(BusSOSFilingsSlim, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -LastSeenDate);
+  sortFilings := SORT(BusSOSFilingsSlim, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -LastSeenDate);
   groupFilings := GROUP(sortFilings, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
 	// ------                                                                        ------
@@ -12,30 +12,31 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
   // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
   // ------                                                                       ------
-	DueDiligence.LayoutsInternalReport.ReportingOfSOSFilingsChildLayout  FormatTheListOfSOSFilings(BusSOSFilingsSlim le, Integer FilingCount) := TRANSFORM, 
+	DueDiligence.LayoutsInternalReport.ReportingOfSOSFilingsChildLayout FormatTheListOfSOSFilings(BusSOSFilingsSlim le, Integer FilingCount) := TRANSFORM, 
                                                                                       SKIP(FilingCount > iesp.constants.DDRAttributesConst.MaxSOSFilingStatuses)
-            
+    
     SELF.BusSOSFilingsChild := PROJECT(le, TRANSFORM(iesp.duediligencebusinessreport.t_DDRSOSFiling,
                                                       SELF.BusinessName                     := le.BusinessName;                      
-                                                      SELF.FilingType                       := le.FilingType;
+                                                      SELF.FilingType                       := le.OrgStructure;
                                                       SELF.SOSFilingStatus                  := le.FilingStatus;
                                                       SELF.FilingNumber                     := le.FilingNumber;
                                                       SELF.SOSIncorporationState            := le.IncorporationState; 
-																															SELF.FilingDate.Year                  := (unsigned4)((STRING)le.FilingDate)[1..4];     //** YYYY
-																														 SELF.FilingDate.Month                 := (unsigned2)((STRING)le.FilingDate)[5..6];     //** MM
-																															SELF.FilingDate.Day                   := (unsigned2)((STRING)le.FilingDate)[7..8];     //** DD
-																															SELF.SOSLastUpdated.Year              := (unsigned4)((STRING)le.LastSeenDate)[1..4];   //** YYYY
-																															SELF.SOSLastUpdated.Month             := (unsigned2)((STRING)le.LastSeenDate)[5..6];   //** MM
-																															SELF.SOSLastUpdated.Day               := (unsigned2)((STRING)le.LastSeenDate)[7..8];   //** DD 
+                                                      SELF.FilingDate.Year                  := (unsigned4)((STRING)le.FilingDate)[1..4];     //** YYYY
+                                                      SELF.FilingDate.Month                 := (unsigned2)((STRING)le.FilingDate)[5..6];     //** MM
+                                                      SELF.FilingDate.Day                   := (unsigned2)((STRING)le.FilingDate)[7..8];     //** DD
+                                                      SELF.SOSLastUpdated.Year              := (unsigned4)((STRING)le.LastSeenDate)[1..4];   //** YYYY
+                                                      SELF.SOSLastUpdated.Month             := (unsigned2)((STRING)le.LastSeenDate)[5..6];   //** MM
+                                                      SELF.SOSLastUpdated.Day               := (unsigned2)((STRING)le.LastSeenDate)[7..8];   //** DD 
                                                       SELF                                  := [];));
     SELF := le;
     SELF := [];
 	END;  
 	 
 
-	BusSOSFilingDataset := PROJECT(groupFilings, FormatTheListOfSOSFilings(LEFT, COUNTER));
+	BusSOSFilingDataset := UNGROUP(PROJECT(groupFilings, FormatTheListOfSOSFilings(LEFT, COUNTER)));
   
-  rollFilings := ROLLUP(BusSOSFilingDataset,
+  sortFilingDataset := SORT(BusSOSFilingDataset, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())); 
+  rollFilings := ROLLUP(sortFilingDataset,
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
                         TRANSFORM(RECORDOF(LEFT),
                                   SELF.BusSOSFilingsChild := LEFT.BusSOSFilingsChild + RIGHT.BusSOSFilingsChild;
@@ -44,7 +45,7 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   addFilteredSOSFilings := JOIN(BusnData, rollFilings,
                                 #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                                 TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                          SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSFilingStatuses := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSFilingStatuses  + RIGHT.BusSOSFilingsChild;  
+                                          SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSFilingStatuses := RIGHT.BusSOSFilingsChild;  
                                           SELF := LEFT),
                                 LEFT OUTER);
   
@@ -53,8 +54,9 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                             SELF.otherStatusFilingCount := IF(LEFT.isActive, 0, 1);
                                                             SELF := LEFT;
                                                             SELF := [];));
-				       
-	rollCounts := ROLLUP(countFilingStatus,
+	
+  sortFilingStatus := SORT(countFilingStatus, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())); 
+	rollCounts := ROLLUP(sortFilingStatus,
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
                         TRANSFORM(RECORDOF(LEFT),
                                   SELF.activeStatusFilingCount := LEFT.activeStatusFilingCount + RIGHT.activeStatusFilingCount;
@@ -66,12 +68,15 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	addSOSCounts := JOIN(addFilteredSOSFilings, rollCounts,
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                         TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSActiveCount := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSActiveCount  + RIGHT.activeStatusFilingCount;  
-                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSOtherCount := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSOtherCount  + RIGHT.otherStatusFilingCount;  
+                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSActiveCount := RIGHT.activeStatusFilingCount;  
+                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SOSOtherCount := RIGHT.otherStatusFilingCount;  
                                   SELF := LEFT),
                         LEFT OUTER);
+                        
 
-		
+
+  
+  
 	// OUTPUT(sortFilings,   NAMED('sortFilings'));
 	// OUTPUT(BusSOSFilingsSlim,   NAMED('BusSOSFilingsSlim'));
 	// OUTPUT(BusSOSFilingDataset, NAMED('BusSOSFilingDataset'));
@@ -79,7 +84,8 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// OUTPUT(countFilingStatus, NAMED('countFilingStatus'));
 	// OUTPUT(rollCounts, NAMED('rollCounts'));
 	// OUTPUT(addSOSCounts, NAMED('addSOSCounts'));
-																
+  
+														
 		
   RETURN addSOSCounts;
 		
