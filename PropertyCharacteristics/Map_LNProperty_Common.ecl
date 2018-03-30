@@ -1,6 +1,24 @@
-import	Address,AID,AID_Build,Codes,LN_PropertyV2,ut;
+﻿import	Address,AID,AID_Build,Codes,LN_PropertyV2,ut;
 
-dTax						:=	distribute(LN_PropertyV2.File_Assessment,hash32(ln_fares_id));
+//JIRA DF-21659 Bad Square Footage Data Correction - begin
+dTaxOrig	:=	distribute(LN_PropertyV2.File_Assessment,hash32(ln_fares_id));
+dTaxLayout := recordof(dTaxOrig);
+
+//blank out building_area for the "bad" records
+bad_sf_recs := project(dTaxOrig(process_date < '20180329' //only want to update old records that have been verified as incorrect
+																							and vendor_source_flag = 'F' //fares source only
+																							and state_code = 'NJ'								
+																							and trim(county_name) in (['UNION','HUDSON'])
+																							//where building area is not blank and matches sales price or prior sales price
+																							and length(trim(building_area)) > 0 
+																							and (trim(sales_price)=trim(building_area) or trim(prior_sales_price)=trim(building_area)))
+																							, TRANSFORM(dTaxLayout,	SELF.building_area := '';	SELF := LEFT;));
+		
+good_sf_recs	:= join(dTaxOrig, bad_sf_recs, LEFT.ln_fares_id = RIGHT.ln_fares_id, LOCAL, LEFT ONLY);
+
+dTax := bad_sf_recs + good_sf_recs;
+//JIRA DF-21659 Bad Square Footage Data Correction - end
+
 dAddlFaresTax		:=	distribute(Ln_PropertyV2.File_addl_Fares_tax,hash32(ln_fares_id));
 dDeeds					:=	distribute(LN_PropertyV2.File_Deed(current_record	=	'Y'),hash32(ln_fares_id));
 dAddlFaresDeeds	:=	distribute(Ln_PropertyV2.File_addl_Fares_deed,hash32(ln_fares_id));
