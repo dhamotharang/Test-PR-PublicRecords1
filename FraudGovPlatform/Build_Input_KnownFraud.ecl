@@ -48,6 +48,9 @@ module
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
 		self.sequence := C;
+		self.ssn	:= If(regexfind('^[0-9]*$',l.ssn),trim(l.ssn,left,right),'');
+		Self.Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
+		SELF.Zip		:=if(regexfind('^[0-9]*$',regexreplace('-',l.zip,'')),if(length(trim(l.zip,left,right)) in [5,9],l.zip,''),'');
 		self:=l;
 		self:=[];
 	end;
@@ -60,7 +63,7 @@ module
 						Customer_Account_Number						=''
 				or		Customer_County 									=''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-				or 	(SSN = '' and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+				or 	((SSN = '' or length(SSN)<>9 ) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
 				or 	(Street_1='' and City=''	and State='' and Zip='')
 				or 	(Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
 				or 	(Customer_Agency_Vertical_Type 		in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
