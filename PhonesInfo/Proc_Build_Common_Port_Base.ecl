@@ -1,4 +1,4 @@
-import _control, Doxie, RoxieKeyBuild, std, Ut;
+﻿import _control, Doxie, RoxieKeyBuild, std, Ut;
 
 EXPORT Proc_Build_Common_Port_Base(string version, string version2, const varstring eclsourceip, string thor_name):= function
 	
@@ -33,7 +33,7 @@ EXPORT Proc_Build_Common_Port_Base(string version, string version2, const varstr
 	ut.mac_sk_move_v2('~thor_data400::key::phones_ported','Q',mvQAPhonesPort);
 */
 	//Run Build & Provide Email on Build Status
-	sendEmail				:= sequential(processTCPA, processICon, buildComBase, clearDelete, moveComBase/*, bkPhonesPort, mvBltPhonesPort, mvQAPhonesPort*/):
+	sendEmail				:= sequential(/*processTCPA,*/ processICon, buildComBase, clearDelete, moveComBase/*, bkPhonesPort, mvBltPhonesPort, mvQAPhonesPort*/):
 																Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Succeeded', workunit + ': Build complete.')),
 																Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Failed', workunit + '\n' + FAILMESSAGE)
 																);

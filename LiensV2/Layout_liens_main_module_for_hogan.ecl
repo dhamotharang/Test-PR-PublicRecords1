@@ -1,4 +1,4 @@
-import liensv2;
+﻿import liensv2;
 
 export layout_liens_main_module_for_hogan := module 
 
@@ -57,6 +57,13 @@ string certificate_number := '';
 BOOLEAN	bCBFlag	:=	FALSE;
 unsigned8 persistent_record_id := 0 ; 
 dataset(layout_filing_status) filing_status;
+STRING8	DOB	:=	'';
+STRING2 Filing_Type_ID := '';
+STRING8	Collection_Date	:=	'';
+STRING45	CaseLinkID	:=	'';
+STRING50 TMSID_old	:=	'';
+STRING50 RMSID_old	:=	'';
+BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
 
 end;
 end;
