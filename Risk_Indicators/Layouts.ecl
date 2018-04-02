@@ -1793,10 +1793,19 @@ export layout_BIP_Header_info_54 := record
 	qstring100 	bus_ssn_ver_sources		 := '';
 	qstring200 	bus_ssn_ver_sources_first_seen		 := '';
 	qstring200 	bus_ssn_ver_sources_last_seen		 := '';
-	integer   	bus_phone_ver_sources_total		 := 0;
+	integer   	 bus_phone_ver_sources_total		 := 0;
 	qstring100 	bus_phone_ver_sources		 := '';
 	qstring200 	bus_phone_ver_sources_first_seen		 := '';
 	qstring200 	bus_phone_ver_sources_last_seen		 := '';
+//MS-124
+ integer3    bus_sos_filings_not_instate := 0;
+ integer3    bus_ucc_count := 0;
+ integer3    bus_ucc_active_count := 0;
+ integer3    bus_inq_count12 := 0;
+ integer3    bus_inq_credit_count12 := 0;
+ integer3    bus_inq_highriskcredit_count12 := 0;
+ integer3    bus_inq_other_count12 := 0;
+ boolean     bus_seleID_match := 0;
 end;
 
 //MS-167: new Equifax Fraud Flags fields
@@ -1808,6 +1817,7 @@ export layout_Equifax_FraudFlags := record
 	string2 	factact_curr_alert_code := '';
 	integer 	factact_hist_fraud_alert_ct := 0;
 	integer 	factact_hist_fraud_alert_lseen := 0;
+ 
 end;
 
 END;
