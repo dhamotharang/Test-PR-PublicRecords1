@@ -1,4 +1,4 @@
-//Risk_Indicators.iid_common_function
+﻿//Risk_Indicators.iid_common_function
 
 import didville,doxie,FCRA,header,header_quick,header_SlimSort,watchdog,ut,DID_Add,address,
        gong,drivers,mdr,riskwise,suppress;
@@ -76,11 +76,7 @@ with_ssn_flags := risk_indicators.iid_getSSNFlags(rolled_header, dppa, glb, isFC
 
 with_best_addr := risk_indicators.iid_check_best(with_hhid_summary, with_ssn_flags, ExactMatchLevel, bsversion);
 
-common_roxie := if(runBestAddrCheck or bsversion >=50, with_best_addr, with_ssn_flags);
-common_thor := if(runBestAddrCheck or bsversion >=50, with_best_addr, with_ssn_flags) : PERSIST('~BOCASHELLFCRA::iid_commonresults');
-
-common := if(onThor, common_thor, common_roxie);
-
+common := if(runBestAddrCheck or bsversion >=50, with_best_addr, with_ssn_flags);
 
 RETURN common;
 
