@@ -259,7 +259,7 @@
 /*--INFO-- Business Shell Service - This is the XML Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT;
+IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators;
 
 EXPORT Business_Shell_Service() := FUNCTION
 	/* ************************************************************************
@@ -757,7 +757,6 @@ EXPORT Business_Shell_Service() := FUNCTION
 	UNSIGNED1 BIPBestAppend				 := Business_Risk_BIP.Constants.BIPBestAppend.Default : STORED('BIPBestAppend');
   UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
-	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
 	UNSIGNED1 KeepLargeBusinesses  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN IncludeTargusGateway   := FALSE : STORED('IncludeTargusGateway');
 	BOOLEAN RunTargusGateway       := FALSE : STORED('RunTargusGatewayAnywayForTesting');
@@ -766,6 +765,13 @@ EXPORT Business_Shell_Service() := FUNCTION
 	BOOLEAN CorteraRetrotest := FALSE : STORED('CorteraRetrotest');
 	
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
+ 
+  layout_watchlists_temp := record
+    dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
+  end;
+
+  watchlist_options := dataset([],layout_watchlists_temp) : stored('Watchlists_Requested', few);
+  Watchlists_Requested := watchlist_options[1].WatchList;
 
 	/* ************************************************************************
 	 *              Create the Appropriate Library Interface                  *
@@ -1001,6 +1007,8 @@ EXPORT Business_Shell_Service() := FUNCTION
 	END;
 	
 	Input := DATASET([grabInput()]);
+  
+  if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 	
 	/* ************************************************************************
 	 *                   Get the Business Shell Results                       *

@@ -262,15 +262,16 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get the watchlist results.  To simplify watchlist searching we are only supporting the custom watchlist set (Could include 'ALL', 'OFA', 'OFC', 'OSC', 'BES', 'CFT', etc etc) - See Patriot.WL_Include_Keys for the full list.
 	// By doing this it eliminates all of the extra OFAC_Only/Include_OFAC/Include_Additional_Watchlists input options that really can be accomplished with the Watchlists_Requested input dataset
 	OFAC_Only := FALSE;
-	Include_OFAC := FALSE;
+  Include_OFAC := FALSE;
 	Include_Additional_Watchlists := FALSE;
 	Skip_Company_Search := TRUE; // No need to search for company watchlist info - these are people
 	DOB_Radius := -1;
 	// Don't attempt to grab watchlists unless we actually have some in the list...
 	watchlistResults := IF(COUNT(Options.Watchlists_Requested) <= 0, watchlistInputPrep,
-																																	 UNGROUP(Risk_Indicators.getWatchLists2(watchlistInput, OFAC_Only, Skip_Company_Search, Options.OFAC_Version, Include_OFAC, Include_Additional_Watchlists, Options.Global_Watchlist_Threshold, DOB_Radius, Options.Watchlists_Requested)));
+																																	 UNGROUP(Risk_Indicators.getWatchLists2(watchlistInput, OFAC_Only, Skip_Company_Search, Options.OFAC_Version, Include_OFAC, Include_Additional_Watchlists, Options.Global_Watchlist_Threshold, DOB_Radius, Options.Watchlists_Requested, options.gateways)));
+  if(exists(watchlistResults(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
-	// Count the number of unique Associates per Seq, and count the number that have a watchlist hit
+  // Count the number of unique Associates per Seq, and count the number that have a watchlist hit
 	watchlistStats := TABLE(watchlistResults, 
 		{Seq,
 		UNSIGNED8 Associates := COUNT(GROUP),
