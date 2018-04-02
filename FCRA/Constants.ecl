@@ -8,9 +8,21 @@ EXPORT Constants := MODULE
 		EXPORT STRING SECURITY_FRAUD_ALERT := '100B';
 		EXPORT STRING CONSUMER_STATEMENT := '100C';
 		EXPORT STRING STATE_EXCEPTION := '100D';
-		EXPORT STRING IDENTITY_THEFT_ALERT := '100E';
-		EXPORT STRING LEGAL_HOLD_ALERT := '100F';
+		EXPORT STRING UNDER_AGE21_ALERT := '100E';   // code used by RiskView products
+		EXPORT STRING OPTOUT_ALERT := '100F';        // code used by RiskView products
+		EXPORT STRING IDENTITY_THEFT_ALERT := '100G';
+		EXPORT STRING LEGAL_HOLD_ALERT := '100H';
 		EXPORT STRING NO_DID_FOUND := '222A';
+		
+		/*  -- the following alert codes are used by RiskView products:
+				200A - Subject Reported as Deceased
+				300A - Chapter 7 Bankruptcy On File
+				300B - Chapter 9 Bankruptcy On File
+				300C - Chapter 11 Bankruptcy On File
+				300D - Chapter 12 Bankruptcy On File
+				300E - Chapter 13 Bankruptcy On File
+				300F - Chapter 15 Bankruptcy On File
+		*/
 	END;
 
  SHARED ds_alerts := DATASET ([
