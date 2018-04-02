@@ -33,8 +33,10 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			output(final, NAMED('Results')); //This is the customer facing output    
 
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
-			IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
+			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 
+      IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask'))); 
+
 	
 
 ENDMACRO;

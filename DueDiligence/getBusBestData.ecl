@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, iesp;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
 EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 											DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
@@ -89,9 +89,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 															
 															SELF  := LEFT;),
 										LEFT OUTER);
-										
-										
-	addReportData := IF(includeReport, DueDiligence.reportBestBusInfo(bestData), bestData);							
+						
 	
 
 	// OUTPUT(busInfo, NAMED('busInfo'));
@@ -102,6 +100,6 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	// OUTPUT(addReportData, NAMED('addReportData'));
 	
 
-	RETURN addReportData;
+	RETURN bestData;
 	
 END;

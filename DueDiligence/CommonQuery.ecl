@@ -92,18 +92,24 @@ EXPORT CommonQuery := MODULE
 				firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
 
 				optionsIn := GLOBAL(firstRow.options);
-				userIn := GLOBAL(firstRow.user);
-				search := GLOBAL(firstRow.reportBy);
+				userIn    := GLOBAL(firstRow.user);    //***see the t_user layout in PublicRecords.iesp.share for details 
+				search    := GLOBAL(firstRow.reportBy);
 				
 				//get outer band data - to use if customer data is not populated
 				UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
-				UNSIGNED1 outerBandGLBPurpose := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
-				outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('HistoryDateYYYYMMDD');
+				UNSIGNED1 outerBandGLBPurpose  := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
+				outerBandHistoryDate           := DueDiligence.Constants.NUMERIC_ZERO      : STORED('HistoryDateYYYYMMDD');
+        //*** grab the SSNMASK from the outer band section of the request ***//
+        STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMASK');  
 				
-				drm	:= IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
-				dpm	:= IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
-				dppa := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
-				glba := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);	
+				
+        //*** The general rule for picking these options is to look in the inner band (ie the User section) first
+        //***  If the inner band fields are not populated look in the outer band or the Default from the Global Module 
+        drm	    := IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
+				dpm	    := IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
+				dppa    := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
+				glba    := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);
+        STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
 				
         //since the initial version can be defaulted, default options for person and business reports only attributes need to be requested
         defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)),
@@ -386,6 +392,8 @@ EXPORT CommonQuery := MODULE
 							EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
 							EXPORT BOOLEAN LNBranded := TRUE; // Not entirely certain what effect this has
 				END;
+        
+         
 				
 		ENDMACRO;
 		

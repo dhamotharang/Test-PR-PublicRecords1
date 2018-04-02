@@ -24,10 +24,11 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 		//********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
 			DueDiligence.CommonQuery.mac_GetBusinessOptionSettings();
 
-			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, debugIndicator);
+			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, DD_SSNMask, debugIndicator);
 
 			busnIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
+      
 			
 			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
 																															DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion);
@@ -37,7 +38,8 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
 			IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
-			IF(intermediates, output(businessResults, NAMED('busResults')));                   //This is for debug mode 
+			IF(intermediates, output(businessResults, NAMED('busResults')));                   //This is for debug mode
+      IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask')));   
 
 
 ENDMACRO;

@@ -7,22 +7,29 @@
 */
 
 EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
-												Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
-	
+												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                        BOOLEAN includeReport) := FUNCTION
+                        
+	//first start by grabing the registered agents
+	allAgents := DueDiligence.CommonBusiness.getChildAsInquired(inData, registeredagents, DueDiligence.Constants.REGISTERED_AGENT);
+  
+  inquiredAndAgents := inData + allAgents;  
+  
 	//call key to initially get counts based on address, regardless of powID
-	addrCountRaw := JOIN(inData, Address_Attributes.key_AML_addr, 
+	addrCountRaw := JOIN(inquiredAndAgents, Address_Attributes.key_AML_addr, 
 												KEYED(TRIM(LEFT.busn_info.address.zip5) = RIGHT.zip) AND
 												KEYED(TRIM(LEFT.busn_info.address.prim_range) = RIGHT.prim_range) AND
 												KEYED(TRIM(LEFT.busn_info.address.prim_name) = RIGHT.prim_name) AND
 												KEYED(TRIM(LEFT.busn_info.address.addr_suffix) = RIGHT.addr_suffix) AND
 												KEYED(TRIM(LEFT.busn_info.address.predir) = RIGHT.predir) AND
 												KEYED(TRIM(LEFT.busn_info.address.postdir) = RIGHT.postdir),
-												TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
+												TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED4 historyDate, STRING2 partyIndicator, RECORDOF(RIGHT)},
 																	SELF.seq := LEFT.seq;
 																	SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																	SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																	SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
 																	SELF.historyDate := LEFT.historyDate;
+                                  SELF.partyIndicator := LEFT.relatedDegree;
 																	SELF := RIGHT;
 																	SELF := [];),
 												KEEP(1),
@@ -35,7 +42,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	addrCountDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(cleanDateFields, dt_first_seen);
 	
 	//determine businesses counts (at addr, incorporated in loose state, have no fein)
-	addCounts := JOIN(inData, addrCountDataFiltRecs,
+	addCounts := JOIN(inData, addrCountDataFiltRecs(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
 										#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 										TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 															SELF.numOfBusFoundAtAddr := RIGHT.biz_cnt;
@@ -43,14 +50,15 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 															SELF.numOfBusNoReportedFein := RIGHT.no_fein_cnt;
 															SELF := LEFT;),
 										LEFT OUTER);
-
-										
-	//first start by grabing the registered agents
-	allAgents := DueDiligence.CommonBusiness.getChildAsInquired(inData, registeredagents, DueDiligence.Constants.REGISTERED_AGENT);
-
-	sortAgents := SORT(allAgents, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids()));
+                    
+                    
+  //add counts for the registered agents - only if we need it as requested by the report
+  addAgentCounts := IF(includeReport, DueDiligence.getBusAddrDataReportData.AddRegisteredAgentAddressCounts(addrCountDataFiltRecs(partyIndicator = DueDiligence.Constants.REGISTERED_AGENT), addCounts), addCounts);
+  
 	
 	//Grab registered agent if at the same address as the business
+  sortAgents := SORT(allAgents, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids()));
+  
 	rollMatchingRAAddr :=  ROLLUP(sortAgents,
 																LEFT.seq = RIGHT.seq AND
 																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
@@ -60,7 +68,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																						SELF.atleastOneAgentSameAddrAsBus := LEFT.atleastOneAgentSameAddrAsBus OR RIGHT.atleastOneAgentSameAddrAsBus;
 																						SELF := LEFT;));
 	
-	addMatchingRAAddresses := JOIN(addCounts, rollMatchingRAAddr,
+	addMatchingRAAddresses := JOIN(addAgentCounts, rollMatchingRAAddr,
 																	LEFT.seq = RIGHT.seq AND
 																	LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
 																	LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
@@ -166,20 +174,8 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																						SELF := LEFT;),
 																	LEFT OUTER);
                                   
-  //add the vancancy to the operating locations
-	initialOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(addOperatingMailingAddr);
-	addOpLocVancancy := JOIN(initialOpLocations, rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
-												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-												TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
-																	SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
-                                                                          SELF.vacant := RIGHT.vacant;
-                                                                          SELF := LEFT;)]);
-																	SELF := LEFT;),
-												LEFT OUTER);
-	
-										
-	//reAdd operating locations
-	addOperatingLocation := DueDiligence.CommonBusiness.readdOperatingLocations(addOperatingMailingAddr, addOpLocVancancy, opLocations);                                
+  //add the vancancy to the operating locations - only if requested by the report
+  addOperatingLocation := IF(includeReport, DueDiligence.getBusAddrDataReportData.AddOperatingVacancy(rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION), addOperatingMailingAddr), addOperatingMailingAddr);
 
 
 	//determine if registered agent address contains a NIS or business incubator
@@ -254,27 +250,8 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 													LEFT OUTER);
 													
 													
-	//add the cmra to the operating locations
-	originalOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(addAddrSicData);
-	addOpLocCMRA := JOIN(originalOpLocations, addrSicDataTrans(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
-												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-												LEFT.zip5 = RIGHT.z5 AND
-												LEFT.prim_range = RIGHT.prim_range AND
-												LEFT.prim_name = RIGHT.prim_name AND
-												LEFT.addr_suffix = RIGHT.suffix AND
-												LEFT.predir = RIGHT.predir AND
-												LEFT.postdir = RIGHT.postdir AND
-												LEFT.sec_range = RIGHT.sec_range,
-												TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
-																	SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
-																																							SELF.cmra := RIGHT.cmrasiccode;
-																																							SELF := LEFT;)]);
-																	SELF := LEFT;),
-												LEFT OUTER);
-	
-										
-	//reAdd operating locations
-	readdOperatingLocation := DueDiligence.CommonBusiness.ReaddOperatingLocations(addAddrSicData, addOpLocCMRA, opLocations);
+	//add the cmra to the operating locations - only if requested by the report
+	readdOperatingLocation := IF(includeReport, DueDiligence.getBusAddrDataReportData.AddOperatingCMRA(addrSicDataTrans(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION), addAddrSicData), addAddrSicData); 
 
 
 
@@ -308,8 +285,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	// OUTPUT(operatingMailingAddr, NAMED('operatingMailingAddr'));
 	// OUTPUT(rollOperatingMailingAddr, NAMED('rollOperatingMailingAddr'));
 	// OUTPUT(addOperatingMailingAddr, NAMED('addOperatingMailingAddr'));
-	// OUTPUT(initialOpLocations, NAMED('initialOpLocations'));
-	// OUTPUT(addOpLocVancancy, NAMED('addOpLocVancancy'));
+	
 	// OUTPUT(addOperatingLocation, NAMED('addOperatingLocation'));
 	
 	// OUTPUT(raInfo, NAMED('raInfo'));
@@ -325,11 +301,9 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	// OUTPUT(addrSicDataDedup, NAMED('addrSicDataDedup'));
 	// OUTPUT(addAddrSicData, NAMED('addAddrSicData'));
 	
-	// OUTPUT(originalOpLocations, NAMED('originalOpLocations'));
-	// OUTPUT(addOpLocCMRA, NAMED('addOpLocCMRA'));
-	// OUTPUT(rollOpLocations, NAMED('rollOpLocations'));
 	// OUTPUT(readdOperatingLocation, NAMED('readdOperatingLocation'));
-	
+  
+	// OUTPUT(addAgentCounts, NAMED('addAgentCounts'));	
 
 
 

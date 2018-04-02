@@ -58,6 +58,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT Agent := RECORD
 		InternalBIPIDsLayout;
+    UNSIGNED4	  historydate;
 		DueDiligence.Layouts.LayoutAgent agent;
 	END;
 	
@@ -84,6 +85,21 @@ EXPORT LayoutsInternal := MODULE
 		DueDiligence.Layouts.Licenses license;
 	END;
 
+  
+  EXPORT MultipleNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.LayoutAgent) nameAndDate {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+  END;
+
+  EXPORT MultipleCompanyNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.DD_CompanyNames) companyNameAndLastSeen {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+  END;
+  
+  EXPORT SourceLayout := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.BusSourceLayout) sources;
+  END;
 
 
 //------                                      ------
@@ -201,9 +217,13 @@ END;
 	
 	EXPORT layout_liens_judgments := RECORD
 		InternalBIPIDsLayout  liensJudgment;
+    unsigned6 	did;
 		common_layout_liens_judgments;   
 	END;
 
+//------                                      ------
+//------  Populated with Liens and Judgements ------
+//------                                      ------
 	EXPORT 	layout_liens_judgments_categorized := RECORD
 		layout_liens_judgments;
 		plus_category_liens_judgments;
