@@ -23,11 +23,12 @@
       inl_set := IF(le.RecordType = FFD.Constants.RecordType.SF, STD.Str.SplitWords(STD.Str.CleanSpaces(le.Content), ','), []);
       LH_flag := IF(le.RecordType = FFD.Constants.RecordType.LH, STD.Str.CleanSpaces(le.Content), ''); // Expected values in content field: SP (Suppress Product), SA (Suppress All), Empty for no suppression
 
-      SELF.suppress_for_legal_hold := LH_flag = PersonContext.Constants.LegalFlag.SuppressProduct OR LH_flag = PersonContext.Constants.LegalFlag.SuppressAll;
+      suppress_for_LH := LH_flag = PersonContext.Constants.LegalFlag.SuppressProduct OR LH_flag = PersonContext.Constants.LegalFlag.SuppressAll;
+      SELF.suppress_for_legal_hold := suppress_for_LH;
       SELF.set_FCRA_purpose := CovertSetStr2Int(inl_set);
       SELF.Content := CASE(le.RecordType, 
                             FFD.Constants.RecordType.IT => FFD.Constants.AlertMessage.IDTheftMessage,
-                            FFD.Constants.RecordType.LH => '', //FFD.Constants.AlertMessage.LegalHoldMessage,
+                            FFD.Constants.RecordType.LH => IF(suppress_for_LH, FFD.Constants.AlertMessage.LegalHoldMessage, SKIP), // we should only return LH alert if we are suppressing results for it
                             FFD.Constants.RecordType.SF => FFD.Constants.AlertMessage.FreezeMessage,
                             FFD.Constants.RecordType.FA => FFD.Constants.AlertMessage.FraudMessage + 
                                                 IF(consumer_phone<>'', ' ' + FFD.Constants.AlertMessage.ConsumerPhoneMessage + consumer_phone,''),
@@ -80,7 +81,7 @@ EXPORT FetchPersonContext (DATASET(FFD.Layouts.DidBatch) dids,
                        SELF := RIGHT)); 
                        
   recs_filt := recs((~apply_group_filter OR datagroup in data_group_set)
-                    AND (showConsumerStatements OR RecordType IN FFD.Constants.RecordType.ComplianceSet));    
+                    AND (showConsumerStatements OR RecordType IN FFD.Constants.RecordType.ComplianceRecordLevel));    
   
   RETURN recs_filt;
 END;
