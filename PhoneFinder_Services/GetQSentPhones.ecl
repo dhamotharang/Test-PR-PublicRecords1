@@ -1,4 +1,4 @@
-IMPORT Address,AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,Risk_Indicators,std,PhoneFinder_Services;
+﻿IMPORT Address,AutoStandardI,BatchServices,Doxie_Raw,Gateway,iesp,Phones,Risk_Indicators,std,PhoneFinder_Services;
 
 globalMod := AutoStandardI.GlobalModule();
 
@@ -132,9 +132,10 @@ MODULE
 			lBatchIn             batch_in;
 		END;
 		today 	 := (string) STD.Date.Today();
-		// Rule 1 - SSN and last name
-		rQSent_Layout tGetIQ411Rule1Data(dIn pInput) :=
-		TRANSFORM
+		
+		// making single call to Qsent with full addr, last name and ssn to improve response time
+			rQSent_Layout IQ411_Recs(dIn pInput) :=
+			TRANSFORM
 			dPhones := PROJECT( dExcludePhones(acctno = pInput.acctno),
 													TRANSFORM(iesp.share.t_StringArrayItem,SELF.Value := LEFT.phone));
 			
@@ -142,10 +143,16 @@ MODULE
 												EXPORT STRING15                              Phone                  := '';
 												EXPORT STRING30                              FirstName              := '';
 												EXPORT STRING30                              LastName               := pInput.name_last;
-												EXPORT STRING200                             Addr                   := '';
-												EXPORT STRING25                              City                   := '';
-												EXPORT STRING2                               State                  := '';
-												EXPORT STRING6                               Zip                    := '';
+												EXPORT STRING200                             Addr                   := Address.Addr1FromComponents( pInput.prim_range,
+																																																														                     pInput.predir,
+																																																														                     pInput.prim_name,
+																																																														                     pInput.addr_suffix,
+																																																														                     pInput.postdir,
+																																																														                     pInput.unit_desig,
+																																																														                     pInput.sec_range);
+												EXPORT STRING25                              City                   := pInput.p_city_name;
+												EXPORT STRING2                               State                  := pInput.st;
+												EXPORT STRING6                               Zip                    := pInput.z5;
 												EXPORT STRING11                              SSN                    := IF(pInput.ssn != '',INTFORMAT((INTEGER)pInput.ssn,9,1),'');
 												EXPORT BOOLEAN                               FailOnError            := FALSE;
 												EXPORT STRING5                               ServiceType            := Phones.Constants.ServiceType.IQ411;
@@ -160,77 +167,7 @@ MODULE
 			SELF.batch_in   := pInput;
 		END;
 		
-		dIQ411Rule1Recs := PROJECT(dIn,tGetIQ411Rule1Data(LEFT));
-		
-		// Rule 2 - Last name and SSN Last 4
-		rQSent_Layout tGetIQ411Rule2Data(dIQ411Rule1Recs pInput) :=
-		TRANSFORM
-			dPhones := PROJECT( dExcludePhones(acctno = pInput.batch_in.acctno),
-													TRANSFORM(iesp.share.t_StringArrayItem,SELF.Value := LEFT.phone));
-			
-			tmpMod := MODULE(PROJECT(globalMod,BatchServices.RealTimePhones_Params.params,OPT))
-												EXPORT STRING15                              Phone                  := '';
-												EXPORT STRING30                              FirstName              := '';
-												EXPORT STRING30                              LastName               := pInput.batch_in.name_last;
-												EXPORT STRING200                             Addr                   := '';
-												EXPORT STRING25                              City                   := '';
-												EXPORT STRING2                               State                  := '';
-												EXPORT STRING6                               Zip                    := '';
-												EXPORT STRING11                              SSN                    := IF(pInput.batch_in.ssn != '',INTFORMAT((INTEGER)pInput.batch_in.ssn[6..9],9,1),'');
-												EXPORT BOOLEAN                               FailOnError            := FALSE;
-												EXPORT STRING5                               ServiceType            := Phones.Constants.ServiceType.IQ411;
-												EXPORT UNSIGNED1                             RecordCount            := PhoneFinder_Services.Constants.MaxTUGatewayResults;
-												EXPORT STRING20                              AcctNo                 := pInput.batch_in.acctno;
-												EXPORT STRING	                               EspTransactionId       := pGateway.TransactionId;
-												EXPORT BOOLEAN                               TUGatewayPhoneticMatch := inMod.PhoneticMatch;
-												EXPORT BOOLEAN                               UseQSentV2             := TRUE;
-												EXPORT DATASET(iesp.share.t_StringArrayItem) ExcludedPhones         := dPhones;
-								END;
-			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(DATASET(pGateway),timeoutSecs,,tmpMod,inMod.UseQSent,TRUE);
-			SELF				    := pInput;
-		END;
-		
-		dIQ411Rule2Recs := IF(EXISTS(dIQ411Rule1Recs(~EXISTS(qsent_recs))),
-													PROJECT(dIQ411Rule1Recs(~EXISTS(qsent_recs)),tGetIQ411Rule2Data(LEFT)));
-		
-		// Rule 3 - Last name amd address
-		rQSent_Layout tGetIQ411Rule3Data(dIQ411Rule2Recs pInput) :=
-		TRANSFORM
-			dPhones := PROJECT( dExcludePhones(acctno = pInput.batch_in.acctno),
-													TRANSFORM(iesp.share.t_StringArrayItem,SELF.Value := LEFT.phone));
-			
-			tmpMod := MODULE(PROJECT(globalMod,BatchServices.RealTimePhones_Params.params,OPT))
-												EXPORT STRING15                              Phone                  := '';
-												EXPORT STRING30                              FirstName              := '';
-												EXPORT STRING30                              LastName               := pInput.batch_in.name_last;
-												EXPORT STRING200                             Addr                   := Address.Addr1FromComponents( pInput.batch_in.prim_range,
-																																																														pInput.batch_in.predir,
-																																																														pInput.batch_in.prim_name,
-																																																														pInput.batch_in.addr_suffix,
-																																																														pInput.batch_in.postdir,
-																																																														pInput.batch_in.unit_desig,
-																																																														pInput.batch_in.sec_range);
-												EXPORT STRING25                              City                   := pInput.batch_in.p_city_name;
-												EXPORT STRING2                               State                  := pInput.batch_in.st;
-												EXPORT STRING6                               Zip                    := pInput.batch_in.z5;
-												EXPORT STRING11                              SSN                    := '';
-												EXPORT BOOLEAN                               FailOnError            := FALSE;
-												EXPORT STRING5                               ServiceType            := Phones.Constants.ServiceType.IQ411;
-												EXPORT UNSIGNED1                             RecordCount            := PhoneFinder_Services.Constants.MaxTUGatewayResults;
-												EXPORT STRING20                              AcctNo                 := pInput.batch_in.acctno;
-												EXPORT STRING	                               EspTransactionId       := pGateway.TransactionId;
-												EXPORT BOOLEAN                               TUGatewayPhoneticMatch := inMod.PhoneticMatch;
-												EXPORT BOOLEAN                               UseQSentV2             := TRUE;
-												EXPORT DATASET(iesp.share.t_StringArrayItem) ExcludedPhones         := dPhones;
-								END;
-			SELF.qsent_recs := Doxie_Raw.RealTimePhones_Raw(DATASET(pGateway),timeoutSecs,,tmpMod,inMod.UseQSent,TRUE);											
-			SELF				    := pInput;
-		END;
-		
-		dIQ411Rule3Recs := IF(EXISTS(dIQ411Rule2Recs(~EXISTS(qsent_recs))),
-													PROJECT(dIQ411Rule2Recs(~EXISTS(qsent_recs)),tGetIQ411Rule3Data(LEFT)));
-		
-		dIQ411Combined := dIQ411Rule1Recs(EXISTS(qsent_recs)) + dIQ411Rule2Recs(EXISTS(qsent_recs)) + dIQ411Rule3Recs;
+		dIQ411Recs := PROJECT(dIn,IQ411_Recs(LEFT));
 		
 		// NORMALIZE the qsent gateway records to flatten the child DATASET
 		lFinal tNormIQ411Recs(rQSent_Layout le,lPPResponse ri,INTEGER cnt) :=
@@ -251,15 +188,12 @@ MODULE
 			SELF                := [];
 		END;
 		
-		dNormIQ411Recs := NORMALIZE(dIQ411Combined,LEFT.qsent_recs,tNormIQ411Recs(LEFT,RIGHT,COUNTER));
-		
+		dNormIQ411Recs := NORMALIZE(dIQ411Recs,LEFT.qsent_recs,tNormIQ411Recs(LEFT,RIGHT,COUNTER));
+
 		// Debug
 		#IF(PhoneFinder_Services.Constants.Debug.QSent)
 			OUTPUT(dIn,NAMED('dQSentIQ411_In'));
-			OUTPUT(dIQ411Rule1Recs,NAMED('dIQ411Rule1Recs'));
-			OUTPUT(dIQ411Rule2Recs,NAMED('dIQ411Rule2Recs'));
-			OUTPUT(dIQ411Rule3Recs,NAMED('dIQ411Rule3Recs'));
-			OUTPUT(dIQ411Combined,NAMED('dIQ411Combined'));
+			OUTPUT(dIQ411Recs,NAMED('dIQ411Recs'));
 			OUTPUT(dNormIQ411Recs,NAMED('dNormIQ411Recs'));
 		#END
 		
