@@ -547,7 +547,7 @@ Layout_Phone_Verification := RECORD
 	UNSIGNED1 recent_disconnects;
 	Layout_Gong_DID 		Gong_DID;
 	string2 Insurance_Phone_Verification;
-	string2 Experian_Phone_Verification;
+	string2 phone_ver_bureau;
 END;	
 
 Layout_SSN_Information := RECORD
@@ -1389,7 +1389,7 @@ export Layout_Boca_Shell_Edina_v54 := RECORD
 	Layout_credit_derived_perf       												credit_derived_perf; 
 	string20	historyDateTimeStamp := '';  
 	STRING200 errorcode;
-	Risk_Indicators.Layouts.layout_BIP_Header_info_54 					BIP_Header54;
+	Risk_Indicators.Layouts.layout_BIP_Header_info_54 -bus_seleID_match					BIP_Header54;
 
 	// Layout_VOOAttributes             VOO_attributes; 
 
