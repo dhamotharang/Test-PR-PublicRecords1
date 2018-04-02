@@ -36,6 +36,7 @@ EXPORT prep_ingest_file := FUNCTION
 																							+TRIM(self.LastName)
 																							+TRIM(pInput.MiddleInit)
 																							+TRIM(pInput.Suffix)
+																							+TRIM(pInput.Address)
 																							+TRIM(pInput.City)
 																							+TRIM(pInput.State)
 																							+TRIM(pInput.ZipCode)
