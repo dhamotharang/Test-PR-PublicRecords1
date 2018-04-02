@@ -1,4 +1,4 @@
-import risk_indicators, models, seed_files, riskwise, ut, address, gateway, Royalty, MDR, std;
+﻿import risk_indicators, models, seed_files, riskwise, ut, address, gateway, Royalty, MDR, std;
 
 export BIDO_Function(string4 tribcode, boolean test_data_enabled, string addr, string city, string state, string zip,
 						dataset(business_risk.Layout_Output) biid, 
@@ -60,6 +60,11 @@ clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Pur
 r := RECORD
 	business_risk.Layout_Final_Denorm;
 	DATASET(Models.Layout_Model) models;
+  unsigned2 royalty_type_code_targus;
+  string20  royalty_type_targus; 			
+  unsigned2 royalty_count_targus; 			 
+  unsigned2 non_royalty_count_targus;  
+  string20  count_entity_targus; 
 end;
 	
 riskwise.Layout_BusReasons_Input into_orig_input(biid le) := transform
@@ -251,11 +256,25 @@ r into_final(biid L, scores R) := transform
 	self.altareacode := if(l.areacodesplitflag='Y', l.altareacode, '');
 	self.models := r;
 	self := l;
+  self := [];
 end;
 
-
 with_models := join(biid, scores, left.account=right.accountnumber, into_final(left,right));
-	
+
+// Add Targus royalties.
+with_models_and_royalties := 
+  PROJECT(
+    with_models,
+    TRANSFORM( r,
+      SELF.royalty_type_code_targus := iidRoyalties[1].royalty_type_code,
+      SELF.royalty_type_targus      := iidRoyalties[1].royalty_type,
+      SELF.royalty_count_targus     := iidRoyalties[1].royalty_count,
+      SELF.non_royalty_count_targus := iidRoyalties[1].non_royalty_count,
+      SELF.count_entity_targus      := iidRoyalties[1].count_entity,
+      SELF := LEFT,
+      SELF := []    
+    )
+  );
 
 	// check for testseed record
 		seed := Choosen(Seed_Files.Key_bd1obd1i( keyed(trib=tribcode), keyed(fein1 = fein_value) ),1);
@@ -281,7 +300,7 @@ with_models := join(biid, scores, left.account=right.accountnumber, into_final(l
 	
 	
 	final := if(test_data_enabled and count(seed_final) > 0, seed_final, with_models);
-	#stored('Royalties', iidRoyalties);
+
 	return final;
 	
 END;

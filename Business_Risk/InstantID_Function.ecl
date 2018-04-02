@@ -1,4 +1,4 @@
-
+﻿
 import aca, codes, Business_Header, Business_Header_SS, BankruptcyV3, corp2, 
 		yellowpages, Risk_Indicators, did_add, doxie, ut, riskwise, suppress, 
 		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, ut, gateway, Royalty, MDR, Business_Risk_BIP;
@@ -114,7 +114,6 @@ ciid_results := risk_indicators.InstantID_Function(repIN, gateways, dppa, glb, i
 
 if(exists(ciid_results(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
-//************track Royalties for who uses targus********* /
 royalties4Targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ciid_results), src, TargusType, TRUE, FALSE, FALSE, TRUE);
 
 nugen_rec := record, MAXLENGTH(14000)
@@ -573,6 +572,7 @@ layout_output rep_to_output(repOUT  L, indata R) := transform
 	self.repriskindicators := rep_pris;
 	self.busriskindicators := [];
 	SELF.attributes := [];
+  self := [];
 end;
 
 wRep_nobest := join(repOut, indata, 
@@ -697,6 +697,7 @@ layout_output addAttus(grouped_rep le, attus_out rt) := transform
 	SELF.watchlist_zip := rt.watchlist_zip;
 	SELF.watchlist_country := rt.watchlist_contry;
   SELF := le;
+  SELF := [];
 end;
 
 b2bzWatch := join(grouped_rep, attus_out, left.seq=right.seq, addAttus(left, right), left outer);
@@ -710,6 +711,7 @@ layout_output addZipClass(withWatchlistsData le, riskwise.Key_CityStZip rt) := t
 	self.statezipflag := IF(rt.state <> '' and le.st <> '' and StringLib.StringToUpperCase(le.st) <> rt.state, '1', '0');
 	self.cityzipflag := IF(rt.city <> '' and le.p_city_name <> '' and (risk_indicators.LnameScore(StringLib.StringToUpperCase(le.p_city_name), rt.city) < 80), '1', '0');
 	self := le;
+  self := [];
 end;
 
 wZipClass := join(withWatchlistsData, riskwise.Key_CityStZip,
@@ -720,6 +722,7 @@ layout_output zipRoll(layout_output le, layout_output ri) := transform
 	self.statezipflag := IF(le.statezipflag = '0', le.statezipflag, ri.statezipflag);
 	self.cityzipflag := IF(le.cityzipflag = '0', le.cityzipflag, ri.cityzipflag);
 	self := le;
+  self := [];
 end;
 wZipClassRoll := ROLLUP(wZipClass,true,zipRoll(left,right));
 
@@ -2307,12 +2310,13 @@ layout_output add_reasons(wFeinMatches L) := transform
 	risk_indicators.mac_add_sequence(pris, reasons_with_seq);
 	self.BusRiskIndicators := reasons_with_seq; 
 	self := l;
+  self := [];
 end;
 
 withReasons := project(wFeinMatches, add_reasons(LEFT));
 
 // join the results back to the original input so that every record on input has a response populated
-full_response := join(indata1, withReasons,
+full_response_pre := join(indata1, withReasons,
 						left.company_name=right.company_name and
 						left.alt_company_name=right.alt_company_name and
 						left.phone10=right.phone10 and
@@ -2333,9 +2337,24 @@ full_response := join(indata1, withReasons,
 						left.rep_dob=right.rep_dob,	
 			transform(layout_output, 	self.seq := left.seq, 
 																self.account := left.account,
-																self := right), keep(1));
+																self := right,
+                                self := []), keep(1));
 			
-
+//************track Royalties for who uses targus********* /
+full_response := 
+  PROJECT(
+    full_response_pre, 
+    TRANSFORM( layout_output,
+        SELF.royalty_type_code_targus := royalties4Targus[1].royalty_type_code,
+        SELF.royalty_type_targus      := royalties4Targus[1].royalty_type,
+        SELF.royalty_count_targus     := royalties4Targus[1].royalty_count,
+        SELF.non_royalty_count_targus := royalties4Targus[1].non_royalty_count,
+        SELF.count_entity_targus      := royalties4Targus[1].count_entity,
+        SELF := LEFT,
+        SELF := []
+    )
+  );
+  
  // *************************************
   // *   Boca Shell Logging Functionality  *
   // * NOTE: Because of the #stored below  *
@@ -2344,10 +2363,9 @@ full_response := join(indata1, withReasons,
   // **************************************
 	productID := Risk_Reporting.ProductID.Business_Risk__InstantID_Service;
 	
-	intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(bocaShell, productID, IF(IncludeRepAttributes, 3, bsversion));
-	#stored('Intermediate_Log', intermediate_log);
-	//track royalties
-	#stored('Bus_Royalties', royalties4Targus);
+//	intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(bocaShell, productID, IF(IncludeRepAttributes, 3, bsversion));
+//	#stored('Intermediate_Log', intermediate_log);
+
  // ************ End Logging ***********
  
  // output(indata1, named('indata1BIIDFunc'), overwrite);
