@@ -1,4 +1,4 @@
-import iesp, InstantID_Archiving, doxie, Gateway;
+﻿import iesp, InstantID_Archiving, doxie, Gateway;
 /*This attribute retrieves data for  the instantId archiving and reporting project. 
 	- retrieves data for the summaryReport_InstantIdInternational
 	- runs standalone
@@ -108,23 +108,24 @@ EXPORT SummaryReport_IIDI2_Records := MODULE
 		tbl_verifiedname_cnts := table(ds_iidi_verified_deduped((integer) Source_count >= 1), {name, src_cnt :=count(group)}, name); 
 		
 		// Verified fields per Country
-		VerifiedLayout := map(in_mod.CountryId = InstantID_Archiving_Services.Constants.Australia => Constants.iidi2_Australia_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Austria => Constants.iidi2_Austria_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Brazil => Constants.iidi2_Brazil_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Canada => Constants.iidi2_Canada_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.China => Constants.iidi2_China_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Germany => Constants.iidi2_Germany_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.HongKong => Constants.iidi2_Hong_Kong_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Ireland => Constants.iidi2_Ireland_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Japan => Constants.iidi2_Japan_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Luxembourg => Constants.iidi2_Luxembourg_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Mexico => Constants.iidi2_Mexico_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Netherlands => Constants.iidi2_Netherlands_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.NewZealand => Constants.iidi2_New_Zealand_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Singapore => Constants.iidi2_Singapore_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.SouthAfrica => Constants.iidi2_South_Africa_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.Switzerland => Constants.iidi2_Switzerland_Elements,
-													in_mod.CountryId = InstantID_Archiving_Services.Constants.UnitedKingdom => Constants.iidi2_United_Kingdom_Elements,
+  inCountry := trim(UnicodeLib.UnicodeToUpperCase(in_mod.CountryId));
+		VerifiedLayout := map(inCountry = InstantID_Archiving_Services.Constants.Australia => Constants.iidi2_Australia_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Austria => Constants.iidi2_Austria_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Brazil => Constants.iidi2_Brazil_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Canada => Constants.iidi2_Canada_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.China => Constants.iidi2_China_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Germany => Constants.iidi2_Germany_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.HongKong => Constants.iidi2_Hong_Kong_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Ireland => Constants.iidi2_Ireland_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Japan => Constants.iidi2_Japan_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Luxembourg => Constants.iidi2_Luxembourg_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Mexico => Constants.iidi2_Mexico_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Netherlands => Constants.iidi2_Netherlands_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.NewZealand => Constants.iidi2_New_Zealand_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Singapore => Constants.iidi2_Singapore_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.SouthAfrica => Constants.iidi2_South_Africa_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.Switzerland => Constants.iidi2_Switzerland_Elements,
+													inCountry = InstantID_Archiving_Services.Constants.UnitedKingdom => Constants.iidi2_United_Kingdom_Elements,
 																										 InstantID_Archiving_Services.Constants. iidi_verifiedElements); //old layout, leave here? Shouldn't ever hit it.
 		//gets the counts for each source type 
 		ds_srcCnt_Eq_one := Macros.mac_GetIIDI2Counts(tbl_verified_cnts((INTEGER) Source_count = 1), iidi_trans_cnt, '2', VerifiedLayout); 
