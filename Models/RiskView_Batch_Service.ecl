@@ -1824,7 +1824,6 @@ Layout_working addScore(Layout_working le, Models.Layout_ModelOut ri, integer i)
 	self.reason22   := if(i=2 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason22);
 	self.reason23   := if(i=3 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason23);
 	self.reason24   := if(i=4 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason24);
-	self.reason25   := if(i=4 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason25);
 	// Turn on the 5th reason code for the Payment Score model as well...
 	self.reason25   := if(i=5 and (FlagshipVersion >= 4 OR AlternateModel IN ['rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvc1208_1', 'rvc1301_1','rvc1405_3','rvc1405_4','rvc1412_1', 'rvc1412_2', 'rvc1703_1']), ri.ri[5].hri, le.reason25);
 
