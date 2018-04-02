@@ -57,9 +57,6 @@ module
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
 		self.sequence := C;
-		self.ssn	:= If(regexfind('^[0-9]*$',l.ssn),trim(l.ssn,left,right),'');
-		Self.Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
-		SELF.Zip		:=if(regexfind('^[0-9]*$',regexreplace('-',l.zip,'')),if(length(trim(l.zip,left,right)) in [5,9],l.zip,''),'');
 		self:=l;
 		self:=[];
 	end;
@@ -102,8 +99,9 @@ module
 	dappendName		:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
 	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dAppendLexid,Layouts.Input.IdentityData));
+	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
 	
 	Build_Input_File :=  OUTPUT(new_file,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
