@@ -5,6 +5,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		boolean IncludeLnJ = false, boolean onThor = false, 
 		GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext) := function
  
+
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	// if the bsOption is turned on to remove liens, use the w_bankruptcy data prior to the liens joins
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
@@ -535,10 +536,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 			self := left),LEFT OUTER);
 			
 	liens_fullunSorted := ungroup(liens_fuller + liens_main_overrides);
-	//project the childset out to dataset on it's own to work with easier
-	PcontextStId := project(iid_withPersonContext.ConsumerStatements, 
-		transform(Risk_Indicators.Layouts.tmp_Consumer_Statements,
-			self := left));
+	//normalize the childset out to dataset on it's own to work with easier
+	PcontextStId := NORMALIZE(iid_withPersonContext, LEFT.ConsumerStatements, TRANSFORM(Risk_Indicators.Layouts.tmp_Consumer_Statements, SELF := RIGHT));
+	
 	//if any statementIds match between our data and person context, populate the statementId and carry it back
 	//in the LNJ datasets. The datasets are limited to 99 records.
 	LiensFullWithStId := join(liens_fullunSorted, PcontextStId,
