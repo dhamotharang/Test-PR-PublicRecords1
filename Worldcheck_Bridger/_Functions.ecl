@@ -1144,6 +1144,7 @@
 				trim(kword, left, right) = 'OFAC-CAATSA-RUSSIA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_RUSSIA,
 				trim(kword, left, right) = 'DPRK-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_DPRK_WC,
 				trim(kword, left, right) = 'QANCTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_QANCTC,
+				trim(kword, left, right) = 'SECO-VE' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_VE,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
