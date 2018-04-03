@@ -29,7 +29,6 @@ export Keys(
 	
 	shared BaseMain           						:= Project(pFileKeybuild, Transform(Layouts_key.Main
 																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
-																									,self.customer_person_id :=(unsigned6)left.customer_person_id ////temporary fix until new layouts released to keys 03/16/2018.
 																									,self					:=left)
 																									);
 																									
