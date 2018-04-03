@@ -1,4 +1,4 @@
-﻿export fGetRegExPattern := module
+﻿export fGetRegExPattern := module 
 
 	export Address := module
 		//Note:Hex values are as follows:x2a=>*;x5c=>\;x27=>';x60=>`;x40=>@;x5b=>[;x5d=>];

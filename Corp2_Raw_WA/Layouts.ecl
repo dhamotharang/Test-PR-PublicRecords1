@@ -1,5 +1,5 @@
 ﻿import corp2_mapping, corp2;
-
+ 
 EXPORT Layouts := module
 
     // Corporations Raw Vendor Input File

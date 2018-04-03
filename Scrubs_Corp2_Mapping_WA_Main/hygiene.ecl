@@ -1,4 +1,4 @@
-﻿IMPORT ut,SALT34,corp2_mapping;
+﻿IMPORT ut,SALT34,corp2_mapping;  
 EXPORT hygiene(dataset(Corp2_Mapping.LayoutsCommon.Main) h) := MODULE
  
 //A simple summary record
