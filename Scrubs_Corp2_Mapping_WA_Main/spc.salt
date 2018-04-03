@@ -1,6 +1,6 @@
 ﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_WA_Main
-FILENAME:In_WA
+FILENAME:In_WA 
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
 //RIDFIELD:<NameOfRidField>
@@ -17,7 +17,7 @@ FILENAME:In_WA
 FIELDTYPE:invalid__date:ALLOW(0123456789):LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid__optional_date:ALLOW(0123456789):LENGTHS(0,1,8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
 FIELDTYPE:invalid__corp_key:ALLOW(0123456789-):LENGTHS(10,11,12)
-FIELDTYPE:invalid__corp_vendor:ENUM(53|53)
+FIELDTYPE:invalid__corp_vendor:ENUM(53|53|53)
 FIELDTYPE:invalid__state_origin:ENUM(WA|WA)
 FIELDTYPE:invalid__charter:ALLOW(0123456789):LENGTHS(7,8,9)
 FIELDTYPE:invalid__mandatory:LENGTHS(1..)
@@ -60,7 +60,7 @@ FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
 FIELD:corp_merger_desc:TYPE(STRING250):LIKE(invalid__merger_desc):0,0
 FIELD:cont_title1_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
 FIELD:recordorigin:TYPE(STRING1):LIKE(invalid__recordOrigin):0,0
-
+  
 //Fields not being Scrubbed
 // DATEFIELD:corp_filing_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
 // DATEFIELD:corp_status_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0

@@ -1,4 +1,4 @@
-﻿IMPORT ut,SALT34,corp2_mapping;
+﻿IMPORT ut,SALT34,corp2_mapping;  
 IMPORT Scrubs,Scrubs_Corp2_Mapping_WA_Main; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  

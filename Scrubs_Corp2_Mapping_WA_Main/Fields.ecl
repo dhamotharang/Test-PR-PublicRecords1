@@ -1,4 +1,4 @@
-﻿IMPORT ut,SALT34;
+﻿IMPORT ut,SALT34; 
 IMPORT Scrubs,Scrubs_Corp2_Mapping_WA_Main; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
@@ -30,8 +30,8 @@ EXPORT InValidMessageFT_invalid__corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT34.Hygi
 EXPORT MakeFT_invalid__corp_vendor(SALT34.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid__corp_vendor(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['53','53']);
-EXPORT InValidMessageFT_invalid__corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('53|53'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid__corp_vendor(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['53','53','53']);
+EXPORT InValidMessageFT_invalid__corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('53|53|53'),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid__state_origin(SALT34.StrType s0) := FUNCTION
   RETURN  s0;

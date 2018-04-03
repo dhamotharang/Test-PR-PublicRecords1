@@ -1,5 +1,5 @@
-﻿IMPORT corp2, corp2_raw_wa;
-	
+﻿IMPORT corp2, corp2_raw_wa; 
+	 
 EXPORT Functions := MODULE
 
 		//******************************************************************************

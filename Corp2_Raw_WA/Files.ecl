@@ -1,4 +1,4 @@
-﻿import ut, tools, Corp2_Raw_WA;
+﻿import ut, tools, Corp2_Raw_WA; 
 
 EXPORT Files(STRING  pversion = '',
              BOOLEAN pUseOtherEnvironment = FALSE) := MODULE

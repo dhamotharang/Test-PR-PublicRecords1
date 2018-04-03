@@ -1,4 +1,4 @@
-﻿IMPORT tools, Corp2_Raw_WA;
+﻿IMPORT tools, Corp2_Raw_WA; 
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE

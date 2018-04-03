@@ -1,4 +1,4 @@
-﻿/*
+﻿/* 
 	Source:  					Washington Secretary of State				 									
 	Update Frequency: Weekly													
 	Update Type:			Full Append													

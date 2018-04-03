@@ -1,5 +1,5 @@
 ﻿//This is the code to execute in a builder window
-#OPTION('multiplePersistInstances', FALSE);
+#OPTION('multiplePersistInstances', FALSE); 
 #workunit('name','Scrubs_Corp2_Mapping_WA_Main.BWR_PopulationStatistics - Population Statistics - SALT V3.4.3');
 IMPORT Scrubs_Corp2_Mapping_WA_Main,SALT34;
 // In the line below substitute the file you want statistics for; and substitute any field names you can
