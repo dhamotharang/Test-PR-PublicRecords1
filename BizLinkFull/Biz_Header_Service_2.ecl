@@ -238,7 +238,7 @@ dProxidMatches:=PROJECT(dRawResultsNormed,TRANSFORM({LEFT.uniqueid;STRING proxid
   SELF:=LEFT;
 ));
 
-dSeleProxids:=THISMODULE.Process_Biz_Layouts.KeyseleidUp(seleid=e_seleid); // 20180329 JA: replaced KeyproxidUp(ultid=e_seleid AND orgid=e_seleid AND seleid=e_seleid);
+dSeleProxids:=THISMODULE.Process_Biz_Layouts.KeyseleidUp(keyed(seleid=e_seleid)); // 20180329 JA: replaced KeyproxidUp(ultid=e_seleid AND orgid=e_seleid AND seleid=e_seleid);
 dLinkIDs:=BIPV2_Best.Key_LinkIds.kfetch(
   inputs:=DEDUP(PROJECT(dSeleProxids,BIPV2.IDlayouts.l_xlink_ids),ALL),
   Level:=BIPV2.IDconstants.Fetch_Level_PROXID
