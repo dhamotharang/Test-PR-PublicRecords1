@@ -1,4 +1,4 @@
-IMPORT BIPV2, Data_Services, doxie;
+﻿IMPORT BIPV2, Data_Services, doxie;
 
 EXPORT Key_OSHAIR_LinkIds := MODULE
 
@@ -10,7 +10,8 @@ EXPORT Key_OSHAIR_LinkIds := MODULE
   slimLayout	:=	record
 		OSHAIR.layout_OSHAIR_inspection_clean_BIP	 
 		  - dt_first_seen	- dt_last_seen						 
-			- dt_vendor_first_reported - dt_vendor_last_reported;	  
+			- dt_vendor_first_reported - dt_vendor_last_reported
+			- raw_aid -ace_aid;	  
   end;
 
   NewKeyBuild	:=	project(Base, TRANSFORM(slimLayout,SELF := LEFT;));
@@ -39,9 +40,9 @@ EXPORT Key_OSHAIR_LinkIds := MODULE
 	EXPORT kFetch(
 		DATASET(BIPV2.IDlayouts.l_xlink_ids) inputs, 
 		STRING1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
-																								//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
-																								//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
-		UNSIGNED2 ScoreThreshold = 0,								//Applied at lowest leve of ID
+																													//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
+																													//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
+		UNSIGNED2 ScoreThreshold = 0,													//Applied at lowest leve of ID
 		joinLimit = 25000
 		) :=
 	FUNCTION
