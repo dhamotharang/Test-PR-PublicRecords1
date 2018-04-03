@@ -1,10 +1,10 @@
-﻿IMPORT SALT37,std, data_services;
-EXPORT Key_InsuranceHeader_DOB(BOOLEAN incremental=FALSE) := MODULE
+﻿IMPORT SALT37,std;
+EXPORT Key_InsuranceHeader_DOB(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit=Config.DOB_MAXBLOCKLIMIT) := MODULE/*HACK*/
  
 //DOB:LNAME:?:FNAME:MNAME:+:ST:CITY:SSN5:SSN4:DERIVED_GENDER:SNAME
 EXPORT KeyName := KeyNames().DOB_super; /*HACK*/
  
-EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::DOB';
+EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::DOB';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  
@@ -103,6 +103,7 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.DOB_MAXBLOCKLIMIT, aBlockLimit);
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0;
 KeyRec := RECORDOF(Key);
  
@@ -111,7 +112,7 @@ EXPORT RawFetch(UNSIGNED4 param_DOB,TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAM
            param_DOB <> 0 AND KEYED(DOB_year = param_DOB DIV 10000 AND DOB_month = param_DOB DIV 100 % 100 AND DOB_day = param_DOB % 100)
       AND KEYED(( LNAME = param_LNAME AND param_LNAME <> (TYPEOF(LNAME))''))
       AND ( (FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME OR param_FNAME[1..LENGTH(TRIM(FNAME))] = FNAME)  OR FNAME_PreferredName = fn_PreferredName(param_FNAME) OR metaphonelib.DMetaPhone1(FNAME)=metaphonelib.DMetaPhone1(param_FNAME) OR Config.WithinEditN(FNAME,FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK*/ OR Config.WildMatch(FNAME,param_FNAME,FALSE) )
-      AND ( (MNAME[1..LENGTH(TRIM(param_MNAME))] = param_MNAME OR param_MNAME[1..LENGTH(TRIM(MNAME))] = MNAME) OR Config.WithinEditN(MNAME,MNAME_len,param_MNAME,param_MNAME_len,2, 0) )),Config.DOB_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+      AND ( (MNAME[1..LENGTH(TRIM(param_MNAME))] = param_MNAME OR param_MNAME[1..LENGTH(TRIM(MNAME))] = MNAME) OR Config.WithinEditN(MNAME,MNAME_len,param_MNAME,param_MNAME_len,2, 0) )),MAX_BLOCKLIMIT /*HACK*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
 EXPORT ScoredDIDFetch(UNSIGNED4 param_DOB,TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',TYPEOF(h.CITY) param_CITY = (TYPEOF(h.CITY))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
