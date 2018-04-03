@@ -60,7 +60,7 @@ module
 						Customer_Account_Number						=''
 				or		Customer_County 									=''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-				or 	(SSN = '' and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+				or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
 				or 	(Street_1='' and City=''	and State='' and Zip='')
 				or 	(Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
 				or 	(Customer_Agency_Vertical_Type 		in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
@@ -90,8 +90,9 @@ module
 	dappendName		:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone   := Standardize_Entity.Clean_Phone (dappendName);
 	dAppendLexid   := Standardize_Entity.Append_Lexid (dAppendPhone);	
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	new_file := fn_dedup(files().Input.KnownFraud.sprayed  + project(dAppendLexid,Layouts.Input.KnownFraud));
+	new_file := fn_dedup(files().Input.KnownFraud.sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 	
 	Build_Input_File :=  OUTPUT(new_file,,Filenames().Input.KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 

@@ -469,7 +469,9 @@ export Main         :=
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
-
+	string10					clean_SSN :='';
+	string10					clean_Zip :='';
+	string25					clean_IP_Address :='';
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
 	string1						Ethnicity := '';
@@ -664,6 +666,9 @@ export keybuild
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
+	string10					clean_SSN :='';
+	string10					clean_Zip :='';
+	string25					clean_IP_Address :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
