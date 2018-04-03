@@ -68,7 +68,7 @@ module
 						Customer_Account_Number						=''
 				or		Customer_County 									=''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-				or 	((SSN = '' or length(SSN)<>9 ) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+				or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
 				or 	(Street_1='' and City=''	and State='' and Zip='')
 				or 	(Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
 				or 	(Customer_Agency_Vertical_Type 		in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
