@@ -1,4 +1,4 @@
-import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master, promotesupers;
+﻿import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master, promotesupers,strata;
 
 export proc_deathmaster_buildkey_ssa(string filedate) := function
 	#uniquename(version_date)
@@ -89,11 +89,15 @@ export proc_deathmaster_buildkey_ssa(string filedate) := function
 	///////////////////////// Move FCRA KEYS /////////////////////////
 	RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::fcra::did_death_masterV2_ssa', 'Q', move9, 2);
 
+	// DF-21696 Show counts of blanked out fields in thor_data400::key::fcra::did_death_masterv2_ssa_qa
+	cnt_death_masterv2_ssa_did_key_fcra := OUTPUT(strata.macf_pops(Doxie.key_death_masterv2_ssa_did_fcra,,,,,,FALSE,['st_country_code','zip_lastpayment']));
+
+
 	move_qa	:=	parallel(move1,move2,move3,move4,move5,move6,move7,move8,move9);
 
 	// Move building to built
 	post1 := promotesupers.SF_MaintBuilding('~thor_data400::base::did_death_master_ssa');  
 	post2 := promotesupers.SF_MaintBuilding('~thor_data400::base::did_death_masterV2_ssa');
 
-	return sequential(pre1,pre2,full1,move_qa,post1,post2);
+	return sequential(pre1,pre2,full1,move_qa,cnt_death_masterv2_ssa_did_key_fcra,post1,post2);
 end;
