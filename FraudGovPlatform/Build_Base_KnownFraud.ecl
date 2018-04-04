@@ -1,4 +1,4 @@
-﻿Import ut,tools,inquiry_acclogs,FraudShared,Address; 
+﻿Import ut,tools,FraudShared; 
 
 EXPORT Build_Base_KnownFraud (
    string pversion
@@ -8,42 +8,31 @@ EXPORT Build_Base_KnownFraud (
 ) := 
 module 
 
-	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
-
-		Layouts.Base.KnownFraud	tPrep(inKnownFraudUpdateUpper	pInput,integer	cnt)	:=
+		Layouts.Base.KnownFraud	tPrep(inKnownFraudUpdate	pInput,integer	cnt)	:=
 	transform
-				
-						self.process_date                   	:= (unsigned) pInput.ProcessDate, 
-						self.dt_first_seen								:= (unsigned) pInput.ProcessDate; 
-						self.dt_last_seen									:= (unsigned) pInput.ProcessDate;
-						self.dt_vendor_last_reported				:= (unsigned) pInput.ProcessDate; 
-						self.dt_vendor_first_reported				:= (unsigned) pInput.ProcessDate; 
-						self.Unique_Id										:= 0; 
-					  self.source_rec_id								:= 0;
-																										
-						// add  address and name prep 
-					  self.current											:= 'C' ; 
-						cleanperson73										:= Address.cleanperson73(if(pInput.full_name <> '',pInput.full_name, pInput.first_name + ' ' + pInput.middle_name + ' ' + pInput.last_name));
-						self.cleaned_name.title						:= ut.CleanSpacesAndUpper(cleanperson73[1..5]); 
-						self.cleaned_name.fname						:= ut.CleanSpacesAndUpper(cleanperson73[6..25]);
-						self.cleaned_name.mname						:= ut.CleanSpacesAndUpper(cleanperson73[26..45]); 
-						self.cleaned_name.lname						:= ut.CleanSpacesAndUpper(cleanperson73[46..65]);
-						self.cleaned_name.name_suffix				:= ut.CleanSpacesAndUpper(cleanperson73[66..70]); 
-						self.cleaned_name.name_score				:= ut.CleanSpacesAndUpper(cleanperson73[71..73]); 							
-						self														:= pInput; 
-						self														:= []; 
+			self.process_date                   	:= (unsigned) pInput.ProcessDate, 
+			self.dt_first_seen								:= (unsigned) pInput.ProcessDate; 
+			self.dt_last_seen									:= (unsigned) pInput.ProcessDate;
+			self.dt_vendor_last_reported				:= (unsigned) pInput.ProcessDate; 
+			self.dt_vendor_first_reported				:= (unsigned) pInput.ProcessDate; 
+			self.source_rec_id								:= 0;
+			// add  address and name prep 
+			self.current											:= 'C' ; 
+			self														:= pInput; 
+			self														:= []; 
    end; 
 		
-	KnownFraudUpdate	:=	project(dedup(inKnownFraudUpdateUpper ,all),tPrep(left,counter));
+	KnownFraudUpdate	:=	project(dedup(inKnownFraudUpdate ,all),tPrep(left,counter));
 	
 	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
 	
-	KnownFraudSource  := join(	KnownFraudUpdate + FraudGovPlatform.Build_Base_NAC(pversion).NACKNFDUpdate,
+	KnownFraudSource  := join(	KnownFraudUpdate,
 												Mbs_ds, 
-												(unsigned6) left.Client_ID = right.gc_id and 
+												(unsigned6) left.Customer_Account_Number = right.gc_id and 
 												right.file_type = Functions.file_type_fn('KNFD') and 
 												Functions.ind_type_fn(left.customer_program) = right.ind_type and 
-												left.customer_state = right.Customer_State,  
+												left.customer_state = right.Customer_State and
+												left.Customer_County = right.Customer_County,  
 												TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
 
@@ -72,12 +61,12 @@ module
 								ut.CleanSpacesAndUpper(l.head_of_household_indicator) + ',' +  
 								ut.CleanSpacesAndUpper(l.relationship_indicator) + ',' +  
 								(string)l.lexid + ',' +  
-								ut.CleanSpacesAndUpper(l.title) + ',' +  
-								ut.CleanSpacesAndUpper(l.first_name) + ',' +  
-								ut.CleanSpacesAndUpper(l.middle_name) + ',' +  
-								ut.CleanSpacesAndUpper(l.last_name) + ',' +  
-								ut.CleanSpacesAndUpper(l.orig_suffix) + ',' +  
-								ut.CleanSpacesAndUpper(l.full_name) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_title) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_first_name) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_middle_name) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_last_name) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_orig_suffix) + ',' +  
+								ut.CleanSpacesAndUpper(l.raw_full_name) + ',' +  
 								ut.CleanSpacesAndUpper(l.name_risk_code) + ',' +  
 								ut.CleanSpacesAndUpper(l.ssn) + ',' +  
 								ut.CleanSpacesAndUpper(l.ssn_risk_code) + ',' +  
@@ -86,14 +75,14 @@ module
 								ut.CleanSpacesAndUpper(l.Drivers_License_Number) + ',' +  
 								ut.CleanSpacesAndUpper(l.Drivers_License_State) + ',' +  
 								ut.CleanSpacesAndUpper(l.drivers_license_risk_code) + ',' +  
-								ut.CleanSpacesAndUpper(l.physical_address_1) + ',' +  
-								ut.CleanSpacesAndUpper(l.physical_address_2) + ',' +  
+								ut.CleanSpacesAndUpper(l.street_1) + ',' +  
+								ut.CleanSpacesAndUpper(l.street_2) + ',' +  
 								ut.CleanSpacesAndUpper(l.city) + ',' +  
 								ut.CleanSpacesAndUpper(l.state) + ',' +  
 								ut.CleanSpacesAndUpper(l.zip) + ',' +  
 								ut.CleanSpacesAndUpper(l.physical_address_risk_code) + ',' +  
-								ut.CleanSpacesAndUpper(l.mailing_address_1) + ',' +  
-								ut.CleanSpacesAndUpper(l.mailing_address_2) + ',' +  
+								ut.CleanSpacesAndUpper(l.mailing_street_1) + ',' +  
+								ut.CleanSpacesAndUpper(l.mailing_street_2) + ',' +  
 								ut.CleanSpacesAndUpper(l.mailing_city) + ',' +  
 								ut.CleanSpacesAndUpper(l.mailing_state) + ',' +  
 								ut.CleanSpacesAndUpper(l.mailing_zip) + ',' +  
@@ -185,6 +174,7 @@ module
 		SELF.dt_vendor_last_reported := max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
 		SELF.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
 		SELF.source_rec_id := if(l.source_rec_id < r.source_rec_id,l.source_rec_id, r.source_rec_id); // leave always previous rid 
+		SELF.Unique_Id := if(l.Unique_Id < r.Unique_Id,l.Unique_Id, r.Unique_Id); // leave always previous Unique_Id 
 		self.current := if(l.current = 'C' or r.current = 'C', 'C', 'H');
 		self := l;
 	end;
@@ -192,7 +182,7 @@ module
 	pDataset_rollup := rollup( pDataset_sort
 														,RollupUpdate(left, right)
 														,Record																						
-														,except process_date, dt_first_seen ,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported, source_rec_id ,local
+														,except process_date, dt_first_seen ,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported, source_rec_id ,Unique_Id, local
 										);
 
 	
