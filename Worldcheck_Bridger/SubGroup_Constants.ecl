@@ -1042,6 +1042,8 @@
 		export string KEYWORD_OFAC_CAATSA_RUSSIA		:= '730';
 		export string KEYWORD_DPRK_WC								:= '731';
 		export string KEYWORD_QANCTC								:= '732';
+		export string KEYWORD_SECO_VE								:= '733';
+		export string KEYWORD_IDKPK									:= '734';
 
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
