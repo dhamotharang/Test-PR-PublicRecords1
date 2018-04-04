@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_raw_pa;
+﻿IMPORT corp2, corp2_raw_pa;
 	
 EXPORT Functions := MODULE
 
@@ -27,8 +27,11 @@ EXPORT Functions := MODULE
 						'PREVIOUS APPLICANT',
 						'PREVIOUS PRINCIPAL PLACE OF BUSINESS',
 						'PREVIOUS PRINICIPAL',
+						'PREVIOUS REGISTERED MAILING',
+						'PREVIOUS REGISTERED OFFICE',
 						'PREVIOUS UCC ADDRESS',
 						'BUSINESS',
+						'REGISTERED OFFICE',
 						'UCC ADDRESS',
 						'WITHDRAWAL ADDRESS',
 						''];
