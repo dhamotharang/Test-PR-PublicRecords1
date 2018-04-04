@@ -1,4 +1,4 @@
-import Salt35;
+﻿import Salt35;
 EXPORT Layouts := MODULE
 
 //	Scrubs
@@ -43,6 +43,7 @@ string Severity := '';
 string Pass_Percentage;
 string Percentage_Error_Min := '';
 string Percentage_Error_Max := '';
+// string ScrubsAlertsPerRelToPopulationMin := ''; Currently in Testing
 string Change_To_From_Zero := '';
 end;
 
@@ -66,12 +67,15 @@ export LogRecord	:=	record
 				string NumRecs;
 				string NumRules;
 				string NumErroredRules;
+				string RulesExceedingThreshold;
+				string RulesExceedingSevere;
 				string NumErroredRecs;
 				string PcntErroredRecs;
 				string NumRemovedRecs;
 				string WU;
 			end;
 export OrbitLogLayout	:=	record
+			string ProfileName;
 			string version;
 			UNSIGNED8 recordstotal;
 			UNSIGNED4 processdate;
@@ -79,7 +83,7 @@ export OrbitLogLayout	:=	record
 			STRING    ruledesc;
 			STRING    ErrorMessage;
 			UNSIGNED8 rulecnt;
-			UNSIGNED1 rulepcnt;
+			decimal5_2 rulepcnt;
 			STRING1   rejectwarning := '';
 			Salt35.StrType rawcodemissing := '';
 			UNSIGNED1 rawcodemissingcnt := 0;
@@ -94,6 +98,8 @@ export OrbitLogLayout	:=	record
 		string RuleType;
 		Decimal5_2 PassPercentageBottom:=0.0;
 		Decimal5_2 PassPercentageTop;
+		//Decimal5_2 CompareToPreviousMin:=0.0;
+		//Decimal5_2 CompareToPreviousMax:=0.0;
 		string Code;
 		string Severity;
 	end;

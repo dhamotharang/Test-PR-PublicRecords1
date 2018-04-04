@@ -1,4 +1,6 @@
-import Ut, lib_stringlib, Drivers, std;
+﻿import Ut, lib_stringlib, Drivers, std;
+
+export ME_as_DL(dataset(drivers.Layout_ME_Full) pFile_ME_Input) := function
 
 string8 lFixMDY(string6 pMDYIn)
  := if((integer4)pMDYIn < 10000,
@@ -21,7 +23,7 @@ string8 lFixDOB(string6 pMDYIn)
 bad_names  := ['UNKNOWN','UNK','UNKN','NONE','N/A','UNAVAILABLE'];
 bad_mnames := ['NMN','NMI'];
 
-DriversV2.Layout_DL_Extended lTransform_ME_To_Common(Drivers.File_ME_Full pInput)
+DriversV2.Layout_DL_Extended lTransform_ME_To_Common(pFile_ME_Input pInput)
  := transform
   self.orig_state 							:= 'ME';
 	self.dt_first_seen 						:= (unsigned8)pInput.append_PROCESS_DATE div 100;
@@ -119,7 +121,7 @@ DriversV2.Layout_DL_Extended lTransform_ME_To_Common(Drivers.File_ME_Full pInput
 	self.status										:= pInput.orig_DLStat;
 end;
 
-ME_Transform := project(Drivers.File_ME_Full(orig_DLStat in ['','A','D','I','S','V','X','C','R'])
+ME_Transform := project(pFile_ME_Input(orig_DLStat in ['','A','D','I','S','V','X','C','R'])
 												,lTransform_ME_To_Common(left));
 
 //** Included expiration_date by replacing the orig_expiration_date as the field is always empty and using 
@@ -129,6 +131,10 @@ ME_Sort := sort(ME_Transform, dl_number, name, addr1, city, lic_issue_date, -exp
 
 // The use of dedup is unnecessary and eliminates data history, the rollup later in the process
 // should take care of things. (8/28/13)
-export ME_as_DL := ME_Sort : persist(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_ME_as_DL');
+ME_as_DL_mapper := ME_Sort;
+
+return ME_as_DL_mapper;
+
+end;
 
 

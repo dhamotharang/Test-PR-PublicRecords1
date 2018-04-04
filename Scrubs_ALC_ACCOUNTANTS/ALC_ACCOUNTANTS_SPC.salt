@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_ALC_ACCOUNTANTS
 FILENAME:ALC_ACCOUNTANTS
 //Uncomment up to NINES for internal or external adl
@@ -49,8 +49,8 @@ FIELD:number_of_employees:TYPE(STRING7):LIKE(invalid_numeric):0,0
 FIELD:msa:TYPE(STRING4):LIKE(invalid_numeric):0,0
 FIELD:source_code:TYPE(STRING100):0,0
 FIELD:company_type:TYPE(STRING4):LIKE(invalid_company_type):0,0
-FIELD:phone:TYPE(STRING10):LIKE(invalid_numeric):0,0
-FIELD:email:TYPE(STRING60):0,0
+FIELD:phone:TYPE(STRING20):LIKE(invalid_numeric):0,0
+FIELD:email:TYPE(STRING132):0,0
 FIELD:list_id:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:scno:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:keycode:TYPE(STRING35):0,0

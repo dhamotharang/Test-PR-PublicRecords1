@@ -1,4 +1,4 @@
-import doxie,ut,Inquiry_AccLogs,Data_Services;
+﻿import doxie,ut,Inquiry_AccLogs,Data_Services;
 
 export Key_Inquiry_industry_use_vertical(boolean IsFCRA=false) := function
 
@@ -8,7 +8,10 @@ df := Inquiry_AccLogs.File_MBS.File(~(inquiry_acclogs.fnTranslations.is_Disable_
 
 //mapping to the MBS industry vertical layout
 
-df_ := project(df, transform({Inquiry_AccLogs.Layout_MBS_Industry_vertical},self := left, self := []));
+df_ := project(df, transform({Inquiry_AccLogs.Layout_MBS_Industry_vertical}
+																														,self.sub_market := if (left.sub_market='CARD','CARDS',left.sub_market)
+																														,self := left
+																														, self := []));
 						
 df_dist := distribute(df_, hash(company_id,gc_id));
 df_dedup := dedup(sort(df_dist, gc_id, company_id, product_id, local), 

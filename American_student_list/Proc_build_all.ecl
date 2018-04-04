@@ -1,5 +1,5 @@
-// Process to build the American Student List Files.
-import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List;
+﻿// Process to build the American Student List Files.
+import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List,dops;
 
 export Proc_build_all(string filedate, string filename) :=
 function
@@ -31,12 +31,13 @@ e_mail_fail := fileservices.sendemail(
 build_keys  				:=	American_student_list.Proc_build_keys(filedate);
 
 //Update Roxie Page with Key Version
-UpdateRoxiePage := sequential(RoxieKeybuild.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie)
-											,RoxieKeybuild.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie));
-
+UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'N')
+											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'F'));
 
 email_notify := sequential(
-							//doSpray,
+							//DF-20264 Build base file for ASL suppression list
+							American_student_list.Proc_build_suppression(filedate),
+							doSpray,
 							American_student_list.Proc_build_base,
 							American_student_list.proc_build_address_list(filedate),
 							parallel(
@@ -45,8 +46,9 @@ email_notify := sequential(
 										,American_student_list.Out_Base_Stats_Population_V2(filedate)    //populate STRATA for v2 6/11/13
 										,American_student_list.Proc_Build_Autokeys(filedate)
 									   ),
-							UpdateRoxiePage,
-							Scrubs_American_Student_List.PostBuildScrubs(filedate)
+										 American_student_list.fn_Key_Compare(filedate),
+							Scrubs_American_Student_List.PostBuildScrubs(filedate),
+							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage),
 							) : 
 							SUCCESS(e_mail_success), 
 							FAILURE(e_mail_fail)

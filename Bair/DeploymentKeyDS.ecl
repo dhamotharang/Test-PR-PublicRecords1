@@ -1,4 +1,4 @@
-import pkgfile;
+﻿import pkgfile;
 
 EXPORT DeploymentKeyDS(string clustername = '', string	version = '', boolean isFullreplace = true, boolean isdeltareplace = false) := module
 
@@ -25,21 +25,21 @@ EXPORT DeploymentKeyDS(string clustername = '', string	version = '', boolean isF
 			], pkgfile.layouts.flat_layouts.FileRecord);
 	
 	EXPORT BairPublicSafetyKeys_V2 := DATASET([	//15
-			 {'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::name'    	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::name',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::meow'     			,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::meow',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::lfz'     	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::lfz',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::vin'     	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::vin',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::dln'     	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::dln',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::zip_pr'  	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::zip_pr',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::plate'   	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::plate',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::dob'     	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::dob',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::lexid'   	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::lexid',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::ssn'     	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::ssn',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::ph'      	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::ph',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::latlong' 	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::latlong',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::address'	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::address',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::company'	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::refs::company',isFullreplace, isdeltareplace}
-			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::wordbag::lname'	,'thor400_data::key::bair_externallinkkeys_v2::' + version + if(isFullreplace,'','_delta') +	'::eid_hash::wordbag::lname',isFullreplace, isdeltareplace}
+			 {'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::name'    	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::name',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::meow'     			,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::meow',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::lfz'     	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::lfz',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::vin'     	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::vin',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::dln'     	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::dln',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::zip_pr'  	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::zip_pr',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::plate'   	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::plate',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::dob'     	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::dob',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::lexid'   	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::lexid',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::ssn'     	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::ssn',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::ph'      	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::ph',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::latlong' 	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::latlong',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::address'	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::address',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::refs::company'	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::refs::company',isFullreplace, isdeltareplace}
+			,{'BairPublicSafetyKeys', 'thor400_data::key::bair_externallinkkeys_v2::qa::eid_hash::wordbag::lname'	,'thor400_data::key::bair_externallinkkeys_v2::' + if(isFullreplace,'20170823_163001_490105954w', version + '_delta') +	'::eid_hash::wordbag::lname',isFullreplace, isdeltareplace}
 			], pkgfile.layouts.flat_layouts.FileRecord);
 			
 	EXPORT BairCompositeDeltaKeys := DATASET([	//8
@@ -106,9 +106,9 @@ EXPORT DeploymentKeyDS(string clustername = '', string	version = '', boolean isF
 			], pkgfile.layouts.flat_layouts.FileRecord);			
 
 	AL := DATASET([
-			 {'BairALWeeklyKeys', 'thor_data400::key::bair::agency_layers::qa::layerid'	,'thor_data400::key::bair::agency_layers::20170723::layerid' , true}
-			,{'BairALWeeklyKeys', 'thor_data400::key::bair::agency_layers::qa::search'	,'thor_data400::key::bair::agency_layers::20170723::search'	, true}
-			,{'BairALWeeklyKeys', 'thor_data400::base::bair::agency_layers::qa'					,'thor_data400::base::bair::agency_layers::20170723'				  , true}
+			 {'BairALWeeklyKeys', 'thor_data400::key::bair::agency_layers::qa::layerid'	,'thor_data400::key::bair::agency_layers::20171106::layerid' , true}
+			,{'BairALWeeklyKeys', 'thor_data400::key::bair::agency_layers::qa::search'	,'thor_data400::key::bair::agency_layers::20171106::search'	, true}
+			,{'BairALWeeklyKeys', 'thor_data400::base::bair::agency_layers::qa'					,'thor_data400::base::bair::agency_layers::20171106'				  , true}
 			], pkgfile.layouts.flat_layouts.FileRecord);			
 	
 	PayloadDeltaKeysCertOnly := DATASET([], pkgfile.layouts.flat_layouts.FileRecord);	

@@ -1,4 +1,4 @@
-import lib_StringLib,Prof_License,ut;
+﻿import lib_StringLib,Prof_License,ut;
 
 
 EXPORT Map_OK_Medical(string fdate) := module
@@ -41,21 +41,21 @@ self.Speciality_1       := l.SPECIALTY1;
 self.Speciality_2       := l.SPECIALTY2;                           
 self.Speciality_3       := l.SPECIALTY3;                           
 self.Speciality_4       := l.SPECIALTY4;                           
-self.Medical_School_Name := '';                    
+self.Medical_School_Name := l.LastMedSch;                    
 self.Med_Sch_Foreign_Name := '';                             
 self.Med_Sch_YR_To      := '';                       
 self.COUNTYNAME         := l.MailCounty;                             
 self.UG_Sch_Type        := '';                                      
-self.Disc_Action        := '';                                      
-self.Disc_Remarks       := '';                                     
-self.Speciality_5       := '';                                     
+self.Disc_Action        :=l.DiscAct;                                      
+self.Disc_Remarks       := l.Disc_Remarks;                                       
+self.Speciality_5       := l.SPECIALTY5;                                     
 self.ADDRLINE1          := l.ADDRLINE1;                     
 self.ADDRLINE2          := l.ADDRLINE2;                     
 self.ADDRLINE3          := l.ADDRLINE3;                     
 self.CITY               := l.CITY;                            
 self.STATECODE          := l.STATECODE;                      
 self.ZIP                := l.ZIP;                              
-self.ProfTYPE           := l.ProfTYPE;                              
+self.ProfTYPE           := l.LicType;                              
 self.STATUS             := l.STATUS;                                 
 self.DATEEXPIRE         :=    dateconv_bi(trim(l.DATEEXPIRE)); 
 self := l;               
@@ -195,12 +195,12 @@ export buildprep := Sequential( dOKMedicalSF,
 								        if ( FileServices.FileExists( '~thor_data400::in::prolic_ok_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ok_old')),
                         FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ok','~thor_data400::in::prolic_ok_old'),   
                          
-											output( outfile,,'~thor_data400::in::prolic_ok',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_ok',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 							
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ok'),
-	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ok_old'),
+	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ok_old'),
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

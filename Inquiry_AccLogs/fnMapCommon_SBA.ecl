@@ -1,4 +1,4 @@
-import ut,lib_stringlib;
+﻿import ut,lib_stringlib;
 
 export fnMapCommon_SBA := module
 
@@ -6,7 +6,7 @@ export ready_file := function
 
 SBA_daily_in := inquiry_acclogs.File_SBA_Logs.input
            (regexfind(
-					            'SMLLBUSANALYTICS|SMBUSAN_|RELIDENTSEARCH|CP_RELIDENTRPT|VERIFICATION|AUTHENTICATION'
+					            'SMLLBUSANALYTICS|SMBUSAN_|RELIDENTSEARCH|CP_RELIDENTRPT|VERIFICATION|AUTHENTICATION|BUSINSID'
 					            ,stringlib.stringtouppercase(function_name)
 											)
 						);
@@ -20,6 +20,8 @@ SBA_data_dedup := dedup(sort(SBA_data_dist,record, local), record,local);
 ///////////// PROJECT INTO SLIM LAYOUT ///////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 SBA_project := project(SBA_data_dedup, transform(inquiry_acclogs.Layout_SBA_Logs.common, 
+self.cmp_fax_number := left.cmp_fax_phone;
+self.cmp_alt_name   := left.cmp_alt_name;
 self.pii2_clean_first_name := left.pii2_first_name;        
 self.pii2_clean_middle_name := left.pii2_middle_name;      
 self.pii2_clean_last_name := left.pii2_last_name;        
@@ -51,7 +53,8 @@ self.pii8_clean_suffix_name := left.pii8_suffix_name;
 fixDate := Inquiry_AccLogs.fncleanfunctions.tDateAdded(left.date_added);
 fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(fixDate);
 self.DateTime := 	fixTime;
-self := left));
+self := left;
+self :=[]));
 
 return SBA_project;
 end;

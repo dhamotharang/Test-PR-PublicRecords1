@@ -1,4 +1,4 @@
-import header,eq_hist,transunioncred,experiancred,ut,doxie;
+﻿import header,eq_hist,transunioncred,experiancred,ut,doxie;
 
 export Mod_CreditBureau_address := module
 
@@ -40,10 +40,13 @@ r:=record
 	string75 fn { virtual(logicalfilename)};
 end;
 
+rw:={header.File_Header_In().monthly_file};
+inw:=DATASET('~thor_data400::in::quickhdr_raw',             {string75 fn { virtual(logicalfilename)},rw}, THOR);
+
 #if (IsFullUpdate = false)
 EqFiles0
 	:=
-	  DATASET('~thor_data400::in::quickhdr_raw',             {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR)
+	  inw
 	;
 
 EqFiles:=project(EqFiles0
@@ -62,9 +65,11 @@ EqFiles:=project(EqFiles0
 #else
 EqFiles0
 	:=
-	  DATASET('~thor_data400::in::quickhdr_raw',             {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR)
-	+ DATASET('~thor_data400::in::quickhdr_raw_father',      {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR)
-	+ DATASET('~thor_data400::in::quickhdr_raw_history',     {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR)
+    inw            
+	+ project(DATASET('~thor_data400::in::quickhdr_raw_father',      {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR), transform({inw},self:=left,self:=[]))
+	+ project(DATASET('~thor_data400::in::quickhdr_raw_history',     {string75 fn { virtual(logicalfilename)},EQ_Hist.Layout.current_raw}, THOR), transform({inw},self:=left,self:=[]))
+	;
+
 	;
 EqFiles1
 	:=
@@ -102,7 +107,7 @@ EqFiles:=project(EqFiles0
 
 EnFiles
 	:=
-	DATASET(ExperianCred.SuperFile_List.Source_File_Processed, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR)
+	DATASET(ExperianCred.SuperFile_List.Source_File_History, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR, opt)
 	;
 
 TnFiles

@@ -1,4 +1,4 @@
-includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
+﻿includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
 
 layout_counts := RECORD
     unsigned2 counttotal;
@@ -1231,36 +1231,35 @@ Layout_credit_derived_perf := RECORD
 	string8	archive_date_24mo;	//history date + 2 years
 
 END;
-/* Exclude PII corroboration counters from the Edina shell layout until they are approved for release...
+
 //new for BS 5.3 - PII corroboration counters based off of verified elements against inquiry keys
 Layout_inq_PII_corroboration := RECORD
-	integer	inq_corrnameaddrcount	;
-	integer	inq_corrnameaddrcount_adl	;
-	integer	inq_corrnamessncount	;
-	integer	inq_corrnamessncount_adl	;
-	integer	inq_corrnamephonecount	;
-	integer	inq_corrnamephonecount_adl	;
-	integer	inq_corraddrssncount	;
-	integer	inq_corraddrssncount_adl	;
-	integer	inq_corraddrdobcount	;
-	integer	inq_corraddrdobcount_adl	;
-	integer	inq_corraddrphonecount	;
-	integer	inq_corraddrphonecount_adl	;
-	integer	inq_corrssndobcount	;
-	integer	inq_corrssndobcount_adl	;
-	integer	inq_corrssnphonecount	;
-	integer	inq_corrssnphonecount_adl	;
-	integer	inq_corrdobphonecount	;
-	integer	inq_corrdobphonecount_adl	;
+	integer	inq_corrnameaddr	;
+	integer	inq_corrnameaddr_adl	;
+	integer	inq_corrnamessn	;
+	integer	inq_corrnamessn_adl	;
+	integer	inq_corrnamephone	;
+	integer	inq_corrnamephone_adl	;
+	integer	inq_corraddrssn	;
+	integer	inq_corraddrssn_adl	;
+	integer	inq_corrdobaddr	;
+	integer	inq_corrdobaddr_adl	;
+	integer	inq_corraddrphone	;
+	integer	inq_corraddrphone_adl	;
+	integer	inq_corrdobssn	;
+	integer	inq_corrdobssn_adl	;
+	integer	inq_corrphonessn	;
+	integer	inq_corrphonessn_adl	;
+	integer	inq_corrdobphone	;
+	integer	inq_corrdobphone_adl	;
 	integer	inq_corrnameaddrssn	;
 	integer	inq_corrnameaddrssn_adl	;
 	integer	inq_corrnamephonessn	;
 	integer	inq_corrnamephonessn_adl	;
-	integer	inq_corrnameaddrssnphn	;
-	integer	inq_corrnameaddrssnphn_adl	;
+	integer	inq_corrnameaddrphnssn	;
+	integer	inq_corrnameaddrphnssn_adl	;
 END;
-*/
-/* Exclude PII tumblings counters from Edina shell layout until they are approved for release
+
 //new for BS 5.3 - PII tumblings in Inquiries
 Layout_inq_PII_tumblings := RECORD
 	integer	inq_ssnsperadl_1subs	;
@@ -1280,7 +1279,23 @@ Layout_inq_PII_tumblings := RECORD
 	integer	inq_dobsperssn_1dig	;
 	integer	inq_ssnsperaddr_1dig	;
 END;
-*/
+
+//new for BS 5.3 - MS-110 fields
+Layout_BRM_Derogs := RECORD
+	unsigned1	liens_unreleased_count84	;
+	unsigned1	liens_released_count84	;
+	unsigned1	filing_count120	;
+	string8		liens_last_unrel_date84	;
+	unsigned4	liens_last_rel_date84	;
+	unsigned	liens_unrel_total_amount84	;
+	unsigned	liens_unrel_total_amount	;
+	unsigned	liens_rel_total_amount84	;
+	unsigned	liens_rel_total_amount	;
+	unsigned1	bk_dismissed_historical_cnt120	;
+	unsigned1	bk_disposed_historical_cnt120	;
+	unsigned1	attr_eviction_count84	;	
+END;
+
 export Layout_Boca_Shell_Edina_v53 := RECORD
 	#if(includeADLFields)
 	risk_indicators.iid_constants.adl_based_modeling_flags;
@@ -1359,9 +1374,22 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	// Layout_VOOAttributes             VOO_attributes; 
 	Layout_corr_risk_summary         corr_risk_summary; 
 	Layout_credit_derived_perf       credit_derived_perf; 
-	// Layout_inq_PII_corroboration     inq_PII_corroboration; 
-	// Layout_inq_PII_tumblings     		 inq_PII_tumblings; 
+	Layout_inq_PII_tumblings     		 inq_PII_tumblings; 
+	integer swappedNames;
+	Layout_inq_PII_corroboration     inq_PII_corroboration; 
+	Layout_BRM_Derogs                BRM_Derogs;
+	//MS-159: new business address fields
+	integer	bus_addr_only_curr;
+	integer	bus_addr_only;
+	//MS-71: new BIP header fields
+	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;
+	//MS-158: new business property fields
+	integer bus_property_owned_total;
+	integer bus_property_owned_assess_total;
+	integer bus_property_owned_assess_count;
+	integer bus_property_sold_total;
+	integer bus_property_sold_assess_total;
+	integer bus_property_sold_assess_count;
 	
-
 END;
 

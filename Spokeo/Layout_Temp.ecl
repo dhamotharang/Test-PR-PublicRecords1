@@ -1,4 +1,4 @@
-import	Address;
+﻿import	Address;
 // intermediate layout for cleaning
 EXPORT Layout_Temp := RECORD
 		Layout_in;
@@ -59,5 +59,12 @@ EXPORT Layout_Temp := RECORD
 		string1				current_address_flag;
 		string1				confirmed_address_flag;
 		string1				better_address_flag;
+
+		string1				judgments := '';
+		string1				civilCourtRecords := '';
+		string1				crimCourtRecords := '';
+		string1				curr_incar_flag := '';
+		string1				foreclosures := '';
+		string1				bankruptcy := '';
 		
 END;

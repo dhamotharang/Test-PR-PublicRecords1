@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,12 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib;
 
 fIA := Civ_Court.Files_In_IA.Civil_in;
 
-fmtsin := '%d-%b-%y';
-fmtout := '%Y%m%d';
+
+fmtsin := [
+		'%m/%d/%Y',
+		'%d-%b-%y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tIA(fIA input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -19,7 +23,7 @@ self.court_code					:= '';
 self.court						  := 'IOWA CIVIL COURT';
 self.case_number				:= trim(input.case_number,left,right);
 self.case_title					:= trim(input.case_title,left,right);
-self.filing_date				:= ut.ConvertDate(input.file_date,fmtsin,fmtout);
+self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.file_date,fmtsin,fmtout);
 self := [];
 end;
 

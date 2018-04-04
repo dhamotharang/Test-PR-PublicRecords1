@@ -1,8 +1,9 @@
-import tools;
+﻿import tools;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
-EXPORT Promote(string     pversion      =  ''
-							,boolean    pUseProd      = false
+EXPORT Promote(string     pVersion      =  ''
+							,boolean    fcra      		= false
+							,boolean    pDaily      	= false							
 							,boolean		pBaseFileType	= false
 							,string     pFilter       = ''
 							,boolean    pDelete       = true
@@ -10,76 +11,53 @@ EXPORT Promote(string     pversion      =  ''
 							,unsigned1  pnGenerations = 3
 				):= MODULE
 		
-		export Promote_Accurint := module				
+		export INQL := module				
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Accurint_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Accurint_eid_key.dAll_filenames
+															,INQL_v2.Filenames(pVersion, fcra).INQL_Base.dAll_filenames
+															,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
 															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
 		end;
 		
-		export Promote_Custom := module				
+		export SBA := module				
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Custom_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Custom_eid_key.dAll_filenames
+															,INQL_v2.Filenames(pVersion, fcra).SBA_Base.dAll_filenames
+															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
 															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
 		end;
 		
-		export Promote_Banko := module				
+		export Batch_PIIs := module				
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Banko_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Banko_eid_key.dAll_filenames
+															,INQL_v2.Filenames(pVersion, fcra).Batch_PIIs_Base.dAll_filenames
+															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
 															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+		end;	
+		
+		
+		export MBS_Deconfliction := module				
+			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
+															,INQL_v2.Filenames(pVersion, fcra).MBS_Deconfliction_Base.dAll_filenames
+															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
+															);
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
 		end;
 		
-		export Promote_Batch := module				
+		export MBS_Transaction := module				
 			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Batch_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Batch_eid_key.dAll_filenames
+															,INQL_v2.Filenames(pVersion, fcra).MBS_Transaction_Base.dAll_filenames
+															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
 															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+			export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
 		end;
 		
-		export Promote_BatchR3 := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).BatchR3_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).BatchR3_eid_key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		end;
-		
-		export Promote_Bridger := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Bridger_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Bridger_eid_key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		end;
-		
-		export Promote_Riskwise := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).Riskwise_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).Riskwise_eid_key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		end;
-		
-		export Promote_IDM := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).IDM_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).IDM_eid_key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		end;
-		
-		export Promote_SBA := module				
-			dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
-															,INQL_v2.Filenames(pversion, pUseProd).SBA_Base.dAll_filenames
-															,INQL_v2.keynames(pversion, pUseProd).SBA_eid_key.dAll_filenames
-															);
-			export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
-		end;
+		// export INQL := module				
+			// dataset(lay_builds)  pBuildFilenames := if(pBaseFileType
+															// ,INQL_v2.Filenames(pVersion, fcra).INQL_Base.dAll_filenames
+															// ,INQL_v2.keynames(pVersion, fcra).INQL_Key.dAll_filenames
+															// );
+			// export buildfiles := tools.mod_PromoteBuild(pVersion,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+		// end;
 		
 END;

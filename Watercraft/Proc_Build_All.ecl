@@ -1,4 +1,4 @@
-import Orbit_report,Watercraft, Lib_FileServices, doxie_build, watercraftv2_services,ut,RoxieKeyBuild, Watercraft_infutor, Watercraft_preprocess;
+﻿import Orbit_report,Watercraft, Lib_FileServices, doxie_build, watercraftv2_services,ut,RoxieKeyBuild, Watercraft_infutor, Watercraft_preprocess, DOPS;
 
 /*Folderdate and InfolinkQtr are for spray process.
   Folderdate is where files are located, ie: '14q2' or '14q3'.  InfolinkQtr is in filename, ie: WI2014_Q3.  'Q3' would be the InfolinkQtr.*/
@@ -83,8 +83,8 @@ return sequential
 				   '      25) thor_data400::key::watercraft::'+filedate+'::autokey::zip \n' +
 				   '      26) thor_data400::key::watercraft::'+filedate+'::autokey::zipb2 \n' +
 				   'have been built and ready to be deployed to QA.'),
-					 RoxieKeyBuild.updateversion('WatercraftKeys',filedate,'skasavajjala@seisint.com',,'N|B'),
-					 RoxieKeyBuild.updateversion('FCRA_WatercraftKeys',filedate,'skasavajjala@seisint.com',,'F'),
+					 DOPS.updateversion('WatercraftKeys',filedate,'skasavajjala@seisint.com',,'N|B'),
+					 DOPS.updateversion('FCRA_WatercraftKeys',filedate,'skasavajjala@seisint.com',,'F'),
 				   getretval
   );
 	

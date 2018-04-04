@@ -1,8 +1,11 @@
+﻿/*2017-08-21T16:06:34Z (dlingle)
+C:\Users\lingledg\AppData\Roaming\HPCC Systems\eclide\dlingle\OSS_Dataland\BusinessBatch_BIP\Functions\2017-08-21T16_06_34Z.ecl
+*/
 IMPORT BIPV2,BIPV2_Build, BusinessBatch_BIP,
 	Corp2,DCAV2,Gong,LiensV2,LN_PropertyV2,
        Suppress,TopBusiness_Services,UCCV2,FAA,Watercraft,VehicleV2,ut, 
 			 SAM,Business_Risk,Business_Risk_BIP,Codes,bankruptcyV3, STD,
-			 UCCV2_Services, AutoStandardI, MDR;
+			 UCCV2_Services, AutoStandardI, MDR, diversity_certification,OSHAIR,LaborActions_WHD;
 			 
 // These are general functions which for the most part go against the *linkids* kfetch routines
 // which return unique Id's for particular datasets.  These unique ID's can then be used to return
@@ -28,16 +31,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
 	
   ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
 	
-	tmp_ds_bestInfoBatchProxIdNonRestricted := PROJECT(ds_bestInfoProxIdNonRestricted,
-		                        TRANSFORM({string30 acctno; unsigned6 ultid; unsigned6 orgid;
-														           unsigned6 seleid; unsigned6 proxid; integer proxweight;
-																			 integer record_score; unsigned4 dt_first_seen; unsigned4 dt_last_seen;
-																			 string10 company_phone; string9 company_fein; string2 source;
-																			 string34 vl_id;},
-														   SELF := LEFT;
-															 ));
-	
-	TopBusiness_Services.functions.MAC_IsRestricted(tmp_ds_bestInfoBatchProxIdNonRestricted,
+	TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
 															 ds_bestInfoBatchProxIdRestricted, 															
 	                             source, // field name
 															 vl_id, // field name
@@ -74,7 +68,8 @@ END;
   EXPORT GetPhones( DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dGongPhones := Gong.key_History_LinkIDs.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
+    dGongPhones := Gong.key_History_LinkIDs.kFetch(dLinkIds,
+		     BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
     
     // Dedup phones
     dGongPhonesDedup := DEDUP(DEDUP(SORT( dGongPhones,
@@ -555,8 +550,7 @@ END;
 	
 	EXPORT getLiensLinkids(DATASET(BIPV2.IDlayouts.l_xlink_ids) dLinkIds) :=
 	FUNCTION
-      dLiens := LiensV2.Key_Linkids.KeyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);												 
-												 
+      dLiens := LiensV2.Key_Linkids.KeyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);											 												 
    RETURN(dliens);
   END;												 
 	
@@ -863,8 +857,8 @@ END;
 	
 	  // Fetch MVR and filter only 
 		// Owner(type=1), Registrant(type=4) or Lessee(type=5) of the vehicle, 
-		dVehicles := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)(
-													  orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_OWNER OR
+		dVehicles := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)
+													 (orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_OWNER OR
 														orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_REGISTRANT OR
 														orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_LESSEE);
 	 // Join by link ids to get the acctno
@@ -1099,5 +1093,99 @@ END;
     
     RETURN dDCAInfoWithAcctNo;
   END;
+	
+	EXPORT GetDiversityCertInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
+                    DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
+  FUNCTION
+	
+	   dDiversityCertInfo := Diversity_Certification.Key_LinkIds.keyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
+		                                                                  BusinessBatch_BIP.Constants.Limits.MAXDivCert);   
+  
+	   dDivsersityCertInfoSorted := sort(dDiversityCertInfo, -dt_last_seen, record);
+																																			
+	   dDiversityCertInfoWithAcctNo := JOIN(dLinkIDsWithAcctNo,dDivsersityCertInfoSorted,
+																					BIPV2.IDmacros.mac_JoinTop3Linkids(),
+															     TRANSFORM(BusinessBatch_BIP.Layouts.DivCertInfo,
+																			SELF.acctno := LEFT.acctno;      
+																			SELF.div_dt_first_seen := RIGHT.dt_first_seen;
+																			SELF.div_dt_last_seen := RIGHT.dt_last_seen;
+																			SELF.div_state := RIGHT.addressstate;
+																			SELF.div_minorityAffiliation := RIGHT.minorityAffiliation;
+																			SELF.div_certificationtype1 := RIGHT.certificationtype1;
+																			SELF.div_certificatedatefrom1 := RIGHT.certificatedatefrom1;
+																			SELF.div_certificatedateto1  := RIGHT.certificatedateto1;
+																			SELF.div_certificatestatus1   := RIGHT.certificatestatus1;
+																			SELF.div_certificatenumber1   := RIGHT.certificationnumber1;
+																	
+																			SELF.div_certificationtype2 := RIGHT.certificationtype2;
+																			SELF.div_certificatedatefrom2 := RIGHT.certificatedatefrom2;
+																			SELF.div_certificatedateto2  := RIGHT.certificatedateto2;
+																			SELF.div_certificatestatus2   := RIGHT.certificatestatus2;
+																			SELF.div_certificatenumber2   := RIGHT.certificationnumber2;
+																	
+																			SELF.div_certificationtype3 := RIGHT.certificationtype3;
+																			SELF.div_certificatedatefrom3 := RIGHT.certificatedatefrom3;
+																			SELF.div_certificatedateto3  := RIGHT.certificatedateto3;
+																			SELF.div_certificatestatus3   := RIGHT.certificatestatus3;
+																			SELF.div_certificatenumber3   := RIGHT.certificationnumber3;
+																	
+																			SELF.div_certificationtype4 := RIGHT.certificationtype4;
+																			SELF.div_certificatedatefrom4 := RIGHT.certificatedatefrom4;
+																			SELF.div_certificatedateto4  := RIGHT.certificatedateto4;
+																			SELF.div_certificatestatus4   := RIGHT.certificatestatus4;
+																			SELF.div_certificatenumber4   := RIGHT.certificationnumber4;
+																			
+																			SELF        := LEFT
+																			), LEFT OUTER, 
+																			LIMIT(0), KEEP(1)); 
+				
+	  RETURN dDiversityCertInfoWithAcctNo;
+		
+END;
 
+EXPORT GetLaborActionsWHDInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
+                    DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
+  FUNCTION
+	   // max limit not needed as per thor job to check max of any seleid < 4K
+	   dLaborActionsWHDInfo := LaborActions_WHD.Key_LinkIDS.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
+		 		                                                            
+	   dLaborActionsWHDSlim := DEDUP(SORT(dLaborActionsWHDInfo, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), caseid,-dateupdated),
+																				#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), caseid);
+																				
+	   dLaborActionsWHDWithAcctNo := JOIN(dLinkIDsWithAcctNo,dLaborActionsWHDSlim,
+														     BIPV2.IDmacros.mac_JoinTop3Linkids(),
+															     TRANSFORM(BusinessBatch_BIP.Layouts.LaborActionsWHDInfo,
+																			SELF.acctno := LEFT.acctno;  
+																				SELF.laborActionViolations := RIGHT.totalViolations; // meaning total case violations
+																	      SELF.laborActionBackWages := RIGHT.bw_totalagreedamount; // total back wages agreed to pay
+																	      SELF.laborActionMoneyPenalties := RIGHT.cmp_totalAssessments;// total civil monetary penalties assessment										
+																			SELF        := LEFT;
+																			)
+																 , LEFT OUTER, 
+																 LIMIT(0), KEEP(1)
+																 ); 				
+	  RETURN dLaborActionsWHDWithAcctNo;		
+END;
+
+	EXPORT GetOSHAInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
+                    DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
+  FUNCTION
+	
+	   dOSHAInfo := OSHAIR.Key_OSHAIR_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
+		                                               BusinessBatch_BIP.Constants.Limits.MAXOshair);
+
+     dOSHAInfoSlim := DEDUP(SORT(dOSHAInfo,activity_number),activity_number);
+		         
+	   dOSHADataWithAcctNo := JOIN(dLinkIDsWithAcctNo,dOSHAInfoSlim,
+														  BIPV2.IDmacros.mac_JoinTop3Linkids(),
+															  TRANSFORM(BusinessBatch_BIP.Layouts.OSHAInspectionInfo,
+																  SELF.acctno := LEFT.acctno; 
+																	SELF.OshaViolations := (unsigned2) RIGHT.total_Violations;
+																	SELF        := LEFT;
+																)
+															, LEFT OUTER, 
+															LIMIT(0), KEEP(1)
+														); 				
+	  RETURN dOSHADataWithAcctNo;		
+	END;
 END;

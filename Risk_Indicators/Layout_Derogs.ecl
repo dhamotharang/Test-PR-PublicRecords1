@@ -1,15 +1,18 @@
-export Layout_Derogs :=
+﻿export Layout_Derogs :=
 RECORD
 	BOOLEAN bankrupt := false;
 	UNSIGNED4 date_last_seen := 0;
 	STRING1 filing_type := '';
 	STRING35 disposition := '';	
 	UNSIGNED1 filing_count := 0;
+	UNSIGNED1 filing_count120 := 0;
 	UNSIGNED1 bk_recent_count := 0;
 	UNSIGNED1 bk_dismissed_recent_count := 0;
 	UNSIGNED1 bk_dismissed_historical_count := 0;
+	UNSIGNED1 bk_dismissed_historical_cnt120 := 0;
 	UNSIGNED1 bk_disposed_recent_count := 0;
 	UNSIGNED1 bk_disposed_historical_count := 0;
+	UNSIGNED1 bk_disposed_historical_cnt120 := 0;
 	UNSIGNED1 bk_count30 := 0;
 	UNSIGNED1 bk_count90 := 0;
 	UNSIGNED1 bk_count180 := 0;
@@ -31,7 +34,9 @@ RECORD
 	UNSIGNED1 liens_unreleased_count24 := 0;
 	UNSIGNED1 liens_unreleased_count36 := 0;
 	UNSIGNED1 liens_unreleased_count60 := 0;
+	UNSIGNED1 liens_unreleased_count84 := 0;
 	string8 last_liens_unreleased_date := '';
+	string8 liens_last_unrel_date84 := '';
 	INTEGER   liens_unreleased_count12_6mos := 0;
 	INTEGER   liens_unreleased_count12_12mos := 0;
 	INTEGER   liens_unreleased_count12_24mos := 0;
@@ -45,7 +50,9 @@ RECORD
 	UNSIGNED1 liens_released_count24 := 0;
 	UNSIGNED1 liens_released_count36 := 0;
 	UNSIGNED1 liens_released_count60 := 0;
+	UNSIGNED1 liens_released_count84 := 0;
 	UNSIGNED4 last_liens_released_date := 0;
+	UNSIGNED4 liens_last_rel_date84 := 0;
 	
 	UNSIGNED1 criminal_count := 0;
 	UNSIGNED1 criminal_count30 := 0;
@@ -78,6 +85,7 @@ RECORD
 	UNSIGNED1 eviction_count24 := 0;
 	UNSIGNED1 eviction_count36 := 0;
 	UNSIGNED1 eviction_count60 := 0;
+	UNSIGNED1 eviction_count84 := 0;
 	UNSIGNED4 last_eviction_date := 0;
 	INTEGER   eviction_count12_6mos := 0;
 	INTEGER   eviction_count12_12mos := 0;

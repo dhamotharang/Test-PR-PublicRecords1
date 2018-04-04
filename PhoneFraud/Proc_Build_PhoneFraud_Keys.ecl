@@ -1,11 +1,11 @@
-IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut,Scrubs_PhoneFraud;
+﻿IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut,Scrubs_PhoneFraud, Orbit3;
 
 //oType: populate 'otp', if file is available 'Y', else 'N'
 //sType: populate 'spoofing', if file is available 'Y', else 'N'
 
 EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= FUNCTION
 
-	#workunit('name', 'Phone Fraud Build - ' + version);
+	#workunit('name', 'Yogurt:Phone Fraud Build - ' + version);
 	#workunit('priority','high');
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +137,14 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																						,buildStrata);
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Create Orbit Entry for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	create_phonefraud_build:=	IF(	ut.Weekday((INTEGER)version[1..8]) NOT IN ['SATURDAY','SUNDAY'],
+																Orbit3.proc_Orbit3_CreateBuild ('PhoneFraud',version,'N'),
+																OUTPUT('No Orbit Entry Needed for Saturday and Sunday'));
+																
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Run Build & Provide Email on Build Status//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -152,10 +160,11 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																	mvQAPhoneFraudOTP, 
 																	mvQAPhoneFraudSpoofing,
 																	dopsUpdate,
+																	create_phonefraud_build,
 																	buildStrata,
 																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
-																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
-																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
+																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
+																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
 																	);
 
 	RETURN sendEmail;

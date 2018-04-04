@@ -1,8 +1,8 @@
-IMPORT SALT35;
+﻿IMPORT SALT35;
 EXPORT Config := MODULE,VIRTUAL
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
 EXPORT ByPassCleave := FALSE; // If set to true Cleave process will not run in the next internal linking iteration.
-EXPORT PersistExpire := 30; // PERSIST file expiration time in days.
+EXPORT PersistExpire := 7; // PERSIST file expiration time in days.
 EXPORT AttrValueType := SALT35.AttrValueType;
 EXPORT MaxChildren := 100; // Maximum children allowed for a MULTIPLE(,LIST)
 alg := ENUM(UNSIGNED1, Standard=0, NoTrailingHalfEdit);

@@ -1,9 +1,9 @@
-import American_student_list,Data_Services;
+﻿import American_student_list,Data_Services, OKC_Student_List;
 
-file_in := American_student_list.File_american_student_DID_PH_Suppressed_v2(DID != 0);
+file_in := American_student_list.File_american_student_DID_PH_Suppressed_v2(DID != 0) + OKC_Student_List.Map_To_ASL_Base(did<>0);
 
 ASL_Key_Layout := RECORD
-	American_student_list.layout_american_student_base_v2 and not source;
+	American_student_list.layout_american_student_base_v2;			//DF-19996
 	unsigned1 zero := 0;
 	string1		blank	:=	'';
 END;

@@ -1,8 +1,9 @@
-IMPORT didville, Doxie, Doxie_Raw, header, NID, watchdog, STD, address;
+﻿IMPORT didville, Doxie, Doxie_Raw, header, NID, STD, address;
 
 EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_BatchIn) f_in_raw = DATASET([],DidVille.Layout_RAN_BestInfo_BatchIn),
                                           boolean CompareInputAddrWithRel = false,
-																					boolean CompareInputAddrNameWithRel = false) := FUNCTION
+																					boolean CompareInputAddrNameWithRel = false,
+																					boolean UseBlankPhoneNumberRecords = false) := FUNCTION
 
 	//get input
 	doxie.MAC_Header_Field_Declare()
@@ -276,7 +277,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 													include_dod :=true);
 													
 	f_rel_best_valid := f_rel_best(prim_name <> '' or phone<>'');
-	f_rel_best_dep := dedup(sort(f_rel_best_valid, NID.PreferredFirstNew(fname), lname, prim_name, -sec_range, zip, phone),
+	f_rel_best_valid_to_use := if(UseBlankPhoneNumberRecords, f_rel_best(prim_name <> ''), f_rel_best_valid);
+	f_rel_best_dep := dedup(sort(f_rel_best_valid_to_use, NID.PreferredFirstNew(fname), lname, prim_name, -sec_range, zip, phone),
 															 NID.PreferredFirstNew(fname), lname, prim_name, zip, phone);
 																 
 	best_with_rank_rec := record
@@ -305,9 +307,10 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	didville.Mac_RAN_phone_append(f_rel_best_final_ready, f_rel_best_final_app_raw,fixed_DRM, GLB_Purpose, industry_class_value, checkRNA, DPPA_Purpose)
 	f_rel_best_final_app_flted := f_rel_best_final_app_raw(phone<>'');
+	f_rel_best_final_app_to_use := if(UseBlankPhoneNumberRecords, f_rel_best_final_app_raw, f_rel_best_final_app_flted);
 	f_rel_best_final_app := if(dedup_with_same_phone, 
-														 dedup(sort(f_rel_best_final_app_flted, seqTarget, phone, rel_rank), seqTarget, phone),
-														 f_rel_best_final_app_flted);
+														 dedup(sort(f_rel_best_final_app_to_use, seqTarget, phone, rel_rank), seqTarget, phone),
+														 f_rel_best_final_app_to_use);
 
 	//check against input address, phones
 	best_with_rank_rec check_input(f_rel_best_final_app l) := transform
@@ -334,8 +337,9 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 												 right.phoneno_10, right.phoneno_11],
 									 check_input(left), left only),
 								 f_rel_best_final_addr_ckd);						  
-												
-	f_rel_best_final_grp := group(sort(f_rel_best_final_phone_ckd(phone<>''), seqTarget, rel_rank), seqTarget);					
+	
+	f_rel_best_final_phone_ckd_toUse := if(UseBlankPhoneNumberRecords, f_rel_best_final_phone_ckd, f_rel_best_final_phone_ckd(phone<>''));
+	f_rel_best_final_grp := group(sort(f_rel_best_final_phone_ckd_toUse, seqTarget, rel_rank), seqTarget);					
 
 	f_rel_best_final :=	topN(f_rel_best_final_grp, 10, rel_rank);
 

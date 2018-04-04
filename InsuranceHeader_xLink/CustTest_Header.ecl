@@ -1,7 +1,7 @@
-import header, prte2_header, idl_header, ut;
+﻿import header, prte2_header, idl_header, ut;
 
 // cust_header := PRTE.File_PRTE_Header;
-cust_header := prte2_header.files.file_headers_base;
+cust_header := PRTE2_Header.file_header_base;
 
 hdrC := PROJECT(cust_header, transform(idl_header.layout_xLink,
 			 SELF.source_rid := left.rid,

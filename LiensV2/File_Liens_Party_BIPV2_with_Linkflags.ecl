@@ -1,4 +1,4 @@
-import LiensV2,	LiensV2_preprocess, ut; 
+﻿import LiensV2,	LiensV2_preprocess, ut; 
 LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags refHGPTY(LiensV2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags l) :=
 TRANSFORM
 	//	Clear Date_Last_Seen for Hogan records with filing_type_desc=CORRECTED FEDERAL TAX LIEN
@@ -20,15 +20,15 @@ END;
 
 Hogan_party := project(LiensV2.file_Hogan_party, refHGPTY(left));
 
-file_liens := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-              + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_SA_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_chicago_law_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_CA_federal_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_Superior_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
-   						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID)
+file_liens := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+              + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_SA_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_chicago_law_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_CA_federal_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_Superior_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+   						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
 ;
 
 file_liens_dist := distribute(project(file_liens, transform({file_liens},

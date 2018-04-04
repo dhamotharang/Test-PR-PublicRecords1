@@ -1,4 +1,4 @@
-// ***********************
+﻿// ***********************
 // RUN this script on hthor
 // if the copy doesn't appear to do anything, make sure that file "copyfiles::in::transfer::filelistprod_copyinprogress" doesn't already exist.  
 // if it does delete it, or rename line 77 below to something other than dev
@@ -94,7 +94,6 @@ PBKEY := dops.xFerRoxieFiles(filestocopyds
 											,false
 											, srcthorclusters := ['thor400_44'
 											                     ,'thor400_20'
-																					 ,'thor400_30'
 																					 ,'thor400_60'
 																					 ,'hthor__eclagent'
 																					 //,'thor400_31_store'

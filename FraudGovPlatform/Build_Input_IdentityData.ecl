@@ -1,126 +1,109 @@
-IMPORT tools,STD, FraudGovPlatform_Validation;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
 EXPORT Build_Input_IdentityData(
 	 string		pversion
+	,boolean		PSkipIdentityData	= false 
+	,boolean		PSkipNAC				= false	 
+	,boolean		PSkipDeltabase		= false	 
+	,boolean		PSkipInquiryLogs	= false	 
 ) :=
 module
 
-	SHARED fn_dedup(infile , inputs):=functionmacro
-			// rollup by Customer_Name + Customer_Account_Number + Customer_State + 
-			//           Customer_Agency_Vertical_Type + Customer_Program + First_name + 
-			//           Last_Name + SSN + Date_of_Birth + Transaction ID, 
-			// keep most recent filedate 
-			
-			in_srt:=sort(inputs
-						,Customer_Name
-						,Customer_Account_Number
-						,Customer_State
-						,Customer_Agency_Vertical_Type
-						,Customer_Program
-						,First_name
-						,Last_Name
-						,SSN
-						,DOB
-						,Transaction_ID_Number
-						,-FileDate
-						,-FileTime
-						,local
-						);
-
-			infile tr(in_srt l, in_srt r) :=transform
-				self:=l;
-			end;
-
-			in_ddp:=rollup(in_srt,tr(left,right)
-																				,Customer_Name
-																				,Customer_Account_Number
-																				,Customer_State
-																				,Customer_Agency_Vertical_Type
-																				,Customer_Program
-																				,First_name
-																				,Last_Name
-																				,SSN
-																				,DOB
-																				,Transaction_ID_Number
-																				,local
-																				);
-
-			return in_ddp;
-	endmacro;
-
-	SHARED Sprayed_IdentityData := Files(pversion).Sprayed.IdentityData;
+	SHARED fn_dedup(inputs):=FUNCTIONMACRO
+		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
+		in_ddp:=rollup(in_srt,
+								TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT; SELF := []),
+								RECORD,
+								EXCEPT ProcessDate);	
+		return in_ddp;
+	ENDMACRO;	
 	
-		Layouts.Input.IdentityData tr(Sprayed_IdentityData l) := transform
-			self.FileName := l.fn;
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::identitydata')) > 0 and PSkipIdentityData = false, 
+													Files(pversion).Sprayed.IdentityData, 
+													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+											)   
+											+ if ( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::deltabase')) > 0  and PSkipDeltabase = false,
+													Build_Prepped_Deltabase(pversion),
+													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+											)	
+											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
+													Build_Prepped_NAC(pversion).NACIDDTUpdate,
+													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+											)
+											+ if (PSkipInquiryLogs = false, 
+													Build_Prepped_InquiryLogs(pversion),
+													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+											);
 
-			sub:=stringlib.stringfind(l.fn,'20',1);
-			sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
-			self.ProcessDate := (unsigned)pversion;
-			FileDate := (unsigned)l.fn[sub..sub+7];
-			FileTime := l.fn[sub2..sub2+5];
-			self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
-			self.FileTime :=map(
-															FileTime in ['0000.a','0000.s','0000.o','0000.n'] =>'999999'
-															,FileTime ='5527.a' =>'195527'
-															,FileTime ='1911.a' =>'091911'
-															,FileTime ='0359.s' =>'140359'
-															,FileTime ='2744.s' =>'102744'
-															,FileTime ='0033.o' =>'140033'
-															,FileTime ='1935.o' =>'111935'
-															,FileTime
-															);
-			self:=l;
-			self:=[];
-		end;
+	Functions.CleanFields(inIdentityDataUpdate ,inIdentityDataUpdateUpper); 
 
-	f1:=project(Sprayed_IdentityData,tr(left));
+	iddt := record
+		FraudGovPlatform.Layouts.Input.IdentityData;
+		INTEGER sequence;			
+	end;
+		
+	iddt tr(inIdentityDataUpdateUpper l, INTEGER C) := transform
+		sub:=stringlib.stringfind(l.fn,'20',1);
+		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
+		FileDate := (unsigned)l.fn[sub..sub+7];
+		FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
+		self.FileName := l.fn;
+		self.ProcessDate := (unsigned)pversion;
+		self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
+		self.FileTime := FileTime;
+		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
+		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));  
+		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));;
+		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
+		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
+		self.sequence := C;
+		self:=l;
+		self:=[];
+	end;
 
-
-	f1_bypass:=f1
+	f1:=project(inIdentityDataUpdateUpper,tr(left,counter));
+	
+	f1_errors:=f1
 			(	 
-			//Empty Values
-			Customer_Name 											=''
-			or Customer_Account_Number 					=''
-			or Customer_Job_ID 									=''
-			or Batch_Record_ID 									=''
-			or Reason_for_Transaction_Activity 	=''
-			or Customer_County 									=''
-			or Customer_Agency 									=''
-			or First_name												=''
-			or Last_Name												=''
-			// Format
-			or length(Date_of_Transaction)		<>8	
-			// Lists
-			or (Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 								= FALSE
-			or (Customer_Agency_Vertical_Type 	in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 	= FALSE
-			or (Customer_Program 							in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
+						Customer_Account_Number						=''
+				or		Customer_County 									=''
+				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
+				or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+				or 	(Street_1='' and City=''	and State='' and Zip='')
+				or 	(Customer_State 								in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
+				or 	(Customer_Agency_Vertical_Type 		in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
+				or 	(Customer_Program 							in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
 			);
 
-	f1_bypass_dedup:=fn_dedup(f1_bypass, files().Input.ByPassed_IdentityData.sprayed + f1_bypass);
-	
+	NotInMbs := join(f1,
+							FraudShared.Files().Input.MBS.sprayed(status = 1)
+										,left.Customer_Account_Number =(string)right.gc_id
+										and left.Customer_State = right.customer_state
+										and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
+										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+										and left.Customer_County = right.Customer_County,
+										TRANSFORM(iddt,SELF := LEFT),LEFT ONLY, lookup);
+	//Exclude Errors
+	ByPassed_records := f1_errors + NotInMbs;
+	f1_bypass_dedup := files().Input.ByPassed_IdentityData.sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData);
 	Build_Bypass_Records :=  OUTPUT(f1_bypass_dedup,,Filenames().Input.ByPassed_IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
-	f1_valid := 	f1(Customer_Name<>''
-										,Customer_Account_Number<>''
-										,Customer_State<>''
-										,Customer_Agency_Vertical_Type<>''
-										,Customer_Program<>''
-										,First_name<>''
-										,Last_Name<>''
-										,SSN<>''
-										,Physical_Address_1<>''
-										,City<>''
-										,State<>''
-										,Zip<>''
-										,Mailing_Address_1<>''
-										,Mailing_City<>''
-										,Mailing_State<>''
-										,Mailing_Zip<>''
-										,DOB<>''
-									);
-									
-	f1_dedup:=fn_dedup(f1_valid, files().Input.IdentityData.sprayed + f1_valid);
-
-	Build_Input_File :=  OUTPUT(f1_dedup,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+	//Move only Valid Records
+	f1_dedup					:=	 join (f1,
+																							ByPassed_records,
+																							left.sequence = right.sequence,
+																							TRANSFORM(iddt,SELF := LEFT),
+																							left only);
+																							
+	dAppendAID   := Standardize_Entity.Clean_Address(f1_dedup,pversion);// : persist(Persistnames.AppendAID);
+	dappendName		:= Standardize_Entity.Clean_Name(dAppendAID);	
+	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
+	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
+	
+	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
+	
+	Build_Input_File :=  OUTPUT(new_file,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
 	Promote_Input_File := 
 		sequential(
@@ -150,16 +133,18 @@ module
 				,Filenames().Input.ByPassed_IdentityData.New(pversion)
 			)
 			//Clear Individual Sprayed Files
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed, TRUE)
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected, TRUE)
+			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed, TRUE)
+			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected, TRUE)
+			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed, TRUE)
+			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected, TRUE)		
 			,STD.File.FinishSuperFileTransaction()	
 		);
 // Return
-	export build_prepped :=
-		 sequential(
-			 Build_Input_File
-			,Build_Bypass_Records
-			,Promote_Input_File
+	export build_prepped := 
+			 sequential(
+				 Build_Input_File
+				,Build_Bypass_Records 
+				,Promote_Input_File
 		);
 		
 	export All :=

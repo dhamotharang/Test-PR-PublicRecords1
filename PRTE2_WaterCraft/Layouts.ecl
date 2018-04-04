@@ -1,4 +1,4 @@
-/********************************************************************************************************** 
+﻿/********************************************************************************************************** 
 	Name: 			Layouts
 	Created On: 06/10/2013
 	By: 				ssivasubramanian
@@ -15,6 +15,9 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING20	cust_name;
 		STRING8		link_inc_date;
+		STRING9		link_fein;
+		STRING8		link_dob;
+		STRING9		link_ssn;
 	END;
 	
 	/*****************************************************************************
@@ -33,6 +36,9 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING20	cust_name;
 		STRING8		link_inc_date;
+		STRING9		link_fein;
+		STRING8		link_dob;
+		STRING9		link_ssn;
 	END;
 	
 	/***************************************************************************** 

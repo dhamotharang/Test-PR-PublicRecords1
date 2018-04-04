@@ -1,7 +1,7 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_American_Student_List
 FILENAME:American_Student_List
-NAMESCOPE:input
+NAMESCOPE:input 
 
 FIELDTYPE:invalid_nums:ALLOW(0123456789):SPACES( )
 FIELDTYPE:invalid_gender_code:ENUM(1|2|M|F|U|)

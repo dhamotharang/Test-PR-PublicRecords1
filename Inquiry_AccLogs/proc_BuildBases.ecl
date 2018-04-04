@@ -1,8 +1,8 @@
-import ut, Data_Services, address, aid, lib_stringlib, address, did_add, Business_Header_SS, Inquiry_AccLogs_Append;
+﻿import ut, Data_Services, address, aid, lib_stringlib, address, did_add, Business_Header_SS, Inquiry_AccLogs_Append;
 import standard, header_slimsort, didville, business_header,watchdog, mdr, header, zz_jbello;
 
 export 	proc_buildbases(string param_version = '') := function
-
+#stored('did_add_force','thor');
 #Workunit('name','New Logs Thor Inquiry Tracking Daily Build')
 
 ////////////////////////// CREATE DAILY OUTPUT FILES
@@ -38,7 +38,8 @@ Clean := Inquiry_AccLogs.fn_clean_and_parse(Parsed) : persist('~persist::inquiry
 
 Appends := Inquiry_AccLogs_Append.FN_Append_IDs(Clean): persist('~persist::inquiry_tracking::appends::daily'); 
 
-// Appends := dataset('~persist::inquiry_tracking::appends::daily', inquiry_acclogs.layout_in_common, thor);
+// Appends := dataset('~persist::inquiry_tracking::appends::daily__p864301537', inquiry_acclogs.layout_in_common, thor);
+
 /*
 Appends_Filtered_ := Appends
 											(
@@ -59,15 +60,16 @@ inquiry_acclogs.mac_append_score(Appends, Appends_score, daily_file_fraud_cnt)
 
 Appends_Filtered := Appends_score : persist('~persist::inquiry_tracking::appends_score::daily');
 //Appends_Filtered:=dataset('~persist::inquiry_tracking::appends_score::daily__p2492301627',inquiry_acclogs.layout_in_common, thor);
-ReadyForOutputAccurint 	:= inquiry_acclogs.fnMapCommon_Accurint('ACCURINT').ready_file(Appends_Filtered);
-ReadyForOutputCustom 		:= inquiry_acclogs.fnMapCommon_Accurint('CUSTOM').ready_file(Appends_Filtered);
-ReadyForOutputBanko 		:= inquiry_acclogs.fnMapCommon_Banko.ready_file(Appends_Filtered);
-ReadyForOutputBatch 		:= inquiry_acclogs.fnMapCommon_Batch.ready_file(Appends_Filtered);
-ReadyForOutputBatchR3 	:= inquiry_acclogs.fnMapCommon_BatchR3.ready_file(Appends_Filtered);
-ReadyForOutputBridger 	:= inquiry_acclogs.fnMapCommon_Bridger.ready_file(Appends_Filtered);
-ReadyForOutputRiskwise 	:= inquiry_acclogs.fnMapCommon_Riskwise.ready_file(Appends_Filtered);
-ReadyForOutputIDM			 	:= inquiry_acclogs.fnMapCommon_IDM.ready_file(Appends_Filtered);
-ReadyForOutputSBA       := inquiry_acclogs.fnMapCommon_SBA.ready_file;
+ReadyForOutputAccurint 			:= inquiry_acclogs.fnMapCommon_Accurint('ACCURINT').ready_file(Appends_Filtered);
+ReadyForOutputCustom 				:= inquiry_acclogs.fnMapCommon_Accurint('CUSTOM').ready_file(Appends_Filtered);
+ReadyForOutputBanko 				:= inquiry_acclogs.fnMapCommon_Banko.ready_file(Appends_Filtered);
+ReadyForOutputBatch 				:= inquiry_acclogs.fnMapCommon_Batch.ready_file(Appends_Filtered);
+ReadyForOutputBatchR3 			:= inquiry_acclogs.fnMapCommon_BatchR3.ready_file(Appends_Filtered);
+ReadyForOutputBridger 			:= inquiry_acclogs.fnMapCommon_Bridger.ready_file(Appends_Filtered);
+ReadyForOutputRiskwise 			:= inquiry_acclogs.fnMapCommon_Riskwise.ready_file(Appends_Filtered);
+ReadyForOutputIDM			 			:= inquiry_acclogs.fnMapCommon_IDM.ready_file(Appends_Filtered);
+ReadyForOutputSBA       		:= inquiry_acclogs.fnMapCommon_SBA.ready_file;
+ReadyForOutputBatchLinkid  	:= inquiry_acclogs.fnMapCommon_Batch_Linkids.ready_file;
 
 previous_version := dataset('~thor100_21::out::inquiry::processedfiles', recordof(workunitservices.WorkunitFilesRead(workunit)), thor)(name = 'build version')[1].cluster : stored('Previous_Version'); // previous build version is stored in processed files output
 //mbs_new_records := Inquiry_AccLogs.File_MBS.File;//(current and datelastseen > previous_version);
@@ -82,8 +84,10 @@ buildall :=
 					output(ReadyForOutputBatchR3,,'~thor100_21::out::inquiry::'+version+'::batchr3', overwrite, __compressed__);
 					output(ReadyForOutputBridger,,'~thor100_21::out::inquiry::'+version+'::bridger', overwrite, __compressed__);
 					output(ReadyForOutputIDM,,'~thor100_21::out::inquiry::'+version+'::idm_bls', overwrite, __compressed__);
-				  output(ReadyForOutputSBA,,'~thor100_21::out::inquiry::'+version+'::SBA', overwrite, __compressed__);
-					output(ReadyForOutputRiskwise,,'~thor100_21::out::inquiry::'+version+'::riskwise', overwrite, __compressed__))/*,
+					output(ReadyForOutputRiskwise,,'~thor100_21::out::inquiry::'+version+'::riskwise', overwrite, __compressed__);
+					output(ReadyForOutputBatchLinkid ,,'~thor100_21::out::inquiry::'+version+'::batch_linkid', overwrite, __compressed__);
+				  output(ReadyForOutputSBA,,'~thor100_21::out::inquiry::'+version+'::SBA', overwrite, __compressed__));
+/*,
 				 	
 					output(Appends(
 												 ((company_id = '1534586' or global_company_id = '16952912') and function_description = 'FRAUDPOINT' and datetime[..6] between '201301' and '201302') or //TEMPORARY
@@ -153,6 +157,7 @@ movebase := sequential(
 								fnMove(version, 'custom'),
 								fnMove(version, 'idm_bls'),
 								fnMove(version, 'sba'),
+								fnMove(version, 'batch_linkid'),
 								fnMove(version, 'riskwise'))
 							);
 
@@ -189,7 +194,7 @@ return sequential(
 					  movepre,    // input - from preprocess to input superfile 
 					  if(file_available_for_base_build, // any files in the input superfile for processing? if so then build bases
 									sequential(buildall   	// base - build individual base file
-														,movebase   // base - move new base files into update weekly and base superfiles
+													 ,movebase   // base - move new base files into update weekly and base superfiles
 														,movepost		// input - from input superfile to processed superfile 
 														,output(ProcessedFiles,,'~thor100_21::out::inquiry::processedfiles', overwrite)
 														,output(New_Dates,,'out::stats::new_dates', __compressed__, overwrite, named('New_Dates_In_Base_Files'))),

@@ -1,4 +1,4 @@
-import address, AID, BIPV2, bair_composite;
+﻿import address, AID, BIPV2, bair_composite;
 
 export layouts := module
 	
@@ -2092,7 +2092,7 @@ export layouts := module
 	END;
 
 	EXPORT ClassificationLayout := RECORD
-		unsigned1  mode; //(keyed â€“ 1 for event, 2 for cfs)
+		unsigned1  mode; //(keyed – 1 for event, 2 for cfs)
 		string50   ori; //(keyed)
 		unsigned4  ucr_group;
 		string255  crime;

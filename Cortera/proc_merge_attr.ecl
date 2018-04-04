@@ -1,10 +1,13 @@
-import	std, ut;
+﻿import	std, ut;
 
-EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) current, dataset(Cortera.Layout_Attributes_Out) previous, string8 version) := FUNCTION
+EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) allcurrent, dataset(Cortera.Layout_Attributes_Out) allprevious, string8 version) := FUNCTION
+	previous := DISTRIBUTE(allprevious(current_rec),ULTIMATE_LINKID);			// previously current
+	current := DISTRIBUTE(allcurrent,ULTIMATE_LINKID);			// now current
 	curr := DISTRIBUTE(PROJECT(current, cortera.Layout_Attributes),ULTIMATE_LINKID);
 	prev := DISTRIBUTE(PROJECT(previous, cortera.Layout_Attributes),ULTIMATE_LINKID);
+	not_curr := allprevious(NOT current_rec);
 	
-	// fined new, lost, changed
+	// find new, lost, changed
 	new := JOIN(current,previous, left.ULTIMATE_LINKID = right.ULTIMATE_LINKID,
 							TRANSFORM(Cortera.Layout_Attributes_Out, 
 								self.current_rec := true;
@@ -30,9 +33,15 @@ EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) current, dataset(C
 							self.n_diff := Std.Str.FindCount(self.diff,'1');
 							), INNER, LOCAL);
 	// set previous changed to not current and add to output
-	changed := JOIN(previous, delta(n_diff<>0), left.ULTIMATE_LINKID=right.ULTIMATE_LINKID,
+	archived := JOIN(previous, delta(n_diff<>0), left.ULTIMATE_LINKID=right.ULTIMATE_LINKID,
 								TRANSFORM(Cortera.Layout_Attributes_Out,
 										self.current_rec := false;
+										self := left;), INNER, LOCAL);
+	// set new current values
+	changed := JOIN(current, delta(n_diff<>0), left.ULTIMATE_LINKID=right.ULTIMATE_LINKID,
+								TRANSFORM(Cortera.Layout_Attributes_Out,
+										self.current_rec := true;
+										self.dt_vendor_first_reported := (unsigned4)version;
 										self := left;), INNER, LOCAL);
 	// for unchanged update the date first seen
 	unchanged_prev := JOIN(previous, delta(n_diff=0), left.ULTIMATE_LINKID=right.ULTIMATE_LINKID,
@@ -45,7 +54,7 @@ EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) current, dataset(C
 																				ut.min2(left.dt_vendor_first_reported, right.dt_vendor_first_reported));
 										self := left;), INNER, LOCAL);	
 										
-	result := new + lost + changed + unchanged;
+	result := new + lost + changed + unchanged + archived + not_curr;
 										
 	return result;
 END;

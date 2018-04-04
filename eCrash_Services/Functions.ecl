@@ -1,11 +1,40 @@
-/*2017-03-14T21:25:39Z (Dmitriy Lazarenko)
-checking if input params are populated for IsReportDeletedFromDeltabase() function and also changing vehicle_incident_id comparison since we can have situation where deleted and non deleted reports have the same incident_id
-*/
-import iesp,lib_stringlib,ut,FLAccidents_Ecrash,AutoStandardI,doxie,Std;
+﻿import iesp, lib_stringlib, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
 
 export Functions := MODULE
 
-	EXPORT Layouts.recs_with_penalty FilterOutDeletedReports(DATASET(Layouts.recs_with_penalty) Recs) := FUNCTION
+	/*
+		Break Str1 and Str2 into sets of tokens, takes the set with lesser amount of tokens (let's say it would be Str1), 
+		intersects with the second set (Str2) and determines if all of the tokens from the first set (in our example Str1) are present in the second set (Str2).
+	*/
+	EXPORT BOOLEAN StringTokenMatch(STRING Str1, STRING Str2, STRING SeparatorStr = ' ') := FUNCTION
+		Str1Trimmed := TRIM(Str1, LEFT, RIGHT);
+		Str2Trimmed := TRIM(Str2, LEFT, RIGHT);
+		Str1Prepared := Std.Str.FindReplace(Str1Trimmed, '-', SeparatorStr);
+		Str2Prepared := Std.Str.FindReplace(Str2Trimmed, '-', SeparatorStr);
+		Str1Set := Std.Str.SplitWords(Std.Str.ToUpperCase(Str1Prepared), SeparatorStr);
+		Str2Set := Std.Str.SplitWords(Std.Str.ToUpperCase(Str2Prepared), SeparatorStr);
+		
+		StrCondition := COUNT(Str2Set) <= COUNT(Str1Set);
+		TokensMustMatchSet := IF(StrCondition, Str2Set, Str1Set);
+		TokensMustMatchWithSet := IF(StrCondition, Str1Set, Str2Set);
+		
+		TokenLayout := RECORD
+			STRING piece;
+		END;
+		TokensMustMatchDs := DATASET(TokensMustMatchSet, TokenLayout);
+		TokensMustMatchWithDs := DATASET(TokensMustMatchWithSet, TokenLayout);
+		
+		TokensNotMatched := JOIN(
+			TokensMustMatchDs,
+			TokensMustMatchWithDs,
+			LEFT.piece = RIGHT.piece,
+			LEFT ONLY
+		);	
+		
+		RETURN Str1Trimmed <> '' AND Str2Trimmed <> '' AND ~EXISTS(TokensNotMatched);
+	END;
+
+	EXPORT eCrash_Services.Layouts.recs_with_penalty FilterOutDeletedReports(DATASET(eCrash_Services.Layouts.recs_with_penalty) Recs) := FUNCTION
 			//eliminating supplements and leaving only unique reports with is_deleted = 1
 			RecsDeletedDeduped := DEDUP(
 				SORT(
@@ -55,7 +84,7 @@ export Functions := MODULE
 			RETURN Result;
 		END;
 
-	EXPORT create_date_dataset(string startdate, integer offset, boolean bothways = false, boolean forwardOnly=false):=function
+	EXPORT create_date_dataset(string startdate, integer offset, boolean forwardOnly=false):=function
 
 		tmp_rec := record
 			string8 daterange;
@@ -74,32 +103,32 @@ export Functions := MODULE
 		ds_back:=normalize(ds_tmp,offset,create_back_dates(left,counter));
 		ds_forward:=normalize(ds_tmp,offset,create_forward_dates(left,counter));
 		
-		result := MAP ( bothways => ds_back+ds_forward+ds_tmp,
-		                forwardOnly => ds_forward + ds_tmp,
-										ds_back + ds_tmp
-		              );
+		result := MAP (
+			forwardOnly => ds_forward + ds_tmp,
+			ds_back + ds_tmp
+		);
 		
 		return result;
 
 	end;
 	
 	
-	EXPORT location_filter (dataset(recordof(Layouts.recs_with_penalty)) recs, IParam.searchrecords in_mod):=function
+	EXPORT location_filter (dataset(recordof(eCrash_Services.Layouts.recs_with_penalty)) recs, eCrash_Services.IParam.searchrecords in_mod):=function
 				string CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
 				string loc_street := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
-				recs_exact:= recs((CrossStreet='' or (Constants.contains_match(accident_cross_street,CrossStreet) or 
-																						 Constants.contains_match(accident_street,CrossStreet) or
-																						 Constants.contains_match(next_street,CrossStreet)))
+				recs_exact:= recs((CrossStreet='' or (eCrash_Services.Constants.contains_match(accident_cross_street,CrossStreet) or 
+																						 eCrash_Services.Constants.contains_match(accident_street,CrossStreet) or
+																						 eCrash_Services.Constants.contains_match(next_street,CrossStreet)))
 																						 and 
 													
-												(loc_street='' or (Constants.contains_match(accident_cross_street,loc_street) or
-																						 Constants.contains_match(next_street,loc_street) or 
-																						 Constants.contains_match(accident_street,loc_street))));
+												(loc_street='' or (eCrash_Services.Constants.contains_match(accident_cross_street,loc_street) or
+																						 eCrash_Services.Constants.contains_match(next_street,loc_street) or 
+																						 eCrash_Services.Constants.contains_match(accident_street,loc_street))));
 												
 				return recs_exact;
 	end;
 	
-	EXPORT OwnerDriverDedup(DATASET(Layouts.eCrashRecordStructure) Parties) := FUNCTION
+	EXPORT OwnerDriverDedup(DATASET(eCrash_Services.Layouts.eCrashRecordStructure) Parties) := FUNCTION
 		Result := DEDUP(
 			SORT(
 				Parties,
@@ -137,9 +166,9 @@ export Functions := MODULE
 		RETURN Result;
 	END;
 	
-	EXPORT SupplementRollupTransform (DATASET(Layouts.eCrashRecordStructure) recs) := FUNCTION
+	EXPORT SupplementRollupTransform (DATASET(eCrash_Services.Layouts.eCrashRecordStructure) recs) := FUNCTION
 		
-		Layouts.eCrashRecordCompare rollupTransform(Layouts.eCrashRecordCompare L, Layouts.eCrashRecordCompare R) := TRANSFORM
+		eCrash_Services.Layouts.eCrashRecordCompare rollupTransform(eCrash_Services.Layouts.eCrashRecordCompare L, eCrash_Services.Layouts.eCrashRecordCompare R) := TRANSFORM
 				SELF.accident_street := L.accident_street + R.accident_street;
 				SELF.accident_cross_street := L.accident_cross_street + R.accident_cross_street;
 				SELF.fname := L.fname + R.fname;
@@ -205,7 +234,7 @@ export Functions := MODULE
 
 		ReportsAllCompare := PROJECT(
 			ReportsAllSorted, 
-			Layouts.eCrashRecordCompare
+			eCrash_Services.Layouts.eCrashRecordCompare
 		);
 		
 		ReportsAllRolledUp := ROLLUP(ReportsAllCompare,LEFT.report_id = RIGHT.report_id,rollupTransform(LEFT, RIGHT));
@@ -258,13 +287,13 @@ export Functions := MODULE
 	END;
 
 		
-	EXPORT GetSuperReportIdFromDeltabase(STRING SqlQuery, IParam.searchrecords InMod) := FUNCTION
+	EXPORT GetSuperReportIdFromDeltabase(STRING SqlQuery, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
 		Parties := RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(SqlQuery);
 		
 		RETURN MIN(Parties, report_id);
 	END;
 	
-	EXPORT GetSuperReportId(Layouts.recs_with_penalty ReportRecord, IParam.searchrecords InMod) := FUNCTION
+	EXPORT GetSuperReportId(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
 			Payload := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
 				KEYED(
 					l_accnbr = ReportRecord.l_accnbr AND
@@ -280,7 +309,7 @@ export Functions := MODULE
 			ReportRecordForSql := PROJECT(
 				ReportRecord, 
 				TRANSFORM(
-					Layouts.eCrashRecordStructure,
+					eCrash_Services.Layouts.eCrashRecordStructure,
 					SELF := LEFT;
 				)
 			);
@@ -295,7 +324,7 @@ export Functions := MODULE
 			RETURN SuperReportId;
 	END;
 
-	EXPORT GetReportPricingData(Layouts.recs_with_penalty ReportRecord, IParam.searchrecords InMod) := FUNCTION
+	EXPORT GetReportPricingData(eCrash_Services.Layouts.recs_with_penalty ReportRecord, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
 			Payload := LIMIT(
 				FLAccidents_Ecrash.key_EcrashV2_accnbrv1(
 					KEYED(
@@ -308,14 +337,14 @@ export Functions := MODULE
 					orig_accnbr = ReportRecord.orig_accnbr AND
 					report_type_id = ReportRecord.report_type_id
 				),
-				constants.MAX_REPORT_NUMBER,
+				eCrash_Services.constants.MAX_REPORT_NUMBER,
 				FAIL(203, doxie.ErrorCodes(203))
 			);	
 			
 			ReportRecordForSql := PROJECT(
 				ReportRecord, 
 				TRANSFORM(
-					Layouts.eCrashRecordStructure,
+					eCrash_Services.Layouts.eCrashRecordStructure,
 					SELF := LEFT;
 				)
 			);
@@ -323,12 +352,12 @@ export Functions := MODULE
 			DeltaBaseSqlString := RecordsDeltaBase(InMod).deltaSQL.getImageRetrievalSql(ReportRecordForSql);
 			Parties := RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(DeltaBaseSqlString);
 			ReportOwnerDriverDeduped := OwnerDriverDedup(Parties);
-			PayloadRecs := project(Payload,TRANSFORM(Layouts.eCrashRecordStructure, SELF:=LEFT, SELF := []));
+			PayloadRecs := project(Payload,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF:=LEFT, SELF := []));
 			
 			ReportsPageCountRaw := ReportOwnerDriverDeduped + PayloadRecs;
-			ReportsPageCountWithDeleted := PROJECT(ReportsPageCountRaw, TRANSFORM(Layouts.recs_with_penalty, SELF := LEFT, SELF := []));
+			ReportsPageCountWithDeleted := PROJECT(ReportsPageCountRaw, TRANSFORM(eCrash_Services.Layouts.recs_with_penalty, SELF := LEFT, SELF := []));
 			ReportsPageCountWithoutDeleted := FilterOutDeletedReports(ReportsPageCountWithDeleted);
-			ReportsPageCount := PROJECT(ReportsPageCountWithoutDeleted,TRANSFORM(Layouts.eCrashRecordStructure, SELF := LEFT, SELF := []));	
+			ReportsPageCount := PROJECT(ReportsPageCountWithoutDeleted,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF := LEFT, SELF := []));	
 			
 			// Get the min report_id for page_count, we have to pick the page_count for the lastest non dupe report (If supplemental we want the older report page_count, since supplements are free)
 			SupplementTransformedRecs := SupplementRollupTransform(ReportsPageCount);
@@ -339,13 +368,13 @@ export Functions := MODULE
 														left.report_id = right.report_id,
 														transform(right),keep(1));
 														
-			deltabaseRecs := project(Parties,TRANSFORM(Layouts.eCrashRecordStructure, SELF.super_report_id := left.report_id, SELF:=LEFT));
+			deltabaseRecs := project(Parties,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF.super_report_id := left.report_id, SELF:=LEFT));
 			
 			superReportRecsRaw :=PayloadRecs + deltabaseRecs; 
 			superReportRecsWithDeleted := PROJECT(
 				superReportRecsRaw,
 				TRANSFORM(
-					Layouts.recs_with_penalty, 
+					eCrash_Services.Layouts.recs_with_penalty, 
 					SELF := LEFT; 
 					SELF := [];
 				)	
@@ -358,7 +387,7 @@ export Functions := MODULE
 			supplementalRecsPageCount := TOPN(
 				CHOOSEN(
 					FLAccidents_Ecrash.Key_eCrashv2_Supplemental(super_report_id=superReportRecsFiltered[1].super_report_id),
-					constants.MAX_REPORT_NUMBER
+					eCrash_Services.constants.MAX_REPORT_NUMBER
 				),	
 				1,
 				report_id
@@ -367,17 +396,17 @@ export Functions := MODULE
 			
 			page_count := if(exists(supplementalRecsPageCount),supplementalRecsPageCount[1].page_count, PageCountRecs[1].page_count);
 			
-			reportPricingRec := ROW(TRANSFORM(Layouts.ReportPricing, SELF.superreportid := superReportRecsFiltered[1].super_report_id; SELF.pagecount := page_count));
+			reportPricingRec := ROW(TRANSFORM(eCrash_Services.Layouts.ReportPricing, SELF.superreportid := superReportRecsFiltered[1].super_report_id; SELF.pagecount := page_count));
 			
 			RETURN reportPricingRec;
 	END;
 
-   EXPORT AssociatedReportsTransform (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, IParam.searchrecords in_mod) := FUNCTION
+   EXPORT AssociatedReportsTransform (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, eCrash_Services.IParam.searchrecords in_mod) := FUNCTION
 	 
 		RawDocIn := RawDocument(in_mod);
 		iesp.ecrash.t_ECrashSearchRecordData xformSearchRecordData(iesp.ecrash.t_ECrashSearchRecord l) := TRANSFORM
 	
-		  iesp.ecrash.t_ECrashDocument xform_Documents(Layouts.DocumentData l) := TRANSFORM
+		  iesp.ecrash.t_ECrashDocument xform_Documents(eCrash_Services.Layouts.DocumentData l) := TRANSFORM
 				self.DocType := l.reportTypeId;
 				self.id := l.documentId;
 				self.extension := l.extension;
@@ -410,8 +439,8 @@ export Functions := MODULE
 		// groupable := in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src);
 		// groupable_recs := in_recs(in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src));
     // non_groupable_recs := in_recs(~(in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src)));
-		groupable_recs := in_recs(ReportType in constants.groupable_report_codes and ReportCode in constants.Iyetek_src);
-    non_groupable_recs := in_recs(ReportType not in constants.groupable_report_codes or ReportCode not in constants.Iyetek_src);
+		groupable_recs := in_recs(ReportType in eCrash_Services.constants.groupable_report_codes and ReportCode in eCrash_Services.constants.Iyetek_src);
+    non_groupable_recs := in_recs(ReportType not in eCrash_Services.constants.groupable_report_codes or ReportCode not in eCrash_Services.constants.Iyetek_src);
 		
 		rpt_grp := GROUP(
 				SORT(groupable_recs,
@@ -433,19 +462,23 @@ export Functions := MODULE
 	
 	
 	
-	EXPORT InvolvedPartyTransform (dataset(Layouts.recs_with_penalty) in_recs, IParam.searchrecords in_mod, boolean is_direct_match):=FUNCTION
+	EXPORT InvolvedPartyTransform (dataset(eCrash_Services.Layouts.recs_with_penalty) in_recs, eCrash_Services.IParam.searchrecords in_mod, boolean is_direct_match):=FUNCTION
 		
 		primary_agency := in_mod.agencies(PrimaryAgency)[1];
-		boolean no_state_search :=constants.no_state_search(in_mod);
-		boolean no_jurisdiction_search :=constants.no_jurisdiction_search(in_mod);
-		boolean use_rpt_num:= Constants.use_rpt_num (in_mod);
+		boolean no_state_search := eCrash_Services.constants.no_state_search(in_mod);
+		boolean no_jurisdiction_search := eCrash_Services.constants.no_jurisdiction_search(in_mod);
+		boolean use_rpt_num:= eCrash_Services.Constants.use_rpt_num (in_mod);
 		boolean direct_match_confirm:= is_direct_match and not no_state_search and not no_jurisdiction_search;
 		boolean has_name:=in_mod.firstname<>'' and in_mod.lastname<>'';
 
-		iesp.ecrash.t_ECrashSearchRecord final_xform(Layouts.recs_with_penalty l, dataset(Layouts.recs_with_penalty) r):=TRANSFORM	
+		iesp.ecrash.t_ECrashSearchRecord final_xform(eCrash_Services.Layouts.recs_with_penalty l, dataset(eCrash_Services.Layouts.recs_with_penalty) r):=TRANSFORM	
 		
-			iesp.ecrash.t_ECrashInvolvedParty xform_InvolvedParty(Layouts.recs_with_penalty l):=TRANSFORM
+			iesp.ecrash.t_ECrashInvolvedParty xform_InvolvedParty(eCrash_Services.Layouts.recs_with_penalty l):=TRANSFORM
 							self.DriverLicenseNumber := l.driver_license_nbr,
+							self.Vehicle.Licenseplate := l.tag_nbr,
+							self.Vehicle.Vin := l.vin,
+							self.Vehicle.VehicleUnitNumber := l.vehicle_Unit_Number,
+							self.Vehicle.PlateState := l.tagnbr_st,
 							self.DOB := iesp.ECL2ESP.toDatestring8(l.dob),
 							self.Name:= iesp.ECL2ESP.SetName(l.fname, l.mname, l.lname, l.name_suffix,''),
 							self.address :=   iesp.ECL2ESP.SetAddress(l.prim_name, l.prim_range, l.predir, l.postdir,
@@ -475,16 +508,16 @@ export Functions := MODULE
 																		 l.Jurisdiction = primary_agency.Jurisdiction);
 				
 																						 
-				  self.ResultType := MAP(	constants.b_internal_pduser(in_mod.UserType) and direct_match_confirm and (use_rpt_num or has_name) and agency_match =>constants.DIRECT_hit,
-																	constants.b_internal_pduser(in_mod.UserType) =>constants.POSSIBLE_hit,
-																  direct_match_confirm and agency_match =>constants.DIRECT_hit,
-																	constants.POSSIBLE_hit),
+				  self.ResultType := MAP(	eCrash_Services.constants.b_internal_pduser(in_mod.UserType) and direct_match_confirm and (use_rpt_num or has_name) and agency_match =>eCrash_Services.constants.DIRECT_hit,
+																	eCrash_Services.constants.b_internal_pduser(in_mod.UserType) => eCrash_Services.constants.POSSIBLE_hit,
+																  direct_match_confirm and agency_match => eCrash_Services.constants.DIRECT_hit,
+																	eCrash_Services.constants.POSSIBLE_hit),
 					self.ReportHashKey := l.image_hash;
 					self.AgencyORI := l.agency_ori;
 					self.agencyid:=l.jurisdiction_nbr;
 					self.JurisdictionState := l.jurisdiction_state,
 					self.Jurisdiction :=l.jurisdiction,
-					self.IsReadyForPublic :=trim(l.is_available_for_public) = '1' or l.report_code in constants.Inhouse_src;
+					self.IsReadyForPublic :=trim(l.is_available_for_public) = '1' or l.report_code in eCrash_Services.constants.Inhouse_src;
 					//getting involved parties from the latest report
 					InvolvedParties := r(report_id = l.report_id);
 					
@@ -499,6 +532,10 @@ export Functions := MODULE
 					self.ReportLinkID := l.reportlinkid;
 					self.VendorCode := l.vendor_code;
 					self.ReportCode := l.report_code;
+					self.ContribSource := l.contrib_source;
+					keys_report_date := eCrash_Services.Constants.Format_Report_Creation_Date(l.creation_date);
+					self.DateReportCreated := IF(l.isDelta, l.date_added[1..10], keys_report_date);
+					self.OfficerBadgeNumber := l.officer_id;
 					self:=[]
 					END;
 					
@@ -528,7 +565,7 @@ export Functions := MODULE
 			RETURN recs_result;
 		END;
 		
-		EXPORT GetImageDataFromDeltabase(SET OF STRING ReportIds, IParam.searchrecords InModuleDeltabase) := FUNCTION
+		EXPORT GetImageDataFromDeltabase(SET OF STRING ReportIds, eCrash_Services.IParam.searchrecords InModuleDeltabase) := FUNCTION
 			DeltabaseService := DeltaBaseSoapCall(InModuleDeltabase);
 			DeltabaseSql := RawDeltaBaseSQL(InModuleDeltabase);
 			DeltabaseResponse := DeltabaseService.GetImageData(DeltabaseSql.GetTmImageSql(ReportIds));
@@ -554,7 +591,7 @@ export Functions := MODULE
 		return project(in_recs,final_xform(left));
 	END;
 	
-	EXPORT PreferDriverRecords(DATASET(Layouts.recs_with_penalty) InRecords) := FUNCTION
+	EXPORT PreferDriverRecords(DATASET(eCrash_Services.Layouts.recs_with_penalty) InRecords) := FUNCTION
 		
 			RecordsSorted := SORT(InRecords, 
 					fname,
@@ -573,7 +610,13 @@ export Functions := MODULE
 					-(UNSIGNED8)report_id,
 					-isDelta,
 					-date_added,
-					if(record_type = 'DRIVER', 0, 1) //DRIVER records have more information
+					 //DRIVER records have more information
+					if(record_type = 'DRIVER', 0, 1),
+					//preferring record with person that is assigned to a vehicle because sometimes we might not have vehicle.unit_number keyed in and in that case
+					//we will be assigning vehicle without unit_number to every single person in the report (even to a person that is properly assigned to a vehicle) 
+					//and we might end up with several records with the same person where one of them has vehicle's unit_number populated and another one don't. In that
+					//case we need to prefer person with assigned vehicle number.
+					IF(vehicle_unit_number <> '' AND vehicle_unit_number = unit_number, 0, 1) 
 				);
 				
 			RETURN DEDUP(
@@ -592,7 +635,7 @@ export Functions := MODULE
 			
 		END;	
 		
-		EXPORT dedupReportRecordsFromParties(DATASET(Layouts.recs_with_penalty) recs) := FUNCTION
+		EXPORT dedupReportRecordsFromParties(DATASET(eCrash_Services.Layouts.recs_with_penalty) recs) := FUNCTION
 			result := DEDUP(
 									SORT(
 										recs,
@@ -631,10 +674,10 @@ export Functions := MODULE
 			RETURN ValueStrLower IN Tokens;
 		END;
 				
-  	EXPORT Layouts.GetSupplementalsResult getSupplementalsDeltabase(
+  	EXPORT eCrash_Services.Layouts.GetSupplementalsResult getSupplementalsDeltabase(
 			STRING RequestReportId,
 			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) ReportHashKeysFromKey,
-			IParam.searchrecords InModuleDeltaBase
+			eCrash_Services.IParam.searchrecords InModuleDeltaBase
 		) := FUNCTION
 				
 		//Filtering out TMs from the mix because we were having problems where TM were sent to HPCC before TF/EA but it would have greater report_id (caused by migration of TMs to incident table). 
@@ -664,10 +707,10 @@ export Functions := MODULE
 			LEFT.orig_accnbr = RIGHT.orig_accnbr AND
 			LEFT.report_type_id = RIGHT.report_type_id,	
 			TRANSFORM(
-				Layouts.eCrashRecordStructure,
+				eCrash_Services.Layouts.eCrashRecordStructure,
 				SELF := RIGHT;
 			),
-			LIMIT(constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203)))
+			LIMIT(eCrash_Services.constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203)))
 		);	
 
 		DeltaBaseService := DeltaBaseSoapCall(InModuleDeltaBase);
@@ -705,7 +748,7 @@ export Functions := MODULE
 				orig_accnbr = ReportDeltabaseRow[1].orig_accnbr	AND
 				report_type_id = ReportDeltabaseRow[1].report_type_id
 			),
-			constants.MAX_REPORT_NUMBER,
+			eCrash_Services.constants.MAX_REPORT_NUMBER,
 			FAIL(203, doxie.ErrorCodes(203))
 		);	
 		PayloadRowByDeltabase := PROJECT(PayloadRowByDeltabaseRaw, eCrash_Services.Layouts.eCrashRecordStructure);
@@ -719,7 +762,7 @@ export Functions := MODULE
 					FLAccidents_Ecrash.Key_eCrashv2_Supplemental(
 						super_report_id = PayloadRowByDeltabase[1].super_report_id
 					),
-					constants.MAX_REPORT_NUMBER,
+					eCrash_Services.constants.MAX_REPORT_NUMBER,
 					FAIL(203, doxie.ErrorCodes(203))
 				)	
 			)	
@@ -735,7 +778,7 @@ export Functions := MODULE
 			AND	SuperReportRow[1].jurisdiction_state != ''
 			AND SuperReportRow[1].accident_date != '', 
 			DeltaBaseService.LookupIncidentPersons(DeltaBaseSqlString),
-			DATASET([], Layouts.eCrashRecordStructure)
+			DATASET([], eCrash_Services.Layouts.eCrashRecordStructure)
 		);
 
 		ReportDeltabaseDriverOwnerDeduped := OwnerDriverDedup(ReportDeltabase);
@@ -768,7 +811,7 @@ export Functions := MODULE
 		ReportsAllDedupedWithDeleted := PROJECT(
 			ReportsAllDeduped, 
 			TRANSFORM(
-				Layouts.recs_with_penalty, 
+				eCrash_Services.Layouts.recs_with_penalty, 
 				SELF := LEFT; 
 				SELF := [];
 			)
@@ -777,7 +820,7 @@ export Functions := MODULE
 		ReportHashKeyesFromKeyForDedupWithDeleted := PROJECT(
 			ReportHashKeyesFromKeyForDedup, 
 			TRANSFORM(
-				Layouts.recs_with_penalty, 
+				eCrash_Services.Layouts.recs_with_penalty, 
 				SELF.image_hash := LEFT.hash_key;
 				SELF := LEFT; 
 				SELF := [];
@@ -806,12 +849,12 @@ export Functions := MODULE
 			), 
 			ReportsAll,
 			ReportsAllSlim
-		}, Layouts.GetSupplementalsResult);
+		}, eCrash_Services.Layouts.GetSupplementalsResult);
 		
 	END;
 			
 	//Returns the same result type as getSupplementalsDeltabase() except return datasets don't contain reports from deltabase.
-  EXPORT Layouts.GetSupplementalsResult getSupplementalsBypassDeltabase(
+  EXPORT eCrash_Services.Layouts.GetSupplementalsResult getSupplementalsBypassDeltabase(
 			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) ReportHashKeysFromKey
 		) := FUNCTION			
 
@@ -838,10 +881,10 @@ export Functions := MODULE
 			ReportsAll,//this is used as SuperReportRow and ReportsAll in the underlying code
 			DATASET([], eCrash_Services.Layouts.eCrashRecordStructure),
 			ReportHashKeyesFromKeyForDedup
-		}, Layouts.GetSupplementalsResult);
+		}, eCrash_Services.Layouts.GetSupplementalsResult);
 		END;	
 		
-		EXPORT SortFinalResults (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, IParam.searchrecords in_mod):=FUNCTION
+		EXPORT SortFinalResults (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, eCrash_Services.IParam.searchrecords in_mod):=FUNCTION
 		
 			search_record_with_primaryAgency := RECORD
 					iesp.ecrash.t_ECrashSearchRecord;
@@ -867,4 +910,22 @@ export Functions := MODULE
 			
 			RETURN result_recs;
 		END;
+		
+		EXPORT GetAgencySearchDs (IParam.searchrecords in_mod):=FUNCTION
+		
+			searchDs    := PROJECT(in_mod.agencies, transform(eCrash_Services.Layouts.SearchParameters, 
+																														self.vin := in_mod.VehicleVin;
+																														self.DriversLicenseNum := in_mod.driversLicenseNumber;
+																														self.OfficerBadge := in_mod.OfficerBadgeNumber;
+																														self.LicensePlate := in_mod.LicensePlate;
+																														self.CrossStreet := in_mod.AccidentLocationCrossStreet;
+																														self.LocStreet := in_mod.AccidentLocationStreet;
+																														self.start_date := in_mod.DolStartdate;
+																														self.end_date := in_mod.DolEnddate;
+																														self := left;));
+																															
+			
+			RETURN searchDs;
+		END;
+
 END;

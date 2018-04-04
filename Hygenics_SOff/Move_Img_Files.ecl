@@ -1,4 +1,4 @@
-EXPORT Move_Img_Files (string file_date) := function
+﻿EXPORT Move_Img_Files (string file_date) := function
 
 	filedate 	:= StringLib.StringFilter(file_date, '0123456789');
 
@@ -17,7 +17,7 @@ return sequential(
 						Hygenics_Soff.Move_Soff_Image_Files('hi', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('ia', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('id', filedate),
-						Hygenics_Soff.Move_Soff_Image_Files('il', filedate),
+						//Hygenics_Soff.Move_Soff_Image_Files('il', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('in', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('ks', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('ky', filedate),
@@ -27,7 +27,7 @@ return sequential(
 						Hygenics_Soff.Move_Soff_Image_Files('me', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('mi', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('mn', filedate),
-						Hygenics_Soff.Move_Soff_Image_Files('mo', filedate),
+						//Hygenics_Soff.Move_Soff_Image_Files('mo', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('ms', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('mt', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('nc', filedate),

@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT SALT37;
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -26,71 +26,71 @@ EXPORT Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Layout_BizHead) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.company_name_Invalid := Fields.InValid_company_name((SALT33.StrType)le.company_name);
-      clean_company_name := (TYPEOF(le.company_name))Fields.Make_company_name((SALT33.StrType)le.company_name);
-      clean_company_name_Invalid := Fields.InValid_company_name((SALT33.StrType)clean_company_name);
+    SELF.company_name_Invalid := Fields.InValid_company_name((SALT37.StrType)le.company_name);
+      clean_company_name := (TYPEOF(le.company_name))Fields.Make_company_name((SALT37.StrType)le.company_name);
+      clean_company_name_Invalid := Fields.InValid_company_name((SALT37.StrType)clean_company_name);
       SELF.company_name := IF(withOnfail, clean_company_name, le.company_name); // ONFAIL(CLEAN)
-    SELF.company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT33.StrType)le.company_name_prefix);
-      clean_company_name_prefix := (TYPEOF(le.company_name_prefix))Fields.Make_company_name_prefix((SALT33.StrType)le.company_name_prefix);
-      clean_company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT33.StrType)clean_company_name_prefix);
+    SELF.company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT37.StrType)le.company_name_prefix);
+      clean_company_name_prefix := (TYPEOF(le.company_name_prefix))Fields.Make_company_name_prefix((SALT37.StrType)le.company_name_prefix);
+      clean_company_name_prefix_Invalid := Fields.InValid_company_name_prefix((SALT37.StrType)clean_company_name_prefix);
       SELF.company_name_prefix := IF(withOnfail, clean_company_name_prefix, le.company_name_prefix); // ONFAIL(CLEAN)
-    SELF.cnp_name_Invalid := Fields.InValid_cnp_name((SALT33.StrType)le.cnp_name);
-      clean_cnp_name := (TYPEOF(le.cnp_name))Fields.Make_cnp_name((SALT33.StrType)le.cnp_name);
-      clean_cnp_name_Invalid := Fields.InValid_cnp_name((SALT33.StrType)clean_cnp_name);
+    SELF.cnp_name_Invalid := Fields.InValid_cnp_name((SALT37.StrType)le.cnp_name);
+      clean_cnp_name := (TYPEOF(le.cnp_name))Fields.Make_cnp_name((SALT37.StrType)le.cnp_name);
+      clean_cnp_name_Invalid := Fields.InValid_cnp_name((SALT37.StrType)clean_cnp_name);
       SELF.cnp_name := IF(withOnfail, clean_cnp_name, le.cnp_name); // ONFAIL(CLEAN)
-    SELF.company_fein_Invalid := Fields.InValid_company_fein((SALT33.StrType)le.company_fein);
+    SELF.company_fein_Invalid := Fields.InValid_company_fein((SALT37.StrType)le.company_fein);
       SELF.company_fein := IF(SELF.company_fein_Invalid=0 OR NOT withOnfail, le.company_fein, (TYPEOF(le.company_fein))''); // ONFAIL(BLANK)
-    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT33.StrType)le.prim_name);
-      clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT33.StrType)le.prim_name);
-      clean_prim_name_Invalid := Fields.InValid_prim_name((SALT33.StrType)clean_prim_name);
+    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT37.StrType)le.prim_name);
+      clean_prim_name := (TYPEOF(le.prim_name))Fields.Make_prim_name((SALT37.StrType)le.prim_name);
+      clean_prim_name_Invalid := Fields.InValid_prim_name((SALT37.StrType)clean_prim_name);
       SELF.prim_name := IF(withOnfail, clean_prim_name, le.prim_name); // ONFAIL(CLEAN)
-    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT33.StrType)le.sec_range);
-      clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT33.StrType)le.sec_range);
-      clean_sec_range_Invalid := Fields.InValid_sec_range((SALT33.StrType)clean_sec_range);
+    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT37.StrType)le.sec_range);
+      clean_sec_range := (TYPEOF(le.sec_range))Fields.Make_sec_range((SALT37.StrType)le.sec_range);
+      clean_sec_range_Invalid := Fields.InValid_sec_range((SALT37.StrType)clean_sec_range);
       SELF.sec_range := IF(withOnfail, clean_sec_range, le.sec_range); // ONFAIL(CLEAN)
-    SELF.city_Invalid := Fields.InValid_city((SALT33.StrType)le.city);
-      clean_city := (TYPEOF(le.city))Fields.Make_city((SALT33.StrType)le.city);
-      clean_city_Invalid := Fields.InValid_city((SALT33.StrType)clean_city);
+    SELF.city_Invalid := Fields.InValid_city((SALT37.StrType)le.city);
+      clean_city := (TYPEOF(le.city))Fields.Make_city((SALT37.StrType)le.city);
+      clean_city_Invalid := Fields.InValid_city((SALT37.StrType)clean_city);
       SELF.city := IF(withOnfail, clean_city, le.city); // ONFAIL(CLEAN)
-    SELF.city_clean_Invalid := Fields.InValid_city_clean((SALT33.StrType)le.city_clean);
-      clean_city_clean := (TYPEOF(le.city_clean))Fields.Make_city_clean((SALT33.StrType)le.city_clean);
-      clean_city_clean_Invalid := Fields.InValid_city_clean((SALT33.StrType)clean_city_clean);
+    SELF.city_clean_Invalid := Fields.InValid_city_clean((SALT37.StrType)le.city_clean);
+      clean_city_clean := (TYPEOF(le.city_clean))Fields.Make_city_clean((SALT37.StrType)le.city_clean);
+      clean_city_clean_Invalid := Fields.InValid_city_clean((SALT37.StrType)clean_city_clean);
       SELF.city_clean := IF(withOnfail, clean_city_clean, le.city_clean); // ONFAIL(CLEAN)
-    SELF.st_Invalid := Fields.InValid_st((SALT33.StrType)le.st);
-      clean_st := (TYPEOF(le.st))Fields.Make_st((SALT33.StrType)le.st);
-      clean_st_Invalid := Fields.InValid_st((SALT33.StrType)clean_st);
+    SELF.st_Invalid := Fields.InValid_st((SALT37.StrType)le.st);
+      clean_st := (TYPEOF(le.st))Fields.Make_st((SALT37.StrType)le.st);
+      clean_st_Invalid := Fields.InValid_st((SALT37.StrType)clean_st);
       SELF.st := IF(withOnfail, clean_st, le.st); // ONFAIL(CLEAN)
-    SELF.zip_Invalid := Fields.InValid_zip((SALT33.StrType)le.zip);
-      clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT33.StrType)le.zip);
-      clean_zip_Invalid := Fields.InValid_zip((SALT33.StrType)clean_zip);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT37.StrType)le.zip);
+      clean_zip := (TYPEOF(le.zip))Fields.Make_zip((SALT37.StrType)le.zip);
+      clean_zip_Invalid := Fields.InValid_zip((SALT37.StrType)clean_zip);
       SELF.zip := IF(withOnfail, clean_zip, le.zip); // ONFAIL(CLEAN)
-    SELF.company_url_Invalid := Fields.InValid_company_url((SALT33.StrType)le.company_url);
-      clean_company_url := (TYPEOF(le.company_url))Fields.Make_company_url((SALT33.StrType)le.company_url);
-      clean_company_url_Invalid := Fields.InValid_company_url((SALT33.StrType)clean_company_url);
+    SELF.company_url_Invalid := Fields.InValid_company_url((SALT37.StrType)le.company_url);
+      clean_company_url := (TYPEOF(le.company_url))Fields.Make_company_url((SALT37.StrType)le.company_url);
+      clean_company_url_Invalid := Fields.InValid_company_url((SALT37.StrType)clean_company_url);
       SELF.company_url := IF(withOnfail, clean_company_url, le.company_url); // ONFAIL(CLEAN)
-    SELF.fname_Invalid := Fields.InValid_fname((SALT33.StrType)le.fname);
-      clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT33.StrType)le.fname);
-      clean_fname_Invalid := Fields.InValid_fname((SALT33.StrType)clean_fname);
+    SELF.fname_Invalid := Fields.InValid_fname((SALT37.StrType)le.fname);
+      clean_fname := (TYPEOF(le.fname))Fields.Make_fname((SALT37.StrType)le.fname);
+      clean_fname_Invalid := Fields.InValid_fname((SALT37.StrType)clean_fname);
       SELF.fname := IF(withOnfail, clean_fname, le.fname); // ONFAIL(CLEAN)
-    SELF.fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT33.StrType)le.fname_preferred);
-      clean_fname_preferred := (TYPEOF(le.fname_preferred))Fields.Make_fname_preferred((SALT33.StrType)le.fname_preferred);
-      clean_fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT33.StrType)clean_fname_preferred);
+    SELF.fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT37.StrType)le.fname_preferred);
+      clean_fname_preferred := (TYPEOF(le.fname_preferred))Fields.Make_fname_preferred((SALT37.StrType)le.fname_preferred);
+      clean_fname_preferred_Invalid := Fields.InValid_fname_preferred((SALT37.StrType)clean_fname_preferred);
       SELF.fname_preferred := IF(withOnfail, clean_fname_preferred, le.fname_preferred); // ONFAIL(CLEAN)
-    SELF.mname_Invalid := Fields.InValid_mname((SALT33.StrType)le.mname);
-      clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT33.StrType)le.mname);
-      clean_mname_Invalid := Fields.InValid_mname((SALT33.StrType)clean_mname);
+    SELF.mname_Invalid := Fields.InValid_mname((SALT37.StrType)le.mname);
+      clean_mname := (TYPEOF(le.mname))Fields.Make_mname((SALT37.StrType)le.mname);
+      clean_mname_Invalid := Fields.InValid_mname((SALT37.StrType)clean_mname);
       SELF.mname := IF(withOnfail, clean_mname, le.mname); // ONFAIL(CLEAN)
-    SELF.lname_Invalid := Fields.InValid_lname((SALT33.StrType)le.lname);
-      clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT33.StrType)le.lname);
-      clean_lname_Invalid := Fields.InValid_lname((SALT33.StrType)clean_lname);
+    SELF.lname_Invalid := Fields.InValid_lname((SALT37.StrType)le.lname);
+      clean_lname := (TYPEOF(le.lname))Fields.Make_lname((SALT37.StrType)le.lname);
+      clean_lname_Invalid := Fields.InValid_lname((SALT37.StrType)clean_lname);
       SELF.lname := IF(withOnfail, clean_lname, le.lname); // ONFAIL(CLEAN)
-    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT33.StrType)le.name_suffix);
-      clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT33.StrType)le.name_suffix);
-      clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT33.StrType)clean_name_suffix);
+    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT37.StrType)le.name_suffix);
+      clean_name_suffix := (TYPEOF(le.name_suffix))Fields.Make_name_suffix((SALT37.StrType)le.name_suffix);
+      clean_name_suffix_Invalid := Fields.InValid_name_suffix((SALT37.StrType)clean_name_suffix);
       SELF.name_suffix := IF(withOnfail, clean_name_suffix, le.name_suffix); // ONFAIL(CLEAN)
-    SELF.contact_email_Invalid := Fields.InValid_contact_email((SALT33.StrType)le.contact_email);
-      clean_contact_email := (TYPEOF(le.contact_email))Fields.Make_contact_email((SALT33.StrType)le.contact_email);
-      clean_contact_email_Invalid := Fields.InValid_contact_email((SALT33.StrType)clean_contact_email);
+    SELF.contact_email_Invalid := Fields.InValid_contact_email((SALT37.StrType)le.contact_email);
+      clean_contact_email := (TYPEOF(le.contact_email))Fields.Make_contact_email((SALT37.StrType)le.contact_email);
+      clean_contact_email_Invalid := Fields.InValid_contact_email((SALT37.StrType)clean_contact_email);
       SELF.contact_email := IF(withOnfail, clean_contact_email, le.contact_email); // ONFAIL(CLEAN)
     SELF := le;
   END;
@@ -187,8 +187,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT33.StrType ErrorMessage;
-    SALT33.StrType FieldContents;
+    SALT37.StrType ErrorMessage;
+    SALT37.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -214,14 +214,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.contact_email_Invalid,'CAPS','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'company_name','company_name_prefix','cnp_name','company_fein','prim_name','sec_range','city','city_clean','st','zip','company_url','fname','fname_preferred','mname','lname','name_suffix','contact_email','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_FEIN','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHA','T_NUMBER','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALPHANUM','T_ALLCAPS','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT33.StrType)le.company_name,(SALT33.StrType)le.company_name_prefix,(SALT33.StrType)le.cnp_name,(SALT33.StrType)le.company_fein,(SALT33.StrType)le.prim_name,(SALT33.StrType)le.sec_range,(SALT33.StrType)le.city,(SALT33.StrType)le.city_clean,(SALT33.StrType)le.st,(SALT33.StrType)le.zip,(SALT33.StrType)le.company_url,(SALT33.StrType)le.fname,(SALT33.StrType)le.fname_preferred,(SALT33.StrType)le.mname,(SALT33.StrType)le.lname,(SALT33.StrType)le.name_suffix,(SALT33.StrType)le.contact_email,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.company_name,(SALT37.StrType)le.company_name_prefix,(SALT37.StrType)le.cnp_name,(SALT37.StrType)le.company_fein,(SALT37.StrType)le.prim_name,(SALT37.StrType)le.sec_range,(SALT37.StrType)le.city,(SALT37.StrType)le.city_clean,(SALT37.StrType)le.st,(SALT37.StrType)le.zip,(SALT37.StrType)le.company_url,(SALT37.StrType)le.fname,(SALT37.StrType)le.fname_preferred,(SALT37.StrType)le.mname,(SALT37.StrType)le.lname,(SALT37.StrType)le.name_suffix,(SALT37.StrType)le.contact_email,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT33.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT37.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -303,12 +303,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT33.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT37.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT33.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT37.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;

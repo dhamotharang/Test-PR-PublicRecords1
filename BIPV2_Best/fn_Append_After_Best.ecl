@@ -1,4 +1,4 @@
-import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
+﻿import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
 EXPORT fn_Append_After_Best (linkid,best_file,pHrchyBase,pFips2County) := FUNCTIONMACRO
 bip_business_header := pHrchyBase;
 best_company_name_l := RECORD
@@ -241,8 +241,12 @@ company_address_flat := join(
   ),lookup,left outer
 );
 //-------append company_incorporation_date
-import mdr;
-company_inc_dt := dedup(sort(distribute(company_names_(company_incorporation_date > 0,~mdr.sourceTools.sourceisCortera(source)), hash(linkid)), linkid, company_incorporation_date, local), linkid, local);
+isYearOnlyDate := company_names_.company_incorporation_date%10000 = 0;
+isYearMonthOnlyDate := company_names_.company_incorporation_date%100 = 0;
+isValidIncDate := company_names_.company_incorporation_date >=17641029; // 17641029 per Tim Bernhard: As far as the oldest date – let’s just draw a line with 17641029… There are some older, still existing cos, but I’m using the Hartford Courant as my oldest, valid date.
+company_inc_dt := dedup(sort(distribute(company_names_(isValidIncDate), hash(linkid)), linkid, isYearOnlyDate, isYearMonthOnlyDate, company_incorporation_date, local), linkid, local);
+
+
 company_inc_dt_src := dedup(sort(join(
   distribute(company_inc_dt, hash(linkid)),
   distribute(company_names_, hash(linkid)),

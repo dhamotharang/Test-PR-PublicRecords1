@@ -1,4 +1,4 @@
-/*2016-06-22T18:47:08Z (Harrison Sun_prod)
+﻿/*2016-06-22T18:47:08Z (Harrison Sun_prod)
 Temp check in
 */
 export KeySuffix_mod2 :=
@@ -51,7 +51,16 @@ end;
 //export constant_ThisBuild_versionDate := '20170315'; // S46
 //export constant_ThisBuild_versionDate := '20170526'; // S47
 // export constant_ThisBuild_versionDate := '20170622'; // S48
-export constant_ThisBuild_versionDate := '20170801'; // S49
+// export constant_ThisBuild_versionDate := '20170801'; // S49
+// export constant_ThisBuild_versionDate := '20170901'; // S50
+// export constant_ThisBuild_versionDate := '20170901a'; // S50a
+// export constant_ThisBuild_versionDate := '20171002'; // S51
+// export constant_ThisBuild_versionDate := '20171101'; // S52
+// export constant_ThisBuild_versionDate := '20171129'; // S53
+// export constant_ThisBuild_versionDate := '20180103'; // S54
+//export constant_ThisBuild_versionDate := '20180201'; // S55
+//export constant_ThisBuild_versionDate := '20180302'; // S56
+export constant_ThisBuild_versionDate := '20180402'; // S57
 
 
 
@@ -110,6 +119,16 @@ dataset([
 ,{  47, '',   '20170526' ,  '20170526', '', '', 				'', 			  'Ingested S46 base. RR-11124'}
 ,{  48, '',   '20170622' ,  '20170622', '', '', 				'', 			  'Ingested S47 base. RR-11251'}
 ,{  49, '',   '20170801' ,  '20170801', '', '', 				'', 			  'Ingested S48 base. BH-316 -- BIP Build 49 - August 2017'}
+,{  50, '',   '20170901' ,  '20170901', '', '', 				'', 			  'Ingested S49 base. BH-328 -- BIP Build 50 - September 2017'}
+,{  50, 'a',  '20170901a',  '20170901', '', '', 				'', 			  'RR for xlink 3.7 upgrade.  uses S50 file. RR-11735 -- BIPV2 Bizlinkfull keys upgrade to salt 3.7'}//never went, rolled back!!!!
+,{  51, '',   '20171002' ,  '20171002', '', '', 				'', 			  'Ingested S50 base. BH-358 -- BIP Build 51 - October 2017'}
+,{  52, '',   '20171101' ,  '20171101', '', '', 				'', 			  'Ingested S51 base. BH-362 -- BIP Build 52 - November 2017'}
+,{  52, 'a',  '20171101a',  '20171101', '', '', 		    '', 			  'RR-11900 -- BIPV2 BizLinkFull keys upgrade to SALT 3.7'}
+,{  53, '',   '20171129' ,  '20171129', '', '', 				'', 			  'Ingested S52 base. BH-385 -- BIP Build 53 - December 2017'}
+,{  54, '',   '20180103' ,  '20180103', '', '', 				'', 			  'Ingested S53 base. BH-396 -- BIP Build 54 - January 2018'}
+,{  55, '',   '20180201' ,  '20180201', '', '', 				'', 			  'Ingested S54 base. BH-397 -- BIP Build 55 - February 2018'}
+,{  56, '',   '20180302' ,  '20180302', '', '',         '',         'Ingested S55 base. BH-424 -- BIP Build 56 - March 2018'}
+,{  57, '',   '20180402' ,  '20180402', '', '',         '',         'Ingested S56 base + BH-449 patch. BH-458 -- BIP Build 57 - April 2018'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

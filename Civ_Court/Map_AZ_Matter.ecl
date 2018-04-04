@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib;
 
 fAZ := Civ_Court.Files_In_AZ.Civil_in;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tAZ(fAZ input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -22,8 +25,8 @@ self.case_type_code			:= '';
 self.case_type					:= input.case_category;
 tmpCaseTitle						:= REGEXREPLACE('\\*|!',input.case_title,'');
 self.case_title					:= IF(StringLib.StringFind(tmpCaseTitle,' VS',1)>0 AND Civ_Court.IsInvalidName(tmpCaseTitle) = 0,tmpCaseTitle,'');
-self.filing_date				:= ut.ConvertDate(input.filing_date);
-self.disposition_date		:= ut.ConvertDate(input.disposition_date);
+self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.filing_date,fmtsin,fmtout);
+self.disposition_date		:= Std.Date.ConvertDateFormatMultiple(input.disposition_date,fmtsin,fmtout);
 self := [];
 end;
 

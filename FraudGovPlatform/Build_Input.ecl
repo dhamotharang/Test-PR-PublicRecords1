@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT Build_Input (
 	 string			pversion
 	,boolean		PSkipIdentityDataBase	= false 
@@ -12,9 +12,9 @@ module
 			 parallel(
 				 if(PSkipIdentityDataBase , output('IdentityData input skipped')
 					,Build_Input_IdentityData(pversion).All)
-				,if(PSkipKnownFraudBase , output('IdentityData input skipped')
+				,if(PSkipKnownFraudBase , output('KnownFraud input skipped')
 					,Build_Input_KnownFraud(pversion).All)	
-			 )
+			 )		 
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Input atribute')
 	 );

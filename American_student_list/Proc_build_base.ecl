@@ -1,4 +1,4 @@
-import ut,
+﻿import ut,
 			address,
 			PromoteSupers,
 			idl_header,
@@ -38,19 +38,17 @@ import ut,
 				self.GENDER   			     					:= if(trim(self.GENDER_CODE,left,right) = '1', 'MALE',
 											  if(trim(self.GENDER_CODE,left,right) = '2', 'FEMALE', 
 											  ''));
-				self.DOB_FORMATTED        				:= MAP(LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 2 => if (TRIM(pInput.BIRTH_DATE,left,right) > '40', 
-																										 '19' + TRIM(pInput.BIRTH_DATE,left,right) + '0000',
-																										 '20' + TRIM(pInput.BIRTH_DATE,left,right) + '0000'),
-																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 4 => if (pInput.BIRTH_DATE[1..2] > '40',
-																																					'19' + TRIM(pInput.BIRTH_DATE,left,right) + '00',
-																																					'20' + TRIM(pInput.BIRTH_DATE,left,right) + '00'),
-																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 6 => if (pInput.BIRTH_DATE[1..2] > '40',
-																																					'19' + TRIM(pInput.BIRTH_DATE,left,right),
-																																					'20' + TRIM(pInput.BIRTH_DATE,left,right)),
+				self.BIRTH_DATE										:=	TRIM(pInput.BIRTH_DATE,left,right)[3..];
+				self.DOB_FORMATTED        				:= MAP(LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 4 => TRIM(pInput.BIRTH_DATE,left,right) + '0000', 
+																										 
+																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 6 => TRIM(pInput.BIRTH_DATE,left,right) + '00',
+																									   
+																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 8 => TRIM(pInput.BIRTH_DATE,left,right),
 																						'');
 				self.COLLEGE_CODE_EXPLODED     		:= MAP(TRIM(pInput.COLLEGE_CODE,left,right) = '2' => 'Two Year College',
 																								 TRIM(pInput.COLLEGE_CODE,left,right) = '4' => 'Four Year College',
 																								 TRIM(pInput.COLLEGE_CODE,left,right) = '1' => 'Graduate School',
+																								 TRIM(pInput.COLLEGE_CODE,left,right) = 'GR' => 'Graduate School',
 																						 '');
 				self.COLLEGE_TYPE_EXPLODED      	:= MAP(TRIM(pInput.COLLEGE_TYPE,left,right) = 'S' => 'Public/State School',
 																								 TRIM(pInput.COLLEGE_TYPE,left,right) = 'P' => 'Private School',
@@ -89,6 +87,7 @@ import ut,
 				self.HEAD_OF_HOUSEHOLD_GENDER   	:= if(trim(self.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right) = '1', 'MALE',
 											  if(trim(self.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right) = '2', 'FEMALE', 
 											  ''));
+				self.Class												:=	if(length(pinput.Class)=4,pinput.Class[3..4],pinput.Class);
 				self.INCOME_LEVEL_CODE        		:= if(trim(pinput.INCOME_LEVEL,left,right)in ['K','L','M','N','O'],'K',trim(pinput.INCOME_LEVEL,left,right));
 				self.INCOME_LEVEL        					:= map(trim(pinput.INCOME_LEVEL,left,right) = 'A' => '$1-$9,999',
 												trim(pinput.INCOME_LEVEL,left,right) = 'B' => '$10,000-$19,999',
@@ -250,11 +249,12 @@ import ut,
 	
 	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + American_student_list.File_American_Student_DID_v2;
 	
-	
-  
+	//DF-20264 Suppress records in ASL suppression list
+	rsCleanAIDGood_Supp := American_student_list.fnExcludeSuppressedRecords(rsCleanAIDGood); 
 	
 	//Flip names before DID process
-	ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	// ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	ut.mac_flipnames(rsCleanAIDGood_Supp,fname,mname,lname,rsAIDCleanFlipNames);
 
 	//add src 
 	src_rec := record

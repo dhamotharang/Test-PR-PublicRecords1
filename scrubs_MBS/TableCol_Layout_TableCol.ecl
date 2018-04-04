@@ -1,0 +1,1 @@
+﻿EXPORT TableCol_Layout_TableCol := {Scrubs_MBS.TableCol_In_TableCol};

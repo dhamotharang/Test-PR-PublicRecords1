@@ -1,5 +1,5 @@
-import Header, Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server, 
-       LN_PropertyV2_Services,mdr, DeathV2_Services, iesp, AutoStandardI, CriminalRecords_Services,American_Student_Services;
+﻿import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server, 
+       LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services,American_Student_Services;
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare ();
@@ -93,7 +93,10 @@ boolean viewDOCv2(string20 sect)      := CriminalRecordVersion in [0,2] and IF (
 boolean viewSexOffender(string20 sect):= IF (IsCRS, Include_SexualOffenses_val, viewAll(sect) OR sect = 'sexoffender');
 //probably not needed here since they're only ever filled in for a Loc Report
 boolean viewBusHeader(string20 sect)  := viewAll(sect) OR sect = 'busheader';
-boolean viewQuickHeader(string20 sect):= viewAll(sect) OR sect = 'QH';
+
+// -- Removed Quickheader section from headersourceservice since the records are redundant and will appear in their respective sections(equifax, bankruptcy, etc..)
+boolean viewQuickHeader(string20 sect):= viewAll(sect) OR sect = 'qh';
+
 boolean viewTargus(string20 sect)     := viewAll(sect) OR sect = 'targ';
 boolean viewFBNv2(string20 sect)      := viewAll(sect) OR sect = 'fbnv2';
 boolean viewStudent(string20 sect)    := viewALL(sect) OR sect = 'student';

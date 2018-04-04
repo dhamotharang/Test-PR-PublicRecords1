@@ -1,5 +1,5 @@
-Import ut,tools,_control,OIG,business_header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, Business_HeaderV2,AID_Support,AID, 
-AppendProviderAttributes, Health_Provider_Services, Health_Facility_Services, HealthCareFacility,BIPV2_Company_Names;
+﻿Import ut,tools,_control,OIG,business_header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, Business_HeaderV2,AID_Support,AID, 
+AppendProviderAttributes, Health_Provider_Services, Health_Facility_Services, HealthCareFacility,BIPV2_Company_Names, address;
 
 EXPORT Build_Base_OIG ( 
    string pversion
@@ -48,22 +48,21 @@ module
 	
  FraudDefenseNetwork.Standardize_Name(oig_dedup, firstname,midname,lastname,suffix_name, oigCleanName); 
  
- unsigned4	lFlags 	    := AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;	
- 
- AID.MacAppendFromRaw_2Line(oigCleanName, Append_Prep_Address1, Append_Prep_AddressLast, RawAID, oigCleanAddr, lFlags);
- 		oig_forIDL := project( oigCleanAddr ,transform( FraudDefenseNetwork.Layouts.Temp.oig,
-			self.fname				:= left.cleaned_name.fname		    	;
-			self.mname				:= left.cleaned_name.mname	 	    	;
-			self.lname				:= left.cleaned_name.lname					;
-			self.name_suffix	:= left.cleaned_name.name_suffix		;
-			self.prim_range		:= left.aidwork_acecache.prim_range		;
-			self.prim_name		:= left.aidwork_acecache.prim_name		;
-			self.sec_range		:= left.aidwork_acecache.sec_range		;			
-			self.v_city_name  := left.aidwork_acecache.v_city_name	;		
-			self.state		    := left.aidwork_acecache.st						;
-			self.zip5		 			:= left.aidwork_acecache.zip5					;	
-			self		 	    		:= left;
+ 	oig_forIDL     := project( oigCleanName ,transform(FraudDefenseNetwork.Layouts.Temp.oig,
+			self.fname			                	:= left.cleaned_name.fname;
+			self.mname			                	:= left.cleaned_name.mname;
+			self.lname				                := left.cleaned_name.lname;
+			self.name_suffix	                := left.cleaned_name.name_suffix;
+      Clean_Address_182 								:= address.CleanAddress182(left.address_1, left.address_2);
+			self.prim_range		                := Clean_Address_182[1..10];
+			self.prim_name		                := Clean_Address_182[13..40];
+			self.sec_range		                := Clean_Address_182[57..64];			
+			self.v_city_name                  := Clean_Address_182[90..114]	;		
+			self.state		                    := Clean_Address_182[115..116];
+			self.zip5		 			                := Clean_Address_182[117..121];	
+			self		 	    		                := left;
 			));
+
 
 	Did_Matchset := ['D','S','A','Z'];
 		did_Add.MAC_Match_Flex(oig_forIDL, Did_Matchset,

@@ -1,4 +1,4 @@
-import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
+﻿import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
 
 export Files(
 
@@ -13,7 +13,6 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Input := module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Mbs                 	,Layouts.Input.Mbs                		,Mbs 										, 'CSV'		,,'|\n','|\t|'  	,,,true      	);
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsGcIdExclusion    	,Layouts.Input.MbsGcIdExclusion       ,MbsGcIdExclusion  			, 'CSV'		,,'|\n','|\t|'  	,,,true     	);
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsNewGcIdExclusion   ,Layouts.Input.MbsNewGcIdExclusion    ,MbsNewGcIdExclusion  	, 'CSV'		,,'|\n','|\t|'  	,,,true     	);
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsIndTypeExclusion 	,Layouts.Input.MbsIndTypeExclusion    ,MbsIndTypeExclusion  	, 'CSV'		,,'|\n','|\t|'  	,,,true       );
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsProductInclude   	,Layouts.Input.MbsProductInclude      ,MbsProductInclude    	, 'CSV'		,,'|\n','|\t|'   	,,,true       );
@@ -25,6 +24,7 @@ module
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSColValDesc       	,Layouts.Input.MBSColValDesc          ,MBSColValDesc    			, 'CSV'		,,'|\n','|\t|'    ,,,true      	);
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSmarketAppend     	,Layouts.Input.MBSmarketAppend        ,MBSmarketAppend    		, 'CSV'		,,['\n','\r\n','\n\r'],['|','\t']    ,,,true      );
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsFdnMasterIDIndTypeInclusion 	,Layouts.Input.MbsFdnMasterIDIndTypeInclusion       ,MbsFdnMasterIDIndTypeInclusion  			, 'CSV'		,,'|\n','|\t|'  	,,,true     	); 
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsVelocityRules 			,Layouts.Input.MbsVelocityRules       ,MbsVelocityRules  			, 'CSV'		,,'|\n','|\t|'  	,,,true     	); 
 
 		end;
 	

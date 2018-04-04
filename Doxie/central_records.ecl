@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_crs, doxie_ln, moxie_phonesplus_server,gateway, 
+﻿IMPORT doxie, doxie_crs, doxie_ln, moxie_phonesplus_server,gateway, 
   LN_PropertyV2_Services, Business_Risk, iesp, CriminalRecords_Services,
   ATF_Services, American_Student_Services, AutoStandardI, suppress, fcra, doxie_raw, ut, EmailService,
 	FFD;
@@ -58,6 +58,9 @@ plrr := if(Include_ProfessionalLicenses_val, doxie.pl_records (dids, IsFCRA, ds_
 
 sanc := if(Include_Sanctions_val, doxie.Sanc_records(dids));
 prov := if(Include_Providers_val, doxie.Prov_records(dids));
+
+util := if(Include_Utility_val, doxie.Util_records(dids, ssn_mask_value, dl_mask_value, GLB_Purpose, industry_class_val));
+
 aMod := module(project (global_mod,ATF_Services.IParam.search_params,opt)) 
 	export string14 did := (string) dids[1].did;
 	export unsigned1 non_subject_suppression := nonSS;
@@ -96,8 +99,8 @@ nod := if(include_NoticeOfDefaults_val, nod_for.nod);
 frcl := if(include_foreclosures_val, nod_for.foreclosure);
 phpl := if(Include_PhonesPlus_val, 
            moxie_phonesplus_server.phonesplus_did_records(dids, con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,,true,true).w_timezone);
-email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value), // checking if to dedup emails
-             Include_Email_Addresses_val  => doxie.email_records(dids,ssn_mask_value,application_type_value),
+email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value,industry_class_value), // checking if to dedup emails
+             Include_Email_Addresses_val  => doxie.email_records(dids,ssn_mask_value,application_type_value,,industry_class_value),
              dataset([],EmailService.Assorted_Layouts.layout_report_rollup));
 // Premium Phones
 dedup_phones:=dataset(dedupPremiumPhones,doxie.premium_phone.phone_rec)+
@@ -150,6 +153,7 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.professional_licenses_children := global(plrr);
   self.sanction_children                  := IF (~IsFCRA, global(sanc));
   self.provider_children                  := IF (~IsFCRA, global(prov)); 
+  self.utility_children                   := IF (~IsFCRA, global(util)); 
   self.firearms_and_explosives_children   := global(atfr);
   self.hunting_licenses_children          := global(hunr);
   self.pilot_licenses_children            := global(pilr);

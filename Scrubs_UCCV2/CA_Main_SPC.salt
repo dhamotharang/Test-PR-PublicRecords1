@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_UCCV2
 FILENAME:UCCV2
 NAMESCOPE:CA_Main
@@ -16,6 +16,7 @@ NAMESCOPE:CA_Main
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
 //FIELDTYPE DEFINITIONS
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)

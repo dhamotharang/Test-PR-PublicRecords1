@@ -14,7 +14,7 @@ EXPORT Spray_TCPA_Daily(string version, const varstring eclsourceip, string thor
 																				',',
 																				'\r\n',
 																				,
-																				thor_name,
+																				STD.System.Thorlib.Group(),
 																				root + version + '_' + suffixLC,
 																				,
 																				,

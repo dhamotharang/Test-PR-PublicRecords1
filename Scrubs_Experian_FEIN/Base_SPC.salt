@@ -1,0 +1,130 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Experian_FEIN
+FILENAME:Experian_FEIN
+NAMESCOPE:Base
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_mandatory:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_populated_strings>0)
+FIELDTYPE:invalid_zero_integer:ENUM(0|)
+FIELDTYPE:invalid_boolean_yes_no:ENUM(Y|N)
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0)
+FIELDTYPE:invalid_percentage:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_range_numeric>0,0,100)
+FIELDTYPE:invalid_pastdate8:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_past_yyyymmdd>0)
+
+FIELDTYPE:invalid_business_identification_number:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,9)
+FIELDTYPE:invalid_business_state:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_business_zip:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,5)
+FIELDTYPE:invalid_norm_type:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_range_numeric>0,1,5)
+FIELDTYPE:invalid_norm_tax_id:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,9)
+FIELDTYPE:invalid_norm_confidence_level:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_range_numeric>0,1,3)
+FIELDTYPE:invalid_source:ENUM(E5|E6)
+FIELDTYPE:invalid_direction:ALLOW(ENSW)
+FIELDTYPE:invalid_st:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,5)
+FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,4)
+FIELDTYPE:invalid_cart:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_alphanumeric>0,4)
+FIELDTYPE:invalid_cr_sort_sz:ENUM(A|B|C|D)
+FIELDTYPE:invalid_lot:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,4)
+FIELDTYPE:invalid_lot_order:ENUM(A|D)
+FIELDTYPE:invalid_dpbc:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,2)
+FIELDTYPE:invalid_chk_digit:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,1)
+FIELDTYPE:invalid_rec_type:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_addr_rec_type>0)
+FIELDTYPE:invalid_fips_state:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,2)
+FIELDTYPE:invalid_fips_county:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,3)
+FIELDTYPE:invalid_geo:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_geo_coord>0)
+FIELDTYPE:invalid_msa:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,4)
+FIELDTYPE:invalid_geo_blk:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,7)
+FIELDTYPE:invalid_geo_match:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0,1)
+FIELDTYPE:invalid_err_stat:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_alphanumeric>0,4)
+FIELDTYPE:invalid_raw_aid:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0)
+FIELDTYPE:invalid_ace_aid:CUSTOM(Scrubs_Experian_FEIN.Functions.fn_numeric>0)
+
+
+//FIELD DEFINITIONS
+FIELD:business_identification_number:TYPE(STRING9):LIKE(invalid_business_identification_number):0,0
+FIELD:business_name:TYPE(STRING40):LIKE(invalid_mandatory):0,0
+FIELD:business_address:TYPE(STRING30):LIKE(invalid_mandatory):0,0
+FIELD:business_city:TYPE(STRING28):LIKE(invalid_mandatory):0,0
+FIELD:business_state:TYPE(STRING2):LIKE(invalid_business_state):0,0
+FIELD:business_zip:TYPE(STRING5):LIKE(invalid_business_zip):0,0
+FIELD:norm_type:TYPE(STRING1):LIKE(invalid_norm_type):0,0
+FIELD:norm_tax_id:TYPE(STRING9):LIKE(invalid_norm_tax_id):0,0
+FIELD:norm_confidence_level:TYPE(STRING1):LIKE(invalid_norm_confidence_level):0,0
+FIELD:norm_display_configuration:TYPE(STRING1):LIKE(invalid_boolean_yes_no):0,0
+FIELD:long_name:TYPE(STRING120):LIKE(invalid_mandatory):0,0
+FIELD:dotid:TYPE(UNSIGNED6):LIKE(invalid_zero_integer):0,0
+FIELD:dotscore:TYPE(UNSIGNED2):LIKE(invalid_zero_integer):0,0
+FIELD:dotweight:TYPE(UNSIGNED2):LIKE(invalid_zero_integer):0,0
+FIELD:empid:TYPE(UNSIGNED6):LIKE(invalid_zero_integer):0,0
+FIELD:empscore:TYPE(UNSIGNED2):LIKE(invalid_zero_integer):0,0
+FIELD:empweight:TYPE(UNSIGNED2):LIKE(invalid_zero_integer):0,0
+FIELD:powid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:powscore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
+FIELD:powweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
+FIELD:proxid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:proxscore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
+FIELD:proxweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
+FIELD:seleid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:selescore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
+FIELD:seleweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
+FIELD:orgid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:orgscore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
+FIELD:orgweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
+FIELD:ultid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:ultscore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
+FIELD:ultweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
+FIELD:source:TYPE(STRING2):LIKE(invalid_source):0,0
+FIELD:source_rec_id:TYPE(UNSIGNED8):LIKE(invalid_numeric):0,0
+FIELD:bdid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:bdid_score:TYPE(UNSIGNED1):LIKE(invalid_percentage):0,0
+FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_pastdate8):0,0
+FIELD:prim_range:TYPE(STRING10):0,0
+FIELD:predir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:prim_name:TYPE(STRING28):LIKE(invalid_mandatory):0,0
+FIELD:addr_suffix:TYPE(STRING4):0,0
+FIELD:postdir:TYPE(STRING2):LIKE(invalid_direction):0,0
+FIELD:unit_desig:TYPE(STRING10):0,0
+FIELD:sec_range:TYPE(STRING8):0,0
+FIELD:p_city_name:TYPE(STRING25):LIKE(invalid_mandatory):0,0
+FIELD:v_city_name:TYPE(STRING25):LIKE(invalid_mandatory):0,0
+FIELD:st:TYPE(STRING2):LIKE(invalid_st):0,0
+FIELD:zip:TYPE(STRING5):LIKE(invalid_zip5):0,0
+FIELD:zip4:TYPE(STRING4):LIKE(invalid_zip4):0,0
+FIELD:cart:TYPE(STRING4):LIKE(invalid_cart):0,0
+FIELD:cr_sort_sz:TYPE(STRING1):LIKE(invalid_cr_sort_sz):0,0
+FIELD:lot:TYPE(STRING4):LIKE(invalid_lot):0,0
+FIELD:lot_order:TYPE(STRING1):LIKE(invalid_lot_order):0,0
+FIELD:dbpc:TYPE(STRING2):LIKE(invalid_dpbc):0,0
+FIELD:chk_digit:TYPE(STRING1):LIKE(invalid_chk_digit):0,0
+FIELD:rec_type:TYPE(STRING2):LIKE(invalid_rec_type):0,0
+FIELD:fips_state:TYPE(STRING2):LIKE(invalid_fips_state):0,0
+FIELD:fips_county:TYPE(STRING3):LIKE(invalid_fips_county):0,0
+FIELD:geo_lat:TYPE(STRING10):LIKE(invalid_geo):0,0
+FIELD:geo_long:TYPE(STRING11):LIKE(invalid_geo):0,0
+FIELD:msa:TYPE(STRING4):LIKE(invalid_msa):0,0
+FIELD:geo_blk:TYPE(STRING7):LIKE(invalid_geo_blk):0,0
+FIELD:geo_match:TYPE(STRING1):LIKE(invalid_geo_match):0,0
+FIELD:err_stat:TYPE(STRING4):LIKE(invalid_err_stat):0,0
+FIELD:raw_aid:TYPE(UNSIGNED8):LIKE(invalid_raw_aid):0,0
+FIELD:ace_aid:TYPE(UNSIGNED8):LIKE(invalid_ace_aid):0,0
+FIELD:prep_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

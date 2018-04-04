@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export Filenames(
 
@@ -15,7 +15,6 @@ module
 	
 		shared Template(string tag) := Platform.InputTemplate(false) + tag;
 		export MBS                           := tools.mod_FilenamesInput(Template('mbs'                              ),pversion);
-		export MbsGcIdExclusion              := tools.mod_FilenamesInput(Template('MbsGcIdExclusion'                 ),pversion);
 		export MbsNewGcIdExclusion           := tools.mod_FilenamesInput(Template('MbsNewGcIdExclusion'              ),pversion); //In this new file gcid is replaced by exclusion_id and exclusion_type
 		export MbsIndTypeExclusion           := tools.mod_FilenamesInput(Template('MbsIndTypeExclusion'              ),pversion);
     export MbsProductInclude             := tools.mod_FilenamesInput(Template('MbsProductInclude'                ),pversion);
@@ -26,12 +25,12 @@ module
     export MBSTableCol                   := tools.mod_FilenamesInput(Template('MBSTableCol'                      ),pversion);
     export MBSColValDesc                 := tools.mod_FilenamesInput(Template('MBSColValDesc'                    ),pversion);
     export MBSmarketAppend               := tools.mod_FilenamesInput(Template('MBSmarketAppend'                  ),pversion);
-		export MbsFdnMasterIDIndTypeInclusion	:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsFdnMasterIDIndTypeInclusion:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsVelocityRules							 :=	tools.mod_FilenamesInput(Template('MbsVelocityRules'   							 ),pversion);
 
 
 		export dAll_filenames :=
 			MBS.dAll_filenames +
-			MbsGcIdExclusion.dAll_filenames +
 			MbsNewGcIdExclusion.dAll_filenames +
 			MbsIndTypeExclusion.dAll_filenames +
 			MbsProductInclude.dAll_filenames +
@@ -42,7 +41,8 @@ module
 			MBSTableCol.dAll_filenames +
 			MBSColValDesc.dAll_filenames +
 			MBSmarketAppend.dAll_filenames +
-			if(Platform.Source = 'FraudGov',MbsFdnMasterIDIndTypeInclusion.dAll_filenames) ;
+			MbsFdnMasterIDIndTypeInclusion.dAll_filenames +
+			MbsVelocityRules.dAll_filenames;
 			
 			
 	end;

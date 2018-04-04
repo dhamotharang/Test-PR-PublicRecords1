@@ -1,8 +1,25 @@
-import std;
+﻿import tools, std;
 
-EXPORT Promote := MODULE
+lay_builds 	:= tools.Layout_FilenameVersions.builds;
+lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
 
+export Promote(
 
+	 string								pversion				= 	''
+	,string								pFilter					= 	''
+	,boolean							pDelete					= 	false
+	,boolean							pIsTesting			= 	false
+	//,dataset(lay_inputs)	pInputFilenames = 	Filenames	(pversion).Input.dAll_filenames
+	//,dataset(lay_builds)	pBuildFilenames = 	Filenames	(pversion).dAll_filenames
+	//																				+ keynames	(pversion).dAll_filenames
+	,dataset(lay_builds)	pBuildFilenames = 	keynames	(pversion).dAll_filenames
+
+) :=
+module
+	
+	//export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
+	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
+	
 	set of string	GetSFList(string sfBase) := [
 							sfBase,
 							sfBase+'::father',
@@ -16,5 +33,8 @@ EXPORT Promote := MODULE
 	export Executives(string lfn) := PromoteFiles(Constants.sfExecutives, lfn);
 	export CorteraAsLinking(string lfn) := PromoteFiles(Constants.sfLinking, lfn);
 	export Industry(string lfn) := PromoteFiles(Constants.sfIndustry, lfn);
+	export Hdr_in(string lfn) := PromoteFiles(Constants.sfHeaderIn, lfn);
+	export Attr_in(string lfn) := PromoteFiles(Constants.sfAttributesIn, lfn);
+	
 
-END;
+end;

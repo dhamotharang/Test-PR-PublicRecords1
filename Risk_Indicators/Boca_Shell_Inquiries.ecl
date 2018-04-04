@@ -1,4 +1,4 @@
-import inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master;
+﻿import inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master;
 
 isFCRA := false;
 
@@ -22,6 +22,7 @@ cap125(unsigned cnt) := min(cnt, 125);
 layout_ID := record
 	clam_pre_Inquiries.seq;
 	clam_pre_Inquiries.DID;
+	clam_pre_Inquiries.truedid;	//MS-104 and MS-105 need truedid in calculating their new fields
 end;
 
 layout_temp := record
@@ -35,7 +36,7 @@ layout_temp := record
 	string func;
 	string	Transaction_ID := '';
 	string	Sequence_Number := '';
-	layouts.layout_inquiries_52;
+	layouts.layout_inquiries_53;	//MS-104 and MS-105 
 
 	// for calculating velocity counters per ADL
 	string9 inquirySSNsFromADL := '';  
@@ -47,12 +48,14 @@ layout_temp := record
 	string10 cbd_inquiryPhonesFromADL := '';
 	string8 inquiryDOBsFromADL := '';
 	string50 inquiryEmailsFromADL := '';
+	string10 inquiryPrimRangeFromADL := ''; //MS-104 and MS-105 
 	
 	// for calculating velocity counters per SSN
 	unsigned6 inquiryADLsFromSSN := 0;
 	string30 inquiryLNamesFromSSN := '';
 	string65 inquiryAddrsFromSSN := '';
 	string8 inquiryDOBsFromSSN := '';
+	string10 inquiryPrimRangeFromSSN := '';	//MS-104 and MS-105 
 	
 	// for calculating velocity counters per Addr
 	unsigned6 inquiryADLsFromAddr := 0;
@@ -79,12 +82,17 @@ layout_temp := record
 	boolean good_inquiry;
 	boolean good_cbd_inquiry;
 	risk_indicators.layouts.layout_virtual_fraud Virtual_Fraud;
+
 end;
 //can have multiple gateways so account for them
 deltabase_check := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url;
 deltabase_Name := gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].servicename;
 
-deltabase_URL := if(bsversion >= 50 and clam_pre_Inquiries[1].historydate=999999 and ~isFCRA, deltabase_check, '');
+//MS-160
+deltabase_URL := if(bsversion >= 50 and 
+( clam_pre_Inquiries[1].historydate=999999 or clam_pre_Inquiries [1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]) )
+and ~isFCRA, deltabase_check, '');
+
 DeltabaseGateway := DATASET ([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := deltabase_Name;
 																																							 SELF.URL := deltabase_URL;
 																																							 SELF := [])]);
@@ -96,6 +104,7 @@ MAC_raw_did_transform (trans_name, key_did) := MACRO
 layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.seq := le.seq;
 	self.did := le.did;
+	self.truedid := le.truedid;	//MS-104 and MS-105 
 	industry := trim(StringLib.StringToUpperCase(rt.bus_intel.industry));
 	vertical := trim(StringLib.StringToUpperCase(rt.bus_intel.vertical));
 	sub_market := trim(StringLib.StringToUpperCase(rt.bus_intel.sub_market));
@@ -109,7 +118,8 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	
 	// for collections retro test, we also need to mimic the 1 year rule we have for FCRA
 	isFCRA_temp := isFCRA or isCollectionRetro;
-	inquiry_hit := Inquiry_AccLogs.shell_constants.inquiry_is_ok(le.historydate, logdate, isFCRA_temp) and
+	//MS-160
+	inquiry_hit := Inquiry_AccLogs.shell_constants.inquiry_is_ok(le.historydate, logdate, isFCRA_temp, le.historydatetimestamp) and
 								 function_is_ok and
 								 not is_banko_inquiry and
 								 trim(rt.bus_intel.use)='' and
@@ -160,8 +170,8 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 		// self.raw_addr := [];
 		// self.raw_phone := [];
 	//
-	
-	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate);
+	//MS-160
+	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate, le.historyDateTimeStamp);
 	
 	within1day_orig := Inquiry_AccLogs.shell_constants.age1day(logdate, le.historydate);
 	within1week_orig := Inquiry_AccLogs.shell_constants.age1week(logdate, le.historydate);
@@ -412,9 +422,10 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.StudentLoans.Count24 := if( isStudentLoan and ageBucket between 1 and 24, 1, 0 );
 	
 	// only increment the velocity counters if it meets the criteria in the valid_velocity_inquiry function
-	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, bsversion,rt.search_info.method);
-	good_virtual_fraud_inquiry := Inquiry_AccLogs.shell_constants.Valid_VirtualFraud_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, bsversion);
-	good_cbd_inquiry := Inquiry_AccLogs.shell_constants.ValidCBDInquiry(func, logdate, le.historydate, rt.bus_intel.use, rt.search_info.product_code);
+	//MS-160
+	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, bsversion,rt.search_info.method, le.historyDateTimeStamp);
+	good_virtual_fraud_inquiry := Inquiry_AccLogs.shell_constants.Valid_VirtualFraud_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, bsversion, le.historyDateTimeStamp);
+	good_cbd_inquiry := Inquiry_AccLogs.shell_constants.ValidCBDInquiry(func, logdate, le.historydate, rt.bus_intel.use, rt.search_info.product_code, le.historyDateTimeStamp);
 	
 	self.good_inquiry     := good_inquiry;
 	self.good_cbd_inquiry := good_cbd_inquiry;
@@ -444,6 +455,8 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.inq_addrsperadl_count03 := if(good_inquiry and trim(rt.person_q.zip)<>'' and ageBucket between 1 and 3, 1, 0);
 	self.inq_addrsperadl_count06 := if(good_inquiry and trim(rt.person_q.zip)<>'' and ageBucket between 1 and 6, 1, 0);
 	
+	//MS-104 and MS-105 - need prim_range in layout to calculate tumblings substitutions count for prim_range later.
+	self.inquiryPrimRangeFromADL := if(good_inquiry and trim(rt.person_q.Prim_Range)<>'', trim(rt.person_q.Prim_Range), '');
 	
 	self.inquiryLnamesPerADL := if(good_inquiry and trim(rt.person_q.lname)<>'', 1, 0);
 	self.inquiryLnamesFromADL := if(good_inquiry and trim(rt.person_q.lname)<>'', trim(rt.person_q.lname), '');
@@ -524,6 +537,82 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.virtual_fraud.LexID_ssn_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and socsmatch and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	self.virtual_fraud.AltLexID_ssn_hi_risk_ct := 0; // will be set in the ssn join
 	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := 0; // will be set in the ssn join
+
+	//MS-87 - corraboration counts for verified input element combinations. need to match on zip to consider address as matching so refigure addrmatch here with zip. 
+	//Because the join to the inquiry address key further down requires exact match on address, enforce exact match on address here as well for the counts by ADL
+	addrmatch2 := le.shell_input.z5 = rt.person_q.zip[1..5] and 
+								le.shell_input.prim_range = rt.person_q.prim_range and 
+								le.shell_input.prim_name = rt.person_q.prim_name and
+								le.shell_input.sec_range = rt.person_q.sec_range and 
+								le.shell_input.predir = rt.person_q.predir and 
+								le.shell_input.addr_suffix = rt.person_q.addr_suffix;
+	socsmatchexact := le.shell_input.ssn = rt.person_q.ssn;
+	hphonematchexact := le.shell_input.phone10 = rt.person_q.personal_phone;
+
+	//MS-87: the logic for these new inquiry corroboration counters includes new special values of -1, -2, -3.  Here's what they mean...
+	//  -1 will be returned if we didn't assign a valid DID or if the necessary input fields pertaining to the counter are not populated
+	//  -2 will be returned if a DID was assigned and there is an inquiry but that inquiry does not qualify as a good inquiry
+	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the calculation  
+	self.inq_corrnameaddr_adl 			:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.fname='' or le.shell_input.lname=''		=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.fname='' or rt.person_q.lname=''																													=> -3,
+																				 addrmatch2 and firstmatch and lastmatch																																												=> 1, 
+																																																																																					 0);
+	self.inq_corrnamessn_adl 				:= map(le.DID = 0 or le.truedid = false or le.shell_input.ssn='' or le.shell_input.fname='' or le.shell_input.lname=''								=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.ssn='' or rt.person_q.fname='' or rt.person_q.lname=''																															=> -3,
+																				 socsmatchexact and firstmatch and lastmatch																																										=> 1, 
+																																																																																					 0);
+	self.inq_corrnamephone_adl			:= map(le.DID = 0 or le.truedid = false or le.shell_input.phone10='' or le.shell_input.fname='' or le.shell_input.lname=''						=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.personal_phone='' or rt.person_q.fname='' or rt.person_q.lname=''																									=> -3,
+																				 hphonematchexact and firstmatch and lastmatch																																									=> 1, 
+																																																																																					 0);
+	self.inq_corraddrssn_adl				:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.ssn=''																=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.ssn=''																																										=> -3,
+																				 addrmatch2 and socsmatchexact																																																	=> 1, 
+																																																																																					 0);
+	self.inq_corrdobaddr_adl				:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.dob=''																=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.dob=''																																										=> -3,
+																				 addrmatch2 and dobmatch																																																				=> 1, 
+																																																																																					 0);
+	self.inq_corraddrphone_adl			:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.phone10=''														=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.personal_phone=''																																				=> -3,
+																				 addrmatch2 and hphonematchexact																																																=> 1, 
+																																																																																					 0);
+	self.inq_corrdobssn_adl					:= map(le.DID = 0 or le.truedid = false or le.shell_input.ssn='' or le.shell_input.dob=''																							=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.ssn='' or rt.person_q.dob=''																																												=> -3,
+																				 socsmatchexact and dobmatch																																																		=> 1, 
+																																																																																					 0);
+	self.inq_corrphonessn_adl				:= map(le.DID = 0 or le.truedid = false or le.shell_input.ssn='' or le.shell_input.phone10=''																					=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.ssn='' or rt.person_q.personal_phone=''																																						=> -3,
+																				 socsmatchexact and hphonematchexact																																														=> 1, 
+																																																																																					 0);
+	self.inq_corrdobphone_adl				:= map(le.DID = 0 or le.truedid = false or le.shell_input.dob='' or le.shell_input.phone10=''																					=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.dob='' or rt.person_q.personal_phone=''																																						=> -3,
+																				 dobmatch and hphonematchexact																																																	=> 1, 
+																																																																																					 0);
+	self.inq_corrnameaddrssn_adl		:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn=''		=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.fname=''	or rt.person_q.lname='' or rt.person_q.ssn=''																		=> -3,
+																				 addrmatch2 and firstmatch and lastmatch and socsmatchexact																																			=> 1, 
+																																																																																					 0);
+	self.inq_corrnamephonessn_adl		:= map(le.DID = 0 or le.truedid = false or le.shell_input.phone10='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn=''		=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.personal_phone='' or rt.person_q.fname=''	or rt.person_q.lname='' or rt.person_q.ssn=''														=> -3,
+																				 hphonematchexact and firstmatch and lastmatch and socsmatchexact																																=> 1, 
+																																																																																					 0);
+	self.inq_corrnameaddrphnssn_adl	:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.phone10='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn=''		=> -1,
+																				 ~good_inquiry																																																									=> -2, 
+																				 rt.person_q.address='' or rt.person_q.personal_phone='' or rt.person_q.fname=''	or rt.person_q.lname='' or rt.person_q.ssn=''	=> -3,
+																				 addrmatch2 and firstmatch and lastmatch and socsmatchexact and hphonematchexact																								=> 1, 
+																																																																																					 0);
 
 	
 	// these will all be set in a later join to the billgroups key
@@ -624,7 +713,46 @@ layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM
 																	 rt.Inquiry_email_ver_ct=255 => le.Inquiry_email_ver_ct,
 																	 le.Inquiry_email_ver_ct=255 => rt.Inquiry_email_ver_ct,
 																	 min(le.Inquiry_email_ver_ct + rt.Inquiry_email_ver_ct, 254));
-	
+
+																																																									 
+  //MS-87 - the rollup logic when considering special values is confusing.  																																																												
+	self.inq_corrnameaddr_adl 			:= map(le.inq_corrnameaddr_adl >= 0 and rt.inq_corrnameaddr_adl >= 0									=>	min(le.inq_corrnameaddr_adl + rt.inq_corrnameaddr_adl, 254),
+																				 le.inq_corrnameaddr_adl in [-2,-3] and rt.inq_corrnameaddr_adl in [-2,-3]			=>	min(le.inq_corrnameaddr_adl, rt.inq_corrnameaddr_adl),
+																																																														max(le.inq_corrnameaddr_adl, rt.inq_corrnameaddr_adl));
+	self.inq_corrnamessn_adl 				:= map(le.inq_corrnamessn_adl >= 0 and rt.inq_corrnamessn_adl >= 0										=>	min(le.inq_corrnamessn_adl + rt.inq_corrnamessn_adl, 254),
+																				 le.inq_corrnamessn_adl in [-2,-3] and rt.inq_corrnamessn_adl in [-2,-3]				=>	min(le.inq_corrnamessn_adl, rt.inq_corrnamessn_adl),
+																																																														max(le.inq_corrnamessn_adl, rt.inq_corrnamessn_adl));
+	self.inq_corrnamephone_adl 			:= map(le.inq_corrnamephone_adl >= 0 and rt.inq_corrnamephone_adl >= 0								=>	min(le.inq_corrnamephone_adl + rt.inq_corrnamephone_adl, 254),
+																				 le.inq_corrnamephone_adl in [-2,-3] and rt.inq_corrnamephone_adl in [-2,-3]		=>	min(le.inq_corrnamephone_adl, rt.inq_corrnamephone_adl),
+																																																														max(le.inq_corrnamephone_adl, rt.inq_corrnamephone_adl));
+	self.inq_corraddrssn_adl 				:= map(le.inq_corraddrssn_adl >= 0 and rt.inq_corraddrssn_adl >= 0										=>	min(le.inq_corraddrssn_adl + rt.inq_corraddrssn_adl, 254),
+																				 le.inq_corraddrssn_adl in [-2,-3] and rt.inq_corraddrssn_adl in [-2,-3]				=>	min(le.inq_corraddrssn_adl, rt.inq_corraddrssn_adl),
+																																																														max(le.inq_corraddrssn_adl, rt.inq_corraddrssn_adl));
+	self.inq_corrdobaddr_adl 				:= map(le.inq_corrdobaddr_adl >= 0 and rt.inq_corrdobaddr_adl >= 0										=>	min(le.inq_corrdobaddr_adl + rt.inq_corrdobaddr_adl, 254),
+																				 le.inq_corrdobaddr_adl in [-2,-3] and rt.inq_corrdobaddr_adl in [-2,-3]				=>	min(le.inq_corrdobaddr_adl, rt.inq_corrdobaddr_adl),
+																																																														max(le.inq_corrdobaddr_adl, rt.inq_corrdobaddr_adl));
+	self.inq_corraddrphone_adl 			:= map(le.inq_corraddrphone_adl >= 0 and rt.inq_corraddrphone_adl >= 0								=>	min(le.inq_corraddrphone_adl + rt.inq_corraddrphone_adl, 254),
+																				 le.inq_corraddrphone_adl in [-2,-3] and rt.inq_corraddrphone_adl in [-2,-3]		=>	min(le.inq_corraddrphone_adl, rt.inq_corraddrphone_adl),
+																																																														max(le.inq_corraddrphone_adl, rt.inq_corraddrphone_adl));
+	self.inq_corrdobssn_adl 				:= map(le.inq_corrdobssn_adl >= 0 and rt.inq_corrdobssn_adl >= 0											=>	min(le.inq_corrdobssn_adl + rt.inq_corrdobssn_adl, 254),
+																				 le.inq_corrdobssn_adl in [-2,-3] and rt.inq_corrdobssn_adl in [-2,-3]					=>	min(le.inq_corrdobssn_adl, rt.inq_corrdobssn_adl),
+																																																														max(le.inq_corrdobssn_adl, rt.inq_corrdobssn_adl));
+	self.inq_corrphonessn_adl 			:= map(le.inq_corrphonessn_adl >= 0 and rt.inq_corrphonessn_adl >= 0									=>	min(le.inq_corrphonessn_adl + rt.inq_corrphonessn_adl, 254),
+																				 le.inq_corrphonessn_adl in [-2,-3] and rt.inq_corrphonessn_adl in [-2,-3]			=>	min(le.inq_corrphonessn_adl, rt.inq_corrphonessn_adl),
+																																																														max(le.inq_corrphonessn_adl, rt.inq_corrphonessn_adl));
+	self.inq_corrdobphone_adl 			:= map(le.inq_corrdobphone_adl >= 0 and rt.inq_corrdobphone_adl >= 0									=>	min(le.inq_corrdobphone_adl + rt.inq_corrdobphone_adl, 254),
+																				 le.inq_corrdobphone_adl in [-2,-3] and rt.inq_corrdobphone_adl in [-2,-3]			=>	min(le.inq_corrdobphone_adl, rt.inq_corrdobphone_adl),
+																																																														max(le.inq_corrdobphone_adl, rt.inq_corrdobphone_adl));
+	self.inq_corrnameaddrssn_adl 		:= map(le.inq_corrnameaddrssn_adl >= 0 and rt.inq_corrnameaddrssn_adl >= 0							=>	min(le.inq_corrnameaddrssn_adl + rt.inq_corrnameaddrssn_adl, 254),
+																				 le.inq_corrnameaddrssn_adl in [-2,-3] and rt.inq_corrnameaddrssn_adl in [-2,-3]	=>	min(le.inq_corrnameaddrssn_adl, rt.inq_corrnameaddrssn_adl),
+																																																															max(le.inq_corrnameaddrssn_adl, rt.inq_corrnameaddrssn_adl));
+	self.inq_corrnamephonessn_adl 	:= map(le.inq_corrnamephonessn_adl >= 0 and rt.inq_corrnamephonessn_adl >= 0							=>	min(le.inq_corrnamephonessn_adl + rt.inq_corrnamephonessn_adl, 254),
+																				 le.inq_corrnamephonessn_adl in [-2,-3] and rt.inq_corrnamephonessn_adl in [-2,-3]	=>	min(le.inq_corrnamephonessn_adl, rt.inq_corrnamephonessn_adl),
+																																																																max(le.inq_corrnamephonessn_adl, rt.inq_corrnamephonessn_adl));
+	self.inq_corrnameaddrphnssn_adl := map(le.inq_corrnameaddrphnssn_adl >= 0 and rt.inq_corrnameaddrphnssn_adl >= 0							=>	min(le.inq_corrnameaddrphnssn_adl + rt.inq_corrnameaddrphnssn_adl, 254),
+																				 le.inq_corrnameaddrphnssn_adl in [-2,-3] and rt.inq_corrnameaddrphnssn_adl in [-2,-3]	=>	min(le.inq_corrnameaddrphnssn_adl, rt.inq_corrnameaddrphnssn_adl),
+																																																																		max(le.inq_corrnameaddrphnssn_adl, rt.inq_corrnameaddrphnssn_adl));
+
 	self.Inquiries.CBDCountTotal := le.Inquiries.CBDCountTotal + rt.Inquiries.CBDCountTotal;
 	self.Inquiries.CBDCount01 := le.Inquiries.CBDCount01 + rt.Inquiries.CBDCount01;
 	self.Inquiries.CountTotal := le.Inquiries.CountTotal + rt.Inquiries.CountTotal;
@@ -841,7 +969,6 @@ end;
 	
 // the first time this is sorted by ssnfromADL to calculate ssnsperadl	
 grouped_raw := group(sort( j_raw, seq, -inquirySSNsFromADL), seq);
-// output(grouped_raw, named('grouped_raw'));
 
 rolled_raw := rollup( grouped_raw, roll(left,right), true);
 
@@ -849,7 +976,6 @@ rolled_raw := rollup( grouped_raw, roll(left,right), true);
 
 // sort and roll addresses per adl
 sorted_addrs_per_adl := group(sort(j_raw, seq, -inquiryAddrsFromADL, -unverifiedAddrsPerAdl, -cbd_inquiryAddrsFromADL), seq);
-// output(sorted_addrs_per_adl, named('sorted_addrs_per_adl'));
 
 layout_temp count_addrs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedAddrsPerADL     := le.unverifiedAddrsPerADL     + IF(le.inquiryAddrsFromADL     = rt.inquiryAddrsFromADL, 0, rt.unverifiedAddrsPerADL);
@@ -863,11 +989,9 @@ layout_temp count_addrs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_addrs_per_adl := rollup( sorted_addrs_per_adl, count_addrs_per_adl(left,right), true);
-// output(choosen(rolled_addrs_per_adl, eyeball), named('rolled_addrs_per_adl'));											
 
 // sort and roll fnames per adl
 sorted_fnames_per_adl := group(sort(j_raw, seq,  -inquiryfnamesFromADL), seq);
-// output(sorted_fnames_per_adl, named('sorted_fnames_per_adl'));
 
 layout_temp count_fnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryfnamesPerADL := le.inquiryfnamesPerADL + IF(le.inquiryfnamesFromADL=rt.inquiryfnamesFromADL, 0, rt.inquiryfnamesPerADL);
@@ -879,12 +1003,10 @@ layout_temp count_fnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_fnames_per_adl := rollup( sorted_fnames_per_adl, count_fnames_per_adl(left,right), true);
-// output(choosen(rolled_fnames_per_adl, eyeball), named('rolled_fnames_per_adl'));
 
 
 // sort and roll lnames per adl
 sorted_lnames_per_adl := group(sort(j_raw, seq,  -inquirylnamesFromADL), seq);
-// output(sorted_lnames_per_adl, named('sorted_lnames_per_adl'));
 
 layout_temp count_lnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerADL := le.inquirylnamesPerADL + IF(le.inquirylnamesFromADL=rt.inquirylnamesFromADL, 0, rt.inquirylnamesPerADL);
@@ -897,14 +1019,10 @@ layout_temp count_lnames_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_lnames_per_adl := rollup( sorted_lnames_per_adl, count_lnames_per_adl(left,right), true);
-// output(choosen(rolled_lnames_per_adl, eyeball), named('rolled_lnames_per_adl'));
-
-
 
 // sort and roll phoness per adl
 sorted_phones_per_adl_cbd := group(sort(j_raw, seq,  -cbd_inquiryphonesFromADL), seq);
 sorted_phones_per_adl := group(sort(j_raw, seq,  -inquiryphonesFromADL, -unverifiedphonesPerADL), seq);
-// output(sorted_phones_per_adl, named('sorted_phones_per_adl'));
 
 layout_temp count_phones_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedphonesPerADL     := le.unverifiedphonesPerADL     + IF(le.inquiryphonesFromADL     = rt.inquiryphonesFromADL,     0, rt.unverifiedphonesPerADL);			
@@ -919,13 +1037,9 @@ layout_temp count_phones_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 end;
 rolled_phones_per_adl_cbd := rollup( sorted_phones_per_adl_cbd, count_phones_per_adl(left,right), true);
 rolled_phones_per_adl := rollup( sorted_phones_per_adl, count_phones_per_adl(left,right), true);
-// output(choosen(rolled_phones_per_adl, eyeball), named('rolled_phones_per_adl'));
-
-
 
 // sort and roll DOB per adl
 sorted_DOBs_per_adl := group(sort(j_raw, seq,  -inquiryDOBsFromADL, -unverifiedDOBsPerADL), seq);
-// output(sorted_DOBs_per_adl, named('sorted_DOBs_per_adl'));
 
 layout_temp count_DOBs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.unverifiedDOBsPerADL := le.unverifiedDOBsPerADL + 
@@ -939,12 +1053,9 @@ layout_temp count_DOBs_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_DOBs_per_adl := rollup( sorted_DOBs_per_adl, count_DOBs_per_adl(left,right), true);
-// output(choosen(rolled_DOBs_per_adl, eyeball), named('rolled_DOBs_per_adl'));
-
 
 // sort and roll emails per adl
 sorted_Emails_per_adl := group(sort(j_raw, seq,  -inquiryEmailsFromADL), seq);
-// output(sorted_Emails_per_adl, named('sorted_Emails_per_adl'));
 
 layout_temp count_Emails_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM			
 	self.inquiryEmailsPerADL := le.inquiryEmailsPerADL + IF(le.inquiryEmailsFromADL=rt.inquiryEmailsFromADL, 0, rt.inquiryEmailsPerADL);			
@@ -958,9 +1069,206 @@ layout_temp count_Emails_per_adl( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_Emails_per_adl := rollup( sorted_Emails_per_adl, left.seq=right.seq, count_Emails_per_adl(left,right));
-// output(choosen(rolled_Emails_per_adl, eyeball), named('rolled_Emails_per_adl'));
 
-// append the counts to the rolled_raw
+// MS-104 - calculate how many inquiry records have first name/s that are different by one character ***
+// get all unique first names for this DID
+deduped_fnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryfnamesFromADL<>''), seq, inquiryfnamesFromADL), seq, inquiryfnamesFromADL),seq);
+
+slim_fnames := project(deduped_fnames_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryFnamesFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfFnames(slim_fnames le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_fnames,slim_fnames[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedFnames := project(slim_fnames, tfFnames(left, counter));
+
+//rollup here to get the sum of all inquiries being off by 1 character
+Risk_Indicators.iid_constants.subsLayout rollSubs(Risk_Indicators.iid_constants.subsLayout le, Risk_Indicators.iid_constants.subsLayout ri) := transform
+	SELF.seq 						:= le.seq;	
+	self.subsString			:= le.subsString;
+	self.subsCount			:= le.subsCount + ri.subsCount;
+end;
+rolledSubFnames := rollup(substitutedFnames, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have last name/s that are different by one character ***
+deduped_lnames_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirylnamesFromADL<>''), seq, inquirylnamesFromADL), seq, inquirylnamesFromADL),seq);
+
+slim_lnames := project(deduped_lnames_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryLnamesFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfLnames(slim_lnames le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_lnames,slim_lnames[c].subsString);	
+end;
+substitutedLnames := project(slim_lnames, tfLnames(left, counter));
+
+rolledSubLnames := rollup(substitutedLnames, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have SSNs that are different by one character ***
+deduped_SSN_per_adl := group(dedup(sort(j_raw(good_inquiry and inquirySSNsFromADL<>''), seq, inquirySSNsFromADL), seq, inquirySSNsFromADL),seq);
+
+slim_SSNs := project(deduped_SSN_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquirySSNsFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfSSNs(slim_SSNs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedSSNs := project(slim_SSNs, tfSSNs(left, counter));
+
+rolledSubSSNs := rollup(substitutedSSNs, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have phones that are different by one character ***
+deduped_Phones_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPhonesFromADL<>''), seq, inquiryPhonesFromADL), seq, inquiryPhonesFromADL),seq);
+
+slim_phones := project(deduped_phones_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryPhonesFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfPhones(slim_phones le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedPhones := project(slim_phones, tfPhones(left, counter));
+
+rolledSubPhones := rollup(substitutedPhones, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have primary range that are different by one character ***
+deduped_Primrange_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryPrimRangeFromADL<>''), seq, inquiryPrimRangeFromADL), seq, inquiryPrimRangeFromADL),seq);
+
+slim_primrange := project(deduped_primrange_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryPrimRangeFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfPrimrange(slim_primrange le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedPrimrange := project(slim_primrange, tfPrimrange(left, counter));
+
+rolledSubPrimrange := rollup(substitutedPrimrange, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have DOB that are different by one character ***
+deduped_DOBs_per_adl := group(dedup(sort(j_raw(good_inquiry and inquiryDOBsFromADL<>''), seq, inquiryDOBsFromADL), seq, inquiryDOBsFromADL),seq);
+
+slim_DOBs := project(deduped_DOBs_per_adl,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryDOBsFromADL,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfDOBs(slim_DOBs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubs(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedDOBs := project(slim_DOBs, tfDOBs(left, counter));
+
+rolledSubDOBs := rollup(substitutedDOBs, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have DOB that match year and month but have different day ***
+Risk_Indicators.iid_constants.subsLayout tfDOBDay(slim_DOBs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBDay(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedDOBDay := project(slim_DOBs, tfDOBDay(left, counter));
+
+rolledSubDOBDay := rollup(substitutedDOBDay, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have DOB that match year and day but have different month ***
+Risk_Indicators.iid_constants.subsLayout tfDOBMonth(slim_DOBs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBMonth(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedDOBMonth := project(slim_DOBs, tfDOBMonth(left, counter));
+
+rolledSubDOBMonth := rollup(substitutedDOBMonth, rollSubs(left,right), seq);
+
+
+// MS-104 - calculate how many inquiry records have DOB that match month and day but have different year ***
+Risk_Indicators.iid_constants.subsLayout tfDOBYear(slim_DOBs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countSubDOBYear(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+substitutedDOBYear := project(slim_DOBs, tfDOBYear(left, counter));
+
+rolledSubDOBYear := rollup(substitutedDOBYear, rollSubs(left,right), seq);
+
+
+// MS-105 - calculate how many inquiry records have SSN that has 1 digit that is off by 1 sequentially ***
+Risk_Indicators.iid_constants.subsLayout tfssnsperadl_1dig(slim_SSNs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_SSNs,slim_SSNs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+ssnsperadl_1dig := project(slim_SSNs, tfssnsperadl_1dig(left, counter));
+
+rolledssnsperadl_1dig := rollup(ssnsperadl_1dig, rollSubs(left,right), seq);
+
+
+// MS-105 - calculate how many inquiry records have phone that has 1 digit that is off by 1 sequentially ***
+Risk_Indicators.iid_constants.subsLayout tfphonesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_phones,slim_phones[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+phonesperadl_1dig := project(slim_phones, tfphonesperadl_1dig(left, counter));
+
+rolledphonesperadl_1dig := rollup(phonesperadl_1dig, rollSubs(left,right), seq);
+
+
+// MS-105 - calculate how many inquiry records have primary range that has 1 digit that is off by 1 sequentially ***
+Risk_Indicators.iid_constants.subsLayout tfprimrangesperadl_1dig(slim_phones le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_primrange,slim_primrange[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+primrangesperadl_1dig := project(slim_primrange, tfprimrangesperadl_1dig(left, counter));
+
+rolledprimrangesperadl_1dig := rollup(primrangesperadl_1dig, rollSubs(left,right), seq);
+
+
+// MS-105 - calculate how many inquiry records have DOB that has 1 digit that is off by 1 sequentially ***
+Risk_Indicators.iid_constants.subsLayout tfDOBsperadl_1dig(slim_DOBs le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_DOBs,slim_DOBs[c].subsString);	//use counter here to pass in the actual string we are comparing to
+end;
+DOBsperadl_1dig := project(slim_DOBs, tfDOBsperadl_1dig(left, counter));
+
+rolledDOBsperadl_1dig := rollup(DOBsperadl_1dig, rollSubs(left,right), seq);
+
+
+// append the counts to the rolled_raw (or to with_DOBsperadl_1dig if BS version is 53 or higher)
 with_addr_per_adl := join(rolled_raw, rolled_addrs_per_adl, left.seq=right.seq,
 											transform(layout_temp, 
 											self.inquiryAddrsPerADL := right.inquiryAddrsPerADL, 
@@ -1031,7 +1339,118 @@ with_Emails_per_adl := join(with_DOBs_per_adl, rolled_Emails_per_adl, left.seq=r
 
 											self := left));
 // output(with_Emails_per_adl, named('with_Emails_per_adl'));
+
+// MS104 and MS-105 - Append the counters that were calculated earlier. New special values are assigned in these counters that indicate different scenarios for being unable to calculate...
+// 		-1 = there is no DID assigned or 'truedid' = false
+//		-2 = there are no valid inquiries within the past 12 months 
+//		-3 = there are valid inquiries within the past 12 months but the field associated with the counter (first name, last name, SSN...) is not populated in the inquiry record/s
+
+with_SubFnames := join(with_Emails_per_adl, rolledSubFnames, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_fnamesperadl_1subs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);	
+											self := left), left outer);
+
+with_SubLnames := join(with_SubFnames, rolledSubLnames, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_lnamesperadl_1subs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_SubSSNs := join(with_SubLnames, rolledSubSSNs, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_ssnsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
 											
+with_SubPhones := join(with_SubSSNs, rolledSubPhones, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_phnsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+											
+with_SubPrimrange := join(with_SubPhones, rolledSubPrimrange, left.seq=right.seq,
+											transform(layout_temp, 							
+											self.inq_primrangesperadl_1subs	:= 	map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+											
+with_SubDOBs := join(with_SubPrimrange, rolledSubDOBs, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_dobsperadl_1subs	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);
+											self := left), left outer);
+											
+with_SubDOBDay := join(with_SubDOBs, rolledSubDOBDay, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_dobsperadl_daysubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_SubDOBMonth := join(with_SubDOBDay, rolledSubDOBMonth, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_dobsperadl_mosubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_SubDOBYear := join(with_SubDOBMonth, rolledSubDOBYear, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_dobsperadl_yrsubs	:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_ssnsperadl_1dig := join(with_SubDOBYear, rolledssnsperadl_1dig, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_ssnsperadl_1dig		:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_phonesperadl_1dig := join(with_ssnsperadl_1dig, rolledphonesperadl_1dig, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_phnsperadl_1dig		:= 			map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_primrangesperadl_1dig := join(with_phonesperadl_1dig, rolledprimrangesperadl_1dig, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_primrangesperadl_1dig	:= 	map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+with_DOBsperadl_1dig := join(with_primrangesperadl_1dig, rolledDOBsperadl_1dig, left.seq=right.seq,
+											transform(layout_temp, 
+											self.inq_dobsperadl_1dig	:= 				map(left.DID = 0	or left.truedid = false															=> -1,	
+																															left.inquiryPerADL = 0 																						=> -2,	
+																															left.inquiryPerADL > 0 and left.seq<>right.seq										=> -3,	
+																																																																	 right.subsCount);
+											self := left), left outer);
+
+// for BS 5.3 and higher, take the file that has all the new fields that were appended in 5.3.											
+with_all_per_adl := if(BSversion >= 53, with_DOBsperadl_1dig, with_Emails_per_adl);
 
 // -----------------------------------------------------
 // start of the SSN velocity counter section
@@ -1050,7 +1469,8 @@ layout_temp trans_name(layout_temp le, ssn_key rt) := transform
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose,
 															isFCRA, bsversion,
-															rt.search_info.method);  	
+															rt.search_info.method, 
+															le.historyDateTimeStamp);  	//for MS-160
 	good_virtual_fraud_inquiry := Inquiry_AccLogs.shell_constants.Valid_VirtualFraud_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -1060,11 +1480,15 @@ layout_temp trans_name(layout_temp le, ssn_key rt) := transform
 															rt.bus_intel.use,
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose,
-															isFCRA, bsversion);  	
+															isFCRA, bsversion, 
+															le.historyDateTimeStamp);  	//for MS-160
 															
+	//MS-105 - need 'good_inquiry' for the inquiries by SSN for filtering later
+	self.good_inquiry     := good_inquiry;
+													
 	logdate := trim(rt.search_info.datetime[1..8]);
 	good_fraudsearch_inquiry := Inquiry_AccLogs.shell_constants.ValidFraudSearchInquiry(rt.search_info.function_description, logdate, rt.bus_intel.use, rt.search_info.product_code ); 
-	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate);
+	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate, le.historyDateTimeStamp);	//for MS-160
 
 	within1day_orig := Inquiry_AccLogs.shell_constants.age1day(logdate, le.historydate);
 	within1week_orig := Inquiry_AccLogs.shell_constants.age1week(logdate, le.historydate);
@@ -1085,9 +1509,9 @@ layout_temp trans_name(layout_temp le, ssn_key rt) := transform
 	self.inquiryDOBsPerSSN := if(good_inquiry and trim(rt.person_q.dob)<>'', 1, 0);  
 	self.inquiryDOBsFromSSN := if(good_inquiry and trim(rt.person_q.dob)<>'', trim(rt.person_q.dob), ''); 
  	
+ 	//MS-105 - need prim_range in layout to calculate tumblings substitutions count for prim_range later
+	self.inquiryPrimRangeFromSSN := if(good_inquiry and trim(rt.person_q.Prim_Range)<>'', trim(rt.person_q.Prim_Range), '');	
 
-
-	
 	self.fraudSearchInquiryPerSSN := if(good_fraudsearch_inquiry, 1, 0);
 	self.fraudSearchInquiryPerSSNYear := if(good_fraudsearch_inquiry and ageBucket between 1 and 12, 1, 0);
 	self.fraudSearchInquiryPerSSNMonth := if(good_fraudsearch_inquiry and ageBucket = 1, 1, 0);
@@ -1100,7 +1524,6 @@ layout_temp trans_name(layout_temp le, ssn_key rt) := transform
 	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
-	//self.Transaction_ID := rt.search_info.Transaction_ID;
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perssn_count_day := if(good_inquiry and within1day, 1, 0);
@@ -1132,7 +1555,64 @@ layout_temp trans_name(layout_temp le, ssn_key rt) := transform
 	self.inq_dobsperssn_count01 := if(good_inquiry and trim(rt.person_q.dob)<>'' and agebucket=1, 1, 0); 
 	self.inq_dobsperssn_count03 := if(good_inquiry and trim(rt.person_q.dob)<>'' and agebucket between 1 and 3, 1, 0); 
 	self.inq_dobsperssn_count06 := if(good_inquiry and trim(rt.person_q.dob)<>'' and agebucket between 1 and 6, 1, 0); 
-	
+
+	//MS-87 - new corroboration fields indicating if input name/DOB/address/phone were verified along with the input SSN
+	firstmatch_score := risk_indicators.FnameScore(le.shell_input.fname,rt.person_q.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstmatch_score);
+	lastmatch_score := risk_indicators.LnameScore(le.shell_input.lname, rt.person_q.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastmatch_score);
+	//because the join to the inquiry address key further down requires exact match on address, enforce exact match on address here as well for the counts by ADL
+	addrmatch  := le.shell_input.z5 = rt.person_q.zip[1..5] and 
+								le.shell_input.prim_range = rt.person_q.prim_range and 
+								le.shell_input.prim_name = rt.person_q.prim_name and
+								le.shell_input.sec_range = rt.person_q.sec_range and 
+								le.shell_input.predir = rt.person_q.predir and 
+								le.shell_input.addr_suffix = rt.person_q.addr_suffix;
+	socsmatchexact := le.shell_input.ssn = rt.person_q.ssn;
+	hphonematchexact := le.shell_input.phone10 = rt.person_q.personal_phone;
+	dobmatch_score := did_add.ssn_match_score(le.shell_input.dob[1..8],rt.person_q.dob[1..8]);
+	dobmatch := risk_indicators.iid_constants.g(dobmatch_score);
+
+	//MS-87: the logic for these new inquiry corroboration counters includes new special values of -1, -2, -3.  Here's what they mean...
+	//  -1 will be returned if we didn't assign a valid DID or if the necessary input fields pertaining to the counter are not populated
+	//  -2 will be returned if a DID was assigned and there is an inquiry but that inquiry does not qualify as a good inquiry
+	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the calculation  
+	self.inq_corrnamessn 				:= map(le.shell_input.fname='' or le.shell_input.lname=''	or length(trim(le.shell_input.ssn))<>9																			=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.fname='' or rt.person_q.lname=''																																										=> -3,
+																	   firstmatch and lastmatch																																																				=> 1, 
+																																																																																		   0);
+	self.inq_corraddrssn 				:= map(le.shell_input.in_streetaddress=''	or length(trim(le.shell_input.ssn))<>9																											=> -1,
+																	   ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.address='' 																																																				=> -3,
+																	   addrmatch																																																											=> 1, 
+																																																																																		   0);
+	self.inq_corrdobssn 				:= map(length(trim(le.shell_input.dob))<>8	or length(trim(le.shell_input.ssn))<>9																										=> -1,
+																	   ~good_inquiry																																																									=> -2, 
+																	   length(trim(rt.person_q.dob))<>8																																																=> -3,
+																	   dobmatch																																																												=> 1, 
+																																																																																			 0);
+	self.inq_corrphonessn 			:= map(le.shell_input.phone10=''	or length(trim(le.shell_input.ssn))<>9																															=> -1,
+																	   ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.personal_phone=''																																																	=> -3,
+																	   hphonematchexact																																																								=> 1, 
+																																																																																		   0);
+	self.inq_corrnameaddrssn		:= map(le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.in_streetaddress=''	or length(trim(le.shell_input.ssn))<>9	=> -1,
+																		 ~good_inquiry																																																										=> -2, 
+																		 rt.person_q.fname=''	or rt.person_q.lname=''	or rt.person_q.address=''																														=> -3,
+																	   firstmatch and lastmatch and addrmatch																																														=> 1, 
+																																																																																				 0);
+	self.inq_corrnamephonessn		:= map(le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.phone10=''	or length(trim(le.shell_input.ssn))<>9				=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																		 rt.person_q.fname=''	or rt.person_q.lname=''	or rt.person_q.personal_phone=''																									=> -3,
+																	   firstmatch and lastmatch and hphonematchexact																																									=> 1, 
+																								  																																																										 0);
+	self.inq_corrnameaddrphnssn	:= map( le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.in_streetaddress='' or le.shell_input.phone10=''	or length(trim(le.shell_input.ssn))<>9	=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																		 rt.person_q.fname=''	or rt.person_q.lname=''	or rt.person_q.address=''or rt.person_q.personal_phone=''													=> -3,
+																	   firstmatch and lastmatch and addrmatch and hphonematchexact																																		=> 1, 
+										 														  																																																										 0);
+
 	self := le;
 end;
 ENDMACRO;
@@ -1147,20 +1627,21 @@ MAC_raw_ssn_transform(add_ssn_raw, Inquiry_AccLogs.Key_Inquiry_SSN);
 MAC_raw_ssn_transform(add_ssn_raw_update, Inquiry_AccLogs.Key_Inquiry_SSN_update);
 MAC_raw_ssn_transform(add_ssn_raw_deltabase, deltabase_ssn_results);
 
-ssn_raw_base := join(with_Emails_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN,
+
+ssn_raw_base := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN,	//MS-104 and MS-105
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
 // update keys are only built for non-fcra
-ssn_raw_updates := join(with_Emails_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,
+ssn_raw_updates := join(with_all_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,	//MS-104 and MS-105
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and	
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw_update(left, right), atmost(riskwise.max_atmost));
 								
-ssn_raw_deltabase := join(with_Emails_per_adl, deltaBase_ssn_results,
+ssn_raw_deltabase := join(with_all_per_adl, deltaBase_ssn_results,	//MS-104 and MS-105
 								Death_Master.fn_clean_death_ssn(left.shell_input.ssn, true) <> '' and
 								left.shell_input.ssn=right.ssn,
 								add_ssn_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);
@@ -1169,11 +1650,7 @@ ssn_raw := if(bsversion >= 50, dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates
 							dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number));
 
 
-// ssn_raw := dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates +ssn_raw_deltabase), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number);
-							
-
 grouped_ssn_raw := group(sort( ssn_raw, seq, -inquiryADLsFromSSN), seq);
-// output(grouped_ssn_raw, named('grouped_ssn_raw'));
 
 layout_temp roll_ssn( layout_temp le, layout_temp rt ) := TRANSFORM	
 	self.inquiryPerSSN := le.inquiryPerSSN + rt.inquiryPerSSN;
@@ -1198,18 +1675,38 @@ layout_temp roll_ssn( layout_temp le, layout_temp rt ) := TRANSFORM
 	
 	self.virtual_fraud.AltLexID_ssn_hi_risk_ct := cap125(le.virtual_fraud.AltLexID_ssn_hi_risk_ct + rt.virtual_fraud.AltLexID_ssn_hi_risk_ct);
 	self.virtual_fraud.AltLexID_ssn_lo_risk_ct := cap125(le.virtual_fraud.AltLexID_ssn_lo_risk_ct + rt.virtual_fraud.AltLexID_ssn_lo_risk_ct);
-		
+
+  //MS-87 - If both left and right are valid inquiries, add them together.  Otherwise if one or both are not valid, take the highest sequential value as they are in precedence order.																																																												
+	self.inq_corrnamessn 			:= map(le.inq_corrnamessn >= 0 and rt.inq_corrnamessn >= 0							=>	min(le.inq_corrnamessn + rt.inq_corrnamessn, 254),
+																				 le.inq_corrnamessn in [-2,-3] and rt.inq_corrnamessn in [-2,-3]	=>	min(le.inq_corrnamessn, rt.inq_corrnamessn),
+																																																												max(le.inq_corrnamessn, rt.inq_corrnamessn));
+	self.inq_corraddrssn 			:= map(le.inq_corraddrssn >= 0 and rt.inq_corraddrssn >= 0							=>	min(le.inq_corraddrssn + rt.inq_corraddrssn, 254),
+																				 le.inq_corraddrssn in [-2,-3] and rt.inq_corraddrssn in [-2,-3]	=>	min(le.inq_corraddrssn, rt.inq_corraddrssn),
+																																																												max(le.inq_corraddrssn, rt.inq_corraddrssn));
+	self.inq_corrdobssn 			:= map(le.inq_corrdobssn >= 0 and rt.inq_corrdobssn >= 0							=>	min(le.inq_corrdobssn + rt.inq_corrdobssn, 254),
+																				 le.inq_corrdobssn in [-2,-3] and rt.inq_corrdobssn in [-2,-3]	=>	min(le.inq_corrdobssn, rt.inq_corrdobssn),
+																																																												max(le.inq_corrdobssn, rt.inq_corrdobssn));
+	self.inq_corrphonessn 			:= map(le.inq_corrphonessn >= 0 and rt.inq_corrphonessn >= 0							=>	min(le.inq_corrphonessn + rt.inq_corrphonessn, 254),
+																				 le.inq_corrphonessn in [-2,-3] and rt.inq_corrphonessn in [-2,-3]	=>	min(le.inq_corrphonessn, rt.inq_corrphonessn),
+																																																												max(le.inq_corrphonessn, rt.inq_corrphonessn));
+	self.inq_corrnameaddrssn 			:= map(le.inq_corrnameaddrssn >= 0 and rt.inq_corrnameaddrssn >= 0							=>	min(le.inq_corrnameaddrssn + rt.inq_corrnameaddrssn, 254),
+																				 le.inq_corrnameaddrssn in [-2,-3] and rt.inq_corrnameaddrssn in [-2,-3]	=>	min(le.inq_corrnameaddrssn, rt.inq_corrnameaddrssn),
+																																																												max(le.inq_corrnameaddrssn, rt.inq_corrnameaddrssn));
+	self.inq_corrnamephonessn 			:= map(le.inq_corrnamephonessn >= 0 and rt.inq_corrnamephonessn >= 0							=>	min(le.inq_corrnamephonessn + rt.inq_corrnamephonessn, 254),
+																				 le.inq_corrnamephonessn in [-2,-3] and rt.inq_corrnamephonessn in [-2,-3]	=>	min(le.inq_corrnamephonessn, rt.inq_corrnamephonessn),
+																																																												max(le.inq_corrnamephonessn, rt.inq_corrnamephonessn));
+	self.inq_corrnameaddrphnssn 			:= map(le.inq_corrnameaddrphnssn >= 0 and rt.inq_corrnameaddrphnssn >= 0							=>	min(le.inq_corrnameaddrphnssn + rt.inq_corrnameaddrphnssn, 254),
+																				 le.inq_corrnameaddrphnssn in [-2,-3] and rt.inq_corrnameaddrphnssn in [-2,-3]	=>	min(le.inq_corrnameaddrphnssn, rt.inq_corrnameaddrphnssn),
+																																																												max(le.inq_corrnameaddrphnssn, rt.inq_corrnameaddrphnssn));
+
 	self := rt;							
 end;
 
 rolled_ssn_raw := rollup( grouped_ssn_raw, roll_ssn(left,right), true);
-// output(choosen(rolled_ssn_raw, eyeball), named('rolled_ssn_raw'));
-
 
 
 // sort and roll lnames per SSN
 sorted_lnames_per_SSN := group(sort(ssn_raw, seq,  -inquiryLnamesFromSSN), seq);
-// output(sorted_lnames_per_SSN, named('sorted_lnames_per_SSN'));
 layout_temp count_lnames_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerSSN := le.inquirylnamesPerSSN + IF(le.inquirylnamesFromSSN=rt.inquirylnamesFromSSN, 0, rt.inquirylnamesPerSSN);	
 	
@@ -1221,12 +1718,10 @@ layout_temp count_lnames_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_lnames_per_SSN := rollup( sorted_lnames_per_SSN, count_lnames_per_SSN(left,right), true);
-// output(rolled_lnames_per_SSN, named('rolled_lnames_per_SSN'));
 
 
 // sort and roll Addrs per SSN
 sorted_Addrs_per_SSN := group(sort(ssn_raw, seq,  -inquiryAddrsFromSSN), seq);
-// output(sorted_Addrs_per_SSN, named('sorted_Addrs_per_SSN'));
 layout_temp count_Addrs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryAddrsPerSSN := le.inquiryAddrsPerSSN + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inquiryAddrsPerSSN);		
 	self.inq_addrsperssn_count_day := le.inq_addrsperssn_count_day + IF(le.inquiryAddrsFromSSN=rt.inquiryAddrsFromSSN, 0, rt.inq_addrsperssn_count_day);	
@@ -1237,12 +1732,10 @@ layout_temp count_Addrs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_Addrs_per_SSN := rollup( sorted_Addrs_per_SSN, count_Addrs_per_SSN(left,right), true);
-// output(rolled_Addrs_per_SSN, named('rolled_Addrs_per_SSN'));
 
 
 // sort and roll DOBs per SSN
 sorted_DOBs_per_SSN := group(sort(ssn_raw, seq,  -inquiryDOBsFromSSN), seq);
-// output(sorted_DOBs_per_SSN, named('sorted_DOBs_per_SSN'));
 layout_temp count_DOBs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquiryDOBsPerSSN := le.inquiryDOBsPerSSN + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inquiryDOBsPerSSN);	
 	self.inq_dobsperssn_count_day := le.inq_dobsperssn_count_day + IF(le.inquiryDOBsFromSSN=rt.inquiryDOBsFromSSN, 0, rt.inq_dobsperssn_count_day);	
@@ -1253,7 +1746,42 @@ layout_temp count_DOBs_per_SSN( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_DOBs_per_SSN := rollup( sorted_DOBs_per_SSN, count_DOBs_per_SSN(left,right), true);
-// output(rolled_DOBs_per_SSN, named('rolled_DOBs_per_SSN'));
+
+// MS-105 - calculate how many inquiry records have primary range that are different by one character ***
+deduped_Primrange_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryPrimRangeFromSSN<>''), seq, inquiryPrimRangeFromSSN), seq, inquiryPrimRangeFromSSN),seq);
+
+slim_primrangeFromSSN := project(deduped_Primrange_per_SSN,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryPrimRangeFromSSN,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfprimrangesperSSN_1dig(slim_primrangeFromSSN le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_primrangeFromSSN,slim_primrangeFromSSN[c].subsString);	
+end;
+primrangesperSSN_1dig := project(slim_primrangeFromSSN, tfprimrangesperSSN_1dig(left, counter));
+
+rolledprimrangesperSSN_1dig := rollup(primrangesperSSN_1dig, rollSubs(left,right), seq);											
+
+// MS-105 - calculate how many inquiry records have DOB that are different by one character ***
+deduped_DOBs_per_SSN := group(dedup(sort(ssn_raw(good_inquiry and inquiryDOBsFromSSN<>''), seq, inquiryDOBsFromSSN), seq, inquiryDOBsFromSSN),seq);
+
+slim_DOBsFromSSN := project(deduped_DOBs_per_SSN,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquiryDOBsFromSSN,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfDOBsperSSN_1dig(slim_DOBsFromSSN le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_DOBsFromSSN,slim_DOBsFromSSN[c].subsString);	
+end;
+DOBsperSSN_1dig := project(slim_DOBsFromSSN, tfDOBsperSSN_1dig(left, counter));
+
+rolledDOBsperSSN_1dig := rollup(DOBsperSSN_1dig, rollSubs(left,right), seq);											
 
 with_Lnames_per_SSN := join(rolled_ssn_raw, rolled_lnames_per_ssn, left.seq=right.seq,
 											transform(layout_temp, self.inquirylnamesPerSSN := right.inquirylnamesPerSSN,
@@ -1262,7 +1790,6 @@ with_Lnames_per_SSN := join(rolled_ssn_raw, rolled_lnames_per_ssn, left.seq=righ
 											self.inq_lnamesperssn_count01 := right.inq_lnamesperssn_count01;	
 											self.inq_lnamesperssn_count03 := right.inq_lnamesperssn_count03;	
 											self.inq_lnamesperssn_count06 := right.inq_lnamesperssn_count06;		
-											
 											self := left));
 
 with_Addrs_per_SSN := join(with_Lnames_per_SSN, rolled_addrs_per_ssn, left.seq=right.seq,
@@ -1282,17 +1809,31 @@ with_ssn_velocity := join(with_Addrs_per_SSN, rolled_DOBs_per_ssn, left.seq=righ
 											self.inq_dobsperssn_count03 := right.inq_dobsperssn_count03;	
 											self.inq_dobsperssn_count06 := right.inq_dobsperssn_count06;		
 											self := left));
-// output(with_ssn_velocity, named('with_ssn_velocity'));
 
+//MS-105 -  append new Tumblings counters by SSN
+with_primrangesperssn_1dig := join(with_ssn_velocity, rolledprimrangesperSSN_1dig, left.seq=right.seq,
+											transform(layout_temp,  
+											self.inq_primrangesperssn_1dig := 	map(left.shell_input.ssn=''																						=> -1,	
+																															left.inquiryPerSSN = 0 																						=> -2,	
+																															left.inquiryPerSSN > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
 
-
+with_DOBsperssn_1dig := join(with_primrangesperssn_1dig, rolledDOBsperSSN_1dig, left.seq=right.seq,
+											transform(layout_temp,  
+											self.inq_dobsperssn_1dig := 				map(left.shell_input.ssn=''																						=> -1,	
+																															left.inquiryPerSSN = 0 																						=> -2,	
+																															left.inquiryPerSSN > 0 and left.seq<>right.seq										=> -3,
+																																																																	 right.subsCount);
+											self := left), left outer);
+											
+with_all_per_ssn := if(BSversion >= 53, with_DOBsperssn_1dig, with_ssn_velocity);
 
 // -----------------------------------------------------
 // start of the Address velocity counter section
 // -----------------------------------------------------
 MAC_raw_addr_transform (trans_name, addr_key) := MACRO
 layout_temp trans_name(layout_temp le, addr_key rt) := transform
-	// self.raw_addr := rt;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -1303,7 +1844,8 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose, 
 															isFCRA, bsVersion,
-															rt.search_info.method); 	
+															rt.search_info.method, 
+															le.historyDateTimeStamp); 	//for MS-160
 															
 	good_virtual_fraud_inquiry := Inquiry_AccLogs.shell_constants.Valid_VirtualFraud_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
@@ -1314,7 +1856,12 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 															rt.bus_intel.use,
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose, 
-															isFCRA, bsVersion);  														
+															isFCRA, bsVersion, 
+															le.historyDateTimeStamp);  	//for MS-160		
+
+	//MS-105: need 'good_inquiry' for these inquiries by address so it can be used for filtering later
+	self.good_inquiry     := good_inquiry;
+
 	self.inquiryPerAddr := if(good_inquiry, 1, 0);   // any search at all by Addr that meets the good_inquiry criteria														
 	self.inquiryADLsPerAddr:= if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  	
 	self.inquiryADLsFromAddr := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
@@ -1323,12 +1870,12 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 	self.inquirySSNsPerAddr := if(good_inquiry and trim(rt.person_q.SSN)<>'', 1, 0);  
 	self.inquirySSNsFromAddr := if(good_inquiry and trim(rt.person_q.SSN)<>'', trim(rt.person_q.SSN), '');
 
-	good_cbd_inquiry := Inquiry_AccLogs.shell_constants.ValidCBDInquiry(rt.search_info.function_description, rt.search_info.datetime[1..8], le.historydate, rt.bus_intel.use, rt.search_info.product_code);
+	good_cbd_inquiry := Inquiry_AccLogs.shell_constants.ValidCBDInquiry(rt.search_info.function_description, rt.search_info.datetime[1..8], le.historydate, rt.bus_intel.use, rt.search_info.product_code, le.historyDateTimeStamp);	//for MS-160
 	self.cbd_inquiryadlsperaddr := if(good_cbd_inquiry and rt.person_q.appended_adl<>0, 1, 0);
 	
 	logdate := trim(rt.search_info.datetime[1..8]);
 	good_fraudsearch_inquiry := Inquiry_AccLogs.shell_constants.ValidFraudSearchInquiry(rt.search_info.function_description, logdate, rt.bus_intel.use, rt.search_info.product_code ); 
-	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate);
+	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate, le.historyDateTimeStamp);	//for MS-160
 	within1day_orig := Inquiry_AccLogs.shell_constants.age1day(logdate, le.historydate);
 	within1week_orig := Inquiry_AccLogs.shell_constants.age1week(logdate, le.historydate);
 	
@@ -1350,7 +1897,6 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 	self.virtual_fraud.AltLexID_addr_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);
-	//self.Transaction_ID := rt.search_info.Transaction_ID;
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_peraddr_count_day := if(good_inquiry and within1day, 1, 0);
@@ -1376,8 +1922,30 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 	self.inq_ssnsperaddr_count01 := if(good_inquiry and trim(rt.person_q.SSN)<>'' and ageBucket = 1, 1, 0); 
 	self.inq_ssnsperaddr_count03 := if(good_inquiry and trim(rt.person_q.SSN)<>'' and ageBucket between 1 and 3, 1, 0); 
 	self.inq_ssnsperaddr_count06 := if(good_inquiry and trim(rt.person_q.SSN)<>'' and ageBucket between 1 and 6, 1, 0); 
-	
-	
+
+	//MS-87 - new corroboration fields indicating if input name/DOB were verified along with the input address
+	firstmatch_score := risk_indicators.FnameScore(le.shell_input.fname,rt.person_q.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstmatch_score);
+	lastmatch_score := risk_indicators.LnameScore(le.shell_input.lname, rt.person_q.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastmatch_score);
+	dobmatch_score := did_add.ssn_match_score(le.shell_input.dob[1..8],rt.person_q.dob[1..8]);
+	dobmatch := risk_indicators.iid_constants.g(dobmatch_score);
+
+	//MS-87: the logic for these new inquiry corroboration counters includes new special values of -1, -2, -3.  Here's what they mean...
+	//  -1 will be returned if we didn't assign a valid DID or if the necessary input fields pertaining to the counter are not populated
+	//  -2 will be returned if a DID was assigned and there is an inquiry but that inquiry does not qualify as a good inquiry
+	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the calculation  
+	self.inq_corrnameaddr 			:= map(le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.in_streetaddress=''																				=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.fname='' or rt.person_q.lname=''																																										=> -3,
+																	   firstmatch and lastmatch																																																				=> 1, 
+																																																																																		   0);
+	self.inq_corrdobaddr 				:= map(length(trim(le.shell_input.dob))<>8 or le.shell_input.in_streetaddress=''																											=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.dob=''																																																							=> -3,
+																	   dobmatch																																																												=> 1, 
+																																																																																		   0);
+
 	self := le;
 end;
 ENDMACRO;
@@ -1395,7 +1963,7 @@ MAC_raw_addr_transform(add_Addr_raw, Inquiry_AccLogs.Key_Inquiry_Address);
 MAC_raw_addr_transform(add_Addr_raw_Update, Inquiry_AccLogs.Key_Inquiry_Address_update);
 MAC_raw_addr_transform(add_Addr_raw_deltabase, deltaBase_address_results);
 
-Addr_raw_base := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address,
+Addr_raw_base := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -1408,7 +1976,7 @@ Addr_raw_base := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address,
 								add_Addr_raw(left, right), left outer, atmost(riskwise.max_atmost));
 								
 // update keys are only built for non-fcra
-Addr_raw_updates := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address_update,
+Addr_raw_updates := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address_update,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -1420,7 +1988,7 @@ Addr_raw_updates := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address_
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw_Update(left, right), atmost(riskwise.max_atmost));
 								
-Addr_raw_deltabase := join(with_ssn_velocity, deltabase_address_results,
+Addr_raw_deltabase := join(with_all_per_ssn, deltabase_address_results,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								left.shell_input.z5=right.zip and 
@@ -1434,11 +2002,6 @@ Addr_raw_deltabase := join(with_ssn_velocity, deltabase_address_results,
 addr_raw := if(bsversion >= 50, dedup(sort(ungroup(addr_raw_base + addr_raw_updates + Addr_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 							dedup(sort(ungroup(addr_raw_base + addr_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );
 						
-// addr_raw := dedup(sort(ungroup(addr_raw_base + addr_raw_updates + Addr_raw_deltabase), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number );
-												
-												
-// output(Addr_raw, named('Addr_raw'));
-
 
 adls_from_address := project(addr_raw(inquiryADLsFromAddr<>0), 
 	transform(risk_indicators.Boca_Shell_Fraud.layout_identities_input, self.did := left.inquiryADLsFromAddr;
@@ -1503,18 +2066,22 @@ layout_temp roll_Addr( layout_temp le, layout_temp rt ) := TRANSFORM
 	
 	self.virtual_fraud.AltLexID_addr_hi_risk_ct := cap125(le.virtual_fraud.AltLexID_addr_hi_risk_ct + rt.virtual_fraud.AltLexID_addr_hi_risk_ct);
 	self.virtual_fraud.AltLexID_addr_lo_risk_ct := cap125(le.virtual_fraud.AltLexID_addr_lo_risk_ct + rt.virtual_fraud.AltLexID_addr_lo_risk_ct);	
-	
+
+  //MS-87 - If both left and right are valid inquiries, add them together.  Otherwise if one or both are not valid, take the highest sequential value as they are in precedence order.																																																												
+	self.inq_corrnameaddr 			:= map(le.inq_corrnameaddr >= 0 and rt.inq_corrnameaddr >= 0							=>	min(le.inq_corrnameaddr + rt.inq_corrnameaddr, 254),
+																				 le.inq_corrnameaddr in [-2,-3] and rt.inq_corrnameaddr in [-2,-3]	=>	min(le.inq_corrnameaddr, rt.inq_corrnameaddr),
+																																																												max(le.inq_corrnameaddr, rt.inq_corrnameaddr));
+	self.inq_corrdobaddr 			:= map(le.inq_corrdobaddr >= 0 and rt.inq_corrdobaddr >= 0							=>	min(le.inq_corrdobaddr + rt.inq_corrdobaddr, 254),
+																				 le.inq_corrdobaddr in [-2,-3] and rt.inq_corrdobaddr in [-2,-3]	=>	min(le.inq_corrdobaddr, rt.inq_corrdobaddr),
+																																																												max(le.inq_corrdobaddr, rt.inq_corrdobaddr));
+
 	self := rt;							
 end;
 
 rolled_Addr_raw := rollup( grouped_addr_raw, roll_addr(left,right), true);
-// output(choosen(rolled_Addr_raw, eyeball), named('rolled_Addr_raw'));
-	
-
 
 // sort and roll lnames per Addr
 sorted_lnames_per_Addr := group(sort(Addr_raw, seq,  -inquiryLnamesFromAddr), seq);
-// output(sorted_lnames_per_Addr, named('sorted_lnames_per_Addr'));
 layout_temp count_lnames_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirylnamesPerAddr := le.inquirylnamesPerAddr + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inquirylnamesPerAddr);		
 	self.inq_lnamesperaddr_count_day := le.inq_lnamesperaddr_count_day + IF(le.inquirylnamesFromAddr=rt.inquirylnamesFromAddr, 0, rt.inq_lnamesperaddr_count_day);	
@@ -1525,12 +2092,10 @@ layout_temp count_lnames_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_lnames_per_Addr := rollup( sorted_lnames_per_Addr, count_lnames_per_Addr(left,right), true);
-// output(rolled_lnames_per_Addr, named('rolled_lnames_per_Addr'));
 
 
 // sort and roll SSNs per Addr
 sorted_SSNs_per_Addr := group(sort(Addr_raw, seq,  -inquirySSNsFromAddr), seq);
-// output(sorted_SSNs_per_Addr, named('sorted_SSNs_per_Addr'));
 layout_temp count_SSNs_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM		
 	self.inquirySSNsPerAddr := le.inquirySSNsPerAddr + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inquirySSNsPerAddr);				
 	self.inq_ssnsperaddr_count_day := le.inq_ssnsperaddr_count_day + IF(le.inquirySSNsFromAddr=rt.inquirySSNsFromAddr, 0, rt.inq_ssnsperaddr_count_day);
@@ -1541,8 +2106,24 @@ layout_temp count_SSNs_per_Addr( layout_temp le, layout_temp rt ) := TRANSFORM
 	self := rt;
 end;
 rolled_SSNs_per_Addr := rollup( sorted_SSNs_per_Addr, count_SSNs_per_Addr(left,right), true);
-// output(rolled_SSNs_per_Addr, named('rolled_SSNs_per_Addr'));
 
+// MS-105 - calculate how many inquiry records by address have SSN that is different by one character ***
+deduped_SSN_per_addr := group(dedup(sort(addr_raw(good_inquiry and inquirySSNsFromAddr<>''), seq, inquirySSNsFromAddr), seq, inquirySSNsFromAddr),seq);
+
+slim_SSNsFromAddr := project(deduped_SSN_per_addr,  
+											transform(Risk_Indicators.iid_constants.subsLayout,
+											self.seq 					:= left.seq,
+											self.subsString 	:= left.inquirySSNsFromAddr,
+											self.subsCount		:= 0));
+
+Risk_Indicators.iid_constants.subsLayout tfSSNsFromAddr_1dig(slim_SSNsFromAddr le, INTEGER c) := TRANSFORM
+	SELF.seq 						:= le.seq;	
+	SELF.subsString 		:= le.subsString;
+	SELF.subsCount 			:= risk_indicators.iid_constants.countDiff1Dig(slim_SSNsFromAddr,slim_SSNsFromAddr[c].subsString);	//use counter here to skip an additional record with each pass
+end;
+SSNsFromAddr_1dig := project(slim_SSNsFromAddr, tfSSNsFromAddr_1dig(left, counter));
+
+rolledSSNsFromAddr_1dig := rollup(SSNsFromAddr_1dig, rollSubs(left,right), seq);											
 
 with_Lnames_per_Addr := join(rolled_Addr_raw, rolled_lnames_per_Addr, left.seq=right.seq,
 											transform(layout_temp, 
@@ -1565,15 +2146,23 @@ with_address_velocities := join(with_Lnames_per_Addr, rolled_SSNs_per_Addr, left
 												self.inq_SSNsperaddr_count06 := right.inq_SSNsperaddr_count06;	
 											
 												self := left));
-// output(with_address_velocities, named('with_address_velocities'));
 
+//MS-105 - append the new counter of SSNs off by one digit
+with_SSNsFromAddr_1dig := join(with_address_velocities, rolledSSNsFromAddr_1dig, left.seq=right.seq,
+											transform(layout_temp,  
+											self.inq_ssnsperaddr_1dig := 	map(left.shell_input.in_streetaddress=''															=> -1,	
+																												left.inquiryPerAddr = 0 																					=> -2,	
+																												left.inquiryPerAddr > 0 and left.seq<>right.seq										=> -3,
+																																																														 right.subsCount);
+											self := left), left outer);
+
+with_all_per_addr := if(BSversion >= 53, with_SSNsFromAddr_1dig, with_address_velocities);
 
 // -----------------------------------------------------
 // start of the Phone velocity counter section
 // -----------------------------------------------------
 MAC_raw_phone_transform (trans_name, phone_key) := MACRO
 layout_temp trans_name(layout_temp le, phone_key rt) := transform
-	// self.raw_Phone := rt;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -1584,7 +2173,8 @@ layout_temp trans_name(layout_temp le, phone_key rt) := transform
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose, 
 															isFCRA, bsVersion,
-															rt.search_info.method); 	
+															rt.search_info.method, 
+															le.historyDateTimeStamp); 	//for MS-160
 	good_virtual_fraud_inquiry := Inquiry_AccLogs.shell_constants.Valid_VirtualFraud_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -1594,14 +2184,15 @@ layout_temp trans_name(layout_temp le, phone_key rt) := transform
 															rt.bus_intel.use,
 															rt.search_info.product_code,
 															rt.permissions.fcra_purpose, 
-															isFCRA, bsVersion);  														
+															isFCRA, bsVersion, 
+															le.historyDateTimeStamp);  	//for MS-160													
 	self.inquiryPerPhone := if(good_inquiry, 1, 0);   // any search at all by Phone that meets the good_inquiry criteria														
 	self.inquiryADLsPerPhone := if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromPhone := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
 	
 	logdate := trim(rt.search_info.datetime[1..8]);
 	good_fraudsearch_inquiry := Inquiry_AccLogs.shell_constants.ValidFraudSearchInquiry(rt.search_info.function_description, logdate, rt.bus_intel.use, rt.search_info.product_code ); 
-	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate);
+	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate, le.historyDateTimeStamp);	//for MS-160
 	within1day_orig := Inquiry_AccLogs.shell_constants.age1day(logdate, le.historydate);
 	within1week_orig := Inquiry_AccLogs.shell_constants.age1week(logdate, le.historydate);
 	
@@ -1622,7 +2213,6 @@ layout_temp trans_name(layout_temp le, phone_key rt) := transform
 	self.virtual_fraud.AltLexID_Phone_lo_risk_ct := if(FDN_ok and good_virtual_fraud_inquiry and alt_lexid and fd_score<>0 and fd_score >= low_risk_fraud_cutoff, 1, 0);
 	
 	self.Transaction_ID := if(rt.search_info.Transaction_ID <> '' or bsversion < 50,rt.search_info.Transaction_ID, rt.search_info.Sequence_Number);	
-	//self.Transaction_ID := rt.search_info.Transaction_ID;
 	self.Sequence_Number := rt.search_info.Sequence_Number;
 	
 	self.inq_perphone_count_day := if(good_inquiry and within1day, 1, 0);
@@ -1636,7 +2226,42 @@ layout_temp trans_name(layout_temp le, phone_key rt) := transform
 	self.inq_adlsperphone_count01 := if(good_inquiry and rt.person_q.appended_adl<>0 and ageBucket = 1, 1, 0); 
 	self.inq_adlsperphone_count03 := if(good_inquiry and rt.person_q.appended_adl<>0 and ageBucket between 1 and 3, 1, 0); 
 	self.inq_adlsperphone_count06 := if(good_inquiry and rt.person_q.appended_adl<>0 and ageBucket between 1 and 6, 1, 0); 
-	
+
+	//MS-87 - new corroboration fields indicating if input name/DOB/address were verified along with the input phone
+	firstmatch_score := risk_indicators.FnameScore(le.shell_input.fname,rt.person_q.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstmatch_score);
+	lastmatch_score := risk_indicators.LnameScore(le.shell_input.lname, rt.person_q.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastmatch_score);
+	dobmatch_score := did_add.ssn_match_score(le.shell_input.dob[1..8],rt.person_q.dob[1..8]);
+	dobmatch := risk_indicators.iid_constants.g(dobmatch_score);
+	//because the join to the inquiry address key further down requires exact match on address, enforce exact match on address here as well for the counts by ADL
+	addrmatch  := le.shell_input.z5 = rt.person_q.zip[1..5] and 
+								le.shell_input.prim_range = rt.person_q.prim_range and 
+								le.shell_input.prim_name = rt.person_q.prim_name and
+								le.shell_input.sec_range = rt.person_q.sec_range and 
+								le.shell_input.predir = rt.person_q.predir and 
+								le.shell_input.addr_suffix = rt.person_q.addr_suffix;
+
+	//MS-87: the logic for these new inquiry corroboration counters includes new special values of -1, -2, -3.  Here's what they mean...
+	//  -1 will be returned if we didn't assign a valid DID or if the necessary input fields pertaining to the counter are not populated
+	//  -2 will be returned if a DID was assigned and there is an inquiry but that inquiry does not qualify as a good inquiry
+	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the calculation  
+	self.inq_corrnamephone 			:= map(le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.phone10=''																								=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.fname='' or rt.person_q.lname=''																																										=> -3,
+																	   firstmatch and lastmatch																																																				=> 1, 
+																																																																																		   0);
+	self.inq_corrdobphone 			:= map(length(trim(le.shell_input.dob))<>8 or le.shell_input.phone10=''																																=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.dob='' 																																																						=> -3,
+																	   dobmatch																																																												=> 1, 
+																																																																																		   0);
+	self.inq_corraddrphone 			:= map(le.shell_input.in_streetaddress='' or le.shell_input.phone10=''																																=> -1,
+																		 ~good_inquiry																																																									=> -2, 
+																	   rt.person_q.address=''																																																					=> -3,
+																	   addrmatch																																																											=> 1, 
+																																																																																		   0);
+
 	self := le;
 end;
 ENDMACRO;
@@ -1645,7 +2270,6 @@ phone_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.La
 																														self.seq := left.shell_input.seq;
 																														self.Phone10 := left.shell_input.Phone10));
 
-//deltaBase_phone := DATASET(phone_ds, Inquiry_Deltabase.Layouts.Input_Deltabase_Phone);
 
 deltaBase_phone_results := Inquiry_Deltabase.Search_Phone(phone_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 
@@ -1653,20 +2277,20 @@ MAC_raw_phone_transform(add_Phone_raw, Inquiry_AccLogs.Key_Inquiry_Phone);
 MAC_raw_phone_transform(add_Phone_raw_update, Inquiry_AccLogs.Key_Inquiry_Phone_update);
 MAC_raw_phone_transform(add_Phone_raw_deltabase, deltaBase_phone_results);
 
-Phone_raw_base := join(with_address_velocities, Inquiry_AccLogs.Key_Inquiry_Phone,
+Phone_raw_base := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and 
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw(left, right), left outer, atmost(riskwise.max_atmost));
 								
 // update keys are only built for non-fcra
-Phone_raw_updates := join(with_address_velocities, Inquiry_AccLogs.Key_Inquiry_Phone_update,
+Phone_raw_updates := join(with_all_per_addr, Inquiry_AccLogs.Key_Inquiry_Phone_update,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw_update(left, right), atmost(riskwise.max_atmost));			
 								
-Phone_raw_deltabase := join(with_address_velocities, deltaBase_phone_results,
+Phone_raw_deltabase := join(with_all_per_addr, deltaBase_phone_results,	//MS-104 and MS-105
 								left.shell_input.phone10<>'' and 
 								left.shell_input.phone10=right.phone10,
 								add_Phone_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);	
@@ -1675,12 +2299,7 @@ phone_raw := if(bsversion >= 50, dedup(sort(ungroup(phone_raw_base + phone_raw_u
 												dedup(sort(ungroup(phone_raw_base + phone_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );		
 
 
-// phone_raw := dedup(sort(ungroup(phone_raw_base + phone_raw_updates + Phone_raw_deltabase), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number);	
-				
-// output(Phone_raw, named('Phone_raw'));
-
 grouped_Phone_raw := group(sort(Phone_raw, seq, -inquiryADLsFromPhone), seq);
-// output(grouped_Phone_raw, named('grouped_Phone_raw'));
 
 
 layout_temp roll_Phone( layout_temp le, layout_temp rt ) := TRANSFORM	
@@ -1707,12 +2326,22 @@ layout_temp roll_Phone( layout_temp le, layout_temp rt ) := TRANSFORM
 	self.inq_adlsperphone_count01 := le.inq_adlsperphone_count01 + IF(le.inquiryADLsFromPhone=rt.inquiryADLsFromPhone, 0, rt.inq_adlsperphone_count01);	 
 	self.inq_adlsperphone_count03 := le.inq_adlsperphone_count03 + IF(le.inquiryADLsFromPhone=rt.inquiryADLsFromPhone, 0, rt.inq_adlsperphone_count03);	
 	self.inq_adlsperphone_count06 := le.inq_adlsperphone_count06 + IF(le.inquiryADLsFromPhone=rt.inquiryADLsFromPhone, 0, rt.inq_adlsperphone_count06);	
-	
+
+  //MS-87 - If both left and right are valid inquiries, add them together.  Otherwise if one or both are not valid, take the highest sequential value as they are in precedence order.																																																												
+	self.inq_corrnamephone 			:= map(le.inq_corrnamephone >= 0 and rt.inq_corrnamephone >= 0							=>	min(le.inq_corrnamephone + rt.inq_corrnamephone, 254),
+																				 le.inq_corrnamephone in [-2,-3] and rt.inq_corrnamephone in [-2,-3]	=>	min(le.inq_corrnamephone, rt.inq_corrnamephone),
+																																																												max(le.inq_corrnamephone, rt.inq_corrnamephone));
+	self.inq_corrdobphone 			:= map(le.inq_corrdobphone >= 0 and rt.inq_corrdobphone >= 0							=>	min(le.inq_corrdobphone + rt.inq_corrdobphone, 254),
+																				 le.inq_corrdobphone in [-2,-3] and rt.inq_corrdobphone in [-2,-3]	=>	min(le.inq_corrdobphone, rt.inq_corrdobphone),
+																																																												max(le.inq_corrdobphone, rt.inq_corrdobphone));
+	self.inq_corraddrphone 			:= map(le.inq_corraddrphone >= 0 and rt.inq_corraddrphone >= 0							=>	min(le.inq_corraddrphone + rt.inq_corraddrphone, 254),
+																				 le.inq_corraddrphone in [-2,-3] and rt.inq_corraddrphone in [-2,-3]	=>	min(le.inq_corraddrphone, rt.inq_corraddrphone),
+																																																												max(le.inq_corraddrphone, rt.inq_corraddrphone));
+
 	self := rt;							
 end;
 
 with_phone_velocities := rollup( grouped_Phone_raw, roll_Phone(left,right), true);
-// output(choosen(with_phone_velocities, eyeball), named('with_phone_velocities'));
 
 
 // -----------------------------------------------------
@@ -1730,13 +2359,14 @@ layout_temp trans_name(layout_temp le, email_key rt) := transform
 															rt.search_info.product_code,
 															'', 
 															isFCRA, bsVersion,
-															rt.search_info.method);  														
+															rt.search_info.method, 
+															le.historyDateTimeStamp);  //for MS-160														
 	self.inquiryPerEmail := if(good_inquiry, 1, 0);   // any search at all by email that meets the good_inquiry criteria														
 	self.inquiryADLsPerEmail := if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromEmail := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
 	
 	logdate := trim(rt.search_info.datetime[1..8]);
-	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate);
+	agebucket := risk_indicators.iid_constants.age_bucket(logdate, le.historydate, le.historyDateTimeStamp);	//for MS-160
 	within1day_orig := Inquiry_AccLogs.shell_constants.age1day(logdate, le.historydate);
 	within1week_orig := Inquiry_AccLogs.shell_constants.age1week(logdate, le.historydate);
 	within1day_50 := Inquiry_AccLogs.shell_constants.age_in_days_using_timestamp(1, rt.search_info.datetime, le.historydateTimeStamp, le.historydate);
@@ -1784,11 +2414,8 @@ Email_raw_deltabase := join(with_phone_velocities, deltaBase_email_results,
 email_raw:= if(bsversion >= 50, dedup(sort(ungroup(Email_raw_base + Email_raw_updates + Email_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),
 									dedup(sort(ungroup(Email_raw_base + Email_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) );
 
-
-// email_raw:= dedup(sort(ungroup(Email_raw_base + Email_raw_updates + Email_raw_deltabase), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number);
 									
 grouped_Email_raw := group(sort(Email_raw, seq, -inquiryADLsFromEmail), seq);
-// output(grouped_Email_raw, named('grouped_Email_raw'));
 
 layout_temp roll_Email( layout_temp le, layout_temp rt ) := TRANSFORM	
 	self.inquiryPerEmail := le.inquiryPerEmail + rt.inquiryPerEmail;
@@ -1804,7 +2431,6 @@ layout_temp roll_Email( layout_temp le, layout_temp rt ) := TRANSFORM
 end;
 
 with_email_velocities := rollup( grouped_Email_raw, roll_Email(left,right), true);
-// output(choosen(with_email_velocities, eyeball), named('with_email_velocities'));
 
 // email velocity is nonfcra only and only shell 5.0 and higher
 with_all_velocities := if(bsversion>=50, with_email_velocities, with_phone_velocities);
@@ -1814,7 +2440,6 @@ with_inquiries := group(join(clam_pre_Inquiries, with_all_velocities, left.seq=r
 													self.acc_logs := right,
 													self.virtual_fraud := right.virtual_fraud,
 													self := left)), seq);				
-// output(choosen(with_inquiries, eyeball), named('with_inquiries'));
 
 
 // append the pre-calculated billgroup counts
@@ -1835,7 +2460,7 @@ with_billgroups := join(with_inquiries, billgroup_key,
 inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inquiries, seq) );
 
 // output(deltabase_URL, named('deltabase_URL'));
-// output(clam_pre_Inquiries_deltabase, named('clam_pre_Inquiries_deltabase'));
+// output(clam_pre_Inquiries, named('clam_pre_Inquiries'));
 // output(did_ds, named('did_ds'));
 // output(deltaBase_did_results, named('deltabase_did_results'));
 // output(j_raw_nonfcra_full, all, named('j_raw_nonfcra_full'));
@@ -1843,14 +2468,73 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 // output(j_raw_nonfcra_deltabase, all, named('j_raw_nonfcra_deltabase'));
 // output(j_raw_nonfcra1, all, named('j_raw_nonfcra1'));
 // output(j_raw, all, named('j_raw'));
+// output(grouped_raw, named('grouped_raw'));
 // output(rolled_raw, named('rolled_raw'));
+// output(deduped_Phones_per_adl, named('deduped_Phones_per_adl'));
+// output(slim_phones, named('slim_phones'));
+// output(substitutedPhones, named('substitutedPhones'));
+// output(rolledSubPhones, named('rolledSubPhones'));
+// output(deduped_Primrange_per_adl, named('deduped_Primrange_per_adl'));
+// output(slim_primrange, named('slim_primrange'));
+// output(substitutedPrimrange, named('substitutedPrimrange'));
+// output(rolledSubPrimrange, named('rolledSubPrimrange'));
+// output(deduped_fnames_per_adl, named('deduped_fnames_per_adl'));
+// output(slim_fnames, named('slim_fnames'));
+// output(substitutedFnames, named('substitutedFnames'));
+// output(rolledSubFnames, named('rolledSubFnames'));
+// output(deduped_SSN_per_adl, named('deduped_SSN_per_adl'));
+// output(slim_SSNs, named('slim_SSNs'));
+// output(substitutedSSNs, named('substitutedSSNs'));
+// output(rolledSubSSNs, named('rolledSubSSNs'));
+// output(deduped_DOBs_per_adl, named('deduped_DOBs_per_adl'));
+// output(slim_DOBs, named('slim_DOBs'));
+// output(substitutedDOBs, named('substitutedDOBs'));
+// output(rolledSubDOBs, named('rolledSubDOBs'));
+// output(deduped_lnames_per_adl, named('deduped_lnames_per_adl'));
+// output(slim_Lnames, named('slim_Lnames'));
+// output(substitutedLnames, named('substitutedLnames'));
+// output(rolledSubLnames, named('rolledSubLnames'));
+
+// output(with_SubPhones, named('with_SubPhones'));
+// output(with_addr_per_adl, named('with_addr_per_adl'));
+// output(with_Lnames_per_SSN, named('with_Lnames_per_SSN'));
+// output(with_Lnames_per_Addr, named('with_Lnames_per_Addr'));
 // output(with_emails_per_adl, named('with_emails_per_adl'));
+// output(ssn_raw, named('ssn_raw'));
+// output(rolled_ssn_raw, named('rolled_ssn_raw'));
+// output(addr_raw, named('addr_raw'));
+// output(rolled_addr_raw, named('rolled_addr_raw'));
+// output(phone_raw, named('phone_raw'));
+// output(addr_raw_base, named('addr_raw_base'));
+// output(addr_raw_updates, named('addr_raw_updates'));
+// output(addr_raw_deltabase, named('addr_raw_deltabase'));
+// output(addr_raw, named('addr_raw'));
+// output(sorted_SSNs_per_Addr, named('sorted_SSNs_per_Addr'));
+// output(rolled_SSNs_per_Addr, named('rolled_SSNs_per_Addr'));
+// output(deduped_SSN_per_addr, named('deduped_SSN_per_addr'));
+// output(slim_SSNsFromAddr, named('slim_SSNsFromAddr'));
+// output(SSNsFromAddr_1dig, named('SSNsFromAddr_1dig'));
+// output(rolledSSNsFromAddr_1dig, named('rolledSSNsFromAddr_1dig'));
+// output(with_SSNsFromAddr_1dig, named('with_SSNsFromAddr_1dig'));
+// output(rolled_addr_raw, named('rolled_addr_raw'));
+
 // output(with_ssn_velocity, named('with_ssn_velocity'));
 // output(with_address_velocities, named('with_address_velocities'));
 // output(with_phone_velocities, named('with_phone_velocities'));
 // output(with_email_velocities, named('with_email_velocities'));
 // output(with_inquiries, named('with_inquiries'));
 // output(with_billgroups, named('with_billgroups'));
+
+// output(rolled_addrs_per_adl, named('rolled_addrs_per_adl'));
+// output(deduped_SSN_per_adl, named('deduped_SSN_per_adl'));
+// output(slim_SSNs, named('slim_SSNs'));
+// output(substitutedSSNs, named('substitutedSSNs'));
+// output(rolledSubSSNs, named('rolledSubSSNs'));
+// output(slim_DOBs, named('slim_DOBs'));
+// output(substitutedDOBDay, named('substitutedDOBDay'));
+// output(rolledSubDOBDay, named('rolledSubDOBDay'));
+
+// output(inquiry_summary, named('inquiry_summary'));
 
 	return inquiry_summary;
 END;

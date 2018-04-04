@@ -1,4 +1,4 @@
-import tools,FraudShared;
+﻿import tools,FraudShared;
 
 export Create_Supers :=
 	tools.mod_Utilities.createallsupers(
@@ -9,5 +9,15 @@ export Create_Supers :=
 		FraudShared.keynames().dAll_filenames);
 
 //Create manually		
-	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::temp::passed');
-	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::temp::rejected');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::passed::knownfraud');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::passed::identitydata');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::passed::deltabase');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::passed::nac');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::passed::inquirylogs');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::rejected::knownfraud');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::rejected::identitydata');	
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::rejected::deltabase');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::rejected::nac');
+	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::rejected::inquirylogs');
+
+	// Std.File.CreateSuperFile('~thor_data400::Scrubs_FraudGov::Log');

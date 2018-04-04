@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -77,8 +77,11 @@ jCaseAty	:= join(sort(distribute(jCaseCourt,hash(county_code,idxno)),county_code
 									trim(left.idxno) = trim(right.idxno),
 									tCaseAtty(left,right), left outer, local);									
 
-fmtsin := '%m-%d-%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tCase(jCaseAty input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -92,7 +95,7 @@ self.court						  := map(trim(input.court_code) = '0' => 'NEW YORK STATE LOWER C
 																trim(input.court_code) = '1' => 'NEW YORK STATE SUPREME CIVIL COURT: '+input.county,
 																'NEW YORK STATE COURT');
 self.case_number				:= ClnCase;
-self.event_date					:= ut.ConvertDate(CHOOSE(C,input.rji_dispos_deadline,
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(CHOOSE(C,input.rji_dispos_deadline,
 																									input.rji_pre_noi_deadline,
 																									input.rji_noi_disp_deadline,
 																									input.noi_was_filed,
@@ -182,7 +185,7 @@ self.court						  := map(trim(input.court_code) = '0' => 'NEW YORK STATE LOWER C
 																trim(input.court_code) = '1' => 'NEW YORK STATE SUPREME CIVIL COURT: '+input.county,
 																'NEW YORK STATE COURT');
 self.case_number				:= ClnCase;
-self.event_date					:= ut.ConvertDate(CHOOSE(C,input.submission_date,
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(CHOOSE(C,input.submission_date,
 																									input.applying_filed,
 																									input.opposing_filed,
 																									input.date_of_decision,
@@ -245,7 +248,7 @@ self.court						  := map(trim(L.court_code) = '0' => 'NEW YORK STATE LOWER CIVIL
 																trim(L.court_code) = '1' => 'NEW YORK STATE SUPREME CIVIL COURT: '+L.county,
 																'NEW YORK STATE COURT');
 self.case_number				:= ClnCase;
-self.event_date					:= ut.ConvertDate(L.appearance_date,fmtsin,fmtout);
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(L.appearance_date,fmtsin,fmtout);
 self.event_type_code		:= L.appearance_type;
 self.event_type_description_1 := ut.CleanSpacesAndUpper(R.description);
 self.event_type_description_2 := trim(L.appearance_comment1,left,right)+' '+trim(L.appearance_comment2,left,right);

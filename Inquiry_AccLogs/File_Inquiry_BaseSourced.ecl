@@ -1,4 +1,4 @@
-import ut,data_services;
+﻿import ut,data_services;
 
 export File_Inquiry_BaseSourced := module
 
@@ -11,23 +11,19 @@ shared Blank_IDs(infile, outfile) := macro
 											self.search_info.function_description	:= Inquiry_AccLogs.fncleanfunctions.fnCleanUp(left.search_info.function_description);
 											self.mbs.company_id 				:= '';
 											self.mbs.global_company_id 	:= '';
+											self.bus_intel.sub_market := if (left.bus_intel.sub_market='CARD','CARDS',left.bus_intel.sub_market);
 											self := left));
 endmacro;
 
-Updates_Only :=	(inquiry_acclogs.File_Accurint_Logs_Common + //temporary comment out until rebuilt
-									inquiry_acclogs.File_Custom_Logs_Common +
-									inquiry_acclogs.File_Banko_Logs_Common + 
-									inquiry_acclogs.File_Bridger_Logs_Common + 
-									inquiry_acclogs.File_Riskwise_Logs_Common + 
-									Inquiry_AccLogs.File_Batch_Logs_Common + 
-									Inquiry_AccLogs.File_IDM_Logs_Common + 
-									Inquiry_AccLogs.File_BatchR3_Logs_Common)
-														 (~inquiry_acclogs.fnTranslations.is_SubMarketFilter(allow_flags.allowflags) and
-														 ~inquiry_acclogs.fnTranslations.is_IndustryFilter(allow_flags.allowflags) and
-														 ~inquiry_acclogs.fnTranslations.is_VerticalFilter(allow_flags.allowflags) and
-														 ~inquiry_acclogs.fnTranslations.is_Disable_Observation(allow_flags.allowflags) and
-														 ~inquiry_acclogs.fnTranslations.is_Internal(allow_flags.allowflags) and
-														 ~inquiry_acclogs.fnTranslations.is_AdditionalHealthcare(allow_flags.allowflags));
+USABase := Inquiry_AccLogs.fn_NonFCRABaseUSAfilter;
+
+Updates_Only :=	USABase
+								(~inquiry_acclogs.fnTranslations.is_SubMarketFilter(allow_flags.allowflags) and
+								 ~inquiry_acclogs.fnTranslations.is_IndustryFilter(allow_flags.allowflags) and
+								 ~inquiry_acclogs.fnTranslations.is_VerticalFilter(allow_flags.allowflags) and
+								 ~inquiry_acclogs.fnTranslations.is_Disable_Observation(allow_flags.allowflags) and
+								 ~inquiry_acclogs.fnTranslations.is_Internal(allow_flags.allowflags) and
+								 ~inquiry_acclogs.fnTranslations.is_AdditionalHealthcare(allow_flags.allowflags));
 
 Blank_IDs(Updates_Only, Updates_Only_Blank);
 

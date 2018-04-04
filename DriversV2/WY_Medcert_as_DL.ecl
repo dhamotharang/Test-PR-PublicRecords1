@@ -1,4 +1,6 @@
-IMPORT Ut, lib_stringlib, Drivers, DriversV2;
+﻿IMPORT Ut, lib_stringlib, Drivers, DriversV2;
+
+EXPORT WY_Medcert_as_DL(dataset(DriversV2.Layouts_DL_WY_In.Layout_WY_MedCert_Cleaned) pFile_WY_Input) := function
 
 bad_names  := ['UNKNOWN','UNK','UNKN','NONE','N/A','UNAVAILABLE'];
 bad_mnames := ['NMN','NMI'];
@@ -17,7 +19,7 @@ Layout_norm trfNormAddr(DriversV2.Layouts_DL_WY_In.Layout_WY_MedCert_Cleaned l, 
    SELF                := l;
 END;
 
-norm_file := NORMALIZE(DriversV2.File_DL_WY_MedCert_Update,
+norm_file := NORMALIZE(pFile_WY_Input,
                        IF(TRIM(LEFT.phys_STREET_ADDR_2) != '' AND TRIM(LEFT.phys_CITY_2) != '' AND TRIM(LEFT.phys_ZIP_CODE_2) != '',2,1),
 											 trfNormAddr(LEFT, COUNTER));
 
@@ -96,4 +98,8 @@ DriversV2.Layout_DL_Extended tTransform_WY_To_Common(Layout_norm pInput) := TRAN
 	SELF                          := pInput;     
 END;
 
-EXPORT WY_Medcert_as_DL := PROJECT(norm_file, tTransform_WY_To_Common(LEFT)) :PERSIST(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_WY_MedCert_as_DL');
+WY_Medcert_as_DL_mapper := PROJECT(norm_file, tTransform_WY_To_Common(LEFT));
+
+return WY_Medcert_as_DL_mapper;
+
+end;

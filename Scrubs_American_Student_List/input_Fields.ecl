@@ -1,4 +1,4 @@
-IMPORT SALT38;
+﻿IMPORT SALT38;
 EXPORT input_Fields := MODULE
  
 EXPORT NumFields := 29;
@@ -61,8 +61,8 @@ EXPORT InValidMessageFT_invalid_college_class(UNSIGNED1 wh) := CHOOSE(wh,SALT38.
 EXPORT MakeFT_invalid_college_code(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_college_code(SALT38.StrType s) := WHICH(((SALT38.StrType) s) NOT IN ['1','2','4','GR','']);
-EXPORT InValidMessageFT_invalid_college_code(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInEnum('1|2|4|GR|'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_college_code(SALT38.StrType s) := WHICH(((SALT38.StrType) s) NOT IN ['1','2','4','']);
+EXPORT InValidMessageFT_invalid_college_code(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInEnum('1|2|4|'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_college_type(SALT38.StrType s0) := FUNCTION
   RETURN  s0;

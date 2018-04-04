@@ -1,10 +1,6 @@
 IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
 
 EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip, string thor_name):= FUNCTION
-
-	#workunit('name', 'Deltabase Gateway Build - ' + version);
-	#workunit('priority','high');
-	#OPTION('multiplePersistInstances',FALSE);
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Spray Delta Gateway Files to Thor//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,14 +83,12 @@ EXPORT Proc_Build_Deltabase_Gateway(string version, const varstring eclsourceip,
 
 		sendEmail				:= sequential(sprayDltGwy, 
 																	bldDltGwyBase, clrDltGwyDelete, mvDltGwyBase,
-																	catDltGwyHistory, mvDltGwyHistory
+																	catDltGwyHistory, mvDltGwyHistory,
 																	//Only AT&T LIDB Deltabase is going to Prod for now; These records will be populated in the Phones Metadata Key
-																	//Keybuild, Strata, and Scrubs will be updated, once the other sources go live.
-																	/*bkDltGwy 
-																	mvBltDltGwy, 
-																	mvQADltGwy, 
+																	//Strata and Scrubs will be updated, once the other sources go live.
+																	bkDltGwy, mvBltDltGwy, mvQADltGwy)/*, 
 																	dopsUpdate,
-																	buildStrata*/):
+																	buildStrata)*/:
 																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'Deltabase Gateway Key Build Succeeded', workunit + ': Build completed.')),
 																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'Deltabase Gateway Build Failed', workunit + '\n' + FAILMESSAGE)
 																	);

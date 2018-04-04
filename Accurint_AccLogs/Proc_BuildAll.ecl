@@ -1,4 +1,4 @@
-import ut, RoxieKeybuild, data_services;
+﻿import ut, RoxieKeybuild, data_services;
 
 export Proc_BuildAll := function
 
@@ -9,7 +9,7 @@ export Proc_BuildAll := function
 
 //////// Are there new files in the logs thor super input file 
 
-for_filelist := nothor(fileservices.superfilecontents(data_services.foreign_logs + 'thor100_21::in::accurint_acclogs_cc'));
+for_filelist := nothor(fileservices.superfilecontents('~thor_data400::in::accurint_acclogs_cc'));
 
 newfiles := count(for_filelist) > 0;
 

@@ -1,4 +1,4 @@
-import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+﻿import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -67,6 +67,7 @@ export myGetDateTimestamp(string historydateTimeStamp, unsigned3 history_date) :
 	
 	ts := map(historydateTimeStamp_trim='' and history_date=999999 => todays_date + ' ' + ut.getTimeStamp()[1..8],
 						historydateTimeStamp_trim='' and history_date<>999999 => (string)history_date + defaultTimeStamp  , // hard code 01 as the day, and hard code the time
+						historydateTimeStamp_trim[1..6] = '999999' => todays_date + ' ' + ut.getTimeStamp()[1..8],	//even though this should be an 8 digit date, account for if only 6 nines are passed in to indicate current
 					  historydateTimeStamp_trim<>'' and length(historydateTimeStamp_trim)=6 => historydatetimestamp[1..6] + defaultTimeStamp, // YYYYMM support for historydatetimestamp
 						historydatetimestamp);  // otherwise, simply use the full timestamp the user sent in
 	return ts;
@@ -382,9 +383,9 @@ export dobmatch_score_exact6(boolean indobpop, boolean founddobpop, string8 indo
 
 export SIC_Prison := '2225';
 
-
-export age_bucket(string logdate, unsigned3 historydate) := function
-	today := mygetdate(historydate);
+//for MS-160
+export age_bucket(string logdate, unsigned3 historydate, string historyDateTimeStamp = '') := function
+	today := if(historyDateTimeStamp <> '', historyDateTimeStamp[1..8], mygetdate(historydate));
 	days := ut.DaysApart( logdate, today );
 	ageBucket := map(logdate='' => 0,
 		days <= 30  => 1,
@@ -713,5 +714,164 @@ export SetFICOScoreXDRejectCodes := ['A1','B0','C1','C6','C7','C8','C9','CC','CD
 																		 'CZ','L0','N1','R0','X1','X3','X4','X5','X6','X7',
 																		 'A1','C1','C2','C3','C4','C6','L0','L1','L2','L3',
 																		 'L4','L5','L6','L7','R0','X5'];
+
+//MS-104
+export subsLayout := record
+	unsigned4 seq;
+	string30	subsString;
+	unsigned4 subsCount;
+end;
+
+// accepts a record set of unique string values and a single string and compares the single string to those in the record set using the editDistance function to count how many are off by 1 char
+export countSubs(GROUPED DATASET(subsLayout) subsFile, string30 currString) := function
+	subsLayout projNames(subsLayout le) := transform
+		self.seq							:= le.seq;
+		self.subsString				:= le.subsString;
+		editDistance			 		:= STD.Str.EditDistance(currString,le.subsString);
+		self.subsCount				:= if(editDistance = 1, 1, 0);
+	end;
+	projSubs 	:= project(subsFile, projNames(left));
+	countSubs	:= exists(projSubs(subsCount = 1));
+	return (integer)countSubs;
+end;
+
+
+// accepts a record set of unique DOB values and a single DOB value and compares to see if any in the record set have same year and month but different day and counts those that do
+export countSubDOBDay(GROUPED DATASET(subsLayout) subsFile, string30 currString) := function
+	subsLayout projDOBDay(subsLayout le) := transform
+		self.seq							:= le.seq;
+		self.subsString				:= le.subsString;
+		dayIsDiff							:= currString[1..6] = le.subsString[1..6] and currString[7..8] <> le.subsString[7..8];  
+		self.subsCount				:= if(dayIsDiff, 1, 0);
+	end;
+	projSubsDOBDay	:= project(subsFile, projDOBDay(left));
+	countSubsDOBDay	:= exists(projSubsDOBDay(subsCount = 1));
+	return (integer)countSubsDOBDay;
+end;
+
+// accepts a record set of unique DOB values and a single DOB value and compares to see if any in the record set have same year and day but different month and counts those that do
+export countSubDOBMonth(GROUPED DATASET(subsLayout) subsFile, string30 currString) := function
+	subsLayout projDOBMonth(subsLayout le) := transform
+		self.seq							:= le.seq;
+		self.subsString				:= le.subsString;
+		MonthIsDiff						:= currString[1..4] = le.subsString[1..4] and currString[7..8] = le.subsString[7..8] and currString[5..6] <> le.subsString[5..6]; 
+		self.subsCount				:= if(MonthIsDiff, 1, 0);
+	end;
+	projSubsDOBMonth	:= project(subsFile, projDOBMonth(left));
+	countSubsDOBMonth	:= exists(projSubsDOBMonth(subsCount = 1));
+	return (integer)countSubsDOBMonth;
+end;
+
+// accepts a record set of unique DOB values and a single DOB value and compares to see if any in the record set have same month and day but different year and counts those that do
+export countSubDOBYear(GROUPED DATASET(subsLayout) subsFile, string30 currString) := function
+	subsLayout projDOBYear(subsLayout le) := transform
+		self.seq							:= le.seq;
+		self.subsString				:= le.subsString;
+		YearIsDiff						:= currString[5..8] = le.subsString[5..8] and currString[1..4] <> le.subsString[1..4]; 
+		self.subsCount				:= if(YearIsDiff, 1, 0);
+	end;
+	projSubsDOBYear	:= project(subsFile, projDOBYear(left));
+	countSubsDOBYear	:= exists(projSubsDOBYear(subsCount = 1));
+	return (integer)countSubsDOBYear;
+end;
+
+//MS-105
+export diffValues1Dig := [1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000];
+
+// accepts a record set of unique numeric values and a single value and compares to see if any in the record set have 1 digit that is different by 1 and counts those that are
+export countDiff1Dig(GROUPED DATASET(subsLayout) subsFile, string30 currString) := function
+	subsLayout proj1dig(subsLayout le) := transform
+		self.seq							:= le.seq;
+		self.subsString				:= le.subsString;
+		diffValue							:= abs((integer)currString - (integer)le.subsString); 
+		diff1dig							:= diffValue in diffValues1Dig;  //if the difference in the two values is any of the numbers in the set, than only 1 digit is off by 1
+		self.subsCount				:= if(diff1dig, 1, 0);
+	end;
+	projDiff1Dig	:= project(subsFile, proj1dig(left));
+	countDiffs1Dig	:= exists(projDiff1Dig(subsCount = 1));
+	// countDiffs1Dig	:= count(projDiff1Dig(subsCount = 1) > 0);
+	return (integer)countDiffs1Dig;
+	
+end;
+
+export Set_Restricted_States_For_Marketing := ['ID', 'IL', 'KS', 'NM', 'SC', 'WA', 'NY'];
+export Set_Restricted_Colleges_For_Marketing := [
+'15322',
+'15323',
+'15324',
+'15325',
+'15326',
+'15327',
+'15328',
+'15329',
+'15330',
+'15331',
+'15334',
+'15335',
+'15336',
+'15337',
+'15338',
+'15340',
+'15341',
+'15343',
+'15344',
+'15345',
+'15346',
+'15347',
+'15348',
+'15349',
+'15350',
+'15351',
+'15352',
+'15353',
+'15354',
+'15355',
+'15356',
+'15357',
+'15360',
+'15362',
+'15363',
+'15364',
+'15366',
+'15368',
+'15371',
+'15372',
+'15373',
+'15378',
+'15417',
+'15418',
+'15419',
+'15421',
+'15423',
+'15425',
+'15426',
+'15431',
+'15432',
+'15434',
+'15436',
+'15438',
+'15439',
+'15441',
+'15443',
+'15444',
+'15446',
+'15856',
+'15858',
+'15873',
+'15877',
+'15896',
+'15901',
+'15904',
+'16172',
+'16174',
+'16176',
+'16178',
+'16179',
+'16181',
+'16182',
+'16189',
+'16196',
+'16198',
+'16201'];
 
 end;

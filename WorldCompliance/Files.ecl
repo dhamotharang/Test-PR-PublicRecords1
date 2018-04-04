@@ -1,4 +1,4 @@
-EXPORT Files := MODULE
+﻿EXPORT Files := MODULE
 
 Entities 					:= ['Individual','Organization','Vessel','Bank','Aircraft'];
 
@@ -12,6 +12,10 @@ export dsAddresses := DISTRIBUTE(
 					DATASET(root+'addresses', Layouts.rAddress, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),
 					Ent_id);
 export dsRelationships := DATASET(root+'relationships', Layouts.rRelationship, CSV(separator('|'),heading(1),quote('\t'),UNICODE))(rid<>0,RelationId<>0);
+
+export dsSanctionsDOB := DISTRIBUTE(
+					DATASET(root+'SanctionsDOB', Layouts.rSanctionsDOB, CSV(separator('|'),heading(1),quote('\t'),UNICODE)),
+					SanctionsDobId);
 
 WhiteListEntities := ['Branch', 'Lead', 'Member', 'Single', 'Sponsoring Entity'];
 export dsWhiteListEntities := 

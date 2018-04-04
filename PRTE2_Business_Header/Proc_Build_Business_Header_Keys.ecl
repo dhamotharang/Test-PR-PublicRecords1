@@ -1,4 +1,4 @@
-import Business_Header, Business_Header_SS, ut, business_risk, doxie_cbrs, roxiekeybuild, VersionControl;
+﻿import Business_Header, Business_Header_SS, ut, business_risk, doxie_cbrs, roxiekeybuild, VersionControl;
 
 export Proc_Build_Business_Header_Keys(
 
@@ -71,7 +71,7 @@ module
 		,Build_Slimsort_CN_Phone_File	
 		,Build_Slimsort_CN_Fein_File	
 		,Build_Supergroup_File			
-	) : success(output('Build Business Header Base Files Complete'));
+	) : success(output('Build PRCT Business Header Base Files Complete'));
 
 	shared keygroupnames := 
 				keyname.HeaderBest.FileposData.dAll_filenames                                                                           
@@ -129,10 +129,10 @@ module
 			,Build_Base_Rcid_Key
 			,Build_Commercial_Siccode_Key				
 
-		)) : success(output('Build Business Header Slimsort, Supergroup, and Best Keys Complete'));
+		)) : success(output('Build PRCT Business Header Slimsort, Supergroup, and Best Keys Complete'));
 
 	export all := sequential(
-		 if(pbuild_base_files, Build_Bases, output('Base files and SFs not affected.'))
+		 if(pbuild_base_files, Build_Bases, output('PRCT Base files and SFs not affected.'))
 		,PRTE2_business_header.promote(pversion,'^~prte.*?base::business_header.*').new2built
 		,Build_Keys
 		,PRTE2_business_header.promote(pversion,'^(.*?)key(.*?)$').new2built

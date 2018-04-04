@@ -1,12 +1,12 @@
-EXPORT BuildData(string version) := FUNCTION
+﻿EXPORT BuildData(string version) := FUNCTION
 
-		hdrin := cortera.File_Header_In(version);
+		hdrin := cortera.File_Header_In;
 
 		ds := Cortera.proc_processHeader(hdrin, version) : INDEPENDENT;
 		exec := Cortera.proc_createExecutives(ds) : INDEPENDENT;
 		bizlinking := Cortera.As_Business_Linking(exec(country='US'));
 		industry := Cortera.As_Industry(exec(country='US'));
-		attr := Cortera.proc_processAttributes(ds, Cortera.File_Attributes_In(version), version);
+		attr := Cortera.proc_processAttributes(ds, Cortera.File_Attributes_In, version);
 
 		lfnHdr := Cortera.Constants.sfCorteraHdr + '::' + version;
 		lfnexecutives := Cortera.Constants.sfExecutives + '::' + version;
@@ -23,11 +23,11 @@ EXPORT BuildData(string version) := FUNCTION
 				OUTPUT(attr,,lfnAttributes, COMPRESSED, OVERWRITE)
 			),
 			PARALLEL(
-				Cortera.Promote.CorteraHeader(lfnHdr),
-				Cortera.Promote.Executives(lfnexecutives),
-				Cortera.Promote.CorteraAsLinking(lfnLinking),
-				Cortera.Promote.industry(lfnIndustry),
-				Cortera.Promote.Attributes(lfnAttributes)
+				Cortera.Promote().CorteraHeader(lfnHdr),
+				Cortera.Promote().Executives(lfnexecutives),
+				Cortera.Promote().CorteraAsLinking(lfnLinking),
+				Cortera.Promote().industry(lfnIndustry),
+				Cortera.Promote().Attributes(lfnAttributes)
 			)
 		);
 	

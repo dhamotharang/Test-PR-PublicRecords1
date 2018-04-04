@@ -1,4 +1,4 @@
-IMPORT PRTE2_DCA, PRTE2;
+﻿IMPORT PRTE2_DCA, PRTE2;
 
 EXPORT Files := MODULE
 
@@ -51,10 +51,11 @@ EXPORT Files := MODULE
 		PROJECT(file_base, 
 						Transform(Layouts.layout_linkids,
 											SELF.rawfields	:= LEFT.companies;
-                      SELF 						:= LEFT;
-											SELF						:= [];
+           SELF := LEFT;
+											SELF	:= [];
 											));
 
+                     
 	EXPORT file_bdid := 
 		PROJECT(file_base, 
 						Transform(Layouts.layout_bdid,
@@ -148,5 +149,14 @@ EXPORT Files := MODULE
 		PROJECT(file_base_empty, Transform(Layouts.layout_autokey,	SELF:=Left;	SELF := [];));
 	//end empty key files
 	
+ //needed for BIP header
+	EXPORT file_base_companies := 
+		PROJECT(file_base, 
+						Transform(Layouts.layout_base_companies,
+											SELF.rawfields	:= LEFT.companies;
+           SELF := LEFT;
+											SELF	:= [];
+											));
+                      
 
 END;

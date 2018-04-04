@@ -1,21 +1,29 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, lib_word;
+﻿import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, lib_word, Data_Services;
 import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
 
 export fnMapCommon_Batch := module
 
+
+shared rawfile := distribute(inquiry_acclogs.File_Batch_Logs.input 
+																				(orig_method <> 'METHOD' and 
+																				 orig_global_company_id <> '' and 
+																				 length(orig_datetime_stamp) < 20 and 
+																				 length(orig_domain_name) < 60)  
+														); 		
+																		
+shared inputfile := project(rawfile,transform(Inquiry_AccLogs.Layout_Batch_Logs.input,
+													self := left));
+
+export additionfile := project(rawfile,transform({Inquiry_AccLogs.Layout_Batch_Logs.addedInput},
+													self := left));
+													
 export clean := function
 
 n := inquiry_acclogs.test_count; /* n - to test a sample set, 0 to run all */
 										
 NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
-inputfile := distribute(choosen(inquiry_acclogs.File_Batch_Logs.input
-																				(orig_method <> 'METHOD' and orig_global_company_id <> '' and length(orig_datetime_stamp) < 20 and length(orig_domain_name) < 60)  
-																				// (orig_last_name not in nullset or
-																				 // orig_company_name not in nullset))
-																		,IF(n > 0, n, choosen:ALL)), random()) // choosen for testing purposes
-																		; 		
-																		
+																	
 blankRefCode := inputfile(length(orig_address1_z5 + orig_address1_z4) < 12);
 
 inquiry_acclogs.fncleanfunctions.cleanfields(blankRefCode, cleaned_fields);

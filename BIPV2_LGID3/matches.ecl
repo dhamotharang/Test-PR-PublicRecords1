@@ -1,4 +1,4 @@
-// Begin code to perform the matching itself
+﻿// Begin code to perform the matching itself
  
 IMPORT SALT30,ut,std;
 EXPORT matches(DATASET(layout_LGID3) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
@@ -16,7 +16,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   SELF.rcid1 := le.rcid;
   SELF.rcid2 := ri.rcid;
   SELF.DateOverlap := SALT30.fn_ComputeDateOverlap(((UNSIGNED)le.dt_first_seen),((UNSIGNED)le.dt_last_seen),((UNSIGNED)ri.dt_first_seen),((UNSIGNED)ri.dt_last_seen));
-  INTEGER2 sbfe_id_score_temp := MAP(
+  INTEGER2 sbfe_id_score := MAP(
                         le.sbfe_id_isnull OR ri.sbfe_id_isnull => 0,
                         le.sbfe_id = ri.sbfe_id  => le.sbfe_id_weight100,
                         SALT30.Fn_Fail_Scale(le.sbfe_id_weight100,s.sbfe_id_switch));
@@ -53,7 +53,6 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.cnp_btype_isnull OR ri.cnp_btype_isnull => 0,
                         le.cnp_btype = ri.cnp_btype  => le.cnp_btype_weight100,
                         SALT30.Fn_Fail_Scale(le.cnp_btype_weight100,s.cnp_btype_switch));
-  INTEGER2 sbfe_id_score := sbfe_id_score_temp*2.00; 
   INTEGER2 Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_duns_number_score := MAP(
                         le.active_duns_number_isnull OR ri.active_duns_number_isnull => 0,

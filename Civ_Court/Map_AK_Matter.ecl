@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut;
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, crim_common, ut;
 
 fAlaska 	:= Civ_Court.File_In_AK.Input(case_type = 'Civil');
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tAlaskaMatter(fAlaska input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -27,7 +30,7 @@ self.case_cause					:= ut.CleanSpacesAndUpper(input.criminal_charge_offense);
 self.manner_of_filing_code		:= '';
 self.manner_of_filing		:= '';
 self.filing_date				:= IF(input.date_filed <> '', 
-                              ut.ConvertDate(input.date_filed),
+                              Std.date.ConvertDateFormatMultiple(input.date_filed,fmtsin,fmtout),
 															'');
 self.manner_of_judgmt_code		:= '';
 self.manner_of_judgmt		:= '';

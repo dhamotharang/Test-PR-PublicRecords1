@@ -1,4 +1,4 @@
-#workunit('name','DEA Weekly Build');
+﻿#workunit('name','Yogurt: DEA Daily Build');
 #OPTION('multiplePersistInstances',FALSE);
 import ut, roxiekeybuild, tools, DEA, Orbit3;
 export proc_build_all(string sourceip,string filename,string filedate,string do_spray='true') :=
@@ -28,7 +28,7 @@ build_dea_keys :=	dea.proc_build_key(filedate);
 
 update_dops := RoxieKeyBuild.updateversion('DEAKeys',(filedate),'Darren.Knowles@lexisnexis.com;charlene.ros@lexisnexis.com',,'N|B');
 
-orbit_update := Orbit3.proc_Orbit3_CreateBuild('DEA',(filedate),'N|B');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('DEA',(filedate),'N|B');
 
 e_mail_ret := if(do_spray='true',
 						sequential(pre,

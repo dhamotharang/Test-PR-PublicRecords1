@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 tmp := Spokeo.File_Processed;
 
 r1 := RECORD
@@ -10,6 +10,10 @@ r1 := RECORD
 		string3				score;
 		string50			name;
 		string50			cln_name;
+		string20			Best_First_Name;
+		string20			Best_Middle_Name;
+		string20			Best_Last_Name;
+		string5				Best_Name_Suffix;
 		string60			addr1;
 		string40			addr2;
 		string60			cln_addr1;
@@ -25,9 +29,16 @@ r1 := RECORD
 		boolean				deceased;
 		string10			phone;
 		string8				dob;
+		unsigned8			hhid;
+		string6				Best_Birth_YearMonth;
+		string1				judgments := '';
+		string1				civilCourtRecords := '';
+		string1				crimCourtRecords := '';
+		string1				curr_incar_flag := '';
+		string1				foreclosures := '';
+		string1				bankruptcy := '';
 		string10      geo_lat;
 		string11      geo_long;
-		unsigned8			hhid;
 		string64			SpokeoID;
 END;
 

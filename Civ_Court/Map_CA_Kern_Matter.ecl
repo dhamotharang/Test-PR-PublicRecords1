@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut;
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, crim_common, ut;
 
 fKern 	:= Civ_Court.Files_In_CA_Kern.civil;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tKern(fKern input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -23,7 +26,7 @@ self.case_type_code			:= ut.CleanSpacesAndUpper(input.jc1);
 self.case_type					:= '';
 self.case_cause_code		:= ut.CleanSpacesAndUpper(input.jc2);
 self.case_cause					:= '';
-self.filing_date				:= ut.ConvertDate(input.filedate);
+self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.filedate,fmtsin,fmtout);
 self := [];
 END;
 
@@ -68,7 +71,8 @@ self.parent_case_key		:= '';
 self.court						  := 'KERN COUNTY-CIVIL COURT';
 self.case_number				:= input.CaseNumber;
 a := stringlib.StringFind(input.FileDate, ' 0:00', 1);
-self.filing_date				:= ut.ConvertDate(input.FileDate[1..a]);
+self.filing_date				:= if(stringlib.StringFind(input.FileDate, ' 0:00', 1) = 1,Std.Date.ConvertDateFormatMultiple(input.FileDate[1..a],fmtsin,fmtout),
+                              Std.Date.ConvertDateFormatMultiple(input.FileDate,fmtsin,fmtout));
 self := [];
 END;
 										

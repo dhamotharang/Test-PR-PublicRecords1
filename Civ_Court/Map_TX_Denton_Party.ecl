@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib, Address, STD;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Address, STD;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -8,9 +8,9 @@ fTXDenton	:= Civ_Court.File_In_TX_Denton;
 
 fmtsin := [
 		'%m/%d/%Y',
-		'%m/%d/%y'
-];
-fmtout := '%Y%m%d';
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 dba_pattern		:= '(.*)DBA(.*)';
 aka_pattern		:= '(.*)AKA(.*)';
@@ -20,7 +20,7 @@ Civil_Court.Layout_In_Party tDenton(fTXDenton input, integer1 C) := TRANSFORM
 	self.vendor						  := '39';
 	self.state_origin				:= 'TX';
 	self.source_file				:= 'TX_DENTON_COUNTY';
-	StdFileDate							:= ut.ConvertDateMultiple(input.FiledDate,fmtsin,fmtout);
+	StdFileDate							:= Std.date.ConvertDateFormatMultiple(input.FiledDate,fmtsin,fmtout);
 	self.case_key						:= '39'+ut.CleanSpacesAndUpper(input.CaseNumber)+StdFileDate;
 	self.parent_case_key		:='';
 	self.court_code					:='';

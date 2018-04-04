@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr, Corp2,BIPV2;
+﻿IMPORT  doxie,mdr, Corp2,BIPV2;
 
 EXPORT keys := MODULE
 
@@ -31,7 +31,7 @@ EXPORT key_corp_ar := INDEX(FILES.DS_AR_key, {corp_key,record_type},
 	 {FILES.DS_corp_charter_key}, 
 	Constants.KeyName_corp2 + doxie.Version_SuperKey + '::corp::st.charter_number');
 		
-	EXPORT key_corp2_corpbdidpl := INDEX(Files.DS_corp_pl_key,
+	EXPORT key_corp2_corpbdidpl := INDEX(Files.DS_corp_pl_key (bdid!=0), 
 	 {bdid}, {Files.DS_corp_pl_key},
 	 Constants.KeyName_corp2 + doxie.Version_SuperKey + '::corp::bdid.pl');
 	 

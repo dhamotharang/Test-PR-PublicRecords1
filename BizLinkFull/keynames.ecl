@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT keynames(
    string   pversion              = ''
 	,boolean	pUseOtherEnvironment	= false
@@ -45,8 +45,8 @@ module
 
   export dall_filenames := 
       meow                      .dall_filenames
-    + refs                      .dall_filenames
-    + words                     .dall_filenames
+    // + refs                      .dall_filenames
+    // + words                     .dall_filenames
     + refs_l_cnpname            .dall_filenames
     + refs_l_cnpname_zip        .dall_filenames
     + refs_l_cnpname_st         .dall_filenames

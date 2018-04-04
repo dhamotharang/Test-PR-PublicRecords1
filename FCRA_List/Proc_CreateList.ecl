@@ -1,4 +1,4 @@
-import Header, Watercraft, Gong_Neustar, InfutorCID, Impulse_Email, HMS, Infogroup, iBehavior, AutoStandardI, Suppress,PromoteSupers, ALC, prof_license, doxie_build, ut,FCRA_LIST,STD,_control;
+﻿import Header, Watercraft, Gong_Neustar, InfutorCID, Impulse_Email,iBehavior, AutoStandardI, Suppress,PromoteSupers, prof_license, doxie_build, ut,FCRA_LIST,STD,_control,Risk_Indicators;
 
 EXPORT Proc_CreateList(STRING pversion = '', boolean pUseProd = false) := module
 
@@ -7,7 +7,7 @@ EXPORT Proc_CreateList(STRING pversion = '', boolean pUseProd = false) := module
 
 //Proflic 
 
-approved_proflic := FCRA_list.proflic_as_header(,,true);
+approved_proflic := prof_license.proflic_as_header(,,,true);
 
 //FCRA header 
 incoming_file := //Header.File_FCRA_Headers;
@@ -23,52 +23,18 @@ approved_header := dsMarket_combine;
 
 //Watercraft Sources(8W)
 
-approved_watercraft := watercraft.Watercraft_as_Header(,,,,true);
+//approved_watercraft := watercraft.Watercraft_as_Header(,,,,true);
 
-//Neustar(GN)
-approved_gong := FCRA_List.Gong_as_header(,true);
+//Combine all sources
+combine_file := project(fcra_list.fn_header_joined(approved_proflic), header.Layout_Header)+ approved_header;
 
-//Infutor Data Solutions(IR)
-approved_InfutorCID := FCRA_list.InfutorCID_as_header(,true);
+dedup_all := dedup(sort(distribute(combine_file, hash(did)), record, local), record, local): persist('~thor_data400::persist::header_list_generate_fcra_pre_correction');
+/* ****************************************************
+ *                  Apply Corrections                 *
+ ****************************************************** */
+base_hf_corrected := Risk_Indicators.Header_Corrections_Function(dedup_all);
 
-//Purchase Activity(IB) will be added in phase2 
-//approved_iBehavior_Consumer := FCRA_list.iBehavior_as_header;
-
-//Impulse Subprime Credit Information Requests(IM)
-//approved_Impulse_Email := FCRA_list.Impulse_Email_as_header(,true);
-
-//CNLD_Practitioner
-
-approved_CNLD := FCRA_list.CNLD_Practitioner_as_header(,true);
-
-//NCPDP
-
-approved_NCPDP := FCRA_list.NCPDP_as_header(,true);
-
-//Proflic Mari
-
-approved_Proflic_Mari := FCRA_list.Mari_as_header(,true);
-
-//the below sources will be added in phase2
-//HMS
-//approved_HMS	:= HMS.Files(pversion,pUseProd).Individual_Base.Built(did != 0);
-
-//ALC-- in development
-//approved_ALC := ALC.Files().Base.Built(did != 0);
-
-//Infogroup(X3)
-//approved_Infogroup := Infogroup.Files(pversion,false).Base.Built(did != 0);
-
-//Combine all sources 
-
-combine_file := project(approved_proflic + approved_Watercraft + approved_gong + approved_infutorCID 
- + approved_CNLD + approved_NCPDP + approved_Proflic_Mari, header.Layout_Header)
- + approved_header;// + convert_infogroup + convert_HMS + convert_alc + approved_iBehavior_Consumer;
-
-
-dedup_all := dedup(sort(distribute(combine_file, hash(did)), record, local), record, local);
-
-PromoteSupers.MAC_SF_BuildProcess(dedup_all,'~thor_data400::base::header_list_generate_fcra',buildFCRA,3,,true);
+PromoteSupers.MAC_SF_BuildProcess(base_hf_corrected,'~thor_data400::base::header_list_generate_fcra',buildFCRA,3,,true);
 
 export buildbase := buildFCRA;
 

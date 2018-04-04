@@ -1,4 +1,4 @@
-IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data,
+﻿IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data,
        Gong, MDR, STD,  ut;
 
 EXPORT Best := MODULE
@@ -94,10 +94,7 @@ EXPORT Best := MODULE
 												TRANSFORM({BusinessBatch_BIP.Layouts.Best_Final; INTEGER2 record_score;},
 													SELF.acctno := LEFT.acctno;
 													SELF.record_score := LEFT.record_score;
-													// tmpULTID := LEFT.ULTID;
-													// tmpORGID := LEFT.ORGID;
-													// tmpSELEID := LEFT.SELEID;
-													
+												
 													SELF.ultid := LEFT.ultid;
 													SELF.orgid := LEFT.orgid;
 													SELF.seleid := LEFT.seleid;
@@ -501,6 +498,7 @@ END;
    DS_SELEBestRecsAcctnoBH := PROJECT(ds_SeleBest, TRANSFORM(
 	                      {STRING20 acctno; UNSIGNED6 ultid; UNSIGNED6 orgid; UNSIGNED6 seleid;},
 	                                                 SELF := LEFT));	 
+   DS_SELEBestRecsAcctnoBHSlim := DEDUP(DS_SELEBestRecsAcctnoBH, ALL);																							 
 	 FETCH_LEVEL := BIPV2.IDconstants.Fetch_Level_SELEID;
 	 linkidsOnly := DEDUP(SORT(PROJECT(DS_SELEBestRecsAcctnoBH, TRANSFORM(
 																											 BIPV2.IDlayouts.l_xlink_ids, SELF.ultid := LEFT.ultid;
@@ -567,7 +565,7 @@ END;
 		                                               #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_org_structure_derived, RECORD),
 	                                                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_org_structure_derived);
 
-  ds_busHeaderRecsIsCorporationOrLLCWAcctno := JOIN(SORT(DS_SELEBestRecsAcctnoBH, #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
+  ds_busHeaderRecsIsCorporationOrLLCWAcctno := JOIN(SORT(DS_SELEBestRecsAcctnoBHSlim, #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
 	                                                 ds_busHeaderRecsIsCorporationOrLLC,
 																									  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 																										TRANSFORM(BusinessBatch_BIP.Layouts.BusinessType_Final,
@@ -577,14 +575,13 @@ END;
 																						
 																								isLLC := STD.Str.Find(right.company_org_structure_derived,
 																								       'LIMITED LIABILITY CORPORATION',1) > 0;
-																	                    SELF.BUSINESS_TYPE := IF (IsCorp, 'Corporation', 
-																		                          IF (isLLC, 'LLC', ''));
+																	                    
 																											SELF := RIGHT;
 																											SELF := []), LEFT OUTER, LIMIT(0), KEEP(1));
    																									 
     ds_busHeaderRecsSlimSorted := SORT(ds_busHeaderRecsSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), RECORD);
    // add back acctno to the DS.
-   DS_BHRecsWAcctno := 	JOIN(SORT(DS_SELEBestRecsAcctnoBH,#expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
+   DS_BHRecsWAcctno := 	JOIN(SORT(DS_SELEBestRecsAcctnoBHSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
                                      	ds_busHeaderRecsSlimSorted,
 	                             BIPV2.IDmacros.mac_JoinTop3Linkids(),
 															TRANSFORM(rec_seleBest,
@@ -666,12 +663,12 @@ END;
 	ds_initialAcctno := PROJECT(ds_seleBest, TRANSFORM({STRING20 acctno;
 	                                     UNSIGNED6 ultid; UNSIGNED6 orgid;UNSIGNED6 seleid;},
 																			 SELF := LEFT));
-
+  ds_initialacctnoSlim := dedup(ds_initialAcctno, all);
   // this left outer is done cause ds_addressVarsOut might be empty need to 'seed'
 	// the resulting DS with acctno's as its built to ensure 
 	// e.g. extra fein variations are added in even if there are not extra address variations
 	// so join together the addresses/cname variations and fein variations.
-	ds_AddressVarsOut := JOIN(ds_initialAcctno, ds_AddressVarsOutStart,
+	ds_AddressVarsOut := JOIN(ds_initialAcctnoSlim, ds_AddressVarsOutStart,
 	                      LEFT.acctno = RIGHT.acctno AND
 											 BIPV2.IDmacros.mac_JoinTop3Linkids(),
 												  TRANSFORM(BusinessBatch_BIP.Layouts.ADDRESS_Final,
@@ -711,7 +708,7 @@ END;
 	                              LEFT.acctno = RIGHT.acctno AND
 																  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 																	TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,																	 
-																	  SELF.BUSINESS_TYPE := RIGHT.BUSINESS_TYPE;
+																	 
 																		SELF := LEFT,
 																		SELF := []),
 																		LEFT OUTER);
@@ -724,7 +721,7 @@ END;
                                    SELF := LEFT,																													 
 																	 SELF := RIGHT,
 																	 SELF :=[];
-																	 ), LEFT OUTER); 																		 
+																	 ), LEFT OUTER);										 
 																									 
   // add in current businesses count.
 	ds_ActiveAddrVariationsCountFinal := JOIN(ds_nameAddressFeinVarsOutFinal, ds_ActiveAddrVariationsCount,
@@ -739,15 +736,14 @@ END;
 																			 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
 																			  SELF.Input_total_businesses_history := RIGHT.cnt;
 																				SELF := LEFT), 
-																				LEFT OUTER);																				
+																				LEFT OUTER);																			
 	
 	// now need to combine the best/parent DS with variations of addresses/cnames/feins
 	DS_BestNameAddressOutputTmp := PROJECT(SORT(JOIN(ds_seleidBestout, ds_InActiveAddrVariationsCountFinal,
 	                                 LEFT.acctno = RIGHT.acctno AND
 																	  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 																	 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVarsTmp,
-																	 SELF.years_in_business :=  RIGHT.Years_in_business;																	 
-																	 SELF.business_type := RIGHT.business_type;
+																	 SELF.years_in_business :=  RIGHT.Years_in_business;																	 	                                 																 
 																	 SELF.Input_residential := RIGHT.Input_residential;
 																	 SELF.Input_total_businesses_Active := RIGHT.Input_Total_businesses_active;
 																	 SELF.Input_total_businesses_history := RIGHT.Input_total_businesses_history;
@@ -755,30 +751,30 @@ END;
 																	                                          right.total_fein);
 																	 SELF := LEFT,
 																	 SELF := RIGHT,
-																	 SELF :=[];
+																	 SELF :=[]; // self.business_type set later from corp data
 																	 )), acctno,record), BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars);	  																		  
    
 	 // output(DS_SeleBestGrouped, named('DS_SeleBestGrouped'));
 	  //output(ds_seleBest, named('ds_seleBest'));
 	  //output(ds_seleBestSORTEDBYRecordScore, named('ds_seleBestSORTEDBYRecordScore'));
 	// output(ds_SeleBestWacctno, named('ds_SeleBestWacctno'));
-	//output(DS_SELEBestRecsAcctnoBH, named('DS_SELEBestRecsAcctnoBH'));
-
+	// output(DS_SELEBestRecsAcctnoBH, named('DS_SELEBestRecsAcctnoBH'));
+  // output(DS_SELEBestRecsAcctnoBHSlim, named('DS_SELEBestRecsAcctnoBHSlim'));
 	  //output(ds_SeleBestWacctnoSorted, named('ds_SeleBestWacctnoSorted'));
 		//output(ds_parents, named('ds_parents'));
 	  //output(ds_seleidBestWithParent, named('ds_seleidBestWithParent'));
 	 
 		// output(ds_seleidBestWithParent_Sorted, named('ds_seleidBestWithParent_Sorted'));
 
-
-		// output(ds_initialAcctno, named('ds_initialAcctno'));
+    
+		//output(ds_initialAcctno, named('ds_initialAcctno'));
 	 // output(ds_seleidBestout, named('ds_seleidBestout'));
-	 
+
 	// output(inRec, named('inRec'));
 	 //output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
 	 // output(ds_BHrecsDedup, named('ds_BHrecsDedup'));
-	 
-	 // output(ds_BHrecsDedupWAcctno, named('ds_BHrecsDedupWAcctno'));
+	 //output(ds_initialAcctno, named('ds_initialAcctno'));
+	 //output(ds_BHrecsDedupWAcctno, named('ds_BHrecsDedupWAcctno'));
 	// output(ds_seleBest, named('ds_seleBest'));
 	//output(ds_BHrecsCombined, named('ds_BHrecsCombined'));
 	 // output(ds_AddrVariationsCount, named('ds_AddrVariationsCount'));
@@ -794,21 +790,23 @@ END;
 	// output(ds_FeinVarsOut, named('ds_FeinVarsOut'));
 	//output(DS_BHRecsWAcctno, named('DS_BHRecsWAcctno'));
 	// output(DS_SeleBestGrouped, named('DS_SeleBestGrouped'));
-	//output(DS_seleBestGroupedAddrDedup, named('DS_seleBestGroupedAddrDedup'));
-  
-	// output(DS_seleBestGroupedAddrDedupSlim, named('DS_seleBestGroupedAddrDedupSlim'));
-	//output(ds_AddressVarsOut, named('ds_AddressVarsOut'));
+	// output(DS_seleBestGroupedAddrDedup, named('DS_seleBestGroupedAddrDedup'));
+ 
+	 // output(DS_seleBestGroupedAddrDedupSlim, named('DS_seleBestGroupedAddrDedupSlim'));
+	// output(ds_AddressVarsOut, named('ds_AddressVarsOut'));
+
 	// output(ds_CnameVarsOut, named('ds_CnameVarsOut'));
 	// output(ds_FeinVarsOut, named('ds_FeinVarsOut'));
-	//output(ds_NameAddressVarsOutFinal, named('ds_NameAddressVarsOutFinal'));
-	// output(ds_NameAddressFeinVarsOutFinal, named('ds_NameAddressFeinVarsOutFinal'));
+	// output(ds_NameAddressVarsOutFinal, named('ds_NameAddressVarsOutFinal'));
+	//output(ds_NameAddressFeinVarsOutFinal, named('ds_NameAddressFeinVarsOutFinal'));
 	//output(DS_BestNameAddressOutputTmp, named('DS_BestNameAddressOutputTmp'));
 	//output(ds_NameAddressVarsOutFinal, named('ds_NameAddressVarsOutFinal'));
-	
+	// output(ds_busNameCorporLLC, named('ds_busNameCorporLLC'));
 	// output(DS_SeleBestGroupedYrsInBusDedupSmall, named('DS_SeleBestGroupedYrsInBusDedupSmall'));
 	// output(ds_YrsInBusOut, named('ds_YrsInBusOut'));  
 	// output(ds_YrsInBusinessOutFinal, named('ds_YrsInBusinessOutFinal'));
-	 //output(ds_NameAddressFeinVarsOutFinal, named('ds_NameAddressFeinVarsOutFinal'));  
+
+	 // output(ds_NameAddressFeinVarsOutFinal, named('ds_NameAddressFeinVarsOutFinal'));  
 	 
 	// output(DS_seleBestGroupedYrsInBusDedup, named('DS_seleBestGroupedYrsInBusDedup'));
 	// output(DS_SeleBestGroupedYrsInBusDedupSmall, named('DS_SeleBestGroupedYrsInBusDedupSmall'));
@@ -816,8 +814,9 @@ END;
 	
 	// output(DS_seleBestGroupedAddrDedupSlim, named('DS_seleBestGroupedAddrDedupSlim'));
 	// output(DS_SeleBestGroupedAddrDedupSmall, named('DS_SeleBestGroupedAddrDedupSmall'));
-	// output(ds_AddressVarsOutStart, named('ds_AddressVarsOutStart'));
+	 //output(ds_AddressVarsOutStart, named('ds_AddressVarsOutStart'));
 	//output(DS_BestNameAddressOutputTmp, named('DS_BestNameAddressOutputTmp'));
-  EXPORT DS_BestParentNameAddressOutput := DS_BestNameAddressOutputTmp; 
+	        
+   EXPORT DS_BestParentNameAddressOutput := DS_BestNameAddressOutputTmp; 
 	END;
 END;

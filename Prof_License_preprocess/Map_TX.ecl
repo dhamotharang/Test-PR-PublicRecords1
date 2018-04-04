@@ -1,4 +1,4 @@
-import Prof_License,ut;
+﻿import Prof_License,ut;
 
 EXPORT Map_TX (dataset({string ftype,string fdate})infile) := module
 
@@ -23,7 +23,7 @@ Prof_License.Layout_proLic_in map2RNall( dRegNurseIn l) := transform
   self.orig_city          := l.Mailing_Address_City;
   self.orig_st            := l.Mailing_Address_State;
   self.orig_zip           := l.Mailing_Address_Zip_code;
-  self.dob           := if ( l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 and regexfind('[aA-zZ]',l.Date_of_Birth) = false, l.Date_of_Birth [5..8] + l.Date_of_Birth[1..4] , '') ;
+ // self.dob           := if ( l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 , l.Date_of_Birth [5..8] + l.Date_of_Birth[1..4] , '') ;
   self.sex                := l.Gender;
   self.county_str         := l.County_of_Residence;
   self.last_renewal_date  := if(l.Date_of_Last_Renewal <> '' and length(l.Date_of_Last_Renewal) = 8 , l.Date_of_Last_Renewal[5..8] + l.Date_of_Last_Renewal[1..4],'');
@@ -64,7 +64,7 @@ dAPRegNurseIn := Files_TX.APRN_raw;
   self.orig_city            := l.Mailing_Address_City;
   self.orig_st              := l.Mailing_Address_State;
   self.orig_zip             := l.Mailing_Address_Zipcode;
-  self.dob             := if(l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 and regexfind('[aA-zZ]',l.Date_of_Birth) = false, l.Date_of_Birth[5..8] + l.Date_of_Birth[1..4], '');
+ // self.dob             := if(l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 , l.Date_of_Birth[5..8] + l.Date_of_Birth[1..4], '');
   self.sex                  := l.Gender;
   self.expiration_date      := if (l.APNExpiration_Date <> '' and length(l.APNExpiration_Date) = 8 , l.APNExpiration_Date[5..8] + l.APNExpiration_Date[1..4] , '' );
   self.issue_date           := if (l.APNApproval_Date <> ''  and length(l.APNApproval_Date) = 8 , l.APNApproval_Date[5..8] + l.APNApproval_Date[1..4] ,'' );
@@ -99,7 +99,7 @@ self.business_flag             := 'N';
   self.orig_city                  := l.Mailing_Address_City;
   self.orig_st                    := l.Mailing_Address_State;
   self.orig_zip                   := l.Mailing_Address_Zip_code;
-  self.dob                   := if ( l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 and regexfind('[aA-zZ]',l.Date_of_Birth) = false, l.Date_of_Birth[5..8] + l.Date_of_Birth[1..4], '') ;
+  //self.dob                   := if ( l.Date_of_Birth <> '' and length(l.Date_of_Birth) = 8 , l.Date_of_Birth[5..8] + l.Date_of_Birth[1..4], '') ;
   self.sex                        := l.Gender;
   self.county_str                 := l.County_of_Residence;
   self.last_renewal_date          := if ( l.Date_of_Last_Renewal <> '' and length(l.Date_of_Last_Renewal) = 8 , l.Date_of_Last_Renewal[5..8] + l.Date_of_Last_Renewal[1..4] , '') ;
@@ -387,14 +387,20 @@ dout :=  map ( count(infile(ftype = 'nurses')) = 1 and count(infile) = 1 => dNur
 outfile := proc_clean_all(doutfinal,'TX').cleanout;
 
 export buildprep := Sequential(dout, 
-                           FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_tx'),
-                           if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old')),
-								           if ( FileServices.FileExists( '~thor_data400::in::prolic_tx_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_tx_old')),
-                   				FileServices.RenameLogicalfile( '~thor_data400::in::prolic_tx','~thor_data400::in::prolic_tx_old'),                         
-											 output( outfile,,'~thor_data400::in::prolic_tx',overwrite),
-                         FileServices.StartSuperfiletransaction(),											 
+                        FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_tx'),
+                if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_tx_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_tx_old')),
+                   					   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_tx','~thor_data400::in::prolic_tx_old'),
+
+                         
+											output( outfile,,'~thor_data400::in::prolic_tx',compressed,overwrite),
+                         FileServices.StartSuperfiletransaction(),
+						
+												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_tx'),
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old'),  
+	 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old'),  
+
+	
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

@@ -1,6 +1,7 @@
-import PRTE2_Ecrash, FLAccidents_Ecrash;
+﻿import PRTE2_Ecrash, FLAccidents_Ecrash;
 
-ds := project (File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
+
+ds := File_KeybuildV2.eCrashSearchRecs(Accident_Location <> '');  
 
 
 SlimAccident := record 
@@ -216,7 +217,7 @@ Parse_Accident_Location := project(ds, transform(SlimAccident,
 	
 Slim_Accident_Rec	:=	RECORD
 	String100	Partial_Accident_Location := '';
-	ds;
+	FLAccidents_Ecrash.Layouts.key_slim_layout;
 END;
 
 Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform
@@ -327,7 +328,7 @@ Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform
 					   
 norm_report := normalize(Parse_Accident_Location, 97, SlimLocation(left, counter))(partial_accident_location <>''); 
 
-EXPORT file_stAndLocation	:=	dedup(sort(distribute(project(norm_report , transform(Slim_Accident_Rec , 
+EXPORT file_stAndLocation	:=	dedup(sort(distribute(project(norm_report , transform(Slim_Accident_Rec, 
 																														self.Partial_Accident_Location := if(trim(left.Partial_Accident_Location,left,right) ='' , '', 
 																																																	trim(left.Partial_Accident_Location,left,right));
 																														self := left;))(Partial_Accident_Location <>''),hash64(accident_nbr)),accident_nbr, local), all,local);

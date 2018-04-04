@@ -1,7 +1,9 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common;
 
-EXPORT proc_build_keys(string filedate) := function
-
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
+is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
+doDOPS 								:= is_running_in_prod AND NOT skipDOPS;
+		
 //Foreclosures Keys
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Keys.key_did(), 					Constants.key_prefix + 'did',							Constants.key_prefix+filedate+ '::did',							do1);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Keys.key_email_address,	Constants.key_prefix + 'email_addresses',	Constants.key_prefix+filedate+ '::email_addresses',	do2);
@@ -31,9 +33,13 @@ To_qa	:=	parallel(mv_qa1, mv_qa2, fcra_mv_qa1);
 build_autokeys 	:= Keys.autokeys(filedate);
 
 
-// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-updatedops   		 := PRTE.UpdateVersion('EmailDataKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra	 := PRTE.UpdateVersion('FCRA_EmailDataKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+//---------- making DOPS optional and only in PROD build -------------------------------													
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('EmailDataKeys',filedate,notifyEmail,'B','N','N');
+		updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_EmailDataKeys',filedate,notifyEmail,'B','F','N');
+		PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
+//--------------------------------------------------------------------------------------
 
 
 // -- Actions
@@ -42,8 +48,7 @@ buildKey	:=	sequential(
 												,Move_keys
 												,to_qa
 												,build_autokeys
-												,updatedops
-												,updatedops_fcra	
+												,PerformUpdateOrNot
 												);	
 
 return	buildKey;

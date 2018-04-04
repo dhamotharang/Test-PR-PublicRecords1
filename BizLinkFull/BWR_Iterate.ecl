@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_Iterate - Internal Linking - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -31,3 +31,4 @@ P.DoAll; // Use this version to run an iteration
  
 // Run all three in a single workunit - but don't forget to comment-out the individual actions above to avoid conflict
 // SEQUENTIAL(P.DoAllAgain, OutMatchPatterns, ReviewSamples);
+

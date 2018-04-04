@@ -1,4 +1,4 @@
-#workunit('name','Bocashell_Collections');
+﻿#workunit('name','Bocashell_Collections');
 IMPORT  Scoring_Project_Macros, RiskWise, UT;
 
 //Here are the URLs to run data collections for testing non-FCRA OSS roxie
@@ -24,11 +24,13 @@ bs_version_41 := 41;
 bs_version_50 := 50;
 //***** UNIQUE OUPUT FILE TAG *********
 filetag := '_1';  
+// filetag := '_test';  
 
 //***FILE IN***///
-// bocashell_file_in := '~scoring_project::in::bocashell_v3_v4_v5_input_20140528';
+// bocashell_file_in := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20161110';
 
-bocashell_file_in :='~foreign::' + '10.241.12.201' + '::' + 'scoring_project::in::bocashell_v3_v4_v5_input_20140528';
+bocashell_file_in :='~foreign::' + '10.241.12.201' + '::' + 'scoring_project::in::riskview_xml_generic_v3_v4_v5_20161110';
+// bocashell_file_in :='~scoring_project::in::bocashell_v3_v4_v5_input_20160419';
 
 
 //**********OUTPUT FILE NAMES**************//
@@ -66,15 +68,13 @@ Fcra_41 := sequential(Bocashell_41_fcra_999999, Bocashell_41_fcra_201207);
 Nonfcra_50 := sequential(Bocashell_50_nonfcra_999999, Bocashell_50_nonfcra_201207);
 Fcra_50 := sequential(Bocashell_50_fcra_999999, Bocashell_50_fcra_201207);
 
-data_collection := parallel(Nonfcra_41, Nonfcra_50, Fcra_41, Fcra_50);
+data_collection := parallel(Nonfcra_41, Fcra_41, Nonfcra_50, Fcra_50);
+// data_collection := parallel(Nonfcra_41, Fcra_41);
 
 // Prod_Report_41 := Scoring_Project_DailyTracking.BocaShell_41_Prod_Tracking_DailyReport;
 // Prod_Report_50 := Scoring_Project_DailyTracking.BocaShell_50_Prod_Tracking_DailyReport;
 
 //Run nonfcra sequentially and fcra sequentially in parallel
-sequential(data_collection);
-			// : WHEN(CRON('30 9 * * *')), //4:30 am
-			// FAILURE(FileServices.SendEmail(Scoring_Project_Macros.email_distribution.fail_list,'Prod Bocashell collections job failed.','The failed workunit is: ' + workunit + FailMessage))
-			// ;
+sequential(data_collection);	
 
 EXPORT BWR_to_run_BocaShell_PROD_Collections := 'todo';

@@ -1,4 +1,4 @@
-import STD,lib_fileservices,ut;
+﻿import STD,lib_fileservices,ut;
 export ArchiveFiles(string location, string environment, integer noofpartitions = 0, integer whichpartition = 0) := module
 	
 	export rundatetime := ut.GetTimeDate() : independent;
@@ -85,6 +85,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 	export SlimmedFilesToCopy := function
 		SlimmedDs := dedup(sort(dataset('~'+filestoprocess, filesrec, thor, opt)(~(regexfind('foreign',files) 
 																																							or regexfind(':: ',files)
+																																							or regexfind('thor::base::aid_nonheader::ace',files)
 																																							or regexfind('::nid::',files))),files),files)
 																																							(files not in thorbackup.SkipCopyList);
 
@@ -263,7 +264,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 			//dataset(resultnames) resultfiles{xpath('Results/ECLResult')};
 		end;
 	
-		results := SOAPCALL('http://10.241.31.11:8010/WsWorkunits', 'WUInfo', 
+		results := SOAPCALL('http://10.173.26.7:8010/WsWorkunits', 'WUInfo', 
 											InRecord, dataset(OutRecord),
 											xpath('WUInfoResponse/Workunit')
 										 );
@@ -372,7 +373,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 														)) : failure(sequential(
 																				fileservices.deletelogicalfile(jobstatusfile),
 																				fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt Copy Process failed on http://10.241.31.11:8010/ - ' + ut.GetTimeDate(),
+			'Yogurt Copy Process failed on http://10.173.26.7:8010/ - ' + ut.GetTimeDate(),
 			'workunit: ' + workunit+ '\r\n' + failmessage
 																	,
 																	,
@@ -407,7 +408,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 										)  : failure(sequential(
 																	fileservices.deletelogicalfile(jobstatusfile),
 																	fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt Copy Process failed on http://10.241.31.11:8010/ - ' + ut.GetTimeDate(),
+			'Yogurt Copy Process failed on http://10.173.26.7:8010/ - ' + ut.GetTimeDate(),
 			'workunit: ' + workunit + '\r\n' + failmessage
 																	,
 																	,

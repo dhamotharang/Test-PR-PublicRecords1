@@ -1,4 +1,4 @@
-import fcra, ut;
+﻿import fcra, ut;
 
 Layout_Override_AVM1 := RECORD
 	string28 prim_name;
@@ -59,7 +59,7 @@ Layout_Override_AVM1 := RECORD
 	integer  median_block_valuation;  // median valuation of the property's block group (blkgrp=geo_blk[7])
 	string20 flag_file_id;
 end;
-ds := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::avm',layout_override_avm1,csv(separator('\t'),quote('\"'),terminator('\r\n'))),-flag_file_id),except flag_file_id,keep(1));
+ds := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::avm',layout_override_avm1,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt),-flag_file_id),except flag_file_id,keep(1));
 
 
 

@@ -1,6 +1,6 @@
-IMPORT HMS_KOP_TRGT_HARV;
+﻿IMPORT HMS_KOP_TRGT_HARV;
 
-pVersion := '20170324';
+pVersion := '20170823';
 pUseProd := false; 
    
 #workunit('name', 'HMS KOP TRGT HARV AUDIT Build ' + pVersion); //To Schedule Weekly on FRiday Mornings

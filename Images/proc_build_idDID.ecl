@@ -1,16 +1,16 @@
-import drivers, crim_common, sexoffender, hygenics_crim, ut;
+﻿import drivers, crim_common, sexoffender, hygenics_crim, ut;
 
 // DL
-DLfiles := drivers.File_Dl(orig_state = 'FL');
+// DLfiles := drivers.File_Dl(orig_state = 'FL');
 
-Images.Layout_idDID stripDLs (DLfiles L) :=
-TRANSFORM
-	SELF.state := L.orig_state;
-	SELF.rtype := 'DL';
-	SELF.id := L.dl_number;
-	SELF.did := L.did;
-END;
-justDLid := PROJECT(DLfiles, stripDLs(LEFT));
+// Images.Layout_idDID stripDLs (DLfiles L) :=
+// TRANSFORM
+	// SELF.state := L.orig_state;
+	// SELF.rtype := 'DL';
+	// SELF.id := L.dl_number;
+	// SELF.did := L.did;
+// END;
+// justDLid := PROJECT(DLfiles, stripDLs(LEFT));
 
 // public
 DOCpublicFiles := hygenics_crim.File_Moxie_Crim_Offender2_Dev;
@@ -38,7 +38,7 @@ end;
 
 JustSOid := project(SOpublicFiles, strip_PublicSOs(LEFT));
 
-noBlankDIDs := (justDLid + justDOCid + justSOid)(did != 0);
+noBlankDIDs := (/*justDLid +*/ justDOCid + justSOid)(did != 0);
 allids := DEDUP(noBlankDIDs, ALL);
 
 export proc_build_idDID := allids : persist('~images::idDID');

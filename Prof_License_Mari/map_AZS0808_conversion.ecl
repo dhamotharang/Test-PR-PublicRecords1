@@ -1,4 +1,4 @@
-IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
+﻿IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 
@@ -17,7 +17,7 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 	oApr		:= OUTPUT(inFile);
 	
 	//Filtering out BAD RECORDS
-	ValidRecs	:= inFile(NAME_LAST != '' AND TRIM(NAME_LAST) != 'X' AND LICENSE_NBR != '' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(NAME_LAST)));
+	ValidRecs	:= inFile(NAME_LAST != '' AND TRIM(NAME_LAST) != 'X' AND LICENSE_NBR != '' AND LICENSE_NBR != 'PENDING' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(NAME_LAST)));
 	cnt_valid_rec := COUNT(ValidRecs);
 	
 	//Map Real Estate License to common MARIBASE layout
@@ -130,15 +130,15 @@ EXPORT map_AZS0808_conversion(STRING pVersion) := FUNCTION
 		tmp_EXPIRE_DTE			:= IF(pInput.EXPIRE_DTE != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPIRE_DTE),'17530101');
 		SELF.EXPIRE_DTE			:= IF(REGEXFIND('^[0-9]{8}$',tmp_EXPIRE_DTE),tmp_EXPIRE_DTE,'17530101');
 		SELF.ADDR_BUS_IND		:= IF(TRIM(pInput.ADDR_ADDRESS1 + pInput.ADDR_CITY + pInput.ADDR_ZIP) != '','B','');
-		
-		SELF.PHN_MARI_1			:= TRIM(pInput.PHONE,LEFT,RIGHT);
-		SELF.PHN_PHONE_1    	:= ut.CleanPhone(pInput.PHONE);
+		TrimPhone           := TRIM(StringLib.StringFilter(pInput.PHONE,'0123456789'),LEFT,RIGHT);
+		SELF.PHN_MARI_1			:= ut.CleanPhone(TrimPhone);
+		SELF.PHN_PHONE_1    := ut.CleanPhone(TrimPhone);
 	
 		//Extract company name out of address field
 		COMPANY_PATTERN := '^(.*LLC,)';
 		TrimAddress1				:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDR_ADDRESS1);
 		TempBusNameFlag			:= IF(REGEXFIND(COMPANY_PATTERN,TrimAddress1),'YES','NO');
-		TempBusName					:=IF(REGEXFIND(COMPANY_PATTERN,TrimAddress1),
+		TempBusName					:= IF(REGEXFIND(COMPANY_PATTERN,TrimAddress1),
 														 REGEXFIND(COMPANY_PATTERN,TrimAddress1,1),
 														 ' ');
 		StripAddress1				:= TRIM(IF(TRIM(TempBusName)<>'',REGEXREPLACE(TempBusName,TrimAddress1,''),TrimAddress1),LEFT,RIGHT);

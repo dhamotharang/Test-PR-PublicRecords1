@@ -1,4 +1,4 @@
-import RoxieKeyBuild, ut;
+﻿import RoxieKeyBuild, ut, Orbit3, dops;
 
 export Proc_Build_Keys(string version) := function
 
@@ -32,14 +32,19 @@ RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::infutorcid::'+version+':
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::infutorcid::fcra::did', 'Q', mDID_fcra_qa);
 
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Caller ID',(string)version,'N');
+
+orbit_updatef := Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Caller ID',(string)version,'F');
 
 run_keys := sequential(
 				parallel(bPhone, bPhone_fcra, bDID, bDID_fcra),
 				parallel(mPhone, mPhone_fcra, mDID, mDID_fcra),
 				parallel(mPhone_qa, mPhone_fcra_qa, mDID_qa, mDID_fcra_qa),
-				RoxieKeybuild.updateversion('InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'N');
-				RoxieKeybuild.updateversion('FCRA_InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'F')
+				dops.updateversion('InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'N'),
+				orbit_update,
+				dops.updateversion('FCRA_InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'F'),
+				orbit_updatef
 					);
-					
+		
 return run_keys;
 end;

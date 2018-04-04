@@ -1,4 +1,4 @@
-	#WORKUNIT('name','Avenger Daily Build');
+	#WORKUNIT('name','Yogurt: Avenger Daily Build');
 	#OPTION('multiplePersistInstances',FALSE);
 
 IMPORT ut;

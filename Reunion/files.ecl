@@ -1,4 +1,4 @@
-IMPORT header,mdr;
+﻿IMPORT header,mdr;
 
 EXPORT files:=MODULE
 
@@ -44,6 +44,6 @@ EXPORT files:=MODULE
   EXPORT dCollege:=DATASET('~thor::base::mylife::college',reunion.layouts.lCollege,FLAT);
   EXPORT dEmail:=DATASET('~thor::base::mylife::email',reunion.layouts.lEmail,FLAT);
   EXPORT dTax:=DATASET('~thor::base::mylife::tax',reunion.layouts.l_tax,FLAT);
-  EXPORT dDeed:=DATASET('~thor::base::mylife::deed',reunion.layouts.l_deed,FLAT);
+  EXPORT dDeed:=DATASET('~thor::base::mylife::deeds',reunion.layouts.l_deed,FLAT);
   EXPORT dFlags:=DATASET('~thor::base::mylife::flags',reunion.layouts.l_flags,FLAT);
 END;

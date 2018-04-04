@@ -1,6 +1,6 @@
-import liensv2, ut;
+﻿import liensv2, ut;
 
-export MAC_Spray_Input_Files(sourcefile,thor_filename,updatetype,group_name='\'thor_dell400_2\'') := macro
+export MAC_Spray_Input_Files(sourcefile,thor_filename,updatetype,group_name='\'thor400_44\'') := macro
 //////////////////////////////////////////
 // -- Declare value types
 //////////////////////////////////////////
@@ -25,14 +25,14 @@ export MAC_Spray_Input_Files(sourcefile,thor_filename,updatetype,group_name='\'t
 // -- Set value types
 ///////////////////////////////////////////
 %sourceIP% := if ( _Control.ThisEnvironment.Name = 'Prod_Thor',  _control.IPAddress.bctlpedata10 , _control.IPAddress.bctlpedata12);
-unsigned4 %recordsize% 			:= liensv2.Get_Infile_Record_Length(updatetype);
+// unsigned4 %recordsize% 			:= liensv2.Get_Infile_Record_Length(updatetype);
 string100 %superfilename% 		:= LiensV2.Get_Upadte_SuperFilename(updatetype);
 //unsigned4 %recordsize% 			:= 1186 ;
 
 //////////////////////////////////////////
 // -- Spray File
 /////////////////////////////////////////
-%spray_first% := FileServices.SprayFixed(%sourceIP%,sourcefile, %recordsize%, group_name, 
+%spray_first% := STD.File.SprayDelimited(%sourceIP%,sourcefile,,',','\r\n','"', group_name, 
 				thor_filename ,-1,,,true,true);
 				
 //////////////////////////////////////////////////////////////////////////////////////////////

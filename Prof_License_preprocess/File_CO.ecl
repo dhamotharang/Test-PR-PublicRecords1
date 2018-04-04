@@ -1,4 +1,4 @@
-EXPORT File_CO := module
+﻿EXPORT File_CO := module
 
 
 
@@ -57,31 +57,34 @@ shared Layout_in := record
    string  FirstName;          
    string  MiddleName;         
    string Suffix;  
-	 string BusinessName;
-   string  Phone;              
+	 string Entity_Name;
+	 string FormattedName;
+	 string Attention;
    string  Address;            
    string  Address_2;          
    string  City;               
-   string StateCode;           
-   string  ZipCode;            
-   string  Description;        
-   string CredentialNumber;    
-   string EffectiveDate;       
-   string ExpirationDate;      
-   string FirstEffectiveDate;  
-   string  Status;             
-   string  License_Method;
-	 string License_Title;
+   string StateCode; 
+	 string County;
+   string  ZipCode;
+	  string ZipCode_4;
+		string LicenseType;
+		string subcategory;
+		string LicenseNumber;
+		string FirstIssueDate;
+		string LastRenewalDate;
+		string ExpirationDate;
+		string  Status;             
 	 string Speciality;
+	 string License_Title;
    string  Degree;             
-   string  SchoolName;         
-   string attendedFromDate;    
-   string attendedToDate;      
-   string FormattedCaseNumber; 
-   string  CaseActionTypeDesc; 
+  string CaseNumber;
+	string ProgramAction;
+	string DisciplineEffectiveDate;
+	string DisciplineCompletedDate;
+ 
 end;                            
 /*****Files missing License Title field********/
-export med1 := dataset('~thor_data400::in::prolic::co::medical::raw1',Layout_in,CSV( heading(1),separator(','),terminator(['\n','\r\n']),Quote('')));
+export med := dataset('~thor_data400::in::prolic::co::medical::raw',Layout_in,CSV( heading(1),separator(','),terminator(['\n','\r\n']),Quote('')));
 /*
 export aud_had := dataset('~thor_data400::in::prolic::co::medical::aud_had',Layout_in,CSV( separator(','),terminator(['\n','\r\n']),Quote('')));
 
@@ -100,7 +103,7 @@ export lpc := dataset('~thor_data400::in::prolic::co::medical::lpc',Layout_in,CS
 export nlc := dataset('~thor_data400::in::prolic::co::medical::phaco',Layout_in,CSV( separator(','),terminator(['\n','\r\n']),Quote('')));
 /*************************************************************/
 /**********Files with Lic Title field ***********/
-export med2 := dataset('~thor_data400::in::prolic::co::medical::raw2',common_lt,CSV( separator(','),terminator(['\n','\r\n']),Quote('')));
+//export med2 := dataset('~thor_data400::in::prolic::co::medical::raw2',common_lt,CSV( separator(','),terminator(['\n','\r\n']),Quote('')));
 /*
 export optin := dataset('~thor_data400::in::prolic::co::medical::opt',common_lt,CSV( separator(','),terminator(['\n','\r\n']),Quote('')));
 

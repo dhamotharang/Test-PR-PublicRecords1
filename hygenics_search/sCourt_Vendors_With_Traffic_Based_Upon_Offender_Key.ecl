@@ -1,4 +1,4 @@
-export sCourt_Vendors_With_Traffic_Based_Upon_Offender_Key := [	'82', // OK-29 Counties
+﻿export sCourt_Vendors_With_Traffic_Based_Upon_Offender_Key := [	'82', // OK-29 Counties
                                 '6M',  //	OH_BUTLERFAIRFELD_MC
                                 '7H',  //	OH_GALLIA_GALIPLS_MC
 																'89',  //	OH-Putnam County
@@ -61,8 +61,9 @@ export sCourt_Vendors_With_Traffic_Based_Upon_Offender_Key := [	'82', // OK-29 C
 																'W0252',//  OHIO_AUGLAIZE_COUNTY_MUNICIPAL_COURT_CW
 																'W0257',//  OHIO_JEFFERSON_COUNTY_DILLONVALE_MUNICIPAL_COURT_CW
 																'W0258',//  OHIO_MORGAN_COUNTY_MUNICIPAL_COURT_CW     
-																'W0259' //  OHIO_LICKING_COUNTY_COMMON_PLEAS_COURT_CW 
-
+																'W0259', //  OHIO_LICKING_COUNTY_COMMON_PLEAS_COURT_CW 
+                                'W0319',
+                                'W0318'
 											];
 	                           
 														 

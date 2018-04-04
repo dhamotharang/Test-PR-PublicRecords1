@@ -1,12 +1,12 @@
-EXPORT Spray_MI(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_MI(dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_control;
+import VersionControl,_control,lib_thorlib;
 
 	string pServer			:=  _Control.IPAddress.bctlpedata11 ;
 	string		pDir(string lictype)		:=  map ( lictype = 'TradeLic'  => '/data/hds_4/prolic/mi/trade/'+infile(ftype = 'Tradelic')[1].fdate,
 	                                                                      '/data/hds_4/prolic/mi/all_available/'+infile(ftype = 'Health')[1].fdate
 																						);
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 		         
 	
@@ -15,7 +15,7 @@ import VersionControl,_control;
 
 	spry_trade_raw:=DATASET([
 
-		 {pServer,pDir('TradeLic'),'*.txt' 			,0 ,lfile('trade_license'				),[{sfile('trade_license'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\t','\\n,\\r\\n','"'}
+		 {pServer,pDir('TradeLic'),'*.csv' 			,0 ,lfile('trade_license'				),[{sfile('trade_license'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\t','\\n,\\r\\n','"'}
 		
 		 	], VersionControl.Layout_Sprays.Info);
 	

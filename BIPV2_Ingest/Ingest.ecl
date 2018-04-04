@@ -1,4 +1,4 @@
-IMPORT SALT35,BIPV2_Ingest; 
+﻿IMPORT SALT35,BIPV2_Ingest; 
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_BASE) Delta = DATASET([],Layout_BASE)
 , DATASET(Layout_BASE) dsBase = In_BASE // Change IN_BASE to change input to ingest process
@@ -24,7 +24,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Base recs start out Old, Ingest recs start out New -- matched records will become Unchanged or Updated below
   FilesToIngest0 := PROJECT(FilesToIngest,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.New,SELF:=LEFT));
   Delta0 := PROJECT(Delta,TRANSFORM(WithRT,SELF.__Tpe:=IF(incremental,RecordType.Old,RecordType.New),SELF:=LEFT));
-  Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
+  Base0WithBlank := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
+Base0 := _Custom.FilterBlanks(Base0WithBlank);/*HACK05*/
  
   WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
     SELF.dt_first_seen := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_first_seen = 0 => ri.dt_first_seen,
@@ -165,7 +166,7 @@ Group0 := GROUP(Group0_dist,source,source_record_id,title,fname,mname,lname,name
 //Base upon ut.Mac_Sequence_Records
 // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
-  ORe := AllRecs0(__Tpe<>RecordType.New);
+  ORe := AllRecs0(__Tpe<>RecordType.New) + _Custom.GetBlanks(Base0WithBlank);/*HACK06*/
   PrevBase := MAX(ORe,rcid);
   WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
     SELF.rcid := IF ( le.rcid=0, PrevBase+1+thorlib.node(), le.rcid+thorlib.nodes() );

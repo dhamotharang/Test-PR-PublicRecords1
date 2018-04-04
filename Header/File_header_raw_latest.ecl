@@ -12,9 +12,10 @@ EXPORT File_header_raw_latest := module
         latest_ful_dt := versionControl.fGetFilenameVersion(lc+'thor_data400::base::header_raw');      
         latest_raw_dt := versionControl.fGetFilenameVersion(fileName);
 
+        raw_hdr_ver_info:=latest_raw_dt+'<-ltst|inc->'+latest_inc_dt+'|mth->'+latest_ful_dt;
         filedate_is_latest := when((latest_raw_dt >= latest_inc_dt AND 
                                latest_raw_dt >= latest_ful_dt)
-                               ,output(latest_raw_dt+'<-ltst|inc->'+latest_inc_dt+'|mth->'+latest_ful_dt,named('raw_vers'))
+                               ,output(raw_hdr_ver_info,named('raw_vers'))
                                ,before);
 
         one_week_ago  := ut.date_math((STRING8)Std.Date.Today(),-7 );
@@ -27,10 +28,11 @@ EXPORT File_header_raw_latest := module
                                           ,before);
                                     
         // Force to true to temporary bypass a fail (BUT MAKE SURE YOU HAVE THE RIGHT VERSIONS IN PLACE)
-        is_latest_header_raw_best := file_age_less_than_2_weeks AND filedate_is_latest;
+        is_latest_header_raw_best := filedate_is_latest AND file_age_less_than_2_weeks;
        
         export File := when(
-                            dataset(fileName ,header.Layout_Header,thor),
-                            assert(is_latest_header_raw_best,'latest raw is not latest or > 2 weeks',fail)
+                            dataset(fileName ,header.Layout_Header,thor),if(not(is_latest_header_raw_best),
+                             STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
+                               '** CRITICAL ** HEADER_RAW', 'Lasted is older than 2 week. VERIFY!!\r\n\r\n'+raw_hdr_ver_info+'\r\n\r\n'+workunit))
                             ,before);
 end; 

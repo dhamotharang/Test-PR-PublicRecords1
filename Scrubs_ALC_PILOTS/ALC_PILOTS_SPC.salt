@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_ALC_PILOTS
 FILENAME:ALC_PILOTS
 //Uncomment up to NINES for internal or external adl
@@ -39,7 +39,7 @@ FIELD:country:TYPE(STRING22):0,0
 FIELD:postal_cd:TYPE(STRING20):0,0
 FIELD:dpv:TYPE(STRING1):0,0
 FIELD:addr_type:TYPE(STRING15):LIKE(invalid_addr_type):0,0
-FIELD:cert_lvl:TYPE(STRING255):LIKE(invalid_alphapound):0,0
+FIELD:cert_lvl:TYPE(STRING254):LIKE(invalid_alphapound):0,0
 FIELD:cert_type:TYPE(STRING50):LIKE(invalid_alphapound):0,0
 FIELD:cert_type_secondary:TYPE(STRING120):LIKE(invalid_alphanumericpound):0,0
 FIELD:county_cd:TYPE(STRING15):LIKE(invalid_alphanumeric):0,0

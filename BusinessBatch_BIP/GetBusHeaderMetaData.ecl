@@ -1,4 +1,4 @@
-IMPORT BIPV2,Business_Risk_BIP, BusinessBatch_BIP, Codes, MDR, STD, TopBusiness_BIPV2;
+﻿IMPORT BIPV2,Business_Risk_BIP, BusinessBatch_BIP, Codes, MDR, STD, TopBusiness_BIPV2;
 EXPORT GetBusHeaderMetaData := MODULE
 
   SHARED Rec_top3LinkIds  := RECORD
@@ -9,6 +9,13 @@ EXPORT GetBusHeaderMetaData := MODULE
 	
 	SHARED acctnoLayout := RECORD
     STRING20 acctno;
+	END;
+	
+	SHARED rec_DBALayoutSlim := RECORD
+		Rec_top3LinkIds;
+		STRING120 DBA_name;
+		String2 SOURCE;
+		STRING50  Business_Status;
 	END;
 	
   SHARED rec_DBALayout := RECORD
@@ -312,11 +319,12 @@ EXPORT GetBusHeaderMetaData := MODULE
                                                             BusinessBatch_BIP.Constants.DEFAULTS.MaxBHLinkidsDBA
                                                             ,TRUE)(source <> MDR.sourceTools.src_Dunn_Bradstreet AND
                                                                    ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)));
-  
-    ds_busHeaderRecsMetaData := DEDUP(SORT (ds_busHeaderRecsSlim(dba_name <> '' AND source <> ''),
-                                            #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), dba_name, RECORD),
+		// slim layout before dedup/sort to reduce footprint.																															 
+    ds_busHeaderRecsMetaDataSlimDBA := PROJECT(ds_busHeaderRecsSlim, TRANSFORM(rec_DBALayoutSlim, self.business_status := ''; SELF := LEFT));
+		ds_busHeaderRecsMetaData := DEDUP(SORT (ds_busHeaderRecsMetaDataSlimDBA(dba_name <> '' AND source <> ''),
+                                            #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), dba_name,RECORD),
                                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), dba_name);
-																		    		
+																		     																		 																		    		
     ds_busHeaderRecsLinkIDs := PROJECT(DEDUP(SORT(ds_busHeaderRecsSlim,
                                             #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),                                           
 																						  -dt_last_seen, -dt_vendor_last_reported, RECORD),
@@ -380,13 +388,11 @@ EXPORT GetBusHeaderMetaData := MODULE
                                       SELF.acctno := LEFT.acctno;
                                       SELF := LEFT,
                                       SELF := RIGHT,
-                                      SELF := []), LEFT OUTER);
-  			 
-    BusHeaderMetaDataOut := ds_allMetadata;
+                                      SELF := []), LEFT OUTER);  			
     
     // set all the fields in here
     // join back to the acctno at the end.
-	 ds_resultsTmp := PROJECT(JOIN(BatchInputIn,  BusHeaderMetaDataOut,
+	 ds_resultsTmp := PROJECT(JOIN(BatchInputIn,  ds_allMetadata,
                                       LEFT.acctno = RIGHT.acctno AND
                                       BIPV2.IDmacros.mac_JoinTop3Linkids(),
                                       TRANSFORM(BusinessBatch_BIP.Layouts.BusHeaderMetaDataTmp,
@@ -397,7 +403,7 @@ EXPORT GetBusHeaderMetaData := MODULE
                                                 SELF := LEFT,
                                                 SELF := RIGHT,
                                                 SELF := []),
-                                      LEFT OUTER),                                 
+                                      LEFT OUTER),                                
                             BusinessBatch_BIP.Layouts.BusHeaderMetaDataFinal);	  	
 										 
 		// output(BatchInputIn, named('BatchInputIn'));
@@ -432,13 +438,14 @@ EXPORT GetBusHeaderMetaData := MODULE
 		// output(ds_NaicsCodeDescriptions, named('ds_NaicsCodeDescriptions'));
 		// output(ds_NaicsCodeDescriptions, named('ds_NaicsCodeDescriptions'));
 		// output(ds_NaicsCodeWLinkIds, named('ds_NaicsCodeWLinkIds'));
-		// output(ds_IndustryRecsDenormNAICSCode, named('ds_IndustryRecsDenormNAICSCode'));
+		//output(ds_IndustryRecsDenormSicCode, named('ds_IndustryRecsDenormSicCode'));
+		//output(ds_IndustryRecsDenormNAICSCode, named('ds_IndustryRecsDenormNAICSCode'));
 		//output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
 		// output(count(ds_busHeaderRecsLinkIDs(business_status != '')),named('cnt_ds_busHeaderRecsLinkIDs'));
 		// output(ds_IndustryRecsDenorm, named('ds_IndustryRecsDenorm'));
 	 //output(ds_SicCodeRecsWAcctno, named('ds_SicCodeRecsWAcctno'));
 
-		//output(ds_AllCodesRecsWAcctno, named('ds_AllCodesRecsWAcctno'));
+		// output(ds_AllCodesRecsWAcctno, named('ds_AllCodesRecsWAcctno'));
 		// output(ds_allMetadata, named('ds_allMetadata'));
 	//output(ds_resultsTmp, named('ds_resultsTmp'));
     

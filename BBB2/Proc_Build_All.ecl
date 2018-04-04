@@ -1,4 +1,4 @@
-import RoxieKeyBuild, business_header, strata, _control,VersionControl, Orbit3;
+import $, RoxieKeyBuild, business_header, strata, _control,VersionControl, Orbit3;
 
 	
 	export Proc_Build_All(
@@ -31,13 +31,13 @@ module
 		));
 
 	export full_build := sequential(
-		 spray_files
+		spray_files
 		,Proc_Build_Base(pversion).all
 		,Proc_Build_Keys(pversion).all
 		,Promote().built2qa
 		,send_emails(pversion).roxie.qa
 		,Strata_Population_Stats(pversion).all
-		,Query_Build_Stats
+		/*,Query_Build_Stats*/
 		,Query_New_Records
 		,orbitUpdate
 	) : success(send_emails(pversion).BuildSuccess), failure(send_emails(pversion).BuildFailure);

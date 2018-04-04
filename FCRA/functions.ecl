@@ -1,4 +1,4 @@
-IMPORT ln_propertyv2, risk_indicators, ut, SexOffender, SexOffender_Services;
+﻿IMPORT ln_propertyv2, risk_indicators, ut, SexOffender, SexOffender_Services;
 
 EXPORT functions := MODULE
 
@@ -496,4 +496,15 @@ EXPORT functions := MODULE
 		ids_set := set(ids, sspk);
 		return if(exists(PUIDS), ids_set, []);
 	end;
+
+  EXPORT checkCaseNumMinInput(STRING CaseNumber, STRING fname, 
+                              STRING lname, STRING9 ssn, STRING2 state, UNSIGNED6 did) :=
+    IF ((CaseNumber != '') AND 
+        (DID = 0) AND 
+        (fname = '' OR lname = '' OR state = '') AND 
+        (LENGTH(TRIM(ssn,LEFT,RIGHT)) != 9),
+        ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET,
+        0 /* no error code */
+       );
+
 END;

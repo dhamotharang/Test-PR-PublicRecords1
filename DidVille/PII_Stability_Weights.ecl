@@ -1,4 +1,4 @@
-IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
+﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
 
 /*
 This module is for the statistical analysis team to be able to run searches 
@@ -44,11 +44,12 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 											
 		InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(interm, 
 																						UniqueID, 
+																						, // did
 																						suffix, 
 																						fname,
 																						mname,
 																						lname,
-																						, 
+																						, // gender
 																						prim_range,
 																						prim_name,
 																						sec_range,
@@ -61,11 +62,10 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 																						phone10,
 																						,//DL_STATE,
 																						,//DL_NBR, 
-																						,
-																						,
-																						,
-																						,
-																						,
+																						,// src
+																						,// src_rid
+																						,// fname2
+																						,// lname2																						
 																						outfile
 																						);			
 																						

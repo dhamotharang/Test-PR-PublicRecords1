@@ -1,9 +1,9 @@
-import crim_common, lib_date,STD ;
+﻿import crim_common, lib_date,STD ;
  
-def := distribute(hygenics_crim.file_in_defendant_arrests(),hash(recordid+statecode));
-cha := distribute(hygenics_crim.file_in_charge_arrests(),hash(recordid+statecode));
-off := distribute(hygenics_crim.file_in_offense_arrests(),hash(recordid+statecode));
-sen := distribute(hygenics_crim.file_in_sentence_arrests(),hash(recordid+statecode));
+def := distribute(hygenics_crim.file_in_defendant_arrests(),hash(recordid,sourceid));
+cha := distribute(hygenics_crim.file_in_charge_arrests(),hash(recordid,sourceid));
+off := distribute(hygenics_crim.file_in_offense_arrests(),hash(recordid,sourceid));
+sen := distribute(hygenics_crim.file_in_sentence_arrests(),hash(recordid,sourceid));
 
 
 layout_j_final := record
@@ -157,6 +157,7 @@ layout_j_final := record
 	string10	ProbationMinMonths			:= '';
 	string10	ProbationMinDays			:= '';
 	string100	ProbationStatus				:= '';
+	string20  sourceid              :='';
 	//
 end;
 
@@ -200,7 +201,7 @@ layout_j_final to_j1(def l, off r) := transform
 end;
 
 j1 := join(def,off, 
-		left.statecode=right.statecode and 
+		left.sourceid=right.sourceid and 
 		left.recordid=right.recordid, 
 		to_j1(left,right),local);
 
@@ -230,7 +231,7 @@ layout_j_final to_j2(j1 l, cha r) := transform
 end;
 
 j2 := join(j1, cha,
-			left.statecode=right.statecode and 
+			left.sourceid=right.sourceid and 
 			left.recordid=right.recordid and 
 			left.caseid=right.caseid, 
 			to_j2(left,right), left outer, local);
@@ -278,7 +279,7 @@ layout_j_final to_j3(j2 l, sen r) := transform
  self := l;
  //self := r;
  end;
-j3 := join(j2,sen, left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+j3 := join(j2,sen, left.sourceid=right.sourceid and left.recordid=right.recordid and left.caseid=right.caseid, 
 										to_j3(left,right), left outer, local);
 
 j_final := j3;
@@ -631,8 +632,11 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 															 stringlib.stringfind(temp_offense,'MISDEMEANOR)',1) >0  and stringlib.stringfind(temp_offense,'(MISC',1) >0 => 'M',
                                ls_vendor ='W0221' and stringlib.stringfind(temp_offense,'TRAFFIC',1) >0 => 'T',
 															 stringlib.stringfind(temp_offense,' TRAFFIC:',1) >0 => 'T',
+															 stringlib.stringfind(temp_offense,'TRAFFIC VIOLATIONS',1) >0 => 'T',															 
 															 stringlib.stringfind(temp_offense,' MISD:',1) >0 => 'M',
 															 stringlib.stringfind(temp_offense,' FEL:',1) >0  => 'F',
+															 stringlib.stringfind(temp_offense,' MISD;',1) >0 => 'M',
+															 stringlib.stringfind(temp_offense,' FEL;',1) >0  => 'F',
 	                             stringlib.stringfilterout(off_lev,',.`{(')
 															 );
     
@@ -673,6 +677,11 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 
                                ls_vendor IN ['W0103','W0104','W0107','W0108','W0115','W0116'] => trim(l.offensecode),
 															 
+															 ls_vendor IN ['W0310'] and stringlib.stringfind(temp_offense,'-',2) >0 => temp_offense[1..stringlib.stringfind(temp_offense,'-',2)-1], 
+                               ls_vendor IN ['W0310'] and regexfind('^([0-9\\.]+[0-9]+)[-]([A-Z0-9]+)[ ]*(.*)$',temp_offense) => regexreplace('^([0-9\\.]+[0-9]+)[-]([A-Z0-9]+)[ ]*(.*)$',temp_offense,'$1$2'), 
+                               ls_vendor IN ['W0310'] and stringlib.stringfind(temp_offense,' ',1) >0  
+															                        and stringlib.stringfind(temp_offense,'-',2) =0 => temp_offense[1..stringlib.stringfind(temp_offense,'-',1)-1],                                
+															 
 															 regexfind('[a-zA-Z]+[0-9.]+[(a-zA-Z)]*[(0-9)]*:',temp_offense) => StringLib.StringFilterOut(trim(regexreplace('([a-zA-Z]+0-9.]+[/(a-zA-Z/)]*[(0-9)]*:)(.*)',temp_offense,'$1'),left,right),'()'),
 	  													 regexfind('[0-9.]+[a-zA-Z]+[(a-zA-Z)]*[(0-9)]*:',temp_offense) => StringLib.StringFilterOut(trim(regexreplace('([0-9.]+[a-zA-Z]+[/(a-zA-Z/)]*[(0-9)]*:)(.*)',temp_offense,'$1'),left,right),'()'),
 															 
@@ -709,7 +718,12 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
   													   ls_vendor IN ['W0091'] and  regexfind('^([0-9\\.]+[A-Z0-9\\./]+)([ ]*[\\(][A-Z0-9][\\)])[ ]*([\\(][A-Z0-9][\\)])([A-Z]+[/: ]*)(.*)$'      ,temp_offense)=>regexreplace('^([0-9\\.]+[A-Z0-9\\./]+)([ ]*[\\(][A-Z0-9][\\)])[ ]*([\\(][A-Z0-9][\\)])([A-Z]+[/: ]*)(.*)$',temp_offense,'$4$5'),   
                                ls_vendor IN ['W0091'] and  regexfind('(PC|VC|HS|BP)( [0-9\\./]+[A-Z0-9\\. ]+)([\\(][A-Z0-9]+[\\)])+[ ]*([A-Z]+[/: ]*)(.*)$'              ,temp_offense)=>regexreplace('(PC|VC|HS|BP)( [0-9\\./]+[A-Z0-9\\. ]+)([\\(][A-Z0-9]+[\\)])+[ ]*([A-Z]+[/: ]*)(.*)$',temp_offense,'$4$5'),
                                ls_vendor IN ['W0091'] and  regexfind('(PC|VC|HS|BP)( [0-9\\./ ]+) ([A-Z]+[/: ]*)(.*)$'                                                   ,temp_offense)=>regexreplace('(PC|VC|HS|BP)( [0-9\\./ ]+) ([A-Z]+[/: ]*)(.*)$',temp_offense,'$3$4'),
-         
+
+															 ls_vendor IN ['W0310'] and stringlib.stringfind(temp_offense,'-',2) >0 => temp_offense[stringlib.stringfind(temp_offense,'-',2)+1..], 
+                               ls_vendor IN ['W0310'] and regexfind('^([0-9\\.]+[0-9]+)[-]([A-Z0-9]+)[ ]*(.*)$',temp_offense) => regexreplace('^([0-9\\.]+[0-9]+)[-]([A-Z0-9]+)[ ]*(.*)$',temp_offense,'$3'), 
+                               ls_vendor IN ['W0310'] and stringlib.stringfind(temp_offense,'-',2) =0 
+															                        and stringlib.stringfind(temp_offense,'-',1) >0 => temp_offense[stringlib.stringfind(temp_offense,'-',1)+1..],                                
+					         
 				                       regexfind('[a-zA-Z]+[0-9.]+[(a-zA-Z)]*[(0-9)]*:',temp_offense)=>  trim(regexreplace('([a-zA-Z]+[0-9.]+[/(a-zA-Z/)]*[(0-9)]*:)(.*)',temp_offense,'$2'),left,right),
                                regexfind('[0-9.]+[a-zA-Z]+[(a-zA-Z)]*[(0-9)]*:',temp_offense)=>  trim(regexreplace('([0-9.]+[a-zA-Z]+[/(a-zA-Z/)]*[(0-9)]*:)(.*)',temp_offense,'$2'),left,right),
                                regexfind('[a-zA-Z0-9.]+[.][(a-zA-Z)]*[(0-9)]*', l.offensecode) => temp_offense,
