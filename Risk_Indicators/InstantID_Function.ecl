@@ -126,7 +126,7 @@ seq_map := join( indata1, indata,
 	// join the results back to the original input so that every record on input has a response populated
 	full_response := join( seq_map, iid_results, left.deduped_seq=right.seq, transform( layout_output, self.seq := left.input_seq, self := right ), keep(1) );
   
-  if(exists(full_response(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
+  if(not in_isFCRA and exists(full_response(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
 
 // output(	indata1	, named('indata1')	);
