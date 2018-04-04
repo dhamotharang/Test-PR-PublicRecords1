@@ -46,7 +46,7 @@ string6 ninesDate   := '999999';
 																							Business_Risk_BIP.Constants.Limit_BusHeader,
 																							FALSE, 
 																							TRUE, 
-																							Options.KeepLargeBusinesses);
+																							BIPV2.IDconstants.JoinTypes.LimitTransformJoin);
 											
 	// clean up the business header before doing anything else
 	Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRaw1, BusinessHeaderRaw);	
