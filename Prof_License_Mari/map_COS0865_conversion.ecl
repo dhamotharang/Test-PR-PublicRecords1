@@ -38,7 +38,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 					 'LINE 1|LINE 2|LEGAL DEPT\\.|SALES OFFICE|BUSINESS OFFICE|^.* MORTGAGE$' +
 					 ')';
   	AddrPattern   :=	'( ST$| STE$| STREET| RD$| DR$| DR\\.$| DRIVE| ROUTE| ROAD|SUITE|AVENUE|AVE$|LANE|'+
-		                     ' CT$| BLDG| BLVD| BOULEVARD| MAINSTREET| PLACE| PKWY| PARK| BLD| CENTRE)';
+		                     ' CT$| BLDG| BLVD|^BLDG,|BOULEVARD| FL$| MAINSTREET| PLACE| PKWY| PARK| BLD| CENTRE)';
  
    website_pattern := '(HTTP://|)(WWW\\.)?([^\\.]+)\\.(\\w{2}|(COM|NET|ORG|EDU|INT|MIL|GOV|ARPA|BIZ|AERO|NAME|COOP|INFO|PRO|MUSEUM|TV|US|CO))$';
 
@@ -108,18 +108,18 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 		// 1.) Replacing D/B/A with  '|' to separate ORG_NAME & DBA
 		// 2.) Handle AKA Names to First, Middle Last Format
 		// 3.) Standardized corporation suffixes
-			TrimFName	   	:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
-			TrimMName     := ut.CleanSpacesAndUpper(pInput.MIDDLE_NAME);
-			TrimLName	   	:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
-			TrimAttention := ut.CleanSpacesAndUpper(pInput.ATTENTION);
-			TrimSuffix    := ut.CleanSpacesAndUpper(pInput.SUFFIX);
-		 TrimCompany_1	:= ut.CleanSpacesAndUpper(pInput.ENTITY_NAME);
-		 TrimAddress1  := ut.CleanSpacesAndUpper(pInput.ADDRESS);
-  	TrimAddress2  := ut.CleanSpacesAndUpper(pInput.ADDRESS_2);	
+			TrimFName	   	:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.FIRST_NAME),'="');
+			TrimMName     := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.MIDDLE_NAME),'="');
+			TrimLName	   	:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.LAST_NAME),'="');
+			TrimAttention := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ATTENTION),'="');
+			TrimSuffix    := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.SUFFIX),'="');
+		  TrimCompany_1	:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ENTITY_NAME),'="');
+		  TrimAddress1  := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ADDRESS),'="');
+    	TrimAddress2  := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ADDRESS_2),'="');	
 			TrimSubCategory := ut.CleanSpacesAndUpper(pInput.REGISTRATION_SUB_TYPE);
   
 	//Parsing Attention
-		 prepAddress   := IF(Prof_License_Mari.func_is_address(TrimAttention), TrimAttention,'');
+		  prepAddress   := IF(Prof_License_Mari.func_is_address(TrimAttention), TrimAttention,'');
 
 			prepCompany   := IF(Prof_License_Mari.func_is_company(TrimAttention) AND NOT Prof_License_Mari.func_is_address(TrimAttention), TrimAttention
 			                    ,'');
@@ -133,7 +133,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 													 TrimAttention);
 
 		// Identify NICKNAME in the various format 
-	  tempFNick := Prof_License_Mari.fGetNickname(TrimFName, 'nick');
+	    tempFNick := Prof_License_Mari.fGetNickname(TrimFName, 'nick');
 			tempMNick := Prof_License_Mari.fGetNickname(TrimMName, 'nick');
 			tempLNick	:= Prof_License_Mari.fGetNickname(TrimLName, 'nick');
 			
@@ -146,7 +146,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 			cleanMNAME		  := Prof_License_Mari.mod_clean_name_addr.strippunctName(removeMNick);
 			cleanLNAME		  := Prof_License_Mari.mod_clean_name_addr.strippunctName(removeLNick);
 		
-		 tmpSuffix         := MAP(cleanMNAME = 'III'=> 'III',
+		  tmpSuffix         := MAP(cleanMNAME = 'III'=> 'III',
 															 cleanMNAME = 'IV'=> 'IV',
 															 cleanMNAME = 'SR'=> 'SR',
 															 cleanMNAME = 'JR'=> 'JR',
@@ -173,19 +173,19 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 															 cleanMNAME);	
 															 
 			GoodLNAME         := MAP(REGEXFIND('^(.*) (III)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (III)(\\.?)$',cleanLNAME,1),
-			             REGEXFIND('^(.*) (II)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (II)(\\.?)$',cleanLNAME,1),
+			                         REGEXFIND('^(.*) (II)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (II)(\\.?)$',cleanLNAME,1),
 															 REGEXFIND('^(.*) (IV)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (IV)(\\.?)$',cleanLNAME,1),
 															 REGEXFIND('^(.*) (SR)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (SR)(\\.?)$',cleanLNAME,1),
 															 REGEXFIND('^(.*) (JR)(\\.?)$',cleanLNAME) => REGEXFIND('^(.*) (JR)(\\.?)$',cleanLNAME,1),
 															 cleanlNAME);																 
 												 
 			SELF.NAME_ORG			:= StringLib.StringCleanSpaces(GoodLNAME+ ' ' +cleanFNAME); 
-			SELF.NAME_ORG_ORIG:= ut.CleanSpacesAndUpper(pInput.First_Name + ' ' + pInput.Middle_Name + ' ' + pInput.Last_Name); 
+			SELF.NAME_ORG_ORIG:= ut.CleanSpacesAndUpper(TrimFName + ' ' + TrimMName + ' ' + TrimLName); 
 			SELF.NAME_FIRST 	:= cleanFNAME;
 			SELF.NAME_MID  	  := GoodMNAME;
 			SELF.NAME_LAST  	:= GoodLNAME;
 			SELF.NAME_SUFX    := tmpSuffix;
-   SELF.NAME_FORMAT	:= 'F';	
+      SELF.NAME_FORMAT	:= 'F';	
 			
 			stripNick				  := MAP(StringLib.stringfind(tempLNick,'AKA',1)> 0 => REGEXREPLACE('(AKA)',tempLNick,''),
 			             tempFNick !='' => tempFNick,
@@ -195,7 +195,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 			SELF.NAME_NICK	  := StringLib.StringCleanSpaces(stripNick);
 
 			// Parsing Contact Name
-		 cleanContactName  := Prof_License_Mari.mod_clean_name_addr.cleanFMLName(prepName);
+		  cleanContactName  := Prof_License_Mari.mod_clean_name_addr.cleanFMLName(prepName);
 			SELF.Name_Contact_First := cleanContactName[6..25];
 			SELF.Name_Contact_Mid	 	:= cleanContactName[26..45];
 			SELF.Name_Contact_Last	 := cleanContactName[46..65];
@@ -231,11 +231,11 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 			                           trimAddrAddr = 'XXX'=> '',
 			                           prepAddress);
 															 
-			mail_ind           := '^(.*)MAILING(.*)$';
+			mail_ind            := '^(.*)MAILING(.*)$';
 			tmpAddr1	         	:= IF(REGEXFIND(mail_ind, trimAddress), REGEXFIND(mail_ind, trimAddress,1), trimAddress);
 			trimCity						:= ut.CleanSpacesAndUpper(pInput.city);
-			trimState     := ut.CleanSpacesAndUpper(pInput.state);
-			trimZip       := ut.CleanSpacesAndUpper(pInput.POSTAL_CODE);
+			trimState     := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.state),'="');
+			trimZip       := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.POSTAL_CODE),'="');
 			careof_ind    := 'C/O ([0-9A-Za-z\\s][^\\,]+)\\,\\s([0-9A-Za-z \\s \\.]+)$';
 			//Extract DBA Name from Address
 			
@@ -257,7 +257,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 																 TrimCompany_1 = '' AND REGEXFIND(CoPattern,trimAddress1) AND NOT REGEXFIND(AddrPattern,trimAddress1)=> trimAddress1,
 																 TrimCompany_1 = '' AND Prof_License_Mari.func_is_company(trimAddress2) AND NOT REGEXFIND(AddrPattern,trimAddress2)=> trimAddress2,
 																 TrimCompany_1 = '' AND REGEXFIND(CoPattern,trimAddress2) AND NOT REGEXFIND(AddrPattern,trimAddress2)=> trimAddress2,
-	                TrimCompany_1 <> '' AND TrimCompany_1 <> '.' => TrimCompany_1, 
+	                               TrimCompany_1 <> '' AND TrimCompany_1 <> '.' => TrimCompany_1, 
 																 prepCompany);	
 																 
  	tmpCompany       := IF(Prof_License_Mari.func_is_address(TrimCompany),'',TrimCompany);	
@@ -265,7 +265,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 		tmpNAME_DBA						:= IF(REGEXFIND('( DBA | D/B/A | DBA: |(DBA)| A/K/A | AKA )',tmpNameOffice), Prof_License_Mari.mod_clean_name_addr.GetDBAName(tmpNameOffice),
 																				'');
 		StdNAME_DBA 					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(tmpNAME_DBA);
-		CleanNAME_DBA				:= MAP(StringLib.stringfind(StdNAME_DBA,'.COM',1) > 0 => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
+		CleanNAME_DBA				  := MAP(StringLib.stringfind(StdNAME_DBA,'.COM',1) > 0 => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
 																	tmpDBA1 <> ''=> tmpDBA1,
 																	REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_DBA,LEFT,RIGHT))
 																		OR REGEXFIND('^([A-Za-z ]*)(CORP)[ ](LLC)',TRIM(StdNAME_DBA,LEFT,RIGHT)) => Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_DBA),
@@ -301,7 +301,7 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
              																REGEXFIND(AddrPattern, tmpNameContact1) => '',
 			                          tmpNameContact1);			
 		 SELF.OFFICE_PARSE		:= MAP(SELF.NAME_OFFICE = '' => '',
-														 		SELF.NAME_OFFICE != '' AND StringLib.stringfind(TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ',1)<1 => 'GR',
+														  	 SELF.NAME_OFFICE != '' AND StringLib.stringfind(TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ',1)<1 => 'GR',
 																 SELF.NAME_OFFICE <> '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE)=> 'GR',
 																 SELF.NAME_OFFICE != '' AND REGEXFIND('^([A-Za-z ]*)[ ](CO)[ ]',SELF.NAME_OFFICE) => 'GR', 
 																 SELF.NAME_OFFICE != '' AND REGEXFIND(CoPattern,SELF.NAME_OFFICE)=>'GR','MD');
@@ -326,20 +326,21 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 																StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));	
 		 GoodADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
 			
-		 SELF.ADDR_ADDR1_1		:= IF(GoodADDR_ADDR1_1 <> '',GoodADDR_ADDR1_1,GoodADDR_ADDR2_1);
+		  SELF.ADDR_ADDR1_1		:= IF(GoodADDR_ADDR1_1 <> '',GoodADDR_ADDR1_1,GoodADDR_ADDR2_1);
 			SELF.ADDR_ADDR2_1		:= IF(GoodADDR_ADDR1_1 <> '',GoodADDR_ADDR2_1,'');
 			SELF.ADDR_ADDR3_1 	:= '';
 			SELF.ADDR_ADDR4_1 	:= '';
 			SELF.ADDR_CITY_1 		:= trimCity;
 			SELF.ADDR_STATE_1		:= trimState;
-			SELF.ADDR_CNTY_1   := ut.CleanSpacesAndUpper(pInput.COUNTY) ;
-		  
-			tmpZIPCODE          := REGEXFIND('[0-9]{5,}(-[0-9]{4})?$', TRIM(pInput.postal_code,LEFT,RIGHT), 0);	
+			SELF.ADDR_CNTY_1    := ut.CleanSpacesAndUpper(pInput.COUNTY) ;
+		  			
+			tmpZIPCODE          := REGEXFIND('[0-9]{5,}(-[0-9]{4})?$', trimZip, 0);	
 			SELF.ADDR_ZIP5_1		:= tmpZIPCODE[1..5];
-			SELF.ADDR_ZIP4_1		:= IF(pInput.ZIP4<> '',pInput.ZIP4,tmpZIPCODE[7..10]);
+			SELF.ADDR_ZIP4_1		:= tmpZIPCODE[7..10];
 			
 			// standardize phone numbers to 10 digits
-			cleanPhone          := ut.CleanPhone(pInput.phone_number);
+			TrimPhone           := StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.phone_number),'="');
+			cleanPhone          := ut.CleanPhone(TrimPhone);
 			SELF.PHN_PHONE_1    := cleanPhone;
 			SELF.PHN_MARI_1     := cleanPhone;	
 		  
@@ -370,11 +371,11 @@ EXPORT map_COS0865_conversion(STRING pVersion) := FUNCTION
 																			+ TRIM(SELF.name_org,LEFT,RIGHT) + ','
 																			+ TRIM(trimAddress ,LEFT,RIGHT) + ','
 																			+ TRIM(trimCity, LEFT,RIGHT) + ','
-																			+ ut.CleanSpacesAndUpper(pInput.state)+ ','
-																			+	ut.CleanSpacesAndUpper(pInput.postal_code)
+																			+ TRIM(trimState, LEFT,RIGHT)+ ','
+																			+	TRIM(trimZip, LEFT,RIGHT)
 																			);
 																			
-			SELF.NMLS_ID    := pInput.NMLS_ID;
+			SELF.NMLS_ID    := (UNSIGNED8)StringLib.StringFilterout(ut.CleanSpacesAndUpper(pInput.NMLS_ID),'="');
 			SELF.PROVNOTE_1 := TrimSubCategory;		
 			SELF := [];		   		   
 END;

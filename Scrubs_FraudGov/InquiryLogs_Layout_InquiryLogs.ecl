@@ -1,0 +1,1 @@
+﻿EXPORT InquiryLogs_Layout_InquiryLogs := {InquiryLogs_In_InquiryLogs};

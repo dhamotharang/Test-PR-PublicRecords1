@@ -1,10 +1,11 @@
-﻿IMPORT	versioncontrol;
+﻿//	Needed in file_liens_fcra_main
+IMPORT	LiensV2_SrcInfoRpt, versioncontrol;
 EXPORT	Filenames(STRING	pVersion	=	'',
 									BOOLEAN	pUseProd	=	FALSE)	:=	MODULE
 
-	EXPORT	lInputTemplate	:=	_Dataset(pUseProd).thor_cluster_files	+	'in::'		+	_Dataset().name	+	'::@version@::';
-	EXPORT	lBaseTemplate		:=	_Dataset(pUseProd).thor_cluster_files	+	'base::'	+	_Dataset().name	+	'::@version@::';
-	EXPORT	lOutTemplate		:=	_Dataset(pUseProd).thor_cluster_files	+	'out::'		+	_Dataset().name	+	'::@version@::';
+	EXPORT	lInputTemplate	:=	LiensV2_SrcInfoRpt._Dataset(pUseProd).thor_cluster_files	+	'in::'		+	_Dataset().name	+	'::@version@::';
+	EXPORT	lBaseTemplate		:=	LiensV2_SrcInfoRpt._Dataset(pUseProd).thor_cluster_files	+	'base::'	+	_Dataset().name	+	'::@version@::';
+	EXPORT	lOutTemplate			:=	LiensV2_SrcInfoRpt._Dataset(pUseProd).thor_cluster_files	+	'out::'		+	_Dataset().name	+	'::@version@::';
 
 	EXPORT	Input						:=	MODULE
 		EXPORT	srcinforpt			:=	versioncontrol.mInputFilenameVersions(lInputTemplate	+	'srcinforpt'	,	pVersion);
