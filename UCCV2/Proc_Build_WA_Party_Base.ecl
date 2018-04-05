@@ -1,7 +1,7 @@
 ﻿IMPORT Address, NID, UCCV2, ut;
 
 newInput   			:= 	UCCV2.File_WA_in;	
-suppressionFile	:=	if (COUNT(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression')) > 0,
+suppressionFile	:=	if (COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0,
 													UCCV2.File_WA_Suppression,
 													DATASET([], UCCV2.Layout_File_WA_Suppression)
 												);
