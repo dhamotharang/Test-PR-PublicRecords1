@@ -137,7 +137,7 @@ ret := CASE(state,
 				    dl_len=13 => '6',
 				    '1'),
 		'MA' =>  	MAP(/*dl_len=9 AND IsAllNumeric(dl_trim) => ssnVerifyValidate(dlmatch,socsvalflag,dobvalflag),*/
-				    dl_len=9 AND dl_trim[1]='S' AND IsAllNumeric(dl_trim[2..9]) => '0',
+            dl_len=9 AND dl_trim[1]='S' AND dl_trim[2]IN ['A','0','1','2','3','4','5','6','7','8','9'] AND IsAllNumeric(dl_trim[3..9]) => '0',
 				    dl_len=9 => '12',			    
 				    '1'),
 		'MI' =>  	MAP(dl_len=13 AND dl_trim[1]>='A' AND dl_trim[1]<='Z' AND IsAllNumeric(dl_trim[2..13]) /* AND dl_trim[1..4]=lnSoundex(lname) */
