@@ -52,7 +52,7 @@ pVersion := '20180306';
 		
 // Build All
 		
-		build_all := sequential(
+		build_fraudgov := sequential(
 					  #workunit('name','FRAUDGOV DATA BUILD ' + pVersion)
 					, FraudGovPlatform.Create_Supers
 					, create_build
@@ -64,5 +64,5 @@ pVersion := '20180306';
 					, build_keys			
 		);		
 		
-		build_all;
+		build_fraudgov;
 			

@@ -5,7 +5,7 @@ EXPORT Clean_Address(pInputFile, pAddressCache ) :=
 FUNCTIONMACRO		
 		
 		
-		pInputFile addCleanAddress(pInputFile L, FraudGovPlatform.Layouts.address_cleaner R) := TRANSFORM
+		pInputFile addCleanAddress(pInputFile L, FraudGovPlatform.Layouts.Base.AddressCache R) := TRANSFORM
 				SELF.clean_address.prim_range			:= R.clean_address.prim_range;	 
 				SELF.clean_address.predir			 	:= R.clean_address.predir;			 
 				SELF.clean_address.prim_name		 	:= R.clean_address.prim_name;		 
@@ -44,7 +44,7 @@ FUNCTIONMACRO
 														LEFT OUTER
 												);			 
 
-		  pInputFile addCleanAAddress(pInputFile L, FraudGovPlatform.Layouts.address_cleaner R) := TRANSFORM
+		  pInputFile addCleanAAddress(pInputFile L, FraudGovPlatform.Layouts.Base.AddressCache R) := TRANSFORM
 				SELF.additional_address.prim_range		:= R.clean_address.prim_range;	 
 				SELF.additional_address.predir			:= R.clean_address.predir;			 
 				SELF.additional_address.prim_name		:= R.clean_address.prim_name;		 
@@ -80,8 +80,7 @@ FUNCTIONMACRO
 														pAddressCache,
 														left.mailing_address_id = RIGHT.address_id,
 														addCleanAAddress(LEFT,RIGHT),
-														INNER,
-														LOCAL
+														INNER
 													);
 
 
@@ -116,12 +115,11 @@ FUNCTIONMACRO
 					SELF := L;
 			END;
 																		 
-			Cleaned_Addresses:=	 JOIN (	distribute(Cleaned_Address_1,hash(sequence)),
-														distribute(Cleaned_Address_2,hash(sequence)),
+			Cleaned_Addresses:=	 JOIN (	Cleaned_Address_1,
+														Cleaned_Address_2,
 														left.sequence = RIGHT.sequence,
 														appENDCleanMailingAddress(left, RIGHT),
-														left outer,
-														local
+														left outer
 											);
 																									
 			

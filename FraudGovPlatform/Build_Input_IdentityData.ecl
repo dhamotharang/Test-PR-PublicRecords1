@@ -58,8 +58,11 @@ module
 		self.address_1 := address_1;
 		self.address_2 := address_2;
 		self.address_id := hash64(address_1 + address_2);
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));;
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
+		mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));
+		mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
+		self.mailing_address_1 := mailing_address_1;
+		self.mailing_address_2 := mailing_address_2;
+		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
 		self.sequence := C;
@@ -101,10 +104,10 @@ module
 																							TRANSFORM(iddt,SELF := LEFT),
 																							left only);
 
-	new_addresses := Functions.New_Addresses(f1_dedup,pversion);
+	new_addresses := Functions.New_Addresses(f1_dedup);
 	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_IDDT.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
 																							
-	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, Files(pversion).Input.AddressCache_IDDT.New);
+	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, Files(pversion).Input.AddressCache_IDDT.New(pversion));
 	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone	:= Standardize_Entity.Clean_Phone (dappendName);
 	dAppendLexid	:= Standardize_Entity.Append_Lexid (dAppendPhone);
@@ -152,18 +155,12 @@ module
 				 Filenames().Input.AddressCache_IDDT.Sprayed
 				,Filenames().Input.AddressCache_IDDT.New(pversion)
 			)
-			
-			//Clear Individual Sprayed Files
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed, TRUE)
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected, TRUE)
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed, TRUE)
-			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected, TRUE)		
 			,STD.File.FinishSuperFileTransaction()	
 		);
 // Return
 	export build_prepped := 
 			 sequential(
-				,Build_Address_Cache
+				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
 				,Promote_Input_File

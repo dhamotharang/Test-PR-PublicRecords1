@@ -309,9 +309,11 @@ EXPORT Layouts := MODULE
 			Sprayed.KnownFraud;
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;			
 			string100		address_1 := '';   
 			string50		address_2 := '';				
 			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
 			string100		mailing_address_1 := '';   
 			string50		mailing_address_2 := '';				
 			Address.Layout_Clean182_fips			additional_address;
