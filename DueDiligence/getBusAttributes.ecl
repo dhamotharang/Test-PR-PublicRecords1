@@ -29,30 +29,26 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	//Get best data - best address for this LINKID (not everything was populated on the input).  This is our attempt to fill in what was not INPUT.
 	//  Bus_Info is populated here.   
-	busBestData := DueDiligence.getBusBestData(cleanedInput, inquiredBusWithBIP, options, linkingOptions, includeReport);
+	busBestData := DueDiligence.getBusBestData(cleanedInput, inquiredBusWithBIP, options, linkingOptions, includeReport, DD_SSNMask);
 	
 	//Get linked business to the business passed in
-	linkedBus := DueDiligence.getBusLinkedBus(busBestData, options, linkingOptions);
+	linkedBus := DueDiligence.getBusLinkedBus(busBestData, options, linkingOptions, DD_SSNMask);
 	
 	//Get executives from inquired businesses
 	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions, includeReport);
-	
+  
 	//Get related businesses
 	relatedBus := DATASET([], DueDiligence.Layouts.Busn_Internal);
-	
-	
 	
 	//get attribute data for individuals related to the inquired business
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
 	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
 	
-
-
 	//get attribute data for the inquired business
-	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions, includeReport);
+	busProperty    := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions, includeReport);
 
-	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
+	busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
 
 	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
 	
@@ -62,15 +58,11 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
 
-	 
-
 	/*attributes taking in inquired and linked businesses*/
 	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeReport);
 	
 	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, linkingOptions, includeReport);
 
-	
-	
 	/*attributes that must be called after other attributes*/
 	addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
 	
@@ -99,6 +91,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 	
 	/*debugging section */   
+	//IF(debugMode, OUTPUT(DD_SSNMask, NAMED('DD_SSNMask')));
 	IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
 	IF(debugMode, OUTPUT(inquiredBusWithBIP, NAMED('inquiredBusWithBIP')));
 	IF(debugMode, OUTPUT(inquiredBusNoBIP, NAMED('inquiredBusNoBIP')));
@@ -107,14 +100,12 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(linkedBus, NAMED('linkedBus')));	
 	IF(debugMode, OUTPUT(busExecs, NAMED('busExecs')));
 	IF(debugMode, OUTPUT(relatedBus, NAMED('relatedBus')));
-
 	IF(debugMode, OUTPUT(busProfLicense, NAMED('busProfLicense')));
 	IF(debugMode, OUTPUT(busLegalEvents, NAMED('busLegalEvents')));
-	
 	IF(debugMode, OUTPUT(busProperty, NAMED('busProperty')));
 	IF(debugMode, OUTPUT(busWatercraft, NAMED('busWatercraft')));
 	IF(debugMode, OUTPUT(busAircraft, NAMED('busAircraft')));	
-	IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
+  IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
 	IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
 	IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
 	
