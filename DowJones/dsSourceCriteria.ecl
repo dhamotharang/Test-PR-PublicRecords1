@@ -1579,5 +1579,11 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/465 Egypt List','1565'},
 {'EC 2018/468 Terrorism List','1566'},
 {'OFAC - Countering America\'s Adversaries Through Sanctions Act of 2017 (CAATSA) - Section 224','1567'},
-{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List','1568'}
+{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List','1568'},
+{'EC (CFSP) 2018/516 Sudan List','1569'},
+{'EC 2018/512 Sudan List','1570'},
+{'SECO (Switzerland) Venezuela List','1571'},
+{'UN Security Council Resolution 2371 (2017) -  Vessels Prohibited from Port Entry Pursuant to Paragraph 6','1572'},
+{'UN Security Council Vessels Subject to Asset Freeze - North Korea List','1573'},
+{'UN Security Council Vessels Subject to De-Flagging - North Korea List','1574'}
 ],r);
