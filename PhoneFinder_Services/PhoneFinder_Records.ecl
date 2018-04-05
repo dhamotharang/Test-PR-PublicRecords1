@@ -58,13 +58,8 @@ MODULE
 	dPhoneSearchResults := IF(EXISTS(dInPhone),PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways));
 
 	// Waterfall process when only PII is provided
-	dWaterfallResults_pre := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
+	dWaterfallResults := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
 
- dWaterfall_LimitOtherPhones := TOPN(dWaterfallResults_pre(~isPrimaryPhone),inMod.MaxOtherPhones,acctno,-phone_score);	
-
- dWaterfallResults  := dWaterfallResults_pre(isPrimaryPhone) + dWaterfall_LimitOtherPhones;
-
-	
 	SHARED dSearchRecs_pre		     := IF(vPhoneBlank,dWaterfallResults,dPhoneSearchResults);
 
 	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
