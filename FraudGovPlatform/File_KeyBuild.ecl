@@ -13,9 +13,6 @@ import ut, Std;
 
 	DpatchIdentityDatadid   := project ( Outfile , transform (FraudShared.Layouts.KeyBuild, 
 	                            self.did  := if(left.source = 'IdentityData' and left.did =0, left.Rawlinkid , left.did ); 
-															self.ssn	:= left.clean_ssn;
-															self.zip	:= left.clean_zip;
-															self.ip_address	:= left.clean_ip_address;
                               self      := left ; 
 															)); 
 															
