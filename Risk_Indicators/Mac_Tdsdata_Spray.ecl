@@ -1,4 +1,4 @@
-import roxiekeybuild,ut;
+﻿import roxiekeybuild,ut,Scrubs_TelcordiaTDS;
 
 export Mac_Tdsdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_20\'',email_target='\' \'') := 
 macro
@@ -18,6 +18,7 @@ macro
 #uniquename(send_failure_msg)
 #uniquename(updatedops)
 #uniquename(TDS_transform)
+#uniquename(RunScrubs)
 
 %spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_20','~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);
 %TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
@@ -52,7 +53,7 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate))
+sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate),Scrubs_TelcordiaTDS.fnRunScrubs(filedate,''))
  : success(parallel(%send_succ_msg%,%send_success_msg%)),
    failure(parallel(%send_fail_msg%,%send_failure_msg%));
 
