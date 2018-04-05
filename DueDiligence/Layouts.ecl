@@ -559,10 +559,17 @@ EXPORT LinkIDs := RECORD
     UNSIGNED4 numberOfBusinessesWithNoFein;
     UNSIGNED4 numberOfBusinssesIncWithLooseIncLaws;
 	END;
+  
+  EXPORT FEINLayoutSources := RECORD
+		STRING2 source;  
+		INTEGER  source_record_id;
+    STRING  vl_id;     
+	END;
 	
 	EXPORT BusReportDetails        := RECORD
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
-    BOOLEAN headerSourceContainsE5;
+    BOOLEAN FEINSourceContainsE5;
+    DATASET(FEINLayoutSources) FEINSources; 
     DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;

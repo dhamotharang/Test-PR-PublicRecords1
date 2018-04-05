@@ -8,7 +8,8 @@
 
 EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-													BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+													BIPV2.mod_sources.iParams linkingOptions,
+                          string6 DD_SSNMask = '') := FUNCTION
 
 	
 	relatedBusRaw := BIPV2.Key_BH_Relationship_SELEID.kFetch(PROJECT(indata, TRANSFORM(BIPV2.Key_BH_Relationship_SELEID.l_kFetch_in, 
@@ -45,7 +46,7 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																										 SELF.Busn_Info.BIP_IDs.SeleID.LinkID := LEFT.seleid2;
 																										 SELF := [])); 
 																												 
-	bestDataForLinkedBus := DueDiligence.getBusBestData(DATASET([], DueDiligence.Layouts.CleanedData), transformLinkIDs, options, linkingOptions, FALSE);
+	bestDataForLinkedBus := DueDiligence.getBusBestData(DATASET([], DueDiligence.Layouts.CleanedData), transformLinkIDs, options, linkingOptions, FALSE, DD_SSNMask);
 	
 	//tie the best data back to the unique linkIDs for the inquired business
 	joinBestWithMatch := JOIN(matchUltIDs, bestDataForLinkedBus,
