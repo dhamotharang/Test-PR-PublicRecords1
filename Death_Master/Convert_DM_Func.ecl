@@ -1,4 +1,4 @@
-import header,text_search,Property,Codes;
+﻿import header,text_search,Property,Codes;
 
 export Convert_DM_Func := function
 
@@ -150,7 +150,7 @@ end;
 lkp_join := join(main_join,Codes.Key_Codes_V3,
 					left.st_country_code = right.code and right.file_name = 'DEATH_MASTER' and right.field_name = 'ST_COUNTRY_CODE'
 					and right.field_name2 = '',
-					lkp_st_ctry_codes(left,right),left outer, local);
+					lkp_st_ctry_codes(left,right),left outer, LOOKUP,	local);
 
 boolean_layout lkp_county(lkp_join l,Property.Layout_County_Code_Names R) := transform
 	self.county_desc := r.county_name;

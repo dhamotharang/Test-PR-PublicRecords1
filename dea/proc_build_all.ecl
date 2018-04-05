@@ -1,4 +1,4 @@
-﻿#workunit('name','DEA Weekly Build');
+﻿#workunit('name','Yogurt: DEA Daily Build');
 #OPTION('multiplePersistInstances',FALSE);
 import ut, roxiekeybuild, tools, DEA, Orbit3;
 export proc_build_all(string sourceip,string filename,string filedate,string do_spray='true') :=

@@ -1,0 +1,40 @@
+﻿OPTIONS:-gn 
+MODULE:LocationID_Ingest
+
+// -------------------------------------------------------------------
+// Ingest
+// -------------------------------------------------------------------
+FILENAME:BASE
+IDFIELD:EXISTS:LocId
+RIDFIELD:rid:GENERATE
+SOURCEFIELD:source
+SOURCERIDFIELD:source_record_id
+INGESTFILE:address_update:NAMED(LocationID_Ingest.In_INGEST)
+CONFIG:_CFG
+
+FIELDTYPE:WORDBAG:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-):SPACES( ):ONFAIL(IGNORE)
+FIELDTYPE:CITY:LIKE(WORDBAG):LENGTHS(0,3..):ONFAIL(IGNORE) 
+FIELDTYPE:zip5:ALLOW(0123456789):LENGTHS(0,5):ONFAIL(IGNORE)
+FIELDTYPE:hasZip4:ALLOW(0123456789):LENGTHS(0,4):ONFAIL(IGNORE)
+FIELDTYPE:alpha_st:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(0,2):ONFAIL(IGNORE)
+
+// FIELD:source_record_id:DERIVED:0,0
+FIELD:aid:DERIVED:0,0
+// RECORDDATE fields are not considered for matching, and will be rolled up
+FIELD:dateseenfirst:RECORDDATE(FIRST):0,0
+FIELD:dateseenlast:RECORDDATE(LAST):0,0
+
+// Fields DERIVED by the linking team are not considered for matching, and will receive their "new" value (i.e. ingest file)
+FIELD:prim_range:0,0
+FIELD:predir:0,0
+FIELD:prim_name:0,0
+FIELD:addr_suffix:0,0
+FIELD:postdir:0,0
+FIELD:unit_desig:0,0
+FIELD:sec_range:0,0
+FIELD:v_city_name:like(CITY):0,0
+FIELD:st:LIKE(alpha_st):0,0
+FIELD:zip5:LIKE(zip5):0,0
+FIELD:rec_type:0,0  
+FIELD:err_stat:0,0  
+FIELD:cntprimname:0,0  

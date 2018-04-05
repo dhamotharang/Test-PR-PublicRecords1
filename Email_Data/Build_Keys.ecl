@@ -1,4 +1,4 @@
-import roxiekeybuild,autokey,doxie;
+﻿import roxiekeybuild,autokey,doxie;
 
 export Build_Keys (filedate) := function
 
@@ -57,23 +57,23 @@ RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_data::fcra::@version@::did',
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_data::fcra::@version@::did2', 'Q', mv_email_data_fcra_did2_key_qa);
 
 build_keys := sequential(email_data_did_key,
-                         email_data_did2_key,
+                         // email_data_did2_key,
 												 email_data_email_address_key,
-												 email_data_email_address2_key,
+												 // email_data_email_address2_key,
 												 fcra_key,
-												 fcra_did2_key,
+												 // fcra_did2_key,
 												 mv_email_data_did_key,
-												 mv_email_data_did2_key,
+												 // mv_email_data_did2_key,
 												 mv_email_data_email_address_key,
-												 mv_email_data_email_address2_key,
+												 // mv_email_data_email_address2_key,
 												 mv_fcra_key,
-												 mv_fcra_did2_key,
+												 // mv_fcra_did2_key,
 												 mv_email_data_did_key_qa,
-												 mv_email_data_did2_key_qa,
+												 // mv_email_data_did2_key_qa,
 												 mv_email_data_email_address_key_qa,
-												 mv_email_data_email_address2_key_qa,
+												 // mv_email_data_email_address2_key_qa,
 												 mv_email_data_fcra_did_key_qa,
-												 mv_email_data_fcra_did2_key_qa
+												 // mv_email_data_fcra_did2_key_qa
 												 );
 
 build_autokeys := build_autokey((string) filedate);

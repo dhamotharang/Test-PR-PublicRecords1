@@ -1,4 +1,4 @@
-IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	MDR,	ut,	RiskWise;
+﻿IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	MDR,	ut,	RiskWise;
 EXPORT	Constants(string	pFileDate='')	:=
 MODULE
 
@@ -6,7 +6,7 @@ MODULE
 
 	EXPORT	threads					:=	2;
 
-	EXPORT	RoxieIP					:=	RiskWise.shortcuts.prod_batch_neutral;
+	EXPORT	RoxieIP					:=	RiskWise.shortcuts.prod_batch_analytics_roxie;
 
 	EXPORT	Score_Name			:=	'CREDIT_SCORE';
 	

@@ -1,4 +1,4 @@
-import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report;
+﻿import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report,dops;
 export BWR_Build_All_Moxie_Files := function
 #workunit('name','Official Records Build All' );
 
@@ -14,7 +14,7 @@ official_records.Out_Moxie_Dev_Population_Stats(official_records.File_Moxie_Part
 								               ,official_records.Version_Development
            									   ,DoTheSTRATAStats)
 
-dops_update := RoxieKeyBuild.updateversion('OfficialRecordsKeys',filedate,'skasavajjala@seisint.com',,'N');
+dops_update := dops.updateversion('OfficialRecordsKeys',filedate,'skasavajjala@seisint.com',,'N');
 orbit_report.Orecs_Stats(getretval);
 build_all :=
 sequential

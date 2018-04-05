@@ -1,7 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_GoExternal - External Linking Keybuild - SALT V3.3.1');
-IMPORT BizLinkFull,SALT33;
+#workunit('name','BizLinkFull.BWR_GoExternal - External Linking Keybuild - SALT V3.7.2');
+IMPORT BizLinkFull,SALT37;
 BizLinkFull.Proc_GoExternal;
  
 //If you want/need to shrink your external keys a little then removing some extra credit fields can help

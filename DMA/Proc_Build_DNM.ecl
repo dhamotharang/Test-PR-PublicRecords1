@@ -1,5 +1,5 @@
-#workunit('name','DNM Weekly Build')
-import ut, DMA, _control, RoxieKeyBuild;
+﻿#workunit('name','DNM Monthly Build')
+import ut, DMA, _control, RoxieKeyBuild, Orbit3;
 
 export proc_build_DNM(string sourceIP,string SourceFile,string fileDate,string groupName='thor400_44',string emailTarget=' ') :=
 function
@@ -57,11 +57,13 @@ function
 										
 	qaRecs 	:= output(choosen(sampleRecs,1000),named('DNM_Sample_Records'));
 	Strata_Stats := DMA.Out_Base_Stats_Population(fileDate);
-	qaEmail	:= fileservices.sendemail('cbrodeur@seisint.com;qualityassurance@seisint.com;camaral@seisint.com;randy.reyes@lexisnexis.com',
+	qaEmail	:= fileservices.sendemail('cbrodeur@seisint.com;qualityassurance@seisint.com;camaral@seisint.com;randy.reyes@lexisnexisrisk.com',
 																		'DNM sample data for build version ' + fileDate,
 																		'http://prod_esp:8010/WsWorkunits/WUInfo?Wuid=' + workunit);
 	
+	orbit_update := Orbit3.proc_Orbit3_CreateBuild ('Do Not Mail',fileDate,'N');
+	
 	return sequential(sprayFile,addSuper,buildBase,buildKey,//updateVersion,buildClickdataFile, 
-	                                                                        qaRecs,Strata_Stats,qaEmail);
+	                                                                        qaRecs,Strata_Stats,qaEmail,orbit_update);
 	
 end;

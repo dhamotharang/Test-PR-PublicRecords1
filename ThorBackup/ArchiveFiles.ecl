@@ -264,7 +264,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 			//dataset(resultnames) resultfiles{xpath('Results/ECLResult')};
 		end;
 	
-		results := SOAPCALL('http://10.241.31.11:8010/WsWorkunits', 'WUInfo', 
+		results := SOAPCALL('http://10.173.26.7:8010/WsWorkunits', 'WUInfo', 
 											InRecord, dataset(OutRecord),
 											xpath('WUInfoResponse/Workunit')
 										 );
@@ -373,7 +373,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 														)) : failure(sequential(
 																				fileservices.deletelogicalfile(jobstatusfile),
 																				fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt Copy Process failed on http://10.241.31.11:8010/ - ' + ut.GetTimeDate(),
+			'Yogurt Copy Process failed on http://10.173.26.7:8010/ - ' + ut.GetTimeDate(),
 			'workunit: ' + workunit+ '\r\n' + failmessage
 																	,
 																	,
@@ -408,7 +408,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 										)  : failure(sequential(
 																	fileservices.deletelogicalfile(jobstatusfile),
 																	fileservices.sendemail(thorbackup.constants.yogurt().emailerrors,
-			'Yogurt Copy Process failed on http://10.241.31.11:8010/ - ' + ut.GetTimeDate(),
+			'Yogurt Copy Process failed on http://10.173.26.7:8010/ - ' + ut.GetTimeDate(),
 			'workunit: ' + workunit + '\r\n' + failmessage
 																	,
 																	,

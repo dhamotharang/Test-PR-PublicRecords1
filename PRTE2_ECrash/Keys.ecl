@@ -84,7 +84,7 @@ EXPORT Key_ecrashv2_LastName := INDEX(files_addl.ds_lastname_state, {lname,juris
 
 EXPORT key_ecrashv2_prefname_state 	:= INDEX(files_addl.ds_prefname_state,{fname,jurisdiction_state,jurisdiction}, {files_addl.ds_prefname_state},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::prefname_state');
-
+	
 EXPORT key_ecrashv2_standlocation 	:= INDEX(file_stAndLocation, {Partial_Accident_location,jurisdiction_state, jurisdiction},
 																					{file_stAndLocation},
 																					Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::standlocation');
@@ -99,7 +99,7 @@ EXPORT key_ecrashv2_reportid := INDEX(files.ds_reportid, {report_id}, {Super_rep
 
 EXPORT Key_eCrashv2_reportlinkId := INDEX(files_addl.ds_reportLinkID, {reportlinkid}, {files_addl.ds_reportLinkID}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::ReportLinkId');
 
-EXPORT key_ecrashv2_photoid 	:= INDEX(Files.ds_photoid, {Super_report_id,Document_id}, {Files.ds_photoid}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::PhotoId');
+EXPORT key_ecrashv2_photoid 	:= INDEX(Files.ds_photoid, {Super_report_id,Document_id,Report_Type}, {Files.ds_photoid}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::PhotoId');
 	
 	
 //Use key_EcrashV2_accnbrv1 as input	
@@ -254,6 +254,18 @@ EXPORT Key_LinkIds   := MODULE
 	END;
 
 END;
+	
+	
+//New Keys for  BuyCrash Appriss Ingretation
+EXPORT	key_ecrashv2_DlnNbrDLState :=	INDEX(Files_Addl.ds_DLNbrState,{driver_license_nbr,dlnbr_st,jurisdiction_state,jurisdiction}
+																							,{Files_Addl.ds_DLNbrState}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::DlnNbrDLState'); 
 
+EXPORT	key_ecrashv2_LicensePlateNbr :=	INDEX(Files_Addl.ds_LicensePlateNbr, {tag_nbr,tagnbr_st,jurisdiction_state,jurisdiction}, {Files_Addl.ds_LicensePlateNbr}
+																							  ,Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::LicensePlateNbr'); 
+																								
+EXPORT	key_ecrashv2_OfficerBadgeNbr :=	INDEX(Files_Addl.ds_OfficerBadgeNbr, {officer_id,jurisdiction_state,jurisdiction}, {Files_Addl.ds_OfficerBadgeNbr}
+																								,Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::OfficerBadgeNbr'); 
 
+EXPORT	key_ecrashv2_VinNbr :=	INDEX(Files_Addl.ds_VinNbr, {vin,jurisdiction_state,jurisdiction}, {Files_Addl.ds_VinNbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::VinNbr'); 		
+																				
 END;

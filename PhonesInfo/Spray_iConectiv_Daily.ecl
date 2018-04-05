@@ -15,7 +15,7 @@ EXPORT Spray_iConectiv_Daily(string version, const varstring eclsourceip, string
 																												',',
 																												'\r\n',
 																												,						
-																												thor_name,
+																												STD.System.Thorlib.Group(),
 																												'~thor_data400::in::phones::' + filename,
 																												,
 																												,

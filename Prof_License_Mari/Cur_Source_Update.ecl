@@ -1,12 +1,12 @@
-EXPORT Cur_Source_Update := [
+﻿EXPORT Cur_Source_Update := [
 //Bug 197535: Reflect Non-Updting Sources (S0630,S0644,S0889,S0682)
 'S0812',		// ** Alabama Real Estate Commission
 'S0845',		// ** Alabama Real Estate Appraiser Board
 'S0635',		// ** State of Alabama Banking Department
 'S0376',	 	// ** Alaska Department of Community & Economic Development
 'S0813',		// ** Arizona Department of Real Estate
-'S0808',		// ** Arizona Board of Appraisers
-'S0639',		// ** Arizona State Banking Department
+// 'S0808',		// ** Arizona Board of Appraisers
+// 'S0639',		// ** Arizona State Banking Department
 'S0835',  	// ** Arkansas Real Estate Commision
 'S0824',		// ** Arkansas Appraiser Licensing & Certification Board 
 'S0681',		// ** California Department of Real Estate

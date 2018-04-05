@@ -1,14 +1,14 @@
-// The purpose of this code is to generate pairs of Proxids that MAY NOT be linked together
-IMPORT SALT30,ut;
+﻿// The purpose of this code is to generate pairs of Proxids that MAY NOT be linked together
+IMPORT SALT37;
 EXPORT LinkBlockers(DATASET(layout_DOT_Base) ih) := MODULE
 SHARED h := specificities(ih).input_file;
 SHARED bp := OverLinks;
 // The object is to get a stream of Proxid pairs that cannot link
 // First step is to convert the 'match criteria' in the block file into a Proxid stream
   SHARED IdRec := RECORD
-    SALT30.UIDType Proxid; // The cluster id
-    SALT30.UIDType RuleNum; // The id to show these 'goods and bads' are related
-    SALT30.UIDType rcid; // The RecordID causing the rule to fire
+    SALT37.UIDType Proxid; // The cluster id
+    SALT37.UIDType RuleNum; // The id to show these 'goods and bads' are related
+    SALT37.UIDType rcid; // The RecordID causing the rule to fire
     BOOLEAN Good; // Will be true for the individual, false for the bad data
   END;
   IdRec FilterHits(h le,bp ri) := TRANSFORM
@@ -42,9 +42,9 @@ SHARED bp := OverLinks;
   SHARED AllIds := DEDUP( SORT( AllIds1,RuleNum,Proxid,Good,LOCAL ), WHOLE RECORD, LOCAL );
   EXPORT RuleBreakers0 := JOIN(AllIds,AllIds,LEFT.RuleNum=RIGHT.RuleNum AND LEFT.good <> RIGHT.good AND LEFT.rcid=RIGHT.rcid,LOCAL); // Records spanning good and bad of one rule!
   SHARED BadPairRec := RECORD
-    SALT30.UIDType Proxid1;
-    SALT30.UIDType Proxid2;
-    SALT30.UIDType RuleNum; // Really for debug purposes - find rule being violated
+    SALT37.UIDType Proxid1;
+    SALT37.UIDType Proxid2;
+    SALT37.UIDType RuleNum; // Really for debug purposes - find rule being violated
   END;
   BadPairRec NotePair(AllIds le,AllIds ri) := TRANSFORM
     SELF.Proxid1 := le.Proxid;
@@ -58,16 +58,18 @@ EXPORT BrokenProxid := DEDUP(AllBadPairs(Proxid1=Proxid2),ALL);
 // First slim all the matches down to those with violations
   WithIssues := JOIN(AllIds1,BrokenProxid,LEFT.Proxid=RIGHT.Proxid1 AND LEFT.RuleNum=RIGHT.RuleNum,TRANSFORM(LEFT),SMART) : ONWARNING(1005,IGNORE);
 // Now sort so that all the records that need to be clustered together - are together
-SHARED InSeq := SORT(WithIssues,RuleNum,Proxid,Good,rcid,LOCAL);
+SHARED InSeq := DEDUP(SORT(WithIssues,RuleNum,Proxid,Good,rcid,LOCAL),rcid,LOCAL);
   IdRec FormDid(IdRec le,IdRec ri) := TRANSFORM
     SELF.Proxid := IF ( le.RuleNum=ri.RuleNum and le.Good = ri.Good, le.Proxid, ri.rcid );
     SELF := ri;
   END;
-EXPORT Patches := ITERATE(InSeq,FormDid(LEFT,RIGHT),LOCAL) : PERSIST('~temp::Proxid::BIPV2_PROXID::BlockLink::patches',EXPIRE(Config.PersistExpire));
+EXPORT Patches := ITERATE(InSeq,FormDid(LEFT,RIGHT),LOCAL) : PERSIST('~temp::Proxid::BIPV2_ProxID::BlockLink::patches',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
 // Now make a note of the new IDs that will be created
   allid := DEDUP(Patches,Proxid,ALL); // All the new dids (including old ones!)
 EXPORT New := JOIN(allid,InSeq,LEFT.Proxid=RIGHT.Proxid,TRANSFORM(LEFT),LEFT ONLY);
-SALT30.MAC_Reassign_UID(h,Patches,Proxid,rcid,h1);
+EXPORT RuleCountTotal := COUNT(DEDUP(bp, rcid, ALL));
+EXPORT RuleCountActive := COUNT(TABLE(New, {RuleNum}, RuleNum, FEW)); 
+SALT37.MAC_Reassign_UID(h,Patches,Proxid,rcid,h1);
 //Provide a version of the input file which has been split according to linkblockers
 EXPORT input_file := h1;
 // Now we need to create blockers - both for the DIDs which are already split

@@ -1,4 +1,4 @@
-IMPORT  Advo,AutoStandardI,iesp,doxie,suppress,ut,LN_PropertyV2,TeaserSearchServices;
+﻿IMPORT  Advo,AutoStandardI,iesp,doxie,suppress,ut,LN_PropertyV2,TeaserSearchServices;
 
 EXPORT ReverseAddressTeaserRecords := MODULE
 
@@ -24,8 +24,7 @@ EXPORT val(params in_mod,
 	// make this call get_dids_HHID call and now everything read via stored from being set
 	// in this call:  iesp.ECL2ESP.SetInputAddress
   // from top level service.
-  dids := doxie.get_dids_HHID(forceLocal := TRUE, 
-	                             noFail := FALSE);
+  dids := doxie.get_dids(forceLocal := TRUE, noFail := FALSE);
   
 	// suppress by did and ssn is done within this call so not needed after this call
 	// for header records.

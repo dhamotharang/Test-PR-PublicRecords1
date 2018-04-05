@@ -1,7 +1,9 @@
-﻿IMPORT _control;
+﻿IMPORT _control,lib_thorlib;
 EXPORT CONSTANTS := MODULE
 		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-		
+	
+		EXPORT alpha_ip := fileservices.ResolveHostName('alpha_prod_thor_dali.risk.regn.net');
+
 		export prefix                        :=   '/data/super_credit/ecrash/sla_build/';                
 		EXPORT InPathForIncident					  := prefix + 'noniyetek/incident/in';
 		EXPORT InPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/in';
@@ -10,6 +12,7 @@ EXPORT CONSTANTS := MODULE
 	EXPORT InPathForCitation					  := prefix + 'noniyetek/citation/in';
 	EXPORT InPathForPerson					  := prefix + 'noniyetek/person/in';
   EXPORT InPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/in';
+    EXPORT InPathForDocument					  := prefix + 'noniyetek/document/in';
 
 
 	EXPORT ProcessPathForIncident					  := prefix + 'noniyetek/incident/process';
@@ -20,6 +23,7 @@ EXPORT CONSTANTS := MODULE
 	EXPORT ProcessPathForCitation					  := prefix + 'noniyetek/citation/process';
 	EXPORT ProcessPathForPerson					  := prefix + 'noniyetek/person/process';
 		EXPORT ProcessPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/process';
+		EXPORT ProcessPathForDocument					  := prefix + 'noniyetek/document/process';
 
 
  EXPORT BackupPathForIncident					  := prefix + 'noniyetek/incident/backup';
@@ -29,8 +33,10 @@ EXPORT CONSTANTS := MODULE
 	EXPORT BackupPathForCitation					  := prefix + 'noniyetek/citation/backup';
 	EXPORT BackupPathForPerson					  := prefix + 'noniyetek/person/backup';
 		EXPORT BackupPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/backup';
+				EXPORT BackupPathForDocument					  := prefix + 'noniyetek/document/backup';
 
-	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_60', 'thor400_dev01');	
+
+	EXPORT DestinationCluster 		        := thorlib.group();	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
 	EXPORT IncidentFileMask												:= 'dbpeccl-???.risk.regn.net.incident*' ;
 		EXPORT BillingAgencyFileMask												:= 'dbpeccl-???.risk.regn.net.BillingAgencies*' ;
@@ -39,6 +45,7 @@ EXPORT CONSTANTS := MODULE
 	EXPORT CitationFileMask												:= 'dbpeccl-ala.risk.regn.net.citation*';
 	EXPORT VehicleFileMask												:= 'dbpeccl-ala.risk.regn.net.vehicle*';
 	EXPORT PtyDamageFileMask												:= 'dbpeccl-ala.risk.regn.net.propertyDamage*';
+	EXPORT DocumentFileMask												:= 'dbpeccl-ala.risk.regn.net.document*';
 
   
 	EXPORT INCIDENT_SPRAYED_DAILY      := '~thor_data400::in::ecrash::incidnt_raw_new';
@@ -48,7 +55,8 @@ EXPORT CONSTANTS := MODULE
 	EXPORT CITATION_SPRAYED_DAILY      := '~thor_data400::in::ecrash::citatn_raw';
 	EXPORT COMMERCIAL_SPRAYED_DAILY      := '~thor_data400::in::ecrash::commercl_raw';
 	EXPORT PTYDAMAGE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::propertydamage_raw';
-	
+		EXPORT DOCUMENT_SPRAYED_DAILY      := '~thor_data400::in::ecrash::document_raw';
+
 	EXPORT FILE_DAILY_FILE_LIST := '~thor_data400::temp::ecrash_files_list';
 
 	EXPORT FileSeparator									:= '/';

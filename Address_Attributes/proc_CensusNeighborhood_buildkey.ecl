@@ -1,4 +1,4 @@
-import roxiekeybuild,Address_Attributes, addrfraud,FBI_UCR;
+﻿import roxiekeybuild,Address_Attributes, addrfraud,FBI_UCR,Orbit3;
 
 export proc_CensusNeighborhood_buildkey(string filedate) := function
 
@@ -211,8 +211,15 @@ full1 := 	sequential(parallel(a1,a2,a3,a4,a5a,a5,sequential(a7,b7,move7),sequent
 	move_qa	:=	parallel(move1,move2,move3,move4,move5a,move5,move9,move10,
 											 move11,move12,move13,move14,move15,move16,move17,move18,move19,move20,move21);
 
-     UpdateRoxiePage := RoxieKeybuild.updateversion('NeighborhoodKeys',filedate,'Charles.Pettola@lexisnexisrisk.com,_control.MyInfo.EmailAddressNotify',,'N');
+     UpdateRoxiePage := RoxieKeybuild.updateversion('NeighborhoodKeys',filedate, 'Christopher.Brodeur@lexisnexisrisk.com;Charles.Pettola@lexisnexisrisk.com',,'N');
 
+     create_orbit_build:= Orbit3.proc_Orbit3_CreateBuild ('Neighborhood',filedate,'N');
+		 
+build_all := sequential(full1,move_qa,UpdateRoxiePage,create_orbit_build) : //,parallel(UpdateRoxiePage));
 
-return sequential(full1,move_qa,UpdateRoxiePage);//,parallel(UpdateRoxiePage));
+SUCCESS(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com', 'Neighborhood Keybuild Complete', WORKUNIT)),
+Failure(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com', 'Neighborhood Keybuild Failure',WORKUNIT + '\n' + FAILMESSAGE));
+
+		 
+return build_all;
 END;										

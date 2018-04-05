@@ -1,10 +1,10 @@
-IMPORT AutoStandardI,AutoHeaderI,doxie,ut;
+﻿IMPORT AutoStandardI,AutoHeaderI,doxie,PublicProfileServices,ut;
 
 autoStndGlbMod := AutoStandardI.GlobalModule();
 
 EXPORT Functions := MODULE
 
-	EXPORT FetchI_Hdr_Indv_do_hhid(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT FetchI_Hdr_Indv_do_hhid(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		glbMod := MODULE(PROJECT(rptByMod,autoStndGlbMod,OPT)),VIRTUAL
 			EXPORT BOOLEAN   IncludeMinors := TRUE;
 			EXPORT BOOLEAN   StrictMatch := TRUE;
@@ -15,17 +15,17 @@ EXPORT Functions := MODULE
 		END;
 		tmpmod := MODULE(PROJECT(glbMod,AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,OPT))
 		END;
-		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do_hhid(tmpmod);
+		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod);
 	END;
 
-	EXPORT FetchI_Hdr_Indv_do(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT FetchI_Hdr_Indv_do(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		glbMod := MODULE(PROJECT(rptByMod,autoStndGlbMod,OPT)),VIRTUAL
 			EXPORT BOOLEAN IncludeMinors := TRUE;
 			EXPORT BOOLEAN UseOnlyBestDid := TRUE;
 		END;
 		tmpmod := MODULE(PROJECT(glbMod,AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,OPT))
 		END;
-		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod);
+		RETURN PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod), doxie.layout_references);
 	END;
 
 	EXPORT cntUnqSsnDob(DATASET(doxie.layout_presentation) hdrRecs) := FUNCTION

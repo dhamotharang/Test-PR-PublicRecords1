@@ -1,4 +1,4 @@
-EXPORT Map_WI_All_Available(string fdate) := module
+﻿EXPORT Map_WI_All_Available(string fdate) := module
 
 import NID,Prof_License; 
 
@@ -58,7 +58,7 @@ export buildprep := Sequential(dout,
                               FileServices.RenameLogicalfile( '~thor_data400::in::prolic_wi','~thor_data400::in::prolic_wi_old'),                         
 												 
                          
-											output( outfile,,'~thor_data400::in::prolic_wi',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_wi',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 											 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_wi'),

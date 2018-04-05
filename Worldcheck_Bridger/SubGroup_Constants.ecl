@@ -1004,6 +1004,47 @@
 		export string KEYWORD_IDPWMD								:= '692';
 		export string KEYWORD_VEPTRE_WC							:= '693';		
 		export string KEYWORD_CNSPC									:= '694';		
+		export string KEYWORD_UZTVP									:= '695';		
+		export string KEYWORD_PEOSCE_TCE						:= '696';		
+		export string KEYWORD_AZL_WC								:= '697';		
+		export string KEYWORD_RUFTS_DD							:= '698';		
+		export string KEYWORD_CANSEMVE							:= '699';		
+		export string KEYWORD_INSAE_50_WC						:= '700';		
+		export string KEYWORD_OFAC_DPRK4						:= '701';		
+		export string KEYWORD_PHNBI									:= '702';		
+		export string KEYWORD_PHDND_MLAO						:= '703';		
+		export string KEYWORD_BISN_CAATSA231				:= '704';		
+		export string KEYWORD_CANS_JVCFO						:= '705';		
+		export string KEYWORD_PPICIJ_WC							:= '706';		
+		export string KEYWORD_USCRL									:= '707';		
+		export string KEYWORD_CODIAN								:= '708';
+		export string KEYWORD_NPCIAA								:= '709';
+		export string KEYWORD_EDES									:= '710';
+		export string KEYWORD_KRFSS									:= '711';
+		export string KEYWORD_PKPPMWT								:= '712';
+		export string KEYWORD_BRPRORJ								:= '713';
+		export string KEYWORD_USFHFA								:= '714';
+		export string KEYWORD_OFAC_GLOMAG						:= '715';
+		export string KEYWORD_USCFPB								:= '716';
+		export string KEYWORD_TWMOJ									:= '717';
+		export string KEYWORD_EU_VE									:= '718';
+		export string KEYWORD_RSSRE_DIR4_WC					:= '719';
+		export string KEYWORD_MYRMP									:= '720';
+		export string KEYWORD_INMCA_DD2							:= '721';
+		export string KEYWORD_INMCA_SC							:= '722';
+		export string KEYWORD_PHPNP									:= '723';
+		export string KEYWORD_EUNCJ_TAX							:= '724';
+		export string KEYWORD_USCG_PV								:= '725';
+		export string KEYWORD_AIFSC									:= '726';
+		export string KEYWORD_CRSUGESE							:= '727';
+		export string KEYWORD_CZFAA_TERR						:= '728';
+		export string KEYWORD_IDKPPU								:= '729';
+		export string KEYWORD_OFAC_CAATSA_RUSSIA		:= '730';
+		export string KEYWORD_DPRK_WC								:= '731';
+		export string KEYWORD_QANCTC								:= '732';
+		export string KEYWORD_SECO_VE								:= '733';
+		export string KEYWORD_IDKPK									:= '734';
+
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

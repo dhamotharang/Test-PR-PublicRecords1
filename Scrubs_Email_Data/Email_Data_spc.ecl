@@ -1,4 +1,4 @@
-MODULE:Scrubs_Email_Data
+﻿MODULE:Scrubs_Email_Data
 FILENAME:Email_Data
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
@@ -14,11 +14,11 @@ FILENAME:Email_Data
 
 SOURCEFIELD:email_src
 
-FIELDTYPE:invalid_alpha:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ó”ÒªÃ˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼á´Ò«):SPACES( -'/.):LENGTHS(0..)
+FIELDTYPE:invalid_alpha:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓӔҪØËÈÉâãáåäïöøéüᴁҫ):SPACES( -'/.):LENGTHS(0..)
 FIELDTYPE:invalid_alnum:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( -/):LENGTHS(0..)
-FIELDTYPE:invalid_name:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ó”ÒªÃ˜Ã‹ÃˆÃ‰Ã¢Ã£Ã¡Ã¥Ã¤Ã¯Ã¶Ã¸Ã©Ã¼á´Ò«0123456789'):SPACES( -`,&\/.:;_+):LENGTHS(0..)
+FIELDTYPE:invalid_name:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓӔҪØËÈÉâãáåäïöøéüᴁҫ0123456789'):SPACES( -`,&\/.:;_+):LENGTHS(0..)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789):SPACES( -):LENGTHS(0..)
-FIELDTYPE:invalid_address:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÃ‚ÃƒÃÃ…Ã„Ã‘ÃšÃœÃÃÃŽÃ”Ã–Ã“Ã¸Ã˜Ã‹ÃˆÃ‰Ã¤Ã¯Ã¶Ã©Ã¼Ó”0123456789'):SPACES( -&/\#.;,):LENGTHS(0..)
+FIELDTYPE:invalid_address:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÂÃÁÅÄÑÚÜÍÏÎÔÖÓøØËÈÉäïöéüӔ0123456789'):SPACES( -&/\#.;,):LENGTHS(0..)
 FIELDTYPE:invalid_dir:ENUM(N|NW|NE|S|SE|SW|E|W| )
 FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(2,0)
 FIELDTYPE:invalid_zip:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ):SPACES( -):LENGTHS(5,0)
@@ -26,7 +26,7 @@ FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( ):LENGTHS(8,6,4,1,0)
 FIELDTYPE:invalid_dob:ALLOW(0123456789):SPACES( ):LENGTHS(8,4,1,0)
 FIELDTYPE:invalid_ssn:ALLOW(0123456789):LENGTHS(9,0)
 FIELDTYPE:invalid_activecode:ENUM(A|I| ):LENGTHS(1,0)
-FIELDTYPE:invalid_source:ENUM(T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET)
+FIELDTYPE:invalid_source:ENUM(T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET|AN|RS)
 FIELDTYPE:invalid_email:ALLOW(abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( -@&._!?/):LENGTHS(1..)
 FIELDTYPE:invalid_blank:LENGTHS(1..)
 

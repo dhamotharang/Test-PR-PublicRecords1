@@ -10,7 +10,7 @@ EXPORT proc_fullAndWeeklyKeys(
 functionmacro
 
   ecl		  := '#workunit(\'name\',\'BIPV2_PostProcess.CreatestrataForAllKeys @version@\');\n#workunit(\'protect\' ,true);\n' + 'BIPV2_PostProcess.CreatestrataForAllKeys(\'' + pversion + '\',' + pIsTesting + ',' + pOverwrite + ');\n';
-  cluster := if(Tools._Constants.IsDataland,'infinband_hthor','hthor');
+  cluster := _Control.Config.LocalHthor;
   
   kickBuild := wk_ut.mac_ChainWuids(ecl,1,1,pversion,,cluster,pOutputEcl := false,pUniqueOutput := 'CreatestrataForAllKeys',pNotifyEmails := BIPV2_Build.mod_email.emailList
   ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::proc_fullAndWeeklyKeys'

@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 // Unified module to process any search or external append request
 //---------------------------------------------------------------------------
 IMPORT BIPV2;
@@ -143,7 +143,7 @@ EXPORT _Search:=MODULE
       #FOR(Field)
         #IF(%inChild%=0)
           #APPEND(pbl,'SELF.'+%'{@label}'%+':=(TYPEOF(BizLinkFull._Search.lInputAugmented.'+%'{@label}'%+'))')
-          #IF(%'{@label}'% IN ['uniqueid','maxids','leadthreshold','zip_cases','matchrecords','fullmatch','entered_rcid','entered_proxid','entered_seleid','entered_orgid','entered_ultid','entered_powid','zip_radius','allow7digitmatch','hierarchicalsort','soapcallmode'])
+          #IF(%'{@label}'% IN ['uniqueid','maxids','leadthreshold','zip_cases','matchrecords','fullmatch','entered_rcid','entered_proxid','entered_seleid','entered_orgid','entered_ultid','entered_powid','zip_radius','allow7digitmatch','hierarchicalsort','soapcallmode','bgetallscores','disableforce'])
             #APPEND(pbl,'___;\n')
           #ELSE
             #APPEND(pbl,'BizLinkFull.Fields.Make_'+%'{@label}'%+'((STRING)___);\n')
@@ -171,7 +171,7 @@ EXPORT _Search:=MODULE
     #END
     // Special cases:
     // If the uniqueid field is blank, populate it with a sequential number
-    #SET(pbl,REGEXREPLACE('(SELF.uniqueid:=[^;]+)___',%'pbl'%,'$1COUNTER;'))
+    #SET(pbl,REGEXREPLACE('(SELF.uniqueid:=[^;]+)___',%'pbl'%,'$1COUNTER'))
     // Set all unassigned fields to blank, add in the suffix
     // #SET(pbl,REGEXREPLACE('___',%'pbl'%,'\'\'')+'SELF.zip_weights:=DATASET([],BizLinkFull.Process_Biz_Layouts.Zip_Weights_Layout);))');
     #SET(pbl,REGEXREPLACE('___',%'pbl'%,'\'\'')+'))');
@@ -183,7 +183,7 @@ EXPORT _Search:=MODULE
   // Dataset showing the mappings being performed based on input
   EXPORT macShowMapping(d,f=''):=FUNCTIONMACRO
     sMapped:=BizLinkFull._Search.macFieldMap(d,f);
-    dMapped:=REGEXREPLACE(',[^{}]*[)][)]',REGEXREPLACE('.+lInputAugmented,',REGEXREPLACE('SELF[.]([^:]+):=[^;]+(\'\')[^;]*;',REGEXREPLACE('SELF[.]([^:]+):=[^;]+LEFT[.]([^);]+)[^;]*;',sMapped,'{\'$2\',\'$1\'},'),'{\'\',\'$1\'},'),'DATASET(['),'],{STRING input_field;STRING mapped_field;})');
+    dMapped:=REGEXREPLACE(',[^{}]*[)][)]',REGEXREPLACE('.+lInputAugmented,',REGEXREPLACE('SELF[^;]+COUNTER;',REGEXREPLACE('SELF[.]([^:]+):=[^;]+(\'\')[^;]*;',REGEXREPLACE('SELF[.]([^:]+):=[^;]+LEFT[.]([^);]+)[^;]*;',sMapped,'{\'$2\',\'$1\'},'),'{\'\',\'$1\'},'),'{\'auto-generated uniqueid\',\'uniqueid\'},'),'DATASET(['),'],{STRING input_field;STRING mapped_field;})');
     RETURN #EXPAND(dMapped);
   ENDMACRO;
   // FunctionMacro takes a dataset of indeterminite layout and formalizes it
@@ -244,16 +244,18 @@ EXPORT _Search:=MODULE
   // Builds the call to MAC_MEOW_Biz_Batch using InputLayout as the template
   // and then submits the input dataset
   EXPORT BatchSubmit(DATASET(lInputAugmented) d,BOOLEAN bIncludeFilter=FALSE, BOOLEAN bGetAllScores=TRUE):=FUNCTION
-    #EXPAND('BizLinkFull.MAC_MEOW_Biz_Batch('+#TEXT(d)+','+REGEXREPLACE(',address_type_derived',REGEXREPLACE('input_company_name_prefix',sMEOWParameters,'',NOCASE),'',NOCASE)+',dResults,,,bIncludeFilter,bGetAllScores)');
+    // #EXPAND('BizLinkFull.MAC_MEOW_Biz_Batch('+#TEXT(d)+','+REGEXREPLACE(',address_type_derived',REGEXREPLACE('input_company_name_prefix',sMEOWParameters,'',NOCASE),'',NOCASE)+',dResults,,dStats,bIncludeFilter,bGetAllScores)');
+    #EXPAND('BizLinkFull.MAC_MEOW_Biz_Batch(\ninfile:=d,\nRef:=uniqueid,\nOutFile:=dResults,'+REGEXREPLACE('input_zip_cases',REGEXREPLACE('([^,]+)',REGEXREPLACE('(uniqueid,|address_type_derived,|input_company_name_prefix,|bgetallscores,|disableforce,)',sMEOWParameters,'',NOCASE),'\nInput_$1:=$1',NOCASE),'input_zip',NOCASE)+')')
+    // RETURN 'BizLinkFull.MAC_MEOW_Biz_Batch(\ninfile:=d,\nRef:=uniqueid,\nOutFile:=dResults,'+REGEXREPLACE('input_zip_cases',REGEXREPLACE('([^,]+)',REGEXREPLACE('(uniqueid,|address_type_derived,|input_company_name_prefix,|bgetallscores,|disableforce,)',sMEOWParameters,'',NOCASE),'\nInput_$1:=$1',NOCASE),'input_zip',NOCASE)+')';
     RETURN dResults;
   END;
   // Take a formalized dataset and SOAP it through the search service
-  EXPORT SoapSubmit(DATASET(lInputAugmented) d,STRING IP='http://10.239.190.1:9876'):=FUNCTION
+/*  EXPORT SoapSubmit(DATASET(lInputAugmented) d,STRING IP='http://10.239.190.1:9876'):=FUNCTION
     // lResponse:=RECORDOF(BizLinkFull.MEOW_Biz(DATASET([],BizLinkFull.Process_Biz_Layouts.InputLayout)).Raw_Results);
     // RETURN SOAPCALL(d,IP,'bip_header_soap',{d},DATASET(lResponse),PARALLEL(1));
     #EXPAND('BizLinkFull.MAC_MEOW_Biz_Online('+#TEXT(d)+','+sMEOWParameters+',dResults)');
     RETURN dResults;
-  END;
+  END;*/
   // Function takes results from a scored fetch, and optionally the input data
   // in formalized format, and formats the results for easy readability
   EXPORT fMatchResults(DATASET(BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch) d,DATASET(lInputAugmented) dIn=DATASET([],lInputAugmented)):=FUNCTION
@@ -277,8 +279,8 @@ EXPORT _Search:=MODULE
     #END
     #SET(fScored,REGEXREPLACE('[{][^{]+[{][^}]+_hash[^{]+[{][^}]+[}],',%'fScored'%,''))
     #SET(fScored,REGEXREPLACE('(_cases)(,[^}]+_cases)[}][^{]+[{][^L]+LEFT[.]([^,}]+)[^{]+[{][^}]+(LEFT[^,]+weight[^}]+)',%'fScored'%,'$1[1].$3$2[1].$3,$4'))
-    lMatches:={STRING fieldname;STRING val;STRING orig:='';UNSIGNED weight:=0;UNSIGNED matchcode:=0;};
-    lRowResults:={UNSIGNED proxid;UNSIGNED weight;DATASET(lMatches) field_matches;};
+    lMatches:={STRING fieldname;STRING val;STRING orig:='';INTEGER weight:=0;UNSIGNED matchcode:=0;};
+    lRowResults:={UNSIGNED proxid;INTEGER weight;DATASET(lMatches) field_matches;};
     lJoinedResults:={UNSIGNED reference;DATASET(lRowResults) results};
     dIDs:=TABLE(d,{reference;},reference);
     dWithIDs:=IF(COUNT(dIDs)=1 AND dIDs[1].reference=0,PROJECT(d,TRANSFORM(RECORDOF(LEFT),SELF.reference:=dIn[1].uniqueid;SELF:=LEFT;)),d);

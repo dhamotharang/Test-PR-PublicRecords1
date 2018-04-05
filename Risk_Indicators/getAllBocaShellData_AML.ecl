@@ -1,4 +1,4 @@
-IMPORT Ut, riskwise, american_student_list, models, easi, doxie, doxie_files, dma, fcra_opt_out, USPIS_HotList, AML, paw, gateway;
+﻿IMPORT Ut, riskwise, american_student_list, models, easi, doxie, doxie_files, dma, fcra_opt_out, USPIS_HotList, AML, paw, gateway;
 
 EXPORT getAllBocaShellData_AML (
   GROUPED DATASET (Layout_output) iid, 
@@ -360,9 +360,11 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
 
   // =============== Derogs ===============
-
+ onThor := false;
+ IncludeLnJ := false;
   derogs := IF (IsFCRA,
-                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion),
+                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, 
+									BSOptions, IncludeLnJ, onThor, iid),
                 Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion),
@@ -400,7 +402,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion));
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares));
 
 
 // =============== Aircraft ===============

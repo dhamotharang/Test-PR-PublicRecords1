@@ -1,4 +1,4 @@
-EXPORT Layout_SBA_logs := module
+﻿EXPORT Layout_SBA_logs := module
 
 export input_raw := record
 
@@ -368,7 +368,8 @@ string8 	cmp_naic_code;
 string32 	cmp_business_structure;   
 string3 	cmp_years_in_business; 
 string8 	cmp_bus_start_date;       
-string12 	cmp_yearly_revenue; 
+string12 	cmp_yearly_revenue;
+string100 cmp_alt_name;
 
 string30 pii2_first_name;          
 string30 pii2_middle_name;         

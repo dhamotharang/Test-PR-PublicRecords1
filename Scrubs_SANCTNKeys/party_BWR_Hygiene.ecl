@@ -1,7 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_SANCTNKeys.party_BWR_Hygiene - Hygiene & Stats - SALT V3.3.2');
-IMPORT Scrubs_SANCTNKeys,SALT33;
+#workunit('name','Scrubs_SANCTNKeys.party_BWR_Hygiene - Hygiene & Stats - SALT V3.8.0');
+IMPORT Scrubs_SANCTNKeys,SALT38;
 // First create an instantiated hygiene module
   infile := Scrubs_SANCTNKeys.party_In_SANCTNKeys;
   ip := DISTRIBUTE(infile, SKEW(0.1));
@@ -12,8 +12,8 @@ IMPORT Scrubs_SANCTNKeys,SALT33;
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
   OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
   OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
-  OUTPUT(SALT33.MAC_Character_Counts.EclRecord(p,'Layout_SANCTNKeys'),NAMED('OptimizedLayout'));// File layout suggested by data
+  OUTPUT(SALT38.MAC_Character_Counts.EclRecord(p,'party_Layout_SANCTNKeys'),NAMED('OptimizedLayout'));// File layout suggested by data
   // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
-  OUTPUT(SALT33.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  OUTPUT(SALT38.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
   // ****** Cross Tabs *******
-  // It is possible to create a cross table between any two fields, see documentation on SALT33.MAC_CrossTab
+  // It is possible to create a cross table between any two fields, see documentation on SALT38.MAC_CrossTab

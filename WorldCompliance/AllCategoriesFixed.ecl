@@ -1,4 +1,4 @@
-//363 Next
+﻿//364 Next
 EXPORT AllCategoriesFixed := DATASET([
 {359,'Adverse Media','Administrative','Adverse Media-Administrative'},
 {1,'Adverse Media','Aircraft Hijacking','Adverse Media-Aircraft Hijacking'},
@@ -90,6 +90,7 @@ EXPORT AllCategoriesFixed := DATASET([
 {83,'Associated Entity','N/A','Associated Entity-N/A'},
 {84,'Associated Entity','Organized Crime','Associated Entity-Organized Crime'},
 {85,'Associated Entity','Securities Fraud','Associated Entity-Securities Fraud'},
+{363,'Associated Entity','SWIFT BIC Entity','Associated Entity-SWIFT BIC Entity'},
 {86,'Associated Entity','Terrorism','Associated Entity-Terrorism'},
 {87,'Associated Entity','Unauthorized','Associated Entity-Unauthorized'},
 {88,'Company of Interest','Associate','Company of Interest-Associate'},

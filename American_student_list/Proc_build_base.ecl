@@ -249,11 +249,12 @@
 	
 	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + American_student_list.File_American_Student_DID_v2;
 	
-	
-  
+	//DF-20264 Suppress records in ASL suppression list
+	rsCleanAIDGood_Supp := American_student_list.fnExcludeSuppressedRecords(rsCleanAIDGood); 
 	
 	//Flip names before DID process
-	ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	// ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	ut.mac_flipnames(rsCleanAIDGood_Supp,fname,mname,lname,rsAIDCleanFlipNames);
 
 	//add src 
 	src_rec := record

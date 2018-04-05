@@ -1,4 +1,4 @@
-import Worldcheck_Bridger;
+﻿import Worldcheck_Bridger;
 export Reformat := module 
 
 
@@ -200,7 +200,7 @@ export source_CWL_32    := allsources(accuityDataSource='CWL 32');   //Cumulativ
 export source_DB_1088   := allsources(accuityDataSource='DB 1088');   //GERMAN FEDERAL BANK
 export source_DNB_1090  := allsources(accuityDataSource='DNB 1090'); //DUTCH BANK
 export source_DTC_1030  := allsources(accuityDataSource='DTC 1030'); //Defense Trade Controls
-export source_ECO_1144  := allsources(accuityDataSource='ECO 1144'); //EXPORT CONTROL ORGANISATION UK - IRAN LIST
+//export source_ECO_1144  := allsources(accuityDataSource='ECO 1144'); //EXPORT CONTROL ORGANISATION UK - IRAN LIST
 export source_ES_1014   := allsources(accuityDataSource='ES 1014');  //Spain
 export source_ESE_1158  := allsources(accuityDataSource='ESE 1158'); //EGYPT FINANCIAL SUPERVISORY AUTHORITY
 export source_EU_33     := allsources(accuityDataSource='EU 33');    //European Union List

@@ -1,4 +1,4 @@
-import address, gong_neustar,lib_stringlib,aid, nid, ut;
+﻿import address, gong_neustar,lib_stringlib,aid, nid, ut;
 
 export File_ACA_Clean(
 
@@ -155,6 +155,9 @@ dacaresult := if(pUseDatasets
 	,aca_clean_persisted
 );
 
-return dacaresult;
+//*** Modified code to remove the ACA records due to contractual obligations ad per Jira DL-20439
+dacaemptyresult := dataset([],layout_aca_clean);
+
+return dacaemptyresult;
 
 end;

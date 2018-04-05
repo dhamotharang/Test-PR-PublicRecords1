@@ -1,4 +1,4 @@
-EXPORT Map_HI_All_Available(string fdate) := module
+﻿EXPORT Map_HI_All_Available(string fdate) := module
 
 import NID,Prof_License;
 
@@ -297,19 +297,17 @@ self.license_type :=   license_type_desc;
 
  
  export prep :=  Sequential( dout, 
-                  FileServices.StartSuperfiletransaction(),
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_hi'),
 																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_hi_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_hi_old')),
 								       if ( FileServices.FileExists( '~thor_data400::in::prolic_hi_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_hi_old')),
                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_hi','~thor_data400::in::prolic_hi_old'),
-										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_hi_old'),
-										            FileServices.FinishSuperfiletransaction(),
                          
 											output( outfile,,'~thor_data400::in::prolic_hi',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
-											   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_hi','~thor_data400::in::prolic_hi_old'),
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_hi'),
+												   FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_hi_old'),
+
 												 FileServices.FinishSuperfiletransaction()
 
 											 );

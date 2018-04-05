@@ -1,4 +1,4 @@
-
+﻿
 IMPORT lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools, std;
 
 EXPORT fSprayDd(
@@ -8,7 +8,7 @@ EXPORT fSprayDd(
 	BOOLEAN   pUseProd              = FALSE,
 	STRING		pServerIP							= _control.IPAddress.bctlpedata12,
 	STRING		pRawfile							= '*.txt',
-	STRING		pDirectory						= '/data/hds_3/uniqueid/enclarity/hxmx/',
+	STRING		pDirectory						= '/data/run_enclarity/hxmx/input/',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
 	BOOLEAN		pIsTesting						= FALSE,
 	BOOLEAN		pOverwrite						= TRUE,

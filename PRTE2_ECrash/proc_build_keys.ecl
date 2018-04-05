@@ -35,7 +35,13 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_ecrashv2_supplemental,					
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_ecrashv2_tagnbr,											Constants.KeyName_ecrashv2+ '::@version@::tagnbr',										Constants.KeyName_ecrashv2 + '::'+ filedate + '::tagnbr', 										build_key_ecrashv2_tagnbr);
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_ecrashv2_vin,												Constants.KeyName_ecrashv2+ '::@version@::vin',   										Constants.KeyName_ecrashv2 + '::'+ filedate + '::vin', 												build_key_ecrashv2_vin);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_LinkIds.Key,													Constants.KeyName_ecrashv2+ '::@version@::linkids', 									Constants.KeyName_ecrashv2 + '::'+ filedate + '::linkids',										build_key_ecrashv2_linkids);
+
+//New Keys Buy Crash
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashV2_agency,											Constants.KeyName_ecrashv2+ '::@version@::agency', 										Constants.KeyName_ecrashv2 + '::'+ filedate + '::agency',											build_key_ecrashv2_agency);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_DlnNbrDLState,							Constants.KeyName_ecrashv2+ '::@version@::dlnnbrdlstate', 						Constants.KeyName_ecrashv2 + '::'+ filedate + '::dlnnbrdlstate',							build_key_ecrashv2_dlnbrstate);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_LicensePlateNbr,						Constants.KeyName_ecrashv2+ '::@version@::licenseplatenbr', 					Constants.KeyName_ecrashv2 + '::'+ filedate + '::licenseplatenbr',						build_key_ecrashv2_licplatenbr);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_OfficerBadgeNbr,						Constants.KeyName_ecrashv2+ '::@version@::officerbadgenbr', 					Constants.KeyName_ecrashv2 + '::'+ filedate + '::officerbadgenbr',						build_key_ecrashv2_officebadgenbr);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_VinNbr,											Constants.KeyName_ecrashv2+ '::@version@::vinnbr', 										Constants.KeyName_ecrashv2 + '::'+ filedate + '::vinnbr',											build_key_ecrashv2_vinnbr);
 
 build_keys := sequential(	build_key_ecrash0, build_key_ecrash1, build_key_ecrash2v, build_key_ecrash3v, 
 													build_key_ecrash5, build_key_ecrash6, build_key_ecrash7,build_key_ecrash8,
@@ -50,7 +56,8 @@ build_keys := sequential(	build_key_ecrash0, build_key_ecrash1, build_key_ecrash
 													build_key_ecrashv2_reportid, build_key_ecrashv2_reportlinkid,
 													build_key_ecrashv2_standlocation, build_key_ecrashv2_supplemental, 
 													build_key_ecrashv2_tagnbr, build_key_ecrashv2_vin, build_key_ecrashv2_linkids,
-													build_key_ecrashv2_agency
+													build_key_ecrashv2_agency,build_key_ecrashv2_dlnbrstate,build_key_ecrashv2_licplatenbr,
+													build_key_ecrashv2_officebadgenbr,build_key_ecrashv2_vinnbr,
 												);
 
 
@@ -88,7 +95,13 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'standl
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'supplemental',  			Constants.KeyName_ecrashv2 +'::' + filedate + '::supplemental', 			move_built_key_ecrashv2_supplemental);
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'tagnbr',  						Constants.KeyName_ecrashv2 +'::' + filedate + '::tagnbr', 						move_built_key_ecrashv2_tagnbr);
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'vin', 								Constants.KeyName_ecrashv2 +'::' + filedate + '::vin',  							move_built_key_ecrashv2_vin);
+
+//New Keyx
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'agency', 							Constants.KeyName_ecrashv2 +'::' + filedate + '::agency',  						move_built_key_ecrashv2_agency);
+RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'dlnnbrdlstate', 			Constants.KeyName_ecrashv2 +'::' + filedate + '::dlnnbrdlstate',  		move_built_key_ecrashv2_dlnbrstate);
+RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'licenseplatenbr', 		Constants.KeyName_ecrashv2 +'::' + filedate + '::licenseplatenbr',  	move_built_key_ecrashv2_licplatenbr);
+RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'officerbadgenbr', 		Constants.KeyName_ecrashv2 +'::' + filedate + '::officerbadgenbr',  	move_built_key_ecrashv2_officebadgenbr);
+RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.SuperKeyname_ecrashV2 + 'vinnbr', 							Constants.KeyName_ecrashv2 +'::' + filedate + '::vinnbr',  						move_built_key_ecrashv2_vinnbr);
 
 Move_Keys := sequential(move_built_key_ecrash0, move_built_key_ecrash1, move_built_key_ecrash2v, move_built_key_ecrash3v, 
 												move_built_key_ecrash5, move_built_key_ecrash6, move_built_key_ecrash7, move_built_key_ecrash8,
@@ -102,7 +115,9 @@ Move_Keys := sequential(move_built_key_ecrash0, move_built_key_ecrash1, move_bui
 												move_built_key_ecrashv2_reportid,	move_built_key_ecrashv2_reporlinktid, move_built_key_ecrashv2_standlocation, 
 												move_built_key_ecrashv2_supplemental, move_built_key_ecrashv2_tagnbr, 
 												move_built_key_ecrashv2_vin, move_built_key_ecrashv2_linkids,
-												move_built_key_ecrashv2_agency
+												move_built_key_ecrashv2_agency,move_built_key_ecrashv2_dlnbrstate,
+												move_built_key_ecrashv2_licplatenbr,move_built_key_ecrashv2_officebadgenbr,
+												move_built_key_ecrashv2_vinnbr
 												);
 											
 
@@ -140,7 +155,12 @@ RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'supplemental', 	
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'tagnbr', 										'Q', 	move_qa_key_ecrashv2_tagnbr);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'vin', 											'Q', 	move_qa_key_ecrashv2_vin);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'linkids', 									'Q', 	move_qa_key_ecrashv2_linkids);
+
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'agency', 										'Q', 	move_qa_key_ecrashv2_agency);
+RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'dlnnbrdlstate', 						'Q', 	move_qa_key_ecrashv2_dlnbrstate);
+RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'licenseplatenbr', 					'Q', 	move_qa_key_ecrashv2_licplatenbr);
+RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'officerbadgenbr', 					'Q', 	move_qa_key_ecrashv2_officebadgenbr);
+RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'vinnbr', 										'Q', 	move_qa_key_ecrashv2_vinnbr);
 
 To_QA := sequential(move_qa_key_ecrash0,move_qa_key_ecrash1, move_qa_key_ecrash2v, move_qa_key_ecrash3v, 
 										move_qa_key_ecrash5, move_qa_key_ecrash6, move_qa_key_ecrash7, move_qa_key_ecrash8,
@@ -155,7 +175,9 @@ To_QA := sequential(move_qa_key_ecrash0,move_qa_key_ecrash1, move_qa_key_ecrash2
 										move_qa_key_ecrashv2_reportid, move_qa_key_ecrashv2_reportlinkid,
 										move_qa_key_ecrashv2_standlocation, move_qa_key_ecrashv2_supplemental, 
 										move_qa_key_ecrashv2_tagnbr, move_qa_key_ecrashv2_vin, 
-										move_qa_key_ecrashv2_linkids,	move_qa_key_ecrashv2_agency
+										move_qa_key_ecrashv2_linkids,	move_qa_key_ecrashv2_agency,
+										move_qa_key_ecrashv2_dlnbrstate,move_qa_key_ecrashv2_licplatenbr,
+										move_qa_key_ecrashv2_officebadgenbr,move_qa_key_ecrashv2_vinnbr
 										);
 
 AutoKeyB2.MAC_Build (file_Autokey
@@ -191,7 +213,7 @@ DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
 updatedops   		 		:= PRTE.UpdateVersion('EcrashV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
 
 RETURN 		
-			sequential(	build_keys,
+			sequential(build_keys,
 									Move_Keys, 
 									To_QA, 
 									proc_build_keys_addl(filedate),

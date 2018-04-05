@@ -1,4 +1,4 @@
-#workunit('name','Bocas_hell51_BTST_CBD50');
+﻿#workunit('name','Bocas_hell51_BTST_CBD50');
 
 /* *** Note that Netacuity is turned ON *** needs to use Cert gateway  */
 /* If don't want Netacuity, then search for netacuity and change the code to the code that is commented.
@@ -16,6 +16,7 @@ string datapermissionmask := '000000000010';
 string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 12 restricts ADVO
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 roxieIP := Riskwise.shortcuts.prod_batch_neutral;//;prod_batch_neutral;
 
@@ -139,7 +140,7 @@ l :=	RECORD
 	STRING typeofOrder;
 	boolean IncludeScore;
 	boolean ExcludeIbehavior;  // temporary field until end of July 2017
-
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
@@ -207,7 +208,7 @@ self.ExcludeIbehavior := true;  // set this back to false if they would like to 
 	self.Email2 := le.email2;	
 	self.includescore := true; //for FDN
 	self.datapermissionmask := datapermissionmask;
-
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.IPAddress := if(le.IPAddress != '', le.IPAddress, ''); //Uncomment FOR Netacuity
 
 	SELF := le;

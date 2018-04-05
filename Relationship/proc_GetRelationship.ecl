@@ -1,10 +1,4 @@
-/*2016-03-17T18:40:56Z (Steven Stockton)
-Remove only from High Confidence parms.
-*/
-/*2016-03-04T04:50:49Z (Steven Stockton)
-Additional flags for filtering.
-*/
-import ut;
+﻿import std;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout); 
 
@@ -30,8 +24,8 @@ EXPORT proc_GetRelationship(DATASET(Layout_GetRelationship.DIDs_layout) DID_ds,
 														unsigned2 RelLookbackMonths                 = 0,
 														Layout_GetRelationship.TransactionalFlags_layout txflag = notx) := MODULE
 
-CurrentDate             := stringlib.GetDateYYYYMMDD();
-shared LookbackDate     := (unsigned4) ut.month_math(CurrentDate,-RelLookbackMonths);
+CurrentDate             := (unsigned4) stringlib.GetDateYYYYMMDD();
+shared LookbackDate     := std.date.AdjustDate(CurrentDate,,-RelLookbackMonths);
 shared isDefault :=  NOT(RelativeFlag OR 
                   AssociateFlag OR  
 									AllFlag OR 
@@ -90,29 +84,29 @@ shared relationship_key  := Relationship.key_relatives_v3;
 shared relationship_flat := distribute(pull(Relationship.key_relatives_v3),hash(did1));
 shared DID_ds_dist       := distribute(DID_ds,hash(did));
 
-shared layout_GetRelationship.InterfaceOuput xform(DID_ds l, relationship_key r) := TRANSFORM
+shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key r) := TRANSFORM
   self.title_type  := MAP(r.title between 1 and 43 => 'R',
 		                      r.title = 44             => 'A',
 													r.title = 45             => 'N',
 													r.title = 46             => 'B',
 													'O'),
-  self.source_type := MAP(//r.cohabit_cnt > 0           => -3,
-		                      //r.copobox_cnt > 0           => -3,
-													r.coapt_cnt   > 0           => -3,
-													r.covehicle_cnt > 0         => -6,
-													r.coproperty_cnt > 0        => -5,
-													r.bcoproperty_cnt > 0       => -4,
-													r.bcoforeclosure_cnt > 0    => -4,
-													r.bcolien_cnt > 0           => -4,
-													r.bcobankruptcy_cnt > 0     => -4,
-													r.coenclarity_cnt > 0       => -4,
-													r.type = 'TRANS CLOSURE'    => -2,
-													r.cossn_cnt     > 0         => -1,
-													r.covehicle_cnt > 0         => -6,
-													r.coproperty_cnt > 0        => -5,
-													r.comarriagedivorce_cnt > 0 => -7,
-													r.copolicy_cnt > 0          =>  0,
-													999),
+  self.source_type := MAP(//r.rels(rel_type = Constants.cohabit) > 0								=> -3
+													//r.rels(rel_type = Constants.copobox) > 0								=> -3
+													r.rels(rel_type = Constants.coapt)[1].cnt   > 0           => -3,
+												  r.rels(rel_type = Constants.covehicle)[1].cnt >0					=> -6,
+												  r.rels(rel_type = Constants.coproperty)[1].cnt > 0					=> -5,
+												  r.rels(rel_type = Constants.bcoproperty)[1].cnt > 0				=> -4,
+												  r.rels(rel_type = Constants.bcoforeclosure)[1].cnt > 0		=> -4,
+												  r.rels(rel_type = Constants.bcolien)[1].cnt > 0						=> -4,
+												  r.rels(rel_type = Constants.bcobankruptcy)[1].cnt > 0			=> -4,
+												  r.rels(rel_type = Constants.coenclarity)[1].cnt > 0				=> -4,
+												  r.type = Constants.TransClosure 													=> -2,
+												  r.rels(rel_type = Constants.cossn)[1].cnt > 0							=> -1,
+												  r.rels(rel_type = Constants.covehicle)[1].cnt > 0         => -6,
+												  r.rels(rel_type = Constants.coproperty)[1].cnt > 0				=> -5,
+												  r.rels(rel_type = Constants.comarriagedivorce)[1].cnt > 0 => -7,
+												  r.rels(rel_type = Constants.copolicy)[1].cnt > 0					=>  0,
+												  999),
   self.isRelative  := self.title_type = 'R';
 	self.isAssociate := self.title_type = 'A';
 	self.isBusiness  := self.title_type = 'B';
@@ -144,35 +138,43 @@ shared rels      := MAP(doThor                       => relsThor,
 												IF(HighConfidenceAssociates AND title=44,total_score>=79,TRUE) AND
 												IF(RelLookbackMonths>0 AND rel_dt_last_seen>0,rel_dt_last_seen>LookbackDate,TRUE));
 
-shared txonly := rels(type NOT IN ['PERSONAL','TRANS CLOSURE']);
-         
-shared Vehicle             := rels(covehicle_cnt > 0);
-shared BankruptcyDirect    := rels(cobankruptcy_cnt > 0);
-shared BankruptcyIndirect  := rels(bcobankruptcy_cnt > 0);
-shared PropertyDirect      := rels(coproperty_cnt > 0);
-shared PropertyIndirect    := rels(bcoproperty_cnt > 0);
-shared Experian            := rels(coexperian_cnt > 0);
-shared Enclarity           := rels(coenclarity_cnt > 0);
-shared Transunion          := rels(cotransunion_cnt > 0);
-shared ForeclosureDirect   := rels(coforeclosure_cnt > 0);
-shared ForeclosureIndirect := rels(bcoforeclosure_cnt > 0);
-shared LienDirect          := rels(colien_cnt > 0);
-shared LienIndirect        := rels(bcolien_cnt > 0);
-shared ECrashSame          := rels(coecrash_cnt > 0);
-shared ECrashDifferent     := rels(bcoecrash_cnt > 0);
-shared Watercraft          := rels(cowatercraft_cnt > 0);
-shared Aircraft            := rels(coaircraft_cnt > 0);
-shared UCC                 := rels(coucc_cnt > 0);
-shared MarriageDivorce     := rels(coMarriageDivorce_cnt > 0);
-shared Policy              := rels(coPolicy_cnt > 0);
-shared SSN                 := rels(coSSN_cnt > 0);
-shared Claim               := rels(coclaim_cnt > 0);
-shared Cohabit             := rels(cohabit_cnt > 0);
-shared CoApt               := rels(coApt_cnt > 0);
-shared CoPOBox             := rels(coPOBox_cnt > 0);
+relsNew := functions_getRelationship.convertNeutralToFlat(rels);
+shared relsFlat := relsNew(cohabit_score>0 or coapt_score>0 or copobox_score>0 or cossn_score>0 or copolicy_score>0
+													 or coclaim_score>0 or coproperty_score>0 or bcoproperty_score>0 or coforeclosure_score>0
+													 or bcoforeclosure_score>0 or colien_score>0 or bcolien_score>0 or cobankruptcy_score>0
+													 or bcobankruptcy_score>0 or covehicle_score>0 or coexperian_score>0 or cotransunion_score>0
+													 or coenclarity_score>0 or coecrash_score>0 or bcoecrash_score>0 or cowatercraft_score>0
+													 or coaircraft_score>0 or comarriagedivorce_score>0 or coucc_score>0 or type='TRANS CLOSURE');
 
-shared RelativesOnly   := rels(title BETWEEN 1 AND 43);
-shared AssociatesOnly  := rels(title = 44);
+shared txonly := relsFlat(type NOT IN ['PERSONAL','TRANS CLOSURE']);
+         
+shared Vehicle             := relsFlat(covehicle_cnt > 0);
+shared BankruptcyDirect    := relsFlat(cobankruptcy_cnt > 0);
+shared BankruptcyIndirect  := relsFlat(bcobankruptcy_cnt > 0);
+shared PropertyDirect      := relsFlat(coproperty_cnt > 0);
+shared PropertyIndirect    := relsFlat(bcoproperty_cnt > 0);
+shared Experian            := relsFlat(coexperian_cnt > 0);
+shared Enclarity           := relsFlat(coenclarity_cnt > 0);
+shared Transunion          := relsFlat(cotransunion_cnt > 0);
+shared ForeclosureDirect   := relsFlat(coforeclosure_cnt > 0);
+shared ForeclosureIndirect := relsFlat(bcoforeclosure_cnt > 0);
+shared LienDirect          := relsFlat(colien_cnt > 0);
+shared LienIndirect        := relsFlat(bcolien_cnt > 0);
+shared ECrashSame          := relsFlat(coecrash_cnt > 0);
+shared ECrashDifferent     := relsFlat(bcoecrash_cnt > 0);
+shared Watercraft          := relsFlat(cowatercraft_cnt > 0);
+shared Aircraft            := relsFlat(coaircraft_cnt > 0);
+shared UCC                 := relsFlat(coucc_cnt > 0);
+shared MarriageDivorce     := relsFlat(coMarriageDivorce_cnt > 0);
+shared Policy              := relsFlat(coPolicy_cnt > 0);
+shared SSN                 := relsFlat(coSSN_cnt > 0);
+shared Claim               := relsFlat(coclaim_cnt > 0);
+shared Cohabit             := relsFlat(cohabit_cnt > 0);
+shared CoApt               := relsFlat(coApt_cnt > 0);
+shared CoPOBox             := relsFlat(coPOBox_cnt > 0);
+
+shared RelativesOnly   := relsFlat(title BETWEEN 1 AND 43);
+shared AssociatesOnly  := relsFlat(title = 44);
 
 rel_title_layout := RECORD
    unsigned1 title;
@@ -203,7 +205,7 @@ END;
 shared OldRelativesOnly  := project(RelativesOnly,legacy_format(left));
 shared OldAssociatesOnly := project(AssociatesOnly,legacy_format(left));
 
-shared selected := MAP(AllFlag => rels,
+shared selected := MAP(AllFlag => relsFlat,
                        isDefault  => RelativesOnly + AssociatesOnly,
 								                  IF(RelativeFlag,RelativesOnly) +
 								                  IF(AssociateFlag,AssociatesOnly) +

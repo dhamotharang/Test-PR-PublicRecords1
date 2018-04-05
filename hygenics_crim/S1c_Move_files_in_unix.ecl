@@ -1,4 +1,4 @@
-/* moving files to individual folders
+﻿/* moving files to individual folders
 mkdir doc
 mkdir county
 mkdir aoc
@@ -818,6 +818,20 @@ mv *OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT* ./county/.
 mv *TEXAS_KAUFMAN_COUNTY* ./county/.
 mv *TEXAS_RANDALL_COUNTY* ./county/.
 
+
+/////////////////////////////////////////////////////////////////VC 20171013 
+
+mv *CALIFORNIA_EL_DORADO_COUNTY_SUPERIOR_COURT* ./county/.
+mv *FLORIDA_MANATEE_COUNTY* ./county/.
+mv *OHIO_VINTON_COUNTY_COMMON_PLEAS_COURT* ./county/.
+mv *TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT* ./county/.
+mv *TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC* ./county/.
+
+mv *GEORGIA_PAROLE_RELEASED_INMATES* ./doc/.
+
+mv *UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY* ./aoc/.
+mv *MONTANA_VIOLENT_OFFENDER_REGISTRY* ./aoc/.
+mv *NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN* ./aoc/.
 
 
 

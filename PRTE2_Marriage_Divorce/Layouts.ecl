@@ -1,4 +1,4 @@
-IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2;
+﻿IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2;
 
 EXPORT Layouts := MODULE
 
@@ -102,12 +102,20 @@ EXPORT Layouts := MODULE
 		UNSIGNED8 persistent_record_id := 0;
 		STRING20	cust_name;
 		STRING10	bug_num;
+		STRING8		link_party1_dob;
+		STRING9		link_party1_ssn;
+		STRING8		link_party2_dob;
+		STRING9		link_party2_ssn;
 	END;
 	
 	EXPORT Main_Base_out := RECORD //includes DI added fields(cust_name, bug_num)
 		marriage_divorce_v2.layout_mar_div_base;
 		STRING20	cust_name;
 		STRING10	bug_num;
+		STRING8		link_party1_dob;
+		STRING9		link_party1_ssn;
+		STRING8		link_party2_dob;
+		STRING9		link_party2_ssn;
 	END;
 	
 	EXPORT Main_Base := RECORD
@@ -117,6 +125,15 @@ EXPORT Layouts := MODULE
 	EXPORT Search_Base := RECORD
 		marriage_divorce_v2.layout_mar_div_search;
 	END;
+	
+	EXPORT Search_Base_ext := RECORD
+		Search_Base;
+		STRING20	cust_name;
+		STRING10	bug_num;
+		STRING8		link_dob;
+		STRING9		link_ssn;
+	END;	
+	
 	
 END;
 		

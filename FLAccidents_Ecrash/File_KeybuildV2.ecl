@@ -1,20 +1,7 @@
-/*2016-06-03T19:09:46Z (Srilatha Katukuri)
-DF-16695 - Coplogic Data Ingestion2
-*/
-/*2016-05-12T00:02:00Z (Srilatha Katukuri)
-#167113 
-
-*/
-/*2016-05-11T23:55:08Z (Srilatha Katukuri)
-Checkin for Review:  Previous version ready for review.
-*/
-/*2015-05-15T21:02:48Z (Srilatha Katukuri)
-Bug# 180852 - PIR 4710 Coplogic Data ingestion
-*/
-/////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////
 //Expand Florida file 
 /////////////////////////////////////////////////////////////////
-import FLAccidents,ut;
+import FLAccidents,ut, STD;
 
 export File_KeybuildV2 := module 
 
@@ -391,27 +378,32 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 		self.vehicle_unit_number 						:= L.unit_number;
 		self.next_street 										:= l.next_street;
 		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
-		self.agency_ori											:= IF (l.ori_number = 'FL0130600','FL0130000',l.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
+		self.agency_ori											:= l.ori_number;
 		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
 		self.is_available_for_public				:= if(l.report_code in ['TF','EA'],'1',l.is_available_for_public);
 		self.report_status 									:= l.report_status;
 		self.date_vendor_last_reported 			:= L.date_vendor_last_reported;
 		self.creation_date 									:= l.creation_date; 
 		self.report_type_id 								:= L.report_type_id ;
-		self.ssn 															:= l.ssn; 
+		self.ssn 													  := l.ssn; 
 		self.cru_jurisdiction 							:= l.cru_agency_name; 
-		self.cru_jurisdiction_nbr 				:= l.cru_agency_id;
+		self.cru_jurisdiction_nbr 				  := l.cru_agency_id;
 		//Policy records Addition
 		self.fatality_involved							:= L.fatality_involved;
-		self.latitude													:= L.lattitude;
-		self.longitude												:= L.Longitude;
+		self.latitude												:= L.lattitude;
+		self.longitude											:= L.Longitude;
 		self.address1												:= L.address;
 		self.address2												:= L.address2;
-		self.state															:= L.State;
-		self.home_phone										:= L.home_phone;
+		self.state													:= L.State;
+		self.home_phone										  := L.home_phone;
 	//End of Police Record/Claims Process
-		self								            := L;
-		self                    := [];
+	  
+		// BuyCrash
+		self.officer_id                     := L.officer_id;
+		//Appriss Integration
+		self.Releasable                     := '1'; 		
+		self								                := L;
+		self                                := [];
    
 end;
 
@@ -468,5 +460,8 @@ shared AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGI
 AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
 export Alpha  :=  AlphaOtherVendors + AlphaCoplogic;
 export out    := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
+export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
 
 end; 

@@ -1,8 +1,8 @@
-IMPORT lib_stringlib, lib_fileservices, _control;
+﻿IMPORT lib_stringlib, lib_fileservices, _control;
 
 EXPORT  Spray (STRING jobid = '') := FUNCTION
 srcIP := _Control.IPAddress.bctlpedata11;
-targetGrp := 'thor400_20';
+targetGrp := 'thor400_44';
 superfileReq := filenames().in_request	;
 superfileRes := filenames().in_response	;
 filenameReq := superfileReq + '::' + jobid;

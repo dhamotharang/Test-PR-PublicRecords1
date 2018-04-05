@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 							
@@ -80,6 +80,7 @@ EXPORT Functions := MODULE
 														 uc_s = 'LIMITED LIABILITY PARTNERSHIP' => true,
 														 uc_s = 'GENERAL PARTNERSHIP' 					=> true,
 														 uc_s = 'LIMITED PARTNERSHIP' 					=> true,
+														 uc_s = 'LP 1988 ACT' 									=> true,
 														 uc_s = 'FOREIGN NAME' 									=> false,
 														 uc_s = 'FOREIGN REGISTERED NAME' 			=> false,
 														 false

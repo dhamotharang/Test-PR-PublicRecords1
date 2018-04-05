@@ -1,4 +1,4 @@
-import header,compID ; 
+﻿import header; 
 export fn_BestJoined_No_New_header( dataset(recordof(header.layout_header))head,boolean isnewheader) := function 
 //boolean var2 := true : stored('isnewheader');
 string20 var1 := '' : stored('watchtype');
@@ -63,8 +63,6 @@ fbest := map(
 					,var1='nonglb_noneq'			=> Watchdog.File_Best_nonglb_nonEquifax
 				  ,var1='marketing'         => Watchdog.File_Best_marketing
 					,var1='marketing_noneq'   => Watchdog.File_Best_marketing_nonEquifax
-				  ,var1='compid'            => project(compID.file_compid_best,watchdog.Layout_Best)
-				  ,var1='compid_weekly'     => project(compID.file_compid_best_weekly,watchdog.Layout_Best)
 				  ,var1='glb_nonen'         => Watchdog.File_Best_nonExperian
 				  ,var1='glb_noneq'         => Watchdog.File_Best_nonEquifax	
 				  ,var1='nonutility'        => watchdog.File_Best_nonutility

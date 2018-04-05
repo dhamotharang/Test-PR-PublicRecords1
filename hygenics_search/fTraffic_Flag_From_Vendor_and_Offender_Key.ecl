@@ -1,4 +1,4 @@
-sVendor82TrafficSet		// OK-29_Counties have traffic/infraction if positions 7-9 of offender_key have any of these
+﻿sVendor82TrafficSet		// OK-29_Counties have traffic/infraction if positions 7-9 of offender_key have any of these
  := [
 	'CRT',
 	'MRT',
@@ -107,8 +107,8 @@ export fTraffic_Flag_From_Vendor_and_Offender_Key(string5 pVendor, string pOffen
 		 'W0258' =>  if(stringlib.stringfind(pOffenderKey,'TRC',1)>0 OR stringlib.stringfind(pOffenderKey,'TRD',1)>0,'Y','N'),  //OHIO_MORGAN_COUNTY_MUNICIPAL_COURT_CW	
 		 
 		 'W0259' =>  if(stringlib.stringfind(pOffenderKey,'TRC',1)>0 OR stringlib.stringfind(pOffenderKey,'TRD',1)>0,'Y','N'),  //OHIO_LICKING_COUNTY_COMMON_PLEAS_COURT_CW
-
-		  
+		 'W0318' =>  if(stringlib.stringfind(pOffenderKey,'TRC',1)>0 OR stringlib.stringfind(pOffenderKey,'TRD',1)>0,'Y','N'),  //
+		 'W0319' =>  if(stringlib.stringfind(pOffenderKey,'TRC',1)>0 OR stringlib.stringfind(pOffenderKey,'TRD',1)>0,'Y','N'),  //
 			
 		 '') ;
          

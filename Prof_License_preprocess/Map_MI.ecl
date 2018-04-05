@@ -1,4 +1,4 @@
-﻿import lib_StringLib,Prof_License,STD;
+﻿import lib_StringLib,Prof_License,ut;
 
 
 
@@ -7,23 +7,22 @@ EXPORT Map_MI(dataset({string ftype,string fdate})infile) := MODULE
 /* Trade License */
 inTL := File_MI.TradeLic;
 
-string8 currentdate := (string8) Std.Date.Today();
-
 Prof_License.Layout_proLic_in map2TL( inTL l) := transform
 
 self.date_first_seen      := infile(ftype = 'TradeLic')[1].fdate;                                                                          
 self.date_last_seen       := infile(ftype = 'TradeLic')[1].fdate;                                                                           
 self.source_st            := 'MI';                                                                                          
-self.vendor               := 'Michigan Department of Labor and Economic Growth';                                                            
+self.vendor               := 'Michigan Dept of Consumer and Indus';                                                            
 self.orig_addr_1          := l.Address_1;                                                                                   
-self.orig_name            := StringLib.Stringfilterout(trim(l.LastName) + ' '+ trim(l.FirstName),'\'');                                                        
+self.orig_name            := StringLib.Stringfilterout(trim(l.LastName) + ' '+ trim(l.FirstName),'\'');                                              
 self.name_order           := 'LFM';                                                                                        
-self.profession_or_board           := 'Trade';  
-self.license_type                 := l.RecordType;                                                                                    
-self.license_number       := l.LICENSE;                                                                                
+self.profession_or_board           := 'Trade';                                                                                      
+self.license_number       := l.LICENSE; 
+self.issue_date                := if ( trim(l.Date_Issued) <> '' , fSlashedMDYtoCYMD(trim(l.Date_Issued)), '');                                                                                 
 self.expiration_date      := if ( trim(l.Date_Expired) <> '' , fSlashedMDYtoCYMD(trim(l.Date_Expired)), '');   
-self.orig_addr_2          := trim(l.City)+' '+StringLib.Stringfilter(l.Zip,'0123456789');                          
-self.status               := StringLib.Stringfilterout(l.Status,'\'');                                                          
+self.orig_addr_2          :=trim(l.City)+' '+StringLib.Stringfilter(l.Zip,'0123456789');                          
+self.status               := StringLib.Stringfilterout(l.Status,'\'');  
+self.Phone                := trim(l.Phone1);                                                        
 self := [];
 end;
 
@@ -34,10 +33,10 @@ dMITradeSF := Sequential(
                        if ( NOT FileServices.SuperFileExists( '~thor_data400::in::prolic::mi::trade_license'),FileServices.CreateSuperfile('~thor_data400::in::prolic::mi::trade_license'), 
                                                                                                               FileServices.ClearSuperfile( '~thor_data400::in::prolic::mi::trade_license')),
 
-                        output(dMITrade,,'~thor_data400::in::prolic::mi::trade_license_'+currentdate,overwrite),
+                        output(dMITrade,,'~thor_data400::in::prolic::mi::trade_license_'+ut.GetDate,overwrite),
                          FileServices.StartSuperfiletransaction(),
 												 
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::mi::trade_license','~thor_data400::in::prolic::mi::trade_license_'+currentdate),
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::mi::trade_license','~thor_data400::in::prolic::mi::trade_license_'+ut.GetDate),
 											   FileServices.FinishSuperfiletransaction()
 											 );
 											 
@@ -407,10 +406,10 @@ dMIHealthSF := Sequential(
                          if ( NOT FileServices.SuperFileExists( '~thor_data400::in::prolic::mi::health'),FileServices.CreateSuperfile('~thor_data400::in::prolic::mi::health'),
                                                                                                          FileServices.ClearSuperfile( '~thor_data400::in::prolic::mi::health')),
 
-                        output(dMIHealth,,'~thor_data400::in::prolic::mi::health_'+currentdate,overwrite),
+                        output(dMIHealth,,'~thor_data400::in::prolic::mi::health_'+ut.GetDate,overwrite),
                          FileServices.StartSuperfiletransaction(),
 												 
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::mi::health','~thor_data400::in::prolic::mi::health_'+currentdate),
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::mi::health','~thor_data400::in::prolic::mi::health_'+ut.GetDate),
 											   FileServices.FinishSuperfiletransaction()
 											 );
 											 
@@ -428,13 +427,18 @@ outfile := proc_clean_all(input,'MI').cleanout;
 
 export buildprep := Sequential(dout, 
                         FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_mi'),
-                        if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_mi_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_mi_old')),
-								        if ( FileServices.FileExists( '~thor_data400::in::prolic_mi_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_mi_old')),
-                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_mi','~thor_data400::in::prolic_mi_old'),                         
-											  output( outfile,,'~thor_data400::in::prolic_mi',compressed,overwrite),
-                         FileServices.StartSuperfiletransaction(),									 
+                 if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_mi_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_mi_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_mi_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_mi_old')),
+                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_mi','~thor_data400::in::prolic_mi_old'),
+                         
+											output( outfile,,'~thor_data400::in::prolic_mi',compressed,overwrite),
+                         FileServices.StartSuperfiletransaction(),
+								
+												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_mi'),
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_mi_old'),
+  										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_mi_old'),
+
+	
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

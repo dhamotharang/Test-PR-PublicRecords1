@@ -1,10 +1,12 @@
-Import prte2_votersv2, VotersV2, FCRA, ut, PRTE_CSV, VersionControl, _Control,codes, mdr;
+﻿Import prte2_votersv2, VotersV2, FCRA, ut, PRTE_CSV, VersionControl, _Control,codes, mdr;
 
 EXPORT files := module
 
-EXPORT VotersV2_IN := DATASET(constants.In_VotersV2, Layouts.Base_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+EXPORT VotersV2_IN := DATASET(constants.In_VotersV2, Layouts.Base_ext, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
-EXPORT VotersV2_Base := DATASET(constants.Base_VotersV2, Layouts.Base_Layout, FLAT );
+EXPORT VotersV2_Base_Ext := DATASET(constants.Base_VotersV2, Layouts.Base_ext, FLAT );
+
+EXPORT VotersV2_Base := Project(VotersV2_Base_Ext, Layouts.Base_Layout);
 
 Export DS_Voters_Hist := DATASET([ ],layouts.Layout_VoteHistory);
 

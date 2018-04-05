@@ -1,10 +1,10 @@
-Import _Control, Corp2, Corp2_Raw_WI, Scrubs, Scrubs_Corp2_Mapping_WI_Main, Tools, UT, VersionControl, std;
+﻿Import _Control, Corp2, Corp2_Raw_WI, Scrubs, Scrubs_Corp2_Mapping_WI_Main, Tools, UT, VersionControl, std;
 
 Export WI 	:= Module
 
 	Export Update(String filedate, string version, boolean pShouldSpray = Corp2_mapping._Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) := Function
 		
-		state_origin			:= 'WI';
+		state_origin			:= 'WI'; 
 		state_fips	 			:= '55';	
 		state_desc	 			:= 'WISCONSIN';
 		
@@ -12,7 +12,7 @@ Export WI 	:= Module
 
 		Corp2_Mapping.LayoutsCommon.Main corpTransform(Corp2_Raw_WI.Layouts.fullLine_Layout input) := transform
 		
-			setForgnTypes 												:= ['02','08','13','15','16','90'];
+			setForgnTypes 												:= ['02','08','13','15','16','18','90'];
 			self.dt_vendor_first_reported		 	  	:= (integer)fileDate;
 			self.dt_vendor_last_reported		 	  	:= (integer)fileDate;
 			self.dt_first_seen							 	  	:= (integer)fileDate;
@@ -38,7 +38,7 @@ Export WI 	:= Module
 																									 '');	
 			self.corp_name_status_cd            	:= if(corp2.t2u(input.current_status) in['CMC','CNF','DNP','EXP','PND','RES','RGL','RLT','TER'],corp2.t2u(input.current_status),'');
  			self.Corp_Name_Status_Desc						:= Corp2_Raw_WI.Functions.fGetNameStatus_desc(input.current_status);
-			self.corp_orig_org_structure_cd       := if(trim(input.org_type,left,right) not in ['90','98','96'],trim(input.org_type,left,right),'');
+			self.corp_orig_org_structure_cd       := if(trim(input.org_type,left,right) not in ['90','98','96','L:','S:','TY'],trim(input.org_type,left,right),'');
 			self.corp_orig_org_structure_desc     := Corp2_Raw_WI.Functions.fGetOrg_structure_desc(self.corp_orig_org_structure_cd);
 			self.corp_status_cd									  := corp2.t2u(input.current_status);
 			self.corp_status_desc								  := Corp2_Raw_WI.Functions.fGetStatus_desc(input.current_status);

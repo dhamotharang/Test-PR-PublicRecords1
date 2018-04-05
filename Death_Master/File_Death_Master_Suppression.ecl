@@ -230,7 +230,9 @@ dSuppressRecs				:=
 	//	LNK-575	Alive Consumer marked as deceased
 		{/*'001146418435'*/'', 100, '19990501', 'A', 'A', '482563467', 'HOFFMAN             ', '    ', 'SANDRA         ', '               ', ' ', '19861100', '19571206', '23', '48640', '     ', 'MI', '111', '  ', 'N', 'SSA', /*'482563467H861100'*/'', 'DE', 'N'},
 	//	LNK-447	Health Equity - Olugbenga Fadare
-    {'191961589382', 100, '20170707', ' ', ' ', '         ', 'FADARE              ', '    ', 'OLUGBENGA      ', '               ', ' ', '        ', '19860830', '39', '44118', '     ', 'OH', '035', '  ', 'N', 'TUN', /*'191961589382FTUN'*/'', 'TN', 'Y'}
+    {'191961589382', 100, '20170707', ' ', ' ', '         ', 'FADARE              ', '    ', 'OLUGBENGA      ', '               ', ' ', '        ', '19860830', '39', '44118', '     ', 'OH', '035', '  ', 'N', 'TUN', /*'191961589382FTUN'*/'', 'TN', 'Y'},
+	// DF-21085 Death Master - Suppress JAMES PALMER death record from SSA
+    {'001907266974', 100, '20160617', 'A', 'A', /*'086360734'*/'', 'PALMER              ', '    ', 'JAMES          ', 'LEWIS          ', 'P', '20160610', '19450316', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'086360734P160610'*/'', 'D$', 'N'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

@@ -1,5 +1,5 @@
-import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,boolean runcreatebuild = true) := function
+﻿import ut,Orbit3,_Control;
+export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean runcreatebuild = true) := function
 
 	tokenval := orbit3.GetToken();
 
@@ -13,7 +13,7 @@ export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,boolean runcr
 	Update_build := Orbit3.UpdateBuildInstance(buildname,
 									Buildvs,
 									tokenval,
-									'PRODUCTION'
+									BuildStatus
 						
 									).retcode;
 																

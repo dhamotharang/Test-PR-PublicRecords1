@@ -18,7 +18,7 @@ EXPORT Spray_Deact_Daily(string version, const varstring eclsourceip, string tho
 																												',',
 																												'\r\n',
 																												,						
-																												thor_name,
+																												STD.System.Thorlib.Group(),
 																												'~thor_data400::in::phones::' + filename,
 																												,
 																												,

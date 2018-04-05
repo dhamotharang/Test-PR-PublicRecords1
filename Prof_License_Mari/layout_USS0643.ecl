@@ -1,4 +1,4 @@
-// USS0643 / Federal Deposit Insurance Corporation / Multiple Professions //
+﻿// USS0643 / Federal Deposit Insurance Corporation / Multiple Professions //
 EXPORT layout_USS0643 := MODULE
 
 EXPORT raw := RECORD
@@ -101,6 +101,7 @@ EXPORT raw := RECORD
 	STRING		ULTCERT;
 	STRING		CFPBEFFDTE;
 	STRING		CFPBENDDTE;
+	STRING    CFPBFLAG;
 	STRING		REGAGENT2;
 	// 20160606 - new fields   
 	// URL of other public-facing internet web site the reporting institution uses to accept or solicit deposits from the public

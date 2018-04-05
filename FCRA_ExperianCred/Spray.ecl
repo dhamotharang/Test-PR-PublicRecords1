@@ -1,4 +1,4 @@
-import VersionControl,_Control;
+﻿import VersionControl,_Control;
 
 export Spray := module
 
@@ -14,9 +14,12 @@ export Spray := module
  	// }
 // ], VersionControl.Layout_Sprays.Info);
 
+export ip 		:= _Control.IPAddress.bctlpedata11;
+export path 	:= '/data/data_lib_2_hus2/Experian/FCRA/in/' + version;
+
 export load := DATASET([
  	{_Control.IPAddress.bctlpedata11
- 	,'/data/data_lib_2_hus2/Experian/FCRA/in/' + version   //Location to be determined by operations                
+ 	,path   //Location to be determined by operations                
  	,'D*LEXNEX*EXP*FCRA.dat'                           
  	,'3775'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_load_@version@'    
@@ -28,8 +31,8 @@ export load := DATASET([
 ], VersionControl.Layout_Sprays.Info);
 
 export Updates := DATASET([
- 	{_Control.IPAddress.bctlpedata11
- 	,'/data/data_lib_2_hus2/Experian/FCRA/in/' + version   //Location to be determined by operations                
+ 	{ip
+ 	,path   //Location to be determined by operations                
  	,'D*LEXNEX*FCRA.dat'                           
  	,'3775'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_updates_@version@'    
@@ -41,8 +44,8 @@ export Updates := DATASET([
 ], VersionControl.Layout_Sprays.Info);
 
 export Deletes := DATASET([
- 	{_Control.IPAddress.bctlpedata11
- 	,'/data/data_lib_2_hus2/Experian/FCRA/in/' + version   //Location to be determined by operations                
+ 	{ip
+ 	,path   //Location to be determined by operations                
  	,'DPINS'                           
  	,'101'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_deletes_@version@'    
@@ -53,8 +56,8 @@ export Deletes := DATASET([
 ], VersionControl.Layout_Sprays.Info);
 
 export Deceased := DATASET([
- 	{_Control.IPAddress.bctlpedata11
- 	,'/data/data_lib_2_hus2/Experian/FCRA/in/' + version 
+ 	{ip
+ 	,path
  	,'DEC'                           
  	,'101'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_deceased_@version@'    

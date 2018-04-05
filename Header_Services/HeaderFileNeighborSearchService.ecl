@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="HeaderFileNeighborSearchService">
   <part name="did" type="xsd:string"/>
 	<part name="Addr" type="xsd:string"/>
@@ -41,6 +41,9 @@
 		LNBranded. Switch for specific behavior for dayton apps
 */
 export HeaderFileNeighborSearchService := MACRO
+  // v-- Added for RQ-13563 to purposely force off the use of FDN keys
+  #CONSTANT('IncludeFraudDefenseNetwork',FALSE);
+
 	MatchingRecs := Header_Services.Fetch_Header_File_Neighbor;
   OUTPUT(MatchingRecs, NAMED('MatchingRecs'));
 ENDMACRO;

@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPv2_HRCHY, BIPV2_Best,Business_Credit, BusinessCredit_Services, iesp, TopBusiness_Services;
+﻿IMPORT BIPV2, BIPv2_HRCHY, BIPV2_Best,Business_Credit, BusinessCredit_Services, iesp, TopBusiness_Services;
 
 EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, boolean buzCreditAccess = FALSE) := FUNCTION
 
@@ -52,7 +52,7 @@ EXPORT fn_getSubsidiaries (BusinessCredit_Services.Iparam.reportrecords inmod, b
 																						 SELF.SeleID 	:= LEFT.SeleID;
 																						 self := []));
 
-	best_rec := BIPV2_Best.Key_LinkIds.Kfetch2(combined_linkids,,,,false,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
+	best_rec := BIPV2_Best.Key_LinkIds.Kfetch2(combined_linkids, inmod.FetchLevel,,,false,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
 
 	iesp.businesscreditreport.t_BusinessCreditSubsidiary final_trans(RECORDOF(best_rec) L , temp_rec R) := TRANSFORM
 		SELF.BusinessIds.UltId 				:= L.UltId;

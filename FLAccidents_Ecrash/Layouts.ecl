@@ -1,16 +1,4 @@
-/*2015-08-08T00:09:54Z (Srilatha Katukuri)
-#181860 - PRUS
-*/
-/*2015-07-23T17:10:11Z (Srilatha Katukuri)
-#173799
-*/
-/*2015-06-11T03:50:00Z (skatukuri)
-C:\Users\katusr01\AppData\Roaming\HPCC Systems\eclide\skatukuri\Boca_Dataland_Thor\FLAccidents_Ecrash\Layouts\2015-06-11T03_50_00Z.ecl
-*/
-/*2015-01-28T19:09:59Z (Ayeesha Kayttala)
-
-*/
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
 	export slim_layout := record
 
@@ -251,29 +239,70 @@ string  source_id;
 
 end;
 
+export key_search_layout := record  
+	string40  accident_nbr;	
+	string40  orig_accnbr;
+	string40  addl_report_number;	
+	string8   accident_date; 
+	string2   report_code;
+	string100 jurisdiction;
+	string2   jurisdiction_state;
+	string11  jurisdiction_nbr;
+	string4   work_type_id;
+  string3   report_type_id;
+	string11  report_id;
+	string9   agency_ori;
+	string100 vendor_code;
+	string20  vendor_report_id;
+	string20  reportLinkID;
+  string30  vin;
+  string25  driver_license_nbr;
+  string2   dlnbr_st;
+  string10  tag_nbr;
+  string2   tagnbr_st;
+  string12  officer_id;
+	string8   date_vendor_last_reported;
+	string100 accident_location;
+	unsigned6 Idfield;
+  string12  did;
+  string60  fname;
+  string60  mname;
+  string100 lname;
+	string60  orig_fname;
+	string60  orig_mname;
+	string100	orig_lname;
+end;
 
-export key_slim_layout := record 
-
-string40  accident_nbr;
-string40  orig_accnbr,
-string40  addl_report_number,
-string8   accident_date,
-string2   report_code,
-string100 jurisdiction,
-string2   jurisdiction_state,
-string11  jurisdiction_nbr;
-string4   work_type_id,
-string3   report_type_id,
-string11  report_id,
-string9   agency_ori,
-string100 Vendor_Code,
-string20  vendor_report_id,
-string20  ReportLinkID ,
-string8   date_vendor_last_reported , 
-string100 accident_location;
-unsigned6 Idfield ; 
-
-end; 
+export key_slim_layout := record  
+	string40  accident_nbr;	
+	string40  orig_accnbr;
+	string40  addl_report_number;	
+	string8   accident_date; 
+	string2   report_code;
+	string100 jurisdiction;
+	string2   jurisdiction_state;
+	string11  jurisdiction_nbr;
+	string4   work_type_id;
+  string3   report_type_id;
+	string11  report_id;
+	string9   agency_ori;
+	string100 vendor_code;
+	string20  vendor_report_id;
+	string20  reportLinkID;
+  string30  vin;
+  string25  driver_license_nbr;
+  string2   dlnbr_st;
+  string10  tag_nbr;
+  string2   tagnbr_st;
+  string12  officer_id;
+	string8   date_vendor_last_reported;
+	string100 accident_location;
+	unsigned6 idfield;
+  string12  did;
+  string60  fname;
+  string60  mname;
+  string100 lname;
+end;
 
 export PhotoLayout := record
 string11 document_id,

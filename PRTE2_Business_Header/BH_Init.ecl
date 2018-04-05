@@ -1,4 +1,4 @@
-import Address, AID, Business_Header, ut, PRTE2;
+﻿import Address, AID, Business_Header, ut, PRTE2;
 
 export BH_Init (
 
@@ -83,6 +83,7 @@ function
 	//Append cleaned address fields
 	Layouts.Out.Layout_BH_Out tMapClnAddr(dBH_Addr_For_AID l, dWithAID r) := transform
 			self.RawAID					:= r.aidwork_rawaid;
+			self.AceAID					:= r.AIDWork_ACECache.aid;
 			self.prim_range     := r.AIDWork_ACECache.prim_range;
 			self.predir         := r.AIDWork_ACECache.predir;
 			self.prim_name      := r.AIDWork_ACECache.prim_name;
@@ -119,18 +120,18 @@ function
 												left.uniq_id = right.uniq_id,
 												tMapClnAddr(left,right),left outer);
 	
-	// Appending the fake BDID's for new cust_name= LNPR or blank BDID records.
+	// Appending the fake BDID's for ONLY new business entitie records, cust_name <> ''.
 	bh_out_recs := project(jBH_CleanAddr, transform(Layouts.Out.Layout_BH_Out, 
-																									self.bdid	:= if(trim(left.cust_name) = 'LN_PR',
+																									self.bdid	:= if(trim(left.cust_name) = '',
+																																	left.bdid,
 																																	PRTE2.fn_AppendFakeID.bdid(left.long_bus_name, 
 																																														 left.prim_range, 
 																																														 left.prim_name, 
 																																														 left.v_city_name, 
 																																														 left.st, 
 																																														 left.zip,
-																																														 left.cust_name),
-																																	left.bdid
-																																 ),
+																																														 left.cust_name)
+																																 ),																																
 																									self := left)
 												): persist('~prte::persist::PRTE2_Business_Header::BH_Init');
 												

@@ -1,4 +1,4 @@
-import aid, AID_Build, std;
+﻿import aid, AID_Build, std;
 
 FixupAddress(DATASET(Spokeo.Layout_temp) src) := FUNCTION
 	spk := PROJECT(src, TRANSFORM(Spokeo.Layout_temp,
@@ -93,11 +93,14 @@ Insert a new record if infutor_watchdog has a more recent address than what Spok
 										self := left;),
 									left outer, KEEP(1), LOCAL);
 
-			k1a := src + ln2(err_stat[1]='S') + ln3;
+			inserted := ln2(err_stat[1]='S') + ln3;
+			//k1a := src + ln2(err_stat[1]='S') + ln3;
 			
-			k1 := Spokeo.Fn_Append_HHId(k1a);
+			//k1 := Spokeo.Fn_Append_HHId(k1a);
 			
-			k2 := SORT(k1, spokeoid, -address_source);
+			//k2 := SORT(k1, spokeoid, -address_source);
+			k1 := Spokeo.Fn_Append_HHId(inserted);
+			k2 := src + k1;
 			
 			return k2;
 
