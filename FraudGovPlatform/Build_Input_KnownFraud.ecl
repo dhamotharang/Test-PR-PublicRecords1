@@ -86,14 +86,17 @@ module
 																							left.sequence = right.sequence,
 																							TRANSFORM(knfd,SELF := LEFT),
 																							left only);	
-	dAppendAID     := Standardize_Entity.Clean_Address(f1_dedup, pversion);// : persist(Persistnames.AppendAID);
-	dappendName		:= Standardize_Entity.Clean_Name(dAppendAID);	
-	dAppendPhone   := Standardize_Entity.Clean_Phone (dappendName);
-	dAppendLexid   := Standardize_Entity.Append_Lexid (dAppendPhone);	
+																							
+	new_addresses := Functions.New_Addresses(f1_dedup,pversion);
+	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_KFND.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
+		
+	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, Files(pversion).Input.AddressCache_KNFD.New);
+	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
+	dAppendPhone	:= Standardize_Entity.Clean_Phone (dappendName);
+	dAppendLexid	:= Standardize_Entity.Append_Lexid (dAppendPhone);	
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
 	new_file := fn_dedup(files().Input.KnownFraud.sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
-	
 	Build_Input_File :=  OUTPUT(new_file,,Filenames().Input.KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
 	Promote_Input_File := 
@@ -123,9 +126,21 @@ module
 				 Filenames().Input.ByPassed_KnownFraud.Sprayed
 				,Filenames().Input.ByPassed_KnownFraud.New(pversion)
 			)
+			 //Promote AddressCache
+			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Used, TRUE)
+			,STD.File.AddSuperfile(
+				 Filenames().Input.AddressCache_KNFD.Sprayed
+				,Filenames().Input.AddressCache_KNFD.Used
+				,addcontents := true
+			)
+			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Sprayed)
+			,STD.File.AddSuperfile(
+				 Filenames().Input.AddressCache_KNFD.Sprayed
+				,Filenames().Input.AddressCache_KNFD.New(pversion)
+			)			
 			//Clear Individual Sprayed Files
-			//,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed, TRUE)
-			//,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudRejected, TRUE)
+			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed, TRUE)
+			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudRejected, TRUE)
 			,STD.File.FinishSuperFileTransaction()	
 		);
 		
