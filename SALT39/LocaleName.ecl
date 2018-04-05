@@ -1,0 +1,1 @@
+﻿export LocaleName := 'en';
