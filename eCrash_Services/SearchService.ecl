@@ -1,4 +1,4 @@
-/*2015-06-24T16:52:16Z (Sai Nagula)
+﻿/*2015-06-24T16:52:16Z (Sai Nagula)
 Open State search and Drivers exchange report grouping.
 */
 /*--SOAP--
@@ -156,16 +156,19 @@ EXPORT SearchService := MACRO
     //set search criteria
     search_by := global (first_row.searchBy);
 	
-    #stored ('AccidentLocationCrossStreet', STD.Str.ToUpperCase (search_by.AccidentLocation.CrossStreet));
-    #stored ('AccidentLocationStreet', STD.Str.ToUpperCase (search_by.AccidentLocation.Street));
-		#stored ('ReportNumber', search_by.ReportNumber);
-		#stored ('Jurisdiction', STD.Str.ToUpperCase (search_by.Jurisdiction));
-		#stored ('JurisdictionState', STD.Str.ToUpperCase (search_by.JurisdictionState));
+    #stored ('AccidentLocationCrossStreet', TRIM(STD.Str.ToUpperCase (search_by.AccidentLocation.CrossStreet),left,right));
+    #stored ('AccidentLocationStreet', TRIM(STD.Str.ToUpperCase (search_by.AccidentLocation.Street),left,right));
+		#stored ('ReportNumber', TRIM(search_by.ReportNumber,left,right));
+		#stored ('Jurisdiction', TRIM(STD.Str.ToUpperCase (search_by.Jurisdiction),left,right));
+		#stored ('JurisdictionState', TRIM(STD.Str.ToUpperCase (search_by.JurisdictionState),left,right));
 		#stored ('Agencies', search_by.Agencies);
-		#stored ('UserType', STD.Str.ToUpperCase (search_by.UserType));
-		#stored ('AgencyORI', STD.Str.ToUpperCase (search_by.AgencyORI));
+		#stored ('UserType', TRIM(STD.Str.ToUpperCase (search_by.UserType),left,right));
+		#stored ('AgencyORI', TRIM(STD.Str.ToUpperCase (search_by.AgencyORI),left,right));
 		#stored ('RequestHashKey', search_by.RequestHashKey);
-		
+		#stored('OfficerBadgeNumber', TRIM(search_by.OfficerBadgeNumber,left,right));
+		#stored('DriversLicense', TRIM(STD.Str.ToUpperCase (search_by.DriversLicense),left,right));
+		#stored('Vin', TRIM(STD.Str.ToUpperCase (search_by.Vin),left,right));
+		#stored('LicensePlate', TRIM(STD.Str.ToUpperCase (search_by.LicensePlate),left,right));
 		#stored ('GroupRecords', Search_opt.GroupRecords);
 		
 		#stored ('SortOrder', Search_opt.SortOrder);
@@ -189,11 +192,13 @@ EXPORT SearchService := MACRO
 		#stored('DateOfLoss', dol_date);
 		#stored('DolStartdate', dol_start_date);
 		#stored('DolEnddate', dol_end_date);
+		
+
 
 		string Jurisdiction_tmp 					:= '' : stored('Jurisdiction');
-		string Jurisdiction_old 					:= STD.Str.ToUpperCase (Jurisdiction_tmp);
+		string Jurisdiction_old 					:= TRIM(STD.Str.ToUpperCase (Jurisdiction_tmp),left,right);
 		string JurisdictionState_tmp 			:= '' : stored('JurisdictionState');
-		string JurisdictionState_old 			:= STD.Str.ToUpperCase (JurisdictionState_tmp);
+		string JurisdictionState_old 			:= TRIM(STD.Str.ToUpperCase (JurisdictionState_tmp),left,right);
 		string AgencyORI_old 							:= '' : stored('AgencyORI');
 		//added empty dataset if no state or jurisdiction information is supplied in request	
 		recordof(iesp.ecrash.t_ECrashSearchAgency) xform_emptyagency():=TRANSFORM
@@ -202,10 +207,10 @@ EXPORT SearchService := MACRO
 		
 		DATASET(iesp.ecrash.t_ECrashSearchAgency) Agencies_stored := DATASET([], iesp.ecrash.t_ECrashSearchAgency) : stored('Agencies', FEW);
 		DATASET(iesp.ecrash.t_ECrashSearchAgency) Agencies_tmp 		:= PROJECT(IF(EXISTS(Agencies_stored), Agencies_stored, dataset([xform_emptyagency()])), TRANSFORM(iesp.ecrash.t_ECrashSearchAgency,
-																																								SELF.Jurisdiction := STD.Str.ToUpperCase (LEFT.Jurisdiction);
-																																								SELF.JurisdictionState := STD.Str.ToUpperCase (LEFT.JurisdictionState);
-																																								SELF.AgencyID := STD.Str.ToUpperCase (LEFT.AgencyID);
-																																								SELF.AgencyORI := STD.Str.ToUpperCase (LEFT.AgencyORI);
+																																								SELF.Jurisdiction := TRIM(STD.Str.ToUpperCase (LEFT.Jurisdiction),left,right);
+																																								SELF.JurisdictionState := TRIM(STD.Str.ToUpperCase (LEFT.JurisdictionState),left,right);
+																																								SELF.AgencyID := TRIM(STD.Str.ToUpperCase (LEFT.AgencyID),left,right);
+																																								SELF.AgencyORI := TRIM(STD.Str.ToUpperCase (LEFT.AgencyORI),left,right);
 																																								SELF := LEFT;));
 		recordof(iesp.ecrash.t_ECrashSearchAgency) xform_agency():=TRANSFORM
 					SELF.Jurisdiction := Jurisdiction_old;
@@ -222,18 +227,11 @@ EXPORT SearchService := MACRO
         export string AccidentLocationStreet  := '' : stored('AccidentLocationStreet');
 				export string ReportNumber_raw 			:= '' : stored('ReportNumber');
         export string ReportNumber 			:= stringlib.stringfilter(STD.Str.ToUpperCase (ReportNumber_raw), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-				// export string Jurisdiction 			:= Jurisdiction_old;
-				// export string JurisdictionState 			:= JurisdictionState_old;
-				// export string Jurisdiction_tmp 			:= '' : stored('Jurisdiction');
-				// export string Jurisdiction 			:= stringlib.stringtouppercase(Jurisdiction_tmp);
-				// export string JurisdictionState_tmp 			:= '' : stored('JurisdictionState');
-				// export string JurisdictionState 			:= stringlib.stringtouppercase(JurisdictionState_tmp);
 				export dataset(iesp.ecrash.t_ECrashSearchAgency) Agencies := agency_ds;	
 				export string DateOfLoss 				:= '' : stored('DateOfLoss');
 				export string DolStartdate 				:= '' : stored('DolStartdate');
 				export string DolEnddate 				:= '' : stored('DolEnddate');
 				export string UserType 				:= '' : stored('UserType');
-				// export string AgencyORI 				:= '' : stored('AgencyORI');
 				export boolean RequestHashKey := false : stored('RequestHashKey');
 				export boolean GroupRecords 				:= false : stored('GroupRecords');
 				export boolean SubscriptionReports 				:= false : stored('SubscriptionReports');
@@ -242,17 +240,34 @@ EXPORT SearchService := MACRO
 				export integer MaxLimit 				:= 750 : stored('MaxResults');
 				export string200 SqlSearchEspURL := SQL_SEARCH_ESP_URL;
 				export string SqlSearchEspNAME := SQL_SEARCH_ESP_NAME;
+				export string   OfficerBadgeNumber 	  :=  '' : stored('OfficerBadgeNumber');
+				export string   driversLicenseNumber  :=  '' : stored('DriversLicense');
+				export string   VehicleVin  :=  '' : stored('Vin');
+				export string   LicensePlate  :=  '' : stored('LicensePlate');
+			  export string200 KY_SearchEspURL := gateways_in(STD.Str.ToUpperCase (TRIM(servicename,ALL)) = 'GATEWAY_ESP')[1].url;
+			  export string KY_SearchEspNAME 	:= 'KYCrashSearch';
     END;
-		
-		Recs_in := eCrash_Services.Records(tempmod);
-		
-		recs := if (tempmod.SubscriptionReports = true, Recs_in.getSubscriptionRecords(), Recs_in.getSearchRecords());
-				
-//look to pass Max limit in Macro. 
-//could be this maxRetCnt:=MaxLimit
-		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs, results,iesp.eCrash.t_ECrashSearchResponse, Records, false);
-    output(results,named('Results'));
-		// output(tmpURLString);
 
+		/* The function should return:
+ 	  1. The list of alias agencies that needs to be processed through hpcc & deltabase
+	  2. The KY response in the format of REcords results */
+		/*
+		KY_recs := eCrash_Services.Records_KY(tempmod);		
+	  KY_results := KY_recs.getKYrecords();		
+	 */
+		Recs_in := eCrash_Services.Records(tempmod );		
+		
+		KY_results := Recs_in.getKYrecords();		
+		
+		
+		recs := if (tempmod.SubscriptionReports = true, Recs_in.getSubscriptionRecords()
+																									, Recs_in.getSearchRecords(KY_results.alias_agencies
+																																					,  KY_results.ky_response_final));	
+		
+		//look to pass Max limit in Macro. 
+		//could be this maxRetCnt:=MaxLimit		
+		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs, results,iesp.eCrash.t_ECrashSearchResponse, Records, false);
+
+		output(results,named('Results'));   	
+		
 ENDMACRO;
- // SearchService();

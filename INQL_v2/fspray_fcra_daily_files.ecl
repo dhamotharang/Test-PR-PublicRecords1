@@ -1,33 +1,28 @@
-import Versioncontrol, _Control, std;
+﻿import Versioncontrol, std;
 
 EXPORT fspray_fcra_daily_files := module
 	
-	pServerIP		:= _control.IPAddress.bctlpedata10;
-	rootDir 		:= '/data/inquiry_data_01/';
-	readyDir		:= rootDir + 'spray_ready/';
-	sprayingDir	:= rootDir + 'spraying/';
-	doneDir 		:= rootDir + 'done/';
-	errorDir 		:= rootDir + 'error/';
-
 	GetFileList(string path, string pFilenameExp) := function
-		pFileList  :=  nothor(FileServices.Remotedirectory(pServerIP,path,pFilenameExp));
+		pFileList  :=  nothor(FileServices.Remotedirectory(INQL_v2._Constants.LZ,path,pFilenameExp));
 		return pFileList;
-	end;
-
-	filters := ['banko_batch_fcra*.txt','fcra_log_accounting_log_*.txt','banko_fcra*.txt','batch_fcra*.cat','riskwise_fcra*.txt'];
+	end;	
 	
 	GetFiles(string path) := function
-		pFiles 	:=  GetFileList(path, filters[1])
-							+	GetFileList(path, filters[2])
-							+ GetFileList(path, filters[3])
-							+ GetFileList(path, filters[4])
-							+ GetFileList(path, filters[5]);
+		pFiles 	:=  GetFileList(path, INQL_v2._Constants.fcra_filters[1])
+							+	GetFileList(path, INQL_v2._Constants.fcra_filters[2])
+							+ GetFileList(path, INQL_v2._Constants.fcra_filters[3])
+							+ GetFileList(path, INQL_v2._Constants.fcra_filters[4])
+							+ GetFileList(path, INQL_v2._Constants.fcra_filters[5]);
 		return pFiles;
 	end;
 					
 	export _spray := sequential(
-					nothor(apply(GetFiles(readyDir), STD.File.MoveExternalFile(pServerIP, readyDir + name, sprayingDir + name)))
-				 ,INQL_v2.fSpray(GetFiles(sprayingDir), true)
-				 ,nothor(apply(GetFiles(sprayingDir), STD.File.MoveExternalFile(pServerIP, sprayingDir + name, doneDir + name)))
-					);		
+					nothor(apply(GetFiles(INQL_v2._Constants.READYDIR), STD.File.MoveExternalFile(INQL_v2._Constants.LZ, INQL_v2._Constants.READYDIR + name, INQL_v2._Constants.SPRAYINGDIR + name)))
+				 ,INQL_v2.fSpray(GetFiles(INQL_v2._Constants.sprayingDir), true)
+				 ,nothor(apply(GetFiles(INQL_v2._Constants.SPRAYINGDIR), STD.File.MoveExternalFile(INQL_v2._Constants.LZ, INQL_v2._Constants.SPRAYINGDIR + name, INQL_v2._Constants.DONEDIR + name)))
+				 ,notify(INQL_v2._Constants.FCRA_DAILY_BASE_EVENTNAME, '*') //Starting the base building process.
+					) : SUCCESS(FileServices.SendEmail(INQL_v2.email_notification_lists.BuildSuccess,'FCRA Logs Spray Complete - Inquiry Tracking, Score and Attribute', thorlib.wuid())),
+							Failure(FileServices.SendEmail(INQL_v2.email_notification_lists.BuildFailure, 'FCRA Input Logs Spray Fail', thorlib.wuid()
+                + '\n  *  Please go to bctlpedata10 inquiry_data_01 spray_ready to see what files need to be sprayed. May need gunzip. Resubmit WU.'+'\n' + FAILMESSAGE));
+								
 end;

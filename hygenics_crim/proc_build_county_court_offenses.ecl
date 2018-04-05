@@ -1,4 +1,4 @@
-/*2014-04-23T19:31:32Z (Vani Chikte)
+﻿/*2014-04-23T19:31:32Z (Vani Chikte)
 
 */
 import address, crim_common,STD;
@@ -9,10 +9,10 @@ import address, crim_common,STD;
 // sen := sort(distribute(hygenics_crim.file_in_sentence, hash(recordid)), recordid, local);
 
  
-def := distribute(hygenics_crim.file_in_defendant_counties(),hash(recordid+statecode));
-cha := distribute(hygenics_crim.file_in_charge_counties(),hash(recordid+statecode));
-off := distribute(hygenics_crim.file_in_offense_counties(),hash(recordid+statecode));
-sen := distribute(hygenics_crim.file_in_sentence_counties(),hash(recordid+statecode));
+def := distribute(hygenics_crim.file_in_defendant_counties(),hash(recordid,sourceid));
+cha := distribute(hygenics_crim.file_in_charge_counties(),hash(recordid,sourceid));
+off := distribute(hygenics_crim.file_in_offense_counties(),hash(recordid,sourceid));
+sen := distribute(hygenics_crim.file_in_sentence_counties(),hash(recordid,sourceid));
 
 
 layout_j_final := record
@@ -157,6 +157,7 @@ layout_j_final := record
                 string10             ProbationMinMonths     := '';
                 string10             ProbationMinDays       := '';
                 string100            ProbationStatus        := '';
+								string20             sourceid               := '';
                 //
 end;
 
@@ -188,7 +189,7 @@ self                         := r;
 end;
 
 j1 := join(def(),off, 
-                                left.statecode=right.statecode and 
+                                left.sourceid=right.sourceid and 
                                 left.recordid=right.recordid, 
                                 to_j1(left,right),local);
 
@@ -236,7 +237,7 @@ layout_j_final to_j2(j1 l, cha r) := transform
   self                       := r;
 end;
 
-j2 := join(j1, cha, left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+j2 := join(j1, cha, left.sourceid=right.sourceid and left.recordid=right.recordid and left.caseid=right.caseid, 
                     to_j2(left,right), left outer, local);
                                                
 //output(choosen(j2,25));
@@ -289,7 +290,7 @@ layout_j_final to_j3(j2 l, sen r) := transform
 self := l;
 //self := r;
 end;
-j3 := join(j2,sen, left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+j3 := join(j2,sen,left.recordid=right.recordid and  left.sourceid=right.sourceid and left.caseid=right.caseid, 
            to_j3(left,right), left outer, local);
 
 j_final := j3;
@@ -806,7 +807,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 												    length(trim(offensedegree)) <= 2 and regexfind('[0-9A-Z0-9]+',offensedegree) => trim(offensedegree),
 														offensetype in ['F','M'] => trim(offensetype),
                             ''
-                                                                                                             ),left,right);
+                            ),left,right);
                 
 		LE_off_lev                  := Map(regexfind('(.*) ([/(]*[0-9:]+[0-9:.]+[ A-Z]*[/( 0-9A-Z/)]*[/)]), ([A-Z])',l.finaloffense) => trim(regexreplace('(.*) ([/(]*[0-9:]+[0-9:.]+[ A-Z]*[/( 0-9A-Z/)]*[/)]), ([A-Z])',l.finaloffense,'$3'),left,right),
 																			 regexfind('(.*) ([0-9:]+[0-9:.]+[ A-Z]*[/( 0-9A-Z/)]*), ([A-Z])',l.finaloffense)       => trim(regexreplace('(.*) ([0-9:]+[0-9:.]+[ A-Z]*[/( 0-9A-Z/)]*), ([A-Z])',l.finaloffense,'$3'),left,right),
@@ -815,7 +816,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 		self.court_off_lev          := MAP(vVendor ='LB' and off_lev <> '' => off_lev, 
 		                                   vVendor ='LB' => LE_off_lev,
                                      	 vVendor ='UV'  and regexfind('CRIMINAL (.*)',off_lev)=>	regexreplace('CRIMINAL (.*)',off_lev,'$1'),                                      
-																			 
+																			 vVendor ='10C'  and l.CitationNumber <> '' => 'T',  
+
                                      // the word traffic in offense
                                      vVendor ='7G' and stringlib.stringfind('TRAFFIC ',temp_offense,1)>0 and off_lev ='PM' => 'PMT',
 																		 
@@ -947,10 +949,13 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																		 vVendor ='W0027' and l.classification_code <>'TV' and trim(l.casetype) IN ['TRAFFIC','PARKING'] => '' ,
 																		 vVendor ='W0041' and l.classification_code <>'TV' and trim(l.casetype) IN ['CRIMINAL TRAFFIC']  => '' ,
 																		 
-                                     (stringlib.stringfind(temp_offense,'FELONY',1) >0  or regexfind('FELONY|FEL0NY|FELONIOUS|FELONEOUS|FELONIOS|FELONOUS|CRIM-FEL', temp_offense) ) and 
+                                     (stringlib.stringfind(temp_offense,'FELONY',1) >0  or regexfind('FELONY|FEL0NY|FELONIOUS|FELONEOUS|FELONIOS|FELONOUS|CRIM-FEL|FEL:', temp_offense) ) and 
                                       regexfind('REDU[U]*CED|AMEND[DED]* TO|NON-FELONY|ACCESSORY|ATTEMPT TO COMMIT|FACILITATION',temp_offense,0) ='' => 'F',
-																																						
-                                     trim(l.casetype) IN ['CRIMINAL FELONY','FELONY'] => 'F' ,
+																			
+																		 regexfind('MISD:', temp_offense)  and 
+                                     regexfind('REDU[U]*CED|AMEND[DED]* TO|NON-FELONY|ACCESSORY|ATTEMPT TO COMMIT|FACILITATION',temp_offense,0) ='' => 'M',  																				
+                                     
+																		 trim(l.casetype) IN ['CRIMINAL FELONY','FELONY'] => 'F' ,
 																		 trim(l.casetype) IN ['FELONY II']      => 'F2' ,
 																		 trim(l.casetype) IN ['FELONY I']       => 'F1' ,
 																		 trim(l.casetype) IN ['CAPITAL FELONY'] => 'CF' ,
@@ -964,7 +969,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                                       stringlib.stringfind(temp_offense,'CRIM-FEL',1) >0   ) =>'F',*/
 																		 trim(l.casetype) IN ['CRIMINAL TRAFFIC'] => 'CT' ,
 																		 trim(l.casetype) IN ['TRAFFIC'] and  vVendor in ['RE'] => '', //As per Margaret don't use case types for RE 3/8/2017
-																		 trim(l.casetype) IN ['TRAFFIC','PARKING','PARKING INFRACTION'] => 'T' ,
+																		 trim(l.casetype) IN ['TR','TRAFFIC','PARKING','PARKING INFRACTION'] => 'T' ,
                                      trim(l.casetype) IN ['CRIMINAL INFRACTION','CRIMINAL INFRACTIONS'] => 'CI',
 																		 trim(l.casetype) IN ['INFRACTION'] => 'I',
 																		 trim(l.casetype) IN ['TRAFFIC INFRACTION','TRAFFIC INFRACTIONS','INFRACTION TRAFFIC','INFRACTION: TRAFFIC/'] => 'TI',
@@ -1028,10 +1033,10 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                 //use disposition from charge table when value in offense table is null
   self.court_disp_desc_1    := MAP( trim(temp_disp) ='G'=>'GUILTY',                                            
                                     trim(temp_disp) ='D'=>'DISMISS',
-																		trim(temp_disp) ='PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY', 
-																		trim(temp_disp) ='TYPE:P  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
-                                    trim(temp_disp) ='TYPE:S  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
-                                    trim(temp_disp) ='TYPE:J  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+																		trim(temp_disp) ='PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY', 
+																		trim(temp_disp) ='TYPE:P  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+                                    trim(temp_disp) ='TYPE:S  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+                                    trim(temp_disp) ='TYPE:J  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
 
 																		regexfind('&NBS',temp_disp) => regexreplace('(.*)&NBSP;',temp_disp,'$1'),
                                     vVendor IN ['US','8I','8K','9G','9U'] and regexfind('(.*) - (.*)',temp_disp) => regexreplace('(.*) - (.*)',temp_disp,'$2'),                                                                                                                                                        
@@ -1306,6 +1311,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																		vVendor ='9I' => addl_prov_desc_9I[1..40],
 																		vVendor ='9T' => addl_prov_desc_9T[1..40],
 	                                  vVendor ='PJ' => l.casecomments,
+																	  vVendor ='9Z' and stringlib.stringfind(l.sentenceadditionalinfo,';',1)>0=> l.sentenceadditionalinfo[1..stringlib.stringfind(l.sentenceadditionalinfo,';',1)-1],
+																	  vVendor ='9Z' =>l.sentenceadditionalinfo,
                                     vVendor IN ['OP','PC','9N'] => '',
 																		
                                     vVendor IN ['SA','YB'] and length(l.sentencestatus) > 40 => l.sentencestatus[1..40],
@@ -1340,6 +1347,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																	 vVendor ='8R' => l.sentencestatus[41..],
 																	 vVendor ='9I' => addl_prov_desc_9I[41..],
 																	 vVendor ='9T' => addl_prov_desc_9T[41..],
+																	 vVendor ='9Z' and stringlib.stringfind(l.sentenceadditionalinfo,';',1)>0=> trim(l.sentenceadditionalinfo[stringlib.stringfind(l.sentenceadditionalinfo,';',1)+2..],left,right),
+																	  
 	                                 trim(l.sentencestatus) IN ['CONSECUTIVE','CONSECUTIVE'] =>'',
                                    vVendor IN ['SA','YB'] and length(l.sentencestatus) > 40 => l.sentencestatus[41..],
 																	 vVendor IN ['ZD','ZG','ZH','ZI','ZJ','ZK','ZL','ZM','ZN','ZO','ZP','ZQ','ZR','ZS','ZT','ZU','ZV',

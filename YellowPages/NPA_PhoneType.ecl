@@ -1,4 +1,4 @@
-//Pass in your file and it returns your file with the phone type field appended.
+﻿//Pass in your file and it returns your file with the phone type field appended.
 // Example: YellowPages.NPA_PhoneType(MyFile,MyFile.phoneField,NewFile.phoneTypeFieldName,NewFile);
 //LDS FLAG (defaulted to true) - LDS means Large Dataset. Definition of LDS Flag means that there are enough unique phones to spread across all nodes.
 
@@ -17,7 +17,7 @@ import Risk_Indicators, Gong_Neustar;
 //Check Telcordia TDS file for phonetypes
 //------------------------------------------------------------------------------------------------
 %tds%   := Risk_Indicators.File_Telcordia_tds ;
-%s_tds% := sort(distribute(%tds%,hash(npa,nxx,tb)),npa,nxx,tb,local);
+%s_tds% := dedup(sort(distribute(%tds%,hash(npa,nxx,tb)),npa,nxx,tb,-coctype,-ssc,local),npa,nxx,tb,local);
 //------------------------------------------------------------------------------------------------
 // Temporary 8xx (toll free) number set until NPA_Phone_type is fixed
 %Toll_Free_Area_Codes% := ['800','811','822','833','844','855','866','877','888','899'];
@@ -143,9 +143,3 @@ outfile := %goodnpanxx% ;
 
 endmacro;
 	
-
-
-				
-
-
-				 

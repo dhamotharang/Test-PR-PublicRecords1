@@ -1,4 +1,4 @@
-import sexoffender;
+﻿import sexoffender;
 
 df := File_Accurint_In; 
 
@@ -756,6 +756,7 @@ o2 defCategory(o2 l):= transform
             'LISTED AS A TIER 3 IN PENNSYLVANIA|'+
 
             'DESIGNATED A TIER LEVEL 3 BY NV|'+
+						'DESIGNATED TIER III IN MISSISSIPPI|'+
              'DESIGNATED A TIER LEVEL 3 IN NV'
 
 						,
@@ -2041,6 +2042,9 @@ o2 defCategory(o2 l):= transform
 						'AGG. SDMY|'+
 						'SDMY-K|'+
 
+            'RAPR|'+
+
+
             'RAP-1129-F9'  
 						
 						,
@@ -2577,9 +2581,26 @@ o2 defCategory(o2 l):= transform
 						'SAC 18-3-405|'+
 						'SAC / ATTEMPT|'+
 						'SAC - ATTEMPT|'+
+						
+						'SAC; 03CR2964|'+
+						'SAC; 99CR2887|'+
+						'SAC 2005CR4365|'+
+						'SAC; 94CR699|'+
+						'SAC; 1993CR001300|'+
+						'ADULTRY|'+
+						'INDECENT A &AMP; B|'+
+						'1ST DEG SAC|'+
+						'SAC; 95CR2792|'+
+						'ATT SAC; 2015CR540|'+
+						'SAC|'+
+						'ATT SAC|'+
+						'SAC; 92CR2913|'+
+						'SAC; 08CR2707|'+
+						'SAC; 12CR2998|'+
+						'SAC; 05CR480|'+
+						'SAC; 2012CR809|'+
+						
 						'SAC-ATTEMPT'
-
-
 						,				
 						
 						trim(l.offense_description, left, right),
@@ -3122,8 +3143,26 @@ o2 defCategory(o2 l):= transform
 						'RSA 632-A:2|'+	
 						'18 USC 2252A\\(A\\)\\(2\\) AND 18:2256\\(A\\)\\(2\\)&AMP;\\(8\\)\\(A\\)|'+	
 						'RSA 632-A:2|'+	
+						'DUI - IMPAIRMENT|'+
+						'UCMJ ART 134|'+
 
-
+						'ENTERED BY MISTAKE|'+
+						'D0622012CR000238|'+
+						'D0622015CR001097|'+
+						'D0622015CR001339|'+
+						'DE1111110000FF\\(\\)|'+
+						'TIME.|'+
+						'D0222007CR000271|'+
+						'D0392016CR005553|'+
+						
+						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+
+						'A|'+
+						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+
+						'ELUDING|'+
+						'LCD_DS|'+
+						'T17-A 253\\(1\\) \\(B\\)|'+
+						
+						
 						
 						'16-6-4-\\(B\\)'						
 						,						

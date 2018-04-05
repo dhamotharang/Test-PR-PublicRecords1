@@ -1,5 +1,5 @@
 ﻿// See also: AlloyMediaConsumer._BWR_Build
-IMPORT STD,_control,tris_lnssi_build,VersionControl,BuildLogger;
+IMPORT STD,_control,tris_lnssi_build,VersionControl,BuildLogger,Orbit3,Roxiekeybuild;
 
 EXPORT proc_build_all(string filedate,string moreEmails='') := function
 
@@ -34,6 +34,9 @@ EXPORT proc_build_all(string filedate,string moreEmails='') := function
     spray_new  		 := VersionControl.fSprayInputFiles(            // this will spray the source directory EVEN IF it's the old data
                     tris_lnssi_build.fSpray(filedate,pUseProd));  // only the version you supply matters
 
+		update_dops := RoxieKeyBuild.updateversion('TrisISPKeys',(filedate),'Darren.Knowles@lexisnexisrisk.com;Gabriel.Marcan@lexisnexisrisk.com',,'N');
+		update_orbit := Orbit3.proc_Orbit3_CreateBuild_AddItem('TRIS_LNSSI',(filedate),'N');
+
     actions := sequential(
     
         BuildLogger.BuildStart()
@@ -41,6 +44,8 @@ EXPORT proc_build_all(string filedate,string moreEmails='') := function
         ,spray_new 
         ,tris_lnssi_build.proc_build_base(filedate) // run ingest on the input file and update base file
         ,tris_lnssi_build.proc_build_keys(filedate)
+				,update_dops
+				,update_orbit
         ,BuildLogger.BuildEnd()
 
     ): success(successEmail),failure(failureEmail);

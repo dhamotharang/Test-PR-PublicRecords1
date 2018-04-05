@@ -1,11 +1,14 @@
-IMPORT PRTE2_Liens, LiensV2, Address, BIPV2;
+﻿IMPORT PRTE2_Liens, LiensV2, Address, BIPV2;
 
 EXPORT Layouts := MODULE
 
 EXPORT BaseMain_in := RECORD
-LiensV2.layout_liens_main_module.layout_liens_main and not filing_status;
+//LiensV2.layout_liens_main_module.layout_liens_main and not filing_status;
+LiensV2.layout_liens_main_module.layout_liens_main and not [bCBFlag,filing_status];
 string20	cust_name;
 string10	bug_num;
+string7		courtid;
+string2		filing_typ_code;
 END;
 
 EXPORT BaseStatus_in := RECORD
@@ -29,7 +32,9 @@ string		fp;
 string10	bug_num;
 string20	cust_name;
 STRING8		link_dob;
+STRING9		link_ssn;
 STRING8		link_inc_date;
+STRING9		link_fein;
 END;
 
 //Base Key files
@@ -37,6 +42,8 @@ EXPORT main_base_ext := RECORD, maxlength(32766) //Contains DI added fields
 LiensV2.layout_liens_main_module.layout_liens_main;
 string20	cust_name;
 string10	bug_num;
+string7		courtid;
+string2		filing_typ_code;
 END;
 
 EXPORT main_base := RECORD, maxlength(32766)
@@ -49,7 +56,9 @@ BIPV2.IDlayouts.l_xlink_ids;
 string10	bug_num;
 string20	cust_name;
 STRING8		link_dob;
+STRING9		link_ssn;
 STRING8		link_inc_date;
+STRING9		link_fein;
 END;
 
 EXPORT party_base := RECORD

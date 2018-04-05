@@ -1,4 +1,4 @@
-import FLAccidents_Ecrash, ut, std, prte2_Ecrash;
+﻿import FLAccidents_Ecrash, ut, std, prte2_Ecrash;
 
 export File_KeybuildV2 := module 
 
@@ -26,7 +26,7 @@ layouts.keybuild_SSv2 	xpndrecs(file_BuildSS L, files.base_ecrash2v R) := transf
 		self.dotweight            := L.dotweight;
 		self.dt_first_seen				:= L.accident_date;
 		self.dt_last_seen					:= L.accident_date;
-		self.report_code					:= 'FA';
+		self.report_code					:= 'EA';
 		self.report_category			:= 'AUTO REPORT';
 		self.report_code_desc			:= 'AUTO ACCIDENT';
 		self.vehicle_incident_id	:= '';
@@ -53,6 +53,7 @@ layouts.keybuild_SSv2 	xpndrecs(file_BuildSS L, files.base_ecrash2v R) := transf
 		self.Policy_Expiration_Date	:= '';
 		self.Report_Has_Coversheet	:= '0';
 		self.date_vendor_last_reported := L.accident_date; // need to create date field...
+		self.report_type_id					:= 'A';
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
@@ -128,7 +129,7 @@ layouts.keybuild_SSv2 	slimrecs(ddrecs L) := transform
 																				 trim(l.policy_effective_date)[8] = '-' =>  trim(l.policy_effective_date)[1..7],
 																				 trim(l.policy_effective_date)
 																				);
-		 
+  self.releasable		 					:= '1';
 self 								:= L;
 end;
 
@@ -145,4 +146,6 @@ AlphaCoplogic 		:= AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((t
 export Alpha  		:= AlphaOtherVendors + AlphaCoplogic;
 export out   			:= outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
 
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_rec), hash64(accident_nbr)):independent;
 end; 

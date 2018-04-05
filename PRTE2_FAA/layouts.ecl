@@ -1,4 +1,4 @@
-import faa, BIPV2;
+﻿import faa, BIPV2;
 
 EXPORT layouts := module
 
@@ -12,6 +12,7 @@ EXPORT layouts := module
 		string50  cust_name;
 		string10	bug_name;
 		string8		link_dob;
+		string9		link_ssn;
 	end;
 	
 	export airmen_certificate := record
@@ -34,6 +35,7 @@ EXPORT layouts := module
 		string9   link_fein;
 		string8		link_inc_date;
 		string8   link_dob;
+		string9   link_ssn;
 	end;
 	
   export base_airmen_cert := record
@@ -48,6 +50,7 @@ EXPORT layouts := module
 		string50  cust_name;
 		string10	bug_name;
 		string8		link_dob;
+		string9		link_ssn;
 	end;
 	
 	
@@ -63,6 +66,7 @@ EXPORT layouts := module
 		string9   link_fein;
 		string8		link_inc_date;
 		string8   link_dob;
+		string9		link_ssn;
 	end;
 	
 	export Common_Aircraft_Airmen := record
@@ -88,14 +92,14 @@ EXPORT layouts := module
   end;	
 	
 	export Search_Airmen_slim := record
-		Search_Airmen - [cust_name,bug_name,link_dob];
+		Search_Airmen - [cust_name,bug_name,link_dob,link_ssn];
 		end;
 
 	export Search_Aircraft_slim := record
-		Search_Aircraft - [source_rec_id,__internal_fpos__,cust_name,bug_name,link_fein,link_inc_date,link_dob];
+		Search_Aircraft - [source_rec_id,__internal_fpos__,cust_name,bug_name,link_fein,link_inc_date,link_dob,link_ssn];
 		end;
 		
 export Search_Aircraft_linkids := record
-		Search_Aircraft - [aircraft_id,persistent_record_id,cust_name,bug_name,__internal_fpos__,link_fein,link_inc_date,link_dob];
+		Search_Aircraft - [aircraft_id,persistent_record_id,cust_name,bug_name,__internal_fpos__,link_fein,link_inc_date,link_dob,link_ssn];
 		end;		
 END;	

@@ -1,4 +1,5 @@
-// 22.	APPENDIX C â€“ Medical Terms for FCRA Suppression
+﻿// file_liens_fcra_main
+// 22.	APPENDIX C Ã¢â‚¬â€œ Medical Terms for FCRA Suppression
 EXPORT	MedicalTerms	:=	MODULE
 	EXPORT	PATTERN	ExactMatch	:=	[
 		'A D D',

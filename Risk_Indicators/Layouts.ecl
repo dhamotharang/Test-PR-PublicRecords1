@@ -1,4 +1,4 @@
-import /* models, */ header, didville, Risk_Indicators;
+﻿import /* models, */ header, didville, Risk_Indicators, iesp;
 
 export Layouts := module
 
@@ -113,6 +113,10 @@ export Layout_Liens := RECORD
 	Layout_Liens_Info liens_released_small_claims;
 	Layout_Liens_Info liens_unreleased_suits;  // new for shell 5.0
 	Layout_Liens_Info liens_released_suits; // new for shell 5.0
+	unsigned  liens_unrel_total_amount84;
+	unsigned  liens_unrel_total_amount;
+	unsigned  liens_rel_total_amount84;
+	unsigned  liens_rel_total_amount;
 end;
 
 
@@ -327,6 +331,12 @@ export Layout_Relat_Prop_Plusv4 := RECORD
 	Layout_Recent_Property_Sales;
 END;
 
+//MS-158: new property record layout that includes the business address indicator from ADVO
+export Layout_Relat_Prop_Plus_BusInd := RECORD	
+	Layout_Relat_Prop_Plusv4;
+	string1 Residential_or_Business_Ind;			
+	unsigned3 historydate;
+END;
 
 export Layout_Infutor := RECORD
 	unsigned4 infutor_date_first_seen;
@@ -1607,30 +1617,30 @@ export layout_inquiries_52 := record
 end;
 export shell53_inquiries_additions := record
 	//risk corroboration fields (MS-87)
-	integer	inq_corrnameaddrcount	;
-	integer	inq_corrnameaddrcount_adl	;
-	integer	inq_corrnamessncount	;
-	integer	inq_corrnamessncount_adl	;
-	integer	inq_corrnamephonecount	;
-	integer	inq_corrnamephonecount_adl	;
-	integer	inq_corraddrssncount	;
-	integer	inq_corraddrssncount_adl	;
-	integer	inq_corraddrdobcount	;
-	integer	inq_corraddrdobcount_adl	;
-	integer	inq_corraddrphonecount	;
-	integer	inq_corraddrphonecount_adl	;
-	integer	inq_corrssndobcount	;
-	integer	inq_corrssndobcount_adl	;
-	integer	inq_corrssnphonecount	;
-	integer	inq_corrssnphonecount_adl	;
-	integer	inq_corrdobphonecount	;
-	integer	inq_corrdobphonecount_adl	;
+	integer	inq_corrnameaddr	;
+	integer	inq_corrnameaddr_adl	;
+	integer	inq_corrnamessn	;
+	integer	inq_corrnamessn_adl	;
+	integer	inq_corrnamephone	;
+	integer	inq_corrnamephone_adl	;
+	integer	inq_corraddrssn	;
+	integer	inq_corraddrssn_adl	;
+	integer	inq_corrdobaddr	;
+	integer	inq_corrdobaddr_adl	;
+	integer	inq_corraddrphone	;
+	integer	inq_corraddrphone_adl	;
+	integer	inq_corrdobssn	;
+	integer	inq_corrdobssn_adl	;
+	integer	inq_corrphonessn	;
+	integer	inq_corrphonessn_adl	;
+	integer	inq_corrdobphone	;
+	integer	inq_corrdobphone_adl	;
 	integer	inq_corrnameaddrssn	;
 	integer	inq_corrnameaddrssn_adl	;
 	integer	inq_corrnamephonessn	;
 	integer	inq_corrnamephonessn_adl	;
-	integer	inq_corrnameaddrssnphn	;
-	integer	inq_corrnameaddrssnphn_adl	;
+	integer	inq_corrnameaddrphnssn	;
+	integer	inq_corrnameaddrphnssn_adl	;
 	//PII tumblings - substitutions (MS-104)
 	integer inq_ssnsperadl_1subs;
 	integer inq_phnsperadl_1subs;
@@ -1739,5 +1749,40 @@ export common_layout := record
 	unsigned dt_last_seen;
 	unsigned record_count;
 end;
+
+export tmp_Consumer_Statements := Record
+	iesp.share_fcra.t_ConsumerStatement;
+  string RecIdForStId := '';
+end;
+
+export tmp_ConsumerStatements := Record
+	dataset(tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+end;
+
+//MS-71: new BIP header fields
+export layout_BIP_Header_info := record
+	integer 	bus_seleids_peradl := 0;
+	integer 	bus_gold_seleids_peradl := 0;
+	integer 	bus_active_seleids_peradl := 0;
+	integer 	bus_inactive_seleids_peradl := 0;
+	integer 	bus_defunct_seleids_peradl := 0;
+	integer 	bus_gold_seleid_first_seen := 0;
+	integer 	bus_header_first_seen := 0;
+	integer 	bus_header_last_seen := 0;
+	integer 	bus_header_build_date := 0;
+	integer 	bus_SOS_filings_peradl := 0;
+	integer 	bus_active_SOS_filings_peradl := 0;
+end;
+
+//MS-167: new Equifax Fraud Flags fields
+// export layout_Equifax_FraudFlags := record
+	// integer 	factact_curr_active_duty := 0;
+	// integer 	factact_curr_active_duty_fseen := 0;
+	// integer 	factact_curr_fraud_alert := 0;
+	// integer 	factact_curr_fraud_alert_fseen := 0;
+	// integer 	factact_curr_alert_code := 0;
+	// integer 	factact_hist_fraud_alert_ct := 0;
+	// integer 	factact_hist_fraud_alert_lseen := 0;
+// end;
 
 END;

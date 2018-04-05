@@ -248,7 +248,7 @@ export buildprep := Sequential(doutfinal,
 											       output( outfile,,'~thor_data400::in::prolic_va',compressed,overwrite),
                             FileServices.StartSuperfiletransaction(),												 
 					    							 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_va'),
-				    								 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_va_old'),
+				    								 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_va_old'),
 				   							   FileServices.FinishSuperfiletransaction()
 											 );
 

@@ -1,0 +1,1 @@
+﻿EXPORT Layout_BizHead := RECORDOF(File_BizHead);

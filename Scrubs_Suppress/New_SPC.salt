@@ -1,0 +1,22 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Suppress
+FILENAME:Suppress
+NAMESCOPE:New
+
+FIELDTYPE:invalid_product:ENUM(ACCURINT|CONSUMER|LE|ALL)
+FIELDTYPE:invalid_linking_type:ENUM(DID|SSN|BDID|)
+FIELDTYPE:invalid_num:ALLOW(0123456789)
+FIELDTYPE:invalid_document_type:ENUM(OFFENDER KEY|FARES ID|OFFICIAL RECORD|)
+FIELDTYPE:invlid_document_id:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- /)
+
+
+FIELD:product:LIKE(invalid_product):TYPE(STRING10):0,0
+FIELD:linking_type:LIKE(invalid_linking_type):TYPE(STRING5):0,0 
+FIELD:linking_id:LIKE(invalid_num):TYPE(STRING20):0,0
+FIELD:document_type:LIKE(invalid_document_type):TYPE(STRING15):0,0
+FIELD:document_id:LIKE(invlid_document_id):TYPE(STRING60):0,0
+FIELD:date_added:LIKE():TYPE(STRING8):0,0
+FIELD:user:TYPE(STRING25):0,0
+FIELD:compliance_id:LIKE(invalid_num):TYPE(STRING25):0,0
+FIELD:comment:TYPE(STRING255):0,0
+

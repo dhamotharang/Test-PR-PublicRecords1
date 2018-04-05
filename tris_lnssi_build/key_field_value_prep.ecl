@@ -7,10 +7,9 @@ keyname := data_services.Data_location.prefix('tris_lnssi')+
 
 in_file := tris_lnssi_build.file_base;
 
-// Remove ISP-NAME[x] suffix
+// place holder for key mappings / trimming etc.
 tris_lnssi_build.layout_key_field_value prep_key(in_file L):=transform
 
-    self.Contrib_Risk_field := if(L.Contrib_Risk_field[1..8]='ISP-NAME','ISP-NAME',L.Contrib_Risk_field);
     self:=L;
 
 end;

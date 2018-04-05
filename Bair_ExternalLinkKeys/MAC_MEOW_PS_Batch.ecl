@@ -1,4 +1,4 @@
- 
+﻿ 
 EXPORT MAC_MEOW_PS_Batch(infile,Ref='',Input_NAME_SUFFIX = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_P_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_DOB = '',Input_PHONE = '',Input_DL_ST = '',Input_DL = '',Input_LEXID = '',Input_POSSIBLE_SSN = '',Input_CRIME = '',Input_NAME_TYPE = '',Input_CLEAN_GENDER = '',Input_CLASS_CODE = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_DATA_PROVIDER_ORI = '',Input_VIN = '',Input_PLATE = '',Input_LATITUDE = '',Input_LONGITUDE = '',Input_SEARCH_ADDR1 = '',Input_SEARCH_ADDR2 = '',Input_CLEAN_COMPANY_NAME = '',Input_MAINNAME = '',Input_FULLNAME = '',OutFile,AsIndex='true',Stats='') := MACRO
   #uniquename(ToProcess)
   IMPORT SALT33,Bair_ExternalLinkKeys;
@@ -230,6 +230,14 @@ EXPORT MAC_MEOW_PS_Batch(infile,Ref='',Input_NAME_SUFFIX = '',Input_FNAME = '',I
 #ELSE
   %OutputADDRESS% := DATASET([],Bair_ExternalLinkKeys.Process_PS_Layouts.LayoutScoredFetch);
 #END
+  #uniquename(OutputADDRESS1)
+#IF(#TEXT(Input_PRIM_NAME)<>'' AND #TEXT(Input_P_CITY_NAME)<>'' AND #TEXT(Input_ST)<>'')
+  #uniquename(HoldADDRESS1)
+  %HoldADDRESS1% := %ToProcess%;
+  Bair_ExternalLinkKeys.Key_Classify_PS_ADDRESS1.MAC_ScoredFetch_Batch(%HoldADDRESS1%,UniqueId,PRIM_NAME,P_CITY_NAME,ST,PRIM_RANGE,LNAME,FNAME,SEC_RANGE,ZIP,DOB,%OutputADDRESS1%,AsIndex)
+#ELSE
+  %OutputADDRESS1% := DATASET([],Bair_ExternalLinkKeys.Process_PS_Layouts.LayoutScoredFetch);
+#END
   #uniquename(OutputDOB)
 #IF(#TEXT(Input_DOB)<>'' AND #TEXT(Input_LNAME)<>'')
   #uniquename(HoldDOB)
@@ -319,7 +327,7 @@ EXPORT MAC_MEOW_PS_Batch(infile,Ref='',Input_NAME_SUFFIX = '',Input_FNAME = '',I
   %OutputCOMPANY% := DATASET([],Bair_ExternalLinkKeys.Process_PS_Layouts.LayoutScoredFetch);
 #END
   #uniquename(AllRes)
-  %AllRes% := %OutputNAME%+%OutputADDRESS%+%OutputDOB%+%OutputZIP_PR%+%OutputDLN%+%OutputPH%+%OutputLFZ%+%OutputVIN%+%OutputLEXID%+%OutputSSN%+%OutputLATLONG%+%OutputPLATE%+%OutputCOMPANY%;
+  %AllRes% := %OutputNAME%+%OutputADDRESS%+%OutputADDRESS1%+%OutputDOB%+%OutputZIP_PR%+%OutputDLN%+%OutputPH%+%OutputLFZ%+%OutputVIN%+%OutputLEXID%+%OutputSSN%+%OutputLATLONG%+%OutputPLATE%+%OutputCOMPANY%;
   #uniquename(All)
   %All% := Bair_ExternalLinkKeys.Process_PS_Layouts.CombineAllScores(%AllRes%);
   #uniquename(OutFile0)

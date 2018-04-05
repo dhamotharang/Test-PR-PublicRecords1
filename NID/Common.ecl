@@ -1,4 +1,4 @@
-export Common := MODULE
+﻿export Common := MODULE
 
 	import _Control, lib_stringlib, ut, Address, STD, Data_Services;
 
@@ -39,7 +39,7 @@ IP Address for LogsThor mapping
 
 */
 	shared set of string LogsThor := ['10.241.50.42:8010','10.173.231.12:7070', '10.173.11.12:7070',
-																	'10.241.21.34:7070','10.241.50.45:7070','10.173.52.3:7070'];
+																	'10.241.21.34:7070','10.241.50.45:7070','10.173.52.3:7070', '10.173.52.1:7070'];
     shared nidCluster1 :=  MAP(
          Thorlib.Daliservers() in LogsThor => Data_Services.foreign_prod + 'thor::',
  				_Control.ThisEnvironment.name='Dataland' => '~thor::',          //'~thor400_88::',

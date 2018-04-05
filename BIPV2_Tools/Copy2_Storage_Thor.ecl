@@ -1,4 +1,4 @@
-import wk_ut,_control,tools,BIPV2_Build,bipv2;
+﻿import wk_ut,_control,tools,BIPV2_Build,bipv2;
 
 EXPORT Copy2_Storage_Thor(
 
@@ -10,7 +10,7 @@ EXPORT Copy2_Storage_Thor(
   ,pWorkmanFilename  = '\'~bipv2_build::@version@::workunit_history::copy2Storagethor.\''
   ,pWorkmanSuper     = '\'~bipv2_build::qa::workunit_history\''
   ,tempname          = '\'\''
-  ,pCluster          = '\'thor400_31_store\''
+  ,pCluster          = '\'thor400_24_store\''
   ,pEclserver        = '\'prod_esp.br.seisint.com\''//10.241.20.202
   ,pSourceDali       = '\'prod_dali.br.seisint.com\''
   ,pOutputEcl        = 'false'

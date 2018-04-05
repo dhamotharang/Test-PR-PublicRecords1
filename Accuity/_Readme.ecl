@@ -1,4 +1,4 @@
-/*
+﻿/*
 There are two source files from Accuity found at
  \\tapeload02b\k\sanctions_patriot\accuity_watchlists_(en)\{version date}
 
@@ -36,7 +36,6 @@ accuity_source_CSSF_1114.xml
 accuity_source_CWL_32.xml
 accuity_source_DB_1088.xml
 accuity_source_DNB_1090.xml
-accuity_source_ECO_1144.xml
 accuity_source_ES_1014.xml
 accuity_source_ESE_1158.xml
 accuity_source_EUE_1170.xml

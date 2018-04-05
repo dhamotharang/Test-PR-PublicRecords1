@@ -1,4 +1,4 @@
-////////////// README //////////////////////////
+﻿////////////// README //////////////////////////
 
 // xFerRoxieFiles is used to 
 
@@ -52,11 +52,45 @@ EXPORT xFerRoxieFiles(
 											,string roxiecertespport = '8010'
 											,string roxiecertesp = '10.173.235.23'
 											,string roxiecerttarget = 'roxie_130'
+											,boolean useRoxieToGetSubFilenames = true
 											) := module
 		
 		export isAddSubFileSuffix := if (suffixSuperName <> ''
 																			,true
 																			,false);
+		
+		
+		export GetSubFilesFromThor() := function
+			rGetSubFiles := record
+				string superfile;
+				string subfile;
+			end;
+			
+			rFiles := record
+				dops.layouts.filestocopy;
+				dataset(rGetSubFiles) fromGetSubFiles;
+			end;
+			
+			rFiles xGetFiles(filescopyds l) := transform
+				self.fromGetSubFiles := dops.GetSubFiles(l.superfile,srcthoresp);
+				self := l;
+			end;
+			
+			dFiles := project(filescopyds,xGetFiles(left));
+			
+			dops.layouts.filestocopy xConvertToCommonLayout(dFiles l, rGetSubFiles r) := transform
+				self.subfile := r.subfile;
+				self := l;
+			end;
+			
+			dNormRecs := normalize(dFiles
+															,left.fromGetSubFiles
+															,xConvertToCommonLayout(left,right)
+														);
+			
+			return dNormRecs;
+			
+		end;
 		
 		export RoxiePackage(string esp, string port, string target, boolean addSubFileSuffix = false, boolean useFile = false) := function
 			dPackageKeys := sort(dops.GetRoxiePackage(esp
@@ -75,13 +109,17 @@ EXPORT xFerRoxieFiles(
 				self := l;
 			end;
 		
-			dFilesReadyForLive := join(dFilesToMove
-																,dPackageKeys
-																,stringlib.StringToLowerCase(regexreplace('_'+suffixSuperName
-																													,regexreplace('::'+suffixSuperName+'::',left.superfile, '::qa::'),
-																														'_qa')) = stringlib.StringToLowerCase(right.superfile)
+			dFilesReadyForLive := if (useRoxieToGetSubFilenames
+																,join(dFilesToMove
+																			,dPackageKeys
+																			,stringlib.StringToLowerCase(regexreplace('_'+suffixSuperName
+																													,regexreplace('::'+suffixSuperName+'::',left.superfile, '::qa::',nocase),
+																														'_qa',nocase)) = stringlib.StringToLowerCase(right.superfile)
 																																
-																,xFilesReadyForLive(left,right)
+																			,xFilesReadyForLive(left,right)
+																		)
+																,GetSubFilesFromThor()
+																
 																);
 
 			rtFilesToMove := record
@@ -220,12 +258,12 @@ EXPORT xFerRoxieFiles(
 													)
 												))
 											,nothor(apply(global(dFilesReadyForStaging,few)
-												,if (fileservices.fileexists('~'+subfile)
-														,sequential
-															(
-																if ( ~fileservices.superfileexists('~'+superfile)
-																		,fileservices.createsuperfile('~'+superfile))
-																,if (fileservices.FindSuperFileSubname('~'+superfile,'~'+subfile) = 0
+													,if (fileservices.fileexists('~'+subfile)
+															,sequential
+																(
+																	if ( ~fileservices.superfileexists('~'+superfile)
+																			,fileservices.createsuperfile('~'+superfile))
+																	,if (fileservices.FindSuperFileSubname('~'+superfile,'~'+subfile) = 0
 																			,sequential
 																			(
 																				if (cnt = 1,
@@ -335,7 +373,7 @@ EXPORT xFerRoxieFiles(
 			return map(
 															jobtype = 'stage' => output(dops.WorkUnitModule(dstthoresp,dstthorespport).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Indexes to Staging\');\r\n'+
-																	'sequential(\r\noutput(dops.copyconstants(\''+destenv+'\').copyfileds,,\'~\'+dops.copyconstants(\''+destenv+'\').copyfile+\'_cert\',overwrite)\r\n,dops.xFerRoxieFiles(,\''+dstthoresp+'\',\''+dstthordali+'\',\''+dstthorcluster+'\',\''+dstthorespport+'\',\''+destenv+'\',\''+rToEmail+'\',\''+suffixSuperName+'\',' + MoveToLive + ',\''+roxieip+'\',\''+srcthoresp+'\',\''+srcthordali+'\',\''+srcthorespport+'\',,\''+roxieprodespport+'\',\''+roxieprodesp+'\',\''+roxieprodtarget+'\',\''+roxiecertespport+'\',\''+roxieprodesp+'\',\''+roxieprodtarget+'\',\''+roxiecertespport+'\',\''+roxiecertesp+'\',\''+roxiecerttarget+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+dops.copyconstants(\''+destenv+'\').copyfile+\'_cert\'));','hthor')),
+																	'sequential(\r\noutput(dops.copyconstants(\''+destenv+'\').copyfileds,,\'~\'+dops.copyconstants(\''+destenv+'\').copyfile+\'_cert\',overwrite)\r\n,dops.xFerRoxieFiles(,\''+dstthoresp+'\',\''+dstthordali+'\',\''+dstthorcluster+'\',\''+dstthorespport+'\',\''+destenv+'\',\''+rToEmail+'\',\''+suffixSuperName+'\',' + MoveToLive + ',' + spawnWU + ',\''+roxieip+'\',\''+srcthoresp+'\',\''+srcthordali+'\',\''+srcthorespport+'\',,\''+roxieprodespport+'\',\''+roxieprodesp+'\',\''+roxieprodtarget+'\',\''+roxiecertespport+'\',\''+roxieprodesp+'\',\''+roxieprodtarget+'\',\''+roxiecertespport+'\',\''+roxiecertesp+'\',\''+roxiecerttarget+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+dops.copyconstants(\''+destenv+'\').copyfile+\'_cert\'));','hthor')),
 															jobtype = 'live' => output(dops.WorkUnitModule(dstthoresp,dstthorespport).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Staging Indexes to Live\');\r\n'+
 																	'dops.xFerRoxieFiles(\''+destenv+'\').MoveStagingToLive() : failure(\r\n' +

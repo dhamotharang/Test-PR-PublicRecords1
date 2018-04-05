@@ -1,4 +1,4 @@
-import tools,ut;
+﻿import tools,Data_Services;
 export Constants(
 
 	 string					pDatasetName
@@ -8,6 +8,7 @@ export Constants(
 	,boolean				pIsTesting						= Tools._Constants.IsDataland
 	,set of string1	pAutokey_Skipset			= []
 	,string					pAutokey_typestr			= ''
+  ,boolean        pAdd_Eclcc            = false
 
 ) :=
 module, virtual
@@ -15,7 +16,7 @@ module, virtual
 	export Name										:= pDatasetName		;
 	export IsTesting 							:= pIsTesting			;
 	export IsDataland 						:= pIsTesting			;
-	export foreign_environment		:= if(IsDataland						,ut.foreign_prod													,ut.foreign_dataland);
+	export foreign_environment		:= if(IsDataland						,Data_Services.foreign_prod										,Data_Services.foreign_dataland);
 	export prefix           			:= if(pUseOtherEnvironment 	,foreign_environment 		                  ,'~'	              );
 	export thor_cluster_Files			:= if(pUseOtherEnvironment 	,foreign_environment + 'thor_data400::'		,'~thor_data400::'	);
 	export thor_cluster_Persists	:= thor_cluster_Files		;
@@ -38,7 +39,7 @@ module, virtual
 	export statsTemplate					:= lTemplate('stats');
 	export OldFileTemplate				:= lOldTemplate('base'	);
 	export max_record_size				:= pMaxRecordSize				;
-	export Groupname							:= tools.fun_Groupname(pGroupname);
+	export Groupname							:= tools.fun_Groupname(pGroupname,,pAdd_Eclcc);
 	export autokey_buildskipset 	:= pAutokey_Skipset;
 	export ak_skipSet							:= pAutokey_Skipset;
 	export ak_typeStr							:= pAutokey_typestr;

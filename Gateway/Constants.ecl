@@ -1,4 +1,4 @@
-export Constants := module
+﻿export Constants := module
 
 	export void_gateway := dataset([], Gateway.layouts.config);
 	
@@ -55,7 +55,11 @@ export Constants := module
 		export String40 delta_personcontext	:= 'delta_personcontext';				//FCRA Full File Disclosure
 		export String40 AttIapQuery	:= 'att_iap';				// ATT DQ_IRS - Information Retrieval Service
 		export String40 ConsumerCreditReport := 'consumercreditreport';			//FCRA Consumer Credit Report
-		
+		export String40 DeltabaseSql := 'DeltaBaseSql';	
+		export String40 EcrashImageRetrieval := 'AccidentImage';	
+		export String40 ZumigoIdentity := 'zumigoidentity';			//Zumigo Line Identity
+    // Equifax Account Decisioning gateway
+    export String40 EquifaxAcctDecisioning := 'equifaxattributes';   // FCRA only as of 10/2017
 	end;
 	
 	export ConfigProperties := module

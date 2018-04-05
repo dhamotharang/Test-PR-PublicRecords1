@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_infutor, ut, AID, header_slimsort, did_Add, VersionControl;
+﻿import lib_stringlib, watercraft, watercraft_infutor, ut, AID, header_slimsort, did_Add, VersionControl, Data_Services;
 
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -63,8 +63,10 @@ search_group_add_on search_mapping_format(ds_watercraft_in L)
   transform
 	self.date_first_seen			:=	''; //Cannot be determined if dates in record were firstlast seen as they are vendor
 	self.date_last_seen				:=	''; //processing dates which does not meet our definition of these date fields.
-	self.date_vendor_first_reported	:=	(string)VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
-	self.date_vendor_last_reported	:=	(string)VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
+	// self.date_vendor_first_reported	:=	(string)VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
+	// self.date_vendor_last_reported	:=	(string)VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
+	self.date_vendor_first_reported	:= L.filedate;
+	self.date_vendor_last_reported	:= L.filedate;
 	tempName								:= REGEXREPLACE('[^a-zA-Z0-9]',trim(L.fname,all)+trim(L.mname,all)+trim(L.lname,left,right)+trim(L.suffix,all),'');
 	self.watercraft_key			:= IF(trim(L.pid,all)='',REGEXREPLACE('[^a-zA-Z0-9]',tempName+trim(L.make,left,right)+trim(L.model,left,right)+
 																trim(L.year,left,right)+trim(L.boat_length,left,right)[1..30],''),
@@ -148,6 +150,6 @@ ds_map_to_watercraft_search := project(ds_map_search, transform(Watercraft.Layou
 ds_watercraft_search_dedup := dedup(ds_map_to_watercraft_search,all);
 
 //Count of records that were filtered due to blank names
-output(count(ds_watercraft_in(trim(fname,all) = '' and trim(lname,all) = '')),named('BlankNamesFilteredsearch'));
+output(count(ds_watercraft_in(trim(fname,all) = '' and trim(lname,all) = '')),named('BlankNamesFiltered'));
 
 EXPORT Map_watercraft_infutor_search := ds_watercraft_search_dedup; 

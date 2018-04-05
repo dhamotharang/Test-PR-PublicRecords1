@@ -1,17 +1,24 @@
+﻿/*2018-03-06T22:19:46Z ()
+Sandboxed
+*/
 import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
 	
-	portFile 		:= PhonesInfo.File_Phones.Ported_Current;
-	lidbFile		:= PhonesInfo.File_LIDB.Response_Processed;
-	discFile		:= PhonesInfo.File_Deact.Main_Current;
-	lidbDelt		:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0);
-
+	portFile 		:= PhonesInfo.File_Phones.Ported_Current; 																	//Port File
+	lidbFile			:= PhonesInfo.File_LIDB.Response_Processed;																//LIDB File
+	discFile			:= PhonesInfo.File_Deact.Main_Current2;																				//Deact File
+	discGHFile	:= PhonesInfo.File_Deact_GH.Main_Current;																		//Deact Gong History File
+	lidbDelt			:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); //Deltabase Gateway File
+	srcRef					:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE); //Source Reference Table
+	
 //////////////////////////////////////////////////////////////////////////////////////////
 //Map Ported Base to Common Layout - Append Serv/Line/Carrier Names from Reference Table//
 //////////////////////////////////////////////////////////////////////////////////////////
-	sortSPID		:= sort(distribute(PhonesInfo.File_Source_Reference.Main(is_current=TRUE), hash(spid)), spid, serv, line, carrier_name, local);//Lookup Supplied Internally	
+
+//iConectiv File - Join by SPID
+	//Append Serv, Line, High Risk Indicator, Prepaid, & Operator Full Name
+	sortSPID		:= sort(distribute(srcRef, hash(spid)), spid, serv, line, carrier_name, local);//Lookup Supplied Internally	
 	sortiCon		:= sort(distribute(portFile(source='PK'), hash(spid)), spid, local);
 	
-	//iConectiv File - Join by SPID
 	PhonesInfo.Layout_Common.portedMetadata_Main addiConSL(sortiCon l, sortSPID r):= transform
 		self.serv 							:= r.serv;
 		self.line								:= r.line;	
@@ -22,17 +29,51 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 		self 										:= l;
 	end;
 		
-	addiConFields 						:= join(sortiCon, sortSPID,
-																		left.spid = right.spid,
-																		addiConSL(left, right), left outer, local, keep(1));
-
-	ddiConAddFields 					:= dedup(sort(distribute(addiConFields, hash(phone)), record, local), record, local);
+	addiConON 				:= join(sortiCon, sortSPID,
+														left.spid = right.spid,
+														addiConSL(left, right), left outer, local, keep(1));
 	
-	//TCPA File - Join by Phone
-	sortTCPAPh		:= sort(distribute(portFile(source='PJ' and vendor_first_reported_dt<=20150308), hash(phone)), phone, local);
-	sortiConPh 		:= sort(distribute(ddiConAddFields, hash(phone)), phone, porting_dt, local);//pull the earliest, since these records are historical
+	//Append OCN and Carrier Name to Port Recs By Joining to Ref Table (where carrier_name = operator_full_name) By SPID
+	//There are a few instances where there are multiple ocns for a spid
+	srtAddiCOFN				:= sort(distribute(addiConON, hash(spid)), spid, operator_fullname, local);
+	srtRefOFN_match		:= sort(distribute(srcRef(carrier_name=operator_full_name), hash(spid)), spid, carrier_name, local);
+		
+	PhonesInfo.Layout_Common.portedMetadata_Main addiCOFNTr(srtAddiCOFN l, srtRefOFN_match r):= transform
+		self.account_owner			:= r.ocn;
+		self.carrier_name				:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
+		self 										:= l;
+	end;
+	
+	addiOCN_match 		:= join(srtAddiCOFN, srtRefOFN_match,
+														left.spid = right.spid and
+														PhonesInfo._Functions.fn_CarrierName(left.operator_fullname) = PhonesInfo._Functions.fn_CarrierName(right.carrier_name),
+														addiCOFNTr(left, right), left outer, local, keep(1));
+	
+	//Append OCN and Carrier Name to Remaining Port Recs (where account_owner='') By Joining to Ref Table (where carrier_name <> operator_full_name) By SPID
+	srtAddiCRem				:= sort(distribute(addiOCN_match(account_owner=''), hash(spid)), spid, operator_fullname, local);
+	srtRefRem					:= sort(distribute(srcRef(carrier_name<>operator_full_name), hash(spid)), spid, operator_full_name, carrier_name, local);
+	
+	PhonesInfo.Layout_Common.portedMetadata_Main addiRemTr(srtAddiCRem l, srtRefRem r):= transform
+		self.account_owner			:= r.ocn;
+		self.carrier_name				:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
+		self 										:= l;
+	end;	
+	
+	addiCRem 					:= join(srtAddiCRem, srtRefRem,
+														left.spid = right.spid,
+														addiRemTr(left, right), left outer, local, keep(1));
+	
+	//Concat Appended OCN/Carrier Name Results
+	ddiConAddFields 	:= dedup(sort(distribute(addiOCN_match(account_owner<>'')+addiCRem, hash(phone)), record, local), record, local);
+	
+//TCPA File - Join by Phone
+	//Append Serv, Line, High Risk Indicator, Prepaid, & Operator Full Name
+	sortTCPAPh	:= sort(distribute(portFile(source='PJ' and vendor_first_reported_dt<=20150308), hash(phone)), phone, local);
+	sortiConPh 	:= sort(distribute(ddiConAddFields, hash(phone)), phone, porting_dt, local);//pull the earliest, since these records are historical
 
 	PhonesInfo.Layout_Common.portedMetadata_Main addTCPASL(sortTCPAPh l, ddiConAddFields r):= transform
+		self.account_owner			:= r.account_owner;
+		self.carrier_name				:= r.carrier_name;
 		self.serv 							:= r.serv;
 		self.line								:= r.line;
 		self.spid								:= r.spid;
@@ -42,11 +83,11 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 		self 										:= l;
 	end;
 
-	addTCPAFields := join(sortTCPAPh, ddiConAddFields,
-												trim(left.phone, left, right) = trim(right.phone, left, right),	
-												addTCPASL(left, right), left outer, local, keep(1));
-
-	ddTCPAFields 	:= dedup(sort(distribute(addTCPAFields, hash(phone)), record, local), record, local);	
+	addTCPAON 				:= join(sortTCPAPh, ddiConAddFields,
+														trim(left.phone, left, right) = trim(right.phone, left, right),	
+														addTCPASL(left, right), left outer, local, keep(1));
+	
+	ddTCPAFields 			:= dedup(sort(distribute(addTCPAON, hash(phone)), record, local), record, local);	
 	
 	cmnPort := ddiConAddFields + ddTCPAFields;
 
@@ -94,8 +135,8 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 	dsDisc 			:= project(discFile, trDisc(left));	
 	
 	//Append Carrier Info to Deact Files from LIDB - Join by Phone & Carrier_Name
-	sortDisc 		:= sort(distribute(dsDisc, hash(phone)), phone, local);
-	sortLidb		:= sort(distribute(srcLidb, hash(phone)), phone, -vendor_last_reported_dt, local);
+	sortDisc 		:= sort(distribute(dsDisc, hash(phone)), phone, -vendor_last_reported_dt, carrier_name, local);
+	sortLidb		:= sort(distribute(srcLidb, hash(phone)), phone, -vendor_last_reported_dt, src, local);
 	
 	PhonesInfo.Layout_Common.portedMetadata_Main addDiscSL(sortDisc l, sortLidb r):= transform
 		self.serv 							:= r.serv;
@@ -113,6 +154,35 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 														addDiscSL(left, right), left outer, local, keep(1));
 														
 	cmnDisc 		:= dedup(sort(distribute(addLidbDiscFields, hash(phone)), record, local), record, local);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//Map Disconnect Gong History Base to Common Layout///////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+	PhonesInfo.Layout_Common.portedMetadata_Main trdiscGH(discGHFile l):= transform
+		self.source := 'PG';
+		self 							:= l;
+	end;
+	
+	dsdiscGH 				:= project(discGHFile, trdiscGH(left));	
+	
+	//Append Carrier Info to Gong History Deact Files from LIDB - Join by Phone 
+	sortdiscGH 		:= sort(distribute(dsdiscGH, hash(phone)), phone, -vendor_last_reported_dt, local);
+	
+	PhonesInfo.Layout_Common.portedMetadata_Main adddiscGHSL(sortdiscGH l, sortLidb r):= transform
+		self.serv 														:= r.serv;
+		self.line															:= r.line;
+		self.spid															:= r.spid;
+		self.operator_fullname 	:= PhonesInfo._Functions.fn_CarrierName(r.operator_fullname);
+		self.high_risk_indicator:= r.high_risk_indicator;
+		self.prepaid												:= r.prepaid;	
+		self 																			:= l;
+	end;
+
+	addLidbdiscGHFields := join(sortdiscGH, sortLidb,
+																													trim(left.phone, left, right) = trim(right.phone, left, right),
+																													adddiscGHSL(left, right), left outer, local, keep(1));
+														
+	cmndiscGH 		:= dedup(sort(distribute(addLidbdiscGHFields, hash(phone)), record, local), record, local);
 	
 //////////////////////////////////////////////////////////////////////////////////////////	
 //Map LIDB Deltabase to Common Layout/////////////////////////////////////////////////////	
@@ -182,6 +252,15 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 //////////////////////////////////////////////////////////////////////////////////////////
 //Concat Reformatted Files////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-	concatComm 	:= cmnPort + cmnLidb + cmnDisc + cmnLidbDelt;
+	concatC 		:= cmnPort + cmnLidb + cmnDisc + cmndiscGH + cmnLidbDelt;
+	
+	//Set Blank Serv/Line Types to "UNKNOWN"
+	concatC addSL(concatC l):= transform
+		self.serv := if(l.serv='', '3', l.serv);
+		self.line	:= if(l.line='', '3', l.line);
+		self := l;
+	end;
+	
+	concatComm	:= project(concatC, addSL(left));
 
 EXPORT Map_Ported_Metadata_Main := dedup(sort(concatComm(phone<>''), record, local), record, local);

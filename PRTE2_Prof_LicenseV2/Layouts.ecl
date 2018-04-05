@@ -1,4 +1,4 @@
-Import Prof_LicenseV2,Prof_License;
+﻿Import Prof_LicenseV2,Prof_License;
 
 EXPORT layouts := MODULE
 Export Layout_Autokeys := Prof_licenseV2.Layouts_ProfLic.Layout_Autokeys;
@@ -134,10 +134,10 @@ RECORD
   unsigned8 rawaid;
   unsigned8 aceaid;
   string18 county_name;
-  string12 did;
+	unsigned6 did;
   string3 score;
   string9 best_ssn;
-  string12 bdid;
+	unsigned6 bdid;
   unsigned8 source_rec_id;
   unsigned6 dotid;
   unsigned2 dotscore;
@@ -161,6 +161,12 @@ RECORD
   unsigned2 ultscore;
   unsigned2 ultweight;
 	unsigned6 lnpid;
+	string10 cust_name;
+  string10 bug_num;
+  string8 link_dob;
+  string9 link_ssn;
+  string9 link_fein;
+  string8 link_inc_date;
  END;
  
 Export LayoutLinkID:= {Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - lnpid}; 

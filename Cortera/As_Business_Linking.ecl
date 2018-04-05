@@ -1,4 +1,4 @@
-import ut, business_header, mdr, std;
+﻿import ut, business_header, mdr, std;
 
 EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 
@@ -15,7 +15,6 @@ EXPORT As_Business_Linking(dataset(Cortera.Layout_Executives) hdr) := FUNCTION
 		self.rcid := 0;
 		self.vl_id := (string)hdr.LINK_ID;
 		self.source := Mdr.sourceTools.src_Cortera;
-		self.current := true;
 		SELF.dt_first_seen						:= hdr.dt_first_seen;
 		SELF.dt_last_seen							:= hdr.dt_last_seen;
 		SELF.dt_vendor_first_reported := hdr.dt_vendor_first_reported;

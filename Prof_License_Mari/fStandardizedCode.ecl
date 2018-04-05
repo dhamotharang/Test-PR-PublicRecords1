@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 
 EXPORT fStandardizedCode(DATASET(RECORDOF(Prof_License_Mari.layouts.base)) int0)
 	:=
@@ -13,7 +13,7 @@ LicStatusLkp	:=	Prof_License_Mari.files_References.MARIcmvLicStatus;
 RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
       SELF.STD_LICENSE_DESC	 := MAP(le.STD_SOURCE_UPD = 'S0636' AND le.RAW_LICENSE_TYPE = 'REGULATED LENDER' AND le.STD_LICENSE_DESC = '' => le.RAW_LICENSE_TYPE,
 			                              le.STD_SOURCE_UPD = 'S0658' AND TRIM(le.RAW_LICENSE_TYPE) = 'REGULATED LENDER' AND le.STD_LICENSE_DESC = '' => le.RAW_LICENSE_TYPE,
-                                    le.STD_SOURCE_UPD = 'S0658' AND le.RAW_LICENSE_TYPE[1..6] IN ['BANKER','BROKER'] AND le.STD_LICENSE_DESC = '' => le.RAW_LICENSE_TYPE[1..6],
+                                    le.STD_SOURCE_UPD = 'S0658' AND le.RAW_LICENSE_TYPE[1..6] in ['BANKER','BROKER'] AND le.STD_LICENSE_DESC = '' => le.RAW_LICENSE_TYPE[1..6],
 																		le.STD_SOURCE_UPD = 'S0636' AND le.RAW_LICENSE_TYPE = 'CREDIT ACCESS BUSINESS' AND le.STD_LICENSE_TYPE = '' => le.RAW_LICENSE_TYPE,
                                     le.STD_SOURCE_UPD = 'S0636' AND le.RAW_LICENSE_TYPE = 'MOTOR VEHICLE SALES FINANCE' AND le.STD_LICENSE_TYPE = '' => le.RAW_LICENSE_TYPE,
 																		le.STD_SOURCE_UPD = 'S0636' AND le.RAW_LICENSE_TYPE = 'PAWN SHOP' AND le.STD_LICENSE_TYPE = '' => le.RAW_LICENSE_TYPE,
@@ -22,7 +22,7 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																				                                                                              
 
 																				
-			tmp_STATUS_DESC := MAP(le.STD_SOURCE_UPD IN ['S0636','S0376'] AND le.STD_STATUS_DESC = '' AND TRIM(le.RAW_LICENSE_STATUS) IN 
+			tmp_STATUS_DESC := MAP(le.STD_SOURCE_UPD IN ['S0636','S0376'] AND le.STD_STATUS_DESC = '' AND TRIM(le.RAW_LICENSE_STATUS) in 
 																	['ACTIVE','INACTIVE','REVOKED','SURRENDERED'] => le.RAW_LICENSE_STATUS,
 														 le.STD_SOURCE_UPD IN ['S0636','S0376'] AND le.STD_STATUS_DESC = '' AND TRIM(le.RAW_LICENSE_STATUS) = 'REVOKED LICENSE' => 'REVOKED',
 														 le.STD_SOURCE_UPD IN ['S0636','S0376'] AND le.STD_STATUS_DESC = '' AND TRIM(le.RAW_LICENSE_STATUS) = 'CANCELED' => 'CANCELLED',
@@ -44,6 +44,7 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																				'');
 			SELF.ORIGIN_CD_DESC		:= CASE(TRIM(le.ORIGIN_CD),
 																			'D' => 'ENDORSEMENT',
+																			'C' => 'CREDENTIAL',
 																			'E' => 'EXAM',
 																			'G' => 'GRANDFATHERED',
 																			'L' => 'ORIGINAL',
@@ -52,6 +53,9 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																			'R' => 'RECIPROCITY/COMITY',
 																			'S' => 'SCHOOLING',
 																			'U' => 'UNKNOWN',
+																			'F' => 'EXAMINATION-FEDERAL',
+																			'X' => 'RECIPROCITY-FEDERAL',
+																			'5' => 'IA RULE 5.3', // valid for IA professional records only
 																			'');
 
 			SELF.DISP_TYPE_DESC			:= CASE(TRIM(le.DISP_TYPE_CD),
@@ -78,7 +82,7 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																			'WHT'  	=> 'WHITE/CAUCASIAN','');
 			SELF  := le;
 END;
-p_code_desc := project(int0,xformMiscCodes(LEFT));
+p_code_desc := PROJECT(int0,xformMiscCodes(LEFT));
 
 RECORDOF(int0) JoinLicStatus(p_code_desc le, cmvTransLkp RInput) := TRANSFORM
 	SELF.STD_LICENSE_STATUS := IF(le.STD_LICENSE_STATUS = '',ut.CleanSpacesAndUpper(RInput.DM_VALUE1),le.STD_LICENSE_STATUS);

@@ -1,4 +1,4 @@
-import lib_StringLib,Prof_License;
+﻿import lib_StringLib,Prof_License;
 
 EXPORT Map_MD_Medical(string fdate) := module
 
@@ -79,18 +79,18 @@ dMDMedicalSF := Sequential(
 											 
 outfile := proc_clean_all(dMDMedical,'MD').cleanout;
 
-export buildprep :=FileServices.StartSuperfiletransaction(),
+export buildprep := Sequential(dMDMedicalSF,
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_md'),
 																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_md_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_md_old')),
 								       if ( FileServices.FileExists( '~thor_data400::in::prolic_md_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_md_old')),
                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_md','~thor_data400::in::prolic_md_old'),
-										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_md_old'),
-										            FileServices.FinishSuperfiletransaction(),
                          
-											output( outfile,,'~thor_data400::in::prolic_md',overwrite),
-            
+											output( outfile,,'~thor_data400::in::prolic_md',compressed,overwrite),
+                    FileServices.StartSuperfiletransaction(),
 												 
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ma'),
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_md'),
+	 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_md_old'),
+
 	
 											   FileServices.FinishSuperfiletransaction()
 											 );

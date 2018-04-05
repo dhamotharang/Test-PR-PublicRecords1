@@ -1,4 +1,4 @@
-#workunit('name','ADL Bocashell 4.1-Fcra Prescreen Score');
+﻿#workunit('name','ADL Bocashell 4.1-Fcra Prescreen Score');
 
 Import RiskWise, Risk_Indicators, Models;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,7 @@ unsigned1 eyeball := 10;
 unsigned record_limit := 5;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 string DataRestrictionMask := '100001000101'; // to restrict fares, experian and transunion, and ADVO because of prescreen 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,6 +71,7 @@ l := RECORD
 	string neutral_gateway;
 	string DataRestrictionMask;
 	integer bsversion;
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
@@ -82,6 +84,7 @@ l t_f(ds_input le, INTEGER c) := TRANSFORM
 	SELF.HistoryDateYYYYMM := if(historical, (unsigned)le.historydate, 999999);
  	self.neutral_gateway := neutral_roxieIP;
 	SELF.datarestrictionmask := datarestrictionmask;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 41;		
 	self := le;
 END;

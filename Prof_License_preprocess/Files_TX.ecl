@@ -1,4 +1,4 @@
-EXPORT Files_TX  := module
+﻿EXPORT Files_TX  := module
 
 rn_rec :=  
  record                                         
@@ -12,7 +12,7 @@ rn_rec :=
    string  Mailing_Address_City;                 
    string Mailing_Address_State;                 
    string Mailing_Address_Zip_code;              
-   string Date_of_Birth;                         
+   string fieldtype;                         
    string Gender;                                
    string  Ethnicity;                            
    string  License_Status;                       
@@ -53,7 +53,7 @@ record
    string  Mailing_Address_City;                   
    string Mailing_Address_State;                   
    string Mailing_Address_Zipcode;                 
-   string Date_of_Birth;                           
+   string fieldtype;                           
    string Gender;                                  
    string  Ethnicity;                              
    string  County_of_Residence;                    
@@ -85,7 +85,7 @@ record
    string  Mailing_Address_City;                
    string Mailing_Address_State;                
    string Mailing_Address_Zip_code;             
-   string Date_of_Birth;                        
+   string fieldtype;                        
    string Gender;                               
    string  Ethnicity;                           
    string  License_Status;                      

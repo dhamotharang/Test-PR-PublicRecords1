@@ -2,9 +2,9 @@
 //version
 lversion              := BIPV2.KeySuffix       ;
 //Start iterations
-DotStartIteration     := 184                   ;
-ProxStartIteration    := 346                   ;
-Lgid3StartIteration   := 244                   ;
+DotStartIteration     := 196                   ;
+ProxStartIteration    := 378                   ;
+Lgid3StartIteration   := 304                   ;
 PowDownStartIteration := 1                     ;
 PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
@@ -66,7 +66,8 @@ SkipEmp               := SkipEmpDown          ;
 SkipCommonBase        := SkipEmp              ;
 SkipXlink             := SkipCommonBase       ; // -- Thread 1
 SkipCopyXlinkKeys     := SkipXlink            ; // --
-SkipXlinkSample       := SkipCopyXlinkKeys    ; // --
+SkipXlinkValidation   := SkipCopyXlinkKeys    ; // --
+SkipXlinkSample       := SkipXlinkValidation  ; // --
 SkipWeeklyKeys        := SkipXlinkSample      ; // --
 SkipBest              := SkipWeeklyKeys       ; // -- Thread 2
 SkipIndustry          := SkipBest             ; // --
@@ -154,6 +155,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipCommonBase        := SkipCommonBase
   ,pSkipXlink             := SkipXlink
   ,pSkipCopyXlinkKeys     := SkipCopyXlinkKeys
+  ,pSkipXlinkValidation   := SkipXlinkValidation
   ,pSkipXlinkSample       := SkipXlinkSample
   ,pSkipWeeklyKeys        := SkipWeeklyKeys
   ,pSkipBest              := SkipBest

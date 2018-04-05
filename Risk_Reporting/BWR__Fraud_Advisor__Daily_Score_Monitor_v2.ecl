@@ -23,7 +23,7 @@ LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['FRAUDPOINT'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs)));
 
 // In order to join the parsed input and output together I need to force the transaction id into the inputxml, and I needed a root XML node for the outputxml.  This seemed like the most reasonable way to do that.
-Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+Logs_1 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
 				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<FraudPoint>', '<FraudPoint><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
 				SELF.outputxml := '<FraudPoint>' + LEFT.outputxml + '</FraudPoint>';
 				SELF.TransactionID := LEFT.Transaction_ID;
@@ -31,7 +31,7 @@ Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, S
 				SELF.TransactionDate := LEFT.DateTime[1..8];
 				SELF := LEFT));
 				
-OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Raw_Logs'));
+OUTPUT(CHOOSEN(Logs_1, eyeball), NAMED('Sample_Raw_Logs_1'));
 
 Risk_Reporting.Layouts.Parsed_FraudAdvisor_Layout parseInput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
@@ -53,9 +53,48 @@ Risk_Reporting.Layouts.Parsed_FraudAdvisor_Layout parseInput () := TRANSFORM
 	
 	SELF := [];
 END;
-parsedInput := PARSE(Logs, inputxml, parseInput(), XML('FraudPoint'));
+parsedInput_1 := PARSE(Logs_1, inputxml, parseInput(), XML('FraudPoint'));
+OUTPUT(CHOOSEN(parsedInput_1, eyeball), NAMED('Sample_parsedInput_1'));
+LOGS_11 := JOIN(DISTRIBUTE(parsedInput_1, HASH64(TransactionID)), DISTRIBUTE(Logs_1, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+//new XML
+Logs_2 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<FraudPointRequest>', '<FraudPointRequest><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
+				SELF.outputxml := '<FraudPoint>' + LEFT.outputxml + '</FraudPoint>';
+				SELF.TransactionID := LEFT.Transaction_ID;
+				SELF.AccountID := LEFT.customer_id;
+				SELF.TransactionDate := LEFT.DateTime[1..8];
+				SELF := LEFT));
+				
+OUTPUT(CHOOSEN(Logs_2, eyeball), NAMED('Sample_Raw_Logs_2'));
 
-OUTPUT(CHOOSEN(parsedInput, eyeball), NAMED('Sample_Parsed_Input'));
+Risk_Reporting.Layouts.Parsed_FraudAdvisor_Layout parseInput2 () := TRANSFORM
+	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.SSN						:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
+	SELF.DOB						:= TRIM(XMLTEXT('SearchBy/DOB')) + Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/DOB/Year'), XMLTEXT('SearchBy/DOB/Month'), XMLTEXT('SearchBy/DOB/Day'));
+	SELF.Address				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/Address/StreetAddress1'), XMLTEXT('SearchBy/Address/StreetAddress2'), XMLTEXT('SearchBy/Address/StreetNumber'), XMLTEXT('SearchBy/Address/StreetPreDirection'), XMLTEXT('SearchBy/Address/StreetName'),
+															XMLTEXT('SearchBy/Address/StreetSuffix'), XMLTEXT('SearchBy/Address/StreetPostDirection'), XMLTEXT('SearchBy/Address/UnitDesignation'), XMLTEXT('SearchBy/Address/UnitNumber'));
+	SELF.City						:= TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State					:= TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip						:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/Address/Zip5'));
+	SELF.DL							:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/Phone10'));
+	SELF.WorkPhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/WPhone10'));
+	SELF.Email					:= TRIM(XMLTEXT('SearchBy/Email'));
+	SELF.IPAddress			:= TRIM(XMLTEXT('SearchBy/IPAddress'));
+	
+	SELF := [];
+END;
+parsedInput_2 := PARSE(Logs_2, inputxml, parseInput2(), XML('FraudPointRequest'));
+OUTPUT(CHOOSEN(parsedInput_2, eyeball), NAMED('Sample_parsedInput_2'));
+LOGS_22 := JOIN(DISTRIBUTE(parsedInput_2, HASH64(TransactionID)), DISTRIBUTE(Logs_2, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+Logs := Logs_11 + LOGS_22; //since the rawlog_1 has all the records, we only want the records with the correct XML tags we could link them to
 
 Parsed_Layout_Temp := RECORD
 	Risk_Reporting.Layouts.Parsed_FraudAdvisor_Layout;
@@ -321,7 +360,9 @@ Parsed_Layout_Temp parseOutput () := TRANSFORM
 	
 	SELF := [];
 END;
-parsedOutputTemp := PARSE(Logs, outputxml, parseOutput(), XML('FraudPoint'));
+parsedOutputTemp_1 := PARSE(Logs_11, outputxml, parseOutput(), XML('FraudPoint'));
+parsedOutputTemp_2 := PARSE(Logs_22, outputxml, parseOutput(), XML('FraudPoint'));
+parsedOutputTemp := parsedOutputTemp_1 + parsedOutputTemp_2;
 
 OUTPUT(CHOOSEN(parsedOutputTemp, eyeball), NAMED('Sample_Parsed_Output'));
 
@@ -505,7 +546,8 @@ Risk_Reporting.Layouts.Parsed_FraudAdvisor_Layout combineParsedRecords(Risk_Repo
 END;
 
 // Join the parsed input/output and then filter out the results where no model was requested or where this was an income estimated model and not a true RiskView model
-parsedRecordsTemp := JOIN(parsedInput, parsedOutput, LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(10), ATMOST(RiskWise.max_atmost)) (TRIM(StringLib.StringToUpperCase(model)) NOT IN ['', '00 TO 50', '10 TO 50']);
+parsedRecordsTemp_in := parsedInput_1+parsedInput_2 ;
+parsedRecordsTemp := JOIN(parsedRecordsTemp_in, parsedOutput, LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(10), ATMOST(RiskWise.max_atmost)) (TRIM(StringLib.StringToUpperCase(model)) NOT IN ['', '00 TO 50', '10 TO 50']);
 
 parsedRecords := JOIN(parsedRecordsTemp, Logs, LEFT.TransactionID = RIGHT.TransactionID, TRANSFORM(RECORDOF(LEFT), SELF.TransactionDate := RIGHT.TransactionDate; SELF.AccountID := RIGHT.AccountID; SELF := LEFT));
 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Biz_Header_Service">
 <part name="company_name" type="xsd:string"/>
 </message>
@@ -43,3 +43,4 @@ EXPORT ServiceTest := MACRO
   RawData := steppedmatches;
   OUTPUT(RawData,named('Header_Data'));
 endmacro;
+

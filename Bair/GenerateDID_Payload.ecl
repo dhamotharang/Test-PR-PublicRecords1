@@ -71,6 +71,8 @@ EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pD
 
 	ddd:=dedup(dd,record,except Prepped_rec_type, all);
 
+	rgxAddress_w_2_parts := '(.*),(.*)';
+	
 	d:=join(ddd, dpl
 					,left.data_provider_id = right.dataProviderID
 						,transform(r
@@ -83,11 +85,18 @@ EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pD
 																,if(right.dataProviderID>0   and right.state<>''  ,right.state,left.orig_st)
 																,if(left.orig_st<>'',left.orig_st,right.state)
 																)
-							,SELF.Prepped_addr1 := trim(StringLib.StringCleanSpaces(left.orig_address))
-							,SELF.Prepped_addr2 := trim(StringLib.StringCleanSpaces(	trim(self.orig_City) + if(self.orig_city <> '',',','')
+							,temp_adddr 	:= trim(regexreplace('USA$', Left.orig_address, ' ' ), left, right);
+							 addr_w_2_token	:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 2, true, false);
+																			
+							 SELF.Prepped_addr1 := trim(StringLib.StringCleanSpaces(left.orig_address))
+							,Prep2 := trim(StringLib.StringCleanSpaces(	trim(self.orig_City) + if(self.orig_city <> '',',','')
 																	+ ' '+ self.orig_st
 																	+ ' '+ left.orig_zip
-																	),left,right)
+																	),left,right);							
+							SELF.Prepped_addr2 := trim(if(addr_w_2_token
+																				,regexfind(rgxAddress_w_2_parts, left.orig_address, 2, nocase)
+																				,Prep2)
+																			,left, right)
 							,SELF.Prepped_name := trim(StringLib.StringCleanSpaces(left.orig_name))
 							,self:=left
 							)
@@ -249,6 +258,9 @@ EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pD
 		SELF.geo_blk     			:= if(l.cached_addr, l.geo_blk, Clean_Address[171..177]);
 		SELF.geo_match   			:= if(l.cached_addr, l.geo_match, Clean_Address[178..178]);
 		SELF.err_stat    			:= if(l.cached_addr, l.err_stat, Clean_Address[179..182]);
+		self.orig_city 				:= if(self.p_city_name <> '', self.p_city_name, l.orig_city);
+		self.orig_st 					:= if(self.st <> '', self.st, l.orig_st);
+		self.orig_zip 				:= if(self.zip <> '', self.zip, l.orig_zip);
 		SELF := l;
 	END;
 
@@ -286,6 +298,9 @@ EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pD
 					,self.geo_blk      :=if(left.Prepped_addr1=right.Prepped_addr1,right.geo_blk,'')
 					,self.geo_match    :=if(left.Prepped_addr1=right.Prepped_addr1,right.geo_match,'')
 					,self.err_stat     :=if(left.Prepped_addr1=right.Prepped_addr1,right.err_stat,'')
+					,self.orig_city 	 := if(self.p_city_name <> '', self.p_city_name, right.orig_city);
+					,self.orig_st 		 := if(self.st <> '', self.st, right.orig_st);
+					,self.orig_zip 		 := if(self.zip <> '', self.zip, right.orig_zip);
 					,self:=left)
 				,left outer
 				,local

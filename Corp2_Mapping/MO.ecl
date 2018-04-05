@@ -1,10 +1,10 @@
-Import corp2, corp2_raw_mo, scrubs, scrubs_corp2_mapping_mo_main, scrubs_corp2_mapping_mo_event, scrubs_corp2_mapping_mo_ar, ut, versioncontrol, tools, std ;
-
-Export MO:=MODULE;
+﻿Import corp2, corp2_raw_mo, scrubs, scrubs_corp2_mapping_mo_main, scrubs_corp2_mapping_mo_event, scrubs_corp2_mapping_mo_ar, ut, versioncontrol, tools, std ;
+  
+Export MO:=MODULE;   
 
 Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) :=Function
 		
-	state_origin 							:= 'MO';
+	state_origin 							:= 'MO';   
 	state_fips	 							:= '29';	
 	state_desc	 							:= 'MISSOURI';
 	ds_Address   	 						:= dedup(sort(distribute(corp2_raw_mo.files(filedate,pUseProd).Input.Address.logical,hash(CorpID)),record,local),record,local) 				: independent;
@@ -87,9 +87,7 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 		self.corp_for_profit_ind				  := map(corp2.t2u(l.corp_typeid)='4'=>'Y',
 																						 corp2.t2u(l.corp_typeid) in ['6','1017','1018','1019','1020']=>'N',
 																						 '');
-		self.corp_status_cd					      := map(trim(l.corp_status,left,right)='0' =>'' ,
-																						 corp2.t2u(l.corp_status) 
-																						 );
+		self.corp_status_cd					      := corp2.t2u(l.corp_status);
 		self.corp_status_desc				      := corp2_raw_mo.Functions.status_desc(l.corp_status);
 		self.corp_standing                := if(trim(l.corp_status,left,right)='0','Y','');
 		//Per CI :vendor format in MO data can be either ccyy-mm-dd OR  mm/dd/yyyy "fFormatOfDate" has been added !
@@ -301,10 +299,10 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 	ds_mapEvent_docType := join(ds_mapEvent_norm,DocumentType_DescLn,
 															corp2.t2u(left.event_filing_cd) = corp2.t2u(right.TypeCode), 
 															transform(corp2_mapping.LayoutsCommon.Events,
-																				//Â€Â“Null/unprintable characters noticed in the data & fitting into 60 length  ,Cleaning Ã¢Â€Â“ chars through "STD.Uni.CleanAccents" !
-																				self.event_filing_desc    := map(corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|Â€Â“',right.typeDesc,'')))='REINSTATEMENT A REGISTRATION REPORTS FOR FOREIGN NON-PROFIT' 	 =>'REINSTATEMENT A REG REPORTS FOR FOREIGN NON-PROFIT', 
-																																				 corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|Â€Â“',right.typeDesc,'')))='REINSTATEMENT A REGISTRATION REPORTS FOR FOREIGN GENERAL BUS.' =>'REINSTATEMENT A REG REPORTS FOR FOREIGN GENERAL BUS.', 
-																																				 (right.len =60 or right.len <60) and corp2.t2u(right.typeDesc) 								 <>''																															 =>corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|Â€Â“',right.typeDesc,''))),
+																				//Null/unprintable characters noticed in the data & fitting into 60 length  ,Cleaning â chars through "STD.Uni.CleanAccents" !
+																				self.event_filing_desc    := map(corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|',right.typeDesc,'')))='REINSTATEMENT A REGISTRATION REPORTS FOR FOREIGN NON-PROFIT' 	 =>'REINSTATEMENT A REG REPORTS FOR FOREIGN NON-PROFIT', 
+																																				 corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|',right.typeDesc,'')))='REINSTATEMENT A REGISTRATION REPORTS FOR FOREIGN GENERAL BUS.' =>'REINSTATEMENT A REG REPORTS FOR FOREIGN GENERAL BUS.', 
+																																				 (right.len =60 or right.len <60) and corp2.t2u(right.typeDesc) 								 <>''																															 =>corp2.t2u((string)STD.Uni.CleanAccents(regexreplace('\\x00|',right.typeDesc,''))),
 																																				 //Functions.filing_desc/fitting into 60 lengths due to "event_filing_desc" defined as 60 in common layout
 																																				  right.len >60 and corp2.t2u(right.typeDesc) 								  								 <>'' 																														 =>corp2_raw_mo.Functions.filing_desc(left.event_filing_cd), 
 																																				 '');
@@ -339,7 +337,7 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 	ds_mapAR_docType 		:= join(ds_mapAR_proj,DocumentType_Table,
 															corp2.t2u(left.ar_type)  =  corp2.t2u(right.TypeCode),
 															transform(corp2_mapping.LayoutsCommon.AR,
-																				self.ar_type    := map(corp2.t2u(right.typeDesc)<>''=>corp2.t2u((string)STD.Uni.CleanAccents(right.typeDesc)),//Cleaning Ã¢Â€Â“ characters ,noticed in the data 
+																				self.ar_type    := map(corp2.t2u(right.typeDesc)<>''=>corp2.t2u((string)STD.Uni.CleanAccents(right.typeDesc)),//Cleaning â characters ,noticed in the data 
 																															 corp2.t2u(left.ar_type)  ='' =>'',
 																															 '**|'+ corp2.t2u(left.ar_type)
 																															 );	//scrubs will catch codes those don't have descriptions 
@@ -574,11 +572,11 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 	Event_CreateBitMaps				:= output(Event_N.BitmapInfile,,'~thor_data::corp_MO_event_scrubs_bits',overwrite,compressed);	//long term storage
 	Event_TranslateBitMap			:= output(Event_T);
 	//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-	Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').ProfileAlertsTemplate;
+	Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').ProfileAlertsTemplate;
 	//Submits Profile's stats to Orbit
-	Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').SubmitStats;
+	Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').SubmitStats;
 
-	Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').CompareToProfile_with_Examples;
+	Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').CompareToProfile_with_Examples;
 	
 	Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 	Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
@@ -696,7 +694,7 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
 																						,fileservices.addsuperfile(corp2_mapping._Dataset().thor_cluster_Files + 'in::'+corp2_mapping._Dataset().NameMapped+'::sprayed::event',corp2_mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::event_mo')
 																						,fileservices.addsuperfile(corp2_mapping._Dataset().thor_cluster_Files + 'in::'+corp2_mapping._Dataset().NameMapped+'::sprayed::main'	,corp2_mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::main_mo')	
 																						,fileservices.addsuperfile(corp2_mapping._Dataset().thor_cluster_Files + 'in::'+corp2_mapping._Dataset().NameMapped+'::sprayed::stock',corp2_mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::stock_mo')																		 
-																						,if (count(Main_BadRecords) <> 0 or count(Event_GoodRecords)<> 0 or count(AR_GoodRecords)<> 0
+                                            ,if (count(Main_BadRecords) <> 0 or count(Event_GoodRecords)<> 0 or count(AR_GoodRecords)<> 0
 																								 ,corp2_mapping.Send_Email(state_origin,version,count(Main_Badrecords)<>0,count(AR_Badrecords)<>0,count(Event_Badrecords)<>0,,count(Main_Badrecords),count(AR_Badrecords),count(Event_Badrecords),,count(Main_Approvedrecords),count(AR_Approvedrecords),count(Event_Approvedrecords),count(mapStock)).recordsRejected																				 
 																								 ,corp2_mapping.Send_Email(state_origin,version,count(Main_Badrecords)<>0,count(AR_Badrecords)<>0,count(Event_Badrecords)<>0,,count(Main_Badrecords),count(AR_Badrecords),count(Event_Badrecords),,count(Main_Approvedrecords),count(AR_Approvedrecords),count(Event_Approvedrecords),count(mapStock)).mappingSuccess	
 																								)

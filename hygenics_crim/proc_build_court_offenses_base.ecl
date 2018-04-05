@@ -1,9 +1,9 @@
-import crim_common;
+﻿import crim_common;
 
-def := sort(distribute(hygenics_crim.file_in_defendant, hash(recordid)), recordid, local);
-cha := sort(distribute(hygenics_crim.file_in_charge, hash(recordid)), recordid, local);
-off := sort(distribute(hygenics_crim.file_in_offense, hash(recordid)), recordid, local);
-sen := sort(distribute(hygenics_crim.file_in_sentence, hash(recordid)), recordid, local);
+def := sort(distribute(hygenics_crim.file_in_defendant, hash(recordid,sourceid)), recordid, local);
+cha := sort(distribute(hygenics_crim.file_in_charge, hash(recordid,sourceid)), recordid, local);
+off := sort(distribute(hygenics_crim.file_in_offense, hash(recordid,sourceid)), recordid, local);
+sen := sort(distribute(hygenics_crim.file_in_sentence, hash(recordid,sourceid)), recordid, local);
 
 layout_j_final := record
 
@@ -152,6 +152,7 @@ layout_j_final := record
 	string10	ProbationMinMonths			:= '';
 	string10	ProbationMinDays			:= '';
 	string100	ProbationStatus				:= '';
+	string20  sourceid              := '';
 	//
 end;
 
@@ -196,9 +197,9 @@ layout_j_final to_j1(def l, off r) := transform
 end;
 
 j1 := join(def,off, 
-		left.statecode=right.statecode and 
-		left.recordid=right.recordid, 
-		to_j1(left,right), local);
+		 	left.recordid=right.recordid and 
+		  left.sourceid=right.sourceid, 
+		  to_j1(left,right), local);
 
 layout_j_final to_j2(j1 l, cha r) := transform
 
@@ -241,7 +242,7 @@ layout_j_final to_j2(j1 l, cha r) := transform
 end;
 
 j2 := join(j1, cha,
-			left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+			left.sourceid=right.sourceid and left.recordid=right.recordid and left.caseid=right.caseid, 
 			to_j2(left,right), left outer, local);
 			
 		//	output(choosen(j2,25));
@@ -287,7 +288,7 @@ layout_j_final to_j3(j2 l, sen r) := transform
  self := l;
  //self := r;
  end;
-j3 := join(j2,sen, left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+j3 := join(j2,sen, left.sourceid=right.sourceid and left.recordid=right.recordid and left.caseid=right.caseid, 
 										to_j3(left,right), left outer, local);
 
 j_final := j3;
@@ -440,7 +441,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																							  										     ,''),
 																						l.sourcename = 'VIRGINIA_ADMINISTRATOR_OF_THE_COURTS_CIRCUIT_COURTS_WEBSITE' => Trim(l.courtname), 																														 
 																																																																									
-																						'');									
+																						Trim(l.courtname));									
 										
   self.court_desc				    :=  get_court_desc;	
 
@@ -557,7 +558,9 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 	                                       '');
 																			 
 	self.court_off_lev			    		:= MAP(
-	
+	                                      l.sourcename = 'UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY' => 'F', //with legal approval- https://www.utfraud.com/Home/Faqs
+																			  l.sourcename = 'ILLINOIS_VIOLENT_OFFENDER_AGAINST_YOUTH ' => 'F',//with legal approval - http://www.isp.state.il.us/cmvo/cmvofaq.cfm?CFID=44357946&CFTOKEN=2407f7570d66c157-59497B11-B879-EA3C-2BFB1AAF644EEFE6&jsessionid=ec3096b73f85ef3429152c1a665965836404#offenses
+																				
 	                                      l.sourcename ='WASHINGTON_PUBLIC_SCOMIS_CRIMINAL_INDEX' and 
 																				trim(l.offenseclass)= 'GROSS MISDEMEANOR' => 'GM',
 																				l.sourcename ='WASHINGTON_PUBLIC_SCOMIS_CRIMINAL_INDEX' and 
@@ -918,6 +921,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
   self.court_disp_desc_1		:= IF(temp_disp = '' and length(trim(l.chargedisposed)) >= 3 and regexfind('[A-Z]+', trim(l.chargedisposed)[1..3], 0)<>'',
 											            l.ChargeDisposed,
 																	If(l.ln_vendor = 'W0001' and regexfind('(.*) - (.*)',temp_disp) , regexreplace('(.*) - (.*)',temp_disp,'$2'),
+																	IF(l.ln_vendor = 'W0320' , 'CONVICTED', //As per hygenics everyone in the registry is convicted.
 																	If(trim(l.ln_vendor) ='TB' , //TXDPS - strip the court dispo out to match the disp lookup
 																	    MAP(regexfind('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*[, ]+(.*)',temp_disp) =>  regexreplace('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*[, ]+(.*)',temp_disp,'$2'),
 																					regexfind('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*$',temp_disp) =>  regexreplace('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*$',temp_disp,'$2'),
@@ -1020,7 +1024,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 												if(length(trim(temp_disp)) >= 3, 		temp_disp,
 												if(l.statecode = 'HI' and stringlib.stringfind(temp_offense, '|', 2) <> 0,
 													temp_offense[stringlib.stringfind(temp_offense, '|', 1)+1..stringlib.stringfind(temp_offense, '|', 2)-1],
-													''))))));
+													'')))))));
   self.court_disp_desc_2		    := Map(l.ln_vendor = 'NF' => l.dispositionstatus,
 	                                     l.trialtype);
   self.sent_date				    := MAP(l.SentenceDate <> '' => l.SentenceDate,

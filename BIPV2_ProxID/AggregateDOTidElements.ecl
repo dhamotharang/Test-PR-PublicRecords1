@@ -1,9 +1,9 @@
-import BIPV2_Tools,tools;
+﻿import BIPV2_Tools,tools;
 EXPORT AggregateDOTidElements(
-	 dataset(layout_DOT_Base)	pDataset
-	,boolean																											pShouldFilt	= true
+	 pDataset
+	,pShouldFilt	= 'true'
 ) :=
-function
+functionmacro
 	dslim := project(pDataset, transform(
 	{pDataset.proxid,pDataset.company_name,pDataset.cnp_name,pDataset.cnp_number,pDataset.cnp_btype
 	,string address,string contact
@@ -16,8 +16,8 @@ function
 		self					:= left;	
 	));
 	
-	dpost := tools.mac_AggregateFieldsPerID(dslim,dotid,pFew := true);
+	dpost := tools.mac_AggregateFieldsPerID(dslim,dotid,,false,pLimitChildDatasts := 100);
 		
 	return dpost;
 	
-end;
+endmacro;

@@ -1,5 +1,5 @@
-
-import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master;
+﻿
+import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master,Scrubs_Risk_Indicators;
 
 export proc_RiskIndicator_buildkey(string filedate) := function
   #uniquename(version_date)
@@ -236,6 +236,6 @@ full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,a9,a10,a11,a12,a13,a14,a15,a16,
 		UpdateFCRARoxiePage := RoxieKeybuild.updateversion('FCRA_RiskTableKeys',filedate,'Michael.Gould@lexisnexis.com',,'F');
 
 
-return sequential(full1,move_qa/*,parallel(UpdateRoxiePage,UpdateFCRARoxiePage)*/);
+return sequential(full1,move_qa/*,parallel(UpdateRoxiePage,UpdateFCRARoxiePage)*/,Scrubs_Risk_Indicators.fn_GenerateStats(filedate),Scrubs_Risk_Indicators.fn_RunScrubs(filedate,''));
 END;				
 									

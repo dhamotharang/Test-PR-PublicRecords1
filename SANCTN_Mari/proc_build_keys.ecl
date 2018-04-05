@@ -1,4 +1,4 @@
-import	RoxieKeyBuild,ut,autokey,SANCTN_Mari;
+﻿import	RoxieKeyBuild,ut,autokey,SANCTN_Mari,dops;
 
 export	proc_build_keys(string	filedate)	:=	function
 
@@ -80,14 +80,15 @@ To_qa_orig	:=	parallel(mv1_qa,mv2_qa,mv3_qa,mv4_qa,mv5_qa,mv6_qa,mv7_qa,mv8_qa,m
 // Build Autokeys
 autokeys	:=	SANCTN_Mari.proc_build_autokeys(filedate);
 
-update_dops	:=	RoxieKeyBuild.updateversion('SANCTN_NPKeys', filedate, 'terri.hardy-george@lexisnexis.com',,'N');
+update_dops	:=	dops.updateversion('SANCTN_NPKeys', filedate, 'terri.hardy-george@lexisnexis.com',,'N');
+
 												
 
 buildKey	:=	sequential(Keys
 												,Move_keys_orig
 												,to_qa_orig
 												,autokeys
-	 										  ,update_dops
+												,update_dops
 												);	
 
 return	buildKey;

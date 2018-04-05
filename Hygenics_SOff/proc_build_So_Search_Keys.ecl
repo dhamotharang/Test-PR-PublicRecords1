@@ -1,9 +1,9 @@
-import autokey, sexoffender, doxie, fair_isaac, codes, did_add, didville, VehLic, minibuild, ut, VehicleCodes, header_slimsort, watchdog, vehicle_wildcard, doxie_files,RoxieKeyBuild, doxie_build;
+﻿import autokey, sexoffender, doxie, fair_isaac, codes, did_add, didville, VehLic, minibuild, VehicleCodes, header_slimsort, watchdog, vehicle_wildcard, doxie_files,RoxieKeyBuild, doxie_build, promotesupers;
 
 export Proc_Build_SO_Search_Keys(string filedate) := function
 
-pre1 := ut.SF_MaintBuilding('~thor_data400::base::sex_offender_main'+ doxie_build.buildstate);
-pre2 := ut.SF_MaintBuilding('~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate);
+pre1 := promotesupers.SF_MaintBuilding('~thor_data400::base::sex_offender_main'+ doxie_build.buildstate);
+pre2 := promotesupers.SF_MaintBuilding('~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate);
 pre3 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::UtilityHeader_Building')>0,
 
 output('Nothing added to Base::UtilityHeader_Building'),
@@ -71,8 +71,8 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender::fcra::zi
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender::fcra::fdid_'+ doxie_build.buildstate,
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::fdid_'+ doxie_build.buildstate,mv_fdid_fcra);
 	
-post1 := ut.SF_MaintBuilt('~thor_data400::base::sex_offender_main'+ doxie_build.buildstate);
-post2 := ut.SF_MaintBuilt('~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate);
+post1 := promotesupers.SF_MaintBuilt('~thor_data400::base::sex_offender_main'+ doxie_build.buildstate);
+post2 := promotesupers.SF_MaintBuilt('~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate);
 //post3 := if(util_populated, output('Dont clear utility super'),fileservices.clearsuperfile('~thor_data400::Base::UtilityHeader_Building'));
 		
 return sequential(chk_build,

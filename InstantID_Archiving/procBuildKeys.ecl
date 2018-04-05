@@ -1,4 +1,4 @@
-IMPORT RoxieKeyBuild, Doxie, ut;
+﻿IMPORT RoxieKeyBuild, Doxie, ut;
 
 EXPORT procBuildKeys(STRING pversion = ut.GetDate) := FUNCTION
 
@@ -19,6 +19,7 @@ EXPORT procBuildKeys(STRING pversion = ut.GetDate) := FUNCTION
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(InstantID_Archiving.Key_Report4,'~thor_data400::key::instantid_archiving::@version@::report4','~thor_data400::key::instantid_archiving::'+pversion+'::report4',bk_report4);
  RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(InstantID_Archiving.Key_Report5,'~thor_data400::key::instantid_archiving::@version@::report5','~thor_data400::key::instantid_archiving::'+pversion+'::report5',bk_report5);
  RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(InstantID_Archiving.Key_Report6,'~thor_data400::key::instantid_archiving::@version@::report6','~thor_data400::key::instantid_archiving::'+pversion+'::report6',bk_report6);
+ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(InstantID_Archiving.key_queryID,'~thor_data400::key::instantid_archiving::@version@::queryID','~thor_data400::key::instantid_archiving::'+pversion+'::queryID',bk_queryID);
 
 
  RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::@version@::report','~thor_data400::key::instantid_archiving::'+pversion+'::report',mv_report,3);
@@ -38,6 +39,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(InstantID_Archiving.Key_Report4,'~tho
 RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::@version@::report4','~thor_data400::key::instantid_archiving::'+pversion+'::report4',mv_report4,3);
  RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::@version@::report5','~thor_data400::key::instantid_archiving::'+pversion+'::report5',mv_report5,3);
  RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::@version@::report6','~thor_data400::key::instantid_archiving::'+pversion+'::report6',mv_report6,3);
+ RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::@version@::queryID','~thor_data400::key::instantid_archiving::'+pversion+'::queryID',mv_queryID,3);
 
 
  RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::instantid_archiving::@version@::report','Q',mvq_report,3);
@@ -57,10 +59,11 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::instantid_archiving::
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::instantid_archiving::@version@::report4','Q',mvq_report4,3);
  RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::instantid_archiving::@version@::report5','Q',mvq_report5,3);
  RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::instantid_archiving::@version@::report6','Q',mvq_report6,3);
+ RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::instantid_archiving::@version@::queryID','Q',mvq_queryID,3);
 
-BuildKeys := PARALLEL(bk_report, bk_verf, bk_model, bk_red, bk_index, bk_risk, bk_mrisk, bk_pay, bk_dt,bk_report1,bk_report2,bk_report3,bk_report4,bk_report5,bk_report6);
-MoveKeys := PARALLEL(mv_report, mv_verf, mv_model, mv_red, mv_index, mv_risk, mv_mrisk, mv_pay, mv_dt,mv_report1,mv_report2,mv_report3,mv_report4,mv_report5,mv_report6);
-MoveQKeys := PARALLEL(mvq_report, mvq_verf, mvq_model, mvq_red, mvq_index, mvq_risk, mvq_mrisk, mvq_pay, mvq_dt,mvq_report1,mvq_report2,mvq_report3,mvq_report4,mvq_report5,mvq_report6);
+BuildKeys := PARALLEL(bk_report, bk_verf, bk_model, bk_red, bk_index, bk_risk, bk_mrisk, bk_pay, bk_dt,bk_report1,bk_report2,bk_report3,bk_report4,bk_report5,bk_report6,bk_queryID);
+MoveKeys := PARALLEL(mv_report, mv_verf, mv_model, mv_red, mv_index, mv_risk, mv_mrisk, mv_pay, mv_dt,mv_report1,mv_report2,mv_report3,mv_report4,mv_report5,mv_report6,mv_queryID);
+MoveQKeys := PARALLEL(mvq_report, mvq_verf, mvq_model, mvq_red, mvq_index, mvq_risk, mvq_mrisk, mvq_pay, mvq_dt,mvq_report1,mvq_report2,mvq_report3,mvq_report4,mvq_report5,mvq_report6,mvq_queryID);
 
 RETURN SEQUENTIAL(BuildKeys, MoveKeys, MoveQKeys);
 END;

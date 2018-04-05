@@ -21,12 +21,15 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.NPI.New'								  						,BuildNPIKey						   					);
 	tools.mac_WriteIndex('TheKeys.Main.AppProviderID.New'       						,BuildAppProviderIDKey	   					);
 	tools.mac_WriteIndex('TheKeys.Main.LNPID.New'               						,BuildLNPIDKey	         						);
+	tools.mac_WriteIndex('TheKeys.Main.DriversLicense.New'               		,BuildDriversLicenseKey	         		);
+	tools.mac_WriteIndex('TheKeys.Main.BankAccount.New'               			,BuildBankAccountKey	         			);
 	tools.mac_WriteIndex('TheKeys.Main.MBS.New'								  						,BuildMbsKey							 					);
 	tools.mac_WriteIndex('TheKeys.Main.MbsIndTypeExclusion.New'							,BuildMbsIndTypeExclusionKey				);
   tools.mac_WriteIndex('TheKeys.Main.MbsProductInclude.New'								,BuildMbsProductIncludeKey				 	);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDKey.New'								,BuildMbsFDNMasterIDKey				 			);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDExclKey.New'						,BuildMbsFDNMasterIDExclKey				 	);
 	tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDIndTypInclKey.New'			,BuildMbsFDNMasterIDIndTypInclKey	 	);
+	tools.mac_WriteIndex('TheKeys.Main.MbsVelocityRules.New'								,BuildMbsVelocityRules	 						);
 	VersionControl.macBuildNewLogicalKeyWithName(Get_Key_LinkIds.Key	,keynames(pversion,false).Main.LinkIds.new, BuildLinkIdsKey);
 													  
 	export full_build :=
@@ -43,12 +46,15 @@ export Build_Keys(
 			,BuildNPIKey
 			,BuildAppProviderIDKey
 			,BuildLNPIDKey
+			,BuildDriversLicenseKey
+			,BuildBankAccountKey
 			,BuildMbsKey
 			,BuildMbsIndTypeExclusionKey
 			,BuildMbsProductIncludeKey
 			,BuildMbsFDNMasterIDKey
 			,BuildMbsFDNMasterIDExclKey
-			,If(Platform.Source = 'FraudGov'  ,BuildMbsFDNMasterIDIndTypInclKey)
+			,BuildMbsFDNMasterIDIndTypInclKey
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsVelocityRules)
 			,BuildLinkIdsKey
 			
 		 )

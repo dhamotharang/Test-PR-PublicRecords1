@@ -1,4 +1,4 @@
-IMPORT  prte2_DLV2,PromoteSupers,prte2,std,AID,Address,PRTE2,ut;
+﻿IMPORT  prte2_DLV2,PromoteSupers,prte2,std,AID,Address,PRTE2,ut;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
   //uppercase and remove spaces from in file
@@ -67,8 +67,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF.err_stat		  := L.AIDWork_ACECache.err_stat;
     
       //Append ID(s)
-      dob := (string)L.dob;
-      SELF.did := prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, L.ssn, dob, L.cust_name);
+      SELF.did := prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, L.link_ssn, L.link_dob, L.cust_name);
 
       SELF.age := (qstring3)ut.age(L.dob);
       

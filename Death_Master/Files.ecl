@@ -1,4 +1,4 @@
-IMPORT	Data_Services, Header;
+﻿IMPORT	Data_Services, Header;
 EXPORT	Files	:=
 MODULE
 	
@@ -23,7 +23,7 @@ MODULE
 
 	EXPORT	California		:= 	IF(NOTHOR(FileServices.GetSuperFileSubCount(vCaliforniaFileName) <> 0),
 																			DATASET(vCaliforniaFileName,Death_Master.Layout_States.California,
-																			CSV(HEADING(0), SEPARATOR(','), QUOTE('"'), MAXLENGTH(100000))));
+																			CSV(HEADING(0), SEPARATOR('\t'), QUOTE(''), MAXLENGTH(100000))));
 	EXPORT	Connecticut		:=	IF(NOTHOR(FileServices.GetSuperFileSubCount(vConnecticutFileName) <> 0),
 																			DATASET(vConnecticutFileName,Death_Master.Layout_States.Connecticut,
 																			CSV(HEADING(0), SEPARATOR(','), QUOTE('"'), MAXLENGTH(100000))));

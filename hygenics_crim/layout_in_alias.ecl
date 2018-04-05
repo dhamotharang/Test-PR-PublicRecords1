@@ -1,4 +1,4 @@
-export layout_in_alias := record
+﻿export layout_in_alias := record
 string40	RecordID;
 string2	StateCode;
 string115	AKAName;
@@ -8,4 +8,5 @@ string40	AKAMiddleName;
 string15	AKASuffix;
 string8	AKADOB;
 string100	SourceName;
+string20	SourceId;
 end;

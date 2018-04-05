@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 export Proc_Npa_Change (string date) := function
 infcid_input  := infutorcid.File_InfutorCID;
 npa_change 		:= infcid_input(orig_telephoneconfidencescore = '7');
@@ -28,7 +28,7 @@ npa_change_f := join(distribute(npa_change, hash(orig_Phone[4..])),
 all_changes := if(nothor(FileServices.GetSuperFileSubCount('~thor_data400::base::infutorcid_npa_changed')) = 0, npa_change_f, InfutorCID.File_npa_change + npa_change_f);
 
 Layout_InfutorCID_Npa_Change t_rollup (all_changes le, all_changes ri) := transform
-	self.dt_last_changed := ut.Max2(le.dt_last_changed, ri.dt_last_changed);
+	self.dt_last_changed := MAX(le.dt_last_changed, ri.dt_last_changed);
 	self.dt_first_changed := ut.Min2(le.dt_first_changed, ri.dt_first_changed);
 	self := ri;
 end;

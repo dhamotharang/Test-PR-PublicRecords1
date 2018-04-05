@@ -1,7 +1,11 @@
-import Address, BatchShare, AutoStandardI, Relationship;
+﻿import BatchShare, AutoStandardI, Relationship, AutoHeaderI;
 
 export IParams := module
-	
+  
+	export DIDParams :=
+    INTERFACE(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
+  end;
+  
 	export BatchParams := interface (BatchShare.IParam.BatchParams,Relationship.IParams.relationshipParams)
 		export boolean AppendBest          := false; // We're calling another function to append Best.
 		export UNSIGNED3 DIDScoreThreshold := 0;

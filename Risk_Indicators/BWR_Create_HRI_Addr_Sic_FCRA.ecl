@@ -1,4 +1,4 @@
-import business_header, header, ut,paw,corp2;
+﻿import business_header, header, ut,paw,corp2,mdr;
 
 laycorp := corp2.Layout_Corporate_Direct_Corp_Base;
 
@@ -14,7 +14,8 @@ export BWR_Create_HRI_Addr_Sic_FCRA(
 ) := 
 function
 
-f_sic_addr_out := pHri_Businesses;
+//*** The new Correctional Facilities records are filtered out from this FCRA key as per JIRA# DF-20295
+f_sic_addr_out := pHri_Businesses(~mdr.sourceTools.sourceIsCorrectional_Facilities(source));
 
 f_sic_addr_valid := f_sic_addr_out(prim_name<>'');
 

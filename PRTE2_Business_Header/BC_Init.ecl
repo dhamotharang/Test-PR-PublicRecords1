@@ -1,4 +1,4 @@
-import AID, Business_Header, Address, NID, ut, PRTE2, STD;
+﻿import AID, Business_Header, Address, NID, ut, PRTE2, STD;
 
 export BC_Init (
 	 
@@ -87,15 +87,17 @@ function
 		// -- Append DID's using the fn_AppendFakeID.DID fucntion
 		// -- Preping the (Business and Contact)Addresses for AID call
 		//////////////////////////////////////////////////////////////////////////////////////
+		//*** CleanPersonLFM73_fields Name cleaner is flipping some names and messing up the names. so, only using the name clear title and suffix values if exists
 		tempCleanName												:= Address.CleanPersonLFM73_fields(ut.CleanSpacesAndUpper(l.contact_lname+' '+l.contact_fname+' '+l.contact_mname));
 		tfname															:= tempCleanName.fname;
 		tlname															:= tempCleanName.lname;
+		tsuffix															:= tempCleanName.name_suffix;
 
 		self.title		        					 		:= if(trim(l.cust_name) = '', l.contact_title, tempCleanName.title);
-		self.fname	           						 	:= if(trim(l.cust_name) = '', l.contact_fname, tfname);
-		self.mname	            						:= if(trim(l.cust_name) = '', l.contact_mname, tempCleanName.mname);
-		self.lname		       					  		:= if(trim(l.cust_name) = '', l.contact_lname, tlname);
-		self.name_suffix	     						 	:= if(trim(l.cust_name) = '', l.contact_suffix, tempCleanName.name_suffix);
+		self.fname	           						 	:= if(trim(l.cust_name) = '', l.contact_fname, if(trim(tsuffix) <> '', regexreplace(trim(tsuffix), l.contact_fname,'',nocase), l.contact_fname));
+		self.mname	            						:= if(trim(l.cust_name) = '', l.contact_mname, l.contact_mname);
+		self.lname		       					  		:= if(trim(l.cust_name) = '', l.contact_lname, l.contact_lname);
+		self.name_suffix	     						 	:= if(trim(l.cust_name) = '', l.contact_suffix, if(trim(tsuffix) <> '',tsuffix, l.contact_suffix));
 		self.name_score	       						 	:= if(trim(l.cust_name) = '', '0', tempCleanName.name_score);
 		self.contact_title							    := ut.CleanSpacesAndUpper(l.contact_title);
 		self.contact_score							    := trim(l.contact_score);
@@ -149,6 +151,7 @@ function
 	//*** Appending cleaned contact address fields in this join
 	Layouts.Out.Layout_BC_out MapClnContAddr(dBC_w_Uniq_id l, dWithAID r) := transform
 		self.contact_rawaid              				:= r.AIDWork_RawAID;
+		self.contact_aceaid              				:= r.AIDWork_ACECache.aid;
 		self.contact_clean_addr.prim_range     	:= r.AIDWork_ACECache.prim_range;
 		self.contact_clean_addr.predir         	:= r.AIDWork_ACECache.predir;
 		self.contact_clean_addr.prim_name				:= r.AIDWork_ACECache.prim_name;

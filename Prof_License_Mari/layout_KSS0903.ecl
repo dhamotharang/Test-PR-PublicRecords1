@@ -13,7 +13,7 @@ EXPORT raw := RECORD
 	string	EXPIRATION_DATE;		//fmt: YYYYMMDD, MM/DD/YYYY
 	string	SUM_OF_HOURS;
 	string	LICENSE_STATUS;
-	// string	STATUS_CODE;
+	string	STATUS_CODE;
 	string	COMPANY_LICENSE_NUMBER;	
 	string	COMPANY_NAME;		
 	string	BUSINESS_PHONE;

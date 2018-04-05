@@ -1,4 +1,4 @@
-export sCourt_Vendors_With_Traffic_Based_Upon_Off_Lev 	:= [
+﻿export sCourt_Vendors_With_Traffic_Based_Upon_Off_Lev 	:= [
                           '1U',//	OK_CLEVELAND_CRIM_CO
 											'2D',//	OK_ROGERS_CRIM_COURT
 											'2E',//	OK_TULSA_CRIM_COURT 
@@ -265,21 +265,21 @@ export sCourt_Vendors_With_Traffic_Based_Upon_Off_Lev 	:= [
     	                '2Z', //  OH NOBLE CRIM CT
 											'ZC', //SC_ABBEVILLE_CTY_CRC	
 											'TU',//	CA_SACRAMENTO_CTY_SC
-											'5W',//	OKLAHOMA_DISTRICT_COURTS_HISTORY_FILEÂ & OKLAHOMA_DISTRICT_COURTS
+											'5W',//	OKLAHOMA_DISTRICT_COURTS_HISTORY_FILE & OKLAHOMA_DISTRICT_COURTS
 											'B1',//	SC_NEWBERRY_CTY_CRC 
 											'5A',// SC_NEWBERRY_CTY_SC  
-											'5B',//	SC_OCONEE_CTY_CRCÂ 
+											'5B',//	SC_OCONEE_CTY_CRC 
 											'5C',// SC_OCONEE_CTY_SC   
 											'5D',//	SC_ORANGEBURG_CTY_CC
 											'5J',// SC_SALUDA_CTY_SC    
-											// '5G',//	SC_PICKENS_CTY_SCÂ Â  
-											'5H',//	SC_RICHLAND_CTY_SCÂ  
+											// '5G',//	SC_PICKENS_CTY_SC   
+											'5H',//	SC_RICHLAND_CTY_SC  
 											'5L',//	SC_SPARTANBRG_CTY_SC
-											'5P',//	SC_WILLIAMSBRG_SCÂ Â  
-											'5Q',//	TN_DAVIDSON_CTYÂ Â Â Â  
-											'5X',//	TX_FRANKLIN_CTYÂ Â Â 
+											'5P',//	SC_WILLIAMSBRG_SC   
+											'5Q',//	TN_DAVIDSON_CTY     
+											'5X',//	TX_FRANKLIN_CTY   
 											'5Y',// TEXAS_GALVESTON_COUNTY
-											'6E',//	TX_SMITH_CTYÂ Â Â Â Â Â Â  
+											'6E',//	TX_SMITH_CTY        
                       '6J',//	OH_PREBLE_EATON_MC  
 											'6O',// OHIO_CLARK_MUNICIPAL_COURT
 											'6N',// OHIO_GEAUGA_COUNTY_CHARDON_MUNICIPAL_COURT_WEB
@@ -307,7 +307,8 @@ export sCourt_Vendors_With_Traffic_Based_Upon_Off_Lev 	:= [
                       '9L',// FLORIDA_ST_LUCIE_COUNTY_CIRCUIT_COURT       
                       '9N',// OHIO_DARKE_COUNTY_MUNICIPAL_COURT   
 											'9W',// TX_KAUFMAN_CTY      
-
+           '10B',//TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT
+           '10C', //TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC
 											//'98'  //TX_Waller_Cty_CrmCrt
 											
 										  // CRIMWISE Sources 
@@ -317,7 +318,38 @@ export sCourt_Vendors_With_Traffic_Based_Upon_Off_Lev 	:= [
 											'W0037',//OHIO_WOOD_COUNTY_PERRYSBURG_MUNICIPAL_COURT_CW
    										'W0038',//TEXAS_HOCKLEY_COUNTY_CW                       
                       'W0156',//CALIFORNIA_SISKIYOU_COUNTY_CW    
-											'W0253'//FL_ESCAMBIA_CTY     
+											'W0253',//FL_ESCAMBIA_CTY,
+											'W0271',
+											'W0272',
+											'W0273',
+											'W0274',
+											'W0275',
+											'W0277',
+											'W0278',
+											'W0279',
+        	            'W0280',
+											'W0281',
+											'W0282',
+											'W0283',
+											'W0284',
+											'W0285',
+											'W0286',
+											'W0287',
+											'W0288',
+											'W0289',
+							        'W0292',
+											'W0294',
+											'W0295',
+											'W0296',
+											'W0297',
+											'W0298',
+											'W0299',
+											'W0301',
+											'W0302',
+											'W0304',
+							        'W0306',
+											'W0307',
+											'W0309'
 											];
 										
                                                         

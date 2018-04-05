@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_GA_Main
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -22,13 +22,14 @@ FIELDTYPE:invalid_forgn_dom_code:ENUM(D|F| )
 FIELDTYPE:invalid_flag_code:ENUM(N|Y| )
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789):LENGTHS(1..)
-FIELDTYPE:invalid_charter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(1..)
+FIELDTYPE:invalid_charter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-):LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(0..8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_future_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
 FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(5,9)
 FIELDTYPE:invalid_phone:ALLOW(0123456789-):LENGTHS(0..12):SPACES( )
 FIELDTYPE:invalid_recordorigin:ENUM(C|T|)
 FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_characters:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ/-())
 FIELDTYPE:invalid_State_Desc:ALLOW( &ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 
 DATEFIELD:dt_vendor_first_reported:TYPE(STRING8):LIKE(invalid_date):0,0
@@ -99,7 +100,7 @@ FIELD:corp_forgn_term_exist_cd:TYPE(STRING8):0,0
 FIELD:corp_forgn_term_exist_exp:TYPE(STRING8):0,0
 FIELD:corp_forgn_term_exist_desc:TYPE(STRING60):0,0
 FIELD:corp_orig_org_structure_cd:TYPE(STRING8):0,0
-FIELD:corp_orig_org_structure_desc:TYPE(STRING60):0,0
+FIELD:corp_orig_org_structure_desc:TYPE(STRING60):LIKE(invalid_characters):0,0
 FIELD:corp_for_profit_ind:TYPE(STRING1):LIKE(invalid_flag_code):0,0
 FIELD:corp_public_or_private_ind:TYPE(STRING1):0,0
 FIELD:corp_sic_code:TYPE(STRING8):0,0
