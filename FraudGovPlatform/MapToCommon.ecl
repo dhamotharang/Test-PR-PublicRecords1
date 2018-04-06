@@ -40,8 +40,13 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;
+<<<<<<< HEAD
 		self.Household_ID := (unsigned8) left.Case_ID;
 		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+=======
+		self.Household_ID := (unsigned8)left.Case_ID;
+		self.Customer_Person_ID := (unsigned6)left.Client_ID;
+>>>>>>> bbad0afcb6a248b464808439266eab060ce17b8a
 		self:= left; 
 		self:= [];
 	)); 
@@ -65,8 +70,13 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;		
+<<<<<<< HEAD
 		self.Household_ID := (unsigned8) left.Case_ID;
 		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+=======
+		self.Household_ID := (unsigned8)left.Case_ID;
+		self.Customer_Person_ID := (unsigned6)left.Client_ID;
+>>>>>>> bbad0afcb6a248b464808439266eab060ce17b8a
 		self:= left; 
 		self:= [];
 	)); 

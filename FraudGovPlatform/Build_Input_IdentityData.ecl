@@ -1,12 +1,15 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
 EXPORT Build_Input_IdentityData(
-	 string		pversion
+	 string			pversion
 	,boolean		PSkipIdentityData	= false 
 	,boolean		PSkipNAC				= false	 
 	,boolean		PSkipDeltabase		= false	 
 	,boolean		PSkipInquiryLogs	= false	 
 ) :=
 module
+
+
+	
 
 	SHARED fn_dedup(inputs):=FUNCTIONMACRO
 		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
@@ -29,7 +32,7 @@ module
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)
-											+ if (PSkipInquiryLogs = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipInquiryLogs = false, 
 													Build_Prepped_InquiryLogs(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											);
@@ -50,10 +53,16 @@ module
 		self.ProcessDate := (unsigned)pversion;
 		self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
 		self.FileTime := FileTime;
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));  
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));;
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
+		address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
+		address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
+		self.address_1 := address_1;
+		self.address_2 := address_2;
+		self.address_id := hash64(address_1 + address_2);
+		mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1) + ' ' + trim(l.Mailing_Street_2));
+		mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));
+		self.mailing_address_1 := mailing_address_1;
+		self.mailing_address_2 := mailing_address_2;
+		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
 		self.sequence := C;
@@ -94,7 +103,11 @@ module
 																							left.sequence = right.sequence,
 																							TRANSFORM(iddt,SELF := LEFT),
 																							left only);
+
+	new_addresses := Functions.New_Addresses(f1_dedup);
+	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_IDDT.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
 																							
+<<<<<<< HEAD
 	dAppendAID   := Standardize_Entity.Clean_Address(f1_dedup,pversion);// : persist(Persistnames.AppendAID);
 	dappendName		:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
@@ -103,6 +116,16 @@ module
 	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dAppendLexid,Layouts.Input.IdentityData));
 	
 	Build_Input_File :=  OUTPUT(new_file,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+=======
+	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, Files(pversion).Input.AddressCache_IDDT.New(pversion));
+	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
+	dAppendPhone	:= Standardize_Entity.Clean_Phone (dappendName);
+	dAppendLexid	:= Standardize_Entity.Append_Lexid (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
+	
+	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
+	Build_Input_File := OUTPUT(new_file,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+>>>>>>> bbad0afcb6a248b464808439266eab060ce17b8a
 
 	Promote_Input_File := 
 		sequential(
@@ -131,17 +154,25 @@ module
 				 Filenames().Input.ByPassed_IdentityData.Sprayed
 				,Filenames().Input.ByPassed_IdentityData.New(pversion)
 			)
-			//Clear Individual Sprayed Files
-			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed, TRUE)
-			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected, TRUE)
-			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed, TRUE)
-			// ,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected, TRUE)		
+			 //Promote AddressCache
+			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Used, TRUE)
+			,STD.File.AddSuperfile(
+				 Filenames().Input.AddressCache_IDDT.Sprayed
+				,Filenames().Input.AddressCache_IDDT.Used
+				,addcontents := true
+			)
+			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Sprayed)
+			,STD.File.AddSuperfile(
+				 Filenames().Input.AddressCache_IDDT.Sprayed
+				,Filenames().Input.AddressCache_IDDT.New(pversion)
+			)
 			,STD.File.FinishSuperFileTransaction()	
 		);
 // Return
 	export build_prepped := 
 			 sequential(
-				 Build_Input_File
+				 Build_Address_Cache
+				,Build_Input_File
 				,Build_Bypass_Records 
 				,Promote_Input_File
 		);

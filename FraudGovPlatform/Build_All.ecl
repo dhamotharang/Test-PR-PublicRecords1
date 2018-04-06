@@ -8,6 +8,8 @@ export Build_All(
 	// All sources are not updated each build if no updates to particular source skip that source base 
   ,boolean                                     	PSkipIdentityDataBase					= false 
   ,boolean                                     	PSkipKnownFraudBase           	= false 
+  ,boolean                                     	PSkipAddressCache           		= false 
+  ,boolean                                     	PSkipMainBase           				= false 
  	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile								=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile					=	IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile						=	IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
@@ -32,6 +34,8 @@ module
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
+				,PSkipAddressCache
+				,PSkipMainBase
 				//Base
 				,pBaseMainFile	
 				//IdentityData
