@@ -108,7 +108,7 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	
 	
 	SuperFile				:='~thor_data400::Scrubs_FraudGov::Log';
-	Super_Log_File		:='~thor_data400::Scrubs_FraudGov::FraudGov::Log';
+	Super_Log_File	:='~thor_data400::Scrubs_FraudGov::FraudGov::Log';
 	SuperFile_Entries	:=	dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
 	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull_'+filedate)),
@@ -122,9 +122,9 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	publish:=sequential(
 										Create_New_File,
 										nothor(global(sequential(fileservices.deleteLogicalFile(Super_Log_File),
-										fileservices.renameLogicalFile(Super_Log_File+'_temp',Super_Log_File+'_'+scopename),
+										fileservices.renameLogicalFile(Super_Log_File+'_temp',Super_Log_File),
 										STD.File.StartSuperFileTransaction(),
-										STD.File.AddSuperFile(SuperFile,Super_Log_File+'_'+scopename),
+										STD.File.AddSuperFile(SuperFile,Super_Log_File),
 										STD.File.FinishSuperFileTransaction()))));
 
 	return SEQUENTIAL(
