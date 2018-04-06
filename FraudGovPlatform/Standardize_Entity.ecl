@@ -252,4 +252,21 @@ FUNCTIONMACRO
 	
 ENDMACRO;
 
+EXPORT Clean_InputFields(pInputFile) := 
+FUNCTIONMACRO
+	import std;
+	pInputFile tr(pInputFile l) := TRANSFORM
+		SELF.clean_ssn				:= If(regexfind('^[0-9]*$',STD.Str.CleanSpaces(l.ssn)),STD.Str.CleanSpaces(l.ssn),'');
+		SELF.clean_Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
+		SELF.clean_Zip				:= If(regexfind('^[0-9]*$',STD.Str.CleanSpaces(regexreplace('-',l.zip,''))),if(length(STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) in [5,9],l.zip,''),'');		
+		SELF:=l;
+		SELF:=[];
+	END;
+
+	Cleaned_InputFields := project(pInputFile,tr(left));
+
+  RETURN Cleaned_InputFields;
+	
+ENDMACRO;
+
 END; 

@@ -32,7 +32,7 @@ module
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipInquiryLogs = false, 
+											+ if (PSkipInquiryLogs = false, 
 													Build_Prepped_InquiryLogs(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											);
@@ -111,8 +111,9 @@ module
 	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone	:= Standardize_Entity.Clean_Phone (dappendName);
 	dAppendLexid	:= Standardize_Entity.Append_Lexid (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dAppendLexid,Layouts.Input.IdentityData));
+	new_file := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
 	Build_Input_File := OUTPUT(new_file,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
 	Promote_Input_File := 
