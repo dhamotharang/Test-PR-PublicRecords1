@@ -298,9 +298,6 @@ EXPORT Layouts := MODULE
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;	
 			clean_phones										clean_phones;
-			string9			clean_SSN;
-			string9			clean_Zip;
-			string25		clean_IP_Address;
 			unsigned6 	did ; 
 			unsigned1		did_score;				
 			Provenance;
@@ -318,9 +315,6 @@ EXPORT Layouts := MODULE
 			string50		mailing_address_2 := '';				
 			Address.Layout_Clean182_fips			additional_address;
 			clean_phones										clean_phones;
-			string10		clean_SSN;
-			string10		clean_Zip;
-			string25		clean_IP_Address;
 			unsigned6 	did ; 
 			unsigned1		did_score;				
 			Provenance;
@@ -341,9 +335,6 @@ EXPORT Layouts := MODULE
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;	
 			clean_phones										clean_phones;
-			string9			clean_SSN;
-			string9			clean_Zip;
-			string25		clean_IP_Address;
 			unsigned6		did ; 
 			unsigned1		did_score;		
 			string			current ; 
@@ -370,9 +361,6 @@ EXPORT Layouts := MODULE
 			string50          	mailing_address_2 := '';				
 			Address.Layout_Clean182_fips		additional_address;
 			clean_phones									clean_phones;
-			string10		clean_SSN;
-			string10		clean_Zip;
-			string25		clean_IP_Address;
 			unsigned6		did ; 
 			unsigned1		did_score;			
 			string			current ; 

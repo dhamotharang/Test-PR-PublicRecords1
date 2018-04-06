@@ -26,7 +26,6 @@ module
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACRejected, TRUE)
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed, TRUE)
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._KnownFraudRejected, TRUE)
-			,Scrubs_FraudGov.BuildSCRUBSReport(pversion) 
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Input atribute')
 	 );
