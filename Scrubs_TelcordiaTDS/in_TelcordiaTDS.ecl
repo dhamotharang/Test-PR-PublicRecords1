@@ -1,2 +1,4 @@
-﻿import Risk_Indicators;
-EXPORT in_TelcordiaTDS := Risk_Indicators.File_Telcordia_tds;
+﻿import Risk_Indicators,ut;
+
+ut.CleanFields(Risk_Indicators.File_Telcordia_tds,loadfile);
+EXPORT in_TelcordiaTDS := loadfile;

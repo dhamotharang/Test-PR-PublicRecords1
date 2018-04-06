@@ -295,21 +295,5 @@ functionmacro
 	
 endmacro;
 
-export Clean_InputFields(pInputFile) := 
-functionmacro
-	import std;
-	pInputFile tr(pInputFile l) := transform
-		self.clean_ssn				:= If(regexfind('^[0-9]*$',STD.Str.CleanSpaces(l.ssn)),STD.Str.CleanSpaces(l.ssn),'');
-		Self.clean_Ip_address := If(Count(Std.Str.SplitWords(l.ip_address,'.')) =4,l.ip_address,''); 
-		SELF.clean_Zip				:= If(regexfind('^[0-9]*$',STD.Str.CleanSpaces(regexreplace('-',l.zip,''))),if(length(STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) in [5,9],l.zip,''),'');		
-		self:=l;
-		self:=[];
-	end;
-
-	Cleaned_InputFields := project(pInputFile,tr(left));
-
-  return Cleaned_InputFields;
-	
-endmacro;
 
 end; 
