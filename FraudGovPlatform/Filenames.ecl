@@ -8,6 +8,8 @@ export Filenames(
 ) :=
 module
 
+	export Address_Cache := _Dataset().thor_cluster_Files +'in::'+_Dataset().Name+'::AddressCache';
+
 	//////////////////////////////////////////////////////////////////
 	// -- Sprayed Filename Versions
 	//////////////////////////////////////////////////////////////////
@@ -44,23 +46,17 @@ module
 	
 		shared Template(string tag) := _Dataset(pUseOtherEnvironment).InputTemplate + tag;
 		
-		export IdentityData                  			:= tools.mod_FilenamesInput(Template('IdentityData'),pversion);
-		export KnownFraud                  			:= tools.mod_FilenamesInput(Template('KnownFraud'),pversion);
+		export IdentityData                  					:= tools.mod_FilenamesInput(Template('IdentityData'),pversion);
+		export KnownFraud                  				 	:= tools.mod_FilenamesInput(Template('KnownFraud'),pversion);
 		
-		export ByPassed_IdentityData						:= tools.mod_FilenamesInput(Template('ByPassed_IdentityData'),pversion);
-		export ByPassed_KnownFraud							:= tools.mod_FilenamesInput(Template('ByPassed_KnownFraud'),pversion);
-		
-		export AddressCache_IDDT								:= tools.mod_FilenamesInput(Template('AddressCache_IDDT'),pversion);
-		export AddressCache_KNFD								:= tools.mod_FilenamesInput(Template('AddressCache_KNFD'),pversion);
+		export ByPassed_IdentityData								:= tools.mod_FilenamesInput(Template('ByPassed_IdentityData'),pversion);
+		export ByPassed_KnownFraud									:= tools.mod_FilenamesInput(Template('ByPassed_KnownFraud'),pversion);
 		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
 			ByPassed_IdentityData.dAll_filenames +
-			ByPassed_KnownFraud.dAll_filenames + 
-			AddressCache_IDDT.dAll_filenames + 
-			AddressCache_KNFD.dAll_filenames;
-			
+			ByPassed_KnownFraud.dAll_filenames;
 	end;
 	
 	//////////////////////////////////////////////////////////////////
@@ -69,15 +65,11 @@ module
 	export Base := module
 	
 		shared Template(string tag) := _Dataset(pUseOtherEnvironment).FileTemplate + tag;
-
-		export IdentityData := tools.mod_FilenamesBuild(Template('IdentityData'),pversion);
-		export KnownFraud 	:= tools.mod_FilenamesBuild(Template('KnownFraud'),pversion);
-		export AddressCache	:= tools.mod_FilenamesBuild(Template('AddressCache'),pversion);
-
+		export IdentityData := tools.mod_FilenamesBuild(Template('IdentityData' ),pversion);
+		export KnownFraud := tools.mod_FilenamesBuild(Template('KnownFraud' ),pversion);
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
-			KnownFraud.dAll_filenames +
-			AddressCache.dAll_filenames; 
+			KnownFraud.dAll_filenames;
 	
 	end;
 	
