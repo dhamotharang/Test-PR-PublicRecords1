@@ -9,9 +9,9 @@ export Standardize_Addr := module
 			// -- Prepare Addresses for Cleaning using macro
 			//////////////////////////////////////////////////////////////////////////////////////
 			addr1 																 :=	ut.CleanSpacesAndUpper(l.Inspected_Site_Street);					       
-			addr2 																 :=	ut.CleanSpacesAndUpper(l.Inspected_Site_City_Name +
-																																			 if (trim(l.Inspected_Site_City_Name) <> '',', ','')+ 
-																																			 l.Inspected_Site_State + ' ' + l.Inspected_Site_Zip
+			addr2 																 :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(l.Inspected_Site_City_Name) +
+																																			 if (trim(l.Inspected_Site_City_Name,all) <> '',', ','')+ 
+																																			 ut.CleanSpacesAndUpper(l.Inspected_Site_State) + ' ' + intformat(l.Inspected_Site_Zip,5,1)
 																																			 ); 
 			//////////////////////////////////////////////////////////////////////////////////////
 			// -- Map Fields
