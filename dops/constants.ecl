@@ -1,4 +1,4 @@
-import STD,lib_thorlib;
+﻿import STD,lib_thorlib;
 export constants := module
 	
 	
@@ -41,7 +41,7 @@ export constants := module
 								, string environment = '') := if (environment in healthcareset // Health care
 																							,if (dopsenv = 'prod'
 																								,'http://'+ gethost(environment) +'/webservices/demodopsservice.asmx'
-																								,'http://10.176.142.139:83/webservices/demodopsservice.asmx')
+																								,'http://devhcdops.risk.lexisnexis.com/webservices/demodopsservice.asmx')
 																							,if (dopsenv = 'prod'
 																								,'http://'+ gethost(environment) +'/demodopsservice.asmx'
 																								,'http://10.176.142.139:81/demodopsservice.asmx')
