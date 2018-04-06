@@ -208,9 +208,9 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 
 	SeRs_PreProc_Patterns_Applied := Models.Healthcare_SocioEconomic_Transforms_V3.SeRs_Preprocessing_and_Patterns_M0_M1(Combined_LI_PB_Prep_Pre_Proc,Models.Layouts_Healthcare_V3.layout_SocioEconomic_LI_PB_flat_typed);
 		   
-	SeRs_PreProc_Patterns_Filtered := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =0 and isSeRsMinor =0);
+	SeRs_PreProc_Patterns_Filtered := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =0 and isSeRsMinor =0 and ADMIT_DATE <>'');
 		
-	SeRs_PreProc_Patterns_Excluded := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =1 or isSeRsMinor =1);
+	SeRs_PreProc_Patterns_Excluded := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =1 or isSeRsMinor =1 or ADMIT_DATE ='');
 	
  SeRs_PreProc_Patterns_Filtered_Validated := join(SeRs_PreProc_Patterns_Filtered,icdkey.key().ref_icd10_diag_key.qa,
 																																																	keyed(STD.Str.ToUpperCase(std.Str.FilterOut(left.admit_diagnosis_code, '.')) = right.diag_cd),
@@ -235,12 +235,14 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
  //TODO
  	M0_SeRs_Prediction_Post_Proc := Join(M0_SeRs_PreProc_Patterns_Filtered_Validated_Mapped, M0_SeRs_LUCI_results_base, left.seq=(integer)right.TransactionID, transform(Models.Layouts_Healthcare_V3.layout_SocioEconomic_LI_PB_flat_typed,
 		self.SeRs_Raw_Score := (string) right.score;
-		self.SeRs_Score := (string) (TRUNCATE((real8)right.score*10000)/100);
+		DECIMAL5_2 vScore :=  TRUNCATE((real8)right.score*10000)/100;
+		self.SeRs_Score := (string) vScore;
 		self.seq := (integer)right.TransactionID;
 		self := left;),left outer, keep(1000), atmost(1));
 	M1_SeRs_Prediction_Post_Proc := Join(M1_Xwalked, M1_SeRs_LUCI_results_base, left.seq=(integer)right.TransactionID, transform(Models.Layouts_Healthcare_V3.layout_SocioEconomic_LI_PB_flat_typed,
 		self.SeRs_Raw_Score := (string) right.score;
-		self.SeRs_Score := (string) (TRUNCATE((real8)right.score*10000)/100);
+		DECIMAL5_2 vScore := TRUNCATE((real8)right.score*10000)/100;
+		self.SeRs_Score := (string) vScore;
 		self.seq := (integer)right.TransactionID;
 		self := left;),left outer, keep(1000), atmost(1));
 

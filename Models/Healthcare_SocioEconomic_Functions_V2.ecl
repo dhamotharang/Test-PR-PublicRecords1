@@ -104,6 +104,9 @@ EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 								clnState = 'RN' => 54,
 								clnState = 'RR' => 55,
 								clnState = 'EE' => 56,
+								clnState = 'AA' => 53,
+								clnState = 'AE' => 53,
+								clnState = 'AP' => 53,
 								0);
 	end;
 	export crosswalkAddrRecentEconTrajectory(String inVal) := function
@@ -164,7 +167,6 @@ EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 		return map(clnVal = 'CASE DISMISSED' => 1,
 								clnVal = 'DISCHARGE GRANTED' => 2,
 								clnVal = 'DISCHARGE NA' => 3,
-								clnVal = 'DISCHARGE GRANTED' => 4,
 								clnVal = 'DISCHARGED' => 5,
 								clnVal = 'DISMISSED' => 6,
 								clnVal = 'TERMINATED' => 7,
@@ -301,6 +303,9 @@ EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 								clnState = 'RN' => 54,
 								clnState = 'RR' => 55,
 								clnState = 'EE' => 56,
+								clnState = 'AA' => 53,
+								clnState = 'AE' => 53,
+								clnState = 'AP' => 53,
 								0);
 	end;
 	export CrosswalkStatusMostRecent(String inVal) := function
