@@ -1,1 +1,0 @@
-buildindex(_Certification.IndexFile,overwrite);

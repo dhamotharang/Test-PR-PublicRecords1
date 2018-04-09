@@ -1,13 +1,7 @@
-IMPORT PRTE2_DOC;
+﻿IMPORT PRTE2_DOC;
 
 EXPORT proc_build_all(string filedate) := FUNCTION
-
-	build_base_file	:=	PRTE2_DOC.proc_build_base(filedate);
-
-	build_keys :=	PRTE2_DOC.proc_build_keys(filedate);
-
-	return_val := 	sequential(	build_base_file, build_keys) ;
-
-	return return_val;
+	do_all := 	sequential(fspray,	proc_build_base(filedate), proc_build_keys(filedate));
+	return do_all;
 
 END;
