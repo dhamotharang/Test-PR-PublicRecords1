@@ -5,7 +5,8 @@ EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In,
 																						string50 DataRestrictionMask,
 																						string50 DataPermissionMask,
 																						string8 AttributesVersion, 
-																						boolean onThor=false) := FUNCTION
+																						boolean onThor=false,
+                                            boolean domodel=false) := FUNCTION
 
 	isFCRA 			:= false;
 	GLBA 				:= 0;
@@ -1360,6 +1361,7 @@ prop_common_distr := distribute(prop_common, did);
 	withHHIncome := ProfileBooster.HHestimatedIncome(withIncome); //for production
 	
 	withBankingExperiance := ProfileBooster.getBankingExperiance (withHHIncome);
+  withCustomModel := ProfileBooster.PMB1803_1_0_score (withBankingExperiance,iid_prep );
 	
 	
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
@@ -1437,7 +1439,8 @@ prop_common_distr := distribute(prop_common, did);
 	// output( withBankingExperiance, named('withBankingExperiance'));
 /* ********************/
 
-return withBankingExperiance;	
+//return withBankingExperiance;	
+RETURN withCustomModel;
 
 
 END;

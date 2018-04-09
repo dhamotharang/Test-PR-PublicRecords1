@@ -24,8 +24,8 @@ EXPORT Batch_Service() := FUNCTION
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
 																	self := left ) );
-
-  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest);  
+  domodel := True;
+  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, false, domodel);  
 
 
 
@@ -217,7 +217,7 @@ EXPORT Batch_Service() := FUNCTION
 		self.v1_PPCurrOwnedAutoModel				:= le.attributes.version1.PPCurrOwnedAutoModel;
 		self.v1_PPCurrOwnedAutoSeries				:= le.attributes.version1.PPCurrOwnedAutoSeries;
 		self.v1_PPCurrOwnedAutoType				:= le.attributes.version1.PPCurrOwnedAutoType;
-		
+		self.score1                                   := le.attributes.version1.score1;
 		self := le;
 	end;	
 	
