@@ -1,4 +1,4 @@
-export Constants := module
+﻿export Constants := module
 	
 	export 	LIMIT_DIDS_PER_SEQ	:= 3000;
 	export 	MAX_RES_PER_SEQ			:= 100;
@@ -8,7 +8,7 @@ export Constants := module
     export integer NOFAIL := 1;
     export integer ALLOW_WILDCARD := 2; // TODO: add to the library input layout before full recompile
     export integer PRESERVE_SEQUENCE := 4; // TODO: add to the library input layout before full recompile
-		export integer CURRENT_RESIDENTS := 8;
+			export integer CURRENT_RESIDENTS := 8;		
   end;
 	
 	export SearchCodeDescription := module
@@ -50,7 +50,8 @@ export Constants := module
     export unsigned W_STNAMESMALL := 1<<27;        //AutoHeaderI.FetchI_Hdr_Indv_Wild_StNameSmall
     export unsigned W_STREET      := 1<<28;        //AutoHeaderI.FetchI_Hdr_Indv_Wild_Street
     export unsigned W_ZIP         := 1<<29;        //AutoHeaderI.FetchI_Hdr_Indv_Wild_Zip
-
+		export unsigned SALT				  := 1<<31;				 //AutoHeaderV2.fetch_SALT
+		
 		export unsigned SSN_TRANSPOSITION := 1<<30;    // transposition of adjacent digits in SSN
 
     export unsigned HH           :=  2048; // household
@@ -176,6 +177,11 @@ export Constants := module
 	end;
 
   export string RemoteSearchServiceName := 'AutoheaderV2.LexIDSearchService';
-  export string SearchLibraryName := 'AutoheaderV2.LIB_header';
-	
+  export string SearchLibraryName := 'AutoheaderV2.LIB_header';	
+		export string SearchSALTLibraryName := 'AutoheaderV2.LIB_header_SALTPlus';	
+		
+		EXPORT LibVersion := module
+			EXPORT integer LEGACY := 0;
+			EXPORT integer SALT := 1;
+		END;
 end;
