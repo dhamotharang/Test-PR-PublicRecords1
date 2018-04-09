@@ -14,7 +14,6 @@ Layouts.Common_v2 	encImg2(files.Images_base_reformat l):= transform
 	ds_crim_reform := project(files.Images_base_reformat, encImg2(left));
 	
 
-	// PromoteSupers.Mac_SF_BuildProcess(ds_crim_reform, Constants.base_prefix_name_v2+'matrix_images_base',do_build,2,,true);
 	RoxieKeyBuild.Mac_SF_BuildProcess(ds_crim_reform,Constants.base_prefix_name_v2+'matrix_images',Constants.base_prefix_name_v2+filedate+'::matrix_images_base', do_build, 2);
 	return do_build;
 	

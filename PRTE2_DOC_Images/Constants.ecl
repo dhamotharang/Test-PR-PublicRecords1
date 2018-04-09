@@ -14,10 +14,3 @@
 		EXPORT SuperKeyName_v2 			:= keyname_v2+'@version@::';		
 		
 		end;
-		
-		
-		// prte::criminal_images::base::criminal::20140210::matrix_images_base
-		// prte::criminal_images::key::criminal::20140210::matrix_images_did
-		// prte::criminal_images::base::criminal::20140210::matrix_images_base
-		
-		
