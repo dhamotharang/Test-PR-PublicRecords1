@@ -2,8 +2,8 @@
 
 export Proc_Build_Keys (string filedate) := function
 
- pre 			:= promotesupers.SF_MaintBuilding(Constants.base_prefix_name    + 'Matrix_Images_base');
-	pre_v2 := promotesupers.SF_MaintBuilding(Constants.base_prefix_name_v2 + 'Matrix_Images_base');
+ pre 			:= promotesupers.SF_MaintBuilding(Constants.base_prefix_name    + 'Matrix_Images');
+	pre_v2 := promotesupers.SF_MaintBuilding(Constants.base_prefix_name_v2 + 'Matrix_Images');
 
 	// Build keys
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Keys.DID, 			Constants.keyname +'Matrix_Images_did',	Constants.keyname +filedate+ '::matrix_images_did',	images_did);
@@ -22,8 +22,8 @@ export Proc_Build_Keys (string filedate) := function
 
 	Move_keys	:=	parallel(	mv_images_did, mv_images_data, mv_images_did2, mv_images_data2);
 
- post				:= promotesupers.SF_MaintBuilt(Constants.base_prefix_name     + 'Matrix_Images_base');
-	post_v2 := promotesupers.SF_MaintBuilt(Constants.base_prefix_name_v2  + 'Matrix_Images_base');
+ post				:= promotesupers.SF_MaintBuilt(Constants.base_prefix_name     + 'Matrix_Images');
+	post_v2 := promotesupers.SF_MaintBuilt(Constants.base_prefix_name_v2  + 'Matrix_Images');
 
  // Move keys to QA superfile
 	RoxieKeyBuild.MAC_SK_Move_V2(Constants.SuperKeyName+'Matrix_Images_did',										'Q',qa_images_did,2);
