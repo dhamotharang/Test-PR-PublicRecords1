@@ -38,7 +38,6 @@ IMG_CommonInfo := project(Files.offender_base, slimFile(left));
 																								trim(STD.Str.ToUpperCase(LEFT.filename))	= trim(RIGHT.filename),
 																								getspk(LEFT,RIGHT));
 
-	// PromoteSupers.Mac_SF_BuildProcess(jMatrixImaages,Constants.base_prefix_name+'matrix_images_base',do_build,2,,,filedate);
 	RoxieKeyBuild.Mac_SF_BuildProcess(jMatrixImaages,Constants.base_prefix_name+'matrix_images',Constants.base_prefix_name+filedate+'::matrix_images_base', do_build, 2);
 	
 	return do_build;
