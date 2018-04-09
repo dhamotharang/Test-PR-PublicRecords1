@@ -338,14 +338,20 @@ outf := business_risk.InstantID_Function(df2, gateways, if (bdid = '', false, tr
 							dob_radius_use,IsPOBoxCompliant,bsVersion,exactMatchLevel, DataRestriction, 
 							IncludeMSoverride, IncludeDLverification, watchlists_request, AppendBest, IncludeRepAttributes, IncludeAllRC,
 							DataPermission);
-
 				
-ret_btest_seed := business_risk.InstantID_Test_Function(Test_Data_Table_Name,rep_fname,rep_lname,FEIN,zip,busphone,company_name, seqnum);
+ret_btest_seed_pre := business_risk.InstantID_Test_Function(Test_Data_Table_Name,rep_fname,rep_lname,FEIN,zip,busphone,company_name, seqnum);
 
 r := RECORD
 	business_risk.Layout_Final_Denorm;
 	DATASET(Models.Layout_Model) models;
+  unsigned2 royalty_type_code_targus;
+  string20  royalty_type_targus; 			
+  unsigned2 royalty_count_targus; 			 
+  unsigned2 non_royalty_count_targus;  
+  string20  count_entity_targus;
 end;
+
+ret_btest_seed := PROJECT( ret_btest_seed_pre, TRANSFORM( r, SELF := LEFT, SELF := [] ) );
 
 r into_final(outf L) := transform
 
@@ -642,8 +648,18 @@ rep_input := PROJECT(df,into_rep(LEFT));
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
 
-bido := business_risk.BIDO_Function(tribcode, test_data_enabled, addr, city, state, zip,
-									outf, rep_input, gateways, dppa, glb, ofac_only,
+// To avoid running risk_indicators.InstantID_Function( ) unnecessarily in business_risk.BIDO_Function
+// --which has caused performance issues--blank out the search criteria unless tribcode = '2x42'.
+addr_bido      := IF( tribcode = '2x42', addr, '' );
+city_bido      := IF( tribcode = '2x42', city, '' );
+state_bido     := IF( tribcode = '2x42', state, '' );
+zip_bido       := IF( tribcode = '2x42', zip, '' );
+outf_bido      := IF( tribcode = '2x42', outf, DATASET( [], business_risk.Layout_Output) );
+rep_input_bido := IF( tribcode = '2x42', rep_input, DATASET( [], risk_indicators.Layout_Input) );
+gateways_bido  := IF( tribcode = '2x42', gateways, DATASET( [], Gateway.Layouts.Config ) );
+
+bido := business_risk.BIDO_Function(tribcode, test_data_enabled, addr_bido, city_bido, state_bido, zip_bido,
+									outf_bido, rep_input_bido, gateways_bido, dppa, glb, ofac_only,
 									ExcludeWatchlists, ofac_version, include_ofac, include_additional_watchlists,
 									global_watchlist_threshold, dob_radius_use,bsVersion,
 									exactMatchLevel:=exactMatchLevel, 
@@ -664,8 +680,6 @@ r mask_dobs(r le) := transform
 	self.rep_deceasedDOB := risk_indicators.iid_constants.mask_dob(le.rep_deceasedDOB, dob_mask_value);
 	self := le;
 end;
-
-dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
 
 post_dob_masking := project(post_ssn_mask2,mask_dobs(left));
 
@@ -742,6 +756,19 @@ IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(intermediateLog, NAMED
 
 //Improved Scout Logging
 IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+
+// Output Royalties
+dRoyalties := 
+  PROJECT(
+    bido,
+    TRANSFORM( Royalty.Layouts.Royalty,
+      SELF.royalty_type_code := LEFT.royalty_type_code_targus;
+      SELF.royalty_type      := LEFT.royalty_type_targus;
+      SELF.royalty_count     := LEFT.royalty_count_targus;
+      SELF.non_royalty_count := LEFT.non_royalty_count_targus;
+      SELF.count_entity      := LEFT.count_entity_targus;
+    )
+  );
 
 output(dRoyalties, named('RoyaltySet'));
 

@@ -10,7 +10,7 @@
 
 export FBNReportService := Macro
 
-#constant('isSearch',FALSE)
+#constant('isSearch',FALSE);
 
 output(FBNV2_services.FBNReport, named('Results'));
 

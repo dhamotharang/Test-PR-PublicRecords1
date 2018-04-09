@@ -138,7 +138,7 @@ if(PermissionDPPA,FAIL('Not an allowable DPPA permissible purpose'));
 		    + intformat((integer1)l.searchby.Individual.dob.month, 2, 1)
 		    + intformat((integer1)l.searchby.Individual.dob.day,   2, 1);
 		self.dob := if((unsigned)dob=0, '', dob);
-		self.age := (STRING3)ut.GetAgeI_asOf((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date));
+		self.age := (STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date));
 		
 		fullname := trim(l.searchby.Individual.name.full);
 		cleanname := address.CleanPerson73( fullname );

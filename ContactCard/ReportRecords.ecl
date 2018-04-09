@@ -1,11 +1,11 @@
-import doxie_raw, doxie, ut;
+﻿import doxie_raw, doxie, ut, std;
 
 doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
 
 con := contactcard.constants;
 rec := contactcard.layouts;
-std := contactcard.storeds;
+storeds := contactcard.storeds;
 
 export ReportRecords( 
 	dataset(doxie.layout_references) gdids
@@ -84,7 +84,7 @@ rec.subject_rec dodWork(si l) := transform
 	self.dod.year := (unsigned)r.dod8[1..4];
 	self.dod.month := (unsigned)r.dod8[5..6];
 	self.dod.day := (unsigned)r.dod8[7..8];
-	self.age_at_death := if(iDOB < 18000000 or iDOD < 18000000, 0, ut.GetAgeI_asOf(iDOB, iDOD));
+	self.age_at_death := if(iDOB < 18000000 or iDOD < 18000000, 0, ut.Age(iDOB, iDOD));
 	self.deceased := if ((integer)r.did > 0 ,'Y','N');
 	self := l;
 END;
@@ -106,7 +106,7 @@ end;
 l_akas := project(akas,t_akas(left));
 
 return 
-	project(ut.ds_oneRecord, 
+	dataset([
 					transform(rec.result_rec2,
 										self.akas :=  choosen(l_akas, con.max_akas),
 										self.finders := choosen(project(srtd, rec.finder_rec), con.max_finders),
@@ -120,7 +120,8 @@ return
 										self.imposters :=  choosen(imposters_cln, con.max_imposters),
 										self.addresses := choosen(addr_phone_rolled_srtd, con.max_addresses),
 										self := []
-										))(con.AllowMinors or (not SubjectIsMinor));
+                   )
+  ])(con.AllowMinors or (not SubjectIsMinor));
 
 END;
 

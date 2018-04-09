@@ -65,6 +65,7 @@ MODULE
 		EXPORT STRING8	BillingId := '';
 		// batch only options.
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly        := FALSE;
+		EXPORT INTEGER   MaxOtherPhones := 0;
 	END;
 
 	EXPORT AKParams :=

@@ -1,4 +1,4 @@
-
+﻿
 IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, ut;
 
 EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) inData = DATASET([],BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo),
@@ -716,6 +716,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.seq	 	                 := key1.seq;
 			SELF.InputEcho.acctno	                 := key1.AcctNo;
 			SELF.InputEcho.transaction_id	       	 := key1.transaction_id;
+			SELF.InputEcho.NumberValidAuthRepsInput:= key1.numbervalidauthrepsinput;
 			SELF.InputEcho.in_bus_name           	 := key1.bus_company_name;
 			SELF.InputEcho.in_bus_alternatename  	 := key1.bus_alt_company_name;
 			SELF.InputEcho.in_bus_streetaddress1 	 := key1.bus_addr1;

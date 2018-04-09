@@ -1,10 +1,10 @@
-/* 
+﻿/* 
  ***** FCRA Corrections *****
  implement fcra corrections/overrides for on main and search bk files
  based on doxie.bk_records (as of 2013.03.16)
 */
 
-import bankruptcyv3, business_header, fcra, STD, ut;
+import bankruptcyv3, business_header, FCRA, FFD, Gateway, STD, ut;
 
 export layouts.layout_rollup fn_fcra_correct(dataset(layouts.layout_rollup) ds) := function
 
@@ -13,38 +13,25 @@ export layouts.layout_rollup fn_fcra_correct(dataset(layouts.layout_rollup) ds) 
 	string5  ccode := '' : stored('CourtCode');
 	string1 in_party_type := '';
 
-	// result will contain flag records for "this" person only
-	READ_LIMIT := ut.limits.FLAG_RECORDS_PER_PERSON;
-
-	flag_rec := RECORD
-		DATASET (fcra.Layout_override_flag) flags {MAXCOUNT(READ_LIMIT)};
-	END;
-
-	// fetch flag records for this person
-	// want to keep this as similar to the input dataset layout as possible 
-	// so minimal projection is required
-	// if FCRA, only one debtor in search results
-	flag_rec GetFlagRecords (layouts.layout_rollup L) := TRANSFORM
-
-		ssn_flags := JOIN (L.debtors, fcra.Key_Override_Flag_SSN, 
-												keyed(left.ssn = right.l_ssn) 
-												and datalib.NameMatch(left.names[1].fname, left.names[1].mname, left.names[1].lname, 
-																							right.fname, right.mname, right.lname)<3, 
-												KEEP (READ_LIMIT), LIMIT (0));
-
-		did_flags := JOIN (L.debtors, fcra.Key_Override_Flag_DID, 
-												keyed(trim(intformat((integer)LEFT.did,12,0),left,right) = right.l_did), 
-												KEEP(READ_LIMIT), LIMIT (0));
-												
-    flags_all := PROJECT (did_flags, fcra.Layout_override_flag) +
-                 PROJECT (ssn_flags, fcra.Layout_override_flag);
-
-		SELF.flags := CHOOSEN (dedup (flags_all, ALL), READ_LIMIT);
-		
-	END;
-
-	ds_pro := PROJECT (ds, GetFlagRecords (Left));
-	ds_flags := NORMALIZE (ds_pro, Left.flags, TRANSFORM (fcra.Layout_override_flag, SELF := Right));
+  gateways := Gateway.Configuration.Get();    
+    
+  dids4flag := normalize(ds, left.debtors,
+	                  transform(doxie.layout_best, 
+                     self.did := (unsigned6) right.did, 
+										 self.fname := right.names[1].fname,
+										 self.mname := right.names[1].mname,
+										 self.lname := right.names[1].lname,
+										 self.ssn := right.ssn,
+										 self := right));
+ 										
+  dids4pc := project(dids4flag, transform(FFD.Layouts.DidBatch, 
+                      self.did := left.did, 
+                      self.acctno := FFD.Constants.SingleSearchAcctno));
+                    
+  // call person context  to get LT suppression records  
+	// we are deliberately making additional call to person context here to keep changes as simple as possible
+  pc_recs := FFD.FetchPersonContext(dids4pc, gateways, FFD.Constants.DataGroupSet.Bankruptcy);  
+	ds_flags := FFD.GetFlagFile(dids4flag, pc_recs);
 
 	// Get overrides records:
 	// a) identifiers (unique for this datatype) showing which records are to be corrected;

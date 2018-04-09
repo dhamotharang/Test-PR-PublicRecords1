@@ -31,7 +31,7 @@ dsResponseRecords_roxie := dedup(
 	dsResponse[1].records.LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS));
 
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
-dsResponseRecords_thor := SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'));
+dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
 
 dsResponseRecords := if(onThor, dsResponseRecords_thor, dsResponseRecords_roxie);
 

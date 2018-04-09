@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp;
+﻿IMPORT DueDiligence, iesp, STD, ut;
 
 EXPORT CommonIndividual := MODULE
 	
@@ -35,6 +35,26 @@ EXPORT CommonIndividual := MODULE
 		
 		RETURN parents;
 	END;
+  
+  
+  
+  EXPORT calcCrimData(dataRow, offenderLevelIn, offenseScoreIn, daysLookupSymbol) := FUNCTIONMACRO
+  
+    dataType := STD.Str.ToUpperCase(#GETDATATYPE(offenseScoreIn));
+    offenseOperator := IF(STD.Str.StartsWith(dataType, 'STRING'), '=', ' IN ');
+        
+    #if(daysLookupSymbol = DueDiligence.Constants.EMPTY)
+       val := (INTEGER)(dataRow.criminalOffenderLevel = offenderLevelIn AND
+                           dataRow.offenseScore #EXPAND(offenseOperator) offenseScoreIn);
+    #else
+       val := (INTEGER)(dataRow.criminalOffenderLevel = offenderLevelIn AND
+                        dataRow.offenseScore #EXPAND(offenseOperator) offenseScoreIn AND
+                       (dataRow.NumOfDaysAgo #EXPAND(daysLookupSymbol) ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)));
+    #end
+         
+         
+    RETURN val;
+  ENDMACRO;
 
 
 END;

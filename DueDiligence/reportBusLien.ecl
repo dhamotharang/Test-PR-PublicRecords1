@@ -1,72 +1,56 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
+﻿IMPORT DueDiligence, iesp;
 
 EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens, 
-											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) BusinessLiens_unreleased,
-											   boolean DebugMode = FALSE
-											   ) := FUNCTION
+											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) UnreleasedBusinessLiens,
+											   boolean DebugMode = FALSE) := FUNCTION
 
-	 
-	 													
-	// ------                                                                       ------
- // ------ define the ChildDataset                                               ------
-	// ------                                                                       ------
-	BusLiensChildDatasetLayout    := RECORD
-	  unsigned2                      seq;                                                        //*  This is the seqence number of the parent  
-	  DATASET(iesp.duediligencereport.t_DDRLiensJudgmentsEvictionRecords) BusLiensChild;
-	END;
-	 
-	// ------                                                                       ------
- // ------ populate the ChildDataset                                             ------
- // ------ by building a DATASET we can INSERT the entire ChiledDATASET          ------
- // ------ as a 'WHOLE' into the DATASET defined within the PARENT               ------
-	// ------                                                                       ------
-	iesp.duediligencereport.t_DDRLiensJudgmentsEvictionRecords   FormatTheListOfLIENS(RECORDOF(BusinessLiens_unreleased) le, Integer LienSeq) := TRANSFORM 
-																								                                      SELF.FilingType     := le.filing_type_desc;  
-																								                                      SELF.FilingAmount   := (integer)le.amount;
-																																											                   //SELF.FilingDate     := le.orig_filing_date;
-																																																				          SELF.FilingNumber   := 'ZZZFILINGNUMBER';
-																																																				          SELF.FilingJurisdiction  := 'ZZ'; 
-																																																									     //SELF.ReleaseDate    := le.release_date;
-																																																											   SELF.Eviction       := IF(le.eviction = 'Y', true, false); 
-																																																												  SELF.Agency         := 'ZZZZAGENCY';
-																	                                             SELF.AgencyState    := le.agency_state; 
-																																							                
-				                                                          SELF                := [];
-																								                                   END;  
-	 
-	  
-	BusLiensChildDataset  :=   
-		PROJECT(BusinessLiens_unreleased,
-			TRANSFORM(BusLiensChildDatasetLayout,
-				SELF.seq             := LEFT.liensJudgment.seq,          //***This is the sequence number of the Inquired Business (or the Parent)
-				SELF.BusLiensChild   := PROJECT(LEFT, FormatTheListOfLIENS(LEFT, COUNTER)))); 
-				       
-				                                         
-	
-	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
-	  DueDiligence.Layouts.Busn_Internal CreateNestedData(UpdateBusnLiens le, BusLiensChildDataset ri, Integer BLCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.NumberOfJudgmentsLeans  := BLCount,
-																	//SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnerShip.TaxAssessedValue      := le.PropTaxValue,
-																	 SELF.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.PossibleLiensJudgmentsEvictions := le.BusinessReport.BusinessAttributeDetails.LegalEventAttributeDataDetails.PossibleLiensJudgmentsEvictions  + ri.BusLiensChild;
-																	SELF := le;
-																	END; 
-																	
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-	 UpdateBusnLIENSWithReport := DENORMALIZE(UpdateBusnLiens, BusLiensChildDataset,
-	                                             LEFT.seq = RIGHT.seq, 
-												                       CreateNestedData(Left, Right, Counter));  
+
+   // -----                                                                                     ----- 
+	 // ------ Limit the number of records for each business listed in the report                 ------
+	 // ------ Start by sorting them in seleid sequence and getting the records  with the         ------
+	 // ------ most recent filed and largest dollar amount                                        ------
+	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
+	 // ------                                                                                    ------
+	 BusinessLiensUnreleasedButLimted   := dedup(sort(UnreleasedBusinessLiens,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  
+                                                    KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
+
+
+  UdateBusinessLiensForReporting   := DueDiligence.reportBusLienDebtorCreditor(BusinessLiensUnreleasedButLimted, debugmode);
+			
+ 
+ /* perform the DENORMALIZE (join) by Link ID                                 */   															 															
+	UpdateBusWithLiensAndItsDebtors := DENORMALIZE(UpdateBusnLiens, UdateBusinessLiensForReporting,
+                                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
+                                                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                               //SELF.BusinessReport.BusinessAttributeDetails.Legal.LegalSummary.NumberOfInfractionNonConvictions  := LEFT.BusInfractionNonConviction_1I;
+                                                               //*** This is now moving the  **//
+                                                               SELF.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions      := LEFT.BusinessReport.BusinessAttributeDetails.Legal.PossibleLiensJudgmentsEvictions  + RIGHT.LIENACTIVITY;
+                                                               
+                                                               SELF := LEFT;));  
+                                                               
+    
 		
-	
-	// ********************
+ // ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
 	 
-	  IF(DebugMode,     OUTPUT(COUNT  (UpdateBusnLiens),         NAMED('HowManyUpdateBusnLiens')));
+	  //IF(DebugMode,     OUTPUT(COUNT  (UpdateBusnLiens),         NAMED('HowManyUpdateBusnLiens')));
+	  IF(DebugMode,     OUTPUT(CHOOSEN(UnreleasedBusinessLiens, 100),  NAMED('UnreleasedBusinessLiensin')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(liensPartyDEBTORS, 100),  NAMED('liensPartyDEBTORSout')));
+    // IF(DebugMode,     OUTPUT(CHOOSEN(SortLiensWithDEBTORS, 100),  NAMED('SortLiensWithDEBTORSout')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(DedupLiensWithDEBTORS, 100),  NAMED('DedupLiensWithDEBTORSout')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(DebtorChildDataset, 100),  NAMED('DebtorChildDatasetout')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(SortDebtorChildDataset, 100),  NAMED('SortDebtorChildDatasetout')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(RollupDebtorChildDataset, 100),  NAMED('RollupDebtorChildDatasetout')));
+	  // IF(DebugMode,     OUTPUT(CHOOSEN(BusWithLiensAndItsDebtors, 100),  NAMED('BusWithLiensAndItsDebtorsout')));
+	 // IF(DebugMode,     OUTPUT(CHOOSEN(savedforreporting, 100),  NAMED('savedforreporting')));
+	  
+	  //IF(DebugMode,     OUTPUT(CHOOSEN(BusLiensChildDataset, 100),  NAMED('BusLiensChildDataset')));
 	 
-	  IF(DebugMode,     OUTPUT(CHOOSEN(BusLiensChildDataset, 100),  NAMED('BusLiensChildDataset')));
 	 
-	 
-		Return UpdateBusnLIENSWithReport;
+		Return UpdateBusWithLiensAndItsDebtors;
+		//Return UpdateBusnLiens;
 		
 	END;   
+  
 	

@@ -22,8 +22,8 @@ ProfileBooster.Layouts.Layout_PB_BatchOut getAttr(PBShell le) := transform
 	self.attributes.version1.VerifiedCurrResMatchIndex			:= map(noDid															=> '-1', 
 																																 le.VerifiedCurrResMatchIndex = ''	=> '0',
 																																																			 le.VerifiedCurrResMatchIndex);
-	TimeOnRecord 		:= if(le.dt_first_seen = 0, '-1', (string)min(ut.MonthsApart((string6)le.dt_first_seen,(string6)le.HistoryDate),maxmths));
-	TimeLastUpdate 	:= if(le.dt_last_seen = 0, '-1', (string)min(ut.MonthsApart((string6)le.dt_last_seen,(string6)le.HistoryDate), le.CrtRecTimeNewest, maxmths));
+	TimeOnRecord 		:= if(le.dt_first_seen = 0, '-1', (string)min(ut.MonthsApart((string6)le.dt_first_seen,risk_indicators.iid_constants.myGetDate(le.historydate)[1..6]),maxmths));
+	TimeLastUpdate 	:= if(le.dt_last_seen = 0, '-1', (string)min(ut.MonthsApart((string6)le.dt_last_seen,risk_indicators.iid_constants.myGetDate(le.historydate)[1..6]), le.CrtRecTimeNewest, maxmths));
 	self.attributes.version1.ProspectTimeOnRecord						:= if(noDid, '-1', TimeOnRecord);
 	self.attributes.version1.ProspectTimeLastUpdate					:= if(noDid, '-1', TimeLastUpdate);
 	self.attributes.version1.ProspectLastUpdate12Mo					:= if(noDid, '-1', if(TimeLastUpdate<>'-1' and (integer)TimeLastUpdate <= 12, '1', '0'));

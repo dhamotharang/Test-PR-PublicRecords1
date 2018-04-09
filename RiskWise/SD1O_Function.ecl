@@ -1,7 +1,12 @@
-import ut, address, Risk_Indicators, Models, Business_Risk, easi, gateway, Royalty, MDR;
+﻿import ut, address, Risk_Indicators, Models, Business_Risk, easi, gateway, Royalty, MDR;
 
 export SD1O_Function(dataset(Layout_SD1I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa,  
-																					string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+																					string4 tribCode, 
+                                          unsigned1 ofac_version = 1,
+                                          boolean include_ofac = false,
+                                          boolean include_additional_watchlists = false,
+                                          real global_watchlist_threshold = 0.84, 
+                                          string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																					string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := FUNCTION
 
 Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
@@ -98,8 +103,8 @@ END;
 prep := project(indata,into_btst_in(LEFT));
 
 iid_results := risk_indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, false, true, false, 
-																											 false, false, false, 1, false, false, .84, 1, 1, DataRestriction, 
-																											 false, DataPermission);
+																											 false, false, false, ofac_version, include_ofac, include_additional_watchlists, 
+                                                       global_watchlist_threshold, 1, 1, DataRestriction, false, DataPermission);
 
 risk_indicators.layout_output mkOutput( risk_indicators.layout_ciid_btst_Output le, UNSIGNED bt ) := TRANSFORM
 	self := if( bt = 1, le.Bill_To_Output, le.Ship_To_Output );
@@ -435,7 +440,8 @@ end;
 biid_prep := project(indata,into_btst_in2(LEFT));
 
 biid := if(tribCode in ['cb61','cb62'], 
-			business_risk.InstantId_Function_BtSt(biid_prep, gateways, false, DPPA, GLB, false, false, '', DataRestriction, DataPermission), 
+			business_risk.InstantId_Function_BtSt(biid_prep, gateways, false, DPPA, GLB, false, false, '', ofac_version, include_ofac, include_additional_watchlists, 
+                                            global_watchlist_threshold, DataRestriction, DataPermission), 
 			dataset([],Business_Risk.Layout_BIID_BtSt_Output));
 
 dbus_Royalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');

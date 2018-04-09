@@ -652,8 +652,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                                             ,
                                                             ,
                                                             ,
-                                                            ,
-                                                            inMod.IncludeLastResort,
+																														inMod.IncludeLastResort,
                                                             IncludePhonesFeedback, 
 																														Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
 																														BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,

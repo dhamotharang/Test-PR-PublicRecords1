@@ -1,7 +1,12 @@
-import ut, address, Risk_Indicators, Models, easi, gateway;
+﻿import ut, address, Risk_Indicators, Models, easi, gateway;
 
 export SC1O_Function(dataset(Layout_SD1I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
-							string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+							string4 tribCode,
+              unsigned1 ofac_version = 1,
+              boolean include_ofac = false,
+              boolean include_additional_watchlists = false,
+              real global_watchlist_threshold = 0.84, 
+              string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := 
 
 FUNCTION
@@ -99,17 +104,17 @@ Risk_Indicators.Layout_CIID_BtSt_In into_btst_in(indata le) := TRANSFORM
 END;
 prep := project(indata,into_btst_in(LEFT));
 
-include_ofac := tribcode in ['ex95'];
+isbridgerservicename := count( gateways(ServiceName = 'bridgerwlc') ) > 0;
+
+includeOFAC := (tribcode in ['ex95']) or (isbridgerservicename and include_ofac);
 
 BSVersion := Map(tribCode in ['ex01','ex11','ex12','ex39','ex40','ex90','ex91','ex94','sc51','2x01'] => 1,
 								tribCode in ['ex95'] => 2,
 								1);
 
-
 iid_results := risk_indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, true, true,
-																											 false, false, false, false, 1, include_ofac, false, .84, -1, 
-																											 BSVersion, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
-
+																											 false, false, false, false, ofac_version, includeOFAC, include_additional_watchlists, 
+                                                       global_watchlist_threshold, -1, BSVersion, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
 
 
 // intermediate results

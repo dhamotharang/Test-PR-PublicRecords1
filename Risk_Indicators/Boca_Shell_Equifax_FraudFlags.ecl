@@ -120,6 +120,7 @@ risk_indicators.Layout_Boca_Shell addFraudFlags(risk_indicators.Layout_Boca_Shel
 	SELF.Eqfx_FraudFlags.factact_hist_fraud_alert_lseen	:= map(noDID															=> -1,
 																														 noHit															=> -2,
 																														 invalidHit													=> -3,
+																														 ri.factact_hist_fraud_alert_lseen > le.historydate	=> le.historydate,
 																																																	 ri.factact_hist_fraud_alert_lseen);
 	SELF 																								:= le;
 END;

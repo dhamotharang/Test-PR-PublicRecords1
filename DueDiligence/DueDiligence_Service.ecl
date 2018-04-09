@@ -10,11 +10,11 @@ EXPORT DueDiligence_Service := MACRO
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
 			
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, 'BOTH');
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, DueDiligence.Constants.ATTRIBUTES);
 			
-			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
+			validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa);
 			
-			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
+			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE), DueDiligence.Constants.ATTRIBUTES);
 			
 			cleanData := DueDiligence.Common.GetCleanData(validatedRequest(validRequest));
 
@@ -34,7 +34,7 @@ EXPORT DueDiligence_Service := MACRO
 			//********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
 			DueDiligence.CommonQuery.mac_GetBusinessOptionSettings();
 
-			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, debugIndicator);
+			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, DD_SSNMask, debugIndicator);
 
 			busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
@@ -54,8 +54,8 @@ EXPORT DueDiligence_Service := MACRO
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
 			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(businessResults, NAMED('busResults')));                   //This is for debug mode 
-			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 
-
+			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode
+      IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask')));
 
 ENDMACRO;
 

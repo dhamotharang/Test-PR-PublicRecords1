@@ -53,7 +53,7 @@ r :=
 					trim(left.internal_src, left, right) + trim(right.internal_src, left, right),
 					left.internal_src
 				);
-			self.dt_last_seen := ut.max2(left.dt_last_seen, right.dt_last_seen),
+			self.dt_last_seen := max(left.dt_last_seen, right.dt_last_seen),
 			self.exact_lname_match 		:= left.exact_lname_match 	or right.exact_lname_match;
 			self.leading_lname_match 	:= left.leading_lname_match or right.leading_lname_match;
 			self := left

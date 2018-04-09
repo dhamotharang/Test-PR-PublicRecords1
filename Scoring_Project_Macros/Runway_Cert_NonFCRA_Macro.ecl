@@ -1,7 +1,7 @@
 ﻿// EXPORT Runway_Cert_NonFCRA_Macro := 'todo';
 EXPORT Runway_Cert_NonFCRA_Macro( bs_version, neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= functionmacro
 
-IMPORT Risk_Indicators, ut, models, Scoring_Project;
+IMPORT Risk_Indicators, ut, models, Scoring_Project, zz_bbraaten2;
 
 unsigned8 no_of_records := records_ToRun;
 integer retry := retry;

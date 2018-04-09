@@ -25,9 +25,9 @@
 import suppress, STD;
 
 export BH_ProfileSearchService() := macro
-#stored('MileRadius',25)
-#stored('isProfileSearch',true)
-#stored('AllowNickNames',true)
+#stored('MileRadius',25);
+#stored('isProfileSearch',true);
+#stored('AllowNickNames',true);
 
 Business_Header.doxie_MAC_Field_Declare(true)
 

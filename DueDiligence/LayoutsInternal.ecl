@@ -12,8 +12,7 @@ EXPORT LayoutsInternal := MODULE
 	END; 
 	
 	EXPORT CommonGeographicLayout   := RECORD
-	 DueDiligence.Layouts.Address;
-	 DueDiligence.Layouts.GeographicRiskLayout;
+		DueDiligence.Layouts.BusOperLocationLayout;
 	END;
 	
 	
@@ -59,6 +58,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT Agent := RECORD
 		InternalBIPIDsLayout;
+    UNSIGNED4	  historydate;
 		DueDiligence.Layouts.LayoutAgent agent;
 	END;
 	
@@ -76,14 +76,6 @@ EXPORT LayoutsInternal := MODULE
 		InternalBIPIDsLayout;
 		UNSIGNED4	  historydate;
 		DueDiligence.Layouts.RelatedParty party;
-		BOOLEAN eventTypeCategory9;
-		BOOLEAN eventTypeCategory8;
-		BOOLEAN eventTypeCategory7;
-		BOOLEAN eventTypeCategory6;
-		BOOLEAN eventTypeCategory5;
-		BOOLEAN eventTypeCategory4;
-		BOOLEAN eventTypeCategory3;
-		BOOLEAN eventTypeCategory2;
 	END;
 	
 	EXPORT PartyLicenses := RECORD
@@ -93,6 +85,21 @@ EXPORT LayoutsInternal := MODULE
 		DueDiligence.Layouts.Licenses license;
 	END;
 
+  
+  EXPORT MultipleNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.LayoutAgent) nameAndDate {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+  END;
+
+  EXPORT MultipleCompanyNames := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.DD_CompanyNames) companyNameAndLastSeen {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+  END;
+  
+  EXPORT SourceLayout := RECORD
+    InternalBIPIDsLayout;
+    DATASET(DueDiligence.Layouts.BusSourceLayout) sources;
+  END;
 
 
 //------                                      ------
@@ -127,7 +134,7 @@ EXPORT LayoutsInternal := MODULE
    string5   zip;
    string4   zip4;
 	  STRING5   County;
-		 STRING20  countyName;
+		 //STRING20  countyName;
 		 string7   geo_blk;
 		 DueDiligence.Layouts.GeographicRiskLayout;
   END;					
@@ -179,7 +186,9 @@ EXPORT common_layout_liens_judgments := RECORD
 	 STRING50 tmsid;
   UNSIGNED4	HistoryDate;
 		UNSIGNED4 DateToUse; 
-		UNSIGNED3 NumOfDaysAgo;   
+		UNSIGNED3 NumOfDaysAgo; 
+    STRING20 filing_number;                      //***all these fields are from:  liensV2.key_liens_main_ID
+    STRING20 filing_jurisdiction;             
 		STRING8  date_first_seen;
 		STRING8  date_last_seen;
 		STRING1  eviction;
@@ -189,7 +198,9 @@ EXPORT common_layout_liens_judgments := RECORD
 		STRING8  release_date;
 		STRING8  lapse_date;
 		STRING30 filing_status;
+    STRING75 agency;
 		STRING2  agency_state;
+    STRING25 agency_county; 
 END;
 
 
@@ -206,9 +217,13 @@ END;
 	
 	EXPORT layout_liens_judgments := RECORD
 		InternalBIPIDsLayout  liensJudgment;
+    unsigned6 	did;
 		common_layout_liens_judgments;   
 	END;
 
+//------                                      ------
+//------  Populated with Liens and Judgements ------
+//------                                      ------
 	EXPORT 	layout_liens_judgments_categorized := RECORD
 		layout_liens_judgments;
 		plus_category_liens_judgments;
@@ -263,6 +278,19 @@ END;
 		UNSIGNED4 dateFirstSeen;
 		STRING50 src;
 	END;
+
+ 
+ EXPORT FeinSources := RECORD
+		InternalBIPIDsLayout;
+		STRING9 companyFEIN;
+    STRING9 maskedFEIN;  
+    STRING6 mask;  
+		BOOLEAN FEINSourceContainsE5;  
+    DATASET(DueDiligence.Layouts.FEINLayoutSources) Sources;    
+	END;
+  
+
+
 
 
 END;

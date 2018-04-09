@@ -1490,10 +1490,27 @@ self.fp1609_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_FP1609_1_0, named('with_FP1609_1_0'));
 
+FP1508_1_0_score := Models.FP1508_1_0( ungroup(clam), 6);
+// output(FP1508_1_0_score, named('FP1508_1_0_score'));
+
+with_FP1508_1_0	:= join(with_FP1609_1_0, FP1508_1_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1508_1_0_score := right.score;
+self.fp1508_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1508_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1508_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1508_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1508_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1508_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1508_1_0, named('with_fp1508_1_0'));
+
+
 FP1702_2_0_score := Models.FP1702_2_0	( ungroup(clam), 6);
 // output(FP1606_1_0_score, named('FP1606_1_0_score'));
 
-with_FP1702_2_0	:= join(with_FP1609_1_0, FP1702_2_0_score,
+with_FP1702_2_0	:= join(with_FP1508_1_0, FP1702_2_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.FP1702_2_0_score := right.score;
@@ -3252,10 +3269,30 @@ self.RVC1703_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVC1703_1_0, named('with_RVC1703_1_0'));
 
+
+RVC1801_1_0_score := Models.RVC1801_1_0(clam, iscalifornia);
+// output(RVC1801_1_0_score, named('RVC1801_1_0_score'));
+                             
+with_RVC1801_1_0 := join(with_RVC1703_1_0, RVC1801_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVC1801_1_0_score := right.score;
+self.RVC1801_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVC1801_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVC1801_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVC1801_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self := left), keep(1), left outer);
+// output(with_RVC1801_1_0, named('with_RVC1801_1_0'));
+
+
+
+
+
+
 RVD1010_0_0_score := Models.RVD1010_0_0(UNGROUP(clam), iscalifornia);
 // output(RVD1010_0_0_score, named('RVD1010_0_0_score'));
                              
-with_RVD1010_0_0 := join(with_RVC1703_1_0, RVD1010_0_0_score,
+with_RVD1010_0_0 := join(with_RVC1801_1_0, RVD1010_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVD1010_0_0_score := right.score;
@@ -5075,6 +5112,14 @@ self.FP1609_2_0_reason4	:= if(model_environment in [1,3], left.FP1609_2_0_reason
 self.FP1609_2_0_reason5	:= if(model_environment in [1,3], left.FP1609_2_0_reason5	, '');
 self.FP1609_2_0_reason6	:= if(model_environment in [1,3], left.FP1609_2_0_reason6	, '');
 
+self.FP1508_1_0_score	:= if(model_environment in [1,3], left.FP1508_1_0_score	, '');
+self.FP1508_1_0_reason1	:= if(model_environment in [1,3], left.FP1508_1_0_reason1	, '');
+self.FP1508_1_0_reason2	:= if(model_environment in [1,3], left.FP1508_1_0_reason2	, '');
+self.FP1508_1_0_reason3	:= if(model_environment in [1,3], left.FP1508_1_0_reason3	, '');
+self.FP1508_1_0_reason4	:= if(model_environment in [1,3], left.FP1508_1_0_reason4	, '');
+self.FP1508_1_0_reason5	:= if(model_environment in [1,3], left.FP1508_1_0_reason5	, '');
+self.FP1508_1_0_reason6	:= if(model_environment in [1,3], left.FP1508_1_0_reason6	, '');
+
 
 self.FP1607_1_0_score	:= if(model_environment in [1,3], left.FP1607_1_0_score	, '');
 self.FP1607_1_0_reason1	:= if(model_environment in [1,3], left.FP1607_1_0_reason1	, '');
@@ -5721,6 +5766,12 @@ self.RVC1703_1_0_reason1	:= if(model_environment in [1,2], left.RVC1703_1_0_reas
 self.RVC1703_1_0_reason2	:= if(model_environment in [1,2], left.RVC1703_1_0_reason2	, '');
 self.RVC1703_1_0_reason3	:= if(model_environment in [1,2], left.RVC1703_1_0_reason3	, '');
 self.RVC1703_1_0_reason4	:= if(model_environment in [1,2], left.RVC1703_1_0_reason4	, '');
+
+self.RVC1801_1_0_score	:= if(model_environment in [1,2], left.RVC1801_1_0_score	, '');
+self.RVC1801_1_0_reason1	:= if(model_environment in [1,2], left.RVC1801_1_0_reason1	, '');
+self.RVC1801_1_0_reason2	:= if(model_environment in [1,2], left.RVC1801_1_0_reason2	, '');
+self.RVC1801_1_0_reason3	:= if(model_environment in [1,2], left.RVC1801_1_0_reason3	, '');
+self.RVC1801_1_0_reason4	:= if(model_environment in [1,2], left.RVC1801_1_0_reason4	, '');
 
 self.RVD1010_0_0_score	:= if(model_environment in [1,2], left.RVD1010_0_0_score	, '');
 self.RVD1010_0_0_reason1	:= if(model_environment in [1,2], left.RVD1010_0_0_reason1	, '');

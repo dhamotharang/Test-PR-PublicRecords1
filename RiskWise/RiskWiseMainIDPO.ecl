@@ -21,6 +21,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="runSeed" type="xsd:boolean"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -59,6 +60,7 @@ export RiskWiseMainIDPO := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'runSeed',
+	'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -105,6 +107,7 @@ unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false : stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string10 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+unsigned1 ofac_version_       := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
@@ -117,6 +120,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url,  // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url,  // targus gateway
+         tribcode in ['idp1'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
 				 ''); // default to no gateway call			 
 	self := le;
 end;
@@ -190,10 +194,10 @@ from_BIID := false;
 isFCRA := false;
 ExcludeWatchLists := false;
 from_IT1O := false;
-ofac_version := 1;
-include_ofac := false;
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
 include_additional_watchlists := false;
-global_watchlist_threshold := .84;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 dob_radius := -1;
 BSversion := 1;
 runSSNCodes := true;
@@ -201,6 +205,8 @@ runBestAddrCheck := true;
 runChronoPhoneLookup := true;
 runAreaCodeSplitSearch := true;
 allowCellPhones := true;
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2Ele,
 																					from_BIID, isFCRA, ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold,

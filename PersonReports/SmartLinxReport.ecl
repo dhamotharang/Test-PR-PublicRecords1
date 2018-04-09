@@ -274,7 +274,12 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	p_bankruptcy_closed  := choosen (if (param.Smart_rollup, s_bankruptcy_closed, 
 	                              project(bankruptcy,transform(iesp.smartlinxreport.t_SLRbankruptcy, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxBankruptcies);
-  liensMod      := PersonReports.lienjudgment_records (dids,MODULE (project (param, input.liens, opt)) END , IsFCRA);
+
+  // NOTE: Using case link reduction for the liens records does NOT work correctly with FCRA overrides.
+  // This is not currently a problem as SmartLinx does not use FCRA overrides.  
+  // If FCRA is added to SmartLinx - the case link reduction needs to be reworked 
+  //  to properly account for overrides.
+  liensMod      := PersonReports.lienjudgment_records (dids,MODULE (project (param, input.liens, opt)) END , IsFCRA, rollup_by_case_link := true);
 	liens         := IF (param.include_liensjudgments,   project(liensMod.liensjudgment_v2(),iesp.lienjudgement.t_LienJudgmentReportRecord), dataset([],iesp.lienjudgement.t_LienJudgmentReportRecord));
   s_liens       := SmartRollup.fn_smart_rollup_liens(liens);  
 	s_liens_active := s_liens(ActiveClosed=iesp.Constants.SMART.ACTIVE);

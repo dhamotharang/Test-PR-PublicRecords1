@@ -2,7 +2,7 @@
 
 EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.BatchParams email_batch_params,
 																	DATASET(BatchServices.Layouts.Email.rec_batch_email_input) batch_in,
-																	BOOLEAN useCannedRecs = FALSE) := MODULE
+																	BOOLEAN useCannedRecs = FALSE, BOOLEAN emailforMemberpoint = FALSE) := MODULE
 
 		Boolean use_dm_email_sources_only := email_batch_params.useDMEmailSourcesOnly;
 				
@@ -13,6 +13,8 @@ EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.Ba
 																														SELF.name_last  := LEFT.name_last,
 																														SELF.email_addrFull := LEFT.sic_code,
 																														SELF := LEFT));
+	
+	
 		ds_batch_in_email := IF (NOT useCannedRecs, batch_in ,test_email_recs);
 		
     // move raw input into layout to pass to autokeys.
@@ -26,6 +28,7 @@ EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.Ba
 		
 		// Search via Input Email
 		fromInputEmail := BatchServices.Email_BatchIds.byInputEmail(ds_batch_in_email);
+	
 
 		ds_raw := fromAK + fromDID + fromInputEmail;
 		ds_raw_slim := dedup(sort(ds_raw(orig_email <> ''), acctno, orig_email), acctno, orig_email);
@@ -53,14 +56,19 @@ EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.Ba
 		nonroyal_recs := join(ds_raw_pulled_ssn, royal_codes, left.email_src = right.code, left only);
 		
 		_recs := project(royal_recs_all + nonroyal_recs, BatchServices.Layouts.email.rec_results_raw);
-
-		dm_email_recs := _recs(email_src in MDR.sourceTools.set_digital_email_cookie_matching);
+		
+		//differentiate between email data sources called
+		dm_email_recs :=if (emailforMemberpoint,_recs(email_src in MDR.sourceTools.set_digital_email_cookie_matching_Memberpt)
+																																									,_recs(email_src in MDR.sourceTools.set_digital_email_cookie_matching));
+		
+			
 		recs_to_use := if(use_dm_email_sources_only, dm_email_recs , _recs);
-
+	
 		EXPORT recs := group(sort(recs_to_use, acctno, -orig_login_date, -process_date, record), acctno);
 		
 		Boolean detailedRoyalties := email_batch_params.ReturnDetailedRoyalties;
 		unsigned8 MAX_EMAIL_PER_ACCTNO := email_batch_params.MAX_EMAIL_PER_ACCTNO;		
 		
 		EXPORT dRoyalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(recs, email_src, MAX_EMAIL_PER_ACCTNO, detailedRoyalties);
+		
 END;

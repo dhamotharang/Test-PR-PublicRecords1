@@ -1,7 +1,7 @@
 ﻿IMPORT codes, DueDiligence, faa, iesp, BIPv2;
 
 EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData, 
-														DATASET(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout) watercraftSlim) := FUNCTION
+													 DATASET(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout) watercraftSlim) := FUNCTION
 
 
 	//group slimmed dataset by seq and linkIDs so counter can count per group
@@ -10,37 +10,27 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 	
 	//Transform to limit the number of data in our dataset
 	DueDiligence.LayoutsInternalReport.BusWatercraftReportChildren getReportChildren(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout wsl, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxWatercraft)
-		SELF.water := PROJECT(wsl, TRANSFORM(iesp.duediligencereport.t_DDRWatercraft,
-																				SELF.sequence := c;
-																				SELF.watercraft := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRYearMakeModel,
-																																										SELF.year := LEFT.year;
-																																										SELF.make := LEFT.make;
-																																										SELF.model := LEFT.model;
-																																										SELF := [];)])[1];
-																				SELF.vesselType := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRAdditionalDetails,
-																																										SELF.detailType := LEFT.vesselType;
-																																										SELF := [];)])[1];
+		SELF.water := PROJECT(wsl, TRANSFORM(iesp.duediligenceshared.t_DDRWatercraft,
+																				SELF.yearMakeModel.year := LEFT.year;
+																				SELF.yearMakeModel.make := LEFT.make;
+																				SELF.yearMakeModel.model := LEFT.model;
+                                        
+																				SELF.vesselType.detailType := LEFT.vesselType;
+                                        
 																				SELF.lengthFeet := LEFT.vesselLengthFeet;
 																				SELF.lengthInches := LEFT.vesselLengthInches;
-																				SELF.title := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRTitleInfo,
-																																								SELF.state := LEFT.titleState;
-																																								SELF.date := DATASET([TRANSFORM(iesp.share.t_Date,
-																																																								SELF.year := (INTEGER)LEFT.titleDate[1..4];
-																																																								SELF.month := (INTEGER)LEFT.titleDate[5..6];
-																																																								SELF.day := (INTEGER)LEFT.titleDate[7..8];
-																																																								SELF := [];)])[1];)])[1];
-																				SELF.registration := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRRegistration,
-																																											SELF.state := LEFT.registrationState;
-																																											SELF.date := DATASET([TRANSFORM(iesp.share.t_Date,
-																																																											SELF.year := (INTEGER)LEFT.registrationDate[1..4];
-																																																											SELF.month := (INTEGER)LEFT.registrationDate[5..6];
-																																																											SELF.day := (INTEGER)LEFT.registrationDate[7..8];
-																																																											SELF := [];)])[1];)])[1];
+																				SELF.title.state := LEFT.titleState;
+																				SELF.title.date.year := (INTEGER)LEFT.titleDate[1..4];
+                                        SELF.title.date.month := (INTEGER)LEFT.titleDate[5..6];
+                                        SELF.title.date.day := (INTEGER)LEFT.titleDate[7..8];
+																				
+                                        SELF.registration.state := LEFT.registrationState;
+                                        SELF.registration.date.year := (INTEGER)LEFT.registrationDate[1..4];
+                                        SELF.registration.date.month := (INTEGER)LEFT.registrationDate[5..6];
+                                        SELF.registration.date.day := (INTEGER)LEFT.registrationDate[7..8];
 																																																											
-																				SELF.vin := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRVINNumber,
-																																							SELF.vin := LEFT.vin;
-																																							SELF := [];)])[1];
-																				SELF := LEFT;
+																				SELF.VINNumber.vin := LEFT.vin;
+
 																				SELF := [];));
 		SELF := wsl;
 	END;
@@ -55,8 +45,8 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 																				LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
 																				LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
 																				TRANSFORM(DueDiligence.layouts.Busn_Internal,
-																									SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.WatercraftOwnership.WatercraftCount  := LEFT.watercraftCount,
-																									SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.WatercraftOwnership.Watercrafts := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.WatercraftOwnership.Watercrafts + RIGHT.water;
+																									SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.WatercraftCount  := LEFT.watercraftCount,
+																									SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.Watercrafts := LEFT.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.Watercrafts + RIGHT.water;
 																									SELF := LEFT;));
 												
 

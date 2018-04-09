@@ -13,9 +13,9 @@ EXPORT DueDiligence_PersonRptService := MACRO
 	
 			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.INDIVIDUAL);
 			
-			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
+			validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa);
 			
-			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
+			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE), DueDiligence.Constants.INDIVIDUAL);
 			
 			cleanData := DueDiligence.Common.GetCleanData(validatedRequest(validRequest));
 			
@@ -33,8 +33,10 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			output(final, NAMED('Results')); //This is the customer facing output    
 
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
-			IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
+			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 
+      IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask'))); 
+
 	
 
 ENDMACRO;

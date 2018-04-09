@@ -1,4 +1,4 @@
-﻿IMPORT Address, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
+﻿IMPORT Address, BIPv2, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
        Models, Risk_Indicators, Risk_Reporting, RiskWise, Suspicious_Fraud_LN, 
        UT, Royalty, Address;
 
@@ -6,7 +6,7 @@ EXPORT SmallBusiness_BIP_Function (
 											DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 											UNSIGNED1	DPPA_Purpose					= Business_Risk_BIP.Constants.Default_DPPA,
 											UNSIGNED1	GLBA_Purpose					= Business_Risk_BIP.Constants.Default_GLBA,
-											STRING50	DataRestrictionMask	  = Business_Risk_BIP.Constants.Default_DataRestrictionMask,
+											STRING50	DataRestrictionMask_in	  = Business_Risk_BIP.Constants.Default_DataRestrictionMask,
 											STRING50	DataPermissionMask		= Business_Risk_BIP.Constants.Default_DataPermissionMask,
 											STRING10	IndustryClass				  = Business_Risk_BIP.Constants.Default_IndustryClass,
 											UNSIGNED1	LinkSearchLevel			  = Business_Risk_BIP.Constants.LinkSearch.Default,
@@ -24,7 +24,8 @@ EXPORT SmallBusiness_BIP_Function (
 											BOOLEAN RunTargusGateway = FALSE,
 											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE,
                       BOOLEAN CorteraRetrotest = FALSE,
-											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
+											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
+           BOOLEAN AppendBestsFromLexIDs = FALSE           
 																							) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
@@ -46,7 +47,7 @@ EXPORT SmallBusiness_BIP_Function (
 	Risk_Reporting.Layouts.Business_Risk_Job_Options xfm_options := TRANSFORM
 		SELF.DPPA_Purpose	              := DPPA_Purpose;
 		SELF.GLBA_Purpose	              := GLBA_Purpose;
-		SELF.DataRestrictionMask        := DataRestrictionMask;
+		SELF.DataRestrictionMask        := DataRestrictionMask_in;
 		SELF.DataPermissionMask         := DataPermissionMask;
 		SELF.IndustryClass              := IndustryClass;
 		SELF.LinkSearchLevel            := LinkSearchLevel;
@@ -67,8 +68,23 @@ EXPORT SmallBusiness_BIP_Function (
 /* ************************************************************************
 	 *     Uniquely Sequence Input and Convert to Business Shell inputs     *
 	 ************************************************************************ */
-	SeqInput := PROJECT(Input, TRANSFORM({LNSmallBusiness.BIP_Layouts.Input, UNSIGNED4 Seq}, SELF.Seq := COUNTER; SELF := LEFT));
-
+	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
+	linkingOptions := MODULE(BIPV2.mod_sources.iParams)
+		EXPORT STRING DataRestrictionMask		:= DataRestrictionMask_in; // Note: Must unfortunately leave as undefined STRING length to match the module definition
+		EXPORT BOOLEAN ignoreFares					:= FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - since the Business Shell doesn't accept this input default it to FALSE to always utilize whatever the DataRestrictionMask allows
+		EXPORT BOOLEAN ignoreFidelity				:= FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - since the Business Shell doesn't accept this input default it to FALSE to always utilize whatever the DataRestrictionMask allows
+		EXPORT BOOLEAN AllowAll							:=  FALSE; // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
+		EXPORT BOOLEAN AllowGLB							:= Risk_Indicators.iid_constants.GLB_OK(GLBA_Purpose, FALSE /*isFCRA*/);
+		EXPORT BOOLEAN AllowDPPA						:= Risk_Indicators.iid_constants.DPPA_OK(DPPA_Purpose, FALSE /*isFCRA*/);
+		EXPORT UNSIGNED1 DPPAPurpose				:= DPPA_Purpose;
+		EXPORT UNSIGNED1 GLBPurpose					:= GLBA_Purpose;
+		EXPORT BOOLEAN IncludeMinors				:= TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
+		EXPORT BOOLEAN LNBranded						:= TRUE; // Not entirely certain what effect this has
+	END;
+   
+	SeqInput_Raw := PROJECT(Input, TRANSFORM(LNSmallBusiness.BIP_Layouts.InputWSeq, SELF.Seq := COUNTER; SELF := LEFT));
+ SeqInput := IF(AppendBestsFromLexIDs, LNSmallBusiness.SmallBusiness_BIP_Append_Inputs(SeqInput_Raw, linkingOptions), SeqInput_Raw) ;
+ 
 	Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(SeqInput le) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.AcctNo := le.AcctNo;
@@ -189,7 +205,7 @@ EXPORT SmallBusiness_BIP_Function (
 	Shell_Results_pre := Business_Risk_BIP.LIB_Business_Shell_Function(Shell_Input,
 																																 DPPA_Purpose,
 																																 GLBA_Purpose,
-																																 DataRestrictionMask,
+																																 DataRestrictionMask_in,
 																																 DataPermissionMask,
 																																 IndustryClass,
 																																 LinkSearchLevel,
@@ -207,7 +223,7 @@ EXPORT SmallBusiness_BIP_Function (
 																																 FALSE,
 																																 FALSE,
 																																 FALSE,
-                                                                 CorteraRetrotest,
+                                 CorteraRetrotest,
 																																 ds_CorteraRetrotestRecsRaw);
 
 	Business_Risk_BIP.Layouts.Shell fn_transformToNoHit( Business_Risk_BIP.Layouts.Shell shell_results ) :=
@@ -352,10 +368,10 @@ unsigned8 BSOptions :=
 	IID_Prep := PROJECT(IID_Prep_Acct, Risk_Indicators.Layout_Input );
 	
 	IID := Risk_Indicators.InstantID_Function(IID_Prep, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, LN_Branded, OFAC_Only, SuppressNearDups, Require2ele, IsFCRA, 
-	From_BIID, ExcludeWatchLists, From_IT1O, OFAC_Version, Include_OFAC, Addtl_Watchlists, Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := DataRestrictionMask, 
+	From_BIID, ExcludeWatchLists, From_IT1O, OFAC_Version, Include_OFAC, Addtl_Watchlists, Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := DataRestrictionMask_in, 
 	in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := DataPermissionMask);
 	
-	Clam := Risk_Indicators.Boca_Shell_Function(IID, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen, DataRestriction := DataRestrictionMask, BSOptions := BSOptions, DataPermission := DataPermissionMask);																							 
+	Clam := Risk_Indicators.Boca_Shell_Function(IID, Gateways,	DPPA_Purpose,	GLBA_Purpose, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen, DataRestriction := DataRestrictionMask_in, BSOptions := BSOptions, DataPermission := DataPermissionMask);																							 
 	
 	Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 	

@@ -1,17 +1,18 @@
-import doxie, codes, FFD;
+﻿import doxie, codes, FFD, FCRA;
 
 export sexoffender_search_records (
   DATASET (doxie.layout_best) ds_best  = DATASET ([], doxie.layout_best),
   boolean IsFCRA = false,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-	integer8 inFFDOptionsMask = 0 
+	integer8 inFFDOptionsMask = 0,
+	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile 
 	) := function
 
 doxie.mac_header_field_declare(IsFCRA);
 
 so_slim_pc_recs := slim_pc_recs(datagroup in FFD.Constants.DataGroupSet.SexOffender);
-f_person := doxie.SexOffender_Search_People_Records (ds_best, IsFCRA, so_slim_pc_recs, inFFDOptionsMask);
-f_events := doxie.SexOffender_Search_Events_Records (f_person, ds_best, IsFCRA, so_slim_pc_recs, inFFDOptionsMask);
+f_person := doxie.SexOffender_Search_People_Records (ds_best, IsFCRA, so_slim_pc_recs, inFFDOptionsMask, ds_flags);
+f_events := doxie.SexOffender_Search_Events_Records (f_person, ds_best, IsFCRA, so_slim_pc_recs, inFFDOptionsMask, ds_flags);
 
 //dedup on every field except those name realted and did_score			   
 f1 := dedup(f_person, except lname, except fname, except mname, except name_suffix, 

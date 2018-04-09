@@ -63,6 +63,7 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="runSeed" type="xsd:boolean"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -143,6 +144,7 @@ export RiskWiseMainSC1O := MACRO
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'runSeed',
+	'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 	
@@ -233,6 +235,7 @@ unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose'
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  			: stored('HistoryDateYYYYMM');
 boolean   runSeed_value := false 			: stored('runSeed');
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 productSet := ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex90','ex91','ex94','ex95','sc51','2x01'];
@@ -242,14 +245,21 @@ boolean Log_trib := tribCode in ['2x01', 'ex01', 'ex11', 'ex12', 'ex90', 'sc63']
 
 targusGatewaySet := ['ex05'];
 
+ofac_version := ofac_version_;
+include_ofac := if(ofac_version = 1, false, true);
+include_additional_watchlists := false;
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
+
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	self.servicename := le.servicename;
-	self.url := if(tribcode in targusGatewaySet and le.servicename = 'targus', le.url, ''); // default to no gateway call			 
+	self.url := map(tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
+  	              tribcode in ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex90','ex91','ex94','ex95','2x01'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                  ''); // default to no gateway call
 	self := le;
 END;
 gateways := project(gateways_in, gw_switch(left));
 
-
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 d := dataset([{0}],RiskWise.Layout_SD1I);
 
@@ -338,7 +348,8 @@ RiskWise.Layout_SC1O format_seed(seed_out le) := TRANSFORM
 END;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], RiskWise.Layout_SC1O));
 
-almost_final := RiskWise.SC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode,DataRestriction,DataPermission);
+almost_final := RiskWise.SC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
+                                       global_watchlist_threshold, DataRestriction,DataPermission);
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
 	Royalty.RoyaltyTargus.GetOnlineRoyalties(almost_final, src, TargusType, TRUE, FALSE, FALSE, TRUE));

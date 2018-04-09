@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, codes, DueDiligence, Easi, iesp, Risk_Indicators, STD, ut, Census_Data;
+﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, codes, DueDiligence, Easi, Census_Data, iesp, Risk_Indicators, STD, ut;
 
 
 EXPORT Common := MODULE
@@ -670,18 +670,16 @@ EXPORT Common := MODULE
 	END;	
 	
 
- // ------                                                                                -----
- // ------   THIS FUNCTION IS EXPECTING THE 3 DIGIT FIPS CODE TO BE POPULATED             -----
+  // ------                                                                                -----
+  // ------   THIS FUNCTION IS EXPECTING THE 3 DIGIT FIPS CODE TO BE POPULATED             -----
 	// ------   IT NEEDS BOTH THE 3 DIGIT FIPS AND THE 5 DIGIT FIPS CODE                     -----
 	// ------   The FIPS county code is a five-digit Federal Information Processing          -----
 	// ------   Standards (FIPS) code (FIPS 6-4) which uniquely identifies counties and      -----
 	// ------   county equivalents in the United States,                                     -----
 
-	EXPORT getGeographicRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) AddressList, 
-													 boolean DebugMode = FALSE
-											     ) := FUNCTION
-	
- // ------                                                                                     ------
+	EXPORT getGeographicRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) AddressList) := FUNCTION
+											      
+  // ------                                                                                     ------
 	// ------ Pick up the EasiTotCrime this state and county and geo blk                          ------  
 	// ------ from the Census Keys.  The address cleaner picked up the county put into the        ------
 	// ------ Busn_info.address of the Busn_Internal layout.                                      ------
@@ -689,7 +687,7 @@ EXPORT Common := MODULE
 	// ------   Build the 5 digit FIPS code using the state code + county                         ------
 	// ------   Use the 5 digit FIPS code to determine if the county area matches the lists       ------
 	// ------   created in the duediligence.constants                                             ------
-	// ------                                                                                     ------
+	// ------   SPRINT9                                                                           ------
 	// ------ Note:  The Easi - if we cannot find any Census data for this geographic location    ------
 	// ------        per our requirements the "not found" condition will produce the same result  ------
 	// ------        a low to average crime index                                                 ------
@@ -699,32 +697,41 @@ EXPORT Common := MODULE
 		transform(DueDiligence.layoutsInternal.GeographicLayout, 
 		        /*  Set all of the County/State area risk indicators   */
 		        self.EasiTotCrime             := right.totcrime;
-						    self.buildgeolink             := left.state + left.county + left.geo_blk;
-						    integer tempCrimeValue        := (integer)right.totcrime;   
-					    	self.CountyHasHighCrimeIndex  := tempCrimeValue >= DueDiligence.Constants.HighCrimeValue;
-								  STRING5 tempFIPS               := codes.st2FipsCode(StringLib.StringToUpperCase(left.state)) + left.county; 
-			       SELF.HIFCA                     := IF(tempFIPS IN DueDiligence.Constants.setHIFCA,1,0);
-			       SELF.HIDTA                     := IF(tempFIPS IN DueDiligence.Constants.setHIDTA,1,0);
-				      SELF.CountyBordersForgeinJur   := IF(tempFIPS IN DueDiligence.Constants.CountyForeignJurisdic,1,0);   
-				      SELF.CountyBorderOceanForgJur  := IF(tempFIPS IN DueDiligence.Constants.CountyBordersOceanForgJur,1,0);
-				      /*  Set all of the City/State area risk indicators   */  
-				      SELF.CityState                 := TRIM(left.city, LEFT, RIGHT) + ','+ left.state; 
-				      tempCityState                  := TRIM(left.city, LEFT, RIGHT) + ','+ left.state;
-				      self.CityBorderStation         := tempCityState in DueDiligence.Constants.CityBorderStation;
-				      self.CityFerryCrossing         := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
-				      self.CityRailStation           := tempCityState in DueDiligence.Constants.CityRailStation; 
-							  // temprecord                     := Census_Data.file_Fips2County(state_code = left.state and county_fips = left.county)[1];
-							  // self.CountyName                := temprecord.county_name; 
-								  self.CountyName                := 'SPRINT9';   
-					    	/* populate the remaining business internal record with data from the left  */ 
-						    self                          := left;), left outer,
+            /*  So we should have something populated in the buildgeolink even when we don't find a match on the census file */  
+						self.buildgeolink             := left.state + left.county + left.geo_blk;
+						integer tempCrimeValue        := (integer)right.totcrime;   
+					  self.CountyHasHighCrimeIndex  := tempCrimeValue >= DueDiligence.Constants.HighCrimeValue;
+						STRING5 tempFIPS               := codes.st2FipsCode(StringLib.StringToUpperCase(left.state)) + left.county;
+            SELF.FipsCode                  := tempFIPS;  
+			      SELF.HIFCA                     := IF(tempFIPS IN DueDiligence.Constants.setHIFCA,1,0);
+			      SELF.HIDTA                     := IF(tempFIPS IN DueDiligence.Constants.setHIDTA,1,0);
+				    SELF.CountyBordersForgeinJur   := IF(tempFIPS IN DueDiligence.Constants.CountyForeignJurisdic,1,0);   
+				    SELF.CountyBorderOceanForgJur  := IF(tempFIPS IN DueDiligence.Constants.CountyBordersOceanForgJur,1,0);
+				     /*  Set all of the City/State area risk indicators   */  
+				    SELF.CityState                 := TRIM(left.city, LEFT, RIGHT) + ','+ left.state; 
+				    tempCityState                  := TRIM(left.city, LEFT, RIGHT) + ','+ left.state;
+				    self.CityBorderStation         := tempCityState in DueDiligence.Constants.CityBorderStation;
+				    self.CityFerryCrossing         := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
+				    self.CityRailStation           := tempCityState in DueDiligence.Constants.CityRailStation; 
+					   /* populate the remaining business internal record with data from the left  */ 
+						self                          := left;), left outer,
 		ATMOST
 		    (keyed(right.geolink = left.state + left.county + left.geo_blk), 
 				 DueDiligence.Constants.MAX_ATMOST), KEEP(1));
   
-		RETURN withGeographicRisk;
-	END;
-	
+  // ------                                                                                                              ------
+  // ------ Use the Census Macro to fill in the county_name - pass the result set as input,                              ------
+  // ------ the field name that contains the state,                                                                      ------ 
+  // ------ the field name that contains the 3 digit fips(county) and the field name of the county name.                 ------
+  // ------ the name of the output result set                                                                            ------
+  // ------                                                                                                              ------
+	Census_Data.MAC_Fips2County_Keyed(withGeographicRisk, state, Fipscode, countyName, WithGeoRiskCounty);
+  
+  
+  
+		RETURN WithGeoRiskCounty;
+	END;   //*** END OF FUNCTION
+  
 	
 	EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION
 		
@@ -737,6 +744,65 @@ EXPORT Common := MODULE
 																																								SELF := [];));	
 																													
 		RETURN execOffenses;
-	END;
+	END;   //*** END OF FUNCTION
+  
+  // ------                                                                                              ------ 
+  // ------ Convert the 1 character offense score to a description to be used for the report             ------
+  // ------                                                                                              ------
+  EXPORT getOffenseScoreDescription(STRING1 offensescore) := FUNCTION
+
+		returnOffenseScoreDescription :=    
+				 MAP(
+							offenseScore = DueDiligence.Constants.FELONY                          	=> DueDiligence.Constants.TEXT_FELONY,      
+							offenseScore = DueDiligence.Constants.MISDEMEANOR                       => DueDiligence.Constants.TEXT_MISDEMEANOR,
+							offenseScore = DueDiligence.Constants.INFRACTION                        => DueDiligence.Constants.TEXT_INFRACTION,
+							offenseScore = DueDiligence.Constants.TRAFFIC                           => DueDiligence.Constants.TEXT_TRAFFIC,
+							offenseScore = DueDiligence.Constants.UNKNOWN                           => DueDiligence.Constants.TEXT_UNKNOWN,																		
+                                                                                         DueDiligence.Constants.TEXT_UNKNOWN); // default
+						
+		RETURN returnOffenseScoreDescription;
+	END;    //*** END OF FUNCTION
 	
+  // ------                                                                                              ------ 
+  // ------ Convert the 1 character offender level to a description to be used for the report            ------
+  // ------                                                                                              ------
+  EXPORT getOffenseLevelDescription(STRING1 criminalOffenderLevel) := FUNCTION
+
+		returnOffenseLevelDescription :=    
+				 MAP(
+							criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED     => DueDiligence.Constants.TEXT_NONTRAFFIC_CONVICTED,      
+							criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED => DueDiligence.Constants.TEXT_NONTRAFFIC_NOT_CONVICTED,
+							criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED        => DueDiligence.Constants.TEXT_TRAFFIC_CONVICTED,
+							criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_NOT_CONVICTED    => DueDiligence.Constants.TEXT_TRAFFIC_NOT_CONVICTED,
+                                                                                         DueDiligence.Constants.TEXT_UNKNOWN); // default
+						
+		RETURN returnOffenseLevelDescription;
+	END;    //*** END OF FUNCTION 
+  
+  
+  EXPORT RollFlags(fieldName) := FUNCTIONMACRO
+    rollMe := IF(LEFT.fieldName[1] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[1] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[2] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[2] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[3] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[3] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[4] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[4] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[5] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[5] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[6] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[6] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[7] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[7] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[8] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[8] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[9] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[9] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR) +
+              IF(LEFT.fieldName[10] = DueDiligence.Constants.T_INDICATOR OR 
+                 RIGHT.fieldName[10] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+     RETURN rollMe;
+  ENDMACRO;
+  
 END;

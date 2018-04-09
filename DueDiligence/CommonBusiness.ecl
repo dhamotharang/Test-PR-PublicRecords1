@@ -1,7 +1,7 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
 EXPORT CommonBusiness := MODULE
- // ***
+
 	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch2
 	EXPORT GetLinkIDs(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
 		
@@ -317,14 +317,38 @@ EXPORT CommonBusiness := MODULE
 	EXPORT getRegisteredAgents(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 		
 		agent := NORMALIZE(inquiredBus, LEFT.registeredAgents, TRANSFORM(DueDiligence.LayoutsInternal.Agent,
-																																			SELF.agent := RIGHT;
+																																			SELF.agent.addressMatchesInquiredBusiness := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
+                                                                                                                    LEFT.busn_info.address.predir = RIGHT.predir AND
+                                                                                                                    LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
+                                                                                                                    LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
+                                                                                                                    LEFT.busn_info.address.postdir = RIGHT.postdir AND
+                                                                                                                    LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
+                                                                                                                    LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
+                                                                                                                    LEFT.busn_info.address.city = RIGHT.city AND
+                                                                                                                    LEFT.busn_info.address.state = RIGHT.state AND
+                                                                                                                    LEFT.busn_info.address.zip5 = RIGHT.zip5;
+                                                                      SELF.agent := RIGHT;
 																																			SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																																			SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																																			SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                      
 																																			SELF := LEFT;
 																																			SELF := [];));
 		
 		RETURN agent;
+	END;
+	
+	EXPORT getOperatingLocations(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
+		
+		locations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, RECORDOF(RIGHT)},
+																																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																																						SELF := RIGHT;
+																																						SELF := LEFT;
+																																						SELF := [];));
+		
+		RETURN locations;
 	END;
 	
 	// ******************************************************************************************************** //
@@ -477,26 +501,24 @@ EXPORT CommonBusiness := MODULE
 		
 		//grab all unique addresses
 		sortAllAddrs := SORT(allAddrs, seq, ultID, locaddrs[1].prim_range, locaddrs[1].prim_name, locaddrs[1].zip5, -locaddrs[1].dateLastSeen);
-		dedupAllAddrs := DEDUP(sortAllAddrs, seq, ultID, locaddrs[1].prim_range, locaddrs[1].prim_name, locaddrs[1].zip5);
-		
+
 		//make sure our counts get added from the passed in call - those added to the inquired business counts would be 0
-		addCounts := JOIN(dedupAllAddrs, locations,
+    addCounts := ROLLUP(sortAllAddrs, 
 												LEFT.seq = RIGHT.seq AND
 												LEFT.ultID = RIGHT.ultID AND
 												LEFT.locaddrs[1].prim_range = RIGHT.locaddrs[1].prim_range AND
 												LEFT.locaddrs[1].prim_name = RIGHT.locaddrs[1].prim_name AND
 												LEFT.locaddrs[1].zip5 = RIGHT.locaddrs[1].zip5,
 												TRANSFORM(RECORDOF(LEFT),
-																	SELF.addrCount := RIGHT.addrCount;
-																	SELF := LEFT;),
-												LEFT OUTER);
+																	SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
+																	SELF := LEFT;));
 												
 		sortCounts := SORT(addCounts, seq, ultID, -locaddrs[1].dateLastSeen);
-		
-		rollAddr := ROLLUP(sortCounts,
+    
+    rollAddr := ROLLUP(sortCounts,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.ultID = RIGHT.ultID,
-												TRANSFORM({RECORDOF(sortAllAddrs)},
+												TRANSFORM({RECORDOF(LEFT)},
 																	SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
 																	SELF.locAddrs := LEFT.locAddrs + RIGHT.locAddrs;
 																	SELF := LEFT;));
@@ -511,9 +533,178 @@ EXPORT CommonBusiness := MODULE
 																						SELF.SOSAddrLocationCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, RIGHT.addrCount, LEFT.SOSAddrLocationCount);
 																						SELF.operatingLocations := RIGHT.locAddrs[1..DueDiligence.Constants.MAX_OPERATING_LOCATIONS];
 																						SELF := LEFT;),
-																	LEFT OUTER);														
-																	
+																	LEFT OUTER);	
+															
 		RETURN addOperatingLocations;
 	END;
+
+	
+	EXPORT GetChildAsInquired(inquiredBus, dsNameFromInquired, relationshipToInquired) := FUNCTIONMACRO
+		newInquired := NORMALIZE(inquiredBus, LEFT.dsNameFromInquired, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                                              SELF.seq := LEFT.seq;
+                                                                              SELF.historyDate := LEFT.historyDate;
+                                                                              SELF.Busn_info.BIP_IDS.UltID.LinkID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.OrgID.LinkID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.SeleID.LinkID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.ProxID.LinkID := LEFT.Busn_info.BIP_IDS.ProxID.LinkID;
+                                                                              SELF.Busn_info.BIP_IDS.PowID.LinkID := LEFT.Busn_info.BIP_IDS.PowID.LinkID;
+                                                                              SELF.relatedDegree := relationshipToInquired;
+                                                                              SELF.Busn_info.address.prim_range := RIGHT.prim_range;
+                                                                              SELF.Busn_info.address.predir := RIGHT.predir;
+                                                                              SELF.Busn_info.address.prim_name := RIGHT.prim_name;
+                                                                              SELF.Busn_info.address.addr_suffix := RIGHT.addr_suffix;
+                                                                              SELF.Busn_info.address.postdir := RIGHT.postdir;
+                                                                              SELF.Busn_info.address.unit_desig := RIGHT.unit_desig;
+                                                                              SELF.Busn_info.address.sec_range := RIGHT.sec_range;
+                                                                              SELF.Busn_info.address.city := RIGHT.city;
+                                                                              SELF.Busn_info.address.state := RIGHT.state;
+                                                                              SELF.Busn_info.address.zip5 := RIGHT.zip5;
+                                                                              SELF.Busn_info.address.zip4 := RIGHT.zip4;
+                                                                              SELF.setUniquePowIDs := LEFT.setUniquePowIDs;
+                                                                              SELF.atleastOneAgentSameAddrAsBus := LEFT.busn_info.address.prim_range = RIGHT.prim_range AND
+                                                                                                                    LEFT.busn_info.address.predir = RIGHT.predir AND
+                                                                                                                    LEFT.busn_info.address.prim_name = RIGHT.prim_name AND
+                                                                                                                    LEFT.busn_info.address.addr_suffix = RIGHT.addr_suffix AND
+                                                                                                                    LEFT.busn_info.address.postdir = RIGHT.postdir AND
+                                                                                                                    LEFT.busn_info.address.unit_desig = RIGHT.unit_desig AND
+                                                                                                                    LEFT.busn_info.address.sec_range = RIGHT.sec_range AND
+                                                                                                                    LEFT.busn_info.address.city = RIGHT.city AND
+                                                                                                                    LEFT.busn_info.address.state = RIGHT.state AND
+                                                                                                                    LEFT.busn_info.address.zip5 = RIGHT.zip5;
+                                                                              SELF := []));
+																																	
+		RETURN newInquired;	
+	ENDMACRO;
+  
+  
+  EXPORT ReaddOperatingLocations(inquiredBusDS, operatingLocationDS, operatingLocationDSFieldName) := FUNCTIONMACRO
+   
+    //rollup the operating location to the inquired business level to add back
+    rollOpLocations := ROLLUP(operatingLocationDS,
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                              TRANSFORM({RECORDOF(LEFT)},
+                                          SELF.operatingLocationDSFieldName := LEFT.operatingLocationDSFieldName + RIGHT.operatingLocationDSFieldName;
+                                          SELF := LEFT));
+    
+                        
+    //reAdd operating locations
+    readdOperatingLocation := JOIN(inquiredBusDS, rollOpLocations,
+                                    #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                    TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                              SELF.operatingLocations := RIGHT.operatingLocationDSFieldName;
+                                              SELF := LEFT;),
+                                    LEFT OUTER);
+                                    
+    RETURN readdOperatingLocation;                                
+
+  ENDMACRO;
+
+  
+  EXPORT GetSOSStatuses(sosRecord) := FUNCTIONMACRO
+     corpStatusDescUC := STD.Str.ToUpperCase(sosRecord.corp_status_desc);
+     filingStatus := MAP(business_header.is_ActiveCorp(sosRecord.record_type, sosRecord.corp_status_cd, sosRecord.corp_status_desc) => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'INACTIVE', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_INACTIVE,
+                          STD.Str.Find(CorpStatusDescUC, 'DISSOLV', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+                          STD.Str.Find(CorpStatusDescUC, 'DISSOLUTION', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+                          STD.Str.Find(CorpStatusDescUC, 'REINSTAT', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_REINSTATE,
+                          STD.Str.Find(CorpStatusDescUC, 'SUSPEN', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_SUSPEND,
+                          DueDiligence.Constants.COPR_STATUS_OTHER);
+                                    
+     RETURN filingStatus;
+  ENDMACRO;
+  
+  EXPORT AddHeaderSources(bureauData, inquiredBus, inquiredBusFieldToPopulate) := FUNCTIONMACRO
+  
+     sortSrc := SORT(bureauData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
+     rollSrc := ROLLUP(sortSrc,
+                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                       LEFT.source = RIGHT.source,
+                       TRANSFORM({RECORDOF(LEFT)},
+                                 SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
+                                 SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
+                                 SELF := LEFT));
+                                       
+                                       
+     //limit the number of sources
+     DueDiligence.LayoutsInternal.SourceLayout getMaxBureaus(rollSrc rs, INTEGER bureauCnt) := TRANSFORM, SKIP(bureauCnt > DueDiligence.Constants.MAX_BUREAUS)
+
+         SELF.sources := DATASET([TRANSFORM(DueDiligence.Layouts.BusSourceLayout,
+                                                      
+                                  nameAndType := DueDiligence.translationSource.mapCategoryAndRecordTypeFromCode(rs.source);
+                                  
+                                  SELF.source := rs.source;
+                                  SELF.sourceName := nameAndType.category;
+                                  SELF.sourceType := nameAndType.recordType;
+                                  SELF.firstReported := rs.dt_first_seen;
+                                  SELF.lastReported  := rs.dt_last_seen;
+                                  SELF := [];)]);
+         SELF := rs;;                                                
+     END;
+     
+     recentSrc := SORT(rollSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dt_last_seen);
+     maxSrc := PROJECT(recentSrc, getMaxBureaus(LEFT, COUNTER));
+                                                           
+                                                           
+     //sort bureau sources to keep all rows for a LINKID together 
+     sortProjectSrc := SORT(maxSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+     rollProjectSrc := ROLLUP(sortProjectSrc,
+                               #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                               TRANSFORM({RECORDOF(LEFT)},
+                                         SELF.sources := LEFT.sources + RIGHT.sources;
+                                         SELF := LEFT));
+                                               
+     addHeaderSrc := JOIN(inquiredBus, rollProjectSrc,
+                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                           TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                     SELF.inquiredBusFieldToPopulate := RIGHT.sources;                 
+                                     SELF := LEFT),
+                           LEFT OUTER);
+
+     RETURN addHeaderSrc;   
+  ENDMACRO;
+  
+	EXPORT GetMaxSources(inquiredBus, childSource, maxResults) := FUNCTIONMACRO
+     
+     ListOfBusSources := NORMALIZE(inquiredBus, LEFT.childSource, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.BusSourceLayout},																												
+                                                                            SELF.seq := LEFT.seq;
+                                                                            SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                                            SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                                                            SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID; 
+                                                                            SELF := RIGHT;
+                                                                            SELF := [];)); 
+	
+     sortSourceList := SORT(ListOfBusSources, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -lastReported);
+     groupSources := GROUP(sortSourceList, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+     
+     DueDiligence.LayoutsInternalReport.ListOfBusSourceLayout getMaxSources(sortSourceList ssl, Integer srcCount) := TRANSFORM, SKIP(srcCount > maxResults)
+          SELF.sources := PROJECT(ssl, TRANSFORM(iesp.duediligencebusinessreport.t_DDRReportingSources,
+                                                  SELF.SourceName := LEFT.sourceName;                      
+                                                  SELF.SourceType := LEFT.sourceType;
+                                                  SELF.FirstReported.Year := (unsigned4)((STRING)LEFT.firstreported)[1..4];  //YYYY
+                                                  SELF.FirstReported.Month := (unsigned2)((STRING)LEFT.firstreported)[5..6];  //MM
+                                                  SELF.FirstReported.Day := (unsigned2)((STRING)LEFT.firstreported)[7..8];  //DD
+                                                  SELF.LastReported.Year := (unsigned4)((STRING)LEFT.lastreported)[1..4];
+                                                  SELF.LastReported.Month := (unsigned2)((STRING)LEFT.lastreported)[5..6];
+                                                  SELF.LastReported.Day := (unsigned2)((STRING)LEFT.lastreported)[7..8]; 
+                                                  SELF := [];));
+          SELF := ssl;
+          SELF := [];
+     END;  
+	 
+    
+		sources := UNGROUP(PROJECT(groupSources, getMaxSources(LEFT, COUNTER)));
+    
+    sortSources := SORT(sources, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+    rollSources := ROLLUP(sortSources,
+                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                          TRANSFORM(RECORDOF(LEFT),
+                                    SELF.sources := LEFT.sources + RIGHT.sources;
+                                    SELF := LEFT;));
+                                    
+                                    
+	
+		RETURN rollSources;
+	ENDMACRO;  
 	
 END;

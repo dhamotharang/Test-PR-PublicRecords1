@@ -1,7 +1,7 @@
 ﻿EXPORT LI_Score_Attributes_V4_XML_Macro(roxie_ip, Gateway_dummy, Thread, Timeout, Retry, Input_file_name, Output_file_name1_score, Output_file_name2_attr, records_ToRun):= FUNCTIONMacro
 
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, zz_bbraaten2;
 IMPORT UT, scoring , Scoring_Project_PIP;
 
 

@@ -1,4 +1,4 @@
-import FLAccidents_eCrash,codes,ut,AutoStandardI,iesp,Census_Data,suppress,Accident_services,lib_stringlib;
+﻿import FLAccidents_eCrash,codes,ut,AutoStandardI,iesp,Census_Data,suppress,Accident_services,lib_stringlib;
 
 EXPORT Report_Records := MODULE
 
@@ -24,7 +24,7 @@ EXPORT Report_Records := MODULE
 				UNSIGNED accidentID := IF((integer)l.l_accnbr>boundary,(integer)l.l_accnbr-boundary,(integer)l.l_accnbr);
 				self.ReportDescription := rptDesc(l.report_code);
 				self.AccidentID := if(isClaims,(string)accidentID,'');
-				self.AccidentDate := iesp.ECL2ESP.toDate ((integer4) l.accident_date);
+				self.AccidentDate := iesp.ECL2ESP.toDatestring8 ((String8) l.accident_date);
 				self.Location.city := r.vehicle_incident_city;
 				self.Location.state := r.vehicle_incident_st;
 				string30 DamageLocation := if(isClaims,r.point_of_impact,'');
@@ -37,7 +37,7 @@ EXPORT Report_Records := MODULE
 				UNSIGNED accidentID := IF((integer)l.l_accnbr>boundary,(integer)l.l_accnbr-boundary,(integer)l.l_accnbr);
 				self.ReportDescription := rptDesc(l.report_code);
 				self.AccidentID := if(isClaims,(string)accidentID,'');
-				self.AccidentDate := iesp.ECL2ESP.toDate ((integer4) l.accident_date);
+				self.AccidentDate := iesp.ECL2ESP.toDatestring8 ((String8) l.accident_date);
 				self.Location.city := r.vehicle_incident_city;
 				self.Location.state := r.vehicle_incident_st;
 				string30 DamageLocation := if(isClaims,if(ut.isNumeric(r.point_of_impact),codes.KeyCodes('FLCRASH2_VEHICLE','POINT_OF_IMPACT','',r.point_of_impact),r.point_of_impact),'');

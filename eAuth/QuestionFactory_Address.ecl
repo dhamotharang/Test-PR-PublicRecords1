@@ -290,7 +290,7 @@ export QuestionFactory_Address := MODULE
     street_name := Functions.FormatAddressLine1 (project (ds_correct, iesp.share.t_Address)[1]);
     boolean IsSufficient := valid_input and (street_name != '') and (date.Year != 0);
 
-    years := ut.GetAgeI (date.Year * 10000 + date.Month * 100 + date.Day);
+    years := ut.Age (date.Year * 10000 + date.Month * 100 + date.Day);
     answers_date_full := dataset ([
      {'Less than 2 years', years < 2},
      {'2 - 3 years',  years = 2},
