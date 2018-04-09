@@ -1,9 +1,10 @@
-// The vendor layout for the vote history will change annualy. 
+﻿// The vendor layout for the vote history will change annualy. 
 // Please pay special attention to the layout changes and notify
 // data fabrication team to accommodate the changes.
 import VotersV2;
 
 In_File    := VotersV2.Updated_Voters;
+VoteHistoryBase_File  := VotersV2.File_Voters_VoteHistory_base;
 
 Layout_History := record
    In_File.process_date;
@@ -100,4 +101,7 @@ end;
 
 vote_hist := project(rollup_vote_hist, trfVoteHist(left));
 
-export Mapping_Voters_VoteHistory := vote_hist : persist(VotersV2.Cluster + 'persist::Voters_VoteHistory_Base');
+//Barb O'Neill modified for DOPS-461.
+allVoteHistory := vote_hist + voteHistoryBase_File;
+
+export Mapping_Voters_VoteHistory := allVoteHistory : persist(VotersV2.Cluster + 'persist::Voters_VoteHistory_Base');

@@ -4,7 +4,7 @@ C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp
 /*2013-12-06T19:54:44Z (mgould_prod)
 C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp2_Mapping\Filenames\2013-12-06T19_54_44Z.ecl
 */
-import VersionControl;
+import VersionControl; 
 
 export Filenames(
 
@@ -1128,10 +1128,14 @@ module
 	export wa_raw :=
 		module
 	
-			export Wa_Vendor_Data            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Wa_Vendor_Data::wa','bctlpedata10',,,,,pGroupname,,,'XML','Corporation',512*500,,,); 
-	
+			export Corporations            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::wa','bctlpedata10',,,,,pGroupname,,,'XML','Corporations',512*500,,,); 
+			export GoverningPersons        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::governingpersons::wa','bctlpedata10',,,,,pGroupname,,,'XML','GoverningPerson',512*500,,,); 
+  		export DocumentTypes           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::documenttypes::wa','bctlpedata10',,,,,pGroupname,,,'XML','DocumentTypes',512*500,,,); 
+
 			export dAll_filenames :=
-				  Wa_Vendor_Data.dAll_filenames
+				  Corporations.dAll_filenames
+				+ GoverningPersons.dAll_filenames
+				+ DocumentTypes.dAll_filenames
 				;
 	
 	end;
