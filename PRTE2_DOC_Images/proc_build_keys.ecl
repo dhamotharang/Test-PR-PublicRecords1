@@ -36,7 +36,7 @@ export Proc_Build_Keys (string filedate) := function
  //---------- making DOPS optional and only in PROD build -------------------------------													
 		is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 		DOPS_Comment		 					:= OUTPUT('Skipping DOPS process');
-		updatedops   		 				:= PRTE.UpdateVersion('DocImageKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+		updatedops   		 				:= PRTE.UpdateVersion('DocImagesKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
 //--------------------------------------------------------------------------------------
 
 
