@@ -1,4 +1,4 @@
-import	_control, PRTE_CSV, hygenics_search;
+﻿import	_control, PRTE_CSV, hygenics_search;
 
 export Proc_Build_Corrections_Keys (string pIndexVersion)	:=
 
@@ -283,5 +283,5 @@ return	sequential(
 								);
 								 
 
-end;
+end: DEPRECATED('Use PRTE2_DOC.proc_build_keys');;
 
