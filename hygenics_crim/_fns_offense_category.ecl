@@ -1658,7 +1658,7 @@ REGEXFIND('MFG'                                        ,poffense)   and
 REGEXFIND('LOOK[ -]A[ ]*LIKE|DWELLING| C[N ]*SUB[S]* | SCH\\. | ADULTERATED | SELL | CTR | POSS | UNLAW'                               ,poffense)   => 'Y',							 
 
 REGEXFIND('TRAFFI[CK]+[I]*NG|TRAFFING|TRAFFINKING|TRAFFKG|TRAFFKICKING|TRAFFRKG|TRAFFKING|TRAFFICK' ,poffense)    and
-~REGEXFIND(Drug_Narcotic_exc+'|FISH|PERSON|CHILD'  ,poffense)  and
+~REGEXFIND(Drug_Narcotic_exc+'|FISH|PERSON|CHILD|FORCED LABOR|PERSON'  ,poffense)  and
 stringlib.stringfind(poffense ,'FOOD',1) = 0      => 'Y',
 
 REGEXFIND('KEEP|MAIN'              ,poffense)   and 
