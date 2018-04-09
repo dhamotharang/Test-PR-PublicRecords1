@@ -164,7 +164,7 @@ r	:=RECORD,maxlength(60000)
   string10 mitigated_amount;
   string20 external_referral_or_casenumber;
   string5 fraud_point_score;
-  unsigned6 customer_person_id;
+  string20 customer_person_id;
   string50 raw_title;
   string100 raw_first_name;
   string60 raw_middle_name;
@@ -227,7 +227,7 @@ r	:=RECORD,maxlength(60000)
   string20 serial_number;
   string25 device_type;
   string25 device_identification_provider;
-  string20 transaction_id;
+  string	 transaction_id;
   string10 transaction_type;
   string12 amount_of_loss;
   string12 professional_id;

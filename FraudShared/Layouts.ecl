@@ -354,7 +354,7 @@ export Main         :=
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -424,7 +424,7 @@ export Main         :=
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -551,7 +551,7 @@ export keybuild
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -621,7 +621,7 @@ export keybuild
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)

@@ -53,7 +53,14 @@ export Keys(
 																											,self:=left)
 																											,left outer),all); 		
   																												
-	Export BankNames_JSON									:= Dedup(Table(BaseMain_BankNamePrep(Bank_Name<>''),{Bank_Name},few),all); 	//Json file for webteam GRP_518																																
+	Export BankNames_JSON									:= Dedup(Table(BaseMain_BankNamePrep(Bank_Name<>''),{Bank_Name},few),all); 	//Json file for webteam GRP_518
+	
+	shared BaseMain_AccountNumber 				:= dedup(table(Normalize(BaseMain(bank_account_number_1<>'' or bank_account_number_2<>'')
+																									,If(left.bank_account_number_2<>'',2,1) 
+																									,Transform({Fraudshared.Layouts_Key.main,string20 Bank_Account_Number}
+																									,self.Bank_Account_Number	:=	Choose(Counter,left.Bank_Account_Number_1,left.Bank_Account_Number_2)
+																									,self :=left)
+																									),{Bank_Account_Number,classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id,record_id , UID},few),all);	
 	
 	//ISP Begin
 	
@@ -116,7 +123,7 @@ export Keys(
 	shared BaseMain_AppProviderID  				:= BaseMain(Appended_Provider_ID != 0);
 	shared BaseMain_LNPID          				:= BaseMain(LNPID != 0);
 	shared BaseMain_DriversLicense 				:= BaseMain(drivers_license != '');
-	shared BaseMain_BankAccount						:= BaseMain(bank_account_number_1 != '' or bank_account_number_2 != '');
+	shared BaseMain_BankAccount						:= BaseMain_AccountNumber(bank_account_number!= '');
 	shared BaseMain_CityState 						:= BaseMain(clean_address.p_city_name != '' and clean_address.st != '');
 	shared BaseMain_Zip				 						:= BaseMain(clean_address.zip != '');
 	shared BaseMain_CustomerID 						:= BaseMain(customer_id != '');
@@ -154,7 +161,7 @@ export Keys(
 	tools.mac_FilesIndex('BaseMain_AppProviderID,{Appended_Provider_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.AppProviderID,AppProviderID);
 	tools.mac_FilesIndex('BaseMain_LNPID,{LNPID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.LNPID,LNPID);
 	tools.mac_FilesIndex('BaseMain_DriversLicense,{drivers_license ,drivers_license_state, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DriversLicense,DriversLicense);
-	tools.mac_FilesIndex('BaseMain_BankAccount,{bank_account_number_1 ,bank_routing_number_1,bank_account_number_2,bank_routing_number_2, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankAccount,BankAccount);
+	tools.mac_FilesIndex('BaseMain_BankAccount,{bank_account_number ,Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankAccount,BankAccount);
 	tools.mac_FilesIndex('BaseMain_CityState,{clean_address.p_city_name, clean_address.st , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.CityState,CityState);		
 	tools.mac_FilesIndex('BaseMain_Zip,{clean_address.zip , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Zip,Zip);		
 	tools.mac_FilesIndex('BaseMain_CustomerID,{customer_id , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.CustomerID,CustomerID);		
