@@ -167,7 +167,7 @@ MODULE
 		EXPORT testing := FALSE;
 	END;
 
-	//Phone Ownership (Phone Attributes)
+	//Phone Ownership (Phone Attributes) and Phone Finder
 	EXPORT PhoneAttributes :=
 	MODULE
 		EXPORT MaxRecsPerPhone 	:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
@@ -179,7 +179,7 @@ MODULE
 		EXPORT NUMBER_SWAPPED		:= 'DS'; // swap identifies both a disconnect and a number swap
 		EXPORT SUSPENDED				:= 'U';
 		EXPORT LIDB_VERFICATION	:= 'V';
-		EXPORT ATT_LIDB_RealTime:=  'PG'; // use to identify ATT gateway records for royalty
+		EXPORT ATT_LIDB_RealTime:=  'PR'; // use to identify ATT gateway records for royalty
 		EXPORT ATT_LIDB_Delta		:=  'PD'; // temporarily used to distinguish deltabase records
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
 		EXPORT set_ATT_LIDB			:=  [ATT_LIDB_SRC,ATT_LIDB_RealTime];
@@ -187,6 +187,7 @@ MODULE
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
 		EXPORT SUSPENDED_CODE		:= 'SU';
 		EXPORT DISCONNECTED_CODE:= 'DE';
+
 	END;
 
 
