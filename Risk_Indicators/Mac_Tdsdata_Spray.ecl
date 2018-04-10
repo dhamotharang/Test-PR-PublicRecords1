@@ -1,4 +1,4 @@
-import roxiekeybuild,ut;
+﻿import roxiekeybuild,ut,Scrubs_TelcordiaTDS,dops;
 
 export Mac_Tdsdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_20\'',email_target='\' \'') := 
 macro
@@ -21,7 +21,7 @@ macro
 
 %spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_20','~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);
 %TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
-%updatedops% 				:= RoxieKeyBuild.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|BN');
+%updatedops% 				:= dops.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|BN');
 
 
 %super_tdsdata% := sequential(FileServices.StartSuperFileTransaction(),
@@ -39,7 +39,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_tds,'~t
 
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_tds','~thor_data400::key::telcordia::'+filedate+'::tds',key1_built,true);
 
-ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
+RoxieKeyBuild.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 
 %move_them% := sequential(key1,key1_built,out1);
 
@@ -52,7 +52,7 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate))
+sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate),Scrubs_TelcordiaTDS.fnRunScrubs(filedate,''))
  : success(parallel(%send_succ_msg%,%send_success_msg%)),
    failure(parallel(%send_fail_msg%,%send_failure_msg%));
 
