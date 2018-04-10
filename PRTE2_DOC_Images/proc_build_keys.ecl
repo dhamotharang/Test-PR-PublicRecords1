@@ -44,8 +44,8 @@ return sequential(parallel(pre,pre_v2),
 																		build_roxie_keys,
 																		Move_keys,
 																		To_qa,
-																		parallel(post,post_v2)
-																		// if(is_running_in_prod, updatedops,DOPS_Comment)
+																		parallel(post,post_v2),
+																		if(is_running_in_prod, updatedops,DOPS_Comment)
 																		);
 
 end;
