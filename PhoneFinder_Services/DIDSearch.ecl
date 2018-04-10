@@ -30,6 +30,7 @@ FUNCTION
 		EXPORT BOOLEAN UseQSent      := FALSE;
 		EXPORT BOOLEAN UseTargus     := FALSE;
 		EXPORT BOOLEAN UseLastResort := FALSE;
+		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
 	END;
 	
 	dPrimaryPhoneHist := PhoneFinder_Services.GetPhones(dFormat2BatchIn,psMod);
@@ -55,7 +56,7 @@ FUNCTION
 													LIMIT(0), KEEP (1));
 													
 	// limiting no.of other phones returned based on MaxOtherPhones	option for each acct						
-	dCombined := TOPN(GROUP(SORT(dPhonesWaterfall(~isPrimaryPhone), acctno, -phone_score), acctno), inMod.MaxOtherPhones, acctno) + dWFPrimaryRecs;
+	dCombined := TOPN(GROUP(SORT(dPhonesWaterfall(~isPrimaryPhone), acctno, -phone_score), acctno), inMod.MaxOtherPhones, acctno) + dPhonesWaterfall(isPrimaryPhone) + dWFPrimaryRecs;
 
  dCombinedWithDIDs := PhoneFinder_Services.Functions.AppendDIDs(dCombined);
 	
