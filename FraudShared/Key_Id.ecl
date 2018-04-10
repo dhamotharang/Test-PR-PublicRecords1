@@ -227,7 +227,7 @@ r	:=RECORD,maxlength(60000)
   string20 serial_number;
   string25 device_type;
   string25 device_identification_provider;
-  string20 transaction_id;
+  string	 transaction_id;
   string10 transaction_type;
   string12 amount_of_loss;
   string12 professional_id;

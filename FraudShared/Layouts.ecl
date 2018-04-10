@@ -424,7 +424,7 @@ export Main         :=
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -621,7 +621,7 @@ export keybuild
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
