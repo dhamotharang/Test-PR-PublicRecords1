@@ -66,6 +66,7 @@ MODULE
 		// batch only options.
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly        := FALSE;
 		EXPORT INTEGER   MaxOtherPhones := 0;
+		EXPORT BOOLEAN   UseInHousePhoneMetadata	           := FALSE;
 	END;
 
 	EXPORT AKParams :=

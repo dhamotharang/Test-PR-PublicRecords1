@@ -1,4 +1,4 @@
-IMPORT Doxie,Gateway,Phones,ut;
+﻿IMPORT Doxie,Gateway,Phones,ut;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -114,8 +114,19 @@ FUNCTION
 	// Get QSent gateway records only for ultimate transaction type
 	dQSentRecs := IF(inMod.useQSent and qSentGateway.url != '',dQSentCombined);
 	
+	dInhousePhoneDetail	:= PhoneFinder_Services.GetPhoneDetails(PROJECT(dIn,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+																																											SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.homephone,SELF:=[])), dGateways, inMod);
+																																																																																				
+	dPhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
+																																					LEFT.acctno = RIGHT.acctno,
+																			 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
+																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
+																																																																						
+ //use inhouse metada (metadata index, att libd, carrier reference index)
+	dPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dPhoneDetailWBatchIn, dQSentRecs);
+
 	// Combine all the sources
-	dPhonesCombined := dReformat2Common + dQSentRecs;
+	dPhonesCombined := dReformat2Common + dPhoneDetail;
 		
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
