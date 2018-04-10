@@ -54,7 +54,7 @@ Export MT := module;
 				self 						                           := l;
 		end;
 
-			NormRA	:= normalize(ds_Agent, 2, normRAAddr(left, counter));
+			NormRA	:= normalize(ds_Agent, 2, normRAAddr(left, counter),local);
 			
 		//********************************************************************
 		// Perform Joins to create file that Corporations will be mapped from
@@ -96,7 +96,7 @@ Export MT := module;
 				self                    := l;
 		 end;
 		 
-		 NormCorpFileDate := normalize(join_CrpAgABNTM, 2, NormCorpFiling(left, counter));
+		 NormCorpFileDate := normalize(join_CrpAgABNTM, 2, NormCorpFiling(left, counter),local);
 		 
 	
 		 //********************************************************************
@@ -136,7 +136,7 @@ Export MT := module;
 					self                    := l;
 			 end;
 			 
-			 NormLLCFileDate := normalize(join_LLCAgABNTM, 2, NormLLCFiling(left, counter));									 
+			 NormLLCFileDate := normalize(join_LLCAgABNTM, 2, NormLLCFiling(left, counter),local);									 
 												 
 			//********************************************************************
 			// Joining the BE-LP file with the AGENTS 
@@ -157,7 +157,7 @@ Export MT := module;
 					self                    := l;
 			 end;
 			 
-		  NormLPFileDate := normalize(join_LPAgent, 3, NormLPFiling(left, counter));			
+		  NormLPFileDate := normalize(join_LPAgent, 3, NormLPFiling(left, counter),local);			
 
 
 		//********************************************************************
@@ -229,7 +229,7 @@ Export MT := module;
 				self 																			  := [];
 		end;
 		
-		MapBECorp := normalize(NormCorpFileDate, if(corp2.t2u(left.ExpirationDate) = '',1,2), CorpTransform(left, counter));
+		MapBECorp := normalize(NormCorpFileDate, if(corp2.t2u(left.ExpirationDate) = '',1,2), CorpTransform(left, counter),local);
 		
 		//----------------------------BE-LLC-----------------------------
 		corp2_mapping.LayoutsCommon.Main LLCTransform(Corp2_Raw_MT.Layouts.TempNormLLCLayoutIn l, unsigned1 cnt) := transform		
@@ -299,7 +299,7 @@ Export MT := module;
 				self 																			  := [];
 		end;
 		
-		MapBELLC := normalize(NormLLCFileDate, if(corp2.t2u(left.ExpirationDate) = '',1,2), LLCTransform(left, counter));
+		MapBELLC := normalize(NormLLCFileDate, if(corp2.t2u(left.ExpirationDate) = '',1,2), LLCTransform(left, counter),local);
 		 
 		//--------------------BE-LP-----------------------//
 		corp2_mapping.LayoutsCommon.Main LPTransform(Corp2_Raw_MT.Layouts.TempNormLPLayoutIn l, unsigned1 cnt) := transform		
@@ -364,7 +364,7 @@ Export MT := module;
 				self 																			  := [];
 		end;
 		
-		MapBELP := normalize(NormLPFileDate, if(corp2.t2u(left.DurationExpirationDate) = '',1,2), LPTransform(left, counter));
+		MapBELP := normalize(NormLPFileDate, if(corp2.t2u(left.DurationExpirationDate) = '',1,2), LPTransform(left, counter),local);
 		
 		//--------------------BE-LLP-----------------------//
 		corp2_mapping.LayoutsCommon.Main LLPTransform(Corp2_Raw_MT.Layouts.FileBELLPLayoutIn l, unsigned1 cnt) := transform
@@ -421,7 +421,7 @@ Export MT := module;
 				self 																			  := [];
 		end;
 		
-		MapBELLP := normalize(ds_BELLP, 2, LLPTransform(left, counter));	
+		MapBELLP := normalize(ds_BELLP, 2, LLPTransform(left, counter),local);	
 		
 		//--------------------TRADEMARK-----------------------//
 		corp2_mapping.LayoutsCommon.Main TMTransform(Corp2_Raw_MT.Layouts.FileTMLayoutIn l) := transform		

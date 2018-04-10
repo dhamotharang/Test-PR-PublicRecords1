@@ -1107,9 +1107,9 @@ module
 	export wa_raw :=
 		module
 	
-			export Corporations            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::wa','bctlpedata10',,,,,pGroupname,,,'XML','Corporations',512*500,,,); 
-			export GoverningPersons        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::governingpersons::wa','bctlpedata10',,,,,pGroupname,,,'XML','GoverningPerson',512*500,,,); 
-  		export DocumentTypes           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::documenttypes::wa','bctlpedata10',,,,,pGroupname,,,'XML','DocumentTypes',512*500,,,); 
+			export Corporations            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::wa','bctlpedata10',,,,,pGroupname,,,'XML','Corporation',512*500,,,); 
+			export GoverningPersons        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::governingpersons::wa','bctlpedata10',,,,,pGroupname,,,'XML','Governor',512*500,,,); 
+  		export DocumentTypes           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::documenttypes::wa','bctlpedata10',,,,,pGroupname,,,'XML','DocumentType',512*500,,,); 
 
 			export dAll_filenames :=
 				  Corporations.dAll_filenames
