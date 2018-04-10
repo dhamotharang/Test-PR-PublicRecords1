@@ -17,7 +17,8 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		SELF.error_desc := '',
 		SELF.carrier_city := '',
 		SELF.carrier_state := '',
-		SELF := RIGHT),
+		SELF := RIGHT,
+		SELF := []),
 	LIMIT(0), KEEP(Consts.MaxRecsPerPhone));
 
 	//Get phone data from the deltabase
@@ -65,6 +66,7 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 
 	//get real time LIDB data
 	attGateway  := in_mod.gateways(Gateway.Configuration.IsAttIapQuery(servicename))[1];
+	
 	realtimeAttPhones := IF(EXISTS(numbersForRealtime) AND attGateway.url<>'' AND attLIBD_enabled,
 		Gateway.Soapcall_ATTPhoneSearch(numbersForRealtime, attGateway, attLIBD_enabled));
 
@@ -111,6 +113,19 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 			//All records get carrier_city and carrier_state added
 			SELF.carrier_city := RIGHT.carrier_city,
 			SELF.carrier_state := RIGHT.carrier_state,
+			SELF.carrier_route := RIGHT.cart,
+			SELF.carrier_route_zonecode := RIGHT.cr_sort_sz,
+			SELF.delivery_point_code := RIGHT.dpbc,
+			SELF.affiliated_to := RIGHT.affiliated_to,
+			SELF.contact_name := RIGHT.contact_name,
+			SELF.contact_address1 := RIGHT.contact_address1,
+			SELF.contact_address2 := RIGHT.contact_address2,
+			SELF.contact_city := RIGHT.contact_city,
+			SELF.contact_state := RIGHT.contact_state,
+			SELF.contact_zip := RIGHT.contact_zip,
+			SELF.contact_phone := RIGHT.contact_phone,
+			SELF.contact_fax := RIGHT.contact_fax,
+			SELF.contact_email := RIGHT.contact_email,
 
 			//Check if the source is deltabase or realtime and that we didn't get an error.
 			SET OF STRING2 sourcesMissingInfo := [Consts.ATT_LIDB_Delta, Consts.ATT_LIDB_RealTime];
@@ -130,25 +145,100 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 			//We do a LEFT OUTER since we still have relevant information from the ATT/Deltabase response
 			//Even if we don't have a match on the carrier reference table.
 			LEFT OUTER, LIMIT(0), KEEP(1));
+			
+			//prioritize Realtime LIDB
+	dPortedPhonesSorted := SORT(dPortedPhonesFinal, acctno,phone, -dt_last_reported, -dt_first_reported,
+		source <> Consts.ATT_LIDB_RealTime, record);
+		
+	Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
+		SELF.acctno := L.acctno;
+		SELF.phoneno := L.phone;
+		SELF.is_current	:= FALSE;
 
-	#IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)
-		OUTPUT(dBatchPhonesIn,NAMED('dBatchPhonesIn'));
-		OUTPUT(dPortedMetadataPhones,NAMED('dPortedMetadataPhones'));
-		OUTPUT(numbersForDelta,NAMED('numbersForDelta'));
-		OUTPUT(deltaATTPhones,NAMED('deltaATTPhones'));
-		OUTPUT(filteredDeltaATTPhones,NAMED('filteredDeltaATTPhones'));
-		OUTPUT(dPortedDeltaPhones,NAMED('dPortedDeltaPhones'));
-		OUTPUT(dPortedMetadataDeltaPhones,NAMED('dPortedMetadataDeltaPhones'));
-		OUTPUT(latestPhoneRecs,NAMED('latestPhoneRecs'));
-		OUTPUT(oldOrIncompleteRecs,NAMED('oldOrIncompleteRecs'));
-		OUTPUT(numbersWithNoData,NAMED('numbersWithNoData'));
-		OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'));
-		OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'));
-		OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'));
-		OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'));
-		OUTPUT(dPortedPhones,NAMED('dPortedPhones'));
-		OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'));
+		// * Disconnect event_date = deact_start_dt
+		// * Ported phone event_date = port_start_dt
+		// * Swap Phone Number event_date = swap_start_dt
+		// * Suspended Number event_date = deact_start_dt
+		// * Reactivated Number event_date = react_start_dt
+		boolean ported_phone := L.source = Consts.ICONECTIV_SRC;
+		boolean ported_line := ported_phone or  L.source IN Consts.set_ATT_LIDB;
+
+		//identifies both historic and current disconnect records
+		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
+		boolean number_swapped := L.phone_swap <> '';
+		boolean suspended := L.deact_code = Consts.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
+		boolean reactivated := L.deact_code = Consts.SUSPENDED_CODE and L.is_react = 'Y';
+		boolean lidb_verfication := L.source IN Consts.set_ATT_LIDB;
+		event_type := if(ported_phone, Consts.PORTED_PHONE, '') +
+			if(disconnected and not ported_phone, Consts.DISCONNECTED, '') +
+			if(reactivated, Consts.REACTIVATED, '') +
+			if(number_swapped, Consts.NUMBER_SWAPPED, '') +
+			if(suspended, Consts.SUSPENDED, '') +
+			if(lidb_verfication, Consts.LIDB_VERFICATION, '');
+
+		event_date := if(lidb_verfication,L.dt_last_reported,MAX(L.port_start_dt, L.swap_start_dt, L.deact_start_dt, L.react_start_dt));
+		SELF.event_type := event_type;
+		SELF.event_date	:= if(event_type <> '', event_date, 0);
+
+		// populate disconnect date based on record's event type to report most recent event date
+		SELF.disconnect_date := MAP(disconnected => L.deact_start_dt,
+			number_swapped => L.swap_start_dt, 0);
+
+		SELF.ported_date := if(ported_phone, L.port_start_dt, 0);
+		SELF.carrier_id	:= L.account_owner;
+		SELF.carrier_name := L.carrier_name;
+		SELF.carrier_category := L.carrier_category;
+		SELF.operator_id := L.spid;
+		SELF.operator_name := if(L.operator_fullname <> '', L.operator_fullname, L.carrier_name);
+		SELF.line_type_last_seen := CASE(L.source,
+			Consts.ATT_LIDB_SRC => L.dt_last_reported,
+			Consts.ATT_LIDB_RealTime => L.dt_last_reported,
+			Consts.ICONECTIV_SRC => L.port_start_dt, 0);
+
+		SELF.phone_serv_type := if(ported_line, L.serv, '');
+		SELF.phone_line_type := if(ported_line, L.line, '');
+		SELF.swapped_phone_number_date := if(number_swapped, L.swap_start_dt, 0);
+		SELF.new_phone_number_from_swap	:= L.phone_swap;
+		SELF.suspended_date := if(suspended, L.deact_start_dt, 0);
+		SELF.reactivated_date := if(reactivated, L.react_start_dt, 0);
+		SELF.source := L.source;
+		SELF.prepaid := L.prepaid;
+		SELF.error_desc	:= L.error_desc;
+		SELF.carrier_city := L.carrier_city;
+		SELF.carrier_state := L.carrier_state;
+
+		//Check if the current record is outdated, from PX, or has an error_code, if so we mark dialable false.
+		today := STD.Date.Today();
+		earliestAllowedDate_libd := (UNSIGNED)ut.date_math((STRING)today, -in_mod.max_lidb_age_days);
+		boolean is_outdated := SELF.event_date < earliestAllowedDate_libd;
+		SELF.dialable := ~is_outdated AND L.error_desc = '' AND L.source <> Consts.DISCONNECT_SRC;
+
+		//These values are assigned below when all the most recent data is combined so they match what is being displayed.
+		SELF.phone_line_type_desc := '';
+		SELF.phone_serv_type_desc := '';
+		SELF := L;
+	END;
+	dPhones_w_Metadata := PROJECT(dPortedPhonesSorted, ProcessRecs(LEFT));
+	
+ #IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)
+        OUTPUT(dBatchPhonesIn,NAMED('dBatchPhonesIn'), EXTEND);
+        OUTPUT(dPortedMetadataPhones,NAMED('dPortedMetadataPhones'), EXTEND);
+        OUTPUT(numbersForDelta,NAMED('numbersForDelta'), EXTEND);
+        OUTPUT(deltaATTPhones,NAMED('deltaATTPhones'), EXTEND);
+        OUTPUT(filteredDeltaATTPhones,NAMED('filteredDeltaATTPhones'), EXTEND);
+        OUTPUT(dPortedDeltaPhones,NAMED('dPortedDeltaPhones'), EXTEND);
+        OUTPUT(dPortedMetadataDeltaPhones,NAMED('dPortedMetadataDeltaPhones'), EXTEND);
+        OUTPUT(latestPhoneRecs,NAMED('latestPhoneRecs'), EXTEND);
+        OUTPUT(oldOrIncompleteRecs,NAMED('oldOrIncompleteRecs'), EXTEND); 
+        OUTPUT(numbersWithNoData,NAMED('numbersWithNoData'), EXTEND);
+		OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'), EXTEND);
+		OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'), EXTEND);
+		OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'), EXTEND);
+		OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
+		OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
+		OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
 	#END
-
-	RETURN dPortedPhonesFinal;
+	
+	
+RETURN dPhones_w_Metadata;
 END;

@@ -1,4 +1,4 @@
-﻿IMPORT AddrBest,Doxie_Raw,Gateway,MDR,PhoneFinder_Services,Progressive_phone;
+﻿IMPORT AddrBest,Doxie_Raw,Gateway,MDR,Phones,PhoneFinder_Services,Progressive_phone;
 
 // Layouts
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
@@ -142,13 +142,24 @@ FUNCTION
 																																												inMod,phone,acctno,
 																																												TRUE,qSentV2Gateway));
 	
-	dWFQSentCombined := dPrimaryPhones + dWFQSentPrimaryPhoneDetail + dWFQSentOtherPhones + dWFQSentMatches;
+	dInhousePhoneDetail	:= IF(EXISTS(dPrimaryPhones),PhoneFinder_Services.GetPhoneDetails(PROJECT(dPrimaryPhones,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+																																											SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.phone,SELF:=[])), dGateways, inMod));
+																																											
+	dInhousePhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
+																																					LEFT.acctno = RIGHT.acctno,
+																			 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
+																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
+
+ dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn, dWFQSentPrimaryPhoneDetail);	
+																																																												
+	dWFQSentCombined := dPrimaryPhones + dPrimaryPhoneDetail + dWFQSentOtherPhones + dWFQSentMatches;
 	
 	BOOLEAN vHitQSent := inMod.useQSent and qSentV2Gateway.url != '';
 	
 	dWFQSentRecs := IF(vHitQSent,dWFQSentCombined);
 	
-	dWaterfallCombined := IF(~isPhoneExists and vHitQSent,dWaterfallOtherPhones + dWFQSentRecs,dWaterfallPrimaryPhone + dWaterfallOtherPhones);
+			
+  dWaterfallCombined := IF(~isPhoneExists and vHitQSent,dWaterfallOtherPhones + dWFQSentRecs,dWaterfallPrimaryPhone + dWaterfallOtherPhones);
 	
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.Waterfall)
@@ -174,6 +185,8 @@ FUNCTION
 																							OUTPUT(dWFQSentMatches,NAMED('dWFQSentMatches'),EXTEND),
 																							OUTPUT(dPrimaryPhones,NAMED('dPrimaryPhones'),EXTEND),
 																							OUTPUT(dWFQSentPrimaryPhoneDetail,NAMED('dWFQSentPrimaryPhoneDetail'),EXTEND),
+																							OUTPUT(dInhousePhoneDetail,NAMED('dInhousePhoneDetail'),EXTEND),
+																							OUTPUT(dPrimaryPhoneDetail,NAMED('dPrimaryPhoneDetail'),EXTEND),
 																							OUTPUT(dWFQSentRecs,NAMED('dWFQSentRecs'),EXTEND)),
 																#END
 																OUTPUT(DATASET([],{STRING1 Dummy}),NAMED('DummyDS'),EXTEND));

@@ -213,28 +213,30 @@ MACRO
 		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
 		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
 		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
+		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
+		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
 	END;
 
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch,reportMod,
 																												IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 																																											 dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
- 																												formattedSearchBy);
- iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
-      		TRANSFORM
-      			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
-      			SELF.Records   := modRecords.dFormat2IESP;
-      			SELF.InputEcho := pfSearchBy;
- END;
-      		
- results := DATASET([tFormat2IespResponse()]);
-   
- royalties	:= modRecords.dRoyalties;
+  																												formattedSearchBy);
+  iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
+         		TRANSFORM
+         			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
+         			SELF.Records   := modRecords.dFormat2IESP;
+         			SELF.InputEcho := pfSearchBy;
+    END;
+         		
+    results := DATASET([tFormat2IespResponse()]);
+      
+    royalties	:= modRecords.dRoyalties;
    	
- Zumigo_Log := modRecords.Zumigo_History_Recs;
-    
- OUTPUT(results,named('Results'));
- OUTPUT(royalties,named('RoyaltySet'));
- OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+    Zumigo_Log := modRecords.Zumigo_History_Recs;
+     
+    OUTPUT(results,named('Results'));
+    OUTPUT(royalties,named('RoyaltySet'));
+    OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
 
 ENDMACRO;
 
