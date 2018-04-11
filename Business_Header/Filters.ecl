@@ -37,6 +37,7 @@ module
 	// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
 	// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 	// -- JIRA - DF-21021 - Wrongly Linked Zoom Record-LexID 257274842 Consumer Advocacy
+	// -- JIRA - DF-21627 - Incorrect Linking PAW - LexID 9785873368 
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -48,9 +49,11 @@ module
 																'1676507481   C37536530',
 																'1149525038   C37536530',
 																'1665485437   C37536530',
-																'2083107149    C107741806',
+																'2083107149    C107741806',		// JIRA - LNK-788
+																'2083107149    C232603813',		// JIRA - LNK-788
 																'2061716462    C344399990',
-																'3941486       C275579153'
+																'3941486       C275579153',
+																'1343528727   C354557740'			// JIRA - DF-21627
 															 ];
 	
 	export Input :=
@@ -411,6 +414,8 @@ module
 				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 				// -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
+				// -- JIRA - DF-20795 - Consumer disputing association with a company
+				or  (mdr.sourceTools.sourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -945,6 +950,8 @@ module
 				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 				// -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
+				// -- JIRA - DF-20795 - Consumer disputing association with a company
+				or  (mdr.sourceTools.sourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1223,6 +1230,12 @@ module
 														)
 												and l.state = 'TX'
 												;
+				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
+				filterbugLNK563 := trimids(l.vl_id) in ['12-552868'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
+												and l.did = 2323167047
+												;
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
 				ZeroEq_EmployerDate :=  (MDR.sourceTools.SourceIsEq_Employer(l.source));
@@ -1235,8 +1248,8 @@ module
 				self.dt_first_seen        := if (ZeroEq_EmployerDate, 0, dt_first_seen);
 				self.dt_last_seen         := if (ZeroEq_EmployerDate, 0, dt_last_seen);
 				
-				self.DID									:= if(filterbug30402, 0, l.did)	;
-				self.ssn									:= if(filterbug30402, 0, l.ssn)	;
+				self.DID									:= if(filterbug30402 or filterbugLNK563, 0, l.did)	;
+				self.ssn									:= if(filterbug30402 or filterbugLNK563, 0, l.ssn)	;
 				self											:= l														;                              
 			end;
 			
@@ -1536,6 +1549,8 @@ module
 				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 			or // -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
 			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
+			or // -- JIRA - DF-20795 - Consumer disputing association with a company
+				( mdr.sourceTools.sourceIsEq_Employer(pInput.source) and (integer)pInput.company_phone = 3192333309)
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -2045,6 +2060,8 @@ module
 				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and trim(pInput.phone) = '6123046073')
 			or // -- JIRA - DF-20685 LexID 523271314 - Wrongly Appended PAW records - Consumer Advocacy.
 			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = '07503' and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
+			or // -- JIRA - DF-20795 - Consumer disputing association with a company
+				( mdr.sourceTools.sourceIsEq_Employer(pInput.source) and (integer)pInput.company_phone = 3192333309)
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 

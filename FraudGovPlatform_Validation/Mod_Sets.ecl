@@ -5,12 +5,12 @@ EXPORT threshld:=0.05;
 EXPORT validDelimiter := '~|~';
 EXPORT validTerminators := '~<EOL>~';
 
-EXPORT validDelimiterInqLog := '|\t|';
-EXPORT validTerminatorsInqLog := '|\n';
+EXPORT validDelimiterDeltabase := '|\t|';
+EXPORT validTerminatorsDeltabase := '|\n';
 
 EXPORT IdentityData_numberOfColumns := 58;
 EXPORT KnownFraud_numberOfColumns	:= 117;
-EXPORT InquiryLogs_numberOfColumns	:=50;
+EXPORT Deltabase_numberOfColumns	:=50;
 EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
@@ -43,8 +43,8 @@ EXPORT CriticalFieldError_KnownFraud	:= [
 															,'reported_by'
 														];	
 														
-EXPORT CriticalFieldError_InquiryLogs	:= [
-															'Client_ID'
+EXPORT CriticalFieldError_Deltabase	:= [
+															'Customer_Account_Number'
 															,'Customer_program'								
 															,'Customer_County'
 															,'Customer_State'											

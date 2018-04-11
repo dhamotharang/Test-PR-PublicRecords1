@@ -1,4 +1,4 @@
-Import Obituaries, ut, VersionControl;
+﻿Import Obituaries, ut, VersionControl;
 
 EXPORT Build_obituary_base := FUNCTION
 
@@ -63,7 +63,7 @@ END;
 
 RollupObituary	:=	ROLLUP(dsSort,xformCombined(LEFT,RIGHT),person_id,local);
 
-ut.MAC_SF_BuildProcess(RollupObituary,'~thor_data400::base::obituarydata_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/false,(string8)file_date);
+ut.MAC_SF_BuildProcess(RollupObituary,'~thor_data400::base::obituarydata_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/true,(string8)file_date);
 
 return build_obituary_out;
 	

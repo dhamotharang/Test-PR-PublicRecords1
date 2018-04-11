@@ -1,4 +1,4 @@
-import FraudShared;
+﻿import FraudShared;
 EXPORT File_KeyBuild (
 dataset(FraudShared.Layouts.Base.Main)										pBaseMainBuilt									= Fraudshared.Files().Base.Main.Built ) 
 := 
