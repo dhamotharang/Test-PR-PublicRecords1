@@ -4,7 +4,7 @@ EXPORT SprayAndQualifyDeltabase(
 	STRING version,
 	STRING ip	= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10),
 	STRING rootDir = '/data/super_credit/fraudgov/in/deltabase/dev/', 
-	STRING destinationGroup = IF(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_44')
+	STRING destinationGroup = IF(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44')
 ) := FUNCTION
 
 dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, rootDir + version[1..8], '*.txt')):INDEPENDENT;
