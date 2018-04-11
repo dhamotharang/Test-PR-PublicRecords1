@@ -52,7 +52,7 @@ module
 		shared dsVer 	:= dataset(filenames().OutputF.RefreshAddresses,{unsigned8 pVersion},flat,opt);
 		
 		EXPORT IsTimeForRefresh	:= if(	nothor(fileservices.fileExists(filenames().OutputF.RefreshAddresses)), 
-										(unsigned8) pVersion - dsVer[1].pVersion >= Constants().RefreshAddresses, 
+										(string8) pVersion - dsVer[1].pVersion >= Constants().RefreshAddresses, 
 										true);
 		
 		PromoteSupers.MAC_SF_BuildProcess(dataset([{pVersion}],{string8 pVersion}), filenames().OutputF.RefreshAddresses, PostRefreshAddresses ,2,,true);
