@@ -63,7 +63,7 @@ EXPORT Layouts := MODULE
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
 			string11	geo_long; 
-			string100 source_input := 'Contributory';
+			string100 	source_input := 'Contributory';
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -168,7 +168,7 @@ EXPORT Layouts := MODULE
 			string1		Customer_Program;
 			string8		start_date;
 			string8		end_date;
-			string10  amount_paid;
+			string10  	amount_paid;
 			string10	region_code;
 			string10	investigator_id;
 			string250	reason_description;
@@ -208,7 +208,7 @@ EXPORT Layouts := MODULE
 			string50	raw_title;
 			string100	raw_first_name;
 			string60	raw_middle_name;
-			string100 raw_last_name;
+			string100 	raw_last_name;
 			string10	raw_Orig_Suffix;
 			string  	full_address;
 			string100	street_1;
@@ -286,139 +286,157 @@ EXPORT Layouts := MODULE
 	
 	EXPORT Input := module
 		EXPORT IdentityData := RECORD
-				Sprayed.IdentityData;
-				unsigned8		Unique_Id ;
-				Address.Layout_Clean_Name						cleaned_name;				
-				string100         	address_1 := '';   
-				string50          	address_2 := '';
-				Address.Layout_Clean182_fips					clean_address;
-				string100         	mailing_address_1 := '';   
-				string50          	mailing_address_2 := '';
-				Address.Layout_Clean182_fips					additional_address;	
-				clean_phones												clean_phones;
-				unsigned6 				did ; 
-				unsigned1					did_score;				
-				Provenance;
+			Sprayed.IdentityData;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;			
+			string100		address_1 := '';   
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
+			string100		mailing_address_1 := '';   
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;	
+			clean_phones										clean_phones;
+			string9			clean_SSN;
+			string9			clean_Zip;
+			string25		clean_IP_Address;
+			unsigned6 	did ; 
+			unsigned1		did_score;				
+			Provenance;
 		END;
 		EXPORT KnownFraud := RECORD
-				Sprayed.KnownFraud;
-				unsigned8		Unique_Id ;
-				Address.Layout_Clean_Name						cleaned_name;
-				string100         	address_1 := '';   
-				string50          	address_2 := '';				
-				Address.Layout_Clean182_fips					clean_address;
-				string100         	mailing_address_1 := '';   
-				string50          	mailing_address_2 := '';				
-				Address.Layout_Clean182_fips					additional_address;
-				clean_phones												clean_phones;
-				unsigned6 				did ; 
-				unsigned1					did_score;				
-				Provenance;
+			Sprayed.KnownFraud;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;			
+			string100		address_1 := '';   
+			string50		address_2 := '';				
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
+			string100		mailing_address_1 := '';   
+			string50		mailing_address_2 := '';				
+			Address.Layout_Clean182_fips			additional_address;
+			clean_phones										clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			unsigned6 	did ; 
+			unsigned1		did_score;				
+			Provenance;
 		END;
 	END;
 
 
-EXPORT Base := MODULE
-	EXPORT IdentityData	:= 
-		record 
-		Sprayed.IdentityData ;
-		unsigned8		Unique_Id ;
-		Address.Layout_Clean_Name						cleaned_name;				
-		string100         	address_1 := '';   
-		string50          	address_2 := '';
-		Address.Layout_Clean182_fips					clean_address;
-		string100         	mailing_address_1 := '';   
-		string50          	mailing_address_2 := '';
-		Address.Layout_Clean182_fips					additional_address;	
-		clean_phones												clean_phones;
-		unsigned6 				did ; 
-		unsigned1					did_score;		
-		string			current ; 
-		unsigned4		dt_first_seen;
-		unsigned4		dt_last_seen;
-		unsigned4		dt_vendor_first_reported;
-		unsigned4		dt_vendor_last_reported;
-		unsigned2		name_ind:=0;
-		unsigned8		NID:=0;
-		unsigned4		process_date ; 
-		string100		Source; 
-		unsigned8		source_rec_id; 
-	END; 
-	
-	EXPORT KnownFraud	:= 
-		record 
-		Sprayed.KnownFraud ;
-		unsigned8		Unique_Id ;
-		Address.Layout_Clean_Name						cleaned_name;
-		string100         	address_1 := '';   
-		string50          	address_2 := '';				
-		Address.Layout_Clean182_fips					clean_address;
-		string100         	mailing_address_1 := '';   
-		string50          	mailing_address_2 := '';				
-		Address.Layout_Clean182_fips					additional_address;
-		clean_phones												clean_phones;
-		unsigned6 				did ; 
-		unsigned1					did_score;			
-		string			current ; 
-		unsigned4		dt_first_seen;
-		unsigned4		dt_last_seen;
-		unsigned4		dt_vendor_first_reported;
-		unsigned4		dt_vendor_last_reported;
-		unsigned2		name_ind:=0;
-		unsigned8		NID:=0;
-		unsigned4		process_date ; 
-		string100		Source; 
-		unsigned8		source_rec_id;
+	EXPORT Base := MODULE
+		EXPORT IdentityData	:= 
+			record 
+			Sprayed.IdentityData ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;				
+			string100		address_1 := '';   
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			string100		mailing_address_1 := '';   
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;	
+			clean_phones										clean_phones;
+			string9			clean_SSN;
+			string9			clean_Zip;
+			string25		clean_IP_Address;
+			unsigned6		did ; 
+			unsigned1		did_score;		
+			string			current ; 
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date; 
+			string100		Source; 
+			unsigned8		source_rec_id; 
+		END; 
+		
+		EXPORT KnownFraud	:= 
+			record 
+			Sprayed.KnownFraud ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name			cleaned_name;
+			string100         	address_1 := '';   
+			string50          	address_2 := '';				
+			Address.Layout_Clean182_fips		clean_address;
+			string100         	mailing_address_1 := '';   
+			string50          	mailing_address_2 := '';				
+			Address.Layout_Clean182_fips		additional_address;
+			clean_phones									clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			unsigned6		did ; 
+			unsigned1		did_score;			
+			string			current ; 
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date ; 
+			string100		Source; 
+			unsigned8		source_rec_id;
+		END;
+
+		EXPORT AddressCache := record
+			unsigned8			address_id;
+			unsigned4			address_cleaned;
+			string100      address_1 := '';   
+			string50       address_2 := '';
+			Address.Layout_Clean182_fips					clean_address;
+		END;
 	END;
 
-END;
 
-export address_cleaner :=
-	record
-	string100         	address_1 := '';   
-	string50          	address_2 := '';
-	Address.Layout_Clean182_fips				clean_address;
-	end;
 
 export temp := module 
 	 
 	 export DidSlim := 
 	  record
-			unsigned8		unique_id				;
-			string20 		fname						;
-			string20 		mname						;
-			string20 		lname						;
-			string5  		name_suffix		  ;
-			string10  	prim_range			;
-			string28		prim_name				;
-			string8			sec_range			 	;
-			string5			zip5						;
-			string2			state						;
-			string10		phone						;
-			string9 		ssn							;
-			string8   	dob							;
-			unsigned6		did					:= 0;
-			unsigned1		did_score		:= 0;
+			unsigned8		unique_id;
+			string20 		fname;
+			string20 		mname;
+			string20 		lname;
+			string5  		name_suffix;
+			string10		prim_range;
+			string28		prim_name;
+			string8			sec_range;
+			string5			zip5;
+			string2			state;
+			string10		phone;
+			string9 		ssn;
+			string8			dob;
+			unsigned6		did:= 0;
+			unsigned1		did_score:= 0;
 	  end;
 
 	  export BdidSlim := 
 	  record
-			unsigned8		unique_id					;
-			string100 	business_name			;
-			string10  	prim_range				;
-			string28		prim_name					;
-			string5			zip5							;
-			string8			sec_range					;
-			string25 		p_City_name				;   		// City
-			string2			state		 					;
-			string10		phone		  		    ;
-			string20 		fname							;
-			string20 		mname							;
-			string20 		lname							;
-			string9 		fein						  ;
-			unsigned6		bdid					:= 0;
-			unsigned1		bdid_score		:= 0;
-			BIPV2.IDlayouts.l_xlink_ids		;
+			unsigned8		unique_id;
+			string100		business_name;
+			string10		prim_range;
+			string28		prim_name;
+			string5			zip5;
+			string8			sec_range;
+			string25 		p_City_name;   		// City
+			string2			state;
+			string10		phone;
+			string20 		fname;
+			string20 		mname;
+			string20 		lname;
+			string9 		fein;
+			unsigned6		bdid:= 0;
+			unsigned1		bdid_score:= 0;
+			BIPV2.IDlayouts.l_xlink_ids;
 	  end;
 		
  end; 

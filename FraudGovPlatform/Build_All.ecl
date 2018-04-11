@@ -2,27 +2,31 @@
 
 export Build_All(
 
-	 string																				pversion
-	,string																				pServerIP		          = _control.IPAddress.bair_batchlz01
-	,string																				pDirectory	          = '/data/otto/in/'	 
+	 string																pversion
+	,string																pServerIP 							= _control.IPAddress.bair_batchlz01
+	,string																pDirectory 							= '/data/otto/in/'	 
 	// All sources are not updated each build if no updates to particular source skip that source base 
-  ,boolean                                     	PSkipIdentityDataBase					= false 
-  ,boolean                                     	PSkipKnownFraudBase           	= false 
- 	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile								=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
-	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile					=	IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
-	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile						=	IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
-	,dataset(Layouts.Input.IdentityData)	       	pUpdateIdentityDataFile	       	=	Files().Input.IdentityData.Sprayed
-	,dataset(Layouts.Input.KnownFraud)	        	pUpdateKnownFraudFile	        	=	Files().Input.KnownFraud.Sprayed
-  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt								= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
+	,boolean															PSkipIdentityDataBase			= false 
+	,boolean															PSkipKnownFraudBase				= false 
+	,boolean															PSkipAddressCache					= false 
+	,boolean															PSkipMainBase           		= false 
+ 	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
+	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
+	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
+	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
+  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
-	,boolean                                    	pUpdateIdentityDataFlag        	= _Flags.Update.IdentityData
-	,boolean                                     pUpdateKnownFraudFlag         	= _Flags.Update.KnownFraud
+	,boolean                                    	pUpdateIdentityDataFlag		= _Flags.Update.IdentityData
+	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
 ) :=
 module
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
-		 Create_Supers
+			Create_Supers
+			,_flags.HeaderInfo.Post
+			,_flags.RefreshAddresses(pversion).Post		 
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
@@ -32,9 +36,11 @@ module
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
+				,PSkipAddressCache
+				,PSkipMainBase
 				//Base
 				,pBaseMainFile	
-				//IdentityData
+				//IdentityData 
 				,pBaseIdentityDataFile
 				,pUpdateIdentityDataFile	
 				,pUpdateIdentityDataFlag
