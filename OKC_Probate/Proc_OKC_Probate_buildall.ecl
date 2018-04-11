@@ -1,4 +1,4 @@
-﻿IMPORT OKC_Probate, BuildLogger, VersionControl, STD;
+﻿IMPORT OKC_Probate, BuildLogger, VersionControl, STD, Orbit3;
 EXPORT Proc_OKC_Probate_buildall(
 		STRING		pVersion					=	(STRING)STD.Date.Today()
 		,STRING		pServerIP			=	OKC_Probate.Constants(pVersion).serverIP
@@ -26,6 +26,9 @@ EXPORT Proc_OKC_Probate_buildall(
 	//	All filenames associated with this Dataset
 	SHARED	dAll_filenames	:=	Filenames().dAll_filenames;
 
+	//	Orbit Entry Creation
+	EXPORT	orbit_entry	:=	Orbit3.proc_Orbit3_CreateBuild('Probate Death Records',pVersion,'N');
+
 	//	Full Build
 	EXPORT	full_build	:=	SEQUENTIAL(
 			BuildLogger.BuildStart(false),
@@ -37,10 +40,11 @@ EXPORT Proc_OKC_Probate_buildall(
 			OKC_Probate.Proc_OKC_Probate_buildfiles(pversion).All,
 			BuildLogger.BaseEnd(False),
 			BuildLogger.PostStart(False),
-			// Business_Credit.QA_Records(),
-			// Business_Credit.Strata_Population_Stats(pversion,
-																							// pIsTesting).All,
+			OKC_Probate.QA_Records(),
+			OKC_Probate.Strata_Population_Stats(pversion,
+																							pIsTesting).All,
 			BuildLogger.PostEnd(False),
+			orbit_entry,
 			BuildLogger.BuildEnd(false)
 	) : SUCCESS(Send_Emails(pversion).BuildSuccess),
 					FAILURE(Send_Emails(pversion).BuildFailure);
