@@ -1,4 +1,4 @@
-// Function to update data operations database with a new build version for a specific
+﻿// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -66,6 +66,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 												subjectprefixstring + datasetname + ' DOPS UPDATE ' + newcversion, 
 												'Dataset: ' + datasetname + '\n' +
 												'Version: ' + uversion + '\n' +
+												'Workunit: ' + WORKUNIT + '\n' +
 												'HPCC Build Owner/User: ' + dops.constants.jobowner + '\n\n' +
 												'DOPS ENVIRONMENT: ' + dopsenv + if (dopsenv = 'dev', '. Updating DOPS DEV DB because the ECL code is running on dev, dops.constants.daliip is pointing to dev dali.', '') + '\n\n' +
 												newemailmessage
