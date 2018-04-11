@@ -148,6 +148,7 @@ MODULE
 		RECORD
 			STRING flag;
 			DATASET(iesp.share.t_StringArrayItem) messages;
+			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
 		END;
 		
 		// Phone finder common layout with carrier information	
@@ -759,5 +760,81 @@ MODULE
 	  UNSIGNED RecordsReturned;
 	END;
 	
+	//	DeltaPhones
+	EXPORT delta_phones_rpt_transaction := record
+   		STRING16 transaction_id;
+		STRING32 transaction_date;
+		STRING60 user_id;
+		STRING8 product_code;
+		STRING16 company_Id;
+		STRING8 source_code; 		
+   		STRING60 reference_code;
+   		STRING32 phonefinder_type;
+		//SearchTerms
+		STRING32 submitted_lexid;
+		STRING15 submitted_phonenumber;
+		STRING20 submitted_firstname;
+		STRING20 submitted_lastname;
+		STRING20 submitted_middlename;
+		STRING128 submitted_streetaddress1;
+		STRING64 submitted_city;
+		STRING16 submitted_state;
+		STRING10 submitted_zip;
+		//Primary Phone details 
+   		STRING15 phonenumber;
+   		STRING16 risk_indicator;
+   		STRING32 phone_type;
+   		STRING32 phone_status;
+   		Integer  ported_count;
+		STRING32 last_ported_date; 
+   		INTEGER  otp_count;
+   		STRING32 last_otp_date;
+   		integer  spoof_count;
+   		STRING32 last_spoof_date;
+   		STRING32 phone_forwarded;
+   END;
+		
+	EXPORT	delta_phones_rpt_otherphones:= record
+   		string16 transaction_id;
+   		Integer sequence_number;
+		Integer phone_id;
+   		string15 phonenumber;
+		string16 risk_indicator;
+   		string32 phone_type;
+   		string32 phone_status;
+   		string64 listing_name;
+   		string16 porting_code;
+   		string32 phone_forwarded;
+   		Boolean	verified_carrier; 
+	END;
+   	
+   EXPORT	delta_phones_rpt_identities:= record
+   		string16 transaction_id;
+   		Integer  sequence_number;
+		string32 lexid;
+   		string128 full_name;
+   		string128 full_address;
+   		string64 city;
+   		string16 state;
+   		string10 zip;
+   		boolean	 verified_carrier; 
+   	END;
+
+	EXPORT delta_phones_rpt_riskindicators:= record
+        string16 transaction_id;
+        integer phone_id;
+        integer sequence_number;
+	    string256 risk_indicator_text;		 	
+	    integer risk_indicator_id;
+        string16 risk_indicator_level;
+        string32 risk_indicator_category;
+   END;
+	 
+	EXPORT delta_phones_rpt_Usage_records := RECORD
+	   DATASET(delta_phones_rpt_transaction) delta_phones_rpt_transaction {xpath('delta__phonefinder_delta__phones_rpt__transaction/Row')};
+       DATASET(delta_phones_rpt_otherphones) delta_phones_rpt_otherphones {xpath('delta__phonefinder_delta__phones_rpt__otherphones/Row')};
+       DATASET(delta_phones_rpt_identities) delta_phones_rpt_identities {xpath('delta__phonefinder_delta__phones_rpt__identities/Row')};
+       DATASET(delta_phones_rpt_riskindicators) delta_phones_rpt_riskindicators {xpath('delta__phonefinder_delta__phones_rpt__riskindicators/Row')};
+	END;
 	
 END;

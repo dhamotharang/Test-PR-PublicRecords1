@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, MDR;
+﻿IMPORT iesp, Gateway, MDR, ut;
 EXPORT Constants :=
 MODULE
 
@@ -27,7 +27,20 @@ MODULE
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3);
-	EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
+ SHARED TransTypeCodes := DATASET([
+       {TransType.Basic, 'BASIC'},
+       {TransType.Premium, 'PREMIUM'},
+       {TransType.Ultimate, 'ULTIMATE'},                    
+       {TransType.PhoneRiskAssessment, 'PHONERISKASSESSMENT'}
+       ], {unsigned1 tcode; string ttype;});
+
+TransCodeTypeDCT := DICTIONARY(TransTypeCodes, {tcode => ttype}); 
+EXPORT MapTransCode2Type(UNSIGNED1 t) := TransCodeTypeDCT[t].ttype;
+
+TransTypeCodeDCT := DICTIONARY(TransTypeCodes, {ttype => tcode}); 
+EXPORT MapTransType2Code(STRING t) := TransTypeCodeDCT[ut.CleanSpacesAndUpper(t)].tcode;
+
+EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
 	
 	// Phone types
 	EXPORT PhoneType :=
