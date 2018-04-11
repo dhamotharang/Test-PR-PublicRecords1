@@ -3,8 +3,8 @@ MODULE:Scrubs_Phonesinfo
 FILENAME:Phonesinfo
 NAMESCOPE:DeactRaw2
 
-FIELDTYPE:Invalid_Num:ALLOW(0213456789)
-FIELDTYPE:Invalid_TimeStamp:ALLOW(0213456789-)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 \n)
+FIELDTYPE:Invalid_TimeStamp:ALLOW(0123456789- \n) 
 
 FIELD:msisdn:LIKE(Invalid_Num):TYPE(STRING):0,0
 FIELD:timestamp:LIKE(Invalid_TimeStamp):TYPE(STRING):0,0

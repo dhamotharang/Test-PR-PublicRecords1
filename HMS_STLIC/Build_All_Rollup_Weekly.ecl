@@ -12,8 +12,10 @@ EXPORT Build_all_rollup_weekly(string pversion, boolean pUseProd = false) := FUN
 								,Promote.Promote_stlicrollup(pversion,pUseProd).buildfiles.Built2QA
 								,Build_Strata(pversion,pUseProd).StlRollup
 									//Clean Up Base Files
+								,FileServices.StartSuperFileTransaction()	
 								,FileServices.RemoveOwnedSubFiles('~thor400_data::base::hms_stl::hms_stlicrollup',true)
 								,FileServices.AddSuperFile('~thor400_data::base::hms_stl::hms_stlicrollup','~thor400_data::base::hms_stl::hms_stlicrollup::' + pVersion)
+								,FileServices.FinishSuperFileTransaction()
 						
 					): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 	);

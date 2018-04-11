@@ -21,6 +21,7 @@ export Rollup_Base( dataset(Layouts.Base) pDataset) := function
 																							l.GEO_Code_Longitude,
 																							l.GEO_Code_Longitude_Direction,
 																							l.Recent_Update_Code,
+																							l.Years_in_Business_Code,
 																							l.Year_Business_Started,
 																							l.Address_Type_Code,
 																							l.Estimated_Number_of_Employees,
@@ -97,6 +98,9 @@ export Rollup_Base( dataset(Layouts.Base) pDataset) := function
 																							l.TXB002_Sign,
 																							l.TXB002,
 																							l.TXP016,
+																							l.UCC001,
+																							l.UCC002,
+																							l.UCC003,
 																							l.Model_action,
 																							l.Score_Factor_1,
 																							l.Score_Factor_2,
@@ -138,22 +142,17 @@ export Rollup_Base( dataset(Layouts.Base) pDataset) := function
 																							l.FSR_Score_Factor_2,
 																							l.FSR_Score_Factor_3,
 																							l.FSR_Score_Factor_4,
+																							l.IP_Score_change_sign,
+																							l.FSR_Score_change_sign,
+																							l.FSR_Score_change,
 																							l.DBA_Name	));
 		self							 :=l;
 	end;
-	
   DS_RecID      :=project(pDataset ,trans_RecID(left));
 	
-	pDataset_sort := sort( distribute(DS_RecID, hash(Experian_Bus_Id)),
-												 record, experian_bus_id, source_rec_id, -dt_vendor_last_reported, 
-												 except  source_rec_id, dt_first_seen, dt_last_seen, dt_vendor_first_reported,
-															   dt_vendor_last_reported, establish_date ,latest_reported_date, 
-															   years_in_file, months_in_file, ip_score_change,ip_score_change_sign, 
-															   fsr_score_change, fsr_score_change_sign, years_in_business_code,
-														     ucc001, ucc002, ucc003,local
-											  );
+	pDataset_sort := sort(distribute(DS_RecID, hash(Experian_Bus_Id)), Experian_Bus_Id, source_rec_id, -dt_vendor_last_reported, local);
 	
-	Experian_CRDB.Layouts.Base RollupUpdate(Experian_CRDB.Layouts.Base l, Experian_CRDB.Layouts.Base r) := transform
+	Layouts.Base RollupUpdate(Layouts.Base l, Layouts.Base r) := transform
 		SELF.dt_first_seen 						:= ut.EarliestDate(l.dt_first_seen , r.dt_first_seen);
 	  SELF.dt_last_seen							:= Max(l.dt_last_seen	, r.dt_last_seen);
 		SELF.Establish_Date 					:= (string) ut.EarliestDate((unsigned4)l.Establish_Date , (unsigned4)r.Establish_Date);
@@ -163,16 +162,12 @@ export Rollup_Base( dataset(Layouts.Base) pDataset) := function
 		self 													:= l;
 	end;
 
-	pDataset_rollup := rollup( pdataset_sort,
-														 rollupupdate(left, right),
-														 record,
-														 except source_rec_id, dt_first_seen, dt_last_seen, dt_vendor_first_reported,
-																		dt_vendor_last_reported, establish_date ,latest_reported_date,
-																		years_in_file, months_in_file, ip_score_change,ip_score_change_sign, 
-																		fsr_score_change, fsr_score_change_sign, years_in_business_code,
-																	  ucc001, ucc002, ucc003,local
+	pDataset_rollup := rollup( pDataset_sort
+														,left.Experian_Bus_Id = right.Experian_Bus_Id and 
+														 left.source_rec_id = right.source_rec_id
+														,RollupUpdate(left, right)
+														,local
 													 );
-
 	
 	return pDataset_rollup;
 

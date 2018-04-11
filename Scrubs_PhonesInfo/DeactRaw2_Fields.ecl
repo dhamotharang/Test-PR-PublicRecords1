@@ -8,18 +8,18 @@ EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Num','Inva
 EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Num' => 1,'Invalid_TimeStamp' => 2,0);
  
 EXPORT MakeFT_Invalid_Num(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0213456789'); // Only allow valid symbols
+  s1 := SALT39.stringfilter(s0,'0123456789 \\n'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0213456789'))));
-EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0213456789'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 \\n'))));
+EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 \\n'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_TimeStamp(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0213456789-'); // Only allow valid symbols
+  s1 := SALT39.stringfilter(s0,'0123456789- \\n'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_TimeStamp(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0213456789-'))));
-EXPORT InValidMessageFT_Invalid_TimeStamp(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0213456789-'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_TimeStamp(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789- \\n'))));
+EXPORT InValidMessageFT_Invalid_TimeStamp(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789- \\n'),SALT39.HygieneErrors.Good);
  
 EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'msisdn','timestamp','changeid','operatorid','msisdneid','msisdnnew','filename');
 EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'msisdn','timestamp','changeid','operatorid','msisdneid','msisdnnew','filename');

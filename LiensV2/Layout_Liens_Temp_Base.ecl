@@ -1,4 +1,4 @@
-export Layout_Liens_temp_base := record, maxlength(10000)
+﻿export Layout_Liens_temp_base := record, maxlength(10000)
 
 string50 tmsid;
 string50 rmsid;
@@ -17,7 +17,7 @@ string filing_status := '';
 string filing_status_desc := '';
 string case_number   := '';
 string20 filing_number := '';
-string filing_type   := '';
+string2 filing_type	:= '';
 string filing_type_desc := '';
 string filing_date := '';
 string filing_time := '';
@@ -109,8 +109,13 @@ string  clean_creditor_cname := '';
 string  clean_atty_cname := '';
 string  clean_thd_cname := '';
 string  thd_phone := '' ;
-
-
+STRING8	DOB	:=	'';
+string2 Filing_Type_ID	:= '';
+STRING8	Collection_Date	:=	'';
+STRING45	CaseLinkID	:=	'';
+string50 TMSID_old	:=	'';
+string50 RMSID_old	:=	'';
+BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
 end;
 
 

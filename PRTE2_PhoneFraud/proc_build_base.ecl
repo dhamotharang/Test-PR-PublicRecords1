@@ -124,8 +124,8 @@ EXPORT proc_build_base(String filedate) := FUNCTION
 		df_spoofing_final := PROJECT(df_spoofing_combined, Layouts.layout_phonefraud_spoofing_base_ext);
 
 
-  PromoteSupers.MAC_SF_BuildProcess(df_otp_final, Constants.base_phonefraud_otp, writefile_otp,,,,filedate);
-  PromoteSupers.MAC_SF_BuildProcess(df_spoofing_final, Constants.base_phonefraud_spoofing, writefile_spoofing,,,,filedate);  
+  PromoteSupers.MAC_SF_BuildProcess(df_otp_final, Constants.base_phonefraud_otp, writefile_otp,,,true,filedate);
+  PromoteSupers.MAC_SF_BuildProcess(df_spoofing_final, Constants.base_phonefraud_spoofing, writefile_spoofing,,,true,filedate);  
   
   RETURN SEQUENTIAL(writefile_otp, writefile_spoofing);	
 
