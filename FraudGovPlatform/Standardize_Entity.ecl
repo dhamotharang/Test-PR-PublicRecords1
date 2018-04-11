@@ -177,7 +177,7 @@ FUNCTIONMACRO
 			SELF		 	    		:= l;
 		END;
 			
-		dSlimForDiding	:= normalize(dAddUniqueId
+		dSlimForDiding	:= normalize(pInputFile
 																,if(left.clean_phones.phone_number <>'' and left.clean_phones.cell_phone != '',2,1)
 																,tSlimForDiding(left,counter)
 																);
@@ -213,7 +213,7 @@ FUNCTIONMACRO
 		dDidOut_sort			:= sort				(dDidOut_dist,unique_id, -did_score	,local);
 		dDidOut_dedup		:= dedup			(dDidOut_sort,unique_id ,local);
 		
-		dAddUniqueId_dist := distribute	(dAddUniqueId,unique_id	);
+		dAddUniqueId_dist := distribute	(pInputFile,unique_id	);
 
  			 
 		pInputFile tAssignDIDs(pInputFile l, FraudGovPlatform.Layouts.Temp.DidSlim r) :=
