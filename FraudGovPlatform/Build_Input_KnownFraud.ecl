@@ -27,12 +27,7 @@ module
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
 	
-	knfd := record
-		FraudGovPlatform.Layouts.Input.knownfraud;
-		INTEGER sequence;			
-	end;	
-
-	knfd tr(inKnownFraudUpdateUpper l) := transform
+	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -52,9 +47,9 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
+		source_input := if (l.source_input = '', 'KNFD',l.source_input);
+		self.source_input := source_input;
 		SELF.unique_id := hash64(
-								'KNFD,' + 
 								ut.CleanSpacesAndUpper(l.customer_name) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_account_number) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_state) + ',' +  
@@ -199,7 +194,7 @@ module
 									and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
 									and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
 									and left.Customer_County = right.Customer_County,
-									TRANSFORM(knfd,SELF := LEFT),LEFT ONLY,lookup);
+									TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),LEFT ONLY,lookup);
 	//Exclude Errors
 	ByPassed_records := f1_errors + NotInMbs;
 	f1_bypass_dedup := files().Input.ByPassed_KnownFraud.sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud);
@@ -208,8 +203,8 @@ module
 	//Move only Valid Records
 	f1_dedup					:=	 join (	f1,
 											ByPassed_records,
-											left.sequence = right.sequence,
-											TRANSFORM(knfd,SELF := LEFT),
+											left.Unique_Id = right.Unique_Id,
+											TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
 											left only);	
 																							
 	new_addresses := Functions.New_Addresses(f1_dedup);
@@ -278,17 +273,14 @@ module
 				,Filenames().Input.AddressCache_KNFD.New(pversion)
 			)			
 			,STD.File.FinishSuperFileTransaction()	
-		);
-		
+		);		
 // Return
 	export build_prepped := 
-		if(	STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::knownfraud') > 0, 
 			 sequential(
 				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
 				,Promote_Input_File
-			)		
 		);
 		
 	export All :=

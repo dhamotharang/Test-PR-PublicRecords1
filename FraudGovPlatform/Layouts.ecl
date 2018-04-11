@@ -134,7 +134,7 @@ EXPORT Layouts := MODULE
 			string60	email_address_risk_code;
 			string10	email_address_type;
 			string8		email_date;
-			string15	host;
+			string		host;
 			string25	alias;
 			string25	location;
 			string25	ip_address;
@@ -168,7 +168,7 @@ EXPORT Layouts := MODULE
 			string1		Customer_Program;
 			string8		start_date;
 			string8		end_date;
-			string10  	amount_paid;
+			string10  amount_paid;
 			string10	region_code;
 			string10	investigator_id;
 			string250	reason_description;

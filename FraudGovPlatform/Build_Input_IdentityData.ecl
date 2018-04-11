@@ -59,9 +59,9 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-		self.source_input := if (l.source_input = '', 'Contributory',l.source_input);
-		SELF.Unique_Id := hash64(
-									'IDDT,' + 
+		source_input := if (l.source_input = '', 'IDDT',l.source_input);
+		self.source_input := source_input;
+		SELF.unique_id := hash64(
 									ut.CleanSpacesAndUpper(l.Customer_Name) + ',' + 
 									ut.CleanSpacesAndUpper(l.Customer_Account_Number) + ',' + 
 									ut.CleanSpacesAndUpper(l.Customer_State) + ',' + 
@@ -153,11 +153,11 @@ module
 	Build_Bypass_Records :=  OUTPUT(f1_bypass_dedup,,Filenames().Input.ByPassed_IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
 
 	//Move only Valid Records
-	f1_dedup					:=	 join (f1,
-																							ByPassed_records,
-																							left.Unique_Id = right.Unique_Id,
-																							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
-																							left only);
+	f1_dedup					:=	 join (	f1,
+													ByPassed_records,
+													left.Unique_Id = right.Unique_Id,
+													TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
+													left only);
 
 	new_addresses := Functions.New_Addresses(f1_dedup);
 	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_IDDT.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
