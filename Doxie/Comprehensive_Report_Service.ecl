@@ -176,6 +176,7 @@ import doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services
 
 export Comprehensive_Report_Service := MACRO
 #CONSTANT('TwoPartySearch', FALSE);
+#CONSTANT('OFACversion', 1);
 
 #option ('maxCompileThreads', 4);
 #stored('IncludeAllDIDRecords','1');
