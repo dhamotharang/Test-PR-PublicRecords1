@@ -137,7 +137,7 @@ EXPORT Functions :=  MODULE
 		
 	end; 
 
-	EXPORT nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null', '\N'];
+	EXPORT nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null', '\\N'];
 
 	EXPORT CleanFields(inputFile,outputFile) := macro
 
