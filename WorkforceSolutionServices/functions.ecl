@@ -24,6 +24,6 @@ export varstring StatusMessages(integer c , string equifax_message = '') :=
 		 2	=> 'No Hit/No Charge: LN could not find a unique LexID for the output information coming back from the Vendor',
 		 3	=> 'No Hit/No Charge: Mismatch. The LexID captured on input did not match the LexID resolved to from the Vendor’s output' ,
 		 4	=> 'No Hit/No Charge:' + equifax_message,
-					 'No Hit/No Charge: Network Error. Please call your LN Sales Rep or try again later');
+					 '');
 											 
 end;
