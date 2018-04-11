@@ -3,7 +3,8 @@
 EXPORT PhoneFinder_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dIn,
 														PhoneFinder_Services.iParam.ReportParams         inMod,
 														DATASET(Gateway.Layouts.Config)                  dGateways,
-														iesp.phonefinder.t_PhoneFinderSearchBy           pSearchBy
+														iesp.phonefinder.t_PhoneFinderSearchBy           pSearchBy,
+														iesp.phonefinder.t_PhoneFinderSearchBy           InputEcho
 													) :=
 MODULE
 
@@ -127,6 +128,9 @@ MODULE
             																																						  dinBestDID, 
             																																							dSearchResultsUnfiltered,TRUE),
             														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy,inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
+																				
+		//Deltabase Logging Dataset
+	 EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, inMod, InputEcho);																		
       	 
   // Royalties
 		  // filtering out inhouse phonmetadata records 
