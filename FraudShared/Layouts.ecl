@@ -404,7 +404,7 @@ export Main         :=
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string15					Host ;
+	string						Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS
@@ -601,7 +601,7 @@ export keybuild
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string15					Host ;
+	string						Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS

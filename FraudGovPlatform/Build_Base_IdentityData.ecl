@@ -10,23 +10,23 @@ module
 
 		Layouts.Base.IdentityData	tPrep(inIdentityDataUpdate	l)	:=
 	transform
-			self.process_date                   	:= (unsigned) l.ProcessDate, 
+			self.process_date							:= (unsigned) l.ProcessDate, 
 			self.dt_first_seen						:= (unsigned) l.ProcessDate; 
-			self.dt_last_seen						:= (unsigned) l.ProcessDate;
-			self.dt_vendor_last_reported			:= (unsigned) l.ProcessDate; 
-			self.dt_vendor_first_reported			:= (unsigned) l.ProcessDate; 
+			self.dt_last_seen							:= (unsigned) l.ProcessDate;
+			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
+			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
 			self.source_rec_id						:= l.unique_id;																
 			// add  address and name prep 
-			self.current							:= 'C' ; 
-			self									:= l; 			
-			self									:= []; 
+			self.current									:= 'C' ; 
+			self												:= l; 			
+			self												:= []; 
    end; 
 		
-	IdentityDataUpdate	:=	project(dedup(inIdentityDataUpdate ,all),tPrep(left));
+	IdentityDataUpdate	:=	project(inIdentityDataUpdate,tPrep(left));
 	
 	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
 
-	IdentityDataSource  := join(	IdentityDataUpdate,
+	IdentityDataSource := join(	IdentityDataUpdate,
 									Mbs_ds, 
 									(unsigned6) left.Customer_Account_Number = right.gc_id and 
 									right.file_type = Functions.file_type_fn('IDDT') and 
@@ -37,9 +37,10 @@ module
 
   // Rollup Update and previous base 
   
-	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , IdentityDataSource); 
+	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , inBaseIdentityData); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , -source_rec_id, -dt_last_seen,-process_date,record ,local);
+
 	
 	Layouts.Base.IdentityData RollupUpdate(Layouts.Base.IdentityData l, Layouts.Base.IdentityData r) := 
 	transform
@@ -53,13 +54,13 @@ module
 		self := l;
 	end;
 
-	pDataset_rollup := rollup(	pDataset_sort
-								,RollupUpdate(left, right)
-								,Record																						
-								,except process_date, dt_first_seen ,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported, source_rec_id, Unique_Id ,local);
-
+	pDataset_rollup := rollup( pDataset_sort
+														,RollupUpdate(left, right)
+														,source_rec_id ,local
+										);
 	
 	tools.mac_WriteFile(Filenames(pversion).Base.IdentityData.New,pDataset_rollup,Build_Base_File);
+	// tools.mac_WriteFile(Filenames(pversion).Base.IdentityData.New,IdentityDataSource,Build_Base_File);
 
 // Return
 	export full_build :=

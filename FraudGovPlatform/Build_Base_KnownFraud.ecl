@@ -10,18 +10,18 @@ module
 
 		Layouts.Base.KnownFraud	tPrep(inKnownFraudUpdate l)	:=
 	transform
-			self.process_date                   	:= (unsigned) l.ProcessDate, 
+			self.process_date							:= (unsigned) l.ProcessDate, 
 			self.dt_first_seen						:= (unsigned) l.ProcessDate; 
-			self.dt_last_seen						:= (unsigned) l.ProcessDate;
-			self.dt_vendor_last_reported			:= (unsigned) l.ProcessDate; 
-			self.dt_vendor_first_reported			:= (unsigned) l.ProcessDate; 
+			self.dt_last_seen							:= (unsigned) l.ProcessDate;
+			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
+			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
 			self.source_rec_id						:= l.unique_id;
 			// add  address and name prep 
-			self									:= l; 
-			self									:= []; 
+			self												:= l; 
+			self												:= []; 
    end; 
 		
-	KnownFraudUpdate	:=	project(dedup(inKnownFraudUpdate ,all),tPrep(left)); 
+	KnownFraudUpdate	:=	project(inKnownFraudUpdate ,tPrep(left)); 
 	
 	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
 	
@@ -35,7 +35,7 @@ module
 												TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
   // Rollup Update and previous base 
-	Pcombined     := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudSource , KnownFraudSource); 	
+	Pcombined     := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudSource , inBaseKnownFraud); 	
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , -source_rec_id, -dt_last_seen,-process_date,record ,local);
 			
@@ -51,13 +51,13 @@ module
 		self := l;
 	end;
 
-	pDataset_rollup := rollup( 	pDataset_sort
-								,RollupUpdate(left, right)
-								,Record																						
-								,except process_date, dt_first_seen ,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported, source_rec_id ,Unique_Id, local);
+	pDataset_rollup := rollup( pDataset_sort
+														,RollupUpdate(left, right)
+														,source_rec_id, local
+										);
 
-	
 	tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,pDataset_rollup,Build_Base_File);
+	// tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,KnownFraudSource,Build_Base_File);
 
 // Return
 	export full_build :=
