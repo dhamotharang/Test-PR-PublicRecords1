@@ -90,7 +90,7 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		validation_row := row(r, 
 										transform(iesp.share.t_CodeMap,
 															self.Code := (string) StatusCode;
-															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,EquifaxStatusCode +':'+ EquifaxStatusMessage);
+															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,EquifaxStatusMessage+'('+ EquifaxStatusCode +').');
 															)
 										);
 
