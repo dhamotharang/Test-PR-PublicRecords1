@@ -264,7 +264,7 @@ FUNCTIONMACRO
 	pInputFile t1(pInputFile L, RefreshLexid R) := transform
 		self.did := IF(R.did > 0, R.did, L.did);
 		self.did_score := IF(R.did_score > 0, R.did_score, L.did_score);
-		self := IF(R.did > 0, R, L);;
+		self := IF(R.did > 0, R, L);
 	end;
 	
 	updateInputFile := join(pInputFile,
@@ -313,7 +313,7 @@ FUNCTIONMACRO
 		self.clean_address.geo_blk	:= IF(R.clean_address.geo_blk <> '', R.clean_address.geo_blk, L.clean_address.geo_blk);
 		self.clean_address.geo_match:= IF(R.clean_address.geo_match <> '', R.clean_address.geo_match, L.clean_address.geo_match);
 		self.clean_address.err_stat:= IF(R.clean_address.err_stat <> '', R.clean_address.err_stat, L.clean_address.err_stat);
-		self := L;
+		self := IF(R.clean_address.err_stat <> '', R, L);
 	end;
 	
 	updateInputFile := join(pInputFile,
