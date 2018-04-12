@@ -49,6 +49,7 @@ end;
 export t_VerificationOfEmploymentReportOption := record (iesp.share.t_BaseReportOption)
 	boolean GeneratePDF {xpath('GeneratePDF')};
 	boolean IncludeIncome {xpath('IncludeIncome')};
+	boolean IsRhodeIslandResident {xpath('IsRhodeIslandResident')}; //hidden[internal]
 end;
 		
 export t_VerificationOfEmploymentStatus := record

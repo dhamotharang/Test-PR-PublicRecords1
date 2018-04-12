@@ -38,10 +38,9 @@ EXPORT getVerificationDataFromEquifax(dataset(iesp.employment_verification_fcra.
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.platform := left.signonreq.platform,
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.intermediary := left.signonreq.intermediary,
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.enduser := left.signonreq.enduser,
-							isRhodeIsland := trim(left.ReportBy.employercode)<> '' or trim(left.ReportBy.employername) <> '';
-							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.firstname := if(isRhodeIsland,left.ReportBy.Name.first,''),
-							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.middlename := if(isRhodeIsland,left.ReportBy.Name.middle,''),
-							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.lastname :=  if(isRhodeIsland,left.ReportBy.Name.last,''),
+							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.firstname := if(config.IsRhodeIslandResident,left.ReportBy.Name.first,''),
+							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.middlename := if(config.IsRhodeIslandResident,left.ReportBy.Name.middle,''),
+							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.lastname :=  if(config.IsRhodeIslandResident,left.ReportBy.Name.last,''),
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.salarykey := [],
 							SELF.searchby.tsvermsgsrqv1.tsvtwnselecttrnrq.tsvtwnselectsmrq.templatename := [],
 
@@ -53,6 +52,6 @@ EXPORT getVerificationDataFromEquifax(dataset(iesp.employment_verification_fcra.
 
  Gateway_eq_evs := Gateways(Gateway.Configuration.IsEquifaxEVS(servicename))[1];
  gateway_results := gateway.SoapCall_EquifaxEVS(input_to_gateway,Gateway_eq_evs,makeGWCall);
- 
+ //output(input_to_gateway,named('input_to_gateway'));
 return(gateway_results);
 end;

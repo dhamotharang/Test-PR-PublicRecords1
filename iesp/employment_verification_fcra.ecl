@@ -12,6 +12,7 @@ end;
 export t_FcraVerificationOfEmploymentReportOption := record (iesp.share_fcra.t_FcraReportOption)
 	boolean GeneratePDF {xpath('GeneratePDF')};
 	boolean IncludeIncome {xpath('IncludeIncome')};
+	boolean IsRhodeIslandResident {xpath('IsRhodeIslandResident')}; //hidden[internal]
 	string1 FilterType {xpath('FilterType')}; //values['N','S','C','']//hidden[internal]
 end;
 		

@@ -9,6 +9,7 @@ export IParam := module
 		FCRA.iRules,
 		FCRA.FCRAPurpose.Params)
 		export boolean IncludeIncome;
+		export boolean IsRhodeIslandResident;
 	end;
 
 end;

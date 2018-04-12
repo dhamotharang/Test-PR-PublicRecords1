@@ -104,16 +104,12 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		end;
 		out_row := row({OutputDID,GatewayResponse,ConsumerStatements,Royalties,validation_row},combined);
 
-/* 		output(OutputFromEquifax,named('OutputFromEquifax'));
-   		output(pick_request,named('pick_request_input'));
-   		output(pick_response,named('pick_response_input'));
-   
-   		output(EmpRec2_picklist_in,named('pick_request_equifax'));
-   		output(EmpRec2_picklist_out,named('pick_response_equifax'));
-   
-   		output(isAvailable_EmpRec_1,named('isAvailable_EmpRec_1'));
-   		output(isAvailable_EmpRec_2,named('isAvailable_EmpRec_2'));
-   		output(isFoundInputDid,named('isFoundInputDid'));
+ /*
+ 		output(OutputFromEquifax,named('OutputFromEquifax'));
+		output(pick_request,named('pick_request_input'));
+   	output(pick_response,named('pick_response_input'));
+   	output(isAvailable_EmpRec_1,named('isAvailable_EmpRec_1'));
+   	output(isFoundInputDid,named('isFoundInputDid'));
 */
 
 
