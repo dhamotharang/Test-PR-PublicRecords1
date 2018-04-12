@@ -56,7 +56,7 @@ doObits			:=	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10
 																			Obituaries.out_ObituaryData_stats(filedate),
 													),
 													OUTPUT('No new raw input files, skip Tributes and Obituaries build')
-												);
+												)
 											);
 
 	RETURN RunBuild;
