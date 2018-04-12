@@ -257,18 +257,73 @@ ENDMACRO;
 EXPORT dRefreshLexid(pInputFile) := 
 FUNCTIONMACRO
 
-	RefreshLexid := Standardize_Entity.Append_Lexid (pInputFile);
-	RETURN RefreshLexid;
+	// Append Lexid only to those records without DID
+	DID_unassigned := pInputFile(did=0);
+	RefreshLexid := Standardize_Entity.Append_Lexid (DID_unassigned);
+	
+	pInputFile t1(pInputFile L, RefreshLexid R) := transform
+		self.did := IF(R.did > 0, R.did, L.did);
+		self.did_score := IF(R.did_score > 0, R.did_score, L.did_score);
+		self := IF(R.did > 0, R, L);;
+	end;
+	
+	updateInputFile := join(pInputFile,
+					 RefreshLexid,
+					 left.unique_id = right.unique_id,
+					 t1(left,right),
+					 left outer);
+	
+	RETURN updateInputFile;
 	
 ENDMACRO;
 
 EXPORT dRefreshAID(pInputFile) := 
 FUNCTIONMACRO
 	
-	getNewAddresses := Functions.refresh_addresses(pInputFile);	
-	RefreshAID := Standardize_Entity.Clean_Address(pInputFile, getNewAddresses );
-	RETURN RefreshAID;
+	// Clean only those addresses that in the past they weren't cleaned
+	nonCleanAddresses := pInputFile(clean_address.err_stat = '' or regexfind('E',clean_address.err_stat,nocase));
+	getNewAddresses := Functions.refresh_addresses(nonCleanAddresses);	
+	RefreshAID := Standardize_Entity.Clean_Address(nonCleanAddresses, getNewAddresses );
+
+	pInputFile t1(pInputFile L, RefreshAID R) := transform
+		self.clean_address.prim_range := IF(R.clean_address.prim_range <> '', R.clean_address.prim_range, L.clean_address.prim_range);
+		self.clean_address.predir	:= IF(R.clean_address.predir <> '', R.clean_address.predir, L.clean_address.predir);
+		self.clean_address.prim_name := IF(R.clean_address.prim_name <> '', R.clean_address.prim_name, L.clean_address.prim_name);
+		self.clean_address.addr_suffix:= IF(R.clean_address.addr_suffix <> '', R.clean_address.addr_suffix, L.clean_address.addr_suffix);
+		self.clean_address.postdir	:= IF(R.clean_address.postdir <> '', R.clean_address.postdir, L.clean_address.postdir);
+		self.clean_address.unit_desig:= IF(R.clean_address.unit_desig <> '', R.clean_address.unit_desig, L.clean_address.unit_desig);
+		self.clean_address.sec_range:= IF(R.clean_address.sec_range <> '', R.clean_address.sec_range, L.clean_address.sec_range);
+		self.clean_address.p_city_name:= IF(R.clean_address.p_city_name <> '', R.clean_address.p_city_name, L.clean_address.p_city_name);
+		self.clean_address.v_city_name:= IF(R.clean_address.v_city_name <> '', R.clean_address.v_city_name, L.clean_address.v_city_name);
+		self.clean_address.st:= IF(R.clean_address.st <> '', R.clean_address.st, L.clean_address.st);
+		self.clean_address.zip:= IF(R.clean_address.zip <> '', R.clean_address.zip, L.clean_address.zip);
+		self.clean_address.zip4	:= IF(R.clean_address.zip4 <> '', R.clean_address.zip4, L.clean_address.zip4);
+		self.clean_address.cart	:= IF(R.clean_address.cart <> '', R.clean_address.cart, L.clean_address.cart);
+		self.clean_address.cr_sort_sz:= IF(R.clean_address.cr_sort_sz <> '', R.clean_address.cr_sort_sz, L.clean_address.cr_sort_sz);
+		self.clean_address.lot:= IF(R.clean_address.lot <> '', R.clean_address.lot, L.clean_address.lot);
+		self.clean_address.lot_order:= IF(R.clean_address.lot_order <> '', R.clean_address.lot_order, L.clean_address.lot_order);
+		self.clean_address.dbpc	:= IF(R.clean_address.dbpc <> '', R.clean_address.dbpc, L.clean_address.dbpc);
+		self.clean_address.chk_digit:= IF(R.clean_address.chk_digit <> '', R.clean_address.chk_digit, L.clean_address.chk_digit);
+		self.clean_address.rec_type:= IF(R.clean_address.rec_type <> '', R.clean_address.rec_type, L.clean_address.rec_type);
+		self.clean_address.fips_state:= IF(R.clean_address.fips_state <> '', R.clean_address.fips_state, L.clean_address.fips_state);
+		self.clean_address.fips_county:= IF(R.clean_address.fips_county <> '', R.clean_address.fips_county, L.clean_address.fips_county);
+		self.clean_address.geo_lat	:= IF(R.clean_address.geo_lat <> '', R.clean_address.geo_lat, L.clean_address.geo_lat);
+		self.clean_address.geo_long:= IF(R.clean_address.geo_long <> '', R.clean_address.geo_long, L.clean_address.geo_long);
+		self.clean_address.msa:= IF(R.clean_address.predir <> '', R.clean_address.predir, L.clean_address.predir);
+		self.clean_address.geo_blk	:= IF(R.clean_address.geo_blk <> '', R.clean_address.geo_blk, L.clean_address.geo_blk);
+		self.clean_address.geo_match:= IF(R.clean_address.geo_match <> '', R.clean_address.geo_match, L.clean_address.geo_match);
+		self.clean_address.err_stat:= IF(R.clean_address.err_stat <> '', R.clean_address.err_stat, L.clean_address.err_stat);
+		self := L;
+	end;
 	
+	updateInputFile := join(pInputFile,
+					 RefreshAID,
+					 left.unique_id = right.unique_id,
+					 t1(left,right),
+					 left outer);
+	
+	RETURN updateInputFile;
+
 ENDMACRO;
 
 END; 

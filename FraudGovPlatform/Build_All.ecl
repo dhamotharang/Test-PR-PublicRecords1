@@ -25,13 +25,13 @@ module
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
 			Create_Supers
-			,_flags.HeaderInfo.Post
-			,_flags.RefreshAddresses(pversion).Post		 
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
 			 ).All
+			,_flags.HeaderInfo.Post
+			,_flags.RefreshAddresses(pversion).Post				 
 		  ,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
