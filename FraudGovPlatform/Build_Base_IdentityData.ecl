@@ -39,7 +39,7 @@ module
   
 	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , inBaseIdentityData); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
-	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date,record ,local);
+	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
 
 	
 	Layouts.Base.IdentityData RollupUpdate(Layouts.Base.IdentityData l, Layouts.Base.IdentityData r) := 
