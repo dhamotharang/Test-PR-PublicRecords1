@@ -8,8 +8,8 @@ export IParam := module
 		AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
 		FCRA.iRules,
 		FCRA.FCRAPurpose.Params)
-		export boolean IncludeIncome;
-		export boolean IsRhodeIslandResident;
+		export boolean IncludeIncome  := false;
+		export boolean IsRhodeIslandResident := false;
 	end;
 
 end;
