@@ -1,5 +1,5 @@
 IMPORT _control,ut,wk_ut,Data_Services,header;
-EXPORT Build_monitor_Alpharetta := FUNCTION
+EXPORT Build_monitor_Alpharetta(string emailList) := FUNCTION
 
 // If you run every hour, then your are at most 1 hour late for reporting. (Once a day - max 24 hour delay) (avoid total time etc.)
 aesp := _control.IPAddress.aprod_thor_esp;
@@ -30,7 +30,7 @@ o_fList:=output(fList,named('Alpha_list_completed'))
     :success(if(count(fList)>0,
 
                 STD.System.Email.SendEmailAttachText(
-				_control.MyInfo.EmailAddressNotify,			               // recipientAddress
+				emailList,			                                        // recipientAddress
 				'ATTENTION!! RECENT Alpharetta builds completed',  			// subjectText
 				'See attachement and http://'+                              // bodyText
                     _Control.ThisEnvironment.ESP_IPAddress+':8010/?Wuid='+workunit
