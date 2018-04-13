@@ -158,9 +158,8 @@ END;
 
 wl_hits := ITERATE(s,iter(LEFT,RIGHT));
 //************************************************** ofac_version = 4 - XG5 Bridger call**************************************************
-// blank out Bridger Gateway url if not version 4	or if no searching was actually requested
-skipWatchlist := ((ofac_version = 4 and Include_Ofac=FALSE and Include_Additional_Watchlists=FALSE and count(watchlists_requested)=0));
-gateways	:= if(ofac_version <> 4 or skipWatchlist, dataset([],Gateway.Layouts.Config), Gateway.Configuration.Get());
+// blank out Bridger Gateway url if not version 4	
+gateways	:= if(ofac_version <> 4, dataset([],Gateway.Layouts.Config), Gateway.Configuration.Get());
 
 OFAC_XG5.Layout.InputLayout XG5prep(in_data le) := TRANSFORM											
 	SELF.seq := if(le.seq = 0, (unsigned4)le.acctno, le.seq);
