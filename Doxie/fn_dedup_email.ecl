@@ -1,4 +1,4 @@
-﻿IMPORT EmailService, codes, Suppress;
+﻿IMPORT EmailService, codes, Suppress, Royalty;
 EXPORT fn_dedup_email(Dataset(doxie.layout_references) dids,
   string6 ssn_mask = '', string32 appType = Suppress.Constants.ApplicationTypes.DEFAULT,
 	string5 industry_class = '') := FUNCTION
@@ -18,7 +18,7 @@ EXPORT fn_dedup_email(Dataset(doxie.layout_references) dids,
 	   boolean isRoyalty;
   end;
 	
-	set_royalty := set(codes.Key_Codes_V3(file_name = 'EMAIL_SOURCES', field_name = 'ROYALTY'), code);
+	set_royalty := Royalty.Constants.EMAIL_ROYALTY_SET();
 	
 	email_Only_Rec makeEmails(inrecs_w_seq l,EmailService.Assorted_Layouts.layout_emails r) := transform
 	  self.seq := l.seq;

@@ -207,7 +207,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
 	email_recs	:=	ifrReportMod.email_results;
 
 	// ROYALTIES
-	Royalty.MAC_RoyaltyEmail(email_recs, royalties_email)
+	Royalty.MAC_RoyaltyEmail(email_recs, royalties_email,, false)
 	
   // test run
   boolean is_testrun := first_row.User.TestDataEnabled : stored ('TestDataEnabled');

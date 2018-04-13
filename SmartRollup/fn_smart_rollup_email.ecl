@@ -1,5 +1,6 @@
-IMPORT iesp, codes;
-export fn_smart_rollup_email(DATASET(iesp.emailsearch.t_EmailSearchRecord) inRecs) := function
+IMPORT iesp, codes, Royalty;
+export fn_smart_rollup_email(DATASET(iesp.emailsearch.t_EmailSearchRecord) inRecs, 
+	boolean isFCRA = false) := function
 
 	emailOnlyRec := record
      iesp.emailsearch.t_EmailSearchRecord - Emails;
@@ -8,7 +9,7 @@ export fn_smart_rollup_email(DATASET(iesp.emailsearch.t_EmailSearchRecord) inRec
   end;
 	
 	emailOnlyRec makeEmails(inRecs l, iesp.emailsearch.t_EmailSearchEmail r) := transform
-	  self.isRoyalty := l.source in set(codes.Key_Codes_V3(file_name = 'EMAIL_SOURCES', field_name = 'ROYALTY'), code);
+	  self.isRoyalty := l.source in Royalty.Constants.EMAIL_ROYALTY_SET(isFCRA);
 		self.emails := r;
 		self := l;
 	end;

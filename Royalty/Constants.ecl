@@ -183,7 +183,15 @@ EXPORT Constants := module
 		MDR.sourceTools.src_Thrive_PD 
 		];
 	
-	export EMAIL_ROYALTY_SET := set(codes.Key_Codes_V3(file_name = 'EMAIL_SOURCES', field_name = 'ROYALTY'), code);			
+	// Email Royalties: Ensure that removed providers are absent from FCRA/non-FCRA queries
+	base_email_tab := Codes.Key_Codes_V3(keyed(file_name = 'EMAIL_SOURCES'), keyed(field_name = 'ROYALTY'));
+	set_removed_email := [];
+	set_removed_email_fcra := [MDR.sourceTools.src_Datagence];	// Datagence/V12 has been removed from FCRA
+
+	export EMAIL_ROYALTY_TABLE(boolean isFCRA = false) := if(isFCRA, 
+		base_email_tab(code not in set_removed_email_fcra), 
+		base_email_tab(code not in set_removed_email));
+	export EMAIL_ROYALTY_SET(boolean isFCRA = false) := set(EMAIL_ROYALTY_TABLE(isFCRA), code);			
 	
 	export SourceType := MODULE
 		export string1 INHOUSE := 'I';
