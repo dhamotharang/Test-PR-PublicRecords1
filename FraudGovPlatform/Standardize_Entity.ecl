@@ -281,7 +281,7 @@ EXPORT dRefreshAID(pInputFile) :=
 FUNCTIONMACRO
 	
 	// Clean only those addresses that in the past they weren't cleaned
-	nonCleanAddresses := pInputFile(clean_address.err_stat[1]='E',nocase));
+	nonCleanAddresses := pInputFile(clean_address.err_stat[1]='E');
 	getNewAddresses := Functions.refresh_addresses(nonCleanAddresses);	
 	RefreshAID := Standardize_Entity.Clean_Address(nonCleanAddresses, getNewAddresses );
 
