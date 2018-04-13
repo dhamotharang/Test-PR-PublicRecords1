@@ -5,7 +5,7 @@ EXPORT Transforms := MODULE
 	// Key_eCrash0 (Accident Location/DOT Info)
 	EXPORT Accident_services.Layouts.accRptRecWithAccNbr reportRecord(Accident_services.Layouts.report L,FLAccidents_eCrash.Key_eCrash0 R) := TRANSFORM
 		SELF.accident_nbr      := L.accident_nbr;
-		SELF.AccidentDate      := iesp.ECL2ESP.toDatestring8 ((String8)R.accident_date);
+		SELF.AccidentDate      := iesp.ECL2ESP.toDatestring8 ((String8)TRIM(R.accident_date,LEFT,RIGHT));
 		SELF.DhsmvVehicleCrash := R.dhsmv_veh_crash_ind;
 		SELF.FormType          := R.form_type;
 		SELF.UpdateNumber      := R.update_nbr;
@@ -108,7 +108,7 @@ EXPORT Transforms := MODULE
 		SELF.Investigation.InvestigationAgent.AgentDepartmentName := R.dept_name;
 		SELF.Investigation.InvestMaede         := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','INVEST_MAEDE','',R.invest_maede);
 		SELF.Investigation.InvestComplete      := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','INVEST_COMPLETE','',R.invest_complete);
-		SELF.Investigation.SearchDate          := iesp.ECL2ESP.toDatestring8 ((String8)R.report_date);
+		SELF.Investigation.SearchDate          := iesp.ECL2ESP.toDatestring8 ((String8)TRIM(R.report_date,LEFT,RIGHT));
 		SELF.Investigation.PhotosTaken         := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','PHOTOS_TAKEN','',R.photos_taken);
 		SELF.Investigation.PhotosTakenWhom     := codes.KeyCodes('FLCRASH1_ACCIDENT_CHAR','PHOTOS_TAKEN_WHOM','',R.photos_taken_whom);
 		SELF.Investigation.FirstAidName        := R.first_aid_name;
@@ -184,7 +184,7 @@ EXPORT Transforms := MODULE
 		SELF.Owner.Name := iesp.ECL2ESP.SetName(R.fname,R.mname,R.lname,R.suffix,R.title);
 		SELF.Owner.CompanyName := R.cname;
 		SELF.Owner.DriverLicenseNumber := IF(mask_dl AND R.vehicle_owner_dl_nbr != '', suppress.dl_mask (R.vehicle_owner_dl_nbr), R.vehicle_owner_dl_nbr);
-		SELF.Owner.DOB  := iesp.ECL2ESP.toDate ((INTEGER4)R.vehicle_owner_dob);
+		SELF.Owner.DOB  := iesp.ECL2ESP.toDatestring8 ((String8)TRIM(R.vehicle_owner_dob,LEFT,RIGHT));
 		SELF.Owner.Sex  := codes.KeyCodes('FLCRASH2_VEHICLE','VEHICLE_OWNER_SEX','',R.vehicle_owner_sex);
 		SELF.Owner.Race := codes.KeyCodes('FLCRASH2_VEHICLE','VEHICLE_OWNER_RACE','',R.vehicle_owner_race);
 		SELF.Owner.ForgeAsterisk := R.vehicle_owner_forge_asterisk;
@@ -233,7 +233,7 @@ EXPORT Transforms := MODULE
 		SELF.Driver.DriverLicense.LicenseType   := codes.KeyCodes('FLCRASH4_DRIVER','DRIVER_LIC_TYPE','',R.driver_lic_type);
 		SELF.Driver.Individual.UniqueId         := R.did;
 		SELF.Driver.Individual.Name := iesp.ECL2ESP.SetName(R.fname,R.mname,R.lname,R.suffix,R.title);
-		SELF.Driver.Individual.DOB := iesp.ECL2ESP.toDate ((INTEGER4)R.driver_dob);
+		SELF.Driver.Individual.DOB := iesp.ECL2ESP.toDatestring8 ((String8)TRIM(R.driver_dob,LEFT,RIGHT));
 		CountyName := IF(R.st!='' AND R.county!='', Functions.get_county_name(R.st, R.county),'');
 		SELF.Driver.Individual.Address := iesp.ECL2ESP.SetAddress(R.prim_name,R.prim_range,R.predir,R.postdir,
 				R.addr_suffix,R.unit_desig,R.sec_range,R.v_city_name,R.st,R.zip,R.zip4,countyname); 
@@ -287,7 +287,7 @@ EXPORT Transforms := MODULE
 		SELF.DriverlicenseNumber    := IF(mask_dl AND L.ped_dl_nbr != '',suppress.dl_mask(L.ped_dl_nbr),L.ped_dl_nbr);
 		SELF.Individual.UniqueId    := L.did;
 		SELF.Individual.Name := iesp.ECL2ESP.SetName(L.fname,L.mname,L.lname,L.suffix,L.title);
-		SELF.Individual.DOB := iesp.ECL2ESP.toDate ((INTEGER4)L.ded_dob);
+		SELF.Individual.DOB := iesp.ECL2ESP.toDatestring8 ((String8)TRIM(L.ded_dob,LEFT,RIGHT));
 		CountyName := IF(L.st!='' AND L.county!='', Functions.get_county_name(L.st, L.county),'');
 		SELF.Individual.Address := iesp.ECL2ESP.SetAddress(L.prim_name,L.prim_range,L.predir,L.postdir,
 				L.addr_suffix,L.unit_desig,L.sec_range,L.v_city_name,L.st,L.zip,L.zip4,countyname); 
@@ -367,7 +367,7 @@ EXPORT Transforms := MODULE
 		SELF.TagState            := L.tagnbr_st;
 		SELF.AccidentNumber      := L.l_accnbr;
 		SELF.AccidentState       := L.vehicle_incident_st;
-		SELF.AccidentDate        := iesp.ECL2ESP.toDatestring8((String8)L.accident_date);
+		SELF.AccidentDate        := iesp.ECL2ESP.toDatestring8((String8)TRIM(L.accident_date,LEFT,RIGHT));
 		SELF.GenerateReport      := L.vehicle_incident_st IN Constants.Report_States;
 		SELF._penalty            := L.penalt;
 		SELF.AlsoFound           := L.isDeepDive;
