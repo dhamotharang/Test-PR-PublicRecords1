@@ -172,7 +172,7 @@ module
 		self:=[];
 	end;
 
-	f1:=project(inKnownFraudUpdateUpper, tr(left));
+	shared f1:=project(inKnownFraudUpdateUpper, tr(left));
 	
 
 	f1_errors:=f1
@@ -196,7 +196,7 @@ module
 									and left.Customer_County = right.Customer_County,
 									TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),LEFT ONLY,lookup);
 	//Exclude Errors
-	ByPassed_records := f1_errors + NotInMbs;
+	shared ByPassed_records := f1_errors + NotInMbs;
 	f1_bypass_dedup := files().Input.ByPassed_KnownFraud.sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud);
 
 	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
@@ -211,13 +211,13 @@ module
 
 
 	//Move only Valid Records
-	f1_dedup					:=	 join (	f1,
+	shared f1_dedup					:=	 join (	f1,
 											ByPassed_records,
 											left.Unique_Id = right.Unique_Id,
 											TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
 											left only);	
 																							
-	new_addresses := Functions.New_Addresses(f1_dedup);
+	shared new_addresses := Functions.New_Addresses(f1_dedup);
 
 	tools.mac_WriteFile(Filenames().Input.AddressCache_KNFD.New(pversion),
 									new_addresses,
@@ -238,13 +238,13 @@ module
 	input_file_1 := fn_dedup(files().Input.KnownFraud.sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 
 	// Refresh Addresses every 90 days
-	IsTimeForRefresh := _flags.RefreshAddresses(pversion).IsTimeForRefresh;
+	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
 	dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
 	input_file_2 := if(	IsTimeForRefresh,
 						dRefreshAID,
 						input_file_1);  
 	// Refresh Lexid when new header is released
-	IsNewHeader := _flags.HeaderInfo.IsNew;
+	IsNewHeader := HeaderInfo.IsNew;
 	dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
 	input_file_3 := if(	IsNewHeader,
 						dRefreshLexid,
