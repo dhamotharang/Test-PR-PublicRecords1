@@ -9,83 +9,11 @@ EXPORT PhoneAttributes_BatchRecords(
 	Layout_BatchOut := Phones.Layouts.PhoneAttributes.BatchOut;
 	Layout_BatchRaw	:= Phones.Layouts.PhoneAttributes.Raw;
 
-	dPortedPhoneswLineType := Phones.GetPhoneMetadata_wLIDB(dBatchPhonesIn,in_mod);
-
-	//prioritize Realtime LIDB
-	dPortedPhonesSorted := SORT(dPortedPhoneswLineType, acctno,phone, -dt_last_reported, -dt_first_reported,
-		source <> Consts.ATT_LIDB_RealTime, record);
-	Layout_BatchOut tOutputLayout(Layout_BatchRaw L) := TRANSFORM
-		SELF.acctno := L.acctno;
-		SELF.phoneno := L.phone;
-		SELF.is_current	:= FALSE;	//Value assigned in iteration
-
-		// * Disconnect event_date = deact_start_dt
-		// * Ported phone event_date = port_start_dt
-		// * Swap Phone Number event_date = swap_start_dt
-		// * Suspended Number event_date = deact_start_dt
-		// * Reactivated Number event_date = react_start_dt
-		boolean ported_phone := L.source = Consts.ICONECTIV_SRC;
-		boolean ported_line := ported_phone or  L.source IN Consts.set_ATT_LIDB;
-
-		//identifies both historic and current disconnect records
-		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
-		boolean number_swapped := L.phone_swap <> '';
-		boolean suspended := L.deact_code = Consts.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
-		boolean reactivated := L.deact_code = Consts.SUSPENDED_CODE and L.is_react = 'Y';
-		boolean lidb_verfication := L.source IN Consts.set_ATT_LIDB;
-		event_type := if(ported_phone, Consts.PORTED_PHONE, '') +
-			if(disconnected and not ported_phone, Consts.DISCONNECTED, '') +
-			if(reactivated, Consts.REACTIVATED, '') +
-			if(number_swapped, Consts.NUMBER_SWAPPED, '') +
-			if(suspended, Consts.SUSPENDED, '') +
-			if(lidb_verfication, Consts.LIDB_VERFICATION, '');
-
-		event_date := if(lidb_verfication,L.dt_last_reported,MAX(L.port_start_dt, L.swap_start_dt, L.deact_start_dt, L.react_start_dt));
-		SELF.event_type := event_type;
-		SELF.event_date	:= if(event_type <> '', event_date, 0);
-
-		// populate disconnect date based on record's event type to report most recent event date
-		SELF.disconnect_date := MAP(disconnected => L.deact_start_dt,
-			number_swapped => L.swap_start_dt, 0);
-
-		SELF.ported_date := if(ported_phone, L.port_start_dt, 0);
-		SELF.carrier_id	:= L.account_owner;
-		SELF.carrier_name := L.carrier_name;
-		SELF.carrier_category := L.carrier_category;
-		SELF.operator_id := L.spid;
-		SELF.operator_name := if(L.operator_fullname <> '', L.operator_fullname, L.carrier_name);
-		SELF.line_type_last_seen := CASE(L.source,
-			Consts.ATT_LIDB_SRC => L.dt_last_reported,
-			Consts.ATT_LIDB_RealTime => L.dt_last_reported,
-			Consts.ICONECTIV_SRC => L.port_start_dt, 0);
-
-		SELF.phone_serv_type := if(ported_line, L.serv, '');
-		SELF.phone_line_type := if(ported_line, L.line, '');
-		SELF.swapped_phone_number_date := if(number_swapped, L.swap_start_dt, 0);
-		SELF.new_phone_number_from_swap	:= L.phone_swap;
-		SELF.suspended_date := if(suspended, L.deact_start_dt, 0);
-		SELF.reactivated_date := if(reactivated, L.react_start_dt, 0);
-		SELF.source := L.source;
-		SELF.prepaid := L.prepaid;
-		SELF.error_desc	:= L.error_desc;
-		SELF.carrier_city := L.carrier_city;
-		SELF.carrier_state := L.carrier_state;
-
-		//Check if the current record is outdated, from PX, or has an error_code, if so we mark dialable false.
-		today := STD.Date.Today();
-		earliestAllowedDate := (UNSIGNED)ut.date_math((STRING)today, -in_mod.max_lidb_age_days);
-		boolean is_outdated := SELF.event_date < earliestAllowedDate;
-		SELF.dialable := ~is_outdated AND L.error_desc = '' AND L.source <> Consts.DISCONNECT_SRC;
-
-		//These values are assigned below when all the most recent data is combined so they match what is being displayed.
-		SELF.phone_line_type_desc := '';
-		SELF.phone_serv_type_desc := '';
-	END;
-	dIntermediateBatchPhones := PROJECT(dPortedPhonesSorted, tOutputLayout(LEFT));
-
-	dFilterBatchPhones	:= if(in_mod.include_temp_susp_reactivate,
-		dIntermediateBatchPhones,
-		dIntermediateBatchPhones(event_type NOT IN [Consts.SUSPENDED, Consts.REACTIVATED, Consts.REACTIVATED+Consts.SUSPENDED]));
+ 	dIntermediateBatchPhones := Phones.GetPhoneMetadata_wLIDB(dBatchPhonesIn,in_mod);
+   
+  dFilterBatchPhones	:= if(in_mod.include_temp_susp_reactivate,
+  dIntermediateBatchPhones,
+  dIntermediateBatchPhones(event_type NOT IN [Consts.SUSPENDED, Consts.REACTIVATED, Consts.REACTIVATED+Consts.SUSPENDED]));
 
 	//Check previous records to mark PORTED_LINE events
 	//A PORTED_PHONE event becomes a PORTED_PHONE+PORTED_LINE event when the most recent historic record
@@ -93,7 +21,7 @@ EXPORT PhoneAttributes_BatchRecords(
 	//if no historic record exists with line or serv
 	dPortedLineSortPhones := SORT(dFilterBatchPhones, acctno, phoneno, -event_date);
 
-	Layout_BatchOut tMostRecentRecord(Layout_BatchOut L) := TRANSFORM
+	Layout_BatchOut tMostRecentRecord(Layout_BatchRaw L) := TRANSFORM
 		allrows_rec := dPortedLineSortPhones(acctno = L.acctno and phoneno = L.phoneno and event_date < L.event_date);
 		SELF.disconnect_date :=	MAX(L.disconnect_date, MAX(allrows_rec, allrows_rec.disconnect_date)
 			,MAX(allrows_rec,allrows_rec.swapped_phone_number_date)); // swaps also produces a disconnected phone

@@ -17,6 +17,7 @@ FUNCTION
 	wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.ReportParams,OPT))
 		EXPORT BOOLEAN UseQSent      := FALSE;
 		EXPORT BOOLEAN UseLastResort := FALSE;
+		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
 	END;
 	
 	dInDIDPopulated       := dIn(orig_did != 0 or did != 0);

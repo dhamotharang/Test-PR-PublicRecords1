@@ -93,7 +93,8 @@ currentDate := (STRING)STD.Date.Today();
 		SELF.indicator 	:= MAP(totalAlerts >= MIN(l.LevelCount,r.levelCount) => Constants.RiskLevel.FAILED,
 													totalAlerts > 0 															 => Constants.RiskLevel.WARN,
 																																						Constants.RiskLevel.PASS);
-		SELF.LevelCount	:=	MIN(l.LevelCount,r.levelCount); 
+		SELF.LevelCount	:=	MIN(l.LevelCount,r.levelCount);
+		SELF.Level	:=	l.Level; 
 		SELF := [];
 	END;
 	dsAlert := ROLLUP(levelSort,

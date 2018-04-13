@@ -1,4 +1,4 @@
-IMPORT Royalty,Phones;
+﻿IMPORT Royalty,Phones;
 EXPORT RoyaltyATT := MODULE
 
   EXPORT GetOnlineRoyalties(inp, type_flag='source') := 
@@ -8,7 +8,7 @@ EXPORT RoyaltyATT := MODULE
 						[{
 							Royalty.Constants.RoyaltyCode.ATT_IAP_DQ_IRS, 
 							Royalty.Constants.RoyaltyType.ATT_IAP_DQ_IRS, 
-							count(inp(source = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime)), 
+							count(inp(type_flag = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime)), 
 							0
 						}], 
 						Royalty.Layouts.Royalty
