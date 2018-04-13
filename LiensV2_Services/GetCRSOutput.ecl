@@ -65,7 +65,7 @@ export GetCRSOutput (
 	ds_party_raw_w_ins_flag_itr := ungroup(iterate(ds_party_raw_w_ins_flag_sort, tIterate(left, right)));
 	
 	// Filter records for FCRA insurance
-	ds_party_raw_filter := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
+	ds_party_raw_filter := if(isFCRA and FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose),
                             group(sort(project(ds_party_raw_w_ins_flag_itr(bcbflag), liensv2_services.layout_lien_party_raw), acctno), acctno),
                             ds_party_raw_pre);
   
@@ -115,7 +115,7 @@ export GetCRSOutput (
 	// ROLLUP CASE INFORMATION
 	ds_case_rolled := rollup(ds_case_sort, left.case_link_id = right.case_link_id, xf_case_rollup(left,right));
 	
-	ds_case_filtered := ds_case_rolled(~IsFCRA OR (FCRAPurpose != FCRA.FCRAPurpose.InsuranceApplication) OR bcbflag); //If FCRAPurpose=6 return only records with bcbflag set to true, else return all. 
+	ds_case_filtered := ds_case_rolled(~IsFCRA OR (~FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose)) OR bcbflag); //If FCRAPurpose is for isInsurance Applicatio return only records with bcbflag set to true, else return all. 
 	
   //===== ROLLUP HISTORY =====
 
@@ -135,10 +135,10 @@ export GetCRSOutput (
 	ds_hist_roll := rollup(ds_history_sort, left.case_link_id = right.case_link_id, xf_hist_roll_1(left,right));
 
 	layout_liens_history_extended xf_history_rollup(ds_hist_roll l) := transform
-		// FCRA - Insurance liens and judgments, FCRAPurpose = 6
+		// FCRA - Insurance liens and judgments, check FCRAPurpose 
 		oldest_orig_filing_dt := min(l.filings, orig_filing_date);
 		is_liens_ok := FCRA.lien_is_ok((string)STD.Date.Today(), oldest_orig_filing_dt);
-		filings := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
+		filings := if(isFCRA and FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose),
 			if(is_liens_ok, l.filings(bcbflag), dataset([], LiensV2_Services.layout_lien_history_w_bcb)),
 			l.filings);
 		filings_d := dedup(sort(filings,
