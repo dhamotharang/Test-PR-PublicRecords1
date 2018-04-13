@@ -1,4 +1,4 @@
-﻿import _control, tools, FraudShared, did_add, PromoteSupers;
+﻿import _control, tools, FraudShared;
 
 export _Flags :=
 module
@@ -33,31 +33,4 @@ module
 		export KnownFraud       	:= ~FileExists.Input.KnownFraud ;
 	end;
 
-	EXPORT HeaderInfo := module
-		
-		shared ProdVer	:= did_add.get_EnvVariable('header_build_version')[1..8] : INDEPENDENT;
-		shared dsVer	:= dataset(filenames().OutputF.NewHeader,{string8 Prod_Ver},flat,opt);
-		
-		EXPORT IsNew 	:= if(nothor(fileservices.fileExists(filenames().OutputF.NewHeader)), ProdVer <> dsVer[1].Prod_Ver, true);
-		
-		PromoteSupers.MAC_SF_BuildProcess(dataset([{ProdVer}],{string8 Prod_Ver}), filenames().OutputF.NewHeader, PostNewHeader ,2,,true);
-		EXPORT Post 	:= if(	IsNew
-								,sequential(PostNewHeader, output('header_build_version Changed', named('HeaderInfoChanged')))
-								,sequential(output('header_build_version Not Changed', named('HeaderInfoNotChanged'))));	
-		
-	END;
-
-	EXPORT RefreshAddresses(string pVersion) := module
-		
-		shared dsVer 	:= dataset(filenames().OutputF.RefreshAddresses,{string8 pVersion},flat,opt);
-		
-		EXPORT IsTimeForRefresh	:= if(	nothor(fileservices.fileExists(filenames().OutputF.RefreshAddresses)), 
-										(unsigned8) pVersion - (unsigned8) dsVer[1].pVersion >= Constants().RefreshAddresses, 
-										true);
-		
-		PromoteSupers.MAC_SF_BuildProcess(dataset([{pVersion}],{string8 pVersion}), filenames().OutputF.RefreshAddresses, PostRefreshAddresses ,2,,true);
-		EXPORT Post 	:= if(	 IsTimeForRefresh
-								,sequential(PostRefreshAddresses, output('refresh_addresses_version Changed', named('RefreshAddressesChanged')))
-								,sequential(output('refresh_addresses_version Not Changed', named('RefreshAddressesNotChanged'))));			
-	END;
 end;

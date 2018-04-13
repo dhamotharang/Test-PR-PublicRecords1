@@ -30,8 +30,8 @@ module
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
 			 ).All
-			,_flags.HeaderInfo.Post
-			,_flags.RefreshAddresses(pversion).Post				 
+			,HeaderInfo.Post
+			,AddressesInfo(pversion).Post				 
 		  ,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase

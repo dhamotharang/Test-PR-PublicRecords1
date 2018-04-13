@@ -258,7 +258,7 @@ EXPORT dRefreshLexid(pInputFile) :=
 FUNCTIONMACRO
 
 	// Append Lexid only to those records without DID
-	DID_unassigned := pInputFile(did=0);
+	DID_unassigned := pInputFile;
 	RefreshLexid := Standardize_Entity.Append_Lexid (DID_unassigned);
 	
 	pInputFile t1(pInputFile L, RefreshLexid R) := transform
@@ -281,7 +281,7 @@ EXPORT dRefreshAID(pInputFile) :=
 FUNCTIONMACRO
 	
 	// Clean only those addresses that in the past they weren't cleaned
-	nonCleanAddresses := pInputFile(clean_address.err_stat = '' or regexfind('E',clean_address.err_stat,nocase));
+	nonCleanAddresses := pInputFile(clean_address.err_stat[1]='E',nocase));
 	getNewAddresses := Functions.refresh_addresses(nonCleanAddresses);	
 	RefreshAID := Standardize_Entity.Clean_Address(nonCleanAddresses, getNewAddresses );
 
