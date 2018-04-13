@@ -1,4 +1,4 @@
-﻿import ut,AutoStandardI,doxie,suppress,Email_Data,codes,D2C;
+﻿import ut,AutoStandardI,doxie,suppress,Email_Data,codes,D2C,Royalty;
 
 export EmailSearchService_Records := MODULE
 
@@ -125,12 +125,11 @@ export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids,
 													group(sort(recs_masked, did,src), did,src),
 													group(sort(recs_masked, did), did));
 		
+		royal_codes := Royalty.Constants.EMAIL_ROYALTY_TABLE();
 		royal_recs := 
       JOIN( recs_masked_grp, 
-            Codes.Key_Codes_V3, 
-            KEYED(RIGHT.file_name = 'EMAIL_SOURCES' AND
-                  RIGHT.field_name = 'ROYALTY' )    AND
-                  LEFT.src = RIGHT.code, grouped);
+            royal_codes, 
+            LEFT.src = RIGHT.code, grouped);
 		
 		royal_recs_sorted := if(multipleRoyalties,
 														project(royal_recs, Assorted_Layouts.layout_entiera_rollup_w_seq),

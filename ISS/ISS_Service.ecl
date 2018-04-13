@@ -1,6 +1,7 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ISS_Service">
 	<part name="InsuranceScoringServiceRequest" type="tns:XmlDataSet" cols="80" rows="50" />
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="4"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
   <part name="DataPermissionMask" type="xsd:string"/>
@@ -117,6 +118,7 @@ export ISS_Service := MACRO
 
 	// Get XML input 
 	ds_in    	:= dataset([], iesp.issservice.t_InsuranceScoringServiceRequest)  	: stored('InsuranceScoringServiceRequest', few);
+  unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 	gateways_in := Gateway.Configuration.Get();
 
 	optionsIn := ds_in[1].options;
@@ -307,11 +309,11 @@ export ISS_Service := MACRO
 	boolean   fromBIID            := false;
 	boolean   excludeWatchlists   := false;
 	boolean   fromIT1O            := false;
-	unsigned1 OFACVersion 			:= 1;
-	real      watchlist_threshold := 0.84;
+	unsigned1 OFACVersion 			:= ofac_version_;
+	real      watchlist_threshold := if(OFACVersion in [1, 2, 3], 0.84, 0.85);
 	boolean   usedobFilter 			:= false;
 	integer2  dob_radius 			:= -1;	
-	boolean   includeOfac         := false;
+	boolean   includeOfac         := if(OFACVersion = 1, false, true);
 	boolean   includeAddWatchlists:= false;
 	boolean   nugen               := true;
 	boolean   doScore 				:= true;
@@ -414,6 +416,8 @@ export ISS_Service := MACRO
 																		
 
 	finalClam := if(ADLBasedShell, adlBasedClam, clam);
+  
+  if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	// get boca shell test seeds
 	clamTestSeeds := Risk_Indicators.Boca_Shell_Test_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);

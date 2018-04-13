@@ -7,6 +7,7 @@ import iesp;
 export consumercreditreport_fcra := MODULE
 			
 export t_FcraCCROptions := record (iesp.share.t_BaseOption)
+	string FCRAPurpose {xpath('FCRAPurpose')}; //values['0','1','2','3','4','5','6','7','8','9','10','11','12','13','']
 	string PermissiblePurpose {xpath('PermissiblePurpose')}; //values['4','5','7','8','10','14','57','73','']
 	string20 FFDOptionsMask {xpath('FFDOptionsMask')};//hidden[ecl_only]
 	boolean IncludeLiensJudgments {xpath('IncludeLiensJudgments')};

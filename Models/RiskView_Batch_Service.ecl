@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RiskView Batch Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="IncludeAllScores" type="xsd:boolean"/>
@@ -156,7 +156,7 @@ AlternateModel := StringLib.StringToLowercase( trim( AlternateModel_in ) );
 
 // Since Payment Score is goofy - we need to make sure we turn on the Money section when the model is requested.
 IncludeMoney := IF(AlternateModel IN ['rvc1412_1','rvc1405_4','rvc1405_3','rvc1405_2','rvc1405_1','rvc1307_1',
-	'rvc1301_1', 'rvc1208_1', 'rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvc1412_2', 'rvc1703_1'], TRUE, IncludeMoney_temp);
+	'rvc1301_1', 'rvc1208_1', 'rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvc1412_2', 'rvc1703_1','rvc1801_1'], TRUE, IncludeMoney_temp);
 
 AltRetails    := ['ex89', 'rvr1104_2', 'rvr1210_1'];
 AltTelecoms   := ['ex23'];
@@ -166,7 +166,7 @@ AltPreScreens := ['rvp1012_1', 'rvp1208_1', 'rvp1401_1', 'rvp1401_2','rvp1503_1'
 // all new models should go here. with old models, we completely blank out scores & reasons for prescreen opt-out. this allows us to return 222+rc95
 Newer_AltModels := ['rvr1104_2', 'rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvp1012_1', 'rvp1208_1', 'rvc1208_1', 'rvr1210_1', 'rvc1301_1',
 										'rva1309_1', 'rvc1307_1', 'rvp1401_1', 'rvp1401_2', 'rvc1405_1', 'rvc1405_2', 'rvc1405_3', 'rvc1405_4', 'rvc1412_1',
-										'rvp1503_1', 'rvb1402_1', 'ied1002_0', 'rvc1412_2', 'rvc1703_1'];
+										'rvp1503_1', 'rvb1402_1', 'ied1002_0', 'rvc1412_2', 'rvc1703_1','rvc1801_1'];
 
 CustomIndex := case( AlternateModel,
 	'ex23' => '102',
@@ -195,6 +195,7 @@ CustomIndex := case( AlternateModel,
 	'ied1002_0' => Risk_indicators.BillingIndex.IED1002_0,
 	'rvc1412_2' => Risk_indicators.BillingIndex.RVC1412_2,
 	'rvc1703_1' => Risk_indicators.BillingIndex.RVC1703_1,
+	'rvc1801_1' => Risk_indicators.BillingIndex.RVC1801_1,
 	'' => '',
 	error('Invalid model input: ' + alternatemodel)
 );
@@ -226,6 +227,7 @@ CustomScoreName := case( AlternateModel,
 	'ied1002_0' => 'IncomeIED10020',
 	'rvc1412_2' => 'RVC14122',
 	'rvc1703_1' => 'RVC17031',
+	'rvc1801_1' => 'RVC18011',
 	''
 );
 
@@ -254,7 +256,7 @@ doVersion4    := IncludeVersion4;
 
 bsVersion := max( FlagshipVersion, map(
 	AlternateModel IN ['rvr1210_1', 'rvc1301_1', 'rva1309_1', 'rvc1307_1', 'rvp1401_1', 'rvp1401_2', 'rvc1405_1', 'rvc1405_2', 'rvc1405_3',
-										 'rvc1405_4', 'rvc1412_1', 'rvp1503_1', 'rvb1402_1', 'ied1002_0', 'rvc1412_2', 'rvc1703_1'] => 41,
+										 'rvc1405_4', 'rvc1412_1', 'rvp1503_1', 'rvb1402_1', 'ied1002_0', 'rvc1412_2', 'rvc1703_1','rvc1801_1'] => 41,
 	AlternateModel IN ['rvr1104_2', 'rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvp1012_1', 'rvp1208_1', 'rvc1208_1'] => 4,
 	doVersion4 => 4,
 	doVersion3 => 3,  
@@ -1672,6 +1674,7 @@ rvMoney := map(
 				AlternateModel = 'ied1002_0' => ungroup(Models.IED1002_0_9(clam, false)),
 				AlternateModel = 'rvc1412_2' => ungroup(Models.RVC1412_2_0(custom_adl_clam, false)),
 				AlternateModel = 'rvc1703_1' => ungroup(Models.RVC1703_1_0(adl_clam, false)),
+				AlternateModel = 'rvc1801_1' => ungroup(Models.RVC1801_1_0(adl_clam, false)),
 				FlagshipVersion=4 => ungroup(Models.RVG1103_0_0(clam,false,false)),
 				FlagshipVersion=3 => ungroup(Models.RVG1003_0_0(clam)),
 				ungroup(Models.RVG812_0_0(ungroup(clam),  false))),
@@ -1692,7 +1695,7 @@ Layout_working addScore(Layout_working le, Models.Layout_ModelOut ri, integer i)
 	self.score1 := if(i=1, ri.score, le.score1);
 	self.scorename1 := if(i=1 and ri.score <> '', if(AlternateModel in AltAuto,CustomScoreName,'Auto'), le.scorename1);
 
-  models36 := ['rvc1307_1','rvc1405_1','rvc1405_2','rvc1405_3', 'rvc1405_4', 'rvc1412_1', 'rvc1412_2', 'rvc1703_1'];  
+  models36 := ['rvc1307_1','rvc1405_1','rvc1405_2','rvc1405_3', 'rvc1405_4', 'rvc1412_1', 'rvc1412_2', 'rvc1703_1','rvc1801_1'];  
 	self.reason1 := if(i=1, if(ri.ri[1].hri='00', '36', ri.ri[1].hri), le.reason1);
 	self.reason2 := map(
 		i <> 1 => le.reason2,
@@ -1782,6 +1785,7 @@ Layout_working addScore(Layout_working le, Models.Layout_ModelOut ri, integer i)
 		AlternateModel = 'ied1002_0'  => Risk_Indicators.BillingIndex.IED1002_0,
 		AlternateModel = 'rvc1412_2'  => Risk_Indicators.BillingIndex.RVC1412_2,
 		AlternateModel = 'rvc1703_1'  => Risk_Indicators.BillingIndex.RVC1703_1,
+		AlternateModel = 'rvc1801_1'  => Risk_Indicators.BillingIndex.RVC1801_1,
 		FlagshipVersion=4             => Risk_Indicators.BillingIndex.RVMoney_V4,
 		FlagshipVersion=3             => Risk_Indicators.BillingIndex.RVMoney_V3,
 		                                 Risk_Indicators.BillingIndex.RVMoney_v2),
@@ -1802,6 +1806,7 @@ Layout_working addScore(Layout_working le, Models.Layout_ModelOut ri, integer i)
 																										AlternateModel = 'ied1002_0' => 'IncomeIED10020',
 																										AlternateModel = 'rvc1412_2' => 'RVC14122',
 																										AlternateModel = 'rvc1703_1' => 'RVC17031',
+																										AlternateModel = 'rvc1801_1' => 'RVC18011',
 																																			'Money'), 
 																								le.scorename5);
 	self.reason17 	:= if(i=5, if(ri.ri[1].hri='00', '36', ri.ri[1].hri), le.reason17);

@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP;
+﻿IMPORT Business_Risk_BIP;
 
 EXPORT fnMac_ExcludeExperian_ChildDataset(ds_recs_in, 
                                           companyChildDatasetName = 'company_name[1].sources', 
@@ -10,11 +10,11 @@ EXPORT fnMac_ExcludeExperian_ChildDataset(ds_recs_in,
     ds_noExperianRecs := 
       ds_recs_in(COUNT(companyChildDatasetName) > 2 
                  OR
-                 COUNT(companyChildDatasetName) = 1 AND companyChildDatasetName[1].source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source)
+                 COUNT(companyChildDatasetName) = 1 AND companyChildDatasetName[1].sourcFieldName NOT IN Business_Risk_BIP.Constants.SetExperianRestrictedSources
                  OR
                  ( COUNT(companyChildDatasetName) = 2 AND 
-                   ( companyChildDatasetName[1].source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source) OR
-                     companyChildDatasetName[2].source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source) ) 
+                   ( companyChildDatasetName[1].sourcFieldName NOT IN Business_Risk_BIP.Constants.SetExperianRestrictedSources OR
+                     companyChildDatasetName[2].sourcFieldName NOT IN Business_Risk_BIP.Constants.SetExperianRestrictedSources) 
                  ));
  
     RETURN ds_noExperianRecs;                               

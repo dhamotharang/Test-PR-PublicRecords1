@@ -1,10 +1,12 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, iesp;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Suppress;
 
 EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 											DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 											Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
 											BIPV2.mod_sources.iParams linkingOptions,
-											BOOLEAN includeReport) := FUNCTION
+											BOOLEAN includeReport,
+                      string6 DD_SSNMask = '',
+                      BOOLEAN debugmode = FALSE) := FUNCTION
 
 
 	cleanedShell := IF(EXISTS(indata), DueDiligence.CommonBusiness.GetCleanBIPShell(indata), DueDiligence.CommonBusiness.GetBusInternalBIPShell(busInfo));
@@ -41,7 +43,6 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 		
 	// Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
 	linkIDsFound := Business_Risk_BIP.BIP_Best_Append(withBIP, tempOptions, linkingOptions, allowedSourcesSet);
-	
 	
 	bestData := JOIN(busInfo, linkIDsFound, 
 										LEFT.seq = RIGHT.seq AND
@@ -89,19 +90,58 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 															
 															SELF  := LEFT;),
 										LEFT OUTER);
-										
-										
-	addReportData := IF(includeReport, DueDiligence.reportBestBusInfo(bestData), bestData);							
+						
+                    
+    //***********ADDING NEW LOGIC FOR EXPERIAN FEIN - E5 SOURCE ******************//
+    
+   FeinSources  := DueDiligence.getBusBestInfoRaw(withBIP, tempOptions, linkingOptions, allowedSourcesSet); 
+    
+	 ListOfFEINSources := NORMALIZE(FeinSources, LEFT.company_fein, TRANSFORM(DueDiligence.LayoutsInternal.FeinSources,
+                             /*  start by getting all of the FEIN Sources (RIGHT) */  																														
+																												SELF.seq                  := LEFT.seq;
+																												SELF.ultID                := LEFT.UltID;
+																												SELF.orgID                := LEFT.OrgID;
+																												SELF.seleID               := LEFT.SeleID;
+                                                        SELF.proxid               := 0;
+                                                        SELF.powid                := 0;
+                                                        /* Sources is a DATASET  */  
+                                                        SELF.FEINSourceContainsE5 := IF(COUNT(RIGHT.Sources(source = DueDiligence.Constants.FEIN_SOURCE_EXPERIAN_RESTRICTED)) > 0, true, false);
+																												SELF.companyFEIN          := RIGHT.company_fein;
+                                                        SELF.maskedFEIN           := RIGHT.company_fein;
+                                                        SELF.mask                 := DD_SSNMask; 
+																												SELF                      := RIGHT));
+   
+  // ------                                                                                                   ------
+  // ------ pass the input file and the name of the output file, and name of the ssn field and the name of the -----
+  // ------ dl_field(driver's license field) in this case is '' and the boolean flags for isassn and isadl     -----
+  // ------                                                                                                   ------
+  Suppress.MAC_Mask(ListOfFEINSources, MaskListOfFEINSources, maskedFEIN, '', true, false,,,,DD_SSNMask);
+   
+   FinalbestData := JOIN(bestData, MaskListOfFEINSources, 
+										LEFT.seq                              = RIGHT.seq AND
+										LEFT.Busn_info.BIP_IDS.UltID.LinkID   = RIGHT.UltID AND
+										LEFT.Busn_info.BIP_IDS.OrgID.LinkID   = RIGHT.OrgID AND
+										LEFT.Busn_info.BIP_IDS.SeleID.LinkID  = RIGHT.SeleID AND
+                    LEFT.busn_info.fein                   = RIGHT.companyfein,		
+										TRANSFORM(DueDiligence.Layouts.Busn_Internal,		  
+                         SELF.FEINSourceContainsE5       := RIGHT.FEINSourceContainsE5;
+                         SELF.busn_info.fein             := RIGHT.maskedFEIN;
+                         SELF.FEINSources                := RIGHT.Sources;
+                         SELF                            := LEFT;),
+                    ATMOST(DueDiligence.Constants.MAX_ATMOST_1000),
+                    LEFT OUTER);                
 	
 
-	// OUTPUT(busInfo, NAMED('busInfo'));
-	// OUTPUT(cleanedShell, NAMED('cleanedShell'));
-	// OUTPUT(withBIP, NAMED('withBIP'));
-	// OUTPUT(linkIDsFound, NAMED('linkIDsFound'));
-	// OUTPUT(bestData, NAMED('bestData'));
-	// OUTPUT(addReportData, NAMED('addReportData'));
-	
+	//OUTPUT(busInfo, NAMED('busInfo'));
+	//OUTPUT(cleanedShell, NAMED('cleanedShell'));
+	//OUTPUT(withBIP, NAMED('withBIP'));
+	//IF(debugMode, OUTPUT(linkIDsFound, NAMED('linkIDsFound')));
+  //OUTPUT(bestData, NAMED('bestDatax'));
+	//OUTPUT(FeinSources, NAMED('FeinSources'));
+	//IF(debugmode, OUTPUT(ListOfFEINSources, NAMED('ListOfFEINSources')));
+ 
 
-	RETURN addReportData;
+	//RETURN addReportData;
+	RETURN FinalbestData;
 	
 END;

@@ -307,17 +307,19 @@ EXPORT Functions :=  MODULE;
 		SHARED boolean   hasStartDate				:= in_mod.StartDate <> '';
 		SHARED boolean   hasEndDate					:= in_mod.EndDate <> '';			
 	
-		SHARED string 	StartDateSQL				:= ' date_format(i.date_added, \'%Y%m%d\')  >= ? and ';	//default is per Greg Bethke
-		SHARED string 	EndDateSQL					:= IF(hasEndDate, 'date_format(i.date_added, \'%Y%m%d\') <= ? and ','');		
+		SHARED string 	StartDateSQL				:= ' i.date_added  >= ? and ';	//default is per Greg Bethke
+		SHARED string 	EndDateSQL					:= IF(hasEndDate, 'i.date_added <= ? and ','');		
 		SHARED string		CompanyIdSQL				:= IF(hasCompanyId, ' company_id = ? and ','');	
 		
-		SHARED tmpDates := '(' + StartDateSQL + ' date_format(i.date_added, \'%Y%m%d\') <= ? ) and ';
+		SHARED tmpDates := '(' + StartDateSQL + ' i.date_added <= ? ) and ';
 		SHARED tmpFieldsSQL := tmpDates + CompanyIdSQL;
 	
-		SHARED tmpStartDate := if(hasStartDate, in_mod.StartDate, '20130101');
-		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) STD.Date.Today());
-		SHARED DATASET		StartDateValueSQL		:= dataset([{trim(tmpStartDate, left, right)}], Layouts.delta_value)	;
-		SHARED DATASET		EndDateValueSQL		 	:= dataset([{trim(tmpEndDate, left, right)}], Layouts.delta_value)	;
+		SHARED tmpStartDate := trim(if(hasStartDate, in_mod.StartDate, '20130101'), left, right);
+		SHARED tmpStartDatey := tmpStartDate[1..4]+'-'+tmpStartDate[5..6]+'-'+tmpStartDate[7..8] + ' 00:00:00';
+		SHARED tmpEndDate := trim(if(hasEndDate, (string) in_mod.EndDate, (string) STD.Date.Today()), left, right);
+		SHARED tmpEndDatey := tmpEndDate[1..4]+'-'+tmpEndDate[5..6]+'-'+tmpEndDate[7..8] + ' 23:59:59';	
+		SHARED DATASET		StartDateValueSQL		:= dataset([{tmpStartDatey}], Layouts.delta_value);
+		SHARED DATASET		EndDateValueSQL		 	:= dataset([{tmpEndDatey}], Layouts.delta_value);
 		SHARED DATASET		CompanyIdValueSQL		:= if(hasCompanyId, dataset([{trim(in_mod.CompanyId, left, right)}], Layouts.delta_value))	;
 		
 		SHARED ValuesSQL := StartDateValueSQL + EndDateValueSQL + CompanyIdValueSQL ;
@@ -327,6 +329,7 @@ EXPORT Functions :=  MODULE;
 		
 		EXPORT SQLSummaryFields := FieldsSQL;
 		EXPORT SQLSummaryValues := SQL_Values_List;
+
 	END;
 	
 	EXPORT GetIIDI2SummarySQLFields(IParam.IIDI2_summary_params in_mod) := MODULE
@@ -335,18 +338,20 @@ EXPORT Functions :=  MODULE;
 		SHARED boolean   hasStartDate				:= in_mod.StartDate <> '';
 		SHARED boolean   hasEndDate					:= in_mod.EndDate <> '';		
 	
-		SHARED string 	StartDateSQL				:= ' date_format(i.date_added, \'%Y%m%d\')  >= ? and ';	//default is per Greg Bethke
-		SHARED string 	EndDateSQL					:= IF(hasEndDate, 'date_format(i.date_added, \'%Y%m%d\') <= ? and ','');		
+		SHARED string 	StartDateSQL				:= ' i.date_added >= ? and ';	//default is per Greg Bethke
+		SHARED string 	EndDateSQL					:= IF(hasEndDate, 'i.date_added <= ? and ','');		
 		SHARED string		CompanyIdSQL				:= IF(hasCompanyId, ' company_id = ? and ','');	
 		SHARED string		CountryIdSQL				:= IF(hasCountryId, ' country = ? and ','');	
 		
-		SHARED tmpDates := '(' + StartDateSQL + ' date_format(i.date_added, \'%Y%m%d\') <= ? ) and ';
+		SHARED tmpDates := '(' + StartDateSQL + ' i.date_added <= ? ) and ';
 		SHARED tmpFieldsSQL := tmpDates + CompanyIdSQL + CountryIdSQL;
 	
 		SHARED tmpStartDate := if(hasStartDate, in_mod.StartDate, '20150101');
+		SHARED tmpStartDatey := tmpStartDate[1..4]+'-'+tmpStartDate[5..6]+'-'+tmpStartDate[7..8] + ' 00:00:00';
 		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) STD.Date.Today());
-		SHARED DATASET		StartDateValueSQL		:= dataset([{trim(tmpStartDate, left, right)}], Layouts.delta_value);
-		SHARED DATASET		EndDateValueSQL		 	:= dataset([{trim(tmpEndDate, left, right)}], Layouts.delta_value);
+		SHARED tmpEndDatey := tmpEndDate[1..4]+'-'+tmpEndDate[5..6]+'-'+tmpEndDate[7..8] + ' 23:59:59';	
+		SHARED DATASET		StartDateValueSQL		:= dataset([{tmpStartDatey}], Layouts.delta_value);
+		SHARED DATASET		EndDateValueSQL		 	:= dataset([{tmpEndDatey}], Layouts.delta_value);
 		SHARED DATASET		CompanyIdValueSQL		:= if(hasCompanyId, dataset([{trim(in_mod.CompanyId, left, right)}], Layouts.delta_value))	;
 		SHARED DATASET		CountryIdValueSQL		:= if(hasCountryId, dataset([{trim(in_mod.CountryId, left, right)}], Layouts.delta_value))	;
 		
@@ -357,7 +362,7 @@ EXPORT Functions :=  MODULE;
 		
 		EXPORT SQLSummaryFields := FieldsSQL;
 		EXPORT SQLSummaryValues := SQL_Values_List;
-	END;
+END;
 	
 	EXPORT GetStartDate(IParam.summary_params in_mod) := FUNCTION
 			tmpStartDate := if(in_mod.StartDate <> '', in_mod.StartDate, '20130101');

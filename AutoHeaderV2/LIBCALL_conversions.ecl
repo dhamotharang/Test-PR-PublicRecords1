@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, AutoHeaderI, doxie, AutoHeaderV2, lib_stringlib;
+﻿IMPORT AutoStandardI, AutoHeaderI, doxie, AutoHeaderV2, lib_stringlib;
 
 // Encapsulates functionality for transforming/cleaning/deriving from/to search library interface
 EXPORT LIBCALL_conversions := MODULE
@@ -90,7 +90,7 @@ EXPORT LIBCALL_conversions := MODULE
 
 
 
-	EXPORT CleanSearchInputDataset (dataset (AutoHeaderV2.layouts.lib_search) ds_in) := function
+	EXPORT CleanSearchInputDataset (dataset (AutoHeaderV2.layouts.lib_search) ds_in, integer libVersion =AutoHeaderV2.Constants.LibVersion.LEGACY) := function
     first_row := ds_in[1];
 
     HasWildcard (string str) := (Stringlib.StringFind(str, '*', 1) <> 0) or (Stringlib.StringFind(str, '?', 1) <> 0);
@@ -102,10 +102,11 @@ EXPORT LIBCALL_conversions := MODULE
       Self.did := (unsigned6) if (stringlib.stringfilterout (first_row.did, '0123456789') = '', first_row.did, '');
       Self.rid := (unsigned6) first_row.rid;    //AutoStandardI.InterfaceTranslator.rid_value.val
 
+						boolean isSaltFetch := libVersion = AutoHeaderV2.Constants.LibVersion.SALT;
       // Name
-      Self.tname := AutoheaderV2.translate.cname (first_row);
+      Self.tname := AutoheaderV2.translate.cname (first_row,isSaltFetch);
       // Address
-      addr := AutoheaderV2.translate.caddress (first_row);
+      addr := AutoheaderV2.translate.caddress (first_row, isSaltFetch);
       Self.taddress := addr;
       // SSN
       Self.tssn := AutoheaderV2.translate.cssn (first_row);

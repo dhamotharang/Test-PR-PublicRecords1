@@ -36,6 +36,7 @@ EXPORT ReportServiceFCRA  := macro
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);		
 		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose); // should we?
 		export boolean IncludeIncome := first_row.options.IncludeIncome;
+		export boolean IsRhodeIslandResident := first_row.options.IsRhodeIslandResident;
 	end;
    	
 	

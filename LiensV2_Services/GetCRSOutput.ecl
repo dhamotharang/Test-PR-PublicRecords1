@@ -15,15 +15,22 @@ export GetCRSOutput (
 ) := FUNCTION
 
   doxie.MAC_Header_Field_Declare(IsFCRA); // only for DisplayMatchedParty_value !
-	
+
+    // We'll dedup and link cases by case_link_id if provided.  If not, use tmsid
+	case_link := project(case_in, transform(liensv2_services.layout_liens_case_extended, 
+		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
+		self := left));
+	history_link := project(history_in, transform(liensv2_services.layout_liens_history_extended, 
+		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
+		self := left));
+
 	// FCRA FFD  
-	ds_ffd := LiensV2_Services.fn_doFcraCompliance(party_in, case_in,
-																								 history_in, ds_slim_pc, 
-																								 inFFDOptionsMask);
+	ds_ffd := LiensV2_Services.fn_doFcraCompliance(party_in, case_link,
+		history_link, ds_slim_pc, inFFDOptionsMask);
   
 	ds_party_raw_pre :=  if(IsFCRA,group(sort(ds_ffd._party,acctno),acctno), party_in);
-	ds_case_raw_pre  :=  if(IsFCRA, ds_ffd._case, case_in);
-	ds_history_raw   :=  if(IsFCRA, ds_ffd._history, history_in);
+	ds_case_raw_pre  :=  if(IsFCRA, ds_ffd._case, case_link);
+	ds_history_raw   :=  if(IsFCRA, ds_ffd._history, history_link);
 	
 	// Populate insurance flag for parties
 	rParty_w_ins_flag :=
@@ -58,7 +65,7 @@ export GetCRSOutput (
 	ds_party_raw_w_ins_flag_itr := ungroup(iterate(ds_party_raw_w_ins_flag_sort, tIterate(left, right)));
 	
 	// Filter records for FCRA insurance
-	ds_party_raw_filter := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
+	ds_party_raw_filter := if(isFCRA and FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose),
                             group(sort(project(ds_party_raw_w_ins_flag_itr(bcbflag), liensv2_services.layout_lien_party_raw), acctno), acctno),
                             ds_party_raw_pre);
   
@@ -66,14 +73,16 @@ export GetCRSOutput (
   
   //===== ROLLUP CASE =====
 	
-	// SORT CASE DATA BY TMSID AND MOST RECENT FILING DATE
+	// SORT CASE DATA BY CASE LINK (OR TMSID), CASE_LINK_PRIORITY (IF PROVIDED) AND MOST RECENT FILING DATE
   ds_case_raw := project(ds_case_raw_pre, transform(LiensV2_Services.layout_liens_case_extended, self.rmsid := '', self := left));
-	ds_case_sort := sort (ds_case_raw, tmsid, orig_filing_date, -filing_number, filing_type_desc, record);
+	ds_case_sort := sort (ds_case_raw, case_link_id, case_link_priority, orig_filing_date, -filing_number, filing_type_desc, record);
 	
 	// TRANSFORM TO ROLL UP CASE INFO
 	ds_case_sort xf_case_rollup(ds_case_sort l, ds_case_sort r) := transform
 	  self.acctno			   			 := l.acctno;
 	  self.tmsid               := l.tmsid;
+	  self.case_link_id        := l.case_link_id;
+	  self.case_link_priority  := l.case_link_priority;
 	  self.persistent_record_id:= l.persistent_record_id;
 		self.filing_jurisdiction := if(l.filing_jurisdiction = '',r.filing_jurisdiction,l.filing_jurisdiction);
 		self.filing_jurisdiction_name := if(l.filing_jurisdiction_name = '',r.filing_jurisdiction_name,l.filing_jurisdiction_name);
@@ -104,38 +113,42 @@ export GetCRSOutput (
 	end;      
 	
 	// ROLLUP CASE INFORMATION
-	ds_case_rolled := rollup(ds_case_sort, left.tmsid = right.tmsid, xf_case_rollup(left,right));
+	ds_case_rolled := rollup(ds_case_sort, left.case_link_id = right.case_link_id, xf_case_rollup(left,right));
 	
-	ds_case_filtered := ds_case_rolled(~IsFCRA OR (FCRAPurpose != FCRA.FCRAPurpose.InsuranceApplication) OR bcbflag); //If FCRAPurpose=6 return only records with bcbflag set to true, else return all. 
+	ds_case_filtered := ds_case_rolled(~IsFCRA OR (~FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose)) OR bcbflag); //If FCRAPurpose is for isInsurance Applicatio return only records with bcbflag set to true, else return all. 
 	
   //===== ROLLUP HISTORY =====
 
-	ds_history_sort := sort(ds_history_raw, tmsid, record);
+	ds_history_sort := sort(ds_history_raw, case_link_id, case_link_priority, record);
 
 	// TRANSFORM TO ROLL UP HISTORY INFO
 	layout_liens_history_extended xf_hist_roll_1(ds_history_sort l, ds_history_sort r) := transform
-	  self.tmsid  := l.tmsid;
+		self.tmsid  := l.tmsid;
 		self.acctno := l.acctno;
+		self.case_link_id := l.case_link_id;
+		self.case_link_priority := l.case_link_priority;
 		// Choosen not good since we are doing a dedup later and should be restricting the number of records after that
 		// And we need to know the oldest filing date and can't determine the value correctly if we only keep the first 15 records
 		self.filings := choosen(l.filings & r.filings, 15);
 	end;
 	
-	ds_hist_roll := rollup(ds_history_sort, left.tmsid = right.tmsid, xf_hist_roll_1(left,right));
+	ds_hist_roll := rollup(ds_history_sort, left.case_link_id = right.case_link_id, xf_hist_roll_1(left,right));
 
 	layout_liens_history_extended xf_history_rollup(ds_hist_roll l) := transform
-		// FCRA - Insurance liens and judgments, FCRAPurpose = 6
+		// FCRA - Insurance liens and judgments, check FCRAPurpose 
 		oldest_orig_filing_dt := min(l.filings, orig_filing_date);
 		is_liens_ok := FCRA.lien_is_ok((string)STD.Date.Today(), oldest_orig_filing_dt);
-		filings := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
-                  if(is_liens_ok, l.filings(bcbflag), dataset([], LiensV2_Services.layout_lien_history_w_bcb)),
-                  l.filings);
-		
-	  self.tmsid := l.tmsid;
+		filings := if(isFCRA and FCRA.FCRAPurpose.isInsuranceCreditApplication(FCRAPurpose),
+			if(is_liens_ok, l.filings(bcbflag), dataset([], LiensV2_Services.layout_lien_history_w_bcb)),
+			l.filings);
+		filings_d := dedup(sort(filings,
+			-filing_date,-orig_filing_date,-filing_number,filing_type_desc,-filing_book,-filing_page,record),
+			filing_date,orig_filing_date,filing_number,filing_type_desc)(filing_number <> '' or filing_date <> '' or filing_type_desc <> '');
+	    self.tmsid := l.tmsid;
 		self.acctno := l.acctno;
-		self.filings := dedup(sort(filings,
-															-filing_date,-orig_filing_date,-filing_number,filing_type_desc,-filing_book,-filing_page,record),
-													filing_date,orig_filing_date,filing_number,filing_type_desc)(filing_number <> '' or filing_date <> '' or filing_type_desc <> '');
+		self.case_link_id := l.case_link_id;
+		self.case_link_priority := l.case_link_priority;
+		self.filings := sort(filings_d, case_link_priority, -filing_date, -orig_filing_date);
 	end;
 	
 	ds_history_rolled := project(ds_hist_roll,xf_history_rollup(left));
@@ -156,6 +169,7 @@ export GetCRSOutput (
 
 	layout_lien_rollup_with_page_no := RECORD		
 		liensv2_services.layout_lien_rollup;
+		string case_link_id;
 		INTEGER page_no;		
 	END;
 
@@ -190,7 +204,8 @@ export GetCRSOutput (
 
 		bp := formatted_parties(tmsid = l.tmsid);
 
-	  self.tmsid := l.tmsid;
+		self.tmsid := l.tmsid;
+		self.case_link_id := l.case_link_id;
 		SELf.matched_party.party_type := if(DisplayMatchedParty_value,
 		                                    MAP(bp[1].name_type ='0' => 'D'
 		                                       ,bp[1].name_type ='1' => 'C'
@@ -220,7 +235,8 @@ export GetCRSOutput (
 
 	rec_max_pages_per_tmsid xfm_determine_max_pages(ds_primed_rollup l) :=
 		TRANSFORM
-			SELF.tmsid     := l.tmsid;
+			SELF.tmsid        := l.tmsid;
+			SELF.case_link_id := l.case_link_id;
 			SELF.max_pages := MAX( MAX(ds_debtor_formatted(tmsid = l.tmsid), page_no),
 														 MAX(ds_creditor_formatted(tmsid = l.tmsid), page_no),
 														 MAX(ds_attorney_formatted(tmsid = l.tmsid), page_no),
@@ -234,7 +250,8 @@ export GetCRSOutput (
 	ds_party_recs_seed := NORMALIZE(ds_tmsids_with_max_pages, 
 																 LEFT.max_pages, 
 																 TRANSFORM(layout_lien_rollup_with_page_no,
-																					 SELF.tmsid    := LEFT.tmsid,
+																					 SELF.tmsid        := LEFT.tmsid,
+																					 SELF.case_link_id := LEFT.case_link_id, 
 																					 SELF.page_no  := COUNTER,
 																					 SELF          := LEFT,
 																					 SELF          := [])
@@ -315,9 +332,9 @@ export GetCRSOutput (
 																xf_join_thds(left,right),
 																left outer, keep(1000));
 																
-	// JOIN HISTORY INFORMATION (we're not paginating filing history)
+	// JOIN HISTORY INFORMATION ON CASE LINK ID (we're not paginating filing history)
 	ds_primed_rollup_dcath := join(ds_primed_rollup_dcatx, ds_history_rolled,
-	                              left.tmsid = right.tmsid AND
+	                              left.case_link_id = right.case_link_id AND
 																LEFT.page_no = 1,
 																xf_join_history(left,right),
 																left outer, keep(1000));	
@@ -326,10 +343,15 @@ export GetCRSOutput (
 	ds_results := PROJECT(ds_primed_rollup_dcath,LiensV2_Services.layout_lien_rollup);
 	
   //DEBUG	
+   // ut.out(case_in);
+   // ut.out(case_link);
+   // ut.out(history_in);
+   // ut.out(history_link);
    // ut.out(ds_party_raw_pre);
    // ut.out(ds_case_raw_pre);
    // ut.out(ds_case_raw);
    // ut.out(ds_history_raw);
+   // ut.out(ds_hist_roll);
    // ut.out(ds_party_raw);
    // ut.out(ds_case_rolled);
    // ut.out(ds_case_filtered);

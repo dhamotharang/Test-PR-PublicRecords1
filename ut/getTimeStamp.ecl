@@ -1,4 +1,4 @@
-export string12 getTimeStamp () := function
+﻿export string12 getTimeStamp () := function
 
 // Function to get time in HHMMSS Milliseconds format
 
@@ -13,7 +13,7 @@ string12 getTime() := BEGINC++
      gettimeofday(&tv, &tz);
      localtime_r(&tv.tv_sec, &localt);
      sprintf(outstr, "%02d%02d%02d%06d", localt.tm_hour, localt.tm_min,
-              localt.tm_sec, tv.tv_usec);
+              localt.tm_sec, (int)tv.tv_usec);
 
 		 strncpy(__result, outstr, 12);
 		 

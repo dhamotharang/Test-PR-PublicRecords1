@@ -1,12 +1,10 @@
-EXPORT MAC_RoyaltyEmail(inf, royal_out, src = 'src') := macro
+EXPORT MAC_RoyaltyEmail(inf, royal_out, src = 'src', isFCRA = false) := macro
 	
-	import Codes;
+	import Codes, Royalty;
 
-	#uniquename(royalty_codes)
 	#uniquename(royalty_set)
 	#uniquename(src_suffix)
-	%royalty_codes% := codes.Key_Codes_V3(file_name = 'EMAIL_SOURCES', field_name = 'ROYALTY');
-	%royalty_set% 	:= set(%royalty_codes%, code);
+	%royalty_set% 	:= Royalty.Constants.EMAIL_ROYALTY_SET(isFCRA);
 	
 	#uniquename(addroyalty)
 	Royalty.Layouts.Royalty %addroyalty%(recordof(inf) l) := transform	

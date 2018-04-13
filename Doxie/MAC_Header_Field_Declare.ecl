@@ -3,7 +3,6 @@ export MAC_Header_Field_Declare(IsFCRA = false) := MACRO
 	#uniquename(inputmod);
 	
 	%inputmod% := AutoStandardI.GlobalModule(isFCRA);
-	// parsed address inputs for moxie_server services
 	isCRS := AutoStandardI.InterfaceTranslator.isCRS.val(project(%inputmod%,AutoStandardI.InterfaceTranslator.isCRS.params));
 	party_type := AutoStandardI.InterfaceTranslator.party_type.val(project(%inputmod%,AutoStandardI.InterfaceTranslator.party_type.params));
   // in compound queries this is a party type specifically for bankruptcy

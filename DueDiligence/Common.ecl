@@ -713,10 +713,8 @@ EXPORT Common := MODULE
 				    self.CityBorderStation         := tempCityState in DueDiligence.Constants.CityBorderStation;
 				    self.CityFerryCrossing         := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
 				    self.CityRailStation           := tempCityState in DueDiligence.Constants.CityRailStation; 
-  
 					   /* populate the remaining business internal record with data from the left  */ 
-						self                          := left;
-            self                          := [];), left outer,
+						self                          := left;), left outer,
 		ATMOST
 		    (keyed(right.geolink = left.state + left.county + left.geo_blk), 
 				 DueDiligence.Constants.MAX_ATMOST), KEEP(1));

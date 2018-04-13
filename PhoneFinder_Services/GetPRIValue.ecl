@@ -12,9 +12,11 @@ PRIRules := IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PH
 																			TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level:='H', SELF.LevelCount:=1, SELF:=LEFT, SELF:=[])),
 										inMod.RiskIndicators);
 currentDate := (STRING)STD.Date.Today();										
-	alertRec:= RECORD
+alertRec:= RECORD
 		STRING flag;
-		STRING message;
+		STRING messages;
+		integer RiskId;
+		string Level;
 	END;	
 	RulesRec := RECORD
 		iesp.phonefinder.t_PhoneFinderRiskIndicator;
@@ -74,7 +76,7 @@ currentDate := (STRING)STD.Date.Today();
 										34 => (UNSIGNED)SubjectPhone.dt_first_seen = 0 AND (UNSIGNED)SubjectPhone.dt_last_seen = 0,
 										FALSE);				
 		//Keep violating rules and risk indicator	based on individual rule.
-		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category,SELF.message := LEFT.RiskDescription)));
+		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category, SELF.messages := LEFT.RiskDescription, SELF := LEFT)));
 		SELF.OTPRIFailed:= hasFailed and l.OTP;
 		SELF.indicator := MAP(hasFailed AND l.LevelCount = 1 => Constants.RiskLevel.FAILED,
 													hasFailed AND l.LevelCount > 1 => Constants.RiskLevel.WARN,
@@ -104,7 +106,8 @@ currentDate := (STRING)STD.Date.Today();
 	//Rollup alerts by categories req2.12										
 	PhoneFinder_Services.Layouts.PhoneFinder.alert rollCategory(alertRec l, DATASET(alertRec) allRows) :=TRANSFORM
 		SELF.flag := l.flag;
-		SELF.messages := PROJECT(allRows,TRANSFORM(iesp.share.t_StringArrayItem, SELF.value := LEFT.message));
+		SELF.messages := PROJECT(allRows,TRANSFORM(iesp.share.t_StringArrayItem, SELF.value := LEFT.messages));
+		SELF.AlertIndicators 	:= PROJECT(allRows,TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator, SELF := LEFT));
 	END;
 	alertResults := ROLLUP(GROUP(SORT(dsAlert.Alerts,flag),flag), GROUP, rollCategory(LEFT,ROWS(LEFT)));
 
@@ -118,7 +121,7 @@ currentDate := (STRING)STD.Date.Today();
 																										SELF.PhoneRiskIndicator:=Constants.RiskIndicator[risk.indicator],
 																										SELF.OTPRIFailed			 :=risk.OTPRIFailed,
 																										SELF:=LEFT));
-	// OUTPUT(dsRules);																									
+	// OUTPUT(dsRules);		 																							
 	// OUTPUT(levelSort);
 	// OUTPUT(dsAlert.alerts);
 	// OUTPUT(alertResults);																										

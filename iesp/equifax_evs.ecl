@@ -270,7 +270,7 @@ export t_TsVResponse_V100 := record
 end;
 		
 export t_TsVTwnSelectRs := record
-	dataset(t_TsVResponse_V100) TsVResponseData {xpath('TsVResponseData/TsVResponse_V100'), MAXCOUNT(2)};
+	dataset(t_TsVResponse_V100) TsVResponseData {xpath('TsVResponseData/TsVResponse_V100'), MAXCOUNT(20)};
 end;
 		
 export t_TsVTwnSelectTrnRs := record

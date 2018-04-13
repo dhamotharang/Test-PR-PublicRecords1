@@ -10,6 +10,7 @@ EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
 																										SELF.phone := LEFT.busn_info.phone;
 																										SELF.lexID := (STRING)LEFT.busn_info.BIP_IDS.SeleID.LinkID;
 																										SELF.inputFEIN := LEFT.busn_input.fein;
+       /* TIN/FEIN is EXPERIAN RESTRICTED */        SELF.TINSource := IF(LEFT.FEINSourceContainsE5 = true, DueDiligence.Constants.FEIN_SOURCE_EXPERIAN_RESTRICTED, DueDiligence.Constants.EMPTY);                     
 																										SELF.bestFein := LEFT.busn_info.fein;
 																										SELF.name := LEFT.busn_info.companyName;
 																										SELF.inputAddress := PROJECT(LEFT.busn_input.address, TRANSFORM(iesp.share.t_Address,

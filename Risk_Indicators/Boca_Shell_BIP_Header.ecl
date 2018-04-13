@@ -1,4 +1,5 @@
-﻿IMPORT Address, ADVO, BIPV2, BizLinkFull, Business_Risk_BIP, CellPhone, Gong, Risk_Indicators, RiskWise, UT, Corp2, MDR, LN_PropertyV2, DueDiligence, DID_add;
+﻿IMPORT Address, ADVO, BIPV2, BizLinkFull, Business_Risk_BIP, CellPhone, Gong, Risk_Indicators, RiskWise, UT, Corp2, MDR, LN_PropertyV2, DueDiligence, DID_add, UCCv2, UCCv2_Services,
+       Inquiry_AccLogs, TopBusiness_Services;
 
 EXPORT Boca_Shell_BIP_Header(grouped DATASET(Risk_Indicators.Layout_Boca_Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -7,14 +8,16 @@ EXPORT Boca_Shell_BIP_Header(grouped DATASET(Risk_Indicators.Layout_Boca_Shell) 
 												 boolean isFCRA,
 												 unsigned1 BSversion=1) := FUNCTION
 
-string2 stringZero := '0';
-string2 stringNeg1 := '-1';
-string2 stringNeg2 := '-2';
-string2 stringNeg3 := '-3';
+string2 stringZero  := '0';
+string2 stringNeg1  := '-1';
+string2 stringNeg2  := '-2';
+string2 stringNeg3  := '-3';
 integer integerZero := 0;
+integer integerOne  := 1;
 integer integerNeg1 := -1;
 integer integerNeg2 := -2;
-string6 ninesDate := '999999';
+integer integerNeg3 := -3;
+string6 ninesDate   := '999999';
 
 	// ------- Get FEIN Matches across all businesses ------------- //
 	For_FEIN_Search := PROJECT(UNGROUP(Shell), TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,
@@ -38,12 +41,12 @@ string6 ninesDate := '999999';
 	
 	BusinessHeaderRaw1 := BIPV2.Key_BH_Linking_Ids.kFetch2(UniqueRawFEINMatches,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID), 
-																							integerZero, /*ScoreThreshold --> 0 = Give me everything*/
+																							integerZero, 
 																							linkingOptions,
 																							Business_Risk_BIP.Constants.Limit_BusHeader,
-																							FALSE, /* dnbFullRemove */
-																							TRUE, /* bypassContactSuppression */
-																							Options.KeepLargeBusinesses);
+																							FALSE, 
+																							TRUE, 
+																							BIPV2.IDconstants.JoinTypes.LimitTransformJoin);
 											
 	// clean up the business header before doing anything else
 	Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRaw1, BusinessHeaderRaw);	
@@ -54,8 +57,6 @@ string6 ninesDate := '999999';
 										SELF.HistoryDate := RIGHT.HistoryDate; 
 										SELF.HistoryDateTime := (integer)RIGHT.HistoryDateTimeStamp[1..8]; 
 										SELF.HistoryDateLength := LENGTH( TRIM((STRING)RIGHT.HistoryDateTimeStamp[1..8]) );
-										// SELF.HistoryDateTime := integerZero; 
-										// SELF.HistoryDateLength := integerZero;
 										SELF := LEFT), 
 								FEW); 
 	
@@ -103,8 +104,8 @@ string6 ninesDate := '999999';
 	
 		
 	// Sort business header records by SeleID
-	SortedBusinessHeader := SORT(UNGROUP(BusinessHeaderExpanded), UniqueID, SeleID);
-	
+		SortedBusinessHeader := SORT(UNGROUP(BusinessHeaderExpanded), UniqueID, SeleID);
+    
 	// Rollup business header records to calculate counts and dates within unique SeleID
   layoutExpanded rollBusinessHeader(layoutExpanded le, layoutExpanded ri) := transform
 		same_SeleID													:= le.SeleID = ri.SeleID;
@@ -178,6 +179,17 @@ string6 ninesDate := '999999';
 	
 	WithBusinessHeader := JOIN(Shell, RolledBusinessHeader, LEFT.seq=RIGHT.UniqueID, addBusinessHeader(LEFT,RIGHT), LEFT OUTER);
 
+ 	UniqueSeleIDs := DEDUP(SORT(UniqueRawFEINMatches, UniqueID, -SeleID),	UniqueID); 
+
+	WithSeleIDFlag := JOIN(WithBusinessHeader, UniqueSeleIDs, LEFT.Seq = RIGHT.UniqueID,
+                     TRANSFORM(risk_indicators.Layout_Boca_Shell,
+                       SELF.BIP_Header54.bus_seleID_match     := LEFT.seq = RIGHT.UniqueID;
+											 SELF                                   := LEFT),
+										 LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+
+
+
+
 	LinkIDs := DEDUP(SORT(UniqueRawFEINMatches, UniqueID, SeleID),	UniqueID, SeleID);
 
 	//get SOS filings
@@ -189,13 +201,16 @@ string6 ninesDate := '999999';
 													);
 
 	// Add back our Seq numbers.
-	CorpFilings_Seq := JOIN(CorpFilings_raw, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength, integer bus_SOS_filings_peradl, integer bus_active_SOS_filings_peradl},
+	CorpFilings_Seq := JOIN(CorpFilings_raw, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength, integer bus_SOS_filings_peradl, integer bus_active_SOS_filings_peradl, integer3 bus_sos_filings_not_instate},
 										SELF.Seq := RIGHT.Seq;
 										SELF.HistoryDate := RIGHT.HistoryDate; 
 										SELF.HistoryDateTime := integerZero; 
 										SELF.HistoryDateLength := integerZero;
 										SELF.bus_SOS_filings_peradl := 1;
 										SELF.bus_active_SOS_filings_peradl := if(Business_Risk_BIP.Common.is_ActiveCorp(LEFT.record_type, LEFT.corp_status_cd, LEFT.corp_status_desc), 1, integerZero);
+										SELF.bus_sos_filings_not_instate := map(LEFT.corp_inc_state = '' and LEFT.corp_forgn_state_cd = ''																																				=> -3,  //can't know
+																																																		LEFT.corp_inc_state = RIGHT.shell_input.st or LEFT.corp_forgn_state_cd = RIGHT.shell_input.st	=> 0,	  //in state
+																																																																																																																																																   1);  //out of state
 										SELF := LEFT), 
 								FEW); 
 	
@@ -221,6 +236,10 @@ string6 ninesDate := '999999';
 		same_Corp_Key												:= le.Corp_Key = ri.Corp_Key;
 		self.bus_SOS_filings_peradl					:= le.bus_SOS_filings_peradl + if(~same_Corp_Key, ri.bus_SOS_filings_peradl, integerZero);
 		self.bus_active_SOS_filings_peradl	:= le.bus_active_SOS_filings_peradl + if(~same_Corp_Key, ri.bus_active_SOS_filings_peradl, integerZero);
+		//if any SOS filing record matches input state (value of 0), return 0. Only if ALL filings are out of state (value of 1) do we want to return 1. 
+		self.bus_sos_filings_not_instate	:= map(le.bus_sos_filings_not_instate <> -3 and ri.bus_sos_filings_not_instate <> -3 => min(le.bus_sos_filings_not_instate, ri.bus_sos_filings_not_instate),
+																																										le.bus_sos_filings_not_instate = -3 and ri.bus_sos_filings_not_instate = -3 		=> le.bus_sos_filings_not_instate,
+																																																																																																																											max(le.bus_sos_filings_not_instate, ri.bus_sos_filings_not_instate));
 		self.UniqueID												:= ri.UniqueID;
 		self.SeleID 												 := ri.SeleID;
 		self.Corp_Key												:= ri.Corp_Key;
@@ -232,6 +251,9 @@ string6 ninesDate := '999999';
   RECORDOF(SortedCorpFilings) rollSOSFilings(RolledCorpFilings le, RolledCorpFilings ri) := transform
 		self.bus_SOS_filings_peradl					:= le.bus_SOS_filings_peradl + ri.bus_SOS_filings_peradl;
 		self.bus_active_SOS_filings_peradl	:= le.bus_active_SOS_filings_peradl + ri.bus_active_SOS_filings_peradl;
+		self.bus_sos_filings_not_instate	:= map(le.bus_sos_filings_not_instate = -3 and ri.bus_sos_filings_not_instate = -3 		=> le.bus_sos_filings_not_instate,
+																																										le.bus_sos_filings_not_instate <> -3 and ri.bus_sos_filings_not_instate <> -3 => min(le.bus_sos_filings_not_instate, ri.bus_sos_filings_not_instate),
+																																																																																																																											max(le.bus_sos_filings_not_instate, ri.bus_sos_filings_not_instate));
 		self.UniqueID												:= ri.UniqueID;
 		self.SeleID 												 := ri.SeleID;
 		self.Corp_Key												:= ri.Corp_Key;
@@ -243,16 +265,215 @@ string6 ninesDate := '999999';
 	risk_indicators.Layout_Boca_Shell addSOSFilings(risk_indicators.Layout_Boca_Shell le, RolledSOSFilings ri) := TRANSFORM
 		noHit																					:= le.seq <> ri.UniqueID;
 		noDID																					:= le.DID = integerZero;
-		SELF.BIP_Header.bus_SOS_filings_peradl     		:= map(noDID															=> integerNeg1,
-																												 noHit															=> integerNeg2,
-																																															 ri.bus_SOS_filings_peradl);
-		SELF.BIP_Header.bus_active_SOS_filings_peradl := map(noDID															=> integerNeg1,
-																												 noHit															=> integerNeg2,
-																																															 ri.bus_active_SOS_filings_peradl);
+		SELF.BIP_Header.bus_SOS_filings_peradl     		:= map(noDID															  => integerNeg1,
+																												 noHit															  => integerNeg2,
+                                                                                                 ri.bus_SOS_filings_peradl);
+		SELF.BIP_Header.bus_active_SOS_filings_peradl := map(noDID															  => integerNeg1,
+																												 noHit															  => integerNeg2,
+                                                                                                 ri.bus_active_SOS_filings_peradl);
+		SELF.BIP_Header54.bus_sos_filings_not_instate := map(noDID															  => integerNeg1,
+                                                         ~le.BIP_Header54.bus_seleID_match    => integerNeg2,
+																												 noHit															  => integerNeg3,
+                                                                                                 ri.bus_sos_filings_not_instate);
 		SELF 																					:= le;
 	END;
 	
-	WithSOSFilings := JOIN(WithBusinessHeader, RolledSOSFilings, LEFT.seq=RIGHT.UniqueID, addSOSFilings(LEFT,RIGHT), LEFT OUTER);
+	WithSOSFilings := JOIN(WithSeleIDFlag, RolledSOSFilings, LEFT.seq=RIGHT.UniqueID, addSOSFilings(LEFT,RIGHT), LEFT OUTER);
+
+
+	// *** Get UCC filings *** 
+  
+  // Key fetch to get UCC linkids key records
+	ds_ucc_linkidskey_recs := UCCv2.Key_LinkIds.kFetch2(UniqueRawFEINMatches,
+	                                                     Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),TopBusiness_Services.Constants.UCCKfetchMaxLimit);	
+
+	// Add back our Seq numbers
+	ds_ucc_linkidskey_seq := JOIN(ds_ucc_linkidskey_recs, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength},
+										SELF.Seq := RIGHT.Seq;
+										SELF.HistoryDate := RIGHT.HistoryDate; 
+										SELF.HistoryDateTime := (integer)RIGHT.HistoryDateTimeStamp[1..8]; 
+										SELF.HistoryDateLength := LENGTH( TRIM((STRING)RIGHT.HistoryDateTimeStamp[1..8]) );
+										SELF := LEFT), 
+								FEW); 
+
+	// Filter out records after our history date
+	ds_ucc_linkidskey_filtered := Business_Risk_BIP.Common.FilterRecords(ds_ucc_linkidskey_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_UCCV2, AllowedSourcesSet);
+
+
+  layout_UCC_TMSID_slim := record
+    unsigned6 UniqueID;
+    TopBusiness_Services.UCCSection_Layouts.rec_ids_with_linkidsdata_slimmed;
+  end;
+
+	// Filter to only use recs that are not 'A'/Assignee (bug 138650) and then project onto a slimmed layout.
+  ds_linkids_keyrecs_slimmed := project (ds_ucc_linkidskey_filtered(party_type != 'A'),
+		  transform(layout_UCC_TMSID_slim,
+				self.source       := MDR.sourceTools.src_UCCv2, // not needed here???
+				self.role_type    := if(left.party_type = TopBusiness_Services.Constants.Debtor, //D = Debtor
+														    TopBusiness_Services.Constants.Debtor,TopBusiness_Services.Constants.SecuredParty), //S = SecuredParty
+			  self              := left, // to preserve ids & other key fields being kept
+			));
+
+  // Sort/dedup to only keep 1 record for each tmsid per set of linkids to reduce the number of key lookups when joining to the ucc main key file below.
+	ds_linkids_keyrecs_deduped := dedup(sort(ds_linkids_keyrecs_slimmed,
+												                   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+																			     tmsid 
+																					 ),
+																      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+																			tmsid);
+
+	set_terminated_types := ['LAPSED','L','RELEASE','EXPUNGED','DELETED',
+	                         'TERMINATED','TERMINATION','UCC3 TERMINATION', 'UCC-3 TERMINATION'];
+
+  layout_UCC_RMSID_slim := record
+    unsigned6 UniqueID;
+    TopBusiness_Services.UCCSection_Layouts.rec_ids_with_maindata_slimmed;
+  end;
+
+  // Get RMSID records
+  ds_uccmain_keyrecs := join(ds_linkids_keyrecs_deduped,UCCV2.Key_Rmsid_Main(),
+                               keyed(left.tmsid = right.tmsid), //get all recs for the tmsids
+	  transform(layout_UCC_RMSID_slim,
+			temp_status_type           := StringLib.StringToUpperCase(right.status_type);
+			temp_filing_type           := StringLib.StringToUpperCase(right.filing_type);
+			self.orig_filing_number    := if(right.orig_filing_number != '',
+			                                 right.orig_filing_number,right.filing_number),
+			self.status_type           := temp_status_type,
+			self.filing_type           := temp_filing_type,
+			self.status_code           := if(temp_status_type in set_terminated_types or
+						                           temp_filing_type in set_terminated_types,
+																			 TopBusiness_Services.Constants.TERMINATED,TopBusiness_Services.Constants.ACTIVE
+																			 );
+			self := right,  // to pull off the ucc main key fields we want                       
+			self := left,   // to preserve ids & other(?) kept linkids key fields ???
+    ),
+		left outer, 
+		limit(10000,skip) // needed because of bad/generic tmsid=DNB, see bug 148946
+	 );
+
+  ds_ucc_RMSID_dedup := dedup(sort(ds_uccmain_keyrecs, UniqueID, TMSID, -status_code), UniqueID, TMSID);
+
+	table_UCC_counts 	:= table(ds_ucc_RMSID_dedup, {UniqueID, bus_UCC_count := count(group), bus_UCC_active_count := count(group, status_code = 'A')}, UniqueID); //count total UCC filings and active UCC filings
+
+	WithUCCFilings := JOIN(WithSOSFilings, table_UCC_counts, LEFT.Seq = RIGHT.UniqueID,
+                     TRANSFORM(risk_indicators.Layout_Boca_Shell,
+                       noHit																	:= LEFT.seq <> RIGHT.UniqueID;
+                       noDID																	:= LEFT.DID = integerZero;
+                       SELF.BIP_Header54.bus_UCC_count        := map(noDID					                      => integerNeg1,
+                                                                     ~LEFT.BIP_Header54.bus_seleID_match  => integerNeg2,
+                                                                                                             RIGHT.bus_UCC_count);
+                       SELF.BIP_Header54.bus_UCC_active_count := map(noDID					                      => integerNeg1,
+                                                                     ~LEFT.BIP_Header54.bus_seleID_match  => integerNeg2,
+                                                                     noHit                                => integerNeg3,
+                                                                                                             RIGHT.bus_UCC_active_count);
+											 SELF                                   := LEFT),
+										 LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+ 
+
+ // *** Get Inquiries ***
+ 
+	InqBuildDate := Risk_Indicators.get_Build_date('inquiry_update_build_version');
+
+	// ---------------- Business Inquiries - Only Allowed in Non-Marketing Mode ------------------
+	InquiriesRaw := Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(UniqueRawFEINMatches,
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
+																							0, 
+																							Business_Risk_BIP.Constants.Limit_Inquiries,
+																							Options.KeepLargeBusinesses);
+
+	// Add back our Seq numbers
+	InquiriesSeq := JOIN(InquiriesRaw, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength,
+                                                                                 INTEGER3 bus_inq_count12, INTEGER3 bus_inq_credit_count12, INTEGER3 bus_inq_highriskcredit_count12, INTEGER3 bus_inq_other_count12},
+										SELF.Seq := RIGHT.Seq;
+										SELF.HistoryDate := RIGHT.HistoryDate; 
+										SELF.HistoryDateTime := (integer)RIGHT.HistoryDateTimeStamp[1..8]; 
+										SELF.HistoryDateLength := LENGTH( TRIM((STRING)RIGHT.HistoryDateTimeStamp[1..8]) );
+          agebucket := risk_indicators.iid_constants.age_bucket(LEFT.search_info.datetime[1..8], RIGHT.historydate, RIGHT.historyDateTimeStamp);
+          SELF.bus_inq_count12					            := if(ageBucket between 1 and 12, 1, 0);
+          SELF.bus_inq_credit_count12          := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry in Inquiry_AccLogs.shell_constants.banking_industry5, 1, 0);
+          SELF.bus_inq_highriskcredit_count12  := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry in [Inquiry_AccLogs.shell_constants.collection_industry,
+                                                                                                                Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5, 
+                                                                                                                Inquiry_AccLogs.shell_constants.PrepaidCards_industry], 1, 0);
+										SELF.bus_inq_other_count12           := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry not in [Inquiry_AccLogs.shell_constants.banking_industry5,
+                                                                                                                    Inquiry_AccLogs.shell_constants.collection_industry,
+                                                                                                                    Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5, 
+                                                                                                                    Inquiry_AccLogs.shell_constants.PrepaidCards_industry], 1, 0);
+          SELF := LEFT), 
+								FEW); 
+	
+	// Figure out if the kFetch was successful
+	kFetchErrorCodesInquiry := Business_Risk_BIP.Common.GrabFetchErrorCode(InquiriesSeq);
+	
+	// Filter out records after our history date
+	Inquiries := Business_Risk_BIP.Common.FilterRecords2(InquiriesSeq, (TRIM(Search_Info.DateTime,ALL))[1..12], '', AllowedSourcesSet);
+
+	InquiriesUpdateRaw := Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(UniqueRawFEINMatches,
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+																							0, 
+																							Business_Risk_BIP.Constants.Limit_Inquiries,
+																							Options.KeepLargeBusinesses);
+
+	// Add back our Seq numbers
+	InquiriesUpdateSeq := JOIN(InquiriesUpdateRaw, Shell, LEFT.UniqueID = RIGHT.Seq, TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate, UNSIGNED6 HistoryDateTime, UNSIGNED1 HistoryDateLength,
+                                                                                             INTEGER3 bus_inq_count12, INTEGER3 bus_inq_credit_count12, INTEGER3 bus_inq_highriskcredit_count12, INTEGER3 bus_inq_other_count12},
+										SELF.Seq := RIGHT.Seq;
+										SELF.HistoryDate := RIGHT.HistoryDate; 
+										SELF.HistoryDateTime := (integer)RIGHT.HistoryDateTimeStamp[1..8]; 
+										SELF.HistoryDateLength := LENGTH( TRIM((STRING)RIGHT.HistoryDateTimeStamp[1..8]) );
+          agebucket := risk_indicators.iid_constants.age_bucket(LEFT.search_info.datetime[1..8], RIGHT.historydate, RIGHT.historyDateTimeStamp);
+          SELF.bus_inq_count12					            := if(ageBucket between 1 and 12, 1, 0);
+          SELF.bus_inq_credit_count12          := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry in Inquiry_AccLogs.shell_constants.banking_industry5, 1, 0);
+          SELF.bus_inq_highriskcredit_count12  := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry in [Inquiry_AccLogs.shell_constants.collection_industry,
+                                                                                                                Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5, 
+                                                                                                                Inquiry_AccLogs.shell_constants.PrepaidCards_industry], 1, 0);
+										SELF.bus_inq_other_count12           := if(ageBucket between 1 and 12 and LEFT.bus_intel.industry not in [Inquiry_AccLogs.shell_constants.banking_industry5,
+                                                                                                                    Inquiry_AccLogs.shell_constants.collection_industry,
+                                                                                                                    Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5, 
+                                                                                                                    Inquiry_AccLogs.shell_constants.PrepaidCards_industry], 1, 0);
+										SELF := LEFT), 
+								FEW); 
+	
+	// Figure out if the kFetch was successful
+	kFetchErrorCodesInquiryUpdate := Business_Risk_BIP.Common.GrabFetchErrorCode(InquiriesUpdateSeq);
+	
+	// Filter out records after our history date
+	InquiriesUpdate := Business_Risk_BIP.Common.FilterRecords2(InquiriesUpdateSeq, (TRIM(Search_Info.DateTime,ALL))[1..12], '', AllowedSourcesSet);
+
+	// Keep the unique inquiries between the historical and update keys
+	InquiriesAllTemp := DEDUP(SORT((Inquiries + InquiriesUpdate), Seq, Search_Info.Transaction_ID, -Search_Info.DateTime[1..8], -Search_Info.DateTime[10..15]), Seq, Search_Info.Transaction_ID, Search_Info.DateTime[1..8], Search_Info.DateTime[10..15]);
+	
+ RECORDOF(InquiriesAllTemp) rollInquiries(InquiriesAllTemp le, InquiriesAllTemp ri) := transform
+		self.bus_inq_count12					       := le.bus_inq_count12 + ri.bus_inq_count12;
+		self.bus_inq_credit_count12       	 := le.bus_inq_credit_count12 + ri.bus_inq_credit_count12;
+		self.bus_inq_highriskcredit_count12	 := le.bus_inq_highriskcredit_count12 + ri.bus_inq_highriskcredit_count12;
+		self.bus_inq_other_count12	         := le.bus_inq_other_count12 + ri.bus_inq_other_count12;
+		self															   := le;
+	end;
+	
+ rolledInquiries := rollup(sort(InquiriesAllTemp, Seq), rollInquiries(left,right), Seq);
+
+	risk_indicators.Layout_Boca_Shell addInquiries(risk_indicators.Layout_Boca_Shell le, rolledInquiries ri) := TRANSFORM
+		noDID																					    := le.DID = integerZero;
+		SELF.BIP_Header54.bus_inq_count12                 := map(noDID					                    => integerNeg1, // return -1 if no LexID found
+                                                             ~le.BIP_Header54.bus_seleID_match  => integerNeg2, // return -2 if no SeleIDs found for LexID
+                                                                                                   ri.bus_inq_count12);
+		SELF.BIP_Header54.bus_inq_credit_count12          := map(noDID					                    => integerNeg1,
+                                                             ~le.BIP_Header54.bus_seleID_match  => integerNeg2, 
+                                                             ri.bus_inq_count12 = 0             => integerNeg3, // return -3 if no inquiries for SeleIDs in last 12 months
+                                                                                                   ri.bus_inq_credit_count12);
+		SELF.BIP_Header54.bus_inq_highriskcredit_count12  := map(noDID					                    => integerNeg1,
+                                                             ~le.BIP_Header54.bus_seleID_match  => integerNeg2,
+                                                             ri.bus_inq_count12 = 0             => integerNeg3,
+                                                                                                   ri.bus_inq_highriskcredit_count12);
+		SELF.BIP_Header54.bus_inq_other_count12           := map(noDID					                    => integerNeg1,
+                                                             ~le.BIP_Header54.bus_seleID_match  => integerNeg2,
+                                                             ri.bus_inq_count12 = 0             => integerNeg3,
+                                                                                                   ri.bus_inq_other_count12);
+	SELF 																					      := le;
+	END;
+	
+	withInquiries := JOIN(WithUCCFilings, rolledInquiries, LEFT.seq=RIGHT.Seq, addInquiries(LEFT,RIGHT), LEFT OUTER);
+
 
 	// Here starts business header verification to verify input DID, address, SSN, fname, lname and phone against the business header records.  This logic mimics the business shell, but
 	// for name, SSN and phone verification, both the contact information and business information on the business header will be verified against to give lift to verification rates.
@@ -279,9 +500,9 @@ string6 ninesDate := '999999';
 		lNameMatched						:= Risk_Indicators.iid_constants.g(lNameMatchScore);
 
 		phonematchscore 		:= Risk_Indicators.PhoneScore(le.shell_input.phone10, ri.contact_phone);
-		phonematched 					:= iid_constants.gn(phonematchscore);
+		phonematched 					:= Risk_Indicators.iid_constants.gn(phonematchscore);
 		cphonematchscore 	:= Risk_Indicators.PhoneScore(le.shell_input.phone10, ri.company_phone);
-		cphonematched 				:= iid_constants.gn(cphonematchscore);
+		cphonematched 				:= Risk_Indicators.iid_constants.gn(cphonematchscore);
 		
 		SSNPopulated 					:= (INTEGER)le.shell_Input.ssn > integerZero;
 		SSNLength									:= LENGTH(TRIM(le.shell_Input.SSN));
@@ -364,7 +585,7 @@ string6 ninesDate := '999999';
 	END;
 
 
-	BusinessHeaderVerification := JOIN(WithSOSFilings, BusinessHeader, LEFT.Seq = RIGHT.Seq, 
+	BusinessHeaderVerification := JOIN(withInquiries, BusinessHeader, LEFT.Seq = RIGHT.Seq, 
 																																			verifyElements(LEFT, RIGHT),
 																																			INNER, ATMOST(Business_Risk_BIP.Constants.Limit_BusHeader));
 
@@ -521,7 +742,7 @@ string6 ninesDate := '999999';
 		SELF := le;
 	END;
 
-	withBIPHeaderVerification := JOIN(WithSOSFilings, BusinessHeaderVerificationRolled, LEFT.seq=RIGHT.seq, addBIPHeaderVer(LEFT,RIGHT), LEFT OUTER);
+	withBIPHeaderVerification := JOIN(withInquiries, BusinessHeaderVerificationRolled, LEFT.seq=RIGHT.seq, addBIPHeaderVer(LEFT,RIGHT), LEFT OUTER);
 
 	//for FCRA these fields are not allowed so just set to -1 if no DID, else set to -2
 	FCRAdefaults := project(ungroup(shell), 
@@ -561,42 +782,65 @@ string6 ninesDate := '999999';
 			self.BIP_Header54.bus_phone_ver_sources	:= if(left.DID = integerZero, stringNeg1, stringNeg2);
 			self.BIP_Header54.bus_phone_ver_sources_first_seen	:= if(left.DID = integerZero, stringNeg1, stringNeg2);
 			self.BIP_Header54.bus_phone_ver_sources_last_seen	:= if(left.DID = integerZero, stringNeg1, stringNeg2);
+			self.BIP_Header54.bus_sos_filings_not_instate	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_ucc_count	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_ucc_active_count	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_inq_count12	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_inq_credit_count12	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_inq_highriskcredit_count12	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
+			self.BIP_Header54.bus_inq_other_count12	:= if(left.DID = integerZero, integerNeg1, integerNeg2);
 
 			self := left));
 		
 	FinalBIP := map(isFCRA                    => FCRADefaults,
-                 BSVersion >= 54           => withBIPHeaderVerification, //this is new for BS 5.4
-                                              WithSOSFilings);	
- 
+                 BSVersion >= 54            => withBIPHeaderVerification, //this is new for BS 5.4
+                                               WithSOSFilings);	
+
 
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(CHOOSEN(For_FEIN_Search, 33), NAMED('For_FEIN_Search'));	
-	// OUTPUT(CHOOSEN(FEIN_results_w_acct, 33), NAMED('FEIN_results_w_acct'));	
-	// OUTPUT(CHOOSEN(UniqueRawFEINMatches, 33), NAMED('UniqueRawFEINMatches'));	
-	// OUTPUT(COUNT(BusinessHeaderRaw), NAMED('BusinessHeaderRawCount'));	
-	// OUTPUT(COUNT(BusinessHeaderSeq), NAMED('BusinessHeaderSeq'));	
-	// OUTPUT(COUNT(BusinessHeader), NAMED('BusinessHeader'));	
-	// OUTPUT(COUNT(BusinessHeaderExpanded), NAMED('BusinessHeaderExpanded'));	
-	// OUTPUT(CHOOSEN(SortedBusinessHeader, 25), NAMED('SortedBusinessHeader'));	
-	// OUTPUT(COUNT(SortedBusinessHeader), NAMED('SortedBusinessHeaderCount'));	
-	// OUTPUT(CHOOSEN(RolledBusinessHeader, 100), NAMED('RolledBusinessHeader'));	
-	// OUTPUT(COUNT(RolledBusinessHeader), NAMED('RolledBusinessHeaderCount'));	
-	// OUTPUT(COUNT(withBusinessHeader), NAMED('withBusinessHeader'));	
-	// OUTPUT(COUNT(LinkIDs), NAMED('LinkIDs'));	
-	// OUTPUT(COUNT(CorpFilings_raw), NAMED('CorpFilings_raw'));	
-	// OUTPUT(COUNT(CorpFilings_seq), NAMED('CorpFilings_seq'));	
-	// OUTPUT(COUNT(CorpFilings_withSrcCode), NAMED('CorpFilings_withSrcCode'));	
-	// OUTPUT(COUNT(CorpFilings_recs), NAMED('CorpFilings_recs'));	
-	// OUTPUT(COUNT(SortedCorpFilings), NAMED('SortedCorpFilings'));	
-	// OUTPUT(COUNT(RolledCorpFilings), NAMED('RolledCorpFilings'));	
-	// OUTPUT(COUNT(RolledSOSFilings), NAMED('RolledSOSFilings'));	
-	// OUTPUT(COUNT(withSOSFilings), NAMED('withSOSFilingsCount'));	
-	// OUTPUT(COUNT(BusinessHeaderVerification), NAMED('BusinessHeaderVerificationCount'));	
-	// OUTPUT(COUNT(BusinessHeaderVerificationRolled), NAMED('BusinessHeaderVerificationRolledCount'));	
-	// OUTPUT(COUNT(withBIPHeaderVerification), NAMED('withBIPHeaderVerificationCount'));	
+	// OUTPUT(CHOOSEN(CorpFilings_raw, 33), NAMED('CorpFilings_raw'));	
+	// OUTPUT(CHOOSEN(CorpFilings_Seq, 33), NAMED('CorpFilings_Seq'));	
+	// OUTPUT(CHOOSEN(kFetchErrorCodes, 33), NAMED('kFetchErrorCodes'));	
+	// OUTPUT(CHOOSEN(CorpFilings_withSrcCode, 33), NAMED('CorpFilings_withSrcCode'));	
+	// OUTPUT(CHOOSEN(CorpFilings_recs, 33), NAMED('CorpFilings_recs'));	
+	// OUTPUT(CHOOSEN(SortedCorpFilings, 33), NAMED('SortedCorpFilings'));	
+	// OUTPUT(CHOOSEN(RolledCorpFilings, 30), NAMED('RolledCorpFilings'));	
+	// OUTPUT(CHOOSEN(RolledSOSFilings, 30), NAMED('RolledSOSFilings'));	
+	// OUTPUT(CHOOSEN(WithSOSFilings, 30), NAMED('WithSOSFilings'));	
+	// OUTPUT(CHOOSEN(BusinessHeaderSeq, 300), NAMED('BusinessHeaderSeq'));	
+	// OUTPUT(CHOOSEN(BusinessHeader, 300), NAMED('BusinessHeader'));	
+	// OUTPUT(CHOOSEN(BusinessHeaderVerification, 300), NAMED('BusinessHeaderVerification'));	
+	// OUTPUT(CHOOSEN(BusinessHeaderVerificationRolled, 300), NAMED('BusinessHeaderVerificationRolled'));	
+	// OUTPUT(CHOOSEN(withBIPHeaderVerification, 300), NAMED('withBIPHeaderVerification'));	
 
+	// OUTPUT(CHOOSEN(UniqueRawFEINMatches, 100), NAMED('UniqueRawFEINMatches'));	
+	// OUTPUT(CHOOSEN(sortedBusinessHeader, 100), NAMED('sortedBusinessHeader'));	
+	// OUTPUT(COUNT(sortedBusinessHeader), NAMED('sortedBusinessHeaderCount'));	
+	// OUTPUT(CHOOSEN(rolledBusinessHeader, 100), NAMED('rolledBusinessHeader'));	
+	// OUTPUT(CHOOSEN(WithSeleIDFlag, 100), NAMED('WithSeleIDFlag'));	
+	// OUTPUT(CHOOSEN(RolledSOSFilings, 100), NAMED('RolledSOSFilings'));	
+	// OUTPUT(CHOOSEN(withSOSFilings, 100), NAMED('withSOSFilings'));	
+	// OUTPUT(CHOOSEN(InquiriesRaw, 100), NAMED('InquiriesRaw'));	
+	// OUTPUT(CHOOSEN(InquiriesSeq, 100), NAMED('InquiriesSeq'));	
+	// OUTPUT(CHOOSEN(InquiriesAllTemp, 100), NAMED('InquiriesAllTemp'));	
+	// OUTPUT(CHOOSEN(rolledInquiries, 100), NAMED('rolledInquiries'));	
+	// OUTPUT(CHOOSEN(withInquiries, 100), NAMED('withInquiries'));	
+	// OUTPUT(CHOOSEN(ds_ucc_linkidskey_recs, 100), NAMED('ds_ucc_linkidskey_recs'));	
+	// OUTPUT(COUNT(ds_ucc_linkidskey_recs), NAMED('ds_ucc_linkidskey_recs'));	
+	// OUTPUT(CHOOSEN(ds_ucc_linkidskey_seq, 100), NAMED('ds_ucc_linkidskey_seq'));	
+	// OUTPUT(COUNT(ds_ucc_linkidskey_seq), NAMED('ds_ucc_linkidskey_seq'));	
+	// OUTPUT(CHOOSEN(ds_ucc_linkidskey_filtered, 100), NAMED('ds_ucc_linkidskey_filtered'));	
+	// OUTPUT(COUNT(ds_ucc_linkidskey_recs), NAMED('ds_ucc_linkidskey_recs_count'));	
+	// OUTPUT(CHOOSEN(ds_linkids_keyrecs_slimmed, 100), NAMED('ds_linkids_keyrecs_slimmed'));	
+	// OUTPUT(CHOOSEN(ds_linkids_keyrecs_deduped, 100), NAMED('ds_linkids_keyrecs_deduped'));	
+	// OUTPUT(COUNT(ds_linkids_keyrecs_deduped), NAMED('ds_linkids_keyrecs_deduped_count'));	
+	// OUTPUT(CHOOSEN(ds_uccmain_keyrecs, 450), NAMED('ds_uccmain_keyrecs'));	
+	// OUTPUT(COUNT(ds_uccmain_keyrecs), NAMED('ds_uccmain_keyrecs_count'));	
+	// OUTPUT(COUNT(ds_ucc_RMSID_dedup), NAMED('ds_ucc_RMSID_dedup'));	
+	// OUTPUT(COUNT(ds_ucc_RMSID_dedup(status_code = 'A')), NAMED('ds_ucc_RMSID_dedup_active'));	
+	// OUTPUT(CHOOSEN(table_UCC_counts, 100), NAMED('table_UCC_counts'));	
 	RETURN FinalBIP;
 	
 END;													
