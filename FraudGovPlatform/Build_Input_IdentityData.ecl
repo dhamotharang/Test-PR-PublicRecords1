@@ -125,7 +125,7 @@ module
 		self:=[];
 	end;
 
-	f1:=project(inIdentityDataUpdateUpper,tr(left));
+	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
 	
 	f1_errors:=f1
 			(	 
@@ -148,19 +148,39 @@ module
 										and left.Customer_County = right.Customer_County,
 										TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors
-	ByPassed_records := f1_errors + NotInMbs;
+	shared ByPassed_records := f1_errors + NotInMbs;
 	f1_bypass_dedup := files().Input.ByPassed_IdentityData.sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData);
-	Build_Bypass_Records :=  OUTPUT(f1_bypass_dedup,,Filenames().Input.ByPassed_IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
-
+	
+	tools.mac_WriteFile(Filenames().Input.ByPassed_IdentityData.New(pversion),
+									f1_bypass_dedup,
+									Build_Bypass_Records,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
+									
 	//Move only Valid Records
-	f1_dedup					:=	 join (	f1,
-													ByPassed_records,
-													left.Unique_Id = right.Unique_Id,
-													TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
-													left only);
+	shared f1_dedup					:=	 join (f1,
+																							ByPassed_records,
+																							left.Unique_Id = right.Unique_Id,
+																							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
+																							left only);
+																							
 
-	new_addresses := Functions.New_Addresses(f1_dedup);
-	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_IDDT.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
+	shared new_addresses := Functions.New_Addresses(f1_dedup);
+
+	tools.mac_WriteFile(Filenames().Input.AddressCache_IDDT.New(pversion),
+									new_addresses,
+									Build_Address_Cache,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
+
 																							
 	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
 	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
@@ -171,19 +191,27 @@ module
 	input_file_1 := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
 
 	// Refresh Addresses every 90 days
-	IsTimeForRefresh := _flags.RefreshAddresses(pversion).IsTimeForRefresh;
+	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
 	dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
 	input_file_2 := if(	IsTimeForRefresh,
 						dRefreshAID,
 						input_file_1); 
 	// Refresh Lexid when new header is released
-	IsNewHeader := _flags.HeaderInfo.IsNew;
+	IsNewHeader := HeaderInfo.IsNew;
 	dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
 	input_file_3 := if(	IsNewHeader,
 						dRefreshLexid,
 						input_file_2); 
 
-	Build_Input_File := OUTPUT(input_file_3,,Filenames().Input.IdentityData.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+	tools.mac_WriteFile(Filenames(pversion).Input.IdentityData.New(pversion),
+									input_file_3,
+									Build_Input_File,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
 
 	Promote_Input_File := 
 		sequential(

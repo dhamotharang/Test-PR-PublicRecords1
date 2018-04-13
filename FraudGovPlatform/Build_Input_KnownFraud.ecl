@@ -198,7 +198,17 @@ module
 	//Exclude Errors
 	ByPassed_records := f1_errors + NotInMbs;
 	f1_bypass_dedup := files().Input.ByPassed_KnownFraud.sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud);
-	Build_Bypass_Records :=  OUTPUT(f1_bypass_dedup,,Filenames().Input.ByPassed_KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+
+	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
+									f1_bypass_dedup,
+									Build_Bypass_Records,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
+
 
 	//Move only Valid Records
 	f1_dedup					:=	 join (	f1,
@@ -208,8 +218,17 @@ module
 											left only);	
 																							
 	new_addresses := Functions.New_Addresses(f1_dedup);
-	Build_Address_Cache :=  OUTPUT(new_addresses,,Filenames().Input.AddressCache_KNFD.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);
-		
+
+	tools.mac_WriteFile(Filenames().Input.AddressCache_KNFD.New(pversion),
+									new_addresses,
+									Build_Address_Cache,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
+									
 	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
 	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
@@ -231,7 +250,15 @@ module
 						dRefreshLexid,
 						input_file_2); 
 
-	Build_Input_File := OUTPUT(input_file_3,,Filenames().Input.KnownFraud.New(pversion),CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')), COMPRESSED);							
+	tools.mac_WriteFile(Filenames(pversion).Input.IdentityData.New(pversion),
+									input_file_3,
+									Build_Input_File,
+									pCompress	:= true,
+									pCsvout := true,
+									pSeparator := '~|~',
+									pOverwrite := true,
+									pTerminator := '~<EOL>~',
+									pQuote:= '');
 
 	Promote_Input_File := 
 		sequential(
