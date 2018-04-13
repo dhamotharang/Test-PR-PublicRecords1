@@ -44,7 +44,7 @@ EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.Ba
 
 		
 		// Royalty Code
-		royal_codes := codes.Key_Codes_V3(KEYED(file_name = 'EMAIL_SOURCES'), KEYED(field_name='ROYALTY'));
+		royal_codes := Royalty.Constants.EMAIL_ROYALTY_TABLE();
 		_royal_recs := join(ds_results_grouped, royal_codes, left.email_src = right.code, grouped);
 		_royal_recs_top    := topn(sort(_royal_recs, field_name2), 1, acctno);
 		royal_recs         := ungroup(_royal_recs_top);

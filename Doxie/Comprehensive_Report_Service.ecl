@@ -355,7 +355,7 @@ END;
 FDNrecords_table :=normalize(fdn_table, left.MatchDetails.records, FDNrecords_child(right));
 
 Royalty.RoyaltyFares.MAC_SetA(property_table, foreclosure_table, royalties_fares);
-Royalty.MAC_RoyaltyEmail(all_records.email_children, royalties_email);
+Royalty.MAC_RoyaltyEmail(all_records.email_children, royalties_email,, false);
 Royalty.RoyaltyVehicles.MAC_ReportSet(all_records.RealTime_Vehicle_children, royalties_rtv, datasource, vehicleinfo.vin);
 Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(all_records.premium_phone_children,equifax_royalties,vendor,MDR.sourceTools.src_EQUIFAX);
 FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDNrecords_table);	
