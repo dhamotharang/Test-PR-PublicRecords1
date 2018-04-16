@@ -43,6 +43,7 @@
    string20 lname_prev;
   END;
 
+
 layout_addr_flags := RECORD
     string1 dwelltype;
     string1 valid;
