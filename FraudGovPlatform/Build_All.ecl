@@ -1,4 +1,4 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation;
 
 export Build_All(
 
@@ -25,6 +25,9 @@ module
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
 			Create_Supers
+			,FraudShared.SprayMBSFiles(pversion := pVersion[1..8],
+													pGroupName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30'), 
+													pDirectory := FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase)
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
