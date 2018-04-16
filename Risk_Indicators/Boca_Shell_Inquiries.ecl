@@ -196,7 +196,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	boolean methodFltr := if(bsversion >= 41, method not in ['BATCH','MONITORING'], true); 
 
 	boolean isCollection := inquiry_hit and 
-			(~isFCRA or trim(rt.permissions.fcra_purpose) = '164') and
+			(~isFCRA or trim(rt.permissions.fcra_purpose) IN Inquiry_AccLogs.shell_constants.collections_purpose_set) and
 			(vertical in collections_bucket or industry IN Inquiry_AccLogs.shell_constants.collection_industry or
 				StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
 	boolean isAuto       					:= not isCollection and inquiry_hit and industry in Inquiry_AccLogs.shell_constants.auto_industry

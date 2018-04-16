@@ -185,7 +185,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	// anything with the vertical or industry of collection goes into collections bucket
 	collections_bucket := if(bsversion>=50, Inquiry_AccLogs.shell_constants.collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);	
 	boolean isCollection := inquiry_hit and 
-			(~isFCRA or trim(rt.permissions.fcra_purpose) = '164') and
+			(~isFCRA or trim(rt.permissions.fcra_purpose) IN Inquiry_AccLogs.shell_constants.collections_purpose_set) and
 			(vertical in collections_bucket or industry IN Inquiry_AccLogs.shell_constants.collection_industry or
 				StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
 	
@@ -193,7 +193,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 //	methodFltr := method not in Inquiry_AccLogs.shell_constants.InvalidMethod(bsversion);
 	boolean methodFltr := if(bsversion >= 41, method not in ['BATCH','MONITORING'], true); 	
 	// Don't count collections purpose inquiries in any buckets other than Collections
-	boolean notCollectionsPurpose := ~isFCRA OR TRIM(rt.permissions.fcra_purpose) != '164';
+	boolean notCollectionsPurpose := ~isFCRA OR TRIM(rt.permissions.fcra_purpose) NOT IN Inquiry_AccLogs.shell_constants.collections_purpose_set;
 	
 	boolean isAuto		          	:= not isCollection AND notCollectionsPurpose and inquiry_hit and industry in Inquiry_AccLogs.shell_constants.auto_industry
 					and methodFltr;
@@ -637,17 +637,10 @@ ENDMACRO;
 MAC_raw_did_transform (add_inquiry_raw_FCRA, Inquiry_AccLogs.Key_FCRA_DID);
 MAC_raw_did_transform (add_inquiry_corrections_fcra, fcra.Key_Override_Inquiries_ffid);
 
-// 0           Legacy RiskWise Products - Hard 
-// 100         Application RiskView_Applica - Hard 
-// 101         FCRA Phone History Report ? Hard
-// 164         Collections
-// 106				 Demand Deposit / Checking Account
-set_fcra_permissible_purposes := ['0','100','101','164', '106'];  // if the inquiry wasn't run with one of these 4 permissible purposes, throw it out
-
 j_raw_fcra_roxie := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_FCRA_DID, 
 						left.shell_input.did<>0 and keyed(left.shell_input.did=right.appended_adl) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion) and
-						trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes and
+						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra(left, right),
 						left outer, atmost(5000));		
@@ -656,7 +649,7 @@ j_raw_fcra_thor := join(distribute(clam_pre_Inquiries, hash64(shell_input.did)),
 						distribute(pull(Inquiry_AccLogs.Key_FCRA_DID), hash64(appended_adl)), 
 						left.shell_input.did<>0 and (left.shell_input.did=right.appended_adl) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion) and
-						trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes and
+						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra(left, right),
 						left outer, atmost(left.shell_input.did=right.appended_adl, 5000), LOCAL);		
@@ -720,14 +713,14 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	// anything with the vertical or industry of collection goes into collections bucket
 	collections_bucket := if(bsversion>=50, Inquiry_AccLogs.shell_constants.collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);	
 	boolean isCollection := inquiry_hit and 
-			(~isFCRA or trim(rt.permissions.fcra_purpose) = '164') and
+			(~isFCRA or trim(rt.permissions.fcra_purpose) IN Inquiry_AccLogs.shell_constants.collections_purpose_set) and
 			(vertical in collections_bucket or industry IN Inquiry_AccLogs.shell_constants.collection_industry or
 				StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
 	
 	method := trim(StringLib.StringToUpperCase(rt.search_info.method));
 	boolean methodFltr := if(bsversion >= 41, method not in ['BATCH','MONITORING'], true); 	
 	// Don't count collections purpose inquiries in any buckets other than Collections
-	boolean notCollectionsPurpose := ~isFCRA OR TRIM(rt.permissions.fcra_purpose) != '164';
+	boolean notCollectionsPurpose := ~isFCRA OR TRIM(rt.permissions.fcra_purpose) NOT IN Inquiry_AccLogs.shell_constants.collections_purpose_set;
 	
 	boolean isHighRiskCredit		  := not isCollection AND notCollectionsPurpose and inquiry_hit and industry in 
 				if(bsversion>=50, Inquiry_AccLogs.shell_constants.HighRiskCredit_industry5, Inquiry_AccLogs.shell_constants.HighRiskCredit_industry4)
@@ -793,17 +786,10 @@ ENDMACRO;
 MAC_raw_did_transform_offset (add_inquiry_raw_FCRA_offset, Inquiry_AccLogs.Key_FCRA_DID);
 MAC_raw_did_transform_offset (add_inquiry_corrections_fcra_offset, fcra.Key_Override_Inquiries_ffid);
 
-// 0           Legacy RiskWise Products - Hard 
-// 100         Application RiskView_Applica - Hard 
-// 101         FCRA Phone History Report ? Hard
-// 164         Collections
-// 106				 Demand Deposit / Checking Account
-// set_fcra_permissible_purposes := ['0','100','101','164', '106'];  // if the inquiry wasn't run with one of these 4 permissible purposes, throw it out
-
 j_raw_fcra_offset_roxie := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_FCRA_DID, 
 						left.shell_input.did<>0 and keyed(left.shell_input.did=right.appended_adl) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, '', /*left.historydateTimeStamp*/ left.historydate + 200, bsversion) and
-						trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes and
+						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra_offset(left, right),
 						left outer, atmost(5000));		
@@ -812,7 +798,7 @@ j_raw_fcra_offset_thor := join(distribute(clam_pre_Inquiries, hash64(shell_input
 						distribute(pull(Inquiry_AccLogs.Key_FCRA_DID), hash64(appended_adl)), 
 						left.shell_input.did<>0 and (left.shell_input.did=right.appended_adl) and
 						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate + 200, bsversion) and
-						trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes and
+						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra_offset(left, right),
 						left outer, atmost(left.shell_input.did=right.appended_adl, 5000), LOCAL);		
@@ -1793,14 +1779,14 @@ MAC_raw_ssn_transform(add_ssn_raw_fcra, Inquiry_AccLogs.Key_FCRA_SSN);
 ssn_raw_base_fcra_roxie := join(with_all_per_adl, Inquiry_AccLogs.Key_FCRA_SSN,	//MS-104 and MS-105
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose						
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose						
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw_fcra(left, right), left outer, atmost(riskwise.max_atmost));
 
 ssn_raw_base_fcra_thor := join(distribute(with_all_per_adl(shell_input.ssn<>''), hash64(shell_input.ssn)), //MS-104 and MS-105
 								distribute(pull(Inquiry_AccLogs.Key_FCRA_SSN), hash64(ssn)), 
 								left.shell_input.ssn=right.ssn and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose						
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose						
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_ssn_raw_fcra(left, right), left outer, atmost(left.shell_input.ssn=right.ssn,riskwise.max_atmost), LOCAL) 
 								+ with_all_per_adl(shell_input.ssn='');	//MS-104 and MS-105
@@ -1996,7 +1982,7 @@ Addr_raw_base_fcra_roxie := join(with_ssn_velocity, Inquiry_AccLogs.Key_FCRA_Add
 								keyed(left.shell_input.sec_range=right.sec_range) and
 								left.shell_input.predir=right.person_q.predir and
 								left.shell_input.addr_suffix=right.person_q.addr_suffix and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw_fcra(left, right), left outer, atmost(riskwise.max_atmost));
 
@@ -2008,7 +1994,7 @@ Addr_raw_base_fcra_thor := join(distribute(with_ssn_velocity(shell_input.prim_na
 								left.shell_input.sec_range=right.sec_range and
 								left.shell_input.predir=right.person_q.predir and
 								left.shell_input.addr_suffix=right.person_q.addr_suffix and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Addr_raw_fcra(left, right), left outer, 
 								atmost(left.shell_input.z5=right.zip and 
@@ -2168,14 +2154,14 @@ MAC_raw_phone_transform(add_Phone_raw_fcra, Inquiry_AccLogs.Key_FCRA_Phone);
 Phone_raw_base_fcra_roxie := join(with_address_velocities, Inquiry_AccLogs.Key_FCRA_Phone,
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw_fcra(left, right), left outer, atmost(riskwise.max_atmost));				
 
 Phone_raw_base_fcra_thor := join(distribute(with_address_velocities(shell_input.phone10<>''), hash64(shell_input.phone10)), 
 								distribute(pull(Inquiry_AccLogs.Key_FCRA_Phone), hash64(phone10)),
 								left.shell_input.phone10=right.phone10 and
-								(~isFCRA or trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes) and  // if it is FCRA, need to check the purpose
+								(~isFCRA or trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes) and  // if it is FCRA, need to check the purpose
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, bsversion),	
 								add_Phone_raw_fcra(left, right), left outer, 
 								atmost(left.shell_input.phone10=right.phone10, riskwise.max_atmost), LOCAL) 
