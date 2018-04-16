@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="BocaShellFCRA" wuTimeout="300000">
 	<part name="AccountNumber" type="xsd:string"/>
 	<part name="FirstName" type="xsd:string"/>
@@ -39,7 +39,6 @@
 	<part name="IncludeLnJ" type="xsd:boolean"/>
 	<part name="IncludeRecordsWithSSN" type="xsd:boolean"/>
 	<part name="IncludeBureauRecs" type="xsd:boolean"/>
- <part name="ReportingPeriod" type="xsd:integer"/>
 	<part name="ExcludeCityTaxLiens" type="xsd:boolean"/>
 	<part name="ExcludeCountyTaxLiens" type="xsd:boolean"/>
 	<part name="ExcludeStateTaxWarrants" type="xsd:boolean"/>
@@ -50,7 +49,7 @@
 	<part name="ExcludeEvictions" type="xsd:boolean"/>
 <!--	<part name="Gateways" type = 'tns:XmlDataSet' cols = '70' rows = '10'/>-->
  </message>
-*/ 
+*/
 import gateway;
 export Boca_Shell_FCRA := MACRO
 
@@ -94,8 +93,7 @@ export Boca_Shell_FCRA := MACRO
 	'DID',
 	'IncludeLnJ',
   'IncludeRecordsWithSSN',
-  'IncludeBureauRecs', 
-  'ReportingPeriod', 
+  'IncludeBureauRecs',
   'ExcludeCityTaxLiens',
   'ExcludeCountyTaxLiens',
   'ExcludeStateTaxWarrants',
@@ -158,8 +156,7 @@ boolean FilterLiens := DataRestriction[risk_indicators.iid_constants.posLiensJud
 // when true, this will run an additional soapcall over to neutral roxie to Risk_Indicators.Boca_Shell_Collections_Inquiry_Service
 boolean Include_nonFCRA_Collections_Inquiries := false				: stored('Include_nonFCRA_Collections_Inquiries'); 
 boolean IncludeRecordsWithSSN := false 					: stored('IncludeRecordsWithSSN');
-boolean IncludeBureauRecs := false 					: stored('IncludeBureauRecs'); 
-integer2 ReportingPeriod := 84      : stored('ReportingPeriod'); 
+boolean IncludeBureauRecs := false 					: stored('IncludeBureauRecs');
 boolean ExcludeCityTaxLiens := false 					: stored('ExcludeCityTaxLiens');
 boolean ExcludeCountyTaxLiens := false 					: stored('ExcludeCountyTaxLiens');
 boolean ExcludeStateTaxWarrants := false 					: stored('ExcludeStateTaxWarrants');
@@ -195,7 +192,6 @@ gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
 
 //Since RiskView only runs ADL shell for Prescreen, enforce that here as well
 if(ADL_Based_Shell and ~isPreScreen, FAIL('Request for ADL shell must also request Prescreen'));
-if(ReportingPeriod <= 0 or ReportingPeriod > 84, FAIL('Input Value for ReportingPeriod must be 1 - 84 months.'));
 
 clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr1_val, city_val, state_val, zip_value);
 
@@ -269,16 +265,15 @@ if(Include_nonFCRA_Collections_Inquiries, Risk_Indicators.iid_constants.BSOption
 if(FilterLiens, Risk_Indicators.iid_constants.BSOptions.FilterLiens, 0) +
 if(isPreScreen, risk_indicators.iid_constants.BSOptions.IncludePreScreen, 0) +
 Risk_Indicators.iid_constants.FlagLiensOptions(FilterLienTypes) + //sets the individual Lien/Judgment Filters
-if( IncludeRecordsWithSSN, risk_indicators.iid_constants.BSOptions.SSNLienFtlr, 0 ) + 
-if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 ) 
-;
+if( IncludeRecordsWithSSN, risk_indicators.iid_constants.BSOptions.SSNLienFtlr, 0 ) +
+if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 ) ;
 
 ret := risk_indicators.Boca_Shell_Function_FCRA
    (iid_prep, gateways, DPPA_Purpose, GLB_purpose, industry_class_value='UTILI',
     false, require2Ele, includeRelativeInfo, true, false, true, TRUE, FALSE, FALSE, 
     FALSE, FALSE, 1, FALSE, FALSE, 0.84, version, isPreScreen, doScore, nugen, 
 		ADL_Based_Shell,dataRestriction, AppendBest, BSOptions,
-		DataPermission, false, IncludeLnJ, false, ReportingPeriod);
+		DataPermission, false, IncludeLnJ);
 
 output (ret, NAMED('Results'))
 

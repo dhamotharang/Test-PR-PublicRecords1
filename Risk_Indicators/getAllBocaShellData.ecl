@@ -16,14 +16,12 @@ EXPORT getAllBocaShellData (
 	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 	boolean isDirectToConsumerPurpose = false,
 	boolean IncludeLnJ = false,
-	boolean onThor = false,
- integer2 ReportingPeriod = 84  
-  ) := FUNCTION
+	boolean onThor = false) := FUNCTION
 	
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	// if the record is default_history_date or same month as today's date, run production_realtime_mode
 	production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
-														or iid[1].historydate = (unsigned)((string)risk_indicators.iid_constants.todaydate[1..6]);		
+														or iid[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);		
 	
 	// myGetDate := iid_constants.myGetDate(history_date);	// full history date
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -173,7 +171,7 @@ EXPORT getAllBocaShellData (
 	
 	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
 	prop_with_advo_roxie := join(pre_ADVO, if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history),  //join to appropriate FCRA/nonFCRA key
-					left.zip5 != '' and 
+			left.zip5 != '' and 
 					left.prim_range != '' and
 					keyed(left.zip5 = right.zip) and
 					keyed(left.prim_range = right.prim_range) and
@@ -463,11 +461,11 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   // =============== Derogs ===============
 
   derogs := IF (IsFCRA,
-                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor, iid, ReportingPeriod), 
+                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor, iid),
 								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   
 	derogs_hist := IF (IsFCRA,
-                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod), 
+                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ),
                      Risk_Indicators.Boca_Shell_Derogs_Hist      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion));
   doc_rolled := if (production_realtime_mode, derogs, derogs_hist);
 	

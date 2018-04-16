@@ -1,4 +1,4 @@
-﻿/*--LIBRARY--*/
+/*--LIBRARY--*/
 
 import fcra, gateway;
 
@@ -39,7 +39,6 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 	IN_doScore := args.bs_doScore;
 	IN_isDirectToConsumerPurpose := args.IN_isDirectToConsumer;
 	IncludeLnJ := args.bs_IncludeLnJ;
- in_ReportingPeriod := args.bs_ReportingPeriod;
 
 
 	// when running FCRA shell version 4 or higher in prescreen mode for attributes, set append best=2 so we append an SSN to input if it's missing
@@ -83,7 +82,7 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, 
-							IN_isDirectToConsumerPurpose, IncludeLnJ, false, in_ReportingPeriod);
+							IN_isDirectToConsumerPurpose, IncludeLnJ);
 
 	export results := per_prop;
 END;

@@ -1,4 +1,7 @@
-﻿/*--SOAP--
+﻿/*2017-06-19T14:44:53Z (mmarshik)
+C:\Users\marsmi01\AppData\Roaming\HPCC Systems\eclide\mmarshik\DataLand\RiskView\Batch_Service\2017-06-19T14_44_53Z.ecl
+*/
+/*--SOAP--
 <message name="RiskView Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="IntendedPurpose" type="xsd:string"/>
@@ -24,7 +27,6 @@
 	<part name="IncludeLNJReport" type="xsd:boolean"/>
 	<part name="IncludeLNJRecordsWithSSN" type="xsd:boolean"/>
 	<part name="IncludeLNJBureauRecs" type="xsd:boolean"/>
- <part name="ReportingPeriod" type="xsd:integer"/>
 	<part name="ExcludeCityTaxLiens" type="xsd:boolean"/>
 	<part name="ExcludeCountyTaxLiens" type="xsd:boolean"/>
 	<part name="ExcludeStateTaxWarrants" type="xsd:boolean"/>
@@ -78,12 +80,11 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 STRING  strFFDOptionsMask_in	 :=  '0' : STORED('FFDOptionsMask');
-boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';
+boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';	
 
 boolean IncludeLnJ := false : stored('IncludeLNJReport');
 boolean IncludeRecordsWithSSN := false : stored('IncludeLNJRecordsWithSSN');
-boolean IncludeBureauRecs := false : stored('IncludeLNJBureauRecs');	
-integer2 ReportingPeriod := 84 : stored('ReportingPeriod'); 
+boolean IncludeBureauRecs := false : stored('IncludeLNJBureauRecs');
 
 boolean ExcludeCityTaxLiens := false : stored('ExcludeCityTaxLiens');
 boolean ExcludeCountyTaxLiens := false : stored('ExcludeCountyTaxLiens');
@@ -203,7 +204,7 @@ MLA_alone				:= StringLib.StringToLowerCase(custom_model_name) = 'mla1608_0' AND
 								 
 //error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
-valid_inputs := batchin_with_seq((
+valid_inputs := batchin_with_seq(
 							((trim(name_first)<>'' and trim(name_last)<>'') or trim(unparsedfullname)<>'') and  	// name check
 							(trim(ssn)<>'' or   																																																		// ssn check
 								( trim(street_addr)<>'' and 																																													// address check
@@ -213,7 +214,7 @@ valid_inputs := batchin_with_seq((
 							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
 							  ) or
 							(unsigned)LexID <> 0
-						) and ReportingPeriod > 0 and ReportingPeriod <= 84);
+						);
 						
 search_Results := riskview.Search_Function(valid_inputs, 
 	gateways,
@@ -243,8 +244,7 @@ search_Results := riskview.Search_Function(valid_inputs,
 	CustomerNumber,
 	SecurityCode,
 	IncludeRecordsWithSSN,
- IncludeBureauRecs, 
-	ReportingPeriod, 
+	IncludeBureauRecs,
 	IncludeLnJ,
 	RetainInputDID
 	);
