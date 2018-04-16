@@ -30,8 +30,8 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 
 	iesp.zumigo_identity.t_ZIdIdentitySearch rollInput (Phones.Layouts.ZumigoIdentity.zIn l, DATASET(Phones.Layouts.ZumigoIdentity.zIn) r):= TRANSFORM
 		SELF.MobileDeviceNumber := l.MobileDeviceNumber;
-		SELF.NameAddrValidation.NameList := PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdNameToVerify,SELF:=LEFT.Name,SELF:=[]));
-		SELF.NameAddrValidation.AddressList := PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdSubjectAddress,SELF:=LEFT.Address,SELF:=[]));
+		SELF.NameAddrValidation.NameList := IF(inMod.NameAddressValidation, PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdNameToVerify,SELF:=LEFT.Name)));
+		SELF.NameAddrValidation.AddressList := IF(inMod.NameAddressValidation, PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdSubjectAddress,SELF:=LEFT.Address)));
 		SELF:=[];
 	END;
 	dsZum := ROLLUP(validZumigoRequests,GROUP,

@@ -56,24 +56,24 @@ MODULE
    										'');
    		                
 */
-		 EXPORT STRING20 Usecase := 'FCIP';
-		 EXPORT STRING3 	productCode := 'ACC';
-		 EXPORT STRING8	billingId := inMod.billingId;
-		 EXPORT STRING20 productName := 'PHONE FINDER';
-		 SHARED UNSIGNED1 consent_level := inMod.LineIdentityConsentLevel;	
-		 EXPORT BOOLEAN 	NameAddressValidation := IF(consent_level = 3, TRUE, FALSE); // Only nameaddrvalidation and callhandlinginfo for this phase
+		 EXPORT STRING20 Usecase              := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
+		 EXPORT STRING3 	productCode          := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
+		 EXPORT STRING8	billingId             := inMod.billingId;
+		 EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
+		 SHARED UNSIGNED1 consent_level       := inMod.LineIdentityConsentLevel;	
+		 EXPORT BOOLEAN NameAddressValidation := consent_level = 3 and inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate; // Only nameaddrvalidation for ultimate transactions
 		 EXPORT BOOLEAN	NameAddressInfo       := FALSE;
 		 EXPORT BOOLEAN	AccountInfo           := FALSE;
 		 EXPORT BOOLEAN	CarrierInfo           := FALSE;
-		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level =3, TRUE, FALSE);
+		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level = 3, TRUE, FALSE);
 		 EXPORT BOOLEAN	DeviceInfo            := FALSE;
-		 EXPORT BOOLEAN 	DeviceHistory         := FALSE;
-		 EXPORT STRING10 optInType             := 'Whitelist';
-		 EXPORT STRING5 	optInMethod           := IF(consent_level= 3, 'TCO', '');
-		 EXPORT STRING3 	optinDuration         := IF(consent_level= 3, 'ONG', '');
+		 EXPORT BOOLEAN 	DeviceHistory        := FALSE;
+		 EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
+		 EXPORT STRING5 	optInMethod          := IF(consent_level= 3, PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
+		 EXPORT STRING3 	optinDuration        := IF(consent_level= 3, PhoneFinder_Services.Constants.ZumigoConstants.optinDuration, '');
 		 EXPORT STRING 	optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
 		 EXPORT STRING 	optInVersionId        := '';
-		 EXPORT STRING15 optInTimestamp := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);	
+		 EXPORT STRING15 optInTimestamp       := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);	
 	
 		 EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
    END;	
