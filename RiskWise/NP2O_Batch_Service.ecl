@@ -7,6 +7,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -29,6 +30,7 @@ unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],riskwise.Layout_PR2I_BatchIn)			: stored('batch_in',few);
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 tribcode := StringLib.StringToLowerCase(tribcode_value);
 
@@ -36,9 +38,10 @@ productSet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','n
 
 BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
-OFACversion := map(BridgerGateway and tribcode = 'np21' => 4,
-																			tribcode in ['np90','np91','np92'] => 3,
-																																																			1);
+OFACversion := map(BridgerGateway and tribcode in ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'] and ofac_version = 4 => 4,
+                   BridgerGateway and tribcode = 'np21' => 4, // this won't hit fail message on line 59 as it was determined that can't be done without changing current prod logic
+																			tribcode in ['np90','np91','np92'] and ofac_version != 4 => 3,
+																																						1);                                                                                                             
 
 targusGatewaySet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 attusSet := ['np80','np81','np82'];
@@ -47,11 +50,13 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url, // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
-				 tribcode = 'np21' and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
+				 tribcode in ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'] and le.servicename = 'bridgerwlc' and OFACversion = 4 => le.url, // bridger gateway
 				 ''); // default to no gateway call		
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
 
 RiskWise.Layout_PRII addseq(batchin le, integer C) := transform
 	self.acctno := le.acctno;
