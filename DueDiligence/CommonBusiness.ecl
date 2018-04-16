@@ -183,7 +183,11 @@ EXPORT CommonBusiness := MODULE
 														 STRING10 SICCode := IF(IsSicField, (STRING)SicNaicsField, DueDiligence.Constants.EMPTY),
 														 BOOLEAN IsPrimary := PrimaryField,
 														 STRING3 Source := IF(SourceName = DueDiligence.Constants.EMPTY, SourceFieldName, SourceName)},
-									seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField);
+                  #if(SourceName = DueDiligence.Constants.EMPTY)
+                    seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField, SourceFieldName);
+                  #else           
+                    seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField);
+                  #end
 													 
 		filterSic := temp(SICCode <> DueDiligence.Constants.EMPTY);
 		filterNaic := temp(NAICCode <> DueDiligence.Constants.EMPTY);

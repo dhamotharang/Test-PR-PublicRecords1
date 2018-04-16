@@ -1,6 +1,6 @@
 ﻿IMPORT Census_Data, codes, DueDiligence, iesp;
 
-EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
+EXPORT reportBusBestInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
 
 		projectESPBusInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.duediligencebusinessreport.t_DDRBusinessInformation, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
 																										SELF.seq := LEFT.seq;
@@ -49,6 +49,10 @@ EXPORT reportBestBusInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
                                                                                                                   
                                                     SELF.bestFipsCode := codes.st2FipsCode(StringLib.StringToUpperCase(LEFT.busn_info.address.state)) + LEFT.busn_info.address.county;
                                                     SELF.bestState := LEFT.busn_info.address.state;
+                                                    
+                                                    date := IF(LEFT.sosIncorporationDate > 0, LEFT.sosIncorporationDate, LEFT.dateVendorFirstReported); 
+                                                    SELF.EstablishedDate := iesp.ECL2ESP.toDate(date);
+                                                    
 																										SELF := [];));
 																																																	
 		
