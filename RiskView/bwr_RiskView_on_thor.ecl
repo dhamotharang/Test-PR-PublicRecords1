@@ -57,8 +57,7 @@ STRING50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission;
 STRING strFFDOptionsMask_in	 :=  '1';
 BOOLEAN IncludeLnJ := TRUE;
 BOOLEAN IncludeRecordsWithSSN := FALSE;
-BOOLEAN IncludeBureauRecs := FALSE; 
-integer2 ReportingPeriod := 84; // 84 is default (acceptable values 1-84 months)
+BOOLEAN IncludeBureauRecs := FALSE;
 BOOLEAN ExcludeCityTaxLiens := FALSE;
 BOOLEAN ExcludeCountyTaxLiens := FALSE;
 BOOLEAN ExcludeStateTaxWarrants := FALSE;
@@ -271,7 +270,6 @@ Search_Results := riskview.Search_Function(valid_inputs,
 	SecurityCode,
 	IncludeRecordsWithSSN,
 	IncludeBureauRecs,
- ReportingPeriod, // xNJJx
 	IncludeLnJ,
 	RetainInputDID,
 	onThor
