@@ -239,7 +239,8 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // ----- ELSE just leave the reporting sections empty                                        -----
 	 // -----                                                                                     -----
 	UpdateBusnLiensWithReport  := IF(ReportIsRequested, 
-	                                     DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiens_unreleased, DebugMode),
+                                  /* Pass both released and unreleased liens to the business report  */ 
+                                  DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiens_categorized, DebugMode),
 																			             /* ELSE */ 
 																			 Update_BusnLiens); 
 		

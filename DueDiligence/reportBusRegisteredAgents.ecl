@@ -104,7 +104,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
                                                                                                                                                     SELF.UnitDesignation := LEFT.agent.unit_desig;
                                                                                                                                                     SELF.UnitNumber := LEFT.agent.sec_range;
                                                                                                                                                     SELF.postalCode := LEFT.agent.zip5 + LEFT.agent.zip4;
-                                                                                                                                                    SELF.StateCityZip := LEFT.agent.State + LEFT.agent.city + LEFT.agent.zip5;
+                                                                                                                                                    SELF.StateCityZip := TRIM(LEFT.agent.State) + TRIM(LEFT.agent.city) + TRIM(LEFT.agent.zip5);
                                                                                                                                                     SELF := LEFT.agent;
                                                                                                                                                     SELF := [];));
                                                                                                             

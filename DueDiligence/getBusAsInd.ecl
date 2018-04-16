@@ -238,7 +238,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
  
  
   //reformat to add max individuals
-  formatNames := PROJECT(sortAndGroupNames, getMaxNames(LEFT, COUNTER));
+  formatNames := UNGROUP(PROJECT(sortAndGroupNames, getMaxNames(LEFT, COUNTER)));
 
 	
   //combine names for the same inquired business															
@@ -268,7 +268,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF := LEFT;),
 													LEFT OUTER, KEEP(100));
 													
-	rollFeinCheck := ROLLUP(checkFeinIsSSN,
+	rollFeinCheck := ROLLUP(SORT(checkFeinIsSSN, seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids())),
 													LEFT.seq = RIGHT.seq AND
 													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
 													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
