@@ -3,7 +3,7 @@ import risk_indicators, riskwise, riskwisefcra, ut, std;
 
 export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
-  RVC_DEBUG := False;
+  RVC_DEBUG :=false;
 
   #if(RVC_DEBUG)
     layout_debug := record
@@ -160,7 +160,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    _reported_dob                       ; //    _reported_dob;
                     integer    reported_age                        ; //    reported_age;
                     integer    iv_combined_age                     ; //    iv_combined_age;
-                    integer    iv_inp_addr_avm_pct_change_1yr      ; //    iv_inp_addr_avm_pct_change_1yr;
+                    real    iv_inp_addr_avm_pct_change_1yr      ; //    iv_inp_addr_avm_pct_change_1yr;
                     integer    _paw_first_seen                     ; //    _paw_first_seen;
                     integer   iv_mos_since_paw_first_seen         ; //    iv_mos_since_paw_first_seen;
                     integer    iv_mi001_adlperssn_count            ; //    iv_mi001_adlperssn_count;
@@ -192,7 +192,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    iv_inp_addr_avm_change_1yr          ; //    iv_inp_addr_avm_change_1yr;
                     integer    iv_max_ids_per_addr                 ; //    iv_max_ids_per_addr;
                     string    iv_gong_did_fname_x_lname_ct        ; //    iv_gong_did_fname_x_lname_ct;
-                    integer    iv_bst_addr_avm_pct_change_3yr      ; //    iv_bst_addr_avm_pct_change_3yr;
+                    real    iv_bst_addr_avm_pct_change_3yr      ; //    iv_bst_addr_avm_pct_change_3yr;
                     integer   bureau_ssn_tn_fseen_pos             ; //    bureau_ssn_tn_fseen_pos;
                     string     bureau_ssn_fseen_tn                 ; //    bureau_ssn_fseen_tn;
                     integer    _bureau_ssn_fseen_tn                ; //    _bureau_ssn_fseen_tn;
@@ -240,7 +240,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    _bureau_adl_fseen_eq                ; //    _bureau_adl_fseen_eq;
                     integer    _src_bureau_adl_fseen               ; //    _src_bureau_adl_fseen;
                     integer    iv_sr001_m_bureau_adl_fs            ; //    iv_sr001_m_bureau_adl_fs;
-                    integer    iv_bst_addr_avm_pct_change_2yr      ; //    iv_bst_addr_avm_pct_change_2yr;
+                    real    iv_bst_addr_avm_pct_change_2yr      ; //    iv_bst_addr_avm_pct_change_2yr;
                     integer    _rc_ssnhighissue                    ; //    _rc_ssnhighissue;
                     integer    iv_age_at_high_issue                ; //    iv_age_at_high_issue;
                     integer    iv_va060_dist_add_in_bst            ; //    iv_va060_dist_add_in_bst;
@@ -267,7 +267,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    bst_addr_avm_auto_val_3             ; //    bst_addr_avm_auto_val_3;
                     integer    iv_bst_addr_avm_change_2yr          ; //    iv_bst_addr_avm_change_2yr;
                     integer    bst_addr_fips_fall                  ; //    bst_addr_fips_fall;
-                    integer    iv_bst_addr_fips_ratio              ; //    iv_bst_addr_fips_ratio;
+                    real    iv_bst_addr_fips_ratio              ; //    iv_bst_addr_fips_ratio;
                     string    iv_in001_wealth_index               ; //    iv_in001_wealth_index;
                     integer    iv_inp_addr_building_area           ; //    iv_inp_addr_building_area;
                     integer    bst_addr_avm_auto_val_4             ; //    bst_addr_avm_auto_val_4;
@@ -331,7 +331,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    iv_src_bureau_adl_count             ; //    iv_src_bureau_adl_count;
                     integer    inp_addr_fips_fall                  ; //    inp_addr_fips_fall;
                     integer    inp_addr_avm_auto_val               ; //    inp_addr_avm_auto_val;
-                    integer    iv_inp_addr_fips_ratio              ; //    iv_inp_addr_fips_ratio;
+                    real    iv_inp_addr_fips_ratio              ; //    iv_inp_addr_fips_ratio;
                     integer    iv_bst_addr_mortgage_amount         ; //    iv_bst_addr_mortgage_amount;
                     integer    iv_dist_bst_addr_to_prv_addr        ; //    iv_dist_bst_addr_to_prv_addr;
                     real    iv_avg_prop_assess_purch_amt        ; //    iv_avg_prop_assess_purch_amt;
@@ -386,7 +386,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    emerge_adl_e4_count_pos             ; //    emerge_adl_e4_count_pos;
                     integer    emerge_adl_count_e4                 ; //    emerge_adl_count_e4;
                     integer    iv_src_emerge_adl_count             ; //    iv_src_emerge_adl_count;
-                    integer    iv_avg_prop_sold_assess_amt         ; //    iv_avg_prop_sold_assess_amt;
+                    real    iv_avg_prop_sold_assess_amt         ; //    iv_avg_prop_sold_assess_amt;
                     integer    iv_inq_other_count12                ; //    iv_inq_other_count12;
                     integer    bureau_dob_tn_count_pos             ; //    bureau_dob_tn_count_pos;
                     integer    bureau_dob_count_tn                 ; //    bureau_dob_count_tn;
@@ -473,7 +473,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
                     integer    iv_po001_m_snc_veh_adl_fs           ; //    iv_po001_m_snc_veh_adl_fs;
                     string    iv_pl001_addr_stability_v2          ; //    iv_pl001_addr_stability_v2;
                     integer    iv_phones_per_addr_c6               ; //    iv_phones_per_addr_c6;
-                    integer    iv_avg_prop_sold_purch_amt          ; //    iv_avg_prop_sold_purch_amt;
+                    real    iv_avg_prop_sold_purch_amt          ; //    iv_avg_prop_sold_purch_amt;
                     string    iv_nap_status                       ; //    iv_nap_status;
                     integer    iv_addr_lres_6mo_count              ; //    iv_addr_lres_6mo_count;
                     integer    iv_liens_unrel_ot_ct                ; //    iv_liens_unrel_ot_ct;
@@ -1672,7 +1672,7 @@ export RVC1801_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 	ssnlength                        := le.input_validation.ssn_length;
 	dobpop                           := le.input_validation.dateofbirth;
 	hphnpop                          := le.input_validation.homephone;
-	lname_change_date                := le.name_verification.lname_change_date;
+	lname_change_date               := le.name_verification.lname_change_date;
 	source_count                     := le.name_verification.source_count;
 	fname_eda_sourced_type           := le.name_verification.fname_eda_sourced_type;
 	lname_eda_sourced_type           := le.name_verification.lname_eda_sourced_type;
@@ -2035,16 +2035,16 @@ ver_phn_inf := (infutor_nap in [4, 6, 7, 9, 10, 11, 12]);
 ver_phn_nap := (nap_summary in [4, 6, 7, 9, 10, 11, 12]);
 
 inf_phn_ver_lvl := map(
-    ver_phn_inf     => 3,
-    infutor_nap = 1 => 1,
-    infutor_nap = 0 => 0,
-                       2);
+    ver_phn_inf     => '3',
+    infutor_nap = 1 => '1',
+    infutor_nap = 0 => '0',
+                       '2');
 
 nap_phn_ver_lvl := map(
-    ver_phn_nap     => 3,
-    nap_summary = 1 => 1,
-    nap_summary = 0 => 0,
-                       2);
+    ver_phn_nap     => '3',
+    nap_summary = 1 => '1',
+    nap_summary = 0 => '0',
+                       '2');
 
 // iv_nap_phn_ver_x_inf_phn_ver := map(
     // not(addrpop or hphnpop) => '   ',
@@ -2054,7 +2054,10 @@ nap_phn_ver_lvl := map(
 	iv_nap_phn_ver_x_inf_phn_ver :=__common__( map(
 		not(addrpop or hphnpop) => '   ',
 		not(hphnpop)            => ' -1',
-								   trim((string)nap_phn_ver_lvl, LEFT, RIGHT) + trim(' - ', LEFT, RIGHT) + trim((string)inf_phn_ver_lvl, LEFT, RIGHT)));
+		// not(hphnpop)            => '-1',
+								   trim(nap_phn_ver_lvl) +
+                   trim(' - ', LEFT, RIGHT) + 
+                   trim(inf_phn_ver_lvl, LEFT, RIGHT)));
 
 
 
@@ -2168,7 +2171,9 @@ iv_dc001_mos_since_crim_ls := map(
     _criminal_last_date = NULL => -1,
                                   min(if(if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _criminal_last_date) / (365.25 / 12) >= 0, truncate((sysdate - _criminal_last_date) / (365.25 / 12)), roundup((sysdate - _criminal_last_date) / (365.25 / 12)))), 240));
 
-iv_criminal_x_felony := if(not(truedid), ' ', (string)min(if(criminal_count = NULL, -NULL, criminal_count), 3) + '-' + (string)min(if(felony_count = NULL, -NULL, felony_count), 3));
+iv_criminal_x_felony := if(not(truedid), ' ', 
+                      (string)min(if(criminal_count = NULL, -NULL, criminal_count), 3)
+                      + '-' + (string)min(if(felony_count = NULL, -NULL, felony_count), 3));
 
 iv_paw_dead_bus_x_active_phn := if(not(truedid), ' ', (string)min(if(paw_dead_business_count = NULL, -NULL, paw_dead_business_count), 3) + '-' + (string)min(if(paw_active_phone_count = NULL, -NULL, paw_active_phone_count), 3));
 
@@ -2268,13 +2273,15 @@ iv_mos_src_bureau_lname_fseen := map(
 
 lien_adl_li_lseen_pos := Models.Common.findw_cpp(ver_sources, 'LI' , ', ', 'E');
 
-lien_adl_lseen_li := if(lien_adl_li_lseen_pos = 0, '       0', Models.Common.getw(ver_sources_last_seen, lien_adl_li_lseen_pos, ','));
+lien_adl_lseen_li := if(lien_adl_li_lseen_pos = 0, '       0',
+                      Models.Common.getw(ver_sources_last_seen, lien_adl_li_lseen_pos, ','));
 
 _lien_adl_lseen_li := common.sas_date((string)(lien_adl_lseen_li));
 
 lien_adl_l2_lseen_pos := Models.Common.findw_cpp(ver_sources, 'L2' , ', ', 'E');
 
-lien_adl_lseen_l2 := if(lien_adl_l2_lseen_pos = 0, '       0', Models.Common.getw(ver_sources_last_seen, lien_adl_l2_lseen_pos, ','));
+lien_adl_lseen_l2 := if(lien_adl_l2_lseen_pos = 0, '       0', 
+                    Models.Common.getw(ver_sources_last_seen, lien_adl_l2_lseen_pos, ','));
 
 _lien_adl_lseen_l2 := common.sas_date((string)(lien_adl_lseen_l2));
 
@@ -2599,7 +2606,22 @@ iv_sr001_m_wp_adl_fs := map(
 
 _rc_ssnlowissue := common.sas_date((string)(rc_ssnlowissue));
 
-iv_age_at_low_issue := if(not(truedid and (integer)ssnlength > 0 and age > 0), NULL, if (age - (sysdate - _rc_ssnlowissue) / 365.25 >= 0, truncate(age - (sysdate - _rc_ssnlowissue) / 365.25), roundup(age - (sysdate - _rc_ssnlowissue) / 365.25)));
+// iv_age_at_low_issue := if(not(truedid and (integer)ssnlength > 0 and age > 0), NULL, 
+                        // if (age - (sysdate - _rc_ssnlowissue) / 365.25 >= 0, 
+                        // truncate(age - (sysdate - _rc_ssnlowissue) / 365.25), 
+                        // roundup(age - (sysdate - _rc_ssnlowissue) / 365.25)));
+                        
+	iv_age_at_low_issue := __common__( MAP(
+		not(truedid and (integer)ssnlength > 0 and age >0)  										=> NULL,
+		_rc_ssnlowissue	= NULL															=> NULL,
+		age - (sysdate - _rc_ssnlowissue) / 365.25 	>= 0 		=> truncate(age - (sysdate - _rc_ssnlowissue) / 365.25),
+																													 roundup(age - (sysdate - _rc_ssnlowissue) / 365.25)) );
+
+
+
+
+
+
 
 iv_bst_addr_assessed_total_val := map(
     not(truedid)     => NULL,
@@ -2628,12 +2650,29 @@ bst_addr_avm_auto_val_2 :=__common__( map(
                         
                         
 
-bst_addr_mortgage_amount_1 := map(
-    not(truedid)     => NULL,
-    add1_isbestmatch => add1_mortgage_amount,
-                        add2_mortgage_amount);
+// bst_addr_mortgage_amount_1 := map(
+    // not(truedid)     => NULL,
+    // add1_isbestmatch => add1_mortgage_amount,
+                        // add2_mortgage_amount);
 
-iv_bst_addr_mtg_avm_pct_diff := if(bst_addr_mortgage_amount_1 <= 0 or bst_addr_avm_auto_val_2 <= 0, NULL, bst_addr_avm_auto_val_2 / bst_addr_mortgage_amount_1);
+// iv_bst_addr_mtg_avm_pct_diff := if(bst_addr_mortgage_amount_1 <= 0 or bst_addr_avm_auto_val_2 <= 0, 
+                                    // NULL, bst_addr_avm_auto_val_2 / bst_addr_mortgage_amount_1);
+//
+bst_addr_avm_auto_val := map(
+    not(truedid)     => NULL,
+    add1_isbestmatch => add1_avm_automated_valuation,
+                        add2_avm_automated_valuation);
+
+bst_addr_mortgage_amount := map(
+     not(truedid)     => NULL,
+     add1_isbestmatch => add1_mortgage_amount,
+                         add2_mortgage_amount);
+                         
+ iv_bst_addr_mtg_avm_pct_diff := if(bst_addr_mortgage_amount <= 0 or 
+																	 bst_addr_avm_auto_val <= 0, NULL, bst_addr_avm_auto_val / bst_addr_mortgage_amount);
+
+//
+
 
 
 _gong_did_last_seen := common.sas_date((string)(gong_did_last_seen));
@@ -2821,11 +2860,26 @@ iv_bst_addr_avm_pct_change_2yr_1 := map(
     add1_isbestmatch => NULL,
                         NULL);
 
-iv_bst_addr_avm_pct_change_2yr := if(bst_addr_avm_auto_val_1_4 > 0 and bst_addr_avm_auto_val_3_1 > 0, bst_addr_avm_auto_val_1_4 / bst_addr_avm_auto_val_3_1, NULL);
+iv_bst_addr_avm_pct_change_2yr := if(bst_addr_avm_auto_val_1_4 > 0 
+                          and bst_addr_avm_auto_val_3_1 > 0, 
+                          bst_addr_avm_auto_val_1_4 / bst_addr_avm_auto_val_3_1, NULL);
 
 _rc_ssnhighissue := common.sas_date((string)(rc_ssnhighissue));
 
-iv_age_at_high_issue := if(not(truedid and (integer)ssnlength > 0 and age > 0), NULL, if (age - (sysdate - _rc_ssnhighissue) / 365.25 >= 0, truncate(age - (sysdate - _rc_ssnhighissue) / 365.25), roundup(age - (sysdate - _rc_ssnhighissue) / 365.25)));
+// iv_age_at_high_issue := if(not(truedid and (integer)ssnlength > 0 and age > 0), NULL, 
+                        // if (age - (sysdate - _rc_ssnhighissue) / 365.25 >= 0, 
+                        // truncate(age - (sysdate - _rc_ssnhighissue) / 365.25), 
+                        // roundup(age - (sysdate - _rc_ssnhighissue) / 365.25)));
+                        
+
+iv_age_at_high_issue := __common__( MAP(
+		not(truedid and (integer)ssnlength > 0 and age >0) 											=> NULL, 
+		_rc_ssnhighissue	= NULL														=> NULL,
+		age - (sysdate - _rc_ssnhighissue) / 365.25 >= 0		=> truncate(age - (sysdate - _rc_ssnhighissue) / 365.25),
+																													 roundup(age - (sysdate - _rc_ssnhighissue) / 365.25)) );
+
+
+
 
 iv_va060_dist_add_in_bst := map(
     not(truedid)       => NULL,
@@ -3012,15 +3066,15 @@ iv_mos_since_prv_addr_fseen := map(
     prv_addr_date_first_seen = NULL => -1,
                                        if ((sysdate - prv_addr_date_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - prv_addr_date_first_seen) / (365.25 / 12)), roundup((sysdate - prv_addr_date_first_seen) / (365.25 / 12))));
 
-bst_addr_avm_auto_val := map(
-    not(truedid)     => NULL,
-    add1_isbestmatch => add1_avm_automated_valuation,
-                        add2_avm_automated_valuation);
+// bst_addr_avm_auto_val := map(
+    // not(truedid)     => NULL,
+    // add1_isbestmatch => add1_avm_automated_valuation,
+                        // add2_avm_automated_valuation);
 
-bst_addr_mortgage_amount := map(
-    not(truedid)     => NULL,
-    add1_isbestmatch => add1_mortgage_amount,
-                        add2_mortgage_amount);
+// bst_addr_mortgage_amount := map(
+    // not(truedid)     => NULL,
+    // add1_isbestmatch => add1_mortgage_amount,
+                        // add2_mortgage_amount);
 
 iv_bst_addr_mtg_avm_abs_diff := if(bst_addr_mortgage_amount <= 0 or bst_addr_avm_auto_val <= 0, NULL, bst_addr_avm_auto_val - bst_addr_mortgage_amount);
 
@@ -3093,7 +3147,7 @@ _bureau_dob_fseen_tn := common.sas_date((string)(bureau_dob_fseen_tn));
 
 bureau_dob_ts_fseen_pos := Models.Common.findw_cpp(ver_DOB_sources, 'TS' , ', ', 'E');
 
-bureau_dob_fseen_ts := if(bureau_dob_ts_fseen_pos = 0, '       0', Models.Common.getw(ver_DOB_sources_first_seen, bureau_dob_ts_fseen_pos, ', '));
+bureau_dob_fseen_ts := if(bureau_dob_ts_fseen_pos = 0, '       0', Models.Common.getw(ver_DOB_sources_first_seen, bureau_dob_ts_fseen_pos, ','));
 
 _bureau_dob_fseen_ts := common.sas_date((string)(bureau_dob_fseen_ts));
 
@@ -3105,7 +3159,7 @@ _bureau_dob_fseen_tu := common.sas_date((string)(bureau_dob_fseen_tu));
 
 bureau_dob_en_fseen_pos := Models.Common.findw_cpp(ver_DOB_sources, 'EN' , ', ', 'E');
 
-bureau_dob_fseen_en := if(bureau_dob_en_fseen_pos = 0, '       0', Models.Common.getw(ver_DOB_sources_first_seen, bureau_dob_en_fseen_pos, ' '));
+bureau_dob_fseen_en := if(bureau_dob_en_fseen_pos = 0, '       0', Models.Common.getw(ver_DOB_sources_first_seen, bureau_dob_en_fseen_pos, ', '));
 
 _bureau_dob_fseen_en := common.sas_date((string)(bureau_dob_fseen_en));
 
@@ -3117,14 +3171,21 @@ _bureau_dob_fseen_eq := common.sas_date((string)(bureau_dob_fseen_eq));
 
 //_src_bureau_dob_fseen := if(max(_bureau_dob_fseen_tn, _bureau_dob_fseen_ts, _bureau_dob_fseen_tu, _bureau_dob_fseen_en, _bureau_dob_fseen_eq) = NULL, NULL, min(if(_bureau_dob_fseen_tn = NULL, -NULL, _bureau_dob_fseen_tn), if(_bureau_dob_fseen_ts = NULL, -NULL, _bureau_dob_fseen_ts), if(_bureau_dob_fseen_tu = NULL, -NULL, _bureau_dob_fseen_tu), if(_bureau_dob_fseen_en = NULL, -NULL, _bureau_dob_fseen_en), if(_bureau_dob_fseen_eq = NULL, -NULL, _bureau_dob_fseen_eq)));
 
-_src_bureau_dob_fseen := if(max(_bureau_dob_fseen_tn, _bureau_dob_fseen_ts, _bureau_dob_fseen_tu, _bureau_dob_fseen_en, _bureau_dob_fseen_eq) = NULL, NULL, min(if(_bureau_dob_fseen_tn = NULL, -NULL, _bureau_dob_fseen_tn), if(_bureau_dob_fseen_ts = NULL, -NULL, _bureau_dob_fseen_ts), if(_bureau_dob_fseen_tu = NULL, -NULL, _bureau_dob_fseen_tu), if(_bureau_dob_fseen_en = NULL, -NULL, _bureau_dob_fseen_en), if(_bureau_dob_fseen_eq = NULL, -NULL, _bureau_dob_fseen_eq)));
+_src_bureau_dob_fseen := if(max(_bureau_dob_fseen_tn, _bureau_dob_fseen_ts, _bureau_dob_fseen_tu, _bureau_dob_fseen_en, _bureau_dob_fseen_eq) = NULL, 
+                            NULL, min(if(_bureau_dob_fseen_tn = NULL, -NULL, _bureau_dob_fseen_tn), 
+                            if(_bureau_dob_fseen_ts = NULL, -NULL, _bureau_dob_fseen_ts), 
+                            if(_bureau_dob_fseen_tu = NULL, -NULL, _bureau_dob_fseen_tu), 
+                            if(_bureau_dob_fseen_en = NULL, -NULL, _bureau_dob_fseen_en), 
+                            if(_bureau_dob_fseen_eq = NULL, -NULL, _bureau_dob_fseen_eq)));
 
 
 
 iv_mos_src_bureau_dob_fseen := map(
     not(truedid)                 => NULL,
     _src_bureau_dob_fseen = NULL => -1,
-                                    if ((sysdate - _src_bureau_dob_fseen) / (365.25 / 12) >= 0, truncate((sysdate - _src_bureau_dob_fseen) / (365.25 / 12)), roundup((sysdate - _src_bureau_dob_fseen) / (365.25 / 12))));
+                                    if ((sysdate - _src_bureau_dob_fseen) / (365.25 / 12) >= 0, 
+                                    truncate((sysdate - _src_bureau_dob_fseen) / (365.25 / 12)), 
+                                    roundup((sysdate - _src_bureau_dob_fseen) / (365.25 / 12))));
 
 _lname_change_date := common.sas_date((string)(lname_change_date));
 
@@ -3133,12 +3194,28 @@ iv_mos_since_lname_change := map(
     _lname_change_date = NULL => -1,
                                  if ((sysdate - _lname_change_date) / (365.25 / 12) >= 0, truncate((sysdate - _lname_change_date) / (365.25 / 12)), roundup((sysdate - _lname_change_date) / (365.25 / 12))));
 
-iv_prv_own_prop_x_addr_naprop := map(
-    not(truedid)                                  => '  ',
-    add1_isbestmatch and property_owned_total > 0 => (string)(add2_naprop + 10),
-    add1_isbestmatch                              => ('00' + (string)add2_naprop[-2..]),
-    property_owned_total > 0                      => (string)(add3_naprop + 10),
-                                                     (string)add3_naprop);
+
+
+
+
+
+iv_prv_own_prop_x_addr_naprop_c122 := __common__( if(property_owned_total > 0, (string2)(add2_naprop + 10), (string2)intformat(add2_naprop, 2,1)) );
+
+
+iv_prv_own_prop_x_addr_naprop_c123 := __common__( if(property_owned_total > 0, (string2)(add3_naprop + 10), (string2)intformat(add3_naprop, 2,1)) );
+
+iv_prv_own_prop_x_addr_naprop := __common__( map(
+    not(truedid)     => '  ',
+    add1_isbestmatch => iv_prv_own_prop_x_addr_naprop_c122,
+                        iv_prv_own_prop_x_addr_naprop_c123) );
+
+
+
+
+
+
+
+
 
 iv_prv_addr_source_count := map(
     not(truedid)     => NULL,
@@ -3704,20 +3781,22 @@ iv_liens_unrel_lt_ct := if(not(truedid), NULL, liens_unrel_LT_ct);
 
 iv_inq_dobs_per_ssn := if(not((integer)ssnlength > 0), NULL, inq_dobsperssn);
 
-//iv_cvi := if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), '  ', trim(('00' + (string)cvi)[-2..], LEFT));
-iv_cvi := if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), ' ', ('0' + (string)cvi)[-2..]);
+iv_cvi := if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), '  ', zero_fill((string)cvi, 2));
+////iv_cvi := if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), ' ', ((string)cvi));
 //
 
-//iv_cvi_1 :=__common__( if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), '  ', zero_fill((string)cvi, 2)));
-//iv_cvi :=__common__( if(iv_cvi_1 = '', 50, (integer)iv_cvi_1));
-//
+// iv_cvi_1 :=__common__( if(not(truedid or (integer)ssnlength > 0) and not(hphnpop or addrpop), '  ', zero_fill((string)cvi, 2)));
+// iv_cvi :=__common__( if(iv_cvi_1 = '', 50, (integer)iv_cvi_1));
+
 iv_paw_source_count := if(not(truedid), NULL, paw_source_count);
 
 _add1_mortgage_date_1 := common.sas_date((string)(add1_mortgage_date));
 
 _add1_mortgage_due_date_1 := common.sas_date((string)(add1_mortgage_due_date));
 
-mortgage_date_diff_2 := if(not(_add1_mortgage_date_1 = NULL) and not(_add1_mortgage_due_date_1 = NULL), round((_add1_mortgage_due_date_1 - _add1_mortgage_date_1) / 365.25), NULL);
+mortgage_date_diff_2 := if(not(_add1_mortgage_date_1 = NULL) and 
+                          not(_add1_mortgage_due_date_1 = NULL), 
+                          round((_add1_mortgage_due_date_1 - _add1_mortgage_date_1) / 365.25), NULL);
 
 iv_inp_addr_mortgage_term := map(
     not(add1_pop)              => '  ',
@@ -4277,10 +4356,19 @@ iv_attr_proflic_recency := map(
 
 iv_inp_addr_eda_sourced := if(not(add1_pop), NULL, (integer)add1_eda_sourced);
 
-//iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '', trim(('00'+ (string)nas_summary)[-2..], LEFT));
+//iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '  ', trim(('00'+ (string)nas_summary)[-2..], LEFT));
+iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '  ', zero_fill((string)nas_summary, 2));
 //iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '  ', trim(('00'+ (string)nas_summary)[3..], LEFT));
-iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '', (string)nas_summary);
+//iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), '', (string)nas_summary);
 //iv_nas_summary := if(not(truedid or (integer)ssnlength > 0), NULL, nas_summary);
+// iv_nas_summary_1 :=__common__( if(not(truedid or (integer)ssnlength > 0), '  ', zero_fill((string)nas_summary, 2)));
+// iv_nas_summary :=__common__( if(iv_nas_summary_1 = ' ', 12, (integer)iv_nas_summary_1));
+
+
+
+
+
+
 
 iv_adls_per_apt_addr_c6 := map(
     not(add1_pop)    => NULL,
@@ -4403,7 +4491,7 @@ final_score_tree_1_c449 := map(
                                                                   0.0366624468);
 
 final_score_tree_1 := map(
-    NULL < (real)iv_bst_own_prop_x_addr_naprop AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_1_c447,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_1_c447,
     (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_1_c449,
                                                                                     0.0370643483);
 
@@ -4428,7 +4516,7 @@ final_score_tree_2_c454 := map(
                                                                             0.0318818488);
 
 final_score_tree_2 := map(
-    NULL < (real)iv_bst_own_prop_x_addr_naprop AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_2_c452,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_2_c452,
     (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_2_c454,
                                                                                     0.0350826452);
 
@@ -4478,7 +4566,7 @@ final_score_tree_4_c465 := map(
                                                                               0.0066816016);
 
 final_score_tree_4 := map(
-    NULL < (real)iv_inp_own_prop_x_addr_naprop AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_4_c462,
+    iv_inp_own_prop_x_addr_naprop != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_4_c462,
     (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_4_c465,
                                                                                     0.0390227532);
 
@@ -4578,7 +4666,8 @@ final_score_tree_8_c482 := map(
                                                                                -0.0131263628);
 
 final_score_tree_8 := map(
-    NULL < (real)iv_bst_addr_naprop AND (real)iv_bst_addr_naprop < 3.5 => final_score_tree_8_c482,
+   // NULL < (real)iv_bst_addr_naprop AND (real)iv_bst_addr_naprop < 3.5 => final_score_tree_8_c482,
+   iv_bst_addr_naprop != ' ' AND (real)iv_bst_addr_naprop < 3.5 => final_score_tree_8_c482,
     (real)iv_bst_addr_naprop >= 3.5                              => 0.0360412099,
                                                               0.0179567877);
 
@@ -4603,7 +4692,7 @@ final_score_tree_9_c489 := map(
                                                                       0.0194554365);
 
 final_score_tree_9 := map(
-    NULL < (REAL)iv_inp_own_prop_x_addr_naprop AND (REAL)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_9_c487,
+    iv_inp_own_prop_x_addr_naprop != '  ' AND (REAL)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_9_c487,
     (REAL)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_9_c489,
                                                                                     0.0339351096);
 
@@ -4628,7 +4717,7 @@ final_score_tree_10_c495 := map(
                                         0.0311942667);
 
 final_score_tree_10 := map(
-    NULL < (real)iv_bst_addr_naprop AND (real)iv_bst_addr_naprop < 3.5 => final_score_tree_10_c492,
+    iv_bst_addr_naprop != ' ' AND (real)iv_bst_addr_naprop < 3.5 => final_score_tree_10_c492,
     (real)iv_bst_addr_naprop >= 3.5                              => final_score_tree_10_c495,
                                                               0.0169877612);
 
@@ -4648,8 +4737,8 @@ final_score_tree_11_c500 := map(
                                           -0.0306366363);
 
 final_score_tree_11_c497 := map(
-   '' < (string)iv_addrs_per_adl AND (string)iv_addrs_per_adl < '8.5' => final_score_tree_11_c498,
-    (string)iv_addrs_per_adl >= '8.5'                            => final_score_tree_11_c500,
+   NULL < iv_addrs_per_adl AND iv_addrs_per_adl < 8.5 => final_score_tree_11_c498,
+    iv_addrs_per_adl >= 8.5                            => final_score_tree_11_c500,
                                                           -0.0102441132);
 
 final_score_tree_11 := map(
@@ -4716,10 +4805,12 @@ final_score_tree_14_c514 := map(
     NULL < adl_addr AND adl_addr < 1.5 => -0.0608748518,
     adl_addr >= 1.5                    => 0.0035917140,
                                           -0.0001985934);
+                                          
+
 
 final_score_tree_14_c512 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-1']) => final_score_tree_14_c513,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '3-0', '3-3'])                                                   => final_score_tree_14_c514,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '3-0', '3-3'])                                                   => final_score_tree_14_c514,
                                                                                                                 0.0206023106);
 
 final_score_tree_14_c515 := map(
@@ -4728,9 +4819,9 @@ final_score_tree_14_c515 := map(
                                                                         -0.0070164974);
 
 final_score_tree_14 := map(
-    NULL < adl_hphn AND adl_hphn < 1.5 => final_score_tree_14_c512,
-    adl_hphn >= 1.5                    => final_score_tree_14_c515,
-                                          -0.0010125942);
+   NULL < adl_hphn AND adl_hphn < 1.5 => final_score_tree_14_c512,
+   adl_hphn >= 1.5                    => final_score_tree_14_c515,
+                                            -0.0010125942);
 
 final_score_tree_15_c518 := map(
     (iv_criminal_x_felony in ['1-0', '1-1', '2-0', '2-1', '2-2', '3-0', '3-1', '3-2', '3-3']) => -0.0835059071,
@@ -4814,7 +4905,7 @@ final_score_tree_18_c534 := map(
 
 final_score_tree_18_c533 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-1']) => -0.0389723762,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '3-0', '3-3'])                                                   => final_score_tree_18_c534,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '3-0', '3-3'])                                                   => final_score_tree_18_c534,
                                                                                                                 -0.0158476997);
 
 final_score_tree_18_c535 := map(
@@ -4839,7 +4930,7 @@ final_score_tree_19_c539 := map(
 
 final_score_tree_19_c538 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-1']) => -0.0268048380,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '2-3', '3-0', '3-3'])                                     => final_score_tree_19_c539,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '2-3', '3-0', '3-3'])                                     => final_score_tree_19_c539,
                                                                                                          -0.0035155710);
 
 final_score_tree_19_c537 := map(
@@ -4984,12 +5075,12 @@ final_score_tree_24 := map(
 
 final_score_tree_25_c568 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-1', '3-3']) => -0.0313433493,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '3-0'])                                                                 => 0.0009882872,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '3-0'])                                                                 => 0.0009882872,
                                                                                                                        -0.0121074863);
 
 final_score_tree_25_c570 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-1']) => 0.0032146409,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '3-0', '3-3'])                                     => 0.0271094620,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '3-0', '3-3'])                                     => 0.0271094620,
                                                                                                          0.0109517534);
 
 final_score_tree_25_c569 := map(
@@ -5009,7 +5100,7 @@ final_score_tree_25 := map(
 
 final_score_tree_26_c575 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '2-3', '3-1', '3-3']) => -0.0132916442,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '2-0', '3-0'])                                                   => 0.0130374884,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '2-0', '3-0'])                                                   => 0.0130374884,
                                                                                                                 0.0030055831);
 
 final_score_tree_26_c574 := map(
@@ -5104,7 +5195,7 @@ final_score_tree_29_c589 := map(
 
 final_score_tree_29 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-1']) => final_score_tree_29_c587,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '3-0', '3-3'])                                                   => final_score_tree_29_c589,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '3-0', '3-3'])                                                   => final_score_tree_29_c589,
                                                                                                                 0.0147044200);
 
 final_score_tree_30_c595 := map(
@@ -5148,8 +5239,8 @@ final_score_tree_31_c599 := map(
                                         0.0145312349);
 
 final_score_tree_31_c597 := map(
-   '' < (string)iv_prv_own_prop_x_addr_naprop AND (string)iv_prv_own_prop_x_addr_naprop < '1.5' => final_score_tree_31_c598,
-    (string)iv_prv_own_prop_x_addr_naprop >= '1.5'                                         => final_score_tree_31_c599,
+   iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 1.5 => final_score_tree_31_c598,
+    (real)iv_prv_own_prop_x_addr_naprop >= 1.5                                         => final_score_tree_31_c599,
                                                                                     0.0047261681);
 
 final_score_tree_31 := map(
@@ -5233,8 +5324,8 @@ final_score_tree_34 := map(
                                          0.0009957881);
 
 final_score_tree_35_c620 := map(
-    '' < (string)iv_hist_addr_match AND (string)iv_hist_addr_match < '0.5' => -0.0120688362,
-    (string)iv_hist_addr_match >= '0.5'                              => 0.0079992049,
+    NULL < iv_hist_addr_match AND iv_hist_addr_match < 0.5 => -0.0120688362,
+    iv_hist_addr_match >= 0.5                              => 0.0079992049,
                                                               0.0023106989);
 
 final_score_tree_35_c619 := map(
@@ -5374,7 +5465,7 @@ final_score_tree_40_c643 := map(
 
 final_score_tree_40_c642 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3']) => -0.0159169731,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '3-0', '3-1', '3-3'])                       => final_score_tree_40_c643,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '3-0', '3-1', '3-3'])                       => final_score_tree_40_c643,
                                                                                                   -0.0702326968);
 
 final_score_tree_40 := map(
@@ -5533,8 +5624,8 @@ final_score_tree_46 := map(
                                                                                            0.0056518991);
 
 final_score_tree_47_c680 := map(
-    '' < (string)iv_vp011_phn_non_us AND (string)iv_vp011_phn_non_us < '0.5' => 0.0028931300,
-    (string)iv_vp011_phn_non_us >= '0.5'                               => 0.0724997376,
+    iv_vp011_phn_non_us  != ' ' AND (real)iv_vp011_phn_non_us < 0.5 => 0.0028931300,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0724997376,
                                                                 0.0124745207);
 
 final_score_tree_47_c679 := map(
@@ -5579,7 +5670,7 @@ final_score_tree_48_c685 := map(
 
 final_score_tree_48 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-1', '1-3', '2-0', '2-1', '2-3'])       => -0.0130548534,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '3-0', '3-1', '3-3']) => final_score_tree_48_c682,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '3-0', '3-1', '3-3']) => final_score_tree_48_c682,
                                                                                           final_score_tree_48_c685);
 
 final_score_tree_49_c690 := map(
@@ -5588,7 +5679,7 @@ final_score_tree_49_c690 := map(
                                                                       -0.0005481946);
 
 final_score_tree_49_c689 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3']) => final_score_tree_49_c690,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3']) => final_score_tree_49_c690,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '2-0', '3-0', '3-1', '3-3'])                     => 0.0145921209,
                                                                                                  0.0035790668);
 
@@ -5623,13 +5714,13 @@ final_score_tree_50_c695 := map(
                                                                                      -0.0160177089);
 
 final_score_tree_50_c694 := map(
-    '' < (string)adl_hphn AND (STRING)adl_hphn < '1.5' => final_score_tree_50_c695,
-    (string)adl_hphn >= '1.5'                    => 0.0027714926,
+    NULL < adl_hphn AND adl_hphn < 1.5 => final_score_tree_50_c695,
+    adl_hphn >= 1.5                    => 0.0027714926,
                                           -0.0073143593);
 
 final_score_tree_50 := map(
-    '' < (string)iv_dl_addrs_per_adl AND (string)iv_dl_addrs_per_adl < '-0.5' => final_score_tree_50_c692,
-   (string) iv_dl_addrs_per_adl >= '-0.5'                               => final_score_tree_50_c694,
+    NULL< iv_dl_addrs_per_adl AND iv_dl_addrs_per_adl < -0.5 => final_score_tree_50_c692,
+    iv_dl_addrs_per_adl >= -0.5                               => final_score_tree_50_c694,
                                                                  0.0024694832);
 
 final_score_tree_51_c700 := map(
@@ -5679,7 +5770,7 @@ final_score_tree_52_c702 := map(
 
 final_score_tree_52 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '1-3', '2-0', '2-1', '2-3']) => -0.0103821782,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '3-0', '3-1', '3-3'])         => final_score_tree_52_c702,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '3-0', '3-1', '3-3'])         => final_score_tree_52_c702,
                                                                                            -0.0043248076);
 
 final_score_tree_53_c710 := map(
@@ -5733,8 +5824,8 @@ final_score_tree_54 := map(
                                                                    0.0051309538);
 
 final_score_tree_55_c718 := map(
-    '' < (string)iv_pl001_addr_stability_v2 AND (string)iv_pl001_addr_stability_v2 < '5.5' => -0.0088882538,
-    (string)iv_pl001_addr_stability_v2 >= '5.5'                                      => 0.0155117305,
+    iv_pl001_addr_stability_v2 != ' ' AND (real)iv_pl001_addr_stability_v2 < 5.5 => -0.0088882538,
+    (real)iv_pl001_addr_stability_v2 >= 5.5                                      => 0.0155117305,
                                                                               -0.0014369518);
 
 final_score_tree_55_c717 := map(
@@ -5828,8 +5919,8 @@ final_score_tree_58_c735 := map(
                                                                                       0.0105429549);
 
 final_score_tree_58 := map(
-    '' < (string)iv_prv_addr_naprop AND (string)iv_prv_addr_naprop < '1.5' => final_score_tree_58_c732,
-    (string)iv_prv_addr_naprop >= '1.5 '                             => final_score_tree_58_c735,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 1.5 => final_score_tree_58_c732,
+    (real)iv_prv_addr_naprop >= 1.5                              => final_score_tree_58_c735,
                                                               -0.0034021087);
 
 final_score_tree_59_c740 := map(
@@ -5888,8 +5979,8 @@ final_score_tree_61_c749 := map(
                                                                               -0.0136316048);
 
 final_score_tree_61_c750 := map(
-    '' < (string)iv_vp011_phn_non_us AND (string)iv_vp011_phn_non_us < '0.5' => -0.0035359311,
-    (string)iv_vp011_phn_non_us >= '0.5'                               => 0.0361057354,
+    iv_vp011_phn_non_us != ' ' AND (real)iv_vp011_phn_non_us < 0.5 => -0.0035359311,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0361057354,
                                                                 0.0042283899);
 
 final_score_tree_61_c748 := map(
@@ -5948,8 +6039,8 @@ final_score_tree_63_c759 := map(
                                         0.0048733887);
 
 final_score_tree_63_c758 := map(
-    '' < iv_vp011_phn_non_us AND iv_vp011_phn_non_us < '0.5' => final_score_tree_63_c759,
-    iv_vp011_phn_non_us >= '0.5'                               => 0.0593901300,
+    iv_vp011_phn_non_us != ' '  AND (real)iv_vp011_phn_non_us < 0.5 => final_score_tree_63_c759,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0593901300,
                                                                 0.0057486889);
 
 final_score_tree_63 := map(
@@ -6013,8 +6104,8 @@ final_score_tree_66_c774 := map(
                                                                                          -0.0040927826);
 
 final_score_tree_66_c775 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '2.5' => 0.0034208465,
-    iv_prv_addr_naprop >= '2.5'                              => 0.0177101365,
+    iv_prv_addr_naprop != ' '  AND (real)iv_prv_addr_naprop < 2.5 => 0.0034208465,
+    (real)iv_prv_addr_naprop >= 2.5                              => 0.0177101365,
                                                               0.0056712785);
 
 final_score_tree_66_c773 := map(
@@ -6043,8 +6134,8 @@ final_score_tree_67_c779 := map(
                                                                                0.0009123369);
 
 final_score_tree_67_c778 := map(
-   '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => -0.0134861494,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => -0.0006320505,
+    iv_vp091_phnzip_mismatch  != ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => -0.0134861494,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => -0.0006320505,
                                                                           final_score_tree_67_c779);
 
 final_score_tree_67_c777 := map(
@@ -6188,8 +6279,8 @@ final_score_tree_73_c809 := map(
                                                                           -0.0165441757);
 
 final_score_tree_73_c808 := map(
-   '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => final_score_tree_73_c809,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => -0.0045377462,
+   iv_vp091_phnzip_mismatch != ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => final_score_tree_73_c809,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => -0.0045377462,
                                                                           -0.0014028231);
 
 final_score_tree_73_c810 := map(
@@ -6213,9 +6304,13 @@ final_score_tree_74_c815 := map(
                                                                   -0.0083102523);
 
 final_score_tree_74_c814 := map(
-    '' < (string)iv_inp_addr_mortgage_amount AND (string)iv_inp_addr_mortgage_amount < '110191' => final_score_tree_74_c815,
-    (string)iv_inp_addr_mortgage_amount >= '110191'                                       => 0.0090372136,
+    NULL < iv_inp_addr_mortgage_amount AND iv_inp_addr_mortgage_amount < 110191 => final_score_tree_74_c815,
+    iv_inp_addr_mortgage_amount >= 110191                                       => 0.0090372136,
                                                                                    -0.0022921478);
+
+
+
+
 
 final_score_tree_74_c813 := map(
     NULL < iv_adls_per_addr AND iv_adls_per_addr < 7.5 => 0.0083244605,
@@ -6313,8 +6408,8 @@ final_score_tree_78_c834 := map(
                                                                           -0.0109194949);
 
 final_score_tree_78_c835 := map(
-    '' < iv_vp011_phn_non_us AND iv_vp011_phn_non_us < '0.5' => -0.0003813574,
-    iv_vp011_phn_non_us >= '0.5'                               => 0.0580097776,
+    iv_vp011_phn_non_us != ' ' AND (real)iv_vp011_phn_non_us < 0.5 => -0.0003813574,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0580097776,
                                                                 0.0008154830);
 
 final_score_tree_78_c833 := map(
@@ -6333,8 +6428,8 @@ final_score_tree_78 := map(
                                                                                   -0.0003772680);
 
 final_score_tree_79_c840 := map(
-    '' < (string)adl_dob AND (string)adl_dob < '1.5' => -0.0003751624,
-    (string)adl_dob >= '1.5'                   => 0.0093918024,
+    NULL < adl_dob AND adl_dob < 1.5 => -0.0003751624,
+    adl_dob >= 1.5                   => 0.0093918024,
                                         0.0036564117);
 
 final_score_tree_79_c839 := map(
@@ -6418,7 +6513,7 @@ final_score_tree_82_c854 := map(
                                                  0.0059064854);
 
 final_score_tree_82_c852 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '1-1', '1-3', '2-0', '2-3', '3-1']) => final_score_tree_82_c853,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '1-1', '1-3', '2-0', '2-3', '3-1']) => final_score_tree_82_c853,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '2-1', '3-0', '3-3'])                     => final_score_tree_82_c854,
                                                                                                  -0.0050195929);
 
@@ -6433,8 +6528,8 @@ final_score_tree_82 := map(
                                                                           final_score_tree_82_c855);
 
 final_score_tree_83_c859 := map(
-    '' < iv_vp011_phn_non_us AND iv_vp011_phn_non_us < '0.5' => -0.0178651983,
-    iv_vp011_phn_non_us >= '0.5'                               => 0.0271999759,
+     iv_vp011_phn_non_us != ' '  AND (real)iv_vp011_phn_non_us < 0.5 => -0.0178651983,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0271999759,
                                                                 -0.0068079305);
 
 final_score_tree_83_c858 := map(
@@ -6493,8 +6588,8 @@ final_score_tree_85_c867 := map(
                                                                             0.0064206266);
 
 final_score_tree_85_c870 := map(
-    '' < iv_vp011_phn_non_us AND iv_vp011_phn_non_us < '0.5' => -0.0068586792,
-    iv_vp011_phn_non_us >= '0.5'                               => 0.0313932775,
+     iv_vp011_phn_non_us != ' '  AND (real)iv_vp011_phn_non_us < 0.5 => -0.0068586792,
+    (Real)iv_vp011_phn_non_us >= 0.5                               => 0.0313932775,
                                                                 -0.0103885497);
 
 final_score_tree_85_c869 := map(
@@ -6574,7 +6669,7 @@ final_score_tree_88_c885 := map(
 
 final_score_tree_88_c884 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3']) => -0.0283046246,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '2-0', '2-1', '3-0', '3-1', '3-3'])         => 0.0174547825,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '2-0', '2-1', '3-0', '3-1', '3-3'])         => 0.0174547825,
                                                                                            final_score_tree_88_c885);
 
 final_score_tree_88 := map(
@@ -6583,13 +6678,13 @@ final_score_tree_88 := map(
                                                                                                                          final_score_tree_88_c884);
 
 final_score_tree_89_c889 := map(
-   '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => -0.0240668564,
-    iv_in001_wealth_index >= '2.5'                                 => -0.0016807085,
+   iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 2.5 => -0.0240668564,
+    (real)iv_in001_wealth_index >= 2.5                                 => -0.0016807085,
                                                                     -0.0147252741);
 
 final_score_tree_89_c888 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => -0.0017273459,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_89_c889,
+    iv_in001_wealth_index!= ' '  AND (real)iv_in001_wealth_index < 0.5 => -0.0017273459,
+    (Real)iv_in001_wealth_index >= 0.5                                 => final_score_tree_89_c889,
                                                                     -0.0068614514);
 
 final_score_tree_89_c887 := map(
@@ -6883,13 +6978,13 @@ final_score_tree_100 := map(
                                                                        0.0000756914);
 
 final_score_tree_101_c950 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => -0.0185613565,
-    iv_in001_wealth_index >= '2.5'                                 => 0.0012758769,
+    iv_in001_wealth_index != ' '  AND (real)iv_in001_wealth_index < 2.5 => -0.0185613565,
+    (real)iv_in001_wealth_index >= 2.5                                 => 0.0012758769,
                                                                     -0.0024235278);
 
 final_score_tree_101_c949 := map(
-    ''< iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => 0.0094866968,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_101_c950,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 0.5 => 0.0094866968,
+    (real)iv_in001_wealth_index >= 0.5                                 => final_score_tree_101_c950,
                                                                     0.0020154318);
 
 final_score_tree_101_c948 := map(
@@ -6908,8 +7003,8 @@ final_score_tree_101 := map(
                                                                             -0.0003015561);
 
 final_score_tree_102_c954 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '1.5' => -0.0002524076,
-    iv_prv_own_prop_x_addr_naprop >= '1.5'                                         => 0.0190958167,
+    iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 1.5 => -0.0002524076,
+    (real)iv_prv_own_prop_x_addr_naprop >= 1.5                                         => 0.0190958167,
                                                                                     0.0039529015);
 
 final_score_tree_102_c953 := map(
@@ -6918,8 +7013,8 @@ final_score_tree_102_c953 := map(
                                                               -0.0005458359);
 
 final_score_tree_102_c952 := map(
-    '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => -0.0109764576,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => -0.0000799715,
+    iv_vp091_phnzip_mismatch != ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => -0.0109764576,
+    (Real)iv_vp091_phnzip_mismatch >= 0.5                                    => -0.0000799715,
                                                                           final_score_tree_102_c953);
 
 final_score_tree_102_c955 := map(
@@ -6959,7 +7054,7 @@ final_score_tree_103 := map(
 
 final_score_tree_104_c964 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '3-0', '3-3']) => -0.0061948726,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-3', '2-0', '2-1', '2-3', '3-1'])         => 0.0323836483,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-3', '2-0', '2-1', '2-3', '3-1'])         => 0.0323836483,
                                                                                            0.0171048463);
 
 final_score_tree_104_c963 := map(
@@ -7008,8 +7103,8 @@ final_score_tree_105 := map(
                                                                                -0.0035473146);
 
 final_score_tree_106_c975 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '1.5' => -0.0007420737,
-    iv_prv_addr_naprop >= '1.5'                             => 0.0222878074,
+    iv_prv_addr_naprop !=' '  AND (real)iv_prv_addr_naprop < 1.5 => -0.0007420737,
+    (real)iv_prv_addr_naprop >= 1.5                             => 0.0222878074,
                                                               0.0029948555);
 
 final_score_tree_106_c974 := map(
@@ -7054,7 +7149,7 @@ final_score_tree_107_c978 := map(
 
 final_score_tree_107 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3']) => final_score_tree_107_c977,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '3-0', '3-1', '3-3'])                       => final_score_tree_107_c978,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '3-0', '3-1', '3-3'])                       => final_score_tree_107_c978,
                                                                                                   -0.0004424840);
 
 final_score_tree_108_c985 := map(
@@ -7288,8 +7383,8 @@ final_score_tree_117_c1030 := map(
                                           -0.0041660535);
 
 final_score_tree_117_c1029 := map(
-    '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => final_score_tree_117_c1030,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => 0.0057270776,
+    iv_vp091_phnzip_mismatch != ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => final_score_tree_117_c1030,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => 0.0057270776,
                                                                           0.0021364089);
 
 final_score_tree_117_c1028 := map(
@@ -7323,8 +7418,8 @@ final_score_tree_118_c1035 := map(
                                                  0.0097289138);
 
 final_score_tree_118_c1034 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_118_c1035,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => 0.0004188796,
+    iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_118_c1035,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => 0.0004188796,
                                                                                     0.0031930107);
 
 final_score_tree_118 := map(
@@ -7404,7 +7499,7 @@ final_score_tree_121_c1050 := map(
 
 final_score_tree_121 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '1-3', '2-1', '2-3', '3-1']) => final_score_tree_121_c1047,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '2-0', '3-0', '3-3'])         => final_score_tree_121_c1048,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '2-0', '3-0', '3-3'])         => final_score_tree_121_c1048,
                                                                                            final_score_tree_121_c1050);
 
 final_score_tree_122_c1053 := map(
@@ -7498,8 +7593,8 @@ final_score_tree_125_c1070 := map(
                                                                              0.0241311748);
 
 final_score_tree_125_c1067 := map(
-    '' < iv_vs001_ssn_deceased AND iv_vs001_ssn_deceased < '0.5' => final_score_tree_125_c1068,
-    iv_vs001_ssn_deceased >= '0.5'                                 => final_score_tree_125_c1070,
+    iv_vs001_ssn_deceased != ' ' AND (real)iv_vs001_ssn_deceased < 0.5 => final_score_tree_125_c1068,
+    (real)iv_vs001_ssn_deceased >= 0.5                                 => final_score_tree_125_c1070,
                                                                     -0.0095404664);
 
 final_score_tree_125 := map(
@@ -7524,7 +7619,7 @@ final_score_tree_126_c1073 := map(
 
 final_score_tree_126_c1072 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-3', '2-0', '2-1', '2-3'])                     => -0.0062778688,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '1-1', '3-0', '3-1', '3-3']) => final_score_tree_126_c1073,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '1-1', '3-0', '3-1', '3-3']) => final_score_tree_126_c1073,
                                                                                                  0.0008934956);
 
 final_score_tree_126 := map(
@@ -7538,8 +7633,8 @@ final_score_tree_127_c1079 := map(
                                                                          -0.0016337436);
 
 final_score_tree_127_c1078 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => final_score_tree_127_c1079,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => 0.0172031028,
+    iv_inp_own_prop_x_addr_naprop != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_127_c1079,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => 0.0172031028,
                                                                                     0.0030550818);
 
 final_score_tree_127_c1077 := map(
@@ -7668,7 +7763,7 @@ final_score_tree_132_c1103 := map(
                                                                   0.0003034872);
 
 final_score_tree_132_c1105 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-3']) => -0.0081323012,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-3']) => -0.0081323012,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3', '2-0', '2-1', '3-0', '3-1', '3-3'])       => 0.0258244667,
                                                                                           -0.0060729426);
 
@@ -7719,7 +7814,7 @@ final_score_tree_134_c1114 := map(
 
 final_score_tree_134_c1112 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-3']) => final_score_tree_134_c1113,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '3-0', '3-1'])                                     => final_score_tree_134_c1114,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '3-0', '3-1'])                                     => final_score_tree_134_c1114,
                                                                                                          -0.0039464559);
 
 final_score_tree_134_c1115 := map(
@@ -7757,10 +7852,16 @@ final_score_tree_135 := map(
     iv_inq_ssns_per_adl >= 1.5                               => final_score_tree_135_c1120,
                                                                 0.0027199675);
 
+// final_score_tree_136_c1123 := map(
+    // '' < iv_infutor_nap AND iv_infutor_nap < '11.5' => 0.0009103269,
+    // iv_infutor_nap >= '11.5'                          => -0.0202703674,
+                                                       // -0.0030702012);
 final_score_tree_136_c1123 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '11.5' => 0.0009103269,
-    iv_infutor_nap >= '11.5'                          => -0.0202703674,
-                                                       -0.0030702012);
+     iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 11.5 => 0.0009103269,
+    (real) iv_infutor_nap >= 11.5                          => -0.0202703674,
+                                                        -0.0030702012);                                                       
+
+
 
 final_score_tree_136_c1122 := map(
     NULL < iv_vp090_phn_dst_to_inp_add AND iv_vp090_phn_dst_to_inp_add < 43.5 => final_score_tree_136_c1123,
@@ -7783,13 +7884,13 @@ final_score_tree_136 := map(
                                                                                     0.0009795060);
 
 final_score_tree_137_c1129 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => -0.0129060033,
-    iv_in001_wealth_index >= '2.5'                                 => 0.0025797025,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 2.5 => -0.0129060033,
+    (real)iv_in001_wealth_index >= 2.5                                 => 0.0025797025,
                                                                     -0.0008496431);
 
 final_score_tree_137_c1128 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => 0.0050914720,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_137_c1129,
+   iv_in001_wealth_index  != ' ' AND (real)iv_in001_wealth_index < 0.5 => 0.0050914720,
+    (real)iv_in001_wealth_index >= 0.5                                 => final_score_tree_137_c1129,
                                                                     0.0008706030);
 
 final_score_tree_137_c1127 := map(
@@ -7868,8 +7969,8 @@ final_score_tree_140_c1142 := map(
                                                                                    -0.0010886685);
 
 final_score_tree_140_c1145 := map(
-    '' < iv_input_dob_match_level AND iv_input_dob_match_level < '6.5' => -0.0329810961,
-    iv_input_dob_match_level >= '6.5'                                    => 0.0779902229,
+    iv_input_dob_match_level != ' ' AND (real)iv_input_dob_match_level < 6.5 => -0.0329810961,
+    (real)iv_input_dob_match_level >= 6.5                                    => 0.0779902229,
                                                                           -0.0211625739);
 
 final_score_tree_140_c1144 := map(
@@ -7878,8 +7979,8 @@ final_score_tree_140_c1144 := map(
                                                                                    0.0034774913);
 
 final_score_tree_140 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '1.5' => final_score_tree_140_c1142,
-    iv_vs100_ssn_problem >= '1.5'                                => 0.0320498080,
+    iv_vs100_ssn_problem != ' '  AND (real)iv_vs100_ssn_problem < 1.5 => final_score_tree_140_c1142,
+    (real)iv_vs100_ssn_problem >= 1.5                                => 0.0320498080,
                                                                   final_score_tree_140_c1144);
 
 final_score_tree_141_c1149 := map(
@@ -7933,8 +8034,8 @@ final_score_tree_142 := map(
                                                                    -0.0074109534);
 
 final_score_tree_143_c1158 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '6.5' => 0.0138519605,
-    iv_infutor_nap >= '6.5'                          => -0.0199751713,
+    iv_infutor_nap != ' '  AND (real)iv_infutor_nap < 6.5 => 0.0138519605,
+    (Real)iv_infutor_nap >= 6.5                          => -0.0199751713,
                                                       0.0113130737);
 
 final_score_tree_143_c1157 := map(
@@ -8008,8 +8109,8 @@ final_score_tree_145 := map(
                                                                         -0.0024185018);
 
 final_score_tree_146_c1174 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => 0.0030735895,
-    iv_in001_wealth_index >= '0.5'                                 => -0.0059918296,
+    iv_in001_wealth_index != ' '  AND (real)iv_in001_wealth_index < 0.5 => 0.0030735895,
+    (real)iv_in001_wealth_index >= 0.5                                 => -0.0059918296,
                                                                     -0.0022698559);
 
 final_score_tree_146_c1173 := map(
@@ -8018,8 +8119,8 @@ final_score_tree_146_c1173 := map(
                                                                                   -0.0011230195);
 
 final_score_tree_146_c1172 := map(
-    '' < iv_vs001_ssn_deceased AND iv_vs001_ssn_deceased < '0.5' => final_score_tree_146_c1173,
-    iv_vs001_ssn_deceased >= '0.5'                                 => -0.0633529958,
+    iv_vs001_ssn_deceased != ' '  AND (real)iv_vs001_ssn_deceased < 0.5 => final_score_tree_146_c1173,
+    (real)iv_vs001_ssn_deceased >= 0.5                                 => -0.0633529958,
                                                                     -0.0031186385);
 
 final_score_tree_146_c1175 := map(
@@ -8063,8 +8164,8 @@ final_score_tree_148_c1185 := map(
                                                            0.0037131277);
 
 final_score_tree_148_c1184 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => final_score_tree_148_c1185,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => -0.0130022317,
+    iv_inp_own_prop_x_addr_naprop != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_148_c1185,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => -0.0130022317,
                                                                                     -0.0059442860);
 
 final_score_tree_148_c1183 := map(
@@ -8088,8 +8189,8 @@ final_score_tree_149_c1189 := map(
                                                                             0.0034000749);
 
 final_score_tree_149_c1188 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => final_score_tree_149_c1189,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => -0.0137809909,
+    iv_inp_own_prop_x_addr_naprop !='  ' AND (real) iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_149_c1189,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                        => -0.0137809909,
                                                                                     -0.0084368566);
 
 final_score_tree_149_c1187 := map(
@@ -8108,8 +8209,8 @@ final_score_tree_149 := map(
                                                                                   0.0004103284);
 
 final_score_tree_150_c1194 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '2.5' => 0.0104159555,
-    iv_bst_own_prop_x_addr_naprop >= '2.5'                                         => -0.0009099263,
+     iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => 0.0104159555,
+    (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => -0.0009099263,
                                                                                     0.0041219586);
 
 final_score_tree_150_c1193 := map(
@@ -8238,8 +8339,8 @@ final_score_tree_155_c1219 := map(
                                                                 -0.0048737609);
 
 final_score_tree_155_c1218 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '0.5' => 0.0026290258,
-    iv_prv_addr_naprop >= '0.5'                              => final_score_tree_155_c1219,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 0.5 => 0.0026290258,
+    (real)iv_prv_addr_naprop >= 0.5                              => final_score_tree_155_c1219,
                                                               -0.0005591818);
 
 final_score_tree_155_c1220 := map(
@@ -8248,8 +8349,8 @@ final_score_tree_155_c1220 := map(
                                                          0.0070048917);
 
 final_score_tree_155_c1217 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '2.5' => final_score_tree_155_c1218,
-    iv_prv_addr_naprop >= '2.5'                              => final_score_tree_155_c1220,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 2.5 => final_score_tree_155_c1218,
+    (real)iv_prv_addr_naprop >= 2.5                              => final_score_tree_155_c1220,
                                                               -0.0015242217);
 
 final_score_tree_155 := map(
@@ -8283,8 +8384,8 @@ final_score_tree_156 := map(
                                                                       0.0018280535);
 
 final_score_tree_157_c1229 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '0.5' => -0.0332675837,
-    iv_vs100_ssn_problem >= '0.5'                                => 0.0631385114,
+    iv_vs100_ssn_problem != ' ' AND (real)iv_vs100_ssn_problem < 0.5 => -0.0332675837,
+    (real)iv_vs100_ssn_problem >= 0.5                                => 0.0631385114,
                                                                   -0.0690557352);
 
 final_score_tree_157_c1228 := map(
@@ -8303,8 +8404,8 @@ final_score_tree_157_c1227 := map(
                                                                             0.0005495920);
 
 final_score_tree_157 := map(
-    '' < iv_inp_addr_avm_land_use AND iv_inp_addr_avm_land_use < '1.5' => final_score_tree_157_c1227,
-    iv_inp_addr_avm_land_use >= '1.5'                                    => 0.0156415050,
+    iv_inp_addr_avm_land_use != ' '  AND (real)iv_inp_addr_avm_land_use < 1.5 => final_score_tree_157_c1227,
+    (real)iv_inp_addr_avm_land_use >= 1.5                                    => 0.0156415050,
                                                                           -0.0007710277);
 
 final_score_tree_158_c1233 := map(
@@ -8393,8 +8494,8 @@ final_score_tree_161_c1247 := map(
                                                                                             final_score_tree_161_c1248);
 
 final_score_tree_161_c1250 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '1.5' => 0.0105898710,
-    iv_inp_own_prop_x_addr_naprop >= '1.5'                                         => -0.0000210124,
+    iv_inp_own_prop_x_addr_naprop != ' '  AND (real)iv_inp_own_prop_x_addr_naprop < 1.5 => 0.0105898710,
+    (real)iv_inp_own_prop_x_addr_naprop >= 1.5                                         => -0.0000210124,
                                                                                     0.0051258328);
 
 final_score_tree_161_c1249 := map(
@@ -8409,7 +8510,7 @@ final_score_tree_161 := map(
 
 final_score_tree_162_c1254 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-3', '3-0', '3-3'])                                                 => -0.0621782638,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-1']) => 0.0064712956,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-1']) => 0.0064712956,
                                                                                                                -0.0111357157);
 
 final_score_tree_162_c1253 := map(
@@ -8433,8 +8534,8 @@ final_score_tree_162 := map(
                                                                                   0.0023079480);
 
 final_score_tree_163_c1258 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '0.5' => -0.0217697276,
-    iv_vs100_ssn_problem >= '0.5'                                => 0.0295328603,
+    iv_vs100_ssn_problem != ' '  AND (real)iv_vs100_ssn_problem < 0.5 => -0.0217697276,
+    (real)iv_vs100_ssn_problem >= 0.5                                => 0.0295328603,
                                                                   0.0078339757);
 
 final_score_tree_163_c1257 := map(
@@ -8483,8 +8584,8 @@ final_score_tree_164 := map(
                                                                              final_score_tree_164_c1264);
 
 final_score_tree_165_c1270 := map(
-    '' < iv_vp011_phn_non_us AND iv_vp011_phn_non_us < '0.5' => 0.0044585962,
-    iv_vp011_phn_non_us >= '0.5'                               => 0.0719548767,
+    iv_vp011_phn_non_us != ' ' AND (real)iv_vp011_phn_non_us < 0.5 => 0.0044585962,
+    (real)iv_vp011_phn_non_us >= 0.5                               => 0.0719548767,
                                                                 0.0143753446);
 
 final_score_tree_165_c1269 := map(
@@ -8524,7 +8625,7 @@ final_score_tree_166_c1273 := map(
 
 final_score_tree_166_c1275 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-3', '2-3'])                     => -0.0237432586,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '1-1', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0083341239,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '1-1', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0083341239,
                                                                                                  -0.0073686005);
 
 final_score_tree_166 := map(
@@ -8533,8 +8634,8 @@ final_score_tree_166 := map(
                                                                           final_score_tree_166_c1275);
 
 final_score_tree_167_c1280 := map(
-   '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '2.5' => 0.0097003713,
-    iv_bst_own_prop_x_addr_naprop >= '2.5'                                         => -0.0014042207,
+   iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => 0.0097003713,
+    (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => -0.0014042207,
                                                                                     0.0034406338);
 
 final_score_tree_167_c1279 := map(
@@ -8623,8 +8724,8 @@ final_score_tree_170_c1293 := map(
                                         0.0054173228);
 
 final_score_tree_170_c1292 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop <'1.5' => -0.0014874100,
-    iv_prv_addr_naprop >= '1.5'                              => final_score_tree_170_c1293,
+    iv_prv_addr_naprop != ' '  AND (real)iv_prv_addr_naprop <1.5 => -0.0014874100,
+    (real)iv_prv_addr_naprop >= 1.5                              => final_score_tree_170_c1293,
                                                               0.0002231830);
 
 final_score_tree_170 := map(
@@ -8727,10 +8828,21 @@ final_score_tree_174_c1313 := map(
     iv_mos_src_bureau_lname_fseen >= 38.5                                         => final_score_tree_174_c1314,
                                                                                      0.0005331239);
 
+// final_score_tree_174 := map(
+    // '' < iv_cvi AND iv_cvi < '25' => final_score_tree_174_c1312,
+    // iv_cvi >= '25'                  => final_score_tree_174_c1313,
+    //                                 -0.0007945251);
+    
+    
+    
 final_score_tree_174 := map(
-    '' < iv_cvi AND iv_cvi < '25' => final_score_tree_174_c1312,
-    iv_cvi >= '25'                  => final_score_tree_174_c1313,
+    iv_cvi != '  ' AND (integer)iv_cvi < 25 => final_score_tree_174_c1312,
+    (integer)iv_cvi >= 25     => final_score_tree_174_c1313,
                                      -0.0007945251);
+                          
+
+
+
 
 final_score_tree_175_c1318 := map(
     NULL < iv_inp_addr_assessed_total_val AND iv_inp_addr_assessed_total_val < 28109 => -0.0057798674,
@@ -8814,7 +8926,7 @@ final_score_tree_178_c1334 := map(
 
 final_score_tree_178_c1333 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '1-3', '2-1', '2-3', '3-1']) => -0.0052737436,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '2-0', '3-0', '3-3'])         => final_score_tree_178_c1334,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '2-0', '3-0', '3-3'])         => final_score_tree_178_c1334,
                                                                                            0.0005984161);
 
 final_score_tree_178_c1332 := map(
@@ -8958,7 +9070,7 @@ final_score_tree_183 := map(
                                                                                                                                      -0.0002309095);
 
 final_score_tree_184_c1363 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-3', '2-3', '3-0', '3-1', '3-3']) => -0.0352657227,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-3', '2-3', '3-0', '3-1', '3-3']) => -0.0352657227,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '1-1', '2-0', '2-1'])                     => 0.0677012679,
                                                                                                  -0.0260761956);
 
@@ -9008,8 +9120,8 @@ final_score_tree_185 := map(
                                                                          0.0015436536);
 
 final_score_tree_186_c1372 := map(
-    '' < iv_vs001_ssn_deceased AND iv_vs001_ssn_deceased < '0.5' => 0.0001814327,
-    iv_vs001_ssn_deceased >= '0.5'                                 => -0.0502654867,
+     iv_vs001_ssn_deceased != ' ' AND (real)iv_vs001_ssn_deceased < 0.5 => 0.0001814327,
+    (real)iv_vs001_ssn_deceased >= 0.5                                 => -0.0502654867,
                                                                     -0.0144476163);
 
 final_score_tree_186_c1375 := map(
@@ -9053,8 +9165,8 @@ final_score_tree_187_c1380 := map(
                                                                            -0.0090026162);
 
 final_score_tree_187 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_187_c1377,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_187_c1380,
+     iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_187_c1377,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_187_c1380,
                                                                 0.0014859927);
 
 final_score_tree_188_c1384 := map(
@@ -9134,7 +9246,7 @@ final_score_tree_190 := map(
 
 final_score_tree_191_c1399 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '1-3', '2-0', '2-1', '3-0']) => -0.0341026276,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '2-3', '3-1', '3-3'])         => 0.0028056192,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '2-3', '3-1', '3-3'])         => 0.0028056192,
                                                                                            -0.0017649483);
 
 final_score_tree_191_c1398 := map(
@@ -9173,8 +9285,8 @@ final_score_tree_192_c1405 := map(
                                                                                            0.0062191428);
 
 final_score_tree_192_c1402 := map(
-    '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => final_score_tree_192_c1403,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => final_score_tree_192_c1405,
+    iv_vp091_phnzip_mismatch!= ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => final_score_tree_192_c1403,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => final_score_tree_192_c1405,
                                                                           -0.0000245325);
 
 final_score_tree_192 := map(
@@ -9238,13 +9350,13 @@ final_score_tree_195_c1418 := map(
                                                                                -0.0060667364);
 
 final_score_tree_195_c1420 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => -0.0120333974,
-    iv_in001_wealth_index >= '2.5'                                 => 0.0009982413,
+     iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 2.5 => -0.0120333974,
+    (real)iv_in001_wealth_index >= 2.5                                 => 0.0009982413,
                                                                     -0.0015342920);
 
 final_score_tree_195_c1419 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => 0.0058873655,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_195_c1420,
+    iv_in001_wealth_index != ' '  AND (real)iv_in001_wealth_index < 0.5 => 0.0058873655,
+    (real)iv_in001_wealth_index >= 0.5                                 => final_score_tree_195_c1420,
                                                                     0.0010866388);
 
 final_score_tree_195_c1417 := map(
@@ -9343,8 +9455,8 @@ final_score_tree_199_c1437 := map(
                                                                             -0.0001382314);
 
 final_score_tree_199_c1439 := map(
-    '' < iv_bst_addr_naprop AND iv_bst_addr_naprop < '1.5' => -0.0074222424,
-    iv_bst_addr_naprop >= '1.5'                              => -0.0392849896,
+    iv_bst_addr_naprop != ' ' AND (real)iv_bst_addr_naprop < 1.5 => -0.0074222424,
+    (real)iv_bst_addr_naprop >= 1.5                              => -0.0392849896,
                                                               -0.0159984202);
 
 final_score_tree_199_c1440 := map(
@@ -9434,7 +9546,7 @@ final_score_tree_202 := map(
 
 final_score_tree_203_c1459 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '2-0', '2-1', '2-3', '3-1', '3-3']) => -0.0011521143,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-1', '1-3', '3-0'])                       => 0.0234436669,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-1', '1-3', '3-0'])                       => 0.0234436669,
                                                                                                   0.0122615982);
 
 final_score_tree_203_c1458 := map(
@@ -9468,8 +9580,8 @@ final_score_tree_204_c1464 := map(
                                         -0.0135346439);
 
 final_score_tree_204_c1463 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '11.5' => final_score_tree_204_c1464,
-    iv_inp_own_prop_x_addr_naprop >= '11.5'                                         => -0.0650908461,
+    iv_inp_own_prop_x_addr_naprop != '  '  AND (real)iv_inp_own_prop_x_addr_naprop < 11.5 => final_score_tree_204_c1464,
+    (real)iv_inp_own_prop_x_addr_naprop >= 11.5                                         => -0.0650908461,
                                                                                      0.0106352768);
 
 final_score_tree_204_c1462 := map(
@@ -9514,7 +9626,7 @@ final_score_tree_206_c1474 := map(
 
 final_score_tree_206_c1475 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '2-0', '2-1', '2-3', '3-0'])                     => -0.0155887721,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-1', '1-3', '3-1', '3-3']) => 0.0109573720,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-1', '1-3', '3-1', '3-3']) => 0.0109573720,
                                                                                                  0.0083043866);
 
 final_score_tree_206_c1473 := map(
@@ -9628,8 +9740,8 @@ final_score_tree_210_c1492 := map(
                                                                                                  -0.0030956381);
 
 final_score_tree_210 := map(
-    '' < iv_inp_addr_avm_land_use AND iv_inp_addr_avm_land_use < '1.5' => -0.0015378777,
-    iv_inp_addr_avm_land_use >= '1.5'                                    => 0.0140465888,
+     iv_inp_addr_avm_land_use != ' ' AND (real)iv_inp_addr_avm_land_use < 1.5 => -0.0015378777,
+    (real)iv_inp_addr_avm_land_use >= 1.5                                    => 0.0140465888,
                                                                           final_score_tree_210_c1492);
 
 final_score_tree_211_c1498 := map(
@@ -9708,7 +9820,7 @@ final_score_tree_213 := map(
                                                                                 0.0011981695);
 
 final_score_tree_214_c1514 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-0', '1-3', '2-0', '2-1', '2-3', '3-1']) => -0.0389494694,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-0', '1-3', '2-0', '2-1', '2-3', '3-1']) => -0.0389494694,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-1', '3-0', '3-3'])                     => -0.0028478787,
                                                                                                  -0.0158096546);
 
@@ -9763,8 +9875,8 @@ final_score_tree_216_c1523 := map(
                                           0.0053997738);
 
 final_score_tree_216_c1522 := map(
-    '' < iv_vs001_ssn_deceased AND iv_vs001_ssn_deceased < '0.5' => -0.0000129678,
-    iv_vs001_ssn_deceased >= '0.5'                                 => -0.0454284206,
+    iv_vs001_ssn_deceased != ' ' AND (real)iv_vs001_ssn_deceased < 0.5 => -0.0000129678,
+    (real)iv_vs001_ssn_deceased >= 0.5                                 => -0.0454284206,
                                                                     final_score_tree_216_c1523);
 
 final_score_tree_216_c1525 := map(
@@ -9773,8 +9885,8 @@ final_score_tree_216_c1525 := map(
                                                                                  0.0404233478);
 
 final_score_tree_216_c1524 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '2.5' => final_score_tree_216_c1525,
-    iv_bst_own_prop_x_addr_naprop >= '2.5'                                         => -0.0066795299,
+     iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_216_c1525,
+    (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => -0.0066795299,
                                                                                     0.0184448583);
 
 final_score_tree_216 := map(
@@ -9808,8 +9920,8 @@ final_score_tree_217 := map(
                                                                                            final_score_tree_217_c1530);
 
 final_score_tree_218_c1534 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '-0.5' => -0.0094508394,
-    iv_inp_addr_mortgage_term >= '-0.5'                                    => 0.0331358997,
+     iv_inp_addr_mortgage_term  != '  ' AND (real)iv_inp_addr_mortgage_term < -0.5 => -0.0094508394,
+     iv_inp_addr_mortgage_term  != '  ' AND (real)iv_inp_addr_mortgage_term >= -0.5                                    => 0.0331358997,
                                                                              -0.0030591124);
 
 final_score_tree_218_c1533 := map(
@@ -9893,7 +10005,7 @@ final_score_tree_221_c1548 := map(
                                                                                   0.0083883216);
 
 final_score_tree_221_c1550 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '1-1', '2-0', '2-1', '3-1', '3-3']) => 0.0110787825,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '1-1', '2-0', '2-1', '3-1', '3-3']) => 0.0110787825,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-3', '2-3', '3-0'])                                   => 0.0443453486,
                                                                                                         0.0205623470);
 
@@ -9908,8 +10020,8 @@ final_score_tree_221 := map(
                                                                                   -0.0004957666);
 
 final_score_tree_222_c1555 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '0.5' => -0.0053412387,
-    iv_vs100_ssn_problem >= '0.5'                                => 0.0190146471,
+    iv_vs100_ssn_problem != ' ' AND (real)iv_vs100_ssn_problem < 0.5 => -0.0053412387,
+    (real)iv_vs100_ssn_problem >= 0.5                                => 0.0190146471,
                                                                   -0.0038696479);
 
 final_score_tree_222_c1554 := map(
@@ -9918,8 +10030,8 @@ final_score_tree_222_c1554 := map(
                                                                         0.0022493968);
 
 final_score_tree_222_c1553 := map(
-   '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_222_c1554,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0049848776,
+   iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_222_c1554,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0049848776,
                                                                                     -0.0023304039);
 
 final_score_tree_222_c1552 := map(
@@ -9969,7 +10081,7 @@ final_score_tree_224_c1565 := map(
 
 final_score_tree_224_c1564 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '1-3', '2-3'])                                   => -0.0304454022,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0207863140,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0207863140,
                                                                                                         final_score_tree_224_c1565);
 
 final_score_tree_224_c1563 := map(
@@ -10088,7 +10200,7 @@ final_score_tree_229_c1587 := map(
                                                                                                                 0.0010153279);
 
 final_score_tree_229_c1590 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-1', '2-0', '2-3', '3-1', '3-3']) => -0.0100552435,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-1', '2-0', '2-3', '3-1', '3-3']) => -0.0100552435,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-3', '2-1', '3-0'])       => 0.0059822451,
                                                                                           -0.0019478998);
 
@@ -10183,8 +10295,8 @@ final_score_tree_232 := map(
                                                                 -0.0007430654);
 
 final_score_tree_233_c1608 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '0.5' => 0.0404989678,
-    iv_inp_own_prop_x_addr_naprop >= '0.5'                                         => 0.0059984027,
+    iv_inp_own_prop_x_addr_naprop != '  '  AND (real)iv_inp_own_prop_x_addr_naprop < 0.5 => 0.0404989678,
+    (real)iv_inp_own_prop_x_addr_naprop >= 0.5                                         => 0.0059984027,
                                                                                     0.0149137241);
 
 final_score_tree_233_c1607 := map(
@@ -10263,8 +10375,8 @@ final_score_tree_236_c1622 := map(
                                                                             -0.0611459282);
 
 final_score_tree_236_c1624 := map(
-    '' < iv_pa001_no_phone_at_addr AND iv_pa001_no_phone_at_addr < '0.5' => -0.0115421779,
-    iv_pa001_no_phone_at_addr >= '0.5'                                     => -0.0958172541,
+     iv_pa001_no_phone_at_addr != ' ' AND (real)iv_pa001_no_phone_at_addr < 0.5 => -0.0115421779,
+    (real)iv_pa001_no_phone_at_addr >= 0.5                                     => -0.0958172541,
                                                                             -0.0330656686);
 
 final_score_tree_236_c1625 := map(
@@ -10343,7 +10455,7 @@ final_score_tree_239_c1638 := map(
                                                                                                                        -0.0283467323);
 
 final_score_tree_239_c1640 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '2-3', '3-0', '3-3']) => 0.0029767356,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '2-3', '3-0', '3-3']) => 0.0029767356,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '1-3', '2-0', '2-1', '3-1'])                     => 0.0622086042,
                                                                                                  0.0084303091);
 
@@ -10469,12 +10581,12 @@ final_score_tree_244_c1664 := map(
 
 final_score_tree_244_c1665 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '3-1'])                     => -0.0220883124,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0103496771,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0103496771,
                                                                                                  -0.0101621116);
 
 final_score_tree_244_c1663 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_244_c1664,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_244_c1665,
+    iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_244_c1664,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_244_c1665,
                                                                 -0.0080307267);
 
 final_score_tree_244 := map(
@@ -10498,13 +10610,13 @@ final_score_tree_245_c1667 := map(
                                                                   0.0024809671);
 
 final_score_tree_245_c1670 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '1.5' => -0.0160663992,
-    iv_in001_wealth_index >= '1.5'                                 => -0.0016811531,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 1.5 => -0.0160663992,
+    (real)iv_in001_wealth_index >= 1.5                                 => -0.0016811531,
                                                                     -0.0028597292);
 
 final_score_tree_245 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => final_score_tree_245_c1667,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_245_c1670,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 0.5 => final_score_tree_245_c1667,
+    (real)iv_in001_wealth_index >= 0.5                                 => final_score_tree_245_c1670,
                                                                     -0.0036350293);
 
 final_score_tree_246_c1675 := map(
@@ -10513,8 +10625,8 @@ final_score_tree_246_c1675 := map(
                                                                  0.0073568406);
 
 final_score_tree_246_c1674 := map(
-   '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '1.5' => final_score_tree_246_c1675,
-    iv_inp_own_prop_x_addr_naprop >= '1.5'                                         => -0.0039965020,
+   iv_inp_own_prop_x_addr_naprop  != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 1.5 => final_score_tree_246_c1675,
+    (real)iv_inp_own_prop_x_addr_naprop >= 1.5                                         => -0.0039965020,
                                                                                     0.0003384791);
 
 final_score_tree_246_c1673 := map(
@@ -10523,8 +10635,8 @@ final_score_tree_246_c1673 := map(
                                                                         -0.0016338827);
 
 final_score_tree_246_c1672 := map(
-    '' < iv_vs002_ssn_prior_dob AND iv_vs002_ssn_prior_dob < '0.5' => final_score_tree_246_c1673,
-    iv_vs002_ssn_prior_dob >= '0.5'                                  => -0.0504327556,
+    iv_vs002_ssn_prior_dob != ' '  AND  (Real)iv_vs002_ssn_prior_dob < 0.5 => final_score_tree_246_c1673,
+    (real)iv_vs002_ssn_prior_dob >= 0.5                                  => -0.0504327556,
                                                                       0.0024532837);
 
 final_score_tree_246 := map(
@@ -10559,7 +10671,7 @@ final_score_tree_247 := map(
 
 final_score_tree_248_c1685 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3', '2-3', '3-0', '3-1', '3-3'])                     => -0.0061695238,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1']) => 0.0124469405,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1']) => 0.0124469405,
                                                                                                  0.0072646696);
 
 final_score_tree_248_c1684 := map(
@@ -10758,13 +10870,13 @@ final_score_tree_255 := map(
                                                                           0.0002199103);
 
 final_score_tree_256_c1725 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '1.5' => -0.0108990532,
-    iv_in001_wealth_index >= '1.5'                                 => 0.0359612779,
+     iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 1.5 => -0.0108990532,
+    (real)iv_in001_wealth_index >= 1.5                                 => 0.0359612779,
                                                                     0.0215018224);
 
 final_score_tree_256_c1724 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-1', '1-3', '2-0', '3-0', '3-3']) => -0.0065922404,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '2-1', '2-3', '3-1'])         => final_score_tree_256_c1725,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '2-1', '2-3', '3-1'])         => final_score_tree_256_c1725,
                                                                                            0.0061370921);
 
 final_score_tree_256_c1723 := map(
@@ -10803,8 +10915,8 @@ final_score_tree_257_c1728 := map(
                                                                                0.0008017781);
 
 final_score_tree_257 := map(
-    '' < iv_prof_license_category AND iv_prof_license_category < '4.5' => final_score_tree_257_c1727,
-    iv_prof_license_category >= '4.5'                                    => 0.0474725058,
+     iv_prof_license_category != '  ' AND (real)iv_prof_license_category < 4.5 => final_score_tree_257_c1727,
+    (real)iv_prof_license_category >= 4.5                                    => 0.0474725058,
                                                                           final_score_tree_257_c1728);
 
 final_score_tree_258_c1733 := map(
@@ -10828,8 +10940,8 @@ final_score_tree_258_c1734 := map(
                                                                              -0.0102192131);
 
 final_score_tree_258 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_258_c1732,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_258_c1734,
+    iv_ams_college_tier !='  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_258_c1732,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_258_c1734,
                                                                 -0.0022441317);
 
 final_score_tree_259_c1737 := map(
@@ -10839,7 +10951,7 @@ final_score_tree_259_c1737 := map(
 
 final_score_tree_259_c1740 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-3', '3-1']) => -0.0240521826,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-3', '2-1', '3-0', '3-3'])                       => 0.0233567736,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-3', '2-1', '3-0', '3-3'])                       => 0.0233567736,
                                                                                                   -0.0015049524);
 
 final_score_tree_259_c1739 := map(
@@ -10918,8 +11030,8 @@ final_score_tree_262_c1752 := map(
                                                                                                                                                                    -0.0005318383);
 
 final_score_tree_262_c1755 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '10.5' => 0.0767676428,
-    iv_infutor_nap >= '10.5'                          => -0.0197453533,
+     iv_infutor_nap != ' '  AND (real)iv_infutor_nap < 10.5 => 0.0767676428,
+    (real)iv_infutor_nap >= 10.5                          => -0.0197453533,
                                                        0.0552024678);
 
 final_score_tree_262_c1754 := map(
@@ -11003,8 +11115,8 @@ final_score_tree_265_c1767 := map(
                                                                                 0.0024803947);
 
 final_score_tree_265 := map(
-    '' < iv_vp010_phn_nongeo AND iv_vp010_phn_nongeo < '0.5' => final_score_tree_265_c1767,
-    iv_vp010_phn_nongeo >= '0.5'                               => 0.0672509821,
+    iv_vp010_phn_nongeo != ' ' AND (real)iv_vp010_phn_nongeo < 0.5 => final_score_tree_265_c1767,
+    (real)iv_vp010_phn_nongeo >= 0.5                               => 0.0672509821,
                                                                 -0.0012451083);
 
 final_score_tree_266_c1772 := map(
@@ -11149,7 +11261,7 @@ final_score_tree_271_c1799 := map(
 
 final_score_tree_271_c1800 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '2-3'])                                                               => -0.0574274349,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0045667247,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0045667247,
                                                                                                                       0.0022162396);
 
 final_score_tree_271 := map(
@@ -11223,7 +11335,7 @@ final_score_tree_274_c1813 := map(
                                                                                    0.0047810701);
 
 final_score_tree_274_c1812 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '3-3']) => -0.0012032638,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '3-3']) => -0.0012032638,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '2-3', '3-0', '3-1'])                     => final_score_tree_274_c1813,
                                                                                                  -0.0238674812);
 
@@ -11308,8 +11420,8 @@ final_score_tree_277 := map(
                                                                           0.0010548135);
 
 final_score_tree_278_c1835 := map(
-    '' < iv_va050_apartment AND iv_va050_apartment < '0.5' => -0.0014611870,
-    iv_va050_apartment >= '0.5'                              => 0.0173205207,
+    iv_va050_apartment != ' ' AND (real)iv_va050_apartment < 0.5 => -0.0014611870,
+    (real)iv_va050_apartment >= 0.5                              => 0.0173205207,
                                                               0.0038784032);
 
 final_score_tree_278_c1834 := map(
@@ -11408,8 +11520,8 @@ final_score_tree_281 := map(
                                                                                                                        -0.0007940903);
 
 final_score_tree_282_c1855 := map(
-    '' < iv_input_dob_match_level AND iv_input_dob_match_level < '3.5' => -0.0555002223,
-    iv_input_dob_match_level >= '3.5'                                   => 0.0294245749,
+     iv_input_dob_match_level != ' ' AND (real)iv_input_dob_match_level < 3.5 => -0.0555002223,
+    (real)iv_input_dob_match_level >= 3.5                                   => 0.0294245749,
                                                                           0.0243676656);
 
 final_score_tree_282_c1854 := map(
@@ -11544,7 +11656,7 @@ final_score_tree_287_c1879 := map(
 
 final_score_tree_287_c1878 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-3', '2-0', '3-1', '3-3']) => final_score_tree_287_c1879,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-1', '2-1', '2-3', '3-0'])         => 0.0037908466,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-1', '2-1', '2-3', '3-0'])         => 0.0037908466,
                                                                                            0.0007252749);
 
 final_score_tree_287_c1877 := map(
@@ -11603,8 +11715,8 @@ final_score_tree_289_c1890 := map(
                                                                                             -0.0097145961);
 
 final_score_tree_289 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_289_c1887,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_289_c1890,
+     iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_289_c1887,
+   (real) iv_ams_college_tier >= 3.5                               => final_score_tree_289_c1890,
                                                                 -0.0005507513);
 
 final_score_tree_290_c1893 := map(
@@ -11643,8 +11755,8 @@ final_score_tree_291_c1898 := map(
                                                                                0.0029549990);
 
 final_score_tree_291_c1897 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => final_score_tree_291_c1898,
-    iv_in001_wealth_index >= '0.5'                                 => -0.0016504452,
+     iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 0.5 => final_score_tree_291_c1898,
+    (real)iv_in001_wealth_index >= 0.5                                 => -0.0016504452,
                                                                     0.0001979088);
 
 final_score_tree_291_c1900 := map(
@@ -11738,8 +11850,8 @@ final_score_tree_295_c1918 := map(
                                                                             -0.0000161106);
 
 final_score_tree_295_c1917 := map(
-    ''< iv_inp_addr_avm_land_use AND iv_inp_addr_avm_land_use < '1.5' => -0.0010131284,
-    iv_inp_addr_avm_land_use >= '1.5'                                    => 0.0113841172,
+    iv_inp_addr_avm_land_use !=' ' AND (real)iv_inp_addr_avm_land_use < 1.5 => -0.0010131284,
+    (real)iv_inp_addr_avm_land_use >= 1.5                                    => 0.0113841172,
                                                                           final_score_tree_295_c1918);
 
 final_score_tree_295_c1920 := map(
@@ -11774,7 +11886,7 @@ final_score_tree_296_c1923 := map(
 
 final_score_tree_296_c1922 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '2-1']) => final_score_tree_296_c1923,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '2-3', '3-0', '3-1', '3-3'])         => 0.0024309819,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '2-3', '3-0', '3-1', '3-3'])         => 0.0024309819,
                                                                                            0.0009072148);
 
 final_score_tree_296 := map(
@@ -11838,7 +11950,7 @@ final_score_tree_299_c1937 := map(
                                                                       0.0304990390);
 
 final_score_tree_299_c1940 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-3', '3-0', '3-1', '3-3']) => -0.0079116898,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-3', '3-0', '3-1', '3-3']) => -0.0079116898,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3', '2-1'])                                                               => 0.0883551105,
                                                                                                                       -0.0043196450);
 
@@ -11864,7 +11976,7 @@ final_score_tree_300_c1944 := map(
 
 final_score_tree_300_c1943 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '3-1', '3-3'])                     => final_score_tree_300_c1944,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0']) => 0.0034845787,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0']) => 0.0034845787,
                                                                                                  -0.0066502556);
 
 final_score_tree_300_c1945 := map(
@@ -12068,7 +12180,7 @@ final_score_tree_308_c1985 := map(
                                                                          -0.0327306534);
 
 final_score_tree_308_c1984 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '1-3', '2-0', '2-1'])         => final_score_tree_308_c1985,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '1-3', '2-0', '2-1'])         => final_score_tree_308_c1985,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '2-3', '3-0', '3-1', '3-3']) => 0.0174131447,
                                                                                            -0.0051285627);
 
@@ -12084,7 +12196,7 @@ final_score_tree_308 := map(
 
 final_score_tree_309_c1987 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-3', '2-0', '3-3']) => -0.0066876014,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-1', '2-1', '2-3', '3-0', '3-1'])         => 0.0004789555,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-1', '2-1', '2-3', '3-0', '3-1'])         => 0.0004789555,
                                                                                            -0.0026484137);
 
 final_score_tree_309_c1990 := map(
@@ -12098,8 +12210,8 @@ final_score_tree_309_c1989 := map(
                                                     -0.0024022058);
 
 final_score_tree_309_c1988 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '1.5' => 0.0066871752,
-    iv_inp_own_prop_x_addr_naprop >= '1.5'                                         => final_score_tree_309_c1989,
+    iv_inp_own_prop_x_addr_naprop != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 1.5 => 0.0066871752,
+    (real)iv_inp_own_prop_x_addr_naprop >= 1.5                                         => final_score_tree_309_c1989,
                                                                                     0.0019792971);
 
 final_score_tree_309 := map(
@@ -12114,7 +12226,7 @@ final_score_tree_310_c1995 := map(
 
 final_score_tree_310_c1994 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '2-0', '2-1', '3-1', '3-3'])       => final_score_tree_310_c1995,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-3', '3-0']) => 0.0205311419,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-3', '3-0']) => 0.0205311419,
                                                                                           0.0143657849);
 
 final_score_tree_310_c1993 := map(
@@ -12293,7 +12405,7 @@ final_score_tree_317_c2029 := map(
                                                                                          -0.0026973037);
 
 final_score_tree_317_c2027 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-1', '1-3', '2-3'])                                     => final_score_tree_317_c2028,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-1', '1-3', '2-3'])                                     => final_score_tree_317_c2028,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => final_score_tree_317_c2029,
                                                                                                          -0.0050693830);
 
@@ -12364,7 +12476,7 @@ final_score_tree_320_c2045 := map(
 
 final_score_tree_320_c2044 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '2-0', '3-1'])                                                 => -0.0534967396,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3', '3-0', '3-3']) => final_score_tree_320_c2045,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3', '3-0', '3-3']) => final_score_tree_320_c2045,
                                                                                                                0.0117032060);
 
 final_score_tree_320_c2043 := map(
@@ -12378,8 +12490,8 @@ final_score_tree_320_c2042 := map(
                                                                                   0.0067088491);
 
 final_score_tree_320 := map(
-   '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '35' => final_score_tree_320_c2042,
-    iv_inp_addr_mortgage_term >= '35'                                     => -0.0368197054,
+    iv_inp_addr_mortgage_term != '  ' AND  (real)iv_inp_addr_mortgage_term < 35 => final_score_tree_320_c2042,
+    (real)iv_inp_addr_mortgage_term >= 35                                     => -0.0368197054,
                                                                            -0.0074014853);
 
 final_score_tree_321_c2048 := map(
@@ -12408,8 +12520,8 @@ final_score_tree_321 := map(
                                                               -0.0036392624);
 
 final_score_tree_322_c2055 := map(
-    '' < iv_prv_addr_mortgage_present AND iv_prv_addr_mortgage_present < '0.5' => -0.0359333293,
-    iv_prv_addr_mortgage_present >= '0.5'                                        => 0.0873945596,
+    iv_prv_addr_mortgage_present != ''  AND (real)iv_prv_addr_mortgage_present < 0.5 => -0.0359333293,
+    (real)iv_prv_addr_mortgage_present >= 0.5                                        => 0.0873945596,
                                                                                   0.0451589812);
 
 final_score_tree_322_c2054 := map(
@@ -12469,7 +12581,7 @@ final_score_tree_324_c2063 := map(
 
 final_score_tree_324_c2065 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '1-3', '2-0', '2-1'])                     => -0.0426802719,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '2-3', '3-0', '3-1', '3-3']) => 0.0018013615,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '2-3', '3-0', '3-1', '3-3']) => 0.0018013615,
                                                                                                  -0.0007135812);
 
 final_score_tree_324_c2062 := map(
@@ -12478,8 +12590,8 @@ final_score_tree_324_c2062 := map(
                                                                  final_score_tree_324_c2065);
 
 final_score_tree_324 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => final_score_tree_324_c2062,
-    iv_in001_wealth_index >= '0.5'                                 => -0.0024080739,
+     iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 0.5 => final_score_tree_324_c2062,
+    (real)iv_in001_wealth_index >= 0.5                                 => -0.0024080739,
                                                                     0.0002244045);
 
 final_score_tree_325_c2069 := map(
@@ -12577,10 +12689,18 @@ final_score_tree_328_c2082 := map(
     iv_dist_bst_addr_to_prv_addr >= 15.5                                        => final_score_tree_328_c2085,
                                                                                    -0.0015081857);
 
+// final_score_tree_328 := map(
+    // '' < iv_cvi AND iv_cvi < '35' => final_score_tree_328_c2082,
+    // iv_cvi >= '35'                  => 0.0018006379,
+                                     // -0.0005649256);
+
 final_score_tree_328 := map(
-    '' < iv_cvi AND iv_cvi < '35' => final_score_tree_328_c2082,
-    iv_cvi >= '35'                  => 0.0018006379,
-                                     -0.0005649256);
+  iv_cvi != '  ' AND (integer)iv_cvi < 35 => final_score_tree_328_c2082,
+  (integer) iv_cvi >= 35                  => 0.0018006379,
+                                    -0.0005649256);
+
+
+
 
 final_score_tree_329_c2090 := map(
     NULL < iv_email_domain_free_count AND iv_email_domain_free_count < 1.5 => 0.0027641693,
@@ -12774,12 +12894,12 @@ final_score_tree_336_c2125 := map(
 
 final_score_tree_336_c2124 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-3', '2-0', '2-1', '3-3'])                     => -0.1113670132,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '1-1', '2-3', '3-0', '3-1']) => final_score_tree_336_c2125,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '1-1', '2-3', '3-0', '3-1']) => final_score_tree_336_c2125,
                                                                                                  -0.0363901691);
 
 final_score_tree_336 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '35' => final_score_tree_336_c2122,
-    iv_inp_addr_mortgage_term >= '35'                                     => final_score_tree_336_c2124,
+    iv_inp_addr_mortgage_term != '  ' AND (real)iv_inp_addr_mortgage_term < 35 => final_score_tree_336_c2122,
+    (real)iv_inp_addr_mortgage_term >= 35                                     => final_score_tree_336_c2124,
                                                                            0.0062058879);
 
 final_score_tree_337_c2128 := map(
@@ -12838,7 +12958,7 @@ final_score_tree_339_c2137 := map(
                                                                   -0.0004390128);
 
 final_score_tree_339_c2139 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-1', '1-3', '2-0', '3-0']) => -0.0456515060,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-1', '1-3', '2-0', '3-0']) => -0.0456515060,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '2-1', '2-3', '3-1', '3-3'])       => 0.0500589503,
                                                                                           -0.0061919320);
 
@@ -12973,8 +13093,8 @@ final_score_tree_344_c2165 := map(
                                                                     0.0106151701);
 
 final_score_tree_344_c2164 := map(
-    '' < iv_prv_addr_eda_sourced AND iv_prv_addr_eda_sourced < '0.5' => final_score_tree_344_c2165,
-    iv_prv_addr_eda_sourced >= '0.5'                                   => 0.0962332451,
+    iv_prv_addr_eda_sourced != ' ' AND (real)iv_prv_addr_eda_sourced < 0.5 => final_score_tree_344_c2165,
+    (real)iv_prv_addr_eda_sourced >= 0.5                                   => 0.0962332451,
                                                                         0.0138391545);
 
 final_score_tree_344 := map(
@@ -13072,10 +13192,19 @@ final_score_tree_348_c2183 := map(
     iv_age_at_low_issue >= 27.5                               => -0.0984427915,
                                                                  final_score_tree_348_c2184);
 
+// final_score_tree_348_c2182 := map(
+    // '' < iv_cvi AND iv_cvi < '25' => final_score_tree_348_c2183,
+    // iv_cvi >= '25'                  => 0.0002825521,
+                                     // -0.0001582663);
+
+
+
+
 final_score_tree_348_c2182 := map(
-    '' < iv_cvi AND iv_cvi < '25' => final_score_tree_348_c2183,
-    iv_cvi >= '25'                  => 0.0002825521,
-                                     -0.0001582663);
+    iv_cvi != '  ' AND (integer)iv_cvi < 25 => final_score_tree_348_c2183,
+  (integer)iv_cvi >= 25                  => 0.0002825521,
+                                      -0.0001582663);
+
 
 final_score_tree_348 := map(
     NULL < iv_paw_source_count AND iv_paw_source_count < 5.5 => final_score_tree_348_c2182,
@@ -13083,7 +13212,7 @@ final_score_tree_348 := map(
                                                                 0.0014875265);
 
 final_score_tree_349_c2188 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '3-0', '3-1', '3-3']) => -0.0008677133,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '3-0', '3-1', '3-3']) => -0.0008677133,
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-1', '2-3'])                                                               => 0.0899618495,
                                                                                                                       0.0033994473);
 
@@ -13138,8 +13267,8 @@ final_score_tree_351_c2197 := map(
                                                                              -0.0019892679);
 
 final_score_tree_351_c2200 := map(
-    '' < iv_prv_addr_eda_sourced AND iv_prv_addr_eda_sourced < '0.5' => 0.0346184365,
-    iv_prv_addr_eda_sourced >= '0.5'                                   => -0.0287268178,
+    iv_prv_addr_eda_sourced != ' ' AND (real)iv_prv_addr_eda_sourced < 0.5 => 0.0346184365,
+    (real)iv_prv_addr_eda_sourced >= 0.5                                   => -0.0287268178,
                                                                         0.0284357661);
 
 final_score_tree_351_c2199 := map(
@@ -13178,8 +13307,8 @@ final_score_tree_352_c2202 := map(
                                                                                                0.0091408457);
 
 final_score_tree_352 := map(
-    '' < iv_bst_addr_avm_land_use AND iv_bst_addr_avm_land_use < '1.5' => -0.0018766431,
-    iv_bst_addr_avm_land_use >= '1.5'                                    => final_score_tree_352_c2202,
+    iv_bst_addr_avm_land_use != ' ' AND (real)iv_bst_addr_avm_land_use < 1.5 => -0.0018766431,
+    (real)iv_bst_addr_avm_land_use >= 1.5                                    => final_score_tree_352_c2202,
                                                                           0.0004119714);
 
 final_score_tree_353_c2207 := map(
@@ -13283,8 +13412,8 @@ final_score_tree_356 := map(
                                                                                   -0.0018245839);
 
 final_score_tree_357_c2227 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '0.5' => -0.1257056493,
-    iv_prv_addr_naprop >= '0.5'                              => -0.0107939757,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 0.5 => -0.1257056493,
+    (real)iv_prv_addr_naprop >= 0.5                              => -0.0107939757,
                                                               -0.0557943514);
 
 final_score_tree_357_c2229 := map(
@@ -13394,7 +13523,7 @@ final_score_tree_361_c2250 := map(
 
 final_score_tree_361_c2249 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-1', '2-0', '2-1', '2-3', '3-1']) => final_score_tree_361_c2250,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '1-3', '3-0', '3-3'])         => 0.0048848215,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '1-3', '3-0', '3-3'])         => 0.0048848215,
                                                                                            -0.0045299554);
 
 final_score_tree_361_c2247 := map(
@@ -13403,8 +13532,8 @@ final_score_tree_361_c2247 := map(
                                                                                0.0044206694);
 
 final_score_tree_361 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '1.5' => -0.0011078313,
-    iv_prv_addr_naprop >= '1.5'                              => final_score_tree_361_c2247,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 1.5 => -0.0011078313,
+    (real)iv_prv_addr_naprop >= 1.5                              => final_score_tree_361_c2247,
                                                               0.0009500698);
 
 final_score_tree_362_c2255 := map(
@@ -13479,7 +13608,7 @@ final_score_tree_364_c2262 := map(
 
 final_score_tree_364 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '1-3', '2-0', '2-1'])                                   => final_score_tree_364_c2262,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '2-3', '3-0', '3-1', '3-3']) => 0.0013146204,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '2-3', '3-0', '3-1', '3-3']) => 0.0013146204,
                                                                                                         0.0052254452);
 
 final_score_tree_365_c2269 := map(
@@ -13578,8 +13707,8 @@ final_score_tree_368_c2284 := map(
                                                                                     -0.0095638471);
 
 final_score_tree_368 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_368_c2282,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_368_c2284,
+     iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_368_c2282,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_368_c2284,
                                                                 -0.0014913747);
 
 final_score_tree_369_c2288 := map(
@@ -13632,10 +13761,18 @@ final_score_tree_370 := map(
     iv_purch_sold_val_diff >= 197430                                  => final_score_tree_370_c2295,
                                                                          -0.0008291049);
 
+// final_score_tree_371_c2299 := map(
+    // '' < iv_cvi AND iv_cvi < '25' => -0.0227784833,
+    // iv_cvi >= '25'                  => -0.0000849380,
+                                     // -0.0004057844);
+
 final_score_tree_371_c2299 := map(
-    '' < iv_cvi AND iv_cvi < '25' => -0.0227784833,
-    iv_cvi >= '25'                  => -0.0000849380,
-                                     -0.0004057844);
+ iv_cvi != '  ' AND (integer)iv_cvi < 25 => -0.0227784833,
+     (integer)iv_cvi >= 25                  => -0.0000849380,
+                                      -0.0004057844);
+
+
+
 
 final_score_tree_371_c2298 := map(
     NULL < iv_age_at_high_issue AND iv_age_at_high_issue < 49.5 => final_score_tree_371_c2299,
@@ -13643,8 +13780,8 @@ final_score_tree_371_c2298 := map(
                                                                    0.0002658135);
 
 final_score_tree_371_c2297 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '1.5' => final_score_tree_371_c2298,
-    iv_vs100_ssn_problem >= '1.5'                                => 0.0220288169,
+    iv_vs100_ssn_problem != ' '  AND (real)iv_vs100_ssn_problem < 1.5 => final_score_tree_371_c2298,
+    (real)iv_vs100_ssn_problem >= 1.5                                => 0.0220288169,
                                                                   -0.0052894615);
 
 final_score_tree_371_c2300 := map(
@@ -13673,7 +13810,7 @@ final_score_tree_372_c2302 := map(
                                                             0.0097892493);
 
 final_score_tree_372_c2305 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => 0.0029067836,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => 0.0029067836,
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-0', '2-1'])                                                               => 0.0803869244,
                                                                                                                       -0.0030109751);
 
@@ -13728,18 +13865,18 @@ final_score_tree_374_c2315 := map(
                                                                  -0.0052430529);
 
 final_score_tree_374 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => final_score_tree_374_c2312,
-    iv_in001_wealth_index >= '0.5'                                 => final_score_tree_374_c2315,
+    iv_in001_wealth_index != ' ' AND (REAL)iv_in001_wealth_index < 0.5 => final_score_tree_374_c2312,
+    (REAL)iv_in001_wealth_index >= 0.5                                 => final_score_tree_374_c2315,
                                                                     0.0004611739);
 
 final_score_tree_375_c2317 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3'])                                                                             => -0.0441862180,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => 0.0048674174,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => 0.0048674174,
                                                                                                                              0.0041877080);
 
 final_score_tree_375_c2320 := map(
     ((string)iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '2-1', '3-0'])                     => -0.0314136042,
-    ((string)iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-3', '2-0', '2-3', '3-1', '3-3']) => 0.0111843260,
+    ((string)iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-3', '2-0', '2-3', '3-1', '3-3']) => 0.0111843260,
                                                                                                  -0.0001602277);
 
 final_score_tree_375_c2319 := map(
@@ -13938,8 +14075,8 @@ final_score_tree_383_c2359 := map(
                                         -0.0078712363);
 
 final_score_tree_383_c2358 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '10.5' => final_score_tree_383_c2359,
-    iv_bst_own_prop_x_addr_naprop >= '10.5'                                         => -0.0499542929,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 10.5 => final_score_tree_383_c2359,
+    (real)iv_bst_own_prop_x_addr_naprop >= 10.5                                         => -0.0499542929,
                                                                                      -0.0127592565);
 
 final_score_tree_383_c2357 := map(
@@ -14028,8 +14165,8 @@ final_score_tree_386_c2372 := map(
                                                                          0.0040352012);
 
 final_score_tree_386 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_386_c2372,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0008034889,
+    iv_prv_own_prop_x_addr_naprop !='  ' AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_386_c2372,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0008034889,
                                                                                     -0.0007771783);
 
 final_score_tree_387_c2378 := map(
@@ -14038,8 +14175,8 @@ final_score_tree_387_c2378 := map(
                                                             0.0010665764);
 
 final_score_tree_387_c2377 := map(
-    '' < iv_pl001_addr_stability_v2 AND iv_pl001_addr_stability_v2 < '1.5' => -0.0100920444,
-    iv_pl001_addr_stability_v2 >= '1.5'                                      => final_score_tree_387_c2378,
+   iv_pl001_addr_stability_v2 != ' ' AND (real)iv_pl001_addr_stability_v2 < 1.5 => -0.0100920444,
+    (real)iv_pl001_addr_stability_v2 >= 1.5                                      => final_score_tree_387_c2378,
                                                                               0.0003609891);
 
 final_score_tree_387_c2380 := map(
@@ -14099,7 +14236,7 @@ final_score_tree_389_c2388 := map(
 
 final_score_tree_389_c2387 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '2-0', '2-1', '3-1', '3-3'])       => final_score_tree_389_c2388,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-3', '2-3', '3-0']) => 0.0015903127,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-3', '2-3', '3-0']) => 0.0015903127,
                                                                                           -0.0001593068);
 
 final_score_tree_389 := map(
@@ -14258,7 +14395,7 @@ final_score_tree_395 := map(
                                                                           0.0014078871);
 
 final_score_tree_396_c2425 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-3', '3-0'])                                     => -0.0147620126,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-3', '3-0'])                                     => -0.0147620126,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-1', '3-3']) => 0.0652993465,
                                                                                                          0.0326453278);
 
@@ -14298,7 +14435,7 @@ final_score_tree_397_c2429 := map(
                                                                           -0.0166862377);
 
 final_score_tree_397_c2428 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-3', '2-3'])         => final_score_tree_397_c2429,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-3', '2-3'])         => final_score_tree_397_c2429,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0116070866,
                                                                                            0.0012475496);
 
@@ -14448,7 +14585,7 @@ final_score_tree_403_c2458 := map(
                                                                       0.0021988881);
 
 final_score_tree_403_c2457 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_403_c2458,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_403_c2458,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '1-3', '2-3', '3-1'])                                   => 0.0208380272,
                                                                                                         0.0042160078);
 
@@ -14474,7 +14611,7 @@ final_score_tree_404_c2462 := map(
 
 final_score_tree_404_c2465 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '1-1', '1-3', '2-3'])                     => -0.0379974694,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0046510123,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0046510123,
                                                                                                  -0.0018496162);
 
 final_score_tree_404 := map(
@@ -14548,8 +14685,8 @@ final_score_tree_407_c2479 := map(
                                                                                    0.0130607513);
 
 final_score_tree_407_c2478 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '11.5' => final_score_tree_407_c2479,
-    iv_infutor_nap >= '11.5'                          => 0.0823733959,
+    iv_infutor_nap != ' '  AND (real)iv_infutor_nap < 11.5 => final_score_tree_407_c2479,
+    (real)iv_infutor_nap >= 11.5                          => 0.0823733959,
                                                        0.0118114872);
 
 final_score_tree_407 := map(
@@ -14623,7 +14760,7 @@ final_score_tree_410_c2493 := map(
                                                                                0.0031712687);
 
 final_score_tree_410_c2492 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '1-1', '2-0', '2-1', '2-3', '3-0']) => -0.0422810564,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '1-1', '2-0', '2-1', '2-3', '3-0']) => -0.0422810564,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-3', '3-1', '3-3'])                     => final_score_tree_410_c2493,
                                                                                                  -0.0222187664);
 
@@ -14658,8 +14795,8 @@ final_score_tree_411 := map(
                                                                                           0.0036443842);
 
 final_score_tree_412_c2504 := map(
-    '' < iv_bst_addr_mortgage_present AND iv_bst_addr_mortgage_present < '0.5' => 0.0169285472,
-    iv_bst_addr_mortgage_present >= '0.5'                                        => 0.0008705567,
+     iv_bst_addr_mortgage_present != ' ' AND (real)iv_bst_addr_mortgage_present < 0.5 => 0.0169285472,
+    (real)iv_bst_addr_mortgage_present >= 0.5                                        => 0.0008705567,
                                                                                   0.0046385639);
 
 final_score_tree_412_c2503 := map(
@@ -14928,8 +15065,8 @@ final_score_tree_422_c2552 := map(
                                                                                  final_score_tree_422_c2555);
 
 final_score_tree_422 := map(
-    '' < iv_pl001_addr_stability_v2 AND iv_pl001_addr_stability_v2 < '1.5' => final_score_tree_422_c2552,
-    iv_pl001_addr_stability_v2 >= '1.5'                                      => -0.0005885105,
+    iv_pl001_addr_stability_v2!= ' ' AND (real)iv_pl001_addr_stability_v2 < 1.5 => final_score_tree_422_c2552,
+    (real)iv_pl001_addr_stability_v2 >= 1.5                                      => -0.0005885105,
                                                                               -0.0048228690);
 
 final_score_tree_423_c2557 := map(
@@ -15018,7 +15155,7 @@ final_score_tree_426_c2575 := map(
                                                                                   0.0153738055);
 
 final_score_tree_426_c2573 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '3-0', '3-1', '3-3'])         => final_score_tree_426_c2574,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '3-0', '3-1', '3-3'])         => final_score_tree_426_c2574,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3']) => final_score_tree_426_c2575,
                                                                                            0.0030263536);
 
@@ -15028,8 +15165,8 @@ final_score_tree_426_c2572 := map(
                                                     0.0047758305);
 
 final_score_tree_426 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_426_c2572,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0009987676,
+    iv_prv_own_prop_x_addr_naprop != '  '  AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_426_c2572,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0009987676,
                                                                                     -0.0006105547);
 
 final_score_tree_427_c2578 := map(
@@ -15223,8 +15360,8 @@ final_score_tree_434_c2615 := map(
                                                                               0.0011083017);
 
 final_score_tree_434_c2613 := map(
-    '' < iv_ed001_college_ind_26 AND iv_ed001_college_ind_26 < '0.5' => final_score_tree_434_c2614,
-    iv_ed001_college_ind_26 >= '0.5'                                   => 0.0055613536,
+   iv_ed001_college_ind_26  != ' ' AND (real)iv_ed001_college_ind_26 < 0.5 => final_score_tree_434_c2614,
+    (real)iv_ed001_college_ind_26 >= 0.5                                   => 0.0055613536,
                                                                         final_score_tree_434_c2615);
 
 final_score_tree_434 := map(
@@ -15248,8 +15385,8 @@ final_score_tree_435_c2620 := map(
                                                                              0.0242095217);
 
 final_score_tree_435_c2617 := map(
-    '' < iv_bst_addr_naprop AND iv_bst_addr_naprop < '2.5' => final_score_tree_435_c2618,
-    iv_bst_addr_naprop >= '2.5'                              => final_score_tree_435_c2620,
+    iv_bst_addr_naprop != ' ' AND (real)iv_bst_addr_naprop < 2.5 => final_score_tree_435_c2618,
+    (real)iv_bst_addr_naprop >= 2.5                              => final_score_tree_435_c2620,
                                                               -0.0054238856);
 
 final_score_tree_435 := map(
@@ -15328,8 +15465,8 @@ final_score_tree_438_c2634 := map(
                                                               -0.0021543424);
 
 final_score_tree_438 := map(
-    '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => -0.0008717713,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => final_score_tree_438_c2632,
+   iv_vp091_phnzip_mismatch != ' '  AND (real)iv_vp091_phnzip_mismatch < 0.5 => -0.0008717713,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => final_score_tree_438_c2632,
                                                                           final_score_tree_438_c2634);
 
 final_score_tree_439_c2637 := map(
@@ -15369,7 +15506,7 @@ final_score_tree_440_c2645 := map(
 
 final_score_tree_440_c2644 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '2-0', '2-1'])                                   => final_score_tree_440_c2645,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => 0.0006562732,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => 0.0006562732,
                                                                                                         -0.0001034600);
 
 final_score_tree_440_c2642 := map(
@@ -15383,7 +15520,7 @@ final_score_tree_440 := map(
                                                                               0.0002273242);
 
 final_score_tree_441_c2647 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '2-0', '3-3'])                       => -0.0714775431,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '2-0', '3-3'])                       => -0.0714775431,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1']) => 0.0045794547,
                                                                                                   -0.0368395369);
 
@@ -15533,7 +15670,7 @@ final_score_tree_446 := map(
                                                                                   -0.0025208451);
 
 final_score_tree_447_c2680 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '2-1', '3-0'])                                                   => -0.0169555631,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '2-1', '3-0'])                                                   => -0.0169555631,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-3', '3-1', '3-3']) => 0.0461458003,
                                                                                                                 0.0369139288);
 
@@ -15609,7 +15746,7 @@ final_score_tree_449 := map(
 
 final_score_tree_450_c2694 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '3-1'])                                                               => -0.0632506417,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => -0.0056318322,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => -0.0056318322,
                                                                                                                       -0.0081327796);
 
 final_score_tree_450_c2695 := map(
@@ -15663,7 +15800,7 @@ final_score_tree_452_c2705 := map(
                                                                                                                             0.0505634498);
 
 final_score_tree_452_c2704 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-3', '2-0', '3-0', '3-1', '3-3']) => 0.0138746085,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-3', '2-0', '3-0', '3-1', '3-3']) => 0.0138746085,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-0', '1-1', '2-1', '2-3'])       => final_score_tree_452_c2705,
                                                                                           0.0235349187);
 
@@ -15703,8 +15840,8 @@ final_score_tree_453_c2710 := map(
                                                    -0.0024425424);
 
 final_score_tree_453 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '2.5' => final_score_tree_453_c2707,
-    iv_bst_own_prop_x_addr_naprop >= '2.5'                                         => final_score_tree_453_c2710,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 2.5 => final_score_tree_453_c2707,
+    (real)iv_bst_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_453_c2710,
                                                                                     -0.0014407482);
 
 final_score_tree_454_c2713 := map(
@@ -15748,7 +15885,7 @@ final_score_tree_455_c2720 := map(
                                                                   0.0513459752);
 
 final_score_tree_455_c2717 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-3', '2-0', '3-1'])         => final_score_tree_455_c2718,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-3', '2-0', '3-1'])         => final_score_tree_455_c2718,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '2-1', '2-3', '3-0', '3-3']) => final_score_tree_455_c2720,
                                                                                            0.0235432175);
 
@@ -15779,7 +15916,7 @@ final_score_tree_456_c2722 := map(
 
 final_score_tree_456 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '2-1', '2-3', '3-3'])                                   => final_score_tree_456_c2722,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '3-0', '3-1']) => 0.0013183278,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '3-0', '3-1']) => 0.0013183278,
                                                                                                         -0.0015985886);
 
 final_score_tree_457_c2729 := map(
@@ -15834,7 +15971,7 @@ final_score_tree_458 := map(
 
 final_score_tree_459_c2738 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '2-0', '2-3', '3-0', '3-1', '3-3']) => -0.0043003272,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-1', '1-3', '2-1'])         => 0.0585196294,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-1', '1-3', '2-1'])         => 0.0585196294,
                                                                                            0.0258090309);
 
 final_score_tree_459_c2737 := map(
@@ -16059,7 +16196,7 @@ final_score_tree_467 := map(
 
 final_score_tree_468_c2783 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-3', '2-0', '3-0', '3-1', '3-3']) => -0.0266807680,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '1-1', '2-1', '2-3'])         => 0.0324979092,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '1-1', '2-1', '2-3'])         => 0.0324979092,
                                                                                            -0.0020541983);
 
 final_score_tree_468_c2782 := map(
@@ -16073,7 +16210,7 @@ final_score_tree_468_c2785 := map(
                                                           -0.0016968523);
 
 final_score_tree_468_c2784 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-3']) => final_score_tree_468_c2785,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-3']) => final_score_tree_468_c2785,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '2-0', '2-1', '3-1'])                                   => 0.0511795396,
                                                                                                         0.0029312759);
 
@@ -16084,7 +16221,7 @@ final_score_tree_468 := map(
 
 final_score_tree_469_c2789 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '2-1', '2-3', '3-1', '3-3'])       => -0.0585490663,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-3', '2-0', '3-0']) => -0.0001400804,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-3', '2-0', '3-0']) => -0.0001400804,
                                                                                           -0.0216222315);
 
 final_score_tree_469_c2788 := map(
@@ -16117,10 +16254,18 @@ final_score_tree_470_c2793 := map(
     iv_pv001_bst_avm_chg_1yr_pct >= 108.85                                        => final_score_tree_470_c2794,
                                                                                      -0.0214878845);
 
+// final_score_tree_470_c2792 := map(
+    // '' < iv_cvi AND iv_cvi < '15' => final_score_tree_470_c2793,
+    // iv_cvi >= '15'                  => 0.0001942615,
+                                     // -0.0000754156);
+                                     
+
+
 final_score_tree_470_c2792 := map(
-    '' < iv_cvi AND iv_cvi < '15' => final_score_tree_470_c2793,
-    iv_cvi >= '15'                  => 0.0001942615,
-                                     -0.0000754156);
+    iv_cvi != '  ' AND (integer)iv_cvi < 15 => final_score_tree_470_c2793,
+    (integer)iv_cvi >= 15                 => 0.0001942615,
+                                    -0.0000754156);
+
 
 final_score_tree_470_c2795 := map(
     NULL < iv_src_bureau_dob_count AND iv_src_bureau_dob_count < 6.5 => 0.0080300495,
@@ -16193,8 +16338,8 @@ final_score_tree_473_c2809 := map(
                                                                   0.0028657892);
 
 final_score_tree_473_c2807 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '1.5' => final_score_tree_473_c2808,
-    iv_prv_addr_naprop >= '1.5'                              => final_score_tree_473_c2809,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 1.5 => final_score_tree_473_c2808,
+    (real)iv_prv_addr_naprop >= 1.5                              => final_score_tree_473_c2809,
                                                               -0.0014583257);
 
 final_score_tree_473_c2810 := map(
@@ -16253,8 +16398,8 @@ final_score_tree_475_c2817 := map(
                                                                         0.0040102627);
 
 final_score_tree_475 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_475_c2817,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0010832437,
+    iv_prv_own_prop_x_addr_naprop != '  '  AND  (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_475_c2817,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0010832437,
                                                                                     -0.0017034681);
 
 final_score_tree_476_c2824 := map(
@@ -16368,7 +16513,7 @@ final_score_tree_480_c2843 := map(
                                                                                                                         0.0018447340);
 
 final_score_tree_480_c2845 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-3', '2-3'])                                     => -0.0070102169,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-3', '2-3'])                                     => -0.0070102169,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0373196027,
                                                                                                          0.0230146684);
 
@@ -16488,8 +16633,8 @@ final_score_tree_485_c2867 := map(
                                                           0.0169847778);
 
 final_score_tree_485_c2869 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => 0.0134767553,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => -0.0011759215,
+    iv_inp_own_prop_x_addr_naprop != '  '  AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => 0.0134767553,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => -0.0011759215,
                                                                                     0.0087959398);
 
 final_score_tree_485_c2870 := map(
@@ -16558,8 +16703,8 @@ final_score_tree_487 := map(
                                                                         0.0005876356);
 
 final_score_tree_488_c2883 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '11.5' => -0.0032761182,
-    iv_infutor_nap >= '11.5'                          => 0.0079653513,
+    iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 11.5 => -0.0032761182,
+    (real)iv_infutor_nap >= 11.5                          => 0.0079653513,
                                                        0.0046501190);
 
 final_score_tree_488_c2882 := map(
@@ -16693,8 +16838,8 @@ final_score_tree_493_c2908 := map(
                                                                                      0.0000410659);
 
 final_score_tree_493_c2907 := map(
-    '' < iv_prof_license_category AND iv_prof_license_category < '4.5' => final_score_tree_493_c2908,
-    iv_prof_license_category >= '4.5'                                    => 0.0407069762,
+    iv_prof_license_category != '  ' AND (real)iv_prof_license_category < 4.5 => final_score_tree_493_c2908,
+    (real)iv_prof_license_category >= 4.5                                    => 0.0407069762,
                                                                           -0.0032958546);
 
 final_score_tree_493_c2910 := map(
@@ -16833,8 +16978,8 @@ final_score_tree_498 := map(
                                                                     -0.0022634963);
 
 final_score_tree_499_c2938 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => -0.0091360172,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => -0.0289545919,
+    iv_inp_own_prop_x_addr_naprop  != '  ' AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => -0.0091360172,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => -0.0289545919,
                                                                                     -0.0152482519);
 
 final_score_tree_499_c2940 := map(
@@ -17088,7 +17233,7 @@ final_score_tree_509_c2988 := map(
                                                                          -0.0324810802);
 
 final_score_tree_509_c2989 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-3', '2-0', '2-3', '3-0'])                       => -0.0186478223,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-3', '2-0', '2-3', '3-0'])                       => -0.0186478223,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '2-1', '3-1', '3-3']) => 0.0313409587,
                                                                                                   0.0150987567);
 
@@ -17113,8 +17258,8 @@ final_score_tree_510_c2993 := map(
                                                                                         -0.0134727235);
 
 final_score_tree_510_c2992 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '4.5' => -0.0004811612,
-    iv_ams_college_tier >= '4.5'                               => final_score_tree_510_c2993,
+     iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 4.5 => -0.0004811612,
+    (real)iv_ams_college_tier >= 4.5                               => final_score_tree_510_c2993,
                                                                 -0.0009531778);
 
 final_score_tree_510_c2995 := map(
@@ -17269,7 +17414,7 @@ final_score_tree_516_c3022 := map(
 
 final_score_tree_516_c3025 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-3', '3-0', '3-1'])                                   => -0.0200624748,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-3']) => 0.0605796734,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-3']) => 0.0605796734,
                                                                                                         0.0399967251);
 
 final_score_tree_516_c3024 := map(
@@ -17433,7 +17578,7 @@ final_score_tree_522 := map(
                                                                                      0.0004498341);
 
 final_score_tree_523_c3060 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '1-1', '1-3', '2-1', '2-3', '3-1']) => -0.1060246447,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '1-1', '1-3', '2-1', '2-3', '3-1']) => -0.1060246447,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '2-0', '3-0', '3-3'])       => 0.0368749056,
                                                                                           -0.0221744953);
 
@@ -17457,10 +17602,19 @@ final_score_tree_523 := map(
     iv_inp_addr_building_area >= 268539                                     => -0.1128489813,
                                                                                -0.0006817265);
 
-final_score_tree_524_c3063 := map(
-    '' < iv_nas_summary AND iv_nas_summary < '5.5' => 0.0753787460,
-    iv_nas_summary >= '5.5'                          => 0.0027482572,
-                                                      0.0029367475);
+// final_score_tree_524_c3063 := map(
+    // '' < iv_nas_summary AND iv_nas_summary < '5.5' => 0.0753787460,
+    // iv_nas_summary >= '5.5'                          => 0.0027482572,
+ //                                                     0.0029367475);
+
+ final_score_tree_524_c3063 := map(
+     iv_nas_summary != '  ' AND (real)iv_nas_summary < 5.5 => 0.0753787460,
+     (real)iv_nas_summary >= 5.5                          => 0.0027482572,
+                                                     0.0029367475);
+
+
+
+
 
 final_score_tree_524_c3065 := map(
     NULL < iv_pl001_m_snc_prop_adl_fs AND iv_pl001_m_snc_prop_adl_fs < 19.5 => -0.0122041093,
@@ -17468,13 +17622,13 @@ final_score_tree_524_c3065 := map(
                                                                                -0.0027404534);
 
 final_score_tree_524_c3064 := map(
-    '' < iv_ed001_college_ind_26 AND iv_ed001_college_ind_26 < '0.5' => 0.0163342967,
-    iv_ed001_college_ind_26 >= '0.5'                                   => 0.0193541571,
+     iv_ed001_college_ind_26 != ' ' AND (real)iv_ed001_college_ind_26 < 0.5 => 0.0163342967,
+    (real)iv_ed001_college_ind_26 >= 0.5                                   => 0.0193541571,
                                                                         final_score_tree_524_c3065);
 
 final_score_tree_524_c3062 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => final_score_tree_524_c3063,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => final_score_tree_524_c3064,
+    iv_inp_own_prop_x_addr_naprop != '  '  AND (REAL)iv_inp_own_prop_x_addr_naprop < 2.5 => final_score_tree_524_c3063,
+    (REAL)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_524_c3064,
                                                                                     -0.0446561648);
 
 final_score_tree_524 := map(
@@ -17533,7 +17687,7 @@ final_score_tree_526 := map(
                                                                                      0.0044555559);
 
 final_score_tree_527_c3079 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '2-1', '2-3', '3-1'])         => -0.0042675224,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '2-1', '2-3', '3-1'])         => -0.0042675224,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '1-3', '2-0', '3-0', '3-3']) => 0.0440110709,
                                                                                            0.0191453122);
 
@@ -17728,8 +17882,8 @@ final_score_tree_534_c3112 := map(
                                                             final_score_tree_534_c3115);
 
 final_score_tree_534 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '5.5' => 0.0016325940,
-    iv_ams_college_tier >= '5.5'                               => final_score_tree_534_c3112,
+    iv_ams_college_tier  != '  ' AND (real)iv_ams_college_tier < 5.5 => 0.0016325940,
+    (real)iv_ams_college_tier >= 5.5                               => final_score_tree_534_c3112,
                                                                 -0.0007089796);
 
 final_score_tree_535_c3117 := map(
@@ -17769,7 +17923,7 @@ final_score_tree_536_c3123 := map(
 
 final_score_tree_536_c3122 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '1-3', '2-0', '3-3'])                                   => -0.0048843397,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '2-1', '2-3', '3-0', '3-1']) => final_score_tree_536_c3123,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '2-1', '2-3', '3-0', '3-1']) => final_score_tree_536_c3123,
                                                                                                         -0.0001213917);
 
 final_score_tree_536_c3125 := map(
@@ -17878,8 +18032,8 @@ final_score_tree_540_c3143 := map(
                                                                              final_score_tree_540_c3145);
 
 final_score_tree_540 := map(
-    '' < iv_vp091_phnzip_mismatch AND iv_vp091_phnzip_mismatch < '0.5' => -0.0013168211,
-    iv_vp091_phnzip_mismatch >= '0.5'                                    => final_score_tree_540_c3142,
+    iv_vp091_phnzip_mismatch != ' ' AND (real)iv_vp091_phnzip_mismatch < 0.5 => -0.0013168211,
+    (real)iv_vp091_phnzip_mismatch >= 0.5                                    => final_score_tree_540_c3142,
                                                                           final_score_tree_540_c3143);
 
 final_score_tree_541_c3148 := map(
@@ -18003,8 +18157,8 @@ final_score_tree_545_c3169 := map(
                                                   0.0142258868);
 
 final_score_tree_545 := map(
-    '' < iv_prof_license_category AND iv_prof_license_category < '2.5' => final_score_tree_545_c3167,
-    iv_prof_license_category >= '2.5'                                    => final_score_tree_545_c3169,
+    iv_prof_license_category!= '  ' AND (real)iv_prof_license_category < 2.5 => final_score_tree_545_c3167,
+    (real)iv_prof_license_category >= 2.5                                    => final_score_tree_545_c3169,
                                                                           -0.0024644282);
 
 final_score_tree_546_c3172 := map(
@@ -18084,12 +18238,12 @@ final_score_tree_548 := map(
 
 final_score_tree_549_c3188 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3', '2-1', '3-1'])                                                 => -0.0224442290,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-3', '3-0', '3-3']) => 0.0002580255,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-0', '2-3', '3-0', '3-3']) => 0.0002580255,
                                                                                                                -0.0018516682);
 
 final_score_tree_549_c3190 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '1.5' => 0.0243184254,
-    iv_in001_wealth_index >= '1.5'                                 => 0.0072132398,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 1.5 => 0.0243184254,
+    (real)iv_in001_wealth_index >= 1.5                                 => 0.0072132398,
                                                                     0.0114574150);
 
 final_score_tree_549_c3189 := map(
@@ -18273,8 +18427,8 @@ final_score_tree_556_c3224 := map(
                                                                                                 final_score_tree_556_c3225);
 
 final_score_tree_556_c3222 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '1.5' => final_score_tree_556_c3223,
-    iv_inp_own_prop_x_addr_naprop >= '1.5'                                         => final_score_tree_556_c3224,
+    iv_inp_own_prop_x_addr_naprop != '  '  AND (real)iv_inp_own_prop_x_addr_naprop < 1.5 => final_score_tree_556_c3223,
+    (real)iv_inp_own_prop_x_addr_naprop >= 1.5                                         => final_score_tree_556_c3224,
                                                                                     0.0068420712);
 
 final_score_tree_556 := map(
@@ -18343,8 +18497,8 @@ final_score_tree_559_c3238 := map(
                                                                           -0.0023646352);
 
 final_score_tree_559_c3240 := map(
-    '' < iv_prv_addr_eda_sourced AND iv_prv_addr_eda_sourced < '0.5' => 0.0156953069,
-    iv_prv_addr_eda_sourced >= '0.5'                                   => -0.0314387818,
+    iv_prv_addr_eda_sourced != ' ' AND (real)iv_prv_addr_eda_sourced < 0.5 => 0.0156953069,
+    (real)iv_prv_addr_eda_sourced >= 0.5                                   => -0.0314387818,
                                                                         0.0112628821);
 
 final_score_tree_559_c3237 := map(
@@ -18363,7 +18517,7 @@ final_score_tree_560_c3243 := map(
                                                                              0.0018729394);
 
 final_score_tree_560_c3245 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-3']) => 0.0222813932,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '3-3']) => 0.0222813932,
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-3', '3-0', '3-1'])                                                 => 0.1165603951,
                                                                                                                0.0265693670);
 
@@ -18378,8 +18532,8 @@ final_score_tree_560_c3242 := map(
                                                                    0.0343500526);
 
 final_score_tree_560 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_560_c3242,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0015343151,
+    iv_prv_own_prop_x_addr_naprop  != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_560_c3242,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0015343151,
                                                                                     0.0031370520);
 
 final_score_tree_561_c3250 := map(
@@ -18414,7 +18568,7 @@ final_score_tree_562_c3255 := map(
 
 final_score_tree_562_c3254 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '1-3', '2-3'])                                                 => final_score_tree_562_c3255,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => -0.0001682023,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => -0.0001682023,
                                                                                                                -0.0035776562);
 
 final_score_tree_562_c3253 := map(
@@ -18473,8 +18627,8 @@ final_score_tree_564_c3262 := map(
                                         -0.0010118053);
 
 final_score_tree_564_c3265 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '2.5' => 0.0128139596,
-    iv_inp_own_prop_x_addr_naprop >= '2.5'                                         => -0.0013447716,
+    iv_inp_own_prop_x_addr_naprop != ' ' AND (real)iv_inp_own_prop_x_addr_naprop < 2.5 => 0.0128139596,
+    (real)iv_inp_own_prop_x_addr_naprop >= 2.5                                         => -0.0013447716,
                                                                                     0.0045298010);
 
 final_score_tree_564 := map(
@@ -18603,8 +18757,8 @@ final_score_tree_569_c3287 := map(
                                                                             -0.0052973231);
 
 final_score_tree_569 := map(
-    '' < iv_pl001_addr_stability_v2 AND iv_pl001_addr_stability_v2 < '2.5' => final_score_tree_569_c3287,
-    iv_pl001_addr_stability_v2 >= '2.5'                                      => 0.0006677516,
+     iv_pl001_addr_stability_v2!= ' ' AND (real)iv_pl001_addr_stability_v2 < 2.5 => final_score_tree_569_c3287,
+    (real)iv_pl001_addr_stability_v2 >= 2.5                                      => 0.0006677516,
                                                                               -0.0005245692);
 
 final_score_tree_570_c3293 := map(
@@ -18719,7 +18873,7 @@ final_score_tree_574_c3313 := map(
 
 final_score_tree_574_c3315 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '1-1', '2-0', '2-3', '3-0', '3-3']) => 0.0146728031,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-3', '2-1', '3-1'])         => 0.0940763839,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-3', '2-1', '3-1'])         => 0.0940763839,
                                                                                            0.0388025131);
 
 final_score_tree_574_c3312 := map(
@@ -18784,7 +18938,7 @@ final_score_tree_576 := map(
 
 final_score_tree_577_c3329 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '2-3', '3-1']) => -0.1018360231,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '2-0', '3-0', '3-3'])                       => -0.0095589606,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '2-0', '3-0', '3-3'])                       => -0.0095589606,
                                                                                                   -0.0281111672);
 
 final_score_tree_577_c3330 := map(
@@ -19009,7 +19163,7 @@ final_score_tree_585 := map(
 
 final_score_tree_586_c3374 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '2-1', '3-1'])                                   => -0.0275154746,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-3', '3-0', '3-3']) => 0.0364030975,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-3', '3-0', '3-3']) => 0.0364030975,
                                                                                                         0.0270184549);
 
 final_score_tree_586_c3375 := map(
@@ -19028,8 +19182,8 @@ final_score_tree_586_c3372 := map(
                                                                          0.0034827330);
 
 final_score_tree_586 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '0.5' => final_score_tree_586_c3372,
-    iv_prv_own_prop_x_addr_naprop >= '0.5'                                         => -0.0011447127,
+    iv_prv_own_prop_x_addr_naprop  != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 0.5 => final_score_tree_586_c3372,
+    (real)iv_prv_own_prop_x_addr_naprop >= 0.5                                         => -0.0011447127,
                                                                                     0.0004178072);
 
 final_score_tree_587_c3380 := map(
@@ -19228,8 +19382,8 @@ final_score_tree_594_c3412 := map(
                                                                                         0.0027341000);
 
 final_score_tree_594 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '0.5' => final_score_tree_594_c3412,
-    iv_in001_wealth_index >= '0.5'                                 => -0.0014701195,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 0.5 => final_score_tree_594_c3412,
+    (real)iv_in001_wealth_index >= 0.5                                 => -0.0014701195,
                                                                     -0.0005611182);
 
 final_score_tree_595_c3420 := map(
@@ -19288,7 +19442,7 @@ final_score_tree_597_c3429 := map(
                                                                          -0.0363150338);
 
 final_score_tree_597_c3428 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_597_c3429,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_597_c3429,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '2-3', '3-1'])                                   => 0.0548804706,
                                                                                                         -0.0237875955);
 
@@ -19589,7 +19743,7 @@ final_score_tree_609_c3489 := map(
 
 final_score_tree_609_c3488 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '1-1', '2-0'])                                   => -0.0288219536,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_609_c3489,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_609_c3489,
                                                                                                         0.0230438367);
 
 final_score_tree_609_c3490 := map(
@@ -19699,7 +19853,7 @@ final_score_tree_613_c3508 := map(
 
 final_score_tree_613_c3507 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-0'])                                                                             => final_score_tree_613_c3508,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => -0.0001818635,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => -0.0001818635,
                                                                                                                              -0.0003406953);
 
 final_score_tree_613 := map(
@@ -19733,7 +19887,7 @@ final_score_tree_614 := map(
                                                                                  -0.0001912227);
 
 final_score_tree_615_c3519 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '2-0', '2-3', '3-3'])                       => -0.0732639661,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '2-0', '2-3', '3-3'])                       => -0.0732639661,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '1-3', '2-1', '3-0', '3-1']) => 0.0429979221,
                                                                                                   0.0049724173);
 
@@ -19823,8 +19977,8 @@ final_score_tree_618_c3534 := map(
                                                                                   -0.0096290331);
 
 final_score_tree_618_c3532 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '3.5' => final_score_tree_618_c3533,
-    iv_prv_own_prop_x_addr_naprop >= '3.5'                                         => final_score_tree_618_c3534,
+    iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 3.5 => final_score_tree_618_c3533,
+    (real)iv_prv_own_prop_x_addr_naprop >= 3.5                                         => final_score_tree_618_c3534,
                                                                                     -0.0230905379);
 
 final_score_tree_618 := map(
@@ -19908,8 +20062,8 @@ final_score_tree_621 := map(
                                                                                        0.0083365996);
 
 final_score_tree_622_c3555 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => -0.0971089432,
-    iv_in001_wealth_index >= '2.5'                                 => 0.0319271028,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 2.5 => -0.0971089432,
+    (real)iv_in001_wealth_index >= 2.5                                 => 0.0319271028,
                                                                     -0.0206431382);
 
 final_score_tree_622_c3554 := map(
@@ -19988,12 +20142,12 @@ final_score_tree_625_c3567 := map(
                                                                            -0.0003372944);
 
 final_score_tree_625_c3568 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '2-3', '3-1'])         => 0.0017049040,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '2-3', '3-1'])         => 0.0017049040,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '1-3', '2-0', '2-1', '3-0', '3-3']) => 0.0652991396,
                                                                                            0.0283917707);
 
 final_score_tree_625_c3570 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '2-0', '2-1', '2-3', '3-0']) => 0.0084286514,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '2-0', '2-1', '2-3', '3-0']) => 0.0084286514,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '1-3', '3-1', '3-3'])       => 0.0846093212,
                                                                                           0.0319641429);
 
@@ -20114,7 +20268,7 @@ final_score_tree_630_c3594 := map(
 
 final_score_tree_630_c3593 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-3', '2-3', '3-1'])       => -0.0270240882,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-1', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_630_c3594,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-1', '2-0', '2-1', '3-0', '3-3']) => final_score_tree_630_c3594,
                                                                                           -0.0043666048);
 
 final_score_tree_630_c3595 := map(
@@ -20123,8 +20277,8 @@ final_score_tree_630_c3595 := map(
                                                             0.0240433267);
 
 final_score_tree_630_c3592 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '10.5' => final_score_tree_630_c3593,
-    iv_infutor_nap >= '10.5'                          => final_score_tree_630_c3595,
+   iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 10.5 => final_score_tree_630_c3593,
+    (real)iv_infutor_nap >= 10.5                          => final_score_tree_630_c3595,
                                                        -0.0075790902);
 
 final_score_tree_630 := map(
@@ -20228,7 +20382,7 @@ final_score_tree_634_c3612 := map(
                                                                      0.0018210546);
 
 final_score_tree_634 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-3', '2-0', '2-1', '3-3']) => -0.0023602085,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-3', '2-0', '2-1', '3-3']) => -0.0023602085,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '2-3', '3-0', '3-1'])                     => final_score_tree_634_c3612,
                                                                                                  0.0012745683);
 
@@ -20333,8 +20487,8 @@ final_score_tree_638 := map(
                                                                 0.0019626154);
 
 final_score_tree_639_c3637 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '35' => 0.0005899787,
-    iv_inp_addr_mortgage_term >= '35'                                     => -0.0268878736,
+    iv_inp_addr_mortgage_term != '  ' AND (real)iv_inp_addr_mortgage_term < 35 => 0.0005899787,
+    (real)iv_inp_addr_mortgage_term >= 35                                     => -0.0268878736,
                                                                            0.0348201733);
 
 final_score_tree_639_c3640 := map(
@@ -20349,7 +20503,7 @@ final_score_tree_639_c3639 := map(
 
 final_score_tree_639_c3638 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-1', '2-3', '3-3'])                                   => final_score_tree_639_c3639,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '1-3', '2-0', '2-1', '3-0', '3-1']) => 0.0054163453,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '1-3', '2-0', '2-1', '3-0', '3-1']) => 0.0054163453,
                                                                                                         0.0051383060);
 
 final_score_tree_639 := map(
@@ -20363,8 +20517,8 @@ final_score_tree_640_c3642 := map(
                                                                                     -0.0003324908);
 
 final_score_tree_640_c3643 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '8' => 0.0790583395,
-    iv_infutor_nap >= '8'                          => -0.0294659456,
+     iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 8 => 0.0790583395,
+    (real)iv_infutor_nap >= 8                          => -0.0294659456,
                                                     0.0829240343);
 
 final_score_tree_640_c3645 := map(
@@ -20414,7 +20568,7 @@ final_score_tree_642_c3654 := map(
 
 final_score_tree_642_c3653 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '2-0', '3-0', '3-1'])       => -0.0110402083,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-1', '1-3', '2-1', '2-3', '3-3']) => final_score_tree_642_c3654,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-1', '1-3', '2-1', '2-3', '3-3']) => final_score_tree_642_c3654,
                                                                                           0.0312389894);
 
 final_score_tree_642_c3655 := map(
@@ -20533,7 +20687,7 @@ final_score_tree_646 := map(
                                                             final_score_tree_646_c3672);
 
 final_score_tree_647_c3678 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3', '3-3']) => -0.0073763272,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-1', '2-3', '3-3']) => -0.0073763272,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1', '2-0', '3-0', '3-1'])                     => 0.0078416527,
                                                                                                  -0.0054480604);
 
@@ -20743,13 +20897,13 @@ final_score_tree_655_c3720 := map(
                                                              0.0164911919);
 
 final_score_tree_655_c3718 := map(
-    '' < iv_va001_add_po_box AND iv_va001_add_po_box < '0.5' => final_score_tree_655_c3719,
-    iv_va001_add_po_box >= '0.5'                               => final_score_tree_655_c3720,
+    iv_va001_add_po_box != '' AND (real)iv_va001_add_po_box < 0.5 => final_score_tree_655_c3719,
+    (real)iv_va001_add_po_box >= 0.5                               => final_score_tree_655_c3720,
                                                                 -0.0016070324);
 
 final_score_tree_655_c3717 := map(
-    '' < iv_vp008_phn_pay_phone AND iv_vp008_phn_pay_phone < '0.5' => -0.0002561230,
-    iv_vp008_phn_pay_phone >= '0.5'                                  => -0.0594798120,
+     iv_vp008_phn_pay_phone!= ''  AND (real)iv_vp008_phn_pay_phone < 0.5 => -0.0002561230,
+    (real)iv_vp008_phn_pay_phone >= 0.5                                  => -0.0594798120,
                                                                       final_score_tree_655_c3718);
 
 final_score_tree_655 := map(
@@ -20823,7 +20977,7 @@ final_score_tree_658_c3733 := map(
                                           -0.0069750208);
 
 final_score_tree_658_c3732 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-3']) => final_score_tree_658_c3733,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-3']) => final_score_tree_658_c3733,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '2-0', '2-1', '3-1'])                     => 0.0354151534,
                                                                                                  0.0049059669);
 
@@ -20943,8 +21097,8 @@ final_score_tree_663_c3760 := map(
                                                                           -0.0092520407);
 
 final_score_tree_663_c3759 := map(
-    '' < iv_bst_addr_mortgage_term AND iv_bst_addr_mortgage_term < '27.5' => 0.0105508978,
-    iv_bst_addr_mortgage_term >= '27.5'                                     => final_score_tree_663_c3760,
+     iv_bst_addr_mortgage_term != '  ' AND (real)iv_bst_addr_mortgage_term < 27.5 => 0.0105508978,
+    (real)iv_bst_addr_mortgage_term >= 27.5                                     => final_score_tree_663_c3760,
                                                                              0.0076431742);
 
 final_score_tree_663_c3758 := map(
@@ -20968,8 +21122,8 @@ final_score_tree_664_c3762 := map(
                                                                              -0.0046926444);
 
 final_score_tree_664_c3765 := map(
-    '' < iv_prof_license_category AND iv_prof_license_category < '1.5' => 0.0085829324,
-    iv_prof_license_category >= '1.5'                                    => -0.0165257150,
+     iv_prof_license_category!= '  ' AND (real)iv_prof_license_category < 1.5 => 0.0085829324,
+    (real)iv_prof_license_category >= 1.5                                    => -0.0165257150,
                                                                           0.0064421342);
 
 final_score_tree_664_c3764 := map(
@@ -21084,7 +21238,7 @@ final_score_tree_668 := map(
 
 final_score_tree_669_c3790 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '2-0', '2-1', '2-3', '3-0', '3-1']) => -0.1088366550,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '1-3', '3-3'])                                     => 0.0021466606,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '1-3', '3-3'])                                     => 0.0021466606,
                                                                                                          -0.0603915569);
 
 final_score_tree_669_c3789 := map(
@@ -21158,7 +21312,7 @@ final_score_tree_671 := map(
                                                                                  0.0012639713);
 
 final_score_tree_672_c3802 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => -0.0014406898,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0', '3-1', '3-3']) => -0.0014406898,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '2-0', '2-1'])                                                 => 0.0124086724,
                                                                                                                -0.0010790679);
 
@@ -21339,7 +21493,7 @@ final_score_tree_679_c3840 := map(
 
 final_score_tree_679_c3839 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-3', '2-0', '2-1', '3-0'])                                   => -0.0736102672,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-3', '3-1', '3-3']) => final_score_tree_679_c3840,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '2-3', '3-1', '3-3']) => final_score_tree_679_c3840,
                                                                                                         -0.0234674786);
 
 final_score_tree_679_c3838 := map(
@@ -21434,7 +21588,7 @@ final_score_tree_682 := map(
 
 final_score_tree_683_c3859 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '2-0', '2-1', '3-1'])                                   => -0.0249367135,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-3']) => 0.0009891006,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-3']) => 0.0009891006,
                                                                                                         -0.0017946844);
 
 final_score_tree_683_c3858 := map(
@@ -21483,7 +21637,7 @@ final_score_tree_684 := map(
                                                                     0.0009676870);
 
 final_score_tree_685_c3869 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '2-0', '2-3', '3-0', '3-1'])         => -0.0800737989,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '2-0', '2-3', '3-0', '3-1'])         => -0.0800737989,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '3-3']) => 0.0535414471,
                                                                                            -0.0100335490);
 
@@ -21538,7 +21692,7 @@ final_score_tree_687_c3880 := map(
                                                                     -0.0379976503);
 
 final_score_tree_687_c3879 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-1', '2-1', '2-3', '3-1', '3-3']) => final_score_tree_687_c3880,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-1', '2-1', '2-3', '3-1', '3-3']) => final_score_tree_687_c3880,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '1-3', '2-0', '3-0'])                     => 0.0142572769,
                                                                                                  -0.0119847808);
 
@@ -21798,8 +21952,8 @@ final_score_tree_697_c3930 := map(
                                                                       0.0230241630);
 
 final_score_tree_697_c3929 := map(
-    '' < iv_prv_addr_eda_sourced AND iv_prv_addr_eda_sourced < '0.5' => final_score_tree_697_c3930,
-    iv_prv_addr_eda_sourced >= '0.5'                                   => 0.1361375293,
+     iv_prv_addr_eda_sourced!= ' ' AND (real)iv_prv_addr_eda_sourced < 0.5 => final_score_tree_697_c3930,
+    (real)iv_prv_addr_eda_sourced >= 0.5                                   => 0.1361375293,
                                                                         0.0316697706);
 
 final_score_tree_697 := map(
@@ -21863,8 +22017,8 @@ final_score_tree_700_c3944 := map(
                                                                                         -0.0296233426);
 
 final_score_tree_700_c3945 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '0.5' => 0.0356357328,
-    iv_bst_own_prop_x_addr_naprop >= '0.5'                                         => -0.0017359904,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 0.5 => 0.0356357328,
+    (real)iv_bst_own_prop_x_addr_naprop >= 0.5                                         => -0.0017359904,
                                                                                     0.0025803027);
 
 final_score_tree_700_c3943 := map(
@@ -21889,7 +22043,7 @@ final_score_tree_701_c3948 := map(
 
 final_score_tree_701_c3949 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '1-1', '1-3', '2-0', '3-3'])       => -0.0811754730,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '2-1', '2-3', '3-0', '3-1']) => -0.0018855929,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '2-1', '2-3', '3-0', '3-1']) => -0.0018855929,
                                                                                           -0.0305040210);
 
 final_score_tree_701_c3947 := map(
@@ -22038,7 +22192,7 @@ final_score_tree_707_c3979 := map(
                                                             -0.0446312292);
 
 final_score_tree_707_c3978 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-3', '3-0', '3-1'])                       => final_score_tree_707_c3979,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-3', '3-0', '3-1'])                       => final_score_tree_707_c3979,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-1', '2-0', '2-1', '2-3', '3-3']) => 0.0206649504,
                                                                                                   -0.0141924086);
 
@@ -22133,7 +22287,7 @@ final_score_tree_710 := map(
                                                                                         -0.0008574753);
 
 final_score_tree_711_c4000 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '2-0', '2-1', '2-3', '3-3']) => -0.0084934881,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '2-0', '2-1', '2-3', '3-3']) => -0.0084934881,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '1-3', '3-0', '3-1'])                                   => 0.0266526463,
                                                                                                         -0.0006608056);
 
@@ -22208,7 +22362,7 @@ final_score_tree_713 := map(
                                                                         -0.0014995041);
 
 final_score_tree_714_c4015 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-1', '1-3', '2-0', '2-3']) => -0.0897871678,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-1', '1-3', '2-0', '2-3']) => -0.0897871678,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '2-1', '3-0', '3-1', '3-3'])       => 0.0052960785,
                                                                                           -0.0457671464);
 
@@ -22298,8 +22452,8 @@ final_score_tree_717_c4028 := map(
                                                                                     0.0175723431);
 
 final_score_tree_717_c4027 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '8' => final_score_tree_717_c4028,
-    iv_infutor_nap >= '8'                         => -0.0104253177,
+     iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 8 => final_score_tree_717_c4028,
+    (real)iv_infutor_nap >= 8                         => -0.0104253177,
                                                     -0.0007615391);
 
 final_score_tree_717 := map(
@@ -22363,7 +22517,7 @@ final_score_tree_720_c4044 := map(
                                                                                                                   -0.0651755422);
 
 final_score_tree_720_c4043 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '2-1', '3-1', '3-3']) => final_score_tree_720_c4044,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '2-1', '3-1', '3-3']) => final_score_tree_720_c4044,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-1', '1-3', '2-0', '2-3', '3-0'])       => 0.0214087158,
                                                                                           -0.0302525360);
 
@@ -22468,8 +22622,8 @@ final_score_tree_724_c4065 := map(
                                                                                                 -0.0097167577);
 
 final_score_tree_724_c4064 := map(
-   ''  < iv_prv_addr_mortgage_term AND iv_prv_addr_mortgage_term < '27.5' => final_score_tree_724_c4065,
-    iv_prv_addr_mortgage_term >= '27.5'                                     => -0.0933977994,
+   iv_prv_addr_mortgage_term  != '  ' AND (real)iv_prv_addr_mortgage_term < 27.5 => final_score_tree_724_c4065,
+    (real)iv_prv_addr_mortgage_term >= 27.5                                     => -0.0933977994,
                                                                              -0.0164525815);
 
 final_score_tree_724_c4063 := map(
@@ -22524,7 +22678,7 @@ final_score_tree_726_c4075 := map(
 
 final_score_tree_726_c4072 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '2-0', '3-3'])                     => final_score_tree_726_c4073,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1']) => final_score_tree_726_c4075,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1']) => final_score_tree_726_c4075,
                                                                                                  0.0153683463);
 
 final_score_tree_726 := map(
@@ -22573,8 +22727,8 @@ final_score_tree_728_c4083 := map(
                                                                                           0.0028770604);
 
 final_score_tree_728_c4082 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '12.5' => -0.0034423908,
-    iv_inp_addr_mortgage_term >= '12.5'                                     => final_score_tree_728_c4083,
+   iv_inp_addr_mortgage_term != '  ' AND (real)iv_inp_addr_mortgage_term < 12.5 => -0.0034423908,
+    (real)iv_inp_addr_mortgage_term >= 12.5                                     => final_score_tree_728_c4083,
                                                                              -0.0008866646);
 
 final_score_tree_728 := map(
@@ -22609,7 +22763,7 @@ final_score_tree_729 := map(
 
 final_score_tree_730_c4093 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-0', '2-1', '2-3', '3-0'])                                   => -0.0451145865,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '3-1', '3-3']) => -0.0031440242,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '3-1', '3-3']) => -0.0031440242,
                                                                                                         -0.0051360922);
 
 final_score_tree_730_c4092 := map(
@@ -22628,8 +22782,8 @@ final_score_tree_730_c4094 := map(
                                                                                    0.0000693799);
 
 final_score_tree_730 := map(
-    '' < iv_pl001_addr_stability_v2 AND iv_pl001_addr_stability_v2 < '1.5' => final_score_tree_730_c4092,
-    iv_pl001_addr_stability_v2 >= '1.5'                                      => final_score_tree_730_c4094,
+    iv_pl001_addr_stability_v2 != ' ' AND (real)iv_pl001_addr_stability_v2 < 1.5 => final_score_tree_730_c4092,
+    (real)iv_pl001_addr_stability_v2 >= 1.5                                      => final_score_tree_730_c4094,
                                                                               -0.0031580253);
 
 final_score_tree_731_c4100 := map(
@@ -22718,7 +22872,7 @@ final_score_tree_734_c4115 := map(
                                                                                  -0.0328608422);
 
 final_score_tree_734_c4114 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '2-3', '3-0', '3-1'])         => final_score_tree_734_c4115,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '2-3', '3-0', '3-1'])         => final_score_tree_734_c4115,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-1', '1-3', '2-0', '2-1', '3-3']) => 0.0031899797,
                                                                                            -0.0041410345);
 
@@ -22794,7 +22948,7 @@ final_score_tree_737_c4129 := map(
 
 final_score_tree_737_c4128 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0'])                                                                             => -0.0740672313,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_737_c4129,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_737_c4129,
                                                                                                                              -0.0130404705);
 
 final_score_tree_737_c4127 := map(
@@ -22807,10 +22961,18 @@ final_score_tree_737 := map(
     (iv_in001_college_income in ['-1', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K']) => 0.0002461161,
                                                                                    0.0052176994);
 
+// final_score_tree_738_c4132 := map(
+    // '' < iv_cvi AND iv_cvi < '15' => -0.0132008366,
+    // iv_cvi >= '15'                  => 0.0009993324,
+                                     // 0.0007827309);
+
+
 final_score_tree_738_c4132 := map(
-    '' < iv_cvi AND iv_cvi < '15' => -0.0132008366,
-    iv_cvi >= '15'                  => 0.0009993324,
+    iv_cvi != '  ' AND (integer)iv_cvi < 15 => -0.0132008366,
+   (integer)iv_cvi >= 15                  => 0.0009993324,
                                      0.0007827309);
+
+
 
 final_score_tree_738_c4135 := map(
     (iv_prv_addr_mortgage_type in ['Conventional', 'No Mortgage', 'Other'])                                                            => -0.1010676760,
@@ -22878,8 +23040,8 @@ final_score_tree_740_c4142 := map(
                                                                           final_score_tree_740_c4143);
 
 final_score_tree_740 := map(
-    '' < iv_vp001_phn_not_issued AND iv_vp001_phn_not_issued < '0.5' => -0.0005769475,
-    iv_vp001_phn_not_issued >= '0.5'                                   => 0.0403299001,
+    iv_vp001_phn_not_issued != ' ' AND (real)iv_vp001_phn_not_issued < 0.5 => -0.0005769475,
+    (real)iv_vp001_phn_not_issued >= 0.5                                   => 0.0403299001,
                                                                         final_score_tree_740_c4142);
 
 final_score_tree_741_c4147 := map(
@@ -22903,8 +23065,8 @@ final_score_tree_741_c4148 := map(
                                                                    final_score_tree_741_c4149);
 
 final_score_tree_741 := map(
-    '' < iv_in001_wealth_index AND iv_in001_wealth_index < '2.5' => final_score_tree_741_c4147,
-    iv_in001_wealth_index >= '2.5'                                 => final_score_tree_741_c4148,
+    iv_in001_wealth_index != ' ' AND (real)iv_in001_wealth_index < 2.5 => final_score_tree_741_c4147,
+    (real)iv_in001_wealth_index >= 2.5                                 => final_score_tree_741_c4148,
                                                                     -0.0022740060);
 
 final_score_tree_742_c4153 := map(
@@ -23199,7 +23361,7 @@ final_score_tree_753_c4210 := map(
 
 final_score_tree_753_c4209 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '2-0'])                                                               => -0.0493640382,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_753_c4210,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_753_c4210,
                                                                                                                       0.0304936423);
 
 final_score_tree_753 := map(
@@ -23289,7 +23451,7 @@ final_score_tree_757_c4228 := map(
 
 final_score_tree_757_c4229 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-1', '1-3', '2-0', '2-3', '3-0', '3-3']) => -0.0257324133,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '2-1', '3-1'])                                     => 0.0106399776,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '2-1', '3-1'])                                     => 0.0106399776,
                                                                                                          0.0049049749);
 
 final_score_tree_757_c4230 := map(
@@ -23378,8 +23540,8 @@ final_score_tree_760_c4244 := map(
                                                                                                final_score_tree_760_c4245);
 
 final_score_tree_760 := map(
-    '' < iv_pl001_addr_stability_v2 AND iv_pl001_addr_stability_v2 < '1.5' => final_score_tree_760_c4242,
-    iv_pl001_addr_stability_v2 >= '1.5'                                      => 0.0006620168,
+    iv_pl001_addr_stability_v2 != ' ' AND (real)iv_pl001_addr_stability_v2 < 1.5 => final_score_tree_760_c4242,
+    (real)iv_pl001_addr_stability_v2 >= 1.5                                      => 0.0006620168,
                                                                               final_score_tree_760_c4244);
 
 final_score_tree_761_c4249 := map(
@@ -23484,7 +23646,7 @@ final_score_tree_764 := map(
 
 final_score_tree_765_c4267 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '1-3', '3-1'])                                                 => -0.0513614957,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0523574552,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0523574552,
                                                                                                                0.0394558296);
 
 final_score_tree_765_c4270 := map(
@@ -23509,7 +23671,7 @@ final_score_tree_765 := map(
 
 final_score_tree_766_c4275 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-1', '1-3', '2-0', '2-3', '3-0', '3-1']) => -0.0608233533,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '2-1', '3-3'])                                     => -0.0012340409,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '2-1', '3-3'])                                     => -0.0012340409,
                                                                                                          -0.0383639297);
 
 final_score_tree_766_c4274 := map(
@@ -23533,8 +23695,8 @@ final_score_tree_766 := map(
                                                                                    -0.0018081807);
 
 final_score_tree_767_c4279 := map(
-    '' < iv_vs100_ssn_problem AND iv_vs100_ssn_problem < '1.5' => -0.0015440738,
-    iv_vs100_ssn_problem >= '1.5'                                => -0.0494890247,
+    iv_vs100_ssn_problem != ' '  AND (real)iv_vs100_ssn_problem < 1.5 => -0.0015440738,
+    (real)iv_vs100_ssn_problem >= 1.5                               => -0.0494890247,
                                                                   -0.0017147462);
 
 final_score_tree_767_c4280 := map(
@@ -23643,8 +23805,8 @@ final_score_tree_771_c4298 := map(
                                                                                -0.0125937693);
 
 final_score_tree_771_c4300 := map(
-    '' < iv_bst_addr_avm_land_use AND iv_bst_addr_avm_land_use < '1.5' => 0.0004034049,
-    iv_bst_addr_avm_land_use >= '1.5'                                    => 0.0087987870,
+    iv_bst_addr_avm_land_use != ' ' AND (real)iv_bst_addr_avm_land_use < 1.5 => 0.0004034049,
+    (real)iv_bst_addr_avm_land_use >= 1.5                                    => 0.0087987870,
                                                                           0.0175160860);
 
 final_score_tree_771_c4297 := map(
@@ -23798,7 +23960,7 @@ final_score_tree_777_c4329 := map(
                                                                                -0.0066363353);
 
 final_score_tree_777_c4328 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '2-0', '2-3', '3-0', '3-3']) => final_score_tree_777_c4329,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '2-0', '2-3', '3-0', '3-3']) => final_score_tree_777_c4329,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '1-3', '2-1', '3-1'])       => 0.0032548573,
                                                                                           -0.0040518723);
 
@@ -23913,8 +24075,8 @@ final_score_tree_782_c4353 := map(
                                                                                                -0.0319364164);
 
 final_score_tree_782_c4352 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '35' => 0.0000053833,
-    iv_inp_addr_mortgage_term >= '35'                                     => final_score_tree_782_c4353,
+    iv_inp_addr_mortgage_term != '  ' AND (real)iv_inp_addr_mortgage_term < 35 => 0.0000053833,
+    (real)iv_inp_addr_mortgage_term >= 35                                     => final_score_tree_782_c4353,
                                                                            -0.0210547784);
 
 final_score_tree_782_c4355 := map(
@@ -23993,7 +24155,7 @@ final_score_tree_785_c4368 := map(
                                                                    0.0217754248);
 
 final_score_tree_785_c4367 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-3', '3-1', '3-3']) => -0.0229740413,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-3', '3-1', '3-3']) => -0.0229740413,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '2-0', '2-1', '2-3', '3-0'])                     => final_score_tree_785_c4368,
                                                                                                  -0.0149373074);
 
@@ -24078,8 +24240,8 @@ final_score_tree_788_c4382 := map(
                                                                            0.0050476416);
 
 final_score_tree_788 := map(
-    '' < iv_prv_addr_naprop AND iv_prv_addr_naprop < '1.5' => 0.0001563102,
-    iv_prv_addr_naprop >= '1.5'                              => final_score_tree_788_c4382,
+    iv_prv_addr_naprop != ' ' AND (real)iv_prv_addr_naprop < 1.5=> 0.0001563102,
+    (real)iv_prv_addr_naprop >= 1.5                              => final_score_tree_788_c4382,
                                                               -0.0018277288);
 
 final_score_tree_789_c4389 := map(
@@ -24163,7 +24325,7 @@ final_score_tree_792_c4404 := map(
                                                                                                                        -0.0219044430);
 
 final_score_tree_792_c4403 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '2-0', '2-3', '3-3'])         => final_score_tree_792_c4404,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '2-0', '2-3', '3-3'])         => final_score_tree_792_c4404,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '1-3', '2-1', '3-0', '3-1']) => 0.0121128695,
                                                                                            -0.0087360325);
 
@@ -24223,13 +24385,13 @@ final_score_tree_794_c4413 := map(
                                                       -0.0104114327);
 
 final_score_tree_794_c4412 := map(
-    '' < iv_prof_license_category AND iv_prof_license_category < '1.5' => final_score_tree_794_c4413,
-    iv_prof_license_category >= '1.5'                                    => 0.0428979388,
+    iv_prof_license_category != '  ' AND (real)iv_prof_license_category < 1.5 => final_score_tree_794_c4413,
+    (real)iv_prof_license_category >= 1.5                                    => 0.0428979388,
                                                                           -0.0035235645);
 
 final_score_tree_794 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-1'])                                                               => final_score_tree_794_c4412,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => 0.0007293356,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-0', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => 0.0007293356,
                                                                                                                       -0.0046737606);
 
 final_score_tree_795_c4417 := map(
@@ -24379,7 +24541,7 @@ final_score_tree_800_c4442 := map(
 
 final_score_tree_800 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '2-1', '3-0'])                                                 => final_score_tree_800_c4442,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-3', '3-1', '3-3']) => 0.0003337822,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-3', '3-1', '3-3']) => 0.0003337822,
                                                                                                                0.0028856048);
 
 final_score_tree_801_c4449 := map(
@@ -24433,8 +24595,8 @@ final_score_tree_802 := map(
                                                                                   0.0024852243);
 
 final_score_tree_803_c4457 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '0.5' => 0.0031747186,
-    iv_inp_own_prop_x_addr_naprop >= '0.5'                                         => -0.0016971313,
+     iv_inp_own_prop_x_addr_naprop  != ' ' AND (real)iv_inp_own_prop_x_addr_naprop < 0.5 => 0.0031747186,
+    (real)iv_inp_own_prop_x_addr_naprop >= 0.5                                         => -0.0016971313,
                                                                                     -0.0000715294);
 
 final_score_tree_803_c4459 := map(
@@ -24444,7 +24606,7 @@ final_score_tree_803_c4459 := map(
 
 final_score_tree_803_c4460 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0', '1-3', '2-0', '2-3', '3-1'])                     => -0.0675020920,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '2-1', '3-0', '3-3']) => 0.0081246295,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '2-1', '3-0', '3-3']) => 0.0081246295,
                                                                                                  0.0046225976);
 
 final_score_tree_803_c4458 := map(
@@ -24474,7 +24636,7 @@ final_score_tree_804_c4463 := map(
 
 final_score_tree_804_c4462 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-1', '3-1'])                                   => final_score_tree_804_c4463,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0018326125,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0018326125,
                                                                                                         0.0002175689);
 
 final_score_tree_804 := map(
@@ -24713,8 +24875,8 @@ final_score_tree_814_c4513 := map(
                                                                            0.0073775798);
 
 final_score_tree_814_c4514 := map(
-    '' < iv_bst_addr_mortgage_term AND iv_bst_addr_mortgage_term < '7.5' => -0.0672861657,
-    iv_bst_addr_mortgage_term >= '7.5'                                     => -0.0095463361,
+    iv_bst_addr_mortgage_term != '  ' AND (real)iv_bst_addr_mortgage_term < 7.5 => -0.0672861657,
+    (real)iv_bst_addr_mortgage_term >= 7.5                                     => -0.0095463361,
                                                                             -0.0194017430);
 
 final_score_tree_814_c4512 := map(
@@ -24864,7 +25026,7 @@ final_score_tree_820_c4544 := map(
 
 final_score_tree_820_c4545 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-3', '2-0', '2-1', '2-3', '3-1']) => -0.0337785331,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '1-1', '3-0', '3-3'])         => -0.0026287105,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '1-1', '3-0', '3-3'])         => -0.0026287105,
                                                                                            -0.0166420366);
 
 final_score_tree_820_c4543 := map(
@@ -24944,7 +25106,7 @@ final_score_tree_823_c4559 := map(
 
 final_score_tree_823_c4558 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-0'])                                                                             => -0.0795948586,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_823_c4559,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-1', '3-3']) => final_score_tree_823_c4559,
                                                                                                                              0.0041541734);
 
 final_score_tree_823_c4557 := map(
@@ -24968,8 +25130,8 @@ final_score_tree_824_c4563 := map(
                                                                          -0.0288920366);
 
 final_score_tree_824_c4565 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '13.5' => -0.0120608959,
-    iv_inp_own_prop_x_addr_naprop >= '13.5'                                         => 0.0186978743,
+    iv_inp_own_prop_x_addr_naprop != ' ' AND (real)iv_inp_own_prop_x_addr_naprop < 13.5 => -0.0120608959,
+    (real)iv_inp_own_prop_x_addr_naprop >= 13.5                                         => 0.0186978743,
                                                                                      0.0003483203);
 
 final_score_tree_824_c4562 := map(
@@ -24983,8 +25145,8 @@ final_score_tree_824 := map(
                                                                                  -0.0022295679);
 
 final_score_tree_825_c4570 := map(
-    '' < iv_bst_own_prop_x_addr_naprop AND iv_bst_own_prop_x_addr_naprop < '3.5' => -0.0099081280,
-    iv_bst_own_prop_x_addr_naprop >= '3.5'                                         => 0.0124986246,
+    iv_bst_own_prop_x_addr_naprop != '  ' AND (real)iv_bst_own_prop_x_addr_naprop < 3.5 => -0.0099081280,
+    (real)iv_bst_own_prop_x_addr_naprop >= 3.5                                         => 0.0124986246,
                                                                                     -0.0068691975);
 
 final_score_tree_825_c4569 := map(
@@ -25008,7 +25170,7 @@ final_score_tree_825 := map(
                                                                                     0.0020878425);
 
 final_score_tree_826_c4574 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '1-1', '2-3', '3-3']) => 0.0025081409,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '1-1', '2-3', '3-3']) => 0.0025081409,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-3', '2-0', '2-1', '3-0', '3-1'])       => 0.0620822409,
                                                                                           0.0137485371);
 
@@ -25024,7 +25186,7 @@ final_score_tree_826_c4572 := map(
 
 final_score_tree_826_c4575 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '1-1', '2-1', '3-0', '3-1'])       => -0.0461139225,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-3', '2-0', '2-3', '3-3']) => 0.0050481273,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-3', '2-0', '2-3', '3-3']) => 0.0050481273,
                                                                                           -0.0048950886);
 
 final_score_tree_826 := map(
@@ -25074,7 +25236,7 @@ final_score_tree_828_c4584 := map(
 
 final_score_tree_828_c4582 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '1-3', '2-0', '2-1', '3-0']) => final_score_tree_828_c4583,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '2-3', '3-1', '3-3'])                       => final_score_tree_828_c4584,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '2-3', '3-1', '3-3'])                       => final_score_tree_828_c4584,
                                                                                                   0.0055356003);
 
 final_score_tree_828 := map(
@@ -25188,13 +25350,13 @@ final_score_tree_833_c4610 := map(
                                                                                                                 -0.0138662146);
 
 final_score_tree_833_c4609 := map(
-    '' < iv_input_dob_match_level AND iv_input_dob_match_level < '0.5' => final_score_tree_833_c4610,
-    iv_input_dob_match_level >= '0.5'                                    => 0.0221757018,
+   iv_input_dob_match_level != ' ' AND (real)iv_input_dob_match_level < 0.5 => final_score_tree_833_c4610,
+    (real)iv_input_dob_match_level >= 0.5                                    => 0.0221757018,
                                                                           -0.0052509965);
 
 final_score_tree_833_c4608 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '8' => 0.0647302550,
-    iv_infutor_nap >= '8'                          => -0.0518789746,
+    iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 8 => 0.0647302550,
+    (real)iv_infutor_nap >= 8                          => -0.0518789746,
                                                     final_score_tree_833_c4609);
 
 final_score_tree_833_c4607 := map(
@@ -25223,7 +25385,7 @@ final_score_tree_834_c4612 := map(
                                                                 0.0168523516);
 
 final_score_tree_834_c4615 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-0', '2-0', '2-1', '2-3', '3-0', '3-3']) => -0.0015790267,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-0', '2-0', '2-1', '2-3', '3-0', '3-3']) => -0.0015790267,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-1', '1-3', '3-1'])                                   => 0.0055569634,
                                                                                                         0.0026819690);
 
@@ -25303,8 +25465,8 @@ final_score_tree_837_c4630 := map(
                                                          -0.0084937422);
 
 final_score_tree_837 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '3.5' => final_score_tree_837_c4627,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_837_c4630,
+    iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => final_score_tree_837_c4627,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_837_c4630,
                                                                 -0.0009763269);
 
 final_score_tree_838_c4634 := map(
@@ -25358,8 +25520,8 @@ final_score_tree_839 := map(
                                                                         -0.0007981517);
 
 final_score_tree_840_c4643 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '10.5' => -0.0675803551,
-    iv_prv_own_prop_x_addr_naprop >= '10.5'                                         => 0.0562483717,
+    iv_prv_own_prop_x_addr_naprop != '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 10.5 => -0.0675803551,
+    (real)iv_prv_own_prop_x_addr_naprop >= 10.5                                         => 0.0562483717,
                                                                                      -0.0157450741);
 
 final_score_tree_840_c4645 := map(
@@ -25433,7 +25595,7 @@ final_score_tree_842 := map(
                                                                               final_score_tree_842_c4655);
 
 final_score_tree_843_c4659 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-0', '1-1', '1-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => -0.0424770363,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-0', '1-1', '1-3', '2-0', '2-1', '3-0', '3-1', '3-3']) => -0.0424770363,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '2-3'])                                                 => 0.0548135160,
                                                                                                                -0.0093568483);
 
@@ -25538,13 +25700,13 @@ final_score_tree_847_c4679 := map(
                                                                                       -0.0599850654);
 
 final_score_tree_847_c4678 := map(
-    '' < iv_bst_addr_eda_sourced AND iv_bst_addr_eda_sourced < '0.5' => -0.0107867186,
-    iv_bst_addr_eda_sourced >= '0.5'                                   => final_score_tree_847_c4679,
+     iv_bst_addr_eda_sourced != ' ' AND (real)iv_bst_addr_eda_sourced < 0.5 => -0.0107867186,
+    (real)iv_bst_addr_eda_sourced >= 0.5                                   => final_score_tree_847_c4679,
                                                                         -0.0135281680);
 
 final_score_tree_847_c4680 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '0-3', '1-0', '1-3', '2-0', '3-0', '3-1']) => -0.0188515287,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '1-1', '2-1', '2-3', '3-3'])         => 0.0954789665,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '1-1', '2-1', '2-3', '3-3'])         => 0.0954789665,
                                                                                            0.0466882456);
 
 final_score_tree_847_c4677 := map(
@@ -25584,7 +25746,7 @@ final_score_tree_848 := map(
 
 final_score_tree_849_c4688 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-0', '2-3', '3-0', '3-1', '3-3'])                     => -0.0811680958,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1']) => -0.0066969566,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1']) => -0.0066969566,
                                                                                                  -0.0302269257);
 
 final_score_tree_849_c4690 := map(
@@ -25633,8 +25795,8 @@ final_score_tree_850 := map(
                                                                                         -0.0001052105);
 
 final_score_tree_851_c4700 := map(
-    '' < iv_vs001_ssn_deceased AND iv_vs001_ssn_deceased < '0.5' => 0.0003507668,
-    iv_vs001_ssn_deceased >= '0.5'                                 => -0.0585978097,
+     iv_vs001_ssn_deceased != ' ' AND (real)iv_vs001_ssn_deceased < 0.5 => 0.0003507668,
+    (real)iv_vs001_ssn_deceased >= 0.5                                 => -0.0585978097,
                                                                     0.0084362130);
 
 final_score_tree_851_c4699 := map(
@@ -25668,7 +25830,7 @@ final_score_tree_852_c4705 := map(
                                                   0.0092592115);
 
 final_score_tree_852_c4704 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '1-1', '1-3', '2-0', '2-3', '3-0']) => -0.0743283174,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '1-1', '1-3', '2-0', '2-3', '3-0']) => -0.0743283174,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '2-1', '3-1', '3-3'])       => final_score_tree_852_c4705,
                                                                                           -0.0132981427);
 
@@ -25753,8 +25915,8 @@ final_score_tree_855_c4717 := map(
                                                           0.0092012306);
 
 final_score_tree_855 := map(
-    '' < iv_va001_add_po_box AND iv_va001_add_po_box < '0.5' => -0.0008321875,
-    iv_va001_add_po_box >= '0.5'                               => final_score_tree_855_c4717,
+     iv_va001_add_po_box != '' AND (real)iv_va001_add_po_box < 0.5 => -0.0008321875,
+    (real)iv_va001_add_po_box >= 0.5                               => final_score_tree_855_c4717,
                                                                 -0.0012781011);
 
 final_score_tree_856_c4725 := map(
@@ -25883,8 +26045,8 @@ final_score_tree_860 := map(
                                                                                   0.0009435249);
 
 final_score_tree_861_c4749 := map(
-    '' < iv_prv_addr_mortgage_term AND iv_prv_addr_mortgage_term < '17.5' => 0.0029335053,
-    iv_prv_addr_mortgage_term >= '17.5'                                     => -0.0594223372,
+    iv_prv_addr_mortgage_term != '  ' AND (real)iv_prv_addr_mortgage_term < 17.5 => 0.0029335053,
+    (real)iv_prv_addr_mortgage_term >= 17.5                                    => -0.0594223372,
                                                                              -0.0102997329);
 
 final_score_tree_861_c4748 := map(
@@ -25933,7 +26095,7 @@ final_score_tree_862 := map(
                                                                                      0.0003609935);
 
 final_score_tree_863_c4760 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-3', '2-0', '3-0', '3-1'])                       => -0.1510541953,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-3', '2-0', '3-0', '3-1'])                       => -0.1510541953,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '2-1', '2-3', '3-3']) => -0.0034877239,
                                                                                                   -0.0726595073);
 
@@ -26008,12 +26170,12 @@ final_score_tree_865 := map(
                                                             final_score_tree_865_c4770);
 
 final_score_tree_866_c4775 := map(
-    '' < iv_inp_addr_mortgage_term AND iv_inp_addr_mortgage_term < '27.5' => 0.0605850485,
-    iv_inp_addr_mortgage_term >= '27.5'                                     => -0.0314981185,
+    iv_inp_addr_mortgage_term != '  ' AND (real)iv_inp_addr_mortgage_term < 27.5 => 0.0605850485,
+    (real)iv_inp_addr_mortgage_term >= 27.5                                     => -0.0314981185,
                                                                              0.0267585790);
 
 final_score_tree_866_c4774 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-3', '2-1', '2-3', '3-0', '3-3']) => -0.0232626791,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-3', '2-1', '2-3', '3-0', '3-3']) => -0.0232626791,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-0', '1-1', '2-0', '3-1'])       => final_score_tree_866_c4775,
                                                                                           -0.0068127352);
 
@@ -26033,7 +26195,7 @@ final_score_tree_866 := map(
                                                                        -0.0037378017);
 
 final_score_tree_867_c4779 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0']) => 0.0076372162,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-1', '1-3', '2-3', '3-0']) => 0.0076372162,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '2-0', '2-1', '3-1', '3-3'])       => 0.0384293149,
                                                                                           0.0130407329);
 
@@ -26259,7 +26421,7 @@ final_score_tree_875 := map(
 
 final_score_tree_876_c4823 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['2-0', '2-1', '3-3'])                                                 => -0.0063859845,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-1']) => -0.0000908918,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-3', '3-0', '3-1']) => -0.0000908918,
                                                                                                                -0.0010098036);
 
 final_score_tree_876_c4825 := map(
@@ -26343,8 +26505,8 @@ final_score_tree_879_c4840 := map(
                                                                                          -0.0098893207);
 
 final_score_tree_879_c4838 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '7' => final_score_tree_879_c4839,
-    iv_inp_own_prop_x_addr_naprop >= '7'                                         => final_score_tree_879_c4840,
+    iv_inp_own_prop_x_addr_naprop != ' '  AND (real)iv_inp_own_prop_x_addr_naprop < 7 => final_score_tree_879_c4839,
+    (Real)iv_inp_own_prop_x_addr_naprop >= 7                                         => final_score_tree_879_c4840,
                                                                                   -0.0028653321);
 
 final_score_tree_879_c4837 := map(
@@ -26533,8 +26695,8 @@ final_score_tree_886 := map(
                                                                                       -0.0001058839);
 
 final_score_tree_887_c4879 := map(
-    '' < iv_ams_college_tier AND iv_ams_college_tier < '2.5' => 0.0253615624,
-    iv_ams_college_tier >= '2.5'                               => -0.0667980531,
+    iv_ams_college_tier != '  '  AND (real)iv_ams_college_tier < 2.5 => 0.0253615624,
+    (Real)iv_ams_college_tier >= 2.5                               => -0.0667980531,
                                                                 0.0170500852);
 
 final_score_tree_887_c4878 := map(
@@ -26634,7 +26796,7 @@ final_score_tree_890 := map(
 
 final_score_tree_891_c4900 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '3-0', '3-1'])                                                 => -0.0033235320,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-3']) => 0.1352164344,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-0', '1-1', '1-3', '2-0', '2-1', '2-3', '3-3']) => 0.1352164344,
                                                                                                                0.0572235644);
 
 final_score_tree_891_c4899 := map(
@@ -26788,7 +26950,7 @@ final_score_tree_897_c4928 := map(
                                                                                0.0170458173);
 
 final_score_tree_897_c4927 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '3-0', '3-3']) => -0.0057065866,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '0-3', '1-0', '2-0', '2-1', '3-0', '3-3']) => -0.0057065866,
     (iv_nap_phn_ver_x_inf_phn_ver in ['1-1', '1-3', '2-3', '3-1'])                                   => final_score_tree_897_c4928,
                                                                                                         -0.0040239817);
 
@@ -26798,8 +26960,8 @@ final_score_tree_897_c4930 := map(
                                                                                           0.0146274769);
 
 final_score_tree_897_c4929 := map(
-    '' < iv_prv_own_prop_x_addr_naprop AND iv_prv_own_prop_x_addr_naprop < '2.5' => -0.0009040308,
-    iv_prv_own_prop_x_addr_naprop >= '2.5'                                         => final_score_tree_897_c4930,
+    iv_prv_own_prop_x_addr_naprop!= '  ' AND (real)iv_prv_own_prop_x_addr_naprop < 2.5 => -0.0009040308,
+    (real)iv_prv_own_prop_x_addr_naprop >= 2.5                                         => final_score_tree_897_c4930,
                                                                                     -0.0018054549);
 
 final_score_tree_897 := map(
@@ -26808,8 +26970,8 @@ final_score_tree_897 := map(
                                                                 final_score_tree_897_c4929);
 
 final_score_tree_898_c4935 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '10.5' => 0.0236072604,
-    iv_infutor_nap >= '10.5'                          => -0.0318043259,
+    iv_infutor_nap != ' ' AND (real)iv_infutor_nap < 10.5 => 0.0236072604,
+    (real)iv_infutor_nap >= 10.5                          => -0.0318043259,
                                                        0.0428371725);
 
 final_score_tree_898_c4934 := map(
@@ -26818,8 +26980,8 @@ final_score_tree_898_c4934 := map(
                                                                                   0.0264319480);
 
 final_score_tree_898_c4933 := map(
-    '' < (string)iv_mos_since_prv_addr_fseen AND (string)iv_mos_since_prv_addr_fseen < '266.5' => -0.0032758786,
-    (string)iv_mos_since_prv_addr_fseen >= '266.5'                                       => final_score_tree_898_c4934,
+    NULL < iv_mos_since_prv_addr_fseen AND iv_mos_since_prv_addr_fseen < 266.5 => -0.0032758786,
+    iv_mos_since_prv_addr_fseen >= 266.5                                       => final_score_tree_898_c4934,
                                                                                   0.0127388389);
 
 final_score_tree_898_c4932 := map(
@@ -26913,7 +27075,7 @@ final_score_tree_902_c4955 := map(
                                                                                 -0.0116853234);
 
 final_score_tree_902_c4954 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-3', '1-0', '1-1', '3-1'])                       => final_score_tree_902_c4955,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-3', '1-0', '1-1', '3-1'])                       => final_score_tree_902_c4955,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '1-3', '2-0', '2-1', '2-3', '3-0', '3-3']) => 0.0213687731,
                                                                                                   -0.0027517838);
 
@@ -26942,13 +27104,21 @@ final_score_tree_903_c4959 := map(
     adl_dob >= 1.5                   => -0.0305030332,
                                         -0.0151470871);
 
+// final_score_tree_903_c4960 := map(
+    // '' < iv_cvi AND iv_cvi < '25' => -0.0715106584,
+    // iv_cvi >= '25'                  => -0.0017350819,
+                                     // -0.0026175773);
+                                     
 final_score_tree_903_c4960 := map(
-    '' < iv_cvi AND iv_cvi < '25' => -0.0715106584,
-    iv_cvi >= '25'                  => -0.0017350819,
-                                     -0.0026175773);
+   iv_cvi != '  ' AND (integer)iv_cvi < 25 => -0.0715106584,
+    (integer)iv_cvi >= 25                  => -0.0017350819,
+                                      -0.0026175773);
+
+
+
 
 final_score_tree_903_c4958 := map(
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '2-0', '2-3', '3-0'])                                     => final_score_tree_903_c4959,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '2-0', '2-3', '3-0'])                                     => final_score_tree_903_c4959,
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-0', '1-1', '1-3', '2-1', '3-1', '3-3']) => final_score_tree_903_c4960,
                                                                                                          -0.0051095230);
 
@@ -27133,8 +27303,8 @@ final_score_tree_910 := map(
                                                                 -0.0053046914);
 
 final_score_tree_911_c4999 := map(
-    '' < iv_inp_own_prop_x_addr_naprop AND iv_inp_own_prop_x_addr_naprop < '1.5' => -0.0082407136,
-    iv_inp_own_prop_x_addr_naprop >= '1.5'                                         => 0.0511657205,
+     iv_inp_own_prop_x_addr_naprop != ' ' AND (real)iv_inp_own_prop_x_addr_naprop < 1.5 => -0.0082407136,
+    (real)iv_inp_own_prop_x_addr_naprop >= 1.5                                         => 0.0511657205,
                                                                                     0.0138375397);
 
 final_score_tree_911_c4998 := map(
@@ -27183,8 +27353,8 @@ final_score_tree_912 := map(
                                                                                    0.0048030971);
 
 final_score_tree_913_c5008 := map(
-    '' < iv_prv_addr_mortgage_present AND iv_prv_addr_mortgage_present < '0.5' => -0.0780316770,
-    iv_prv_addr_mortgage_present >= '0.5'                                        => -0.0161467574,
+    iv_prv_addr_mortgage_present != ''  AND (real)iv_prv_addr_mortgage_present < 0.5 => -0.0780316770,
+    (real)iv_prv_addr_mortgage_present >= 0.5                                        => -0.0161467574,
                                                                                   -0.0469771068);
 
 final_score_tree_913_c5010 := map(
@@ -27194,7 +27364,7 @@ final_score_tree_913_c5010 := map(
 
 final_score_tree_913_c5009 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-1', '0-3', '1-1', '1-3', '2-3'])       => final_score_tree_913_c5010,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0058711225,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '1-0', '2-0', '2-1', '3-0', '3-1', '3-3']) => 0.0058711225,
                                                                                           -0.0060129184);
 
 final_score_tree_913_c5007 := map(
@@ -27234,7 +27404,7 @@ final_score_tree_914 := map(
 
 final_score_tree_915_c5019 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '1-0', '2-1', '2-3', '3-0'])                     => -0.0684371655,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '0-3', '1-1', '1-3', '2-0', '3-1', '3-3']) => -0.0023687602,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '0-3', '1-1', '1-3', '2-0', '3-1', '3-3']) => -0.0023687602,
                                                                                                  -0.0172058744);
 
 final_score_tree_915_c5020 := map(
@@ -27293,8 +27463,8 @@ final_score_tree_917_c5027 := map(
                                                                                   0.0012402675);
 
 final_score_tree_917_c5030 := map(
-    '' < iv_infutor_nap AND iv_infutor_nap < '5' => 0.1301326100,
-    iv_infutor_nap >= '5'                          => 0.0314573883,
+    iv_infutor_nap != ' ' AND (REAL)iv_infutor_nap < 5 => 0.1301326100,
+    (REAL)iv_infutor_nap >= 5                          => 0.0314573883,
                                                     0.0763716271);
 
 final_score_tree_917_c5029 := map(
@@ -27323,8 +27493,8 @@ final_score_tree_918_c5033 := map(
                                                                                          -0.0098149855);
 
 final_score_tree_918_c5032 := map(
-    ''< iv_ams_college_tier AND iv_ams_college_tier < '3.5' => 0.0003924578,
-    iv_ams_college_tier >= '3.5'                               => final_score_tree_918_c5033,
+    iv_ams_college_tier != '  ' AND (real)iv_ams_college_tier < 3.5 => 0.0003924578,
+    (real)iv_ams_college_tier >= 3.5                               => final_score_tree_918_c5033,
                                                                 -0.0003058193);
 
 final_score_tree_918 := map(
@@ -27344,7 +27514,7 @@ final_score_tree_919_c5039 := map(
 
 final_score_tree_919_c5038 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-3', '1-0', '1-1', '2-1', '2-3', '3-1'])       => -0.0800124998,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-1', '1-3', '2-0', '3-0', '3-3']) => final_score_tree_919_c5039,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-1', '1-3', '2-0', '3-0', '3-3']) => final_score_tree_919_c5039,
                                                                                           -0.0270713943);
 
 final_score_tree_919_c5037 := map(
@@ -27379,7 +27549,7 @@ final_score_tree_920_c5042 := map(
 
 final_score_tree_920 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-1', '1-0', '2-1'])                                                 => final_score_tree_920_c5042,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-0', '0-3', '1-1', '1-3', '2-0', '2-3', '3-0', '3-1', '3-3']) => 0.0003542927,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-0', '0-3', '1-1', '1-3', '2-0', '2-3', '3-0', '3-1', '3-3']) => 0.0003542927,
                                                                                                                -0.0081775628);
 
 final_score_tree_921_c5048 := map(
@@ -27478,8 +27648,8 @@ final_score_tree_924_c5062 := map(
                                                                                                                                                      0.0019213807);
 
 final_score_tree_924 := map(
-    '' < iv_prv_addr_mortgage_term AND iv_prv_addr_mortgage_term < '22.5' => final_score_tree_924_c5062,
-    iv_prv_addr_mortgage_term >= '22.5'                                     => -0.0040388436,
+    iv_prv_addr_mortgage_term != '  ' AND (real)iv_prv_addr_mortgage_term < 22.5 => final_score_tree_924_c5062,
+    (real)iv_prv_addr_mortgage_term >= 22.5                                     => -0.0040388436,
                                                                              -0.0018946726);
 
 final_score_tree_925_c5069 := map(
@@ -27498,8 +27668,8 @@ final_score_tree_925_c5070 := map(
                                                                                   -0.0024020183);
 
 final_score_tree_925_c5067 := map(
-   '' < (string)iv_inp_own_prop_x_addr_naprop AND (string)iv_inp_own_prop_x_addr_naprop < '7' => final_score_tree_925_c5068,
-    (string)iv_inp_own_prop_x_addr_naprop >= '7'                                         => final_score_tree_925_c5070,
+   iv_inp_own_prop_x_addr_naprop != ' ' AND (real)iv_inp_own_prop_x_addr_naprop < 7 => final_score_tree_925_c5068,
+    (Real)iv_inp_own_prop_x_addr_naprop >= 7                                         => final_score_tree_925_c5070,
                                                                                   0.0068874682);
 
 final_score_tree_925 := map(
@@ -27524,7 +27694,7 @@ final_score_tree_926_c5072 := map(
 
 final_score_tree_926_c5075 := map(
     (iv_nap_phn_ver_x_inf_phn_ver in ['0-0', '0-3', '1-3', '2-0', '2-3', '3-0', '3-1']) => 0.0003599699,
-    (iv_nap_phn_ver_x_inf_phn_ver in ['-1', '0-1', '1-0', '1-1', '2-1', '3-3'])         => 0.0877611940,
+    (iv_nap_phn_ver_x_inf_phn_ver in [' -1', '0-1', '1-0', '1-1', '2-1', '3-3'])         => 0.0877611940,
                                                                                            0.0389918589);
 
 final_score_tree_926 := map(
@@ -28543,25 +28713,25 @@ rvc1801_1_0 := map(
     iv_riskview_222s => 222,
                         min(if(max(round(point * (final_score_gbm_logit - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(point * (final_score_gbm_logit - ln(odds)) / ln(2) + base), 501)), 900));
 
-rc1_4 := '';
+// rc1_4 := '';
 
-rc1v := 0;
+// rc1v := 0;
 
-rc2_4 := '';
+// rc2_4 := '';
 
-rc2v := 0;
+// rc2v := 0;
 
-rc3_4 := '';
+// rc3_4 := '';
 
-rc3v := 0;
+// rc3v := 0;
 
-rc4_3 := '';
+ //rc4_3 := '';
 
-rc4v := 0;
+// rc4v := 0;
 
-rc5_4 := '';
+ rc5_4 := '';
 
-rcvalue9m := if(0 <= iv_in001_estimated_income AND iv_in001_estimated_income <= 35000, 13, NULL);
+rcvalue9m := if((integer)0 <= iv_in001_estimated_income AND iv_in001_estimated_income <= 35000, 13, NULL);
 
 rcvalue9a := if(iv_bst_own_prop_x_addr_naprop = '00' or iv_bst_own_prop_x_addr_naprop = '01' or iv_src_property_adl_count = 0 or iv_inp_own_prop_x_addr_naprop = '00' or iv_inp_own_prop_x_addr_naprop = '01' or iv_pl001_m_snc_prop_adl_fs = -1 or iv_mos_src_property_adl_lseen = -1, 11, NULL);
 
@@ -28573,7 +28743,7 @@ rcvalue27 := if(iv_nap_phn_ver_x_inf_phn_ver = '0-0' or iv_nap_phn_ver_x_inf_phn
 
 rcvalue9q := if(iv_iq001_inq_count12 > 0 or iv_inq_addrs_per_adl > 0, 2, NULL);
 
-rcvalue73 := if(adl_hphn = 0, 4, NULL);
+rcvalue73 := if((integer)adl_hphn = 0, 4, NULL);
 
 rcvalue9i := if((trim((string)iv_college_attendance_x_age, LEFT))[1..1] = 'N', 3, NULL);
 
@@ -28622,7 +28792,7 @@ rc_dataset := DATASET([
     {'07', RCValue07},
     {'EV', RCValueEV},
     {'MI', RCValueMI}
-    ], ds_layout);
+    ], ds_layout) (value >0);
 
 //*************************************************************************************//
 // IMPORTANT NOTE:  Only select reason codes when their associated value is > 0.
@@ -28631,23 +28801,26 @@ rc_dataset := DATASET([
 
 rc_dataset_sorted := sort(rc_dataset, -rc_dataset.value);
 
-// rc1_4 := rc_dataset_sorted[1].rc;
-// rc2_4 := rc_dataset_sorted[2].rc;
-// rc3_4 := rc_dataset_sorted[3].rc;
-// rc4_4 := rc_dataset_sorted[4].rc;
+rc1_4 := rc_dataset_sorted[1].rc;
+rc2_4 := rc_dataset_sorted[2].rc;
+rc3_4 := rc_dataset_sorted[3].rc;
+rc4_4 := rc_dataset_sorted[4].rc;
 
-// rc1v := rc_dataset_sorted[1].value;
-// rc2v := rc_dataset_sorted[2].value;
-// rc3v := rc_dataset_sorted[3].value;
-// rc4v := rc_dataset_sorted[4].value;
+rc1v := rc_dataset_sorted[1].value;
+rc2v := rc_dataset_sorted[2].value;
+rc3v := rc_dataset_sorted[3].value;
+rc4v := rc_dataset_sorted[4].value;
 
-rc5_3 := if(rc1_4 != '9Q' and rc2_4 != '9Q' and rc3_4 != '9Q' and rc4_3 != '9Q' and iv_iq001_inq_count12 > 0, '9Q', rc5_4);
+//rc5_3 := if(rc1_4 != '9Q' and rc2_4 != '9Q' and rc3_4 != '9Q' and rc4_3 != '9Q' and iv_iq001_inq_count12 > 0, '9Q', rc5_4);
+rc5_3 := if(rc1_4 != '9Q' and rc2_4 != '9Q' and rc3_4 != '9Q' and rc4_4 != '9Q' and iv_iq001_inq_count12 > 0, '9Q', rc5_4);
 
 rc1_3 := if(rc1_4 = '', '36', rc1_4);
 
 rc2_3 := if(rc2_4 = '' and rc1_3 != '36', '36', rc2_4);
 
 rc3_3 := if(rc3_4 = '' and rc1_3 != '36' and rc2_3 != '36', '36', rc3_4);
+
+rc4_3 := if(rc4_4 = '' and rc1_3 != '36' and rc2_3 != '36' and rc3_3 != '36', '', rc4_4);
 
 rc4_2 := if(rvc1801_1_0 = 900, '', rc4_3);
 
@@ -28722,8 +28895,8 @@ reasons := CHOOSEN(ri & zeros, 5); // Keep up to 5 reason codes
                     self.iv_liens_unrel_x_rel             := iv_liens_unrel_x_rel;
                     self.ver_phn_inf                      := ver_phn_inf;
                     self.ver_phn_nap                      := ver_phn_nap;
-                    self.inf_phn_ver_lvl                  := inf_phn_ver_lvl;
-                    self.nap_phn_ver_lvl                  := nap_phn_ver_lvl;
+                    self.inf_phn_ver_lvl                  := (integer)inf_phn_ver_lvl;
+                    self.nap_phn_ver_lvl                  := (integer)nap_phn_ver_lvl;
                     self.iv_nap_phn_ver_x_inf_phn_ver     := iv_nap_phn_ver_x_inf_phn_ver;
                     self.iv_inq_addrs_per_adl             := iv_inq_addrs_per_adl;
                     self.prop_adl_p_count_pos             := prop_adl_p_count_pos;
@@ -29199,7 +29372,7 @@ reasons := CHOOSEN(ri & zeros, 5); // Keep up to 5 reason codes
                     self.iv_all_email_domain_free         := iv_all_email_domain_free;
                     self.iv_liens_unrel_lt_ct             := iv_liens_unrel_lt_ct;
                     self.iv_inq_dobs_per_ssn              := iv_inq_dobs_per_ssn;
-                    self.iv_cvi                           := iv_cvi;
+                    self.iv_cvi                           := (string)iv_cvi;
                     self.iv_paw_source_count              := iv_paw_source_count;
                     self.iv_inp_addr_mortgage_term        := iv_inp_addr_mortgage_term;
                     self.iv_pl002_addrs_per_adl_c6        := iv_pl002_addrs_per_adl_c6;

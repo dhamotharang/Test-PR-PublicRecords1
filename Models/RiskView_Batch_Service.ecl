@@ -110,7 +110,7 @@ export RiskView_Batch_Service := MACRO
 		'FFDOptionsMask'
 	));
 
-VALIDATING := FALSE;
+VALIDATING := False;
 
 batchin := dataset([],risk_indicators.Layout_Batch_In_Plus_Custom) 	: stored('batch_in',few);
 
@@ -395,7 +395,8 @@ custom_adl_clam := group(join(adl_clam, batchinseq_temp, left.seq=right.seq, get
 #if(VALIDATING)
 // final := adl_clam;
 // final := ungroup(Models.RVC1405_4_0(adl_clam, false)); // select correct clam here...adl_clam or clam.
-final := ungroup(Models.RVC1703_1_0(adl_clam, false)); 
+final := ungroup(Models.RVC1801_1_0(adl_clam, false)); 
+//OUTPUT(final, NAMED('Results'));
 #else
 attr := Models.getRVAttributes(clam, ''/*account_value*/, IsPreScreenTemp, false, DataRestriction);
 
@@ -1825,7 +1826,7 @@ Layout_working addScore(Layout_working le, Models.Layout_ModelOut ri, integer i)
 	self.reason23   := if(i=3 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason23);
 	self.reason24   := if(i=4 and FlagshipVersion >= 4, ri.ri[5].hri, le.reason24);
 	// Turn on the 5th reason code for the Payment Score model as well...
-	self.reason25   := if(i=5 and (FlagshipVersion >= 4 OR AlternateModel IN ['rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvc1208_1', 'rvc1301_1','rvc1405_3','rvc1405_4','rvc1412_1', 'rvc1412_2', 'rvc1703_1']), ri.ri[5].hri, le.reason25);
+	self.reason25   := if(i=5 and (FlagshipVersion >= 4 OR AlternateModel IN ['rvc1112_0', 'rvc1110_1', 'rvc1110_2', 'rvc1208_1', 'rvc1301_1','rvc1405_3','rvc1405_4','rvc1412_1', 'rvc1412_2', 'rvc1703_1','rvc1801_1']), ri.ri[5].hri, le.reason25);
 
 	self := le;
 	self := [];
@@ -1991,8 +1992,9 @@ final := map(
 	isPreScreen => after_suppressions,
 	project(filtered_pre_screen_recs, models.Layout_RiskView_Batch_Out)
 );
-
 #end
+
+
 
 // output(CustomIndex, named('CustomIndex'));
 // output(CustomScoreName, named('CustomScoreName'));

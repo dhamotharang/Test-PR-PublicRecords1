@@ -2,7 +2,8 @@
 	Unsigned seq := 0;
 	Unsigned did := 0;
 	
-	string2 NAP;
+	
+  string2 NAP;
 	string2 NAS;
 	string2 CVI_score;
 	string2 CVI_reason1;
