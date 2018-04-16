@@ -126,7 +126,8 @@ export Search_Service := MACRO
 	
 	boolean IncludeLnJ := option.IncludeLiensJudgmentsReport;
 	boolean IncludeRecordsWithSSN := option.LiensJudgmentsReportOptions.IncludeRecordsWithSSN;
- 	boolean IncludeBureauRecs := option.LiensJudgmentsReportOptions.IncludeBureauRecs;
+	boolean IncludeBureauRecs := option.LiensJudgmentsReportOptions.IncludeBureauRecs; 
+ integer ReportingPeriod := option.LiensJudgmentsReportOptions.ReportingPeriod; 
 	
 	//Default the options to be ON which is '1'. If excluded, then change to 0
 	string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
@@ -254,9 +255,11 @@ MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND ban
 									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name ='' AND AttributesVersionRequest = '' AND
 									 custom2_model_name = '' AND custom3_model_name = '' AND custom4_model_name = '' AND custom5_model_name = '' AND
 									 ~run_riskview_report;
-								 
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
-input_ok := if(( 
+
+rpt_period_error_message := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
+            
+input_ok := map((( 
 							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
 							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
 								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
@@ -265,11 +268,26 @@ input_ok := if((
 								) or
 							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
 							  ) or
-							(unsigned)packagedInput[1].LexID <> 0,
-							true,
-							ERROR(301,error_message)
+							(unsigned)packagedInput[1].LexID <> 0) 
+           and
+        (ReportingPeriod > 0 and ReportingPeriod <= 84)
+         => true,
+       (( 
+							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
+							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
+								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
+								(trim(packagedInput[1].z5)<>'' OR (trim(packagedInput[1].p_city_name)<>'' AND trim(packagedInput[1].St)<>'')))												// zip or city/state check
+							)
+								) or
+							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
+							  ) or
+							(unsigned)packagedInput[1].LexID <> 0) 
+           and
+        (ReportingPeriod <= 0 or ReportingPeriod > 84) // same as above, everything is good EXCEPT reportingperiod
+         => ERROR(301,rpt_period_error_message),
+							ERROR(301,error_message) // else if anything else is wrong, give the other error message first priority.
 						);
-						
+		//output(input_ok);				
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
@@ -303,7 +321,8 @@ input_ok := if((
 		CustomerNumber,
 		SecurityCode, 
 		IncludeRecordsWithSSN,
-		IncludeBureauRecs,
+	 IncludeBureauRecs, 
+		ReportingPeriod, 
 		IncludeLnJ,
 		RetainInputDID
 
@@ -1179,6 +1198,7 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
 		&lt;LiensJudgmentsReportOptions&gt;
 		 &lt;IncludeRecordsWithSSN&gt;&lt;/IncludeRecordsWithSSN&gt;
 		 &lt;IncludeBureauRecs&gt;&lt;/IncludeBureauRecs&gt;
+   &lt;ReportingPeriod&gt;&lt;/ReportingPeriod&gt;
 		 &lt;ExcludeCityTaxLiens&gt;&lt;/ExcludeCityTaxLiens&gt;
 		 &lt;ExcludeCountyTaxLiens&gt;&lt;/ExcludeCountyTaxLiens&gt;
 		 &lt;ExcludeStateTaxWarrants&gt;&lt;/ExcludeStateTaxWarrants&gt;
@@ -1204,6 +1224,6 @@ IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED
   &lt;/Row&gt;
 &lt;/RiskView2Request&gt;
 </pre>
-*/
+*/ 
 
 ENDMACRO;
