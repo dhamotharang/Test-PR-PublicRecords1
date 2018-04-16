@@ -35,9 +35,7 @@ export Boca_Shell_Function_FCRA (	DATASET (risk_indicators.Layout_input) pre_iid
 																	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																	BOOLEAN	IN_isDirectToConsumer = false,
 																	BOOLEAN IncludeLnJ = false,
-																	BOOLEAN onThor = false,
-                 integer2 ReportingPeriod = 84 
-                 ) := FUNCTION
+																	BOOLEAN onThor = false) := FUNCTION
 
 // for batch queries, dedup the input to reduce searching
 pre_iid := dedup(sort(pre_iid1, 
@@ -99,7 +97,6 @@ seq_map := join( pre_iid1, pre_iid,
 			export real bs_Global_watchlist_threshold       := IN_Global_watchlist_threshold;
 			export boolean bs_IsDirectToConsumer						:= IN_isDirectToConsumer;
 			export boolean bs_IncludeLnJ										:= IncludeLnJ;
-   export integer2 bs_ReportingPeriod := ReportingPeriod; 
 	END;
 
 	fcra_shell_results := library('Risk_Indicators.LIB_Boca_Shell_Function_FCRA', Risk_Indicators.IBoca_Shell_Function_FCRA(pre_iid, gateways, args)).results;
@@ -146,9 +143,7 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, onThor := onThor, 
-       ReportingPeriod := ReportingPeriod 
-       );
+							IncludeLnJ, onThor := onThor);
 
 
   fcra_shell_results := per_prop;

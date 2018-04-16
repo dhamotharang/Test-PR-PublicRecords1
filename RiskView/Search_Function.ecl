@@ -29,8 +29,7 @@ EXPORT Search_Function(
 	string20 CustomerNumber,
 	string10 SecurityCode,
 	boolean	IncludeRecordsWithSSN,
-	boolean	IncludeBureauRecs, 
-	integer2 ReportingPeriod, 
+	boolean	IncludeBureauRecs,
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
 	boolean onThor = FALSE
@@ -219,7 +218,7 @@ bsversion := IF(Crossindustry_model = 'RVS1706_0', 52,50);  // hard code this fo
 		Risk_Indicators.iid_constants.FlagLiensOptions(FilterLienTypes) + //sets the individual Lien/Judgment Filters
 		if( FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) +//DRM to drive Liens/Judgments
 		if( IncludeRecordsWithSSN, risk_indicators.iid_constants.BSOptions.SSNLienFtlr, 0 ) +
-		if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 )	 + 
+		if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 )	 +
 		if( RetainInputDID or LexIDOnlyOnInput, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 );
 		
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
@@ -232,8 +231,7 @@ bsversion := IF(Crossindustry_model = 'RVS1706_0', 52,50);  // hard code this fo
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=ADL_Based_Shell, datarestriction:=datarestriction, BSOptions:=BSOptions,
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
-		IncludeLnJ :=IncludeLnJ, onThor := onThor,
-    ReportingPeriod := ReportingPeriod 
+		IncludeLnJ :=IncludeLnJ, onThor := onThor
 	);
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
@@ -762,7 +760,6 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	SELF.Custom_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason4);
 	SELF.Custom_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason5);
 
- 
 	SELF.Custom2_score := MAP(le.Custom2_score <> '' AND score_override_alert_returned 	=> '100',
 													 le.Custom2_score <> '' AND prescreen_score_pass_custom		=> '1',
 													 le.Custom2_score <> '' AND prescreen_score_fail_custom		=> '0',
@@ -806,7 +803,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom5_reason3);
 	SELF.Custom5_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom5_reason4);
 	SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom5_reason5);
-  
+	
 	AlertRegulatoryCondition := map(
 		le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 

@@ -72,7 +72,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string rmsid;
 		string name_type;
 		string plaintiff;
-		string DateLastSeen;
+		string vendorDateLastSeen;
 	end;
 
   export LNJ_attrs := RECORD
@@ -152,7 +152,7 @@ EXPORT Layouts_Derog_Info := MODULE
 	end;		
 	
 	EXPORT Liens_Working := RECORD
-		string8 DateFiled ;  
+		string8 DateFiled ;    
 		string50 LJType           ;    
 		string15 Amount             ;    
 		string8 ReleaseDate    ;    
@@ -177,7 +177,6 @@ EXPORT Layouts_Derog_Info := MODULE
 		Liens_Working;
 		string PersistId;
 		unsigned ConsumerStatementId;
-  string2 Filing_Type_Id;
 	END;	
 	
 	EXPORT layout_derog_process_plus_workingDF := RECORD
@@ -192,8 +191,7 @@ EXPORT Layouts_Derog_Info := MODULE
 	EXPORT Liens := RECORD
 		string30 Seq                ;
     unsigned6 did;
-		string8 DateFiled ;   
-  string2 LienTypeID;
+		string8 DateFiled ;    
 		string50 LienType           ;    
 		string15 Amount             ;    
 		string8 ReleaseDate    ;    
@@ -216,8 +214,7 @@ EXPORT Layouts_Derog_Info := MODULE
 	EXPORT Judgments := RECORD
 		string30 Seq ;
 		unsigned6 did;
-		string8 DateFiled          ;   
-  string2 JudgmentTypeID;
+		string8 DateFiled          ;           
 		string50 JudgmentType      ;           
 		string15 Amount            ;           
 		string8 ReleaseDate      ;           

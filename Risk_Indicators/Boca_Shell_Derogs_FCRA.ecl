@@ -3,9 +3,7 @@
 export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids, 
 	integer bsVersion, unsigned8 BSOptions=0, 
 	boolean IncludeLnJ = false, boolean onThor=false,
-	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
- integer2 ReportingPeriod = 84
-   ) := function
+	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 
@@ -120,7 +118,7 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids,
 	BankLiensCrimSO := Risk_Indicators.Boca_Shell_SO_FCRA(bsVersion, BSOptions, BankLiensCrim, onThor); 
 
 	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(bsVersion, BSOptions, w_corrections, 
-		IncludeLnJ, onThor, iid_withPersonContext, ReportingPeriod); 							
+		IncludeLnJ, onThor, iid_withPersonContext);								
 	DerogsLNJ := JOIN(BankLiensCrimSO, BankLiensCrimSO_LNJ,
 					LEFT.Did = Right.Did,
 					RiskView.Transforms.GetLnJInfo(LEFT, RIGHT),
