@@ -37,10 +37,10 @@ EXPORT SprayAndQualifyInquiryLogs(
 	tools.mac_WriteFile(FileSprayed,
 									IDM_Logs,
 									Build_Input_File,
-									pCompress	:= 'true',
-									pCsvout := 'true',
+									pCompress	:= true,
+									pCsvout := true,
 									pSeparator := '~|~',
-									pOverwrite := 'true'
+									pOverwrite := true,
 									pTerminator := '~<EOL>~',
 									pQuote:= '');
 
