@@ -118,7 +118,8 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 						101 => 'No Phone number was entered for the verification request',
 					'Unspecified Failure');
 		
-	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN]; // phonerisk assessment gateways
+	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN,
+                                            Gateway.Constants.ServiceName.ZumigoIdentity]; // phonerisk assessment gateways
 	// Debugging
 	EXPORT Debug :=
 	MODULE
@@ -132,6 +133,16 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT Targus       := FALSE;
 		EXPORT PhoneMetadata:= FALSE;
 	END;
+	
+	EXPORT ZumigoConstants := MODULE
+		EXPORT STRING20 Usecase     := 'FCIP';
+		EXPORT STRING3 	productCode := 'ACC';
+		EXPORT STRING20 productName := 'PHONE FINDER';
+		EXPORT STRING10 optInType   := 'Whitelist';
+		EXPORT STRING5 	optInMethod := 'TCO';
+		EXPORT STRING3 	optinDuration := 'ONG';
+	END;
+	
 	//Zumigo
 	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
 	// Batch only
