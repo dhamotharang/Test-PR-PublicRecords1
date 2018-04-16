@@ -1099,41 +1099,6 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.AKAs := PROJECT( le.Additional_Lname, xfm_AlternateNames(LEFT) );
 
 		// WatchLists
-				iesp.instantid.t_WatchList xfm_SingleWatchlistRecord := TRANSFORM
-					SELF.Table											 := le.Watchlist_Table;
-					SELF.RecordNumber								 := le.Watchlist_Record_Number;
-					SELF.Name.Full									 := '';
-					SELF.Name.First									 := le.Watchlist_fname;
-					SELF.Name.Middle								 := '';
-					SELF.Name.Last									 := le.Watchlist_lname;
-					SELF.Name.Suffix								 := '';	
-					SELF.Name.Prefix								 := '';		
-					SELF.Address.StreetNumber				 := le.WatchlistPrimRange;
-					SELF.Address.StreetPreDirection	 := le.WatchlistPreDir;
-					SELF.Address.StreetName					 := le.WatchlistPrimName;
-					SELF.Address.StreetSuffix				 := le.WatchlistAddrSuffix;
-					SELF.Address.StreetPostDirection := le.WatchlistPostDir;
-					SELF.Address.UnitDesignation		 := le.WatchlistUnitDesignation;
-					SELF.Address.UnitNumber					 := le.WatchlistSecRange;
-					SELF.Address.StreetAddress1			 := le.Watchlist_address;
-					SELF.Address.StreetAddress2			 := '';
-					SELF.Address.City								 := le.Watchlist_city;
-					SELF.Address.State							 := le.Watchlist_state;
-					SELF.Address.Zip5								 := le.Watchlist_zip[1..5];
-					SELF.Address.Zip4								 := '';
-					SELF.Address.County							 := '';
-					SELF.Address.PostalCode					 := '';
-					SELF.Address.StateCityZip				 := '';
-					SELF.Country										 := le.Watchlist_contry; 
-					SELF.EntityName									 := le.Watchlist_Entity_Name;
-					SELF.Sequence										 := 1; 
-					// SELF.Program										 := le.Watchlist_Program;
-					SELF := [];
-				END;
-		
-				SingleWatchlistRecord := DATASET( [xfm_SingleWatchlistRecord] );
-
-		// WatchLists
 				iesp.instantid.t_WatchList xfm_Watchlists( risk_indicators.layouts.layout_watchlists_plus_seq gwl_le) := TRANSFORM
 					SELF.Table											 := gwl_le.Watchlist_Table;
 					SELF.RecordNumber								 := gwl_le.Watchlist_Record_Number;
@@ -1161,14 +1126,14 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 					SELF.Address.StateCityZip				 := '';
 					SELF.Country										 := gwl_le.Watchlist_contry; 
 					SELF.EntityName									 := gwl_le.Watchlist_Entity_Name;
-					SELF.Sequence										 := gwl_le.seq + 1; 
+					SELF.Sequence										 := gwl_le.seq; 
 					// SELF.Program										 := gwl_le.Watchlist_Program;
 					SELF := [];
 				END;
 				
 				ds_WatchlistRecords := PROJECT( le.WatchLists, xfm_Watchlists(LEFT) );
 		
-		SELF.Watchlists := SORT( ( SingleWatchlistRecord + ds_WatchlistRecords ), Sequence );
+		SELF.Watchlists := SORT( ds_WatchlistRecords, Sequence );
 
 		// Address Risk 
 		SELF.AddressRisk.AddressIsPOBox := le.addressPOBox;
