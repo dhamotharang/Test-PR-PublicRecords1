@@ -250,7 +250,7 @@ module
 						dRefreshLexid,
 						input_file_2); 
 
-	tools.mac_WriteFile(Filenames(pversion).Input.IdentityData.New(pversion),
+	tools.mac_WriteFile(Filenames(pversion).Input.KnownFraud.New(pversion),
 									input_file_3,
 									Build_Input_File,
 									pCompress	:= true,
