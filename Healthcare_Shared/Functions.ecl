@@ -2117,4 +2117,10 @@ EXPORT Functions := MODULE
 			// output(date_st, Named('datestat_date_st'),overwrite);
 			return date_st;
 	end;
+
+        EXPORT CleanLicenseNumber(STRING lic_in) := FUNCTION
+		toUpper						:= TRIM(StringLib.StringToUpperCase(lic_in), ALL);
+		removeNonAlphaNum := REGEXREPLACE(Healthcare_Shared.Constants.NonAlphaNumChar, toUpper, '');
+		RETURN IF(removeNonAlphaNum IN Healthcare_Shared.Constants.setBogusLicense, '', removeNonAlphaNum);
+	END;
 End;
