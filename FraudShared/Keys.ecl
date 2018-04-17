@@ -5,7 +5,109 @@ export Keys(
    ,dataset(FraudShared.Layouts.Base.Main)		      pBaseMainBuilt		  =	Files(pversion).Base.Main.Built	
 
 ) := module
-  shared pFileKeybuild           				:= Get_File_KeyBuild(pBaseMainBuilt).File_KeyBuild;
+
+	shared pFileKeybuild           				:= Get_File_KeyBuild(pBaseMainBuilt).File_KeyBuild;
+	
+  shared  layout_hostuser :=record,maxlength(60000) //only used for host & user indexing & will not be part of shared layout. GRP-394,465
+					Layouts_Key.Main;
+					unsigned8 hash64_host; 
+					unsigned8 hash64_user;		
+					end;
+					
+	shared  layout_bankrouting :=record,maxlength(60000) //only used for bank routing indexing & will not be part of shared layout. GRP-447
+					Layouts_Key.Main;
+					string20 Bank_Routing_Number; 		
+					end;
+					
+	shared  layout_iprange :=record,maxlength(60000) //only used for ip range indexing & will not be part of shared layout. GRP-446
+					Layouts_Key.Main;
+					unsigned1	octet1;
+					unsigned1	octet2;
+					unsigned1	octet3;
+					unsigned1	octet4;
+					end;										
+	
+	shared BaseMain           						:= Project(pFileKeybuild, Transform(Layouts_key.Main
+																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
+																									,self					:=left)
+																									);
+																									
+	Shared BaseMain_HostUser 							:= Project(BaseMain
+																						,Transform(layout_hostuser 
+																							,self.hash64_host		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,2))),0)
+																							,self.hash64_user		:=if(left.email_address<>'',hash64(STD.Str.ToUpperCase(regexfind('(.*)@(.*)$',left.email_address,1))),0)
+																							,self:=left)
+																							);
+																																								
+  shared BaseMain_RoutingNumber					:= dedup(table(Normalize(BaseMain(Bank_Routing_Number_1<>'' or Bank_Routing_Number_2<>'')
+																									,2
+																									,Transform(layout_bankrouting
+																									,self.Bank_Routing_Number	:=	Choose(Counter,left.Bank_Routing_Number_1,left.Bank_Routing_Number_2)
+																									,self					:=left)
+																									),{Bank_Routing_Number,classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id,record_id , UID},few),all);																									
+  
+	shared BaseMain_BankNamePrep					:= Dedup(Join(BaseMain_RoutingNumber,Bank_Routing.key_rtn
+																									,left.bank_routing_number=right.routing_number_micr
+																										,transform({string50 bank_name,recordof(BaseMain_RoutingNumber)-[bank_routing_number]}
+																											,self.Bank_Name :=right.institution_name_abbreviated
+																											,self:=left)
+																											,left outer),all); 		
+  																												
+	Export BankNames_JSON									:= Dedup(Table(BaseMain_BankNamePrep(Bank_Name<>''),{Bank_Name},few),all); 	//Json file for webteam GRP_518
+	
+	shared BaseMain_AccountNumber 				:= dedup(table(Normalize(BaseMain(bank_account_number_1<>'' or bank_account_number_2<>'')
+																									,If(left.bank_account_number_2<>'',2,1) 
+																									,Transform({Fraudshared.Layouts_Key.main,string20 Bank_Account_Number}
+																									,self.Bank_Account_Number	:=	Choose(Counter,left.Bank_Account_Number_1,left.Bank_Account_Number_2)
+																									,self :=left)
+																									),{Bank_Account_Number,classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id,record_id , UID},few),all);	
+	
+	//ISP Begin
+	
+	shared BaseIsp_Tbl										:= Table(BaseMain,{isp,ip_address,classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id,record_id , UID},few);
+	
+	shared Key_iprecs											:= Normalize(IP_Metadata.Key_IP_Metadata_IPv4(isp_name<>'')
+																										,(left.end_octets34-left.beg_octets34) +1
+																										,transform({recordof(IP_Metadata.Key_IP_Metadata_IPv4),unsigned8 octets34}
+																										,self.octets34	 := (left.beg_octets34 + counter) - 1 ,self:=left));
+																																																
+	shared BaseIspPrep										:= Project(BaseIsp_Tbl(isp='',ip_address<>'')
+																									,transform({recordof(BaseIsp_Tbl), unsigned8 octet1, unsigned8 octet2, unsigned8 octets34}
+																									,self.octet1		:= (unsigned8)Std.Str.SplitWords(left.ip_address,'.')[1]
+																									,self.octet2		:= (unsigned8)Std.Str.SplitWords(left.ip_address,'.')[2]
+																									,self.octets34	:= IP_Metadata._Functions.IPv4toInt(left.ip_address)
+																									,self:=left));
+																									
+	Shared BaseIsp_FromIPKey							:= Join(distribute(Key_iprecs,hash(beg_octet1,beg_octet2,octets34)),distribute(BaseIspPrep,hash(octet1,octet2,octets34))
+																								,left.beg_octet1 = right.octet1
+																								 and left.beg_octet2 = right.octet2
+																								 and left.octets34 =right.octets34
+																								,Transform(recordof(BaseIsp_Tbl)
+																								,self.isp :=trim(left.isp_name,left,right)
+																								,self:=right),right outer,local);
+  
+	Shared BaseMain_IspPrep								:= Project(BaseIsp_Tbl(isp<>'') + BaseIsp_FromIPKey(isp<>''), Transform(recordof(BaseIsp_Tbl)-[ip_address],self:=left));
+	
+	Export Isp_JSON												:= Table(BaseMain_IspPrep,{Isp},Isp,few,merge);	//Json file for webteam GRP_519										
+																									
+// ISP End
+
+//Ip Range Begin 
+
+ layout_iprange triprange(BaseMain l) := transform
+				octets := Std.Str.SplitWords(l.ip_address,'.');
+				self.octet1	:= (unsigned1)octets[1];
+				self.octet2	:= (unsigned1)octets[2];
+				self.octet3	:= (unsigned1)octets[3];
+				self.octet4	:= (unsigned1)octets[4];
+				self:=l;
+			end;	
+	
+	shared BaseMain_IPRangePrep						:= Project(BaseMain(Ip_address<>'',IP_address<>'0.0.0.0'),triprange(left));
+
+// Ip Range End
+
+	
 	shared pFileKeyFDNMasterID     				:= File_FDNMasterIDBuild.FDNMasterID;
   shared pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
 	shared pFileKeyFDNMasterIDIndTypIncl 	:= File_FDNMasterIDBuild.FdnmasterIdIndTypIncl;
