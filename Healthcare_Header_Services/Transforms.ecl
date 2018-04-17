@@ -560,7 +560,7 @@ EXPORT Transforms := MODULE
 	Export Layouts.CombinedHeaderResults build_selectfile_Provider_base (Layouts.selectfile_providers_base_with_input l) := transform
 		//Does the DID link and DOB and SSN make sense when compared with Enclarity year of birth or lic_begin_date.
 		hasYear := l.birth_year <> '' and (integer)l.birth_year > 0;
-		hasBestYear := l.clean_dob <>'';
+		hasBestYear := l.best_dob > 0;
 		hasLicYear := l.lic_begin_date <> '' and (integer)l.lic_begin_date > 0;
 		compareYr := ((string)l.best_dob)[1..4];
 		goodYear := hasYear and hasBestYear and (integer)compareYr = (integer)l.birth_year;
@@ -2516,7 +2516,7 @@ EXPORT Transforms := MODULE
 																											       NORMALIZE(allRows, LEFT.Addresses,TRANSFORM( Layouts.layout_addressinfo, SELF := RIGHT	)),
 																											          prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),
 																								                prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),
-																							                  group,doDEABaseRecordAddrRollup(left,rows(left))),addrseq)(prim_range<>'' and prim_range[1..10]<>'*** NOT AV');
+																							                  group,doDEABaseRecordAddrRollup(left,rows(left))),addrseq)(prim_range<>'' and prim_range[1..13]<>'*** NOT AVAI');
 
 							self.ssns          := DEDUP( NORMALIZE( allRows, LEFT.ssns, TRANSFORM( Layouts.layout_ssn, SELF := RIGHT	)	), ssn, ALL );
 							self.dids          := Functions.processDids( NORMALIZE( allRows, LEFT.dids, TRANSFORM( Layouts.layout_did, SELF := RIGHT	)	) );
@@ -2933,29 +2933,9 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.NPPESVerified := map(exists(allRows(NPPESVerified='YES')) => 'YES',
 															exists(allRows(NPPESVerified='CORRECTED')) => 'CORRECTED',
 															' ');
-		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)), RECORD, ALL );
-	 	 Names              := sort(
-		                            DEDUP(
-		                                  sort
-		                                  ( 
-																			    NORMALIZE( allRows, LEFT.Names(nameSeq>0 and (FirstName<>'' or LastName<>'' or FullName<>'' )), 
-																					            TRANSFORM( 
-																											          Layouts.layout_nameinfo, 
-																																SELF.fullname:=if(right.fullname <>'',right.fullname ,std.str.CleanSpaces(right.firstname+' '+right.middlename+' '+right.lastname+' '+right.suffix)),
-																																self.nameseq:=right.nameseq,
-																																self.namepenalty:=right.namepenalty)
-																																),
-																			  STD.Str.ToUpperCase(STD.Str.CleanSpaces(FullName)),nameseq 
-																			), 
-																			  STD.Str.ToUpperCase(STD.Str.CleanSpaces(FullName))
-																			),
-																			nameSeq,namePenalty,-gender
-																		);
-     companyNames         := sort(DEDUP(sort( NORMALIZE( allRows, LEFT.Names(nameSeq>0 and  CompanyName <>''), TRANSFORM( Layouts.layout_nameinfo,self.companyname:=right.companyname; self.nameSeq:=right.nameSeq,self.namePenalty:=right.namePenalty	)	), STD.Str.ToUpperCase(CompanyName),nameSeq ), STD.Str.ToUpperCase(CompanyName)),nameSeq,namePenalty);
-	 	 finalnames:=names+companynames;	
-		 self.Names:=finalnames;
-		
-	 	
+		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
+		self.Names         := sort(DEDUP(sort( NORMALIZE( allRows, LEFT.Names(nameSeq>0 and (FirstName<>'' or LastName<>'' or FullName<>'' or CompanyName <>'')), TRANSFORM( Layouts.layout_nameinfo, SELF := RIGHT	)	), FullName,FirstName,MiddleName,LastName,Suffix,CompanyName,nameSeq ), STD.Str.ToUpperCase(STD.Str.CleanSpaces(FullName)),STD.Str.ToUpperCase(FirstName),STD.Str.ToUpperCase(MiddleName),STD.Str.ToUpperCase(LastName),Suffix,STD.Str.ToUpperCase(CompanyName)),nameSeq,namePenalty,-gender);
+
 		/*Add logic to sort based on requirements
 			normalize the addresses
 			sort them so similar address are together and get priority fields in first position

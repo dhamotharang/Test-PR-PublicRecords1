@@ -1,6 +1,4 @@
-﻿
-Import healthcare_shared,MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
-
+﻿Import MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
 EXPORT Customer_License_Search_Records := module
 	Shared myLayouts := Healthcare_Services.Customer_License_Search_Layouts;
 	Shared myConst := Healthcare_Services.Customer_License_Search_Constants;
@@ -186,14 +184,8 @@ EXPORT CleanLicenseNumber(STRING lic_in) := FUNCTION
 	
 	Export RecordsBatch(dataset(myLayouts.autokeyInput) inRecs, unsigned2 maxPenalty) := function
    	clean_in_recs:=	project(inRecs,transform(myLayouts.autokeyInput,
-
-		                                    self.license_number:=healthcare_shared.functions.CleanLicenseNumber
-																				(left.license_number);
-																				self:=left;));
-
-		                                    
-
-
+		                                    self.license_number:=CleanLicenseNumber(left.license_number);
+		                                    self:=left;));
 		recs := Records(clean_in_recs,maxPenalty);
 		recs_fmt := project(recs,transform(myLayouts.LayoutOutput_batch, 
 															self.cln_fname:=left.clean_name.fname;
