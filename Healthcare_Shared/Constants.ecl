@@ -1010,6 +1010,13 @@ export Constants := MODULE
 	EXPORT SET_FILECODE_LICENSE:='LIC';
 	EXPORT SET_FILECODE_SSA:='SSA';
 	EXPORT SET_FILECODE_SKA:='SKA';
+        EXPORT NonAlphaNumChar	:= '[^A-Za-z0-9]';
+        EXPORT setBogusLicense := ['390200000X','WC1','35NULL','34NULL','LARN00000',
+	                           'INPROCESS','NOTAPPLICABLE','APPLIEDFOR','PENDING',
+	                           '0','00','000','0000','00000','000000','0000000','00000000','000000000',
+														 'NOLICNUMBER','NR','NULL','NA','NONE',
+														 'TEMPORARY','STUDENT','UNKNOWN','TEMP','RESIDENT','OPT'];
+
 	
 
 END;
