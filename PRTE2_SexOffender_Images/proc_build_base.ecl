@@ -9,27 +9,24 @@ EXPORT proc_build_base(string filedate):= function
 	
 
 //Format Offender File
-	Layouts.IMG_CommonInfo slimFile(files.offender_base l):= transform
-		self.filename 				:= trim(l.image_link,all);
+	Layouts.IMG_CommonInfo slimFile(files.sexoffender_base l):= transform
+		self.filename 				:= trim(STD.Str.ToUpperCase(l.image_link));
 		self.state_origin := ut.st2abbrev(STD.Str.ToUpperCase(l.orig_state));
 		self 			:= l;
 	end;
 
-IMG_CommonInfo := project(Files.offender_base, slimFile(left));
+IMG_CommonInfo := project(files.sexoffender_base, slimFile(left));
 
 //CREATE IMAGE BASE FILE/////////////////////////
 	Layouts.Common getspk(ds1b le, IMG_CommonInfo ri) := TRANSFORM
 		SELF.did        := (unsigned)ri.did;
-		SELF.state 		  	:= ri.offender_key[1..2];
-		SELF.rtype 		  	:= map(ri.data_type ='1' => 'DC',
-																									ri. data_type ='5' => 'AL',
-																									'');
-	
-	 SELF.id 		    		:= TRIM(ri.offender_key, ALL);;
+		SELF.state 		  	:= ri.state_origin;
+		SELF.rtype 		  	:= 'SO';
+	 SELF.id 		    		:= ri.seisint_primary_key;
 		SELF.seq 		    	:= 0;
 		SELF.date 		  		:= '';
 		SELF.num 		    	:= 1;
-		self.image_link := TRIM(ri.filename,ALL);
+		self.image_link := ri.filename;
 		SELF.imgLength 	:= le.imgLength;
 		SELF.photo 		  	:= le.photo;
 	END;
