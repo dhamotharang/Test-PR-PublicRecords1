@@ -85,12 +85,14 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		GatewayExceptions := OutputFromEquifax[1].response._Header.Exceptions ;
 		AllExceptions := 	GatewayExceptions;
 
+		
 		//Response Header 
 		r := iesp.ECL2ESP.GetHeaderRow();
+		message := 	STD.STr.RemoveSuffix(trim(EquifaxStatusMessage),'.')+' ('+ EquifaxStatusCode +').';
 		validation_row := row(r, 
 										transform(iesp.share.t_CodeMap,
 															self.Code := (string) StatusCode;
-															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,EquifaxStatusMessage+'('+ EquifaxStatusCode +').');
+															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,message);
 															)
 										);
 
