@@ -54,6 +54,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 
 %update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N|BN');
 
+/******Comment out the dops update and orbit for GWL on  Insurance end -- DF - 21830
 #uniquename(update_alpha_version)
 
 %update_alpha_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'skasavajjala@seisint.com',,'N',,,'A'); 
@@ -61,7 +62,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 #uniquename(create_orbitI)
 
 %create_orbitI% := GlobalWatchLists.Proc_OrbitI_CreateBuild(filedate);
-
+******************************************************/
 #uniquename(create_orbit)
 
 
@@ -76,7 +77,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 
 sequential(
 						%spray_first%,%pull_ofac_fse%,%build_super%,%validate_recs%,%build_all%,
-						%validate_key%,%update_version%,%update_alpha_version%,%create_orbitI%,%create_orbit% ,%getupdate%,%scrubs%)//,DoTheStats)
+						%validate_key%,%update_version%,/*%update_alpha_version%,%create_orbitI%,*/%create_orbit% ,%getupdate%,%scrubs%)//,DoTheStats)
 			: success(%send_succ_msg%),
 			  failure(%send_fail_msg%);
 
