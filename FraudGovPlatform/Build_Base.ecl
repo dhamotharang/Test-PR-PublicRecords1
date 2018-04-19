@@ -5,7 +5,6 @@ export Build_Base(
 	 string	pversion
 	,boolean	PSkipIdentityDataBase	= false 
 	,boolean	PSkipKnownFraudBase	= false 
-	,boolean	PSkipInquiryLogsBase	= false 
 	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.QA
 	
   ,dataset(Layouts.Base.IdentityData)	pBaseIdentityDataFile	=	Files().Base.IdentityData.QA
@@ -15,10 +14,6 @@ export Build_Base(
 	,dataset(Layouts.Base.KnownFraud)	pBaseKnownFraudFile	=	Files().Base.KnownFraud.QA
 	,dataset(Layouts.Input.KnownFraud)	pUpdateKnownFraudFile	=	Files().Input.KnownFraud.Sprayed
 	,boolean	pUpdateKnownFraudFlag	= _Flags.Update.KnownFraud
-
-  ,dataset(Layouts.Base.InquiryLogs)	pBaseInquiryLogsFile	=	Files().Base.InquiryLogs.QA
-	,dataset(Layouts.Input.InquiryLogs)	pUpdateInquiryLogsFile	=	Files().Input.InquiryLogs.Sprayed
-	,boolean	pUpdateInquiryLogsFlag	= _Flags.Update.InquiryLogs
 
 ) :=
 module
@@ -41,14 +36,6 @@ module
 					,pUpdateKnownFraudFile
 					,pUpdateKnownFraudflag
 					).All)
-				,if(PSkipInquiryLogsBase , output('InquiryLogs base skipped')
-					,Build_Base_InquiryLogs(
-					 pversion
-					,pBaseInquiryLogsFile
-					,pUpdateInquiryLogsFile
-					,pUpdateInquiryLogsflag
-					).All)					
-
 			 )
 			 ,MapToCommon(
 					 pversion

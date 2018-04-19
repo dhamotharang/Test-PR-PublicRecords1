@@ -1,4 +1,4 @@
-EXPORT fConvert_13d13g(string filedate) := module
+﻿EXPORT fConvert_13d13g(string filedate) := module
 import lib_StringLib,_control;
 
 
@@ -11,7 +11,7 @@ infilelist := FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,sourc
 
 string8 fdate := infilelist[1].name[25..32] ;
 
-d13d13g_Remote 	:= 	dataset('~file::bctlpedata11.risk.regn.net::data::prod_data_build_10::production_data::business_headers::vickers::in::^Seisint13^D13^G6yr^Rpt.txt.'+fdate+'.fixed', Vickers.Layouts_raw.r13d13g, thor) ( trim(form_id) <> 'formId');
+d13d13g_Remote 	:= 	dataset('~file::'+_control.IPAddress.bctlpedata11+'::data::prod_data_build_10::production_data::business_headers::vickers::in::^Seisint13^D13^G6yr^Rpt.txt.'+fdate+'.fixed', Vickers.Layouts_raw.r13d13g, thor) ( trim(form_id) <> 'formId');
 	
 	string					Insider13d13gLF				:=	'~thor_data400::in::vickers::'+filedate+'::13d13g_raw';
   string					Insider13d13gSF				:=	'~thor_data400::in::vickers::13d13g_raw';

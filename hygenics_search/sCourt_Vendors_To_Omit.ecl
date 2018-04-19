@@ -73,6 +73,7 @@
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
 '7R', // FLORIDA_PASCO_COUNTY                                                                                
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
+'7U', // DISTRICT_OF_COLUMBIA_SUPERIOR_COURT                                                                 
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
 '8P', // OHIO_CUYAHOGA_COUNTY_CLEVELAND_MUNICIPAL_COURT                                                      
@@ -112,18 +113,21 @@
 'CS', // COLORADO_PUEBLO_COUNTY_ARRESTS                                                                      
 'CU', // COLORADO_WELD_COUNTY_ARRESTS                                                                        
 'CW', // FLORIDA_BREVARD_COUNTY_ARRESTS                                                                      
+'CX', // FLORIDA_BROWARD_COUNTY_ARRESTS                                                                      
 'CY', // FLORIDA_CHARLOTTE_COUNTY_ARRESTS                                                                    
 'CZ', // FLORIDA_CITRUS_COUNTY_ARRESTS                                                                       
+'DA', // ALABAMA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DB', // ARKANSAS_DEPARTMENT_OF_CORRECTIONS                                                                  
-'DH', // COLORADO_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DL', // HAWAII_DEPARTMENT_OF_CORRECTIONS                                                                    
+'DO', // IOWA_DEPARTMENT_OF_CORRECTIONS                                                                      
 'DP', // IOWA_DEPARTMENT_OF_CORRECTIONS_PROBATION                                                            
 'DQ', // ILLINOIS_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DR', // KENTUCKY_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
+'DY', // MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS                                                               
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
 'EC', // NEVADA_DEPARTMENT_OF_CORRECTIONS                                                                    
 'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
@@ -188,6 +192,7 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'IC', // IOWA_ADMINISTRATOR_OF_THE_COURTS                                                                    
 'IG', // MINNESOTA_OLMSTED_COUNTY_ARRESTS                                                                    
 'IH', // MISSOURI_CLAY_COUNTY_ARRESTS                                                                        
 'II', // MISSOURI_ST_FRANCOIS_COUNTY_ARRESTS                                                                 
@@ -299,6 +304,7 @@
 'PT', // OREGON_ADMINISTRATOR_OF_THE_COURTS                                                                  
 'PY', // WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC                                                       
 'PZ', // CALIFORNIA_GLENN_COUNTY                                                                             
+'QA', // WASHINGTON_JEFFERSON_COUNTY_ARRESTS                                                                 
 'QD', // WASHINGTON_PIERCE_COUNTY_ARRESTS                                                                    
 'QE', // WASHINGTON_THURSTON_COUNTY_ARRESTS                                                                  
 'QF', // WASHINGTON_WHATCOM_COUNTY_ARRESTS                                                                   
@@ -335,7 +341,6 @@
 'TA', // TENNESSEE_ADMINISTRATOR_OF_THE_COURTS                                                               
 'TC', // TEXAS_BRAZORIA_COUNTY                                                                               
 'TD', // TEXAS_COLLIN_COUNTY                                                                                 
-'TE', // TEXAS_DALLAS_COUNTY                                                                                 
 'TG', // TEXAS_EL_PASO_COUNTY                                                                                
 'TL', // TEXAS_JOHNSON_COUNTY                                                                                
 'TM', // TEXAS_MIDLAND_COUNTY                                                                                
@@ -379,6 +384,7 @@
 'WG', // NORTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                    
 'WH', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WK', // UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                              
+'WN', // OHIO_CUYAHOGA_COUNTY_PARMA_MUNICIPAL_COURT                                                          
 'WT', // OHIO_GUERNSEY_COUNTY_CAMBRIDGE_MUNICIPAL_COURT                                                      
 'XX', // OHIO_KNOX_COUNTY_COMMON_PLEAS_COURT                                                                 
 'XY', // OHIO_KNOX_COUNTY_MOUNT_VERNON_MUNICIPAL_COURT                                                       
@@ -415,7 +421,7 @@
 'ZX', // SOUTH_CAROLINA_COLLETON_COUNTY_SUMMARY_COURTS                                                       
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
-                                            
+
 
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
@@ -481,12 +487,10 @@
 'W0129', // MAINE_GORHAM_POLICE_DEPARTMENT_CW                                                                   
 'W0130', // MARYLAND_FREDERICK_COUNTY_SHERIFF_CW                                                                
 'W0132', // MASSACHUSETTS_DUXBURY_CW                                                                            
-'W0133', // MASSACHUSETTS_EAST_LONGMEADOW_CW                                                                    
 'W0135', // MASSACHUSETTS_FRANKLIN_POLICE_CW                                                                    
 'W0136', // MASSACHUSETTS_HALIFAX_POLICE_DEPARTMENT_CW                                                          
 'W0137', // MASSACHUSETTS_HAMPDEN_POLICE_DEPARTMENT_CW                                                          
 'W0138', // MASSACHUSETTS_MARION_POLICE_DEPARTMENT_CW                                                           
-'W0139', // MASSACHUSETTS_MELROSE_POLICE_DEPARTMENT_CW                                                          
 'W0140', // MASSACHUSETTS_NANTUCKET_POLICE_DEPARTMENT_CW                                                        
 'W0141', // MASSACHUSETTS_ROCHESTER_CW                                                                          
 'W0142', // MASSACHUSETTS_SALEM_POLICE_CW                                                                       
@@ -518,6 +522,7 @@
 'W0184', // MASSACHUSETTS_WALTHAM_ARRESTS_CW                                                                    
 'W0185', // MICHIGAN_KENT_COUNTY_SHERIFFS_DEPARTMENT_CW                                                         
 'W0188', // NORTH_CAROLINA_GUILFORD_COUNTY_SHERIFFS_OFFICE_CW                                                   
+'W0191', // SOUTH_CAROLINA_YORK_COUNTY_SHERIFF_CW                                                               
 'W0194', // UTAH_IRON_COUNTY_SHERIFFS_OFFICE_CW                                                                 
 'W0195', // VIRGINIA_ARLINGTON_COUNTY_ARRESTS_CW                                                                
 'W0196', // NORTH_CAROLINA_ROWAN_COUNTY_SHERIFFS_OFFICE_CW                                                      
@@ -636,7 +641,6 @@
 'W0316', // ARIZONA_TOLLESON_CW                                                                                 
 'W0317', // ARIZONA_WICKENBURG_CW                                                                               
 'W0318', // OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                                                            
-
 
 ////////////////////////////////////////////////////////
 /////Source that Risk view doesn't want in the build. EXCLUDE FROM FCRA UNTIL FURTHER NOTICE!!!!

@@ -729,7 +729,7 @@ export InterfaceTranslator := module
       ssn_filt := ssn_filtered_value.val(in_mod);
 			app_type := application_type_val.val (in_mod);
 			Suppress.MAC_Suppress_Set(app_type,supp_set);
-			supp_key := suppress.Key_New_Suppression (
+			supp_key := suppress.Key_New_Suppression() (
 				keyed (product in supp_set),
 				keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
 				keyed (Linking_ID=ssn_filt));

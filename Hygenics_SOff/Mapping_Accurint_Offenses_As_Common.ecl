@@ -3155,6 +3155,15 @@ o2 defCategory(o2 l):= transform
 						'D0222007CR000271|'+
 						'D0392016CR005553|'+
 						
+						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+
+						'A|'+
+						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+
+						'ELUDING|'+
+						'LCD_DS|'+
+						'T17-A 253\\(1\\) \\(B\\)|'+
+						
+						
+						
 						'16-6-4-\\(B\\)'						
 						,						
 						trim(l.offense_description, left, right),

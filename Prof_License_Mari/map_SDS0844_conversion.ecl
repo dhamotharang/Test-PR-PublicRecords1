@@ -1,4 +1,4 @@
-IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
+﻿IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
 
 	code 										:= 'SDS0844';
@@ -180,6 +180,7 @@ EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_ZIP5_1		:= IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),
 														  IF(TrimZip<>'0',TrimZip,''));
 		SELF.ADDR_ZIP4_1		:= clnAddrAddr1[122..125];	
+		SELF.EMAIL					:= ut.CleanSpacesAndUpper(pInput.EMAIL);
 
 		ParseContact				:= IF(clnGetContactName<>'', Address.CleanPersonFML73(clnGetContactName), '');																				
 		

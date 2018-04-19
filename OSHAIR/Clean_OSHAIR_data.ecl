@@ -25,24 +25,13 @@ export Clean_OSHAIR_data (string filedate, string process_date) := function
 							have been completed, the alleged status is removed.
 */
 
-layout_cleaned := record
-  unsigned4 dt_first_seen						 := 0;
-	unsigned4 dt_last_seen						 := 0;
-	unsigned4 dt_vendor_first_reported := 0;
-	unsigned4 dt_vendor_last_reported	 := 0;
-  bipv2.IDlayouts.l_xlink_ids;						  //Added for BIP project
-	unsigned8 source_rec_id 					 := 0; //Added for BIP project	
-	string2 source 										 := '';
-  OSHAIR.layout_OSHAIR_inspection_clean;
-end; 
+layouts_input.cleaned_inspection trfinspectionmapped(layouts_input.inspection l) := transform
 
-layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
   //Jira--DF-20163:Excluding numerals & "-" from estab_names !!  
 	//Pass1: Eliminating WA (plus digits) preceding the business name ex:WA317940156 - HOLADAY PARKS IN
 	//Pass2: Eliminating 5 digits or more preceding the business name  //95497 - D - E CONSTRUCTION INC
 	Pass1   								 								:=  regexreplace('^WA[0-9]{5,}\\x20+\\x2D+\\x20',ut.CleanSpacesAndUpper(l.estab_name),'');
 	Pass2   															  :=  regexreplace('^[0-9]{5,}\\x20+\\x2D+\\x20',Pass1,'');
-  string182 cleanaddress 									:=  Address.CleanAddress182(l.Site_Address, l.site_city + ', ' + l.Site_State + ' ' + INTFORMAT((INTEGER)l.Site_Zip,5,1));
 	self.dt_first_seen 											:=  (unsigned4)process_date;
 	self.dt_last_seen  											:=  (unsigned4)process_date;
 	self.dt_vendor_first_reported 					:=  (unsigned4)process_date;
@@ -86,120 +75,31 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self.Insp_Scope_Desc              			:= 	OSHAIR.lookup_OSHAIR_Mini.Inspection_Scope_lookup(L.Insp_Scope);
 	self.cname                        			:= 	Pass2;
 	self.SIC_Code                     			:= 	(integer)l.SIC_Code;
-  self.prim_range                   			:= 	cleanaddress[1..10];
-	self.predir 	                   				:= 	cleanaddress[11..12];
-	self.prim_name 	  	              			:= 	cleanaddress[13..40];
-	self.addr_suffix  	              			:= 	cleanaddress[41..44];
-	self.postdir 	    	              			:= 	cleanaddress[45..46];
-	self.unit_desig   	              			:= 	cleanaddress[47..56];
-	self.sec_range 	  	              			:= 	cleanaddress[57..64];
-	self.p_city_name  	              			:= 	cleanaddress[65..89];
-	self.v_city_name  	              			:= 	cleanaddress[90..114];
-	self.st 	     		                			:= 	cleanaddress[115..116];
-	self.zip5 		           	        			:= 	cleanaddress[117..121];
-	self.zip4 		    	              			:= 	cleanaddress[122..125];
-	self.cart      		    	          			:= 	cleanaddress[126..129];
-	self.cr_sort_sz        	          			:= 	cleanaddress[130];
-	self.lot 		           	          			:= 	cleanaddress[131..134];
-	self.lot_order 	  	              			:= 	cleanaddress[135];
-	self.dpbc      		    	          			:= 	cleanaddress[136..137];
-	self.chk_digit      	  	        			:= 	cleanaddress[138];
-	self.addr_rec_type  	            			:= 	cleanaddress[139..140];
-	self.fips_state                   			:= 	cleanaddress[141..142];
-	self.fips_county                  			:= 	cleanaddress[143..145];
-	self.geo_lat 	    	              			:= 	cleanaddress[146..155];
-	self.geo_long 	  	              			:= 	cleanaddress[156..166];
-	self.cbsa 		      	            			:= 	cleanaddress[167..170];
-	self.geo_blk   	  	              			:= 	cleanaddress[171..177];
-	self.geo_match 	  	              			:= 	cleanaddress[178];
-	self.err_stat 	  	              			:= 	cleanaddress[179..182];
 	self.source_rec_id                			:= 	HASH64(l.activity_nr + l.estab_name + l.site_address + l.SIC_CODE + l.Site_Zip);
 	self.owner_code													:=	(integer)l.owner_code;
-	self                              			:= 	l;
-	self																		:= 	[];
+	self                              			:=  l;
+	self																		:=  [];
+
 end;
 
-InspectionMapped	:=	project(oshair.files().input.Inspection.using, trfInspectionMapped(left));
+inspection_mapped	:=	project(oshair.files().input.Inspection.using, trfinspectionmapped(left));
+basewithsource		:=	project(oshair.files().base.Inspection.qa,
+															transform(layouts_input.cleaned_inspection,
+																				self.source 		:= mdr.sourcetools.src_oshair;
+																				self.bdid				:= 0;
+																				self.bdid_score	:= 0;
+																				self 						:= left;
+																				self						:=[];)
+															);
 
-BaseWithSource		:=	project(OSHAIR.Files().base.Inspection.qa,
-															TRANSFORM(layout_cleaned,
-																				self.source := mdr.sourceTools.src_OSHAIR;
-																				self.bdid	:= 0;
-																				self.BDID_score	:= 0;
-																				self := left;));
+inspectionall			 :=	inspection_mapped + basewithsource;
+dstandardize_addr  := standardize_addr.fall(inspectionall);
+dAppendIds				 := Append_Ids.fAll(dstandardize_addr);
+rollup_data 			 := oshair.rollup_base(dAppendIds, filedate, process_date);	
 
-InspectionAll			:=	InspectionMapped + BaseWithSource;
-BDID_Matchset 		:= 	['A'];
-
-Business_Header_SS.MAC_Add_BDID_Flex(InspectionAll       		  // Input Dataset
-                                     ,BDID_Matchset           // BDID Matchset
-                                     ,cname                   // company_name
-                                     ,prim_range              // prim_range
-																		 ,prim_name               // prim_name
-																		 ,zip5                    // zip5
-                                     ,sec_range               // sec_range
-																		 ,st                      // state
-                                     ,''                      // phone
-																		 ,fein_append             // fein
-                                     ,bdid                    // bdid
-																		 ,layout_cleaned          // Output Layout
-                                     ,TRUE                    // output layout has bdid score field?
-																		 ,BDID_Score              // bdid_score
-                                     ,OSHAIR_bdid_match       // Output Dataset   
-	                                   ,												// deafult threscold
-	                                   ,											  // use prod version of superfiles
-                                     ,												// default is to hit prod from dataland, and on prod hit prod.		
-	                                   ,BIPV2.xlink_version_set // Create BIP Keys only
-	                                   ,           					   	// Url
-	                                   ,								        // Email
-	                                   ,p_city_name			    		// City
-	                                   ,              		      // fname
-                                     ,              	      	// mname
-	                                   ,              	        // lname
-  																	 ,                        // contact_ssn
-																		 ,source								  // source - MDR.sourceTools
-																		 ,source_rec_id           // source_record_id
-																		 ,FALSE                   // src_matching_is_priority
-                                     );
-
-																		 
-Business_Header_SS.MAC_Add_FEIN_By_BDID(OSHAIR_bdid_match
-																				,BDID
-																				,FEIN_append
-																				,OSHAIR_out_add_fein);
- 
-OSHAIR_out_add_fein2 := distribute(PROJECT(OSHAIR_out_add_fein,OSHAIR.layout_OSHAIR_inspection_clean_BIP),hash32(Activity_Number));
-
-OSHAIR.layout_OSHAIR_inspection_clean_BIP RollupInspection(OSHAIR.layout_OSHAIR_inspection_clean_BIP l, OSHAIR.layout_OSHAIR_inspection_clean_BIP r) := transform
-  
-	self.dt_first_seen  					:= ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
-	self.dt_last_seen 						:= Max  (l.dt_last_seen	 ,r.dt_last_seen	);
-	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);	
-  self.dt_vendor_last_reported 	:= Max	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
-	self 													:= l;
-	
+return rollup_data;	
+				  
 end;
-
-srtOSHAIR	:=	sort(OSHAIR_out_add_fein2,activity_number,source_rec_id, record, 
-									 except dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,
-									 BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	POWScore, POWWeight, ProxScore, 
-									 ProxWeight, SeleScore, SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight, local);
-
-InspectionRollup := rollup(srtOSHAIR, RollupInspection(left, right), record 
-													 ,except dt_first_seen, dt_last_seen, 
-																	 dt_vendor_first_reported, dt_vendor_last_reported,
-																	 BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	
-																	 POWScore, POWWeight, ProxScore, ProxWeight, SeleScore,
-																	 SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight
-													 ,local);
-
-/* Generate the other OSHA base files */
-OSHAIR.normalize_child_datasets(filedate, process_date);
-
-return output(InspectionRollup,,'~thor_data400::base::oshair::' + filedate + '::inspection',compressed, overwrite);
-						  
-end;
-
 
 
 
