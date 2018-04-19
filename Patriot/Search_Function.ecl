@@ -20,7 +20,8 @@ r_threshold_score := map(threshold_value = 0.00 and ofac_version < 4 => OFAC_XG5
 												threshold_value);
 
 // blank out Bridger Gateway url if not version 4	
-gateways	:= if(ofac_version <> 4, dataset([],Gateway.Layouts.Config), Gateway.Configuration.Get());
+skipWatchlist := ((ofac_version = 4 and Include_Ofac=FALSE and Include_Additional_Watchlists=FALSE and count(watchlists_requested)=0));
+gateways	:= if(ofac_version <> 4 or skipWatchlist, dataset([],Gateway.Layouts.Config), Gateway.Configuration.Get());
 											
 //************************************************** ofac_version = 1,2,3 **************************************************
 base := patriot.Search_Base_Function(in_data,ofaconly_value,r_threshold_score,false,ofac_version,include_ofac,Include_additional_watchlists,watchlists_requested);

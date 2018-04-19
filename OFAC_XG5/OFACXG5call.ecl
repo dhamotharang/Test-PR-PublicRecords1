@@ -18,8 +18,7 @@ watchlists_requested := project (watchlists_original, transform (iesp.share.t_St
                                                                  Self.value := StringLib.StringToUpperCase (Left.value))); 
 customWLset := OFAC_XG5.GetSearchFiles(watchlists_requested);
 
-fileToSearch := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false and count(customWLset) = 0 => OFAC_XG5.Constants.WCOFACNames + OFAC_XG5.Constants.WCOAddtnlFiles,
-										include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => customWLset,
+fileToSearch := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => customWLset,
 										include_ofac and include_additional_watchlists => OFAC_XG5.Constants.WCOFACNames + OFAC_XG5.Constants.WCOAddtnlFiles,
 										include_ofac and include_additional_watchlists = false => OFAC_XG5.Constants.WCOFACNames + customWLset,
 										include_ofac=false and include_additional_watchlists => OFAC_XG5.Constants.WCOAddtnlFiles,
@@ -169,8 +168,6 @@ addentityseq := project(AddinputBackErr,
 // output(gateway_cfg, named('gateway_cfg'), overwrite);
 // output(customWLset, named('customWLset'), overwrite);
 // output(fileToSearch, named('fileToSearch'), overwrite);
-// output(fileToSearchDedup, named('fileToSearchDedup'), overwrite );
-// output(gateway_cfg, named('gateway_cfg'), overwrite );
 // output(in_req, named('Call_in_req'), overwrite);
 // output(outBridger, named('Call_outBridger'), overwrite);
 // output(ErrorRecs, named('Call_ErrorRecs'), overwrite);
