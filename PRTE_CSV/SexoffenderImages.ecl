@@ -1,4 +1,4 @@
-import PRTE_CSV.Constants;
+﻿import PRTE_CSV.Constants;
 
 export SexoffenderImages :=
 module
@@ -58,4 +58,4 @@ module
 	export dimages__key__sexoffender__matrix_images     	:= dataset(lCSVFileNamePrefix + 'images__key__sexoffender__' + lCSVVersion + '__matrix_images.csv', rimages__key__sexoffender__matrix_images, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 	export dimages__key__sexoffender__matrix_images_did 	:= dataset(lCSVFileNamePrefix + 'images__key__sexoffender__' + lCSVVersion + '__matrix_images_did.csv', rimages__key__sexoffender__matrix_images_did, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 
-end;
+end :DEPRECATED('Use PRET2_SEXOFFENDER_IMAGES.FILES');
