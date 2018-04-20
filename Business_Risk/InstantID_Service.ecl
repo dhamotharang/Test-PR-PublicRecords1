@@ -758,7 +758,7 @@ IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(intermediateLog, NAMED
 IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 // Output Royalties
-dRoyalties := 
+dRoyalties_bido := 
   PROJECT(
     bido,
     TRANSFORM( Royalty.Layouts.Royalty,
@@ -769,6 +769,20 @@ dRoyalties :=
       SELF.count_entity      := LEFT.count_entity_targus;
     )
   );
+
+dRoyalties_empty := 
+  DATASET(
+    1,
+    TRANSFORM( Royalty.Layouts.Royalty,
+      SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.TARGUS;
+      SELF.royalty_type      := Royalty.Constants.RoyaltyType.TARGUS;
+      SELF.royalty_count     := 0;
+      SELF.non_royalty_count := 0;
+      SELF.count_entity      := '';
+    )
+  );
+
+dRoyalties := IF( tribcode = '2x42', dRoyalties_bido, dRoyalties_empty );
 
 output(dRoyalties, named('RoyaltySet'));
 
