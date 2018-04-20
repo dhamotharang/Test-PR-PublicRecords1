@@ -53,7 +53,7 @@ MODULE
 		EXPORT Base :=
 		RECORD
 			STRING3  carrier_type;
-			STRING60 carrier_name;
+			STRING30 carrier_name;
 			STRING50 carrier_city;
 			STRING2  carrier_state;
 			STRING1  dial_ind;
@@ -204,7 +204,7 @@ MODULE
 			STRING2                                           TargusType;
 			BOOLEAN                                           vendor_dt_last_seen_used;
 			STRING1                                           dial_indicator;
-			STRING60                                          carrier_name;
+			STRING30                                          carrier_name;
 			STRING50                                          phone_region_city;
 			STRING2                                           phone_region_st;
 			STRING3                                           coctype;
@@ -295,7 +295,7 @@ MODULE
 			STRING1   typeflag;
 			STRING10  orig_phone;
 			STRING10  phone;
-			STRING60  carrier_name;
+			STRING30  carrier_name;
 			STRING50  phone_region_city;
 			STRING2   phone_region_st;
 			STRING    coc_description;

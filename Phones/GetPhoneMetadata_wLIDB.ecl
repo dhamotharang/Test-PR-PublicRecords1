@@ -111,16 +111,12 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		RIGHT.is_current,
 		TRANSFORM(Layout_BatchRaw,
 			//All records get carrier_city and carrier_state added
-			SELF.carrier_address1 := RIGHT.carrier_address1,
-			SELF.carrier_address2     := RIGHT.carrier_address2,
-			SELF.carrier_city     := RIGHT.carrier_city,
-			SELF.carrier_state    := RIGHT.carrier_state,
-			SELF.carrier_zip      := RIGHT.carrier_zip,
-			SELF.carrier_route    := RIGHT.cart,
+			SELF.carrier_city := RIGHT.carrier_city,
+			SELF.carrier_state := RIGHT.carrier_state,
+			SELF.carrier_route := RIGHT.cart,
 			SELF.carrier_route_zonecode := RIGHT.cr_sort_sz,
 			SELF.delivery_point_code := RIGHT.dpbc,
 			SELF.affiliated_to := RIGHT.affiliated_to,
-			SELF.contact_function := RIGHT.contact_function,
 			SELF.contact_name := RIGHT.contact_name,
 			SELF.contact_address1 := RIGHT.contact_address1,
 			SELF.contact_address2 := RIGHT.contact_address2,
@@ -241,9 +237,8 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
 		OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
 		OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
-		OUTPUT(dPortedPhonesSorted,NAMED('dPortedPhonesSorted'), EXTEND);
-		OUTPUT(dPhones_w_Metadata,NAMED('dPhones_w_Metadata'), EXTEND);
 	#END
-
+	
+	
 RETURN dPhones_w_Metadata;
 END;
