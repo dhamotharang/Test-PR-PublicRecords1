@@ -1,7 +1,7 @@
 ﻿import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD;
 
-export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam, 
-	grouped DATASET(Risk_Indicators.Layout_Output) iid, 
+export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
+	grouped DATASET(Risk_Indicators.Layout_Output) iid,
 	string30 account_value,
 	dataset(riskwise.Layout_IP2O) ips,
 	string model_name='',
@@ -50,20 +50,20 @@ Layout_EasiSeq := record
 ENd;
 easi_census := join(e_address, Easi.Key_Easi_Census,
 										keyed(right.geolink=left.st+left.county+left.geo_blk),
-										transform(Layout_EasiSeq, 
+										transform(Layout_EasiSeq,
 															self.seq := left.seq,
-															self.easi := right), 
+															self.easi := right),
 															ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1));
-											
-				
+
+
 used_ip := RECORD
 	string45 ipaddr;
 	string3 countrycode;
 	string30 state;
 	string20 continent;
 END;
-	
-											
+
+
 layout_bseasi := record, maxlength(100000)
 	Risk_Indicators.Layout_Boca_Shell;
 	used_census inEasi;
@@ -90,7 +90,7 @@ layout_bseasi joinEm(wideClam le, easi_census ri) := transform
 	Hist2_Match := LE.Address_Verification.Address_History_2.st+
 				LE.Address_Verification.Address_History_2.county+
 				LE.Address_Verification.Address_History_2.geo_blk=RI.easi.geolink;
-				
+
 	self.inEasi := if(Input_match, ri.easi, le.inEasi);
 	self.Easi1 := if(Hist1_Match, ri.easi, le.easi1);
 	self.Easi2 := if(Hist2_Match, ri.easi, le.easi2);
@@ -111,13 +111,13 @@ layout_bseasi add_ips(wiid le, ips ri) := transform
 	self := le;
 end;
 
-wIPs := join(wiid, ips, left.seq=right.seq, add_ips(left,right), left outer);	
+wIPs := join(wiid, ips, left.seq=right.seq, add_ips(left,right), left outer);
 
 Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 
 	fulldate := (unsigned4)((STRING6)le.historyDate+'01');
-	
-	
+
+
 	getPreviousMonth(unsigned histdate) := FUNCTION
 			rollBack := trim(((string)histdate)[5..6])='01';
 			histYear := if(rollBack, (unsigned)((trim((string)histdate)[1..4]))-1, (unsigned)(trim((string)histdate)[1..4]));
@@ -129,19 +129,19 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 			outDate := if(foundDate > le.historyDate, getPreviousMonth(le.historyDate), foundDate);
 			return outDate;
 	END;
-	
+
 	/* The following accounts for randomized socials - This code is located within Risk_Indicators.iid_getSSNFlags:
 				ssnLowIssue - If possibly randomized, set low issue to the first date of randomization - June 25th, 2011
 				ssnHighIssue - If possibly randomized, set to the current date (Or archive date if running in archive mode)
 	*/
 	randomizedSocial := Risk_Indicators.rcSet.isCodeRS(le.shell_input.ssn, le.iid.socsvalflag, le.iid.socllowissue, le.iid.socsRCISflag);
 	ssnLowIssue := le.iid.socllowissue;
-	ssnHighIssue := le.iid.soclhighissue;	
+	ssnHighIssue := le.iid.soclhighissue;
 
 	self.input.historydate := le.historydate;
 	self.input := le.shell_input;
 	self.AccountNumber:= account_value;
-	
+
 	// VERSION 1 fields---------------------------------------------------------------------------------------------------------
 
 	// Identity Authentication Attributes
@@ -158,12 +158,12 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.inferredAge := ut.Age(le.reported_dob, ageDate);
 	self.version1.isSSNInvalid := ~le.SSN_Verification.Validation.valid;
 	self.version1.isPhoneInvalid := le.iid.phonetype <> '1' and le.shell_input.phone10 <> '';
-	self.version1.isAddrInvalid := le.iid.addrvalflag='N' and ((le.shell_input.in_StreetAddress<>'' and le.shell_input.in_City<>'' and 
+	self.version1.isAddrInvalid := le.iid.addrvalflag='N' and ((le.shell_input.in_StreetAddress<>'' and le.shell_input.in_City<>'' and
 																 le.shell_input.in_State<>'') or (le.shell_input.in_StreetAddress<>'' and le.shell_input.in_Zipcode<>''));
 	self.version1.isDLInvalid := le.iid.drlcvalflag in ['1','3'];
 	self.version1.isNoVer := le.iid.nas_summary <= 4 and le.iid.nap_summary <= 4 and le.address_verification.input_address_information.naprop <= 2;
-	
-	
+
+
 	// SSN Attributes
 	self.version1.isDeceased := le.iid.decsflag='1';
 	self.version1.DeceasedDate := if(le.ssn_verification.Validation.deceasedDate>fullDate, 0, le.ssn_verification.Validation.deceasedDate);
@@ -172,16 +172,16 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.LowIssueDate := if((unsigned)ssnLowIssue>fullDate, 0, (unsigned)ssnLowIssue);
 	self.version1.HighIssueDate := if((unsigned)ssnHighIssue>fullDate, 0, (unsigned)ssnHighIssue);
 	self.version1.IssueState := le.iid.soclstate;
-	self.version1.isNonUS := le.iid.non_us_ssn OR 
+	self.version1.isNonUS := le.iid.non_us_ssn OR
 													 (le.shell_input.ssn[1]='9' and le.shell_input.ssn[4] in ['7','8']);// ITIN logic
 	self.version1.isIssued3 := // If it is not a randomized social and only issued within the last 36 months
-																(~randomizedSocial AND (sysdate - (INTEGER)(le.iid.socllowissue[1..6])) < 300) OR 
+																(~randomizedSocial AND (sysdate - (INTEGER)(le.iid.socllowissue[1..6])) < 300) OR
 																// Or it was possibly randomized and the date is prior to June 25th, 2014
 																(randomizedSocial AND sysdate <= Risk_Indicators.iid_constants.randomSSN3Years);
 	self.version1.isIssuedAge5 := ((INTEGER)(le.iid.socllowissue[1..6]) - (INTEGER)(le.shell_input.Dob[1..6])) > 500 AND (INTEGER)(le.shell_input.Dob[1..4]) > 1990 AND (INTEGER)(le.shell_input.Dob[1..6]) < 200606;
 	self.version1.ssnCode := le.ssn_verification.validation.inputsocscode;
-	
-	
+
+
 	// Evidence of Compromised Identity
 	self.version1.isSSNNotFound := ~le.iid.ssnexists;
 	self.version1.isFoundOther := le.iid.nas_summary in [1,2,3,4,5,8] and le.iid.ssnExists and ~le.iid.lastssnmatch2;
@@ -205,8 +205,8 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.SSNPerAddr6 := le.velocity_counters.ssns_per_addr_created_6months;
 	self.version1.PhonePerAddr6 := le.velocity_counters.phones_per_addr_created_6months;
 	self.version1.IDPerPhone6 := le.velocity_counters.adls_per_phone_created_6months;
-	
-	
+
+
 	// Identity Change Information
 	self.version1.LastPerSSN := le.SSN_Verification.namePerSSN_count;
 	self.version1.LastPerID := le.velocity_counters.lnames_per_adl;
@@ -221,12 +221,12 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.LastNames60 := le.velocity_counters.lnames_per_adl60;
 	self.version1.IDPerSFDUAddr := if(le.address_validation.error_codes[1]='S', le.velocity_counters.adls_per_addr, 0);
 	self.version1.SSNPerSFDUAddr := if(le.address_validation.error_codes[1]='S', le.velocity_counters.ssns_per_addr, 0);
-	
-	
+
+
 	// Characteristics of Input Address
 	self.version1.IAAddress := Risk_Indicators.MOD_AddressClean.street_address('',le.shell_input.prim_range,le.shell_input.predir,
 																												 le.shell_input.prim_name,le.shell_input.addr_suffix,
-																												 le.shell_input.postdir, le.shell_input.unit_desig, 
+																												 le.shell_input.postdir, le.shell_input.unit_desig,
 																												 le.shell_input.sec_range);
 	self.version1.IACity := le.shell_input.p_city_name;
 	self.version1.IAState := le.shell_input.st;
@@ -236,8 +236,8 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.IADateLastReported := checkDate6(le.address_verification.input_address_information.date_last_seen);
 	self.version1.IALenOfRes := if(self.version1.IADateFirstReported <> 0 and
 																 self.version1.IADateLastReported <> 0,
-																		round((ut.DaysApart((string)self.version1.IADateFirstReported, 
-																												(string)self.version1.IADateLastReported)) / 30), 
+																		round((ut.DaysApart((string)self.version1.IADateFirstReported,
+																												(string)self.version1.IADateLastReported)) / 30),
 																 0);
 	self.version1.IADwellType := if(le.shell_input.addr_type='S' and le.iid.addrvalflag='N', '', le.shell_input.addr_type);
 	self.version1.IAisNotPrimaryRes := ~le.address_verification.input_address_information.isbestmatch;
@@ -249,53 +249,53 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.IACARTHEFT := le.ineasi.cartheft;
 	self.version1.IABURGLARY := le.ineasi.burglary;
 	self.version1.IATOTCRIME := le.ineasi.totcrime;
-	
-	
+
+
 	// Characteristics of Current Address (Most Recent Date First Reported)
 	CAaddrChooser := map(le.did=0 => 0,
 											 le.address_verification.input_address_information.date_first_seen >=
-										   le.address_verification.address_history_1.date_first_seen and 
-														le.address_verification.input_address_information.date_first_seen >= 
+										   le.address_verification.address_history_1.date_first_seen and
+														le.address_verification.input_address_information.date_first_seen >=
 														le.address_verification.address_history_2.date_first_seen => 1,	// input is picked
-											 le.address_verification.address_history_1.date_first_seen >= 
+											 le.address_verification.address_history_1.date_first_seen >=
 											 le.address_verification.input_address_information.date_first_seen and
-														le.address_verification.address_history_1.date_first_seen >= 
+														le.address_verification.address_history_1.date_first_seen >=
 														le.address_verification.address_history_2.date_first_seen => 2,	// address history 1 is picked
 											 3);	// address history 2 is picked
-											 
+
 	currAddr := map(CAaddrChooser=0 => '',
-									CAaddrChooser=1 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range, 
-																																 le.address_verification.input_address_information.predir, 
+									CAaddrChooser=1 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range,
+																																 le.address_verification.input_address_information.predir,
 																																 le.address_verification.input_address_information.prim_name,
-																																 le.address_verification.input_address_information.addr_suffix, 
-																																 le.address_verification.input_address_information.postdir, 
-																																 le.address_verification.input_address_information.unit_desig, 
+																																 le.address_verification.input_address_information.addr_suffix,
+																																 le.address_verification.input_address_information.postdir,
+																																 le.address_verification.input_address_information.unit_desig,
 																																 le.address_verification.input_address_information.sec_range),
-									CAaddrChooser=2 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_1.prim_range, 
-																																 le.address_verification.address_history_1.predir, 
+									CAaddrChooser=2 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_1.prim_range,
+																																 le.address_verification.address_history_1.predir,
 																																 le.address_verification.address_history_1.prim_name,
-																																 le.address_verification.address_history_1.addr_suffix, 
-																																 le.address_verification.address_history_1.postdir, 
-																																 le.address_verification.address_history_1.unit_desig, 
+																																 le.address_verification.address_history_1.addr_suffix,
+																																 le.address_verification.address_history_1.postdir,
+																																 le.address_verification.address_history_1.unit_desig,
 																																 le.address_verification.address_history_1.sec_range),
-									Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_2.prim_range, 
-																							le.address_verification.address_history_2.predir, 
+									Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_2.prim_range,
+																							le.address_verification.address_history_2.predir,
 																							le.address_verification.address_history_2.prim_name,
-																							le.address_verification.address_history_2.addr_suffix, 
-																							le.address_verification.address_history_2.postdir, 
-																							le.address_verification.address_history_2.unit_desig, 
+																							le.address_verification.address_history_2.addr_suffix,
+																							le.address_verification.address_history_2.postdir,
+																							le.address_verification.address_history_2.unit_desig,
 																							le.address_verification.address_history_2.sec_range));
 	currAddrSt := map(CAaddrChooser=0 => '',
 										CAaddrChooser=1 => le.address_verification.input_address_information.st,
 										CAaddrChooser=2 => le.address_verification.address_history_1.st,
 										le.address_verification.address_history_2.st);
-										
+
 	// fits in above
 	self.version1.NumSources := map(CAaddrChooser=0 => 0,
 																	CAaddrChooser=1 => le.address_verification.input_address_information.source_count,
 																	CAaddrChooser=2 => le.address_verification.address_history_1.source_count,
 																	le.address_verification.address_history_2.source_count);
-	
+
 	self.version1.CAAddress := currAddr;
 	self.version1.CACity := map(CAaddrChooser=0 => '',
 															CAaddrChooser=1 => le.address_verification.input_address_information.city_name,
@@ -313,13 +313,13 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.CADateFirstReported := map(CAaddrChooser=1 => le.address_verification.input_address_information.date_first_seen,
 																					 CAaddrChooser=2 =>	le.address_verification.address_history_1.date_first_seen,
 																					 le.address_verification.address_history_2.date_first_seen);
-	self.version1.CADateLastReported := checkDate6( 
+	self.version1.CADateLastReported := checkDate6(
 																					map(CAaddrChooser=1 => le.address_verification.input_address_information.date_last_seen,
 																							CAaddrChooser=2 =>	le.address_verification.address_history_1.date_last_seen,
 																							le.address_verification.address_history_2.date_last_seen));
 	self.version1.CALenOfRes := if(self.version1.CADateFirstReported <> 0 and self.version1.CADateLastReported <> 0,
-																		round((ut.DaysApart((string)self.version1.CADateFirstReported, 
-																												(string)self.version1.CADateLastReported)) / 30), 
+																		round((ut.DaysApart((string)self.version1.CADateFirstReported,
+																												(string)self.version1.CADateLastReported)) / 30),
 																 0);
 	self.version1.CADwellType := map(CAaddrChooser=1 => if(le.shell_input.addr_type='S' and le.iid.addrvalflag='N', '', le.shell_input.addr_type),
 																	 CAaddrChooser=2 => le.address_verification.addr_type2,
@@ -351,51 +351,51 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.CATOTCRIME := map(CAaddrChooser=1 => le.ineasi.totcrime,
 																	CAaddrChooser=2 => le.easi1.totcrime,
 																	le.easi2.totcrime);
-									
-	
+
+
 	// Characteristics of Previous Address (next most recently reported)
 	PAaddrChooser := map(le.did=0 => 0,
 											 (le.address_verification.input_address_information.date_first_seen between
-														le.address_verification.address_history_1.date_first_seen and 
+														le.address_verification.address_history_1.date_first_seen and
 														le.address_verification.address_history_2.date_first_seen) OR
 													(le.address_verification.input_address_information.date_first_seen between
-															le.address_verification.address_history_2.date_first_seen and 
+															le.address_verification.address_history_2.date_first_seen and
 															le.address_verification.address_history_1.date_first_seen) => 1,	// input is picked
-											 (le.address_verification.address_history_1.date_first_seen between 
+											 (le.address_verification.address_history_1.date_first_seen between
 														le.address_verification.input_address_information.date_first_seen and
 														le.address_verification.address_history_2.date_first_seen) OR
 													(le.address_verification.address_history_1.date_first_seen between
 														le.address_verification.address_history_2.date_first_seen and
 														le.address_verification.input_address_information.date_first_seen) => 2,	// address history 1 is picked
 											 3);	// address history 2 is picked
-											 
+
 	prevAddr := map(PAaddrChooser=0 => '',
-									PAaddrChooser=1 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range, 
-																																 le.address_verification.input_address_information.predir, 
+									PAaddrChooser=1 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range,
+																																 le.address_verification.input_address_information.predir,
 																																 le.address_verification.input_address_information.prim_name,
-																																 le.address_verification.input_address_information.addr_suffix, 
-																																 le.address_verification.input_address_information.postdir, 
-																																 le.address_verification.input_address_information.unit_desig, 
+																																 le.address_verification.input_address_information.addr_suffix,
+																																 le.address_verification.input_address_information.postdir,
+																																 le.address_verification.input_address_information.unit_desig,
 																																 le.address_verification.input_address_information.sec_range),
-									PAaddrChooser=2 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_1.prim_range, 
-																																 le.address_verification.address_history_1.predir, 
+									PAaddrChooser=2 => Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_1.prim_range,
+																																 le.address_verification.address_history_1.predir,
 																																 le.address_verification.address_history_1.prim_name,
-																																 le.address_verification.address_history_1.addr_suffix, 
-																																 le.address_verification.address_history_1.postdir, 
-																																 le.address_verification.address_history_1.unit_desig, 
+																																 le.address_verification.address_history_1.addr_suffix,
+																																 le.address_verification.address_history_1.postdir,
+																																 le.address_verification.address_history_1.unit_desig,
 																																 le.address_verification.address_history_1.sec_range),
-									Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_2.prim_range, 
-																							le.address_verification.address_history_2.predir, 
+									Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_2.prim_range,
+																							le.address_verification.address_history_2.predir,
 																							le.address_verification.address_history_2.prim_name,
-																							le.address_verification.address_history_2.addr_suffix, 
-																							le.address_verification.address_history_2.postdir, 
-																							le.address_verification.address_history_2.unit_desig, 
+																							le.address_verification.address_history_2.addr_suffix,
+																							le.address_verification.address_history_2.postdir,
+																							le.address_verification.address_history_2.unit_desig,
 																							le.address_verification.address_history_2.sec_range));
 	prevAddrSt := map(PAaddrChooser=0 => '',
 										PAaddrChooser=1 => le.address_verification.input_address_information.st,
 										PAaddrChooser=2 => le.address_verification.address_history_1.st,
 										le.address_verification.address_history_2.st);
-											 
+
 	self.version1.PAAddress := prevAddr;
 	self.version1.PACity := map(PAaddrChooser=0 => '',
 															PAaddrChooser=1 => le.address_verification.input_address_information.city_name,
@@ -413,13 +413,13 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.PADateFirstReported := map(PAaddrChooser=1 => le.address_verification.input_address_information.date_first_seen,
 																					 PAaddrChooser=2 =>	le.address_verification.address_history_1.date_first_seen,
 																					 le.address_verification.address_history_2.date_first_seen);
-	self.version1.PADateLastReported := checkDate6( 
+	self.version1.PADateLastReported := checkDate6(
 																					map(PAaddrChooser=1 => le.address_verification.input_address_information.date_last_seen,
 																							PAaddrChooser=2 =>	le.address_verification.address_history_1.date_last_seen,
 																							le.address_verification.address_history_2.date_last_seen));
 	self.version1.PALenOfRes := if(self.version1.PADateFirstReported <> 0 and self.version1.PADateLastReported <> 0,
-																		round((ut.DaysApart((string)self.version1.PADateFirstReported, 
-																												(string)self.version1.PADateLastReported)) / 30), 
+																		round((ut.DaysApart((string)self.version1.PADateFirstReported,
+																												(string)self.version1.PADateLastReported)) / 30),
 																 0);
 	self.version1.PADwellType := map(PAaddrChooser=1 => if(le.shell_input.addr_type='S' and le.iid.addrvalflag='N', '', le.shell_input.addr_type),
 																	 PAaddrChooser=2 => le.address_verification.addr_type2,
@@ -451,8 +451,8 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.PATOTCRIME := map(PAaddrChooser=1 => le.ineasi.totcrime,
 																	PAaddrChooser=2 => le.easi1.totcrime,
 																	le.easi2.totcrime);
-																		 
-	
+
+
 	// Differences between Input Address and Current Address
 	self.version1.isInputCurrMatch := CAaddrChooser=1;
 	self.version1.DistInputCurr := map(CAaddrChooser=1 => 0,// same address as input
@@ -465,14 +465,14 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 																																					(unsigned)self.version1.PAmed_hval - (unsigned)self.version1.IAmed_hval), 0);
 	self.version1.CrimeDiff := if(~CAaddrChooser=1, if(CAaddrChooser=2, (unsigned)self.version1.CAtotcrime - (unsigned)self.version1.IAtotcrime,
 																																			(unsigned)self.version1.PAtotcrime - (unsigned)self.version1.IAtotcrime), 0);
-	
-	inputEcon := Models.EconCode(le.iid.dwelltype, le.address_verification.input_address_information.assessed_amount, 
+
+	inputEcon := Models.EconCode(le.iid.dwelltype, le.address_verification.input_address_information.assessed_amount,
 												le.avm.input_address_information, (unsigned)le.address_verification.input_address_information.census_home_value);
-	hist1Econ := Models.EconCode(le.address_verification.addr_type2, le.address_verification.address_history_1.assessed_amount, 
-												le.avm.address_history_1, (unsigned)le.address_verification.address_history_1.census_home_value);											
-	hist2Econ := Models.EconCode(le.address_verification.addr_type3, le.address_verification.address_history_2.assessed_amount, 
+	hist1Econ := Models.EconCode(le.address_verification.addr_type2, le.address_verification.address_history_1.assessed_amount,
+												le.avm.address_history_1, (unsigned)le.address_verification.address_history_1.census_home_value);
+	hist2Econ := Models.EconCode(le.address_verification.addr_type3, le.address_verification.address_history_2.assessed_amount,
 												le.avm.address_history_2, (unsigned)le.address_verification.address_history_2.census_home_value);
-																							
+
 	CAeconCode := map(CAaddrChooser=1 => inputEcon,
 										CAaddrChooser=2 => hist1Econ,
 										hist2Econ);
@@ -481,15 +481,15 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 										hist2Econ);
 
 	self.version1.EcoTrajectory := CAeconCode+inputEcon;
-	
-	
+
+
 	// Differences between Current Address and Previous Address
-	self.version1.isInputPrevMatch := Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range, 
-																																le.address_verification.input_address_information.predir, 
+	self.version1.isInputPrevMatch := Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.input_address_information.prim_range,
+																																le.address_verification.input_address_information.predir,
 																																le.address_verification.input_address_information.prim_name,
-																																le.address_verification.input_address_information.addr_suffix, 
-																																le.address_verification.input_address_information.postdir, 
-																																le.address_verification.input_address_information.unit_desig, 
+																																le.address_verification.input_address_information.addr_suffix,
+																																le.address_verification.input_address_information.postdir,
+																																le.address_verification.input_address_information.unit_desig,
 																																le.address_verification.input_address_information.sec_range) =
 																																prevAddr;
 	self.version1.DistCurrPrev := map(CAaddrChooser=1 and PAaddrChooser=2 OR CAaddrChooser=2 and PAaddrChooser=1 => le.address_verification.distance_in_2_h1,
@@ -501,43 +501,43 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.HomeValueDiff2 := if(~self.version1.isInputPrevMatch, (unsigned)self.version1.CAmed_hval - (unsigned)self.version1.PAmed_hval, 0);
 	self.version1.CrimeDiff2 := if(~self.version1.isInputPrevMatch, (unsigned)self.version1.CAtotcrime - (unsigned)self.version1.PAtotcrime, 0);
 	self.version1.EcoTrajectory2 := PAeconCode+CAeconCode;
-	
-	
+
+
 	// Transient Person Attributes
 	self.version1.mobility_indicator := le.mobility_indicator;
-	
-	statusAddr1 := map(le.address_verification.input_address_information.applicant_owned or 
+
+	statusAddr1 := map(le.address_verification.input_address_information.applicant_owned or
 														le.address_verification.input_address_information.applicant_sold or
-														le.address_verification.input_address_information.family_owned or 
+														le.address_verification.input_address_information.family_owned or
 														le.address_verification.input_address_information.family_sold => 'O',// owned
 										 ~le.address_verification.input_address_information.occupant_owned and
 														le.iid.dwelltype not in ['','S'] => 'R',// rent,
 										 'U');// unknown
-	statusAddr2 := map(le.address_verification.address_history_1.applicant_owned or 
+	statusAddr2 := map(le.address_verification.address_history_1.applicant_owned or
 														le.address_verification.address_history_1.applicant_sold or
-														le.address_verification.address_history_1.family_owned or 
+														le.address_verification.address_history_1.family_owned or
 														le.address_verification.address_history_1.family_sold => 'O',// owned
-										 ~le.address_verification.address_history_1.occupant_owned and 
+										 ~le.address_verification.address_history_1.occupant_owned and
 														le.address_verification.addr_type2 not in ['','S'] => 'R',// rent,
 										 'U');// unknown;
-	statusAddr3 := map(le.address_verification.address_history_2.applicant_owned or 
+	statusAddr3 := map(le.address_verification.address_history_2.applicant_owned or
 														le.address_verification.address_history_2.applicant_sold or
-														le.address_verification.address_history_2.family_owned or 
+														le.address_verification.address_history_2.family_owned or
 														le.address_verification.address_history_2.family_sold => 'O',// owned
-										 ~le.address_verification.address_history_2.occupant_owned and 
+										 ~le.address_verification.address_history_2.occupant_owned and
 														le.address_verification.addr_type3 not in ['','S'] => 'R',// rent,
 										 'U');// unknown;
-	
+
 	self.version1.statusAddr := map(CAaddrChooser=1 => statusAddr1,
 																	CAaddrChooser=2 => statusAddr2,
 																	statusAddr3);
-																	
+
 	self.version1.statusAddr2 := map(PAaddrChooser=1 => statusAddr1,
 																	 PAaddrChooser=2 => statusAddr2,
 																	 statusAddr3);
 	self.version1.statusAddr3 := map(CAaddrChooser=1 and PAaddrChooser=2 OR CAaddrChooser=2 and PAaddrChooser=1 => statusAddr3,
 																	 CAaddrChooser=1 and PAaddrChooser=3 OR CAaddrChooser=3 and PAaddrChooser=1 => statusAddr2,
-																	 'U'/*if(le.iid.chronodate_first<self.version1.PADateFirstReported, le.iid.chronodate_first, 
+																	 'U'/*if(le.iid.chronodate_first<self.version1.PADateFirstReported, le.iid.chronodate_first,
 																				 if(le.iid.chronodate_first2<self.version1.PADateFirstReported, le.iid.chronodate_first2,
 																							 le.iid.chronodate_first3))*/);
 	self.version1.PADateFirstReported2 := map(PAaddrChooser=1 => le.address_verification.input_address_information.date_first_seen,
@@ -545,7 +545,7 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 																						le.address_verification.address_history_2.date_first_seen);
 	self.version1.NPADateFirstReported := map(CAaddrChooser=1 and PAaddrChooser=2 OR CAaddrChooser=2 and PAaddrChooser=1 => le.address_verification.address_history_2.date_first_seen,
 																						CAaddrChooser=1 and PAaddrChooser=3 OR CAaddrChooser=3 and PAaddrChooser=1 => le.address_verification.address_history_1.date_first_seen,
-																						if(le.iid.chronodate_first<self.version1.PADateFirstReported, le.iid.chronodate_first, 
+																						if(le.iid.chronodate_first<self.version1.PADateFirstReported, le.iid.chronodate_first,
 																									if(le.iid.chronodate_first2<self.version1.PADateFirstReported, le.iid.chronodate_first2,
 																												le.iid.chronodate_first3)));// does this make sense?  assuming one of the chronodates is the third address, pick the one that is less than the pa date
 	self.version1.addrChanges30 := le.other_address_info.addrs_last30;
@@ -555,8 +555,8 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.addrChanges24 := le.other_address_info.addrs_last24;
 	self.version1.addrChanges36 := le.other_address_info.addrs_last36;
 	self.version1.addrChanges60 := le.other_address_info.addrs_last_5years;
-	
-	
+
+
 	// Higher Risk Address and Phone Attributes
 	self.version1.isAddrHighRisk := le.iid.hriskaddrflag = '4';
 	self.version1.isPhoneHighRisk := le.iid.hriskphoneflag = '6';
@@ -585,15 +585,15 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	self.version1.addrval := le.iid.addrvalflag;
   self.version1.invalidaddr := riskwise.certErr(le.shell_input.addr_status, le.shell_input.predir, le.shell_input.prim_name,
 																								le.shell_input.addr_suffix, le.shell_input.postdir, le.shell_input.st);
-	
-	
+
+
 	// Higher Risk Internet Connection Attributes
 	self.version1.IPinvalid := trim(le.ip2o.ipaddr)='' and trim(le.shell_input.ip_address)<>'';
 	self.version1.IPNonUS := StringLib.StringToUpperCase(le.ip2o.countrycode[1..2]) <> 'US' and trim(StringLib.StringToUpperCase(le.ip2o.countrycode[1..2]))<>'';
 	self.version1.IPState := if(StringLib.StringToUpperCase(le.ip2o.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(le.ip2o.state), '');
 	self.version1.IPCountry := StringLib.StringToUpperCase(le.ip2o.countrycode);
 	self.version1.IPContinent := le.ip2o.continent;
-	
+
 
 	le_clam := row( le, risk_indicators.Layout_Boca_Shell );
 	le_inEASI := project( le.inEasi, transform(EASI.Layout_Easi_Census, self := left, self := []) );
@@ -601,29 +601,29 @@ Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 	le_Easi2 := project( le.Easi2, transform(EASI.Layout_Easi_Census, self := left, self := []) );
 	le_IP2O := project( le.IP2O, transform(riskwise.Layout_IP2O, self := left, self := []) );
 	isFCRA := false;
-	
+
 	attr := models.Attributes_Master(le_clam, isFCRA, le_inEASI, le_Easi1, le_Easi2, ,le_IP2O );
-	
-self.version2.IdentityRiskLevel	:=	attr.IdentityRiskLevel		; 
+
+self.version2.IdentityRiskLevel	:=	attr.IdentityRiskLevel		;
 self.version2.IdentityAgeOldest	:=	attr.AgeOldestRecord		;
 self.version2.IdentityAgeNewest	:=	attr.AgeNewestRecord		;
 self.version2.IdentityRecentUpdate	:=	attr.RecentUpdate		;
-self.version2.IdentityRecordCount	:=	attr.IdentityRecordCount		;  
-self.version2.IdentitySourceCount	:=	attr.IdentitySourceCount		;  
+self.version2.IdentityRecordCount	:=	attr.IdentityRecordCount		;
+self.version2.IdentitySourceCount	:=	attr.IdentitySourceCount		;
 self.version2.IdentityAgeRiskIndicator	:=	attr.AgeRiskIndicator		;
-self.version2.IDVerRiskLevel	:=	attr.IDVerRiskLevel		;  
+self.version2.IDVerRiskLevel	:=	attr.IDVerRiskLevel		;
 self.version2.IDVerSSN	:=	attr.IDVerSSN	;
 self.version2.IDVerName	:=	attr.VerifiedName		;
 self.version2.IDVerAddress	:=	attr.VerifiedAddress		;
-self.version2.IDVerAddressNotCurrent	:=	attr.VerAddressNotCurrent		;  
-self.version2.IDVerAddressAssocCount	:=	attr.VerAddressAssocCount		;  
+self.version2.IDVerAddressNotCurrent	:=	attr.VerAddressNotCurrent		;
+self.version2.IDVerAddressAssocCount	:=	attr.VerAddressAssocCount		;
 self.version2.IDVerPhone	:=	attr.VerifiedPhone		;
-self.version2.IDVerDriversLicense	:=	attr.verifiedDL		;  
+self.version2.IDVerDriversLicense	:=	attr.verifiedDL		;
 self.version2.IDVerDOB	:=	attr.VerifiedDOB		;
-self.version2.IDVerSSNSourceCount	:=	attr.VerSSNSourceCount		;  
+self.version2.IDVerSSNSourceCount	:=	attr.VerSSNSourceCount		;
 self.version2.IDVerAddressSourceCount	:=	attr.IDVerAddressSourceCount	;
-// self.version2.IDVerPhoneSourceCount	:=	attr.VerPhoneSourceCount		;  
-self.version2.IDVerDOBSourceCount	:=	attr.VerDOBSourceCount		;  
+// self.version2.IDVerPhoneSourceCount	:=	attr.VerPhoneSourceCount		;
+self.version2.IDVerDOBSourceCount	:=	attr.VerDOBSourceCount		;
 self.version2.IDVerSSNCreditBureauCount	:=	attr.VerSSNCreditBureauCount		;
 self.version2.IDVerSSNCreditBureauDelete	:=	attr.IDVerSSNCreditBureauDelete		;
 self.version2.IDVerAddrCreditBureauCount	:=	attr.VerAddrCreditBureauCount		;
@@ -637,9 +637,9 @@ self.version2.SourceCreditBureauAgeChange	:=	attr.SourceCreditBureauAgeChange		;
 self.version2.SourcePublicRecord	:=	attr.SourcePublicRecord		;
 self.version2.SourcePublicRecordCount	:=	attr.SourcePublicRecordCount		;
 self.version2.SourcePublicRecordCountYear	:=	attr.SourcePublicRecordCountYear		;
-self.version2.SourceEducation	:=	attr.EducationAttendedCollege		;  
+self.version2.SourceEducation	:=	attr.EducationAttendedCollege		;
 self.version2.SourceOccupationalLicense	:=	attr.SourceOccupationalLicense		;
-self.version2.SourceVoterRegistration	:=	attr.VoterRegistrationRecord;  
+self.version2.SourceVoterRegistration	:=	attr.VoterRegistrationRecord;
 self.version2.SourceOnlineDirectory	:=	attr.SourceOnlineDirectory		;
 self.version2.SourceDoNotMail	:=	attr.SourceDoNotMail		;
 self.version2.SourceAccidents	:=	attr.SourceAccidents		;
@@ -845,15 +845,15 @@ self.version201.IDVerAddressDriversLicense :=  map(invalidIdAddr => '-1',
 
 self.version201.IDVerDriversLicenseType := map(invalidIdDl => '-1',
 																					(Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0) AND
-																					(Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0) AND 
+																					(Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0) AND
 																					(le.iid_out.insurance_dl_used)                                                     => '7',
-																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0 AND 
+																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0 AND
 																					(le.iid_out.insurance_dl_used)                                                     => '6',
-																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0 AND 
-																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0       => '5',																					
-																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0 AND 
+																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0 AND
+																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0       => '5',
+																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0 AND
 																					(le.iid_out.insurance_dl_used)                                                     => '4',
-																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0       => '3',																					
+																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'D' , ', ', 'E') > 0       => '3',
 																					(le.iid_out.insurance_dl_used)                                                     => '2',
 																					Models.Common.findw_cpp(le.iid_out.verified_DL_sources, 'CY' , ', ', 'E') > 0      => '1',
 																					'0');
@@ -872,26 +872,27 @@ self.version201.SourceDriversLicense := map(le.did=0 => '-1',
 																					(le.iid_out.insurance_dl_used)																													=> '7',
 																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'D' , ', ', 'E') > 0 AND
 																					(le.iid_out.insurance_dl_used)																													=> '6',
-																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 AND 
-																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'D' , ', ', 'E') > 0 				=> '5',																					
-																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 AND 
+																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 AND
+																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'D' , ', ', 'E') > 0 				=> '5',
+																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 AND
 																					(le.iid_out.insurance_dl_used) 																													=> '4',
-																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'D' , ', ', 'E') > 0 				=> '3',																					
+																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'D' , ', ', 'E') > 0 				=> '3',
 																					(le.iid_out.insurance_dl_used)																													=> '2',
 																					Models.Common.findw_cpp(le.header_summary.ver_sources, 'CY' , ', ', 'E') > 0 				=> '1',
 																					'0');
-																					
+
 // if the option to SuppressCompromisedDLs is set to true, check the last name and SSN against the equifax compromised DL key
-DL_is_compromised := if(SuppressCompromisedDLs, 
-	IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(le.shell_input.lname, le.shell_input.ssn),
-	false);
+compromised_DL_hash := if(SuppressCompromisedDLs,
+	IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(le.shell_input.lname, le.shell_input.ssn), '');
+
+DL_is_compromised := compromised_DL_hash <> '';
 
 self.version201.IdentityDriversLicenseComp := map(
 	le.truedid=false => '-1',  // no identity found
 	(integer)le.shell_input.ssn=0 => '0',  // SSN not provided
 	DL_is_compromised => '2',  //  A Driver’s License associated to the identity potentially compromised
 	'1');  // no known issues
-	
+
 	self := [];
 END;
 
@@ -922,10 +923,10 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 	phonelisting_verified_residence := le.iid.phoneverlevel in verfied_residence;
 	high_risk_address := le.iid.hriskaddrflag<>'0';
 	address_not_most_recent := le.iid.inputAddrNotMostRecent;
-	
-	disconnected_or_no_phonelisting := map(le.iid.phoneaddr_firstcount > 0 and 
-								le.iid.phoneaddr_lastcount > 0 and 
-								le.iid.phoneaddr_addrcount > 0 => le.iid.phoneaddr_disconnected, 
+
+	disconnected_or_no_phonelisting := map(le.iid.phoneaddr_firstcount > 0 and
+								le.iid.phoneaddr_lastcount > 0 and
+								le.iid.phoneaddr_addrcount > 0 => le.iid.phoneaddr_disconnected,
 								le.iid.phonefirstcount > 0 and
 								le.iid.phonelastcount > 0 and
 								le.iid.phoneaddrcount > 0 => le.iid.phone_disconnected,
@@ -933,7 +934,7 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 								// set disconnect = true because we have no idea if utility listing is recent
 								true);
 	inputPresent := if(le.iid.fname='' and le.iid.lname='' and le.iid.in_streetAddress='' and le.iid.ssn='' and le.iid.dob='' and le.iid.phone10='' and le.iid.wphone10='', false, true);
-		
+
 	SELF.IDAttributes.InputPresent := if(inputPresent, 'True', 'False');
 	SELF.IDAttributes.DoOutput := if(inputPresent, 'True', 'False');
 	SELF.IDAttributes.DataReturn := if(inputPresent, 'Y', 'N');
@@ -959,7 +960,7 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 	SELF.IDAttributes.VerDRLC := '';
 	SELF.IDAttributes.VerDOB := le.iid.combo_dob;
 	SELF.IDAttributes.NumELever := (string)le.iid.numelever;
-	SELF.IDAttributes.NumSource := (string)((integer)if(le.iid.fname<>'',RiskWise.flattenCount(le.iid.combo_firstcount,1,1),'')+(integer)if(le.iid.lname<>'',RiskWise.flattenCount(le.iid.combo_lastcount,1,1),'')+(integer)if(le.iid.employer_name<>'' and 
+	SELF.IDAttributes.NumSource := (string)((integer)if(le.iid.fname<>'',RiskWise.flattenCount(le.iid.combo_firstcount,1,1),'')+(integer)if(le.iid.lname<>'',RiskWise.flattenCount(le.iid.combo_lastcount,1,1),'')+(integer)if(le.iid.employer_name<>'' and
 														le.iid.combo_cmpyscore<>255,RiskWise.flattenCount(le.iid.combo_cmpycount,1,1),'')+(integer)if(le.iid.in_streetAddress<>'',RiskWise.flattenCount(le.iid.combo_addrcount,1,1),'')+(integer)if(le.iid.phone10<>'',RiskWise.flattenCount(le.iid.combo_hphonecount,1,1),'')+
 														(integer)if(le.iid.ssn<>'',RiskWise.flattenCount(le.iid.combo_ssncount,1,1),'')+(integer)if(le.iid.dob<>'',RiskWise.flattenCount(le.iid.combo_dobcount,1,1),''));
 	SELF.IDAttributes.FirstScore := if(le.iid.fname<>'',if(le.iid.combo_firstscore=255, '0',(string)le.iid.combo_firstscore),'');
@@ -1041,7 +1042,7 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 	SELF.IDAttributes.EmailUserFlag := '';
 	SELF.IDAttributes.EmailBrowserFlag := '';
 	SELF.IDAttributes.HRiskEmailDomainFlag := '';
-	SELF.IDAttributes.DistAddrDomain := '';	 
+	SELF.IDAttributes.DistAddrDomain := '';
 	SELF := le;
 	SELF := [];
 END;
@@ -1057,7 +1058,7 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
      socialsource_verified_residence := (le.iid.NAS_Summary in [8,12]);
      phonelisting_verified_residence := (le.iid.NAP_Summary in [8,12]);
      disconnected_or_no_phonelisting := ((le.iid.phoneaddr_lastcount > 0 and le.iid.phoneaddr_addrcount > 0 and le.iid.nap_status = 'D') or
-                                        (le.iid.phonelastcount > 0      and le.iid.phoneaddrcount > 0      and le.iid.nap_status = 'D'));     
+                                        (le.iid.phonelastcount > 0      and le.iid.phoneaddrcount > 0      and le.iid.nap_status = 'D'));
      por_addr_not_verd := (not (socialsource_verified_residence or (phonelisting_verified_residence and not disconnected_or_no_phonelisting)));
 
 // *** B *** por_high_risk_address;
@@ -1076,7 +1077,7 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
     _add2_date_last_seen  := models.common.sas_date((string)add2_date_last_seen );
 
     sysdate := models.common.sas_date( if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01'));
-    
+
     mos_add1_date_first_seen := (integer)((sysdate-_add1_date_first_seen)/(365.25/12));
     mos_add1_date_last_seen  := (integer)((sysdate-_add1_date_last_seen )/(365.25/12));
     mos_add2_date_first_seen := (integer)((sysdate-_add2_date_first_seen)/(365.25/12));
@@ -1088,10 +1089,10 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
         and (mos_add2_date_first_seen > 12 )
         and (mos_add2_date_last_seen <= 12 )
       );
-     
+
 // *** D *** por_addr_disconnected_phone;
      por_addr_disconnected_phone := (not socialsource_verified_residence and (phonelisting_verified_residence and disconnected_or_no_phonelisting));
-     
+
 // *** E *** por_more_than_4_addrs_last_year ;
      por_more_than_4_addrs_last_year := (le.other_address_info.addrs_last12 >= 4);
 
@@ -1101,8 +1102,8 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
      _B := por_high_risk_address;
      _C := por_newer_address_found;
      _D := por_addr_disconnected_phone;
-     _E := por_more_than_4_addrs_last_year;     
-     
+     _E := por_more_than_4_addrs_last_year;
+
 	SELF.IDAttributes.TciAddrFlag := map(
     not (_A or _B or _C or _D or _E)     => '0',
     _A and not (_B or _C)                => '1',
