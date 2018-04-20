@@ -215,25 +215,25 @@ MODULE
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
 			recordof(PhonesInfo.Key_Phones.Ported_Metadata);
-			BatchOut;
+			STRING error_desc;
+			//Add carrier_city and carrier_state here so we don't need to do an additional keyed join.
+			string30 carrier_city;
+			string2 carrier_state;
 			//Added for Phone Finder inhousemetadata
-			string30 carrier_address1;
-   string30 carrier_address2;
-   string9 carrier_zip;
-	 	string4	carrier_route;
-		 string1	carrier_route_zonecode;
-		 string2	delivery_point_code;
-	 	string80 affiliated_to;
-		 string20 contact_function;
-		 string60 contact_name;	
-		 string30 contact_address1;
-		 string30 contact_address2;
-		 string30 contact_city;
-		 string2	contact_state;
-		 string9	contact_zip;
-		 string10 contact_phone;
-		 string10 contact_fax;
-		 string60 contact_email;
+		string4	carrier_route;
+		string1	carrier_route_zonecode;
+		string2	delivery_point_code;
+		string80 affiliated_to;
+		string60 contact_name;	
+		string30 contact_address1;
+		string30 contact_address2;
+		string30 contact_city;
+		string2	contact_state;
+		string9	contact_zip;
+		string10 contact_phone;
+		string10 contact_fax;
+		string60 contact_email;
+		BatchOut;
 		END;
 
 	END;
