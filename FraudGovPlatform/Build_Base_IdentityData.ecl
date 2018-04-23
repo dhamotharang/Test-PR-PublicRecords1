@@ -32,7 +32,7 @@ module
 									right.file_type = Functions.file_type_fn('IDDT') and 
 									Functions.ind_type_fn(left.customer_program) = right.ind_type and 
 									left.customer_state = right.Customer_State and
-									left.Customer_County = right.Customer_County,  
+									left.Customer_County = right.Customer_County,									
 									TRANSFORM(Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 
