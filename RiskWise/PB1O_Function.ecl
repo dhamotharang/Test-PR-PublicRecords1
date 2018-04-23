@@ -91,7 +91,6 @@ Real Global_WatchList_Threshold := if(OFACversion = 4, 0.85, 0.84);
 boolean include_ofac := if(OFACversion = 4, True, False);
  
 biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
-dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');
 
 min2(integer L, integer R) :=  if (l < r , l, r);								
 // business_risk instant id was designed differently, convert those levels to what riskwise customers are used to on the 0-6 scale for PB1O.									
@@ -113,6 +112,15 @@ UNSIGNED1 convertCmpyVerLevel(unsigned1 bnap, unsigned1 bnat) :=
 									bnap=2 => 1, // address or company match, but not both together
 									bnap=1 => 1,  // phone match only
 									0);
+
+layout_targus := RECORD
+  unsigned2 royalty_type_code_targus := 0;
+  string20  royalty_type_targus := '';
+  unsigned2 royalty_count_targus := 0;
+  unsigned2 non_royalty_count_targus := 0;
+  string20  count_entity_targus := '';
+END;
+
 xlayout := record
 	riskwise.layout_pb1o;
 	
@@ -138,6 +146,7 @@ xlayout := record
 	string orig_rep_wphone :='';
 	boolean bus_present := false;
 	boolean rep_present := false;	
+  layout_targus;
 end;
 
 xlayout filloutput(biid_results le, indata rt) := transform
@@ -319,12 +328,22 @@ xlayout filloutput(biid_results le, indata rt) := transform
 	self.action6 := self.rep_fuas[2].hri;
 	self.action7 := self.rep_fuas[3].hri;
 	self.action8 := self.rep_fuas[4].hri;
+  self.royalty_type_code_targus := le.royalty_type_code_targus;
+  self.royalty_type_targus := le.royalty_type_targus;
+  self.royalty_count_targus := le.royalty_count_targus;
+  self.non_royalty_count_targus := le.non_royalty_count_targus;
+  self.count_entity_targus := le.count_entity_targus;
 end;
 
 biid_ret := join(biid_results, indata, left.seq = right.seq, filloutput(left, right), left outer);
 	
 // add this transform to blank out the section(s) that were blank on input like it works in st. cloud
-riskwise.layout_pb1o fillempty(biid_ret le) := transform
+layout_pb1o_w_targus := RECORD
+  riskwise.layout_pb1o;
+  layout_targus;
+END;
+
+layout_pb1o_w_targus fillempty(biid_ret le) := transform
 	self.acctno := le.acctno;
 	self.account := le.account;
 	self.riskwiseid := le.riskwiseid;
@@ -455,10 +474,15 @@ riskwise.layout_pb1o fillempty(biid_ret le) := transform
 	self.alertstate := if(le.rep_present, le.alertstate, '');
 	self.alertzip := if(le.rep_present, le.alertzip, '');
 	self.alertentity := if(le.rep_present, le.alertentity, '');
+  self.royalty_type_code_targus := le.royalty_type_code_targus;
+  self.royalty_type_targus := le.royalty_type_targus;
+  self.royalty_count_targus := le.royalty_count_targus;
+  self.non_royalty_count_targus := le.non_royalty_count_targus;
+  self.count_entity_targus := le.count_entity_targus;
 end;
 
 res := project(biid_ret, fillempty(left));
-#STORED('Royalties', dRoyalties);
+
 return res;
 
 end;

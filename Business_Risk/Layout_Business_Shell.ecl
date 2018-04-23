@@ -1,4 +1,4 @@
-// fields that were added to business instantid because they wanted them,
+﻿// fields that were added to business instantid because they wanted them,
 // but these extra watchlist fields won't be useful in modeling, remove them from the business shell layout
 extra_fields := record
 	STRING60  Watchlist_Table_2 := '';
@@ -134,6 +134,11 @@ extra_fields := record
 	STRING30  RepWatchlist_country_7 := '';
 	STRING200 RepWatchlist_Entity_Name_7 := '';
 	STRING1		Valid_SSN := '';
+  UNSIGNED2 royalty_type_code_targus := 0;
+  STRING20  royalty_type_targus := ''; 			
+  UNSIGNED2 royalty_count_targus := 0; 			 
+  UNSIGNED2 non_royalty_count_targus := 0;  
+  STRING20  count_entity_targus := '';
 end;
 
 biid_layout := record
