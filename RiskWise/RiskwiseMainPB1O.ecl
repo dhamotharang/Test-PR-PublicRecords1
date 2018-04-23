@@ -208,12 +208,23 @@ RiskWise.Layout_PB1O format_seed(seed_out le) := transform
 end;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], riskwise.Layout_PB1O));
 
-ret := if(tribcode in ['pb01', 'pb02'], 
-		if(count(final_seed)>0 and runSeed_value, final_seed, RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, 
-		DataRestriction:=DataRestriction, DataPermission:=DataPermission, OFACversion := OFACversion)), 
-		dataset([{'',account_value}], riskwise.Layout_PB1O));
+ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission);
 
-dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
+ret := if(tribcode in ['pb01', 'pb02'], 
+		if(count(final_seed)>0 and runSeed_value, final_seed, PROJECT( ret_pre, TRANSFORM( riskwise.layout_pb1o, SELF := LEFT, SELF := [] ) )), 
+		dataset([{'',account_value}], riskwise.Layout_PB1O));
+    
+dRoyalties := 
+  PROJECT(
+    ret_pre,
+    TRANSFORM( Royalty.Layouts.Royalty,
+      SELF.royalty_type_code := LEFT.royalty_type_code_targus;
+      SELF.royalty_type      := LEFT.royalty_type_targus;
+      SELF.royalty_count     := LEFT.royalty_count_targus;
+      SELF.non_royalty_count := LEFT.non_royalty_count_targus;
+      SELF.count_entity      := LEFT.count_entity_targus;
+    )
+  );
 
 //Log to Deltabase
 Deltabase_Logging_prep := project(ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
