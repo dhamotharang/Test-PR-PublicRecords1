@@ -282,7 +282,7 @@ EXPORT Functions :=  MODULE
 	FUNCTIONMACRO		
 			IMPORT address;
 
-			Address_Cache := Files().Base.AddressCache.Built;
+			Address_Cache := FraudGovPlatform.Files().Base.AddressCache.Built;
 			
 			prepped_Addresses := 	dedup(
 											table(pInputFile(address_1 <> '' and address_2 <> ''),{address_1, address_2, address_id})  
@@ -290,48 +290,48 @@ EXPORT Functions :=  MODULE
 										,all);
 
 
-		FraudGovPlatform.Layouts.Base.AddressCache CleanAddress(Layouts.Base.AddressCache l, prepped_Addresses r) := TRANSFORM 
-					Clean_Address_182						:= if (r.address_2 != '', address.CleanAddress182(r.address_1, r.address_2), '');
-					SELF.address_id							:= hash64(r.address_1 + r.address_2);
-					SELF.address_cleaned					:= (unsigned4)ut.GetDate;
-					SELF.address_1							:= r.address_1;
-					SELF.address_2							:= r.address_2;
+		FraudGovPlatform.Layouts.Base.AddressCache CleanAddress( prepped_Addresses l,  FraudGovPlatform.Layouts.Base.AddressCache r) := TRANSFORM 
+					Clean_Address_182								:= if (l.address_id  = r.address_id, address.CleanAddress182(r.address_1, r.address_2) ,address.CleanAddress182(l.address_1, l.address_2));
+					SELF.address_id								:= if (l.address_id  = r.address_id, hash64(r.address_1 + r.address_2) ,hash64(l.address_1 + l.address_2));
+					SELF.address_cleaned						:= (unsigned4)ut.GetDate;
+					SELF.address_1									:= l.address_1;
+					SELF.address_2									:= l.address_2;
 					SELF.clean_address.prim_range			:= Clean_Address_182[1..10]					; //prim_range
 					SELF.clean_address.predir				:= Clean_Address_182[11..12]				; //predir
 					SELF.clean_address.prim_name			:= Clean_Address_182[13..40]				; //prim_name
-					SELF.clean_address.addr_suffix			:= Clean_Address_182[41..44]				; //addr_suffix
+					SELF.clean_address.addr_suffix		:= Clean_Address_182[41..44]				; //addr_suffix
 					SELF.clean_address.postdir				:= Clean_Address_182[45..46]				; //postdir
 					SELF.clean_address.unit_desig			:= Clean_Address_182[47..56]				; //unit_desig
 					SELF.clean_address.sec_range			:= Clean_Address_182[57..64]				; //sec_range
-					SELF.clean_address.p_city_name			:= Clean_Address_182[65..89]				; //p_city_name
-					SELF.clean_address.v_city_name			:= Clean_Address_182[90..114]				; //v_city_name
-					SELF.clean_address.st					:= Clean_Address_182[115..116]				; //st
-					SELF.clean_address.zip					:= Clean_Address_182[117..121]				; //zip
+					SELF.clean_address.p_city_name		:= Clean_Address_182[65..89]				; //p_city_name
+					SELF.clean_address.v_city_name		:= Clean_Address_182[90..114]				; //v_city_name
+					SELF.clean_address.st						:= Clean_Address_182[115..116]				; //st
+					SELF.clean_address.zip						:= Clean_Address_182[117..121]				; //zip
 					SELF.clean_address.zip4					:= Clean_Address_182[122..125]				; //zip4
 					SELF.clean_address.cart					:= Clean_Address_182[126..129]				; //cart
 					SELF.clean_address.cr_sort_sz			:= Clean_Address_182[130]					; //cr_sort_sz
-					SELF.clean_address.lot					:= Clean_Address_182[131..134]				; //lot
+					SELF.clean_address.lot						:= Clean_Address_182[131..134]				; //lot
 					SELF.clean_address.lot_order			:= Clean_Address_182[135]					; //lot_order
 					SELF.clean_address.dbpc					:= Clean_Address_182[136..137]				; //dpbc
 					SELF.clean_address.chk_digit			:= Clean_Address_182[138]					; //chk_digit
 					SELF.clean_address.rec_type				:= Clean_Address_182[139..140]				; //record_type
-					SELF.clean_address.fips_state 			:= Clean_Address_182[141..142]				; //ace_fips_state
-					SELF.clean_address.fips_county			:= Clean_Address_182[143..145]				; //county
+					SELF.clean_address.fips_state 		:= Clean_Address_182[141..142]				; //ace_fips_state
+					SELF.clean_address.fips_county		:= Clean_Address_182[143..145]				; //county
 					SELF.clean_address.geo_lat				:= Clean_Address_182[146..155]				; //geo_lat
 					SELF.clean_address.geo_long				:= Clean_Address_182[156..166]				; //geo_long
-					SELF.clean_address.msa					:= Clean_Address_182[167..170]				; //msa
+					SELF.clean_address.msa						:= Clean_Address_182[167..170]				; //msa
 					SELF.clean_address.geo_blk				:= Clean_Address_182[171..177]				; //geo_blk
 					SELF.clean_address.geo_match			:= Clean_Address_182[178]					; //geo_match
 					SELF.clean_address.err_stat				:= Clean_Address_182[179..182]				; //err_stat		
-					SELF									:= r;
+					SELF													:= l;
 			END;
 
 			new_addresses := join(
-												Address_Cache,
-												prepped_Addresses,								
+												prepped_Addresses,
+												Address_Cache,								
 												left.address_id = RIGHT.address_id,
 												CleanAddress(LEFT,RIGHT),
-												RIGHT ONLY
+												LEFT ONLY
 										);							
 
 			Sort_Address_Cache := sort(FraudGovPlatform.Files().Base.AddressCache.Built + new_addresses, address_id, -address_cleaned);

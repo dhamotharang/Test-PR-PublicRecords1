@@ -38,6 +38,7 @@ EXPORT SprayAndQualifyInquiryLogs(
 									IDM_Logs,
 									Build_Input_File,
 									pCompress	:= true,
+									pHeading := false,
 									pCsvout := true,
 									pSeparator := '~|~',
 									pOverwrite := true,
