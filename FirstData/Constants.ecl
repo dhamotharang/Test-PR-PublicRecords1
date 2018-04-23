@@ -1,9 +1,6 @@
 ﻿IMPORT	MDR,	Tools;
 EXPORT	Constants(STRING	pFileDate='')	:=
 INLINE MODULE
-
-	//	Source
-	// EXPORT	source	:=	MDR.sourceTools.src_OKC_Probate;
 	
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	Tools._Constants.IsDataland,

@@ -2,7 +2,7 @@
 
 EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today()) := MODULE
 
-	//OKC_Probate input file 
+	//FirstData input file 
 	ds_firstdata_in := FirstData.Files().file_in;
 	
   file_name	:=	FirstData.Filenames().Input.Raw.Using;

@@ -18,11 +18,11 @@ EXPORT fSprayFiles(
 ) :=
 function
 
-	//FirstData.com
+	//FirstData
 	spry_raw:=DATASET([
 
 		 {pServer																// SourceIP
-		 ,pDir								// SourceDirectory
+		 ,pDir							                   	// SourceDirectory
 		 ,'*csv'																// directory_filter
 		 ,0																			// record_size
 		 ,Filenames(pVersionDate).input.raw.new(pVersionDate)	// Thor_filename_template
@@ -32,7 +32,7 @@ function
 		 ,'[0-9]{8}' 														// date_regex
 			,'VARIABLE' 													// file_type
 			,'' 																	// sourceRowTagXML
-			,_Dataset().pMaxRecordSize		 		// sourceMaxRecordSize
+			,_Dataset().pMaxRecordSize		 		    // sourceMaxRecordSize
 			,srcCSVseparator 											// sourceCsvSeparate
 			,srcCSVterminator 										// sourceCsvTerminate
 			,srcCSVquote 													// sourceCsvQuote
