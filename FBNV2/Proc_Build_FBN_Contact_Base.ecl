@@ -1,4 +1,4 @@
-IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib;
+﻿IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib;
 
 dContact  	:= 
 				ungroup(Mapping_FBN_BUSREG_Contact)+
@@ -138,7 +138,7 @@ dPostDIDandBDIDPersist	:=	dWithBusHdrSourceMatch
 						
  
 					
-PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Contact',Out, 3);
+PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Contact',Out, 3,pCompress:=true);
 //ut.MAC_SF_Build_standard(dPostDIDandBDIDPersist,cluster.cluster_out+'base::FBNv2::Contact',out,ut.GetDate);
 
 
