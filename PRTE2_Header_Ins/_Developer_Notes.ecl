@@ -1,6 +1,7 @@
 ﻿/* *****************************************************************************************************************
 PRTE2_Header_Ins._Developer_Notes
 NOTHING IN HERE BUILDS ANY PRODUCT KEYS ... ONLY TO PREPARE THE ALPHARETTA HEADER BASE FILE.
+2018 - new - Boca Personnel will do all building steps.
 Ask Boca personnel before actually building new keys - To build use:
 PRTE.BWR_Build
 
