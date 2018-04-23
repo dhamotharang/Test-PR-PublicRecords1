@@ -12,17 +12,18 @@ export lookup_images_in := project(prep_lookup_images_in(std.str.find(column_1,'
 																																																																				self.column_3	:= left.column_1;
 																																																																				self := left;
 																																																																				));
- 	
- OKC_Sexual_Offenders.Layout_OKC_Pics_Lookup fixState(lookup_images_in l):= transform
+
+
+OKC_Sexual_Offenders.Layout_OKC_Pics_Lookup fixState(lookup_images_in l):= transform
 	 self.state_of_origin := if(trim(l.column_1, left, right)<>'', trim(l.column_1, left, right)[1..2],''); //need to populate only the state
-	 self.image_file_name := if(regexfind('.JPG|.JPEG|.GIF', trim(l.column_3, left, right), 0)<>'',
+	 self.image_file_name := if(regexfind('.JPG|.JPEG|.GIF|.jpg', trim(l.column_3, left, right), 0)<>'',
 																													trim(l.column_3, left, right),
-																													if(regexfind('.JPG|.JPEG|.GIF', trim(l.column_2, left, right), 0)<>'',
+																													if(regexfind('.JPG|.JPEG|.GIF|.jpg', trim(l.column_2, left, right), 0)<>'',
 																													trim(l.column_2, left, right),
 																													''));
 	 self := l;
  end;
- 
+ 	
 export Crim_Pics_Lookup := project(lookup_images_in,fixState(left));
  
 export Images_base										:=  dataset(Constants.base_prefix_name+ 'matrix_images', Layouts.matrix_images, flat);

@@ -10,7 +10,7 @@ EXPORT proc_build_base(string filedate):= function
 
 //Format Offender File
 	Layouts.IMG_CommonInfo slimFile(files.offender_base l):= transform
-		self.filename 				:= trim(STD.Str.ToUpperCase(l.image_link));
+		self.filename 				:= trim(l.image_link,all);
 		self.state_origin := ut.st2abbrev(STD.Str.ToUpperCase(l.orig_state));
 		self 			:= l;
 	end;
@@ -25,11 +25,11 @@ IMG_CommonInfo := project(Files.offender_base, slimFile(left));
 																									ri. data_type ='5' => 'AL',
 																									'');
 	
-	 SELF.id 		    		:= ri.offender_key;
+	 SELF.id 		    		:= TRIM(ri.offender_key, ALL);;
 		SELF.seq 		    	:= 0;
 		SELF.date 		  		:= '';
 		SELF.num 		    	:= 1;
-		self.image_link := ri.filename;
+		self.image_link := TRIM(ri.filename,ALL);
 		SELF.imgLength 	:= le.imgLength;
 		SELF.photo 		  	:= le.photo;
 	END;
