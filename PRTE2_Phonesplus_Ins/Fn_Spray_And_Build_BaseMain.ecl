@@ -12,7 +12,7 @@ EXPORT Fn_Spray_And_Build_BaseMain(STRING CSVName, STRING fileVersion, STRING ov
 																								Constants.CSVSprayFieldSeparator,		// field separator(s)
 																								Constants.CSVSprayLineSeparator,		// line separator(s)
 																								Constants.CSVSprayQuote,						// text quote character
-																								ThorLib.Cluster(),									// destination THOR cluster
+																								ThorLib.Group(),									// destination THOR cluster
 																								Files.FILE_SPRAY,
 																								-1,												  				// -1 means no timeout
 																									,													  			// use default ESP server IP port
