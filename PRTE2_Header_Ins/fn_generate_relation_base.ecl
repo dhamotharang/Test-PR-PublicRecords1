@@ -1,5 +1,4 @@
-﻿// *******WIP**************WIP**************WIP**************WIP**************WIP**************WIP**************WIP*******
-/* ********************************************************************************************
+﻿/* ********************************************************************************************
 PRTE2_Header_Ins.fn_generate_relation_base
 MUST SWITCH TO THE NEW BOCA BUSINESS CASE BUILD PROCESSES - FOR NOW MUST KEEP THE SAME FILE NAMES
 NOTE: We only need file info here for 
@@ -17,8 +16,12 @@ EXPORT fn_generate_relation_base() := FUNCTION;
 // ***************************************************************************************************	
 // FEB 2018 - Gabriel says they re-generate relations with all combined legacy data so this seems to
 // 							be obsolete unless at some point, we (a) need specific relations and (b) get them to alter their build
+// 							Gabriel says look at this WU W20180213-102027 in prod thor.
 	retds2b := PROJECT(retds1,retds_Layout);
-/* ***************************************************************************************************
+//TODO - if Gabriel isn't right we may need to create some new way to generate some relations.
+// ***************************************************************************************************	
+	
+/* ***** old historical fake relations generation ****************************************************
 	// ------------------------------------------------------------------------------------------------------------------
 	// NOTE: Danny designed this to make everyone related to everyone.
 	// However, it looks like he actually made relationships only if streetNums are equal.
@@ -40,6 +43,7 @@ EXPORT fn_generate_relation_base() := FUNCTION;
 	retds2b := PROJECT(retds2,retds_Layout);
 	// ------------------------------------------------------------------------------------------------------------------	
 *************************************************************************************************** */
+
 	retds3 := SORT(retds2b, did);	// : PERSIST('~prte::persist::custtest::PeopleHeader_LNProperty_Dedup_Sort');
 	RETURN dedup(retds3, RECORD, all);
 	

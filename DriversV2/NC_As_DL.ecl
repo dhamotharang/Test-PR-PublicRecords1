@@ -1,6 +1,8 @@
-import ut,lib_stringlib, Data_services, Drivers,idl_header, std;
+﻿import ut,lib_stringlib, Data_services, Drivers,idl_header, std;
 
-in_file            :=  DriversV2.File_DL_NC_In_Update;
+export NC_As_DL(dataset(DriversV2.Layout_DL_NC_In.Layout_NC_With_Clean) pFile_NC_Input) := function
+
+in_file     :=  pFile_NC_Input;
 																			
 string f2CharCodeAndComma(string pRestrictionCode) :=  // process each two-character restriction code
 					 if(trim(pRestrictionCode,right)<>'',
@@ -14,7 +16,7 @@ Table_Layout := record,MAXLENGTH(100)
 end; 
 	
 //Restric_Table := dataset(ut.foreign_prod+'thor_data400::lookup::dl2::nc_restrictions',Table_Layout,CSV(SEPARATOR(['|']),QUOTE('"'), TERMINATOR(['\r\n', '\n'])));
-Restric_Table := dataset('~thor_data400::lookup::dl2::nc_restrictions',Table_Layout,CSV(SEPARATOR(['|']),QUOTE('"'), TERMINATOR(['\r\n', '\n'])));
+Restric_Table := dataset(ut.foreign_prod+'thor_data400::lookup::dl2::nc_restrictions',Table_Layout,CSV(SEPARATOR(['|']),QUOTE('"'), TERMINATOR(['\r\n', '\n'])));
  		
 		
 DriversV2.Layout_DL_NC_In.Layout_NC_With_Clean restric_Code1(in_file input, Table_Layout r ) := transform
@@ -153,4 +155,8 @@ licenseType := join(NC_Update , license_Table,
 
 ut.mac_flipnames(licenseType, fname, mname, lname, NC_Unload_post_flip);
 
-export NC_As_DL := NC_Unload_post_flip : persist(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_NC_as_DL');
+NC_As_DL_mapper := NC_Unload_post_flip;
+
+return NC_As_DL_mapper;
+
+end;

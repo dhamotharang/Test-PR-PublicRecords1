@@ -1,4 +1,4 @@
-
+﻿
 import ut; 
 
 export ConcatInput := function
@@ -8,6 +8,9 @@ ECrash_commercl := FLAccidents_Ecrash.Infiles.commercl;
 ECrash_persn := FLAccidents_Ecrash.Infiles.persn;
 ECrash_vehicl := FLAccidents_Ecrash.Infiles.vehicl;
 ECrash_Property_damage := FLAccidents_Ecrash.Infiles.Property_damage;
+photo := DATASET('~thor_data400::in::ecrash::document_raw'
+																	,FLAccidents_Ecrash.Layouts.PhotoLayout
+																	,CSV(TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT);
 
 time := ut.gettime() : independent; 
 date := ut.GetDate : independent; 
@@ -33,7 +36,9 @@ output(ECrash_vehicl,,'~thor_data400::in::ecrash::vehicl_patch_'+date+'_'+time,c
 output(ECrash_persn,,'~thor_data400::in::ecrash::persn_patch_'+date+'_'+time,compressed,csv(terminator('\n'), separator(','),quote('"'))),
 output(ECrash_incident,,'~thor_data400::in::ecrash::incident_patch_'+date+'_'+time,compressed,csv(terminator('\n'), separator(','),quote('"'),maxlength(60000))),
 output(ds,,'~thor_data400::out::ecrash::extract::caseDupes::thru_'+date+'_'+time,compressed,csv(heading('filedate,flag,del_incident_id,add_incident_id\n'),terminator('\n')
-												 ,separator(',')),compressed,overwrite)); 
+												 ,separator(','))), 
+output(photo,,'~thor_data400::in::ecrash::document_raw_'+date+'_'+time,compressed,csv(terminator('\n'), separator(','),quote('"'))));
+
 /*output(FLAccidents_Ecrash.File_Accident_Watch_Full ,,'~thor_data::base::AccidentWatch_full_thru_'+date+'_'+time,csv(
     HEADING('orig_accnbr|vehicle_incident_id|vehicle_status|accident_date|did|title|fname|mname|lname|name_suffix|dob|b_did|cname|prim_range|predir|prim_name|addr_suffix|postdir|unit_desig|sec_range|v_city_name|st|zip|zip4|record_type|report_code|report_code_desc|report_category|vin|driver_license_nbr|dlnbr_st|tag_nbr|tagnbr_st|accident_location|accident_street|accident_cross_street|jurisdiction|jurisdiction_state|vehicle_unit_number|vehicle_incident_city|vehicle_incident_st|carrier_name|Policy_num|Policy_Effective_Date|process_date_time|report_type|addl_report_number|agency_id|agency_ori|Insurance_Company_Standardized|source_id|hash_key|work_type_id|CRU_order_id|CRU_Seq_number|carrier_id_carriername|update_flag|Report_Type_ID|carrier_id_carrierSource\n','',SINGLE)
       ,SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE)
@@ -47,7 +52,8 @@ fileservices.clearsuperfile('~thor_data400::in::ecrash::incidnt_raw_new'),
 fileservices.clearsuperfile('~thor_data400::in::ecrash::persn_raw'), 
 fileservices.clearsuperfile('~thor_data400::in::ecrash::vehicl_raw'), 
 fileservices.clearsuperfile('~thor_data400::in::ecrash::propertydamage_raw'),
-fileservices.clearsuperfile( '~thor_data400::out::ecrash::dupes'));
+fileservices.clearsuperfile( '~thor_data400::out::ecrash::dupes'),
+fileservices.clearsuperfile( '~thor_data400::in::ecrash::document_raw')	);
 //fileservices.clearsuperfile( '~thor_data::base::AccidentWatch_full')); 
 
 add_super := sequential(fileservices.addsuperfile('~thor_data400::in::ecrash::commercl_raw','~thor_data400::in::ecrash::commercl_patch_'+date+'_'+time), 
@@ -56,7 +62,8 @@ fileservices.addsuperfile('~thor_data400::in::ecrash::incidnt_raw_new','~thor_da
 fileservices.addsuperfile('~thor_data400::in::ecrash::persn_raw','~thor_data400::in::ecrash::persn_patch_'+date+'_'+time), 
 fileservices.addsuperfile('~thor_data400::in::ecrash::vehicl_raw','~thor_data400::in::ecrash::vehicl_patch_'+date+'_'+time), 
 fileservices.addsuperfile('~thor_data400::in::ecrash::propertydamage_raw','~thor_data400::in::ecrash::Property_damage_patch_'+date+'_'+time),
-fileservices.addsuperfile('~thor_data400::out::ecrash::dupes', '~thor_data400::out::ecrash::extract::caseDupes::thru_'+date+'_'+time));
+fileservices.addsuperfile('~thor_data400::out::ecrash::dupes', '~thor_data400::out::ecrash::extract::caseDupes::thru_'+date+'_'+time),
+FileServices.AddSuperfile('~thor_data400::in::ecrash::document_raw','~thor_data400::in::ecrash::document_raw_'+date+'_'+time));
 //fileservices.addsuperfile('~thor_data::base::AccidentWatch_full', '~thor_data::base::AccidentWatch_full_thru_'+date+'_'+time 
 
 validate_counts := map ( count(FLAccidents_Ecrash.Infiles.incident) <> count(ECrash_incident) => FAIL('ECrash_Incident_counts_mismatch'),

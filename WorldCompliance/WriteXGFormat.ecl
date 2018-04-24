@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 EXPORT WriteXGFormat := MODULE
 
@@ -93,7 +93,7 @@ shared SourceCodetoDescr(string SourceCode) := CASE(SourceCode,
 'WorldCompliance - Full' => 'Full WorldCompliance data set',
 'WorldCompliance - Countries' => 'Includes Countries from all WorldCompliance Categories that need additional due diligence',
 'Belgium Financial Sector Federation' => 'Belgium Financial Sector Federation',
-'WorldCompliance - Registrations' => U'US IRS FATCA â€“ Foreign Financial Institutions; Marijuana Registered Businesses (MRB); IHS (FATF High-Risk Country) Vessels; US Money Services Businesses (MSBs); UAE Money Services Businesses (MSBs)',
+'WorldCompliance - Registrations' => U'US IRS FATCA – Foreign Financial Institutions; Marijuana Registered Businesses (MRB); IHS (FATF High-Risk Country) Vessels; US Money Services Businesses (MSBs); UAE Money Services Businesses (MSBs)',
 NameSources.CodeToDesc(SourceCode));
 //SourceCode + ' from World Compliance, a LexisNexis Company');
 

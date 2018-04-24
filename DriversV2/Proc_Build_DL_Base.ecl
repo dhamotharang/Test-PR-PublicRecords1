@@ -1,4 +1,4 @@
-import header, ut, STRATA, lib_fileservices, MDR, std, PromoteSupers;
+﻿import header, ut, STRATA, lib_fileservices, MDR, std, PromoteSupers;
 
 
 #workunit('priority','high');
@@ -15,7 +15,7 @@ zVerifyVersion	:=	if(ut.DaysApart((string8)Std.Date.Today(), pversion) >= 10,
 					   output(pversion,named('Version_Date'))
 					  );
  
-zTXData       :=  DriversV2.File_DL_TX_Update2 + DriversV2.File_DL_TX_Update_Clean;
+zTXData       :=  DriversV2.File_DL_TX_Update_Clean;
 zVerifyTXData	:=	if (count(zTXData(length(trim(dl_number)) = 10 and trim(dl_number)[1..2]!='00' and trans_indicator ='U')) > 0,
 												fail('TX DLs is sending data containing something other than 2 leading zeroes in the DL_number field  - Development is needed!')
 											);
@@ -52,7 +52,7 @@ END;
 dl_patched_slim := PROJECT(dl_patched,tSlim(LEFT));						  
 
 PromoteSupers.MAC_SF_BuildProcess(dl_patched_slim + 
-                       Driversv2.File_Dummy_Data(pversion), DriversV2.Constants.Cluster+'base::DL2::drvlic',aBuildDLBase,2, ,true);
+                       Driversv2.File_Dummy_Data(pversion), DriversV2.Constants.Cluster+'base::DL2::drvlic',aBuildDLBase,3, ,true);
 
 /* Transform/Project the dummy data to map to Base w/AID format */
 DriversV2.Layout_Base_withAID tMapping(DriversV2.Layout_DL_Extended L) := TRANSFORM
@@ -64,9 +64,9 @@ DriversV2.Layout_Base_withAID tMapping(DriversV2.Layout_DL_Extended L) := TRANSF
 END;
 dMapping := PROJECT(Driversv2.File_Dummy_Data(pversion),tMapping(LEFT));
 
-PromoteSupers.MAC_SF_BuildProcess(dl_patched + dMapping, DriversV2.Constants.Cluster+'base::DL2::drvlic_AID',bBuildDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dl_patched + dMapping, DriversV2.Constants.Cluster+'base::DL2::drvlic_AID',bBuildDLBase,3, ,true);
 											                                                          
-PromoteSupers.MAC_SF_BuildProcess(dl_restricted, DriversV2.Constants.Cluster+'base::DL2::RESTRICTED_drvlic_AID',resBuildDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dl_restricted, DriversV2.Constants.Cluster+'base::DL2::RESTRICTED_drvlic_AID',resBuildDLBase,3, ,true);
 
 DriversV2.Layout_DL_For_Insurance trfSlim(DriversV2.File_DL_Extended input) := TRANSFORM
 // Note! In June of 2009 a layout change for TX occured where dl_numbers went from 8 to 10 in length
@@ -82,7 +82,7 @@ END;
 											 
 dSlimDLBase	:=	project(DriversV2.File_DL_Extended(source_code != 'CY'), trfSlim(left));
 
-PromoteSupers.MAC_SF_BuildProcess(dSlimDLBase, DriversV2.Constants.Cluster+'base::DL2::InsuranceSlim',aSlimDLBase,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(dSlimDLBase, DriversV2.Constants.Cluster+'base::DL2::InsuranceSlim',aSlimDLBase,3, ,true);
 
 //---------------------------------------------------
 // New Stats
@@ -145,17 +145,17 @@ e_mail_fail := fileservices.sendemail('fhumayun@seisint.com;giri.rajulapalli@lex
                     // DriversV2.Layouts_DL_Conv_Points_Common.Layout_FRA_Insurance,thor);
 // ut.MAC_SF_BuildProcess(_upd_ins,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,2, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions',aConvBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions',aConvBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions_Restricted,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions_Restricted',aResConvBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Convictions_Restricted,DriversV2.Constants.Cluster+'base::DL2::CP_Convictions_Restricted',aResConvBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Suspensions,DriversV2.Constants.Cluster+'base::DL2::CP_Suspensions',aSuspBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Suspensions,DriversV2.Constants.Cluster+'base::DL2::CP_Suspensions',aSuspBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_DR_Info,DriversV2.Constants.Cluster+'base::DL2::CP_DR_Info',aDRInfoBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_DR_Info,DriversV2.Constants.Cluster+'base::DL2::CP_DR_Info',aDRInfoBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Accidents,DriversV2.Constants.Cluster+'base::DL2::CP_Accidents',aAccidBuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Accidents,DriversV2.Constants.Cluster+'base::DL2::CP_Accidents',aAccidBuild,3, ,true);
 
-PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Insurance,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,2, ,true);
+PromoteSupers.MAC_SF_BuildProcess(DriversV2.Update_DL_ConvPoints.Update_DL_Insurance,DriversV2.Constants.Cluster+'base::DL2::CP_FRA_Insurance',aFRABuild,3, ,true);
 
 results := sequential(parallel(zVerifyVersion,
 						zVerifyTXData,
