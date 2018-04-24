@@ -35,7 +35,8 @@ EXPORT fspray_And_Build_Base(STRING lzFilePath, STRING fileVersion) := FUNCTION
 	
 	PickOne(STRING s1, STRING s2) := IF(TRIM(s1,left,right)<>'',s1,s2);
 	
-	// Expand the slim dataset to include default columns doing MINIMAL changes during full build
+	// Expand the slim dataset to include default columns doing MINIMAL changes during full build this is because data out there is so bad
+   // later we may want more initializing in case addresses were modified, etc...
 	AllSlimInitialized						:= PROJECT(All_Slim_SubFile_Upper, 
 																					TRANSFORM(Layouts.BaseInput_Slim_Common, 
 																										bestHullNumber 	:= PickOne(LEFT.hull_number_Main, LEFT.hull_number_cg);

@@ -1,4 +1,4 @@
-﻿IMPORT	OKC_Probate,	MDR,	Tools;
+﻿IMPORT	OKC_Probate,	MDR,	Tools, _Control;
 EXPORT	Constants(STRING	pFileDate='')	:=
 INLINE MODULE
 
@@ -7,8 +7,8 @@ INLINE MODULE
 	
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	Tools._Constants.IsDataland,
-																								'bctlpedata12.risk.regn.net',
-																								'bctlpedata10.risk.regn.net');
+																								_Control.IPAddress.bctlpedata12,
+																								_Control.IPAddress.bctlpedata10);
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	Tools._Constants.IsDataland,

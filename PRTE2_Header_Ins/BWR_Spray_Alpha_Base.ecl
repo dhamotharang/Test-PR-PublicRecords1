@@ -1,6 +1,5 @@
 ﻿/* ********************************************************************************************
 PRTE2_Header_Ins.BWR_Spray_Alpha_Base
-
 ***********************************************************************************************
 NOTE: to add new records - must be added to Alpha IHDR, then moved thru the MHDR and then into
 PRTE2_Header_Ins_Data_Work.BWR_Add_New_Alp_MHDR_to_Alp_Base to then add them in here.

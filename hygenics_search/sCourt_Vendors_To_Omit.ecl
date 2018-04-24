@@ -22,7 +22,7 @@
 '4L', // SOUTH_CAROLINA_HORRY_COUNTY_SUMMARY_COURTS                                                          
 '4M', // SOUTH_CAROLINA_KERSHAW_COUNTY_CIRCUIT_COURTS                                                        
 '4N', // SOUTH_CAROLINA_KERSHAW_COUNTY_SUMMARY_COURTS                                                        
-'4O', // SOUTH_CAROLINA_LANCASTER_COUNTY_CIRCUIT_COURTS                                                                                                                          
+'4O', // SOUTH_CAROLINA_LANCASTER_COUNTY_CIRCUIT_COURTS                                                      
 '4P', // SOUTH_CAROLINA_LANCASTER_COUNTY_SUMMARY_COURTS                                                      
 '4Q', // SOUTH_CAROLINA_LAUREN_COUNTY_CIRCUIT_COURTS                                                         
 '4R', // SOUTH_CAROLINA_LAUREN_COUNTY_SUMMARY_COURTS                                                         
@@ -113,7 +113,8 @@
 'CS', // COLORADO_PUEBLO_COUNTY_ARRESTS                                                                      
 'CU', // COLORADO_WELD_COUNTY_ARRESTS                                                                        
 'CW', // FLORIDA_BREVARD_COUNTY_ARRESTS                                                                      
-'CY', // FLORIDA_CHARLOTTE_COUNTY_ARRESTS
+'CX', // FLORIDA_BROWARD_COUNTY_ARRESTS                                                                      
+'CY', // FLORIDA_CHARLOTTE_COUNTY_ARRESTS                                                                    
 'CZ', // FLORIDA_CITRUS_COUNTY_ARRESTS                                                                       
 'DA', // ALABAMA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DB', // ARKANSAS_DEPARTMENT_OF_CORRECTIONS                                                                  
@@ -340,7 +341,6 @@
 'TA', // TENNESSEE_ADMINISTRATOR_OF_THE_COURTS                                                               
 'TC', // TEXAS_BRAZORIA_COUNTY                                                                               
 'TD', // TEXAS_COLLIN_COUNTY                                                                                 
-'TE', // TEXAS_DALLAS_COUNTY                                                                                 
 'TG', // TEXAS_EL_PASO_COUNTY                                                                                
 'TL', // TEXAS_JOHNSON_COUNTY                                                                                
 'TM', // TEXAS_MIDLAND_COUNTY                                                                                
@@ -487,12 +487,10 @@
 'W0129', // MAINE_GORHAM_POLICE_DEPARTMENT_CW                                                                   
 'W0130', // MARYLAND_FREDERICK_COUNTY_SHERIFF_CW                                                                
 'W0132', // MASSACHUSETTS_DUXBURY_CW                                                                            
-'W0133', // MASSACHUSETTS_EAST_LONGMEADOW_CW                                                                    
 'W0135', // MASSACHUSETTS_FRANKLIN_POLICE_CW                                                                    
 'W0136', // MASSACHUSETTS_HALIFAX_POLICE_DEPARTMENT_CW                                                          
 'W0137', // MASSACHUSETTS_HAMPDEN_POLICE_DEPARTMENT_CW                                                          
 'W0138', // MASSACHUSETTS_MARION_POLICE_DEPARTMENT_CW                                                           
-'W0139', // MASSACHUSETTS_MELROSE_POLICE_DEPARTMENT_CW                                                          
 'W0140', // MASSACHUSETTS_NANTUCKET_POLICE_DEPARTMENT_CW                                                        
 'W0141', // MASSACHUSETTS_ROCHESTER_CW                                                                          
 'W0142', // MASSACHUSETTS_SALEM_POLICE_CW                                                                       
@@ -643,7 +641,6 @@
 'W0316', // ARIZONA_TOLLESON_CW                                                                                 
 'W0317', // ARIZONA_WICKENBURG_CW                                                                               
 'W0318', // OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                                                            
-
 
 ////////////////////////////////////////////////////////
 /////Source that Risk view doesn't want in the build. EXCLUDE FROM FCRA UNTIL FURTHER NOTICE!!!!

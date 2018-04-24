@@ -75,7 +75,7 @@ Patriot.Out_Patriot_File_Stats_Population(filedate,strata_output)
 %do9% := dops.updateversion('PatriotKeys',filedate,'kgummadi@seisint.com',,'N');
 
 //Create Orbit Entry
-%do10% := Orbit3.proc_Orbit3_CreateBuild('Patriot Act',filedate);
+%do10% := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Patriot Act',filedate);
 
 #if(doscore)
 	sequential(%pre%, /*%stats%,*/ %do1%, %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output) : 
