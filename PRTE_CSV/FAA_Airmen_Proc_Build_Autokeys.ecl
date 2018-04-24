@@ -1,4 +1,4 @@
-import AutoKeyB2, FAA, Tools; 
+﻿import AutoKeyB2, FAA, Tools; 
  
 export FAA_Airmen_Proc_Build_Autokeys(dataset(PRTE_CSV.FAA_Input_Layouts.input.sprayed.layout_faa_airmen) ds_Airmen
 																		  ,string pversion
@@ -53,4 +53,4 @@ export FAA_Airmen_Proc_Build_Autokeys(dataset(PRTE_CSV.FAA_Input_Layouts.input.s
 
 		return retval; 				
 				
-end;
+end: DEPRECATED('Use PRTE2_FAA.proc_build_keys.');

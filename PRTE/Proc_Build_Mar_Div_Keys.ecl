@@ -1,4 +1,4 @@
-import	_control, PRTE_CSV;
+﻿import	_control, PRTE_CSV;
 
 export	Proc_Build_Mar_Div_Keys(string pIndexVersion)	:=
 function
@@ -188,4 +188,4 @@ return	sequential(
 																				)
 										 );
 
-end;	
+end: DEPRECATED('Use PRTE2_Marriage_Divorce.proc_build_keys');;	

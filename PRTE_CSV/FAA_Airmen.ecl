@@ -1,4 +1,4 @@
-export FAA_Airmen := 
+﻿export FAA_Airmen := 
 
 module
 
@@ -213,4 +213,4 @@ export dthor_data400__key__faa__airmen__autokey__payload 			:= dataset(lCSVFileN
 export dthor_data400__key__faa__airmen__autokey__ssn2 				:= dataset(lCSVFileNamePrefix + 'thor_data400__key__faa__airmen__' + lCSVVersion + '__autokey__ssn2.csv', rthor_data400__key__faa__airmen__autokey__ssn2, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__faa__airmen__autokey__stname 			:= dataset(lCSVFileNamePrefix + 'thor_data400__key__faa__airmen__' + lCSVVersion + '__autokey__stname.csv', rthor_data400__key__faa__airmen__autokey__stname, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__faa__airmen__autokey__zip 					:= dataset(lCSVFileNamePrefix + 'thor_data400__key__faa__airmen__' + lCSVVersion + '__autokey__zip.csv', rthor_data400__key__faa__airmen__autokey__zip, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
-end;	
+end: DEPRECATED('Use PRTE2_FAA.files instead.');

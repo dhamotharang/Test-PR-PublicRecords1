@@ -1,4 +1,4 @@
-export Mar_Div := 
+﻿export Mar_Div := 
 
 module
 
@@ -316,4 +316,4 @@ export dthor_data400__key__mar_div__did 									:= dataset(lCSVFileNamePrefix +
 export dthor_data400__key__mar_div__filing_nbr 						:= dataset(lCSVFileNamePrefix + 'thor_data400__key__mar_div__' + lCSVVersion + '__filing_nbr.csv', rthor_data400__key__mar_div__filing_nbr, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__mar_div__id_main 							:= dataset(lCSVFileNamePrefix + 'thor_data400__key__mar_div__' + lCSVVersion + '__id_main.csv', rthor_data400__key__mar_div__id_main, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
 export dthor_data400__key__mar_div__id_search 						:= dataset(lCSVFileNamePrefix + 'thor_data400__key__mar_div__' + lCSVVersion + '__id_search.csv', rthor_data400__key__mar_div__id_search, csv(separator('\t'), terminator('\r\n'), quote(''), heading(single)));
-end;
+end: DEPRECATED('Use PRTE2_Marriage_Divorce.files instead.');;

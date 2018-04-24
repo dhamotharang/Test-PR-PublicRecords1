@@ -1,4 +1,4 @@
-IMPORT PRTE2_Marriage_Divorce;
+﻿IMPORT PRTE2_Marriage_Divorce;
 
 EXPORT Constants := MODULE
 		
@@ -20,5 +20,12 @@ EXPORT Constants := MODULE
 						// B in this set to skip ALL Business data
 
 		EXPORT ak_typeStr := 'BC';
+		
+	//DF-21803:FCRA Consumer Data Fields Depreciation
+		EXPORT key_main_id := 'divorce_docket_volume,divorce_filing_dt,filing_subtype,grounds_for_divorce,marriage_docket_volume,marriage_duration,' +
+																								'marriage_duration_cd,marriage_filing_dt,number_of_children,place_of_marriage,type_of_ceremony';
+																				
+		EXPORT key_search_id := 'age,birth_state,how_marriage_ended,last_marriage_end_dt,party_county,previous_marital_status,race,times_married,title';
+		
 		
 END;
