@@ -1,4 +1,4 @@
-export SET OF STRING ConjunctiveTokens := 
+﻿export SET OF STRING ConjunctiveTokens := 
 [
 // conjunctives
 // e.g. 'BAIT & TACKLE' and 'LOCK AND KEY'
@@ -14,6 +14,7 @@ export SET OF STRING ConjunctiveTokens :=
 'BATHS & KITCHENS',
 'BATH & BODY',
 'KITCHEN & BAR',
+'CUP & SAUCER',
 'WASHER & DRYER',
 'HIGH & DRY',
 'PICTURE & SOUND',
@@ -100,7 +101,9 @@ export SET OF STRING ConjunctiveTokens :=
 'HANDPRINTS & FOOTSTEPS',                                                                                                                            
 'FACE & BODY',
 'BEER & SODA',
+'BEER & ICE',
 'WELL & PUMP',
+'WELLS & PUMPS',
 'PUMP & CORROSION',
 'SOCKS & UNDERWEAR',
 'MARBLE & GRANITE',
@@ -196,6 +199,7 @@ export SET OF STRING ConjunctiveTokens :=
 'NAIL & TAN',
 'NAIL & TOE',
 'NAIL & WAX',
+'WASH & WAX',
 'TIPS & TOES',
 'HAIR & TAN',
 'CUT & CURL',
@@ -363,6 +367,7 @@ export SET OF STRING ConjunctiveTokens :=
 'LOCK & DOOR',
 'LOCKS & GATES',
 'KEY & LOCK',
+'KEY & DOOR',
 'SAFE & LOCK',
 'LOCK & GUN',
 'STORE & LOCK',
@@ -386,6 +391,7 @@ export SET OF STRING ConjunctiveTokens :=
 'HOME & GARDENS',                                                                                       
 'HOME & LAND',                                                                                       
 'HOME & OFFICE',                                                                                       
+'HOME & SCHOOL',                                                                                       
 'HOUSE & OFFICE',                                                                                       
 'FLOWERS & PLANTS',
 'FLOWER & PLANT',
