@@ -9,7 +9,7 @@ EXPORT fSprayFiles(
 
 	 STRING		pVersionDate	= (STRING)STD.Date.Today()
 	,string		pServer			= Constants(pVersionDate).serverIP
-	,string		pDir				= Constants(pVersionDate).Directory
+	,string		pDir				= Constants(pVersionDate).Directory + pVersionDate + '/'
 	,STRING		pFilename			=	'*csv'
 	,string		pGroupName	=	_Dataset().pGroupname
 	,boolean	pIsTesting	= FALSE
@@ -52,7 +52,7 @@ RETURN tools.fun_Spray
 					,							// pReplicate
 					,TRUE					// pAddCounter
 					,pIsTesting		// pIsTesting
-					,'xia.sheng@lexisnexis.com'				// pEmailNotificationList
+					,_control.MyInfo.EmailAddressNotify + ';xia.sheng@lexisnexis.com'				// pEmailNotificationList
 					,'FirstData spray' + ' ' + pVersionDate	// pEmailSubjectDataset
 					,pNameOutput 	// pOutputName
 					,TRUE 				// pShouldClearSuperfileFirst

@@ -2,7 +2,7 @@
 EXPORT Proc_FirstData_buildall(
 		STRING		pVersion					=	(STRING)STD.Date.Today()
 		,STRING		pServerIP			=	FirstData.Constants(pVersion).serverIP
-		,STRING		pDirectory		=	FirstData.Constants(pVersion).Directory
+		,STRING		pDirectory		=	FirstData.Constants(pVersion).Directory + pVersion + '/'
 		,STRING		pFilename			=	'*csv'
 		,STRING		pGroupName		=	_Dataset().pGroupname
 		,BOOLEAN	pIsTesting		=	FALSE
@@ -26,6 +26,9 @@ EXPORT Proc_FirstData_buildall(
 	//	All filenames associated with this Dataset
 	SHARED	dAll_filenames	:=	Filenames().dAll_filenames;
 	
+	//	Orbit Entry Creation
+	EXPORT	orbit_entry	:=	Orbit3.proc_Orbit3_CreateBuild('First Data',pVersion,'N');
+	
 	//	Full Build
 	EXPORT	full_build	:=	SEQUENTIAL(
 			BuildLogger.BuildStart(false),
@@ -40,7 +43,7 @@ EXPORT Proc_FirstData_buildall(
 			FirstData.QA_Records(),
 			// FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
 			BuildLogger.PostEnd(False),
-			// orbit_entry,
+			orbit_entry,
 			BuildLogger.BuildEnd(false)
 	) : SUCCESS(Send_Emails(pversion).BuildSuccess),
 					FAILURE(Send_Emails(pversion).BuildFailure);
