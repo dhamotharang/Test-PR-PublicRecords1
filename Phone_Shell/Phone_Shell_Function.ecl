@@ -191,7 +191,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	from_biid           := FALSE;
 
 	// We don't want to call Targus twice...
-	BocaShellGateways		:= Gateway.Constants.void_gateway;
+	BocaShellGateways		:= if(exists(Gateways(servicename = 'bridgerwlc')), Gateways, Gateway.Constants.void_gateway);
 	
 	/* ************************************************************************
 	 *  Get IID and Boca Shell Data - This will also perform our DID append   *

@@ -198,7 +198,7 @@ EXPORT common_layout_liens_judgments := RECORD
 		STRING8  release_date;
 		STRING8  lapse_date;
 		STRING30 filing_status;
-    STRING25 agency;
+    STRING75 agency;
 		STRING2  agency_state;
     STRING25 agency_county; 
 END;
@@ -278,6 +278,19 @@ END;
 		UNSIGNED4 dateFirstSeen;
 		STRING50 src;
 	END;
+
+ 
+ EXPORT FeinSources := RECORD
+		InternalBIPIDsLayout;
+		STRING9 companyFEIN;
+    STRING9 maskedFEIN;  
+    STRING6 mask;  
+		BOOLEAN FEINSourceContainsE5;  
+    DATASET(DueDiligence.Layouts.FEINLayoutSources) Sources;    
+	END;
+  
+
+
 
 
 END;

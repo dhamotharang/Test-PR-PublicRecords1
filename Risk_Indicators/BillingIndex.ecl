@@ -5,6 +5,7 @@
 
 
 
+
 export BillingIndex := MODULE
 		export RVBankcard_v1        := '1';
 		export RVAuto_v1            := '2';
@@ -117,7 +118,7 @@ export BillingIndex := MODULE
 		export RVT1605_1			:= '202'; // Verizon - Telecom
 		export RVT1605_2			:= '203'; // Verizon - Wireless 
 		export RVC1703_1			:= '204'; // Rossman & Co //batch only
-		export RVC1801_1			:= '205'; // Rossman & Co //batch only
+		export RVC1801_1			:= '205'; // TSI //batch only
 		
 	
 		// Chargeback Defender Version 1

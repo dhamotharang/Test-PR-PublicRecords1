@@ -572,7 +572,6 @@ layout_output rep_to_output(repOUT  L, indata R) := transform
 	self.repriskindicators := rep_pris;
 	self.busriskindicators := [];
 	SELF.attributes := [];
-  self := [];
 end;
 
 wRep_nobest := join(repOut, indata, 
@@ -697,7 +696,6 @@ layout_output addAttus(grouped_rep le, attus_out rt) := transform
 	SELF.watchlist_zip := rt.watchlist_zip;
 	SELF.watchlist_country := rt.watchlist_contry;
   SELF := le;
-  SELF := [];
 end;
 
 b2bzWatch := join(grouped_rep, attus_out, left.seq=right.seq, addAttus(left, right), left outer);
@@ -711,7 +709,6 @@ layout_output addZipClass(withWatchlistsData le, riskwise.Key_CityStZip rt) := t
 	self.statezipflag := IF(rt.state <> '' and le.st <> '' and StringLib.StringToUpperCase(le.st) <> rt.state, '1', '0');
 	self.cityzipflag := IF(rt.city <> '' and le.p_city_name <> '' and (risk_indicators.LnameScore(StringLib.StringToUpperCase(le.p_city_name), rt.city) < 80), '1', '0');
 	self := le;
-  self := [];
 end;
 
 wZipClass := join(withWatchlistsData, riskwise.Key_CityStZip,
@@ -722,7 +719,6 @@ layout_output zipRoll(layout_output le, layout_output ri) := transform
 	self.statezipflag := IF(le.statezipflag = '0', le.statezipflag, ri.statezipflag);
 	self.cityzipflag := IF(le.cityzipflag = '0', le.cityzipflag, ri.cityzipflag);
 	self := le;
-  self := [];
 end;
 wZipClassRoll := ROLLUP(wZipClass,true,zipRoll(left,right));
 
@@ -2310,7 +2306,6 @@ layout_output add_reasons(wFeinMatches L) := transform
 	risk_indicators.mac_add_sequence(pris, reasons_with_seq);
 	self.BusRiskIndicators := reasons_with_seq; 
 	self := l;
-  self := [];
 end;
 
 withReasons := project(wFeinMatches, add_reasons(LEFT));
@@ -2337,8 +2332,7 @@ full_response_pre := join(indata1, withReasons,
 						left.rep_dob=right.rep_dob,	
 			transform(layout_output, 	self.seq := left.seq, 
 																self.account := left.account,
-																self := right,
-                                self := []), keep(1));
+																self := right), keep(1));
 			
 //************track Royalties for who uses targus********* /
 full_response := 

@@ -2,7 +2,7 @@
 
 EXPORT Layouts := MODULE
 
-EXPORT LinkIDs := RECORD
+  EXPORT LinkIDs := RECORD
 		SALT28.UIDType	LinkID := 0;
 		INTEGER2				Weight := 0;                    // Specificity attached to this match
 		UNSIGNED2				Score := 0;                     // Chances of being correct as a percentage
@@ -559,10 +559,17 @@ EXPORT LinkIDs := RECORD
     UNSIGNED4 numberOfBusinessesWithNoFein;
     UNSIGNED4 numberOfBusinssesIncWithLooseIncLaws;
 	END;
+  
+  EXPORT FEINLayoutSources := RECORD
+		STRING2 source;  
+		INTEGER  source_record_id;
+    STRING  vl_id;     
+	END;
 	
 	EXPORT BusReportDetails        := RECORD
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
-    BOOLEAN headerSourceContainsE5;
+    BOOLEAN FEINSourceContainsE5;
+    DATASET(FEINLayoutSources) FEINSources; 
     DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
@@ -580,10 +587,10 @@ EXPORT LinkIDs := RECORD
 	
 	EXPORT Licenses := RECORD
 		STRING30 licenseNumber;
-		UNSIGNED6 dateFirstSeen;
-		UNSIGNED6 dateLastSeen;
-		UNSIGNED6 issueDate;
-		UNSIGNED6 expirationDate;
+		UNSIGNED4 dateFirstSeen;
+		UNSIGNED4 dateLastSeen;
+		UNSIGNED4 issueDate;
+		UNSIGNED4 expirationDate;
 		BOOLEAN isActive;
 		STRING90 status; 
 		STRING80 licenseType;
@@ -615,6 +622,10 @@ EXPORT LinkIDs := RECORD
 		STRING10 legalEventTypeFlags;
     STRING2 trafficInfractionScore;
     STRING10 trafficInfractionFlags;
+    STRING2 criminalLegalEventsScore;
+    STRING10 criminalLegalEventsFlags;
+    STRING2 civilLegalEventsScore;
+    STRING10 civilLegalEventsFlags;
     DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
@@ -638,20 +649,9 @@ EXPORT LinkIDs := RECORD
 		Indv_Input indvRawInput;
 		Indv_Input	indvCleanInput;
 		STRING2				indvType;                         					    //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
-		/*PerUSResidency*/
-		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
-		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader
-		BOOLEAN			stateVotingSourceAvailable;										    //populated in DueDiligence.getIndHeader
-		BOOLEAN			hasSSN;																				    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			hasITIN;																			    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			hasImmigrantSSN;															    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			validSSN;																			    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			hasParent;																		    //populated in DueDiligence.getIndRelatives
-		BOOLEAN			atleastOneParentHasSSN;												    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			atleastOneParentHasITIN;											    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			atleastOneParentHasImmigrantSSN;							    //populated in DueDiligecne.getIndSSNData
-		BOOLEAN			atleastOneParentIsRegisteredVoter;					      //populated in DueDiligence.getIndHeader
-		UNSIGNED4		mostRecentParentSSNIssuanceDate;							    //populated in DueDiligecne.getIndSSNData
+		
+    DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
+
 		/*PerLegalEventType*/
 		BOOLEAN			atleastOneCategory9;
 		BOOLEAN			atleastOneCategory8;
@@ -690,110 +690,21 @@ EXPORT LinkIDs := RECORD
 		DATASET(Busn_Input) linkedBusinesses {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};	//populated in DueDiligence.getBusLinkedBus
 		UNSIGNED2		execCount;
 		DATASET(RelatedParty) execs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
-		/* BusAssetOwnProperty */
-		unsigned6 	PropTaxValue;                                       //populated in DueDiligence.getBusProperty
-		unsigned2 	CurrPropOwnedCount;                                 //populated in DueDiligence.getBusProperty - do we need this?
-		unsigned2 	CountSoldProp;                                      //populated in DueDiligence.getBusProperty - do we need this?
+    
+    DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
+
 		unsigned2 	CountOwnProp;                                       //populated in DueDiligence.getBusProperty - 
-		/* BusAssetOwnWatercraft */ 
-		unsigned2 	WatercraftCount;                                    //populated in DueDiligence.getBusWatercraft 
-		unsigned2  	Watercraftlength;                                   //populated in DueDiligence.getBusWatercraft 
-		/* BusAssetOwnAircraft */
-		unsigned2 	AircraftCount;                                      //populated in DueDiligence.getBusAircraft 
-		/* BusAssetOwnVehicle */
-		unsigned2 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
-		unsigned6  	VehicleBaseValue;
-		/*BusSOSAgeRange*/  
-		UNSIGNED4  	sosIncorporationDate;										            //populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	noSOSFilingEver;												            //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED4		filingDate;	
-		/*BusPublicRecordAgeRange*/ 	
-		UNSIGNED4 	busnHdrDtFirstSeen;											            //populated in DueDiligence.getBusHeader
-		UNSIGNED3 	srcCount;																            //populated in DueDiligence.getBusHeader  This is a count of ALL Sources
-		/*BusValidityRisk*/
-		UNSIGNED2 	sosAddrLocationCount;										            //populated in DueDiligence.getBusSOSDetail
-		UNSIGNED2 	hdAddrCount;														            //populated in DueDiligence.getBusHeader 
-		UNSIGNED2 	creditSrcCnt;														            //populated in DueDiligence.getBusHeader  This is a count of Credit Bureaus
-		BOOLEAN     noFein;																	            //populated in DueDiligence.getBusHeader			
-		BOOLEAN     busRegHit;															            //populated in DueDiligence.getBusRegistration
-		/*BusStabilityRisk*/
 		BOOLEAN			sosFilingExists;												            //populated in DueDiligence.getBusSOSDetail
-		BOOLEAN			sosAllDissolveInactiveSuspend;					            //populated in DueDiligence.getBusSOSDetail
-		BOOLEAN			sosHasAtleastOneDissolvedFiling;				            //populated in DueDiligence.getBusSOSDetail					
-		BOOLEAN			sosHasAtleastOneInactiveFiling;					            //populated in DueDiligence.getBusSOSDetail			
-		BOOLEAN			sosHasAtleastOneSuspendedFiling;				            //populated in DueDiligence.getBusSOSDetail	
-		BOOLEAN			sosHasAtleastOneOtherStatusFiling;			            //populated in DueDiligence.getBusSOSDetail		
-		BOOLEAN			sosHasAtleastOneActiveFiling;						            //populated in DueDiligence.getBusSOSDetail
-		UNSIGNED4   sosLastReinstateDate;										            //populated in DueDiligence.getBusSOSDetail
-		UNSIGNED4   firstReportedAtInputAddress;						            //populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	sosBusNameChange;												            //populated in DueDiligence.getBusSOSDetail																				
-		BOOLEAN   	sosBusAddressChange;										            //populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	sosContactNameChange;										            //populated in DueDiligence.getBusSOSDetail			
-		BOOLEAN   	sosContactAddressChange;								            //populated in DueDiligence.getBusSOSDetail		
-		BOOLEAN			feinIsSSN;															            //populated in DueDiligence.getBusAsInd
-		BOOLEAN			busIsSOHO;															            //populated in DueDiligence.getBusAsInd
 		STRING2			residentialAddr;												            //populated in DueDiligence.getBusAsInd
 		UNSIGNED1		personNameSSN;													            //populated in DueDiligence.getBusAsInd
 		UNSIGNED1		personAddrSSN;													            //populated in DueDiligence.getBusAsInd
-		BOOLEAN     inputAddressVerified;                		            //populated in DueDiligence.getBusHeader
-		BOOLEAN			cmra;																		            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			vacant;																	            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			notFoundInHeader;												            //populated in DueDiligence.getBusHeader
-		/*BusStructureType*/
-		STRING60    hdBusnType;															            //populated in DueDiligence.getBusHeader
-		STRING60    adrBusnType;														            //populated in DueDiligence.getBusAddrData
 		/*BusIndustryRisk*/
-		SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic
+		SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic -- ATTRIBUTE AND OTHER LAYOUTS??
 		UNSIGNED3		numOfSicNaic;
 		DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		/*BusShellShelfRisk*/
-		UNSIGNED3 	numOfBusFoundAtAddr;										            //populated in DueDiligence.getBusAddrData
-		UNSIGNED3		numOfBusIncInStateLooseLaws;						            //populated in DueDiligence.getBusAddrData
-		UNSIGNED3		numOfBusNoReportedFein;									            //populated in DueDiligence.getBusAddrData
-		UNSIGNED4 	busnHdrDtFirstSeenNonCredit;						            //populated in DueDiligence.getBusHeader
-		UNSIGNED2 	shellHdrSrcCnt;													            //populated in DueDiligence.getBusHeader
-		BOOLEAN			incorpWithLooseLaws;										            //populated in DueDiligence.getBusHeader, DueDiligence.getBusSOSDetail, DueDiligence.getBusAddrData
-		BOOLEAN			privatePostExists;											            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			mailDropExists;													            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			remailerExists;													            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			storageFacilityExists;								            	//populated in DueDiligence.getBusAddrData
-		BOOLEAN			undeliverableSecRangeExists;						            //populated in DueDiligence.getBusAddrData
-		BOOLEAN			registeredAgentExists;									            //populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		BOOLEAN 		atleastOneAgentSameAddrAsBus;						            //populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		UNSIGNED3		numOfRegAgents;
 		DATASET(LayoutAgent) registeredAgents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};		//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		BOOLEAN     agentShelfBusn;													            //populated in DueDiligence.getBusAddrData
-		BOOLEAN		  agentPotentialNIS;											            //populated in DueDiligence.getBusAddrData
-		/*BusExecutiveOfficersRisk*/
-		UNSIGNED3		numOfBusExecs;												            	//populated in DueDiligence.getBusExec
-		BOOLEAN			atleastOneActiveLawAcctExec;					            	//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveFinRealEstateExec;		            	//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveMedicalExec;						            //populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveBlastPilotExec;					            //populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveLawAcctExec;					            //populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveFinRealEstateExec;		            //populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveMedicalExec;					            //populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveBlastPilotExec;				            //populated in DueDiligence.getBusProfLic
-		/*BusLegalEventType*/
-		BOOLEAN			atleastOneBEOInCategory9;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory8;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory7;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory6;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory5;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory4;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory3;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			atleastOneBEOInCategory2;                           //populated in DueDiligence.getBusLegalEvents
-		BOOLEAN			BEOsHaveNoConvictionsOrCategoryHits;                //populated in DueDiligence.getBusLegalEvents
-		/*BusUSResidency*/
-		BOOLEAN		atleastOneBEOInvalidSSN;
-		BOOLEAN		atleastOneBEOAssocITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEODOBPriorToParentSSN;
-		BOOLEAN   atleastOneBEOParentWithITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEONoParentsOrNeitherHaveSSNITIN;
-		BOOLEAN		atleastOneBEOPublicRecordsLess3YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOOrParentRegisteredVoter;
 		
 		/* BusMatchLevel  */ 
 		INTEGER2		weight;                                             //populated in -------------------------- 
@@ -816,39 +727,6 @@ EXPORT LinkIDs := RECORD
 		boolean     ExecSNNMatch;
 	  /* Civil Offenses   */   
 		CivilOffensesCounts  Business;
-		
-		/* Criminal Evidence flags  are all for any one of the Business Executives tied to this business*/                                    
-		BOOLEAN     BEOevidenceOfCurrentIncarceration;                // Level 9
-		BOOLEAN     BEOevidenceOfCurrentParole;                       // Level 9
-		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 - at least one 4F - in last 3 years
-		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7 - at least one 4F - older than 3 years
-		BOOLEAN     BEOevidenceOfPreviousIncarceration;               // Level 6
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5 - at least one 4U - in the last 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4 - at least one 4M - in the last 3 years
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3 - at least one 4U - older than 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2 - at lease one 4M - older than 3 years
-    BOOLEAN     BEONoEvidenceOfStateCriminal;
-		
-		/* Civil Evidence flags  are all for any one of the Business Executives tied to this business - Civil can be any combo of liens, judgments and evictions */                                    
-		BOOLEAN     BEOevidenceOf10CivilNYR;                          // Level 9 - 10 or more Civil      in last 3 years
-		BOOLEAN     BEOevidenceOf5To9CivilNYR;                        // Level 8 -  5 - 9     Civil      in last 3 years
-		BOOLEAN     BEOevidenceOf3To4CivilNYR;                        // Level 7 -  3 - 4     Civil      in last 3 years
-		BOOLEAN     BEOevidenceOf1To2CivilNYR;                        // Level 6 -  1 - 2     Civil      in last 3 years
-		BOOLEAN     BEOevidenceOf10CivilOlderNYR;                     // Level 5 - 10 or more Civil      older than 3 years
-		BOOLEAN     BEOevidenceOf5To9CivilOlderNYR;                   // Level 4 -  5 - 9     Civil      older than 3 years
-		BOOLEAN     BEOevidenceOf3To4CivilOlderNYR;                   // Level 3 -  3 - 4     Civil      older than 3 years
-		BOOLEAN     BEOevidenceOf1To2CivilOlderNYR;                   // Level 2 -  1 - 2     Civil      older than 3 years
-		
-		/* Traffic & Infraction Evidence flags  are all for any one of the Business Executives tied to this business*/                                    
-		BOOLEAN     BEOevidenceOf3TrafficNYR;                         // Level 9 - 3 or more traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf2TrafficNYR;                         // Level 8 - 1 or 2    traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsNYR;                     // Level 7 - 3 or more infractions in last 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsNYR;                     // Level 6 - 1 or 2    infractions in last 3 years
-		BOOLEAN     BEOevidenceOf3TrafficOlderNYR;                    // Level 5 - 3 or more traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf2TrafficOlderNYR;                    // Level 4 - 1 or 2    traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsOlderNYR;                // Level 3 - 3 or more infractions older than 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsOlderNYR;                // Level 2 - 1 or 2    infractions older than 3 years
-    BOOLEAN     BEONoEvidenceOfTrafficOrInfraction;
 
 		BusAttributes;
 		BusReportDetails;

@@ -199,7 +199,9 @@ EXPORT Constants := MODULE
 						{MDR.sourceTools.src_EBR},
 						{MDR.SourceTools.src_Experian_CRDB}
 						], LayoutSources);
-
+  
+  EXPORT SetExperianRestrictedSources := SET(ExperianRestrictedSources, source);
+    
 	// This dataset contains sources that must be filtered out when "Marketing Mode" is enabled for the shell - beyond this list Inquiries data must also be filtered out						
 	EXPORT MarketingRestrictedSources := DATASET([
 						{MDR.sourceTools.src_Business_Credit},

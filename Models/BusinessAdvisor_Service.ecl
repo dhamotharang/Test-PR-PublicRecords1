@@ -184,6 +184,8 @@ string20  Test_Data_Table_Name := ''   	: stored('TestDataTableName');
 dobradius:= if(usedobFilter,dobradius0,-1);
 gateways := Gateway.Configuration.Get();
 
+if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
 // constants
 	suppressNearDups := true;
 	require2Ele      := false;

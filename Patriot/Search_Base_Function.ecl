@@ -1,4 +1,4 @@
-﻿import doxie, GlobalWatchLists, ut, iesp;
+import doxie, GlobalWatchLists, ut, iesp;
 
 export Search_Base_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data, 
 														boolean ofaconly_value,
@@ -145,10 +145,8 @@ with_ptys_bridger := PROJECT(res_bridger, add_ptys_bridger(LEFT));
 // if the ofac_version is 2 or less, use the original plugin (with_ptys_orig) otherwise use bridger plugin
 with_ptys := if(ofac_version > 2, with_ptys_bridger, with_ptys_orig);
 												
-custom_set := Patriot.WL_Include_Keys().getIncludeKeys(SET(watchlists_requested,value)); 					
-
-include_keys := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false and custom_set = [] and ofac_version in [2,3] => Patriot.WL_Include_Keys().OFAC_SET + Patriot.WL_Include_Keys().ADDITIONAL_WATCHLISTS_SET,
-										include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => custom_set,
+custom_set := Patriot.WL_Include_Keys().getIncludeKeys(SET(watchlists_requested,value)); 										
+include_keys := map(include_ofac=false and include_additional_watchlists=false and ofaconly_value=false => custom_set,
 										include_ofac and include_additional_watchlists => custom_set + Patriot.WL_Include_Keys().OFAC_SET + Patriot.WL_Include_Keys().ADDITIONAL_WATCHLISTS_SET,
 										include_ofac and include_additional_watchlists=false => custom_set + Patriot.WL_Include_Keys().OFAC_SET,
 										include_ofac=false and include_additional_watchlists => custom_set + Patriot.WL_Include_Keys().ADDITIONAL_WATCHLISTS_SET,

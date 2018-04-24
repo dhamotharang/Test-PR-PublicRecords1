@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, MDR;
+﻿IMPORT iesp, Gateway, MDR, ut;
 EXPORT Constants :=
 MODULE
 
@@ -27,7 +27,20 @@ MODULE
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3);
-	EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
+ SHARED TransTypeCodes := DATASET([
+       {TransType.Basic, 'BASIC'},
+       {TransType.Premium, 'PREMIUM'},
+       {TransType.Ultimate, 'ULTIMATE'},                    
+       {TransType.PhoneRiskAssessment, 'PHONERISKASSESSMENT'}
+       ], {unsigned1 tcode; string ttype;});
+
+TransCodeTypeDCT := DICTIONARY(TransTypeCodes, {tcode => ttype}); 
+EXPORT MapTransCode2Type(UNSIGNED1 t) := TransCodeTypeDCT[t].ttype;
+
+TransTypeCodeDCT := DICTIONARY(TransTypeCodes, {ttype => tcode}); 
+EXPORT MapTransType2Code(STRING t) := TransTypeCodeDCT[ut.CleanSpacesAndUpper(t)].tcode;
+
+EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
 	
 	// Phone types
 	EXPORT PhoneType :=
@@ -105,7 +118,8 @@ MODULE
 						101 => 'No Phone number was entered for the verification request',
 					'Unspecified Failure');
 		
-	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN]; // phonerisk assessment gateways
+	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN,
+                                            Gateway.Constants.ServiceName.ZumigoIdentity]; // phonerisk assessment gateways
 	// Debugging
 	EXPORT Debug :=
 	MODULE
@@ -119,6 +133,16 @@ MODULE
 		EXPORT Targus       := FALSE;
 		EXPORT PhoneMetadata:= FALSE;
 	END;
+	
+	EXPORT ZumigoConstants := MODULE
+		EXPORT STRING20 Usecase     := 'FCIP';
+		EXPORT STRING3 	productCode := 'ACC';
+		EXPORT STRING20 productName := 'PHONE FINDER';
+		EXPORT STRING10 optInType   := 'Whitelist';
+		EXPORT STRING5 	optInMethod := 'TCO';
+		EXPORT STRING3 	optinDuration := 'ONG';
+	END;
+	
 	//Zumigo
 	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
 	// Batch only

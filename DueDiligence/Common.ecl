@@ -805,4 +805,16 @@ EXPORT Common := MODULE
      RETURN rollMe;
   ENDMACRO;
   
+  //dsToLimit, should already come in sorted and grouped so counter can keep groups sequential
+  EXPORT GetMaxRecords(dsToLimit, maxRecords) := FUNCTIONMACRO
+    
+    RECORDOF(dsToLimit) getMaxRecs(dsToLimit dtl, INTEGER maxCounter) := TRANSFORM, SKIP(maxCounter > maxRecords) 
+      SELF := dtl;
+    END;
+    
+    maxedRecords := PROJECT(dsToLimit, getMaxRecs(LEFT, COUNTER));
+    
+    RETURN UNGROUP(maxedRecords);
+  ENDMACRO;
+  
 END;

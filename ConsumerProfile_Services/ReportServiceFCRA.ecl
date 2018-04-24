@@ -25,6 +25,8 @@
    &lt;CAInPersonApplication&gt;&lt;/CAInPersonApplication&gt;
    &lt;StateLawException&gt;&lt;/StateLawException&gt;
    &lt;IntendedPurpose&gt;&lt;/IntendedPurpose&gt;
+   &lt;FFDOptionsMask&gt;&lt;/FFDOptionsMask&gt;
+   &lt;FCRAPurpose&gt;&lt;/FCRAPurpose&gt;
   &lt;/Options&gt;
   &lt;ReportBy&gt;
    &lt;UniqueId&gt;&lt;/UniqueId&gt;
@@ -92,7 +94,7 @@ EXPORT ReportServiceFCRA := MACRO
 			export boolean isECHRestricted := AutoStandardI.DataRestrictionI.val(drm_mod).isECHRestricted(datarestrictionmask);
 			export boolean isEQCHRestricted := AutoStandardI.DataRestrictionI.val(drm_mod).isEQCHRestricted(datarestrictionmask);
 			export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
-			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.IntendedPurpose);	
+			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);	
 		end;
 		
 		rec_out := ConsumerProfile_Services.ReportRecords_FCRA(ReportBy, ConsumerProfile_mod, gateways_in);

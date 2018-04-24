@@ -459,7 +459,7 @@ EXPORT AssociateSection := MODULE;
 	  BIPV2.IDlayouts.l_header_ids; 
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
-		recordof(UCCV2.Key_rmsid_party_linkids()) - BIPV2.IDlayouts.l_header_ids;
+		recordof(UCCV2.Key_rmsid_party()) - BIPV2.IDlayouts.l_header_ids;
 	  BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	end;
 
@@ -467,7 +467,7 @@ EXPORT AssociateSection := MODULE;
 	// data for the tmsids/rmsids involved to output on the report.
   ds_ucc_linkids_keyrecs_plusparty := 
 	                         join(ds_ucc_linkids_keyrecs_deduped2,
-	                              UCCV2.Key_rmsid_party_linkids(), 
+	                              UCCV2.Key_rmsid_party(), 
                                    keyed(left.tmsid = right.tmsid and
 											                   // v--- to only get the sub-filings (rmsids) from the linkids key
                                          left.rmsid = right.rmsid)
@@ -729,7 +729,7 @@ EXPORT AssociateSection := MODULE;
 	  BIPV2.IDlayouts.l_header_ids; 
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
 	  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
-		recordof(LN_PropertyV2.key_search_fid_linkids()) - BIPV2.IDlayouts.l_header_ids; 
+		recordof(LN_PropertyV2.key_search_fid()) - BIPV2.IDlayouts.l_header_ids; 
 	  BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	end;
 
@@ -737,7 +737,7 @@ EXPORT AssociateSection := MODULE;
 	// the property "party" data for the ln_fares_ids involved to output on the report.
   ds_prop_linkids_keyrecs_plusparty := 
 	                         join(ds_prop_linkids_keyrecs_deduped,
-	                              LN_PropertyV2.key_search_fid_linkids(),
+	                              LN_PropertyV2.key_search_fid(),
                                    keyed(left.ln_fares_id = right.ln_fares_id)
 														       // v--- only get the "parties" not on the linkids key,
 														       //   i.e. the parties other than the company the report

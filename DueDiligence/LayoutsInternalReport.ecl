@@ -177,6 +177,17 @@ EXPORT LayoutsInternalReport := MODULE
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
+  
+  EXPORT BusExecs := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    UNSIGNED6 did;
+    iesp.duediligencebusinessreport.t_DDRBusinessExecutives;
+  END;
+  
+  EXPORT InquiredBusExecs := RECORD
+    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutives) execs {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusinessExecs)};
+  END;
 	
   // ------                                                                      ------
   // ------ define the Flat      Dataset  For Debtors                            ------

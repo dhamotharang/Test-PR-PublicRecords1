@@ -1,12 +1,32 @@
-﻿/*2017-08-09T23:16:44Z (Kevin Huls)
-MS-160 - correctly use the full date from 'HistoryDateTimeStamp' when it is provided on input.
-*/
-import risk_indicators, ut;
+﻿import risk_indicators, ut;
 
 EXPORT shell_constants :=  module
 
+export collections_purpose_set := ['164','113'];
 export collections_vertical_set := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
+export employee_volunteer_purposes_set := ['165', '216'];
 
+// LEGACY CODES
+// 0           Legacy RiskWise Products - Hard 
+// 100         Application RiskView_Applica - Hard 
+// 101         FCRA Phone History Report ? Hard
+// 106				 Demand Deposit / Checking Account
+// 164         Collections
+// 165				 Employment or Volunteer Screening
+
+// NEW CODES
+// 110 			- Credit application
+// 113				- collections
+// 115				- Demand Deposit
+// 216				- Employment Screening
+
+// if the inquiry wasn't run with one of these  permissible purposes, throw it out
+export set_fcra_shell_permissible_purposes := ['0','100','101','164', '106',
+																								'110', '113', '115']; 
+																					
+export set_fcra_permissible_purposes := ['0','100','101','164', '106',
+																					'110', '113', '115', '165', '216']; 
+																	
 // for FCRA, we need to cap records at 1 years from the history date
 // for non-fcra, allow anything as long as the log_date is populated
 export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA, string historyDateTimeStamp = '') := function
@@ -1462,7 +1482,7 @@ export Valid_Suspicious_Fraud_Inquiry(UNSIGNED3 ArchiveDate, STRING8 LogDate, ST
 export Valid_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
 											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string method, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
-		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
+		isCollection := (~isFCRA or trim(fcra_purpose) in collections_purpose_set) and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
 										trim(StringLib.StringToUpperCase(industry)) IN collection_industry or
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
@@ -1488,7 +1508,7 @@ end;
 export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
 											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
-		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
+		isCollection := (~isFCRA or trim(fcra_purpose) in collections_purpose_set) and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
 										trim(StringLib.StringToUpperCase(industry)) IN collection_industry or
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
@@ -1588,7 +1608,7 @@ export Valid_BillGroup_Inquiry(string vertical,
 															 boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') :=function
 															 
         collections_bucket := if(bsversion>=50, collections_vertical_set,['COLLECTIONS','1PC','3PC']);                                             
-        isCollection := (~isFCRA or trim(fcra_purpose) = '164') and 
+        isCollection := (~isFCRA or trim(fcra_purpose) in collections_purpose_set) and 
 				                trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or                                        
                         trim(StringLib.StringToUpperCase(industry)) IN collection_industry or                                       
 												StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1)> 0;

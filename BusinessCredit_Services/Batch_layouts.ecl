@@ -1,4 +1,4 @@
-IMPORT BIPV2, BatchShare, BIPV2_Best_SBFE;
+﻿IMPORT BIPV2, BatchShare, BIPV2_Best_SBFE;
 
 EXPORT Batch_layouts := MODULE
 		EXPORT Batch_Input := RECORD
@@ -23,7 +23,7 @@ EXPORT Batch_layouts := MODULE
 		
 		// Common layout for SBFE best and Bus header best, SBFE best contains all bus header best fields.
 		EXPORT BestKeyComb := RECORD(RECORDOF(BIPV2_Best_SBFE.Key_LinkIds().kFetch2(DATASET([],BIPV2.IDlayouts.l_xlink_ids2))))
-       UNSIGNED1	source;
+      UNSIGNED1	source;
     END;
 		
 		EXPORT BestCompInfo := RECORD
@@ -174,10 +174,11 @@ EXPORT Batch_layouts := MODULE
 				UNSIGNED6 orig_orgid;
 				UNSIGNED6 orig_seleid;
 				UNSIGNED6 orig_proxid;
+        UNSIGNED1	source;
 		END;
 		
 		EXPORT Batch_Output_Final := RECORD
-				Batch_Output - [orig_ultid, orig_orgid, orig_seleid, orig_proxid];
+				Batch_Output - [orig_ultid, orig_orgid, orig_seleid, orig_proxid, source];
 				Batchshare.Layouts.ShareErrors;
 		END;
 END;

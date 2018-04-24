@@ -28,6 +28,7 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="runSeed" type="xsd:boolean"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
 </message>
@@ -75,6 +76,7 @@ export RiskWiseMainNP2O := MACRO
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'runSeed',
+  'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -127,6 +129,7 @@ unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose'
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose');
 unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 boolean   runSeed_value := false 		: stored('runSeed');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 productSet := ['np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
@@ -141,10 +144,13 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode in attusSet and trim(StringLib.StringToLowerCase(le.servicename)) = 'attus' => le.url,  // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url,  // targus gateway
+         tribcode in ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'] and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
 				 ''); // default to no gateway call			 
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 d := dataset([{0}],RiskWise.Layout_PRII);
 
@@ -179,7 +185,7 @@ f := project(d, addseq(LEFT,COUNTER));
 
 final_seed := if(runSeed_value, RiskWise.seedNP2O(tribcode, socs_value, account_value), dataset([],RiskWise.Layout_NP2O));
 
-almost_final := RiskWise.NP2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission);
+almost_final := RiskWise.NP2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission, ofac_version);
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
 	Royalty.RoyaltyTargus.GetOnlineRoyalties(almost_final, src, TargusType, TRUE, FALSE, FALSE, TRUE));

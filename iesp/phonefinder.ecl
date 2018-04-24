@@ -52,6 +52,7 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer LineIdentityConsentLevel {xpath('LineIdentityConsentLevel')};//hidden[internal]
 	integer MaxOtherPhones {xpath('MaxOtherPhones')};
 	integer MaxIdentities {xpath('MaxIdentities')};
+	boolean UseInHousePhoneMetadata {xpath('UseInHousePhoneMetadata')};//hidden[internal]
 end;
 		
 export t_SpoofCommon := record
@@ -90,9 +91,17 @@ export t_OneTimePassword := record
 	dataset(t_OTPHistory) OTPHistory {xpath('OTPHistory/History'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxOTPs)};
 end;
 		
+export t_PhoneFinderAlertIndicator := record
+	integer RiskId {xpath('RiskId')};
+	string Level {xpath('Level')}; //values['','L','M','H','']
+	string Flag {xpath('Flag')};
+	string256 Messages {xpath('Messages')};
+end;
+		
 export t_PhoneFinderAlert := record
 	string Flag {xpath('Flag')};
 	dataset(iesp.share.t_StringArrayItem) Messages {xpath('Messages/Message'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxAlertMessages)};
+	dataset(t_PhoneFinderAlertIndicator) AlertIndicators {xpath('AlertIndicators/AlertIndicator'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPRIRules)};//hidden[ecl_only]
 end;
 		
 export t_PhoneFinderInfo := record

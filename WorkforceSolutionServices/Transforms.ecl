@@ -87,7 +87,7 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactioncreated.datetimestamp.hour24 	:=	l.fcraactioncreated.datetimestamp.hour24  ;
 		self.fcraactioncreated.datetimestamp.minute 	:=	l.fcraactioncreated.datetimestamp.minute  ;
 		self.fcraactioncreated.datetimestamp.second 	:=	l.fcraactioncreated.datetimestamp.second  ;
-		self.fcraactioncreated.comment 	:=	l.fcraactioncreated.comments ;
+		self.fcraactioncreated.comments 	:=	l.fcraactioncreated.comments ;
 		self.fcraactionclosed.userid 	:=	l.fcraactionclosed.userid;		
 		self.fcraactionclosed.username.full 	:=	[];
 		self.fcraactionclosed.username.first 	:=	l.fcraactionclosed.firstname;
@@ -121,7 +121,7 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactionclosed.datetimestamp.hour24 	:=		l.fcraactionclosed.datetimestamp.hour24;
 		self.fcraactionclosed.datetimestamp.minute 	:=		l.fcraactionclosed.datetimestamp.minute;
 		self.fcraactionclosed.datetimestamp.second 	:=	l.fcraactionclosed.datetimestamp.second;
-		self.fcraactionclosed.comment 	:=	l.fcraactionclosed.comments;		
+		self.fcraactionclosed.comments 	:=	l.fcraactionclosed.comments;		
 end;
 
 shared iesp.employment_verification.t_VerificationOfEmploymentAnnualComp 

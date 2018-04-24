@@ -74,12 +74,12 @@ MACRO
 		EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
 		                                                                                     PhoneFinder_Services.Constants.TransType.Ultimate,
 																																												 PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
-					 BOOLEAN   RealtimeData 			 := FALSE : STORED('UseDeltabase');
+					    BOOLEAN   RealtimeData 			 := FALSE : STORED('UseDeltabase');
 		EXPORT BOOLEAN   UseDeltabase 			 := IF(IncludePhoneMetadata,RealtimeData,FALSE);
-					 BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
+					    BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
 		EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-										 UserRules  				 := DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator) : STORED('RiskIndicators');
-										 allRules := IF(EXISTS(UserRules) and IncludePhoneMetadata, PhoneFinder_Services.Constants.defaultRules + UserRules,
+									UserRules  				 := DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator) : STORED('RiskIndicators');
+									allRules := IF(EXISTS(UserRules) and IncludePhoneMetadata, PhoneFinder_Services.Constants.defaultRules + UserRules,
 										                                                            DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	
 																						:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
@@ -91,10 +91,12 @@ MACRO
 		EXPORT STRING20  Usecase                        := '': STORED('LineIdentityUseCase');
 		EXPORT STRING3 	 ProductCode                    := '': STORED('ProductCode');
 		EXPORT STRING8	 BillingId                      := '': STORED('BillingId');
-		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
+		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
+																												PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] and BillingId <>'';
 				
-					 BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
+				     BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly := DirectMarketing AND TransactionType = PhoneFinder_Services.Constants.TransType.BASIC;
+		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
 	END;
 	
@@ -102,8 +104,8 @@ MACRO
    																																		IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
    																																											dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways));
    	
-    royalties	:= modBatchRecords.dRoyalties;
-   	results	:= modBatchRecords.dBatchOut;
+    royalties	 := modBatchRecords.dRoyalties;
+   	results   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
  
    OUTPUT(results,named('Results'));

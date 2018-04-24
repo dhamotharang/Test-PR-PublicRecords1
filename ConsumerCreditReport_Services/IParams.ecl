@@ -36,7 +36,7 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN hasGlbPermissiblePurpose := perm.glb.ok(bs_mod.GLBPurpose);
 			EXPORT INTEGER bsVersion := 50 : STORED('bsVersion');
 			EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
-			EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get(PermissiblePurpose);	
+			EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get();	
 		END;
 	END;
 
@@ -49,11 +49,14 @@ EXPORT IParams := MODULE
 		#STORED('BillingCode',BillingCode);
 		STRING120 EndUserCompanyName:=USER.EndUser.CompanyName;
 		#STORED('EndUserCompanyName',EndUserCompanyName);
+		
 		OPTIONS:=GLOBAL(req.Options);
 		STRING PermissiblePurpose:=OPTIONS.PermissiblePurpose;
 		#STORED('PermissiblePurpose',PermissiblePurpose);
 		STRING FFDOptionsMask:=OPTIONS.FFDOptionsMask;
 		#STORED('FFDOptionsMask',FFDOptionsMask);
+		STRING FCRAPurpose:=OPTIONS.FCRAPurpose;
+		#STORED('FCRAPurpose',FCRAPurpose);
 		BOOLEAN IncludeLiensJudgments:=OPTIONS.IncludeLiensJudgments;
 		#STORED('IncludeLiensJudgments',IncludeLiensJudgments);
 		RETURN OUTPUT(DATASET([],{INTEGER x}),NAMED('__internal__'),EXTEND);

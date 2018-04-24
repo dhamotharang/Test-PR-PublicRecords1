@@ -53,7 +53,13 @@ MODULE
 	  EXPORT BOOLEAN   UseLengthOfTimeVerify  := FALSE;
 		EXPORT BOOLEAN   IsPhone7Search         := FALSE;
 		
-		
+		//Deltabase
+		EXPORT STRING 	    TransactionID := '';
+		EXPORT STRING16 	CompanyId := '';
+		EXPORT STRING60 	ReferenceCode := '';
+		EXPORT STRING8 		SourceCode := '';
+		EXPORT STRING60 	BillingCode := '';
+			
 		// Risk evaluation requests
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator);
 		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators  := FALSE;
@@ -65,7 +71,8 @@ MODULE
 		EXPORT STRING8	BillingId := '';
 		// batch only options.
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly        := FALSE;
-		EXPORT INTEGER   MaxOtherPhones	                   := PhoneFinder_Services.Constants.MaxOtherPhones;
+		EXPORT INTEGER   MaxOtherPhones := 0;
+		EXPORT BOOLEAN   UseInHousePhoneMetadata	           := FALSE;
 	END;
 
 	EXPORT AKParams :=
