@@ -3,6 +3,8 @@ PRTE2_Email_Data_Ins._Developer_Notes
 **************************************************************************************************
 **************************************************************************************************
 **************************************************************************************************
+//TODO JAN 2018 - noticed that the DIDs in the old data aren't real - someday fix DIDs
+for Data3 we'll have to create a new spray/despray base which is then transformed into the current Boca Compatible base
 
 Nov 2017 - need to alter PRTE2_Email_Data.proc_build_keys to make DOPS and emails compatible.
 Sample: PRTE2_PhonesPlus.proc_build_keys
