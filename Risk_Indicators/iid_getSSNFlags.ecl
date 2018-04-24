@@ -1,4 +1,4 @@
-import risk_indicators, suppress, ut, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship;
+﻿import risk_indicators, suppress, ut, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship;
 import STD;
 
 export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -45,9 +45,7 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 
 	pre_history := header_version.header_first_seen < le.historydate;
 
-	self.ssnexists := IF(i = 1 or ssnCorrectionHit,trim(ri.ssn)<>'' and pre_history,le.ssnexists);
-
-	//self.did := IF(i=1,IF(le.did=0 AND ri.bestCount=1,ri.bestDID,le.did),le.did);
+	self.ssnexists := IF(i = 1 or ssnCorrectionHit,header_version.header_first_seen<>0 and pre_history,le.ssnexists);
 	
 	vssn := Risk_Indicators.Validate_SSN(le.ssn,'');
 	
