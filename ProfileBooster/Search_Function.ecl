@@ -1361,8 +1361,10 @@ prop_common_distr := distribute(prop_common, did);
 	withHHIncome := ProfileBooster.HHestimatedIncome(withIncome); //for production
 	
 	withBankingExperiance := ProfileBooster.getBankingExperiance (withHHIncome);
-  withCustomModel := ProfileBooster.PMB1803_1_0_score (withBankingExperiance,iid_prep );
 	
+  with_mover_model := if(domodel,
+                        profilebooster.PBM1803_0_1_score(withBankingExperiance, iid_prep),
+                        withBankingExperiance);
 	
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 // output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
@@ -1439,8 +1441,7 @@ prop_common_distr := distribute(prop_common, did);
 	// output( withBankingExperiance, named('withBankingExperiance'));
 /* ********************/
 
-//return withBankingExperiance;	
-RETURN withCustomModel;
+return with_mover_model;	
 
 
 END;
