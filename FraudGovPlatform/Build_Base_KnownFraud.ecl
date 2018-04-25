@@ -31,7 +31,8 @@ module
 												right.file_type = Functions.file_type_fn('KNFD') and 
 												Functions.ind_type_fn(left.customer_program) = right.ind_type and 
 												left.customer_state = right.Customer_State and
-												left.Customer_County = right.Customer_County,  
+												left.Customer_County = right.Customer_County and 	
+												left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
 												TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
   // Rollup Update and previous base 

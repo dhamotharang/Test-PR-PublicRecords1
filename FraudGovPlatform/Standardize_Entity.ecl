@@ -222,8 +222,8 @@ FUNCTIONMACRO
 		pInputFile tAssignDIDs(pInputFile l, FraudGovPlatform.Layouts.Temp.DidSlim r) :=
 		TRANSFORM
 
-			SELF.did				:= if(r.did <> 0, r.did				, 0);
-			SELF.did_score	:= if(r.did_score <> 0, r.did_score	, 0);
+			SELF.did				:= if(l.lexid <> 0,l.lexid,if(r.did <> 0, r.did,0));
+			SELF.did_score		:= if(l.lexid <> 0, 100,if(r.did_score <> 0, r.did_score, 0));
 			SELF 						:= l;
 
 		END;
