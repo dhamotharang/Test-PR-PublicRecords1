@@ -47,14 +47,14 @@ IMPORT HCSE_LT_18_LUCI_MODEL;
 
 
 export Healthcare_SocioEconomic_Batch_Service_V2 := MACRO
-	//#stored('GLBPurpose',Models.Healthcare_Constants_V2.default_GLBA);
-	//#stored('DataRestrictionMask',Models.Healthcare_Constants_V2.default_DataRestriction);
 
 	batchin := dataset([],Models.Layouts_Healthcare_V2.Layout_SocioEconomic_Batch_In) : stored('batch_in',few);
 	gateways := Gateway.Constants.void_gateway;
 
-	unsigned1 prep_dppa := 0 : stored('DPPAPurpose');
+	unsigned1 prep_dppa := 1 : stored('DPPAPurpose');
 	unsigned1 glb := 0 : stored('GLBPurpose');
+
+	IF(prep_dppa <> Models.Healthcare_Constants_V2.authorized_DPPA OR glb <> Models.Healthcare_Constants_V2.authorized_GLBA, FAIL('Supplied Permissible Purpose Settings (GLBPurpose and/or DPPAPurpose) are invalid'));
 	
 	unsigned1 runtime_attributesVersion := 1 : stored('Version');//Default for integer fields is 0, so if the user does not supply default to 1
 	unsigned1 attributesVersion := if(runtime_attributesVersion>0,runtime_attributesVersion,1);//If the input version is set (ie greater thant zero) take it otherwise default to 1
