@@ -672,8 +672,10 @@ dl_mask_value := dlmask=1;
 Suppress.MAC_Mask(final, post_ssn_mask1, repssnverify, '', true, false, false, false, '', ssnmask);
 Suppress.MAC_Mask(post_ssn_mask1, post_ssn_mask2, repbestssn, rep_verDL, true, true, false, false, '', ssnmask);
 
+layout_out := { r AND NOT [royalty_type_code_targus, royalty_type_targus, royalty_count_targus, non_royalty_count_targus, count_entity_targus] };
+
 unsigned1 dob_mask_value := Suppress.date_mask_math.MaskIndicator (dobmask);
-r mask_dobs(r le) := transform
+layout_out mask_dobs(r le) := transform
 	self.RepDOBVerify := risk_indicators.iid_constants.mask_dob(le.RepDOBVerify, dob_mask_value);
 	self.RepBestDOB := risk_indicators.iid_constants.mask_dob(le.RepBestDOB, dob_mask_value);
 	self.rep_deceasedDate := risk_indicators.iid_constants.mask_dob(le.rep_deceasedDate, dob_mask_value);

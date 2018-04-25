@@ -16,21 +16,21 @@ export GetCRSOutput (
 
   doxie.MAC_Header_Field_Declare(IsFCRA); // only for DisplayMatchedParty_value !
 
-    // We'll dedup and link cases by case_link_id if provided.  If not, use tmsid
-	case_link := project(case_in, transform(liensv2_services.layout_liens_case_extended, 
-		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
-		self := left));
-	history_link := project(history_in, transform(liensv2_services.layout_liens_history_extended, 
-		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
-		self := left));
-
 	// FCRA FFD  
-	ds_ffd := LiensV2_Services.fn_doFcraCompliance(party_in, case_link,
-		history_link, ds_slim_pc, inFFDOptionsMask);
+	ds_ffd := LiensV2_Services.fn_doFcraCompliance(party_in, case_in,
+		history_in, ds_slim_pc, inFFDOptionsMask);
   
 	ds_party_raw_pre :=  if(IsFCRA,group(sort(ds_ffd._party,acctno),acctno), party_in);
-	ds_case_raw_pre  :=  if(IsFCRA, ds_ffd._case, case_link);
-	ds_history_raw   :=  if(IsFCRA, ds_ffd._history, history_link);
+	ds_case_raw_pre  :=  if(IsFCRA, ds_ffd._case, case_in);
+	ds_history_raw   :=  if(IsFCRA, ds_ffd._history, history_in);
+
+	// We'll dedup and link cases by case_link_id if provided.  If not, use tmsid
+	ds_case_raw_pre_lnk := project(ds_case_raw_pre, transform(liensv2_services.layout_liens_case_extended, 
+		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
+		self := left));
+	ds_history_raw_lnk := project(ds_history_raw, transform(liensv2_services.layout_liens_history_extended, 
+		self.case_link_id := if(left.case_link_id <> '', left.case_link_id, left.tmsid), 
+		self := left));
 	
 	// Populate insurance flag for parties
 	rParty_w_ins_flag :=
@@ -47,7 +47,7 @@ export GetCRSOutput (
 	end;
 	
 	ds_party_raw_w_ins_flag := join(ungroup(ds_party_raw_pre),
-																	ds_case_raw_pre,
+																	ds_case_raw_pre_lnk,
 																	left.tmsid = right.tmsid and
 																	left.rmsid = right.rmsid,
 																	tInsuranceFlag(left, right),
@@ -74,7 +74,7 @@ export GetCRSOutput (
   //===== ROLLUP CASE =====
 	
 	// SORT CASE DATA BY CASE LINK (OR TMSID), CASE_LINK_PRIORITY (IF PROVIDED) AND MOST RECENT FILING DATE
-  ds_case_raw := project(ds_case_raw_pre, transform(LiensV2_Services.layout_liens_case_extended, self.rmsid := '', self := left));
+  ds_case_raw := project(ds_case_raw_pre_lnk, transform(LiensV2_Services.layout_liens_case_extended, self.rmsid := '', self := left));
 	ds_case_sort := sort (ds_case_raw, case_link_id, case_link_priority, orig_filing_date, -filing_number, filing_type_desc, record);
 	
 	// TRANSFORM TO ROLL UP CASE INFO
@@ -119,7 +119,7 @@ export GetCRSOutput (
 	
   //===== ROLLUP HISTORY =====
 
-	ds_history_sort := sort(ds_history_raw, case_link_id, case_link_priority, record);
+	ds_history_sort := sort(ds_history_raw_lnk, case_link_id, case_link_priority, record);
 
 	// TRANSFORM TO ROLL UP HISTORY INFO
 	layout_liens_history_extended xf_hist_roll_1(ds_history_sort l, ds_history_sort r) := transform
@@ -344,13 +344,13 @@ export GetCRSOutput (
 	
   //DEBUG	
    // ut.out(case_in);
-   // ut.out(case_link);
    // ut.out(history_in);
-   // ut.out(history_link);
    // ut.out(ds_party_raw_pre);
    // ut.out(ds_case_raw_pre);
+	 // ut.out(ds_case_raw_pre_lnk);
    // ut.out(ds_case_raw);
    // ut.out(ds_history_raw);
+	 // ut.out(ds_history_raw_lnk);
    // ut.out(ds_hist_roll);
    // ut.out(ds_party_raw);
    // ut.out(ds_case_rolled);
