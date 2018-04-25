@@ -26,7 +26,7 @@ EXPORT CompromisedDL := MODULE
         hashedValue := fn_hashValueSHA512(prehash);
 
         //Check if we have a match on our key. The values are all uppercase in the provided key.
-        isMatchFound := EXISTS(hashKey(lname_ssn_fixedrandom_hash = STD.Str.ToUpperCase(hashedValue)));
+        isMatchFound := EXISTS(hashKey(KEYED(lname_ssn_fixedrandom_hash = STD.Str.ToUpperCase(hashedValue))));
 
         //Return the hash itself, or a blank string if there is no match.
         RETURN IF(isMatchFound, STD.Str.ToUpperCase(hashedValue), '');

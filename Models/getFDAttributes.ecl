@@ -882,10 +882,8 @@ self.version201.SourceDriversLicense := map(le.did=0 => '-1',
 																					'0');
 
 // if the option to SuppressCompromisedDLs is set to true, check the last name and SSN against the equifax compromised DL key
-compromised_DL_hash := if(SuppressCompromisedDLs,
-	IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(le.shell_input.lname, le.shell_input.ssn), '');
-
-DL_is_compromised := compromised_DL_hash <> '';
+DL_is_compromised := if(SuppressCompromisedDLs,
+	IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(le.shell_input.lname, le.shell_input.ssn), '') <> '';
 
 self.version201.IdentityDriversLicenseComp := map(
 	le.truedid=false => '-1',  // no identity found
