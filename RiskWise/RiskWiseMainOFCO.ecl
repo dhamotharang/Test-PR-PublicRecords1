@@ -16,6 +16,7 @@
 	<part name="countrycode" type="xsd:string"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
 	<part name="GLBPurpose" type="xsd:byte"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
  </message>
 */
@@ -47,6 +48,7 @@ export RiskWiseMainOFCO := MACRO
 	'countrycode',
 	'DPPAPurpose',
 	'GLBPurpose',
+  'OFACversion',
 	'gateways'));
 
 string4  tribCode_value := '' : stored('tribcode');
@@ -66,13 +68,15 @@ string2  countrycode_value := '' : stored('countrycode');
 
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode='ofc2' and le.servicename='attus' => le.url,  //ofc2 uses attus gateway
-				 ''); // default to no gateway call			 
+                  tribcode in ['ofac', 'ofc3'] and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+                  ''); // default to no gateway call		 
 	self := le;
 end;
 
@@ -93,11 +97,19 @@ end;
 
 indata := group(project(d, prep(LEFT,COUNTER)), seq);
 
-ofac_version := if(tribcode='ofc3', 3, 1);
-watchlist_threshold := if(tribcode='ofc3', 0.85, 0.84);
+ofac_version := map( tribcode in ['ofac', 'ofc3'] and ofac_version_ = 4 => 4,
+                     tribcode='ofc3' => 3, 
+                                        1);
+
+watchlist_threshold := map(
+                           tribcode in ['ofac', 'ofc3'] and ofac_version = 4 => 0.85,
+                           tribcode='ofc3' => 0.85,
+                           0.84);
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 // getWatchLists2( dataset, ofac_only, from_BIID, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold);
-patriot_final := risk_indicators.getWatchLists2(indata, true, false, ofac_version, true, false, watchlist_threshold);
+patriot_final := risk_indicators.getWatchLists2(indata, true, false, ofac_version, true, false, watchlist_threshold, gateways := gateways);
 
 
 riskwise.Layout_OFCO add_patriot(patriot_final le) := TRANSFORM
@@ -145,7 +157,9 @@ attus_ret := project(attus_final, filterAttus(left));
 
 final := if(tribcode='ofc2', attus_ret, ret);
 
-/* 
+if(exists(patriot_final(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
+
+/*
 output(gateways_in, named('gateways_in'));
 output(gateways, named('gateways'));
 output(indata, named('indata'));

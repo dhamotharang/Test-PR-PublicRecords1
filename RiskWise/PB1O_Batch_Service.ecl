@@ -7,6 +7,7 @@
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -28,12 +29,15 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 batchin := dataset([],Riskwise.Layout_PB1O_BatchIn) : stored('batch_in', few);
 tribcode := StringLib.StringToLowerCase(tribcode_value);
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
 
 gateways_in := Gateway.Configuration.Get();
 
 BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
-OFACversion := if(BridgerGateway and tribcode_value = '', 4, 1);
+OFACversion := map(BridgerGateway and tribcode_value = '' => 4, // this won't hit fail message on line 59 as it was determined that can't be done without changing current prod logic
+                   BridgerGateway and tribcode_value in ['pb01', 'pb02'] and ofac_version = 4 => 4,
+                                                                                                     1);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -43,6 +47,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 RiskWise.Layout_PB1I addseq(batchin L, integer C) := transform
 	self.seq := C;

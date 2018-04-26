@@ -1,7 +1,28 @@
-﻿IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut;
+﻿// *****************************************************************************************************************
+// RUN THIS SCRIPT ON 400 WAY THOR TO OPTIMIZE PERFORMANCE
+//
+// 1.  FROM THE THORPROD BRANCH, COPY ALL PUBLIC RECORD KEYS THAT RiskView 5.0 USES TO THE analyt_thor400_90_a CLUSTER 
+//   -  RiskView.bwr_transfer_rv5_files
+//	 -	RiskView.bwr_transfer_rv5_files_from_alpha
+// 2. ONCE FILES ARE SUCCESSFULLY COPIED, SWITCH TO THE ROXIEDEV BRANCH.
+// 3.  MAKE SURE _Control.LibraryUse IS SANDBOXED with the following 
+//   - export ForceOff_AllLibraries := TRUE;
+// 4. MAKE SURE Risk_Indicators.iid_base_function IS SANDBOXED with the following:
+//		- with_DID := with_DID_Thor;
+// 5.  Update your input test file logical name:  test_file_name on line 35
+// 6.  RUN a 100 record sample through the roxie version to make sure all keys are working
+//   - To run the roxie version, sandbox these changes:
+//       Line 38 of Risk_Indicators.iid_base_function:
+//          with_DID := with_DID_Thor ;
+// 7.  remove the 100 record limit on line 29, change the flag for onThor on line 21 to true and RUN the entire job  
+//	 - (wait couple days for it to finish)
+// *****************************************************************************************************************
 
-onThor := TRUE;	//Use thor logic (distributed data)
-// onThor := FALSE;  //Use roxie logic (Keyed JOINS): Use this for testing small batches to make sure everything is working.
+
+IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut;
+
+// onThor := TRUE;	//Use thor logic (distributed data)
+onThor := FALSE;  //Use roxie logic (Keyed JOINS): Use this for testing small batches to make sure everything is working.
 
 #WORKUNIT('name', 'RiskView 5.0 ' + 	if(onThor, 'thor ', 'roxie ') );
 #STORED('did_add_force', if(onThor, 'thor', 'roxi') );  // stored parameter used inside the DID append macro to determine which version of the macro to use
@@ -13,15 +34,14 @@ RecordsToRun := 100;
 
 eyeball_count := 100;
 
-// test_file_name := '~lweiner::in::20170701_riskview_inputdata';
-test_file_name := '~lweiner::out::20170701_riskview_inputdata_1M';
+test_file_name := '~thor::base::ar::prod::riskview_inputdata';
 
 // Lots of configurable options //
 STRING Auto_model_name := 'RVA1503_0';
 STRING Bankcard_model_name := 'RVB1503_0';
 STRING Short_term_lending_model_name := 'RVG1502_0';
 STRING Telecommunications_model_name := 'RVT1503_0';
-STRING Crossindustry_model_name := 'RVS1706_0';
+STRING Crossindustry_model_name := ''; // 'RVS1706_0'; // If cross industry model is run, bsversion will get bumped up from 50 to 52. Turn this off for now since thor is only coded for 50.
 STRING Custom_model_name := '';
 STRING Custom2_model_name := '';
 STRING Custom3_model_name := '';

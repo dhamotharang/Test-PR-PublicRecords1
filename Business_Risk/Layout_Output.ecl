@@ -1,4 +1,4 @@
-/*2012-09-17T19:12:42Z (Ken Hill)
+﻿/*2012-09-17T19:12:42Z (Ken Hill)
 111402 -- BIID return all risk indicators
 */
 import risk_indicators, iesp;
@@ -566,5 +566,11 @@ export Layout_Output := record
 	DATASET(Rep_Attributes) Attributes{MAXCOUNT(iesp.constants.biid.MAXREPATTRIBUTES)};
 	DATASET(risk_indicators.layouts.layout_desc_plus_seq) BusRiskIndicators{MAXCOUNT(iesp.constants.biid.MAXRISKINDICATORS)};
 	DATASET(risk_indicators.layouts.layout_desc_plus_seq) RepRiskIndicators{MAXCOUNT(iesp.constants.biid.MAXRISKINDICATORS)};
+
+  unsigned2 royalty_type_code_targus := '';
+  string20  royalty_type_targus := ''; 			
+  unsigned2 royalty_count_targus := ''; 			 
+  unsigned2 non_royalty_count_targus := '';  
+  string20  count_entity_targus := ''; 
 
 end;	

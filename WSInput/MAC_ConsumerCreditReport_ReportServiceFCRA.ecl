@@ -8,6 +8,7 @@
 		'GLBPurpose',
 		'PermissiblePurpose',
 		'FFDOptionsMask',
+		'FCRAPurpose',
 		/*---- Other Fields ----*/
 		'IncludeLiensJudgments',
 		/*---- Gateways ----*/

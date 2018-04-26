@@ -170,7 +170,7 @@ EXPORT Constants := MODULE
 	
 	EXPORT TRISv3 := MODULE
 
-		EXPORT Correctional_Institution := '9223';
+		EXPORT Correctional_Institution := '2225'; //2018-04-10 v3.2.2 change
 		EXPORT Data_Type_1 := '1';
 		EXPORT Data_Type_2 := '2';
 		EXPORT Department_of_Corrections := 'Department of Corrections';

@@ -1,5 +1,6 @@
-﻿IMPORT AddrBest, Address, Address_Attributes, Autokey_batch, AutoStandardI, batchservices, BatchShare, 
-			 CriminalRecords_BatchService, Didville, Models, Gateway, NID, progressive_phone,Std, tris_lnssi_build;
+﻿IMPORT AddrBest, Address, Address_Attributes, Autokey_batch, AutoStandardI, 
+       batchservices, BatchShare, CriminalRecords_BatchService, Didville, Gateway, Models, 
+			 NID, progressive_phone, Risk_Indicators, Std, tris_lnssi_build;
 
 EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
@@ -517,38 +518,73 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																		'');
 			RETURN IPAddrExceedsInputAddr;
 	END;
-	
 
- // *--- Function to get HRI Address codes ---* //
-  export getHRIRecords(dataset(rec_in_wdid) in_clean_batch) := function
-  
-      Autokey_batch.Layouts.rec_inBatchMaster xformToBatchRec(rec_in_wdid L) := transform
-        SELF.acctno      := l.acctno;
-        
-        SELF.prim_range  := StringLib.StringToUpperCase(l.prim_range);	
-        SELF.predir      := StringLib.StringToUpperCase(l.predir);	
-        SELF.prim_name   := StringLib.StringToUpperCase(l.prim_name);	
-        SELF.addr_suffix := StringLib.StringToUpperCase(l.addr_suffix);	
-        SELF.postdir     := StringLib.StringToUpperCase(l.postdir);	
-        SELF.unit_desig  := StringLib.StringToUpperCase(l.unit_desig);	
-        SELF.sec_range   := StringLib.StringToUpperCase(l.sec_range);	
 
-        SELF.p_city_name := StringLib.StringToUpperCase(l.p_city_name);	
-        SELF.st          := StringLib.StringToUpperCase(l.st);
-        SELF.z5          := l.z5;
-        
-        self := [];
+ // *--- Function to get HRI Address/"prison" info ---* //
+  export getHRIRecords(dataset(rec_in_wdid) ds_in_clnbatch_wdid) := function
+
+      // *** Tris v3.2.2, 2018-04-10 RR-12192 InputAddrPrison=Y determination logic enhancement
+      rec_inaddrs_with_keyfields := record
+        string4   pseudo_sic_code;
+        string120 company_name;
+        rec_in_wdid;
       end;
-      
-      indata := project(in_clean_batch, xformToBatchRec(left));
 
-      // Retrieve and output records
-      ds_outrecs := BatchServices.HRI_Address_Records(indata);
-      
-			// 2015 enhancements/fix req 4.1.13 to only use the first 4 digits of the sic_code 
-			// returned from BatchServices.HRI_Address_Records.
-			ds_outrecs_filt := ds_outrecs(sic_code[1..4] = 
-	                              BatchServices.Constants.TRISV3.Correctional_Institution);
+      // Join input addresses to Risk Indicators (Business Header) HRI address_to_sic_QA Key
+      // and filter for key sic_code='2225' 
+      // NOTE: '2225' is not really a "sic_code", but it is a "pseudo" internal sic_code.
+      //       (see Risk_Indicators.HRI_Businesses clean1:= ... for more info)
+      ds_inaddrs_onhrikey2225 := join(ds_in_clnbatch_wdid, Risk_Indicators.key_HRI_Address_To_SIC,
+												              keyed(left.z5          = right.z5         and 
+												                    left.prim_name   = right.prim_name  and 
+												                    left.addr_suffix = right.suffix     and 
+												                    left.predir      = right.predir     and
+												                    left.postdir     = right.postdir    and
+												                    left.prim_range  = right.prim_range and  
+												                    left.sec_range   = right.sec_range)     
+												              AND 
+ 												                right.sic_code = BatchServices.Constants.TRISV3.Correctional_Institution, // '2225'
+												              transform(rec_inaddrs_with_keyfields,
+												                self.pseudo_sic_code := right.sic_code,
+                                        self.company_name    := right.company_name,
+													              self                 := left),
+												              inner, 
+                                      limit(0),
+												              keep(10)); // might be more than 1 '2225' code per address
+
+      // Next filter using STRINGFIND to look for certain "non-prison name" terms in the 
+			// 'company_name' field of the address matched/'2225' key recs and only keep the 
+			// record if any of these terms DO NOT exist.
+      ds_outrecs_filt := ds_inaddrs_onhrikey2225(
+			                        // Only keep records if they DO NOT contain certain terms
+															// Law Enforcement related non-prison/jail name terms
+															STD.str.Find(company_name,' PD',1)=0            AND //must have space b4 the "PD"
+															STD.str.Find(company_name,'POLICE',1)=0         AND 
+                              STD.str.Find(company_name,'MARSHAL OF',1)=0     AND
+                              STD.str.Find(company_name,'MARSHALS OF',1)=0    AND
+                              STD.str.Find(company_name,'MARSHAL\'S OF',1)=0  AND
+                              STD.str.Find(company_name,'TROOPERS',1)=0       AND
+                              STD.str.Find(company_name,'TRPRS',1)=0          AND
+                              //Other non-Law Enforcement name terms
+                              STD.str.Find(company_name,'ASSOC',1)=0          AND //covers ASSOC, ASSOCIATES & ASSOCIATION
+                              STD.str.Find(company_name,'ASSN',1)=0           AND
+                              STD.str.Find(company_name,' BOARD',1)=0         AND //must have space b4 the beginning "B"
+															STD.str.Find(company_name,'CHAPLAIN',1)=0       AND //covers CHAPLAIN(S) & CHAPLAINCY
+														  STD.str.Find(company_name,'CHAPTER',1)=0        AND
+                              STD.str.Find(company_name,'COMMISSION',1)=0     AND
+                              STD.str.Find(company_name,'CONSULT',1)=0        AND //covers CONSULTANT(S) & CONSULTING 
+                              STD.str.Find(company_name,'FEDERATION',1)=0     AND
+                              STD.str.Find(company_name,'FOUNDATION',1)=0     AND
+                              STD.str.Find(company_name,'JAIL BUILDING',1)=0  AND
+                              STD.str.Find(company_name,' MINIST',1)=0        AND //must have space b4 the beginning "M", covers MINISTRIES, MINISTRY & "... MINIST"
+															STD.str.Find(company_name,'OUTREACH',1)=0       AND
+                              STD.str.Find(company_name,'VA CTR',1)=0         AND 
+                              STD.str.Find(company_name,'VETERAN',1)=0
+                            ); 
+
+	    //OUTPUT(ds_in_clnbatch_wdid,     NAMED('funcs_ds_in_clnbatch_wdid'));
+	    //OUTPUT(ds_inaddrs_onhrikey2225, NAMED('funcs_ds_inaddrs_onhrikey2225'));
+			//OUTPUT(ds_outrecs_filt,         NAMED('funcs_ds_outrecs_filt'));
 
 			return ds_outrecs_filt;
 			

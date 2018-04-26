@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="StudentAdvisorService">
 	<part name="AccountNumber" type="xsd:string"/>
 	<part name="FirstName" type="xsd:string"/>
@@ -145,6 +145,8 @@ boolean   isStudent := false			: stored('isStudent');
 
 dobradius := if(usedobfilter,dobradius0,-1);
 gateways := Gateway.Configuration.Get();
+
+if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 // constants
 	suppressNearDups := true;

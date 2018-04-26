@@ -1,10 +1,10 @@
-﻿IMPORT SALT37,std,data_services;
-EXPORT Key_InsuranceHeader_RELATIVE(BOOLEAN incremental=FALSE) := MODULE
+﻿IMPORT SALT37,std;
+EXPORT Key_InsuranceHeader_RELATIVE(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit=Config.RELATIVE_MAXBLOCKLIMIT) := MODULE/*HACK*/
  
 //fname2:lname2:?:FNAME:LNAME
 EXPORT KeyName := KeyNames().RELATIVE_super; /*HACK*/
  
-EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::RELATIVE';
+EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::RELATIVE';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  
@@ -70,6 +70,7 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.RELATIVE_MAXBLOCKLIMIT, aBlockLimit);
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.fname2 <> (TYPEOF(le.fname2))'' AND Fields.InValid_fname2((SALT37.StrType)le.fname2)=0 AND le.lname2 <> (TYPEOF(le.lname2))'' AND Fields.InValid_lname2((SALT37.StrType)le.lname2)=0;
 KeyRec := RECORDOF(Key);
  
@@ -78,7 +79,7 @@ EXPORT RawFetch(SALT37.StrType param_fname2,SALT37.StrType param_lname2,TYPEOF(h
           ( fname2 = param_fname2 AND param_fname2 <> (TYPEOF(fname2))'' )
       AND ( lname2 = param_lname2 AND param_lname2 <> (TYPEOF(lname2))'' )
       AND ( (FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME OR param_FNAME[1..LENGTH(TRIM(FNAME))] = FNAME)  OR FNAME_PreferredName = fn_PreferredName(param_FNAME) OR metaphonelib.DMetaPhone1(FNAME)=metaphonelib.DMetaPhone1(param_FNAME) OR Config.WithinEditN(FNAME,FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK*/ OR Config.WildMatch(FNAME,param_FNAME,FALSE) )
-      AND ( LNAME = (TYPEOF(LNAME))'' OR param_LNAME = (TYPEOF(LNAME))'' OR metaphonelib.DMetaPhone1(LNAME)=metaphonelib.DMetaPhone1(param_LNAME) OR Config.WithinEditN(LNAME,LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK*/ OR SALT37.HyphenMatch(LNAME,param_LNAME,1)<=2 OR Config.WildMatch(LNAME,param_LNAME,FALSE) )),Config.RELATIVE_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+      AND ( LNAME = (TYPEOF(LNAME))'' OR param_LNAME = (TYPEOF(LNAME))'' OR metaphonelib.DMetaPhone1(LNAME)=metaphonelib.DMetaPhone1(param_LNAME) OR Config.WithinEditN(LNAME,LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK*/ OR SALT37.HyphenMatch(LNAME,param_LNAME,1)<=2 OR Config.WildMatch(LNAME,param_LNAME,FALSE) )),MAX_BLOCKLIMIT /*HACK*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
 EXPORT ScoredDIDFetch(SALT37.StrType param_fname2,SALT37.StrType param_lname2,TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',BOOLEAN param_disableForce = FALSE) := FUNCTION

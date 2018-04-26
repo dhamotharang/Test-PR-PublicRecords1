@@ -91,7 +91,8 @@ MACRO
 		EXPORT STRING20  Usecase                        := '': STORED('LineIdentityUseCase');
 		EXPORT STRING3 	 ProductCode                    := '': STORED('ProductCode');
 		EXPORT STRING8	 BillingId                      := '': STORED('BillingId');
-		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
+		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
+																												PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] and BillingId <>'';
 				
 				     BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly := DirectMarketing AND TransactionType = PhoneFinder_Services.Constants.TransType.BASIC;

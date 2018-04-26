@@ -1,4 +1,5 @@
-IMPORT	Address, DriversV2, EmailService, iesp, doxie, AutoStandardI, PersonReports, ut, Risk_Indicators, Header, suppress, models, codes,Gateway;
+IMPORT	Address, DriversV2, EmailService, iesp, doxie, AutoStandardI, PersonReports, ut, 
+	Risk_Indicators, Header, suppress, models, codes,Gateway, Royalty;
 
 ifr := iesp.identityfraudreport;
 
@@ -653,7 +654,8 @@ EXPORT Functions := MODULE
 	
 	// Function to get the emails for the identity
 	export	dataset(IdentityFraud_Services.Layouts.email_did_rec)	GetEmails(	dataset(EmailService.Assorted_Layouts.layout_report_rollup)	dEmails,
-																																						IdentityFraud_Services.IParam._identityfraudreport					param
+																																						IdentityFraud_Services.IParam._identityfraudreport					param, 
+																																						boolean isFCRA = false
 																																					)	:=
 	function
 		IdentityFraud_Services.Layouts.email_rec	tNormEmail(dEmails	pInput,integer	cnt)	:=
@@ -675,7 +677,7 @@ EXPORT Functions := MODULE
 		// Populate the royalty flag
 		IdentityFraud_Services.Layouts.email_rec	tEmailRoyaltyFlag(dEmailNorm	pInput)	:=
 		transform
-			self.royalty	:=	pInput.src	in	set(codes.Key_Codes_V3(file_name	=	'EMAIL_SOURCES',field_name	=	'ROYALTY'),code);
+			self.royalty	:=	pInput.src in Royalty.Constants.EMAIL_ROYALTY_SET(isFCRA);
 			self					:=	pInput;
 		end;
 		

@@ -1,4 +1,4 @@
-﻿Import Gateway, iesp, WorkforceSolutionServices, Royalty, FCRA, FFD, Doxie, BatchShare;
+﻿Import Gateway, iesp, WorkforceSolutionServices, Royalty, FCRA, FFD, Doxie, BatchShare, STD;
 
 EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRequest) Input,
 							 WorkforceSolutionServices.IParam.report_params	InputParams
@@ -18,7 +18,10 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		OutputFromEquifax := if(isFoundInputDid, WorkforceSolutionServices.getVerificationDataFromEquifax(Input, InputParams, makeGatewayCall, gateways));
 
 		//Get PII from Equifax
-		dsResponseData := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.TsVTwnSelectRs.TsVResponseData;
+		dsResponseData_pre := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.TsVTwnSelectRs.TsVResponseData;
+		
+		// Try match PII with an active record if available
+		dsResponseData := sort(dsResponseData_pre,STD.Str.ToUpperCase(trim(TsVEmployee_V100.EmployeeStatus.Message))= 'ACTIVE',TsVEmployee_V100.EmployeeStatus.Message);
 		
 		//Error codes are sent in 2 places. 
 		SignonMsgs_StatusCode :=  OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Code;		
@@ -35,10 +38,8 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		isEquifaxSentError := ~isEquifaxSentData;
 
 		isAvailable_EmpRec_1 := count(dsResponseData) > 0 and isEquifaxSentData;
-		isAvailable_EmpRec_2 := count(dsResponseData) > 1 and isEquifaxSentData;
 
 		EmployeeRecord_1 := if(isAvailable_EmpRec_1, dsResponseData[1].TsVEmployee_V100);
-		EmployeeRecord_2 := if(isAvailable_EmpRec_2, dsResponseData[2].TsVEmployee_V100);
 
 		EmpRec1_picklist_in := project(EmployeeRecord_1,
 													WorkforceSolutionServices.transforms.GwEmployee_to_Picklist(left,InputParams));
@@ -48,17 +49,10 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		OutputDID_1 := if(isAvailable_EmpRec_1 and EmpRec1_picklist_out[1].SubjectTotalCount = 1,
 									(unsigned)EmpRec1_picklist_out[1].Records[1].UniqueId,0);
 									
-		EmpRec2_picklist_in :=	project(EmployeeRecord_2,WorkforceSolutionServices.transforms.GwEmployee_to_Picklist(left,InputParams));																												 														
-		EmpRec2_picklist_out := doxie.get_remote_picklist (dataset(EmpRec1_picklist_in), gateways);
-
-		OutputDID_2 := if(isAvailable_EmpRec_2 and EmpRec2_picklist_out[1].SubjectTotalCount = 1,
-									(unsigned)EmpRec2_picklist_out[1].Records[1].UniqueId,0);
 
 		//Find DID for Output PII
-		OutputDID :=  map( isAvailable_EmpRec_1 and isAvailable_EmpRec_2 and OutputDID_1 = OutputDID_2 => OutputDID_1,
-											 isAvailable_EmpRec_1 and ~isAvailable_EmpRec_2  and OutputDID_1 <> 0  => OutputDID_1,
-										0 
-								);
+		OutputDID :=  if(isAvailable_EmpRec_1,OutputDID_1,0);
+		
 		isFoundOutputDid := OutputDID <> 0;
 
 		//Query Status Code
@@ -91,12 +85,14 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		GatewayExceptions := OutputFromEquifax[1].response._Header.Exceptions ;
 		AllExceptions := 	GatewayExceptions;
 
+		
 		//Response Header 
 		r := iesp.ECL2ESP.GetHeaderRow();
+		message := 	STD.STr.RemoveSuffix(trim(EquifaxStatusMessage),'.')+' ('+ EquifaxStatusCode +').';
 		validation_row := row(r, 
 										transform(iesp.share.t_CodeMap,
 															self.Code := (string) StatusCode;
-															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,EquifaxStatusCode +':'+ EquifaxStatusMessage);
+															self.Description := WorkforceSolutionServices.functions.StatusMessages(StatusCode,message);
 															)
 										);
 
@@ -110,16 +106,12 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 		end;
 		out_row := row({OutputDID,GatewayResponse,ConsumerStatements,Royalties,validation_row},combined);
 
-/* 		output(OutputFromEquifax,named('OutputFromEquifax'));
-   		output(pick_request,named('pick_request_input'));
-   		output(pick_response,named('pick_response_input'));
-   
-   		output(EmpRec2_picklist_in,named('pick_request_equifax'));
-   		output(EmpRec2_picklist_out,named('pick_response_equifax'));
-   
-   		output(isAvailable_EmpRec_1,named('isAvailable_EmpRec_1'));
-   		output(isAvailable_EmpRec_2,named('isAvailable_EmpRec_2'));
-   		output(isFoundInputDid,named('isFoundInputDid'));
+ /*
+ 		output(OutputFromEquifax,named('OutputFromEquifax'));
+		output(pick_request,named('pick_request_input'));
+   	output(pick_response,named('pick_response_input'));
+   	output(isAvailable_EmpRec_1,named('isAvailable_EmpRec_1'));
+   	output(isFoundInputDid,named('isFoundInputDid'));
 */
 
 

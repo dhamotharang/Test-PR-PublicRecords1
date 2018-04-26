@@ -142,6 +142,7 @@ MACRO
 		self.Address.zip5 := l.z5;
 		self.Address.zip4 := l.zip4;
 		self.PhoneNumber := l.homephone;
+		self.UniqueId := (STRING)l.did;
 		self := l;
 		self := [];
 	
@@ -156,12 +157,7 @@ MACRO
 
 	// Report module
 	reportMod := MODULE(PhoneFinder_Services.iParam.ReportParams)
-		EXPORT UNSIGNED1 TransactionType     := CASE(ut.fnTrim2Upper(vTransactionType),
-																									'BASIC'    => 0,
-																									'PREMIUM'  => 1,
-																									'ULTIMATE' => 2,
-																									'PHONERISKASSESSMENT' => 3,
-																									0);
+	 EXPORT UNSIGNED1 TransactionType     := PhoneFinder_Services.Constants.MapTransType2Code(vTransactionType);
 		EXPORT BOOLEAN   StrictMatch        		:= AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
 		EXPORT BOOLEAN   PhoneticMatch      		:= AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
 		EXPORT STRING32  ApplicationType   		  := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
@@ -193,9 +189,9 @@ MACRO
 		EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName 				: STORED('VerifyPhoneName');
 		EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress : STORED('VerifyPhoneNameAddress');
 		EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive    : STORED('VerifyPhoneIsActive');
-  EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold	: STORED('DateFirstSeenThreshold');
-  EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold 	: STORED('DateLastSeenThreshold');
-  EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold 	: STORED('LengthOfTimeThreshold');
+        EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold	: STORED('DateFirstSeenThreshold');
+        EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold 	: STORED('DateLastSeenThreshold');
+        EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold 	: STORED('LengthOfTimeThreshold');
 		EXPORT BOOLEAN   UseDateFirstSeenVerify := pfOptions.VerificationOptions.UseDateFirstSeenVerify	: STORED('UseDateFirstSeenVerify');
 		EXPORT BOOLEAN   UseDateLastSeenVerify  := pfOptions.VerificationOptions.UseDateLastSeenVerify  : STORED('UseDateLastSeenVerify');
 		EXPORT BOOLEAN   UseLengthOfTimeVerify  := pfOptions.VerificationOptions.UseLengthOfTimeVerify  : STORED('UseLengthOfTimeVerify');
@@ -205,38 +201,48 @@ MACRO
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
 		                                                                                  UserRules,
 																																		                  allRules);
-		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators		:= pfOptions.IncludeOtherPhoneRiskIndicators : STORED('IncludeOtherPhoneRiskIndicators');	
+		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators				:= pfOptions.IncludeOtherPhoneRiskIndicators : STORED('IncludeOtherPhoneRiskIndicators');	
 		EXPORT UNSIGNED1 LineIdentityConsentLevel           := pfOptions.LineIdentityConsentLevel : STORED('LineIdentityConsentLevel');                                                     
 		EXPORT STRING20  Usecase                            := pfOptions.LineIdentityUseCase: STORED('LineIdentityUseCase');
 		EXPORT STRING3 	 ProductCode                        := pfUser.ProductCode: STORED('ProductCode');
-		EXPORT STRING8	 BillingId                          := pfUser.BillingId: STORED('BillingId');
-		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
+		EXPORT STRING8	 BillingId                          	:= pfUser.BillingId: STORED('BillingId');
+			
+		EXPORT STRING16 CompanyId     := pfUser.CompanyId;
+		EXPORT STRING60 ReferenceCode := pfUser.ReferenceCode;
+		EXPORT STRING8  SourceCode    := pfUser.SourceCode;
+		EXPORT STRING60 BillingCode   := pfUser.BillingCode;
+		EXPORT STRING   TransactionId := '': STORED('_TransactionId');
+		 		
+		
+		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
+		                                                                                                        PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] and BillingId <>'';
 		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
 		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
 		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
 	END;
 
-	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch,reportMod,
-																												IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
-																																											 dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
-  																												formattedSearchBy);
-  iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
-         		TRANSFORM
-         			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
-         			SELF.Records   := modRecords.dFormat2IESP;
-         			SELF.InputEcho := pfSearchBy;
-    END;
-         		
-    results := DATASET([tFormat2IespResponse()]);
-      
-    royalties	:= modRecords.dRoyalties;
+	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
+															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
+ 															formattedSearchBy, pfSearchBy);
+ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
+      		TRANSFORM
+      			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
+      			SELF.Records   := modRecords.dFormat2IESP;
+      			SELF.InputEcho := pfSearchBy;
+ END;
+      		
+ results := DATASET([tFormat2IespResponse()]);
+   
+ royalties	:= modRecords.dRoyalties;
    	
-    Zumigo_Log := modRecords.Zumigo_History_Recs;
-     
-    OUTPUT(results,named('Results'));
-    OUTPUT(royalties,named('RoyaltySet'));
-    OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+ Zumigo_Log := modRecords.Zumigo_History_Recs; 
+ PF_Reporting_Dataset := modRecords.ReportingDataset;
+    
+ OUTPUT(results,named('Results'));
+ OUTPUT(royalties,named('RoyaltySet'));
+ OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+ OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
 
 ENDMACRO;
 

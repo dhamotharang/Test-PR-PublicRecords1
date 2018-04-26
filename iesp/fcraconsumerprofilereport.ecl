@@ -11,6 +11,7 @@ export t_ConsumerProfileOptions := record (iesp.share.t_BaseOption)
 	string2 StateLawException {xpath('StateLawException')};
 	string50 IntendedPurpose {xpath('IntendedPurpose')}; //values['Application','Prescreening','Portfolio Review','Insurance Application','Insurance Portfolio Review','Disclosure','Government','Collections','Tenant Screening','Healthcare Credit Transaction','Healthcare Legitimate Business Need','Rental Car Loss Damage Waiver','Employee or Volunteer Screening','Written Consent Prequalification','Rental Car','Written Consent','Child Support','Demand Deposit','Written Consent Direct to Consumer','Credit Application','']
 	string20 FFDOptionsMask {xpath('FFDOptionsMask')};//hidden[ecl_only]
+	string FCRAPurpose {xpath('FCRAPurpose')}; //values['0','1','2','3','4','5','6','7','8','9','10','11','12','13','']
 end;
 		
 export t_ConsumerProfileReportBy := record

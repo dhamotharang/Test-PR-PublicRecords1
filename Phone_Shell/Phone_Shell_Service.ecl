@@ -349,6 +349,8 @@ EXPORT Phone_Shell_Service() := FUNCTION
 		SELF := le;
 	END;
 	batch := PROJECT(Batch_In, batchSettings(LEFT));
+  
+    if( BocaShell_OFAC_Version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 	
 	// Combine Realtime and Batch Inputs - this allows the service to run in either realtime OR batch mode.  If both realtime and batch fields are filled in the realtime fields simply get added to the batch input
 	input := DEDUP(SORT(realtime + batch, AcctNo, FullName, FirstName, MiddleName, LastName, TitleName, SuffixName, StreetAddress1, StreetAddress2, City, State, Zip, Prim_Range, Predir, Prim_Name, Addr_Suffix, Postdir, Unit_Desig, Sec_Range, Zip5, Zip4, SSN, DateOfBirth, Age, HomePhone, 

@@ -1,5 +1,6 @@
 ﻿import models, risk_indicators, easi, riskwise, business_risk, riskview, ut, iesp;
 
+
 // model environment options:  1 = both nonfcra and fcra, 2 = FCRA only, 3= nonFCRA only
 EXPORT Runway_function(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, 
 boolean exclude_reasons = False, 
@@ -3269,10 +3270,30 @@ self.RVC1703_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVC1703_1_0, named('with_RVC1703_1_0'));
 
+
+RVC1801_1_0_score := Models.RVC1801_1_0(clam, iscalifornia);
+// output(RVC1801_1_0_score, named('RVC1801_1_0_score'));
+                             
+with_RVC1801_1_0 := join(with_RVC1703_1_0, RVC1801_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVC1801_1_0_score := right.score;
+self.RVC1801_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVC1801_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVC1801_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVC1801_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self := left), keep(1), left outer);
+// output(with_RVC1801_1_0, named('with_RVC1801_1_0'));
+
+
+
+
+
+
 RVD1010_0_0_score := Models.RVD1010_0_0(UNGROUP(clam), iscalifornia);
 // output(RVD1010_0_0_score, named('RVD1010_0_0_score'));
                              
-with_RVD1010_0_0 := join(with_RVC1703_1_0, RVD1010_0_0_score,
+with_RVD1010_0_0 := join(with_RVC1801_1_0, RVD1010_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVD1010_0_0_score := right.score;
@@ -5746,6 +5767,12 @@ self.RVC1703_1_0_reason1	:= if(model_environment in [1,2], left.RVC1703_1_0_reas
 self.RVC1703_1_0_reason2	:= if(model_environment in [1,2], left.RVC1703_1_0_reason2	, '');
 self.RVC1703_1_0_reason3	:= if(model_environment in [1,2], left.RVC1703_1_0_reason3	, '');
 self.RVC1703_1_0_reason4	:= if(model_environment in [1,2], left.RVC1703_1_0_reason4	, '');
+
+self.RVC1801_1_0_score	:= if(model_environment in [1,2], left.RVC1801_1_0_score	, '');
+self.RVC1801_1_0_reason1	:= if(model_environment in [1,2], left.RVC1801_1_0_reason1	, '');
+self.RVC1801_1_0_reason2	:= if(model_environment in [1,2], left.RVC1801_1_0_reason2	, '');
+self.RVC1801_1_0_reason3	:= if(model_environment in [1,2], left.RVC1801_1_0_reason3	, '');
+self.RVC1801_1_0_reason4	:= if(model_environment in [1,2], left.RVC1801_1_0_reason4	, '');
 
 self.RVD1010_0_0_score	:= if(model_environment in [1,2], left.RVD1010_0_0_score	, '');
 self.RVD1010_0_0_reason1	:= if(model_environment in [1,2], left.RVD1010_0_0_reason1	, '');

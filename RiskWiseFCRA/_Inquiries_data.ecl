@@ -1,4 +1,4 @@
-import doxie, fcra, inquiry_acclogs, riskwise, gong, risk_indicators, ut, mdr;
+﻿import doxie, fcra, inquiry_acclogs, riskwise, gong, risk_indicators, ut, mdr;
 
 EXPORT _Inquiries_data(	dataset (doxie.layout_references) bshell_dids, 
                       dataset (fcra.Layout_override_flag) ds_flagfile
@@ -29,23 +29,14 @@ EXPORT _Inquiries_data(	dataset (doxie.layout_references) bshell_dids,
 	// comment this out when inquiries override key is ready
 	// inquiries_corr  := dataset([], recordof(FCRA.key_override_inquiries_ffid)) ;
 
-	// 0           Legacy RiskWise Products - Hard 
-	// 100         Application RiskView_Applica - Hard 
-	// 101         FCRA Phone History Report - Hard
-	// 164         Collections
-	// 165 				 Employee or Volunteer Screening
-	// 106 				 Demand Deposit / Checking Account
-	string employee_volunteer_purpose := '165';
-	set_fcra_permissible_purposes := ['0','100','101','164', '106', employee_volunteer_purpose];  // if the inquiry wasn't run with one of these 4 permissible purposes, throw it out
-
 	inquiry_main_raw  := join(bshell_dids, Inquiry_AccLogs.Key_FCRA_DID,
 													left.did<>0 and keyed(left.did=right.appended_adl)
 													and trim(right.search_info.transaction_id) not in inquiries_correction_keys
 													and (ut.DaysApart(ut.GetDate,right.search_info.datetime[1..8]) < ut.DaysInNYears(1) or 
-															 trim(right.permissions.fcra_purpose) = employee_volunteer_purpose)
+															 trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.employee_volunteer_purposes_set)
 													and (ut.DaysApart(ut.GetDate,right.search_info.datetime[1..8]) < ut.DaysInNYears(2) or 
-															 trim(right.permissions.fcra_purpose) != employee_volunteer_purpose)
-													and trim(right.permissions.fcra_purpose) in set_fcra_permissible_purposes,
+															 trim(right.permissions.fcra_purpose) NOT IN Inquiry_AccLogs.shell_constants.employee_volunteer_purposes_set)
+													and trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_permissible_purposes,
 													transform(Inquiry_AccLogs.Layout.Layout_inquiry_disclosure, self := right, self := []),
 													KEEP(100), atmost(riskwise.max_atmost));
 

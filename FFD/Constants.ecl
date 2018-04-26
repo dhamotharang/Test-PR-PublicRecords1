@@ -31,6 +31,7 @@ EXPORT Constants := MODULE
 	
   EXPORT AlertMessage := MODULE(PersonContext.Constants.AlertMessages)
     EXPORT CSMessage := 'The subject of this consumer report has Consumer Statement(s) on file.';
+    EXPORT LegalHoldMessage := 'The file for this consumer is not currently available.';
   END;
   
   // to be used when fabricating a batch structure from a single input record

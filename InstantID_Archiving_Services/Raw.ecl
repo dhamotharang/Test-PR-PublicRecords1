@@ -583,7 +583,7 @@ EXPORT Raw := MODULE
 		//parse out DB data into format we need
 		ds_db_results := macros.mac_build_GetAndMassageSoapCall(SQLSelect, SQLValueList, 
 				InstantID_Archiving_Services.Layouts.IIDI_RiskInd_Response, InstantID_Archiving_Services.Layouts.IIDI_RiskInd_Records, dGateways);
-		RETURN ds_db_results;
+    RETURN ds_db_results;
 	END;
 	
 	EXPORT summaryInstantIdInterntlIVIViakeys(InstantID_Archiving_Services.IParam.summary_params in_mod) := FUNCTION
@@ -626,9 +626,9 @@ EXPORT Raw := MODULE
 				KEYED((company_id = in_mod.CompanyId) AND
 				product = InstantID_Archiving_Services.Constants.InstantIdIntrnatl AND
 				(date_added >= StartDate AND date_added <= EndDate) AND
-				country = in_mod.CountryId)),
+				country=trim(UnicodeLib.UnicodeToUpperCase(in_mod.CountryId)))),
 				InstantID_Archiving_Services.Constants.Max_Error_COUNT);	
-		//join with payload to get the rest of the information
+   //join with payload to get the rest of the information
 		ds_payload_slimmed := JOIN(ds_filtered_recs, InstantID_Archiving.Key_Payload,
 			KEYED(LEFT.transaction_id = RIGHT.transaction_id) AND RIGHT.product = InstantID_Archiving_Services.Constants.InstantIdIntrnatl,
 			TRANSFORM(InstantID_Archiving_Services.Layouts.IIDI_RiskInd_Records, self.ivi := (string)right.ivi, SELF := RIGHT, SELF := []),
@@ -713,7 +713,7 @@ EXPORT Raw := MODULE
 				KEYED(company_id = in_mod.CompanyId AND
 							product = InstantID_Archiving_Services.Constants.InstantIdIntrnatl AND
 						 (date_added >= StartDate AND date_added <= EndDate) AND
-							country = in_mod.CountryId));
+							country =trim(UnicodeLib.UnicodeToUpperCase(in_mod.CountryId))));
 		//join with payload to get the rest of the information	
 		ds_payload_slimmed := JOIN(ds_filtered_recs, InstantID_Archiving.Key_Payload,
 			KEYED(LEFT.transaction_id = RIGHT.transaction_id) AND RIGHT.product = InstantID_Archiving_Services.Constants.InstantIdIntrnatl,

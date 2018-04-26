@@ -55,7 +55,7 @@ EXPORT IdentityFraudReport (
 	email_recs	:=	doxie.email_records(dids(did	=	subj_did),param.ssn_mask,param.applicationtype,true);
 	
 	// normalize the child dataset emails so as to restrict the number of emails shown to the customer
-	shared email_recs_norm	:=	Functions.GetEmails(email_recs,param);
+	shared email_recs_norm	:=	Functions.GetEmails(email_recs, param, IsFCRA);
 	
   // ========================================================================
   // Get Best data for subject and imposters

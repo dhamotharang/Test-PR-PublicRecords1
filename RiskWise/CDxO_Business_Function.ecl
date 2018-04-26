@@ -1,10 +1,13 @@
-import ut, address, Risk_Indicators, Models, Business_Risk, gateway;
+﻿import ut, address, Risk_Indicators, Models, Business_Risk, gateway;
 
 export CDxO_Business_Function(DATASET(Layout_CD2I) indata, 
 															dataset(Gateway.Layouts.Config) gateways, 
 															unsigned1 glb, 
 															unsigned1 dppa,
 															string4 tribcode,
+                              unsigned1 ofac_version = 1,
+                              boolean include_ofac = false,
+                              real global_watchlist_threshold = 0.84,
 															string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 															string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := 
 
@@ -132,7 +135,8 @@ BSversion           := map(tribcode='nd11' => 51,
 													 tribcode in BS3_tribs => 2,
 													 1);
 
-biid_results := Business_Risk.InstantId_Function_BtSt(prep, gateways, false, dppa, glb, false, false, tribcode, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
+biid_results := Business_Risk.InstantId_Function_BtSt(prep, gateways, false, dppa, glb, false, false, tribcode, ofac_version, include_ofac, , global_watchlist_threshold, 
+                                                      dataRestriction:=DataRestriction, dataPermission:=dataPermission);
 
 
 // intermediate results

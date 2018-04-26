@@ -19,13 +19,13 @@ EXPORT getWatchlists(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// Get the watchlist results.  To simplify watchlist searching we are only supporting the custom watchlist set (Could include 'ALL', 'OFA', 'OFC', 'OSC', 'BES', 'CFT', etc etc) - See Patriot.WL_Include_Keys for the full list.
 	// By doing this it eliminates all of the extra OFAC_Only/Include_OFAC/Include_Additional_Watchlists input options that really can be accomplished with the Watchlists_Requested input dataset
-	OFAC_Only := FALSE;
+  OFAC_Only := FALSE;
 	Include_OFAC := FALSE;
 	Include_Additional_Watchlists := FALSE;
-	From_BIID := FALSE; // Interestingly this field doesn't do anything in getWatchlists2...
+  From_BIID := FALSE; // Interestingly this field doesn't do anything in getWatchlists2...
 	// Don't attempt to grab watchlists unless we actually have some in the list...
 	watchlistResults := IF(COUNT(Options.Watchlists_Requested) <= 0, DATASET([], Business_Risk.Layout_Output),
-																																	 UNGROUP(Business_Risk.getWatchLists2(watchlistInput, OFAC_Only, From_BIID, Options.OFAC_Version, Include_OFAC, Include_Additional_Watchlists, Options.Global_Watchlist_Threshold, Options.Watchlists_Requested)));
+																																	 UNGROUP(Business_Risk.getWatchLists2(watchlistInput, OFAC_Only, From_BIID, Options.OFAC_Version, Include_OFAC, Include_Additional_Watchlists, Options.Global_Watchlist_Threshold, Options.Watchlists_Requested, options.gateways)));
 
 	Business_Risk_BIP.Layouts.Shell combineResults(Business_Risk_BIP.Layouts.Shell le, Business_Risk.Layout_Output ri) := TRANSFORM
 		// Rather than keeping the funky flat layout - move it all into a dataset structure

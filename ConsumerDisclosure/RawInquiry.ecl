@@ -10,15 +10,18 @@ END;
 	
 todaysdate := (STRING) Std.Date.Today(); 
 
-STRING employee_volunteer_purpose := '165'; // 165 				 Employee or Volunteer Screening
-STRING demand_deposit_purpose := '106';    // 106 				 Demand Deposit / Checking Account
-STRING collections_purpose := '164';       // 164         Collections
-STRING phone_history_purpose := '101';     // 101         FCRA Phone History Report - Hard
-STRING RiskView_Applica_purpose := '100';  // 100         Application RiskView_Applica - Hard
-STRING legacy_purpose := '0';              // 0           Legacy RiskWise Products - Hard
-set_fcra_permissible_purposes := [legacy_purpose, RiskView_Applica_purpose, 
-																	phone_history_purpose, collections_purpose, demand_deposit_purpose];  
+STRING legacy_purpose := '0'; // Legacy RiskWise Products - Hard
 
+IsAcceptedPermissiblePurpose(STRING _str_purpose) := FUNCTION
+  _purpose := FCRA.FCRAPurpose.ConvertAndValidate((INTEGER)_str_purpose); 
+  is_accepted := _str_purpose = legacy_purpose OR 
+																FCRA.FCRAPurpose.isDemandDeposit(_purpose) OR
+															  FCRA.FCRAPurpose.isCollections(_purpose) OR
+															  FCRA.FCRAPurpose.isCreditApplication(_purpose); 
+	RETURN is_accepted;
+END;
+
+IsEmploymentScreeningPurpose(STRING _purpose) := FCRA.FCRAPurpose.isEmploymentScreening(FCRA.FCRAPurpose.ConvertAndValidate((INTEGER)_purpose)); 
 	
 EXPORT RawInquiry := MODULE
 
@@ -98,9 +101,9 @@ EXPORT RawInquiry := MODULE
 		recs_filt:= recs_all(
 			in_mod.ReturnOverwritten OR ~compliance_flags.isOverwritten,
 			in_mod.ReturnSuppressed OR ~compliance_flags.isSuppressed,
-			(TRIM(permissions.fcra_purpose) IN set_fcra_permissible_purposes
+			(IsAcceptedPermissiblePurpose(TRIM(permissions.fcra_purpose)) 
 			AND ut.fn_date_is_ok(todaysdate, search_info.datetime[1..8], 1))
-			OR (TRIM(permissions.fcra_purpose) = employee_volunteer_purpose AND 
+			OR (IsEmploymentScreeningPurpose(TRIM(permissions.fcra_purpose)) AND 
 					ut.fn_date_is_ok(todaysdate, search_info.datetime[1..8], 2))
 			);
 											

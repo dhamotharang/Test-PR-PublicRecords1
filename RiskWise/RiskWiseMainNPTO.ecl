@@ -27,6 +27,7 @@
 	<part name="runSeed" type="xsd:boolean"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -71,6 +72,7 @@ export RiskWiseMainNPTO := MACRO
 	'runSeed',
 	'DataRestrictionMask',
 	'DataPermissionMask',
+  'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -123,6 +125,7 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 
 unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false 	: stored('runSeed');
+unsigned1 ofac_version      := 2        : stored('OFACVersion'); // set to two as this was the original version
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
@@ -139,11 +142,14 @@ targusGatewaySet := ['npt1'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	self.servicename := le.servicename;
-	self.url := if(tribcode in targusGatewaySet and le.servicename = 'targus', le.url, ''); // default to no gateway call			 
+	self.url := map(tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
+                  tribcode in productSet and le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
+  ''); // default to no gateway call			 
 	self := le;
 END;
 gateways := project(gateways_in, gw_switch(left));
 
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 rec := RECORD
 	unsigned4 seq;
@@ -208,6 +214,9 @@ risk_indicators.layout_input into(rec l, INTEGER C) := TRANSFORM
 END;
 prep := PROJECT(d,into(left,counter));
 
+include_ofac := true; // set always to true as this was the original default
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
+
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose,
 		false, // isUtility
@@ -219,10 +228,9 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 		false, // isFCRA default value
 		false, // ExcludeWatchLists default value
 		false, // from_IT1O default value
-		2,     // ofac_version default value
-		true, // include_ofac default value
-		false, // include_additional_watchlists default value
-		0.84,   // threshold -- use 0.84 instead of default 0.8
+		in_ofac_version := ofac_version,     // ofac_version default value
+		in_include_ofac := include_ofac, // include_ofac default value
+		in_global_watchlist_threshold := global_watchlist_threshold, // threshold -- use 0.84 instead of default 0.8
 		in_DataRestriction:=DataRestriction,
 		in_DataPermission:=DataPermission
 );

@@ -713,10 +713,8 @@ EXPORT Common := MODULE
 				    self.CityBorderStation         := tempCityState in DueDiligence.Constants.CityBorderStation;
 				    self.CityFerryCrossing         := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
 				    self.CityRailStation           := tempCityState in DueDiligence.Constants.CityRailStation; 
-  
 					   /* populate the remaining business internal record with data from the left  */ 
-						self                          := left;
-            self                          := [];), left outer,
+						self                          := left;), left outer,
 		ATMOST
 		    (keyed(right.geolink = left.state + left.county + left.geo_blk), 
 				 DueDiligence.Constants.MAX_ATMOST), KEEP(1));
@@ -805,6 +803,18 @@ EXPORT Common := MODULE
                  RIGHT.fieldName[10] = DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
 
      RETURN rollMe;
+  ENDMACRO;
+  
+  //dsToLimit, should already come in sorted and grouped so counter can keep groups sequential
+  EXPORT GetMaxRecords(dsToLimit, maxRecords) := FUNCTIONMACRO
+    
+    RECORDOF(dsToLimit) getMaxRecs(dsToLimit dtl, INTEGER maxCounter) := TRANSFORM, SKIP(maxCounter > maxRecords) 
+      SELF := dtl;
+    END;
+    
+    maxedRecords := PROJECT(dsToLimit, getMaxRecs(LEFT, COUNTER));
+    
+    RETURN UNGROUP(maxedRecords);
   ENDMACRO;
   
 END;

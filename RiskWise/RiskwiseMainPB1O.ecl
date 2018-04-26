@@ -34,6 +34,7 @@
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
@@ -85,6 +86,7 @@ export RiskwiseMainPB1O := MACRO
 	'HistoryDateYYYYMM',
 	'DataRestrictionMask',
 	'DataPermissionMask',
+  'OFACversion',
 	'gateways',
 	'OutcomeTrackingOptOut'));
 
@@ -144,6 +146,7 @@ boolean  runSeed_value := false 	: stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+unsigned1 OFACversion      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
 tribcode := StringLib.StringToLowerCase(tribCode_value);
@@ -152,11 +155,14 @@ boolean Log_trib := tribcode in ['pb01'];
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode='pb01' and le.servicename in ['targus'] => le.url,  // use targus gateway if needed
-				 ''); // default to no gateway call			 
+                  tribcode in ['pb01', 'pb02'] and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
+                                                                          ''); // default to no gateway call			 
 	self := le;
 end;
 
 gateways := project(gateways_in, gw_switch(left));
+
+if( OFACversion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 d := dataset([{0}],RiskWise.Layout_PB1I);
 RiskWise.Layout_PB1I addseq(d l, integer C) := transform
@@ -202,12 +208,23 @@ RiskWise.Layout_PB1O format_seed(seed_out le) := transform
 end;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], riskwise.Layout_PB1O));
 
-ret := if(tribcode in ['pb01', 'pb02'], 
-		if(count(final_seed)>0 and runSeed_value, final_seed, RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, 
-		DataRestriction:=DataRestriction, DataPermission:=DataPermission)), 
-		dataset([{'',account_value}], riskwise.Layout_PB1O));
+ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission);
 
-dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
+ret := if(tribcode in ['pb01', 'pb02'], 
+		if(count(final_seed)>0 and runSeed_value, final_seed, PROJECT( ret_pre, TRANSFORM( riskwise.layout_pb1o, SELF := LEFT, SELF := [] ) )), 
+		dataset([{'',account_value}], riskwise.Layout_PB1O));
+    
+dRoyalties := 
+  PROJECT(
+    ret_pre,
+    TRANSFORM( Royalty.Layouts.Royalty,
+      SELF.royalty_type_code := LEFT.royalty_type_code_targus;
+      SELF.royalty_type      := LEFT.royalty_type_targus;
+      SELF.royalty_count     := LEFT.royalty_count_targus;
+      SELF.non_royalty_count := LEFT.non_royalty_count_targus;
+      SELF.count_entity      := LEFT.count_entity_targus;
+    )
+  );
 
 //Log to Deltabase
 Deltabase_Logging_prep := project(ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,

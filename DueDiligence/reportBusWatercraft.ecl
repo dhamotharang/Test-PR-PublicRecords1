@@ -30,6 +30,7 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                                         SELF.registration.date.day := (INTEGER)LEFT.registrationDate[7..8];
 																																																											
 																				SELF.VINNumber.vin := LEFT.vin;
+                                        SELF.Propulsion := LEFT.propulsion;
 
 																				SELF := [];));
 		SELF := wsl;

@@ -76,6 +76,7 @@
 	<part name="TimeofApplication" type="xsd:string"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
   <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
+  <part name="IncludeQAOutputs" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
@@ -164,7 +165,8 @@ export FraudAdvisor_Service := MACRO
 		'DateofApplication',
 		'TimeofApplication',
 		'OutcomeTrackingOptOut',
-		'SuppressCompromisedDLs'
+		'SuppressCompromisedDLs',
+  'IncludeQAOutputs'  
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -275,7 +277,8 @@ string8 TimeofApplication            := '' : stored('TimeofApplication');
 string20  Model              := ''    : stored('Model');
 boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to include the 6 fraud indices that come back in fp1109_0
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
-
+// Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
+boolean IncludeQAOutputs             := FALSE : stored('IncludeQAOutputs'); 
 
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
@@ -378,6 +381,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
   self := le;																																								
 end;
 gateways := project(gateways_in, gw_switch(left));
+
+if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 r := record
 	unsigned4 seq;
@@ -2264,6 +2269,57 @@ output(royalties,NAMED('RoyaltySet'));
 
 // always give us back just 1 record, and sort the results by descending account number to keep the result with account number populated
 joined_results := choosen(sort(join(scores, attributes_w_redflags, left.accountnumber = right.accountnumber, full outer), -accountnumber), 1);
+
+
+	
+  QA_dataset := PROJECT(Clam, TRANSFORM(Models.Layout_Fraudpoint_Debug,
+    SELF.shell.account := account_value;
+    SELF.shell.shell_version := bsversion;
+    SELF.shell.did := LEFT.did;
+    SELF.shell.TrueDID := LEFT.TrueDID;
+    SELF.shell.adl_category := LEFT.adlcategory;
+    SELF.shell.LexID_score := LEFT.Name_Verification.adl_score;
+    SELF.shell.fnamepop := LEFT.input_validation.firstname;
+    SELF.shell.lnamepop := LEFT.input_validation.lastname;
+    SELF.shell.addrpop := LEFT.input_validation.address;
+    SELF.shell.hphnpop := LEFT.input_validation.homephone;
+    SELF.shell.ssnlength := LEFT.input_validation.ssn_length;
+    SELF.shell.dobpop := LEFT.input_validation.dateofbirth;
+    SELF.shell.emailpop := LEFT.input_validation.email;
+    SELF.shell.DLpop := TRIM(drlc_value) <> '' AND TRIM(drlcstate_value) <> '';
+    SELF.shell.ipaddrpop := LEFT.input_validation.ipaddress;
+    SELF.shell.ver_sources := LEFT.header_summary.ver_sources;
+    SELF.shell.ver_sources_nas := LEFT.header_summary.ver_sources_nas;
+    SELF.shell.ver_sources_first_seen := LEFT.header_summary.ver_sources_first_seen_date;
+    SELF.shell.ver_sources_last_seen := LEFT.header_summary.ver_sources_last_seen_date;
+    SELF.shell.ver_sources_count := LEFT.header_summary.ver_sources_recordcount;
+    SELF.shell.ver_fname_sources := LEFT.header_summary.ver_fname_sources;
+    SELF.shell.ver_fname_sources_first_seen := LEFT.header_summary.ver_fname_sources_first_seen_date;
+    SELF.shell.ver_fname_sources_count := LEFT.header_summary.ver_fname_sources_recordcount;
+    SELF.shell.ver_lname_sources := LEFT.header_summary.ver_lname_sources;
+    SELF.shell.ver_lname_sources_first_seen := LEFT.header_summary.ver_lname_sources_first_seen_date;
+    SELF.shell.ver_lname_sources_count := LEFT.header_summary.ver_lname_sources_recordcount;
+    SELF.shell.ver_addr_sources := LEFT.header_summary.ver_addr_sources;
+    SELF.shell.ver_addr_sources_first_seen := LEFT.header_summary.ver_addr_sources_first_seen_date;
+    SELF.shell.ver_addr_sources_count := LEFT.header_summary.ver_addr_sources_recordcount;
+    SELF.shell.ver_ssn_sources := LEFT.header_summary.ver_ssn_sources;
+    SELF.shell.ver_ssn_sources_first_seen := LEFT.header_summary.ver_ssn_sources_first_seen_date;
+    SELF.shell.ver_ssn_sources_count := LEFT.header_summary.ver_ssn_sources_recordcount;
+    SELF.shell.ver_dob_sources := LEFT.header_summary.ver_dob_sources;
+    SELF.shell.ver_dob_sources_first_seen := LEFT.header_summary.ver_dob_sources_first_seen_date;
+    SELF.shell.ver_dob_sources_count := LEFT.header_summary.ver_dob_sources_recordcount;
+    SELF.shell.age := LEFT.name_verification.age;
+    SELF.shell.add_input_isbestmatch := LEFT.address_verification.input_address_information.isbestmatch;
+    SELF.shell.add_input_pop := LEFT.addrPop;
+    SELF.shell.add_curr_isbestmatch := LEFT.address_verification.address_history_1.isbestmatch;
+    SELF.shell.add_curr_pop := LEFT.addrPop2;
+    SELF.shell.add_prev_isbestmatch := LEFT.address_verification.address_history_2.isbestmatch;
+    SELF.shell.add_prev_pop := LEFT.addrPop3;
+    SELF.shell.header_build_date := LEFT.header_summary.header_build_date;
+    SELF.shell.historydatetimestamp := LEFT.historydatetimestamp;    
+    ));
+    
+IF(IncludeQAOutputs, OUTPUT(QA_dataset, NAMED('QA_dataset')));
 
 //Log to Deltabase
 Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,

@@ -2,7 +2,8 @@
 	Unsigned seq := 0;
 	Unsigned did := 0;
 	
-	string2 NAP;
+	
+  string2 NAP;
 	string2 NAS;
 	string2 CVI_score;
 	string2 CVI_reason1;
@@ -1282,6 +1283,14 @@ string2 RVC1703_1_0_reason1 := '';
 string2 RVC1703_1_0_reason2 := '';
 string2 RVC1703_1_0_reason3 := '';
 string2 RVC1703_1_0_reason4 := '';
+
+
+String3 RVC1801_1_0_score := '';
+string2 RVC1801_1_0_reason1 := '';
+string2 RVC1801_1_0_reason2 := '';
+string2 RVC1801_1_0_reason3 := '';
+string2 RVC1801_1_0_reason4 := '';
+
 
 String3 RVD1010_0_0_score := '';
 string2 RVD1010_0_0_reason1 := '';

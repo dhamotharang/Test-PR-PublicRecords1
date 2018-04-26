@@ -1,4 +1,4 @@
-
+﻿
 import aca, codes, Business_Header, Business_Header_SS, BankruptcyV3, corp2, 
 		yellowpages, Risk_Indicators, did_add, doxie, ut, riskwise, suppress, 
 		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, ut, gateway, Royalty, MDR, Business_Risk_BIP;
@@ -114,7 +114,6 @@ ciid_results := risk_indicators.InstantID_Function(repIN, gateways, dppa, glb, i
 
 if(exists(ciid_results(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
-//************track Royalties for who uses targus********* /
 royalties4Targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ciid_results), src, TargusType, TRUE, FALSE, FALSE, TRUE);
 
 nugen_rec := record, MAXLENGTH(14000)
@@ -2312,7 +2311,7 @@ end;
 withReasons := project(wFeinMatches, add_reasons(LEFT));
 
 // join the results back to the original input so that every record on input has a response populated
-full_response := join(indata1, withReasons,
+full_response_pre := join(indata1, withReasons,
 						left.company_name=right.company_name and
 						left.alt_company_name=right.alt_company_name and
 						left.phone10=right.phone10 and
@@ -2335,7 +2334,21 @@ full_response := join(indata1, withReasons,
 																self.account := left.account,
 																self := right), keep(1));
 			
-
+//************track Royalties for who uses targus********* /
+full_response := 
+  PROJECT(
+    full_response_pre, 
+    TRANSFORM( layout_output,
+        SELF.royalty_type_code_targus := royalties4Targus[1].royalty_type_code,
+        SELF.royalty_type_targus      := royalties4Targus[1].royalty_type,
+        SELF.royalty_count_targus     := royalties4Targus[1].royalty_count,
+        SELF.non_royalty_count_targus := royalties4Targus[1].non_royalty_count,
+        SELF.count_entity_targus      := royalties4Targus[1].count_entity,
+        SELF := LEFT,
+        SELF := []
+    )
+  );
+  
  // *************************************
   // *   Boca Shell Logging Functionality  *
   // * NOTE: Because of the #stored below  *
@@ -2344,10 +2357,9 @@ full_response := join(indata1, withReasons,
   // **************************************
 	productID := Risk_Reporting.ProductID.Business_Risk__InstantID_Service;
 	
-	intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(bocaShell, productID, IF(IncludeRepAttributes, 3, bsversion));
-	#stored('Intermediate_Log', intermediate_log);
-	//track royalties
-	#stored('Bus_Royalties', royalties4Targus);
+//	intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(bocaShell, productID, IF(IncludeRepAttributes, 3, bsversion));
+//	#stored('Intermediate_Log', intermediate_log);
+
  // ************ End Logging ***********
  
  // output(indata1, named('indata1BIIDFunc'), overwrite);
