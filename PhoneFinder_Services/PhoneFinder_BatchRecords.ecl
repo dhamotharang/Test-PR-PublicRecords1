@@ -74,7 +74,6 @@ MODULE
 
 	//combine results to get phone metadata
  	SHARED dSearchRecs_pre		:= UNGROUP(dPhoneSearchResults + dWaterfallResults);
-	
   dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
 	 PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.BatchInAppendDID L) := TRANSFORM
@@ -119,10 +118,8 @@ MODULE
  dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
-  // output(dSearchResultsUnfiltered, named('dSearchResultsUnfiltered'));
-	// output(dSearchResultsUnfilteredFinal, named('dSearchResultsUnfilteredFinal'));
-	
-	PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
+ 
+ PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
 	DidSearchResults	:=UNGROUP(dSearchResultsUnfilteredFinal(acctno NOT IN SET(dInPhone,acctno)));
 	// Format to batch out layout
 	SHARED dFormat2Batch := IF( EXISTS(dInPhone),
@@ -133,9 +130,8 @@ MODULE
 															PhoneFinder_Services.Functions.FormatResults2Batch( dAppendDIDs(phone = '' and err_search = 0),inMod,
 																																									dinBestInfo,DidSearchResults,FALSE));
  	
- // Royalties	
- dSearchResultsFilter := dSearchRecs_pre(typeflag != Phones.Constants.TypeFlag.DataSource_PV);
-   	
+ // Royalties
+  dSearchResultsFilter := dSearchRecs_pre(typeflag != Phones.Constants.TypeFlag.DataSource_PV);   	
  // Sort and dedup data
  dResultsDIDDedup   := DEDUP(SORT(dSearchResultsFilter(did != 0),acctno,did,phone,-dt_last_seen,RECORD),acctno,did,phone);
  dResultsNoDIDDedup := DEDUP(SORT(dSearchResultsFilter(did = 0),
@@ -153,7 +149,14 @@ MODULE
 																					
  SHARED dResultsDedup_More := dResultsDedup + accu_royalty + Zum_final;	
    	
- SHARED dResultsDedupQSent := dResultsDedup_More + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
+ SHARED dResultsDedupRecs := dResultsDedup_More + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
+ 
+ // filtering out inhouse phonmetadata records
+ SHARED dFilteringInHousePhoneData_typeflag := 	IF(inMod.UseInHousePhoneMetadata, PROJECT(dResultsDedupRecs, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, 
+		                                                            SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
+		                                                            SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
+																																                              0, LEFT.phone_source),
+																																                              SELf := LEFT)), dResultsDedupRecs);	
  
  PhoneFinder_Services.Layouts.PhoneFinder.BatchOut tPopulateRoyalty(PhoneFinder_Services.Layouts.PhoneFinder.BatchOut le,PhoneFinder_Services.Layouts.PhoneFinder.Final ri) :=
  TRANSFORM
@@ -163,8 +166,9 @@ MODULE
    		BOOLEAN vQSentPVSExists   := ri.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
    		BOOLEAN vTargusExists     := ri.vendor_id = MDR.sourceTools.src_Targus_Gateway;
    		BOOLEAN vEquifaxExists    := ri.subj_phone_type_new = MDR.sourceTools.src_EQUIFAX;
-   		BOOLEAN vAccudata_ocnExists    := ri.typeflag = Phones.Constants.TypeFlag.AccuData_OCN; // accudata_ocn royalty
-   		BOOLEAN vZumigoExists    := ri.rec_source = Phones.Constants.GatewayValues.ZumigoIdentity; // accudata_ocn royalty
+   		BOOLEAN vAccudata_ocnExists := ri.typeflag = Phones.Constants.TypeFlag.AccuData_OCN; // accudata_ocn royalty
+   		BOOLEAN vZumigoExists     := ri.rec_source = Phones.Constants.GatewayValues.ZumigoIdentity; // Zumigo royalty
+   		BOOLEAN vATT_LIBDExists   := ri.src = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime; // ATT_LIBD royalty
    		
    		SELF.royalty_type_1 := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_type_1);
    		SELF.royalty_src_1  := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_src_1);
@@ -183,40 +187,40 @@ MODULE
    		SELF.royalty_src_8  := IF(vAccudata_ocnExists,MDR.sourceTools.src_Phones_Accudata_OCN_LNP,le.royalty_src_8); // accudata_ocn royalty
 			SELF.royalty_type_9 := IF(vZumigoExists,Royalty.Constants.RoyaltyType.ZUMIGO_IDENTITY,le.royalty_type_9); 
 			SELF.royalty_src_9  := IF(vZumigoExists,MDR.sourceTools.src_Zumigo_GetLineId,le.royalty_src_9);
+			SELF.royalty_type_10 := IF(vATT_LIBDExists, Royalty.Constants.RoyaltyType.ATT_IAP_DQ_IRS, le.royalty_type_10); 
+			SELF.royalty_src_10  := IF(vATT_LIBDExists, Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime, le.royalty_src_10);
    		SELF                := le;
  END;
    	
- dResultsWithRoyalty := DENORMALIZE( dFormat2Batch,   																			
-																				    dResultsDedupQsent,
-   																			  LEFT.acctno = RIGHT.acctno,
-   																			  tPopulateRoyalty(LEFT,RIGHT));
-  																					
-  //output(dFormat2Batch, named('dFormat2Batch'));																					
-																	
-   	
+ dResultsWithRoyalty := DENORMALIZE(dFormat2Batch, dFilteringInHousePhoneData_typeflag,
+                                     LEFT.acctno = RIGHT.acctno,
+                                     tPopulateRoyalty(LEFT,RIGHT));
+
  BatchShare.MAC_RestoreAcctno(dAppendDIDs,dResultsWithRoyalty,EXPORT dBatchOut);
    	
  // Calculate royalties by acctno
- dRoyaltiesLastResort 	:= Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, phone);
+ dRoyaltiesLastResort 	    := Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, phone);
  dResultsDedupMNR			:= dedup(sort(dResultsDedup, acctno, subj_phone_type_new), acctno, subj_phone_type_new); // to match the counters calculated in the denormalize step above
- dResultsDedupQSentR		:= dedup(sort(dResultsDedupQSent, acctno, vendor_id, typeflag), acctno, vendor_id, typeflag); // to match the counters calculated in the denormalize step above
+ dResultsDedupQSentR		:= dedup(sort(dFilteringInHousePhoneData_typeflag, acctno, vendor_id, typeflag), acctno, vendor_id, typeflag); // to match the counters calculated in the denormalize step above
  dRoyaltiesQSent 			:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupQSentR, vendor_id, typeflag);
  dRoyaltiesTargus 			:= Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, targustype);
  dRoyaltiesEquifax			:= Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, subj_phone_type_new,,,MDR.sourceTools.src_EQUIFAX);
- Accu_OCN_ddp          := dedup(sort(dResultsDedup_More,acctno, typeflag), acctno, typeflag);
- dRoyaltiesAccudata_ocn:= Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
- dRoyaltyZumGetIden := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
-   
+ Accu_OCN_ddp               := dedup(sort(dResultsDedup_More,acctno, typeflag), acctno, typeflag);
+ dRoyaltiesAccudata_ocn     := Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
+ dRoyaltyZumGetIden         := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
+ dRoyalty_ATT_LIDB          := Royalty.RoyaltyATT.GetBatchRoyaltiesByAcctno(dFilteringInHousePhoneData_typeflag, src, phone, acctno);	
+ 
  dRoyaltiesByAcctno := 
    		if(inMod.UseLastResort, dRoyaltiesLastResort) + 
    		if(inMod.UseInHouseQSent or inMod.UseQSent, dRoyaltiesQSent) + 
    		if(inMod.UseTargus, dRoyaltiesTargus) +	
    		if(inMod.UseEquifax, dRoyaltiesEquifax) +	
    		if(inMod.UseAccudata_OCN, dRoyaltiesAccudata_ocn) +	 //accudata_ocn
-   		if(inMod.UseZumigoIdentity, dRoyaltyZumGetIden) +	 //accudata_ocn
+   		if(inMod.UseZumigoIdentity, dRoyaltyZumGetIden) +	 //zumigo
+    	if(inMod.UseInHousePhoneMetadata, dRoyalty_ATT_LIDB) + // ATT_LIBD
    		dataset([], Royalty.Layouts.RoyaltyForBatch);
-   
-  // Create RoyaltySet to be returned
+
+ // Create RoyaltySet to be returned
  EXPORT dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, inMod.DetailedRoyalties);
  
  Zumigo_log_records := DATASET([{Zum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
