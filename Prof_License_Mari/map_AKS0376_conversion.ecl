@@ -1,11 +1,11 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take AK Professional License raw files AND convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI, SCANK, AND PL_BASE development.
 //************************************************************************************************************* */	
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_AKS0376_conversion(STRING pVersion) := FUNCTION
-#workunit('name','Prof License MARI- AKS0376 ' + pVersion);
+#workunit('name','Yogurt:Prof License MARI- AKS0376 ' + pVersion);
 
 src_cd	:= 'S0376';
 bus_name_pattern := '( INC$| INC\\.$| INC\\.;$|,INC$|,INC\\.$|,INC\\.;$| INC\\.,$| INC\\. | INC,|' +
@@ -220,7 +220,7 @@ maribase_plus_dbas	TransformOccToCommon(layout_AKocc_ProfCd L) := TRANSFORM
 	
   TrimDBA			  := ut.CleanSpacesAndUpper(L.DBA);	
   clnNameDBA    := StringLib.StringFindReplace(TrimDBA,'.','');
-  tmpDBA        := stringLib.StringFindReplace(clnNameDBA,' DBA ',' / '); // This will replace all DBA(s) w/ â€˜/â€™
+  tmpDBA        := stringLib.StringFindReplace(clnNameDBA,' DBA ',' / '); // This will replace all DBA(s) w/ Ã¢â‚¬Ëœ/Ã¢â‚¬â„¢
 
   SELF.dba1 := IF(REGEXFIND('^(.*) /(.*)',tmpDBA),REGEXFIND('^(.*) /(.*)',tmpDBA,1),clnNameDBA);         
   SELF.dba2 := REGEXFIND('^(.*) /(.*)',tmpDBA,2);

@@ -1,4 +1,4 @@
-export SpecialNames := MODULE
+﻿export SpecialNames := MODULE
 
 import ut, Data_Services, Std, _Control, Nid;	//, lib_StringLib, _Control, Header;
 
@@ -1311,6 +1311,7 @@ export set of string invalid_segments := [
 'DEMOBORROWER',
 'DFDF',
 'DFGH',
+'DIAL 1',
 'DOB SSN',
 'DONT CONTACT',
 'ELECTRON CARDHOLDER',
@@ -1382,7 +1383,7 @@ export set of string invalid_segments := [
 'NOFIRSTNAME',
 'NOLASTNAME',
 'NONE LISTED',
-'NONEXEMPT',
+//'NONEXEMPT',
 'NONLIST',
 'NONPUB',
 'NUMEROUS AKAS',
@@ -2413,7 +2414,7 @@ export  dsCounty_Names := dsCounty_Names2 +
 									PROJECT(dsCounty_Names2(county_name[1..3]='ST '), TRANSFORM(recordof(dsCounty_Names2),
 											self.county_name := 'SAINT' + left.county_name[3..];
 											self := LEFT;)) +
-									DATASET([{'TX','48','157','FT BEND','H1'}], recordof(dsCounty_Names1));
+									DATASET([{'TX','48','157','FT BEND','H1'}], recordof(dsCounty_Names1)) : GLOBAL(FEW);
 
 												
 /*shared dsCity_Names := DATASET(prefix + 'thor::nid::aux::citynames',{

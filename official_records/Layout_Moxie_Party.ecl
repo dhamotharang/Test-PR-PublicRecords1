@@ -1,4 +1,4 @@
-export Layout_Moxie_Party
+﻿export Layout_Moxie_Party
  :=
   record
 	Official_Records.Layout_In_Party;
