@@ -18,7 +18,7 @@ EXPORT CompromisedDL := MODULE
 
     //This function hashes a last name, ssn, and salt value and checks for a match in a key of hashes.
     //The salt value was provided by Equifax when they sent us the file of the hashes.
-    EXPORT boolean fn_CheckForMatch(string lname, string9 ssn) := FUNCTION
+    EXPORT string128 fn_CheckForMatch(string lname, string9 ssn) := FUNCTION
         cleanedName := cleanName(lname);
         prehash := cleanedName + ssn + salt;
 
@@ -26,8 +26,10 @@ EXPORT CompromisedDL := MODULE
         hashedValue := fn_hashValueSHA512(prehash);
 
         //Check if we have a match on our key. The values are all uppercase in the provided key.
-        RETURN EXISTS(hashKey(lname_ssn_fixedrandom_hash = STD.Str.ToUpperCase(hashedValue)));
+        isMatchFound := EXISTS(hashKey(KEYED(lname_ssn_fixedrandom_hash = STD.Str.ToUpperCase(hashedValue))));
 
+        //Return the hash itself, or a blank string if there is no match.
+        RETURN IF(isMatchFound, STD.Str.ToUpperCase(hashedValue), '');
     END;
 
 END;
