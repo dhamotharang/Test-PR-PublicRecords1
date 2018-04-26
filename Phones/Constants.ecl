@@ -4,8 +4,6 @@ EXPORT Constants :=
 MODULE
 	EXPORT UNSIGNED  MAX_RECORDS := 10000;
 	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2; 
-  // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above 
-	// the line".  The text is derived from decoding the "rules" field by using 
   // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above
 	// the line".  The text is derived from decoding the "rules" field by using
 	// Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap.
@@ -29,7 +27,7 @@ MODULE
 	EXPORT PhoneType := module
 		export Residential := 'Residential';
 		export Business    := 'Business';
-		export Government    := 'Government';
+		export Government  := 'Government';
 	END;
 
 //NewType
@@ -77,10 +75,10 @@ MODULE
 	EXPORT TargusType :=
 	MODULE
 		EXPORT WirelessConnectionSearch 	:= 'W';
-		EXPORT ConfirmConnect 						:= 'C';
-		EXPORT PhoneDataExpress						:= 'P';
-		EXPORT VerifyExpress							:= 'V';
-		EXPORT NameVerification 					:= 'N';	// E3220, used by Riskwise
+		EXPORT ConfirmConnect 				:= 'C';
+		EXPORT PhoneDataExpress				:= 'P';
+		EXPORT VerifyExpress				:= 'V';
+		EXPORT NameVerification 			:= 'N';	// E3220, used by Riskwise
 	END;
 
 	// Phone listing type
@@ -94,7 +92,7 @@ MODULE
 		// COCType
 	EXPORT COCType :=
 	MODULE
-		EXPORT EndofOfficeCode			:= 'EOC';
+		EXPORT EndofOfficeCode		:= 'EOC';
 		EXPORT PublicMobileCarrier  := 'PMC';
 		EXPORT RadioCommonCarrier  	:= 'RCC';
 		EXPORT ServiceProvider1   	:= 'SP1';
@@ -104,22 +102,22 @@ MODULE
 		// Special Service Codes (SSCs)
 	EXPORT SSC :=
 	MODULE
-		EXPORT Intralata 	 			:= 'A'; //Only within Local access and transport area(LATA) - the NXX or thousand blocks assigned
-		EXPORT Paging    				:= 'B';
-		EXPORT Cellular  				:= 'C';
-		EXPORT Pseudo800 				:= 'I';
-		EXPORT Extended  				:= 'J'; //NXX and/or thousands block has an extended/expanded local Calling area
+		EXPORT Intralata 	 	:= 'A'; //Only within Local access and transport area(LATA) - the NXX or thousand blocks assigned
+		EXPORT Paging    		:= 'B';
+		EXPORT Cellular  		:= 'C';
+		EXPORT Pseudo800 		:= 'I';
+		EXPORT Extended  		:= 'J'; //NXX and/or thousands block has an extended/expanded local Calling area
 		EXPORT LocalMassCalling := 'M';
 		EXPORT NotApplicable  	:= 'N'; //No SSC needed eg. POTS,900 Service, Test Code, and 500 Personal Communication Services (PCS)
-		EXPORT Other				  	:= 'O'; //restrictions and/or special services not defined by other SSC
-		EXPORT Radio				  	:= 'R'; //Two-way Conventional Mobile Radio - pre-cellphone technology
-		EXPORT MiscServices			:= 'S'; //Miscellaneous Services - non-500 PCS, Voice Mail, etc.
-		EXPORT Time				  		:= 'T'; //Time of day announcement
-		EXPORT VOIP					  	:= 'V'; //Internet Protocol Voice Enabled Services
-		EXPORT Weather			  	:= 'W'; //Weather announcement
-		EXPORT Exchange			  	:= 'X'; //Local Exchange - LEC IntraLATA special billing option on a LATA-wide basis
+		EXPORT Other			:= 'O'; //restrictions and/or special services not defined by other SSC
+		EXPORT Radio			:= 'R'; //Two-way Conventional Mobile Radio - pre-cellphone technology
+		EXPORT MiscServices		:= 'S'; //Miscellaneous Services - non-500 PCS, Voice Mail, etc.
+		EXPORT Time				:= 'T'; //Time of day announcement
+		EXPORT VOIP				:= 'V'; //Internet Protocol Voice Enabled Services
+		EXPORT Weather			:= 'W'; //Weather announcement
+		EXPORT Exchange			:= 'X'; //Local Exchange - LEC IntraLATA special billing option on a LATA-wide basis
 		EXPORT SelectiveLocal  	:= 'Z'; //LEC IntraLATA special billing option on a SELECTIVE Exchange basis
-		EXPORT PRnUSVI			  	:= '8'; //Puerto Rico and U.S. Virgin Islands
+		EXPORT PRnUSVI			:= '8'; //Puerto Rico and U.S. Virgin Islands
 	END;
 
 	// Phone types
@@ -133,15 +131,16 @@ MODULE
 
 	EXPORT GatewayValues :=
 	MODULE
-	  EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
-	  EXPORT STRING AccuDataCNAM := 'CNM2'; // Retrieve Calling Name for phone number
+		 EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
+	  	EXPORT STRING AccuDataCNAM := 'CNM2'; // Retrieve Calling Name for phone number
 		EXPORT UNSIGNED1 SQLSelectLimit			 	 := 100;  // Limit SQL select for each phone
 		EXPORT UNSIGNED1 requestTimeout			 	 := 5;
 		EXPORT UNSIGNED1 requestRetries			 	 := 0;
-		EXPORT UNSIGNED1 MaxRecords					 	 := 5;
+		EXPORT UNSIGNED1 MaxRecords					 := 5;
 		EXPORT STRING 	 DELTA_ATT_DQ_IRS			 := 'ATT_DQ_IRS';
-		EXPORT STRING 	 QueryType_ATT_DQ_IRS	 := 'DQ_IRS';
+		EXPORT STRING 	 QueryType_ATT_DQ_IRS	 	 := 'DQ_IRS';
 		EXPORT STRING 	 ZumigoIdentity				 := 'Zumigo_GLI';
+		EXPORT STRING 	 ClientIDPrefix				 := 'LEXISNEXIS_';
 		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;
 	END;
 	// Zumigo Input Values
@@ -149,11 +148,14 @@ MODULE
 	MODULE
 		EXPORT STRING OptInType := 'WHITELIST';
 		EXPORT OptInMethod := ['TCO','MA','TCP','IVR','SMS','TCPA','ONE','OTHER'];
+		EXPORT TCPA_OptInMethod := 'TCPA';
 		EXPORT OptInDuration := ['ONE','ONG'];
+		EXPORT ONE_OptInDuration := 'ONE'; 
 	END;
 
 	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
 	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MAX :=100;
+	EXPORT UNSIGNED1 ZumigoMaxValidation := 15;
 	// Debug
 	EXPORT Debug :=
 	MODULE
@@ -170,7 +172,7 @@ MODULE
 	//Phone Ownership (Phone Attributes) and Phone Finder
 	EXPORT PhoneAttributes :=
 	MODULE
-		EXPORT MaxRecsPerPhone 	:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
+		EXPORT MaxRecsPerPhone 		:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
 		EXPORT LastActivityThreshold:= 90; //tolerance threshold for record age
 		EXPORT PORTED_PHONE			:= 'C';
 		EXPORT DISCONNECTED			:= 'D';
@@ -182,7 +184,7 @@ MODULE
 		EXPORT ATT_LIDB_RealTime:=  'PR'; // use to identify ATT gateway records for royalty
 		EXPORT ATT_LIDB_Delta		:=  'PD'; // temporarily used to distinguish deltabase records
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
-		EXPORT set_ATT_LIDB			:=  [ATT_LIDB_SRC,ATT_LIDB_RealTime];
+		EXPORT set_ATT_LIDB			:= [ATT_LIDB_SRC,ATT_LIDB_RealTime];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
 		EXPORT SUSPENDED_CODE		:= 'SU';

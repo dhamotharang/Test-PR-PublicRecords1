@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare,Gateway;
+﻿IMPORT BatchShare,Gateway,Phones;
 
 EXPORT IParam := MODULE
 	
@@ -6,8 +6,8 @@ EXPORT IParam := MODULE
 		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
 			EXPORT BOOLEAN 		return_current								:= TRUE;
 			EXPORT BOOLEAN		include_temp_susp_reactivate 	:= FALSE;
-			EXPORT UNSIGNED		max_lidb_age_days						 	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
-			EXPORT BOOLEAN		use_realtime_lidb				 			:= FALSE;
+			EXPORT UNSIGNED		max_lidb_age_days				:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
+			EXPORT BOOLEAN		use_realtime_lidb				:= FALSE;
 			EXPORT DATASET(Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);
 		END;	
 
@@ -33,6 +33,7 @@ EXPORT IParam := MODULE
 		EXPORT STRING3 	productCode := '';
 		EXPORT STRING8	billingId := '';
 		EXPORT STRING20 productName := '';
+		EXPORT UNSIGNED	NameAddressPairs := Phones.Constants.ZumigoMaxValidation;
 		EXPORT BOOLEAN 	NameAddressValidation := FALSE;
 		EXPORT BOOLEAN	NameAddressInfo := FALSE;
 		EXPORT BOOLEAN	AccountInfo := FALSE;

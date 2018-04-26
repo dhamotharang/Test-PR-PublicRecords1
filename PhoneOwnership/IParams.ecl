@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, Doxie, Gateway, PhoneOwnership, Phones, ut;
+﻿IMPORT BatchShare, Doxie, Gateway, PhoneOwnership, Phones;
 EXPORT IParams := MODULE
 
 		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,Phones.IParam.inZumigoParams)
@@ -19,31 +19,30 @@ EXPORT IParams := MODULE
 			in_mod := MODULE(PROJECT(mBaseParams, BatchParams, OPT))					
 				EXPORT BOOLEAN   contactRiskFlag				:= FALSE 	: STORED('contact_risk_flag');						
 				EXPORT DATASET   (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get(); 
-							 useCaseMask											:= '' : STORED('use_case');
-				EXPORT STRING20  useCase								:= PhoneOwnership.Functions.getUseCase(useCaseMask);
-				EXPORT STRING3   productCode	 					:= '' : STORED('product_code');
-				EXPORT STRING8   billingId 							:= '' : STORED('billing_id');	
-							 STRING    searchLevel						:= '' : STORED('search_level');		
+				STRING useCaseMask								:= '' : STORED('use_case');
+				EXPORT STRING20  useCase						:= PhoneOwnership.Functions.getUseCase(useCaseMask);
+				EXPORT STRING3   productCode	 				:= '' : STORED('product_code');
+				EXPORT STRING8   billingId 						:= '' : STORED('billing_id');	
+				STRING searchLevel								:= '' : STORED('search_level');		
 				EXPORT UNSIGNED1 search_level 					:= PhoneOwnership.Functions.getSearchLevel(searchLevel);																														
 				EXPORT BOOLEAN   returnCurrent					:= TRUE : STORED('return_current');		
-				EXPORT UNSIGNED1 MaxIdentityCount  			:= 1;//  : STORED('MaxIdentityCount');	
-				EXPORT STRING    reverse_phonescore_model := '' : STORED('reverse_phonescore_model');		
-				EXPORT BOOLEAN   useZumigo					  	:= FALSE; //Future development
-				//doxie.DataPermission.use_ZumigoIdentity AND serviceLevel = PhoneOwnership.Constants.SearchLevel.ULTIMATE;					
-				EXPORT BOOLEAN   NameAddressValidation	:= useZumigo;	
+				EXPORT UNSIGNED1 MaxIdentityCount  				:= 1;//  : STORED('MaxIdentityCount');	- Future development
+				EXPORT STRING    reverse_phonescore_model 		:= '' : STORED('reverse_phonescore_model');		
+				EXPORT BOOLEAN   useZumigo					  	:= Doxie.DataPermission.use_ZumigoIdentity AND search_level = PhoneOwnership.Constants.SearchLevel.ULTIMATE;					
+				EXPORT BOOLEAN   NameAddressValidation			:= useZumigo;	
 				EXPORT BOOLEAN   NameAddressInfo				:= FALSE;	
-				EXPORT BOOLEAN   AccountInfo						:= FALSE;	
-				EXPORT BOOLEAN   CarrierInfo						:= FALSE;	
-				EXPORT BOOLEAN   CallHandlingInfo				:= FALSE;// : useZumigo AND serviceLevel = PhoneOwnership.Constants.SearchLevel.ULTIMATE;	
-				EXPORT BOOLEAN   DeviceInfo							:= FALSE;	
+				EXPORT BOOLEAN   AccountInfo					:= FALSE;	
+				EXPORT BOOLEAN   CarrierInfo					:= FALSE;	
+				EXPORT BOOLEAN   CallHandlingInfo				:= FALSE;
+				EXPORT BOOLEAN   DeviceInfo						:= FALSE;	
 				EXPORT BOOLEAN   DeviceHistory					:= FALSE;
-				EXPORT STRING10  OptInType 							:= ''; //IF(useZumigo AND serviceLevel = PhoneOwnership.Constants.SearchLevel.ULTIMATE,Phones.Constants.ZumigoInputOptions.OptInType,'');	
-				EXPORT STRING5   OptInMethod 						:= ''; //IF(useZumigo AND serviceLevel = PhoneOwnership.Constants.SearchLevel.ULTIMATE,Phones.Constants.ZumigoInputOptions.OptInMethod[6],'');		
-				EXPORT STRING3   OptinDuration 					:= ''; //IF(useZumigo AND serviceLevel = PhoneOwnership.Constants.SearchLevel.ULTIMATE,Phones.Constants.ZumigoInputOptions.OptinDuration[1],'');	;	
-				EXPORT STRING    OptinId 								:= ''; //'1';	
+				EXPORT STRING10  OptInType 						:= IF(useZumigo,Phones.Constants.ZumigoInputOptions.OptInType,'');	
+				EXPORT STRING5   OptInMethod 					:= IF(useZumigo,Phones.Constants.ZumigoInputOptions.TCPA_OptInMethod,'');		
+				EXPORT STRING3   OptinDuration 					:= IF(useZumigo,Phones.Constants.ZumigoInputOptions.ONE_OptinDuration,'');	;	
+				EXPORT STRING    OptinId 						:= '1';	
 				EXPORT STRING    OptInVersionId 				:= '';	
 				EXPORT STRING15  OptInTimestamp 				:= '';	
-				EXPORT BOOLEAN   useAccudataCNAM		  	:= ~Doxie.DataRestriction.AccuData AND search_level <> PhoneOwnership.Constants.SearchLevel.BASIC;	// this includes Ultimate when added later
+				EXPORT BOOLEAN   useAccudataCNAM		  		:= ~Doxie.DataRestriction.AccuData AND search_level <> PhoneOwnership.Constants.SearchLevel.BASIC;	// this includes Ultimate
 				EXPORT BOOLEAN   useRealTimeLIDB				:= ~Doxie.DataRestriction.ATT_LIDB;				
 			END;
 			

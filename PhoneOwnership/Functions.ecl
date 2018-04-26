@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_batch,BatchServices,DeathV2_Services,Doxie,Doxie_crs,Doxie_Raw,PhoneOwnership,Phones,Relationship,STD,ut;
+﻿IMPORT Doxie,PhoneOwnership,Phones,STD,ut;
 EXPORT Functions := MODULE
 
 	SHARED today := STD.Date.Today();
@@ -6,7 +6,7 @@ EXPORT Functions := MODULE
 	RETURN CASE(ut.CleanSpacesAndUpper(searchLevel),
 							'BASIC'    => PhoneOwnership.Constants.SearchLevel.BASIC,
 							'PREMIUM'  => PhoneOwnership.Constants.SearchLevel.PREMIUM,
-							// 'ULTIMATE' => Phones.PhoneOwnership_Constants.SearchLevel.ULTIMATE, //future development
+							'ULTIMATE' => PhoneOwnership.Constants.SearchLevel.ULTIMATE,
 							PhoneOwnership.Constants.SearchLevel.BASIC);		
 	END;
 	EXPORT getUseCase(STRING useCaseMask) := FUNCTION
@@ -20,14 +20,24 @@ EXPORT Functions := MODULE
 	
 	EXPORT STRING getOwnershipValue(UNSIGNED ownershipIndex) := FUNCTION
 		RETURN CASE(ownershipIndex,
-								5 => 'HIGH', //PhoneOwnership.Constants.Ownership.HIGH,
-								4 => 'MEDIUM_HIGH', //PhoneOwnership.Constants.Ownership.MEDIUM_HIGH,
-								3 => 'MEDIUM', //PhoneOwnership.Constants.Ownership.MEDIUM,
-								2 => 'UNDETERMINED', //PhoneOwnership.Constants.Ownership.UNDETERMINED,
-								1 => 'LOW', //PhoneOwnership.Constants.Ownership.LOW,
-								0 => 'INVALID', //PhoneOwnership.Constants.Ownership.INVALID,
-								'UNDETERMINED'); //PhoneOwnership.Constants.Ownership.UNDETERMINED));													
+								5 => 'High', //PhoneOwnership.Constants.Ownership.HIGH,
+								4 => 'Medium High', //PhoneOwnership.Constants.Ownership.MEDIUM_HIGH,
+								3 => 'Medium', //PhoneOwnership.Constants.Ownership.MEDIUM,
+								2 => 'Undetermined', //PhoneOwnership.Constants.Ownership.UNDETERMINED,
+								1 => 'Low', //PhoneOwnership.Constants.Ownership.LOW,
+								0 => 'Invalid', //PhoneOwnership.Constants.Ownership.INVALID,
+								'Undetermined'); //PhoneOwnership.Constants.Ownership.UNDETERMINED));													
 	END;		
+	EXPORT STRING getRelationship(UNSIGNED ownershipIndex) := FUNCTION
+		RETURN CASE(ownershipIndex,
+								5 => PhoneOwnership.Constants.Relationship.SUBJECT,
+								//4 => specific relations husband, wife, mother, father ...
+								3 => PhoneOwnership.Constants.Relationship.RELATIVE,
+								2 => PhoneOwnership.Constants.Relationship.NO_IDENTITY,
+								1 => PhoneOwnership.Constants.Relationship.NONE,
+								0 => PhoneOwnership.Constants.Relationship.INVALID,
+								PhoneOwnership.Constants.Relationship.NO_IDENTITY);
+	END;	
 	
 	EXPORT fuzzyString(STRING str) := FUNCTION
 		RETURN STD.Metaphone.Primary(str);
@@ -41,13 +51,34 @@ EXPORT Functions := MODULE
 								(InputLName != '' AND fuzzyString(InputLName) = fuzzyString(ResultLName)) => PhoneOwnership.Constants.NameMatch.PARTIAL,
 								PhoneOwnership.Constants.NameMatch.NONE);	
 	END;
+
+	EXPORT checkOwnership(STRING subjectFName, STRING subjectLName,STRING resultFName, STRING resultLName,STRING LNMatchCode,STRING relationship) := FUNCTION
+		ownershipLevel := MAP(
+			// Matched Subject by First and Last names
+			EvaluateNameMatch(subjectFName,subjectLName,resultFName,resultLName)=PhoneOwnership.Constants.NameMatch.FIRSTLAST 
+																					=> PhoneOwnership.Constants.Ownership.enumIndex.HIGH,
+			// Matched Subject by Firstname  >=3 characters
+			relationship = PhoneOwnership.Constants.Relationship.NONE AND LENGTH(subjectFName)>=3 AND LENGTH(resultFName)>=3 AND 
+							fuzzyString(subjectFName) = fuzzyString(resultFName) 	=> PhoneOwnership.Constants.Ownership.enumIndex.HIGH,
+			// Matched Subject by first initial and last name
+			relationship = PhoneOwnership.Constants.Relationship.NONE AND subjectFName[1] = resultFName[1] AND 
+							fuzzyString(subjectLName) = fuzzyString(resultLName) 	=> PhoneOwnership.Constants.Ownership.enumIndex.HIGH,
+			// Matched Relative by lastname ONLY
+			relationship = PhoneOwnership.Constants.Relationship.NONE AND fuzzyString(subjectFName) != fuzzyString(resultFName) AND 
+							fuzzyString(subjectLName) = fuzzyString(resultLName) 	=> PhoneOwnership.Constants.Ownership.enumIndex.MEDIUM,
+			PhoneOwnership.Constants.Ownership.enumIndex.LOW
+		);
+
+		RETURN ownershipLevel;
+	END;	
 	
 	EXPORT getReasonCodes(BOOLEAN subject, BOOLEAN noOwner, BOOLEAN disconnected) := FUNCTION
-		subjectReason := IF(subject,PhoneOwnership.Constants.Reason_Codes.MATCH,PhoneOwnership.Constants.Reason_Codes.NO_MATCH);
+		subjectReason := IF(subject,PhoneOwnership.Constants.Reason_Codes.MATCH,'');
+		unlinkedReason := IF(NOT subject AND NOT noOwner,PhoneOwnership.Constants.Reason_Codes.NO_MATCH,'');
 		noOwnerReason := IF(noOwner,PhoneOwnership.Constants.Reason_Codes.NO_IDENTITY,'');
 		disconnectedReason := IF(disconnected,PhoneOwnership.Constants.Reason_Codes.DISCONNECTED,'');
 		
-		reason := subjectReason + noOwnerReason + disconnectedReason;
+		reason := subjectReason + unlinkedReason + noOwnerReason + disconnectedReason;
 		
 		RETURN STD.STr.RemoveSuffix(reason,',');
 	
@@ -99,6 +130,6 @@ EXPORT Functions := MODULE
 		// OUTPUT(dsSortedHeaderRecs,NAMED('dsSortedHeaderRecs'));
 		// OUTPUT(dsAlternateName,NAMED('dsAlternateName'));
 		RETURN dBestInfo + dsAlternateName;
-	END;
+	END;	
 	
 END;

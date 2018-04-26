@@ -1,28 +1,39 @@
 ﻿/*--SOAP--
 <message name="PhoneOwnership_BatchService">
 	<part name="batch_in"              					type="tns:XmlDataSet" cols="70" rows="25"/>
-	<part name="DataPermissionMask" 						type="xsd:string"/>
-	<part name="DataRestrictionMask" 						type="xsd:string"/>
-	<part name="DPPAPurpose"				 						type="xsd:string"/>
-	<part name="GLBPurpose"				 							type="xsd:string"/>
-	<part name="IndustryClass" 									type="xsd:string"/>
-	<part name="UseCase"												type="xsd:string"/>
-	<part name="ProductCode"										type="xsd:string"/>
-	<part name="BillingID" 											type="xsd:string"/>
-	<part name="search_level"										type="xsd:unsignedInt"/>
-	<part name="return_current"									type="xsd:boolean"/>
-	<part name="MaxIdentityCount"								type="xsd:unsignedInt"/>
-	<part name="contact_risk_flag"							type="xsd:boolean"/>
+	<part name="DataPermissionMask" 					type="xsd:string"/>
+	<part name="DataRestrictionMask" 					type="xsd:string"/>
+	<part name="DPPAPurpose"				 			type="xsd:string"/>
+	<part name="GLBPurpose"				 				type="xsd:string"/>
+	<part name="IndustryClass" 							type="xsd:string"/>
+	<part name="UseCase"								type="xsd:string"/>
+	<part name="ProductCode"							type="xsd:string"/>
+	<part name="BillingID" 								type="xsd:string"/>
+	<part name="search_level"							type="xsd:unsignedInt"/>
+	<part name="return_current"							type="xsd:boolean"/>
+	<part name="MaxIdentityCount"						type="xsd:unsignedInt"/>
+	<part name="contact_risk_flag"						type="xsd:boolean"/>
 	<part name="reverse_phonescore_model"				type="xsd:string"/>
 	<part name="ReturnDetailedRoyalties" 				type="xsd:boolean"/>	
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 </message>
 */
-/*--INFO-- This service returns likely ownership for phone based on CallerID and/or Relative/Employer/Business Associations.
+/*--INFO-- 
+This service returns likely ownership for phone based on CallerID and/or Relative/Employer/Business Associations.
+The minimum required input is firstname, lastname, and phone with 10 digits.
+The service has three flavors:-
+ ULTIMATE: validates relatives, employers, associates, and businesses (REAB) data with Carriers\Zumigo
+ PREMIUM : get callerID data from Accudata
+ BASIC	 : gets phone info from gong, phonesplus, and Bip contacts
+
+ The service outputs 3 datasets:-
+ Results
+ Royalties
+ Zumigo Results
 */
 
-IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,STD,Royalty,ut,WSInput;
+IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,STD,Royalty,WSInput;
 
 EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') := 
 	MACRO
@@ -47,13 +58,15 @@ EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') :=
 		dBatchPhonesOut := PhoneOwnership.BatchRecords(batch_in_wErr(err_search=0), batch_params);
 		BatchShare.MAC_RestoreAcctno(batch_in_wErr, dBatchPhonesOut.Results,Results,TRUE,TRUE);	
 		BatchShare.MAC_RestoreAcctno(batch_in_wErr, dBatchPhonesOut.Royalties,Royalties,TRUE,FALSE);	
+		BatchShare.MAC_RestoreAcctno(batch_in_wErr, dBatchPhonesOut.ZumigoResults,ZumigoResults,TRUE,FALSE);	
 		dBatchResults := SORT(Results, acctno);
 		dBatchRoyalties := SORT(Royalties, acctno);
+		dBatchZumigoResults := SORT(ZumigoResults, acctno);
 		
 		RoyaltySet := Royalty.GetBatchRoyalties(dBatchRoyalties, batch_params.ReturnDetailedRoyalties);		
 			
 		OUTPUT(dBatchResults,  NAMED('Results') );		
 		OUTPUT(RoyaltySet,  NAMED('RoyaltySet') );		
-		OUTPUT(DATASET([],Phones.Layouts.ZumigoIdentity.zOut),NAMED('LOG_delta__phonefinder_delta__phones__gateway'));
+		OUTPUT(dBatchZumigoResults(source = Phones.Constants.GatewayValues.ZumigoIdentity),NAMED('LOG_delta__phonefinder_delta__phones__gateway'));
 				
 	ENDMACRO;	
