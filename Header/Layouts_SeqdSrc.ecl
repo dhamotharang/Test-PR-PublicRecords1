@@ -1,4 +1,4 @@
-/*2016-09-22T21:31:07Z (Wendy Ma)
+﻿/*2016-09-22T21:31:07Z (Wendy Ma)
 
 */
 import
@@ -22,6 +22,7 @@ import
 			,LiensV2
 			,ln_propertyv2
 			,american_student_list
+            ,OKC_Student_List
 			,votersv2
 			,certegy
 			,ExperianCred
@@ -67,6 +68,7 @@ EXPORT Layouts_SeqdSrc := module
 	EXPORT DEA_src_rec:={lsrc, DEA.layout_DEA_In};
 	EXPORT WP_src_rec:={lsrc, targus.layout_consumer_out};
 	EXPORT SL_src_rec:={lsrc, american_student_list.layout_american_student_base};
+	EXPORT S1_src_rec:={lsrc, OKC_Student_List.Layout_Base.base};
 	EXPORT VO_src_rec:={lsrc, VotersV2.Layouts_Voters.Layout_Voters_Base};
 	EXPORT CY_src_rec:={lsrc, Certegy.layouts.base};
 	EXPORT ND_src_rec:={lsrc, Property.Layout_Fares_Foreclosure};

@@ -1,0 +1,40 @@
+﻿/*
+	Special Trust processing
+	
+*/
+import STD;
+EXPORT Trusts := MODULE
+
+export set of string TrustWords := ['AGREEMENT','ANNUITY','ANTI',
+	'ASSIGNEE','AWARD','BANKERS','BENEFIT','BLIND','BOAT','BOOK','BYPASS','CAPITAL',
+	'CHARITY','CHARITABLE','CHILDREN','CHILDRENS','CIVIC','CREDIT',
+	'DECD','DECEDENTS','DEDUCTION','DESCENDANTS','DEV','DEVELOPMENT','DISCLAIMED','DISCRETIONARY','DR',
+	'ENDOWMENT','ESTATE','EXCHANGE','EXEMPT','EXEMPTION',
+	'FAM','FMLY','FAMILY','FAMILYE','FARM','GENERAL','GENERATIONAL','GRANDCHILDREN','GRANDCHILDRENS','GRANTOR','GRANTORS',
+	'HERITAGE','HOLDING','HOLDINGS','HOMESTEAD','HOUSING',
+	'IN','INCOME','INDENTURE','INHERITANCE','INTER VIVOS','INTERVIVOS','INVESTMENT','INVSTM','IRREV','IRREVOCABL',
+	'IRREVOCABLE','IV','JD', 'JOINT','LAND','LEASE','LEGACY','LIFE','LIFETIME',
+	'LIV','LIVING','LIVG','LIVN','LVG','LVNG','LOAN','LOVING','MARITAL','MASTER','MD','MS',
+	'NEEDS','NONEXEMPT','PENSION','PROPERTY','PROTECTION','PROTECTIVE','PROXY','QUALIFIED','REMAINDER',
+	'RE','RESIDENCE','RESIDUARY','RESTATED','REV','REVOC','REVOCABLE','REVOCABL','RVC','RVCBLE','REVOCALBE','SECOND',
+	'STATUTORY','SUCCESSOR','SUCC','SUPPLEMENTAL','SURVIVING','SURVIVOR','SURVIVORS','TESTAMENTARY','TESTAMENTORY','THIRD','TRUST','VIVOS','VOLUNTARY',
+	// common geo terms
+	'AVE','AVENUE','CIRCLE','RD', 'ROAD', 'ST', 'STREET','WAY'
+	];
+
+export set of string BusTrustWords := ['BANKERS','HOLDING','LAND','NATIONAL', 'INVESTMENT'];
+
+KnownTrusts := [
+'KHI POST-CONSUMMATION TRUST',                                                     
+'LEHMAN BROTHERS TRUST',                                                           
+'MORGAN STANLEY TRUST',
+'MERRYL LYNCH TRUST',
+'PROTIUM MASTER GRANTOR TRUST',                                                    
+'PROTIUM MASTER GRANTOR TRUST,',                                                    
+'SABINE ROYALTY TRUST',                                                            
+'USA IN TRUST-QUINAULT NATION'                                                    
+];
+
+export IsKnownTrust(string s) := s in KnownTrusts OR Std.Str.StartsWith(s, 'USA IN TRUST');
+
+END;

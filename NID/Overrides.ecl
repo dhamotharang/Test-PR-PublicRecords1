@@ -1,4 +1,4 @@
-
+﻿
 layout_Override := RECORD
 			string1					nametype;
 			string75				name := '';
@@ -38,5 +38,5 @@ EXPORT Overrides(boolean fullname=true) := DISTRIBUTE(PROJECT(OverrideData, TRAN
 											self.name := IF(left.name<>'', left.name,
 																	Nid.ReconstructName(left.fname,left.mname,left.lname, left.suffix));
 											self := LEFT;
-											self.derivation := 98;		// overridden name
-											self := [])), nid);
+											self.derivation := 98;		// overridden name for sorting
+											self := [])), nid) : GLOBAL(FEW);
