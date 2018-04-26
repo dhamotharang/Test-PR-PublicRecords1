@@ -13,7 +13,6 @@ Layout_outfile  getRaceEthnicity(Layout_outfile L, codes.File_Codes_V3_In R) := 
 	self          := L;
 end;
 
-//Clean_file_Race_Exp := join(Cleaned_Norm_vbase,
 Clean_file_Race_Exp := join(CleanedNormVbaseAndBase,
 		                    codes.File_Codes_V3_In(trim(file_name, left, right) = 'EMERGES_HVC',trim(field_name, left, right) = 'RACEETHNICITY'),
 		                    trim(left.race, left, right) = trim(right.code, left, right),
@@ -127,5 +126,4 @@ end;
 
 Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs(left,right),local);						  
 
-//export Transulate_Voters_Codes := ds_Clean_file_Voter_Status_exp: persist(VotersV2.Cluster+ 'persisit::Cleaned_Voter_base');
 export Transulate_Voters_Codes := Clean_patched_vtid_dob_file: persist(VotersV2.Cluster+ 'persisit::Cleaned_Voter_base');
