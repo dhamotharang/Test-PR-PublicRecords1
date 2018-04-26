@@ -120,6 +120,7 @@ export Search_Service := MACRO
 	string intended_purpose := trim(option.IntendedPurpose);
 	string	AttributesVersionRequest := trim(option.AttributesVersionRequest);
 	string prescreen_score_threshold := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='prescreen_score_threshold')[1].OptionValue;
+	boolean exception_score_reason := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='exception_score_reason')[1].OptionValue='1'; // T-Mobile option only - default to false
 	boolean isCalifornia_in_person := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(OptionName)='inpersonapplicant')[1].OptionValue='1';  // defaults to false unless there is an option passed in to turn it on
 	boolean run_riskview_report := option.IncludeReport;
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
@@ -305,7 +306,8 @@ input_ok := if((
 		IncludeRecordsWithSSN,
 		IncludeBureauRecs,
 		IncludeLnJ,
-		RetainInputDID
+		RetainInputDID,
+		exception_score_reason
 
 		) 
 	);

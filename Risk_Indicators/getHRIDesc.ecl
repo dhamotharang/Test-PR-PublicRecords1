@@ -452,6 +452,9 @@ export getHRIDesc(string5 rc) := CASE(TRIM(rc),
 'P88' => 'Distance from address to phone listing address is too far',
 'P89' => 'Too many identities associated with phone number',
 'P90' => 'Input phone is not a residential land-line',
+'Z97' => 'Unable to return a valid score as no information is on file for the identity',
+'Z98' => 'Unable to return a valid score as the identity is deceased',
+'Z99' => 'Unable to return a valid score for the identity due to consumer-initiated activity',
 
 // custom reason codes for GreenDot
 'D1' => 'Distance from Input Address to Retail Address over 100 Miles',

@@ -66,6 +66,7 @@ BOOLEAN ExcludeFederalTaxLiens := FALSE;
 BOOLEAN ExcludeOtherLiens := FALSE;
 BOOLEAN ExcludeJudgments := FALSE;
 BOOLEAN ExcludeEvictions := FALSE;
+BOOLEAN exception_score_reason := FALSE;
 
 inlayout := RECORD
   unsigned4 seq;
@@ -272,6 +273,7 @@ Search_Results := riskview.Search_Function(valid_inputs,
 	IncludeBureauRecs,
 	IncludeLnJ,
 	RetainInputDID,
+  exception_score_reason,
 	onThor
 	);
 
