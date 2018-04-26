@@ -1,4 +1,4 @@
-﻿IMPORT DidVille,Drivers,MDR,Phonesplus_v2,STD,ut;
+﻿IMPORT BIPV2_Company_Names,DidVille,Drivers,MDR,Phones,Phonesplus_v2,STD,ut;
 
 EXPORT Functions :=
 MODULE
@@ -408,24 +408,36 @@ MODULE
 		1 => Phones.Constants.PhoneServiceType.Wireless,
 		2 => Phones.Constants.PhoneServiceType.VoIP,
 		Phones.Constants.PhoneServiceType.Other);
+
 	EXPORT GetDIDs(DATASET(DidVille.Layout_Did_OutBatch) dBatchIn, STRING32 ApplicationType='',UNSIGNED1 GLBPurpose,UNSIGNED1 DPPAPurpose) := FUNCTION
 
 		dDIDsbyAcctno	:= didville.did_service_common_function(dBatchIn,appType := ApplicationType,glb_purpose_value:=GLBPurpose,dppa_purpose_value:=DPPAPurpose);
 
 		dBatchInwDID	:= JOIN(dBatchIn, dDIDsbyAcctno,
-																							LEFT.seq = RIGHT.seq,
-																							TRANSFORM(DidVille.Layout_Did_OutBatch,
-																								SELF.did		:= RIGHT.did,
-																								SELF						:= LEFT,
-																								SELF:=[]),
-																							LEFT OUTER,ALL);
+								LEFT.seq = RIGHT.seq,
+								TRANSFORM(DidVille.Layout_Did_OutBatch,
+									SELF.did		:= RIGHT.did,
+									SELF			:= LEFT,
+									SELF:=[]),
+								LEFT OUTER,ALL);
 		RETURN dBatchInwDID;
 	END;
 
 	//Taken from PhonesInfo._Functions. Spoke with Ricardo about this, decided it's best to seperate it to avoid :PERSIST
 	EXPORT STRING StandardName(string name):= FUNCTION
 		stdName := STD.Str.Filter(STD.Str.ToUpperCase(XMLDECODE(trim(name, left, right))), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-	return stdName;
-END;
+		return stdName;
+	END;
+	EXPORT BOOLEAN isPassZumigo(UNSIGNED zumigoScore):= FUNCTION
+		RETURN	zumigoScore BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
+	END;
+	EXPORT BOOLEAN isValidZumigo(UNSIGNED zumigoScore):= FUNCTION
+		RETURN	zumigoScore BETWEEN 0 AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
+	END;	
+	EXPORT GetCleanCompanyName(STRING inputCompanyName) := FUNCTION
+		dInputPrep:=DATASET([{1,inputCompanyName}],{UNSIGNED rid; STRING company_name;});
+		BIPV2_Company_Names.functions.mac_go(dInputPrep,dsCleanCompanyName,rid,company_name);
+		RETURN dsCleanCompanyName[1].cnp_name; 
+	END;			
 
 END;

@@ -2,6 +2,9 @@
 	EXPORT SearchLevel := ENUM(BASIC = 0,PREMIUM = 1,ULTIMATE = 2); 
 	EXPORT STRING LIDB := 'LIDB;'; 
 	EXPORT STRING CNAM := 'CNAM;'; 
+	EXPORT STRING CARRIER := 'Carrier;'; 
+	EXPORT STRING ATTPhone := 'AT&T'; 
+	EXPORT STRING Delimiter := '; ';
 	EXPORT LNMatch := MODULE
 		EXPORT STRING1 INVALID := 'I'; //created for internal use - to consistently use a single character - will be outputted as INV
 		EXPORT STRING1 NONE := 'O';    //created for internal use - to consistently use a single character - will be outputted as NON
@@ -19,12 +22,6 @@
 	END;	
 	
 	EXPORT UseCaseValues := ['OTPCFD','IdentityFraud','TCPA','GeoLocation'];
-		EXPORT STRING INVALID := 'Invalid';
-		EXPORT STRING LOW := 'Low';
-		EXPORT STRING UNDETERMINED := 'Undetermined';		
-		EXPORT STRING MEDIUM := 'Medium';
-		EXPORT STRING MEDIUM_HIGH := 'Medium High';
-		EXPORT STRING HIGH := 'High';	
 	EXPORT Ownership := MODULE
 		EXPORT STRING INVALID := 'Invalid';
 		EXPORT STRING LOW := 'Low';
@@ -41,10 +38,11 @@
 	END;
 	EXPORT Relationship := MODULE
 		EXPORT STRING EMPLOYER := 'Possible Employer';
-		EXPORT STRING BUSINESS := 'Possible Business Affliation';
+		EXPORT STRING BUSINESS := 'Possible Business Affiliation';
 		EXPORT STRING SUBJECT  := 'Possible Subject';
 		EXPORT STRING RELATIVE := 'Possible Relative';
-		EXPORT STRING NONE 		 := 'No Relationship Found';
+		EXPORT STRING ROOMMATE := 'Possible Roommate';		
+		EXPORT STRING NONE 	   := 'No Relationship Found';
 		EXPORT STRING NO_IDENTITY := 'Owner Identity Unavailable ';
 		EXPORT STRING INVALID  := 'Number Invalid';
 	END;	
@@ -73,6 +71,9 @@
 	MODULE
 		EXPORT Main := FALSE; 
 		EXPORT REAB := FALSE;
+		EXPORT LNPhones := FALSE;
+		EXPORT AccuDataCNAM := FALSE;
+		EXPORT Zumigo := FALSE;
 	END;
 
 END;

@@ -18,23 +18,24 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF.Options.Blind 			 := Gateway.Configuration.GetBlindOption(gateway_cfg);
 		SELF.Options.ProductName := If(Gateway.Configuration.GetRoxieQueryName(gateway_cfg)='',inMod.ProductName,
 																																													Gateway.Configuration.GetRoxieQueryName(gateway_cfg));	
-		SELF.Options.ClientId:=IF(inMod.useCase='' AND inMod.productCode='' AND inMod.billingId='' AND Phones.Constants.Debug.Testing, 
-																					Phones.Constants.Debug.InternalTestClientID,'LEXISNEXIS_'+trim(inMod.useCase)+'_'+trim(inMod.productCode)+inMod.billingId);
-		SELF.Options.NameAddressValidation	:= inMod.NameAddressValidation;
-		SELF.Options.NameAddressInfo				:= FALSE;//inMod.NameAddressInfo; //will not be used until later.
-		SELF.Options.AccountInfo						:= FALSE;//inMod.AccountInfo;
-		SELF.Options.CarrierInfo						:= FALSE;//inMod.CarrierInfo;
-		SELF.Options.CallHandlingInfo				:= inMod.CallHandlingInfo;
-		SELF.Options.DeviceInfo							:= FALSE;//inMod.DeviceInfo;
-		SELF.Options.DeviceHistory					:= FALSE;//inMod.DeviceHistory;
-		SELF.SearchBy.Consent.OptInType			:= STD.Str.ToLowerCase(inMod.OptInType);//inMod.OptInType; 
-		SELF.SearchBy.Consent.OptInMethod		:= STD.Str.ToUpperCase(inMod.OptInMethod);//inMod.OptInMethod; 
+		SELF.Options.ClientId:=IF(Phones.Constants.Debug.Testing, Phones.Constants.Debug.InternalTestClientID,
+																  Phones.Constants.GatewayValues.ClientIDPrefix+trim(inMod.useCase)+'_'+trim(inMod.productCode)+inMod.billingId);
+		//Note that Zumigo does not permit NameAddressInfo without NameAddressValidation
+		SELF.Options.NameAddressValidation	:= inMod.NameAddressValidation OR inMod.NameAddressInfo;
+		SELF.Options.NameAddressInfo		:= inMod.NameAddressInfo;
+		SELF.Options.AccountInfo			:= inMod.AccountInfo;
+		SELF.Options.CarrierInfo			:= inMod.CarrierInfo;
+		SELF.Options.CallHandlingInfo		:= inMod.CallHandlingInfo;
+		SELF.Options.DeviceInfo				:= inMod.DeviceInfo;
+		SELF.Options.DeviceHistory			:= inMod.DeviceHistory;
+		SELF.SearchBy.Consent.OptInType		:= STD.Str.ToLowerCase(inMod.OptInType);
+		SELF.SearchBy.Consent.OptInMethod	:= STD.Str.ToUpperCase(inMod.OptInMethod);
 		SELF.SearchBy.Consent.OptInDuration	:= STD.Str.ToUpperCase(inMod.OptInDuration);//IF(notTCPA,inMod.OptInDuration,'');		//inMod.OptInDuration;		
-		SELF.SearchBy.Consent.OptinId				:= inMod.OptInId;				
+		SELF.SearchBy.Consent.OptinId		:= inMod.OptInId;				
 		SELF.SearchBy.Consent.OptInVersionId:= inMod.OptInVersionId;				
 		SELF.SearchBy.Consent.OptInTimestamp:= iesp.ECL2ESP.toTimeStamp(inMod.OptInTimestamp);//iesp.ECL2ESP.toTimeStamp(IF(notTCPA,inMod.OptInTimestamp,''));
-		SELF.SearchBy.MobileDeviceNumber		:= '1' + l.MobileDeviceNumber;
-		SELF.SearchBy.NameAddrValidation		:= l.NameAddrValidation;
+		SELF.SearchBy.MobileDeviceNumber	:= '1' + l.MobileDeviceNumber;
+		SELF.SearchBy.NameAddrValidation	:= l.NameAddrValidation;
 		SELF := l;
 		SELF := [];
 	END;
@@ -45,7 +46,6 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF.response.LineIdentityResponse.MobileDeviceNumber := '1' + l.MobileDeviceNumber;
 		SELF := [];
 	END;
-
 	outf := IF(pMakeGatewayCall AND  gateway_cfg.url <> '',
 								SOAPCALL(inf, 
 									gateway_cfg.url,

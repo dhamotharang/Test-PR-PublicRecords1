@@ -1,4 +1,4 @@
-﻿IMPORT Batchshare,Doxie,Royalty;
+﻿IMPORT Batchshare,Doxie,Phones,Royalty;
 EXPORT Layouts := MODULE
 
 	EXPORT BatchIn := RECORD
@@ -41,6 +41,11 @@ EXPORT Layouts := MODULE
 		STRING		subj2own_relationship;
 		BatchIn - acctno batch_in;
 	END;	
+
+	EXPORT CompanyNames := RECORD
+		UNSIGNED rid;
+		STRING company_name;
+	END;
 	
 	EXPORT Phone_Relationship := RECORD
 		PhonesCommon;
@@ -50,19 +55,26 @@ EXPORT Layouts := MODULE
 	END;	
 
 	EXPORT BatchOut := RECORD
-		STRING20 acctno;
-		UNSIGNED seq;
-		STRING20 AppendedDID;
-		STRING20 AppendedFirstName;
-		STRING20 AppendedMiddleName;
-		STRING20 AppendedSurname;
-		BOOLEAN		validatedName;	//internal - to identify gateway confirmation.	
-		STRING10 phone;
-		STRING120	AppendedCompanyName;
-		STRING120	AppendedListingName;
-		STRING10	AppendedStreetNumber;
-		STRING2  AppendedPreDirectional;
-		STRING28 AppendedStreetName;
+		STRING20 	acctno;
+		UNSIGNED 	seq;
+		STRING20 	AppendedDID;
+		STRING20 	AppendedFirstName;
+		STRING20 	AppendedMiddleName;
+		STRING20 	AppendedSurname;
+		BOOLEAN	 	validatedRecord;	//internal - to identify gateway confirmation.	
+		STRING10 	phone;
+		STRING120 	AppendedCompanyName;
+		UNSIGNED6 	DotID;
+		UNSIGNED6 	EmpID;
+		UNSIGNED6 	POWID;
+		UNSIGNED6 	ProxID;
+		UNSIGNED6 	SELEID;  
+		UNSIGNED6 	OrgID;
+		UNSIGNED6 	UltID;		
+		STRING120 	AppendedListingName;
+		STRING10 	AppendedStreetNumber;
+		STRING2  	AppendedPreDirectional;
+		STRING28 	AppendedStreetName;
 		STRING4		AppendedStreetSuffix;
 		STRING2		AppendedPostDirectional;
 		STRING10	AppendedUnitDesignator;
@@ -76,11 +88,12 @@ EXPORT Layouts := MODULE
 		STRING15	AppendedRecordType;
 		UNSIGNED4	AppendedFirstDate;
 		UNSIGNED4	AppendedLastDate;
-		STRING		AppendedTelcoName;
+		STRING		AppendedTelcoName; //operator Name - e.g. Sprint Spectrum, NEW CINGULAR WIRELESS PCS
+		STRING		AppendedCarrierName; // Carrier Name e.g. Sprint, AT&T
 		BOOLEAN		PrepaidPhoneFlag;
 		STRING10	LexisNexisMatchCode;
 		STRING		subj2own_relationship;
-		UNSIGNED1	ownership_index;
+		UNSIGNED	ownership_index;
 		STRING		ownership_likelihood;
 		STRING		disconnect_status;
 		UNSIGNED4	ph_poss_disconnect_date;
@@ -94,13 +107,13 @@ EXPORT Layouts := MODULE
 		STRING		error_desc;
 		Batchshare.Layouts.ShareErrors;		
 		BatchIn - acctno;
-
 	END;
 
 
 	EXPORT Final := RECORD
 		DATASET(BatchOut) Results;
 		DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
+		DATASET(Phones.Layouts.ZumigoIdentity.zOut) ZumigoResults;
 	END;
 
 END;
