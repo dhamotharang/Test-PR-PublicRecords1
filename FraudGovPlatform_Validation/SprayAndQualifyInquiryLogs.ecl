@@ -34,16 +34,9 @@ EXPORT SprayAndQualifyInquiryLogs(
 	FileSprayed := FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 	InquiryLogs_Sprayed := FraudGovPlatform.Filenames().Sprayed.InquiryLogs;
 	
-	tools.mac_WriteFile(FileSprayed,
-									IDM_Logs,
-									Build_Input_File,
-									pCompress	:= true,
-									pHeading := false,
-									pCsvout := true,
-									pSeparator := '~|~',
-									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+	
+	
+	Build_Input_File :=  output (IDM_Logs,,FileSprayed,CSV(separator(['|\t|']),quote(''),terminator('|\n')), compressed, overwrite);
 
 	outputwork  := sequential(
 								  Build_Input_File
