@@ -1,9 +1,9 @@
-import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader;
-pairs:=distribute(dataset(Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
+import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader,header;
+pairs:=distribute(dataset(header.Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
 PromoteSupers.MAC_SF_BuildProcess(pairs,Data_Services.Data_Location.Prefix('Header')+'thor_data400::base::iheader_did_rid',copy_pairs,3,,true,pVersion:=Header.version_build);
 
 hr:=distribute(file_header_raw(header.Blocked_data()),hash(rid));
-droppedRids:=join(hr,File_LAB_Pairs
+droppedRids:=join(hr,header.File_LAB_Pairs
 											,left.rid=right.rid
 											,left only
 											,local):persist('~thor_data400::persist::missing_header_rid');
