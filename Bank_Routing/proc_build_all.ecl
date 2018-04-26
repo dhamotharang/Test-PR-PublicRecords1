@@ -48,7 +48,8 @@ EXPORT proc_build_all(STRING filedate, STRING filename) := FUNCTION
   
   Scrubs_bank_routing.PostBuildScrubs(filedate)
 	
-	)): 
+	),UpdateRoxiePage
+	): 
   SUCCESS(e_mail_success), 
   FAILURE(e_mail_fail);
 
