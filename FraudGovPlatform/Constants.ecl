@@ -21,9 +21,11 @@ MODULE
 	EXPORT          TYPE_STR	       := 'AK';
   
   #STORED('Platform','FraudGov');  
-  EXPORT          ak_dataset       := FraudShared.File_Autokey();
-	EXPORT          ak_qa_keyname    := FraudGovPlatform._Dataset().thor_cluster_files + 'key::fraudgov::qa::autokey::';
-	EXPORT          AUTOKEY_SKIP_SET := autokey_buildskipset;  
+  EXPORT	ak_dataset       := FraudShared.File_Autokey();
+	EXPORT	ak_qa_keyname    := FraudGovPlatform._Dataset().thor_cluster_files + 'key::fraudgov::qa::autokey::';
+	EXPORT	AUTOKEY_SKIP_SET := autokey_buildskipset;
+
+	EXPORT	RefreshAddresses := 90; //every 90 days
 
 	EXPORT 	special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|\\.|;|_|#|%|&|\\*|<|>|/|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
   EXPORT  word_characters       := ' A | ABC | AN | AND | ANY | AS | AT | BUT | BY | ETC | FOR | FROM | IN | NA | OF | ON | OR | OTH | OTHER | PER | THAN | THE | THEN | TO | UP | WITH ';
