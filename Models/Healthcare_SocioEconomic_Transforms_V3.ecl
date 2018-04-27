@@ -4706,8 +4706,8 @@ self.isSeRsMinor := IF(SeRSAge < 18, 1, 0);
 //Diag Check
 string _dot := '.';
 SELF.isSeRsExcludedDiag := IF(L.ADMIT_DIAGNOSIS_CODE <> '' and (STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))) IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Exclusion_Diags_SET, 1 ,0);
-SELF.isSeRsInvalidFinancialClass := IF(L.FINANCIAL_CLASS <>'' and L.FINANCIAL_CLASS IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Financial_Class_SET, 0, 1);
-SELF.isSeRsInvalidPatientType := IF(L.PATIENT_TYPE <>'' and L.PATIENT_TYPE IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Patient_Type_SET, 0, 1);
+SELF.isSeRsInvalidFinancialClass := IF(L.FINANCIAL_CLASS <>'' and L.FINANCIAL_CLASS NOT IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Financial_Class_SET, 1, 0);
+SELF.isSeRsInvalidPatientType := IF(L.PATIENT_TYPE <>'' and L.PATIENT_TYPE NOT IN Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Patient_Type_SET, 1, 0);
 SELF.isSeRsM1ModelUsed := IF(L.ADMIT_DIAGNOSIS_CODE<>'' OR L.FINANCIAL_CLASS<>'' OR L.PATIENT_TYPE<>'', 1, 0);
 
 //Pre Processing
@@ -5191,9 +5191,9 @@ EXPORT SeRs_M1_Xwalk(ds, outRecord) := FUNCTIONMACRO
             age_group := Models.Healthcare_SocioEconomic_Functions_V3.GetAge_Group(L.RSMemberAge);
             SELF.age_group := age_group;
             string _dot := '.';
-            string11 admit_diag := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].admit_diag;
-            string11 readmit_diag := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].readmit_diag;
-            string11 readmit_lift := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].readmit_lift;
+            string admit_diag := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].admit_diag;
+            string readmit_diag := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].readmit_diag;
+            string readmit_lift := Models.Healthcare_SocioEconomic_Ref_Data.SeRs_Derived_Vars_DCT[L.GenderStr, age_group, STD.Str.ToUpperCase(std.Str.FilterOut(L.ADMIT_DIAGNOSIS_CODE, _dot))].readmit_lift;
             SELF.admit_diag := IF(admit_diag <> '', admit_diag, 'MISC_LOW');
             SELF.readmit_diag := IF(readmit_diag <> '', readmit_diag, 'MISC_LOW');
 				SELF.readmit_lift := IF(readmit_lift <> '', readmit_lift, 'MISC_LOW');
