@@ -18,10 +18,11 @@ MODULE
   SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
 
   dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
-																								
+	
+	 useADL := vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
+	
 	 SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
-	                   IF(vPhoneBlank, PhoneFinder_Services.GetDIDs(dProcessInput, true), 
-										                          PhoneFinder_Services.GetDIDs(dProcessInput)));						
+	                    PhoneFinder_Services.GetDIDs(dProcessInput, useADL));						
 	
 																					
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
