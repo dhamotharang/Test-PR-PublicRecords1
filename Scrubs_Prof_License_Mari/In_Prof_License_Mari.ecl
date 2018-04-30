@@ -1,11 +1,14 @@
-
+﻿
 #OPTION('multiplePersistInstances',FALSE);
-IMPORT	Prof_License_Mari, ut;
+IMPORT	Prof_License_Mari, ut, std;
 
 FileName	  :=	'~thor_data400::in::proflic_mari::';
 
+End_Date:=(string)thorlib.wuid()[2..9];
+Start_Date:=(string)std.date.adjustdate((STD.Date.Date_t)End_Date,0,0,-6);
+
 dLatestUpdate (dataset(Prof_License_Mari.layouts.base) inFile) := Function
-	LatestUpdate := infile(date_vendor_last_reported = MAX(infile,date_vendor_last_reported));
+	LatestUpdate := infile(process_date >= Start_Date and process_date<=End_Date);
 	Return LatestUpdate;
 End;
 Latest_Update:=              dLatestUpdate(dataset(FileName + 'S0900',	Prof_License_Mari.layouts.base,thor))		// ** NMLS

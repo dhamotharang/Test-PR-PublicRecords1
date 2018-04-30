@@ -1,4 +1,4 @@
-// import ut, header_slimsort, did_add, didville, header,address, Business_Header_SS,Business_Header;
+﻿// import ut, header_slimsort, did_add, didville, header,address, Business_Header_SS,Business_Header;
 IMPORT business_header, business_header_ss, TopBusiness_External, DID_Add, ut, MDR, BIPv2;
 
 EXPORT proc_build_base(DATASET(Prof_License_Mari.layouts.intermediate) in0) := MODULE
@@ -21,7 +21,7 @@ current_flag			 := Prof_License_Mari.fn_SetResultCode(reformat_intermediate);
 // Create unique id and reformat to base layout
 ut.MAC_Sequence_Records(current_flag,mari_rid,dSeqNum);
 
-EXPORT base_file_intermediate := dSeqNum;  //: persist('~thor_data400::persist::proflic_mari::cleaned');
+EXPORT base_file_intermediate := dSeqNum;
 
 seqrec := RECORD
 				base_file_intermediate;
@@ -201,7 +201,7 @@ seqrec := RECORD
 											into_final(LEFT,RIGHT),
 											LOCAL,
 											LEFT OUTER, KEEP(1)
-										) : persist('~thor_data400::persist::proflic_mari::append_bdid');
+										); /*: persist('~thor_data400::persist::proflic_mari::append_bdid');*/
 
 
 		layout_mari_final_plus := RECORD

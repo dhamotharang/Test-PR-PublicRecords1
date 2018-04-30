@@ -1,4 +1,4 @@
-// spray ALS0845 Professional Licenses Files for MARI	   
+﻿// spray ALS0845 Professional Licenses Files for MARI	   
 
 
 import ut
@@ -12,11 +12,11 @@ import ut
 
 //Files for S0845 are Located  //
 export spray_ALS0845 (string filedate) := MODULE
-#workunit('name','Spray ALS0845 ' + filedate);
+#workunit('name','Yogurt:Spray ALS0845 ' + filedate);
 
 shared filepath		    :=	'/data/data_build_5_2/MARI/in/ALS0845/' + filedate +'/';
 shared sourcepath		:=	'/data/data_build_5_2/MARI/';
-shared group_name	:=	'thor400_20';
+shared group_name	:=	'thor400_66';
 shared maxRecordSize	:=	8192;
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'ALS0845::' + filedate + '::';
 shared superfile := '~thor_data400::in::proflic_mari::als0845::using::licensee';
