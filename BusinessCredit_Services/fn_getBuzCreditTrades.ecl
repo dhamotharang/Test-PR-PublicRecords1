@@ -1,13 +1,13 @@
-IMPORT BIPV2, Business_Credit, Business_Credit_Scoring, BusinessCredit_Services, Codes,  
+﻿IMPORT BIPV2, Business_Credit, Business_Credit_Scoring, BusinessCredit_Services, Codes,  
        iesp, LNSmallBusiness, STD, ut;
 
 EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod, 
 															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs
 														  ) := MODULE
 
-	SHARED todaysDate := (STRING8)Std.Date.Today();
+	SHARED todaysDate := std.Date.Today();
   // calculate the date one year  
-  SHARED unsigned_DateOneYearAgo := (unsigned)todaysDate - 10000;
+  SHARED unsigned_DateOneYearAgo := todaysDate - 10000;
   
   SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
 
@@ -42,12 +42,12 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
                                                   (LEFT.isRemain_Bal_Changed  OR (rightRecordWithinLastYear AND LEFT.remaining_balance != RIGHT.remaining_balance)),
                      SELF.isRecent_Pmt_Not_Zero := leftRecordWithinLastYear AND 
                                                    (LEFT.isRecent_Pmt_Not_Zero OR (rightRecordWithinLastYear AND ((UNSIGNED)LEFT.recent_payment_amount != 0 OR (UNSIGNED)RIGHT.recent_payment_amount != 0))),
-                     SELF.Account_Status_1      := MAP( LEFT.Account_Status_1 IN ['009', '011']                                                => LEFT.Account_Status_1,
-                                                        RIGHT.Account_Status_1 IN ['009', '011']                                               => RIGHT.Account_Status_1,
+                     SELF.Account_Status_1      := MAP( LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_1,
+                                                        RIGHT.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_1,
                                                         LEFT.Account_Status_1 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_1,
                                                         RIGHT.Account_Status_1),
-                     SELF.Account_Status_2      := MAP( LEFT.Account_Status_2 IN ['009', '011']                                                => LEFT.Account_Status_2,
-                                                        RIGHT.Account_Status_2 IN ['009', '011']                                               => RIGHT.Account_Status_2,
+                     SELF.Account_Status_2      := MAP( LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS        => LEFT.Account_Status_2,
+                                                        RIGHT.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS       => RIGHT.Account_Status_2,
                                                         LEFT.Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes => LEFT.Account_Status_2,
                                                         RIGHT.Account_Status_2),
                      SELF.Account_Closure_Basis := IF(LEFT.Account_Closure_Basis != '', LEFT.Account_Closure_Basis, RIGHT.Account_Closure_Basis),
@@ -97,7 +97,14 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		SELF.TotalCurrentExposure		:= (STRING)Total_Current_Exposure;
 		SELF.MedianBalance					:= (STRING)Median_Balance; 
 		SELF.AvgOpenBalance					:= (STRING)AvgOpenBalance;
-		SELF.ChargeOffRecorded			:= COUNT(TradeRecs_dedup((INTEGER)Charge_Off_Type_Indicator > 0 OR Account_Status_1 IN ['009', '011']));
+		SELF.ChargeOffRecorded			:= COUNT(TradeRecs_dedup((UNSIGNED)Charge_Off_Type_Indicator > 0 OR 
+                                                          Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
+                                                          Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
+                                                          ((UNSIGNED)date_account_was_charged_off != 0 AND 
+                                                           (UNSIGNED4)TRIM(date_account_was_charged_off,LEFT,RIGHT) <= todaysDate) OR
+                                                          (UNSIGNED)amount_charged_off_by_creditor > 0 OR
+                                                          (UNSIGNED)total_charge_off_recoveries_to_date > 0 ));
+
 		SELF.AccountsWithGuarantor	:= COUNT(TradeRecs_Active_AC_Open(Guarantors_Indicator = 'Y' OR Government_Guarantee_Flag = 'Y'));
 	END;
 	
@@ -115,7 +122,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		SELF.AvailableCredit 			:= (STRING) (CreditLimit_curr - CreditUtilized_curr);
 		SELF.CreditUtilizedPercent:= (STRING) ROUND(CreditUtilized_curr *100 / CreditLimit_curr);
 		SELF.CurrentPriorFlag 		:= LNSmallBusiness.Constants.CURRENT_FLAG;
-		SELF.ScoreCalculatedDate	:= iesp.ECL2ESP.toDatestring8(todaysDate);
+		SELF.ScoreCalculatedDate	:= iesp.ECL2ESP.toDate(todaysDate);
 	END;
 
 	SHARED CreditUtil_recs_curr := DATASET([transform_CreditUtilCurr()]);
@@ -147,7 +154,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	CreditUtil_recs_hist_srt 		:= SORT(CreditUtil_recs_hist , -Cycle_end_date);
 	
 	CreditUtil_recs_hist_1 			:= PROJECT(CreditUtil_recs_hist_srt(Cycle_end_date >= ut.getDateOffset(BusinessCredit_Services.Constants.PAST24MONTHSInDays) and 
-																					Cycle_end_date < todaysDate[1..6]), 
+																					((UNSIGNED)Cycle_end_date < (UNSIGNED)(STRING)todaysDate[1..6])), 
 																					TRANSFORM(iesp.businesscreditreport.t_BusinessCreditUtilized, 
 																						SELF.CurrentPriorFlag 	:= LNSmallBusiness.Constants.HISTORICAL_FLAG,
 																						SELF.ScoreCalculatedDate:= iesp.ECL2ESP.toDatestring8(LEFT.Cycle_end_date),
@@ -157,7 +164,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 															
 	EXPORT CreditUtil_recs_combined := SORTED(CreditUtil_recs_curr + CreditUtil_recs_hist_1, -(CurrentPriorFlag = 'C'), -ScoreCalculatedDate);
 
-	SHARED previousYear 		 := (integer)todaysDate[1..4] - 1;
+	SHARED previousYear 		 := (integer)((STRING)todaysDate[1..4]) - 1;
 	SHARED prevYearStartDate := (string)(previousYear) + '0101';
 	SHARED prevYearEndDate 	 := (string)(previousYear) + '1231';
 
@@ -171,7 +178,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	IndustryDesc			:=	IF(SIC_Desc <> '' , SIC_Desc , NAICS_Desc);
 
 	iesp.businesscreditreport.t_BusinessCreditDBT	trans_curr_dbt() := TRANSFORM
-		SELF.DBTCalculatedDate					:= iesp.ECL2ESP.toDatestring8(todaysDate);
+		SELF.DBTCalculatedDate					:= iesp.ECL2ESP.toDate(todaysDate);
 		SELF.DBTMinRange								:= BusinessCredit_Services.Constants.DBT_MIN_RANGE;
 		SELF.DBTMaxRange								:= BusinessCredit_Services.Constants.DBT_MAX_RANGE;
 		SELF.DBT												:= (string) ROUND(AVE(TradeRecs_dbt , (integer)TradeRecs_dbt.dbt));
