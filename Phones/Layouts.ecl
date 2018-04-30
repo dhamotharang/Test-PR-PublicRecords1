@@ -179,7 +179,23 @@ MODULE
 			BatchShare.Layouts.ShareAcct;
 			BatchShare.Layouts.SharePhone;
 		END;
-
+  
+	 EXPORT Carrier_Reference := RECORD
+			STRING25 ocn_abbr_name;			
+		 STRING4	carrier_route;
+		 STRING1	carrier_route_zonecode;
+		 STRING2	delivery_point_code;
+		 STRING80 affiliated_to;
+		 STRING60 contact_name;	
+		 STRING30 contact_address1;
+		 STRING30 contact_address2;
+		 STRING30 contact_city;
+		 STRING2	contact_state;
+		 STRING9	contact_zip;
+		 STRING10 contact_phone;
+		 STRING10 contact_fax;
+		 STRING60 contact_email;
+		END;
 
 		EXPORT BatchOut := RECORD
 			BatchIn;
@@ -215,25 +231,8 @@ MODULE
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
 			recordof(PhonesInfo.Key_Phones.Ported_Metadata);
-			STRING error_desc;
-			//Add carrier_city and carrier_state here so we don't need to do an additional keyed join.
-			string30 carrier_city;
-			string2 carrier_state;
-			//Added for Phone Finder inhousemetadata
-		string4	carrier_route;
-		string1	carrier_route_zonecode;
-		string2	delivery_point_code;
-		string80 affiliated_to;
-		string60 contact_name;	
-		string30 contact_address1;
-		string30 contact_address2;
-		string30 contact_city;
-		string2	contact_state;
-		string9	contact_zip;
-		string10 contact_phone;
-		string10 contact_fax;
-		string60 contact_email;
-		BatchOut;
+			BatchOut;
+		 Carrier_Reference;//Added for Phone Finder inhousemetadata
 		END;
 
 	END;
