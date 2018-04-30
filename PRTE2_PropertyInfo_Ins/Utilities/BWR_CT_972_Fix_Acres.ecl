@@ -32,7 +32,7 @@ EXPORT_DS := PROJECT(EXPORT_DS0,
 										calcAcres := TRIM(REALFORMAT(testAcres,14,4),LEFT,RIGHT);
 										CompAcres := IF(lotInvalid OR testAcZero,'',calcAcres);
 										SELF.acres := IF(acIsAstks,CompAcres,LEFT.acres);
-										SELF.tax_dt_location_influence_code := IF(acIsAstks,LEFT.acres,'');  //just for spotting changed records for audit
+										// SELF.tax_dt_location_influence_code := IF(acIsAstks,LEFT.acres,'');  //just for spotting changed records for audit
 										SELF.property_city_state_zip := appendIfCSZ(LEFT.v_city_name,LEFT.st,LEFT.zip);
 										SELF := LEFT;
 								));
