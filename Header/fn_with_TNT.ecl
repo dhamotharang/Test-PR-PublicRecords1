@@ -3,7 +3,7 @@ import header, gong;
 export fn_with_TNT(boolean isEN=false) := function
 
 //workaround
-h_new_wo := sort(fn_Apt_Patch(isEN),did);
+h_new_wo := sort(header.fn_Apt_Patch(isEN),did);
 
 h_new := distribute(h_new_wo,hash(rid));
 

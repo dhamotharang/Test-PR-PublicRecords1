@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeybuild,Scrubs_Prof_License_Mari,orbit_report,PromoteSupers;
+﻿IMPORT ut,RoxieKeybuild,Scrubs_Prof_License_Mari,orbit_report,PromoteSupers,BuildLogger;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT proc_build_all(STRING pVersion) := FUNCTION
@@ -57,19 +57,44 @@ PromoteSupers.MAC_SF_BuildProcess(Prof_License_Mari.proc_build_base(dDatasetPrep
 PromoteSupers.MAC_SF_BuildProcess(Prof_License_Mari.proc_build_base(dDatasetPrep).search_file                                  ,'~thor_data400::base::proflic_mari::search'                ,build_search,2,,true);
 
 
-
+/*
  do_all := SEQUENTIAL(
                       PARALLEL(build_base, build_regulatory, build_disciplinary, build_detail)
 											,build_intermediate
 											,build_search
-											,proc_build_keys(pVersion)
+											,proc_build_keys(pVersion)b                                                                                                                                                                                                                                                                       gnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnb
 											,Prof_License_Mari.Missing_Codes.Standardized_Codes
   										,Scrubs_Prof_License_Mari.PostBuildScrubs(pVersion)
 											,Prof_License_Mari.strata_popMARI_full(pVersion)
 											// ,Prof_License_Mari.BWR_SampleRecords  // Sample per source code
 											// ,Prof_License_Mari.fSampleRecords_S0900_addl(pVersion) // Sample Records for NMLS addl records
                      	);
+ */
  
+ do_all := SEQUENTIAL(
+ 
+											  BuildLogger.BuildStart(),BuildLogger.PrepStart(),BuildLogger.PrepEnd(),BuildLogger.BaseStart(),
+                        PARALLEL(build_base, build_regulatory, build_disciplinary, build_detail)
+											 ,BuildLogger.BaseEnd()
+											 ,BuildLogger.CustomTag('Intermediate_Start')
+											 ,build_intermediate
+											 ,BuildLogger.CustomTag('Intermediate_End')
+											 ,BuildLogger.CustomTag('Search_Start')
+											 ,build_search
+											 ,BuildLogger.CustomTag('Search_End')
+											 ,BuildLogger.KeyStart()
+											 ,proc_build_keys(pVersion)
+											 ,BuildLogger.KeyEnd()
+											 ,BuildLogger.PostStart()
+											 ,Prof_License_Mari.Missing_Codes.Standardized_Codes
+  										,Scrubs_Prof_License_Mari.PostBuildScrubs(pVersion)
+											,Prof_License_Mari.strata_popMARI_full(pVersion)
+											,BuildLogger.PostEnd()
+											,BuildLogger.BuildEnd()
+											// ,Prof_License_Mari.BWR_SampleRecords  // Sample per source code
+											// ,Prof_License_Mari.fSampleRecords_S0900_addl(pVersion) // Sample Records for NMLS addl records
+   
+               	);
 RETURN do_all;
 
 END;

@@ -84,7 +84,7 @@ EXPORT Mod_SetSources(boolean pFastHeader=false,string ver='default') := module
 	Mac_output(DE,SFname+'_DE',seq_DE);
 	EXPORT sequence_DE:=seq_DE;
 
-	DS := state_death_as_source(,true);
+	DS := header.state_death_as_source(,true);
 	Mac_output(DS,SFname+'_DS',seq_DS);
 	EXPORT sequence_DS:=seq_DS;
 

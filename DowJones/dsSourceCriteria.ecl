@@ -1594,5 +1594,13 @@ EXPORT dsSourceCriteria := DATASET([
 {'Vessels - EC (CFSP) 2018/551 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1580'},
 {'Vessels - EC (CFSP) 2018/551 Democratic People\'s Republic of Korea List Subject to Asset Freeze','1581'},
 {'Vessels - EC 2018/548 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1582'},
-{'Vessels - EC 2018/548 Democratic People\'s Republic of Korea List Subject to Seizure','1583'}
+{'Vessels - EC 2018/548 Democratic People\'s Republic of Korea List Subject to Seizure','1583'},
+{'CNBC (Panama) Warning List','1584'},
+{'EC (CFSP) 2018/568 Iran List','1585'},
+{'EC (CFSP) 2018/569 Democratic Republic of the Congo List','1586'},
+{'EC 2018/565 Iran List','1587'},
+{'EC 2018/566 Democratic Republic of the Congo List','1588'},
+{'EC (CFSP) 2018/611 Democratic People\'s Republic of Korea List','1589'},
+{'EC 2018/602 Democratic People\'s Republic of Korea List','1590'},
+{'Qatar National Terrorist Designation List','1591'}
 ],r);
