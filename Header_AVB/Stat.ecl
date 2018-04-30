@@ -1,10 +1,10 @@
 ﻿import header, did_add, ut, data_services;
 
-export stat(boolean incremental=FALSE, string filedate=header.version_build) := module
+export stat(boolean incremental=FALSE, string filedate=header.version_build, string operatorEmailList) := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , filedate); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
+		#stored ('emailList', operatorEmailList  ); 
 
         NewHeaderFileN := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
         NewHeaderFileI := 'thor_data400::base::header_raw_incremental';
@@ -136,11 +136,11 @@ shared srtdistrAll := sort(jflag1 + jflag2 + jflag3 + pflag1 + pflag2 + pflag3 +
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-emailAdd  := if(incremental, 'Incremental ','');
+emailAdd  := if(incremental, 'Incremental ','Monthly');
 stat_base := if(incremental, '~thor_data400::out::header_raw_incremental::stats',
                              '~thor_data400::out::header_raw::stats'            );
 
-export build_file(string statsEmailRecepients) := sequential(header.LogBuild('Start: header_stats')
+export build_file(string statsEmailRecepients) := sequential(header.LogBuild.single('Start: header_stats')
 
 										 ,if(~fileservices.fileexists('~thor_data400::out::header_raw::stats_'+NewHeader) and NewHeader <> '',
 											 sequential(output(srtdistrAll,,'~thor_data400::out::header_raw::stats_'+NewHeader, overwrite, __compressed__),
@@ -150,7 +150,7 @@ export build_file(string statsEmailRecepients) := sequential(header.LogBuild('St
 
 																	output('File Exists. No new stat file created.'))
 																	
-										,header.LogBuild('Completed: header_stats')); 
+										,header.LogBuild.single('Completed: header_stats')); 
 
 export boca_file := dataset('~thor_data400::out::header_raw::stats',recordof(srtdistrAll), thor);
 

@@ -10,7 +10,7 @@ import header,std,_control;
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 
-EXPORT BWR_Build_Incremental(string filedate) := FUNCTION
+EXPORT BWR_Build_Incremental(string operatorEmailList, string extraNotifyEmailList, string filedate) := FUNCTION
 basename:='~thor_data400::base::header_raw_incremental';
 
 the_new_monthly := '~'+fileservices.SuperFileContents('~thor_data400::base::header_raw')[1].name;
@@ -33,8 +33,8 @@ the_eq_file_for_this_month_is_available:=not(((STRING8)Std.Date.Today())[5..6]<>
 monthly_ingest :=nothor(fileservices.SuperFileContents('~thor_data400::base::header_raw',1)[1].name);
 the_full_ingest_for_this_month_is_completed := not(((STRING8)Std.Date.Today())[5..6]<>file_version(monthly_ingest));
 
-run_full_monthly_ingest                         :=  STD.System.Email.sendemail(_control.MyInfo.EmailAddressNotify,'PLEASE RUN FULL MONTHLY HEADER !!','');
-run_the_weekly_header_ingest(string filedate)    :=  Header.proc_Header.Ingest_Incremental(filedate);
+run_full_monthly_ingest                         :=  STD.System.Email.sendemail(operatorEmailList,'PLEASE RUN FULL MONTHLY HEADER !!','');
+run_the_weekly_header_ingest(string filedate)    :=  Header.proc_Header(operatorEmailList, extraNotifyEmailList).Ingest_Incremental(filedate);
 
 report_conditions:= output(dataset([
 

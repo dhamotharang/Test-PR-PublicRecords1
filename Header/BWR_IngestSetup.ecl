@@ -1,7 +1,7 @@
 ﻿#workunit('name','HeaderIngestSetup');
 IMPORT wk_ut,STD,dops,ut,_control,zz_gmarcan,Header;
 
-EXPORT BWR_IngestSetup(boolean skip_action=true) := FUNCTION
+EXPORT BWR_IngestSetup(string emailList, boolean skip_action=true) := FUNCTION
 
 // Converts the date from 'M?/D?/YYYY H?:M?:S? AM/PM' to ISO8601
 toIso8601(string tf1) := function
@@ -217,11 +217,10 @@ ok_to_run_update := (//quick_header_is_not_running AND
                      raw_is_not_running //AND  most_recent_external_base_is_done
                     );
 
-run_inputs_set := _control.fSubmitNewWorkunit(
+run_inputs_set := std.system.Email.sendemail(emailList,'PLEASE RUN',
                                                 '#workunit(\'name\',\'Header_Input_Set\');\n'
-                                               +'Header.Inputs_Set();'
-                                             
-                                             ,'thor400_44_eclcc');
+                                               +'Header.Inputs_Set();');
+
 no_update := project(wk_ut.get_DS_Result(workunit,'input_did_NOT_make_prod_yet',recReport),
                      {LEFT.roxie_package_name,LEFT.current_prod_roxie_version,
                                               LEFT.pre_reset_header_building,LEFT.logical_file_name});
@@ -236,13 +235,16 @@ part2 := zz_gmarcan.mac_convertDs.toHTML(yes_update,logical_file_name,pre_reset_
                                             roxie_package_name,current_prod_roxie_version,
                                             current_prod_roxie_cert_deployment_datetime,base_file_time_stamp);
 
-attachment := regexreplace('</BODY></HTML>',part1,'</BR>')+'<P><u>The following WILL BE UPDATED:</u></P>'+
+part1a :=     regexreplace('<BODY>',part1,'<BODY><P><u>The following will NOT be updated:</u></P>');
+
+attachment := 
+              regexreplace('</BODY></HTML>',part1a,'</BR>')+'<P><u>The following WILL be updated:</u></P>'+
               regexreplace('<HTML>.*<BODY>',part2,'</BR>');
 
 wLink := 'http://prod_esp.br.seisint.com:8010/?Wuid='+workunit+'&Widget=WUDetailsWidget#/stub/Summary';
 
 send_report := STD.System.Email.SendEmailAttachText(
-				_control.MyInfo.EmailAddressNotify,			            // recipientAddress
+				emailList,			            // recipientAddress
 
 				'HeaderIngestSetup No Update Report',  	                // subjectText
 				'Please find report attached.'+

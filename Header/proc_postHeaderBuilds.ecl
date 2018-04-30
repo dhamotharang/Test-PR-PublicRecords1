@@ -18,7 +18,7 @@ export proc_postHeaderBuilds := module
                                                 + ',Wenhong.Ma@lexisnexisrisk.com'
                                                 ;
 
-		SHARED fn:=nothor(fileservices.SuperFileContents(Filename_Header,1)[1].name);
+		SHARED fn:=nothor(fileservices.SuperFileContents(header.Filename_Header,1)[1].name);
 		SHARED sub:=stringlib.stringfind(fn,((STRING8)Std.Date.Today())[1..2],1);
     EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
 
@@ -32,9 +32,7 @@ export proc_postHeaderBuilds := module
     END;
     
     KeySuperFile := if(_Control.mod_xADLversion.QA_version, doxie.version_superkey, 'built');
-    seg_key_name:=std.file.GetSuperFileSubName(
-        Data_Services.Data_Location.Prefix('LAB_xLink')
-        + 'key::insuranceheader_segmentation::did_ind_'+KeySuperFile,1);
+    seg_key_name:=InsuranceHeader_xLink.KeyPrefix+ 'key::insuranceheader_segmentation::did_ind_'+KeySuperFile;
     
     SHARED checkLinkingVersion(string build_version):= if (
     
@@ -76,16 +74,16 @@ export proc_postHeaderBuilds := module
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export XADLkeys := sequential(
-                                         header.LogBuild('Started :'+step)
+                                         header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,nothor(Header.Proc_Copy_From_Alpha.Copy)
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
-                                        ,notify('Build_Relatives','*')
+                                        // ,notify('Build_Relatives','*')
                                         ,build_slimsorts
                                         ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
-                                        ,header.LogBuild('Completed :'+step)
+                                        ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_owners).good)
                                         ,failure(header.msg(failed,elist_owners).bad)
@@ -119,14 +117,14 @@ export proc_postHeaderBuilds := module
 		PromoteSupers.MAC_SF_BuildProcess(header.HHID_Table_Final,'~thor_data400::BASE::HHID',make_hhid,2,,true,pVersion:=Header.version_build);
 		PromoteSupers.MAC_SF_BuildProcess(header.FCRA_HHID_Table_Final,'~thor_data400::BASE::FCRA_HHID',make_fcra_hhid,2,,true,pVersion:=Header.version_build);
 		export relatives := sequential(
-                                            header.LogBuild('Started :'+step)
+                                            header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,bld_relatives
                                             ,parallel(make_hhid	,make_fcra_hhid)
-                                            ,notify('Build_Header_Keys','*')
+                                            // ,notify('Build_Header_Keys','*')
                                             ,bld_relative_title
-                                            ,header.LogBuild('Completed :'+step)
+                                            ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
@@ -154,7 +152,7 @@ export proc_postHeaderBuilds := module
 		failed:=step+' failed';
 		isQuarterly := Header.version_build[5..6] in ['03','06','09','12'];
 		export headerKeys := sequential(
-                                            header.LogBuild('Started :'+step)
+                                            header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,Doxie.Proc_Doxie_Keys_All()
@@ -162,9 +160,9 @@ export proc_postHeaderBuilds := module
                                             // ,output(verify_keys('RelativeKeys'),named('RelativeKeys'))
                                             // ,output(verify_keys('PersonSlimsortKeys'),named('PersonSlimsortKeys'))
                                             // ,notify('Finalize_Header_build','*')
-                                            // ,Header.Proc_Copy_To_Alpha(header.version_build)
-                                            // ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
-                                            ,header.LogBuild('Completed :'+step)
+                                            ,Header.Proc_Copy_To_Alpha(header.version_build)
+                                            ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
+                                            ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_build_in_qa).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
@@ -182,7 +180,7 @@ export proc_postHeaderBuilds := module
 		failed:=step+' failed';
 		wl:=nothor(WorkunitServices.WorkunitList('',jobname:='y*quick*'))(state in ['blocked','running','wait']);
 		export finalize := sequential(
-                                            header.LogBuild('Started :'+step)
+                                            header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
                                             ,checkLinkingVersion(header.version_build)
@@ -191,9 +189,9 @@ export proc_postHeaderBuilds := module
                                             // ,output(Verify_XADL1_base_files,named('XADLfiles'),all)
                                             ,header.Proc_Accept_SRC_toQA()
                                             // ,output(verify_keys('SourceKeys'),named('SourceKeys'))
-                                            ,notify('Build_FCRA_Header','*')
+                                            // ,notify('Build_FCRA_Header','*')
                                             ,notify('build_property_full','*')
-                                            ,header.LogBuild('Completed :'+step)
+                                            ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
@@ -211,13 +209,13 @@ export proc_postHeaderBuilds := module
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export FCRAheader := sequential(
-                                        header.LogBuild('Started :'+step)
+                                        header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,checkLinkingVersion(header.version_build)
                                         ,Doxie.Proc_FCRA_Doxie_keys_All()
                                         // ,output(verify_keys('FCRA_PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'))
-                                        ,notify('Build_Header_boolean','*')
-                                        ,header.LogBuild('Completed :'+step)
+                                        // ,notify('Build_Header_boolean','*')
+                                        ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_fcra).good)
                                         ,failure(header.msg(failed,elist_owners).bad)
@@ -236,12 +234,12 @@ export proc_postHeaderBuilds := module
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export booleanSrch := sequential(
-                                            header.LogBuild('Started :'+step)
+                                            header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,Text_FragV1.Build_PowerSearch_Keys(Header.version_build)
                                             // ,output(verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'))
-                                            ,header.LogBuild('Completed :'+step)
+                                            ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
