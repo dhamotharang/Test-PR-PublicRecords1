@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 
 export Constants := module
 
@@ -13,7 +13,7 @@ export Constants := module
 	EXPORT MAXCOUNT_PARTIES   := 25;
 	EXPORT MAXCOUNT_FILINGS   := 15;
   
-  EXPORT UNSIGNED2 JOIN_LIMIT     := 25000;
+  EXPORT UNSIGNED2 JOIN_LIMIT     := 10000;
 	EXPORT UNSIGNED1 JOIN_TYPE      := BIPV2.IDconstants.JoinTypes.KeepJoin;
 	EXPORT UNSIGNED1 LIENS_DID_KEEP := 1000;
   
