@@ -1,7 +1,9 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FD5607_1_Service">
 	<part name="batch_in" type="tns:XmlDataSet"/>
 	<part name="tribCode" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
  </message>
@@ -16,6 +18,7 @@ export FD_NonFCRA_Service := MACRO
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('GLBPurpose',RiskWise.permittedUse.GLBA);
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
 
 unsigned1 dppa := 0;
 unsigned1 glb := RiskWise.permittedUse.GLBA : stored('GLBPurpose');
@@ -23,12 +26,27 @@ unsigned3 history_date := 999999  	: stored('HistoryDateYYYYMM');
 string4   tribCode_value := ''	: stored('tribCode');
 string   DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_Value);
-gateways := Gateway.Constants.void_gateway;	// no gateways for ex17, ex18, ex19, ex31 which call this service
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version = 4 and tribcode in ['ex17','ex80'] and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version = 4 and tribcode in ['ex17','ex80'] and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
+include_ofac := if(ofac_version = 1, false, true);
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
+
+
 prep	:= dataset([],Risk_Indicators.Layout_CIID_BtSt_In) : stored('batch_in',few);
 
-iid_results := Risk_Indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, true, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+iid_results := Risk_Indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, true, true, ofac_version := ofac_version, include_ofac := include_ofac, 
+                                                       global_watchlist_threshold := global_watchlist_threshold, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
 
 clamfull := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, true, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
 									

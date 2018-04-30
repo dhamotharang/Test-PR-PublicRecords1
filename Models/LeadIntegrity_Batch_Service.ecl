@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LeadIntegrity_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -7,6 +7,8 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="ModelName" type="xsd:string"/>
 	<part name="Version" type="xsd:integer"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="DisableDoNotMailFilter" type="xsd:boolean"/>
 </message>
@@ -50,7 +52,7 @@ export LeadIntegrity_Batch_Service := MACRO
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
 
 batchin := dataset([],Models.layouts.Layout_LeadIntegrity_Batch_In) 			: stored('batch_in',few);
-gateways := Gateway.Constants.void_gateway;
+gateways_in := Gateway.Configuration.Get();
 
 unsigned1 prep_dppa := 0 :		stored('DPPAPurpose');
 unsigned1 glb := RiskWise.permittedUse.GLBA : stored('GLBPurpose');
@@ -60,6 +62,7 @@ model_name := StringLib.StringToLowerCase( modelname_in );
 string5   industry_class_val := '';
 boolean   isUtility := false;
 boolean   ofac_Only := false;
+unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
@@ -145,6 +148,13 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 END;
 cleanIn := project(batchinseq, into_in(left));
 
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+self.servicename := if(ofac_version_ = 4 and attributesVersion >= 4 and le.servicename = 'bridgerwlc', le.servicename, '');
+self.url := if(ofac_version_ = 4 and attributesVersion >= 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
+self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
 // set variables for passing to bocashell function
 BOOLEAN includeDLverification := IF(attributesVersion >= 4, TRUE, FALSE);
 boolean 	require2ele := false;
@@ -159,9 +169,12 @@ boolean   isFCRA := false;
 boolean   fromIT1O := false;
 boolean   doScore := false;
 boolean   nugen := true;	
-BOOLEAN ofacSearching := IF(attributesVersion >= 4, TRUE, FALSE);
-UNSIGNED1 ofacVersion := IF(attributesVersion >= 4, 2, 1);
-BOOLEAN includeAdditionalWatchlists := IF(attributesVersion >= 4, TRUE, FALSE);
+	BOOLEAN include_ofac := IF(attributesVersion >= 4, TRUE, FALSE);
+	UNSIGNED1 ofacVersion := map(attributesVersion >= 4 and ofac_version_ = 4 => 4,
+                               attributesVersion >= 4 => 2, 
+                                                            1);
+	BOOLEAN includeAdditionalWatchlists := IF(attributesVersion >= 4, TRUE, FALSE);
+  REAL    global_watchlist_threshold := if(ofacVersion in [1, 2, 3], 0.84, 0.85);
 BOOLEAN excludeWatchlists := IF(attributesVersion >= 4, FALSE, TRUE); // Attributes 4.1 return a watchlist hit, so don't exclude watchlists
 // For ITA we can't use FARES Data
 BOOLEAN filterOutFares := TRUE;
@@ -170,12 +183,14 @@ append_best := if( model_name = 'msn1106_0' or attributesVersion >= 4, 2, 0 );
 unsigned8 BSOptions := IF(attributesVersion >= 4, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail + 
 																										risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 																										risk_indicators.iid_constants.BSOptions.IncludeDoNotMail);
+                                                    
+if(ofacVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 /* ***************************************
 	 *     Gather Boca Shell Results:      *
    *************************************** */
 iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
-																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
+																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																					in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
 
 clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
