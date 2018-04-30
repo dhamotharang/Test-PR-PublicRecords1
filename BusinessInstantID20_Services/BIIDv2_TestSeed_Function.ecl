@@ -1,5 +1,5 @@
 ﻿
-IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, ut;
+IMPORT BusinessInstantID20_Services, iesp, Risk_Indicators, RiskWise, Seed_Files, STD, ut;
 
 EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) inData = DATASET([],BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo),
 																STRING32 TestDataTableName_in = '',
@@ -44,12 +44,30 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	key2 := Seed_Files.BIID20_keys.BIID20keypart2( KEYED(dataset_name = _dataset_name AND hashvalue = _hashvalue) )[1];
 	key3 := Seed_Files.BIID20_keys.BIID20keypart3( KEYED(dataset_name = _dataset_name AND hashvalue = _hashvalue) )[1];
 	
+  fn_CreateFakeDID( STRING fname, STRING lname ) := 
+    (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
 
 	
 //rep1	
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_1 := 
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+      SELF.did              := fn_CreateFakeDID( key1.rep1_firstname, key1.rep1_lastname );
+      SELF.title            := key1.rep1_titlename;
+      SELF.fname            := key1.rep1_firstname;
+      SELF.mname            := key1.rep1_middlename;
+      SELF.lname            := key1.rep1_lastname;
+      SELF.in_streetAddress := key1.rep1_addr1;
+      SELF.in_city          := key1.rep1_city_name;
+      SELF.in_state         := key1.rep1_st;
+      SELF.in_zipCode       := key1.rep1_z5;
+      SELF.ssn              := key1.rep1_ssn;
+      SELF.dob              := key1.rep1_dob;
+      SELF.age              := key1.rep1_age;
+      SELF.phone10          := key1.rep1_phone10;
+      SELF.dl_number        := key1.rep1_dlnumber;
+      SELF.dl_state         := key1.rep1_dlstate;
+      SELF.email_address    := key1.rep1_email;
 			SELF.verfirst	     := key2.rep1_verfirst;
 			SELF.verlast	     := key2.rep1_verlast;
 			SELF.veraddr	     := key2.rep1_veraddr;
@@ -89,7 +107,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ 8, key2.rep1_hri_8, key2.rep1_hri_desc_8 }
 						], 
 						Risk_Indicators.layouts.layout_desc_plus_seq 
-					);
+					)(hri != '');
 
 			SELF.fua :=
 					DATASET( 
@@ -100,7 +118,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ key2.rep1_fua_4, key2.rep1_fua_desc_4 }
 						], 
 						Risk_Indicators.Layout_Desc 
-					);			
+					)(hri != '');			
 
 			SELF.corrected_lname	    := key2.rep1_corrected_lname;
 			SELF.corrected_dob	      := key2.rep1_corrected_dob;
@@ -131,7 +149,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{3,key2.rep1_chron_address_3,'','','','','','','',key2.rep1_chron_city_3,key2.rep1_chron_st_3,key2.rep1_chron_zip_3,key2.rep1_chron_zip4_3,key2.rep1_chron_phone_3,key2.rep1_chron_dt_first_seen_3,key2.rep1_chron_dt_last_seen_3,false,''}
 						],
 						Risk_Indicators.Layout_AddressHistory
-					);
+					)(Address != '');
 			
 			SELF.Additional_Lname := 
 					DATASET(
@@ -141,7 +159,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{key2.rep1_addl_fname_3,key2.rep1_addl_lname_3,key2.rep1_addl_lname_date_last_3}
 						],
 						Risk_Indicators.Layout_LastNames
-					);
+					)(lname1 != '');
 					
 			SELF.addresspobox	           := key2.rep1_addresspobox;
 			SELF.addresscmra	           := key2.rep1_addresscmra;
@@ -169,7 +187,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{7,key2.rep1_watchlist_table_7,key2.rep1_watchlist_program_7,key2.rep1_watchlist_record_number_7,key2.rep1_watchlist_fname_7,key2.rep1_watchlist_lname_7,key2.rep1_watchlist_address_7,'','','','','','','',key2.rep1_watchlist_city_7,key2.rep1_watchlist_state_7,key2.rep1_watchlist_zip_7,key2.rep1_watchlist_country_7,key2.rep1_watchlist_entity_name_7}
 						],
 						Risk_Indicators.layouts.layout_watchlists_plus_seq
-					)(Watchlist_Table <> '');
+					)(Watchlist_Table != '');
 
 			SELF := [];
 		END;
@@ -179,6 +197,22 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_2 := 
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+      SELF.did              := fn_CreateFakeDID( key1.rep2_firstname, key1.rep2_lastname );
+      SELF.title            := key1.rep2_titlename;
+      SELF.fname            := key1.rep2_firstname;
+      SELF.mname            := key1.rep2_middlename;
+      SELF.lname            := key1.rep2_lastname;
+      SELF.in_streetAddress := key1.rep2_addr1;
+      SELF.in_city          := key1.rep2_city_name;
+      SELF.in_state         := key1.rep2_st;
+      SELF.in_zipCode       := key1.rep2_z5;
+      SELF.ssn              := key1.rep2_ssn;
+      SELF.dob              := key1.rep2_dob;
+      SELF.age              := key1.rep2_age;
+      SELF.phone10          := key1.rep2_phone10;
+      SELF.dl_number        := key1.rep2_dlnumber;
+      SELF.dl_state         := key1.rep2_dlstate;
+      SELF.email_address    := key1.rep2_email;
 			SELF.verfirst	     := key2.rep2_verfirst;
 			SELF.verlast	     := key2.rep2_verlast;
 			SELF.veraddr	     := key2.rep2_veraddr;
@@ -218,7 +252,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ 8, key2.rep2_hri_8, key2.rep2_hri_desc_8 }
 						], 
 						Risk_Indicators.layouts.layout_desc_plus_seq 
-					) ;
+					)(hri != '');
 
 			SELF.fua :=
 					DATASET( 
@@ -229,7 +263,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ key2.rep2_fua_4, key2.rep2_fua_desc_4 }
 						], 
 						Risk_Indicators.Layout_Desc 
-					);			
+					)(hri != '');			
 
 			SELF.corrected_lname	    := key2.rep2_corrected_lname;
 			SELF.corrected_dob	      := key2.rep2_corrected_dob;
@@ -260,7 +294,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{3,key2.rep2_chron_address_3,'','','','','','','',key2.rep2_chron_city_3,key2.rep2_chron_st_3,key2.rep2_chron_zip_3,key2.rep2_chron_zip4_3,key2.rep2_chron_phone_3,key2.rep2_chron_dt_first_seen_3,key2.rep2_chron_dt_last_seen_3,FALSE,''}
 						],
 						Risk_Indicators.Layout_AddressHistory
-					);
+					)(Address != '');
 			
 			SELF.Additional_Lname := 
 					DATASET(
@@ -270,7 +304,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{key2.rep2_addl_fname_3,key2.rep2_addl_lname_3,key2.rep2_addl_lname_date_last_3}
 						],
 						Risk_Indicators.Layout_LastNames
-					);
+					)(lname1 != '');
 					
 			SELF.addresspobox	           := key2.rep2_addresspobox;
 			SELF.addresscmra	           := key2.rep2_addresscmra;
@@ -298,7 +332,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{7,key2.rep2_watchlist_table_7,key2.rep2_watchlist_program_7,key2.rep2_watchlist_record_number_7,key2.rep2_watchlist_fname_7,key2.rep2_watchlist_lname_7,key2.rep2_watchlist_address_7,'','','','','','','',key2.rep2_watchlist_city_7,key2.rep2_watchlist_state_7,key2.rep2_watchlist_zip_7,key2.rep2_watchlist_country_7,key2.rep2_watchlist_entity_name_7}
 						],
 						Risk_Indicators.layouts.layout_watchlists_plus_seq
-					);
+					)(Watchlist_Table != '');
 
 			SELF := [];
 		END;		
@@ -306,6 +340,22 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_3 := 
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+      SELF.did              := fn_CreateFakeDID( key1.rep3_firstname, key1.rep3_lastname );
+      SELF.title            := key1.rep3_titlename;
+      SELF.fname            := key1.rep3_firstname;
+      SELF.mname            := key1.rep3_middlename;
+      SELF.lname            := key1.rep3_lastname;
+      SELF.in_streetAddress := key1.rep3_addr1;
+      SELF.in_city          := key1.rep3_city_name;
+      SELF.in_state         := key1.rep3_st;
+      SELF.in_zipCode       := key1.rep3_z5;
+      SELF.ssn              := key1.rep3_ssn;
+      SELF.dob              := key1.rep3_dob;
+      SELF.age              := key1.rep3_age;
+      SELF.phone10          := key1.rep3_phone10;
+      SELF.dl_number        := key1.rep3_dlnumber;
+      SELF.dl_state         := key1.rep3_dlstate;
+      SELF.email_address    := key1.rep3_email;
 			SELF.verfirst	     := key2.rep3_verfirst;
 			SELF.verlast	     := key2.rep3_verlast;
 			SELF.veraddr	     := key2.rep3_veraddr;
@@ -345,7 +395,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ 8, key2.rep3_hri_8, key2.rep3_hri_desc_8 }
 						], 
 						Risk_Indicators.layouts.layout_desc_plus_seq 
-					);
+					)(hri != '');
 
 			SELF.fua :=
 					DATASET( 
@@ -356,7 +406,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ key2.rep3_fua_4, key2.rep3_fua_desc_4 }
 						], 
 						Risk_Indicators.Layout_Desc 
-					);			
+					)(hri != '');			
 
 			SELF.corrected_lname	    := key2.rep3_corrected_lname;
 			SELF.corrected_dob	      := key2.rep3_corrected_dob;
@@ -387,7 +437,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{3,key2.rep3_chron_address_3,'','','','','','','',key2.rep3_chron_city_3,key2.rep3_chron_st_3,key2.rep3_chron_zip_3,key2.rep3_chron_zip4_3,key2.rep3_chron_phone_3,key2.rep3_chron_dt_first_seen_3,key2.rep3_chron_dt_last_seen_3,false,''}
 						],
 						Risk_Indicators.Layout_AddressHistory
-					);
+					)(Address != '');
 			
 			SELF.Additional_Lname := 
 					DATASET(
@@ -397,7 +447,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{key2.rep3_addl_fname_3,key2.rep3_addl_lname_3,key2.rep3_addl_lname_date_last_3}
 						],
 						Risk_Indicators.Layout_LastNames
-					);
+					)(lname1 != '');
 					
 			SELF.addresspobox	           := key2.rep3_addresspobox;
 			SELF.addresscmra	           := key2.rep3_addresscmra;
@@ -425,7 +475,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{7,key2.rep3_watchlist_table_7,key2.rep3_watchlist_program_7,key2.rep3_watchlist_record_number_7,key2.rep3_watchlist_fname_7,key2.rep3_watchlist_lname_7,key2.rep3_watchlist_address_7,'','','','','','','',key2.rep3_watchlist_city_7,key2.rep3_watchlist_state_7,key2.rep3_watchlist_zip_7,key2.rep3_watchlist_country_7,key2.rep3_watchlist_entity_name_7}
 						],
 						Risk_Indicators.layouts.layout_watchlists_plus_seq
-					);
+					)(Watchlist_Table != '');
 
 			SELF := [];
 		END;
@@ -433,6 +483,22 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_4 := 
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+      SELF.did              := fn_CreateFakeDID( key1.rep4_firstname, key1.rep4_lastname );
+      SELF.title            := key1.rep4_titlename;
+      SELF.fname            := key1.rep4_firstname;
+      SELF.mname            := key1.rep4_middlename;
+      SELF.lname            := key1.rep4_lastname;
+      SELF.in_streetAddress := key1.rep4_addr1;
+      SELF.in_city          := key1.rep4_city_name;
+      SELF.in_state         := key1.rep4_st;
+      SELF.in_zipCode       := key1.rep4_z5;
+      SELF.ssn              := key1.rep4_ssn;
+      SELF.dob              := key1.rep4_dob;
+      SELF.age              := key1.rep4_age;
+      SELF.phone10          := key1.rep4_phone10;
+      SELF.dl_number        := key1.rep4_dlnumber;
+      SELF.dl_state         := key1.rep4_dlstate;
+      SELF.email_address    := key1.rep4_email;
 			SELF.verfirst	     := key3.rep4_verfirst;
 			SELF.verlast	     := key3.rep4_verlast;
 			SELF.veraddr	     := key3.rep4_veraddr;
@@ -472,7 +538,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ 8, key3.rep4_hri_8, key3.rep4_hri_desc_8 }
 						], 
 						Risk_Indicators.layouts.layout_desc_plus_seq 
-					);
+					)(hri != '');
 
 			SELF.fua :=
 					DATASET( 
@@ -483,7 +549,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ key3.rep4_fua_4, key3.rep4_fua_desc_4 }
 						], 
 						Risk_Indicators.Layout_Desc 
-					);			
+					)(hri != '');			
 
 			SELF.corrected_lname	    := key3.rep4_corrected_lname;
 			SELF.corrected_dob	      := key3.rep4_corrected_dob;
@@ -514,7 +580,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{3,key3.rep4_chron_address_3,'','','','','','','',key3.rep4_chron_city_3,key3.rep4_chron_st_3,key3.rep4_chron_zip_3,key3.rep4_chron_zip4_3,key3.rep4_chron_phone_3,key3.rep4_chron_dt_first_seen_3,key3.rep4_chron_dt_last_seen_3,false,''}
 						],
 						Risk_Indicators.Layout_AddressHistory
-					);
+					)(Address != '');
 			
 			SELF.Additional_Lname := 
 					DATASET(
@@ -524,7 +590,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{key3.rep4_addl_fname_3,key3.rep4_addl_lname_3,key3.rep4_addl_lname_date_last_3}
 						],
 						Risk_Indicators.Layout_LastNames
-					);
+					)(lname1 != '');
 					
 			SELF.addresspobox	           := key3.rep4_addresspobox;
 			SELF.addresscmra	           := key3.rep4_addresscmra;
@@ -547,12 +613,12 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{2,key3.rep4_watchlist_table_2,key3.rep4_watchlist_program_2,key3.rep4_watchlist_record_number_2,key3.rep4_watchlist_fname_2,key3.rep4_watchlist_lname_2,key3.rep4_watchlist_address_2,'','','','','','','',key3.rep4_watchlist_city_2,key3.rep4_watchlist_state_2,key3.rep4_watchlist_zip_2,key3.rep4_watchlist_country_2,key3.rep4_watchlist_entity_name_2},
 							{3,key3.rep4_watchlist_table_3,key3.rep4_watchlist_program_3,key3.rep4_watchlist_record_number_3,key3.rep4_watchlist_fname_3,key3.rep4_watchlist_lname_3,key3.rep4_watchlist_address_3,'','','','','','','',key3.rep4_watchlist_city_3,key3.rep4_watchlist_state_3,key3.rep4_watchlist_zip_3,key3.rep4_watchlist_country_3,key3.rep4_watchlist_entity_name_3},
 							{4,key3.rep4_watchlist_table_4,key3.rep4_watchlist_program_4,key3.rep4_watchlist_record_number_4,key3.rep4_watchlist_fname_4,key3.rep4_watchlist_lname_4,key3.rep4_watchlist_address_4,'','','','','','','',key3.rep4_watchlist_city_4,key3.rep4_watchlist_state_4,key3.rep4_watchlist_zip_4,key3.rep4_watchlist_country_4,key3.rep4_watchlist_entity_name_4},
-							{5,key3.rep4_watchlist_table_5,key3.rep4_watchlist_program_5,key3.rep4_watchlist_record_number_5,key3.rep4_watchlist_fname_5,key3.rep4_watchlist_lname_5,key3.rep4_watchlist_address_5,'','','','','','','',key3.rep4_watchlist_city_5,key3.rep4_watchlist_state_5,key3.rep4_watchlist_zip_5,key3.rep4_watchlist_country_5,key3.rep4_watchlist_entity_name_5}//,
-					//		{6,key3.rep4_watchlist_table_6,key3.rep4_watchlist_program_6,key3.rep4_watchlist_record_number_6,key3.rep4_watchlist_fname_6,key3.rep4_watchlist_lname_6,key3.rep4_watchlist_address_6,'','','','','','','',key3.rep4_watchlist_city_6,key3.rep4_watchlist_state_6,key3.rep4_watchlist_zip_6,key3.rep4_watchlist_country_6,key3.rep4_watchlist_entity_name_6},
-						//	{7,key3.rep4_watchlist_table_7,key3.rep4_watchlist_program_7,key3.rep4_watchlist_record_number_7,key3.rep4_watchlist_fname_7,key3.rep4_watchlist_lname_7,key3.rep4_watchlist_address_7,'','','','','','','',key3.rep4_watchlist_city_7,key3.rep4_watchlist_state_7,key3.rep4_watchlist_zip_7,key3.rep4_watchlist_country_7,key3.rep4_watchlist_entity_name_7}
+							{5,key3.rep4_watchlist_table_5,key3.rep4_watchlist_program_5,key3.rep4_watchlist_record_number_5,key3.rep4_watchlist_fname_5,key3.rep4_watchlist_lname_5,key3.rep4_watchlist_address_5,'','','','','','','',key3.rep4_watchlist_city_5,key3.rep4_watchlist_state_5,key3.rep4_watchlist_zip_5,key3.rep4_watchlist_country_5,key3.rep4_watchlist_entity_name_5},
+							{6,key3.rep4_watchlist_table_6,key3.rep4_watchlist_program_6,key3.rep4_watchlist_record_number_6,key3.rep4_watchlist_fname_6,key3.rep4_watchlist_lname_6,key3.rep4_watchlist_address_6,'','','','','','','',key3.rep4_watchlist_city_6,key3.rep4_watchlist_state_6,key3.rep4_watchlist_zip_6,key3.rep4_watchlist_country_6,key3.rep4_watchlist_entity_name_6},
+							{7,key3.rep4_watchlist_table_7,key3.rep4_watchlist_program_7,key3.rep4_watchlist_record_number_7,key3.rep4_watchlist_fname_7,key3.rep4_watchlist_lname_7,key3.rep4_watchlist_address_7,'','','','','','','',key3.rep4_watchlist_city_7,key3.rep4_watchlist_state_7,key3.rep4_watchlist_zip_7,key3.rep4_watchlist_country_7,key3.rep4_watchlist_entity_name_7}
 						],
 						Risk_Indicators.layouts.layout_watchlists_plus_seq
-					);
+					)(Watchlist_Table != '');
 
 			SELF := [];
 		END;;
@@ -561,6 +627,22 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_buildConsumerInstantID_5 := 
 	TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+      SELF.did              := fn_CreateFakeDID( key1.rep5_firstname, key1.rep5_lastname );
+      SELF.title            := key1.rep5_titlename;
+      SELF.fname            := key1.rep5_firstname;
+      SELF.mname            := key1.rep5_middlename;
+      SELF.lname            := key1.rep5_lastname;
+      SELF.in_streetAddress := key1.rep5_addr1;
+      SELF.in_city          := key1.rep5_city_name;
+      SELF.in_state         := key1.rep5_st;
+      SELF.in_zipCode       := key1.rep5_z5;
+      SELF.ssn              := key1.rep5_ssn;
+      SELF.dob              := key1.rep5_dob;
+      SELF.age              := key1.rep5_age;
+      SELF.phone10          := key1.rep5_phone10;
+      SELF.dl_number        := key1.rep5_dlnumber;
+      SELF.dl_state         := key1.rep5_dlstate;
+      SELF.email_address    := key1.rep5_email;
 			SELF.verfirst	     := key3.rep5_verfirst;
 			SELF.verlast	     := key3.rep5_verlast;
 			SELF.veraddr	     := key3.rep5_veraddr;
@@ -600,7 +682,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ 8, key3.rep5_hri_8, key3.rep5_hri_desc_8 }
 						], 
 						Risk_Indicators.layouts.layout_desc_plus_seq 
-					);
+					)(hri != '');
 
 			SELF.fua :=
 					DATASET( 
@@ -611,7 +693,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{ key3.rep5_fua_4, key3.rep5_fua_desc_4 }
 						], 
 						Risk_Indicators.Layout_Desc 
-					);			
+					)(hri != '');			
 
 			SELF.corrected_lname	    := key3.rep5_corrected_lname;
 			SELF.corrected_dob	      := key3.rep5_corrected_dob;
@@ -642,7 +724,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{3,key3.rep5_chron_address_3,'','','','','','','',key3.rep5_chron_city_3,key3.rep5_chron_st_3,key3.rep5_chron_zip_3,key3.rep5_chron_zip4_3,key3.rep5_chron_phone_3,key3.rep5_chron_dt_first_seen_3,key3.rep5_chron_dt_last_seen_3,false,''}
 						],
 						Risk_Indicators.Layout_AddressHistory
-					);
+					)(Address != '');
 			
 			SELF.Additional_Lname := 
 					DATASET(
@@ -652,7 +734,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{key3.rep5_addl_fname_3,key3.rep5_addl_lname_3,key3.rep5_addl_lname_date_last_3}
 						],
 						Risk_Indicators.Layout_LastNames
-					);
+					)(lname1 != '');
 					
 			SELF.addresspobox	           := key3.rep5_addresspobox;
 			SELF.addresscmra	           := key3.rep5_addresscmra;
@@ -680,38 +762,22 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 							{7,key3.rep5_watchlist_table_7,key3.rep5_watchlist_program_7,key3.rep5_watchlist_record_number_7,key3.rep5_watchlist_fname_7,key3.rep5_watchlist_lname_7,key3.rep5_watchlist_address_7,'','','','','','','',key3.rep5_watchlist_city_7,key3.rep5_watchlist_state_7,key3.rep5_watchlist_zip_7,key3.rep5_watchlist_country_7,key3.rep5_watchlist_entity_name_7}
 						],
 						Risk_Indicators.layouts.layout_watchlists_plus_seq
-					);
+					)(Watchlist_Table != '');
 
 			SELF := [];
 		END;
-
-
-
- 
-
   
 	ConsumerInstantID_1 := DATASET( [xfm_buildConsumerInstantID_1] ); 
 	ConsumerInstantID_2 := DATASET( [xfm_buildConsumerInstantID_2] );
 	ConsumerInstantID_3 := DATASET( [xfm_buildConsumerInstantID_3] );
 	ConsumerInstantID_4 := DATASET( [xfm_buildConsumerInstantID_4] );
 	ConsumerInstantID_5 := DATASET( [xfm_buildConsumerInstantID_5] );
-
-
-
-
-
-
-
-
 	
-	
+  
 	BusinessInstantID20_Services.layouts.OutputLayout_intermediate xfm_toIntermediateLayout :=
 		TRANSFORM
-	//		buildConsumerInstantIDDataset := xfm_buildConsumerInstantID_1 + xfm_buildConsumerInstantID_2 + xfm_buildConsumerInstantID_3 + xfm_buildConsumerInstantID_4 + xfm_buildConsumerInstantID_5;
-			buildConsumerInstantIDDataset := ConsumerInstantID_1 + ConsumerInstantID_2 + ConsumerInstantID_3 + ConsumerInstantID_4 + ConsumerInstantID_5;
-
-
-					
+			buildConsumerInstantIDDataset := (ConsumerInstantID_1 + ConsumerInstantID_2 + ConsumerInstantID_3 + ConsumerInstantID_4 + ConsumerInstantID_5)(lname != '');
+				
 			SELF.seq	 	                 	         := key1.seq;
 			SELF.InputEcho.seq	 	                 := key1.seq;
 			SELF.InputEcho.acctno	                 := key1.AcctNo;
@@ -729,6 +795,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_bus_fax            	 := key1.bus_fax;
 			SELF.InputEcho.in_bus_ipaddr         	 := key1.bus_ipaddr;
 			SELF.InputEcho.in_bus_url            	 := key1.bus_url;
+      SELF.InputEcho.rep1_lexid              := fn_CreateFakeDID( key1.rep1_firstname, key1.rep1_lastname );
 			SELF.InputEcho.in_rep1_title         	 := key1.rep1_titlename;
 			SELF.InputEcho.in_rep1_full          	 := key1.rep1_fullname;
 			SELF.InputEcho.in_rep1_first         	 := key1.rep1_firstname;
@@ -746,6 +813,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep1_dlnumber      	 := key1.rep1_dlnumber;
 			SELF.InputEcho.in_rep1_dlstate       	 := key1.rep1_dlstate;
 			SELF.InputEcho.in_rep1_email         	 := key1.rep1_email;
+      SELF.InputEcho.rep2_lexid              := fn_CreateFakeDID( key1.rep2_firstname, key1.rep2_lastname );
 			SELF.InputEcho.in_rep2_title         	 := key1.rep2_titlename;
 			SELF.InputEcho.in_rep2_full          	 := key1.rep2_fullname;
 			SELF.InputEcho.in_rep2_first         	 := key1.rep2_firstname;
@@ -763,6 +831,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep2_dlnumber      	 := key1.rep2_dlnumber;
 			SELF.InputEcho.in_rep2_dlstate       	 := key1.rep2_dlstate;
 			SELF.InputEcho.in_rep2_email         	 := key1.rep2_email;
+      SELF.InputEcho.rep3_lexid              := fn_CreateFakeDID( key1.rep3_firstname, key1.rep3_lastname );
 			SELF.InputEcho.in_rep3_title         	 := key1.rep3_titlename;
 			SELF.InputEcho.in_rep3_full          	 := key1.rep3_fullname;
 			SELF.InputEcho.in_rep3_first         	 := key1.rep3_firstname;
@@ -780,6 +849,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep3_dlnumber      	 := key1.rep3_dlnumber;
 			SELF.InputEcho.in_rep3_dlstate       	 := key1.rep3_dlstate;
 			SELF.InputEcho.in_rep3_email         	 := key1.rep3_email;
+      SELF.InputEcho.rep4_lexid              := fn_CreateFakeDID( key1.rep4_firstname, key1.rep4_lastname );
 			SELF.InputEcho.in_rep4_title         	 := key1.rep4_titlename;
 			SELF.InputEcho.in_rep4_full          	 := key1.rep4_fullname;
 			SELF.InputEcho.in_rep4_first         	 := key1.rep4_firstname;
@@ -797,6 +867,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep4_dlnumber      	 := key1.rep4_dlnumber;
 			SELF.InputEcho.in_rep4_dlstate       	 := key1.rep4_dlstate;
 			SELF.InputEcho.in_rep4_email         	 := key1.rep4_email;
+      SELF.InputEcho.rep5_lexid              := fn_CreateFakeDID( key1.rep5_firstname, key1.rep5_lastname );
 			SELF.InputEcho.in_rep5_title         	 := key1.rep5_titlename;
 			SELF.InputEcho.in_rep5_full          	 := key1.rep5_fullname;
 			SELF.InputEcho.in_rep5_first         	 := key1.rep5_firstname;
@@ -823,13 +894,14 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.VerifiedEcho.bus_ver_phone	 := key1.verphone;
 			SELF.VerifiedEcho.bus_ver_tin	   := key1.verfein;
 			
-			SELF.Verification.ver_name_indicator      	 := key1.cnamematchflag;
-			SELF.Verification.ver_streetaddr_indicator	 := key1.addrmatchflag;
-			SELF.Verification.ver_city_indicator      	 := key1.citymatchflag;
-			SELF.Verification.ver_state_indicator     	 := key1.statematchflag;
-			SELF.Verification.ver_zip_indicator       	 := key1.zipmatchflag;
-			SELF.Verification.ver_phone_indicator	       := key1.phonematchflag;
-			SELF.Verification.ver_tin_indicator	         := key1.feinmatchflag;
+			SELF.Verification.ver_name_indicator      	 := IF( TRIM(key1.vercmpy)  != '', '1', '0' );
+      SELF.Verification.ver_altname_indicator      := '0';
+			SELF.Verification.ver_streetaddr_indicator	 := IF( TRIM(key1.veraddr)  != '', '1', '0' );
+			SELF.Verification.ver_city_indicator      	 := IF( TRIM(key1.vercity)  != '', '1', '0' );
+			SELF.Verification.ver_state_indicator     	 := IF( TRIM(key1.verstate) != '', '1', '0' );
+			SELF.Verification.ver_zip_indicator       	 := IF( TRIM(key1.verzip)   != '', '1', '0' );
+			SELF.Verification.ver_phone_indicator	       := IF( TRIM(key1.verphone) != '', '1', '0' );
+			SELF.Verification.ver_tin_indicator	         := IF( TRIM(key1.verfein)  != '', '1', '0' );
 			
 			SELF.BestEcho.best_bus_name	   := key1.bestcompanyname;
 			SELF.BestEcho.best_bus_addr 	 := key1.bestaddr;
@@ -849,21 +921,21 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.VerificationSummaries.bvi     	 := key1.bvi;
 			SELF.VerificationSummaries.bvi_desc	 := key1.bvi_desc;
 			
-			SELF.RiskIndicators.bus_ri_1     	 := key1.bus_ri_1;
+			SELF.RiskIndicators.bus_ri_1     	 := IF( TRIM(key1.bus_ri_1) = '', '00', key1.bus_ri_1 );
 			SELF.RiskIndicators.bus_ri_desc_1	 := key1.bus_ri_desc_1;
-			SELF.RiskIndicators.bus_ri_2     	 := key1.bus_ri_2;
+			SELF.RiskIndicators.bus_ri_2     	 := IF( TRIM(key1.bus_ri_2) = '', '00', key1.bus_ri_2 );
 			SELF.RiskIndicators.bus_ri_desc_2	 := key1.bus_ri_desc_2;
-			SELF.RiskIndicators.bus_ri_3     	 := key1.bus_ri_3;
+			SELF.RiskIndicators.bus_ri_3     	 := IF( TRIM(key1.bus_ri_3) = '', '00', key1.bus_ri_3 );
 			SELF.RiskIndicators.bus_ri_desc_3	 := key1.bus_ri_desc_3;
-			SELF.RiskIndicators.bus_ri_4     	 := key1.bus_ri_4;
+			SELF.RiskIndicators.bus_ri_4     	 := IF( TRIM(key1.bus_ri_4) = '', '00', key1.bus_ri_4 );
 			SELF.RiskIndicators.bus_ri_desc_4	 := key1.bus_ri_desc_4;
-			SELF.RiskIndicators.bus_ri_5     	 := key1.bus_ri_5;
+			SELF.RiskIndicators.bus_ri_5     	 := IF( TRIM(key1.bus_ri_5) = '', '00', key1.bus_ri_5 );
 			SELF.RiskIndicators.bus_ri_desc_5	 := key1.bus_ri_desc_5;
-			SELF.RiskIndicators.bus_ri_6     	 := key1.bus_ri_6;
+			SELF.RiskIndicators.bus_ri_6     	 := IF( TRIM(key1.bus_ri_6) = '', '00', key1.bus_ri_6 );
 			SELF.RiskIndicators.bus_ri_desc_6	 := key1.bus_ri_desc_6;
-			SELF.RiskIndicators.bus_ri_7     	 := key1.bus_ri_7;
+			SELF.RiskIndicators.bus_ri_7     	 := IF( TRIM(key1.bus_ri_7) = '', '00', key1.bus_ri_7 );
 			SELF.RiskIndicators.bus_ri_desc_7	 := key1.bus_ri_desc_7;
-			SELF.RiskIndicators.bus_ri_8     	 := key1.bus_ri_8;
+			SELF.RiskIndicators.bus_ri_8     	 := IF( TRIM(key1.bus_ri_8) = '', '00', key1.bus_ri_8 );
 			SELF.RiskIndicators.bus_ri_desc_8	 := key1.bus_ri_desc_8;
 			
 			SELF.Bus2Exec.bus2exec_index_rep1	 := key1.bus2exec_index_rep1;
