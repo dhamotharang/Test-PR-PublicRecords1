@@ -1,9 +1,9 @@
-IMPORT Drivers, DriversV2, lib_stringlib, _Validate, ut;
+﻿IMPORT Drivers, DriversV2, lib_stringlib, _Validate, ut, VersionControl;
 
-EXPORT Mapping_DL_TN_As_ConvPoints := MODULE
+EXPORT Mapping_DL_TN_As_ConvPoints( string  pversion) := MODULE
 
   //********* Conviction Mapping *****************************************************************************
-  in_Conv_file   := DriversV2.File_DL_TN_Convictions;
+  in_Conv_file   := DriversV2.File_DL_TN_Convictions(pversion);
 
   Layout_Conv_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Convictions;
 
@@ -32,7 +32,7 @@ EXPORT Mapping_DL_TN_As_ConvPoints := MODULE
   
   //********* Suspension Mapping *****************************************************************************
   
-  in_Susp_file   := DriversV2.File_DL_TN_Withdrawals;
+  in_Susp_file   := DriversV2.File_DL_TN_Withdrawals(pversion);
 
   Layout_Susp_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Suspensions;
 
@@ -54,5 +54,40 @@ EXPORT Mapping_DL_TN_As_ConvPoints := MODULE
   END;
 
   EXPORT TN_As_Suspension := PROJECT(in_Susp_file, trfToSuspensions(LEFT));
+	
+	shared logical_name := DriversV2.Constants.Cluster+'in::dl2::'+pversion+'::TN::';	 
+
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Convictions'	,TN_As_Convictions		,Bld_TN_As_Convictions	);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Suspension'		,TN_As_Suspension			,Bld_TN_As_Suspension		);	
+	
+	export Build_DL_TN_Conviction :=
+	sequential( Bld_TN_As_Convictions							
+						 ,sequential(  FileServices.StartSuperFileTransaction()
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')													
+													,FileServices.FinishSuperFileTransaction()
+												)
+						);
+						
+	export Build_DL_TN_Suspension :=
+	sequential( Bld_TN_As_Suspension							
+						 ,sequential(  FileServices.StartSuperFileTransaction()
+													,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')													
+													,FileServices.FinishSuperFileTransaction()
+												)
+						);
+	/* 
+	export Build_DL_TN_Convpoints :=
+		sequential(
+							 parallel(
+									 Bld_TN_As_Convictions
+									,Bld_TN_As_Suspension		
+							 )
+							 ,sequential(  FileServices.StartSuperFileTransaction()
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')
+														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')
+														,FileServices.FinishSuperFileTransaction()
+													)
+							);
+	*/
   
 END;

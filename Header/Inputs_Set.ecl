@@ -1,6 +1,6 @@
-import liensv2;
-
-export Inputs_Set(boolean incremental=false, string versionBuild=header.version_build) := function
+﻿import liensv2;
+#WORKUNIT('name','hdr_bld_input_set');
+export Inputs_Set(boolean incremental=false) := function
 
 dLv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::BASE::dl2::DLHeader_Building')>0,
 output('Nothing added to BASE::dl2::DLHeader_Building.'),
@@ -39,8 +39,8 @@ fileservices.addsuperfile('~thor_data400::base::LiensHeader_Building','~thor_dat
 liensv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::base::LiensV2_mainHeader_Building')>0,
 output('Nothing added to base::LiensV2Header_Building'),
 sequential(
-output(liensv2.file_liens_main,,'~thor_data400::base::liens::main', overwrite,compressed), //combines all liensv2 base files main
-output(liensv2.file_liens_party,,'~thor_data400::base::liens::party', overwrite,compressed), //combines all liensv2 base files party
+output(liensv2.file_liens_main,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
+output(liensv2.file_liens_party,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
 fileservices.addsuperfile('~thor_data400::base::LiensV2_mainHeader_Building','~thor_data400::base::liens::main'),
 fileservices.addsuperfile('~thor_data400::base::LiensV2_partyHeader_Building','~thor_data400::base::liens::party')
 ));
@@ -122,17 +122,13 @@ asl_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::ASLHeader
 output('Nothing added to Base::ASLHeader_Building'),
 fileservices.addsuperfile('~thor_data400::Base::ASLHeader_Building','~thor_data400::base::american_student_list',,true));
 
+osl_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::OKC_SLHeader_Building')>0,
+output('Nothing added to Base::OKC_SLHeader_Building'),
+fileservices.addsuperfile('~thor_data400::Base::OKC_SLHeader_Building','~thor_data400::base::okc_student_list',,true));
+
 voters_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::Voters_Header_Building')>0,
 output('Nothing added to Base::Voters_Header_Building'),
 fileservices.addsuperfile('~thor_data400::Base::Voters_Header_Building','~thor_data400::Base::Voters_Reg',,true));
-
-vehicle_v2_main  := if(fileservices.getsuperfilesubcount('~thor_data400::base::vehicles_v2_main_header_building')>0,
-output('Nothing added to base::vehicles_v2_main_header_building'),
-fileservices.addsuperfile('~thor_data400::base::vehicles_v2_main_header_building','~thor_data400::base::vehiclev2::main',,true));
-
-vehicle_v2_party := if(fileservices.getsuperfilesubcount('~thor_data400::base::vehicles_v2_party_header_building')>0,
-output('Nothing added to base::vehicles_v2_party_header_building'),
-fileservices.addsuperfile('~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party',,true));
 
 certegy_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::certegyHeader_Building')>0,
 output('Nothing added to Base::certegyHeader_Building'),
@@ -170,43 +166,9 @@ targus := if(fileservices.getsuperfilesubcount('~thor_data400::base::consumer_ta
 output('Nothing added to Base::consumer_targusHeader_Building'),
 fileservices.addsuperfile('~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus',,true));
 
-sequence_sources :=parallel(
-                             Header.Mod_SetSources(,versionBuild).sequence_EQ
-                            ,Header.Mod_SetSources(,versionBuild).sequence_L2
-                            ,Header.Mod_SetSources(,versionBuild).sequence_EN
-    ,if(~incremental        ,Header.Mod_SetSources(,versionBuild).sequence_TN   )
-                            ,Header.Mod_SetSources(,versionBuild).sequence_DL
-                            ,Header.Mod_SetSources(,versionBuild).sequence_VH
-                            ,Header.Mod_SetSources(,versionBuild).sequence_BA
-                            ,Header.Mod_SetSources(,versionBuild).sequence_FAT
-                            ,Header.Mod_SetSources(,versionBuild).sequence_FAD
-                            ,Header.Mod_SetSources(,versionBuild).sequence_DE
-                            ,Header.Mod_SetSources(,versionBuild).sequence_DS
-                            ,Header.Mod_SetSources(,versionBuild).sequence_EM
-                            ,Header.Mod_SetSources(,versionBuild).sequence_UT
-                            ,Header.Mod_SetSources(,versionBuild).sequence_AK
-                            ,Header.Mod_SetSources(,versionBuild).sequence_ATF
-                            ,Header.Mod_SetSources(,versionBuild).sequence_PL
-                            ,Header.Mod_SetSources(,versionBuild).sequence_WC
-                            ,Header.Mod_SetSources(,versionBuild).sequence_LI
-                            ,Header.Mod_SetSources(,versionBuild).sequence_FR
-                            ,Header.Mod_SetSources(,versionBuild).sequence_AM
-                            ,Header.Mod_SetSources(,versionBuild).sequence_AC
-                            ,Header.Mod_SetSources(,versionBuild).sequence_WA
-                            ,Header.Mod_SetSources(,versionBuild).sequence_BO
-                            ,Header.Mod_SetSources(,versionBuild).sequence_DEA
-                            ,Header.Mod_SetSources(,versionBuild).sequence_WP
-                            ,Header.Mod_SetSources(,versionBuild).sequence_SL
-                            ,Header.Mod_SetSources(,versionBuild).sequence_VO
-                            ,Header.Mod_SetSources(,versionBuild).sequence_CY
-                            ,Header.Mod_SetSources(,versionBuild).sequence_ND
-                            ,Header.Mod_SetSources(,versionBuild).sequence_EL
-                            ,Header.Mod_SetSources(,versionBuild).sequence_AY
-                            );
-
 add_super := sequential(
                             parallel(
-                                            dLv2_file
+                                             dLv2_file
                                             ,emrg
                                             ,akPerm
                                             ,akPermE
@@ -216,7 +178,6 @@ add_super := sequential(
                                             ,gong_file
                                             ,ms_work
                                             ,liens_file
-                                            ,liensv2_file
                                             ,utils
                                             ,bksrch
                                             ,bkmain
@@ -233,9 +194,9 @@ add_super := sequential(
                                             ,ln_prop_srch
                                             ,ln_prop_addl_deeds
                                             ,ln_prop_addl_asses
-                                            ,asl_file,voters_v2
-                                            ,vehicle_v2_main
-                                            ,vehicle_v2_party
+                                            ,asl_file
+                                            ,osl_file
+                                            ,voters_v2
                                             ,certegy_file
                                             ,tucs_file
                                             ,experian_file
@@ -246,7 +207,7 @@ add_super := sequential(
                                             ,AlloyMedia_SL_file
                                             ,targus
                                             )
-                            ,sequence_sources
+                    ,liensv2_file
                     );
 
 return add_super;
