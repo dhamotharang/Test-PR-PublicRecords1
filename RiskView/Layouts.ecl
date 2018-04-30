@@ -898,6 +898,7 @@ end;
 				#APPEND(Liens,
 							'string30 Liens' + %'cntLiens'% + '_Seq;' +
 							'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
+       'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
 							'string50 Liens' + %'cntLiens'% + '_LienType;' +
 							'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
 							'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
@@ -928,6 +929,7 @@ end;
 				#APPEND(Jgmts,
 						'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
 						'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
+      'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
 						'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
 						'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
 						'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
