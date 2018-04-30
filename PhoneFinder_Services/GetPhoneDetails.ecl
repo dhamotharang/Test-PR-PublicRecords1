@@ -5,7 +5,7 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 											           := FUNCTION
 
 tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
-		EXPORT UNSIGNED		max_lidb_age_days					:= 60; 
+		EXPORT UNSIGNED		max_lidb_age_days					:= PhoneFinder_Services.Constants.LIBD_LastActivityThreshold; 
 		EXPORT BOOLEAN		use_realtime_lidb				 	:= TRUE;
 		EXPORT DATASET (Gateway.Layouts.Config) gateways := dGateways; 
 	END;
@@ -36,38 +36,40 @@ tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
 				
   end;
 
-	PhoneFinder_Services.Layouts.PhoneFinder.Final appendDetails(Phones.Layouts.PhoneAttributes.Raw pInput) := TRANSFORM
-																																																												
-		SELF.acctno                                               := pInput.acctno;
-		SELF.phone                                                := pInput.phone;
-		SELF.src                                                  := pInput.source;
-		SELF.typeflag                                             := 'P';
-		SELF.phone_source                                         := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
-		SELF.dt_last_seen                                         := (STRING8)pInput.dt_last_reported;
-		SELF.coc_description                                      := pInput.phone_serv_type;
-  SELF.carrier_name                                         := pInput.carrier_name;
-  SELF.phone_region_city                                    := pInput.carrier_city;
-  SELF.phone_region_st                                      := pInput.carrier_state;
-  SELF.RealTimePhone_Ext.CarrierRoute                       := pInput.carrier_route;
-  SELF.RealTimePhone_Ext.SortZone                           := pInput.carrier_route_zonecode;
-  SELF.RealTimePhone_Ext.DeliveryPointCode                  := pInput.delivery_point_code;
-	 SELF.RealTimePhone_Ext.operatingcompany.number            := pInput.carrier_id;
-	 SELF.RealTimePhone_Ext.operatingcompany.name              := pInput.operator_name;
-	 SELF.RealTimePhone_Ext.operatingCompany.AffiliatedTo        := pInput.affiliated_to;
-	 SELF.RealTimePhone_Ext.operatingcompany.contact.name.fullname := pInput.contact_Name;
-	 SELF.RealTimePhone_Ext.operatingcompany.contact.address := Row(addr_format(pInput.contact_address1,pInput.contact_address2,pInput.contact_city,pInput.contact_state,pInput.contact_zip));
-		SELF.RealTimePhone_Ext.operatingcompany.contact.email := pInput.Contact_email;		
-		SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneNpa := pInput.Contact_Phone[1..3];
-  SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneNXX := pInput.Contact_Phone[4..6];
-  SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneLine := pInput.Contact_Phone[7..10];
-  SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneExt := '';
-	 SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNpa := pInput.Contact_Fax[1..3];
-  SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNXX := pInput.Contact_Fax[4..6];
-  SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxLine := pInput.Contact_Fax[7..10];
-		SELF := [];																											
-	END;
-	
-	dDetailedPhoneInfo	:= PROJECT(dsPhonesAttr_recs, appendDetails(LEFT));
+  dsPhonesAttrRecsGrp := GROUP(SORT(dsPhonesAttr_recs, acctno, phone, carrier_city = '', contact_name = ''), acctno, phone);
 
+  PhoneFinder_Services.Layouts.PhoneFinder.Final appendDetails(Phones.Layouts.PhoneAttributes.Raw le, DATASET(Phones.Layouts.PhoneAttributes.Raw) ri) := TRANSFORM
+    SELF.acctno                                                   := le.acctno;
+    SELF.phone                                                    := le.phone;
+    SELF.src                                                      := IF(EXISTS(ri(source = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime)),
+		                                                                             Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime, '');
+    SELF.typeflag                                                 := 'P';
+    SELF.phone_source                                             := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
+    SELF.dt_last_seen                                             := (STRING8)MAX(ri,ri.dt_last_reported);
+    SELF.coc_description                                          := le.phone_serv_type;
+    SELF.carrier_name                                             := le.carrier_name;
+    SELF.phone_region_city                                        := le.carrier_city;
+    SELF.phone_region_st                                          := le.carrier_state;
+    SELF.RealTimePhone_Ext.CarrierRoute                           := le.carrier_route;
+    SELF.RealTimePhone_Ext.SortZone                               := le.carrier_route_zonecode;
+    SELF.RealTimePhone_Ext.DeliveryPointCode                      := le.delivery_point_code;
+    SELF.RealTimePhone_Ext.operatingcompany.number                := IF(le.operator_id <> '', le.operator_id, le.carrier_id); // operator id = spid and carrier id = ocn
+    SELF.RealTimePhone_Ext.operatingcompany.name                  := le.ocn_abbr_name;
+    SELF.RealTimePhone_Ext.operatingCompany.AffiliatedTo          := le.affiliated_to;
+    SELF.RealTimePhone_Ext.operatingcompany.contact.name.fullname := le.contact_Name;
+    SELF.RealTimePhone_Ext.operatingcompany.contact.address       := ROW(addr_format(le.contact_address1, le.contact_address2,
+                                                                                     le.contact_city,le.contact_state, le.contact_zip));
+    SELF.RealTimePhone_Ext.operatingcompany.contact.email         := le.Contact_email;    
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneNpa    := le.Contact_Phone[1..3];
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneNXX    := le.Contact_Phone[4..6];
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneLine   := le.Contact_Phone[7..10];
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.PhoneExt    := '';
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNpa      := le.Contact_Fax[1..3];
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNXX      := le.Contact_Fax[4..6];
+    SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxLine     := le.Contact_Fax[7..10];
+    SELF                                                          := [];                                                      
+  END;
+  
+  dDetailedPhoneInfo  := ROLLUP(dsPhonesAttrRecsGrp, GROUP, appendDetails(LEFT, ROWS(LEFT)));
 	RETURN dDetailedPhoneInfo;
 	END;

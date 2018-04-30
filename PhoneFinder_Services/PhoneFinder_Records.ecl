@@ -86,7 +86,7 @@ MODULE
 	ds_in_accu := IF(IsPhoneRiskAssessment,
 	                 PROJECT(DEDUP(SORT(dSearchRecs, acctno), acctno),
 									 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
-									 PROJECT(DEDUP(SORT(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
+									 PROJECT(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
   AccuDataGateway := IF(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
@@ -137,6 +137,9 @@ MODULE
 		  // filtering out inhouse phonmetadata records 
     dFilteringInHousePhoneData_typeflag := 	IF(inMod.UseInHousePhoneMetadata, PROJECT(dSearchRecs_pre, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, 
 		                                                            SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
+																																                              SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
+																																                                                       0, LEFT.phone_source),
+																																
 																																    SELf := LEFT)),dSearchRecs_pre);
 
    	 // Counting royalties before filtering recs - RQ 13804
