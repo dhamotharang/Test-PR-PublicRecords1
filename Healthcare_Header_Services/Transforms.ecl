@@ -560,7 +560,7 @@ EXPORT Transforms := MODULE
 	Export Layouts.CombinedHeaderResults build_selectfile_Provider_base (Layouts.selectfile_providers_base_with_input l) := transform
 		//Does the DID link and DOB and SSN make sense when compared with Enclarity year of birth or lic_begin_date.
 		hasYear := l.birth_year <> '' and (integer)l.birth_year > 0;
-		hasBestYear := l.clean_dob <>'';
+		hasBestYear := l.best_dob > 0;
 		hasLicYear := l.lic_begin_date <> '' and (integer)l.lic_begin_date > 0;
 		compareYr := ((string)l.best_dob)[1..4];
 		goodYear := hasYear and hasBestYear and (integer)compareYr = (integer)l.birth_year;
@@ -2516,7 +2516,7 @@ EXPORT Transforms := MODULE
 																											       NORMALIZE(allRows, LEFT.Addresses,TRANSFORM( Layouts.layout_addressinfo, SELF := RIGHT	)),
 																											          prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),
 																								                prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),
-																							                  group,doDEABaseRecordAddrRollup(left,rows(left))),addrseq)(prim_range<>'' and prim_range[1..10]<>'*** NOT AV');
+																							                  group,doDEABaseRecordAddrRollup(left,rows(left))),addrseq)(prim_range<>'' and prim_range[1..10]<>'*** NOT AVAI');
 
 							self.ssns          := DEDUP( NORMALIZE( allRows, LEFT.ssns, TRANSFORM( Layouts.layout_ssn, SELF := RIGHT	)	), ssn, ALL );
 							self.dids          := Functions.processDids( NORMALIZE( allRows, LEFT.dids, TRANSFORM( Layouts.layout_did, SELF := RIGHT	)	) );
@@ -2898,6 +2898,26 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 			self := l;
 			self := [];
 	end;
+	Export  Layouts.layout_nameinfo xformRollNames( Layouts.layout_nameinfo l, 
+																							DATASET( Layouts.layout_nameinfo) allRows) := TRANSFORM
+									self.nameSeq := l.nameSeq;
+									self.namePenalty := min(allRows,namePenalty);
+									self.FullName := if(l.FullName<>'',l.FullName,allRows(FullName<>'')[1].FullName);
+									self.FirstName := if(l.FirstName<>'',l.FirstName,allRows(FirstName<>'')[1].FirstName);
+									self.MiddleName := if(l.MiddleName<>'',l.MiddleName,allRows(MiddleName<>'')[1].MiddleName);
+									self.LastName := if(l.LastName<>'',l.LastName,allRows(LastName<>'')[1].LastName);
+									self.Suffix := if(l.Suffix<>'',l.Suffix,allRows(Suffix<>'')[1].Suffix);
+									self.Title := if(l.Title<>'',l.Title,allRows(Title<>'')[1].Title);
+									self.Gender := if(l.Gender<>'',l.Gender,allRows(Gender<>'')[1].Gender);
+									self:=l;
+	end;
+	Export  Layouts.layout_nameinfo xformRollCompany( Layouts.layout_nameinfo l, 
+																							DATASET( Layouts.layout_nameinfo) allRows) := TRANSFORM
+									self.nameSeq := l.nameSeq;
+									self.namePenalty := min(allRows,namePenalty);
+									self.CompanyName := if(l.CompanyName<>'',l.CompanyName,allRows(CompanyName<>'')[1].CompanyName);
+									self:=l;
+	end;
 	Export layouts.CombinedHeaderResults doFinalRollup(layouts.CombinedHeaderResults l, 
 																							DATASET(layouts.CombinedHeaderResults) allRows) := TRANSFORM
 		SELF.acctno := l.acctno;
@@ -2922,7 +2942,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.facilitytype := allRows(facilitytype<>'')[1].facilitytype;
 		self.organizationtype := allRows(organizationtype<>'')[1].organizationtype;
 		//Handle Status
-		currentDate := (string)Std.Date.Today();
+		currentDate := (string)ut.GetDate;
 		statusDeceased := exists(allRows(status='D'));
 		statusRetired := exists(allRows(status='R'));
 		statusActive := exists(allRows(status='A')); 
@@ -2933,27 +2953,29 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.NPPESVerified := map(exists(allRows(NPPESVerified='YES')) => 'YES',
 															exists(allRows(NPPESVerified='CORRECTED')) => 'CORRECTED',
 															' ');
-		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)), RECORD, ALL );
-	 	 Names              := sort(
-		                            DEDUP(
-		                                  sort
-		                                  ( 
-																			    NORMALIZE( allRows, LEFT.Names(nameSeq>0 and (FirstName<>'' or LastName<>'' or FullName<>'' )), 
-																					            TRANSFORM( 
-																											          Layouts.layout_nameinfo, 
-																																SELF.fullname:=if(right.fullname <>'',right.fullname ,std.str.CleanSpaces(right.firstname+' '+right.middlename+' '+right.lastname+' '+right.suffix)),
-																																self.nameseq:=right.nameseq,
-																																self.namepenalty:=right.namepenalty)
-																																),
-																			  STD.Str.ToUpperCase(STD.Str.CleanSpaces(FullName)),nameseq 
-																			), 
-																			  STD.Str.ToUpperCase(STD.Str.CleanSpaces(FullName))
-																			),
-																			nameSeq,namePenalty,-gender
-																		);
-     companyNames         := sort(DEDUP(sort( NORMALIZE( allRows, LEFT.Names(nameSeq>0 and  CompanyName <>''), TRANSFORM( Layouts.layout_nameinfo,self.companyname:=right.companyname; self.nameSeq:=right.nameSeq,self.namePenalty:=right.namePenalty	)	), STD.Str.ToUpperCase(CompanyName),nameSeq ), STD.Str.ToUpperCase(CompanyName)),nameSeq,namePenalty);
-	 	 finalnames:=names+companynames;	
-		 self.Names:=finalnames;
+		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
+				//normalize the set for any name that has a first or last or full name building a full name it it does not exist
+				nNames := NORMALIZE( allRows, LEFT.Names( (FirstName<>'' or LastName<>'' or FullName<>'' )), 
+																																TRANSFORM( Layouts.layout_nameinfo, 
+																																									SELF.fullname:=if(right.fullname <>'',right.fullname ,STD.Str.ToUpperCase(std.str.CleanSpaces(right.firstname+' '+right.middlename+' '+right.lastname+' '+right.suffix))),
+																																									self.nameseq:=right.nameseq,
+																																									self.namepenalty:=right.namepenalty, 
+																																									self:=right)	);
+				//group and rollup the names based on the newly built full name
+				gNames := group(sort(nNames,fullname,nameSeq),fullname);
+				Names := rollup(gNames,group,xformRollNames(left,rows(left)));
+				//Do the same for Company names
+				nCompany := NORMALIZE( allRows, LEFT.Names( CompanyName<>''), 
+																																TRANSFORM( Layouts.layout_nameinfo, 
+																																									SELF.CompanyName:=if(right.CompanyName <>'',right.CompanyName,right.CompanyName),
+																																									self.nameseq:=right.nameseq,
+																																									self.namepenalty:=right.namepenalty, 
+																																									self:=right)	);
+				gCompany := group(sort(nCompany,CompanyName,nameSeq),CompanyName);
+				companyNames := rollup(gCompany,group,xformRollCompany(left,rows(left)));
+    	 	 sort_names:=dedup(sort(ungroup(names)+ungroup(companynames),fullname,firstname,lastname,suffix,title,companyname),fullname,firstname,lastname,suffix,title,companyname);
+		 finalnames:=sort(sort_names,nameSeq,namePenalty,fullname,companyname);	
+		 self.Names:=finalnames(nameseq>0);
 		
 	 	
 		/*Add logic to sort based on requirements
@@ -3318,7 +3340,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.UniqueIds := choosen(project(resultRec.dids, transform (iesp.share.t_StringArrayItem, Self.value := (string)Left.did)),iesp.Constants.HPR.MAX_UNIQUEIDS);
 		self.BusinessIds := choosen(project(resultRec.bdids, transform (iesp.share.t_StringArrayItem, Self.value := (string)Left.bdid)),iesp.Constants.HPR.MAX_BDIDS);
 		self.BusinessLinkIds := choosen(project(resultRec.bipkeys, transform (iesp.share.t_BusinessIdentity, self := left)),iesp.Constants.HPR.MAX_UNIQUEIDS);
-		self.Names := choosen(project(sort(dedup(sort(resultRec.names(nameSeq>0),FirstName,MiddleName,LastName,companyname,nameSeq),FirstName,MiddleName,LastName,companyname),nameSeq), transform(iesp.share.t_Name, self := iesp.ECL2ESP.SetName(left.FirstName, left.MiddleName, left.LastName, left.Suffix,'',map(left.LastName = '' and left.CompanyName <>''=>left.CompanyName,left.FullName)))),iesp.Constants.HPR.MAX_NAMES);
+		self.Names := choosen(dedup(sort(project(sort(dedup(sort(resultRec.names(nameSeq>0),FirstName,MiddleName,LastName,companyname,nameSeq),FirstName,MiddleName,LastName,companyname),nameSeq), transform(iesp.share.t_Name, self := iesp.ECL2ESP.SetName(left.FirstName, left.MiddleName, left.LastName, left.Suffix,'',map(left.LastName = '' and left.CompanyName <>''=>left.CompanyName,left.FullName)))),record),record)  ,iesp.Constants.HPR.MAX_NAMES);
 		self.Languages := choosen(project(dedup(sort(resultRec.Languages,language),language), transform (iesp.share.t_StringArrayItem, Self.value := Left.language)),iesp.Constants.HPR.MAX_LANGUAGES);
 		self.DOBs := choosen(project(dedup(sort(resultRec.dobs,-dob),dob), transform (iesp.share.t_Date, Self := if(resultRec.glb_ok,iesp.ECL2ESP.toDatestring8(Left.dob),iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDatestring8(Left.dob),5)))),iesp.Constants.HPR.MAX_DOBS);
 		tmp_feins := project(dedup(sort(resultRec.feins,fein),fein), transform (iesp.share.t_StringArrayItem, Self.value := Left.fein));
