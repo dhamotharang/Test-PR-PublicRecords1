@@ -3,7 +3,9 @@
 export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
 		boolean IncludeLnJ = false, boolean onThor = false, 
-		GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext) := function
+		GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
+  integer2 ReportingPeriod = 84 
+    ) := function
  
 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
@@ -18,8 +20,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	FilterJudgments := (BSOptions & risk_indicators.iid_constants.BSOptions.Judgment) > 0;
 	FilterEvictions := (BSOptions & risk_indicators.iid_constants.BSOptions.Eviction) > 0;
 	FilterSSNs := (BSOptions & risk_indicators.iid_constants.BSOptions.SSNLienFtlr) > 0;
-	FilterBcb := (BSOptions & risk_indicators.iid_constants.BSOptions.BCBLienFtlr) > 0;
-
+ FilterBcb := (BSOptions & risk_indicators.iid_constants.BSOptions.BCBLienFtlr) > 0;
+ 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ add_liens(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, liensv2.key_liens_did_FCRA ri) :=
 	TRANSFORM
 		SELF.rmsid := ri.rmsid;
@@ -51,7 +53,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		self.name_type := ri.name_type;
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
-		SELF.VendorDateLastSeen := ri.date_vendor_last_reported;
+		//SELF.VendorDateLastSeen := ri.date_vendor_last_reported; // removed this as we're doing it in main now 
 		self.PersistId := (string) ri.persistent_record_id;
 		SELF := le;
 		SELF := [];
@@ -66,7 +68,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							right.name_type='D' and
+							// make sure date_first_seen is within ReportingPeriod months of the historydate 
+       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       right.name_type='D' and
 						  (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
@@ -78,7 +82,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
+							// make sure date_first_seen is within ReportingPeriod months of the historydate 
+       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
@@ -98,7 +104,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											keyed(right.flag_file_id IN left.lien_correct_ffid) and 
 											left.did=(unsigned)right.did and
 											(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-											right.name_type='D'
+											// make sure date_first_seen is within ReportingPeriod months of the historydate 
+           ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+           right.name_type='D'
 											and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL								
 											get_liensparty_corrections(LEFT, RIGHT),
 											ATMOST(riskwise.max_atmost));
@@ -107,7 +115,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											right.flag_file_id IN left.lien_correct_ffid and 
 											left.did=(unsigned)right.did and
 											(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-											right.name_type='D'
+											// make sure date_first_seen is within ReportingPeriod months of the historydate xNJJx
+           ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+           right.name_type='D'
 											and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL								
 											get_liensparty_corrections(LEFT, RIGHT), ALL, LOCAL);
 					
@@ -122,6 +132,11 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
 		releasedDate := (string) le.date_last_seen ;
 		OrigDateFiled := (string) le.date_first_seen;
+    
+  
+  SELF.VendorDateLastSeen := ri.collection_date;
+  // self.vendordatelastseen := '20180215';  
+  //self.filing_type_id := 'ZZ';
 		
 		SELF.date_first_seen := (unsigned) OrigDateFiled;
 		SELF.date_last_seen :=(unsigned)  releasedDate;
@@ -291,6 +306,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.certificateNumber := ri.certificate_number;
 		SELF.irsSerialNumber := ri.irs_serial_number;
 		SELF.CaseNumberL := ri.Case_number;
+  self.Filing_Type_id := ri.Filing_Type_ID;
 		SELF.ProcessDate := ri.Process_Date;
 		SELF.seq := (Unsigned4) le.Seq;
 		//liens
@@ -351,7 +367,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50 AND
 					(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 					and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
-					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),	
+					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE) 
+          ,	
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
 
@@ -364,7 +381,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant			
 					(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 					and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
-					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),	
+					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE) 
+          ,	
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid) 
 					, riskwise.max_atmost), LOCAL);
@@ -490,7 +508,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix)),
 											'');
 		SELF.Name_type := ri.name_type;
-		SELF.vendorDateLastSeen := ri.Date_vendor_Last_reported;
+		//SELF.vendorDateLastSeen := ri.Date_vendor_Last_reported;
+  self.datelastseen := ri.date_last_seen;
 		SELF := le;
 	END;
 	
@@ -500,7 +519,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							keyed(left.tmsid=right.tmsid) and 
 							(left.lnj_jgmt_cnt >= 1 or left.lnj_eviction_count >= 1) and 
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
+							// make sure date_first_seen is within ReportingPeriod months of the historydate 
+       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
 							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
 							right.name_type='C'
 							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
@@ -517,6 +537,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
 							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
+							// make sure date_first_seen is within ReportingPeriod months of the historydate 
+       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
 							right.name_type='C'
 							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
@@ -526,7 +548,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							(left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
 
   liensWplainTiff := if(onThor, liensWplainTiff_thor, ungroup(liensWplainTiff_roxie));
-	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, vendorDateLastSeen), TMSID, name_type, KEEP(1));
+	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, DateLastSeen), TMSID, name_type, KEEP(1));
 	liens_fuller := JOIN(liens_filtered_DF, liensWplainTiff_duped,
 		LEFT.Tmsid = RIGHT.Tmsid and 
 		LEFT.rmsid = RIGHT.rmsid and 
@@ -772,6 +794,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		self.LienType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
 		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
+  self.LienTypeID := le.Filing_Type_ID;
 		self := le;
 		self :=[];
 	end;
@@ -807,6 +830,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		self.JudgmentType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
 		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
+  self.JudgmentTypeID := le.Filing_Type_ID;
 		self := le;
 		self :=[];
 	end;
@@ -907,8 +931,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 // output(liens_fuller, named('liens_fuller'));
 // output(liens_main_raw, named('liens_main_raw'));
 // output(liensWithDesc, named('liensWithDesc'));
-// output(liens_party_raw, named('liens_party_raw'));
-// output(liensWplainTiff, named('liensWplainTiff'));
+ //output(liens_party_raw, named('liens_party_raw'));
+ //output(liensWplainTiff, named('liensWplainTiff'));
 // output(liensWplainTiff_duped, named('liensWplainTiff_duped'));
 // output(liens_party_rawTMp, named('liens_party_rawTMp'));
 // output(liens_added, named('liens_added'));
