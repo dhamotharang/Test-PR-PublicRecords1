@@ -1,4 +1,4 @@
-IMPORT Address, Risk_Indicators, Models, RiskWise, Risk_Reporting, ut, dma, doxie, gateway;
+﻿IMPORT Address, Risk_Indicators, Models, RiskWise, Risk_Reporting, ut, dma, doxie, gateway;
 
 EXPORT LeadIntegrity_Search_Function(
 														DATASET(Models.Layout_LeadIntegrity_In) indata,
@@ -9,7 +9,9 @@ EXPORT LeadIntegrity_Search_Function(
 														unsigned1 attributesVersion,
 														STRING16 modelName,
 														BOOLEAN DisableDoNotMailMask = FALSE,
-														STRING50 DataPermission = Risk_Indicators.iid_constants.default_DataPermission
+														STRING50 DataPermission = Risk_Indicators.iid_constants.default_DataPermission,
+                            dataset(Gateway.Layouts.Config) gateways =  dataset([],Gateway.Layouts.Config),
+                            unsigned1 ofac_version = 1
 													) := FUNCTION
 
 /* ***************************************
@@ -98,13 +100,16 @@ EXPORT LeadIntegrity_Search_Function(
 	BOOLEAN nugen := TRUE;
 	BOOLEAN isUtility := FALSE;
 	BOOLEAN ofacOnly := FALSE;
-	BOOLEAN ofacSearching := IF(attributesVersion >= 4, TRUE, FALSE);
-	UNSIGNED1 ofacVersion := IF(attributesVersion >= 4, 2, 1);
+	BOOLEAN include_ofac := IF(attributesVersion >= 4, TRUE, FALSE);
+	UNSIGNED1 ofacVersion := map(attributesVersion >= 4 and ofac_version = 4 => 4,
+                               attributesVersion >= 4 => 2, 
+                                                         1);
 	BOOLEAN includeAdditionalWatchlists := IF(attributesVersion >= 4, TRUE, FALSE);
+  REAL    global_watchlist_threshold := if(ofacVersion in [1, 2, 3], 0.84, 0.85);
 	BOOLEAN excludeWatchlists := IF(attributesVersion >= 4, FALSE, TRUE); // Attributes 4.1 return a watchlist hit, so don't exclude watchlists
 	// For ITA we can't use FARES Data
 	BOOLEAN filterOutFares := TRUE;
-	gateways := Gateway.Constants.void_gateway;
+	gateways_BS := if(ofacVersion = 4 and attributesVersion >= 4, gateways, Gateway.Constants.void_gateway);
 	append_best := if( modelname in ['msn1106_0', 'msn1210_1'] or attributesVersion >= 4, 2, 0 );
 	unsigned8 BSOptions := IF(attributesVersion >= 4, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail + 
 																										risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
@@ -113,12 +118,12 @@ EXPORT LeadIntegrity_Search_Function(
 /* ***************************************
 	 *     Gather Boca Shell Results:      *
    *************************************** */
-	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, ofacOnly, 
-																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
+	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways_BS, DPPAPurpose, GLBPurpose, isUtility, isLn, ofacOnly, 
+																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																					in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions,
 																					in_DataPermission := DataPermission);
 
-	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, doRelatives, doDL, 
+	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways_BS, DPPAPurpose, GLBPurpose, isUtility, isLn, doRelatives, doDL, 
 																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction,
 																						BSOptions := BSOptions, DataPermission := DataPermission);
 
