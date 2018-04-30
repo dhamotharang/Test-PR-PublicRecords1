@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ThinTeaserRollupService">	
   <part name="FirstName" type="xsd:string"/>
   <part name="AllowNickNames" type="xsd:boolean"/>
@@ -33,6 +33,7 @@
   <part name="IncludeAddress"     type="xsd:boolean"/>
   <part name="IncludeEmailAddress" type="xsd:boolean"/>
   <part name="IncludeEducationInformation" type="xsd:boolean"/>
+<part name="IncludeDtcCounts" type="xsd:boolean"/>
   <separator />
 	<part name="ThinRollupPersonExtendedSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 </message>
@@ -96,6 +97,10 @@ export ThinTeaserRollupService := MACRO
   boolean in_IncludeEducationInformation := false : stored('IncludeEducationInformation');	
  	// end new additions.
 	
+	#stored ('IncludeDtcCounts', search_options.IncludeDtcCounts);
+  boolean in_IncludeDtcCounts := false : stored('IncludeDtcCounts');	
+ 	// end new additions.
+	
 	#stored ('ForceLogging', search_options.ForceLogging);
   boolean in_ForceLogging := false : stored('ForceLogging');	
 	// forceLogging := random()%100000=1 or in_ForceLogging; //Log an event roughly 1 in every 100k occurances or when forced to
@@ -121,6 +126,7 @@ export ThinTeaserRollupService := MACRO
 		export IncludeAddress := in_IncludeAddress;		
 		export IncludeEmailAddress := in_IncludeEmailAddress;		
 		export IncludeEducationInformation := in_IncludeEducationInformation;
+		export IncludeDtcCounts               := in_IncludeDtcCounts;
 		export RelaxedMiddleNameMatch := in_RelaxedMiddleNameMatch;
 		export AlwaysReturnRecords := in_AlwaysReturnRecords;
 		export applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
@@ -138,10 +144,13 @@ export ThinTeaserRollupService := MACRO
 																																				tempmod.IncludeEmailAddress,		
 																																				tempmod.IncludeEducationInformation,
 																																				tempmod.ApplicationType);
+  w_additional_data_Counts := TeaserSearchServices.Functions.GetCounts(w_additional_data,
+	                                                                   tempmod.IncludeDtcCounts,
+																																		 tempmod.ApplicationType);
 	
 	lastRec:=count(tempresults);
 	lastID:=tempresults[lastrec].UniqueId;
-	getExtendedFakeAddress := if(forceLogging,TeaserSearchServices.Functions.getExtendedFakeAddress(w_additional_data[lastRec]));
+	getExtendedFakeAddress := if(forceLogging,TeaserSearchServices.Functions.getExtendedFakeAddress(w_additional_data_Counts[lastRec]));
 	//Verify Addresses size and Addend Data for extended version
 	iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord appendExtendedFakeData(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord inrec, integer c) := transform
 		integer4 CntAddresses := count(inrec.Addresses);
@@ -149,13 +158,16 @@ export ThinTeaserRollupService := MACRO
 		self.addresses := if(c=lastRec,newAddress,inrec.Addresses);
 		self := inrec;
 	end;
-	w_additional_dataPlus := if(in_ForceLogging,project(w_additional_data,appendExtendedFakeData(left,counter)), w_additional_data);	
+	w_additional_dataPlus := if(in_ForceLogging,project(w_additional_data_Counts,appendExtendedFakeData(left,counter)), w_additional_data_Counts);	
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(w_additional_dataPlus, results, 
                          iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchResponse, Records, 
 												 false, RecordCount,,,iesp.Constants.ThinRpsExt.MaxRespRecords);
   // output(InFROMESP_DtcPhoneAddressTeaserMask, named('InFROMESP_DtcPhoneAddressTeaserMask'));												 
 	//output(In_DtcPhoneAddressTeaserMask, named('In_DtcPhoneAddressTeaserMask'));
+	// output(w_additional_data, named('w_additional_data'));
+	// output(w_addition_data_counts, named('w_addition_data_counts'));
+	//output(dtcCounts, named('dtcCounts'));
 	output(results, named('Results'));
 	
 	// Generate Royalty Billing information if this is ForceLogging event
