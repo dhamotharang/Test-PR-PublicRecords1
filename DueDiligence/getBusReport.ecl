@@ -24,7 +24,11 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   addBestData                := DueDiligence.reportBusBestInfo(addRegisteredAgents);   	
   
   //***This section is for Best Business Information ***//
-  addExecutives              := DueDiligence.reportBusExecs(addBestData);
+  addExecutives              := DueDiligence.reportBusExecs(addBestData, options, linkingOptions);
+  
+  //***This section is for Shell Shelf Information ***//
+  addShellShelf              := DueDiligence.reportBusShellShelf(addExecutives);
+  //addShellShelf              := addExecutives;
 																													
 													 
 	// ********************
@@ -33,15 +37,16 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 
 	// *********************
 
-	  IF(DebugMode,      OUTPUT(UpdateBusnExecCriminalWithReport,           NAMED('UpdateBusnExecCriminalWithReport')));		
-   	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingLocToReport, 100),     NAMED('AddOperatingLocToReportout')));		
-   	IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingInfoToReport, 100),     NAMED('AddOperatingInfoToReport')));		
-   	IF(DebugMode,      OUTPUT(CHOOSEN(addBestData, 100),                NAMED('addBestData')));		
+	  // IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBusnExecCriminalWithReport, 50),   NAMED('UpdateBusnExecCriminalWithReport')));		
+   	// IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingLocToReport, 50),     NAMED('AddOperatingLocToReportout')));		
+   	// IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingInfoToReport, 50),     NAMED('AddOperatingInfoToReport')));		
+   	// IF(DebugMode,      OUTPUT(CHOOSEN(addBestData, 50),                NAMED('addBestData')));		
+   	// IF(DebugMode,      OUTPUT(CHOOSEN(addShellShelf, 50),                NAMED('addShellShelf')));		
     
     
   // OUTPUT(addBestData, NAMED('addBestData'));  
   // OUTPUT(addExecutives, NAMED('addExecutives'));  
 
 
-	RETURN addExecutives;
+	RETURN addShellShelf;
 END;

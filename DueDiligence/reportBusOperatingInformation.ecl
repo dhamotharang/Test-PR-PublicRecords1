@@ -3,23 +3,11 @@
 EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
                                              boolean DebugMode = FALSE) := FUNCTION
                                              
-  //****************************Begining of Bureau Reporting****************************
-  bureauSources := DueDiligence.CommonBusiness.GetMaxSources(BusnData, bureauReporting, iesp.constants.DDRAttributesConst.MaxReportingBureaus);
   
-  addBureauSources := JOIN(BusnData, bureauSources,
-                            #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
-                            TRANSFORM(RECORDOF(LEFT),
-                                      SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfBureauReporting := COUNT(LEFT.bureauReporting);
-                                      SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ReportingBureaus := RIGHT.sources;
-                                      SELF := LEFT;),
-                            LEFT OUTER);
-                           
- 
-	
-	//****************************Begining of Non-Credit Bureau Sources****************************
-	nonBureauSources := DueDiligence.CommonBusiness.GetMaxSources(BusnData, sourcesReporting, iesp.constants.DDRAttributesConst.MaxReportingSources);
+	//all reporting sources
+	allReportingSources := DueDiligence.CommonBusiness.GetMaxSources(BusnData, iesp.constants.DDRAttributesConst.MaxReportingSources);
   
-  addNonBureauSources := JOIN(addBureauSources, nonBureauSources,
+  addAllReportingSources := JOIN(BusnData, allReportingSources,
                               #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                               TRANSFORM(RECORDOF(LEFT),
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.NumberOfSourcesReporting := COUNT(LEFT.sourcesReporting);
@@ -59,10 +47,14 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                                 SELF.name := LEFT.name + RIGHT.name;
                                 SELF := LEFT));
   
-  addAssociatedNames := JOIN(addNonBureauSources, rollNames,
+  addAssociatedNames := JOIN(addAllReportingSources, rollNames,
                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                              TRANSFORM(RECORDOF(LEFT),
-                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := LEFT.busn_info.fein;
+                                                        /*  IF TIN/FEIN is EXPERIAN RESTRICTED  then use the MASKED FEIN */ 
+                                                        /*  EXPERIAN is letting us know this FEIN may be an SSN - so it must be masked
+																										    /*  Expecting online request to have the SSN_MASK of '' and take care of masking in Evolution */
+                                                        /*  Expecting API request to have the SSN_MASK of ALL, NONE, FIRST5, LAST4 or '' based on customer's setting in MBS */  
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := IF(LEFT.FEINSourceContainsE5 = true, LEFT.FEIN_Masked_For_Report, LEFT.busn_info.fein);
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEINIsSSN := LEFT.feinIsSSN;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.name;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.OperatesOutOfAHomeOffice := LEFT.busIsSOHO;
@@ -115,7 +107,6 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   addMiscInfo := PROJECT(addDBANames, TRANSFORM(RECORDOF(LEFT),
                                                 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ParentCompany := LEFT.parentCompanyName;
                                                 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.StructureType := IF(LEFT.hdBusnType = DueDiligence.Constants.EMPTY, LEFT.adrBusnType, LEFT.hdBusnType);
-                                                SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.RegisteredBusiness := LEFT.busRegHit;
                                                 SELF := LEFT;));
   
   
@@ -128,8 +119,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-  // OUTPUT(bureauSources, NAMED('bureauSources'));
-  // OUTPUT(nonBureauSources, NAMED('nonBureauSources'));
+  // OUTPUT(allReportingSources, NAMED('allReportingSources'));
   
   // OUTPUT(assocNames, NAMED('assocNames'));
   // OUTPUT(sortGroupAssocNames, NAMED('sortGroupAssocNames'));

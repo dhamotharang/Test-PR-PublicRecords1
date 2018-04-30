@@ -130,6 +130,42 @@
 		BOOLEAN			atleastOneParentHasImmigrantSSN;							    //populated in DueDiligecne.getIndSSNData
 		BOOLEAN			atleastOneParentIsRegisteredVoter;					      //populated in DueDiligence.getIndHeader
 		UNSIGNED4		mostRecentParentSSNIssuanceDate;							    //populated in DueDiligecne.getIndSSNData
+    /*PerLegalEventType*/
+		BOOLEAN			atleastOneCategory9;
+		BOOLEAN			atleastOneCategory8;
+		BOOLEAN			atleastOneCategory7;
+		BOOLEAN			atleastOneCategory6;
+		BOOLEAN			atleastOneCategory5;
+		BOOLEAN			atleastOneCategory4;
+		BOOLEAN			atleastOneCategory3;
+		BOOLEAN			atleastOneCategory2;
+    /*PerLegalTrafficInfractions*/
+    BOOLEAN     threePlusTrafConvictPast3Yrs;
+    BOOLEAN     twoOrLessTrafConvictPast3Yrs;
+    BOOLEAN     threePlusInfractConvictPast3Yrs;
+    BOOLEAN     twoOrLessInfractConvictPast3Yrs;
+    BOOLEAN     threePlusTrafConvictOver3Yrs;
+    BOOLEAN     twoOrLessTrafConvictOver3Yrs;
+    BOOLEAN     threePlusInfractConvictOver3Yrs;
+    BOOLEAN     twoOrLessInfractConvictOver3Yrs;
+    /*PerLegalCivil*/
+    BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
+    BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;
+    BOOLEAN     three2FourLiensJudgementsEvictionsPast3Yrs;
+    BOOLEAN     one2TwoLiensJudgementsEvictionsPast3Yrs;
+    BOOLEAN     tenPlusLiensJudgementsEvictionsOver3Yrs;
+    BOOLEAN     five2NineLiensJudgementsEvictionsOver3Yrs;
+    BOOLEAN     three2FourLiensJudgementsEvictionsOver3Yrs;
+    BOOLEAN     one2TwoLiensJudgementsEvictionsOver3Yrs;
+    /*PerLegalStateCriminal*/
+    BOOLEAN     currentIncarcerationOrParole;
+    BOOLEAN     felonyPast3Yrs;
+    BOOLEAN     felonyOver3Yrs;
+    BOOLEAN     previousIncarceration;
+    BOOLEAN     uncategorizedConvictionPast3Yrs;
+    BOOLEAN     misdemeanorConvictionPast3Yrs;
+    BOOLEAN     uncategorizedConvictionOver3Yrs;
+    BOOLEAN     misdemeanorConvictionOver3Years;
   END;
 
 END;

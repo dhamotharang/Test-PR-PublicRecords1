@@ -618,9 +618,9 @@ EXPORT CommonBusiness := MODULE
      RETURN filingStatus;
   ENDMACRO;
   
-  EXPORT AddHeaderSources(bureauData, inquiredBus, inquiredBusFieldToPopulate) := FUNCTIONMACRO
+  EXPORT AddHeaderSources(sourceData, inquiredBus, inquiredBusFieldToPopulate) := FUNCTIONMACRO
   
-     sortSrc := SORT(bureauData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
+     sortSrc := SORT(sourceData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, dt_first_seen, dt_vendor_first_reported);
      rollSrc := ROLLUP(sortSrc,
                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                        LEFT.source = RIGHT.source,
@@ -668,9 +668,9 @@ EXPORT CommonBusiness := MODULE
      RETURN addHeaderSrc;   
   ENDMACRO;
   
-	EXPORT GetMaxSources(inquiredBus, childSource, maxResults) := FUNCTIONMACRO
+	EXPORT GetMaxSources(inquiredBus, maxResults) := FUNCTIONMACRO
      
-     ListOfBusSources := NORMALIZE(inquiredBus, LEFT.childSource, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.BusSourceLayout},																												
+     ListOfBusSources := NORMALIZE(inquiredBus, LEFT.bureauReporting + LEFT.sourcesReporting, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.BusSourceLayout},																												
                                                                             SELF.seq := LEFT.seq;
                                                                             SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                             SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;

@@ -448,6 +448,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxLicenses   							:= 500;
 		export unsigned2 MaxBusinessExecs   				:= 500;
 		export unsigned2 MaxRegisteredAgents   			:= 500;
+		export unsigned2 MaxIndvAssociations   			:= 500;
+		export unsigned2 MaxBusAssociations   			:= 500;
 	end;
 
   //Dun and Bradstreet (DNB)
