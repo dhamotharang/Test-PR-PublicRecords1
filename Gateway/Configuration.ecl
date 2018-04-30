@@ -1,4 +1,4 @@
-﻿import Risk_Indicators, STD;
+﻿import Gateway, Risk_Indicators, STD;
 
 /*
 	*************************************************************************************
@@ -15,8 +15,8 @@
 export Configuration := module
 
 	// Read gateway configuration from #store.
-	export Get() := function		
-		
+	export Get() := function
+
 		// Reading additional configuration.
 		string 	_transactionID 	:= '' : stored('_TransactionId');
 		string 	_bJobID 			 	:= '' : stored('_BatchJobId');
@@ -27,54 +27,54 @@ export Configuration := module
 		--------------------------------------------------------------------------------------------------------------------------*/
 		boolean	__Blind	:= FALSE : stored('_Blind');
 		boolean	Blind		:= FALSE : stored('Blind');
-		string _Blind 	:= if(Blind or __Blind, '1', '0'); 
-		
-		// Reading query name; removing appended version, if necessary.		
+		string _Blind 	:= if(Blind or __Blind, '1', '0');
+
+		// Reading query name; removing appended version, if necessary.
 		string 	_roxieQName 		:= thorlib.jobname();
-		integer _vIdx 					:= stringlib.stringfind(_roxieQName,'.',2)-1;
+		integer _vIdx 					:= STD.Str.Find(_roxieQName,'.',2)-1;
 		string 	_roxieQueryName	:= IF(_vIdx>0, _roxieQName[1.._vIdx], _roxieQName);
 
 		// ************************************************************************
-		// Storing configuration properties as name value pairs. 
+		// Storing configuration properties as name value pairs.
 		//
 		// NOTE: Why name/pairs? Once we migrate the riskwise libraries over to
 		// use this attribute, the libraries will take in Layouts.Config instead
-		// of Risk_Indicators.Layout_Gateways_In. Having these properties as name/value 
-		// pairs should minimize dependencies. 
+		// of Risk_Indicators.Layout_Gateways_In. Having these properties as name/value
+		// pairs should minimize dependencies.
 		// ************************************************************************
-		dGWProperties := 
-			dataset([ 
-								{Constants.ConfigProperties.TransactionId		, trim(_transactionID,left,right)},
-								{Constants.ConfigProperties.BatchJobId			,	trim(_bJobID,left,right)			 },
-								{Constants.ConfigProperties.BatchSpecId			,	trim(_bSpecID,left,right)			 },
-								{Constants.ConfigProperties.BlindOption			,	_Blind												 },
-								{Constants.ConfigProperties.RoxieQueryName	,	_roxieQueryName								 }
-							 ], Gateway.Layouts.ConfigProperties);			
+		dGWProperties :=
+			dataset([
+								{Gateway.Constants.ConfigProperties.TransactionId		, trim(_transactionID,left,right)},
+								{Gateway.Constants.ConfigProperties.BatchJobId			,	trim(_bJobID,left,right)			 },
+								{Gateway.Constants.ConfigProperties.BatchSpecId			,	trim(_bSpecID,left,right)			 },
+								{Gateway.Constants.ConfigProperties.BlindOption			,	_Blind												 },
+								{Gateway.Constants.ConfigProperties.RoxieQueryName	,	_roxieQueryName								 }
+							 ], Gateway.Layouts.ConfigProperties);
 
 		// ************************************************************************
 		// Temporarily reading from store using old layout to avoid conflict.
 		// Once we make the change to RiskIndicators, uncomment this line and deprecate the old layout.
 		// ************************************************************************
-		// dGWIn 			:= Constants.void_gateway : stored ('Gateways', few);				
-		dGWIn := dataset([], Risk_Indicators.Layout_Gateways_In) : stored ('Gateways', few);		
+		// dGWIn 			:= Constants.void_gateway : stored ('Gateways', few);
+		dGWIn := dataset([], Risk_Indicators.Layout_Gateways_In) : stored ('Gateways', few);
 
-		dGWInProps 	:= project(dGWIn, 
-													 transform(Gateway.Layouts.Config, 
-																		 self.TransactionId := _transactionID, 
+		dGWInProps 	:= project(dGWIn,
+													 transform(Gateway.Layouts.Config,
+																		 self.TransactionId := _transactionID,
 																		 self.properties := dGWProperties,
-																		 self := left));    
+																		 self := left));
 		return dGWInProps;
-		
+
 	end;
-	
-	// ************************************************************************	
+
+	// ************************************************************************
 	// Use functions below to filter gateway configuration.
 	//
 	export IsQSent			(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.QSent;
 	export IsQSentV2		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.QSentV2;
 	export IsTargus			(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Targus;
-	export IsMetronet		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Metronet; 
-	export IsAccuDataOCN(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.AccuDataOCN; // accudata_ocn 
+	export IsMetronet		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Metronet;
+	export IsAccuDataOCN(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.AccuDataOCN; // accudata_ocn
 	export IsPolk				(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Polk;
 	export IsExperian		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Experian;
 	export IsEquifax		(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.Equifax;
@@ -86,29 +86,30 @@ export Configuration := module
 	export IsNews				(string40 svcName) := FALSE;  // should never be used
 	export IsEquifaxSts (string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.EquifaxSts;
 	export IsThreatMetrix	(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.ThreatMetrix;
-	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;		
-	export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;		
+	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;
+	export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;
   export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;
 	export IsEquifaxEVS(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxEVS;
 	export IsAccuDataCNAM(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsAccuDataCNAM;
-  // internal
+	export IsEquifaxEmsReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsEquifaxEmsReport;
+	// internal
 	export IsNeutralRoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.NeutralRoxie;
 	export IsFCRARoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FCRARoxie;
-	export IsInsurancePhoneHeader(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.InsurancePhoneHeader;	
-	export IsSearchCore(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.SearchCore;		
+	export IsInsurancePhoneHeader(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.InsurancePhoneHeader;
+	export IsSearchCore(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.SearchCore;
 	export IsBridgerXG5(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.BridgerXG5;
-	export IsBridgerWLC(string40 svcName) := stringlib.StringToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.BridgerWLC;		
-	export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;		
-	export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;	
-	export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;	
+	export IsBridgerWLC(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.BridgerWLC;
+	export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;
+	export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;
+	export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;
 
-	// ************************************************************************	
+	// ************************************************************************
 	// Use functions below to retrieve gateway configuration properties.
 	//
-	export string 	GetTransactionIdX(Layouts.Config GWCfg) := GWCfg.properties(name=Gateway.Constants.ConfigProperties.TransactionId)[1].val;
-	export boolean 	GetBlindOption(Layouts.Config GWCfg) 		:= GWCfg.properties(name=Gateway.Constants.ConfigProperties.BlindOption)[1].val = '1';
-	export integer 	GetBatchJobId(Layouts.Config GWCfg) 		:= (integer)GWCfg.properties(name=Gateway.Constants.ConfigProperties.BatchJobId)[1].val;
-	export integer 	GetBatchSpecId(Layouts.Config GWCfg) 		:= (integer)GWCfg.properties(name=Gateway.Constants.ConfigProperties.BatchSpecId)[1].val;
-	export string 	GetRoxieQueryName(Layouts.Config GWCfg) := GWCfg.properties(name=Gateway.Constants.ConfigProperties.RoxieQueryName)[1].val;
-	
+	export string 	GetTransactionIdX(Gateway.Layouts.Config GWCfg) := GWCfg.properties(name=Gateway.Constants.ConfigProperties.TransactionId)[1].val;
+	export boolean 	GetBlindOption(Gateway.Layouts.Config GWCfg) 		:= GWCfg.properties(name=Gateway.Constants.ConfigProperties.BlindOption)[1].val = '1';
+	export integer 	GetBatchJobId(Gateway.Layouts.Config GWCfg) 		:= (integer)GWCfg.properties(name=Gateway.Constants.ConfigProperties.BatchJobId)[1].val;
+	export integer 	GetBatchSpecId(Gateway.Layouts.Config GWCfg) 		:= (integer)GWCfg.properties(name=Gateway.Constants.ConfigProperties.BatchSpecId)[1].val;
+	export string 	GetRoxieQueryName(Gateway.Layouts.Config GWCfg) := GWCfg.properties(name=Gateway.Constants.ConfigProperties.RoxieQueryName)[1].val;
+
 end;
