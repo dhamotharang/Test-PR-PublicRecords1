@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, STD, MDR;
 
 /*
 	Following Keys being used: 
@@ -38,21 +38,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
 
 
-  //get date vendor first reported - to be used to calc established date for report
-  vendorFirstReported := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_vendor_first_reported);
   
-  rollVendorDates := ROLLUP(vendorFirstReported(dt_vendor_first_reported > 0), 
-                          #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-													TRANSFORM({RECORDOF(busHeaderFilt)},
-																		SELF.dt_vendor_first_reported := MIN(LEFT.dt_vendor_first_reported, RIGHT.dt_vendor_first_reported);
-																		SELF := LEFT;));
-                                    
-  addVenderFirstSeen := JOIN(indata, rollVendorDates,
-                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-                              TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                        SELF.dateVendorFirstReported := RIGHT.dt_vendor_first_reported;
-                                        SELF := LEFT;),
-                              LEFT OUTER);
 
 	//get date first seen and date last seen
 	sortByDates := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen, dt_last_seen);
@@ -64,7 +50,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
 																		SELF := LEFT;));
 	
-	addBusHdrDtSeen := JOIN(addVenderFirstSeen, rollForDates,
+	addBusHdrDtSeen := JOIN(inData, rollForDates,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
                           TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                     SELF.BusnHdrDtFirstSeen := RIGHT.dt_first_seen;
@@ -113,8 +99,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF.shellHdrSrcCnt := RIGHT.shellSrcCnt;
 																		SELF := LEFT),
 													LEFT OUTER);
-
-	
+                          
 
 													
 	//get business header operating location address count - should only have 1 address associated with proxID
@@ -124,7 +109,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	hdrAddrProject := PROJECT(dedupSortBusHdrAddr, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
 																														SELF.addrCount := 1;
-																													 SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
+																													  SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
 																																																			SELF.county:= LEFT.fips_county;
 																																																			SELF.city := LEFT.v_city_name;
 																																																			SELF.state := LEFT.st;
@@ -134,7 +119,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																																			SELF := [];));
 																														SELF := LEFT;
 																														SELF := [];));
-	
+	                                                                                  /* the bus internal */   
 	addHdrAddrCount := DueDiligence.CommonBusiness.AddOperatingLocations(hdrAddrProject, addShellSrcCnt, DueDiligence.Constants.EMPTY);
 														
 	//get the business structure
@@ -146,7 +131,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF.company_org_structure_derived := IF(LEFT.company_org_structure_derived = DueDiligence.Constants.EMPTY, RIGHT.company_org_structure_derived, LEFT.company_org_structure_derived);
 																				SELF := LEFT;));
 
-	addStructure := JOIN(addShellSrcCnt, rollForStructure,
+	addStructure := JOIN(addHdrAddrCount, rollForStructure,
 														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																			SELF.hdBusnType := RIGHT.company_org_structure_derived;
@@ -228,8 +213,9 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                     LEFT OUTER);
 											
 	//is the business incorporated in a state with loose incorporation laws
-	projectLooseLaws := PROJECT(busHeaderFilt, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState}, 
-																													SELF.looseLawState := LEFT.company_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
+	projectLooseLaws := PROJECT(busHeaderFilt, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 
+																													SELF.looseLawState    := LEFT.company_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
+                                                          SELF.CompanyIncorpSt  := LEFT.company_inc_state;  
 																													SELF := LEFT;));
 	
 	sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
@@ -237,13 +223,15 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	rollLooseLaws := ROLLUP(sortLooseLaws,
 													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
 													TRANSFORM({RECORDOF(LEFT)},
-																			SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
+																			SELF.looseLawState   := LEFT.looseLawState OR RIGHT.looseLawState;
+                                      SELF.CompanyIncorpSt := IF(LEFT.CompanyIncorpSt != '', LEFT.CompanyIncorpSt, RIGHT.CompanyIncorpSt); 
 																			SELF := LEFT;));
 																			
 	addIncLooseLaws := JOIN(addNoFein, rollLooseLaws,
 													#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
+                                    SELF.CompanyIncorpState  := RIGHT.CompanyIncorpSt;                         //***To be printed on the shell shelf char section of report  
 																		SELF := LEFT;),
 													LEFT OUTER);										
 											
@@ -322,6 +310,10 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
   // OUTPUT(addCreditSrcCnt, NAMED('addCreditSrcCnt'));
 	
 	//OUTPUT(addShellSrcCnt, NAMED('addShellSrcCnt'));
+	//OUTPUT(shellSrcTable, NAMED('shellSrcTable'));
+	//OUTPUT(rollShellSrc, NAMED('rollShellSrc'));
+	
+	
 	// OUTPUT(shellSrcTable, NAMED('shellSrcTable'));
 	// OUTPUT(rollShellSrc, NAMED('rollShellSrc'));
 	
@@ -348,9 +340,9 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(rollFein, NAMED('rollFein'));
 	// OUTPUT(addNoFein, NAMED('addNoFein'));
 	
-	// OUTPUT(projectLooseLaws, NAMED('projectLooseLaws'));
-	// OUTPUT(rollLooseLaws, NAMED('rollLooseLaws'));
-	// OUTPUT(addIncLooseLaws, NAMED('addIncLooseLaws'));									
+	//OUTPUT(projectLooseLaws, NAMED('projectLooseLaws'));
+	//OUTPUT(rollLooseLaws, NAMED('rollLooseLaws'));
+	//OUTPUT(addIncLooseLaws, NAMED('addIncLooseLaws'));									
 
 	// OUTPUT(nonCreditFrstSeenSort, NAMED('nonCreditFrstSeenSort'));
 	// OUTPUT(nonCreditFirstSeenDedup, NAMED('nonCreditFirstSeenDedup'));
@@ -364,9 +356,6 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(addNotFound, NAMED('addNotFound'));	
 	// OUTPUT(addAdditionalHeaderReportData, NAMED('addAdditionalHeaderReportData'));	
   
-	
-
-	
 	
 
 	

@@ -443,6 +443,8 @@ EXPORT Layouts := MODULE
 		unsigned2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
 		unsigned2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
 		unsigned2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
+    
+    unsigned2   liensReleasedCnt;                                   //*** liens released EVER
 		
 		unsigned2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
 		unsigned2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
@@ -569,7 +571,15 @@ EXPORT Layouts := MODULE
 	EXPORT BusReportDetails        := RECORD
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
-    DATASET(FEINLayoutSources) FEINSources; 
+    STRING  FEIN_Masked_For_Report;
+    UNSIGNED3 FEINSourcesCnt;   
+    DATASET(FEINLayoutSources) FEINSources;
+    UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
+    UNSIGNED3 BetterBusCnt;           //***among all of the Shell Shelf Sources - Better Business Bureau is 1 of them
+    UNSIGNED3 UtilityCnt;             //***among all of the Shell Shelf Sources - Utilities is 1 of them
+    UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
+    UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
+    STRING2 CompanyIncorpState;
     DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
@@ -622,8 +632,8 @@ EXPORT Layouts := MODULE
 		STRING10 legalEventTypeFlags;
     STRING2 trafficInfractionScore;
     STRING10 trafficInfractionFlags;
-    STRING2 criminalLegalEventsScore;
-    STRING10 criminalLegalEventsFlags;
+    STRING2 stateCriminalLegalEventsScore;
+    STRING10 stateCriminalLegalEventsFlags;
     STRING2 civilLegalEventsScore;
     STRING10 civilLegalEventsFlags;
     DerogatoryEvents;                           //***these are rolled upto the DID 
@@ -652,27 +662,6 @@ EXPORT Layouts := MODULE
 		
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
-		/*PerLegalEventType*/
-		BOOLEAN			atleastOneCategory9;
-		BOOLEAN			atleastOneCategory8;
-		BOOLEAN			atleastOneCategory7;
-		BOOLEAN			atleastOneCategory6;
-		BOOLEAN			atleastOneCategory5;
-		BOOLEAN			atleastOneCategory4;
-		BOOLEAN			atleastOneCategory3;
-		BOOLEAN			atleastOneCategory2;
-		// BOOLEAN			noConvictionsOrCategoryHit;
-    /*PerLegalTrafficInfractions*/
-    BOOLEAN     threePlusTrafConvictPast3Yrs;
-    BOOLEAN     twoOrLessTrafConvictPast3Yrs;
-    BOOLEAN     threePlusInfractConvictPast3Yrs;
-    BOOLEAN     twoOrLessInfractConvictPast3Yrs;
-    BOOLEAN     threePlusTrafConvictOver3Yrs;
-    BOOLEAN     twoOrLessTrafConvictOver3Yrs;
-    BOOLEAN     threePlusInfractConvictOver3Yrs;
-    BOOLEAN     twoOrLessInfractConvictOver3Yrs;
-    // BOOLEAN     noTrafficOrInfractions;
-	
 		PerAttributes;
 	END;
 

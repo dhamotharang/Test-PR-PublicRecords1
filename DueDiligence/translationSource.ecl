@@ -2,7 +2,7 @@
 
 EXPORT translationSource := MODULE
  
-    
+    //Category constants
     SHARED CATEGORY_BANKRUPTCY_FILING := 'Bankruptcy Filings';
     SHARED CATEGORY_CORPORATE_FILING := 'Corporate Filings';
     SHARED CATEGORY_BUSINESS_DIRECTORY := 'Business Directory';
@@ -16,7 +16,8 @@ EXPORT translationSource := MODULE
     SHARED CATEGORY_TELCO := 'Telco';
     SHARED CATEGORY_UCC_FILING := 'UCC Filings';
     
-        
+    
+    //Record type constants
     SHARED RECORD_BBB_MEMBER := 'Better Business Bureau Member';
     SHARED RECORD_BBB_NON_MEMBER := 'Better Business Bureau Non-Member';
     SHARED RECORD_BOAT_REGISTRATION := 'Boat Registrations';

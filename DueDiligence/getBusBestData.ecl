@@ -112,8 +112,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																												SELF                      := RIGHT));
    
   // ------                                                                                                   ------
-  // ------ pass the input file and the name of the output file, and name of the ssn field and the name of the -----
-  // ------ dl_field(driver's license field) in this case is '' and the boolean flags for isassn and isadl     -----
+  // ------ pass the input file and the name of the output file,                                              -----
   // ------                                                                                                   ------
   Suppress.MAC_Mask(ListOfFEINSources, MaskListOfFEINSources, maskedFEIN, '', true, false,,,,DD_SSNMask);
    
@@ -123,9 +122,12 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 										LEFT.Busn_info.BIP_IDS.OrgID.LinkID   = RIGHT.OrgID AND
 										LEFT.Busn_info.BIP_IDS.SeleID.LinkID  = RIGHT.SeleID AND
                     LEFT.busn_info.fein                   = RIGHT.companyfein,		
-										TRANSFORM(DueDiligence.Layouts.Busn_Internal,		  
+										TRANSFORM(DueDiligence.Layouts.Busn_Internal,		
+                         /*  Masking of the FEIN occurs when at least 1 FEIN Source comes from E5 - Equifax Restricted  */
+                         /*  Don't mask the FEIN that reside within the Bus_info.fein - because other logic uses fein to search by  */   
                          SELF.FEINSourceContainsE5       := RIGHT.FEINSourceContainsE5;
-                         SELF.busn_info.fein             := RIGHT.maskedFEIN;
+                         SELF.FEINSourcesCnt             := COUNT(RIGHT.sources);
+                         SELF.FEIN_Masked_For_Report     := RIGHT.maskedFEIN;
                          SELF.FEINSources                := RIGHT.Sources;
                          SELF                            := LEFT;),
                     ATMOST(DueDiligence.Constants.MAX_ATMOST_1000),

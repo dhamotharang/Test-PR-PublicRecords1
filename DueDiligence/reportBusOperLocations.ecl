@@ -50,7 +50,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 // ------                                                                       ------
 	 iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk  FormatTheListOfOperLoc(groupAddressOperLocGeoRisk le, Integer OperLocSeq) := TRANSFORM,
                                                             SKIP(OperLocSeq > iesp.constants.DDRAttributesConst.MaxOperatingLocations)
-               SELF.Sequence                         := OperLocSeq;                      
+                    
                SELF.Address.StreetNumber             := le.prim_range;
                SELF.Address.StreetPreDirection       := le.predir;
                SELF.Address.StreetName               := le.prim_name;     
@@ -81,7 +81,8 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
                SELF.AreaRisk.CrimeIndex                                       :=  IF(le.CountyHasHighCrimeIndex, 'HIGH', 'LOW');   
                /*  Other Address Information  */   
                SELF.AddressType                     := Advo.Lookup_Descriptions.fn_resbus(le.addressType);         
-               SELF.InputAddressVerified            := true;                     //*** verified is true because it was found on the business header ***//
+               SELF.InputAddressVerified            := true;                    //To be removed at later date - replaced by AddressVerified
+               SELF.AddressVerified                 := true;   //*** verified is true because it was found on the business header ***//
                SELF.IsVacant                        := le.vacant;     
                SELF.Cmra                            := le.cmra;                   
                SELF                                 := le;

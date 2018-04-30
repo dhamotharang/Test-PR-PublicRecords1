@@ -1,7 +1,9 @@
-﻿IMPORT BIPv2, BizLinkFull, Doxie, DueDiligence, iesp, STD;
+﻿IMPORT BIPv2, BizLinkFull, Business_Risk_BIP, Doxie, DueDiligence, iesp, MDR, Risk_Indicators, STD;
 
 
-EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
+EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
+                      Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                      BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
                                   
   //retrieve execs off the inquired business
   allExecs := DueDiligence.CommonBusiness.getExecs(inData);
@@ -13,16 +15,17 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUN
   workingExecs := DueDiligence.Common.GetMaxRecords(limitedExecs, iesp.constants.DDRAttributesConst.MaxBusinessExecs);
   
   //start populating the report with the exec info before dealing with the child datasets
-  popExecReport := PROJECT(workingExecs, TRANSFORM(DueDiligence.LayoutsInternalReport.BusExecs,
+  popExecReport := PROJECT(workingExecs, TRANSFORM({DueDiligence.LayoutsInternalReport.BusExecs, UNSIGNED4 historyDate, STRING SSN},
                                                     SELF.Name := iesp.ECL2ESP.SetName(LEFT.party.firstName, LEFT.party.middleName, LEFT.party.lastName, LEFT.party.suffix, DueDiligence.Constants.EMPTY, LEFT.party.fullName);
                                                     SELF.LexID := (STRING)LEFT.party.did;
                                                     SELF.DOB := iesp.ECL2ESP.toDate(LEFT.party.dob);
                                                     SELF.USResidency := LEFT.party.usResidencyScore;
-                                                    SELF.CriminalLegalEvents := (INTEGER)LEFT.party.criminalLegalEventsScore;
-                                                    SELF.CivilLegalEvents := (INTEGER)LEFT.party.civilLegalEventsScore;
+                                                    SELF.CriminalLegalEvents := (INTEGER)LEFT.party.stateCriminalLegalEventsScore;  //To be removed at later date replaced with CriminalStateLegalEvents
+                                                    SELF.CriminalStateLegalEvents := (INTEGER)LEFT.party.stateCriminalLegalEventsScore;
                                                     SELF.LegalTypes := (INTEGER)LEFT.party.legalEventTypeScore;
                                                                                           
                                                     SELF.did := LEFT.party.did;
+                                                    SELF.SSN := LEFT.party.ssn;
                                                     SELF := LEFT;
                                                     SELF := [];));
   
@@ -109,35 +112,79 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUN
   //first get all the unique dids (no need to call the keys multiple time for the same key
   uniqueDIDs := DEDUP(SORT(addPos, did), did);
   
-  //check to see if the individual is tied to another business - need to add some history date for archiving here..... 11.2 changes
+  //check to see if the individual is tied to another business - no history date since there no date field in key. No way to tell when they were associated
+  //with other business unless we were to do another key cal - this is just a boolean check for the report
   busAssociations := JOIN(uniqueDIDs, BizLinkFull.Key_BizHead_L_CONTACT_DID.key,
                           KEYED(LEFT.did = RIGHT.contact_did) AND
                           LEFT.seleid <> RIGHT.seleid,
-                          TRANSFORM({BOOLEAN assocOtherBus, RECORDOF(LEFT)},
-                                    SELF.assocOtherBus := RIGHT.contact_did <> 0;
+                          TRANSFORM({RECORDOF(LEFT)},
                                     SELF := LEFT;),
                           LIMIT(0), KEEP(1));                 
                   
   addAssociation := JOIN(addPos, busAssociations,
                           LEFT.did = RIGHT.did,
                           TRANSFORM(RECORDOF(LEFT),
-                                    SELF.AssociatedWithOtherCompanies := RIGHT.assocOtherBus;
+                                    SELF.AssociatedWithOtherCompanies := RIGHT.did <> 0; 
                                     SELF := LEFT;),
                           LEFT OUTER,
                           ATMOST(1));
+                     
   
   //check to see if the individual is deceased
-  // deceasedDIDs := JOIN(uniqueDIDs, Doxie.key_Death_masterV2_ssa_DID,
-                      // (UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
-                      // KEYED(LEFT.DID = RIGHT.l_did),
-                      // TRANSFORM({RECORDOF(LEFT) le, RECORDOF(RIGHT) ri},
-                                // SELF.le := LEFT;
-                                // SELF.ri := RIGHT;), 
-                      // KEEP(200), ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+  deceasedDIDs := JOIN(uniqueDIDs, Doxie.key_Death_masterV2_ssa_DID,
+                      (UNSIGNED)(RIGHT.dod8) < LEFT.historydate AND									
+                      KEYED(LEFT.DID = RIGHT.l_did) AND
+                      NOT((Risk_Indicators.iid_constants.deathSSA_ok(options.DataRestrictionMask) = FALSE AND RIGHT.src = MDR.sourceTools.src_Death_Restricted) 
+                          OR (linkingOptions.AllowGLB = FALSE AND RIGHT.glb_flag = DueDiligence.Constants.YES)),
+                      TRANSFORM({RECORDOF(RIGHT)},
+                                SELF := RIGHT;), 
+                      KEEP(1), ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
   
+  uniqueDeceasedDIDs := DEDUP(SORT(deceasedDIDs, l_did), l_did);
   
+  addDeceased := JOIN(addAssociation, uniqueDeceasedDIDs,
+                      LEFT.did = RIGHT.l_did,
+                      TRANSFORM(RECORDOF(LEFT),
+                                SELF.Deceased := RIGHT.l_did <> 0; 
+                                SELF := LEFT;),
+                      LEFT OUTER,
+                      ATMOST(1));
+                      
+                      
+  //check to see if more than 2 individuals are associated with the ssn                    
+  indsAssocWithSSN := JOIN(uniqueDIDs, doxie.Key_Header_SSN,
+                            (INTEGER)LEFT.SSN > 0 AND LENGTH(TRIM(LEFT.SSN)) = 9 AND
+                            KEYED(LEFT.SSN[1] = RIGHT.S1 AND 
+                                  LEFT.SSN[2] = RIGHT.S2 AND 
+                                  LEFT.SSN[3] = RIGHT.S3 AND 
+                                  LEFT.SSN[4] = RIGHT.S4 AND 
+                                  LEFT.SSN[5] = RIGHT.S5 AND 
+                                  LEFT.SSN[6] = RIGHT.S6 AND 
+                                  LEFT.SSN[7] = RIGHT.S7 AND 
+                                  LEFT.SSN[8] = RIGHT.S8 AND 
+                                  LEFT.SSN[9] = RIGHT.S9),
+                            TRANSFORM({UNSIGNED6 didSearching, STRING9 SSN, RECORDOF(RIGHT), UNSIGNED3 didsAssoc},
+                                      SELF.didSearching := LEFT.did;
+                                      SELF.SSN := LEFT.SSN;
+                                      SELF.didsAssoc := 1;
+                                      SELF := RIGHT;),
+                            ATMOST(Business_Risk_BIP.Constants.Limit_Default));      
   
- 
+  uniqueIndAssocs := DEDUP(SORT(indsAssocWithSSN, didSearching, SSN, did), didSearching, SSN, did);
+  
+  countIndAssocs := ROLLUP(SORT(uniqueIndAssocs, didSearching),
+                          LEFT.didSearching = RIGHT.didSearching,
+                          TRANSFORM(RECORDOF(LEFT),
+                                    SELF.didsAssoc := LEFT.didsAssoc + RIGHT.didsAssoc;
+                                    SELF := LEFT;));
+                                    
+  addMoreTwoAssocsWithSSN := JOIN(addDeceased, countIndAssocs,
+                                  LEFT.did = RIGHT.didSearching,
+                                  TRANSFORM(RECORDOF(LEFT),
+                                            SELF.MoreThanTwoIndvsAssociatedWithSSN := RIGHT.didsAssoc > 2; 
+                                            SELF := LEFT;),
+                                  LEFT OUTER,
+                                  ATMOST(1));                                 
  
  
  
@@ -145,12 +192,12 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUN
  
  
   //roll up all BEOs to the business level to add to the report
-  transformData := PROJECT(addAssociation, TRANSFORM(DueDiligence.LayoutsInternalReport.InquiredBusExecs,
-                                                      SELF.execs := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessExecutives,
-                                                                                        SELF := LEFT;
-                                                                                        SELF := [];)]);
-                                                      SELF := LEFT;
-                                                      SELF := [];));
+  transformData := PROJECT(addMoreTwoAssocsWithSSN, TRANSFORM(DueDiligence.LayoutsInternalReport.InquiredBusExecs,
+                                                              SELF.execs := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessExecutives,
+                                                                                                SELF := LEFT;
+                                                                                                SELF := [];)]);
+                                                              SELF := LEFT;
+                                                              SELF := [];));
                                               
   rollExecs := ROLLUP(SORT(transformData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),
                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
@@ -170,6 +217,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUN
   
   
   
+  // OUTPUT(inData, NAMED('inData'));
   // OUTPUT(allExecs, NAMED('allExecs'));
   // OUTPUT(limitedExecs, NAMED('limitedExecs'));
   // OUTPUT(workingExecs, NAMED('workingExecs'));
@@ -193,6 +241,13 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUN
   // OUTPUT(addAssociation, NAMED('addAssociation'));
   
   // OUTPUT(deceasedDIDs, NAMED('deceasedDIDs'));
+  // OUTPUT(uniqueDeceasedDIDs, NAMED('uniqueDeceasedDIDs'));
+  // OUTPUT(addDeceased, NAMED('addDeceased'));
+  
+  // OUTPUT(indsAssocWithSSN, NAMED('indsAssocWithSSN'));
+  // OUTPUT(uniqueIndAssocs, NAMED('uniqueIndAssocs'));
+  // OUTPUT(countIndAssocs, NAMED('countIndAssocs'));
+  // OUTPUT(addMoreTwoAssocsWithSSN, NAMED('addMoreTwoAssocsWithSSN'));
   
   // OUTPUT(transformData, NAMED('transformData'));
   // OUTPUT(rollExecs, NAMED('rollExecs'));
