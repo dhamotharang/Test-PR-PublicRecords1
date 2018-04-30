@@ -70,7 +70,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		
 		jl_batch_params := module(PROJECT(batch_params, LiensV2_Services.IParam.batch_params, opt))
 			EXPORT UNSIGNED8 MaxResults   										:= 10000 : STORED('MaxResults');	
-			INTEGER max_results_per_acct 											:= 100   : STORED('Max_Results_Per_Acct');	
+			INTEGER max_results_per_acct 											:= 1000 : STORED('Max_Results_Per_Acct');	
 			EXPORT MaxResultsPerAcct 													:= max_results_per_acct;
 			EXPORT party_types 																:= partyTypes;
 			EXPORT DATASET (Gateway.layouts.config) gateways 	:= gw_config;
@@ -118,9 +118,10 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		ds_JL_recs_flat := PROJECT(ds_JL_recs_flat_with_alerts,LiensV2_Services.Batch_Layouts.fcra_batch_out);
 				
 		pre_result := SORT(ds_JL_recs_flat, acctno, penalt, -orig_filing_date, -release_Date, filing_jurisdiction, orig_filing_number);
+		pre_resultSlim := UNGROUP(TOPN(GROUP(pre_result, acctno), jl_batch_params.MaxResultsPerAcct,acctno));
 		
-		ut.mac_TrimFields(pre_result, 'pre_result', result);
-		
+		ut.mac_TrimFields(pre_resultSlim, 'pre_resultSlim', result);
+
 		OUTPUT(result, NAMED('Results'));
 		OUTPUT(consumer_statements_alerts, NAMED('CSDResults'));
 		

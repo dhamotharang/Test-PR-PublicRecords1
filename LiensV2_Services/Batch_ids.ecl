@@ -1,4 +1,4 @@
-import Autokey_batch, AutokeyB2, BatchServices, BIPV2, LiensV2;
+﻿import Autokey_batch, AutokeyB2, BatchServices, BIPV2, LiensV2;
 
 EXPORT Batch_ids := MODULE
 	shared out_rec := LiensV2_Services.Batch_Layouts.layout_batchids;
@@ -170,7 +170,7 @@ EXPORT Batch_ids := MODULE
 
       ds_linkIds    := PROJECT(ds_batch_in,BIPV2.IDlayouts.l_xlink_ids2);
       ds_linkIdRecs := LiensV2.Key_LinkIds.KFetch2(ds_linkIds,		
-                                                   configData.BIPFetchLevel,
+                                                   configData.BIPFetchLevel,,
                                                    LiensV2.Constants.JOIN_LIMIT,
                                                    LiensV2.Constants.JOIN_TYPE );
       
