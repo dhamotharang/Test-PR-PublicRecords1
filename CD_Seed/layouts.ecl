@@ -1,0 +1,85 @@
+﻿IMPORT address;
+
+EXPORT layouts := MODULE
+
+export input := RECORD
+	string75 fn { virtual(logicalfilename)};
+	string		orig_Title; 
+	string		orig_Fname; 
+	string		orig_Mname; 
+	string		orig_Lname; 
+	string		orig_name_suffix; 
+	string		orig_Address; 
+	string		orig_City; 
+	string		orig_St; 
+	string		orig_Zip; 
+	string		orig_Ssn; 
+	string		orig_Dob; 
+	string		orig_phone;
+	string		orig_DL; 
+	string		orig_DL_State; 
+	string		orig_vendor_id;														
+	string		orig_Customer_Reported_date;														
+END;
+
+export base:=RECORD
+	unsigned6 did;
+	string orig_title;
+	string orig_fname;
+	string orig_mname;
+	string orig_lname;
+	string orig_name_suffix;
+	string orig_address;
+	string orig_city;
+	string orig_st;
+	string orig_zip;
+	string orig_ssn;
+	string orig_dob;
+	string orig_phone;
+	string orig_dl;
+	string orig_dl_state;
+	string orig_vendor_id;
+	string2 src;
+	unsigned4 dt_first_seen;
+	unsigned4 dt_last_seen;
+	unsigned4 dt_vendor_first_reported;
+	unsigned4 dt_vendor_last_reported;
+	string18 vendor_id;
+	string10 phone;
+	string9 ssn;
+	integer4 dob;
+	address.Layout_Clean_Name.title;
+	address.Layout_Clean_Name.fname;
+	address.Layout_Clean_Name.mname;
+	address.Layout_Clean_Name.lname;
+	address.Layout_Clean_Name.name_suffix;
+	address.Layout_Clean182.prim_range;
+	address.Layout_Clean182.predir;
+	address.Layout_Clean182.prim_name;
+	address.Layout_Clean182.addr_suffix;
+	address.Layout_Clean182.postdir;
+	address.Layout_Clean182.unit_desig;
+	address.Layout_Clean182.sec_range;
+	address.Layout_Clean182.p_city_name;
+	address.Layout_Clean182.v_city_name;
+	address.Layout_Clean182.st;
+	address.Layout_Clean182.zip;
+	address.Layout_Clean182.zip4;
+	address.Layout_Clean182.cart;
+	address.Layout_Clean182.cr_sort_sz;
+	address.Layout_Clean182.lot;
+	address.Layout_Clean182.lot_order;
+	address.Layout_Clean182.dbpc;
+	address.Layout_Clean182.chk_digit;
+	address.Layout_Clean182.rec_type;
+	string2		fips_st:='';
+	string3		fips_county:='';
+	address.Layout_Clean182.geo_lat;
+	address.Layout_Clean182.geo_long;
+	address.Layout_Clean182.msa;
+	address.Layout_Clean182.geo_blk;
+	address.Layout_Clean182.geo_match;
+	address.Layout_Clean182.err_stat;
+ END;
+					
+END;
