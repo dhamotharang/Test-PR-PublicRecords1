@@ -1,4 +1,4 @@
-/* 
+﻿/* 
   BIPV2_Tools.mac_Set_Statuses()
     -- Set statuses for each BIP ID, allowing for public(no use of DNB) and private(limited use of DNB to corroborate other sources' status)
 
@@ -11,38 +11,39 @@ EXPORT mac_Set_Statuses(
   ,pUse_DNB           = 'false'
   ,pBIP_ID_Test_Value = '0'
   ,pFuture_Dates      = 'true'    // set future dates to 19700101 so they are treated as old.  
+  ,pToday             = 'bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate'//in case you want to run as of a date in the past.  default to date of newest data.
 
 ) :=
 FUNCTIONMACRO
 
   import bipv2,ut,mdr,bipv2,AutoStandardI,BIPV2_PostProcess;
 
-  today := bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate;
+  today := pToday;
   
   // -- prep file and fix future dates to make them old
-	h   := project(infile ,transform(recordof(left) 
+  h   := project(infile ,transform(recordof(left) 
           ,self.dt_first_seen             := if(left.dt_first_seen            = 0 or (left.dt_first_seen            > (unsigned6)today and pFuture_Dates = true)  ,19700101  ,left.dt_first_seen           )
           ,self.dt_last_seen              := if(left.dt_last_seen             = 0 or (left.dt_last_seen             > (unsigned6)today and pFuture_Dates = true)  ,19700101  ,left.dt_last_seen            )
           ,self.dt_vendor_first_reported  := if(left.dt_vendor_first_reported = 0 or (left.dt_vendor_first_reported > (unsigned6)today and pFuture_Dates = true)  ,19700101  ,left.dt_vendor_first_reported)
           ,self.dt_vendor_last_reported   := if(left.dt_vendor_last_reported  = 0 or (left.dt_vendor_last_reported  > (unsigned6)today and pFuture_Dates = true)  ,19700101  ,left.dt_vendor_last_reported )
           ,self                           := left
         ));  //assume this is cleaned
-	
+  
   rec := {               h.ultid ,h.orgid ,h.seleid  ,h.proxid ,h.powid  ,h.source  ,h.company_status_derived  ,h.dt_first_seen ,h.dt_last_seen  ,h.dt_vendor_first_reported  ,h.dt_vendor_last_reported       };
   d   := table(h  ,rec  ,ultid   ,orgid   ,seleid    ,proxid   ,powid    ,source    ,company_status_derived    ,dt_first_seen   ,dt_last_seen    ,dt_vendor_first_reported    ,dt_vendor_last_reported   ,merge);
 
   // -- rollup status
-	rec xroll(rec l, rec r) := 
+  rec xroll(rec l, rec r) := 
   transform
-		ut.mac_roll_DFS(dt_first_seen           )
-		ut.mac_roll_DFS(dt_vendor_first_reported)
-		ut.mac_roll_DLS(dt_last_seen            )
-		ut.mac_roll_DLS(dt_vendor_last_reported )		
-		self := l
-	end;
+    ut.mac_roll_DFS(dt_first_seen           )
+    ut.mac_roll_DFS(dt_vendor_first_reported)
+    ut.mac_roll_DLS(dt_last_seen            )
+    ut.mac_roll_DLS(dt_vendor_last_reported )   
+    self := l
+  end;
 
   ds_status_rollup_prep         := sort   (d                                        ,ultid, orgid, seleid, proxid,powid, source, company_status_derived);
-	ds_status_rollup_unrestricted := rollup (ds_status_rollup_prep ,xroll(left, right),ultid, orgid, seleid, proxid,powid, source, company_status_derived);
+  ds_status_rollup_unrestricted := rollup (ds_status_rollup_prep ,xroll(left, right),ultid, orgid, seleid, proxid,powid, source, company_status_derived);
   ds_status_rollup_mask         := BIPV2.mod_sources.applyMasking(ds_status_rollup_unrestricted ,PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt));
 
   // -- get latest dt_last_seens per ID(restricted and unrestricted)
@@ -108,9 +109,9 @@ FUNCTIONMACRO
       self_isDefunct  := right.company_status_derived in BIPV2.BL_Tables.CompanyStatusConstants.setDefunct ;
       self_isInactive := right.company_status_derived in BIPV2.BL_Tables.CompanyStatusConstants.setInactive;
       // self.company_status_derived := '';// blank out company_status_derived.  i was setting it to what is in the key, but now (bug 146880) that is unrestricted, so i cannot show it.  we may be able to remove the field later. 
-      self.pActive_Fieldname			:= 
+      self.pActive_Fieldname      := 
         map(
-           self_isDefunct 	                                                        => BIPV2_PostProcess.constants.Inactive_Reported 
+           self_isDefunct                                                           => BIPV2_PostProcess.constants.Inactive_Reported 
           ,   ~(    ut.Age(left.dt_last_seen_unsorted              ) < 2
                 OR  ut.Age(left.dt_last_seen_unsorted_unrestricted ) < 2
                )
@@ -158,14 +159,14 @@ lksd.oc(ws_new)
 
 j :=
 join(
-	ws_old,
-	ws_new,
-	left.seleid = right.seleid,
-	transform(
-		{recordof(ws_old) old, recordof(ws_new) new},
-		self.old := left,
-		self.new := right
-	)
+  ws_old,
+  ws_new,
+  left.seleid = right.seleid,
+  transform(
+    {recordof(ws_old) old, recordof(ws_new) new},
+    self.old := left,
+    self.new := right
+  )
 );
 
 status_change := j.old.company_status_derived <> j.new.company_status_derived;
