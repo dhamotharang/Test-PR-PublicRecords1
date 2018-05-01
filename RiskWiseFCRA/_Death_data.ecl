@@ -1,4 +1,4 @@
-import doxie, fcra, riskwise, ut;
+﻿import doxie, fcra, riskwise, ut;
 
 EXPORT _Death_data(	dataset (doxie.layout_references) dids, 
                       dataset (fcra.Layout_override_flag) flag_file
@@ -9,7 +9,7 @@ EXPORT _Death_data(	dataset (doxie.layout_references) dids,
   main_rids  := SET (flag_file (file_id = FCRA.FILE_ID.DID_death), record_id);
 
   // MAIN data
-  key_main := doxie.key_death_masterV2_DID_fcra;
+  key_main := doxie.key_death_masterV2_ssa_DID_fcra;
   rec_main := recordof (key_main);
   
   raw_data := join (dids, key_main,
