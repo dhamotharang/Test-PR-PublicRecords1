@@ -1602,5 +1602,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/566 Democratic Republic of the Congo List','1588'},
 {'EC (CFSP) 2018/611 Democratic People\'s Republic of Korea List','1589'},
 {'EC 2018/602 Democratic People\'s Republic of Korea List','1590'},
-{'Qatar National Terrorist Designation List','1591'}
+{'Qatar National Terrorist Designation List','1591'},
+{'EC (CFSP) 2018/656 Afghanistan List','1592'},
+{'EC 2018/648 Afghanistan List','1593'}
 ],r);
