@@ -17,7 +17,7 @@ functionmacro
   ds_proxid_candidate_records_reset := project(pProxidRecords2Reset                                                                                              ,transform({recordof(left),unsigned6 old_proxid,unsigned6 old_seleid},self.old_proxid := left.proxid,self.proxid := left.dotid ,self.lgid3  := 0,self.seleid := 0,self := left,,self.old_seleid := left.seleid)) ;
   ds_seleid_candidate_records_reset := join(pSeleidRecords2Reset  ,table(pProxidRecords2Reset,{proxid},proxid,merge) ,left.proxid = right.proxid ,transform({recordof(left),unsigned6 old_proxid,unsigned6 old_seleid},self.old_proxid := left.proxid,self.old_seleid := left.seleid,self.lgid3  := left.proxid,self.seleid := self.lgid3/*test*/,self := left,self := []) ,left only ,hash);
   
-  ds_concat_candidate_records := ds_proxid_candidate_records_reset + ds_seleid_candidate_records_reset  : persist('~persist::lbentley::ds_concat_candidate_records');
+  ds_concat_candidate_records := ds_proxid_candidate_records_reset + ds_seleid_candidate_records_reset  : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_concat_candidate_records');
   
   ds_base_patched             := project(ds_concat_candidate_records  ,bipv2.commonbase.layout);
   
@@ -38,7 +38,7 @@ functionmacro
   ds_proxid_reform_prep  := table(ds_proxid_candidate_records_reset  ,{dotid,old_proxid,cnp_name},dotid,old_proxid,cnp_name,merge);
   ds_reform_proxid       := BIPV2_Tools.mac_reform_clusters(ds_proxid_reform_prep ,dotid  ,cnp_name,20,old_proxid);
   ds_patch_proxid        := join(ds_concat_candidate_records  ,table(ds_reform_proxid,{dotid,unsigned6 lowest_dotid := min(group,lowest_dotid)},dotid,merge) ,left.dotid = right.dotid  ,transform(recordof(left),self.proxid := if(right.dotid != 0,right.lowest_dotid,left.proxid),self := left),left outer,hash)
-                              : persist('~persist::bipv2_tools::mac_reset_clusters::ds_patch_proxid');
+                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_proxid');
   
   // -- reform reset seleid clusters
   ds_seleid_reform_prep  := table(ds_patch_proxid                   ,{proxid,old_seleid,cnp_name},proxid,old_seleid,cnp_name,merge);

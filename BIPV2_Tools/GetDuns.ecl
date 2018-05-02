@@ -10,7 +10,7 @@ EXPORT GetDuns(
 functionmacro
   import _control,ut,Data_Services,std;
   
-	Persistname := 'thor_data400::persist::BIPV2::file_current_Duns';
+	Persistname := 'persist::BIPV2_Tools::GetDuns::ds_active_duns_new';
 //	#IF(_Control.ThisEnvironment.Name='Prod_Thor')
 		import dnb_dmi;
     import BIPV2_Company_Names,ut,Data_Services;

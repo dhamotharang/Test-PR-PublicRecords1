@@ -11,7 +11,6 @@ export Refresh_Duns(
 function
     l_dot := BIPV2.CommonBase.Layout;
   
-    pPersistname := 'thor_data400::persist::BIPV2::file_current_Duns';
     ds_active_duns_new2 :=  BIPV2_Tools.GetDuns(pDuns_file,pPersistUnique);
     
     // --------------------------------------
@@ -43,9 +42,9 @@ function
       ,self.company_fein := if(Left.company_fein != '' ,Left.company_fein ,Left.deleted_fein);
       ,self.deleted_fein := '';
       ,self := left)) 
-      : persist('~persist::BIPV2_Tools::Refresh_Duns'+ pPersistUnique); 
-    ds_blank_duns     := ds_in_fix(duns_number ='') : persist('~persist::BIPV2_Tools::Refresh_Duns.ds_blank_duns'   + pPersistUnique);
-    ds_nonblank_duns  := ds_in_fix(duns_number<>'') : persist('~persist::BIPV2_Tools::Refresh_Duns.ds_nonblank_duns'+ pPersistUnique);
+      : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_in_fix'+ pPersistUnique); 
+    ds_blank_duns     := ds_in_fix(duns_number ='') : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_blank_duns'   + pPersistUnique);
+    ds_nonblank_duns  := ds_in_fix(duns_number<>'') : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_nonblank_duns'+ pPersistUnique);
     
     ds_refresh_duns  := join(
       ds_nonblank_duns, ds_active_duns_new2,
@@ -53,12 +52,12 @@ function
       tr_Refresh_Duns(left,right),
       left outer, hash
     )
-    : persist('~persist::BIPV2_Tools::Refresh_Duns.ds_refresh_duns'+ pPersistUnique);
+    : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_refresh_duns'+ pPersistUnique);
     
     // -- Full file after duns refresh
     ds_result   := project(ds_blank_duns,transform(l_dot_temp,self.active_duns_number := '',self.hist_duns_number := '',self := left)) 
                             & ds_refresh_duns
-      : persist('~persist::BIPV2_Tools::Refresh_Duns.ds_result'+ pPersistUnique);
+      : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_result'+ pPersistUnique);
 
    import wk_ut;
    dmi_input_file := wk_ut.Orbit_Item_list(workunit,'dmi'); //get the dmi file used
