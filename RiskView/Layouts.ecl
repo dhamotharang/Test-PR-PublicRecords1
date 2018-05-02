@@ -792,6 +792,15 @@ export layout_riskview5 := record
 	string3 Telecommunications_reason4;
 	string3 Telecommunications_reason5;
 	
+	string3 Crossindustry_Index;
+	string30 Crossindustry_Score_Name := '';
+	string3 Crossindustry_score;
+	string3 Crossindustry_reason1;
+	string3 Crossindustry_reason2;
+	string3 Crossindustry_reason3;
+	string3 Crossindustry_reason4;
+	string3 Crossindustry_reason5;
+	
 	string3 Custom_Index;
 	string30 Custom_Score_Name := '';
 	string3 Custom_score;
@@ -861,6 +870,7 @@ export layout_riskview5_search_results := record
 	string10 BankCard_Type := '';
 	string10 Short_term_lending_Type := '';
 	string10 Telecommunications_Type := '';
+	string10 Crossindustry_Type := '';
 	string10 Custom_Type := '';	
 	string10 Custom2_Type := '';	
 	string10 Custom3_Type := '';	
