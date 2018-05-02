@@ -36,14 +36,17 @@ functionmacro
   
   // -- reform reset proxid clusters
   ds_proxid_reform_prep  := table(ds_proxid_candidate_records_reset  ,{dotid,old_proxid,cnp_name},dotid,old_proxid,cnp_name,merge);
-  ds_reform_proxid       := BIPV2_Tools.mac_reform_clusters(ds_proxid_reform_prep ,dotid  ,cnp_name,20,old_proxid);
+  ds_reform_proxid       := BIPV2_Tools.mac_reform_clusters(ds_proxid_reform_prep ,dotid  ,cnp_name,20,old_proxid)
+                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_proxid');
   ds_patch_proxid        := join(ds_concat_candidate_records  ,table(ds_reform_proxid,{dotid,unsigned6 lowest_dotid := min(group,lowest_dotid)},dotid,merge) ,left.dotid = right.dotid  ,transform(recordof(left),self.proxid := if(right.dotid != 0,right.lowest_dotid,left.proxid),self := left),left outer,hash)
                               : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_proxid');
   
   // -- reform reset seleid clusters
   ds_seleid_reform_prep  := table(ds_patch_proxid                   ,{proxid,old_seleid,cnp_name},proxid,old_seleid,cnp_name,merge);
-  ds_reform_seleid       := BIPV2_Tools.mac_reform_clusters(ds_seleid_reform_prep ,proxid  ,cnp_name,20,old_seleid);
-  ds_patch_seleid        := join(ds_patch_proxid              ,table(ds_reform_seleid,{proxid,unsigned6 lowest_proxid := min(group,lowest_proxid)},proxid,merge) ,left.proxid = right.proxid  ,transform(recordof(left),self.lgid3 := if(right.proxid != 0,right.lowest_proxid,left.lgid3),self := left),left outer,hash);
+  ds_reform_seleid       := BIPV2_Tools.mac_reform_clusters(ds_seleid_reform_prep ,proxid  ,cnp_name,20,old_seleid)
+                            : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_reform_seleid');
+  ds_patch_seleid        := join(ds_patch_proxid              ,table(ds_reform_seleid,{proxid,unsigned6 lowest_proxid := min(group,lowest_proxid)},proxid,merge) ,left.proxid = right.proxid  ,transform(recordof(left),self.lgid3 := if(right.proxid != 0,right.lowest_proxid,left.lgid3),self := left),left outer,hash)
+                              : persist('~persist::BIPV2_Tools::mac_reset_clusters::ds_patch_seleid');
 
   ds_full_patched_reformed := project(ds_patch_seleid ,bipv2.commonbase.layout) + ds_base_not_patched;
   
