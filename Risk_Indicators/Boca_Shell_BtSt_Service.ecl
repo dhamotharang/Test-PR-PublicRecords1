@@ -359,7 +359,10 @@ includeDerogInfo := true;
 iid_results := risk_indicators.InstantId_BtSt_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, 
 											isUtility, ln_branded, ofac_only, suppressNearDups, require2elements, 
 											from_BIID, isFCRA,	excludeWatchlists, from_IT1O, ofac_version, include_ofac, include_additional_watchlists, 
-											global_watchlist_threshold, dob_radius, version, DataRestriction := DataRestriction, runDLverification:=IncludeDLverification, DataPermission := DataPermission);
+											global_watchlist_threshold, dob_radius, version, DataRestriction := DataRestriction, 
+                      runDLverification:=IncludeDLverification, DataPermission := DataPermission,
+                      BSOptions:=BSOptions
+                      );
 //defaulting to emtpy on this dataset as it's only used in CBD models
 ScoresInput := project(prep, transform(Risk_Indicators.Layout_BocaShell_BtSt.input_Scores,
 	self.DeviceProvider1_value := DeviceProvider1_value;
