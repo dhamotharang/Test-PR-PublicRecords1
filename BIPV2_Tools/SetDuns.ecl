@@ -30,11 +30,11 @@ function
   
   // -- Refresh Duns number fields first
   ds_sample         := ds_in;
-  ds_refreshed_duns := BIPV2_Tools.refresh_duns(ds_sample,pDuns_file);
+  ds_refreshed_duns := BIPV2_Tools.refresh_duns(ds_sample,pDuns_file)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns');
   
   // -- keep only non-zero proxid and lgid3 clusters for possible explosion.  zero proxid and lgid3s don't go through this logic
-  ds_refreshed_duns_good_proxid := ds_refreshed_duns (proxid != 0);
-  ds_refreshed_duns_zero_proxid := ds_refreshed_duns (proxid  = 0);
+  ds_refreshed_duns_good_proxid := ds_refreshed_duns (proxid != 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_good_proxid');
+  ds_refreshed_duns_zero_proxid := ds_refreshed_duns (proxid  = 0)  : persist('~persist::BIPV2_Tools::SetDuns::ds_refreshed_duns_zero_proxid');
   ds_refreshed_duns_zero_lgid3  := ds_refreshed_duns (lgid3   = 0);
   
   // -- append cnp_name BOW field.  this filters down the number of correction candidates for proxid and lgid3 to ones that will not come back together in a BOW match
@@ -56,7 +56,7 @@ function
 
   // -- Get god keys for cnp_name from other sources for lgid3 and proxid
   ds_slim_prep   := table(ds_refreshed_duns_good_proxid,{dotid,proxid,lgid3,cnp_name,duns_number,deleted_key,prev_deleted_duns,company_fein,active_domestic_corp_key,active_enterprise_number,string sbfe_id := if(mdr.sourceTools.SourceIsBusiness_Credit(source) ,vl_id ,'')}
-                                            ,dotid,proxid,lgid3,cnp_name,duns_number,deleted_key,prev_deleted_duns,company_fein,active_domestic_corp_key,active_enterprise_number,                  if(mdr.sourceTools.SourceIsBusiness_Credit(source) ,vl_id ,''),merge);
+                                                        ,dotid,proxid,lgid3,cnp_name,duns_number,deleted_key,prev_deleted_duns,company_fein,active_domestic_corp_key,active_enterprise_number,                  if(mdr.sourceTools.SourceIsBusiness_Credit(source) ,vl_id ,''),merge);
   ds_other_cnp_name_sources       := table(ds_slim_prep ,{proxid,lgid3,cnp_name,duns_number,deleted_key,company_fein,active_domestic_corp_key,active_enterprise_number,sbfe_id} ,proxid,lgid3,cnp_name,duns_number,deleted_key,company_fein,active_domestic_corp_key,active_enterprise_number,sbfe_id ,merge);
   ds_other_cnp_name_sources_filt  := ds_other_cnp_name_sources(deleted_key = '',duns_number != '' or company_fein != '' or active_domestic_corp_key != '' or active_enterprise_number != '' or sbfe_id != '');
   ds_other_cnp_name_sources_norm := normalize(ds_other_cnp_name_sources_filt ,5  ,transform({unsigned6 proxid,unsigned6 lgid3,string cnp_name,string god_key}
@@ -120,8 +120,8 @@ function
   ds_eval_god_keys_not_validated_lgid3 := ds_eval_god_keys_lgid3(did_god_keys_validate = false);
   
   // -- join back to full file to get all the records for the IDs that will be exploded
-  ds_get_all_proxid_records := join(ds_sample ,table(ds_eval_god_keys_not_validated_proxid,{proxid},proxid,merge)  ,left.proxid = right.proxid ,transform(left)  ,hash);
-  ds_get_all_seleid_records := join(ds_sample ,table(ds_eval_god_keys_not_validated_lgid3 ,{lgid3 },lgid3 ,merge)  ,left.lgid3  = right.lgid3  ,transform(left)  ,hash);
+  ds_get_all_proxid_records := if(exists(ds_refreshed_duns_good_proxid)  ,join(ds_sample ,table(ds_eval_god_keys_not_validated_proxid,{proxid},proxid,merge)  ,left.proxid = right.proxid ,transform(left)  ,hash)  ,dataset([],recordof(ds_sample)));
+  ds_get_all_seleid_records := if(exists(ds_refreshed_duns_good_proxid)  ,join(ds_sample ,table(ds_eval_god_keys_not_validated_lgid3 ,{lgid3 },lgid3 ,merge)  ,left.lgid3  = right.lgid3  ,transform(left)  ,hash)  ,dataset([],recordof(ds_sample)));
   
   // -- reset the clusters if necessary
   ds_refreshed_duns_out := project(ds_refreshed_duns  ,bipv2.commonbase.layout);  
@@ -130,7 +130,7 @@ function
   ds_return := if(exists(ds_get_all_proxid_records) or exists(ds_get_all_seleid_records)
                   ,project(reset_clusters,bipv2.commonbase.layout) + project(ds_refreshed_duns_zero_proxid,bipv2.commonbase.layout)
                   ,ds_refreshed_duns_out
-               );
+               )  : persist('~persist::BIPV2_Tools::SetDuns::ds_return');
 
 
   lay_cands_stats   := {string stat, unsigned value};
@@ -158,28 +158,21 @@ function
     ,{'Current'                                         
      ,(unsigned)ds_refresh_stats(trim(file) = 'Input',trim(stat) = 'Count Records')[1].value               //,unsigned countgroup
      ,(integer )ds_refresh_stats(trim(file) = 'Input',trim(stat) = 'Count Records')[1].value - (integer)ds_refresh_stats(trim(file) = 'Output',trim(stat) = 'Count Records')[1].value               //,integer diff_in_out0
-     ,ds_cands_stats(trim(stat) = 'seleid candidate records')[1].value               //,unsigned records_affected_lgid3  
+     ,ds_cands_stats(trim(stat) = 'seleid candidate records'  )[1].value               //,unsigned records_affected_lgid3  
      ,ds_cands_stats(trim(stat) = 'Combined candidate records')[1].value                //,unsigned records_affected_total 
-     ,ds_cands_stats(trim(stat) = 'proxid candidates')[1].value               //,unsigned proxids_in 
-     ,ds_cands_stats(trim(stat) = 'total reformed proxids')[1].value               //,unsigned proxids_out 
-     ,ds_cands_stats(trim(stat) = 'total reformed proxids')[1].value - ds_cands_stats(trim(stat) = 'proxid candidates')[1].value               //,unsigned cnt_proxid_increase 
-     
-     
-     
+     ,ds_cands_stats(trim(stat) = 'proxid candidates'         )[1].value               //,unsigned proxids_in 
+     ,ds_cands_stats(trim(stat) = 'total reformed proxids'    )[1].value               //,unsigned proxids_out 
+     ,ds_cands_stats(trim(stat) = 'total reformed proxids'    )[1].value - ds_cands_stats(trim(stat) = 'proxid candidates')[1].value               //,unsigned cnt_proxid_increase 
      
      ,(unsigned)((real8)realformat(
                                     (ds_cands_stats(trim(stat) = 'total reformed proxids')[1].value - ds_cands_stats(trim(stat) = 'proxid candidates')[1].value) / ds_bow_info(trim(id) = 'proxid',trim(file) = 'Input')[1].cnt_clusters  * 100.0  ,6,2) * 100 )          //,unsigned pct_proxid_increase 
-
-
-
      
      ,count(ds_refreshed_duns_zero_proxid)               //,unsigned cnt_blank_proxids
-     ,ds_cands_stats(trim(stat) = 'seleid candidates')[1].value               //,unsigned lgid3s_in  
+     ,ds_cands_stats(trim(stat) = 'seleid candidates'     )[1].value               //,unsigned lgid3s_in  
      ,ds_cands_stats(trim(stat) = 'total reformed seleids')[1].value               //,unsigned lgid3s_out  
      ,ds_cands_stats(trim(stat) = 'total reformed seleids')[1].value - ds_cands_stats(trim(stat) = 'seleid candidates')[1].value               //,unsigned cnt_lgid3_increase  
      
      ,(unsigned)((real8)realformat(ds_cands_stats(trim(stat) = 'total reformed seleids' )[1].value - ds_cands_stats(trim(stat) = 'seleid candidates')[1].value /  ds_bow_info(trim(id) = 'lgid3',trim(file) = 'Input')[1].cnt_clusters * 100.0  ,6,2) * 100 )               //,unsigned pct_lgid3_increase  
-     
      
      ,count(ds_refreshed_duns_zero_lgid3)               //,unsigned cnt_blank_lgid3s
      ,(unsigned)ds_refresh_stats(trim(file) = 'Input' ,trim(field) = 'cnp_name'           ,trim(stat) = 'Count NonBlank')[1].value               //,unsigned cnp_name_in     
@@ -204,23 +197,23 @@ function
   
   // -- do some stats on the bow and god key stuff
   ds_stats := dataset([
-     {'SetDuns','Input'                                     ,count(ds_in                            ) ,count(table(ds_in             ,{proxid},proxid,merge))}
-    ,{'SetDuns','Output'                                    ,count(ds_return                        ) ,count(table(ds_return             ,{proxid},proxid,merge))}
-    ,{'SetDuns','ds_refreshed_duns_good_proxid'             ,count(ds_refreshed_duns_good_proxid    ) ,count(table(ds_refreshed_duns_good_proxid             ,{proxid},proxid,merge))}
-    ,{'SetDuns','ds_refreshed_duns_zero_proxid'             ,count(ds_refreshed_duns_zero_proxid    ) ,0                                                                             }
-    ,{'SetDuns','reset_clusters'                            ,count(reset_clusters                   ) ,count(table(reset_clusters             ,{proxid},proxid,merge))                                                                             }
+     {'SetDuns','Input'                                     ,count(ds_in                                  ) ,count(table(ds_in                                  ,{proxid},proxid,merge))}
+    ,{'SetDuns','Output'                                    ,count(ds_return                              ) ,count(table(ds_return                              ,{proxid},proxid,merge))}
+    ,{'SetDuns','ds_refreshed_duns_good_proxid'             ,count(ds_refreshed_duns_good_proxid          ) ,count(table(ds_refreshed_duns_good_proxid          ,{proxid},proxid,merge))}
+    ,{'SetDuns','ds_refreshed_duns_zero_proxid'             ,count(ds_refreshed_duns_zero_proxid          ) ,0                                                                          }
+    ,{'SetDuns','reset_clusters'                            ,count(reset_clusters                         ) ,count(table(reset_clusters                         ,{proxid},proxid,merge))}
 
-    ,{'Proxid','ds_append_bow_proxid_filt'            ,count(ds_append_bow_proxid_filt             ) ,count(table(ds_append_bow_proxid_filt             ,{proxid},proxid,merge))}
-    ,{'Proxid','ds_get_god_keys_left'                 ,count(ds_get_god_keys_left_proxid           ) ,count(table(ds_get_god_keys_left_proxid           ,{proxid},proxid,merge))}
-    ,{'Proxid','ds_get_god_keys_right'                ,count(ds_get_god_keys_right_proxid          ) ,count(table(ds_get_god_keys_right_proxid          ,{proxid},proxid,merge))}
-    ,{'Proxid','ds_eval_god_keys'                     ,count(ds_eval_god_keys_proxid               ) ,count(table(ds_eval_god_keys_proxid               ,{proxid},proxid,merge))}
-    ,{'Proxid','ds_eval_god_keys_not_validated'       ,count(ds_eval_god_keys_not_validated_proxid ) ,count(table(ds_eval_god_keys_not_validated_proxid ,{proxid},proxid,merge))}
+    ,{'Proxid','ds_append_bow_proxid_filt'                  ,count(ds_append_bow_proxid_filt              ) ,count(table(ds_append_bow_proxid_filt              ,{proxid},proxid,merge))}
+    ,{'Proxid','ds_get_god_keys_left'                       ,count(ds_get_god_keys_left_proxid            ) ,count(table(ds_get_god_keys_left_proxid            ,{proxid},proxid,merge))}
+    ,{'Proxid','ds_get_god_keys_right'                      ,count(ds_get_god_keys_right_proxid           ) ,count(table(ds_get_god_keys_right_proxid           ,{proxid},proxid,merge))}
+    ,{'Proxid','ds_eval_god_keys'                           ,count(ds_eval_god_keys_proxid                ) ,count(table(ds_eval_god_keys_proxid                ,{proxid},proxid,merge))}
+    ,{'Proxid','ds_eval_god_keys_not_validated'             ,count(ds_eval_god_keys_not_validated_proxid  ) ,count(table(ds_eval_god_keys_not_validated_proxid  ,{proxid},proxid,merge))}
    
-    ,{'lgid3','ds_append_bow_lgid3_filt'                   ,count(ds_append_bow_lgid3_filt             ) ,count(table(ds_append_bow_lgid3_filt             ,{lgid3},lgid3,merge))}
-    ,{'lgid3','ds_get_god_keys_left_lgid3'                 ,count(ds_get_god_keys_left_lgid3           ) ,count(table(ds_get_god_keys_left_lgid3           ,{lgid3},lgid3,merge))}
-    ,{'lgid3','ds_get_god_keys_right_lgid3'                ,count(ds_get_god_keys_right_lgid3          ) ,count(table(ds_get_god_keys_right_lgid3          ,{lgid3},lgid3,merge))}
-    ,{'lgid3','ds_eval_god_keys_lgid3'                     ,count(ds_eval_god_keys_lgid3               ) ,count(table(ds_eval_god_keys_lgid3               ,{lgid3},lgid3,merge))}
-    ,{'lgid3','ds_eval_god_keys_not_validated_lgid3'       ,count(ds_eval_god_keys_not_validated_lgid3 ) ,count(table(ds_eval_god_keys_not_validated_lgid3 ,{lgid3},lgid3,merge))}
+    ,{'lgid3','ds_append_bow_lgid3_filt'                    ,count(ds_append_bow_lgid3_filt               ) ,count(table(ds_append_bow_lgid3_filt               ,{lgid3 },lgid3 ,merge))}
+    ,{'lgid3','ds_get_god_keys_left_lgid3'                  ,count(ds_get_god_keys_left_lgid3             ) ,count(table(ds_get_god_keys_left_lgid3             ,{lgid3 },lgid3 ,merge))}
+    ,{'lgid3','ds_get_god_keys_right_lgid3'                 ,count(ds_get_god_keys_right_lgid3            ) ,count(table(ds_get_god_keys_right_lgid3            ,{lgid3 },lgid3 ,merge))}
+    ,{'lgid3','ds_eval_god_keys_lgid3'                      ,count(ds_eval_god_keys_lgid3                 ) ,count(table(ds_eval_god_keys_lgid3                 ,{lgid3 },lgid3 ,merge))}
+    ,{'lgid3','ds_eval_god_keys_not_validated_lgid3'        ,count(ds_eval_god_keys_not_validated_lgid3   ) ,count(table(ds_eval_god_keys_not_validated_lgid3   ,{lgid3 },lgid3 ,merge))}
   
   ],{string ID  ,string file  ,unsigned cnt_records ,unsigned cnt_clusters });
 
@@ -255,6 +248,6 @@ function
     ,Strata_explode_stats
   );
   
-  return when(reset_clusters,output_all);
+  return when(ds_return,output_all);
     
 end;
