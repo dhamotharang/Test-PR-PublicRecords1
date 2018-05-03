@@ -17,7 +17,10 @@ functionmacro
     // -- get annotated cnp_name field from proxid cnp_names key to prep for BOW scoring
     import BIPV2_ProxID,salt37;
     
-    ds_slim := table(pDataset ,{pID,duns_number,deleted_key,prev_deleted_duns,cnp_name},pID,duns_number,deleted_key,prev_deleted_duns,cnp_name,merge);
+    // -- only care about records with a cluster id on them.
+    ds_has_ID := pDataset(pID != 0)  : persist('~persist::BIPV2_Tools::mac_Append_BOW_Info::ds_has_ID.' + #TEXT(pID));
+    
+    ds_slim := table(ds_has_ID ,{pID,duns_number,deleted_key,prev_deleted_duns,cnp_name},pID,duns_number,deleted_key,prev_deleted_duns,cnp_name,merge);
     
     ds_append_bow_field := join(ds_slim  ,pBOW_Index, left.cnp_name = right.cnp_name ,transform({string cnp_name_bow,real field_specificity,recordof(left)}
       ,self.cnp_name_bow      := if(right.word != '' ,(unsigned)(right.field_specificity * 100) +' '+ trim(right.word)  ,'')
@@ -68,6 +71,7 @@ functionmacro
     // -- Stats for this
     ds_stats := dataset([
        {#TEXT(pID),'Input'                                            ,count(pDataset                                     ) ,count(table(pDataset                                     ,{pID},pID,merge))}
+      ,{#TEXT(pID),'ds_has_ID'                                        ,count(ds_has_ID                                    ) ,0                                                                          }
       ,{#TEXT(pID),'ds_slim'                                          ,count(ds_slim                                      ) ,count(table(ds_slim                                      ,{pID},pID,merge))}
       ,{#TEXT(pID),'ds_not_deleted_duns'                              ,count(ds_not_deleted_duns                          ) ,count(table(ds_not_deleted_duns                          ,{pID},pID,merge))}
       ,{#TEXT(pID),'ds_old_deleted_duns'                              ,count(ds_old_deleted_duns                          ) ,count(table(ds_old_deleted_duns                          ,{pID},pID,merge))}
