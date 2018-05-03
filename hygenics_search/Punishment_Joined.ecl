@@ -100,7 +100,9 @@ sorted_Pun := sort(distribute(lPunishmentProcessed,HASH(offender_key,  vendor,  
 	                    par_cur_stat,	par_cur_stat_desc,	par_status_dt,	par_st_dt,	par_sch_end_dt,
 	                    par_act_end_dt,	par_cty_cd,	par_cty,	supv_office,	supv_officer,	office_phone,
 	                    tdcjid_unit_type,	tdcjid_unit_assigned,	tdcjid_admit_date,	prison_status,	recv_dept_code,
-	                    recv_dept_date,	parole_active_flag,	casepull_date,	pro_st_dt,  pro_end_dt,  pro_status,punishment_persistent_id,
+	                    recv_dept_date,	parole_active_flag,	casepull_date,	pro_st_dt,  pro_end_dt,  pro_status,
+											fcra_date,fcra_date_type,conviction_override_date,conviction_override_date_type,
+											punishment_persistent_id,
                       local);
 deduped_Pun := dedup(sorted_pun,
                       process_date,	offender_key,	event_dt,	vendor,	source_file,	record_type  ,	orig_state,	offense_key,	punishment_type,
@@ -112,7 +114,8 @@ deduped_Pun := dedup(sorted_pun,
 	                    par_cur_stat,	par_cur_stat_desc,	par_status_dt,	par_st_dt,	par_sch_end_dt,
 	                    par_act_end_dt,	par_cty_cd,	par_cty,	supv_office,	supv_officer,	office_phone,
 	                    tdcjid_unit_type,	tdcjid_unit_assigned,	tdcjid_admit_date,	prison_status,	recv_dept_code,
-	                    recv_dept_date,	parole_active_flag,	casepull_date,	pro_st_dt,  pro_end_dt,  pro_status,								
+	                    recv_dept_date,	parole_active_flag,	casepull_date,	pro_st_dt,  pro_end_dt,  pro_status,
+											fcra_date,fcra_date_type,conviction_override_date,conviction_override_date_type,
 								      punishment_persistent_id,local);       	
 												
 

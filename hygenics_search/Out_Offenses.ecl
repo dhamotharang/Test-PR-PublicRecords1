@@ -341,9 +341,9 @@ sorted_offense := sort(distribute(fcra_v1_as_v3,HASH(offender_key,  vendor,  sou
 													StringLib.StringFilter(StringLib.StringToUpperCase(addl_sent_dates),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(probation_desc2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(court_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),									
-									        offense_persistent_id,
-									        off_comp,-process_date,  -offense_category,	local);
+									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),		
+													/*arr_off_lev_mapped,  court_off_lev_mapped,  fcra_offense_key,*/ fcra_conviction_flag,   fcra_date,  fcra_date_type,conviction_override_date,  conviction_override_date_type, offense_score, //offense_category, 
+									        offense_persistent_id, off_comp,-process_date,-offense_category,-fcra_traffic_flag,	local);
 deduped_offenses := dedup(sorted_offense,
                           offender_key,  vendor,  state_origin,  source_file,  data_type, trim(off_date),  trim(arr_date),  
 									        StringLib.StringFilter(StringLib.StringToUpperCase(num_of_counts),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
@@ -402,7 +402,8 @@ deduped_offenses := dedup(sorted_offense,
 													StringLib.StringFilter(StringLib.StringToUpperCase(addl_sent_dates),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(probation_desc2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(court_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),									
+									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+													/*arr_off_lev_mapped,  court_off_lev_mapped,  fcra_offense_key,*/ fcra_conviction_flag, /*fcra_traffic_flag,*/  fcra_date,  fcra_date_type,conviction_override_date,  conviction_override_date_type, offense_score,offense_category, 
 									        offense_persistent_id,	local);    
 /***************************************end*******************************************************/										
 

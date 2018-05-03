@@ -66,17 +66,17 @@ hygenics_crim.Layout_Base_Offenses_with_OffenseCategory addDOPID(offns l):= tran
 			self.offense_persistent_id 				:= hash64(trim(l.offender_key, left, right) + 
                                            Voff_date + 
                                            trim(l.case_num, left, right) +
-                                           Voff_code + 
+                                           Voff_code + 'X' +
                                            Voff_desc_1 + 
-                                           Voff_desc_2 + 
+                                           Voff_desc_2 + 'X' + 
                                            Voff_typ + 
                                            Voff_lev + 
                                            Varr_date +
-                                           Vstc_desc_1 +
+                                           Vstc_desc_1 + 'X' +
                                            Vstc_desc_2 +
                                            Vstc_desc_3 +
                                            Vstc_desc_4 +
-                                           Vmin_term +
+                                           Vmin_term + 'X' +
                                            Vmin_term_desc +
                                            Vmax_term +
                                            Vmax_term_desc +
@@ -157,49 +157,81 @@ all_files3 := all_files2 + all_files(offense_category <>0 and offense_category <
 /*************************************Final Dedup and rollup to make persistent key unique******************************************/
 result_sort 	:= sort(distribute(all_files3,HASH(offender_key,vendor,source_file,offense_persistent_id)),
                                      process_date,offender_key,offense_persistent_id,vendor, source_file, off_date, arr_date, case_num, 
- 																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-                                     chg, chg_typ_flg,
-																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-																		 add_off_cd, add_off_desc,
-                                     StringLib.StringFilter(StringLib.StringToUpperCase(off_typ),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
-                                     StringLib.StringFilter(StringLib.StringToUpperCase(off_lev),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	                                     
-																		 arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
+ 																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 chg, chg_typ_flg, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 add_off_cd, add_off_desc, off_typ, off_lev,
+                                     arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
                                      ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
-                                     ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
-                                     cty_conv, adj_wthd,trim(stc_dt),stc_comp,stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
-                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, 
+                                     ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(ct_disp_desc_1+ct_disp_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 cty_conv_cd,
+                                     cty_conv, adj_wthd,trim(stc_dt),stc_comp,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_3),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_4),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+                                     stc_lgth, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_lgth_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 inc_adm_dt, min_term, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(min_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 max_term, 
                                      StringLib.StringFilter(StringLib.StringToUpperCase(max_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-																		 parole,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(parole),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 																		 StringLib.StringFilter(StringLib.StringToUpperCase(probation),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-																		 offensetown,convict_dt,local);
-
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(offensetown),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(convict_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(Court_County),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 fcra_conviction_flag, fcra_traffic_flag, fcra_date, fcra_date_type, 
+	                                   conviction_override_date, conviction_override_date_type, offense_score, offense_category,
+																		 local); 
+ 
 result_dedup 	:= dedup(result_sort,  process_date,offender_key,offense_persistent_id,vendor, source_file, off_date, arr_date, case_num, 
- 																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-                                     chg, chg_typ_flg,
-																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-																		 add_off_cd, add_off_desc,
-                                     StringLib.StringFilter(StringLib.StringToUpperCase(off_typ),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
-                                     StringLib.StringFilter(StringLib.StringToUpperCase(off_lev),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	                                     
-																		 arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
+ 																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 chg, chg_typ_flg, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 add_off_cd, add_off_desc, off_typ, off_lev,
+                                     arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
                                      ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
-                                     ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
-                                     cty_conv, adj_wthd,trim(stc_dt),stc_comp,stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
-                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, 
+                                     ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(ct_disp_desc_1+ct_disp_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 cty_conv_cd,
+                                     cty_conv, adj_wthd,trim(stc_dt),stc_comp,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_3),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_desc_4),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+                                     stc_lgth, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(stc_lgth_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 inc_adm_dt, min_term, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(min_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 max_term, 
                                      StringLib.StringFilter(StringLib.StringToUpperCase(max_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-																		 parole,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(parole),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 																		 StringLib.StringFilter(StringLib.StringToUpperCase(probation),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-																		 offensetown,convict_dt,local);
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(offensetown),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(convict_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(Court_County),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 fcra_conviction_flag, fcra_traffic_flag, fcra_date, fcra_date_type, 
+	                                   conviction_override_date, conviction_override_date_type, offense_score, offense_category,
+																		 local
+																		 ) ;
 																		 
 result_sort2 	:= sort(result_dedup,  offender_key,offense_persistent_id, vendor, source_file, off_date, case_num,
-																		 arr_date, chg, add_off_desc, off_typ, off_lev,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+							  										 arr_date, chg, add_off_desc, off_typ, off_lev,
                                      arr_disp_date, arr_disp_desc_1, arr_disp_desc_2, court_desc,
                                      ct_fnl_plea, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, 
 																		 cty_conv, adj_wthd, trim(stc_dt), stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
                                      stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, 
 																		 StringLib.StringFilter(StringLib.StringToUpperCase(max_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-																		 parole,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(parole),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 																		 StringLib.StringFilter(StringLib.StringToUpperCase(probation),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
-																		 offensetown,convict_dt,local);																		 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(offensetown),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(convict_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(Court_County),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	 
+																		 fcra_conviction_flag, fcra_traffic_flag, fcra_date, fcra_date_type, 
+	                                   conviction_override_date, conviction_override_date_type, offense_score, offense_category,local);																		 
 
 result_sort2 rollupCrim(result_sort2 L, result_sort2 R) := TRANSFORM
                 self.arr_date             := if(l.arr_date              = '', r.arr_date       ,l.arr_date);
@@ -233,7 +265,18 @@ result_sort2 rollupCrim(result_sort2 L, result_sort2 R) := TRANSFORM
                 self.parole               := if(l.parole                = '', r.parole         , l.parole);
 								self.probation            := if(l.probation             = '', r.probation      , l.probation);
 								self.offensetown          := if(l.offensetown           = '', r.offensetown    , l.offensetown);
-								self.convict_dt           := if(l.convict_dt            = '', r.convict_dt     , l.convict_dt);
+								self.convict_dt           := if(l.convict_dt            = '', r.convict_dt     , l.convict_dt); 
+								self.Court_County                  :=  if(l.Court_County                 = '', r.Court_County                 , l.Court_County                 );
+								self.fcra_conviction_flag          :=  if(l.fcra_conviction_flag         = '', r.fcra_conviction_flag         , l.fcra_conviction_flag         );
+								self.fcra_traffic_flag             :=  if(l.fcra_traffic_flag            = '', r.fcra_traffic_flag            , l.fcra_traffic_flag            );
+								self.fcra_date                     :=  if(l.fcra_date                    = '', r.fcra_date                    , l.fcra_date                    );
+								self.fcra_date_type                :=  if(l.fcra_date_type               = '', r.fcra_date_type               , l.fcra_date_type               );
+								self.conviction_override_date      :=  if(l.conviction_override_date     = '', r.conviction_override_date     , l.conviction_override_date     );
+								self.conviction_override_date_type :=  if(l.conviction_override_date_type= '', r.conviction_override_date_type, l.conviction_override_date_type);
+								self.offense_score                 :=  if(l.offense_score                = '', r.offense_score                , l.offense_score                );
+								self.offense_category              :=  if(l.offense_category             = 0 , r.offense_category             , l.offense_category             );
+								       
+								
                 SELF   := L; 
 END;														 
 
@@ -242,7 +285,7 @@ rollupoffenseOut := ROLLUP(result_sort2,
 							left.offense_persistent_id = right.offense_persistent_id and
               trim(left.vendor)       = trim(right.vendor) and 
 							trim(left.source_file)  = trim(right.source_file) and 
-							trim(REGEXREPLACE('~|=|!|\\-|\\&|%|\\/|\\^|\\+|:|\\.|\\(|\\)|,|;|_|\\#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'', off_desc_1+off_desc_2, ''),all)   = trim(REGEXREPLACE('~|=|!|\\-|\\&|%|\\/|\\^|\\+|:|\\.|\\(|\\)|,|;|_|\\#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'', off_desc_1+off_desc_2, ''),all) and 
+							StringLib.StringFilter(StringLib.StringToUpperCase(left.off_desc_1+left.off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ')   = StringLib.StringFilter(StringLib.StringToUpperCase(right.off_desc_1+right.off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') and 
 							trim(left.off_date)     = trim(Right.off_date) and 
 							trim(left.case_num)     = trim(right.case_num) and 
 							(left.arr_date          = right.arr_date       or   right.arr_date       ='' or left.arr_date       ='') and 
@@ -276,10 +319,17 @@ rollupoffenseOut := ROLLUP(result_sort2,
 		          (left.parole            = right.parole          or   right.parole         ='' or left.parole            ='') and  
               (left.probation         = right.probation       or   right.probation      ='' or left.probation         ='') and 
               (left.offensetown       = right.offensetown     or   right.offensetown    ='' or left.offensetown       ='') and  
-              (left.convict_dt        = right.convict_dt      or   right.convict_dt     ='' or left.convict_dt        ='') ,
-         
-							rollupCrim(LEFT,RIGHT),local) : persist ('~thor200_144::persist::hygenics::RolledupDOCoffenses');
-							
+              (left.convict_dt        = right.convict_dt      or   right.convict_dt     ='' or left.convict_dt        ='') and 							
+              (left.Court_County              = right.Court_County             or   right.Court_County             ='' or left.Court_County             ='') and 
+							(left.fcra_conviction_flag      = right.fcra_conviction_flag     or   right.fcra_conviction_flag     ='' or left.fcra_conviction_flag     ='') and 
+							(left.fcra_traffic_flag         = right.fcra_traffic_flag        or   right.fcra_traffic_flag        ='' or left.fcra_traffic_flag        ='') and 
+							(left.fcra_date                 = right.fcra_date                or   right.fcra_date                ='' or left.fcra_date                ='') and 
+							(left.fcra_date_type            = right.fcra_date_type           or   right.fcra_date_type           ='' or left.fcra_date_type           ='') and 
+							(left.conviction_override_date  = right.conviction_override_date or   right.conviction_override_date ='' or left.conviction_override_date ='') and 
+							(left.conviction_override_date_type = right.conviction_override_date_type or   right.conviction_override_date_type ='' or left.conviction_override_date_type ='') and 
+							(left.offense_score                 = right.offense_score                 or   right.offense_score                 ='' or left.offense_score                 ='') and 
+							(left.offense_category              = right.offense_category              or   right.offense_category              =0  or left.offense_category              = 0), 
+							rollupCrim(LEFT,RIGHT),local) : persist ('~thor200_144::persist::hygenics::RolledupDOCoffenses');							
 
 
 /*************************************End******************************************/
