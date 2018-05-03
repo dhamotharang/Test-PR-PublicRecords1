@@ -338,7 +338,7 @@ export Main         :=
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	string20 					Household_ID;
+	unsigned8 				Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -354,7 +354,7 @@ export Main         :=
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	string20					  Customer_Person_ID;
+	unsigned6					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -404,7 +404,7 @@ export Main         :=
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string						Host ;
+	string15					Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS
@@ -419,12 +419,12 @@ export Main         :=
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string25					MAC_Address;
+	string10					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string					  Transaction_ID;
+	string20					Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -469,9 +469,7 @@ export Main         :=
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
-	string10					clean_SSN :='';
-	string10					clean_Zip :='';
-	string25					clean_IP_Address :='';
+
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
 	string1						Ethnicity := '';
@@ -535,7 +533,7 @@ export keybuild
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	string20 					Household_ID;
+	unsigned8 				Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -551,7 +549,7 @@ export keybuild
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	string20					  Customer_Person_ID;
+	unsigned6					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -601,7 +599,7 @@ export keybuild
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string						Host ;
+	string15					Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS
@@ -616,12 +614,12 @@ export keybuild
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string25					MAC_Address;
+	string10					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string					  Transaction_ID;
+	string20					Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -666,9 +664,6 @@ export keybuild
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
-	string10					clean_SSN :='';
-	string10					clean_Zip :='';
-	string25					clean_IP_Address :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
