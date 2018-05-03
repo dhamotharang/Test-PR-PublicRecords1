@@ -1352,7 +1352,7 @@ prop_common_distr := distribute(prop_common, did);
 // *******************************************************************************************************************
 // Now that we have all necessary data in the PBShell, pass it to the attributes function to produce the attributes
 // *******************************************************************************************************************
-  attributes := if(StringLib.StringToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions, //if valid attributes version requested, go get attributes
+  attributes := if(StringLib.StringToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions OR domodel, //if valid attributes version requested, go get attributes
 									 ProfileBooster.getAttributes(withAVMMed, DataPermissionMask),
 									 emptyAttr);  
 									 
