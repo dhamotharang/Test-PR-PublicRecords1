@@ -31,8 +31,8 @@ gateways_in := Gateway.Configuration.Get();
 tribCode := StringLib.StringToLowerCase(tribCode_Value);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-	self.servicename := if(ofac_version = 4 and tribcode in ['ex17','ex80'] and le.servicename = 'bridgerwlc', le.servicename, '');
-	self.url := if(ofac_version = 4 and tribcode in ['ex17','ex80'] and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self.servicename := if(ofac_version = 4 and tribcode in ['','ex17','ex80'] and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version = 4 and tribcode in ['','ex17','ex80'] and le.servicename = 'bridgerwlc', le.url, ''); 		
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
@@ -91,7 +91,7 @@ ret := map(
 	tribcode in ['2x13','2x14','2x15','2x17','2x18','2x19'] => Models.FD9606_0_0(clam, ungroup(easi_census_bt), false),
 	tribcode = '2x20' => Models.FD9606_0_0(clam, ungroup(easi_census_bt), false),
 	tribcode = 'ex17' => Models.FD5709_1_0(clam, true),
-	Models.FD5607_1_0(clam, history_date, true)
+	Models.FD5607_1_0(clam, true)
 );
 
 ret2 := map(
