@@ -102,9 +102,9 @@ all_f				 			:= ds_fcra_filtered + ds_fcra_all;
 																						Vorig_mname + 'X' +
 																						Vorig_name_suffix + 
 																						Vpty_typ + 
-																						Vlname + 'X' + 
-																						Vfname + 'X' +
-																						Vmname + 'X' +
+																						// Vlname + 'X' + 
+																						// Vfname + 'X' +
+																						// Vmname + 'X' +
 																						Vname_suffix + 
 																						trim(l.case_num, left, right) + 
 																						Vcase_court + 
