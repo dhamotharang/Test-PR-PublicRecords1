@@ -26,7 +26,7 @@ export t_ThinRollupPersonExtendedSearchOptions := record (iesp.share.t_BaseSearc
 	boolean IncludeAddress {xpath('IncludeAddress')};
 	boolean IncludeEmailAddress {xpath('IncludeEmailAddress')};
 	boolean IncludeEducationInformation {xpath('IncludeEducationInformation')};
-	boolean IncludeDtcCounts {xpath('IncludeDtcCounts')};
+	integer IncludeDtcCounts {xpath('IncludeDtcCounts')};
 	boolean RelaxedMiddleNameMatch {xpath('RelaxedMiddleNameMatch')};
 	boolean IncludeAllAddresses {xpath('IncludeAllAddresses')};
 	boolean AlwaysReturnRecords {xpath('AlwaysReturnRecords')};
@@ -61,6 +61,7 @@ end;
 export t_ThinRollupPersonExtendedPersonCount := record                
        string50  Category {xpath('Category')};
        unsigned2   Count{xpath('Count')};
+	 string1     exists{xpath('exists')};
 end;
 		
 export t_ThinRollupPersonExtendedSearchRecord := record
