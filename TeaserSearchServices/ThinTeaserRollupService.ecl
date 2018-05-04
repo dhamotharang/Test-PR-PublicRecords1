@@ -98,7 +98,7 @@ export ThinTeaserRollupService := MACRO
  	// end new additions.
 	
 	#stored ('IncludeDtcCounts', search_options.IncludeDtcCounts);
-  boolean in_IncludeDtcCounts := false : stored('IncludeDtcCounts');	
+  integer in_IncludeDtcCounts := 1 : stored('IncludeDtcCounts');	
  	// end new additions.
 	
 	#stored ('ForceLogging', search_options.ForceLogging);
