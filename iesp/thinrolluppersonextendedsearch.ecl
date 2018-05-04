@@ -61,7 +61,7 @@ end;
 export t_ThinRollupPersonExtendedPersonCount := record                
        string50  Category {xpath('Category')};
        unsigned2   Count{xpath('Count')};
-	 string1     exists{xpath('exists')};
+	 string1     Exists{xpath('Exists')};
 end;
 		
 export t_ThinRollupPersonExtendedSearchRecord := record
