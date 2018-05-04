@@ -43,7 +43,7 @@ function
       ,self.deleted_fein := '';
       ,self := left)) 
       : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_in_fix'+ pPersistUnique); 
-    ds_blank_duns     := ds_in_fix(duns_number ='') : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_blank_duns'   + pPersistUnique);
+    ds_blank_duns     := distribute(ds_in_fix(duns_number ='')) : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_blank_duns'   + pPersistUnique);
     ds_nonblank_duns  := ds_in_fix(duns_number<>'') : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_nonblank_duns'+ pPersistUnique);
     
     ds_refresh_duns  := join(
@@ -56,8 +56,8 @@ function
     
     // -- Full file after duns refresh
     ds_result   := project(ds_blank_duns,transform(l_dot_temp,self.active_duns_number := '',self.hist_duns_number := '',self := left)) 
-                            & ds_refresh_duns
-      : persist('~persist::BIPV2_Tools::Refresh_Duns::ds_result'+ pPersistUnique);
+                            + ds_refresh_duns
+      ;
 
    import wk_ut;
    dmi_input_file := wk_ut.Orbit_Item_list(workunit,'dmi'); //get the dmi file used
