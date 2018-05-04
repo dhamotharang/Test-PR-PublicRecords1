@@ -9,6 +9,8 @@ EXPORT Batch_Service() := FUNCTION
 	STRING50 	DataRestriction						:= IF(DataRestrictionTemp = '1    0', Risk_Indicators.iid_constants.default_DataRestriction, DataRestrictionTemp);
 	string50 	DataPermission 						:= risk_indicators.iid_constants.default_DataPermission  : stored('DataPermissionMask');
 	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
+	string50 	Custom_Model 						  := ''  : stored('Custom_Model');
+
 	
 	PB_wseq := project( batch_in, transform( ProfileBooster.Layouts.Layout_PB_In, 
 																	self.seq := counter; 
@@ -24,7 +26,11 @@ EXPORT Batch_Service() := FUNCTION
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
 																	self := left ) );
-  domodel := True;
+  
+  setvalidmodels :=['PBM1803_0'];
+  domodel := TRIM(TRIM(stringlib.stringtouppercase(Custom_Model),LEFT),RIGHT) IN setvalidmodels;
+  
+  
   attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, false, domodel);  
 
 

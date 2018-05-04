@@ -720,9 +720,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																									 le.Auto_score);
 	SELF.Auto_Type := IF(prescreen_score_scenario_auto, '0-1', le.Auto_Type);
 	SELF.Auto_reason1 := MAP(prescreen_score_scenario_auto OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                           SELF.Auto_score = '222' AND exception_score_reason                                           => 'Z97',
-                           SELF.Auto_score = '200' AND exception_score_reason                                           => 'Z98',
-                           SELF.Auto_score = '100' AND exception_score_reason                                           => 'Z99',
+                           SELF.Auto_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                           SELF.Auto_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                           SELF.Auto_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                            le.Auto_reason1);
 	SELF.Auto_reason2 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason2);
 	SELF.Auto_reason3 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason3);
@@ -736,9 +736,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																													 le.Bankcard_score);
 	SELF.Bankcard_Type := IF(prescreen_score_scenario_bankcard, '0-1', le.Bankcard_Type);
 	SELF.Bankcard_reason1 := MAP(prescreen_score_scenario_bankcard OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                               SELF.Bankcard_score = '222' AND exception_score_reason                                           => 'Z97',
-                               SELF.Bankcard_score = '200' AND exception_score_reason                                           => 'Z98',
-                               SELF.Bankcard_score = '100' AND exception_score_reason                                           => 'Z99',
+                               SELF.Bankcard_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                               SELF.Bankcard_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                               SELF.Bankcard_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                    le.Bankcard_reason1);
 	SELF.Bankcard_reason2 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason2);
 	SELF.Bankcard_reason3 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason3);
@@ -752,9 +752,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																																							 le.Short_term_lending_score);
 	SELF.Short_term_lending_Type := IF(prescreen_score_scenario_stl, '0-1', le.Short_term_lending_Type);
 	SELF.Short_term_lending_reason1 := MAP(prescreen_score_scenario_stl OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                                         SELF.Short_term_lending_score = '222' AND exception_score_reason                            => 'Z97',
-                                         SELF.Short_term_lending_score = '200' AND exception_score_reason                            => 'Z98',
-                                         SELF.Short_term_lending_score = '100' AND exception_score_reason                            => 'Z99',
+                                         SELF.Short_term_lending_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z97',
+                                         SELF.Short_term_lending_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z98',
+                                         SELF.Short_term_lending_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z99',
                                                                                                                                         le.Short_term_lending_reason1);
 	SELF.Short_term_lending_reason2 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason2);
 	SELF.Short_term_lending_reason3 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason3);
@@ -768,9 +768,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																																							 le.Telecommunications_score);
 	SELF.Telecommunications_Type := IF(prescreen_score_scenario_teleco, '0-1', le.Telecommunications_Type);
 	SELF.Telecommunications_reason1 := MAP(prescreen_score_scenario_teleco OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                                         SELF.Telecommunications_score = '222' AND exception_score_reason                               => 'Z97',
-                                         SELF.Telecommunications_score = '200' AND exception_score_reason                               => 'Z98',
-                                         SELF.Telecommunications_score = '100' AND exception_score_reason                               => 'Z99',
+                                         SELF.Telecommunications_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z97',
+                                         SELF.Telecommunications_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z98',
+                                         SELF.Telecommunications_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z99',
                                                                                                                                            le.Telecommunications_reason1);
 	SELF.Telecommunications_reason2 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason2);
 	SELF.Telecommunications_reason3 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason3);
@@ -784,9 +784,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																																							 le.Crossindustry_score);
 	SELF.Crossindustry_Type := IF(prescreen_score_scenario_Crossindustry, '0-1', le.Crossindustry_Type);
 	SELF.Crossindustry_reason1 := MAP(prescreen_score_scenario_Crossindustry OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                                    SELF.Crossindustry_score = '222' AND exception_score_reason                                           => 'Z97',
-                                    SELF.Crossindustry_score = '200' AND exception_score_reason                                           => 'Z98',
-                                    SELF.Crossindustry_score = '100' AND exception_score_reason                                           => 'Z99',
+                                    SELF.Crossindustry_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                                    SELF.Crossindustry_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                                    SELF.Crossindustry_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                              le.Crossindustry_reason1);
 	SELF.Crossindustry_reason2 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason2);
 	SELF.Crossindustry_reason3 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason3);
@@ -800,9 +800,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																											 le.Custom_score);
 	SELF.Custom_Type := IF(prescreen_score_scenario_custom, '0-1', le.Custom_Type);
 	SELF.Custom_reason1 := MAP(prescreen_score_scenario_custom OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                             SELF.Custom_score = '222' AND exception_score_reason                                           => 'Z97',
-                             SELF.Custom_score = '200' AND exception_score_reason                                           => 'Z98',
-                             SELF.Custom_score = '100' AND exception_score_reason                                           => 'Z99',
+                             SELF.Custom_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                             SELF.Custom_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                             SELF.Custom_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                le.Custom_reason1);
 	SELF.Custom_reason2 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason2);
 	SELF.Custom_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason3);
@@ -816,9 +816,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																											 le.Custom2_score);
 	SELF.Custom2_Type := IF(prescreen_score_scenario_custom2, '0-1', le.Custom2_Type);
 	SELF.Custom2_reason1 := MAP(prescreen_score_scenario_custom2 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                              SELF.Custom2_score = '222' AND exception_score_reason                                           => 'Z97',
-                              SELF.Custom2_score = '200' AND exception_score_reason                                           => 'Z98',
-                              SELF.Custom2_score = '100' AND exception_score_reason                                           => 'Z99',
+                              SELF.Custom2_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom2_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom2_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                  le.Custom2_reason1);
 	SELF.Custom2_reason2 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason2);
 	SELF.Custom2_reason3 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason3);
@@ -832,9 +832,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																											 le.Custom3_score);
 	SELF.Custom3_Type := IF(prescreen_score_scenario_custom3, '0-1', le.Custom3_Type);
 	SELF.Custom3_reason1 := MAP(prescreen_score_scenario_custom3 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                              SELF.Custom3_score = '222' AND exception_score_reason                                           => 'Z97',
-                              SELF.Custom3_score = '200' AND exception_score_reason                                           => 'Z98',
-                              SELF.Custom3_score = '100' AND exception_score_reason                                           => 'Z99',
+                              SELF.Custom3_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom3_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom3_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                  le.Custom3_reason1);
 	SELF.Custom3_reason2 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason2);
 	SELF.Custom3_reason3 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason3);
@@ -848,9 +848,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																											 le.Custom4_score);
 	SELF.Custom4_Type := IF(prescreen_score_scenario_custom4, '0-1', le.Custom4_Type);
 	SELF.Custom4_reason1 := MAP(prescreen_score_scenario_custom4 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                              SELF.Custom4_score = '222' AND exception_score_reason                                           => 'Z97',
-                              SELF.Custom4_score = '200' AND exception_score_reason                                           => 'Z98',
-                              SELF.Custom4_score = '100' AND exception_score_reason                                           => 'Z99',
+                              SELF.Custom4_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom4_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom4_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                  le.Custom4_reason1);
 	SELF.Custom4_reason2 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason2);
 	SELF.Custom4_reason3 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason3);
@@ -864,9 +864,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 																																											 le.Custom5_score);
 	SELF.Custom5_Type := IF(prescreen_score_scenario_custom5, '0-1', le.Custom5_Type);
 	SELF.Custom5_reason1 := MAP(prescreen_score_scenario_custom5 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
-                              SELF.Custom5_score = '222' AND exception_score_reason                                           => 'Z97',
-                              SELF.Custom5_score = '200' AND exception_score_reason                                           => 'Z98',
-                              SELF.Custom5_score = '100' AND exception_score_reason                                           => 'Z99',
+                              SELF.Custom5_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom5_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom5_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                  le.Custom5_reason1);
 	SELF.Custom5_reason2 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason2);
 	SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason3);

@@ -594,7 +594,7 @@ export Functions := MODULE
 		RETURN sort_recs_WithEmail;
 	end;
 	export getCounts(dataset(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord) inrecs,
-							boolean IncludeCounts,
+							integer IncludeCounts,
 							string32 application_Type_value) := FUNCTION
 									 
    dsLookups := JOIN(inrecs, doxie.key_D2C_lookup(),
@@ -634,6 +634,7 @@ export Functions := MODULE
 																	,LEFT.FAA_Pilot_cnt 
 																);																											
 															self.categoryIndex := counter;
+															self.exists := '';
 														 ));
 													 														 																		
   outrecs := project(inRecs, 
@@ -643,11 +644,12 @@ export Functions := MODULE
       			                             																												   
 										CountSet := dsLookupsIndexed(didvalue = (unsigned6) UniqueID);
 										self.personCounts := choosen( 
-										   if (IncludeCounts,
+										   if (IncludeCounts > 1,
 										     project(countSet,                                       											 
 													 TRANSFORM(IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedPersonCount,																							 													  
 														 SELF.category  := Countset(categoryIndex = counter)[1].Category;
-														 SELF.count := countset(categoryIndex = counter)[1].Count;														
+														 SELF.count := if (includeCounts = 3, countset(categoryIndex = counter)[1].Count, 0);
+														 self.exists := if (includeCounts = 2 and countset(categoryIndex = counter)[1].Count > 0, 'Y','');
 													)),												  
 													dataset([], IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedPersonCount)
 											)
