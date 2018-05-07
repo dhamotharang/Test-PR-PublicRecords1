@@ -24,11 +24,11 @@ EXPORT LIB_RiskView_Models (
 	shared isPreScreenPurpose := StringLib.StringToUpperCase(intendedPurpose) = 'PRESCREENING';
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
-  EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
-	// EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
+ EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
+	 // EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVG1610_1_0(BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVP1702_1_0(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -147,6 +147,7 @@ that is sent INTO calcindex for ECL.
 																			{'RVA1611_1', MType_A+'RVA1611_1', calcIndex( 66), '0-999', 0}, //Ford Motor Credit
 																			{'RVA1611_2', MType_A+'RVA1611_2', calcIndex( 67), '0-999', 0}, //Ford Motor Credit
 																			{'RVG1610_1', MType_G+'RVG1610_1', calcIndex( 68), '0-999', 0}, //ACCESS Model
+																			{'RVP1702_1', MType_G+'RVP1702_1', calcIndex( 69), '0-999', 0}, //DM Services
 																			
 																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
@@ -193,6 +194,7 @@ that is sent INTO calcindex for ECL.
 											//'RVS1706_0' => UNGROUP(Models.RVS1706_0_0(BocaShell)),	
 											'RVS1706_0' => UNGROUP(Models.RVS1706_0_2(BocaShell)),	
 											'RVG1610_1' => UNGROUP(Models.RVG1610_1_0(BocaShell)),	
+											'RVP1702_1' => UNGROUP(Models.RVP1702_1_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),
