@@ -201,7 +201,7 @@ seqrec := RECORD
 											into_final(LEFT,RIGHT),
 											LOCAL,
 											LEFT OUTER, KEEP(1)
-										); /*: persist('~thor_data400::persist::proflic_mari::append_bdid');*/
+										); /* : persist('~thor_data400::persist::proflic_mari::append_bdid');*/
 
 
 		layout_mari_final_plus := RECORD
@@ -292,8 +292,9 @@ seqrec := RECORD
 		//Propagate DID using Midex DID lookup table for those records do not have DIDs
 		enh_did := MARI_Enhance_Did(WithOutDID2s);
 		
-		AllDIDs	:=	DEDUP(SORT(DISTRIBUTE((WithDIDs + WithDID2s+ enh_did),HASH(cmc_slpk)),cmc_slpk,LOCAL),RECORD);
-			
+		//DF-21263 removed records with same data except did, did score, and enh did src 
+		AllDIDs	:=	DEDUP(SORT(DISTRIBUTE((WithDIDs + WithDID2s+ enh_did),HASH(cmc_slpk)),cmc_slpk,persistent_record_id,-did_score, LOCAL),RECORD, EXCEPT DID, did_score,enh_did_src);
+					
 		// Re-Create unique id and reformat to base layout
 		ut.MAC_Sequence_Records(AllDIDs,mari_rid,dDID_Seq);
 
@@ -303,6 +304,7 @@ seqrec := RECORD
 		reformat_searchRID := PROJECT(dsSearch_RID, TRANSFORM(Prof_License_Mari.layouts.final, SELF.mari_rid := LEFT.tmp_mari_rid; SELF := LEFT));
 
 		EXPORT search_file	:=	reformat_searchRID;
+
 		
 			
 END;
