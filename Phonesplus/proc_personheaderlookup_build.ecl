@@ -1,4 +1,4 @@
-#workunit('name','PersonHeaderLookup '+ Phonesplus.version)
+﻿// #workunit('name','PersonHeaderLookup '+ Phonesplus.version)
 
 import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild;
 
@@ -12,8 +12,6 @@ addHeaderKeyBuilding := if(fileservices.getsuperfilesubcount('~thor_data400::Bas
 clearHeaderKeyBuilding := FileServices.ClearSuperFile('~thor_data400::Base::HeaderKey_Building');
 
 export proc_personheaderlookup_build := sequential(addHeaderKeyBuilding,
-			Phonesplus.proc_build_PersonHeaderLookupKey(Phonesplus.version),
-			personheaderlookup_dops_update
-			): 
+			Phonesplus.proc_build_PersonHeaderLookupKey(Phonesplus.version)): 
 				success(e_mail_success), 
 				FAILURE(e_mail_failure);
