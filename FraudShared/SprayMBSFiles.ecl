@@ -1,4 +1,4 @@
-﻿import tools, _control;
+﻿import tools, _control,lib_thorlib;
 
 export SprayMBSFiles(
 
@@ -18,7 +18,7 @@ export SprayMBSFiles(
 	,string   pFilenameMBSTableCol           						= 'table_column.txt' 
 	,string   pFilenameMBSColValDesc         						= 'column_value_desc.txt' 
 	,string		pversion
-	,string		pGroupName	                   = Platform.groupname()																		
+	,string		pGroupName	                   = thorlib.group()																		
 	,boolean	pIsTesting	                   = false
 	,boolean	pOverwrite	                   =  true
 	,boolean	pReplicate	                   =	true

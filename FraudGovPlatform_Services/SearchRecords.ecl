@@ -1,7 +1,8 @@
 ﻿IMPORT BatchShare, DidVille, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
 
-EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
-                     FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
+                     FraudGovPlatform_Services.IParam.BatchParams batch_params,
+										 BOOLEAN IsOnline = FALSE) := FUNCTION
 	
 	//Defining the constants to be used later.
 	Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
@@ -24,23 +25,40 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 	random_no_of_identities_ds := DATASET([{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}] , {unsigned1 num}); 
 	random_no_of_identities := ROUNDUP(count(random_no_of_identities_ds) * (((RANDOM()%100000)+1)/100000));
 	// ***random_scores ends***
+
+	// **************************************************************************************
+	// Getting the payload records from FraudGov Payload key.
+	// **************************************************************************************
+	ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs(ds_batch_in,
+																																					batch_params.GlobalCompanyId,
+																																					batch_params.IndustryType,
+																																					batch_params.ProductCode,
+																																					IsOnline := IsOnline);	
 	
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
-	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
+	ds_input_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
+	BOOLEAN did_exists := EXISTS(ds_input_with_did(did > 0));
 
-	DidVille.Layout_Did_OutBatch trans_to_BestADL_batchIn(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
-		SELF.phone10    := L.phoneno;
-		SELF.fname      := L.name_first;
-		SELF.mname      := L.name_middle;
-		SELF.lname      := L.name_last;
-		SELF.suffix			:= L.name_suffix;
-		SELF            := L;
-		SELF            := [];
-	END;
+	ds_input_best_in := PROJECT(ds_input_with_did, TRANSFORM(DidVille.Layout_Did_OutBatch,
+																										SELF.fname	:= LEFT.name_first,
+																										SELF.mname	:= LEFT.name_middle,
+																										SELF.lname	:= LEFT.name_last,
+																										SELF.suffix	:= LEFT.name_suffix,
+																										SELF.phone10	:= LEFT.phoneno,
+																										SELF	:= LEFT,
+																										SELF	:= []));
+	
+	ds_payload_best_in := PROJECT(ds_allPayloadRecs , TRANSFORM(DidVille.Layout_Did_OutBatch,
+																											SELF.Seq := COUNTER,
+																											SELF.did := LEFT.did,
+																											SELF := []));
 
-	ds_best_in := PROJECT(ds_batch_in_with_did, trans_to_BestADL_batchIn(LEFT));
+	ds_payload_best_in_dedup := DEDUP(SORT(ds_payload_best_in(did > 0), did), did);
+	
+	ds_best_in := IF(did_exists , ds_input_best_in , ds_payload_best_in_dedup);
+
 	ds_Best := DidVille.did_service_common_function(ds_best_in,
 																									appends_value      := 'BEST_ALL,VERIFY_ALL',
 																									verify_value       := 'BEST_ALL,VERIFY_ALL',
@@ -50,22 +68,24 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																									include_minors     := TRUE,
 																									IndustryClass_val  := batch_params.IndustryClass,
 																									DRM_val            := batch_params.DataRestrictionMask,
-																									GetSSNBest         := TRUE);		
-
-	ds_allPayloadRecs := FraudGovPlatform_Services.Raw_Records(ds_batch_in_with_did,
-																															batch_params.GlobalCompanyId, 
-																															batch_params.IndustryType, 
-																															batch_params.ProductCode); 
-																																																												
-	ds_fragment_recs := FraudShared_Services.Functions.getFragmentMatchTypes(ds_batch_in_with_did, ds_allPayloadRecs, batch_params);
-
+																									GetSSNBest         := TRUE);
+		
+	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
+	ds_elements_dids := PROJECT(ds_payload_best_in_dedup, TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec, 
+																													SELF.acctno := '1',
+																													SELF.did := LEFT.did,
+																													SELF := []));
+	
+	ds_combinedfreg_recs := IF(did_exists, ds_batch_in, ds_batch_in + ds_elements_dids);
+	ds_fragment_recs := FraudShared_Services.Functions.getFragmentMatchTypes(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params);
+	
 	fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
-		string50 Email_Address;
+		STRING50 Email_Address;
 		STRING60 fragment_value;
 		UNSIGNED3 file_type;
-		unsigned4	LastActivityDate := 0;
-		unsigned4	LastKnownRiskDate := 0;
+		UNSIGNED4	LastActivityDate := 0;
+		UNSIGNED4	LastKnownRiskDate := 0;
 	END;
 
 	fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
@@ -114,7 +134,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 
 	ds_fragment_recs_tab	:= TABLE(ds_fragment_recs_sorted,ds_fragment_tab_Recs, fragment_value, fragment);	
 
-	iesp.fraudgovsearch.t_FraudGovSearchRecord records_trans (fragment_w_value_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
+	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (fragment_w_value_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
 		best_rec := ds_Best(L.fragment_value = (string)ds_Best.did)[1];
 		
@@ -125,15 +145,15 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		SELF.ElementValue := L.fragment_value;
 		SELF.Score := random_scores_ds[random_score].num;
 		SELF.NoOfIdentities := random_no_of_identities_ds[random_no_of_identities].num;;
-		SELF.BestInformation.UniqueId := IF(populateBest, (string) best_rec.did, '');  
-		SELF.BestInformation.Name.Prefix := IF(populateBest, best_rec.best_title	, ''); 
-		SELF.BestInformation.Name.First := IF(populateBest, best_rec.best_fname, ''); 
-		SELF.BestInformation.Name.Middle := IF(populateBest, best_rec.best_mname, ''); 
-		SELF.BestInformation.Name.Last := IF(populateBest, best_rec.best_lname, ''); 
-		SELF.BestInformation.Name.Suffix := IF(populateBest, best_rec.best_name_suffix, '');
-		SELF.BestInformation.SSN := IF(populateBest, (string) best_rec.best_ssn, '');
-		SELF.BestInformation.DOB := IF(populateBest, iesp.ECL2ESP.toDate((integer)best_rec.best_dob));
-		SELF.BestInformation.Address := IF(populateBest,  iesp.ECL2ESP.SetAddress('',
+		SELF.GovernmentBest.UniqueId := IF(populateBest, (string) best_rec.did, '');  
+		SELF.GovernmentBest.Name.Prefix := IF(populateBest, best_rec.best_title	, ''); 
+		SELF.GovernmentBest.Name.First := IF(populateBest, best_rec.best_fname, ''); 
+		SELF.GovernmentBest.Name.Middle := IF(populateBest, best_rec.best_mname, ''); 
+		SELF.GovernmentBest.Name.Last := IF(populateBest, best_rec.best_lname, ''); 
+		SELF.GovernmentBest.Name.Suffix := IF(populateBest, best_rec.best_name_suffix, '');
+		SELF.GovernmentBest.SSN := IF(populateBest, (string) best_rec.best_ssn, '');
+		SELF.GovernmentBest.DOB := IF(populateBest, iesp.ECL2ESP.toDate((integer)best_rec.best_dob));
+		SELF.GovernmentBest.Address := IF(populateBest,  iesp.ECL2ESP.SetAddress('',
 																																							'', 
 																																							'', 
 																																							'', 
@@ -147,7 +167,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																																							'',
 																																							'',
 																																							best_rec.best_addr1));
-		SELF.BestInformation.Phone10 := IF(populateBest,(string) best_rec.best_phone	, '');
+		SELF.GovernmentBest.Phone10 := IF(populateBest,(string) best_rec.best_phone	, '');
 		SELF.EmailAddress := L.email_address;
 		SELF.NoOfClusters := random_no_of_cluster_ds[random_no_of_cluster].num;
 		SELF.NoOfRecentTransactions := R.NoOfRecentTransactions; //Last 24 hours velocity count.
@@ -162,23 +182,25 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		SELF := [];
 	END;
 	
-	ds_records := JOIN(ds_fragment_recs_rolled, ds_fragment_recs_tab,
-											LEFT.fragment_value = RIGHT.fragment_value AND
-											LEFT.fragment = RIGHT.fragment,
-											records_trans(LEFT, RIGHT));
-	
+	ds_ElementsNIdentities := JOIN(ds_fragment_recs_rolled, ds_fragment_recs_tab,
+																	LEFT.fragment_value = RIGHT.fragment_value AND
+																	LEFT.fragment = RIGHT.fragment,
+																	ElementsNIdentities_trans(LEFT, RIGHT));
+											
 	// output(ds_batch_in, named('ds_batch_in'));
-	// output(ds_batch_in_with_did, named('ds_batch_in_with_did'));
+	// output(ds_input_with_did, named('ds_input_with_did'));
+	// output(ds_input_best_in, named('ds_input_best_in'));
+	// output(ds_payload_best_in, named('ds_payload_best_in'));
 	// output(ds_best_in, named('ds_best_in'));
 	// output(ds_Best, named('ds_Best'));
-	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
+	// output(ds_elements_dids, named('ds_elements_dids'));
 	// output(ds_fragment_recs, named('ds_fragment_recs'));
+	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
 	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
-	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
-	// output(ds_fragment_recs_grouped, named('ds_fragment_recs_grouped'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
+	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
+	// output(ds_otherElementsIdentities, named('ds_otherElementsIdentities'));
 	// output(ds_records, named('ds_records'));
-	
-	RETURN ds_records;
+	RETURN ds_ElementsNIdentities;
 END;

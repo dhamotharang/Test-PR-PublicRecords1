@@ -24,9 +24,9 @@ export t_FraudGovSearchBy := record
 	string12 AmountMin {xpath('AmountMin')};
 	string12 AmountMax {xpath('AmountMax')};
 	string100 BankName {xpath('BankName')};
-	string10 BankRoutingNumber {xpath('BankRoutingNumber')};
-	string30 BankAccountNumber {xpath('BankAccountNumber')};
-	string25 ISPName {xpath('ISPName')};
+	string20 BankRoutingNumber {xpath('BankRoutingNumber')};
+	string20 BankAccountNumber {xpath('BankAccountNumber')};
+	string75 ISPName {xpath('ISPName')};
 	string25 IpAddress {xpath('IpAddress')};
 	string25 MACAddress {xpath('MACAddress')};
 	string50 DeviceId {xpath('DeviceId')};
@@ -43,16 +43,8 @@ end;
 		
 export t_FraudGovSearchOption := record (iesp.share.t_BaseOption)
 	boolean IsOnline {xpath('IsOnline')};
+	boolean IsTestRequest {xpath('IsTestRequest')};
 	string Platform {xpath('Platform')};
-end;
-		
-export t_FraudGovSearchBestInformation := record
-	string12 UniqueId {xpath('UniqueId')};
-	iesp.share.t_Name Name {xpath('Name')};
-	string11 SSN {xpath('SSN')};
-	iesp.share.t_Date DOB {xpath('DOB')};
-	iesp.share.t_Address Address {xpath('Address')};
-	string15 Phone10 {xpath('Phone10')};
 end;
 		
 export t_FraudGovSearchRecord := record
@@ -61,7 +53,8 @@ export t_FraudGovSearchRecord := record
 	string100 ElementValue {xpath('ElementValue')};
 	integer Score {xpath('Score')};
 	integer NoOfIdentities {xpath('NoOfIdentities')};
-	t_FraudGovSearchBestInformation BestInformation {xpath('BestInformation')};
+	iesp.fraudgovplatform.t_FraudGovBestInfo GovernmentBest {xpath('GovernmentBest')};
+	iesp.fraudgovplatform.t_FraudGovBestInfo ContributedBest {xpath('ContributedBest')};
 	string50 EmailAddress {xpath('EmailAddress')};
 	integer NoOfClusters {xpath('NoOfClusters')};
 	integer NoOfRecentTransactions {xpath('NoOfRecentTransactions')};
@@ -78,6 +71,7 @@ end;
 export t_FraudGovSearchResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	t_FraudGovSearchBy InputEcho {xpath('InputEcho')};
+	unsigned2 RecordCount {xpath('RecordCount')};
 	dataset(t_FraudGovSearchRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_SEARCH_RECORDS)};
 end;
 		
