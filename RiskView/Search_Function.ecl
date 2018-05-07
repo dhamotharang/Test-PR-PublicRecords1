@@ -190,7 +190,12 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 										
 Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
 
-bsversion := IF(Crossindustry_model = 'RVS1706_0', 52,50);  // hard code this for now
+bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
+                Custom_model_name in  ['RVP1702_1'] or 
+                Custom2_model_name in ['RVP1702_1'] or 
+                Custom3_model_name in ['RVP1702_1'] or
+                Custom4_model_name in ['RVP1702_1'] or 
+                Custom5_model_name in ['RVP1702_1'],52,50);  // hard code this for now
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;

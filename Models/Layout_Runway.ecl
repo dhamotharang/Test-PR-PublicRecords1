@@ -1478,6 +1478,9 @@ string2 RVP1503_1_0_reason1 := '';
 String3 RVP1605_1_0_score := '';
 string2 RVP1605_1_0_reason1 := '';
 
+String3 RVP1702_1_0_score := '';
+string2 RVP1702_1_0_reason1 := '';
+
 String3 RVR1003_0_0_score := '';
 string2 RVR1003_0_0_reason1 := '';
 string2 RVR1003_0_0_reason2 := '';
