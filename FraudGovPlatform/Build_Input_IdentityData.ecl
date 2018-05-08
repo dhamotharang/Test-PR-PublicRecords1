@@ -142,10 +142,19 @@ module
 	NotInMbs := join(f1,
 							FraudShared.Files().Input.MBS.sprayed(status = 1)
 										,left.Customer_Account_Number =(string)right.gc_id
-										and left.Customer_State = right.customer_state
-										and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
-										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-										and left.Customer_County = right.Customer_County,
+										and right.file_type = Functions.file_type_fn('IDDT') 
+										and Functions.ind_type_fn(left.Customer_Program) = right.ind_type AND 
+										( 
+											(	left.source_input[1..9] = 'DELTABASE'  
+												AND regexfind('DELTA', right.fdn_file_code, nocase) 
+											) 
+											OR 
+											(	left.source_input[1..9] != 'DELTABASE' AND
+												left.customer_State = right.Customer_State AND
+												left.Customer_County = right.Customer_County AND 	
+												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+											)
+										),
 										TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;

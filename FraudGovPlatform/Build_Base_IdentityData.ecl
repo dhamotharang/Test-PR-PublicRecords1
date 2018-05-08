@@ -28,13 +28,21 @@ module
 
 	IdentityDataSource := join(	IdentityDataUpdate,
 									Mbs_ds, 
-									(unsigned6) left.Customer_Account_Number = right.gc_id and 
-									right.file_type = Functions.file_type_fn('IDDT') and 
-									Functions.ind_type_fn(left.customer_program) = right.ind_type and 
-									left.customer_state = right.Customer_State and
-									left.Customer_County = right.Customer_County and 	
-									left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
-									TRANSFORM(Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
+									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
+									right.file_type = FraudGovPlatform.Functions.file_type_fn('IDDT') AND 
+									FraudGovPlatform.Functions.ind_type_fn(left.Customer_Program) = right.ind_type AND 
+									( 
+										(	left.source_input[1..9] = 'DELTABASE'  
+											AND regexfind('DELTA', right.fdn_file_code, nocase) 
+										) 
+										OR 
+										(	left.source_input[1..9] != 'DELTABASE' AND
+											left.customer_State = right.Customer_State AND
+											left.Customer_County = right.Customer_County AND 	
+											left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+										)
+									)
+									,TRANSFORM(FraudGovPlatform.Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 
   
