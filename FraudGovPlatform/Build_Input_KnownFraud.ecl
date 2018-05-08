@@ -2,7 +2,8 @@
 EXPORT Build_Input_KnownFraud(
 	  string		pversion
 	 ,boolean		PSkipKnownFraud	= false 
-	 ,boolean		PSkipNAC				= false	 
+	 ,boolean		PSkipNAC				= false	
+	 ,boolean		PSkipValidations	= false
 ) :=
 module
 
@@ -176,7 +177,7 @@ module
 	
 
 	f1_errors:=f1
-			(	 
+			((	 
 					Customer_Account_Number =''
 				or	Customer_County =''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
@@ -184,8 +185,9 @@ module
 				or 	(Street_1='' and City='' and State='' and Zip='')
 				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
 				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
-				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE				
-			);
+				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
+			)and PSkipValidations = false);
+			
 
 	NotInMbs := join(	f1,
 						FraudShared.Files().Input.MBS.sprayed(status = 1)

@@ -5,6 +5,7 @@ EXPORT Build_Input_IdentityData(
 	,boolean		PSkipNAC			= false	 
 	,boolean		PSkipDeltabase		= false	 
 	,boolean		PSkipInquiryLogs	= false	 
+	,boolean		PSkipValidations	= false
 ) :=
 module
 
@@ -128,7 +129,7 @@ module
 	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
 	
 	f1_errors:=f1
-			(	 
+			((	 
 					Customer_Account_Number = ''
 				or	Customer_County = ''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
@@ -137,7 +138,7 @@ module
 				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
 				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
 				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
-			);
+			)and PSkipValidations = false);
 
 	NotInMbs := join(f1,
 							FraudShared.Files().Input.MBS.sprayed(status = 1)
