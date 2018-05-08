@@ -1,4 +1,4 @@
-import Models, Seed_Files, iesp;
+﻿import Models, Seed_Files, iesp;
 
 export OS_Testseed_Function (dataset(Risk_Indicators.Layout_BocaShell_BtSt.BTST_input) inData, 
 		string30 account_value, string20 TestDataTableName) := 
@@ -68,6 +68,7 @@ FUNCTION
 		SELF.result.inputecho.BillTo.DOB.day := (integer)  ri.dobday ;
 		SELF.result.inputecho.BillTo.IPAddress := ri.ipaddr;
 		//bill to - verified
+    self.result.BillTo.UniqueID := (string)Risk_Indicators.iid_constants.fn_CreateFakeDID((string)ri.vFirst, (string)ri.vLast);
 		SELF.result.BillTo.VerifiedInput.Name.Full := ri.vFull;	
 		SELF.result.BillTo.VerifiedInput.Name.First := ri.vFirst;	
 		SELF.result.BillTo.VerifiedInput.Name.Middle := ri.vMiddle;	
@@ -159,6 +160,7 @@ FUNCTION
 		SELF.result.inputecho.ShipTo.DOB.month := (integer) ri.dobmonth2 ;
 		SELF.result.inputecho.ShipTo.DOB.day := (integer) ri.dobday2 ;
 		//bill to - verified
+    self.result.ShipTo.UniqueID := (string)Risk_Indicators.iid_constants.fn_CreateFakeDID((string)ri.vFirst2, (string)ri.vLast2);
 		SELF.result.ShipTo.VerifiedInput.Name.Full := ri.vFull2;	
 		SELF.result.ShipTo.VerifiedInput.Name.First := ri.vFirst2;	
 		SELF.result.ShipTo.VerifiedInput.Name.Middle := ri.vMiddle2;	

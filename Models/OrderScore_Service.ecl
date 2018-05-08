@@ -363,6 +363,7 @@ export OrderScore_Service := MACRO
 			self.AccountNumber := ri.account;
 			self.seq := ri.seq;
 			//bill to verified name
+			self.Result.BillTo.UniqueID := (string)le.bill_to_output.DID;
 			self.Result.BillTo.VerifiedInput.Name.First := le.bill_to_output.combo_first;
 			self.Result.BillTo.VerifiedInput.Name.Last := le.bill_to_output.combo_last;
 			//bill to verified address
@@ -400,6 +401,7 @@ export OrderScore_Service := MACRO
 			//might need to convert to iesp date
 			self.Result.BillTo.NewAreaCode.EffectiveDate := iesp.ECL2ESP.toDate((integer)le.bill_to_output.areacodesplitdate);
 			//ship to
+			self.Result.ShipTo.UniqueID := (string)le.ship_to_output.DID;
 			self.Result.ShipTo.VerifiedInput.Name.First := le.ship_to_output.combo_first;
 			self.Result.ShipTo.VerifiedInput.Name.Last := le.ship_to_output.combo_last;	
 			//bill to verified address
