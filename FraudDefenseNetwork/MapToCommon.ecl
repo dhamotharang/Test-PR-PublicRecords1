@@ -60,16 +60,20 @@ module
 	)); 
 
 // GLB5 Append Market information 
+  inBaseGLB5_dist       := distribute(inBaseGLB5, hash(orig_company_id));
+  MBSmarketAppend_dist  := distribute(FraudShared.Files().Input.MBSmarketAppend.Sprayed, hash(company_id));
 
-	j := join(inBaseGLB5, FraudShared.Files().Input.MBSmarketAppend.Sprayed/*Files().mbs_lookup*/ , left.orig_COMPANY_ID = right.company_id,
+	Glb5MarketAppend      := join(inBaseGLB5_dist, MBSmarketAppend_dist, left.orig_company_id = right.company_id,
                                               transform(FraudDefenseNetwork.Layouts.base.Glb5,
-																							        self.sybase_company_id        := stringlib.stringtouppercase(right.company_id); 
-																							        self.sybase_main_country_code := stringlib.stringtouppercase(right.main_country_code); 
-																											self.sybase_bill_country_code := stringlib.stringtouppercase(right.bill_country_code);
-																											self.sybase_app_type          := stringlib.stringtouppercase(right.app_type);
-																											self.sybase_market            := stringlib.stringtouppercase(right.market);
-																											self.sybase_sub_market        := stringlib.stringtouppercase(right.sub_market);
-																											self.sybase_vertical          := stringlib.stringtouppercase(right.vertical) , self:= left, self := []),left outer);
+																							               self.sybase_company_id        := stringlib.stringtouppercase(right.company_id); 
+																							               self.sybase_main_country_code := stringlib.stringtouppercase(right.main_country_code); 
+																							               self.sybase_bill_country_code := stringlib.stringtouppercase(right.bill_country_code);
+																							               self.sybase_app_type          := stringlib.stringtouppercase(right.app_type);
+																							               self.sybase_market            := stringlib.stringtouppercase(right.market);
+																							               self.sybase_sub_market        := stringlib.stringtouppercase(right.sub_market);
+																							               self.sybase_vertical          := stringlib.stringtouppercase(right.vertical) ;
+																							               self                          := left; 
+																							               self                          := []), left outer, local);
 
 
 // Source exlusions 
@@ -77,7 +81,7 @@ module
   FilterSet    := ['GOV', 'GOVERNMENT & ACADEMIC', 'GOVERNMENT', 'HEA', 'HEALTHCARE INITIATIVE', 'GOVERNMENT HEALTHCARE', 'INTERNAL', 'HC -   PROVIDER',  'TAX & REVENUE.FEDERAL','HEALTHCARE' , 'PROVIDER', 'PHARMACY' ,'PAYER'];
   SrcExclusion := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
 	SrcExclusionC := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
-  Jfiltered    := J (global_company_id   not in SrcExclusion ); 
+  Jfiltered    := Glb5MarketAppend(global_company_id   not in SrcExclusion ); 
 	Jfiltered1   := Jfiltered(company_id    not in SrcExclusionC );
   JcountryCode := Jfiltered1(sybase_MAIN_COUNTRY_CODE = 'USA'); 
   Japptype     := JcountryCode(sybase_app_type          not in FilterSet ); 
@@ -162,13 +166,13 @@ module
 			self.classification_source.Primary_source_Entity                        := Mod_MbsContext.Glb5PrimarySrcEntity; 
 			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext.Glb5ExpOfVicEntities;
 			self.classification_source.Industry_segment                             := MAP(left.Industry_segment='COLLECTIONS'          => 'COLLECTIONS',
-																																									left.Industry_segment   ='EMERGING'             => 'UNKNOWN/NOT SUPPLIED' ,
-																																									left.Industry_segment   ='FINANCIAL SERVICES'   => 'FINANCE',
-																																									left.Industry_segment   ='IRB'                  => 'UNKNOWN/NOT SUPPLIED',
-																																									left.Industry_segment   ='INSURANCE'            => 'INSURANCE (UNSPECIFIED SEGMENT)',
-																																									left.Industry_segment   ='LEGAL'                => 'LEGAL',
-																																								  left.Industry_segment   ='OTHERS'               => 'UNKNOWN/NOT SUPPLIED',
-                                                                                  left.Industry_segment   ='PRIVATE INVESTIGATORS'=> 'PRIVATE INVESTIGATION(UNSPECIFIED SEGMENT)','');
+																																															left.Industry_segment   ='EMERGING'             => 'UNKNOWN/NOT SUPPLIED' ,
+																																															left.Industry_segment   ='FINANCIAL SERVICES'   => 'FINANCE',
+																																															left.Industry_segment   ='IRB'                  => 'UNKNOWN/NOT SUPPLIED',
+																																															left.Industry_segment   ='INSURANCE'            => 'INSURANCE (UNSPECIFIED SEGMENT)',
+																																															left.Industry_segment   ='LEGAL'                => 'LEGAL',
+																																															left.Industry_segment   ='OTHERS'               => 'UNKNOWN/NOT SUPPLIED',
+																																															left.Industry_segment   ='PRIVATE INVESTIGATORS'=> 'PRIVATE INVESTIGATION(UNSPECIFIED SEGMENT)','');
 			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext.Glb5SuspDiscrepancy;
 			self.classification_Activity.Confidence_that_activity_was_deceitful     := Mod_MbsContext.Glb5ConfActivityDeceitful;
 			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext.Glb5WrkFlowStgComtd;
