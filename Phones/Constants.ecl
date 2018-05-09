@@ -4,10 +4,8 @@ EXPORT Constants :=
 MODULE
 	EXPORT UNSIGNED  MAX_RECORDS := 10000;
 	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2; 
-  // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above
-	// the line".  The text is derived from decoding the "rules" field by using
-	// Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap.
-	EXPORT InsVeriBelow := 'INS-VERIFIED-BELOW';
+  // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above the line".
+	EXPORT InsVeriBelow := 'Ins-Verified-Below';
 
 	// Default confidence score threshold for phones
 	EXPORT PhoneConfidenceScore := 11;
