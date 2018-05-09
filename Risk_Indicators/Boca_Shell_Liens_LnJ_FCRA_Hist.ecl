@@ -60,7 +60,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
 							// make sure date_first_seen is within ReportingPeriod months of the historydate 
-       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       //ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
        right.name_type='D' and							
 							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
@@ -405,7 +405,8 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 			-(integer) ProcessDate), 
 			did, filingNumber, Agencystate, AgencyCounty);	
 
-	liens_filtered_DF_ := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
+	liens_filtered_DF_date := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
+ liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart(((string) date_first_seen)[1..6],(string)iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
 
 	//drop off the DF date
 	liens_filtered_DF := project(liens_filtered_DF_, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
@@ -418,7 +419,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							(left.lnj_jgmt_cnt >= 1 or left.lnj_eviction_count >= 1 ) and 
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
        // make sure date_first_seen is within ReportingPeriod months of the historydate 
-       ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       //ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
        //							FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type ='C'
 							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
 							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
@@ -783,6 +784,9 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
   // output(FilterJudgments,   named('FilterJudgments'));   
   // output(FilterEvictions,   named('FilterEvictions'));     		
 	// output(liensWithDesc, named('liensWithDesc'));
+ //output(liens_filtered_DF_date, named('H_liens_filtered_DF_date'));
+ //output(liens_filtered_DF_, named('H_liens_filtered_DF_'));  
+  
 return SORT(w_LiensNJudgmentsFinal,seq);	
 
  END;

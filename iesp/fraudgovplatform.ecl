@@ -13,6 +13,15 @@ export t_FraudGovUser := record
 	string IndustryTypeName {xpath('IndustryTypeName')};//hidden[internal]
 end;
 		
+export t_FraudGovBestInfo := record
+	string12 UniqueId {xpath('UniqueId')};
+	iesp.share.t_Name Name {xpath('Name')};
+	string9 SSN {xpath('SSN')};
+	iesp.share.t_Date DOB {xpath('DOB')};
+	iesp.share.t_Address Address {xpath('Address')};
+	string10 Phone10 {xpath('Phone10')};
+end;
+		
 export t_FraudGovBaseRequest := record (iesp.share.t_BaseRequest)
 	t_FraudGovUser FraudGovUser {xpath('FraudGovUser')};//hidden[internal]
 end;

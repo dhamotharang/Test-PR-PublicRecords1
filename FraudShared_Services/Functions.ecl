@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, FraudGovPlatform_Services, FraudShared, STD;
+﻿IMPORT BatchShare, FraudGovPlatform_Services, FraudShared, STD, ut;
 
 EXPORT Functions := MODULE
 	
@@ -294,7 +294,7 @@ EXPORT Functions := MODULE
 		
 	END;
 	
-	EXPORT getFragmentMatchTypes(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
+	EXPORT getFragmentMatchTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
 															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
 															 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 	
@@ -314,7 +314,7 @@ EXPORT Functions := MODULE
 			DATASET({STRING contributionType}) contributionType_matches;
 		END;
 		
-		rec_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchIn_rec l, 
+		rec_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
 																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			SELF.date := r.event_date;
@@ -336,35 +336,39 @@ EXPORT Functions := MODULE
 								 l.ssn = r.ssn, 
 								 DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.SSN_FRAGMENT}], 
 										{STRING fragmentType}));
-					 
-			physicalAddress :=  IF(l.prim_range = r.clean_address.prim_range AND
-															stringlib.StringToUpperCase(l.prim_name) = r.clean_address.prim_name AND
+										
+			BOOLEAN isPhysicalAddress	:=  l.prim_name != '' AND ((l.p_city_name != '' AND l.st != '') OR l.z5 != '');
+			BOOLEAN isMailingAddress 	:=  (l.mailing_addr <> '' OR
+																		((l.mailing_prim_range<>'' OR ut.isPOBox(l.mailing_prim_name)) AND l.mailing_prim_name<>'')) AND 
+																		((l.mailing_p_city_name<>'' AND l.mailing_st<>'') OR l.mailing_z5<>'');
+										
+			physicalAddress :=  IF( isPhysicalAddress AND 
+															l.prim_range = r.clean_address.prim_range AND
+															l.prim_name = r.clean_address.prim_name AND
 															l.sec_range = r.clean_address.sec_range AND
 															l.unit_desig = r.clean_address.unit_desig AND
-															((stringlib.StringToUpperCase(l.p_city_name) = r.clean_address.p_city_name AND 
-															stringlib.StringToUpperCase(l.st) = r.clean_address.st ) OR
-															l.z5 = r.clean_address.zip), 
-															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}], 
+															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip),
+															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}],
 																	{STRING fragmentType}));
-															
-			mailing_address_1 := IF(l.mailing_addr <> '', TRIM(stringlib.StringToUpperCase(l.mailing_addr)), l.mailing_prim_range + ' ' + 
-															TRIM(stringlib.StringToUpperCase(l.mailing_predir)) + ' ' + 
-															TRIM(stringlib.StringToUpperCase(l.mailing_prim_name)) + 
-															' ' + TRIM(stringlib.StringToUpperCase(l.mailing_addr_suffix)) + ' ' + 
-															TRIM(stringlib.StringToUpperCase(l.mailing_postdir)));
-			
-			mailing_address_2 := TRIM(stringlib.StringToUpperCase(l.mailing_unit_desig)) + ' ' + l.mailing_sec_range;
-			
-			mailingAddress :=  IF(mailing_address_1 = r.additional_address.street_1 AND
-														mailing_address_2 = r.additional_address.street_2 OR 
-														((stringlib.StringToUpperCase(l.mailing_p_city_name) = r.additional_address.city AND 
-														stringlib.StringToUpperCase(l.mailing_st) = r.additional_address.state ) OR
-														l.mailing_z5 = r.additional_address.zip), 
+		
+			mailing_address_1 := 	IF(	l.mailing_addr <> '', 
+																l.mailing_addr, 
+																l.mailing_prim_range + ' ' + l.mailing_predir + ' ' + l.mailing_prim_name + ' ' + 
+																l.mailing_addr_suffix + ' ' + l.mailing_postdir + ' ' + l.mailing_unit_desig + ' ' + 
+																l.mailing_sec_range);
+
+			mailingAddress :=  IF(isMailingAddress AND 
+														STD.Str.CleanSpaces(mailing_address_1) = r.additional_address.street_1 AND
+														((l.mailing_p_city_name = r.additional_address.city AND l.mailing_st = r.additional_address.state ) OR
+														l.mailing_z5 = r.additional_address.zip),
 														DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.MAILING_ADDRESS_FRAGMENT}], 
 																{STRING fragmentType}));			
-															 
+			
+			//Calculation for IP Range so elements card be returned.. 
+			xxx_length := StringLib.StringFind(STD.Str.CleanSpaces(stringlib.StringToUpperCase(l.ip_address)), 'XXX', 1);
 			IPAddress :=  IF(l.ip_address <> '' AND 
-											 l.ip_address = r.IP_Address, 
+											 (l.ip_address = r.IP_Address OR 
+											 (xxx_length <> 0 AND  l.ip_address[1..(xxx_length-2)] = r.IP_Address[1..(xxx_length-2)])),
 											 DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.IP_ADDRESS_FRAGMENT}], 
 													{STRING fragmentType}));
 													

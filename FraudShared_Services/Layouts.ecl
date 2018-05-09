@@ -47,6 +47,21 @@ EXPORT Layouts := MODULE
     string11  geo_long;
   END;
 
+	EXPORT BatchInExtended_rec := RECORD
+		BatchIn_rec;
+		string10 ProgramCode := '';
+		string20 HouseholdId := '';
+		string20 CustomerPersonId := '';
+		string8 TransactionStartDate := '';
+		string8 TransactionEndDate := '';
+		string12 AmountMin := '';
+		string12 AmountMax := '';
+		string100 BankName := '';
+		string75 ISPName := '';
+		string25 MACAddress := '';
+		string20 DeviceSerialNumber := '';
+	END;
+
   EXPORT BatchIn_Valid_rec := RECORD
     BatchIn_rec;
     boolean hasValidInput         := false;
