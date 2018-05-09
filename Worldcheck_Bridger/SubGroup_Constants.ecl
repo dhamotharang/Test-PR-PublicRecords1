@@ -1048,7 +1048,6 @@
 		export string KEYWORD_FINBI									:= '736';
 		export string KEYWORD_PAMEF_CNBC						:= '737';
 		export string KEYWORD_LVSCS									:= '738';
-		export string KEYWORD_AUS_ISEL							:= '739';
 
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
