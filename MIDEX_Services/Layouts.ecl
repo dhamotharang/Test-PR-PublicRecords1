@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, doxie, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, SANCTN_Services, Standard, BIPV2;
+﻿IMPORT AutoStandardI, doxie, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, SANCTN_Services, Standard, BIPV2;
 
 EXPORT Layouts := MODULE
   
@@ -148,7 +148,8 @@ EXPORT Layouts := MODULE
       STRING2   licenseIssueState  := '';
       BOOLEAN   isLicenseCurrent := FALSE;
 			UNSIGNED8 nmls_id       := 0;
-			hash_layout;
+      BOOLEAN  exactMatch := FALSE;
+      hash_layout;
     END;
 		
 		EXPORT Midex_RecordSearch_hash_layout := RECORD
@@ -202,6 +203,7 @@ EXPORT Layouts := MODULE
 				STRING150 licensee_companyName;
 				UNSIGNED6 did;
 				UNSIGNED6 bdid;
+        BIPV2.IDlayouts.l_xlink_ids;
 				address_layout;
 				LicenseInfo_Layout;
 				STRING9		ssn;
@@ -209,7 +211,8 @@ EXPORT Layouts := MODULE
 				STRING80 	data_source;
         STRING10  phone;
 				UNSIGNED penalt := 99;
-				STRING8 dob;
+				BOOLEAN  exactMatch := FALSE;
+        STRING8 dob;
 				hash_layout;
 		END;
     

@@ -1,4 +1,4 @@
-/*2015-11-06T19:44:02Z (Krishna Gummadi)
+﻿/*2015-11-06T19:44:02Z (Krishna Gummadi)
 RRBug 193228 - Midex report upgrade changes
 */
 EXPORT Constants := MODULE
@@ -15,7 +15,11 @@ EXPORT Constants := MODULE
 	EXPORT STRING1 NonPublicData    := 'N';
 	EXPORT STRING1 PublicData       := 'P';
   
-  EXPORT UNSIGNED1 PENALTYTHRESHOLD := 10;
+  // Combined penalty (more than on input field entered by customer)
+  EXPORT UNSIGNED1 PENALTYTHRESHOLD := 15;
+  // 4/2018 - US Bank & Chase want only Penalties <= 3; 
+  // the code uses less than, so setting the penalty to 4
+  EXPORT UNSIGNED1 PENALTY_SINGLE_INPUT_SEARCH := 4;
   
   // Midex Data Sources:  Sanctn_Mari - dbcode = 'N' => Non-Public
   //                      Sanctn      - Public

@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, Business_Header, doxie, ERO_Services, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, 
+﻿IMPORT AutoStandardI, Business_Header, doxie, ERO_Services, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, 
        SANCTN_Services, lib_stringlib, BIPV2, MIDEX_Services;
 
 EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) := 
@@ -81,19 +81,18 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
                  addr_suffix, postdir, unit_desig, sec_range, city, st, Zip5, Zip4, 
                  phone, county, DateFirstSeen, DateLastSeen, tin);
                  
-// Add 230 fail statement here -- using ds_recs_raw_dedup?
-
         // Call a function to assign the penalty and filter out recs with too high a penalty.
-        // ds_penalized := MIDEX_Services.Functions.fn_penalize_ss_results(ds_recs_raw, in_mod);
-        ds_penalized_raw := MIDEX_Services.Macros.fnMac_penalize_results(ds_recs_raw_dedup, in_mod, 
+        ds_penalized_raw := MIDEX_Services.Macros.fnMac_penalize_results(ds_recs_raw_dedup, in_mod,
                                                                          MIDEX_Services.Layouts.rec_temp_layout,
                                                                          firstname, middlename, lastname, CompanyName,
                                                                          licenseNumber, licenseIssueState, tin, penalt,  
                                                                          midex_rpt_nbr, ssn, uniqueId, prim_range, predir, 
                                                                          prim_name, postdir, addr_suffix, sec_range,
-                                                                         city, st, zip5, phone);
-
-        ds_recsKept := ds_penalized_raw((penalt DIV 1000) < MIDEX_Services.Constants.penaltyThreshold);
+                                                                         city, st, zip5, phone, nmlsinfo[1].nmlsid);
+        
+        searchPenalty := MIDEX_Services.Functions.getPenalty(in_mod);
+         
+        ds_recsKept := ds_penalized_raw(penalt < searchPenalty OR exactMatch);
         
         // add population penalty to kept records
         ds_penalized := PROJECT(ds_recsKept, MIDEX_Services.Functions.xfm_addPopulationPenalt(LEFT, MidexSearchType));
@@ -123,13 +122,7 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
                   LEFT.DID = RIGHT.DID AND
                   LEFT.DID != 0,
                   TRANSFORM (MIDEX_Services.Layouts.Midex_RecordSearch_hash_layout_plus, 
-                             // per Bonnie Taepakdee 10/18/2013 we are no longer limiting the number of records returned. Commenting out the code in case this changes back.
-                             // countLeftDetails  := COUNT(LEFT.Details);
-                             // details_raw       := IF( countLeftDetails < iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_REPORTNUMBERS,
-                                                      // LEFT.Details + RIGHT.Details,
-                                                      // LEFT.Details);
-                             // SELF.Details      := details_raw;
-														 SELF.Details          := LEFT.Details + RIGHT.Details,
+                             SELF.Details          := LEFT.Details + RIGHT.Details,
 														 SELF.UniqueId         := LEFT.UniqueId,
                              SELF.penalt           := MIN( LEFT.penalt, RIGHT.penalt),
                              SELF.populationPenalt := MAX(LEFT.populationPenalt, RIGHT.populationPenalt),
@@ -138,7 +131,7 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
                              SELF                  := LEFT,
                            ));
         
-        ds_didRecsSortedByPenalt := SORT( ds_didRecsRolled, penalt, -populationPenalt );
+        ds_didRecsSortedByPenalt := SORT( ds_didRecsRolled, penalt, IF(UniqueId != '',1,2), -populationPenalt );
 
         //------------------------------------------------------------------------------------------
         //
@@ -152,24 +145,18 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
                               SELF.BusinessId     := (STRING)LEFT.BDID;
 															SELF.BusinessIds    := LEFT.BusinessIds;
                               SELF.Details        := MIDEX_Services.Functions.fn_setMIDEXSearchRecordDetail(LEFT);
-                              // SELF.penalt      := LEFT.penalt;
-                              // SELF.BDID        := LEFT.BDID; 
-															SELF.PrevSearchHash	:= LEFT.prev_all_hash;
+                              SELF.PrevSearchHash	:= LEFT.prev_all_hash;
 															SELF.SearchHash	    := LEFT.all_hash;
+                              SELF.ULTID          := LEFT.BusinessIds.UltId;
+                              SELF.ORGID          := LEFT.BusinessIds.OrgId;
+                              SELF.SELEID         := LEFT.BusinessIds.SeleId;
                               SELF                := LEFT; 
                             ));
                             
-        ds_businessRecsBdidSorted := SORT(ds_BusinessRecsFinalLayoutRaw(BDID <> 0), BDID);
-				ds_businessRecsLinkIdSorted := SORT(ds_BusinessRecsFinalLayoutRaw(BDID = 0), #expand(BIPV2.IDmacros.mac_ListAllLinkids()));
-        
+        ds_businessRecsLinkIdSorted := SORT(ds_BusinessRecsFinalLayoutRaw,penalt,#expand(BIPV2.IDmacros.mac_ListAllLinkids()),-populationPenalt);
+                        
 				MIDEX_Services.Layouts.Midex_RecordSearch_hash_layout_plus xform_business(MIDEX_Services.Layouts.Midex_RecordSearch_hash_layout_plus L, MIDEX_Services.Layouts.Midex_RecordSearch_hash_layout_plus R) 
 					:= TRANSFORM
-					// per Bonnie 10/18/2013 we are no longer limiting the number of records returned. Commenting out the code in case this changes back.
-					// countLeftDetails := COUNT(LEFT.Details);
-					// details_raw      := IF( countLeftDetails < iesp.Constants.MIDEX.MAX_COUNT_REPORT_RESPONSE_RECORDS,
-														 // LEFT.Details + RIGHT.Details,
-														 // LEFT.Details);
-					// SELF.Details     := details_raw;
 					SELF.Details          := IF(COUNT(L.Details) < iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_REPORTNUMBERS,
 																			L.Details + R.Details, 
 																			L.Details);
@@ -180,34 +167,18 @@ EXPORT MidexSearch_Records (MIDEX_Services.Iparam.searchrecords in_mod) :=
 					SELF                  := L;
 				END;
 				
-        ds_bdidRecsRolled := 
-          ROLLUP( ds_businessRecsBdidSorted, 
-                  LEFT.BDID = RIGHT.BDID AND
-                  LEFT.BDID != 0,
-                  xform_business(LEFT, RIGHT));
         ds_linkIdRecsRolled := 
 					ROLLUP( ds_businessRecsLinkIdSorted,
 									BIPV2.IDmacros.mac_JoinTop3Linkids() AND
 									LEFT.UltID != 0,
 									xform_business(LEFT, RIGHT));
 									
-        ds_busRecsSortedByPenalt := SORT( ds_bdidRecsRolled + ds_linkIdRecsRolled, penalt, -populationPenalt );
+        ds_busRecsSortedByPenalt := SORT( ds_linkIdRecsRolled, penalt, IF(seleid != 0,1,2), -populationPenalt);
         
         ds_ResultRecs_raw := IF( MidexSearchType = MIDEX_SERVICES.Constants.PERSON_REPORT,
                                  ds_didRecsSortedByPenalt,
                                  ds_busRecsSortedByPenalt );
 				
-        /*
-        // Since we moved to a different alert version, we don't need to make use of the "ReturnAllRecords" flag
-				// Only keep search records that do not match the previous search hash values.
-				alertOnly_recs := 
-          JOIN( ds_ResultRecs_raw,in_mod.searchHashes,
-								LEFT.SearchHash = RIGHT.all_hash,
-								TRANSFORM(LEFT),
-								LEFT ONLY );
-        
-				ds_final_results := IF(~in_mod.EnableAlert OR in_mod.ReturnAllRecords,ds_ResultRecs_raw,alertOnly_recs);
-        */
         alertUpdateHash_recs := 
           PROJECT( ds_ResultRecs_raw,
 								   TRANSFORM( MIDEX_Services.Layouts.hash_layout,

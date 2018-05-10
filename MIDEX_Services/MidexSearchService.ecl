@@ -35,7 +35,6 @@
   
 	<!-- INTERNAL TESTING FIELDS/OPTIONS -->
   <part name="NoDeepDive"               type="xsd:boolean"     default="true"/>  //???
-	<part name="PenaltThreshold"	        type="xsd:unsignedInt" default="0"/>     //or 10 ???
 
 	<part name="ReturnCount"			        type="xsd:unsignedInt"/>
 	<part name="StartingRecord"		        type="xsd:unsignedInt"/>
@@ -85,7 +84,6 @@ EXPORT MidexSearchService :=
     #STORED('companyName',             search_by.companyName);
 		#STORED('NMLSId',                  search_by.NMLSId);
 	  #STORED('StartLoadDate',           iesp.ECL2ESP.t_DateToString8(search_by.StartLoadDate));
-    // #STORED('StartLoadDate',           iesp.ECL2ESP.DateToString(search_by.StartLoadDate));
     #STORED('EnableAlert',             alert_Input.EnableAlert);
     
     iesp.ECL2ESP.SetInputName    (search_by.Name);
@@ -110,7 +108,7 @@ EXPORT MidexSearchService :=
       EXPORT STRING20  license_state           := ''    : STORED('LicenseState');
       EXPORT STRING26  midex_rpt_num           := ''    : STORED('MIDEXReportNumber');
       EXPORT STRING40  TIN                     := ''    : STORED('TIN');
-      EXPORT STRING50  NMLSId                  := ''    : STORED('NMLSId');
+      EXPORT STRING40  nmls_id                 := ''    : STORED('NMLSId');
       EXPORT DATASET   searchHashes 		       := ds_Search_Hashes;
 			EXPORT UNSIGNED8 dob_filter 			       := iesp.ECL2ESP.DateToInteger(search_by.DOB);
       EXPORT STRING8   StartLoadDate           := ''    : STORED('StartLoadDate');
