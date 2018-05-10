@@ -1,4 +1,4 @@
-
+﻿
 Import UT, Gateway, Risk_Indicators;
 
 /*
@@ -45,10 +45,7 @@ END;
 
 PrepNewsProfile := project(indata, PrepBridger(left));
 
-// BridgerSearch := AML.BSSXG5GatewayCall(PrepNewsProfile, Gateways);
-// Bridger4 := AML.BSSXG4GatewayCall(PrepNewsProfile, gateways);
-
-BridgerSearch := IF(UseXG5 in ['2', '1'],	AML.BSSXG5GatewayCall(PrepNewsProfile, gateways), AML.BSSXG4GatewayCall(PrepNewsProfile, gateways));
+BridgerSearch := AML.BSSXG5GatewayCall(PrepNewsProfile, gateways);
 
 CategoryRecord := RECORD
 	string fullname;
