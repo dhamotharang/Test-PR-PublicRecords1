@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, AutoStandardI, census_data, iesp, Prof_License_Mari, ut, BIPV2;
+﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp, Prof_License_Mari, ut, BIPV2;
 
 // ==============================================================================================================	
 //  MARI MIDEX "LICENSE" DATA (Prof_License_Mari) related functions
@@ -214,6 +214,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                                     SELF.phone := IF(stringlib.stringfilterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
                                                     SELF.data_source := RIGHT.std_source_desc,
                                                     SELF.isCurrent := (RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource),
+                                                    SELF := RIGHT,
                                                     SELF := []),
                                           LIMIT(iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_RECORDS,SKIP));
                   

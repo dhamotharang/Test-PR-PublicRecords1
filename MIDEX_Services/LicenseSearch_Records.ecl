@@ -1,4 +1,4 @@
-import AutoStandardI, iesp, doxie;
+﻿import AutoStandardI, iesp, doxie;
 
 EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod) := 
   FUNCTION
@@ -27,26 +27,21 @@ EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod) :=
 																							                      licensee_FirstName,licensee_MidName,
                                                                     licensee_LastName,
                                                                     licensee_companyName,lic_number,
-                                                                    lic_state,taxid,,,,did);
-		
-		all_recs_kept := all_recs_penalt((penalt DIV 1000) < MIDEX_Services.Constants.penaltyThreshold); 
-    all_recs_sorted := SORT(all_recs_kept, penalt, ~isCurrent);
+                                                                    lic_state,taxid,,,,did,,,,,,,,,,,
+                                                                    nmls_info[1].NMLSId);
+
+    searchPenalty := MIDEX_Services.Functions.getPenalty(in_mod);
+
+		all_recs_kept := all_recs_penalt(penalt < searchPenalty OR exactMatch);
+
+    all_recs_sorted := IF(in_mod.CompanyName != '',
+                          SORT(all_recs_kept,penalt,~isCurrent,IF(SELEID != 0,1,2)),
+                          SORT(all_recs_kept,penalt,~isCurrent,IF(DID != 0,1,2)));
     
-		/*
-    // Since we moved to a different alert version, we don't need to make use of the "ReturnAllRecords" flag
-		// Only keep search records that do not match the previous search hash values.
-    alertOnly_recs := JOIN(all_recs_sorted,in_mod.searchHashes,
-													 LEFT.all_hash = RIGHT.all_hash,
-													 TRANSFORM(LEFT),
-													 LEFT ONLY);
-		
-    // If Alert search and if ReturnAllRecords is false (default), return the changed search records, otherwise return all of the search records.
-    all_recs_final := IF(~in_mod.EnableAlert OR in_mod.ReturnAllRecords,all_recs_sorted,alertOnly_recs);
-    */
-   	alertUpdateHash_recs := PROJECT(all_recs_sorted,MIDEX_Services.Layouts.hash_layout);
+		alertUpdateHash_recs := PROJECT(all_recs_sorted,MIDEX_Services.Layouts.hash_layout);
 		
 		finalresults := MIDEX_Services.Functions.Format_licenseSearch_iesp(all_recs_sorted,alertUpdateHash_recs,in_mod);
-    
+
 	  RETURN(finalresults);
 
 	END;
