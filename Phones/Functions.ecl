@@ -25,11 +25,9 @@ MODULE
     GLB_OK  := ut.glb_ok(glb_purpose, checkRNA);
     DPPA_OK := ut.dppa_ok(dppa_purpose, checkRNA);
 
-    // Decode passed in "rules" field and look for special Insurance text.
-    STRING rules_decoded := Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap(rules);
-    BOOLEAN INSURANCE_RESTRICTED := STD.Str.Find(STD.Str.ToUpperCase(rules_decoded),
-		                                             Phones.Constants.InsVeriBelow,1) > 0
-																		and NOT GLB_OK;
+    // Check if specific Insurance bit is set
+    ins_bit := Phonesplus_v2.Translation_Codes.rules_bitmap_code (Phones.Constants.InsVeriBelow);
+    boolean INSURANCE_RESTRICTED := NOT GLB_OK AND (rules & ins_bit = ins_bit);
 
  		// Decode the input "src_all" value to see all the 2 char source codes that were rolled into
 		// that phonesplus record.  The decode function output is a string with 1 or more 2 char
@@ -44,8 +42,8 @@ MODULE
 
     // Use mutiple filters against the dataset of all sources to check for specific sources
 		// that are restricted via: GLB/preGLB or DPPA or Utility/Industry_Class or DRM.
-    ds_srcs_restricted := ds_src_all(
-
+    // A phone is restricted if:
+    boolean restricted (string2 src) :=
        // Sources that might be restricted via GLB
 			 (src in MDR.sourceTools.set_GLB
 			   and NOT GLB_OK
@@ -72,28 +70,20 @@ MODULE
 		   OR (src = MDR.sourceTools.src_Certegy         and data_restriction_mask[7] not in ['0',''])
 	     OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
 		   OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
- 		   OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0',''])
+ 		   OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0','']);
+      //end of filters
 
-    ); //end of filters
-
-		// Join to remove restricted sources from the dataset of all sources to see if any
-		// non-restricted sources are left.
-		ds_srcs_not_restricted := JOIN(ds_src_all, ds_srcs_restricted,
-		                                 LEFT.src = RIGHT.src,
-		                               TRANSFORM(LEFT),
-		                               LEFT ONLY // 1 rec for each left ds rec with no match in right
-																	);
+		// remove restricted sources from the dataset of all sources
+    ds_srcs_not_restricted := ds_src_all (NOT restricted (src));
 
     // debugging outputs have to be here before the "RETURN"
 		//output(GLB_OK,                 NAMED('GLB_OK'),EXTEND);
 		//output(DPPA_OK,                NAMED('DPPA_OK'),EXTEND);
     //output(rules,                  NAMED('rules'),EXTEND);
-    //output(rules_decoded,          NAMED('rules_decoded'),EXTEND);
 	  //output(INSURANCE_RESTRICTED,   NAMED('INSURANCE_RESTRICTED'),EXTEND);
     //output(src_all,                NAMED('src_all'),EXTEND);
     //output(src_all_decoded,        NAMED('src_all_decoded'),EXTEND);
     //output(ds_src_all,             NAMED('ds_src_all'),EXTEND);
-    //output(ds_srcs_restricted,     NAMED('ds_srcs_restricted'),EXTEND);
     //output(ds_srcs_not_restricted, NAMED('ds_srcs_not_restricted'),EXTEND);
 
 	  // "TRUE"(restricted) is returned if either the input rec is restricted by Insurance verified/GLB
