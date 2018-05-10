@@ -12,7 +12,7 @@ EXPORT File_header_raw_latest := module
         latest_ful_dt := versionControl.fGetFilenameVersion(lc+'thor_data400::base::header_raw');      
         latest_raw_dt := versionControl.fGetFilenameVersion(fileName);
 
-        raw_hdr_ver_info:=latest_raw_dt+'<-ltst|inc->'+latest_inc_dt+'|mth->'+latest_ful_dt;
+        raw_hdr_ver_info:='Latest Incremental='+latest_inc_dt+', Latest Monthly='+latest_ful_dt+' |Therefore latest to use='+latest_raw_dt;
         filedate_is_latest := when((latest_raw_dt >= latest_inc_dt AND 
                                latest_raw_dt >= latest_ful_dt)
                                ,output(raw_hdr_ver_info,named('raw_vers'))
@@ -22,10 +22,10 @@ EXPORT File_header_raw_latest := module
         two_weeks_ago := ut.date_math((STRING8)Std.Date.Today(),-14);
 
         file_age_less_than_2_weeks := when((latest_raw_dt>((unsigned)two_weeks_ago)),
-                                           if(latest_raw_dt<((unsigned)one_week_ago),
+                                           if(latest_raw_dt<((unsigned)one_week_ago-1),
                                               fileservices.sendemail(_control.MyInfo.EmailAddressNotify,
                          'WARNING: Latest header raw ('+latest_raw_dt+') > 1 week.',workunit))
-                                          ,before);
+                                          ,before):global;
                                     
         // Force to true to temporary bypass a fail (BUT MAKE SURE YOU HAVE THE RIGHT VERSIONS IN PLACE)
         is_latest_header_raw_best := filedate_is_latest AND file_age_less_than_2_weeks;

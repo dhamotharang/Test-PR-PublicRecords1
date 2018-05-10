@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export Filenames(
 
@@ -67,5 +67,10 @@ module
 	
 	export dAll_filenames :=
 		Base.dAll_filenames;
- 
+	
+	export Fdn_Prefix                 := '~THOR_DATA400::BASE::FDN';
+	export LexID_Header_Build_Suffix  := 'PRODLEXIDHEADERVERSION';
+	export BIP_Header_Build_Suffix    := 'PRODBIPHEADERVERSION';
+  export LexID_Header_Build_Version := Fdn_Prefix + '::QA::' + LexID_Header_Build_Suffix;
+  export BIP_Header_Build_Version   := Fdn_Prefix + '::QA::' + BIP_Header_Build_Suffix;
 end;
