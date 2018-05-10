@@ -89,7 +89,7 @@ EXPORT AllCategoriesFixed := DATASET([
 {82,'Associated Entity','Murder','Associated Entity-Murder'},
 {83,'Associated Entity','N/A','Associated Entity-N/A'},
 {84,'Associated Entity','Organized Crime','Associated Entity-Organized Crime'},
-{367,'Associated Entity','Ownership or Control','Associated Entity-Ownership or Control'},
+{367,'Associated Entity','Ownership Or Control','Associated Entity-Ownership Or Control'},
 {85,'Associated Entity','Securities Fraud','Associated Entity-Securities Fraud'},
 {363,'Associated Entity','SWIFT BIC Entity','Associated Entity-SWIFT BIC Entity'},
 {86,'Associated Entity','Terrorism','Associated Entity-Terrorism'},
