@@ -105,47 +105,54 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	//Add additional carrier info only to deltabase and realtime records. They don't contain this information.
 	//However records retrieved from the metadata file should be left alone.
 	//is_current looks like it's true for all records but we are keeping the old logic for now.
-	dPortedPhonesFinal := JOIN(dPortedPhones, PhonesInfo.Key_Source_Reference.ocn_name,
-		KEYED(LEFT.account_owner = RIGHT.ocn) AND
-		Phones.Functions.StandardName(LEFT.carrier_name) = RIGHT.name AND
-		RIGHT.is_current,
-		TRANSFORM(Layout_BatchRaw,
-			//All records get carrier_city and carrier_state added
-			SELF.carrier_city := RIGHT.carrier_city,
-			SELF.carrier_state := RIGHT.carrier_state,
-			SELF.carrier_route := RIGHT.cart,
-			SELF.carrier_route_zonecode := RIGHT.cr_sort_sz,
-			SELF.delivery_point_code := RIGHT.dpbc,
-			SELF.affiliated_to := RIGHT.affiliated_to,
-			SELF.contact_name := RIGHT.contact_name,
-			SELF.contact_address1 := RIGHT.contact_address1,
-			SELF.contact_address2 := RIGHT.contact_address2,
-			SELF.contact_city := RIGHT.contact_city,
-			SELF.contact_state := RIGHT.contact_state,
-			SELF.contact_zip := RIGHT.contact_zip,
-			SELF.contact_phone := RIGHT.contact_phone,
-			SELF.contact_fax := RIGHT.contact_fax,
-			SELF.contact_email := RIGHT.contact_email,
-
-			//Check if the source is deltabase or realtime and that we didn't get an error.
+		Layout_BatchRaw tAppendCarrierRefInfo1(Layout_BatchRaw le, RECORDOF(PhonesInfo.Key_Source_Reference.ocn_name) ri) :=
+  TRANSFORM
+      
+    is_carrier_info := ri.contact_function = '' AND ri.overall_ocn <> '' AND (ri.carrier_city != '' OR ri.carrier_state != '');
+    
+    //All records get carrier_city and carrier_state added
+    SELF.ocn_abbr_name           := IF(is_carrier_info, ri.ocn_abbr_name, le.ocn_abbr_name);
+    SELF.carrier_city            := IF(is_carrier_info, ri.carrier_city, le.carrier_city);
+    SELF.carrier_state           := IF(is_carrier_info, ri.carrier_state, le.carrier_state);
+    SELF.carrier_route           := IF(is_carrier_info, ri.cart, le.carrier_route);
+    SELF.carrier_route_zonecode  := IF(is_carrier_info, ri.cr_sort_sz, le.carrier_route_zonecode);
+    SELF.delivery_point_code     := IF(is_carrier_info, ri.dpbc, le.delivery_point_code);
+    SELF.affiliated_to           := IF(is_carrier_info, ri.affiliated_to, le.affiliated_to);
+    SELF.contact_name            := IF(is_carrier_info, ri.contact_name, le.contact_name);
+		  SELF.contact_address1        := IF(is_carrier_info, ri.carrier_address1, le.contact_address1);
+		 	SELF.contact_address2        := IF(is_carrier_info, ri.carrier_address2, le.contact_address2);
+			 SELF.contact_city            := IF(is_carrier_info, ri.carrier_city, le.carrier_city);
+			 SELF.contact_state           := IF(is_carrier_info, ri.carrier_state, le.carrier_state);
+		 	SELF.contact_zip             := IF(is_carrier_info, ri.carrier_zip, le.contact_zip);
+    SELF.contact_phone           := IF(is_carrier_info, ri.carrier_phone, le.contact_phone);
+    SELF.contact_fax             := IF(is_carrier_info, ri.contact_fax, le.contact_fax);
+    SELF.contact_email           := IF(is_carrier_info, ri.contact_email, le.contact_email);
+			
 			SET OF STRING2 sourcesMissingInfo := [Consts.ATT_LIDB_Delta, Consts.ATT_LIDB_RealTime];
-			recNeedsLineServ := LEFT.source IN sourcesMissingInfo AND LEFT.error_desc = '';
+			recNeedsLineServ := le.source IN sourcesMissingInfo AND le.error_desc = '';
 
 			//Add the remaining information only to deltabase and realtime records.
-			SELF.line:=IF(recNeedsLineServ, RIGHT.line, LEFT.line),
-			SELF.serv:=IF(recNeedsLineServ, RIGHT.serv, LEFT.serv),
-			SELF.spid:=IF(recNeedsLineServ, RIGHT.spid, LEFT.spid),
-			SELF.prepaid:=IF(recNeedsLineServ, RIGHT.prepaid, LEFT.prepaid),
-			SELF.operator_fullname:=IF(recNeedsLineServ, RIGHT.operator_full_name, LEFT.operator_fullname),
+			SELF.line:=IF(recNeedsLineServ, ri.line, le.line);
+			SELF.serv:=IF(recNeedsLineServ, ri.serv, le.serv);
+			SELF.spid:=IF(recNeedsLineServ, ri.spid, le.spid);
+			SELF.prepaid:=IF(recNeedsLineServ, ri.prepaid, le.prepaid);
+			SELF.operator_fullname:=IF(recNeedsLineServ, ri.operator_full_name, le.operator_fullname);
 
 			//Remove temporary PD source.
-			SELF.source := IF(LEFT.source=Consts.ATT_LIDB_Delta,Consts.ATT_LIDB_SRC,LEFT.source),
-			SELF:=LEFT),
-
-			//We do a LEFT OUTER since we still have relevant information from the ATT/Deltabase response
-			//Even if we don't have a match on the carrier reference table.
-			LEFT OUTER, LIMIT(0), KEEP(1));
-			
+			SELF.source := IF(le.source=Consts.ATT_LIDB_Delta,Consts.ATT_LIDB_SRC,le.source);
+			SELF := le;
+   
+  END;
+  
+	//denormalize to join index records for contact function = '' and overall ocn <> '' -  limit to 100
+  dPortedPhonesFinal := DENORMALIZE(dPortedPhones, PhonesInfo.Key_Source_Reference.ocn_name,
+    KEYED(LEFT.account_owner = RIGHT.ocn) AND
+    Phones.Functions.StandardName(LEFT.carrier_name) = RIGHT.name AND
+    RIGHT.is_current,
+    tAppendCarrierRefInfo1(LEFT, RIGHT),
+		    LEFT OUTER, LIMIT(100, SKIP));
+				
+				
 			//prioritize Realtime LIDB
 	dPortedPhonesSorted := SORT(dPortedPhonesFinal, acctno,phone, -dt_last_reported, -dt_first_reported,
 		source <> Consts.ATT_LIDB_RealTime, record);
@@ -231,14 +238,14 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
         OUTPUT(latestPhoneRecs,NAMED('latestPhoneRecs'), EXTEND);
         OUTPUT(oldOrIncompleteRecs,NAMED('oldOrIncompleteRecs'), EXTEND); 
         OUTPUT(numbersWithNoData,NAMED('numbersWithNoData'), EXTEND);
-		OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'), EXTEND);
-		OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'), EXTEND);
-		OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'), EXTEND);
-		OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
-		OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
-		OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
+	      	OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'), EXTEND);
+		      OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'), EXTEND);
+		      OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'), EXTEND);
+		      OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
+		      OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
+		      OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
+	      	OUTPUT(dPortedPhonesSorted,NAMED('dPortedPhonesSorted'), EXTEND);
+	       OUTPUT(dPhones_w_Metadata,NAMED('dPhones_w_Metadata'), EXTEND);
 	#END
-	
-	
 RETURN dPhones_w_Metadata;
 END;

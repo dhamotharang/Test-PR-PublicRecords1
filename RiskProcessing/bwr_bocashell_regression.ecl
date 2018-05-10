@@ -1,4 +1,4 @@
-/*
+﻿/*
 Regression testing notes
 
 1. _Control.LibraryUse => set ForceOff_AllLibraries := TRUE;  
@@ -333,8 +333,8 @@ output(diff_stats, named('diff_stats'));
 // if the cursory test shows differences and you want to see the details, uncomment this section
 **************************************************************************************************/
 
-// ashirey.flatten(baseline_shell, flatten_baseline);
-// ashirey.flatten(testfile_shell, flatten_testfile);
+// models.flatten(baseline_shell, flatten_baseline);
+// models.flatten(testfile_shell, flatten_testfile);
 // Models.Diff_Macro(flatten_baseline, flatten_testfile, ['seq'], compared_results, 'shell' );
 
 // OUTPUT(COUNT(compared_results), NAMED('macro_differences_count'));

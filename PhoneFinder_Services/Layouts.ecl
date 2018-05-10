@@ -53,7 +53,7 @@ MODULE
 		EXPORT Base :=
 		RECORD
 			STRING3  carrier_type;
-			STRING30 carrier_name;
+			STRING60 carrier_name;
 			STRING50 carrier_city;
 			STRING2  carrier_state;
 			STRING1  dial_ind;
@@ -95,6 +95,7 @@ MODULE
 			DATASET(PortHistory) PortingHistory;
 			UNSIGNED4 FirstPortedDate;
 			UNSIGNED4 LastPortedDate;
+			STRING15 PhoneStatus;
 			UNSIGNED4 ActivationDate;
 			UNSIGNED4 DisconnectDate;
 			BOOLEAN 	NoContractCarrier;
@@ -167,7 +168,7 @@ MODULE
 			STRING25	                                        append_phone_type;
 			STRING10                                          phone;
 			STRING2	                                          phoneState;		
-			UNSIGNED1																					serviceType;
+			UNSIGNED1																					                    serviceType;
 			STRING9                                           ssn;
 			STRING2                                           SSNMatch;
 			UNSIGNED4                                         dob;
@@ -191,7 +192,7 @@ MODULE
 			STRING5                                           county_code;
 			STRING18                                          county_name;
 			STRING1                                           tnt;
-			STRING40																					primary_address_type;			 
+			STRING40																				                     	primary_address_type;			 
 			STRING120                                         listed_name;
 			STRING120                                         listed_name_targus;
 			STRING10                                          listed_phone;
@@ -204,7 +205,7 @@ MODULE
 			STRING2                                           TargusType;
 			BOOLEAN                                           vendor_dt_last_seen_used;
 			STRING1                                           dial_indicator;
-			STRING30                                          carrier_name;
+			STRING60                                          carrier_name;
 			STRING50                                          phone_region_city;
 			STRING2                                           phone_region_st;
 			STRING3                                           coctype;
@@ -295,7 +296,7 @@ MODULE
 			STRING1   typeflag;
 			STRING10  orig_phone;
 			STRING10  phone;
-			STRING30  carrier_name;
+			STRING60  carrier_name;
 			STRING50  phone_region_city;
 			STRING2   phone_region_st;
 			STRING    coc_description;

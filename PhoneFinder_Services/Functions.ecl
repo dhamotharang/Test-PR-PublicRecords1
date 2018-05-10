@@ -155,9 +155,9 @@ MODULE
 																																2 => PhoneFinder_Services.Constants.PhoneType.VoIP,
 																																PhoneFinder_Services.Constants.PhoneType.Other);
 	
-	EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10,11,12,13,20,21,22,23] => 'ACTIVE',
-																														pPhoneStatus IN [30,31,32,33]             => 'INACTIVE',
-																														'NOT AVAILABLE');
+	EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10,11,12,13,20,21,22,23] => PhoneFinder_Services.Constants.PhoneStatus.Active,
+																														pPhoneStatus IN [30,31,32,33]             => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
+																														PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
 	
 	EXPORT STRING AddressTypeDesc(STRING pAddressType) := CASE(pAddressType,
 																															'F' => 'FIRM',
@@ -445,7 +445,7 @@ MODULE
 	
 	
 	// Primary phone info
-	EXPORT GetPhoneInfo(dIn) :=
+	EXPORT GetPhoneInfo(dIn,inMod) :=
 	FUNCTIONMACRO
 		lpf := PhoneFinder_Services.Layouts;
 		dPhoneSlim := PROJECT(dIn(phone != ''),
@@ -499,29 +499,29 @@ MODULE
 				SELF.PortingCode       := IF(ri.phone != '',ri.PortingCode,le.PortingCode);
 				SELF.PortingCount      := IF(ri.phone != '',ri.PortingCount,le.PortingCount);
 				SELF.PortingHistory    := IF(ri.phone != '',ri.PortingHistory,le.PortingHistory);
-				SELF.PortingStatus		 := IF(ri.phone != '',ri.PortingStatus,le.PortingStatus);
-				SELF.FirstPortedDate	 := IF(ri.phone != '',ri.FirstPortedDate,le.FirstPortedDate);
-				SELF.LastPortedDate		 := IF(ri.phone != '',ri.LastPortedDate,le.LastPortedDate);
-				SELF.ActivationDate		 := IF(ri.phone != '',ri.ActivationDate,le.ActivationDate);
-				SELF.DisconnectDate		 := IF(ri.phone != '',ri.DisconnectDate,le.DisconnectDate);
-				SELF.Prepaid		 			 := IF(ri.phone != '',ri.Prepaid,le.Prepaid);
+				SELF.PortingStatus		   := IF(ri.phone != '',ri.PortingStatus,le.PortingStatus);
+				SELF.FirstPortedDate	  := IF(ri.phone != '',ri.FirstPortedDate,le.FirstPortedDate);
+				SELF.LastPortedDate		  := IF(ri.phone != '',ri.LastPortedDate,le.LastPortedDate);
+				SELF.ActivationDate		  := IF(ri.phone != '',ri.ActivationDate,le.ActivationDate);
+				SELF.DisconnectDate		  := IF(ri.phone != '',ri.DisconnectDate,le.DisconnectDate);
+				SELF.Prepaid		 			     := IF(ri.phone != '',ri.Prepaid,le.Prepaid);
 				SELF.NoContractCarrier := IF(ri.phone != '',ri.NoContractCarrier,le.NoContractCarrier);
-				SELF.Spoof						 := IF(ri.phone != '',ri.Spoof,le.Spoof);
-				SELF.Destination			 := IF(ri.phone != '',ri.Destination,le.Destination);
-				SELF.Source						 := IF(ri.phone != '',ri.Source,le.Source);
+				SELF.Spoof						       := IF(ri.phone != '',ri.Spoof,le.Spoof);
+				SELF.Destination			    := IF(ri.phone != '',ri.Destination,le.Destination);
+				SELF.Source						      := IF(ri.phone != '',ri.Source,le.Source);
 				SELF.FirstEventSpoofedDate := IF(ri.phone != '',ri.FirstEventSpoofedDate,le.FirstEventSpoofedDate);
 				SELF.LastEventSpoofedDate  := IF(ri.phone != '',ri.LastEventSpoofedDate,le.LastEventSpoofedDate);
 				SELF.TotalSpoofedCount := IF(ri.phone != '',ri.TotalSpoofedCount,le.TotalSpoofedCount);
 				SELF.SpoofingHistory	 := IF(ri.phone != '',ri.SpoofingHistory,le.SpoofingHistory);
-				SELF.OTP							 := IF(ri.phone != '',ri.OTP,le.OTP);
-				SELF.OTPCount					 := IF(ri.phone != '',ri.OTPCount,le.OTPCount);
-				SELF.FirstOTPDate			 := IF(ri.phone != '',ri.FirstOTPDate,le.FirstOTPDate);
-				SELF.LastOTPDate			 := IF(ri.phone != '',ri.LastOTPDate,le.LastOTPDate);
-				SELF.LastOTPStatus		 := IF(ri.phone != '',ri.LastOTPStatus,le.LastOTPStatus);
-				SELF.OTPHistory	 			 := IF(ri.phone != '',ri.OTPHistory,le.OTPHistory);
+				SELF.OTP							       := IF(ri.phone != '',ri.OTP,le.OTP);
+				SELF.OTPCount					    := IF(ri.phone != '',ri.OTPCount,le.OTPCount);
+				SELF.FirstOTPDate			  := IF(ri.phone != '',ri.FirstOTPDate,le.FirstOTPDate);
+				SELF.LastOTPDate			   := IF(ri.phone != '',ri.LastOTPDate,le.LastOTPDate);
+				SELF.LastOTPStatus		  := IF(ri.phone != '',ri.LastOTPStatus,le.LastOTPStatus);
+				SELF.OTPHistory	 			  := IF(ri.phone != '',ri.OTPHistory,le.OTPHistory);
 				SELF.PhoneRiskIndicator:= IF(ri.phone != '',ri.PhoneRiskIndicator,le.PhoneRiskIndicator);
 				SELF.OTPRIFailed			 := IF(ri.phone != '',ri.OTPRIFailed,le.OTPRIFailed);
-				SELF.Alerts						 := IF(ri.phone != '',ri.Alerts,le.Alerts);				
+				SELF.Alerts						   := IF(ri.phone != '',ri.Alerts,le.Alerts);				
 				SELF.ListingType       := IF(ri.ListingType != '',ri.ListingType,le.ListingType);
 				SELF.coc_description   := IF(ri.ServiceClass != '',
 																			PhoneFinder_Services.Functions.ServiceClassDesc((INTEGER)ri.ServiceClass),
@@ -560,17 +560,18 @@ MODULE
 			SELF.Carrier                          := pInput.carrier_name;
 			SELF.CarrierCity                      := pInput.phone_region_city;
 			SELF.CarrierState                     := pInput.phone_region_st;
-			SELF.PortingCode	                    := pInput.PortingCode;
+			SELF.PortingCode	                     := pInput.PortingCode;
 			SELF.PortingCount                     := pInput.PortingCount;
 			SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(pInput.FirstPortedDate);
 			SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(pInput.LastPortedDate);	
-			Phone_Status                          := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode);
+			Phone_Status                          := IF(inMod.UseInHousePhoneMetadata, pInput.PhoneStatus, 
+			                                         PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode)); // flag to use inhouse phone metatdata instead of Qsent PVS
 			SELF.ActivationDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active,
 			                                         iesp.ECL2ESP.toDate(pInput.ActivationDate));			
 			SELF.DisconnectDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE,
 			                                            iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-			SELF.Prepaid		 			 								:= pInput.Prepaid;
-			SELF.NoContractCarrier 								:= pInput.NoContractCarrier;			
+			SELF.Prepaid		 			 								           := pInput.Prepaid;
+			SELF.NoContractCarrier 								       := pInput.NoContractCarrier;			
 			SELF.PortingStatus                    := pInput.PortingStatus;
 			SELF.PortingHistory                   := PROJECT(pInput.PortingHistory,TRANSFORM(iesp.phonefinder.t_PortingHistory,
 																																				SELF.PortStartDate 	:= iesp.ECL2ESP.toDate(LEFT.PortStartDate),
@@ -660,12 +661,12 @@ MODULE
       OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
 			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
 		#END
-		
+		 
 		RETURN dPhoneIesp_Final;
 	ENDMACRO;
 	
 	// Other phone info
-	EXPORT GetOtherInfo(dIn) :=
+	EXPORT GetOtherInfo(dIn,inMod) :=
 	FUNCTIONMACRO
 		IMPORT std, ut;
 		lpf := PhoneFinder_Services.Layouts;
@@ -714,11 +715,12 @@ MODULE
 			SELF.Carrier                          := pInput.carrier_name;
 			SELF.CarrierCity                      := pInput.phone_region_city;
 			SELF.CarrierState                     := pInput.phone_region_st;
-			SELF.PortingCode	                    := pInput.PortingCode;
+			SELF.PortingCode	                     := pInput.PortingCode;
 			SELF.LastPortedDate	                  := iesp.ECL2ESP.toDate(pInput.LastPortedDate);
 			SELF.PhoneRiskIndicator	              := pInput.PhoneRiskIndicator;
-			SELF.OTPRIFailed	              			:= pInput.OTPRIFailed;
-			SELF.PhoneStatus                      := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode);
+			SELF.OTPRIFailed	              			    := pInput.OTPRIFailed;
+			SELF.PhoneStatus                      := IF(inMod.UseInHousePhoneMetadata, pInput.PhoneStatus, 
+			                                         PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode)); // flag to use inhouse phone metatdata instead of Qsent PVS
 			SELF.Address       := iesp.ECL2ESP.SetAddress(pInput.prim_name,pInput.prim_range,
 																										pInput.predir,pInput.postdir,pInput.suffix,
 																										pInput.unit_desig,pInput.sec_range,
@@ -853,7 +855,7 @@ MODULE
 			dSearchResultsPrimaryPhone := dSearchResults;
 			
 			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered);
+			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered,inMod);
 		#ELSE
 			dSearchResultsPrimaryPhoneUnfiltered := dSearchResultsUnfiltered(isPrimaryPhone);
 			dSearchResultsPrimaryPhone := dSearchResults(isPrimaryPhone);
@@ -864,8 +866,8 @@ MODULE
 																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
 			
 			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs);
-			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones);
+			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
+			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
 		// start phone verification
 		doVerify := inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
@@ -1000,7 +1002,7 @@ MODULE
 			dSearchResultsPrimaryPhone := dSearchResults;
 			
 			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered);
+			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered,inMod);
 		#ELSE
 			dSearchResultsPrimaryPhoneUnfiltered := dSearchResultsUnfiltered(isPrimaryPhone);
 			dSearchResultsPrimaryPhone := dSearchResults(isPrimaryPhone);
@@ -1011,8 +1013,8 @@ MODULE
 																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
 			
 			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs);
-			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones);
+			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
+			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
 		
 		pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendAcctno pInput) :=

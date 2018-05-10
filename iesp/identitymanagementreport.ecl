@@ -392,6 +392,7 @@ export t_IdentityManagementReportIndividual := record
 	dataset(t_IdmInetDomainRecord) InternetDomains {xpath('InternetDomains/InternetDomain'), MAXCOUNT(iesp.Constants.BR.MaxInternetDomains)};
 	dataset(t_IdmInsuranceDriverLicenseRecord) InsuranceDriverLicenses {xpath('InsuranceDriverLicenses/InsuranceDriverLicense'), MAXCOUNT(iesp.Constants.IDM.MaxDriverLicenses)};
 	boolean SuppressCompromisedDLIndicator {xpath('SuppressCompromisedDLIndicator')};//hidden[internal]
+	string128 CompromisedDLHash {xpath('CompromisedDLHash')};//hidden[internal]
 end;
 
 export t_IdentityManagementReportResponse := record

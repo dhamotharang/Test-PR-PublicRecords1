@@ -22,6 +22,7 @@
 	<part name="RiskIndicators" type="tns:XmlDataSet" cols="70" rows="20" />
   <part name="IncludeOtherPhoneRiskIndicators" type="xsd:boolean" default="false"/>
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
+  <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
@@ -97,6 +98,8 @@ MACRO
 				     BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly := DirectMarketing AND TransactionType = PhoneFinder_Services.Constants.TransType.BASIC;
 		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
+		                 UseInHousePhoneMetadata_internal	 := FALSE : STORED('UseInHousePhoneMetadata');
+		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
 
 	END;
 	

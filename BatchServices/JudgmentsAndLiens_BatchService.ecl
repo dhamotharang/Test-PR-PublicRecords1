@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="JudgmentsAndLiens_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -12,6 +12,7 @@
 	<part name="Match_SSN"            type="xsd:boolean"/>
 		
 	<part name="MaxResults"           type="xsd:unsignedInt"/>
+	<part name="Max_Results_Per_Acct" type="xsd:byte"/>	
 	
 	<part name="batch_in"             type="tns:XmlDataSet" cols="70" rows="25"/>	
 	
@@ -72,7 +73,8 @@ EXPORT JudgmentsAndLiens_BatchService(useCannedRecs = 'false') :=
 		gm := AutoStandardI.GlobalModule();								
 		batch_params		:= BatchShare.IParam.getBatchParams();
 		jl_batch_params := MODULE(PROJECT(batch_params, LiensV2_Services.IParam.batch_params, OPT))
-			EXPORT UNSIGNED8 MaxResults   					:= 10000 : STORED('MaxResults');	
+			EXPORT UNSIGNED8 MaxResults   					:= 10000  : STORED('MaxResults');
+			EXPORT UNSIGNED8 maxResultsPerAcct 			:= 1000  : STORED('Max_Results_Per_Acct');
 			EXPORT BOOLEAN no_did_append					 	:= FALSE : STORED('NoDIDAppend');
 			EXPORT BOOLEAN no_bdid_append				 		:= FALSE : STORED('NoBDIDAppend');
 			EXPORT UNSIGNED2 PenaltThreshold   			:= 10    : STORED('PenaltThreshold');
@@ -96,9 +98,10 @@ EXPORT JudgmentsAndLiens_BatchService(useCannedRecs = 'false') :=
 		BatchShare.MAC_RestoreAcctno(ds_batch_in, ds_batch_out, ds_batch_ready, false);	
 		ds_JL_recs_flat := PROJECT(ds_batch_ready, LiensV2_Services.batch_make_flat(LEFT));		
 		pre_result := SORT(ds_JL_recs_flat, acctno, penalt, -orig_filing_date, -release_Date, filing_jurisdiction, orig_filing_number);
+		pre_resultSlim := UNGROUP(TOPN(GROUP(pre_result, acctno), jl_batch_params.MaxResultsPerAcct,acctno));
 		
-		ut.mac_TrimFields(pre_result, 'pre_result', result);
-
+		ut.mac_TrimFields(pre_resultSlim, 'pre_resultSlim', result);
+		
 		OUTPUT(result, NAMED('Results'));
 		
 ENDMACRO;	

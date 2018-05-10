@@ -1,9 +1,13 @@
-import ut, codes, address, business_risk, Risk_Indicators, Models, gateway;
+﻿import ut, codes, address, business_risk, Risk_Indicators, Models, gateway;
 
 export SS1O_Function(DATASET(Layout_SS1I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 boolean isUtility=false, boolean ln_branded=false,
 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+unsigned1 ofac_version = 1,
+boolean include_ofac = false,
+real global_watchlist_threshold = 0.84
+) := function
 
 	tribCode := indata[1].tribcode;
 
@@ -97,7 +101,8 @@ end;
 
 prep := project(indata,into_btst_in(LEFT));
 
-iid_results := risk_indicators.InstantId_BtSt_Function(prep,gateways,dppa,glb,isUtility,ln_branded, true, true, true,datarestriction:=datarestriction, datapermission:=datapermission);
+iid_results := risk_indicators.InstantId_BtSt_Function(prep,gateways,dppa,glb,isUtility,ln_branded, true, true, true, ofac_version := ofac_version, include_ofac := include_ofac, 
+                                                       global_watchlist_threshold := global_watchlist_threshold,datarestriction:=datarestriction, datapermission:=datapermission);
 
 xlayout := record
 	RiskWise.Layout_SS1O;

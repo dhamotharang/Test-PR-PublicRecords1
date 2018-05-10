@@ -4,7 +4,7 @@
 	</message>
 */
 
-IMPORT Doxie, FraudDefenseNetwork_Services, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
+IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
 		
@@ -22,7 +22,16 @@ EXPORT SearchService() := MACRO
 	#STORED('ProductCode',FraudGovUser.ProductCode);
 	#STORED('FraudPlatform', Options.Platform);
 
-	// **************************************************************************************
+	// *********************************Validation*******************************************
+	
+	BOOLEAN isMinimumInput := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR searchBy.UniqueId <> '' OR 
+														searchBy.EmailAddress <> '' OR (searchBy.DriversLicenseNumber <> '' AND searchBy.DriversLicenseState <> '') OR
+														searchBy.HouseholdID <> '' OR searchBy.CustomerPersonId <> ''  OR searchBy.DeviceSerialNumber <> '' OR 
+														searchBy.AmountMin <> '' OR searchBy.AmountMax <> '' OR searchBy.BankName <> '' OR searchBy.BankRoutingNumber <> '' OR
+														searchBy.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
+														(iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') OR
+														searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
+	
 	//Checking that gc_id, industry type, and product code have some values - they are required.
 	IF(FraudGovUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
 	IF(FraudGovUser.IndustryTypeName = '', FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
@@ -30,7 +39,8 @@ EXPORT SearchService() := MACRO
 	// **************************************************************************************
 
 	GetSearchModule(iesp.fraudgovsearch.t_FraudGovSearchBy searchBy) := FUNCTION
-		FraudShared_Services.Layouts.BatchIn_rec xform_batch_in() := TRANSFORM
+		FraudShared_Services.Layouts.BatchInExtended_rec xform_batch_in() := TRANSFORM
+			SELF.acctno := '1';
 			// SELF.name_Full := searchBy.Name.Full; 
 			SELF.name_first := searchBy.Name.First;
 			SELF.name_middle := searchBy.Name.Middle;
@@ -54,21 +64,21 @@ EXPORT SearchService() := MACRO
 			SELF.email_address := searchBy.EmailAddress;
 			SELF.dl_number := searchBy.DriversLicenseNumber; 
 			SELF.dl_state := searchBy.DriversLicenseState; 
-			// string10 ProgramCode {xpath('ProgramCode')};
-			// string20 HouseholdID {xpath('HouseholdID')};
-			// string20 CustomerPersonId {xpath('CustomerPersonId')};
-			// iesp.share.t_Date TransactionStartDate {xpath('TransactionStartDate')};
-			// iesp.share.t_Date TransactionEndDate {xpath('TransactionEndDate')};
-			// string12 AmountMin {xpath('AmountMin')};
-			// string12 AmountMax {xpath('AmountMax')};
-			// string10 BankName {xpath('BankName')};
-			SELF.bank_routing_number := searchBy.BankRoutingNumber; 
-			SELF.bank_account_number := searchBy.BankAccountNumber; 
-			// string25 ISPName {xpath('ISPName')};
+			SELF.ProgramCode := searchBy.ProgramCode;
+			SELF.HouseholdID := searchBy.HouseholdID;
+			SELF.CustomerPersonId := searchBy.CustomerPersonId;
+			SELF.TransactionStartDate := iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate);
+			SELF.TransactionEndDate := iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate);
+			SELF.AmountMin := searchBy.AmountMin;
+			SELF.AmountMax := searchBy.AmountMax;
+			SELF.BankName := searchBy.BankName;
+			SELF.bank_routing_number := searchBy.BankRoutingNumber;
+			SELF.bank_account_number := searchBy.BankAccountNumber;
+			SELF.ISPname := searchBy.ISPName;
 			SELF.ip_address := searchBy.IPAddress; 
-			// string10 MACAddress {xpath('MACAddress')};
+			SELF.MACAddress := searchBy.MACAddress; 
 			SELF.device_id := searchBy.DeviceId;
-			// string20 DeviceSerialNumber {xpath('DeviceSerialNumber')};							
+			SELF.DeviceSerialNumber := searchBy.DeviceSerialNumber;
 			SELF.appendedproviderid := searchBy.AppendedProviderId;
 			SELF.lnpid := searchBy.lnpid; 
 			SELF.tin := searchBy.tin; 
@@ -94,16 +104,20 @@ EXPORT SearchService() := MACRO
 	batch_params := FraudGovPlatform_Services.IParam.getBatchParams();
 	search_mod := GetSearchModule(first_row.SearchBy);
 
-	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params);
+	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsOnline);
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
+			SELF.RecordCount := COUNT(search_records);
 			SELF.InputEcho:= SearchBy,
 			SELF.Records	:= search_records
 	END;
 
 	results := DATASET([final_transform_t_FraudGovSearchResponse()]) ;
 
-	output(results, named('Results'));
+	IF (isMinimumInput, 
+				OUTPUT(results, named('Results')),
+				FAIL(301,doxie.ErrorCodes(301))
+			);
 		
 ENDMACRO;

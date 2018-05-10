@@ -1,4 +1,4 @@
-export BS_LIBIN := INTERFACE
+﻿export BS_LIBIN := INTERFACE
 	export unsigned1 bs_dppa;
 	export unsigned1 bs_glb;
 	export boolean bs_isUtility := false;
@@ -34,4 +34,5 @@ export BS_LIBIN := INTERFACE
 	export string50 bs_DataPermission := risk_indicators.iid_constants.default_DataPermission;
 	export boolean IN_isDirectToConsumer := false;
 	export boolean bs_IncludeLnJ := false;
+ export integer2 bs_ReportingPeriod := 84;
 END;

@@ -13,9 +13,13 @@ export t_DDRComponentsOfBusiness := record
 end;
 		
 export t_DDRSOSActions := record
-	integer2 Sequence {xpath('Sequence')};
 	string Action {xpath('Action')};
 	iesp.share.t_Date SOSActionDate {xpath('SOSActionDate')};
+end;
+		
+export t_DDRBusinessNameWithLexID := record
+	string businessName {xpath('businessName')};
+	string LexID {xpath('LexID')};
 end;
 		
 export t_DDRBusinessInformation := record
@@ -73,7 +77,7 @@ export t_DDRBusinessEconomicAttributeDetails := record
 end;
 		
 export t_DDRBusinessAddressRisk := record
-	integer2 Sequence {xpath('Sequence')};
+	boolean AddressVerified {xpath('AddressVerified')};
 	iesp.share.t_Address Address {xpath('Address')};
 	string AddressType {xpath('AddressType')};
 	boolean InputAddressVerified {xpath('InputAddressVerified')};
@@ -128,9 +132,6 @@ end;
 export t_DDRBusinessOperatingInformation := record
 	iesp.share.t_Date FirstReported {xpath('FirstReported')};
 	iesp.share.t_Date LastReported {xpath('LastReported')};
-	integer2 NumberOfBureauReporting {xpath('NumberOfBureauReporting')};
-	dataset(t_DDRReportingSources) ReportingBureaus {xpath('ReportingBureaus/ReportingBureau'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxReportingBureaus)};
-	boolean RegisteredBusiness {xpath('RegisteredBusiness')};
 	integer2 NumberOfSourcesReporting {xpath('NumberOfSourcesReporting')};
 	dataset(t_DDRReportingSources) ReportingSources {xpath('ReportingSources/ReportingSource'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxReportingSources)};
 	integer2 SOSActiveCount {xpath('SOSActiveCount')};
@@ -145,6 +146,12 @@ export t_DDRBusinessOperatingInformation := record
 	string Filing {xpath('Filing')};
 	string StructureType {xpath('StructureType')};
 	string ParentCompany {xpath('ParentCompany')};
+	iesp.share.t_Date PublicRecordsFirstReported {xpath('PublicRecordsFirstReported')};
+	iesp.share.t_Date PublicRecordsLastReported {xpath('PublicRecordsLastReported')};
+	iesp.share.t_Date SOSFirstReported {xpath('SOSFirstReported')};
+	iesp.share.t_Date SOSLastReported {xpath('SOSLastReported')};
+	iesp.share.t_Date BureauFirstReported {xpath('BureauFirstReported')};
+	iesp.share.t_Date BureauLastReported {xpath('BureauLastReported')};
 end;
 		
 export t_DDRLinkedBusinessInformation := record
@@ -173,16 +180,8 @@ export t_DDRBusinessShellShelfCharacteristics := record
 	boolean IncorporatedInStateWithLooseIncorpLaws {xpath('IncorporatedInStateWithLooseIncorpLaws')};
 	string IncoporationState {xpath('IncoporationState')};
 	string20 FEINReported {xpath('FEINReported')};
-	integer2 NumberOfSourcesReporting {xpath('NumberOfSourcesReporting')};
-	string SourcesReporting {xpath('SourcesReporting')};
 	boolean BetterBusinessBureau {xpath('BetterBusinessBureau')};
 	boolean YellowPages {xpath('YellowPages')};
-	integer2 NumberOfBureauReporting {xpath('NumberOfBureauReporting')};
-	t_DDRReportingSources BureauSources {xpath('BureauSources')};
-	integer2 NumberOfGovernmentSources {xpath('NumberOfGovernmentSources')};
-	t_DDRReportingSources GovernmentSources {xpath('GovernmentSources')};
-	integer2 NumberOfUtilitySources {xpath('NumberOfUtilitySources')};
-	t_DDRReportingSources UtilitySources {xpath('UtilitySources')};
 	integer2 NumberOfBusinessesFoundAtAddress {xpath('NumberOfBusinessesFoundAtAddress')};
 	integer2 NumberOfIncorporatedInStateWithLooseIncorpLaws {xpath('NumberOfIncorporatedInStateWithLooseIncorpLaws')};
 	integer2 NumberOfBusinessWithNoFEIN {xpath('NumberOfBusinessWithNoFEIN')};
@@ -197,6 +196,14 @@ export t_DDRBusinessShellShelfCharacteristics := record
 	iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
 	integer4 TimeBetweenSOSIncorporationDateDateFirstSeen {xpath('TimeBetweenSOSIncorporationDateDateFirstSeen')};
+	boolean BureauReporting {xpath('BureauReporting')};
+	boolean GovernmentSources {xpath('GovernmentSources')};
+	boolean UtilitySources {xpath('UtilitySources')};
+	boolean AgentExists {xpath('AgentExists')};
+	boolean TINReported {xpath('TINReported')};
+	integer3 NumberOfYears {xpath('NumberOfYears')};
+	integer2 NumberOfMonths {xpath('NumberOfMonths')};
+	integer3 NumberOfDays {xpath('NumberOfDays')};
 end;
 		
 export t_DDRBusinessOperatingAttributeDetails := record
@@ -225,14 +232,14 @@ export t_DDRBusinessExecutives := record
 	iesp.share.t_Date DOB {xpath('DOB')};
 	dataset(iesp.duediligenceshared.t_DDRPositionTitles) Titles {xpath('Titles/Title'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTitles)};
 	boolean AssociatedWithOtherCompanies {xpath('AssociatedWithOtherCompanies')};
-	integer2 BusinessScore {xpath('BusinessScore')};
 	dataset(iesp.duediligenceshared.t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicens'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLicenses)};
+	integer1 CriminalStateLegalEvents {xpath('CriminalStateLegalEvents')};
+	integer1 CriminalFederalLegalEvents {xpath('CriminalFederalLegalEvents')};
 	string2 USResidency {xpath('USResidency')};
-	integer1 IdentityRisk {xpath('IdentityRisk')};
-	integer1 AssociatesRisk {xpath('AssociatesRisk')};
 	integer1 CriminalLegalEvents {xpath('CriminalLegalEvents')};
-	integer1 CivilLegalEvents {xpath('CivilLegalEvents')};
 	integer1 LegalTypes {xpath('LegalTypes')};
+	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) AssociatedWithOtherIndividuals {xpath('AssociatedWithOtherIndividuals/Individual'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxIndvAssociations)};
+	dataset(t_DDRBusinessNameWithLexID) AssociatedWithOtherBusinesses {xpath('AssociatedWithOtherBusinesses/Business'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusAssociations)};
 end;
 		
 export t_DDRRegisteredAgents := record

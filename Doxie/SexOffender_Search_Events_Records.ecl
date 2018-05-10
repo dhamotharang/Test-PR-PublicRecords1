@@ -14,8 +14,10 @@ doxie.MAC_Header_Field_Declare (IsFCRA);
 offs := doxie_raw.SexOffender_Events_Raw(persons, '', //sid_value; not used
 	dateVal,dppa_purpose,glb_purpose,application_type_value, IsFCRA,  ds_flags,
 	slim_pc_recs, inFFDOptionsMask);
+	
+offs_dp := dedup(sort(offs, record),record);
 		
 //-----------------[ done ]----------------
 
-return offs;
+return offs_dp;
 end;

@@ -448,6 +448,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxLicenses   							:= 500;
 		export unsigned2 MaxBusinessExecs   				:= 500;
 		export unsigned2 MaxRegisteredAgents   			:= 500;
+		export unsigned2 MaxIndvAssociations   			:= 500;
+		export unsigned2 MaxBusAssociations   			:= 500;
 	end;
 
   //Dun and Bradstreet (DNB)
@@ -1649,6 +1651,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxRespRecords := ThinRps.MaxCountResponseRecords;				
 		EXPORT UNSIGNED2 MaxEmailAddresses := 5;		
 		EXPORT UNSIGNED2 MaxCountCollegeAddresses := 5;
+		EXPORT UNSIGNED2 MaxCountPersonCounts := 25;
 	END;
 	EXPORT ThinReverseAddress := MODULE
 		EXPORT UNSIGNED2 MaxAddresses := 5;

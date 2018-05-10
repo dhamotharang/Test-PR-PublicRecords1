@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ITA_Search_Service">
 	<part name="seq" type="xsd:string"/>
 	<part name="AccountNumber" type="xsd:string"/>
@@ -22,6 +22,8 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="ModelName" type="xsd:string"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="Version" type="xsd:integer"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 </message>
@@ -62,6 +64,8 @@ EXPORT ITA_Search_Service := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'ModelName',
+  'gateways',  
+  'OFACversion',
 	'Version',
 	'HistoryDateYYYYMM'));
 
@@ -91,10 +95,22 @@ UNSIGNED1 DPPA := 0			: stored('DPPAPurpose');
 UNSIGNED1 GLB := RiskWise.permittedUse.GLBA : stored('GLBPurpose');
 STRING ModelName_in := ''				: stored('ModelName');
 model_name := StringLib.StringToLowerCase( modelname_in );
+UNSIGNED1 ofac_version      := 1        : stored('OFACVersion');
 UNSIGNED1 attributesVersion   := 1 : stored('Version');
 UNSIGNED3 historyDate := 999999 : stored('HistoryDateYYYYMM');
 STRING DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 STRING50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+gateways_in := Gateway.Configuration.Get();
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
+	self.url := if(ofac_version = 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 /* ***************************************
 	 *           Package Input:            *
@@ -127,7 +143,7 @@ packagedInput := project(emptyRecord, intoInput(LEFT));
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
-results := Models.LeadIntegrity_Search_Function(packagedInput, GLB, DPPA, historyDate, DataRestriction, attributesVersion, model_name, false, DataPermission);
+results := Models.LeadIntegrity_Search_Function(packagedInput, GLB, DPPA, historyDate, DataRestriction, attributesVersion, model_name, false, DataPermission, gateways, ofac_version);
 
 OUTPUT(results, NAMED('Results'));
 	

@@ -9,9 +9,16 @@ EXPORT reportBusBestInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
 																										SELF.seleID := LEFT.busn_info.BIP_IDS.SeleID.LinkID;
 																										SELF.phone := LEFT.busn_info.phone;
 																										SELF.lexID := (STRING)LEFT.busn_info.BIP_IDS.SeleID.LinkID;
+                                                    
+                                                        /*  FEIN on input is not masked  */  
 																										SELF.inputFEIN := LEFT.busn_input.fein;
-       /* TIN/FEIN is EXPERIAN RESTRICTED */        SELF.TINSource := IF(LEFT.FEINSourceContainsE5 = true, DueDiligence.Constants.FEIN_SOURCE_EXPERIAN_RESTRICTED, DueDiligence.Constants.EMPTY);                     
-																										SELF.bestFein := LEFT.busn_info.fein;
+                                                        /*  IF TIN/FEIN is EXPERIAN RESTRICTED  then SET the TINSource to E5 for online to use in masking   */
+                                                    SELF.TINSource := IF(LEFT.FEINSourceContainsE5 = true, DueDiligence.Constants.FEIN_SOURCE_EXPERIAN_RESTRICTED, DueDiligence.Constants.EMPTY);                     
+                                                        /*  IF TIN/FEIN is EXPERIAN RESTRICTED  then use the MASKED FEIN */  
+																										    /*  Expecting online request to have the SSN_MASK of '' and take care of masking in Evolution */
+                                                        /*  Expecting API request to have the SSN_MASK of ALL, NONE, FIRST5, LAST4 or '' based on customer's setting in MBS */  
+                                                    SELF.bestFein  := IF(LEFT.FEINSourceContainsE5 = true, LEFT.FEIN_Masked_For_Report, LEFT.busn_info.fein);
+                                                    
 																										SELF.name := LEFT.busn_info.companyName;
 																										SELF.inputAddress := PROJECT(LEFT.busn_input.address, TRANSFORM(iesp.share.t_Address,
                                                                                                                     SELF.StreetAddress1 := LEFT.streetAddress1;

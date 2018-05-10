@@ -1,4 +1,4 @@
-/*--SOAP-- 
+﻿/*--SOAP-- 
 <message name="SexOffender_Search" wuTimeout="240000">
  <part name="SSN" type="xsd:string"/>
 	<part name="UnParsedFullName" type="xsd:string"/>
@@ -51,7 +51,7 @@
 /*--INFO-- This service pulls from the Sex Offenders file.*/
 import SexOffender, Alerts;
 
-export sexoffender_search := macro
+export SexOffender_Search := macro
 #STORED('LookupType','SEX');
 #STORED('ScoreThreshold',20);
 
@@ -59,7 +59,7 @@ WSInput.MAC_SexOffender_Search();
 SexOffender.MAC_Header_Field_Declare();
 
 f_raw := doxie.sexoffender_search_people_records ();
-f := project(f_raw(st<>''),  
+f_searchperson := project(f_raw(st<>''),  
              transform(doxie.layout_sexoffender_searchperson, 
                                self.did := if(doxie.FN_Tra_Penalty_Addr(left.predir,left.prim_range,
 	 			  		                                           left.prim_name,left.addr_suffix,
@@ -69,7 +69,7 @@ f := project(f_raw(st<>''),
              self.name_orig := address.NameFromComponents(left.fname,left.mname,left.lname,left.name_suffix);
 						 self := left)) + f_raw(st='');
 
-doxie.Layout_SexOffender_NameScore get_name_score(F le) := transform
+doxie.Layout_SexOffender_NameScore get_name_score(doxie.layout_sexoffender_searchperson le) := transform
 	self.name_score  := IF(fname_val='' AND lname_val='',0,
 												 datalib.namematch(le.fname,le.mname,le.lname,fname_val,mname_val,lname_val));
 	SELF.Alternate_Address_Search_Results := le.addresses;
@@ -86,7 +86,7 @@ doxie.Layout_SexOffender_NameScore get_name_score(F le) := transform
 	self             := le;
 end;
 
-f_score := project(f, get_name_score(left));
+f_score := project(f_searchperson, get_name_score(left));
 
 f_sort  := sort(f_score, seisint_primary_key, -(length(trim(lname)) > 0),
                                               -(length(trim(fname)) > 0), 
@@ -115,7 +115,7 @@ chooseNSort := SORT(GROUP(f_dedup), -addr_pref, penalt, seisint_primary_key);
 // will marshall after the alert calculation
 FinalN := CHOOSEN(chooseNSort,MaxResults_val);
 
-FinalN get_best_name(FinalN l, f_best_name r) := transform
+doxie.Layout_SexOffender_NameScore get_best_name(doxie.Layout_SexOffender_NameScore l, doxie.Layout_SexOffender_NameScore r) := transform
      self.Alternate_Address_Search_Results := SORT(l.Alternate_Address_Search_Results, -alt_addr_dt_last_seen);
     	self.name_orig   := r.name_orig;
      self.lname       := r.lname;
@@ -143,14 +143,14 @@ layout_spk_name := record
    string1 	  name_type := '';
 end;
 
-layout_spk_name get_spk_name(F l) := transform
+layout_spk_name get_spk_name(doxie.layout_sexoffender_searchperson l) := transform
 	self := l;
 end;
 
-f_spk_name := project(f, get_spk_name(left));
+f_spk_name := project(f_searchperson, get_spk_name(left));
 
 //  Add name field
-FinalN get_aka_name(Fetched l, f_spk_name r) := transform
+doxie.Layout_SexOffender_NameScore get_aka_name(doxie.Layout_SexOffender_NameScore l, layout_spk_name r) := transform
      self.name := l.name + project(r,transform(doxie.layout_sexoffender_name,self:=left));
      self := l;
 end;
@@ -183,8 +183,7 @@ Layout_SexOffender_with_Offenses addOffenseChildren(doxie.Layout_SexOffender_Nam
 	self := L;
 end;
 
-ds_best := dedup(sort(project(f_final_alert,transform(doxie.layout_best,self.did:=left.did,self:=[])),did),did);
-offenses := dedup(sort(doxie.sexoffender_search_events_local(ds_best),record),record);
+offenses := doxie.sexoffender_search_events_records(f_searchperson);
 f_final_with_offenses := denormalize(f_final_alert,offenses,left.Seisint_Primary_Key=right.Seisint_Primary_Key,group,addOffenseChildren(left,rows(right)));
 
 doxie.MAC_Marshall_Results(f_final_with_offenses,results, 200000);

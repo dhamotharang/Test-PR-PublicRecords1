@@ -15,8 +15,10 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
 	pers := IdentityManagement_Services.report_records(dids, param);
 	bestPerson := pers.person_report[1];
 
-	isDLCompromised := param.SuppressCompromisedDLs AND
-		IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(bestPerson.Name.Last, bestPerson.SSNInfo.SSN);
+	compromisedDLHash := IF(param.SuppressCompromisedDLs,
+		IdentityManagement_Services.CompromisedDL.fn_CheckForMatch(bestPerson.Name.Last, bestPerson.SSNInfo.SSN), '');
+
+	isDLCompromised :=  compromisedDLHash <> '';
 
 	//Personal record
 	p_person         := pers.person_report;
@@ -98,6 +100,7 @@ EXPORT Report(DATASET (doxie.layout_references) dids, IdentityManagement_Service
 		SELF.InternetDomains				:= IF (param.include_InternetDomains, p_domain_names);
 		SELF.InsuranceDriverLicenses:= IF (param.include_InsuranceDL, p_insurance_dl);
 		SELF.SuppressCompromisedDLIndicator  := isDLCompromised;
+		SELF.CompromisedDLHash 			:= compromisedDLHash;
   END;
 
   individual := DATASET([Format ()]);

@@ -1,10 +1,12 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CDIP_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
 	<part name="GLBPurpose" type="xsd:byte"/> 
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 </message>
 */
@@ -54,10 +56,18 @@ export CDIP3_Batch_Service := MACRO
 	unsigned1 GLB  := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 	string DataRestriction := '00000000000' : stored('DataRestrictionMask');
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+  unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 
 	batch_in       := dataset([],Risk_Indicators.CDIP_Layouts.Batch_In) : STORED('batch_in',few);
-	gateways       := Gateway.Constants.void_gateway;
+	gateways_in := Gateway.Configuration.Get();
 	history_date   := 999999 : stored('HistoryDateYYYYMM');
+  
+  Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.url, ''); 	
+  self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
 
 
 	/* IID & Boca Shell Values */
@@ -75,14 +85,16 @@ export CDIP3_Batch_Service := MACRO
 	from_biid           := false;
 	excludeWatchlists   := false;
 	from_IT1O           := false;
-	ofac_version        := 1;
-	include_ofac        := false;
+	ofac_version        := ofac_version_;
+	include_ofac        := if(ofac_version = 1, false, true);
 	addtl_watchlists    := false;
-	watchlist_threshold := 0.84;
+	watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 	dob_radius          := -1;
 	doScore             := true;
 	nugen               := true;
 	unsigned1 AppendBest := 1;		// search best file
+  
+if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	layout_acctno := record
 		unsigned4 input_seq;

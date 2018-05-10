@@ -1,4 +1,4 @@
-EXPORT diff_macro( indata1, indata2, unique_fields, outdata, meta='\'\'' ) := MACRO
+﻿EXPORT diff_macro( indata1, indata2, unique_fields, outdata, meta='\'\'' ) := MACRO
   LOADXML('<xml/>');
   #exportxml(diffs, recordof(indata1) )
 
@@ -32,7 +32,7 @@ EXPORT diff_macro( indata1, indata2, unique_fields, outdata, meta='\'\'' ) := MA
       #if(%@isDataset%=1)
         #error( 'Your input contains a child dataset. This won\'t work.' )
       #elseif( %@isRecord%=1)
-        #error( 'Your input is hierarchical. Flatten it first with ashirey.Flatten' )
+        #error( 'Your input is hierarchical. Flatten it first with Models.Flatten' )
       #else
         // everything is fine and dandy
         #if( meta != '' )

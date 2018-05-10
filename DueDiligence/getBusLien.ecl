@@ -185,51 +185,67 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				   SELF                        := [])); 	
 	 
 	 
-	  BusinessLiens_unreleased     := BusinessLiens_categorized(release_date = DueDiligence.Constants.EMPTY); 
 	
   // ------                                                                                    ------	
 	 // ------                                                                                    ------
 	 // ----- Summarize the results in scope for these liens and judgments                        ------
 	 // ------                                                                                    ------
 	
-	Summary_BusinessLiens_Unreleased := table(BusinessLiens_unreleased,
+   lienJudgementCounts := PROJECT(BusinessLiens_categorized, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED historyDate, UNSIGNED dateToUse, 
+                                                                                    UNSIGNED totalEvictions, UNSIGNED totalEvictionsOver3Yrs, UNSIGNED totalEvictionsPast3Yrs, 
+                                                                                    UNSIGNED totalUnreleasedLiens, UNSIGNED totalUnreleasedLiensOver3Yrs, UNSIGNED totalUnreleasedLiensPast3Yrs, 
+                                                                                    UNSIGNED totalReleasedLiens},
 	                               /* columns in the table */  
-	                              {liensJudgment.seq, 
-																liensJudgment.ultid, 
-																liensJudgment.orgid, 
-																liensJudgment.seleid,
-																HistoryDate,
-																DateToUse,
-																TotalEvictions               := #EXPAND (DueDiligence.Constants.mac_calculate_evictions()),
-																TotalEvictionsOVNYR          := #EXPAND (DueDiligence.Constants.mac_calculate_evictions_OVNYR()),                          																									 
-																TotalEvictionsNYR            := #EXPAND (DueDiligence.Constants.mac_calculate_evictionsNYR()), 
+                                                                       SELF.seq := LEFT.liensJudgment.seq;
+                                                                       SELF.ultID := LEFT.liensJudgment.ultid;
+                                                                       SELF.orgID := LEFT.liensJudgment.orgid;
+                                                                       SELF.seleID := LEFT.liensJudgment.seleid;
 																																			 
-																TotalLienAmount              := SUM(GROUP, (integer)amount), 
+                                                                       SELF.totalEvictions := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES AND LEFT.release_date = DueDiligence.Constants.EMPTY);
+                                                                       SELF.totalEvictionsOver3Yrs := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES  AND  LEFT.NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.release_date = DueDiligence.Constants.EMPTY);
+                                                                       SELF.totalEvictionsPast3Yrs := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES  AND  LEFT.NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.release_date = DueDiligence.Constants.EMPTY);
 																
+                                                                       SELF.totalUnreleasedLiens := (INTEGER)(LEFT.eviction != DueDiligence.Constants.YES AND LEFT.release_date = DueDiligence.Constants.EMPTY);
+                                                                       SELF.totalUnreleasedLiensOver3Yrs := (INTEGER)(LEFT.eviction != DueDiligence.Constants.YES 	AND   LEFT.NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.release_date = DueDiligence.Constants.EMPTY);
+                                                                       SELF.totalUnreleasedLiensPast3Yrs := (INTEGER)(LEFT.eviction != DueDiligence.Constants.YES   AND  LEFT.NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.release_date = DueDiligence.Constants.EMPTY);
 																/* if evictions flag is anything other than a 'Y' it will get counted as a lien  */   
-																TotalUnreleasedLiens         := #EXPAND (DueDiligence.Constants.mac_calculate_liens()),
-																TotalUnreleasedLiensOVNYR    := #EXPAND (DueDiligence.Constants.mac_calculate_liens_OVNYR()),											 
-																TotalUnreleasedLiensNYR      := #EXPAND (DueDiligence.Constants.mac_calculate_liensNYR()),
-															  /*end of columns in the table */ },
+                                                                       SELF.totalReleasedLiens := (INTEGER)(LEFT.eviction != DueDiligence.Constants.YES AND LEFT.release_date != DueDiligence.Constants.EMPTY);
 																/* Grouped by */  
-																liensJudgment.seq, liensJudgment.ultid, liensJudgment.orgid, liensJudgment.seleid);
+                                                                       SELF := LEFT;
+                                                                       SELF := [];)); 
+																
+  sortlienJudgementCounts := SORT(lienJudgementCounts, seq, ultID, orgID, seleID);
+	// ----                                                                                 ------	
+  Summary_BusinessLiens := ROLLUP(sortlienJudgementCounts,
+                      #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                      TRANSFORM(RECORDOF(LEFT),
+                                SELF.totalEvictions := LEFT.totalEvictions + RIGHT.totalEvictions;
+                                SELF.totalEvictionsOver3Yrs := LEFT.totalEvictionsOver3Yrs + RIGHT.totalEvictionsOver3Yrs;
+                                SELF.totalEvictionsPast3Yrs := LEFT.totalEvictionsPast3Yrs + RIGHT.totalEvictionsPast3Yrs;
+	// ----  JOIN Summary to the Business Internal layout                                   ------
+                                SELF.totalUnreleasedLiens := LEFT.totalUnreleasedLiens + RIGHT.totalUnreleasedLiens;
+                                SELF.totalUnreleasedLiensOver3Yrs := LEFT.totalUnreleasedLiensOver3Yrs + RIGHT.totalUnreleasedLiensOver3Yrs;
+                                SELF.totalUnreleasedLiensPast3Yrs := LEFT.totalUnreleasedLiensPast3Yrs + RIGHT.totalUnreleasedLiensPast3Yrs;
+	// ----                                                                                 ------																									
+                                SELF.totalReleasedLiens := LEFT.totalReleasedLiens + RIGHT.totalReleasedLiens;
+                                
+                                SELF := LEFT;));
 																
 	// ----                                                                                 ------	
 	// ----  JOIN Summary to the Business Internal layout                                   ------
 	// ----                                                                                 ------																									
-	Update_BusnLiens := JOIN(BusnData, Summary_BusinessLiens_Unreleased,
-												LEFT.seq                             = RIGHT.seq    AND
-												LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultid  AND
-												LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.orgid  AND
-												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleid,												
+	Update_BusnLiens := JOIN(BusnData, Summary_BusinessLiens,
+												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),												
 												TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																	SELF.Business.liensUnreleasedCnt              := RIGHT.TotalUnreleasedLiens,
-																	SELF.Business.liensUnreleasedCntOVNYR         := RIGHT.TotalUnreleasedLiensOVNYR,
-																	SELF.Business.liensUnreleasedCntInThePastNYR  := RIGHT.TotalUnreleasedLiensNYR,
+																	SELF.Business.liensUnreleasedCntOVNYR         := RIGHT.totalUnreleasedLiensOver3Yrs,
+																	SELF.Business.liensUnreleasedCntInThePastNYR  := RIGHT.totalUnreleasedLiensPast3Yrs,
+																	
+                                  SELF.Business.liensReleasedCnt                := RIGHT.totalReleasedLiens;
 																	
 																	SELF.Business.evictionsCnt                    := RIGHT.TotalEvictions,
-																	SELF.Business.evictionsCntOVNYR               := RIGHT.TotalEvictionsOVNYR,
-																	SELF.Business.evictionsCntInThePastNYR        := RIGHT.TotalEvictionsNYR,
+																	SELF.Business.evictionsCntOVNYR               := RIGHT.totalEvictionsOver3Yrs,
+																	SELF.Business.evictionsCntInThePastNYR        := RIGHT.totalEvictionsPast3Yrs,
 																	SELF := LEFT),
 																	LEFT OUTER);
 
@@ -249,13 +265,14 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	//   DEBUGGING OUTPUTS
 	// *********************
 	
-	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiensTMSIDSeq, 100),            NAMED('BusinessLiensTMSIDSeq')));
-	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiensTMSID, 100),               NAMED('BusinessLiensTMSID')));
-	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_main, 100),               NAMED('BusinessLiens_main')));
-	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_rolled, 100),             NAMED('BusinessLiens_rolled')));
-	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_categorized, 100),        NAMED('BusinessLiens_categorized')));
-	IF(DebugMode,    OUTPUT(CHOOSEN (Summary_BusinessLiens_Unreleased, 10),  NAMED('Summary_BusinessLiens_Unreleased')));  
-	IF(DebugMode,    OUTPUT(CHOOSEN (Update_BusnLiens, 10),                  NAMED('Update_BusnLiens')));  
+	// IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiensTMSIDSeq, 10),            NAMED('BusinessLiensTMSIDSeq')));
+	// IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiensTMSID, 10),               NAMED('BusinessLiensTMSID')));
+	// IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_main, 10),               NAMED('BusinessLiens_main')));
+	// IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_rolled, 10),             NAMED('BusinessLiens_rolled')));
+	IF(DebugMode,    OUTPUT(CHOOSEN (BusinessLiens_categorized, 10),        NAMED('BusinessLiens_categorized')));
+	//IF(DebugMode,    OUTPUT(CHOOSEN (Update_BusnLiens, 10),                  NAMED('Update_BusnLiens')));  
+	
+
 	
 
 	RETURN UpdateBusnLiensWithReport;

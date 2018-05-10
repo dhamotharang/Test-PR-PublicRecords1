@@ -332,6 +332,15 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                                       SELF.twoOrLessTrafConvictOver3Yrs := LEFT.TotalConvictedTraffic2T_OVERNYR BETWEEN 1 AND 2;
                                                       SELF.threePlusInfractConvictOver3Yrs := LEFT.TotalConvictedInfractions2I_OVERNYR >= 3;
                                                       SELF.twoOrLessInfractConvictOver3Yrs := LEFT.TotalConvictedInfractions2I_OVERNYR BETWEEN 1 AND 2;
+                                                      /*PerLegalStateCriminal*/
+                                                      SELF.currentIncarcerationOrParole := LEFT.TotalCurrentParoles > 0 OR LEFT.TotalCurrentIncarcerations > 0;
+                                                      SELF.felonyPast3Yrs := LEFT.TotalConvictedFelonies4F_NY;
+                                                      SELF.felonyOver3Yrs := LEFT.TotalConvictedFelonies4F_OVERNYR;
+                                                      SELF.previousIncarceration := LEFT.TotalEverIncarcerations > 0;
+                                                      SELF.uncategorizedConvictionPast3Yrs := LEFT.TotalConvictedUnknowns4U_NY;
+                                                      SELF.misdemeanorConvictionPast3Yrs := LEFT.TotalConvictedMisdemeanor4M_NY > 0;
+                                                      SELF.uncategorizedConvictionOver3Yrs := LEFT.TotalConvictedUnknowns4U_OVERNYR;
+                                                      SELF.misdemeanorConvictionOver3Years := LEFT.TotalConvictedMisdemeanor4M_OVERNYR > 0;
                                                       SELF := [];));
   
   
@@ -385,6 +394,11 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                   trafInfrac := DueDiligence.getIndKRILegalTrafficInfraction(LEFT);
                                   SELF.party.trafficInfractionScore := trafInfrac.name;
                                   SELF.party.trafficInfractionFlags := trafInfrac.value;
+                                  
+                                  stateCrim := DueDiligence.getIndKRILegalStateCriminal(LEFT);
+                                  SELF.party.stateCriminalLegalEventsScore := stateCrim.name;
+                                  SELF.party.stateCriminalLegalEventsFlags := stateCrim.value;
+                                  
                                   
                                   SELF := RIGHT;
                                   SELF := [];));
@@ -449,6 +463,10 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                      
                                      SELF.party.trafficInfractionScore := RIGHT.party.trafficInfractionScore;
                                      SELF.party.trafficInfractionFlags := RIGHT.party.trafficInfractionFlags;
+                                     
+                                     SELF.party.stateCriminalLegalEventsScore := RIGHT.party.stateCriminalLegalEventsScore;
+                                     SELF.party.stateCriminalLegalEventsFlags := RIGHT.party.stateCriminalLegalEventsFlags;
+                                  
                                      SELF := LEFT;),
                           LEFT OUTER);
   

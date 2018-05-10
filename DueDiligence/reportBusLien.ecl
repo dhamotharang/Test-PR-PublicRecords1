@@ -1,7 +1,7 @@
 ﻿IMPORT DueDiligence, iesp;
 
 EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens, 
-											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) UnreleasedBusinessLiens,
+											   DATASET(DueDiligence.LayoutsInternal.layout_liens_judgments_categorized) BusinessLiens,
 											   boolean DebugMode = FALSE) := FUNCTION
 
 
@@ -11,11 +11,11 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 	 // ------ most recent filed and largest dollar amount                                        ------
 	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
 	 // ------                                                                                    ------
-	 BusinessLiensUnreleasedButLimted   := dedup(sort(UnreleasedBusinessLiens,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  
+	 BusinessLiensButLimted   := dedup(sort(BusinessLiens,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  
                                                     KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
 
 
-  UdateBusinessLiensForReporting   := DueDiligence.reportBusLienDebtorCreditor(BusinessLiensUnreleasedButLimted, debugmode);
+  UdateBusinessLiensForReporting   := DueDiligence.reportBusLienDebtorCreditor(BusinessLiensButLimted, debugmode);
 			
  
  /* perform the DENORMALIZE (join) by Link ID                                 */   															 															
@@ -35,7 +35,7 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 	// *********************
 	 
 	  //IF(DebugMode,     OUTPUT(COUNT  (UpdateBusnLiens),         NAMED('HowManyUpdateBusnLiens')));
-	  IF(DebugMode,     OUTPUT(CHOOSEN(UnreleasedBusinessLiens, 100),  NAMED('UnreleasedBusinessLiensin')));
+	  IF(DebugMode,     OUTPUT(CHOOSEN(BusinessLiens, 100),  NAMED('UnreleasedBusinessLiensin')));
 	  // IF(DebugMode,     OUTPUT(CHOOSEN(liensPartyDEBTORS, 100),  NAMED('liensPartyDEBTORSout')));
     // IF(DebugMode,     OUTPUT(CHOOSEN(SortLiensWithDEBTORS, 100),  NAMED('SortLiensWithDEBTORSout')));
 	  // IF(DebugMode,     OUTPUT(CHOOSEN(DedupLiensWithDEBTORS, 100),  NAMED('DedupLiensWithDEBTORSout')));

@@ -103,6 +103,9 @@ EXPORT Healthcare_SocioEconomic_Functions_V3 := Module
 								clnState = 'WY' => 50,
 								clnState = 'DC' => 51,
 								clnState = 'PR' => 52,
+								clnState = 'AA' => 53,
+								clnState = 'AE' => 53,
+								clnState = 'AP' => 53,
 								clnState = 'AS' => 53,
 								clnState = 'FM' => 53,
 								clnState = 'GS' => 53,
@@ -114,9 +117,6 @@ EXPORT Healthcare_SocioEconomic_Functions_V3 := Module
 								clnState = 'RN' => 54,
 								clnState = 'RR' => 55,
 								clnState = 'EE' => 56,
-								clnState = 'AA' => 53,
-								clnState = 'AE' => 53,
-								clnState = 'AP' => 53,
 								0);
 	end;
 	export crosswalkAddrRecentEconTrajectory(String inVal) := function
@@ -302,6 +302,9 @@ EXPORT Healthcare_SocioEconomic_Functions_V3 := Module
 								clnState = 'WY' => 50,
 								clnState = 'DC' => 51,
 								clnState = 'PR' => 52,
+								clnState = 'AA' => 53,
+								clnState = 'AE' => 53,
+								clnState = 'AP' => 53,
 								clnState = 'AS' => 53,
 								clnState = 'FM' => 53,
 								clnState = 'GS' => 53,
@@ -313,9 +316,6 @@ EXPORT Healthcare_SocioEconomic_Functions_V3 := Module
 								clnState = 'RN' => 54,
 								clnState = 'RR' => 55,
 								clnState = 'EE' => 56,
-								clnState = 'AA' => 53,
-								clnState = 'AE' => 53,
-								clnState = 'AP' => 53,
 								0);
 	end;
 	export CrosswalkStatusMostRecent(String inVal) := function

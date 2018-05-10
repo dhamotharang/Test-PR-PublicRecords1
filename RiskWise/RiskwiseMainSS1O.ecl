@@ -42,7 +42,9 @@
 	<part name="ccexpdate" type="xsd:string"/>
 	<part name="buysellid" type="xsd:string"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 
+	<part name="GLBPurpose" type="xsd:byte"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -104,6 +106,8 @@ export RiskwiseMainSS1O := macro
 	'buysellid',
 	'DPPAPurpose',
 	'GLBPurpose', 
+  'OFACversion',
+  'gateways',
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
@@ -179,12 +183,25 @@ unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean isUtility := false;
 boolean ln_branded := false;
 boolean ofac_only := true;
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean suppressNearDups := true;
 boolean require2Ele := true;
-gateways := Gateway.Constants.void_gateway;
+gateways_in := Gateway.Configuration.Get();
 
 tribcode := StringLib.StringToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['ss02'];
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version = 4 and tribcode = 'fds7' and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version = 4 and tribcode = 'fds7' and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
+include_ofac := if(ofac_version = 1, false, true);
+global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 
 d := dataset([{0}],RiskWise.Layout_SS1I);
 
@@ -236,7 +253,8 @@ end;
 f := project(d, addseq(LEFT,COUNTER));
 
 ret := if(tribcode in ['ss02', 'fdsl', 'fds7'], 
-RiskWise.SS1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose,DataRestriction:=datarestriction,DataPermission:=DataPermission), 
+RiskWise.SS1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose,DataRestriction:=datarestriction,DataPermission:=DataPermission, ofac_version := ofac_version, include_ofac := include_ofac, 
+                       global_watchlist_threshold := global_watchlist_threshold), 
 																   dataset([{account_value}], riskwise.Layout_SS1O));
 
 //Log to Deltabase

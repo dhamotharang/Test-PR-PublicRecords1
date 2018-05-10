@@ -226,6 +226,8 @@ export t_RiskView2LiensJudgmentsReportOptions := record
 	boolean ExcludeJudgments {xpath('ExcludeJudgments')};
 	boolean ExcludeEvictions {xpath('ExcludeEvictions')};
 	boolean IncludeBureauRecs {xpath('IncludeBureauRecs')};
+	boolean GeneratePDF {xpath('GeneratePDF')};
+	integer ReportingPeriod {xpath('ReportingPeriod')};
 end;
 		
 export t_RiskView2Options := record (iesp.share.t_BaseOption)
@@ -286,6 +288,7 @@ end;
 export t_RiskView2LiensJudgmentsReportForLien := record
 	string30 Seq {xpath('Seq')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+ string2 LienTypeID {xpath('LienTypeID')};
 	string50 LienType {xpath('LienType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
@@ -302,6 +305,7 @@ end;
 export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string30 Seq {xpath('Seq')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+ string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string50 JudgmentType {xpath('JudgmentType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};

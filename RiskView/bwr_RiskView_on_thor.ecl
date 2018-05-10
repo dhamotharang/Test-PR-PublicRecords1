@@ -57,7 +57,8 @@ STRING50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission;
 STRING strFFDOptionsMask_in	 :=  '1';
 BOOLEAN IncludeLnJ := TRUE;
 BOOLEAN IncludeRecordsWithSSN := FALSE;
-BOOLEAN IncludeBureauRecs := FALSE;
+BOOLEAN IncludeBureauRecs := FALSE; 
+integer2 ReportingPeriod := 84; // 84 is default (acceptable values 1-84 months)
 BOOLEAN ExcludeCityTaxLiens := FALSE;
 BOOLEAN ExcludeCountyTaxLiens := FALSE;
 BOOLEAN ExcludeStateTaxWarrants := FALSE;
@@ -66,6 +67,7 @@ BOOLEAN ExcludeFederalTaxLiens := FALSE;
 BOOLEAN ExcludeOtherLiens := FALSE;
 BOOLEAN ExcludeJudgments := FALSE;
 BOOLEAN ExcludeEvictions := FALSE;
+BOOLEAN exception_score_reason := FALSE;
 
 inlayout := RECORD
   unsigned4 seq;
@@ -270,8 +272,10 @@ Search_Results := riskview.Search_Function(valid_inputs,
 	SecurityCode,
 	IncludeRecordsWithSSN,
 	IncludeBureauRecs,
+ ReportingPeriod, // xNJJx
 	IncludeLnJ,
 	RetainInputDID,
+  exception_score_reason,
 	onThor
 	);
 

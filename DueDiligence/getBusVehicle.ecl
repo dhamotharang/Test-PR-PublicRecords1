@@ -202,21 +202,21 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																			                   UpdateBusnVehicleForAttributeLogic); 
 	
 																				
- IF(DebugMode,     OUTPUT(CHOOSEN(VehicleRaw, 100),                       NAMED('Step1VehicleRaw')));
- IF(DebugMode,     OUTPUT(COUNT  (VehicleRaw),                            NAMED('Step1')));
+ // IF(DebugMode,     OUTPUT(CHOOSEN(VehicleRaw, 10),                        NAMED('Step1VehicleRaw')));
+ // IF(DebugMode,     OUTPUT(COUNT  (VehicleRaw),                            NAMED('Step1')));
  
- IF(DebugMode,     OUTPUT(CHOOSEN(VehiclesSelectedForThisBusiness, 100),  NAMED('Step2VehiclesSelectedForThisBusiness')));
- IF(DebugMode,     OUTPUT(COUNT  (VehiclesSelectedForThisBusiness),       NAMED('Step2')));
+ // IF(DebugMode,     OUTPUT(CHOOSEN(VehiclesSelectedForThisBusiness, 10),  NAMED('Step2VehiclesSelectedForThisBusiness')));
+ // IF(DebugMode,     OUTPUT(COUNT  (VehiclesSelectedForThisBusiness),       NAMED('Step2')));
  
  
- IF(DebugMode,     OUTPUT(CHOOSEN(VehicleSlim, 100),                      NAMED('Step3VehicleDetails')));  
- IF(DebugMode,     OUTPUT(COUNT  (VehicleSlim),                           NAMED('Step3')));
+ // IF(DebugMode,     OUTPUT(CHOOSEN(VehicleSlim, 10),                      NAMED('Step3VehicleDetails')));  
+ // IF(DebugMode,     OUTPUT(COUNT  (VehicleSlim),                           NAMED('Step3')));
  
- IF(DebugMode,     OUTPUT(CHOOSEN(Vehicles_sorted, 200),                  NAMED('Step4VehicleSorted')));  
- IF(DebugMode,     OUTPUT(COUNT  (Vehicles_sorted),                       NAMED('Step4')));
+ // IF(DebugMode,     OUTPUT(CHOOSEN(Vehicles_sorted, 20),                  NAMED('Step4VehicleSorted')));  
+ // IF(DebugMode,     OUTPUT(COUNT  (Vehicles_sorted),                       NAMED('Step4')));
  
- IF(DebugMode,     OUTPUT(CHOOSEN(BusVehicleUnique, 100),                 NAMED('Step5VehicleUnique')));  
- IF(DebugMode,     OUTPUT(COUNT  (BusVehicleUnique),                      NAMED('Step5')));
+ // IF(DebugMode,     OUTPUT(CHOOSEN(BusVehicleUnique, 20),                 NAMED('Step5VehicleUnique')));  
+ // IF(DebugMode,     OUTPUT(COUNT  (BusVehicleUnique),                      NAMED('Step5')));
  
  IF(DebugMode,      OUTPUT(SummaryCurrentVehicle,                         NAMED('Step6SummaryVehicle')));   
    

@@ -68,7 +68,11 @@ EXPORT Functions := MODULE
 													FraudGovPlatform_Services.IParam.BatchParams batch_params,
 													DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payload) := FUNCTION
 
-		contributionType_recs_norm := FraudShared_Services.Functions.getFragmentMatchTypes(ds_batch_in, ds_payload, batch_params);
+		//Following project is necessary to transform "ds_batch_in" to "BatchInExtended_rec" , which is actually used by Search service and is new input 
+		//layout sent to FraudGovPlatform_Services.Raw_Records
+		ds_batch_in_extended := PROJECT(ds_batch_in, FraudShared_Services.Layouts.BatchInExtended_rec);
+
+		contributionType_recs_norm := FraudShared_Services.Functions.getFragmentMatchTypes(ds_batch_in_extended, ds_payload, batch_params);
 
 		rules := FraudShared_Services.Functions.GetVelocityRules(batch_params);
 

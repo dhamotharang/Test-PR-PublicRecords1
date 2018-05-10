@@ -18,10 +18,11 @@ MODULE
   SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
 
   dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
-																								
+	
+	 useADL := vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
+	
 	 SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
-	                   IF(vPhoneBlank, PhoneFinder_Services.GetDIDs(dProcessInput, true), 
-										                          PhoneFinder_Services.GetDIDs(dProcessInput)));						
+	                    PhoneFinder_Services.GetDIDs(dProcessInput, useADL));						
 	
 																					
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
@@ -85,7 +86,7 @@ MODULE
 	ds_in_accu := IF(IsPhoneRiskAssessment,
 	                 PROJECT(DEDUP(SORT(dSearchRecs, acctno), acctno),
 									 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
-									 PROJECT(DEDUP(SORT(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
+									 PROJECT(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
   AccuDataGateway := IF(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
@@ -136,6 +137,9 @@ MODULE
 		  // filtering out inhouse phonmetadata records 
     dFilteringInHousePhoneData_typeflag := 	IF(inMod.UseInHousePhoneMetadata, PROJECT(dSearchRecs_pre, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, 
 		                                                            SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
+																																                              SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
+																																                                                       0, LEFT.phone_source),
+																																
 																																    SELf := LEFT)),dSearchRecs_pre);
 
    	 // Counting royalties before filtering recs - RQ 13804

@@ -2,7 +2,9 @@
  
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
-		 boolean IncludeLnJ = false) := function
+		 boolean IncludeLnJ = false,
+   integer2 ReportingPeriod = 84 
+     ) := function
 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	// if the bsOption is turned on to remove liens, use the w_bankruptcy data prior to the liens joins
@@ -16,7 +18,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 	FilterJudgments := (BSOptions & risk_indicators.iid_constants.BSOptions.Judgment) > 0;
 	FilterEvictions := (BSOptions & risk_indicators.iid_constants.BSOptions.Eviction) > 0;
 	FilterSSNs := (BSOptions & risk_indicators.iid_constants.BSOptions.SSNLienFtlr) > 0;
-	FilterBcb := (BSOptions & risk_indicators.iid_constants.BSOptions.BCBLienFtlr) > 0;
+	FilterBcb := (BSOptions & risk_indicators.iid_constants.BSOptions.BCBLienFtlr) > 0; 
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ add_liens(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, liensv2.key_liens_did_FCRA ri) :=
 	TRANSFORM
@@ -41,7 +43,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		self.name_type := ri.name_type;
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
-		SELF.VendorDateLastSeen := ri.date_vendor_last_reported;
+		//SELF.VendorDateLastSeen := ri.date_vendor_last_reported; // filling in main instead
 		SELF := le;
 		SELF := [];
 
@@ -57,7 +59,9 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							right.name_type='D' and							
+							// make sure date_first_seen is within ReportingPeriod months of the historydate 
+       //ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       right.name_type='D' and							
 							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
 							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
@@ -69,6 +73,12 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
 		releasedDate := (string) le.date_last_seen;
 		OrigDateFiled := (string) le.date_first_seen;
+    
+  
+  SELF.VendorDateLastSeen := ri.collection_date;
+  // SELF.VendorDateLastSeen := '20180215';
+  //self.filing_type_id := 'ZZ';
+    
 		SELF.date_first_seen := (unsigned) OrigDateFiled;
 		SELF.date_last_seen :=(unsigned)  releasedDate;
 		myGetDate := iid_constants.myGetDate(le.historydate);
@@ -395,7 +405,8 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 			-(integer) ProcessDate), 
 			did, filingNumber, Agencystate, AgencyCounty);	
 
-	liens_filtered_DF_ := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
+	liens_filtered_DF_date := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
+ liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart(((string) date_first_seen)[1..6],(string)iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
 
 	//drop off the DF date
 	liens_filtered_DF := project(liens_filtered_DF_, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
@@ -407,10 +418,13 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							(left.lnj_jgmt_cnt >= 1 or left.lnj_eviction_count >= 1 ) and 
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-//							FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type ='C'
+       // make sure date_first_seen is within ReportingPeriod months of the historydate 
+       //ut.monthsapart(right.date_first_seen[1..6],(string)iid_constants.myGetDate(left.historydate)[1..6]) <= ReportingPeriod and
+       //							FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type ='C'
 							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
 							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
-							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
+							right.name_type= 'C' and
+       if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							TRANSFORM(Risk_Indicators.Layouts_Derog_Info.plaintiff_rec,
 								SELF.Plaintiff := if((left.lnj_jgmt_cnt>=1 or left.lnj_eviction_count >= 1) and right.name_type='C', 
 								if(RIGHT.cname !='', 
@@ -418,11 +432,12 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 									Risk_Indicators.iid_constants.CreateFullName(RIGHT.title, RIGHT.fname, RIGHT.mname, RIGHT.lname, RIGHT.name_suffix)),
 								''); 
 							SELF.name_type := RIGHT.name_type;
+        self.datelastseen :=  right.date_last_seen;     
 							SELF := LEFT), 
 							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
 							riskwise.max_atmost));
  
-	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type), TMSID, RMSID, name_type, KEEP(1));
+	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, DateLastSeen), TMSID, RMSID, name_type, KEEP(1));
 	liens_fuller := JOIN(liens_filtered_DF, liensWplainTiff_duped,
 		LEFT.Tmsid = RIGHT.Tmsid and LEFT.rmsid = RIGHT.rmsid and LEFT.Did = RIGHT.did,
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
@@ -642,6 +657,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 	//Liens section of PR
 	Risk_Indicators.Layouts_Derog_Info.Liens GetLienSeq(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, integer c) := transform
 		self.seq := (string) c;
+    self.lientypeid := le.filing_type_id;
 		self.LienType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
 		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
@@ -676,6 +692,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 //Judgments
 	Risk_Indicators.Layouts_Derog_Info.Judgments GetJdgSeq(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, integer c) := transform
 		self.seq := (string) c;
+    self.judgmenttypeid := le.filing_type_id;
 		self.JudgmentType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
 		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
@@ -740,15 +757,16 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 	// output(liensJudgments, named('liensJudgments'));
 	// output(liens_added, named('liens_added'));
 	// output(liens_party_raw, named('liens_party_raw'));
-	// OUTPUT(liens_main_raw, named('liens_main_raw'));
+	// OUTPUT(liens_main_raw, named('liens_main_raw_hist'));
+	// OUTPUT(liensWplainTiff, named('liensWplainTiff_hist'));
 	// output(liens_full, named('liens_full'));
 	// output(liens_rolled_original, named('liens_rolled_original'));
 	// output(final_liens, named('final_liens'));
 	// output(SrtedLiens, named('SrtedLiens'));
 	// output(SrtedJudgments, named('SrtedJudgments'));
 	// output(w_Liens, named('w_Liens'));
-	// output(w_LiensNJudgments, named('w_LiensNJudgments'));
-	// output(liens_formatted, named('liens_formatted'));
+	 //output(w_LiensNJudgments, named('w_LiensNJudgments'));
+	 //output(liens_formatted, named('liens_formatted'));
 	// output(w_Liens_rolled, named('w_Liens_rolled'));
 	// output(w_Liens_Jdg_rolled);
 	// output(w_Judgments, named('w_Judgments'));
@@ -766,6 +784,9 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
   // output(FilterJudgments,   named('FilterJudgments'));   
   // output(FilterEvictions,   named('FilterEvictions'));     		
 	// output(liensWithDesc, named('liensWithDesc'));
+ //output(liens_filtered_DF_date, named('H_liens_filtered_DF_date'));
+ //output(liens_filtered_DF_, named('H_liens_filtered_DF_'));  
+  
 return SORT(w_LiensNJudgmentsFinal,seq);	
 
  END;

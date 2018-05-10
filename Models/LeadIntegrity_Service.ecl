@@ -5,6 +5,8 @@
   <part name="DataPermissionMask" type="xsd:string"/>
   <part name="DisableDoNotMailMask" type="xsd:boolean"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 </message>
 */
 /*--INFO-- Lead Integrity Service -- ITA Attributes via ESDL*/
@@ -164,10 +166,21 @@ EXPORT LeadIntegrity_Service := MACRO
 	UNSIGNED3 historyDate := if(TRIM(date_in) <> '', (INTEGER)date_in, 999999); 
 	
 	UNSIGNED6 did_value := (UNSIGNED6)search.UniqueId;
-	gateways := Gateway.Constants.void_gateway;
 	
 	BOOLEAN DisableDNMMask_stored := FALSE : STORED('DisableDoNotMailMask');
 	BOOLEAN DisableDNMMask := DisableDNMMask_stored OR option.DisableDoNotMailFilter;
+  unsigned1 ofac_version      := 1        : stored('OFACVersion');
+  
+  gateways_in := Gateway.Configuration.Get();
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
+	self.url := if(ofac_version = 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 /* ***************************************
 	 *           Set User Values:          *

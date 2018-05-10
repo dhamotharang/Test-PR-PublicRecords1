@@ -68,11 +68,12 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			BOOLEAN   Prepaid 					:= MAX(GROUP, (integer) sortedPorts.prepaid) > 0;
 			UNSIGNED4 dt_last_reported	:= MAX(GROUP, sortedPorts.dt_last_reported);
 			BOOLEAN 	is_deact 					:= MAX(GROUP,sortedPorts.is_deact)='Y';
+			BOOLEAN 	is_react 					:= MAX(GROUP,sortedPorts.is_react)='Y';
 			UNSIGNED1 serviceType					:= MAX(GROUP, (integer) sortedPorts.serv);
 		
   END;	
-	dPorts:= UNGROUP(TABLE(sortedPorts(source <> MDR.sourceTools.src_Phones_Disconnect),portedRec));		
-	dDisconnects:= UNGROUP(TABLE(sortedPorts(source=MDR.sourceTools.src_Phones_Disconnect),portedRec));		
+	dPorts:= UNGROUP(TABLE(sortedPorts(source NOT IN [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_Gong_History_Disconnect]),portedRec));		
+	dDisconnects:= UNGROUP(TABLE(sortedPorts(source IN [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_Gong_History_Disconnect]),portedRec));		
   dPortedInfo   := dPorts+ dDisconnects;
 	
   Porting_layout := RECORD
@@ -99,6 +100,7 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.ActivationDate 	 := MAX(l.ActivationDate,r.ActivationDate);	
 			SELF.DisconnectDate 	 := MAX(l.DisconnectDate,r.DisconnectDate);																				
 			SELF.is_deact		 			 := MAX(l.is_deact,r.is_deact);
+			SELF.is_react		 			 := MAX(l.is_react,r.is_react);
 			SELF.serviceType		 	 := IF(mostCurrent,l.serviceType,r.serviceType);
 			SELF.Prepaid				 	 := IF(mostCurrent,l.Prepaid,r.Prepaid);
 			SELF.NoContractCarrier := IF(mostCurrent,l.NoContractCarrier,r.NoContractCarrier);
@@ -124,7 +126,12 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.LastPortedDate  := IF(displayAll,r.LastPortedDate,l.LastPortedDate);
 			SELF.NoContractCarrier  := IF(displayAll,r.NoContractCarrier,l.NoContractCarrier);
 			SELF.Prepaid				 := IF(displayAll,r.Prepaid,l.Prepaid);
-			Phone_Status         := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)l.RealTimePhone_Ext.StatusCode);
+			Phone_Status_Qsent   := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)l.RealTimePhone_Ext.StatusCode);
+			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
+		                             ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active,
+			                            PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
+			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, Phone_Status_Qsent); // flag to use inhouse phone metatdata instead of Qsent PVS
+			SELF.PhoneStatus     :=  Phone_Status;
 			SELF.ActivationDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
 			SELF.DisconnectDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);
 			// Override TU data to use LIBD and Port data when available
@@ -162,7 +169,7 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 		   OUTPUT(dPortedRolled,NAMED('dPortedRolled'));												
 	    OUTPUT(dphonemetadataWPorting,NAMED('dphonemetadataWPorting'));															
 	#END;
-	
+
 	RETURN dPhoneMetadataWPorting;
 	
 END;

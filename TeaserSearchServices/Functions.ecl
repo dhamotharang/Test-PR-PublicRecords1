@@ -1,4 +1,4 @@
-import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list;
+﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list;
 
 export Functions := MODULE
 	
@@ -593,5 +593,74 @@ export Functions := MODULE
 		 // output(sort_recs_WithEmail, named('sort_recs_WithEmail'));						
 		RETURN sort_recs_WithEmail;
 	end;
+	export getCounts(dataset(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord) inrecs,
+							integer IncludeCounts,
+							string32 application_Type_value) := FUNCTION
+									 
+   dsLookups := JOIN(inrecs, doxie.key_D2C_lookup(),
+              (unsigned6) LEFT.UNIQUEID =  RIGHT.DID,							   							  					  
+								 TRANSFORM(recordOf(right),
+								 self := RIGHT;
+								 ),limit(0), keep(1)
+								 );		
+								 
+   dsLookupsIndexed := NORMALIZE(dsLookups,count(TeaserSearchServices.Constants.Category),
+                            TRANSFORM({unsigned6 didValue;
+														 iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedPersonCount; 
+														 integer categoryIndex},
+														   self.Didvalue := LEFT.did;
+														   self.Category := TeaserSearchServices.Constants.Category[counter].categoryString;																				 
+													     self.Count  := choose(Counter
+													                   ,LEFT.Addresses_cnt
+															          ,LEFT.PhonesPlus_cnt
+															          ,LEFT.Email_cnt
+																	,LEFT.Education_Student_cnt
+																	,LEFT.Possible_Relatives_and_Associates_cnt
+																	,LEFT.Possible_Properties_owned_cnt
+																      ,LEFT.Criminal_Records_cnt
+																	,LEFT.Sexual_Offenses_cnt
+																	,LEFT.Liens_and_Judgements_cnt
+																	,LEFT.Bankruptcies_cnt
+																	,LEFT.Marriage_and_Divorce_cnt
+																	,LEFT.Professional_Licenses_cnt
+																	,LEFT.People_at_Work_possible_employment_records_cnt
+																	,LEFT.Businesses_records_cnt
+																	,LEFT.Corporate_affiliations_cnt
+																	,LEFT.UCC_cnt
+																	,LEFT.Hunting_and_Fishing_Permits_cnt
+																	,LEFT.Concealed_Weapon_Permits_cnt
+																	,LEFT.Firearms_and_Explosives_cnt
+																	,LEFT.FAA_Aircraft_cnt
+																	,LEFT.FAA_Pilot_cnt 
+																);																											
+															self.categoryIndex := counter;
+															self.exists := '';
+														 ));
+													 														 																		
+  outrecs := project(inRecs, 
+           transform(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord,
+					 uniqueID := left.UniqueID;
+			     self.uniqueID := left.UniqueId;
+      			                             																												   
+										CountSet := dsLookupsIndexed(didvalue = (unsigned6) UniqueID);
+										self.personCounts := choosen( 
+										   if (IncludeCounts > 1,
+										     project(countSet,                                       											 
+													 TRANSFORM(IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedPersonCount,																							 													  
+														 SELF.category  := Countset(categoryIndex = counter)[1].Category;
+														 SELF.count := if (includeCounts = 3, countset(categoryIndex = counter)[1].Count, 0);
+														 self.exists := if (includeCounts = 2 and countset(categoryIndex = counter)[1].Count > 0, 'Y','');
+													)),												  
+													dataset([], IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedPersonCount)
+											)
+										, iesp.Constants.ThinRpsExt.MaxCountPersonCounts); // MAXCOUNT FOR CHOOSEN
+										self := Left;
+										));								   									 									 
+                 // output(inrecs, named('inRecs'));		
+			 // output(dsLookups, named('dsLookups'));												 
+			 // output(dsLookupsIndexed, named('dsLookupsIndexed'));		       												 
+                // output(outrecs, named('outrecs'));
+			 RETURN(outrecs);														
+    end;														
 	
 end;

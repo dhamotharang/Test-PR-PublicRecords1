@@ -8,7 +8,7 @@ MODULE
 	EXPORT UNSIGNED1 MaxGatewayMatches   := 100;
 	EXPORT UNSIGNED1 MaxTUGatewayResults := 30;
 	EXPORT UNSIGNED1 MaxPhoneMatches     := 10;
-	EXPORT UNSIGNED1 MaxRoyalties        := 9; // zumigo royalty
+	EXPORT UNSIGNED1 MaxRoyalties        := 10; // ATT_LIBD
 	EXPORT INTEGER   MaxOtherPhones      := 5; // MaxOtherPhones default
 	
 	
@@ -24,6 +24,7 @@ MODULE
 	EXPORT UNSIGNED1 gatewayTimeout			 	 := 2;  
 	EXPORT UNSIGNED1 gatewayRetries			 	 := 0;  
 	EXPORT UNSIGNED1 NoPenalty           := 0;
+	EXPORT UNSIGNED1 LIBD_LastActivityThreshold           := 60;
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3);
@@ -58,6 +59,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		MODULE
 			EXPORT Inactive := 'INACTIVE';
 			EXPORT Active 	:= 'ACTIVE';
+			EXPORT NotAvailable 	:= 'NOT AVAILABLE';
 		END;
 	
 	// Listing types

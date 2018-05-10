@@ -1,7 +1,6 @@
 EXPORT Healthcare_Constants_V2 := MODULE
-
-	export default_DPPA := 0;
-	export default_GLBA := 6;
+	export authorized_DPPA := 0;
+	export authorized_GLBA := 6;
 	export default_DataRestriction := '000000000000010000000000000000'; 
 	export default_DataPermission := '000000000000000000000000000000';  
 	export default_LeadIntegrity_Version := 4;

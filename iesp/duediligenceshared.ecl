@@ -6,6 +6,11 @@ import iesp;
 
 export duediligenceshared := MODULE
 			
+export t_DDRPersonNameWithLexID := record
+	iesp.share.t_Name name {xpath('name')};
+	string LexID {xpath('LexID')};
+end;
+		
 export t_DDRYearMakeModel := record
 	string4 Year {xpath('Year')};
 	string Make {xpath('Make')};
@@ -154,9 +159,23 @@ export t_DDRLegalEventCriminal := record
 	string15 EyeColor {xpath('EyeColor')};
 	string3 Height {xpath('Height')};
 	string3 Weight {xpath('Weight')};
+	string10 FederalOrState {xpath('FederalOrState')};
+	string CaseType {xpath('CaseType')};
+	string ArrestLevel {xpath('ArrestLevel')};
+	string Agency {xpath('Agency')};
+	string30 Race {xpath('Race')};
+	string2 OffenseState {xpath('OffenseState')};
+	string30 OffenseCounty {xpath('OffenseCounty')};
+	string40 OffenseCity {xpath('OffenseCity')};
+	boolean TrafficRelatedOffense {xpath('TrafficRelatedOffense')};
 end;
 		
 export t_DDRLegalSummary := record
+	integer2 NumberOfFelonyArrests {xpath('NumberOfFelonyArrests')};
+	integer2 NumberOfMisdemeanorArrests {xpath('NumberOfMisdemeanorArrests')};
+	integer2 NumberOfTrafficArrests {xpath('NumberOfTrafficArrests')};
+	integer2 NumberOfInfractionArrests {xpath('NumberOfInfractionArrests')};
+	integer2 NumberOfUnknownArrests {xpath('NumberOfUnknownArrests')};
 	integer2 NumberOfFelonyConvictions {xpath('NumberOfFelonyConvictions')};
 	integer2 NumberOfFelonyNonConvictions {xpath('NumberOfFelonyNonConvictions')};
 	integer2 NumberOfMisdemeanorConvictions {xpath('NumberOfMisdemeanorConvictions')};

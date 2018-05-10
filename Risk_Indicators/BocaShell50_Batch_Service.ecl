@@ -1,10 +1,12 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BocaShell50_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
 	<part name="GLBPurpose" type="xsd:byte"/> 
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/> 
 	<part name="RetainInputDID" type="xsd:boolean"/>
 </message>
 */
@@ -57,6 +59,7 @@ export BocaShell50_Batch_Service := MACRO
 	string DataRestriction := '000000000000000' : stored('DataRestrictionMask');
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	boolean RetainInputDID := true : stored('RetainInputDID');
+  unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 
 	// first query to get rid of the historydateYYYYMM and switch over to string20 timestamp
 	batch_in50 := record
@@ -67,7 +70,14 @@ export BocaShell50_Batch_Service := MACRO
 	
 	batch_in       := dataset([],batch_in50) : STORED('batch_in',few);
 	// gateways       := dataset([],Risk_Indicators.Layout_Gateways_In);// : STORED('gateways',few);
-	gateways := Gateway.Constants.void_gateway;
+	gateways_in := Gateway.Configuration.Get();
+  
+  Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.url, ''); 	
+  self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
 
 	/* IID & Boca Shell Values */
 	isUtility           := false;
@@ -84,16 +94,18 @@ export BocaShell50_Batch_Service := MACRO
 	from_biid           := false;
 	excludeWatchlists   := false;
 	from_IT1O           := false;
-	ofac_version        := 1;
-	include_ofac        := false;
+	ofac_version        := ofac_version_;
+	include_ofac        := if(ofac_version = 1, false, true);
 	addtl_watchlists    := false;
-	watchlist_threshold := 0.84;
+	watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 	dob_radius          := -1;
 	doScore             := true;
 	nugen               := true;
 	include_DL_verification := true;
 	unsigned1 AppendBest := 1;		// search best file
 	unsigned3 LastSeenThreshold := risk_indicators.iid_constants.max_unsigned3;
+  
+if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	unsigned8 BSOptions := risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity +
 		if(RetainInputDID, risk_indicators.iid_constants.BSOptions.RetainInputDID, 0) +
