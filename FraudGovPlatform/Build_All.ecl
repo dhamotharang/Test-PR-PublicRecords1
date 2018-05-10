@@ -26,9 +26,6 @@ module
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
 			Create_Supers
-			,FraudShared.SprayMBSFiles(pversion := pVersion[1..8],
-													pGroupName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30'), 
-													pDirectory := FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase)
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
@@ -71,14 +68,12 @@ module
 	
 	export full_build := sequential(
 		 base_portion
-		,if(PSkipIdentityDataBase, output('keys_portion skipped')
+		,if(PSkipKeysPortion, output('keys_portion skipped')
 				,keys_portion)
 		// Promote Contributory Files	
 		,Promote().buildfiles.Built2QA
 		// Promote Shared Files
-		,FraudShared.Promote().Inputfiles.Sprayed2Using
 		,FraudShared.Promote().buildfiles.Built2QA			
-		,FraudShared.Promote().Inputfiles.Using2Used
 		// Clean Up Shared Files	
 		,FraudShared.Promote().buildfiles.cleanup		
 	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
