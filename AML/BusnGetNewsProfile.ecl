@@ -1,4 +1,4 @@
-Import UT, Gateway;
+﻿Import UT, Gateway;
 
 EXPORT BusnGetNewsProfile (DATASET(Layouts.AMLRiskProfileInput) indata, 
 													string UseXG5, 
@@ -31,9 +31,8 @@ END;
 
 PrepNewsProfile := project(indata, PrepBridger(left));
 
-BridgerSearch := IF(UseXG5 in ['2', '1'] ,AML.BSSXG5GatewayCall(PrepNewsProfile, gateways),
-													 AML.BSSXG4GatewayCall(PrepNewsProfile, gateways));
-													 
+BridgerSearch := AML.BSSXG5GatewayCall(PrepNewsProfile, gateways);
+
 CategoryRecord := RECORD
 	string fullname;
 	string notes;

@@ -63,11 +63,9 @@ EXPORT AML_Service := MACRO
 	// '0' - do not call XG5
 	// '1' - full XG5 response will be returned for AML report
 	// '2' - Call Bridger XG5 for KRIs but not full response
-	// '3' - Call Bridger XG4 for KRIs but not full response
 
-	//Do not want XG5 call yet, continue to call XG4. for future
-	// UseXG5 := if(length(gateways(trim(ServiceName, LEFT,RIGHT) = Gateway.Constants.ServiceName.bridgerxg5)) > 0,  '2', '3'); 
-	UseXG5 := '3'; 
+	// Always call Bridger XG5 for KRIs but not full response
+	UseXG5 := '2'; 
 		 
 						 
 	TestDataEnabled 				:= userIn.TestDataEnabled;

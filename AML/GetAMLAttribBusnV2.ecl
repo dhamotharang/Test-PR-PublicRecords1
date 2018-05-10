@@ -1,4 +1,4 @@
-import Business_Risk, Business_Header_SS, ut, Business_Header, did_add, RiskWise,
+﻿import Business_Risk, Business_Header_SS, ut, Business_Header, did_add, RiskWise,
 				Risk_indicators, doxie, Gateway;
 
 EXPORT GetAMLAttribBusnV2(DATASET(Business_Risk.Layout_Input) indata, 
@@ -30,7 +30,6 @@ dppa_ok := dppa > 0 and dppa < 8;
 
 UseXG5 := Map(UseXG5Flag = '1' 										=> '1',
 								~IncludeNews								  		=> '0',
-								UseXG5Flag = '3' and IncludeNews	=> '3',
 								UseXG5Flag = '2' and IncludeNews 	=> '2',							
 																										'0'); 
 									 
