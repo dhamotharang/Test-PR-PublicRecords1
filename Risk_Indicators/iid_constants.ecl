@@ -960,4 +960,7 @@ export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 
 export OFAC4_NoGateway := 'watchlist server error';  
 
+export fn_CreateFakeDID( STRING fname, STRING lname ) := 
+    (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
+
 end;
