@@ -2126,7 +2126,7 @@ module
 				self.phone								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.phone								);
 				self.company_phone				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.company_phone				);
 				self.did									:= if(filterbugLNK563, 0, l.did);
-				self.ssn									:= if(filterbugLNK563, 0, l.ssn);
+				self.ssn									:= if(filterbugLNK563, '', l.ssn);
 				self 											:= l;                                              
 			end;
 			
