@@ -1,4 +1,5 @@
-﻿EXPORT U_Key_Layouts_For_Checking := MODULE
+﻿
+EXPORT Key_Layouts_For_Checking := MODULE
 		EXPORT DIDKeyLay_i := RECORD
 		  unsigned6 l_did;
 		END;
