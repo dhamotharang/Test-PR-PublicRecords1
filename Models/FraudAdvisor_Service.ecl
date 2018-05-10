@@ -659,6 +659,7 @@ pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));
 
 //pick_attr := ungroup(attributes);			
 
+output(attributes[1].compromisedDL_hash, named('compromisedDL_hash'));
 
 
 checkBoolean(boolean x) := if(x, '1', '0');									
