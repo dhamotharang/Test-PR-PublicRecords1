@@ -1,4 +1,4 @@
-import _Control, Property;
+﻿import _Control, Property, Orbit3;
 
 #option('skipfileformatcrccheck',1);
 export Proc_Build_Forceclosure_all(string filedate) := function
@@ -13,8 +13,8 @@ doKeyBuild := Property.Foreclosure_Keys(filedate);
 doOrbitStat := Property.scrubs_foreclosure_raw(filedate);
 
 retval := sequential(doSpray
-										,doKeyBuild
 										,doOrbitStat
+										,doKeyBuild
 										); 
 
 return retval;
