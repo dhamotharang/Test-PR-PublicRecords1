@@ -18,7 +18,7 @@ export t_DDRSOSActions := record
 end;
 		
 export t_DDRBusinessNameWithLexID := record
-	string businessName {xpath('businessName')};
+	string BusinessName {xpath('BusinessName')};
 	string LexID {xpath('LexID')};
 end;
 		
@@ -178,7 +178,7 @@ end;
 		
 export t_DDRBusinessShellShelfCharacteristics := record
 	boolean IncorporatedInStateWithLooseIncorpLaws {xpath('IncorporatedInStateWithLooseIncorpLaws')};
-	string IncoporationState {xpath('IncoporationState')};
+	string IncorporationState {xpath('IncorporationState')};
 	string20 FEINReported {xpath('FEINReported')};
 	boolean BetterBusinessBureau {xpath('BetterBusinessBureau')};
 	boolean YellowPages {xpath('YellowPages')};

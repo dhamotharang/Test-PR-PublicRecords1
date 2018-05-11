@@ -109,7 +109,8 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																												SELF.companyFEIN          := RIGHT.company_fein;
                                                         SELF.maskedFEIN           := RIGHT.company_fein;
                                                         SELF.mask                 := DD_SSNMask; 
-																												SELF                      := RIGHT));
+																												SELF                      := RIGHT;
+                                                        SELF                      := [];));
    
   // ------                                                                                                   ------
   // ------ pass the input file and the name of the output file,                                              -----

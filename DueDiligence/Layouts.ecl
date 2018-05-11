@@ -122,16 +122,16 @@ EXPORT Layouts := MODULE
 		STRING10 PerGeographic_Flag;
 		STRING2 PerMobility;
 		STRING10 PerMobility_Flag;
-		STRING2 PerLegalCriminal;
-		STRING10 PerLegalCriminal_Flag;
+		STRING2 PerLegalStateCriminal;
+		STRING10 PerLegalStateCriminal_Flag;
+    STRING2 PerLegalFedCriminal;
+		STRING10 PerLegalFedCriminal_Flag;
 		STRING2 PerLegalCivil;
 		STRING10 PerLegalCivil_Flag;
 		STRING2 PerLegalTraffInfr;
 		STRING10 PerLegalTraffInfr_Flag;
 		STRING2 PerLegalTypes;
 		STRING10 PerLegalTypes_Flag;
-		STRING4 PerHighRiskNewsProfiles;
-		STRING10 PerHighRiskNewsProfiles_Flag;
 		STRING2 PerAgeRange;
 		STRING10 PerAgeRange_Flag;
 		STRING2 PerIdentityRisk;
@@ -352,71 +352,88 @@ EXPORT Layouts := MODULE
 	EXPORT CriminalOffenseLayout_by_DIDOffense  := RECORD
 		unsigned4	seq := 0;
 		UNSIGNED6 DID;
-		string60 	offender_key;               // offenders key
-		//unsigned6 origdid;
+		string60 	offender_key;      // offenders key
 		unsigned4 historydate;
 		unsigned4 ToDaysDate;   
 		UNSIGNED4 DateToUse; 
 		UNSIGNED3 NumOfDaysAgo;  
-		string8 	file_date;
-		string8   earliestOffenseDate;         // in order to calculate how old this date is I need to send we clean it before using it.
-		string8   untouchedearliestOffenseDate;  // if we need to show this in the report it should be the uncleaned date. 
-		/* data from the offender_risk_ key */    // A summary of offenses for this offender_key
-		/* data about the offense */ 
-		string1   dataType;                    // ***new 2 = Criminal court 
-		string1   convictionFlag;              // ***new
-		string1   trafficFlag;                 // ***new
-		string1   untouchedOffenseScore;
-		string1   offenseScore;                // values are 'U' or null = UNKOWN, 'M'= Misdemeanor, 'F'= Felony, 'T' = TRAFFIC, 'I'=Infraction.
-		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
-		string5   courtOffenseLevel;           // values are documented in a spreadsheet.  
-		string20  courtStatute;                // offenders risk key - offense.court_statute
-		string70  courtStatuteDesc;            // offenders risk key - offense.court_statute_desc
-		string35 	caseNum;                     // offenders risk key
-		string20  caseCourt;                   // offenders risk key
-		string20  caseTypeDesc;                // ***???
-		string20  courtType;                   // offenders risk key - source_file
-		string75  charge;                      // offenders risk key - offense.court_off_desc_1
-		string40  courtDispDesc1;              // offender_risk_ key
-		string40  courtDispDesc2;              // offender_risk_ key
-		string8   offenseDate;                 // offender_risk_ key
-		string8   arrestDate;                  // offender_risk_ key
-		string8   courtDispDate;               // offender_risk_ key
-		string8   sentenceDate;                // offender_risk_ key
-		string8   appealDate;                  // offender_risk_ key
-		string30  countyOfOrigin;              // offender_risk_ key
-		string50  origState;                   // offender_risk_ key
-		string30  stc_desc_2;                  // offenses key
-		string35  arr_off_lev_mapped;          // Court_Offenses key
-		string35  court_off_lev_mapped;        // Court_Offenses key
-		string3   num_of_counts;                // Court_offenses key
-		string1   punishment_type;             // punishment key
-    STRING    sent_probation;
-		/*  To determine whether any of these 3 condition are CURRENTLY TRUE - Use logic similar to the VOO function */
-		string1   Curr_incarc_offenders;        // pulled from key_ offenders
-		string1   Curr_incarc_offenses;         // pulled from key_ offenses
-		string1   Curr_incarc_punishments;      // pulled from key_ punishment
-		/*  To determine whether any of these 3 conditions were EVER TRUE - follow the code in getIndCriminal */
+    
+    //case details
+    string35 	caseNum;                     // Key_Offenders_Risk.case_num
+    string50  courtType;                   // Key_Offenders.datasource
+    string3   num_of_counts;               // Key_Offenses.num_of_counts
+    string75  charge;                      // Key_Offenders_Risk.offense.court_off_desc_1
+    string40  courtDispDesc1;              // Key_Offenders_Risk.offense.court_disp_desc_1
+		string40  courtDispDesc2;              // Key_Offenders_Risk.offense.court_disp_desc_2
+    
+    //offense details
+    STRING35  caseType;                    // Key_Offenders.case_type_desc
+    STRING35  arrestLevel;                 // Key_Court_Offenses.arr_off_lev_mapped 
+    string1   untouchedOffenseScore;
+    string1   offenseScore;                // values are 'U' or null = UNKOWN, 'M'= Misdemeanor, 'F'= Felony, 'T' = TRAFFIC, 'I'=Infraction.
+    string5   courtOffenseLevel;           // values are documented in a spreadsheet. 
+    
+    //offense locations
+    STRING25  offenseState;                // Key_Offenders_Risk.orig_state
+    STRING30  offenseCounty;               // Key_Offenders_Risk.county_of_origin
+    STRING    courtCounty;                 // Key_Offenses.court_county
+    STRING50  offenseCity;                 // Key_Offenses.offenseTown
+    STRING    agency;                      // Key_Court_Offenses.le_agency_desc
+           
+    //offense dates
+    string8   offenseDate;                 // Key_Offenders_Risk.offense.off_date
+		string8   arrestDate;                  // Key_Offenders_Risk.offense.arr_date
+    string8   courtDispDate;               // Key_Offenders_Risk.offense.court_disp_date
+    string8   sentenceDate;                // Key_Offenders_Risk.offense.sent_date
+		string8   appealDate;                  // Key_Offenders_Risk.offense.appeal_date
+    STRING8   incarcerationDate;
+    STRING8   incarcerationReleaseDate;
+    
+    //additional offense details
+    /*  To determine whether any of these 3 conditions were EVER TRUE - follow the code in getIndCriminal */
 		string1   Ever_incarc_offenders;       // pulled from key_ offenders
 		string1   Ever_incarc_offenses;        // pulled from key_ offenses
 		string1   Ever_incarc_punishments;     // pulled from key_ punishment
-		/*  To determine whether any of these conditions are CURRENTLY TRUE */ 
-    string1 	 curr_parole_flag;            // pulled from the offenders key
-    string1 	 curr_parole_punishments;     // pulled from the key_ punishment
-    string20  curr_stat_inm;               // pulled from the punishment key
-    /* data about the agency and offense */ 
-    string50  le_agency_desc;              // pulled from the Key_ Court_Offenses
-    string20  source_file;                 // pulled from the Key_ Offenders
-    string40  OffenseTown;                 // pulled from ???
-    string40  CourtCounty;                 // pulled from ???
-    /* data about the offender */
-    string2   citizenship;                 // pulled from Key_ Offenders
-    string30  race_desc;                   // pulled from Key_ Offenders
-    string7   sex;                         // pulled from Key_ Offenders
-    string15  hair_color_desc;             // pulled from Key_ Offenders
-    string15  eye_color_desc;              // pulled from Key_ Offenders
-    string3   height;                      // pulled from Key_ Offenders
-    string3   weight;                      // pulled from Key_ Offenders
+    /*  To determine whether any of these 3 condition are CURRENTLY TRUE - Use logic similar to the VOO function */
+		string1   Curr_incarc_offenders;        // Key_Offenses.curr_incar_flag
+		string1   Curr_incarc_offenses;         // Key_Offenses.stc_desc_2
+		string1   Curr_incarc_punishments;      // Key_Punishment.latest_adm_dt
+    STRING1   currentProbation;             // Key_Offenders.curr_prob_flag
+    STRING    probationSentence;            // Key_Court_Offenses.sent_probation
+    
+    //offender description/info
+    string30  race;                        // Key_Offenders_Risk.race_desc
+    string1   sex;                         // Key_Offenders_Risk.sex
+    string50  hairColor;                   // Key_Offenders_Risk.hair_color_desc
+    string15  eyeColor;                    // Key_Offenders_Risk.eye_color_desc
+    string3   height;                      // Key_Offenders_Risk.height
+    string3   weight;                      // Key_Offenders_Risk.weight
+    string2   citizenship;                 // Key_Offenders_Risk.citizenship
+    
+    //other details
+    UNSIGNED4 legalEventTypeCode;       // Code/Weight from RegularExpressions
+    STRING1   stateFederalData;            //Constant of S = State  or F = Federal
+    string8   earliestOffenseDate;         // in order to calculate how old this date is I need to send we clean it before using it.
+		string8   untouchedearliestOffenseDate;  // if we need to show this in the report it should be the uncleaned date.
+    string20  courtStatute;                // Key_Offenders_Risk.offense.court_statute
+		string70  courtStatuteDesc;            // Key_Offenders_Risk.offense.court_statute_desc
+    
+    string1 	curr_parole_flag;            // pulled from the offenders key
+    string1 	curr_parole_punishments;     // pulled from the key_ punishment
+    
+		
+    
+
+
+
+		string1   convictionFlag; 
+		string1   trafficFlag;
+		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
+		
+		string20  caseTypeDesc;                // ***???
+
+		string30  stc_desc_2;                  // offenses key  --- pulled but not used, except for verification
+		string35  court_off_lev_mapped;        // Court_Offenses key
 	 
 	END;
 	
@@ -663,6 +680,7 @@ EXPORT Layouts := MODULE
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
 		PerAttributes;
+    iesp.duediligencepersonreport.t_DDRPersonReport personReport;
 	END;
 
 

@@ -2,7 +2,7 @@
 
 EXPORT reportBusBestInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
 
-		projectESPBusInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.duediligencebusinessreport.t_DDRBusinessInformation, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
+		projectESPBusInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, iesp.duediligencebusinessreport.t_DDRBusinessInformation, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
 																										SELF.seq := LEFT.seq;
 																										SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
 																										SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;

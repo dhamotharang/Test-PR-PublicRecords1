@@ -344,7 +344,7 @@ EXPORT CommonBusiness := MODULE
 	
 	EXPORT getOperatingLocations(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 		
-		locations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, RECORDOF(RIGHT)},
+		locations := NORMALIZE(inquiredBus, LEFT.operatingLocations, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, RECORDOF(RIGHT)},
 																																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
@@ -363,7 +363,7 @@ EXPORT CommonBusiness := MODULE
 
 		 // Define a layout just for this FUNCTION                              //  
 		 ExecsChildRollUPLayout    := RECORD
-				DueDiligence.LayoutsInternal.InternalBIPIDsLayout;                           //*  This is the unique ID of the parent  
+				DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;                           //*  This is the unique ID of the parent  
 				DATASET(DueDiligence.Layouts.RelatedParty) ExecutiveInfo;
 		 END;														 
 
@@ -643,7 +643,8 @@ EXPORT CommonBusiness := MODULE
                                   SELF.firstReported := rs.dt_first_seen;
                                   SELF.lastReported  := rs.dt_last_seen;
                                   SELF := [];)]);
-         SELF := rs;;                                                
+         SELF := rs;
+         SELF := [];
      END;
      
      recentSrc := SORT(rollSrc, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dt_last_seen);
@@ -670,7 +671,7 @@ EXPORT CommonBusiness := MODULE
   
 	EXPORT GetMaxSources(inquiredBus, maxResults) := FUNCTIONMACRO
      
-     ListOfBusSources := NORMALIZE(inquiredBus, LEFT.bureauReporting + LEFT.sourcesReporting, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.BusSourceLayout},																												
+     ListOfBusSources := NORMALIZE(inquiredBus, LEFT.bureauReporting + LEFT.sourcesReporting, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.BusSourceLayout},																												
                                                                             SELF.seq := LEFT.seq;
                                                                             SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                             SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;

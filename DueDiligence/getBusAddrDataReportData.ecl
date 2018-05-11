@@ -49,7 +49,7 @@ EXPORT getBusAddrDataReportData := MODULE
     
     addOpLocVancancy := JOIN(initialOpLocations, operatingLocationData,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-                          TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
                                     SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
                                                                             SELF.vacant := RIGHT.vacant;
                                                                             SELF := LEFT;)]);
@@ -76,7 +76,7 @@ EXPORT getBusAddrDataReportData := MODULE
                           LEFT.predir = RIGHT.predir AND
                           LEFT.postdir = RIGHT.postdir AND
                           LEFT.sec_range = RIGHT.sec_range,
-                          TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
                                     SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
                                                                             SELF.cmra := RIGHT.cmrasiccode;
                                                                             SELF := LEFT;)]);

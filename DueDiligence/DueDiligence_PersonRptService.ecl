@@ -3,10 +3,10 @@
 
 EXPORT DueDiligence_PersonRptService := MACRO
 
-			requestName := 'DueDiligenceAttributesRequest';
-			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
+			requestName := 'DueDiligencePersonReportRequest';
+			requestLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportRequest;
 			
-			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
+			requestResponseLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportResponse;
 			
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
@@ -21,17 +21,17 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			
 
 		//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, includeReport, displayAttributeText, debugIndicator);
+			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, DD_SSNMask, includeReport, displayAttributeText, debugIndicator);
 		 
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
 			
 			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
-																																DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
+																																DueDiligence.Constants.STRING_TRUE, indIndex, indIndexHits, requestedVersion);
 
 
 			output(final, NAMED('Results')); //This is the customer facing output    
-
+	
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
 			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
 			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 

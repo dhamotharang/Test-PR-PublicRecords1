@@ -91,7 +91,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 
 
 	 BusOperLocChildDataset  := PROJECT(groupAddressOperLocGeoRisk,  //Using this input dataset - these addresses have the geo risk populated  
-                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
+                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessAddressRisk) BusOperLocRiskChild}, //format the data according to this layout.
                                                 SELF.BusOperLocRiskChild   := PROJECT(LEFT, FormatTheListOfOperLoc(LEFT, COUNTER));
                                                 SELF := LEFT;)); 
 				       

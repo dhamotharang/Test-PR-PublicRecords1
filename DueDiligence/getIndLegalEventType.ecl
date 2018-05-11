@@ -1,10 +1,10 @@
 ﻿IMPORT BIPv2, DueDiligence;
 
 EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) inData) := FUNCTION
-																	
+															
 		offenses := DueDiligence.Common.getRelatedPartyOffenses(inData);
 		
-    eventTypes := PROJECT(offenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, BOOLEAN hitLevel9, BOOLEAN hitLevel8, BOOLEAN hitLevel7, 
+    eventTypes := PROJECT(offenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, BOOLEAN hitLevel9, BOOLEAN hitLevel8, BOOLEAN hitLevel7, 
 																															BOOLEAN hitLevel6, BOOLEAN hitLevel5, BOOLEAN hitLevel4, BOOLEAN hitLevel3, BOOLEAN hitLevel2},
 																																															
 																								expression := DueDiligence.RegularExpressions(LEFT.offense.charge, LEFT.offense.offenseScore);
@@ -13,21 +13,16 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 																																expression.foundLaundering OR
 																																expression.foundOrganizedCrime OR
 																																expression.foundTerror OR
-																																expression.foundFraud OR
 																																expression.foundIdentityTheft OR
 																																expression.foundCounterfeit OR
-																																expression.foundCheckFraud OR
-																																expression.foundForgery OR
-																																expression.foundEmbezzlement OR
 																																expression.foundFalsePretense OR
 																																expression.foundInterceptCommunication OR
-																																expression.foundWire OR
 																																expression.foundInsiderTrading OR
 																																expression.foundTreasonOrEspionage OR
 																																expression.foundExtortion OR
 																																expression.foundConcealmentOfFunds OR
-																																expression.foundTaxOffenses OR
 																																expression.foundHijacking OR
+                                                                expression.foundWire OR                
 																																expression.foundChopShop;
 																																																						
 																								typeLevel_8 := expression.foundTraffickingOrSmuggling OR
@@ -36,9 +31,12 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 																																expression.foundDrugs OR
 																																expression.foundDistributionManufacturingTransportation;
 																																																						
-																								typeLevel_7 := expression.foundMurderHomocideManslaughter OR
-																																expression.foundAssultWithIntentToKill OR
-																																expression.foundKidnappingOrAbduction;
+																								typeLevel_7 := expression.foundFraud OR                 
+                                                                expression.foundCheckFraud OR           
+																																expression.foundForgery OR              
+																																expression.foundEmbezzlement OR         
+                                                                expression.foundTaxOffenses;            
+                                                                 
 																																																						
 																								typeLevel_6 := expression.foundGrandLarceny OR
 																																expression.foundBankRobbery OR
@@ -50,7 +48,11 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 																																expression.foundOrganizedRetailTheft OR
 																																expression.foundArson OR
 																																expression.foundBurglary OR
-																																expression.foundBreakingAndEntering;
+																																expression.foundBreakingAndEntering OR
+                                                                expression.foundMurderHomocideManslaughter OR   
+                                                                expression.foundAssultWithIntentToKill OR       
+                                                                expression.foundKidnappingOrAbduction;          
+                                                                
 																																																						
 																								typeLevel_5 := expression.foundSolicitation OR
 																																expression.foundPorn OR
@@ -172,8 +174,7 @@ EXPORT getIndLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedParty) i
 		
 																	
 		// OUTPUT(inData, NAMED('inData_crimType'));
-		// OUTPUT(offenses, NAMED('offenses'));
-		// OUTPUT(convictedParties, NAMED('convictedParties'));
+		//OUTPUT(offenses, NAMED('offenses'));
 		// OUTPUT(eventTypes, NAMED('eventTypes'));
 		// OUTPUT(rollEventTypes, NAMED('rollEventTypes'));
 		// OUTPUT(addEventType, NAMED('addEventType'));

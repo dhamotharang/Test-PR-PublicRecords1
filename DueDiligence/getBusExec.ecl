@@ -76,14 +76,15 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							SELF := LEFT;));
 
 																						
-	transformExecsWithDID := PROJECT(rollPulledExecsWithDID, TRANSFORM({DueDiligence.Layouts.RelatedParty relatedParty, UNSIGNED4 partyFirstSeen, UNSIGNED4 partyLastSeen, DueDiligence.LayoutsInternal.InternalBIPIDsLayout},
+	transformExecsWithDID := PROJECT(rollPulledExecsWithDID, TRANSFORM({DueDiligence.Layouts.RelatedParty relatedParty, UNSIGNED4 partyFirstSeen, UNSIGNED4 partyLastSeen, DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout},
 																																			SELF.relatedParty.numOfPositions := 1;
 																																			SELF.relatedParty.positions := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Positions,
 																																																															SELF.firstSeen := LEFT.partyFirstSeen;
 																																																															SELF.lastSeen := LEFT.partyLastSeen;
 																																																															SELF.title := LEFT.title;
 																																																															SELF := [];));
-																																			SELF := LEFT;));
+																																			SELF := LEFT;
+                                                                      SELF := [];));
 																																			
 	sortExecsWithDID := SORT(transformExecsWithDID, seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, partyFirstSeen);
 	

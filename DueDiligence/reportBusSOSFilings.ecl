@@ -49,7 +49,7 @@ EXPORT reportBusSOSFilings(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                           SELF := LEFT),
                                 LEFT OUTER);
   
-  countFilingStatus := PROJECT(BusSOSFilingsSlim, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 activeStatusFilingCount, UNSIGNED4 otherStatusFilingCount},
+  countFilingStatus := PROJECT(BusSOSFilingsSlim, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 activeStatusFilingCount, UNSIGNED4 otherStatusFilingCount},
                                                             SELF.activeStatusFilingCount := (INTEGER)LEFT.isActive;
                                                             SELF.otherStatusFilingCount := IF(LEFT.isActive, 0, 1);
                                                             SELF := LEFT;

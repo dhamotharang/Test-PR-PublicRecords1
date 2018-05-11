@@ -13,6 +13,7 @@ EXPORT MAC_DueDiligence_Service(reqName) := MACRO
 										'DPPAPurpose',
 										'GLBPurpose',
 										'HistoryDateYYYYMMDD',
+										'SSNMask',
 										/*---- Debug ----*/
 										'DebugMode',
 										'IntermediateVariables'

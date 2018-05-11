@@ -20,10 +20,10 @@ EXPORT reportBusLienDebtorCreditor(
                                    (unsigned)RIGHT.date_first_seen <> 0 AND	                                                // date first seen was blank on some records
                                     right.name_type IN DueDiligence.Constants.PARTY_SET,                                    // ***Pick up DEBTOR AND CREDITOR records only         
                                     TRANSFORM(DueDiligence.LayoutsInternalReport.BusLiensDebtorsCreditorsFlatLayout,
-                                               SELF.liensJudgment.seq      := LEFT.liensJudgment.seq,       //*** This is the sequence number of the Inquired Business (or the Parent)
-                                               SELF.liensJudgment.ultid    := LEFT.liensJudgment.ultid,
-                                               SELF.liensJudgment.orgid    := LEFT.liensJudgment.orgid,
-                                               SELF.liensJudgment.seleid   := LEFT.liensJudgment.seleid,
+                                               SELF.seq      := LEFT.seq,       //*** This is the sequence number of the Inquired Business (or the Parent)
+                                               SELF.ultid    := LEFT.ultid,
+                                               SELF.orgid    := LEFT.orgid,
+                                               SELF.seleid   := LEFT.seleid,
                                                SELF.did                    := LEFT.did, 
                                                self.tmsid                   := if(RIGHT.tmsid = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, LEFT.tmsid),	
                                                self.rmsid                   := RIGHT.rmsid,
@@ -54,13 +54,13 @@ EXPORT reportBusLienDebtorCreditor(
                                     ATMOST(keyed(left.tmsid=right.tmsid), riskwise.max_atmost));
  
  
-  SortLiensParty  := SORT(liensPartyCREDITORDEBTOR, liensJudgment.seq, liensJudgment.ultid, liensJudgment.orgid, liensJudgment.seleid, did, tmsid, rmsid, -date_last_seen); 
+  SortLiensParty  := SORT(liensPartyCREDITORDEBTOR, seq, ultid, orgid, seleid, did, tmsid, rmsid, -date_last_seen); 
   
   DedupLiensWithParty := ROLLUP(SortLiensParty,
-                                LEFT.liensJudgment.seq    = RIGHT.liensJudgment.seq     AND  
-                                LEFT.liensJudgment.ultID  = RIGHT.liensJudgment.ultID   AND  
-                                LEFT.liensJudgment.orgID  = RIGHT.liensJudgment.orgID   AND  
-                                LEFT.liensJudgment.seleID = RIGHT.liensJudgment.seleID  AND 
+                                LEFT.seq    = RIGHT.seq     AND  
+                                LEFT.ultID  = RIGHT.ultID   AND  
+                                LEFT.orgID  = RIGHT.orgID   AND  
+                                LEFT.seleID = RIGHT.seleID  AND 
                                 LEFT.did                  = RIGHT.did                   AND
                                 LEFT.tmsid                = RIGHT.tmsid                 AND  
                                 LEFT.rmsid                = RIGHT.rmsid                 AND
@@ -78,10 +78,10 @@ EXPORT reportBusLienDebtorCreditor(
 	// ------                                                                       ------
 	DueDiligence.LayoutsInternalReport.ReportingofLiensDebtorChildDatasetLayout  FormatTheListOfPartiesForThisLien(DedupLiensWithParty le, Integer CreditorCount) := TRANSFORM,
                                                                                             SKIP(CreditorCount > iesp.constants.DDRAttributesConst.MaxCreditors)
-        SELF.seq          := le.liensJudgment.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
-				SELF.ultid        := le.liensJudgment.ultid,
-				SELF.orgid        := le.liensJudgment.orgid,
-				SELF.seleid       := le.liensJudgment.seleid,
+        SELF.seq          := le.seq,                     //*** This is the sequence number of the Inquired Business (or the Parent)
+				SELF.ultid        := le.ultid,
+				SELF.orgid        := le.orgid,
+				SELF.seleid       := le.seleid,
         SELF.did          := le.did,  
         SELF.proxid       := 0;
         SELF.powid        := 0;

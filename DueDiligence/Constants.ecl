@@ -4,7 +4,7 @@ EXPORT Constants := MODULE
 
 EXPORT VERSION_3 := 3;
 
-EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
+EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAPERV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
 
 //request type
@@ -75,8 +75,12 @@ EXPORT MAX_DBA_NAMES := 500;
 
 EXPORT EMPTY := '';
 EXPORT ZERO := '0';
-EXPORT YES := 'Y'; 
 EXPORT NUMERIC_ZERO := 0;
+
+EXPORT YES := 'Y'; 
+EXPORT NO := 'N'; 
+EXPORT UNKNOWN := 'U';  
+
 
 
 
@@ -92,16 +96,7 @@ EXPORT FELONY                   := 'F';
 EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
-EXPORT UNKNOWN                  := 'U';  
-EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ]; 
-// ---- 
-// ---- Offense Score Descriptions 
-// ----
-EXPORT TEXT_FELONY              := 'FELONY';
-EXPORT TEXT_MISDEMEANOR         := 'MISDEMEANOR';
-EXPORT TEXT_INFRACTION          := 'INFRACTION';
-EXPORT TEXT_TRAFFIC             := 'TRAFFIC';
-EXPORT TEXT_UNKNOWN             := 'UNKNOWN';       
+EXPORT UNKNOWN_OFFENSES         := [ UNKNOWN, '' ];   
  
 
 // ---- 
@@ -111,13 +106,7 @@ EXPORT NONTRAFFIC_CONVICTED     := '4';
 EXPORT NONTRAFFIC_NOT_CONVICTED := '3';
 EXPORT TRAFFIC_CONVICTED        := '2';
 EXPORT TRAFFIC_NOT_CONVICTED    := '1';
-// ---- 
-// ---- Offense Level Descriptions 
-// ----
-EXPORT TEXT_NONTRAFFIC_CONVICTED     := 'NONTRAFFIC CONVICTED';
-EXPORT TEXT_NONTRAFFIC_NOT_CONVICTED := 'NONTRAFFIC NOT CONVICTED';
-EXPORT TEXT_TRAFFIC_CONVICTED        := 'TRAFFIC CONVICTED';
-EXPORT TEXT_TRAFFIC_NOT_CONVICTED    := 'TRAFFIC NOT CONVICTED';
+
 
 // ---- 
 // ---- constants used in the Liens processing
@@ -202,7 +191,8 @@ EXPORT mac_TRANSFORMLinkids := MACRO
 				'SELF.orgid                  := LEFT.orgid; '  +
 				'SELF.seleid                 := LEFT.seleid; ' +
 				'SELF.proxid                 := LEFT.proxid; ' +
-				'SELF.powid                  := LEFT.powid; '
+				'SELF.powid                  := LEFT.powid; '  +  
+				'SELF.did                    := LEFT.did; '    
 ENDMACRO;
 
 
@@ -255,6 +245,9 @@ EXPORT RELATED_BUSINESS_DEGREE := 'RB';
 EXPORT INQUIRED_INDIVIDUAL := 'II';
 EXPORT INQUIRED_INDIVIDUAL_SPOUSE := 'IS';
 EXPORT INQUIRED_INDIVIDUAL_PARENT := 'IP';
+
+EXPORT STATE_CRIMINAL_DATA := 'S';
+EXPORT FEDERAL_CRIMINAL_DATA := 'F';
 
 EXPORT EXECUTIVE_TITLES := ['ATTORNEY', 'BOARD MEMBER', 'CHAIRMAN', 'CHIEF EXECUTIVE OFFICER', 'CHIEF EXECUTIVE OFFICER, DIRECTOR', 
 														'CHIEF EXECUTIVE OFFICER, PRESIDENT', 'CHIEF FINANCIAL OFFICER', 'CHIEF FINANCIAL OFFICER, SR VICE PRESIDENT', 

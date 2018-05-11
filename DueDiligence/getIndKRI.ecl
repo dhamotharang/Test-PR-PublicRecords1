@@ -16,9 +16,21 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 		
 		SELF.PerUSResidency_Flag := usResidency.value;
 		SELF.PerUSResidency  := usResidency.name;
-		
-
-		
+    
+    
+    
+    
+    
+    
+    
+    
+    //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
+    
+    /* PERSON STATE CRIMINAL */
+    //is populated in DueDiligence.getIndKRILegalStateCriminal, which is ultimately called in DueDiligence.getIndCriminal
+		SELF.PerLegalStateCriminal := le.individual.stateCriminalLegalEventsScore;
+    SELF.PerLegalStateCriminal_Flag := le.individual.stateCriminalLegalEventsFlags;
+	
 		
 		SELF := le;
 	END;
@@ -42,8 +54,10 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							// SELF.PerGeographic_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerMobility_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerLegalCriminal := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerLegalCriminal_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerLegalStateCriminal := INVALID_INDIVIDUAL_SCORE;
+                                              SELF.PerLegalStateCriminal_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              // SELF.PerLegalFedCriminal := INVALID_INDIVIDUAL_SCORE;
+                                              // SELF.PerLegalFedCriminal_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerLegalCivil := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerLegalCivil_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerLegalTraffInfr := INVALID_INDIVIDUAL_SCORE;

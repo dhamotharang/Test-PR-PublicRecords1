@@ -61,10 +61,10 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 			TRANSFORM(DueDiligence.LayoutsInternal.layout_liens_judgments,
 			  /* create a new intermediate resultset */ 
 			  /* populate the data from the LEFT     */  
-				SELF.liensJudgment.seq                   := LEFT.seq,
-				SELF.liensJudgment.UltID                 := LEFT.ultID,
-				SELF.liensJudgment.OrgID                 := LEFT.orgID,
-				SELF.liensJudgment.SeleID                := LEFT.seleID,		
+				SELF.seq                                 := LEFT.seq,
+				SELF.UltID                               := LEFT.ultID,
+				SELF.OrgID                               := LEFT.orgID,
+				SELF.SeleID                              := LEFT.seleID,		
 				SELF.HistoryDate			                   := LEFT.HistoryDate,
 				/* Essentially this is today's date if history date is all 9's OR the history date itself */   
 				SELF.DateToUse                           := DueDiligence.Common.GetMyDate(LEFT.HistoryDate),
@@ -96,11 +96,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ---- Sort the liens and judgement records in seq , TMSID and date sequence           ------
 	// ----                                                                                 ------
   BusinessLiens_sorted := 
-		SORT( BusinessLiens_main, liensJudgment.seq, 
-		                          liensJudgment.UltID,
-																            liensJudgment.OrgID,
-																            liensJudgment.SeleID,
-																            tmsid, -orig_filing_date, -release_date, RECORD );
+		SORT( BusinessLiens_main, seq, UltID, OrgID, SeleID, tmsid, -orig_filing_date, -release_date, RECORD );
 	
 	// Rollup to aggregate to the Liens Level (TMSID)
 	// Rules: retain...
@@ -118,18 +114,18 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	BusinessLiens_rolled :=
 		ROLLUP(
 			BusinessLiens_sorted,
-			LEFT.liensJudgment.seq     = RIGHT.liensJudgment.seq AND
-			LEFT.liensJudgment.UltID   = RIGHT.liensJudgment.UltID AND
-			LEFT.liensJudgment.OrgID   = RIGHT.liensJudgment.OrgID AND
-			LEFT.liensJudgment.SeleID  = RIGHT.liensJudgment.SeleID AND
+			LEFT.seq     = RIGHT.seq AND
+			LEFT.UltID   = RIGHT.UltID AND
+			LEFT.OrgID   = RIGHT.OrgID AND
+			LEFT.SeleID  = RIGHT.SeleID AND
 			LEFT.tmsid = RIGHT.tmsid,
 			TRANSFORM(DueDiligence.LayoutsInternal.layout_liens_judgments,
-				SELF.liensJudgment.seq          := LEFT.liensJudgment.seq,
-				SELF.liensJudgment.UltID        := LEFT.liensJudgment.UltID,
-				SELF.liensJudgment.OrgID        := LEFT.liensJudgment.OrgID,
-				SELF.liensJudgment.SeleID       := LEFT.liensJudgment.SeleID,
-				SELF.liensJudgment.proxid       := LEFT.liensJudgment.proxid,
-				SELF.liensJudgment.powid        := LEFT.liensJudgment.powid,
+				SELF.seq          := LEFT.seq,
+				SELF.UltID        := LEFT.UltID,
+				SELF.OrgID        := LEFT.OrgID,
+				SELF.SeleID       := LEFT.SeleID,
+				SELF.proxid       := LEFT.proxid,
+				SELF.powid        := LEFT.powid,
 				SELF.did                        := 0,    /*  This is always zero for all of our business logic  */   
 				SELF.HistoryDate			          := LEFT.HistoryDate,
 				SELF.DateToUse                  := LEFT.DateToUse,
@@ -161,6 +157,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				SELF.agency_county              := IF( LEFT.agency_county != DueDiligence.Constants.EMPTY, LEFT.agency_county, RIGHT.agency_county),
 				SELF.filing_jurisdiction        := IF( LEFT.filing_jurisdiction != DueDiligence.Constants.EMPTY, LEFT.filing_jurisdiction, RIGHT.filing_jurisdiction),
 				SELF.filing_status              := IF(TRIM(RIGHT.filing_status) != DueDiligence.Constants.EMPTY, RIGHT.filing_status, LEFT.filing_status ),
+        SELF                            := [];
 			)
 		);
 			
@@ -191,15 +188,15 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // ----- Summarize the results in scope for these liens and judgments                        ------
 	 // ------                                                                                    ------
 	
-   lienJudgementCounts := PROJECT(BusinessLiens_categorized, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED historyDate, UNSIGNED dateToUse, 
+   lienJudgementCounts := PROJECT(BusinessLiens_categorized, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED historyDate, UNSIGNED dateToUse, 
                                                                                     UNSIGNED totalEvictions, UNSIGNED totalEvictionsOver3Yrs, UNSIGNED totalEvictionsPast3Yrs, 
                                                                                     UNSIGNED totalUnreleasedLiens, UNSIGNED totalUnreleasedLiensOver3Yrs, UNSIGNED totalUnreleasedLiensPast3Yrs, 
                                                                                     UNSIGNED totalReleasedLiens},
 	                               /* columns in the table */  
-                                                                       SELF.seq := LEFT.liensJudgment.seq;
-                                                                       SELF.ultID := LEFT.liensJudgment.ultid;
-                                                                       SELF.orgID := LEFT.liensJudgment.orgid;
-                                                                       SELF.seleID := LEFT.liensJudgment.seleid;
+                                                                       SELF.seq := LEFT.seq;
+                                                                       SELF.ultID := LEFT.ultid;
+                                                                       SELF.orgID := LEFT.orgid;
+                                                                       SELF.seleID := LEFT.seleid;
 																																			 
                                                                        SELF.totalEvictions := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES AND LEFT.release_date = DueDiligence.Constants.EMPTY);
                                                                        SELF.totalEvictionsOver3Yrs := (INTEGER)(LEFT.eviction = DueDiligence.Constants.YES  AND  LEFT.NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK) AND LEFT.release_date = DueDiligence.Constants.EMPTY);
