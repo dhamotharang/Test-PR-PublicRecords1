@@ -357,7 +357,7 @@ ds_newModels;
                         SELF := []
               ));
 
-    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty} xfm_transform_SmallBusinessBipCombinedReportResponse() := 
+    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty, UNSIGNED6 Rep_LexID} xfm_transform_SmallBusinessBipCombinedReportResponse() := 
       TRANSFORM
         SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
 				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
@@ -365,11 +365,12 @@ ds_newModels;
         SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
         SELF.CreditReportRecords           := ds_Final_CreditReportRecords;	
         SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
+        SELF.Rep_LexID                     := SBA_Results[1].Rep_LexID;
       END;
       
     ds_results_Hit := DATASET([xfm_transform_SmallBusinessBipCombinedReportResponse()]) ;
  
-    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty} xfm_transform_NoHit() := 
+    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty, UNSIGNED6 Rep_LexID} xfm_transform_NoHit() := 
       TRANSFORM
         SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
 				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
@@ -377,6 +378,7 @@ ds_newModels;
         SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
         SELF.CreditReportRecords           := ds_Final_CreditReportRecords_NoHit;	
         SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
+        SELF.Rep_LexID                     := 0;
       END;
       
     ds_results_NoHit := DATASET([xfm_transform_NoHit()]) ;

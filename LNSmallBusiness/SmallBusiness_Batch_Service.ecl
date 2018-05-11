@@ -97,7 +97,7 @@ export SmallBusiness_Batch_Service := MACRO
 																		self.HistoryDateYYYYMM := IF(LEFT.HistoryDateYYYYMM=0, HISTORY_DATE, LEFT.HISTORYDATEYYYYMM);  
 																		self:=left ) );
 	indata := LNSmallBusiness.Helpers.BatchIn2Hierarchical( batch_seq, modelname, glb, dppa );
-	lnsb   := LNSmallBusiness.SmallBusiness_Function( indata, gateways, false, '', DataRestriction, DataPermission );
+	lnsb   := PROJECT(LNSmallBusiness.SmallBusiness_Function( indata, gateways, false, '', DataRestriction, DataPermission ), TRANSFORM(LNSmallBusiness.Layouts.ResponseEx, SELF := LEFT));
 	batch_out := LNSmallBusiness.Helpers.HierarchicalOut2Testseed( lnsb );
 
 

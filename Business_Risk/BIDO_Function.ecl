@@ -58,6 +58,7 @@ clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Pur
 
 				
 r := RECORD
+  unsigned6 Rep_DID := 0;
 	business_risk.Layout_Final_Denorm;
 	DATASET(Models.Layout_Model) models;
   unsigned2 royalty_type_code_targus;
@@ -132,6 +133,7 @@ END;
 scores := project(ret, form_model(LEFT));
 
 r into_final(biid L, scores R) := transform
+  self.Rep_DID := L.RepDID;
 	self.PRI_seq_1 := if(L.pri1 = '', '', '1');
 	self.PRI_seq_2 := if(L.pri2 = '', '', '2');
 	self.PRI_seq_3 := if(L.pri3 = '', '', '3');

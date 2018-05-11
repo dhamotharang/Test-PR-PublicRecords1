@@ -212,6 +212,7 @@ string10  hphone_value := ''      : stored('HomePhone');
 string10  wphone_value := ''      : stored('WorkPhone');
 string100 cmpy_value := ''        : stored('EmployerName');
 string30  formerlast_value := ''  : stored('FormerName');
+string120 unparsed_fullname_value := '' : stored('UnParsedFullName');
 
 // ----------[ Second input ]----------
 // Perform unparsed name cleaning without a macro until we make MAC_UnparsedFullName completely BtSt-savvy. 
@@ -2339,11 +2340,15 @@ Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layo
 																					 self.exclude_dmv_pii := ExcludeDMVPII,
 																					 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																					 self.archive_opt_in := ArchiveOptIn,
+                                           self.glb := GLB_Purpose,
+                                           self.dppa := DPPA_Purpose,
 																					 self.data_restriction_mask := DataRestriction,
 																					 self.data_permission_mask := DataPermission,
 																					 self.industry := Industry_Search[1].Industry,
 																					 self.i_attributes_name := attributesIn[1].name,
 																					 self.i_ssn := socs_value,
+                                           self.i_dob := dob_value,
+                                           self.i_name_full := unparsed_fullname_value,
 																					 self.i_name_first := first_value,
 																					 self.i_name_last := last_value,
 																					 self.i_lexid := did_value, 
@@ -2353,6 +2358,8 @@ Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layo
 																					 self.i_zip := zip_value,
 																					 self.i_dl := drlc_value,
 																					 self.i_dl_state := drlcstate_value,
+                                           self.i_home_phone := hphone_value,
+                                           self.i_work_phone := wphone_value,
 																					 self.i_name_first_2 := pre_fname_val2,
 																					 self.i_name_last_2 := pre_lname_val2,
 																					 self.i_model_name_1 := model_name,

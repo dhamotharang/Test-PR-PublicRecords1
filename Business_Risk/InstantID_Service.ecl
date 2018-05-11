@@ -169,7 +169,7 @@ string45	Bus_IP		:= '' : stored('BusinessIPAddress');
 
 Risk_Indicators.Mac_UnparsedFullName(title_val,rep_Fname,rep_Mname,rep_Lname,rep_name_suffix,'RepresentativeFirstName','RepresentativeMiddleName','RepresentativeLastName','RepresentativeNameSuffix');
 
-
+string120 unparsed_fullname_val := '' : stored('UnParsedFullName');
 string200	rep_addr		:= '' : stored('RepresentativeAddr');
 string30	rep_city		:= '' : stored('RepresentativeCity');
 string2	rep_state		:= '' : stored('RepresentativeState');
@@ -342,6 +342,7 @@ outf := business_risk.InstantID_Function(df2, gateways, if (bdid = '', false, tr
 ret_btest_seed_pre := business_risk.InstantID_Test_Function(Test_Data_Table_Name,rep_fname,rep_lname,FEIN,zip,busphone,company_name, seqnum);
 
 r := RECORD
+  unsigned6 Rep_DID := 0;
 	business_risk.Layout_Final_Denorm;
 	DATASET(Models.Layout_Model) models;
   unsigned2 royalty_type_code_targus;
@@ -354,6 +355,7 @@ end;
 ret_btest_seed := PROJECT( ret_btest_seed_pre, TRANSFORM( r, SELF := LEFT, SELF := [] ) );
 
 r into_final(outf L) := transform
+  self.Rep_DID := L.RepDID;
 
 	self.PRI_seq_1 := if(L.pri1 = '', '', '1');
 	self.PRI_seq_2 := if(L.pri2 = '', '', '2');
@@ -689,60 +691,67 @@ intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('
 
 //Log to Deltabase
 Deltabase_Logging_prep := project(final, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																							 self.company_id := (Integer)CompanyID,
-																							 self.login_id := _LoginID,
-																							 self.product_id := Risk_Reporting.ProductID.Business_Risk__InstantID_Service,
-																							 self.function_name := FunctionName,
-																							 self.esp_method := ESPMethod,
-																							 self.interface_version := InterfaceVersion,
-																							 self.delivery_method := DeliveryMethod,
-																							 self.date_added := (STRING8)Std.Date.Today(),
-																							 self.death_master_purpose := DeathMasterPurpose,
-																							 self.ssn_mask := ssnmask,
-																							 self.dob_mask := dobmask,
-																							 self.dl_mask := (String)dlmask,
-																							 self.exclude_dmv_pii := ExcludeDMVPII,
-																							 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																							 self.archive_opt_in := ArchiveOptIn,
-																							 self.data_restriction_mask := DataRestriction,
-																							 self.data_permission_mask := DataPermission,
-																							 self.industry := Industry_Search[1].Industry,
-																							 self.i_attributes_name := AttributesVersionRequest,
-																							 self.i_ssn := rep_ssn,
-																							 self.i_name_first := rep_Fname,
-																							 self.i_name_last := rep_Lname,
-																							 self.i_lexid := (Integer)bdid, 
-																							 self.i_address := rep_addr,
-																							 self.i_city := rep_city,
-																							 self.i_state := rep_state,
-																							 self.i_zip := rep_zip,
-																							 self.i_dl := rep_dl_num,
-																							 self.i_dl_state := rep_dl_state,
-																							 self.i_tin := FEIN,
-																							 self.i_bus_name := If(company_name <> '', company_name, alt_Co_Name),
-																							 self.i_bus_address := addr,
-																							 self.i_bus_city := city,
-																							 self.i_bus_state := state,
-																							 self.i_bus_zip := zip,
-																							 self.i_model_name_1 := 'BVI',
-																							 self.i_model_name_2 := 'CVI',
-																							 self.o_score_1    := (Integer)left.BVI, //bvi
-																							 self.o_reason_1_1 := left.PRI_1,
-																							 self.o_reason_1_2 := left.PRI_2,
-																							 self.o_reason_1_3 := left.PRI_3,
-																							 self.o_reason_1_4 := left.PRI_4,
-																							 self.o_reason_1_5 := left.PRI_5,
-																							 self.o_reason_1_6 := left.PRI_6,
-																							 self.o_score_2    := (Integer)left.RepCVI, //rep cvi
-																							 self.o_reason_2_1 := left.Rep_PRI_1,
-																							 self.o_reason_2_2 := left.Rep_PRI_2,
-																							 self.o_reason_2_3 := left.Rep_PRI_3,
-																							 self.o_reason_2_4 := left.Rep_PRI_4,
-																							 self.o_reason_2_5 := left.Rep_PRI_5,
-																							 self.o_reason_2_6 := left.Rep_PRI_6,
-																							 self.o_lexid      := (Integer)left.bdid,
-																							 self := left,
-																							 self := [] ));
+                                                  self.company_id := (Integer)CompanyID,
+                                                  self.login_id := _LoginID,
+                                                  self.product_id := Risk_Reporting.ProductID.Business_Risk__InstantID_Service,
+                                                  self.function_name := FunctionName,
+                                                  self.esp_method := ESPMethod,
+                                                  self.interface_version := InterfaceVersion,
+                                                  self.delivery_method := DeliveryMethod,
+                                                  self.date_added := (STRING8)Std.Date.Today(),
+                                                  self.death_master_purpose := DeathMasterPurpose,
+                                                  self.ssn_mask := ssnmask,
+                                                  self.dob_mask := dobmask,
+                                                  self.dl_mask := (String)dlmask,
+                                                  self.exclude_dmv_pii := ExcludeDMVPII,
+                                                  self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                                                  self.archive_opt_in := ArchiveOptIn,
+                                                  self.glb := glb,
+                                                  self.dppa := dppa,
+                                                  self.data_restriction_mask := DataRestriction,
+                                                  self.data_permission_mask := DataPermission,
+                                                  self.industry := Industry_Search[1].Industry,
+                                                  self.i_attributes_name := AttributesVersionRequest,
+                                                  self.i_ssn := rep_ssn,
+                                                  self.i_dob := rep_dob;
+                                                  self.i_name_full := unparsed_fullname_val,
+                                                  self.i_name_first := rep_Fname,
+                                                  self.i_name_last := rep_Lname,
+                                                  self.i_address := rep_addr,
+                                                  self.i_city := rep_city,
+                                                  self.i_state := rep_state,
+                                                  self.i_zip := rep_zip,
+                                                  self.i_dl := rep_dl_num,
+                                                  self.i_dl_state := rep_dl_state,
+                                                  self.i_home_phone := rep_phone,
+                                                  self.i_tin := FEIN,
+                                                  self.i_bus_name := company_name,
+                                                  self.i_alt_bus_name := alt_Co_Name,
+                                                  self.i_bus_address := addr,
+                                                  self.i_bus_city := city,
+                                                  self.i_bus_state := state,
+                                                  self.i_bus_zip := zip,
+                                                  self.i_bus_phone := busphone,
+                                                  self.i_model_name_1 := 'BVI',
+                                                  self.i_model_name_2 := 'CVI',
+                                                  self.o_score_1    := (Integer)left.BVI, //bvi
+                                                  self.o_reason_1_1 := left.PRI_1,
+                                                  self.o_reason_1_2 := left.PRI_2,
+                                                  self.o_reason_1_3 := left.PRI_3,
+                                                  self.o_reason_1_4 := left.PRI_4,
+                                                  self.o_reason_1_5 := left.PRI_5,
+                                                  self.o_reason_1_6 := left.PRI_6,
+                                                  self.o_score_2    := (Integer)left.RepCVI, //rep cvi
+                                                  self.o_reason_2_1 := left.Rep_PRI_1,
+                                                  self.o_reason_2_2 := left.Rep_PRI_2,
+                                                  self.o_reason_2_3 := left.Rep_PRI_3,
+                                                  self.o_reason_2_4 := left.Rep_PRI_4,
+                                                  self.o_reason_2_5 := left.Rep_PRI_5,
+                                                  self.o_reason_2_6 := left.Rep_PRI_6,
+                                                  self.o_lexid      := left.Rep_DID,
+                                                  self.o_bdid       := bdid,
+                                                  self := left,
+                                                  self := [] ));
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 

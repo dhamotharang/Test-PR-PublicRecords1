@@ -231,11 +231,17 @@ EXPORT PAR_Search_Service() := MACRO
 																									 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
 																									 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																									 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                   self.glb := GLBA,
+                                                   self.dppa := DPPA,
 																									 self.data_restriction_mask := DataRestriction,
 																									 self.data_permission_mask := DataPermission,
 																									 self.industry := Industry_Search[1].Industry,
 																									 self.i_attributes_name := attributesVersion,
 																									 self.i_ssn := search.SSN,
+                                                   self.i_dob := search.dob.year +
+                                                                 intformat((integer1)search.dob.month, 2, 1) +
+                                                                 intformat((integer1)search.dob.day, 2, 1),
+                                                   self.i_name_full := search.name.Full,
 																									 self.i_name_first := search.name.first,
 																									 self.i_name_last := search.name.last,
 																									 self.i_lexid := (Integer)search.UniqueId, 
@@ -243,6 +249,7 @@ EXPORT PAR_Search_Service() := MACRO
 																									 self.i_city := search.address.City,
 																									 self.i_state := search.address.State,
 																									 self.i_zip := search.address.Zip5,
+                                                   self.i_home_phone := search.Phone,
 																									 self.o_lexid := (Integer)left.Result.UniqueId,
 																									 self := left,
 																									 self := [] ));

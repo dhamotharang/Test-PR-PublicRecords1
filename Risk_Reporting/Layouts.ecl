@@ -1972,76 +1972,86 @@ EXPORT Parsed_SMALLBUSINESSBIPCOMBINEDREPORT_Layout := RECORD
 END;
 
 EXPORT LOG_Deltabase_Layout_Record := Record
-	// Transaction data
-	Integer8 company_id;
-	String20 login_id;
-	Integer8 product_id;
-	String20 function_name;
-	String50 esp_method;
-	String10 interface_version;
-	String5 delivery_method;
-	String8 date_added;
-	// Transaction Metadata - User options
-	String5  death_master_purpose;
-	String10 ssn_mask;
-	String10 dob_mask;
-	String1  dl_mask;
-	String1  exclude_dmv_pii;
-	String1  scout_opt_out;
-	String1  archive_opt_in;
-	String   data_restriction_mask;
-	String   data_permission_mask;
-	String30 industry;
-	// PII Request data
-	String9  i_ssn;
-	String30 i_name_first;
-	String30 i_name_last;
-	Integer8 i_lexid;
-	String60 i_address;
-	String50 i_city;
-	String2  i_state;
-	String9  i_zip;
-	String30 i_dl;
-	String2  i_dl_state;
-	String9  i_tin;
-	String30 i_name_first_2;
-	String30 i_name_last_2;
-	String30 i_name_first_3;
-	String30 i_name_last_3;
-	String30 i_name_first_4;
-	String30 i_name_last_4;
-	String30 i_name_first_5;
-	String30 i_name_last_5;
-	String30 i_name_first_6;
-	String30 i_name_last_6;
-	String30 i_name_first_7;
-	String30 i_name_last_7;
-	String30 i_name_first_8;
-	String30 i_name_last_8;
-	String50 i_bus_name;
-	String60 i_bus_address;
-	String50 i_bus_city;
-	String2  i_bus_state;
-	String9  i_bus_zip;
-	String20 i_model_name_1;
-	String20 i_model_name_2;
-	String60 i_attributes_name;
-	// Response data
-	Integer2 o_score_1;
-	String4 o_reason_1_1;
-	String4 o_reason_1_2;
-	String4 o_reason_1_3;
-	String4 o_reason_1_4;
-	String4 o_reason_1_5;
-	String4 o_reason_1_6;
-	Integer2 o_score_2;
-	String4 o_reason_2_1;
-	String4 o_reason_2_2;
-	String4 o_reason_2_3;
-	String4 o_reason_2_4;
-	String4 o_reason_2_5;
-	String4 o_reason_2_6;
-	Integer8 o_lexid;
+  // Transaction data
+  Integer8 company_id;
+  String20 login_id;
+  Integer8 product_id;
+  String20 function_name;
+  String50 esp_method;
+  String10 interface_version;
+  String5 delivery_method;
+  String8 date_added;
+  // Transaction Metadata - User options
+  String5  death_master_purpose;
+  String10 ssn_mask;
+  String10 dob_mask;
+  String1  dl_mask;
+  String1  exclude_dmv_pii;
+  String1  scout_opt_out;
+  String1  archive_opt_in;
+  unsigned1 glb;
+  unsigned1 dppa;
+  String   data_restriction_mask;
+  String   data_permission_mask;
+  String30 industry;
+  // PII Request data
+  String9  i_ssn;
+  String8  i_dob;       //new
+  String120 i_name_full; //new
+  String30 i_name_first;
+  String30 i_name_last;
+  Integer8 i_lexid;
+  String60 i_address;
+  String50 i_city;
+  String2  i_state;
+  String9  i_zip;
+  String30 i_dl;
+  String2  i_dl_state;
+  String10 i_home_phone; //new
+  String10 i_work_phone; //new
+  String9  i_tin;
+  String30 i_name_first_2;
+  String30 i_name_last_2;
+  String30 i_name_first_3;
+  String30 i_name_last_3;
+  String30 i_name_first_4;
+  String30 i_name_last_4;
+  String30 i_name_first_5;
+  String30 i_name_last_5;
+  String30 i_name_first_6;
+  String30 i_name_last_6;
+  String30 i_name_first_7;
+  String30 i_name_last_7;
+  String30 i_name_first_8;
+  String30 i_name_last_8;
+  String50 i_bus_name;
+  String50 i_alt_bus_name; //new
+  String60 i_bus_address;
+  String50 i_bus_city;
+  String2  i_bus_state;
+  String9  i_bus_zip;
+  String10 i_bus_phone;    //new
+  String20 i_model_name_1;
+  String20 i_model_name_2;
+  String60 i_attributes_name;
+  // Response data
+  Integer2 o_score_1;
+  String4 o_reason_1_1;
+  String4 o_reason_1_2;
+  String4 o_reason_1_3;
+  String4 o_reason_1_4;
+  String4 o_reason_1_5;
+  String4 o_reason_1_6;
+  Integer2 o_score_2;
+  String4 o_reason_2_1;
+  String4 o_reason_2_2;
+  String4 o_reason_2_3;
+  String4 o_reason_2_4;
+  String4 o_reason_2_5;
+  String4 o_reason_2_6;
+  Integer8 o_lexid;
+  String14 o_bdid;          //new
+  unsigned6 o_seleid;       //new
 END;
 
 EXPORT LOG_Deltabase_Layout := RECORD

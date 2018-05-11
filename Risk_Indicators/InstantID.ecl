@@ -251,12 +251,18 @@ addr_value := map(
 										Address.Addr1FromComponents(PrimRange, PreDir, PrimName, AddrSuffix, PostDir, UnitDesignation, SecRange)
 										);
 
+string120 fullname_val := '' : stored('UnParsedFullName');
+string8 dob_value := ''      : stored('DateOfBirth');
 string25 city_val := ''      : stored('City');
 string2 state_val := ''      : stored('State');
 string5 zip_value := AutoStandardI.GlobalModule().zip;
 string9 ssn_value := AutoStandardI.GlobalModule().ssn;
-STRING20 dl_number_value := ''     : stored('DLNumber');
-STRING2 dl_state_value := ''       : stored('DLState');
+STRING20 dl_number_value := '' : stored('DLNumber');
+STRING2 dl_state_value   := '' : stored('DLState');
+string10 phone_val     := '' : stored('HomePhone');
+string10 wphone_val    := '' : stored('WorkPhone');
+unsigned1 DPPAPurpose  := 0  : stored('DPPAPurpose');
+unsigned1 GLBPurpose   := 8  : stored('GLBPurpose');
 string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
 string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
@@ -265,6 +271,9 @@ fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_se
 model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
 custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
 modelname := if(model_version='', custom_modelname, model_version);
+
+string128 In_CustomCVIModelName := '' : STORED('CustomCVIModelName');
+LoggedCCVI := StringLib.StringToUppercase(In_CustomCVIModelName);
 
 
 iid := Risk_Indicators.InstantID_records;
@@ -293,55 +302,62 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
 
 // Deltabase_Log
 Deltabase_Logging_prep := project(iid, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-   																												 self.company_id := (Integer)CompanyID,
-   																												 self.login_id := _LoginID,
-   																												 self.product_id := Risk_Reporting.ProductID.Risk_Indicators__InstantID,
-   																												 self.function_name := FunctionName,
-   																												 self.esp_method := ESPMethod,
-   																												 self.interface_version := InterfaceVersion,
-   																												 self.delivery_method := DeliveryMethod,
-   																												 self.date_added := (STRING8)Std.Date.Today(),
-   																												 self.death_master_purpose := DeathMasterPurpose,
-   																												 self.ssn_mask := ssnmask,
-																													 self.dob_mask := dobmask,
-																													 self.dl_mask := (String)dlmask,
-																													 self.exclude_dmv_pii := ExcludeDMVPII,
-																													 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																													 self.archive_opt_in := ArchiveOptIn,
-   																												 self.data_restriction_mask := DataRestriction,
-   																												 self.data_permission_mask := DataPermission,
-   																												 self.industry := Industry_Search[1].Industry,
-   																												 self.i_ssn := ssn_value,
-   																												 self.i_name_first := fname_val,
-   																												 self.i_name_last := lname_val,
-   																												 // self.i_lexid := 0, 
-   																												 self.i_address := addr_value,
-   																												 self.i_city := city_val,
-   																												 self.i_state := state_val,
-   																												 self.i_zip := zip_value,
-   																												 self.i_dl := dl_number_value,
-   																												 self.i_dl_state := dl_state_value,
-																													 self.i_model_name_1 := 'CVI',
-																													 self.i_model_name_2 := modelname,
-   																												 self.o_score_1 := (Integer)left.cvi,
-   																												 self.o_reason_1_1 := left.ri[1].hri,
-   																												 self.o_reason_1_2 := left.ri[2].hri,
-   																												 self.o_reason_1_3 := left.ri[3].hri,
-   																												 self.o_reason_1_4 := left.ri[4].hri,
-   																												 self.o_reason_1_5 := left.ri[5].hri,
-   																												 self.o_reason_1_6 := left.ri[6].hri,
-   																												 //Check to see if there was a model requested
-   																												 extra_score := left.models[1].scores[1].i <> '';
-   																												 self.o_score_2 := IF(extra_score, (Integer)left.models[1].scores[1].i, 0),
-   																												 self.o_reason_2_1 := IF(extra_score, left.models[1].scores[1].reason_codes[1].reason_code, ''),
-   																												 self.o_reason_2_2 := IF(extra_score, left.models[1].scores[1].reason_codes[2].reason_code, ''),
-   																												 self.o_reason_2_3 := IF(extra_score, left.models[1].scores[1].reason_codes[3].reason_code, ''),
-   																												 self.o_reason_2_4 := IF(extra_score, left.models[1].scores[1].reason_codes[4].reason_code, ''),
-   																												 self.o_reason_2_5 := IF(extra_score, left.models[1].scores[1].reason_codes[5].reason_code, ''),
-   																												 self.o_reason_2_6 := IF(extra_score, left.models[1].scores[1].reason_codes[6].reason_code, ''),
-   																												 self.o_lexid := left.did,
-   																												 self := left,
-   																												 self := [] ));
+                                                self.company_id := (Integer)CompanyID,
+                                                self.login_id := _LoginID,
+                                                self.product_id := Risk_Reporting.ProductID.Risk_Indicators__InstantID,
+                                                self.function_name := FunctionName,
+                                                self.esp_method := ESPMethod,
+                                                self.interface_version := InterfaceVersion,
+                                                self.delivery_method := DeliveryMethod,
+                                                self.date_added := (STRING8)Std.Date.Today(),
+                                                self.death_master_purpose := DeathMasterPurpose,
+                                                self.ssn_mask := ssnmask,
+                                                self.dob_mask := dobmask,
+                                                self.dl_mask := (String)dlmask,
+                                                self.exclude_dmv_pii := ExcludeDMVPII,
+                                                self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                                                self.archive_opt_in := ArchiveOptIn,
+                                                self.glb := GLBPurpose,
+                                                self.dppa := DPPAPurpose,
+                                                self.data_restriction_mask := DataRestriction,
+                                                self.data_permission_mask := DataPermission,
+                                                self.industry := Industry_Search[1].Industry,
+                                                self.i_ssn := ssn_value,
+                                                self.i_dob := dob_value,
+                                                self.i_name_full := fullname_val,
+                                                self.i_name_first := fname_val,
+                                                self.i_name_last := lname_val,
+                                                // self.i_lexid := 0, 
+                                                self.i_address := addr_value,
+                                                self.i_city := city_val,
+                                                self.i_state := state_val,
+                                                self.i_zip := zip_value,
+                                                self.i_dl := dl_number_value,
+                                                self.i_dl_state := dl_state_value,
+                                                self.i_home_phone := phone_val,
+                                                self.i_work_phone := wphone_val,
+                                                //Custom CVI takes presidence over normal CVI
+                                                self.i_model_name_1 := IF(LoggedCCVI != '', LoggedCCVI, 'CVI'),
+                                                self.i_model_name_2 := modelname,
+                                                self.o_score_1 := IF(LoggedCCVI != '', (Integer)left.cviCustomScore, (Integer)left.cvi),
+                                                self.o_reason_1_1 := IF(LoggedCCVI != '', left.cviCustomScore_ri[1].hri, left.ri[1].hri),
+                                                self.o_reason_1_2 := IF(LoggedCCVI != '', left.cviCustomScore_ri[2].hri, left.ri[2].hri),
+                                                self.o_reason_1_3 := IF(LoggedCCVI != '', left.cviCustomScore_ri[3].hri, left.ri[3].hri),
+                                                self.o_reason_1_4 := IF(LoggedCCVI != '', left.cviCustomScore_ri[4].hri, left.ri[4].hri),
+                                                self.o_reason_1_5 := IF(LoggedCCVI != '', left.cviCustomScore_ri[5].hri, left.ri[5].hri),
+                                                self.o_reason_1_6 := IF(LoggedCCVI != '', left.cviCustomScore_ri[6].hri, left.ri[6].hri),
+                                                //Check to see if there was a model requested
+                                                extra_score := left.models[1].scores[1].i <> '';
+                                                self.o_score_2 := IF(extra_score, (Integer)left.models[1].scores[1].i, 0),
+                                                self.o_reason_2_1 := IF(extra_score, left.models[1].scores[1].reason_codes[1].reason_code, ''),
+                                                self.o_reason_2_2 := IF(extra_score, left.models[1].scores[1].reason_codes[2].reason_code, ''),
+                                                self.o_reason_2_3 := IF(extra_score, left.models[1].scores[1].reason_codes[3].reason_code, ''),
+                                                self.o_reason_2_4 := IF(extra_score, left.models[1].scores[1].reason_codes[4].reason_code, ''),
+                                                self.o_reason_2_5 := IF(extra_score, left.models[1].scores[1].reason_codes[5].reason_code, ''),
+                                                self.o_reason_2_6 := IF(extra_score, left.models[1].scores[1].reason_codes[6].reason_code, ''),
+                                                self.o_lexid := left.did,
+                                                self := left,
+                                                self := [] ));
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 
 final := project(iid, risk_indicators.Layout_InstandID_NuGen);
