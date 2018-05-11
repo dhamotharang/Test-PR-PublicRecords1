@@ -1,4 +1,4 @@
-import Models, Risk_Indicators, Business_Risk, RiskWise, Risk_Reporting, address, ut, iesp, Gateway;
+﻿import Models, Risk_Indicators, Business_Risk, RiskWise, Risk_Reporting, address, ut, iesp, Gateway;
 
 
 EXPORT SmallBusiness_Function(
@@ -270,10 +270,17 @@ EXPORT SmallBusiness_Function(
 	
 	withModel := join( indata, model, left.seq = right.seq, addModel(left,right), left outer, keep(1) );
 	
-	
+  withbdid := join(withModel, bshell, left.seq = right.biid.seq, TRANSFORM({UNSIGNED6 rep_did, unsigned bdid, recordof(LEFT)},
+                                                                           SELF.rep_did := 0,
+                                                                           SELF.bdid := RIGHT.biid.bdid,
+                                                                           SELF := LEFT),
+                                                                       LEFT OUTER, KEEP(1));
+                                                                       
+  withdid := join(withbdid, iid, left.seq = right.seq, TRANSFORM({recordof(LEFT)}, SELF.rep_did := right.did, SELF := LEFT), LEFT OUTER, KEEP(1));
+
 	// get seeds
-	seeds := SmallBusiness_Testseed_Function( indata, model_name, Test_Data_Table_Name );
-	final := if( testseeds, seeds, withModel );
+	seeds := PROJECT(SmallBusiness_Testseed_Function( indata, model_name, Test_Data_Table_Name ), TRANSFORM({UNSIGNED6 rep_did, unsigned bdid, recordof(LEFT)}, SELF := LEFT, SELF := []));
+	final := if( testseeds, seeds, withdid );
 	
  /* *************************************
   *   Boca Shell Logging Functionality  *

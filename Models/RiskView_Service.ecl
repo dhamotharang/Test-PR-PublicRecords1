@@ -113,6 +113,8 @@ export RiskView_Service := MACRO
 	Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
 
 	unsigned6 did_value := 0				: stored('DID');
+  string120	fullname_value :=	''	: stored('UnParsedFullName');
+  string8   dob_value := ''      	: stored('DateOfBirth');
 	string120 addr_value := ''    	: stored('StreetAddress');
 	string25  city_value := ''     	: stored('City');
 	string2   state_value := ''     : stored('State');
@@ -120,6 +122,8 @@ export RiskView_Service := MACRO
 	string9   ssn_value := ''      	: stored('ssn');
 	string20  drlc_value := ''    	: stored('DLNumber');
 	string2   drlcstate_value := '' : stored('DLState');
+  string10  hphone_value := ''   	: stored('HomePhone');
+	string10  wphone_value := ''  	: stored('WorkPhone');
 	string50 DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
@@ -153,11 +157,15 @@ export RiskView_Service := MACRO
 																					 self.exclude_dmv_pii := ExcludeDMVPII,
 																					 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																					 self.archive_opt_in := ArchiveOptIn,
+                                           self.glb := 0,  //hardcoded to 0 as that's what riskview records is doing
+                                           self.dppa := 0, //hardcoded to 0 as that's what riskview records is doing
 																					 self.data_restriction_mask := DataRestriction,
 																					 self.data_permission_mask := DataPermission,
 																					 self.industry := Industry_Search[1].Industry,
 																					 self.i_attributes_name := attributesIn[1].name,
 																					 self.i_ssn := ssn_value,
+                                           self.i_dob := dob_value,
+                                           self.i_name_full := fullname_value,
 																					 self.i_name_first := fname_val,
 																					 self.i_name_last := lname_val,
 																					 self.i_lexid := did_value, 
@@ -167,6 +175,8 @@ export RiskView_Service := MACRO
 																					 self.i_zip := zip_value,
 																					 self.i_dl := drlc_value,
 																					 self.i_dl_state := drlcstate_value,
+                                           self.i_home_phone := hphone_value,
+                                           self.i_work_phone := wphone_value,
 																					 self.i_model_name_1 := if(model_count >= 1, model_url.parameters[1].value, ''),
 																					 // Check to see if there was a model requested
 																					 extra_score := model_count > 1;

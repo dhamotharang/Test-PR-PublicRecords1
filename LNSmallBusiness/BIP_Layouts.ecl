@@ -2614,6 +2614,7 @@ EXPORT BIP_Layouts := MODULE
 		SBFEAttributes;
 		BatchScoreData;
 		Company_IDs;
+    UNSIGNED6 Rep_Lexid;
 	END;
 
 	EXPORT IntermediateLayout_plus_PhoneSources := RECORD

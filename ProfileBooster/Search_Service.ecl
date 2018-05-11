@@ -568,11 +568,17 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
 																									 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																									 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                   self.glb := (Integer)userIn.GLBPurpose,
+                                                   self.dppa := (Integer)userIn.DLPurpose,
 																									 self.data_restriction_mask := DataRestriction,
 																									 self.data_permission_mask := DataPermission,
 																									 self.industry := Industry_Search[1].Industry,
 																									 self.i_attributes_name := attributesVersion,
 																									 self.i_ssn := search.SSN,
+                                                   self.i_dob := Search.dob.year +
+                                                                 intformat((integer1)Search.dob.month, 2, 1) +
+                                                                 intformat((integer1)Search.dob.day, 2, 1),
+                                                   self.i_name_full := search.Name.Full,
 																									 self.i_name_first := search.Name.First,
 																									 self.i_name_last := search.Name.Last,
 																									 self.i_lexid := (Integer)search.UniqueId,
@@ -580,6 +586,7 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.i_city := search.address.City,
 																									 self.i_state := search.address.State,
 																									 self.i_zip := search.address.Zip5,
+                                                   self.i_home_phone := search.phone,
 																									 // ProfileBooster does not have any models at the moment.
 																									 // This will have to be updated if that happens.
 																									 // self.i_model_name_1 := in_modelname,
