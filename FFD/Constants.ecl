@@ -2,6 +2,7 @@
 
 EXPORT Constants := MODULE
 
+	EXPORT BlankConsumerRec := ROW ([], FFD.Layouts.ConsumerLogInquiry);
 	EXPORT BlankStatementid := ROW ([], FFD.Layouts.StatementIdRec);
 	EXPORT BlankStatements := DATASET ([], FFD.Layouts.StatementIdRec);
 	EXPORT BlankConsumerStatements := DATASET([], iesp.share_fcra.t_ConsumerStatement);	

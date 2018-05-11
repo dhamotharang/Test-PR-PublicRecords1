@@ -113,6 +113,7 @@ export LiensSearchServiceFCRA() := macro
 	all_recs := all_recs_and_statements.records;
 	statements := all_recs_and_statements.statements;
 	consumer_alerts := all_recs_and_statements.ConsumerAlerts;
+  input_consumer := FFD.Constants.BlankConsumerRec;
 	
 	// returns filtered results if filter is specifed
 	recs_filt := all_recs((evictions_only and eviction = 'Y') 
@@ -129,5 +130,6 @@ export LiensSearchServiceFCRA() := macro
 	OUTPUT(recs_marshalled, NAMED('Results'));
 	OUTPUT(statements,NAMED('ConsumerStatements'));
 	OUTPUT(consumer_alerts, NAMED('ConsumerAlerts'));
+	OUTPUT(input_consumer, NAMED('Consumer'));
 
 endmacro;

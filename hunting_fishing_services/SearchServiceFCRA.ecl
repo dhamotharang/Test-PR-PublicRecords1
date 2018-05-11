@@ -47,9 +47,11 @@ export SearchServiceFCRA := macro
 		end;
 		tempresults := hunting_fishing_services.Search_Records.val(tempmod, true);
 
+	  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.Records, results, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse, Records, false);
 																																	
-		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_new, tempresults.Statements, tempresults.ConsumerAlerts, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse);
+		FFD.MAC.AppendConsumerAlertsAndStatements(results, results_new, tempresults.Statements, tempresults.ConsumerAlerts, input_consumer, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse);
 
 		output(results_new, named('Results'));
 

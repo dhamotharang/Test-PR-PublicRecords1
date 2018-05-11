@@ -56,11 +56,13 @@ export SearchServiceFCRA := macro
     export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
   end;
   
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+
   pilot_res := FaaV2_PilotServices.SearchService_Records.fcra_val(tempmod); 
    
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(pilot_res.Records, results, iesp.faapilot_fcra.t_fcraPilotSearchResponse);
      
-  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_out, pilot_res.Statements, pilot_res.ConsumerAlerts, iesp.faapilot_fcra.t_fcraPilotSearchResponse);                                               
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_out, pilot_res.Statements, pilot_res.ConsumerAlerts, input_consumer, iesp.faapilot_fcra.t_fcraPilotSearchResponse);                                               
    
   output(results_out, named('Results'));      
   

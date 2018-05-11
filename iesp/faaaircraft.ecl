@@ -84,7 +84,7 @@ end;
 export t_AircraftReportAircraft := record
 	string30 ManufacturerName {xpath('ManufacturerName')};
 	string20 ModelName {xpath('ModelName')};
-	string12 ModelCode {xpath('ModelCode')};
+	string7 ModelCode {xpath('ModelCode')};
 	string30 SerialNumber {xpath('SerialNumber')};
 	integer ManufactureYear {xpath('ManufactureYear')};
 	string40 AircraftType {xpath('AircraftType')};
@@ -104,8 +104,6 @@ export t_AircraftReportRecordBase := record
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	iesp.share.t_Date LastActionDate {xpath('LastActionDate')};
 	iesp.share.t_Date CertificationDate {xpath('CertificationDate')};
-	t_AircraftReportAircraft AircraftInfo {xpath('AircraftInfo')};
-	t_AircraftReportEngine EngineInfo {xpath('EngineInfo')};
 end;
 		
 export t_AircraftReportRecord := record (t_AircraftReportRecordBase)
@@ -113,6 +111,8 @@ export t_AircraftReportRecord := record (t_AircraftReportRecordBase)
 	string100 IdValue {xpath('IdValue')};
 	string1 AmateurCertification {xpath('AmateurCertification')};
 	t_AircraftReportRegistrant Registrant {xpath('Registrant')};
+	t_AircraftReportAircraft AircraftInfo {xpath('AircraftInfo')};
+	t_AircraftReportEngine EngineInfo {xpath('EngineInfo')};
 end;
 		
 export t_AircraftReportResponse := record

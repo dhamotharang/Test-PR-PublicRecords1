@@ -31,6 +31,7 @@ export t_FcraSexOffenderSearchResponse := record
 	dataset(t_FcraOffenderRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.SEXOFF_MAX_COUNT_SEARCH_RESPONSE_RECORDS)};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MaxConsumerStatements)};
 	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};
 end;
 		
 export t_FcraSexOffenderReportBy := record (iesp.share_fcra.t_FcraReportBy)
@@ -52,6 +53,7 @@ export t_FcraSexOffenderReportResponse := record
 	dataset(t_FcraSexOffReportRecord) SexualOffenses {xpath('SexualOffenses/SexualOffense'), MAXCOUNT(iesp.Constants.SEXOFF_MAX_COUNT_REPORT_RESPONSE_RECORDS)};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MaxConsumerStatements)};
 	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};
 end;
 		
 export t_FcraSexOffenderSearchRequest := record (iesp.share.t_BaseRequest)
