@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RecoverScore Batch Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -7,6 +7,8 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="ApplicationType"     	type="xsd:string"/>
 	<part name="Model" type="xsd:string"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="ExcludeWatchLists" type="xsd:boolean"/> <!-- For Testing Purposes Only -->
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="10"/>
 </message>
 */
@@ -75,11 +77,12 @@ export RecoverScore_Batch_Service := MACRO
 #stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
 
 batchin := dataset([],Models.Layout_RecoverScore_Batch_Input) 			: stored('batch_in',few);
-gateways := Gateway.Configuration.Get();
 // per Brian Worley request, set permissible purpose on batch query to 0 and 0
 unsigned1 DPPA_Purpose := 0									: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := 0 : stored('GLBPurpose');
 string20 model_val := ''													: stored('Model');
+unsigned1 ofac_version      := 1        : stored('OFACVersion');
+boolean   excludewatchlists := false 		: stored('ExcludeWatchLists');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
@@ -112,8 +115,18 @@ valid_models := [
 									'RSN1009_1_0' // apex
 									];
 
+gateways_in := Gateway.Configuration.Get();
 
 model_name := if(model in valid_models, model, ERROR(301,'Missing or Invalid Model Name') );
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
+	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
+	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
+  self := le;																																								
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if(ofac_version = 4 and model_name in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 // add sequence to matchup later to add acctno to output
 Models.Layout_RecoverScore_Batch_Input into_seq(batchin le, integer C) := TRANSFORM
@@ -187,12 +200,11 @@ skiptrace := riskwise.skip_trace(prep, DPPA_Purpose, glb_Purpose, datarestrictio
 boolean isUtility := false;
 boolean ln_branded := false;
 boolean ofac_only := true;
-include_ofac := false;
+include_ofac := if(ofac_version = 1, false, true);
 boolean suppressNearDups := true;
 boolean require2Ele := false;
 boolean fromBIID := false;
 boolean isFCRA := false;
-boolean excludeWatchlists := false;
 boolean from_IT1O := true;  // set to true so we get the same chrono phone information back from IID function 
 														// that we would in it51 so that skiptrace works the same as it does in it51
 boolean includeRelativeInfo := true;
@@ -208,9 +220,8 @@ integer bsVersion := map(
 );
 boolean doScore := false;
 boolean nugen := true;
-ofac_version := 1;
 include_additional_watchlists := false;
-watchlist_threshold := 0.84;
+watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 dob_radius := -1;
 
 prep_from_skiptrace := project(ungroup(skiptrace), transform(risk_indicators.layout_input, self:=left));

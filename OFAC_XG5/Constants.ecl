@@ -1,6 +1,6 @@
-﻿EXPORT Constants := module
+EXPORT Constants := module
 
-// Test
+
 EXPORT ENTITYtype (INTEGER ID) := 
 																	map(
 																	ID = 0 => 'NONE' ,

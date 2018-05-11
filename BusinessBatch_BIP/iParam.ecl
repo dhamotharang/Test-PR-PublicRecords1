@@ -1,4 +1,4 @@
-IMPORT BatchShare,BusinessBatch_BIP;
+﻿IMPORT BatchShare,BusinessBatch_BIP,Business_Risk_BIP,Gateway;
 
 EXPORT iParam :=
 MODULE
@@ -8,6 +8,7 @@ MODULE
   INTERFACE(BatchShare.IParam.BatchParams)
 		EXPORT BOOLEAN BestOnly;
     EXPORT BOOLEAN ExcludeExperian;
+    EXPORT UNSIGNED1 OFAC_Version;
   END;
 
   // Function to initalize the params
@@ -19,6 +20,9 @@ MODULE
 				EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessBatch_BIP.Constants.Defaults.MaxResultsPerAcctno : STORED('Max_Results_Per_Acct');
 				EXPORT BOOLEAN BestOnly := FALSE : STORED('Best_Only');
         EXPORT BOOLEAN ExcludeExperian := FALSE : STORED('ExcludeExperian');
+        EXPORT UNSIGNED1 OFAC_Version := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
+	
+        EXPORT DATASET(Gateway.Layouts.Config) Gateways := Gateway.Configuration.Get();
 			END;
 			
 			RETURN inMod;
