@@ -1212,8 +1212,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 																			 -record_score,
 																		   ds_rolled_results.Best.CompanyNameInfo.CompanyName, record),
 																							
-																		 sort(ds_rolled_results, -proxweight,
-																		 -record_score,record)
+																		 sort(ds_rolled_results, -proxweight,																		
+																		 -record_score, 
+																		  //-Best.ToDate.Year,-Best.ToDate.Month,-Best.toDate.Day, // could add back in later
+																			if (best.isActive, 0, 1), record)
 																		 );
 				// dedup out the matches that are the same within a particular SELEID even if different proxids
 				// and a lot of FIELDs to exclude in the dedup too.
@@ -1360,7 +1362,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		// OUTPUT(ds_rolled_Suppressed, NAMED('ds_rolled_Suppressed'));
     // OUTPUT(useBusinessCreditSorting, NAMED('useBusinessCreditSorting'));
 		               
-		// output(choosen(ds_linkIDsRestricted(source = 'BA'),500), named('ds_linkIDsRestricted'));
+		// output(choosen(ds_linkIDsRestricted,50), named('ds_linkIDsRestricted'));
 		// output(choosen(ds_linkIDsNonRestricted,500), named('ds_linkIDsNonRestricted'));
 		// OUTPUT(ds_rolled_final, NAMED('ds_rolled_final'));
     		
@@ -1381,14 +1383,14 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 //	  output(possible_Lafn, named('possible_lafn'));
 //	  output(possible_truncation, named('possible_truncation'));
 //	  output(ds_linkIDsNonRestricted, named('ds_linkIDsNonRestricted'));
-//    output(ds_linkIDsRestricted, named('ds_linkIDsRestricted'));
+ // output(ds_linkIDsRestricted, named('ds_linkIDsRestricted'));
 //		output(ds_seleidBestWirelessIndicator, named('ds_seleidBestWirelessIndicator'));		 		
 		// output(SearchResultsStats, named('SearchResultsStats'));
 		// output(cntRecsReturned, named('cntRecsReturned'));
 		// output(recs, named('recs'));
 		
 		// output(ds_add_UltWAF, named('ds_add_UltWAF'));
-		//output(ds_seleidBest, named('ds_seleidBest'));
+		// output(ds_seleidBest, named('ds_seleidBest'));
 		// output(ds_seleidBestTmp, named('ds_seleidBestTmp'));
 //		output(ds_ultLinkIDInfo, named('ds_ultLinkIDInfo'));
 		
@@ -1396,7 +1398,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		// output(TopResultsScored_WirelessIndicator, named('TopResultsScored_WirelessIndicator'));
 		//output(ds_ultInfo, named('ds_ultInfo'));		
 		// output(choosen(ds_linkIDsNonRestricted, 4500), named('ds_linkIDsNonRestricted'));	
-		// output(choosen(ds_linkIDsRestricted,5000), named('ds_linkIDsRestricted'));		
+		 // output(ds_linkIDsRestricted, named('ds_linkIDsRestricted'));		
 		// output(count(ds_seleidBest), named('count_ds_seleidBest'));
 		
 		// output(ds_rolled_results, named('ds_rolled_results'));
@@ -1419,7 +1421,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		
     // output(topResultsPreSuppress, named('topResultsPreSuppress'));
 	  // output(TopResultsScored_wirelessIndicator, named('TopResultsScored_wirelessIndicator'));
-	  // output(tmp_return_results_NEW, named('tmp_return_results_new'));
+	  //output(tmp_return_results_NEW, named('tmp_return_results_new'));
 		// output(tmp_return_results_NEW_sorted, named('tmp_return_results_new_sorted'));
 				
 		// output(tmp_return_results_NEWExpFein, named('tmp_return_results_NEWExpFein'));
@@ -1474,7 +1476,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 	// output(ds_seleidBest, named('ds_seleidBest'));
 	
 		// output(sorted_add_metadata_3, named('sorted_add_metadata_3'));
-		// output(ds_sortedBySELEID_results, named('ds_sortedBySELEID_results'));
+	//	output(ds_sortedBySELEID_results, named('ds_sortedBySELEID_results'));
 	   // output(ds_rolled_results, named('ds_rolled_results'));			
 		 // output(ds_rolled_results_sorted, named('ds_rolled_results_sorted'));
 		 // output(ds_rolled_final, named('ds_rolled_final'));
