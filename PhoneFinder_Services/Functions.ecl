@@ -149,10 +149,10 @@ MODULE
 
 	END;
 
-	EXPORT STRING ServiceClassDesc(INTEGER pServiceClass) := CASE(pServiceClass,
-																																0 => PhoneFinder_Services.Constants.PhoneType.Landline,
-																																1 => PhoneFinder_Services.Constants.PhoneType.Wireless,
-																																2 => PhoneFinder_Services.Constants.PhoneType.VoIP,
+	EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
+																																'0' => PhoneFinder_Services.Constants.PhoneType.Landline,
+																																'1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
+																																'2' => PhoneFinder_Services.Constants.PhoneType.VoIP,
 																																PhoneFinder_Services.Constants.PhoneType.Other);
 	
 	EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10,11,12,13,20,21,22,23] => PhoneFinder_Services.Constants.PhoneStatus.Active,
@@ -524,7 +524,7 @@ MODULE
 				SELF.Alerts						   := IF(ri.phone != '',ri.Alerts,le.Alerts);				
 				SELF.ListingType       := IF(ri.ListingType != '',ri.ListingType,le.ListingType);
 				SELF.coc_description   := IF(ri.ServiceClass != '',
-																			PhoneFinder_Services.Functions.ServiceClassDesc((INTEGER)ri.ServiceClass),
+																			PhoneFinder_Services.Functions.ServiceClassDesc(ri.ServiceClass),
 																			le.coc_description);
 				SELF.carrier_name      := IF(ri.operatingcompany.name != '',ri.operatingcompany.name,le.carrier_name);
 				SELF.phone_region_city := IF(ri.operatingcompany.address.city != '',ri.operatingcompany.address.city,le.phone_region_city);
@@ -541,14 +541,15 @@ MODULE
 														LEFT OUTER,
 														LIMIT(0),KEEP(1));
 														
-			// To preserve Qsent PVS(type flag P ) records
+			// To preserve single records coming from Qsent PVS(type flag P ) 
 			dTUPhonesOnly := JOIN(dPrimaryPhoneDetail, dPhoneDetail_, 
 			                     LEFT.acctno = RIGHT.acctno and 
-													           LEFT.phone  = RIGHT.phone, 
-																		      TRANSFORM(lpf.PhoneFinder.PhoneSlim,
-																					   SELF.coc_description   := PhoneFinder_Services.Functions.ServiceClassDesc((INTEGER)LEFT.ServiceClass),
-																						  SELF := LEFT),
-																		      LEFT ONLY);
+													            LEFT.phone  = RIGHT.phone, 
+																		       TRANSFORM(lpf.PhoneFinder.PhoneSlim,
+ 																					    SELF.coc_description   := IF(LEFT.ServiceClass != '', 
+   																						                             PhoneFinder_Services.Functions.ServiceClassDesc(LEFT.ServiceClass), LEFT.coc_description);
+                       SELF := LEFT),
+																		       LEFT ONLY);
 			
 		 dAllPhonesDetail_ := dPhoneDetail_ + dTUPhonesOnly;
 		 dPhoneDetail := IF(EXISTS(dPhoneRollup),dAllPhonesDetail_,dPrimaryPhoneDetail);
@@ -660,7 +661,7 @@ MODULE
    			OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
       OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
 			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
-		#END
+		 #END
 		 
 		RETURN dPhoneIesp_Final;
 	ENDMACRO;
