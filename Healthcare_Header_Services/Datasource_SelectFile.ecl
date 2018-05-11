@@ -1,9 +1,9 @@
-/*2018-02-01T01:11:27Z (HABBU, JAIDEEP (RIS-BCT))
+﻿/*2018-02-01T01:11:27Z (HABBU, JAIDEEP (RIS-BCT))
 checkin changes as per RR-12063
 */
 Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions;
 /*Changes for RR11959*/
-EXPORT Datasource_SelectFile := MODULE
+ EXPORT Datasource_SelectFile := MODULE
 	Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input):= function
 			// rawdataIndividual:= join(dedup(sort(input(lnpid>0),record),record), Enclarity.Keys(,true).individual_lnpid.qa,
 											// keyed(left.lnpid = right.lnpid),
@@ -502,9 +502,8 @@ EXPORT Datasource_SelectFile := MODULE
 			// updateFEIN := join(baseRecs(min(names,namepenalty) < Healthcare_Header_Services.Constants.BUS_NAME_MATCH_THRESHOLD),fein_rolled,left.acctno=right.acctno,transform(Layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateFEIN := join(mergedRecs,fein_rolled,left.acctno=right.acctno and left.lnpid=right.providerid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateSanctions := project(updateFEIN+getSanctionRecords,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
-																										//sanctionLookup := appendSanctionLookupStep1(left.Sanctions);
-																										StateSanctions := left.Sanctions;
-																										FinalSanctions := appendSanctionGroup(StateSanctions);
+																										sanctionLookup := appendSanctionLookupStep1(left.Sanctions);
+																										FinalSanctions := appendSanctionGroup(sanctionLookup);
 																										self.Sanctions := FinalSanctions;
 																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,FinalSanctions);
 																										self := Left));
