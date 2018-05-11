@@ -1,4 +1,4 @@
-﻿IMPORT FraudShared_Services, iesp, Royalty;
+﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -20,7 +20,15 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, TRANSFORM(iesp.fraudgovreport.t_FraudGovKnownRisk,
 																																					SELF.KnownRiskCount := LEFT.KnownRiskCount,
 																																					SELF.KnownRiskReasons := CHOOSEN(LEFT.KnownRiskReasons, MaxKnownFrauds)));
-
+		
+		/* Filling up IdentityCardDetails && GovernmentBest for IDENTITY record. */
+			//* For A Lexid that is provided as input *//
+		ds_dids := PROJECT(ds_batch_in (did > 0) , TRANSFORM(DidVille.Layout_Did_OutBatch, SELF.Seq := COUNTER, SELF.did := LEFT.did, SELF := []));
+		ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids, batch_params)[1];
+		ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)[1];
+		
+		
+		
     iesp.fraudgovreport.t_FraudGovRecord xform_response() := TRANSFORM
       SELF.RiskScore := ds_batch[1].risk_score;
       SELF.RiskLevel := ds_batch[1].risk_level;
@@ -37,15 +45,16 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
       SELF.GlobalWatchlists :=	PROJECT(CHOOSEN(ds_batch.childRecs_Patriot, iesp.constants.FraudGov.MAX_COUNT_GLOBAL_WATCHLIST), 
 																						FraudGovPlatform_Services.Transforms.xform_global_watchlist(LEFT, COUNTER));
 																															
-      SELF.VelocityCounts :=	PROJECT(CHOOSEN(ds_batch.childRecs_velocities, MaxVelocities),
+      SELF.Velocities :=	PROJECT(CHOOSEN(ds_batch.childRecs_velocities, MaxVelocities),
 																						FraudGovPlatform_Services.Transforms.xform_velocities(LEFT));
 			
 			SELF.KnownRisks := all_knownfrauds_final;
+
+			SELF.IdentityCardDetails := PROJECT(ds_contributoryBest	, TRANSFORM(LEFT));
+			SELF.GovernmentBest := PROJECT(ds_GovBest, TRANSFORM(LEFT));
+
+			SELF := [];
 		END;
-     
-		// output(MaxVelocities, named('MaxVelocities'));
-		// output(MaxKnownFrauds, named('MaxKnownFrauds'));
-		// output(all_knownfrauds_final, named('all_knownfrauds_final'));
 		
 		EXPORT esdl_out := DATASET([xform_response()]);
 		EXPORT ds_royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(fdn_knownfrauds, true);

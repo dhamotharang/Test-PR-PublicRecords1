@@ -14,8 +14,7 @@ export t_FraudGovSearchBy := record
 	string15 Phone10 {xpath('Phone10')};
 	string12 UniqueId {xpath('UniqueId')};
 	string50 EmailAddress {xpath('EmailAddress')};
-	string2 DriversLicenseState {xpath('DriversLicenseState')};
-	string25 DriversLicenseNumber {xpath('DriversLicenseNumber')};
+	iesp.fraudgovplatform.t_FraudGovDriversLicense DriversLicense {xpath('DriversLicense')};
 	string10 ProgramCode {xpath('ProgramCode')};
 	string20 HouseholdId {xpath('HouseholdId')};
 	string20 CustomerPersonId {xpath('CustomerPersonId')};
@@ -24,8 +23,7 @@ export t_FraudGovSearchBy := record
 	string12 AmountMin {xpath('AmountMin')};
 	string12 AmountMax {xpath('AmountMax')};
 	string100 BankName {xpath('BankName')};
-	string20 BankRoutingNumber {xpath('BankRoutingNumber')};
-	string20 BankAccountNumber {xpath('BankAccountNumber')};
+	iesp.fraudgovplatform.t_FraudGovBankInformation BankInformation {xpath('BankInformation')};
 	string75 ISPName {xpath('ISPName')};
 	string25 IpAddress {xpath('IpAddress')};
 	string25 MACAddress {xpath('MACAddress')};
@@ -48,6 +46,7 @@ export t_FraudGovSearchOption := record (iesp.share.t_BaseOption)
 end;
 		
 export t_FraudGovSearchRecord := record
+	string70 AnalyticsRecordId {xpath('AnalyticsRecordId')};
 	string10 RecordType {xpath('RecordType')};
 	string60 ElementType {xpath('ElementType')};
 	string100 ElementValue {xpath('ElementValue')};
@@ -62,10 +61,8 @@ export t_FraudGovSearchRecord := record
 	integer NoOfKnownRisks {xpath('NoOfKnownRisks')};
 	iesp.share.t_Date LastActivityDate {xpath('LastActivityDate')};
 	iesp.share.t_Date LastKnownRiskDate {xpath('LastKnownRiskDate')};
-	string12 DollarAmount {xpath('DollarAmount')};
 	string100 ClusterName {xpath('ClusterName')};
-	string50 ClusterNumber {xpath('ClusterNumber')};
-	integer RateOfGrowth {xpath('RateOfGrowth')};
+	dataset(iesp.share.t_NameValuePair) NVPs {xpath('NVPs/NVP'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_NVP)};
 end;
 		
 export t_FraudGovSearchResponse := record

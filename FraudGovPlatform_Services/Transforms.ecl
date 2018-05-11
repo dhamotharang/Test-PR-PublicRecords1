@@ -113,7 +113,7 @@ EXPORT Transforms := MODULE
 
 	END;
 	
-	EXPORT iesp.fraudgovreport.t_FraudGovVelocityCount xform_velocities(FraudGovPlatform_Services.Layouts.velocities l) := TRANSFORM		
+	EXPORT iesp.fraudgovreport.t_FraudGovVelocity xform_velocities(FraudGovPlatform_Services.Layouts.velocities l) := TRANSFORM		
 		
 		SELF.FoundCount := l.foundCnt;
 		SELF.Description := l.description;

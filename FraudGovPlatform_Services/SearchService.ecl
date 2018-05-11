@@ -19,16 +19,16 @@ EXPORT SearchService() := MACRO
 	
 	#STORED('GlobalCompanyId', FraudGovUser.GlobalCompanyId);
 	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
-	#STORED('ProductCode',FraudGovUser.ProductCode);
+	#STORED('ProductCode',FraudGovUser.ProductCode); 
 	#STORED('FraudPlatform', Options.Platform);
 
 	// *********************************Validation*******************************************
 	
 	BOOLEAN isMinimumInput := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR searchBy.UniqueId <> '' OR 
-														searchBy.EmailAddress <> '' OR (searchBy.DriversLicenseNumber <> '' AND searchBy.DriversLicenseState <> '') OR
+														searchBy.EmailAddress <> '' OR (searchBy.DriversLicense.DriversLicenseNumber <> '' AND searchBy.DriversLicense.DriversLicenseState <> '') OR
 														searchBy.HouseholdID <> '' OR searchBy.CustomerPersonId <> ''  OR searchBy.DeviceSerialNumber <> '' OR 
-														searchBy.AmountMin <> '' OR searchBy.AmountMax <> '' OR searchBy.BankName <> '' OR searchBy.BankRoutingNumber <> '' OR
-														searchBy.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
+														searchBy.AmountMin <> '' OR searchBy.AmountMax <> '' OR searchBy.BankName <> '' OR searchBy.BankInformation.BankRoutingNumber <> '' OR
+														searchBy.BankInformation.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
 														(iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') OR
 														searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
 	
@@ -40,8 +40,7 @@ EXPORT SearchService() := MACRO
 
 	GetSearchModule(iesp.fraudgovsearch.t_FraudGovSearchBy searchBy) := FUNCTION
 		FraudShared_Services.Layouts.BatchInExtended_rec xform_batch_in() := TRANSFORM
-			SELF.acctno := '1';
-			// SELF.name_Full := searchBy.Name.Full; 
+			SELF.acctno := '1';	//Input will always be batch of 1 record. 
 			SELF.name_first := searchBy.Name.First;
 			SELF.name_middle := searchBy.Name.Middle;
 			SELF.name_last := searchBy.Name.Last;
@@ -53,17 +52,28 @@ EXPORT SearchService() := MACRO
 			SELF.addr_suffix := searchBy.Address.StreetSuffix;
 			SELF.postdir := searchBy.Address.StreetPostDirection;
 			SELF.unit_desig := searchBy.Address.UnitDesignation;
-			// SELF.sec_range := searchBy.Address.UnitNumber;
+			SELF.sec_range := searchBy.Address.UnitNumber;
 			SELF.p_city_name := searchBy.Address.City; 
 			SELF.st := searchBy.Address.State; 
 			SELF.z5 := searchBy.Address.Zip5; 
+			SELF.mailing_addr := searchBy.MailingAddress.StreetAddress1;
+			SELF.mailing_prim_range := searchBy.MailingAddress.StreetPredirection;
+			SELF.mailing_predir := searchBy.MailingAddress.StreetNumber;
+			SELF.mailing_prim_name := searchBy.MailingAddress.StreetName;
+			SELF.mailing_addr_suffix := searchBy.MailingAddress.StreetSuffix;
+			SELF.mailing_postdir := searchBy.MailingAddress.StreetPostDirection;
+			SELF.mailing_unit_desig := searchBy.MailingAddress.UnitDesignation;
+			SELF.mailing_sec_range := searchBy.MailingAddress.UnitNumber;
+			SELF.mailing_p_city_name := searchBy.MailingAddress.City; 
+			SELF.mailing_st := searchBy.MailingAddress.State; 
+			SELF.mailing_z5 := searchBy.MailingAddress.Zip5; 			
 			SELF.dob := iesp.ECL2ESP.t_DateToString8(searchBy.DOB);
 			SELF.ssn := searchBy.SSN;
 			SELF.phoneno := searchBy.Phone10;
 			SELF.did := (INTEGER)searchBy.UniqueId; 
 			SELF.email_address := searchBy.EmailAddress;
-			SELF.dl_number := searchBy.DriversLicenseNumber; 
-			SELF.dl_state := searchBy.DriversLicenseState; 
+			SELF.dl_number := searchBy.DriversLicense.DriversLicenseNumber; 
+			SELF.dl_state := searchBy.DriversLicense.DriversLicenseState; 
 			SELF.ProgramCode := searchBy.ProgramCode;
 			SELF.HouseholdID := searchBy.HouseholdID;
 			SELF.CustomerPersonId := searchBy.CustomerPersonId;
@@ -72,8 +82,8 @@ EXPORT SearchService() := MACRO
 			SELF.AmountMin := searchBy.AmountMin;
 			SELF.AmountMax := searchBy.AmountMax;
 			SELF.BankName := searchBy.BankName;
-			SELF.bank_routing_number := searchBy.BankRoutingNumber;
-			SELF.bank_account_number := searchBy.BankAccountNumber;
+			SELF.bank_routing_number := searchBy.BankInformation.BankRoutingNumber;
+			SELF.bank_account_number := searchBy.BankInformation.BankAccountNumber;
 			SELF.ISPname := searchBy.ISPName;
 			SELF.ip_address := searchBy.IPAddress; 
 			SELF.MACAddress := searchBy.MACAddress; 
@@ -104,7 +114,9 @@ EXPORT SearchService() := MACRO
 	batch_params := FraudGovPlatform_Services.IParam.getBatchParams();
 	search_mod := GetSearchModule(first_row.SearchBy);
 
-	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsOnline);
+	//Adding Options.IsTestRequest. When Options.IsTestRequest = TRUE, the service returns mockedup data in the
+	//... roxie response, to help ESP and Web to continue with the development until we find a real way to return the data.
+	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsOnline, Options.IsTestRequest);
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
