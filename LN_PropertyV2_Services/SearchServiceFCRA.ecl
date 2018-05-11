@@ -118,6 +118,7 @@ export SearchServiceFCRA() := macro
 	raw := raw_combined.Records;
 	statements := raw_combined.Statements;
   consumer_alerts := raw_combined.ConsumerAlerts;
+  input_consumer := FFD.Constants.BlankConsumerRec;
 	
 	// standard record counts & limits
 	doxie.MAC_Header_Field_Declare(isFCRA);
@@ -134,5 +135,6 @@ export SearchServiceFCRA() := macro
 	output(cooked, named('Results'));
 	output(statements, named('ConsumerStatements'));
 	output(consumer_alerts, named('ConsumerAlerts'));
+	output(input_consumer, named('Consumer'));
 
 endmacro;

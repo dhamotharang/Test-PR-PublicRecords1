@@ -79,6 +79,8 @@ export SearchServiceFCRA := MACRO
 		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);	
 	end;
 
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	
 	crim_all := CriminalRecords_Services.SearchService_Records.fcra_val(tempmod);
 	crim_records_all := crim_all.Records;
 	
@@ -86,7 +88,7 @@ export SearchServiceFCRA := MACRO
 
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(crim_records, results_pre, iesp.criminal_fcra.t_FcraCriminalSearchResponse);
 
-	FFD.MAC.AppendConsumerAlertsAndStatements(results_pre, results, crim_all.Statements, crim_all.ConsumerAlerts, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
+	FFD.MAC.AppendConsumerAlertsAndStatements(results_pre, results, crim_all.Statements, crim_all.ConsumerAlerts, input_consumer, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
 	
 	output(results, named('Results'), all);																	 															
 																 															

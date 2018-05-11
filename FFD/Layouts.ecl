@@ -79,5 +79,9 @@ EXPORT Layouts := MODULE
 		BOOLEAN has_consumer_statement := FALSE;  // keeping for internal use to set alert_cnsmr_statement later
   END;
   
-  
+  EXPORT ConsumerLogInquiry := RECORD (iesp.share_fcra.t_FcraConsumer)
+	  STRING CaseNumber := '';   // log for bankruptcy search by case number
+  END;
+		
+
 END;

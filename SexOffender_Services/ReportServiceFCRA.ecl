@@ -64,10 +64,12 @@ export ReportServiceFCRA := macro
 
 	temp := SexOffender_Services.ReportRecords.fcra_val(tempmod);
  
+  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did);
+	
  	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(temp.Records, results, 
                   iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse, SexualOffenses, true);
  // transform to FCRA FFD layout
-  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, temp.Statements, temp.ConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse);
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, temp.Statements, temp.ConsumerAlerts, input_consumer, iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse);
 
   output(out_results,named('Results'));
 

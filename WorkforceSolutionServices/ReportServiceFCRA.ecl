@@ -34,7 +34,7 @@ EXPORT ReportServiceFCRA  := macro
 		
 	in_mod := module(project(AutoStandardI.GlobalModule(true), WorkforceSolutionServices.IParam.report_params,opt))
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);		
-		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose); // should we?
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose); 
 		export boolean IncludeIncome := first_row.options.IncludeIncome;
 		export boolean IsRhodeIslandResident := first_row.options.IsRhodeIslandResident;
 	end;
@@ -53,6 +53,7 @@ EXPORT ReportServiceFCRA  := macro
 		self.VerificationOfEmploymentReportRecord := wssRecords;
 		self.ConsumerStatements := wss_out.Statements;
 		self.ConsumerAlerts := [];
+		self := [];
 	end;
 	results := row(xtOut());
 	output(results, named('Results'));

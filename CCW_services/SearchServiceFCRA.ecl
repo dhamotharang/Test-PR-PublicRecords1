@@ -47,10 +47,12 @@ EXPORT SearchServiceFCRA := MACRO
 	end;
 	
 	ccwresults := CCW_services.SearchService_Records.search(tempmod, true);		
+
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ccwresults.Records, results, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	
 	
-  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_final, ccwresults.Statements, ccwresults.ConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, results_final, ccwresults.Statements, ccwresults.ConsumerAlerts, input_consumer, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
 	
 	output(results_final, named('Results'));
 	 

@@ -36,9 +36,12 @@ export WatercraftReportServiceFCRA := macro
 	END;
 	
 	report_recs := watercraftV2_Services.WatercraftReport(params, true);
+
+  input_consumer := FFD.Constants.BlankConsumerRec;
 																	
 	output(report_recs.Records, named('Results'));
 	output(report_recs.Statements, named('ConsumerStatements'));
 	output(report_recs.ConsumerAlerts, named('ConsumerAlerts'));
+	output(input_consumer, named('Consumer'));
 
 endmacro;

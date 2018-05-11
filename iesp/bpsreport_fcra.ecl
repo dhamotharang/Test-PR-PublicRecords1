@@ -6,6 +6,29 @@ import iesp;
 
 export bpsreport_fcra := MODULE
 			
+export t_FcraBpsReportBestInfo := record (iesp.bpsreport.t_BpsReportBestInfo)
+end;
+		
+export t_FcraBpsReportAddressEx := record (iesp.bpsreport.t_BpsReportAddressEx)
+end;
+		
+export t_FcraBpsReportIdentity := record (iesp.bps_share.t_BpsReportIdentity)
+end;
+		
+export t_FcraBpsReportOldPhone := record (iesp.bpsreport.t_BpsReportOldPhone)
+end;
+		
+export t_AccountDecisioningAttributes := record
+	integer OpenAutoAccountsWithin3Months {xpath('OpenAutoAccountsWithin3Months')};
+	integer OpenMortgageAccountsWithin3Months {xpath('OpenMortgageAccountsWithin3Months')};
+	integer OpenHomeEquityLineAccountsWithin3Months {xpath('OpenHomeEquityLineAccountsWithin3Months')};
+	integer UnpaidThirdPartyCollections {xpath('UnpaidThirdPartyCollections')};
+	integer PercentCreditBankCardsWithin3Months {xpath('PercentCreditBankCardsWithin3Months')};
+	integer PercentAutoLoanAmountWithin3Months {xpath('PercentAutoLoanAmountWithin3Months')};
+	integer PercentMortgageAmountWithin3Months {xpath('PercentMortgageAmountWithin3Months')};
+	integer NumberOfThirdPartyCollections {xpath('NumberOfThirdPartyCollections')};
+end;
+		
 export t_FcraBpsReportBy := record (iesp.share_fcra.t_FcraReportBy)
 end;
 		
@@ -14,7 +37,7 @@ export t_FcraBaseBpsReportOption := record (iesp.share_fcra.t_FcraReportOption)
 	boolean IncludePriorProperties {xpath('IncludePriorProperties')};
 	boolean IncludeCurrentProperties {xpath('IncludeCurrentProperties')};
 	boolean IncludeBankruptcies {xpath('IncludeBankruptcies')};
-	boolean SuppressWithdrawnBankruptcy {xpath('SuppressWithdrawnBankruptcy')};
+	boolean SuppressWithdrawnBankruptcy {xpath('SuppressWithdrawnBankruptcy')};//hidden[internal]
 	boolean IncludeLiensJudgments {xpath('IncludeLiensJudgments')};
 	boolean IncludeCriminalRecords {xpath('IncludeCriminalRecords')};
 	boolean IncludeWaterCrafts {xpath('IncludeWaterCrafts')};
@@ -27,6 +50,10 @@ export t_FcraBaseBpsReportOption := record (iesp.share_fcra.t_FcraReportOption)
 end;
 		
 export t_FcraBpsReportOption := record (t_FcraBaseBpsReportOption)
+	boolean IncludeAccountDecisioning {xpath('IncludeAccountDecisioning')};//hidden[internal]
+	boolean IncludeProfessionalLicenses {xpath('IncludeProfessionalLicenses')};//hidden[internal]
+	boolean IncludeAKAs {xpath('IncludeAKAs')};//hidden[internal]
+	boolean IncludeOldPhones {xpath('IncludeOldPhones')};//hidden[internal]
 end;
 		
 export t_FcraFAACertificate := record (iesp.bpsreport.t_FAACertificate)
@@ -67,6 +94,12 @@ export t_FcraBpsReportIndividual := record
 	dataset(t_FcraBpsFAACertification) FAACertifications {xpath('FAACertifications/Certification'), MAXCOUNT(iesp.Constants.BR.MaxFaaCertificates)};
 	boolean IsDisputed {xpath('IsDisputed')};
 	dataset(iesp.share_fcra.t_StatementIdRec) StatementIds {xpath('StatementIdRecs/StatementIdRec'), MAXCOUNT(iesp.Constants.MaxConsumerStatementIds)};
+	t_AccountDecisioningAttributes AccountDecisioningAttributes {xpath('AccountDecisioningAttributes')};//hidden[internal]
+	t_FcraBpsReportBestInfo BestInfo {xpath('BestInfo')};//hidden[internal]
+	dataset(iesp.proflicense_fcra.t_FcraProfessionalLicenseRecord) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.Constants.BR.MaxProfLicenses)};//hidden[internal]
+	dataset(t_FcraBpsReportAddressEx) BpsReportAddresses {xpath('BpsReportAddresses/BpsReportAddress'), MAXCOUNT(iesp.Constants.BR.UNKNOWN)};//hidden[internal]
+	dataset(t_FcraBpsReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.Constants.BR.MaxAKA)};//hidden[internal]
+	dataset(t_FcraBpsReportOldPhone) OldPhones {xpath('OldPhones/OldPhone'), MAXCOUNT(iesp.Constants.BR.MaxPhonesHistorical)};//hidden[internal]
 end;
 		
 export t_FcraBpsReportResponse := record
@@ -74,6 +107,7 @@ export t_FcraBpsReportResponse := record
 	t_FcraBpsReportIndividual Individual {xpath('Individual')};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MaxConsumerStatements)};
 	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[ecl_only]
 end;
 		
 export t_FcraBpsReportRequest := record (iesp.share.t_BaseRequest)

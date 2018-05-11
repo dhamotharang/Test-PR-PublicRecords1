@@ -1,10 +1,28 @@
 ﻿EXPORT MAC := MODULE
 
-	EXPORT AppendConsumerAlertsAndStatements(__inf, __outf, __statements, __alerts, __lout, __csf = 'ConsumerStatements', __caf = 'ConsumerAlerts') := MACRO
+	EXPORT AppendConsumerAlertsAndStatements(__inf, __outf, __statements, __alerts, __consumer, __lout, __csf = 'ConsumerStatements', __caf = 'ConsumerAlerts', __cnsmr = 'Consumer') := MACRO
 		__outf := PROJECT(__inf, transform(__lout, 
                                         self.__caf := __alerts, 
                                         self.__csf := __statements, 
+                                        self.__cnsmr := __consumer, 
                                         self := left, self:=[]));
+	ENDMACRO;
+	
+	EXPORT PrepareConsumerRecord(__lexId, __isByLexId = TRUE, __searchby = '') := FUNCTIONMACRO
+		IMPORT FFD,iesp, AutoStandardI;
+
+	  iesp.share_fcra.t_FcraConsumer SetConsumerRecord() := TRANSFORM
+		  SELF.Lexid := __lexId;
+			#IF(__isByLexId)
+			  SELF.Inquiry.UniqueId := __lexId;  // for report ESDL queries we have only input UniqueId
+			#ELSIF(#TEXT(__searchby)<>'')
+		    SELF.Inquiry.DOB := iesp.ECL2ESP.t_DateToString8(__searchby.DOB);
+		    SELF.Inquiry := __searchby;
+			#END
+		  SELF := [];
+	  END;
+		__outrec := ROW(SetConsumerRecord()); 
+    RETURN 	__outrec;	
 	ENDMACRO;
 	
 	EXPORT PrepareResultRecord(__results, __outrec, __statements, __alerts, __lout) := MACRO
@@ -17,6 +35,7 @@
 			DATASET(__lout) Records;
 			DATASET(iesp.share_fcra.t_ConsumerStatement) Statements;
 			DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
+//			DATASET(iesp.share_fcra.t_FcraConsumer) Consumer;
    	END;   			
 		__outrec := ROW ({__results, %__res_statements%, __alerts}, %__res_layout%);		
 	ENDMACRO;

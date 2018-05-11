@@ -180,10 +180,13 @@ export BankruptcyReportServiceFCRA() :=  macro
                             all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
   
   consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
+	input_consumer := FFD.Constants.BlankConsumerRec;
+	
   doOutput := sequential(
     output(final, named('Results')),
     output(consumer_statements,named('ConsumerStatements')),
-    output(consumer_alerts, named('ConsumerAlerts')));  
+    output(consumer_alerts, named('ConsumerAlerts')),  
+    output(input_consumer, named('Consumer')));  
     
   
   sequential(
