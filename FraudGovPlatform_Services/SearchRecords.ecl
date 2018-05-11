@@ -1,8 +1,9 @@
-﻿IMPORT BatchShare, DidVille, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
+﻿IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
-										 BOOLEAN IsOnline = FALSE) := FUNCTION
+										 BOOLEAN IsOnline = FALSE,
+										 BOOLEAN IsTestRequest = FALSE) := FUNCTION
 	
 	//Defining the constants to be used later.
 	Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
@@ -10,6 +11,11 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	TodaysDate := std.date.today();
 	YesterdayDate := TodaysDate - 1;
+	
+	// ***random_no_of_identities*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual values. 
+	random_no_of_identities_ds := DATASET([{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}] , {unsigned1 num}); 
+	random_no_of_identities := ROUNDUP(count(random_no_of_identities_ds) * (((RANDOM()%100000)+1)/100000));
+	// ***random_scores ends***	
 
 	// ***random_scores*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual score. 
 	random_scores_ds := DATASET([{35}, {40}, {49}, {79}, {85}, {89}, {95}, {99}] , {unsigned1 num}); 
@@ -19,11 +25,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// ***random_no_of_cluster*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual values. 
 	random_no_of_cluster_ds := DATASET([{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}] , {unsigned1 num}); 
 	random_no_of_cluster := ROUNDUP(count(random_no_of_cluster_ds) * (((RANDOM()%100000)+1)/100000));
-	// ***random_scores ends***
-
-	// ***random_no_of_identities*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual values. 
-	random_no_of_identities_ds := DATASET([{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}] , {unsigned1 num}); 
-	random_no_of_identities := ROUNDUP(count(random_no_of_identities_ds) * (((RANDOM()%100000)+1)/100000));
 	// ***random_scores ends***
 
 	// **************************************************************************************
@@ -58,21 +59,17 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	ds_payload_best_in_dedup := DEDUP(SORT(ds_payload_best_in(did > 0), did), did);
 	
 	ds_best_in := IF(did_exists , ds_input_best_in , ds_payload_best_in_dedup);
-
-	ds_Best := DidVille.did_service_common_function(ds_best_in,
-																									appends_value      := 'BEST_ALL,VERIFY_ALL',
-																									verify_value       := 'BEST_ALL,VERIFY_ALL',
-																									glb_flag           := TRUE,
-																									glb_purpose_value  := (integer) batch_params.GLBPurpose,
-																									appType            := batch_params.ApplicationType,
-																									include_minors     := TRUE,
-																									IndustryClass_val  := batch_params.IndustryClass,
-																									DRM_val            := batch_params.DataRestrictionMask,
-																									GetSSNBest         := TRUE);
-		
+	
+	
+	//Getting the PR best to fill Indentity Detail card.
+	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_best_in, batch_params);
+	
+	//Getting the Contributory best to fill Indentity Detail card.
+	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_best_in, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+	
 	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
 	ds_elements_dids := PROJECT(ds_payload_best_in_dedup, TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec, 
-																													SELF.acctno := '1',
+																													SELF.acctno := (string) COUNTER,
 																													SELF.did := LEFT.did,
 																													SELF := []));
 	
@@ -81,7 +78,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
-		STRING50 Email_Address;
 		STRING60 fragment_value;
 		UNSIGNED3 file_type;
 		UNSIGNED4	LastActivityDate := 0;
@@ -104,7 +100,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																L.fragment = Fragment_Types_const.SSN_FRAGMENT => (string) R.ssn,
 																'');
 		SELF.file_type := R.classification_Permissible_use_access.file_type;
-		SELF.Email_Address := R.Email_Address;
 		SELF := L;
 	END;
 
@@ -136,49 +131,27 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (fragment_w_value_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
-		best_rec := ds_Best(L.fragment_value = (string)ds_Best.did)[1];
-		
+		gov_best_rec := ds_GovBest(ds_GovBest.UniqueId = L.fragment_value)[1];
+		contri_best_rec := ds_contributoryBest(ContributedBest.UniqueId = L.fragment_value)[1];
+
 		SELF.RecordType := MAP(	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => 'IDENTITY',
 														L.fragment In FraudGovPlatform_Services.Constants.RECORD_TYPE_ELEMENT_SET => 'ELEMENT',
 														'');
 		SELF.ElementType := L.fragment;
 		SELF.ElementValue := L.fragment_value;
 		SELF.Score := random_scores_ds[random_score].num;
-		SELF.NoOfIdentities := random_no_of_identities_ds[random_no_of_identities].num;;
-		SELF.GovernmentBest.UniqueId := IF(populateBest, (string) best_rec.did, '');  
-		SELF.GovernmentBest.Name.Prefix := IF(populateBest, best_rec.best_title	, ''); 
-		SELF.GovernmentBest.Name.First := IF(populateBest, best_rec.best_fname, ''); 
-		SELF.GovernmentBest.Name.Middle := IF(populateBest, best_rec.best_mname, ''); 
-		SELF.GovernmentBest.Name.Last := IF(populateBest, best_rec.best_lname, ''); 
-		SELF.GovernmentBest.Name.Suffix := IF(populateBest, best_rec.best_name_suffix, '');
-		SELF.GovernmentBest.SSN := IF(populateBest, (string) best_rec.best_ssn, '');
-		SELF.GovernmentBest.DOB := IF(populateBest, iesp.ECL2ESP.toDate((integer)best_rec.best_dob));
-		SELF.GovernmentBest.Address := IF(populateBest,  iesp.ECL2ESP.SetAddress('',
-																																							'', 
-																																							'', 
-																																							'', 
-																																							'', 
-																																							'', 
-																																							'',
-																																							best_rec.best_city,
-																																							best_rec.best_state, 
-																																							best_rec.best_zip, 
-																																							best_rec.best_zip4, 
-																																							'',
-																																							'',
-																																							best_rec.best_addr1));
-		SELF.GovernmentBest.Phone10 := IF(populateBest,(string) best_rec.best_phone	, '');
-		SELF.EmailAddress := L.email_address;
+		SELF.NoOfIdentities := random_no_of_identities_ds[random_no_of_identities].num;
+		
+		SELF.GovernmentBest := PROJECT(gov_best_rec, TRANSFORM(LEFT));
+		SELF.ContributedBest := PROJECT(contri_best_rec.ContributedBest	, TRANSFORM(LEFT));
+		SELF.EmailAddress :=  contri_best_rec.EmailAddress;
+		
 		SELF.NoOfClusters := random_no_of_cluster_ds[random_no_of_cluster].num;
 		SELF.NoOfRecentTransactions := R.NoOfRecentTransactions; //Last 24 hours velocity count.
 		SELF.NoOfTransactions := R.NoOfTransactions; //Total velocity count.
 		SELF.NoOfKnownRisks := R.NoOfKnownRisks; //Total Known Risk count.
 		SELF.LastActivityDate := iesp.ECL2ESP.toDate(L.LastActivityDate);
 		SELF.LastKnownRiskDate := iesp.ECL2ESP.toDate(L.LastKnownRiskDate); //Highest Knownrisk date.
-		// SELF.DollarAmount := '';
-		// SELF.ClusterName := '';
-		// SELF.ClusterNumber := '';
-		// SELF.RateofGrowth := '';
 		SELF := [];
 	END;
 	
@@ -186,21 +159,14 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LEFT.fragment_value = RIGHT.fragment_value AND
 																	LEFT.fragment = RIGHT.fragment,
 																	ElementsNIdentities_trans(LEFT, RIGHT));
-											
+																	
 	// output(ds_batch_in, named('ds_batch_in'));
-	// output(ds_input_with_did, named('ds_input_with_did'));
-	// output(ds_input_best_in, named('ds_input_best_in'));
-	// output(ds_payload_best_in, named('ds_payload_best_in'));
-	// output(ds_best_in, named('ds_best_in'));
-	// output(ds_Best, named('ds_Best'));
 	// output(ds_elements_dids, named('ds_elements_dids'));
-	// output(ds_fragment_recs, named('ds_fragment_recs'));
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
-	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
-	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
+	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
+	// output(ds_fragment_recs, named('ds_fragment_recs'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
-	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
-	// output(ds_otherElementsIdentities, named('ds_otherElementsIdentities'));
-	// output(ds_records, named('ds_records'));
+	// output(ds_contributoryBest, named('ds_contributoryBest'));
+
 	RETURN ds_ElementsNIdentities;
 END;

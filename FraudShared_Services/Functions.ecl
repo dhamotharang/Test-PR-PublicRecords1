@@ -346,7 +346,7 @@ EXPORT Functions := MODULE
 															l.prim_range = r.clean_address.prim_range AND
 															l.prim_name = r.clean_address.prim_name AND
 															l.sec_range = r.clean_address.sec_range AND
-															l.unit_desig = r.clean_address.unit_desig AND
+															// l.unit_desig = r.clean_address.unit_desig AND
 															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip),
 															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}],
 																	{STRING fragmentType}));
@@ -458,6 +458,9 @@ EXPORT Functions := MODULE
 		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
 			OUTPUT(ds_velocity_matches, NAMED('ds_velocity_matches'));
 		#END
+		
+		// output(ds_velocity_matches, named('ds_velocity_matches'));
+		// output(fragment_recs_norm, named('fragment_recs_norm'));
 		
 		RETURN contributionType_recs_norm;
 		

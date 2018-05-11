@@ -115,32 +115,6 @@ EXPORT fn_getadvsearch_raw_recs (
 								IsOnline and NOT isIPRangeKey => EntitiesIds_.GetIp(),
 								dataset([], FraudShared_Services.Layouts.Recid_rec));
 
-
-	
-	//Get Payload Records for all the invidual keys.
-	// ds_payload_autoname 	:= IF(EXISTS(ds_auto_name), FraudShared_Services.GetPayloadRecords(ds_auto_name, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_autoaddress 	:= IF(EXISTS(ds_auto_address), FraudShared_Services.GetPayloadRecords(ds_auto_address, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_autossn 	:= IF(EXISTS(ds_auto_ssn), FraudShared_Services.GetPayloadRecords(ds_auto_ssn, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_autophone 	:= IF(EXISTS(ds_auto_phone), FraudShared_Services.GetPayloadRecords(ds_auto_phone, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_did 	:= IF(EXISTS(ds_did), FraudShared_Services.GetPayloadRecords(ds_did, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_ip := IF(EXISTS(ds_ip), FraudShared_Services.GetPayloadRecords(ds_ip, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_linkids := IF(EXISTS(ds_linkId), FraudShared_Services.GetPayloadRecords(ds_linkId, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_deviceid := IF(EXISTS(ds_device_id), FraudShared_Services.GetPayloadRecords(ds_device_id, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_profid := IF(EXISTS(ds_professional_id), FraudShared_Services.GetPayloadRecords(ds_professional_id, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_tin := IF(EXISTS(ds_tin), FraudShared_Services.GetPayloadRecords(ds_tin, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_email := IF(EXISTS(ds_emailIds), FraudShared_Services.GetPayloadRecords(ds_emailIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_providerid := IF(EXISTS(ds_appended_provider_id), FraudShared_Services.GetPayloadRecords(ds_appended_provider_id, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_npi := IF(EXISTS(ds_provider_npi), FraudShared_Services.GetPayloadRecords(ds_provider_npi, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_lnpid:= IF(EXISTS(ds_provider_lnpid), FraudShared_Services.GetPayloadRecords(ds_provider_lnpid, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_householdid := IF(EXISTS(ds_householdid), FraudShared_Services.GetPayloadRecords(ds_householdid, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_CustomerPersonId := IF(EXISTS(ds_CustomerPersonId), FraudShared_Services.GetPayloadRecords(ds_CustomerPersonId, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_AmountRange := IF(EXISTS(ds_AmountRangeIds), FraudShared_Services.GetPayloadRecords(ds_AmountRangeIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_BankName := IF(EXISTS(ds_BankNameIds), FraudShared_Services.GetPayloadRecords(ds_BankNameIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_BankRouting := IF(EXISTS(ds_BankRoutingIds), FraudShared_Services.GetPayloadRecords(ds_BankRoutingIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_ISPName := IF(EXISTS(ds_ISPNameIds), FraudShared_Services.GetPayloadRecords(ds_ISPNameIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_MACAddress := IF(EXISTS(ds_MACAddressIds), FraudShared_Services.GetPayloadRecords(ds_MACAddressIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	// ds_payload_SerialNumber := IF(EXISTS(ds_SerialNumberIds), FraudShared_Services.GetPayloadRecords(ds_SerialNumberIds, fraud_platform), dataset([], FraudShared_Services.Layouts.Raw_Payload_rec));
-	
 	initial_rec := RECORD
 		unsigned1 cnt;
 		string100 key_identifier;
@@ -192,7 +166,6 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '', reported_date BETWEEN in_rec.transactionstartdate AND in_rec.transactionenddate , true) AND
 																			if(in_rec.amountmin <> '', amount_paid >= in_rec.amountmin, true) AND
 																			if(in_rec.amountmax <> '', amount_paid <= in_rec.amountmax, true) AND
-																			// if(in_rec.bankname <> '', in_rec.bankname = , true) AND 
 																			if(in_rec.bank_routing_number <> '', bank_routing_number_1 = in_rec.bank_routing_number OR bank_routing_number_2 = in_rec.bank_routing_number, true) AND 
 																			if(in_rec.ispname <> '', isp = in_rec.ispname, true) AND 
 																			if(in_rec.ip_address <> '' AND NOT isIPRangeKey , ip_address = in_rec.ip_address, true) AND
@@ -204,35 +177,29 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(isIPRange1 	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 , true) AND
 																			if(in_rec.MACAddress <> '', mac_address = in_rec.MACAddress, true) AND
 																			if(in_rec.device_id <> '', device_id = in_rec.device_id, true) AND
-																			if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true)																			
+																			if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true)
 																		 );
 																		 
+	//AND filter with BankName , explicit join because we do not have BankName field in the payload. 
+	ds_recs_filtered_final := IF(EXISTS(ds_BankNameIds),
+																JOIN(ds_recs_filtered, ds_BankNameIds,
+																	LEFT.record_id = RIGHT.record_id,
+																	TRANSFORM(LEFT)),
+																ds_recs_filtered);
+																		 
   // *** No filtering in FraudGov
-  ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered);
+  ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered_final);
 	
 	// --- TO BE USED LATER ON WHEN ITS READY TO USE----- //
   // ds_appendDeltabase := FraudShared_Services.Common_Deltabase(ds_batch_in, ds_recs_pulled, ds_file_types_in, DeltaUse, DeltaStrict);
   ds_FilterThruMBS := FraudShared_Services.FilterThruMBS(ds_recs_pulled, gc_id_in, ind_type_in, product_code_in, ds_industry_types_in, ds_file_types_in, fraud_platform);
 
   ds_allPayloadRecs := ds_FilterThruMBS;
-
-	// output(FraudShared.Key_AmountPaid('FraudGov'));
-	// output(FraudShared.Key_BankName('FraudGov'));
-	// output(FraudShared.Key_BankRoutingNumber('FraudGov'));
-	// output(FraudShared.Key_CityState('FraudGov'));
-	// output(FraudShared.Key_County('FraudGov'));
-	// output(FraudShared.Key_CustomerID('FraudGov'));
-	// output(FraudShared.Key_CustomerProgram('FraudGov'));
-	// output(FraudShared.Key_Host('FraudGov'));
-	// output(FraudShared.Key_HouseholdID('FraudGov'));
-	// output(FraudShared.Key_IPRange('FraudGov'));
-	// output(FraudShared.Key_Isp('FraudGov'));
-	// output(FraudShared.Key_MACAddress('FraudGov'));
-	// output(FraudShared.Key_ReportedDate('FraudGov'));
-	// output(FraudShared.Key_SerialNumber('FraudGov'));
-	// output(FraudShared.Key_User('FraudGov'));
-	// output(FraudShared.Key_Zip('FraudGov'));
+	
+	// output(ds_recs, named('ds_recs'));
+	// output(ds_recs_sorted, named('ds_recs_sorted'));
 	// output(ds_recs_filtered, named('ds_recs_filtered'));
+	// output(ds_recs_filtered_final, named('ds_recs_filtered_final'));
 	// output(ds_recs_pulled, named('ds_recs_pulled'));
 	// output(ds_FilterThruMBS, named('ds_FilterThruMBS'));
 	

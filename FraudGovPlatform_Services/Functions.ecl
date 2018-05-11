@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, Risk_Indicators, STD, ut;
+﻿IMPORT AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform_Services, FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, ut;
 
 EXPORT Functions := MODULE
 	
@@ -372,5 +372,140 @@ EXPORT Functions := MODULE
 
 		RETURN ds_results;
 	END;
+	
+	EXPORT getGovernmentBest(	DATASET(didville.Layout_Did_OutBatch) ds_best_in,
+														FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 
+		p := module(AutoStandardI.PermissionI_Tools.params)
+			export unsigned1 GLBPurpose := batch_params.GLBPurpose;
+		END;
+		
+		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(batch_params.GLBPurpose);
+
+		ds_best := DidVille.did_service_common_function(ds_best_in,
+																										appends_value			:= FraudGovPlatform_Services.Constants.append_l,
+																										verify_value			:= FraudGovPlatform_Services.Constants.verify_l,
+																										glb_flag					:= GLB,
+																										glb_purpose_value	:= batch_params.GLBPurpose,
+																										appType						:= batch_params.ApplicationType,
+																										include_minors		:= TRUE,
+																										IndustryClass_val	:= batch_params.IndustryClass,
+																										DRM_val						:= batch_params.DataRestrictionMask,
+																										GetSSNBest				:= TRUE);
+		
+		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM																									
+			SELF.UniqueId := (string) L.did;  
+			SELF.Name.Prefix := L.best_title; 
+			SELF.Name.First := L.best_fname; 
+			SELF.Name.Middle := L.best_mname; 
+			SELF.Name.Last := L.best_lname; 
+			SELF.Name.Suffix := L.best_name_suffix;
+			SELF.SSN := (string) L.best_ssn;
+			SELF.DOB := iesp.ECL2ESP.toDate((integer)L.best_dob);
+			SELF.Address := iesp.ECL2ESP.SetAddress('',
+																							'', 
+																							'', 
+																							'', 
+																							'', 
+																							'', 
+																							'',
+																							L.best_city,
+																							L.best_state, 
+																							L.best_zip, 
+																							L.best_zip4, 
+																							'',
+																							'',
+																							L.best_addr1);
+			SELF.Phone10 := L.best_phone;
+			SELF := [];
+		END;
+		
+		ds_best_proj := PROJECT(ds_best, best_trans(LEFT));
+		
+		RETURN ds_best_proj; 
+	END;
+	
+	EXPORT getContributedBest(DATASET(didville.Layout_Did_OutBatch) ds_best_in,
+														STRING fraud_platform) := FUNCTION
+
+		ds_rids:=	JOIN(ds_best_in, FraudShared.Key_Did(fraud_platform),
+										KEYED(LEFT.did = RIGHT.did),
+										TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+											SELF.AcctNo := (string) Left.Seq, //Assigning the seq number as acctno so I can use the acctno for rollup, that's it. 
+											SELF := RIGHT,
+											SELF := LEFT,
+											SELF := []),
+									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+
+		ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_rids, fraud_platform);
+
+		ds_payload_recs_sorted := SORT(ds_payload_recs, acctno, -event_date, record);
+
+		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
+				//We wanted to keep the record which has good address, instead of first non blank address...
+				//We wanted to keep the name from record which has atleast last name given, instead of first non blank names...
+				BOOLEAN isPhysicalAddress	:=  l.clean_address.prim_name != '' AND ((l.clean_address.p_city_name != '' AND l.clean_address.st != '') OR l.clean_address.zip != '');
+				BOOLEAN isName := L.cleaned_name.lname <> '';
+
+				SELF.AcctNo := L.Acctno;
+				SELF.DID := L.DID;
+				SELF.cleaned_name.title :=  IF(isName , L.cleaned_name.title , R.cleaned_name.title);
+				SELF.cleaned_name.fname :=  IF(isName , L.cleaned_name.fname , R.cleaned_name.fname);
+				SELF.cleaned_name.lname :=  IF(isName , L.cleaned_name.lname , R.cleaned_name.lname);
+				SELF.cleaned_name.mname :=  IF(isName , L.cleaned_name.mname , R.cleaned_name.mname);
+				SELF.cleaned_name.name_suffix :=  IF(L.cleaned_name.name_suffix <> '' , L.cleaned_name.name_suffix , R.cleaned_name.name_suffix);
+				SELF.ssn :=  IF(L.ssn <> '' , L.ssn , R.ssn);
+				SELF.dob :=  IF(L.dob <> '' , L.dob , R.dob);
+				SELF.phone_number :=  IF(L.phone_number <> '' , L.phone_number , R.phone_number);
+				SELF.email_address :=  IF(L.email_address <> '' , L.email_address , R.email_address);
+				SELF.clean_address.prim_range := IF(isPhysicalAddress, L.clean_address.prim_range, R.clean_address.prim_range);
+				SELF.clean_address.predir := IF(isPhysicalAddress, L.clean_address.predir, R.clean_address.predir);
+				SELF.clean_address.prim_name := IF(isPhysicalAddress, L.clean_address.prim_name, R.clean_address.prim_name);
+				SELF.clean_address.addr_suffix := IF(isPhysicalAddress, L.clean_address.addr_suffix, R.clean_address.addr_suffix);
+				SELF.clean_address.postdir := IF(isPhysicalAddress, L.clean_address.postdir, R.clean_address.postdir);
+				SELF.clean_address.unit_desig := IF(isPhysicalAddress, L.clean_address.unit_desig, R.clean_address.unit_desig);
+				SELF.clean_address.sec_range := IF(isPhysicalAddress, L.clean_address.sec_range, R.clean_address.sec_range);
+				SELF.clean_address.p_city_name := IF(isPhysicalAddress, L.clean_address.p_city_name, R.clean_address.p_city_name);
+				SELF.clean_address.v_city_name := IF(isPhysicalAddress, L.clean_address.v_city_name, R.clean_address.v_city_name);
+				SELF.clean_address.st := IF(isPhysicalAddress, L.clean_address.st, R.clean_address.st);
+				SELF.clean_address.zip := IF(isPhysicalAddress, L.clean_address.zip, R.clean_address.zip);
+				SELF.clean_address.zip4 := IF(isPhysicalAddress, L.clean_address.zip4, R.clean_address.zip4);
+				SELF := [];
+		END;
+
+		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.acctno = right.acctno, xformRollup(left, right));
+
+		iesp.fraudgovreport.t_FraudGovIdentityCardDetails best_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			SELF.ContributedBest.UniqueId := (string) L.DID;
+			SELF.ContributedBest.Name.Prefix := L.cleaned_name.title;
+			SELF.ContributedBest.Name.First := L.cleaned_name.fname;
+			SELF.ContributedBest.Name.Middle := L.cleaned_name.mname;
+			SELF.ContributedBest.Name.Last := L.cleaned_name.lname;
+			SELF.ContributedBest.Name.Suffix := L.cleaned_name.name_suffix;
+			SELF.ContributedBest.SSN := L.ssn;
+			SELF.ContributedBest.DOB := iesp.ECL2ESP.toDatestring8(L.dob);
+			SELF.ContributedBest.Address := iesp.ECL2ESP.SetAddress(L.clean_address.prim_name,
+																															L.clean_address.prim_range,
+																															L.clean_address.predir,
+																															L.clean_address.postdir,
+																															L.clean_address.addr_suffix,
+																															L.clean_address.unit_desig,
+																															L.clean_address.sec_range,
+																															L.clean_address.p_city_name,
+																															L.clean_address.st,
+																															L.clean_address.zip,
+																															L.clean_address.zip4,
+																															'');
+			SELF.ContributedBest.Phone10 :=  L.phone_number;
+			SELF.EmailAddress := L.email_address;
+			SELF := [];
+		END;
+
+		ds_Contrib_Best := PROJECT(ds_payload_recs_rolled, best_trans(LEFT));
+		
+		// output(ds_payload_recs_sorted, named('ds_payload_recs_sorted'));
+		// output(ds_Contrib_Best, named('ds_Contrib_Best'));
+		
+		RETURN ds_Contrib_Best;
+	END;
 END;

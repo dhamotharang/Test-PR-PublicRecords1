@@ -217,4 +217,7 @@
 	EXPORT	maxAllowedVersion := 1;	
 	EXPORT IsInstantID := TRUE;
 	
+	EXPORT append_l  := 'BEST_ALL,VERIFY_ALL'; //Append_1 allows all Best Info to return
+	EXPORT verify_l  := 'BEST_ALL,VERIFY_ALL';
+	
 END;

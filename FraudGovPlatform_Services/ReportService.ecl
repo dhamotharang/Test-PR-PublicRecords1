@@ -31,8 +31,8 @@ EXPORT ReportService() := MACRO
 												~Options.IsOnline => FraudGovPlatform_Services.Constants.MAX_VELOCITIES,
 												0);
 											 
-	MaxKnownFrauds := MAP(Options.IsOnline and Options.MaxKnownFrauds > 0 => MIN(Options.MaxKnownFrauds, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
-												Options.IsOnline and Options.MaxKnownFrauds = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
+	MaxKnownFrauds := MAP(Options.IsOnline and Options.MaxKnownRisks > 0 => MIN(Options.MaxKnownRisks, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
+												Options.IsOnline and Options.MaxKnownRisks = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
 												~Options.IsOnline => FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS,
 												0);
 
@@ -87,10 +87,10 @@ EXPORT ReportService() := MACRO
 			SELF.ip_address := reportBy.IPAddress; 
 			SELF.device_id := reportBy.DeviceId;
 			SELF.professionalid := reportBy.ProfessionalId;
-			SELF.bank_routing_number := reportBy.BankRoutingNumber; 
-			SELF.bank_account_number := reportBy.BankAccountNumber; 
-			SELF.dl_state := reportBy.DriversLicenseState; 
-			SELF.dl_number := reportBy.DriversLicenseNumber; 
+			SELF.bank_routing_number := reportBy.BankInformation.BankRoutingNumber; 
+			SELF.bank_account_number := reportBy.BankInformation.BankAccountNumber; 
+			SELF.dl_state := reportBy.DriversLicense.DriversLicenseState; 
+			SELF.dl_number := reportBy.DriversLicense.DriversLicenseNumber; 
 			SELF.geo_lat := reportBy.GeoLocation.Latitude; 
 			SELF.geo_long := reportBy.GeoLocation.Longitude;
 			SELF := [];
@@ -118,8 +118,6 @@ EXPORT ReportService() := MACRO
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
 																																											 
-	// Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(tmp);
-	
 	output(tmp.ds_royalties, NAMED('RoyaltySet'));
 	output(results, NAMED('Results'));
 	
