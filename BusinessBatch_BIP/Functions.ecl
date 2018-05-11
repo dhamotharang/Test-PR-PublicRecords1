@@ -2,7 +2,8 @@
 	Corp2,DCAV2,Gong,LiensV2,LN_PropertyV2,
        Suppress,TopBusiness_Services,UCCV2,FAA,Watercraft,VehicleV2,ut, 
 			 SAM,Business_Risk,Business_Risk_BIP,Codes,bankruptcyV3, STD,
-			 UCCV2_Services, AutoStandardI, MDR, diversity_certification,OSHAIR,LaborActions_WHD;
+			 UCCV2_Services, AutoStandardI, MDR, diversity_certification,OSHAIR,LaborActions_WHD,
+       Risk_Indicators;
 			 
 // These are general functions which for the most part go against the *linkids* kfetch routines
 // which return unique Id's for particular datasets.  These unique ID's can then be used to return
@@ -253,7 +254,8 @@ END;
                   DATASET(BIPV2.IDlayouts.l_xlink_ids) dLinkIds,
 									DATASET( BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars) ds_BestInfoRecs) := FUNCTION
 					
-    
+    IF( inMod.OFAC_version = 4 AND NOT EXISTS(inMod.Gateways(servicename = 'bridgerwlc')) , FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
 		STRING8 CurDate := (string8) STD.Date.today();
 		
 	  dWatchListLinkids := SAM.key_linkID.kfetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);				
@@ -320,9 +322,9 @@ END;
 	From_BIID := FALSE; 
 	 
   dOFACWatchList := Business_Risk.getWatchLists2(watchlistInput, OFAC_Only, From_BIID, 
-        Business_Risk_BIP.Constants.Default_OFAC_Version,
+        inMod.OFAC_Version,
 				 Include_OFAC, Include_Additional_Watchlists,         
-				BusinessBatch_BIP.Constants.Defaults.OFAC_ONLY_GlobalWatchListThreshold);
+				BusinessBatch_BIP.Constants.Defaults.OFAC_ONLY_GlobalWatchListThreshold, , inMod.Gateways);
 				//  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 				// this is a defined set value for this query only ...since the default value
 				// used previously was not stringent enough and got too many false hits of 'true' (i.e. yes)

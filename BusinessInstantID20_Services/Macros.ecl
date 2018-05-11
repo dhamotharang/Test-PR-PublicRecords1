@@ -248,7 +248,7 @@
 		#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 		#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
 		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
-		#STORED('OFAC_Version'       ,2);
+		#STORED('OFAC_Version'       ,Business_Risk_BIP.Constants.Default_OFAC_Version);
 		#STORED('Global_Watchlist_Threshold',Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold);
 
 		UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
@@ -279,7 +279,7 @@
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
 		BOOLEAN		_include_ofac                  := TRUE;
-		BOOLEAN   _include_additional_watchlists := FALSE;
+		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');

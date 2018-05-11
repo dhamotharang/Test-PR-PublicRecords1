@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessInstantID20_Batch_Service">
 	<part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="25"/>
 	<!-- Option Fields --> 
@@ -287,7 +287,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT UNSIGNED1	MarketingMode				 := MAX(MIN(_MarketingMode, 1), 0);
 			EXPORT STRING50		AllowedSources			 := STD.Str.ToUpperCase(_AllowedSources);
 			EXPORT UNSIGNED1	BIPBestAppend				 := IF(_BIPBestAppend BETWEEN Business_Risk_BIP.Constants.BIPBestAppend.Default AND Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest, _BIPBestAppend, Business_Risk_BIP.Constants.BIPBestAppend.Default);
-			EXPORT UNSIGNED1	OFAC_Version				 := MAX(MIN(_OFAC_Version, 3), 0);
+			EXPORT UNSIGNED1	OFAC_Version				 := MAX(MIN(_OFAC_Version, BusinessInstantID20_Services.Constants.MAX_OFAC_VERSION), 0);
 			EXPORT BOOLEAN    IncludeTargusGateway := _IncludeTargusGateway;
 			EXPORT REAL				Global_Watchlist_Threshold	     := MAX(MIN(_Global_Watchlist_Threshold, 1), 0);
 			EXPORT BOOLEAN    OverRideExperianRestriction      := MAP( _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
@@ -334,6 +334,9 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			
 		IF( _ForRetroTesting AND NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
+
+    IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
+      FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 		
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
 	
