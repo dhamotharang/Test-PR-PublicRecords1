@@ -2,7 +2,7 @@
 
 IMPORT promotesupers;
 
-promotesupers.mac_create_superfiles(Files.NewCraftRawName);
+promotesupers.mac_create_superfiles(Files.ProdGatherMainName);
 
 /*	*******************	Using these then works like the following *********************
 IMPORT PromoteSupers;

@@ -11,8 +11,8 @@ IMPORT PRTE2_Common,PRTE2_PropertyInfo_Ins;
 Add_Foreign_prod := PRTE2_Common.Constants.Add_Foreign_prod;
 
 // TRUE says to use the foreignProd name.
-AddrKey := PRTE2_PropertyInfo_Ins.key_PropertyInfo_address('20170907',TRUE);
-RidKey 	:= PRTE2_PropertyInfo_Ins.key_PropertyInfo_rid('20170907',TRUE);
+AddrKey := PRTE2_PropertyInfo_Ins.key_PropertyInfo_address('20180425',TRUE);
+RidKey 	:= PRTE2_PropertyInfo_Ins.key_PropertyInfo_rid('20180425',TRUE);
 
 q_prange	:= '10';
 q_pname		:= '1ST';
