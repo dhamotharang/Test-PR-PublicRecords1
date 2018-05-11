@@ -137,7 +137,7 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			// Override TU data to use LIBD and Port data when available
 			SELF.serviceType  	 := r.serviceType;
 			SELF.RealTimePhone_Ext.ServiceClass := IF(hasMetadata,(STRING)r.serviceType,l.RealTimePhone_Ext.ServiceClass);
-			SELF.COC_description := IF(hasMetadata,PhoneFinder_Services.Functions.ServiceClassDesc(r.serviceType),l.COC_description);
+			SELF.COC_description := IF(hasMetadata,PhoneFinder_Services.Functions.ServiceClassDesc((STRING)r.serviceType),l.COC_description);
 			SELF.PortingStatus   := '';
 			
 			// Temporarily remove until better disconnect data is obtained
