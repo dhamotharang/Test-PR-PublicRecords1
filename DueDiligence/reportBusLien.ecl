@@ -11,7 +11,7 @@ EXPORT reportBusLien(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnLiens
 	 // ------ most recent filed and largest dollar amount                                        ------
 	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
 	 // ------                                                                                    ------
-	 BusinessLiensButLimted   := dedup(sort(BusinessLiens,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  
+	 BusinessLiensButLimted   := dedup(sort(BusinessLiens,  seleid, -orig_filing_date, -amount), seleid,  
                                                     KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
 
 

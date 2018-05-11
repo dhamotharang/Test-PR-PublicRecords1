@@ -2,13 +2,14 @@
 
 EXPORT LayoutsInternal := MODULE
 
- EXPORT  InternalBIPIDsLayout := RECORD
+ EXPORT InternalSeqAndIdentifiersLayout := RECORD
 		UNSIGNED4 seq;
 		UNSIGNED6 ultID;
 		UNSIGNED6 orgID;
 		UNSIGNED6 seleID;
 		UNSIGNED6 proxID;
 		UNSIGNED6 powID;
+    UNSIGNED6 did;
 	END; 
 	
 	EXPORT CommonGeographicLayout   := RECORD
@@ -18,8 +19,7 @@ EXPORT LayoutsInternal := MODULE
 	
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
-	 InternalBIPIDsLayout;
-	 unsigned6 	did;
+	 InternalSeqAndIdentifiersLayout;
 	 unsigned4  GeoSequence;
 	 CommonGeographicLayout;
 	END;
@@ -27,77 +27,76 @@ EXPORT LayoutsInternal := MODULE
  
  //*** Use this layout to build a nested dataset (GeographicLayout) 
 	EXPORT OperatingLocationLayout := RECORD
-		InternalBIPIDsLayout;                                 
+		InternalSeqAndIdentifiersLayout;                                 
 		UNSIGNED3 addrCount;
 		DATASET(CommonGeographicLayout) locAddrs;
 	END;
 	
 	
 	EXPORT SicNaicLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DATASET(DueDiligence.Layouts.LayoutSICNAIC) sources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};
 	END;
 	
 	EXPORT SicNaicUniqueIndustryLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DueDiligence.Layouts.LayoutSICNAIC;
 		DueDiligence.Layouts.SicNaicRiskLayout;
 	END;
 	
 	EXPORT SlimSicNaicLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DueDiligence.Layouts.LayoutSICNAIC;
 		STRING codeDescription;
 		STRING8 formattedSicCode;
 	END;
 	
 	EXPORT AgentLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DATASET(DueDiligence.Layouts.LayoutAgent) agents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};
 	END;
 	
 	EXPORT Agent := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
     UNSIGNED4	  historydate;
 		DueDiligence.Layouts.LayoutAgent agent;
 	END;
 	
 	EXPORT LinkedBusLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DATASET(DueDiligence.Layouts.Busn_Input) linkedBus {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};
 	END;
 	
 	EXPORT RelatedPartyLayout := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		DATASET(DueDiligence.Layouts.RelatedParty) executives {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
 	END;
 	
 	EXPORT RelatedParty := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		UNSIGNED4	  historydate;
 		DueDiligence.Layouts.RelatedParty party;
 	END;
 	
 	EXPORT PartyLicenses := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		UNSIGNED4	  historydate;
-		UNSIGNED6 did;
 		DueDiligence.Layouts.Licenses license;
 	END;
 
   
   EXPORT MultipleNames := RECORD
-    InternalBIPIDsLayout;
+    InternalSeqAndIdentifiersLayout;
     DATASET(DueDiligence.Layouts.LayoutAgent) nameAndDate {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
   END;
 
   EXPORT MultipleCompanyNames := RECORD
-    InternalBIPIDsLayout;
+    InternalSeqAndIdentifiersLayout;
     DATASET(DueDiligence.Layouts.DD_CompanyNames) companyNameAndLastSeen {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
   END;
   
   EXPORT SourceLayout := RECORD
-    InternalBIPIDsLayout;
+    InternalSeqAndIdentifiersLayout;
     DATASET(DueDiligence.Layouts.BusSourceLayout) sources;
   END;
 
@@ -107,7 +106,7 @@ EXPORT LayoutsInternal := MODULE
 //------  Populated with data for the report  ------
 //------                                      ------
   EXPORT PropertySlimLayout := RECORD
-   InternalBIPIDsLayout  PropertyReportData;
+   InternalSeqAndIdentifiersLayout  PropertyReportData;
 	  unsigned4 propertySeq;   
 		 STRING12  LNFaresId;
 		 STRING80  AssesseeName;
@@ -146,7 +145,7 @@ EXPORT LayoutsInternal := MODULE
 //------  Populated with data for the report  ------
 //------                                      ------
  EXPORT VehicleSlimLayout := RECORD
-  InternalBIPIDsLayout  VehicleReportData;
+  InternalSeqAndIdentifiersLayout  VehicleReportData;
   string30		Vehicle_Key;
 		string15		Iteration_Key;
 		string2			Source_Code;
@@ -216,8 +215,7 @@ END;
 //------                                      ------
 	
 	EXPORT layout_liens_judgments := RECORD
-		InternalBIPIDsLayout  liensJudgment;
-    unsigned6 	did;
+		InternalSeqAndIdentifiersLayout;
 		common_layout_liens_judgments;   
 	END;
 
@@ -259,8 +257,7 @@ END;
 	END;
 	
 	EXPORT CriminalOffenses := RECORD
-		InternalBIPIDsLayout;
-		UNSIGNED6 did;
+		InternalSeqAndIdentifiersLayout;
 		DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense offense;
 	END;
 	
@@ -281,7 +278,7 @@ END;
 
  
  EXPORT FeinSources := RECORD
-		InternalBIPIDsLayout;
+		InternalSeqAndIdentifiersLayout;
 		STRING9 companyFEIN;
     STRING9 maskedFEIN;  
     STRING6 mask;  

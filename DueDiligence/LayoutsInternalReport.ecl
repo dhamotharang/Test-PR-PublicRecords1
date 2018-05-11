@@ -17,7 +17,7 @@ EXPORT LayoutsInternalReport := MODULE
 	END;
 
   EXPORT BusAircraftSlimLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		YearMakeModel;
 		STRING1   detailType; 
 		UNSIGNED1	numberOfEngines;
@@ -27,7 +27,7 @@ EXPORT LayoutsInternalReport := MODULE
   END;								
 
   EXPORT BusWatercraftSlimLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		STRING30 watercraftKey;		//used to get watercraft details
 	  STRING30 sequenceKey;			//used to get watercraft details
 		STRING2 stateOrigin;			//used to get watercraft details
@@ -44,15 +44,14 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	
 	EXPORT ListOfBusSourceLayout := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
    DATASET(iesp.duediligencebusinessreport.t_DDRReportingSources) sources;
 	END;
 
 
 
  EXPORT BEOPositionLayout := RECORD
-  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-  unsigned6 did;   
+  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
   DueDiligence.Layouts.Positions;
   DueDiligence.Layouts.SlimIndividual;
   DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) BEOOffenses;  
@@ -66,7 +65,7 @@ EXPORT LayoutsInternalReport := MODULE
 // ------    offenses
 // ------    ********************************************************************     ------
  EXPORT BEOCriminalReportingOFOffenses := RECORD
-  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
   integer2 numberOfCriminalEvents;
   string20 mostRecentTitle;
   DueDiligence.Layouts.RelatedParty;     //***there is a DATASET of party offenses, positions and titles
@@ -75,8 +74,8 @@ EXPORT LayoutsInternalReport := MODULE
   // ------                                                                            ------
   // ------ define a simple list of BEO's with Criminal Events                         ------
   // ------ ********************************************************                   ------ 
-  EXPORT FlatListOfBEOWithCriminalLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+  EXPORT FlatListOfIndividualsWithCriminalLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
     DueDiligence.Layouts.SlimIndividual;
     string20 mostRecentTitle;
     DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense;   
@@ -86,46 +85,44 @@ EXPORT LayoutsInternalReport := MODULE
   // ------ define the internal GrandChildDataset for the Legal Events section  report ------
 	// ------   these list just the offenses and nothing about the person charged        ------
   // ------   *********************************************************************    ------
-	EXPORT ReportingofBEOCriminalChildDatasetLayout    := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent  
+	EXPORT ReportingOfIndvCriminalChildDatasetLayout    := RECORD
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;      //*  This is the LINKID number of the parent  
 	 iesp.duediligenceshared.t_DDRLegalEventIndividual;
 	 string ExecTitle;
-   unsigned6 did;   
-   DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal)  BusExecCriminalChild;
+   DATASET(iesp.duediligenceshared.t_DDRLegalEventCriminal)  criminalChildDS;
 	END;
   // ------                                                                       ------
   // ------ define the internal ChildDataset for the Legal Events section report  ------
 	// ------                                                                       ------
 	EXPORT ReportingofBEOWithCrimChildDatasetLayout    := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;     //*  This is the LINKID number of the parent 
-   unsigned6 did; 
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;     //*  This is the LINKID number of the parent 
 	 DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents)  BusExecWithCriminalEventsChild;
 	END;
 	
 	EXPORT BusAircraftReportChildren := RECORD
-		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		DATASET(iesp.duediligenceshared.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAircraft)};
 	END;
 	
 	EXPORT BusWatercraftReportChildren := RECORD
-		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		DATASET(iesp.duediligenceshared.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxWatercraft)};
 	END;
 	
 	EXPORT BusIndustryRiskChildren := RECORD
-		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		DATASET(iesp.duediligencebusinessreport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
 	
 	
 	EXPORT ReportingOfOperatingLocations  := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	 DueDiligence.Layouts.BusOperLocationLayout ReportOfOperatingLocs;
 	END;
 	
 	
 	EXPORT BusCorpFilingsSlimLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     UNSIGNED4	  historydate;
     STRING    CorpKey;
 		STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
@@ -142,7 +139,7 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	
 	EXPORT ReportingOfSOSFilingsChildLayout     :=  RECORD 
-	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+	  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     STRING corpKey;
 	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
@@ -151,7 +148,7 @@ EXPORT LayoutsInternalReport := MODULE
   // ------ define the ChildDataset  For Debtors                                 ------
 	// ------                                                                      ------
  EXPORT	BusLiensDebtorsCreditorsChildDatasetLayout    := RECORD
-	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	  DATASET(iesp.duediligenceshared.t_DDRCreditorDebtor) BusLiensDebtorCreditorChild;
 	END; 
  
@@ -159,33 +156,32 @@ EXPORT LayoutsInternalReport := MODULE
   // ------ define the ChildDataset  For Business Liens                          ------
 	// ------                                                                      ------
  EXPORT	BusLiensChildDatasetLayout    := RECORD
-	  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
 	END;
   
   EXPORT BusOpInfoAssociatedNamesByFein := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	  DATASET(iesp.share.t_Name) name;
   END;
   
   EXPORT BusOpInfoDBANames := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DATASET(iesp.duediligencebusinessreport.t_DDRComponentsOfBusiness) businessNames {MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
   END;
   
   EXPORT BusRegisteredAgents := RECORD
-		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
   
   EXPORT BusExecs := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-    UNSIGNED6 did;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     iesp.duediligencebusinessreport.t_DDRBusinessExecutives;
   END;
   
   EXPORT InquiredBusExecs := RECORD
-    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutives) execs {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusinessExecs)};
   END;
 	
@@ -207,8 +203,8 @@ EXPORT LayoutsInternalReport := MODULE
   // ------ define the internal Dataset for the Liens section  report           ------
   // ------                                                                     ------
 	EXPORT ReportingofLiensDebtorChildDatasetLayout    := RECORD
-	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;      //*  This is the LINKID number of the parent 
-   unsigned6 did;  
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;      //*  This is the LINKID number of the parent 
+   // unsigned6 did;  
    STRING50 tmsid;
    UNSIGNED4	HistoryDate;
    STRING1    NameType;                   // D = Debtor   C = Creditor

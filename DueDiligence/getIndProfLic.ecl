@@ -13,8 +13,9 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 	licenseRaw := JOIN(indiv, prof_licenseV2.Key_Proflic_Did(),
 											TRIM(RIGHT.prolic_key)!= DueDiligence.Constants.EMPTY AND
 											KEYED(RIGHT.did = LEFT.party.did),
-											TRANSFORM({UNSIGNED4 uniqueID, DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
-																	SELF := LEFT;
+											TRANSFORM({UNSIGNED4 uniqueID, DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout -did, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
+																	SELF.did := LEFT.party.did;
+                                  SELF := LEFT;
 																	SELF := RIGHT;
 																	SELF := [];),
 											ATMOST(RIGHT.did = LEFT.party.did, DueDiligence.Constants.MAX_ATMOST_1000));
@@ -161,7 +162,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																				SELF := LEFT;));
 	
 	
-	projectLic := PROJECT(rollupLicenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, BOOLEAN activeLA,
+	projectLic := PROJECT(rollupLicenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, BOOLEAN activeLA,
 																												BOOLEAN activeFRE, BOOLEAN activeMed, BOOLEAN activeBP, BOOLEAN inactiveLA, BOOLEAN inactiveFRE,
 																												BOOLEAN inactiveMed, BOOLEAN inactiveBP, DATASET(DueDiligence.Layouts.RelatedParty) party},
 																									

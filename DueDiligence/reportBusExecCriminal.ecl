@@ -60,7 +60,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                         
   
   //*** add logic here to SORT the list of offenses that are added to the report so that only the oldest ones are truncated  ****//	
-	 ListOfExecutivesAndOffenses := NORMALIZE(ExecutivesWithTitles, LEFT.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.FlatListOfBEOWithCriminalLayout,
+	 ListOfExecutivesAndOffenses := NORMALIZE(ExecutivesWithTitles, LEFT.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.FlatListOfIndividualsWithCriminalLayout,
                              /*  start by getting all of the Executive Names from the (RIGHT) */  																														
 																												SELF.seq                    := LEFT.seq;                //*** This is the sequence number of the Inquired Business (or the Parent)
 				                                                SELF.ultid                  := LEFT.ultid;  
@@ -89,12 +89,12 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
          SELF.CourtType                := le.courtType;
          SELF.CaseTypeDescription      := le.caseTypeDesc;  //to be removed at later date replaced with CaseType
          SELF.CaseType                 := le.caseTypeDesc; 
-         SELF.ArrestLevelDescription   := le.arr_off_lev_mapped;  //to be removed at later date replaced with ArrestLevel
-         SELF.ArrestLevel              := le.arr_off_lev_mapped;
+         SELF.ArrestLevelDescription   := le.arrestLevel;  //to be removed at later date replaced with ArrestLevel
+         SELF.ArrestLevel              := le.arrestLevel;
          SELF.OffenseScore             := le.offenseScore;  //??? Is this or OffenseScoreDescription displayed on web and are both needed??
-         SELF.OffenseScoreDescription  := DueDiligence.Common.getOffenseScoreDescription(le.offenseScore);  //??? Is this or OffenseScore displayed on web and are both needed??
+         SELF.OffenseScoreDescription  := DueDiligence.translateCodeToText.OffenseScoreText(le.offenseScore);  //??? Is this or OffenseScore displayed on web and are both needed??
          SELF.OffenseLevel             := le.criminalOffenderLevel; //??? Is this or OffenseLevelDescription displayed on web and are both needed??
-         SELF.OffenseLevelDescription  := DueDiligence.Common.getOffenseLevelDescription(le.criminalOffenderLevel); //??? Is this or OffenseLevel displayed on web and are both needed??
+         SELF.OffenseLevelDescription  := DueDiligence.translateCodeToText.OffenseLevelText(le.criminalOffenderLevel); //??? Is this or OffenseLevel displayed on web and are both needed??
          SELF.NumberOfCounts           := le.num_of_counts;
          SELF.Conviction               := le.convictionFlag;
          SELF.Charge                   := le.Charge;
@@ -145,7 +145,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                                                    
          SELF.CurrentParole            := IF(le.Curr_parole_flag = 'Y', TRUE, FALSE);  
          SELF.CurrentProbation         := FALSE;
-         SELF.ProbationSentence        := le.sent_probation; 
+         SELF.ProbationSentence        := le.probationSentence; 
          
 
          SELF                          := [];
@@ -154,9 +154,9 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
 	  
   BusExecCriminalChildDataset  :=   
 	  PROJECT(MaskSSNInThisListOfExecutives,                                                        //***Using this input dataset  
-			  TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingofBEOCriminalChildDatasetLayout,  //***format the data according to this layout.
+			  TRANSFORM(DueDiligence.LayoutsInternalReport.ReportingOfIndvCriminalChildDatasetLayout,  //***format the data according to this layout.
 				  #EXPAND (DueDiligence.Constants.mac_TRANSFORMLinkids())                               //***This is the sequence number and LINKID of the Inquired Business (or the Parent)
-          SELF.did                    := LEFT.did,
+          // SELF.did                    := LEFT.did,
           SELF.Name.Full              := LEFT.fullName,
           SELF.Name.First             := LEFT.firstName,
           SELF.Name.Last              := LEFT.lastName,
@@ -183,7 +183,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
           SELF.ExecTitle              := LEFT.mostRecentTitle,
           SELF.SSN                    := LEFT.ssn, 
           SELF.DOB                    := iesp.ECL2ESP.toDate(LEFT.DOB);
-          SELF.BusExecCriminalChild   := PROJECT(LEFT, FormatTheListOfOffenses(LEFT, COUNTER)))); 
+          SELF.criminalChildDS   := PROJECT(LEFT, FormatTheListOfOffenses(LEFT, COUNTER)))); 
 				       
     																
 	//perform the ROLLUP by LINKID And DID
@@ -192,7 +192,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                   #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                                   LEFT.did = RIGHT.did,
 											            TRANSFORM(RECORDOF (LEFT),
-                                            SELF.BusExecCriminalChild  := LEFT.BusExecCriminalChild  + RIGHT.BusExecCriminalChild,
+                                            SELF.criminalChildDS  := LEFT.criminalChildDS  + RIGHT.criminalChildDS,
                                             SELF                       := LEFT));
                                     
   BEOExecutiveCriminalEvents  := PROJECT(RollupCriminalOffense,
@@ -201,7 +201,7 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
                                                   // *  Create a dataset of criminal activity that can be in moved as entire block to the report *//   
                                                   SELF.CriminalActivity  := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessExecutiveCriminalEvents,
                                                               /* First move the DataSet of Criminal Offenses for this Executive */ 
-                                                                 SELF.CriminalEvents         := LEFT.BusExecCriminalChild,
+                                                                 SELF.CriminalEvents         := LEFT.criminalChildDS,
                                                               /* Now move the Name and Address of each Executive with criminal history */
                                                                  SELF.ExecutiveOfficer.Name.First             := LEFT.Name.First,
                                                                  SELF.ExecutiveOfficer.Name.Full              := LEFT.Name.Full,
