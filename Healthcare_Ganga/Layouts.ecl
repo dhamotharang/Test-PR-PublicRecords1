@@ -1,10 +1,9 @@
 ﻿Import BIPV2;
 EXPORT Layouts := MODULE
-	Shared MaxLengthVal := 10000000;
 	EXPORT IdentityInput := RECORD
 		string20  acctno := '';
-		string30 	APSTransactionID := '';
-		string30 	EnrollmentId := '';
+		string1 	EntityType := '';
+		string30 	RecordIdentifier := '';
 		string20	FirstName := '';
 		string20	LastName := '';
 		string8 	DoB := '';
@@ -19,11 +18,17 @@ EXPORT Layouts := MODULE
 		string80  LegalName := '';
 		string50	BusinessName := '';
 		string11  TaxID:='';
+		string50	RequestDateTime := '';
 	END;
 	
 	EXPORT WarningsOutput := RECORD
 		string3 	Code := '';
 		string10	Source := '';
+	END;
+	
+	EXPORT NameValueOutput := RECORD
+		string25 	Name := '';
+		string100 Value := '';
 	END;
 
 	EXPORT gapInput := RECORD
@@ -44,14 +49,13 @@ EXPORT Layouts := MODULE
 		WarningsOutput;
 	END;
 	
-
 	EXPORT IdentityOutput := RECORD
 		string20	acctno := '';
 		unsigned6	lnpid := 0;
-		string30 	APSTransactionID := '';
+		string1 	EntityType := '';
+		string30 	RecordIdentifier := '';
 		string30 	TransactionId := '';
 		string20	UniqueId	:= '';
-		string30 	EnrollmentId := '';
 		string5		NamePrefix := '';
 		string20	FirstName := '';
 		string20	MiddleName := '';
@@ -71,7 +75,7 @@ EXPORT Layouts := MODULE
 		string2   State := '';
 		string5   Zip5 := '';
 		string4   Zip4 := '';
-		string10 	NPI	:= '';
+		string10	NPI	:= '';
 		string12 	BusinessId := '';
 		string50	BusinessName := '';
 		string80	LegalName := '';
@@ -85,6 +89,53 @@ EXPORT Layouts := MODULE
 		string20 	Sales	:= '';
 		string4 	SicCode := '';
 		string255	SicDesc := '';
+		string50	RequestDateTime := '';
+		string50 ResponseDateTime := '';
 		dataset(WarningsOutput) Warnings := dataset([],WarningsOutput);
+		dataset(NameValueOutput) NameValues := dataset([], NameValueOutput);
+	END;
+
+	EXPORT IdentityOutputBatch := RECORD
+		IdentityOutput -[Warnings,NameValues];
+		string3 	WarningsCode1 := '';
+		string10	WarningsSource1 := '';
+		string3 	WarningsCode2 := '';
+		string10	WarningsSource2 := '';
+		string3 	WarningsCode3 := '';
+		string10	WarningsSource3 := '';
+		string3 	WarningsCode4 := '';
+		string10	WarningsSource4 := '';
+		string3 	WarningsCode5 := '';
+		string10	WarningsSource5 := '';
+		string3 	WarningsCode6 := '';
+		string10	WarningsSource6 := '';
+		string3 	WarningsCode7 := '';
+		string10	WarningsSource7 := '';
+		string3 	WarningsCode8 := '';
+		string10	WarningsSource8 := '';
+		string3 	WarningsCode9 := '';
+		string10	WarningsSource9 := '';
+		string3 	WarningsCode10 := '';
+		string10	WarningsSource10 := '';
+		string25		Name1 := '';
+		string100 Value1 := '';
+		string25		Name2 := '';
+		string100 Value2 := '';		
+		string25		Name3 := '';
+		string100 Value3 := '';		
+		string25		Name4 := '';
+		string100 Value4 := '';		
+		string25		Name5 := '';
+		string100 Value5 := '';		
+		string25		Name6 := '';
+		string100 Value6 := '';		
+		string25		Name7 := '';
+		string100 Value7 := '';		
+		string25		Name8 := '';
+		string100 Value8 := '';		
+		string25		Name9 := '';
+		string100 Value9 := '';		
+		string25		Name10 := '';
+		string100 Value10 := '';
 	END;
 END;
