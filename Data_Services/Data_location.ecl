@@ -28,9 +28,9 @@ export Prefix(string serviceName='NoNameGiven') := function
 																					,Data_Services.Default_Data_Location),
 								'TDS'								=> map(_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod
 																					,Data_Services.Default_Data_Location),
-								'biz_linking'     	=> map(thorlib.group() = 'thor400_60' => ''
-                                          ,                                  '~thor400_44::'
-                                       ),
+								'biz_linking'     	=> map(thorlib.group() = 'thor400_66' => '~thor400_66::'
+                                          ,thorlib.group() = 'thor400_44' => '~thor400_44::'
+																					,'~thor_data400::'),
 								'BogusPlaceHolder' => Data_Services.Default_Data_Location,	// Can add exceptions here
 								Data_Services.Default_Data_Location));
 end;
