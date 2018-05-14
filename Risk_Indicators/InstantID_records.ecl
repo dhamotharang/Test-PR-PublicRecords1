@@ -4,6 +4,8 @@
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
 
+string CallingServiceName := '' : STORED('CallingServiceName');
+
 string32 _LoginID           := ''	: STORED('_LoginID');
 string20 CompanyID          := '' : STORED('_CompanyID');
 string6 ssnmask             := 'NONE' : STORED('SSNMask');
@@ -80,8 +82,8 @@ boolean ofac_only := true 						: stored('OfacOnly');
 boolean ExcludeWatchLists := false 		: stored('ExcludeWatchLists');
 unsigned1 OFAC_version_temp := 1 			: stored('OFACversion');
 	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
-boolean Include_Additional_watchlists := FALSE	: stored('IncludeAdditionalWatchlists');
-boolean Include_Ofac := FALSE										: stored('IncludeOfac');
+boolean Include_Additional_watchlists_temp := FALSE	: stored('IncludeAdditionalWatchlists');
+boolean Include_Ofac_temp := FALSE										: stored('IncludeOfac');
 real global_watchlist_threshold_temp := 0 			: stored('GlobalWatchlistThreshold');
 		 global_watchlist_threshold := Map( trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  	=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0																													=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
@@ -172,6 +174,20 @@ boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeCLoverride := false : stored('IncludeCLoverride');
 boolean SearchSicNAICSCodes := false : STORED('SearchSicNAICSCodes');
 
+// If OFACVersion is set to 2 or 3, check whether include_ofac = false and include_additional_watchlists 
+// = false and watchlists_requested is empty. If they are, set include_ofac = true and include_
+// additional_watchlists = true so that this service will imitate the system behavior when OFACVersion
+// is 1 (returns everything). This will fix a problem for customers who were converted from
+// OFACVersion 1 to 2 and suddenly had no Watchlist records from the system. Applicable only to 
+// Patriot Search, IID, and BIID.
+
+noWatchlistsSelectedAtAll := 
+  CallingServiceName = 'Risk_Indicators__InstantID' AND 
+  NOT Include_Additional_watchlists_temp AND 
+  NOT Include_Ofac_temp AND COUNT(watchlists_request) = 0;
+  
+Include_Additional_watchlists := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Additional_watchlists_temp );
+Include_Ofac                  := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Ofac_temp );
 
 // DOB options
 DOBMatchOptions_in := dataset([], risk_indicators.layouts.Layout_DOB_Match_Options) : STORED('DOBMatchOptions',few);
