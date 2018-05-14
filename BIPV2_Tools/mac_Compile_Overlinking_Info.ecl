@@ -1,4 +1,4 @@
-/*
+﻿/*
   probably have to use cnt of complete mismatches(i can know this from the specificites) and/or the score. say if there is over 10 complete mismatches.
   could have different levels.  over 50, 40-50, etc.  and/or just sort descending and pick the top worst 300.
   1. aggregate the cluster per ID passed in.  limit child datasets to 100 for speed
@@ -367,7 +367,6 @@ functionmacro
       ,self.pctile_diff_cnp_names := realformat(left.diff_cnp_names_score / max_diff_cnp_names_score * 100.0  ,10,4)
       ,self := left
     ));
-    return result;
     
     // pct_bow_mismatches_lt3
 //    34% looks ok
@@ -393,7 +392,7 @@ functionmacro
     more detailed overlinking info
     
   */
-//    export output_debug := parallel(
+   output_debug := parallel(
        // output(count   (ds_calc_scores(proxid = 41686893,is_complete_mismatch_lt3 = 1)) ,named('count_is_complete_mismatch_proxid_41686893'     ),all)
       // ,output(count   (ds_calc_scores(proxid = 41686893,is_complete_mismatch_lt3 = 0)) ,named('count_not_complete_mismatch_proxid_41686893'     ),all)
 
@@ -408,8 +407,8 @@ functionmacro
       // ,output(enth    (ds_calc_scores(proxid = 41686893,is_complete_mismatch_lt3 = 0) ,500            ) ,named('not_complete_mismatch_enth_proxid_41686893'   ),all)
       // ,output('-------------------------------------------------------------'  ,named('________________________'))
 
-//       output('Examples of Complete SALT BOW mismatches sorted Descending by longest common subtring size'  ,named('_'));
-//       output(topn    (ds_calc_scores(is_complete_salt_mismatch = 1     ) ,500  ,-substring_size              ) ,named('complete_BOW_mismatches_'   + #TEXT(pID)),all)
+      output('Examples of Complete SALT BOW mismatches sorted Descending by longest common subtring size'  ,named('_'))
+      ,output(topn    (ds_calc_scores(is_complete_salt_mismatch = 1     ) ,500  ,-substring_size              ) ,named('complete_BOW_mismatches_'   + #TEXT(pID)),all)
       // ,output(topn    (ds_calc_scores(is_complete_salt_mismatch = 1     ) ,500  , substring_size              ) ,named('complete_salt_mismatch_asc_substring_size'    + #TEXT(pID)),all)
       // ,output(topn    (ds_calc_scores(is_hyphen_match_good      = false ) ,500  ,-substring_size              ) ,named('complete_hyphen_mismatch_desc_substring_size' + #TEXT(pID)),all)
       // ,output(topn    (ds_calc_scores(is_hyphen_match_good      = false ) ,500  , substring_size              ) ,named('complete_hyphen_mismatch_asc_substring_size'  + #TEXT(pID)),all)
@@ -420,8 +419,10 @@ functionmacro
       // ,output(topn    (ds_calc_scores(is_substring_mismatch_lt4 = 1     ) ,500  ,-is_complete_salt_mismatch   ) ,named('substring_lt_4_desc_salt_mistmatch'           + #TEXT(pID)),all)
       // ,output(topn    (ds_calc_scores(is_substring_mismatch_lt5 = 1     ) ,500  ,-is_complete_salt_mismatch   ) ,named('substring_lt_5_desc_salt_mistmatch'           + #TEXT(pID)),all)
 
-//    );
+   );
 //  end;  //end of module
+
+    return when(result,output_debug);
   
 endmacro;
 /*
