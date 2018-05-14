@@ -55,37 +55,32 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 
 			SELF.IdentityCardDetails := PROJECT(ds_contributoryBest	, TRANSFORM(LEFT));
 			SELF.GovernmentBest := PROJECT(ds_GovBest, TRANSFORM(LEFT));
-
-			SELF := [];
-		END;
-	  	
-	  SELF.KnownRisks := all_knownfrauds_final;
 	  
-	  //If either test flags are set, return mock data, if not, then return empty dataset until we get the RAMPS query
-	  SELF.IndicatorAttributes := IF(IsIdentityTestRequest OR IsElementTestRequest,
-	  								fn_GetTestRecords.GetTestIndicatorAttributes(),
-									DATASET([],iesp.fraudgovreport.t_FraudGovIndicatorAttribute));
+			//If either test flags are set, return mock data, if not, then return empty dataset until we get the RAMPS query
+			SELF.IndicatorAttributes := IF(IsIdentityTestRequest OR IsElementTestRequest,
+											fn_GetTestRecords.GetTestIndicatorAttributes(),
+										DATASET([],iesp.fraudgovreport.t_FraudGovIndicatorAttribute));
 
-	  SELF.ScoreBreakdown := IF(IsIdentityTestRequest OR IsElementTestRequest,
-	  								fn_GetTestRecords.GetTestScoreBreakdowns(),
-									DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
+			SELF.ScoreBreakdown := IF(IsIdentityTestRequest OR IsElementTestRequest,
+											fn_GetTestRecords.GetTestScoreBreakdowns(),
+										DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
-	  SELF.AssociatedIdentities := IF(IsElementTestRequest,
-	  								fn_GetTestRecords.GetTestAssociatedIdentities(),
-									DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+			SELF.AssociatedIdentities := IF(IsElementTestRequest,
+											fn_GetTestRecords.GetTestAssociatedIdentities(),
+										DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+			
+			SELF.AssociatedAddresses := IF(IsIdentityTestRequest OR IsElementTestRequest,
+											fn_GetTestRecords.GetTestAssociatedAddresses(),
+										DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
+
+			SELF.RelatedClusters := IF(IsIdentityTestRequest OR IsElementTestRequest,
+										fn_GetTestRecords.GetTestClusters(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
+
+			SELF.TimeLineDetails := IF(IsIdentityTestRequest OR IsElementTestRequest,
+										fn_GetTestRecords.GetTestTimelineDetails(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovTimeLineDetails));
 	  
-	  SELF.AssociatedAddresses := IF(IsIdentityTestRequest OR IsElementTestRequest,
-	  								fn_GetTestRecords.GetTestAssociatedAddresses(),
-									DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
-
-	  SELF.RelatedClusters := IF(IsIdentityTestRequest OR IsElementTestRequest,
-	  							fn_GetTestRecords.GetTestClusters(),
-								DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
-
-	  SELF.TimeLineDetails := IF(IsIdentityTestRequest OR IsElementTestRequest,
-	  							fn_GetTestRecords.GetTestTimelineDetails(),
-								DATASET([],iesp.fraudgovreport.t_FraudGovTimeLineDetails));
-
 	  SELF := [];
 	END;
 		
