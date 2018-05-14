@@ -1,4 +1,4 @@
-import mdr;
+﻿import mdr;
 
 export Constants := MODULE
 		// range of scores... 0 (worst) .. DEFAULT_RANGE (best)
@@ -8,18 +8,18 @@ export Constants := MODULE
 		export UNSIGNED2 RESPONSE_THRESHOLD := 40;	// responses scoring below this value are not returned
 
 		// tag values for EntityType
-		export type_EntityType := STRING10;
+		export type_EntityType := STRING15;
 		export type_EntityType  TAG_ENTITY_IND := 'Individual';
 		export type_EntityType  TAG_ENTITY_BIZ := 'Business';
 		export type_EntityType  TAG_ENTITY_UNK := 'Unknown';
 
 		// tag values used in commonLayout.rollup_key_type.  Records the origin
 		// of the rollup id column so we can drop RIDs later.
-		export STRING4   TAG_ROLLUP_KEY_DID  := 'did';
-		export STRING4   TAG_ROLLUP_KEY_BDID := 'bdid';
-		export STRING4   TAG_ROLLUP_KEY_RID  := 'rid';
-		export STRING4   TAG_ROLLUP_KEY_FDID := 'fdid';
-		
+		export STRING7   TAG_ROLLUP_KEY_DID  := 'did';
+		export STRING7   TAG_ROLLUP_KEY_LINKID := 'PowID';
+		export STRING7   TAG_ROLLUP_KEY_RID  := 'rid';
+		export STRING7   TAG_ROLLUP_KEY_FDID := 'fdid';
+		export STRING7   TAG_ROLLUP_KEY_FAKEID := 'fakeid';
 		// note that MAX_RETURNED_ADDRS is not a hard limit.  This is the limit 
 		// for "normal" circumstances, when the matched address is within this
 		// limit.  One additional record may be added if the best matching 

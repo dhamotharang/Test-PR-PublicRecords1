@@ -1,4 +1,4 @@
-IMPORT iesp, AutoStandardI, doxie,CAN_PH,Address,canadianphones_V2,ut;
+﻿IMPORT iesp, AutoStandardI, CAN_PH, Address, ut, Fedex_Services;
 
 // This module provides the main logic for executing UPS "RightAddress" 
 // searches.
@@ -8,7 +8,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 
   //set options (translate from the pre-determined xml style into the stored/soap style that roxie is expecting
 	shared search_options := global(first_row.options);
-	shared boolean isCanada :=  search_options.isCanada ; 
+	shared boolean isCanada :=  search_options.isCanada; 
 	shared search_by := global (first_row.SearchBy);
 	shared powersearch := global(search_by.PowerSearch);
 	shared boolean isZipSearch := search_options.ZipPostalSearch; 
@@ -56,7 +56,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 
 	#stored ('phone', validPhone);
 	
-	fname_was_input := search_by.name.first <> '';
+	fname_was_input := trim(search_by.name.first) <> '';
 	lname_doesnt_look_like_a_biz := ut.Word(search_by.lastnameorcompany,2,' ') = '';//only has 1 word
 
 	shared EntityType := 
@@ -70,8 +70,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		OR search_by.EntityType = Constants.TAG_ENTITY_UNK 								
 			=> search_by.EntityType, 
 		Constants.TAG_ENTITY_UNK
-	);	
-	
+	);		
   // pack input parameters into a module
 	shared inputmod := AutoStandardI.GlobalModule();
 
@@ -84,7 +83,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	// *** Do a person search 
 	export PersonSearch := MODULE
 	
-		PSearchMod := module( project( inputmod, mod_Params.PersonSearch, opt))
+		PSearchMod := module( project( inputmod, mod_Params.PersonSearch, opt)) 
 		end;
 
 		header_res := mod_Searches.personSearch.records(PSearchMod);
@@ -106,8 +105,8 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		// Do a business search
 		BSearchMod := module (project (inputmod, mod_Params.BusinessSearch, opt))
 		end;
-
-		biz_res := ups_services.mod_Searches.businessSearch.records(BSearchMod);	
+										 
+		biz_res := ups_services.mod_Searches.businessSearch.records(search_inputs,BSearchMod);	
 
 		// Penalize business search results
 		BPenMod := module(project (inputmod, IF_PartialMatchSearchParams, opt))
@@ -120,6 +119,47 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 															DATASET( [], RECORDOF(biz_res_pen)),
 															biz_res_pen);
 	END;
+	
+  export FedExSearch := MODULE
+		
+		fedex_raw := Fedex_Services.mod_Searches.FedexNoHit; 
+		fedex_sort := sort(fedex_raw, company_name, lname, fname, mname, prim_range, prim_name, zip5, -dt_last_seen);				
+		fedex_dedup := dedup(fedex_sort, company_name, lname, fname, mname, prim_range, prim_name, zip5);
+			
+   	 
+   	fedex_filtered := map (EntityType = Constants.TAG_ENTITY_IND  => fedex_dedup(trim(business_indicator) <> 'Y'),
+   														EntityType = Constants.TAG_ENTITY_BIZ  => fedex_dedup(trim(business_indicator) = 'Y'),
+   														fedex_dedup ) ;
+   	 
+   	fedex_format := project(fedex_filtered,transform(UPS_Services.layout_Common, 
+													SELF.rollup_key := left.fakeid;
+													SELF.rollup_key_type := Constants.TAG_ROLLUP_KEY_FAKEID, 
+													self.phone := left.phone,
+													self.fname := left.fname,
+													self.mname := left.mname,
+													self.lname := left.lname,
+													self.company_name := left.company_name,
+													self.prim_range := left.prim_range,
+													self.predir 		:= left.predir ,
+													self.prim_name 	:= left.prim_name,
+													self.suffix 		:= left.addr_suffix,
+													self.sec_range 	:= left.sec_range ,
+													self.city_name 	:= left.p_city_name,
+													self.state 			:= left.state,
+													self.zip 						:= left.zip5,
+													self.dt_first_seen 	:=  0,
+													self.dt_last_seen  	:=  (unsigned4) left.dt_last_seen,
+													self.listing_type   := if(trim(left.business_indicator) = 'Y','B','');
+													//self.history_flag;
+													self 	:= left, 
+													self := [])); 
+   																					
+   	 fedex_pen := mod_Score(search_inputs).score(fedex_format);
+		 
+   	 export records := fedex_pen;
+
+  END;
+	
 	
 	export CanadaSearch := MODULE
 
@@ -164,18 +204,21 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 
 	// note that number of records returned here are limited in mod_Searches to
 	// iesp.Constants.MAX_SEARCH_RESULTS for each individuals and businesses.
-	#if(Debug.debug_flag)
-	output(search_by_name, NAMED('SearchByName'));
-	output(search_by_addr, NAMED('SearchByAddr'));
-	output(validPhone, NAMED('SearchByPhone'));
-	output(ps_name, NAMED('psName'));
-	output(ps_addr, NAMED('psAddr'));
-	output(ps_phone, NAMED('psPhone'));
-	#end
 
-	  us_records  := PersonSearch.records + BusinessSearch.records;
-	  can_records := CanadaSearch.records;
-		export records := if(isCanada,can_records,us_records);
+	permissions := AutoStandardI.DataPermissionI.val(project(inputmod, AutoStandardI.DataPermissionI.params));
+	us_records  := PersonSearch.records + BusinessSearch.records + if(permissions.use_FedExData,FedExSearch.records);
+	can_records := CanadaSearch.records;
+	
+	#if(Debug.debug_flag)
+			output(search_by_name, NAMED('SearchByName'));
+			output(validPhone, NAMED('SearchByPhone'));
+			output(ps_name, NAMED('psName'));
+			output(ps_phone, NAMED('psPhone'));
+			output(FedExSearch.records, NAMED('FedExSearch'));
+			output(permissions.use_FedExData, NAMED('use_FedExData'));
+	#end
+	
+	export records := if(isCanada,can_records,us_records);
   
 	export rolled_records := mod_Rollup(search_inputs).roll(records, inputmod.MaxResults);
 	BOOLEAN doHighlight := search_options.highlight;
