@@ -1681,6 +1681,7 @@ EXPORT Constants := MODULE
 	EXPORT TISTA := MODULE
 		export unsigned2 MAX_WARNINGS := 20;
 		export unsigned2 MAX_ADDRESSES := 5;
+		export unsigned2	MAX_NAMEVALUES := 10;
 	end;
 
 	// TopBusiness, AKA BIP/Business Integration Project 
