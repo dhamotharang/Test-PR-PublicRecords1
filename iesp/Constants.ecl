@@ -543,6 +543,12 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_REPORT_RECORDS := 100; //???
   end;
 
+	// FCRA Inquiry History
+	EXPORT FCRAInqHist := MODULE
+		EXPORT UNSIGNED2 MAX_LEXIDS := 100;
+		EXPORT UNSIGNED2 MAX_RECORDS := 10000;
+	END;
+
   // FlexID
   export FI := MODULE
 		export unsigned1 MaxCVIRiskIndicators	:= 75;
