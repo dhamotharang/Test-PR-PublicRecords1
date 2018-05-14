@@ -1,6 +1,6 @@
-export layout_Common := RECORD
+﻿export layout_Common := RECORD
 	UNSIGNED6 rollup_key;
-	STRING4   rollup_key_type;  // a Constants.TAG_ROLLUP_KEY* value
+	STRING7   rollup_key_type;  // a Constants.TAG_ROLLUP_KEY* value
 
 	UNSIGNED4 dt_first_seen;
 	UNSIGNED4 dt_last_seen;
