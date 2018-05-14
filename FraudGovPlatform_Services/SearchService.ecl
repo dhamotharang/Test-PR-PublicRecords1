@@ -127,9 +127,16 @@ EXPORT SearchService() := MACRO
 
 	results := DATASET([final_transform_t_FraudGovSearchResponse()]) ;
 
+	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
+														first_row,
+														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
+
+
+	
 	IF (isMinimumInput, 
 				OUTPUT(results, named('Results')),
 				FAIL(301,doxie.ErrorCodes(301))
 			);
+	IF(~Options.IsOnline AND isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 		
 ENDMACRO;

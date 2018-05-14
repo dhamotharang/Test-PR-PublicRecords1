@@ -3,7 +3,9 @@
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
 										 INTEGER MaxVelocities,
-										 INTEGER MaxKnownFrauds) := MODULE
+										 INTEGER MaxKnownFrauds,
+										 BOOLEAN IsIdentityTestRequest,
+										 BOOLEAN IsElementTestRequest) := MODULE
                 
 		SHARED ds_batch := FraudGovPlatform_Services.BatchRecords(ds_batch_in, batch_params);
 		
@@ -34,6 +36,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
       SELF.RiskLevel := ds_batch[1].risk_level;
       SELF.IdentityResolved := ds_batch[1].identity_resolved;
       SELF.LexID := ds_batch[1].lexid;
+
       SELF.Deceased := ROW(FraudGovPlatform_Services.Transforms.xform_deceased(ds_batch.childRecs_Death[1]));
 			
       SELF.Criminals :=	PROJECT(CHOOSEN(ds_batch.childRecs_Criminal, iesp.constants.FraudGov.MAX_COUNT_CRIMINAL), 
@@ -55,6 +58,36 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 
 			SELF := [];
 		END;
+	  	
+	  SELF.KnownRisks := all_knownfrauds_final;
+	  
+	  //If either test flags are set, return mock data, if not, then return empty dataset until we get the RAMPS query
+	  SELF.IndicatorAttributes := IF(IsIdentityTestRequest OR IsElementTestRequest,
+	  								fn_GetTestRecords.GetTestIndicatorAttributes(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovIndicatorAttribute));
+
+	  SELF.ScoreBreakdown := IF(IsIdentityTestRequest OR IsElementTestRequest,
+	  								fn_GetTestRecords.GetTestScoreBreakdowns(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
+
+	  SELF.AssociatedIdentities := IF(IsElementTestRequest,
+	  								fn_GetTestRecords.GetTestAssociatedIdentities(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+	  
+	  SELF.AssociatedAddresses := IF(IsIdentityTestRequest OR IsElementTestRequest,
+	  								fn_GetTestRecords.GetTestAssociatedAddresses(),
+									DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
+
+	  SELF.RelatedClusters := IF(IsIdentityTestRequest OR IsElementTestRequest,
+	  							fn_GetTestRecords.GetTestClusters(),
+								DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
+
+	  SELF.TimeLineDetails := IF(IsIdentityTestRequest OR IsElementTestRequest,
+	  							fn_GetTestRecords.GetTestTimelineDetails(),
+								DATASET([],iesp.fraudgovreport.t_FraudGovTimeLineDetails));
+
+	  SELF := [];
+	END;
 		
 		EXPORT esdl_out := DATASET([xform_response()]);
 		EXPORT ds_royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(fdn_knownfrauds, true);

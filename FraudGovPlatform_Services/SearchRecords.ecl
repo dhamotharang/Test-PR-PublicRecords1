@@ -35,6 +35,22 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																																					batch_params.IndustryType,
 																																					batch_params.ProductCode,
 																																					IsOnline := IsOnline);	
+
+	ds_clusters := FraudGovPlatform_Services.fn_getTestRecords.GetTestClusters();
+
+	iesp.fraudgovsearch.t_FraudGovSearchRecord trans(iesp.fraudgovreport.t_FraudGovClusterCardDetails L) := TRANSFORM
+		SELF.AnalyticsRecordId := L.AnalyticsRecordId;			
+		SELF.RecordType := L.ScoreDetails.RecordType;
+		SELF.ElementType := L.ScoreDetails.ElementType;
+		SELF.ElementValue := L.ScoreDetails.ElementValue;
+		SELF.Score := random_scores_ds[random_score].num;
+		SELF.NoOfIdentities := random_no_of_identities_ds[random_no_of_identities].num;
+		SELF.ClusterName := L.ClusterName;
+		SELF := [];
+	END;
+
+	mockup_cluster := PROJECT(ds_clusters, trans(LEFT));
+
 	
 	// **************************************************************************************
 	// Append DID for Input PII
@@ -168,5 +184,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
 	// output(ds_contributoryBest, named('ds_contributoryBest'));
 
-	RETURN ds_ElementsNIdentities;
+
+	ds_results := IF(IsTestRequest, ds_ElementsNIdentities + mockup_cluster, ds_ElementsNIdentities);
+
+	RETURN ds_results;
 END;
