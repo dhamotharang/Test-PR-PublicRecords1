@@ -1,4 +1,4 @@
-IMPORT ut, watercraft, FCRA, MDR, doxie, FFD;
+﻿IMPORT ut, watercraft, FCRA, MDR, doxie, FFD, D2C;
 
 EXPORT get_owner_records(
 	dataset(WatercraftV2_Services.Layouts.search_watercraftkey) in_watercraftkeys,
@@ -16,11 +16,13 @@ EXPORT get_owner_records(
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
 	getOwnerRecs(inRecs, inKeyFile) := FUNCTIONMACRO
+	  CNSMR_flag := ut.IndustryClass.is_Knowx;
 			orecs := JOIN(inRecs,inKeyFile,
 					KEYED(LEFT.state_origin = RIGHT.state_origin or LEFT.state_origin ='') 
 						and KEYED(LEFT.watercraft_key = RIGHT.watercraft_key) 
 						and KEYED(LEFT.sequence_key = RIGHT.sequence_key or LEFT.sequence_key='')
-						and (include_non_regulated_data or RIGHT.source_code != MDR.sourceTools.src_Infutor_Watercraft),
+						and (include_non_regulated_data or RIGHT.source_code != MDR.sourceTools.src_Infutor_Watercraft)
+						and (~CNSMR_flag or right.source_code not in D2C.Constants.WatercraftRestrictedSources),
 					TRANSFORM (owner_rec,
 						SELF.isDeepDive := LEFT.isDeepDive,
 						SELF.NonDMVSource := RIGHT.source_code in MDR.sourcetools.set_Infutor_Watercraft,
