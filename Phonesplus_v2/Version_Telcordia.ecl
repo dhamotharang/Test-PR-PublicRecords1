@@ -1,1 +1,1 @@
-export Version_Telcordia := '20120723';
+﻿export Version_Telcordia := '20180430';
