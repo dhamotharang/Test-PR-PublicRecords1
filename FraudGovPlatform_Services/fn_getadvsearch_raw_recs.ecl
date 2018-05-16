@@ -92,9 +92,13 @@ EXPORT fn_getadvsearch_raw_recs (
 	email_user_name :=  STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',in_rec.email_address,1));
 	email_user_domain := STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',in_rec.email_address,2));
 	
-	ds_emailIds := MAP (email_user_name <> '' and email_user_domain = '' => Search_EntitiesIDs_.GetEmailUserIds(),
-											email_user_name = ''  and email_user_domain <> '' => Search_EntitiesIDs_.GetEmailDomainIds(),
-											IsOnline and email_user_name <> '' and email_user_domain <> '' => EntitiesIds_.GetEmail(),
+	boolean userNameOnly := email_user_name <> '' and email_user_domain = '';
+	boolean domainNameOnly := email_user_name = ''  and email_user_domain <> '';
+	boolean fullemail := email_user_name <> '' and email_user_domain <> '';
+	
+	ds_emailIds := MAP (userNameOnly => Search_EntitiesIDs_.GetEmailUserIds(),
+											domainNameOnly => Search_EntitiesIDs_.GetEmailDomainIds(),
+											fullemail => EntitiesIds_.GetEmail(),
 											dataset([], FraudShared_Services.Layouts.Recid_rec));
 	
 	//Find which IP_Address key to hit.
@@ -156,6 +160,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	
 	ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform);
 	
+	//Applying the all AND filters based on all the Search Fields.
 	ds_recs_filtered := ds_payload_recs(if(in_rec.did <> 0, did = in_rec.did, true) AND
 																			if(in_rec.name_last <> '', raw_last_name = in_rec.name_last, true) AND
 																			if(in_rec.addr <> '', street_1 = in_rec.addr, true) AND
@@ -177,7 +182,13 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(isIPRange1 	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 , true) AND
 																			if(in_rec.MACAddress <> '', mac_address = in_rec.MACAddress, true) AND
 																			if(in_rec.device_id <> '', device_id = in_rec.device_id, true) AND
-																			if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true)
+																			if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true) AND
+																			if((integer)in_rec.dob [1..4] <> 0 , dob[1..4] = in_rec.dob [1..4] , true) AND
+																			if((integer)in_rec.dob [5..6] <> 0 , dob[5..6] = in_rec.dob [5..6] , true) AND
+																			if((integer)in_rec.dob [7..8] <> 0 , dob[7..8] = in_rec.dob [7..8] , true) AND
+																			if(userNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,1)) = email_user_name, true) AND
+																			if(domainNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,2)) = email_user_domain, true) AND
+																			if(fullemail, email_address = STD.Str.CleanSpaces(in_rec.email_address), true)
 																		 );
 																		 
 	//AND filter with BankName , explicit join because we do not have BankName field in the payload. 
