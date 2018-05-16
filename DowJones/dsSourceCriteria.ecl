@@ -1608,5 +1608,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/694 Yemen List','1594'},
 {'EC (CFSP) 2018/699 Central African Republic List','1595'},
 {'EC 2018/689 Yemen List','1596'},
-{'EC 2018/698 Central African Republic List','1597'}
+{'EC 2018/698 Central African Republic List','1597'},
+{'EC (CFSP) 2018/706 Ukraine List','1598'},
+{'EC 2018/705 Ukraine List','1599'}
 ],r);
