@@ -3,7 +3,7 @@ export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) Bui
     IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
     //Self.hasProdRecord:=DOPSGrowthCheck.HasPrevious(Left.PackageName,Left.KeyFile,Left.ProdVersion);
     //Self.hasProdRecord:='true';
-    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFile);
+    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
     Self:=Left;));
 
     CommandLayout:=RECORD
@@ -17,7 +17,7 @@ export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) Bui
                             Left.PackageName        +'\',\''+
                             Left.KeyAttribute       +'\',\''+
                             Left.KeyNickName        +'\',\''+
-                            Left.KeyFile            +'\',\''+
+                            Left.KeyFileNew         +'\',\''+
                             Left.indexfields        +'\',\''+
 							Left.PersistRecIDField  +'\',\''+
 							Left.EmailField         +'\',\''+

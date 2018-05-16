@@ -23,12 +23,14 @@
 				string PackageName;
 				string KeyAttribute;
 				string KeyNickName;
-				string KeyFile;
+				string KeyFilePre;
+				string KeyFilePost;
 				string PersistRecIDField;
 				string EmailField;
 				string PhoneField;
 				string SSNField;
 				string FeinField;
+				string FieldsOfInterest;
 				string Threshold;
 			END;
 			export Date_Compare_Layout := RECORD
@@ -41,7 +43,8 @@
 				string PackageName;
 				string KeyAttribute;
 				string KeyNickName;
-				string KeyFile;
+				string KeyFileNew;
+				string KeyFileOld;
 				string CertVersion;
 				string ProdVersion;
 				string PersistRecIDField;
@@ -49,13 +52,14 @@
 				string PhoneField;
 				string SSNField;
 				string FeinField;
+				string FieldsOfInterest;
 				string Threshold;				
 			END;
 			export Attribute_Layout_For_Command := RECORD
 				string PackageName;
 				string KeyAttribute;
 				string KeyNickName;
-				string KeyFile;
+				string KeyFileNew;
 				string indexfields;
 				//string hasProdRecord;
 				string PersistRecIDField;
@@ -66,13 +70,27 @@
 				string CertVersion;
 				string ProdVersion;
 			END;
+			
+			export Delta_Attribute_Layout_For_Command := RECORD
+				string KeyFileNew;
+				string KeyFileOld;
+				string PackageName;
+				string KeyNickName;
+				string KeyAttribute;
+				string PersistRecIDField;
+				string CertVersion;
+				string ProdVersion;
+				string FieldsOfInterest;
+			END;
 			export Full_Delta_Stat_Layout := RECORD
 				string PackageName;
-				string KeyAttribute;
 				string KeyNickName;
+				string CurrVersion;
+				string PrevVersion;
+				string field;
 				string Stat_Name;
-				string results;
+				string results_percent;
+				string results_count;
+				string passed;
 			END;
-
-			end;
 end;

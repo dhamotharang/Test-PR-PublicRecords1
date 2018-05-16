@@ -1,5 +1,5 @@
 ﻿import DOPSGrowthCheck,STD,ut;
-export CalculateStats(PackageName='',KeyRef,KeyNickName, KeyFile='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionCert='', VersionProd='') := functionmacro 
+export CalculateStats(PackageName='',KeyRef,InputKeyNickName, KeyFile='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionCert='', VersionProd='') := functionmacro 
 LoadKey:=index(#expand(KeyRef),KeyFile);
 
 PullKey:=pull(LoadKey);
@@ -97,12 +97,12 @@ RemoveDates:=PullKey;
 #END 
 UniquePayload:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),record,local),record,local));
 
-NewEntry:=dataset([{PackageName,KeyFile,KeyNickName,VersionCert,'n/a',NumRecs,UniqueDID,UniqueProxID,UniqueSeleID,UniquePersistentRecID,UniqueEmail,UniquePhone,UniqueSSN,UniqueFEIN,UniqueIndex,UniquePayload,'B','N'}],DOPSGrowthCheck.layouts.Stats_Layout);
+NewEntry:=dataset([{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a',NumRecs,UniqueDID,UniqueProxID,UniqueSeleID,UniquePersistentRecID,UniqueEmail,UniquePhone,UniqueSSN,UniqueFEIN,UniqueIndex,UniquePayload,'B','N'}],DOPSGrowthCheck.layouts.Stats_Layout);
 OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
-IdentifyProdRecord:=OldRecords(KeyName=KeyFile and CurrVersion=VersionProd and RecType='B');
+IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=VersionProd and RecType='B');
 
-UpdatePassed:=project(OldRecords,transform(recordof(OldRecords),Self.Passed:=if(Left.CurrVersion=VersionProd and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+
 
 DOPSGrowthCheck.layouts.Stats_Layout tCalculateDelTaStats(DOPSGrowthCheck.layouts.Stats_Layout L ,DOPSGrowthCheck.layouts.Stats_Layout R):= transform
                     Self.num_recs:=(string)((((real)L.Num_Recs-(real)R.Num_Recs)/(real)R.Num_Recs)*100);
@@ -122,15 +122,15 @@ DOPSGrowthCheck.layouts.Stats_Layout tCalculateDelTaStats(DOPSGrowthCheck.layout
                     Self.Passed:='n/a';
                     Self:=L;
                 end;
-NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyName=Right.KeyName,tCalculateDelTaStats(left,right));
+NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyNickName=Right.KeyNickName,tCalculateDelTaStats(left,right));
 //output(NewDeltaStat,named('NewDeltaStat'));
 
-NewFile:=if(exists(IdentifyProdRecord),NewDeltaStat+NewEntry+UpdatePassed,NewEntry+UpdatePassed);
+NewFile:=if(exists(IdentifyProdRecord),NewDeltaStat+NewEntry,NewEntry);
 
-Publish:=output(NewFile,,'~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+KeyNickName,thor,compressed,overwrite);
+Publish:=output(NewFile,,'~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+InputKeyNickName,thor,compressed,overwrite);
 
 AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::IndividualFileStats::using','~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+KeyNickName),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::IndividualFileStats::using','~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+InputKeyNickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 

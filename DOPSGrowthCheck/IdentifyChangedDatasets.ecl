@@ -24,6 +24,8 @@ END;
 dAlreadyDone:=project(ChangedDataSets,tAlreadyDone(Left));
 
 DOPSGrowthCheck.layouts.Build_Data_Layout tBuildData(DopsGrowthCheck.layouts.Date_Compare_Layout L, DopsGrowthCheck.layouts.Configuration_Layout R) := TRANSFORM
+    Self.KeyFileNew:=R.KeyFilePre+L.CertVersion+R.KeyFilePost;
+    Self.KeyFileOld:=R.KeyFilePre+L.ProdVersion+R.KeyFilePost;
     SELF := L;
     SELF := R;
 END;
