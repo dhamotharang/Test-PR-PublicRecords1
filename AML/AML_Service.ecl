@@ -578,6 +578,7 @@ Deltabase_Logging_prep := project(FINAL, transform(Risk_Reporting.Layouts.LOG_De
                                                   self.i_bus_zip   := search.Business.address.Zip5,
                                                   self.i_bus_phone := search.Business.phone,
                                                   self.o_lexid     := (Integer)left.Result.UniqueId,
+                                                  self.o_bdid      := left.Result.BusinessId,
                                                   self := left,
                                                   self := [] ));
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
