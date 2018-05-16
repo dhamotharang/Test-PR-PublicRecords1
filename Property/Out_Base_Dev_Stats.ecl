@@ -525,7 +525,7 @@ export Out_Base_Dev_Stats(string filedate) := function
 	STRATA.createAsHeaderStats(property.Foreclosure_as_Header(property.File_Foreclosure_Base_v2),'Property','Foreclosure',filedate,'kgummadi@seisint.com;jtrost@seisint.com',zAs_Header_Stats,true);
 
 	return parallel( zOrig_Stats_cnt,
-									 zOrig_Stats,
+									// zOrig_Stats,
 									 zPopulation_Stats,
 									 zAs_Header_Stats
 									//,zRunAsBusinessHeaderStats
