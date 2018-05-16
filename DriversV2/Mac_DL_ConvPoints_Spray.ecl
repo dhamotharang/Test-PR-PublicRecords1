@@ -248,7 +248,11 @@ macro
 																										DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Suspension
 																										)
 														);
-
+  %scrub_files% := case(%stype%
+												,'TN'        => DriversV2.Scrub_DL(filedate).TN_CONV
+	                      ,'TN_WDL'    => DriversV2.Scrub_DL(filedate).TN_WDL
+                        );
+						
 	%Create_Superfiles% := sequential(FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Superfile',false),
 									   FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Delete',false),
 									   FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Old',false)																	
