@@ -6,7 +6,8 @@ DataIn := PROD_ReadOnly_DS;
 OUTPUT(COUNT(dataIn));
 
 report0 := RECORD
-	recTypeSrc	 := DataIn.State_Origin;
+	// recTypeSrc	 := DataIn.State_Origin;
+	recTypeSrc	 := DataIn.st_registration;
 	GroupCount := COUNT(GROUP);
 END;
 

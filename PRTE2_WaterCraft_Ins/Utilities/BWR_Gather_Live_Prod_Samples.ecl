@@ -1,9 +1,14 @@
-﻿IMPORT PromoteSupers,PRTE2_WaterCraft_Ins;
+﻿// PRTE2_WaterCraft_Ins.Utilities.BWR_Gather_Live_Prod_Samples
+
+IMPORT PromoteSupers,PRTE2_WaterCraft_Ins;
 
 PROD_ReadOnly_DS	:= Files.LIVEProdMainReadOnly;
 
 // any filters to get better records?  Let's get year 2000 or later
 DS := PROD_ReadOnly_DS(Sequence_key[1..4]>'2000');
+// NOTE: NH and UT fail with this sequence key filter... so we may not want that (or at least for those 2 states)
+//       I worked around it with second run using BWR_Gather_Live_Prod_Samples_NHUT
+DS1 := PRTE2_WaterCraft_Ins.Utilities.Files.ProdGatherMainDS;
 COUNT(DS);
 GatherCount := 5000;
 DS2 := CHOOSESETS(DS,
@@ -21,11 +26,18 @@ DS2 := CHOOSESETS(DS,
 										State_Origin='UT'=>GatherCount,State_Origin='VA'=>GatherCount,State_Origin='VT'=>GatherCount,State_Origin='WA'=>GatherCount,
 										State_Origin='WI'=>GatherCount,State_Origin='WV'=>GatherCount,State_Origin='WY'=>GatherCount, 0);
 
-PromoteSupers.Mac_SF_BuildProcess(DS2, Files.ProdGatherMainName, Build1,,,TRUE);
+OutLay := PRTE2_WaterCraft_Ins.Utilities.Layouts.GatheredBaseMainLayout;
+OutLay trxForm(DS2 L,INTEGER C) := TRANSFORM
+	SELF.UniqueCnt := C;
+	SELF := L;
+END;
+DS3 := PROJECT(DS2,trxForm(LEFT,COUNTER));
+
+PromoteSupers.Mac_SF_BuildProcess(DS3, Files.ProdGatherMainName, Build1,,,TRUE);
 
 Build1;
 
-DataIn := DS2;
+DataIn := DS3;
 OUTPUT(COUNT(dataIn));
 
 report0 := RECORD

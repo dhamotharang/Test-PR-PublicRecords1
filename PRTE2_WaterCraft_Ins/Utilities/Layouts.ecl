@@ -111,4 +111,8 @@ EXPORT Layouts := MODULE
 		unsigned8 scrubsbits2;
 	END;
 
+	EXPORT GatheredBaseMainLayout := RECORD
+		INTEGER UniqueCnt;
+		ProdBaseMainLayout;
+	END;
 END;
