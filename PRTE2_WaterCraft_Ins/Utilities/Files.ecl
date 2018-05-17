@@ -23,6 +23,6 @@ EXPORT Files := MODULE
 	EXPORT LIVEProdMainReadOnly := DATASET(LIVEProdMainName,Layouts.ProdBaseMainLayout,THOR);
 
 	EXPORT ProdGatherMainName	:= dataprep_Prefix+colon+ProdBaseMainCopy;
-	EXPORT ProdGatherMainDS		:= DATASET(ProdGatherMainName,Layouts.ProdBaseMainLayout,THOR);
+	EXPORT ProdGatherMainDS		:= DATASET(ProdGatherMainName,Layouts.GatheredBaseMainLayout,THOR);
 
 END;
