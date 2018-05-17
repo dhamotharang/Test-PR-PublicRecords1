@@ -120,8 +120,8 @@ gateways_in := Gateway.Configuration.Get();
 model_name := if(model in valid_models, model, ERROR(301,'Missing or Invalid Model Name') );
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
-	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
-	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
+	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
+	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
   self := le;																																								
 end;
 gateways := project(gateways_in, gw_switch(left));

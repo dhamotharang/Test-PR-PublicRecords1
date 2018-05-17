@@ -100,9 +100,11 @@ batchin := dataset([],fp_batch_in) 			: stored('batch_in',few);
 gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-	self.servicename := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and InputArgs.ModelName_in not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.servicename);
-	self.url := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and InputArgs.ModelName_in not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.url); 		
-	self := le;
+	self.servicename := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.servicename);
+	
+  self.url := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.url); 		
+  
+  self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
 
