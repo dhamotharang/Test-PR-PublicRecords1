@@ -1,4 +1,4 @@
-import ut, codes, address, business_risk, Risk_Indicators, Risk_Reporting, models, gateway;
+﻿import ut, codes, address, business_risk, Risk_Indicators, Risk_Reporting, models, gateway;
 
 export BC1O_Function(DATASET(Layout_BC1I) indata, dataset(Gateway.Layouts.Config) gateways, 
 					unsigned1 glb, unsigned1 dppa, boolean isUtility=false, boolean ln_branded=false, string4 tribcode='',
@@ -96,6 +96,7 @@ biid_results := business_risk.InstantID_Function(prep,gateways,false,dppa,glb,is
 	DataRestriction := DataRestriction, DataPermission := DataPermission);
 
 xlayout := record
+  unsigned6 RepDID;
 	riskwise.Layout_BC1O;
 	unsigned4 seq;
 end;
@@ -121,6 +122,7 @@ end;
 r00 := '00';  // for concatenating reason codes together, make any that are blank equal to '00'
 
 xlayout filloutput(biid_results le, indata rt) := transform
+  self.RepDID := le.RepDid;
 	self.seq := rt.seq;
 	self.acctno := rt.acctno;
 	self.account := rt.account;
@@ -379,7 +381,7 @@ fp_input := ungroup(project(clam, transform(bs_with_ip, self.bs := left, self.ip
 num_reason := 4;
 fp_model := models.FP3710_0_0(fp_input, 4);
 
-riskwise.Layout_BC1O append_fraudpoint(withBusinessModel le, fp_model rt) := transform
+xlayout append_fraudpoint(withBusinessModel le, fp_model rt) := transform
 	self.cmpyaddrscore := if(tribcode='cbbl', rt.score, le.cmpyaddrscore);
 	self.sic := if(tribcode='cbbl', rt.ri[1].hri[1..2] + rt.ri[2].hri[1..2] + rt.ri[3].hri[1..2], le.sic);  // first 3 reason codes from fraudpoint mapped into sic field for cbbl
 	

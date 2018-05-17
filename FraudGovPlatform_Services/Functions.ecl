@@ -431,15 +431,14 @@ EXPORT Functions := MODULE
 		ds_rids:=	JOIN(ds_best_in, FraudShared.Key_Did(fraud_platform),
 										KEYED(LEFT.did = RIGHT.did),
 										TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-											SELF.AcctNo := (string) Left.Seq, //Assigning the seq number as acctno so I can use the acctno for rollup, that's it. 
-											SELF := RIGHT,
 											SELF := LEFT,
+											SELF := RIGHT,
 											SELF := []),
 									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
 
 		ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_rids, fraud_platform);
 
-		ds_payload_recs_sorted := SORT(ds_payload_recs, acctno, -event_date, record);
+		ds_payload_recs_sorted := SORT(ds_payload_recs, did, -event_date, record);
 
 		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
 				//We wanted to keep the record which has good address, instead of first non blank address...
@@ -473,7 +472,23 @@ EXPORT Functions := MODULE
 				SELF := [];
 		END;
 
-		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.acctno = right.acctno, xformRollup(left, right));
+		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.did = right.did, xformRollup(left, right));
+
+		//*** MockUp Score Data *** 
+		// ***random_scores*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual score. 
+		random_scores_ds := DATASET([{35}, {40}, {49}, {79}, {85}, {89}, {95}, {99}] , {unsigned1 num}); 
+		random_score := ROUNDUP(count(random_scores_ds) * (((RANDOM()%100000)+1)/100000));
+		// ***random_scores ends***
+	
+		iesp.fraudgovreport.t_FraudGovScoreDetails mockup_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			SELF.RecordType := 'IDENTITY';
+			SELF.ElementType := FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT;
+			SELF.ElementValue := (string) L.DID;
+			SELF.Score := random_scores_ds[random_score].num;
+		END;
+		
+		ds_MockUpScoreCard := PROJECT(ds_payload_recs_rolled, mockup_trans(LEFT));
+		//*** MockUp Score Data *** 
 
 		iesp.fraudgovreport.t_FraudGovIdentityCardDetails best_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
 			SELF.ContributedBest.UniqueId := (string) L.DID;
@@ -498,6 +513,7 @@ EXPORT Functions := MODULE
 																															'');
 			SELF.ContributedBest.Phone10 :=  L.phone_number;
 			SELF.EmailAddress := L.email_address;
+			SELF.ScoreDetails := ds_MockUpScoreCard[1];
 			SELF := [];
 		END;
 

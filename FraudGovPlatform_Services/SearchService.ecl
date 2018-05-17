@@ -21,6 +21,7 @@ EXPORT SearchService() := MACRO
 	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
 	#STORED('ProductCode',FraudGovUser.ProductCode); 
 	#STORED('FraudPlatform', Options.Platform);
+	#STORED('IsOnline', Options.IsOnline);
 
 	// *********************************Validation*******************************************
 	
@@ -116,7 +117,7 @@ EXPORT SearchService() := MACRO
 
 	//Adding Options.IsTestRequest. When Options.IsTestRequest = TRUE, the service returns mockedup data in the
 	//... roxie response, to help ESP and Web to continue with the development until we find a real way to return the data.
-	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsOnline, Options.IsTestRequest);
+	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
@@ -130,9 +131,6 @@ EXPORT SearchService() := MACRO
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
 														first_row,
 														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
-
-
-	
 	IF (isMinimumInput, 
 				OUTPUT(results, named('Results')),
 				FAIL(301,doxie.ErrorCodes(301))

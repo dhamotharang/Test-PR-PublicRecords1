@@ -45,6 +45,7 @@ EXPORT ReportService() := MACRO
 	#STORED('AgencyCounty',  Options.AgencyCounty);
 	#STORED('AgencyState',  Options.AgencyState);
 	#STORED('FraudPlatform',	Options.Platform);
+	#STORED('IsOnline',	Options.IsOnline);
 	#STORED('MaxVelocities', MaxVelocities);
 	#STORED('MaxKnownFrauds', MaxKnownFrauds);
 
@@ -127,7 +128,7 @@ EXPORT ReportService() := MACRO
 
 	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
 	
-	isValidInput := inputCount = 1;
+	isValidInput := inputCount = 1 OR ~Options.IsOnline;
 
 	// **************************************************************************************
 	// Append DID for Input PII
@@ -135,7 +136,6 @@ EXPORT ReportService() := MACRO
 	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_mod, batch_params_mod, usePhone:=TRUE);
 
 	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds,Options.IsIdentityTestRequest,Options.IsElementTestRequest);
-	//tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds);
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
@@ -144,13 +144,12 @@ EXPORT ReportService() := MACRO
 														first_row,
 														FraudGovPlatform_Services.Constants.ServiceType.REPORT);
 
-																																											 
-	output(tmp.ds_royalties, NAMED('RoyaltySet'));
-
 	IF(isValidInput,
-		output(results, NAMED('Results')),
+		PARALLEL( 
+			output(results, NAMED('Results')),
+			output(tmp.ds_royalties, NAMED('RoyaltySet')),
+			output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity'))
+		),
 		FAIL(303,doxie.ErrorCodes(303)));
-	
-	IF(~Options.IsOnline AND isValidInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 	
 ENDMACRO;
