@@ -128,7 +128,7 @@ EXPORT ReportService() := MACRO
 
 	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
 	
-	isValidInput := inputCount = 1;
+	isValidInput := inputCount = 1 OR ~Options.IsOnline;
 
 	// **************************************************************************************
 	// Append DID for Input PII
@@ -147,9 +147,9 @@ EXPORT ReportService() := MACRO
 	IF(isValidInput,
 		PARALLEL( 
 			output(results, NAMED('Results')),
-			output(tmp.ds_royalties, NAMED('RoyaltySet'))),
+			output(tmp.ds_royalties, NAMED('RoyaltySet')),
+			output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity'))
+		),
 		FAIL(303,doxie.ErrorCodes(303)));
-	
-	IF(~Options.IsOnline AND isValidInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 	
 ENDMACRO;
