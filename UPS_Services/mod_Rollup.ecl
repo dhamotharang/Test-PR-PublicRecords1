@@ -50,11 +50,13 @@ export mod_Rollup(SearchParams inputs) := MODULE
 		// removes records without a first seen/last seen date.  If there is only
 		// one address in the input, pass it back REGARDLESS of whether it has a
 		// date or not.  (Bugzilla 42359).
-		filteredAddrs := addrs(DateLastSeen.year > 0 OR DateFirstSeen.year > 0 OR 
-															ut.Age(iesp.ECL2ESP.DateToInteger(DateLastSeen)) <= 10 ); // Remove records older than 10 years if newer are available. 
+		filteredAddrs := addrs(
+															(DateLastSeen.year > 0 OR DateFirstSeen.year > 0 ) AND 
+															 ut.Age(iesp.ECL2ESP.DateToInteger(DateLastSeen)) <= 10 
+														 ); // Keep records newer than or equal to 10 years. 
 		return IF(COUNT(filteredAddrs) > 0 , 
 							 CHOOSEN(filteredAddrs, maxRecs),
-							 addrs);//i am not sure whether this is deterministic
+							 CHOOSEN(addrs, maxRecs));//i am not sure whether this is deterministic
 	END;
 
 	// after names are rolled up, decide which ones are passed to output
