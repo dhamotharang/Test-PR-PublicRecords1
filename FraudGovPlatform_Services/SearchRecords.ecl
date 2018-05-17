@@ -2,7 +2,6 @@
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
-										 BOOLEAN IsOnline = FALSE,
 										 BOOLEAN IsTestRequest = FALSE) := FUNCTION
 	
 	//Defining the constants to be used later.
@@ -34,7 +33,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																																					batch_params.GlobalCompanyId,
 																																					batch_params.IndustryType,
 																																					batch_params.ProductCode,
-																																					IsOnline := IsOnline);	
+																																					IsOnline := batch_params.IsOnline);
 
 	ds_clusters := FraudGovPlatform_Services.fn_getTestRecords.GetTestClusters();
 
@@ -68,7 +67,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																										SELF	:= []));
 	
 	ds_payload_best_in := PROJECT(ds_allPayloadRecs , TRANSFORM(DidVille.Layout_Did_OutBatch,
-																											SELF.Seq := COUNTER,
+																											SELF.Seq := (integer) LEFT.acctno,
 																											SELF.did := LEFT.did,
 																											SELF := []));
 
@@ -85,7 +84,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
 	ds_elements_dids := PROJECT(ds_payload_best_in_dedup, TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec, 
-																													SELF.acctno := (string) COUNTER,
+																													SELF.acctno := (string) LEFT.Seq,
 																													SELF.did := LEFT.did,
 																													SELF := []));
 	
@@ -176,16 +175,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LEFT.fragment = RIGHT.fragment,
 																	ElementsNIdentities_trans(LEFT, RIGHT));
 																	
-	// output(ds_batch_in, named('ds_batch_in'));
-	// output(ds_elements_dids, named('ds_elements_dids'));
-	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
-	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
-	// output(ds_fragment_recs, named('ds_fragment_recs'));
-	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
-	// output(ds_contributoryBest, named('ds_contributoryBest'));
-
-
 	ds_results := IF(IsTestRequest, ds_ElementsNIdentities + mockup_cluster, ds_ElementsNIdentities);
-
 	RETURN ds_results;
 END;

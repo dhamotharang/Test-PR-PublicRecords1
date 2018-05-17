@@ -5,6 +5,7 @@ EXPORT IParam := MODULE
   EXPORT BatchParams := INTERFACE (BatchDatasets.IParams.BatchParams)
 		EXPORT boolean   AppendBest := true;
 		EXPORT boolean   TestVelocityRules := false;
+		EXPORT boolean   IsOnline := false;
 		EXPORT UNSIGNED3 DIDScoreThreshold;
 		EXPORT unsigned6 GlobalCompanyId;     // company (agency)
 		EXPORT unsigned2 IndustryType;        // company (agency) program i.e. SNAP, TANF, Medicaid, etc..
@@ -60,6 +61,7 @@ EXPORT IParam := MODULE
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT boolean   TestVelocityRules	:= false: STORED('TestVelocityRules'); // this option is internal to roxie. added to toggle between test/actual velocity rules. 
 			EXPORT boolean   AppendBest 				:= true	: STORED('AppendBest');
+			EXPORT boolean   IsOnline 					:= false: STORED('IsOnline');
 			EXPORT unsigned3 DIDScoreThreshold  := 80		: STORED('DIDScoreThreshold');
 			EXPORT unsigned6 GlobalCompanyId    := 0		: STORED('GlobalCompanyId');
 			EXPORT unsigned2 IndustryType       := IndustryTypeCode;
