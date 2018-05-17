@@ -1,5 +1,5 @@
-import RoxieKeyBuild, PRTE;
-export MAC_Weekly_Spray(sourceIP,sourceFile,filedate) := macro   //Removed the Â“recordsize=`436`Â” from export
+﻿import RoxieKeyBuild, PRTE;
+export MAC_Weekly_Spray(sourceIP,sourceFile,filedate) := macro   //Removed the recordsize=`436` from export
 #workunit('name','CodesV3 spray')
 #uniquename(spray_file)
 #uniquename(clear_super_csv)
@@ -18,7 +18,7 @@ export MAC_Weekly_Spray(sourceIP,sourceFile,filedate) := macro   //Removed the �
 #uniquename(updateidops)
 #uniquename(update_orbiti)
 
-%spray_file% := fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_20','~thor_data400::in::codes_v3::csv_'+filedate,-1,,,true,true); //added ::csv to in file
+%spray_file% := fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_44','~thor_data400::in::codes_v3::csv_'+filedate,-1,,,true,true); //added ::csv to in file
 
 %clear_super_csv% := fileservices.clearsuperfile('~thor_data400::base::codes_v3_csv');
 %add_super_csv% := fileservices.addsuperfile('~thor_data400::base::codes_v3_csv','~thor_data400::in::codes_v3::csv_'+filedate); //added ::csv to in file

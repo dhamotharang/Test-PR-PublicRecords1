@@ -189,15 +189,23 @@ EXPORT Standardize_NameAddr := MODULE
 			prepTrans2 		  :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.rawTrans.City) + 
 																			 IF(L.rawTrans.City <> '' and L.rawTrans.State <> '', ', ', '') + L.rawTrans.State + ' ' +
 																			 IF(LENGTH(L.rawTrans.PostalCode) >= 5, L.rawTrans.PostalCode[1..5], ''));
-			clean_TransPrep	:= IF(prepTrans2 <> '', Address.CleanAddress182(prepTrans1, prepTrans2), '');
+ 
+			string182	clean_TransPrep	:=	Address.CleanAddress182(prepTrans1, prepTrans2);
+			Address.Layout_Clean182_fips	clean_TransRec	:=	transfer(clean_TransPrep, Address.Layout_Clean182_fips);
 					
-			SELF.prep_trans_line1     := IF(clean_TransPrep not in ['','.'] and ut.CleanSpacesAndUpper(clean_TransPrep[1..64]) not in ['0','.']  
-																			,ut.CleanSpacesAndUpper(clean_TransPrep[1..64])
+			SELF.prep_trans_line1     := IF(clean_TransPrep not in ['','.']  and ut.CleanSpacesAndUpper(clean_TransPrep[1..64]) not in ['0','.']
+																			,Address.Addr1FromComponents(clean_TransRec.prim_range,
+																																	 clean_TransRec.predir,
+																																	 clean_TransRec.prim_name,
+																																	 clean_TransRec.addr_suffix,
+																																	 clean_TransRec.postdir,
+																																	 clean_TransRec.unit_desig,
+																																	 clean_TransRec.sec_range)
 																			,'');
 			SELF.prep_trans_line_last := IF(clean_TransPrep not in ['','.']
-																			,ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(clean_TransPrep[65..89]) + 
-																				 IF(clean_TransPrep[65..89] <> '', ', ', '') + clean_TransPrep[115..116] + ' ' +
-																				 clean_TransPrep[117..121])
+																			,Address.Addr2FromComponents(clean_TransRec.p_city_name,
+																																	 clean_TransRec.st,
+																																	 clean_TransRec.zip)
 																			,'');
 																			
 			// Prep ADDRESS file Address
@@ -208,15 +216,23 @@ EXPORT Standardize_NameAddr := MODULE
 			prepAddr2 		:=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.rawAddr.City) + 
 																							 IF(L.rawAddr.City <> '', ', ', '') + L.rawAddr.State + ' ' +
 																							 IF(LENGTH(L.rawAddr.ZipCode) >= 5, L.rawAddr.ZipCode[1..5], ''));
-			clean_AddrPrep := IF(prepAddr2 <> '', Address.CleanAddress182(prepAddr1, prepAddr2), '');
+			
+			string182	clean_AddrPrep	:=	Address.CleanAddress182(prepAddr1, prepAddr2);
+			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
 					
 			SELF.prep_addr_line1     := IF(clean_AddrPrep not in ['','.']  and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.']
-																			,ut.CleanSpacesAndUpper(clean_AddrPrep[1..64])
+																			,Address.Addr1FromComponents(clean_AddrRec.prim_range,
+																																	 clean_AddrRec.predir,
+																																	 clean_AddrRec.prim_name,
+																																	 clean_AddrRec.addr_suffix,
+																																	 clean_AddrRec.postdir,
+																																	 clean_AddrRec.unit_desig,
+																																	 clean_AddrRec.sec_range)
 																			,'');
 			SELF.prep_addr_line_last := IF(clean_AddrPrep not in ['','.']
-																			,ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(clean_AddrPrep[65..89]) + 
-																				 IF(clean_AddrPrep[65..89] <> '', ', ', '') + clean_AddrPrep[115..116] + ' ' +
-																				 clean_AddrPrep[117..121])
+																			,Address.Addr2FromComponents(clean_AddrRec.p_city_name,
+																																	 clean_AddrRec.st,
+																																	 clean_AddrRec.zip)
 																			,'');
 
 			SELF											:= L;
