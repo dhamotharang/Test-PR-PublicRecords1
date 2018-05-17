@@ -13,6 +13,9 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 	BOOLEAN  	includeNewsProfile := TRUE  : STORED('includeNews');
 	STRING50	dataRestriction := risk_indicators.iid_constants.default_DataRestriction : STORED('dataRestriction');
   STRING50 	dataPermission := Risk_Indicators.iid_constants.default_DataPermission : STORED('dataPermissionMask');
+  
+  // STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');  
+  // STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
 	
 	gateways := Gateway.Configuration.Get();
 
@@ -83,7 +86,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 
 	//clean and retrieve individual attributes
 	cleanIndData := DueDiligence.Common.GetCleanData(indRecs(validRequest));
-	consumerResults := DueDiligence.getIndAttributes(cleanIndData, dppa, glba, dataRestriction, gateways);
+	consumerResults := DueDiligence.getIndAttributes(cleanIndData, dppa, glba, dataRestriction, gateways, '');
 																				 
 
 																						 
