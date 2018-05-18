@@ -302,8 +302,11 @@ EXPORT Layouts := MODULE
 			string9			clean_Zip;
 			string25		clean_IP_Address;
 			unsigned6 	did ; 
-			unsigned1		did_score;				
-			Provenance;
+			unsigned1		did_score;
+			unsigned3		file_type;
+			unsigned6		ind_type;
+			unsigned1		Deltabase := 0;
+			Provenance;			
 		END;
 		EXPORT KnownFraud := RECORD
 			Sprayed.KnownFraud;
@@ -322,7 +325,10 @@ EXPORT Layouts := MODULE
 			string10		clean_Zip;
 			string25		clean_IP_Address;
 			unsigned6 	did ; 
-			unsigned1		did_score;				
+			unsigned1		did_score;	
+			unsigned3		file_type;
+			unsigned6		ind_type;			
+			unsigned1		Deltabase := 0;
 			Provenance;
 		END;
 	END;
@@ -356,6 +362,9 @@ EXPORT Layouts := MODULE
 			unsigned4		process_date; 
 			string100		Source; 
 			unsigned8		source_rec_id; 
+			unsigned3		file_type;
+			unsigned6		ind_type;			
+			unsigned1		Deltabase := 0;
 		END; 
 		
 		EXPORT KnownFraud	:= 
@@ -385,6 +394,9 @@ EXPORT Layouts := MODULE
 			unsigned4		process_date ; 
 			string100		Source; 
 			unsigned8		source_rec_id;
+			unsigned3		file_type;
+			unsigned6		ind_type;				
+			unsigned1		Deltabase := 0;
 		END;
 
 		EXPORT AddressCache := record
@@ -438,7 +450,7 @@ export temp := module
 			unsigned1		bdid_score:= 0;
 			BIPV2.IDlayouts.l_xlink_ids;
 	  end;
-		
+
  end; 
 
 END;
