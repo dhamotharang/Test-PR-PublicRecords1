@@ -4,7 +4,7 @@ EXPORT Build_All(
 
 	 STRING															       pversion
 	,STRING															       pDirectory			    = '/data/hds_180/qa_data/data/' + pversion[1..8]
-	,STRING															       pServerIP			    = _control.IPAddress.bctlpedata12
+	,STRING															       pServerIP			    = 'uspr-edata11.risk.regn.net'
 	,STRING															       pFileType			    = '*.txt'
 	,STRING															       pGroupName			    = tools.fun_Groupname() 																		
 	,BOOLEAN														       pIsTesting			    = FALSE

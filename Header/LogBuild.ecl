@@ -1,5 +1,5 @@
-﻿import std,ut;
-
+import std,ut;
+// TEST COMMIT
 // You can pre-set your logs variables by using the following code, customizing it, and inserting it at the begining of your BWR: 
 // #stored ('buildname', 'my_build_name'   ); 
 // #stored ('version'  , 'my_build_version'); 

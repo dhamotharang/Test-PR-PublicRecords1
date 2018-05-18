@@ -352,7 +352,7 @@ END;
 									
 	END;
 	
-	//InquiryLog MBS validation
+	//InquiryLog MBS validation - ONLY DELTABASE!!!
 	
 	EXPORT ValidateInputWithMBS(string fname, string pSeparator, string pTerminator):= module
 		shared infile:=dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,
