@@ -237,12 +237,12 @@ EXPORT RingId := MODULE
 
 	END;
 	
-
+	//1.Send main dataset to append lexid
 	EXPORT Append_RingID(pBaseFile) := FUNCTIONMACRO
 	
 		import Header;
 		
-		// Take new records w/o a lexid and join them to previous main file (AKA ringid, flexid, no match id)
+		// 2.Take new records w/o a lexid and join them to previous main file (AKA ringid, flexid, no match id)
 		BaseFile := distribute(pBaseFile, hash32(record_id));
 		previous_base 	:= distribute(FraudShared.Files().Base.Main.built, hash32(record_id));
 		
@@ -254,19 +254,17 @@ EXPORT RingId := MODULE
 			local
 		);
 
+		// 3.Where there is a match in #2 transfer the previous RingID over to the record w/o a lexid
 
-	 shared base0 := join(
+		shared base0 := join(
 			BaseFile,
 			previous_RingIds,
 			left.record_id = right.record_id,
 			transform(FraudShared.Layouts.Base.Main, self.did := if(right.did>0,right.did,left.did); self.did_score := if(right.did_score>0,right.did_score,left.did_score); self := left),
 			left outer,
-			local
-	 );
+			local);
 		
-		
-		
-		base1:=project(base0(DID = 0)
+		shared base1:=project(base0(DID = 0)
 					,transform(FraudGovPlatform.RingID.RingId_Layout
 						,self.fname:=left.raw_first_name
 						,self.lname:=left.raw_last_name
@@ -274,9 +272,8 @@ EXPORT RingId := MODULE
 						,self.dob:=(unsigned)left.dob
 						,self:=left
 						));
-						
 		
-		// Where there is a match in #2 transfer the previous flexid over to the record w/o a lexid
+		//4.sequence those records in #2 that did not match anything in #3
 		LastRingID := FraudGovPlatform.RingID.LastRingID;
 		seed:= if (LastRingID > 0 , LastRingID, FraudGovPlatform.Constants().FirstRingID);
 		
@@ -286,6 +283,7 @@ EXPORT RingId := MODULE
 			base2,
 			seed);	
 		
+		//5.send all records with a RingID to be matched and collapsed
 		mtchs:= FraudGovPlatform.RingID.Mod_Collisions( base2 ).matches;
 
 	
@@ -301,7 +299,7 @@ EXPORT RingId := MODULE
 		pairs:=table(mtchs,{new_rid,old_rid});
 
 		Header.MAC_ApplyDid1(tBase,DID,pairs,outfile);
-
+		//6.combine records with a real lexid and a flexid into one main base file
 		RingIDs := join (base0,
 									outfile,
 									left.record_id = right.record_id,
