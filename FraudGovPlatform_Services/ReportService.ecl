@@ -128,6 +128,8 @@ EXPORT ReportService() := MACRO
 
 	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
 	
+	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
+	//for searches, not just card detais.
 	isValidInput := inputCount = 1 OR ~Options.IsOnline;
 
 	// **************************************************************************************
@@ -147,9 +149,9 @@ EXPORT ReportService() := MACRO
 	IF(isValidInput,
 		PARALLEL( 
 			output(results, NAMED('Results')),
-			output(tmp.ds_royalties, NAMED('RoyaltySet')),
-			output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity'))
+			output(tmp.ds_royalties, NAMED('RoyaltySet'))
 		),
 		FAIL(303,doxie.ErrorCodes(303)));
 	
+	IF(~Options.IsOnline,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 ENDMACRO;
