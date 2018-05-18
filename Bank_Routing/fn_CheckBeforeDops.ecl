@@ -2,11 +2,11 @@
 
 EXPORT fn_CheckBeforeDops(String pVersion) := function
 
-ScrubsFileBase:=dataset(bank_routing.thor_cluster + 'scrubs_bank_routing::OrbitReports::'+workunit,Scrubs.Layouts.OrbitLogLayout,thor);
-ScrubsFileInput:=dataset(bank_routing.thor_cluster + 'scrubs_bank_routing_Input::OrbitReports::'+workunit,Scrubs.Layouts.OrbitLogLayout,thor);
+ScrubsFileBase:=dataset(bank_routing.thor_cluster + 'scrubs_bank_routing::OrbitReports',Scrubs.Layouts.OrbitLogLayout,thor);
+ScrubsFileInput:=dataset(bank_routing.thor_cluster + 'scrubs_bank_routing::OrbitReports',Scrubs.Layouts.OrbitLogLayout,thor);
 
-ScrubsRulesBase:=dataset(bank_routing.thor_cluster + 'Scrubs::Scrubs_bank_routing::ProfileStorage::'+workunit,Scrubs.Layouts.ProfileRule_Rec,thor);
-ScrubsRulesInput:=dataset(bank_routing.thor_cluster + 'Scrubs::Scrubs_bank_routing_Input::ProfileStorage::'+workunit,Scrubs.Layouts.ProfileRule_Rec,thor);
+ScrubsRulesBase:=dataset(bank_routing.thor_cluster + 'Scrubs::Scrubs_bank_routing::ProfileStorage',Scrubs.Layouts.ProfileRule_Rec,thor);
+ScrubsRulesInput:=dataset(bank_routing.thor_cluster + 'Scrubs::Scrubs_bank_routing_Input::ProfileStorage',Scrubs.Layouts.ProfileRule_Rec,thor);
 
 ImportantStats:=dataset(bank_routing.thor_cluster + 'file_compare::bank_routing::importantfieldresults',file_compare.Layouts.ImportantFieldsResultsLayout,thor);
 

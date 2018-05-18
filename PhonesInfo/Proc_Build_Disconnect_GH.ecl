@@ -31,7 +31,7 @@ EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
 																										,fileservices.SendEmail(emailTarget, 'Phones Metadata: Disconnect Gong History File', 'Phones Metadata: Disconnect Gong History File Is Now Available.  Please see: ' + 'http://prod_esp.br.seisint.com:8010/WsWorkunits/WUInfo?Wuid='+ workunit + '&Widget=WUDetailsWidget#/stub/Results-DL/Grid')
 																										,fileservices.SendEmail(emailTarget, 'Phones Metadata: No Disconnect Gong History File', 'There Were No Disconnect Gong History Records in This Build')
 																										);	
-																	
+/*																	
 //Send Deact Gong History Flag Breakdown Notification
 	emailAttTarget					:= _control.MyInfo.EmailAddressNotify + emailProduct + emailDOps + emailDev; 
 	senderEmail								:= _control.MyInfo.EmailAddressNotify;
@@ -46,12 +46,12 @@ EXPORT Proc_Build_Disconnect_GH(string version, string thor_name) := function
 																																																							 ,
 																																																							 ,
 																																																							 ,senderEmail);
-	
+*/	
 	return sequential(clearDelete,
 																			buildHistBase,
 																			moveHistory,
 																			moveBase,
-																			emailBuildNotice,
-																			mailFlagAttach);
+																			emailBuildNotice);
+																			//,mailFlagAttach);
 	
 end;
