@@ -18,50 +18,52 @@ ut.hasField(PullKey,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
 ut.hasField(PullKey,Process_Date,hasProcess_Date);
 ut.hasField(PullKey,Filedate,hasFiledate);
 
+DistFile:=distribute(PullKey,hash(#expand(indexfields))),#expand(indexfields);
+
 #IF(hasDID)
-UniqueDID:=(string)count(dedup(sort(distribute(PullKey,hash(did)),did,local),did,local));
+UniqueDID:=(string)count(table(DistFile,{did},did,merge));
 #ELSE
 UniqueDID:='n/a';
 #END
 #IF(hasProxID)
-UniqueProxID:=(string)count(dedup(sort(distribute(PullKey,hash(ProxID)),ProxID,local),ProxID,local));
+UniqueProxID:=(string)count(table(DistFile,{ProxID},ProxID,merge));
 #ELSE
 UniqueProxID:='n/a';
 #END
 #IF(hasSeleID)
-UniqueSeleID:=(string)count(dedup(sort(distribute(PullKey,hash(SeleID)),SeleID,local),SeleID,local));
+UniqueSeleID:=(string)count(table(DistFile,{SeleID},SeleID,merge));
 #ELSE
 UniqueSeleID:='n/a';
 #END
 //Calculate Custom Field Stats
 #IF(PersistentRecIDField!='')
-UniquePersistentRecID:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(PersistentRecIDField))),#expand(PersistentRecIDField),local),#expand(PersistentRecIDField),local));
+UniquePersistentRecID:=(string)count(table(DistFile,{#expand(PersistentRecIDField)},#expand(PersistentRecIDField),merge));
 #ELSE
 UniquePersistentRecID:='n/a';
 #END
 #IF(EmailField!='')
-UniqueEmail:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(EmailField))),#expand(EmailField),local),#expand(EmailField),local));
+UniqueEmail:=(string)count(table(DistFile,{#expand(EmailField)},#expand(EmailField),merge));
 #ELSE
 UniqueEmail:='n/a';
 #END
 #IF(PhoneField!='')
-UniquePhone:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(PhoneField))),#expand(PhoneField),local),#expand(PhoneField),local));
+UniquePhone:=(string)count(table(DistFile,{#expand(PhoneField)},#expand(PhoneField),merge));
 #ELSE
 UniquePhone:='n/a';
 #END
 #IF(SSNField!='')
-UniqueSSN:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(SSNField))),#expand(SSNField),local),#expand(SSNField),local));
+UniqueSSN:=(string)count(table(DistFile,{#expand(SSNField)},#expand(SSNField),merge));
 #ELSE
 UniqueSSN:='n/a';
 #END
 #IF(FEINField!='')
-UniqueFein:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(FEINField))),#expand(FEINField),local),#expand(FEINField),local));
+UniqueFein:=(string)count(table(DistFile,{#expand(FEINField)},#expand(FEINField),merge));
 #ELSE
 UniqueFein:='n/a';
 #END
 
 //Calculate Index Stats
-UniqueIndex:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),#expand(indexfields),local),#expand(indexfields),local));
+UniqueIndex:=(string)count(table(DistFile,{#expand(indexfields)},#expand(indexfields),merge));
 
 //Remove Date Fields
 #IF(hasDate_Last_Seen)
