@@ -48,9 +48,13 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+
+		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
+		self.file_type := 1 ;
+		
 		source_input := if (l.source_input = '', 'KNFD',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := hash64(
+		SELF.unique_id := hash64(hashmd5(
 								ut.CleanSpacesAndUpper(l.customer_name) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_account_number) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_state) + ',' +  
@@ -168,7 +172,8 @@ module
 								ut.CleanSpacesAndUpper(l.mitigated_amount) + ',' +  
 								ut.CleanSpacesAndUpper(l.external_referral_or_casenumber) + ',' +  
 								ut.CleanSpacesAndUpper(l.cleared_fraud) + ',' +  
-								ut.CleanSpacesAndUpper(l.reason_cleared_code));	
+								ut.CleanSpacesAndUpper(l.reason_cleared_code)));	
+		self.Deltabase := if(l.source_input[1..9] = 'DELTABASE', 1, 0);
 		self:=l;
 		self:=[];
 	end;
@@ -192,14 +197,12 @@ module
 	NotInMbs := join(	f1,
 						FraudShared.Files().Input.MBS.sprayed(status = 1)
 									,left.Customer_Account_Number =(string)right.gc_id
-									and right.file_type = Functions.file_type_fn('KNFD') 
-									and Functions.ind_type_fn(left.Customer_Program) = right.ind_type and
+										and left.file_type = right.file_type 
+										and left.ind_type = right.ind_type AND 
  										( 
-											(	left.source_input[1..9] = 'DELTABASE'  
-												AND regexfind('DELTA', right.fdn_file_code, nocase) 
-											) 
+											left.Deltabase = 1											
 											OR 
-											(	left.source_input[1..9] != 'DELTABASE' AND
+											(	left.Deltabase = 0 AND
 												left.customer_State = right.Customer_State AND
 												left.Customer_County = right.Customer_County AND 	
 												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
