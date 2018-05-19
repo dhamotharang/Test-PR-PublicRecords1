@@ -24,13 +24,18 @@ module
 		
 	IdentityDataUpdate	:=	project(inIdentityDataUpdate,tPrep(left));
 	
-	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
+	MBS_Layout := Record
+		FraudShared.Layouts.Input.MBS;
+		unsigned1 Deltabase := 0;
+	end;
+	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 
 	IdentityDataSource := join(	IdentityDataUpdate,
-									Mbs_ds, 
+									MBS, 
 									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
 									left.file_type = right.file_type  AND
 									left.ind_type = right.ind_type AND 
+									left.Deltabase = right.Deltabase AND
 									( 
 											left.Deltabase = 1											
 											OR 

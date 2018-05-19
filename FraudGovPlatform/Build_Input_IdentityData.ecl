@@ -237,54 +237,12 @@ module
 									pTerminator := '~<EOL>~',
 									pQuote:= '');
 
-	Promote_Input_File := 
-		sequential(
-			 STD.File.StartSuperFileTransaction()
-			 //Promote Input Records
-			,STD.File.ClearSuperFile(Filenames().Input.IdentityData.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.IdentityData.Sprayed
-				,Filenames().Input.IdentityData.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.IdentityData.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.IdentityData.Sprayed
-				,Filenames().Input.IdentityData.New(pversion)
-			)
-			//Promote Bypass Records
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_IdentityData.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_IdentityData.Sprayed
-				,Filenames().Input.ByPassed_IdentityData.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_IdentityData.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_IdentityData.Sprayed
-				,Filenames().Input.ByPassed_IdentityData.New(pversion)
-			)
-			 //Promote AddressCache
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_IDDT.Sprayed
-				,Filenames().Input.AddressCache_IDDT.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_IDDT.Sprayed
-				,Filenames().Input.AddressCache_IDDT.New(pversion)
-			)
-			,STD.File.FinishSuperFileTransaction()	
-		);
 // Return
 	export build_prepped := 
 			 sequential(
 				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
-				,Promote_Input_File
 		);
 		
 	export All :=
