@@ -14,6 +14,9 @@ module
 			,if(PSkipKnownFraudBase , output('KnownFraud input skipped')
 				,Build_Input_KnownFraud(pversion).All)	
 			//Clear Individual Sprayed Files
+			,FraudGovPlatform.Promote(pVersion).inputfiles.Sprayed2Using
+			,FraudGovPlatform.Promote(pVersion).inputfiles.Using2Used
+			,FraudGovPlatform.Promote(pVersion).inputfiles.New2Sprayed
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed, TRUE)
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected, TRUE)
 			,STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._DeltabasePassed, TRUE)

@@ -277,54 +277,12 @@ module
 									pTerminator := '~<EOL>~',
 									pQuote:= '');
 
-	Promote_Input_File := 
-		sequential(
-			 STD.File.StartSuperFileTransaction()
-			 //Promote Input Records
-			,STD.File.ClearSuperFile(Filenames().Input.KnownFraud.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.KnownFraud.Sprayed
-				,Filenames().Input.KnownFraud.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.KnownFraud.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.KnownFraud.Sprayed
-				,Filenames().Input.KnownFraud.New(pversion)
-			)
-			//Promote Bypass Records
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_KnownFraud.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_KnownFraud.Sprayed
-				,Filenames().Input.ByPassed_KnownFraud.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_KnownFraud.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_KnownFraud.Sprayed
-				,Filenames().Input.ByPassed_KnownFraud.New(pversion)
-			)
-			 //Promote AddressCache
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_KNFD.Sprayed
-				,Filenames().Input.AddressCache_KNFD.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_KNFD.Sprayed
-				,Filenames().Input.AddressCache_KNFD.New(pversion)
-			)			
-			,STD.File.FinishSuperFileTransaction()	
-		);		
 // Return
 	export build_prepped := 
 			 sequential(
 				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
-				,Promote_Input_File
 		);
 		
 	export All :=
