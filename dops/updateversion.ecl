@@ -106,7 +106,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H','')),
+				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H',''),l_inloc),
 				'iUpdateVersion',
 				InputRec,
 				outrec,
