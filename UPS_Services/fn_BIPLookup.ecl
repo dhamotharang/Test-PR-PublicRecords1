@@ -10,7 +10,11 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
   self.sec_range := STD.Str.ToUpperCase(left.sec_range);
   self.city := STD.Str.ToUpperCase(left.city);
   self.state := STD.Str.ToUpperCase(left.state);
-	self.results_limit:= 100;
+  self.URL := STD.Str.ToUpperCase(left.URL);
+  self.Email := STD.Str.ToUpperCase(left.Email);
+  self.Contact_fname := STD.Str.ToUpperCase(left.Contact_fname);
+  self.Contact_mname := STD.Str.ToUpperCase(left.Contact_mname);
+  self.Contact_lname := STD.Str.ToUpperCase(left.Contact_lname);
   self.hsort := true,
 	self := left )) ;
 	
@@ -35,3 +39,4 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
   					 
 	return(tmpTopResultsScored);
 	end;
+	
