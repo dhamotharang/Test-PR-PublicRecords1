@@ -11,8 +11,7 @@ EXPORT Proc_Build_All(
 	boolean pIsTesting = false,
 	boolean pOverwrite = false
 ) := MODULE
-	EXPORT orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('BBB',pversion,'N');
-	EXPORT orbitAddItem := Orbit3.proc_Orbit3_CreateBuild_AddItem('BBB',(pversion),'N');
+	EXPORT orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('BBB',pversion,'N');
 
 	EXPORT spray_files := 
 	if(pDirectory != '' AND NOT(_Flags.ExistCurrentMemberSprayed AND _Flags.ExistCurrentNonMemberSprayed),
@@ -35,8 +34,7 @@ EXPORT Proc_Build_All(
 		send_emails(pversion).roxie.qa,
 		Strata_Population_Stats(pversion).all,
 		Query_New_Records,
-		orbitUpdate,
-		orbitAddItem
+		orbitUpdate
 	) : success(send_emails(pversion).BuildSuccess), failure(send_emails(pversion).BuildFailure);
 		
 	EXPORT All :=
