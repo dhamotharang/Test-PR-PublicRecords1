@@ -52,6 +52,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IdentityData,Layouts.Base.IdentityData,IdentityData);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.KnownFraud,Layouts.Base.KnownFraud,KnownFraud);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AddressCache,Layouts.Base.AddressCache,AddressCache);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii,Layouts.Pii,Pii);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID,Layouts.CIID,CIID);
 
 	end;
 
