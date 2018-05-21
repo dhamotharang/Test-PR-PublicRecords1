@@ -538,7 +538,7 @@ end;
 
 export erie       := record     
   string12          claimnumber;       
-  string40          insuredlastname; 
+  string100         insuredlastname; 
   string20          insuredfirstname; 
 	string20          insuredmiddlename;       
   string5           insuredsuffixname;       

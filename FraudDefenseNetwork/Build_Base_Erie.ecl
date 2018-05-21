@@ -83,8 +83,8 @@ module
    ErieCleanName_Indiv                           := project(ErieCleanName_cp, CName(LEFT));	 
 	 ErieCleanName_Indiv_dist                      := distribute(ErieCleanName_Indiv, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));																				 
 	 ErieCleanName_Indiv_rmDup                     := dedup(sort(ErieCleanName_Indiv_dist,
-	                                                             claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, -ffid,local),
-	                                                        claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, local);	
+	                                                             claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, -ffid , local),
+	                                                        claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, local);
 	
 	 Erie_Business                                 := dsEriePhoneCleaned(insuredfirstname = '');	
 	 ErieCleanName_Business                        := project(Erie_Business, transform(recordof(Erie_Business),
@@ -95,7 +95,7 @@ module
 	                                                          self := left));
    ErieCleanName_Business_dist                   := distribute(ErieCleanName_Business,hash(claimnumber,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname));
 	 ErieCleanName_Busi_rmDup                      := dedup(sort(ErieCleanName_Business_dist,
-	                                                             claimnumber,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname, -ffid,local),
+	                                                             claimnumber,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname, -ffid, local),
 	                                                        claimnumber,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.lname, local);
 																													
    ErieClean                                     := ErieCleanName_Indiv_rmDup + ErieCleanName_Busi_rmDup;
@@ -110,16 +110,16 @@ module
 																													Type_Of_Mapping          := map(left.responsibleparty not in ['I', 'i']           => 'ERIE_PARTY_MAPPING',
 																																															IsInsuredClaimParty and  Entity_Ind <> 'UNKNOWN'  => 'ERIE_INSURED_MAPPING',
 																																																									                                   'ERIE_PARTY_MAPPING');
-                                                   self.TypeOfMapping       := 	Type_Of_Mapping;
+                                                   self.TypeOfMapping       :=  Type_Of_Mapping;
 	
-			                                              IsErieInsMapIndiv        := Type_Of_Mapping= 'ERIE_INSURED_MAPPING' and 
+			                                              IsErieInsMapIndiv        := Type_Of_Mapping = 'ERIE_INSURED_MAPPING' and 
 																										                                 (left.insuredfirstname <> '' and left.insuredlastName <> '');																																										 
 			                                              IsErieInsMapBusi         := Type_Of_Mapping = 'ERIE_INSURED_MAPPING' and 
 																										                                 (left.insuredfirstname = '' and left.insuredlastName <> '');
 			
-			                                              IsEriePartyMapIndivUnk   := Type_Of_Mapping= 'ERIE_PARTY_MAPPING' and 
-																										                                 (left.entity ='PERSON' or left.entity ='UNKNOWN');
-			                                              IsEriePartyMapBusi       := left.TypeOfMapping = 'ERIE_PARTY_MAPPING' and left.entity ='BUSINESS';																										
+			                                              IsEriePartyMapIndivUnk   := Type_Of_Mapping = 'ERIE_PARTY_MAPPING' and 
+																										                                 (Entity_Ind = 'PERSON' or Entity_Ind = 'UNKNOWN');
+			                                              IsEriePartyMapBusi       := Type_Of_Mapping = 'ERIE_PARTY_MAPPING' and Entity_Ind ='BUSINESS';																								
 			  
 			                                              prepInsLastName          := regexreplace(constants().special_char_bname, left.insuredlastName, '');
 			                                              prepName_last            := regexreplace(constants().special_char_bname, left.name_last, '');			
@@ -129,7 +129,10 @@ module
 			                                                                              '');                                                                              
 			                                              self.clean_business_name := map(IsErieInsMapBusi                         => NID.clnBizName(prepInsLastName),
 			                                                                              IsEriePartyMapBusi                       => NID.clnBizName(prepName_last),
-			                                                                              ''); 
+			                                                                              '');			
+																													self.cleaned_name.title  := map(IsErieInsMapIndiv                        => left.cleaned_name.title,
+                                                                                   IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.title,
+																																															'');
 																													self.cleaned_name.fname  := map(IsErieInsMapIndiv                         => left.cleaned_name.fname, 
                                                                                    IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.fname,
 																																														 '');
@@ -148,9 +151,9 @@ module
    Mac_BusinessIDAppend(ErieWithIDL, ErieWithBDID);
 	 
 //updates
-	 ErieUpdate                                    := distribute(ErieWithBDID, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));		 
+	 ErieUpdate                                    := distribute(ErieWithBDID, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name)); 
 
-	 ErieBase                                      := distribute(inBaseERIE, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));		 
+	 ErieBase                                      := distribute(inBaseERIE, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname, clean_business_name));
 	
 	//Change Capture 
 	 FraudDefenseNetwork.Layouts.Base.Erie getSrcRid(ErieUpdate l, ErieBase r) := transform
@@ -175,7 +178,8 @@ module
 																												left.responsibleparty                         = right.responsibleparty           and
 																												left.policynumber                             = right.policynumber               and
 																												left.cleaned_name_cp.fname                    = right.cleaned_name_cp.fname      and
-																												left.cleaned_name_cp.lname                    = right.cleaned_name_cp.lname       ,
+																												left.cleaned_name_cp.lname                    = right.cleaned_name_cp.lname      and
+																												left.clean_business_name                      = right.clean_business_name       , 
 																												getSrcRid (left,right),
 																												left outer,
 																												keep(1),
