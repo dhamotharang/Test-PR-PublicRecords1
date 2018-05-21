@@ -39,3 +39,4 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
   					 
 	return(tmpTopResultsScored);
 	end;
+	
