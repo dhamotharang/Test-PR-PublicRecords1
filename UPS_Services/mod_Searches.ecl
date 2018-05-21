@@ -333,7 +333,7 @@ export mod_Searches := MODULE
 			// the values in GlobalModule being used for lookups, any records related to the
 			// DIDs passed in will be included
 			
-			DailyLookup(DATASET(doxie.layout_references_hh) dids) := 
+			GongAndDailyLookup(DATASET(doxie.layout_references_hh) dids) := 
 					doxie.mod_header_records(NOT EXISTS(dids),  /* do daily/gong/quick search */
 																	 NOT EXISTS(dids),  /* include dailies */
 																	 true,  /* allow wildcard */
@@ -341,7 +341,7 @@ export mod_Searches := MODULE
 																	 dppaVal,
 																	 glbVal,
 																	 false, /* ln_branded_value */
-																	 false,//NOT EXISTS(dids),	/* include_gong */
+																	 NOT EXISTS(dids),	/* include_gong */
 																	 false, /* probation_override_value */
 																	 industryClass,
 																	 false, /* no scrub */
@@ -383,12 +383,11 @@ export mod_Searches := MODULE
 			// returned by HeaderRecordLookup forces it to be run sequentially.  The
 			// parallel/sequential behavior may be toggled by the line uncommented below.
 
-			daily_recs := DailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
+			daily_recs := GongAndDailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
 			// gong_recs := GongAndDailyLookup(dids).records;        // executed sequentially (after mod_PM)
 
-     WFPV8_recs  := UPS_Services.fn_WaterfallPhonesLookup(dids,in_mod);
 			
-			ind := hdr_recs + daily_recs + WFPV8_recs;
+			ind := hdr_recs + daily_recs ;//+ WFPV8_recs;
 					
 			// convert records to output layout
 			UPS_Services.layout_Common indToLayoutTransform(ind L) := TRANSFORM
