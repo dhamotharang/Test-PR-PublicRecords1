@@ -1,4 +1,8 @@
-﻿import doxie,data_services, iesp;
+﻿/***
+Key definition for Nac_V2 test system.
+See DF-22004
+***/
+import doxie,data_services, iesp;
 
 rNACCannedResponseBase	:=
 record
