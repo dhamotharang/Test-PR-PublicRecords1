@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild, PRTE;
+﻿import RoxieKeyBuild, PRTE,Scrubs_Codes;
 export MAC_Weekly_Spray(sourceIP,sourceFile,filedate) := macro   //Removed the recordsize=`436` from export
 #workunit('name','CodesV3 spray')
 #uniquename(spray_file)
@@ -59,10 +59,10 @@ output('ECL codes match'));
                                         // output(dataset([{filedate}],%string_rec%),,'~thor_data400::out::codesv3_version',overwrite,csv),
                                         // fileservices.Despray('~thor_data400::out::codesv3_version','10.194.64.250',
 																				// '/data/orbitprod/codesv3/process/codesv3flag.txt',,,,TRUE));
-   
+  
 sequential(%spray_file%,%clear_super_csv%,%add_super_csv%,
 output(%preprocess%,,'~thor_data400::in::codes_v3_'+filedate,overwrite), %clear_super%,%add_super%, 
-%build_keys%, %build_keys_PRTE%, %updatedops%, /*%alphacopy%,*/%updateidops%, %update_orbiti%) : success(%e_mail_success%), failure(%e_mail_fail%);
+%build_keys%, %build_keys_PRTE%, %updatedops%, /*%alphacopy%,*/%updateidops%, Scrubs_Codes.fn_RunScrubs(filedate,'john.freibaum@lexisnexis.com'),%update_orbiti%) : success(%e_mail_success%), failure(%e_mail_fail%);
 endmacro;
 
 
