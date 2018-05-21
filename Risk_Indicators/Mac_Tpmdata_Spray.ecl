@@ -1,4 +1,4 @@
-import roxiekeybuild,ut,strata,Risk_Indicators,_Control;
+﻿import roxiekeybuild,ut,strata,Risk_Indicators,_Control,Scrubs_TelcordiaTPM;
 
 export Mac_Tpmdata_Spray(sourceIP,filedate,group_name) := 
 macro
@@ -80,7 +80,7 @@ ut.MAC_SK_Move('~thor_data400::key::fcra::telcordia_tpm_slim','Q',out7);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TPM','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TPM','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tpmdata%,%preprocess_tpmdata%,%super_tpmdata%,%move_them%,%strata_report%,%updatedops%,%updatedops_fcra%,%TPM_Sample%)
+sequential(%spray_tpmdata%,%preprocess_tpmdata%,%super_tpmdata%,%move_them%,%strata_report%,%updatedops%,%updatedops_fcra%,%TPM_Sample%,Scrubs_TelcordiaTPM.fnRunScrubs(filedate,''))
  : success(%send_success_msg%),
    failure(%send_failure_msg%);
 
