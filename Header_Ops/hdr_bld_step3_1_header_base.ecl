@@ -1,4 +1,4 @@
-import header;
+﻿import header;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -10,7 +10,11 @@ import header;
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
-Header.proc_Header.STEP2;
+
+operatorEmailList :=  Header.email_list.BocaDevelopersEx;
+extraNotifyEmailList := '';
+
+Header.proc_Header(operatorEmailList,extraNotifyEmailList).STEP2;
 // syncs header_raw to LAB LexId. Outputs header_raw_syncd and final header base file.
 // Start it after receiving confirmation that iHeader linking has completed
 // and a new LAB pairs file is available for use in Boca.
