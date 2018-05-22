@@ -1,4 +1,4 @@
-import corp2,corp2_raw_co,corp2_raw_dc,corp2_raw_al,corp2_raw_az,corp2_raw_ct,corp2_raw_fl,corp2_raw_hi,corp2_raw_ia,corp2_raw_ks,corp2_raw_ky,corp2_raw_il,corp2_raw_la,corp2_raw_ma,
+﻿import corp2,corp2_raw_co,corp2_raw_dc,corp2_raw_al,corp2_raw_az,corp2_raw_ct,corp2_raw_fl,corp2_raw_hi,corp2_raw_ia,corp2_raw_ks,corp2_raw_ky,corp2_raw_il,corp2_raw_la,corp2_raw_ma,
 			 corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_ms,corp2_raw_mt,corp2_raw_nc,corp2_raw_nd,corp2_raw_nh,corp2_raw_nm,corp2_raw_nv,corp2_raw_ok,corp2_raw_or,corp2_raw_sc,
 			 corp2_raw_sd,corp2_raw_tn,corp2_raw_tx,corp2_raw_va,corp2_raw_vt,corp2_raw_wa,corp2_raw_wv,corp2_raw_wy,ut;
 			 
@@ -12,10 +12,10 @@ export fCleanCountry(string pStateOrigin,string pStateOriginDesc,string pState='
 		//							 If the country cannot be determined, then a "cleaned"
 		//							 country is returned.
 		//********************************************************************
-		export UC_StateOrigin			:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		export UC_StateOriginDesc	:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
-		export UC_Country 				:= ut.fn_RemoveSpecialChars(corp2.t2u(pCountry));
-		export UC_State						:= ut.fn_RemoveSpecialChars(corp2.t2u(pState));
+		export UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		export UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
+		export UC_Country 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCountry));
+		export UC_State						:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pState));
 		
 		export CleanChars  		:= stringlib.stringfilter(UC_Country,' ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 		export CleanWords  		:= Map(UC_StateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.Country.InvalidWords,CleanChars,''),
