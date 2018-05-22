@@ -11,7 +11,7 @@ ut.mac_file_spray_and_build(sourceip,filename,insize,filedate,'dea',pre,tools.fu
 
 
 e_mail_success := fileservices.sendemail(
-													'darren.knowles@lexisnexis.com;roxiebuilds@seisint.com;mluber@seisint.com;tkirk@seisint.com;CPettola@seisint.com;charlene.ros@lexisnexis.com',
+													'darren.knowles@lexisnexisrisk.com;roxiebuilds@seisint.com;charlene.ros@lexisnexis.com;Melanie.Jackson@lexisnexisrisk.com',
 													'DEA Roxie Build Succeeded ' + filedate,
 													'keys: 1) thor_data400::key::dea::qa::did(thor_data400::key::dea::'+filedate+'::did),\n' + 
 													'	     2) thor_data400::key::dea::qa::bdid(thor_data400::key::dea::'+filedate+'::bdid),\n' + 
@@ -19,14 +19,14 @@ e_mail_success := fileservices.sendemail(
 													'	     4) thor_data400::key::dea::qa::linkids(thor_data400::key::dea::'+filedate+'::linkids),\n');
 							
 e_mail_fail := fileservices.sendemail(
-													'darren.knowles@lexisnexis.com;CPettola@seisint.com;avenkatachalam@seisint.com;charlene.ros@lexisnexis.com',
+													'darren.knowles@lexisnexisrisk.com;charlene.ros@lexisnexis.com;Melanie.Jackson@lexisnexisrisk.com',
 													'DEA Roxie Build FAILED',
 													failmessage);
 													
 build_dea_keys :=	dea.proc_build_key(filedate);
 
 
-update_dops := RoxieKeyBuild.updateversion('DEAKeys',(filedate),'Darren.Knowles@lexisnexis.com;charlene.ros@lexisnexis.com',,'N|B');
+update_dops := RoxieKeyBuild.updateversion('DEAKeys',(filedate),'Darren.Knowles@lexisnexisrisk.com;charlene.ros@lexisnexisrisk.com;Melanie.Jackson@lexienexisrisk.com',,'N|B');
 
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('DEA',(filedate),'N|B');
 

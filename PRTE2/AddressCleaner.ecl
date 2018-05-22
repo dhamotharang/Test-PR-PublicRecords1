@@ -1,4 +1,4 @@
-// This macro takes one to many addresses and cleans them using the AID.MacAppendFromRaw_2Line cleaning macro. Cleaned addresses
+﻿// This macro takes one to many addresses and cleans them using the AID.MacAppendFromRaw_2Line cleaning macro. Cleaned addresses
 // are placed in the fields enumerated in set_clean_addr_out.  Address 2 lines containing city, state, and zip can be
 // passed in already prepared, in which case the set_city, set_state, and set_zip are all empty.  Otherwise the 
 // city, state, and zip will be processed using address.fn_addr_clean_prep(Address.Addr2FromComponents.  The set_city_st_zip shouldn't
@@ -136,7 +136,7 @@ loadxml('<XML/>');
 		string150	Append_PrepAddr1;
 		string100	Append_PrepAddr2;
 		AID.Common.xAID	fm_RawAID_ := 0;
-		integer addr_type;
+		integer addr_type_local_1234;
 	END;
 	
 
@@ -163,7 +163,7 @@ loadxml('<XML/>');
 	m_temp_layout xform(SeqFile lh, integer c) := transform
 			self.Append_PrepAddr1 := choose(c,#expand(%'OutStr4'%));
 			self.Append_PrepAddr2 := choose(c,#expand(%'OutStr5'%));
-		self.addr_type := c;
+		self.addr_type_local_1234 := c;
 		self := lh;
 	end;
 
@@ -184,66 +184,66 @@ loadxml('<XML/>');
 				#IF(%rec_cnt% > %cnt_address_recs%)
 					#BREAK
 				#ELSE   	
-						#APPEND(OutStr6, 'self.' + set_rawaid_out[%rec_cnt%] 		 + ' 							:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_RawAID, l.' + set_rawaid_out[%rec_cnt%] +');\n');	
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.prim_range		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.prim_range, l.' + set_clean_addr_out[%rec_cnt%] + '.prim_range);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.predir				:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.predir, l.' + set_clean_addr_out[%rec_cnt%] + '.predir);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.prim_name		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.prim_name	, l.' + set_clean_addr_out[%rec_cnt%] + '.prim_name);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.addr_suffix	:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.addr_suffix, l.' + set_clean_addr_out[%rec_cnt%] + '.addr_suffix);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.postdir			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.postdir, l.' + set_clean_addr_out[%rec_cnt%] + '.postdir);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.unit_desig		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.unit_desig, l.' + set_clean_addr_out[%rec_cnt%] + '.unit_desig);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.sec_range		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.sec_range, l.' + set_clean_addr_out[%rec_cnt%] + '.sec_range);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.p_city_name	:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.p_city_name, l.' + set_clean_addr_out[%rec_cnt%] + '.p_city_name);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.v_city_name	:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.v_city_name, l.' + set_clean_addr_out[%rec_cnt%] + '.v_city_name);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.st						:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.st	, l.' + set_clean_addr_out[%rec_cnt%] + '.st);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.zip					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.zip5	, l.' + set_clean_addr_out[%rec_cnt%] + '.zip);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.zip4					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.zip4	, l.' + set_clean_addr_out[%rec_cnt%] + '.zip4);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.cart					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.cart	, l.' + set_clean_addr_out[%rec_cnt%] + '.cart);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.cr_sort_sz		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.cr_sort_sz, l.' + set_clean_addr_out[%rec_cnt%] + '.cr_sort_sz);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.lot					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.lot	, l.' + set_clean_addr_out[%rec_cnt%] + '.lot);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.lot_order		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.lot_order, l.' + set_clean_addr_out[%rec_cnt%] + '.lot_order);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.dbpc					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.dbpc	, l.' + set_clean_addr_out[%rec_cnt%] + '.dbpc);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.chk_digit		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.chk_digit, l.' + set_clean_addr_out[%rec_cnt%] + '.chk_digit);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.rec_type			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.rec_type, l.' + set_clean_addr_out[%rec_cnt%] + '.rec_type);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.fips_state		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.county[1..2], l.' + set_clean_addr_out[%rec_cnt%] + '.fips_state);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.fips_county	:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.county[3..5], l.' + set_clean_addr_out[%rec_cnt%] + '.fips_county);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_lat			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_lat, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_lat);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_long			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_long, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_long);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.msa					:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.msa	, l.' + set_clean_addr_out[%rec_cnt%] + '.msa);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_blk			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_blk, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_blk);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_match		:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_match, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_match);\n');
-						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.err_stat			:= if(r.addr_type = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.err_stat, l.' + set_clean_addr_out[%rec_cnt%] + '.err_stat);\n');
+						#APPEND(OutStr6, 'self.' + set_rawaid_out[%rec_cnt%] 		 + ' 							:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_RawAID, l.' + set_rawaid_out[%rec_cnt%] +');\n');	
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.prim_range		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.prim_range, l.' + set_clean_addr_out[%rec_cnt%] + '.prim_range);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.predir				:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.predir, l.' + set_clean_addr_out[%rec_cnt%] + '.predir);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.prim_name		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.prim_name	, l.' + set_clean_addr_out[%rec_cnt%] + '.prim_name);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.addr_suffix	:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.addr_suffix, l.' + set_clean_addr_out[%rec_cnt%] + '.addr_suffix);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.postdir			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.postdir, l.' + set_clean_addr_out[%rec_cnt%] + '.postdir);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.unit_desig		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.unit_desig, l.' + set_clean_addr_out[%rec_cnt%] + '.unit_desig);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.sec_range		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.sec_range, l.' + set_clean_addr_out[%rec_cnt%] + '.sec_range);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.p_city_name	:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.p_city_name, l.' + set_clean_addr_out[%rec_cnt%] + '.p_city_name);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.v_city_name	:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.v_city_name, l.' + set_clean_addr_out[%rec_cnt%] + '.v_city_name);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.st						:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.st	, l.' + set_clean_addr_out[%rec_cnt%] + '.st);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.zip					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.zip5	, l.' + set_clean_addr_out[%rec_cnt%] + '.zip);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.zip4					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.zip4	, l.' + set_clean_addr_out[%rec_cnt%] + '.zip4);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.cart					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.cart	, l.' + set_clean_addr_out[%rec_cnt%] + '.cart);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.cr_sort_sz		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.cr_sort_sz, l.' + set_clean_addr_out[%rec_cnt%] + '.cr_sort_sz);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.lot					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.lot	, l.' + set_clean_addr_out[%rec_cnt%] + '.lot);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.lot_order		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.lot_order, l.' + set_clean_addr_out[%rec_cnt%] + '.lot_order);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.dbpc					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.dbpc	, l.' + set_clean_addr_out[%rec_cnt%] + '.dbpc);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.chk_digit		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.chk_digit, l.' + set_clean_addr_out[%rec_cnt%] + '.chk_digit);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.rec_type			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.rec_type, l.' + set_clean_addr_out[%rec_cnt%] + '.rec_type);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.fips_state		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.county[1..2], l.' + set_clean_addr_out[%rec_cnt%] + '.fips_state);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.fips_county	:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.county[3..5], l.' + set_clean_addr_out[%rec_cnt%] + '.fips_county);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_lat			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_lat, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_lat);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_long			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_long, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_long);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.msa					:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.msa	, l.' + set_clean_addr_out[%rec_cnt%] + '.msa);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_blk			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_blk, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_blk);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.geo_match		:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.geo_match, l.' + set_clean_addr_out[%rec_cnt%] + '.geo_match);\n');
+						#APPEND(OutStr6, 'self.' + set_clean_addr_out[%rec_cnt%] + '.err_stat			:= if(r.addr_type_local_1234 = ' + %'rec_cnt'% + ', r.AIDWork_ACECache.err_stat, l.' + set_clean_addr_out[%rec_cnt%] + '.err_stat);\n');
 				#END;
 		#END;		
 // return %'OutStr'%;
 recordof(dAddressCleaned) final_xform(dAddressCleaned l, dAddressCleaned r) := transform
-			self.#EXPAND(set_rawaid_out[1])				:= if(l.addr_type = 1, l.AIDWork_RawAID, l.#EXPAND(set_rawaid_out[1]));
-			self.#EXPAND(set_clean_addr_out[1]).prim_range		:= if(l.addr_type = 1, l.AIDWork_ACECache.prim_range, l.#EXPAND(set_clean_addr_out[1]).prim_range);
-			self.#EXPAND(set_clean_addr_out[1]).predir			:= if(l.addr_type = 1, l.AIDWork_ACECache.predir, l.#EXPAND(set_clean_addr_out[1]).predir);
-			self.#EXPAND(set_clean_addr_out[1]).prim_name		:= if(l.addr_type = 1, l.AIDWork_ACECache.prim_name	,l.#EXPAND(set_clean_addr_out[1]).prim_name);
-			self.#EXPAND(set_clean_addr_out[1]).addr_suffix		:= if(l.addr_type = 1, l.AIDWork_ACECache.addr_suffix,l.#EXPAND(set_clean_addr_out[1]).addr_suffix);
-			self.#EXPAND(set_clean_addr_out[1]).postdir			:= if(l.addr_type = 1, l.AIDWork_ACECache.postdir, l.#EXPAND(set_clean_addr_out[1]).postdir);
-			self.#EXPAND(set_clean_addr_out[1]).unit_desig		:= if(l.addr_type = 1, l.AIDWork_ACECache.unit_desig,l.#EXPAND(set_clean_addr_out[1]).unit_desig);
-			self.#EXPAND(set_clean_addr_out[1]).sec_range		:= if(l.addr_type = 1, l.AIDWork_ACECache.sec_range,l.#EXPAND(set_clean_addr_out[1]).sec_range);
-			self.#EXPAND(set_clean_addr_out[1]).p_city_name		:= if(l.addr_type = 1, l.AIDWork_ACECache.p_city_name,l.#EXPAND(set_clean_addr_out[1]).p_city_name);
-			self.#EXPAND(set_clean_addr_out[1]).v_city_name		:= if(l.addr_type = 1, l.AIDWork_ACECache.v_city_name,l.#EXPAND(set_clean_addr_out[1]).v_city_name);
-			self.#EXPAND(set_clean_addr_out[1]).st			:= if(l.addr_type = 1, l.AIDWork_ACECache.st	,l.#EXPAND(set_clean_addr_out[1]).st);
-			self.#EXPAND(set_clean_addr_out[1]).zip			:= if(l.addr_type = 1, l.AIDWork_ACECache.zip5	,l.#EXPAND(set_clean_addr_out[1]).zip);
-			self.#EXPAND(set_clean_addr_out[1]).zip4			:= if(l.addr_type = 1, l.AIDWork_ACECache.zip4	,l.#EXPAND(set_clean_addr_out[1]).zip4);
-			self.#EXPAND(set_clean_addr_out[1]).cart			:= if(l.addr_type = 1, l.AIDWork_ACECache.cart	,l.#EXPAND(set_clean_addr_out[1]).cart);
-			self.#EXPAND(set_clean_addr_out[1]).cr_sort_sz		:= if(l.addr_type = 1, l.AIDWork_ACECache.cr_sort_sz,l.#EXPAND(set_clean_addr_out[1]).cr_sort_sz);
-			self.#EXPAND(set_clean_addr_out[1]).lot			:= if(l.addr_type = 1, l.AIDWork_ACECache.lot	,l.#EXPAND(set_clean_addr_out[1]).lot);
-			self.#EXPAND(set_clean_addr_out[1]).lot_order		:= if(l.addr_type = 1, l.AIDWork_ACECache.lot_order,l.#EXPAND(set_clean_addr_out[1]).lot_order);
-			self.#EXPAND(set_clean_addr_out[1]).dbpc			:= if(l.addr_type = 1, l.AIDWork_ACECache.dbpc	,l.#EXPAND(set_clean_addr_out[1]).dbpc);
-			self.#EXPAND(set_clean_addr_out[1]).chk_digit		:= if(l.addr_type = 1, l.AIDWork_ACECache.chk_digit,l.#EXPAND(set_clean_addr_out[1]).chk_digit);
-			self.#EXPAND(set_clean_addr_out[1]).rec_type			:= if(l.addr_type = 1, l.AIDWork_ACECache.rec_type,l.#EXPAND(set_clean_addr_out[1]).rec_type);
-			self.#EXPAND(set_clean_addr_out[1]).fips_state		:= if(l.addr_type = 1, l.AIDWork_ACECache.county[1..2],l.#EXPAND(set_clean_addr_out[1]).fips_state);
-			self.#EXPAND(set_clean_addr_out[1]).fips_county		:= if(l.addr_type = 1, l.AIDWork_ACECache.county[3..5],l.#EXPAND(set_clean_addr_out[1]).fips_county);
-			self.#EXPAND(set_clean_addr_out[1]).geo_lat			:= if(l.addr_type = 1, l.AIDWork_ACECache.geo_lat,l.#EXPAND(set_clean_addr_out[1]).geo_lat);
-			self.#EXPAND(set_clean_addr_out[1]).geo_long			:= if(l.addr_type = 1, l.AIDWork_ACECache.geo_long,l.#EXPAND(set_clean_addr_out[1]).geo_long);
-			self.#EXPAND(set_clean_addr_out[1]).msa			:= if(l.addr_type = 1, l.AIDWork_ACECache.msa	,l.#EXPAND(set_clean_addr_out[1]).msa);
-			self.#EXPAND(set_clean_addr_out[1]).geo_blk			:= if(l.addr_type = 1, l.AIDWork_ACECache.geo_blk,l.#EXPAND(set_clean_addr_out[1]).geo_blk);
-			self.#EXPAND(set_clean_addr_out[1]).geo_match		:= if(l.addr_type = 1, l.AIDWork_ACECache.geo_match,l.#EXPAND(set_clean_addr_out[1]).geo_match);
-			self.#EXPAND(set_clean_addr_out[1]).err_stat			:= if(l.addr_type = 1, l.AIDWork_ACECache.err_stat,l.#EXPAND(set_clean_addr_out[1]).err_stat);
+			self.#EXPAND(set_rawaid_out[1])				:= if(l.addr_type_local_1234 = 1, l.AIDWork_RawAID, l.#EXPAND(set_rawaid_out[1]));
+			self.#EXPAND(set_clean_addr_out[1]).prim_range		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.prim_range, l.#EXPAND(set_clean_addr_out[1]).prim_range);
+			self.#EXPAND(set_clean_addr_out[1]).predir			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.predir, l.#EXPAND(set_clean_addr_out[1]).predir);
+			self.#EXPAND(set_clean_addr_out[1]).prim_name		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.prim_name	,l.#EXPAND(set_clean_addr_out[1]).prim_name);
+			self.#EXPAND(set_clean_addr_out[1]).addr_suffix		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.addr_suffix,l.#EXPAND(set_clean_addr_out[1]).addr_suffix);
+			self.#EXPAND(set_clean_addr_out[1]).postdir			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.postdir, l.#EXPAND(set_clean_addr_out[1]).postdir);
+			self.#EXPAND(set_clean_addr_out[1]).unit_desig		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.unit_desig,l.#EXPAND(set_clean_addr_out[1]).unit_desig);
+			self.#EXPAND(set_clean_addr_out[1]).sec_range		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.sec_range,l.#EXPAND(set_clean_addr_out[1]).sec_range);
+			self.#EXPAND(set_clean_addr_out[1]).p_city_name		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.p_city_name,l.#EXPAND(set_clean_addr_out[1]).p_city_name);
+			self.#EXPAND(set_clean_addr_out[1]).v_city_name		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.v_city_name,l.#EXPAND(set_clean_addr_out[1]).v_city_name);
+			self.#EXPAND(set_clean_addr_out[1]).st			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.st	,l.#EXPAND(set_clean_addr_out[1]).st);
+			self.#EXPAND(set_clean_addr_out[1]).zip			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.zip5	,l.#EXPAND(set_clean_addr_out[1]).zip);
+			self.#EXPAND(set_clean_addr_out[1]).zip4			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.zip4	,l.#EXPAND(set_clean_addr_out[1]).zip4);
+			self.#EXPAND(set_clean_addr_out[1]).cart			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.cart	,l.#EXPAND(set_clean_addr_out[1]).cart);
+			self.#EXPAND(set_clean_addr_out[1]).cr_sort_sz		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.cr_sort_sz,l.#EXPAND(set_clean_addr_out[1]).cr_sort_sz);
+			self.#EXPAND(set_clean_addr_out[1]).lot			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.lot	,l.#EXPAND(set_clean_addr_out[1]).lot);
+			self.#EXPAND(set_clean_addr_out[1]).lot_order		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.lot_order,l.#EXPAND(set_clean_addr_out[1]).lot_order);
+			self.#EXPAND(set_clean_addr_out[1]).dbpc			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.dbpc	,l.#EXPAND(set_clean_addr_out[1]).dbpc);
+			self.#EXPAND(set_clean_addr_out[1]).chk_digit		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.chk_digit,l.#EXPAND(set_clean_addr_out[1]).chk_digit);
+			self.#EXPAND(set_clean_addr_out[1]).rec_type			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.rec_type,l.#EXPAND(set_clean_addr_out[1]).rec_type);
+			self.#EXPAND(set_clean_addr_out[1]).fips_state		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.county[1..2],l.#EXPAND(set_clean_addr_out[1]).fips_state);
+			self.#EXPAND(set_clean_addr_out[1]).fips_county		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.county[3..5],l.#EXPAND(set_clean_addr_out[1]).fips_county);
+			self.#EXPAND(set_clean_addr_out[1]).geo_lat			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.geo_lat,l.#EXPAND(set_clean_addr_out[1]).geo_lat);
+			self.#EXPAND(set_clean_addr_out[1]).geo_long			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.geo_long,l.#EXPAND(set_clean_addr_out[1]).geo_long);
+			self.#EXPAND(set_clean_addr_out[1]).msa			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.msa	,l.#EXPAND(set_clean_addr_out[1]).msa);
+			self.#EXPAND(set_clean_addr_out[1]).geo_blk			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.geo_blk,l.#EXPAND(set_clean_addr_out[1]).geo_blk);
+			self.#EXPAND(set_clean_addr_out[1]).geo_match		:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.geo_match,l.#EXPAND(set_clean_addr_out[1]).geo_match);
+			self.#EXPAND(set_clean_addr_out[1]).err_stat			:= if(l.addr_type_local_1234 = 1, l.AIDWork_ACECache.err_stat,l.#EXPAND(set_clean_addr_out[1]).err_stat);
 			
 			#EXPAND(%'OutStr6'%)
 	
@@ -286,7 +286,7 @@ recordof(dAddressCleaned) final_xform_one_addrfield(dAddressCleaned l) := transf
 end;
 
 clean_rolled := if (%cnt_address_recs% > 1,
-										rollup(sort(dAddressCleaned, unique_id, addr_type), final_xform(left,right), unique_id),
+										rollup(sort(dAddressCleaned, unique_id, addr_type_local_1234), final_xform(left,right), unique_id),
 										project(dAddressCleaned, final_xform_one_addrfield(left)));
 	final := project(clean_rolled, final_layout);
 	// Output(dAddressCleaned,	named('dAddressCleaned'));

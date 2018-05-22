@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 // #option ('singlePersistInstances', true)
 
 export fRollup(dataset(Prof_License_Mari.layouts.final) int0) := FUNCTION
@@ -80,7 +80,7 @@ export fRollup(dataset(Prof_License_Mari.layouts.final) int0) := FUNCTION
 							,	rollupXFORM(LEFT, RIGHT),
 			local);												
 			 
-			basefile_rollup := dDataset_rollup + basefile_test : persist('~thor_data400::persist::proflic_mari::rolled_up_v2');
+			basefile_rollup := dDataset_rollup + basefile_test; /*: persist('~thor_data400::persist::proflic_mari::rolled_up_v2');*/
 			
       return basefile_rollup; 
 end;
