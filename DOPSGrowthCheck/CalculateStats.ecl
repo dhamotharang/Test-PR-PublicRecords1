@@ -18,7 +18,7 @@ ut.hasField(PullKey,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
 ut.hasField(PullKey,Process_Date,hasProcess_Date);
 ut.hasField(PullKey,Filedate,hasFiledate);
 
-DistFile:=distribute(PullKey,hash(#expand(indexfields))),#expand(indexfields);
+DistFile:=distribute(PullKey,hash(#expand(indexfields)));
 
 #IF(hasDID)
 UniqueDID:=(string)count(table(DistFile,{did},did,merge));
@@ -99,7 +99,19 @@ RemoveDates:=PullKey;
 #END 
 UniquePayload:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),record,local),record,local));
 
-NewEntry:=dataset([{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a',NumRecs,UniqueDID,UniqueProxID,UniqueSeleID,UniquePersistentRecID,UniqueEmail,UniquePhone,UniqueSSN,UniqueFEIN,UniqueIndex,UniquePayload,'B','N'}],DOPSGrowthCheck.layouts.Stats_Layout);
+NewEntry:=dataset([
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','NumRecs',NumRecs,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueDID',UniqueDID,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueProxID',UniqueProxID,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueEmail',UniqueEmail,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePhone',UniquePhone,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueSSN',UniqueSSN,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueIndex',UniqueIndex,'B','N'},
+{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePayload',UniquePayload,'B','N'}
+],DOPSGrowthCheck.layouts.Stats_Layout);
 OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
 IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=VersionProd and RecType='B');
@@ -107,24 +119,14 @@ IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=Vers
 
 
 DOPSGrowthCheck.layouts.Stats_Layout tCalculateDelTaStats(DOPSGrowthCheck.layouts.Stats_Layout L ,DOPSGrowthCheck.layouts.Stats_Layout R):= transform
-                    Self.num_recs:=(string)((((real)L.Num_Recs-(real)R.Num_Recs)/(real)R.Num_Recs)*100);
-                    Self.unique_did:=if(L.unique_did='n/a','n/a',(string)((((real)L.unique_did-(real)R.unique_did)/(real)R.unique_did)*100));
-                    Self.unique_proxid:=if(L.unique_proxid='n/a','n/a',(string)((((real)L.unique_proxid-(real)R.unique_proxid)/(real)R.unique_proxid)*100));
-                    Self.unique_seleid:=if(L.unique_seleid='n/a','n/a',(string)((((real)L.unique_seleid-(real)R.unique_seleid)/(real)R.unique_seleid)*100));
-                    Self.Unique_PersistentRecID:=if(L.Unique_PersistentRecID='n/a','n/a',(string)((((real)L.Unique_PersistentRecID-(real)R.Unique_PersistentRecID)/(real)R.Unique_PersistentRecID)*100));
-                    Self.Unique_Email:=if(L.Unique_Email='n/a','n/a',(string)((((real)L.Unique_Email-(real)R.Unique_Email)/(real)R.Unique_Email)*100));
-                    Self.Unique_Phone:=if(L.Unique_Phone='n/a','n/a',(string)((((real)L.Unique_Phone-(real)R.Unique_Phone)/(real)R.Unique_Phone)*100));
-                    Self.Unique_SSN:=if(L.Unique_SSN='n/a','n/a',(string)((((real)L.Unique_SSN-(real)R.Unique_SSN)/(real)R.Unique_SSN)*100));
-                    Self.Unique_Fein:=if(L.Unique_Fein='n/a','n/a',(string)((((real)L.Unique_Fein-(real)R.Unique_Fein)/(real)R.Unique_Fein)*100));
-                    Self.unique_index:=if(L.unique_index='n/a','n/a',(string)((((real)L.unique_index-(real)R.unique_index)/(real)R.unique_index)*100));
-                    Self.unique_payload:=if(L.unique_payload='n/a','n/a',(string)((((real)L.unique_payload-(real)R.unique_payload)/(real)R.unique_payload)*100));
+                    Self.results:=(string)((((real)L.results-(real)R.results)/(real)R.results)*100);
                     Self.CurrVersion:=L.CurrVersion;
                     Self.PrevVersion:=R.CurrVersion;
                     Self.RecType:='D';
                     Self.Passed:='n/a';
                     Self:=L;
                 end;
-NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyNickName=Right.KeyNickName,tCalculateDelTaStats(left,right));
+NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyNickName=Right.KeyNickName and Left.Stat_Name=Right.Stat_Name,tCalculateDelTaStats(left,right));
 //output(NewDeltaStat,named('NewDeltaStat'));
 
 NewFile:=if(exists(IdentifyProdRecord),NewDeltaStat+NewEntry,NewEntry);

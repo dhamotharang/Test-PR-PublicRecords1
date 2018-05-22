@@ -1,5 +1,5 @@
 ﻿EXPORT layouts := module
-			export Stats_Layout	:=	record
+			/*export Stats_Layout	:=	record
 				string PackageName;
 				string KeyName;
 				string KeyNickName;
@@ -18,7 +18,18 @@
 				string unique_payload;
 				string RecType;
 				string Passed;
-			end;
+			end;*/
+			export Stats_Layout	:= RECORD
+				string PackageName;
+				string KeyName;
+				string KeyNickName;
+				string CurrVersion;
+				string PrevVersion;
+				string Stat_Name;
+				string results;
+				string RecType;
+				string passed;
+			END;
 			export Configuration_Layout := RECORD
 				string PackageName;
 				string KeyAttribute;
