@@ -1,4 +1,4 @@
-import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
+﻿import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
 
 export Files(
 
@@ -64,4 +64,8 @@ module
   export File_Conviction_Lookup    := hygenics_search.File_Conviction_Lookup;
 									
 	end; 
+	
+ export fdn_Lexid_header_build_version  := dataset(FileNames().LexID_Header_Build_Version,  layouts.base.hdr_build_version, thor, opt);
+ export fdn_BIP_header_build_version    := dataset(FileNames().BIP_Header_Build_Version,  layouts.base.hdr_build_version, thor, opt);
+ 
 end;

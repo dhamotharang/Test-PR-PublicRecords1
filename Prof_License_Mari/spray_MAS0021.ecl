@@ -1,4 +1,4 @@
-
+﻿
 // spray MAS0021 Professional Licenses Files for MARI	   
 import ut
 	   ,_control
@@ -10,11 +10,11 @@ import ut
 //Files for s0021 are Located  //
 EXPORT spray_MAS0021 (STRING filedate) := MODULE
 
-#workunit('name','Spray MAS0021');
+#workunit('name','Yogurt: Spray MAS0021');
 
 SHARED filepath		    :=	'/data/data_build_5_2/MARI/in/MAS0021/' + filedate +'/';
 SHARED sourcepath		:=	'/data/data_build_5_2/MARI/';
-SHARED group_name	:=	'thor400_60';
+SHARED group_name	:=	Common_Prof_Lic_Mari.group_name;
 SHARED maxRecordSize	:=	8192;
 SHARED destination := Common_Prof_Lic_Mari.SourcesFolder + 'MAS0021::' + filedate + '::';
 SHARED superfile := '~thor_data400::in::proflic_mari::MAS0021::using::re';
