@@ -91,13 +91,45 @@ hygenics_crim.Layout_Base_Offenses_with_OffenseCategory addDOPID(offns l):= tran
 																									Vstc_lgth_desc +
 																									Vnum_of_counts +
 																									Vchg);	
-    self.offense_category               := MAP(  l.off_desc_1 = 'NOT SPECIFIED' =>hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),
-		                                             hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(l.off_desc_1))
-																								 );																									
+    // self.offense_category               := MAP(  l.off_desc_1 = 'NOT SPECIFIED' =>hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),
+		                                             // hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(l.off_desc_1))
+																								 // );																									
 		self := l;
 	end;
 
-all_files := project(offns, addDOPID(left));
+DOC_offense := project(offns, addDOPID(left));
+
+dist_doc_offense := TABLE(DOC_offense ,{off_desc_1, count_ := count(group)},off_desc_1,few );				
+
+DOCLayoutWithOffenseCategory := record
+dist_doc_offense;
+unsigned8  offense_category;
+end;	
+
+DOCLayoutWithOffenseCategory addCatdoc(dist_DOC_offense l):= transform
+    off_desc_1          := stringlib.stringtouppercase(l.off_desc_1);
+    court_category      := hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(off_desc_1));		
+	  court_Global        := hygenics_crim._fns_offense_category.set_offense_category_Global(off_desc_1);
+		court_traffic       := hygenics_crim._fns_offense_category.set_offense_category_traffic(off_desc_1);
+		court_other         := hygenics_crim._fns_offense_category.set_offense_category_other(off_desc_1); 
+		
+		self.offense_category                   := MAP(l.off_desc_1 = 'NOT SPECIFIED'     => 0,
+																									 Court_Global <> 0                        => Court_Global,
+																									 court_category <> 0                      => court_category,
+                                                   court_traffic <>0                        => court_traffic,
+																								   court_other <>0                          => court_other,
+																									 0 );																																		
+		self := l;
+	end;
+	DOCWithCat  := project(dist_DOC_offense,  addCatdoc(left));
+
+DOC_offense Joincopycategorydoc1(DOC_offense l , DOCWithCat r):= transform
+self.offense_Category := r.offense_category;
+self := l;
+end;
+
+all_files := join( distribute(DOC_offense,HASH32(off_desc_1)),DOCWithCat,
+                         left.off_desc_1 = right.off_desc_1,Joincopycategorydoc1(left,right),lookup);
 
 all_files tJoinForOffensecategory(all_files L, hygenics_search.Offense_Category.Layout_Lookup R) := transform
     self.offense_category   := MAP(//R.Category = 'GLOBAL' => hygenics_crim._fn_Multiple_categoryToBitmapj('OTHER'),

@@ -1,4 +1,4 @@
-Import Data_Services, doxie;
+﻿Import Data_Services, doxie;
 
 export 	key_mar_div_id_main(boolean IsFCRA = false) := function
 
@@ -20,3 +20,5 @@ return_file		:= INDEX(slim_mar_div,{record_id},{slim_mar_div},key_name);
 return(return_file); 
 
 end;				   
+   
+				   

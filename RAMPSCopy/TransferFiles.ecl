@@ -1,5 +1,7 @@
 ﻿import did_add, dops, lib_fileservices, STD, lib_stringlib;
-EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
+EXPORT TransferFiles(string destenv = '',integer noofgens = 2, boolean useeclcccluster = true) := module
+
+	export clustertorun := if (useeclcccluster, STD.system.Job.Target(),'hthor');
 
 	export RoxiePackage(string esp, string port, string target, boolean iscopy = false) := function
 		dPackageKeys := dedup(sort(dops.GetRoxiePackage(esp
@@ -334,15 +336,15 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 	end;
 	
 	
-	export SubmitWUonRampsThor(string jobtype, string clustertorun = thorlib.cluster()) := function
+	export SubmitWUonRampsThor(string jobtype) := function
 	
 		return map(
 															jobtype = 'stage' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Boca Indexes to Staging\');\r\n'+
-																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));',clustertorun)),
+																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));',clustertorun)),
 															jobtype = 'live' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Staging Indexes to Live\');\r\n'+
-																	'RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+').MoveStagingToLive() : failure(\r\n' +
+																	'RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').MoveStagingToLive() : failure(\r\n' +
 																						'fileservices.sendemail(\r\n' +
 																								'RAMPSCopy.constants(\''+destenv+'\').rToEmail\r\n' +
 																								',\'RAMPS Stage to Live Move Failed\'\r\n' +
@@ -382,7 +384,7 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																			),
 																output(RAMPSCopy.WorkUnitModule(RAMPSCopy.constants(destenv).boca.srcesp,RAMPSCopy.constants(destenv).boca.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Copy Files to RAMPS '+ stringlib.StringToUpperCase(destenv) +' thor\')\r\n'+
-																	'Rampscopy.TransferFiles(\''+destenv+'\').begincopy : WHEN(CRON(\'0 17,21 * * *\'));',thorlib.cluster()))
+																	'Rampscopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').begincopy : WHEN(CRON(\'0 17,21 * * *\'));',clustertorun))
 																)
 														);
 		

@@ -2,9 +2,9 @@
 
 #IF (TransunionCred.IsFullUpdate = false)
 #workunit('protect',true);
-#workunit('name','Yogurt:TransunionCred update ' + version);
+#workunit('name','TransunionCred update ' + version);
 #ELSE
-#workunit('name','Yogurt:TransunionCred load ' + version);
+#workunit('name','TransunionCred load ' + version);
 #END
 #workunit('priority','high');
 #option('AllowedClusters','thor400_44_eclcc');

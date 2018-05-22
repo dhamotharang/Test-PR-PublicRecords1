@@ -1,79 +1,79 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT39,STD;
 EXPORT iConectivMain_hygiene(dataset(iConectivMain_layout_PhonesInfo) h) := MODULE
-
+ 
 //A simple summary record
-EXPORT Summary(SALT38.Str30Type  txt) := FUNCTION
+EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
     populated_country_code_cnt := COUNT(GROUP,h.country_code <> (TYPEOF(h.country_code))'');
     populated_country_code_pcnt := AVE(GROUP,IF(h.country_code = (TYPEOF(h.country_code))'',0,100));
-    maxlength_country_code := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.country_code)));
-    avelength_country_code := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.country_code)),h.country_code<>(typeof(h.country_code))'');
+    maxlength_country_code := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.country_code)));
+    avelength_country_code := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.country_code)),h.country_code<>(typeof(h.country_code))'');
     populated_phone_cnt := COUNT(GROUP,h.phone <> (TYPEOF(h.phone))'');
     populated_phone_pcnt := AVE(GROUP,IF(h.phone = (TYPEOF(h.phone))'',0,100));
-    maxlength_phone := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.phone)));
-    avelength_phone := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.phone)),h.phone<>(typeof(h.phone))'');
+    maxlength_phone := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.phone)));
+    avelength_phone := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.phone)),h.phone<>(typeof(h.phone))'');
     populated_dial_type_cnt := COUNT(GROUP,h.dial_type <> (TYPEOF(h.dial_type))'');
     populated_dial_type_pcnt := AVE(GROUP,IF(h.dial_type = (TYPEOF(h.dial_type))'',0,100));
-    maxlength_dial_type := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.dial_type)));
-    avelength_dial_type := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.dial_type)),h.dial_type<>(typeof(h.dial_type))'');
+    maxlength_dial_type := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.dial_type)));
+    avelength_dial_type := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.dial_type)),h.dial_type<>(typeof(h.dial_type))'');
     populated_spid_cnt := COUNT(GROUP,h.spid <> (TYPEOF(h.spid))'');
     populated_spid_pcnt := AVE(GROUP,IF(h.spid = (TYPEOF(h.spid))'',0,100));
-    maxlength_spid := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.spid)));
-    avelength_spid := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.spid)),h.spid<>(typeof(h.spid))'');
+    maxlength_spid := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.spid)));
+    avelength_spid := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.spid)),h.spid<>(typeof(h.spid))'');
     populated_service_provider_cnt := COUNT(GROUP,h.service_provider <> (TYPEOF(h.service_provider))'');
     populated_service_provider_pcnt := AVE(GROUP,IF(h.service_provider = (TYPEOF(h.service_provider))'',0,100));
-    maxlength_service_provider := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.service_provider)));
-    avelength_service_provider := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.service_provider)),h.service_provider<>(typeof(h.service_provider))'');
+    maxlength_service_provider := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.service_provider)));
+    avelength_service_provider := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.service_provider)),h.service_provider<>(typeof(h.service_provider))'');
     populated_service_type_cnt := COUNT(GROUP,h.service_type <> (TYPEOF(h.service_type))'');
     populated_service_type_pcnt := AVE(GROUP,IF(h.service_type = (TYPEOF(h.service_type))'',0,100));
-    maxlength_service_type := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.service_type)));
-    avelength_service_type := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.service_type)),h.service_type<>(typeof(h.service_type))'');
+    maxlength_service_type := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.service_type)));
+    avelength_service_type := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.service_type)),h.service_type<>(typeof(h.service_type))'');
     populated_routing_code_cnt := COUNT(GROUP,h.routing_code <> (TYPEOF(h.routing_code))'');
     populated_routing_code_pcnt := AVE(GROUP,IF(h.routing_code = (TYPEOF(h.routing_code))'',0,100));
-    maxlength_routing_code := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.routing_code)));
-    avelength_routing_code := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.routing_code)),h.routing_code<>(typeof(h.routing_code))'');
+    maxlength_routing_code := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.routing_code)));
+    avelength_routing_code := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.routing_code)),h.routing_code<>(typeof(h.routing_code))'');
     populated_porting_dt_cnt := COUNT(GROUP,h.porting_dt <> (TYPEOF(h.porting_dt))'');
     populated_porting_dt_pcnt := AVE(GROUP,IF(h.porting_dt = (TYPEOF(h.porting_dt))'',0,100));
-    maxlength_porting_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.porting_dt)));
-    avelength_porting_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.porting_dt)),h.porting_dt<>(typeof(h.porting_dt))'');
+    maxlength_porting_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.porting_dt)));
+    avelength_porting_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.porting_dt)),h.porting_dt<>(typeof(h.porting_dt))'');
     populated_country_abbr_cnt := COUNT(GROUP,h.country_abbr <> (TYPEOF(h.country_abbr))'');
     populated_country_abbr_pcnt := AVE(GROUP,IF(h.country_abbr = (TYPEOF(h.country_abbr))'',0,100));
-    maxlength_country_abbr := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.country_abbr)));
-    avelength_country_abbr := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.country_abbr)),h.country_abbr<>(typeof(h.country_abbr))'');
+    maxlength_country_abbr := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.country_abbr)));
+    avelength_country_abbr := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.country_abbr)),h.country_abbr<>(typeof(h.country_abbr))'');
     populated_filename_cnt := COUNT(GROUP,h.filename <> (TYPEOF(h.filename))'');
     populated_filename_pcnt := AVE(GROUP,IF(h.filename = (TYPEOF(h.filename))'',0,100));
-    maxlength_filename := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.filename)));
-    avelength_filename := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.filename)),h.filename<>(typeof(h.filename))'');
+    maxlength_filename := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.filename)));
+    avelength_filename := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.filename)),h.filename<>(typeof(h.filename))'');
     populated_file_dt_time_cnt := COUNT(GROUP,h.file_dt_time <> (TYPEOF(h.file_dt_time))'');
     populated_file_dt_time_pcnt := AVE(GROUP,IF(h.file_dt_time = (TYPEOF(h.file_dt_time))'',0,100));
-    maxlength_file_dt_time := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.file_dt_time)));
-    avelength_file_dt_time := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.file_dt_time)),h.file_dt_time<>(typeof(h.file_dt_time))'');
+    maxlength_file_dt_time := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.file_dt_time)));
+    avelength_file_dt_time := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.file_dt_time)),h.file_dt_time<>(typeof(h.file_dt_time))'');
     populated_vendor_first_reported_dt_cnt := COUNT(GROUP,h.vendor_first_reported_dt <> (TYPEOF(h.vendor_first_reported_dt))'');
     populated_vendor_first_reported_dt_pcnt := AVE(GROUP,IF(h.vendor_first_reported_dt = (TYPEOF(h.vendor_first_reported_dt))'',0,100));
-    maxlength_vendor_first_reported_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.vendor_first_reported_dt)));
-    avelength_vendor_first_reported_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.vendor_first_reported_dt)),h.vendor_first_reported_dt<>(typeof(h.vendor_first_reported_dt))'');
+    maxlength_vendor_first_reported_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.vendor_first_reported_dt)));
+    avelength_vendor_first_reported_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.vendor_first_reported_dt)),h.vendor_first_reported_dt<>(typeof(h.vendor_first_reported_dt))'');
     populated_vendor_last_reported_dt_cnt := COUNT(GROUP,h.vendor_last_reported_dt <> (TYPEOF(h.vendor_last_reported_dt))'');
     populated_vendor_last_reported_dt_pcnt := AVE(GROUP,IF(h.vendor_last_reported_dt = (TYPEOF(h.vendor_last_reported_dt))'',0,100));
-    maxlength_vendor_last_reported_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.vendor_last_reported_dt)));
-    avelength_vendor_last_reported_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.vendor_last_reported_dt)),h.vendor_last_reported_dt<>(typeof(h.vendor_last_reported_dt))'');
+    maxlength_vendor_last_reported_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.vendor_last_reported_dt)));
+    avelength_vendor_last_reported_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.vendor_last_reported_dt)),h.vendor_last_reported_dt<>(typeof(h.vendor_last_reported_dt))'');
     populated_port_start_dt_cnt := COUNT(GROUP,h.port_start_dt <> (TYPEOF(h.port_start_dt))'');
     populated_port_start_dt_pcnt := AVE(GROUP,IF(h.port_start_dt = (TYPEOF(h.port_start_dt))'',0,100));
-    maxlength_port_start_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.port_start_dt)));
-    avelength_port_start_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.port_start_dt)),h.port_start_dt<>(typeof(h.port_start_dt))'');
+    maxlength_port_start_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.port_start_dt)));
+    avelength_port_start_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.port_start_dt)),h.port_start_dt<>(typeof(h.port_start_dt))'');
     populated_port_end_dt_cnt := COUNT(GROUP,h.port_end_dt <> (TYPEOF(h.port_end_dt))'');
     populated_port_end_dt_pcnt := AVE(GROUP,IF(h.port_end_dt = (TYPEOF(h.port_end_dt))'',0,100));
-    maxlength_port_end_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.port_end_dt)));
-    avelength_port_end_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.port_end_dt)),h.port_end_dt<>(typeof(h.port_end_dt))'');
+    maxlength_port_end_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.port_end_dt)));
+    avelength_port_end_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.port_end_dt)),h.port_end_dt<>(typeof(h.port_end_dt))'');
     populated_remove_port_dt_cnt := COUNT(GROUP,h.remove_port_dt <> (TYPEOF(h.remove_port_dt))'');
     populated_remove_port_dt_pcnt := AVE(GROUP,IF(h.remove_port_dt = (TYPEOF(h.remove_port_dt))'',0,100));
-    maxlength_remove_port_dt := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.remove_port_dt)));
-    avelength_remove_port_dt := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.remove_port_dt)),h.remove_port_dt<>(typeof(h.remove_port_dt))'');
+    maxlength_remove_port_dt := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.remove_port_dt)));
+    avelength_remove_port_dt := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.remove_port_dt)),h.remove_port_dt<>(typeof(h.remove_port_dt))'');
     populated_is_ported_cnt := COUNT(GROUP,h.is_ported <> (TYPEOF(h.is_ported))'');
     populated_is_ported_pcnt := AVE(GROUP,IF(h.is_ported = (TYPEOF(h.is_ported))'',0,100));
-    maxlength_is_ported := MAX(GROUP,LENGTH(TRIM((SALT38.StrType)h.is_ported)));
-    avelength_is_ported := AVE(GROUP,LENGTH(TRIM((SALT38.StrType)h.is_ported)),h.is_ported<>(typeof(h.is_ported))'');
+    maxlength_is_ported := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.is_ported)));
+    avelength_is_ported := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.is_ported)),h.is_ported<>(typeof(h.is_ported))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -82,11 +82,11 @@ EXPORT Summary(SALT38.Str30Type  txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
-
+ 
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
-  SALT38.StrType FieldName;
+  SALT39.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -103,17 +103,17 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 17, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT38.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT38.StrType)le.country_code),TRIM((SALT38.StrType)le.phone),TRIM((SALT38.StrType)le.dial_type),TRIM((SALT38.StrType)le.spid),TRIM((SALT38.StrType)le.service_provider),TRIM((SALT38.StrType)le.service_type),TRIM((SALT38.StrType)le.routing_code),TRIM((SALT38.StrType)le.porting_dt),TRIM((SALT38.StrType)le.country_abbr),TRIM((SALT38.StrType)le.filename),TRIM((SALT38.StrType)le.file_dt_time),TRIM((SALT38.StrType)le.vendor_first_reported_dt),TRIM((SALT38.StrType)le.vendor_last_reported_dt),TRIM((SALT38.StrType)le.port_start_dt),TRIM((SALT38.StrType)le.port_end_dt),TRIM((SALT38.StrType)le.remove_port_dt),TRIM((SALT38.StrType)le.is_ported)));
+SALT39.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT39.StrType)le.country_code),TRIM((SALT39.StrType)le.phone),TRIM((SALT39.StrType)le.dial_type),TRIM((SALT39.StrType)le.spid),TRIM((SALT39.StrType)le.service_provider),TRIM((SALT39.StrType)le.service_type),TRIM((SALT39.StrType)le.routing_code),TRIM((SALT39.StrType)le.porting_dt),TRIM((SALT39.StrType)le.country_abbr),TRIM((SALT39.StrType)le.filename),TRIM((SALT39.StrType)le.file_dt_time),TRIM((SALT39.StrType)le.vendor_first_reported_dt),TRIM((SALT39.StrType)le.vendor_last_reported_dt),TRIM((SALT39.StrType)le.port_start_dt),TRIM((SALT39.StrType)le.port_end_dt),TRIM((SALT39.StrType)le.remove_port_dt),TRIM((SALT39.StrType)le.is_ported)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,17,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT38.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT39.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 17);
   SELF.FldNo2 := 1 + (C % 17);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT38.StrType)le.country_code),TRIM((SALT38.StrType)le.phone),TRIM((SALT38.StrType)le.dial_type),TRIM((SALT38.StrType)le.spid),TRIM((SALT38.StrType)le.service_provider),TRIM((SALT38.StrType)le.service_type),TRIM((SALT38.StrType)le.routing_code),TRIM((SALT38.StrType)le.porting_dt),TRIM((SALT38.StrType)le.country_abbr),TRIM((SALT38.StrType)le.filename),TRIM((SALT38.StrType)le.file_dt_time),TRIM((SALT38.StrType)le.vendor_first_reported_dt),TRIM((SALT38.StrType)le.vendor_last_reported_dt),TRIM((SALT38.StrType)le.port_start_dt),TRIM((SALT38.StrType)le.port_end_dt),TRIM((SALT38.StrType)le.remove_port_dt),TRIM((SALT38.StrType)le.is_ported)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT38.StrType)le.country_code),TRIM((SALT38.StrType)le.phone),TRIM((SALT38.StrType)le.dial_type),TRIM((SALT38.StrType)le.spid),TRIM((SALT38.StrType)le.service_provider),TRIM((SALT38.StrType)le.service_type),TRIM((SALT38.StrType)le.routing_code),TRIM((SALT38.StrType)le.porting_dt),TRIM((SALT38.StrType)le.country_abbr),TRIM((SALT38.StrType)le.filename),TRIM((SALT38.StrType)le.file_dt_time),TRIM((SALT38.StrType)le.vendor_first_reported_dt),TRIM((SALT38.StrType)le.vendor_last_reported_dt),TRIM((SALT38.StrType)le.port_start_dt),TRIM((SALT38.StrType)le.port_end_dt),TRIM((SALT38.StrType)le.remove_port_dt),TRIM((SALT38.StrType)le.is_ported)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT39.StrType)le.country_code),TRIM((SALT39.StrType)le.phone),TRIM((SALT39.StrType)le.dial_type),TRIM((SALT39.StrType)le.spid),TRIM((SALT39.StrType)le.service_provider),TRIM((SALT39.StrType)le.service_type),TRIM((SALT39.StrType)le.routing_code),TRIM((SALT39.StrType)le.porting_dt),TRIM((SALT39.StrType)le.country_abbr),TRIM((SALT39.StrType)le.filename),TRIM((SALT39.StrType)le.file_dt_time),TRIM((SALT39.StrType)le.vendor_first_reported_dt),TRIM((SALT39.StrType)le.vendor_last_reported_dt),TRIM((SALT39.StrType)le.port_start_dt),TRIM((SALT39.StrType)le.port_end_dt),TRIM((SALT39.StrType)le.remove_port_dt),TRIM((SALT39.StrType)le.is_ported)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT39.StrType)le.country_code),TRIM((SALT39.StrType)le.phone),TRIM((SALT39.StrType)le.dial_type),TRIM((SALT39.StrType)le.spid),TRIM((SALT39.StrType)le.service_provider),TRIM((SALT39.StrType)le.service_type),TRIM((SALT39.StrType)le.routing_code),TRIM((SALT39.StrType)le.porting_dt),TRIM((SALT39.StrType)le.country_abbr),TRIM((SALT39.StrType)le.filename),TRIM((SALT39.StrType)le.file_dt_time),TRIM((SALT39.StrType)le.vendor_first_reported_dt),TRIM((SALT39.StrType)le.vendor_last_reported_dt),TRIM((SALT39.StrType)le.port_start_dt),TRIM((SALT39.StrType)le.port_end_dt),TRIM((SALT39.StrType)le.remove_port_dt),TRIM((SALT39.StrType)le.is_ported)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),17*17,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'country_code'}
@@ -132,37 +132,36 @@ SHARED FldIds := DATASET([{1,'country_code'}
       ,{14,'port_start_dt'}
       ,{15,'port_end_dt'}
       ,{16,'remove_port_dt'}
-      ,{17,'is_ported'}],SALT38.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT38.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
-
-EXPORT SrcProfiles := SALT38.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
-
-EXPORT Correlations := SALT38.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
-
-
+      ,{17,'is_ported'}],SALT39.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+ 
+EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+ 
+EXPORT Correlations := SALT39.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+ 
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    iConectivMain_Fields.InValid_country_code((SALT38.StrType)le.country_code),
-    iConectivMain_Fields.InValid_phone((SALT38.StrType)le.phone),
-    iConectivMain_Fields.InValid_dial_type((SALT38.StrType)le.dial_type),
-    iConectivMain_Fields.InValid_spid((SALT38.StrType)le.spid),
-    iConectivMain_Fields.InValid_service_provider((SALT38.StrType)le.service_provider),
-    iConectivMain_Fields.InValid_service_type((SALT38.StrType)le.service_type),
-    iConectivMain_Fields.InValid_routing_code((SALT38.StrType)le.routing_code),
-    iConectivMain_Fields.InValid_porting_dt((SALT38.StrType)le.porting_dt),
-    iConectivMain_Fields.InValid_country_abbr((SALT38.StrType)le.country_abbr),
-    iConectivMain_Fields.InValid_filename((SALT38.StrType)le.filename),
-    iConectivMain_Fields.InValid_file_dt_time((SALT38.StrType)le.file_dt_time),
-    iConectivMain_Fields.InValid_vendor_first_reported_dt((SALT38.StrType)le.vendor_first_reported_dt),
-    iConectivMain_Fields.InValid_vendor_last_reported_dt((SALT38.StrType)le.vendor_last_reported_dt),
-    iConectivMain_Fields.InValid_port_start_dt((SALT38.StrType)le.port_start_dt),
-    iConectivMain_Fields.InValid_port_end_dt((SALT38.StrType)le.port_end_dt),
-    iConectivMain_Fields.InValid_remove_port_dt((SALT38.StrType)le.remove_port_dt),
-    iConectivMain_Fields.InValid_is_ported((SALT38.StrType)le.is_ported),
+    iConectivMain_Fields.InValid_country_code((SALT39.StrType)le.country_code),
+    iConectivMain_Fields.InValid_phone((SALT39.StrType)le.phone),
+    iConectivMain_Fields.InValid_dial_type((SALT39.StrType)le.dial_type),
+    iConectivMain_Fields.InValid_spid((SALT39.StrType)le.spid),
+    iConectivMain_Fields.InValid_service_provider((SALT39.StrType)le.service_provider),
+    iConectivMain_Fields.InValid_service_type((SALT39.StrType)le.service_type),
+    iConectivMain_Fields.InValid_routing_code((SALT39.StrType)le.routing_code),
+    iConectivMain_Fields.InValid_porting_dt((SALT39.StrType)le.porting_dt),
+    iConectivMain_Fields.InValid_country_abbr((SALT39.StrType)le.country_abbr),
+    iConectivMain_Fields.InValid_filename((SALT39.StrType)le.filename),
+    iConectivMain_Fields.InValid_file_dt_time((SALT39.StrType)le.file_dt_time),
+    iConectivMain_Fields.InValid_vendor_first_reported_dt((SALT39.StrType)le.vendor_first_reported_dt),
+    iConectivMain_Fields.InValid_vendor_last_reported_dt((SALT39.StrType)le.vendor_last_reported_dt),
+    iConectivMain_Fields.InValid_port_start_dt((SALT39.StrType)le.port_start_dt),
+    iConectivMain_Fields.InValid_port_end_dt((SALT39.StrType)le.port_end_dt),
+    iConectivMain_Fields.InValid_remove_port_dt((SALT39.StrType)le.remove_port_dt),
+    iConectivMain_Fields.InValid_is_ported((SALT39.StrType)le.is_ported),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -182,15 +181,15 @@ END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
-
-  SALT38.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_PhonesInfo, iConectivMain_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
-
+ 
+  SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_PhonesInfo, iConectivMain_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+ 
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
-  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT38.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
-  allProfiles_Standard := IF(doAllProfiles, SALT38.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
-
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT39.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT39.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+ 
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;
 END;

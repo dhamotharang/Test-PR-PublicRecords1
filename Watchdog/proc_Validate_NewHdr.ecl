@@ -1,4 +1,4 @@
-import ut,dops;
+﻿import ut,dops;
 EXPORT proc_Validate_NewHdr := module
 
 
@@ -17,7 +17,7 @@ shared wdoghdr := nothor(FileServices.GetSuperfilesubname ('~thor_data400::base:
 
 shared fcrahdr := nothor(FileServices.GetSuperfilesubname ('~thor_data400::base::file_fcra_header_building_prod',1));
 
-shared ihdrkey := nothor(FileServices.GetSuperfilesubname ('~thor400_60::key::insuranceheader_xlink::qa::did::refs::name',1));
+shared ihdrkey := nothor(FileServices.GetSuperfilesubname ('~thor400_66::key::insuranceheader_xlink::qa::did::refs::name',1));
 
 
 

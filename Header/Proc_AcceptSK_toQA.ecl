@@ -77,6 +77,7 @@ roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::lab.did_rid','Q',mq_lab_did_ri
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::header::address_rank','Q',mq_address_rank);
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::relatives_v2','Q',mq_rel_title);
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::header::DMV_restricted','Q',mq_DMV_restricted);
+roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::insuranceheader_xlink::did','Q',mq_ins_did);
 
 out40 := doxie_build.proc_accept_header_wildkeys_toQA;
 
@@ -262,6 +263,7 @@ all_keys := sequential(
 											,mq_address_rank
 											,mq_rel_title
 											,mq_DMV_restricted
+											,mq_ins_did
 											,gong_did
 											,bank_did
 											,lien_did

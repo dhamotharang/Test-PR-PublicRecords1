@@ -1,4 +1,4 @@
-import lib_stringlib, ut, mdr;
+﻿import lib_stringlib, ut, mdr;
 export Translation_Codes := module
 
 

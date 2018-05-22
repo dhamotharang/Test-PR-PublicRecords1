@@ -1,3 +1,3 @@
-#workunit('protect', 'true');
+﻿#workunit('protect', 'true');
 #workunit('name','Verify Watchdog New Hdr trigger');
-Watchdog.proc_Validate_NewHdr.newhdr : when(CRON('30 * * * 0'));
+Watchdog.proc_Validate_NewHdr.newhdr : when(CRON('00 * * * 0'));

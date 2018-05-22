@@ -1,4 +1,4 @@
-IMPORT Misc, ut;
+﻿IMPORT Misc, ut;
 
 EXPORT Files_VendorSrc(STRING pVersion) :=  MODULE
 
@@ -22,6 +22,9 @@ EXPORT Files_VendorSrc(STRING pVersion) :=  MODULE
 																							
 	EXPORT MasterList := DATASET(VendorSrc_SF_List('').MasterList, Misc.Layout_VendorSrc.MasterList,
 																							CSV(SEPARATOR([',']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)))
+																							;	// remove blank lines
+	EXPORT CollegeLocator := DATASET(VendorSrc_SF_List('').CollegeLocator, Misc.Layout_VendorSrc.MasterList,
+																							CSV(SEPARATOR(['|']), TERMINATOR(['\n','\r\n']), QUOTE(['"']),HEADING(1)))
 																							;	// remove blank lines
 																							
 // ***** New Files for Crims

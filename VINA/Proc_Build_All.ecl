@@ -1,4 +1,4 @@
-import _Control,RoxieKeybuild,Scrubs_Vina;
+﻿import _Control,RoxieKeybuild,Scrubs_Vina,ORBIT3;
 
 export Proc_Build_All(string filedate,string inFilename = 'no file', string EmailList='') := function
 
@@ -22,6 +22,10 @@ strata_infile := PROJECT(VINA.file_vina_base,TRANSFORM({VINA.layout_vina_infile}
 dops_update := RoxieKeybuild.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N',,,'B');																	
 idops_update:= RoxieKeybuild.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F',,,'A');																	
 
+//Orbit update
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('VINA',(filedate),'N'); 
+
+
 
 // sample records for QA
 f := VINA.file_vina_base;
@@ -39,6 +43,7 @@ retval := sequential(
 													buildkeys,
 													dops_update,
 													idops_update,													//DF-16616
+													orbit_update,
 													new_records_sample_for_qa,
 													//move the new file to processed
 													FileServices.clearsuperfile(processedSuperFile),

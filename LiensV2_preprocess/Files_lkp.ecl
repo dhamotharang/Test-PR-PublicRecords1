@@ -1,3 +1,4 @@
+﻿// Used in LiensV2.file_liens_main
 Import LiensV2_preprocess;
 
 EXPORT Files_lkp := MODULE
@@ -80,6 +81,6 @@ EXPORT Files_lkp := MODULE
 	EXPORT HGCourt	:= project(HGCourt_in, xfrmHGCourt(left));
 	
 	//Generation Code Description
-	EXPORT HGGeneration	:= DATASET(root + 'hg_generation_code_lkp', LiensV2_preprocess.Layouts_Hogan.generation_lkp,CSV(HEADING(1),SEPARATOR('\t'),TERMINATOR(['\n', '\r\n'])));
+	EXPORT HGGeneration	:= DATASET(LiensV2_preprocess.root + 'hg_generation_code_lkp', LiensV2_preprocess.Layouts_Hogan.generation_lkp,CSV(HEADING(1),SEPARATOR('\t'),TERMINATOR(['\n', '\r\n'])));
 			
 END;

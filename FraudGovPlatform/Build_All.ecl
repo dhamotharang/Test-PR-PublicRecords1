@@ -1,49 +1,50 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation;
 
 export Build_All(
 
-	 string																				pversion
-	,string																				pServerIP		          = _control.IPAddress.bair_batchlz01
-	,string																				pDirectory	          = '/data/otto/in/'	 
+	 string																pversion
+	,string																pServerIP 							= _control.IPAddress.bair_batchlz01
+	,string																pDirectory 							= '/data/otto/in/'	 
 	// All sources are not updated each build if no updates to particular source skip that source base 
-  ,boolean                                     	PSkipIdentityDataBase					= false 
-  ,boolean                                     	PSkipKnownFraudBase           	= false 
-  ,boolean                                     	PSkipInquiryLogsBase           	= false 
-  ,boolean                                     	PSkipNACBase           				= false 
- 	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile								=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
-	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile					=	IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
-	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile						=	IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
-	,dataset(Layouts.Input.IdentityData)	       	pUpdateIdentityDataFile	       	=	Files().Input.IdentityData.Sprayed
-	,dataset(Layouts.Input.KnownFraud)	        	pUpdateKnownFraudFile	        	=	Files().Input.KnownFraud.Sprayed
-	,dataset(Layouts.Input.NAC)	        				pUpdateNACFile	        				=	Files().Input.NAC.Sprayed
-	,dataset(Layouts.Base.InquiryLogs)					pBaseInquiryLogsFile					=	IF(_Flags.Update.InquiryLogs, Files().Base.InquiryLogs.QA, DATASET([], Layouts.Base.InquiryLogs))
-	,dataset(Layouts.Input.InquiryLogs)	       	pUpdateInquiryLogsFile	       		=	Files().Input.InquiryLogs.Sprayed
-  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt								= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
+	,boolean															PSkipIdentityDataBase			= false 
+	,boolean															PSkipKnownFraudBase				= false 
+	,boolean															PSkipAddressCache					= false 
+	,boolean															PSkipMainBase           		= false 
+ 	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
+	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
+	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
+	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
+  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
-	,boolean                                    	pUpdateIdentityDataFlag        	= _Flags.Update.IdentityData
-	,boolean                                     pUpdateKnownFraudFlag         	= _Flags.Update.KnownFraud
-	,boolean                                     pUpdateInquiryLogsFlag         	= _Flags.Update.InquiryLogs
+	,boolean                                    	pUpdateIdentityDataFlag		= _Flags.Update.IdentityData
+	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
+	,boolean                                     PSkipKeysPortion					= false
 ) :=
 module
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
-		 Create_Supers
+			Create_Supers
+			,FraudShared.SprayMBSFiles(pversion := pVersion[1..8],
+													pGroupName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30'), 
+													pDirectory := FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase)
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
-				,PSkipInquiryLogsBase
-				,PSkipNACBase
 			 ).All
+			,HeaderInfo.Post
+			,AddressesInfo(pversion).Post				 
 		  ,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
-				,PSkipInquiryLogsBase
+				,PSkipAddressCache
+				,PSkipMainBase
 				//Base
 				,pBaseMainFile	
-				//IdentityData
+				//IdentityData 
 				,pBaseIdentityDataFile
 				,pUpdateIdentityDataFile	
 				,pUpdateIdentityDataFlag
@@ -51,10 +52,6 @@ module
 				,pBaseKnownFraudFile				
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
-				//InquiryLogs
-				,pBaseInquiryLogsFile				
-				,pUpdateInquiryLogsFile	
-				,pUpdateInquiryLogsFlag
 			).All
 			,notify('BASE FILES COMPLETE','*');
 			
@@ -74,7 +71,8 @@ module
 	
 	export full_build := sequential(
 		 base_portion
-		,keys_portion
+		,if(PSkipIdentityDataBase, output('keys_portion skipped')
+				,keys_portion)
 		// Promote Contributory Files	
 		,Promote().buildfiles.Built2QA
 		// Promote Shared Files

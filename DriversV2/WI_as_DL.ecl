@@ -1,6 +1,9 @@
-import lib_stringlib, Drivers;
+﻿import lib_stringlib, Drivers;
 
-dWI := distribute(Drivers.File_WI_Full,hash(orig_dl_number)) + distribute(DriversV2.File_DL_WI_Update,hash(orig_dl_number));
+export WI_as_DL(dataset(Drivers.Layout_WI_Full) pFile_WI_Input) := function
+
+//dWI := distribute(Drivers.File_WI_Full,hash(orig_dl_number)) + distribute(DriversV2.File_DL_WI_Update,hash(orig_dl_number));
+dWI := distribute(pFile_WI_Input,hash(orig_dl_number));
 
 dWIOptOut := dedup(sort(dWI(orig_opt_out_code	=	'S'),orig_DL_NUMBER,-append_PROCESS_DATE,local),orig_DL_NUMBER,local);
 
@@ -90,5 +93,8 @@ DriversV2.Layout_DL_Extended lTransform_WI_To_Common(dWIFinal pInput)
 	self.issuance 				  			:= ''; // had to include explcitly because of...
 end;
 
+WI_as_DL_mapper := project(dWIFinal, lTransform_WI_To_Common(left));
 
-export WI_as_DL := project(dWIFinal, lTransform_WI_To_Common(left));
+return WI_as_DL_mapper;
+
+end;

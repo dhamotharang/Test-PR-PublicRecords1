@@ -1,4 +1,4 @@
-IMPORT ut, PromoteSupers, mdr, prte2, bipv2, prte_bip,std, address, aid;
+﻿IMPORT ut, PromoteSupers, mdr, prte2, bipv2, prte_bip,std, address, aid;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
@@ -146,6 +146,13 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         v_clean_name3					:= Address.CleanPersonFML73_fields(TRIM(L.third_defendant_borrower_owner_first_name) + ' ' + TRIM(L.third_defendant_borrower_owner_last_name)); 
         v_clean_name4					:= Address.CleanPersonFML73_fields(TRIM(L.fourth_defendant_borrower_owner_first_name) + ' ' + TRIM(L.fourth_defendant_borrower_owner_last_name)); 
 
+							//Plaintiff Names
+				    v_clean_name5					:= Address.CleanPersonFML73_fields(TRIM(L.plaintiff_1)); 
+							 v_clean_name7					:= Address.CleanPersonFML73_fields(TRIM(L.plaintiff_2)); 
+				    v_plaintiff_1					:= if(L.name5_link_fein <> '' and L.name5_link_inc_date <> '',L.plaintiff_1,'');
+						  v_plaintiff_2 		  := if(L.name7_link_fein <> '' and L.name7_link_inc_date <> '',L.plaintiff_2,'');
+							
+							
         SELF.name1_prefix	  :=	v_clean_name1.title;
         SELF.name1_first		  :=	v_clean_name1.fname;	
         SELF.name1_middle	  :=	v_clean_name1.mname;
@@ -177,6 +184,31 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name4_suffix   :=	v_clean_name4.name_suffix;
         SELF.name4_score    :=	v_clean_name4.name_score;
         SELF.name4_company  :=	L.fourth_defendant_borrower_company_name;
+				
+							 SELF.name5_prefix   :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.title,'');
+        SELF.name5_first    := if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.fname,'');
+        SELF.name5_middle   :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.mname,'');
+        SELF.name5_last	    :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.lname,'');
+        SELF.name5_suffix   :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.name_suffix,'');
+        SELF.name5_score    :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.name_score,'');
+        SELF.name5_company  :=	v_plaintiff_1;
+				
+								SELF.name6_prefix   :=	'';
+        SELF.name6_first    :=	'';
+        SELF.name6_middle   :=	'';
+        SELF.name6_last	    :=	'';
+        SELF.name6_suffix   :=	'';
+        SELF.name6_score    :=	'';
+        SELF.name6_company  :=	'';
+				
+				  
+				    SELF.name7_prefix   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.title,'');
+        SELF.name7_first    :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.fname,'');
+        SELF.name7_middle   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.mname,'');
+        SELF.name7_last	    :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.lname,'');
+        SELF.name7_suffix   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.name_suffix,'');
+        SELF.name7_score    :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.name_score,'');
+        SELF.name7_company  :=	v_plaintiff_2;
 
         //Append ID(s)
         SELF.name1_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name1.fname, v_clean_name1.lname, L.name1_link_ssn, L.name1_dob, L.cust_name);
@@ -191,15 +223,23 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name4_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name4.fname, v_clean_name4.lname, L.name4_link_ssn, L.name4_dob, L.cust_name);
         SELF.name4_bdid  := (string) prte2.fn_AppendFakeID.bdid(L.fourth_defendant_borrower_company_name, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
 
+								SELF.name5_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name5.fname, v_clean_name5.lname, L.name5_link_ssn, L.name5_link_dob, L.cust_name);
+        SELF.name5_bdid  := (string) prte2.fn_AppendFakeID.bdid(v_plaintiff_1, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
+				
+				    SELF.name7_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name7.fname, v_clean_name7.lname, L.name7_link_ssn, L.name7_link_dob, L.cust_name);
+        SELF.name7_bdid  := (string) prte2.fn_AppendFakeID.bdid(v_plaintiff_2, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
                    
         vLinkingIds_name1 := prte2.fn_AppendFakeID.LinkIds(L.first_defendant_borrower_company_name, L.name1_fein, L.name1_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
         vLinkingIds_name2 := prte2.fn_AppendFakeID.LinkIds(L.second_defendant_borrower_company_name, L.name2_fein, L.name2_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
         vLinkingIds_name3 := prte2.fn_AppendFakeID.LinkIds(L.third_defendant_borrower_company_name, L.name3_fein, L.name3_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
         vLinkingIds_name4 := prte2.fn_AppendFakeID.LinkIds(L.fourth_defendant_borrower_company_name, L.name4_fein, L.name4_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
           
-        SELF.name1.proxid := vLinkingIds_name1.proxid;
+								vLinkingIds_name5 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_1, L.name5_link_fein, L.name5_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
+								vLinkingIds_name7 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_2, L.name7_link_fein, L.name7_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
+        
+								SELF.name1.proxid := vLinkingIds_name1.proxid;
         SELF.name1.seleid	:= vLinkingIds_name1.seleid;
-        SELF.name1.orgid	 := vLinkingIds_name1.orgid;
+       	SELF.name1.orgid	 := vLinkingIds_name1.orgid;
         SELF.name1.ultid  := vLinkingIds_name1.ultid;
 
         SELF.name2.proxid	:= vLinkingIds_name2.proxid;
@@ -215,7 +255,17 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name4.proxid	:= vLinkingIds_name4.proxid;
         SELF.name4.seleid	:= vLinkingIds_name4.seleid;
         SELF.name4.orgid  := vLinkingIds_name4.orgid;
-        SELF.name4.ultid  := vLinkingIds_name4.ultid;         
+        SELF.name4.ultid  := vLinkingIds_name4.ultid;  
+				
+								SELF.name5.proxid	:= vLinkingIds_name5.proxid;
+        SELF.name5.seleid	:= vLinkingIds_name5.seleid;
+        SELF.name5.orgid  := vLinkingIds_name5.orgid;
+        SELF.name5.ultid  := vLinkingIds_name5.ultid;    
+				
+				    SELF.name7.proxid	:= vLinkingIds_name7.proxid;
+        SELF.name7.seleid	:= vLinkingIds_name7.seleid;
+        SELF.name7.orgid  := vLinkingIds_name7.orgid;
+        SELF.name7.ultid  := vLinkingIds_name7.ultid;   
         
         SELF := L;
         SELF := [];
@@ -236,7 +286,12 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF.did_score        := CHOOSE(nameCounter,(INTEGER)l.name1_did_score,(INTEGER)l.name2_did_score,(INTEGER)l.name3_did_score,(INTEGER)l.name4_did_score,(INTEGER)l.name5_did_score,(INTEGER)l.name6_did_score,(INTEGER)l.name7_did_score,(INTEGER)l.name8_did_score);
       SELF.bdid             := CHOOSE(nameCounter,(INTEGER)l.name1_bdid,(INTEGER)l.name2_bdid,(INTEGER)l.name3_bdid,(INTEGER)l.name4_bdid,(INTEGER)l.name5_bdid,(INTEGER)l.name6_bdid,(INTEGER)l.name7_bdid,(INTEGER)l.name8_bdid);
       SELF.bdid_score       := CHOOSE(nameCounter,(INTEGER)l.name1_bdid_score,(INTEGER)l.name2_bdid_score,(INTEGER)l.name3_bdid_score,(INTEGER)l.name4_bdid_score,(INTEGER)l.name5_bdid_score,(INTEGER)l.name6_bdid_score,(INTEGER)l.name7_bdid_score,(INTEGER)l.name8_bdid_score);
-      SELF.site_prim_range 	:=l.situs1_prim_range;
+						SELF.ProxID										 := CHOOSE(nameCounter,l.name1.proxid,l.name2.proxid,l.name3.proxid,l.name4.proxid,l.name5.proxid,l.name6.proxid,l.name7.proxid,l.name8.proxid);
+						SELF.SELEID											:= CHOOSE(nameCounter,l.name1.seleid,l.name2.seleid,l.name3.seleid,l.name4.seleid,l.name5.seleid,l.name6.seleid,l.name7.seleid,l.name8.seleid);
+						SELF.OrgID												:= CHOOSE(nameCounter,l.name1.orgid,l.name2.orgid,l.name3.orgid,l.name4.orgid,l.name5.orgid,l.name6.orgid,l.name7.orgid,l.name8.orgid);
+						SELF.UltID												:= CHOOSE(nameCounter,l.name1.ultid,l.name2.ultid,l.name3.ultid,l.name4.ultid,l.name5.ultid,l.name6.ultid,l.name7.ultid,l.name8.ultid);
+      
+						SELF.site_prim_range 	:=l.situs1_prim_range;
       SELF.site_predir      :=l.situs1_predir;
       SELF.site_prim_name   :=l.situs1_prim_name;
       SELF.site_addr_suffix	:=l.situs1_addr_suffix;
@@ -250,9 +305,6 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF.site_zip4				    :=l.situs1_zip4;
       SELF.name_indicator   := nameCounter;
       SELF.source           := IF(l.deed_category = 'N',MDR.sourceTools.src_Foreclosures_Delinquent,MDR.sourceTools.src_Foreclosures);
-     // SELF.dob							:= CHOOSE(nameCounter,l.name1_dob, l.name2_dob, l.name3_dob, l.name4_dob,'','','','');
-     // SELF.fein							:= CHOOSE(nameCounter,l.name1_fein, l.name2_fein, l.name3_fein, l.name4_fein,'','','','');
-     // SELF.incorp_date			:= CHOOSE(nameCounter,l.name1_inc_date, l.name2_inc_date, l.name3_inc_date, l.name4_inc_date,'','','','');
       SELF := l;
     END;
     ds_name_Normalized := NORMALIZE(dAllRecords,8,NormalizeRecords(LEFT,counter));
@@ -275,11 +327,10 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF := l;
     END;
 
-    ds_Normalized := NORMALIZE(ds_name_Normalized(name_first != '' OR name_last != '' OR name_company != ''), IF((LEFT.situs2_prim_name='' AND LEFT.situs2_zip=''),1,2),NORMALIZE_Addr_Records(LEFT,counter));
+    ds_Normalized := NORMALIZE(ds_name_Normalized(name_first != '' OR name_last != '' OR name_company != ''), IF((LEFT.situs2_prim_name='' AND (LEFT.situs2_zip='' or LEFT.situs2_zip='00000')),1,2),NORMALIZE_Addr_Records(LEFT,counter));
 
     //Populate Linkids field
-    ds_Normalized_linkids := prte2.fn_PopulateLinkIDs(ds_Normalized, name_Company);
-    normalised_linkids 		:= DEDUP(SORT(DISTRIBUTE(ds_Normalized_linkids, HASH(foreclosure_id)),RECORD,LOCAL),RECORD,all);
+    normalised_linkids 		:= DEDUP(SORT(DISTRIBUTE(ds_Normalized, HASH(foreclosure_id)),RECORD,LOCAL),RECORD,all);
 
     RECORDOF(ds_sequenced) 	DeNormalizeRecords(RECORDOF(ds_sequenced) l, Layouts.Normalized r) := TRANSFORM
       SELF.name1_did        := IF(r.name_indicator=1, INTFORMAT(r.did,12,0), l.name1_did);
@@ -505,7 +556,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
     //DISTRIBUTE the data before DENORMALIZE to avoid skewing
     foreclosureInDist					:=	DISTRIBUTE(dAllRecords, HASH32(sequence));
-    foreclosureNormalizedDist	:=	DISTRIBUTE(normalised_linkids, HASH32(sequence));
+    foreclosureNormalizedDist	:=	DISTRIBUTE(ds_Normalized, HASH32(sequence));
 
 
     foreclosureBase := DENORMALIZE(foreclosureInDist, foreclosureNormalizedDist,
@@ -513,7 +564,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                     DeNormalizeRecords(LEFT,right));
 
     PromoteSupers.Mac_SF_BuildProcess(normalised_linkids,Constants.base_prefix_name+ '_Normalized',normalised_out,,,,filedate);													
-    PromoteSupers.Mac_SF_BuildProcess(PROJECT(foreclosureBase,Layouts.base),Constants.base_prefix_name,base_out,,,,filedate);																
+    PromoteSupers.Mac_SF_BuildProcess(PROJECT(foreclosureInDist,Layouts.base),Constants.base_prefix_name,base_out,,,,filedate);																
 
     writeFiles := sequential(normalised_out,base_out);	
     RETURN writeFiles;

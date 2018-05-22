@@ -1,9 +1,9 @@
-import PromoteSupers,ut,mdr,Data_Services,std;
-pairs:=distribute(dataset(Filename_iHeader_did_rid,Layout_LAB_Pairs,flat),hash(rid));
+import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader,header;
+pairs:=distribute(dataset(header.Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
 PromoteSupers.MAC_SF_BuildProcess(pairs,Data_Services.Data_Location.Prefix('Header')+'thor_data400::base::iheader_did_rid',copy_pairs,3,,true,pVersion:=Header.version_build);
 
 hr:=distribute(file_header_raw(header.Blocked_data()),hash(rid));
-droppedRids:=join(hr,File_LAB_Pairs
+droppedRids:=join(hr,header.File_LAB_Pairs
 											,left.rid=right.rid
 											,left only
 											,local):persist('~thor_data400::persist::missing_header_rid');
@@ -14,14 +14,7 @@ droppedRidsBlankCnt:=   count(droppedRids(lname ='' ,  fname =''));
 duplicateRidsCount :=   count(table(Header.File_LAB_Pairs,{rid, rid_cnt := count(group)},rid,few,merge)(rid_cnt>1));
 
 //post Alpharetta DID to Boca DID if LAB build
-header_raw_syncd:=join(hr,File_LAB_Pairs
-						,left.rid=right.rid
-						,transform(layout_header
-											,self.did:=right.did
-											,self.jflag2:=right.ambiguous
-											,self:=left)
-						,local)
-						;
+header_raw_syncd:=InsuranceHeader.File_InsuranceHeader_Payload;
 
 r:={string17 eventstamp:='',string800 eventdesc:=''};
 
@@ -60,8 +53,8 @@ full_ := if ( fileservices.getsuperfilesubname('~thor_data400::base::header_raw_
 							,build_raw_syncd
 							,update_log
 							,post
-							,build_LAB_keys(Header.version_build).buildk
-							,build_LAB_keys(Header.version_build).mv2blt
+							,header.build_LAB_keys(Header.version_build).buildk
+							,header.build_LAB_keys(Header.version_build).mv2blt
 							));
 
 export build_header_raw_syncd := full_;

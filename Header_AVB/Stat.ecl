@@ -1,18 +1,22 @@
-import header, did_add, ut;
+﻿import header, did_add, ut, data_services;
 
-export stat := module
+export stat(boolean incremental=FALSE, string filedate=header.version_build) := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
-		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexis.com'    ); 
+		#stored ('version'  , filedate); 
+		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
 
-NewHeaderFile := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
+        NewHeaderFileN := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
+        NewHeaderFileI := 'thor_data400::base::header_raw_incremental';
+SHARED  NewHeaderFile  := if(~incremental,NewHeaderFileN,NewHeaderFileI);
 
-export New_Key := dataset('~' + NewHeaderFile,header.layout_header,flat);
+SHARED loc     := Data_Services.Data_location.prefix('person_header');
+export New_Key := dataset(loc + NewHeaderFile,header.layout_header,flat);
 
-NewHeaderFile := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
+shared NewHeader     := 'header_raw_'+filedate;
 
-shared NewHeader     := NewHeaderFile[stringlib.stringfind(NewHeaderFile, '::', 2) + 2..];
+
+
 
 
 shared h2 := New_Key : independent;
@@ -132,16 +136,21 @@ shared srtdistrAll := sort(jflag1 + jflag2 + jflag3 + pflag1 + pflag2 + pflag3 +
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export build_file := sequential(header.LogBuild('Start: header_stats')
+emailAdd  := if(incremental, 'Incremental ','Monthly');
+stat_base := if(incremental, '~thor_data400::out::header_raw_incremental::stats',
+                             '~thor_data400::out::header_raw::stats'            );
+
+export build_file(string statsEmailRecepients) := sequential(header.LogBuild.single('Start: header_stats')
 
 										 ,if(~fileservices.fileexists('~thor_data400::out::header_raw::stats_'+NewHeader) and NewHeader <> '',
 											 sequential(output(srtdistrAll,,'~thor_data400::out::header_raw::stats_'+NewHeader, overwrite, __compressed__),
-																	fileservices.promotesuperfilelist(['~thor_data400::out::header_raw::stats','~thor_data400::out::header_raw::stats_father','~thor_data400::out::header_raw::stats_grandfather'],
+																	fileservices.promotesuperfilelist([stat_base+'',stat_base+'_father',stat_base+'_grandfather'],
 																																			'~thor_data400::out::header_raw::stats_'+NewHeader, true),
-																	fileservices.SendEmail('Gavin.Witz@lexisnexis.com,Cody.Fouts@lexisnexis.com,michael.gould@lexisnexis.com,jose.bello@lexisnexis.com, manish.shah@lexisnexis.com, aleida.lima@lexisnexis.com,gabriel.marcan@lexisnexis.com', 'Boca Header RAW Stats - ' + workunit, pop_forEmail, , , )), 
+																	fileservices.SendEmail(statsEmailRecepients, 'Boca Header '+emailAdd+'RAW Stats - ' + workunit, pop_forEmail, , , )), 
+
 																	output('File Exists. No new stat file created.'))
 																	
-										,header.LogBuild('Completed: header_stats')); 
+										,header.LogBuild.single('Completed: header_stats')); 
 
 export boca_file := dataset('~thor_data400::out::header_raw::stats',recordof(srtdistrAll), thor);
 

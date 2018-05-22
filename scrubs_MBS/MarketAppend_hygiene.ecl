@@ -1,32 +1,39 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT39,STD;
 EXPORT MarketAppend_hygiene(dataset(MarketAppend_layout_MarketAppend) h) := MODULE
-
+ 
 //A simple summary record
-EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
+EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
+    populated_company_id_cnt := COUNT(GROUP,h.company_id <> (TYPEOF(h.company_id))'');
     populated_company_id_pcnt := AVE(GROUP,IF(h.company_id = (TYPEOF(h.company_id))'',0,100));
-    maxlength_company_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.company_id)));
-    avelength_company_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.company_id)),h.company_id<>(typeof(h.company_id))'');
+    maxlength_company_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.company_id)));
+    avelength_company_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.company_id)),h.company_id<>(typeof(h.company_id))'');
+    populated_app_type_cnt := COUNT(GROUP,h.app_type <> (TYPEOF(h.app_type))'');
     populated_app_type_pcnt := AVE(GROUP,IF(h.app_type = (TYPEOF(h.app_type))'',0,100));
-    maxlength_app_type := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.app_type)));
-    avelength_app_type := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.app_type)),h.app_type<>(typeof(h.app_type))'');
+    maxlength_app_type := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.app_type)));
+    avelength_app_type := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.app_type)),h.app_type<>(typeof(h.app_type))'');
+    populated_market_cnt := COUNT(GROUP,h.market <> (TYPEOF(h.market))'');
     populated_market_pcnt := AVE(GROUP,IF(h.market = (TYPEOF(h.market))'',0,100));
-    maxlength_market := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.market)));
-    avelength_market := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.market)),h.market<>(typeof(h.market))'');
+    maxlength_market := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.market)));
+    avelength_market := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.market)),h.market<>(typeof(h.market))'');
+    populated_sub_market_cnt := COUNT(GROUP,h.sub_market <> (TYPEOF(h.sub_market))'');
     populated_sub_market_pcnt := AVE(GROUP,IF(h.sub_market = (TYPEOF(h.sub_market))'',0,100));
-    maxlength_sub_market := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.sub_market)));
-    avelength_sub_market := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.sub_market)),h.sub_market<>(typeof(h.sub_market))'');
+    maxlength_sub_market := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.sub_market)));
+    avelength_sub_market := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.sub_market)),h.sub_market<>(typeof(h.sub_market))'');
+    populated_vertical_cnt := COUNT(GROUP,h.vertical <> (TYPEOF(h.vertical))'');
     populated_vertical_pcnt := AVE(GROUP,IF(h.vertical = (TYPEOF(h.vertical))'',0,100));
-    maxlength_vertical := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.vertical)));
-    avelength_vertical := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.vertical)),h.vertical<>(typeof(h.vertical))'');
+    maxlength_vertical := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.vertical)));
+    avelength_vertical := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.vertical)),h.vertical<>(typeof(h.vertical))'');
+    populated_main_country_code_cnt := COUNT(GROUP,h.main_country_code <> (TYPEOF(h.main_country_code))'');
     populated_main_country_code_pcnt := AVE(GROUP,IF(h.main_country_code = (TYPEOF(h.main_country_code))'',0,100));
-    maxlength_main_country_code := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.main_country_code)));
-    avelength_main_country_code := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.main_country_code)),h.main_country_code<>(typeof(h.main_country_code))'');
+    maxlength_main_country_code := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.main_country_code)));
+    avelength_main_country_code := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.main_country_code)),h.main_country_code<>(typeof(h.main_country_code))'');
+    populated_bill_country_code_cnt := COUNT(GROUP,h.bill_country_code <> (TYPEOF(h.bill_country_code))'');
     populated_bill_country_code_pcnt := AVE(GROUP,IF(h.bill_country_code = (TYPEOF(h.bill_country_code))'',0,100));
-    maxlength_bill_country_code := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.bill_country_code)));
-    avelength_bill_country_code := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.bill_country_code)),h.bill_country_code<>(typeof(h.bill_country_code))'');
+    maxlength_bill_country_code := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.bill_country_code)));
+    avelength_bill_country_code := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.bill_country_code)),h.bill_country_code<>(typeof(h.bill_country_code))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -35,11 +42,11 @@ EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
-
+ 
 summary0 := Summary('Summary');
-invRec := RECORD
+  invRec := RECORD
   UNSIGNED  FldNo;
-  SALT37.StrType FieldName;
+  SALT39.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -56,17 +63,17 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 7, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT37.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT37.StrType)le.company_id),TRIM((SALT37.StrType)le.app_type),TRIM((SALT37.StrType)le.market),TRIM((SALT37.StrType)le.sub_market),TRIM((SALT37.StrType)le.vertical),TRIM((SALT37.StrType)le.main_country_code),TRIM((SALT37.StrType)le.bill_country_code)));
+SALT39.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT39.StrType)le.company_id),TRIM((SALT39.StrType)le.app_type),TRIM((SALT39.StrType)le.market),TRIM((SALT39.StrType)le.sub_market),TRIM((SALT39.StrType)le.vertical),TRIM((SALT39.StrType)le.main_country_code),TRIM((SALT39.StrType)le.bill_country_code)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,7,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT37.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT39.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 7);
   SELF.FldNo2 := 1 + (C % 7);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT37.StrType)le.company_id),TRIM((SALT37.StrType)le.app_type),TRIM((SALT37.StrType)le.market),TRIM((SALT37.StrType)le.sub_market),TRIM((SALT37.StrType)le.vertical),TRIM((SALT37.StrType)le.main_country_code),TRIM((SALT37.StrType)le.bill_country_code)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT37.StrType)le.company_id),TRIM((SALT37.StrType)le.app_type),TRIM((SALT37.StrType)le.market),TRIM((SALT37.StrType)le.sub_market),TRIM((SALT37.StrType)le.vertical),TRIM((SALT37.StrType)le.main_country_code),TRIM((SALT37.StrType)le.bill_country_code)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT39.StrType)le.company_id),TRIM((SALT39.StrType)le.app_type),TRIM((SALT39.StrType)le.market),TRIM((SALT39.StrType)le.sub_market),TRIM((SALT39.StrType)le.vertical),TRIM((SALT39.StrType)le.main_country_code),TRIM((SALT39.StrType)le.bill_country_code)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT39.StrType)le.company_id),TRIM((SALT39.StrType)le.app_type),TRIM((SALT39.StrType)le.market),TRIM((SALT39.StrType)le.sub_market),TRIM((SALT39.StrType)le.vertical),TRIM((SALT39.StrType)le.main_country_code),TRIM((SALT39.StrType)le.bill_country_code)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),7*7,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'company_id'}
@@ -75,27 +82,26 @@ SHARED FldIds := DATASET([{1,'company_id'}
       ,{4,'sub_market'}
       ,{5,'vertical'}
       ,{6,'main_country_code'}
-      ,{7,'bill_country_code'}],SALT37.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT37.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
-
-EXPORT SrcProfiles := SALT37.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
-
-EXPORT Correlations := SALT37.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
-
-
+      ,{7,'bill_country_code'}],SALT39.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+ 
+EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+ 
+EXPORT Correlations := SALT39.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+ 
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    MarketAppend_Fields.InValid_company_id((SALT37.StrType)le.company_id),
-    MarketAppend_Fields.InValid_app_type((SALT37.StrType)le.app_type),
-    MarketAppend_Fields.InValid_market((SALT37.StrType)le.market),
-    MarketAppend_Fields.InValid_sub_market((SALT37.StrType)le.sub_market),
-    MarketAppend_Fields.InValid_vertical((SALT37.StrType)le.vertical),
-    MarketAppend_Fields.InValid_main_country_code((SALT37.StrType)le.main_country_code),
-    MarketAppend_Fields.InValid_bill_country_code((SALT37.StrType)le.bill_country_code),
+    MarketAppend_Fields.InValid_company_id((SALT39.StrType)le.company_id),
+    MarketAppend_Fields.InValid_app_type((SALT39.StrType)le.app_type),
+    MarketAppend_Fields.InValid_market((SALT39.StrType)le.market),
+    MarketAppend_Fields.InValid_sub_market((SALT39.StrType)le.sub_market),
+    MarketAppend_Fields.InValid_vertical((SALT39.StrType)le.vertical),
+    MarketAppend_Fields.InValid_main_country_code((SALT39.StrType)le.main_country_code),
+    MarketAppend_Fields.InValid_bill_country_code((SALT39.StrType)le.bill_country_code),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -114,4 +120,16 @@ PrettyErrorTotals := RECORD
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
+EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  fieldPopulationOverall := Summary('');
+ 
+  SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_MBS, MarketAppend_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+ 
+  fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT39.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT39.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+ 
+  RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
+END;
 END;

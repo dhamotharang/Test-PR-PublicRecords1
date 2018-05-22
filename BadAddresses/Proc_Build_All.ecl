@@ -3,7 +3,7 @@
 //Filedate is the update date
 Export Proc_Build_All(String FileName, String Filedate) := Function
 
-#workunit('name','BadAddresses Build - ' + filedate);
+#workunit('name','Yogurt: BadAddresses Build - ' + filedate);
 #workunit('priority','high');
 
 SprayFile := BadAddresses.fsprayInFile(filename, filedate);

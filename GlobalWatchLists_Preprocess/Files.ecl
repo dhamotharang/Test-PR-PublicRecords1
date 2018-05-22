@@ -1,4 +1,4 @@
-import std, GlobalWatchLists, GlobalWatchLists_Preprocess;
+﻿import std, GlobalWatchLists, GlobalWatchLists_Preprocess;
 
 EXPORT Files := MODULE
 
@@ -165,7 +165,7 @@ EXPORT Files := MODULE
 	EXPORT dsInnovativeSystemsFBI		:= 	DATASET(GlobalWatchLists_Preprocess.root+'innovative_systems::FBI', GlobalWatchLists_Preprocess.Layouts.rInnovativeSystems, THOR);
 	EXPORT dsInnovativeSystemsUNS		:= 	DATASET(GlobalWatchLists_Preprocess.root+'innovative_systems::UNS', GlobalWatchLists_Preprocess.Layouts.rInnovativeSystems, THOR);
 
-	EXPORT dsEUterroristListPerson	:= DATASET(GlobalWatchLists_Preprocess.root+'eu_terrorist_list::persons', GlobalWatchLists_Preprocess.Layouts.rEUterroristListPerson,CSV(SEPARATOR('\t'),heading(1),quote('"')));
+	EXPORT dsEUterroristListPerson	:= DATASET(GlobalWatchLists_Preprocess.root+'eu_terrorist_list::persons', GlobalWatchLists_Preprocess.Layouts.rEUterroristListPerson,CSV(SEPARATOR('|'),heading(1),quote('"')));
 	EXPORT dsEUterroristListGroup		:= DATASET(GlobalWatchLists_Preprocess.root+'eu_terrorist_list::groups',GlobalWatchLists_Preprocess.Layouts.rEUterroristListGroup,CSV(separator('|'),heading(1),quote('"')));
 	
 	EXPORT dsStDeptTerroristExcl		:= DATASET(GlobalWatchLists_Preprocess.root+'state_department_terrorist_exclusion',GlobalWatchLists_Preprocess.Layouts.rStateDeptOfTerrorists,
