@@ -1,4 +1,4 @@
-import header;
+import header,ut;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -10,6 +10,7 @@ import header;
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 Header.proc_postHeaderBuilds.XADLkeys;
 // builds a) XADL2 keys b)re-ADL external sources c)XADL1 base files.
 // a and b must have completed successfuly before

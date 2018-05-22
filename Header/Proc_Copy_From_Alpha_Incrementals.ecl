@@ -173,7 +173,12 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false) := function
     
     );
 end;
-EXPORT update_inc_idl(boolean skipIncSFupdate=false) := updateSupers('::header',skipIncSFupdate,'::idl');
+EXPORT update_inc_idl(boolean skipIncSFupdate=false) := 
+
+    sequential(
+                updateSupers('::header',skipIncSFupdate,'::idl'),
+                '~thor400_44::key::InsuranceHeader_xLink::built::header'
+    );
 
 elist:= _control.MyInfo.EmailAddressNotify
         ;

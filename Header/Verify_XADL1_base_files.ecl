@@ -158,4 +158,4 @@ dataset([
 
 t:=table(d,{sfn:=trim(fn),lfn:=if(STD.File.fileexists(fn),STD.File.SuperFileContents(fn))});
 
-EXPORT Verify_XADL1_base_files := t;
+EXPORT Verify_XADL1_base_files := nothor(t);

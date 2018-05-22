@@ -1,3 +1,4 @@
+import ut,header;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -9,6 +10,7 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 Header.proc_postHeaderBuilds.headerKeys;
 //  Builds file_header_building and all header keys including
 // Relatives and XADL1.  It moves all except source keys to _QA

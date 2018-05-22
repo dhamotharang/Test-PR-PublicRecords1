@@ -1,3 +1,4 @@
+import header,ut;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -9,6 +10,7 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 Header.proc_postHeaderBuilds.relatives; 
 // XADL2 and re-ADL external sources must have completed successfuly
 // in previous step before relatives build starts.

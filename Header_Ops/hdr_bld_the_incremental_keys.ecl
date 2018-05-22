@@ -1,8 +1,8 @@
 ﻿#WORKUNIT('name','Update Incremental linking keys');
 #stored ('buildname', 'header_incremental_keys'   ); 
-#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'/*;Debendra.Kumar@lexisnexisrisk.com'*/);
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com');
 string  emailList  := ''  :stored('emailList');
-import Header,_control;
+import Header,_control,std,InsuranceHeader;
 
 wk:=workunit;
 wServer:= _control.ThisEnvironment.ESP_IPAddress;
@@ -47,14 +47,23 @@ update_all:=    sequential(
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iDid:'+workunit,''));
 
 
-// /* STEP 1 */ icheck; // HTHOR;
+/* STEP 1 */ icheck; // HTHOR;
 // /* STEP 2 */ Refresh_copy; // HTHOR
 // /* STEP 3 */ update_inc_idl; // HTHOR
 // /* STEP 4 */ build_inc_key; // * THOR *
 // /* STEP 5 */ update_all; // HTHOR 
-/* STEP 6 */ Header.Proc_Copy_Keys_To_Dataland.Incrementals; // DATALAND HTHOR
+// /* STEP 6 */ Header.Proc_Copy_Keys_To_Dataland(emailList+'aleida.lima@lexisnexisrisk.com').Incrementals;
+// DATALAND HTHOR
 
 /*
+
+20180504
+http://dataland_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-135757#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-134822#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-130147#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-124314#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-124230#/stub/Summary
+
 
 20180502
 http://dataland_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180504-090857#/stub/Summary
