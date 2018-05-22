@@ -4,7 +4,9 @@ export Build_Base(
 
 	 string	pversion
 	,boolean	PSkipIdentityDataBase	= false 
-	,boolean	PSkipKnownFraudBase	= false 
+	,boolean	PSkipKnownFraudBase	= false
+	,boolean	PSkipAddressCacheBase	= false
+	,boolean	PSkipMainBase = false
 	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.QA
 	
   ,dataset(Layouts.Base.IdentityData)	pBaseIdentityDataFile	=	Files().Base.IdentityData.QA
@@ -35,11 +37,11 @@ module
 					,pBaseKnownFraudFile
 					,pUpdateKnownFraudFile
 					,pUpdateKnownFraudflag
-					).All)
-			 )
-			 ,MapToCommon(
-					 pversion
-					).Build_Base_Main.All
+					).All)		 
+			 )			 
+			 , if(PSkipAddressCacheBase , output('AddressCache base skipped'),Build_Base_AddressCache(pversion).All)
+			 , if(PSkipMainBase, output('Main base skipped'), MapToCommon(pversion).Build_Base_Main.All)
+			 , FraudGovPlatform.Promote().buildfiles.Built2QA			 
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );

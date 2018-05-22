@@ -68,10 +68,10 @@ pct_persistent_records						(Persistent Records Same Cluster)/(Previous Records 
 
 */
 import LinkingTools;
-EXPORT PersistenceStats(base,father,rec_id,cluster_id) := functionmacro
+EXPORT PersistenceStats(base,father,rec_id,cluster_id,pDoOutputs = 'true') := functionmacro
   oName1:=(string)RANDOM();
-	ds:=linkingtools.PersistenceStats(base,father,rec_id,cluster_id,oName1).clusterDS;
-	ts:=linkingtools.PersistenceStats(base,father,rec_id,cluster_id,oName1).recordDS;
+	ds:=linkingtools.PersistenceStats(base,father,rec_id,cluster_id,oName1,pDoOutputs).clusterDS;
+	ts:=linkingtools.PersistenceStats(base,father,rec_id,cluster_id,oName1,pDoOutputs).recordDS;
 
 	recA:=record
 string40 cluster_type;
