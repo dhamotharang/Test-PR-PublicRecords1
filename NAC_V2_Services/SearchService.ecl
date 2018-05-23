@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="NAC_V2_SearchService" wuTimeout="300000">
 	<part name="NAC2SearchRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -22,7 +22,11 @@ EXPORT SearchService() := FUNCTION
 	nac_search_complete := NAC_V2_Services.Functions().applyCommonProcedures(in_rec_processed,nac_search_w_hist,nac_mod);
 // Put everything together - returns iesp output layout - iesp.nac2_search.t_NAC2SearchResultRecord
 	nac_search_results  := NAC_V2_Services.SearchFunctions(nac_mod).finalSearchTransform(nac_search_complete);
+
+	nac_canned_results	:= NAC_V2_Services.GetCannedRecords(first_row);
 	
+	final_results	:= if(first_row.user.testdataenabled,nac_canned_results,nac_search_results);
+
 	#WEBSERVICE(FIELDS('NAC2SearchRequest'));
-	RETURN OUTPUT(nac_search_results, NAMED('Results'));
+	RETURN OUTPUT(final_results, NAMED('Results'));
 END;
