@@ -1049,6 +1049,8 @@
 		export string KEYWORD_PAMEF_CNBC						:= '737';
 		export string KEYWORD_LVSCS									:= '738';
 		export string KEYWORD_ECB										:= '739';
+		export string KEYWORD_CAATSA228_WC					:= '740';
+		export string KEYWORD_ESMA									:= '741';
 
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
