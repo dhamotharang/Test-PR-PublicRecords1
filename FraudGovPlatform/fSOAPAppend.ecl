@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services;
 EXPORT fSOAPAppend	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
@@ -253,6 +253,69 @@ soap_results := soapcall( soap_input,
 						;
 Export All := Project(soap_results,Layouts.Crim);
 									
+END;
+
+EXPORT Death	:= MODULE
+
+service_name	:= 'batchservices.death_batchservice';
+serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+layout_in   := DeathV2_Services.Layouts.BatchIn;
+layout_out  := DeathV2_Services.Layouts.BatchOut;
+
+layoutSoap := record
+	dataset(layout_in) batch_in;
+	unsigned1 DPPAPurpose := 1;//Needs to be changed accordingly. 
+	unsigned1 GLBPurpose := 1;//Needs to be changed accordingly. 
+end;
+
+layout_in make_batch_in(pii_base L) := TRANSFORM
+	SELF.acctno := '1';
+	SELF.Name_First := L.fname;
+	SELF.Name_Middle := L.mname;
+	SELF.Name_Last := L.lname;
+	SELF.Name_suffix := L.name_suffix;
+	SELF.prim_name := L.prim_name;
+	SELF.prim_range := L.prim_range;
+	SELF.sec_range := L.sec_range;
+	SELF.St := L.st;
+	SELF.z5 := L.ZIP;
+	SELF.SSN := L.SSN;
+	SELF.DOB := (string)L.dob;
+	SELF := L;
+	SELF := [];
+END;
+
+layoutSoap trans(pii_base L) := TRANSFORM
+	batch := PROJECT(L, make_batch_in(LEFT));
+	SELF.batch_in := batch;
+	self := L;
+END;
+
+soap_input := DISTRIBUTE(project(pii_base, trans(LEFT)),RANDOM() % nodes);
+
+xlayout := RECORD
+	(layout_out)
+	STRING errorcode;
+END;
+
+xlayout myFail(soap_input le) := TRANSFORM
+	SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+	SELF := [];
+END;
+
+soapResponse := soapcall( soap_input,
+						serviceURL,
+						service_name,
+						{soap_input},
+						DATASET(xlayout),
+						PARALLEL(threads), 
+						onFail(myFail(LEFT))
+						)
+						(matchcode<>'',errorcode='')
+						;
+Export All := Project(soapResponse,Layouts.Death);
+						
 END;
 
 END;

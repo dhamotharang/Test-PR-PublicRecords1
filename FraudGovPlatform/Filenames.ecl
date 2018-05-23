@@ -84,6 +84,7 @@ module
 		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
+		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
@@ -91,7 +92,8 @@ module
 			AddressCache.dAll_filenames +
 			Pii.dAll_filenames +
 			CIID.dAll_filenames +
-			Crim.dAll_filenames;
+			Crim.dAll_filenames +
+			Death.dAll_filenames;
 	
 	end;
 	
