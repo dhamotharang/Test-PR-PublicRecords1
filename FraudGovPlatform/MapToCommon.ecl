@@ -79,7 +79,7 @@ module
 	NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
  
 	// Append RingID
-	NewBaseRingID := RingID.Append_RingID (NewBaseRid);
+	NewBaseRingID := Append_RingID (NewBaseRid);
 
 	EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRingID);
 
