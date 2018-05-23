@@ -1,4 +1,4 @@
-import address,corp2,corp2_mapping,corp2_raw_al,corp2_raw_ar,corp2_raw_az,corp2_raw_co,corp2_raw_ct,corp2_raw_dc,corp2_raw_fl,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,
+﻿import address,corp2,corp2_mapping,corp2_raw_al,corp2_raw_ar,corp2_raw_az,corp2_raw_co,corp2_raw_ct,corp2_raw_dc,corp2_raw_fl,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,
 			 corp2_raw_la,corp2_raw_id,corp2_raw_in,corp2_raw_ky,corp2_raw_ma,corp2_raw_md,corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_ms,corp2_raw_mt,corp2_raw_nd,corp2_raw_nc,
 			 corp2_raw_ne,corp2_raw_nh,corp2_raw_nm,corp2_raw_oh,corp2_raw_ok,corp2_raw_or,corp2_raw_pa,corp2_raw_ri,corp2_raw_nv,corp2_raw_sc,corp2_raw_sd,corp2_raw_tn,corp2_raw_tx,corp2_raw_ut,
 			 corp2_raw_va,corp2_raw_vt,corp2_raw_wa,corp2_raw_wi,corp2_raw_wv,corp2_raw_wy,ut;
@@ -10,11 +10,11 @@ export fCleanCity(string pStateOrigin,string pStateOriginDesc,string pState='',s
 		//					 by the Address.CleanAddress182 routine to try and derive
 		//					 it. 
 		//********************************************************************
-		export UC_StateOrigin	:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		export UC_Address	 		:= ut.fn_RemoveSpecialChars(corp2.t2u(pAddress));
-		export UC_City		 		:= ut.fn_RemoveSpecialChars(corp2.t2u(pCity));
-		export UC_State		 		:= ut.fn_RemoveSpecialChars(corp2.t2u(pState));
-		export UC_Zip			 		:= ut.fn_RemoveSpecialChars(corp2.t2u(pZip));
+		export UC_StateOrigin	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		export UC_Address	 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pAddress));
+		export UC_City		 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCity));
+		export UC_State		 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pState));
+		export UC_Zip			 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pZip));
 		
 		export CleanChars  		:= Map(UC_StateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.City.InvalidChars,UC_City,''),
 																 UC_StateOrigin = 'AR' => regexreplace(corp2_raw_ar.fGetRegExPattern.City.InvalidChars,UC_City,''),
