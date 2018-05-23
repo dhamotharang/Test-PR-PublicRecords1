@@ -1610,5 +1610,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/689 Yemen List','1596'},
 {'EC 2018/698 Central African Republic List','1597'},
 {'EC (CFSP) 2018/706 Ukraine List','1598'},
-{'EC 2018/705 Ukraine List','1599'}
+{'EC 2018/705 Ukraine List','1599'},
+{'EC (CFSP) 2018/715 Democratic People\'s Republic of Korea List','1600'},
+{'EC 2018/714 Democratic People\'s Republic of Korea List','1601'},
+{'EC 2018/733-Al-Qaida & Taliban List','1602'},
+{'Illinois Investment Policy Board - Prohibited Investment List','1603'}
 ],r);
