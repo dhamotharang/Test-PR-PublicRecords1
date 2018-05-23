@@ -1,4 +1,4 @@
-﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC;
+﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC,CriminalRecords_BatchService;
 
 EXPORT Layouts := MODULE
 
@@ -641,6 +641,11 @@ Export CIID := RECORD
 	string3 cvicustomscore;
 	string1 instantidversion;
 	STRING errorcode
+ END;
+ 
+ Export Crim	:= RECORD
+ CriminalRecords_BatchService.Layouts.batch_out;
+ string errorcode;
  END;
  
 END;

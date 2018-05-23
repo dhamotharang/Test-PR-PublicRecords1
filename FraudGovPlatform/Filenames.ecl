@@ -83,13 +83,15 @@ module
 		export AddressCache	:= tools.mod_FilenamesBuild(Template('AddressCache'),pversion);
 		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
+		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
 			AddressCache.dAll_filenames +
 			Pii.dAll_filenames +
-			CIID.dAll_filenames;
+			CIID.dAll_filenames +
+			Crim.dAll_filenames;
 	
 	end;
 	
