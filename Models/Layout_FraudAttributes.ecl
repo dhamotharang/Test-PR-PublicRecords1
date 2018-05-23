@@ -537,4 +537,5 @@ export Layout_FraudAttributes := RECORD
 	Layout_IDAttributes IDAttributes;
 	Layout_version2 version2;
 	Layout_version201 version201;
+  string compromisedDL_hash;
 END;

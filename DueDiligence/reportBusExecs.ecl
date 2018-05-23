@@ -31,7 +31,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
   
 
   //grab the licenses 
-  profLicenses := NORMALIZE(workingExecs, LEFT.party.licenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, UNSIGNED4 mostRecentDate, UNSIGNED4 secondRecentDate, STRING lastName, DATASET(iesp.duediligenceshared.t_DDRProfessionalLicenses) lics},
+  profLicenses := NORMALIZE(workingExecs, LEFT.party.licenses, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 mostRecentDate, UNSIGNED4 secondRecentDate, STRING lastName, DATASET(iesp.duediligenceshared.t_DDRProfessionalLicenses) lics},
                                                                           SELF.lics := PROJECT(LEFT, TRANSFORM(iesp.duediligenceshared.t_DDRProfessionalLicenses,
                                                                                                                 SELF.IssuingAgency := RIGHT.licenseCategory;
                                                                                                                 SELF.License := RIGHT.licenseType;
@@ -73,7 +73,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
   
   
   //grab titles/positions child datasets
-  positions := NORMALIZE(workingExecs, LEFT.party.positions, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED6 did, UNSIGNED4 mostRecentDate, UNSIGNED4 secondRecentDate, STRING lastName, DATASET(iesp.duediligenceshared.t_DDRPositionTitles) titles},
+  positions := NORMALIZE(workingExecs, LEFT.party.positions, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 mostRecentDate, UNSIGNED4 secondRecentDate, STRING lastName, DATASET(iesp.duediligenceshared.t_DDRPositionTitles) titles},
                                                                         SELF.titles := PROJECT(LEFT, TRANSFORM(iesp.duediligenceshared.t_DDRPositionTitles,
                                                                                                                 SELF.Title := RIGHT.title;
                                                                                                                 SELF.FirstReported := iesp.ECL2ESP.toDate(RIGHT.firstSeen);

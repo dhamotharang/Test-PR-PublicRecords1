@@ -1,7 +1,7 @@
 ﻿IMPORT MDR;
 EXPORT Constants := MODULE
 
-	
+	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
 		
 	EXPORT CCWRestrictedSources := [
 		MDR.sourceTools.src_EMerge_CCW_NY
@@ -98,6 +98,21 @@ EXPORT Constants := MODULE
 																		//18259
 																		];
  
+//------------------------------------------------------------------------------------------------------//
+EXPORT WatercraftRestrictedSources := [
+		MDR.sourceTools.src_AL_Watercraft, MDR.sourceTools.src_AK_Watercraft, MDR.sourceTools.src_AZ_Watercraft, 
+		MDR.sourceTools.src_AR_Watercraft, MDR.sourceTools.src_CO_Watercraft, MDR.sourceTools.src_CT_Watercraft, 
+		MDR.sourceTools.src_FL_Watercraft, MDR.sourceTools.src_GA_Watercraft, MDR.sourceTools.src_IL_Watercraft, 
+		MDR.sourceTools.src_IA_Watercraft, MDR.sourceTools.src_KS_Watercraft, MDR.sourceTools.src_KY_Watercraft, 
+		MDR.sourceTools.src_ME_Watercraft, MDR.sourceTools.src_MD_Watercraft, MDR.sourceTools.src_MA_Watercraft, 
+		MDR.sourceTools.src_MI_Watercraft, MDR.sourceTools.src_MN_Watercraft, MDR.sourceTools.src_MS_Watercraft, 
+		MDR.sourceTools.src_MT_Watercraft, MDR.sourceTools.src_MO_Watercraft, MDR.sourceTools.src_NE_Watercraft, 
+		MDR.sourceTools.src_NH_Watercraft, MDR.sourceTools.src_NV_Watercraft, MDR.sourceTools.src_NY_Watercraft, 
+		MDR.sourceTools.src_NC_Watercraft, MDR.sourceTools.src_ND_Watercraft, MDR.sourceTools.src_OH_Watercraft, 
+		MDR.sourceTools.src_OR_Watercraft, MDR.sourceTools.src_SC_Watercraft, MDR.sourceTools.src_TN_Watercraft, 
+		MDR.sourceTools.src_TX_Watercraft, MDR.sourceTools.src_UT_Watercraft, MDR.sourceTools.src_VA_Watercraft, 
+		MDR.sourceTools.src_WA_Watercraft, MDR.sourceTools.src_WV_Watercraft, MDR.sourceTools.src_WI_Watercraft, 
+		MDR.sourceTools.src_WY_Watercraft, MDR.sourceTools.src_Infutor_Watercraft, src_AK_commercial_fishing_vessels];
 
 //------------------------------------------------------------------------------------------------------//
 /*	PersonHeaderKeys 

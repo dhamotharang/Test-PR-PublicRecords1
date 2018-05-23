@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, ut, Patriot, iesp, GlobalWatchLists, Risk_Indicators, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, ut, Patriot, iesp, GlobalWatchLists, Risk_Indicators, STD;
 
 EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options

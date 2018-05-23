@@ -543,6 +543,12 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_REPORT_RECORDS := 100; //???
   end;
 
+	// FCRA Inquiry History
+	EXPORT FCRAInqHist := MODULE
+		EXPORT UNSIGNED2 MAX_LEXIDS := 100;
+		EXPORT UNSIGNED2 MAX_RECORDS := 10000;
+	END;
+
   // FlexID
   export FI := MODULE
 		export unsigned1 MaxCVIRiskIndicators	:= 75;
@@ -583,6 +589,17 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_GLOBAL_WATCHLIST := 1000;
 		export unsigned2 MAX_COUNT_RED_FLAG := 1000;
 		export unsigned2 MAX_ALERT := 4;
+		export unsigned2 MAX_COUNT_IDENTITY_DETAIL := 1000;
+		export unsigned2 MAX_COUNT_ELEMENT_DETAIL := 1000;
+		export unsigned2 MAX_COUNT_ASSOCIATED_ADDRESS := 1000;
+		export unsigned2 MAX_COUNT_SCORE_BREAKDOWN := 1000;
+		export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
+		export unsigned2 MAX_COUNT_CLUSTER := 1000;
+		export unsigned2 MAX_COUNT_ASSOCIATED_IDENTITY := 1000;
+		export unsigned2 MAX_COUNT_TIMELINE_DETAILS := 1000;
+		export unsigned2 MAX_COUNT_DELTABASE := 1000;
+		export unsigned2 MAX_COUNT_NVP := 1000;
+		export unsigned2 MAX_TIMELINE_PHONES := 20;
 	end;
 	
 	export Fraud_Point := MODULE
@@ -1664,6 +1681,7 @@ EXPORT Constants := MODULE
 	EXPORT TISTA := MODULE
 		export unsigned2 MAX_WARNINGS := 20;
 		export unsigned2 MAX_ADDRESSES := 5;
+		export unsigned2	MAX_NAMEVALUES := 10;
 	end;
 
 	// TopBusiness, AKA BIP/Business Integration Project 

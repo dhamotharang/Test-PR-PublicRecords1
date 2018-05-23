@@ -17,7 +17,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	
 	
   //retrieve all names associated with the fein
-  assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DueDiligence.Layouts.Name, UNSIGNED4 dateLastSeen},
+  assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.Name, UNSIGNED4 dateLastSeen},
                                                                         SELF.seq := LEFT.seq;
                                                                         SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                         SELF.orgID := LEFT.Busn_info.BIP_IDS.orgID.LinkID;
@@ -64,7 +64,7 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
                              
                              
   //retrieve all the doing business as variations (DBAs)
-  dbaNames := NORMALIZE(BusnData, LEFT.companyDBA, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, STRING companyName, UNSIGNED4 dateLastSeen},
+  dbaNames := NORMALIZE(BusnData, LEFT.companyDBA, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, STRING companyName, UNSIGNED4 dateLastSeen},
                                                               SELF.seq := LEFT.seq;
                                                               SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                               SELF.orgID := LEFT.Busn_info.BIP_IDS.orgID.LinkID;

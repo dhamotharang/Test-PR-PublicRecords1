@@ -22,6 +22,16 @@ export t_FraudGovBestInfo := record
 	string10 Phone10 {xpath('Phone10')};
 end;
 		
+export t_FraudGovDriversLicense := record
+	string2 DriversLicenseState {xpath('DriversLicenseState')};
+	string25 DriversLicenseNumber {xpath('DriversLicenseNumber')};
+end;
+		
+export t_FraudGovBankInformation := record
+	string20 BankRoutingNumber {xpath('BankRoutingNumber')};
+	string20 BankAccountNumber {xpath('BankAccountNumber')};
+end;
+		
 export t_FraudGovBaseRequest := record (iesp.share.t_BaseRequest)
 	t_FraudGovUser FraudGovUser {xpath('FraudGovUser')};//hidden[internal]
 end;

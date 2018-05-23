@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LicenseSearchService">
 
 	<!-- COMPLIANCE/USER SETTINGS -->
@@ -32,12 +32,11 @@
 
 	<!-- INTERNAL TESTING FIELDS/OPTIONS -->
   <part name="NoDeepDive"          type="xsd:boolean"     default="true"/>  //???
-	<part name="PenaltThreshold"	   type="xsd:unsignedInt" default="0"/>     //or 10 ???
   <part name="did"                 type="xsd:string"/>
 
 	<part name="ReturnCount"			   type="xsd:unsignedInt"/>
 	<part name="StartingRecord"		   type="xsd:unsignedInt"/>
-	
+			
   <part name="MIDEXLicenseSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 
 </message>
@@ -79,7 +78,7 @@ export LicenseSearchService := macro
 	#stored ('LicenseState', search_by.LicenseState);
 	#stored ('Tin', search_by.Tin);
 	#stored ('NmlsID', search_by.NmlsID);
-	
+				
   // *** Start of processing
   input_params := AutoStandardI.GlobalModule();
 	

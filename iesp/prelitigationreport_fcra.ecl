@@ -32,6 +32,7 @@ export t_FcraPreLitigationReportResponse := record
 	t_FcraPreLitigationReportIndividual Individual {xpath('Individual')};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MaxConsumerStatements)};
 	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};
 end;
 		
 export t_FcraPreLitigationReportRequest := record (iesp.share.t_BaseRequest)

@@ -61,6 +61,7 @@ export LiensReportServiceFCRA() := macro
 	recs := liens.records;
 	statements := liens.statements;
 	consumer_alerts := liens.ConsumerAlerts;
+  input_consumer := FFD.Constants.BlankConsumerRec;
 
 	doxie.MAC_Marshall_Results(recs, recs_marshalled);
 	
@@ -69,9 +70,11 @@ export LiensReportServiceFCRA() := macro
 		if(liens_params.person_filter_id <> '', output(liens_params.person_filter_id, named('PersonFilterID'))),
     if (shouldFail, 
 		    FAIL('Person filter ID must be used with FCRA search'),
-        OUTPUT(recs_marshalled, NAMED('Results'))));
+        OUTPUT(recs_marshalled, NAMED('Results'))),
 				
-        OUTPUT(statements, NAMED('ConsumerStatements'));
-        OUTPUT(consumer_alerts, NAMED('ConsumerAlerts'));
+        OUTPUT(statements, NAMED('ConsumerStatements')),
+        OUTPUT(consumer_alerts, NAMED('ConsumerAlerts')),
+        OUTPUT(input_consumer, NAMED('Consumer'))
+	);
 
 endmacro;

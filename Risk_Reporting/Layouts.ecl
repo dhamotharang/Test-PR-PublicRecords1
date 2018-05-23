@@ -912,26 +912,26 @@ EXPORT Attributes_Layout := RECORD
 END;
 
 EXPORT Parsed_InstantID_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING10  ReferenceCode := '';
-	STRING10  LoadAmount		:= '';
-	STRING5   RetailZip		  :='';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING70	FullName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING2		DLState				:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
+	STRING30	TransactionID     	:= ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING10  ReferenceCode       := '';
+	STRING10  LoadAmount		      := '';
+	STRING5   RetailZip		        :='';
+	STRING30	FirstName			      := '';
+	STRING30	LastName			      := '';
+	STRING70	FullName			      := '';
+	STRING9		SSN	      					:= '';
+	STRING8		DOB				      		:= '';
+	STRING120	Address	      			:= '';
+	STRING25	City					      := '';
+	STRING2		State     					:= '';
+	STRING9		Zip				      		:= '';
+	STRING20	DL	      					:= '';
+	STRING2		DLState		      		:= '';
+	STRING10	HomePhone     			:= '';
+	STRING10	WorkPhone			      := '';
 	
 	STRING100 OptionName1;
 	STRING100 OptionValue1;
@@ -989,7 +989,7 @@ EXPORT Parsed_FlexID_Layout := RECORD
 	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
 	STRING10	AccountID			:= '';
 	STRING8		TransactionDate := '';
-	// STRING150	CompanyName		:= '';
+	// STRING150	EndUserCompanyName  := '';
 	STRING30	FirstName			:= '';
 	STRING30	LastName			:= '';
 	// STRING70	FullName			:= '';
@@ -1036,23 +1036,23 @@ EXPORT Parsed_FlexID_Layout := RECORD
 END;
 
 EXPORT Parsed_FraudAdvisor_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
-	STRING50	Email					:= '';
-	STRING45	IPAddress			:= '';
+	STRING30	TransactionID       := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID           := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName			      := '';
+	STRING30	LastName      			:= '';
+	STRING9		SSN						      := '';
+	STRING8		DOB     						:= '';
+	STRING120	Address	      			:= '';
+	STRING25	City					      := '';
+	STRING2		State     					:= '';
+	STRING9		Zip				      		:= '';
+	STRING20	DL						      := '';
+	STRING10	HomePhone     			:= '';
+	STRING10	WorkPhone			      := '';
+	STRING50	Email     					:= '';
+	STRING45	IPAddress	      		:= '';
 	STRING100 OptionName1;
 	STRING100 OptionValue1;
 	STRING100 OptionName2;
@@ -1094,104 +1094,109 @@ EXPORT Parsed_FraudAdvisor_Layout_With_Attributes := RECORD
 END;
 
 EXPORT Parsed_RiskView_Tracking_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
-	STRING15	Model					:= '';
-	STRING3		Score					:= '';
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName			      := '';
+	STRING30	LastName      			:= '';
+	STRING9		SSN						      := '';
+	STRING8		DOB	      					:= '';
+	STRING120	Address		      		:= '';
+	STRING25	City      					:= '';
+	STRING2		State			      		:= '';
+	STRING9		Zip     						:= '';
+	STRING20	DL			      			:= '';
+	STRING10	HomePhone     			:= '';
+	STRING10	WorkPhone			      := '';
+	STRING15	Model     					:= '';
+	STRING3		Score			      		:= '';
 	
-	STRING5		RC1						:= '';
-	STRING5		RC2						:= '';
-	STRING5		RC3						:= '';
-	STRING5		RC4						:= '';
-	STRING5		RC5						:= '';
-	STRING5		RC6						:= '';
-	STRING5		RC7						:= '';
-	STRING5		RC8						:= '';
-	STRING5		RC9						:= '';
-	STRING5		RC10					:= '';
+	STRING5		RC1						      := '';
+	STRING5		RC2     						:= '';
+	STRING5		RC3			      			:= '';
+	STRING5		RC4						      := '';
+	STRING5		RC5     						:= '';
+	STRING5		RC6			      			:= '';
+	STRING5		RC7						      := '';
+	STRING5		RC8     						:= '';
+	STRING5		RC9			      			:= '';
+	STRING5		RC10					      := '';
 END;
 
 EXPORT Parsed_RiskView2_Tracking_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING25	LoginID				:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
-	STRING15	Model					:= '';
-	STRING3		Score					:= '';
-	STRING10	ScoreType			:= '';
-	STRING5		RC1						:= '';
-	STRING5		RC2						:= '';
-	STRING5		RC3						:= '';
-	STRING5		RC4						:= '';
-	STRING5		RC5						:= '';
-	STRING5		RC6						:= '';
-	STRING5		Alert1				:= '';
-	STRING5		Alert2				:= '';
-	STRING5		Alert3				:= '';
-	STRING5		Alert4				:= '';
-	STRING5		Alert5				:= '';
-	STRING5		Alert6				:= '';
-	STRING5		Alert7				:= '';
-	STRING5		Alert8				:= '';
-	STRING5		Alert9				:= '';
-	STRING5		Alert10				:= '';
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING25	LoginID				      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName			      := '';
+	STRING30	LastName      			:= '';
+	STRING9		SSN						      := '';
+	STRING8		DOB     						:= '';
+	STRING120	Address	      			:= '';
+	STRING25	City      					:= '';
+	STRING2		State			      		:= '';
+	STRING9		Zip     						:= '';
+	STRING20	DL			      			:= '';
+	STRING10	HomePhone			      := '';
+	STRING10	WorkPhone     			:= '';
+	STRING15	Model					      := '';
+	STRING3		Score     					:= '';
+	STRING10	ScoreType	      		:= '';
+	STRING5		RC1     						:= '';
+	STRING5		RC2			      			:= '';
+	STRING5		RC3						      := '';
+	STRING5		RC4     						:= '';
+	STRING5		RC5			      			:= '';
+	STRING5		RC6						      := '';
+	STRING5		Alert1      				:= '';
+	STRING5		Alert2			      	:= '';
+	STRING5		Alert3      				:= '';
+	STRING5		Alert4			      	:= '';
+	STRING5		Alert5      				:= '';
+	STRING5		Alert6			      	:= '';
+	STRING5		Alert7      				:= '';
+	STRING5		Alert8			      	:= '';
+	STRING5		Alert9      				:= '';
+	STRING5		Alert10			      	:= '';
 END;
 
 EXPORT Parsed_RiskView_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
-	STRING15	Model					:= '';
-	STRING3		Score					:= '';
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName     			:= '';
+	STRING30	LastName			      := '';
+	STRING9		SSN     						:= '';
+	STRING8		DOB			      			:= '';
+	STRING120	Address     				:= '';
+	STRING25	City				      	:= '';
+	STRING2		State     					:= '';
+	STRING9		Zip				      		:= '';
+	STRING20	DL	      					:= '';
+	STRING10	HomePhone	      		:= '';
+	STRING10	WorkPhone     			:= '';
+	STRING15	Model					      := '';
+	STRING3		Score     					:= '';
 	
-	STRING5		RC1						:= '';
-	STRING5		RC2						:= '';
-	STRING5		RC3						:= '';
-	STRING5		RC4						:= '';
-	STRING5		RC5						:= '';
-	STRING5		RC6						:= '';
-	STRING5		RC7						:= '';
-	STRING5		RC8						:= '';
-	STRING5		RC9						:= '';
-	STRING5		RC10					:= '';
+	STRING5		RC1				      		:= '';
+	STRING5		RC2     						:= '';
+	STRING5		RC3			      			:= '';
+	STRING5		RC4						      := '';
+	STRING5		RC5     						:= '';
+	STRING5		RC6			      			:= '';
+	STRING5		RC7     						:= '';
+	STRING5		RC8			      			:= '';
+	STRING5		RC9     						:= '';
+	STRING5		RC10		      			:= '';
 	
+	Attributes_Layout;
+END;
+
+EXPORT Parsed_RiskView2_Layout := RECORD
+	Parsed_RiskView2_Tracking_Layout;
 	Attributes_Layout;
 END;
 
@@ -1584,45 +1589,45 @@ EXPORT Parsed_RiskWiseMainPRIO_Layout := RECORD
 END;
 
 EXPORT Parsed_LeadIntegrity_Layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING2		DLState				:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
-	STRING15	Model					:= '';
-	STRING3		Score					:= '';
-	
-	STRING5		RC1						:= '';
-	STRING5		RC2						:= '';
-	STRING5		RC3						:= '';
-	STRING5		RC4						:= '';
-	STRING5		RC5						:= '';
-	STRING5		RC6						:= '';
-	STRING5		RC7						:= '';
-	STRING5		RC8						:= '';
-	STRING5		RC9						:= '';
-	STRING5		RC10					:= '';
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName			      := '';
+	STRING30	LastName			      := '';
+	STRING9		SSN   						  := '';
+	STRING8		DOB		      				:= '';
+	STRING120	Address			      	:= '';
+	STRING25	City      					:= '';
+	STRING2		State			      		:= '';
+	STRING9		Zip						      := '';
+	STRING20	DL      						:= '';
+	STRING2		DLState	      			:= '';
+	STRING10	HomePhone			      := '';
+	STRING10	WorkPhone     			:= '';
+	STRING15	Model					      := '';
+	STRING3		Score	      				:= '';
+    
+	STRING5		RC1     						:= '';
+	STRING5		RC2			      			:= '';
+	STRING5		RC3						      := '';
+	STRING5		RC4     						:= '';
+	STRING5		RC5			      			:= '';
+	STRING5		RC6						      := '';
+	STRING5		RC7     						:= '';
+	STRING5		RC8			      			:= '';
+	STRING5		RC9						      := '';
+	STRING5		RC10      					:= '';
 	
 	Attributes_Layout;
 END;
 
 EXPORT common_BTST_input_layout := RECORD
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING10	AccountID			:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30  OrderType 		:= '';
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30  OrderType 		      := '';
 	STRING20 DeviceProviderScore1 := '';
 	STRING20 DeviceProviderScore2 := '';
 	STRING20 DeviceProviderScore3 := '';
@@ -1949,99 +1954,128 @@ EXPORT Parsed_SMALLBUSINESSBIPCOMBINEDREPORT_Layout := RECORD
 	STRING30	ModelName2			:= '';
 	STRING3		ModelScore2		:= '';
 
-	STRING5		BusinessRC1Seq	:= '';
-	STRING5		BusinessRC1Code	:= '';
-	STRING5		BusinessRC1Desc	:= '';
-	STRING5		BusinessRC2Seq	:= '';
-	STRING5		BusinessRC2Code	:= '';
-	STRING5		BusinessRC2Desc	:= '';
-	STRING5		BusinessRC3Seq	:= '';
-	STRING5		BusinessRC3Code	:= '';
-	STRING5		BusinessRC3Desc	:= '';
-	STRING5		BusinessRC4Seq	:= '';
-	STRING5		BusinessRC4Code	:= '';
-	STRING5		BusinessRC4Desc	:= '';
-	STRING5		BusinessRC5Seq	:= '';
-	STRING5		BusinessRC5Code	:= '';
-	STRING5		BusinessRC5Desc	:= '';
-	STRING5		BusinessRC6Seq	:= '';
-	STRING5		BusinessRC6Code	:= '';
-	STRING5		BusinessRC6Desc	:= '';
+	STRING1		BusinessModel1RC1Seq	:= '';
+	STRING5		BusinessModel1RC1Code	:= '';
+	STRING100	BusinessModel1RC1Desc	:= '';
+	STRING1		BusinessModel1RC2Seq	:= '';
+	STRING5		BusinessModel1RC2Code	:= '';
+	STRING100	BusinessModel1RC2Desc	:= '';
+	STRING1		BusinessModel1RC3Seq	:= '';
+	STRING5		BusinessModel1RC3Code	:= '';
+	STRING100	BusinessModel1RC3Desc	:= '';
+	STRING1		BusinessModel1RC4Seq	:= '';
+	STRING5		BusinessModel1RC4Code	:= '';
+	STRING100	BusinessModel1RC4Desc	:= '';
+	STRING1		BusinessModel1RC5Seq	:= '';
+	STRING5		BusinessModel1RC5Code	:= '';
+	STRING100	BusinessModel1RC5Desc	:= '';
+	STRING1		BusinessModel1RC6Seq	:= '';
+	STRING5		BusinessModel1RC6Code	:= '';
+	STRING100	BusinessModel1RC6Desc	:= '';
+	
+	STRING1		BusinessModel2RC1Seq	:= '';
+	STRING5		BusinessModel2RC1Code	:= '';
+	STRING100	BusinessModel2RC1Desc	:= '';
+	STRING1		BusinessModel2RC2Seq	:= '';
+	STRING5		BusinessModel2RC2Code	:= '';
+	STRING100	BusinessModel2RC2Desc	:= '';
+	STRING1		BusinessModel2RC3Seq	:= '';
+	STRING5		BusinessModel2RC3Code	:= '';
+	STRING100	BusinessModel2RC3Desc	:= '';
+	STRING1		BusinessModel2RC4Seq	:= '';
+	STRING5		BusinessModel2RC4Code	:= '';
+	STRING100	BusinessModel2RC4Desc	:= '';
+	STRING1		BusinessModel2RC5Seq	:= '';
+	STRING5		BusinessModel2RC5Code	:= '';
+	STRING100	BusinessModel2RC5Desc	:= '';
+	STRING1		BusinessModel2RC6Seq	:= '';
+	STRING5		BusinessModel2RC6Code	:= '';
+	STRING100	BusinessModel2RC6Desc	:= '';
 
 	Attributes_Layout;
 END;
 
 EXPORT LOG_Deltabase_Layout_Record := Record
-	// Transaction data
-	Integer8 company_id;
-	String20 login_id;
-	Integer8 product_id;
-	String20 function_name;
-	String50 esp_method;
-	String10 interface_version;
-	String5 delivery_method;
-	String8 date_added;
-	// Transaction Metadata - User options
-	String5  death_master_purpose;
-	String10 ssn_mask;
-	String10 dob_mask;
-	String1  dl_mask;
-	String1  exclude_dmv_pii;
-	String1  scout_opt_out;
-	String1  archive_opt_in;
-	String   data_restriction_mask;
-	String   data_permission_mask;
-	String30 industry;
-	// PII Request data
-	String9  i_ssn;
-	String30 i_name_first;
-	String30 i_name_last;
-	Integer8 i_lexid;
-	String60 i_address;
-	String50 i_city;
-	String2  i_state;
-	String9  i_zip;
-	String30 i_dl;
-	String2  i_dl_state;
-	String9  i_tin;
-	String30 i_name_first_2;
-	String30 i_name_last_2;
-	String30 i_name_first_3;
-	String30 i_name_last_3;
-	String30 i_name_first_4;
-	String30 i_name_last_4;
-	String30 i_name_first_5;
-	String30 i_name_last_5;
-	String30 i_name_first_6;
-	String30 i_name_last_6;
-	String30 i_name_first_7;
-	String30 i_name_last_7;
-	String30 i_name_first_8;
-	String30 i_name_last_8;
-	String50 i_bus_name;
-	String60 i_bus_address;
-	String50 i_bus_city;
-	String2  i_bus_state;
-	String9  i_bus_zip;
-	String20 i_model_name_1;
-	String20 i_model_name_2;
-	String60 i_attributes_name;
-	// Response data
-	Integer2 o_score_1;
-	String4 o_reason_1_1;
-	String4 o_reason_1_2;
-	String4 o_reason_1_3;
-	String4 o_reason_1_4;
-	String4 o_reason_1_5;
-	String4 o_reason_1_6;
-	Integer2 o_score_2;
-	String4 o_reason_2_1;
-	String4 o_reason_2_2;
-	String4 o_reason_2_3;
-	String4 o_reason_2_4;
-	String4 o_reason_2_5;
-	String4 o_reason_2_6;
-	Integer8 o_lexid;
+  // Transaction data
+  Integer8 company_id;
+  String20 login_id;
+  Integer8 product_id;
+  String20 function_name;
+  String50 esp_method;
+  String10 interface_version;
+  String5 delivery_method;
+  String8 date_added;
+  // Transaction Metadata - User options
+  String5  death_master_purpose;
+  String10 ssn_mask;
+  String10 dob_mask;
+  String1  dl_mask;
+  String1  exclude_dmv_pii;
+  String1  scout_opt_out;
+  String1  archive_opt_in;
+  unsigned1 glb;
+  unsigned1 dppa;
+  String   data_restriction_mask;
+  String   data_permission_mask;
+  String30 industry;
+  // PII Request data
+  String9  i_ssn;
+  String8  i_dob;       //new
+  String120 i_name_full; //new
+  String30 i_name_first;
+  String30 i_name_last;
+  Integer8 i_lexid;
+  String60 i_address;
+  String50 i_city;
+  String2  i_state;
+  String9  i_zip;
+  String30 i_dl;
+  String2  i_dl_state;
+  String10 i_home_phone; //new
+  String10 i_work_phone; //new
+  String9  i_tin;
+  String30 i_name_first_2;
+  String30 i_name_last_2;
+  String30 i_name_first_3;
+  String30 i_name_last_3;
+  String30 i_name_first_4;
+  String30 i_name_last_4;
+  String30 i_name_first_5;
+  String30 i_name_last_5;
+  String30 i_name_first_6;
+  String30 i_name_last_6;
+  String30 i_name_first_7;
+  String30 i_name_last_7;
+  String30 i_name_first_8;
+  String30 i_name_last_8;
+  String50 i_bus_name;
+  String50 i_alt_bus_name; //new
+  String60 i_bus_address;
+  String50 i_bus_city;
+  String2  i_bus_state;
+  String9  i_bus_zip;
+  String10 i_bus_phone;    //new
+  String20 i_model_name_1;
+  String20 i_model_name_2;
+  String60 i_attributes_name;
+  // Response data
+  Integer2 o_score_1;
+  String4 o_reason_1_1;
+  String4 o_reason_1_2;
+  String4 o_reason_1_3;
+  String4 o_reason_1_4;
+  String4 o_reason_1_5;
+  String4 o_reason_1_6;
+  Integer2 o_score_2;
+  String4 o_reason_2_1;
+  String4 o_reason_2_2;
+  String4 o_reason_2_3;
+  String4 o_reason_2_4;
+  String4 o_reason_2_5;
+  String4 o_reason_2_6;
+  Integer8 o_lexid;
+  String14 o_bdid;          //new
+  unsigned6 o_seleid;       //new
 END;
 
 EXPORT LOG_Deltabase_Layout := RECORD

@@ -28,7 +28,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											KEYED(LEFT.Busn_info.address.predir = RIGHT.predir) AND
 											KEYED(LEFT.Busn_info.address.postdir = RIGHT.postdir) AND
 											KEYED(LEFT.Busn_info.address.sec_range = RIGHT.sec_range),
-											TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, STRING2 partyIndicator, UNSIGNED4 historyDate, RECORDOF(RIGHT), INTEGER advoDtfirstseen},
+											TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, STRING2 partyIndicator, UNSIGNED4 historyDate, RECORDOF(RIGHT), INTEGER advoDtfirstseen},
 																	SELF.Residential_or_Business_Ind := RIGHT.Residential_or_Business_Ind;
 																	SELF.advoDtfirstseen := (INTEGER)RIGHT.date_first_seen;
 																	SELF.seq := LEFT.seq;
@@ -61,7 +61,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	initialOpLocations := DueDiligence.CommonBusiness.GetOperatingLocations(indata);
 	addOpLocAddrType := JOIN(initialOpLocations, rollAdvo(partyIndicator = DueDiligence.Constants.OPERATING_LOCATION),
                             #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-                            TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+                            TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
                                       SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
                                                                               SELF.addressType := RIGHT.Residential_or_Business_Ind;
                                                                               SELF := LEFT;)]);

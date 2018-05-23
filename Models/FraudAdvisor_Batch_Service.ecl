@@ -11,7 +11,7 @@
 	<part name="OfacOnly" type="xsd:boolean"/>
 	<part name="OFACSearching" type="xsd:boolean"/>
 	<part name="ExcludeWatchLists" type="xsd:boolean"/>
-	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/> 
 	<part name="IncludeOfac" type="xsd:boolean"/>
 	<part name="GlobalWatchlistThreshold" type="xsd:real"/>  
 	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
@@ -73,7 +73,6 @@ export FraudAdvisor_Batch_Service := MACRO
 fp_batch_in := Models.FraudAdvisor_Batch_Service_Layouts.BatchInput;
 
 batchin := dataset([],fp_batch_in) 			: stored('batch_in',few);
-gateways := Gateway.Configuration.Get();
 
 
 // module here inherits the interface & overrides it
@@ -98,6 +97,18 @@ gateways := Gateway.Configuration.Get();
 					export string DataPermission			 := risk_indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 		END;
 
+gateways_in := Gateway.Configuration.Get();
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.servicename);
+	
+  self.url := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.url); 		
+  
+  self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if(InputArgs.OFACVersion = 4 and InputArgs.ModelName_in in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 
 wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways);

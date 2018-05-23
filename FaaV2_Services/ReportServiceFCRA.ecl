@@ -55,9 +55,11 @@ export ReportServiceFCRA := macro
 	
   recs := FaaV2_Services.ReportService_Records.fcra_val(tempmod);
 	
+  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did);
+
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs.records, results_pre, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse, Aircrafts, true);
 	 
-  FFD.MAC.AppendConsumerAlertsAndStatements(results_pre, results, recs.Statements, recs.ConsumerAlerts, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse);
+  FFD.MAC.AppendConsumerAlertsAndStatements(results_pre, results, recs.Statements, recs.ConsumerAlerts, input_consumer, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse);
   
   output(results, named('Results'));							
 		

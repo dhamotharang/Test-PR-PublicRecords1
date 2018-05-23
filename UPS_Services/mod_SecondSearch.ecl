@@ -1,4 +1,4 @@
-import doxie, ut, AutoStandardI, Business_Header_SS, Business_Header;
+﻿import doxie, ut, AutoStandardI, BIPV2;
 
 export mod_SecondSearch := MODULE
 
@@ -141,111 +141,136 @@ export mod_SecondSearch := MODULE
 		doxie.mac_FetchLimitLimitSkipFail(raw_recs, ut.limits.FETCH_KEYED, ut.limits.FETCH_UNKEYED, 
 																			true, 203, false, false, limit_dids);
 
-		#IF(Debug.debug_flag)
-		// inputs_ds := DATASET( [ { inLastName, inPhoneticLastName, inPrimRange,  inPrimName,
-															// inCity, inStateSet, inZip5Set } ], 
-															// { STRING lname, STRING plname, STRING prim_range, STRING prim_name,
-																// STRING city, SET OF STRING2 states, SET OF STRING5 zipset} );
-		// output(inputs_ds, NAMED('indInputs'), EXTEND);
-		output(if(doStreetQuery, StreetQuery), NAMED('indStreetQuery'));
-		output(if(doRangeZipQuery), NAMED('indRangeZipQuery'));
-		output(if(doStreetZipQuery), NAMED('indStreeZipQuery'));
-		output(if(doLastZipQuery), NAMED('indLastZipQuery'));
-		output(if(doLastCityStateQuery), NAMED('indLastCityStateQuery'));
-		output(if(doLastStateQuery), NAMED('indLastStateQuery'));
-		output(limit_dids, NAMED('indKamikazeDIDs'));
-		#END
-
-		// ut.outputMessage(message_code, message_prefix + 'individual fired returning ' + COUNT(limit_dids) + ' DIDs');
 		export records := limit_dids;
 	END;
 
-	export Business(mod_Params.BusinessSearch search_mod) := MODULE
-		layout := doxie.layout_ref_bdid;
 
-		inCompanyName := '';
-		inPrimRange := IT.prange_value.val(project(search_mod, IT.prange_value.params));
-		inPrimName := IT.pname_value.val(project(search_mod, IT.pname_value.params));
-		inCity := IT.city_value.val(project(search_mod, IT.city_value.params));
-		inState := IT.state_value.val(project(search_mod, IT.state_value.params));
-		inStateSet := if(inState <> '', [ inState ],
-																	  if(inCity <> '', fn_BestStates(inCity, 5), []));
-		inZip5 := (INTEGER) IT.zip_val.val(project(search_mod, IT.zip_val.params));
-		derrivedZipFromCity := IF(inState <> '' and inCity <> '', ut.ZipsWithinCity(inState, inCity), [] );
-		inZip5Set := [inZip5] + derrivedZipFromCity;
-		
-		inPhone := IT.phone_value.val(project(search_mod, IT.phone_value.params));
-		phoneLen := LENGTH(TRIM(inPhone));
-		
-		StateStreetQuery := PROJECT(CHOOSEN(Business_Header_SS.Key_BH_Addr_pr_pn_sr_st(
-																					KEYED(state IN inStateSet) AND
-																					KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')])), maxRecs),
-																TRANSFORM(layout, SELF := LEFT));
+ 	export Business(UPS_Services.SearchParams SearchParams,
+										UPS_Services.mod_Params.BusinessSearch BizParams) := MODULE
 
-		ZipStreetQuery := PROJECT(CHOOSEN(Business_Header_SS.Key_BH_Addr_pr_pn_zip(
-																					KEYED(zip in inZip5Set) AND
-																					KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')])), maxRecs),
-																TRANSFORM(layout, SELF := LEFT));
-
-		//EVEN LOOSER																
-		PRPNQuery := PROJECT(CHOOSEN(Business_Header.RoxieKeys().NewFetch.key_address_qa(
-																					KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')]) AND
-																					KEYED(prim_range = inPrimRange)
-																					), maxRecs),
-																TRANSFORM(layout, SELF := LEFT));
-																
-		errantPhones_7 :=
-			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone7 +
-			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone7;
-		
-		errantPhones_3 :=
-			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone3 +
-			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone3;
+   		layout := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dataset([],BIPV2.IDfunctions.rec_SearchInput)).RecordOut2;
 			
-		errantPhones :=
-			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone10 +
-			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone10;	
+     	
+   		inCompanyName := '';
+   		inPrimRange := SearchParams.addrQueryInputs.StreetNumber;
+   		inPrimName := SearchParams.addrQueryInputs.StreetName; 
+   		inCity := SearchParams.addrQueryInputs.City; 
+   		inState := SearchParams.addrQueryInputs.State;
+   		inStateSet := if(inState <> '', [ inState ],
+   																	  if(inCity <> '', fn_BestStates(inCity, 5), []));
+   		inZip5 := (INTEGER) SearchParams.addrQueryInputs.Zip5; 
+   		derrivedZipFromCity := IF(inState <> '' and inCity <> '', ut.ZipsWithinCity(inState, inCity), [] );
+   		inZip5Set := [inZip5] + derrivedZipFromCity;
+   		
+   		inPhone := SearchParams.phoneQueryInput; 
+   		phoneLen := LENGTH(TRIM(inPhone));
 			
-		PhoneQuery :=	
-		PROJECT(
-			CHOOSEN(
-				LIMIT(
-					Business_Header.RoxieKeys().NewFetch.Key_Phone_QA(
-						KEYED(p7 in errantPhones_7) AND
-						KEYED(p3 in errantPhones_3) AND
-						p3+p7 in errantPhones
-					), 
-					ut.limits.PHONE_PER_PERSON, keyed, skip
-				),
-				maxRecs
-			),
-			TRANSFORM(
-				layout, 
-				SELF := LEFT
-			)
-		);
+			dsStates := DATASET([inStateSet],{string state});			
+			StateStreetInput1 := project(dsStates, TRANSFORM (BIPV2.IDfunctions.rec_SearchInput,
+                                                  self.state := LEFT.state,
+                                                  self.prim_name := inPrimName,
+                                                  self := []));
+																									
+			StateStreetInput2 := project(dsStates, TRANSFORM (BIPV2.IDfunctions.rec_SearchInput,
+                                                  self.state := left.state,
+                                                  self.prim_name := ut.Word(inPrimName, 1, ' '),
+                                                  self := []));
+																									
+			StateStreetInput := StateStreetInput1 + StateStreetInput2;
+				
+			dsZips := DATASET([inZip5Set],{INTEGER zip5});
+			Zip5StreetInput1  := project(dsZips, TRANSFORM (BIPV2.IDfunctions.rec_SearchInput,
+                                      					self.prim_name :=  inPrimName;
+																										self.zip5 := (string)left.zip5;
+																										self := []));
+																									
+			Zip5StreetInput2  := project(dsZips, TRANSFORM (BIPV2.IDfunctions.rec_SearchInput,
+                                      					self.prim_name :=  ut.Word(inPrimName, 1, ' ');
+																										self.zip5 := (string)left.zip5;
+																										self := []));
+																										
+			Zip5StreetInput := Zip5StreetInput1 + Zip5StreetInput2;
+			
+			 ////EVEN LOOSER	
+			PrimRangeStreetInput1  := dataset([transform(BIPV2.IDfunctions.rec_SearchInput,
+																												self.prim_range := SearchParams.AddrQueryInputs.StreetNumber, 
+																												self.prim_name :=  inPrimName,
+																												self := [])]);
+																												
+			PrimRangeStreetInput2  := dataset([transform(BIPV2.IDfunctions.rec_SearchInput,
+																												self.prim_range := SearchParams.AddrQueryInputs.StreetNumber, 
+																												self.prim_name :=  ut.Word(inPrimName, 1, ' '),
+																												self := [])]);
+																												
+			PrimRangeStreetInput := PrimRangeStreetInput1 + PrimRangeStreetInput2;
+			
+   		errantPhones_7 :=
+   			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone7 +
+   			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone7;
+   		
+   		errantPhones_3 :=
+   			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone3 +
+   			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone3;
+   			
+   		errantPhones :=
+   			UPS_Services.mod_GenerateTransposedPhones(inPhone).set_phone10 +
+   			UPS_Services.mod_GenerateFatfingeredPhones(inPhone).set_phone10;	
+			
+			dsErrantPhones_7 := dataset(errantPhones_7,{string phone7});
+			dsErrantPhones_10 := dataset(errantPhones,{string phone10}); 
+			dsErrantPhones_7Input :=  project(dsErrantPhones_7,
+																			transform(BIPV2.IDfunctions.rec_SearchInput,
+																									self.phone10 := left.phone7,
+																									self.allow7digitmatch := true,
+																									self := []));
+																									
+	   dsErrantPhones_10Input :=  project(dsErrantPhones_10,
+																			transform(BIPV2.IDfunctions.rec_SearchInput,
+																									self.phone10 := left.phone10,
+																									self.allow7digitmatch := false,
+																									self := []));
+																									
+			PhonesInput := 	dsErrantPhones_7Input + 	dsErrantPhones_10Input;
+			
+   		doStateStreetQuery := EXISTS(inStateSet) AND inPrimName <> '';
+   		doZipStreetQuery := EXISTS(inZip5Set) AND inPrimName <> '';
+   		doPhone := inPhone <> '' AND (phoneLen = 10);
+   		doPRPNQuery := inPrimName <> '' AND inPrimRange <> '';
+   
+   		FinalInput := 	if(doStateStreetQuery,StateStreetInput) 
+											& if(doZipStreetQuery,Zip5StreetInput) 
+											& if(doPhone,PhonesInput)
+											& if(doPRPNQuery,PrimRangeStreetInput);
+   		
+			
+			
 
-		doStateStreetQuery := EXISTS(inStateSet) AND inPrimName <> '';
-		doZipStreetQuery := EXISTS(inZip5Set) AND inPrimName <> '';
-		doPhone := inPhone <> '' AND (phoneLen = 10);
-		doPRPNQuery := inPrimName <> '' AND inPrimRange <> '';
+  // Get links ids for the search criteria
+	
+	
+	// begin new code *********		to emulate	top biz ranking		
+	
+	in_mod2 := module(AutoStandardI.DataRestrictionI.params)  
+	  export boolean AllowAll := false;
+		export boolean AllowDPPA := false;
+		export boolean AllowGLB := false;
+		export string DataRestrictionMask := BizParams.datarestrictionmask;
+		export unsigned1 DPPAPurpose := BizParams.dppapurpose;
+		export unsigned1 GLBPurpose := BizParams.glbpurpose;
+		export boolean ignoreFares := false;
+		export boolean ignoreFidelity := false;
+		export boolean includeMinors := false;	
+	end;
+	
+			
+     FinalOutput := UPS_Services.fn_BIPLookup(FinalInput,in_mod2); 
+		  FinalOutput_choosen := choosen(FinalOutput,maxRecs);
 
-		raw_recs := 
-		choosen(
-			StateStreetQuery(doStateStreetQuery) 
-			& ZipStreetQuery(doZipStreetQuery) 
-			& PhoneQuery(doPhone)
-			& PRPNQuery(doPRPNQuery)
-			,maxRecs
-		);
+   		#IF(Debug.debug_flag)
+   		output(FinalOutput_choosen, NAMED('second_bip'));
+   		#END
+   
+   		export records := FinalOutput_choosen;
+   	END;
 
-		doxie.mac_FetchLimitLimitSkipFail(raw_recs, ut.limits.FETCH_KEYED, ut.limits.FETCH_UNKEYED, 
-																			true, 203, false, false, limit_bdids);
-		#IF(Debug.debug_flag)
-		output(limit_bdids, NAMED('bizKamikazeBDIDs'));
-		#END
-
-		// ut.outputMessage(message_code, message_prefix + 'business fired returning ' + COUNT(limit_bdids) + ' BDIDs');
-		export records := limit_bdids;
-	END;
 END;

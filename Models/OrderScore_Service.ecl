@@ -363,6 +363,7 @@ export OrderScore_Service := MACRO
 			self.AccountNumber := ri.account;
 			self.seq := ri.seq;
 			//bill to verified name
+			self.Result.BillTo.UniqueID := (string)le.bill_to_output.DID;
 			self.Result.BillTo.VerifiedInput.Name.First := le.bill_to_output.combo_first;
 			self.Result.BillTo.VerifiedInput.Name.Last := le.bill_to_output.combo_last;
 			//bill to verified address
@@ -400,6 +401,7 @@ export OrderScore_Service := MACRO
 			//might need to convert to iesp date
 			self.Result.BillTo.NewAreaCode.EffectiveDate := iesp.ECL2ESP.toDate((integer)le.bill_to_output.areacodesplitdate);
 			//ship to
+			self.Result.ShipTo.UniqueID := (string)le.ship_to_output.DID;
 			self.Result.ShipTo.VerifiedInput.Name.First := le.ship_to_output.combo_first;
 			self.Result.ShipTo.VerifiedInput.Name.Last := le.ship_to_output.combo_last;	
 			//bill to verified address
@@ -731,11 +733,15 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
 																								 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																								 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
+                                                 self.glb := GLBPurpose,
+                                                 self.dppa := DPPAPurpose,
 																								 self.data_restriction_mask := DataRestriction,
 																								 self.data_permission_mask := DataPermission,
 																								 self.industry := Industry_Search[1].Industry,
 																								 self.i_attributes_name := stringified_attributesIn,
 																								 self.i_ssn := socs_value,
+                                                 self.i_dob := dob_value,
+                                                 self.i_name_full := fullname_value,
 																								 self.i_name_first := first_value,
 																								 self.i_name_last := last_value,
 																								 self.i_address := addr_value,
@@ -744,6 +750,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.i_zip := zip_value,
 																								 self.i_dl := drlc_value,
 																								 self.i_dl_state := drlcstate_value,
+                                                 self.i_home_phone := hphone_value,
 																								 self.i_name_first_2 := first2_value,
 																								 self.i_name_last_2 := last2_value,
 																								 self.i_model_name_1 := genericModelName,
@@ -762,6 +769,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.o_reason_2_4 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[4].RiskCode,
 																								 self.o_reason_2_5 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[5].RiskCode,
 																								 self.o_reason_2_6 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[6].RiskCode,
+                                                 self.o_lexid := clam[1].Bill_To_Out.did,
 																								 self := left,
 																								 self := [] ));
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);

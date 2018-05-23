@@ -574,6 +574,7 @@ unsigned8 BSOptions :=
 				BillingHitFromScores := (INTEGER)getBillingHitFromScores(le.ModelResults);
 				SELF.PhoneSources := ri.PhoneSources;
 				SELF.BillingHit := IF( (INTEGER)le.BillingHit + BillingHitFromScores > 0, '1', '0' );
+        SELF.Rep_LexID := ri.Clean_Input.Rep_Lexid;
 				SELF := le;
 		END;
 	
@@ -599,6 +600,7 @@ unsigned8 BSOptions :=
 				SELF.SeleID       := IF( isGoodHit, LEFT.SeleID, 0 );
 				SELF.OrgID        := IF( isGoodHit, LEFT.OrgID , 0 );
 				SELF.UltID        := IF( isGoodHit, LEFT.UltID , 0 );
+        SELF.Rep_LexID := IF(isGoodHit, LEFT.Rep_LexID, 0);
 				SELF := LEFT
 			),
 			LEFT OUTER

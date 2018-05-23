@@ -3790,10 +3790,21 @@ self.RVP804_0_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
 // output(with_RVP804_0_0, named('with_RVP804_0_0'));		
 
+RVP1702_1_0_score := Models.RVP1702_1_0(clam);
+// output(RVP1702_1_0_score, named('RVP1702_1_0_score'));
+
+with_RVP1702_1_0 := join(with_RVP804_0_0, RVP1702_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVP1702_1_0_score := right.score;
+self.RVP1702_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self := left), keep(1), left outer);
+// output(with_RVP804_0_0, named('with_RVP804_0_0'));		
+
 RVR1003_0_0_score := Models.RVR1003_0_0(clam);
-// output(RVR1003_0_0_score, named('RVR1003_0_0_score'));
-                                  
-with_RVR1003_0_0 := join(with_RVP804_0_0, RVR1003_0_0_score,
+// output(RVR1003_0_0_score, named('RVR1003_0_0_score'));  
+  
+with_RVR1003_0_0 := join(with_RVP1702_1_0, RVR1003_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVR1003_0_0_score := right.score;
@@ -5961,6 +5972,9 @@ self.RVP1605_1_0_reason1	:= if(model_environment in [1,2], left.RVP1605_1_0_reas
 
 self.RVP804_0_0_score	:= if(model_environment in [1,2], left.RVP804_0_0_score	, '');
 self.RVP804_0_0_reason1	:= if(model_environment in [1,2], left.RVP804_0_0_reason1	, '');
+
+self.RVP1702_1_0_score	:= if(model_environment in [1,2], left.RVP1702_1_0_score	, '');
+self.RVP1702_1_0_reason1	:= if(model_environment in [1,2], left.RVP1702_1_0_reason1	, '');
 
 self.RVR1003_0_0_score	:= if(model_environment in [1,2], left.RVR1003_0_0_score	, '');
 self.RVR1003_0_0_reason1	:= if(model_environment in [1,2], left.RVR1003_0_0_reason1	, '');

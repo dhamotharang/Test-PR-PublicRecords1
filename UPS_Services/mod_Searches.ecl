@@ -1,4 +1,4 @@
-﻿import autoheaderi, autostandardi, doxie, doxie_cbrs, business_header, iesp, address, UPS_Services, ut;
+﻿import autoheaderi, autostandardi,BIPV2, doxie, doxie_cbrs, iesp, address, UPS_Services, ut;
 
 
 export mod_Searches := MODULE
@@ -11,14 +11,13 @@ export mod_Searches := MODULE
 	// responses after this mod is called.  Only the fields which we are 
 	// interested in are preserved..
 
-	export layout := UPS_Services.layout_Common;
-
 	// ***** BUSINESS SEARCH ***** 
 	export BusinessSearch := MODULE
 
-		export params := mod_Params.BusinessSearch;
 		
-		shared fn_RestrictBusinessSearch(AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full in_mod, 
+		shared fn_RestrictBusinessSearch(//AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full in_mod, 
+																					dataset(BIPV2.IDfunctions.rec_SearchInput) dsInput,
+																					UPS_Services.mod_Params.BusinessSearch BizParams,
 																										BOOLEAN useName = true, 
 																										BOOLEAN useStreet = true,
 																										BOOLEAN useCity = true,
@@ -27,70 +26,77 @@ export mod_Searches := MODULE
 																										BOOLEAN usePhone = true,
 																										BOOLEAN useALL = FALSE) := FUNCTION
 
-			inName := if((useName OR useAll), in_mod.companyname, '');
+			InputRow := dsInput[1];
+			inName := if((useName OR useAll), InputRow.company_name, '');
 
 			// Bugzilla 41403
 			// we only want to run the street searches if we have a prim_range and
 			// a prim_name.  Otherwise, we could end up with overly-broad queries 
 			// such as street name + zip or street name + city + state.
-			reallyUseStreet := ((useStreet OR useAll) AND in_mod.prim_range <> '' AND in_mod.prim_name <> '');
-			inPrimRange := if(reallyUseStreet, in_mod.prim_range, '');
-			inPrimName := if(reallyUseStreet, in_mod.prim_name, '');
-			inSecRange := if(reallyUseStreet, in_mod.sec_range, '');
+			reallyUseStreet := ((useStreet OR useAll) AND InputRow.prim_range <> '' AND InputRow.prim_name <> '');
+			inPrimRange := if(reallyUseStreet, InputRow.prim_range, '');
+			inPrimName := if(reallyUseStreet, InputRow.prim_name, '');
+			inSecRange := if(reallyUseStreet, InputRow.sec_range, '');
 
-			inCity := if((useCity OR useAll), in_mod.city, '');
-			inState := if((useState OR useAll), in_mod.state, '');
-			inZip:= if((useZip OR useAll), in_mod.zip, '');
-			inPhone := if((usePhone OR useAll), in_mod.phone, '');
+			inCity := if((useCity OR useAll), InputRow.city, '');
+			inState := if((useState OR useAll), InputRow.state, '');
+			inZip:= if((useZip OR useAll), InputRow.zip5, '');
+			inPhone := if((usePhone OR useAll), InputRow.phone10, '');
 
-			search_mod := module(project(in_mod,AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))
-				export companyname := inName;
-				export phone := inPhone;
-			end;
+
+			// Format to BIP search layout
+			search_input := project(dsInput,UPS_Services.transforms.adjustSearchInput(left,false,inName,inPhone));
 
 			//this will only be used for cases with '&' or ' AND '
-			search_mod_altName := module(project(search_mod,AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))
-				export companyname := ut.mod_AmpersandTools.createAlternativeName(inName);
-			end;
+			search_input_altName := project(dsInput,UPS_Services.transforms.adjustSearchInput(left,true,inName,inPhone));
 			
-			hasStreet := in_mod.prim_range <> '' OR in_mod.prim_name <> '' OR in_mod.sec_range <> '';
+			hasStreet := InputRow.prim_range <> '' OR InputRow.prim_name <> '' OR InputRow.sec_range <> '';
 			execute := 
 				useALL OR
 				(
 					(
 						// this makes sure that every field is either populated or not in use
-						(NOT useName OR in_mod.companyname <> '') AND
+						(NOT useName OR InputRow.company_name <> '') AND
 						(NOT reallyUseStreet OR hasStreet) AND
-						(NOT useCity OR in_mod.city <> '') AND
-						(NOT useState OR in_mod.state <> '') AND
-						(NOT useZip OR in_mod.zip <> '') AND
-						(NOT usePhone OR in_mod.phone <> '')
+						(NOT useCity OR InputRow.city <> '') AND
+						(NOT useState OR InputRow.state <> '') AND
+						(NOT useZip OR InputRow.zip5 <> '') AND
+						(NOT usePhone OR InputRow.phone10 <> '')
 					)
 					AND
 					(			
 						// the bad situation is where every field NOT used is empty (because we do an extra search)
 						// so, one of the not used fields needs to have a value (or else its just a repeat of the all search)
 						// hmm, would this already be taken care of by the first half of the definition of execute if useALL didnt exist?
-						(NOT useName AND in_mod.companyname <> '') OR
+						(NOT useName AND InputRow.company_name <> '') OR
 						(NOT reallyUseStreet AND hasStreet) OR
-						(NOT useCity AND in_mod.city <> '') OR
-						(NOT useState AND in_mod.state <> '') OR
-						(NOT useZip AND in_mod.zip <> '') OR
-						(NOT usePhone AND in_mod.phone <> '')					
+						(NOT useCity AND InputRow.city <> '') OR
+						(NOT useState AND InputRow.state <> '') OR
+						(NOT useZip AND InputRow.zip5 <> '') OR
+						(NOT usePhone AND InputRow.phone10 <> '')					
 					)
 				);
 
-			bdids:= 
-			if(
-				execute, 
-				AutoHeaderI.LIBCALL_FetchI_Hdr_Biz.do(search_mod) +
-				if(
-					ut.mod_AmpersandTools.hasAmpersandOrHasAnd(inName),
-					AutoHeaderI.LIBCALL_FetchI_Hdr_Biz.do(search_mod_altName)
-				)
-			);
+  // Get links ids for the search criteria		
+	
+	in_mod2 := module(AutoStandardI.DataRestrictionI.params)  
+	  export boolean AllowAll := false;
+		export boolean AllowDPPA := false;
+		export boolean AllowGLB := false;
+		export string DataRestrictionMask := BizParams.datarestrictionmask;
+		export unsigned1 DPPAPurpose := BizParams.dppapurpose;
+		export unsigned1 GLBPurpose := BizParams.glbpurpose;
+		export boolean ignoreFares := false;
+		export boolean ignoreFidelity := false;
+		export boolean includeMinors := false;	
+	end;
+	
+	finalInput 	:= 	search_input + if(ut.mod_AmpersandTools.hasAmpersandOrHasAnd(inName),search_input_altName);
 
-			rval := DEDUP(SORT(bdids, RECORD), RECORD);
+	tmpTopResultsScoredGrouped := if(	execute,UPS_Services.fn_BIPLookup(finalInput,in_mod2));
+
+																														 
+			rval := DEDUP(SORT(tmpTopResultsScoredGrouped, RECORD), RECORD);
 			#IF(UPS_Services.Debug.debug_flag)
 				BizQueryHistoryLayout := RECORD
 					BOOLEAN Company;
@@ -122,176 +128,139 @@ export mod_Searches := MODULE
 				output(hist_ds, NAMED('BizQueryHistory'), EXTEND);
 				output(vals_ds, NAMED('BizQueryValues'), EXTEND);
 			#END
-			return DEDUP(SORT(bdids, RECORD), RECORD);
+			return DEDUP(SORT(tmpTopResultsScoredGrouped, RECORD), RECORD);
 		END;
 
-		shared weightedBDID := RECORD
-			doxie.layout_ref_bdid.bdid;
-			UNSIGNED2 weight := 1;
-		END;
+  shared RecBipRecordOut2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dataset([],BIPV2.IDfunctions.rec_SearchInput)).RecordOut2;
 
-		shared fn_WeightBDIDs(DATASET(doxie.layout_ref_bdid) recs, UNSIGNED2 weight) := FUNCTION
+	shared RecWeightedLinkID := RECORD(RecBipRecordOut2)
+			UNSIGNED2 RAweight;
+	end;
 
-			weightedBDID weightedTransform(recs L) := TRANSFORM
+	shared dataset(RecWeightedLinkID) fn_WeightLinkIds(DATASET(RecBipRecordOut2) recs, UNSIGNED2 weight) := FUNCTION
+
+			RecWeightedLinkID weightedTransform(recs L) := TRANSFORM
 				SELF := L;
-				SELF.weight := weight;
+				SELF.RAweight := weight;
 			END;
 
 			out_recs := PROJECT(recs, weightedTransform(LEFT));
 			return out_recs;
 		END;
 
-		export bdids(params in_mod) := FUNCTION
-			// Get the BDIDs
-			mb := module(project(in_mod,AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))
-				export NoFail := true; 
-				//these three to help performance
-				export score_results := false;		// we will do our own penalizing
-				export use_word_search := false;	//we do our own word search
-				export use_exec_search := false;  //this is for business contacts, which we dont need since we also do a person search
-				export state := 
-				if(
-					in_mod.state <> '', 	//if state is given, use it
-					in_mod.state,
-					if(in_mod.city <> '',	//if state empty and city given, guess the state.
-					address.Key_CityStChance(in_mod.state = '' and keyed(city_name = in_mod.city) and percent_chance > 50)[1].st, //no reason not to guess, but > 50 makes me deterministic
-					in_mod.state //blank
+		shared LinkIds(dataset(BIPV2.IDfunctions.rec_SearchInput) dsInput,
+										UPS_Services.mod_Params.BusinessSearch BizParams) := FUNCTION
+											
+			// Get the LinkIds
+			mInput := project(dsInput,transform(BIPV2.IDfunctions.rec_SearchInput,
+					self.state := if(
+					left.state <> '', 	//if state is given, use it
+					left.state,
+					if(left.city <> '',	//if state empty and city given, guess the state.
+					address.Key_CityStChance(left.state = '' and keyed(city_name = left.city) and percent_chance > 50)[1].st, //no reason not to guess, but > 50 makes me deterministic
+					left.state //blank
 					)
 				);
-			end;
+					self.allow7digitmatch := false;
+					self := left));
+					
+			// Query BIP in various ways and weight the results.
+			linkID_all := fn_RestrictBusinessSearch(mInput,BizParams, true, true, true, true, true, true, TRUE);
+			wt_all := fn_WeightLinkIds(linkID_all, 15);
 
-			bdid_all := fn_RestrictBusinessSearch(mb, true, true, true, true, true, true, TRUE);
-			wt_all := fn_WeightBDIDs(bdid_all, 15);
+			linkID_street_city_state_zip := fn_RestrictBusinessSearch(mInput,BizParams, false, true, true, true, true, false);
+			wt_street_city_state_zip := fn_WeightLinkIDs(linkID_street_city_state_zip, 3);
 
-			bdid_street_city_state_zip := fn_RestrictBusinessSearch(mb, false, true, true, true, true, false);
-			wt_street_city_state_zip := fn_WeightBDIDs(bdid_street_city_state_zip, 3);
+			linkID_name_city_state_zip := fn_RestrictBusinessSearch(mInput, BizParams, true, false, true, true, true, false);
+			wt_linkID_name_city_state_zip := fn_WeightLinkIDs(linkID_name_city_state_zip, 1);
+			
+			linkID_name_zip_fuzzy := fn_RestrictBusinessSearch(mInput, BizParams, true, false, false, false, true, false); 
+			wt_name_zip_fuzzy := project(
+   				linkID_name_zip_fuzzy, 
+   				transform(
+   					RecWeightedLinkID,
+   					self.RAweight := 
+   						if(left.match_zip >0,left.match_zip,0)
+   						+ if(left.is_FullMatch,2,0)
+   						+ if(left.match_company_name > 0	or 
+							     left.match_company_name_prefix > 0 or 	
+									  left.match_cnp_name > 0,1,0),
+   					self := left
+   				)
+   			);;
+			
+			linkID_phone := fn_RestrictBusinessSearch(mInput, BizParams, false, false, false, false, false, true);
+			wt_phone := fn_WeightLinkIDs(linkID_phone, 7);
 
-			bdid_name_city_state_zip := fn_RestrictBusinessSearch(mb, true, false, true, true, true, false);
-			wt_bdid_name_city_state_zip := fn_WeightBDIDs(bdid_name_city_state_zip, 1);
-
-			bdid_name_zip_metaphone := AutoHeaderI.FetchI_Hdr_Biz_Metaphone().records(project(mb,AutoHeaderI.FetchI_Hdr_Biz_Metaphone().params, opt));
-			wt_name_zip_metaphone := 
-			project(
-				bdid_name_zip_metaphone, 
-				transform(
-					weightedBDID,
-					self.weight := 
-						if(left.matched_zip_or_city,2,0)
-						+ if(left.matched_full_input,2,0)
-						+ if(left.num_individual_input_words_matched > 0,1,0),
-					self := left
-				)
-			);;
-
-			bdid_phone := fn_RestrictBusinessSearch(mb, false, false, false, false, false, true);
-			wt_phone := fn_WeightBDIDs(bdid_phone, 7);
-
-			combined_bdids := wt_all + 
+			combined_linkIDs := wt_all + 
 												wt_street_city_state_zip +
-												wt_name_zip_metaphone + wt_phone +
-												wt_bdid_name_city_state_zip;
+												wt_name_zip_fuzzy +   
+												wt_phone +
+												wt_linkID_name_city_state_zip;
 
-			grouped_bdids := GROUP(SORT(combined_bdids, bdid), bdid);
-
-			bdidWeights := RECORD
-				combined_bdids.bdid;
-				UNSIGNED4 weight := SUM(GROUP, combined_bdids.weight);
+			grouped_linkIDs := GROUP(SORT(combined_linkIDs, UltID , OrgID ,SELEID ,ProxID), UltID , OrgID ,SELEID ,ProxID);
+			clinkids := project(combined_linkIDs,transform(RecBipRecordOut2, self := left , self :=[]));
+			linkIDWeights := RECORD
+				combined_linkIDs ;
+				UNSIGNED4 SumRAweight := SUM(GROUP,combined_linkIDs.RAweight);
 			END;
 
-			scored_bdids := TABLE(grouped_bdids, bdidWeights);
-			sorted_bdids := SORT(scored_bdids, -weight, -bdid);
+			scored_linkIDs := TABLE(grouped_linkIDs, linkIDWeights);
+			sorted_linkIDs := SORT(scored_linkIDs, /*-RAweight*/ SumRAweight, ultid, orgid, seleid, proxid,-proxweight);
 
-			max_bdids := 150;  // TODO - should be based on MaxResults!
-			num_bdids := COUNT(sorted_bdids);
-			ref_bdid := if (num_bdids > max_bdids, max_bdids, num_bdids);
-			target_score := sorted_bdids[ref_bdid].weight;
-			target_bdids := IF(num_bdids <= max_bdids, sorted_bdids, sorted_bdids(weight > target_score));
+			max_linkIDs := 150;  // TODO - should be based on MaxResults!
+			num_linkIDs := COUNT(sorted_linkIDs);
+			ref_linkID := if (num_linkIDs > max_linkIDs, max_linkIDs, num_linkIDs);
+			target_score := sorted_linkIDs[ref_linkID].SumRAweight;
+			target_linkIDs := IF(num_linkIDs <= max_linkIDs, sorted_linkIDs, sorted_linkIDs(SumRAweight > target_score));
 
-			// bdids := IF(EXISTS(target_bdids),
-										// PROJECT(target_bdids, doxie.layout_ref_bdid),
-										// PROJECT(CHOOSEN(sorted_bdids, max_bdids), doxie.layout_ref_bdid));
-
-			bdids := PROJECT(MAP(num_bdids <= max_bdids => sorted_bdids,
-											 COUNT(target_bdids) > (0.5 * max_bdids) => target_bdids,
-											 CHOOSEN(sorted_bdids, max_bdids)), doxie.layout_ref_bdid);
+			linkIDs := PROJECT(MAP(num_linkIDs <= max_linkIDs => sorted_linkIDs,
+											 COUNT(target_linkIDs) > (0.5 * max_linkIDs) => target_linkIDs,
+											 CHOOSEN(sorted_linkIDs, max_linkIDs)), RecBipRecordOut2);
 
 			#IF(UPS_Services.Debug.debug_flag)
-			output(wt_all, NAMED('bdid_wt_all'));
-			output(wt_street_city_state, NAMED('bdid_city_state'));
-			output(wt_street_zip, NAMED('bdid_street_zip'));
-			output(wt_name_street_city_state, NAMED('bdid_last_street_city_state'));
-			output(wt_name_street_zip, NAMED('bdid_last_street_zip'));
-			output(wt_name_city_state, NAMED('bdid_last_city_state'));
-			output(wt_name_zip, NAMED('bdid_last_zip'));
-			output(wt_bdid_name_city_state_zip, NAMED('bdid_name_city_state_zip'));
-			output(wt_phone, NAMED('bdid_phone'));
-			output(wt_name_zip_metaphone, NAMED('bdid_name_zip_metaphone'));
-			output(count(bdids), NAMED('numBDIDs'));
-			output(bdids, NAMED('BDIDs'));
+			output(wt_all, NAMED('linkID_wt_all'));
+			output(count(linkIDs), NAMED('numlinkIDs'));
+			output(linkIDs, NAMED('linkIDs'));
 			#END
 
-			return bdids;
+			return linkIDs;
 		END;
 
-		export records(params in_mod) := FUNCTION
-				
-			bset := bdids(in_mod);
-			useBDIDs := 
+		export records(UPS_Services.SearchParams SearchParams,
+										 UPS_Services.mod_Params.BusinessSearch BizParams) := FUNCTION
+			
+			dsInput := dataset([UPS_Services.transforms.ConstructBipInput(SearchParams)]);
+			
+			bset := linkIDs(dsInput,BizParams);
+			uselinkIDs := 
 			MAP(
-				exists(bset) 
-					=> bset, 
-				UPS_Services.Constants.DO_SECOND_SEARCH 
-					=> mod_SecondSearch.Business(in_mod).records,
-					DATASET([], doxie.layout_ref_bdid)
+				exists(bset) => bset, 
+				UPS_Services.Constants.DO_SECOND_SEARCH => mod_SecondSearch.Business(SearchParams, BizParams).records,
+					DATASET([], RecBipRecordOut2)
 			);
 
 			//Get the biz records
-			biz_allphones := doxie_cbrs.fn_getBaseRecs(project(useBDIDs, doxie_cbrs.layout_references), in_use_supergroup := FALSE, append_goup_id := FALSE);
+			 biz_allphones :=  uselinkIDs;
 
 			//Get the best biz phone
-			best_biz_phone := Business_Header.BestPhone(
-				project(
-					ungroup(biz_allphones), 
-					transform(
-						business_header.Layout_Business_Header_Base,
-						self.zip := (integer)left.zip,
-						self.zip4 := (integer)left.zip4,
-						self.phone := (integer)left.phone,
-						self.fein := (integer)left.fein,
-						self.match_company_name := '',
-						self.match_branch_unit := '',		
-						self := left
-					)
-				)
-			);
-
+			best_biz_phone := biz_allphones;
+			
 			//Put the best phone onto the biz record
-			biz := 
-			join(
-				biz_allphones,
-				best_biz_phone,
-				left.bdid = right.bdid,
-				transform(
-					recordof(biz_allphones),
-					self.phone := if(right.phone = 0, '', (string)right.phone),
-					self := left
-				),
-				keep(1),
-				left outer
-			);
+			biz := best_biz_phone;
 
 			// convert biz records to output layout
-			layout bizToLayoutTransform(biz L) := TRANSFORM
-				SELF.rollup_key := L.bdid;
-				SELF.rollup_key_type := UPS_Services.Constants.TAG_ROLLUP_KEY_BDID;
+			UPS_Services.layout_Common bizToLayoutTransform(biz L) := TRANSFORM
+				SELF.rollup_key := L.PowID;
+				SELF.rollup_key_type := UPS_Services.Constants.TAG_ROLLUP_KEY_LINKID;
 				SELF.dt_last_seen := (INTEGER) L.dt_last_seen;
-				SELF.dt_first_seen := 0;
+				SELF.dt_first_seen := (INTEGER) L.dt_first_seen;
 				SELF.fname := '';
 				SELF.mname := '';
 				SELF.lname := '';
 				SELF.name_suffix := '';
 				SELF.company_name := L.company_name;
-				SELF.phone := L.phone;				
+				SELF.phone := L.company_phone;				
 				SELF.prim_range := L.prim_range;
 				SELF.predir := L.predir;
 				SELF.prim_name := L.prim_name;
@@ -300,7 +269,7 @@ export mod_Searches := MODULE
 				SELF.unit_desig := L.unit_desig;
 				SELF.sec_range := L.sec_range;
 				SELF.city_name := L.city;
-				SELF.state := L.state;
+				SELF.state := L.st;
 				SELF.zip := L.zip;
 				SELF.postalcode := '';
 				SELF.zip4 := L.zip4;
@@ -310,15 +279,16 @@ export mod_Searches := MODULE
 				// SELF.score_addrStreet := 0;
 				// SELF.score_addrCityStZip := 0;
 				SELF.score_phone := 0;	
-				SELF.listing_type := '';   // Used only in canadian data to determine if business/individual 
+				SELF.listing_type := ''; // Used only for canadian data to determine if business/individual 
 				SELF.history_flag := '';   // Used only in canadian data
 			END;
 
-			resp := CHOOSEN(PROJECT(SORT(biz,bdid,rcid), bizToLayoutTransform(LEFT)), Constant.MAX_SEARCH_RECORDS);//now deterministic
+			resp := CHOOSEN(PROJECT(SORT(biz,ultid, orgid, seleid, proxid,PowID), bizToLayoutTransform(LEFT)), Constant.MAX_SEARCH_RECORDS);//now deterministic
 
 			#IF(UPS_Services.Debug.debug_flag)
 			output(resp, NAMED('business_recs'));
 			output(count(resp), NAMED('num_business_recs'));
+			output(dsInput, NAMED('dsInput'));
 			#END
 			return resp;
 		END;  // records() function
@@ -328,12 +298,13 @@ export mod_Searches := MODULE
 	// ***** PERSON SEARCH ***** 
 	export PersonSearch := MODULE
 
-		export params := mod_Params.PersonSearch;
+		shared params := mod_Params.PersonSearch;
 		shared max_dids := 100;  // TODO - this should be based on MaxResults!
 
 
 		export records(params in_mod) := FUNCTION
-
+			
+			
 			dppaVal := AIT.DPPA_Purpose.val(project(in_mod, AIT.DPPA_Purpose.params));
 			glbVal := AIT.GLB_Purpose.val(project(in_mod, AIT.GLB_Purpose.params));
 			industryClass := AIT.industry_class_val.val(project(in_mod,AIT.industry_class_val.params));
@@ -380,6 +351,7 @@ export mod_Searches := MODULE
 																	 false,  /* ApplyBpsFilter */
 																	 EXISTS(dids)).mod_Daily(dids); /* GongByDidOnly */
 
+
 			// might need this for a call to autoheaderi fetch
 			AHI_mod := module (project (in_mod, AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt))
 				export addr := address.Addr1FromComponents(in_mod.prim_range, in_mod.predir, in_mod.prim_name, in_mod.suffix, in_mod.postdir, /*unitdesig*/'', in_mod.sec_range) ;
@@ -411,13 +383,14 @@ export mod_Searches := MODULE
 			// returned by HeaderRecordLookup forces it to be run sequentially.  The
 			// parallel/sequential behavior may be toggled by the line uncommented below.
 
-			gong_recs := GongAndDailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
+			daily_recs := GongAndDailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
 			// gong_recs := GongAndDailyLookup(dids).records;        // executed sequentially (after mod_PM)
 
-			ind := hdr_recs + gong_recs;
-
+			
+			ind := hdr_recs + daily_recs ;//+ WFPV8_recs;
+					
 			// convert records to output layout
-			layout indToLayoutTransform(ind L) := TRANSFORM
+			UPS_Services.layout_Common indToLayoutTransform(ind L) := TRANSFORM
 				SELF.rollup_key := if (L.did <> 0, L.did, L.rid);
 				SELF.rollup_key_type := if (L.did <> 0, UPS_Services.Constants.TAG_ROLLUP_KEY_DID, UPS_Services.Constants.TAG_ROLLUP_KEY_RID);
 
@@ -454,11 +427,9 @@ export mod_Searches := MODULE
 				SELF.history_flag := ''; // Used only for canadian data
 			END;
 
-			resp := CHOOSEN(PROJECT(SORT(ind,did,rid), indToLayoutTransform(LEFT)), //now deterministic
+			resp := CHOOSEN(PROJECT(SORT(ind,did,rid,phone<>''), indToLayoutTransform(LEFT)), //now deterministic
 											Constant.MAX_SEARCH_RECORDS);
 			#if(UPS_Services.Debug.debug_flag)
-			// output(std_dids, NAMED('ind_std_dids'));
-			// output(par_dids, NAMED('ind_par_dids'));
 			output(resp, NAMED('ind_hdr'));
 			#end
 			return resp;

@@ -1,4 +1,4 @@
-import iesp, Address;
+﻿import iesp, Address, Std;
 
 // Given an input name (actually, a t_RightAddressSearchBy block), make sense
 // of the values given.
@@ -45,14 +45,14 @@ export mod_Names(iesp.rightaddress.t_RightAddressSearchBy inName) := MODULE
 	export STRING FixRedirect(STRING s) := TRIM(RegexReplace(ln_regex, s, ''), left, right);
 
 	// Last name cleaning removes ATTN:* and *C/O:
-	SHARED inLastNameOrCompany := TRIM(inName.LastNameOrCompany);
+	SHARED inLastNameOrCompany := std.str.toUpperCase(TRIM(inName.LastNameOrCompany));
 	// SHARED fixedLastNameOrCompany := FixRedirect(inLastNameOrCompany);
 
 	SHARED inUnparsedFullName := TRIM(inName.Name.Full);
-	SHARED inLastName := TRIM(inLastNameOrCompany);
+	SHARED inLastName := inLastNameOrCompany;
 	SHARED inFirstName := TRIM(inName.Name.First);
 	SHARED inMiddleName := TRIM(inName.Name.Middle);
-	SHARED inCompanyName := TRIM(inLastnameOrCompany);
+	SHARED inCompanyName := inLastnameOrCompany;
 
 	BOOLEAN hasFirst := inFirstName <> '';
 	BOOLEAN hasMiddle := inMiddleName <> '';

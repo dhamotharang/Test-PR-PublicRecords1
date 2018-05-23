@@ -28,7 +28,10 @@ EXPORT ReportServiceFCRA := MACRO
 	ds_input_recs := ConsumerCreditReport_Services.Functions.format_InputRec(ds_xml);
 
 	ds_records := ConsumerCreditReport_Services.Records(ds_input_recs,in_mod,TRUE);
-	ds_results := PROJECT(ds_records,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse,SELF:=LEFT));
+	ds_results := PROJECT(ds_records,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse,
+	                      SELF.Consumer := FFD.Constants.BlankConsumerRec,
+                        SELF:=LEFT));
+												
 	ds_royalties := Royalty.RoyaltyCCR.GetOnlineRoyalties(ds_records);
 
 	OUTPUT(ds_results,NAMED('Results'));

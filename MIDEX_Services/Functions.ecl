@@ -6,6 +6,62 @@
 EXPORT Functions := 
   MODULE
   
+    EXPORT getPenalty(MIDEX_Services.Iparam.searchrecords in_mod) :=
+      FUNCTION
+        // Because Midex is a derogitory database, the penalty needs to be a little 
+        // looser than with a typical service due to compliance regulations to NOT
+        // miss a company/person that may be trying a allude being found.
+        //   This funciton was created for Midex 2.0 and sets the penalty threshold based 
+        // on whether or not the user entered only one or more than on search field.
+        //   The penalty for a single search term has been set/defined by the customer's 
+        // compliance needs. Currently US Bank and Chase.
+        //   When there is more than one search field entered, the penalty is cumulative
+        // and must be less than 15 to be output.
+        // NOTE: Any piece (or all three pieces) of a persons name is considered 1 search field
+        // The same is true for the address
+        
+        nameSearchedCalc := 
+          AutoStandardI.InterfaceTranslator.fname_value.val(in_mod) != '' OR  
+          AutoStandardI.InterfaceTranslator.mname_value.val(in_mod) != '' OR
+          AutoStandardI.InterfaceTranslator.lname_value.val(in_mod) != '';
+
+        addrSearchedCalc := 
+          AutoStandardI.InterfaceTranslator.prange_value.val(in_mod)      != '' OR
+          AutoStandardI.InterfaceTranslator.predir_value.val(in_mod)      != '' OR
+          AutoStandardI.InterfaceTranslator.pname_value.val(in_mod)       != '' OR
+          AutoStandardI.InterfaceTranslator.postdir_value.val(in_mod)     != '' OR
+          AutoStandardI.InterfaceTranslator.addr_suffix_value.val(in_mod) != '' OR
+          AutoStandardI.InterfaceTranslator.sec_range_value.val(in_mod)   != '' OR
+          AutoStandardI.InterfaceTranslator.city_value.val(in_mod)        != '' OR
+          AutoStandardI.InterfaceTranslator.state_value.val(in_mod)       != '' OR
+          AutoStandardI.InterfaceTranslator.zip_value_cleaned.val(in_mod) != '';
+
+        // fields that are used in the penalization process (ie: phone and license state are searchable
+        // input fields, but because they are eiither sparcely populated or potentially inaccurate they 
+        // do not contribute to the penalty 
+        addrSearched        := (UNSIGNED)addrSearchedCalc;
+        compNameSearched    := IF(AutoStandardI.InterfaceTranslator.company_name_value.val(in_mod) != '',1,0);
+        didSearched         := IF(in_mod.did != '',1,0);
+        licSeached          := IF(TRIM(StringLib.StringToUpperCase(in_mod.license_number)) != '',1,0);
+        MidexRptNbrSearched := IF(in_mod.midex_rpt_num != '',1,0);
+        nameSearched        := (UNSIGNED)nameSearchedCalc;
+        nmlsIdSearched      := IF(in_mod.nmls_id != '',1,0);
+        ssnSearched         := IF(in_mod.ssn != '',1,0);
+        ssnLast4Searched    := IF(in_mod.ssn_last4 != '',1,0);
+        tinSearched         := IF(in_mod.tin != '',1,0); 
+        
+        NumPenalizedInputFields := addrSearched + compNameSearched + didSearched + licSeached + MidexRptNbrSearched + 
+                                   nameSearched + nmlsIdSearched + ssnSearched + ssnLast4Searched + tinSearched; 
+
+        searchPenalty := 
+          IF(NumPenalizedInputFields = 1,
+             MIDEX_Services.Constants.PENALTY_SINGLE_INPUT_SEARCH,
+             MIDEX_Services.Constants.PENALTYTHRESHOLD);
+
+        RETURN searchPenalty;
+      END;
+
+
     // Function to check if the results had changes for the same input criteria since the last time run
     SHARED BOOLEAN IsResultsChanged(DATASET(Midex_Services.Layouts.hash_layout) dInHashes,
                                     DATASET(Midex_Services.Layouts.hash_layout) dSearchResultsHashes,
@@ -141,8 +197,8 @@ EXPORT Functions :=
    
    
    // Format License Search result into iesp layout.
-   EXPORT iesp.midexlicensesearch.t_MIDEXLicenseSearchResponse Format_licenseSearch_iesp(DATASET(Layouts.license_srch_layout) recs,
-																																						             DATASET(Layouts.hash_layout) Alerthashes,
+   EXPORT iesp.midexlicensesearch.t_MIDEXLicenseSearchResponse Format_licenseSearch_iesp(DATASET(MIDEX_Services.Layouts.license_srch_layout) recs,
+																																						             DATASET(MIDEX_Services.Layouts.hash_layout) Alerthashes,
                                                                                          Midex_Services.Iparam.searchrecords inMod) := FUNCTION
                       
 			records := PROJECT(recs,TRANSFORM(iesp.midexlicensesearch.t_MIDEXLicenseSearchRecord,
@@ -178,7 +234,7 @@ EXPORT Functions :=
                               TRANSFORM(iesp.midex_share.t_AlertHash,
                                     SELF.HashValue := (STRING) LEFT.all_hash)),
           SELF.AlertVersion  := IF(inMod.EnableAlert,Midex_Services.Constants.AlertVersion.Current,Midex_Services.Constants.AlertVersion.None);
-          SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,Alerthashes,inMod.alertVersion);
+          SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,CHOOSEN(Alerthashes,numRecsRequested,starting_record),inMod.alertVersion);
 				END;
         
 			iesp.midexlicensesearch.t_MIDEXLicenseSearchResponse format() := 
@@ -197,7 +253,7 @@ EXPORT Functions :=
 			RETURN results;
 		END;
 	  
-		SHARED iesp.midex_share.t_MIDEXLicenseInfoEx Format_licenseRec_iesp(Layouts.LicenseInfo_Layout L) := TRANSFORM
+		SHARED iesp.midex_share.t_MIDEXLicenseInfoEx Format_licenseRec_iesp(MIDEX_Services.Layouts.LicenseInfo_Layout L) := TRANSFORM
 				SELF._TYPE 			    := L.lic_type;
 				SELF.Number 		    := L.lic_number;
 				SELF.Status 		    := L.lic_status;
@@ -349,7 +405,7 @@ EXPORT Functions :=
                                                          rw_inDataset.DateFirstSeen,
                                                          rw_inDataset.DateLastSeen ); 
             SELF.License      := fn_SetLicenseInfo( rw_inDataset.licensenumber, rw_inDataset.licensetype, rw_inDataset.licenseissuestate, '', '', rw_inDataset.isLicenseCurrent);                                          
-            SELF.NMLSs        := PROJECT(rw_inDataset.nmlsInfo,iesp.midex_share.t_NMLSInfo);
+            SELF.NMLSs        := PROJECT(CHOOSEN(DEDUP(SORT(rw_inDataset.nmlsInfo,nmlsid),nmlsid),iesp.Constants.MIDEX.MAX_COUNT_SEARCH_NMLS),iesp.midex_share.t_NMLSInfo);
             SELF.AKAs         := IF( rw_inDataset.companyAKA != '',
                                      rw_inDataset.akas +
                                      DATASET([{'', '', '', '', '', '', rw_inDataset.companyAKA}],iesp.share.t_NameAndCompany ),
@@ -375,7 +431,7 @@ EXPORT Functions :=
 																			 TRANSFORM(iesp.midex_share.t_AlertHash,
 																								SELF.HashValue := (STRING) LEFT.all_hash));
 					SELF.AlertVersion  := IF(inMod.EnableAlert,Midex_Services.Constants.AlertVersion.Current,Midex_Services.Constants.AlertVersion.None);
-					SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,Alerthashes,inMod.alertVersion);
+					SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,CHOOSEN(Alerthashes,numRecsRequested, starting_record),inMod.alertVersion);
 			END;	
 			
 			iesp.midexrecordsearch.t_MIDEXRecordSearchResponse format() := TRANSFORM
@@ -420,13 +476,13 @@ EXPORT Functions :=
                    TRANSFORM( iesp.midexcompreport.t_MIDEXCompReportResponse,
                               SELF._Header                                        := iesp.ECL2ESP.GetHeaderRow(),
                               SELF.RecordCount                                    := IF(EXISTS(ds_inMidexCompResults.PublicRecords) OR
-																																																																																								EXISTS(ds_inMidexCompResults.NonPublicRecords) OR
-																																																																																								EXISTS(ds_inMidexCompResults[1].NonPublicExRecords) OR
-																																																																																								EXISTS(ds_inMidexCompResults.Licenses)OR
-																																																																																								ds_inMidexCompResults[1].BusinessSmartLinxRecord.BestInformation.BusinessId[1]<>'' OR
-																																																																																								ds_inMidexCompResults[1].PersonSmartLinxRecord.UniqueId[1]<>'' OR
-																																																																																								ds_inMidexCompResults[1].TopBusinessRecord.BestSection.BusinessIds.SeleID[1] <> '0',
-																																																																																							1,0),
+                                                                                        EXISTS(ds_inMidexCompResults.NonPublicRecords) OR
+                                                                                        EXISTS(ds_inMidexCompResults[1].NonPublicExRecords) OR
+                                                                                        EXISTS(ds_inMidexCompResults.Licenses)OR
+                                                                                        ds_inMidexCompResults[1].BusinessSmartLinxRecord.BestInformation.BusinessId[1]<>'' OR
+                                                                                        ds_inMidexCompResults[1].PersonSmartLinxRecord.UniqueId[1]<>'' OR
+                                                                                        ds_inMidexCompResults[1].TopBusinessRecord.BestSection.BusinessIds.SeleID[1] <> '0',
+                                                                                      1,0),
                               SELF.Records                                        := ds_inMidexCompResults,
                               SELF.AlertResult.RecordDeleted                      := ds_hashVals.deleted,
                               SELF.AlertResult.AlertVersion                       := pAlertVersion,

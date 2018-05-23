@@ -265,7 +265,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	notFoundInHeader := JOIN(addUniquePows, busHeaderFilt,
 														#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-														TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, BOOLEAN notFound},
+														TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, BOOLEAN notFound},
 																			SELF.seq := LEFT.seq;
 																			SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																			SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;

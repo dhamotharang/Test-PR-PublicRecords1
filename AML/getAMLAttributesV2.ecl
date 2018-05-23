@@ -1,4 +1,4 @@
-
+﻿
 import Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway, ut, Address;
 
 EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep, 
@@ -8,7 +8,7 @@ EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep,
                                             DATASET (Gateway.Layouts.Config) gateways , 
 																						integer bsversion = 50,
 																						string50 DataPermission,
-																						string UseXG5Flag = '3',
+																						string UseXG5Flag = '2',
 																						boolean IncludeNews = TRUE) := FUNCTION
 																						 
 
@@ -52,7 +52,6 @@ EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep,
 	
   UseXG5 := Map(UseXG5Flag = '1' 									=> '1',
 								~IncludeNews								  		=> '0',
-								UseXG5Flag = '3' and IncludeNews	=> '3',
 								UseXG5Flag = '2' and IncludeNews 	=> '2',							
 																									'0'); 
 	

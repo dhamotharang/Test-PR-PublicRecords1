@@ -1,4 +1,4 @@
-EXPORT Macros := 
+﻿EXPORT Macros := 
   MODULE
     
     EXPORT fnMac_penalize_results( ds_recs_in, in_mod, transformLayout, 
@@ -14,46 +14,9 @@ EXPORT Macros :=
                                 
       FUNCTIONMACRO
         IMPORT ut, AutoStandardI;
-        // The following code can be used to further rank the records by including 
-        // sub-penalties in the sort process at the end of the macro.
-        // transformLayoutPlusPenaltFields := 
-          // RECORD
-            // transformLayout,
-            // UNSIGNED didPenalt;
-            // UNSIGNED minPenalt;
-            // UNSIGNED compNamepenalt;
-            // UNSIGNED licPenalt;
-            // UNSIGNED addrPenalt;
-            // UNSIGNED namePenalt;
-            // UNSIGNED phonePenalt;
-            // UNSIGNED ssnPenalt;
-            // UNSIGNED midexRptNumPenalt;
-            // UNSIGNED tinPenalt;  
-            // UNSIGNED cumPenalty;
-            // UNSIGNED dobpenalt;
-            // STRING26  midexNbr;
-            // STRING26  inModfirstname;  
-            // STRING26  inModmiddlename;
-            // STRING26  inModlastname;
-          // END; // transformLayoutPlusPenaltFields for sorting dataset to product reqs after penalization
        	
-        
-        b_nameSearched := AutoStandardI.InterfaceTranslator.fname_value.val(in_mod) != '' OR  
-                          AutoStandardI.InterfaceTranslator.mname_value.val(in_mod) != '' OR
-                          AutoStandardI.InterfaceTranslator.lname_value.val(in_mod) != ''; 
-                          
-        b_addrSearched := AutoStandardI.InterfaceTranslator.prange_value.val(in_mod)      != '' OR
-                          AutoStandardI.InterfaceTranslator.predir_value.val(in_mod)      != '' OR
-                          AutoStandardI.InterfaceTranslator.pname_value.val(in_mod)       != '' OR
-                          AutoStandardI.InterfaceTranslator.postdir_value.val(in_mod)     != '' OR
-                          AutoStandardI.InterfaceTranslator.addr_suffix_value.val(in_mod) != '' OR
-                          AutoStandardI.InterfaceTranslator.sec_range_value.val(in_mod)   != '' OR
-                          AutoStandardI.InterfaceTranslator.city_value.val(in_mod)        != '' OR
-                          AutoStandardI.InterfaceTranslator.state_value.val(in_mod)       != '' OR
-                          AutoStandardI.InterfaceTranslator.zip_value_cleaned.val(in_mod) != '';                 
-                          
         // Calculate the penalty on the records
-        ds_recs_plus_pen := PROJECT(ds_recs_in,TRANSFORM(transformLayout,
+        ds_recs_plus_pen := PROJECT(ds_recs_in,TRANSFORM(transformLayout,   
           IPersonName := PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_Indv_Name.FULL, OPT);
        
           mod_personName := 
@@ -65,7 +28,6 @@ EXPORT Macros :=
              EXPORT fname_field    := LEFT.firstname_layoutName;
              EXPORT mname_field    := LEFT.middlename_layoutName;          // middle names are not input fields
              EXPORT lname_field    := LEFT.lastname_layoutName;						
-              // Booleans to control behavior.
              EXPORT allow_wildcard := FALSE;
            END;  // mod_personname	
           
@@ -100,166 +62,45 @@ EXPORT Macros :=
             EXPORT useGlobalScope := FALSE;
           END;
         
-        // for the penalties calculated in this macro, using 30 as a default value when a
-        // search value entered does not match the record value. This will include the value 
-        // for the cumulative penalty, but not eliminate the record from the search (unless
-        // there is no min penalty that falls within the range).
-        addrPenalt_raw    := ut.mod_penalize.address( in_addr, match_addr );
-        // because the address penalty has extremely large penalties (ie: 3427 ), the address
-        // penalty skews the penalty sorting.  4000 seems like the cap, using the following equation 
-        // to reduce the address penalty to it's equivalent ratio up to 30. In the event the address
-        // penalty comes back greater than 30, we'll revert the value to 30. The following equation 
-        // should take care of the majority of the cases.
-        // addrPenalt_temp   := IF(addrPenalt_raw < 30, 
-                                 // addrPenalt_raw, 
-                                 // (addrPenalt_raw * 30 ) / 4000;
-        addrPenalt        := MAP( addrPenalt_raw < 31        => addrPenalt_raw, 
-        
-                                  addrPenalt_raw > 30 AND 
-                                  addrPenalt_raw < 1001      => 33,
-                                  
-                                  addrPenalt_raw > 1000 AND
-                                  addrPenalt_raw < 2001      => 35,
-                                  
-                                  addrPenalt_raw > 2000 AND
-                                  addrPenalt_raw < 3001      => 38,
-                                  
-                                  addrPenalt_raw > 3000 AND
-                                  addrPenalt_raw < 4001      => 40,
-                                  
-                                                                50
-                               );
-        
-        compNamePenalt    := IF( in_mod.companyname != '', ut.mod_penalize.company_name ( AutoStandardI.InterfaceTranslator.company_name_value.val(in_mod), LEFT.cname_layoutName ), 99);
+        addrPenalt := ut.mod_penalize.address( in_addr, match_addr );
+        compNamePenalt := ut.mod_penalize.company_name(AutoStandardI.InterfaceTranslator.company_name_value.val(in_mod),LEFT.cname_layoutName);
+        ssnPenalt := ut.mod_penalize.ssn(AutoStandardI.InterfaceTranslator.ssn_value.val(in_mod), LEFT.ssn_layoutName);
+        namePenalt := AutoStandardI.LIBCALL_PenaltyI_Indv_name.val(mod_personName);
 
-        didPenalt         := MAP( in_mod.did != '' AND in_mod.did = (STRING)LEFT.uniqueID_layoutName  => 0, 
-                                  in_mod.did != '' AND in_mod.did != (STRING)LEFT.uniqueID_layoutName => 30,
-                                         /* default */                                                   99);
+        didPenalt := MAP(in_mod.did = ''                               => 0,
+                         in_mod.did = (STRING)LEFT.uniqueID_layoutName => 0, 
+                         /* default */                                   99);
          
-				nmlsIDPenalt      := MAP( in_mod.nmls_id != '' AND in_mod.nmls_id = (STRING)LEFT.nmlsID_layoutName  => 0, 
-                                  in_mod.nmls_id != '' AND in_mod.nmls_id != (STRING)LEFT.nmlsID_layoutName => 30,
-																				/* default */                                                         99);
+				nmlsIDPenalt := MAP(in_mod.nmls_id = ''                              => 0, 
+                            in_mod.nmls_id = (STRING)LEFT.nmlsID_layoutName  => 0, 
+                            /* default */                                      99);
 																				 
 				license_number := TRIM(StringLib.StringToUpperCase(in_mod.license_number));
-				license_state  := TRIM(StringLib.StringToUpperCase(in_mod.license_state));
-
-        licPenalt         := MAP(  license_number != '' AND 
-                                   LEFT.licenseNumber_layoutName = license_number AND 
-                                   LEFT.licenseState_layoutName = license_state             => 0, 
-                                  
-                                   license_number != '' AND 
-                                   LEFT.licenseNumber_layoutName = license_number AND 
-                                   ( license_state = '' OR 
-                                     LEFT.licenseState_layoutName = '' )                           => 5,
-                                  
-                                   license_number != '' AND
-                                   license_state != '' AND
-                                   LEFT.licenseNumber_layoutName = license_number AND
-                                   LEFT.licenseState_layoutName != license_state             => 9, /* making this nine so that any other discrepancies in the record will push the record over the penalty threshold */
-                                  
-                                   license_number != '' AND
-                                   LEFT.licenseNumber_layoutName != license_number => 30,
-                                     /* default - in_mod.license_number = ''*/                          99 );
+				licPenalt := MAP(license_number = ''                            => 0, 
+                         LEFT.licenseNumber_layoutName = license_number => 0, 
+                         /* default */                                    99);
         
-       midexRptNumPenalt := MAP( in_mod.midex_rpt_num != '' AND 
-                                  LEFT.midex_rpt_nbr_layoutName = in_mod.midex_rpt_num     => 0,
-                                  
-                                  in_mod.midex_rpt_num != '' AND 
-                                  LEFT.midex_rpt_nbr_layoutName != in_mod.midex_rpt_num    => 30,
-                                     /* default - in_mod.midex_rpt_num = ''*/                 99 );
+        midexRptNumPenalt := MAP(in_mod.midex_rpt_num = ''                            => 0,
+                                 LEFT.midex_rpt_nbr_layoutName = in_mod.midex_rpt_num => 0,
+                                 /* default */                                          99);
                                      
-        namePenalt        := IF( AutoStandardI.InterfaceTranslator.lname_value.val(in_mod) != '',
-                                 AutoStandardI.LIBCALL_PenaltyI_Indv_name.val(mod_personName),
-                                 99);
-        
-        phonePenalt       := MAP( in_mod.phone != '' AND LEFT.phone_layoutName = in_mod.phone   =>  0, 
-                                  in_mod.phone != '' AND LEFT.phone_layoutName != in_mod.phone  =>  30,
-                                      /* default - in_mod.phone = ''*/                              99 );
-                                      
-        fullSsnPenalt     := IF( in_mod.ssn != '', ut.mod_penalize.ssn ( AutoStandardI.InterfaceTranslator.ssn_value.val(in_mod), LEFT.ssn_layoutName), 99);
-        
-        Ssn4Penalt        := MAP( in_mod.ssn_last4 != '' AND in_mod.ssn_last4  = LEFT.ssn_layoutName[6..9] => 0, 
-                                  in_mod.ssn_last4 != '' AND in_mod.ssn_last4 != LEFT.ssn_layoutName[6..9] => 30,   
-                                      /* default - in_mod.ssn_last4 = ''*/                                    99 );
+        Ssn4Penalt        := MAP(in_mod.ssn_last4 = ''                        => 0, 
+                                 in_mod.ssn_last4 = LEFT.ssn_layoutName[6..9] => 0, 
+                                 /* default */                                  99);
 
-        SsnPenalt         := MIN( fullSsnPenalt, Ssn4Penalt );
-
-        tinPenalt         := MAP( in_mod.tin != '' AND LEFT.tin_layoutName = in_mod.tin   => 0, 
-                                  in_mod.tin != '' AND LEFT.tin_layoutName != in_mod.tin  => 30, 
-                                      /* default - in_mod.tin = ''*/                         99 );
+        tinPenalt         := MAP(in_mod.tin = ''                  => 0, 
+                                 LEFT.tin_layoutName = in_mod.tin => 0, 
+                                 /* default */                      99);
         
-				inDob_year  := doxie.DOBTools(in_mod.dob_filter).year_in;
-				inDob_month := doxie.DOBTools(in_mod.dob_filter).find_month;
-				inDob_day   := doxie.DOBTools(in_mod.dob_filter).find_day;
-        dobYear_Penalt  := MAP( inDob_year != 0 AND inDob_year  = (UNSIGNED8) LEFT.dob[1..4] => 0, 
-                                inDob_year != 0 AND inDob_year != (UNSIGNED8) LEFT.dob[1..4] => 20, // Higher penalty for mismtach on year
-                                  /* default -  dobYear = ''*/                 99 );
-				
-				dobMonth_Penalt  := MAP( inDob_month != 0 AND inDob_month  = (UNSIGNED8) LEFT.dob[5..6] => 0, 
-                                 inDob_month != 0 AND inDob_month != (UNSIGNED8) LEFT.dob[5..6] => 10,
-                                  /* default -  dobMonth = ''*/                 99 );
-				
-				dobDay_Penalt  := MAP( inDob_day != 0 AND inDob_day  = (UNSIGNED8) LEFT.dob[7..8] => 0, 
-                               inDob_day != 0 AND inDob_day != (UNSIGNED8) LEFT.dob[7..8] => 5,
-                                  /* default -  dobDay = ''*/                 99 );
-				
-				dobPenalt := dobYear_Penalt+dobMonth_Penalt+dobDay_Penalt;
-				
-        // Product (Bonnie Taepakdee) wanted the penalty to be the min calculated penalty.
-        // The reasoning behind it was that for this product, it's better for customers to have more 
-        // to filter through than to miss a potential bad customer.  
-        // The problem with this logic is that there is no subfiltering within the min penalty grouping.
-        // for example: if a last name, license number and license state are entered and we get hits
-        // on the license number and state for multiple different last names, the matching last name 
-        // may not be the first record returned.
-        // To remedy this issue, we are calculating an accumulative penalty for those penalties
-        // that are lower than 99 (the default, no data entered max value assigned).
-        // Once the cumulative penalty is calculated, it can be combined with the minimum penalty to
-        // create a new penalty that can be used as a combined sort/sub-sort value to return
-        // the best records first.
-        // multiplying the MIN penalty by 1000 and then adding the the cumulative penalty will 
-        // combine the two penalties into one sortable integer.  Since this penalty calculation 
-        // works for both person and business, we need to be able to account for the max of both
-        // calculated penalties (penalt and cumulative penalt). The threshold for the service is 10
-        // and the max possible value for the cumulative penalty is: 686. 
-        // therefore using 1000 allow for filtering by the penalty threshold as well as the sub-sorting.
-				// To avoid skewing with some high penalties, make the maximum penalty 125. This penalty is highter
-				// than if no search term was added which we want to be less, but not too much higher that the sort
-				// order is skewed.
-        cumulativePenalty := IF( b_addrSearched, addrPenalt, 0 ) +   
-                             IF( in_mod.companyname != '', compNamePenalt, 0 ) + 
-                             IF( in_mod.did != '', didPenalt, 0 ) + 
-														 IF( in_mod.nmls_id != '', nmlsIDPenalt, 0 ) +
-                             IF( in_mod.license_number != '', licPenalt, 0 ) + 
-                             IF( in_mod.midex_rpt_num != '', midexRptNumPenalt, 0 ) +  
-                             IF( b_nameSearched, namePenalt, 0 ) + 
-                             IF( in_mod.phone != '', phonePenalt, 0 ) + 
-                             IF( in_mod.ssn != '' OR in_mod.ssn_last4 != '', ssnPenalt, 0 ) + 
-                             IF( in_mod.tin != '', tinPenalt, 0 ) +
-                             IF( in_mod.dob_filter != 0, dobPenalt, 0 );
+        SELF.penalt       := addrPenalt + compNamePenalt + didPenalt + licPenalt + MidexRptNumPenalt +
+                             namePenalt + nmlsIDPenalt + ssnPenalt + ssn4Penalt + tinPenalt;
                              
-        
-        minPenalt         := MIN( addrPenalt, compNamePenalt, didPenalt, licPenalt, midexRptNumPenalt,   
-                                  namePenalt, phonePenalt, SsnPenalt, tinPenalt, nmlsIDPenalt, dobPenalt);
-                                  
-        SELF.penalt            := (minPenalt * 1000) + cumulativePenalty;
-        // SELF.cumPenalty        := cumulativePenalty;
-        // SELF.minPenalt         := minPenalt;
-        // SELF.addrPenalt        := addrPenalt;
-        // SELF.compNamepenalt    := compNamePenalt;
-        // SELF.didPenalt         := didPenalt;
-        // SELF.licPenalt         := licPenalt;
-        // SELF.midexRptNumPenalt := midexRptNumPenalt;
-        // SELF.namePenalt     	  := namePenalt;
-				// SELF.phonePenalt       := phonePenalt;
-        // SELF.ssnPenalt         := ssnPenalt;
-        // SELF.tinPenalt         := tinPenalt;  
-				// SELF.dobPenalt         := dobPenalt;
-        // SELF.midexNbr          := in_mod.midex_rpt_num;
-        // SELF.inModfirstname    := AutoStandardI.InterfaceTranslator.fname_value.val(in_mod);  
-        // SELF.inModmiddlename   := AutoStandardI.InterfaceTranslator.mname_value.val(in_mod);
-        // SELF.inModlastname     := AutoStandardI.InterfaceTranslator.lname_value.val(in_mod); 
-        SELF                   := LEFT ) );
+        SELF.exactMatch   := (in_mod.did != '' AND didPenalt = 0) OR
+                             (in_mod.midex_rpt_num != '' AND midexRptNumPenalt = 0) OR
+                             (in_mod.nmls_id != '' AND nmlsIDPenalt = 0) OR
+                             (in_mod.ssn != '' AND ssnPenalt = 0) OR
+                             (in_mod.tin != '' and tinPenalt = 0); 
+        SELF              := LEFT ) );
 
       RETURN ds_recs_plus_pen;
 

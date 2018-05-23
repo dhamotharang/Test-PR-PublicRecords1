@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, Risk_Indicators, STD, ut;
+﻿IMPORT Address, AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform_Services, FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, ut;
 
 EXPORT Functions := MODULE
 	
@@ -372,5 +372,285 @@ EXPORT Functions := MODULE
 
 		RETURN ds_results;
 	END;
+	
+	EXPORT getGovernmentBest(	DATASET(didville.Layout_Did_OutBatch) ds_best_in,
+														FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+
+		p := module(AutoStandardI.PermissionI_Tools.params)
+			export unsigned1 GLBPurpose := batch_params.GLBPurpose;
+		END;
+		
+		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(batch_params.GLBPurpose);
+
+		ds_best := DidVille.did_service_common_function(ds_best_in,
+																										appends_value			:= FraudGovPlatform_Services.Constants.append_l,
+																										verify_value			:= FraudGovPlatform_Services.Constants.verify_l,
+																										glb_flag					:= GLB,
+																										glb_purpose_value	:= batch_params.GLBPurpose,
+																										appType						:= batch_params.ApplicationType,
+																										include_minors		:= TRUE,
+																										IndustryClass_val	:= batch_params.IndustryClass,
+																										DRM_val						:= batch_params.DataRestrictionMask,
+																										GetSSNBest				:= TRUE);
+		
+		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM																									
+			SELF.UniqueId := (string) L.did;  
+			SELF.Name.Prefix := L.best_title; 
+			SELF.Name.First := L.best_fname; 
+			SELF.Name.Middle := L.best_mname; 
+			SELF.Name.Last := L.best_lname; 
+			SELF.Name.Suffix := L.best_name_suffix;
+			SELF.SSN := (string) L.best_ssn;
+			SELF.DOB := iesp.ECL2ESP.toDate((integer)L.best_dob);
+			SELF.Address := iesp.ECL2ESP.SetAddress('',
+																							'', 
+																							'', 
+																							'', 
+																							'', 
+																							'', 
+																							'',
+																							L.best_city,
+																							L.best_state, 
+																							L.best_zip, 
+																							L.best_zip4, 
+																							'',
+																							'',
+																							L.best_addr1);
+			SELF.Phone10 := L.best_phone;
+			SELF := [];
+		END;
+		
+		ds_best_proj := PROJECT(ds_best, best_trans(LEFT));
+		
+		RETURN ds_best_proj; 
+	END;
+	
+	EXPORT getContributedBest(DATASET(didville.Layout_Did_OutBatch) ds_best_in,
+														STRING fraud_platform) := FUNCTION
+
+		ds_rids:=	JOIN(ds_best_in, FraudShared.Key_Did(fraud_platform),
+										KEYED(LEFT.did = RIGHT.did),
+										TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+											SELF := LEFT,
+											SELF := RIGHT,
+											SELF := []),
+									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+
+		ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_rids, fraud_platform);
+
+		ds_payload_recs_sorted := SORT(ds_payload_recs, did, -event_date, record);
+
+		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
+				//We wanted to keep the record which has good address, instead of first non blank address...
+				//We wanted to keep the name from record which has atleast last name given, instead of first non blank names...
+				BOOLEAN isPhysicalAddress	:=  l.clean_address.prim_name != '' AND ((l.clean_address.p_city_name != '' AND l.clean_address.st != '') OR l.clean_address.zip != '');
+				BOOLEAN isName := L.cleaned_name.lname <> '';
+
+				SELF.AcctNo := L.Acctno;
+				SELF.DID := L.DID;
+				SELF.cleaned_name.title :=  IF(isName , L.cleaned_name.title , R.cleaned_name.title);
+				SELF.cleaned_name.fname :=  IF(isName , L.cleaned_name.fname , R.cleaned_name.fname);
+				SELF.cleaned_name.lname :=  IF(isName , L.cleaned_name.lname , R.cleaned_name.lname);
+				SELF.cleaned_name.mname :=  IF(isName , L.cleaned_name.mname , R.cleaned_name.mname);
+				SELF.cleaned_name.name_suffix :=  IF(L.cleaned_name.name_suffix <> '' , L.cleaned_name.name_suffix , R.cleaned_name.name_suffix);
+				SELF.ssn :=  IF(L.ssn <> '' , L.ssn , R.ssn);
+				SELF.dob :=  IF(L.dob <> '' , L.dob , R.dob);
+				SELF.phone_number :=  IF(L.phone_number <> '' , L.phone_number , R.phone_number);
+				SELF.email_address :=  IF(L.email_address <> '' , L.email_address , R.email_address);
+				SELF.clean_address.prim_range := IF(isPhysicalAddress, L.clean_address.prim_range, R.clean_address.prim_range);
+				SELF.clean_address.predir := IF(isPhysicalAddress, L.clean_address.predir, R.clean_address.predir);
+				SELF.clean_address.prim_name := IF(isPhysicalAddress, L.clean_address.prim_name, R.clean_address.prim_name);
+				SELF.clean_address.addr_suffix := IF(isPhysicalAddress, L.clean_address.addr_suffix, R.clean_address.addr_suffix);
+				SELF.clean_address.postdir := IF(isPhysicalAddress, L.clean_address.postdir, R.clean_address.postdir);
+				SELF.clean_address.unit_desig := IF(isPhysicalAddress, L.clean_address.unit_desig, R.clean_address.unit_desig);
+				SELF.clean_address.sec_range := IF(isPhysicalAddress, L.clean_address.sec_range, R.clean_address.sec_range);
+				SELF.clean_address.p_city_name := IF(isPhysicalAddress, L.clean_address.p_city_name, R.clean_address.p_city_name);
+				SELF.clean_address.v_city_name := IF(isPhysicalAddress, L.clean_address.v_city_name, R.clean_address.v_city_name);
+				SELF.clean_address.st := IF(isPhysicalAddress, L.clean_address.st, R.clean_address.st);
+				SELF.clean_address.zip := IF(isPhysicalAddress, L.clean_address.zip, R.clean_address.zip);
+				SELF.clean_address.zip4 := IF(isPhysicalAddress, L.clean_address.zip4, R.clean_address.zip4);
+				SELF := [];
+		END;
+
+		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.did = right.did, xformRollup(left, right));
+
+		//*** MockUp Score Data *** 
+		// ***random_scores*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual score. 
+		random_scores_ds := DATASET([{35}, {40}, {49}, {79}, {85}, {89}, {95}, {99}] , {unsigned1 num}); 
+		random_score := ROUNDUP(count(random_scores_ds) * (((RANDOM()%100000)+1)/100000));
+		// ***random_scores ends***
+	
+		iesp.fraudgovreport.t_FraudGovScoreDetails mockup_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			SELF.RecordType := 'IDENTITY';
+			SELF.ElementType := FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT;
+			SELF.ElementValue := (string) L.DID;
+			SELF.Score := random_scores_ds[random_score].num;
+		END;
+		
+		ds_MockUpScoreCard := PROJECT(ds_payload_recs_rolled, mockup_trans(LEFT));
+		//*** MockUp Score Data *** 
+
+		iesp.fraudgovreport.t_FraudGovIdentityCardDetails best_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			SELF.ContributedBest.UniqueId := (string) L.DID;
+			SELF.ContributedBest.Name.Prefix := L.cleaned_name.title;
+			SELF.ContributedBest.Name.First := L.cleaned_name.fname;
+			SELF.ContributedBest.Name.Middle := L.cleaned_name.mname;
+			SELF.ContributedBest.Name.Last := L.cleaned_name.lname;
+			SELF.ContributedBest.Name.Suffix := L.cleaned_name.name_suffix;
+			SELF.ContributedBest.SSN := L.ssn;
+			SELF.ContributedBest.DOB := iesp.ECL2ESP.toDatestring8(L.dob);
+			SELF.ContributedBest.Address := iesp.ECL2ESP.SetAddress(L.clean_address.prim_name,
+																															L.clean_address.prim_range,
+																															L.clean_address.predir,
+																															L.clean_address.postdir,
+																															L.clean_address.addr_suffix,
+																															L.clean_address.unit_desig,
+																															L.clean_address.sec_range,
+																															L.clean_address.p_city_name,
+																															L.clean_address.st,
+																															L.clean_address.zip,
+																															L.clean_address.zip4,
+																															'');
+			SELF.ContributedBest.Phone10 :=  L.phone_number;
+			SELF.EmailAddress := L.email_address;
+			SELF.ScoreDetails := ds_MockUpScoreCard[1];
+			SELF := [];
+		END;
+
+		ds_Contrib_Best := PROJECT(ds_payload_recs_rolled, best_trans(LEFT));
+		
+		// output(ds_payload_recs_sorted, named('ds_payload_recs_sorted'));
+		// output(ds_Contrib_Best, named('ds_Contrib_Best'));
+		
+		RETURN ds_Contrib_Best;
+	END;
+	EXPORT GetDeltabaseLogDataSet(ds_in,InquiryReason) := FUNCTIONMACRO
+		
+		commonRecord := RECORD
+			RECORDOF(ds_in.FraudGovUser) fraudGovUser;
+			#IF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.REPORT)
+					RECORDOF(ds_in.reportBy) reportBy;
+			#ELSE
+					RECORDOF(ds_in.searchBy) reportBy;
+			#END
+		
+			RECORDOF(ds_in.Options) options;
+		END;
+		
+		commonRecord createCommonDs(RECORDOF(ds_in) L) := TRANSFORM	
+			SELF.fraudGovUser := L.FraudGovUser;
+			
+			//Storing either reportBy or searchBy, depending on calling service
+			//The input layouts have almost completely the same fields, however
+			//FraudGovPlatform_Services.SearchService input layout named part of them in the SearchBy
+			//sublayout
+			//whereas the same set of fields for FraudGovPlatform_Services.ReportService are stored
+			//in the ReportBy sublayout
+			#IF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.REPORT)
+				SELF.reportBy := L.reportBy;
+			#ELSE
+				SELF.reportBy := L.searchBy;
+			#END
+			
+			SELF.options := L.options;
+		END;
+		
+		common_ds := PROJECT(ds_in, createCommonDs(LEFT));
+		
+		FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record xform_deltabase_log(commonRecord L):= TRANSFORM
+			SELF.gc_id := (STRING)L.FraudGovUser.GlobalCompanyId;
+			SELF.program_name := L.FraudGovUser.IndustryTypeName;
+			SELF.inquiry_reason := InquiryReason;
+			SELF.inquiry_source := FraudGovPlatform_Services.Constants.INQUIRY_SOURCE;
+			
+			#IF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.REPORT)
+				SELF.customer_county_code := L.options.AgencyCounty;
+				SELF.customer_state := L.options.AgencyState;
+				SELF.customer_vertical_code := L.options.AgencyVerticalType;
+				SELF.client_uid := '';
+				SELF.case_id := '';
+			#ELSEIF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.SEARCH)
+				SELF.customer_county_code := '';
+				SELF.customer_state := '';
+				SELF.customer_vertical_code := '';
+				SELF.client_uid := L.reportBy.CustomerPersonId;
+				SELF.case_id := L.reportBy.HouseholdId;
+			#END
+			
+			SELF.ssn := L.reportBy.ssn;
+			SELF.dob := iesp.ECL2ESP.t_DateToString8(L.reportBy.DOB);
+			SELF.lex_id := (INTEGER)L.reportBy.UniqueId;
+			SELF.name_full := L.reportBy.Name.Full;
+			SELF.name_prefix := L.reportBy.Name.Prefix;
+			SELF.name_first := L.reportBy.Name.first;
+			SELF.name_middle := L.reportBy.Name.middle;
+			SELF.name_last := L.reportBy.Name.last;
+			SELF.name_suffix := L.reportBy.Name.suffix;
+			// If StreetAddress is empty, then use the parsed address fields
+			SELF.full_address := IF(L.reportBy.Address.StreetAddress1 = '',
+									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
+											L.reportBy.Address.StreetPreDirection,
+											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
+											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
+											L.reportBy.Address.UnitNumber),
+									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
+			SELF.physical_address := IF(L.reportBy.Address.StreetAddress1 = '',
+									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
+											L.reportBy.Address.StreetPreDirection,
+											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
+											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
+											L.reportBy.Address.UnitNumber),
+									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
+			SELF.physical_city := L.reportBy.Address.City;
+			SELF.physical_state := L.reportBy.Address.State;
+			SELF.physical_zip := L.reportBy.Address.Zip5;
+			SELF.physical_county := L.reportBy.Address.County;
+			SELF.mailing_address := IF(L.reportBy.MailingAddress.StreetAddress1 = '',
+									Address.Addr1FromComponents(L.reportBy.MailingAddress.StreetNumber, 
+											L.reportBy.MailingAddress.StreetPreDirection,
+											L.reportBy.MailingAddress.StreetName, L.reportBy.MailingAddress.StreetSuffix,
+											L.reportBy.MailingAddress.StreetPostDirection,L.reportBy.MailingAddress.UnitDesignation,
+											L.reportBy.MailingAddress.UnitNumber),
+									L.reportBy.MailingAddress.StreetAddress1 + ' ' + L.reportBy.MailingAddress.StreetAddress2);
+			SELF.mailing_city := L.reportBy.MailingAddress.City;
+			SELF.mailing_state := L.reportBy.MailingAddress.State;
+			SELF.mailing_zip := L.reportBy.MailingAddress.Zip5;
+			SELF.mailing_county := L.reportBy.MailingAddress.County;
+			SELF.phone := L.reportBy.Phone10;
+			SELF.ultid := L.reportBy.BusinessLinkIds[1].ultid;
+			SELF.orgid := L.reportBy.BusinessLinkIds[1].orgid;
+			SELF.seleid := L.reportBy.BusinessLinkIds[1].seleid;
+			SELF.tin := L.reportBy.tin;
+			SELF.email_address := L.reportBy.EmailAddress;
+			SELF.appendedproviderid := L.reportBy.appendedproviderid;
+			SELF.lnpid := L.reportBy.lnpid;
+			SELF.npi := L.reportBy.npi;
+			SELF.ip_address := L.reportBy.IpAddress;
+			SELF.device_id := L.reportBy.DeviceId;
+			SELF.professional_id := L.reportBy.ProfessionalId;
+			SELF.bank_routing_number := L.reportBy.BankInformation.BankRoutingNumber;
+			SELF.bank_account_number := L.reportBy.BankInformation.BankAccountNumber;
+			SELF.dl_state := L.reportBy.DriversLicense.DriversLicenseState;
+			SELF.dl_number := L.reportBy.DriversLicense.DriversLicenseNumber;
+			SELF.geo_lat := L.reportBy.GeoLocation.Latitude;
+			SELF.geo_long := L.reportBy.GeoLocation.Longitude;
+			SELF.date_added := STD.Date.CurrentDate(True);
+			SELF := L;
+			SELF := [];
+		END;
+	
+		deltabase_inquiry_log_records := PROJECT(common_ds,xform_deltabase_log(LEFT));
+
+		//Transform to create final XPATH layout that ESP requires
+		FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout xForm_get_records(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record L) := TRANSFORM
+			SELF.records := deltabase_inquiry_log_records; 
+		END;
+
+		deltabase_inquiry_log := PROJECT(deltabase_inquiry_log_records,xForm_get_records(LEFT));
+
+		return deltabase_inquiry_log;
+		
+	ENDMACRO;
+
 
 END;

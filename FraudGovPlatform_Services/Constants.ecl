@@ -200,6 +200,13 @@
 			
 	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
 
+	EXPORT ServiceType := MODULE
+		EXPORT REPORT := 'FraudGovReport';
+		EXPORT SEARCH := 'FraudGovSearch';
+	END;
+
+	EXPORT INQUIRY_SOURCE := 'RIN';
+
 	EXPORT CIID_DESC := MODULE
 			EXPORT NAS_0 := 'This identity could not be located in public records';
 			EXPORT NAS_1 := 'The SSN is not associated with input name and address in public records';
@@ -216,5 +223,8 @@
 	EXPORT lowestAllowedVersion := 1;	
 	EXPORT	maxAllowedVersion := 1;	
 	EXPORT IsInstantID := TRUE;
+	
+	EXPORT append_l  := 'BEST_ALL,VERIFY_ALL'; //Append_1 allows all Best Info to return
+	EXPORT verify_l  := 'BEST_ALL,VERIFY_ALL';
 	
 END;

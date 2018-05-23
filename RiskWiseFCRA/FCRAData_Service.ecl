@@ -591,8 +591,10 @@ ssn_recs1 := ssn_deduped + PROJECT( ssn_corr,
 									self := LEFT
 							) );
 							
-// add the death_sources to the ssn_table result						
-with_death_sources := join(ssn_recs1, Death_Master.key_ssn(isFCRA := true), 
+// add the death_sources to the ssn_table result	
+
+					
+with_death_sources := join(ssn_recs1, Death_Master.key_ssn_ssa(isFCRA := true), 
 	left.ssn<>'' and left.isDeceased and
 	keyed(left.ssn=right.ssn),
 transform(layout_ssn, 

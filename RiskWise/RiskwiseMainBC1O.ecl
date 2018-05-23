@@ -203,11 +203,11 @@ seed_files.Layout_BC1O format_seed(bcii_seed_output le) := transform
 end;
 final_seed := if(runSeed_value, project(bcii_seed_output, format_seed(left)), dataset([],seed_files.Layout_BC1O) );
 
+pre_ret := RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
 
 ret := if(tribCode in ['bnk4', 'cbbl'], 
 					if(count(final_seed)>0 and runSeed_value, final_seed, 
-									RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction:=DataRestriction, 
-									DataPermission:=DataPermission)), 
+									project(pre_ret, transform(riskwise.Layout_BC1O, Self := left))), 
 													  dataset([{account_value}], riskwise.Layout_BC1O));
 																										
 intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('Intermediate_Log');
@@ -219,7 +219,7 @@ intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('
 IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 	//Log to Deltabase
-	Deltabase_Logging_prep := project(ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+	Deltabase_Logging_prep := project(pre_ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
 																									 self.company_id := (Integer)CompanyID,
 																									 self.login_id := _LoginID,
 																									 self.product_id := Risk_Reporting.ProductID.RiskWise__RiskWiseMainBC1O,
@@ -235,10 +235,13 @@ IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(intermediateL
 																									 self.exclude_dmv_pii := ExcludeDMVPII,
 																									 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																									 self.archive_opt_in := ArchiveOptIn,
+                                                   self.glb := GLB_Purpose,
+                                                   self.dppa := DPPA_Purpose,
 																									 self.data_restriction_mask := DataRestriction,
 																									 self.data_permission_mask := DataPermission,
 																									 self.industry := Industry_Search[1].Industry,
 																									 self.i_ssn := socs_value,
+                                                   self.i_dob := dob_value,
 																									 self.i_name_first := fname_value,
 																									 self.i_name_last := lname_value,
 																									 self.i_address := addr_value,
@@ -247,15 +250,18 @@ IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(intermediateL
 																									 self.i_zip := zip_value,
 																									 self.i_dl := dl_number_value,
 																									 self.i_dl_state := dl_state_value,
+                                                   self.i_home_phone := hphone_value,
 																									 self.i_tin := fin_value,
 																									 self.i_bus_name := cmpyname_value,
 																									 self.i_bus_address := cmpyaddr_value,
 																									 self.i_bus_city := cmpycity_value,
 																									 self.i_bus_state := cmpystate_value,
 																									 self.i_bus_zip := cmpyzip_value,
+                                                   self.i_bus_phone := cmpyphone_value,
 																									 self.o_score_1 := (Integer)left.ecovariables,
 																									 self.o_score_2 := if(tribcode = 'cbbl', (Integer)left.cmpyaddrscore, 0),
-																									 self.o_lexid   := (Integer)left.riskwiseid,  //bdid
+																									 self.o_bdid    := left.riskwiseid, //bdid
+																									 self.o_lexid   := left.RepDid,     //repdid
 																									 self := left,
 																									 self := [] ));
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);

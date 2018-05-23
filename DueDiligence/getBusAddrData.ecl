@@ -216,7 +216,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 										KEYED(TRIM(LEFT.busn_info.address.predir) = RIGHT.predir) AND
 										KEYED(TRIM(LEFT.busn_info.address.postdir) = RIGHT.postdir) AND
 										KEYED(TRIM(LEFT.busn_info.address.sec_range) = RIGHT.sec_range),
-										TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, STRING2 partyIndicator, RECORDOF(RIGHT)},
+										TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 historyDate, STRING2 partyIndicator, RECORDOF(RIGHT)},
 															SELF.seq := LEFT.seq;
 															SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 															SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;

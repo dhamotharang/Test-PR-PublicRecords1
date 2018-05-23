@@ -39,6 +39,7 @@ export ReportService_Records := module
       self.CriminalRecords := choosen(recs_fmt,iesp.constants.CRIM.MaxReportRecords);
       self.ConsumerStatements  := FFD.Constants.BlankConsumerStatements;
       self.ConsumerAlerts  := FFD.Constants.BlankConsumerAlerts;
+			self := [];
     end;
     final_proj:=dataset([final_xform()]);
     
@@ -84,14 +85,17 @@ export ReportService_Records := module
     
     consumer_statements := consumer_statements_all(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
     
-	  FFD.MAC.AppendConsumerAlertsAndStatements(result, result_all, consumer_statements, consumer_alerts, iesp.criminal_fcra.t_FcraCriminalReportResponse);	
+    input_consumer := FFD.MAC.PrepareConsumerRecord(in_params.did);
+
+	  FFD.MAC.AppendConsumerAlertsAndStatements(result, result_all, consumer_statements, consumer_alerts, input_consumer, iesp.criminal_fcra.t_FcraCriminalReportResponse);	
         
     iesp.criminal_fcra.t_FcraCriminalReportResponse null_xform() := TRANSFORM
-      self._Header     := iesp.ECL2ESP.GetHeaderRow();
-      self.SexualOffenses   := [];
+      self._Header         := iesp.ECL2ESP.GetHeaderRow();
+      self.SexualOffenses  := [];
       self.CriminalRecords := [];
       self.ConsumerStatements  := consumer_statements;
       self.ConsumerAlerts  := consumer_alerts;
+      self.Consumer        := input_consumer;
     end;
     null_result:=dataset([null_xform()]);
     

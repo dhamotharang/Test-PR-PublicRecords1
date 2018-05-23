@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessInstantID20_Batch_Service">
 	<part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="25"/>
 	<!-- Option Fields --> 

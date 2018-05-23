@@ -1,13 +1,14 @@
 ﻿IMPORT DueDiligence, Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway, ut, Address, AutoStandardI;
 
 EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
-																								UNSIGNED1 dppa,
-																								UNSIGNED1 glba,
-																								STRING dataRestrictionMask,
-																								DATASET(Gateway.Layouts.Config) gateways,
-																								BOOLEAN includeReport = FALSE,
-																								BOOLEAN displayAttributeText = FALSE,
-																								BOOLEAN debugMode = FALSE) := FUNCTION
+                        UNSIGNED1 dppa,
+                        UNSIGNED1 glba,
+                        STRING dataRestrictionMask,
+                        DATASET(Gateway.Layouts.Config) gateways,
+                        STRING6 ssnMask,
+                        BOOLEAN includeReport = FALSE,
+                        BOOLEAN displayAttributeText = FALSE,
+                        BOOLEAN debugMode = FALSE) := FUNCTION
 																						 
 
 	INTEGER bsVersion := DueDiligence.Constants.DEFAULT_BS_VERSION;
@@ -32,10 +33,19 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	//get information pertaining to SSN
 	indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, includeReport);
+  
+  
+  //get legal information
+  indCriminalData := DueDiligence.getIndLegalEvents(indSSNData, includeReport);
+  
+  
+  //if a person report is being requested, populate the report
+  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indCriminalData, ssnMask),
+                                      indCriminalData);
 	
 	
 	//populate the attributes and flags
-	indKRI := DueDiligence.getIndKRI(indSSNData + noDIDFound);
+	indKRI := DueDiligence.getIndKRI(indReportData + noDIDFound);
 	
 	
 	
@@ -51,6 +61,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(inquiredRelatives, NAMED('inquiredRelatives')));
 	IF(debugMode, OUTPUT(indHeader, NAMED('indHeader')));
 	IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
+	IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
 	
 	IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
 

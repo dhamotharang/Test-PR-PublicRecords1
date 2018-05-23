@@ -1,4 +1,4 @@
-IMPORT ut, iesp, NID;
+﻿IMPORT ut, iesp, NID;
 
 // Given a set of records in the common RightAddress layout, rolls up the
 // records by DID.  More specifically, all unique names and addresses are 
@@ -50,9 +50,13 @@ export mod_Rollup(SearchParams inputs) := MODULE
 		// removes records without a first seen/last seen date.  If there is only
 		// one address in the input, pass it back REGARDLESS of whether it has a
 		// date or not.  (Bugzilla 42359).
-		filteredAddrs := addrs(DateLastSeen.year > 0 OR DateFirstSeen.year > 0);
-		return IF(COUNT(addrs) <= 1, addrs,
-		          CHOOSEN(filteredAddrs, maxRecs));//i am not sure whether this is deterministic
+		filteredAddrs := addrs(
+															(DateLastSeen.year > 0 OR DateFirstSeen.year > 0 ) AND 
+															 ut.Age(iesp.ECL2ESP.DateToInteger(DateLastSeen)) <= 10 
+														 ); // Keep records newer than or equal to 10 years. 
+		return IF(COUNT(filteredAddrs) > 0 , 
+							 CHOOSEN(filteredAddrs, maxRecs),
+							 CHOOSEN(addrs, maxRecs));//i am not sure whether this is deterministic
 	END;
 
 	// after names are rolled up, decide which ones are passed to output
@@ -332,7 +336,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			// context later.
 			SELF.best_score_phone := L.score_phone;
 			SELF.listing_type := L.listing_type; 
-			
+			SELF.Current := [];
+			SELF.AddressType := [];
 		END;	// AddrTransform
 
 		addrs := PROJECT(recs, InputToAddrTransform(LEFT));
@@ -385,6 +390,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			SELF.StateCityZip := '';
 			SELF.listing_type := '';
 			//SELF.HistoryFlag := '';
+			SELF.Current := [];
+			SELF.AddressType := [];	
 		END;  // AddressRollup
 
 		BOOLEAN fuzzyMatch(STRING s1, STRING s2) := (s1 = s2 OR fn_NormalizedEditDistance(s1, s2) > 80);
@@ -450,7 +457,6 @@ export mod_Rollup(SearchParams inputs) := MODULE
 		output(sortedAddrs, named('sortedAddrs'));
 		output(uniqueAddrs, named('uniqueAddrs'));
 		output(mergedAddrs, named('mergedAddrs'));
-		output(entities, named('addrEntities'));
 		output(entities, named('addrEntities'));
 		output(emptyResponse, named('emptyAddrResponse'));
 		output(scoredResp, named('scoredAddrResponse'));
@@ -583,10 +589,11 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			
 			SELF.UniqueID := (STRING) L.rollup_key;
 			SELF.EntityType := map( 
-			                        L.rollup_key_type = Constants.TAG_ROLLUP_KEY_BDID => Constants.TAG_ENTITY_BIZ,
+			                      L.rollup_key_type = Constants.TAG_ROLLUP_KEY_LINKID => Constants.TAG_ENTITY_BIZ,
 														  L.rollup_key_type = Constants.TAG_ROLLUP_KEY_DID =>  Constants.TAG_ENTITY_IND,								
 															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='B'=> Constants.TAG_ENTITY_BIZ,
 															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='R'=> Constants.TAG_ENTITY_IND,
+															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FAKEID  and L.Listing_Type ='B'=> Constants.TAG_ENTITY_BIZ,
 															Constants.TAG_ENTITY_UNK
 														 );
 

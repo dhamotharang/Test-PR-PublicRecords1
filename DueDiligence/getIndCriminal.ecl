@@ -38,8 +38,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                               /* Essentially this is today's date if history date is all 9's OR the history date itself */    
                                               tempDateToUse          := DueDiligence.Common.GetMyDate(LEFT.historydate);
                                               SELF.DateToUse         := tempDateToUse,
-                                              /* pass the data needed from the right */  
-                                              self.file_date     	   := RIGHT.file_date;
+                                              /* pass the data needed from the right */ 
                                               self.offender_key 	    := RIGHT.Offender_key;
                                               /*  the values in the curr_incar_flag, curr_parole_flag and are not always populated */ 
                                               /*  so this is just 1 of 3 things that we use to show evidence of incarceration      */
@@ -47,6 +46,11 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                               self.Curr_incarc_Offenders 		:= IF(((string)tempDateToUse) = ((string)todaysdate) AND      /*  If you are running in CURRENT MODE it should be todays date */   
                                                                              RIGHT.curr_incar_flag = 'Y', 'Y', 'N'); 	                 
                                               self.curr_parole_flag        := RIGHT.curr_parole_flag;
+                                              
+                                              SELF.currentProbation        := RIGHT.curr_probation_flag;
+                                              SELF.courtType               := RIGHT.datasource;
+                                              SELF.caseType                := RIGHT.case_type_desc;
+                                              SELF.stateFederalData        := DueDiligence.Constants.STATE_CRIMINAL_DATA;
                                               SELF                         := LEFT, 
                                               SELF                         := []),   //All other fields will get populated in further processing
                                     INNER,  //Only those records that exist in both the leftrecset and rightrecset to Produce a list of just DID's that are offenders.
@@ -72,6 +76,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                            SELF.Ever_incarc_offenders      := IF(LEFT.Ever_incarc_offenders   = 'Y', LEFT.Ever_incarc_offenders,   RIGHT.Ever_incarc_offenders);
                                            /* These are all evidence that indicates if the DID is currently on Parole */   
                                            SELF.curr_parole_flag           := IF(LEFT.curr_parole_flag        = 'Y', LEFT.curr_parole_flag,        RIGHT.curr_parole_flag);
+                                           SELF.currentProbation           := IF(LEFT.currentProbation        = 'Y', LEFT.currentProbation,        RIGHT.currentProbation);
                                            /* Pass all remaining fields forward from the LEFT */  
                                            SELF := LEFT;));	
 
@@ -88,38 +93,43 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                           SELF.seq                   := LEFT.seq,                                                            //***this is the sequence number that ties back to the input transaction (could be business or individual) 
                                           SELF.did                   := LEFT.did,
                                           /* pass the data needed from the RIGHT */
-                                          SELF.punishment_type       := RIGHT.punishment_type,
-                                          SELF.curr_stat_inm         := RIGHT.cur_stat_inm_desc,
-                                          IncarBegin_date	           := IF(RIGHT.latest_adm_dt[1..6] <> '', RIGHT.latest_adm_dt[1..6], '');  //this is the begin date of incarceration
-                                          IncarEnd_date		            := MAP(                                                   //choose any of these 3
-                                                                            RIGHT.act_rel_dt <> ''		=>	RIGHT.act_rel_dt[1..6],	//as the end date of incarceration 
-                                                                            RIGHT.ctl_rel_dt <> ''		=>	RIGHT.ctl_rel_dt[1..6],	//release dates if populated
-                                                                            RIGHT.sch_rel_dt <> ''		=>	RIGHT.sch_rel_dt[1..6],
-                                                                                                          '');
-                                          ParoleBegin_date	          := IF(RIGHT.par_st_dt <> '', RIGHT.par_st_dt, '');                       //this is the begin date of parole
-                                          ParoleEnd_date		           := MAP(                                                                  //choose any of these 2
-                                                                              RIGHT.par_sch_end_dt <> ''		=>	RIGHT.par_sch_end_dt,	             //this is the end date of parole 
-                                                                              RIGHT.par_act_end_dt <> ''		=>	RIGHT.par_act_end_dt,	             //end dates if populated
-                                                                                 /* default */                  '');
+                                          IncarBegin_date	           := RIGHT.latest_adm_dt;  //this is the begin date of incarceration
+                                          IncarEnd_date		           := MAP(                                                   //choose any of these 3
+                                                                            RIGHT.act_rel_dt <> DueDiligence.Constants.EMPTY  =>	RIGHT.act_rel_dt,	//as the end date of incarceration 
+                                                                            RIGHT.ctl_rel_dt <> DueDiligence.Constants.EMPTY  =>	RIGHT.ctl_rel_dt,	//release dates if populated
+                                                                            RIGHT.sch_rel_dt <> DueDiligence.Constants.EMPTY  =>	RIGHT.sch_rel_dt,
+                                                                            DueDiligence.Constants.EMPTY);
+																			
+                                          ParoleBegin_date	          := RIGHT.par_st_dt;                       //this is the begin date of parole
+                                          ParoleEnd_date		          := MAP(                                                                  //choose any of these 2
+                                                                              RIGHT.par_sch_end_dt <> DueDiligence.Constants.EMPTY  =>	RIGHT.par_sch_end_dt,	             //this is the end date of parole 
+                                                                              RIGHT.par_act_end_dt <> DueDiligence.Constants.EMPTY  =>	RIGHT.par_act_end_dt,	             //end dates if populated
+                                                                              DueDiligence.Constants.EMPTY);
+																			  
                                           /* From the punishment - if the IncarBegin date is BEFORE the history date, that is evidence of EVER incarceration */ 
                                           /*  Notice we are not checking the end date for EVER                                                          */  
-                                          SELF.Ever_incarc_Punishments  := IF(IncarBegin_date <> '' and 
+                                          SELF.Ever_incarc_Punishments  := IF(IncarBegin_date <> DueDiligence.Constants.EMPTY and 
                                                                               IncarBegin_date < (string)LEFT.historydate,       'Y', 'N');
-                                          self.Curr_incarc_Punishments 	:= IF(IncarBegin_date <> '' and 
-                                                                              IncarEnd_date   <> '' and 
+                                          self.Curr_incarc_Punishments 	:= IF(IncarBegin_date <> DueDiligence.Constants.EMPTY and 
+                                                                              IncarEnd_date   <> DueDiligence.Constants.EMPTY and 
                                                                                                 IncarBegin_date <= (string)LEFT.historydate and 
                                                                                                          IncarEnd_date   >= (string)LEFT.historydate,      'Y', 'N');   
-                                          /* From the punishment - if the parolebegin date is BEFORE the history date AND the paroleEnd date is AFTER the history date, that is evidence of current parole */  
-                                          self.Curr_parole_Punishments 	:= IF((ParoleBegin_date <> '' AND
-                                                                              ParoleEnd_date <> ''    AND
+                                          
+										  /* From the punishment - if the parolebegin date is BEFORE the history date AND the paroleEnd date is AFTER the history date, that is evidence of current parole */  
+                                          self.Curr_parole_Punishments 	:= IF((ParoleBegin_date <> DueDiligence.Constants.EMPTY AND
+                                                                              ParoleEnd_date <> DueDiligence.Constants.EMPTY    AND
                                                                               ParoleBegin_date < (string)LEFT.historydate   AND
                                                                                                ParoleEnd_date   > (string)LEFT.historydate)  OR
                                                                                 TRIM(RIGHT.cur_stat_inm_desc) = 'PAROLE',               'Y', 'N');   
+                                                                                
+                                          SELF.incarcerationDate := IncarBegin_date;
+                                          SELF.incarcerationReleaseDate := IncarEnd_date;
                                           /* pass the rest of the data from the LEFT  */  
                                           SELF                         := LEFT),
                                LEFT OUTER,  /* At least one record for every record in the leftrecset. */  
                                atmost(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
-                               KEEP(DueDiligence.Constants.MAX_KEEP));					
+                               KEEP(DueDiligence.Constants.MAX_KEEP));
+                               
 	
 	// ------                                             ------
 	// ------  Get data for an offense from the           ------
@@ -133,29 +143,57 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                       /* from the RIGHT - find the position of the data */
                                       /*  Look for the 1st word 'Date:' in the string field     */
                                       posBeg                     := stringlib.stringfind(RIGHT.stc_desc_2, 'Date:', 1);                //format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'
-                                      Incarbeg_dt	               := if(posBeg <> 0, RIGHT.stc_desc_2[posBeg+6..posBeg+11], '');        //position at start date and grab yyyymm
-                                      Incarbeg_dt_isNumeric      := Risk_Indicators.IsAllNumeric(IncarBeg_dt);
-                                      IncarBegin_date            := if(Incarbeg_dt_isNumeric, Incarbeg_dt, '');
+                                      
+                                      incarBegDateFull           := if(posBeg <> 0, RIGHT.stc_desc_2[posBeg+6..posBeg+13], DueDiligence.Constants.EMPTY);
+                                      incarBegDateYearMonth      := incarBegDateFull[1..6];
+                                      IncarBegin_date            := IF(Risk_Indicators.IsAllNumeric(incarBegDateFull), incarBegDateFull, 
+                                                                                              IF(Risk_Indicators.IsAllNumeric(incarBegDateYearMonth), incarBegDateYearMonth, DueDiligence.Constants.EMPTY));
+                                      
+                                      IncarBegin_date_compare    := MAP(LENGTH(IncarBegin_date) = 8 => incarBegDateFull,
+                                                                        LENGTH(IncarBegin_date) = 6 => incarBegDateYearMonth + '01',
+                                                                        DueDiligence.Constants.EMPTY);
+                                                                                              
+                                                                                              
                                       SELF.stc_desc_2            := RIGHT.stc_desc_2,
-                                      SELF.Ever_incarc_offenses  := IF(IncarBegin_date <> '' and 
-                                                                             IncarBegin_date < (string)LEFT.historydate, 'Y', 'N'),
+                                      SELF.Ever_incarc_offenses  := IF(IncarBegin_date_compare <> DueDiligence.Constants.EMPTY and 
+                                                                       IncarBegin_date_compare < (string)LEFT.historydate, 'Y', 'N'),
+                                      
                                       /*  Look for the 2nd word 'Date:' in the string field     */  
                                       posEnd                     := stringlib.stringfind(RIGHT.stc_desc_2, 'Date:', 2);
-                                      Incarend_dt	               := if(posEnd <> 0, RIGHT.stc_desc_2[posEnd+6..posEnd+11], '');        //position at end date and grab yyyymm
-                                      Incarend_dt_isNumeric      := Risk_Indicators.IsAllNumeric(Incarend_dt);
-                                      IncarEnd_date	             := if(Incarend_dt_isNumeric, 
-                                                                         Incarend_dt, 
-                                                                         /*ELSE*/  
-                                                                         IF(TRIM(RIGHT.stc_lgth_desc) = 'LIFE', '999999', ''));       //if life sentence, set end date to max
-                                      SELF.Curr_incarc_offenses 	:= IF(IncarBegin_date <> '' AND 
-                                                                    IncarEnd_date   <> '' AND 
-                                                                                   IncarBegin_date <= (string)LEFT.historydate AND 
-                                                                                          IncarEnd_date   >= (string)LEFT.historydate,   'Y', 'N'); 	
+                                      
+                                      incarEndDateFull           := if(posEnd <> 0, RIGHT.stc_desc_2[posEnd+6..posEnd+13], DueDiligence.Constants.EMPTY);        //position at end date and grab yyyymmdd
+                                      incarEndDateYearMonth      := incarEndDateFull[1..6];
+                                      incarEndDate               := IF(Risk_Indicators.IsAllNumeric(incarEndDateFull), incarEndDateFull,
+                                                                                                                       IF(Risk_Indicators.IsAllNumeric(incarEndDateYearMonth), incarEndDateYearMonth, DueDiligence.Constants.EMPTY));
+                                      
+                                      IncarEnd_date_compare      := MAP(LENGTH(incarEndDate) = 8 => incarEndDateFull,
+                                                                        LENGTH(incarEndDate) = 6 => incarEndDateYearMonth + '01',
+                                                                        TRIM(RIGHT.stc_lgth_desc) = 'LIFE' => '99999999',
+                                                                        DueDiligence.Constants.EMPTY);
+                                                                        
+                                      IncarEnd_date	             := MAP(LENGTH(incarEndDate) > 0 => incarEndDate,
+                                                                        TRIM(RIGHT.stc_lgth_desc) = 'LIFE' => '99999999',
+                                                                        DueDiligence.Constants.EMPTY);
+                                      
+                                  
+                                                                        
+                                      SELF.Curr_incarc_offenses 	:= IF(IncarBegin_date_compare <> DueDiligence.Constants.EMPTY AND 
+                                                                        IncarEnd_date_compare   <> DueDiligence.Constants.EMPTY AND 
+                                                                        IncarBegin_date_compare <= (string)LEFT.historydate AND 
+                                                                        IncarEnd_date_compare   >= (string)LEFT.historydate,   'Y', 'N'); 	
+                                      
+                                      SELF.incarcerationDate := IncarBegin_date;
+                                      SELF.incarcerationReleaseDate := IncarEnd_date;
+                                      SELF.num_of_counts := RIGHT.num_of_counts;
+                                      SELF.courtCounty := RIGHT.court_county;
+                                      SELF.offenseCity := RIGHT.offenseTown;
                                       /* pass the rest of the data from the LEFT  */  
                                       SELF                       := LEFT), 
                             LEFT OUTER,  /* At least one record for every record in the leftrecset. */  
                             ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
                             KEEP(DueDiligence.Constants.MAX_KEEP));	
+                                                    
+                            
 	
 	// ------                                                  ------
 	// ------  Pick up some information about each             ------
@@ -195,11 +233,16 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                          SELF.sentenceDate          := RIGHT.offense.sent_date,
                                          SELF.appealDate            := RIGHT.offense.appeal_date,
                                          SELF.caseNum               := RIGHT.case_num,
-                                         SELF.caseCourt             := RIGHT.case_court,
-                                         SELF.courtType             := RIGHT.source_file,   
-                                         SELF.file_date             := RIGHT.file_date,
-                                         SELF.countyOfOrigin        := RIGHT.county_of_origin,
-                                         SELF.origState             := RIGHT.orig_state,
+                                         SELF.offenseCounty         := RIGHT.county_of_origin,
+                                         SELF.offenseState          := RIGHT.orig_state,
+                                         SELF.citizenship           := RIGHT.citizenship;
+                                         SELF.race                  := RIGHT.race_desc;
+                                         SELF.sex                   := RIGHT.sex;   
+                                         SELF.hairColor             := RIGHT.hair_color_desc;
+                                         SELF.eyeColor              := RIGHT.eye_color_desc;
+                                         SELF.height                := RIGHT.height;
+                                         SELF.weight                := RIGHT.weight;
+                                         SELF.currentProbation      := IF(LEFT.currentProbation = DueDiligence.Constants.EMPTY, RIGHT.curr_probation_flag, LEFT.currentProbation);
                                          SELF                       := LEFT,  //Pass all of the remaining fields forward from the LEFT
                                          SELF                       := []),   //All other fields will get populated in further processing
                               LEFT OUTER,  
@@ -218,9 +261,10 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                            SELF.seq                   := LEFT.seq,                             //***this is the sequence number that ties back to the input transaction (could be business or individual) 
                                            SELF.did                   := LEFT.did,
                                            /* pass the data needed from the RIGHT */
-                                           SELF.arr_off_lev_mapped    := RIGHT.arr_off_lev_mapped,
+                                           SELF.arrestLevel           := RIGHT.arr_off_lev_mapped;
                                            SELF.court_off_lev_mapped  := RIGHT.court_off_lev_mapped,
-                                           SELF.sent_probation        := RIGHT.sent_probation,
+                                           SELF.probationSentence     := RIGHT.sent_probation,
+                                           SELF.agency                := RIGHT.le_agency_desc;
                                            SELF                       := LEFT,  //Pass all of the remaining fields forward from the LEFT
                                            SELF                       := []),   //All other fields will get populated in further processing
                                 LEFT OUTER,  
@@ -256,7 +300,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                                                                                                                 LEFT.charge, 
                                                                                                                                 LEFT.courtDispDesc1, 
                                                                                                                                 LEFT.courtDispDesc2,
-                                                                                                                                LEFT.arr_off_lev_mapped,
+                                                                                                                                LEFT.arrestLevel,
                                                                                                                                 LEFT.court_off_lev_mapped),              //** THEN look at courtoffenseLevel and/or charge
                                                                                                LEFT.offenseScore),                      //** ELSE just keep the offense score as is
                                                                       /*  Calculate how old each offense is based on the earliest offense date */  
@@ -264,7 +308,10 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                                                       /* The earliest offense date was cleaned and defined as an integer by the clean date routine  */ 
                                                                       SELF.earliestOffenseDate         := (STRING)LEFT.earliestOffenseDate,
                                                                       SELF                             := LEFT;));
-											
+	
+  
+  
+  
   // ------                                                                                    ------
   // ------ Sort the offenses in offender_key sequence so that we can roll up the data         ------ 
 	// ------ to the offense and case number                                                     ------
@@ -294,6 +341,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                          SELF.curr_parole_flag           := IF(LEFT.curr_parole_flag        = 'Y', LEFT.curr_parole_flag,        RIGHT.curr_parole_flag);
                                          SELF.Curr_parole_Punishments    := IF(LEFT.Curr_parole_Punishments = 'Y', LEFT.Curr_parole_Punishments, RIGHT.Curr_parole_Punishments);
                                          SELF.earliestOffenseDate        := IF((INTEGER)LEFT.earliestOffenseDate = 0, MAX(LEFT.earliestOffenseDate, RIGHT.earliestOffenseDate), MIN(LEFT.earliestOffenseDate, RIGHT.earliestOffenseDate));
+                                         SELF.appealDate                 := MAX(LEFT.appealDate, RIGHT.appealDate);
                                          /* Pass all remaining fields forward from the LEFT */  
                                          SELF                            := LEFT;));	
   	
@@ -324,6 +372,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   indivResults := PROJECT(allPartyOffenses, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                                       SELF.seq := LEFT.seq;
                                                       SELF.inquiredDID := LEFT.did;
+                                                      /*PerLegalTraffInfr*/
                                                       SELF.threePlusTrafConvictPast3Yrs := LEFT.TotalConvictedTraffic2T_NY >= 3;
                                                       SELF.twoOrLessTrafConvictPast3Yrs := LEFT.TotalConvictedTraffic2T_NY BETWEEN 1 AND 2;
                                                       SELF.threePlusInfractConvictPast3Yrs := LEFT.TotalConvictedInfractions2I_NY >= 3;
@@ -495,6 +544,8 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   // OUTPUT(WithoffensesData, NAMED('WithoffensesData'));
   // OUTPUT(WithOffendersRiskData, NAMED('WithOffendersRiskData'));
   // OUTPUT(WithCourtOffenseData, NAMED('WithCourtOffenseData'));
+  // OUTPUT(OffenseRiskFiltered, NAMED('OffenseRiskFiltered'));
+  // OUTPUT(OffenseDataRolled, NAMED('OffenseDataRolled'));
   // OUTPUT(OffenseRiskCalculateAge, NAMED('OffenseRiskCalculateAge'));
   // OUTPUT(OffenseDataSorted, NAMED('OffenseDataSorted'));
   // OUTPUT(OffenseDataRolled, NAMED('OffenseDataRolled'));

@@ -212,6 +212,7 @@ string10  hphone_value := ''      : stored('HomePhone');
 string10  wphone_value := ''      : stored('WorkPhone');
 string100 cmpy_value := ''        : stored('EmployerName');
 string30  formerlast_value := ''  : stored('FormerName');
+string120 unparsed_fullname_value := '' : stored('UnParsedFullName');
 
 // ----------[ Second input ]----------
 // Perform unparsed name cleaning without a macro until we make MAC_UnparsedFullName completely BtSt-savvy. 
@@ -374,15 +375,17 @@ model_name := map(InvalidGreenDotRequest = true		=> error('Invalid parameter inp
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
 	self.servicename := map(model_name = 'fd5609_2'                                  => '', //turn off all gateways for fd5609_2
                             model_name IN ['fp1303_1', 'fp1307_1'] and le.servicename = 'netacuity' => '', //turn off netacuity gateway for fp1303_1
-																																											 le.servicename);
+                            le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) not in Risk_Indicators.iid_constants.FAXML_WatchlistModels => '', 
+                                                                                                                                               le.servicename);
 	self.url := map(model_name = 'fd5609_2'                                  => '',
                     model_name IN ['fp1303_1', 'fp1307_1'] and le.servicename = 'netacuity' => '',
-																																							 le.url); 
+                    le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) not in Risk_Indicators.iid_constants.FAXML_WatchlistModels => '',
+                                                                                                                                               le.url); 
   self := le;																																								
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(OFACVersion = 4 and model_name in Risk_Indicators.iid_constants.FAXML_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 r := record
 	unsigned4 seq;
@@ -659,6 +662,7 @@ pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));
 
 //pick_attr := ungroup(attributes);			
 
+output(attributes[1].compromisedDL_hash, named('compromisedDL_hash'));
 
 
 checkBoolean(boolean x) := if(x, '1', '0');									
@@ -2338,11 +2342,15 @@ Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layo
 																					 self.exclude_dmv_pii := ExcludeDMVPII,
 																					 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																					 self.archive_opt_in := ArchiveOptIn,
+                                           self.glb := GLB_Purpose,
+                                           self.dppa := DPPA_Purpose,
 																					 self.data_restriction_mask := DataRestriction,
 																					 self.data_permission_mask := DataPermission,
 																					 self.industry := Industry_Search[1].Industry,
 																					 self.i_attributes_name := attributesIn[1].name,
 																					 self.i_ssn := socs_value,
+                                           self.i_dob := dob_value,
+                                           self.i_name_full := unparsed_fullname_value,
 																					 self.i_name_first := first_value,
 																					 self.i_name_last := last_value,
 																					 self.i_lexid := did_value, 
@@ -2352,6 +2360,8 @@ Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layo
 																					 self.i_zip := zip_value,
 																					 self.i_dl := drlc_value,
 																					 self.i_dl_state := drlcstate_value,
+                                           self.i_home_phone := hphone_value,
+                                           self.i_work_phone := wphone_value,
 																					 self.i_name_first_2 := pre_fname_val2,
 																					 self.i_name_last_2 := pre_lname_val2,
 																					 self.i_model_name_1 := model_name,

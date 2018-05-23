@@ -9,7 +9,7 @@ export share_fcra := MODULE
 export t_StatementIdRec := record
 	unsigned StatementId {xpath('StatementId')};
 end;
-		
+
 export t_FcraPersonSearchBy := record
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
@@ -54,6 +54,20 @@ export t_ConsumerAlert := record
 	iesp.share.t_TimeStamp Timestamp {xpath('Timestamp')};
 	string10 Code {xpath('Code')};
 	string500 Message {xpath('Message')};
+end;
+		
+export t_FcraConsumerInquiry := record
+	iesp.share.t_Name Name {xpath('Name')};
+	iesp.share.t_Address Address {xpath('Address')};
+	string8 DOB {xpath('DOB')};
+	string11 SSN {xpath('SSN')};
+	string10 Phone10 {xpath('Phone10')};
+	string12 UniqueId {xpath('UniqueId')};
+end;
+		
+export t_FcraConsumer := record
+	t_FcraConsumerInquiry Inquiry {xpath('Inquiry')};
+	string12 Lexid {xpath('Lexid')};
 end;
 		
 export t_FcraUniversalAddress := record (iesp.share.t_Address)

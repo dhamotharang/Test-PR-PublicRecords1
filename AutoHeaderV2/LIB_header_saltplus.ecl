@@ -69,7 +69,7 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 	saltPlus_results := AutoHeaderV2.fetch_salt(ds_search, SALT_SearchCode);												
 	boolean noSaltResults := 	count(saltPlus_results)=0;			
 	
-	fetched_dups := IF(SEARCH_DID or SEARCH_RID or noSaltResults  , fetched_dups1, saltPlus_results);
+	fetched_dups := IF(SEARCH_DID or SEARCH_RID or noSaltResults  , DEDUP(SORT(fetched_dups1, 	seq, did), seq, did), saltPlus_results);
 // output(fetched_dups1, named('fetched_dups1'));
 // output(saltPlus_results, named('saltPlus_results'));
 // output(noSaltResults, named('noSaltResults'));

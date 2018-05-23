@@ -2257,8 +2257,8 @@ export string2 EducationProgramAttended	:= map(not clam.truedid => '-1',
 						 '0');
 
 export string2 EducationInstitutionPrivate_v5	:= map(not clam.truedid or clam.student.college_type in ['', 'U'] => '-1',
-						 EducationAttendance = '1' and clam.student.college_type = 'S' => '0', //  public or state school (non-private);
-						 '1');						 
+						 EducationAttendance = '1' and clam.student.college_type in ['P', 'R'] => '1', //  private OR religious);
+						 '0');						 
 
 export string2 EducationInstitutionRating_v5 := map(not clam.truedid => '-1',
 																				 clam.student.college_tier in ['1','2','3','4','5','6'] => clam.student.college_tier,

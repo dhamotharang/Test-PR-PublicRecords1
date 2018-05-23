@@ -3,14 +3,14 @@
 EXPORT reportBusShellShelf(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
 
   
-		   projectBusShelfInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, iesp.duediligencebusinessreport.T_DDRBusinessShellShelfCharacteristics, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
+		   projectBusShelfInfo := PROJECT(inData, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, iesp.duediligencebusinessreport.T_DDRBusinessShellShelfCharacteristics, STRING bestFipsCode, STRING bestCounty, STRING2 bestState},
 																										SELF.seq := LEFT.seq;
 																										SELF.ultID := LEFT.busn_info.BIP_IDs.UltID.LinkID;
 																										SELF.orgID := LEFT.busn_info.BIP_IDs.OrgID.LinkID;
 																										SELF.seleID := LEFT.busn_info.BIP_IDS.SeleID.LinkID;
 																	                  /* populate the shell shelf Charactistics section using information already on the business internal */   
 																										SELF.IncorporatedInStateWithLooseIncorpLaws := LEFT.incorpWithLooseLaws;
-																										SELF.IncoporationState                      := LEFT.CompanyIncorpState;
+																										SELF.IncorporationState                      := LEFT.CompanyIncorpState;
                                                     SELF.TINReported                            := IF(LEFT.FEINSourcesCnt > 0, true, false);   
                                                     /* Set these boolean flags for the report */  
                                                     SELF.BetterBusinessBureau                     := IF(LEFT.BetterBusCnt > 0, true, false);   

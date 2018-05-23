@@ -7,7 +7,7 @@ import iesp;
 export duediligenceshared := MODULE
 			
 export t_DDRPersonNameWithLexID := record
-	iesp.share.t_Name name {xpath('name')};
+	iesp.share.t_Name Name {xpath('Name')};
 	string LexID {xpath('LexID')};
 end;
 		
@@ -118,6 +118,7 @@ export t_DDRLegalEventIndividual := record
 end;
 		
 export t_DDRLegalEventCriminal := record
+	string LegalEventType {xpath('LegalEventType')};
 	string1 Conviction {xpath('Conviction')};
 	string1 TrafficRelated {xpath('TrafficRelated')};
 	string CaseNumber {xpath('CaseNumber')};
@@ -164,7 +165,7 @@ export t_DDRLegalEventCriminal := record
 	string ArrestLevel {xpath('ArrestLevel')};
 	string Agency {xpath('Agency')};
 	string30 Race {xpath('Race')};
-	string2 OffenseState {xpath('OffenseState')};
+	string50 OffenseState {xpath('OffenseState')};
 	string30 OffenseCounty {xpath('OffenseCounty')};
 	string40 OffenseCity {xpath('OffenseCity')};
 	boolean TrafficRelatedOffense {xpath('TrafficRelatedOffense')};

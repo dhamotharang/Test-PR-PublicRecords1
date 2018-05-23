@@ -5,7 +5,9 @@
 	<part name="Max_Results_Per_Acct" type="xsd:unsignedInt" default=5/>
 	<part name="Best_Only" 						type="xsd:boolean" default=false/>
   <part name="ExcludeExperian" 			type="xsd:boolean" default=false/>
-	
+  <part name="OFAC_Version"         type="xsd:integer"/>
+	<part name="Gateways"             type="tns:XmlDataSet" cols="100" rows="8"/>
+
 	<part name="batch_in"             type="tns:XmlDataSet" cols="70" rows="25"/>	
 </message>
 */

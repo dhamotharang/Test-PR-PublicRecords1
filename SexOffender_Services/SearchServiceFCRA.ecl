@@ -131,6 +131,8 @@ export SearchServiceFCRA := macro
   end;
   tempresults := SexOffender_Services.Search_Records.fcra_val(tempmod);
 
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+
   // Determine center point of a radius search (when applicable)
   lv := AutoStandardI.InterfaceTranslator.location_value.val(project(tempmod,AutoStandardI.InterfaceTranslator.location_value.params));
   sv := AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.val(project(tempmod,AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params));
@@ -144,7 +146,7 @@ export SearchServiceFCRA := macro
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.records, results, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse,
                                              Records, false, RecordCount, SearchAroundInput, dsSearchAround);
   
-  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, tempresults.Statements, tempresults.ConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
+  FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, tempresults.Statements, tempresults.ConsumerAlerts, input_consumer, iesp.sexualoffender_fcra.t_FcraSexOffenderSearchResponse);
                                              
   output(out_results,named('Results'));
 

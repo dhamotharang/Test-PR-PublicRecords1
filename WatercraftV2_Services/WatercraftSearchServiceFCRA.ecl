@@ -78,10 +78,13 @@ export WatercraftSearchServiceFCRA := macro
 	rsrt1 := rsrt_stmts.Records;
 	Text_Search.MAC_Append_ExternalKey(rsrt1, rsrt2, l.watercraft_key + l.sequence_key + l.state_origin);
 
+  input_consumer := FFD.Constants.BlankConsumerRec;
+
 	doxie.MAC_Marshall_Results(rsrt2,rmar);
 
 	output(rmar, named('Results'));
 	output(rsrt_stmts.Statements, named('ConsumerStatements'));
 	output(rsrt_stmts.ConsumerAlerts, named('ConsumerAlerts'));
+	output(input_consumer, named('Consumer'));
 
 endmacro;

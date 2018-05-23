@@ -105,6 +105,7 @@ all_records := if(suppress_results_due_alerts, dataset([], doxie_crs.layout_repo
 consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
 consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
+input_consumer := FFD.Constants.BlankConsumerRec;
 
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
@@ -115,6 +116,7 @@ DO_ALL := parallel(
   output (all_records,named('CRS_result')),
   output (consumer_statements,named('ConsumerStatements')),
   output (consumer_alerts,named('ConsumerAlerts')),
+  output (input_consumer,named('Consumer')),
   output (royalties,named('RoyaltySet')),
   outputErrors);
 DO_ALL;

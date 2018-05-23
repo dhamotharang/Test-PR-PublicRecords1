@@ -231,10 +231,13 @@ export BankruptcySearchServiceFCRA(
                               all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 
     consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
+	  input_consumer := FFD.Constants.BlankConsumerRec;
+		
     doxie.MAC_Marshall_Results(final, recs_marshalled);
 
     OUTPUT(recs_marshalled, NAMED('Results'));    
     OUTPUT (consumer_statements, named ('ConsumerStatements'));  
     OUTPUT (consumer_alerts, named ('ConsumerAlerts'));  
+    OUTPUT (input_consumer, named ('Consumer'));  
     
 endmacro;

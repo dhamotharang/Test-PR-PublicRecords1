@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, patriot, risk_indicators, 
+﻿IMPORT BatchShare, BIPV2, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, patriot, risk_indicators, 
 			 riskwise, royalty;
 
 EXPORT Layouts := MODULE
@@ -168,4 +168,62 @@ EXPORT Layouts := MODULE
 		STRING PassportLowerLine;
 		STRING gender;
 	END;
+
+	EXPORT LOG_Deltabase_Layout_Record := Record
+		STRING20 gc_id;
+		STRING50 cust_transaction_id;
+		STRING10 cust_transaction_date;
+		STRING20 case_id;
+		STRING20 client_uid;
+		STRING20 program_name;
+		STRING100 inquiry_reason;
+		STRING100 inquiry_source;
+		STRING3 customer_county_code;
+		STRING2 customer_state;
+		STRING1 customer_vertical_code;
+		STRING10 ssn;
+		STRING10 dob;
+		UNSIGNED6 lex_id;
+		STRING100 name_full;
+		STRING50 name_prefix;
+		STRING100 name_first;
+		STRING60 name_middle;
+		STRING100 name_last;
+		STRING6 name_suffix;
+		STRING200 full_address;
+		STRING150 physical_address;
+		STRING30 physical_city;
+		STRING10 physical_state;
+		STRING10 physical_zip;
+		STRING3 physical_county;
+		STRING15 mailing_address;
+		STRING30 mailing_city;
+		STRING2 mailing_state;
+		STRING5 mailing_zip;
+		STRING3 mailing_county;
+		STRING10 phone;
+		BIPV2.IDlayouts.l_xlink_ids.UltID;
+		BIPV2.IDlayouts.l_xlink_ids.OrgID;
+		BIPV2.IDlayouts.l_xlink_ids.SeleID;
+		STRING10 tin;
+		STRING256 email_address;
+		UNSIGNED6 appendedproviderid;
+		UNSIGNED6 lnpid;
+		STRING10 npi;
+		STRING25 ip_address;
+		STRING50 device_id;
+		STRING12 professional_id;
+		STRING20 bank_routing_number;
+		STRING20 bank_account_number;
+		STRING2 dl_state;
+		STRING25 dl_number;
+		STRING10 geo_lat;
+		STRING11 geo_long;
+		UNSIGNED8 date_added;
+	END;
+
+	EXPORT LOG_Deltabase_Layout := RECORD
+		DATASET(LOG_Deltabase_Layout_Record) Records {XPATH('Records/Rec'), MAXCOUNT(1)};
+	END;
+
 END;

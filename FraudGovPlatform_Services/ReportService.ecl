@@ -31,8 +31,8 @@ EXPORT ReportService() := MACRO
 												~Options.IsOnline => FraudGovPlatform_Services.Constants.MAX_VELOCITIES,
 												0);
 											 
-	MaxKnownFrauds := MAP(Options.IsOnline and Options.MaxKnownFrauds > 0 => MIN(Options.MaxKnownFrauds, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
-												Options.IsOnline and Options.MaxKnownFrauds = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
+	MaxKnownFrauds := MAP(Options.IsOnline and Options.MaxKnownRisks > 0 => MIN(Options.MaxKnownRisks, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
+												Options.IsOnline and Options.MaxKnownRisks = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
 												~Options.IsOnline => FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS,
 												0);
 
@@ -45,6 +45,7 @@ EXPORT ReportService() := MACRO
 	#STORED('AgencyCounty',  Options.AgencyCounty);
 	#STORED('AgencyState',  Options.AgencyState);
 	#STORED('FraudPlatform',	Options.Platform);
+	#STORED('IsOnline',	Options.IsOnline);
 	#STORED('MaxVelocities', MaxVelocities);
 	#STORED('MaxKnownFrauds', MaxKnownFrauds);
 
@@ -87,10 +88,10 @@ EXPORT ReportService() := MACRO
 			SELF.ip_address := reportBy.IPAddress; 
 			SELF.device_id := reportBy.DeviceId;
 			SELF.professionalid := reportBy.ProfessionalId;
-			SELF.bank_routing_number := reportBy.BankRoutingNumber; 
-			SELF.bank_account_number := reportBy.BankAccountNumber; 
-			SELF.dl_state := reportBy.DriversLicenseState; 
-			SELF.dl_number := reportBy.DriversLicenseNumber; 
+			SELF.bank_routing_number := reportBy.BankInformation.BankRoutingNumber; 
+			SELF.bank_account_number := reportBy.BankInformation.BankAccountNumber; 
+			SELF.dl_state := reportBy.DriversLicense.DriversLicenseState; 
+			SELF.dl_number := reportBy.DriversLicense.DriversLicenseNumber; 
 			SELF.geo_lat := reportBy.GeoLocation.Latitude; 
 			SELF.geo_long := reportBy.GeoLocation.Longitude;
 			SELF := [];
@@ -108,19 +109,49 @@ EXPORT ReportService() := MACRO
 	batch_params_mod := FraudGovPlatform_Services.IParam.getBatchParams();
 	report_mod := GetReportModule(ReportBy);
 
+	hasName := IF(report_mod[1].name_last != '' OR ReportBy.Name.Full != '', 1,0);
+	hasAddress := IF(report_mod[1].prim_name != '' AND report_mod[1].prim_range != '' AND
+				  ((report_mod[1].p_city_name != '' AND report_mod[1].st != '') OR report_mod[1].z5 != ''),
+				  1,0);
+	hasMailingAddress := IF((report_mod[1].mailing_addr != '' OR 
+								(report_mod[1].mailing_prim_name != '' AND report_mod[1].mailing_prim_range != '')) AND
+				  			((report_mod[1].mailing_p_city_name != '' AND report_mod[1].mailing_st != '') OR report_mod[1].mailing_z5 != ''),
+				  			1,0);
+	hasLexId := IF(report_mod[1].did > 0,1,0);
+	hasSsn := IF(report_mod[1].ssn != '',1,0);
+	hasBankAccount := IF(report_mod[1].bank_account_number != '', 1,0);
+	hasDeviceId := IF(report_mod[1].device_id != '', 1,0);
+	hasDriversLicense := IF(report_mod[1].dl_number != '', 1,0);
+	hasGeoLocation := IF(report_mod[1].geo_lat != '' AND report_mod[1].geo_long != '', 1,0);
+	hasIpAddress := IF(report_mod[1].ip_address != '', 1,0);
+	hasPhone := IF(report_mod[1].phoneno != '', 1,0);
+
+	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
+	
+	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
+	//for searches, not just card detais.
+	isValidInput := inputCount = 1 OR ~Options.IsOnline;
+
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
 	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_mod, batch_params_mod, usePhone:=TRUE);
 
-	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds);
+	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds,Options.IsIdentityTestRequest,Options.IsElementTestRequest);
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
-																																											 
-	// Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(tmp);
+
+	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
+														first_row,
+														FraudGovPlatform_Services.Constants.ServiceType.REPORT);
+
+	IF(isValidInput,
+		PARALLEL( 
+			output(results, NAMED('Results')),
+			output(tmp.ds_royalties, NAMED('RoyaltySet'))
+		),
+		FAIL(303,doxie.ErrorCodes(303)));
 	
-	output(tmp.ds_royalties, NAMED('RoyaltySet'));
-	output(results, NAMED('Results'));
-	
+	IF(~Options.IsOnline,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 ENDMACRO;

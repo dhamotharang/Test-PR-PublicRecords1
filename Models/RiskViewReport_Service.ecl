@@ -215,11 +215,17 @@ IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, N
 																						 self.exclude_dmv_pii := ExcludeDMVPII,
 																						 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
 																						 self.archive_opt_in := ArchiveOptIn,
+                                             self.glb := (Integer)users.GLBPurpose,
+                                             self.dppa := (Integer)users.DLPurpose,
 																						 self.data_restriction_mask := DataRestriction,
 																						 self.data_permission_mask := DataPermission,
 																						 self.industry := Industry_Search[1].Industry,
 																						 // self.i_attributes_name := attributesIn[1].name,
 																						 self.i_ssn := inSSN,
+                                             self.i_dob := Search.dob.year +
+                                                           intformat((integer1)Search.dob.month, 2, 1) +
+                                                           intformat((integer1)Search.dob.day, 2, 1),
+                                             self.i_name_full := search.Name.Full,
 																						 self.i_name_first := search.Name.First,
 																						 self.i_name_last := search.Name.Last,
 																						 // self.i_lexid := did_value, 
@@ -229,6 +235,8 @@ IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, N
 																						 self.i_zip := search.Address.Zip5,
 																						 self.i_dl := search.DriverLicenseNumber,
 																						 self.i_dl_state := Search.DriverLicenseState,
+                                             self.i_home_phone := search.HomePhone,
+                                             self.i_work_phone := search.WorkPhone,
 																						 // Check to see if there were models requested
 																						 // model_count := count(option.IncludeModels.ModelRequests);
 																						 self.i_model_name_1 := model_name1,
@@ -248,7 +256,7 @@ IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, N
 																						 self.o_reason_2_4 := IF(extra_score, left.Models[2].Scores[1].reason_codes[4].reason_code, ''),
 																						 self.o_reason_2_5 := IF(extra_score, left.Models[2].Scores[1].reason_codes[5].reason_code, ''),
 																						 self.o_reason_2_6 := IF(extra_score, left.Models[2].Scores[1].reason_codes[6].reason_code, ''),
-																						 // self.o_lexid      := left.did,
+																						 self.o_lexid      := left.did,
 																						 self := left,
 																						 self := [] ));
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);

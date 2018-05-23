@@ -35,8 +35,9 @@ EXPORT AML_Batch_Service() := FUNCTION
 	// '0' - do not call XG5
 	// '1' - full XG5 response will be returned for AML report
 	// '2' - Call Bridger XG5 for KRIs but not full response
-	// '3' - Call Bridger XG4 for KRIs but not full response
-	UseXG5 := if(count(gateways(ServiceName = Gateway.Constants.ServiceName.bridgerxg5)) > 0,  '2', '3');                               
+
+                           
+	UseXG5 := '2';                               
 
 	// IID and Boca Shell
 Risk_Indicators.Layout_Input into(IndRecs l) := TRANSFORM

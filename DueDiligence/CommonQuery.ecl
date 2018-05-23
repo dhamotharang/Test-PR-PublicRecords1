@@ -87,31 +87,30 @@ EXPORT CommonQuery := MODULE
 				intermediates := FALSE : STORED('intermediateVariables');
 
 				// Get XML input 
-				requestIn := DATASET([], requestType) : STORED(requestStoredName, few);
+				requestIn := DATASET([], requestType) : STORED(requestStoredName, FEW);
 
 				firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
 
 				optionsIn := GLOBAL(firstRow.options);
-				userIn    := GLOBAL(firstRow.user);    //***see the t_user layout in PublicRecords.iesp.share for details 
+				userIn    := GLOBAL(firstRow.user);  //see the t_user layout in PublicRecords.iesp.share for details
 				search    := GLOBAL(firstRow.reportBy);
 				
 				//get outer band data - to use if customer data is not populated
 				UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
 				UNSIGNED1 outerBandGLBPurpose  := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
 				outerBandHistoryDate           := DueDiligence.Constants.NUMERIC_ZERO      : STORED('HistoryDateYYYYMMDD');
-        //*** grab the SSNMASK from the outer band section of the request ***//
-        STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMASK');  
+        STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');  
 				
 				
-        //*** The general rule for picking these options is to look in the inner band (ie the User section) first
-        //***  If the inner band fields are not populated look in the outer band or the Default from the Global Module 
+        //The general rule for picking these options is to look in the inner band (ie the User section) first
+        //If the inner band fields are not populated look in the outer band or the Default from the Global Module 
         drm	    := IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
 				dpm	    := IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
 				dppa    := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
 				glba    := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);
         STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
 				
-        //since the initial version can be defaulted, default options for person and business reports only attributes need to be requested
+        //since the initial version can be defaulted, default options for person and business reports only; attributes need to be requested
         defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)),
                               serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                               serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
@@ -410,11 +409,11 @@ EXPORT CommonQuery := MODULE
 																																								6  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome', LEFT.PerAccessToFundsIncome),
 																																								7  => DueDiligence.Common.createNVPair('PerGeographic', LEFT.PerGeographic),
 																																								8  => DueDiligence.Common.createNVPair('PerMobility', LEFT.PerMobility),
-																																								9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal', LEFT.PerLegalCriminal),
-																																								10 => DueDiligence.Common.createNVPair('PerLegalCivil', LEFT.PerLegalCivil),
-																																								11 => DueDiligence.Common.createNVPair('PerLegalTraffInfr', LEFT.PerLegalTraffInfr),
-																																								12 => DueDiligence.Common.createNVPair('PerLegalTypes', LEFT.PerLegalTypes),
-																																								13 => DueDiligence.Common.createNVPair('PerHighRiskNewsProfiles', LEFT.PerHighRiskNewsProfiles),
+																																								9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal', LEFT.PerLegalStateCriminal),
+																																								10 => DueDiligence.Common.createNVPair('PerLegalFedCriminal', LEFT.PerLegalFedCriminal),
+																																								11 => DueDiligence.Common.createNVPair('PerLegalCivil', LEFT.PerLegalCivil),
+																																								12 => DueDiligence.Common.createNVPair('PerLegalTraffInfr', LEFT.PerLegalTraffInfr),
+																																								13 => DueDiligence.Common.createNVPair('PerLegalTypes', LEFT.PerLegalTypes),
 																																								14 => DueDiligence.Common.createNVPair('PerAgeRange', LEFT.PerAgeRange),
 																																								15 => DueDiligence.Common.createNVPair('PerIdentityRisk', LEFT.PerIdentityRisk),
 																																								16 => DueDiligence.Common.createNVPair('PerUSResidency', LEFT.PerUSResidency),
@@ -441,11 +440,11 @@ EXPORT CommonQuery := MODULE
 																																			6  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
 																																			7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
 																																			8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
-																																			9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal_Flag', LEFT.PerLegalCriminal_Flag),
-																																			10 => DueDiligence.Common.createNVPair('PerLegalCivil_Flag', LEFT.PerLegalCivil_Flag),
-																																			11 => DueDiligence.Common.createNVPair('PerLegalTraffInfr_Flag', LEFT.PerLegalTraffInfr_Flag),
-																																			12 => DueDiligence.Common.createNVPair('PerLegalTypes_Flag', LEFT.PerLegalTypes_Flag),
-																																			13 => DueDiligence.Common.createNVPair('PerHighRiskNewsProfiles_Flag', LEFT.PerHighRiskNewsProfiles_Flag),
+																																			9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal_Flag', LEFT.PerLegalStateCriminal_Flag),
+																																			10 => DueDiligence.Common.createNVPair('PerLegalFedCriminal_Flag', LEFT.PerLegalFedCriminal_Flag),
+																																			11 => DueDiligence.Common.createNVPair('PerLegalCivil_Flag', LEFT.PerLegalCivil_Flag),
+																																			12 => DueDiligence.Common.createNVPair('PerLegalTraffInfr_Flag', LEFT.PerLegalTraffInfr_Flag),
+																																			13 => DueDiligence.Common.createNVPair('PerLegalTypes_Flag', LEFT.PerLegalTypes_Flag),
 																																			14 => DueDiligence.Common.createNVPair('PerAgeRange_Flag', LEFT.PerAgeRange_Flag),
 																																			15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
 																																			16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
@@ -544,7 +543,10 @@ EXPORT CommonQuery := MODULE
 																			
 																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
 																															'SELF.result.uniqueID := (STRING)RIGHT.individual.did;',
-																															DueDiligence.Constants.EMPTY))												
+																															DueDiligence.Constants.EMPTY))	
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL AND includeReport = DueDiligence.Constants.STRING_TRUE,
+																															'SELF.result.PersonReport := RIGHT.personReport;',
+																															DueDiligence.Constants.EMPTY))
 																															
 																															
 																															
