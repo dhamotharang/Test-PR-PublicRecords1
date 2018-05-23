@@ -1,5 +1,5 @@
 ﻿// PRTE2_WaterCraft_Ins.Utilities.BWR_Gather_People2_Assign_To_WC
-IMPORT PRTE2_Header_Ins,PRTE2_WaterCraft_Ins,PromoteSupers,PRTE2_Common,Address,RoxieKeyBuild;
+IMPORT PRTE2_Header_Ins,PRTE2_WaterCraft_Ins,PromoteSupers,PRTE2_Common,Address;
 
 TicketForProject := 'CT-1032';
 G_PII_PerState := 10;	// need to know in order to mark gathered WC as used.
@@ -90,8 +90,8 @@ GU_GWC := UNGROUP(PROJECT(GROUP(SORT(G_WC,st_registration,HASH32(watercraft_key,
 										SELF.phone_2 := '';
 										regok := TRIM(RIGHT.registration_number,LEFT,RIGHT)<>'';
 										decalok := TRIM(RIGHT.decal_number,LEFT,RIGHT)<>'';
-										SELF.registration_number := IF(regok,RIGHT.registration_number[1..3]+'I'+RIGHT.watercraft_key[2..5]+RIGHT.registration_number[5..],'');
-										SELF.decal_number := IF(decalok,RIGHT.decal_number[1..2]+'I'+RIGHT.watercraft_key[4..5]+RIGHT.decal_number[4..],'');
+										SELF.registration_number := IF(regok,RIGHT.registration_number[1..3]+'I.'+RIGHT.registration_number[4..],'');
+										SELF.decal_number := IF(decalok,RIGHT.decal_number[1..2]+'I.'+RIGHT.decal_number[3..],'');
 										SELF.orig_fein := '';
 										SELF.title_number := '';
 										SELF.company_name := '';
@@ -102,52 +102,31 @@ GU_GWC := UNGROUP(PROJECT(GROUP(SORT(G_WC,st_registration,HASH32(watercraft_key,
 										//TODO JAN 2018 - noticed that the DIDs in the old data aren't real - someday fix DIDs
 										SELF.did_score := IF(TRIM((STRING)LEFT.did,left,right)<>'','97','');										
 
-										SELF := RIGHT; 
+										SELF := LEFT; 
 										SELF := [];
 										));
+GU_GPII;
+NewSlimInitialized;
 
-// -------------------------------------------------------------------										
-OUTPUT(GU_GPII,NAMED('GU_GPII'));
-OUTPUT(NewSlimInitialized,NAMED('NewSlimInitialized'));
-// -------------------------------------------------------------------										
-
+// ---------------------------------------------------------------------------------
+dateString	:= PRTE2_Common.Constants.TodayString + '';
+desprayName 			:= 'Watercraft_ReviewAllStateAdd_'+dateString+'.csv';
+ExportDS					:= NewSlimInitialized;
+lzFilePathBaseFile 	:= PRTE2_WaterCraft_Ins.Constants.SourcePathForCSV + desprayName;
+LandingZoneIP 			:= PRTE2_WaterCraft_Ins.Constants.LandingZoneIP;
+TempCSV					:= PRTE2_WaterCraft_Ins.Files.EXPORT_CSV_FILE;
+PRTE2_Common.DesprayCSV(ExportDS, TempCSV, LandingZoneIP, lzFilePathBaseFile);
+// ---------------------------------------------------------------------------------
 // Later I need to append to base and save it.
 
 // ***************** Save the WC as new records to the base file.
 // ***************** mark the assigned WC by the uniqueCnt, then re-save gathered WC
-// This assumes that the people count was consistent per state and they took 1..n from the GU_GWC data...
 AssignedWC_IDs := SET(GU_GWC(IDX_State<=G_PII_PerState),uniqueCnt);
 markedWC := PROJECT(G_WC(uniqueCnt IN AssignedWC_IDs), TRANSFORM({G_WC},SELF.In_use := TicketForProject, SELF := LEFT));
 NewG_WC := G_WC(uniqueCnt NOT IN AssignedWC_IDs) + markedWC;
-OUTPUT(COUNT(G_WC),NAMED('G_WC_CNT'));
-OUTPUT(COUNT(NewG_WC),NAMED('NewG_WC_CNT'));
-OUTPUT(SORT(NewG_WC,-In_Use),NAMED('NewG_WC_inUse'));
-// ***************** Prepare the new full WC base file *****************************
-NewFull_WC := WC+NewSlimInitialized;
-OUTPUT(NewFull_WC,NAMED('NewFull_WC'));
-OUTPUT(COUNT(NewSlimInitialized),NAMED('NewSlimInitialized_CNT'));
-OUTPUT(COUNT(NewFull_WC),NAMED('NewFull_WC_CNT'));
-OUTPUT(COUNT(WC),NAMED('WC_CNT'));
-// ---------------------------------------------------------------------------------
-dateString	:= PRTE2_Common.Constants.TodayString + '';
-desprayName1 			:= 'Watercraft_ReviewAllStateAdd_'+dateString+'.csv';
-desprayName2 			:= 'Watercraft_ReviewFull_'+dateString+'.csv';
-ExportDS					:= NewSlimInitialized;
-lzFilePathBaseFile1 	:= PRTE2_WaterCraft_Ins.Constants.SourcePathForCSV + desprayName1;
-lzFilePathBaseFile2 	:= PRTE2_WaterCraft_Ins.Constants.SourcePathForCSV + desprayName2;
-LandingZoneIP 			:= PRTE2_WaterCraft_Ins.Constants.LandingZoneIP;
-TempCSV1					:= PRTE2_WaterCraft_Ins.Files.EXPORT_CSV_FILE;
-TempCSV2					:= PRTE2_WaterCraft_Ins.Files.EXPORT_CSV_FILE+'_2';
-PRTE2_Common.DesprayCSV(ExportDS, TempCSV1, LandingZoneIP, lzFilePathBaseFile1);
-PRTE2_Common.DesprayCSV(NewFull_WC, TempCSV2, LandingZoneIP, lzFilePathBaseFile2);
-// ---------------------------------------------------------------------------------
-
-Base_Prefix := PRTE2_WaterCraft_Ins.Files.Base_Prefix;
-AllData_Suffix := PRTE2_WaterCraft_Ins.Files.AllData_Suffix;
-// ***************** SAVE All Thor base files **************************************
+OUTPUT(COUNT(G_WC));
+OUTPUT(COUNT(NewG_WC));
 // PromoteSupers.Mac_SF_BuildProcess(NewG_WC, Files.ProdGatherMainName, Build1,,,TRUE);
-// RoxieKeyBuild.Mac_SF_BuildProcess_V2(NewFull_WC,Base_Prefix, AllData_Suffix, fileVersion, Build2, 3);
 // Build1;
-// Build2;
 // ---------------------------------------------------------------------------------
 

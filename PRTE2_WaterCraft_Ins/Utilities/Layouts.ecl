@@ -113,6 +113,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT GatheredBaseMainLayout := RECORD
 		INTEGER UniqueCnt;
+		STRING in_use := '';
 		ProdBaseMainLayout;
 	END;
 END;
