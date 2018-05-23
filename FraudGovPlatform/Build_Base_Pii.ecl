@@ -5,13 +5,17 @@ shared Pii_Base		:= fSOAPAppend.pii.All;
 
 shared Ciid_Base		:= fSOAPAppend.Ciid.All;
 
+shared Crim_Base		:= fSOAPAppend.Crim.All;
+
 tools.mac_WriteFile(Filenames(pversion).Base.Pii.New,Pii_Base,Build_pii_Base);
 tools.mac_WriteFile(Filenames(pversion).Base.CIID.New,Ciid_Base,Build_ciid_Base);
+tools.mac_WriteFile(Filenames(pversion).Base.Crim.New,Crim_Base,Build_crim_Base);
 												
 Export All := 	if(tools.fun_IsValidVersion(pversion)
 									,Sequential
 											(Build_pii_Base
 											,Build_ciid_Base
+											,Build_crim_Base
 											,Promote(pversion).buildfiles.New2Built
 											,Promote(pversion).buildfiles.Built2QA
 											)
