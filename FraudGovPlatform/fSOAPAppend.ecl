@@ -1,7 +1,12 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService;
 EXPORT fSOAPAppend	:= MODULE
 
+Shared nodes				:= thorlib.nodes();
+Shared threads			:= 2;
+
 Shared base := Fraudshared.Files().Base.Main.qa;
+
+Shared pii_base	:= Files().base.pii.built;
 
 Export Pii := Module
 
@@ -27,23 +32,19 @@ Export Pii := Module
 									);
 
 		pdist:=distribute(pbase(did>0),hash(did));
-	Export All :=choosen(dedup(pdist,record,all),100);
+	Export All :=dedup(pdist,record,all);
 End;
 
 EXPORT CIID		:= MODULE
 
 service_name	:= 'risk_indicators.InstantID_batch';
 serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
-nodes					:= thorlib.nodes();;
-threads				:= 2;
 
 string DataRestriction := '00000000000000'; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 																						// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 string pModel := 'FP1109_0' ;
 
 layout_out:=risk_indicators.Layout_InstantID_NuGen_Denorm;
-
-ds_input:= choosen(Files().base.pii.built,10);
 
 in_format := record
 	risk_indicators.Layout_Batch_In;
@@ -127,7 +128,7 @@ layoutSoap := record
 		boolean Include_WBIF_Watchlist:= false ;
 End;
 
-in_format make_batch_in(ds_input le, integer c) := TRANSFORM
+in_format make_batch_in(pii_base le, integer c) := TRANSFORM
 	self.seq := c;
 	SELF.Name_First := le.fname;
 	SELF.Name_Middle := le.mname;
@@ -149,12 +150,12 @@ in_format make_batch_in(ds_input le, integer c) := TRANSFORM
 	SELF := [];
 END;
 
-layoutSoap make_rv_in(ds_input le, integer c) := TRANSFORM
+layoutSoap make_rv_in(pii_base le, integer c) := TRANSFORM
 	batch := PROJECT(le, make_batch_in(LEFT, c));
 	SELF.batch_in := batch;
 END;
 
-soap_in := DISTRIBUTE(project(ds_input, make_rv_in(LEFT, counter)),RANDOM() % nodes);
+soap_in := DISTRIBUTE(project(pii_base, make_rv_in(LEFT, counter)),RANDOM() % nodes);
 
 xlayout := RECORD
 	(layout_out)
@@ -183,5 +184,75 @@ Export All	:= p;
 
 END;
 
+EXPORT Crim		:= MODULE
+
+service_name	:= 'criminalrecords_batchservice.batchservice';
+soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+layout_in   := CriminalRecords_BatchService.Layouts.batch_in;
+layout_out  := CriminalRecords_BatchService.Layouts.batch_out;
+
+//FraudGov only retunring the records for following crim categories. Per GRP-247
+#CONSTANT('includebadchecks', TRUE);
+#CONSTANT('includebribery', TRUE);
+#CONSTANT('ncludeburglarycomm', TRUE);
+#CONSTANT('ncludeburglaryres', TRUE);
+#CONSTANT('ncludeburglaryveh', TRUE);
+#CONSTANT('ncludecomputer', TRUE);
+#CONSTANT('ncludecounterfeit', TRUE);
+#CONSTANT('ncludefraud', TRUE);
+#CONSTANT('ncludeidtheft', TRUE);
+#CONSTANT('ncludemvtheft', TRUE);
+#CONSTANT('ncluderobberycomm', TRUE);
+#CONSTANT('ncluderobberyres', TRUE);
+#CONSTANT('ncludeshoplift', TRUE);
+#CONSTANT('ncludestolenprop', TRUE);
+#CONSTANT('ncludetheft', TRUE);
+#CONSTANT('ncludetraffic', TRUE);
+
+
+layout_in make_batch_in(pii_base L) := TRANSFORM
+	SELF.acctno := '1';
+	SELF.Name_First := L.fname;
+	SELF.Name_Middle := L.mname;
+	SELF.Name_Last := L.lname;
+	SELF.Name_suffix := L.name_suffix;
+	SELF.prim_name := L.prim_name;
+	SELF.prim_range := L.prim_range;
+	SELF.sec_range := L.sec_range;
+	SELF.St := L.st;
+	SELF.z5 := L.ZIP;
+	SELF.SSN := L.SSN;
+	SELF.DOB := (string)L.dob;
+	SELF := L;
+	SELF := [];
+END;
+
+soap_input := DISTRIBUTE(project(pii_base, make_batch_in(left)),RANDOM() % nodes);
+
+xlayout := RECORD
+	(layout_out)
+	STRING errorcode;
+END;
+
+xlayout myFail(soap_input le) := TRANSFORM
+	SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+	SELF := [];
+END;
+
+soap_results := soapcall( soap_input, 
+						soap_host, 
+						service_name,  
+						{soap_input},
+						DATASET(xlayout),
+						HEADING('<batch_in><Row>','</Row></batch_in>'),
+						PARALLEL(threads), 
+						onFail(myFail(LEFT))
+						)
+						(offender_key<>'')
+						;
+Export All := Project(soap_results,Layouts.Crim);
+									
+END;
 
 END;
