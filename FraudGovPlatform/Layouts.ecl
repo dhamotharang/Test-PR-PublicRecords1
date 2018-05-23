@@ -1,4 +1,4 @@
-﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC,CriminalRecords_BatchService;
+﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC,CriminalRecords_BatchService,DeathV2_Services;
 
 EXPORT Layouts := MODULE
 
@@ -645,6 +645,11 @@ Export CIID := RECORD
  
  Export Crim	:= RECORD
  CriminalRecords_BatchService.Layouts.batch_out;
+ string errorcode;
+ END;
+ 
+ Export Death	:= RECORD
+ DeathV2_Services.Layouts.BatchOut;
  string errorcode;
  END;
  
