@@ -114,47 +114,45 @@
   
 	// **********TN DL CONVICTIONS record layout
   export Layout_TN_CP := record
-	  string9  dl_number	;
-		string8  birthdate;
-		string3  action_code;
-		string8  event_date;
-		string8  post_date;	
-		string29 last_name;
-		string2  county_code;
-		string1	 CRLF;
+	  string9    dl_number	;
+		string8    birthdate;
+		string3    action_code;
+		string8    event_date;
+		string8    post_date;	
+		string29   last_name;
+		string2    county_code;
+		string2	 	 crlf;
   end;
 	
-	export Layout_TN_CP_All_Cleaned := record
+	export Layout_TN_CP_With_ProcessDte := record
 	  string8 process_date;
 	  Layout_TN_CP -crlf;
 	end;
  
-/*  	export Layout_TN_CP_All_Cleaned := record
-      		Layout_TN_CP_With_ProcessDte;
-     end;
-*/
+	export Layout_TN_CP_All_Cleaned := record
+		Layout_TN_CP_With_ProcessDte;
+  end;
 	
-	//   *************TN DL WITHDRAWALS/SUSPENSIONS record layout
+	// *************TN DL WITHDRAWALS/SUSPENSIONS record layout
 	export Layout_TN_WDL := record
-		string9  dl_number	;
-		string3  action_code;
-		string8  event_date;
-		string20 last_name;	
-		string8  birthdate;	
-		string8  post_date;	
-		string2  county_code;
-		string3	 action_type;	
-		string7  CRLF;
+		string9    dl_number	;
+		string3    action_code;
+		string8    event_date;
+		string20   last_name;	
+		string8    birthdate;	
+		string8    post_date;	
+		string2    county_code;
+		string3	   action_type;	
+		string2  	 crlf;
 	end;
 	
-	export Layout_TN_WDL_All_Cleaned := record
+	export Layout_TN_WDL_With_ProcessDte := record
 		string8 process_date;
 		Layout_TN_WDL -crlf;
 	end;
 	
-/*   export Layout_TN_WDL_All_Cleaned := record
-      		Layout_TN_WDL_With_ProcessDte;
-     end;
-*/
-	
+  export Layout_TN_WDL_All_Cleaned := record
+		Layout_TN_WDL_With_ProcessDte;
+  end;
+	 
 end;
