@@ -24,7 +24,7 @@ MODULE
  		// Set some easier to understand booleans
     GLB_OK  := ut.glb_ok(glb_purpose, checkRNA);
     DPPA_OK := ut.dppa_ok(dppa_purpose, checkRNA);
-				D2C_OK  := ut.IndustryClass.is_Knowx;
+				is_CNSMR  := ut.IndustryClass.is_Knowx;
 
     // Check if specific Insurance bit is set
     ins_bit := Phonesplus_v2.Translation_Codes.rules_bitmap_code (Phones.Constants.InsVeriBelow);
@@ -72,7 +72,7 @@ MODULE
 	      OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
 		     OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
  		    OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0',''])
-			    OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and D2C_OK);
+			    OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and is_CNSMR);
       //end of filters
 
 		// remove restricted sources from the dataset of all sources
