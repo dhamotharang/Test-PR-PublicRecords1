@@ -89,8 +89,44 @@ EXPORT Best := MODULE
 													// don't need to sort by -record_score here cause sort is performed
 													// in records attr at the bottom before results returned as 
 													// proxweight and record_score is kept for sorting.
+	
+	// get company_corporation_date from bipv2_best kfetch2 and then  if its non 0 use that to calculate
+	// years_in_business in below join.  bipv2_best....Kfetch2 call takes care of dealing with permissions/restrictions etc.
+	// e.g. if only SOURCE = D contributing.
+	// and also allows multiple inputs to be passed in and get mult outputs back.  
+	// proxid= 0 filter limits results for each ult/org/sele combo input to 1 row of output.
+	// company_incorporation_date is a Dataset thus the other project on right side below.
+     CompanyIncorporationDate := PROJECT(bipv2_best.Key_LinkIds.kfetch2(PROJECT(ds_seleBest, TRANSFORM(
+		                                                        BIPV2.IDlayouts.l_xlink_ids2,
+										              SELF.uniqueId :=  (unsigned) LEFT.acctno;
+												   SELF.ultid := LEFT.ultid;
+												   SELF.orgid := LEFT.orgid;
+												    SELF.seleid := LEFT.seleid;
+														SELF := [])
+														)
+														)(proxid = 0),
+													TRANSFORM({STRING20 acctno; bipv2.idlayouts.l_header_ids; STRING8 company_incorporation_date;},
+													SELF.Acctno := (STRING20) LEFT.UniqueID,
+													SELF.company_incorporation_date :=  PROJECT (LEFT.company_incorporation_date, 
+													    TRANSFORM({STRING8 company_incorporation_date;}, 
+														  SELF.company_incorporation_date := (STRING8) LEFT.company_incorporation_date;))[1].company_incorporation_date;
+													SELF.ultid := LEFT.ultid;
+												      SELF.orgid := LEFT.orgid;
+													 SELF.seleid := LEFT.seleid;
+													 SELF := []));
 													
-	ds_seleidBestout := PROJECT(ds_seleidBestWithParent, 
+    ds_seleidbestWithParentDate := join(ds_seleidBestWithParent, CompanyIncorporationdate,		                                              
+                                                          LEFT.acctno = RIGHT.acctno AND																									 
+											LEFT.ultid = RIGHT.ultid and
+											LEFT.orgid = RIGHT.orgid AND
+											LEFT.seleid = RIGHT.seleid,
+											TRANSFORM({RECORDOF(LEFT); STRING3 years_in_business;},							                     																	 																	 																														
+                                                           SELF.Years_In_Business := IF (TRIM(RIGHT.company_incorporation_date,LEFT,RIGHT) <> '',
+																      (STRING3) (curYear - (UNSIGNED4) (RIGHT.company_incorporation_date[1..4])),
+																			     '');
+									           SELF := LEFT)
+											);										          																											
+	ds_seleidBestoutTmp  := PROJECT(ds_seleidBestWithParentDate, 
 												TRANSFORM({BusinessBatch_BIP.Layouts.Best_Final; INTEGER2 record_score;},
 													SELF.acctno := LEFT.acctno;
 													SELF.record_score := LEFT.record_score;
@@ -118,25 +154,7 @@ EXPORT Best := MODULE
 													SELF.best_fein := LEFT.company_fein;
 												
 		                          //self.best_sic_code ...fill in later.
-                          SELF.best_address_status := LEFT.err_stat;	
-													
-													//
-													RECORD_TYPE_CODE := PROJECT(Advo.Key_Addr1(keyed(zip = LEFT.ZIP AND prim_range = LEFT.prim_range AND
-													                      prim_name = LEFT.prim_name)),
-																								TRANSFORM({STRING1 RECORD_TYPE_CODE;},
-																								      SELF.RECORD_TYPE_CODE := LEFT.RECORD_TYPE_CODE))[1].RECORD_TYPE_CODE;
-				           
-									     SELF.best_address_type :=  MAP (RECORD_TYPE_CODE = 'F' => 'FIRM',
-				                                        RECORD_TYPE_CODE = 'G' => 'GENERAL DELIVERY',
-											                          RECORD_TYPE_CODE = 'H' => 'HIGH RISE',
-										                          	RECORD_TYPE_CODE = 'P' => 'PO box',
-										                           	RECORD_TYPE_CODE = 'R' => 'Rural Route',
-											                          RECORD_TYPE_CODE = 'S' => 'Street',
-										                           	'');
-                        
-												 
-													////
-	
+                          SELF.best_address_status := LEFT.err_stat;																	
 													  // tmpDs := project(ut.ds_oneRecord, transform(BIPV2.IDlayouts.l_xlink_ids,
 														                   // SELF.ultid := tmpULTID;
 																							 // SELF.ORGID := tmpORGID;
@@ -183,14 +201,34 @@ EXPORT Best := MODULE
 													SELF.parent_zip := LEFT.parent_zip;
 													SELF.parent_zip4 := LEFT.parent_zip4;
 													SELF.parent_phone := LEFT.parent_phone;
-													SELF.parent_sub := LEFT.parent_sub;		
-													// IF they want best_dt_last_seen set it here.
-													//SELF.years_in_business := (unsigned4) (CurYear - 
-																											// (unsigned4) (left.dt_first_seen[1..4]));		
+													SELF.parent_sub := LEFT.parent_sub;	
+													//yrCompInCorporated :=  (unsigned4)( left.company_incorporation_date[1..4]);
+													// if  years_in_business is blank from above (0 value company_incorporation_date from bipv2best key)
+													// then use the dt_first_seen value from selebest to calculate yrs_in_business
+													self.years_in_business :=  if ( left.years_in_business= '', 
+																						(string3)  (CurYear -  (unsigned4) (left.dt_first_seen[1..4])), 
+																					     left.years_in_business);											 	
 													SELF := [];
 													)
 												);
-				
+												
+     ds_seleidBestout := JOIN(ds_seleidBestoutTmp , Advo.Key_Addr1,
+		                                              keyed(LEFT.best_ZIP = right.zip  AND LEFT.best_prim_range = right.prim_range AND
+												     LEFT.best_prim_name = RIGHT.prim_name),
+														 TRANSFORM(RECORDOF(LEFT),
+														  RECORD_TYPE_CODE := RIGHT.RECORD_TYPE_CODE;
+													SELF.best_address_type :=  MAP (RECORD_TYPE_CODE = 'F' => 'FIRM',
+																									RECORD_TYPE_CODE = 'G' => 'GENERAL DELIVERY',
+																									RECORD_TYPE_CODE = 'H' => 'HIGH RISE',
+																									RECORD_TYPE_CODE = 'P' => 'PO box',
+																									RECORD_TYPE_CODE = 'R' => 'Rural Route',
+																									RECORD_TYPE_CODE = 'S' => 'Street',
+										                           	'									');		
+                                                                     SELF := LEFT;
+												     SELF := [];
+												      ), LEFT OUTER, limit(ut.limits.DEFAULT,skip));																								
+ 			
+		 ////////////////
       addr_layout := RECORD
 			                  INTEGER rec_num;
 			                  STRING ZIP;
@@ -253,7 +291,7 @@ EXPORT Best := MODULE
 							SELF.seleid := LE.seleid;							
 							SELF.prim_range_var1 := allrows[1].prim_range;
 							SELF.prim_name_var1 := allrows[1].prim_name;
-              SELF.predir_var1 := allrows[1].predir;
+							SELF.predir_var1 := allrows[1].predir;
 							SELF.postdir_var1 := allrows[1].postdir;
 							SELF.sec_range_var1 := allrows[1].sec_range;
 							SELF.unit_desig_var1 := allrows[1].unit_desig;
@@ -266,11 +304,11 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var1 := allrows[1].dt_last_seen;
 							SELF.county_var1 := addr_info(rec_num = 1)[1].countyName;
 							SELF.address_type_var1 := Addr_info(rec_num = 1)[1].RECORD_TYPE;							
-						  SELF.Address_status_var1 := allrows[1].err_stat;							
+							SELF.Address_status_var1 := allrows[1].err_stat;							
 							
 							SELF.prim_range_var2 := allrows[2].prim_range;
 							SELF.prim_name_var2 := allrows[2].prim_name;
-              SELF.predir_var2 := allrows[2].predir;
+							SELF.predir_var2 := allrows[2].predir;
 							SELF.postdir_var2 := allrows[2].postdir;
 							SELF.sec_range_var2 := allrows[2].sec_range;
 							SELF.unit_desig_var2 := allrows[2].unit_desig;
@@ -283,12 +321,12 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var2 := allrows[2].dt_last_seen;
 							SELF.county_var2 := addr_info(rec_num = 2)[1].countyName;
 							SELF.address_type_var2 := Addr_info(rec_num = 2)[1].RECORD_TYPE;						
-						  SELF.Address_status_var2 := allrows[2].err_stat;
+						     SELF.Address_status_var2 := allrows[2].err_stat;
 							SELF.URL_var2 := allrows[2].company_url;
 							
 							SELF.prim_range_var3 := allrows[3].prim_range;
 							SELF.prim_name_var3 := allrows[3].prim_name;
-              SELF.predir_var3 := allrows[3].predir;
+							SELF.predir_var3 := allrows[3].predir;
 							SELF.postdir_var3 := allrows[3].postdir;
 							SELF.sec_range_var3 := allrows[3].sec_range;
 							SELF.unit_desig_var3 := allrows[3].unit_desig;
@@ -306,7 +344,7 @@ EXPORT Best := MODULE
 							
 							SELF.prim_range_var4 := allrows[4].prim_range;
 							SELF.prim_name_var4 := allrows[4].prim_name;
-              SELF.predir_var4 := allrows[4].predir;
+							SELF.predir_var4 := allrows[4].predir;
 							SELF.postdir_var4 := allrows[4].postdir;
 							SELF.sec_range_var4 := allrows[4].sec_range;
 							SELF.unit_desig_var4 := allrows[4].unit_desig;
@@ -323,7 +361,7 @@ EXPORT Best := MODULE
 							
 							SELF.prim_range_var5 := allrows[5].prim_range;
 							SELF.prim_name_var5 := allrows[5].prim_name;
-              SELF.predir_var5 := allrows[5].predir;
+						     SELF.predir_var5 := allrows[5].predir;
 							SELF.postdir_var5 := allrows[5].postdir;
 							SELF.sec_range_var5 := allrows[5].sec_range;
 							SELF.unit_desig_var5 := allrows[5].unit_desig;
@@ -340,7 +378,7 @@ EXPORT Best := MODULE
 							
 							SELF.prim_range_var6 := allrows[6].prim_range;
 							SELF.prim_name_var6 := allrows[6].prim_name;
-              SELF.predir_var6 := allrows[6].predir;
+							SELF.predir_var6 := allrows[6].predir;
 							SELF.postdir_var6 := allrows[6].postdir;
 							SELF.sec_range_var6 := allrows[6].sec_range;
 							SELF.unit_desig_var6 := allrows[6].unit_desig;
@@ -353,11 +391,11 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var6 := allrows[6].dt_last_seen;
 							SELF.county_var6 := addr_info(rec_num = 6)[1].countyName;
 							SELF.address_type_var6 := Addr_info(rec_num = 6)[1].RECORD_TYPE;	
-              SELF.Address_status_var6 := allrows[6].err_stat;																				 
+							SELF.Address_status_var6 := allrows[6].err_stat;																				 
 							
 							SELF.prim_range_var7 := allrows[7].prim_range;
 							SELF.prim_name_var7 := allrows[7].prim_name;
-              SELF.predir_var7 := allrows[7].predir;
+							SELF.predir_var7 := allrows[7].predir;
 							SELF.postdir_var7 := allrows[7].postdir;
 							SELF.sec_range_var7 := allrows[7].sec_range;
 							SELF.unit_desig_var7 := allrows[7].unit_desig;
@@ -370,11 +408,11 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var7 := allrows[7].dt_last_seen;
 							SELF.county_var7 := addr_info(rec_num = 7)[1].countyName;
 							SELF.address_type_var7 := Addr_info(rec_num = 7)[1].RECORD_TYPE;						 
-              SELF.Address_status_var7 := allrows[7].err_stat;																				 
+							SELF.Address_status_var7 := allrows[7].err_stat;																				 
 							
 							SELF.prim_range_var8 := allrows[8].prim_range;
 							SELF.prim_name_var8 := allrows[8].prim_name;
-              SELF.predir_var8 := allrows[8].predir;
+							SELF.predir_var8 := allrows[8].predir;
 							SELF.postdir_var8 := allrows[8].postdir;
 							SELF.sec_range_var8 := allrows[8].sec_range;
 							SELF.unit_desig_var8 := allrows[8].unit_desig;
@@ -387,11 +425,11 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var8 := allrows[8].dt_last_seen;
 							SELF.county_var8 := addr_info(rec_num = 8)[1].countyName;
 							SELF.address_type_var8 := Addr_info(rec_num = 8)[1].RECORD_TYPE;	
-						  SELF.Address_status_var8 := allrows[8].err_stat;
+						     SELF.Address_status_var8 := allrows[8].err_stat;
 							
 							SELF.prim_range_var9 := allrows[9].prim_range;
 							SELF.prim_name_var9 := allrows[9].prim_name;
-              SELF.predir_var9 := allrows[9].predir;
+							SELF.predir_var9 := allrows[9].predir;
 							SELF.postdir_var9 := allrows[9].postdir;
 							SELF.sec_range_var9 := allrows[9].sec_range;
 							SELF.unit_desig_var9 := allrows[9].unit_desig;
@@ -404,25 +442,25 @@ EXPORT Best := MODULE
 							SELF.dt_last_seen_var9 := allrows[9].dt_last_seen;
 							SELF.county_var9 := addr_info(rec_num = 9)[1].countyName;
 							SELF.address_type_var9 := Addr_info(rec_num = 9)[1].RECORD_TYPE;
-              SELF.Address_status_var9 := allrows[9].err_stat;																				 
+							SELF.Address_status_var9 := allrows[9].err_stat;																				 
 							
 							SELF.total_addresses := IF (allrows[1].v_city_name <> '' AND
 							                             allrows[1].st <> '' , 1, 0) +
 							                        IF (allrows[2].v_city_name <> '' AND
 							                             allrows[2].st <> '' , 1, 0) +
-																			IF (allrows[3].v_city_name <> '' AND
+											   IF (allrows[3].v_city_name <> '' AND
 							                             allrows[3].st <> '' , 1, 0) +
-																			IF (allrows[4].v_city_name <> '' AND
+											   IF (allrows[4].v_city_name <> '' AND
 							                             allrows[4].st <> '' , 1, 0) +
-																			IF (allrows[5].v_city_name <> '' AND
+											   IF (allrows[5].v_city_name <> '' AND
 							                             allrows[5].st <> '' , 1, 0) +
-																			IF (allrows[6].v_city_name <> '' AND
+											    IF (allrows[6].v_city_name <> '' AND
 							                             allrows[6].st <> '' , 1, 0) +
-																			IF (allrows[7].v_city_name <> '' AND
+												IF (allrows[7].v_city_name <> '' AND
 							                             allrows[7].st <> '' , 1, 0) +
-																			IF (allrows[8].v_city_name <> '' AND
+												IF (allrows[8].v_city_name <> '' AND
 							                             allrows[8].st <> '' , 1, 0) +
-																			IF (allrows[9].v_city_name <> '' AND
+												IF (allrows[9].v_city_name <> '' AND
 							                             allrows[9].st <> '' , 1, 0);
 							 SELF := [];
 END;																 
@@ -431,10 +469,10 @@ END;
    BusinessBatch_BIP.Layouts.cName_Final
        MakeFlatCname( rec_seleBest le,
                  DATASET(rec_seleBest) allrows) := TRANSFORM
-                SELF.acctno := le.acctno;
-								SELF.ultid := LE.ultid;
-								SELF.orgid := LE.orgid;
-							  SELF.seleid := LE.seleid;
+						     SELF.acctno := le.acctno;
+							SELF.ultid := LE.ultid;
+							SELF.orgid := LE.orgid;
+							SELF.seleid := LE.seleid;
 							SELF.company_name_var1 := allrows[1].company_name;
 							SELF.Company_name_var1_first_seen := ut.date_YYYYMMDDtoDateSlashed((string8) allrows[1].dt_first_seen_company_name);
 							SELF.Company_name_var1_last_seen  := ut.date_YYYYMMDDtoDateSlashed((string8) allrows[1].dt_last_seen_company_name);
@@ -470,7 +508,7 @@ END;
        MakeFlatFein( rec_seleBest le,
                  DATASET(rec_seleBest) allrows) := TRANSFORM
               SELF.acctno := le.acctno;
-						  SELF.ultid := LE.ultid;
+						     SELF.ultid := LE.ultid;
 							SELF.orgid := LE.orgid;
 							SELF.seleid := LE.seleid;
 							SELF.fein_var1 := allrows[1].company_fein;
@@ -483,15 +521,14 @@ END;
 							SELF.fein_var8 := allrows[8].company_fein;
 							SELF.fein_var9 := allrows[9].company_fein;
 							SELF.total_fein := IF (allrows[1].company_fein <> '', 1, 0) +
-							                   IF (allrows[2].company_fein <> '', 1, 0) +
-																 IF (allrows[3].company_fein <> '', 1, 0) +
-																 IF (allrows[4].company_fein <> '', 1, 0) +
-																 IF (allrows[5].company_fein <> '', 1, 0) +
-																 IF (allrows[6].company_fein <> '', 1, 0) +
-																 IF (allrows[7].company_fein <> '', 1, 0) +
-																 IF (allrows[8].company_fein <> '', 1, 0) +
-																 IF (allrows[9].company_fein <> '', 1, 0);
-																 
+													IF (allrows[2].company_fein <> '', 1, 0) +
+													IF (allrows[3].company_fein <> '', 1, 0) +
+													IF (allrows[4].company_fein <> '', 1, 0) +
+													IF (allrows[5].company_fein <> '', 1, 0) +
+													IF (allrows[6].company_fein <> '', 1, 0) +
+													IF (allrows[7].company_fein <> '', 1, 0) +
+													IF (allrows[8].company_fein <> '', 1, 0) +
+													IF (allrows[9].company_fein <> '', 1, 0);																 
 							SELF := [];
    END;	
  
@@ -501,10 +538,12 @@ END;
    DS_SELEBestRecsAcctnoBHSlim := DEDUP(DS_SELEBestRecsAcctnoBH, ALL);																							 
 	 FETCH_LEVEL := BIPV2.IDconstants.Fetch_Level_SELEID;
 	 linkidsOnly := DEDUP(SORT(PROJECT(DS_SELEBestRecsAcctnoBH, TRANSFORM(
-																											 BIPV2.IDlayouts.l_xlink_ids, SELF.ultid := LEFT.ultid;
-																											  SELF.orgid := LEFT.orgid; SELF.seleid := LEFT.seleid;
-																												SELF  := [])),  #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),  
-																												                #expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
+									BIPV2.IDlayouts.l_xlink_ids, 
+											SELF.ultid := LEFT.ultid;
+											SELF.orgid := LEFT.orgid; 
+											SELF.seleid := LEFT.seleid;
+									SELF  := [])),  #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),  
+						 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
 																
    // get recs from bus header cap at MaxBHLinkidsBest constant.			
 	 // TRUE means don't return any SOURCE = D recs (Dun and Bradstreet).
@@ -560,24 +599,7 @@ END;
 		    {acctno,UNSIGNED2 cnt:= COUNT(GROUP);},acctno);				
 				
 		// END VARIATIONS of companies at the address.
-		//
-	 	ds_busHeaderRecsIsCorporationOrLLC := DEDUP(SORT (ds_busHeaderRecsSlim(company_org_structure_derived <> '' AND MDR.sourceTools.SourceIsCorpV2(source)), 
-		                                               #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_org_structure_derived, RECORD),
-	                                                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), company_org_structure_derived);
-
-  ds_busHeaderRecsIsCorporationOrLLCWAcctno := JOIN(SORT(DS_SELEBestRecsAcctnoBHSlim, #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
-	                                                 ds_busHeaderRecsIsCorporationOrLLC,
-																									  BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																										TRANSFORM(BusinessBatch_BIP.Layouts.BusinessType_Final,
-																										  SELF.acctno := LEFT.acctno;																											
-																							isCorp := STD.Str.Find(right.company_org_structure_derived,
-																							                 'CORPORATION-BUSINESS',1) > 0;																		         
-																						
-																								isLLC := STD.Str.Find(right.company_org_structure_derived,
-																								       'LIMITED LIABILITY CORPORATION',1) > 0;
-																	                    
-																											SELF := RIGHT;
-																											SELF := []), LEFT OUTER, LIMIT(0), KEEP(1));
+		//	 	
    																									 
     ds_busHeaderRecsSlimSorted := SORT(ds_busHeaderRecsSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), RECORD);
    // add back acctno to the DS.
@@ -595,13 +617,10 @@ END;
    // grab the top X rows for each acctno of the different linkids/acctno
 		 DS_SeleBestGroupedYrsInBusDedupSmall := TOPN( GROUP( SORT(DS_seleBestGroupedYrsInBusDedup,acctno, dt_first_seen), 
 	              acctno), maxVariationsPerAcctno , acctno);																						   																						 
-  
-	 // NOTES : Years_in_Business : company_incorporation_date is in DS_BHRecsWAcctno
-	 // so slim the DS down dedup/sort to get recs with some population on it.
 			 
 	 // slim the BH recs to be only ones with different linkids and addresses
 	 DS_seleBestGroupedAddrDedup := DEDUP( SORT(DS_BHRecsWAcctno,	                                            
-																					acctno, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), st,v_city_name,zip,prim_name,prim_range,record),
+								   acctno, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), st,v_city_name,zip,prim_name,prim_range,record),
 	                                        acctno, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), st,v_city_name,zip,prim_name,prim_range);
    									
    	// eliminate dups of the Bus header addresses that might exist in the best DS
@@ -609,9 +628,9 @@ END;
 																								 LEFT.acctno = RIGHT.acctno AND
 																								 BIPV2.IDmacros.mac_JoinTop3Linkids() AND
 																								 LEFT.st = RIGHT.st AND
-                                                 LEFT.v_city_name = RIGHT.v_city_name AND
+																								 LEFT.v_city_name = RIGHT.v_city_name AND
 																								 LEFT.zip = RIGHT.zip AND
-                                                 LEFT.prim_name = RIGHT.prim_name AND
+																								 LEFT.prim_name = RIGHT.prim_name AND
 																								 LEFT.prim_range = RIGHT.prim_range,
 																								 TRANSFORM(LEFT), LEFT ONLY), acctno), acctno);																					
     // grab the top X rows for each acctno of the different linkids/acctno
@@ -679,71 +698,54 @@ END;
   // join in with cname variations.
 	ds_NameAddressVarsOutFinal := JOIN(ds_AddressVarsOut, ds_CnameVarsOut,
 	                                      LEFT.acctno = RIGHT.acctno and
-																				 BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																				  TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,
+									BIPV2.IDmacros.mac_JoinTop3Linkids(),
+										TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,
 																	 SELF := LEFT,
 																	 SELF := RIGHT,
 																	 SELF :=[];
 																	 ), LEFT OUTER);  		
-		   // add yrsinbuss to the mix.															 
+		   // add input_residential flag															 
 	ds_YrsInBusinessOutFinal := JOIN(ds_NameAddressVarsOutFinal, DS_SeleBestGroupedYrsInBusDedupSmall,
 		                                    LEFT.acctno  = RIGHT.acctno AND
-																				BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																				 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,
+										BIPV2.IDmacros.mac_JoinTop3Linkids(),
+										TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,
 																			
 																			SELF.Input_residential :=  IF (RIGHT.Address_type_derived = 'R', 'Y',						
-																					IF (RIGHT.address_type_derived = 'B',
-						                              'N','N'));																					        
-																					
-																			dt_first_seenInt := RIGHT.dt_first_seen / 10000;
-																			SELF.Years_in_Business := (STRING3) if ((UNSIGNED4) RIGHT.dt_first_seen = 0, 0,
-																																	(unsigned4) (CurYear - (unsigned4) (dt_first_seenInt))
-																																	);																									 																		
+																													IF (RIGHT.address_type_derived = 'B','N','N')
+																												);																					        																																																		
 																			SELF := LEFT,																		
 																			SELF := [];
 																			), LEFT OUTER);
-   // add in corp vs LLC identifier.
-	 // to the end result.
-  ds_busNameCorporLLC := JOIN(ds_YrsInBusinessOutFinal,ds_busHeaderRecsIsCorporationOrLLCWAcctno,
-	                              LEFT.acctno = RIGHT.acctno AND
-																  BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																	TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,																	 
-																	 
-																		SELF := LEFT,
-																		SELF := []),
-																		LEFT OUTER);
-																		
-	ds_NameAddressFeinVarsOutFinal := JOIN(ds_busNameCorporLLC, ds_FeinVarsOut,
+  
+	ds_NameAddressFeinVarsOutFinal := JOIN(ds_YrsInBusinessOutFinal, ds_FeinVarsOut,	                                                                              
 	                                      LEFT.acctno = RIGHT.acctno AND
-																				 BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																				  TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
-																	 																																										 
-                                   SELF := LEFT,																													 
+								 BIPV2.IDmacros.mac_JoinTop3Linkids(),
+									TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,																	 																																										 
+																	 SELF := LEFT,																													 
 																	 SELF := RIGHT,
 																	 SELF :=[];
 																	 ), LEFT OUTER);										 
 																									 
   // add in current businesses count.
 	ds_ActiveAddrVariationsCountFinal := JOIN(ds_nameAddressFeinVarsOutFinal, ds_ActiveAddrVariationsCount,
-	                                     LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
-																			  SELF.Input_total_businesses_active := RIGHT.cnt;
-																				SELF := LEFT), 
-																				LEFT OUTER);
+														LEFT.acctno = RIGHT.acctno,
+														TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
+															SELF.Input_total_businesses_active := RIGHT.cnt;
+															SELF := LEFT), 
+														LEFT OUTER);
  // add in historical businesses count																				
   ds_InActiveAddrVariationsCountFinal := JOIN(ds_ActiveAddrVariationsCountFinal, ds_InActiveAddrVariationsCount,
-	                                     LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
-																			  SELF.Input_total_businesses_history := RIGHT.cnt;
-																				SELF := LEFT), 
-																				LEFT OUTER);																			
+														LEFT.acctno = RIGHT.acctno,
+														TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars,
+															SELF.Input_total_businesses_history := RIGHT.cnt;
+															SELF := LEFT), 
+														 LEFT OUTER);																			
 	
 	// now need to combine the best/parent DS with variations of addresses/cnames/feins
 	DS_BestNameAddressOutputTmp := PROJECT(SORT(JOIN(ds_seleidBestout, ds_InActiveAddrVariationsCountFinal,
-	                                 LEFT.acctno = RIGHT.acctno AND
-																	  BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																	 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVarsTmp,
-																	 SELF.years_in_business :=  RIGHT.Years_in_business;																	 	                                 																 
+																LEFT.acctno = RIGHT.acctno AND
+																	 BIPV2.IDmacros.mac_JoinTop3Linkids(),
+																	 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVarsTmp,																	
 																	 SELF.Input_residential := RIGHT.Input_residential;
 																	 SELF.Input_total_businesses_Active := RIGHT.Input_Total_businesses_active;
 																	 SELF.Input_total_businesses_history := RIGHT.Input_total_businesses_history;
@@ -766,7 +768,7 @@ END;
 	 
 		// output(ds_seleidBestWithParent_Sorted, named('ds_seleidBestWithParent_Sorted'));
 
-    
+           // output(ds_seleidbestWithParentDate, named('ds_seleidbestWithParentDate'));    
 		//output(ds_initialAcctno, named('ds_initialAcctno'));
 	 // output(ds_seleidBestout, named('ds_seleidBestout'));
 
@@ -788,10 +790,12 @@ END;
 	// output(DS_SeleBestGroupedFeinDedupSmall, named('DS_SeleBestGroupedFeinDedupSmall'));
 	//output(ds_seleBestGroupedcnameDedup, named('ds_seleBestGroupedcnameDedup'));
 	// output(ds_FeinVarsOut, named('ds_FeinVarsOut'));
-	//output(DS_BHRecsWAcctno, named('DS_BHRecsWAcctno'));
+	// output(DS_BHRecsWAcctno, named('DS_BHRecsWAcctno'));
+	  // DS_BHRecsWAcctno
 	// output(DS_SeleBestGrouped, named('DS_SeleBestGrouped'));
 	// output(DS_seleBestGroupedAddrDedup, named('DS_seleBestGroupedAddrDedup'));
- 
+    // output(CompanyIncorporationDate, named('CompanyIncorporationDate'));
+	// output(ds_seleidbestWithParentDate, named('ds_seleidbestWithParentDate'));
 	 // output(DS_seleBestGroupedAddrDedupSlim, named('DS_seleBestGroupedAddrDedupSlim'));
 	// output(ds_AddressVarsOut, named('ds_AddressVarsOut'));
 
