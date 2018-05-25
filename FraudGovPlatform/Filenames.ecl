@@ -85,6 +85,7 @@ module
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
+		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
@@ -93,7 +94,8 @@ module
 			Pii.dAll_filenames +
 			CIID.dAll_filenames +
 			Crim.dAll_filenames +
-			Death.dAll_filenames;
+			Death.dAll_filenames +
+			FraudPoint.dAll_filenames;
 	
 	end;
 	
