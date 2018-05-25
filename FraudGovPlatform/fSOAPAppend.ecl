@@ -1,10 +1,10 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models;
 EXPORT fSOAPAppend	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
 Shared threads			:= 2;
 
-Shared base := Fraudshared.Files().Base.Main.qa;
+Shared base := Fraudshared.Files().Base.Main.built;
 
 Shared pii_base	:= Files().base.pii.built;
 
@@ -26,7 +26,7 @@ Export Pii := Module
 											,self.drivers_license				:=left.drivers_license
 											,self.drivers_license_state	:=left.drivers_license_state
 											,self.home_phone						:=left.clean_phones.phone_number
-											,self.work_phone						:=left.clean_phones.work_phone
+											,self.work_phone_						:=left.clean_phones.work_phone
 											,self.ip_address						:=left.ip_address				
 											,self												:=left)
 									);
@@ -140,7 +140,7 @@ in_format make_batch_in(pii_base le, integer c) := TRANSFORM
 	SELF.St := le.st;
 	SELF.z5 := le.ZIP;
 	SELF.Home_Phone := le.home_phone;
-	SELF.work_Phone := le.work_phone;
+	SELF.work_Phone := le.work_phone_;
 	SELF.SSN := le.SSN;
 	SELF.DOB := (string)le.dob;
 	SELF.DL_Number := le.drivers_license;
@@ -312,10 +312,108 @@ soapResponse := soapcall( soap_input,
 						PARALLEL(threads), 
 						onFail(myFail(LEFT))
 						)
-						(matchcode<>'',errorcode='')
+						(matchcode<>'')
 						;
 Export All := Project(soapResponse,Layouts.Death);
 						
+END;
+
+EXPORT FraudPoint	:= MODULE
+
+service_name	:= 'Models.FraudAdvisor_Batch_Service';
+serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+string DataRestriction := '00000000000000'; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+									// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
+string pModel := 'FP31505_0' ;
+
+//===================  options  ==============================================================
+boolean 	includeV1 			:= true;  //set to 'true' to request version 1 attributes, else set to 'false'
+boolean   includeV2 			:= true;	//set to 'true' to request version 2 attributes, else set to 'false'
+unsigned1 redflags 			:= 1;		//set to 1 to request red flags, else set to 0
+//============================================================================================
+
+layout_out:= models.Layout_FD_Batch_Out;
+
+layout_soap_input := RECORD
+	DATASET(Risk_Indicators.Layout_Batch_In) batch_in;
+	DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
+	STRING ModelName;
+	STRING DataRestrictionMask;
+	INTEGER DPPAPurpose;
+	INTEGER GLBPURPOSE;
+	BOOLEAN IncludeVersion1;
+	BOOLEAN IncludeVersion2;
+	UNSIGNED1 RedFlag_version;
+END;
+
+Risk_Indicators.Layout_Batch_In make_batch_in(pii_base le, integer c) := TRANSFORM
+	self.seq := c;
+	self.acctno := (string)le.did;
+	SELF.Name_First := le.fname;
+	SELF.Name_Middle := le.mname;
+	SELF.Name_Last := le.lname;
+	SELF.Name_suffix := le.name_suffix;
+	SELF.prim_name := le.prim_name;
+	SELF.prim_range := le.prim_range;
+	SELF.sec_range := le.sec_range;
+	SELF.St := le.st;
+	SELF.z5 := le.ZIP;
+	SELF.Home_Phone := le.home_phone;
+	SELF.work_Phone := le.work_phone_;
+	SELF.SSN := le.SSN;
+	SELF.DOB := (string)le.dob;
+	SELF.DL_Number := le.drivers_license;
+	SELF.DL_State := le.drivers_license_state;
+	SELF.ip_addr := le.ip_address;
+	self.historydateyyyymm := 999999;  //to run with current date
+	SELF := le;
+	SELF := [];
+END;
+
+layout_soap_input make_fp_in(pii_base le, integer c) := TRANSFORM
+	batch := PROJECT(le, make_batch_in(LEFT, c));
+	SELF.batch_in := batch;
+	SELF.gateways := DATASET([{'FCRA', serviceURL}], risk_indicators.layout_gateways_in);
+	SELF.ModelName := pModel;
+	SELF.DataRestrictionMask := DataRestriction; 
+	SELF.DPPAPurpose := 1;
+	SELF.GLBPURPOSE := 1;
+	SELF.IncludeVersion1 := includeV1;   
+	SELF.IncludeVersion2 := includeV2;		
+	SELF.RedFlag_version := redflags;			
+END;
+
+soap_in := DISTRIBUTE(project(pii_base, make_fp_in(LEFT, counter)),RANDOM() % nodes);
+
+xlayout := RECORD
+	layout_out;
+	STRING errorcode; 
+END;
+
+xlayout myFail(soap_in le) := TRANSFORM
+	SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+	SELF := [];
+END;
+
+soap_results := soapcall(	soap_in,
+						serviceURL,
+						service_name,
+						{soap_in}, 
+						DATASET(xlayout),
+						PARALLEL(threads), 
+						onFail(myFail(LEFT))
+						)
+						// (errorcode='')
+						;
+						
+fp	:= project(soap_results
+							,Transform(Layouts.FraudPoint
+									,self.did	:=(unsigned)left.acctno
+									,self:=left));
+
+Export All := fp;
+
 END;
 
 END;
