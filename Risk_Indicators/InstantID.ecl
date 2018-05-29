@@ -210,8 +210,6 @@ export InstantID := MACRO
 		'outcometrackingoptout'
 	));
 
-#STORED('CallingServiceName','Risk_Indicators__InstantID');
-
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
 
 /* **********************************************
