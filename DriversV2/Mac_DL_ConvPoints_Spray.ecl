@@ -114,10 +114,10 @@ macro
 	  %recSize% := 245;  //MN Convictions data
 	#end
   #if (%stype% = 'TN')
-	  %recSize% := 201;  //TN Convictions data
+	  %recSize% := 69;  //TN Convictions data
 	#end
 	#if (%stype% = 'TN_WDL')
-	  %recSize% := 201;  //TN Withdrawals data
+	  %recSize% := 63;  //TN Withdrawals data
 	#end
 	/*
 	#if (%stype% = 'WY')
@@ -240,16 +240,13 @@ macro
 														// 'MO_MEDCERT' => DriversV2.Mapping_DL_MO_New_As_ConvPoints(filedate).Build_DL_MO_Convpoints,
 														//***  MN conviction date is not being updated anymore.
 														// 'MN' => DriversV2.Mapping_DL_MN_New_As_ConvPoints(filedate, dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+filedate+'::cleaned',drivers.Layout_CT_Full,thor)).Build_DL_MN_New_Convpoints,
-														 'OH' => DriversV2.Mapping_DL_OH_As_ConvPoints(filedate, dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+filedate,DriversV2.Layouts_DL_OH_In.Layout_OH_CP_Pdate,thor)).Build_DL_OH_Convpoints
-													/*  Commenting the below code temporarily. Will uncomment the code when the layout changes complete. 
-														 'TN' => sequential(
-																			DriversV2.Cleaned_DL_TN_ConvPoints(filedate),
-																			DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Conviction
-																		 )
-														 'TN_WDL' => sequential(
-																					DriversV2.Cleaned_DL_TN_Withdrawals(filedate),
-																					DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Suspension
-																				 )*/
+														 'OH' 		=> DriversV2.Mapping_DL_OH_As_ConvPoints(filedate, dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::'+filedate,DriversV2.Layouts_DL_OH_In.Layout_OH_CP_Pdate,thor)).Build_DL_OH_Convpoints,
+														 'TN' 		=> sequential(DriversV2.Cleaned_DL_TN_ConvPoints(filedate),
+																										DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Conviction
+																										),
+														 'TN_WDL' => sequential(DriversV2.Cleaned_DL_TN_Withdrawals(filedate),
+																										DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Suspension
+																										)
 														);
 
 	%Create_Superfiles% := sequential(FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Superfile',false),

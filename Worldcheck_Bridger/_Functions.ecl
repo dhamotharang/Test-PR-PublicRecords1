@@ -1149,6 +1149,10 @@
 				trim(kword, left, right) = 'OFAC-UKR13662' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_UKR13662,
 				trim(kword, left, right) = 'FINBI' =>SubGroup_Constants.numKeywordsID.KEYWORD_FINBI,
 				trim(kword, left, right) = 'PAMEF-CNBC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PAMEF_CNBC,
+				trim(kword, left, right) = 'LVSCS' =>SubGroup_Constants.numKeywordsID.KEYWORD_LVSCS,
+				trim(kword, left, right) = 'ECB' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECB,
+				trim(kword, left, right) = 'CAATSA228-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAATSA228_WC,
+				trim(kword, left, right) = 'ESMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESMA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
