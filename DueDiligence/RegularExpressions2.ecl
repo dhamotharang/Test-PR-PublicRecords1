@@ -1,8 +1,12 @@
-﻿EXPORT RegularExpressions2(STRING textToSearch, STRING offenseScore) := MODULE
+﻿import DueDiligence;
+
+
+EXPORT RegularExpressions2(STRING textToSearch, STRING offenseScore, STRING1 trafficflag) := MODULE
 
 		SHARED trimTextToSearch := TRIM(textToSearch, LEFT, RIGHT);
 		SHARED offenseScoreIsTraffic := TRIM(offenseScore, LEFT, RIGHT) = DueDiligence.Constants.TRAFFIC;
-		
+    SHARED istraffic   := trafficflag = DueDiligence.Constants.YES;
+    
 		//List of expressions
 		SHARED EXPRESSION_CORRUPT_BRIBE := '^(?=.*(CORRUPT|BRIB))(?!.*(DISTRIBUTE|MINOR)).*';
 		SHARED EXPRESSION_LAUNDER :='(LAUNDER)';
@@ -28,7 +32,7 @@
 		SHARED EXPRESSION_EXCLUDE_RELATED_TRAFFIC := '(?!.*\\b(ONE-WAY|SIGNAL|OFFENSE|STOP|HABIT|LANE|PEDES|MOPED|DEVICE|SPEED|BLOCK|CHAPTER|IMPEDE|(NON)?MOVING|OBSTRUCTING|DRUNK|DUI|DWI))';
 		SHARED EXPRESSION_SMUGGLING := '(?=.*(SMUG))'; 
 		SHARED EXPRESSION_TRAFFICKING := '((?=.*(\\bTRAFFICK))|(?=.*(\\bTRAF))(?=.*\\b(DRU|DRG|FIREARM|ORGAN|SEX|LABOR|HUMAN|CONTRABAND|ALIEN|STOLE|COC|SUBSTANCE|CANNABIS|FOOD|CON|COKE|MARIJ|DISTRIB|CS|CONSPIR|GRAM|OPIUM)))' + EXPRESSION_EXCLUDE_RELATED_TRAFFIC + '.*'; ; 
-		SHARED EXPRESSION_EXPOSIVES := '(EXPLOS|NUCLEAR|BOMB|GRENADE|((MASS).*(DES))|((DES).*(DEV)))';
+		SHARED EXPRESSION_EXPLOSIVES := '(EXPLOS|NUCLEAR|BOMB|GRENADE|((MASS).*(DES))|((DES).*(DEV)))';
 		SHARED EXPRESSION_WEAPONS_OFFENSES := '(UUW|WEAP|WPN|WEA|WEP|FIREARM|GUN|AMMUNI|ARMOR|CONTRA(?!CT)|AMMO(?!NIA)|KNIFE|ARMED|DISCHARG)';  
 		SHARED EXPRESSION_DRUG_OFFENSES := '(C\\/S|HYDROC|CODEINE|DIHYDRO|HYDROMORPH|PHENCYC|PENTAZ|ALPRAZ|ECSTASY|DARVO|CDS|MARI|COCA|METH|NARC|DRUG|HALLUC|EPHED|OXY|HEROI|OPIUM|ANHY|AMPH|AMMONIA|\\bCHEM|NITROU|CANNA|((?=.*(\\bCONTR))(?=.*(\\bSUB|\\bDANG)).*))';  
 		SHARED EXPRESSION_DISTRIBUTION_MANUFACTURING_TRANSPORTATION := '^(?:(MAN(U)?F|MFG|TRAN(?!BAND)|DIS(?!(ARMING|C|H))))(?=.*(' + EXPRESSION_WEAPONS_OFFENSES + '|' + EXPRESSION_DRUG_OFFENSES + '))'; 
@@ -85,7 +89,7 @@
     
     SHARED ExpressionEnum := ENUM(CORRUPT_BRIBE, LAUNDER, ORGANIZED_CRIME, TERROR, FRAUD, ID_THEFT, COUNTERFEIT, CHECK_FRAUD, FORGERY, EMBEZZLEMENT, 
                                   FALSE_PRETENSES, INTERCEPT_COMMUNICATION, WIRE, INSIDER_TRADING, TREASON_ESPIONAGE, EXTORTION, CONCEALMENT_OF_FUNDS, 
-                                  TAX_OFFENSES, HIJACKING, CHOP_SHOP, EXCLUDE_RELATED_TRAFFIC, SMUGGLING, TRAFFICKING, EXPOSIVES, WEAPONS_OFFENSES, 
+                                  TAX_OFFENSES, HIJACKING, CHOP_SHOP, EXCLUDE_RELATED_TRAFFIC, SMUGGLING, TRAFFICKING, EXPLOSIVES, WEAPONS_OFFENSES, 
                                   DRUG_OFFENSES, DISTRIBUTION_MANUFACTURING_TRANSPORTATION, MURDER_HOMOCIDE_MANSLAUGHTER, ASSULT_WITH_INTENT_TO_KILL, 
                                   KIDNAPPING_OR_ABDUCTION, GRAND_LARCENY, BANK_ROBBERY, ARMED_ROBBERY, ROBBERY, FELONY_THEFT, MISDEMEANOR_THEFT, LARCENY, 
                                   ORGANIZED_RETAIL_THEFT, ARSON, BURGLARY, BREAKING_AND_ENTERING, SOLICITATION, PORN, PROSTITUTION, SEXUAL_ASSAULT_AND_BATTERY, 
@@ -102,78 +106,78 @@
       UNSIGNED4   expressionWeight;
     END;
 
-    SHARED expressionDS := DATASET([{ExpressionEnum.CORRUPT_BRIBE,	    EXPRESSION_CORRUPT_BRIBE,	72},
-                                    {ExpressionEnum.LAUNDER,	          EXPRESSION_LAUNDER,	71},
-                                    {ExpressionEnum.ORGANIZED_CRIME,	  EXPRESSION_ORGANIZED_CRIME,	70},
-                                    {ExpressionEnum.TERROR,	            EXPRESSION_TERROR,	69},
-                                    {ExpressionEnum.FRAUD,	            EXPRESSION_FRAUD,	68},
-                                    {ExpressionEnum.ID_THEFT,	          EXPRESSION_ID_THEFT,	67},
-                                    {ExpressionEnum.COUNTERFEIT,	      EXPRESSION_COUNTERFEIT,	66},
-                                    {ExpressionEnum.CHECK_FRAUD,	      EXPRESSION_CHECK_FRAUD,	65},
-                                    {ExpressionEnum.FORGERY,	          EXPRESSION_FORGERY,	64},
-                                    {ExpressionEnum.EMBEZZLEMENT,	      EXPRESSION_EMBEZZLEMENT,	63},
-                                    {ExpressionEnum.FALSE_PRETENSES,	  EXPRESSION_FALSE_PRETENSES,	62},
-                                    {ExpressionEnum.INTERCEPT_COMMUNICATION,	EXPRESSION_INTERCEPT_COMMUNICATION,	61},
-                                    {ExpressionEnum.WIRE,	              EXPRESSION_WIRE,	60},
-                                    {ExpressionEnum.INSIDER_TRADING,	  EXPRESSION_INSIDER_TRADING,	59},
-                                    {ExpressionEnum.TREASON_ESPIONAGE,  EXPRESSION_TREASON_ESPIONAGE,	58},
-                                    {ExpressionEnum.EXTORTION,	        EXPRESSION_EXTORTION,	57},
-                                    {ExpressionEnum.CONCEALMENT_OF_FUNDS,	EXPRESSION_CONCEALMENT_OF_FUNDS,	56},
-                                    {ExpressionEnum.TAX_OFFENSES,	      EXPRESSION_TAX_OFFENSES,	55},
-                                    {ExpressionEnum.HIJACKING,	        EXPRESSION_HIJACKING,	54},
-                                    {ExpressionEnum.CHOP_SHOP,	        EXPRESSION_CHOP_SHOP,	53},
-                                    {ExpressionEnum.EXCLUDE_RELATED_TRAFFIC,	EXPRESSION_EXCLUDE_RELATED_TRAFFIC,	52},
-                                    {ExpressionEnum.SMUGGLING,	        EXPRESSION_SMUGGLING,	51},
-                                    {ExpressionEnum.TRAFFICKING,	      EXPRESSION_TRAFFICKING,	50},
-                                    {ExpressionEnum.EXPOSIVES,	        EXPRESSION_EXPOSIVES,	49},
-                                    {ExpressionEnum.WEAPONS_OFFENSES,	  EXPRESSION_WEAPONS_OFFENSES,	48},
-                                    {ExpressionEnum.DRUG_OFFENSES,	    EXPRESSION_DRUG_OFFENSES,	47},
-                                    {ExpressionEnum.DISTRIBUTION_MANUFACTURING_TRANSPORTATION,	EXPRESSION_DISTRIBUTION_MANUFACTURING_TRANSPORTATION,	46},
-                                    {ExpressionEnum.MURDER_HOMOCIDE_MANSLAUGHTER,	EXPRESSION_MURDER_HOMOCIDE_MANSLAUGHTER,	45},
-                                    {ExpressionEnum.ASSULT_WITH_INTENT_TO_KILL,	EXPRESSION_ASSULT_WITH_INTENT_TO_KILL,	44},
-                                    {ExpressionEnum.KIDNAPPING_OR_ABDUCTION,	EXPRESSION_KIDNAPPING_OR_ABDUCTION,	43},
-                                    {ExpressionEnum.GRAND_LARCENY,	    EXPRESSION_GRAND_LARCENY,	42},
-                                    {ExpressionEnum.BANK_ROBBERY,	      EXPRESSION_BANK_ROBBERY,	41},
-                                    {ExpressionEnum.ARMED_ROBBERY,	    EXPRESSION_ARMED_ROBBERY,	40},
-                                    {ExpressionEnum.ROBBERY,	          EXPRESSION_ROBBERY,	39},
-                                    {ExpressionEnum.FELONY_THEFT,	      EXPRESSION_FELONY_THEFT,	38},
-                                    {ExpressionEnum.MISDEMEANOR_THEFT,	EXPRESSION_MISDEMEANOR_THEFT,	37},
-                                    {ExpressionEnum.LARCENY,	          EXPRESSION_LARCENY,	36},
-                                    {ExpressionEnum.ORGANIZED_RETAIL_THEFT,	EXPRESSION_ORGANIZED_RETAIL_THEFT,	35},
-                                    {ExpressionEnum.ARSON,	            EXPRESSION_ARSON,	34},
-                                    {ExpressionEnum.BURGLARY,	          EXPRESSION_BURGLARY,	33},
-                                    {ExpressionEnum.BREAKING_AND_ENTERING,	EXPRESSION_BREAKING_AND_ENTERING,	32},
-                                    {ExpressionEnum.SOLICITATION,	      EXPRESSION_SOLICITATION,	31},
-                                    {ExpressionEnum.PORN,	              EXPRESSION_PORN,	30},
-                                    {ExpressionEnum.PROSTITUTION,	      EXPRESSION_PROSTITUTION,	29},
-                                    {ExpressionEnum.SEXUAL_ASSAULT_AND_BATTERY,	EXPRESSION_SEXUAL_ASSAULT_AND_BATTERY,	28},
-                                    {ExpressionEnum.SEXUAL_ABUSE,	      EXPRESSION_SEXUAL_ABUSE,	27},
-                                    {ExpressionEnum.STATUTORY_RAPE,	    EXPRESSION_STATUTORY_RAPE,	26},
-                                    {ExpressionEnum.RAPE,	              EXPRESSION_RAPE,	25},
-                                    {ExpressionEnum.MOLESTATION,	      EXPRESSION_MOLESTATION,	24},
-                                    {ExpressionEnum.AGGRAVATED_ASSAULT_OR_BATTERY,	EXPRESSION_AGGRAVATED_ASSAULT_OR_BATTERY,	23},
-                                    {ExpressionEnum.ASSAULT_WITH_DEADLY_WEAPON,	EXPRESSION_ASSAULT_WITH_DEADLY_WEAPON,	22},
-                                    {ExpressionEnum.ASSAULT,	          EXPRESSION_ASSAULT,	21},
-                                    {ExpressionEnum.DOMESTIC_VIOLENCE,	EXPRESSION_DOMESTIC_VIOLENCE,	20},
-                                    {ExpressionEnum.ANIMAL_FIGHTING,	  EXPRESSION_ANIMAL_FIGHTING,	19},
-                                    {ExpressionEnum.STALKING_HARASSMENT,	EXPRESSION_STALKING_HARASSMENT,	18},
-                                    {ExpressionEnum.CYBER_STALKING,	    EXPRESSION_CYBER_STALKING,	17},
-                                    {ExpressionEnum.VIOLATE_RESTRAINING_ORDER,	EXPRESSION_VIOLATE_RESTRAINING_ORDER,	16},
-                                    {ExpressionEnum.RESISTING_ARREST,	  EXPRESSION_RESISTING_ARREST,	15},
-                                    {ExpressionEnum.PROPERTY_DESTRUCTION,	EXPRESSION_PROPERTY_DESTRUCTION,	14},
-                                    {ExpressionEnum.VANDALISM,	        EXPRESSION_VANDALISM,	13},
-                                    {ExpressionEnum.PERJURY,	          EXPRESSION_PERJURY,	12},
-                                    {ExpressionEnum.OBSTRUCTION,	      EXPRESSION_OBSTRUCTION,	11},
-                                    {ExpressionEnum.TAMPERING,	        EXPRESSION_TAMPERING,	10},
-                                    {ExpressionEnum.COMPUTER_OFFENSES,	EXPRESSION_COMPUTER_OFFENSES,	9},
-                                    {ExpressionEnum.GAMBLING_BITCOIN,	  EXPRESSION_GAMBLING_BITCOIN,	8},
-                                    {ExpressionEnum.SHOPLIFTING,	      EXPRESSION_SHOPLIFTING,	7},
-                                    {ExpressionEnum.ALIEN_OFFENSES,	    EXPRESSION_ALIEN_OFFENSES,	6},
-                                    {ExpressionEnum.TRAFFIC_OFFENSES,	  EXPRESSION_ALIEN_OFFENSES,	5},
-                                    {ExpressionEnum.DUI,	              EXPRESSION_DUI,	4},
-                                    {ExpressionEnum.TRESPASSING,	      EXPRESSION_TRESPASSING,	3},
-                                    {ExpressionEnum.DISORDERLY_CONDUCT,	EXPRESSION_DISORDERLY_CONDUCT,	2},
-                                    {ExpressionEnum.PUBLIC_INTOXICATION,	EXPRESSION_PUBLIC_INTOXICATION,	1}], ExpressionDSLayout);
+    SHARED expressionDS := DATASET([{ExpressionEnum.CORRUPT_BRIBE,	    EXPRESSION_CORRUPT_BRIBE,	DueDiligence.Constants.CORRUPT_BRIBE_CODE},
+                                    {ExpressionEnum.LAUNDER,	          EXPRESSION_LAUNDER,	DueDiligence.Constants.LAUNDER_CODE},
+                                    {ExpressionEnum.ORGANIZED_CRIME,	  EXPRESSION_ORGANIZED_CRIME,	DueDiligence.Constants.ORGANIZED_CRIME_CODE},
+                                    {ExpressionEnum.TERROR,	            EXPRESSION_TERROR,	DueDiligence.Constants.TERROR_CODE},
+                                    {ExpressionEnum.FRAUD,	            EXPRESSION_FRAUD,	DueDiligence.Constants.FRAUD_CODE},
+                                    {ExpressionEnum.ID_THEFT,	          EXPRESSION_ID_THEFT,	DueDiligence.Constants.ID_THEFT_CODE},
+                                    {ExpressionEnum.COUNTERFEIT,	      EXPRESSION_COUNTERFEIT,	DueDiligence.Constants.COUNTERFEIT_CODE},
+                                    {ExpressionEnum.CHECK_FRAUD,	      EXPRESSION_CHECK_FRAUD,	DueDiligence.Constants.CHECK_FRAUD_CODE},
+                                    {ExpressionEnum.FORGERY,	          EXPRESSION_FORGERY,	DueDiligence.Constants.FORGERY_CODE},
+                                    {ExpressionEnum.EMBEZZLEMENT,	      EXPRESSION_EMBEZZLEMENT,	DueDiligence.Constants.EMBEZZLEMENT_CODE},
+                                    {ExpressionEnum.FALSE_PRETENSES,	  EXPRESSION_FALSE_PRETENSES,	DueDiligence.Constants.FALSE_PRETENSES_CODE},
+                                    {ExpressionEnum.INTERCEPT_COMMUNICATION,	EXPRESSION_INTERCEPT_COMMUNICATION,	DueDiligence.Constants.INTERCEPT_COMMUNICATION_CODE},
+                                    {ExpressionEnum.WIRE,	              EXPRESSION_WIRE,	DueDiligence.Constants.WIRE_CODE},
+                                    {ExpressionEnum.INSIDER_TRADING,	  EXPRESSION_INSIDER_TRADING,	DueDiligence.Constants.INSIDER_TRADING_CODE},
+                                    {ExpressionEnum.TREASON_ESPIONAGE,  EXPRESSION_TREASON_ESPIONAGE,	DueDiligence.Constants.TREASON_ESPIONAGE_CODE},
+                                    {ExpressionEnum.EXTORTION,	        EXPRESSION_EXTORTION,	DueDiligence.Constants.EXTORTION_CODE},
+                                    {ExpressionEnum.CONCEALMENT_OF_FUNDS,	EXPRESSION_CONCEALMENT_OF_FUNDS,	DueDiligence.Constants.CONCEALMENT_OF_FUNDS_CODE},
+                                    {ExpressionEnum.TAX_OFFENSES,	      EXPRESSION_TAX_OFFENSES,	DueDiligence.Constants.TAX_OFFENSES_CODE},
+                                    {ExpressionEnum.HIJACKING,	        EXPRESSION_HIJACKING,	DueDiligence.Constants.HIJACKING_CODE},
+                                    {ExpressionEnum.CHOP_SHOP,	        EXPRESSION_CHOP_SHOP,	DueDiligence.Constants.CHOP_SHOP_CODE},
+                                    {ExpressionEnum.EXCLUDE_RELATED_TRAFFIC,	EXPRESSION_EXCLUDE_RELATED_TRAFFIC,	DueDiligence.Constants.EXCLUDE_RELATED_TRAFFIC_CODE},
+                                    {ExpressionEnum.SMUGGLING,	        EXPRESSION_SMUGGLING,	DueDiligence.Constants.SMUGGLING_CODE},
+                                    {ExpressionEnum.TRAFFICKING,	      EXPRESSION_TRAFFICKING,	DueDiligence.Constants.TRAFFICKING_CODE},
+                                    {ExpressionEnum.EXPLOSIVES,	        EXPRESSION_EXPLOSIVES,	DueDiligence.Constants.EXPLOSIVES_CODE},
+                                    {ExpressionEnum.WEAPONS_OFFENSES,	  EXPRESSION_WEAPONS_OFFENSES,	DueDiligence.Constants.WEAPONS_OFFENSES_CODE},
+                                    {ExpressionEnum.DRUG_OFFENSES,	    EXPRESSION_DRUG_OFFENSES,	DueDiligence.Constants.DRUG_OFFENSES_CODE},
+                                    {ExpressionEnum.DISTRIBUTION_MANUFACTURING_TRANSPORTATION,	EXPRESSION_DISTRIBUTION_MANUFACTURING_TRANSPORTATION,	DueDiligence.Constants.DISTRIBUTION_MANUFACTURING_TRANSPORTATION_CODE},
+                                    {ExpressionEnum.MURDER_HOMOCIDE_MANSLAUGHTER,	EXPRESSION_MURDER_HOMOCIDE_MANSLAUGHTER,	DueDiligence.Constants.MURDER_HOMOCIDE_MANSLAUGHTER_CODE},
+                                    {ExpressionEnum.ASSULT_WITH_INTENT_TO_KILL,	EXPRESSION_ASSULT_WITH_INTENT_TO_KILL,	DueDiligence.Constants.ASSULT_WITH_INTENT_TO_KILL_CODE},
+                                    {ExpressionEnum.KIDNAPPING_OR_ABDUCTION,	EXPRESSION_KIDNAPPING_OR_ABDUCTION,	DueDiligence.Constants.KIDNAPPING_OR_ABDUCTION_CODE},
+                                    {ExpressionEnum.GRAND_LARCENY,	    EXPRESSION_GRAND_LARCENY,	DueDiligence.Constants.GRAND_LARCENY_CODE},
+                                    {ExpressionEnum.BANK_ROBBERY,	      EXPRESSION_BANK_ROBBERY,	DueDiligence.Constants.BANK_ROBBERY_CODE},
+                                    {ExpressionEnum.ARMED_ROBBERY,	    EXPRESSION_ARMED_ROBBERY,	DueDiligence.Constants.ARMED_ROBBERY_CODE},
+                                    {ExpressionEnum.ROBBERY,	          EXPRESSION_ROBBERY,	DueDiligence.Constants.ROBBERY_CODE},
+                                    {ExpressionEnum.FELONY_THEFT,	      EXPRESSION_FELONY_THEFT,	DueDiligence.Constants.FELONY_THEFT_CODE},
+                                    {ExpressionEnum.MISDEMEANOR_THEFT,	EXPRESSION_MISDEMEANOR_THEFT,	DueDiligence.Constants.MISDEMEANOR_THEFT_CODE},
+                                    {ExpressionEnum.LARCENY,	          EXPRESSION_LARCENY,	DueDiligence.Constants.LARCENY_CODE},
+                                    {ExpressionEnum.ORGANIZED_RETAIL_THEFT,	EXPRESSION_ORGANIZED_RETAIL_THEFT,	DueDiligence.Constants.ORGANIZED_RETAIL_THEFT_CODE},
+                                    {ExpressionEnum.ARSON,	            EXPRESSION_ARSON,	DueDiligence.Constants.ARSON_CODE},
+                                    {ExpressionEnum.BURGLARY,	          EXPRESSION_BURGLARY,	DueDiligence.Constants.BURGLARY_CODE},
+                                    {ExpressionEnum.BREAKING_AND_ENTERING,	EXPRESSION_BREAKING_AND_ENTERING,	DueDiligence.Constants.BREAKING_AND_ENTERING_CODE},
+                                    {ExpressionEnum.SOLICITATION,	      EXPRESSION_SOLICITATION,	DueDiligence.Constants.SOLICITATION_CODE},
+                                    {ExpressionEnum.PORN,	              EXPRESSION_PORN,	DueDiligence.Constants.PORN_CODE},
+                                    {ExpressionEnum.PROSTITUTION,	      EXPRESSION_PROSTITUTION,	DueDiligence.Constants.PROSTITUTION_CODE},
+                                    {ExpressionEnum.SEXUAL_ASSAULT_AND_BATTERY,	EXPRESSION_SEXUAL_ASSAULT_AND_BATTERY,	DueDiligence.Constants.SEXUAL_ASSAULT_AND_BATTERY_CODE},
+                                    {ExpressionEnum.SEXUAL_ABUSE,	      EXPRESSION_SEXUAL_ABUSE,	DueDiligence.Constants.SEXUAL_ABUSE_CODE},
+                                    {ExpressionEnum.STATUTORY_RAPE,	    EXPRESSION_STATUTORY_RAPE,	DueDiligence.Constants.STATUTORY_RAPE_CODE},
+                                    {ExpressionEnum.RAPE,	              EXPRESSION_RAPE,	DueDiligence.Constants.RAPE_CODE},
+                                    {ExpressionEnum.MOLESTATION,	      EXPRESSION_MOLESTATION,	DueDiligence.Constants.MOLESTATION_CODE},
+                                    {ExpressionEnum.AGGRAVATED_ASSAULT_OR_BATTERY,	EXPRESSION_AGGRAVATED_ASSAULT_OR_BATTERY,	DueDiligence.Constants.AGGRAVATED_ASSAULT_OR_BATTERY_CODE},
+                                    {ExpressionEnum.ASSAULT_WITH_DEADLY_WEAPON,	EXPRESSION_ASSAULT_WITH_DEADLY_WEAPON,	DueDiligence.Constants.ASSAULT_WITH_DEADLY_WEAPON_CODE},
+                                    {ExpressionEnum.ASSAULT,	          EXPRESSION_ASSAULT,	DueDiligence.Constants.ASSAULT_CODE},
+                                    {ExpressionEnum.DOMESTIC_VIOLENCE,	EXPRESSION_DOMESTIC_VIOLENCE,	DueDiligence.Constants.DOMESTIC_VIOLENCE_CODE},
+                                    {ExpressionEnum.ANIMAL_FIGHTING,	  EXPRESSION_ANIMAL_FIGHTING,	DueDiligence.Constants.ANIMAL_FIGHTING_CODE},
+                                    {ExpressionEnum.STALKING_HARASSMENT,	EXPRESSION_STALKING_HARASSMENT,	DueDiligence.Constants.STALKING_HARASSMENT_CODE},
+                                    {ExpressionEnum.CYBER_STALKING,	    EXPRESSION_CYBER_STALKING,	DueDiligence.Constants.CYBER_STALKING_CODE},
+                                    {ExpressionEnum.VIOLATE_RESTRAINING_ORDER,	EXPRESSION_VIOLATE_RESTRAINING_ORDER,	DueDiligence.Constants.VIOLATE_RESTRAINING_ORDER_CODE},
+                                    {ExpressionEnum.RESISTING_ARREST,	  EXPRESSION_RESISTING_ARREST,	DueDiligence.Constants.RESISTING_ARREST_CODE},
+                                    {ExpressionEnum.PROPERTY_DESTRUCTION,	EXPRESSION_PROPERTY_DESTRUCTION,	DueDiligence.Constants.PROPERTY_DESTRUCTION_CODE},
+                                    {ExpressionEnum.VANDALISM,	        EXPRESSION_VANDALISM,	DueDiligence.Constants.VANDALISM_CODE},
+                                    {ExpressionEnum.PERJURY,	          EXPRESSION_PERJURY,	DueDiligence.Constants.PERJURY_CODE},
+                                    {ExpressionEnum.OBSTRUCTION,	      EXPRESSION_OBSTRUCTION,	DueDiligence.Constants.OBSTRUCTION_CODE},
+                                    {ExpressionEnum.TAMPERING,	        EXPRESSION_TAMPERING,	DueDiligence.Constants.TAMPERING_CODE},
+                                    {ExpressionEnum.COMPUTER_OFFENSES,	EXPRESSION_COMPUTER_OFFENSES,	DueDiligence.Constants.COMPUTER_OFFENSES_CODE},
+                                    {ExpressionEnum.GAMBLING_BITCOIN,	  EXPRESSION_GAMBLING_BITCOIN,	DueDiligence.Constants.GAMBLING_BITCOIN_CODE},
+                                    {ExpressionEnum.SHOPLIFTING,	      EXPRESSION_SHOPLIFTING,	DueDiligence.Constants.SHOPLIFTING_CODE},
+                                    {ExpressionEnum.ALIEN_OFFENSES,	    EXPRESSION_ALIEN_OFFENSES,	DueDiligence.Constants.ALIEN_OFFENSES_CODE},
+                                    {ExpressionEnum.TRAFFIC_OFFENSES,	  DueDiligence.Constants.EMPTY,	DueDiligence.Constants.TRAFFIC_OFFENSES_CODE},
+                                    {ExpressionEnum.DUI,	              EXPRESSION_DUI,	DueDiligence.Constants.DUI_CODE},
+                                    {ExpressionEnum.TRESPASSING,	      EXPRESSION_TRESPASSING,	DueDiligence.Constants.TRESPASSING_CODE},
+                                    {ExpressionEnum.DISORDERLY_CONDUCT,	EXPRESSION_DISORDERLY_CONDUCT,	DueDiligence.Constants.DISORDERLY_CONDUCT_CODE},
+                                    {ExpressionEnum.PUBLIC_INTOXICATION,	EXPRESSION_PUBLIC_INTOXICATION,	DueDiligence.Constants.PUBLIC_INTOXICATION_CODE}], ExpressionDSLayout);
                                 
     SHARED expressionDCT := DICTIONARY(expressionDS, {enumExpression => expressionDS}); 
 		
@@ -211,8 +215,9 @@
 		EXPORT foundChopShop := doesTextContainExpression(ExpressionEnum.CHOP_SHOP);
 		
 		EXPORT foundTraffickingOrSmuggling := MAP(offenseScoreIsTraffic => 0,
+                                              istraffic             => 0,
 																							MAX(doesTextContainExpression(ExpressionEnum.SMUGGLING), doesTextContainExpression(ExpressionEnum.TRAFFICKING)));
-		EXPORT foundExplosives := doesTextContainExpression(ExpressionEnum.EXPOSIVES);
+		EXPORT foundExplosives := doesTextContainExpression(ExpressionEnum.EXPLOSIVES);
 		EXPORT foundWeapons := doesTextContainExpression(ExpressionEnum.WEAPONS_OFFENSES);
 		EXPORT foundDrugs := doesTextContainExpression(ExpressionEnum.DRUG_OFFENSES);
 		EXPORT foundDistributionManufacturingTransportation := doesTextContainExpression(ExpressionEnum.DISTRIBUTION_MANUFACTURING_TRANSPORTATION);
@@ -262,7 +267,7 @@
 		
 		EXPORT foundShoplifting := doesTextContainExpression(ExpressionEnum.SHOPLIFTING);
 		EXPORT foundAlienOffenses := doesTextContainExpression(ExpressionEnum.ALIEN_OFFENSES);
-		EXPORT foundTrafficOffenses := expressionDCT[ExpressionEnum.TRAFFIC_OFFENSES].expressionWeight;
+		EXPORT foundTrafficOffenses := IF(offenseScoreIsTraffic OR istraffic, expressionDCT[ExpressionEnum.TRAFFIC_OFFENSES].expressionWeight, 0);
 		EXPORT foundDUI := doesTextContainExpression(ExpressionEnum.DUI);
 		EXPORT foundTrespassing := doesTextContainExpression(ExpressionEnum.TRESPASSING);
 		EXPORT foundDisorderlyConduct := doesTextContainExpression(ExpressionEnum.DISORDERLY_CONDUCT);

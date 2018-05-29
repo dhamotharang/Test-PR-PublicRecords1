@@ -95,6 +95,8 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
          SELF.OffenseScoreDescription  := DueDiligence.translateCodeToText.OffenseScoreText(le.offenseScore);  //??? Is this or OffenseScore displayed on web and are both needed??
          SELF.OffenseLevel             := le.criminalOffenderLevel; //??? Is this or OffenseLevelDescription displayed on web and are both needed??
          SELF.OffenseLevelDescription  := DueDiligence.translateCodeToText.OffenseLevelText(le.criminalOffenderLevel); //??? Is this or OffenseLevel displayed on web and are both needed??
+         temp_answer                   := DueDiligence.DictionaryValues_LegalEvents.ReportLegalEventTypeDesc[le.legalEventTypeCode];  
+         SELF.LegalEventType           := temp_answer.LegalEventTypeDescription;
          SELF.NumberOfCounts           := le.num_of_counts;
          SELF.Conviction               := le.convictionFlag;
          SELF.Charge                   := le.Charge;
@@ -107,29 +109,30 @@ EXPORT reportBusExecCriminal(DATASET(DueDiligence.layouts.Busn_Internal) InputBu
          SELF.CourtStatuteDescription  := le.courtStatuteDesc; 
          
          //offense dates
-         SELF.EarliestOffenseDate := iesp.ECL2ESP.toDatestring8(le.earliestOffenseDate);
-         SELF.OffenseDate         := iesp.ECL2ESP.toDatestring8(le.offenseDate);
-         // SELF.ArrestDate             //TO BE POPULATED
-         // SELF.CourtDispositionDate             //TO BE POPULATED
-         // SELF.SentenceDate             //TO BE POPULATED
-         // SELF.AppealDate             //TO BE POPULATED
-         // SELF.IncarcerationDate             //TO BE POPULATED
-         // SELF.IncarcerationReleaseDate             //TO BE POPULATED
+         SELF.EarliestOffenseDate      := iesp.ECL2ESP.toDatestring8(le.earliestOffenseDate);
+         SELF.OffenseDate              := iesp.ECL2ESP.toDatestring8(le.offenseDate);
+         // SELF.ArrestDate               := iesp.ECL2ESP.toDatestring8(le.arrestDate);
+         // SELF.CourtDispositionDate     := iesp.ECL2ESP.toDatestring8(le.courtDispDate);
+         // SELF.SentenceDate             := iesp.ECL2ESP.toDatestring8(le.sentenceDate);
+         // SELF.AppealDate               := iesp.ECL2ESP.toDatestring8(le.appealDate);
+         // SELF.IncarcerationDate        := iesp.ECL2ESP.toDatestring8(le.incarcerationDate);
+         // SELF.IncarcerationReleaseDate := iesp.ECL2ESP.toDatestring8(le.incarcerationReleaseDate);
          
          //offense locations
-         // SELF.OffenseState              //TO BE POPULATED
-         // SELF.OffenseCounty              //TO BE POPULATED
-         // SELF.CourtCounty              //TO BE POPULATED
-         // SELF.OffenseCity              //TO BE POPULATED
-         // SELF.Agency              //TO BE POPULATED
+         // SELF.OffenseState             := le.offenseState;
+         // SELF.OffenseCounty            := le.offenseCounty;
+         // SELF.CourtCounty              := le.courtCounty;
+         // SELF.OffenseCity              := le.offenseCity;
+         // SELF.Agency                   := le.agency;
          
          //physical description
-         // SELF.Race              //TO BE POPULATED
-         // SELF.Sex              //TO BE POPULATED
-         // SELF.HairColor              //TO BE POPULATED
-         // SELF.EyeColor              //TO BE POPULATED
-         // SELF.Height              //TO BE POPULATED
-         // SELF.Weight              //TO BE POPULATED
+         // SELF.Race                     := le.race;
+         // SELF.Sex                      := DueDiligence.translateCodeToText.GenderText(le.sex);
+         // SELF.HairColor                := le.hairColor;
+         // SELF.EyeColor                 := le.eyeColor;
+         // SELF.Height                   := le.height;
+         // SELF.Weight                   := le.weight;
+         // SELF.Citizenship              := le.citizenship;
          
          //other details
          SELF.Incarceration            := MAP(
