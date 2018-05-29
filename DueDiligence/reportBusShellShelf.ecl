@@ -30,6 +30,19 @@ EXPORT reportBusShellShelf(DATASET(DueDiligence.layouts.Busn_Internal) inData) :
                                                     SELF.SOSIncorporationDate                     := iesp.ECL2ESP.toDate(LEFT.sosIncorporationDate);
                                                     SELF.DateFirstSeen                            := iesp.ECL2ESP.toDate(LEFT.busnHdrDtFirstSeenNonCredit);
                                                     //***notice the days apart routine can handle the dates in either order (oldest vs most recent) ***//
+                                                    dayzApart := IF(LEFT.busnHdrDtFirstSeenNonCredit > 0 AND LEFT.sosIncorporationDate > 0,
+                                                                    DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)LEFT.busnHdrDtFirstSeenNonCredit, (STRING)LEFT.sosIncorporationDate),
+                                                                    DueDiligence.Constants.NUMERIC_ZERO);
+                                                    
+                                                    years := dayzApart DIV 365;
+                                                    daysAfterYears := dayzApart % 365;
+                                                    months := TRUNCATE(daysAfterYears/30.44);
+                                                    days := TRUNCATE((daysAfterYears - (months*30.44)));
+                                                    
+                                                    SELF.NumberOfYears := years;
+                                                    SELF.NumberOfMonths := months;
+                                                    SELF.NumberOfDays := days;
+                                                    
                                                     SELF.TimeBetweenSOSIncorporationDateDateFirstSeen   := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)LEFT.busnHdrDtFirstSeenNonCredit, (STRING)LEFT.sosIncorporationDate),
 																										SELF := [];));																																														
   

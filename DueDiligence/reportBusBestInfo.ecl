@@ -60,6 +60,8 @@ EXPORT reportBusBestInfo(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
                                                     date := IF(LEFT.sosIncorporationDate > 0, LEFT.sosIncorporationDate, LEFT.dateVendorFirstReported); 
                                                     SELF.EstablishedDate := iesp.ECL2ESP.toDate(date);
                                                     
+                                                    SELF := LEFT.businessReport.businessInformation;
+                                                    
 																										SELF := [];));
 																																																	
 		

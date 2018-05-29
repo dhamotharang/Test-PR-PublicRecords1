@@ -24,7 +24,8 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(SimpleBusinessExecutives, ReportIsRequested, Debugmode, isFCRA);
 	
 	//retrieve related party event types for a given offense charge
-	getBEOLegalEventType := DueDiligence.getIndLegalEventType(UpdateBusinessExecutivesCriminalOffense);
+	//getBEOLegalEventType := DueDiligence.getIndLegalEventType(UpdateBusinessExecutivesCriminalOffense);
+  getBEOLegalEventType := DueDiligence.getIndOffenseLegalEventType(UpdateBusinessExecutivesCriminalOffense);    //***this will switch over on June 5th
 
   // ------                                                                                    ------
 	// ------ Call the Common.ReplaceExecs routine to  update   executive information            ------ 
