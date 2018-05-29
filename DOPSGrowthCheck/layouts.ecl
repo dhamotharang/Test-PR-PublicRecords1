@@ -1,4 +1,4 @@
-﻿EXPORT layouts := module
+﻿	EXPORT layouts := module
 			/*export Stats_Layout	:=	record
 				string PackageName;
 				string KeyName;
@@ -104,4 +104,12 @@
 				string results_count;
 				string passed;
 			END;
+			export FieldChangeLayout	:=	RECORD
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				string PrevVersion;
+				string field;
+				string NumRecsChanged;
+			end;
 end;
