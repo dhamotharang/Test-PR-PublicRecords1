@@ -35,7 +35,7 @@
 	 STRING2   st;
 	 STRING5   z5;
 */
-IMPORT Address, BatchShare, Doxie, Govt_Collections_Services, Suppress, ut, STD;
+IMPORT Address, BatchShare, Doxie, Govt_Collections_Services, Suppress, ut, STD,AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
