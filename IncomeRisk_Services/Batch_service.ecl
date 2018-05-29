@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 	<message name = "IncomeRisk_Services_BATCH">
 	  <part name="batch_in"    type = "tns:XmlDataSet" cols="80" rows="30"/>		
 		<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>		
@@ -10,6 +10,7 @@
 	  <part name="IncludeMSOverride"  type="xsd:boolean"/>
 	  <part name="IncludeDLVerification"  type="xsd:boolean"/>
 	  <part name="DisallowTargusEID3220"  type="xsd:boolean"/>
+    <part name="OFACversion" type="xsd:unsignedInt"/>
 		<part name="ModelName" type="xsd:string"/>
 		
 	  <part name="Include_ALL_Watchlist" type="xsd:boolean"/>
@@ -113,10 +114,10 @@ export Batch_Service() := macro
 		boolean POBoxCompliance              := false : STORED('POBoxCompliance');
 		//boolean ofac_only                     := false : stored('OfacOnly');
 		//boolean ExcludeWatchLists             := false : stored('ExcludeWatchLists');
-		//unsigned1 OFAC_version                := 1 :STORED('OFACversion');
+		unsigned1 OFAC_version                := 1 :STORED('OFACversion');
 		//boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 		//boolean Include_Ofac                  := FALSE: stored('IncludeOfac');
-		real Global_WatchList_Threshold :=.84 :stored('GlobalWatchlistThreshold');
+		// real Global_WatchList_Threshold :=.84 :stored('GlobalWatchlistThreshold');
 		//boolean IncludeFraudScores := false :stored('IncludeFraudScores');
 		boolean isUtility          := false;
 		boolean ln_branded_value   := false;
@@ -127,6 +128,9 @@ export Batch_Service() := macro
 		boolean fromBiid           := false;
 		boolean isFCRA             := false;
 		boolean use_dob_filter     := FALSE;
+    
+    include_ofac := if(ofac_version = 1, false, true);
+    global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 		
 		string  model_name_value   := '' : stored('ModelName');
 		model_name := StringLib.StringToLowerCase(model_name_value);
@@ -201,10 +205,10 @@ export Batch_Service() := macro
 																 tribcode, //string4																																							 
 																 , //excludeWatchLists, //boolean																				
 																 , //ofac_only, //boolean 																			 
-																 , //ofac_version, //unsigned1																				
-																 , //include_ofac, //boolean																				
+																 ofac_version, //unsigned1																				
+																 include_ofac, //boolean																				
 																 , //include_additional_watchlists  //boolean 																			 
-																 , //global_watchlist_threshold, 	//real																				 
+																 global_watchlist_threshold, 	//real																				 
 																 , //dob_radius_use, //integer2																				 
 																 POBoxCompliance, //boolean
 																				//bsversion // set directly,

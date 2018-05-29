@@ -1,4 +1,4 @@
-import doxie, address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway;
+﻿import doxie, address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway;
 export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways_in,
                                  dataset(business_risk.Layout_Input_Moxie_2) df,
 																 boolean hb,
@@ -37,14 +37,14 @@ export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := map(IncludeTargus3220 and le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
+                      le.servicename = 'bridgerwlc' and ofac_version != 4  => '',
 													le.servicename);
 	self.url := map(IncludeTargus3220 and le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
+                  le.servicename = 'bridgerwlc' and ofac_version != 4  => '',
 									le.url); 
 	self := le;								
 end;
 gateways := project(gateways_in, gw_switch(left));
-
-
 
 business_risk.layout_input into_in(df L, integer C) := transform
 	self.seq := C;
@@ -129,6 +129,8 @@ business_risk.layout_input into_in(df L, integer C) := transform
 end;
 
 df2 := project(df, into_in(LEFT, counter));
+
+if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 bsversion := 2;
 exactMatchlevel := risk_indicators.iid_constants.default_ExactMatchLevel;
