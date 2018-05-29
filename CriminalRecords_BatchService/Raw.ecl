@@ -1,4 +1,4 @@
-IMPORT Address, doxie_files, FCRA, NID, FFD, STD, CriminalRecords_BatchService;
+﻿IMPORT Address, doxie_files, FCRA, NID, FFD, STD, CriminalRecords_BatchService;
 
 EXPORT Raw := MODULE
 
@@ -10,7 +10,7 @@ EXPORT Raw := MODULE
 			) := function
 			
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 		
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.PUNISHMENT);
 		pun_correct_rec_id := set(ds_flags, record_id);
@@ -48,7 +48,7 @@ EXPORT Raw := MODULE
 	// Remove or mark Disputed punishment & add StatementIDs
 		raw_rec xformPunishment ( raw_rec L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
 		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 		end;
@@ -73,7 +73,7 @@ EXPORT Raw := MODULE
 														integer8 inFFDOptionsMask = 0) := function 
 														
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
 		ofk_correct_rec_id := set(ds_flags, record_id);
@@ -110,7 +110,7 @@ EXPORT Raw := MODULE
 							( CriminalRecords_BatchService.Layouts.batch_pii_int_offender L , 
 								FFD.Layouts.PersonContextBatchSlim R 	) := transform, 
 								skip(~ShowDisputedRecords and r.isDisputed) 
-										self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+										self.StatementIDs := r.StatementIds;
 										self.isDisputed :=	r.isDisputed;
 										self := L;
 		end;
@@ -136,7 +136,7 @@ EXPORT Raw := MODULE
 														integer8 inFFDOptionsMask = 0) := function
 
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
 		ofk_correct_rec_id := set(ds_flags, record_id);
@@ -180,7 +180,7 @@ EXPORT Raw := MODULE
 	// Remove or mark Disputed punishment & add StatementIDs
 		raw_rec xformOffendersPlus ( raw_rec L, FFD.Layouts.PersonContextBatchSlim R ) := transform,
 		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 		end;
@@ -240,7 +240,7 @@ EXPORT Raw := MODULE
 														integer8 inFFDOptionsMask = 0) := function
 
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.OFFENSES);
 		ofk_correct_rec_id := set(ds_flags, record_id);
@@ -271,7 +271,7 @@ EXPORT Raw := MODULE
 		( CriminalRecords_BatchService.Layouts.batch_int_offenses L , 
 			FFD.Layouts.PersonContextBatchSlim R ) := transform,
 		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 		end;
@@ -307,7 +307,7 @@ EXPORT Raw := MODULE
 																integer8 inFFDOptionsMask = 0) := function
 
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.COURT_OFFENSES);
 		off_correct_rec_id := set(ds_flags, record_id);
@@ -339,7 +339,7 @@ EXPORT Raw := MODULE
 		  FFD.Layouts.PersonContextBatchSlim R 
 		) := transform,
 		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 		end;
@@ -378,7 +378,7 @@ EXPORT Raw := MODULE
 															integer8 inFFDOptionsMask = 0) := function
 
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+		boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
 		ds_flags := flagfile(file_id = FCRA.FILE_ID.PUNISHMENT);
 		pun_correct_rec_id := set(ds_flags, record_id);
@@ -412,7 +412,7 @@ EXPORT Raw := MODULE
 			FFD.Layouts.PersonContextBatchSlim R 
 		) := transform,
 		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 		end;

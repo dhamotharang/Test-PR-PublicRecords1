@@ -126,7 +126,7 @@ EXPORT Functions := MODULE
 			SELF:=L;
 		END;
 
-  ds_work_out:=JOIN(ds_work_with_alerts, pc_alert_flags, LEFT.did=(UNSIGNED)RIGHT.UniqueId AND LEFT.acctno=RIGHT.acctno,
+  ds_work_out:=JOIN(ds_work_with_alerts, pc_alert_flags, LEFT.did=(UNSIGNED)RIGHT.UniqueId,
                     checkForAlerts(LEFT,RIGHT), LEFT OUTER, KEEP(1), LIMIT(0));
 
 		RETURN ds_work_out;
@@ -187,7 +187,8 @@ EXPORT Functions := MODULE
 				L._Header.Exceptions);
 			SELF.UniqueId:=IF(hasMatchingIds,UniqueId2,'');
 			SELF.ConsumerCreditReports:=IF(hasMatchingIds,PROJECT(L.ConsumerCreditReports,applyMasking(LEFT)));
-			SELF.ConsumerStatements:=IF(hasMatchingIds,L.ConsumerStatements, L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
+			SELF.ConsumerStatements:=IF(hasMatchingIds,L.ConsumerStatements);
+			SELF.ConsumerAlerts:=IF(hasMatchingIds,L.ConsumerAlerts);
 			SELF.LiensJudgmentsReports:=IF(hasMatchingIds,L.LiensJudgmentsReports);
 			SELF:=L;
 		END;

@@ -160,8 +160,11 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 			// 6. Obtain matching domain-specific records via a ready-made function. Note: this returns a very fat layout.
 		ds_prep_fids_for_raw := DEDUP(SORT(PROJECT(ds_outpl_slim_filtered, LN_PropertyV2_Services.layouts.fid),ln_fares_id,search_did),ln_fares_id,search_did);
 		
-		 
-		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags)(fid_type != '');
+		//at this step we need for FCRA to get all statemetIds disregarding input inFFDOptionsMask 1st bit 
+		// filtering of Dempsey hits if needed is addressed later in the code
+		FFDOptionsMask_adj := if(isFCRA,inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS, inFFDOptionsMask);
+		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,FFDOptionsMask_adj,ds_flags)(fid_type != '');
+
 		//Apply Party Type filter (return only parties requested by subscriber) and 
 		//tax data filter (return only records where assessment.standardized_land_use_code[1] is not misc. category of 0.
 		PT := LN_PropertyV2.Constants.PARTY_TYPE;
