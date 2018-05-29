@@ -108,7 +108,7 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 END;
 with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
 
-with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, onThor), with_did);
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, onThor, BSversion), with_did);
 
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded, 
 															suppressNearDups, isFCRA, bsversion,
@@ -143,6 +143,7 @@ with_DL_verification := if(runDLverification, dlverify, combined_verification);
 
 // output(with_addrs, named('with_addrs'));
 // output(with_nap, named('with_nap'));
+
 return with_DL_verification;
 
 end;

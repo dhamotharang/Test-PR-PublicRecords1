@@ -146,8 +146,8 @@ export Boca_Shell_Liens_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 		isForeclosureReleased := ftd in iid_constants.setForeclosure and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isLandlordTenant := ftd in iid_constants.setLandlordTenant and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isLandlordTenantReleased := ftd in iid_constants.setLandlordTenant and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
+		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
+		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherLJ := ftd not in iid_constants.setOtherLJ and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherLJReleased := ftd not in iid_constants.setOtherLJ and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherTax := ftd in iid_constants.setOtherTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
@@ -283,6 +283,7 @@ export Boca_Shell_Liens_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.liens_last_rel_date84 := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.bjl.liens_last_rel_date84);
 		SELF.ftd := if(goodResult, '1', '0');
 		SELF := le;
+		self := [];
 	end;
 
 	evictions := JOIN(liens_full, liensV2.key_liens_main_ID_FCRA,
@@ -344,7 +345,8 @@ export Boca_Shell_Liens_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 			SELF.bk_tmsid := right.tmsid;
 			SELF.Liens := RIGHT.Liens;
 			self.ftd := right.ftd;
-			SELF := LEFT),
+			SELF := LEFT,
+			SELF := []),
 		LEFT OUTER);
 
 
@@ -653,7 +655,8 @@ export Boca_Shell_Liens_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 			SELF.bk_tmsid := right.tmsid;
 			SELF.Liens := RIGHT.Liens;
 			self.ftd := right.ftd;
-			SELF := LEFT),
+			SELF := LEFT,
+			self := []),
 		LEFT OUTER);
 
 	//for BS 5.3 rollup just the offset count records so these counts can be appended to the main records down below
