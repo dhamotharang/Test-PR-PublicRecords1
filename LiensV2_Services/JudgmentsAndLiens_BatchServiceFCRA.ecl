@@ -76,7 +76,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 			EXPORT DATASET (Gateway.layouts.config) gateways 	:= gw_config;
 			EXPORT INTEGER1 non_subject_suppression 					:= nss;
 			EXPORT applicationType 														:= AutoStandardI.InterfaceTranslator.application_type_val.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
-			EXPORT INTEGER8 FFDOptionsMask 								    := inFFDOptionsMask;
+			EXPORT INTEGER8 FFDOptionsMask 								    := inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS;  // we need to override 1st bit here to make sure records with statements are flagged in Batch_records. Dempsey Hits filtering is done later if needed
 			EXPORT INTEGER  FCRAPurpose    								    := inFCRAPurpose;
 		END;
 		
@@ -105,14 +105,14 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		ds_JL_recs_flat_pre := PROJECT(ds_batch_ready, LiensV2_Services.fcra_batch_make_flat(LEFT,COUNTER));
 				
 	  alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs_ready, inFCRAPurpose, inFFDOptionsMask);
-	  ds_JL_recs_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_JL_recs_flat_pre, alert_flags, statements, LiensV2_Services.Batch_Layouts.fcra_batch_out_pre);
+	  ds_JL_recs_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_JL_recs_flat_pre, alert_flags, statements, LiensV2_Services.Batch_Layouts.fcra_batch_out_pre, inFFDOptionsMask);
 
 		ds_statements := NORMALIZE (ds_JL_recs_flat_with_alerts, LEFT.statements, 
 			TRANSFORM (FFD.Layouts.ConsumerStatementBatch, SELF := RIGHT));
 			
 		// consumer statements dataset contains information about disputed records as well as Statements.
 		consumer_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs_ready, inFFDOptionsMask);
-    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs_ready);                                               
+    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs_ready, inFFDOptionsMask);                                               
     consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 		
 		ds_JL_recs_flat := PROJECT(ds_JL_recs_flat_with_alerts,LiensV2_Services.Batch_Layouts.fcra_batch_out);

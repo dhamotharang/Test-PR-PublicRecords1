@@ -51,7 +51,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
 	batch_params := module (project (BatchShare.IParam.getBatchParams(), WatercraftV2_Services.Interfaces.batch_params, opt))
     export dataset (Gateway.layouts.config) gateways := gw_config;
 		export integer1 non_subject_suppression := nss;
-		export integer8 FFDOptionsMask := inFFDOptionsMask;
+		export integer8 FFDOptionsMask := inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS; // we need to override 1st bit here to make sure records with statements are flagged correctly. Dempsey Hits filtering is done separately (if needed)
 		export integer8 FCRAPurpose := inFCRAPurpose;
   end;
 	
@@ -83,7 +83,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
 	// Project to the batch_out_pre layout.
 	ds_batch_watercraft_pre := PROJECT(ds_batch_ready, WatercraftV2_Services.Transforms.xform_toFinalBatch(LEFT,counter));
   
-  ds_batch_final_pre := FFD.Mac.ApplyConsumerAlertsBatch(ds_batch_watercraft_pre, alert_flags, Statements, WatercraftV2_Services.Layouts.batch_out_pre);
+  ds_batch_final_pre := FFD.Mac.ApplyConsumerAlertsBatch(ds_batch_watercraft_pre, alert_flags, Statements, WatercraftV2_Services.Layouts.batch_out_pre, inFFDOptionsMask);
 	                            
 	ds_statements := NORMALIZE(ds_batch_final_pre, left.Statements,
 											TRANSFORM(FFD.Layouts.ConsumerStatementBatch,
@@ -92,7 +92,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
 												SELF := RIGHT));
 
 	consumer_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs_ready, inFFDOptionsMask);	
-  consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs_ready);                                               
+  consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs_ready, inFFDOptionsMask);                                               
   consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	//Actual project to the final batch out 

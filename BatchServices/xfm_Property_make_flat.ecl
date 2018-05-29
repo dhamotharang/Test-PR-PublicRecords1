@@ -1,4 +1,4 @@
-
+﻿
 IMPORT LN_PropertyV2_Services, BatchServices, FFD;
 
 STRING DISPLAY_NOTHING := '';
@@ -31,7 +31,6 @@ STRING fn_GetMsaPlusDesc(STRING msa) :=
 	
 EXPORT BatchServices.layout_Property_Batch_out_pre xfm_Property_make_flat(BatchServices.Layouts.LN_Property.rec_widest_plus_acctnos_plus_matchcodes l, 
 																																			BOOLEAN return_unformatted_values,
-																																			BOOLEAN ShowConsumerStatements = false ,
 																																			integer c = 0 ) := 
 	TRANSFORM
 	
@@ -930,7 +929,6 @@ EXPORT BatchServices.layout_Property_Batch_out_pre xfm_Property_make_flat(BatchS
 																	assessee_2_Disputes +
 																	borrower_1_Disputes +
 																	borrower_2_Disputes + 
-																	if(ShowConsumerStatements,
 																			DeedStatements + 
 																			assessStatements +
 																			buyer_1_Statements + 
@@ -942,8 +940,7 @@ EXPORT BatchServices.layout_Property_Batch_out_pre xfm_Property_make_flat(BatchS
 																			assessee_1_Statements +
 																			assessee_2_Statements +
 																			borrower_1_Statements +
-																			borrower_2_Statements,
-																			dataset ([],FFD.Layouts.ConsumerStatementBatch));
+																			borrower_2_Statements;
 		
 		SELF := l;
 		

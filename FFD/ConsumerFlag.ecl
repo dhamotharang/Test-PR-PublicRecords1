@@ -22,9 +22,12 @@ EXPORT ConsumerFlag := MODULE
     RETURN consumer_alerts + has_statements_alert;
   END;
   
-  EXPORT prepareAlertMessagesBatch (DATASET (FFD.Layouts.PersonContextBatch) PersonContext) := FUNCTION
+  EXPORT prepareAlertMessagesBatch (DATASET(FFD.Layouts.PersonContextBatch) PersonContext,
+                                    INTEGER8 inFFDOptionsMask = 0) := FUNCTION
 
-    consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
+    returnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask); 
+    
+		consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
                            TRANSFORM (FFD.layouts.ConsumerStatementBatchFull,
                                   SELF.acctno := LEFT.acctno ,
                                   SELF.SequenceNumber := 0, // Consumer level alerts are for the whole DID, not specefic data rows. 
@@ -33,7 +36,8 @@ EXPORT ConsumerFlag := MODULE
                                   SELF.SectionId := ''; 
                                   SELF := LEFT));
 
-    RETURN consumer_alerts;
+    RETURN IF(returnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
+		          consumer_alerts);
   END;
 
   STRING1 subject_has_alert := FFD.Constants.subject_has_alert;
