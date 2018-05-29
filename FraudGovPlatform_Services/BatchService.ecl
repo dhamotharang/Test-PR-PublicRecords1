@@ -67,7 +67,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 	// **************************************************************************************
 	// Call Batch Records attribute to fetch records. 
 	// **************************************************************************************
-	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
+	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params).ds_results_w_velocities;
 
 	// ** Simple transform to convert the ds_records to the flat output layout
 	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);

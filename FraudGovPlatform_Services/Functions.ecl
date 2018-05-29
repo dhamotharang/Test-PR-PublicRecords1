@@ -651,6 +651,44 @@ EXPORT Functions := MODULE
 		return deltabase_inquiry_log;
 		
 	ENDMACRO;
+	
+	EXPORT GetFragmentRecs (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_freg_recs_in,
+													DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
+													FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 
+		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
+		File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;													
+	
+		ds_fragment_recs := FraudShared_Services.Functions.getFragmentMatchTypes(ds_freg_recs_in, ds_payload, batch_params);
+
+		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
+																										FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
+			
+			bank_account_number := IF(R.bank_account_number_1 <> '', R.bank_account_number_1 , R.bank_account_number_2);
+																																																	
+			SELF.fragment_value := MAP(	L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => (string) bank_account_number,
+																	L.fragment = Fragment_Types_const.DEVICE_ID_FRAGMENT => (string) R.device_id,
+																	L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => (string) R.drivers_license,
+																	// L.fragment = Fragment_Types_const.GEOLOCATION_FRAGMENT => R.geo_lat + ' ' R.geo_long;
+																	L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => (string) R.ip_address	,
+																	L.fragment = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (string) (R.address_1 + ' ' + R.address_2),
+																	L.fragment = Fragment_Types_const.NAME_FRAGMENT => (string) R.raw_full_name	,
+																	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
+																	L.fragment = Fragment_Types_const.PHONE_FRAGMENT => (string) R.phone_number,
+																	L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => (string) (R.street_1 + ' ' +	R.street_2 + ' ' + R.city + ' ' +	R.state + ' ' +	R.zip),
+																	L.fragment = Fragment_Types_const.SSN_FRAGMENT => (string) R.ssn,
+																	'');
+			SELF.file_type := R.classification_Permissible_use_access.file_type;
+			SELF := L;
+		END;
+
+		ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload,
+																			LEFT.record_id = RIGHT.record_id,
+																			ds_fragment_recs_w_trans(LEFT, RIGHT));
+
+		// output(ds_fragment_recs, named('ds_fragment_recs____GetFragmentRecs'));
+		
+		RETURN ds_fragment_recs_w_value;
+	END;
 
 END;

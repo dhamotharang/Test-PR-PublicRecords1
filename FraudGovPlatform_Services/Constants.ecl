@@ -227,4 +227,9 @@
 	EXPORT append_l  := 'BEST_ALL,VERIFY_ALL'; //Append_1 allows all Best Info to return
 	EXPORT verify_l  := 'BEST_ALL,VERIFY_ALL';
 	
+	EXPORT RecordType := MODULE
+		EXPORT ELEMENT := 'ELEMENT';
+		EXPORT IDENTITY := 'IDENTITY';
+	END;
+	
 END;

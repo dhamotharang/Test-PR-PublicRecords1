@@ -25,10 +25,16 @@ EXPORT SearchService() := MACRO
 
 	// *********************************Validation*******************************************
 	
+	BOOLEAN ValidAmount := MAP(searchBy.AmountMin <> '' AND  searchBy.AmountMax = '' => TRUE,
+														 searchBy.AmountMin = '' AND  searchBy.AmountMax <> '' => TRUE,
+														 searchBy.AmountMin <> '' AND  searchBy.AmountMax <> ''
+															AND searchBy.AmountMin <= searchBy.AmountMax 				 => TRUE, 
+															FALSE);
+	
 	BOOLEAN isMinimumInput := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR searchBy.UniqueId <> '' OR 
 														searchBy.EmailAddress <> '' OR (searchBy.DriversLicense.DriversLicenseNumber <> '' AND searchBy.DriversLicense.DriversLicenseState <> '') OR
 														searchBy.HouseholdID <> '' OR searchBy.CustomerPersonId <> ''  OR searchBy.DeviceSerialNumber <> '' OR 
-														searchBy.AmountMin <> '' OR searchBy.AmountMax <> '' OR searchBy.BankName <> '' OR searchBy.BankInformation.BankRoutingNumber <> '' OR
+														ValidAmount OR searchBy.BankName <> '' OR searchBy.BankInformation.BankRoutingNumber <> '' OR
 														searchBy.BankInformation.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
 														(iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') OR
 														searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
