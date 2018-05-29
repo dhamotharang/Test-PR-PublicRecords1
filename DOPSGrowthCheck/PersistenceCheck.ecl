@@ -66,8 +66,8 @@ import std;
 	#APPEND(CommandString,',tCheckPersistence(Left,Right),local);\n');
 	#APPEND(CommandString,'ResultTable:=Table(dCheckPersistence,{Diff,cnt:=count(group)},Diff,merge);\n');
 	#APPEND(CommandString,'result:=OUTPUT(ResultTable);\n');
-// %CommandString%;
-// return result;
-return %'CommandString'%;
+%CommandString%;
+return result;
+// return %'CommandString'%;
 	
 endmacro;
