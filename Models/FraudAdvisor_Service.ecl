@@ -386,8 +386,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(OFACVersion = 4 and StringLib.StringToLowerCase(model_name) in Risk_Indicators.iid_constants.FAXML_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
-
+if(OFACVersion = 4 and StringLib.StringToLowerCase(model_name) in Risk_Indicators.iid_constants.FAXML_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
 r := record
 	unsigned4 seq;
 end;
@@ -2154,9 +2153,8 @@ TRANSFORM
 		''
 	);
 
-	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1705_1'], true, IncludeRiskIndices);	
-	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1'], true, IncludeRiskIndices);	
->>>>>>> fec68960161f4350f0583551d5af493dfaf10998
+	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1','fp1705_1'], true, IncludeRiskIndices);	
+
 	self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
 	self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
 	self.ManipulatedIdentityIndex   := if(IncludeRiskIndicesFinal, le.ManipulatedIdentityIndex, '');
