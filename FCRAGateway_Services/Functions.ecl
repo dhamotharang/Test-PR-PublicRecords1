@@ -1,7 +1,7 @@
 IMPORT FCRAGateway_Services;
 EXPORT Functions := MODULE
-	EXPORT GetValidationCode(integer inDid, integer outDid) := FUNCTION
-			RETURN MAP(
+	EXPORT GetValidationCode(unsigned6 inDid, unsigned6 outDid) := FUNCTION
+		RETURN MAP(
 				inDid = 0 => FCRAGateway_Services.Constants.ValidationCode.INPUT_DID_NOTFOUND,
 				outDid = 0 => FCRAGateway_Services.Constants.ValidationCode.OUTPUT_DID_NOTFOUND,
 				inDid <> outDid => FCRAGateway_Services.Constants.ValidationCode.DID_MISMATCH,

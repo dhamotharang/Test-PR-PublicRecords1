@@ -10,7 +10,7 @@ EXPORT EquifaxEms_Records(dataset(iesp.mergedcreditreport_fcra.t_FcraMergedCredi
 
 	//Retrieve credit alerts, consumer statements, freeze information, and ensure we can resolve to a did.
 	ds_compliance_data := FCRAGateway_Services.GetComplianceData(ds_plist_req, in_mod);
-	input_lexID := ds_compliance_data[1].lexID;
+	input_lexID := (unsigned6)ds_compliance_data[1].consumer.lexID;
 	is_suppressed_by_alert := ds_compliance_data[1].is_suppressed_by_alert;
 	consumer_alerts := ds_compliance_data[1].ConsumerAlerts;
 	consumer_statements := ds_compliance_data[1].ConsumerStatements;
