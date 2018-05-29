@@ -1,8 +1,6 @@
 ﻿import data_services, risk_indicators, models, riskwise, riskprocessing;
 #workunit('name', 'runway regression');
 
-
-
 eyeball := 10;
 parallel_count := 2;  // when running using 50 way, set this to 2.  when running on pound_option_thor (3way), use up to 33 threads
 
@@ -215,6 +213,7 @@ real	FP1508_1_0_score_baseline;	real	FP1508_1_0_score_new;	real	FP1508_1_0_score
 real	FP1702_2_0_score_baseline;	real	FP1702_2_0_score_new;	real	FP1702_2_0_score_diff;
 real	FP1702_1_0_score_baseline;	real	FP1702_1_0_score_new;	real	FP1702_1_0_score_diff;
 real	FP1706_1_0_score_baseline;	real	FP1706_1_0_score_new;	real	FP1706_1_0_score_diff;
+real	FP1705_1_0_score_baseline;	real	FP1705_1_0_score_new;	real	FP1705_1_0_score_diff;
 real	FP1609_2_0_score_baseline;	real	FP1609_2_0_score_new;	real	FP1609_2_0_score_diff;
 real	FP1607_1_0_score_baseline;	real	FP1607_1_0_score_new;	real	FP1607_1_0_score_diff;
 real	FP1606_1_0_score_baseline;	real	FP1606_1_0_score_new;	real	FP1606_1_0_score_diff;
@@ -522,6 +521,7 @@ self.FP1508_1_0_score_baseline 	:= (real)left.FP1508_1_0_score	;		self.FP1508_1_
 self.FP1702_2_0_score_baseline 	:= (real)left.FP1702_2_0_score	;		self.FP1702_2_0_score_new := (real)right.FP1702_2_0_score	;		self.FP1702_2_0_score_diff := (real)right.FP1702_2_0_score	-(real)left.FP1702_2_0_score	;
 self.FP1702_1_0_score_baseline 	:= (real)left.FP1702_1_0_score	;		self.FP1702_1_0_score_new := (real)right.FP1702_1_0_score	;		self.FP1702_1_0_score_diff := (real)right.FP1702_1_0_score	-(real)left.FP1702_1_0_score	;
 self.FP1706_1_0_score_baseline 	:= (real)left.FP1706_1_0_score	;		self.FP1706_1_0_score_new := (real)right.FP1706_1_0_score	;		self.FP1706_1_0_score_diff := (real)right.FP1706_1_0_score	-(real)left.FP1706_1_0_score	;
+self.FP1705_1_0_score_baseline 	:= (real)left.FP1705_1_0_score	;		self.FP1705_1_0_score_new := (real)right.FP1705_1_0_score	;		self.FP1705_1_0_score_diff := (real)right.FP1705_1_0_score	-(real)left.FP1705_1_0_score	;
 self.FP1609_2_0_score_baseline 	:= (real)left.FP1609_2_0_score	;		self.FP1609_2_0_score_new := (real)right.FP1609_2_0_score	;		self.FP1609_2_0_score_diff := (real)right.FP1609_2_0_score	-(real)left.FP1609_2_0_score	;
 self.FP1607_1_0_score_baseline 	:= (real)left.FP1607_1_0_score	;		self.FP1607_1_0_score_new := (real)right.FP1607_1_0_score	;		self.FP1607_1_0_score_diff := (real)right.FP1607_1_0_score	-(real)left.FP1607_1_0_score	;
 self.FP1606_1_0_score_baseline 	:= (real)left.FP1606_1_0_score	;		self.FP1606_1_0_score_new := (real)right.FP1606_1_0_score	;		self.FP1606_1_0_score_diff := (real)right.FP1606_1_0_score	-(real)left.FP1606_1_0_score	;
@@ -1034,6 +1034,7 @@ C= 	295 => 'FP1508_1_0_score ',
 C= 	296 => 'RVC1801_1_0_score ',
 C= 	297 => 'RVP1702_1_0_score ',
 C= 	298 => 'FP1802_1_0_score ',
+C= 	299 => 'FP1705_1_0_score ',
 ''
 );
 
@@ -1337,10 +1338,11 @@ C= 	295 => le.FP1508_1_0_score_diff,
 C= 	296 => le.RVC1801_1_0_score_diff,
 C= 	297 => le.RVP1702_1_0_score_diff,
 C= 	298 => le.FP1802_1_0_score_diff,
+C= 	299 => le.FP1705_1_0_score_diff,
 0);										
 end;
 
-name_pairs :=  normalize(j, 298, norm(left, counter));
+name_pairs :=  normalize(j, 299, norm(left, counter));
 
 
 // get an overall picture of impact
