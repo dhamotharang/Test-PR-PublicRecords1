@@ -108,7 +108,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(InputArgs.OFACVersion = 4 and InputArgs.ModelName_in in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 
 wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways);

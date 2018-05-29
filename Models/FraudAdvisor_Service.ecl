@@ -385,7 +385,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(OFACVersion = 4 and model_name in Risk_Indicators.iid_constants.FAXML_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(OFACVersion = 4 and StringLib.StringToLowerCase(model_name) in Risk_Indicators.iid_constants.FAXML_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 r := record
 	unsigned4 seq;
