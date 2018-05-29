@@ -1,6 +1,7 @@
-﻿//=============================================
-//===         FraudAdvisor_Service          ===
+﻿﻿﻿//=============================================
+//===         FraudAdvisor_Service          === 
 //=============================================
+
 /*--SOAP--
 <message name="FraudAdvisorService">
 	<part name="DID" type="xsd:unsigned"/>
@@ -334,14 +335,14 @@ fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_
 // The ‘fraudpoint3_models’ set are the FraudPoint 3.0 flagship models only.
 fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'];
 
-fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1'];
+fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1', 'fp1705_1'];
 
 // The ‘custom_models’ set are all possible models and so add any new model name to this set.  The model requested must be in this set or the query will return an “Invalid model” error. 
 custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5609_2', 'fp3710_9', 'fp1109_0', 'fp1109_9', 'fp31203_1', 'fp31105_1',
 									'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1',
 									'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
 									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
-                  'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1'];
+                  'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1','fp1705_1'];
 
 // The ‘bill_to_ship_to_models’ set are models that use the new second input address that was introduced in Fraudpoint 3.0.
 bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
@@ -550,7 +551,7 @@ doRelatives      := true;
 doDL             := false;
 doVehicle        := (model_name IN ['fp31105_1','fp3904_1', 'fp1407_1', 'fp1407_2', 'fp1506_1','fp1509_2', 
                                     'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1610_1', 
-																		'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1508_1']) 
+																		'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1508_1','fp1705_1']) 
 																or doAttributesVersion2;
 doDerogs         := true;
 isLn             := false;     // set ln branded to activate exp dl sources in iid getheader in < 5 shells.
@@ -571,7 +572,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
   model_name IN ['fp1712_0','fp1508_1','fp1802_1'] => 53,
-	model_name IN ['fp1706_1'] => 52,
+	model_name IN ['fp1706_1','fp1705_1'] => 52,
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
 		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1'] => 51, 
 	doAttributesVersion201 => 50,
@@ -593,7 +594,8 @@ unsigned8 BSOptions := map(model_name='fp31604_0' and input_ok   => Risk_indicat
 													 model_name IN ['fp31203_1', 'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1','fp1404_1',
 																					'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1506_1', 'fp1509_2','fp1509_1', 'fp31505_0',
 																					'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1511_1','fp1512_1', 'fp1610_1', 
-																					'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1']
+																					'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1','fp1705_1']
+
 													 or doAttributesVersion2               => Risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
 																																	+ Risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity
 																																	+ risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary
@@ -631,22 +633,23 @@ clam_BtSt :=
 	
 	
 /* Validation Mode - Uncomment the two lines below and hit your model */
-	  // ModelValidationResults := Models.fp1802_1_0(ungroup(clam), 6);
+	  // ModelValidationResults := Models.FP1705_1_0(ungroup(clam), 6);
 	  // OUTPUT(ModelValidationResults, named('Results'));
-	
+    
+
 //================================================================
 //===   Comment out all remaining for debug/validation mode   ====
 //================================================================
 	
- /* *************************************
-  *   Boca Shell Logging Functionality  *
-  ***************************************/
+//* *************************************
+//*   Boca Shell Logging Functionality  *
+//***************************************
 
 
 		 productID := Risk_Reporting.ProductID.Models__FraudAdvisor_Service;
 	
      intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(clam, productID, bsVersion);
- /* ************ End Logging ************/
+// ************ End Logging ************
 
 
 ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
@@ -1958,6 +1961,7 @@ ret_fraudpoint3 := case( model_name,
   'fp1712_0' => Models.FP1712_0_0( ungroup(clam), 1), // Fraud flags model -- only one risk indicator is returned.
   'fp1508_1' => Models.FP1508_1_0( ungroup(clam), 6), 
   'fp1802_1' => Models.FP1802_1_0( ungroup(clam), 6), 
+  'fp1705_1' => Models.FP1705_1_0( ungroup(clam), 6), 
 	dataset( [], Models.Layouts.layout_fp1109 )
 );
 
@@ -2005,7 +2009,7 @@ TRANSFORM
 		+ if( model_name in ['fp3710_0', 'fp3904_1', 'fp3905_1', 'fp3710_9', 'fp31203_1', 'fp31105_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1404_1',
 		                     'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1403_2', 'fp1506_1', 'fp1509_2','fp1509_1',
 												 'fp1510_2','fp1511_1', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1606_1','fp1702_2',
-												 'fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1802_1'], 
+												 'fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1802_1','fp1705_1'], 
 		PROJECT(le,form_rc5(LEFT)) + PROJECT(le,form_rc6(LEFT)) );
 	risk_indicators.MAC_add_sequence(reason_codes_temp(reason_code<>''), reason_codes_with_seq);
 	self.reason_codes := reason_codes_with_seq;
@@ -2146,10 +2150,13 @@ TRANSFORM
 		'fp1712_0' => Risk_Indicators.BillingIndex.FP1712_0,
 		'fp1508_1' => Risk_Indicators.BillingIndex.FP1508_1,
 		'fp1802_1' => Risk_Indicators.BillingIndex.FP1802_1,
+    'fp1705_1' => Risk_Indicators.BillingIndex.FP1705_1,
 		''
 	);
 
+	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1705_1'], true, IncludeRiskIndices);	
 	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1'], true, IncludeRiskIndices);	
+>>>>>>> fec68960161f4350f0583551d5af493dfaf10998
 	self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
 	self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
 	self.ManipulatedIdentityIndex   := if(IncludeRiskIndicesFinal, le.ManipulatedIdentityIndex, '');
@@ -2178,7 +2185,9 @@ TRANSFORM
 													model_name = 'fp1712_0'	=> 'FraudPointFP1712_0',
 													model_name = 'fp1508_1'	=> 'FraudPointFP1508_1',
 													model_name = 'fp1802_1'	=> 'FraudPointFP1802_1',
-																												 'FraudPoint');	
+                          model_name = 'fp1705_1'	=> 'FraudPointFP1705_1',
+                          																	 'FraudPoint');	
+
 	self.scores := project(le, form_fp3score(left));
 
 END;
