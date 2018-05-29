@@ -56,7 +56,7 @@ export t_RightAddressSearchOptions := record (iesp.share.t_BaseSearchOptionEx)
 	boolean ZipPostalSearch {xpath('ZipPostalSearch')};
 	boolean IsCanada {xpath('IsCanada')};
 	string PhoneScoreModel {xpath('PhoneScoreModel')};//hidden[internal]
-	integer MaxNumPhoneSubject {xpath('MaxNumPhoneSubject')};
+	integer MaxNumPhoneSubject {xpath('MaxNumPhoneSubject')};//hidden[internal]
 end;
 		
 export t_RightAddressSearchBy := record
