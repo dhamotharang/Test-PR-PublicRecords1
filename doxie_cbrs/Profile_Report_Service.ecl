@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProfileReportService" wuTimeout="300000">
 	<part name="BDID" type="xsd:string" required="1"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -61,7 +61,7 @@
 IMPORT Royalty, WSInput;
 
 EXPORT Profile_Report_Service := MACRO
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Profile_Report_Service();
 		

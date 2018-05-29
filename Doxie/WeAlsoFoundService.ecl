@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WeAlsoFoundService">
   <part name="SSN" type="xsd:string"/>
   <part name="SSNTypos" type="xsd:boolean"/>
@@ -35,6 +35,7 @@
 /*--INFO-- This service searches the dids from header file.*/
 
 EXPORT WeAlsoFoundService := MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   import doxie;
   #CONSTANT('BestOnly', true);
 

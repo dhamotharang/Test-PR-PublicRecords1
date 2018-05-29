@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="STR_BatchService">
 	<part name="batch_in" 						type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" 					type="xsd:byte"/>
@@ -74,7 +74,7 @@ Hit Flags:
 IMPORT BatchServices;
 
 EXPORT STR_BatchService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 in_mod := module (BatchServices.Interfaces.str_config)
 	export string32 	ApplicationType 		:= '' : stored('ApplicationType');
 	export unsigned2 	PenaltThreshold 		:= 10 : stored('PenaltThreshold');

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BeneficiaryRiskScore_Service">
 	<!-- Record-level or SearchBy fields --> 
 	<part name="UniqueClientID"            type="xsd:string" comment="i.e. acctno"/> <!-- required -->
@@ -88,7 +88,7 @@
 IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway;
 
 EXPORT BeneficiaryRiskScore_Service() := FUNCTION
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   UCase := StringLib.StringToUpperCase;
 	
 	// Define query restrictions and search options.

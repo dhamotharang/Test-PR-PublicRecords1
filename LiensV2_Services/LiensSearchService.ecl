@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LiensSearchService">
   
   <part name="DID" 					type="xsd:string"/>
@@ -63,6 +63,7 @@
 
 
 export LiensSearchService() := macro
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);

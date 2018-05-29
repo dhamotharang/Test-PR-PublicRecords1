@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CompanyByPerson_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -13,7 +13,7 @@
 IMPORT BatchServices;
 
 EXPORT CompaniesForPerson_BatchService(useCannedRecs = 'false') := MACRO
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     Pre_result := BatchServices.CompaniesForPerson_BatchService_Records(useCannedRecs);
 		ut.mac_TrimFields(Pre_result, 'Pre_result', result);
 		OUTPUT(result, NAMED('Results'));	

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AssetReportService" wuTimeout="300000">
   <part name="FirstName" type="xsd:string"/>
   <part name="MiddleName" type="xsd:string"/>
@@ -45,6 +45,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI;
 
 EXPORT AssetReportService () := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #onwarning(4207, ignore);
 
 //The following macro defines the field sequence on WsECL page of query. 

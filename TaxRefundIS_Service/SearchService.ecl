@@ -10,7 +10,7 @@
 import TaxRefundIS_Service, iesp, AutoStandardI;
 
 EXPORT SearchService := MACRO
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #onwarning(4207, ignore);
 //b. Receive input 
 		rec_in := iesp.taxrefundinvestigation.t_TaxRefundInvestigativeRequest;

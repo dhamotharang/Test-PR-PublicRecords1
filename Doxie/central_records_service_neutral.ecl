@@ -1,4 +1,4 @@
-// This is an FCRA-neutral service; called by fcra-services through the soap interface.
+﻿// This is an FCRA-neutral service; called by fcra-services through the soap interface.
 
 /*--SOAP--
 <message name="central_records_service_neutral" wuTimeout="300000">
@@ -38,6 +38,7 @@ IMPORT doxie, doxie_crs;
 //       a caller has a choice whether to use standard suppression or domain specific (i.e. overrides on FCRA side)
 
 EXPORT central_records_service_neutral :=  MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #stored('IsCRS',TRUE);
 #stored('useOnlyBestDID',TRUE);
 #constant('AllowGLB',TRUE);

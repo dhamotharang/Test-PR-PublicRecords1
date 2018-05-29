@@ -17,6 +17,7 @@ IMPORT BatchShare, SexOffender_Services;
 
 EXPORT SexOffenderCPS_BatchService(useCannedRecs = false) := 
 	MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);		
 		gm := AutoStandardI.GlobalModule();	
 		batch_params := module (project (BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt))
 			export applicationType 	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));

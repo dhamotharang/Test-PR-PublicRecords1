@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BLJSearchService">
   <part name="IncludeBankruptcies"  type="xsd:boolean"/>
   <part name="IncludeLiensJudgments" type="xsd:boolean"/>
@@ -61,6 +61,7 @@
 import doxie, liensv2_services, Text_Search, bankruptcyv2_Services;
 
 export BLJSearchService() := macro
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     doxie.MAC_Header_Field_Declare(false);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);

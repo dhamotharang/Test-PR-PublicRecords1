@@ -11,7 +11,7 @@ IMPORT Address, AutoStandardI, BIPV2, Doxie, iesp, lib_stringlib, TopBusiness_Se
 
 EXPORT BusinessAuthRepSearchService := 
   MACRO
-	
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	  //The following macro defines the field sequence on WsECL page of query.
 		WSInput.MAC_BusinessCredit_Services_BusinessAuthRepSearchService();
 

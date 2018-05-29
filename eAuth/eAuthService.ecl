@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="EAuthService" wuTimeout="300000">
 <!--
   <part name="UseCurrentlyOwnedProperty" type="xsd:boolean" description=" ...IncludeCurrentProperty"/>
@@ -13,6 +13,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, eAuth;
 
 EXPORT EAuthService () := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #onwarning(4207, ignore);
 #option ('globalAutoHoist', false);
 // for use in outdated code

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessReportServiceRaw" wuTimeout="300000">
 
 	<part name="BDID" type="xsd:string" required="1"/>
@@ -95,7 +95,7 @@
 IMPORT doxie_raw, Royalty, WSInput;
 
 EXPORT Business_Report_Service_Raw := MACRO
-		
+		#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Business_Report_Service_Raw();
 

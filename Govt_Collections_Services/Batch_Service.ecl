@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch_Service">
 	<part name="DPPAPurpose"         type="xsd:byte"/>
 	<part name="GLBPurpose"          type="xsd:byte"/> 
@@ -38,7 +38,7 @@
 IMPORT Address, BatchShare, Doxie, Govt_Collections_Services, Suppress, ut, STD;
 
 EXPORT Batch_Service() := FUNCTION
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
 		
 		

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PostBeneficiaryFraud_Batch_Service">
 	<part name="PBF_batch_in"                      type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="Gateways"                          type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -27,7 +27,7 @@
 IMPORT Address, Risk_Indicators, RiskWise, ut, doxie, gateway;
 
 EXPORT PostBeneficiaryFraud_Batch_Service := MACRO
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   PBF_Layout := Models.Layout_PostBeneficiaryFraud;
   PBF_Functions := Models.PostBeneficiaryFraud_Functions;
   UCase := StringLib.StringToUpperCase;

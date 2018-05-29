@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Accurint_Property_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -43,6 +43,7 @@ IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2, batc
 
 EXPORT Accurint_Property_BatchService(useCannedRecs = 'false') := 
 	MACRO
+	   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     	//non-subject suppression
     nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.doNothing);
 

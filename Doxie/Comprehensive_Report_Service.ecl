@@ -175,6 +175,7 @@
 import doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services, images, Royalty;
 
 export Comprehensive_Report_Service := MACRO
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #CONSTANT('TwoPartySearch', FALSE);
 #CONSTANT('OFACversion', 1);
 
