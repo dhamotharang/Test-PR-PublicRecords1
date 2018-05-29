@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LocationSearchService">
   <part name="apn"  type="xsd:string"/>
   <part name="Addr" type="xsd:string"/>
@@ -25,6 +25,7 @@
 					 */
 
 export LocationSearchService := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 
 doxie.MAC_Header_Field_Declare();
 

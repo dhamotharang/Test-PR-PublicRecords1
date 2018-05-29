@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WorkPlace_SearchService">
 
 	<!-- COMPLIANCE/USER SETTINGS -->
@@ -38,6 +38,7 @@
 import iesp, Royalty;
 
 export SearchService := macro
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #stored('AllowNickNames',true); // used to find the best subject for the input data
 #stored('PhoneticMatch',true);  // used to find the best subject for the input data
 

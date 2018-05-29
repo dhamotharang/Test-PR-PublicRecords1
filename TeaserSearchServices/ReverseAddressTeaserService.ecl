@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReverseAddressTeaserService">	
 
   <part name="StreetNumber" type="xsd:string"/>
@@ -32,7 +32,7 @@
 IMPORT iesp, TeaserSearchServices;
 
 EXPORT ReverseAddressTeaserService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	rec_in := iesp.thinreverseAddressteaser.t_ThinReverseAddressTeaserRequest;
 	ds_in := DATASET ([], rec_in) : STORED ('ThinReverseAddressTeaserRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;

@@ -71,7 +71,7 @@
 
 IMPORT iesp,AutoStandardI, doxie, Royalty;
 EXPORT PersonSearchService () := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonSearch_Services_PersonSearchService();
 	

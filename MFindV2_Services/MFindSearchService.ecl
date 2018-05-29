@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MFindSearch" wuTimeout="300000">
 	<part name = 'DID'			type = 'xsd:string'/>
 	<part name="VID" type="xsd:string" />
@@ -29,7 +29,7 @@
 /*--INFO-- This service searches all Mfind datafiles.*/
 
 export MFindSearchService := macro
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 Param := module(MFindV2_Services.InterFaces.VID) 
 	MFindV2_Services.Mac_stored();
 END;

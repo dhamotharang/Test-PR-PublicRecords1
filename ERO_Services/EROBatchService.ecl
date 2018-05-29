@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="EROBatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -66,6 +66,7 @@
 IMPORT AutoStandardI, Autokey_batch, BatchShare, BatchServices, Doxie, header, Suppress;
 
 EXPORT EROBatchService := MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		boolean useCannedRecs := false;
 	 
 	  //Defaults to use

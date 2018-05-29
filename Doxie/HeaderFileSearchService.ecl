@@ -93,6 +93,7 @@
 
 IMPORT PhonesFeedback,PhonesFeedback_Services,doxie,Risk_Indicators,iesp,AddressFeedback,AddressFeedback_Services,WSInput,Royalty;
 EXPORT HeaderFileSearchService := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_HeaderFileSearchService();

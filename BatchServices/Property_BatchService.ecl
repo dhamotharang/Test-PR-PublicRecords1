@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="Property_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
@@ -46,6 +46,7 @@ import Royalty;
 
 EXPORT Property_BatchService(useCannedRecs = 'false') := 
 	MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	
 		STRING1 BIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
     	//non-subject suppression
     nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.doNothing);

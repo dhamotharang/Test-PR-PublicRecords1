@@ -98,6 +98,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #onwarning(4207, warning);
 #constant('SelectIndividually', true); // we will setup all components explicitly
 

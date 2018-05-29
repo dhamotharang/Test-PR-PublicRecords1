@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FAP_CountRecs" wuTimeout="300000">
   <part name="did" type = "xsd:string" />
 	<part name="bdid" type = "xsd:string" />
@@ -21,7 +21,7 @@ available IN and OUTSIDE the Jurisdiction
 
 
 EXPORT CountService := MACRO
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 // #constant('SearchGoodSSNOnly',true)
 // #constant('SearchIgnoresAddressOnly',true)
 // #constant('getBdidsbyExecutive',FALSE)

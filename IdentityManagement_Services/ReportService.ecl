@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Identity Management Report" wuTimeout="300000">
 	<part name="IdentityManagementReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
   <part name="DID" type="xsd:string"/>
@@ -87,7 +87,7 @@
 
 export ReportService := macro
 import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, IdentityManagement_Services, Relationship;
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		//All constants should be at start of service: Property constanats, Neighbors Constants
 		#CONSTANT('IncludeDetails', true);
 		#CONSTANT('DisplayMatchedParty', true);

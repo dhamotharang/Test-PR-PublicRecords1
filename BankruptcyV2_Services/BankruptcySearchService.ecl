@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BankruptcySearchService">
 	<!-- Indexed Directly -->
   <part name="TMSID" 							type="xsd:string"/>
@@ -52,7 +52,7 @@ import doxie,Text_Search;
 export BankruptcySearchService(
 	) :=
 		macro
-		
+		#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		//The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_BankruptcyV2_Services_SearchService();
 		

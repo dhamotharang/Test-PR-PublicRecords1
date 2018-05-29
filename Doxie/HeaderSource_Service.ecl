@@ -36,7 +36,7 @@ import Doxie_Raw, Header, Property, Doxie_LN, doxie_crs, Location_Services,
   iesp, DriversV2_Services, Royalty;
 
 export HeaderSource_Service := macro
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 //================ Get input ================================
 #constant('IsViewSrc',true); //Used in Doxie.header_records.
 #option('optimizeLevel',0);

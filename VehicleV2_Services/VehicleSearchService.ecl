@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VehicleSearchService" 		wuTimeout="300000">
 	<part name = 'BDID'						type = 'xsd:string'/>
 	<part name = 'DID'						type = 'xsd:string'/>
@@ -64,6 +64,8 @@
 IMPORT iesp, Royalty;
 
 EXPORT VehicleSearchService() := MACRO
+
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('DisplayMatchedParty',true);
