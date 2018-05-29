@@ -1,4 +1,4 @@
-import risk_indicators, ut, address, codes, daybatchPCNSR, Models, easi, gateway;
+﻿import risk_indicators, ut, address, codes, daybatchPCNSR, Models, easi, gateway;
 
 export IT1O_Function(DATASET(Layout_IT1I) inf, dataset(Gateway.Layouts.Config) gateways, unsigned dppa_purpose, unsigned1 glb_purpose, 
 						boolean isUtility=false, boolean ln_branded=false, 
@@ -574,7 +574,7 @@ riskwise.Layout_IT1O filloutput(sortedPhones le) := transform
 	self.seq := le.seq;
 	self.acctno := le.acctno;
 	self.account := le.account;
-	self.riskwiseid := '';
+	self.riskwiseid := (String)le.iid.did;
 	self.bansmatchflag := if(tribcode in ['it37', 'it60', 'it61', 'bkd0', 'wst4', 'it70'], le.bansmatchflag, '');
 	self.banscasenum := if(tribcode in ['it37', 'it60', 'it61', 'bkd0', 'wst4', 'it70'], le.banscasenum, '');
 	self.bansprcode := if(tribcode in ['it37', 'it60', 'it61', 'bkd0', 'wst4', 'it70'], le.bansprcode, '');

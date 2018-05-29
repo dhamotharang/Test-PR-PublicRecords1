@@ -475,6 +475,7 @@ withModel := join(final, getAir, left.seq=right.seq, addModel(left,right), left 
 
 riskwise.Layout_WF2O createEmpty(withModel le) := TRANSFORM
 	self.seq := le.seq;
+  self.riskwiseid := le.riskwiseid;
 	self.account := account_value;
 	self.airwavesscore := if(le.inputPresent, le.airwavesscore, '');
 	self.tciaddrflag := le.tciaddrflag;
