@@ -53,8 +53,8 @@ STRING1 searchtype_value := 'B' : STORED('SearchType');
 boolean ofaconly_value := false : STORED('OfacOnly');
 
 STRING20 country_value := '' : STORED('Country');
-boolean Include_Additional_watchlists_temp := FALSE: stored('IncludeAdditionalWatchlists');
-boolean Include_Ofac_temp := FALSE: stored('IncludeOfac');
+boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
+boolean Include_Ofac := FALSE: stored('IncludeOfac');
 
 
 boolean use_dob_Filter := FALSE :stored('UseDobFilter');
@@ -73,18 +73,6 @@ end;
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
 
-// If OFACVersion is set to 2 or 3, check whether include_ofac = false and include_additional_watchlists 
-// = false and watchlists_requested is empty. If they are, set include_ofac = true and include_
-// additional_watchlists = true so that this service will imitate the system behavior when OFACVersion
-// is 1 (returns everything). This will fix a problem for customers who were converted from
-// OFACVersion 1 to 2 and suddenly had no Watchlist records from the system. Applicable only to 
-// Patriot Search, IID, and BIID.
-
-noWatchlistsSelectedAtAll := 
-  NOT Include_Additional_watchlists_temp AND NOT Include_Ofac_temp AND COUNT(watchlists_request) = 0;
-  
-Include_Additional_watchlists := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Additional_watchlists_temp );
-Include_Ofac                  := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Ofac_temp );
 
 in_data := GROUP(SORTED(DATASET([{'1',1,Stringlib.StringToUpperCase(firstname_value),
 																				Stringlib.StringToUpperCase(middlename_value),
