@@ -13,6 +13,8 @@ EXPORT Constants := MODULE
 		EXPORT integer INPUT_DID_NOTFOUND := 110;  // input PII could not be resolved to LexID
 		EXPORT integer OUTPUT_DID_NOTFOUND := 111; // gateway output could not be resolved to LexID
 		EXPORT integer DID_MISMATCH := 112; // input/out did mismatch
+		EXPORT integer NO_CALL := 113; // gateway was never called
+		EXPORT integer INVALID_RESPONSE := 114; // gateway had an invalid response
 	END;
 
 	ValidationCodes := DATASET ([
@@ -20,7 +22,9 @@ EXPORT Constants := MODULE
 		{ValidationCode.DID_MATCH, 'OK'},
 		{ValidationCode.INPUT_DID_NOTFOUND, 'Input does not resolve to LexID'},
 		{ValidationCode.OUTPUT_DID_NOTFOUND, 'Output does not resolve to LexID'},
-		{ValidationCode.DID_MISMATCH, 'Failed to validate consumer LexID'}
+		{ValidationCode.DID_MISMATCH, 'Failed to validate consumer LexID'},
+		{ValidationCode.NO_CALL, 'Gateway was not called.'},
+		{ValidationCode.INVALID_RESPONSE, 'Gateway had invalid response.'}
   	], {integer code, STRING description});
 
 	DictValidationCodesDesc := DICTIONARY (ValidationCodes, {code => description});
@@ -28,10 +32,13 @@ EXPORT Constants := MODULE
 	EXPORT GetValidationCodeDesc(integer validationCode) := DictValidationCodesDesc[validationCode].description;
 
 	EXPORT Debug := MODULE
+		EXPORT ComplianceData := FALSE;
 		EXPORT EquifaxEmsSoapcall := FALSE;
 		EXPORT EquifaxEmsGateway := FALSE;
 		EXPORT EquifaxEmsRecords := FALSE;
-		EXPORT ComplianceData := FALSE;
+		EXPORT TuFraudAlertSoapCall := FALSE;
+		EXPORT TuPicklistVerification := FALSE;
+		EXPORT TuFraudAlertRecords := FALSE;
 	END;
 
 END;
