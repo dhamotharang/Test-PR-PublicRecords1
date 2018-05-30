@@ -1,13 +1,13 @@
 ﻿import ut, _validate;
 
-export cleaned_dl_tn_withdrawals(string filedate) := function
+export Cleaned_DL_TN_Withdrawals(string filedate) := function
   
   wdl_file             := driversv2.file_dl_tn_wdl_raw(filedate);
-	layout_all_cln       := driversv2.layouts_dl_tn_in.Layout_TN_WDL_All_Cleaned;
+	layout_all_cln       := driversv2.layouts_dl_tn_in.layout_tn_wdl_all_cleaned;
 	
   layout_all_cln mapcleanwdl(wdl_file l) := transform,skip(l.dl_number = '')
   
-    self.process_date  := if(_validate.date.fisvalid(filedate),filedate,'');
+    self.process_date  := if(_validate.date.fisvalid(l.process_date),l.process_date,'');
 	  self.dl_number     := ut.cleanspacesandupper(l.dl_number);
 		self.action_code 	 := ut.cleanspacesandupper(l.action_code);	
 		self.event_date    := if(_validate.date.fisvalid(l.event_date) and

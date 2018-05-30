@@ -1,4 +1,4 @@
-import corp2,corp2_mapping,corp2_raw_al,Corp2_Raw_ar,corp2_raw_co,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,corp2_raw_ky,corp2_raw_la,corp2_raw_ma,
+﻿import corp2,corp2_mapping,corp2_raw_al,Corp2_Raw_ar,corp2_raw_co,corp2_raw_ga,corp2_raw_hi,corp2_raw_ia,corp2_raw_il,corp2_raw_ks,corp2_raw_ky,corp2_raw_la,corp2_raw_ma,
 			 corp2_raw_me,corp2_raw_mi,corp2_raw_mn,corp2_raw_mo,corp2_raw_mt,corp2_raw_nd,corp2_raw_nh,corp2_raw_nm,corp2_raw_nv,corp2_raw_or,corp2_raw_sc,corp2_raw_tn,
 			 corp2_raw_tx,corp2_raw_va,corp2_raw_vt,corp2_raw_wa,corp2_raw_wy,ut;
 			 
@@ -19,11 +19,11 @@ export fCleanPersonName(string pStateOrigin,string pStateOriginDesc,string pfNam
 	//	 and "AS" exists in the middle name and "ABOVE" exists is the last name
 	//   or all these words exists in one of the parameter fields.
 	//********************************************************************                       
-		shared UC_StateOrigin			:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		shared UC_StateOriginDesc	:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
-		shared UC_FName 					:= ut.fn_RemoveSpecialChars(corp2.t2u(pfName));
-		shared UC_MName						:= ut.fn_RemoveSpecialChars(corp2.t2u(pmName));
-		shared UC_LName		 				:= ut.fn_RemoveSpecialChars(corp2.t2u(plName));
+		shared UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));		
+		shared UC_FName 					:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pfName));
+		shared UC_MName						:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pmName));
+		shared UC_LName		 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(plName));
 
 		export CleanCharsFName  	:= Map(pStateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
 																		 pStateOrigin = 'AR' => regexreplace(corp2_raw_ar.fGetRegExPattern.FirstName.InvalidChars,UC_FName,''),
