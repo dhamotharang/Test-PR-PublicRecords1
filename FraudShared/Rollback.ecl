@@ -11,7 +11,7 @@ export Rollback(
 	,string								pFilter							= 	''
 	,dataset(lay_inputs)	pInputFilenames 		= 	Filenames	(pversion).Input.dAll_filenames
 	,dataset(lay_builds)	pBuildFilenames 		= 	Filenames	(pversion).dAll_filenames
-	,dataset(lay_builds)	pKeyFilenames 		= 	keynames	(pversion).dAll_filenames
+																							  + keynames	(pversion).dAll_filenames
 ) :=
 module
 	
