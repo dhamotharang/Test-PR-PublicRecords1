@@ -16,7 +16,6 @@ module
 			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
 			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
 			self.source_rec_id						:= l.unique_id;
-			// add  address and name prep 
 			self												:= l; 
 			self												:= []; 
    end; 
@@ -68,7 +67,6 @@ module
 										);
 
 	tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,pDataset_rollup,Build_Base_File);
-	// tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,KnownFraudSource,Build_Base_File);
 
 // Return
 	export full_build :=

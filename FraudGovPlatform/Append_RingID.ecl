@@ -32,17 +32,18 @@ EXPORT Append_RingID(DATASET(FraudShared.Layouts.Base.Main) FileBase) := FUNCTIO
 	MAC_Sequence_Records(	building_base_without_ringids, did,	building_base_with_new_ringids, seed);	
 
 	
-	building_base_all_ringids := 	project(building_base_with_previous_ringids(DID >= FirstRingID)	,FraudShared.Layouts.Base.Main)
-												+	project(building_base_with_new_ringids											,FraudShared.Layouts.Base.Main) ;
+	building_base_all_ringids := 	building_base_with_previous_ringids(DID >= FirstRingID)
+												+	project(building_base_with_new_ringids,FraudShared.Layouts.Base.Main) ;
 
 	//5.send all records with a RingID to be matched and collapsed
 	mtchs:= Mod_Collisions( building_base_all_ringids ).matches;
+  //output(breakdown matchset)
 	pairs:=table(mtchs,{new_rid,old_rid});
 	Header.MAC_ApplyDid1( building_base_all_ringids  ,DID, pairs, outfile);
 
 	//6.combine records with a real lexid and a flexid into one main base file
-	building_base_RingIDs := 	project(building_base_with_previous_ringids(did > 0 and did < FirstRingID),FraudShared.Layouts.Base.Main) 
-										+ project(outfile,FraudShared.Layouts.Base.Main) ;
+	building_base_RingIDs := 	building_base_with_previous_ringids(did > 0 and did < FirstRingID)
+										+ outfile ;
 
 
 	RETURN building_base_RingIDs;

@@ -301,6 +301,7 @@ EXPORT Layouts := MODULE
 			string9			clean_SSN;
 			string9			clean_Zip;
 			string25		clean_IP_Address;
+			string25		clean_dob;
 			unsigned6 	did ; 
 			unsigned1		did_score;
 			unsigned3		file_type;
@@ -324,6 +325,7 @@ EXPORT Layouts := MODULE
 			string10		clean_SSN;
 			string10		clean_Zip;
 			string25		clean_IP_Address;
+			string10		clean_dob;
 			unsigned6 	did ; 
 			unsigned1		did_score;	
 			unsigned3		file_type;
@@ -350,6 +352,7 @@ EXPORT Layouts := MODULE
 			string9			clean_SSN;
 			string9			clean_Zip;
 			string25		clean_IP_Address;
+			string10		clean_dob;
 			unsigned6		did ; 
 			unsigned1		did_score;		
 			string			current ; 
@@ -382,6 +385,7 @@ EXPORT Layouts := MODULE
 			string10		clean_SSN;
 			string10		clean_Zip;
 			string25		clean_IP_Address;
+			string10		clean_dob;
 			unsigned6		did ; 
 			unsigned1		did_score;			
 			string			current ; 
