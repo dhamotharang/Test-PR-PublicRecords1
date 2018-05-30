@@ -121,7 +121,7 @@
 		string8    post_date;	
 		string29   last_name;
 		string2    county_code;
-		string2	 	 crlf;
+		string133	 crlf;
   end;
 	
 	export Layout_TN_CP_With_ProcessDte := record
@@ -143,7 +143,7 @@
 		string8    post_date;	
 		string2    county_code;
 		string3	   action_type;	
-		string2  	 crlf;
+		string139  crlf;
 	end;
 	
 	export Layout_TN_WDL_With_ProcessDte := record
