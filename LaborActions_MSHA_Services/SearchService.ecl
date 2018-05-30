@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 
 	<!-- COMPLIANCE SETTINGS -->
@@ -19,6 +19,8 @@
 import laborActions_MSHA, iesp, AutoStandardI;
 
 EXPORT SearchService := MACRO
+
+  #ONWARNING (4207, IGNORE);
 
     rec_in := iesp.laborAction_MSHA.t_laborAction_MSHASearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('laborAction_MSHASearchRequest', FEW);

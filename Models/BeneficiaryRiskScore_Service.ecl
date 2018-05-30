@@ -85,7 +85,7 @@
 </message>
 */
 
-IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway;
+IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway,AutoheaderV2;
 
 EXPORT BeneficiaryRiskScore_Service() := FUNCTION
 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
