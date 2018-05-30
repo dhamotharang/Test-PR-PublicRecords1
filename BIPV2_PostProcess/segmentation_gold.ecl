@@ -74,7 +74,7 @@ shared infileWithLgid3Cand :=
 		left.lgid3 = right.lgid3,
 		transform({pInfile, hrec.has_lgid3_cand},
 			self.has_lgid3_cand := right.lgid3 != 0;
-			self := left), hash, limit(1));
+			self := left), hash, limit(1), left outer);
 shared input := distribute(project(infileWithLgid3Cand, transform(hrec, self.id := map(idName = 'PROXID' => left.proxid, 
 																																									 idName = 'SELEID' 	=> left.seleid, 
 																																									 idName = 'ORGID' 	=> left.orgid, 
