@@ -3,7 +3,7 @@ EXPORT Build_Input_KnownFraud(
 	  string		pversion
 	 ,boolean		PSkipKnownFraud	= false 
 	 ,boolean		PSkipNAC				= false	
-	 ,boolean		PSkipValidations	= false
+	 ,boolean		PSkipValidations	= true
 ) :=
 module
 

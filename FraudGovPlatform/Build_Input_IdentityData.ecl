@@ -9,9 +9,6 @@ EXPORT Build_Input_IdentityData(
 ) :=
 module
 
-
-	
-
 	SHARED fn_dedup(inputs):=FUNCTIONMACRO
 		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
 		in_ddp:=rollup(in_srt,

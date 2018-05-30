@@ -32,5 +32,4 @@ MODULE
 
 	EXPORT FirstRingID			:= 900000000000;
 
-
 END;

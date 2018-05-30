@@ -1,4 +1,4 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation, STD;
 
 export Build_All(
 
@@ -23,9 +23,20 @@ export Build_All(
 ) :=
 module
 
+	shared Spray_MBS := sequential(
+				 FraudShared.Promote().Inputfiles.Sprayed2Using,
+				 FraudShared.Promote().Inputfiles.Using2Used,
+				 FraudShared.SprayMBSFiles(pversion := pVersion[1..8], 
+													pDirectory := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', 
+																'/data/super_credit/fraudgov/in/mbs/dev', 
+																'/data/super_credit/fraudgov/in/mbs/prod')),
+				 FraudGovPlatform.Promote().sprayedfiles.MBS_Used2Sprayed
+	);
+
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	shared base_portion := sequential(
 			Create_Supers
+			,Spray_MBS
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
@@ -70,8 +81,6 @@ module
 		 base_portion
 		,if(PSkipKeysPortion, output('keys_portion skipped')
 				,keys_portion)
-		// Promote Contributory Files	
-		,Promote().buildfiles.Built2QA
 		// Promote Shared Files
 		,FraudShared.Promote().buildfiles.Built2QA			
 		// Clean Up Shared Files	
