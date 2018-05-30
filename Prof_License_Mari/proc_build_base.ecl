@@ -201,7 +201,7 @@ seqrec := RECORD
 											into_final(LEFT,RIGHT),
 											LOCAL,
 											LEFT OUTER, KEEP(1)
-										); /* : persist('~thor_data400::persist::proflic_mari::append_bdid');*/
+										); /*: persist('~thor_data400::persist::proflic_mari::append_bdid');*/
 
 
 		layout_mari_final_plus := RECORD
@@ -304,9 +304,8 @@ seqrec := RECORD
 		reformat_searchRID := PROJECT(dsSearch_RID, TRANSFORM(Prof_License_Mari.layouts.final, SELF.mari_rid := LEFT.tmp_mari_rid; SELF := LEFT));
 
 		EXPORT search_file	:=	reformat_searchRID;
-
 		
 			
+
 END;
-		
 		
