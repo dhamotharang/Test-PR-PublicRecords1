@@ -17,7 +17,6 @@ module
 	
 	export inputfiles	:= tools.mod_RollbackInput(pInputFilenames,pFilter,pDeleteInputFiles,pIsTesting);
 	export buildfiles	:= tools.mod_RollbackBuild(pversion,pBuildFilenames,pFilter,pDeleteBuildFiles,pIsTesting);
-	export keyfiles	:= tools.mod_RollbackBuild(pversion,pKeyFilenames,pFilter,pDeleteBuildFiles,pIsTesting);
 	
 	export fullbuild := sequential(
 		 inputfiles.Used2Sprayed
