@@ -116,7 +116,7 @@ macro
   #if (%stype% = 'TN')
 	  %recSize% := 200;  //TN Convictions data
 	#end
-	#if (%stype% = 'TN_WDL')
+	#if (%stype% = 'TN_WDL') 
 	  %recSize% := 200;  //TN Withdrawals data
 	#end
 	/*
