@@ -1,8 +1,7 @@
-import relationship,PRTE2_Header,data_services,doxie,RoxieKeybuild;
+﻿import relationship,PRTE2_Header,data_services,doxie,RoxieKeybuild;
 
-k1:=index(relationship.key_relatives_v3,'~prte::key::header::20180222::relatives_v3');
-kpn:=  PRTE2_Header.constants.KEY_PREFIX;
-
+res:=Relationship.File_Relative(not(confidence IN ['NOISE','LOW']));
+k1:= Relationship.functions_output.convertTitledToKey(res);
 
 rels := dataset([   {'BCOBANKRUPTCY',27,1},  {'BCOECRASH',27,1},      {'BCOFORECLOSURE',27,1},
                     {'BCOLIEN',27,1},        {'BCOPROPERTY',27,1},    {'COAIRCRAFT',27,1},

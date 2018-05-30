@@ -114,10 +114,10 @@ macro
 	  %recSize% := 245;  //MN Convictions data
 	#end
   #if (%stype% = 'TN')
-	  %recSize% := 68;  //TN Convictions data
+	  %recSize% := 69;  //TN Convictions data
 	#end
 	#if (%stype% = 'TN_WDL')
-	  %recSize% := 68;  //TN Withdrawals data
+	  %recSize% := 63;  //TN Withdrawals data
 	#end
 	/*
 	#if (%stype% = 'WY')
@@ -213,10 +213,10 @@ macro
 			DriversV2.Layouts_DL_MN_In.Layout_MN_conv_ProcessDte;  // Fixed length vendor raw data structure
 		#end
     #if(%stype% = 'TN')
-			DriversV2.Layouts_DL_TN_In.Layout_TN_CP_All_Cleaned;     // Fixed length vendor raw data structure
+			DriversV2.Layouts_DL_TN_In.Layout_TN_CP_With_ProcessDte;     // Fixed length vendor raw data structure
 		#end
 		#if(%stype% = 'TN_WDL')
-			DriversV2.Layouts_DL_TN_In.Layout_TN_WDL_All_Cleaned;     // Fixed length vendor raw data structure
+			DriversV2.Layouts_DL_TN_In.Layout_TN_WDL_With_ProcessDte;     // Fixed length vendor raw data structure
 		#end
 		/*
 		#if(%stype% = 'WY')
