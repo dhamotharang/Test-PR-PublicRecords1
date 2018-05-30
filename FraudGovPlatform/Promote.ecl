@@ -1,4 +1,4 @@
-import ut,tools;
+﻿import ut,tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
@@ -11,6 +11,7 @@ export Promote(
 	,boolean							pIsTesting			= 	false
 	,dataset(lay_inputs)	pInputFilenames = 	Filenames	(pversion).Input.dAll_filenames
 	,dataset(lay_builds)	pBuildFilenames = 	Filenames	(pversion).dAll_filenames
+																					+ Keynames  (pversion).dAll_filenames
 																					
 ) :=
 module
