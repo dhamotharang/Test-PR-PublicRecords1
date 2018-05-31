@@ -6,7 +6,7 @@ IMPORT tools,std,ut,SALT311;
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
 	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+DatasetName,ScrubsProfileName);
 	profilename				:=	ScrubsProfileName;
-	Prefix						:=	IF(TRIM(scopename,ALL)<>'',scopename,ScrubsProfileName);
+	Prefix						:=	IF(TRIM(scopename,ALL)<>'',scopename,ScrubsProfileName+'_'+filedate);
 	
 	
 	

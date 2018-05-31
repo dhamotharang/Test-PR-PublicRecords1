@@ -115,10 +115,10 @@ macro
 	  %recSize% := 245;  //MN Convictions data
 	#end
   #if (%stype% = 'TN')
-	  %recSize% := 69;  //TN Convictions data
+	  %recSize% := 200;  //TN Convictions data
 	#end
-	#if (%stype% = 'TN_WDL')
-	  %recSize% := 63;  //TN Withdrawals data
+	#if (%stype% = 'TN_WDL') 
+	  %recSize% := 200;  //TN Withdrawals data
 	#end
 	/*
 	#if (%stype% = 'WY')
