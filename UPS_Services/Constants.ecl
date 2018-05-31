@@ -7,6 +7,8 @@ export Constants := MODULE
 		export unsigned2 SCORE_THRESHOLD := 30;			// score threshold passed into header search modules (through GlobalModule)
 		export UNSIGNED2 RESPONSE_THRESHOLD := 40;	// responses scoring below this value are not returned
 
+		export unsigned2 SCORE_THRESHOLD_WATERFALL_PHONES := 74; // 75 and above are good
+		
 		// tag values for EntityType
 		export type_EntityType := STRING15;
 		export type_EntityType  TAG_ENTITY_IND := 'Individual';
