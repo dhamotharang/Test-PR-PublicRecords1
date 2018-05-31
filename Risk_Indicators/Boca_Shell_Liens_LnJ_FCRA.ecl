@@ -52,7 +52,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		self.name_type := ri.name_type;
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
-		self.PersistId := (string) ri.persistent_record_id;
+		self.Party_PersistId := (string) ri.persistent_record_id;
 		SELF := le;
 		SELF := [];
 	END;
@@ -337,6 +337,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_jgmt_cnt := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, 1);							
 		//End Juli additions
 		self.PersistId := (string) ri.persistent_record_id;
+  self.Party_PersistId := (string) le.Party_PersistId;
 		SELF := le;
 	end;
 	endmacro;
@@ -554,7 +555,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 								PersonContext.constants.datagroups.LIEN_PARTY] and
 		Right.StatementType in [PersonContext.constants.RecordTypes.CS, PersonContext.constants.RecordTypes.RS] and
 		Right.RecIdForStId != '' and 
-		trim(left.PersistId, left, right) = trim(Right.RecIdForStId, left, right),
+		(trim(left.PersistId, left, right) = trim(Right.RecIdForStId, left, right) OR
+  trim(left.Party_PersistId, left, right) = trim(Right.RecIdForStId, left, right)),
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
 			self.did := left.did;
 			self.ConsumerStatementId := (unsigned) Right.statementid;
@@ -881,6 +883,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	// output(liens_added, named('liens_added'));
 	// output(liens_party_raw, named('liens_party_raw'));
 	// OUTPUT(liens_main_raw, named('liens_main_raw'));
+  // output(liens_main_overrides, named('liens_main_overrides'));
+  // output(liens_party_overrides, named('liens_party_overrides'));
 	// output(liens_full, named('liens_full'));
 	// output(liens_rolled_original, named('liens_rolled_original'));
 	// output(final_liens, named('final_liens'));
