@@ -182,6 +182,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string PersistId;
 		unsigned ConsumerStatementId;
   string2 Filing_Type_Id;
+  string Party_PersistId;
 	END;	
 	
 	EXPORT layout_derog_process_plus_workingDF := RECORD

@@ -5,7 +5,7 @@
 EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,      
 									_history_date = 999999, boca_shell) := macro
 
-  IMPORT liensv2, FCRA, riskwise, doxie, ut, Risk_Indicators, STD;
+  IMPORT liensv2, FCRA, riskwise, doxie, ut, Risk_Indicators, STD, PersonContext;
 
 	_MAX_OVERRIDE_LIMIT := 100;
 
@@ -31,16 +31,28 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 	lien_correct_tmsid_rmsid := SET( flag_file(file_id = FCRA.FILE_ID.LIEN), record_id );
 	lien_correct_ffid        := SET( flag_file(file_id = FCRA.FILE_ID.LIEN), flag_file_id );
   tmpConS := record
-    // Risk_Indicators.Layouts.tmp_Consumer_Statements;
     string RecIdForStId;
   end;
+
+ //Gets the PersisentIds of records we can't give back, such as DR types 
  personContext := SET(project(bocashell[1].ConsumerStatements, 
     transform(tmpConS,
-  self.RecIdForStId := left.RecIdForStId)), RecIdForStId);
- 
- // listPerSonContext := SET(personContext.RecIdForStId);
-	//normalize the childset out to dataset on it's own to work with easier
-
+    //make sure to show Lien CS and RS types for Lien Main and Lien Party types
+    self.RecIdForStId := if(left.RecIdForStId <> '' and 
+      left.StatementType NOT in [PersonContext.constants.RecordTypes.CS, PersonContext.constants.RecordTypes.RS] and
+      left.DataGroup in [PersonContext.constants.datagroups.LIEN_MAIN, 
+								PersonContext.constants.datagroups.LIEN_PARTY], 
+      left.RecIdForStId, 
+      '');  
+      )),
+      RecIdForStId);
+ //We want to get the statementIds of the persisentIds that we should give back 
+ //this is for when we return the consumerStatementId back in the RV report section 
+/*	PcontextStId := NORMALIZE(bocashell,
+    LEFT.ConsumerStatements, 
+    TRANSFORM(Risk_Indicators.Layouts.tmp_Consumer_Statements, 
+    SELF := RIGHT));
+*/
  //Overrides aren't used when it's in archive mode so remove the override checks when in archive mode
 	liens_party := JOIN (liens_slim, liensv2.key_liens_party_id_FCRA, 
 					  Right.rmsid<> '' and left.tmsid <> ''
@@ -65,6 +77,7 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 							//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 							self.porig_name := Risk_Indicators.iid_constants.CreateFullName(right.title, right.fname, right.mname, right.lname, right.name_suffix);		 
 							self.pdid := (unsigned)left.did;
+      	self.Party_PersistId := (string) right.persistent_record_id;
        self := right,
 					 self := []),
 					 ATMOST(keyed (Left.tmsid = Right.tmsid) and keyed (Left.rmsid = Right.rmsid), riskwise.max_atmost));
@@ -84,6 +97,7 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 							//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 							self.porig_name := Risk_Indicators.iid_constants.CreateFullName(left.title, left.fname, left.mname, left.lname, left.name_suffix);		 
 							self.pdid := (unsigned) left.did;
+       self.Party_PersistId := (string) left.persistent_record_id;
 							SELF := Left; 
 							Self := []));
 
@@ -130,7 +144,8 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 							self.mFtdDec := right.filing_type_desc;
 							self.ptmsid := if(right.tmsid='', '', left.tmsid);	
 							self.prmsid := if(right.rmsid='', '', left.rmsid);
-							self := right, 
+       self.PersistId := (string) right.persistent_record_id;//gets main persistentid from the right side
+							self := right,
 							self := [];),
 					ATMOST(keyed (Left.ptmsid = Right.tmsid) and 
 							keyed (Left.prmsid = Right.rmsid),
@@ -165,6 +180,7 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 							self.pdate_first_seen := left.pdate_first_seen;
 							self.mFtdDec := right.filing_type_desc;
        SELF.VendorDateLastSeen := right.collection_date;
+       self.PersistId := (string) right.persistent_record_id;//gets main persistentid from the right side
 							self := left,
 							self := right,
 							self := [];),
@@ -263,6 +279,22 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 			(integer) if((integer) mReleaseDate = 0, 99999999, (integer) mReleaseDate),
 			-(integer) mDateFiled, -(integer) mProcessDate), 
 			pdid, mfilingNumber, mAgencystate, mAgencyCounty);	
+
+ /*
+liensTmsidDF_Final := JOIN(liensTmsidDF4_total, PcontextStId, 
+   (unsigned) left.pdid = (unsigned) Right.UniqueId and
+      // Right.DataGroup in [PersonContext.constants.datagroups.LIEN_MAIN, PersonContext.constants.datagroups.LIEN_PARTY] and
+       Right.DataGroup in PersonContext.constants.datagroups.LIEN_MAIN   and
+      // Right.StatementType in [PersonContext.constants.RecordTypes.CS, PersonContext.constants.RecordTypes.RS] and
+      Right.RecIdForStId != '' and 
+      (trim(left.PersistId, left, right) = trim(Right.RecIdForStId, left, right) OR
+      trim(left.Party_PersistId, left, right) = trim(Right.RecIdForStId, left, right)),
+    transform(RiskWiseFCRA.layouts.layoutMain,
+        self.pdid := left.pdid;
+        self.ConsumerStatementId := (integer) Right.statementid;
+        self := left), 
+        left outer);
+ */
 //checks for 7 year filter
 	liens_filtered_DF := liensTmsidDF4_total(	ut.fn_date_is_ok(Risk_indicators.iid_constants.myGetDate(_history_date), DF4, 7));
 
@@ -315,7 +347,7 @@ EXPORT _Lien_RV_data(in_dids, flag_file, liensdata,
 // output(flag_file, named('flag_file'));
 // output(lien_correct_tmsid_rmsid, named('lien_correct_tmsid_rmsid'));
 // output(lien_correct_ffid, named('lien_correct_ffid'));
-
+// output(PcontextStId);
 liensdata := liens_filtered_DF;
 
 ENDMACRO;

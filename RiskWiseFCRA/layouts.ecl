@@ -149,7 +149,8 @@ export layoutLiens := record
 		string8  pdate_last_seen := '';
 		unsigned pdid;
 		string pname_type; 
-		// integer pp_id;
+  string Party_PersistId;
+  integer ConsumerStatementId;
 	end;
 	export layoutParty := record	
 		recordOf(liensv2.layout_liens_party);
@@ -173,14 +174,13 @@ export layoutLiens := record
 			string20 mFilingNumber       ;    
 			string10 mFilingBook         ;    
 			string10 mFilingPage         ;    
-			// string60 Agency             ;    
 			string35 mAgencyCounty       ;    
 			string2 mAgencyState         ; 
 			string mAmount;
 			string mFtdDec;
 			boolean misSuits;
    string8 VendorDateLastSeen;
-			// integer m_pp_id;
+   string PersistId;
 	end;
 
 END;
