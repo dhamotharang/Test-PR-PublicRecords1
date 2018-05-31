@@ -3,7 +3,7 @@
 #workunit('name','Scrubs_DL_TN_WDL.BWR_Hygiene - Hygiene & Stats - SALT V3.8.0');
 IMPORT Scrubs_DL_TN_WDL,SALT38;
 // First create an instantiated hygiene module
-  infile := Scrubs_DL_TN_WDL.In_TN_WDL('20180312');
+  infile := Scrubs_DL_TN_WDL.In_In_TN_WDL;
   ip := DISTRIBUTE(infile, SKEW(0.1));
   h := Scrubs_DL_TN_WDL.Hygiene(ip);
   p := h.AllProfiles; // Detailed profile of every field

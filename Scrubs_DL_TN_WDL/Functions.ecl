@@ -3,8 +3,8 @@
 EXPORT Functions := MODULE
 
   EXPORT fn_check_dl_number(STRING dlnum) := FUNCTION
-    dlnum_clean := ut.CleanSpacesAndUpper(dlnum);
-		isValidNumber := IF(Stringlib.StringFilterOut(dlnum_clean[2..], '0123456789') = '', TRUE, FALSE);    
+    dlnum_clean 	:= ut.CleanSpacesAndUpper(dlnum);
+		isValidNumber := IF(Stringlib.StringFilterOut(dlnum_clean, '0123456789') = '', TRUE, FALSE);    
     RETURN IF(dlnum_clean = '' OR isValidNumber, 1, 0);
   END;
 

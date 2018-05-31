@@ -322,9 +322,9 @@ macro
 						FileServices.DeleteLogicalFile(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::raw_'+ filedate));
 
 
-	%do_super%  := sequential(output('do super 1...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main%, %scrub_files% , %raw_delete%);
+	%do_super%  := sequential(output('do super 1...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main%, %scrub_files%, %raw_delete%);
 
-	%do_super1% := sequential(output('do super 2...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main1%, %scrub_files% , %raw_delete%);
+	%do_super1% := sequential(output('do super 2...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main1%, %scrub_files%, %raw_delete%);
 
 	%out_super% := if(clear_Super = 'N', sequential(%do_super%), sequential(%do_super1%));
 

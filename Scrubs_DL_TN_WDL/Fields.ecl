@@ -5,20 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 9;
  
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_dl_nbr','invalid_lname','invalid_past_date','invalid_action_code','invalid_county_code','invalid_action_type');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_dl_nbr' => 1,'invalid_lname' => 2,'invalid_past_date' => 3,'invalid_action_code' => 4,'invalid_county_code' => 5,'invalid_action_type' => 6,0);
- 
-EXPORT MakeFT_invalid_dl_nbr(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_dl_nbr(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_check_dl_number(s)>0);
-EXPORT InValidMessageFT_invalid_dl_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_check_dl_number'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_lname(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_lname(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_valid_lname(s)>0);
-EXPORT InValidMessageFT_invalid_lname(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_valid_lname'),SALT38.HygieneErrors.Good);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_past_date','invalid_dl_nbr','invalid_action_code','invalid_lname','invalid_county_code','invalid_action_type');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_past_date' => 1,'invalid_dl_nbr' => 2,'invalid_action_code' => 3,'invalid_lname' => 4,'invalid_county_code' => 5,'invalid_action_type' => 6,0);
  
 EXPORT MakeFT_invalid_past_date(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
@@ -26,11 +14,23 @@ END;
 EXPORT InValidFT_invalid_past_date(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_valid_past_date(s)>0);
 EXPORT InValidMessageFT_invalid_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_valid_past_date'),SALT38.HygieneErrors.Good);
  
+EXPORT MakeFT_invalid_dl_nbr(SALT38.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_dl_nbr(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_check_dl_number(s)>0);
+EXPORT InValidMessageFT_invalid_dl_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_check_dl_number'),SALT38.HygieneErrors.Good);
+ 
 EXPORT MakeFT_invalid_action_code(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
 EXPORT InValidFT_invalid_action_code(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_action_code(s)>0);
 EXPORT InValidMessageFT_invalid_action_code(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_action_code'),SALT38.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_lname(SALT38.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_lname(SALT38.StrType s) := WHICH(~Scrubs_DL_TN_WDL.Functions.fn_valid_lname(s)>0);
+EXPORT InValidMessageFT_invalid_lname(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_TN_WDL.Functions.fn_valid_lname'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_county_code(SALT38.StrType s0) := FUNCTION
   RETURN  s0;

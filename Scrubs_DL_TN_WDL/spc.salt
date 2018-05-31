@@ -16,10 +16,10 @@ FILENAME:In_TN_WDL
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
 
-FIELDTYPE:invalid_dl_nbr:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_check_dl_number>0)
-FIELDTYPE:invalid_lname:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_valid_lname>0)
 FIELDTYPE:invalid_past_date:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_valid_past_date>0)
+FIELDTYPE:invalid_dl_nbr:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_check_dl_number>0)
 FIELDTYPE:invalid_action_code:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_action_code>0)
+FIELDTYPE:invalid_lname:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_valid_lname>0)
 FIELDTYPE:invalid_county_code:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_county_code>0)
 FIELDTYPE:invalid_action_type:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_action_type>0)
 
