@@ -8,7 +8,7 @@ ECL1(string wtype,string build_type) :=
 +'#workunit(\'protect\', \'true\');\n'
 +'#workunit(\'priority\', \'high\');\n'
 +'#workunit (\'priority\',12);\n'
-+'#workunit(\'name\', \'Watchdog '+wtype+' Base Build '+ut.GetDate+ '\');\n'
++'#workunit(\'name\', \'Yogurt:Watchdog '+wtype+' Base Build '+ut.GetDate+ '\');\n'
 +'Sequential(Watchdog.BWR_Run_Watchdog(\''+build_type+'\'),Watchdog.UpdateWdogHdrFile(\''+wtype+'\',false), notify(\'Watchdog build can progress\',\'*\'));\n' ;
 
 ECL2 := 
@@ -17,7 +17,7 @@ ECL2 :=
 +'#workunit(\'protect\', \'true\');\n'
 +'#workunit(\'priority\', \'high\');\n'
 +'#workunit (\'priority\',12);\n'
-+'#workunit(\'name\', \'Watchdog key Build '+ut.GetDate+ '\');\n'
++'#workunit(\'name\', \'Yogurt:Watchdog key Build '+ut.GetDate+ '\');\n'
 +'Sequential(Watchdog.Proc_build_Keys , notify(\'Watchdog Marketing build can progress\',\'*\'));\n' ;
 
 //**Get WU List
