@@ -1,4 +1,4 @@
-// Function to update data operations database with a new build version for a specific
+﻿// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -23,6 +23,7 @@
 //							Note: Use Delta Replace when you are replacing a delta version with another delta.
 // tagdelta = allows users to pass "previous/already existing" delta version to tag to the new 
 //						"full" version that is pass in uversion parameter
+// overrideupdateflag = false; if the version already exists do not override the flag field, if set to true override
 //	Example: DOPS.updateversion('ABCKeys','20170516','abc@lexisnexis.com',,'N',,,,,,'F','20170514')
 
 import STD,dops;
@@ -31,7 +32,8 @@ string l_auto_pkg = 'N',string l_inenvment = '',string l_isboolready = 'Y',
 string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_indaliip = '',string l_includeboolean = 'Y', 
 string l_updateflag = 'F',
 string l_tagdelta = '',
-string l_dopsenv = dops.constants.dopsenvironment) := function
+string l_dopsenv = dops.constants.dopsenvironment,
+boolean l_overrideupdateflag = false) := function
 
 	// trim all string variables when a value is passed from a deprecated function/macro
 	// the values are being padded with space
@@ -66,6 +68,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 												subjectprefixstring + datasetname + ' DOPS UPDATE ' + newcversion, 
 												'Dataset: ' + datasetname + '\n' +
 												'Version: ' + uversion + '\n' +
+												'Workunit: ' + WORKUNIT + '\n' +
 												'HPCC Build Owner/User: ' + dops.constants.jobowner + '\n\n' +
 												'DOPS ENVIRONMENT: ' + dopsenv + if (dopsenv = 'dev', '. Updating DOPS DEV DB because the ECL code is running on dev, dops.constants.daliip is pointing to dev dali.', '') + '\n\n' +
 												newemailmessage
@@ -96,6 +99,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 		string inprod{xpath('inprod')} := isprodready;
 		string updateflag{xpath('updateflag')} := updateflag;
 		string tagdelta{xpath('tagdelta')} := tagdelta;
+		boolean overrideupdateflag{xpath('overrideupdateflag')} := l_overrideupdateflag;
 	end;
 	
 
