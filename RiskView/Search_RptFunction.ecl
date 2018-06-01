@@ -105,7 +105,8 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			self.Status := if(TRIM(l.release_date)<>'', 'RELEASED', '');
 			self.FilingDate := iesp.ECL2ESP.toDate((integer)l.orig_filing_date);
 			laDate := if( (integer)l.pdate_last_seen > (integer)l.release_date, (integer)l.pdate_last_seen, (integer)l.release_date);
-			self.LastActionDate := iesp.ECL2ESP.toDate(laDate); 
+			self.LastActionDate := iesp.ECL2ESP.toDate(laDate);
+			//self.ConsumerStatementId := l.ConsumerStatementId;
 			self := [];
 		END;
 // Bankruptcies................	
@@ -328,7 +329,8 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 // Build final report record							
 		returnLayout makereport(risk_indicators.Layout_Boca_Shell l) := TRANSFORM
 			self.seq := l.seq;
-			add_hist := ungroup(addr_History_all);
+			
+   add_hist := ungroup(addr_History_all);
 			self.Summary := RiskView.Search_RptData.summary(add_hist, l, inquiryRestrict, raw_input, 
 				LexIDOnlyOnInput, SSNMask, dob_mask_value);
 			self.AddressHistories := ungroup(final_addr_History2);;
@@ -336,12 +338,14 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			ac := project(aircraftreport, formataircraft(left, counter));
 			self.RealProperties := ungroup(final_propertyrecs);
 			self.PersonalProperties := project(sort(wc + ac, -iesp.ECL2ESP.DateToString(RegistrationDate)), TRANSFORM(iesp.riskview2.t_Rv2ReportPersonalPropertyRecord, self.seq:=counter, self := left));
-			self.FilingRecords := if(FilterLiens,  
+		
+    self.FilingRecords := if(FilterLiens,  
       project(risk_indicators.iid_constants.ds_Record,
             transform(iesp.riskview2.t_Rv2ReportFilingRecord, self := [])),
       project(sort(liensdata, -(integer) VendorDateLastSeen, -(integer) orig_filing_date,
       -(integer) Release_Date ), formatliens(left, counter))); 
-			self.Bankruptcies := project(sort(bankruptcies, -date_last_seen), formatbankruptcies(left, counter)); 
+		
+   self.Bankruptcies := project(sort(bankruptcies, -date_last_seen), formatbankruptcies(left, counter)); 
 			self.Criminal.CriminalRecords := project(sort(criminalrecs, -offender.fcra_date), formatcriminal(left, counter));
 			self.Criminal.OffenderRegistryRecords := project(sorecs, formatSO(left, counter));
 			s1 := project(amstudentrecs, formatamstudent(left, counter));

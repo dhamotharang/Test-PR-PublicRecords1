@@ -226,11 +226,11 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	BOOLEAN doHighlight := search_options.highlight;
 	export highlighted_records := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records), rolled_records);
 	
-	MaxNumPhoneSubjectPre := (unsigned)search_options.MaxNumPhoneSubject;
+	MaxNumPhoneSubjectPre := (integer)search_options.MaxNumPhoneSubject;
 	TrueMaxNumPhoneSubject := map(  MaxNumPhoneSubjectPre > 3 => 3, // max is 3 
-	                            MaxNumPhoneSubjectPre = 0 => 3, // default is 3 
-	                            MaxNumPhoneSubjectPre < 0 => 0, // internal testing to turn off WFP
-																 MaxNumPhoneSubjectPre);
+	                                MaxNumPhoneSubjectPre = 0 => 3, // default is 3 
+	                                MaxNumPhoneSubjectPre < 0 => 0, // internal testing to turn off WFP
+																     MaxNumPhoneSubjectPre);
 	
 	PSearchMod := module( project( inputmod, mod_Params.PersonSearch, opt)) 
 			export string20  PhoneScoreModel := if(trim(search_options.PhoneScoreModel)='','PHONESCORE_V2' ,search_options.PhoneScoreModel );
@@ -238,7 +238,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		end;
 	
 	// Choose top 1 DID 	
-	 topDid := project(choosen(highlighted_records(score > 79 and 
+	 topDid := project(choosen(highlighted_records(score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
 	                            EntityType = UPS_Services.Constants.TAG_ENTITY_IND),1),
 									transform(doxie.layout_references_hh,
 							         self.DID := (unsigned) left.UniqueID ));
@@ -250,7 +250,8 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	highlighted_records_with_phones := if( doWaterfallPhones, 
 				join(highlighted_records,wfpRecords,
 					~isCanada and left.EntityType = UPS_Services.Constants.TAG_ENTITY_IND and 
-					left.score > 79 and left.UniqueID = (string)right.DID,
+					left.score  >  UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
+					left.UniqueID = (string)right.DID,
 					transform(recordof(highlighted_records),
 					firstAddress := left.Addresses[1];
 					phones := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo, 
