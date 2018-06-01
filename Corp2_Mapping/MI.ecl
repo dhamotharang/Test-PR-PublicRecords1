@@ -25,7 +25,9 @@ export MI := module
 		Bad_Addrs           := ['TEST ADDR','ASDFASDFASDFASDF'];
 	  Bad_Names           := ['','TEST RECORD','TESTING RECORD','TESTING NAME','TESTING 190','TESTING 195','USA','MA','MI','DSTE','CRCC'];
 	  Bad_RA_Names        := '^THIS RECORD|THIS RECORD|^NONE|^BUSINESS FILINGS INCORPORATED';
-	  RApattern           := '(\\sRES[G OF| OF|IGN].*$)';
+    //The following patterns of 'RESG OF AGENT EFF 9/1/12', 'RES OF AGENT EFF 3/7/12', 'RESG OF AG EF 10/18/13', 'RESIGN OF AGENT EF 10/18/13'
+	  //have been included at the end of the RA name.  When this pattern is found it will be removed.
+		RApattern           := '(\\sRES[G OF| OF|IGN].*$)';
 	  history_event_codes	:= ['2','3','4','5','02','03','04','05','14','27','41'];
 		ent_types           := ['200','0200','201','0201','300','0300','400','0400','402','0402','500','0500','502','0502',
 		                        '503','0503','504','0504','505','0505','506','0506','601','0601','602','0602','801','0801'];
@@ -367,12 +369,12 @@ export MI := module
 		// PROCESS CORPORATE/LLC/LP/NAME REGISTRATION CONTACT (CONT) DATA
 		//*******************************************************************
 		Corp_NoAssumedName		:= MapCorp + MapLLC + MapLP + MapNameRegistration : independent;
-		Contacts					  	:= distribute(Corp_NoAssumedName,hash(corp_orig_sos_charter_nbr));
+		d_Corp_NoAssumedName 	:= distribute(Corp_NoAssumedName,hash(corp_orig_sos_charter_nbr));
 
 		//The following join is done to pick up the corp_legal_name that doesn't
 		//exist in the GeneralPartnerFile.
 		//Note: MapAssumedName is not to be used to extract the legal name.
-		CorpGeneralPartner		:= join(Contacts, ds_GeneralPartner,
+		CorpGeneralPartner		:= join(d_Corp_NoAssumedName, ds_GeneralPartner,
 																	corp2.t2u(left.corp_orig_sos_charter_nbr)  = corp2.t2u(right.entityid),
 																	transform(Corp2_Raw_MI.Layouts.Temp_CorpGeneralPartner,
 																						self.corp_legal_name 					:= left.corp_legal_name;
@@ -383,7 +385,7 @@ export MI := module
 																 );
 	
 		Corp2_Mapping.LayoutsCommon.Main GeneralPartnerTransform(Corp2_Raw_MI.Layouts.Temp_CorpGeneralPartner L) := transform,
-		  skip(corp2.t2u(l.Name) in Bad_Names or corp2.t2u(l.corp_legal_name) = '')
+		  skip(corp2.t2u(l.Name) in Bad_Names)
 				self.dt_vendor_first_reported		 := (integer)fileDate;
 				self.dt_vendor_last_reported		 := (integer)fileDate;
 				self.dt_first_seen							 := (integer)fileDate;
@@ -447,7 +449,8 @@ export MI := module
 		
 		MapARDates	:= project(ds_History,ARTransform(LEFT));
 		
-		MapAR:= MapARYear + MapARDates;
+		All_AR := MapARYear + MapARDates;
+		MapAR  := dedup(sort(distribute(All_AR,hash(corp_key)),record,local),record,local) : independent;
 		
 		//********************************************************************
 		// PROCESS HISTORY EVENT DATA
@@ -468,7 +471,8 @@ export MI := module
 			  self 																			:= [];
 		end;
 
-		MapEvent	:= project(ds_History,EventTransform(LEFT));
+		pEvent   := project(ds_History,EventTransform(LEFT));
+		MapEvent := dedup(sort(pEvent,record),record) : independent;
 		
 		//********************************************************************
 		// PROCESS HISTORY STOCK DATA

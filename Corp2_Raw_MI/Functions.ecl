@@ -658,7 +658,8 @@ EXPORT Functions := MODULE
 								  uc_s =  '23'       => 'STOCK HISTORY',
 								  uc_s =  '27'       => 'CONSOLIDATION',
 								  uc_s =  '41'       => 'CHANGE OF LIMITED PARTNERSHIP',
-								  ''
+								  uc_s =  ''         => '',
+									'**|'+uc_s
 								 );
     end;
 
