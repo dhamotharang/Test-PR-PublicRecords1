@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control;
 export EnvironmentVariables := module
 
 	export username := 'svc_pr_orbit_hpcc@mbs';
@@ -14,7 +14,7 @@ export EnvironmentVariables := module
 	export statLogicalFilePrefix := '~ProfileStat::';
 	export statLandingZoneFilePrefix := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
-			'\\\\risk.regn.net\\BUS\\Orbit\\ProfileStats\\ProfileStat-', 
+			'C:\\Orbit\\ProfileStats\\ProfileStat-', 
 			'D:\\ProfileStats\\ProfileStat-'
 		);
 	export statLandingZoneServer := 
