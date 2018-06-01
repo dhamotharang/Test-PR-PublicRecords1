@@ -1052,6 +1052,7 @@
 		export string KEYWORD_CAATSA228_WC					:= '740';
 		export string KEYWORD_ESMA									:= '741';
 		export string KEYWORD_PHPDEA								:= '742';
+		export string KEYWORD_PLPOL									:= '743';
 
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
