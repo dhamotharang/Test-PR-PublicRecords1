@@ -1,4 +1,4 @@
-EXPORT proc_build_marketing :=  function
+﻿EXPORT proc_build_marketing :=  function
 
 #stored ('watchtype', 'marketing');
 
@@ -20,8 +20,8 @@ string8 filedate := fd[1].fdate : stored('filedate');
 
 set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
-send_bad_email := fileservices.SendEmail('skasavajjala@seisint.com','Watchdog-marketing Build FAILED','');
-send_email := fileservices.SendEmail('skasavajjala@seisint.com','Watchdog-marketing Build FINISHED','');
+send_bad_email := fileservices.SendEmail('michael.gould@lexisnexis.com,skasavajjala@seisint.com','Watchdog-marketing Build FAILED','');
+send_email := fileservices.SendEmail('michael.gould@lexisnexis.com,skasavajjala@seisint.com','Watchdog-marketing Build FINISHED','');
 updatedops          := RoxieKeyBuild.updateversion('MarketingHeaderKeys',filedate,'skasavajjala@seisint.com',,'N');
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Marketing Best',filedate);
 
