@@ -1,4 +1,4 @@
-EXPORT Lookup_States	:=
+﻿EXPORT Lookup_States	:=
 MODULE
 
 	Layout_lkp_state_codes := RECORD
@@ -107,6 +107,17 @@ MODULE
 	// );
 	
 // CONNECTICUT LOOKUPS
+
+	EXPORT	lkp_ct_age(STRING ageunits, STRING age) := CASE(ageunits,
+		'1'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' YEARS OLD',(UNSIGNED)age + ' YEAR OLD'),
+		'2'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' MONTHS OLD',(UNSIGNED)age + ' MONTH OLD'),
+		'3'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' WEEKS OLD',(UNSIGNED)age + ' WEEK OLD'),
+		'4'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' DAYS OLD',(UNSIGNED)age + ' DAY OLD'),
+		'5'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' HOURS OLD',(UNSIGNED)age + ' HOUR OLD'),
+		'6'	=>	IF((UNSIGNED)age>1,(UNSIGNED)age + ' MINUTES OLD',(UNSIGNED)age + ' MINUTE OLD'),
+		'9'	=>	'AGE UNKNOWN',
+		''
+	);
 
 	EXPORT	lkp_ct_race(UNSIGNED1 casetype) := CASE(casetype,
 		1		=>	'WHITE',
@@ -17153,7 +17164,7 @@ MODULE
 	EXPORT lkp_nc_country_codes := DATASET([
 		{'AFGHANISTAN','AF','',''},
 		{'AKROTIRI','AX','',''},
-		{'Ã…LAND','FI','',''},
+		{'ÅLAND','FI','',''},
 		{'ALBANIA','AL','',''},
 		{'ALGERIA','AG','',''},
 		{'ANDORRA','AN','',''},
@@ -17217,7 +17228,7 @@ MODULE
 		{'COTE D\'IVOIRE','IV','',''},
 		{'CROATIA','HR','',''},
 		{'CUBA','CU','',''},
-		{'CURAÃ‡AO','UC','',''},
+		{'CURAÇAO','UC','',''},
 		{'CYPRUS','CY','',''},
 		{'CZECH REPUBLIC','EZ','',''},
 		{'CZECHOSLOVAKIA ','CZ','*','[prior to January 1, 1993]'},
@@ -17384,7 +17395,7 @@ MODULE
 		{'RWANDA','RW','',''},
 		{'RYUKYU ISLANDS, SOUTHERN','YQ','*',''},
 		{'SABA','NL','',''},
-		{'SAINT BARTHÃ‰LEMY','TB','',''},
+		{'SAINT BARTHÉLEMY','TB','',''},
 		{'SAINT EUSTATIUS','NL','',''},
 		{'SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA','SH','',''},
 		{'SAINT KITTS AND NEVIS','SC','',''},

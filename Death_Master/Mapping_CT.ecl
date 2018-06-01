@@ -1,6 +1,7 @@
-IMPORT HEADER, ADDRESS, UT, Std;
+﻿IMPORT HEADER, ADDRESS, UT, Std;
 
-file_in := Death_Master.Files.Connecticut(DOD_Yr>0);
+file_in := Death_Master.Files.Connecticut(TRIM(DOD_Yr,ALL)<>'' AND ut.isNumeric(TRIM(DOD_Yr,ALL)));
+
 
 Header.layout_death_master_supplemental tDeathMaster_Connecticut_Data_Supplement(file_in pInput) := 
 TRANSFORM
@@ -43,17 +44,24 @@ TRANSFORM
 		'%m%d%Y'
 	];
 	fmtout:='%Y%m%d';
-	STRING8 	clean_dob 		:=	Std.date.ConvertDateFormatMultiple(pInput.dob,fmtsin,fmtout);
-	STRING8		clean_dod 		:= 	INTFORMAT(pInput.DOD_Yr,4,1)+INTFORMAT(pInput.DOD_MthDay,4,1);
+	// Convert the DOB and DOD to a common format
+	STRING8		clean_dob 		:= 	IF(TRIM(pInput.dob_yr,ALL) IN ['0000',''],'',
+																	IF(TRIM(pInput.dob_mth,ALL) IN ['00',''], '', TRIM(pInput.dob_mth,ALL)) +
+																	IF(TRIM(pInput.dob_day,ALL) IN ['00',''], '', TRIM(pInput.dob_day,ALL)) +
+																	pInput.dob_yr);
+	STRING8		clean_dod 		:= 	IF(TRIM(pInput.dod_yr,ALL) IN ['0000',''],'',
+																	IF(TRIM(pInput.dod_mth,ALL) IN ['00',''], '', TRIM(pInput.dod_mth,ALL)) +
+																	IF(TRIM(pInput.dod_day,ALL) IN ['00',''], '', TRIM(pInput.dod_day,ALL)) +
+																	TRIM(pInput.dod_yr,ALL));
 	STRING8		clean_filed_date	:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.DateRecordedModified,8,1),fmtsin,fmtout);
-	STRING8		clean_injury_date	:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.DateOfInjury,8,1),fmtsin,fmtout);
+	// STRING8		clean_injury_date	:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.DateOfInjury,8,1),fmtsin,fmtout);
 	
 	SELF.source_state  			:= 	'CT';
 	SELF.decedent_race			:=	Lookup_States.lkp_ct_race(pInput.race);
 	SELF.decedent_sex				:= 	Lookup_States.lkp_ct_gender(pInput.sex);
-	SELF.decedent_age 			:= 	(STRING)pInput.age+IF(pInput.age=1,' YEAR OLD',' YEARS OLD');
-	SELF.dob 								:=	clean_dob[5..6]+clean_dob[7..8]+clean_dob[1..4];
-	SELF.dod 								:=	clean_dod[5..6]+clean_dod[7..8]+clean_dod[1..4];
+	SELF.decedent_age 			:= 	Lookup_States.lkp_ct_age(TRIM(pInput.AgeUnit,ALL),TRIM(pInput.AgeUnit_NumberOfUnits[2..],ALL));
+	SELF.dob 								:= 	clean_dob;
+	SELF.dod 								:= 	clean_dod;
 	SELF.birthplace					:=	ut.CleanSpacesAndUpper(	
 																IF(pInput.POB_Town_FIPS IN [0,99999],
 																	Death_Master.Lookup_States.lkp_ct_state_country(pInput.POB_StateOrCountry),
@@ -74,8 +82,8 @@ TRANSFORM
 	SELF.med_exam						:= 	Lookup_States.lkp_ct_med_exam(pInput.MedicalExaminerContacted);
 	SELF.disposition				:=	Lookup_States.lkp_ct_disposition(TRIM(pInput.MethodOfDisposition,ALL));
 	SELF.work_injury				:= 	Lookup_States.lkp_ct_work_injury(pInput.InjuryAtWork);
-	SELF.injury_date				:=	clean_injury_date;
-	SELF.injury_type				:=	ut.CleanSpacesAndUpper(pInput.PlaceOfInjury);
+	// SELF.injury_date				:=	clean_injury_date;
+	// SELF.injury_type				:=	ut.CleanSpacesAndUpper(pInput.PlaceOfInjury);
 	SELF.hospital_status		:=	Lookup_States.lkp_ct_hospital_status(pInput.HospitalStatus);
 	SELF.pregnancy					:=	Lookup_States.lkp_ct_Pregnancy(pInput.Pregnancy);
 	SELF.death_type					:=	Lookup_States.lkp_ct_death_type(pInput.MannerOfDeath);
@@ -117,60 +125,9 @@ TRANSFORM
 	SELF.fname							:= 	TRIM(pInput.fname);
 	SELF.mname							:= 	TRIM(pInput.mname);
 	SELF.lname							:= 	TRIM(pInput.lname);
+	SELF.statefn					:=		(STRING)pInput.StateFN;
 	SELF										:=	[];
 	
 END;
 
-fn_cleanParenthesis(STRING	pInput)	:=	FUNCTION
-	RETURN(REGEXREPLACE('\"',pInput,''));
-END;
-
-Death_Master.Layout_States.Connecticut tRemoveQuotes(Death_Master.Layout_States.Connecticut pInput) := 
-TRANSFORM
-	SELF.fname											:=	fn_cleanParenthesis(pInput.fname);
-	SELF.mname											:=	fn_cleanParenthesis(pInput.mname);
-	SELF.lname											:=	fn_cleanParenthesis(pInput.lname);
-	SELF.dob												:=	fn_cleanParenthesis(pInput.dob);
-	SELF.POB_Country_FIPS						:=	fn_cleanParenthesis(pInput.POB_Country_FIPS);
-	SELF.POB_State_FIPS							:=	fn_cleanParenthesis(pInput.POB_State_FIPS);
-	SELF.POD_Country_FIPS						:=	fn_cleanParenthesis(pInput.POD_Country_FIPS);
-	SELF.POD_State_FIPS							:=	fn_cleanParenthesis(pInput.POD_State_FIPS);
-	SELF.POR_Country_FIPS						:=	fn_cleanParenthesis(pInput.POR_Country_FIPS);
-	SELF.POR_State_FIPS							:=	fn_cleanParenthesis(pInput.POR_State_FIPS);
-	SELF.POR_HouseNumber						:=	fn_cleanParenthesis(pInput.POR_HouseNumber);
-	SELF.POR_StreetName							:=	fn_cleanParenthesis(pInput.POR_StreetName);
-	SELF.POR_StreetType							:=	fn_cleanParenthesis(pInput.POR_StreetType);
-	SELF.POR_ApartmentNumber				:=	fn_cleanParenthesis(pInput.POR_ApartmentNumber);
-	SELF.fname_spouse								:=	fn_cleanParenthesis(pInput.fname_spouse);
-	SELF.lname_father								:=	fn_cleanParenthesis(pInput.lname_father);
-	SELF.underlying_cause_of_death	:=	fn_cleanParenthesis(pInput.underlying_cause_of_death);
-	SELF.COD1												:=	fn_cleanParenthesis(pInput.COD1);
-	SELF.COD2												:=	fn_cleanParenthesis(pInput.COD2);
-	SELF.COD3												:=	fn_cleanParenthesis(pInput.COD3);
-	SELF.COD4												:=	fn_cleanParenthesis(pInput.COD4);
-	SELF.COD5												:=	fn_cleanParenthesis(pInput.COD5);
-	SELF.COD6												:=	fn_cleanParenthesis(pInput.COD6);
-	SELF.COD7												:=	fn_cleanParenthesis(pInput.COD7);
-	SELF.COD8												:=	fn_cleanParenthesis(pInput.COD8);
-	SELF.COD9												:=	fn_cleanParenthesis(pInput.COD9);
-	SELF.COD10											:=	fn_cleanParenthesis(pInput.COD10);
-	SELF.COD11											:=	fn_cleanParenthesis(pInput.COD11);
-	SELF.COD12											:=	fn_cleanParenthesis(pInput.COD12);
-	SELF.COD13											:=	fn_cleanParenthesis(pInput.COD13);
-	SELF.COD14											:=	fn_cleanParenthesis(pInput.COD14);
-	SELF.COD15											:=	fn_cleanParenthesis(pInput.COD15);
-	SELF.COD16											:=	fn_cleanParenthesis(pInput.COD16);
-	SELF.COD17											:=	fn_cleanParenthesis(pInput.COD17);
-	SELF.COD18											:=	fn_cleanParenthesis(pInput.COD18);
-	SELF.COD19											:=	fn_cleanParenthesis(pInput.COD19);
-	SELF.COD20											:=	fn_cleanParenthesis(pInput.COD20);
-	SELF.MethodOfDisposition				:=	fn_cleanParenthesis(pInput.MethodOfDisposition);
-	SELF.Tobacco										:=	fn_cleanParenthesis(pInput.Tobacco);
-	SELF.PlaceOfInjury							:=	fn_cleanParenthesis(pInput.PlaceOfInjury);
-	SELF.InjuryDescription					:=	fn_cleanParenthesis(pInput.InjuryDescription);
-	SELF														:=	pInput;
-END;
-
-removeQuotes			:=	PROJECT(file_in, tRemoveQuotes(LEFT));
-
-EXPORT Mapping_CT :=	PROJECT(removeQuotes, tDeathMaster_Connecticut_Data_Supplement(LEFT));
+EXPORT Mapping_CT :=	PROJECT(file_in, tDeathMaster_Connecticut_Data_Supplement(LEFT));
