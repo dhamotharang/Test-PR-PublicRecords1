@@ -6,7 +6,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
   
   WSInput.MAC_FCRA_InquiryHistory_Service();
 
-  in_req := DATASET([], iesp.fcrainquiryhistory.t_FCRAInquiryHistoryPRRequest) : STORED('FCRAInquiryHistoryPRRequest');
+  in_req := DATASET([], iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRequest) : STORED('FCRAInquiryHistoryPRRequest');
   
   // Report request and options
   first_row := in_req[1] : INDEPENDENT;
@@ -20,7 +20,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
 
   IHResponse := InquiryHistory.ReportRecords(in_dids, in_mod, isFCRA)[1];
 
-	iesp.fcrainquiryhistory.t_FCRAInquiryHistoryPRResponse xform(InquiryHistory.Layouts.inquiry_history_out L) := TRANSFORM
+	iesp.fcrainquiryhistory.t_FCRAInquiryHistoryResponse xform(InquiryHistory.Layouts.inquiry_history_out L) := TRANSFORM
 		SELF._Header			:= PROJECT(iesp.ECL2ESP.GetHeaderRow(), 
                                 TRANSFORM(iesp.share.t_ResponseHeader, 
                                            SELF.Status := L.SearchStatus,
@@ -28,7 +28,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
                                            SELF := LEFT));
                         
 		SELF.Records			:= CHOOSEN(PROJECT(L.IndividualResults, 
-                                 TRANSFORM(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryPRRec, 
+                                 TRANSFORM(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRecord, 
                                           SELF.LexID := (STRING) L.UniqueId,
                                           SELF := LEFT)),
                                  iesp.Constants.FCRAInqHist.MAX_RECORDS);
