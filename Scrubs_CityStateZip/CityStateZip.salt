@@ -1,0 +1,15 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_CityStateZip
+FILENAME:CityStateZip
+
+FIElDTYPE:Invalid_Num:ALLOW(0123456789)
+FIELDTYPE:Invalid_ZipClass:ENUM(P|U|M|)
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ .-/()0123456789&')
+
+FIELD:zip5:LIKE(Invalid_Num):TYPE(STRING5):0,0
+FIELD:zipclass:LIKE(Invalid_ZipClass):TYPE(STRING1):0,0
+FIELD:city:LIKE(Invalid_Char):TYPE(STRING28):0,0
+FIELD:state:LIKE(Invalid_Char):TYPE(STRING2):0,0
+FIELD:county:LIKE(Invalid_Char):TYPE(STRING25):0,0
+FIELD:prefctystname:LIKE(Invalid_Char):TYPE(STRING28):0,0
+

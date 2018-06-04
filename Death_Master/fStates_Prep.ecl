@@ -1,4 +1,4 @@
-IMPORT Death_Master, Header, ut, Scrubs, Scrubs_Death_Master_Supplemental, _Control,tools, STD, codes, PromoteSupers;
+﻿IMPORT Death_Master, Header, ut, Scrubs, Scrubs_Death_Master_Supplemental, _Control,tools, STD, codes, PromoteSupers;
 
 EXPORT fStates_Prep(STRING	VersionDate, string emailList='') := FUNCTION
 
@@ -68,7 +68,7 @@ EXPORT fStates_Prep(STRING	VersionDate, string emailList='') := FUNCTION
 																		CITE_ID, FILE_ID, AMENDMENT_CODE, AMENDMENT_YEAR, _ON_LEXIS,_FS_PROFILE, 
 																		US_ARMED_FORCES, PLACE_OF_DEATH, STATE_DEATH_FLAG, LOCAL):persist('death_states_deduped');
 
-	PromoteSupers.MAC_SF_BuildProcess(dCombinedDedup,Death_Master.Files.vStatesFileName,statesResult,3);
+	PromoteSupers.MAC_SF_BuildProcess(dCombinedDedup,Death_Master.Files.vStatesFileName,statesResult,3,,TRUE);
 
 	RETURN //deployScrubs;
 		IF	(FileServices.FileExists(Death_Master.Files.vStatesFileName+'_'+WORKUNIT), // Check if we ran this already.

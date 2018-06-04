@@ -1153,6 +1153,8 @@
 				trim(kword, left, right) = 'ECB' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECB,
 				trim(kword, left, right) = 'CAATSA228-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAATSA228_WC,
 				trim(kword, left, right) = 'ESMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESMA,
+				trim(kword, left, right) = 'PHPDEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPDEA,
+				trim(kword, left, right) = 'PLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLPOL,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
