@@ -41,7 +41,22 @@ Prof_License_Mari.layouts.intermediate xform_base(Prof_License_Mari.layouts.base
 																		+ le.FOREIGN_NMLS_ID + ','
 																		+ le.LICENSE_ID + ','
 																		+ le.REGULATOR + ','
-																		+ le.FEDERAL_REGULATOR
+																		+ le.FEDERAL_REGULATOR +','
+																		// DF-21263 Add following fields to make persistent_record_id unique
+																		+ le.std_source_upd + ','
+																		+ le.LICENSE_STATE + ','
+																		+ le.std_license_type + ','
+																		+ le.license_nbr + ','
+																		+ le.STD_LICENSE_STATUS + ','
+																		+ le.STD_STATUS_DESC + ','
+																		+ le.STD_LICENSE_DESC + ','
+																		+ le.name_org + ','
+																		+ le.name_dba_orig + ','
+																		+ le.name_dba + ','
+																		+ le.STD_LICENSE_DESC + ','
+																		+ le.PREV_CMC_SLPK +','
+																		+ le.addr_addr1_1 + ',' +  le.addr_addr2_1+ ',' + le.addr_addr3_1+ ',' + le.addr_addr4_1+ ',' +  le.addr_city_1+ ',' +  le.addr_state_1 + ',' +  le.addr_zip5_1 + ','  +  le.addr_zip4_1 + ',' + le.addr_cntry_1 + ','
+																		+ le.addr_addr1_2 + ',' +  le.addr_addr2_2+ ',' + le.addr_addr3_2+ ',' + le.addr_addr4_2+ ',' +  le.addr_city_2+ ',' +  le.addr_state_2 + ',' +  le.addr_zip5_2 + ','  +  le.addr_zip4_2
 																		);
  SELF := le;
  SELF := [];
@@ -56,21 +71,6 @@ PromoteSupers.MAC_SF_BuildProcess(standardized_code,'~thor_data400::base::profli
 PromoteSupers.MAC_SF_BuildProcess(Prof_License_Mari.proc_build_base(dDatasetPrep).base_file_intermediate                       ,'~thor_data400::base::proflic_mari::intermediate'          ,build_intermediate,2,,true);
 PromoteSupers.MAC_SF_BuildProcess(Prof_License_Mari.proc_build_base(dDatasetPrep).search_file                                  ,'~thor_data400::base::proflic_mari::search'                ,build_search,2,,true);
 
-
-/*
- do_all := SEQUENTIAL(
-                      PARALLEL(build_base, build_regulatory, build_disciplinary, build_detail)
-											,build_intermediate
-											,build_search
-											,proc_build_keys(pVersion)b                                                                                                                                                                                                                                                                       gnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnb
-											,Prof_License_Mari.Missing_Codes.Standardized_Codes
-  										,Scrubs_Prof_License_Mari.PostBuildScrubs(pVersion)
-											,Prof_License_Mari.strata_popMARI_full(pVersion)
-											// ,Prof_License_Mari.BWR_SampleRecords  // Sample per source code
-											// ,Prof_License_Mari.fSampleRecords_S0900_addl(pVersion) // Sample Records for NMLS addl records
-                     	);
- */
- 
  do_all := SEQUENTIAL(
  
 											  BuildLogger.BuildStart(),BuildLogger.PrepStart(),BuildLogger.PrepEnd(),BuildLogger.BaseStart(),
@@ -95,7 +95,7 @@ PromoteSupers.MAC_SF_BuildProcess(Prof_License_Mari.proc_build_base(dDatasetPrep
 											// ,Prof_License_Mari.fSampleRecords_S0900_addl(pVersion) // Sample Records for NMLS addl records
    
                	);
+
 RETURN do_all;
 
 END;
-
