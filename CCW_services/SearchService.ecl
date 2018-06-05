@@ -48,7 +48,7 @@ import CCW_services, iesp, AutoStandardI;
 
 export SearchService := macro
 
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
     rec_in := iesp.concealedWeapon.t_WeaponSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('WeaponSearchRequest', FEW);
