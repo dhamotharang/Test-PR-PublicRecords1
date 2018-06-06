@@ -15,14 +15,25 @@ DeltaUpdatePassed:=project(DeltaoldrecsPlus,transform(recordof(DeltaoldrecsPlus)
 
 DeltanewrecsPlus:=dataset('~thor_data400::DeltaStats::FullDeltaStats::using',DOPSGrowthCheck.layouts.Full_Delta_Stat_Layout,thor,__compressed__,opt);
 
-CreateNewfile:=sequential(output(UpdatePassed+newrecsPlus,,'~thor_data400::DeltaStats::IndividualFileStats::full::'+workunit,thor,compressed),
-output(DeltaUpdatePassed+DeltanewrecsPlus,,'~thor_data400::DeltaStats::FullDeltaStats::full::'+workunit,thor,compressed));
+FieldoldrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::full',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
+
+FieldUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+
+FieldnewrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::using',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
+
+CreateNewfile:=sequential(
+output(UpdatePassed+newrecsPlus,,'~thor_data400::DeltaStats::IndividualFileStats::full::'+workunit,thor,compressed),
+output(DeltaUpdatePassed+DeltanewrecsPlus,,'~thor_data400::DeltaStats::FullDeltaStats::full::'+workunit,thor,compressed),
+output(FieldUpdatePassed+FieldnewrecsPlus,,'~thor_data400::DeltaStats::ChangesByField::full::'+workunit,thor,compressed)
+);
 
 ClearFiles:=nothor(global(sequential(STD.File.StartSuperFileTransaction(),
 										STD.File.ClearSuperFile('~thor_data400::DeltaStats::IndividualFileStats::full',false),
 										STD.File.ClearSuperFile('~thor_data400::DeltaStats::IndividualFileStats::using',true),
 										STD.File.ClearSuperFile('~thor_data400::DeltaStats::FullDeltaStats::full',false),
 										STD.File.ClearSuperFile('~thor_data400::DeltaStats::FullDeltaStats::using',true),
+										STD.File.ClearSuperFile('~thor_data400::DeltaStats::ChangesByField::full',false),
+										STD.File.ClearSuperFile('~thor_data400::DeltaStats::ChangesByField::using',true),
 										STD.File.FinishSuperFileTransaction())));
 
 EXPORT AggregateFiles := sequential(
@@ -32,6 +43,7 @@ EXPORT AggregateFiles := sequential(
 													STD.File.StartSuperFileTransaction(),
 													STD.File.AddSuperFile('~thor_data400::DeltaStats::IndividualFileStats::full','~thor_data400::DeltaStats::IndividualFileStats::full::'+workunit),
 													STD.File.AddSuperFile('~thor_data400::DeltaStats::FullDeltaStats::full','~thor_data400::DeltaStats::FullDeltaStats::full::'+workunit),
+													STD.File.AddSuperFile('~thor_data400::DeltaStats::ChangesByField::full','~thor_data400::DeltaStats::ChangesByField::full::'+workunit),
 													STD.File.FinishSuperFileTransaction()))));
 
 													

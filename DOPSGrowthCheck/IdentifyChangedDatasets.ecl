@@ -14,7 +14,7 @@ end;
 
 ChangedDataSets:=join(CertList,ProdList,Left.datasetname=Right.datasetname,tCompare(Left,Right));
 
-OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
+OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
 DopsGrowthCheck.layouts.Date_Compare_Layout tAlreadyDone(DopsGrowthCheck.layouts.Date_Compare_Layout L) := TRANSFORM
     SELF.Updated := if(exists(OldRecords(PackageName=L.PackageName and CurrVersion=L.CertVersion)),false,L.Updated);

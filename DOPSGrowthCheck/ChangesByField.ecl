@@ -1,15 +1,38 @@
-﻿EXPORT ChangesByField(in_base,in_father,PackageName,NickName,KeyRef,rec_id,ignorefields='',VersionBase,VersionFather) := functionmacro
+﻿EXPORT ChangesByField(in_base,in_father,PackageName,NickName,recref,rec_id,ignorefields='',VersionBase,VersionFather,publish=false,iskey=false) := functionmacro
 import std;
+#IF(iskey=false)
 	#if(ignorefields='')
-	DistNew:=distribute(in_base,hash(#expand(rec_id)));
-	DistOld:=distribute(in_father,hash(#expand(rec_id)));
+	LoadNew:=dataset(in_base,#expand(recref),thor);
+	LoadOld:=dataset(in_father,#expand(recref),thor);
+	DistNew:=distribute(LoadNew,hash(#expand(rec_id)));
+	DistOld:=distribute(LoadOld,hash(#expand(rec_id)));
 	#else
-	RemoveNew:=project(in_base,transform(recordof(in_base)-[#expand(ignorefields)],Self:=Left;));
-	RemoveOld:=project(in_father,transform(recordof(in_father)-[#expand(ignorefields)],Self:=Left;));
+	LoadNew:=dataset(in_base,#expand(recref),thor);
+	LoadOld:=dataset(in_father,#expand(recref),thor);
+	RemoveNew:=project(LoadNew,transform(recordof(LoadNew)-[#expand(ignorefields)],Self:=Left;));
+	RemoveOld:=project(LoadOld,transform(recordof(LoadOld)-[#expand(ignorefields)],Self:=Left;));
 	DistNew:=distribute(RemoveNew,hash(#expand(rec_id)));
 	DistOld:=distribute(RemoveOld,hash(#expand(rec_id)));
 	#end;
-	
+#ELSE	
+	#if(ignorefields='')
+	LoadKeyNew:=index(#expand(recref),in_base);
+	LoadKeyOld:=index(#expand(recref),in_father);
+	PullKeyNew:=pull(LoadKeyNew);
+	PullKeyOld:=pull(LoadKeyOld);
+	DistNew:=distribute(PullKeyNew,hash(#expand(rec_id)));
+	DistOld:=distribute(PullKeyOld,hash(#expand(rec_id)));
+	#else
+	LoadKeyNew:=index(#expand(recref),in_base);
+	LoadKeyOld:=index(#expand(recref),in_father);
+	PullKeyNew:=pull(LoadKeyNew);
+	PullKeyOld:=pull(LoadKeyOld);
+	RemoveNew:=project(PullKeyNew,transform(recordof(PullKeyNew)-[#expand(ignorefields)],Self:=Left;));
+	RemoveOld:=project(PullKeyOld,transform(recordof(PullKeyOld)-[#expand(ignorefields)],Self:=Left;));
+	DistNew:=distribute(RemoveNew,hash(#expand(rec_id)));
+	DistOld:=distribute(RemoveOld,hash(#expand(rec_id)));
+	#end;
+#END;
 	outrec:=record
 	string PersistentRecID;
 	string Diff;
@@ -26,15 +49,27 @@ import std;
 	
 	#DECLARE(DatasetString);
 	#SET(DatasetString,'Results:=dataset([\n');
-	#APPEND(DatasetString,'{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt))}\n');
+	#APPEND(DatasetString,'{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
 	#EXPORTXML(FieldList,recordof(DistNew));
 	#FOR(FieldList)
 		#FOR(field)
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt))}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
 		#end
 	#end
 	#APPEND(DatasetString,'],DOPSGrowthCheck.layouts.FieldChangeLayout);');
 	%DatasetString%;
+	#if(publish=false)
 	return Results;
+	#else
+	
+	Publish:=output(Results,,'~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName,thor,compressed,overwrite);
+
+	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::ChangesByField::using','~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName),
+                      STD.File.FinishSuperFileTransaction()
+                     );
+										 
+	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,sequential(Publish,AddFile),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
+	#end
 
 endmacro;

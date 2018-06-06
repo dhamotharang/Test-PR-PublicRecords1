@@ -43,9 +43,10 @@ EXPORT DeltaCommand(in_base,in_father,PackageName,KeyNickName,KeyRef,rec_id,Vers
                      );
 
 
-return sequential(
+return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,sequential(
 		Publish,
-    AddFile);
+    AddFile),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
+		
 	// return %'DatasetString'%;
 
 ENDMACRO;

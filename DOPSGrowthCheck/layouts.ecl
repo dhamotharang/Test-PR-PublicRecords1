@@ -42,6 +42,7 @@
 				string SSNField;
 				string FeinField;
 				string FieldsOfInterest;
+				string IgnoreFields;
 				string Threshold;
 			END;
 			export Date_Compare_Layout := RECORD
@@ -64,6 +65,7 @@
 				string SSNField;
 				string FeinField;
 				string FieldsOfInterest;
+				string IgnoreFields;
 				string Threshold;				
 			END;
 			export Attribute_Layout_For_Command := RECORD
@@ -104,6 +106,17 @@
 				string results_count;
 				string passed;
 			END;
+			export Change_Field_Layout_For_Command	:=	record
+				string KeyFileNew;
+				string KeyFileOld;
+				string PackageName;
+				string KeyNickName;
+				string KeyAttribute;
+				string PersistRecIDField;
+				string IgnoreFields;
+				string CertVersion;
+				string ProdVersion;
+			end;
 			export FieldChangeLayout	:=	RECORD
 				string PackageName;
 				string KeyNickName;
@@ -111,5 +124,6 @@
 				string PrevVersion;
 				string field;
 				string NumRecsChanged;
+				string passed;
 			end;
 end;
