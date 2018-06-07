@@ -1,4 +1,4 @@
-export layout_identifier2 := record
+﻿export layout_identifier2 := record
 	string20 table_name; 
 	string30 account; 
 	string20 name_first; 
@@ -11,4 +11,6 @@ export layout_identifier2 := record
 	string inputssnmatcheslastanddob; 
 	string inputssnmatcheslastanddob_riskindicator; 
 	string inputssnmatcheslastanddob_riskindicatordescription;
+  boolean DiscoveredDOB_DOBDiscovered;
+  boolean InputAddressEverOccupant_WasEverOccupant;
 end;
