@@ -1459,6 +1459,13 @@ string3 RVG1706_1_0_reason2 := '';
 string3 RVG1706_1_0_reason3 := '';
 string3 RVG1706_1_0_reason4 := '';
 
+String3 RVG1802_1_0_score := '';
+string3 RVG1802_1_0_reason1 := '';
+string3 RVG1802_1_0_reason2 := '';
+string3 RVG1802_1_0_reason3 := '';
+string3 RVG1802_1_0_reason4 := '';
+string3 RVG1802_1_0_reason5 := '';
+
 String3 RVG1610_1_0_score := '';
 string3 RVG1610_1_0_reason1 := '';
 string3 RVG1610_1_0_reason2 := '';
