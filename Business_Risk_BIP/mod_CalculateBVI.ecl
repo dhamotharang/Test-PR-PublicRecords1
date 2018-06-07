@@ -81,7 +81,7 @@ EXPORT mod_CalculateBVI( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = F
 				cons_record_match_name = '1' OR cons_record_match_altnm = '1'																		 => '| A |',
 																																																						'|   |');
 
-		EXPORT BOOLEAN _e2b_rep1_name                   := e2b_rep1_name_on_file = '3' OR e2b_rep1_idsearch_name = '3' OR e2b_rep1_paw_match = '2' OR (useSBFE AND sbfe_e2b_rep1_name_on_file = '3');
+		EXPORT BOOLEAN _e2b_rep1_name                   := e2b_rep1_name_on_file = '3' OR e2b_rep1_idsearch_name = '1' OR e2b_rep1_paw_match = '2' OR (useSBFE AND sbfe_e2b_rep1_name_on_file = '3');
 		EXPORT BOOLEAN _e2b_rep1_match_bus_file_addr    := e2b_rep1_match_bus_file_addr = '1';
 		EXPORT BOOLEAN _e2b_rep1_match_bus_in_fein      := TRIM((STRING)fein, ALL) != '' AND TRIM((STRING)rep_ssn, ALL) != '' AND TRIM((STRING)fein, ALL) = TRIM((STRING)rep_ssn, ALL);
 		EXPORT BOOLEAN _e2b_rep1_match_bus_file_fein    := _e2b_rep1_match_bus_in_fein = TRUE AND e2b_rep1_match_bus_file_fein = '1';
