@@ -8,7 +8,7 @@ EXPORT Layouts := MODULE
   EXPORT InquiryHistoryDeltabaseResponseEx := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryDeltabaseResponseEx) 
   END;
   
-  EXPORT inquiry_history_per_transaction := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryPRRec) 
+  EXPORT inquiry_history_per_transaction := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRecord) 
   END;
   
 
