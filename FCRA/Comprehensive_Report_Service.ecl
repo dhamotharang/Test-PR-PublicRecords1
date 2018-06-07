@@ -105,7 +105,8 @@ all_records := if(suppress_results_due_alerts, dataset([], doxie_crs.layout_repo
 consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
 consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
-input_consumer := FFD.Constants.BlankConsumerRec;
+
+input_consumer := FFD.MAC.PrepareConsumerRecord(did_fcra, false);
 
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 

@@ -1,4 +1,4 @@
-IMPORT iesp, FFD, FCRA, FCRAGateway_Services;
+﻿IMPORT iesp, FFD, FCRA, FCRAGateway_Services;
 
 //Follows Dempsey compliance for FCRA reports. Resolve a DID from PII, if none found stop.
 //If a did is found retrieve consumer statements and credit alerts as well as the DID.
@@ -20,7 +20,7 @@ EXPORT GetComplianceData(DATASET(iesp.person_picklist.t_PersonPickListRequest) p
 	//Check if we need to suppress the report due to credit alerts.
 	is_suppressed_by_alert := FFD.ConsumerFlag.getAlertIndicators(ds_person_context, params.FCRAPurpose, params.FFDOptionsMask)[1].suppress_records;
 	ds_consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(ds_person_context, is_suppressed_by_alert);
-	consumer:= FFD.MAC.PrepareConsumerRecord((string)plist_did, FALSE, plist_req[1].searchby);
+	consumer:= FFD.MAC.PrepareConsumerRecord((STRING)plist_did, TRUE, plist_req[1].searchby);
 
 	//Bundle the results so we can return them in a dataset.
 	ds_compliance_out := DATASET([{is_suppressed_by_alert, ds_consumer_alerts, ds_consumer_statements, consumer}],

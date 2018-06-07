@@ -52,7 +52,7 @@ export ReportServiceFCRA() := macro
 	raw := raw_combined.Records;
 	statements := raw_combined.Statements;
   consumer_alerts := raw_combined.ConsumerAlerts;
-  input_consumer := FFD.Constants.BlankConsumerRec;
+  input_consumer := FFD.MAC.PrepareConsumerRecord(LN_PropertyV2_Services.input.did, false);
 
 	// standard record counts & limits
 	doxie.MAC_Header_Field_Declare(isFCRA)

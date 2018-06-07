@@ -85,7 +85,7 @@ export ReportService_Records := module
     
     consumer_statements := consumer_statements_all(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
     
-    input_consumer := FFD.MAC.PrepareConsumerRecord(in_params.did);
+    input_consumer := FFD.MAC.PrepareConsumerRecord(in_params.did, true);
 
 	  FFD.MAC.AppendConsumerAlertsAndStatements(result, result_all, consumer_statements, consumer_alerts, input_consumer, iesp.criminal_fcra.t_FcraCriminalReportResponse);	
         

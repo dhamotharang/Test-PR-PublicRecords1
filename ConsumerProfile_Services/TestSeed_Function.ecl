@@ -130,6 +130,7 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		self.Result := project(cpReport_masked, xformSeedResult(LEFT))[1];
 		self.Royalty := [];
 		self.ConsumerStatements := project(cpReport, xformAddConsumerStatement(left, counter));
+		self := []; // no resolved LexId will be logged for test seed
 	end;
 	final_seed:= dataset([xformSeedOut()]);
 	

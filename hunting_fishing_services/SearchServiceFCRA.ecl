@@ -47,7 +47,7 @@ export SearchServiceFCRA := macro
 		end;
 		tempresults := hunting_fishing_services.Search_Records.val(tempmod, true);
 
-	  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults.Records, results, iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse, Records, false);
 																																	

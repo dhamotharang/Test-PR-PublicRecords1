@@ -124,7 +124,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
   recs := recs_combined.Records[1];  // single row coming as dataset here
 //  output (recs);
 
-  input_consumer := FFD.MAC.PrepareConsumerRecord(search_mod.did);  // we only have UniqueId coming from input
+  input_consumer := FFD.MAC.PrepareConsumerRecord(search_mod.did, true,, UniqueId);  // we only have UniqueId coming from input
 
   // wrap it into output structure
    iesp.assetreport_fcra.t_FcraAssetReportResponse SetResponse () := transform
