@@ -249,10 +249,14 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	
 	royalty_rec := Royalty.RoyaltyExperianHeader.GetFCRARoyaltySet(fcra_header_final);
 	
+  rdid := if(count(dids(did <> dids[1].did))>0, '', (string) dids[1].did); // resolved LexId should be single value - to be used for logging
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, in_rec);
+	
 	ConsumerProfile_Services.Layouts.cp_out_layout xformOut() := transform
 		self.Result	 := row(xformResultsOut());
 		self.Royalty := if(not in_param.isECHRestricted, royalty_rec);
 		self.ConsumerStatements := choosen(statement_output_fcra, iesp.Constants.MaxConsumerStatements);
+		self.ConsumerInquiry := input_consumer;
 	end;
 	final_rec := dataset([xformOut()]);
 	
@@ -261,6 +265,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 		self.Result.Alerts 		:= choosen(alerts/*(alertCode in null_alerts_set)*/, iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
 		self.Result.ConsumerStatement := if(has_consumer_statement, sort(consumer_statement, -dateCreated)[1].cs_text, '');
 		self.ConsumerStatements := choosen(statement_output_fcra(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), iesp.Constants.MaxConsumerStatements); // consumer level statements are always returned even if blank result
+		self.ConsumerInquiry := input_consumer;
 		self := [];
 	end;
 	null_final_rec := dataset([xformNull()]);

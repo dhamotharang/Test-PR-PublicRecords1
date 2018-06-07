@@ -49,7 +49,7 @@ export ReportService_Records := module
   consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
   has_consumer_data := ~suppress_results_due_alerts and exists(pilot_final_recs_sorted);
   consumer_statements := statement_output(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
-  input_consumer := FFD.MAC.PrepareConsumerRecord(in_mod.did);
+  input_consumer := FFD.MAC.PrepareConsumerRecord(in_mod.did, true);
     
   iesp.faaPilot_fcra.t_FcraPilotReportResponse  xform_final_response() := transform                                                                                                            
                               self._Header   := iesp.ECL2ESP.GetHeaderRow(),

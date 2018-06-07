@@ -79,7 +79,7 @@ export SearchServiceFCRA := MACRO
 		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);	
 	end;
 
-	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 	
 	crim_all := CriminalRecords_Services.SearchService_Records.fcra_val(tempmod);
 	crim_records_all := crim_all.Records;

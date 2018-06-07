@@ -144,7 +144,7 @@ export BankruptcyReportServiceFCRA() :=  macro
   ds_subj_did := dataset([{FFD.Constants.SingleSearchAcctno, input_did}], FFD.Layouts.DidBatch);
     
   // even if no data found we still need to check for alerts and consumer level statements for subject
-  dsDIDs := if(exists(matched_rec_dids), project(matched_rec_dids, FFD.Layouts.DidBatch), ds_subj_did);
+  dsDIDs := if(exists(matched_rec_dids(did>0)), project(matched_rec_dids(did>0), FFD.Layouts.DidBatch), ds_subj_did);
 
   //  call person context
   pc_recs_prelim := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy, valFFDOptionsMask);
@@ -180,7 +180,12 @@ export BankruptcyReportServiceFCRA() :=  macro
                             all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
   
   consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
-	input_consumer := FFD.Constants.BlankConsumerRec;
+
+  matched_party_lexid := dsDIDs[1].did;
+  search_lexId := if(matched_party_lexid > 0 and ~exists(dsDIDs(did <> matched_party_lexid)), matched_party_lexid, 0);
+                        
+  // if we cannot resolve to single LexId based on input or matched party results there will be no Consumer data populated
+  input_consumer := FFD.MAC.PrepareConsumerRecord(search_lexId, false);
 	
   doOutput := sequential(
     output(final, named('Results')),

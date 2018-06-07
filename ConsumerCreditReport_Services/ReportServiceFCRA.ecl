@@ -13,7 +13,7 @@
 </message>
 */
 
-IMPORT iesp, MDR, Royalty, WSInput;
+IMPORT iesp, Royalty, WSInput;
 
 EXPORT ReportServiceFCRA := MACRO
 
@@ -29,7 +29,8 @@ EXPORT ReportServiceFCRA := MACRO
 
 	ds_records := ConsumerCreditReport_Services.Records(ds_input_recs,in_mod,TRUE);
 	ds_results := PROJECT(ds_records,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse,
-	                      SELF.Consumer := FFD.Constants.BlankConsumerRec,
+	                      SELF.Consumer := IF(~EXISTS(LEFT._Header.Exceptions), // in case of alerts there are no exceptions generated, we log Consumer for inquiry history
+                                         FFD.MAC.PrepareConsumerRecord(LEFT.UniqueId1, TRUE, firstRow.ReportBy)),
                         SELF:=LEFT));
 												
 	ds_royalties := Royalty.RoyaltyCCR.GetOnlineRoyalties(ds_records);

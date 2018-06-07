@@ -61,7 +61,7 @@ export LiensReportServiceFCRA() := macro
 	recs := liens.records;
 	statements := liens.statements;
 	consumer_alerts := liens.ConsumerAlerts;
-  input_consumer := FFD.Constants.BlankConsumerRec;
+  input_consumer := LiensV2_Services.fn_identify_consumer(recs, liens_params.did);
 
 	doxie.MAC_Marshall_Results(recs, recs_marshalled);
 	
