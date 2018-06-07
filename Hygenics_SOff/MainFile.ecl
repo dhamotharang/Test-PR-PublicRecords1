@@ -8,7 +8,7 @@ did_how := 'local';
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
 #stored('did_add_force','thor'); // remove or set to 'thor' to put recs through thor
 
-df_original := Mapping_Accurint_Person_As_Common;
+df_original := Hygenics_SOff.Mapping_Accurint_Person_As_Common;
 
 //Add FlipFlop Macro///////////////////
 ut.mac_flipnames(df_original, fname, mname, lname, df_orig);
@@ -207,7 +207,7 @@ main2 := join(main_dst, hdr_slim_tbl_dep,
 main3 := project(main2, getDecode(LEFT));
 
 // Bring in original, unmodified primary records
-input_uncleaned := File_Accurint_In;
+input_uncleaned := Hygenics_SOff.File_Accurint_In;
 
 // Provide mapping for all blank columns
 	Hygenics_SOff.Layout_Out_Main_CROSS jAddMissingData(main3 L, input_uncleaned R) := transform
@@ -346,7 +346,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended=''          and l.did=107007223771) or
 									(l.ssn_appended='046561828' and l.did=66048309) or
 									(l.ssn_appended='132663291' and l.did=2640241816) or
-									(l.ssn_appended='623211738' and l.did=122113244666),
+									(l.ssn_appended='623211738' and l.did=122113244666) or
+									(l.ssn_appended='542089805' and l.did=2166694879),
 								'',
 								l.ssn_appended);
 		self.did			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -358,7 +359,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended=''          and l.did=107007223771) or
 									(l.ssn_appended='046561828' and l.did=66048309) or
 									(l.ssn_appended='132663291' and l.did=2640241816) or
-									(l.ssn_appended='623211738' and l.did=122113244666),
+									(l.ssn_appended='623211738' and l.did=122113244666) or
+									(l.ssn_appended='542089805' and l.did=2166694879),
 								0,
 								l.did);
 		self.score			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -370,7 +372,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended=''          and l.did=107007223771) or
 									(l.ssn_appended='046561828' and l.did=66048309) or
 									(l.ssn_appended='132663291' and l.did=2640241816) or
-									(l.ssn_appended='623211738' and l.did=122113244666),
+									(l.ssn_appended='623211738' and l.did=122113244666) or
+									(l.ssn_appended='542089805' and l.did=2166694879),
 								0,
 								l.score);
 		

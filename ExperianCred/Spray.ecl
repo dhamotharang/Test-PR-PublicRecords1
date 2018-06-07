@@ -1,4 +1,4 @@
-﻿import VersionControl;
+﻿import VersionControl,_control;
 
 export Spray := module
 
@@ -14,7 +14,7 @@ export Spray := module
                       
  	// }
 	
-export ip 		:= 'bctlpedata11.risk.regn.net';
+export ip 		:= _control.IPAddress.bctlpedata11;
 export path 	:= '/data/data_lib_2_hus2/Experian/non-fcra/in/' + version;
 
 export Input := DATASET([
