@@ -59,6 +59,8 @@ MODULE
 		EXPORT STRING60 	ReferenceCode := '';
 		EXPORT STRING8 		SourceCode := '';
 		EXPORT STRING60 	BillingCode := '';
+		EXPORT STRING60 _LoginId := '';
+		EXPORT STRING16 _CompanyId := '';
 			
 		// Risk evaluation requests
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator);

@@ -207,9 +207,11 @@ MACRO
 		EXPORT STRING3 	 ProductCode                        := pfUser.ProductCode: STORED('ProductCode');
 		EXPORT STRING8	 BillingId                          	:= pfUser.BillingId: STORED('BillingId');
 			
+		EXPORT STRING16 _CompanyId     := '': STORED('_CompanyId');
 		EXPORT STRING16 CompanyId     := pfUser.CompanyId;
 		EXPORT STRING60 ReferenceCode := pfUser.ReferenceCode;
 		EXPORT STRING8  SourceCode    := pfUser.SourceCode;
+		EXPORT STRING60 _LoginId   := '': STORED('_LoginId');
 		EXPORT STRING60 BillingCode   := pfUser.BillingCode;
 		EXPORT STRING   TransactionId := '': STORED('_TransactionId');
 		 		
