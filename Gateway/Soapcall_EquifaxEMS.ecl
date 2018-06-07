@@ -64,7 +64,7 @@ EXPORT SoapCall_EquifaxEms(
 	iesp.equifax_ems.t_EquifaxEmsResponseEx pickupSoapMessage(extended_response L) := TRANSFORM
 		//soapFault exceptions occur when the ESP response status <> 200
 		soapMsg := DATASET([L.soap_message],{STRING line});
-		parsedSoapResponse := PARSE(soapMsg,line,FCRAGateway_Services.Layouts.equifax_ems.fault_rec,XML('soap:Envelope/soap:Body/soap:Fault'));
+		parsedSoapResponse := PARSE(soapMsg,line,FCRAGateway_Services.Layouts.fault_rec,XML('soap:Envelope/soap:Body/soap:Fault'));
 		soapFault := PROJECT(parsedSoapResponse,iesp.share.t_WsException);
 
 		//espFault are from the ESP layer, and not from the external gateway, and have a response status of 200.

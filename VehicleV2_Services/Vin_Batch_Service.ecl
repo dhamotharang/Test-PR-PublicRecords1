@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VIN_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -17,7 +17,7 @@
 IMPORT VehicleV2_Services, BIPV2;
 
 EXPORT Vin_Batch_Service() := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	data_in := DATASET([], VehicleV2_Services.Batch_Layout.Vin_BatchIn) : STORED('batch_in', FEW);
 	
 	STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');

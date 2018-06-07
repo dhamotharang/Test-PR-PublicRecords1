@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CheckSearchService" wuTimeout="300000">
   <part name="CheckPersonSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 </message>
@@ -35,7 +35,7 @@
 
 IMPORT iesp; 
 EXPORT CheckSearchService () := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonSearch_Services_CheckSearchService();
 	

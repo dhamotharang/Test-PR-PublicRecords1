@@ -22,9 +22,12 @@ EXPORT ConsumerFlag := MODULE
     RETURN consumer_alerts + has_statements_alert;
   END;
   
-  EXPORT prepareAlertMessagesBatch (DATASET (FFD.Layouts.PersonContextBatch) PersonContext) := FUNCTION
+  EXPORT prepareAlertMessagesBatch (DATASET(FFD.Layouts.PersonContextBatch) PersonContext,
+                                    INTEGER8 inFFDOptionsMask = 0) := FUNCTION
 
-    consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
+    returnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask); 
+    
+		consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
                            TRANSFORM (FFD.layouts.ConsumerStatementBatchFull,
                                   SELF.acctno := LEFT.acctno ,
                                   SELF.SequenceNumber := 0, // Consumer level alerts are for the whole DID, not specefic data rows. 
@@ -33,7 +36,8 @@ EXPORT ConsumerFlag := MODULE
                                   SELF.SectionId := ''; 
                                   SELF := LEFT));
 
-    RETURN consumer_alerts;
+    RETURN IF(returnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
+		          consumer_alerts);
   END;
 
   STRING1 subject_has_alert := FFD.Constants.subject_has_alert;
@@ -41,14 +45,13 @@ EXPORT ConsumerFlag := MODULE
   FFD.layouts.ConsumerFlagsBatch xf_prepare_alerts(FFD.Layouts.PersonContextBatch re,
                                                     INTEGER purpose, BOOLEAN suppressIT) := TRANSFORM
       is_security_fraud_alert := re.RecordType = FFD.Constants.RecordType.FA;
-      is_security_freeze := re.RecordType = FFD.Constants.RecordType.SF;
+      is_security_freeze := re.RecordType = FFD.Constants.RecordType.SF AND purpose IN re.set_FCRA_purpose;
       is_identity_theft := re.RecordType = FFD.Constants.RecordType.IT;
-      permissible_purpose_list := re.set_FCRA_purpose;  
       
       SELF.acctno := re.acctno;
       SELF.UniqueID := re.LexID;
       suppress_due_alerts := re.suppress_for_legal_hold OR is_security_fraud_alert 
-                             OR (is_security_freeze AND purpose IN permissible_purpose_list)
+                             OR is_security_freeze
                              OR (is_identity_theft AND suppressIT);
       SELF.suppress_records := suppress_due_alerts;                       
       SELF.has_record_statement := re.RecordType IN FFD.Constants.RecordType.StatementRecordLevel;                       

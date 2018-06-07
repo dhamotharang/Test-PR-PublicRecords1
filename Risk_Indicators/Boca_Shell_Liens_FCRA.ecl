@@ -187,8 +187,8 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		isForeclosureReleased := ftd in iid_constants.setForeclosure and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isLandlordTenant := ftd in iid_constants.setLandlordTenant and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isLandlordTenantReleased := ftd in iid_constants.setLandlordTenant and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
+		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
+		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherLJ := ftd not in iid_constants.setOtherLJ and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherLJReleased := ftd not in iid_constants.setOtherLJ and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isOtherTax := ftd in iid_constants.setOtherTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
@@ -324,6 +324,7 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.liens_last_rel_date84 := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.bjl.liens_last_rel_date84);
 		self.ftd := if(goodResult, '1', '0');
 		SELF := le;
+		self := [];
 	end;
 	endmacro;
 
@@ -352,7 +353,7 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 												
 	liens_main_raw_thor := group(sort(distribute(liens_main_raw_thor_pre + 
 																		project(liens_party_raw(rmsid='' or tmsid=''), transform(Risk_Indicators.Layouts_Derog_Info.Layout_derog_process_plus_ftd,
-																						self.ftd := '0', self := left)), hash64(seq)), seq, LOCAL), seq, LOCAL);
+																						self.ftd := '0', self := left, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
 	liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
 												
@@ -419,8 +420,10 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 			SELF.evictionInd := right.evictionInd;
 			SELF.bk_tmsid := right.tmsid;
 			SELF.Liens := RIGHT.Liens;
-			self.ftd := right.ftd;
-			SELF := LEFT),
+			SELF.ftd := right.ftd;
+			SELF := LEFT;
+			SELF := [];
+			),
 		LEFT OUTER);
 
 	Risk_Indicators.Layouts_Derog_Info.Layout_derog_process_plus_ftd roll_liens(Risk_Indicators.Layouts_Derog_Info.Layout_derog_process_plus_ftd le, 

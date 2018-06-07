@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="SearchService" wuTimeout="300000">
  <separator />  
@@ -94,7 +94,7 @@
 
 import AutoStandardI,iesp,ut, Address;
 export SearchService := macro
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#stored('PhoneticMatch','true');
 
     //get xml input 

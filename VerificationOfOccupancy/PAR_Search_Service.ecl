@@ -11,7 +11,7 @@
 IMPORT Address, AutoStandardI, iesp, Risk_indicators, Riskwise, ut, STD, Inquiry_AccLogs, Risk_Reporting;
 
 EXPORT PAR_Search_Service() := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('OnlyReturnSuccessfullyCleanedAddresses',true);
 
 	// Get XML input 

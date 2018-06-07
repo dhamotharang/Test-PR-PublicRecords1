@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Crim_Offender_People_SearchRequest" wuTimeout="240000">
   <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -42,7 +42,7 @@
 /*--INFO-- This service pulls from the Criminal Offenders file.*/
 
 export DOC_Search_People := macro
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 WSInput.MAC_DOC_Search_People()	
 
 #STORED('LookupType','CRIM');

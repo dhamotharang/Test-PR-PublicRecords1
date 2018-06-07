@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessReportService" wuTimeout="300000">
 	<part name="INDUSTRYCLASS" type="xsd:string"/>
 	<part name="BDID" type="xsd:string"/>
@@ -81,6 +81,7 @@
 IMPORT AutoStandardI, Royalty, WSInput;
 
 EXPORT Business_Report_Service() := MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#onwarning(4207, ignore);
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Business_Report_Service();

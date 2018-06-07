@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 
 	<!-- COMPLIANCE SETTINGS -->
@@ -23,7 +23,7 @@
 import CourtSearch_services, iesp, AutoStandardI;
 
 export SearchService := macro
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     //read ESP input values into ECL "standard" names
 		// iesp.ECL2ESP.MAC_ReadESPInput();
 

@@ -131,13 +131,12 @@ export mod_Searches := MODULE
 			return DEDUP(SORT(tmpTopResultsScoredGrouped, RECORD), RECORD);
 		END;
 
-  shared RecBipRecordOut2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dataset([],BIPV2.IDfunctions.rec_SearchInput)).RecordOut2;
-
-	shared RecWeightedLinkID := RECORD(RecBipRecordOut2)
+													 
+	shared RecWeightedLinkID := RECORD(UPS_Services.layouts.RecBipRecordOut2)
 			UNSIGNED2 RAweight;
 	end;
 
-	shared dataset(RecWeightedLinkID) fn_WeightLinkIds(DATASET(RecBipRecordOut2) recs, UNSIGNED2 weight) := FUNCTION
+	shared dataset(RecWeightedLinkID) fn_WeightLinkIds(DATASET(UPS_Services.layouts.RecBipRecordOut2) recs, UNSIGNED2 weight) := FUNCTION
 
 			RecWeightedLinkID weightedTransform(recs L) := TRANSFORM
 				SELF := L;
@@ -199,7 +198,7 @@ export mod_Searches := MODULE
 												wt_linkID_name_city_state_zip;
 
 			grouped_linkIDs := GROUP(SORT(combined_linkIDs, UltID , OrgID ,SELEID ,ProxID), UltID , OrgID ,SELEID ,ProxID);
-			clinkids := project(combined_linkIDs,transform(RecBipRecordOut2, self := left , self :=[]));
+			clinkids := project(combined_linkIDs,transform(UPS_Services.layouts.RecBipRecordOut2, self := left , self :=[]));
 			linkIDWeights := RECORD
 				combined_linkIDs ;
 				UNSIGNED4 SumRAweight := SUM(GROUP,combined_linkIDs.RAweight);
@@ -216,7 +215,7 @@ export mod_Searches := MODULE
 
 			linkIDs := PROJECT(MAP(num_linkIDs <= max_linkIDs => sorted_linkIDs,
 											 COUNT(target_linkIDs) > (0.5 * max_linkIDs) => target_linkIDs,
-											 CHOOSEN(sorted_linkIDs, max_linkIDs)), RecBipRecordOut2);
+											 CHOOSEN(sorted_linkIDs, max_linkIDs)), UPS_Services.layouts.RecBipRecordOut2);
 
 			#IF(UPS_Services.Debug.debug_flag)
 			output(wt_all, NAMED('linkID_wt_all'));
@@ -237,7 +236,7 @@ export mod_Searches := MODULE
 			MAP(
 				exists(bset) => bset, 
 				UPS_Services.Constants.DO_SECOND_SEARCH => mod_SecondSearch.Business(SearchParams, BizParams).records,
-					DATASET([], RecBipRecordOut2)
+				DATASET([], UPS_Services.layouts.RecBipRecordOut2)
 			);
 
 			//Get the biz records
@@ -281,6 +280,9 @@ export mod_Searches := MODULE
 				SELF.score_phone := 0;	
 				SELF.listing_type := ''; // Used only for canadian data to determine if business/individual 
 				SELF.history_flag := '';   // Used only in canadian data
+				SELF.Current := map (trim(L.powid_status_public) = 'I' => 'N',
+															   trim(L.powid_status_public) <> 'I' => 'Y',
+																	'U');
 			END;
 
 			resp := CHOOSEN(PROJECT(SORT(biz,ultid, orgid, seleid, proxid,PowID), bizToLayoutTransform(LEFT)), Constant.MAX_SEARCH_RECORDS);//now deterministic
@@ -386,8 +388,8 @@ export mod_Searches := MODULE
 			daily_recs := GongAndDailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
 			// gong_recs := GongAndDailyLookup(dids).records;        // executed sequentially (after mod_PM)
 
-			
-			ind := hdr_recs + daily_recs ;//+ WFPV8_recs;
+			//WFPV8_recs := UPS_Services.fn_WaterfallPhonesLookup(dids,in_mod);
+			ind := hdr_recs + daily_recs; // + WFPV8_recs;
 					
 			// convert records to output layout
 			UPS_Services.layout_Common indToLayoutTransform(ind L) := TRANSFORM

@@ -1,4 +1,4 @@
- /*--SOAP--
+﻿ /*--SOAP--
  <message name="SmartLinxReportService" wuTimeout="300000">
   <part name="DID" type="xsd:string" required="1" />
   <part name="SSN" type="xsd:string"/>
@@ -315,8 +315,8 @@ to be relatively harmless anyway). <br />
 IMPORT iesp, doxie, AutoStandardI, Royalty;
 
 EXPORT SmartLinxReportService () := MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #onwarning(4207, ignore);
-  
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonReports_SmartLinxReportService();
 

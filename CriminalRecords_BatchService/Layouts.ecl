@@ -55,6 +55,7 @@ export Layouts := MODULE
 		BatchShare.Layouts.ShareErrors;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
 		FFD.Layouts.ConsumerFlags;
+		typeof(Corrections.Layout_Offender.did) INCR_did := '';
 	END;
 	
 	export batch_pii_out_pre := RECORD(batch_pii_out)

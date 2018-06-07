@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BH_ProfileSearchService">
   <part name="CompanyName" 		type="xsd:string"/>
   <part name="ExactOnly"   		type="xsd:boolean"/>
@@ -25,6 +25,7 @@
 import suppress, STD;
 
 export BH_ProfileSearchService() := macro
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #stored('MileRadius',25);
 #stored('isProfileSearch',true);
 #stored('AllowNickNames',true);

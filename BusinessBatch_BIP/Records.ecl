@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI;
+﻿IMPORT BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI, std;
 
 EXPORT Records( DATASET(BusinessBatch_BIP.Layouts.Input_Processed) ds_BatchIn,
                 BusinessBatch_BIP.iParam.BatchParams               inMod
 							) :=
 FUNCTION
+
   // Get links ids for the search criteria
   // Format to BIP search layout
   BIPV2.IDfunctions.rec_SearchInput tFormat2SearchInput(BusinessBatch_BIP.Layouts.Input_Processed pInput) :=
@@ -74,12 +75,13 @@ FUNCTION
 																 SELF := LEFT));											 
 																 
   // Restrict the max records for each acct# depending on user input 
-	ds_BestInfoRecs := UNGROUP(TOPN(GROUP(SORT(ds_BestInfo2,acctno, -weight, -record_score,record),acctno),inMod.MaxResultsPerAcct,acctno));
+	ds_BestInfoRecs := UNGROUP(TOPN(GROUP(SORT(ds_BestInfo2,acctno, -weight, -record_score
+	                         ,record),acctno),inMod.MaxResultsPerAcct,acctno));
   
   // Get link ids
   ds_linkIdsWithAcctNoTmp := PROJECT(ds_BestInfoRecs,BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo);
 	ds_linkidsWithAcctno := SORT(DEDUP(SORT(ds_linkIdsWithAcctNoTmp,acctno, ultid, orgid, seleid, -weight,-record_score),
-	                                              acctno, ultid, orgid, seleid), acctno, -weight, -record_score,record);
+	                                              acctno, ultid, orgid, seleid), acctno, -weight, -record_score, record);
   
 	ds_linkIds := DEDUP(PROJECT(ds_BestInfoRecs,BIPV2.IDlayouts.l_xlink_ids),ALL);
 									 
@@ -222,7 +224,7 @@ FUNCTION
 		SELF.ra_lname       := ri.corp_ra_lname1;
 		SELF.ra_name_suffix := ri.corp_ra_name_suffix1;
 		SELF.ra_cname       := ri.corp_ra_cname1;
-		SELF.ra_phone       := ri.corp_ra_phone10;		
+		SELF.ra_phone       := ri.corp_ra_phone10;			
 		
     SELF.foreign_domestic_status := IF (ri.corp_foreign_domestic_ind = 'F', 'Foreign',
 		                                    IF (ri.corp_foreign_domestic_ind = 'D', 'Domestic',''));																			
@@ -359,7 +361,7 @@ FUNCTION
 	                        
 	                          SELF.Total_Corp :=  
 														     if (LEFT.corp_var1 <> '', 1, 0) +
-							                   if (LEFT.corp_var2 <> '', 1, 0) +
+																 if (LEFT.corp_var2 <> '', 1, 0) +
 																 if (LEFT.corp_var3 <> '', 1, 0) +
 																 if (LEFT.corp_var4 <> '', 1, 0) +
 																 if (LEFT.corp_var5 <> '', 1, 0) +
@@ -367,7 +369,7 @@ FUNCTION
 																 if (LEFT.corp_var7 <> '', 1, 0) +
 																 if (LEFT.corp_var8 <> '', 1, 0) +
 																 if (LEFT.corp_var9 <> '', 1, 0) +
-																 if (LEFT.corp_var10 <> '', 1, 0);
+																 if (LEFT.corp_var10 <> '', 1, 0);                                                                          
 														SELF := LEFT;
 														));
 														
@@ -506,27 +508,27 @@ FUNCTION
 		
 		
 		SELF.executive_var4_lexid         := IF(cnt = 4,ri.contact_did,le.executive_var4_lexid);
-    SELF.executive_title_var4         := IF(cnt = 4,ri.title,le.executive_title_var4);
+          SELF.executive_title_var4         := IF(cnt = 4,ri.title,le.executive_title_var4);
 		SELF.executive_fname_var4         := IF(cnt = 4,ri.fname,le.executive_fname_var4);
 		SELF.executive_mname_var4         := IF(cnt = 4,ri.mname,le.executive_mname_var4);
 		SELF.executive_lname_var4         := IF(cnt = 4,ri.lname,le.executive_lname_var4);
 		SELF.executive_name_suffix_var4   := IF(cnt = 4,ri.name_suffix,le.executive_name_suffix_var4);
 		SELF.executive_display_title_var4 := IF(cnt = 4,ri.contact_job_title_derived,le.executive_display_title_var4);
-    SELF.executive_var4_first_seen := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var4_first_seen);
+          SELF.executive_var4_first_seen := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var4_first_seen);
 		SELF.executive_var4_last_seen := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed(ri.dt_last_seen_contact),le.executive_var4_last_seen);		
 		
 		SELF.executive_var5_lexid         := IF(cnt = 5,ri.contact_did,le.executive_var5_lexid);
-    SELF.executive_title_var5         := IF(cnt = 5,ri.title,le.executive_title_var5);
+          SELF.executive_title_var5         := IF(cnt = 5,ri.title,le.executive_title_var5);
 		SELF.executive_fname_var5         := IF(cnt = 5,ri.fname,le.executive_fname_var5);
 		SELF.executive_mname_var5         := IF(cnt = 5,ri.mname,le.executive_mname_var5);
 		SELF.executive_lname_var5         := IF(cnt = 5,ri.lname,le.executive_lname_var5);
 		SELF.executive_name_suffix_var5   := IF(cnt = 5,ri.name_suffix,le.executive_name_suffix_var5);
 		SELF.executive_display_title_var5 := IF(cnt = 5,ri.contact_job_title_derived,le.executive_display_title_var5);
-    SELF.executive_var5_first_seen := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var5_first_seen);
+          SELF.executive_var5_first_seen := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var5_first_seen);
 		SELF.executive_var5_last_seen := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed(ri.dt_last_seen_contact),le.executive_var5_last_seen);		 
 		 
-	  SELF.executive_var6_lexid         := IF(cnt = 6,ri.contact_did,le.executive_var6_lexid);
-    SELF.executive_title_var6         := IF(cnt = 6,ri.title,le.executive_title_var6);
+	    SELF.executive_var6_lexid         := IF(cnt = 6,ri.contact_did,le.executive_var6_lexid);
+          SELF.executive_title_var6         := IF(cnt = 6,ri.title,le.executive_title_var6);
 		SELF.executive_fname_var6         := IF(cnt = 6,ri.fname,le.executive_fname_var6);
 		SELF.executive_mname_var6         := IF(cnt = 6,ri.mname,le.executive_mname_var6);
 		SELF.executive_lname_var6         := IF(cnt = 6,ri.lname,le.executive_lname_var6);
@@ -537,27 +539,27 @@ FUNCTION
 		
 		
 		SELF.executive_var7_lexid         := IF(cnt = 7,ri.contact_did,le.executive_var7_lexid);
-    SELF.executive_title_var7         := IF(cnt = 7,ri.title,le.executive_title_var7);
+           SELF.executive_title_var7         := IF(cnt = 7,ri.title,le.executive_title_var7);
 		SELF.executive_fname_var7         := IF(cnt = 7,ri.fname,le.executive_fname_var7);
 		SELF.executive_mname_var7         := IF(cnt = 7,ri.mname,le.executive_mname_var7);
 		SELF.executive_lname_var7         := IF(cnt = 7,ri.lname,le.executive_lname_var7);
 		SELF.executive_name_suffix_var7   := IF(cnt = 7,ri.name_suffix,le.executive_name_suffix_var7);
 		SELF.executive_display_title_var7 := IF(cnt = 7,ri.contact_job_title_derived,le.executive_display_title_var7);
-    SELF.executive_var7_first_seen := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var7_first_seen);
+          SELF.executive_var7_first_seen := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var7_first_seen);
 		SELF.executive_var7_last_seen := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed(ri.dt_last_seen_contact),le.executive_var7_last_seen);		
 		
 		SELF.executive_var8_lexid         := IF(cnt = 8,ri.contact_did,le.executive_var8_lexid);
-    SELF.executive_title_var8         := IF(cnt = 8,ri.title,le.executive_title_var8);
+          SELF.executive_title_var8         := IF(cnt = 8,ri.title,le.executive_title_var8);
 		SELF.executive_fname_var8         := IF(cnt = 8,ri.fname,le.executive_fname_var8);
 		SELF.executive_mname_var8         := IF(cnt = 8,ri.mname,le.executive_mname_var8);
 		SELF.executive_lname_var8         := IF(cnt = 8,ri.lname,le.executive_lname_var8);
 		SELF.executive_name_suffix_var8   := IF(cnt = 8,ri.name_suffix,le.executive_name_suffix_var8);
 		SELF.executive_display_title_var8 := IF(cnt = 8,ri.contact_job_title_derived,le.executive_display_title_var8);
-    SELF.executive_var8_first_seen := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var8_first_seen);
+          SELF.executive_var8_first_seen := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed(ri.dt_first_seen_contact),le.executive_var8_first_seen);
 		SELF.executive_var8_last_seen := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed(ri.dt_last_seen_contact),le.executive_var8_last_seen);		
 		
 		SELF.executive_var9_lexid         := IF(cnt = 9,ri.contact_did,le.executive_var9_lexid);
-    SELF.executive_title_var9         := IF(cnt = 9,ri.title,le.executive_title_var9);
+         SELF.executive_title_var9         := IF(cnt = 9,ri.title,le.executive_title_var9);
 		SELF.executive_fname_var9         := IF(cnt = 9,ri.fname,le.executive_fname_var9);
 		SELF.executive_mname_var9         := IF(cnt = 9,ri.mname,le.executive_mname_var9);
 		SELF.executive_lname_var9         := IF(cnt = 9,ri.lname,le.executive_lname_var9);
@@ -900,9 +902,9 @@ FUNCTION
 	 
 	 // OUTPUT(ds_BestInfoTmp_all, named('ds_BestInfoTmp_all'));
 		//OUTPUT(ds_BestBatchRecs, NAMED('ds_BestBatchRecs'));
-		 //output(ds_bestInfo2, named('ds_bestInfo2'));
+		// output(ds_bestInfo2, named('ds_bestInfo2'));
 		 // output(ds_bestInfo2_slim, named('ds_bestInfo2_slim'));
-		 //output(ds_BestInfoRecs, named('ds_BestInfoRecs'));
+		 // output(ds_BestInfoRecs, named('ds_BestInfoRecs'));
 		 
 	 // output(ds_BestInfoTmp, named('ds_BestInfoTmp'));
 	  // OUTPUT(ds_bestKfetchSourceDResults, NAMED('ds_bestKfetchSourceDResults'));
@@ -910,7 +912,7 @@ FUNCTION
 	  //output(ds_best, named('ds_best'));
    //OUTPUT(ds_NameAddressBatchRecs,NAMED('ds_NameAddressBatchRecs'));
    //OUTPUT(ds_HeaderInfoAll,NAMED('ds_HeaderInfoAll'));
-	
+	// output( ds_Corps, named('ds_Corps'));
   // OUTPUT(ds_GongPhones,NAMED('ds_GongPhones'));
 	//output(ds_Phones2Final, NAMED('ds_Phones2Final'));
  // OUTPUT(ds_Corps,NAMED('ds_Corps'));

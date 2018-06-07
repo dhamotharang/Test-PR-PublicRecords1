@@ -1,4 +1,4 @@
-﻿IMPORT iesp, AutoStandardI, CAN_PH, Address, ut, Fedex_Services;
+﻿IMPORT iesp, AutoStandardI, CAN_PH, Address, ut, Fedex_Services, doxie;
 
 // This module provides the main logic for executing UPS "RightAddress" 
 // searches.
@@ -89,9 +89,6 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		header_res := mod_Searches.personSearch.records(PSearchMod);
 
 		// *** Penalize person search results
-		PPenMod := module(project (inputmod, IF_PartialMatchSearchParams, opt))
-		end;
-
 		header_res_pen := mod_Score(search_inputs).score(header_res);
 
 		// do not do a person search if we're searching businesses
@@ -109,9 +106,6 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		biz_res := ups_services.mod_Searches.businessSearch.records(search_inputs,BSearchMod);	
 
 		// Penalize business search results
-		BPenMod := module(project (inputmod, IF_PartialMatchSearchParams, opt))
-		end;
-
 		biz_res_pen := mod_Score(search_inputs).score(biz_res);
 
 		// don't do a business search if we're searching individuals
@@ -130,7 +124,6 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
    	fedex_filtered := map (EntityType = Constants.TAG_ENTITY_IND  => fedex_dedup(trim(business_indicator) <> 'Y'),
    														EntityType = Constants.TAG_ENTITY_BIZ  => fedex_dedup(trim(business_indicator) = 'Y'),
    														fedex_dedup ) ;
-   	 
    	fedex_format := project(fedex_filtered,transform(UPS_Services.layout_Common, 
 													SELF.rollup_key := left.fakeid;
 													SELF.rollup_key_type := Constants.TAG_ROLLUP_KEY_FAKEID, 
@@ -149,7 +142,8 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 													self.zip 						:= left.zip5,
 													self.dt_first_seen 	:=  0,
 													self.dt_last_seen  	:=  (unsigned4) left.dt_last_seen,
-													self.listing_type   := if(trim(left.business_indicator) = 'Y','B','');
+													self.listing_type   := if(trim(left.business_indicator) = 'Y','B','R');
+													self.Current := 'Y'; // assumption , need to check if they have any non current records here. 
 													//self.history_flag;
 													self 	:= left, 
 													self := [])); 
@@ -206,7 +200,12 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	// iesp.Constants.MAX_SEARCH_RESULTS for each individuals and businesses.
 
 	permissions := AutoStandardI.DataPermissionI.val(project(inputmod, AutoStandardI.DataPermissionI.params));
-	us_records  := PersonSearch.records + BusinessSearch.records + if(permissions.use_FedExData,FedExSearch.records);
+	us_person_business_fedex_records := if(permissions.use_FedExData,FedExSearch.records);
+	us_person_records_pre := PersonSearch.records + us_person_business_fedex_records(company_name = '');
+	us_person_records := UPS_Services.fn_CurrentPersonAddressLookup(us_person_records_pre);
+	us_business_records  := BusinessSearch.records + us_person_business_fedex_records(company_name <> '');
+	us_records_pre := us_person_records + us_business_records;
+	us_records := UPS_Services.fn_AdvoLookup(us_records_pre);
 	can_records := CanadaSearch.records;
 	
 	#if(Debug.debug_flag)
@@ -217,12 +216,52 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 			output(FedExSearch.records, NAMED('FedExSearch'));
 			output(permissions.use_FedExData, NAMED('use_FedExData'));
 	#end
+
+	
 	
 	export records := if(isCanada,can_records,us_records);
-  
+	 	
 	export rolled_records := mod_Rollup(search_inputs).roll(records, inputmod.MaxResults);
+	
 	BOOLEAN doHighlight := search_options.highlight;
 	export highlighted_records := IF(doHighlight, mod_Highlight(search_inputs).doBest(rolled_records), rolled_records);
+	
+	MaxNumPhoneSubjectPre := (integer)search_options.MaxNumPhoneSubject;
+	TrueMaxNumPhoneSubject := map(  MaxNumPhoneSubjectPre > 3 => 3, // max is 3 
+	                                MaxNumPhoneSubjectPre = 0 => 3, // default is 3 
+	                                MaxNumPhoneSubjectPre < 0 => 0, // internal testing to turn off WFP
+																     MaxNumPhoneSubjectPre);
+	
+	PSearchMod := module( project( inputmod, mod_Params.PersonSearch, opt)) 
+			export string20  PhoneScoreModel := if(trim(search_options.PhoneScoreModel)='','PHONESCORE_V2' ,search_options.PhoneScoreModel );
+			export integer MaxNumPhoneSubject := TrueMaxNumPhoneSubject ;
+		end;
+	
+	// Choose top 1 DID 	
+	 topDid := project(choosen(highlighted_records(score > UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
+	                            EntityType = UPS_Services.Constants.TAG_ENTITY_IND),1),
+									transform(doxie.layout_references_hh,
+							         self.DID := (unsigned) left.UniqueID ));
+											 
+	boolean doWaterfallPhones := exists(topDid) and ~isCanada and TrueMaxNumPhoneSubject > 0; 
+	
+  wfpRecords := if( doWaterfallPhones, UPS_Services.fn_WaterfallPhonesLookup(topDid,PSearchMod));
+	
+	highlighted_records_with_phones := if( doWaterfallPhones, 
+				join(highlighted_records,wfpRecords,
+					~isCanada and left.EntityType = UPS_Services.Constants.TAG_ENTITY_IND and 
+					left.score  >  UPS_Services.Constants.SCORE_THRESHOLD_WATERFALL_PHONES and 
+					left.UniqueID = (string)right.DID,
+					transform(recordof(highlighted_records),
+					firstAddress := left.Addresses[1];
+					phones := project(right.phones,transform(iesp.rightaddress.t_HighlightedPhoneInfo, 
+														self.phone10 := left.phone10, self := [])) + 
+									firstAddress.phones;
+					firstAddressWithPhones := project(firstAddress,transform(iesp.rightaddress.t_RAAddressWithPhones, 
+																				self.phones := phones, self := left ));
+					self.addresses := firstAddressWithPhones + choosen(Left.Addresses,all,2),
+					self := left), left outer),
+					highlighted_records);
 
 	//**** START TEMP DEMO CODE FOR CUSTOMER REVIEW 
 	//**** This is temp because, if they want this behavior, we need to do the filtering much earlier.
@@ -239,21 +278,24 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 		
 	Addr := DATASET([MA()])[1];				
 		
-	filtered_records_ :=
+	filtered_records_pre :=
 	if(
 		inDemoMode,
 		UPS_Services.mod_Filter(
-			recs := highlighted_records,
+			recs := highlighted_records_with_phones,
 			inName := UPS_Services.mod_Names(search_by).bestparser(),
 			inAddr := Addr,
 			inPhone := validPhone,
 			powersearch := powersearch,
 			EditDistanceAllowed0 := inEditDistanceAllowed
 		).results,
-		highlighted_records
+		highlighted_records_with_phones
 	);
 	
-	filtered_records := if(isZipSearch,dataset([],iesp.rightaddress.t_RightAddressSearchRecord),filtered_records_);
+ 	filtered_records := if(isZipSearch,dataset([],iesp.rightaddress.t_RightAddressSearchRecord),filtered_records_pre);
+	
+	
+	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(filtered_records , response, iesp.rightaddress.t_RightAddressSearchResponse,
 	                                            ,,,ZipPostalLookup,zip_only_response);
 																						 
@@ -269,8 +311,7 @@ export RightAddress(DATASET(iesp.rightaddress.t_RightAddressSearchRequest) inReq
 	// export soap_response := project(response,
 	                                // transform(iesp.rightaddress.t_RightAddressSearchResponse), 
 																	            // self := left, 
-																							// self.ZipPostalLookup := zip_only_response );
-																							
+																							// self.ZipPostalLookup := zip_only_response );																						
 		export soap_response := response;																				
 	
 END;

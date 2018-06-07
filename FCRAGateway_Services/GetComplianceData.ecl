@@ -20,12 +20,14 @@ EXPORT GetComplianceData(DATASET(iesp.person_picklist.t_PersonPickListRequest) p
 	//Check if we need to suppress the report due to credit alerts.
 	is_suppressed_by_alert := FFD.ConsumerFlag.getAlertIndicators(ds_person_context, params.FCRAPurpose, params.FFDOptionsMask)[1].suppress_records;
 	ds_consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(ds_person_context, is_suppressed_by_alert);
+	consumer:= FFD.MAC.PrepareConsumerRecord((string)plist_did, FALSE, plist_req[1].searchby);
 
 	//Bundle the results so we can return them in a dataset.
-	ds_compliance_out := DATASET([{is_suppressed_by_alert, ds_consumer_alerts, ds_consumer_statements, plist_did}],
+	ds_compliance_out := DATASET([{is_suppressed_by_alert, ds_consumer_alerts, ds_consumer_statements, consumer}],
 		FCRAGateway_Services.Layouts.compliance_out);
 
 	#IF(FCRAGateway_Services.Constants.Debug.ComplianceData)
+		OUTPUT(plist_req,NAMED('compliance_plist_req'));
 		OUTPUT(plist_resp,NAMED('compliance_plist_resp'));
 		OUTPUT(ds_person_context,NAMED('ds_person_context'));
 		OUTPUT(ds_consumer_statements,NAMED('ds_consumer_statements'));

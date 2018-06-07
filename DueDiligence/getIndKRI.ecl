@@ -1,5 +1,6 @@
 ﻿IMPORT DueDiligence, STD, ut;
 
+
 EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 	//individual not found
 	STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
@@ -30,6 +31,11 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
     //is populated in DueDiligence.getIndKRILegalStateCriminal, which is ultimately called in DueDiligence.getIndCriminal
 		SELF.PerLegalStateCriminal := le.individual.stateCriminalLegalEventsScore;
     SELF.PerLegalStateCriminal_Flag := le.individual.stateCriminalLegalEventsFlags;
+    
+    /* LEGAL EVENT TYPES  */
+    //is populated in DueDiligence.getIndKRILegalEventType,  
+		SELF.PerLegalTypes := le.individual.legalEventTypeScore;
+    SELF.PerLegalTypes_Flag := le.individual.legalEventTypeFlags;
 	
 		
 		SELF := le;
@@ -62,8 +68,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							// SELF.PerLegalCivil_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerLegalTraffInfr := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerLegalTraffInfr_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerLegalTypes := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerLegalTypes_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerLegalTypes := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerLegalTypes_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerHighRiskNewsProfiles := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerHighRiskNewsProfiles_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;

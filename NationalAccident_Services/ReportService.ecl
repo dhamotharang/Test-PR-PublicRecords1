@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 
     <!-- User Section -->
@@ -49,7 +49,7 @@
 import iesp,AutoStandardI,Accident_Services;
 
 export ReportService := macro
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#constant('StrictMatch', true);
 
     //get XML input 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 
 	<!-- User -->
@@ -50,7 +50,7 @@
 
 import iesp, AutoStandardI;
 export SearchService := macro
-    
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);  
 		rec_in := iesp.ChangeOfAddress.t_ChangeOfAddressRequest;
 		
 		// "FEW" keyword set to make data read more efficient

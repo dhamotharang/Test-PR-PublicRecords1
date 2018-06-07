@@ -391,9 +391,7 @@ EXPORT Functions := MODULE
 																			{STRING fragmentType}));
 
 			bankAccountNumber := IF(l.bank_account_number <> '' AND
-															l.bank_routing_number <> '' AND
-															l.bank_routing_number = r.bank_routing_number_1 AND
-															l.bank_account_number = r.bank_account_number_1,
+															(l.bank_account_number = r.bank_account_number_1 OR l.bank_account_number = r.bank_account_number_2), 
 															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT}], 
 																	{STRING fragmentType}));
 																																	

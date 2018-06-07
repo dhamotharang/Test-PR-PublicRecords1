@@ -8,8 +8,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 	File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;
 	
-	TodaysDate := std.date.today();
-	YesterdayDate := TodaysDate - 1;
+	TodaysDate := STD.date.today();
+	YesterdayDate := STD.Date.AdjustDate(TodaysDate,0,0,-1);
 	
 	// ***random_no_of_identities*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual values. 
 	random_no_of_identities_ds := DATASET([{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}] , {unsigned1 num}); 
@@ -89,40 +89,10 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																													SELF := []));
 	
 	ds_combinedfreg_recs := IF(did_exists, ds_batch_in, ds_batch_in + ds_elements_dids);
-	ds_fragment_recs := FraudShared_Services.Functions.getFragmentMatchTypes(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params);
+
+	ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params);
 	
-	fragment_w_value_recs := RECORD
-		FraudShared_Services.layouts.layout_velocity_in;
-		STRING60 fragment_value;
-		UNSIGNED3 file_type;
-		UNSIGNED4	LastActivityDate := 0;
-		UNSIGNED4	LastKnownRiskDate := 0;
-	END;
-
-	fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
-																									FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
-																																																
-		SELF.fragment_value := MAP(	L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => (string) R.bank_account_number_1,
-																L.fragment = Fragment_Types_const.DEVICE_ID_FRAGMENT => (string) R.device_id,
-																L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => (string) R.drivers_license,
-																// L.fragment = Fragment_Types_const.GEOLOCATION_FRAGMENT => R.geo_lat + ' ' R.geo_long;
-																L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => (string) R.ip_address	,
-																L.fragment = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (string) (R.address_1 + ' ' + R.address_2),
-																L.fragment = Fragment_Types_const.NAME_FRAGMENT => (string) R.raw_full_name	,
-																L.fragment = Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
-																L.fragment = Fragment_Types_const.PHONE_FRAGMENT => (string) R.phone_number,
-																L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => (string) (R.street_1 + ' ' +	R.street_2 + ' ' + R.city + ' ' +	R.state + ' ' +	R.zip),
-																L.fragment = Fragment_Types_const.SSN_FRAGMENT => (string) R.ssn,
-																'');
-		SELF.file_type := R.classification_Permissible_use_access.file_type;
-		SELF := L;
-	END;
-
-	ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_allPayloadRecs,
-																		LEFT.record_id = RIGHT.record_id,
-																		ds_fragment_recs_w_trans(LEFT, RIGHT));
-
-	fragment_w_value_recs do_Rollup(fragment_w_value_recs L, dataset(fragment_w_value_recs) R) := TRANSFORM
+	FraudGovPlatform_Services.Layouts.fragment_w_value_recs do_Rollup(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L, dataset(FraudGovPlatform_Services.Layouts.fragment_w_value_recs) R) := TRANSFORM
 		identity_recs := R(file_type = File_Type_Const.IdentityActivity);
 		knownrisk_recs := R(file_type = File_Type_Const.KnownFraud);
 		SELF.LastActivityDate := MAX(identity_recs[1].date);
@@ -144,13 +114,13 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
 	ds_fragment_recs_tab	:= TABLE(ds_fragment_recs_sorted,ds_fragment_tab_Recs, fragment_value, fragment);	
 
-	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (fragment_w_value_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
+	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.fragment_w_value_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
 		gov_best_rec := ds_GovBest(ds_GovBest.UniqueId = L.fragment_value)[1];
 		contri_best_rec := ds_contributoryBest(ContributedBest.UniqueId = L.fragment_value)[1];
 
-		SELF.RecordType := MAP(	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => 'IDENTITY',
-														L.fragment In FraudGovPlatform_Services.Constants.RECORD_TYPE_ELEMENT_SET => 'ELEMENT',
+		SELF.RecordType := MAP(	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => FraudGovPlatform_Services.Constants.RecordType.IDENTITY,
+														L.fragment In FraudGovPlatform_Services.Constants.RECORD_TYPE_ELEMENT_SET => FraudGovPlatform_Services.Constants.RecordType.ELEMENT,
 														'');
 		SELF.ElementType := L.fragment;
 		SELF.ElementValue := L.fragment_value;
@@ -176,5 +146,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	ElementsNIdentities_trans(LEFT, RIGHT));
 																	
 	ds_results := IF(IsTestRequest, ds_ElementsNIdentities + mockup_cluster, ds_ElementsNIdentities);
+	
+	// output(ds_batch_in, named('ds_batch_in'));
+	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
+	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
+	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
+	// output(ds_results, named('ds_results'));
+	
 	RETURN ds_results;
 END;

@@ -225,5 +225,13 @@ EXPORT Layouts := MODULE
 	EXPORT LOG_Deltabase_Layout := RECORD
 		DATASET(LOG_Deltabase_Layout_Record) Records {XPATH('Records/Rec'), MAXCOUNT(1)};
 	END;
+	
+	EXPORT fragment_w_value_recs := RECORD
+		FraudShared_Services.layouts.layout_velocity_in;
+		STRING60 fragment_value;
+		UNSIGNED3 file_type;
+		UNSIGNED4	LastActivityDate := 0;
+		UNSIGNED4	LastKnownRiskDate := 0;
+	END;
 
 END;

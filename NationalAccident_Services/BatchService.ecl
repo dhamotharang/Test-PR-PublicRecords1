@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -12,6 +12,7 @@
 */
 
 EXPORT BatchService() := MACRO
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('StrictMatch', true)
 	UNSIGNED2 MaxResultsPerAcct := 10 : STORED('MaxResultsPerAcct');
 	BOOLEAN   EnableExtraAccidents := false : STORED('EnableExtraAccidents');

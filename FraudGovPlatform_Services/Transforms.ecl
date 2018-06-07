@@ -117,8 +117,6 @@ EXPORT Transforms := MODULE
 		
 		SELF.FoundCount := l.foundCnt;
 		SELF.Description := l.description;
-		// SELF.PayloadRecords:= PROJECT(l.ds_payload, TRANSFORM(FraudShared.Layouts_Key.Main, SELF := LEFT));
-		
 	END;
 	
 	EXPORT FraudGovPlatform_Services.Layouts.red_flag_desc_w_details xnorm_red_flag(FraudGovPlatform_Services.Layouts.combined_layouts l, INTEGER c) := TRANSFORM
@@ -261,6 +259,75 @@ EXPORT Transforms := MODULE
 															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.MISSING_INPUT;
 															SELF := LEFT)));
 																																						
-		END;
+	END;
+
+	EXPORT iesp.fraudgovreport.t_FraudGovTimelineDetails xform_timeline_details(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+		reported_date_time := L.reported_date + ' ' + L.reported_time;
+
+		SELF.IsRecentActivity := False; // Y Means its a deltabase record, N means its coming from contributory records. 
+		SELF.FileType  := L.classification_permissible_use_access.file_type; //1 -> Identity Transaction, 3-> Known Risk.
+		SELF.GlobalCompanyId := L.classification_permissible_use_access.gc_id;
+		SELF.TransactionId := L.transaction_id;
+		SELF.HouseholdId := L.household_id;
+		SELF.CustomerPersonId := L.customer_person_id;
+		SELF.CustomerEventId := L.customer_event_id;
+		SELF.ReportedDateTime :=  iesp.ECL2ESP.toTimeStamp(reported_date_time);
+		SELF.ReportedBy := L.reported_by;
+		SELF.EventDate := iesp.ECL2ESP.toDatestring8(L.event_date);
+		SELF.EventEndDate := iesp.ECL2ESP.toDatestring8(L.event_end_date);
+		SELF.EventLocation := L.event_location;
+		SELF.EventType1 := L.event_type_1;
+		SELF.EventType2 := L.event_type_1;
+		SELF.EventType3 := L.event_type_1;
+		SELF.IndustryTypeDescription := L.classification_permissible_use_access.ind_type_description;
+		SELF.ActivityReason := L.reason_description;
+		SELF.StartDate := iesp.ECL2ESP.toDatestring8(L.start_date);
+		SELF.EndDate := iesp.ECL2ESP.toDatestring8(L.end_date);
+		SELF.UniqueId := (string) L.did;
+		SELF.Name := iesp.ECL2ESP.SetName(L.cleaned_name.fname, L.cleaned_name.mname, L.cleaned_name.lname, L.cleaned_name.name_suffix,
+																			L.cleaned_name.title, '');
+		SELF.SSN := L.ssn;
+		SELF.DOB := iesp.ECL2ESP.toDatestring8(L.dob);
+		SELF.AddressType := L.address_type;
+		SELF.PhysicalAddress := iesp.ECL2ESP.SetAddress(L.clean_address.prim_name, L.clean_address.prim_range, L.clean_address.predir, L.clean_address.postdir, 
+																										L.clean_address.addr_suffix, L.clean_address.unit_desig, L.clean_address.sec_range, 
+																										L.clean_address.p_city_name, L.clean_address.st, L.clean_address.zip, L.clean_address.zip4, 
+																										'', '', L.address_1, L.address_2,'');
+		SELF.MailingAddress := iesp.ECL2ESP.SetAddress(L.additional_address.clean_address.prim_name, L.additional_address.clean_address.prim_range, L.additional_address.clean_address.predir, L.additional_address.clean_address.postdir, 
+																										L.additional_address.clean_address.addr_suffix, L.additional_address.clean_address.unit_desig, L.additional_address.clean_address.sec_range, 
+																										L.additional_address.clean_address.p_city_name, L.additional_address.clean_address.st, L.additional_address.clean_address.zip, L.additional_address.clean_address.zip4, 
+																										'', '', L.additional_address.street_1, L.additional_address.street_2,'');
+		SELF.County := L.county;
+		SELF.Phones := DATASET([{'', L.phone_number, L.phone_risk_code}, 
+														{'', L.cell_phone, L.cell_phone_risk_code}, 
+														{'', L.work_phone, L.work_phone_risk_code}], iesp.fraudgovreport.t_FraudGovPhoneInfo);
+		SELF.EmailAddress := L.email_address;
+		SELF.DriversLicense.DriversLicenseNumber := L.drivers_license;
+		SELF.DriversLicense.DriversLicenseState := L.drivers_license_state;
+		SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number_1; 
+		SELF.BankInformation1.BankAccountNumber := L.bank_account_number_1;
+		SELF.BankInformation2.BankRoutingNumber := L.bank_routing_number_2;  
+		SELF.BankInformation2.BankAccountNumber := L.bank_account_number_2;
+		SELF.Ethnicity := L.ethnicity;
+		SELF.Race := L.race;
+		SELF.HeadOfHouseholdIndicator := L.head_of_household_indicator;
+		SELF.RelationshipIndicator := L.relationship_indicator;
+		SELF.IpAddress := L.ip_address;
+		SELF.DeviceId := L.device_id;
+		SELF.AmountPaid := L.amount_paid;
+		SELF.NameRiskCode := L.name_risk_code;
+		SELF.SSNRiskCode := L.ssn_risk_code;
+		SELF.DOBRiskCode := L.dob_risk_code;
+		SELF.PhysicalAddressRiskCode := L.physical_address_risk_code;
+		SELF.MailingAddressRiskCode := L.mailing_address_risk_code;
+		SELF.EmailAddressRiskCode := L.email_address_risk_code;
+		SELF.DriversLicenseRiskCode := L.drivers_license_risk_code;
+		SELF.BankAccount1RiskCode := L.bank_account_1_risk_code;
+		SELF.BankAccount2RiskCode := L.bank_account_2_risk_code;
+		SELF.IPAddressFraudCode := L.ip_address_fraud_code;
+		SELF.DeviceRiskCode := L.device_risk_code;
+		SELF.GeoLocation.Latitude := L.clean_address.geo_lat;
+		SELF.GeoLocation.Longitude := L.clean_address.geo_long;
+	END;		
 	
 END;

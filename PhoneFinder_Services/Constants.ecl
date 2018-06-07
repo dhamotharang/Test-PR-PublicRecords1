@@ -77,7 +77,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	MODULE
 		EXPORT UNSIGNED1 MaxPhones 					 := 6;
 		EXPORT UNSIGNED1 MaxSubjects         := 5;
-		EXPORT UNSIGNED1 MaxPremiumSource    := 3; 
+		EXPORT UNSIGNED1 MaxPremiumSource    := 2; //PHPR-95 update to return 2 equifax phones
 		EXPORT UNSIGNED1 MaxSectionLimit	   := 35; 
 	END;
 	

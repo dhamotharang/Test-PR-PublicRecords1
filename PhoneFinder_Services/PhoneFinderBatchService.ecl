@@ -36,7 +36,7 @@ EXPORT PhoneFinderBatchService :=
 MACRO
 
 	IMPORT AutoStandardI,Gateway,PhoneFinder_Services;
-	
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// Batch input request
 	dBatchReq := DATASET([],PhoneFinder_Services.Layouts.BatchIn) : STORED('BatchRequest');
 

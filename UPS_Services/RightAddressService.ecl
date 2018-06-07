@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RightAddress">
   <part name="RightAddressSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 	<part name="DataRestrictionMask" type="xsd:string"/>
@@ -7,7 +7,7 @@
 /*--INFO-- This service searches the header file (Autonomy-style UPS search).*/
 
 export RightAddressService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#stored ('ScoreThreshold', UPS_Services.Constants.SCORE_THRESHOLD);
 	#constant('AllowWildcard',true);
 	#constant('isCP_V2',true);

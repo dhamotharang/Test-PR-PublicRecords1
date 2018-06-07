@@ -7,8 +7,8 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
 												             integer inFCRAPurpose = FCRA.FCRAPurpose.NoValueProvided) := function
     
     gateways := Gateway.Configuration.Get();    
-    boolean showDisputedRecords := FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
+    boolean showDisputedRecords := ShowConsumerStatements AND FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
 
     layout_w_ffd := record    
       BatchServices.layout_BankruptcyV3_Batch_out; 
@@ -30,7 +30,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     // ffd for debtor records
     layout_w_ffd xformStatements( BatchServices.layout_BankruptcyV3_Batch_out l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
        skip(~ShowDisputedRecords and r.isDisputed)               
-       self.StatementIds_deb := IF(ShowConsumerStatements, r.StatementIDs, FFD.Constants.BlankStatements);
+       self.StatementIds_deb := r.StatementIDs;
        self.isDisputed_deb   := r.isDisputed;
        self := l;
     end;
@@ -49,7 +49,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     // ffd for main records
     layout_w_ffd xmainStatements( layout_w_ffd l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
       skip(~ShowDisputedRecords and r.isDisputed)            
-          self.StatementIds := IF(ShowConsumerStatements,r.StatementIDs, FFD.Constants.BlankStatements);
+          self.StatementIds := r.StatementIDs;
           self.IsDisputed   := r.isDisputed;
           self := l;
     end;
@@ -76,12 +76,12 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
         SELF.statements := debtor_statements + debtor_dispute + main_statements + main_dispute;
         SELF := L;    
     end;
-    
+    // we create statements here disregarding ShowConsumerStatements option. The decision on whether to report statements/alerts/disputes is made later when preparing final output
     recs_out := PROJECT(recs_main, formstatements(left));
     
     alert_flags := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDOptionsMask);
     // records maybe suppressed due to alerts
-    ds_out := FFD.Mac.ApplyConsumerAlertsBatch(recs_out, alert_flags, Statements, BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, debtor_did);
+    ds_out := FFD.Mac.ApplyConsumerAlertsBatch(recs_out, alert_flags, Statements, BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, inFFDOptionsMask, debtor_did);
     
     // Sequencing for FCRA FFD
     ds_out_seq := PROJECT(ds_out, TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
@@ -94,7 +94,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
                   SELF := RIGHT));
                                                 
     consumer_statements_prep  := FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask);                                               
-    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs);                                               
+    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, inFFDOptionsMask);                                               
        
     consumer_statements_alerts := consumer_alerts + consumer_statements_prep;
     pre_result := PROJECT(ds_out_seq, BatchServices.layout_BankruptcyV3_Batch_out);  // project to non ffd layout    

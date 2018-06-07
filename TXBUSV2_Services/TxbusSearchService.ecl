@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="TxbusSearch" wuTimeout="300000">
 	<part name = 'BDID'			type = 'xsd:string'/>
 	<part name = 'DID'			type = 'xsd:string'/>
@@ -30,7 +30,7 @@
 /*--INFO-- This service searches all Txbus datafiles.*/
 
 export TxbusSearchService := macro
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('getBdidsbyExecutive',FALSE)
 	#constant('SearchIgnoresAddressOnly',true)
 

@@ -45,7 +45,7 @@
 IMPORT Text_Search, doxie, AutostandardI;
 
 EXPORT WatercraftSearchService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#WEBSERVICE(FIELDS(	'DID',
 											'BDID',
 											'WatercraftKey',

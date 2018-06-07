@@ -1,4 +1,4 @@
-import email_data, riskwise, ut, fcra, mdr;
+﻿import email_data, riskwise, ut, fcra, mdr;
 
 export Boca_Shell_Email(GROUPED DATASET(layout_bocashell_neutral) clam_pre_email_in, 
 	boolean isFCRA, 
@@ -20,7 +20,7 @@ mdr.sourceTools.src_Impulse,
 mdr.sourceTools.src_Wired_Assets_Email,
 mdr.sourceTools.src_MediaOne, 
 mdr.sourceTools.src_SalesChannel,
-mdr.sourceTools.src_Datagence
+if(~isFCRA, mdr.sourceTools.src_Datagence, '')					// Datagence (source DG) was removed from FCRA key in May of 2018 so updating the allowed source list here to reflect that
 ,mdr.sourcetools.src_InfutorNare
 
 
@@ -31,7 +31,7 @@ mdr.sourceTools.src_Entiera,
 mdr.sourceTools.src_Wired_Assets_Email,
 mdr.sourceTools.src_MediaOne, 
 mdr.sourceTools.src_SalesChannel,
-mdr.sourceTools.src_Datagence
+if(~isFCRA, mdr.sourceTools.src_Datagence, '')		      // Datagence (source DG) was removed from FCRA key in May of 2018 so updating the allowed source list here to reflect that
 ,mdr.sourcetools.src_InfutorNare
 
 

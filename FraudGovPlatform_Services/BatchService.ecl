@@ -33,7 +33,7 @@
 IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, Royalty, WSInput;
 
 EXPORT BatchService(useCannedRecs = FALSE) := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_FraudGovPlatform_Services_BatchService();
 
@@ -67,7 +67,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 	// **************************************************************************************
 	// Call Batch Records attribute to fetch records. 
 	// **************************************************************************************
-	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
+	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params).ds_results_w_velocities;
 
 	// ** Simple transform to convert the ds_records to the flat output layout
 	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);

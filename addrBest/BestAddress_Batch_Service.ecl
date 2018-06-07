@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BestAddress_Batch_Service">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DateLastSeen"		type="xsd:string"/>	
@@ -79,6 +79,7 @@
 
 
 export BestAddress_Batch_Service := macro
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('OnlyReturnSuccessfullyCleanedAddresses',true);
 
 	ds_raw := dataset([],AddrBest.Layout_BestAddr.Batch_in) : stored('batch_in',few);

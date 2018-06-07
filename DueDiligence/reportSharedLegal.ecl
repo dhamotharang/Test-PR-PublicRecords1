@@ -1,5 +1,6 @@
 ﻿IMPORT BIPv2, DueDiligence, iesp, Suppress;
 
+
 EXPORT reportSharedLegal := MODULE
 
   EXPORT getDDRLegalEventCriminalWithMasking(DATASET(DueDiligence.LayoutsInternalReport.FlatListOfIndividualsWithCriminalLayout) listOfIndAndOffenses, STRING6 ssnMasking) := FUNCTION
@@ -54,6 +55,8 @@ EXPORT reportSharedLegal := MODULE
                                                            SELF.OffenseScoreDescription  := DueDiligence.translateCodeToText.OffenseScoreText(LEFT.offenseScore);  //??? Is this or OffenseScore displayed on web and are both needed??
                                                            SELF.OffenseLevel             := LEFT.criminalOffenderLevel; //??? Is this or OffenseLevelDescription displayed on web and are both needed??
                                                            SELF.OffenseLevelDescription  := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.criminalOffenderLevel); //??? Is this or OffenseLevel displayed on web and are both needed??
+                                                           temp_answer                   := DueDiligence.DictionaryValues_LegalEvents.ReportLegalEventTypeDesc[LEFT.legalEventTypeCode];  
+                                                           SELF.LegalEventType           := temp_answer.LegalEventTypeDescription;
                                                            SELF.NumberOfCounts           := LEFT.num_of_counts;
                                                            SELF.Conviction               := LEFT.convictionFlag;
                                                            SELF.Charge                   := LEFT.Charge;
@@ -109,7 +112,7 @@ EXPORT reportSharedLegal := MODULE
       END;
      
      
-      limitedReportRecords := PROJECT(groupMaskedList, limitOffenses(LEFT, COUNTER));
+      limitedReportRecords := UNGROUP(PROJECT(groupMaskedList, limitOffenses(LEFT, COUNTER)));
      
           
       //perform the ROLLUP by LINKID And DID

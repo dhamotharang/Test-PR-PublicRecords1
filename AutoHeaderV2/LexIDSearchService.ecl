@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LexIDSearchService" fast_display = "true">
 	<part name="LexIDSearchRequest" type="tns:XmlDataSet" cols="80" rows="20" />
 	<part name="SearchCode" type="xsd:integer" />
@@ -11,7 +11,8 @@
 import AutoheaderV2,WSInput;
 
 EXPORT LexIDSearchService () := FUNCTION
-
+  
+	 #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   ds_search := DATASET ([], AutoheaderV2.layouts.lib_search) : STORED ('LexIDSearchRequest', FEW);
   search_code := 0 : stored ('SearchCode');
 

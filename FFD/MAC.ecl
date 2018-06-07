@@ -35,7 +35,6 @@
 			DATASET(__lout) Records;
 			DATASET(iesp.share_fcra.t_ConsumerStatement) Statements;
 			DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
-//			DATASET(iesp.share_fcra.t_FcraConsumer) Consumer;
    	END;   			
 		__outrec := ROW ({__results, %__res_statements%, __alerts}, %__res_layout%);		
 	ENDMACRO;
@@ -49,7 +48,7 @@
 		__outrec := ROW ({__results, __statements}, %__res_layout%);		
 	ENDMACRO;
 	
-	EXPORT ApplyConsumerAlertsBatch(__inf, __alert_flags, __statementids, __lout, LexidField='') := FUNCTIONMACRO		
+	EXPORT ApplyConsumerAlertsBatch(__inf, __alert_flags, __statementids, __lout, __FFDOptionsmask=0, LexidField='') := FUNCTIONMACRO		
 
 		__lout xf_apply_alerts( RECORDOF(__inf) l, FFD.Layouts.ConsumerFlagsBatch r ) := 
 		TRANSFORM, SKIP(r.suppress_records)																				 
@@ -82,7 +81,13 @@
 				SELF :=[]) 
 				); 
 				
-		__outf := __rec_suppr + __res_ftr;
+		__all_recs := __rec_suppr + __res_ftr;
+
+    __filterDempseyHits := ~FFD.FFDMask.isShowConsumerStatements(__FFDOptionsMask); 
+		
+		__noflag_recs := __res_ftr(alert_security_freeze = '', alert_security_fraud='', alert_identity_theft='', alert_legal_flag='', alert_cnsmr_statement='');
+		
+		__outf := IF(__filterDempseyHits, __noflag_recs, __all_recs);
 				
 		RETURN __outf;
 	ENDMACRO;

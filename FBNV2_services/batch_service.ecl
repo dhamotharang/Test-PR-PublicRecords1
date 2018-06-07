@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FBNBatch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="IsSearch"  		type="xsd:boolean"/>
@@ -10,10 +10,10 @@
 </message>
 */
 
-IMPORT doxie, Autokey_batch, FBNV2_services, Address, FBNV2, BatchServices, AutokeyB2, AutoStandardI;
+IMPORT doxie, Autokey_batch, FBNV2_services, Address, FBNV2, BatchServices, AutokeyB2, AutoStandardI,AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
-
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// Key
 	keyIdDID := FBNV2.Key_DID;
 

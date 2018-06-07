@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RNA ReportService">
   <part name="FirstName" type="xsd:string"/>
   <part name="MiddleName" type="xsd:string"/>
@@ -45,7 +45,7 @@ IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, Relationship;
 
 
 EXPORT RNAReportService() := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonReports_RNAReportService();
 	#constant('IsCRS',true);

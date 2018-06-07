@@ -42,11 +42,15 @@ EXPORT Layouts_Derog_Info := MODULE
   EXPORT 	layout_extended_plus_ftd := record
 		layout_extended;
 		string200 ftd;	
+		string8 DateFiled ; 
+		string8 ReleaseDate ;
 	end;
 	
 	EXPORT Layout_derog_process_plus_ftd := record
 		layout_derog_process_plus;	
 		string200 ftd;
+		string8 DateFiled ; 
+		string8 ReleaseDate ;
 	end;
 
 	EXPORT 	layout_derog_process_plus_slim_PR := RECORD
@@ -152,7 +156,7 @@ EXPORT Layouts_Derog_Info := MODULE
 	end;		
 	
 	EXPORT Liens_Working := RECORD
-		string8 DateFiled ;  
+		string8 DateFiled ;    
 		string50 LJType           ;    
 		string15 Amount             ;    
 		string8 ReleaseDate    ;    
@@ -178,6 +182,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string PersistId;
 		unsigned ConsumerStatementId;
   string2 Filing_Type_Id;
+  string Party_PersistId;
 	END;	
 	
 	EXPORT layout_derog_process_plus_workingDF := RECORD
@@ -186,13 +191,14 @@ EXPORT Layouts_Derog_Info := MODULE
 		STRING DF2;
 		STRING DF3;
 		STRING DF4;
+		boolean isSuits;
 	END;
 	
 	
 	EXPORT Liens := RECORD
 		string30 Seq                ;
-    unsigned6 did;
-		string8 DateFiled ;   
+  unsigned6 did;
+		string8 DateFiled ;  
   string2 LienTypeID;
 		string50 LienType           ;    
 		string15 Amount             ;    
@@ -216,7 +222,7 @@ EXPORT Layouts_Derog_Info := MODULE
 	EXPORT Judgments := RECORD
 		string30 Seq ;
 		unsigned6 did;
-		string8 DateFiled          ;   
+		string8 DateFiled          ;     
   string2 JudgmentTypeID;
 		string50 JudgmentType      ;           
 		string15 Amount            ;           
@@ -316,4 +322,103 @@ EXPORT Layouts_Derog_Info := MODULE
 		LJ_Records;	
 		LNR_AttrIbutes;
 	END;
+	
+EXPORT layout_derog_process_plus_TOGETHER := RECORD
+		layout_derog_process_plus;
+		string ftd;
+		string PersistId;
+		string name_type;
+		string orig_name;
+		string vendordatelastseen;
+		string8 DateFiled ;	
+	 STRING DF;
+		STRING DF2;
+		STRING DF3;
+		STRING DF4;
+		string sort2Date;
+		string8 ReleaseDate    ; 
+		string ProcessDate;
+		string Filingnumber;
+		string Filingbook;
+		string FilingPage;
+		string OrigFilingNumber;
+		string certificateNumber;
+		string irsSerialNumber;
+		string CaseNumberL;
+		string AgencyState;
+		string AgencyCounty;
+		string Amount;
+		string FtdDec;
+END;	
+	
+
+EXPORT layout_extended_plus_TOGETHER := RECORD
+		layout_extended_plus_ftd;
+		string PersistId;
+		string name_type;
+		string orig_name;
+		string vendordatelastseen;
+	 STRING DF;
+		STRING DF2;
+		STRING DF3;
+		STRING DF4;
+		string sort2Date;
+		string ProcessDate;
+		string Filingnumber;
+		string Filingbook;
+		string FilingPage;
+		string OrigFilingNumber;
+		string certificateNumber;
+		string irsSerialNumber;
+		string CaseNumberL;
+		string AgencyState;
+		string AgencyCounty;
+		string Amount;
+		string FtdDec;
+				boolean isSuits;
+END;		
+
+EXPORT layout_export := record
+		string30 Seq ;
+		unsigned6 did;
+		STRING50 rmsid; // liens extras
+		string50 tmsid; // liens extras
+		unsigned4 date_first_seen;	// liens extras
+		unsigned4 date_last_seen;	// liens extras
+		boolean evictionInd;
+		string8 DateFiled          ;           
+		string15 Amount            ;           
+		string8 ReleaseDate      ;           
+		string16 ftd;           
+		string20 FilingNumber ;                
+		string10 FilingBook   ;                
+		string10 FilingPage   ;                
+		string1 Eviction      ;                
+		string60 Agency       ;                
+		string35 AgencyCounty ;                
+		string2 AgencyState    ;
+		string8 archive_date_6mo;
+		string8 archive_date_12mo;
+		string8 archive_date_24mo;
+		STRING DF;
+		STRING DF2;
+		STRING DF3;
+		STRING DF4;
+		INTEGER   eviction_count12_6mos := 0;
+		INTEGER   eviction_count12_12mos := 0;
+		INTEGER   eviction_count12_24mos := 0;
+		INTEGER   liens_unreleased_count12_6mos := 0;
+		INTEGER   liens_unreleased_count12_12mos := 0;
+		INTEGER   liens_unreleased_count12_24mos := 0;
+		unsigned  historydate;
+		string OrigFilingNumber;
+		string certificateNumber;
+		string irsSerialNumber;
+		string CaseNumberL;
+		string sort2Date;
+		string ProcessDate;
+		boolean isSuits;
+		string ftdDesc;
+end;	
+	
 END;
