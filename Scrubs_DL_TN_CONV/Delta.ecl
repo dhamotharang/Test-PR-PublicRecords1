@@ -1,6 +1,6 @@
 ﻿IMPORT SALT38,STD;
 EXPORT Delta(DATASET(Layout_In_tn_conv)old_s, DATASET(Layout_In_tn_conv) new_s) := MODULE//Routines to compute the differences between two instances of a file
-  SHARED inFieldList := ['process_date','dl_number','birthdate','action_code','event_date','post_date','last_name','county_code'];
+  SHARED inFieldList := ['process_date','dl_number','birthdate','action_code','event_date','post_date','last_name','county_code','filler'];
   EXPORT Differences := SALT38.mod_Delta.mac_DifferencesByFieldList(old_s, new_s, inFieldList);
   EXPORT DifferenceSummary := hygiene(old_s).Summary('Old') + hygiene(new_s).Summary('New') + hygiene(PROJECT(Differences(deleted), TRANSFORM(Layout_In_tn_conv, SELF := LEFT.old_rec))).Summary('Deletions') + hygiene(PROJECT(Differences(added), TRANSFORM(Layout_In_tn_conv, SELF := LEFT.new_rec))).Summary('Additions');
   EXPORT StandardStats(BOOLEAN doHygieneSummaryGlobal = TRUE) := FUNCTION

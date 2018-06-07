@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_process_date = '',Input_dl_number = '',Input_action_code = '',Input_event_date = '',Input_last_name = '',Input_birthdate = '',Input_post_date = '',Input_county_code = '',Input_action_type = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_process_date = '',Input_dl_number = '',Input_action_code = '',Input_event_date = '',Input_last_name = '',Input_birthdate = '',Input_post_date = '',Input_county_code = '',Input_action_type = '',Input_filler = '',OutFile) := MACRO
   IMPORT SALT38,Scrubs_DL_TN_WDL;
   #uniquename(of)
   %of% := RECORD
@@ -60,6 +60,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_process_date = '',Input_dl_n
       '' 
     #ELSE
         IF( le.Input_action_type = (TYPEOF(le.Input_action_type))'','',':action_type')
+    #END
+ 
++    #IF( #TEXT(Input_filler)='' )
+      '' 
+    #ELSE
+        IF( le.Input_filler = (TYPEOF(le.Input_filler))'','',':filler')
     #END
 ;
   END;

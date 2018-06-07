@@ -3,10 +3,10 @@ IMPORT Scrubs_DL_TN_CONV; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 8;
-  EXPORT NumRulesFromFieldType := 8;
+  EXPORT NumRules := 9;
+  EXPORT NumRulesFromFieldType := 9;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 8;
+  EXPORT NumFieldsWithRules := 9;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_In_tn_conv)
@@ -18,6 +18,7 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 post_date_Invalid;
     UNSIGNED1 last_name_Invalid;
     UNSIGNED1 county_code_Invalid;
+    UNSIGNED1 filler_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_In_tn_conv)
     UNSIGNED8 ScrubsBits1;
@@ -32,12 +33,13 @@ EXPORT FromNone(DATASET(Layout_In_tn_conv) h) := MODULE
     SELF.post_date_Invalid := Fields.InValid_post_date((SALT38.StrType)le.post_date);
     SELF.last_name_Invalid := Fields.InValid_last_name((SALT38.StrType)le.last_name);
     SELF.county_code_Invalid := Fields.InValid_county_code((SALT38.StrType)le.county_code);
+    SELF.filler_Invalid := Fields.InValid_filler((SALT38.StrType)le.filler);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_In_tn_conv);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.process_date_Invalid << 0 ) + ( le.dl_number_Invalid << 1 ) + ( le.birthdate_Invalid << 2 ) + ( le.action_code_Invalid << 3 ) + ( le.event_date_Invalid << 4 ) + ( le.post_date_Invalid << 5 ) + ( le.last_name_Invalid << 6 ) + ( le.county_code_Invalid << 7 );
+    SELF.ScrubsBits1 := ( le.process_date_Invalid << 0 ) + ( le.dl_number_Invalid << 1 ) + ( le.birthdate_Invalid << 2 ) + ( le.action_code_Invalid << 3 ) + ( le.event_date_Invalid << 4 ) + ( le.post_date_Invalid << 5 ) + ( le.last_name_Invalid << 6 ) + ( le.county_code_Invalid << 7 ) + ( le.filler_Invalid << 8 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -54,6 +56,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.post_date_Invalid := (le.ScrubsBits1 >> 5) & 1;
     SELF.last_name_Invalid := (le.ScrubsBits1 >> 6) & 1;
     SELF.county_code_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.filler_Invalid := (le.ScrubsBits1 >> 8) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -70,7 +73,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     post_date_CUSTOM_ErrorCount := COUNT(GROUP,h.post_date_Invalid=1);
     last_name_CUSTOM_ErrorCount := COUNT(GROUP,h.last_name_Invalid=1);
     county_code_CUSTOM_ErrorCount := COUNT(GROUP,h.county_code_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.process_date_Invalid > 0 OR h.dl_number_Invalid > 0 OR h.birthdate_Invalid > 0 OR h.action_code_Invalid > 0 OR h.event_date_Invalid > 0 OR h.post_date_Invalid > 0 OR h.last_name_Invalid > 0 OR h.county_code_Invalid > 0);
+    filler_CUSTOM_ErrorCount := COUNT(GROUP,h.filler_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.process_date_Invalid > 0 OR h.dl_number_Invalid > 0 OR h.birthdate_Invalid > 0 OR h.action_code_Invalid > 0 OR h.event_date_Invalid > 0 OR h.post_date_Invalid > 0 OR h.last_name_Invalid > 0 OR h.county_code_Invalid > 0 OR h.filler_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -78,9 +82,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birthdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.action_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.post_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birthdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.action_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.post_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filler_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birthdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.action_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.post_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.birthdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.action_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.post_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.county_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filler_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -95,8 +99,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.process_date_Invalid,le.dl_number_Invalid,le.birthdate_Invalid,le.action_code_Invalid,le.event_date_Invalid,le.post_date_Invalid,le.last_name_Invalid,le.county_code_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_process_date(le.process_date_Invalid),Fields.InvalidMessage_dl_number(le.dl_number_Invalid),Fields.InvalidMessage_birthdate(le.birthdate_Invalid),Fields.InvalidMessage_action_code(le.action_code_Invalid),Fields.InvalidMessage_event_date(le.event_date_Invalid),Fields.InvalidMessage_post_date(le.post_date_Invalid),Fields.InvalidMessage_last_name(le.last_name_Invalid),Fields.InvalidMessage_county_code(le.county_code_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.process_date_Invalid,le.dl_number_Invalid,le.birthdate_Invalid,le.action_code_Invalid,le.event_date_Invalid,le.post_date_Invalid,le.last_name_Invalid,le.county_code_Invalid,le.filler_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_process_date(le.process_date_Invalid),Fields.InvalidMessage_dl_number(le.dl_number_Invalid),Fields.InvalidMessage_birthdate(le.birthdate_Invalid),Fields.InvalidMessage_action_code(le.action_code_Invalid),Fields.InvalidMessage_event_date(le.event_date_Invalid),Fields.InvalidMessage_post_date(le.post_date_Invalid),Fields.InvalidMessage_last_name(le.last_name_Invalid),Fields.InvalidMessage_county_code(le.county_code_Invalid),Fields.InvalidMessage_filler(le.filler_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.process_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dl_number_Invalid,'CUSTOM','UNKNOWN')
@@ -105,12 +109,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.event_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.post_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.last_name_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.county_code_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'process_date','dl_number','birthdate','action_code','event_date','post_date','last_name','county_code','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_past_date','invalid_dl_nbr','invalid_past_date','invalid_action_code','invalid_past_date','invalid_past_date','invalid_lname','invalid_county_code','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.process_date,(SALT38.StrType)le.dl_number,(SALT38.StrType)le.birthdate,(SALT38.StrType)le.action_code,(SALT38.StrType)le.event_date,(SALT38.StrType)le.post_date,(SALT38.StrType)le.last_name,(SALT38.StrType)le.county_code,'***SALTBUG***');
+          ,CHOOSE(le.county_code_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.filler_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'process_date','dl_number','birthdate','action_code','event_date','post_date','last_name','county_code','filler','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_past_date','invalid_dl_nbr','invalid_past_date','invalid_action_code','invalid_past_date','invalid_past_date','invalid_lname','invalid_county_code','invalid_filler_data','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.process_date,(SALT38.StrType)le.dl_number,(SALT38.StrType)le.birthdate,(SALT38.StrType)le.action_code,(SALT38.StrType)le.event_date,(SALT38.StrType)le.post_date,(SALT38.StrType)le.last_name,(SALT38.StrType)le.county_code,(SALT38.StrType)le.filler,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,8,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,9,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -129,6 +134,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'post_date:invalid_past_date:CUSTOM'
           ,'last_name:invalid_lname:CUSTOM'
           ,'county_code:invalid_county_code:CUSTOM'
+          ,'filler:invalid_filler_data:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -145,6 +151,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_post_date(1)
           ,Fields.InvalidMessage_last_name(1)
           ,Fields.InvalidMessage_county_code(1)
+          ,Fields.InvalidMessage_filler(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -161,6 +168,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.post_date_CUSTOM_ErrorCount
           ,le.last_name_CUSTOM_ErrorCount
           ,le.county_code_CUSTOM_ErrorCount
+          ,le.filler_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -176,7 +184,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.event_date_CUSTOM_ErrorCount
           ,le.post_date_CUSTOM_ErrorCount
           ,le.last_name_CUSTOM_ErrorCount
-          ,le.county_code_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.county_code_CUSTOM_ErrorCount
+          ,le.filler_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -222,7 +231,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'event_date:' + getFieldTypeText(h.event_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'post_date:' + getFieldTypeText(h.post_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'last_name:' + getFieldTypeText(h.last_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'county_code:' + getFieldTypeText(h.county_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'county_code:' + getFieldTypeText(h.county_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'filler:' + getFieldTypeText(h.filler) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_process_date_cnt
           ,le.populated_dl_number_cnt
@@ -231,7 +241,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_event_date_cnt
           ,le.populated_post_date_cnt
           ,le.populated_last_name_cnt
-          ,le.populated_county_code_cnt,0);
+          ,le.populated_county_code_cnt
+          ,le.populated_filler_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_process_date_pcnt
           ,le.populated_dl_number_pcnt
@@ -240,10 +251,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_event_date_pcnt
           ,le.populated_post_date_pcnt
           ,le.populated_last_name_pcnt
-          ,le.populated_county_code_pcnt,0);
+          ,le.populated_county_code_pcnt
+          ,le.populated_filler_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,8,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,9,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -259,7 +271,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_In_tn_conv));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),8,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),9,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
