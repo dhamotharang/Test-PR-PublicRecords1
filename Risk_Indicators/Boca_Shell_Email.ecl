@@ -20,8 +20,10 @@ mdr.sourceTools.src_Impulse,
 mdr.sourceTools.src_Wired_Assets_Email,
 mdr.sourceTools.src_MediaOne, 
 mdr.sourceTools.src_SalesChannel,
-if(~isFCRA, mdr.sourceTools.src_Datagence, '')					// Datagence (source DG) was removed from FCRA key in May of 2018 so updating the allowed source list here to reflect that
-,mdr.sourcetools.src_InfutorNare
+if(~isFCRA, mdr.sourceTools.src_Datagence, ''),												// this source removed for FCRA April, 2018
+if(~isFCRA and bsversion >= 40, mdr.sourceTools.src_Anchor, ''),			// this source added for non FCRA April, 2018	(BS 40 and higher)
+if(~isFCRA and bsversion >= 40, mdr.sourceTools.src_RealSource, ''),	// this source added for non FCRA April, 2018 (BS 40 and higher)
+mdr.sourcetools.src_InfutorNare
 
 
 ];
@@ -31,8 +33,10 @@ mdr.sourceTools.src_Entiera,
 mdr.sourceTools.src_Wired_Assets_Email,
 mdr.sourceTools.src_MediaOne, 
 mdr.sourceTools.src_SalesChannel,
-if(~isFCRA, mdr.sourceTools.src_Datagence, '')		      // Datagence (source DG) was removed from FCRA key in May of 2018 so updating the allowed source list here to reflect that
-,mdr.sourcetools.src_InfutorNare
+if(~isFCRA, mdr.sourceTools.src_Datagence, ''),		// this source removed for FCRA April, 2018
+if(~isFCRA, mdr.sourceTools.src_Anchor, ''),			// this source added for non FCRA April, 2018	(BS 40 and higher)	
+if(~isFCRA, mdr.sourceTools.src_RealSource, ''),	// this source added for non FCRA April, 2018 (BS 40 and higher)
+mdr.sourcetools.src_InfutorNare
 
 
 
