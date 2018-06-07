@@ -3,7 +3,7 @@ IMPORT AutoStandardI, FFD, FCRA, iesp;
 EXPORT EquifaxEmsService := MACRO
 
 	rec_in := iesp.mergedcreditreport_fcra.t_FcraMergedCreditReportRequest;
-	ds_in := DATASET ([], rec_in) : STORED ('FCRAEquifaxEmsRequest', FEW);
+	ds_in := DATASET ([], rec_in) : STORED ('FcraMergedCreditReportRequest', FEW);
 	first_row := ds_in[1] : INDEPENDENT;
 	iesp.ECL2ESP.SetInputUser(first_row.user);
 
@@ -20,7 +20,6 @@ EXPORT EquifaxEmsService := MACRO
 	//separate the transform, keep header information from resposne
 	final_layout := iesp.mergedcreditreport_fcra.t_FcraMergedCreditReportResponse;
 	final_layout to_final(FCRAGateway_Services.Layouts.equifax_ems.records_out L) := TRANSFORM
-			SELF.uniqueID := (string)L.lexID;
 			SELF.errorInfo := L.response.emsResponse.errorInfo;
 			//Keep the response status, message, and exceptions but use the query transactionID and queryID
 			SELF._header := PROJECT(iesp.ECL2ESP.GetHeaderRow(), TRANSFORM(iesp.share.t_ResponseHeader,
@@ -35,6 +34,7 @@ EXPORT EquifaxEmsService := MACRO
 			SELF.mergedCreditReport := L.response.emsResponse.creditReports;
 			SELF.consumerStatements := L.consumerStatements;
 			SELF.consumerAlerts := L.consumerAlerts;
+			SELF.consumer := L.consumer;
 			SELF := L.response.emsResponse;
 			SELF := [];
 	END;
