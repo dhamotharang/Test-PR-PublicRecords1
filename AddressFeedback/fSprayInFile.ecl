@@ -1,5 +1,5 @@
-Import _control, tools;
-
+﻿Import _control, tools;
+//test GIT
 Export fSprayInFile(String FileName, String Date) := Function
 Groupname := tools.fun_Groupname('44');
 // Groupname := 'thor40_241';//Dataland
