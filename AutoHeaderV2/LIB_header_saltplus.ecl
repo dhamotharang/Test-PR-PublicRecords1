@@ -12,8 +12,9 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 
   // here we must make a choice whether to clean the input inside the library
   shared ds_search := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.SALT);  // input requires full cleaning
-		shared _row := ds_search[1];
-  shared _options := ds_search[1].options;
+		shared ds_search_legacy := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.LEGACY);  
+		shared _row := ds_search_legacy[1];
+  shared _options := ds_search_legacy[1].options;
   shared temp_ssn_value := _row.tssn.ssn;
 
   temp_fname_value := _row.tname.fname;
@@ -49,21 +50,21 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 	
   // Choose the search path
   fetched_dups1 := MAP (
-    SEARCH_RID                 => AutoHeaderV2.fetch_RID (ds_search),
+    SEARCH_RID                 => AutoHeaderV2.fetch_RID (ds_search_legacy),
 		
-    SEARCH_DID                 => AutoHeaderV2.fetch_DID (ds_search),
+    SEARCH_DID                 => AutoHeaderV2.fetch_DID (ds_search_legacy),
 
-    SEARCH_ADDRESS             => AutoHeaderV2.fetch_address (ds_search, search_code) ,
+    SEARCH_ADDRESS             => AutoHeaderV2.fetch_address (ds_search_legacy, search_code) ,
 		
 									// DOB (at least YOB) + lname, optional fname, state, zip
-    SEARCH_DOB_NAME  									=> AutoHeaderV2.fetch_DOBName (ds_search, search_code),
+    SEARCH_DOB_NAME  									=> AutoHeaderV2.fetch_DOBName (ds_search_legacy, search_code),
          // Just a Name
-    SEARCH_NAME               => AutoHeaderV2.fetch_name (ds_search, search_code),
+    SEARCH_NAME               => AutoHeaderV2.fetch_name (ds_search_legacy, search_code),
          // State+Name 
-    SEARCH_STATE_NAME     				=> AutoHeaderV2.fetch_StName (ds_search, search_code),
+    SEARCH_STATE_NAME     				=> AutoHeaderV2.fetch_StName (ds_search_legacy, search_code),
 
          // Otherwise, try the City/State/Name key
-     AutoHeaderV2.fetch_StCityName (ds_search, search_code)    
+     AutoHeaderV2.fetch_StCityName (ds_search_legacy, search_code)    
   );
 
 	saltPlus_results := AutoHeaderV2.fetch_salt(ds_search, SALT_SearchCode);												
