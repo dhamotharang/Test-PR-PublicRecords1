@@ -139,8 +139,8 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 														transform(right),
 														atmost(riskwise.max_atmost)); //Potentially we could have more than 1 consumer statement per DID, but currently we are only returning the most recent one
 	//Alerts
- pc_alert_ind := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_param.FCRAPurpose, in_param.FFDOptionsMask)[1];
- pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind.suppress_records);  // alerts coming from Person Context
+  pc_alert_ind := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_param.FCRAPurpose, in_param.FFDOptionsMask)[1];
+  pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind, in_param.FFDOptionsMask);  // alerts coming from Person Context
 	clam_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromClam(clam[1], in_param);  // alerts coming from indices
 	cs_alert := ConsumerProfile_Services.Functions.getAlertDataset(FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT);
 	boolean has_consumer_statement := exists(consumer_statement) or pc_alert_ind.has_consumer_statement or (pc_alert_ind.has_record_statement and ~pc_alert_ind.suppress_records);

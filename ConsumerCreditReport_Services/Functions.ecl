@@ -76,7 +76,7 @@ EXPORT Functions := MODULE
                 DATASET(FFD.Layouts.PersonContextBatch) pc_recs = DATASET([],FFD.Layouts.PersonContextBatch)) := FUNCTION
 
   pc_alert_flags:=FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask);
-  consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs);
+  consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, pc_alert_flags[1], in_mod.FFDOptionsMask);
 
 		Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(FFD.Layouts.PersonContextBatch L) := TRANSFORM	
 			SELF.UniqueId:=L.LexID;
@@ -119,8 +119,9 @@ EXPORT Functions := MODULE
 				R.suppress_records => ConsumerCreditReport_Services.Constants.CONSUMER_ALERT_CODE, //records to be suppressed due to consumer alert(s), but no _header.exception to be generated, consumer alerts and CS statements to be returned
 				L.did=0 => ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_CODE, 
 				L.error_code);
-			SELF.ConsumerStatements:=IF(R.suppress_records,L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), 
+			ds_consumer_statements:=IF(R.suppress_records,L.ConsumerStatements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), 
                                L.ConsumerStatements);
+      SELF.ConsumerStatements:= IF(R.has_consumer_statement OR R.has_record_statement,  ds_consumer_statements);                       
 			// filtering out consumer statement alert in case of suppression of results and no consumer level statements on file for subject
 			SELF.ConsumerAlerts:=IF(R.has_consumer_statement OR (R.has_record_statement AND ~R.suppress_records), L.ConsumerAlerts, L.ConsumerAlerts(Code<>FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT));
 			SELF:=L;

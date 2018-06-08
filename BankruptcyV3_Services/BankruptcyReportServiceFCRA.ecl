@@ -161,7 +161,8 @@ export BankruptcyReportServiceFCRA() :=  macro
   
   // get FFD compliance records
   temp_results_ffd  := BankruptcyV3_Services.fn_fcra_ffd(temp_rollup, slim_pc_recs, valFFDOptionsMask);
-  suppress_results_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, valFFDOptionsMask)[1].suppress_records;
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, valFFDOptionsMask)[1];
+  suppress_results_due_alerts := alert_indicators.suppress_records;
   
   // add back to report layout
   all_results := join(out_recs_final, temp_results_ffd,
@@ -179,7 +180,7 @@ export BankruptcyReportServiceFCRA() :=  macro
   consumer_statements := if( exists(final), all_statements,
                             all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
   
-  consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
+  consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, valFFDOptionsMask);
 
   matched_party_lexid := dsDIDs[1].did;
   search_lexId := if(matched_party_lexid > 0 and ~exists(dsDIDs(did <> matched_party_lexid)), matched_party_lexid, 0);

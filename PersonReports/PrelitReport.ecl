@@ -156,14 +156,15 @@ EXPORT PrelitReport (
     Self.LiensJudgments2    := IF (param.include_liensjudgments, p_liens_v2);
   END;
 
-  suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, param.FCRAPurpose, param.FFDOptionsMask)[1].suppress_records;
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, param.FCRAPurpose, param.FFDOptionsMask)[1];
+  suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
   // is supposed to produce one row only (usebestdid = true)
   individual_results := dataset ([Format ()]);
   individual := if(suppress_results_due_alerts, dataset ([], out_rec), individual_results);
 
   consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, param.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
   FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, consumer_alerts, 
                              out_rec);
   

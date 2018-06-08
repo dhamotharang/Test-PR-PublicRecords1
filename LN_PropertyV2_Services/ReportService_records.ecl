@@ -21,7 +21,8 @@ export ReportService_records (boolean isFCRA = false,
     ds_best := project(ds_dids, transform(doxie.layout_best, self.did := left.did, self:=[]));
     ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
-    suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
     fids := LN_PropertyV2_Services.ReportService_ids(input.did, input.bdid, input.parcelID, 
                                                      input.faresId,,,isFCRA);
@@ -35,7 +36,7 @@ export ReportService_records (boolean isFCRA = false,
     // Here we are interested only in the record statements or consumer level statements. 
     consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
         
-    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_params.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
 
     FFD.MAC.PrepareResultRecord(results, results_combined, consumer_statements, consumer_alerts, 
                                 LN_PropertyV2_Services.layouts.combined.widest);
