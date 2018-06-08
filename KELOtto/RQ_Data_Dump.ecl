@@ -1,0 +1,35 @@
+﻿//HPCC Systems KEL Compiler Version 0.11.0
+IMPORT KEL011 AS KEL;
+IMPORT B_Address,B_Address_S_S_N,B_Email,B_Person,B_Person_2,B_Person_Address,B_Person_Email,B_Person_Phone,B_Person_S_S_N,B_Phone,B_Social_Security_Number,E_Address,E_Address_S_S_N,E_Email,E_Person,E_Person_Address,E_Person_Email,E_Person_Phone,E_Person_S_S_N,E_Phone,E_Social_Security_Number FROM KELOtto;
+IMPORT * FROM KEL011.Null;
+EXPORT RQ_Data_Dump := MODULE
+  SHARED __EE627822 := B_Person.IDX_Person_UID_Wrapped;
+  SHARED __EE627824 := __EE627822;
+  EXPORT Res0 := __UNWRAP(__EE627824);
+  SHARED __EE627827 := B_Address.IDX_Address_UID_Wrapped;
+  SHARED __EE627829 := __EE627827;
+  EXPORT Res1 := __UNWRAP(__EE627829);
+  SHARED __EE627832 := B_Social_Security_Number.IDX_Social_Security_Number_UID_Wrapped;
+  SHARED __EE627834 := __EE627832;
+  EXPORT Res2 := __UNWRAP(__EE627834);
+  SHARED __EE627837 := B_Phone.IDX_Phone_UID_Wrapped;
+  SHARED __EE627839 := __EE627837;
+  EXPORT Res3 := __UNWRAP(__EE627839);
+  SHARED __EE627842 := B_Email.IDX_Email_UID_Wrapped;
+  SHARED __EE627844 := __EE627842;
+  EXPORT Res4 := __UNWRAP(__EE627844);
+  SHARED __EE627847 := B_Person_Address.IDX_Person_Address_Location__Wrapped;
+  SHARED __EE627849 := __EE627847;
+  EXPORT Res5 := __UNWRAP(__EE627849);
+  SHARED __EE627852 := B_Person_S_S_N.IDX_Person_S_S_N_Social__Wrapped;
+  SHARED __EE627854 := __EE627852;
+  EXPORT Res6 := __UNWRAP(__EE627854);
+  SHARED __EE627857 := B_Address_S_S_N.IDX_Address_S_S_N_Location__Wrapped;
+  SHARED __EE627859 := __EE627857;
+  EXPORT Res7 := __UNWRAP(__EE627859);
+  SHARED __EE627862 := B_Person_Phone.IDX_Person_Phone_Location__Wrapped;
+  SHARED __EE627864 := __EE627862;
+  EXPORT Res8 := __UNWRAP(__EE627864);
+  SHARED __EE627867 := B_Person_Email.IDX_Person_Email_Emailof__Wrapped;
+  EXPORT Res9 := __UNWRAP(__EE627867);
+END;

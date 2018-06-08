@@ -16,11 +16,11 @@ module
 		return in_ddp;
 	ENDMACRO;
 	
-	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::KnownFraud')) > 0 and PSkipKnownFraud = false, 
+	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.KnownFraud)) > 0 and PSkipKnownFraud = false, 
 													Files(pversion).Sprayed.KnownFraud, 
 													dataset([],{string75 fn { virtual(logicalfilename)},		FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										)    											
-									+ 	if	(nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
+									+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.nac)) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACKNFDUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)}, 	FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										);
