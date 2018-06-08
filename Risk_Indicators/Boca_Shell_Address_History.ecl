@@ -1,4 +1,4 @@
-import advo, riskwise, models, ut;
+﻿import advo, riskwise, models, ut;
 
 export Boca_Shell_Address_History(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, 
 																	boolean isFCRA,
@@ -31,7 +31,7 @@ with_advo_college_roxie  := join(iid, ADVOKey,
 										atmost(riskwise.max_atmost), keep(1));
 					
 
-with_advo_college_thor_pre := join(distribute(iid(h.zip != ''), hash64(h.zip, h.prim_range, h.prim_name)), 
+with_advo_college_thor_pre := join(distribute(iid(h.zip<>''), hash64(h.zip, h.prim_range, h.prim_name)), 
 										distribute(pull(ADVOKey), hash64(zip, prim_range, prim_name)),
 										(left.h.zip = right.zip) and
 										(left.h.prim_range = right.prim_range) and
@@ -45,7 +45,10 @@ with_advo_college_thor_pre := join(distribute(iid(h.zip != ''), hash64(h.zip, h.
 										atmost(riskwise.max_atmost), keep(1), 
 										local);
 
-with_advo_college_thor := with_advo_college_thor_pre + iid(h.zip='');
+with_advo_college_thor := with_advo_college_thor_pre + 
+                    project(iid(h.zip=''), TRANSFORM(risk_indicators.iid_constants.layout_outx,
+                              self.address_history_summary.address_history_advo_college_hit := (LEFT.chrono_addr_flags.deliveryStatus<>'' and LEFT.chrono_addr_flags.deliveryStatus='C');
+                              self := left));
 
 with_advo_college := IF(onThor, with_advo_college_thor, with_advo_college_roxie);				
 																										
