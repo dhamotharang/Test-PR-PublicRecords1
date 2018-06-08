@@ -813,7 +813,7 @@ MODULE
 //Email sources for Email_BatchService	
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email 	 ,src_AlloyMedia_consumer        ,src_InfutorNare,
-  src_MediaOne         ,src_Thrive_LT            ,src_Thrive_PD                  ,src_SalesChannel];	
+  src_MediaOne         ,src_Thrive_LT            ,src_Thrive_PD                  ,src_SalesChannel,  src_Anchor, src_RealSource, src_Acquiredweb];	
 	
 	//Email sources for MemberPoint.BatchService	
 	export set_digital_email_cookie_matching_Memberpt := [
