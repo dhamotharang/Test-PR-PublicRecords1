@@ -353,8 +353,7 @@ EXPORT Layouts := MODULE
 		unsigned4	seq := 0;
 		UNSIGNED6 DID;
 		string60 	offender_key;      // offenders key
-		unsigned4 historydate;
-		unsigned4 ToDaysDate;   
+		unsigned4 historydate; 
 		UNSIGNED4 DateToUse; 
 		UNSIGNED3 NumOfDaysAgo;  
     
@@ -425,7 +424,7 @@ EXPORT Layouts := MODULE
     
 
 
-
+  
 		string1   convictionFlag; 
 		string1   trafficFlag;
 		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
@@ -434,6 +433,10 @@ EXPORT Layouts := MODULE
 
 		string30  stc_desc_2;                  // offenses key  --- pulled but not used, except for verification
 		string35  court_off_lev_mapped;        // Court_Offenses key
+    
+    //temp
+    // string8   caseDate;
+    // string8   vendorUploadedDate;
 	 
 	END;
 	
@@ -531,7 +534,6 @@ EXPORT Layouts := MODULE
 		boolean     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
 		boolean     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
 		boolean     HighFelonNeighborhood;                  //populated in ???
-		boolean     HRBusPct;                               //populated in ???
 	END;  	
 	
  
@@ -584,8 +586,30 @@ EXPORT Layouts := MODULE
 		INTEGER  source_record_id;
     STRING  vl_id;     
 	END;
+  
+  EXPORT PropertyDataLayout := RECORD
+    Address;
+    STRING50 addressType;
+    STRING8   purchaseDate; 
+    INTEGER8  purchasePrice;
+    INTEGER2  lengthOfOwnership;
+    STRING4 assessedYear;
+    INTEGER8 assessedValue;
+  END;
+  
+  EXPORT BusPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    STRING120 ownerName;
+  END;
+  
+  EXPORT PerPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    STRING1 ownerOccupied;
+    DATASET(Name) propertyOwners;
+  END;
 	
-	EXPORT BusReportDetails        := RECORD
+	EXPORT BusReportDetails := RECORD
+    DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
     STRING  FEIN_Masked_For_Report;
@@ -597,14 +621,23 @@ EXPORT Layouts := MODULE
     UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
     UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
     STRING2 CompanyIncorpState;
-    DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
-    DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
     BusinessLegalSummary;
     DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
     STRING parentCompanyName;
 	END;
+  
+  EXPORT IndReportDetails := RECORD
+    STRING9 bestSSN;
+    STRING10 bestPhone;
+    UNSIGNED4 bestDOB;
+    Name bestName;
+		Address bestAddress;
+    //DATASET(PerPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+  END;
 	
 	EXPORT Positions := RECORD
 		UNSIGNED4 firstSeen;
@@ -668,17 +701,19 @@ EXPORT Layouts := MODULE
 		UNSIGNED4		historyDateRaw;										//cleaned date used to calc history date
 		BOOLEAN 			inputAddressProvided;
 		BOOLEAN				fullInputAddressProvided;
+    Indv_Input indvRawInput;
+		Indv_Input	indvCleanInput;
+    GeographicRiskLayout; 
 		UNSIGNED6		inquiredDID;
 		RelatedParty 		individual;																								//populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
 		UNSIGNED4 	numberOfSpouses;																							
-		SlimIndividual spouse;																												//populated in DueDiligence.getIndRelatives
+		DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
 		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			//populated in DueDiligence.getIndRelatives
-		Indv_Input indvRawInput;
-		Indv_Input	indvCleanInput;
 		STRING2				indvType;                         					    //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
 		
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
+    IndReportDetails;                               //Used to hold report data when we have access instead of multiple key calls
 		PerAttributes;
     iesp.duediligencepersonreport.t_DDRPersonReport personReport;
 	END;

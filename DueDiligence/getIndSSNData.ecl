@@ -14,7 +14,7 @@ EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		exactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
 		runSSNCodes := TRUE;
 		
-		parents := DueDiligence.CommonIndividual.getParents(inData);																																																		
+		parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																		
 		allInd := parents + inData;
 
 		ssnFlagsPrepSeq := PROJECT(allInd, TRANSFORM(risk_indicators.Layout_output,
