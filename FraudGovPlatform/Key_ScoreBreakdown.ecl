@@ -15,5 +15,5 @@ d	:=dataset([],r);
 
 EXPORT Key_ScoreBreakdown	:= Index(d,{customer_id_,industry_type_,entity_context_uid_},{d},
 																									 data_services.Data_location.Prefix('FraudGov') + 'thor_data400::key::fraudgov::' 
-																									 + doxie.Version_SuperKey +'::kel::scorebreakdown');
+																									 + doxie.Version_SuperKey +'::kel::scorebreakdown');																									
 
