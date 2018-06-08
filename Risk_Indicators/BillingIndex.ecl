@@ -117,6 +117,7 @@ export BillingIndex := MODULE
 		export RVT1605_2			:= '203'; // Verizon - Wireless 
 		export RVC1703_1			:= '204'; // Rossman & Co //batch only
 		export RVC1801_1			:= '205'; // TSI //batch only
+		export RVT1705_1      := '206'; // Huntington	
 		
 	
 		// Chargeback Defender Version 1
