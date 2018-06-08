@@ -1,174 +1,174 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
+﻿IMPORT BIPv2, DueDiligence, iesp;
 
-EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnPropertyForAttributeLogic, 
-											   DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) BusPropertyOwnedWithDetails,
-											   boolean DebugMode = FALSE
-											   ) := FUNCTION
+EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) inData) := FUNCTION
 
-  // ------                                                                                     ------
-  // ------ Limit the number properties according the max for the report                        ------  
-  // ------                                                                                     ------ 
-  PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxProperties));  
- 
-  // ------                                                                                     ------
-  // ------ add a sequence number to uniquely identify each property                            ------  
-  // ------                                                                                     ------ 
-  PropertyCurrentlyOwnedSequenced    := PROJECT(PropertyCurrentlyOwnedButLimited , TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout, 
-                                                                                         SELF.propertySeq := COUNTER, 
-																																												                                             SELF := left));	
 
-  // ------                                                                                     ------
-	// ------ Convert the PropertyCurrentlyOwnedButLimited into the layout                        ------  
-	// ------    expected by the Common.getGeographicRisk                                         ------
-	// ------                                                                                     ------
-  ListOfPropertyAddresses  :=  PROJECT(PropertyCurrentlyOwnedSequenced,  
-			TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
-			 /* populate the Geographic internal record with address data from the List of Operating Locations  */ 
-						  SELF.seq             := LEFT.PropertyReportData.seq;
-							 SELF.ultID           := LEFT.PropertyReportData.ultID;
-							 SELF.orgID           := LEFT.PropertyReportData.orgID;
-							 SELF.seleID          := LEFT.PropertyReportData.seleID;
-							 SELF.proxID          := LEFT.PropertyReportData.proxID;
-							 SELF.powID           := LEFT.PropertyReportData.powID;
-							 SELF.GeoSequence     := LEFT.propertySeq;
-							 /*  County Risk  */
-							 SELF.county          := LEFT.county[3..5];  //***the county on the property slim is the 5 digit county
-							 /*  City Risk    */
-							 SELF.state           := LEFT.st;
-               SELF                 := LEFT;
-               SELF                 := []));  //***all other fields can be empty
-						   
-	 
-	
-	// ------                                                                                   ------
-  // ------ Determine the Geographic Risk for the Inquired Business                           ------
-	// ------     The results are in DueDiligence.layoutsInternal.GeographicLayout              ------
-	// ------                                                                                   ------
-	AddressPropertyOwnedRisk   := DueDiligence.Common.getGeographicRisk(ListOfPropertyAddresses);  
-	
-	// ------                                                                                    ------	
-	// ----- Add the Geographic Risk to Property Slim Record                                     ------
-	// ------                                                                                    ------
-	SlimBusnOwnedProperty := JOIN(PropertyCurrentlyOwnedSequenced, AddressPropertyOwnedRisk,
-												LEFT.PropertyReportData.seq          = RIGHT.seq AND
-												LEFT.PropertyReportData.UltID        = RIGHT.ultID AND
-												LEFT.PropertyReportData.OrgID        = RIGHT.orgID AND
-												LEFT.PropertyReportData.SeleID       = RIGHT.seleID AND
-												LEFT.propertySeq                     = RIGHT.GeoSequence,
-												TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout, 
-												     /*  populate the geographic risk from the RIGHT  */
-																	SELF.buildgeolink                 := RIGHT.buildgeolink,
-																	SELF.EasiTotCrime                 := RIGHT.EasiTotCrime,
-																	SELF.CityState                    := RIGHT.CityState,
-																	SELF.AddressVacancyInd            := RIGHT.AddressVacancyInd,
-																	SELF.CountyHasHighCrimeIndex      := RIGHT.CountyHasHighCrimeIndex,
-																	SELF.CountyBordersForgeinJur      := RIGHT.CountyBordersForgeinJur,
-																	SELF.CountyBorderOceanForgJur     := RIGHT.CountyBorderOceanForgJur,
-																	SELF.CityBorderStation            := RIGHT.CityBorderStation,
-																	SELF.CityFerryCrossing            := RIGHT.CityFerryCrossing,
-																	SELF.CityRailStation              := RIGHT.CityRailStation,
-																	SELF.HIDTA                        := RIGHT.HIDTA,
-																	SELF.HIFCA                        := RIGHT.HIFCA,
-																	SELF.HighFelonNeighborhood        := RIGHT.HighFelonNeighborhood,
-																	SELF.HRBusPct                     := RIGHT.HRBusPct,
-                                  SELF.CountyName                   := RIGHT.CountyName,
-																	/*  pass everything else from the LEFT    */  
-																	SELF := LEFT),
-																	LEFT OUTER);
-												
-	//group slimmed dataset by seq and linkIDs so counter can count per grouping
-	groupSlimBusnOwnedProperty := GROUP(SlimBusnOwnedProperty, PropertyReportData.seq, PropertyReportData.UltID, PropertyReportData.OrgID, PropertyReportData.SeleID );
-	
-	// ------                                                                                    ------
-  // ------ define the ChildDataset of Property                                                ------
-	// ------                                                                                    ------
-	PropertyChildDatasetLayout    := RECORD
-	  unsigned2 seq;                                                        //*  This is the seqence number of the parent  
-	  DATASET(iesp.duediligencebusinessreport.t_DDRBusinessProperty) PropChild;
-	END;
-	 
-  // ------                                                                                    ------
-  // ------ format the Slim Property into the ChildDataset layout of Property                  ------
-	// ------                                                                                    ------	 
-	iesp.duediligencebusinessreport.t_DDRBusinessProperty    FormatTheListOfProperty(RECORDOF(groupSlimBusnOwnedProperty) le, Integer PropertySeq) := TRANSFORM 
- 	                       SELF.OwnerOccupied                 := MAP(
-                                                                    le.OwnerOccupied = 'Y'   => 'Y',
-                                                                    le.OwnerOccupied = 'N'   => 'N',
-                                                                                                'U'); 
-                         SELF.BusinessAddressType                := le.BusinessType; 
-                         SELF.Ownership.PurchasePrice      := le.PurchasePrice;
-                                                                    /* position 1 through 4 = yyyy */
-                         SELF.Ownership.PurchaseDate.Year  := (unsigned4)le.SaleDate[1..4];
-                                                                    /* position 5 through 6 = MM */  
-                         SELF.Ownership.PurchaseDate.Month := (unsigned2)le.SaleDate[5..6];
-                                                                    /* position 6 through 8 = DD  */  
-                         SELF.Ownership.PurchaseDate.Day   := (unsigned2)le.SaleDate[7..8];
-                         SELF.Ownership.LengthofOwnership  := le.lengthOfOwnership;
-                         SELF.Assessment.TaxPrice        := le.TaxAssdValue;          //* check this field?  
-                         SELF.Assessment.TaxYear.Year    := (integer)le.TaxYear;
-                         SELF.Address.StreetNumber          := le.prim_range;
-                         SELF.Address.StreetPreDirection    := le.predir; 
-                         SELF.Address.StreetName            := le.prim_name;
-                         SELF.Address.StreetSuffix          := le.suffix;
-                         SELF.Address.StreetPostDirection   := le.postdir;
-                         SELF.Address.UnitDesignation       := le.unit_desig;
-                         SELF.Address.UnitNumber            := le.sec_range;
-                         SELF.Address.City                  := le.p_city_name;
-                         SELF.Address.State                 := le.st;
-                         SELF.Address.Zip5                  := le.zip; 
-                         SELF.Address.Zip4                  := le.zip4;
-                         SELF.Address.County                := le.countyName; 
-                         SELF.OwnerName.Full                := le.assesseeName;
-                         /*  County Risk  */  
-                         SELF.CountyCityRisk.CountyName         := le.countyName;
-                         SELF.CountyCityRisk.BordersForeignJurisdiction                :=  le.CountyBordersForgeinJur;
-                         SELF.CountyCityRisk.BordersOceanWithin150ForeignJurisdiction  :=  le.CountyBorderOceanForgJur;
-                         /*  City Risk    */  
-                         SELF.CountyCityRisk.AccessThroughBorderStation                :=  le.CityBorderStation; 
-                         SELF.CountyCityRisk.AccessThroughRailCrossing                  :=  le.CityRailStation;
-                         SELF.CountyCityRisk.AccessThroughFerryCrossing                 :=  le.CityFerryCrossing;
-                         /*  Area Risk    */
-                         SELF.AreaRisk.Hifca                                        :=  le.HIFCA;
-                         SELF.AreaRisk.Hidta                                        :=  le.HIDTA; 
-                         SELF.AreaRisk.CrimeIndex                                   :=  IF(le.CountyHasHighCrimeIndex, 'HIGH', 'LOW'); 
-                         /*  The rest of the fields in the report will be blank for now  */  
-                         SELF                                                           :=  [];
-	END;  
-	 
-	  
-	PropertyChildDataset  :=   
-		PROJECT(groupSlimBusnOwnedProperty,
-			TRANSFORM(PropertyChildDatasetLayout,
-				SELF.seq             := LEFT.PropertyReportData.seq,
-				SELF.PropChild       := PROJECT(LEFT, FormatTheListOfProperty(LEFT, COUNTER)))); 
-				       
-				                                         
-	
-	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
-	 DueDiligence.Layouts.Busn_Internal CreateNestedData(UpdateBusnPropertyForAttributeLogic le, PropertyChildDataset ri, Integer PropCount) := TRANSFORM
-												     SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.PropertyCurrentCount  := le.CurrPropOwnedCount,
-																	SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.TaxAssessedValue      := le.PropTaxValue,
-																	SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.Properties := le.BusinessReport.BusinessAttributeDetails.Economic.Property.Properties + ri.PropChild;
-																	SELF := le;
-																	END; 
-																	
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-	 UpdateBusnPropertyWithReport := DENORMALIZE(UpdateBusnPropertyForAttributeLogic, PropertyChildDataset,
-	                                             LEFT.seq = RIGHT.seq, 
-												                       CreateNestedData(Left, Right, Counter));  
+  //pull property data from the inquired
+  listOfProperties := NORMALIZE(inData, LEFT.properties, TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,																												
+                                                                    SELF.seq := LEFT.seq; 
+                                                                    SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                                    SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                                                    SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                    
+                                                                    SELF.prim_range := RIGHT.prim_range;
+                                                                    SELF.predir := RIGHT.predir;
+                                                                    SELF.prim_name := RIGHT.prim_name;
+                                                                    SELF.suffix := RIGHT.addr_suffix;
+                                                                    SELF.postdir := RIGHT.postdir;
+                                                                    SELF.unit_desig := RIGHT.unit_desig;
+                                                                    SELF.sec_range := RIGHT.sec_range;
+                                                                    SELF.p_city_name := RIGHT.city;
+                                                                    SELF.st := RIGHT.state;
+                                                                    SELF.zip := RIGHT.zip5;
+                                                                    SELF.zip4 := RIGHT.zip4;
+                                                                    SELF.county := RIGHT.county;
+                                                                    SELF.geo_blk := RIGHT.geo_blk;
+                                                                    SELF.addressType := RIGHT.addressType;
+                                                                    SELF.purchaseDate := RIGHT.purchaseDate;
+                                                                    SELF.purchasePrice := RIGHT.purchasePrice;
+                                                                    SELF.lengthOfOwnership := RIGHT.lengthOfOwnership;
+                                                                    SELF.assessedYear := RIGHT.assessedYear;
+                                                                    SELF.assessedTotalValue := RIGHT.assessedValue;
+                                                                    SELF.ownerName := RIGHT.ownerName;
+                                                                    
+                                                                    SELF := [];)); 
+  
+
+    //limit the number of properties according to the max for the report
+    limitedProperties := DEDUP(SORT(listOfProperties, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -assessedYear), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), KEEP(iesp.constants.DDRAttributesConst.MaxProperties));
+   
+    
+    //transform data to calc the geographic risk per address
+    geoPropertyAddress := PROJECT(limitedProperties, TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
+                                                               SELF.seq := LEFT.seq;
+                                                               SELF.ultID := LEFT.ultID;
+                                                               SELF.orgID := LEFT.orgID;
+                                                               SELF.seleID := LEFT.seleID;
+                                                               SELF.prim_range := LEFT.prim_range;
+                                                               SELF.predir := LEFT.predir;
+                                                               SELF.prim_name := LEFT.prim_name;
+                                                               SELF.addr_suffix := LEFT.suffix;
+                                                               SELF.postdir := LEFT.postdir;
+                                                               SELF.unit_desig := LEFT.unit_desig;
+                                                               SELF.sec_range := LEFT.sec_range;
+                                                               SELF.city := LEFT.p_city_name;
+                                                               SELF.state := LEFT.st;
+                                                               SELF.zip5 := LEFT.zip;
+                                                               SELF.zip4 := LEFT.zip4;
+                                                               SELF.county := LEFT.county;
+                                                               SELF.geo_blk := LEFT.geo_blk;
+                                                               SELF := LEFT;
+                                                               SELF := [];));
+   
+   propertyOwnedRisk := DueDiligence.Common.getGeographicRisk(geoPropertyAddress);
+   
+   
+   //add the risk back to the property details
+   ownedPropertyDetails := JOIN(limitedProperties, propertyOwnedRisk,
+                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                                LEFT.prim_range = RIGHT.prim_range AND
+                                LEFT.prim_name[1..8] = RIGHT.prim_name[1..8] AND
+                                LEFT.zip = RIGHT.zip5,
+                                TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,
+                                          SELF.buildgeolink := RIGHT.buildgeolink;
+                                          SELF.EasiTotCrime := RIGHT.EasiTotCrime;
+                                          SELF.CityState := RIGHT.CityState;
+                                          SELF.FipsCode := RIGHT.FipsCode;  
+                                          SELF.CountyName := RIGHT.CountyName;                     
+                                          SELF.CountyHasHighCrimeIndex := RIGHT.CountyHasHighCrimeIndex;   
+                                          SELF.CountyBordersForgeinJur := RIGHT.CountyBordersForgeinJur;   
+                                          SELF.CountyBorderOceanForgJur := RIGHT.CountyBorderOceanForgJur;  
+                                          SELF.CityBorderStation := RIGHT.CityBorderStation;  
+                                          SELF.CityFerryCrossing := RIGHT.CityFerryCrossing;  
+                                          SELF.CityRailStation := RIGHT.CityRailStation; 
+                                          SELF.HIDTA := RIGHT.HIDTA;  
+                                          SELF.HIFCA := RIGHT.HIFCA;                                  
+                                          SELF.HighFelonNeighborhood := RIGHT.HighFelonNeighborhood;     
+                                          SELF := LEFT;),
+                                LEFT OUTER,
+                                ATMOST(1));
+                                
+                                
+                                
+    //transform data to the report layout
+    propertyReport := PROJECT(ownedPropertyDetails, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(iesp.duediligencebusinessreport.t_DDRBusinessProperty) busProperties},
+                                                              SELF.seq := LEFT.seq;
+                                                              SELF.ultID := LEFT.ultID;
+                                                              SELF.orgID := LEFT.orgID;
+                                                              SELF.seleID := LEFT.seleID;
+                                                              
+                                                              SELF.busProperties := DATASET([TRANSFORM(iesp.duediligencebusinessreport.t_DDRBusinessProperty,
+                                                                                                        SELF.OwnerOccupied:= IF(LEFT.ownerOccupied NOT IN [DueDiligence.Constants.YES, DueDiligence.Constants.NO], 'U', LEFT.ownerOccupied);
+                                                                                                        SELF.AddressType := LEFT.addressType; 
+                                                                                                        
+                                                                                                        SELF.Ownership.PurchasePrice := LEFT.PurchasePrice;       
+                                                                                                        SELF.Ownership.PurchaseDate := iesp.ECL2ESP.toDatestring8(LEFT.purchaseDate);
+                                                                                                        SELF.Ownership.LengthofOwnership := LEFT.lengthOfOwnership;
+                                                                                                        
+                                                                                                        SELF.Assessment.TaxPrice := LEFT.assessedTotalValue;  
+                                                                                                        SELF.Assessment.TaxYear.Year := (INTEGER)LEFT.assessedYear;
+                                                                                                        
+                                                                                                        SELF.Address.StreetNumber := LEFT.prim_range;
+                                                                                                        SELF.Address.StreetPreDirection := LEFT.predir; 
+                                                                                                        SELF.Address.StreetName := LEFT.prim_name;
+                                                                                                        SELF.Address.StreetSuffix := LEFT.suffix;
+                                                                                                        SELF.Address.StreetPostDirection := LEFT.postdir;
+                                                                                                        SELF.Address.UnitDesignation := LEFT.unit_desig;
+                                                                                                        SELF.Address.UnitNumber := LEFT.sec_range;
+                                                                                                        SELF.Address.City := LEFT.p_city_name;
+                                                                                                        SELF.Address.State := LEFT.st;
+                                                                                                        SELF.Address.Zip5 := LEFT.zip; 
+                                                                                                        SELF.Address.Zip4 := LEFT.zip4;
+                                                                                                        SELF.Address.County := LEFT.countyName; 
+                                                                                                        
+                                                                                                        SELF.OwnerName.Full := LEFT.ownerName;
+                                                                                                        
+                                                                                                        SELF.CountyCityRisk.CountyName := LEFT.countyName;
+                                                                                                        SELF.CountyCityRisk.BordersForeignJurisdiction := LEFT.CountyBordersForgeinJur;
+                                                                                                        SELF.CountyCityRisk.BordersOceanWithin150ForeignJurisdiction := LEFT.CountyBorderOceanForgJur; 
+                                                                                                        SELF.CountyCityRisk.AccessThroughBorderStation := LEFT.CityBorderStation; 
+                                                                                                        SELF.CountyCityRisk.AccessThroughRailCrossing := LEFT.CityRailStation;
+                                                                                                        SELF.CountyCityRisk.AccessThroughFerryCrossing := LEFT.CityFerryCrossing;
+                                                                                                        
+                                                                                                        SELF.AreaRisk.Hifca := LEFT.HIFCA;
+                                                                                                        SELF.AreaRisk.Hidta := LEFT.HIDTA; 
+                                                                                                        SELF.AreaRisk.CrimeIndex := IF(LEFT.CountyHasHighCrimeIndex, 'HIGH', 'LOW'); 
+                                                                                                        
+                                                                                                        SELF := [];)]);
+                                                                
+                                                              SELF :=  [];));
+    
+    
+    rollProperties := ROLLUP(SORT(propertyReport, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.busProperties := LEFT.busProperties + RIGHT.busProperties;
+                                        SELF := LEFT;));
+    
+    
+    
+    //add formatted report data to the report
+    addPropertyToReport := JOIN(inData, rollProperties,
+                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                TRANSFORM(DueDiligence.layouts.Busn_Internal,
+                                          SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.PropertyCurrentCount := LEFT.CurrPropOwnedCount;
+                                          SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.TaxAssessedValue := LEFT.PropTaxValue;
+                                          SELF.BusinessReport.BusinessAttributeDetails.Economic.Property.Properties := RIGHT.busProperties;
+                                          SELF := LEFT;),
+                                LEFT OUTER,
+                                ATMOST(1));
+    
+    
+    
+    // OUTPUT(listOfProperties, NAMED('listOfProperties'));
+    // OUTPUT(limitedProperties, NAMED('limitedProperties'));
+    // OUTPUT(geoPropertyAddress, NAMED('geoPropertyAddress'));
+    // OUTPUT(propertyOwnedRisk, NAMED('propertyOwnedRisk'));
+    // OUTPUT(ownedPropertyDetails, NAMED('ownedPropertyDetails'));
+    // OUTPUT(propertyReport, NAMED('propertyReport'));
+    // OUTPUT(rollProperties, NAMED('rollProperties'));
+    // OUTPUT(addPropertyToReport, NAMED('addPropertyToReport'));
 		
-	
-    // ********************
-    //   DEBUGGING OUTPUTS
-    // *********************
-	  IF(DebugMode,     OUTPUT(COUNT  (PropertyCurrentlyOwnedButLimited),         NAMED('HowManyPropertyCurrentlyOwnedButLimited')));
-	  IF(DebugMode,     OUTPUT(CHOOSEN(AddressPropertyOwnedRisk, 30),            NAMED('AddressPropertyOwnedRisk')));
-	  IF(DebugMode,     OUTPUT(CHOOSEN(ListOfPropertyAddresses, 30),             NAMED('ListOfPropertyAddresses')));
-	  IF(DebugMode,     OUTPUT(CHOOSEN(PropertyChildDataset, 30),                NAMED('PropertyChildDataset')));
-	 
+		RETURN addPropertyToReport;
 		
-		Return UpdateBusnPropertyWithReport;
-		
-	END;   
-	
-	
+END;   

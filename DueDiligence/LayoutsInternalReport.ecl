@@ -40,6 +40,12 @@ EXPORT LayoutsInternalReport := MODULE
 		VinTitleAndRegistration;
 		UNSIGNED2 watercraftCount;
   END;
+  
+  EXPORT SharedPropertyLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    DueDiligence.LayoutsInternal.PropertySlimLayout;
+    DueDiligence.Layouts.GeographicRiskLayout;
+  END;
 
 	
 	

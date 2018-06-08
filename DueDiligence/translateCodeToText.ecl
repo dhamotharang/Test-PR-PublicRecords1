@@ -20,16 +20,16 @@ EXPORT LegalStateFederalText(STRING1 code) := CASE(code,
                                                     DEFAULT_EMPTY);
                                                     
 EXPORT OffenseScoreText(STRING1 code) := CASE(code,
-                                                DueDiligence.Constants.FELONY => 'FELONY',
-                                                DueDiligence.Constants.MISDEMEANOR => 'MISDEMEANOR',
-                                                DueDiligence.Constants.INFRACTION => 'INFRACTION',
-                                                DueDiligence.Constants.TRAFFIC => 'TRAFFIC',
+                                                DueDiligence.Constants.FELONY => 'Felony',
+                                                DueDiligence.Constants.MISDEMEANOR => 'Misdemeanor',
+                                                DueDiligence.Constants.INFRACTION => 'Infraction',
+                                                DueDiligence.Constants.TRAFFIC => 'Traffic',
                                                 DEFAULT_UNKNOWN);
                                                 
 EXPORT OffenseLevelText(STRING1 code) := CASE(code,
-                                                DueDiligence.Constants.NONTRAFFIC_CONVICTED => 'NONTRAFFIC CONVICTED',
-                                                DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED => 'NONTRAFFIC NOT CONVICTED',
-                                                DueDiligence.Constants.TRAFFIC_CONVICTED => 'TRAFFIC CONVICTED',
-                                                DueDiligence.Constants.TRAFFIC_NOT_CONVICTED => 'TRAFFIC NOT CONVICTED',
+                                                DueDiligence.Constants.NONTRAFFIC_CONVICTED => 'Nontraffic Convicted',
+                                                DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED => 'Nontraffic Not Convicted',
+                                                DueDiligence.Constants.TRAFFIC_CONVICTED => 'Traffic Convicted',
+                                                DueDiligence.Constants.TRAFFIC_NOT_CONVICTED => 'Traffic Not Convicted',
                                                 DEFAULT_UNKNOWN);
 END;;
