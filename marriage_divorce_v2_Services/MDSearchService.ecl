@@ -66,7 +66,7 @@
 import text_search, doxie;  
 export MDSearchService() := macro
 
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
  
 	// Generate the full report
 	pre_raw := marriage_divorce_v2_Services.MDSearchService_Records();

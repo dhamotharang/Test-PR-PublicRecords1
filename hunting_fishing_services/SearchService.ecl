@@ -52,7 +52,7 @@ import iesp, AutoStandardI;
 export SearchService := macro
 
 
-    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		
     // Get XML input 
     rec_in := iesp.huntingfishing.t_HuntFishSearchRequest;

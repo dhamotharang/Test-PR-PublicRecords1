@@ -77,7 +77,7 @@ import iesp, AutoStandardI, American_Student_Services;
 
 export SearchService := MACRO
 
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
   WSInput.MAC_American_Student_SearchService();
 	

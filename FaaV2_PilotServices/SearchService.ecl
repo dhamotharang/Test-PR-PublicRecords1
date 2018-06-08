@@ -56,7 +56,7 @@
 export SearchService := macro
 import FaaV2_PilotServices, iesp, AutoStandardI;
 
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     
 		rec_in := iesp.faapilot.t_PilotSearchRequest;
 		// "FEW" keyword set to make data read more efficient
