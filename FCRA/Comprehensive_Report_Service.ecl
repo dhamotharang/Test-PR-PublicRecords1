@@ -47,7 +47,8 @@ in_pc := dataset([{FFD.Constants.SingleSearchAcctno, (unsigned)did_fcra}], FFD.L
 pc_recs := FFD.FetchPersonContext(in_pc, gateways,, inFFDMask);
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
-suppress_results_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1].suppress_records;
+alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1];
+suppress_results_due_alerts := alert_indicators.suppress_records;
 
 // create pseudo-best record only to get flag records; more realistic best is calculated later
 ds_flags := FFD.GetFlagFile (PROJECT (dids, TRANSFORM (doxie.layout_best, SELF.did := LEFT.did, SELF := [])),
@@ -104,7 +105,7 @@ all_records := if(suppress_results_due_alerts, dataset([], doxie_crs.layout_repo
 
 consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
-consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
+consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, inFFDMask);
 
 input_consumer := FFD.MAC.PrepareConsumerRecord(did_fcra, false);
 
