@@ -376,7 +376,7 @@
 			SELF.dt_last_seen					:= (STRING)MAX((INTEGER)l.dt_last_seen,(INTEGER)r.dt_last_seen);
 			SELF.listing_type_bus			:= IF(l.listing_type_bus='',r.listing_type_bus,l.listing_type_bus);
 			SELF.coc_description			:= IF(l.coc_description='',r.coc_description,l.coc_description);
-			SELF.realtimephone_ext.statuscode	:= IF(l.realtimephone_ext.statuscode='',r.realtimephone_ext.statuscode,l.realtimephone_ext.statuscode);
+			SELF.phonestatus	:= IF(l.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,r.phonestatus,l.phonestatus);
 			// preserve address type since recs with zero DIDs are blank
 			SELF.primary_address_type := IF(l.primary_address_type='',r.primary_address_type,l.primary_address_type); 
 			SELF.typeflag							:= IF(r.typeflag = 'P',l.typeflag,r.typeflag);										
@@ -490,7 +490,7 @@
 		OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
 		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
 	#END;
-	
+		
 	RETURN SORT(MetadataResults,acctno,seq);	
 		
 	END;	

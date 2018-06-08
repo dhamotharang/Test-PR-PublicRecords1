@@ -119,14 +119,18 @@ FUNCTION
 																																																																																				
 	dPhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
 																																					LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
+																			                TRANSFORM(lFinal,
+																			                SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
 																																																																						
  //use inhouse metada (metadata index, att libd, carrier reference index)
 	dPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dPhoneDetailWBatchIn, dQSentRecs);
 
 	// Combine all the sources
 	dPhonesCombined := dReformat2Common + dPhoneDetail;
+	
+	dPhoneRecs := PROJECT(dPhonesCombined, TRANSFORM(lFinal,
+																					                       SELF.phonestatus :=  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
+																																             SELF := LEFT));
 		
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
@@ -150,5 +154,5 @@ FUNCTION
 		#END
 	#END
 	
-	RETURN dPhonesCombined;
+	RETURN dPhoneRecs;
 END;

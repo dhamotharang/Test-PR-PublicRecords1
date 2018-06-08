@@ -147,7 +147,7 @@ FUNCTION
 																																											
 	dInhousePhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
 																																					LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
+																			 TRANSFORM(lFinal,
 																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
 
  dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn, dWFQSentPrimaryPhoneDetail);	
@@ -160,6 +160,10 @@ FUNCTION
 	
 			
   dWaterfallCombined := IF(~isPhoneExists and vHitQSent,dWaterfallOtherPhones + dWFQSentRecs,dWaterfallPrimaryPhone + dWaterfallOtherPhones);
+	 
+	 	dDidRecs := PROJECT(dWaterfallCombined, TRANSFORM(lFinal,
+																					                       SELF.phonestatus :=  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
+																																             SELF := LEFT));
 	
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.Waterfall)
@@ -194,5 +198,5 @@ FUNCTION
 		IF(isPhoneExists,wfWithPhone,wfWithNoPhone);
 	#END
 	
-	RETURN dWaterfallCombined;
+	RETURN dDidRecs;
 END;
