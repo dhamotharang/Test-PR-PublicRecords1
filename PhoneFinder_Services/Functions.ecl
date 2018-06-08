@@ -480,7 +480,8 @@ MODULE
 			SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' or le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1),
 			                                   le.CallForwardingIndicator , 
 			                                   ri.CallForwardingIndicator);
-			SELF                 		:= le;
+			SELF.PhoneStatus	            := IF(le.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,ri.phonestatus,le.phonestatus);
+			SELF                 		       := le;
 		END;		
 		dPhoneRollup := ROLLUP(dPhoneSort,
 														LEFT.acctno = RIGHT.acctno and
@@ -502,6 +503,7 @@ MODULE
 				SELF.PortingStatus		   := IF(ri.phone != '',ri.PortingStatus,le.PortingStatus);
 				SELF.FirstPortedDate	  := IF(ri.phone != '',ri.FirstPortedDate,le.FirstPortedDate);
 				SELF.LastPortedDate		  := IF(ri.phone != '',ri.LastPortedDate,le.LastPortedDate);
+				SELF.Phonestatus		  := IF(ri.phone != '',ri.Phonestatus,le.Phonestatus);
 				SELF.ActivationDate		  := IF(ri.phone != '',ri.ActivationDate,le.ActivationDate);
 				SELF.DisconnectDate		  := IF(ri.phone != '',ri.DisconnectDate,le.DisconnectDate);
 				SELF.Prepaid		 			     := IF(ri.phone != '',ri.Prepaid,le.Prepaid);
@@ -565,8 +567,7 @@ MODULE
 			SELF.PortingCount                     := pInput.PortingCount;
 			SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(pInput.FirstPortedDate);
 			SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(pInput.LastPortedDate);	
-			Phone_Status                          := IF(inMod.UseInHousePhoneMetadata, pInput.PhoneStatus, 
-			                                         PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode)); // flag to use inhouse phone metatdata instead of Qsent PVS
+			Phone_Status                          :=  pInput.PhoneStatus;
 			SELF.ActivationDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active,
 			                                         iesp.ECL2ESP.toDate(pInput.ActivationDate));			
 			SELF.DisconnectDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE,
@@ -662,7 +663,7 @@ MODULE
       OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
 			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
 		 #END
-		 
+
 		RETURN dPhoneIesp_Final;
 	ENDMACRO;
 	
@@ -699,6 +700,7 @@ MODULE
 			SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' or le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1),
 			                                   le.CallForwardingIndicator , 
 			                                   ri.CallForwardingIndicator);
+			SELF.PhoneStatus	            := IF(le.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,ri.phonestatus,le.phonestatus);
 			SELF                 := le;
 		END;
 		
@@ -720,8 +722,7 @@ MODULE
 			SELF.LastPortedDate	                  := iesp.ECL2ESP.toDate(pInput.LastPortedDate);
 			SELF.PhoneRiskIndicator	              := pInput.PhoneRiskIndicator;
 			SELF.OTPRIFailed	              			    := pInput.OTPRIFailed;
-			SELF.PhoneStatus                      := IF(inMod.UseInHousePhoneMetadata, pInput.PhoneStatus, 
-			                                         PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)pInput.StatusCode)); // flag to use inhouse phone metatdata instead of Qsent PVS
+			SELF.PhoneStatus                      := pInput.PhoneStatus, 			                                         
 			SELF.Address       := iesp.ECL2ESP.SetAddress(pInput.prim_name,pInput.prim_range,
 																										pInput.predir,pInput.postdir,pInput.suffix,
 																										pInput.unit_desig,pInput.sec_range,

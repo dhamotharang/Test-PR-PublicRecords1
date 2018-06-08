@@ -126,11 +126,10 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.LastPortedDate  := IF(displayAll,r.LastPortedDate,l.LastPortedDate);
 			SELF.NoContractCarrier  := IF(displayAll,r.NoContractCarrier,l.NoContractCarrier);
 			SELF.Prepaid				 := IF(displayAll,r.Prepaid,l.Prepaid);
-			Phone_Status_Qsent   := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)l.RealTimePhone_Ext.StatusCode);
 			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
 		                             ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active,
 			                            PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
-			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, Phone_Status_Qsent); // flag to use inhouse phone metatdata instead of Qsent PVS
+			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, l.PhoneStatus); // flag to use inhouse phone metatdata instead of Qsent PVS
 			SELF.PhoneStatus     :=  Phone_Status;
 			SELF.ActivationDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
 			SELF.DisconnectDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);
