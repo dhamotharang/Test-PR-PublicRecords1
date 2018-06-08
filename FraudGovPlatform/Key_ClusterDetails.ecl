@@ -7,8 +7,8 @@ flagsrec := RECORD
 r	:=RECORD
   integer8 customer_id_;
   integer8 industry_type_;
-  string100 tree_uid_;
   string100 entity_context_uid_;
+  string100 tree_uid_;
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   unsigned1 __customer_id__flags;
@@ -44,6 +44,14 @@ r	:=RECORD
   unsigned1 __latitude__flags;
   real8 longitude_;
   unsigned1 __longitude__flags;
+  string street_address_;
+  unsigned1 __street_address__flags;
+  string vanity_city_;
+  unsigned1 __vanity_city__flags;
+  string state_;
+  unsigned1 __state__flags;
+  integer8 zip_;
+  unsigned1 __zip__flags;
   integer8 person_count_;
   integer8 high_frequency_flag_;
   integer8 high_risk_death_prior_to_all_events_percent_flag_;
@@ -55,7 +63,7 @@ r	:=RECORD
 
 d	:=dataset([],r);
 
-EXPORT Key_ClusterDetails	:= Index(d,{customer_id_,industry_type_,tree_uid_,entity_context_uid_},{d},
+EXPORT Key_ClusterDetails	:= Index(d,{customer_id_,industry_type_,entity_context_uid_,tree_uid_},{d},
 																									 data_services.Data_location.Prefix('FraudGov') + 'thor_data400::key::fraudgov::' 
 																									 + doxie.Version_SuperKey +'::kel::clusterdetails');
 
