@@ -6,7 +6,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
   
   WSInput.MAC_FCRA_InquiryHistory_Service();
 
-  in_req := DATASET([], iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRequest) : STORED('FCRAInquiryHistoryPRRequest');
+  in_req := DATASET([], iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRequest) : STORED('FCRAInquiryHistoryRequest');
   
   // Report request and options
   first_row := in_req[1] : INDEPENDENT;
