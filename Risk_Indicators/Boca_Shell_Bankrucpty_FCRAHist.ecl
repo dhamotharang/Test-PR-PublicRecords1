@@ -1,7 +1,7 @@
 ﻿import doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
 
 EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids, boolean onThor = FALSE) := FUNCTION
 																				
 	bans_did := BankruptcyV3.key_bankruptcyV3_did(true);
 	bans_Withdrawn_Status := BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,TRUE);	
@@ -23,23 +23,49 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF := [];
 	END;
 
-	bankrupt_added := JOIN (ids, bans_did ,LEFT.did=RIGHT.did, add_bankrupt(LEFT,RIGHT), 
+	bankrupt_added_roxie := JOIN (ids, bans_did ,LEFT.did=RIGHT.did, add_bankrupt(LEFT,RIGHT), 
 		atmost(riskwise.max_atmost), 
 		LEFT OUTER, KEEP(10));
-		
-	bankrupt_added_after_withdrawn_check := JOIN (bankrupt_added, bans_Withdrawn_Status,
+	
+	bankrupt_added_thor_did := JOIN (distribute(ids(did<>0), hash64(did)), 
+		distribute(pull(bans_did), hash64(did)) ,
+		LEFT.did=RIGHT.did, 
+		add_bankrupt(LEFT,RIGHT), 
+		atmost(riskwise.max_atmost), 
+		LEFT OUTER, KEEP(10), LOCAL);
+	bankrupt_added_thor := group(sort(project(ids(did=0), transform(Risk_Indicators.Layouts_Derog_Info.layout_extended, self := left, self := [])) + 
+													bankrupt_added_thor_did, did, LOCAL), did, LOCAL);
+													
+	bankrupt_added := if(onThor, bankrupt_added_thor, bankrupt_added_roxie);
+
+	Risk_Indicators.Layouts_Derog_Info.layout_extended getWithdrawnCheck(bankrupt_added le, bans_Withdrawn_Status ri) := TRANSFORM
+		// blank out the TMSID if found on withdrawn key so the next join doesn't hit the search file
+		// per the requirements document, we only want to remove the withdrawn bankruptcy on version 3.0 and higher
+		self.bk_tmsid := if(ri.tmsid<>'' and bsversion >= 3, '', le.bk_tmsid);
+		self := le;
+	END;
+	
+	bankrupt_added_after_withdrawn_check_roxie := JOIN (bankrupt_added, bans_Withdrawn_Status,
 							LEFT.bk_tmsid<>'' AND
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							(unsigned)right.did=left.did and
 							(unsigned)(RIGHT.WithdrawnDispositionDate[1..6]) < left.historydate ,									
-							transform(Risk_Indicators.Layouts_Derog_Info.layout_extended,
-							// blank out the TMSID if found on withdrawn key so the next join doesn't hit the search file
-							// per the requirements document, we only want to remove the withdrawn bankruptcy on version 3.0 and higher
-							self.bk_tmsid := if(right.tmsid<>'' and bsversion >= 3, '', left.bk_tmsid);
-							self := left), 
+							getWithDrawnCheck(LEFT,RIGHT), 
 							left outer, atmost(riskwise.max_atmost), keep(1)
 							);	
 
+	bankrupt_added_after_withdrawn_check_thor := JOIN (distribute(bankrupt_added(bk_tmsid<>''), hash64(bk_tmsid)), 
+							distribute(pull(bans_Withdrawn_Status), hash64(tmsid)),
+							LEFT.bk_tmsid = RIGHT.tmsid AND
+							(unsigned)right.did=left.did AND
+							(unsigned)(RIGHT.WithdrawnDispositionDate[1..6]) < left.historydate, 									
+							getWithdrawnCheck(LEFT, RIGHT), 
+							left outer, atmost(LEFT.bk_tmsid = RIGHT.tmsid, riskwise.max_atmost), keep(1), LOCAL) +
+							bankrupt_added(bk_tmsid='');
+							
+	bankrupt_added_after_withdrawn_check := if(onThor, group(sort(bankrupt_added_after_withdrawn_check_thor, seq),seq), bankrupt_added_after_withdrawn_check_roxie);						
+							
+							
 	Risk_Indicators.Layouts_Derog_Info.layout_extended get_bankrupt_FCRA (Risk_Indicators.Layouts_Derog_Info.layout_extended le, bans_search ri) := TRANSFORM
 		myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
 		SELF.BJL.bankrupt := ri.case_number<>'';
@@ -79,17 +105,31 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF := le;
 	END;
 
-	bankrupt_full := JOIN (bankrupt_added_after_withdrawn_check, bans_search,
+	bankrupt_full_roxie := JOIN (bankrupt_added_after_withdrawn_check, bans_search,
 							LEFT.bk_tmsid<>'' AND
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							right.name_type='D' and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
+								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
+								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
 							get_bankrupt_FCRA (LEFT,RIGHT),
 							LEFT OUTER, ATMOST(Riskwise.max_atmost), keep(100));
+
+	bankrupt_full_thor_tmsid := JOIN (distribute(bankrupt_added_after_withdrawn_check(bk_tmsid <> ''), hash64(bk_tmsid)), 
+							distribute(pull(bans_search(name_type='D')), hash64(tmsid)),
+						 LEFT.bk_tmsid = RIGHT.tmsid AND
+						 (unsigned)right.did=left.did and
+						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
+							if(insurance_fcra_filter and right.chapter in ['7','13'],
+								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
+								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
+							get_bankrupt_FCRA (LEFT,RIGHT),
+							LEFT OUTER, keep(100), LOCAL);
+	bankrupt_full_thor := group(sort(bankrupt_added_after_withdrawn_check(bk_tmsid = '') + bankrupt_full_thor_tmsid, seq), seq);
+
+	bankrupt_full := if(onThor, bankrupt_full_thor, bankrupt_full_roxie);
 
 	Risk_Indicators.Layouts_Derog_Info.layout_extended roll_bankrupt(Risk_Indicators.Layouts_Derog_Info.layout_extended le, Risk_Indicators.Layouts_Derog_Info.layout_extended ri) := TRANSFORM
 		sameBankruptcy := le.case_num=ri.case_num AND le.court_code=ri.court_code;

@@ -3,8 +3,10 @@
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
 		 boolean IncludeLnJ = false,
-   integer2 ReportingPeriod = 84 ) := function
-
+   integer2 ReportingPeriod = 84,
+		boolean onThor = false 
+ ) := function
+ 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	// if the bsOption is turned on to remove liens, use the w_bankruptcy data prior to the liens joins
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
@@ -27,11 +29,20 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF := [];//name_type & Orig_name
 	END;
 
-	liens_added := JOIN(w_corrections, liensv2.key_liens_did_FCRA, 
+	liens_added_roxie := JOIN(w_corrections, liensv2.key_liens_did_FCRA, 
 											keyed(LEFT.did=RIGHT.did),
 											add_liens(LEFT,RIGHT), LEFT OUTER, 
 											atmost(riskwise.max_atmost), keep(100));
 
+	liens_added_thor := JOIN(distribute(w_corrections, hash64(did)), 
+											distribute(pull(liensv2.key_liens_did_FCRA), hash64(did)), 
+											LEFT.did=RIGHT.did,
+											add_liens(LEFT,RIGHT), LEFT OUTER, 
+											atmost(riskwise.max_atmost), keep(100), local);
+											
+	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);			
+
+											
 	MAC_liensParty_transform(trans_name, key_liens_party) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ le, key_liens_party ri) := TRANSFORM
@@ -51,7 +62,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 
 	MAC_liensParty_transform(get_liensparty_raw, liensv2.key_liens_party_id_FCRA);
 
-	 liens_party_raw := JOIN (liens_added, liensv2.key_liens_party_id_FCRA, 
+	 liens_party_raw_roxie := JOIN (liens_added, liensv2.key_liens_party_id_FCRA, 
 							LEFT.rmsid<>'' AND
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
@@ -62,6 +73,23 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
 							riskwise.max_atmost));
 
+	 liens_party_raw_thor_rmsid := JOIN (distribute(liens_added(rmsid<>''), hash64(rmsid)), 
+							distribute(pull(liensv2.key_liens_party_id_FCRA(name_type='D')), hash64(rmsid)), 
+							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
+							left.did=(unsigned)right.did and
+							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
+
+							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
+							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
+							ATMOST(LEFT.rmsid=RIGHT.rmsid AND left.tmsid=right.tmsid, 
+							riskwise.max_atmost), LOCAL);
+
+	liens_party_raw_thor := group(sort(liens_party_raw_thor_rmsid + 
+							project(liens_added(rmsid=''), 
+							transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working, self := left, self := [])), seq, local), seq, local);
+
+	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
+	
 	MAC_liensMain_transform(trans_name, key_liens_main) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, key_liens_main ri) := transform
@@ -290,7 +318,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 
 	MAC_liensMain_transform(get_liens_main_raw, liensv2.key_liens_main_id_FCRA);
 
-	liens_main_raw := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
+	liens_main_raw_roxie := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
 					left.rmsid<>'' and left.tmsid<>'' and 
 					keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and
 					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
@@ -301,6 +329,25 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), 
 					riskwise.max_atmost));
+	
+	liens_main_raw_thor_pre := JOIN(distribute(liens_party_raw(rmsid<>'' and tmsid<>''), hash64(tmsid, rmsid)), 
+					distribute(pull(liensV2.key_liens_main_ID_FCRA(
+					filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and 
+					filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50)), hash64(tmsid, rmsid)),
+					(left.tmsid=right.tmsid) and (left.rmsid=right.rmsid) and
+					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
+					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant
+					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
+					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50 and
+					if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
+					get_liens_main_raw(LEFT,RIGHT), left outer, 
+					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), 
+					riskwise.max_atmost), LOCAL);
+					
+	liens_main_raw_thor := group(sort(liens_main_raw_thor_pre + liens_party_raw(rmsid='' or tmsid=''), seq, local), seq, local);
+								
+  liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
+	
 	//must have a valid File Type Description
 	liensWithDesc := ungroup(liens_main_raw(ljType !=''));
 	//get smallest date first seen for each tmsid	
@@ -402,7 +449,19 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		self := left, self := []));
 
 	//grab C records ...sometimes the cname can be blank on those
-	liensWplainTiff := join(liens_filtered_DF, liensv2.key_liens_party_id_FCRA, 
+  Risk_Indicators.Layouts_Derog_Info.plaintiff_rec getPlaintiff(liens_filtered_DF le, liensv2.key_liens_party_id_FCRA ri) := TRANSFORM
+    SELF.Plaintiff := if((le.lnj_jgmt_cnt>=1 or le.lnj_eviction_count >= 1) and ri.name_type='C', 
+								if(ri.cname !='', 
+									ri.cname, 
+									Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix)),
+								''); 
+		SELF.name_type := ri.name_type;
+    SELF.datelastseen :=  ri.date_last_seen;
+		SELF := le;
+  END;
+   
+              
+	liensWplainTiff_roxie := join(liens_filtered_DF, liensv2.key_liens_party_id_FCRA, 
 							LEFT.rmsid<>'' AND
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							(left.lnj_jgmt_cnt >= 1 or left.lnj_eviction_count >= 1 ) and 
@@ -411,24 +470,32 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
 							right.name_type= 'C' and	
        if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
-							TRANSFORM(Risk_Indicators.Layouts_Derog_Info.plaintiff_rec,
-								SELF.Plaintiff := if((left.lnj_jgmt_cnt>=1 or left.lnj_eviction_count >= 1) and right.name_type='C', 
-								if(RIGHT.cname !='', 
-									RIGHT.cname, 
-									Risk_Indicators.iid_constants.CreateFullName(RIGHT.title, RIGHT.fname, RIGHT.mname, RIGHT.lname, RIGHT.name_suffix)),
-								''); 
-							SELF.name_type := RIGHT.name_type;
-       self.datelastseen :=  right.date_last_seen;
-							SELF := LEFT), 
+							getPlaintiff(LEFT,RIGHT), 
 							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
 							riskwise.max_atmost));
  
+	liensWplainTiff_thor := join(distribute(liens_filtered_DF(rmsid<>'' AND (lnj_jgmt_cnt >= 1 or lnj_eviction_count >= 1 )), hash64(rmsid, tmsid)), 
+							distribute(pull(liensv2.key_liens_party_id_FCRA), hash64(rmsid, tmsid)), 
+							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
+							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
+							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
+							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
+							right.name_type= 'C' and
+       if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
+							getPlaintiff(LEFT,RIGHT), 
+							ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), 
+							riskwise.max_atmost), LOCAL);
+
+	liensWplainTiff := if(onThor, liensWplainTiff_thor, liensWplainTiff_roxie);
+
+              
 	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, DateLastSeen), TMSID, RMSID, name_type, KEEP(1));
 	liens_fuller := JOIN(liens_filtered_DF, liensWplainTiff_duped,
 		LEFT.Tmsid = RIGHT.Tmsid and LEFT.rmsid = RIGHT.rmsid and LEFT.Did = RIGHT.did,
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
 			self.plaintiff := right.plaintiff,
 			self := left), LEFT OUTER);
+
  
 	liens_full := group(ungroup(liens_fuller), did);
 

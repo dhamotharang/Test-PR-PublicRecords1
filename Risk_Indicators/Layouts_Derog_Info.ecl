@@ -37,6 +37,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		boolean evictionInd;
 		string30 sor_number; // sex offender extra
 		unsigned4 bk_disp_date;
+    string60 offender_key;
 	END;	
 	
   EXPORT 	layout_extended_plus_ftd := record

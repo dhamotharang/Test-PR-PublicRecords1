@@ -104,11 +104,11 @@ EXPORT getAllBocaShellData (
 	
   // without history date
   prop := IF (IsFCRA, 
-	            Risk_Indicators.Boca_Shell_Property_FCRA (p_address, ids_only),
+	            Risk_Indicators.Boca_Shell_Property_FCRA (p_address, ids_only, onThor),
 								Risk_Indicators.Boca_Shell_Property (p_address, ids_only, includeRelativeInfo, filter_out_fares)) ;
   // with history date
   prop_hist :=  IF (IsFCRA, 
-	                  Risk_Indicators.Boca_Shell_Property_Hist_FCRA (p_address, ids_only),
+	                  Risk_Indicators.Boca_Shell_Property_Hist_FCRA (p_address, ids_only, onThor := onThor),
                     Risk_Indicators.Boca_Shell_Property_Hist (p_address, ids_only, includeRelativeInfo, filter_out_fares));
 										
   AMLSingleProperty :=  if (production_realtime_mode,   AML.AMLProperty(p_address, ids_only,includeRelativeInfo, filter_out_fares), AML.AMLPropertyHist(p_address, ids_only,includeRelativeInfo, filter_out_fares));
@@ -467,7 +467,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   
 	derogs_hist := IF (IsFCRA,
-                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod), 
+                     Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, ReportingPeriod, onThor),
                      Risk_Indicators.Boca_Shell_Derogs_Hist      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion));
   doc_rolled := if (production_realtime_mode, derogs, derogs_hist);
 	
@@ -480,7 +480,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 											Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion, onThor), 
 											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
 	watercraft_hist := IF (IsFCRA,
-													Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
+													Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion, onThor),
 													Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
 	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
   
@@ -493,7 +493,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 											Risk_Indicators.Boca_Shell_Proflic_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose, onThor),
 											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
 	proflic_hist := IF (IsFCRA,
-													Risk_Indicators.Boca_Shell_Proflic_Hist_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose),
+													Risk_Indicators.Boca_Shell_Proflic_Hist_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose, onThor),
 													Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
 	proflic_rolled := if (production_realtime_mode, proflic, proflic_hist);
 	
@@ -509,7 +509,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 // =============== Aircraft ===============
 	aircraft := IF (IsFCRA,		Risk_Indicators.Boca_Shell_aircraft_FCRA (ids_only(~isrelat), onThor),
 						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/));
-	aircraft_hist := IF (IsFCRA, Risk_Indicators.Boca_Shell_aircraft_Hist_FCRA (ids_only(~isrelat)),
+	aircraft_hist := IF (IsFCRA, Risk_Indicators.Boca_Shell_aircraft_Hist_FCRA (ids_only(~isrelat), onThor),
 					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/) );
 	aircraft_rolled := if (production_realtime_mode, aircraft, aircraft_hist);
 
@@ -1652,7 +1652,7 @@ bsData51 := if(bsversion>=51, group(shell51_branch1, seq), group(bsData50, seq))
 bsData52_a := if(bsversion >= 52 and ~isFCRA, risk_indicators.Boca_Shell_PII_Stability(bsdata51), bsdata51);
 
 bsData := if(bsversion >= 52, 
-	risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, isFCRA, glb, dppa, bsversion, datarestriction, datapermission, bsoptions),
+	risk_indicators.Boca_Shell_BestPII_Data(bsData52_a, isFCRA, glb, dppa, bsversion, datarestriction, datapermission, bsoptions, onThor),
 	bsData52_a);
 
 // output fraudPoint 2.0 attributes

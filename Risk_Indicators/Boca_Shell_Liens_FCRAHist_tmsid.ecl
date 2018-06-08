@@ -1,7 +1,7 @@
 ﻿import doxie_files, ut, doxie, fcra, liensv2, riskwise, Risk_Indicators;
  
 export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_Bankruptcy) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_Bankruptcy, boolean onThor = false) := FUNCTION
  
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
 
@@ -13,10 +13,17 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 		SELF := le;
 	END;
 
-	liens_added := JOIN(w_Bankruptcy, liensv2.key_liens_did_FCRA, 
+	liens_added_roxie := JOIN(w_Bankruptcy, liensv2.key_liens_did_FCRA, 
 											keyed(LEFT.did=RIGHT.did),
 											add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100));
 
+	liens_added_thor := JOIN(distribute(w_Bankruptcy, hash64(did)), 
+                      distribute(pull(liensv2.key_liens_did_FCRA), hash64(did)), 
+											(LEFT.did=RIGHT.did),
+											add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100), LOCAL);
+                      
+	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);	
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER get_liens_FCRA(Risk_Indicators.Layouts_Derog_Info.layout_extended le, liensv2.key_liens_party_id_FCRA ri) := TRANSFORM
 		self.tmsid := if(ri.tmsid='', '', le.tmsid);	
 		self.rmsid := if(ri.rmsid='', '', le.rmsid);
@@ -40,8 +47,20 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 											right.name_type='D',	
 											get_liens_FCRA(LEFT,RIGHT), LEFT OUTER,
 											ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), riskwise.max_atmost));
-	
-	Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER get_evictions(liens_party_raw_roxie le, liensV2.key_liens_main_ID_FCRA ri) := transform
+                      
+	liens_party_raw_thor_rmsid := JOIN (distribute(liens_added(rmsid<>''), hash64(rmsid)), 
+											distribute(pull(liensv2.key_liens_party_id_FCRA(name_type='D')), hash64(rmsid)), 
+											(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
+											left.did=(unsigned)right.did and
+											(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0,	// date first seen was blank on some records
+											get_liens_FCRA(LEFT,RIGHT), LEFT OUTER,
+											ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
+
+	liens_party_raw_thor := group(sort(distribute(liens_party_raw_thor_rmsid + liens_party_raw_roxie(rmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
+
+	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
+
+	Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER get_evictions(liens_party_raw le, liensV2.key_liens_main_ID_FCRA ri) := transform
 		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
 		releasedDate := (string) le.date_last_seen;
 		OrigDateFiled := (string) le.date_first_seen;
@@ -302,8 +321,12 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 													'0');
 		SELF := le;
 	end;
-	liens_party_raw := liens_party_raw_roxie;
-	evictions := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
+
+	key_liens_main_ID_FCRA_thor := pull(liensV2.key_liens_main_ID_FCRA(
+																		filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
+																		filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50));
+                                    
+	evictions_roxie := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
 												left.rmsid<>'' and left.tmsid<>'' and 
 												keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and 
 												(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
@@ -312,6 +335,19 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 												right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50,
 												get_evictions(LEFT,RIGHT), left outer, 
 												ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
+                        
+	evictions_thor_pre := JOIN(distribute(liens_party_raw(rmsid<>'' and tmsid<>''), hash64(tmsid, rmsid)), 
+                        distribute(key_liens_main_ID_FCRA_thor, hash64(tmsid, rmsid)),
+												(left.tmsid=right.tmsid) and (left.rmsid=right.rmsid) and 
+												(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
+												(unsigned) left.date_last_seen = (unsigned) right.release_date, //ensure we get the correct record for the defendant,
+												get_evictions(LEFT,RIGHT), left outer, 
+												ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), riskwise.max_atmost), LOCAL);
+
+  evictions_thor := group(sort(distribute(evictions_thor_pre + liens_party_raw(rmsid='' or tmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
+
+  evictions := if(onThor, evictions_thor, evictions_roxie);
+  
 	liensWithDesc := ungroup(evictions(ftd = '1'));
  
 	//for versions < 50, we need to keep suits on stream
@@ -661,7 +697,7 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 	END;
 
 	invalid_archive_dates := ['', '99999999'];
-	liens_full_offset := JOIN (liens_added(
+	liens_full_offset_roxie := JOIN (liens_added(
 													archive_date_6mo not in invalid_archive_dates or 
 													archive_date_12mo not in invalid_archive_dates or
 													archive_date_24mo not in invalid_archive_dates),
@@ -674,6 +710,28 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 										 get_liens_FCRA_offset(LEFT,RIGHT), LEFT OUTER,
 											ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
 											riskwise.max_atmost));
+
+	liens_full_offset_thor_rmsid := JOIN (distribute(liens_added(rmsid<>'' AND 
+													(archive_date_6mo not in invalid_archive_dates or 
+													archive_date_12mo not in invalid_archive_dates or
+													archive_date_24mo not in invalid_archive_dates)), hash64(rmsid, tmsid)),
+							distribute(pull(liensv2.key_liens_party_id_FCRA(name_type='D')), hash64(rmsid, tmsid)), 
+											(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
+											left.did=(unsigned)right.did and
+											(unsigned3)(RIGHT.date_first_seen[1..6]) < (left.historydate + 200) AND (unsigned)RIGHT.date_first_seen<>0,	// date first seen was blank on some records
+										 get_liens_FCRA_offset(LEFT,RIGHT), LEFT OUTER,
+											ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), 
+											riskwise.max_atmost), LOCAL);
+
+	liens_full_offset_thor := 	group(sort(distribute((liens_full_offset_thor_rmsid + 
+            PROJECT(liens_added(rmsid=''), TRANSFORM(Risk_Indicators.Layouts_Derog_Info.layout_export, 
+                  SELF.seq := (STRING)LEFT.seq, 
+                  SELF := LEFT, 
+                  SELF := []))), 
+            hash64(seq)), seq, LOCAL), seq, LOCAL);
+
+	liens_full_offset := if(onThor, liens_full_offset_thor, liens_full_offset_roxie);
+
 
 	Risk_Indicators.Layouts_Derog_Info.layout_export get_evictions_offset(Risk_Indicators.Layouts_Derog_Info.layout_export le, liensV2.key_liens_main_ID_FCRA ri) := transform
 		myGetDate 			:= iid_constants.myGetDate(le.historydate);
@@ -744,7 +802,7 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 		SELF := [];
 	end;
 
-	evictions_offset := JOIN(liens_full_offset, liensV2.key_liens_main_ID_FCRA,
+	evictions_offset_roxie := JOIN(liens_full_offset, liensV2.key_liens_main_ID_FCRA,
 												left.rmsid<>'' and left.tmsid<>'' and 
 												keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and 
 												(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
@@ -754,6 +812,20 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 												get_evictions_offset(LEFT,RIGHT), left outer, 
 												ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
 
+	evictions_offset_thor_pre := JOIN(distribute(liens_full_offset(rmsid<>'' and tmsid <> ''), hash64(tmsid, rmsid)), 
+												distribute(key_liens_main_ID_FCRA_thor, hash64(tmsid, rmsid)),
+												(left.tmsid=right.tmsid) and (left.rmsid=right.rmsid) and 
+												(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
+												(unsigned) left.date_last_seen = (unsigned) right.release_date, //ensure we get the correct record for the defendant
+												get_evictions_offset(LEFT,RIGHT), left outer, 
+												ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), riskwise.max_atmost), LOCAL);
+
+	evictions_offset_thor :=  group(sort(distribute(evictions_offset_thor_pre + 
+																		project(liens_full_offset(rmsid='' or tmsid=''), transform(Risk_Indicators.Layouts_Derog_Info.layout_export,
+																						self.ftd := '0', self := left, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);											
+	
+	evictions_offset := if(onThor, evictions_offset_thor, evictions_offset_roxie);
+  
 	liensWithDesc_offset := ungroup(evictions_offset(ftd = '1'));
 	 
 //for versions < 50, we need to keep suits on stream
