@@ -112,7 +112,7 @@ MODULE
 		STRING		mname;
 		STRING		lname;
 		UNSIGNED1	sex;
-		UNSIGNED2	DOD_MthDay;
+		STRING		DOD_MthDay;
 		STRING		DOD_Mth;
 		STRING		DOD_Day;
 		STRING		DOD_Time;

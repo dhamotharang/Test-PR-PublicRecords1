@@ -7,7 +7,7 @@ Header.layout_death_master_supplemental tDeathMaster_Connecticut_Data_Supplement
 TRANSFORM
 
 	// Get Address and separate into address1 and address2
-	StateOrCountry					:=	Death_Master.Lookup_States.lkp_ct_state_country(pInput.POR_StateOrCountry);
+	StateOrCountry					:=	Death_Master.Lookup_CT.lkp_state_country(pInput.POR_StateOrCountry);
 	clean_state							:=	IF(Address.Map_State_Name_To_Abbrev(StateOrCountry)<>'',
 																Address.Map_State_Name_To_Abbrev(StateOrCountry),
 																StateOrCountry);
@@ -21,7 +21,7 @@ TRANSFORM
 	clean_streettype				:=	fnCleanAddressField(pInput.POR_StreetType);
 	clean_apartmentnumber		:=	fnCleanAddressField(pInput.POR_ApartmentNumber);
 	clean_town							:=	IF(clean_state='CT',
-																Death_Master.Lookup_States.ct_county_town_codes(town_code=INTFORMAT(pInput.POR_Town_FIPS,5,1))[1].town_name,
+																Death_Master.Lookup_CT.county_town_codes(town_code=INTFORMAT(pInput.POR_Town_FIPS,5,1))[1].town_name,
 																Address.City_names(state_alpha=clean_state AND city_code=INTFORMAT(pInput.POR_Town_FIPS,5,1))[1].city_name
 															);
 	clean_zip								:=	IF(pInput.POR_Zip=0,'',INTFORMAT(pInput.POR_Zip,5,1));
@@ -54,51 +54,75 @@ TRANSFORM
 																	IF(TRIM(pInput.dod_day,ALL) IN ['00',''], '', TRIM(pInput.dod_day,ALL)) +
 																	TRIM(pInput.dod_yr,ALL));
 	STRING8		clean_filed_date	:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.DateRecordedModified,8,1),fmtsin,fmtout);
-	// STRING8		clean_injury_date	:=	Std.date.ConvertDateFormatMultiple(INTFORMAT(pInput.DateOfInjury,8,1),fmtsin,fmtout);
 	
 	SELF.source_state  			:= 	'CT';
-	SELF.decedent_race			:=	Lookup_States.lkp_ct_race(pInput.race);
-	SELF.decedent_sex				:= 	Lookup_States.lkp_ct_gender(pInput.sex);
-	SELF.decedent_age 			:= 	Lookup_States.lkp_ct_age(TRIM(pInput.AgeUnit,ALL),TRIM(pInput.AgeUnit_NumberOfUnits[2..],ALL));
+	SELF.decedent_race			:=	Lookup_CT.lkp_race(pInput.race);
+	SELF.decedent_sex				:= 	Lookup_CT.lkp_gender(pInput.sex);
+	SELF.decedent_age 			:= 	Lookup_CT.lkp_age(TRIM(pInput.AgeUnit_NumberOfUnits[1],ALL),TRIM(pInput.AgeUnit_NumberOfUnits[2..],ALL));
 	SELF.dob 								:= 	clean_dob;
 	SELF.dod 								:= 	clean_dod;
 	SELF.birthplace					:=	ut.CleanSpacesAndUpper(	
-																IF(pInput.POB_Town_FIPS IN [0,99999],
-																	Death_Master.Lookup_States.lkp_ct_state_country(pInput.POB_StateOrCountry),
-																	IF(pInput.POB_StateOrCountry=0,'',
-																		Death_Master.Lookup_States.ct_county_town_codes(town_code=INTFORMAT(pInput.POB_Town_FIPS,5,1))[1].town_name+', '+
-																		Death_Master.Lookup_States.lkp_ct_state_country(pInput.POB_StateOrCountry)
-																	)
-																)
-															);
-	SELF.marital_status 		:= 	Lookup_States.lkp_ct_marital_status(pInput.maritalstatus);
+																									IF(pInput.POB_Town_FIPS IN [99999],
+																										IF(pInput.POB_Country_FIPS='US',
+																											Death_Master.Lookup_CT.lkp_state_country(pInput.POB_StateOrCountry),
+																											Death_Master.Lookup_CT.lkp_Country_Code_FIPS(pInput.POB_Country_FIPS)
+																										),
+																										IF(pInput.POB_Town_FIPS IN [0] AND pInput.POB_Country_FIPS NOT IN ['US'],
+																											IF(pInput.POB_StateOrCountry	NOT IN [59],
+																												Death_Master.Lookup_CT.lkp_state_country(pInput.POB_StateOrCountry),
+																												Death_Master.Lookup_CT.lkp_Country_Code_FIPS(pInput.POB_Country_FIPS)
+																											),
+																											IF(COUNT(Death_Master.Lookup_CT.county_town_codes(town_code=INTFORMAT(pInput.POB_Town_FIPS,5,1)))>0,
+																												Death_Master.Lookup_CT.county_town_codes(town_code=INTFORMAT(pInput.POB_Town_FIPS,5,1))[1].town_name+', '+
+																												Death_Master.Lookup_CT.lkp_state_country(pInput.POB_StateOrCountry),
+																												IF(pInput.POB_State_FIPS	IN ['ZZ'],
+																													Death_Master.Lookup_CT.lkp_Country_Code_FIPS(pInput.POB_Country_FIPS),
+																													IF(pInput.POB_County_FIPS > 0,
+																														Death_Master.Lookup_States.lkp_nc_county_codes(state_code=pInput.POB_State_FIPS AND county_code=INTFORMAT(pInput.POB_County_FIPS,3,1))[1].county_name+', ',
+																														''
+																													)+
+																													Death_Master.Lookup_CT.lkp_State_Code_FIPS(pInput.POB_State_FIPS)
+																												)
+																											)
+																										)
+																									)
+																								);
+	SELF.marital_status 		:= 	Lookup_CT.lkp_marital_status(pInput.maritalstatus);
 	SELF.father							:= 	IF(StringLib.StringToUpperCase(TRIM(pInput.lname_father,LEFT,RIGHT)) = 'NOT AVAILABLE','',StringLib.StringToUpperCase(TRIM(pInput.lname_father,LEFT,RIGHT)));
 	SELF.filed_date					:=	clean_filed_date;
 	SELF.county_residence		:=	Address.County_Names(state_alpha=clean_state AND county_code=INTFORMAT(pInput.POR_County_FIPS,3,1))[1].county_name;
 	SELF.county_death				:=	Address.County_Names(state_alpha=pInput.POD_State_FIPS AND county_code=INTFORMAT(pInput.POD_County_FIPS,3,1))[1].county_name;
 	SELF.orig_address1			:=	TRIM(orig_address1);
 	SELF.orig_address2			:=	TRIM(orig_address2);
-	SELF.autopsy						:= 	Lookup_States.lkp_ct_autopsy(pInput.autopsy);
-	SELF.med_exam						:= 	Lookup_States.lkp_ct_med_exam(pInput.MedicalExaminerContacted);
-	SELF.disposition				:=	Lookup_States.lkp_ct_disposition(TRIM(pInput.MethodOfDisposition,ALL));
-	SELF.work_injury				:= 	Lookup_States.lkp_ct_work_injury(pInput.InjuryAtWork);
-	// SELF.injury_date				:=	clean_injury_date;
-	// SELF.injury_type				:=	ut.CleanSpacesAndUpper(pInput.PlaceOfInjury);
-	SELF.hospital_status		:=	Lookup_States.lkp_ct_hospital_status(pInput.HospitalStatus);
-	SELF.pregnancy					:=	Lookup_States.lkp_ct_Pregnancy(pInput.Pregnancy);
-	SELF.death_type					:=	Lookup_States.lkp_ct_death_type(pInput.MannerOfDeath);
-
-	
+	SELF.autopsy						:= 	Lookup_CT.lkp_autopsy(pInput.autopsy);
+	SELF.med_exam						:= 	Lookup_CT.lkp_med_exam(pInput.MedicalExaminerContacted);
+	SELF.disposition				:=	Lookup_CT.lkp_disposition(TRIM(pInput.MethodOfDisposition,ALL));
+	SELF.work_injury				:= 	Lookup_CT.lkp_work_injury(pInput.InjuryAtWork);
+	SELF.hospital_status		:=	Lookup_CT.lkp_hospital_status(pInput.HospitalStatus);
+	SELF.pregnancy					:=	Lookup_CT.lkp_Pregnancy(pInput.Pregnancy);
+	SELF.death_type					:=	Lookup_CT.lkp_death_type(pInput.MannerOfDeath);
+	SELF.time_death					:=	IF( (UNSIGNED)pInput.dod_time > 0,
+																									Std.date.ConvertTimeFormat(
+																										IF(pInput.dod_time_ap='P',(STRING)(1200+(UNSIGNED)pInput.dod_time),pInput.dod_time),
+																										'%H%M','%H:%M'
+																									),
+																									'UNKWN'
+																								);
+	SELF.birth_cert	:=	IF(pInput.birthcertificatenumber>0,(STRING)pInput.birthcertificatenumber,'');
 	
 	SELF.place_of_death			:=	ut.CleanSpacesAndUpper(
-																IF(pInput.Hospital IN [0,90,91,94,95,96,97,98,99],'',TRIM(Lookup_States.lkp_ct_hospital_name(pInput.Hospital))+', ')+
 																IF(pInput.POD_State_FIPS='CT',
-																	Death_Master.Lookup_States.ct_county_town_codes(town_code=INTFORMAT(pInput.POD_Town_FIPS,5,1))[1].town_name+
-																	', '+pInput.POD_State_FIPS+
+																	IF(pInput.POD_Town_FIPS NOT IN [99999],
+																		Death_Master.Lookup_CT.county_town_codes(town_code=INTFORMAT(pInput.POD_Town_FIPS,5,1))[1].town_name+', ',
+																		''
+																	)+
+																	pInput.POD_State_FIPS+
 																	IF(pInput.POD_Zip=0,'',' '+INTFORMAT(pInput.POD_Zip,5,1)),
 																	''
 																)																
 															);
+	SELF.facility_death			:=	Lookup_CT.lkp_hospital_name(pInput.Hospital);
+	
 	SELF.underlying_cause_of_death	:=	ut.CleanSpacesAndUpper(
 																				TRIM(pInput.COD1)+
 																				IF(TRIM(pInput.COD2)<>'',';'+TRIM(pInput.COD2),'')+
