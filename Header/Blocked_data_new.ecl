@@ -25,6 +25,8 @@ or  (did=167987978810)
 // or  (src='EN' and fname='RONALD' and mname='L' and lname='GATES' and ssn='334303286') //added 20110725 bug 84154
 // or  (src='EN' and fname='RON' and mname='' and lname='GATES' and ssn='334303286') //added 20110725 bug 84154
 
+or (fname='A' and mname in ['GIFT','G FOR','G'] and lname='YOU') // added 20180608 bug DF-21135
+
 or ~(		fname<>''
 		and lname<>''
 		and ~regexfind('^dickless$|^dickles$',trim(fname),nocase)
