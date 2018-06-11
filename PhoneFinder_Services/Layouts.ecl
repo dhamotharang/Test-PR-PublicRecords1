@@ -806,7 +806,7 @@ MODULE
    		string64 listing_name;
    		string16 porting_code;
    		string32 phone_forwarded;
-   		Boolean	verified_carrier; 
+   		Integer1	verified_carrier; 
 	END;
    	
    EXPORT	delta_phones_rpt_identities:= record
@@ -818,7 +818,7 @@ MODULE
    		string64 city;
    		string16 state;
    		string10 zip;
-   		boolean	 verified_carrier; 
+   		Integer1	 verified_carrier; 
    	END;
 
 	EXPORT delta_phones_rpt_riskindicators:= record
