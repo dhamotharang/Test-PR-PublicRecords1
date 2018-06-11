@@ -67,9 +67,9 @@ all_f				 			:= ds_fcra_filtered + ds_fcra_all;
 		Vdl_state 					:= filterField(l.dl_state);
 		Vdob 								:= filterField(l.dob);
 			
-		Vstreet_address			:= trim(trim(trim(trim(trim(trim(trim(trim(trim(trim(l.prim_range, left, right) + trim(l.predir, left, right), left, right) + trim(l.prim_name, left, right), left, right) + trim(l.addr_suffix, left, right), left, right) + trim(l.postdir, left, right), left, right) + trim(l.unit_desig, left, right), left, right) + trim(l.sec_range, left, right), left, right) + trim(l.p_city_name, left, right), left, right) + trim(l.st, left, right), left, right) + trim(l.zip5, left, right), left, right);
+		// Vstreet_address			:= trim(trim(trim(trim(trim(trim(trim(trim(trim(trim(l.prim_range, left, right) + trim(l.predir, left, right), left, right) + trim(l.prim_name, left, right), left, right) + trim(l.addr_suffix, left, right), left, right) + trim(l.postdir, left, right), left, right) + trim(l.unit_desig, left, right), left, right) + trim(l.sec_range, left, right), left, right) + trim(l.p_city_name, left, right), left, right) + trim(l.st, left, right), left, right) + trim(l.zip5, left, right), left, right);
 
-		Vstreet_address_12 	:= filterField(l.street_address_1+l.street_address_2);
+		Vstreet_address_12 	:= l.street_address_1+l.street_address_2;
 
 		Vstreet_address_3 	:= filterField(l.street_address_3);
 		Vstreet_address_4 	:= filterField(l.street_address_4);
@@ -105,7 +105,7 @@ all_f				 			:= ds_fcra_filtered + ds_fcra_all;
 																						// Vlname + 'X' + 
 																						// Vfname + 'X' +
 																						// Vmname + 'X' +
-																						Vname_suffix + 
+																						// Vname_suffix + 
 																						trim(l.case_num, left, right) + 
 																						Vcase_court + 
 																						Vcase_date + 
@@ -122,7 +122,7 @@ all_f				 			:= ds_fcra_filtered + ds_fcra_all;
 																						Vstreet_address_3 + 
 																						Vstreet_address_4 + 
 																						Vstreet_address_5 + 
-																					  Vstreet_address +
+																					  //Vstreet_address + 
 																					  Vrace + 
 																						Vrace_desc + 
 																						Vheight + 
@@ -301,12 +301,12 @@ corrections.layout_offender RemF(dCrimOffender2FixedReady l):= transform
                         height,weight,												
 												_3g_offender,violent_offender,sex_offender,vop_offender,data_type,record_setup_date,
                         datasource,
-												StringLib.StringFilter(StringLib.StringToUpperCase(prim_range+predir+prim_name+addr_suffix+postdir+unit_desig+sec_range+p_city_name),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+												StringLib.StringFilter(StringLib.StringToUpperCase(p_city_name),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 												st,zip5,
                         // cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,
                         county_name,did,ssn_appended,curr_incar_flag,curr_parole_flag,curr_probation_flag,
                         image_link,fcra_conviction_flag, fcra_traffic_flag,fcra_date,fcra_date_type,conviction_override_date,conviction_override_date_type,offense_score,
-												offender_persistent_id,-ace_fips_st,-src_upload_date,-age,-zip4,-citizenship,local);
+												offender_persistent_id,-ace_fips_st,-src_upload_date,-age,-zip4,-citizenship,-prim_range,-predir,-prim_name,-addr_suffix,-postdir,-unit_desig,-sec_range,local);
 FCRA_records_dedup :=   dedup(sortedOffender,
                         offender_key,vendor,source_file,record_type,orig_state,id_num,
                         StringLib.StringFilter(StringLib.StringToUpperCase(pty_nm),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
@@ -337,7 +337,7 @@ FCRA_records_dedup :=   dedup(sortedOffender,
                         height,weight,											
 												_3g_offender,violent_offender,sex_offender,vop_offender,data_type,record_setup_date,
                         datasource,
-												StringLib.StringFilter(StringLib.StringToUpperCase(prim_range+predir+prim_name+addr_suffix+postdir+unit_desig+sec_range+p_city_name),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+												StringLib.StringFilter(StringLib.StringToUpperCase(p_city_name),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 												st,zip5,
                         /* cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,*/
                         county_name,did,ssn_appended,curr_incar_flag,curr_parole_flag,curr_probation_flag,
