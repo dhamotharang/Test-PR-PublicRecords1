@@ -64,9 +64,12 @@ UniqueFein:=(string)count(table(DistFile,{#expand(FEINField)},#expand(FEINField)
 #ELSE
 UniqueFein:='n/a';
 #END
-
+#IF(indexfields!='')
 //Calculate Index Stats
 UniqueIndex:=(string)count(table(DistFile,{#expand(indexfields)},#expand(indexfields),merge));
+#ELSE
+UniqueIndex:='n/a';
+#END
 
 //Remove Date Fields
 #IF(hasDate_Last_Seen)
