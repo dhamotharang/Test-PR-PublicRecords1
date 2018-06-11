@@ -113,6 +113,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 															SELF := []));
 			
 		ds_associated_identities_raw := ds_cluster_details(entity_type_ = FraudGovKelConst_.ENTITY_TYPE_LEXID);
+		
 		ds_associated_identities_dids := PROJECT(ds_associated_identities_raw,  
 																			TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec,
 																				//[4..] because Entitiy Context uid in RAMPS/KEL keys has following format for lexid
@@ -187,12 +188,14 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 
 			/* If either IsIdentityTestRequest OR IsElementTestRequest (used above in the attribute) are set, 
 			return mock data, if not, then return empty dataset until we get data from the RAMPS query. */
-			SELF.IndicatorAttributes := IF(batch_params.IsOnline AND returnMockupData,
-																			fn_GetTestRecords.GetTestIndicatorAttributes(),
-																			DATASET([],iesp.fraudgovreport.t_FraudGovIndicatorAttribute));
+			SELF.IndicatorAttributes := IF(batch_params.IsOnline, 
+																		CHOOSEN(Functions.GetIndicatorAttributes(ds_entityNameUID, batch_params),
+																		iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE),
+																		DATASET([],iesp.fraudgovreport.t_FraudGovIndicatorAttribute));
 
-			SELF.ScoreBreakdown := IF(batch_params.IsOnline AND returnMockupData,
-																fn_GetTestRecords.GetTestScoreBreakdowns(),
+			SELF.ScoreBreakdown := IF(batch_params.IsOnline,
+																CHOOSEN(Functions.GetScoreBreakDown(ds_entityNameUID, batch_params),
+																iesp.Constants.FraudGov.MAX_COUNT_SCORE_BREAKDOWN),
 																DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
 			SELF.AssociatedIdentities := IF(batch_params.IsOnline,
@@ -213,6 +216,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			SELF := [];
 		END;
 		
+		//output(ds_elemets_w_uids);
 		// output(ds_batch_in, named('ds_batch_in'));
 		// output(ds_batch, named('ds_batch'));
 		// output(all_knownfrauds, named('all_knownfrauds'));
