@@ -22,6 +22,7 @@ export InstantID_Function(DATASET(Layout_Input) indata1, dataset(Gateway.Layouts
 FUNCTION
 
 isFCRA := false;
+isCNSMR := ut.IndustryClass.is_Knowx;
 min_score := 80;
 min_addrscore := 70; 
 min_numscore := 90;
@@ -1276,12 +1277,14 @@ rollphonerecs try_yp_For_Lat_long(rollphonerecs L, yellowpages.Key_YellowPages_P
 	self := l;
 end;
 
-try_yp := join(rollphonerecs,
+try_yp_temp := join(rollphonerecs,
 			yellowpages.Key_YellowPages_Phone,
-				left.phone10 != '' and 
+				left.phone10 != '' and
 				keyed(left.phone10 = right.phone10),
 			try_yp_for_lat_long(LEFT,RIGHT),
 			left outer, keep(200), ATMOST(keyed(left.phone10 = right.phone10),RiskWise.max_atmost));
+			
+try_yp := if(isCNSMR,rollphonerecs,try_yp_temp);
 
 try_yp_roll := rollup(try_yp, true, rolltrans(LEFT,RIGHT));
 
@@ -1964,7 +1967,7 @@ with_dca := join(with_ebr,
 									self := left), atmost(riskwise.max_atmost), 
 									LEFT OUTER,keep(1));
 
-with_naics_sics := join(with_dca,
+with_naics_sics_temp := join(with_dca,
 		  YellowPages.Key_YellowPages_BDID,
 			left.bdid != 0 and 
 			keyed(left.bdid = right.bdid) and
@@ -1976,6 +1979,8 @@ with_naics_sics := join(with_dca,
 								self.business_description := if(left.business_description='',right.heading_string, left.business_description),  
 								self := left), atmost(riskwise.max_atmost), LEFT OUTER,
 								keep(1));
+
+with_naics_sics := if(isCNSMR,with_dca,with_naics_sics_temp);
 
 
 //----------------- Bankruptcy and Lien/Judgement data
