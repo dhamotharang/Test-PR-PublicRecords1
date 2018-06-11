@@ -1,4 +1,4 @@
-export MAC_Append_Feedback(
+﻿export MAC_Append_Feedback(
 				dFileIn,
 				dFileOut,
 				dFeedback     = 'Feedback', // Feedback dataset name
@@ -14,7 +14,9 @@ export MAC_Append_Feedback(
 				maxFeedback   = AddressFeedback_Services.Constants.Limits.FEEDBACK_PER_ADDRESS
 				) :=
 macro
-
+#uniquename(isCNSMR)
+ %isCNSMR% := ut.IndustryClass.is_Knowx;
+ 
 	// sequence input: designates [prim_range, prim_name, zip, sec_range, did] combination as unique
 	#uniquename(lFileInSeq)
 	%lFileInSeq% := record
@@ -38,8 +40,9 @@ macro
 		self 								:= l
 	end;
 	
-	#uniquename(dFBRecs)
-	%dFBRecs% := join(%dFileInSeq%, AddressFeedback.Key_AddressFeedback,
+									
+	#uniquename(dFBRecs_temp)
+	%dFBRecs_temp% := join(%dFileInSeq%, AddressFeedback.Key_AddressFeedback,
 										left.fPrimName <> '' and left.fZip <> '' and left.fPrimRange <> '' and
 										keyed(left.fPrimName = right.prim_name) and
 										keyed(left.fZip = right.zip) and
@@ -53,7 +56,14 @@ macro
 										left.fUnitDesig = right.unit_desig,										
 										%xtGetFeedback%(left, right),
 										left outer, limit(0), keep(AddressFeedback_Services.Constants.Limits.FEEDBACK_PER_ADDRESS));
-			
+
+	#uniquename(dFileInSeq_temp)
+	%dFileInSeq_temp% := project(%dFileInSeq%,
+									transform(%lFileInPlusFeedback%,self._feedback :=[], self := left));
+	
+	#uniquename(dFBRecs)
+	%dFBRecs% := if(%isCNSMR%, %dFileInSeq_temp%,	%dFBRecs_temp%);
+	
 	#uniquename(dFBRecsG)											 
 	%dFBRecsG% := group(sort(%dFBRecs%, _seq), _seq);
 
