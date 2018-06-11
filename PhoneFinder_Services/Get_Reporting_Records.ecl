@@ -66,7 +66,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
       	 SELF.listing_name         := R.ListingName;
       	 SELF.porting_code         := R.PortingCode;
       	 SELF.phone_forwarded      := R.CallForwardingIndicator;
-      	 SELF.verified_carrier     := R.PhoneOwnershipIndicator;
+      	 SELF.verified_carrier     := (INTEGER)R.PhoneOwnershipIndicator;
 		 SELF.Alerts 			   := R.Alerts.AlertIndicators;
    END;	
       
@@ -81,7 +81,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
        SELF.City         		:= R.RecentAddress.City;
        SELF.State         		:= R.RecentAddress.State;
        SELF.Zip         		:= R.RecentAddress.Zip5;
-       SELF.verified_carrier   	:= R.PhoneOwnershipIndicator;
+       SELF.verified_carrier   	:= (INTEGER)R.PhoneOwnershipIndicator;
    END;	
          
   Identity_Recs := NORMALIZE(pF_Records, LEFT.Identities, xfm_Identities(RIGHT, COUNTER)); 
