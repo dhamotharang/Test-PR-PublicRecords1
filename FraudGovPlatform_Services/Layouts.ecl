@@ -1,5 +1,5 @@
-﻿IMPORT BatchShare, BIPV2, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, patriot, risk_indicators, 
-			 riskwise, royalty;
+﻿IMPORT BatchShare, BIPV2, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, 
+			 iesp, patriot, risk_indicators, riskwise, royalty;
 
 EXPORT Layouts := MODULE
 
@@ -53,16 +53,16 @@ EXPORT Layouts := MODULE
 	end;
 
  SHARED Batch_out_pre_rec := RECORD
-			BatchOut_risk;    
-   BatchShare.Layouts.ShareAcct;
-   FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
-   DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
-   DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
-   DATASET(combined_layouts) childRecs_RedFlag;
-		 DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
-   DATASET(Patriot.layout_batch_out) childRecs_Patriot;
-		 DATASET(Layout_InstandID_NuGenExt) childRecs_ciid;
-   DATASET(Velocities) childRecs_Velocities;
+		BatchOut_risk;    
+		BatchShare.Layouts.ShareAcct;
+		FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
+		DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
+		DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
+		DATASET(combined_layouts) childRecs_RedFlag;
+		DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
+		DATASET(Patriot.layout_batch_out) childRecs_Patriot;
+		DATASET(Layout_InstandID_NuGenExt) childRecs_ciid;
+		DATASET(Velocities) childRecs_Velocities;
   END;
 	
 	EXPORT Batch_out_pre_w_raw := RECORD
@@ -228,10 +228,27 @@ EXPORT Layouts := MODULE
 	
 	EXPORT fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
-		STRING60 fragment_value;
+		STRING100 fragment_value;
 		UNSIGNED3 file_type;
 		UNSIGNED4	LastActivityDate := 0;
 		UNSIGNED4	LastKnownRiskDate := 0;
+	END;
+	
+	EXPORT elementNidentity_uid_recs := RECORD
+		STRING60 entity_name;
+		STRING100 entity_value;
+		string70 tree_uid := '';
+		string70 entity_context_uid := '';
+	END;
+
+	EXPORT elementNidentity_score_recs := RECORD
+		fragment_w_value_recs;
+		string70 AnalyticsRecordId;
+		unsigned1 score;
+		string100 ClusterName;
+		unsigned1 NumberOfClusters;
+		unsigned1 NumberOfIdentities;
+		DATASET(iesp.share.t_NameValuePair) NVPs;
 	END;
 
 END;

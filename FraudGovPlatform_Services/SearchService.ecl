@@ -7,7 +7,7 @@
 IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
-		
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	WSInput.MAC_FraudGovPlatform_Services_SearchService();
 
 	ds_in					:= DATASET([],iesp.fraudgovsearch.t_FraudGovSearchRequest) : STORED('FraudGovSearchRequest', FEW);
