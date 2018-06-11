@@ -99,4 +99,5 @@ EXPORT Utilities := MODULE
 													SELF := LEFT));
 		RETURN analytics_uids;
 	END;
+
 END;

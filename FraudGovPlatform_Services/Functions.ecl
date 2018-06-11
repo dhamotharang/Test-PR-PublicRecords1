@@ -689,7 +689,6 @@ EXPORT Functions := MODULE
 
 		RETURN ds_fragment_recs_w_value;
 	END;
-
 	
 	EXPORT getIdentityElementScores (DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_entityNameUID,
 																	 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
@@ -717,6 +716,7 @@ EXPORT Functions := MODULE
 		// output(ds_clusterdetails, named('ds_clusterdetails____getIdentityElementScores'));
 		RETURN ds_clusterdetails;
 	END;
+
 	
 	EXPORT getClusterDetails (DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_entityNameUID,
 														 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
@@ -746,7 +746,7 @@ EXPORT Functions := MODULE
 		// output(ds_clusterdetails, named('ds_clusterdetails____getClusterDetails'));
 		// output(ds_center_clusterdetails, named('ds_center_clusterdetails____getClusterDetails'));
 		RETURN ds_center_clusterdetails;											 
-	END;
+	END;	
 	
 	EXPORT getAssociatedAddresses (DATASET(iesp.fraudgovreport.t_FraudGovTimelineDetails) ds_timeline) := FUNCTION
 		
@@ -766,5 +766,68 @@ EXPORT Functions := MODULE
 
 		RETURN ds_address;											 
 	END;	
+
+	EXPORT GetIndicatorAttributes(DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+			
+
+		FraudGovPlatform_Services.Layouts.kel_filter_rec xform_getFilter(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs L) := TRANSFORM
+			SELF.gc_id := batch_params.GlobalCompanyId;
+			SELF.ind_type := batch_params.IndustryType;
+			SELF.element := L;
+		END;
+
+		ds_kel_filter := PROJECT(ds_in,xform_getFilter(LEFT));
+
+		iesp.fraudgovreport.t_FraudGovIndicatorAttribute xform_getIndicatorAttribute(FraudGovPlatform_Services.Layouts.kel_filter_rec L, FraudGovPlatform.Key_ElementPivot R):= TRANSFORM
+			SELF.IndicatorTypeCode := R.indicatortype;
+			SELF.IndicatorTypeDescription := R.indicatordescription;
+			SELF.DataType := R.fieldtype;
+			SELF.RiskLevel := (STRING)R.risklevel;
+			SELF.DescriptionCode := R.field;
+			SELF.Description := R.label; 
+			SELF.DescriptionValue := R.value;
+			SELF := [];
+		END;
+
+		ds_indicator_attributes := JOIN(ds_kel_filter, FraudGovPlatform.Key_ElementPivot(),
+										KEYED(LEFT.gc_id = RIGHT.customer_id_ AND
+											LEFT.ind_type = RIGHT.industry_type_ AND
+											LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
+										xform_getIndicatorAttribute(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT,SKIP));
+
+		return ds_indicator_attributes;
+	END;
+
+	EXPORT GetScoreBreakDown(DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+
+		gc_id := batch_params.GlobalCompanyId;
+		ind_type := batch_params.IndustryType;
+
+		FraudGovPlatform_Services.Layouts.kel_filter_rec xform_getFilter(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs L) := TRANSFORM
+			SELF.gc_id := gc_id;
+			SELF.ind_type := ind_type;
+			SELF.element := L;
+		END;
+
+		ds_kel_filter := PROJECT(ds_in,xform_getFilter(LEFT));
+
+	
+		iesp.fraudgovreport.t_FraudGovScoreBreakdown generateScoreBreakdown(FraudGovPlatform_Services.Layouts.kel_filter_rec L,
+																			FraudGovPlatform.Key_ScoreBreakdown R):= TRANSFORM
+			SELF.IndicatorTypeCode := R.indicatortype;
+			SELF.IndicatorTypeDescription := R.IndicatorDescription;
+			SELF.RiskLevel := (STRING)R.risklevel;
+			SELF.PopulationType := R.populationtype;
+			SELF.Value := R.value;
+		END;
+
+		ds_scoreBreakdowns := JOIN(ds_kel_filter,FraudGovPlatform.Key_ScoreBreakdown(), 
+									KEYED(LEFT.gc_id = RIGHT.customer_id_ AND
+												LEFT.ind_type = RIGHT.industry_type_ AND
+												LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
+									generateScoreBreakdown(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+
+		return ds_scoreBreakdowns;
+	END;
 
 END;

@@ -251,4 +251,10 @@ EXPORT Layouts := MODULE
 		DATASET(iesp.share.t_NameValuePair) NVPs;
 	END;
 
+	EXPORT kel_filter_rec := RECORD
+			INTEGER gc_id;
+			INTEGER ind_type;
+			elementNidentity_uid_recs element;
+		END;
+
 END;
