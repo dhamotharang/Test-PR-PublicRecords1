@@ -1,7 +1,7 @@
 ﻿/*2018-02-13T00:25:56Z (Ros, Charlene (RIS-BCT))
 Added skipclustersforcompression to support DUS-272
 */
-import STD,lib_thorlib;
+import STD,lib_thorlib,_Control;
 export constants := module
 	
 	export location := 'B';
@@ -16,6 +16,28 @@ export constants := module
 																	,daliip = proddaliip => 'prod'
 																	,'na'
 																	);
+	
+	export esp(string dopsenv = ThorEnvironment) := map (
+																	dopsenv = 'dev' => _Control.IPAddress.dataland_esp
+																	,dopsenv = 'prod' => _Control.IPAddress.prod_thor_esp
+																	,'na'
+																	);
+	
+	export rptemail(string l_location = location) := map (
+																	l_location = 'B' => 'bocaroxiepackageteam@lexisnexisrisk.com'
+																	,l_location = 'A' => 'alproxiepackageteam@lexisnexisrisk.com'
+																	,'roxiepackageteam@lexisnexis.com'
+																	);
+	
+	export hthorcluster(string dopsenv = ThorEnvironment) := if (regexfind('eclcc',STD.System.Job.Target()),
+													map( dopsenv = 'prod' => 'hthor_eclcc'
+															,dopsenv = 'dev' => 'hthor_dev_eclcc'
+															,'na'
+													)
+													,map( dopsenv = 'prod' => 'hthor'
+															,dopsenv = 'dev' => 'hthor_dev'
+															,'na'
+													));
 	
 	// N - NonFCRA; F - FCRA; B - Boolean; S - Customer Support
 	// FS - FCRA Customer Support; T - Customer Test
