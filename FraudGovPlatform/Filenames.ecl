@@ -18,22 +18,27 @@ module
 		
 		export _IdentityDataPassed := FileSprayed+'::Passed::IdentityData';
 		export _IdentityDataRejected := FileSprayed+'::Rejected::IdentityData';
+		export _IdentityDataDelete := FileSprayed+'::Delete::IdentityData';
 		export IdentityData	:= _IdentityDataPassed;
 		
 		export _KnownFraudPassed := FileSprayed+'::Passed::KnownFraud';  
 		export _KnownFraudRejected := FileSprayed+'::Rejected::KnownFraud';
+		export _KnownFraudDelete := FileSprayed+'::Delete::KnownFraud';
 		export KnownFraud	:= _KnownFraudPassed;
 
 		export _DeltabasePassed := FileSprayed+'::Passed::Deltabase';  
 		export _DeltabaseRejected := FileSprayed+'::Rejected::Deltabase';
+		export _DeltabaseDelete := FileSprayed+'::Delete::Deltabase';
 		export Deltabase := _DeltabasePassed;	
 		
 		export _NACPassed := FileSprayed+'::Passed::NAC';  
 		export _NACRejected := FileSprayed+'::Rejected::NAC';
+		export _NACDelete := FileSprayed+'::Delete::NAC';
 		export NAC := _NACPassed;	
 		
 		export _InquiryLogsPassed := FileSprayed+'::Passed::InquiryLogs';  
 		export _InquiryLogsRejected := FileSprayed+'::Rejected::InquiryLogs';
+		export _InquiryLogsDelete := FileSprayed+'::Delete::InquiryLogs';
 		export InquiryLogs := _InquiryLogsPassed;		
 		
 	end;

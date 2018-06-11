@@ -352,25 +352,27 @@ END;
 									
 	END;
 	
-	//InquiryLog MBS validation
+	//InquiryLog MBS validation - ONLY DELTABASE!!!
 	
 	EXPORT ValidateInputWithMBS(string fname, string pSeparator, string pTerminator):= module
 		shared infile:=dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,
 									FraudGovPlatform.Layouts.Sprayed.Deltabase,CSV(separator([pSeparator]),quote([]),terminator(pTerminator)));
 		
-		shared InqMbs := join(infile,FraudShared.Files().Input.MBS.sprayed(status = 1)
+		infile_r := record
+			infile;
+			unsigned3		file_type;
+			unsigned6		ind_type;			
+		end;
+		
+		p1 := project(infile, transform(infile_r, self.file_type := 3; self.ind_type := FraudGovPlatform.Functions.ind_type_fn(left.customer_program); self := left;));
+		
+		shared InqMbs := join(p1,FraudShared.Files().Input.MBS.sprayed(status = 1)
 										,left.Customer_Account_Number =(string)right.gc_id
-										and left.Customer_State = right.customer_state
-										and FraudGovPlatform.Functions.ind_type_fn(left.Customer_Program) = right.ind_type
-										and FraudGovPlatform.Functions.file_type_fn('IDDT') = right.file_type
-										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-										and left.Customer_County = right.Customer_County 
+										and left.ind_type = right.ind_type
+										and left.file_type = right.file_type
 										,transform({string20 Customer_Account_Number,string1		Customer_Program,string2		customer_state,string		customer_agency_vertical_type, string3 Customer_County,unsigned4 seq}
 										,self.Customer_Account_Number:=left.Customer_Account_Number,
-										,self.Customer_State:=left.customer_state
-										,self.Customer_Agency_Vertical_Type:=left.Customer_Agency_Vertical_Type
 										,self.Customer_Program:=left.customer_program
-										,self.Customer_County := left.Customer_County 
 										,self.seq := counter
 										,self:=left),left only);
 	
