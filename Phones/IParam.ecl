@@ -40,6 +40,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN	CarrierInfo := FALSE;
 		EXPORT BOOLEAN	CallHandlingInfo := FALSE;
 		EXPORT BOOLEAN	DeviceInfo := FALSE;
+		EXPORT BOOLEAN 	DeviceChangeOption := FALSE;
 		EXPORT BOOLEAN 	DeviceHistory := FALSE;
 		EXPORT STRING10 optInType := '';
 		EXPORT STRING5 	optInMethod := '';

@@ -9,12 +9,16 @@ export zumigo_identity := MODULE
 export t_ZIdIdentityOptions := record (iesp.share.t_BaseOption)
 	string ProductName {xpath('ProductName')};
 	string ClientId {xpath('ClientId')};
+	string EndClientId {xpath('EndClientId')};
+	string UseCase {xpath('UseCase')}; //values['FFAO','FFCO','FCIP','TCPA','','']
 	boolean NameAddressValidation {xpath('NameAddressValidation')};
 	boolean NameAddressInfo {xpath('NameAddressInfo')};
 	boolean AccountInfo {xpath('AccountInfo')};
+	boolean AccountStatusInfo {xpath('AccountStatusInfo')};
 	boolean CarrierInfo {xpath('CarrierInfo')};
 	boolean CallHandlingInfo {xpath('CallHandlingInfo')};
 	boolean DeviceInfo {xpath('DeviceInfo')};
+	boolean DeviceChangeOption {xpath('DeviceChangeOption')};
 	boolean DeviceHistory {xpath('DeviceHistory')};
 end;
 		
@@ -22,6 +26,7 @@ export t_ZIdNameToVerify := record
 	string NameType {xpath('NameType')};
 	string FirstName {xpath('FirstName')};
 	string LastName {xpath('LastName')};
+	string BusinessName {xpath('BusinessName')};
 end;
 		
 export t_ZIdSubjectAddress := record
@@ -34,15 +39,47 @@ export t_ZIdSubjectAddress := record
 	string Country {xpath('Country')};
 end;
 		
+export t_ZIdEmailToVerify := record
+	string EmailType {xpath('EmailType')};
+	string EmailAddress {xpath('EmailAddress')};
+end;
+		
 export t_ZIdValidateValues := record
 	dataset(t_ZIdNameToVerify) NameList {xpath('NameList/Subject'), MAXCOUNT(15)};
 	dataset(t_ZIdSubjectAddress) AddressList {xpath('AddressList/Address'), MAXCOUNT(15)};
+	dataset(t_ZIdEmailToVerify) EmailList {xpath('EmailList/Email'), MAXCOUNT(15)};
 end;
 		
 export t_ZIdIdentitySearch := record
 	string MobileDeviceNumber {xpath('MobileDeviceNumber')};
 	zumigo_share.t_ZIdConsent Consent {xpath('Consent')};
 	t_ZIdValidateValues NameAddrValidation {xpath('NameAddrValidation')};
+end;
+		
+export t_ZIdBaseIdentity := record
+	string _Type {xpath('Type')};
+	string Value {xpath('Value')};
+	iesp.share.t_Date2 TrackedSince {xpath('TrackedSince')};
+	string SeenSince {xpath('SeenSince')};
+	boolean ChangedThisTime {xpath('ChangedThisTime')};
+	integer ChangeCount {xpath('ChangeCount')};
+end;
+		
+export t_ZIdIccid := record (t_ZIdBaseIdentity)
+end;
+		
+export t_ZIdImsi := record (t_ZIdBaseIdentity)
+	iesp.share.t_Date2 ActivationDate {xpath('ActivationDate')};
+	iesp.share.t_Date2 ChangeDate {xpath('ChangeDate')};
+end;
+		
+export t_ZIdSubscriberIdentifier := record
+	t_ZIdImsi Imsi {xpath('Imsi')};
+	t_ZIdIccid Iccid {xpath('Iccid')};
+end;
+		
+export t_ZIdDeviceIdentifier := record
+	t_ZIdImsi Imei {xpath('Imei')};
 end;
 		
 export t_ZIdCallHandlingInfo := record
@@ -56,6 +93,7 @@ export t_ZIdSubscriber := record
 	string LastName {xpath('LastName')};
 	string BusinessName {xpath('BusinessName')};
 	string Email {xpath('Email')};
+	t_ZIdSubscriberIdentifier Identifier {xpath('Identifier')};
 	string IntlMobileSubscriberId {xpath('IntlMobileSubscriberId')};
 	string SeenSince {xpath('SeenSince')};
 	boolean ChangedThisTime {xpath('ChangedThisTime')};
@@ -97,6 +135,9 @@ end;
 export t_ZIdDevice := record
 	string Make {xpath('Make')};
 	string Model {xpath('Model')};
+	boolean LostStolen {xpath('LostStolen')};
+	iesp.share.t_Date2 LostStolenDate {xpath('LostStolenDate')};
+	t_ZIdDeviceIdentifier Identifier {xpath('Identifier')};
 	string IntlMobileEquipmentId {xpath('IntlMobileEquipmentId')};
 	string SeenSince {xpath('SeenSince')};
 	boolean ChangedThisTime {xpath('ChangedThisTime')};
@@ -105,17 +146,25 @@ export t_ZIdDevice := record
 end;
 		
 export t_ZIdValidatedName := record (t_ZIdNameToVerify)
+	integer BillingFirstNameScore {xpath('BillingFirstNameScore')};
+	integer BillingLastNameScore {xpath('BillingLastNameScore')};
 	integer FirstNameScore {xpath('FirstNameScore')};
 	integer LastNameScore {xpath('LastNameScore')};
+	integer BusinessNameScore {xpath('BusinessNameScore')};
 end;
 		
 export t_ZIdValidatedAddress := record (t_ZIdSubjectAddress)
 	integer AddressScore {xpath('AddressScore')};
 end;
 		
+export t_ZIdValidatedEmail := record (t_ZIdEmailToVerify)
+	integer EmailScore {xpath('EmailScore')};
+end;
+		
 export t_ZIdValidationResults := record
 	dataset(t_ZIdValidatedName) NameList {xpath('NameList/ValidatedName'), MAXCOUNT(15)};
 	dataset(t_ZIdValidatedAddress) AddressList {xpath('AddressList/ValidatedAddress'), MAXCOUNT(15)};
+	dataset(t_ZIdValidatedEmail) EmailList {xpath('EmailList/ValidatedEmail'), MAXCOUNT(15)};
 end;
 		
 export t_ZIdPhoneIdentityError := record
