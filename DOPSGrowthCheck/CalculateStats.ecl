@@ -1,24 +1,27 @@
 ﻿import DOPSGrowthCheck,STD,ut;
-export CalculateStats(PackageName='',KeyRef,InputKeyNickName, KeyFile='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionCert='', VersionProd='') := functionmacro 
-LoadKey:=index(#expand(KeyRef),KeyFile);
+export CalculateStats(PackageName='',recref,InputKeyNickName, in_base='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionCert, VersionProd,willPublish=true, iskey=true) := functionmacro 
+#IF(iskey=false)
+	BaseFile:=dataset(in_base,#expand(recref),thor);
+	#ELSE	
+	LoadKeyNew:=index(#expand(recref),in_base);
+	BaseFile:=pull(LoadKeyNew);
+#END;
 
-PullKey:=pull(LoadKey);
+NumRecs:=count(BaseFile);
 
-NumRecs:=count(PullKey);
-
-ut.hasField(PullKey,did,hasDID);
-ut.hasField(PullKey,ProxID,hasProxID);
-ut.hasField(PullKey,SeleID,hasSeleID);
+ut.hasField(BaseFile,did,hasDID);
+ut.hasField(BaseFile,ProxID,hasProxID);
+ut.hasField(BaseFile,SeleID,hasSeleID);
 #DECLARE(CommaString);
 #DECLARE(FieldCount);
 #SET(CommaString,'');
 #SET(FieldCount,0);
-ut.hasField(PullKey,Date_Last_Seen,hasDate_Last_Seen);
-ut.hasField(PullKey,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
-ut.hasField(PullKey,Process_Date,hasProcess_Date);
-ut.hasField(PullKey,Filedate,hasFiledate);
+ut.hasField(BaseFile,Date_Last_Seen,hasDate_Last_Seen);
+ut.hasField(BaseFile,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
+ut.hasField(BaseFile,Process_Date,hasProcess_Date);
+ut.hasField(BaseFile,Filedate,hasFiledate);
 
-DistFile:=distribute(PullKey,hash(#expand(indexfields)));
+DistFile:=distribute(BaseFile,hash(#expand(PersistentRecIDField)));
 
 #IF(hasDID)
 UniqueDID:=(string)count(table(DistFile,{did},did,merge));
@@ -93,24 +96,24 @@ UniqueIndex:=(string)count(table(DistFile,{#expand(indexfields)},#expand(indexfi
     #APPEND(CommaString,'Filedate');
 #END 
 #IF(%FieldCount%>0)
-RemoveDates:=project(PullKey,transform(recordof(PullKey)-[%CommaString%],Self:=Left;));
+RemoveDates:=project(BaseFile,transform(recordof(BaseFile)-[%CommaString%],Self:=Left;));
 #ELSE 
-RemoveDates:=PullKey;
+RemoveDates:=BaseFile;
 #END 
-UniquePayload:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),record,local),record,local));
+UniquePayload:=(string)count(dedup(sort(distribute(RemoveDates,hash(#expand(indexfields))),record,local),record,local));
 
 NewEntry:=dataset([
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','NumRecs',NumRecs,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueDID',UniqueDID,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueProxID',UniqueProxID,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueEmail',UniqueEmail,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePhone',UniquePhone,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueSSN',UniqueSSN,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniqueIndex',UniqueIndex,'B','N'},
-{PackageName,KeyFile,InputKeyNickName,VersionCert,'n/a','UniquePayload',UniquePayload,'B','N'}
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','NumRecs',NumRecs,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueDID',UniqueDID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueProxID',UniqueProxID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueEmail',UniqueEmail,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePhone',UniquePhone,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueSSN',UniqueSSN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueIndex',UniqueIndex,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePayload',UniquePayload,'B','N'}
 ],DOPSGrowthCheck.layouts.Stats_Layout);
 OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
@@ -138,9 +141,11 @@ AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
                       STD.File.FinishSuperFileTransaction()
                      );
 
-
+#IF(willPublish=false)
+return output(NewFile);
+#ELSE
 return sequential(
 		Publish,
     AddFile);
-
+#END
 endmacro;

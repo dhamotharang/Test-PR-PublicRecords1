@@ -1,4 +1,4 @@
-﻿EXPORT PersistenceCheck(in_base,in_father,PackageName,NickName,KeyRef,rec_id,PersistentFields,DistSet,VersionBase,VersionFather) := functionmacro
+﻿EXPORT PersistenceCheck(in_base,in_father,PackageName,NickName,recref,rec_id,PersistentFields,DistSet,VersionBase,VersionFather,publish=true,iskey=true) := functionmacro
 import std;
 
 	#Declare(CommandString);
@@ -19,9 +19,20 @@ import std;
 		#SET(numField, %numField% + 1);
 	#end
 	#Set(numField,1);
-	DistNew:=distribute(in_base,hash(%'CommaString'%));
-	DistOld:=distribute(in_father,hash(%'CommaString'%));
-	#Append(CommandString,'Slim_Rec:=record\n');
+#IF(iskey=false)
+	LoadNew:=dataset(in_base,#expand(recref),thor);
+	LoadOld:=dataset(in_father,#expand(recref),thor);
+	DistNew:=distribute(LoadNew,hash(%CommaString%));
+	DistOld:=distribute(LoadOld,hash(%CommaString%));
+#ELSE	
+	LoadKeyNew:=index(#expand(recref),in_base);
+	LoadKeyOld:=index(#expand(recref),in_father);
+	PullKeyNew:=pull(LoadKeyNew);
+	PullKeyOld:=pull(LoadKeyOld);
+	DistNew:=distribute(PullKeyNew,hash(%CommaString%));
+	DistOld:=distribute(PullKeyOld,hash(%CommaString%));
+#END;
+#Append(CommandString,'Slim_Rec:=record\n');
 	#loop 
 		#IF(%numField%> Count(PersistentFields))
 			#BREAK 
@@ -65,9 +76,20 @@ import std;
 	#end
 	#APPEND(CommandString,',tCheckPersistence(Left,Right),local);\n');
 	#APPEND(CommandString,'ResultTable:=Table(dCheckPersistence,{Diff,cnt:=count(group)},Diff,merge);\n');
-	#APPEND(CommandString,'result:=OUTPUT(ResultTable);\n');
+	#APPEND(CommandString,'results:=OUTPUT(ResultTable);\n');
 %CommandString%;
-return result;
-// return %'CommandString'%;
+#if(publish=false)
+	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,Results,output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
+	#else
+	
+	PublishFile:=output(ResultTable,,'~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+NickName,thor,compressed,overwrite);
+
+	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::PersistenceCheck::using','~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+NickName),
+                      STD.File.FinishSuperFileTransaction()
+                     );
+										 
+	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,sequential(PublishFile,AddFile),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
+	#end
 	
 endmacro;

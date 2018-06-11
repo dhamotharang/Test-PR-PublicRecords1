@@ -20,7 +20,7 @@
                             Left.PersistRecIDField  +'\',\''+
 														Left.ignorefields				+'\',\''+
 														Left.CertVersion        +'\',\''+
-                            Left.ProdVersion        +'\',true,true)';
+                            Left.ProdVersion        +'\')';
             Self.FullCommand:=Self.command;
             ));						
 

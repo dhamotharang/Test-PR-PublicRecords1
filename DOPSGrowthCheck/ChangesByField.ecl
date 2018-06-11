@@ -1,4 +1,4 @@
-﻿EXPORT ChangesByField(in_base,in_father,PackageName,NickName,recref,rec_id,ignorefields='',VersionBase,VersionFather,publish=false,iskey=false) := functionmacro
+﻿EXPORT ChangesByField(in_base,in_father,PackageName,NickName,recref,rec_id,ignorefields='',VersionBase,VersionFather,publish=true,iskey=true) := functionmacro
 import std;
 #IF(iskey=false)
 	#if(ignorefields='')
@@ -59,17 +59,17 @@ import std;
 	#APPEND(DatasetString,'],DOPSGrowthCheck.layouts.FieldChangeLayout);');
 	%DatasetString%;
 	#if(publish=false)
-	return Results;
+	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,output(Results),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
 	#else
 	
-	Publish:=output(Results,,'~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName,thor,compressed,overwrite);
+	PublishFile:=output(Results,,'~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName,thor,compressed,overwrite);
 
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
                       STD.FILE.AddSuperFile('~thor_data400::DeltaStats::ChangesByField::using','~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 										 
-	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,sequential(Publish,AddFile),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
+	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,sequential(PublishFile,AddFile),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
 	#end
 
 endmacro;
