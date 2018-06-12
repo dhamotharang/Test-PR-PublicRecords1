@@ -503,10 +503,22 @@ module
 	export mi_raw :=
 	module
 
-				export master1                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master1::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,,,',');
+				export CorpMaster	    			:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
+				export AssumedName	    		:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::assumedname::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
+				export GeneralPartner  			:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::generalpartner::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
+				export History	    				:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::history::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
+				export LLC            			:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::limitedliabilityco::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',); 
+				export LP             			:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::limitedpartnership::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
+				export NameRegistration			:= VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::nameregistration::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,'\\,',, '"',);
 
 		export dAll_filenames :=
-			  master1.dAll_filenames
+			  CorpMaster.dAll_filenames + 
+				AssumedName.dAll_filenames + 
+				GeneralPartner.dAll_filenames + 
+				History.dAll_filenames + 
+				LLC.dAll_filenames + 
+				LP.dAll_filenames + 
+				NameRegistration.dAll_filenames 
 			;
 
 	end;

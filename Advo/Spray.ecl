@@ -1,4 +1,4 @@
-import VersionControl;
+﻿import VersionControl, _control;
 export Spray(
 
 	//string pDirectory = '/data/hds_180/advo/spray'
@@ -9,7 +9,7 @@ function
 
 	return
 	DATASET([
-		{'bctlpedata11.risk.regn.net'										
+		{ _control.IPAddress.bctlpedata11										
 		,pDirectory                      
 		,'VNEF_BASE_AID_*.dat'                           
 		,'302'                                                             

@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_MI_Stock
 FILENAME:In_MI
 //Uncomment up to NINES for internal or external adl
@@ -39,7 +39,7 @@ FIELD:stock_authorized_nbr:TYPE(STRING50):LIKE(invalid_stock_authorized_nbr):0,0
 FIELD:stock_par_value:TYPE(STRING15):0,0
 FIELD:stock_nbr_par_shares:TYPE(STRING15):0,0
 FIELD:stock_change_ind:TYPE(STRING1):0,0
-FIELD:stock_change_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:stock_change_date:TYPE(STRING8):0,0
 FIELD:stock_voting_rights_ind:TYPE(STRING1):0,0
 FIELD:stock_convert_ind:TYPE(STRING1):0,0
 FIELD:stock_convert_date:TYPE(STRING8):0,0
