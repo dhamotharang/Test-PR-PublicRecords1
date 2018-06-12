@@ -1,27 +1,31 @@
-import DOPSGrowthCheck;
+﻿import DOPSGrowthCheck;
 export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) BuildList) := function
     IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
     //Self.hasProdRecord:=DOPSGrowthCheck.HasPrevious(Left.PackageName,Left.KeyFile,Left.ProdVersion);
     //Self.hasProdRecord:='true';
-    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFile);
+    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
     Self:=Left;));
 
     CommandLayout:=RECORD
         string command;
         string FullCommand;
     END;
-output('test1');
     
 
     GenerateIndividualCommands:=PROJECT(IdentifyAttributes, transform(CommandLayout,
             Self.command:='DOPSGrowthCheck.CalculateStats(\''+
-                            Left.PackageName    +'\',\''+
-                            Left.KeyAttribute   +'\',\''+
-                            Left.KeyFile        +'\',\''+
-                            Left.indexfields    +'\','+
-                            //Left.hasProdRecord  +',\''+
-                            Left.CertVersion    +'\',\''+
-                            Left.ProdVersion    +'\')';
+                            Left.PackageName        +'\',\''+
+                            Left.KeyAttribute       +'\',\''+
+                            Left.KeyNickName        +'\',\''+
+                            Left.KeyFileNew         +'\',\''+
+                            Left.indexfields        +'\',\''+
+							Left.PersistRecIDField  +'\',\''+
+							Left.EmailField         +'\',\''+
+							Left.PhoneField         +'\',\''+
+							Left.SSNField           +'\',\''+
+							Left.FeinField          +'\',\''+
+                            Left.CertVersion        +'\',\''+
+                            Left.ProdVersion        +'\')';
             Self.FullCommand:=Self.command;
             ));
 
