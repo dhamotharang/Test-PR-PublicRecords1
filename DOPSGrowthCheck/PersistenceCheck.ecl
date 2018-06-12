@@ -1,4 +1,4 @@
-﻿EXPORT PersistenceCheck(in_base,in_father,PackageName,NickName,recref,rec_id,PersistentFields,DistSet,VersionBase,VersionFather,publish=true,iskey=true) := functionmacro
+﻿EXPORT PersistenceCheck(in_base,in_father,PackageName,InputKeyNickName,recref,rec_id,PersistentFields,DistSet,VersionBase,VersionFather,willPublish=true,iskey=true) := functionmacro
 import std;
 
 	#Declare(CommandString);
@@ -75,17 +75,27 @@ import std;
 		#SET(numField, %numField% + 1);
 	#end
 	#APPEND(CommandString,',tCheckPersistence(Left,Right),local);\n');
-	#APPEND(CommandString,'ResultTable:=Table(dCheckPersistence,{Diff,cnt:=count(group)},Diff,merge);\n');
+	#APPEND(CommandString,'ResultTable:=Table(dCheckPersistence,{Diff,NumRecsChanged:=count(group)},Diff,merge);\n');
+	#APPEND(CommandString,'AddMetaData:=project(ResultTable,transform(DopsGrowthCheck.layouts.PersistLayout,Self.PackageName:=\''+PackageName+'\';Self.KeyNickName:=\''+InputKeyNickName+'\';self.CurrVersion:=\''+VersionBase+'\';self.PrevVersion:=\''+VersionFather+'\';Self.Passed:=\'N\';Self:=left;));\n');
+	export PersistLayout	:=	RECORD
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				string PrevVersion;
+				string diff;
+				string NumRecsChanged;
+				string passed;
+			end;
 	#APPEND(CommandString,'results:=OUTPUT(ResultTable);\n');
 %CommandString%;
-#if(publish=false)
+#if(willPublish=false)
 	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,Results,output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
 	#else
 	
-	PublishFile:=output(ResultTable,,'~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+NickName,thor,compressed,overwrite);
+	PublishFile:=output(ResultTable,,'~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+InputKeyNickName,thor,compressed,overwrite);
 
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::PersistenceCheck::using','~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+NickName),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::PersistenceCheck::using','~thor_data400::DeltaStats::PersistenceCheck::using::'+workunit+InputKeyNickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 										 

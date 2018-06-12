@@ -126,4 +126,13 @@
 				string NumRecsChanged;
 				string passed;
 			end;
+			export PersistLayout	:=	RECORD
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				string PrevVersion;
+				string diff;
+				string NumRecsChanged;
+				string passed;
+			end;
 end;

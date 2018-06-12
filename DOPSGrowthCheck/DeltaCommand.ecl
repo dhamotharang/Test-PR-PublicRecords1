@@ -1,7 +1,7 @@
 ﻿
 
 import SALT311;
-EXPORT DeltaCommand(in_base,in_father,PackageName,KeyNickName,recref,rec_id,VersionBase,VersionFather,inFields,willPublish=true,iskey=true) := functionmacro
+EXPORT DeltaCommand(in_base,in_father,PackageName,InputKeyNickName,recref,rec_id,VersionBase,VersionFather,inFields,willPublish=true,iskey=true) := functionmacro
 	#Declare(DatasetString);
 	#Declare(numField);
 	#Set(DatasetString,'');
@@ -23,16 +23,16 @@ EXPORT DeltaCommand(in_base,in_father,PackageName,KeyNickName,recref,rec_id,Vers
 	Total:=count(BaseOld);
 
 	#Append(DatasetString,'Result:=dataset([\n');
-	#APPEND(DatasetString,'{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Added\',((string)((((real)count(Differences(added=true)))/((real)(Total)))*100)),((string)count(Differences(added=true))),\'N\'}\n');
-	#APPEND(DatasetString,',{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Deleted\',((string)((((real)count(Differences(Deleted=true)))/((real)(Total)))*100)),((string)count(Differences(Deleted=true))),\'N\'}\n');
-	#APPEND(DatasetString,',{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Changed\',((string)((((real)count(Differences(Changed=true)))/((real)(Total)))*100)),((string)count(Differences(Changed=true))),\'N\'}\n');
+	#APPEND(DatasetString,'{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Added\',((string)((((real)count(Differences(added=true)))/((real)(Total)))*100)),((string)count(Differences(added=true))),\'N\'}\n');
+	#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Removed\',((string)((((real)count(Differences(Deleted=true)))/((real)(Total)))*100)),((string)count(Differences(Deleted=true))),\'N\'}\n');
+	#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'Total\',\'Delta_Modified\',((string)((((real)count(Differences(Changed=true)))/((real)(Total)))*100)),((string)count(Differences(Changed=true))),\'N\'}\n');
 	#loop 
 		#IF(%numField%> Count(inFields))
 			#BREAK 
 		#ELSE 
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Added\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_added=true)))/((real)(Total)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_added=true))),\'N\'}\n');
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Removed\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_removed=true)))/((real)(Total)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_removed=true))),\'N\'}\n');
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+KeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Modified\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_modified=true)))/((real)(Total)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_modified=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Added\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_added=true)))/((real)count(Differences(added=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_added=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Removed\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_removed=true)))/((real)count(Differences(Deleted=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_removed=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Modified\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_modified=true)))/((real)count(Differences(Changed=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_modified=true))),\'N\'}\n');
 		#end 
 		#SET(numField, %numField% + 1);
 	#end 
@@ -40,10 +40,10 @@ EXPORT DeltaCommand(in_base,in_father,PackageName,KeyNickName,recref,rec_id,Vers
 	
 	%DatasetString%;
 
-	Publish:=output(Result,,'~thor_data400::DeltaStats::FullDeltaStats::using::'+workunit+KeyNickName,thor,compressed,overwrite);
+	Publish:=output(Result,,'~thor_data400::DeltaStats::FullDeltaStats::using::'+workunit+InputKeyNickName,thor,compressed,overwrite);
 
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::FullDeltaStats::using','~thor_data400::DeltaStats::FullDeltaStats::using::'+workunit+KeyNickName),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::FullDeltaStats::using','~thor_data400::DeltaStats::FullDeltaStats::using::'+workunit+InputKeyNickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 

@@ -1,5 +1,5 @@
 ﻿import DOPSGrowthCheck,STD,ut;
-export CalculateStats(PackageName='',recref,InputKeyNickName, in_base='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionCert, VersionProd,willPublish=true, iskey=true) := functionmacro 
+export CalculateStats(PackageName='',recref,InputKeyNickName, in_base='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionBase, VersionFather,willPublish=true, iskey=true) := functionmacro 
 #IF(iskey=false)
 	BaseFile:=dataset(in_base,#expand(recref),thor);
 	#ELSE	
@@ -106,21 +106,21 @@ RemoveDates:=BaseFile;
 UniquePayload:=(string)count(dedup(sort(distribute(RemoveDates,hash(#expand(indexfields))),record,local),record,local));
 
 NewEntry:=dataset([
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','NumRecs',NumRecs,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueDID',UniqueDID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueProxID',UniqueProxID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueEmail',UniqueEmail,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePhone',UniquePhone,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueSSN',UniqueSSN,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniqueIndex',UniqueIndex,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionCert,'n/a','UniquePayload',UniquePayload,'B','N'}
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','NumRecs',NumRecs,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueDID',UniqueDID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueProxID',UniqueProxID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueEmail',UniqueEmail,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePhone',UniquePhone,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSSN',UniqueSSN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueIndex',UniqueIndex,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePayload',UniquePayload,'B','N'}
 ],DOPSGrowthCheck.layouts.Stats_Layout);
 OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
-IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=VersionProd and RecType='B');
+IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=VersionFather and RecType='B');
 
 
 

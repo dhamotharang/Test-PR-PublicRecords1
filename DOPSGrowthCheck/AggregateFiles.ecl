@@ -21,6 +21,13 @@ FieldUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus)
 
 FieldnewrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::using',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
 
+PersistoldrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::full',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
+
+PersistUpdatePassed:=project(FieldoldrecsPlus,transform(recordof(FieldoldrecsPlus),Self.Passed:=if(Exists(ProdList(datasetname=Left.Packagename and buildversion=Left.CurrVersion)) and Left.Passed='N','Y',Left.Passed);Self:=Left;));
+
+FieldnewrecsPlus:=dataset('~thor_data400::DeltaStats::ChangesByField::using',DOPSGrowthCheck.layouts.FieldChangeLayout,thor,__compressed__,opt);
+
+
 CreateNewfile:=sequential(
 output(UpdatePassed+newrecsPlus,,'~thor_data400::DeltaStats::IndividualFileStats::full::'+workunit,thor,compressed),
 output(DeltaUpdatePassed+DeltanewrecsPlus,,'~thor_data400::DeltaStats::FullDeltaStats::full::'+workunit,thor,compressed),

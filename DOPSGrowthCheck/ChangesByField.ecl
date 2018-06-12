@@ -1,4 +1,4 @@
-﻿EXPORT ChangesByField(in_base,in_father,PackageName,NickName,recref,rec_id,ignorefields='',VersionBase,VersionFather,publish=true,iskey=true) := functionmacro
+﻿EXPORT ChangesByField(in_base,in_father,PackageName,InputKeyNickName,recref,rec_id,ignorefields='',VersionBase,VersionFather,willPublish=true,iskey=true) := functionmacro
 import std;
 #IF(iskey=false)
 	#if(ignorefields='')
@@ -49,23 +49,23 @@ import std;
 	
 	#DECLARE(DatasetString);
 	#SET(DatasetString,'Results:=dataset([\n');
-	#APPEND(DatasetString,'{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
+	#APPEND(DatasetString,'{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
 	#EXPORTXML(FieldList,recordof(DistNew));
 	#FOR(FieldList)
 		#FOR(field)
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+NickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
 		#end
 	#end
 	#APPEND(DatasetString,'],DOPSGrowthCheck.layouts.FieldChangeLayout);');
 	%DatasetString%;
-	#if(publish=false)
+	#if(willPublish=false)
 	return if(STD.File.FileExists(in_base)=true and STD.File.FileExists(in_father)=true,output(Results),output('One or Both of the files '+in_base+' and '+in_father+'do not exist'));
 	#else
 	
-	PublishFile:=output(Results,,'~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName,thor,compressed,overwrite);
+	PublishFile:=output(Results,,'~thor_data400::DeltaStats::ChangesByField::using::'+workunit+InputKeyNickName,thor,compressed,overwrite);
 
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::ChangesByField::using','~thor_data400::DeltaStats::ChangesByField::using::'+workunit+NickName),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::ChangesByField::using','~thor_data400::DeltaStats::ChangesByField::using::'+workunit+InputKeyNickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 										 
