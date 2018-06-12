@@ -135,18 +135,20 @@ string l_espport = '8010') := function
 													)
 													,'hthor');
 	
-	spawnWUtoUpdateKeyInfo := output(dops.WorkUnitModule(l_esp,l_espport).fSubmitNewWorkunit
+	/*spawnWUtoUpdateKeyInfo := output(dops.WorkUnitModule(l_esp,l_espport).fSubmitNewWorkunit
 																	(
 																		'#workunit(\'name\',\'KEY INFO UPDATE DOPS DB:'+ datasetname+':'+uversion+':'+inenvment+'\');\r\n'+
 																		'dops.UpdateDOPSForPkgValidation(\''+datasetname+'\',\''+uversion+'\',l_environmentflag:=\''+if(l_isprodready = 'Y','P','Q')+'\',l_clusterflag:=\''+inenvment+'\',l_locationflag:=\''+l_inloc+'\',l_dopsenv:=\''+l_dopsenv+'\',l_daliip := \''+l_indaliip+'\',l_email:=\''+l_email_t+'\').RunUpdate();'
 																		,dops.constants.hthorcluster(l_dopsenv))
-																		);
+																	);*/
+
+	updatekeyinfo := dops.UpdateDOPSForPkgValidation(datasetname,uversion,l_environmentflag:=if(l_isprodready = 'Y','P','Q'),l_clusterflag:=inenvment,l_locationflag:=l_inloc,l_dopsenv:=l_dopsenv,l_daliip := l_indaliip,l_email:=l_email_t).RunUpdate();
 	
 	return if(dops.constants.dopsenvironment <> 'na'
 							,if (builtkeys <> ''
 									,missingkeys
 									,if(uversion[1..8] <= (string8)STD.Date.Today()
-													,sequential(codeval,spawnWUtoUpdateKeyInfo)
+													,sequential(output(updatekeyinfo),codeval)
 													,invalid_date))
 							,invaliddaliip);
 
