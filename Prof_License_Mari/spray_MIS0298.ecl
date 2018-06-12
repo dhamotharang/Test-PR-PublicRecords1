@@ -10,7 +10,7 @@ import ut
 //Files for S0812 are Located  //
 export spray_MIS0298 (string filedate) := MODULE
 
-#workunit('name','Spray MIS0298');
+#workunit('name','Yogurt: Spray MIS0298');
 
 shared filepath		    :=	'/data/data_build_5_2/MARI/in/MIS0298/' + filedate +'/';
 shared sourcepath			:=	'/data/data_build_5_2/MARI/';

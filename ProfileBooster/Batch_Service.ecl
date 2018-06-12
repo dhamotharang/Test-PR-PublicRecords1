@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI;
 
 EXPORT Batch_Service() := FUNCTION
 
@@ -26,6 +26,8 @@ EXPORT Batch_Service() := FUNCTION
 																	self := left ) );
 
   attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest);  
+
+
 
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform
 		self.AcctNo 																	:= ri.AcctNo;
@@ -208,6 +210,15 @@ EXPORT Batch_Service() := FUNCTION
 		self.v1_RaAOccProfLicMmbrCnt									:= le.attributes.version1.RaAOccProfLicMmbrCnt;
 		self.v1_RaAOccBusinessAssocMmbrCnt						:= le.attributes.version1.RaAOccBusinessAssocMmbrCnt;
 		self.v1_RaAInterestSportPersonMmbrCnt					:= le.attributes.version1.RaAInterestSportPersonMmbrCnt;
+		
+		self.v1_PPCurrOwnedAutoVIN				:= le.attributes.version1.PPCurrOwnedAutoVIN;
+		self.v1_PPCurrOwnedAutoYear			:= le.attributes.version1.PPCurrOwnedAutoYear;
+		self.v1_PPCurrOwnedAutoMake				:= le.attributes.version1.PPCurrOwnedAutoMake;
+		self.v1_PPCurrOwnedAutoModel				:= le.attributes.version1.PPCurrOwnedAutoModel;
+		self.v1_PPCurrOwnedAutoSeries				:= le.attributes.version1.PPCurrOwnedAutoSeries;
+		self.v1_PPCurrOwnedAutoType				:= le.attributes.version1.PPCurrOwnedAutoType;
+		
+		self := le;
 	end;	
 	
 	final := join(attributes, PB_wSeq, 
