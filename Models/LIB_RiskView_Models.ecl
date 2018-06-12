@@ -28,7 +28,7 @@ EXPORT LIB_RiskView_Models (
 	 // EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVG1802_1_0(BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVD1801_1_0(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -90,6 +90,8 @@ EXPORT LIB_RiskView_Models (
 	SHARED MType_G := 'ShortTermLending';
 	SHARED MType_T := 'Telecom';
 	SHARED MType_S := 'CrossIndustry';
+	SHARED MType_D := 'Digital';
+  
 	// calcIndex returns the 'billing_index' given the report_option value.
 	// billing_index is needed by batch.  it is passed to the ESP logging server
 	// which performs a calculation to determine the actual report option.
@@ -149,6 +151,7 @@ that is sent INTO calcindex for ECL.
 																			{'RVG1610_1', MType_G+'RVG1610_1', calcIndex( 68), '0-999', 0}, //ACCESS Model
 																			{'RVP1702_1', MType_G+'RVP1702_1', calcIndex( 69), '0-999', 0}, //DM Services
 																			{'RVG1802_1', MType_G+'RVG1802_1', calcIndex( 70), '0-999', 0}, //Direct Financial
+																			{'RVD1801_1', MType_D+'RVD1801_1', calcIndex( 71), '0-999', 0}, //Digital
 																			
 																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
@@ -197,6 +200,7 @@ that is sent INTO calcindex for ECL.
 											'RVG1610_1' => UNGROUP(Models.RVG1610_1_0(BocaShell)),	
 											'RVP1702_1' => UNGROUP(Models.RVP1702_1_0(BocaShell)),	
 											'RVG1802_1' => UNGROUP(Models.RVG1802_1_0(BocaShell)),	
+											'RVD1801_1' => UNGROUP(Models.RVD1801_1_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),
