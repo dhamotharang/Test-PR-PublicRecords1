@@ -30,9 +30,9 @@ EXPORT DeltaCommand(in_base,in_father,PackageName,InputKeyNickName,recref,rec_id
 		#IF(%numField%> Count(inFields))
 			#BREAK 
 		#ELSE 
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Added\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_added=true)))/((real)count(Differences(added=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_added=true))),\'N\'}\n');
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Removed\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_removed=true)))/((real)count(Differences(Deleted=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_removed=true))),\'N\'}\n');
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Modified\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_modified=true)))/((real)count(Differences(Changed=true)))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_modified=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Added\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_added=true)))/((real)count(Differences(added=true))))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_added=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Removed\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_removed=true)))/((real)count(Differences(Deleted=true))))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_removed=true))),\'N\'}\n');
+			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+trim(inFields[%numField%])+'\',\'Delta_Modified\','+'((string)((((real)count(Differences('+trim(inFields[%numField%])+'_modified=true)))/((real)count(Differences(Changed=true))))*100)),((string)count(Differences('+trim(inFields[%numField%])+'_modified=true))),\'N\'}\n');
 		#end 
 		#SET(numField, %numField% + 1);
 	#end 
