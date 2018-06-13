@@ -1155,6 +1155,7 @@
 				trim(kword, left, right) = 'ESMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESMA,
 				trim(kword, left, right) = 'PHPDEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPDEA,
 				trim(kword, left, right) = 'PLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLPOL,
+				trim(kword, left, right) = 'ILISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILISA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
