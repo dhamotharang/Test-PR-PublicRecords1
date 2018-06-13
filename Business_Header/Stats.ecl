@@ -14,7 +14,7 @@ export Stats(
 	,dataset(Layout_Business_Header_Temp						)	pBH_Basic_Match_FEIN	= persists().BHBasicMatchFEIN
 	,dataset(Layout_Business_Header_Temp						)	pBH_Basic_Match_SALT	= persists().BHBasicMatchSALT
 	,dataset(Layout_Business_Header_Temp						)	pBH_Match_Init				= persists().BHMatchInit
-	,dataset(Layout_SIC_Code												) pSic_Code							= Persists().BHBDIDSIC									
+	//,dataset(Layout_SIC_Code												) pSic_Code							= Persists().BHBDIDSIC									
 	,dataset(Layout_BDL2														) pBDL									= files().base.bdl2.built
 	,boolean																					pOverwrite						= false
 
