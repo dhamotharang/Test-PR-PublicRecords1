@@ -4,7 +4,7 @@ every_10_min := '*/10 0-23 * * *';
 IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
 RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)):global(few);
 dsFileListSorted := sort(dsFileList,modified);
@@ -12,7 +12,8 @@ pfile:=STD.STR.SplitWords(dsFileListSorted[1].Name,'/');
 FileDir:=RootDir + pfile[1] +'/';
 
 ECL :=
- 'wuname := \'FraudGov Contributory Input Prep\';\n'
+ 'import ut;\n'
++'wuname := \'FraudGov Contributory Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -29,7 +30,7 @@ ECL :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInput(version,\''+IP+'\',\''+FileDir+'\',\''+ThorName+'\'))\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInput(version,\''+IP+'\',\''+FileDir+'\'))\n'
 +'	);\n'
 ;
 

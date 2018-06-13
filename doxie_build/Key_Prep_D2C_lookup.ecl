@@ -236,10 +236,10 @@ export Key_Prep_D2C_lookup() := function
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
  res := dataset([],res_layout);
- return index(res,{did},{res},data_services.Data_location.prefix('NoNameGiven') +  'prte::key::D2C_lookups_' + doxie.version_superkey);
+ return index(res,{did},{res},data_services.data_location.Prefix()+'prte::key::D2C_lookups_' + doxie.Version_SuperKey);
 #ELSE
  res := table(comb,res_layout,did,few,merge);
- return index(res,{did},{res},data_services.Data_location.prefix('NoNameGiven') +  'thor_data400::key::D2C_lookups_' + doxie.version_superkey);
+ return index(res,{did},{res},data_services.data_location.Prefix()+'thor_data400::key::D2C_lookups_' + doxie.Version_SuperKey);
 #END
 
 end;

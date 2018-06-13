@@ -1,5 +1,6 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 EXPORT hygiene(dataset(layout_File_Neustar) h) := MODULE
+
 //A simple summary record
 EXPORT Summary(SALT33.Str30Type txt) := FUNCTION
   SummaryLayout := RECORD
@@ -133,6 +134,7 @@ EXPORT Summary(SALT33.Str30Type txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
+
 summary0 := Summary('Summary');
 invRec := RECORD
   UNSIGNED  FldNo;
@@ -207,8 +209,12 @@ SHARED FldIds := DATASET([{1,'ACTION_CODE'}
       ,{39,'Original_Last_Line'}
       ,{40,'filename'}],SALT33.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT33.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+
 EXPORT SrcProfiles := SALT33.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+
 EXPORT Correlations := SALT33.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+
+
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;

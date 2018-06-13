@@ -1,4 +1,4 @@
-#WORKUNIT('protect',true);
+﻿#WORKUNIT('protect',true);
 // Header.BWR_Build
 
 // USER INSTRUCTION
@@ -110,8 +110,8 @@ lECL9 :=
 // Load all to the scheduler; however, load each one at a time
 // Scheduler only responds to the last event defined in the scheduled workunit
 // and ignores the rest.
-// #workunit('name','PersonHeader: Build_Header_raw'     ); header.fSubmitNewWorkunit(lECL1, 'thor400_60') : WHEN('Build_Header_raw');
-// #workunit('name','PersonHeader: Build_Header_base'    ); header.fSubmitNewWorkunit(lECL2, 'thor400_60') : WHEN('Build_Header_base');
+// #workunit('name','PersonHeader: Build_Header_raw'     ); header.fSubmitNewWorkunit(lECL1, 'thor400_44') : WHEN('Build_Header_raw');
+// #workunit('name','PersonHeader: Build_Header_base'    ); header.fSubmitNewWorkunit(lECL2, 'thor400_44') : WHEN('Build_Header_base');
 // #workunit('name','PersonHeader: Build_XADL'           ); header.fSubmitNewWorkunit(lECL3, 'thor400_60') : WHEN('Build_XADL');
 // #workunit('name','PersonHeader: Build_Relatives'      ); header.fSubmitNewWorkunit(lECL4, 'thor400_60') : WHEN('Build_Relatives');
 // #workunit('name','PersonHeader: Build_Header_Keys'    ); header.fSubmitNewWorkunit(lECL5, 'thor400_60') : WHEN('Build_Header_Keys');

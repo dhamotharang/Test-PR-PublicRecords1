@@ -1143,6 +1143,19 @@
 				trim(kword, left, right) = 'IDKPPU' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDKPPU,
 				trim(kword, left, right) = 'OFAC-CAATSA-RUSSIA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_RUSSIA,
 				trim(kword, left, right) = 'DPRK-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_DPRK_WC,
+				trim(kword, left, right) = 'QANCTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_QANCTC,
+				trim(kword, left, right) = 'SECO-VE' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_VE,
+				trim(kword, left, right) = 'IDKPK' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDKPK,
+				trim(kword, left, right) = 'OFAC-UKR13662' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_UKR13662,
+				trim(kword, left, right) = 'FINBI' =>SubGroup_Constants.numKeywordsID.KEYWORD_FINBI,
+				trim(kword, left, right) = 'PAMEF-CNBC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PAMEF_CNBC,
+				trim(kword, left, right) = 'LVSCS' =>SubGroup_Constants.numKeywordsID.KEYWORD_LVSCS,
+				trim(kword, left, right) = 'ECB' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECB,
+				trim(kword, left, right) = 'CAATSA228-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAATSA228_WC,
+				trim(kword, left, right) = 'ESMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESMA,
+				trim(kword, left, right) = 'PHPDEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPDEA,
+				trim(kword, left, right) = 'PLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLPOL,
+				trim(kword, left, right) = 'ILISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILISA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

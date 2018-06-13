@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_sos_charter_nbr = '',Input_ar_year = '',Input_ar_mailed_dt = '',Input_ar_due_dt = '',Input_ar_filed_dt = '',Input_ar_report_dt = '',Input_ar_report_nbr = '',Input_ar_franchise_tax_paid_dt = '',Input_ar_delinquent_dt = '',Input_ar_tax_factor = '',Input_ar_tax_amount_paid = '',Input_ar_annual_report_cap = '',Input_ar_illinois_capital = '',Input_ar_roll = '',Input_ar_frame = '',Input_ar_extension = '',Input_ar_microfilm_nbr = '',Input_ar_comment = '',Input_ar_type = '',Input_ar_exempt = '',Input_ar_license_tax_amount = '',Input_ar_status = '',Input_ar_paid_date = '',Input_ar_prev_paid_date = '',Input_ar_prev_tax_factor = '',Input_ar_extension_date = '',Input_ar_report_mail_date = '',Input_ar_deliquent_report_mail_date = '',Input_ar_report_filed_date = '',Input_ar_year_and_month_due = '',OutFile) := MACRO
-  IMPORT SALT34,Scrubs_Corp2_Mapping_MI_AR;
+  IMPORT SALT311,Scrubs_Corp2_Mapping_MI_AR;
   #uniquename(of)
   %of% := RECORD
-    SALT34.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

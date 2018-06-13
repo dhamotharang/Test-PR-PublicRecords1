@@ -5,7 +5,7 @@ EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog 
 //same filter used in v1						
 SHARED dLNPropertySearch		:=	if(pFastHeader
 												,dataset('~thor_data400::base::ln_propv2srchQuickHeader_building',ln_propertyv2.Layout_DID_Out,flat)
-														(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)
+														(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= 60+Header.Sourcedata_month.v_fheader_days_to_keep)
 												,dataset('~thor_data400::base::ln_propv2srchheader_building',ln_propertyv2.Layout_DID_Out,flat)
 												)
 												(
@@ -284,7 +284,7 @@ EXPORT ln_propertyv2_as_header	:=	p_rollup_filt
 																	);
 
 fp_rollup_new_records	:=	project(p_rollup,header.Layout_New_Records);
-fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep);
+fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= 60+Header.Sourcedata_month.v_fheader_days_to_keep);
 EXPORT ln_propertyv2_as_fheader	:=	fp_rollup_filt
                                    (
 																		fname <> '',

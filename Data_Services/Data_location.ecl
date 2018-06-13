@@ -2,7 +2,7 @@
 // to read the file from prod sandbox  export Person_header:= ut.foreign_prod;
 // by using a function then this attribute will only have to go to production once
 // becasue the default will be ~ and that is what you want for all indexes in production
-import _Control;
+import _Control,ut;
 export Data_location      := module 
 
 SetDali := [
@@ -19,6 +19,7 @@ export Prefix(string serviceName='NoNameGiven') := function
 															,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
 																					, ''),	
 								'person_xADL2'     	=> '',
+								'IDL_Header'        => ut.foreign_aprod,
 								'LAB_xLink' 				=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
                                           ,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
 																					,_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod+'thor400_60::'
@@ -27,9 +28,9 @@ export Prefix(string serviceName='NoNameGiven') := function
 																					,Data_Services.Default_Data_Location),
 								'TDS'								=> map(_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod
 																					,Data_Services.Default_Data_Location),
-								'biz_linking'     	=> map(thorlib.group() = 'thor400_60' => ''
-                                          ,                                  '~thor400_44::'
-                                       ),
+								'biz_linking'     	=> map(thorlib.group() = 'thor400_66' => '~thor400_66::'
+                                          ,thorlib.group() = 'thor400_44' => '~thor400_44::'
+																					,'~thor_data400::'),
 								'BogusPlaceHolder' => Data_Services.Default_Data_Location,	// Can add exceptions here
 								Data_Services.Default_Data_Location));
 end;

@@ -1041,6 +1041,19 @@
 		export string KEYWORD_IDKPPU								:= '729';
 		export string KEYWORD_OFAC_CAATSA_RUSSIA		:= '730';
 		export string KEYWORD_DPRK_WC								:= '731';
+		export string KEYWORD_QANCTC								:= '732';
+		export string KEYWORD_SECO_VE								:= '733';
+		export string KEYWORD_IDKPK									:= '734';
+		export string KEYWORD_OFAC_UKR13662					:= '735';
+		export string KEYWORD_FINBI									:= '736';
+		export string KEYWORD_PAMEF_CNBC						:= '737';
+		export string KEYWORD_LVSCS									:= '738';
+		export string KEYWORD_ECB										:= '739';
+		export string KEYWORD_CAATSA228_WC					:= '740';
+		export string KEYWORD_ESMA									:= '741';
+		export string KEYWORD_PHPDEA								:= '742';
+		export string KEYWORD_PLPOL									:= '743';
+		export string KEYWORD_ILISA									:= '744';
 
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
