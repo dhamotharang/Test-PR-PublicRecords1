@@ -54,7 +54,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
 
 		/* Returning Element or Identity Score and related clusters and related identities. */
-		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getIdentityElementScores(ds_entityNameUID, batch_params);
+		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
 
 		/* Getting the element and identity socre where Identity or Element is center of their cluster. */
 		ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
@@ -81,7 +81,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																				LEFT OUTER,
 																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
 																				
-		/* Getting the related identities and related clusters */
+		/* Getting the related clusters */
 		ds_cluster_proj := PROJECT(ds_raw_cluster_recs, 
 												TRANSFORM(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs,
 													SELF.entity_name := LEFT.entity_name,
@@ -89,9 +89,12 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 													SELF.tree_uid := LEFT.tree_uid_,
 													SELF.entity_context_uid := LEFT.entity_context_uid_));
 																										
-		ds_cluster_details := FraudGovPlatform_Services.Functions.getClusterDetails(ds_cluster_proj, batch_params);
+		ds_cluster_details := FraudGovPlatform_Services.Functions.getClusterDetails(ds_cluster_proj, batch_params, TRUE);
 		
-		ds_related_clusters := PROJECT(ds_cluster_details, 
+		/* Getting the element and identity socre where Identity or Element is center of their cluster. */
+		ds_center_clusterdetails := ds_cluster_details(tree_uid_ = entity_context_uid_);
+		
+		ds_related_clusters := PROJECT(ds_center_clusterdetails, 
 														TRANSFORM(iesp.fraudgovreport.t_FraudGovClusterCardDetails,
 															SELF.AnalyticsRecordId := LEFT.tree_uid_,
 															SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.CLUSTER,
@@ -111,13 +114,14 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																											SELF.Name := LEFT.indicator,
 																											SELF.Value := LEFT.value)),
 															SELF := []));
-			
-		ds_associated_identities_raw := ds_cluster_details(entity_type_ = FraudGovKelConst_.ENTITY_TYPE_LEXID);
+
+		/* Getting the related identities*/			
+		ds_associated_identities_raw := ds_center_clusterdetails(entity_type_ = FraudGovKelConst_.ENTITY_TYPE_LEXID);
 		
 		ds_associated_identities_dids := PROJECT(ds_associated_identities_raw,  
 																			TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec,
 																				//[4..] because Entitiy Context uid in RAMPS/KEL keys has following format for lexid
-																				// '_01' + DID_Value.
+																				// Calculation goes like => '_01' + DID_Value.
 																				SELF.DID := (unsigned6) LEFT.entity_context_uid_[4..],
 																				SELF := []));
 
@@ -216,7 +220,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			SELF := [];
 		END;
 		
-		//output(ds_elemets_w_uids);
 		// output(ds_batch_in, named('ds_batch_in'));
 		// output(ds_batch, named('ds_batch'));
 		// output(all_knownfrauds, named('all_knownfrauds'));
@@ -233,6 +236,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		// output(ds_ElementcardDetail_w_score, named('ds_ElementcardDetail_w_score'));
 		// output(ds_cluster_proj, named('ds_cluster_proj'));
 		// output(ds_cluster_details, named('ds_cluster_details'));
+		// output(ds_center_clusterdetails, named('ds_center_clusterdetails'));
 		// output(ds_related_clusters, named('ds_related_clusters'));
 		// output(ds_dids, named('ds_dids'));
 		// output(ds_GovBest, named('ds_GovBest'));
