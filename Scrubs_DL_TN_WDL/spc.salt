@@ -1,0 +1,40 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_DL_TN_WDL
+FILENAME:In_TN_WDL
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+FIELDTYPE:invalid_past_date:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_valid_past_date>0)
+FIELDTYPE:invalid_dl_nbr:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_check_dl_number>0)
+FIELDTYPE:invalid_action_code:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_action_code>0)
+FIELDTYPE:invalid_lname:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_valid_lname>0)
+FIELDTYPE:invalid_county_code:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_county_code>0)
+FIELDTYPE:invalid_action_type:CUSTOM(Scrubs_DL_TN_WDL.Functions.fn_action_type>0)
+FIELDTYPE:invalid_filler_data:CUSTOM(Scrubs_DL_TN_CONV.Functions.fn_filler_data>0)
+
+FIELD:process_date:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:dl_number:TYPE(STRING9):LIKE(invalid_dl_nbr):0,0
+FIELD:action_code:TYPE(STRING3):LIKE(invalid_action_code):0,0
+FIELD:event_date:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:last_name:TYPE(STRING29):LIKE(invalid_lname):0,0
+FIELD:birthdate:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:post_date:TYPE(STRING8):LIKE(invalid_past_date):0,0
+FIELD:county_code:TYPE(STRING2):LIKE(invalid_county_code):0,0
+FIELD:action_type:TYPE(STRING3):LIKE(invalid_action_type):0,0
+FIELD:filler:TYPE(STRING137):LIKE(invalid_filler_data):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking
