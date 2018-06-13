@@ -9,11 +9,11 @@ EXPORT Functions := MODULE
   END;
   
   /* fn_filler_data: returns true only if it has no** data values! 
-		 returns false when it has some type of data, needs to be verified with data receiving before we proceed on following steps in the DL Conv&Wdl build!  
+		   returns false when it has some type of data, needs to be verified with data receiving!  
      Details: TN Convictions and Withdrawal files lengths are inconsistent from month to month from vendor, 
      even though they are supposed to be 69 (68+terminator) or 63 (62+terminator), 
      But for some reason vendor has been inconsistent &Michael is padding lengths to 200 bytes by adding a filler field 
-     to the layout! This filler filed should be always empty unless we have record layout change!
+     to the layout! This filler field should be always empty unless we have record layout change!
   */
   EXPORT fn_filler_data(STRING filler_chk) := FUNCTION
 		RETURN IF(trim(filler_chk,all)='',1,0);
