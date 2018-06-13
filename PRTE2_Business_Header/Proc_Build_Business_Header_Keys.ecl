@@ -53,11 +53,11 @@ module
 	VersionControl.macBuildNewLogicalKeyWithName(Doxie_cbrs.key_BDID_NameVariations								,keyname.Base.BdidSeq.New									,Build_Base_BdidSeq_Key									);
 	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_BH_SuperGroup_GroupID				,keyname.Supergroup.Groupid.New						,Build_Supergroup_Groupid_Key						);
 	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_BH_SuperGroup_BDID						,keyname.Supergroup.Bdid.New							,Build_Supergroup_Bdid_Key							);
-	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_Prep_SIC_Code								,keyname.Base.Siccode.New									,Build_Base_Siccode_Key									);
+	//VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_Prep_SIC_Code								,keyname.Base.Siccode.New									,Build_Base_Siccode_Key									);
 	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_SICCode_Zip									,keyname.Base.SiccodeZip.New							,Build_Base_SiccodeZip_Key							);
 	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_ZipPRLName										,keyname.Base.ZipPRLName.New							,Build_Base_ZipPRLName_Key							);
 	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_Business_Header_RCID					,keyname.Base.Rcid.New										,Build_Base_Rcid_Key										);
-	VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_Commercial_SIC_Zip						,keyname.Base.Commercial.New							,Build_Commercial_Siccode_Key						);
+	//VersionControl.macBuildNewLogicalKeyWithName(Business_Header.Key_Commercial_SIC_Zip						,keyname.Base.Commercial.New							,Build_Commercial_Siccode_Key						);
 																																																											 
 																																																											 
 	shared Build_Bases :=
@@ -123,11 +123,11 @@ module
 			,Build_Base_BdidSeq_Key				
 			,Build_Supergroup_Groupid_Key			
 			,Build_Supergroup_Bdid_Key			
-			,Build_Base_Siccode_Key	
+			//,Build_Base_Siccode_Key	
 			,Build_Base_SiccodeZip_Key
 			,Build_Base_ZipPRLName_Key
 			,Build_Base_Rcid_Key
-			,Build_Commercial_Siccode_Key				
+			//,Build_Commercial_Siccode_Key				
 
 		)) : success(output('Build PRCT Business Header Slimsort, Supergroup, and Best Keys Complete'));
 
