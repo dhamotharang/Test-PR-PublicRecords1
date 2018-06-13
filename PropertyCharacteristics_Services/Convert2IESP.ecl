@@ -403,13 +403,13 @@ module
 		
 		iesp.property_info.t_MortgageRecordReport	tMortgageInfo(PropertyCharacteristics_Services.Layouts.SlimmedMortgage	pInput,integer	cnt)	:=
 		transform
-			self.MortgageCompanyName	:=	pInput.mortgage_company_name;
+			self.MortgageCompanyName	:=	choose(cnt,pInput.mortgage_company_name,'');
 			self.MortgageType					:=	choose(cnt,1,2);
 			self.LoanAmount						:=	choose(cnt,(real)pInput.loan_amount,(real)pInput.second_loan_amount);
-			self.LoanTypeCode					:=	pInput.loan_type_code;
-			self.LoanType							:=	Codes.KeyCodes('PROPERTYINFO','MORTGAGE_LOAN_TYPE_CODE','COMMN',pInput.loan_type_code);
-			self.InterestRateTypeCode	:=	pInput.interest_rate_type_code;
-			self.InterestRateType			:=	Codes.KeyCodes('PROPERTYINFO','TYPE_FINANCING','COMMN',pInput.interest_rate_type_code);
+			self.LoanTypeCode					:=	choose(cnt,pInput.loan_type_code,'');
+			self.LoanType							:=	choose(cnt,Codes.KeyCodes('PROPERTYINFO','MORTGAGE_LOAN_TYPE_CODE','COMMN',pInput.loan_type_code),'');
+			self.InterestRateTypeCode	:=	choose(cnt,pInput.interest_rate_type_code,'');
+			self.InterestRateType			:=	choose(cnt,Codes.KeyCodes('PROPERTYINFO','TYPE_FINANCING','COMMN',pInput.interest_rate_type_code),'');
 			self											:=	[];
 		end;
 		
