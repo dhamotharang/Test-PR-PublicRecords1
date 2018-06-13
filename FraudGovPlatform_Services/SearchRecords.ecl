@@ -100,15 +100,16 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	//Getting the Cluster score for an element and the related cluster cards.
 	ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
-	ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getIdentityElementScores(ds_entityNameUID, batch_params);
+	ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
 	
-			// checking with entity_context_uid_ = tree_uid_ only return those elemenet/identities which are center of their cluster. 
+	//Checking with entity_context_uid_ = tree_uid_ only return those elemenet/identities which are center of their cluster. 
 	ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
 	
 	ds_fragment_recs_w_scores := 	JOIN(ds_fragment_recs_rolled, ds_cluster_recs_scores,
 																	LEFT.fragment = RIGHT.entity_name AND
 																	LEFT.fragment_value = RIGHT.entity_value , 
 																	TRANSFORM (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs,
+																		SELF.AnalyticsRecordId := RIGHT.entity_context_uid_,
 																		SELF.score := RIGHT.score_,
 																		SELF.ClusterName := RIGHT.label_,
 																		SELF.NumberOfClusters := COUNT(ds_raw_cluster_recs(	entity_name = LEFT.fragment AND
@@ -154,7 +155,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														L.fragment In FraudGovPlatform_Services.Constants.RECORD_TYPE_ELEMENT_SET => FraudGovPlatform_Services.Constants.RecordType.ELEMENT,
 														'');
 		SELF.ElementType := L.fragment;
-		//Cleaning out @@@ from LEFT.entity_value when ELEMNT is of type address,
+		//Cleaning out @@@ from LEFT.entity_value when ELEMENT is of type address,
 		// @@@ was addded to calcualte the matching HASH value for tree_uid
 		SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
 														REGEXREPLACE('@@@',L.fragment_value,', '), 
@@ -175,16 +176,15 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	END;
 	
 	ds_ElementsNIdentities := JOIN(ds_fragment_recs_w_scores, ds_fragment_recs_tab,
-																	LEFT.fragment_value = RIGHT.fragment_value AND
-																	LEFT.fragment = RIGHT.fragment,
-																	ElementsNIdentities_trans(LEFT, RIGHT),
-																 LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+															LEFT.fragment_value = RIGHT.fragment_value AND
+															LEFT.fragment = RIGHT.fragment,
+															ElementsNIdentities_trans(LEFT, RIGHT),
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
 																	
 	ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
 	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
-	// output(adlDIDFound, named('adlDIDFound'));
 	// output(adlDIDFound, named('adlDIDFound'));
 	// output(ds_adl_in, named('ds_adl_in'));
 	// output(ds_contributory_in, named('ds_contributory_in'));
@@ -196,6 +196,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
 	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
+	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
+	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
+	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
+	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
+	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
+	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 
 	RETURN ds_results;
 END;
