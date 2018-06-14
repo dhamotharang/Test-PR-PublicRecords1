@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, AutoStandardI, census_data, iesp, lib_stringlib, SANCTN_Mari, Suppress, ut, BIPV2, MIDEX_Services;
+﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp, lib_stringlib, SANCTN_Mari, Suppress, ut, BIPV2, MIDEX_Services;
 
 // ==============================================================================================================	
 //  MARI MIDEX "NON-PUBLIC" DATA (SANCTN_Mari) related functions
@@ -96,7 +96,7 @@ EXPORT Raw_Nonpublic :=
       END; // get_nonPublicSsn4Data
 
   
-    EXPORT fn_get_nonPublicTinData ( STRING4 in_tin ) :=
+    EXPORT fn_get_nonPublicTinData ( STRING9 in_tin ) :=
       FUNCTION
         ds_SANCTN_Mari_tin_recs := CHOOSEN(SANCTN_Mari.Key_TIN( KEYED( TIN = in_tin ) AND in_tin != '' ),MIDEX_Services.Constants.JOIN_LIMIT);
         
@@ -260,7 +260,7 @@ EXPORT Raw_Nonpublic :=
                 
                 sanctNP_recsHash := PROJECT(sanctNP_recs_wNmlsID_rolled,MIDEX_Services.alert_calcs.calcLicenseSrchHashes(LEFT));
 
-                RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanctNP_recsHash,sanctNP_recs_wlicInfo_Dedup));
+                RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanctNP_recsHash,sanctNP_recs_wNmlsID_rolled));
             END;
       END; // Search view module
     END; // License module
