@@ -1,4 +1,4 @@
-import	Address,Codes,iesp,InsuranceContext_iesp,ut;  
+import	Address,Codes,iesp,InsuranceContext_iesp,ut,std;  
 
 export	Convert2IESP(	PropertyCharacteristics_Services.IParam.Report	pInMod,
 											iesp.property_info.t_PropertyInformationRequest	pRequest
@@ -73,9 +73,9 @@ module
 			self.ServiceType								:=	pInMod.ReportType;
 			self.AccountNumber							:=	pInsContext.Account.Legacy.Base;
 			self.AccountSuffix							:=	pInsContext.Account.Legacy.Suffix;
-			self.OrderDate									:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
-			self.ReceiptDate								:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
-			self.CompletionDate							:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
+			self.OrderDate									:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
+			self.ReceiptDate								:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
+			self.CompletionDate							:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 			self.ProcessingStatus						:=	map(	valid_account																																		=>	'4',
 																								pInMod.ReportType	not in	['K','L']	AND ~isHomeGateway          								=>	'7',
 			// TODO: there's slight change of logic in relation to "living square footage" here:
