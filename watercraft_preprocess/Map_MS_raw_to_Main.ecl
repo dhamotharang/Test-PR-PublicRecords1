@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates  ms_phase01.mp Ab intio graph into ECL
 
@@ -106,8 +106,10 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.registration_number		:=	trim(L.REG_NUM, left, right);
 	self.hull_number						:=	L.hull_id;
 	self.propulsion_description	:=	L.PROP;
-	self.vehicle_type_Description	:=	map(L.VEH_TYPE = 'OTHER' and L.BOAT_TYPE_CODE <> '' => L.BOAT_TYPE_CODE,
-	                                      L.BOAT_TYPE_CODE <> '' =>  L.BOAT_TYPE_CODE,L.VEH_TYPE);
+	//DF-19984 - Layout change, BOAT_TYPE_CODE is deleted
+	// self.vehicle_type_Description	:=	map(L.VEH_TYPE = 'OTHER' and L.BOAT_TYPE_CODE <> '' => L.BOAT_TYPE_CODE,
+	                                      // L.BOAT_TYPE_CODE <> '' =>  L.BOAT_TYPE_CODE,L.VEH_TYPE);
+	self.vehicle_type_Description := '';																			
 	self.fuel_description					:=	L.FUEL;
 	self.hull_type_description		:=	L.HULL;
 	self.use_description					:=	L.USE_1;
@@ -118,7 +120,9 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.registration_date							:=	If(IsValidRegDate,L.REG_DATE,'');
 	IsValidExpireDate										:=	STD.DATE.IsValidDate((integer)L.EXPIRATION_DATE);
 	self.registration_expiration_date		:=	If(IsValidExpireDate,L.EXPIRATION_DATE,'');
-	self.watercraft_status_description	:=	L.STATUS;
+	//DF-19984 - Layout change, STATUS is deleted
+	// self.watercraft_status_description	:=	L.STATUS;
+	self.watercraft_status_description := '';
 	self := L;
 	self := [];
 	end;
