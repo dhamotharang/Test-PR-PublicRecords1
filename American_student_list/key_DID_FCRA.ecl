@@ -10,10 +10,8 @@ American_student_DID_base	:=	PROJECT(file_in((unsigned8)did<>0), transform(Ameri
 	Self.collegeupdate :=	'';
 	self := left));
 
-//DF-21487 blank out following field in thor_data400::key::avm_v2::fcra::qa::address
-fields_to_clear := 'county_number,delivery_point_barcode,fips_county,gender,gender_code,head_of_household_first_name,head_of_household_gender,' +
-                   'head_of_household_gender_code,income_level,income_level_code,new_income_level,new_income_level_code,telephone,title';
-ut.MAC_CLEAR_FIELDS(American_student_DID_base, American_student_DID_base_cleared, fields_to_clear);
+//DF-21719 blank out specified fields in thor_data400::key::avm_v2::fcra::qa::address
+ut.MAC_CLEAR_FIELDS(American_student_DID_base, American_student_DID_base_cleared, American_Student_List.Constants.fields_to_clear);
 
 export key_DID_FCRA := index(American_student_DID_base_cleared, 
                             {unsigned6 l_did := (unsigned)did},{American_student_DID_base_cleared},
