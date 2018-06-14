@@ -3,8 +3,12 @@
 export Build_All(
 
 	 string																pversion
-	,string																pServerIP 							= _control.IPAddress.bair_batchlz01
-	,string																pDirectory 							= '/data/otto/in/'	 
+	,string																pContributoryServerIP 			= _control.IPAddress.bair_batchlz01
+	,string																pContributoryDirectory 		= '/data/otto/in/'
+	,string																pMBSServerIP 						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
+	,string																pMBSFDNServerIP 					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
+	,string																pMBSFraudGovDirectory			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fraudgov/in/mbs/dev', '/data/super_credit/fraudgov/in/mbs/prod')
+	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fdn/in/mbs/dev', '/data/super_credit/fdn/in/mbs/prod')
 	// All sources are not updated each build if no updates to particular source skip that source base 
 	,boolean															PSkipIdentityDataBase			= false 
 	,boolean															PSkipKnownFraudBase				= false 
@@ -25,13 +29,10 @@ export Build_All(
 module
 
 	export Spray_MBS := sequential(
-				 FraudShared.Promote().Inputfiles.Sprayed2Using,
-				 FraudShared.Promote().Inputfiles.Using2Used,
-				 FraudShared.SprayMBSFiles(pversion := pVersion[1..8], 
-													pDirectory := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', 
-																'/data/super_credit/fraudgov/in/mbs/dev', 
-																'/data/super_credit/fraudgov/in/mbs/prod')),
-				 FraudGovPlatform.Promote().sprayedfiles.MBS_Used2Sprayed
+					FraudShared.Promote().Inputfiles.Sprayed2Using,
+					FraudShared.Promote().Inputfiles.Using2Used,
+					FraudShared.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSServerIP,pDirectory := pMBSFraudGovDirectory),
+					FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSFDNServerIP, pDirectory := pMBSFDNDirectory)
 	);
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
