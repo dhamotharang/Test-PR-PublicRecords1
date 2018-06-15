@@ -60,22 +60,25 @@ MODULE
 		 EXPORT STRING8	billingId             := inMod.billingId;
 		 EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
 		 SHARED UNSIGNED1 consent_level       := inMod.LineIdentityConsentLevel;	
-		 EXPORT BOOLEAN NameAddressValidation := consent_level = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer and 
+		 EXPORT BOOLEAN NameAddressValidation := consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess and 
 		                                         inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate; // Only nameaddrvalidation for ultimate transactions
 		 EXPORT BOOLEAN	NameAddressInfo       := FALSE;
 		 EXPORT BOOLEAN	AccountInfo           := FALSE;
 		 EXPORT BOOLEAN	CarrierInfo           := FALSE;
-		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer, TRUE, FALSE);
+		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess, TRUE, FALSE);
 		 EXPORT BOOLEAN	DeviceInfo            := FALSE;
-		 EXPORT BOOLEAN 	DeviceHistory        := (consent_level = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or 
-			                                         consent_level = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer) and inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
-		 EXPORT BOOLEAN 	DeviceChangeOption   := (consent_level = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or 
-		                                          consent_level = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer) and inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
+		 EXPORT BOOLEAN 	DeviceHistory        := (consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
+			                                         consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess) and 
+													inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
+		 EXPORT BOOLEAN 	DeviceChangeOption   := (consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
+		                                          consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess) and 
+												  inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
 		 EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
-		 EXPORT STRING5 	optInMethod          := IF(consent_level= PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or consent_level= PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer, 
-													                              PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
-		 EXPORT STRING3 	optinDuration        := IF(consent_level= PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or 
-		                                            consent_level= PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer, 
+		 EXPORT STRING5 	optInMethod          := IF(consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
+		                                            consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess, 
+													PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
+		 EXPORT STRING3 	optinDuration        := IF(consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
+		                                            consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess, 
 													PhoneFinder_Services.Constants.ZumigoConstants.optinDuration, '');
 		 EXPORT STRING 	optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
 		 EXPORT STRING 	optInVersionId        := '';

@@ -84,13 +84,13 @@ alertRec:= RECORD
 										34 => (UNSIGNED)SubjectPhone.dt_first_seen = 0 AND (UNSIGNED)SubjectPhone.dt_last_seen = 0,
 										35 =>  IF(SubjectPhone.imsi_ChangeDate <> '', 
 																				IsDateWithin(SubjectPhone.imsi_ChangeDate, l.Threshold),
-																				IsDateWithin(SubjectPhone.imsi_ActivationDate, l.Threshold)) OR 
-																				SubjectPhone.imsi_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold),
-										36 => IsDateWithin(SubjectPhone.imei_ChangeDate, l.Threshold) OR 
-											 SubjectPhone.loststolen = 1 AND  IsDateWithin(SubjectPhone.loststolen_date, l.Threshold) OR
-											 SubjectPhone.imsi_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold) OR																																																																								
-											 SubjectPhone.imei_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imei_seensince, l.Threshold) OR																																																																								
-											 SubjectPhone.iccid_changedthis_time = 1 AND IsDateWithin(SubjectPhone.iccid_seensince, l.Threshold),
+																				SubjectPhone.imsi_ActivationDate <> '' AND IsDateWithin(SubjectPhone.imsi_ActivationDate, l.Threshold)) OR 
+																				SubjectPhone.imsi_changedthis_time = 1  AND SubjectPhone.imsi_seensince <> '' AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold),
+										36 =>SubjectPhone.imei_ChangeDate <> '' AND  IsDateWithin(SubjectPhone.imei_ChangeDate, l.Threshold) OR 
+											 SubjectPhone.loststolen = 1 AND SubjectPhone.loststolen_date <> '' AND IsDateWithin(SubjectPhone.loststolen_date, currentDate)>l.Threshold OR
+											 SubjectPhone.imsi_changedthis_time = 1 AND SubjectPhone.imsi_seensince <> '' AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold) OR																																																																								
+											 SubjectPhone.imei_changedthis_time = 1 AND SubjectPhone.imei_seensince <> '' AND IsDateWithin(SubjectPhone.imei_seensince, l.Threshold) OR																																																																								
+											 SubjectPhone.iccid_changedthis_time = 1 AND SubjectPhone.iccid_seensince <> '' AND IsDateWithin(SubjectPhone.iccid_seensince, l.Threshold),
 										FALSE);				
 		//Keep violating rules and risk indicator	based on individual rule.
 		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category, SELF.messages := LEFT.RiskDescription, SELF := LEFT)));
