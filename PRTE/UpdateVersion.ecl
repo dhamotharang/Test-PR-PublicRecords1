@@ -1,4 +1,4 @@
-﻿// Function to update data operations database with a new build version for a specific
+// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -14,9 +14,7 @@
 
 
 import ut,_Control,dops,std;
-export updateversion(string datasetname,string uversion,string email_t,string inloc = 'B',string inenvment = ''
-													,string isboolready = 'Y'
-													,string dopsenv = dops.constants.dopsenvironment) := function
+export updateversion(string datasetname,string uversion,string email_t,string inloc = 'B',string inenvment = '',string isboolready = 'Y') := function
 
 	
 	emailme_function(string email_t,string datasetname,string cversion, string uversion,
@@ -58,7 +56,7 @@ export updateversion(string datasetname,string uversion,string email_t,string in
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,inenvment),
+				dops.constants.demo.serviceurl,
 				'UpdateVersion',
 				InputRec,
 				dataset(outrec),
@@ -71,7 +69,7 @@ export updateversion(string datasetname,string uversion,string email_t,string in
 					if(soapresults[1].code = -3,zero_rows,email_success)));
 
 								
-	return if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date);							
+	return if(_Control.ThisEnvironment.Name = 'Prod_Thor', if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date),output('Not a Prod environment'));							
 
 	
 end;

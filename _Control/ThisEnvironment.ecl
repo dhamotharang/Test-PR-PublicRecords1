@@ -10,16 +10,14 @@ export ThisEnvironment
  :=
   module
 	// root.environment value comes from eclcc server config setup done by SC ops
-	// -Denvironment='dev'
+	// -Denvironment='Prod_Thor'
 	// https://jira.rsi.lexisnexis.com/browse/DOPS-460
-	export	string	Name			:=	#IFDEFINED(root.environment, 'Dataland');
-	export	string	ESP_IPAddress	:=	_Control.IPAddress.Dataland_ESP;
+	export	string	Name			:=	#IFDEFINED(root.environment, 'Prod_Thor');
+	export	string	ESP_IPAddress	:=	_Control.IPAddress.Prod_thor_ESP;
 	export	string	Dali_IPAddress	:=	lib_thorlib.thorlib.daliservers();	//_Control.IPAddress.Dataland_Dali;
-	export	string	Thor_Version	:=	'648_01';
+	export	string	Thor_Version	:=	'648_08';
 	export	string	RoxieEnv		:=	thorlib.getenv('Environment','');
 	export	boolean	IsPlatformThor		:= true;
-	export 	boolean UseDemoEnvironment := false;
-	export  string Hthor_Name := 'infinband_hthor';
 	export	string	ThisDaliIp		:= Dali_IPAddress[..length(trim(Dali_IPAddress))-5]:independent;
   end
  ;

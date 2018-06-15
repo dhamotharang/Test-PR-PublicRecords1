@@ -79,7 +79,7 @@ output(ta1, all, named('no_basic_match_incremental'));
 //these are the records not seen before since the previous monthly build
 mxr_monthly := max(Header.File_Latest_Header_Raw(FALSE),rid);
 oNMNHRM := oNMNHR+oMNHR(rid>mxr_monthly);
-// THIS IS A TEST COMMENT. THIS COMMIT IS ONLY FOR CHECKING GIT :-)
+output(mxr_monthly,named('max_rid_previous_month'));
 r_nbm2 := record
 	oNMNHRM.src;
 	string30 src_desc := mdr.sourcetools.translatesource(oNMNHRM.src);

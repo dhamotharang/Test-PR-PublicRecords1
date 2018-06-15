@@ -5,9 +5,7 @@
 */
 EXPORT Config :=
 module
-//testing..
-//testing2..
-//testing3..
+
   // ----------------------------------------------------------------------------------------
   // -- these attributes should be changed to match your environments(1 prod, 1 dev environment assumed)
   // ----------------------------------------------------------------------------------------

@@ -1,8 +1,7 @@
-﻿EXPORT GetBuildVersion(string datasetname // DOPS package name
+EXPORT GetBuildVersion(string datasetname // DOPS package name
 											,string location // B - Boca, A - Alpharetta
 											,string environment // N - Nonfcra, F - FCRA, S - Customer Supp, T - Customer Test, FS - FCRA Cust Support
 											,string clusterflag // C - Cert, P - Prod, T - Thor
-											,string dopsenv = dops.constants.dopsenvironment
 											) := function
 
 	InputRec := record
@@ -18,7 +17,7 @@
 	end;
 
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,environment),
+				dops.constants.demo.serviceurl,
 				'GetBuildVersion',
 				InputRec,
 				dataset(outrec),

@@ -4,7 +4,7 @@ Added skipclustersforcompression to support DUS-272
 import STD,lib_thorlib,_Control;
 export constants := module
 	
-	export location := 'B';
+	
 	export devdaliip := fileservices.ResolveHostName('dataland_dali.br.seisint.com');
 	export proddaliip := fileservices.ResolveHostName('prod_dali.br.seisint.com');
 	
@@ -81,6 +81,10 @@ export constants := module
 	end;
 
 	export dopsenvironment := Thorenvironment;
+											
+
+	export location := 'B';
+	
 	
 	export set of string allowedclusters := if (ThorEnvironment = 'prod',
 																									['thor400_20'
@@ -93,20 +97,5 @@ export constants := module
 																											,'thor50_dev02'
 																											,'thor50_dev']
 																							);
-
-	export skipclustersforcompression := if (ThorEnvironment = 'prod',
-																							['thor400_31_store',
-																									'hthor__eclagent',
-																									'hthor__eclagent_1',
-																									'hthor__eclagent_3',
-																									'hthor__eclagent_centos7',
-																									'hthor__eclagent_centos7_2',
-																									'pound_option_thor',
-																									'thor100_21_3',
-																									'thor_200',
-																									'thor400_84'],
-																							['hthor_sta',
-																							 'hthor_dev']
-																				);
 	
 end;

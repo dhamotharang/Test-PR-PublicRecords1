@@ -102,7 +102,7 @@ dPopulationStats_bank_routing__Bank_Routing_Files_base := TABLE(Bank_Routing.Fil
  routing_number_MICR,
  few
 									               );
-
+// export createXMLStats(pStats, pBuildName, pBuildSubSet, pVersionName, pEmailNotifyList, rOut, pBuildView = '\'\'', pBuildType = '\'\'', pShouldExport = 'false',pShouldSendToStrata = 'true', omit_output_to_screen = 'true') := macro
 STRATA.createXMLStats(dPopulationStats_bank_routing__Bank_Routing_Files_base,
  'Bank Routing',
  'data',
@@ -110,7 +110,7 @@ STRATA.createXMLStats(dPopulationStats_bank_routing__Bank_Routing_Files_base,
  '',
  resultsOut,
  'view',
- 'population');
+ 'population',,,true);
 					 
 RETURN resultsOut;
 

@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export _Dataset(
 
@@ -7,7 +7,7 @@ export _Dataset(
 ) :=
 tools.Constants(
 
-	 pDatasetName					:= 'FraudGov'
+	 pDatasetName					:= 'barros01'
 	,pUseOtherEnvironment	:= pUseOtherEnvironment
 	,pGroupname						:= ''
 	,pMaxRecordSize				:= 4096 * 9

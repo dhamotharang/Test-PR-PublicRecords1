@@ -1,3 +1,0 @@
-﻿EXPORT fActivatePackage() := function
-
-end;

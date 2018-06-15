@@ -1,4 +1,4 @@
-﻿import lib_fileservices,lib_thorlib, wk_ut;
+﻿import lib_fileservices,lib_thorlib;
 EXPORT FileModule(string esp
 									,string port = '8010'
 									) := module
@@ -83,9 +83,6 @@ EXPORT FileModule(string esp
 	end;
 	
 	export GetFileDesc(string filename) := fileservices.getfiledescription(if (regexfind('~',filename), filename, '~'+filename));
-	
-	export SearchByFileDesc(string targetcluster
-									, string descriptiontosearch) := wk_ut.get_DFUQuery(,targetcluster,,,,,,,,,,,,,,,,,esp).dnorm(regexfind(descriptiontosearch,Description));
 		
 	
 	

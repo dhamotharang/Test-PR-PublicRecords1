@@ -1,8 +1,8 @@
-﻿import dops;
+import dops;
 // Function - To get current build version in PRCT dops database.
 // dsname - Dataset name - same as of nonfcra (regular)
 // inenvment - F - FCRA, N - Nonfcra or B - Both (fcra and nonfcra)
-export GetDemoBuildVersion(string dsname,string inenvment,string dopsenv = dops.constants.dopsenvironment) := function
+export GetDemoBuildVersion(string dsname,string inenvment) := function
 
 	InputRec := record
 		string dsname{xpath('dsname')} := dsname;
@@ -17,14 +17,13 @@ export GetDemoBuildVersion(string dsname,string inenvment,string dopsenv = dops.
 	end;
 
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,inenvment),
+				dops.constants.demo.serviceurl,
 				'GetDemoBuildVersion',
 				InputRec,
 				dataset(outrec),
 				NAMESPACE('http://lexisnexis.com/'),
 				LITERAL,
-				SOAPACTION('http://lexisnexis.com/GetDemoBuildVersion'),
-				LOG);
+				SOAPACTION('http://lexisnexis.com/GetDemoBuildVersion'));
 				
 	return soapresults[1].retstring;
 
