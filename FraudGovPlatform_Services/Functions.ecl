@@ -456,7 +456,7 @@ EXPORT Functions := MODULE
 				SELF.cleaned_name.name_suffix :=  IF(L.cleaned_name.name_suffix <> '' , L.cleaned_name.name_suffix , R.cleaned_name.name_suffix);
 				SELF.ssn :=  IF(L.ssn <> '' , L.ssn , R.ssn);
 				SELF.dob :=  IF(L.dob <> '' , L.dob , R.dob);
-				SELF.phone_number :=  IF(L.phone_number <> '' , L.phone_number , R.phone_number);
+				SELF.phone_number :=  IF(L.clean_phones.phone_number <> '' , L.clean_phones.phone_number , R.clean_phones.phone_number);
 				SELF.email_address :=  IF(L.email_address <> '' , L.email_address , R.email_address);
 				SELF.clean_address.prim_range := IF(isPhysicalAddress, L.clean_address.prim_range, R.clean_address.prim_range);
 				SELF.clean_address.predir := IF(isPhysicalAddress, L.clean_address.predir, R.clean_address.predir);
@@ -474,22 +474,6 @@ EXPORT Functions := MODULE
 		END;
 
 		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.did = right.did, xformRollup(left, right));
-
-		//*** MockUp Score Data *** 
-		// ***random_scores*** is temporary placeholder and will be repalced by Logic when we know how and where to get the actual score. 
-		random_scores_ds := DATASET([{35}, {40}, {49}, {79}, {85}, {89}, {95}, {99}] , {unsigned1 num}); 
-		random_score := ROUNDUP(count(random_scores_ds) * (((RANDOM()%100000)+1)/100000));
-		// ***random_scores ends***
-	
-		iesp.fraudgovreport.t_FraudGovScoreDetails mockup_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
-			SELF.RecordType := 'IDENTITY';
-			SELF.ElementType := FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT;
-			SELF.ElementValue := (string) L.DID;
-			SELF.Score := random_scores_ds[random_score].num;
-		END;
-		
-		ds_MockUpScoreCard := PROJECT(ds_payload_recs_rolled, mockup_trans(LEFT));
-		//*** MockUp Score Data *** 
 
 		iesp.fraudgovreport.t_FraudGovIdentityCardDetails best_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
 			SELF.ContributedBest.UniqueId := (string) L.DID;
@@ -512,9 +496,8 @@ EXPORT Functions := MODULE
 																															L.clean_address.zip,
 																															L.clean_address.zip4,
 																															'');
-			SELF.ContributedBest.Phone10 :=  L.phone_number;
+			SELF.ContributedBest.Phone10 :=  L.clean_phones.phone_number;
 			SELF.EmailAddress := L.email_address;
-			SELF.ScoreDetails := ds_MockUpScoreCard[1];
 			SELF := [];
 		END;
 
@@ -675,7 +658,7 @@ EXPORT Functions := MODULE
 																	L.fragment = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1) + ' ' + STD.Str.CleanSpaces(R.additional_address.address_2)),
 																	L.fragment = Fragment_Types_const.NAME_FRAGMENT => (R.cleaned_name.fname + ' ' + R.cleaned_name.lname),
 																	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
-																	L.fragment = Fragment_Types_const.PHONE_FRAGMENT => R.phone_number,
+																	L.fragment = Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
 																	L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
 																	L.fragment = Fragment_Types_const.SSN_FRAGMENT => R.ssn,
 																	'');
@@ -776,7 +759,9 @@ EXPORT Functions := MODULE
 											LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
 										xform_getIndicatorAttribute(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT,SKIP));
 
-		return ds_indicator_attributes;
+		ds_indicator_attributes_dedup := DEDUP(SORT(ds_indicator_attributes,DescriptionCode,-DescriptionValue),DescriptionCode);
+
+		return ds_indicator_attributes_dedup;
 	END;
 
 	EXPORT GetScoreBreakDown(DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
@@ -808,7 +793,9 @@ EXPORT Functions := MODULE
 												LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
 									generateScoreBreakdown(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
 
-		return ds_scoreBreakdowns;
+		ds_scoreBreakdowns_dedup := DEDUP(SORT(ds_scoreBreakdowns,IndicatorTypeCode,PopulationType,-Value),IndicatorTypeCode,PopulationType);
+
+		return ds_scoreBreakdowns_dedup;
 	END;
 
 END;
