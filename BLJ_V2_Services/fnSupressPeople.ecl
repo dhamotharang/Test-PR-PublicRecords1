@@ -22,7 +22,9 @@ EXPORT fnSupressPeople(dataset(bankruptcyv2_services.layouts.layout_rollup) bk_r
 																	                          transform(recordof(biz_debtors_mixed),
    																																	Names := left.names;
 																																		CleanedUpNames := Names(cname <> '' and fname = '');
-   																																	self.Names := CleanedUpNames; 
+   																																	self.Names := CleanedUpNames;
+																																		Addresses := dedup(sort(left.addresses,record),record); // remove duplicate addresses
+																																		self.Addresses := Addresses;
 																																		self := left;
    																																));
 																	biz_debtors_final := 	biz_debtors_pure + biz_debtors_cleaned;																		

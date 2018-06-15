@@ -525,6 +525,7 @@ EXPORT Functions := MODULE
 		
 		RETURN ds_Contrib_Best;
 	END;
+	
 	EXPORT GetDeltabaseLogDataSet(ds_in,InquiryReason) := FUNCTIONMACRO
 		
 		commonRecord := RECORD
@@ -690,36 +691,9 @@ EXPORT Functions := MODULE
 		RETURN ds_fragment_recs_w_value;
 	END;
 	
-	EXPORT getIdentityElementScores (DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_entityNameUID,
-																	 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
-
-		unsigned6 GC_ID := batch_params.GlobalCompanyId;
-		unsigned2 IndustryType := batch_params.IndustryType;
-
-		temp_rec := RECORD
-			STRING60 entity_name;
-			STRING60 entity_value;
-			RECORDOF(FraudGovPlatform.Key_ClusterDetails);
-		END;
-
-		ds_clusterdetails:= JOIN(ds_entityNameUID , FraudGovPlatform.Key_ClusterDetails(),
-													KEYED(RIGHT.customer_id_ = GC_ID AND
-																RIGHT.industry_type_ = IndustryType AND
-																LEFT.entity_context_uid = RIGHT.entity_context_uid_),
-													TRANSFORM(temp_rec,
-														SELF.entity_name := LEFT.entity_name,
-														SELF.entity_value := LEFT.entity_value,
-														SELF := RIGHT),
-													LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-													
-		// output(ds_entityNameUID, named('ds_entityNameUID____getIdentityElementScores')); 
-		// output(ds_clusterdetails, named('ds_clusterdetails____getIdentityElementScores'));
-		RETURN ds_clusterdetails;
-	END;
-
-	
-	EXPORT getClusterDetails (DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_entityNameUID,
-														 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+	EXPORT getClusterDetails (ds_entityNameUID, batch_params, useRelatedCluster) := FUNCTIONMACRO
+		
+		IMPORT FraudGovPlatform;
 
 		unsigned6 GC_ID := batch_params.GlobalCompanyId;
 		unsigned2 IndustryType := batch_params.IndustryType;
@@ -733,20 +707,27 @@ EXPORT Functions := MODULE
 		ds_clusterdetails:= JOIN(ds_entityNameUID , FraudGovPlatform.Key_ClusterDetails(),
 													KEYED(RIGHT.customer_id_ = GC_ID AND
 																RIGHT.industry_type_ = IndustryType AND
-																LEFT.tree_uid = RIGHT.entity_context_uid_),
+																#IF(useRelatedCluster)
+																	LEFT.tree_uid = RIGHT.entity_context_uid_),
+																#ELSE
+																	LEFT.entity_context_uid = RIGHT.entity_context_uid_),
+																#END
 													TRANSFORM(temp_rec,
 														SELF.entity_name := LEFT.entity_name,
 														SELF.entity_value := LEFT.entity_value, 
 														SELF := RIGHT),
 													LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-														
-		ds_center_clusterdetails := ds_clusterdetails(tree_uid_ = entity_context_uid_);
+
+		//this is a temporary fix and will be resolved when analytics data sharing is corrected in KEL BUILD.
+		//Leaving the SORT dedup after the fix will not effect the results since the fix will result in NO duplicates in KEL Index.
+		ds_clusterdetails_dedup := DEDUP(SORT(ds_clusterdetails, entity_context_uid_, tree_uid_, -__recordcount),
+																 entity_context_uid_, tree_uid_);		
 
 		// output(ds_entityNameUID, named('ds_entityNameUID____getClusterDetails')); 
 		// output(ds_clusterdetails, named('ds_clusterdetails____getClusterDetails'));
-		// output(ds_center_clusterdetails, named('ds_center_clusterdetails____getClusterDetails'));
-		RETURN ds_center_clusterdetails;											 
-	END;	
+		// output(ds_clusterdetails_dedup, named('ds_clusterdetails_dedup____getClusterDetails'));
+		RETURN ds_clusterdetails_dedup;											 
+	ENDMACRO;	
 	
 	EXPORT getAssociatedAddresses (DATASET(iesp.fraudgovreport.t_FraudGovTimelineDetails) ds_timeline) := FUNCTION
 		

@@ -203,7 +203,8 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(domainNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,2)) = email_user_domain, true) AND
 																			if(fullemail, email_address = STD.Str.CleanSpaces(in_rec.email_address), true) AND
 																			if(in_rec.dl_number <> '' AND in_rec.dl_state <> '',
-																					drivers_license = in_rec.dl_number AND drivers_license_state = in_rec.dl_state, true)
+																					drivers_license = in_rec.dl_number AND drivers_license_state = in_rec.dl_state, true) AND
+																			if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true)
 																		 );
 																		 
 	//AND filter with BankName , explicit join because we do not have BankName field in the payload. 
@@ -218,7 +219,7 @@ EXPORT fn_getadvsearch_raw_recs (
 																JOIN(ds_recs_filtered_bankname, ds_CountyIds,
 																	LEFT.record_id = RIGHT.record_id,
 																	TRANSFORM(LEFT)),
-																ds_recs_filtered);																
+																ds_recs_filtered_bankname);																
 																		 
   // *** No filtering in FraudGov
   ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered_final);
