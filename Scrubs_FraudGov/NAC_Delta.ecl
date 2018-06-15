@@ -1,6 +1,6 @@
 ﻿IMPORT SALT39,STD;
 EXPORT NAC_Delta(DATASET(NAC_Layout_NAC)old_s, DATASET(NAC_Layout_NAC) new_s) := MODULE//Routines to compute the differences between two instances of a file
-  SHARED inFieldList := ['Customer_Account_Number','Customer_County','Customer_State','Customer_Agency_Vertical_Type','Customer_Program','LexID','raw_Full_Name','raw_First_name','raw_Last_Name','SSN','Drivers_License_State','Drivers_License_Number','Street_1','City','State','Zip','did'];
+  SHARED inFieldList := ['SearchAddress1StreetAddress1','SearchAddress1StreetAddress2','SearchAddress1City','SearchAddress1State','SearchAddress1Zip','SearchAddress2StreetAddress1','SearchAddress2StreetAddress2','SearchAddress2City','SearchAddress2State','SearchAddress2Zip','SearchCaseId','enduserip','CaseID','ClientFirstName','ClientMiddleName','ClientLastName','ClientPhone','ClientEmail'];
   EXPORT Differences := SALT39.mod_Delta.mac_DifferencesByFieldList(old_s, new_s, inFieldList);
   EXPORT DifferenceSummary := NAC_hygiene(old_s).Summary('Old') + NAC_hygiene(new_s).Summary('New') + NAC_hygiene(PROJECT(Differences(deleted), TRANSFORM(NAC_Layout_NAC, SELF := LEFT.old_rec))).Summary('Deletions') + NAC_hygiene(PROJECT(Differences(added), TRANSFORM(NAC_Layout_NAC, SELF := LEFT.new_rec))).Summary('Additions');
   EXPORT StandardStats(BOOLEAN doHygieneSummaryGlobal = TRUE) := FUNCTION

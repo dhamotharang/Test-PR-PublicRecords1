@@ -87,7 +87,8 @@ module
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module
 		export NewHeader 				:= FraudGov_Prefix('out') + 'NewHeader_flag';
-		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';			
+		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';	
+		export Scrubs_FraudGov 	:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
 	end;
 
 	//////////////////////////////////////////////////////////////////

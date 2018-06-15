@@ -22,7 +22,7 @@ EXPORT NAC_GenerationMod := MODULE(SALT39.iGenerationMod)
   EXPORT spc_FILENAME := 'NAC';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,Customer_Account_Number,Customer_County,Customer_State,Customer_Agency_Vertical_Type,Customer_Program,LexID,raw_Full_Name,raw_First_name,raw_Last_Name,SSN,Drivers_License_State,Drivers_License_Number,Street_1,City,State,Zip,did';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,SearchAddress1StreetAddress1,SearchAddress1StreetAddress2,SearchAddress1City,SearchAddress1State,SearchAddress1Zip,SearchAddress2StreetAddress1,SearchAddress2StreetAddress2,SearchAddress2City,SearchAddress2State,SearchAddress2Zip,SearchCaseId,enduserip,CaseID,ClientFirstName,ClientMiddleName,ClientLastName,ClientPhone,ClientEmail';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -60,23 +60,24 @@ EXPORT NAC_GenerationMod := MODULE(SALT39.iGenerationMod)
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0. If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
-    + 'FIELD:Customer_Account_Number:TYPE(string20):LIKE(invalid_numeric):0,0 \n'
-    + 'FIELD:Customer_County:TYPE(string3):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Customer_State:TYPE(string2):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Customer_Agency_Vertical_Type:TYPE(string):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Customer_Program:TYPE(string1):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:LexID:TYPE(unsigned6):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:raw_Full_Name:TYPE(string60):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:raw_First_name:TYPE(string100):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:raw_Last_Name:TYPE(string100):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:SSN:TYPE(string9):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Drivers_License_State:TYPE(string2):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Drivers_License_Number:TYPE(string25):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Street_1:TYPE(string70):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:City:TYPE(string30):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:State:TYPE(string2):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0\n'
-    + 'FIELD:did:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0\n'
+    + 'FIELD:SearchAddress1StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress1StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress1City:TYPE(string30):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress1State:TYPE(string2):LIKE(invalid_alphanumeric):0,0 \n'
+    + 'FIELD:SearchAddress1Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress2StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress2StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress2City:TYPE(string30):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress2State:TYPE(string2):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchAddress2Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:SearchCaseId:TYPE(string20):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:enduserip:TYPE(string15):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:CaseID:TYPE(string20):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:ClientFirstName:TYPE(string25):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:ClientMiddleName:TYPE(string25):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:ClientLastName:TYPE(string30):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:ClientPhone:TYPE(string10):LIKE(invalid_alphanumeric):0,0\n'
+    + 'FIELD:ClientEmail:TYPE(string256):LIKE(invalid_alphanumeric):0,0\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'
     + '// RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
     + '// SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'
