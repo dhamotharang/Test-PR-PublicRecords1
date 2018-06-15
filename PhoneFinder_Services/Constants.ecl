@@ -145,10 +145,8 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING3 	optinDuration := 'ONG';
 	END;
 	
-	EXPORT ZumigoConsentLevels := MODULE
-	  EXPORT UNSIGNED1 SingleConsumerConsentAccess  := 2;
-	  EXPORT UNSIGNED1 FullConsumerConsentAccess  := 3;
-	END;
+	//Zumigo
+	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    

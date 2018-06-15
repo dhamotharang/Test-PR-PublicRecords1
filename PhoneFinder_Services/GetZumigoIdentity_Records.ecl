@@ -54,32 +54,23 @@ MODULE
                        inMod.Usecase[3] = '1' => 'TCPA',
                        inMod.Usecase[4] = '1' => 'Geo Location',
    										'');
+   		                
 */
 		 EXPORT STRING20 Usecase              := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
 		 EXPORT STRING3 	productCode          := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
 		 EXPORT STRING8	billingId             := inMod.billingId;
 		 EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
 		 SHARED UNSIGNED1 consent_level       := inMod.LineIdentityConsentLevel;	
-		 EXPORT BOOLEAN NameAddressValidation := consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess and 
-		                                         inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate; // Only nameaddrvalidation for ultimate transactions
+		 EXPORT BOOLEAN NameAddressValidation := consent_level = 3 and inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate; // Only nameaddrvalidation for ultimate transactions
 		 EXPORT BOOLEAN	NameAddressInfo       := FALSE;
 		 EXPORT BOOLEAN	AccountInfo           := FALSE;
 		 EXPORT BOOLEAN	CarrierInfo           := FALSE;
-		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess, TRUE, FALSE);
+		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level = 3, TRUE, FALSE);
 		 EXPORT BOOLEAN	DeviceInfo            := FALSE;
-		 EXPORT BOOLEAN 	DeviceHistory        := (consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
-			                                         consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess) and 
-													inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
-		 EXPORT BOOLEAN 	DeviceChangeOption   := (consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
-		                                          consent_level = PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess) and 
-												  inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
+		 EXPORT BOOLEAN 	DeviceHistory        := FALSE;
 		 EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
-		 EXPORT STRING5 	optInMethod          := IF(consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
-		                                            consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess, 
-													PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
-		 EXPORT STRING3 	optinDuration        := IF(consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.FullConsumerConsentAccess or 
-		                                            consent_level= PhoneFinder_Services.Constants.ZumigoConsentLevels.SingleConsumerConsentAccess, 
-													PhoneFinder_Services.Constants.ZumigoConstants.optinDuration, '');
+		 EXPORT STRING5 	optInMethod          := IF(consent_level= 3, PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
+		 EXPORT STRING3 	optinDuration        := IF(consent_level= 3, PhoneFinder_Services.Constants.ZumigoConstants.optinDuration, '');
 		 EXPORT STRING 	optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
 		 EXPORT STRING 	optInVersionId        := '';
 		 EXPORT STRING15 optInTimestamp       := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);	
@@ -115,7 +106,6 @@ MODULE
 
    Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
 
-
    EXPORT Zumigo_Hist := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose);
 
    PhoneFinder_Services.Layouts.PhoneFinder.Final toZumValidated(PhoneFinder_Services.Layouts.PhoneFinder.Final l, Phones.Layouts.ZumigoIdentity.zOut r) := TRANSFORM
@@ -128,17 +118,7 @@ MODULE
 		 Validhit                       := r.source = Phones.Constants.GatewayValues.ZumigoIdentity AND R.device_mgmt_status = '';
      SELF.CallForwardingIndicator   := IF(Validhit, PhoneFinder_Services.Functions.CallForwardingDesc(r.call_forwarding),'');
      SELF.rec_source := r.source; // for royalty count
-	 SELF.imsi_changedate := r.imsi_changedate;
-	 SELF.imsi_ActivationDate := r.imsi_ActivationDate;
-	 SELF.iccid_changedthis_time := r.iccid_changedthis_time;
-	 SELF.iccid_seensince := r.iccid_seensince;
-	 SELF.imsi_changedthis_time := r.imsi_changedthis_time;
-	 SELF.imsi_seensince := r.imsi_seensince;
-	 SELF.imei_seensince := r.imei_seensince;
-	 SELF.imei_changedate := r.imei_changedate;
-	 SELF.loststolen := r.loststolen;
-	 SELF.loststolen_date := r.loststolen_date;
-	 SELF := l;
+     SELF := l;
    END;
 
    EXPORT Zumigo_GLI := JOIN(dPhoneRecs, Zumigo_Hist,
