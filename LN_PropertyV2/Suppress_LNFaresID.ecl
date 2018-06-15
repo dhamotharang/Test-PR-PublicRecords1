@@ -1,4 +1,4 @@
-export Suppress_LNFaresID	:=	[	'OM0028749755',
+﻿export Suppress_LNFaresID	:=	[	'OM0028749755',
 																'DD0046211503',
 																'DD0047766097',	//received email from Kim Rolston to remove this record due to inflated sales price
 																'RD0642908760', //Bug 193498
@@ -21,4 +21,5 @@ export Suppress_LNFaresID	:=	[	'OM0028749755',
 																// End LexID 1400550559
 																'OA1003118308','RA1899530999', //Issue Jira DF-16360
 																'RA0710774763','RA0841221121'  //Issue Jira DF-16550
+																,'DA0024208085','DA0188761116' //Jira DF-22032 - Request from Telra Moore due to bad zip code
 															];
