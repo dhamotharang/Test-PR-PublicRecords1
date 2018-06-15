@@ -181,13 +181,8 @@
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
-		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC.
-
-    // Per requirements: assign Boolean values to include_additional_watchlists based solely on BIID product type.  
-    //   o  Business InstantID 2.0 - search OFAC only
-    //   o  Business InstantID 2.0 Compliance & Business InstantID 2.0 Compliance with SBFE -- search the global watch list
-		BOOLEAN   _include_additional_watchlists := option.BIID20ProductType IN [ BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE ];
-    
+		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
+		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways := option.Gateways;
 				
@@ -283,7 +278,8 @@
 		BOOLEAN   _RunTargusGateway              := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
-		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC.
+		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
+		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 
