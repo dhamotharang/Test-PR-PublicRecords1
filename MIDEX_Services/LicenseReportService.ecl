@@ -96,7 +96,7 @@ export LicenseReportService := macro
 		export unsigned1 AlertVersion := IF(alert_input.EnableAlert,
                                         vAlertVersion,
                                         Midex_Services.Constants.AlertVersion.None);
-		export boolean   isLicenseOnlyReport := TRUE;
+		export boolean   isLicenseOnlyReport := IF(Midex_number = '',TRUE,FALSE);
 	end;
 
   // No MAC_marshal is used, since the alert values are set at the repsone record level, the .val
