@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, MDR, ut;
+﻿﻿IMPORT iesp, Gateway, MDR, ut;
 EXPORT Constants :=
 MODULE
 
@@ -145,8 +145,10 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING3 	optinDuration := 'ONG';
 	END;
 	
-	//Zumigo
-	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
+	EXPORT ConsentLevels := MODULE
+	  EXPORT UNSIGNED1 SingleConsumer := 2;
+	  EXPORT UNSIGNED1 FullConsumer   := 3;
+	END;
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    
