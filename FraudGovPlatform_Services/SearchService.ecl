@@ -141,6 +141,6 @@ EXPORT SearchService() := MACRO
 				OUTPUT(results, named('Results')),
 				FAIL(301,doxie.ErrorCodes(301))
 			);
-	IF(~Options.IsOnline AND isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
+	IF(isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 		
 ENDMACRO;

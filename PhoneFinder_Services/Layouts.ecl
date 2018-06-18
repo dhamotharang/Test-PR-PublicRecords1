@@ -242,17 +242,6 @@ MODULE
 			BOOLEAN PhoneOwnershipIndicator;
 			STRING rec_source;
 			STRING15 CallForwardingIndicator;
-			string imsi_seensince;
-			string8 imsi_changedate;
-			string8 imsi_ActivationDate;
-			integer imsi_changedthis_time;
-			integer iccid_changedthis_time;
-			string iccid_seensince;
-			string imei_seensince;
-			string8 imei_changedate;
-			integer imei_changedthis_time;
-			integer loststolen;
-			string8 loststolen_date;
 		END;
 		
 		EXPORT ExcludePhones :=

@@ -145,6 +145,17 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																				SELF.ScoreDetails.Score := RIGHT.score_,
 																				SELF := LEFT));
 
+		ds_contributoryBest__idCardDetails := IF(EXISTS(ds_contributoryBest_w_scores),ds_contributoryBest_w_scores,
+												PROJECT(ds_contributoryBest,TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
+																					SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
+																					SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
+																					SELF.ScoreDetails.ElementValue := '',
+																					SELF.ScoreDetails.Score := 0,
+																					SELF := LEFT
+																					)
+															)
+												);
+
 		/* Returning the Timeline Data */
 		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT));
 		
@@ -184,9 +195,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			
 			SELF.KnownRisks := IF(batch_params.IsOnline, all_knownfrauds_final, DATASET([], iesp.fraudgovreport.t_FraudGovKnownRisk));
 
-			SELF.IdentityCardDetails := IF(batch_params.IsOnline, ds_contributoryBest[1], ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+			SELF.IdentityCardDetails := IF(batch_params.IsOnline, ds_contributoryBest__idCardDetails(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			SELF.GovernmentBest := IF(batch_params.IsOnline, 
-																ds_GovBest[1], 
+																IF(ds_batch_in[1].did >0,ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1], ds_GovBest[1]), 
 																ROW([], iesp.fraudgovplatform.t_FraudGovBestInfo));
 			SELF.ElementCardDetails := IF(batch_params.IsOnline, ds_ElementcardDetail_w_score[1] , ROW([], iesp.fraudgovreport.t_FraudGovElementCardDetails));
 
@@ -241,6 +252,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		// output(ds_dids, named('ds_dids'));
 		// output(ds_GovBest, named('ds_GovBest'));
 		// output(ds_contributoryBest, named('ds_contributoryBest'));
+		// output(ds_associated_identities_raw, named('ds_associated_identities_raw'));
 		// output(ds_contributoryBest_w_scores, named('ds_contributoryBest_w_scores'));
 		// output(ds_timeline, named('ds_timeline'));
 		// output(ds_associated_addresses, named('ds_associated_addresses'));

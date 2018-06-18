@@ -27,7 +27,6 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF.Options.CarrierInfo			:= inMod.CarrierInfo;
 		SELF.Options.CallHandlingInfo		:= inMod.CallHandlingInfo;
 		SELF.Options.DeviceInfo				:= inMod.DeviceInfo;
-		SELF.Options.DeviceChangeOption			:= inMod.DeviceChangeOption;
 		SELF.Options.DeviceHistory			:= inMod.DeviceHistory;
 		SELF.SearchBy.Consent.OptInType		:= STD.Str.ToLowerCase(inMod.OptInType);
 		SELF.SearchBy.Consent.OptInMethod	:= STD.Str.ToUpperCase(inMod.OptInMethod);
@@ -64,5 +63,6 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
  	#IF(Phones.Constants.Debug.Zumigo)								
    		OUTPUT(outf,NAMED('zumigoSoapResults'));	
    	#END;
+
 	RETURN outf;   
 END;

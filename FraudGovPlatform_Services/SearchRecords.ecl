@@ -157,8 +157,14 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ElementType := L.fragment;
 		//Cleaning out @@@ from LEFT.entity_value when ELEMENT is of type address,
 		// @@@ was addded to calcualte the matching HASH value for tree_uid
-		SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
+		/*SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
 														REGEXREPLACE('@@@',L.fragment_value,', '), 
+														L.fragment_value);
+														*/
+		SELF.ElementValue := MAP(
+								L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => REGEXREPLACE('@@@',L.fragment_value,', '),
+								L.fragment = Fragment_Types_const.PERSON_FRAGMENT => contri_best_rec.ContributedBest.Name.First + ' ' 
+																					+ contri_best_rec.ContributedBest.Name.Last, 
 														L.fragment_value);
 		SELF.Score := L.Score;
 		SELF.NoOfIdentities := L.NumberOfIdentities;
