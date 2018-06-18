@@ -1,4 +1,4 @@
-﻿IMPORT iesp, PhoneFinder_Services,std,ut;
+﻿﻿IMPORT iesp, PhoneFinder_Services,std,ut;
 
 EXPORT GetPRIValue(PhoneFinder_Services.Layouts.PhoneFinder.Final SubjectPhone,
 										PhoneFinder_Services.iParam.ReportParams inMod):= FUNCTION
@@ -24,6 +24,13 @@ alertRec:= RECORD
 		BOOLEAN OTPRIFailed;
 		DATASET(alertRec) Alerts;
 	END;
+	
+	BOOLEAN IsDateWithin(STRING date, INTEGER days) := FUNCTION	
+	    STRING8 date_clean := STD.Str.Filter(date,'1234567890');
+	    STRING8 today := (STRING8) STD.Date.Today();	
+	    days_apart := IF(Std.Date.IsValidDate((UNSIGNED)date_clean), ut.DaysApart(date_clean, today), -1);
+	  RETURN days_apart >= 0 AND days_apart <= days;
+ END;	
 	
 	RulesRec evaluateRules(iesp.phonefinder.t_PhoneFinderRiskIndicator l) := TRANSFORM
 		hasFailed := CASE(l.RiskId, 
@@ -74,6 +81,15 @@ alertRec:= RECORD
 										32 => (UNSIGNED)SubjectPhone.dt_first_seen = 0,
 										33 => (UNSIGNED)SubjectPhone.dt_last_seen = 0,
 										34 => (UNSIGNED)SubjectPhone.dt_first_seen = 0 AND (UNSIGNED)SubjectPhone.dt_last_seen = 0,
+										35 =>  IF(SubjectPhone.imsi_ChangeDate <> '', 
+																				IsDateWithin(SubjectPhone.imsi_ChangeDate, l.Threshold),
+																				IsDateWithin(SubjectPhone.imsi_ActivationDate, l.Threshold)) OR 
+																				SubjectPhone.imsi_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold),
+										36 => IsDateWithin(SubjectPhone.imei_ChangeDate, l.Threshold) OR 
+											 SubjectPhone.loststolen = 1 AND  IsDateWithin(SubjectPhone.loststolen_date, l.Threshold) OR
+											 SubjectPhone.imsi_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imsi_seensince, l.Threshold) OR																																																																								
+											 SubjectPhone.imei_changedthis_time = 1  AND IsDateWithin(SubjectPhone.imei_seensince, l.Threshold) OR																																																																								
+											 SubjectPhone.iccid_changedthis_time = 1 AND IsDateWithin(SubjectPhone.iccid_seensince, l.Threshold),
 										FALSE);				
 		//Keep violating rules and risk indicator	based on individual rule.
 		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category, SELF.messages := LEFT.RiskDescription, SELF := LEFT)));
@@ -167,4 +183,6 @@ Indicator ID	Risk Alert
 32  No First Seen Date associated to Phone#
 33  No Last Seen Date associated to Phone #
 34  No First Seen and Last Seen Date associated to Phone #
+35  SIM Card Information has changed in the last “Input B” days.
+36  Device Information has changed in the last “Input B” days.
 */	
