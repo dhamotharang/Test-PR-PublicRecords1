@@ -53,7 +53,8 @@ module
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
 			).All
-			,notify('BASE FILES COMPLETE','*');
+			,notify('BASE FILES COMPLETE','*')
+			,notify('Build_FraudGov_PII_SOAP_Appends','*')
 			
 	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 	

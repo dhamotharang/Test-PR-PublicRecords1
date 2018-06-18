@@ -28,6 +28,6 @@ Export All := 	if(tools.fun_IsValidVersion(pversion)
 											,Promote(pversion).buildfiles.New2Built
 											,Promote(pversion).buildfiles.Built2QA
 											)
-									,output('No Valid version parameter passed, skipping Build_Base_KnownFraud atribute')
+									,output('No Valid version parameter passed, skipping Build_Base_Pii atribute')
 									);
 END;
