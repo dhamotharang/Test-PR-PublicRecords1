@@ -1,5 +1,5 @@
 ﻿Import prte2_common,prte,_control;
-EXPORT UpdateDops(STRING current_version, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
+EXPORT UpdateDops_FCRA(STRING current_version, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
  
  is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
 
@@ -9,9 +9,9 @@ EXPORT UpdateDops(STRING current_version, boolean skipDOPS=FALSE, string emailTo
 
  NoUpdate := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
 
- updatedops  := PRTE.UpdateVersion('OverrideKeys',current_version,notifyEmail,'B','F','N');
+ updatedopsFCRA  := PRTE.UpdateVersion('FCRA_OverrideKeys',current_version,notifyEmail,'B','F','N');
 		
- PerformUpdateOrNot := IF(doDOPS,updatedops,NoUpdate);
+ PerformUpdateOrNot := IF(doDOPS,updatedopsFCRA,NoUpdate);
  
  		
  RETURN PerformUpdateOrNot;
