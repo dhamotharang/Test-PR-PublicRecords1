@@ -174,7 +174,7 @@
 		UNSIGNED1	_LinkSearchLevel                 := IF( option.LinkSearchLevel = 0         , Business_Risk_BIP.Constants.LinkSearch.Default         , option.LinkSearchLevel );
 		UNSIGNED1	_MarketingMode                   := IF( option.MarketingMode = 0           , Business_Risk_BIP.Constants.Default_MarketingMode      , option.MarketingMode );
 		UNSIGNED1	_BusShellVersion                 := IF( option.BusShellVersion = 0         , Business_Risk_BIP.Constants.BusShellVersion_v22        , option.BusShellVersion );
-		STRING50	_AllowedSources                  := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
+		STRING50	_AllowedSources                   := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
 		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , 2, option.OFACVersion );
 		REAL      _Global_Watchlist_Threshold      := IF( option.GlobalWatchlistThreshold = 0, Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold, option.GlobalWatchlistThreshold );
 		UNSIGNED6	_HistoryDate                     := IF( option.HistoryDate = 0             , 999999, option.HistoryDate );
@@ -184,7 +184,7 @@
 		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
 		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
-		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways := option.Gateways;
+		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
 				
 		// Per Product Mgmt guidance:
 		//   o  turn off Gateway calls to Targus
@@ -282,12 +282,6 @@
 		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
-
-    // Per requirements: assign Boolean value to include_additional_watchlists based solely on BIID product type.  
-    //   o  Business InstantID 2.0 - search OFAC only
-    //   o  Business InstantID 2.0 Compliance & Business InstantID 2.0 Compliance with SBFE -- search the global watch list
-		BOOLEAN   _include_additional_watchlists := _BIID20ProductType IN [ BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE ];
-
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
 		
 		// The following attributes are included in the service interface by requirement, but aren't used yet.
