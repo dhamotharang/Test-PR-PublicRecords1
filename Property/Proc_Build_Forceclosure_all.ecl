@@ -11,10 +11,13 @@ doSpray := Property.spray_Foreclosure_Raw(filedate
 doKeyBuild := Property.Foreclosure_Keys(filedate);
 
 doOrbitStat := Property.scrubs_foreclosure_raw(filedate);
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Foreclosures',(filedate),'N'); 
+
 
 retval := sequential(doSpray
 										,doOrbitStat
 										,doKeyBuild
+										,orbit_update
 										); 
 
 return retval;
