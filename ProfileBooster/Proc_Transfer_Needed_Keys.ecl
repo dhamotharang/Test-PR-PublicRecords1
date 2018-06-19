@@ -83,21 +83,22 @@ filestocopyds := dataset([
 											// ,false).begincopy;
 											
 PBKEY := dops.xFerRoxieFiles(filestocopyds
-											,'prod_esp.br.seisint.com'  // prod thor ESP
-											,'prod_dali.br.seisint.com'  // prod dali
-											,'thor400_44'  // different cluster
-											,'8010' 
-											,'prod' // prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile
-											,'Melissa.Newport@lexisnexisrisk.com'  // different email address
-											,'pb'
+											,'prod_esp.br.seisint.com'  	// dstthoresp - prod thor ESP
+											,'prod_dali.br.seisint.com'  	// dstthordali - prod dali
+											,'thor400_44'  								// dstthorcluster - different cluster
+											,'8010' 											// dstthorespport
+											,'prod' // destenv - prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile
+											,'Melissa.Newport@lexisnexisrisk.com'  // rToEmail -  different email address
+											,'pb'																	 // suffixSuperName
 											,true
 											,false
-											, srcthorclusters := ['thor400_44'
-											                     ,'thor400_20'
-																					 ,'thor400_60'
-																					 ,'hthor__eclagent'
-																					 //,'thor400_31_store'
-																					 ]
+											,
+											,'prod_esp.br.seisint.com'
+											,'prod_dali.br.seisint.com'
+											,'8010'
+											, srcthorclusters := ['thor400_44','thor400_66']
+											,roxieprodesp := '10.173.109.101'
+											,roxieprodtarget := 'roxie_109' 
 											).begincopy;											
 		
 RETURN PBKEY;

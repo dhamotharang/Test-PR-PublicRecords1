@@ -180,6 +180,14 @@ EXPORT Layout_ProfileBoosterV1 := RECORD
 	String3		RaAOccProfLicMmbrCnt;
 	String3		RaAOccBusinessAssocMmbrCnt;
 	String3		RaAInterestSportPersonMmbrCnt;
+	// new attributes added for bug RQ-13721
+	string25 PPCurrOwnedAutoVIN;
+	string4 PPCurrOwnedAutoYear;
+	string36 PPCurrOwnedAutoMake;
+	string30 PPCurrOwnedAutoModel;
+	string20 PPCurrOwnedAutoSeries;
+	string25 PPCurrOwnedAutoType;
+	
 // for future use, possible custom model return
 	String3 	score1 := '';
 	string15 	scorename1 := '';
@@ -257,13 +265,20 @@ EXPORT Layout_PB_Slim_vehicles := RECORD
 	string4		year_make;
 	string5		make;
 	string3		model;
-	string25	vin;
+
 	string1 	vina_veh_type;
 	unsigned1 totalCount;
 	unsigned1 vehicleCount;
 	unsigned1 motorcycleCount;
 	unsigned2	months_first_reg;
 	unsigned2	months_last_reg;
+	
+	string25 PPCurrOwnedAutoVIN;
+	string4 PPCurrOwnedAutoYear;
+	string36 PPCurrOwnedAutoMake;
+	string30 PPCurrOwnedAutoModel;
+	string20 PPCurrOwnedAutoSeries;
+	string25 PPCurrOwnedAutoType;
 END;
 
 EXPORT Layout_PB_Slim_header := RECORD
@@ -589,6 +604,13 @@ EXPORT Layout_PB_Shell := RECORD
 	Unsigned2 RaAOccProfLicMmbrCnt;
 	Unsigned2 RaAOccBusinessAssocMmbrCnt;
 	Unsigned2 RaAInterestSportPersonMmbrCnt;	
+	
+	string25 PPCurrOwnedAutoVIN;
+	string4 PPCurrOwnedAutoYear;
+	string36 PPCurrOwnedAutoMake;
+	string30 PPCurrOwnedAutoModel;
+	string20 PPCurrOwnedAutoSeries;
+	string25 PPCurrOwnedAutoType;
 END;
 
 EXPORT Layout_PB_In  := RECORD
@@ -826,6 +848,15 @@ EXPORT Layout_PB_BatchOutFlat := RECORD
 	String3		v1_RaAOccProfLicMmbrCnt;
 	String3		v1_RaAOccBusinessAssocMmbrCnt;
 	String3		v1_RaAInterestSportPersonMmbrCnt;
+	
+	// new attributes added for bug RQ-13721
+	string25 v1_PPCurrOwnedAutoVIN;
+	string4 v1_PPCurrOwnedAutoYear;
+	string36 v1_PPCurrOwnedAutoMake;
+	string30 v1_PPCurrOwnedAutoModel;
+	string20 v1_PPCurrOwnedAutoSeries;
+	string25 v1_PPCurrOwnedAutoType;
+	
 // for future use, possible custom model return
 	String3 	score1 := '';
 	string15 	scorename1 := '';
@@ -835,6 +866,7 @@ EXPORT Layout_PB_BatchOutFlat := RECORD
 	String2 	reason4 := '';
 	String2 	reason5 := '';
 	String2 	reason6 := '';
+
 END; 
 
 export Layout_Derogs :=

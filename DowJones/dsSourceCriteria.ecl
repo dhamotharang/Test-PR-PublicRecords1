@@ -1614,5 +1614,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/715 Democratic People\'s Republic of Korea List','1600'},
 {'EC 2018/714 Democratic People\'s Republic of Korea List','1601'},
 {'EC 2018/733-Al-Qaida & Taliban List','1602'},
-{'Illinois Investment Policy Board - Prohibited Investment List','1603'}
+{'Illinois Investment Policy Board - Prohibited Investment List','1603'},
+{'EC (CFSP) 2018/778 Syria List','1604'},
+{'EC (CFSP) 2018/819 Democratic People\'s Republic of Korea List','1605'},
+{'EC 2018/774 Syria List','1606'},
+{'EC 2018/814 Democratic People\'s Republic of Korea List','1607'},
+{'EC 2018/816 ISIL (Da\'esh) and Al-Qaida List','1608'},
+{'South Korea Ministry of Strategy and Finance (MOSF) List','1609'},
+{'CCDI Wanted List','1610'},
+{'EC (CFSP) 2018/833 Iran List','1611'},
+{'EC 2018/827 Iran List','1612'},
+{'EC 2018/855 ISIL (Da\'esh) and Al-Qaida List','1613'},
+{'NYSE American Disciplinary Actions','1614'},
+{'OFAC - Foreign Terrorist Organization List','1615'}
 ],r);
