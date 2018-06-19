@@ -147,7 +147,7 @@ EXPORT UpdateDOPSForPkgValidation(
 		
 		dNormRecs := normalize(dGetKey, left.ulist, xNormRecs(left,right));
 		
-		return dNormRecs;
+		return if (count(dKeyInfo) > 0, dNormRecs, dataset([],rKeyInfo));
 	end;
 
 	export RunUpdate() := function
