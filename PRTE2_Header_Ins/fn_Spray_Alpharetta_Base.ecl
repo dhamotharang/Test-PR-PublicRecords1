@@ -1,3 +1,11 @@
+﻿/* ********************************************************************************************
+PRTE2_Header_Ins.fn_Spray_Alpharetta_Base
+MUST SWITCH TO THE NEW BOCA BUSINESS CASE BUILD PROCESSES - FOR NOW MUST KEEP THE SAME FILE NAMES
+NOTE: We only need file info here for 
+a) Spray/DeSpray and the data preparation we used to do during the build before the append.
+b) Our Base file and 
+c) any research/maintenance
+************************************************************************************ */
 IMPORT ut, RoxieKeyBuild;
 IMPORT PRTE2_Common as Common;
 
@@ -12,7 +20,7 @@ EXPORT fn_Spray_Alpharetta_Base(STRING CSVName, STRING fileVersion, STRING overr
 																								Constants.CSVSprayFieldSeparator,		// field separator(s)
 																								Constants.CSVSprayLineSeparator,		// line separator(s)
 																								Constants.CSVSprayQuote,						// text quote character
-																								ThorLib.Cluster(),									// destination THOR cluster
+																								ThorLib.GROUP(),									// destination THOR cluster
 																								Files.FILE_SPRAY_NAME,
 																								-1,												  				// -1 means no timeout
 																									,													  			// use default ESP server IP port
@@ -25,32 +33,17 @@ EXPORT fn_Spray_Alpharetta_Base(STRING CSVName, STRING fileVersion, STRING overr
 
 			// --------------------------------------------------
 			speadsheetIncoming := Files.SPRAYED_DS;
-			RoxieKeyBuild.Mac_SF_BuildProcess_V2(speadsheetIncoming,
-																					 Files.Base_Prefix, 
-																					 Files.Base_Name,
-																					 fileVersion, buildHDRBase, 3,
-																					 false,true);
-																						 
-			// --------------------------------------------------
+			
+			speadsheetIncomingUpper := Common.mac_ConvertToUpperCase(speadsheetIncoming , fname, mname, lname);
+			
+			buildSteps := fn_Save_BaseAndRels_Alpharetta_Base(speadsheetIncomingUpper, fileVersion);
 			delSprayedFile  := FileServices.DeleteLogicalFile (Files.FILE_SPRAY_NAME);
-
-			// --------------------------------------------------
-			HDR_Alpha_Base := Files.HDR_BASE_ALPHA_DS;
-			ShowResults := CHOOSEN(HDR_Alpha_Base, 400);	
-			// --------------------------------------------------
-			relationFile := fn_generate_relation_base();		// this depends on the Files.HDR_BASE_ALPHA_DS being completed
-			RoxieKeyBuild.Mac_SF_BuildProcess_V2(relationFile,
-																		 Files.Base_Prefix, 
-																		 Files.Relationship_Suffix,
-																		 fileVersion, buildHDRRelatives, 3,
-																		 false,true);
-
+			ShowResults := CHOOSEN(Files.HDR_BASE_ALPHA_DS, 400);	
 			// --------------------------------------------------
 
 			sequentialSteps	:= SEQUENTIAL (
 															sprayFile,
-															buildHDRBase,
-															buildHDRRelatives,	// must happen after buildHDRBase
+															buildSteps,
 															delSprayedFile,
 															OUTPUT(ShowResults)
 															);

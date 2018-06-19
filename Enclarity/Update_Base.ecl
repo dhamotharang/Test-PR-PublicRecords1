@@ -620,7 +620,7 @@ end;
 		c_sort_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and lic_num = ''));
 		h_sort_ssn	:= sort_ssn(record_type = 'H' and lic_num <> '');
 		
-		lic_file	:= sort(distribute(enclarity.Files().license_base.built, hash(group_key)), group_key, local);
+		lic_file	:= sort(distribute(enclarity.Files().license_base.built(record_type = 'C' or (record_type = 'H' and lic_state <> 'MO')), hash(group_key)), group_key, local);
 		c_base_l	:= JOIN(sort(distribute(c_sort_ssn, hash(group_key)), group_key, local), lic_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({sort_ssn}
@@ -1025,8 +1025,25 @@ end;
 		// all_lnpid	:= has_lnpid + rejoin_lnpid;
 		all_lnpid	:= rejoin_lnpid;
 		sort_lnpid	:= fn_rollup(all_lnpid);
+		
+		pre_final_base	:= project(sort_lnpid, enclarity.Layouts.individual_base);		
+		get_historical_mo_provs	:= pre_final_base(lic_state = 'MO' and record_type = 'H');
+		non_historical_provs		:= pre_final_base(record_type = 'C');
+		non_mo_historical				:= pre_final_base(lic_state <> 'MO' and record_type = 'H');
+		
+		get_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367');
+		
+		non_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367');
+		
+		clear_exp_stat	:= project(get_mo_apn, 
+																transform(enclarity.Layouts.individual_base,
+																	self.lic_end_date	:= '00000000',
+																	self.lic_status		:= '',
+																	self							:= left));
+																	
+		recombined_provs	:= non_historical_provs + non_mo_historical + non_mo_apn + clear_exp_stat;
 
-		RETURN project(sort_lnpid, enclarity.Layouts.individual_base);
+		RETURN recombined_provs;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION

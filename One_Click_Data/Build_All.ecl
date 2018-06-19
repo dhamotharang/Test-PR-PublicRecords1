@@ -1,5 +1,6 @@
-//Kick off the entire build
-import versioncontrol,_control; 
+﻿//Kick off the entire build
+import versioncontrol,_control, Orbit3; 
+
 
 export Build_All(
 	
@@ -39,6 +40,7 @@ function
 		,Build_Keys		(pversion																		).all
 		,Build_Strata	(pversion																		)
 		,Promote().buildfiles.Built2QA
+		,Orbit3.proc_Orbit3_CreateBuild_AddItem('One Click Data',pversion,'N'); 
 	) : success(Send_Email(pversion,,not pIsTesting).Roxie), failure(send_email(pversion,,not pIsTesting).buildfailure);
 
 	return

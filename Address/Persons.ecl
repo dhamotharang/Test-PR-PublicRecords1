@@ -1,4 +1,4 @@
-import STD, lib_stringlib;
+﻿import STD, lib_stringlib;
 export Persons := MODULE
 //OPTION('regexVersion', 1)
 
@@ -12,7 +12,8 @@ shared rgxLast := '(DI |DA |DEL |DE LA |DE LOS |DES |DE |DELA |DELLA |DELLO |DOS
 // last or initial
 shared rgxLastI := '(DI |DA |DEL |DE LA |DE LOS |DES |DE |DELA |DELLA |DELLO |DOS |DU |LA |MC |VON |VAN DEN |VAN DER |VAN DE |VAN |VANDER |VANDEN |ST |SAN |EL |LE |ABU |[ODANL]\')?([A-Z]+)';
 //shared rgxLast := '(DI |DA |DEL |DE LA |DE LOS |DES |DE |DELLA |DELLO |DOS |VON |VAN DER |VAN |VANDER |ST |EL |[ODANL]\')?([A-Z][A-Z-]+)';
-shared rgxLastStrong := '(DI |DA |DEL |DE LA |DELA |DE LOS |DES |DE |DELA |DELLA |DOS |DU |LA |MC |MAC |VON |VAN DEN |VAN DER |VAN DE |VAN DEN |VAN |VANDER |VANDEN |ST |SAN |EL |LE |[ODANL]\'|A-|ABU-EL-|ABU|VAN-DEN-)([A-Z][A-Z-]+)';
+//shared rgxLastStrong := '(DI |DA |DEL |DE LA |DELA |DE LOS |DES |DE |DELA |DELLA |DOS |DU |LA |MC |MAC |VON |VAN DEN |VAN DER |VAN DE |VAN DEN |VAN |VANDER |VANDEN |ST |SAN |EL |LE |[ODANL]\'|A-|ABU-EL-|ABU|VAN-DEN-)([A-Z][A-Z-]+)';
+shared rgxLastStrong := '(DI |DA |DEL |DE LA |DELA |DE LOS |DES |DE |DELA |DELLA |DOS |DU |LA |MC |MAC |VON |VAN DEN |VAN DER |VAN DE |VAN DEN |VAN |VANDER |VANDEN |ST |SAN |EL |LE |[ODANL]\'|(A|ABU-EL|ABU|AL|ABDUL|BAR|BEN|BOU|EL|VAN-DEN)-)([A-Z][A-Z-]+)';
 shared rgxLastOrInitial := '(DI |DA |DEL |DES |DE LA |DE LOS |DE |DELA |DELLA |DELLO |DOS |DU |MC |VON |VAN DEN |VAN DER |VAN DE |VAN |VANDER |VANDEN |ST |SAN |EL |LE |[ODANL]\'|A-|ABU-EL-|ABU|VAN-DEN-)?([A-Z][A-Z-]*)';
 shared rgxGen := '(JR|SR|I|II|III|IV|V|VI|VII|VIII|IX|2ND|3RD|THRD|03|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
 shared rgxSureGen := '(JR|SR|II|III|IV|VI|VII|VIII|IX|2ND|3RD|THRD|03|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
@@ -404,8 +405,8 @@ export NameFormat := ENUM(integer2, NoName=0,
 // search order is important
 // based on most common formats first
 // some are order dependent
-export SingleNameFormat(string s) := 
-	IF(NameTester.InvalidNameFormat(s), NameFormat.NoName,
+export SingleNameFormat(string s, boolean forceValid = false) := 
+	IF(NOT forceValid and NameTester.InvalidNameFormat(s), NameFormat.NoName,
 		MAP(
 		// S F L  
 		REGEXFIND(rgxSFL, s) => NameFormat.SFL,
@@ -746,11 +747,11 @@ export DualNameFormat(string s) := MAP(
 	
 // determine name format so we know location of first name
 // supports hyphenated last name and period after middle name
-export PersonalNameFormat(string s) := 
+export PersonalNameFormat(string s, boolean forceValid = false) := 
 	//IF(REGEXFIND('([ ]+AND[ ]+|[ ]*&[ ]*)', s, NOCASE), DualNameFormat(s), SingleNameFormat(s));
 	//IF(REGEXFIND(rgxConnector, s), DualNameFormat(s), SingleNameFormat(s));
 	MAP(
-		NameTester.InvalidNameFormat(s) => NameFormat.NoName,
+		Not forceValid and NameTester.InvalidNameFormat(s) => NameFormat.NoName,
 		REGEXFIND(rgxConnector, s) => DualNameFormat(s),
 		REGEXFIND(rgxLScFMM, s) => NameFormat.LScFMM,	// not to clash with FMLcFML
 		REGEXFIND(rgxLcSFM, s) => NameFormat.LcSFM,	// not to clash with FMLcFML
@@ -758,7 +759,7 @@ export PersonalNameFormat(string s) :=
 		REGEXFIND(rgxLcFMM, s) => NameFormat.LcFMM,	// not to clash with FMLcFML
 		REGEXFIND(rgxFMLcIII, s) => NameFormat.FMLcIII,	// not to clash with FMLcFML
 		REGEXFIND(rgxFMLcFML, s) => NameFormat.FMLcFML,
-		SingleNameFormat(s)
+		SingleNameFormat(s, forceValid)
 	);
 	
 
@@ -800,7 +801,7 @@ export IsSureGen(string name) :=
 	TRIM(name,LEFT,RIGHT) IN ['JR','SR','II','III','IV','VI','VII','VIII','IX'];
 
 // determine if name may be multi-part last name
-export boolean IsLastNameOnly(string name) := RegexFind('^' + rgxLastStrong + '$', name);
+shared boolean IsLastNameOnly(string name) := RegexFind('^' + rgxLastStrong + '$', name);
 export boolean IsJustLastName(string name) := 
 	IF(RegexFind('^' + rgxLastStrong + '$', name),
 		NOT NameTester.IsFirstName(RegexFind('^([A-Z]+) +', name, 1)) and NOT NameTester.IsLoPctFirstName(RegexFind('^([A-Z]+) +', name, 1)),
@@ -809,20 +810,7 @@ export boolean IsJustLastName(string name) :=
 shared ShortLastNames := ['NG','OK','OX','UI','KU','DO','JO','RO','UX','KRCH','LI'];
 shared BadLastNames := ['ASS','AV','NMN','NMI','NLN','ERROR', 'RET','RE','XX','XY','OR','ET','AKA',
 							'MC','ST','HW','FR','CH','SM','ME','AS','LC','EST','COC','NT','PUSSY','BASTARD','BITCH'];
-/*export boolean InvalidLastName(string name) := MAP(
-	Length(name) < 2 => true,
-	Length(name) > 25 => true,
-	//REGEXFIND('^[B-DF-HJ-NP-TVWXZ]{3,}$',name) => true,
-	IsSureSuffix(name) => true,		// don't consider suffixes as last names
-	REGEXFIND('^[A-Z]-[A-Z]$',name) => true,		// A-B
-	name in  BadLastNames => true,
-	name IN ShortLastNames => false,
-	NameTester.IsLastName(name) => false,
-	OrientalNames.IsOrientalSurname(name) => false,
-	REGEXFIND('^[B-DF-HJ-NP-TVWXZ]{2,}$',name) => true,
-	false
-	);*/
-	
+
 export boolean InvalidLastName(string name) := 
 	Length(name) < 2 OR
 	Length(name) > 25 OR
@@ -878,53 +866,9 @@ export boolean IsLastNameEx(string name) := MAP(
 	REGEXFIND('^[B-DF-HJ-NP-TVWXZ]{3,}$',name) => false,
 	REGEXFIND('^[A-Z]{3,}(JR|SR)$',name) => NameTester.IsLastName(REGEXFIND('^([A-Z]+)(JR|SR)$',name,1)),
 	false);
-
 /*
-export boolean IsLastNameEx(string name) := 
-	IF(Length(name) < 2 OR
-		IsSureSuffix(name) OR
-		name in  BadLastNames OR
-		REGEXFIND('^[A-Z]-[A-Z]$',name) OR 		// A-B
-		REGEXFIND('^[B-DF-HJ-NP-TVWXZ]{3,}$',name) OR
-		REGEXFIND('([A-Z])\\1{3,}',name) OR			// repeated character
-		REGEXFIND('[B-DF-HJ-NP-TVWXZ]{7,}',name),	// consecutive consonants
-		false,
-	IF(
-		NameTester.IsLastName(name) OR
-		IsLastNameOnly(name) OR
-		SpanishNames.IsSpanishSurname(name) OR
-		IndianNames.IsIndianSurname(name) OR
-		ArabicNames.IsArabicSurname(name) OR
-		OrientalNames.IsOrientalSurname(name) OR
-		JapaneseNames.IsJapaneseSurname(name) OR
-		name IN ShortLastNames OR
-		REGEXFIND('[A-Z]+(WITZ|WICZ|WISCH|SKI|SKIY|SKY|TZKY|VICH|VITCH|VICZ|VITZ|STEIN|STEAD|STAD|FELD|BACH|MAN|MANN|DOLPH|IAK|OV|OVIC|ROFF|DORF|LIEB|HAUSEN|SCHI|SCHE|SCHO|EVA|OVA|KAYA|ACK|TZKY|ZYK|RECHT|SCHLING|CHUK|ENKO|SHKIN|EK|ESCU|EANU|GONZA|VANDE)$',name)OR	// east european endings
-		REGEXFIND('[A-Z](OULOS|OYLOS|ELLIS|IDIS|IADIS|OUDAS|OUKAS|AKIS|OUSIS|SIOS|KONIS|OTIS|ATOS|ITIS)$',name) OR	// greek endings
-		REGEXFIND('^(KARA|PAPA|KONDO|SCHN|STEIN)[A-Z]{2,}$',name) OR		// greek & otherprefixes
-		(REGEXFIND('[A-Z]{2,}(SON|SEN|FIELD|SHIRE|BERG|BERRY|BERY|BURG|BURY|CROFT|NESS|WELL|INGTON|ELLS|LAND|WARD|FORD|BODY|DALE|OY|ER|TOM|TRY|ARTON|SHAW|DOTTIR|IAMS|VAND|VILL|WILL)$',name)
-							AND NOT NameTester.IsFirstName(name)) OR		// anglo endings
-		REGEXFIND('[A-Z](SWAMY|NKA|OOD|UZ|MURTI|MADI|REVA|REZA|ERJEE|ARJUNA|YAMA|IAN|TULLA)$',name) OR				// asian endings
-		REGEXFIND('[B-DF-HJ-NP-TVWXZ](EZ|ES|IZ)$',name) OR	// possible spanish name
-		(REGEXFIND('[B-DF-HJ-NP-TVWXZ](ITO|ELLI|ANO|ONA|TINI|ACCI|ETTO|COLA|ENCIO|ENZO|ENTO|ETTI|AGNI|ISTA|UCCI|UZZO|DELLA)$',name) AND NOT NameTester.IsFirstName(name)) OR	// possible italian name
-		(name[1] = 'O' AND NameTester.IsLastName(name[2..])) OR
-		NameTester.IsLastName(REGEXFIND('^(O|DU|VAN|DE|DI)([A-Z]{2,})$',name,2)) OR
-		REGEXFIND('^(MAC|MC)[A-Z]{2,}$',name) OR		// scottish prefixes
-		REGEXFIND(rgxSpanishLName1, name), 
-	true,
-		IF(REGEXFIND('^[A-Z]{3,}(JR|SR)$',name),
-			NameTester.IsLastName(REGEXFIND('^([A-Z]+)(JR|SR)$',name,1)),
-		IF(REGEXFIND('^[B-DF-HJ-NP-TVWXZ]{2,}$',name),
-		false,
-	false))));
-*/	
 shared rgxHyphenatedname := '^([A-Z]\'?[A-Z]+)-([A-Z]\'?[A-Z]+)$';
 	
-export boolean IsLastNameExOrHyphenated(string name) := 
-	IF(StringLib.StringFind(name, '-', 1) > 0,
-			REGEXFIND('^(AL|ABDUL|BAR|BEN|BOU|EL)-[A-Z]+', name)
-			OR IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 1))
-			OR IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 2)),		
-		IsLastNameEx(name));
 
 shared rgxDoubledName := '^([A-Z]+) ([A-Z]+)$';
 	
@@ -934,38 +878,43 @@ export boolean IsLastNameDoubled(string name) :=
 			OR IsLastNameEx(REGEXFIND(rgxDoubledName, name, 1))
 			OR IsLastNameEx(REGEXFIND(rgxDoubledName, name, 2)),		
 		false);
-
+*/
 shared boolean ProbableFirstName(string name) :=
 	NameTester.IsFirstName(name) AND NOT NameTester.IsLastName(name);
 	
 	
-	
+/*	
 shared boolean IsLastNameHyphenated(string name) := 		//REGEXFIND(rgxHyphenatedname, name);
 				IF(StringLib.StringFind(name, '-', 1) > 0,
 					REGEXFIND('^(AL|ABDUL|BAR|BEN|BOU|EL)-[A-Z]+', name)
 					OR IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 1))
 					OR IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 2)),
 					false);
+					
+export boolean IsLastNameExOrHyphenated(string name) := 
+	IsLastNameHyphenated(name) OR		
+		IsLastNameEx(name);
+*/
+shared rgxDoubleName := '^([A-Z]\'?[A-Z]+)( |-)([A-Z]\'?[A-Z]+)$';
+export boolean IsDoubleLastName(string name) :=
+					IsLastNameEx(REGEXFIND(rgxDoubleName, name, 1))
+							OR IsLastNameEx(REGEXFIND(rgxDoubleName, name, 3));
+							
+export boolean IsLastNameExOrHyphenated(string name) := 
+		IsLastNameEx(name) OR
+	      IsDoubleLastName(name);		
 
-export boolean ProbableLastName(string name) :=
-	IsLastNameExOrHyphenated(name) OR NOT NameTester.IsFirstName(name);
+export boolean ProbableLastName(string name) := 
+	IsLastNameEx(name) OR IsDoubleLastName(name) OR NOT NameTester.IsFirstName(name);
+//	IsLastNameExOrHyphenated(name) OR IsLastNameDoubled(name) OR NOT NameTester.IsFirstName(name);
 	
-/*export boolean IsLastNameConfirmed(string name) := MAP(
-	Length(name) < 2 => false,
-	IsSureSuffix(name) => false,			// don't consider suffixes as last names
-	IsLastNameEx(name) => true,
-	IsLastNameOnly(name) => true,
-	IsLastNameHyphenated(name) => true,
-	//**StringLib.StringFind(name, '-', 1) > 0 => IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 1)) OR IsLastNameEx(REGEXFIND(rgxHyphenatedname, name, 2)),		
-	//IsFirstname(name) => false,
-	false);*/
 export boolean IsLastNameConfirmed(string name) := 
 	IF(Length(name) < 2 OR
 	IsSureSuffix(name),false,			// don't consider suffixes as last names
 	IF(IsLastNameEx(name) OR
-		IsLastNameOnly(name) OR
-		IsLastNameHyphenated(name) OR
-		IsLastNameDoubled(name)
+		//IsLastNameOnly(name) OR
+		//IsLastNameHyphenated(name) OR
+		IsDoubleLastName(name)
 		, true,
 	false));
 	
@@ -1205,6 +1154,7 @@ export boolean IsFirstNameEx(string name) := MAP(
 		REGEXFIND(rgxCompoundFirstName,name) => 
 				IsFirstNamePart(name,REGEXFIND(rgxCompoundFirstName,name,1)),
 		REGEXFIND('^[A-Z]{3,}(JR|SR)$',name) => NameTester.IsFirstName(REGEXFIND('^([A-Z]+)(JR|SR)$',name,1)),
+		//name[1..2] in ['LA','DA'] AND LENGTH(name) > 5 => NameTester.IsFirstNameBasic(name[3..]) AND NOT Address.OrientalNames.IsOrientalName(name[3..]),
 		false
 	);
 	
@@ -1224,34 +1174,35 @@ shared boolean IsPossibleFirstName(string name) := MAP(
 shared boolean InvalidFirstName(string name) := name in ['NFN','NMN','NMI','NT','ASS','BASTARD'];
 	
 shared boolean IsFirstNameOrInitial(string name) :=
-	IsFirstNameEx(name) OR (LENGTH(name) = 1);
+	IsFirstNameEx(name) OR (LENGTH(TRIM(name)) = 1);
 shared boolean IsFirstNameOrInitialOrBlank(string name) :=
-	IsFirstNameEx(name) OR (LENGTH(name) <= 1);
+	IsFirstNameEx(name) OR (LENGTH(TRIM(name)) <= 1);
 	
 
-shared boolean IsLastNameOnlyOrHyphenated(string name) := 
-	IsLastNameOnly(name) OR
-		IsLastNameHyphenated(name);
+//shared boolean IsLastNameOnlyOrHyphenated(string name) := 
+//	IsLastNameOnly(name) OR
+//		IsLastNameHyphenated(name);
 		
 //shared boolean IsNickName(string name) :=
 //	IF(TRIM(Nid.PreferredFirstNew(name)) = name, false, true);
 shared boolean IsNickName(string name) := NOT IsLastNameEx(name);
-shared boolean IsNoFirstLastNameExOrHyphenated(string name) := 
-	IsLastNameExOrHyphenated(name) AND NOT NameTester.IsFirstName(name);
+//shared boolean IsNoFirstLastNameExOrHyphenated(string name) := 
+//	IsLastNameExOrHyphenated(name) AND NOT NameTester.IsFirstName(name);
 	//IsLastNameEx(name) OR
 	//	((REGEXFIND(rgxHyphenatedname, name) OR LENGTH(name) > 10)AND NOT IsFirstName(name) );
 
 export boolean IsValidLastName(string nm) :=
-	~InvalidLastName(nm) AND IsLastNameExOrHyphenated(nm);
+	~InvalidLastName(nm) AND (IsLastNameEx(nm) OR IsDoubleLastName(nm));
+	//~InvalidLastName(nm) AND (IsLastNameExOrHyphenated(nm) OR IsLastNameDoubled(nm));
 	
 // for test only		
 shared types := ['X','F','L','B'];
 shared string1 GetNameType(string nm) :=
-	types[IF (IsFirstNameEx(nm),1,0) +
+	types[IF (IsFirstNameOrInitial(nm),1,0) +
 	IF (IsValidLastName(nm),2,0) + 1];
 
 shared string1 GetNameTypeI(string nm) :=
-	types[IF (IsFirstNameEx(nm) OR LENGTH(TRIM(nm,LEFT,RIGHT))=1,1,0) +
+	types[IF (IsFirstNameOrInitial(nm) OR LENGTH(TRIM(nm,LEFT,RIGHT))=1,1,0) +
 	IF (IsValidLastName(nm),2,0) + 1];	
 	
 export string GetNameTypes(string fname, string lname, string mname='') := FUNCTION
@@ -1311,7 +1262,7 @@ shared string1 GetNameOrderFML(string rgx, string s, integer2 posf1, integer2 po
 				InvalidLastName(REGEXFIND(rgx, s, posl2)) => 'F',
 				segs IN ['FFL','FBB','FBL','FLB','FBX','BFL','BBL','XXX','FBL','FXL','FLX','FLL','FXX','BXL','BXL','BLX','LXL','XLL','XXL'] => 'F',
 				segs IN ['LFF','LFB','LFL','LFX','LBF','LBB','LBL','LBX','LXX','LXF','LXB','BFF','BBF','XBX','XFX','XFB','XXF','XFF','XBF','XBB'] => 'L',
-				segs in ['LLF','XLF','BLF'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posm1)), 'L', 'U'),
+				segs in ['LLF','XLF','BLF','LLB'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posm1)), 'L', 'U'),
 				segs in ['XFL','XBL'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posl1)), 'L', 'F'),
 				segs in ['BFB'] => if(clue in ['l','L'], 'L', 'F'),
 				/*IsFirstNameEx(REGEXFIND(rgx, s, posf1)) AND IsLastNameExOrHyphenated(REGEXFIND(rgx, s, posl1))
@@ -1410,7 +1361,9 @@ shared string1 GetNameOrderFL(string rgx, string s, integer2 posf1, integer2 pos
 				segs in ['FL','BL','FB','FX','XL'] => 'F',
 				segs in ['LF','LB','BF','XF','LX'] => 'L',
 				segs = 'XB' => IF(NameTester.IsHiPctFirstName(REGEXFIND(rgx,s,posl1)) OR NameTester.IsEthnicFirstName(REGEXFIND(rgx,s,posl1)), 'L', 'L'),
-				segs = 'BB' => IF(NameTester.IsHiPctFirstName(REGEXFIND(rgx,s,posf1)) AND NOT NameTester.IsHiPctFirstName(REGEXFIND(rgx,s,posl1)), 'F', clue),
+				segs = 'BB' => IF(NameTester.IsHiPctFirstName(REGEXFIND(rgx,s,posf1)),'F',
+													IF(NameTester.IsHiPctFirstName(REGEXFIND(rgx,s,posl1)),	'L', clue)),
+	//	
 				segs = 'LL' => IF(NameTester.IsLoPctFirstName(REGEXFIND(rgx,s,posf1)), 'F', 
 													IF(NameTester.IsLoPctFirstName(REGEXFIND(rgx,s,posl1)), 'L', clue)),
 				clue in ['l','L'] => 'L',	// LL XX BX BB
@@ -1470,7 +1423,7 @@ shared string4 GetNameOrderNNaNN(string4 segs) :=
 			MAP(
 				segs in ['BFFF','BBFF','BFBF','BFFB','XFFF','XBFF','XFBF','XFFB','FFFF',
 									'BXFF'] => 'LFFM',		// 
-				segs in ['FLFL','FLBL','BLFL','BLBL','FXFL','FLXL'] => 'FLFL',		// FL & FL
+				segs in ['FLFL','FLBL','BLFL','BLBL','FXFL','FLXL','FLFX'] => 'FLFL',		// FL & FL
 				segs in ['FBBF','FLFF','FLFB','FLBF','BLFF'] => 'FLFM',		// FL & Fm(L)
 				segs in ['LFLF','BFLF','XFLF'] => 'LFLF',		// LF a LF
 				segs in ['FLLF', 'FLLX'] => 'FLLF',		// FL a LF
@@ -1602,6 +1555,8 @@ shared string65 FormatNameFLL(string rgx, string name, integer fn, integer lnm, 
 			blank5;
 	
 	END;
+	
+
 shared string65 FormatNameFLLS(string rgx, string name, integer fn, integer lnm, integer lnm2, integer sn) := 
 	FUNCTION
 		lname := TRIM(FilterLName(REGEXFIND(rgx, name, lnm))) + ' ' +
@@ -1656,34 +1611,34 @@ export string70 FormatName(string s, NameFormat fmt = 0, string1 clue='U') := FU
 			NameFormat.NoName =>	'',
 			NameFormat.FL =>		FormatNameFL(rgxFL, s, 1, 2),
 			NameFormat.LF =>		MAP(
-									TRIM(REGEXFIND(rgxLF, s, 2)) in ['MAC','VAN'] and IsSureSuffix(REGEXFIND(rgxLF, s, 4)) =>
-													FormatNameFLS(rgxLF, s, 2, 3, 4),
-									StandaloneFirstLast(rgxLF, s, 1, 4) => FormatNameFL(rgxLF, s, 1, 4),
-										FormatNameFL(rgxLF, s, 4, 1)),
-			NameFormat.LFM =>	IF(IsSureGen(REGEXFIND(rgxLFM, s, 4)),
-													FormatNameFLS(rgxLFM, s, 5, 1, 4),
-													FormatNameFML(rgxLFM, s, 4, 5, 1)),
+									TRIM(REGEXFIND(rgxLF, s, 2)) in ['MAC','VAN'] and IsSureSuffix(REGEXFIND(rgxLF, s, 5)) =>
+													FormatNameFLS(rgxLF, s, 2, 4, 5),
+									StandaloneFirstLast(rgxLF, s, 1, 5) => FormatNameFL(rgxLF, s, 1, 5),
+										FormatNameFL(rgxLF, s, 5, 1)),
+			NameFormat.LFM =>	IF(IsSureGen(REGEXFIND(rgxLFM, s, 5)),
+													FormatNameFLS(rgxLFM, s, 6, 1, 5),
+													FormatNameFML(rgxLFM, s, 5, 6, 1)),
 			NameFormat.FLorLF => 	CASE(GetNameOrderFL(rgxFLoLF, s, 1, 3, 3, 1, clue),
 										'F' => FormatNameFL(rgxFLoLF, s, 1, 3),
 										'L' => FormatNameFL(rgxFLoLF, s, 3, 1),
 										FormatNameFL(rgxFLoLF, s, 1, 3)
 									),		
 			NameFormat.FLcS =>		FormatNameFLS(rgxFLcS, s, 1, 2, 6),
-			NameFormat.FLS =>		FormatNameFLS(rgxFLS, s, 1, 2, 5),
-			NameFormat.LFS =>		FormatNameFLS(rgxLFS, s, 4, 1, 5),
+			NameFormat.FLS =>		FormatNameFLS(rgxFLS, s, 1, 2, 6),
+			NameFormat.LFS =>		FormatNameFLS(rgxLFS, s, 5, 1, 6),
 			NameFormat.FLSorLFS =>	CASE(GetNameOrderFL(rgxFLSorLFS, s, 1, 2, 2, 1),
 										'F' => FormatNameFLS(rgxFLSorLFS, s, 1, 2, 3),
 										'L' => FormatNameFLS(rgxFLSorLFS, s, 2, 1, 3),
 										FormatNameFLS(rgxFLSorLFS, s, 1, 2, 3)
 									),
-			NameFormat.FLL =>	IF(IsSuffix(REGEXFIND(rgxFLL, s, 5)),
-													FormatNameFLS(rgxFLL, s, 1, 2, 5),
-												CASE(GetNameOrderFL(rgxFLL, s, 1, 5, 5, 2),
-					/* FL or MLF */		'F' => FormatNameFLL(rgxFLL, s, 1, 2, 5),
-										'L' => FormatNameFML(rgxFLL, s, 5, 1, 2),
-										FormatNameFLL(rgxFLL, s, 1, 2, 5)
+			NameFormat.FLL =>	IF(IsSuffix(REGEXFIND(rgxFLL, s, 6)),
+													FormatNameFLS(rgxFLL, s, 1, 2, 6),
+												CASE(GetNameOrderFL(rgxFLL, s, 1, 6, 6, 2),
+					/* FL or MLF */		'F' => FormatNameFLL(rgxFLL, s, 1, 2, 6),
+										'L' => FormatNameFML(rgxFLL, s, 6, 1, 2),
+										FormatNameFLL(rgxFLL, s, 1, 2, 6)
 									)),
-			NameFormat.FLLS =>		FormatNameFLLS(rgxFLLS, s, 1, 2, 5, 8),
+			NameFormat.FLLS =>		FormatNameFLLS(rgxFLLS, s, 1, 2, 6, 9),
 			NameFormat.FxL =>		FormatNameFL(rgxFxL, s, 1, 2),
 			NameFormat.FxLS =>		FormatNameFLS(rgxFxLS, s, 1, 2, 5),
 			NameFormat.LxFM =>		FormatNameFML(rgxLxFM, s, 3, 4, 1),
@@ -1801,7 +1756,11 @@ export string70 FormatName(string s, NameFormat fmt = 0, string1 clue='U') := FU
 										'L' => FormatNameFML(rgxFMiLI, s, 3, 2, 1),
 										FormatNameFML(rgxFMiLI, s, 1, 2, 3)
 									)),
-			NameFormat.LFcMi =>		FormatNameFLL(rgxLFcMi, s, 5, 1, 4),	// Really: LLcFi
+			NameFormat.LFcMi =>		CASE(GetNameOrderFL(rgxLFcMi, s, 1, 4, 4, 1, 'U'),
+															'F' => FormatNameFML(rgxLFcMi, s, 1, 5, 4),
+															'L' => FormatNameFML(rgxLFcMi, s, 4, 5, 1),
+															FormatNameFLL(rgxLFcMi, s, 5, 1, 4)
+														),
 			NameFormat.LcF =>		FormatNameFL(rgxLcF, s, 4, 1),
 			NameFormat.LcTF =>		FormatNameFL(rgxLcTF, s, 5, 1),
 			NameFormat.LcFM =>		FormatNameFML(rgxLcFM, s, 4, 5, 1),
@@ -2369,7 +2328,13 @@ export boolean ValidDualName(string s, integer2 format) := FUNCTION
 	fname2 := TRIM(fullname[76..95]);
 	lname := TRIM(fullname[46..65]);
 	lname2 := TRIM(fullname[116..135]);
-
+/*	segs := ExtractNameTypes4(rgxFaFML, s, 1, 4, 5, 6);
+	ord := GetNameOrderNNaNN(segs);
+OUTPUT('Format: ' + WhichFormat(format));
+OUTPUT('ValidDualName: fname ' + fname + ' lname ' + lname + ' name2: ' + fname2 + ' * ' + lname2);
+OUTPUT('segs ' + segs + ' order ' + ord);
+OUTPUT(NameTester.IsFirstName(FName) OR NameTester.IsFirstName(FName2) 
+				OR IsLastNameConfirmed(LName));*/
 	return MAP (
 			format = NameFormat.NoName OR NOT IsNameFormatDual(format) =>	false,
 		InvalidLastName(lname) => false,
@@ -2390,7 +2355,7 @@ export boolean ValidDualName(string s, integer2 format) := FUNCTION
 								IsFirstNameOrInitial(FName) OR
 								IsFirstNameOrInitial(FName2) OR
 								IsFirstNameOrInitial(TRIM(fullname[96..115])), // middle name 2
-			NameTester.IsFirstName(FName) OR NameTester.IsFirstName(FName2) 
+			IsFirstNameOrInitial(FName) OR IsFirstNameOrInitial(FName2) 
 				OR IsLastNameConfirmed(LName)
 			);
 END;
@@ -2513,7 +2478,7 @@ export NameStatus := enum(UNSIGNED2, NotAName = 0, InvalidNameFormat = 1,
 				PossibleDualName = 6);
 //types := ['X','F','L','B'];
 string1 GetNameClass(string nm) :=
-	types[IF (IsFirstNameEx(nm),1,0) +
+	types[IF (IsFirstNameOrInitial(nm),1,0) +
 	//IF (IsLastNameConfirmed(nm),2,0) + 1];
 	IF (IsValidLastName(nm),2,0) + 1];
 	
@@ -2532,6 +2497,7 @@ END;
 
 NameStatus VerifyName(string fname, string lname) := FUNCTION
 	s := GetNameClass(fname) + GetNameClass(lname);
+//OUTPUT('VerifyName: ' + s + ' fname: ' + fname + ' lname: ' + lname) ;
 	return VerifyNameOrder(s, fname, lname);
 END; 
 
@@ -2549,8 +2515,8 @@ END;
 */
 NameStatus VerifyHyphenatedName(string fname, string lname) := FUNCTION
 	s := IF(NameTester.IsFirstname(fname), 'F', 'X') +
-		IF(IsLastNameEx(REGEXFIND(rgxHyphenatedname, lname, 1)) OR
-			IsLastNameEx(REGEXFIND(rgxHyphenatedname, lname, 2)),'L','X');
+		IF(IsLastNameEx(REGEXFIND(rgxDoubleName, lname, 1)) OR
+			IsLastNameEx(REGEXFIND(rgxDoubleName, lname, 3)),'L','X');
 	return IF(s='XX',NameStatus.PossibleName,NameStatus.ProbableName);
 	//return VerifyNameOrder(s);
 END;
@@ -2591,6 +2557,7 @@ NameStatus VerifyNameL(string lname) := CASE(
 
 NameStatus VerifyNameFLL(string s) := FUNCTION
 	segs := ExtractNameTypesFML(rgxFLL, s, 1, 2, 5);
+
 	return MAP(
 //		segs = 'XXX' => NameStatus.ImprobableName,
 		segs[1] IN ['F','B'] AND (segs[2] IN ['B','L'] OR segs[2] IN ['B','L']) => NameStatus.ProbableName,
@@ -2648,7 +2615,8 @@ export NameStatus NameQuality(string name,string1 hint='U') :=
 		NameTester.InvalidNameFormat(name) => NameStatus.InvalidNameFormat,
 //		REGEXFIND(rgxConnector, name) => IF(IsDualName(name),	NameStatus.PossibleDualName,
 //									NameStatus.InvalidNameFormat),
-		REGEXFIND(rgxConnector, name) => NameStatus.PossibleDualName,
+//		REGEXFIND(rgxConnector, name) => NameStatus.PossibleDualName,
+		REGEXFIND(rgxConnector, name) => If(DualNameFormat(name) = 0, NameStatus.InvalidNameFormat, NameStatus.PossibleDualName),
 		IsJustLastName(name) => NameStatus.StandaloneName,
 		ValidatePersonalName(name,hint)
 		);
@@ -2831,8 +2799,8 @@ export string GetNameSegments(string s1, integer2 fmtx=0) := FUNCTION
 	return CASE(fmt,
 			NameFormat.NoName =>	'',
 			NameFormat.FL =>		ExtractNameTypes(rgxFL,s,1,2),
-			NameFormat.LF =>		ExtractNameTypes(rgxLF,s, 1,4),
-			NameFormat.LFM =>		ExtractNameTypes(rgxLFM,s, 1,4,5),
+			NameFormat.LF =>		ExtractNameTypes(rgxLF,s, 1,5),
+			NameFormat.LFM =>		ExtractNameTypes(rgxLFM,s, 1,5,6),
 			NameFormat.FLorLF => 	ExtractNameTypes(rgxFLoLF, s, 1, 3),
 
 			NameFormat.FLcS =>		ExtractNameTypes(rgxFLcS, s, 1,2),
@@ -2841,7 +2809,7 @@ export string GetNameSegments(string s1, integer2 fmtx=0) := FUNCTION
 			NameFormat.FLSorLFS =>	ExtractNameTypes(rgxFLSorLFS, s, 1, 2),
 			NameFormat.LFSM =>		ExtractNameTypes(rgxLFSM, s, 1, 4),
 			
-			NameFormat.FLL =>		ExtractNameTypesFML(rgxFLL, s, 1, 2, 5),
+			NameFormat.FLL =>		ExtractNameTypesFML(rgxFLL, s, 1, 2, 6),
 			NameFormat.FxL =>		ExtractNameTypes(rgxFxL, s, 1,3),
 			NameFormat.FxLS =>		ExtractNameTypes(rgxFxLS, s, 1,3),
 			NameFormat.LxFM =>		ExtractNameTypes(rgxLxFM, s, 3,1,4),
@@ -2930,6 +2898,7 @@ export string GetNameSegments(string s1, integer2 fmtx=0) := FUNCTION
 									+	GetNameType(REGEXFIND(rgxFMLaFM, s, 8))
 									+ IF(REGEXFIND(rgxFMLaFM,s,10)='','',GetNameType(REGEXFIND(rgxFMLaFM,s,10))),
 			NameFormat.FMaFLS => ExtractNameTypes2I(rgxFMaFLS, s, 1, 2) + '&' + ExtractNameTypes2I(rgxFMaFLS, s, 4, 5),
+			NameFormat.FMaFL => ExtractNameTypes2I(rgxFMaFL, s, 1, 3) + '&' + ExtractNameTypes2I(rgxFMaFL, s, 5, 7),
 			NameFormat.FLSaFM => ExtractNameTypes2I(rgxFLSaFM, s, 1, 2) + '&' + ExtractNameTypes2I(rgxFLSaFM, s, 7, 9),
 			NameFormat.LcFMiMiaFMM =>	ExtractNameTypes4(rgxLcFMiMiaFMM, s, 4, 5, 6, 1) +'%'+ExtractNameTypes4(rgxLcFMiMiaFMM, s, 8, 9, 10, 1), 		
 			'***'

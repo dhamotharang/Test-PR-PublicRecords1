@@ -70,7 +70,7 @@ END;
 		// self.lf						:= L.lf;
 		vDOB	:=	STD.Date.IsValidDate((INTEGER)L.DOB);
 		SELF.DOB	:=	IF(vDOB,L.DOB,'');
-		vCollection_Date	:=	STD.Date.IsValidDate((INTEGER)L.DOB);
+		vCollection_Date	:=	STD.Date.IsValidDate((INTEGER)L.Collection_Date);
 		SELF.Collection_Date	:=	IF(vCollection_Date,L.Collection_Date,'');
 		SELF.CaseLinkID		:= ut.CleanSpacesAndUpper(L.CaseLinkID);
 		SELF.Unused	:=	'';

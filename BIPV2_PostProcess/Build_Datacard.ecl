@@ -1,4 +1,4 @@
-import ut,bipv2,wk_ut,BIPV2_Findlinks,BIPV2_Postprocess,std;
+﻿import ut,bipv2,wk_ut,BIPV2_Findlinks,BIPV2_Postprocess,std;
 thecurrentdate  := (STRING8)Std.Date.Today();         
 highwuid        := 'W' + thecurrentdate + '-999999';
 
@@ -35,7 +35,7 @@ Shared string100 zz4	:='Data fresh as of:';
 Shared string100 zz5	:='US Businesses';
 Shared string100 zz6	:='Total Records';
 Shared string100 zz7	:=' ';
-Shared string100 zz8	:='PROXID--LexIDÂ® Business Place';
+Shared string100 zz8	:='PROXID--LexIDÃ‚Â® Business Place';
 Shared string100 zz9	:='Active';
 //Shared string100 zz10	:='Tri-Major Sources';
 //Shared string100 zz11	:='Dual-Major Sources';
@@ -44,7 +44,7 @@ Shared string100 zz13	:='Single Source w/single record';
 Shared string100 zz14	:='Inactive';
 //Shared string100 zz15	:='Defunct';
 Shared string100 zz16	:='';
-Shared string100 zz17	:='SELE--LexIDÂ® Business Legal Entity';
+Shared string100 zz17	:='SELE--LexIDÃ‚Â® Business Legal Entity';
 Shared string100 zz18	:='Active';
 //Shared string100 zz19	:='Tri-Major Sources';
 //Shared string100 zz20	:='Dual-Major Sources';
@@ -54,7 +54,7 @@ Shared string100 zz23	:='Inactive';
 //Shared string100 zz24	:='Defunct';
 Shared string100 zz25	:='Total SELEs from LGID3 Processing';
 Shared string100 zz26	:='';
-Shared string100 zz27	:='ORGID--LexIDÂ® Business Legal Family';
+Shared string100 zz27	:='ORGID--LexIDÃ‚Â® Business Legal Family';
 Shared string100 zz28	:='Active';
 //Shared string100 zz29	:='Tri-Major Sources';
 //Shared string100 zz30	:='Dual-Major Sources';
@@ -63,7 +63,7 @@ Shared string100 zz32	:='Single Source w/single record';
 Shared string100 zz33	:='Inactive';
 //Shared string100 zz34	:='Defunct';
 Shared string100 zz35	:='';
-Shared string100 zz36	:='ULTID--LexIDÂ® Business Extended Family';
+Shared string100 zz36	:='ULTID--LexIDÃ‚Â® Business Extended Family';
 Shared string100 zz37	:='Active';
 //Shared string100 zz38	:='Tri-Major Sources';
 //Shared string100 zz39	:='Dual-Major Sources';
@@ -72,7 +72,7 @@ Shared string100 zz41	:='Single Source w/single record';
 Shared string100 zz42	:='Inactive';
 //Shared string100 zz43	:='Defunct';
 Shared string100 zz44	:='';
-Shared string100 zz45	:='POWID--LexIDÂ® Business Place Group';
+Shared string100 zz45	:='POWID--LexIDÃ‚Â® Business Place Group';
 Shared string100 zz46	:='Active';
 //Shared string100 zz47	:='Tri-Major Sources';
 //Shared string100 zz48	:='Dual-Major Sources';
@@ -162,7 +162,7 @@ Shared string100 ss4	:='Data fresh as of:';
 Shared string100 ss5	:='US Businesses';
 Shared string100 ss6	:='Total Records';
 Shared string100 ss7	:=' ';
-Shared string100 ss8	:='PROXID--LexIDÂ® Business Place';
+Shared string100 ss8	:='PROXID--LexIDÃ‚Â® Business Place';
 Shared string100 ss9	:='Active';
 Shared string100 ss10	:='Tri-Major Sources';
 Shared string100 ss11	:='Dual-Major Sources';
@@ -171,7 +171,7 @@ Shared string100 ss13	:='Single Source w/single record';
 Shared string100 ss14	:='Inactive';
 Shared string100 ss15	:='Defunct';
 Shared string100 ss16	:='';
-Shared string100 ss17	:='SELE--LexIDÂ® Business Legal Entity';
+Shared string100 ss17	:='SELE--LexIDÃ‚Â® Business Legal Entity';
 Shared string100 ss18	:='Active';
 Shared string100 ss19	:='Tri-Major Sources';
 Shared string100 ss20	:='Dual-Major Sources';
@@ -181,7 +181,7 @@ Shared string100 ss23	:='Inactive';
 Shared string100 ss24	:='Defunct';
 Shared string100 ss25	:='Total SELEs from LGID3 Processing';
 Shared string100 ss26	:='';
-Shared string100 ss27	:='ORGID--LexIDÂ® Business Legal Family';
+Shared string100 ss27	:='ORGID--LexIDÃ‚Â® Business Legal Family';
 Shared string100 ss28	:='Active';
 Shared string100 ss29	:='Tri-Major Sources';
 Shared string100 ss30	:='Dual-Major Sources';
@@ -190,7 +190,7 @@ Shared string100 ss32	:='Single Source w/single record';
 Shared string100 ss33	:='Inactive';
 Shared string100 ss34	:='Defunct';
 Shared string100 ss35	:='';
-Shared string100 ss36	:='ULTID--LexIDÂ® Business Extended Family';
+Shared string100 ss36	:='ULTID--LexIDÃ‚Â® Business Extended Family';
 Shared string100 ss37	:='Active';
 Shared string100 ss38	:='Tri-Major Sources';
 Shared string100 ss39	:='Dual-Major Sources';
@@ -199,7 +199,7 @@ Shared string100 ss41	:='Single Source w/single record';
 Shared string100 ss42	:='Inactive';
 Shared string100 ss43	:='Defunct';
 Shared string100 ss44	:='';
-Shared string100 ss45	:='POWID--LexIDÂ® Business Place Group';
+Shared string100 ss45	:='POWID--LexIDÃ‚Â® Business Place Group';
 Shared string100 ss46	:='Active';
 Shared string100 ss47	:='Tri-Major Sources';
 Shared string100 ss48	:='Dual-Major Sources';
@@ -367,7 +367,7 @@ Shared string80 u26	:='';
 //--------------------------------
 Shared string40 v1		:='';
 Shared string40 v2		:='WU: ' + the_WU;
-Shared string40 v3		:='PROXID--LexIDÂ® Business Place';
+Shared string40 v3		:='PROXID--LexIDÃ‚Â® Business Place';
 Shared string40 v4		:='Active';
 Shared string40 v5		:='';
 Shared string40 v6		:='=+M7/M27';
@@ -421,7 +421,7 @@ Shared string40 w26	:='';
 //-------------------------------------
 Shared string40 e1		:='';
 Shared string40 e2		:='';
-Shared string40 e3		:='SELE--LexIDÂ® Business Legal Entity';
+Shared string40 e3		:='SELE--LexIDÃ‚Â® Business Legal Entity';
 Shared string40 e4		:='Active';
 Shared string40 e5		:='';
 Shared string40 e6		:='=+O7/O27';
@@ -504,7 +504,7 @@ Shared string40 ff26	:='';
 // -----------------------------------------
 Shared string40 g1		:='';
 Shared string40 g2		:='';
-Shared string40 g3		:='ORGID--LexIDÂ® Business Legal Family';
+Shared string40 g3		:='ORGID--LexIDÃ‚Â® Business Legal Family';
 Shared string40 g4		:='Active';
 Shared string40 g5		:='';
 Shared string40 g6		:='=+R7/R27';
@@ -558,7 +558,7 @@ Shared string40 h26	:='';
 // ---------------------------
 Shared string40 i1		:='';
 Shared string40 i2		:='';
-Shared string40 i3		:='ULTID--LexIDÂ® Business Extended Family';
+Shared string40 i3		:='ULTID--LexIDÃ‚Â® Business Extended Family';
 Shared string40 i4		:='Active';
 Shared string40 i5		:='';
 Shared string40 i6		:='';
@@ -612,7 +612,7 @@ Shared string40 j26	:='';
 //-----------------------
 Shared string40 k1		:='';
 Shared string40 k2		:='';
-Shared string40 k3		:='POWID--LexIDÂ® Business Place Group';
+Shared string40 k3		:='POWID--LexIDÃ‚Â® Business Place Group';
 Shared string40 k4		:='Active';
 Shared string40 k5		:='';
 Shared string40 k6		:='=+V7/V27';
@@ -1038,7 +1038,7 @@ end;
 
 Shared string s1:='LexisNexis Risk Solutions - Business Data Profile';
 Shared string s2:='Date: ' + the_WU[2..5] + ' ' + TheSprint;
-Shared string s3:='SELE--LexIDÂ® Business Legal Entity';
+Shared string s3:='SELE--LexIDÃ‚Â® Business Legal Entity';
 Shared string s4:='GOLD';
 Shared string s5:='Multiple Sources at a Business Address';
 Shared string s6:='Gold: Active, No LNCA, Has 1 or more of DMI/EBR, Has 1 or more second tier source, Has 2 or more total sources, At Business Address';
@@ -1069,20 +1069,24 @@ Shared string s30:='';
 Shared string s31:='NON-GOLD';
 Shared string s32:='Single Source at a Business';
 Shared string s33:='Not Gold: Active, No LNCA, No DMI/EBR, No second tier source, Has 1 total source, At Business Address';
-Shared string s34:='';
+Shared string s34:='Not Gold: Active, Has HV Source, Has 1 total source, At Business Address';
+Shared string s34b:='';
 Shared string s35:='Single Source at an Unknown or Residental Address';
 Shared string s36:='Not Gold: Active, No LNCA, No DMI/EBR, Has 1 or more second tier source, Has 1 total source, At Residential or Unknown Address';
 Shared string s37:='Not Gold: Active, No LNCA, Has 1 or more of DMI/EBR, No second tier source, Has 1 total source, At Residential or Unknown Address';
 Shared string s38:='Not Gold: Active, No LNCA, No DMI/EBR, No second tier source, Has 1 total source, At Residential or Unknown Address';
-Shared string s39:='';
+Shared string s39 := 'Not Gold: Active, Has LNCA, Has 1 total source, At Residential or Unknown Address';
+Shared string s39b := '';
 Shared string s40:='Multiple Sources at an Unknown or Residential Address';
 Shared string s41:='Not Gold: Active, No LNCA, No DMI/EBR, No second tier source, Has 2 or more total sources, At Residential or Unknown Address';
-Shared string s42:='';
+Shared string s42:='Not Gold: Active, has HV Source, Has 2 or more total sources, At Residential or Unknown Address';
+Shared string s42b:='';
 Shared string s43:='Multiple Sources at a Business Address';
 Shared string s44:='Non HV Sources'; 
 Shared string _s44 :='Not Gold: Active, No LNCA, No DMI/EBR, No second tier source, Has 2 or more total sources, At Business Address';
 
-Shared string s45:='';
+Shared string s45:='Has HV Sources';
+Shared string s45b:='';
 Shared string s46:='Single Source at PO Box';
 Shared string s47:='Not Gold: Active, Has 1 total source, Only has PO Box';
 Shared string s48:='';
@@ -1093,7 +1097,7 @@ Shared string s52:='Inactive';
 Shared string s53:='';
 Shared string s54:='Total Header SELEs';
 //----------------------------------------
-
+	shared string40 nb := '';
 	Shared string40 n1	:='';
 	Shared string40 n2	:='';
 	Shared string40 n3	:=TheSprint;
@@ -1105,7 +1109,7 @@ Shared string s54:='Total Header SELEs';
    Shared string40 n11	:=(string40)Attribute_Table_SELEID_V2(description=s11)[1].cnt;
    Shared string40 n12	:=(string40)Attribute_Table_SELEID_V2(description=s12)[1].cnt;
    //Shared string40 n5	:=(string40)((integer)n6 + (integer)n7 + (integer)n8 + (integer)n9 + (integer)n10 + (integer)n11 + (integer)n12); //sum of n6 to n12
-   Shared string40 n5	:='=sum(B7:B13)';     //Shared string40 n5	:='=sum(B6:B12)'; //We have to shift one row to handle the worksheet header
+   Shared string40 n5	:='=sum(B6:B12)';     //Shared string40 n5	:='=sum(B6:B12)'; //We have to shift one row to handle the worksheet header
    //----------------------------------------------------------------------------------------------------------------
    
    Shared string40 n13	:='';
@@ -1118,14 +1122,14 @@ Shared string s54:='Total Header SELEs';
    Shared string40 n21	:=(string40)Attribute_Table_SELEID_V2(description=s21)[1].cnt;
    Shared string40 n22	:='';
    //Shared string40 n14	:=(string40)((integer)n15 + (integer)n16 + (integer)n17 + (integer)n18 + (integer)n19 + (integer)n20 + (integer)n21); //will be sum of n15 to n21
-   Shared string40 n14	:='=Sum(B16:B22)'; //Shared string40 n14	:='=Sum(B15:B21)';  //We have to shift one row to handle the worksheet header
+   Shared string40 n14	:='=Sum(B15:B22)'; //Shared string40 n14	:='=Sum(B15:B21)';  //We have to shift one row to handle the worksheet header
    //----------------------------------------------------------------------------------------------------------------
    
    Shared string40 n24	:=(string40)Attribute_Table_SELEID_V2(description=s24)[1].cnt;
    Shared string40 n25	:=(string40)Attribute_Table_SELEID_V2(description=s25)[1].cnt;
    Shared string40 n26	:=(string40)Attribute_Table_SELEID_V2(description=s26)[1].cnt;
    //Shared string40 n23	:=(string40)((integer)n24 + (integer)n25 + (integer)n26); 	//will be sum 24 to 26
-   Shared string40 n23	:='=Sum(B25:B27)'; //Shared string40 n23	:='=Sum(B24:B26)'; //We have to shift one row to handle the worksheet header
+   Shared string40 n23	:='=Sum(B24:B27)'; //Shared string40 n23	:='=Sum(B24:B26)'; //We have to shift one row to handle the worksheet header
    //----------------------------------------------------------------------------------------------------------------
    
    Shared string40 n27	:='';
@@ -1133,47 +1137,44 @@ Shared string s54:='Total Header SELEs';
    Shared string40 n29	:=(string40)Attribute_Table_SELEID_V2(description=s29)[1].cnt;
    Shared string40 n30	:='';
    //Shared string40 n4	:=(string40)((integer)n5 + (integer)n14 + (integer)n23 + (integer)n28);           // sum of GOLD Active (=+N5+N14+N23+N28)
-   Shared string40 n4	:='=B6+B15+B24+B29'; //Shared string40 n4	:='=B5+B14+B23+B28'; //We have to shift one row to handle the worksheet header
+   Shared string40 n4	:='=B5+B14+B23+B28'; //Shared string40 n4	:='=B5+B14+B23+B28'; //We have to shift one row to handle the worksheet header
    //-----------------------------------------------------------------------------------------------------------------
    
-   Shared string40 n32	:=(string40)Attribute_Table_SELEID_V2(description=s33)[1].cnt; //32 is 33
-   Shared string40 n33	:=(string40)Attribute_Table_SELEID_V2(description=s33)[1].cnt;
-   Shared string40 n34	:='';
+   Shared string40 n32	:='=B33+B34';
+   Shared string40 n33	:=(string40)sum(Attribute_Table_SELEID_V2(not isgold, isactive, not hasSuperCoreSrc, not hasOtherCoreSrc, not has2TSrc, not hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt);
+   Shared string40 n34	:=(string40)sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc or hasOtherCoreSrc or has2TSrc, not hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt);
    
    Shared string40 n36	:=(string40)Attribute_Table_SELEID_V2(description=s36)[1].cnt;
    Shared string40 n37	:=(string40)Attribute_Table_SELEID_V2(description=s37)[1].cnt;
    Shared string40 n38	:=(string40)Attribute_Table_SELEID_V2(description=s38)[1].cnt;
-   Shared string40 n39	:='';
+   Shared string40 n39	:=(string40)sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc, not hasMultipleSources, not hasBizAddr, isNotJustPoBox), cnt);
    //Shared string40 n35	:=(string40)((integer)n36 + (integer)n37 + (integer)n38); 														// sum 36 to 38
-   Shared string40 n35	:='=Sum(B37:B40)'; //Shared string40 n35	:='=Sum(B36:B39)';//We have to shift one row to handle the worksheet header
+   Shared string40 n35	:='=Sum(B36:B39)'; //Shared string40 n35	:='=Sum(B36:B39)';//We have to shift one row to handle the worksheet header
    //---------------------------------------------------------------------------------------------------------------
-   Shared string40 n40	:=(string40)Attribute_Table_SELEID_V2(description=s41)[1].cnt;//40 is 41
+   Shared string40 n40	:='=B41+B42';
    Shared string40 n41	:=(string40)Attribute_Table_SELEID_V2(description=s41)[1].cnt;
-   Shared string40 n42	:='';
+   Shared string40 n42	:=(string40)sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc or hasOtherCoreSrc or has2TSrc, hasMultipleSources, not hasBizAddr, isNotJustPoBox), cnt);
    
-   Shared string40 n43	:=(string40)Attribute_Table_SELEID_V2(description=_s44)[1].cnt; //43 is 44 
+   Shared string40 n43	:='=B44+B45';
    Shared string40 n44	:=(string40)Attribute_Table_SELEID_V2(description=_s44)[1].cnt; //Note We use _s44
-   Shared string40 n45	:='';
+   Shared string40 n45	:=(string40)sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc or hasOtherCoreSrc or has2TSrc, hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt);
    
    Shared string40 n47	:=(string40)sum(Attribute_Table_SELEID_V2(isgold=FALSE, isactive=TRUE, hasmultiplesources=FALSE,isnotjustpobox=FALSE),cnt);
    Shared string40 n48	:='';
-   //Shared string40 n46	:=n47; //46 is 47
-   Shared string40 n46	:='=SUM(B48:B49)'; //Shared string40 n46	:='=SUM(B47:B48)'; //We have to shift one row to handle the worksheet header
+   Shared string40 n46	:='=B47';
    
    Shared string40 n50	:=(string40)sum(Attribute_Table_SELEID_V2(isgold=FALSE, isactive=TRUE, hasmultiplesources=TRUE,isnotjustpobox=FALSE),cnt);
    Shared string40 n51	:='';
-   //Shared string40 n49	:=n50; //49 is 50
-   Shared string40 n49	:='=SUM(B51:B52)'; //Shared string40 n49	:='=SUM(B50:B51)'; //We have to shift one row to handle the worksheet header
+   Shared string40 n49	:='=B50';
    
-   //Shared string40 n31	:=(string40)((integer)n32 + (integer)n35 + (integer)n40 + (integer)n43 + (integer)n46 + (integer)n49); // =+N32+N35+N40+N43+N46+N49
-   Shared string40 n31	:='=B33+B36+B41+B44+B47+B50'; //Shared string40 n31	:='=B32+B35+B40+B43+B46+B49'; //We have to shift one row to handle the worksheet header
+   Shared string40 n31	:='=B32+B35+B40+B43+B46+B49'; //Shared string40 n31	:='=B32+B35+B40+B43+B46+B49'; //We have to shift one row to handle the worksheet header
    
    Shared string40 n52	:=(string40)SUM(Attribute_Table_SELEID_V2(isactive=FALSE),cnt); //Sum of the Not Gold Inactive Part. ?????
    Shared string40 n53	:='';
-   //Shared string40 n54	:=''; //n52+n31+n4 ??????
-   Shared string40 n54	:='=B53+B32+B5'; //Shared string40 n54	:='=B52+B31+B4'; //We have to shift one row to handle the worksheet header
    
-  Shared GOLD_ds :=dataset([
+   Shared string40 n54	:='=B52+B31+B4';
+   
+  export GOLD_ds :=dataset([
    							{s1,n1},{s2,n2},{s3,n3},{s4,n4},{s5,n5},{s6,n6},{s7,n7},{s8,n8},{s9,n9},{s10,n10},{s11,n11},{s12,n12},
    							{s13,n13},{s14,n14},{s15,n15},{s16,n16},{s17,n17},{s18,n18},{s19,n19},{s20,n20},{s21,n21},{s22,n22},{s23,n23},{s24,n24},
    							{s25,n25},{s26,n26},{s27,n27},{s28,n28},{s29,n29},{s30,n30},{s31,n31},{s32,n32},{s33,n33},{s34,n34},{s35,n35},{s36,n36},

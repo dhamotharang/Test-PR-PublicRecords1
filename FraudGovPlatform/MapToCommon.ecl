@@ -72,14 +72,8 @@ module
 	)); 
 	
 // Append MBS classification attributes 
-		seed_In := FraudGovPlatform.testseed.test_lexid	+ FraudGovPlatform.testseed.test_ssn	+ FraudGovPlatform.testseed.test_ip ;
-		Fraudshared.layouts.base.main seedprep (seed_In l,integer c) := transform
-																		self.source_rec_id := max(inBaseIdentityData,source_rec_id) +c;
-																		self:=l;
-																		self:=[];
-																		end;
-		seed_Out := Project(seed_In,seedprep(left,counter));
-  CombinedClassification := Functions.Classification(IdentityData + KnownFraud + If(Fraudshared.Platform.Source = 'FraudGov'  ,seed_Out)) ; 
+
+  CombinedClassification := Functions.Classification(IdentityData + KnownFraud) ; 
 	
 	// append rid 
 	

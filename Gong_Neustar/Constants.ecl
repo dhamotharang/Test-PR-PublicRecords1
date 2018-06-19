@@ -1,4 +1,4 @@
-EXPORT Constants := Module
+﻿EXPORT Constants := Module
 
 	export lfnMaster := '~thor::gong::neustar::master::';
 	export lfnHistory := '~thor::gong::neustar::history::';
@@ -8,5 +8,7 @@ EXPORT Constants := Module
 	//export sfHistory := '~thor::gong::neustar::history';
 	export sfHistory := '~thor_data400::base::gong_history';
 	export sfBase := '~thor::gong::neustar::base';
+	
+	export govtRecordTypes := ['G','L','F','S','C'];
 
 END;
