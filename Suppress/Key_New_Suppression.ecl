@@ -9,8 +9,7 @@ SetRequireLinkingId:=['SSN','DID','BDID','RDID'];
 SetRequireDocumentId:=['FARES ID','OFFENDER KEY','OFFICIAL RECORD','FDN ID'];
 
 get_recs := if(isFCRA, Suppress.File_New_Suppression_FCRA,
-                Suppress.File_New_Suppression(Linking_ID not in Suppress.UNsuppress_DID())
-															);
+                Suppress.File_New_Suppression(Linking_ID not in Suppress.UNsuppress_DID()));
 
 FilteredDS := if(isFCRA, get_recs(STD.Str.ToUpperCase(TRIM(linking_type,left,right)) in ['SSN','DID'] and (unsigned)linking_id<>0),
 																										get_recs(
