@@ -620,7 +620,7 @@ end;
 		c_sort_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and lic_num = ''));
 		h_sort_ssn	:= sort_ssn(record_type = 'H' and lic_num <> '');
 		
-		lic_file	:= sort(distribute(enclarity.Files().license_base.built, hash(group_key)), group_key, local);
+		lic_file	:= sort(distribute(enclarity.Files().license_base.built(record_type = 'C' or (record_type = 'H' and lic_state <> 'MO')), hash(group_key)), group_key, local);
 		c_base_l	:= JOIN(sort(distribute(c_sort_ssn, hash(group_key)), group_key, local), lic_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({sort_ssn}

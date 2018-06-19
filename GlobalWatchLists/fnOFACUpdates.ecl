@@ -48,7 +48,7 @@ dboth := dUpdates + dremove  ;
 
 dUpdates_new := dataset( '~thor_200::in::globalwatchlists_updates', joinrec ,flat);
 									 
-outall := Sequential(  output(dboth+dUpdates_new,,'~thor_200::in::globalwatchlists_updates_'+filedate,overwrite),
+outall := Sequential(   output(dedup(sort(dboth+dUpdates_new,pty_key),all),,'~thor_200::in::globalwatchlists_updates_'+filedate,compressed,overwrite),
                        FileServices.StartSuperFileTransaction(),
 											 FileServices.AddSuperfile( '~thor_200::in::globalwatchlists_updates','~thor_200::in::globalwatchlists_updates_'+filedate),
 											 FileServices.FinishSuperfileTransaction()

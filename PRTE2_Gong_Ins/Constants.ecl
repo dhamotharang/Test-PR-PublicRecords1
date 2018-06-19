@@ -1,6 +1,8 @@
 ﻿/* *****************************************************************************************
  PRTE2_Gong_Ins.BWR_Despray_Base 
  This is for despraying base data to csv file
+NOTE: All Boca landing zone files are in 1 directory - we were not given permissions to 
+add new directories or maintain any files outside the single directory.
 ***************************************************************************************** */
 
 IMPORT _Control, ut, PRTE, PRTE2, PRTE2_Common;

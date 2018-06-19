@@ -7,6 +7,7 @@ EXPORT Cross_Module_Files := MODULE
  	// **** In DEV, you may need to use foreign references if the file doesn't exist in DEV.  
 	// Looks like Linda only sprayed this file in production not dev.
 	EXPORT MASTER_BASE_PREFIX				:= '~prct::BASE::ct';
+	EXPORT MASTER_ALPBASE_PREFIX		:= '~prct::BASE::ct_alp';
 	EXPORT MASTER_AUDIT_PREFIX			:= '~prct::BASE_Audit::ct';
 	EXPORT MASTER_IN_PREFIX					:= '~prct::IN::ct';
 	EXPORT MASTER_TMP_PREFIX				:= '~prct::TMP::ct';
