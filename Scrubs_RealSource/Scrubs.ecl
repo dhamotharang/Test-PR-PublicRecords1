@@ -150,7 +150,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dob_Invalid,'ALLOW','LENGTH','UNKNOWN')
           ,CHOOSE(le.datestamp_Invalid,'ALLOW','LENGTH','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'firstname','middleinit','lastname','suffix','address','city','state','zipcode','zipplus4','phone','dob','datestamp','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_name','invalid_name','invalid_name','invalid_suffix','invalid_alnum','invalid_alpha','invalid_state','invalid_zip','invalid_zip','invalid_phone','invalid_date','invalid_date','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_name','invalid_name','invalid_name','invalid_suffix','invalid_alnum','invalid_alpha','invalid_state','invalid_zip5','invalid_zip4','invalid_phone','invalid_date','invalid_date','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.firstname,(SALT38.StrType)le.middleinit,(SALT38.StrType)le.lastname,(SALT38.StrType)le.suffix,(SALT38.StrType)le.address,(SALT38.StrType)le.city,(SALT38.StrType)le.state,(SALT38.StrType)le.zipcode,(SALT38.StrType)le.zipplus4,(SALT38.StrType)le.phone,(SALT38.StrType)le.dob,(SALT38.StrType)le.datestamp,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,12,Into(LEFT,COUNTER));
@@ -171,8 +171,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'address:invalid_alnum:ALLOW','address:invalid_alnum:LENGTH'
           ,'city:invalid_alpha:ALLOW','city:invalid_alpha:LENGTH'
           ,'state:invalid_state:ALLOW','state:invalid_state:LENGTH'
-          ,'zipcode:invalid_zip:ALLOW','zipcode:invalid_zip:LENGTH'
-          ,'zipplus4:invalid_zip:ALLOW','zipplus4:invalid_zip:LENGTH'
+          ,'zipcode:invalid_zip5:ALLOW','zipcode:invalid_zip5:LENGTH'
+          ,'zipplus4:invalid_zip4:ALLOW','zipplus4:invalid_zip4:LENGTH'
           ,'phone:invalid_phone:ALLOW','phone:invalid_phone:LENGTH'
           ,'dob:invalid_date:ALLOW','dob:invalid_date:LENGTH'
           ,'datestamp:invalid_date:ALLOW','datestamp:invalid_date:LENGTH'

@@ -1,4 +1,4 @@
-import header, census_data, did_add, data_services, death_master,mdr;
+﻿import header, census_data, did_add, data_services, death_master,mdr,ut;
 
 //create did key based on the new base file including state_death_id
 
@@ -17,7 +17,10 @@ census_data.MAC_Fips2County(death_ready,state,fipscounty,county_name,dead_with_c
 dead_with_county_dist := distribute(dead_with_county, hash(did));
 dead_with_county_sort := sort(dead_with_county_dist, did, local);
 
+//DF-21696 blank out specified fields in thor_data400::key::fcra::did_death_masterv2_ssa_qa
+ut.MAC_CLEAR_FIELDS(dead_with_county_sort, dead_with_county_sort_cleared, Death_Master.Constants('').fields_to_clear);
+
 //build index on DID
-export key_death_masterv2_ssa_did_fcra := index(dead_with_county_sort,
-                               {unsigned6 l_did := (integer)did},{dead_with_county_sort},
+export key_death_masterv2_ssa_did_fcra := index(dead_with_county_sort_cleared,
+                               {unsigned6 l_did := (integer)did},{dead_with_county_sort_cleared},
 				           data_services.data_location.prefix('Death')+'thor_data400::key::fcra::did_death_masterv2_ssa_'+doxie.Version_SuperKey);
