@@ -71,22 +71,25 @@ export t_DDRTaxAssessmentValues := record
 	integer8 TaxPrice {xpath('TaxPrice')};
 end;
 		
-export t_DDRTenant := record
-	string LexID {xpath('LexID')};
-	iesp.share.t_Name Name {xpath('Name')};
-	iesp.share.t_Date DateOfBirth {xpath('DateOfBirth')};
+export t_DDRLegalSourceInfo := record
+	string OffenseDescription {xpath('OffenseDescription')};
+	boolean Convicted {xpath('Convicted')};
+	string OffenseType {xpath('OffenseType')};
+	string OffenseLevel {xpath('OffenseLevel')};
+	string CaseType {xpath('CaseType')};
+	string CourtDisposition1 {xpath('CourtDisposition1')};
+	string CourtDisposition2 {xpath('CourtDisposition2')};
+	dataset(iesp.share.t_StringArrayItem) PartyNames {xpath('PartyNames/PartyName'), MAXCOUNT(1)};
 end;
 		
 export t_DDRProperty := record
 	iesp.share.t_Address Address {xpath('Address')};
-	string45 BusinessAddressType {xpath('BusinessAddressType')};
-	iesp.share.t_Name OwnerName {xpath('OwnerName')};
+	string45 AddressType {xpath('AddressType')};
 	string1 OwnerOccupied {xpath('OwnerOccupied')};
 	t_DDROwnershipDetails Ownership {xpath('Ownership')};
 	t_DDRTaxAssessmentValues Assessment {xpath('Assessment')};
 	t_DDRAreaRisk AreaRisk {xpath('AreaRisk')};
 	t_DDRCountyCityRisk CountyCityRisk {xpath('CountyCityRisk')};
-	dataset(t_DDRTenant) ResidentTenants {xpath('ResidentTenants/ResidentTenant'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTenants)};
 end;
 		
 export t_DDRAircraft := record
@@ -169,6 +172,17 @@ export t_DDRLegalEventCriminal := record
 	string30 OffenseCounty {xpath('OffenseCounty')};
 	string40 OffenseCity {xpath('OffenseCity')};
 	boolean TrafficRelatedOffense {xpath('TrafficRelatedOffense')};
+	string CourtCaseType {xpath('CourtCaseType')};
+	iesp.share.t_Date MostRecentActivityDate {xpath('MostRecentActivityDate')};
+	string15 HighestCaseOffenseType {xpath('HighestCaseOffenseType')};
+	string15 IncarcerationProbationParole {xpath('IncarcerationProbationParole')};
+	iesp.share.t_Date SentenceStartDate {xpath('SentenceStartDate')};
+	iesp.share.t_Date DOCConvictionOverrideDate {xpath('DOCConvictionOverrideDate')};
+	iesp.share.t_Date DOCScheduledReleaseDate {xpath('DOCScheduledReleaseDate')};
+	iesp.share.t_Date DOCActualReleaseDate {xpath('DOCActualReleaseDate')};
+	string DOCInmateStatus {xpath('DOCInmateStatus')};
+	string DOCParoleStatus {xpath('DOCParoleStatus')};
+	dataset(t_DDRLegalSourceInfo) Sources {xpath('Sources/Source'), MAXCOUNT(1)};
 end;
 		
 export t_DDRLegalSummary := record

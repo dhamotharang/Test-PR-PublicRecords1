@@ -113,8 +113,7 @@ export LiensSearchServiceFCRA() := macro
 	all_recs := all_recs_and_statements.records;
 	statements := all_recs_and_statements.statements;
 	consumer_alerts := all_recs_and_statements.ConsumerAlerts;
-  input_consumer := FFD.Constants.BlankConsumerRec;
-	
+
 	// returns filtered results if filter is specifed
 	recs_filt := all_recs((evictions_only and eviction = 'Y') 
 													or (liens_only 
@@ -125,6 +124,8 @@ export LiensSearchServiceFCRA() := macro
 	need_filter := evictions_only or liens_only or judgments_only;
 
 	out_recs := if(need_filter, recs_filt, all_recs);
+  
+  input_consumer := LiensV2_Services.fn_identify_consumer(out_recs, rdid);
 	
 	doxie.MAC_Marshall_Results(out_recs, recs_marshalled);
 	OUTPUT(recs_marshalled, NAMED('Results'));

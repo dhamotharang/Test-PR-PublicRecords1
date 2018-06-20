@@ -7,7 +7,7 @@
 IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
-		
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	WSInput.MAC_FraudGovPlatform_Services_SearchService();
 
 	ds_in					:= DATASET([],iesp.fraudgovsearch.t_FraudGovSearchRequest) : STORED('FraudGovSearchRequest', FEW);
@@ -141,6 +141,6 @@ EXPORT SearchService() := MACRO
 				OUTPUT(results, named('Results')),
 				FAIL(301,doxie.ErrorCodes(301))
 			);
-	IF(~Options.IsOnline AND isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
+	IF(isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 		
 ENDMACRO;

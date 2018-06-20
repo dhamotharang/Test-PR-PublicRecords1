@@ -23,12 +23,15 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   //***This section is for Best Business Information ***//	
   addBestData                := DueDiligence.reportBusBestInfo(addRegisteredAgents);   	
   
-  //***This section is for Best Business Information ***//
+  //***This section is for Business Executives ***//
   addExecutives              := DueDiligence.reportBusExecs(addBestData, options, linkingOptions);
   
   //***This section is for Shell Shelf Information ***//
   addShellShelf              := DueDiligence.reportBusShellShelf(addExecutives);
-  //addShellShelf              := addExecutives;
+  
+  //***This section is for Property ***//
+  addProperty              := DueDiligence.reportBusProperty(addShellShelf);
+ 
 																													
 													 
 	// ********************
@@ -48,5 +51,5 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // OUTPUT(addExecutives, NAMED('addExecutives'));  
 
 
-	RETURN addShellShelf;
+	RETURN addProperty;
 END;

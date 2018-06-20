@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Address, AutoStandardI, BatchShare, Doxie, Gateway, Models, Risk_Indicators, Riskwise, ut, VehicleV2, 
 VehicleV2_Services, std;
 
@@ -241,7 +241,7 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 	EXPORT get_gateways(Models.BeneficiaryRiskScore_Interfaces.IInputOptions_BocaShell bocashell_options) :=
 		FUNCTION
 			gateways_in   := Gateway.Configuration.Get();
-			
+      
 			Gateway.Layouts.Config gw_switch(Gateway.Layouts.Config le) := TRANSFORM
 				SELF.servicename := le.servicename;
 				SELF.url := // insurance phones gateway allowed if shell version 50 or higher
@@ -253,8 +253,8 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 					); 
 				SELF := le;
 			END;
-
-			gateways := PROJECT(gateways_in, gw_switch(LEFT));
+      
+		gateways := PROJECT(gateways_in, gw_switch(LEFT));
 			
 			RETURN gateways;
 		END;

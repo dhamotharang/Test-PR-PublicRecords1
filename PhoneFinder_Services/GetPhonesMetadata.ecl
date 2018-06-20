@@ -1,4 +1,4 @@
-﻿IMPORT Advo,DID_Add, Gateway, Inquiry_AccLogs,MDR,PhoneFinder_Services,PhoneFraud,PhonesInfo,Phones,Risk_Indicators, std, ut;
+﻿﻿IMPORT Advo,DID_Add, Gateway, Inquiry_AccLogs,MDR,PhoneFinder_Services,PhoneFraud,PhonesInfo,Phones,Risk_Indicators, std, ut;
 	EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs, 
 													 PhoneFinder_Services.iParam.ReportParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
@@ -376,7 +376,7 @@
 			SELF.dt_last_seen					:= (STRING)MAX((INTEGER)l.dt_last_seen,(INTEGER)r.dt_last_seen);
 			SELF.listing_type_bus			:= IF(l.listing_type_bus='',r.listing_type_bus,l.listing_type_bus);
 			SELF.coc_description			:= IF(l.coc_description='',r.coc_description,l.coc_description);
-			SELF.realtimephone_ext.statuscode	:= IF(l.realtimephone_ext.statuscode='',r.realtimephone_ext.statuscode,l.realtimephone_ext.statuscode);
+			SELF.phonestatus	:= IF(l.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,r.phonestatus,l.phonestatus);
 			// preserve address type since recs with zero DIDs are blank
 			SELF.primary_address_type := IF(l.primary_address_type='',r.primary_address_type,l.primary_address_type); 
 			SELF.typeflag							:= IF(r.typeflag = 'P',l.typeflag,r.typeflag);										
@@ -384,6 +384,19 @@
 			SELF.phone_source					:= IF(l.phone_source IN primaryPhoneSource,l.phone_source,r.phone_source); //more efficiently account for the subject
 			SELF.PhoneOwnershipIndicator := l.PhoneOwnershipIndicator or r.PhoneOwnershipIndicator; // retaining values for a phone
 			SELF.CallForwardingIndicator := IF(l.CallForwardingIndicator = call_fowarded, l.CallForwardingIndicator , r.CallForwardingIndicator);
+			
+			SELF.imsi_changedate := IF(l.imsi_changedate = '', r.imsi_changedate, l.imsi_changedate);
+	        SELF.imsi_ActivationDate := IF(l.imsi_ActivationDate ='', r.imsi_ActivationDate, l.imsi_ActivationDate);
+	        SELF.iccid_seensince := IF(l.iccid_seensince='', r.iccid_seensince, l.iccid_seensince);
+	        SELF.imsi_seensince := IF(l.imsi_seensince='', r.imsi_seensince, l.imsi_seensince);
+	        SELF.imei_seensince := IF(l.imei_seensince='', r.imei_seensince, l.imei_seensince);
+	        SELF.imei_changedate := IF(l.imei_changedate='', r.imei_changedate, l.imei_changedate);
+			SELF.loststolen_date := IF(l.loststolen_date='', r.loststolen_date, l.loststolen_date);
+	        SELF.loststolen := IF(l.loststolen = 0, r.loststolen, l.loststolen);
+			SELF.iccid_changedthis_time := IF(l.iccid_changedthis_time = 0, r.iccid_changedthis_time, l.iccid_changedthis_time);
+			SELF.imsi_changedthis_time :=  IF(l.imsi_changedthis_time = 0, r.imsi_changedthis_time, l.imsi_changedthis_time);
+			SELF.imei_changedthis_time :=  IF(l.imei_changedthis_time = 0, r.imei_changedthis_time, l.imei_changedthis_time);
+			
 			SELF               				:= l;
 	END;
 	dRolledMetadataRecs:= ROLLUP(SORT(dPhoneInfowOTP,acctno,did,phone,typeflag=Phones.Constants.TypeFlag.DataSource_PV,-dt_last_seen,dt_first_seen,phone_source),
@@ -490,7 +503,7 @@
 		OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
 		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
 	#END;
-	
+		
 	RETURN SORT(MetadataResults,acctno,seq);	
 		
-	END;	
+	END;

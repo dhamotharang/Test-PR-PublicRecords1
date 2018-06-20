@@ -34,7 +34,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
                                               SELF.seq               := LEFT.seq,                     //this is the sequence number that ties back to the input transaction (could be business or individual) 
                                               SELF.did               := LEFT.party.did,
                                               self.historyDate       := LEFT.Historydate,
-                                              SELF.ToDaysDate        := (integer)todaysdate;                  //capture the run date
+                                              // SELF.ToDaysDate        := (integer)todaysdate;                  //capture the run date
                                               /* Essentially this is today's date if history date is all 9's OR the history date itself */    
                                               tempDateToUse          := DueDiligence.Common.GetMyDate(LEFT.historydate);
                                               SELF.DateToUse         := tempDateToUse,

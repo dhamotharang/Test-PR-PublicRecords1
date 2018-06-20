@@ -181,7 +181,7 @@
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
-		BOOLEAN   _include_ofac                    := TRUE;
+		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
 		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
@@ -193,9 +193,9 @@
 		BOOLEAN   _RunTargusGateway     := FALSE;
 		BOOLEAN   _OverRideExperianRestriction := option.OverRideExperianRestriction;
 		
-  _CompanyID := IF( users.CompanyID != ''     , users.CompanyID     , option.CompanyID );
-  _Login_ID  := IF( users.LoginHistoryId != '', users.LoginHistoryId, option.LoginID );
-  _DOBMask   := IF( users.DOBMask != ''       , users.DOBMask       , option.DOBMask );
+		_CompanyID := IF( users.CompanyID != ''     , users.CompanyID     , option.CompanyID );
+		_Login_ID  := IF( users.LoginHistoryId != '', users.LoginHistoryId, option.LoginID );
+		_DOBMask   := IF( users.DOBMask != ''       , users.DOBMask       , option.DOBMask );
 		_SSNMask   := IF( users.SSNMask != ''       , users.SSNMask       , option.SSNMask );
     
 		// The following #STORED( ) attributes will be read directly within 
@@ -278,8 +278,8 @@
 		BOOLEAN   _RunTargusGateway              := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
-		BOOLEAN		_include_ofac                  := TRUE;
-		BOOLEAN   _include_additional_watchlists := FALSE;
+		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
+		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');

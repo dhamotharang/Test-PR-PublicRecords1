@@ -35,7 +35,8 @@ export ReportService_Records := module
   //Get FCRA files
   ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs));
   
-  suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+  suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
   
   // Send the slim PersonContext
   pilot_final_recs_sorted := faav2_pilotservices.raw.getReportByID(ids, 
@@ -46,10 +47,10 @@ export ReportService_Records := module
                                                                   in_mod.FFDOptionsMask);
     
   statement_output := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
   has_consumer_data := ~suppress_results_due_alerts and exists(pilot_final_recs_sorted);
   consumer_statements := statement_output(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
-  input_consumer := FFD.MAC.PrepareConsumerRecord(in_mod.did);
+  input_consumer := FFD.MAC.PrepareConsumerRecord(in_mod.did, true);
     
   iesp.faaPilot_fcra.t_FcraPilotReportResponse  xform_final_response() := transform                                                                                                            
                               self._Header   := iesp.ECL2ESP.GetHeaderRow(),

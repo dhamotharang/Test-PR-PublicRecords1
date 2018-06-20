@@ -421,13 +421,15 @@ Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_TOGETHER trans_name
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER,
 		self.isSuits := true;
 		self.crim_case_num := ''; //this is defined later in Risk_Indicators.Boca_Shell_Crim_FCRAHist
-		self := left;));
+		self := left;
+    self := []));
 	liensWithDesc_Nosuits := liensWithDesc(FtdDec not in risk_indicators.iid_constants.setSuitsFCRA);
 	liensWithDesc_Nosuits_set := project(liensWithDesc_Nosuits, 
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER, 
 		self.isSuits := false;
 			self.crim_case_num := ''; //this is defined later in Risk_Indicators.Boca_Shell_Crim_FCRAHist
-		self := left;));	
+		self := left;
+    self := []));	
 	liensWithDesc_srted := SORT(liensWithDesc_suits_set + liensWithDesc_Nosuits_set, did, tmsid, isSuits, (integer) DateFiled);
 	
 	liensTmsidDF := DEDUP(liensWithDesc_srted, did, tmsid);

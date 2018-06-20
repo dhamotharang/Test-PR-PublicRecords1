@@ -10,11 +10,6 @@ EXPORT Layouts := MODULE
 		STRING  Message  := XMLTEXT('faultstring');
 	END;
 
-	EXPORT gateway_common := RECORD
-		unsigned6 lexID;
-		integer status;
-	END;
-
 	EXPORT consumer_data := RECORD
 			DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
 			DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
@@ -34,7 +29,8 @@ EXPORT Layouts := MODULE
 
 	EXPORT equifax_ems := MODULE
 
-		EXPORT gateway_out := RECORD(gateway_common)
+		EXPORT gateway_out := RECORD
+			unsigned6 lexID;
 			iesp.equifax_ems.t_EquifaxEmsResponse response;
 		END;
 

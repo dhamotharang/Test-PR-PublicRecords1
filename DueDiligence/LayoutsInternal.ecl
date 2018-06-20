@@ -20,7 +20,6 @@ EXPORT LayoutsInternal := MODULE
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
 	 InternalSeqAndIdentifiersLayout;
-	 unsigned4  GeoSequence;
 	 CommonGeographicLayout;
 	END;
  
@@ -106,36 +105,47 @@ EXPORT LayoutsInternal := MODULE
 //------  Populated with data for the report  ------
 //------                                      ------
   EXPORT PropertySlimLayout := RECORD
-   InternalSeqAndIdentifiersLayout  PropertyReportData;
-	  unsigned4 propertySeq;   
-		 STRING12  LNFaresId;
-		 STRING80  AssesseeName;
-		 STRING45  BusinessType;
-		 STRING8   SaleDate; 
-		 INTEGER2  LengthOfOwnership;
-		 INTEGER8  PurchasePrice;
-		 STRING1   OwnerOccupied;
-	  INTEGER8  TaxAssdValue;   
-   INTEGER8  TaxAmount;
-	  STRING4   TaxYear;
-	  UNSIGNED4 HistoryDate;
-		 string80  cname;
-		 string10  prim_range;
-   string2   predir;
-   string28  prim_name;
-   string4   suffix;
-   string2   postdir;
-   string10  unit_desig;
-   string8   sec_range;
-   string25 p_city_name;
-   string25 v_city_name;
-   string2   st;
-   string5   zip;
-   string4   zip4;
-	  STRING5   County;
-		 //STRING20  countyName;
-		 string7   geo_blk;
-		 DueDiligence.Layouts.GeographicRiskLayout;
+   InternalSeqAndIdentifiersLayout; 
+   STRING12  LNFaresId;
+   STRING2   sourceCode;
+
+   //person related
+   BOOLEAN inquiredOwned;
+   BOOLEAN spouseOwned;
+
+   //business related
+   UNSIGNED4 dateFirstSeen;
+   UNSIGNED4 dateLastSeen;
+   STRING120 ownerName;
+
+   
+   //used for report by both person/business
+   UNSIGNED4 historyDate;
+   STRING50  addressType;
+   STRING1   ownerOccupied;
+   
+   STRING8   recordingDate;
+   STRING8   purchaseDate; 
+   INTEGER8  purchasePrice;
+   INTEGER2  lengthOfOwnership;
+
+   STRING4 assessedYear;
+   INTEGER8 assessedTotalValue;
+
+   STRING10  prim_range;
+   STRING2   predir;
+   STRING28  prim_name;
+   STRING4   suffix;
+   STRING2   postdir;
+   STRING10  unit_desig;
+   STRING8   sec_range;
+   STRING25  p_city_name;
+   STRING25  v_city_name;
+   STRING2   st;
+   STRING5   zip;
+   STRING4   zip4;
+   STRING5   county;
+   STRING7   geo_blk;
   END;					
 	
 	

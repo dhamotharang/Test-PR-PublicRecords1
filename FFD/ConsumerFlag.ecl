@@ -1,25 +1,39 @@
 ﻿IMPORT FCRA, FFD, iesp, PersonContext, STD;
 EXPORT ConsumerFlag := MODULE
 
-  EXPORT  prepareAlertMessages (DATASET (FFD.Layouts.PersonContextBatch) PersonContext, BOOLEAN isSuppressedResult = FALSE) := FUNCTION
+  BOOLEAN RaiseAlert (STRING record_type, FFD.layouts.ConsumerFlagsBatch in_flags) := 
+  (record_type = FFD.Constants.RecordType.FA AND in_flags.consumer_flags.alert_security_fraud <>'') OR
+  (record_type = FFD.Constants.RecordType.SF AND in_flags.consumer_flags.alert_security_freeze <>'') OR
+  (record_type = FFD.Constants.RecordType.IT AND in_flags.consumer_flags.alert_identity_theft <>'') OR
+  (record_type = FFD.Constants.RecordType.LH AND in_flags.consumer_flags.alert_legal_flag <>''); 
+  
+  EXPORT  prepareAlertMessages (DATASET (FFD.Layouts.PersonContextBatch) PersonContext, 
+                                FFD.layouts.ConsumerFlagsBatch in_consumer_flags,
+                                INTEGER8 inFFDOptionsMask = 0) := FUNCTION
 
+    isSuppressedResult := in_consumer_flags.suppress_records;
+    returnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask); 
+    
     consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
                            TRANSFORM(iesp.share_fcra.t_ConsumerAlert,
-                             SELF.UniqueId      := left.LexID,    
-                             SELF.Timestamp     := iesp.ECL2ESP.toTimeStamp(STD.Str.FilterOut(left.DateAdded, '-:')),
-                             SELF.Code          := FCRA.Constants.convertAlertType2Code(left.RecordType),
-                             SELF.Message       := left.Content));
+                             SELF.UniqueId      := LEFT.LexID,    
+                             SELF.Timestamp     := iesp.ECL2ESP.toTimeStamp(STD.Str.FilterOut(LEFT.DateAdded, '-:')),
+                             SELF.Code          := IF(RaiseAlert(LEFT.RecordType, in_consumer_flags), FCRA.Constants.convertAlertType2Code(LEFT.RecordType), SKIP),
+                             SELF.Message       := LEFT.Content));
 
-    has_statements_alert := PROJECT(DEDUP(SORT(PersonContext((~isSuppressedResult AND RecordType IN FFD.Constants.RecordType.StatementRecordLevel)  
+    has_statements_alert := IF(in_consumer_flags.has_record_statement OR in_consumer_flags.has_consumer_statement,
+                         PROJECT(DEDUP(SORT(PersonContext((~isSuppressedResult AND RecordType IN FFD.Constants.RecordType.StatementRecordLevel)  
                                                               OR RecordType IN FFD.Constants.RecordType.StatementConsumerLevel),
                              LexID, -DateAdded, RecordType), LexID),
                            TRANSFORM(iesp.share_fcra.t_ConsumerAlert,
                              SELF.UniqueId      := left.LexID,    
                              SELF.Timestamp     := iesp.ECL2ESP.toTimeStamp(STD.Str.FilterOut(left.DateAdded, '-:')),
                              SELF.Code          := FCRA.Constants.convertAlertType2Code(FFD.Constants.RecordType.CS),
-                             SELF.Message       := FFD.Constants.AlertMessage.CSMessage));
+                             SELF.Message       := FFD.Constants.AlertMessage.CSMessage)),
+                             FFD.Constants.BlankConsumerAlerts);
 
-    RETURN consumer_alerts + has_statements_alert;
+   RETURN IF(returnBlank, FFD.Constants.BlankConsumerAlerts,
+		        consumer_alerts + has_statements_alert);
   END;
   
   EXPORT prepareAlertMessagesBatch (DATASET(FFD.Layouts.PersonContextBatch) PersonContext,

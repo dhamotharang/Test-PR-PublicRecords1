@@ -182,7 +182,7 @@ export BankruptcySearchServiceFCRA(
     ds_subj_did := dataset([{FFD.Constants.SingleSearchAcctno, subj_did}],FFD.Layouts.DidBatch);
     
     // even if no data found we still need to check for alerts and consumer level statements for subject
-    dsDIDs := if(exists(matched_rec_dids), matched_rec_dids, ds_subj_did);
+    dsDIDs := if(exists(matched_rec_dids(did>0)), matched_rec_dids(did>0), ds_subj_did);
  
     //  Call the person context
     pc_recs_prelim := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy, valFFDOptionsMask);
@@ -200,7 +200,9 @@ export BankruptcySearchServiceFCRA(
     
     // get FFD compliance records
     temp_results_ffd  := BankruptcyV3_Services.fn_fcra_ffd(temp_rollup, slim_pc_recs, valFFDOptionsMask);
-    suppress_results_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, valFFDOptionsMask)[1].suppress_records;
+    
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, valFFDOptionsMask)[1];
+    suppress_results_due_alerts := alert_indicators.suppress_records;
    
     // add back to search layout
     all_results := join(rsrt_final, temp_results_ffd,
@@ -230,8 +232,12 @@ export BankruptcySearchServiceFCRA(
     consumer_statements := IF( exists(final), all_statements, 
                               all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 
-    consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
-	  input_consumer := FFD.Constants.BlankConsumerRec;
+    consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, valFFDOptionsMask);
+    matched_party_lexid := dsDIDs[1].did;
+    search_lexId := if(matched_party_lexid > 0 and ~exists(dsDIDs(did <> matched_party_lexid)), matched_party_lexid, 0);
+                        
+    // in case if results contain data for more than one matched LexId and no resolved LexId based on input there will be no Consumer data populated
+		input_consumer := FFD.MAC.PrepareConsumerRecord(search_lexId, false);
 		
     doxie.MAC_Marshall_Results(final, recs_marshalled);
 

@@ -6,8 +6,7 @@
 			Prof_License_Mari.key_did
 */
 
-EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
-											BOOLEAN includeReportData) := FUNCTION
+EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) := FUNCTION
 
 
 	licenseRaw := JOIN(indiv, prof_licenseV2.Key_Proflic_Did(),

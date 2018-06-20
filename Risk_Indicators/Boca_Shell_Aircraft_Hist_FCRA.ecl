@@ -1,9 +1,9 @@
-/*2013-05-28T13:07:02Z (Michele Walklin_prod)
+﻿/*2013-05-28T13:07:02Z (Michele Walklin_prod)
 code review AML
 */
 import faa, riskwise, ut;
 
-export Boca_Shell_Aircraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
+export Boca_Shell_Aircraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, BOOLEAN onThor = FALSE) := FUNCTION
 
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
@@ -26,13 +26,21 @@ layout_reg_ids GetIDs(ids_only le, key_did ri) := transform
                 self := [];
 end;       
 
-reg_ids := join (ids_only, key_did,
+reg_ids_roxie := join (ids_only, key_did,
                  left.did != 0 and keyed(left.did = right.did),
                  GetIDs (Left, Right),
                  left outer, atmost(keyed(left.did=right.did),
                  riskwise.max_atmost));
 
+reg_ids_thor_did := join (distribute(ids_only(did!=0), hash64(did)), 
+								 distribute(pull(key_did), hash64(did)),
+                 (left.did = right.did),
+                 GetIDs (Left, Right),
+                 left outer, atmost(left.did=right.did,
+                 riskwise.max_atmost), LOCAL);
+reg_ids_thor := group(sort(reg_ids_thor_did + project(ids_only(did=0), transform(layout_reg_ids, self := LEFT, self := [])),seq),seq);
 
+reg_ids := if(onThor, reg_ids_thor, reg_ids_roxie);
 // now fetch main registration records;
 key_ids := faa.key_aircraft_id (true);
 
@@ -46,11 +54,19 @@ layout_reg_ids GetRawRegistration (layout_reg_ids le, key_ids ri) := transform
                 self := []; // counts
 end;       
 
-reg_raw := join (reg_ids, key_ids, 
+reg_raw_roxie := join (reg_ids, key_ids, 
                  left.aircraft_id != 0 and keyed (left.aircraft_id = right.aircraft_id),
                  GetRawRegistration (Left, Right),
                  left outer, keep (1), limit (0));
 
+reg_raw_thor_pre := join (distribute(reg_ids(aircraft_id != 0), hash64(aircraft_id)), 
+									distribute(pull(key_ids), hash64(aircraft_id)), 
+                 (left.aircraft_id = right.aircraft_id),
+                 GetRawRegistration (Left, Right),
+                 left outer, keep (1), limit (0), LOCAL);
+reg_raw_thor := group(sort(reg_raw_thor_pre + project(reg_ids(aircraft_id=0), transform(layout_reg_ids, self := LEFT, self := [])), seq),seq);
+
+reg_raw := if(onThor, reg_raw_thor, reg_raw_roxie);
 
 // combine and take only "latest" first-seen registration record for each aircraft
 aircrafts := dedup (sort (reg_raw, seq, n_number, -date_first_seen), seq, n_number);

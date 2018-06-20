@@ -177,7 +177,7 @@ import doxie, CriminalRecords_Services, doxie_crs, doxie_raw, DriversV2_Services
 export Comprehensive_Report_Service := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #CONSTANT('TwoPartySearch', FALSE);
-#CONSTANT('OFACversion', 1);
+
 
 #option ('maxCompileThreads', 4);
 #stored('IncludeAllDIDRecords','1');
@@ -189,6 +189,18 @@ export Comprehensive_Report_Service := MACRO
 #constant('IncludeNonDMVSources', true);
 
 BOOLEAN in_getSSNBest := FALSE: STORED('GetSSNBest');
+UNSIGNED1 OFACversion      := 1        : stored('OFACversion');
+
+gateways_in := Gateway.Configuration.Get();
+
+Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(OFACversion = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
+	self.url := if(OFACversion = 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
+
+if( OFACversion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare();

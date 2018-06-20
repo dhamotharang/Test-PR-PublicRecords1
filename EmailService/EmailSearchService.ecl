@@ -46,7 +46,7 @@ import AutoStandardI, doxie, codes, Royalty;
 
 export EmailSearchService() := MACRO
 
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
 	boolean allow_mult_results := false : stored('AllowMultipleResults');
 

@@ -15,16 +15,15 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 Date := STD.date.ConvertDateFormat(CurrentDate, '%Y%m%d','%Y-%m-%d');
 	 Time :=STD.date.ConvertTimeFormat(Timestamp, '%H%M%S', '%H:%M:%S');
 	 TransactionType := inMod.TransactionType;
-	 		 	  	
-   transaction_rec_with_alerts xfm_Transaction(iesp.phonefinder.t_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
-     SELF.transaction_id    	  := inMod.TransactionId;
+  transaction_rec_with_alerts xfm_Transaction(iesp.phonefinder.t_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
+	 SELF.transaction_id    	  := inMod.TransactionId;
 	 SELF.transaction_date        := (STRING)Date +' '+ (STRING)Time;
-	 SELF.User_Id           	  := inMod.BillingCode;
+	 SELF.User_Id           	  := IF(inMod.CompanyId <> '', inMod.BillingCode, inMod._Loginid);
 	 SELF.Product_Code      	  := inMod.ProductCode;
-   	 SELF.Company_Id        	  := inMod.CompanyId;
-	 SELF.source_code 			  := inMod.SourceCode;  
-   	 SELF.reference_code      	  := inMod.ReferenceCode;
-   	 SELF.phonefinder_type     	  := PhoneFinder_Services.Constants.MapTransCode2Type(TransactionType);
+	 SELF.Company_Id        	  := IF(inMod.CompanyId <> '', inMod.CompanyId, inMod._CompanyId);
+	 SELF.source_code             := inMod.SourceCode;  
+	 SELF.reference_code      	  := inMod.ReferenceCode;
+	 SELF.phonefinder_type     	  := PhoneFinder_Services.Constants.MapTransCode2Type(TransactionType);
 	 //SearchTerms
 	 SELF.submitted_lexid   	 := pSearchBy.UniqueId;
 	 SELF.submitted_phonenumber  := pSearchBy.PhoneNumber;
@@ -36,18 +35,18 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 SELF.submitted_state   	  := pSearchBy.Address.State;
 	 SELF.submitted_zip   		  := pSearchBy.Address.Zip5;
 	 SELF.PhoneNumber   		  := R.PrimaryPhoneDetails.Number;
-   	 SELF.Risk_Indicator       	  := R.PrimaryPhoneDetails.PhoneRiskIndicator;
-   	 SELF.phone_type       		  := R.PrimaryPhoneDetails._Type;
-   	 SELF.phone_status       	  := R.PrimaryPhoneDetails.PhoneStatus;
-   	 SELF.ported_count       	  := R.PrimaryPhoneDetails.PortingCount;
-   	 SELF.last_ported_date        := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.LastPortedDate);
-   	 SELF.otp_count      		  := R.PrimaryPhoneDetails.OneTimePassword.OTPCount;
-   	 SELF.last_otp_date      	  := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.OneTimePassword.LastOTPDate);
-   	 SELF.spoof_count   		  := R.PrimaryPhoneDetails.SpoofingData.TotalSpoofedCount;
-   	 SELF.last_spoof_date		  := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.SpoofingData.LastEventSpoofedDate);
-   	 SELF.phone_forwarded      	  := R.PrimaryPhoneDetails.CallForwardingIndicator;
+	 SELF.Risk_Indicator       	  := R.PrimaryPhoneDetails.PhoneRiskIndicator;
+	 SELF.phone_type       		  := R.PrimaryPhoneDetails._Type;
+	 SELF.phone_status       	  := R.PrimaryPhoneDetails.PhoneStatus;
+	 SELF.ported_count       	  := R.PrimaryPhoneDetails.PortingCount;
+	 SELF.last_ported_date        := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.LastPortedDate);
+	 SELF.otp_count      		  := R.PrimaryPhoneDetails.OneTimePassword.OTPCount;
+	 SELF.last_otp_date      	  := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.OneTimePassword.LastOTPDate);
+	 SELF.spoof_count   		  := R.PrimaryPhoneDetails.SpoofingData.TotalSpoofedCount;
+	 SELF.last_spoof_date		  := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.SpoofingData.LastEventSpoofedDate);
+	 SELF.phone_forwarded      	  := R.PrimaryPhoneDetails.CallForwardingIndicator;
 	 SELF.Alerts 				  := R.PrimaryPhoneDetails.Alerts.AlertIndicators;
-   END;	
+ END;	
    
   Transaction_Rec := PROJECT (pF_Records,  xfm_Transaction(LEFT, COUNTER));
 		 
@@ -67,7 +66,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
       	 SELF.listing_name         := R.ListingName;
       	 SELF.porting_code         := R.PortingCode;
       	 SELF.phone_forwarded      := R.CallForwardingIndicator;
-      	 SELF.verified_carrier     := R.PhoneOwnershipIndicator;
+      	 SELF.verified_carrier     := (INTEGER)R.PhoneOwnershipIndicator;
 		 SELF.Alerts 			   := R.Alerts.AlertIndicators;
    END;	
       
@@ -82,7 +81,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
        SELF.City         		:= R.RecentAddress.City;
        SELF.State         		:= R.RecentAddress.State;
        SELF.Zip         		:= R.RecentAddress.Zip5;
-       SELF.verified_carrier   	:= R.PhoneOwnershipIndicator;
+       SELF.verified_carrier   	:= (INTEGER)R.PhoneOwnershipIndicator;
    END;	
          
   Identity_Recs := NORMALIZE(pF_Records, LEFT.Identities, xfm_Identities(RIGHT, COUNTER)); 

@@ -30,8 +30,6 @@ export t_ErrorInfo := record
 end;
 
 export t_MergedCreditOptions := record (iesp.share_fcra.t_FcraReportOption)
-	//PermissibleUse is not used by ECL but may be required by ESP, waiting for definitive answer.
-	string PermissibleUse {xpath('PermissibleUse')};
 	boolean IncludeEquifax {xpath('IncludeEquifax')};
 	boolean IncludeExperian {xpath('IncludeExperian')};
 	boolean IncludeTransunion {xpath('IncludeTransunion')};
@@ -51,13 +49,13 @@ end;
 
 export t_FcraMergedCreditReportResponse := record (iesp.share.t_BaseResponse)
 	t_ErrorInfo ErrorInfo {xpath('ErrorInfo')};
-	string UniqueId {xpath('UniqueId')};
 	t_BorrowerInfo Borrower {xpath('Borrower')};
 	string PdfReport {xpath('PdfReport')};
 	dataset(t_CreditReportRecord) MergedCreditReport {xpath('MergedCreditReport/CreditReport'), MAXCOUNT(3)};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MaxConsumerStatements)};
 	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
 	iesp.share.t_CodeMap Validation {xpath('Validation')};
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};
 end;
 
 export t_FcraMergedCreditReportRequest := record (iesp.share.t_BaseRequest)

@@ -204,7 +204,7 @@ EXPORT getIndOffenseLegalEventType(DATASET(DueDiligence.LayoutsInternal.RelatedP
                                                                                   SELF.did           := LEFT.offense.did;
                                                                                   SELF.offender_key  := LEFT.offense.offender_key;
                                                                                   SELF.historydate   := LEFT.offense.historydate;  
-                                                                                  SELF.ToDaysDate    := LEFT.offense.todaysdate;
+                                                                                  // SELF.ToDaysDate    := LEFT.offense.todaysdate;
                                                                                   SELF.DateToUse     := LEFT.offense.datetouse;
                                                                                   SELF.NumOfDaysAgo  := LEFT.offense.NumOfDaysAgo;
                                                                                   SELF.caseNum       := LEFT.offense.caseNum;

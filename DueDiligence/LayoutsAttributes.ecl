@@ -166,6 +166,20 @@
     BOOLEAN     misdemeanorConvictionPast3Yrs;
     BOOLEAN     uncategorizedConvictionOver3Yrs;
     BOOLEAN     misdemeanorConvictionOver3Years;
+    /*PerAssetOwnProperty */
+    UNSIGNED2   ownedPropCount;                                 //populated in DueDiligence.getIndProperty
+    /*PerAccessToFundsProperty*/
+    UNSIGNED6   totalAssesedValue;                              //populated in DueDiligence.getIndProperty
+    UNSIGNED2   previouslyOwnedPropCount;                       //populated in DueDiligence.getIndProperty
+    /*PerProfessional License */
+    BOOLEAN			atleastOneActiveLawAcct;					            	//populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveFinRealEstate;		            	//populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveMedical;						            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveBlastPilot;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveLawAcct;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveFinRealEstate;		            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveMedical;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
   END;
 
 END;

@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Address, BatchDatasets, BatchShare;
 
 EXPORT BeneficiaryRiskScore_Interfaces := MODULE
@@ -32,7 +32,7 @@ EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	
 	// An instantiation of the Interface above. There can be other instantiations for different
 	// configurations or purposes. The values assigned below are obtained from Risk_Indicators.Boca_Shell.
-	EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions) := MODULE(IInstantIDConfig)
+EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions) := MODULE(IInstantIDConfig)
 		EXPORT BOOLEAN isFCRA              := FALSE;
 		EXPORT BOOLEAN ln_branded          := FALSE;
 		EXPORT BOOLEAN isUtility           := StringLib.StringToUpperCase(restrictions.industry_class) = 'UTILI';

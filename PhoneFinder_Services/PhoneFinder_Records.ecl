@@ -72,6 +72,7 @@ MODULE
 	 SELF.seq                  := L.seq;
 	 SELF.phone                := L.homephone;
 	 SELF.batch_in.homephone   := L.homephone;
+	 SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
 		SELF                      := [];
  END;
 
