@@ -488,16 +488,18 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 				
 				// ********************** Mark expiration dates for MO APNs ******************************************************************************
 				
+					selected_classes				:= ['APN','CNS','CNM','NPR','CNA'];
 					mo_only									:= stlic_base_result(license_state = 'MO');
-					mo_apns_only				:= mo_only(mapped_class ='APN');
-					no_mo_only						:= stlic_base_result(license_state <> 'MO');
-					mo_no_apns						:= mo_only(mapped_class <> 'APN');
-					base_no_mo_apns	:= no_mo_only + mo_no_apns;
+					mo_apns_only						:= mo_only(mapped_class in selected_classes);
+					no_mo_only							:= stlic_base_result(license_state <> 'MO');
+					mo_no_apns							:= mo_only(mapped_class not in selected_classes);
+					base_no_mo_apns					:= no_mo_only + mo_no_apns;
 								
 					max_dvlr 		:= max(mo_apns_only, dt_vendor_last_reported);
 				
 					mo_apns_only add_exp (mo_apns_only L) := transform
-							self.clean_expiration_date := if(((unsigned4)L.clean_expiration_date = 0 and L.dt_vendor_last_reported < max_dvlr), 
+							self.clean_expiration_date := if(((((unsigned4)L.clean_expiration_date = 0) or ((unsigned4)L.clean_expiration_date > L.dt_vendor_last_reported))
+																									and L.dt_vendor_last_reported < max_dvlr), 
 																								(string)L.dt_vendor_last_reported, (string)L.clean_expiration_date);
 							self	:= L;
 					end;
