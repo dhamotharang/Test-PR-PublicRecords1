@@ -22,6 +22,7 @@ EXPORT TuFraudAlertService := MACRO
 		EXPORT FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
 		EXPORT FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 		EXPORT dataset(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
+		EXPORT ReturnMatchedUniqueIDsOnly := first_row.options.ReturnMatchedUniqueIDsOnly;
 	END;
 
 	//Use request with defaults if option is selected.

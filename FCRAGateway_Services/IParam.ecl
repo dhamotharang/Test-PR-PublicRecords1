@@ -8,5 +8,6 @@ EXPORT IParam := MODULE
 		AutoStandardI.InterfaceTranslator.dob_mask_value.params,
 		FCRA.iRules)
 		EXPORT DATASET(Gateway.Layouts.Config) gateways;
+		EXPORT BOOLEAN ReturnMatchedUniqueIDsOnly := FALSE;
 	END;
 END;
