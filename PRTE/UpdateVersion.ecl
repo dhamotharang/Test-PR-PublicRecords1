@@ -1,4 +1,4 @@
-// Function to update data operations database with a new build version for a specific
+﻿// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -14,7 +14,7 @@
 
 
 import ut,_Control,dops,std;
-export updateversion(string datasetname,string uversion,string email_t,string inloc = 'B',string inenvment = '',string isboolready = 'Y') := function
+export updateversion(string datasetname,string uversion,string email_t,string inloc = 'B',string inenvment = '',string isboolready = 'Y',string dopsenv = dops.constants.dopsenvironment) := function
 
 	
 	emailme_function(string email_t,string datasetname,string cversion, string uversion,
@@ -56,7 +56,7 @@ export updateversion(string datasetname,string uversion,string email_t,string in
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.demo.serviceurl,
+				dops.constants.prboca.serviceurl(dopsenv,l_loc := inloc),
 				'UpdateVersion',
 				InputRec,
 				dataset(outrec),

@@ -1,4 +1,4 @@
-/*2015-10-22T22:12:19Z (Xia Sheng)
+﻿/*2015-10-22T22:12:19Z (Xia Sheng)
 Bug: 187038 
 
 
@@ -8,7 +8,7 @@ IMPORT Prof_License_Mari;
    
 export spray_USS0814 := MODULE
 
-	#workunit('name','Spray USS0814');
+	#workunit('name','Yogurt: Spray USS0814');
 	SHARED STRING7 code						:= 'USS0814';
 
 	//  Spray All Files

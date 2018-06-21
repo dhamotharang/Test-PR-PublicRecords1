@@ -26,7 +26,7 @@ After the current process has determined what is above and below the line, match
 -	For the records that were below the line and moved above, propagate above the line to other records for the same phone and household.
 ===============================================================================================================
 */
-import Experian_Phones, ut, PhoneMart,_Control;
+import Experian_Phones, ut, PhoneMart,_control;
 EXPORT Fn_Phone_Verification(dataset(recordof(Layout_Phonesplus_Base)) phplus_in) := function
 
 // remote insurance verification file
@@ -41,7 +41,7 @@ iver_rec := RECORD
 //ins prod
 
 
-ins := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor400_64::persist::for_phone_verification', iver_rec , thor);
+ins := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 //ins dataland
 //ins := dataset('~foreign::10.194.10.1::thor400_72::persist::for_phone_verification', iver_rec , thor);
 

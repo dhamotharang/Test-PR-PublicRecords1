@@ -1,8 +1,8 @@
-﻿EXPORT Proc_Distributions (string Version) := function
+﻿EXPORT Proc_Distributions (string Version, string PBWU) := function
 
 iMPORT ProfileBooster;
 
-Myda_MM   := DATASET('~in::marketmagnifier::profileboosterin::' + Version + '::profile_booster_attributes_thor_' + thorlib.wuid(),ProfileBooster.Layouts.Layout_PB_BatchOutFlat,CSV(HEADING(1),SEPARATOR(','),quote('"'),MAXLENGTH(4655)));
+Myda_MM   := DATASET('~in::marketmagnifier::profileboosterin::' + Version + '::profile_booster_attributes_thor_' + PBWU,ProfileBooster.Layouts.Layout_PB_BatchOutFlat,CSV(HEADING(1),SEPARATOR(','),quote('"'),MAXLENGTH(4655)));
 
 DS_Populated   := TABLE(Myda_MM,{Myda_MM,
 	STRING1	Populated_v1_crtrecbkrptcnt				   				:= if((integer)v1_crtrecbkrptcnt	      	    	> 0,'Y','N'),
@@ -88,6 +88,12 @@ DS_Populated   := TABLE(Myda_MM,{Myda_MM,
 	STRING1	Populated_v1_raacrtrecbkrptmmbrcnt36mo			:= if((integer)v1_raacrtrecbkrptmmbrcnt36mo	    > 0,'Y','N'),
 	STRING1	Populated_v1_raacrtrecevictionmmbrcnt			  := if((integer)v1_raacrtrecevictionmmbrcnt	    > 0,'Y','N'),
 	STRING1	Populated_v1_raacrtrecevictionmmbrcnt12mo		:= if((integer)v1_raacrtrecevictionmmbrcnt12mo  > 0,'Y','N'),
+	
+	STRING1	Populated_V1_RAACRTRECFELONYMMBRCNT									:= if((integer)V1_RAACRTRECFELONYMMBRCNT  > 0,'Y','N'),
+	STRING1	Populated_V1_RAACRTRECFELONYMMBRCNT12MO					:= if((integer)V1_RAACRTRECFELONYMMBRCNT12MO  > 0,'Y','N'),
+	STRING1	Populated_V1_RAACRTRECLIENJUDGMMBRCNT							:= if((integer)V1_RAACRTRECLIENJUDGMMBRCNT  > 0,'Y','N'),
+	STRING1	Populated_V1_RAACRTRECLIENJUDGMMBRCNT12MO			:= if((integer)V1_RAACRTRECLIENJUDGMMBRCNT12MO  > 0,'Y','N'),
+
 	STRING1	Populated_v1_raacrtrecmmbrcnt				   			:= if((integer)v1_raacrtrecmmbrcnt		    			> 0,'Y','N'),
 	STRING1	Populated_v1_raacrtrecmmbrcnt12mo			   		:= if((integer)v1_raacrtrecmmbrcnt12mo	    		> 0,'Y','N'),
 	STRING1	Populated_v1_raacrtrecmsdmeanmmbrcnt			  := if((integer)v1_raacrtrecmsdmeanmmbrcnt	    	> 0,'Y','N'),
@@ -309,7 +315,11 @@ DS_Populated   := TABLE(Myda_MM,{Myda_MM,
 ,Populated_V1_RaACrtRecLienJudgAmtMax 		
 ,Populated_V1_LIFEEVLASTMOVETAXRATIODIFF     	
 ,Populated_V1_CRTRECLIENJUDGTIMENEWEST       	
-,Populated_V1_PROPSOLDRATIO                  	
+,Populated_V1_PROPSOLDRATIO     
+,Populated_V1_RAACRTRECFELONYMMBRCNT						
+,Populated_V1_RAACRTRECFELONYMMBRCNT12MO		
+,Populated_V1_RAACRTRECLIENJUDGMMBRCNT				
+,Populated_V1_RAACRTRECLIENJUDGMMBRCNT12MO             	
 ,NAMED('MMPart2_Profilebooster'));	
 
 RETURN 0;

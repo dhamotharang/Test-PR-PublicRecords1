@@ -7,10 +7,10 @@ IMPORT PRTE2_Gong_Ins, PRTE2_Common;
 
 STRING dateString := PRTE2_Common.Constants.TodayString+'';
 
-desprayName	:= 'Gong_Base_AfterAdds_'+dateString+'.csv';
-EXPORT_DS		:=	SORT(PRTE2_Gong_Ins.Files.Gong_Base_SF_DS,did);
-// desprayName	:= 'Gong_Base_PROD_'+dateString+'.csv';
-// EXPORT_DS		:=	SORT(PRTE2_Gong_Ins.Files.Gong_Base_SF_DS_PROD,l_did); //Prod file.
+// desprayName	:= 'Gong_Ins_Base_DEV_'+dateString+'.csv';
+// EXPORT_DS		:=	SORT(PRTE2_Gong_Ins.Files.Gong_Base_CSV_DS,did);
+desprayName	:= 'Gong_Ins_Base_PROD_'+dateString+'.csv';
+EXPORT_DS		:=	SORT(PRTE2_Gong_Ins.Files.Gong_Base_CSV_DS_PROD,did); //Prod file.
 
 LandingZoneIP 	:= PRTE2_Gong_Ins.Constants.LandingZoneIP;
 TempCSV					:= PRTE2_Gong_Ins.Files.FILE_SPRAY;
