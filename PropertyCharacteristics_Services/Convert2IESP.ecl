@@ -1,4 +1,4 @@
-import	Address,Codes,iesp,InsuranceContext_iesp,ut;  
+import	Address,Codes,iesp,InsuranceContext_iesp,ut,std;  
 
 export	Convert2IESP(	PropertyCharacteristics_Services.IParam.Report	pInMod,
 											iesp.property_info.t_PropertyInformationRequest	pRequest
@@ -73,9 +73,9 @@ module
 			self.ServiceType								:=	pInMod.ReportType;
 			self.AccountNumber							:=	pInsContext.Account.Legacy.Base;
 			self.AccountSuffix							:=	pInsContext.Account.Legacy.Suffix;
-			self.OrderDate									:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
-			self.ReceiptDate								:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
-			self.CompletionDate							:=	iesp.ECL2ESP.toDate((unsigned)ut.GetDate);
+			self.OrderDate									:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
+			self.ReceiptDate								:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
+			self.CompletionDate							:=	iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 			self.ProcessingStatus						:=	map(	valid_account																																		=>	'4',
 																								pInMod.ReportType	not in	['K','L']	AND ~isHomeGateway          								=>	'7',
 			// TODO: there's slight change of logic in relation to "living square footage" here:
@@ -403,13 +403,13 @@ module
 		
 		iesp.property_info.t_MortgageRecordReport	tMortgageInfo(PropertyCharacteristics_Services.Layouts.SlimmedMortgage	pInput,integer	cnt)	:=
 		transform
-			self.MortgageCompanyName	:=	pInput.mortgage_company_name;
+			self.MortgageCompanyName	:=	choose(cnt,pInput.mortgage_company_name,'');
 			self.MortgageType					:=	choose(cnt,1,2);
 			self.LoanAmount						:=	choose(cnt,(real)pInput.loan_amount,(real)pInput.second_loan_amount);
-			self.LoanTypeCode					:=	pInput.loan_type_code;
-			self.LoanType							:=	Codes.KeyCodes('PROPERTYINFO','MORTGAGE_LOAN_TYPE_CODE','COMMN',pInput.loan_type_code);
-			self.InterestRateTypeCode	:=	pInput.interest_rate_type_code;
-			self.InterestRateType			:=	Codes.KeyCodes('PROPERTYINFO','TYPE_FINANCING','COMMN',pInput.interest_rate_type_code);
+			self.LoanTypeCode					:=	choose(cnt,pInput.loan_type_code,'');
+			self.LoanType							:=	choose(cnt,Codes.KeyCodes('PROPERTYINFO','MORTGAGE_LOAN_TYPE_CODE','COMMN',pInput.loan_type_code),'');
+			self.InterestRateTypeCode	:=	choose(cnt,pInput.interest_rate_type_code,'');
+			self.InterestRateType			:=	choose(cnt,Codes.KeyCodes('PROPERTYINFO','TYPE_FINANCING','COMMN',pInput.interest_rate_type_code),'');
 			self											:=	[];
 		end;
 		
