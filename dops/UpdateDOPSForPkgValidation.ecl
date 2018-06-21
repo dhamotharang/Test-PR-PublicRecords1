@@ -56,7 +56,7 @@ EXPORT UpdateDOPSForPkgValidation(
 			self := l;
 		end;
 	
-		dKeyWithVersion := project(dGetKeyswithVersion,xKeyWithVersion(left));
+		dKeyWithVersion := nothor(project(global(dGetKeyswithVersion,few),xKeyWithVersion(left)));
 
 		return dKeyWithVersion;
 	
