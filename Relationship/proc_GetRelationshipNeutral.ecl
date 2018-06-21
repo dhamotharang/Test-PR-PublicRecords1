@@ -2,7 +2,7 @@
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
-EXPORT proc_GetRelationship_NeutralInterface(DATASET(Layout_GetRelationship.DIDs_layout) DID_ds,
+EXPORT proc_GetRelationshipNeutral(DATASET(Layout_GetRelationship.DIDs_layout) DID_ds,
 																						 boolean   RelativeFlag                      = FALSE,
 																						 boolean   AssociateFlag                     = FALSE,
 																						 boolean   AllFlag                           = FALSE,
@@ -53,7 +53,9 @@ shared isDefault :=  NOT(RelativeFlag OR
 									txflag.ClaimFlag OR 
 									txflag.CohabitFlag OR 
 									txflag.AptFlag OR 
-									txflag.POBoxFlag); 
+									txflag.POBoxFlag OR
+									txflag.CCFlag OR
+									txflag.CLUEFlag);
 									
 shared isTx   :=  txflag.VehicleFlag OR 
                   txflag.BankruptcyDirectRelationshipFlag OR
@@ -78,7 +80,9 @@ shared isTx   :=  txflag.VehicleFlag OR
 									txflag.ClaimFlag OR 
 									txflag.CohabitFlag OR 
 									txflag.AptFlag OR 
-									txflag.POBoxFlag;
+									txflag.POBoxFlag OR
+									txflag.CCFlag OR
+									txflag.CLUEFlag;
 
 shared relationship_key  := Relationship.key_relatives_v3;
 shared relationship_flat := distribute(pull(Relationship.key_relatives_v3),hash(did1));
@@ -140,7 +144,7 @@ shared rels      := MAP(doThor                       => relsThor,
 
 shared txonly := rels(type NOT IN ['PERSONAL','TRANS CLOSURE']);
 
-shared relsFlat := functions_getRelationship.convertNeutralToFlat(rels);
+shared relsFlat := functions_getRelationship.convertNeutralToFlat_new(rels);
 shared Vehicle             := functions_getRelationship.convertFlatToNeutral(relsFlat(covehicle_cnt > 0));
 shared BankruptcyDirect    := functions_getRelationship.convertFlatToNeutral(relsFlat(cobankruptcy_cnt > 0));
 shared BankruptcyIndirect  := functions_getRelationship.convertFlatToNeutral(relsFlat(bcobankruptcy_cnt > 0));
@@ -165,6 +169,8 @@ shared Claim               := functions_getRelationship.convertFlatToNeutral(rel
 shared Cohabit             := functions_getRelationship.convertFlatToNeutral(relsFlat(cohabit_cnt > 0));
 shared CoApt               := functions_getRelationship.convertFlatToNeutral(relsFlat(coApt_cnt > 0));
 shared CoPOBox             := functions_getRelationship.convertFlatToNeutral(relsFlat(coPOBox_cnt > 0));
+shared CoCC             	 := functions_getRelationship.convertFlatToNeutral(relsFlat(coCC_cnt > 0));
+shared CoCLUE            	 := functions_getRelationship.convertFlatToNeutral(relsFlat(coCLUE_cnt > 0));
 
 shared RelativesOnly   := rels(title BETWEEN 1 AND 43);
 shared AssociatesOnly  := rels(title = 44);
@@ -173,30 +179,6 @@ rel_title_layout := RECORD
    unsigned1 title;
    unsigned8 permissions;
   END;
-	
-old_key_layout := record
-		unsigned5 person1;
-		boolean   same_lname;
-		unsigned2 number_cohabits,
-		integer3  recent_cohabit,
-		unsigned5 person2;
-		integer2  prim_range;
-		DATASET(rel_title_layout) rel_title;
-end;
-
-shared old_key_layout legacy_format (recordof(RelativesOnly) l) := TRANSFORM
-    self.person1         := l.did1;
-    self.person2         := l.did2;
-		self.same_lname      := l.isanylnamematch;
-		self.number_cohabits := MAX(l.total_score / 5, 6);
-		self.recent_cohabit  := l.rel_dt_last_seen / 100;
-		self.prim_range      := l.source_type;
-    self.rel_title       := DATASET([{l.title,0}],rel_title_layout),		
-		self := l;
-END;
-
-shared OldRelativesOnly  := project(RelativesOnly,legacy_format(left));
-shared OldAssociatesOnly := project(AssociatesOnly,legacy_format(left));
 
 shared selected := MAP(AllFlag => rels,
                        isDefault  => RelativesOnly + AssociatesOnly,
@@ -227,18 +209,12 @@ shared selected := MAP(AllFlag => rels,
 								                  IF(txflag.ClaimFlag,Claim) + 
 								                  IF(txflag.CohabitFlag,Cohabit) +
 								                  IF(txflag.AptFlag,CoApt) +
-								                  IF(txflag.POBoxFlag,CoPOBox));
-
-shared old_selected := MAP(RelativeFlag  => OldRelativesOnly,
-                           AssociateFlag => OldAssociatesOnly,
-										       OldRelativesOnly + OldAssociatesOnly);
-
-shared old_selected_dist := IF(doTHOR,distribute(old_selected,hash(person1)),old_selected);
+								                  IF(txflag.POBoxFlag,CoPOBox) +
+																	IF(txflag.CCFlag, CoCC) +
+																	IF(txflag.CLUEFlag, CoCLUE));
 
 shared interimResult := sort(dedup(sort(selected,did1,did2),did1,did2),did1,-total_score,did2);
-shared interimLegacy := sort(dedup(sort(old_selected_dist,person1,person2,local),person1,person2,local),person1,-number_cohabits,person2,local);
 
 export result := IF(TopNCount>0,ungroup(topN(group(sort(interimResult,did1),did1),TopNCount,-total_score)),interimResult);
-export legacy := IF(TopNCount>0,ungroup(topN(group(sort(interimLegacy,person1),person1),TopNCount,-number_cohabits)),interimLegacy);
 
 END;
