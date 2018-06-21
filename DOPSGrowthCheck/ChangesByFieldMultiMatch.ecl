@@ -68,13 +68,21 @@ import std;
 	#APPEND(DatasetString,'end;\n');
 	
 	#append(DatasetString,'dDifferences:=join(DistNew,DistOld,\n');
-	#FOR(FieldList)
-		#FOR(field)
-			#IF(%'@name'% in matchfields)
-				#APPEND(DatasetString,'\t\tLeft.'+%'@name'%+'= Right.'+%'@name'%+'\n');
+	#Set(numField,1);
+	#loop
+		#IF(%numField%> Count(matchfields))
+			#BREAK 
+		#ELSE
+			#APPEND(DatasetString,'\t\tLeft.'+matchfields[%numField%]+'= Right.'+matchfields[%numField%]);
+			#if(%numField%!=Count(matchfields))
+				#append(DatasetString,' and \n');
+			#else
+				#append(DatasetString,'\n');
 			#end
 		#end
+		#SET(numField, %numField% + 1);
 	#end
+	
 	#APPEND(DatasetString,',tDifferences(LEFT,RIGHT),local);\n');
 	#APPEND(DatasetString,'DiffTable:=table(dDifferences,{Diff,cnt:=count(group)},Diff,merge);\n');
 	
