@@ -2,6 +2,8 @@
 						 FraudShared_Services, iesp, Patriot, risk_indicators;
 
 EXPORT Transforms := MODULE
+	
+	SHARED Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 
 	EXPORT iesp.fraudgovreport.t_FraudGovDeceased xform_deceased(DeathV2_Services.Layouts.BatchOut l) := TRANSFORM
 
@@ -277,8 +279,8 @@ EXPORT Transforms := MODULE
 		SELF.EventEndDate := iesp.ECL2ESP.toDatestring8(L.event_end_date);
 		SELF.EventLocation := L.event_location;
 		SELF.EventType1 := L.event_type_1;
-		SELF.EventType2 := L.event_type_1;
-		SELF.EventType3 := L.event_type_1;
+		SELF.EventType2 := L.event_type_2;
+		SELF.EventType3 := L.event_type_3;
 		SELF.IndustryTypeDescription := L.classification_permissible_use_access.ind_type_description;
 		SELF.ActivityReason := L.reason_description;
 		SELF.StartDate := iesp.ECL2ESP.toDatestring8(L.start_date);
@@ -328,6 +330,50 @@ EXPORT Transforms := MODULE
 		SELF.DeviceRiskCode := L.device_risk_code;
 		SELF.GeoLocation.Latitude := L.clean_address.geo_lat;
 		SELF.GeoLocation.Longitude := L.clean_address.geo_long;
-	END;		
+	END;
+
+	EXPORT FraudGovPlatform_Services.Layouts.entity_information_recs xform_elements_Information(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L,
+																																														FraudShared_Services.Layouts.Raw_Payload_rec R) := TRANSFORM
+
+		SELF.UniqueId := IF(L.fragment = Fragment_Types_const.PERSON_FRAGMENT, (string) R.did, '');
+		SELF.SSN := IF(L.fragment = Fragment_Types_const.SSN_FRAGMENT, R.ssn, '');
+		SELF.Phone10 := IF(L.fragment = Fragment_Types_const.PHONE_FRAGMENT, 
+												IF(R.clean_phones.phone_number <> '', R.clean_phones.phone_number,R.clean_phones.cell_phone), 
+										'');
+		SELF.IpAddress := IF(L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT, R.ip_address, '');
+		SELF.DeviceId := IF(L.fragment = Fragment_Types_const.DEVICE_ID_FRAGMENT, R.device_id, '');
+		SELF.Name := IF(L.fragment = Fragment_Types_const.NAME_FRAGMENT, 
+											iesp.ECL2ESP.SetName(	R.cleaned_name.fname,
+																						R.cleaned_name.mname,
+																						R.cleaned_name.lname,
+																						R.cleaned_name.name_suffix,
+																						R.cleaned_name.title,), 
+											ROW([], iesp.share.t_Name));
+		SELF.Address := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT, 
+												iesp.ECL2ESP.SetAddress(R.clean_address.prim_name, 
+																								R.clean_address.prim_range, 
+																								R.clean_address.predir,
+																								R.clean_address.postdir,
+																								R.clean_address.addr_suffix, 
+																								R.clean_address.unit_desig, 
+																								R.clean_address.sec_range, 
+																								R.clean_address.p_city_name,
+																								R.clean_address.st, 
+																								R.clean_address.zip, 
+																								R.clean_address.zip4, 
+																								'', 
+																								'', 
+																								R.address_1,
+																								R.address_2), 
+												ROW([], iesp.share.t_Address));
+		SELF.GeoLocation.Latitude := IF(L.fragment = Fragment_Types_const.GEOLOCATION_FRAGMENT, R.clean_address.geo_lat, '');
+		SELF.GeoLocation.Longitude := IF(L.fragment = Fragment_Types_const.GEOLOCATION_FRAGMENT, R.clean_address.geo_long, '');
+		SELF.BankInformation.BankRoutingNumber := IF(L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT, R.bank_routing_number_1, '');
+		SELF.BankInformation.BankAccountNumber := IF(L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT, R.bank_account_number_1, '');
+		SELF.DriversLicense.DriversLicenseState := IF(L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT, R.drivers_license_state, '');
+		SELF.DriversLicense.DriversLicenseNumber := IF(L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT, R.drivers_license, '');
+		SELF := L;
+		SELF := [];
+	END;
 	
 END;

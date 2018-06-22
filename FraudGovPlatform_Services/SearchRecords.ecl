@@ -122,7 +122,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		SELF := LEFT,
 																		SELF := []),
 																		LEFT OUTER,
-																		LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+																		LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 																		
 	ds_clusters := PROJECT(ds_cluster_recs_scores, 
 										TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRecord,
@@ -142,8 +142,14 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																							SELF.Name := LEFT.indicator,
 																							SELF.Value := LEFT.value)), iesp.Constants.FraudGov.MAX_COUNT_NVP),
 											SELF := []));
-											
-																		
+												
+	//Computing ElementInformation from the payload. 
+	ds_elementsInformation := JOIN(ds_fragment_recs_rolled , ds_allPayloadRecs,
+																	LEFT.record_id = RIGHT.record_id,
+																	FraudGovPlatform_Services.Transforms.xform_elements_Information(LEFT, RIGHT),
+																	LEFT OUTER,
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+	
 	//Assembling all the pieces together to form search response.	
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
@@ -157,15 +163,10 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ElementType := L.fragment;
 		//Cleaning out @@@ from LEFT.entity_value when ELEMENT is of type address,
 		// @@@ was addded to calcualte the matching HASH value for tree_uid
-		/*SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
-														REGEXREPLACE('@@@',L.fragment_value,', '), 
-														L.fragment_value);
-														*/
-		SELF.ElementValue := MAP(
-								L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => REGEXREPLACE('@@@',L.fragment_value,', '),
-								L.fragment = Fragment_Types_const.PERSON_FRAGMENT => contri_best_rec.ContributedBest.Name.First + ' ' 
-																					+ contri_best_rec.ContributedBest.Name.Last, 
-														L.fragment_value);
+		SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,REGEXREPLACE('@@@',L.fragment_value,', '),L.fragment_value);
+		
+		SELF.ElementInformation := ds_elementsInformation(fragment_value = L.fragment_value)[1];
+		
 		SELF.Score := L.Score;
 		SELF.NoOfIdentities := L.NumberOfIdentities;
 		SELF.GovernmentBest := PROJECT(gov_best_rec, TRANSFORM(LEFT));
@@ -185,8 +186,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 															LEFT.fragment_value = RIGHT.fragment_value AND
 															LEFT.fragment = RIGHT.fragment,
 															ElementsNIdentities_trans(LEFT, RIGHT),
-														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
-																	
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+																		
 	ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
 	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));

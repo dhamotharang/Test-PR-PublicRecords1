@@ -79,7 +79,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																				SELF := LEFT,
 																				SELF := []),
 																				LEFT OUTER,
-																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 																				
 		/* Getting the related clusters */
 		ds_cluster_proj := PROJECT(ds_raw_cluster_recs, 
@@ -87,7 +87,8 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 													SELF.entity_name := LEFT.entity_name,
 													SELF.entity_value := LEFT.entity_value,
 													SELF.tree_uid := LEFT.tree_uid_,
-													SELF.entity_context_uid := LEFT.entity_context_uid_));
+													SELF.entity_context_uid := LEFT.entity_context_uid_,
+													SELF := []));
 																										
 		ds_cluster_details := FraudGovPlatform_Services.Functions.getClusterDetails(ds_cluster_proj, batch_params, TRUE);
 		
@@ -141,21 +142,11 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																			TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
 																				SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
 																				SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
-																				SELF.ScoreDetails.ElementValue := RIGHT.label_, 
+																				SELF.ScoreDetails.ElementValue := LEFT.ContributedBest.UniqueId, 
 																				SELF.ScoreDetails.Score := RIGHT.score_,
-																				SELF := LEFT));
-
-		ds_contributoryBest__idCardDetails := IF(EXISTS(ds_contributoryBest_w_scores),ds_contributoryBest_w_scores,
-												PROJECT(ds_contributoryBest,TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
-																					SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
-																					SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
-																					SELF.ScoreDetails.ElementValue := '',
-																					SELF.ScoreDetails.Score := 0,
-																					SELF := LEFT
-																					)
-															)
-												);
-
+																				SELF := LEFT),
+																			LEFT OUTER, LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+																			
 		/* Returning the Timeline Data */
 		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT));
 		
@@ -195,10 +186,14 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			
 			SELF.KnownRisks := IF(batch_params.IsOnline, all_knownfrauds_final, DATASET([], iesp.fraudgovreport.t_FraudGovKnownRisk));
 
-			SELF.IdentityCardDetails := IF(batch_params.IsOnline, ds_contributoryBest__idCardDetails(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
-			SELF.GovernmentBest := IF(batch_params.IsOnline, 
-																IF(ds_batch_in[1].did >0,ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1], ds_GovBest[1]), 
+			SELF.IdentityCardDetails := IF(batch_params.IsOnline, 
+																		ds_contributoryBest_w_scores(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], 
+																		ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+			
+			SELF.GovernmentBest := IF(batch_params.IsOnline AND batch_params.AppendBest, 
+																ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1], 
 																ROW([], iesp.fraudgovplatform.t_FraudGovBestInfo));
+																
 			SELF.ElementCardDetails := IF(batch_params.IsOnline, ds_ElementcardDetail_w_score[1] , ROW([], iesp.fraudgovreport.t_FraudGovElementCardDetails));
 
 			/* If either IsIdentityTestRequest OR IsElementTestRequest (used above in the attribute) are set, 
