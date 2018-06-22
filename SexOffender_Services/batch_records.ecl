@@ -109,11 +109,15 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 																	 LEFT.seisint_primary_key = RIGHT.seisint_primary_key,
 																	 SexOffender_Services.batch_make_flat(LEFT, RIGHT, COUNTER) );	
  
-    ds_records_with_alerts := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_records, alert_flags, Statements, SexOffender_Services.Layouts.batch_out_pre, configData.FFDOptionsMask),
-	                            ds_records);
+    ds_records_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_records, alert_flags, Statements, SexOffender_Services.Layouts.batch_out_pre, configData.FFDOptionsMask);
+	                            
+	  // add resolved LexId to the results for inquiry history logging support                    
+    ds_out_fcra := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_records_with_alerts, SexOffender_Services.Layouts.batch_out_pre, 0);
+  
+    ds_records_out := IF(IsFCRA, ds_out_fcra, ds_records);
+    
 		//	sequence the records								 
-		
-		SHARED sequenced_out := PROJECT(ds_records_with_alerts, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
+		SHARED sequenced_out := PROJECT(ds_records_out, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 		EXPORT records := 	PROJECT(sequenced_out, SexOffender_Services.Layouts.batch_out);			// projecting to batch layout
 		
 		// get statements 

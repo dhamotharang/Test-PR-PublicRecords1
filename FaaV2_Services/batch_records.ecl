@@ -46,7 +46,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 									
  
 	// FFD				  
-	dids := PROJECT(clean_in, FFD.Layouts.DidBatch); 
+	dids := PROJECT(clean_in(did>0), FFD.Layouts.DidBatch); 
 
 	pc_recs := IF(isFCRA, FFD.FetchPersonContext(dids, params.gateways, FFD.Constants.DataGroupSet.Aircraft, params.FFDOptionsMask));
 
@@ -103,8 +103,12 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 	out_all := SORT(out + out_link,acctno);
 	
 	ds_out_all := PROJECT(out_all, FaaV2_Services.Layouts.batch_out_pre);
+  
 	// data maybe suppressed due to alerts
 	out_fcra_with_alerts := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(out_fcra, alert_flags, Statements, FaaV2_Services.Layouts.batch_out_pre, params.FFDOptionsMask));
+
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_out_fcra := FFD.Mac.InquiryLexidBatch(clean_in, out_fcra_with_alerts, FaaV2_Services.Layouts.batch_out_pre, 0);
 
 	//Sequencing the Records
 	FaaV2_Services.Layouts.batch_out_pre sequenceIt(FaaV2_Services.Layouts.batch_out_pre L , INTEGER C):=  TRANSFORM
@@ -112,7 +116,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 			SELF :=  L;
 	END; 
 	
-	sequenced_out_fcra := PROJECT(out_fcra_with_alerts, sequenceIt(LEFT,COUNTER)); // FCRA
+	sequenced_out_fcra := PROJECT(ds_out_fcra, sequenceIt(LEFT,COUNTER)); // FCRA
 	sequenced_out := PROJECT(ds_out_all, sequenceIt(LEFT,COUNTER)); //NON-FCRA
 	
 	consumer_statements := NORMALIZE(sequenced_out_fcra, LEFT.Statements, 
