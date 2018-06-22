@@ -117,8 +117,9 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') :=
    
     // FCRA FFD
     res := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_batch, inFFDOptionsMask, inFCRAPurpose);
+    res_records := FFD.Mac.InquiryLexidBatch(ds_batch_in, res.records, BatchServices.layout_BankruptcyV3_Batch_out, 0);
     
-    results_pre := sort(res.records, acctno); // records in batch out layout
+    results_pre := sort(res_records, acctno); // records in batch out layout
     consumer_statements := sort(res.statements, acctno); // statements
 
     ut.mac_TrimFields(results_pre, 'results_pre', results);

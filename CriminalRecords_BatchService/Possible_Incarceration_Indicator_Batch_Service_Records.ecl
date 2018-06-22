@@ -182,8 +182,12 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	rslt_srt := sort(rslt_ungrp,acctno,Incarceration_Flag,INCR_state_origin,INCR_doc_num,INCR_dob,event_dt,punishment_type,sent_length,sent_length_desc,cur_stat_inm,cur_stat_inm_desc,cur_loc_inm,cur_sec_class_dt,cur_loc_sec,gain_time,gain_time_eff_dt,latest_adm_dt,sch_rel_dt,act_rel_dt,ctl_rel_dt,presump_par_rel_dt,match_type,-INCR_ssn,INCR_fname,INCR_lname);
 															
   //FFD 
-  rslt := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(rslt_srt, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_pii_out_pre, configData.FFDOptionsMask),
-	            rslt_srt);
+  ds_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(rslt_srt, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_pii_out_pre, configData.FFDOptionsMask);
+	            
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_flat_with_inquiry := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_flat_with_alerts, CriminalRecords_BatchService.Layouts.batch_pii_out_pre, 0);
+
+  rslt := if(isFCRA, ds_flat_with_inquiry, rslt_srt);
 
 	sequenced_out := PROJECT(rslt, TRANSFORM(CriminalRecords_BatchService.Layouts.batch_pii_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 	out := project(sequenced_out,CriminalRecords_BatchService.Layouts.batch_pii_out);

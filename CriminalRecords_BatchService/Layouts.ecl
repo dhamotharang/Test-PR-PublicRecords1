@@ -56,6 +56,7 @@ export Layouts := MODULE
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
 		FFD.Layouts.ConsumerFlags;
 		typeof(Corrections.Layout_Offender.did) INCR_did := '';
+    string12 inquiry_lexid := '';
 	END;
 	
 	export batch_pii_out_pre := RECORD(batch_pii_out)
@@ -522,6 +523,7 @@ export Layouts := MODULE
 		STRING20 sdid;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
 		FFD.Layouts.ConsumerFlags;
+    STRING12 inquiry_lexid := '';
   END;
 	
 	EXPORT batch_out_pre := RECORD	
