@@ -518,7 +518,7 @@ export Out_Base_Dev_Stats(string filedate) := function
   
  
 	zOrig_Stats_cnt := output(count(tStats));
-	zOrig_Stats 		:= output(tStats);
+
 		
 	STRATA.createXMLStats(tStats,'Property','ForeclosureV1',filedate,'kgummadi@seisint.com;jtrost@seisint.com',zPopulation_Stats,'View','Population',false,true,true);
 

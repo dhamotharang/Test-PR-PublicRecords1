@@ -14,6 +14,8 @@ export AlloyMedia_src := Map_AlloyMedia_as_Email(version);
 export SalesChannel_src	:= Map_SalesChannel_As_Email(version);
 export Datagence_src	:= Map_Datagence_As_Email(version);
 export InfutorNARE_src	:= Map_InfutorNARE_As_Email(version);
+export	Anchor_src	:= Map_Anchor_As_Email(version);
+export RealSource_src	:= Map_RealSource_As_Email(version);
 
 export email_sources := entiera_src +
 				 Impulse_src +
@@ -26,7 +28,9 @@ export email_sources := entiera_src +
 				 AlloyMedia_src +
 				 SalesChannel_src +
 				 Datagence_src +
-				 InfutorNARE_src;	
+				 InfutorNARE_src +
+				 Anchor_src	+
+				 RealSource_src;
 
 //-------Append data from Watchdog
 export append_best_data    := Fn_Append_Best (email_sources);
