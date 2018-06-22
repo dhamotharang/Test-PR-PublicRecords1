@@ -237,6 +237,7 @@ EXPORT Layouts := MODULE
 	EXPORT elementNidentity_uid_recs := RECORD
 		STRING60 entity_name;
 		STRING100 entity_value;
+		unsigned8 record_id;	
 		string70 tree_uid := '';
 		string70 entity_context_uid := '';
 	END;
@@ -255,6 +256,12 @@ EXPORT Layouts := MODULE
 			INTEGER gc_id;
 			INTEGER ind_type;
 			elementNidentity_uid_recs element;
-		END;
+	END;
+	
+	EXPORT entity_information_recs := RECORD
+		STRING60 fragment;
+		STRING100 fragment_value;
+		iesp.fraudgovsearch.t_FraudGovSearchElementInformation;
+	END;	
 
 END;

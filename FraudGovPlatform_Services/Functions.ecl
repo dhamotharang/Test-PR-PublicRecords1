@@ -669,7 +669,7 @@ EXPORT Functions := MODULE
 		ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload,
 																	LEFT.record_id = RIGHT.record_id,
 																	ds_fragment_recs_w_trans(LEFT, RIGHT),
-																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 
 		RETURN ds_fragment_recs_w_value;
 	END;
@@ -686,12 +686,17 @@ EXPORT Functions := MODULE
 			STRING60 entity_value;
 			RECORDOF(FraudGovPlatform.Key_ClusterDetails);
 		END;											 		
-														 
+		
+		
+		// In the Following join, when useRelatedCluster = TRUE, Joining with same tree_uid to entity_context_uid_ & tree_uid_ from Key. 
+		// This is done so I can find the center cluster record for the related entity cluster. 
+		// By definition, center cluster record for an entity has entity_context_uid_ = tree_uid_. (only 1 such row per entity in key).
 		ds_clusterdetails:= JOIN(ds_entityNameUID , FraudGovPlatform.Key_ClusterDetails(),
 													KEYED(RIGHT.customer_id_ = GC_ID AND
 																RIGHT.industry_type_ = IndustryType AND
 																#IF(useRelatedCluster)
-																	LEFT.tree_uid = RIGHT.entity_context_uid_),
+																	LEFT.tree_uid = RIGHT.entity_context_uid_ AND
+																	LEFT.tree_uid = RIGHT.tree_uid_),
 																#ELSE
 																	LEFT.entity_context_uid = RIGHT.entity_context_uid_),
 																#END
@@ -791,7 +796,7 @@ EXPORT Functions := MODULE
 									KEYED(LEFT.gc_id = RIGHT.customer_id_ AND
 												LEFT.ind_type = RIGHT.industry_type_ AND
 												LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
-									generateScoreBreakdown(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+									generateScoreBreakdown(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 
 		ds_scoreBreakdowns_dedup := DEDUP(SORT(ds_scoreBreakdowns,IndicatorTypeCode,PopulationType,-Value),IndicatorTypeCode,PopulationType);
 

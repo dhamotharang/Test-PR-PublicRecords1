@@ -73,7 +73,7 @@ EXPORT Utilities := MODULE
 														TRANSFORM(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs,
 															SELF.entity_name := LEFT.fragment,
 															SELF.entity_value := LEFT.fragment_value,
-															SELF := []));
+															SELF := LEFT));
 		
 		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 		// All the commneted Fragment Types in the below project are not supported as of now (in MVP), However, 
