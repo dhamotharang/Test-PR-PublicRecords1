@@ -417,6 +417,7 @@ real	RVG1706_1_0_score_baseline;	real	RVG1706_1_0_score_new;	real	RVG1706_1_0_sc
 real	RVG1610_1_0_score_baseline;	real	RVG1610_1_0_score_new;	real	RVG1610_1_0_score_diff;
 real	RVG1802_1_0_score_baseline;	real	RVG1802_1_0_score_new;	real	RVG1802_1_0_score_diff;
 real	RVD1801_1_0_score_baseline;	real	RVD1801_1_0_score_new;	real	RVD1801_1_0_score_diff;
+real	FP1801_1_0_score_baseline;	real	FP1801_1_0_score_new;	real	FP1801_1_0_score_diff;
 
 real	FP31505_0_0_score_baseline;	real	FP31505_0_0_score_new;	real	FP31505_0_0_score_diff;
 real	FP3FDN1505_0_0_score_baseline;	real	FP3FDN1505_0_0_score_new;	real	FP3FDN1505_0_0_score_diff;
@@ -728,6 +729,8 @@ self.RVG1706_1_0_score_baseline := (real)left.RVG1706_1_0_score	;		self.RVG1706_
 self.RVG1610_1_0_score_baseline := (real)left.RVG1610_1_0_score	;		self.RVG1610_1_0_score_new := (real)right.RVG1610_1_0_score	;		self.RVG1610_1_0_score_diff := (real)right.RVG1610_1_0_score	-(real)left.RVG1610_1_0_score	;
 self.RVG1802_1_0_score_baseline := (real)left.RVG1802_1_0_score	;		self.RVG1802_1_0_score_new := (real)right.RVG1802_1_0_score	;		self.RVG1802_1_0_score_diff := (real)right.RVG1802_1_0_score	-(real)left.RVG1802_1_0_score	;
 self.RVD1801_1_0_score_baseline := (real)left.RVD1801_1_0_score	;		self.RVD1801_1_0_score_new := (real)right.RVD1801_1_0_score	;		self.RVD1801_1_0_score_diff := (real)right.RVD1801_1_0_score	-(real)left.RVD1801_1_0_score	;
+self.FP1801_1_0_score_baseline := (real)left.FP1801_1_0_score	;		self.FP1801_1_0_score_new := (real)right.FP1801_1_0_score	;		self.FP1801_1_0_score_diff := (real)right.FP1801_1_0_score	-(real)left.FP1801_1_0_score	;
+
 
 self.FP31505_0_0_score_baseline	:= (real)left.FP31505_0_0_score	;		self.FP31505_0_0_score_new := (real)right.FP31505_0_0_score	;		self.FP31505_0_0_score_diff := (real)right.FP31505_0_0_score	-(real)left.FP31505_0_0_score	;
 self.FP3FDN1505_0_0_score_baseline	:= (real)left.FP3FDN1505_0_0_score	;		self.FP3FDN1505_0_0_score_new := (real)right.FP3FDN1505_0_0_score	;		self.FP3FDN1505_0_0_score_diff := (real)right.FP3FDN1505_0_0_score	-(real)left.FP3FDN1505_0_0_score	;
@@ -1044,6 +1047,7 @@ C= 	299 => 'FP1705_1_0_score ',
 C= 	300 => 'RVG1802_1_0_score ',
 C=  301 => 'RVT1705_1_0_score ',
 C=  302 => 'RVD1801_1_0_score ',
+C=  303 => 'FP1801_1_0_score ',
 ''
 );
 
@@ -1351,10 +1355,11 @@ C= 	299 => le.FP1705_1_0_score_diff,
 C= 	300 => le.RVG1802_1_0_score_diff,
 C=  301 => le.RVT1705_1_0_score_diff,
 C=  302 => le.RVD1801_1_0_score_diff,
+C=  303 => le.FP1801_1_0_score_diff,
 0);										
 end;
 
-name_pairs :=  normalize(j, 302, norm(left, counter));
+name_pairs :=  normalize(j, 303, norm(left, counter));
 
 
 // get an overall picture of impact
