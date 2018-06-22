@@ -1,11 +1,12 @@
-﻿IMPORT PhoneFinder_Services,ut, PhonesInfo, MDR, Gateway;
+﻿IMPORT  Gateway, MDR, PhoneFinder_Services, PhonesInfo, STD, ut;
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0, 
 													     PhoneFinder_Services.iParam.ReportParams inMod, 
 													     DATASET(Gateway.Layouts.Config) dGateways, 
 													     DATASET(	PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,
 													     DATASET(PhoneFinder_Services.Layouts.PortedMetadata) accu_rpt = DATASET([],PhoneFinder_Services.Layouts.PortedMetadata)) :=
 	FUNCTION
-
+   
+	 currentDate := (STRING)STD.Date.Today();		
   displayAll := inMod.TransactionType in [PhoneFinder_Services.Constants.TransType.PREMIUM,
 																						PhoneFinder_Services.Constants.TransType.ULTIMATE,
 																						PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];	
@@ -126,7 +127,8 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.LastPortedDate  := IF(displayAll,r.LastPortedDate,l.LastPortedDate);
 			SELF.NoContractCarrier  := IF(displayAll,r.NoContractCarrier,l.NoContractCarrier);
 			SELF.Prepaid				 := IF(displayAll,r.Prepaid,l.Prepaid);
-			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
+			deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
+			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react AND deact_thresholdcheck => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
 		                             ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active,
 			                            PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
 			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, l.PhoneStatus); // flag to use inhouse phone metatdata instead of Qsent PVS
