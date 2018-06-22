@@ -81,10 +81,11 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT UNSIGNED1 MaxSectionLimit	   := 35; 
 	END;
 	
-	// Porting phones constants
+	// Ported metadata phones constants
 	EXPORT PortingStatus:=
 	MODULE
 		EXPORT Disconnected := 'DE'; //SU-suspend
+		EXPORT UNSIGNED1 DisconnectedPhoneThreshold := 180; // no of days threshold for phone disconnect status
 	END;
 	
 	EXPORT SET OF STRING OTPVerifyTransactions := ['mfaverifyotp','mfaverifyotponce'];
