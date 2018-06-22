@@ -5,6 +5,7 @@ import doxie, WatercraftV2_Services, Email_Data, paw_services, Prof_LicenseV2,
        FLAccidents_eCrash, Accident_Services, Relationship,std,ut,D2C;
 			 Relationship.mac_read_application_type();
 
+isCNSMR := ut.IndustryClass.is_Knowx;
 // phones+ counts have to be done outside of transform, since macro declares IMPORTs, 
 // which is not allowed within the transform on non-OSS platform
 integer GetPhonesPlusCount (unsigned6 udid, integer glb, integer dppa, string industry_class, string drm) := function
@@ -73,9 +74,12 @@ inputs tra(inputs l) := transform
 	vess_count := count(CHOOSEN(dedup(sort(WatercraftV2_Services.WatercraftV2_raw.Report_View.by_did(dataset([{udid}],Doxie.layout_references)),
 								watercraft_key,state_origin),watercraft_key,state_origin),255));
 
-	accidents := JOIN(CHOOSEN(FLAccidents_eCrash.Key_eCrashV2_did(KEYED(l_did=udid)),ut.limits.ACCIDENTS_PER_DID),
+	accidents_ecrash := JOIN(CHOOSEN(FLAccidents_eCrash.Key_eCrashV2_did(KEYED(l_did=udid)),ut.limits.ACCIDENTS_PER_DID),
 										FLAccidents_eCrash.Key_eCrash2v,
 										LEFT.accident_nbr=RIGHT.l_acc_nbr,LEFT OUTER,KEEP(1),LIMIT(0)); 
+
+	accidents := if(~isCNSMR, accidents_ecrash);
+
 	accidentNbrs := DEDUP(SORT(accidents,accident_nbr,report_code),accident_nbr,report_code);
 	FLAccident_count := COUNT(CHOOSEN(accidentNbrs(report_code IN Accident_Services.Constants.FLAccident_source),255));
 	NtlAccident_count := IF(enableNationalAccidents,COUNT(CHOOSEN(accidentNbrs(report_code IN Accident_Services.Constants.NtlAccident_source),255)),0);
