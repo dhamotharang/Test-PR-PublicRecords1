@@ -136,6 +136,13 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids, batch_params);
 		ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids, FraudGovConst_.FRAUD_PLATFORM);
 		
+		/*
+			Following function returns the Dummy Government Information when Options.AppendBest is set to False,
+			This will help Sales/Product folks to not show actual PII info when demo'ing the MVP to customers. 
+			More details can be found at https://jira.rsi.lexisnexis.com/browse/GRP-1025
+		*/
+		ds_dummyGovBest := FraudGovPlatform_Services.fn_GetTestRecords.GetDummyGovBestInfo(ds_contributoryBest);
+		
 		/* Append scores to ds_contributoryBest */	
 		ds_contributoryBest_w_scores := JOIN(ds_contributoryBest, ds_associated_identities_raw,
 																			LEFT.ContributedBest.UniqueId	= RIGHT.entity_context_uid_[4..], 
@@ -190,14 +197,14 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																		ds_contributoryBest_w_scores(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], 
 																		ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
-			SELF.GovernmentBest := IF(batch_params.IsOnline AND batch_params.AppendBest, 
-																ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1], 
+			SELF.GovernmentBest := IF(batch_params.IsOnline,
+																IF(batch_params.AppendBest,
+																		ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1],
+																		ds_dummyGovBest[1]),
 																ROW([], iesp.fraudgovplatform.t_FraudGovBestInfo));
 																
 			SELF.ElementCardDetails := IF(batch_params.IsOnline, ds_ElementcardDetail_w_score[1] , ROW([], iesp.fraudgovreport.t_FraudGovElementCardDetails));
 
-			/* If either IsIdentityTestRequest OR IsElementTestRequest (used above in the attribute) are set, 
-			return mock data, if not, then return empty dataset until we get data from the RAMPS query. */
 			SELF.IndicatorAttributes := IF(batch_params.IsOnline, 
 																		CHOOSEN(Functions.GetIndicatorAttributes(ds_entityNameUID, batch_params),
 																		iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE),
