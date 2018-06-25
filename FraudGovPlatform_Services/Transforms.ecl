@@ -1,5 +1,5 @@
-﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, 
-						 FraudShared_Services, iesp, Patriot, risk_indicators;
+﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, DID_Add, FraudGovPlatform_Services, FraudShared, 
+						 FraudShared_Services, iesp, Patriot, risk_indicators, STD;
 
 EXPORT Transforms := MODULE
 	
@@ -375,5 +375,43 @@ EXPORT Transforms := MODULE
 		SELF := L;
 		SELF := [];
 	END;
+		
+		EXPORT FraudGovPlatform_Services.Layouts.Layout_delta_filter xform_getDeltabaseQueryParams(FraudShared_Services.Layouts.BatchInExtended_rec L) := TRANSFORM
+					SELF.ssn := L.ssn;
+					SELF.dob := L.DOB;
+					SELF.lex_id := L.did;
+					SELF.name_first := L.name_first;
+					SELF.name_middle := L.name_middle;
+					SELF.name_last := L.name_last;
+					// If StreetAddress is empty, then use the parsed address fields
+					SELF.physical_address := IF(L.addr = '',
+											Address.Addr1FromComponents(L.prim_range, 
+													L.predir,
+													L.prim_name, L.addr_suffix,
+													L.postdir,'',	''),
+											L.addr);
+					SELF.physical_city := L.p_city_name;
+					SELF.physical_state := L.st;
+					SELF.physical_zip := L.z5;
+					SELF.mailing_address := IF(L.mailing_addr = '',
+											Address.Addr1FromComponents(L.mailing_prim_range, 
+													L.mailing_predir,
+													L.mailing_prim_name, L.mailing_addr_suffix,
+													L.mailing_postdir,'',''),
+											L.mailing_addr);
+					SELF.mailing_city := L.mailing_p_city_name;
+					SELF.mailing_state := L.mailing_st;
+					SELF.mailing_zip := L.mailing_z5;
+					SELF.phone := L.phoneno;
+					SELF.ip_address := L.ip_address;
+					SELF.device_id := L.device_id;
+					SELF.bank_account_number := L.bank_account_number;
+					SELF.dl_state := L.dl_state;
+					SELF.dl_number := L.dl_number;
+					SELF.geo_lat := L.geo_lat;
+					SELF.geo_long := L.geo_long;
+					//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
+					SELF.date_added := (INTEGER)(did_add.get_EnvVariable(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE)+ '000000');
+				END;
 	
 END;

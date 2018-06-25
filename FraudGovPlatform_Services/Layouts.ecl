@@ -225,7 +225,33 @@ EXPORT Layouts := MODULE
 	EXPORT LOG_Deltabase_Layout := RECORD
 		DATASET(LOG_Deltabase_Layout_Record) Records {XPATH('Records/Rec'), MAXCOUNT(1)};
 	END;
-	
+				
+	EXPORT Layout_delta_filter := RECORD
+		STRING10 ssn;
+		STRING10 dob;
+		UNSIGNED6 lex_id;
+		STRING100 name_first;
+		STRING60 name_middle;
+		STRING100 name_last;
+		STRING150 physical_address;
+		STRING30 physical_city;
+		STRING10 physical_state;
+		STRING10 physical_zip;
+		STRING15 mailing_address;
+		STRING30 mailing_city;
+		STRING2 mailing_state;
+		STRING5 mailing_zip;
+		STRING10 phone;
+		STRING25 ip_address;
+		STRING50 device_id;
+		STRING20 bank_account_number;
+		STRING2 dl_state;
+		STRING25 dl_number;
+		STRING10 geo_lat;
+		STRING11 geo_long;
+		UNSIGNED8 date_added;
+	END;
+
 	EXPORT fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
 		STRING100 fragment_value;
