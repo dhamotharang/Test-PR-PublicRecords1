@@ -148,23 +148,21 @@ EXPORT Functions := MODULE
 		Suppress.MAC_Suppress(ds_didville_out,ds_dids,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
 
 		HomesteadExemptionV2_Services.Layouts.workRecSlim appendDids(ds_work_in L, ds_didville_out R) := TRANSFORM
-			keepDid:=R.score>=in_mod.didScoreThreshold;
-			lowLexIdScore:=NOT keepDid;
-			tooManySubjects:=NOT keepDid AND R.cnt>1;
-			SELF.did:=IF(keepDid,R.did,L.did);
-			SELF.score:=IF(keepDid,R.score,L.score);
+			lowLexIdScore:=R.score<in_mod.didScoreThreshold;
+			tooManySubjects:=lowLexIdScore AND R.cnt>1;
+			SELF.did:=IF(tooManySubjects,L.did,R.did);
+			SELF.score:=IF(tooManySubjects,L.score,R.score);
+			// LOGIC IS TO IGNORE tooManySubjects WHEN AT LEAST 1 DID IS ABOVE THE THRESHOLD
 			SELF.error_code:=MAP(
 				L.error_code>0 => L.error_code, // keep any existing error code
 				R.did=0 => Constants.NO_LEXID_FOUND_CODE,
 				lowLexIdScore => Constants.LOW_LEXID_SCORE_CODE,
-				tooManySubjects => Constants.TOO_MANY_SUBJECTS_CODE,
-				L.error_code);
+				0);
 			SELF.exception_code:=MAP(
 				L.error_code=Constants.INSUFFICIENT_INPUT_CODE => Constants.INSUFFICIENT_INPUT,
 				R.did=0 => Constants.NO_LEXID_FOUND,
-				lowLexIdScore AND tooManySubjects => Constants.LOW_LEXID_SCORE+';'+Constants.TOO_MANY_SUBJECTS,
+				tooManySubjects => Constants.LOW_LEXID_SCORE+';'+Constants.TOO_MANY_SUBJECTS,
 				lowLexIdScore => Constants.LOW_LEXID_SCORE,
-				tooManySubjects => Constants.TOO_MANY_SUBJECTS,
 				'');
 			SELF:=L;
 		END;
