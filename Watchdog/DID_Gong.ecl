@@ -28,9 +28,11 @@ propADL := gong_Neustar.fnPropagateADLs(,,apply_title_lift).base;
 //propADL := gong.fnPropagateADLs(,,apply_title).base;
 
 tmp := SEQUENTIAL(
-				Std.File.ClearSuperFile('~thor_data400::base::gong_did'),
 				OUTPUT(propADL,, '~thor_Data400::base::Gong_did::' + workunit, COMPRESSED),
-				Std.File.AddSuperFile('~thor_data400::base::gong_did','~thor_Data400::base::Gong_did::' + workunit)
+                Std.File.StartSuperFileTransaction(),
+                Std.File.ClearSuperFile('~thor_data400::base::gong_did'),
+				Std.File.AddSuperFile('~thor_data400::base::gong_did','~thor_Data400::base::Gong_did::' + workunit),
+                Std.File.FinishSuperFileTransaction()
 				);
 
 
