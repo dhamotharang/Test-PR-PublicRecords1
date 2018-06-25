@@ -153,9 +153,13 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																				SELF.ScoreDetails.Score := RIGHT.score_,
 																				SELF := LEFT),
 																			LEFT OUTER, LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-																			
+												
+		
+		 ds_delta_recentActivity := mod_Deltabase_Functions.getDeltabaseReportRecords(ds_batch_in_extended, batch_params);		
+		
 		/* Returning the Timeline Data */
-		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT));
+		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) 
+									+ ds_delta_recentActivity;
 		
 		/* Returning the Associated Address Data  - This is based on the Timeline Records found above */
 		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_timeline);
@@ -234,6 +238,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		END;
 		
 		// output(ds_batch_in, named('ds_batch_in'));
+		//output(batch_params);
 		// output(ds_batch, named('ds_batch'));
 		// output(all_knownfrauds, named('all_knownfrauds'));
 		// output(all_knownfrauds_final, named('all_knownfrauds_final'));

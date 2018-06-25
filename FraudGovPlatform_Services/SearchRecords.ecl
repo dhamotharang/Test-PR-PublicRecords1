@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
+﻿IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -150,6 +150,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LEFT OUTER,
 																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 	
+
+	ds_delta_recentTransactions := mod_Deltabase_Functions.getDeltabaseSearchRecords(batch_params);											
+																		
 	//Assembling all the pieces together to form search response.	
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
@@ -173,8 +176,29 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ContributedBest := PROJECT(contri_best_rec.ContributedBest	, TRANSFORM(LEFT));
 		SELF.EmailAddress :=  contri_best_rec.EmailAddress;
 		SELF.NoOfClusters := L.NumberOfClusters;
-		SELF.NoOfRecentTransactions := R.NoOfRecentTransactions; //Last 24 hours velocity count.
-		SELF.NoOfTransactions := R.NoOfTransactions; //Total velocity count.
+
+		numOfDeltabaseTransactions := MAP( 
+				 L.fragment = Fragment_Types_const.PERSON_FRAGMENT => COUNT(ds_delta_recentTransactions(UniqueId = L.fragment_value)),
+				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => COUNT(ds_delta_recentTransactions(SSN = L.fragment_value)),
+				 L.fragment = Fragment_Types_const.NAME_FRAGMENT => COUNT(
+															ds_delta_recentTransactions(
+																		Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
+																						STD.Str.CleanSpaces(Name.Last),'') = STD.Str.CleanSpaces(L.fragment_value))),
+																						
+				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => COUNT(
+															ds_delta_recentTransactions(
+					  												(STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
+															  		Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
+																																STD.Str.CleanSPaces(PhysicalAddress.State), 
+																																STD.Str.CleanSPaces(PhysicalAddress.Zip5))
+																		) = STD.Str.CleanSPaces(L.fragment_value))),
+																		
+				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => COUNT(ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value)),
+				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => COUNT(ds_delta_recentTransactions(IpAddress = L.fragment_value)),
+				 R.NoOfRecentTransactions);
+		
+		SELF.NoOfRecentTransactions := numOfDeltabaseTransactions;
+		SELF.NoOfTransactions := R.NoOfTransactions + numOfDeltabaseTransactions; //Total velocity count.
 		SELF.NoOfKnownRisks := R.NoOfKnownRisks; //Total Known Risk count.
 		SELF.LastActivityDate := iesp.ECL2ESP.toDate(L.LastActivityDate);
 		SELF.LastKnownRiskDate := iesp.ECL2ESP.toDate(L.LastKnownRiskDate); //Highest Knownrisk date.
@@ -205,8 +229,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
-	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
-	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
+	 //output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
+	 //output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 
