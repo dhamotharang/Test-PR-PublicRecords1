@@ -1,4 +1,4 @@
-﻿import tools, _control, _validate;
+﻿import tools, _control, _validate, Orbit3;
 
 export Build_All(
 
@@ -19,6 +19,7 @@ function
 		,Build_Base				(pversion,pIsTesting,pSprayedFile	)
 		,Build_Keys				(pversion															).all
 		,Build_Strata			(pversion	,pOverwrite,,,	pIsTesting	)
+	  ,Orbit3.proc_Orbit3_CreateBuild_npf('CCLUE',pversion)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 	): success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
