@@ -1,6 +1,6 @@
 ﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, STD;
 
-EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
+EXPORT getBusProperty(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 boolean DebugMode = FALSE
@@ -40,13 +40,33 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 
   //we need to project the first and last seen dates with vendor if they are not populated so we do not lose records....
   formatProperty := PROJECT(Property_Filtered, TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
+                                                                  SELF.seq := LEFT.seq;
+                                                                  SELF.ultID := LEFT.ultID;
+                                                                  SELF.orgID := LEFT.orgID;
+                                                                  SELF.seleID := LEFT.seleID;
+                                                                  
                                                                   SELF.sourceCode := LEFT.source_code;
                                                                   SELF.LNFaresId := LEFT.ln_fares_id;
                                                                   SELF.dateFirstSeen := IF(LEFT.dt_first_seen > 0, LEFT.dt_first_seen, LEFT.dt_vendor_first_reported);
                                                                   SELF.dateLastSeen := IF(LEFT.dt_last_seen > 0, LEFT.dt_last_seen, LEFT.dt_vendor_last_reported);
                                                                   SELF.historyDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate); 
+                                                                  
                                                                   SELF.ownerName := LEFT.cname;
-                                                                  SELF := LEFT;
+                                                                  
+                                                                  SELF.prim_range := LEFT.prim_range;
+                                                                  SELF.predir := LEFT.predir;
+                                                                  SELF.prim_name := LEFT.prim_name;
+                                                                  SELF.addr_suffix := LEFT.suffix;
+                                                                  SELF.postdir := LEFT.postdir;
+                                                                  SELF.unit_desig := LEFT.unit_desig;
+                                                                  SELF.sec_range := LEFT.sec_range;
+                                                                  SELF.city := LEFT.p_city_name;
+                                                                  SELF.state := LEFT.st;
+                                                                  SELF.zip5 := LEFT.zip;
+                                                                  SELF.zip4 := LEFT.zip4;
+                                                                  SELF.county := LEFT.county[3..5];
+                                                                  SELF.geo_blk := LEFT.geo_blk;
+                                                                  
                                                                   SELF := [];));
                                                                 
   //remove all duplicate values
@@ -66,13 +86,13 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
                                                                                                       SELF.prim_range := LEFT.prim_range;
                                                                                                       SELF.predir := LEFT.predir;
                                                                                                       SELF.prim_name := LEFT.prim_name;
-                                                                                                      SELF.addr_suffix := LEFT.suffix;
+                                                                                                      SELF.addr_suffix := LEFT.addr_suffix;
                                                                                                       SELF.postdir := LEFT.postdir;
                                                                                                       SELF.unit_desig := LEFT.unit_desig;
                                                                                                       SELF.sec_range := LEFT.sec_range;
-                                                                                                      SELF.city := LEFT.p_city_name;
-                                                                                                      SELF.state := LEFT.st;
-                                                                                                      SELF.zip5 := LEFT.zip;
+                                                                                                      SELF.city := LEFT.city;
+                                                                                                      SELF.state := LEFT.state;
+                                                                                                      SELF.zip5 := LEFT.zip5;
                                                                                                       SELF.zip4 := LEFT.zip4;
                                                                                                       SELF.county := LEFT.county;
                                                                                                       SELF.geo_blk := LEFT.geo_blk;

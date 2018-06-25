@@ -123,7 +123,7 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	EXPORT ReportingOfOperatingLocations  := RECORD
 	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
-	 DueDiligence.Layouts.BusOperLocationLayout ReportOfOperatingLocs;
+	 DueDiligence.Layouts.CommonGeographicLayout ReportOfOperatingLocs;
 	END;
 	
 	
@@ -178,7 +178,7 @@ EXPORT LayoutsInternalReport := MODULE
   
   EXPORT BusRegisteredAgents := RECORD
 		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
-		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+		DATASET(iesp.duediligencebusinessreport.t_DDRRegisteredAgents) regAgents {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxRegisteredAgents)};
 	END;
   
   EXPORT BusExecs := RECORD

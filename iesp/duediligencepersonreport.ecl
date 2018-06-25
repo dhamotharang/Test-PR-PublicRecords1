@@ -21,7 +21,7 @@ export t_DDRPersonInformation := record
 end;
 		
 export t_DDRPersonProperty := record (iesp.duediligenceshared.t_DDRProperty)
-	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) Owners {xpath('Owners/Owner'), MAXCOUNT(1)};
+	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxPropertyOwners)};
 	boolean Vacant {xpath('Vacant')};
 	boolean SubjectOwned {xpath('SubjectOwned')};
 	boolean SpouseOwned {xpath('SpouseOwned')};
@@ -29,7 +29,7 @@ end;
 		
 export t_DDRPersonPropertyOwnership := record
 	integer2 PropertyCurrentCount {xpath('PropertyCurrentCount')};
-	integer2 TaxAssessedValue {xpath('TaxAssessedValue')};
+	integer8 TaxAssessedValue {xpath('TaxAssessedValue')};
 	dataset(t_DDRPersonProperty) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxProperties)};
 end;
 		
@@ -38,7 +38,7 @@ export t_DDRPersonEconomicAttributeDetails := record
 end;
 		
 export t_DDRPersonProfessionalNetworkDetails := record
-	dataset(iesp.duediligenceshared.t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(1)};
+	dataset(iesp.duediligenceshared.t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLicenses)};
 end;
 		
 export t_DDRPersonCriminalEvents := record

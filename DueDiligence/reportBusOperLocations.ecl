@@ -9,7 +9,7 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 		
 	 // ***OperatingLocations is a nested DATASET within the Business Internal layout                   ***//
 	 // ***Need to convert this into a flat/simple dataset before calling the Geographic Risk FUNCTION  ***//
-	 ListOfOperatingLocations := NORMALIZE(BusnData, LEFT.operatingLocations, TRANSFORM(DueDiligence.LayoutsInternal.GeographicLayout,																													
+	 ListOfOperAddresses := NORMALIZE(BusnData, LEFT.operatingLocations, TRANSFORM(DueDiligence.LayoutsInternal.GeographicLayout,																													
                                                                                        SELF.seq                       := LEFT.seq;
                                                                                        SELF.ultID                     := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                                        SELF.orgID                     := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
@@ -19,23 +19,11 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
                                                                                        SELF                           := [];)); 
 																													
    
-   // ------                                                                                     ------
-   // ------ Convert the listOfOperatingLocations into the layout                                ------  
-   // ------    expected by the Common.getGeographicRisk                                         ------
-   // ------    Note: make sure we are using the best or the cleaned                             ------
-   // ------                                                                                     ------
-   ListOfOperAddresses  :=  PROJECT(ListOfOperatingLocations,  
-                                    TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
-                                              /* populate the Geographic internal record with address data from the List of Operating Locations  */ 
-                                              SELF.seq             := LEFT.seq;
-                                              SELF                 := LEFT;
-                                              SELF                 := []));
-	
-	
    // ------                                                                                   ------
    // ------ Determine the Geographic Risk for the Inquired Business and operating locations   ------
+   // ------  This list of addresses need to be cleaned                                        ------
    // ------                                                                                   ------
-   GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses);  
+   GeographicRiskResults   := DueDiligence.Common.getGeographicRisk(ListOfOperAddresses, TRUE);  
 
 	 // ------                                                                                   ------
 	 // ------ group the geographic dataset by seq and linkIDs so counter can count per grouping ------
@@ -113,12 +101,12 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 	 // ********************
 	 //   DEBUGGING OUTPUTS
 	 // *********************
-   IF(DebugMode,      OUTPUT(BusnData,                                NAMED('BusnDatainto')));
-   IF(DebugMode,      OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations')));
-   IF(DebugMode,      OUTPUT(CHOOSEN(ListOfOperAddresses, 100),       NAMED('ListOfOperAddresses')));												 
-   IF(DebugMode,      OUTPUT(CHOOSEN(GeographicRiskResults, 100),     NAMED('GeographicRiskResults')));																		 
-   IF(DebugMode,      OUTPUT(CHOOSEN(BusOperLocChildDataset, 100),     NAMED('BusOperLocChildDataset')));												 
-   IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBusnOperLocWithReport, 100),     NAMED('UpdateBusnOperLocWithReport')));	
+   //OUTPUT(BusnData,                                NAMED('BusnDatainto'));
+   //OUTPUT(ListOfOperatingLocations,                NAMED('ListOfOperatingLocations'));
+   //OUTPUT(CHOOSEN(ListOfOperAddresses, 100),       NAMED('ListOfOperAddresses'));												 
+   //OUTPUT(CHOOSEN(GeographicRiskResults, 100),     NAMED('GeographicRiskResults'));																		 
+   //OUTPUT(CHOOSEN(BusOperLocChildDataset, 100),    NAMED('BusOperLocChildDataset'));												 
+   //OUTPUT(CHOOSEN(UpdateBusnOperLocWithReport, 100), NAMED('UpdateBusnOperLocWithReport'));	
    
    // OUTPUT(BusOperLocChildDataset, NAMED('BusOperLocChildDataset'));
      

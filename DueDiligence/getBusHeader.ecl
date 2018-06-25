@@ -109,7 +109,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	hdrAddrProject := PROJECT(dedupSortBusHdrAddr, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
 																														SELF.addrCount := 1;
-																													  SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
+																													  SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.CommonGeographicLayout,
 																																																			SELF.county:= LEFT.fips_county;
 																																																			SELF.city := LEFT.v_city_name;
 																																																			SELF.state := LEFT.st;
