@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, Gateway, Risk_Indicators, RiskWise, STD, ut;
+﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, Risk_Indicators, RiskWise, STD, ut;
 
 EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options,

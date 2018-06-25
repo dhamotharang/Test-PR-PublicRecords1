@@ -13,7 +13,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 	DueDiligence.Layouts.Busn_Internal  BusnKRIs(BusnBIPIDs le)  := TRANSFORM
 		
-		SELF.BusLexID := le.Busn_info.BIP_IDS.SeleID.LinkID;
+		SELF.BusLexID := (STRING)le.Busn_info.BIP_IDS.SeleID.LinkID;
 		
 		/* BUSINESS ASSETS OWNED PROPERTY  */  																																																	 
 		 BusAssetOwnProperty_Flag9 := If (le.CurrPropOwnedCount >= 15,'T','F');                                     /* Index value of 9 was set */
@@ -593,18 +593,14 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										// SELF.BusMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalStateCriminal := INVALID_BUSINESS_SCORE;
 																										SELF.BusLegalStateCriminal_Flag := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLegalFederalCriminal := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLegalFederalCriminal_Flag := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusLegalFedCriminal := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusLegalFedCriminal_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalCivil := INVALID_BUSINESS_SCORE;
 																										SELF.BusLegalCivil_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalTraffInfr := INVALID_BUSINESS_SCORE;
 																										SELF.BusLegalTraffInfr_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalTypes := INVALID_BUSINESS_SCORE;
 																										SELF.BusLegalTypes_Flag := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLinkedBusFootprint := INVALID_BUSINESS_SCORE;
-																										// SELF.BusLinkedBusFootprint_Flag := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLinkedBusIndex := INVALID_BUSINESS_SCORE;
-																										// SELF.BusLinkedBusIndex_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusBEOProfLicense := INVALID_BUSINESS_SCORE;
 																										SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;

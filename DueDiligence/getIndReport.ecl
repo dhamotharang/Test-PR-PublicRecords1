@@ -8,9 +8,11 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   
   getInputBestInfo := DueDiligence.reportIndBestInfo(inData, ssnMask);
   
-  // getPropertyReportData := DueDiligence.reportIndProperty(inData);
+  getPropertyReportData := DueDiligence.reportIndProperty(getInputBestInfo);
   
-  getCriminalReportData := DueDiligence.reportIndCriminal(getInputBestInfo, ssnMask);
+  getCriminalReportData := DueDiligence.reportIndCriminal(getPropertyReportData, ssnMask);
+  
+  getProfessionalLicenseData := DueDiligence.reportIndProfLicense(getCriminalReportData);  
   
   
   
@@ -18,7 +20,8 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   // OUTPUT(getInputBestInfo, NAMED('getInputBestInfo'));
   // OUTPUT(getPropertyReportData, NAMED('getPropertyReportData'));
   // OUTPUT(getCriminalReportData, NAMED('getCriminalReportData'));
+  // OUTPUT(getProfessionalLicenseData, NAMED('getProfessionalLicenseData'));
   
   
-  RETURN getCriminalReportData;
+  RETURN getProfessionalLicenseData;
 END;

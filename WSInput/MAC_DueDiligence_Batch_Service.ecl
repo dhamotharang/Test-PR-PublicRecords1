@@ -6,13 +6,11 @@ EXPORT MAC_DueDiligence_Batch_Service := MACRO
 										/*---- Request Fields ----*/
 										'batch_in',
 										'attributesVersion',
-										'includeNews',
-										/*---- Gateways ----*/
-										'gateways',
 										/*---- Compliance Fields ----*/
-										'glbaPurpose',
+										'glbPurpose',
 										'dppaPurpose',
-										'dataRestriction',
-										'dataPermissionMask'
+										'dataRestrictionMask',
+										'dataPermissionMask',
+                    'historyDateYYYYMMDD'
 									));
 ENDMACRO;

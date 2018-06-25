@@ -6,10 +6,9 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 											     ) := FUNCTION
 	
  
- // ------                                                                                     ------
+  // ------                                                                                     ------
 	// ------ Start by calling the Geographic Risk Function                                       ------  
 	// ------    Busn_info address IS the cleaned input                                           ------
-	// ------    Note: make sure we are using the best or the cleaned                             ------
 	// ------                                                                                     ------
  ListOfAddresses  :=  PROJECT(BusnData,  
 			TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
@@ -37,8 +36,8 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 							 SELF.state           := LEFT.busn_info.address.state;
 							 SELF.county          := LEFT.busn_info.address.county;
 							 SELF.geo_blk         := LEFT.busn_info.address.geo_blk;
-				    SELF                 := LEFT;
-						  SELF                 := []));  //***all other fields can be empty
+				       SELF                 := LEFT;
+						   SELF                 := []));  //***all other fields can be empty
 
  // ------                                                                                   ------
  // ------ Determine the Geographic Risk for the Inquired Business                           ------
@@ -47,7 +46,7 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 
  // ------                                                                                    ------
  // ------ add the Geographic Risk to Busn_Internal layout.                                   ------
-	// ------                                                                                    ------
+	// ------                                                                                   ------
 	WithBusnGeoRisk := JOIN(BusnData, AddressBusnGeoRisk,
 												LEFT.seq                             = RIGHT.seq AND
 												LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultID AND
@@ -66,7 +65,7 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 																	SELF.CityRailStation           := RIGHT.CityRailStation;
 																	SELF.HIDTA                     := RIGHT.HIDTA;
 																	SELF.HIFCA                     := RIGHT.HIFCA;
-																	SELF.HighFelonNeighborhood     := RIGHT.HighFelonNeighborhood;
+                                  SELF.FipsCode                  := RIGHT.FipsCode;
                                   SELF.CountyName                := RIGHT.CountyName;  
 																	/*  Populate the rest of the Business Internal from the LEFT             */
 																	SELF := LEFT),
@@ -75,14 +74,14 @@ EXPORT getBusGeographicRisk(DATASET(DueDiligence.layouts.Busn_Internal) BusnData
 
 
 
- // ********************
+  // ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
 
 	
-	 IF(DebugMode,      OUTPUT(CHOOSEN(ListOfAddresses, 100),                    NAMED('ListOfAddresses')));
-	 IF(DebugMode,      OUTPUT(CHOOSEN(AddressBusnGeoRisk, 100),                 NAMED('AddressBusnGeoRisk')));
-	 IF(DebugMode,      OUTPUT(CHOOSEN(WithBusnGeoRisk, 100),                    NAMED('WithBusnGeoRisk')));
+	// OUTPUT(CHOOSEN(ListOfAddresses, 100),          NAMED('ListOfAddresses'));
+	// OUTPUT(CHOOSEN(AddressBusnGeoRisk, 100),       NAMED('AddressBusnGeoRisk'));
+	// OUTPUT(CHOOSEN(WithBusnGeoRisk, 100),          NAMED('WithBusnGeoRisk'));
 	 
 	RETURN WithBusnGeoRisk;
 END;

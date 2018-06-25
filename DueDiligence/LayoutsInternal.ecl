@@ -12,15 +12,13 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED6 did;
 	END; 
 	
-	EXPORT CommonGeographicLayout   := RECORD
-		DueDiligence.Layouts.BusOperLocationLayout;
-	END;
 	
+  
 	
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
 	 InternalSeqAndIdentifiersLayout;
-	 CommonGeographicLayout;
+	 DueDiligence.Layouts.CommonGeographicLayout;
 	END;
  
  
@@ -28,7 +26,7 @@ EXPORT LayoutsInternal := MODULE
 	EXPORT OperatingLocationLayout := RECORD
 		InternalSeqAndIdentifiersLayout;                                 
 		UNSIGNED3 addrCount;
-		DATASET(CommonGeographicLayout) locAddrs;
+		DATASET(DueDiligence.Layouts.CommonGeographicLayout) locAddrs;
 	END;
 	
 	
@@ -112,13 +110,14 @@ EXPORT LayoutsInternal := MODULE
    //person related
    BOOLEAN inquiredOwned;
    BOOLEAN spouseOwned;
+   DATASET(DueDiligence.Layouts.DIDAndName) ownerNames;
+   STRING1 vacancyIndicator;
 
    //business related
    UNSIGNED4 dateFirstSeen;
    UNSIGNED4 dateLastSeen;
    STRING120 ownerName;
-
-   
+ 
    //used for report by both person/business
    UNSIGNED4 historyDate;
    STRING50  addressType;
@@ -132,20 +131,7 @@ EXPORT LayoutsInternal := MODULE
    STRING4 assessedYear;
    INTEGER8 assessedTotalValue;
 
-   STRING10  prim_range;
-   STRING2   predir;
-   STRING28  prim_name;
-   STRING4   suffix;
-   STRING2   postdir;
-   STRING10  unit_desig;
-   STRING8   sec_range;
-   STRING25  p_city_name;
-   STRING25  v_city_name;
-   STRING2   st;
-   STRING5   zip;
-   STRING4   zip4;
-   STRING5   county;
-   STRING7   geo_blk;
+   DueDiligence.Layouts.AddressSlimDetail;
   END;					
 	
 	
