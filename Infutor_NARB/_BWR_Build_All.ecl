@@ -1,7 +1,7 @@
 ﻿Import AID, AID_Support;
 
-pversion 	:= 'YYYYMMDD'								 ;		// modify to current date
-directory := '/hds_180/infutor_narb/data/' + pversion[1..8];
+pversion 	:= 'YYYYMMDD'								 ;		// modify to current tapeload folder date
+
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
 // -- 	1. Put the Build Date in the pversion attribute above
@@ -9,14 +9,9 @@ directory := '/hds_180/infutor_narb/data/' + pversion[1..8];
 // --				_control.MyInfo.EmailAddressNotify
 // --			 You will receive build emails to this address
 // --		3. Check the following attribute to make sure it is correct:
-// --				QA_Data._Flags
+// --				Infutor_NARB._Flags
 /////////////////////////////////////////////////////////////
 
-// !!!!!!!!!!!!!! For Testing/Development !!!!!!!!!!!!!!!!! 
-// This uses the alternate AID cache (non-header version)
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
-
 #workunit('name', Infutor_NARB._Dataset().Name + ' Build ' + pversion);
-Infutor_NARB.Build_All(pversion, directory);
+Infutor_NARB.Build_All(pversion);
 

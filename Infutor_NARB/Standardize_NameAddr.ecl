@@ -45,7 +45,7 @@ EXPORT Standardize_NameAddr := MODULE
 			SELF								  := L;			
 		END;
 		
-		dStandardizedNames := project(dStandardizedPerson, tMapCleanCompanyName(LEFT)) : INDEPENDENT;
+		dStandardizedNames := project(dStandardizedPerson, tMapCleanCompanyName(LEFT))(REGEXFIND('\\|', clean_company_name) = false) : INDEPENDENT;
 			
 		RETURN dStandardizedNames;
 
@@ -72,12 +72,8 @@ EXPORT Standardize_NameAddr := MODULE
 			
 			string182	clean_AddrPrep	:= IF(prepAddrLast <> '', Address.CleanAddress182(cleanStreet, prepAddrLast), '');
 			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
-											
-			stateCodes := ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY',
-										 'LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH',
-										 'OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY'];
-										 
-			SELF.prep_Address_line1     := IF(L.normCompany_State in stateCodes and clean_AddrPrep not in ['','.'] and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.']  
+
+			SELF.prep_Address_line1     := IF(Codes.St2Name(L.normCompany_State) <> '' and clean_AddrPrep not in ['','.'] and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.']  
 																			,Address.Addr1FromComponents(clean_AddrRec.prim_range,
 																																	 clean_AddrRec.predir,
 																																	 clean_AddrRec.prim_name,
@@ -86,7 +82,7 @@ EXPORT Standardize_NameAddr := MODULE
 																																	 clean_AddrRec.unit_desig,
 																																	 clean_AddrRec.sec_range)
 																			,'');
-			SELF.prep_Address_line_last := IF(L.normCompany_State in stateCodes and clean_AddrPrep not in ['','.']
+			SELF.prep_Address_line_last := IF(Codes.St2Name(L.normCompany_State) <> '' and clean_AddrPrep not in ['','.']
 																			,Address.Addr2FromComponents(clean_AddrRec.p_city_name,
 																																	 clean_AddrRec.st,
 																																	 clean_AddrRec.zip)

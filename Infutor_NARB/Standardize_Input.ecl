@@ -10,10 +10,10 @@ EXPORT Standardize_Input := MODULE
 	  
 		// Normalize on the three sets of company fields:  Company, Tradename/DBA, and Parent Company	
 		Infutor_NARB.Layouts.Base normTrf(Infutor_NARB.Layouts.Sprayed_Input L, unsigned1 cnt) := transform
-			,skip ( (cnt=2 and l.tradename in ['',l.Busname]) or
-						  (cnt=2 and l.street+l.city+l.state+l.zip5 = '' and l.telephone = '') or 
-						  (cnt=3 and l.parent_company = '') or 
-						  (cnt=3 and l.parent_address+l.parent_city+l.parent_state+l.parent_zip = '' and l.parent_phone = '') )
+			,skip ( (cnt=2 and ut.CleanSpacesAndUpper(l.tradename) in ['',ut.CleanSpacesAndUpper(l.Busname)]) or
+						  (cnt=2 and trim(l.street+l.city+l.state+l.zip5) = '' and l.telephone = '') or 
+						  (cnt=3 and trim(l.parent_company) = '') or 
+						  (cnt=3 and trim(l.parent_address+l.parent_city+l.parent_state+l.parent_zip) = '' and l.parent_phone = '') )
 				
 				SELF.normCompany_Type   := choose(cnt ,'B'   // Business
 																							,'T'   // Tradename/DBA

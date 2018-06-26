@@ -6,7 +6,7 @@ export Build_All(
 	,string													    pDirectory			= '/data/hds_180/infutor_narb/data/' + pversion[1..8]
 	,string															pServerIP				= 'uspr-edata11.risk.regn.net'
 	,string															pFilename				= 'NARB3_1_*.txt'
-	,string															pGroupName			= tools.fun_Groupname()
+	,string															pGroupName			= STD.System.Thorlib.Group( )
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																												
 	,dataset(Layouts.Sprayed_Input	)		pSprayedFile		= Files().Input.using

@@ -1,10 +1,11 @@
 ﻿IMPORT SALT34,infutor_narb;
 EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Layout_infutor_narb) Delta = DATASET([],Layout_infutor_narb)
-, DATASET(Layout_infutor_narb) dsBase = In_infutor_narb // Change IN_infutor_narb to change input to ingest process
-, DATASET(RECORDOF(infutor_narb.In_File))  infile = infutor_narb.In_File
+, DATASET(Infutor_NARB.Layouts.Base) Delta = DATASET([],Infutor_NARB.Layouts.Base) //default empty file
+, DATASET(Infutor_NARB.Layouts.Base) dsBase 
+, DATASET(Infutor_NARB.Layouts.Base) infile 
 ) := MODULE
-  SHARED NullFile := DATASET([],Layout_infutor_narb); // Use to replace files you wish to remove
+
+  SHARED NullFile := DATASET([],Infutor_NARB.Layouts.Base); // Use to replace files you wish to remove
  
   SHARED FilesToIngest := infile;
   In_Src_Cnt_Rec := RECORD
@@ -16,7 +17,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 // Now need to discover which records are old / new / updated
   EXPORT RecordType := ENUM(UNSIGNED1,Unknown,Ancient,Old,Unchanged,Updated,New);
   EXPORT RTToText(unsigned1 c) := CHOOSE(c,'UNKNOWN','Ancient','Old','Unchanged','Updated','New','UNKNOWN');
-  WithRT := RECORD(Layout_infutor_narb)
+  WithRT := RECORD(Infutor_NARB.Layouts.Base)
     __Tpe := RecordType.Unknown;
   END;
  
@@ -205,13 +206,13 @@ SHARED UpdateStatsXtab := PROJECT(ROLLUP(PROJECT(SORT(UpdateStatsSrc,source),toR
 SHARED S3 := OUTPUT(UpdateStatsXtab,ALL,NAMED('UpdateStatsXtab'));
  
   EXPORT NewRecords := AllRecs(__Tpe=RecordType.New);
-  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layout_infutor_narb);
+  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Infutor_NARB.Layouts.Base);
   EXPORT OldRecords := AllRecs(__Tpe=RecordType.Old);
-  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layout_infutor_narb);
+  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Infutor_NARB.Layouts.Base);
   EXPORT UpdatedRecords := AllRecs(__Tpe=RecordType.Updated);
-  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layout_infutor_narb);
+  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Infutor_NARB.Layouts.Base);
   EXPORT AllRecords := AllRecs;
-  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_infutor_narb); // Records in 'pure' format
+  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Infutor_NARB.Layouts.Base); // Records in 'pure' format
  
   // Compute field level differences
   IOR := JOIN(OldRecords,InputSourceCounts,left.source=right.source,TRANSFORM(LEFT),LOOKUP); // Only send in old records from sources in this ingest

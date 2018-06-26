@@ -1,4 +1,4 @@
-﻿import _control, versioncontrol;
+﻿import _control, versioncontrol, std;
 export _Dataset(
 
 	boolean	pUseProd = false
@@ -14,8 +14,6 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 4096								;
 
-	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor400_dev01_v2'
-																																					,'thor400_60'
-											);
+	export Groupname	:= STD.System.Thorlib.Group( );
 
 end;
