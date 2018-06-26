@@ -1,4 +1,4 @@
-import AutokeyB2, autokey, roxiekeybuild, CanadianPhones;
+﻿import AutokeyB2, autokey, roxiekeybuild, CanadianPhones;
 
 export proc_fedex_build_keys2(string version_date) := function
 	fedex_dataset := fedex.fedex_autokey_constants.autokey_dataset2;
@@ -95,7 +95,7 @@ OUTACTION :=
 	AutoKeyB2.MAC_AcceptSK_to_QA(super_keyname,move_qa,,fedex.fedex_autokey_constants.autokey_skip_set);
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','SUCC', version_date, send_succ_msg, RoxieKeyBuild.Email_Notification_List);
-	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'maichel.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
+	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
 	
 	update_dops := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N');
 	build_keys	:= sequential(outaction, move_qa);
