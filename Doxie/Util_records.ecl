@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------------------------------------------------------------------
 // DESCRIPTION: Derive data from utility records for the provided DIDs. 
 // -----------------------------------------------------------------------------------------------------------
-IMPORT doxie, doxie_crs, utilfile, ut, Census_data, suppress; 
+IMPORT Census_data, doxie, doxie_crs, iesp, suppress, utilfile, ut; 
 
 EXPORT Util_records (DATASET(doxie.layout_references) ds_dids_in,
                      STRING6 ssn_mask_value, 
@@ -115,100 +115,29 @@ EXPORT Util_records (DATASET(doxie.layout_references) ds_dids_in,
     //--------------------------------------------------------------------------------------------------------
     SELF.address_recs                    := PROJECT(L, set_Address(L, county_name));
 
-    //--------------------------------------------------------------------------------------------------------
-    // Get a flattened verion of the service address information to dedup later on.
-    //--------------------------------------------------------------------------------------------------------
-    SELF.service_addr_type       := IF (is_Service_Address, L.addr_type, '');
-    SELF.service_prim_range      := IF (is_Service_Address, L.prim_range, '');
-    SELF.service_predir          := IF (is_Service_Address, L.predir, '');
-    SELF.service_prim_name       := IF (is_Service_Address, L.prim_name, '');
-    SELF.service_addr_suffix     := IF (is_Service_Address, L.addr_suffix, '');
-    SELF.service_postdir         := IF (is_Service_Address, L.postdir, '');
-    SELF.service_unit_desig      := IF (is_Service_Address, L.unit_desig, '');
-    SELF.service_sec_range       := IF (is_Service_Address, L.sec_range, '');
-    SELF.service_city            := IF (is_Service_Address, L.p_city_name, '');
-    SELF.service_state           := IF (is_Service_Address, L.st, '');
-    SELF.service_zip             := IF (is_Service_Address, L.zip, '');
-    SELF.service_zip4            := IF (is_Service_Address, L.zip4, '');
-    SELF.service_county_name     := IF (is_Service_Address, county_name, '');
-
-    //--------------------------------------------------------------------------------------------------------
-    // Get a flattened verion of the billing address information to dedup later on.
-    //--------------------------------------------------------------------------------------------------------
-    SELF.billing_addr_type       := IF (is_Billing_Address, L.addr_type, '');
-    SELF.billing_prim_range      := IF (is_Billing_Address, L.prim_range, '');
-    SELF.billing_predir          := IF (is_Billing_Address, L.predir, '');
-    SELF.billing_prim_name       := IF (is_Billing_Address, L.prim_name, '');
-    SELF.billing_addr_suffix     := IF (is_Billing_Address, L.addr_suffix, '');
-    SELF.billing_postdir         := IF (is_Billing_Address, L.postdir, '');
-    SELF.billing_unit_desig      := IF (is_Billing_Address, L.unit_desig, '');
-    SELF.billing_sec_range       := IF (is_Billing_Address, L.sec_range, '');
-    SELF.billing_city            := IF (is_Billing_Address, L.p_city_name, '');
-    SELF.billing_state           := IF (is_Billing_Address, L.st, '');
-    SELF.billing_zip             := IF (is_Billing_Address, L.zip, '');
-    SELF.billing_zip4            := IF (is_Billing_Address, L.zip4, '');
-    SELF.billing_county_name     := IF (is_Billing_Address, county_name, '');
-
     SELF := L;
     SELF := []; // to null out any unassigned fields
-
   END;
 
   crs_utils := PROJECT(utils_by_did, transform_Address_Type(LEFT));
 
-  sorted_crs_utils := SORT(crs_utils, exchange_serial_number, -record_date);
+  sorted_crs_utils := SORT(crs_utils, exchange_serial_number, util_type, IF(is_service_addr_set, 0, 1), IF(is_billing_addr_set, 0, 1), -record_date);
 
   //----------------------------------------------------------------------------------------------------------
   // Combine matching Billing and Service records - This is the case for when there is a matching billing 
   // B record and a corresponding service S record.
   //----------------------------------------------------------------------------------------------------------
-  util_crs_layout combine_Billing_and_Service_Utils (util_crs_layout L, util_crs_layout R) := TRANSFORM
+  sorted_crs_utils_grp := GROUP(sorted_crs_utils, exchange_serial_number, util_type);
 
-    SELF.is_service_addr_set := L.is_service_addr_set OR R.is_service_addr_set;
-    SELF.is_billing_addr_set := L.is_billing_addr_set OR R.is_billing_addr_set;
+  util_crs_layout_return combine_Billing_and_Service_Utils (util_crs_layout L, DATASET(util_crs_layout) R) := TRANSFORM
 
     //--------------------------------------------------------------------------------------------------------
-    // Combine the addresses subsets together to create the full complliment of botht the Billing and the 
+    // Combine the addresses subsets together to create the full complliment of both the Billing and the 
     // Service addresses in this one record.
     //--------------------------------------------------------------------------------------------------------
-    SELF.address_recs                    := L.address_recs + R.address_recs;
-    
-    //--------------------------------------------------------------------------------------------------------
-    // Propagate the flattened service address values over for deduping later on.
-    //--------------------------------------------------------------------------------------------------------
-    SELF.service_addr_type       := IF (L.is_service_addr_set, L.service_addr_type, IF (R.is_service_addr_set, R.service_addr_type, ''));
-    SELF.service_prim_range      := IF (L.is_service_addr_set, L.service_prim_range, IF (R.is_service_addr_set, R.service_prim_range, ''));
-    SELF.service_predir          := IF (L.is_service_addr_set, L.service_predir, IF (R.is_service_addr_set, R.service_predir, ''));
-    SELF.service_prim_name       := IF (L.is_service_addr_set, L.service_prim_name, IF (R.is_service_addr_set, R.service_prim_name, ''));
-    SELF.service_addr_suffix     := IF (L.is_service_addr_set, L.service_addr_suffix, IF (R.is_service_addr_set, R.service_addr_suffix, ''));
-    SELF.service_postdir         := IF (L.is_service_addr_set, L.service_postdir, IF (R.is_service_addr_set, R.service_postdir, ''));
-    SELF.service_unit_desig      := IF (L.is_service_addr_set, L.service_unit_desig, IF (R.is_service_addr_set, R.service_unit_desig, ''));
-    SELF.service_sec_range       := IF (L.is_service_addr_set, L.service_sec_range, IF (R.is_service_addr_set, R.service_sec_range, ''));
-    SELF.service_city            := IF (L.is_service_addr_set, L.service_city, IF (R.is_service_addr_set, R.service_city, ''));
-    SELF.service_state           := IF (L.is_service_addr_set, L.service_state, IF (R.is_service_addr_set, R.service_state, ''));
-    SELF.service_zip             := IF (L.is_service_addr_set, L.service_zip, IF (R.is_service_addr_set, R.service_zip, ''));
-    SELF.service_zip4            := IF (L.is_service_addr_set, L.service_zip4, IF (R.is_service_addr_set, R.service_zip4, ''));
-    SELF.service_county_name     := IF (L.is_service_addr_set, L.service_county_name, IF (R.is_service_addr_set, R.service_county_name, ''));
-
-    //--------------------------------------------------------------------------------------------------------
-    // Propagate the flattened billing address values over for deduping later on.
-    //--------------------------------------------------------------------------------------------------------
-    SELF.billing_addr_type       := IF (L.is_billing_addr_set, L.billing_addr_type, IF (R.is_billing_addr_set, R.billing_addr_type, ''));
-    SELF.billing_prim_range      := IF (L.is_billing_addr_set, L.billing_prim_range, IF (R.is_billing_addr_set, R.billing_prim_range, ''));
-    SELF.billing_predir          := IF (L.is_billing_addr_set, L.billing_predir, IF (R.is_billing_addr_set, R.billing_predir, ''));
-    SELF.billing_prim_name       := IF (L.is_billing_addr_set, L.billing_prim_name, IF (R.is_billing_addr_set, R.billing_prim_name, ''));
-    SELF.billing_addr_suffix     := IF (L.is_billing_addr_set, L.billing_addr_suffix, IF (R.is_billing_addr_set, R.billing_addr_suffix, ''));
-    SELF.billing_postdir         := IF (L.is_billing_addr_set, L.billing_postdir, IF (R.is_billing_addr_set, R.billing_postdir, ''));
-    SELF.billing_unit_desig      := IF (L.is_billing_addr_set, L.billing_unit_desig, IF (R.is_billing_addr_set, R.billing_unit_desig, ''));
-    SELF.billing_sec_range       := IF (L.is_billing_addr_set, L.billing_sec_range, IF (R.is_billing_addr_set, R.billing_sec_range, ''));
-    SELF.billing_city            := IF (L.is_billing_addr_set, L.billing_city, IF (R.is_billing_addr_set, R.billing_city, ''));
-    SELF.billing_state           := IF (L.is_billing_addr_set, L.billing_state, IF (R.is_billing_addr_set, R.billing_state, ''));
-    SELF.billing_zip             := IF (L.is_billing_addr_set, L.billing_zip, IF (R.is_billing_addr_set, R.billing_zip, ''));
-    SELF.billing_zip4            := IF (L.is_billing_addr_set, L.billing_zip4, IF (R.is_billing_addr_set, R.billing_zip4, ''));
-    SELF.billing_county_name     := IF (L.is_billing_addr_set, L.billing_county_name, IF (R.is_billing_addr_set, R.billing_county_name, ''));
-
-    SELF.debug := 'BILLING/SERVICE ROLLUP Match';
-    
+    SELF.address_recs                    := CHOOSEN(DEDUP(SORT(R.address_recs, addr_type, prim_name, prim_range, addr_suffix, sec_range, city, state, zip),
+                                                    addr_type, prim_name, prim_range, addr_suffix, sec_range, city, state, zip),
+                                                    iesp.Constants.BR.MaxUtilAddresses);
     SELF := L;
 
   END;
@@ -217,56 +146,16 @@ EXPORT Util_records (DATASET(doxie.layout_references) ds_dids_in,
   // Combine Billing with Service entries, based on the exchange serial nummber and ID (The ID indentifies 
   // the data LexisNexis processing job). 
   //----------------------------------------------------------------------------------------------------------
-  combined_crs_utils := ROLLUP(sorted_crs_utils, 
-                               LEFT.exchange_serial_number = RIGHT.exchange_serial_number AND 
-                               LEFT.id = RIGHT.id,
-                               combine_Billing_and_Service_Utils(LEFT, RIGHT));
+  combined_crs_utils := ROLLUP(sorted_crs_utils_grp, 
+                               GROUP,
+                               combine_Billing_and_Service_Utils(LEFT, ROWS(LEFT)));
 
-  //----------------------------------------------------------------------------------------------------------
-  // Compare the flattened address data for both service and billing addresses to identify equivalent 
-  // addresses.
-  //----------------------------------------------------------------------------------------------------------
-  are_Addresses_Equal(util_crs_layout L, util_crs_layout R) := 
-      L.service_prim_range = R.service_prim_range AND
-      L.service_predir = R.service_predir AND
-      L.service_prim_name = R.service_prim_name AND
-      L.service_addr_suffix = R.service_addr_suffix AND
-      L.service_postdir = R.service_postdir AND
-      L.service_unit_desig = R.service_unit_desig AND
-      L.service_sec_range = R.service_sec_range AND
-      L.service_city = R.service_city AND
-      L.service_state = R.service_state AND
-      L.service_zip = R.service_zip AND
-      L.service_zip4 = R.service_zip4 AND
-      L.service_county_name = R.service_county_name AND
-      L.billing_prim_range = R.billing_prim_range AND
-      L.billing_predir = R.billing_predir AND
-      L.billing_prim_name = R.billing_prim_name AND
-      L.billing_addr_suffix = R.billing_addr_suffix AND
-      L.billing_postdir = R.billing_postdir AND
-      L.billing_unit_desig = R.billing_unit_desig AND
-      L.billing_sec_range = R.billing_sec_range AND
-      L.billing_city = R.billing_city AND
-      L.billing_state = R.billing_state AND
-      L.billing_zip = R.billing_zip AND
-      L.billing_zip4 = R.billing_zip4 AND
-      L.billing_county_name = R.billing_county_name;
-  
-  //----------------------------------------------------------------------------------------------------------
-  // Dedup on exchange_serial_number AND addresses to remove duplicates (A product of the same record from 
-  // the same source imported at a different time). 
-  //----------------------------------------------------------------------------------------------------------
-  crs_util_dedup := DEDUP(combined_crs_Utils, 
-                          LEFT.exchange_serial_number = RIGHT.exchange_serial_number AND 
-                          are_Addresses_Equal(LEFT, RIGHT)
-                          );
-
-  crs_util_sorted := SORT(crs_util_dedup, -record_date);
+  crs_util_sorted := SORT(combined_crs_utils, -record_date);
   
   //----------------------------------------------------------------------------------------------------------
   // Project the resultant data into a layout to be used by the caller.
   //----------------------------------------------------------------------------------------------------------
-  util_crs_layout_return util_crs_slim_and_mask(util_crs_layout L) := TRANSFORM
+  util_crs_layout_return util_crs_slim_and_mask(util_crs_layout_return L) := TRANSFORM
   
     SELF.ssn                := Suppress.ssn_mask(L.ssn, ssn_mask_value);
     SELF.drivers_license    := IF (dl_mask_value, Suppress.dl_mask(L.drivers_license), L.drivers_license);
@@ -294,8 +183,7 @@ EXPORT Util_records (DATASET(doxie.layout_references) ds_dids_in,
   // OUTPUT (utils_by_did, NAMED('utils_by_did'));
   // OUTPUT (crs_utils, NAMED('crs_utils')); 
   // OUTPUT (sorted_crs_utils, NAMED('sorted_crs_utils')); 
-  // OUTPUT (combined_crs_utils, NAMED('combined_crs_utils')); 
-  // OUTPUT (crs_util_dedup, NAMED('crs_util_dedup')); 
+  // OUTPUT (combined_crs_utils, NAMED('combined_crs_utils'));
   // OUTPUT (crs_util_sorted, NAMED('crs_util_sorted')); 
   // OUTPUT (return_Data, NAMED('return_Data'));
 
