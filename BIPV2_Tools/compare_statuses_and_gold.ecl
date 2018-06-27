@@ -1,4 +1,4 @@
-/*
+﻿/*
   examples on production: 
     http://prod_esp:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20171115-162531#/stub/Summary
   uptick in actives for data card.  lets do this for seleid
@@ -33,8 +33,17 @@ functionmacro
 ds_base   := pDs_Base      ;
 ds_father := pDs_Father ;
 
-ds_base_slim   := table(ds_base   ,{seleid,string source := mdr.sourceTools.translatesource(source),dt_last_seen,company_status_derived,seleid_status_public},seleid,source,dt_last_seen,company_status_derived,seleid_status_public,merge  );
-ds_father_slim := table(ds_father ,{seleid,string source := mdr.sourceTools.translatesource(source),dt_last_seen,company_status_derived,seleid_status_public},seleid,source,dt_last_seen,company_status_derived,seleid_status_public,merge  );
+ds_base_slim_prep   := table(ds_base   ,{seleid,string source := mdr.sourceTools.translatesource(source),dt_last_seen,company_status_derived,seleid_status_public},seleid,source,dt_last_seen,company_status_derived,seleid_status_public,merge  );
+ds_father_slim_prep := table(ds_father ,{seleid,string source := mdr.sourceTools.translatesource(source),dt_last_seen,company_status_derived,seleid_status_public},seleid,source,dt_last_seen,company_status_derived,seleid_status_public,merge  );
+
+ds_base_slim_prep2   := table(ds_base_slim_prep   ,{seleid,source} ,seleid,source ,merge);
+ds_father_slim_prep2 := table(ds_father_slim_prep ,{seleid,source} ,seleid,source ,merge);
+
+ds_base_slim_prep3   := table(ds_base_slim_prep2   ,{seleid,unsigned cnt := count(group)} ,seleid ,merge);
+ds_father_slim_prep3 := table(ds_father_slim_prep2 ,{seleid,unsigned cnt := count(group)} ,seleid ,merge);
+
+ds_base_slim   := join(ds_base_slim_prep    ,ds_base_slim_prep3  (cnt = 1) ,left.seleid = right.seleid ,transform(left) ,hash);
+ds_father_slim := join(ds_father_slim_prep  ,ds_father_slim_prep3(cnt = 1) ,left.seleid = right.seleid ,transform(left) ,hash);
 
 ds_sample_base          := ds_base_slim : persist('~persist::lbentley::ds_sample_base');
 // ds_set_statuses_base := BIPV2_Tools.mac_Set_Statuses(ds_sample_base  ,seleid,seleid_status_public,false,87324387,true,,true);
