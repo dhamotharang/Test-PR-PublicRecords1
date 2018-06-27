@@ -13,15 +13,18 @@ EXPORT Files := MODULE
 
 	// *** General common definitions needed below ********************************************************
 	EXPORT Add_Foreign_prod		:= PRTE2_Common.Constants.Add_Foreign_prod;
-	EXPORT MasterSprayPrefix	:= PRTE2_Common.Cross_Module_Files.MASTER_SPRAY_PREFIX;
-	EXPORT MasterBasePrefix		:= PRTE2_Common.Cross_Module_Files.MASTER_BASE_PREFIX;
-	EXPORT MasterALPBasePrefix := PRTE2_Common.Cross_Module_Files.MASTER_ALPBASE_PREFIX;
+	EXPORT MasterSprayPrefix	:= PRTE2_Common.Cross_Module_Files.MASTER_SPRAY_PREFIX; //prct::Spray::ct
+	EXPORT MasterBasePrefix		:= PRTE2_Common.Cross_Module_Files.MASTER_BASE_PREFIX; //prct::BASE::ct
+	EXPORT MasterALPBasePrefix := PRTE2_Common.Cross_Module_Files.MASTER_ALPBASE_PREFIX; //prct::BASE::ct_alp
 	EXPORT Gong_Suffix 				:= '::gong::Alpha_Base';
 	// ****************************************************************************************************
 
 	// *** SPRAY FILE (TEMP) ******************************************************************************
 	EXPORT FILE_SPRAY					:= MasterSprayPrefix + Gong_Suffix + '_' + ThorLib.Wuid();
 	EXPORT SPRAYED_DS					:= DATASET(FILE_SPRAY, Layouts.Alpha_CSV_Layout,
+	                                   CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+	// Oddball spray if the CSV is in Boca layout - use the same name since it is just a temp file.																		 
+	EXPORT SPRAYED_DS_BOCALAY	:= DATASET(FILE_SPRAY, Layouts.Boca_Base_Layout,
 	                                   CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
 	// ****************************************************************************************************
 
