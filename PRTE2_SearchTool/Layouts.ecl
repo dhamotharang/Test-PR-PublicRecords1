@@ -1,4 +1,4 @@
-EXPORT Layouts := Module
+﻿EXPORT Layouts := Module
 
 EXPORT business_bdid_layout := record
 	unsigned6 BDID:=0;
@@ -48,6 +48,12 @@ EXPORT	Layout_People 	:= Record
 		Integer Addresses_cnt := 0;
 		Integer SSN_Cnt := 0;
 		Integer Third_Degree_Relatives_cnt := 0;
+		Integer MARI_License_cnt := 0;
+		Integer Public_Sanctn_cnt := 0;
+		Integer NonPublic_Sanctn_cnt := 0;
+		Integer FreddieMac_Sanctn_cnt := 0;
+		// Integer	DocImages_cnt := 0;
+		// Integer SexOffenderImages_cnt := 0;
 	End;
 
 	
@@ -80,7 +86,12 @@ EXPORT	Layout_People 	:= Record
 		Integer Registered_Agent_cnt := 0;
 		Integer UCC_cnt := 0;
 		Integer Watercraft_cnt := 0;
+		Integer	MARI_License_cnt := 0;
+		Integer Public_Sanctn_cnt := 0;
+		Integer NonPublic_Sanctn_cnt := 0;
+		Integer FreddieMac_Sanctn_cnt := 0;
 	End;
+	
 	EXPORT bdid_pl_layout := RECORD
 		unsigned6 bdid;
 		string2 source;
@@ -113,12 +124,14 @@ EXPORT	Layout_People 	:= Record
 		string2 vendor_st;
 		unsigned8 __internal_fpos__;
 	END;
+	
 	EXPORT layout_address := record
 		qstring10 prim_range;
 		qstring28 prim_name;
 		qstring8 sec_range;
 		string5 zip;
 	end;
+	
 	EXPORT layout_child_address := record
 	  qstring120 company_name;
 		qstring10 prim_range;
@@ -135,6 +148,7 @@ EXPORT	Layout_People 	:= Record
 		unsigned6 phone;
 		unsigned4 fein;
 	end;
+	
 	EXPORT layout_child_bdid_address := record
 		unsigned6 BDID;
 		layout_child_address;
@@ -160,6 +174,7 @@ EXPORT	Layout_People 	:= Record
 		dataset(slim_child_bdid_address,ChooseN(50)) Businesses_bdid := dataset([],slim_child_bdid_address) ;
 		dataset(slim_child_seleid_address,ChooseN(50)) Businesses_seleid := dataset([],slim_child_seleid_address) ;
 	end;
+	
 	EXPORT layout_contacts_bdid := RECORD
   unsigned6 bdid;
   unsigned6 did;
@@ -291,6 +306,7 @@ Export person_header_fcra := RECORD
   string1 death_code;
   unsigned4 lookup_did;
  END;
+ 
 export person_header := record
 	unsigned6 did;
 	qstring9 ssn;
@@ -313,6 +329,7 @@ export person_header := record
   qstring4 zip4;
 	string1 valid_ssn:='';
 end;
+
 export gwl_layout := RECORD
   unsigned6 did;
   string10 pty_key;
@@ -397,6 +414,7 @@ export gwl_layout := RECORD
   string4 err_stat;
   unsigned8 __fpos;
  END;
+ 
  Export bipv2_header_layout := RECORD
   unsigned6 ultid;
   unsigned6 orgid;
@@ -756,6 +774,7 @@ Export bip_contact_linkid := RECORD
   integer8 executive_ind_order;
   integer1 fp;
  END;
+ 
  Export contacts_bdid_layout := RECORD
   unsigned6 bdid;
   unsigned6 did;
@@ -839,6 +858,7 @@ Export bip_contact_linkid := RECORD
 		boolean rel_group;
 		unsigned8 __internal_fpos__;
 	END;
+	
 	Export bipv2_industry_linkids := RECORD
   unsigned6 ultid;
   unsigned6 orgid;
