@@ -70,6 +70,10 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.cnp_btype_isnull OR ri.cnp_btype_isnull => 0,
                         le.cnp_btype = ri.cnp_btype  => le.cnp_btype_weight100,
                         SALT37.Fn_Fail_Scale(le.cnp_btype_weight100,s.cnp_btype_switch));
+  INTEGER2 company_name_type_derived_score_temp := MAP(
+                        le.company_name_type_derived_isnull OR ri.company_name_type_derived_isnull => 0,
+                        le.company_name_type_derived = ri.company_name_type_derived  => le.company_name_type_derived_weight100,
+                        SALT37.Fn_Fail_Scale(le.company_name_type_derived_weight100,s.company_name_type_derived_switch));
   REAL company_address_score_scale := ( le.company_address_weight100 + ri.company_address_weight100 ) / (le.company_addr1_weight100 + ri.company_addr1_weight100 + le.company_csz_weight100 + ri.company_csz_weight100); // Scaling factor for this concept
   INTEGER2 company_address_score_pre := MAP( (le.company_address_isnull OR (le.company_addr1_isnull OR le.prim_range_derived_isnull AND le.prim_name_derived_isnull AND le.sec_range_isnull) AND (le.company_csz_isnull OR le.v_city_name_isnull AND le.st_isnull AND le.zip_isnull)) OR (ri.company_address_isnull OR (ri.company_addr1_isnull OR ri.prim_range_derived_isnull AND ri.prim_name_derived_isnull AND ri.sec_range_isnull) AND (ri.company_csz_isnull OR ri.v_city_name_isnull AND ri.st_isnull AND ri.zip_isnull)) OR le.company_address_weight100 = 0 => 0,
                         le.company_address = ri.company_address  => le.company_address_weight100,
@@ -88,12 +92,12 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
     or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)
     or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_score_temp < Config.cnp_name_Force * 100 and cnp_name_support0 > 0 /*and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  
     => cnp_name_score_supp
-    ,active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100 and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)
-    => active_domestic_corp_key_score
-    ,active_duns_number_score > Config.active_duns_number_Force      *100 and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)
-    => active_duns_number_score
-    ,company_fein_score > Config.company_fein_Force            *100 and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)
-    => company_fein_score
+    ,active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) )
+    => 0
+    ,active_duns_number_score > Config.active_duns_number_Force      *100  and ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) )
+    => 0
+    ,company_fein_score > Config.company_fein_Force            *100  and ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) )  and (le.SALT_Partition = '' and ri.SALT_Partition = '')/*no partitioned sources allowed*/
+    => 0
     , SKIP ); // Enforce FORCE parameter
   REAL company_csz_score_scale := ( le.company_csz_weight100 + ri.company_csz_weight100 ) / (le.v_city_name_weight100 + ri.v_city_name_weight100 + le.st_weight100 + ri.st_weight100 + le.zip_weight100 + ri.zip_weight100); // Scaling factor for this concept
   INTEGER2 company_csz_score_pre := MAP( (le.company_csz_isnull OR le.v_city_name_isnull AND le.st_isnull AND le.zip_isnull) OR (ri.company_csz_isnull OR ri.v_city_name_isnull AND ri.st_isnull AND ri.zip_isnull) OR le.company_csz_weight100 = 0 => 0,
@@ -116,6 +120,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.st_isnull OR ri.st_isnull OR le.st <> ri.st  => 0, // Only valid if the context variable is equal
                         le.v_city_name = ri.v_city_name  => le.v_city_name_weight100,
                         SALT37.Fn_Fail_Scale(le.v_city_name_weight100,s.v_city_name_switch))*IF(company_csz_score_scale=0,1,company_csz_score_scale)*IF(company_address_score_scale=0,1,company_address_score_scale);
+  INTEGER2 company_name_type_derived_score := company_name_type_derived_score_temp*0.00; 
   INTEGER2 st_score_temp := MAP(
                         le.st_isnull OR ri.st_isnull OR le.st_weight100 = 0 => 0,
                         company_csz_score_pre > 0 OR company_address_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
@@ -161,10 +166,11 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 active_domestic_corp_key_score_prop := MAX(le.active_domestic_corp_key_prop,ri.active_domestic_corp_key_prop)*active_domestic_corp_key_score; // Score if either field propogated
   INTEGER2 company_addr1_score_prop := IF(le.company_addr1_prop+ri.company_addr1_prop>0,company_addr1_score*(0+IF(le.prim_range_derived_prop+ri.prim_range_derived_prop>0,s.prim_range_derived_specificity,0)+IF(le.sec_range_prop+ri.sec_range_prop>0,s.sec_range_specificity,0))/( s.prim_range_derived_specificity+ s.sec_range_specificity),0);
   INTEGER2 sec_range_score_prop := MAX(le.sec_range_prop,ri.sec_range_prop)*sec_range_score; // Score if either field propogated
+  INTEGER2 company_name_type_derived_score_prop := MAX(le.company_name_type_derived_prop,ri.company_name_type_derived_prop)*company_name_type_derived_score; // Score if either field propogated
   INTEGER2 company_address_score_prop := IF(le.company_address_prop+ri.company_address_prop>0,company_address_score*(0+IF(le.company_addr1_prop+ri.company_addr1_prop>0,s.company_addr1_specificity,0))/( s.company_addr1_specificity),0);
-  SELF.Conf_Prop := (0 + cnp_number_score_prop + prim_range_derived_score_prop + hist_duns_number_score_prop + ebr_file_number_score_prop + active_duns_number_score_prop + hist_enterprise_number_score_prop + hist_domestic_corp_key_score_prop + foreign_corp_key_score_prop + unk_corp_key_score_prop + company_fein_score_prop + company_phone_score_prop + active_enterprise_number_score_prop + active_domestic_corp_key_score_prop + company_addr1_score_prop + sec_range_score_prop + company_address_score_prop) / 100; // Score based on propogated fields
+  SELF.Conf_Prop := (0 + cnp_number_score_prop + prim_range_derived_score_prop + hist_duns_number_score_prop + ebr_file_number_score_prop + active_duns_number_score_prop + hist_enterprise_number_score_prop + hist_domestic_corp_key_score_prop + foreign_corp_key_score_prop + unk_corp_key_score_prop + company_fein_score_prop + company_phone_score_prop + active_enterprise_number_score_prop + active_domestic_corp_key_score_prop + company_addr1_score_prop + sec_range_score_prop + company_name_type_derived_score_prop + company_address_score_prop) / 100; // Score based on propogated fields
   import ut;
-iComp1 := (cnp_number_score + hist_duns_number_score + ebr_file_number_score + active_duns_number_score + hist_enterprise_number_score + hist_domestic_corp_key_score + foreign_corp_key_score + unk_corp_key_score + company_fein_score + company_phone_score + active_enterprise_number_score + active_domestic_corp_key_score + cnp_name_score + cnp_btype_score + IF(company_address_score>0,MAX(company_address_score,IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score)),IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score))) / 100 + outside;
+iComp1 := (cnp_number_score + hist_duns_number_score + ebr_file_number_score + active_duns_number_score + hist_enterprise_number_score + hist_domestic_corp_key_score + foreign_corp_key_score + unk_corp_key_score + company_fein_score + company_phone_score + active_enterprise_number_score + active_domestic_corp_key_score + cnp_name_score + cnp_btype_score + company_name_type_derived_score + IF(company_address_score>0,MAX(company_address_score,IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score)),IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score))) / 100 + outside;
 iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 
               ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> MatchThreshold
               ,le.cnp_name = ri.cnp_name and  le.prim_range_derived = ri.prim_range_derived and le.prim_name_derived = ri.prim_name_derived and ut.nneq(le.v_city_name,ri.v_city_name) and le.st = ri.st and le.zip = ri.zip and ut.nneq(le.active_duns_number,ri.active_duns_number)=> MatchThreshold
