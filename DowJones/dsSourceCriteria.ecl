@@ -1626,5 +1626,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/827 Iran List','1612'},
 {'EC 2018/855 ISIL (Da\'esh) and Al-Qaida List','1613'},
 {'NYSE American Disciplinary Actions','1614'},
-{'OFAC - Foreign Terrorist Organization List','1615'}
+{'OFAC - Foreign Terrorist Organization List','1615'},
+{'EC (CFSP) 2018/872 Lybia List','1616'},
+{'EC 2018/870 Lybia List','1617'}
 ],r);

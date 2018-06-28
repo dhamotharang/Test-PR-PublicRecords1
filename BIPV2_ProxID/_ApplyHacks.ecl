@@ -31,12 +31,12 @@ function
     + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)\n' 
     + '    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_score_temp < Config.cnp_name_Force * 100 and cnp_name_support0 > 0 /*and regexfind(\'fbn|dba|fictitious|assumed|trade\',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  \n'  
     + '    => cnp_name_score_supp\n'
-    + '    ,' + activedomesticcorpkey + ' > Config.active_domestic_corp_key_Force*100 and regexfind(\'fbn|dba|fictitious|assumed|trade\',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)\n'
-    + '    => ' + activedomesticcorpkey + '\n'
-    + '    ,' + activedunsnumber      + ' > Config.active_duns_number_Force      *100 and regexfind(\'fbn|dba|fictitious|assumed|trade\',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)\n'
-    + '    => ' + activedunsnumber + '\n'
-    + '    ,' + companyfein           + ' > Config.company_fein_Force            *100 and regexfind(\'fbn|dba|fictitious|assumed|trade\',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)\n'
-    + '    => ' + companyfein      + '\n'
+    + '    ,' + activedomesticcorpkey + ' > Config.active_domestic_corp_key_Force*100  and ~(regexfind(\'legal\',le.company_name_type_derived,nocase) and regexfind(\'legal\',ri.company_name_type_derived,nocase) )\n'
+    + '    => ' + '0' + '\n'
+    + '    ,' + activedunsnumber      + ' > Config.active_duns_number_Force      *100  and ~(regexfind(\'legal\',le.company_name_type_derived,nocase) and regexfind(\'legal\',ri.company_name_type_derived,nocase) )\n'
+    + '    => ' + '0' + '\n'
+    + '    ,' + companyfein           + ' > Config.company_fein_Force            *100  and ~(regexfind(\'legal\',le.company_name_type_derived,nocase) and regexfind(\'legal\',ri.company_name_type_derived,nocase) )  and (le.SALT_Partition = \'\' and ri.SALT_Partition = \'\')/*no partitioned sources allowed*/\n'
+    + '    => ' + '0'      + '\n'
     // + '    ,' + histdunsnumber        + ' > Config.hist_duns_number_Force        *100 and regexfind(\'fbn|dba|fictitious|assumed|trade\',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)\n'
     // + '    => ' + histdunsnumber + '\n'
     + '    , ' + SkipOr9999 + ' );'
@@ -132,6 +132,31 @@ function
       + '\n'
       + 'EXPORT Layout_RolledEntity'
      ,'hack attribute file scores'}
+    ,{pModule,'Debug'
+      ,'TYPEOF[(]h[.]cnp_number[)] left_cnp_number;'  
+      ,'INTEGER2 salt_partition_score'  
+      , '  string2 left_salt_partition;\n'
+      + '  string2 right_salt_partition;\n'
+      + '  INTEGER2 salt_partition_score;\n'
+      + '  TYPEOF(h.cnp_number) left_cnp_number;'
+      ,'add partition fields for compareservice'
+    }
+    ,{pModule,'Debug'
+      ,'SELF[.]left_cnp_number := le[.]cnp_number;'  
+      ,'SELF[.]left_salt_partition'  
+      , '  SELF.left_salt_partition  := le.salt_partition;\n'
+      + '  SELF.right_salt_partition := ri.salt_partition;\n'
+      + '  SELF.salt_partition_score := if(le.SALT_Partition = ri.SALT_Partition OR le.SALT_Partition=\'\' OR ri.SALT_Partition = \'\'  ,0,-9999);/*HACK*/\n'
+      + '  SELF.left_cnp_number := le.cnp_number;'
+      ,'set partition fields in match sample join'
+    }
+    ,{pModule,'Debug'
+      ,'[(]SELF[.]cnp_number_score [+] '  
+      ,'self[.]salt_partition_score [+] '  
+      , '(self.salt_partition_score + SELF.cnp_number_score + '
+      ,'add partition score to final conf score of match(iComp1)'
+    }
+
   ],Tools.layout_attribute_hacks2)
   ;
   
@@ -203,7 +228,7 @@ function
     + 'prop_file := project(match_candidates(ih).candidates,BIPV2_ProxID._Old_layouts.mc); // Use propogated file\n'
     + 'EXPORT Candidates         := INDEX(prop_file,{Proxid},{prop_file},keynames(liter,pUseOtherEnvironment).match_candidates_debug.logical);\n'
     + 'ms_temp := project(sort(mtch,Conf,Proxid1,Proxid2,SKEW(1.0))  ,BIPV2_ProxID._Old_layouts.ms); // Some headers have very skewed IDs\n'
-    + 'EXPORT MatchSample        := INDEX(ms_temp,{Conf,Proxid1,Proxid2},{mtch},keynames(liter,pUseOtherEnvironment).match_sample_debug.logical,SORT KEYED);\n'
+    + 'EXPORT MatchSample        := INDEX(ms_temp,{Conf,Proxid1,Proxid2},{ms_temp},keynames(liter,pUseOtherEnvironment).match_sample_debug.logical,SORT KEYED);\n'
 
     + 's_prep := project(s  ,transform(BIPV2_ProxID._Old_layouts.specs,//self._unnamed_1 := left._unnamed_1;\n'
     + 'self.active_duns_number_max         := left.active_duns_number_maximum      ;\n'
