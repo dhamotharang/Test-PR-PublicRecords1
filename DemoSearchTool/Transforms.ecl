@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
+﻿IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
 
 EXPORT Transforms := 
   MODULE
@@ -105,8 +105,27 @@ EXPORT Transforms :=
         IF(searchBy.BusinessDataset.WatercraftsCount = '',
            DemoSearchTool.Constants.DEFAULT_INTEGER,
            (INTEGER2)searchBy.BusinessDataset.WatercraftsCount);
-
-      SELF.Per_AddressesCount := 
+//Adding new datasets
+// /*
+       SELF.Biz_MARILicensesCount := 
+        IF(searchBy.BusinessDataset.MARILicensesCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.BusinessDataset.MARILicensesCount);
+					 SELF.Biz_PublicSanctnsCount := 
+        IF(searchBy.BusinessDataset.PublicSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.BusinessDataset.PublicSanctnsCount);
+					 SELF.Biz_NonPublicSanctnsCount := 
+        IF(searchBy.BusinessDataset.NonPublicSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.BusinessDataset.NonPublicSanctnsCount);
+					 SELF.Biz_FreddieMacSanctnsCount := 
+        IF(searchBy.BusinessDataset.FreddieMacSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.BusinessDataset.FreddieMacSanctnsCount);
+	// */		
+			
+			SELF.Per_AddressesCount := 
         IF(searchBy.PersonDataset.AddressesCount = '',
            DemoSearchTool.Constants.DEFAULT_INTEGER,
            (INTEGER2)searchBy.PersonDataset.AddressesCount);
@@ -239,8 +258,27 @@ EXPORT Transforms :=
         IF(searchBy.PersonDataset.WatercraftsCount = '',
            DemoSearchTool.Constants.DEFAULT_INTEGER,
            (INTEGER2)searchBy.PersonDataset.WatercraftsCount);
-      SELF.isFCRA := options.isFCRA;                           
-    END;
+   //Adding new datasets   
+	 // /*
+						SELF.Per_MARILicensesCount := 
+        IF(searchBy.PersonDataset.MARILicensesCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.PersonDataset.MARILicensesCount);
+						SELF.Per_PublicSanctnsCount := 
+        IF(searchBy.PersonDataset.PublicSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.PersonDataset.PublicSanctnsCount);	 
+						SELF.Per_NonPublicSanctnsCount := 
+        IF(searchBy.PersonDataset.NonPublicSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.PersonDataset.NonPublicSanctnsCount);
+					 SELF.Per_FreddieMacSanctnsCount := 
+        IF(searchBy.PersonDataset.FreddieMacSanctnsCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.PersonDataset.FreddieMacSanctnsCount);
+// */
+			SELF.isFCRA := options.isFCRA; 
+	   END;
     
     
     /* ****************************************************************

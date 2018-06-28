@@ -48,7 +48,10 @@ import std;
 	DistOld:=distribute(RemoveOld,hash(%CommaString%));
 	#end;
 #END;
-
+	Package:=PackageName;
+	Nickname:=InputKeyNickName;
+	Base:=VersionBase;
+	Father:=VersionFather;
 	#DECLARE(DatasetString);
 	#Set(DatasetString,'');
 	#APPEND(DatasetString,'outrec:=record\n');
@@ -88,11 +91,11 @@ import std;
 	
 	
 	#APPEND(DatasetString,'Results:=dataset([\n');
-	#APPEND(DatasetString,'{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
+	#APPEND(DatasetString,'{Package,Nickname,Base,Father,\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
 	#FOR(FieldList)
 		#FOR(field)
 			#IF(%'@name'% not in matchfields)
-				#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
+				#APPEND(DatasetString,',{Package,Nickname,Base,Father,\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
 			#end
 		#end
 	#end
