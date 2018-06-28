@@ -2008,6 +2008,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxCompanyInput := 5;
     export unsigned1 MaxCompanyResult := 5;
     export unsigned1 MaxDBAandOfficersResult := 10;
+    export unsigned1 MaxUtilAddresses := 2;
   end;
 
  	// NOTE: Various Max*** attributes in the AR module refer to the BR & DL modules, 

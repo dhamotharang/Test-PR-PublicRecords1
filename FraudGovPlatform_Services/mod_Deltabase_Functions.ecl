@@ -1,4 +1,4 @@
-﻿IMPORT Address, DID_Add, FraudGovPlatform_Services, FraudShared, FraudShared_Services, Gateway, iesp, mysql, STD, ut;
+﻿IMPORT Address, FraudGovPlatform_Services, FraudShared, FraudShared_Services, Gateway, iesp, lib_thorlib, mysql, STD, ut;
 
 EXPORT mod_Deltabase_Functions := MODULE
 
@@ -192,8 +192,12 @@ EXPORT mod_Deltabase_Functions := MODULE
 					WHERE gc_id = ? AND program_name=? AND date_added >= ?
 			ENDEMBED;
 			
+			yesterday := STD.Date.AdjustDate(STD.Date.Today(),0,0,-1);			
+			
 			//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
-			last_data_build_date := (INTEGER)(did_add.get_EnvVariable(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE) + '000000');
+			//Also added failsafe...if we can't get the environment variable, we default it to yesterday
+			last_data_build_date := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
+																											(STRING)yesterday) + '000000');
 			
 			db_records := deltadata(batch_params.GlobalCompanyId,batch_params.IndustryTypeName,last_data_build_date);
 			
