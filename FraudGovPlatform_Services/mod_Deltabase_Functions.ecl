@@ -41,7 +41,10 @@ EXPORT mod_Deltabase_Functions := MODULE
 			SELF.MailingAddress.State := L.mailing_state;
 			SELF.MailingAddress.Zip5 := L.mailing_zip;
 			SELF.MailingAddress.County := L.mailing_county;
-			SELF.Phones := DATASET([{'',L.phone,''}], iesp.fraudgovreport.t_FraudGovPhoneInfo);
+			SELF.Phones := IF(L.phone <> '',
+												ROW({FraudGovPlatform_Services.Constants.PHONE_TYPE.PHONE_TYPE_HOME, L.phone,''}, iesp.fraudgovreport.t_FraudGovPhoneInfo),
+												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+												);
 			SELF.EmailAddress := L.email_address;
 			SELF.DriversLicense.DriversLicenseNumber := L.dl_number;
 			SELF.DriversLicense.DriversLicenseState := L.dl_state;
