@@ -3,7 +3,8 @@
 
 EXPORT Transforms := MODULE
 	
-	SHARED Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
+	SHARED FraudGovConst := FraudGovPlatform_Services.Constants;
+	SHARED Fragment_Types_const := FraudGovConst.Fragment_Types;	
 
 	EXPORT iesp.fraudgovreport.t_FraudGovDeceased xform_deceased(DeathV2_Services.Layouts.BatchOut l) := TRANSFORM
 
@@ -130,140 +131,156 @@ EXPORT Transforms := MODULE
 													PROJECT(L.FRAUD_ALERT_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
 															SELF.hri_weight := 1,
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.IDENTITY_THEFT_ALERT;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.IDENTITY_THEFT_ALERT;
 															SELF := LEFT)),
 																																	
 													PROJECT(L.IDENTITY_THEFT_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
 															SELF.hri_weight := 1,
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.IDENTITY_THEFT;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.IDENTITY_THEFT;
 															SELF := LEFT)),
 																																															
 													PROJECT(l.CREDIT_FREEZE_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
 															SELF.hri_weight := 1,
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.CREDIT_FREEZE_ALERT;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.CREDIT_FREEZE_ALERT;
 															SELF := LEFT)),
 																																			
 													PROJECT(L.HIGH_RISK_ADDRESS_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_INVALID => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_POB => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_TRANSIENT => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_CORP_MILITARY => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_PRISON => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_CORP => 6, 
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_ARYMILIT => 7,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_POB => 8,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_INVALID => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_POB => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_TRANSIENT => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_CORP_MILITARY => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_PRISON => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_CORP => 6, 
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ZIP_IS_ARYMILIT => 7,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.High_Risk_Address.ADDRESS_IS_POB => 8,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.HIGH_RISK_ADDRESS;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.HIGH_RISK_ADDRESS;
 															SELF := LEFT)),
 																																							
 													PROJECT(L.SUSPICIOUS_SSN_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_DECEASED => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_INVALID => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_MISKEYED => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_RECENT => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_NOT_FOUND => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_WITHIN_3_YEARS => 6,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_AFTER_5 => 7,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_IS_ITIN => 8,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_SSN.MULTIPLE_SSNS => 9,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_DECEASED => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_INVALID => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_MISKEYED => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_RECENT => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_NOT_FOUND => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_WITHIN_3_YEARS => 6,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_AFTER_5 => 7,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.SSN_IS_ITIN => 8,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_SSN.MULTIPLE_SSNS => 9,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SUSPICIOUS_ADDRESS;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SUSPICIOUS_ADDRESS;
 															SELF := LEFT)),
 																																						
 													PROJECT(l.ADDRESS_DISCREPANCY_CODES, 
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.NAME_AND_SSN_VERIFIED => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_INVALID => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_UNVERIFIED => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISKEYED => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISMATCH => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_DISCREPANCY => 6, 
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISMATCH_SECONDARY_RANGE => 7,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Address_Discrepancy.ZIP_CODE_UNVERIFIED => 8,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.NAME_AND_SSN_VERIFIED => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_INVALID => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_UNVERIFIED => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISKEYED => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISMATCH => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_DISCREPANCY => 6, 
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ADDRESS_MISMATCH_SECONDARY_RANGE => 7,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Address_Discrepancy.ZIP_CODE_UNVERIFIED => 8,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.ADDRESS_DISCREPANCY;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.ADDRESS_DISCREPANCY;
 															SELF := LEFT)),
 																																													
 													PROJECT(L.SUSPICIOUS_DOCUMENTS_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.SSN_INVALID => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_INVALID => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.OTHER_DL_FOUND => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_NOT_FOUND => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_MISKEYED => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_UNVERIFIED => 6,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.SSN_INVALID => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_INVALID => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.OTHER_DL_FOUND => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_NOT_FOUND => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_MISKEYED => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Documents.DL_UNVERIFIED => 6,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SUSPICIOUS_DOCUMENTS;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SUSPICIOUS_DOCUMENTS;
 															SELF := LEFT)),		
 																																																							
 													PROJECT(L.SUSPICIOUS_ADDRESS_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.NAME_SSN_VERIFIED => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_INVALID => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_UNVERIFIED => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISKEYED => 4,
-																									   LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISMATCH => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_DISCREPANCY => 6,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISMATCH_SECONDARY_RANGE => 7,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Address.ZIP_CODE_UNVERIFIED => 8,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.NAME_SSN_VERIFIED => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_INVALID => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_UNVERIFIED => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISKEYED => 4,
+																									   LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISMATCH => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_DISCREPANCY => 6,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ADDRESS_MISMATCH_SECONDARY_RANGE => 7,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Address.ZIP_CODE_UNVERIFIED => 8,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SUSPICIOUS_ADDRESS;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SUSPICIOUS_ADDRESS;
 															SELF := LEFT)),
 													
 													PROJECT(L.SUSPICIOUS_DOB_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_DOB.SSN_PRIOR_TO_DECEASED => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_DOB.DOB_UNVERIFIED => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_DOB.DOB_MISKEYED => 3,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_DOB.SSN_PRIOR_TO_DECEASED => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_DOB.DOB_UNVERIFIED => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_DOB.DOB_MISKEYED => 3,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SUSPICIOUS_DOB;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SUSPICIOUS_DOB;
 															SELF := LEFT)),
 						
 													PROJECT(L.SUSPICIOUS_PHONE_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_DISCONNECTED => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_INVALID => 2,
-																									   LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_PAGER => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_MOBBILE => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_TRANSIENT => 5,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_ZIP_INVALID_COMBO => 6,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_UNVERIFIED => 7,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_MISKEYED => 8,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_ADDR_DISTANT => 9,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_NOT_FOUND => 10,
-																									   LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_DIFFERENT => 11,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_DISCONNECTED => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_INVALID => 2,
+																									   LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_PAGER => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_MOBBILE => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_IS_TRANSIENT => 5,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_ZIP_INVALID_COMBO => 6,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_UNVERIFIED => 7,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_MISKEYED => 8,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_ADDR_DISTANT => 9,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_NOT_FOUND => 10,
+																									   LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Suspicious_Phone.PHONE_DIFFERENT => 11,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SUSPICIOUS_PHONE;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SUSPICIOUS_PHONE;
 															SELF := LEFT)),
 																																																																										
 													PROJECT(L.SSN_MULTIPLE_LAST_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_DIFF_NAMES => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_SAME_FNAME => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_DIFF_NAME_ADDR => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_MULT_IDENT => 4,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_DIFF_NAMES => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_SAME_FNAME => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_DIFF_NAME_ADDR => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.SSN_Multiple_Last.SSN_MULT_IDENT => 4,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.SSN_MULTIPLE_LAST;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.SSN_MULTIPLE_LAST;
 															SELF := LEFT)),
 																																							
 													PROJECT(L.MISSING_INPUT_CODES,
 														TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_desc,
-															SELF.hri_weight := MAP(LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Missing_Input.NAME_MISSING => 1,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Missing_Input.ADDR_MISSING => 2,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Missing_Input.SSN_MISSING => 3,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Missing_Input.PHONE_MISSING => 4,
-																										 LEFT.hri = FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Codes.Missing_Input.DOB_MISSING => 5,
+															SELF.hri_weight := MAP(LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Missing_Input.NAME_MISSING => 1,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Missing_Input.ADDR_MISSING => 2,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Missing_Input.SSN_MISSING => 3,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Missing_Input.PHONE_MISSING => 4,
+																										 LEFT.hri = FraudGovConst.Red_Flag_Alerts.Codes.Missing_Input.DOB_MISSING => 5,
 																										 0),
-															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovPlatform_Services.Constants.Red_Flag_Alerts.Description.MISSING_INPUT;
+															SELF.desc := TRIM(LEFT.desc) + ' - ' + FraudGovConst.Red_Flag_Alerts.Description.MISSING_INPUT;
 															SELF := LEFT)));
 																																						
 	END;
 
 	EXPORT iesp.fraudgovreport.t_FraudGovTimelineDetails xform_timeline_details(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+		
+		ds_home_phone := IF(L.phone_number <> '',
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_HOME, L.phone_number, L.phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+												);
+		ds_cell_phone := IF(L.cell_phone <> '', 
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_CELL, L.cell_phone, L.cell_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+												);
+		ds_work_phone := IF(L.work_phone <> '',
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_WORK, L.work_phone, L.work_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+												);
+
+		ds_phones := (ds_home_phone + ds_cell_phone + ds_work_phone)(PhoneNumber <> '');
+	
 		reported_date_time := L.reported_date + ' ' + L.reported_time;
 
 		SELF.IsRecentActivity := False; // Y Means its a deltabase record, N means its coming from contributory records. 
@@ -300,9 +317,7 @@ EXPORT Transforms := MODULE
 																										L.additional_address.clean_address.p_city_name, L.additional_address.clean_address.st, L.additional_address.clean_address.zip, L.additional_address.clean_address.zip4, 
 																										'', '', L.additional_address.street_1, L.additional_address.street_2,'');
 		SELF.County := L.county;
-		SELF.Phones := DATASET([{'', L.phone_number, L.phone_risk_code}, 
-														{'', L.cell_phone, L.cell_phone_risk_code}, 
-														{'', L.work_phone, L.work_phone_risk_code}], iesp.fraudgovreport.t_FraudGovPhoneInfo);
+		SELF.Phones := ds_phones;
 		SELF.EmailAddress := L.email_address;
 		SELF.DriversLicense.DriversLicenseNumber := L.drivers_license;
 		SELF.DriversLicense.DriversLicenseState := L.drivers_license_state;
@@ -417,6 +432,7 @@ EXPORT Transforms := MODULE
 					//Also added failsafe...if we can't get the environment variable, we default it to yesterday
 					SELF.date_added := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
 																											(STRING)yesterday) + '000000');
+
 				END;
 	
 END;

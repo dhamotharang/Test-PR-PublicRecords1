@@ -204,7 +204,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			SELF.GovernmentBest := IF(batch_params.IsOnline,
 																IF(batch_params.AppendBest,
 																		ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1],
-																		ds_dummyGovBest[1]),
+																		ds_dummyGovBest(UniqueId = (STRING)ds_batch_in[1].did)[1]),
 																ROW([], iesp.fraudgovplatform.t_FraudGovBestInfo));
 																
 			SELF.ElementCardDetails := IF(batch_params.IsOnline, ds_ElementcardDetail_w_score[1] , ROW([], iesp.fraudgovreport.t_FraudGovElementCardDetails));
@@ -238,7 +238,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		END;
 		
 		// output(ds_batch_in, named('ds_batch_in'));
-		//output(batch_params);
 		// output(ds_batch, named('ds_batch'));
 		// output(all_knownfrauds, named('all_knownfrauds'));
 		// output(all_knownfrauds_final, named('all_knownfrauds_final'));
@@ -259,6 +258,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		// output(ds_dids, named('ds_dids'));
 		// output(ds_GovBest, named('ds_GovBest'));
 		// output(ds_contributoryBest, named('ds_contributoryBest'));
+		// output(ds_dummyGovBest, named('ds_dummyGovBest'));
 		// output(ds_associated_identities_raw, named('ds_associated_identities_raw'));
 		// output(ds_contributoryBest_w_scores, named('ds_contributoryBest_w_scores'));
 		// output(ds_timeline, named('ds_timeline'));
