@@ -861,4 +861,7 @@
 
 	//BuyCrash Project KY Integration
 	STRING3 Contrib_source; 
+	
+	//BuyCrash Release 6
+  STRING10 Date_Report_Submitted;
 END;

@@ -22,8 +22,8 @@ module
 				    self.process_date                    := (unsigned) pversion, 
 						self.Unique_Id                       := 0; 
 						self.Source                          := 'OIG';
-						self.npi                             := if(pInput.npi='0000000000','', pInput.npi);
-						self.waiverdate                      := if(pInput.waiverdate='00000000','', pInput.waiverdate);
+						self.npi                             := if(( (unsigned) pInput.npi) <> 0, pInput.npi, '');
+						self.waiverdate                      := if(( (unsigned) pInput.waiverdate) <> 0, pInput.waiverdate, '');
 						self.sancdesc                        := map(pInput.sanctype ='1128AA' => 'CIVIL MONETARY PENALTY EXCLUSION',
 						                                            pInput.sanctype ='1128B1' => 'CONVICTION RELATING TO FRAUD',
 																											      pInput.sancdesc);

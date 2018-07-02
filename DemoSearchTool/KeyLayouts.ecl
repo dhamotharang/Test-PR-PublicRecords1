@@ -1,6 +1,6 @@
-IMPORT iesp, DemoSearchTool;
+﻿IMPORT iesp, DemoSearchTool;
 
-EXPORT Layouts := 
+EXPORT KeyLayouts := 
   MODULE
     
     EXPORT business_bdid_rec := 
@@ -49,6 +49,10 @@ EXPORT Layouts :=
         INTEGER2  Biz_RegisteredAgentsCount;
         INTEGER2  Biz_UCCFilingsCount;
         INTEGER2  Biz_WatercraftsCount;
+				INTEGER2	Biz_MARILicensesCount;
+				INTEGER2 	Biz_PublicSanctnsCount;
+				INTEGER2 	Biz_NonPublicSanctnsCount;
+				INTEGER2 	Biz_FreddieMacSanctnsCount;
       END;
       
     EXPORT combinedTemp_rec :=
@@ -103,6 +107,10 @@ EXPORT Layouts :=
         INTEGER2 Per_SSNsCount;
         INTEGER2 Per_ThirdDegreeRelativesCount;
         INTEGER2 Per_WatercraftsCount;
+								INTEGER2	Per_MARILicensesCount;
+								INTEGER2 Per_PublicSanctnsCount;
+								INTEGER2 Per_NonPublicSanctnsCount;
+								INTEGER2 Per_FreddieMacSanctnsCount;
      END;
 
     EXPORT finalPlusSorting_rec :=
@@ -163,6 +171,10 @@ EXPORT People_Layout := RECORD
   integer8 watercraft_cnt;
   integer8 addresses_cnt;
   integer8 ssn_cnt;
+	integer8 mari_license_cnt;
+	integer8 public_sanctn_cnt;
+	integer8 nonpublic_sanctn_cnt;
+	integer8 freddiemac_sanctn_cnt;
   integer8 owned_business_bdid_cnt;
   integer8 owned_business_linkid_cnt;
   unsigned6 did;
@@ -196,7 +208,11 @@ EXPORT People_Layout := RECORD
   integer8 registered_agent_cnt;
   integer8 ucc_cnt;
   integer8 watercraft_cnt;
-  unsigned6 bdid;
+  integer8	mari_license_cnt;
+	integer8 public_sanctn_cnt;
+	integer8 nonpublic_sanctn_cnt;
+	integer8 freddiemac_sanctn_cnt;
+	unsigned6 bdid;
 	integer8 fp := 0;
  END;
  
@@ -225,6 +241,10 @@ EXPORT People_Layout := RECORD
   integer8 registered_agent_cnt;
   integer8 ucc_cnt;
   integer8 watercraft_cnt;
+	integer8	mari_license_cnt;
+	integer8 public_sanctn_cnt;
+	integer8 nonpublic_sanctn_cnt;
+	integer8 freddiemac_sanctn_cnt;
   unsigned6 ultid;
   unsigned6 orgid;
   unsigned6 seleid;

@@ -1626,5 +1626,14 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/827 Iran List','1612'},
 {'EC 2018/855 ISIL (Da\'esh) and Al-Qaida List','1613'},
 {'NYSE American Disciplinary Actions','1614'},
-{'OFAC - Foreign Terrorist Organization List','1615'}
+{'OFAC - Foreign Terrorist Organization List','1615'},
+{'EC (CFSP) 2018/872 Lybia List','1616'},
+{'EC 2018/870 Lybia List','1617'},
+{'EC (CFSP) 2018/900 Burma/Myanmar List','1618'},
+{'EC (CFSP) 2018/901 Venezuela List','1619'},
+{'EC 2018/888 ISIL (Da\'esh) and Al-Qaida List','1620'},
+{'EC 2018/898 Burma/Myanmar List','1621'},
+{'EC 2018/899 Venezuela List','1622'},
+{'NSDC (Ukraine) Special Economic and Other Restrictive Measures (Sanctions) - 14 May 2018','1623'},
+{'US Department of State CAATSA Section 315 - US Coast Guard List of Prohibited Vessels','1624'}
 ],r);
