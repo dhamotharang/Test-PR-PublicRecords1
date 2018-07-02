@@ -118,6 +118,11 @@ EXPORT match_cnp_btype(TYPEOF(h.cnp_btype) L, TYPEOF(h.cnp_btype) R, BOOLEAN Req
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
+EXPORT match_company_name_type_derived(TYPEOF(h.company_name_type_derived) L, TYPEOF(h.company_name_type_derived) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT37.MatchCode.ExactMatch,
+    SALT37.MatchCode.NoMatch),
+        MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
+);
 EXPORT match_company_address(TYPEOF(h.company_address) L,TYPEOF(h.company_address) R, BOOLEAN RequiredField = FALSE) :=  IF(~RequiredField,
     MAP(L = R => SALT37.MatchCode.ExactMatch,
       SALT37.MatchCode.NoMatch),
