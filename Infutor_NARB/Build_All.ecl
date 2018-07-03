@@ -20,7 +20,7 @@ function
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
 		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
 		,Build_Keys (pversion).all
-		,Scrubs.ScrubsPlus('Infutor_NARB','Scrubs_Infutor_NARB','Scrubs_Infutor_NARB', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,Scrubs.ScrubsPlus('Infutor_NARB','Scrubs_Infutor_NARB','Scrubs_Infutor_NARB_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
