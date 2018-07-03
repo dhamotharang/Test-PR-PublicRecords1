@@ -1,4 +1,4 @@
-import	address,codes,iesp,propertycharacteristics,ut, Gateway;
+import	address,codes,iesp,propertycharacteristics,ut, Gateway,std;
 
 // Creates a gateway request and executes it.
 // Gateway request if filled in using in-house data, customer data, or both, dependng on the report type;
@@ -84,8 +84,8 @@ function
 		self.PropertyAttributes.Pool				:=	le.PropertyAttributes.Pool	=	'Y'	or	dLNSearchResult.pool_indicator	=	'Y';
 		self.PropertyAttributes.AC					:=	le.PropertyAttributes.AC	=	'Y'	or	dLNSearchResult.air_conditioning_type	not in	['','NON'];
 		self.PropertyAttributes.Age					:=	if(	le.PropertyAttributes.YearBuilt	!=	0,
-																								(integer)ut.GetDate[1..4]	-	le.PropertyAttributes.YearBuilt,
-																								if(dLNSearchResult.year_built	!=	'',(integer)ut.GetDate[1..4]	-	(integer)dLNSearchResult.year_built,0)
+																								(INTEGER)Std.Date.Today()[1..4]	-	le.PropertyAttributes.YearBuilt,
+																								if(dLNSearchResult.year_built	!=	'',(INTEGER)Std.Date.Today()[1..4]	-	(integer)dLNSearchResult.year_built,0)
 																							);
 		self.PropertyAttributes.Quality			:=	le.PropertyAttributes.QualityOfStructCode;
 		self.PropertyAttributes.Slope				:=	le.PropertyAttributes.SlopeCode;
@@ -133,7 +133,7 @@ function
 		self.PropertyAttributes.Pool				:=	le.PropertyAttributes.Pool	=	'Y';
 		self.PropertyAttributes.AC					:=	le.PropertyAttributes.AC	=	'Y';
 		self.PropertyAttributes.Age					:=	if(	le.PropertyAttributes.YearBuilt	!=	0,
-																								(integer)ut.GetDate[1..4]	-	le.PropertyAttributes.YearBuilt,
+																								(INTEGER)Std.Date.Today()[1..4]	-	le.PropertyAttributes.YearBuilt,
 																								0
 																							);
 		self.PropertyAttributes.Quality			:=	le.PropertyAttributes.QualityOfStructCode;

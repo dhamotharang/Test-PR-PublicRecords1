@@ -10,6 +10,8 @@
 
 	ds_rejects:=PROJECT(ds_with_dids(error_code>0),TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRec,
 		SELF.acctno:=LEFT.acctno,
+		SELF.did:=LEFT.did,
+		SELF.score:=LEFT.score,
 		SELF.error_code:=LEFT.error_code,
 		SELF.exception_code:=LEFT.exception_code,
 		SELF:=[]));

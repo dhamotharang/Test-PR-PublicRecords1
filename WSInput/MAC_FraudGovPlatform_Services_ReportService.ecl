@@ -23,6 +23,8 @@
 										'FraudPlatform',
 										'MaxVelocities',
 										/*---- ESDL Request Field ----*/
-										'FraudGovReportRequest'
+										'FraudGovReportRequest',
+										/*-----Gateway info -----*/
+										'Gateways'
 							));	
 ENDMACRO;

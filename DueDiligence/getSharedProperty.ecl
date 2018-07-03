@@ -11,8 +11,8 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
  
     getUniquePropertyBySource(STRING2 propertySource) := FUNCTION
       filterProperty := soldOwnedProperty(sourceCode = propertySource);
-      sortProperty := SORT(filterProperty, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, LNFaresId, prim_range, prim_name[1..8], zip, -dateLastSeen);
-      dedupProperty := DEDUP(sortProperty, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, LNFaresId, prim_range, prim_name[1..8], zip);
+      sortProperty := SORT(filterProperty, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, LNFaresId, prim_range, prim_name[1..8], zip5, -dateLastSeen);
+      dedupProperty := DEDUP(sortProperty, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, LNFaresId, prim_range, prim_name[1..8], zip5);
       
       RETURN dedupProperty;
     END;
@@ -23,7 +23,7 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
   
     //select property records that were SOLD at some point by this business                                                                                   ------
     propertySold := getUniquePropertyBySource(DueDiligence.Constants.Sold_Property_code);                 
-    uniqueSoldPropAddrs := DEDUP(SORT(propertySold, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip, -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8]); 
+    uniqueSoldPropAddrs := DEDUP(SORT(propertySold, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip5, -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip5); 
   
   
     //select property records that are Currenty OWNED
@@ -36,8 +36,8 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                     LEFT.did = RIGHT.did AND
                                     LEFT.prim_range = RIGHT.prim_range AND
                                     LEFT.prim_name[1..8] = RIGHT.prim_name[1..8] AND
-                                    LEFT.zip = RIGHT.zip,
-                                    TRANSFORM(RECORDOF(LEFT), 
+                                    LEFT.zip5 = RIGHT.zip5,
+                                    TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout, 
                                                 SELF := LEFT),
                                     LEFT ONLY);
     
@@ -59,7 +59,7 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                                 
                                                 SELF.sourceCode := LEFT.sourcecode;
                                                 SELF.ownerOccupied := RIGHT.owner_occupied;
-                                                SELF.county := LEFT.county[3..5];
+                                                SELF.county := LEFT.county;
                                                 SELF.geo_blk := LEFT.geo_blk;
                                                 
                                                 SELF.recordingDate := RIGHT.recording_date; //recorded date is the date the property officially transferred
@@ -74,43 +74,50 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
                                       KEEP(5));
                                       
                                       
-    sortedProps := SORT(propertyOwnedWithDetails, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip, -assessedYear, -recordingDate);  
+    sortedProps := SORT(propertyOwnedWithDetails, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, prim_range, prim_name[1..8], zip5, -assessedYear, -assessedTotalValue, -purchaseDate, -recordingDate);  
     propWithUniqueAddress := ROLLUP(sortedProps,
                                     #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                                     LEFT.did = RIGHT.did AND
                                     LEFT.prim_range = RIGHT.prim_range AND
                                     LEFT.prim_name[1..8] = RIGHT.prim_name[1..8] AND
-                                    LEFT.zip = RIGHT.zip,
-                                    TRANSFORM(RECORDOF(LEFT),
+                                    LEFT.zip5 = RIGHT.zip5,
+                                    TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
                                               purchaseInfo := IF(LEFT.purchasePrice = 0 AND LEFT.purchaseDate = DueDiligence.Constants.EMPTY, RIGHT, LEFT);
                                               
                                               SELF.addressType := IF(LEFT.addressType = DueDiligence.Constants.EMPTY, RIGHT.addressType, LEFT.addressType);
-                                              SELF.ownerOccupied := IF(LEFT.ownerOccupied = DueDiligence.Constants.EMPTY, RIGHT.ownerOccupied, LEFT.ownerOccupied);
                                               SELF.purchasePrice := purchaseInfo.purchasePrice;
                                               SELF.purchaseDate := purchaseInfo.purchaseDate;
                                               SELF.lengthOfOwnership := purchaseInfo.lengthOfOwnership;
                                               SELF.recordingDate := purchaseInfo.recordingDate;
                                               
+                                              //see if we have an assessed amount - else grab the most recent year assessed with 0
+                                              assessed := MAP(LEFT.assessedTotalValue > 0 => LEFT,  //grab most recent assessed value
+                                                              RIGHT.assessedTotalValue > 0 => RIGHT,
+                                                              LEFT);
+                                                              
+                                              SELF.assessedYear := assessed.assessedYear;
+                                              SELF.assessedTotalValue := assessed.assessedTotalValue;
+                                              
                                               SELF := LEFT;)); 
+                                              
+                                           
                  
                  
-    groupProps := GROUP(SORT(propWithUniqueAddress, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -assessedYear), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
+    limitedProperties := DEDUP(SORT(propWithUniqueAddress, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -assessedYear), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, KEEP(DueDiligence.Constants.MAX_PROPERTIES));
+
+    maxProperties := PROJECT(limitedProperties, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 ownPropCnt, UNSIGNED4 soldPropCnt, 
+                                                                                INTEGER8 totalSumAssessedValue, DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) ownedProps},
+                                                           SELF.seq := LEFT.seq;
+                                                           SELF.ultID := LEFT.ultID;
+                                                           SELF.orgID := LEFT.orgID;
+                                                           SELF.seleID := LEFT.seleID;
+                                                           SELF.did := LEFT.did;
+                                                           SELF.totalSumAssessedValue := LEFT.assessedTotalValue;
+                                                           SELF.ownedProps := DATASET([TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout, SELF := LEFT;)]);
+                                                           SELF := [];)); 
     
     
-    {DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 ownPropCnt, UNSIGNED4 soldPropCnt, 
-     INTEGER8 totalSumAssessedValue, DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) ownedProps}  getMaxProperties(DueDiligence.LayoutsInternal.PropertySlimLayout psl, INTEGER c) := TRANSFORM, SKIP(c > DueDiligence.Constants.MAX_PROPERTIES)
-     
-           SELF.seq := psl.seq;
-           SELF.ultID := psl.ultID;
-           SELF.orgID := psl.orgID;
-           SELF.seleID := psl.seleID;
-           SELF.did := psl.did;
-           SELF.totalSumAssessedValue := psl.assessedTotalValue;
-           SELF.ownedProps := DATASET([TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout, SELF := psl;)]);
-           SELF := [];
-    END;
-    
-    maxProperties := UNGROUP(PROJECT(groupProps, getMaxProperties(LEFT, COUNTER)));
+
                                                             
     rollGroup := ROLLUP(SORT(maxProperties, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did),
                         #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
@@ -129,16 +136,20 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
     summerizeSoldProps := TABLE(uniqueSoldPropAddrs, 
 	                              {seq, ultid, orgid, seleid, did,
 																SOLDPropCnt := COUNT(GROUP)}, 
-																seq, ultid, orgid, seleid, did);
+																seq, ultID, orgID, seleID, did);
                                               
     addSoldCounts := JOIN(addOwnCounts, summerizeSoldProps,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
                           LEFT.did = RIGHT.did,
                           TRANSFORM(RECORDOF(LEFT),
+                                    SELF.seq := IF(LEFT.seq = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.seq, LEFT.seq);
+                                    SELF.ultID := IF(LEFT.ultID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.ultID, LEFT.ultID);
+                                    SELF.orgID := IF(LEFT.orgID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.orgID, LEFT.orgID);
+                                    SELF.seleID := IF(LEFT.seleID = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.seleID, LEFT.seleID);
+                                    SELF.did := IF(LEFT.did = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.did, LEFT.did);
                                     SELF.soldPropCnt := RIGHT.SOLDPropCnt;
                                     SELF := LEFT;),
-                          LEFT OUTER,
-                          ATMOST(1));
+                          FULL OUTER);
                       
 
 
@@ -153,6 +164,7 @@ EXPORT getSharedProperty(DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout
      // OUTPUT(propertyOwnedWithDetails, NAMED('propertyOwnedWithDetails'));
      // OUTPUT(sortedProps, NAMED('sortedProps'));
      // OUTPUT(propWithUniqueAddress, NAMED('propWithUniqueAddress'));
+     // OUTPUT(limitedProperties, NAMED('limitedProperties'));
      // OUTPUT(maxProperties, NAMED('maxProperties'));
      
      // OUTPUT(groupProps, NAMED('groupProps'));

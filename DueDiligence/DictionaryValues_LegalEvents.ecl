@@ -21,7 +21,7 @@
  {DueDiligence.Constants.DISORDERLY_CONDUCT_CODE, 'Disorderly Conduct'},
  {DueDiligence.Constants.TRESPASSING_CODE,        'Tresspassing'},
  {DueDiligence.Constants.DUI_CODE,                'DUI'},
- {DueDiligence.Constants.TRAFFIC_OFFENSES_CODE,'   '},       //***Traffic Offenses are not searched 
+ {DueDiligence.Constants.TRAFFIC_OFFENSES_CODE,   'Traffic Offense'},       //***Traffic Offenses are not searched but are triggered by the traffic flag = yes (see the code in regularExpressions2)
  {DueDiligence.Constants.ALIEN_OFFENSES_CODE,'Alien Offenses'},
  {DueDiligence.Constants.SHOPLIFTING_CODE,'Shoplifting'},
  {DueDiligence.Constants.GAMBLING_BITCOIN_CODE,'Gambling or Bitcoin'},

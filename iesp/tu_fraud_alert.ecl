@@ -10,6 +10,7 @@ export t_TuFraudAlertOptions := record (iesp.share.t_BaseOption)
 	string FCRAPurpose {xpath('FCRAPurpose')}; //values['0','1','2','3','4','5','6','7','8','9','10','11','12','13','']//hidden[ecl_only]
 	string20 FFDOptionsMask {xpath('FFDOptionsMask')};//hidden[ecl_only]
 	boolean useRoxieDefaults {xpath('UseRoxieDefaults')};
+	boolean ReturnMatchedUniqueIDsOnly {xpath('ReturnMatchedUniqueIDsOnly')};
 end;
 
 export t_TUTransactionControl_41 := record //RecordCode[TU4I]

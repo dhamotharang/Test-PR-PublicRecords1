@@ -79,7 +79,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 																				SELF := LEFT,
 																				SELF := []),
 																				LEFT OUTER,
-																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT));
+																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 																				
 		/* Getting the related clusters */
 		ds_cluster_proj := PROJECT(ds_raw_cluster_recs, 
@@ -87,7 +87,8 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 													SELF.entity_name := LEFT.entity_name,
 													SELF.entity_value := LEFT.entity_value,
 													SELF.tree_uid := LEFT.tree_uid_,
-													SELF.entity_context_uid := LEFT.entity_context_uid_));
+													SELF.entity_context_uid := LEFT.entity_context_uid_,
+													SELF := []));
 																										
 		ds_cluster_details := FraudGovPlatform_Services.Functions.getClusterDetails(ds_cluster_proj, batch_params, TRUE);
 		
@@ -135,29 +136,30 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids, batch_params);
 		ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids, FraudGovConst_.FRAUD_PLATFORM);
 		
+		/*
+			Following function returns the Dummy Government Information when Options.AppendBest is set to False,
+			This will help Sales/Product folks to not show actual PII info when demo'ing the MVP to customers. 
+			More details can be found at https://jira.rsi.lexisnexis.com/browse/GRP-1025
+		*/
+		ds_dummyGovBest := FraudGovPlatform_Services.fn_GetTestRecords.GetDummyGovBestInfo(ds_contributoryBest);
+		
 		/* Append scores to ds_contributoryBest */	
 		ds_contributoryBest_w_scores := JOIN(ds_contributoryBest, ds_associated_identities_raw,
 																			LEFT.ContributedBest.UniqueId	= RIGHT.entity_context_uid_[4..], 
 																			TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
 																				SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
 																				SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
-																				SELF.ScoreDetails.ElementValue := RIGHT.label_, 
+																				SELF.ScoreDetails.ElementValue := LEFT.ContributedBest.UniqueId, 
 																				SELF.ScoreDetails.Score := RIGHT.score_,
-																				SELF := LEFT));
-
-		ds_contributoryBest__idCardDetails := IF(EXISTS(ds_contributoryBest_w_scores),ds_contributoryBest_w_scores,
-												PROJECT(ds_contributoryBest,TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
-																					SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
-																					SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
-																					SELF.ScoreDetails.ElementValue := '',
-																					SELF.ScoreDetails.Score := 0,
-																					SELF := LEFT
-																					)
-															)
-												);
-
+																				SELF := LEFT),
+																			LEFT OUTER, LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+												
+		
+		 ds_delta_recentActivity := mod_Deltabase_Functions.getDeltabaseReportRecords(ds_batch_in_extended, batch_params);		
+		
 		/* Returning the Timeline Data */
-		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT));
+		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) 
+									+ ds_delta_recentActivity;
 		
 		/* Returning the Associated Address Data  - This is based on the Timeline Records found above */
 		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_timeline);
@@ -195,14 +197,18 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 			
 			SELF.KnownRisks := IF(batch_params.IsOnline, all_knownfrauds_final, DATASET([], iesp.fraudgovreport.t_FraudGovKnownRisk));
 
-			SELF.IdentityCardDetails := IF(batch_params.IsOnline, ds_contributoryBest__idCardDetails(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
-			SELF.GovernmentBest := IF(batch_params.IsOnline, 
-																IF(ds_batch_in[1].did >0,ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1], ds_GovBest[1]), 
+			SELF.IdentityCardDetails := IF(batch_params.IsOnline, 
+																		ds_contributoryBest_w_scores(ContributedBest.UniqueId = (STRING)ds_batch_in[1].did)[1], 
+																		ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
+			
+			SELF.GovernmentBest := IF(batch_params.IsOnline,
+																IF(batch_params.AppendBest,
+																		ds_GovBest(UniqueId = (STRING)ds_batch_in[1].did)[1],
+																		ds_dummyGovBest(UniqueId = (STRING)ds_batch_in[1].did)[1]),
 																ROW([], iesp.fraudgovplatform.t_FraudGovBestInfo));
+																
 			SELF.ElementCardDetails := IF(batch_params.IsOnline, ds_ElementcardDetail_w_score[1] , ROW([], iesp.fraudgovreport.t_FraudGovElementCardDetails));
 
-			/* If either IsIdentityTestRequest OR IsElementTestRequest (used above in the attribute) are set, 
-			return mock data, if not, then return empty dataset until we get data from the RAMPS query. */
 			SELF.IndicatorAttributes := IF(batch_params.IsOnline, 
 																		CHOOSEN(Functions.GetIndicatorAttributes(ds_entityNameUID, batch_params),
 																		iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE),
@@ -252,6 +258,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_
 		// output(ds_dids, named('ds_dids'));
 		// output(ds_GovBest, named('ds_GovBest'));
 		// output(ds_contributoryBest, named('ds_contributoryBest'));
+		// output(ds_dummyGovBest, named('ds_dummyGovBest'));
 		// output(ds_associated_identities_raw, named('ds_associated_identities_raw'));
 		// output(ds_contributoryBest_w_scores, named('ds_contributoryBest_w_scores'));
 		// output(ds_timeline, named('ds_timeline'));

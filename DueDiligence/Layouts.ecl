@@ -24,11 +24,9 @@ EXPORT Layouts := MODULE
 		LinkIDs OrgID;
 		LinkIDs UltID;
 	END;
-
-	EXPORT Address := RECORD
-		STRING   streetAddress1;
-		STRING   streetAddress2;
-		STRING10 prim_range;
+  
+  EXPORT AddressSlimDetail := RECORD
+    STRING10 prim_range;
 		STRING2  predir;
 		STRING28 prim_name;
 		STRING4  addr_suffix;
@@ -39,6 +37,14 @@ EXPORT Layouts := MODULE
 		STRING2  state;
 		STRING5  zip5;
 		STRING4  zip4;
+    STRING3  county;                               //Due Diligence is capturing the last 3 digits of the full 5 digit FIPS code. It uses the 3 digit code to access the Census Keys and the will build the 5 digit FIPS to determine HIFCA and HIDTA  
+    STRING7  geo_blk;
+  END;
+
+	EXPORT Address := RECORD
+		STRING   streetAddress1;
+		STRING   streetAddress2;
+		AddressSlimDetail;
 		STRING4  cart;	
 		STRING1  cr_sort_sz;
 		STRING4  lot;	
@@ -46,11 +52,9 @@ EXPORT Layouts := MODULE
 		STRING2  dbpc; 	
 		STRING1  chk_digit; 
 		STRING2  rec_type;
-		STRING3  county;                               //Due Diligence is capturing the last 3 digits of the full 5 digit FIPS code. It uses the 3 digit code to access the Census Keys and the will build the 5 digit FIPS to determine HIFCA and HIDTA  
 		STRING10 geo_lat;
 		STRING11 geo_long;
-		STRING4  msa; 	
-		string7  geo_blk;
+		STRING4  msa; 
 		STRING1  geo_match;
 		STRING4  err_stat;	
 		UNSIGNED4 dateLastSeen;
@@ -63,25 +67,27 @@ EXPORT Layouts := MODULE
 		STRING20 lastName;
 		STRING5 suffix;	
 	END;
+  
+  EXPORT Shared_Input := RECORD
+    STRING lexID;
+		STRING30 accountNumber;
+    Address address;
+    STRING phone;
+    UNSIGNED6 inputSeq;
+  END;
 
 	EXPORT Busn_Input := RECORD
 		LinkID_Results BIP_IDs;
-		STRING lexID;
-		STRING30 accountNumber;
+		Shared_Input;
 		STRING companyName;
 		STRING altCompanyName;
-		Address address;
-		STRING phone;
 		STRING fein;
 	END;
 
 	EXPORT Indv_Input := RECORD
-		STRING lexID;
-		STRING30 accountNumber;
+		Shared_Input;
 		STRING3 nameInputOrder;
-		Name name;
-		Address address;
-		STRING phone;
+		Name name;		
 		STRING ssn;
 		STRING8 dob;
 	END;
@@ -104,8 +110,9 @@ EXPORT Layouts := MODULE
 		Input cleanedInput;
 	END;
 
+  //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT PerAttributes := RECORD
-		UNSIGNED6 PerLexID;
+		STRING15 PerLexID;
 		STRING2 PerAssetOwnProperty;
 		STRING10 PerAssetOwnProperty_Flag;
 		STRING2 PerAssetOwnAircraft;
@@ -114,10 +121,10 @@ EXPORT Layouts := MODULE
 		STRING10 PerAssetOwnWatercraft_Flag;
 		STRING2 PerAssetOwnVehicle;
 		STRING10 PerAssetOwnVehicle_Flag;
-		STRING2 PerAccessToFundsProperty;
-		STRING10 PerAccessToFundsProperty_Flag;
-		STRING2 PerAccessToFundsIncome;
+    STRING2 PerAccessToFundsIncome;
 		STRING10 PerAccessToFundsIncome_Flag;
+		STRING2 PerAccessToFundsProperty;
+		STRING10 PerAccessToFundsProperty_Flag;		
 		STRING2 PerGeographic;
 		STRING10 PerGeographic_Flag;
 		STRING2 PerMobility;
@@ -140,15 +147,15 @@ EXPORT Layouts := MODULE
 		STRING10 PerUSResidency_Flag;
 		STRING2 PerMatchLevel;
 		STRING10 PerMatchLevel_Flag;
-		STRING2 PerAssociatesIndex;
-		STRING10 PerAssociatesIndex_Flag;
+		STRING2 PerAssociates;
+		STRING10 PerAssociates_Flag;
 		STRING2 PerProfLicense;
 		STRING10 PerProfLicense_Flag;
 	END;
 
-	//------These are the customer facing attributes for this product ------
+  //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT BusAttributes := RECORD
-		UNSIGNED6 BusLexID;
+		STRING15 BusLexID;
 		STRING2 BusAssetOwnProperty;
 		STRING10 BusAssetOwnProperty_Flag;
 		STRING2 BusAssetOwnAircraft;
@@ -179,18 +186,14 @@ EXPORT Layouts := MODULE
 		STRING10 BusMatchLevel_Flag;
 		STRING2 BusLegalStateCriminal;
 		STRING10 BusLegalStateCriminal_Flag;
-    STRING2 BusLegalFederalCriminal;
-    STRING10 BusLegalFederalCriminal_Flag;
+    STRING2 BusLegalFedCriminal;
+    STRING10 BusLegalFedCriminal_Flag;
 		STRING2 BusLegalCivil;
 		STRING10 BusLegalCivil_Flag;
 		STRING2 BusLegalTraffInfr;
 		STRING10 BusLegalTraffInfr_Flag;
 		STRING2 BusLegalTypes;
 		STRING10 BusLegalTypes_Flag;
-		STRING2 BusLinkedBusFootprint;
-		STRING10 BusLinkedBusFootprint_Flag;
-		STRING2 BusLinkedBusIndex;
-		STRING10 BusLinkedBusIndex_Flag;
 		STRING2 BusBEOProfLicense;
 		STRING10 BusBEOProfLicense_Flag;
 		STRING2 BusBEOUSResidency;
@@ -198,13 +201,13 @@ EXPORT Layouts := MODULE
 	END;
 
 	EXPORT BatchInLayout  := RECORD
-		unsigned4 seq;
-		string30  acctNo;
-		string15  custType;
+		UNSIGNED4 seq;
+		STRING30  acctNo;
+		STRING15  custType;
 		STRING15 	lexID;
-		string120 companyName;
-		string120 altCompanyName;
-		string11  taxID;
+		STRING120 companyName;
+		STRING120 altCompanyName;
+		STRING11  taxID;
 		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
 		STRING120 fullName;
 		STRING20 	firstName;
@@ -213,6 +216,7 @@ EXPORT Layouts := MODULE
 		STRING5 	suffix;
 		STRING9   ssn;
 		STRING8   dob;
+    BOOLEAN   useLexIDAsOverride;
 		
 		STRING120   streetAddress1;
 		STRING120   streetAddress2;
@@ -229,89 +233,16 @@ EXPORT Layouts := MODULE
 		STRING4  		zip4;
 
 		STRING10  phone;
-		unsigned4	HistoryDateYYYYMMDD;
+		UNSIGNED4	HistoryDateYYYYMMDD;
 	END;
 
 //***Coordinate these changes witht the batch team ***//
 	EXPORT BatchOut := RECORD
-		STRING30 AcctNo;
-		STRING15 IndLexID;
-		STRING2 IndAssetOwnProperty;
-		STRING10 IndAssetOwnProperty_Flags;
-		STRING2 IndAssetOwnAircraft;
-		STRING10 IndAssetOwnAircraft_Flags;
-		STRING2 IndAssetOwnWatercraft;
-		STRING10 IndAssetOwnWatercraft_Flags;
-		STRING2 IndAssetOwnVehicle;
-		STRING10 IndAssetOwnVehicle_Flags;
-		STRING2 IndAccessToFundsIncome;
-		STRING10 IndAccessToFundsIncome_Flags;
-		STRING2 IndAccessToFundsProperty;
-		STRING10 IndAccessToFundsProperty_Flags;
-		STRING2 IndGeographicRisk;
-		STRING10 IndGeographicRisk_Flags;
-		STRING2 IndMobility;
-		STRING10 IndMobility_Flags;
-		STRING2 IndLegalEvents;
-		STRING10 IndLegalEvents_Flags;
-		STRING2 IndLegalEventsFelonyType;
-		STRING10 IndLegalEventsFelonyType_Flags;
-		STRING2 IndHighRiskNewsProfiles;
-		STRING10 IndHighRiskNewsProfiles_Flags;
-		STRING2 IndAgeRange;
-		STRING10 IndAgeRange_Flags;
-		STRING2 IndIdentityRisk;
-		STRING10 IndIdentityRisk_Flags;
-		STRING2 IndResidencyRisk;
-		STRING10 IndResidencyRisk_Flags;
-		STRING2 IndMatchLevel;
-		STRING10 IndMatchLevel_Flags;
-		STRING2 IndAssociatesRisk;
-		STRING10 IndAssociatesRisk_Flags;
-		STRING2 IndProfessionalRisk;
-		STRING10 IndProfessionalRisk_Flags;
-		 
-		STRING15 BusLexID;
-		STRING2 BusAssetOwnProperty;
-		STRING10 BusAssetOwnProperty_Flags;
-		STRING2 BusAssetOwnAircraft;
-		STRING10 BusAssetOwnAircraft_Flags;
-		STRING2 BusAssetOwnWatercraft;
-		STRING10 BusAssetOwnWatercraft_Flags;
-		STRING2 BusAssetOwnVehicle;
-		STRING10 BusAssetOwnVehicle_Flags;
-		STRING2 BusAccessToFundsProperty;
-		STRING10 BusAccessToFundsProperty_Flags;
-		STRING2 BusGeographicRisk;
-		STRING10 BusGeographicRisk_Flags;
-		STRING2 BusValidityRisk;
-		STRING10 BusValidityRisk_Flags;
-		STRING2 BusStabilityRisk;
-		STRING10 BusStabilityRisk_Flags;
-		STRING2 BusIndustryRisk;
-		STRING10 BusIndustryRisk_Flags;
-		STRING2 BusStructureType;
-		STRING10 BusStructureType_Flags;
-		STRING2 BusSOSAgeRange;
-		STRING10 BusSOSAgeRange_Flags;
-		STRING2 BusPublicRecordAgeRange;
-		STRING10 BusPublicRecordAgeRange_Flags;
-		STRING2 BusShellShelfRisk;
-		STRING10 BusShellShelfRisk_Flags;
-		STRING2 BusMatchLevel;
-		STRING10 BusMatchLevel_Flags;
-		STRING2 BusLegalEvents;
-		STRING10 BusLegalEvents_Flags;
-		STRING2 BusLegalEventsFelonyType;
-		STRING10 BusLegalEventsFelonyType_Flags;
-		STRING2 BusHighRiskNewsProfiles;  //TO BE REMOVED WITH BATCH CHANGES
-		STRING10 BusHighRiskNewsProfiles_Flags;  //TO BE REMOVED WITH BATCH CHANGES
-		STRING2 BusLinkedBusRisk;
-		STRING10 BusLinkedBusRisk_Flags;
-		STRING2 BusExecOfficersRisk;
-		STRING10 BusExecOfficersRisk_Flags;
-		STRING2 BusExecOfficersResidencyRisk;
-		STRING10 BusExecOfficersResidencyRisk_Flags;
+		UNSIGNED4 seq;
+    STRING30 acctNo;
+    BOOLEAN lexIDVerified;
+		PerAttributes;
+		BusAttributes;
 	END;
 	
 	EXPORT LayoutSICNAIC := RECORD
@@ -523,8 +454,7 @@ EXPORT Layouts := MODULE
 		STRING3	    EasiTotCrime;
 		STRING      CityState;
     STRING5     FipsCode;  
-    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk       
-		string1   	AddressVacancyInd;                      //is not being populated?????
+    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk 
 		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
 		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
 		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
@@ -533,7 +463,6 @@ EXPORT Layouts := MODULE
 		boolean     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
 		boolean     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
 		boolean     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HighFelonNeighborhood;                  //populated in ???
 	END;  	
 	
  
@@ -546,14 +475,16 @@ EXPORT Layouts := MODULE
 		UNSIGNED4 firstReported;
 		UNSIGNED4 lastReported;
 	END;
-	
-	EXPORT BusOperLocationLayout := RECORD
+  
+  EXPORT CommonGeographicLayout := RECORD
 	 Address;
 	 GeographicRiskLayout;  
 	 BOOLEAN cmra;
 	 BOOLEAN vacant;
    STRING1 addressType;
 	END;	
+	
+	
   
   EXPORT BusinessLegalSummary := RECORD 
     UNSIGNED3   BusFelonyConviction_4F;
@@ -587,6 +518,11 @@ EXPORT Layouts := MODULE
     STRING  vl_id;     
 	END;
   
+  EXPORT DIDAndName := RECORD
+    UNSIGNED6 did;
+    Name;
+  END;
+  
   EXPORT PropertyDataLayout := RECORD
     Address;
     STRING50 addressType;
@@ -602,15 +538,17 @@ EXPORT Layouts := MODULE
     STRING120 ownerName;
   END;
   
-  EXPORT PerPropertyDataLayout := RECORD
+  EXPORT IndPropertyDataLayout := RECORD
     PropertyDataLayout;
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
     STRING1 ownerOccupied;
-    DATASET(Name) propertyOwners;
+    DATASET(DIDAndName) propertyOwners;
   END;
 	
 	EXPORT BusReportDetails := RECORD
     DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
-    DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
+    DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
     STRING  FEIN_Masked_For_Report;
     UNSIGNED3 FEINSourcesCnt;   
@@ -636,7 +574,7 @@ EXPORT Layouts := MODULE
     UNSIGNED4 bestDOB;
     Name bestName;
 		Address bestAddress;
-    //DATASET(PerPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(IndPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
   END;
 	
 	EXPORT Positions := RECORD
@@ -661,15 +599,13 @@ EXPORT Layouts := MODULE
 		BOOLEAN blastPilot;
 		BOOLEAN other;
 	END;
-
 	
 	EXPORT SlimIndividual := RECORD
-		UNSIGNED6 did;
+		DIDAndName;
 		UNSIGNED2 score;		//did score
 		STRING9 ssn;
 		UNSIGNED4 dob;
 		STRING phone;
-		Name;
 		Address;
 	END;
 	
@@ -735,7 +671,7 @@ EXPORT Layouts := MODULE
     
     DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
 
-		unsigned2 	CountOwnProp;                                       //populated in DueDiligence.getBusProperty - 
+		// unsigned2 	CountOwnProp;                                       //populated in DueDiligence.getBusProperty - 
 		UNSIGNED4		filingDate;	
 		BOOLEAN			sosFilingExists;												            //populated in DueDiligence.getBusSOSDetail
 		STRING2			residentialAddr;												            //populated in DueDiligence.getBusAsInd

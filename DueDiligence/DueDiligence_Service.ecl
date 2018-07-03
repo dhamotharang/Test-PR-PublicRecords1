@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, DueDiligence, Gateway, iesp, STD, WSInput;
+﻿IMPORT AutoStandardI, DueDiligence, iesp, STD, WSInput;
 
 EXPORT DueDiligence_Service := MACRO
 
@@ -16,11 +16,11 @@ EXPORT DueDiligence_Service := MACRO
 			
 			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE), DueDiligence.Constants.ATTRIBUTES);
 			
-			cleanData := DueDiligence.Common.GetCleanData(validatedRequest(validRequest));
+			cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequest(validRequest));
 
 
 			//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, DD_SSNMask, includeReport, displayAttributeText, debugIndicator);
+			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator);
 		 
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
@@ -32,9 +32,9 @@ EXPORT DueDiligence_Service := MACRO
 			
 			
 			//********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
-			DueDiligence.CommonQuery.mac_GetBusinessOptionSettings();
+			DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
 
-			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, DD_SSNMask, debugIndicator);
+			businessResults := DueDiligence.getBusAttributes(cleanData, busOptions, busLinkingOptions, includeReport, displayAttributeText, DD_SSNMask, debugIndicator);
 
 			busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);

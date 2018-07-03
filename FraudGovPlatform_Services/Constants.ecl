@@ -44,6 +44,7 @@
   EXPORT read_retry   := 2;  
   EXPORT read_timeout := 75; 
   EXPORT maxRecs      := 100;
+	EXPORT FRAUDGOV_BUILD_ENV_VARIABLE := 'fraudgov_build_version';
   
   EXPORT Fragment_Types := MODULE
 			EXPORT BANK_ACCOUNT_NUMBER_FRAGMENT := 'BANK_ACCOUNT';
@@ -206,6 +207,8 @@
 	END;
 
 	EXPORT INQUIRY_SOURCE := 'RIN';
+	
+	EXPORT DELTABASE_ESP_GATEWAY_NAME := 'delta_db';
 
 	EXPORT CIID_DESC := MODULE
 			EXPORT NAS_0 := 'This identity could not be located in public records';
@@ -240,5 +243,11 @@
 		EXPORT ENTITY_TYPE_PHONENO := 16;
 		EXPORT ENTITY_TYPE_IPADDRESS := 18;
 	END;
+	
+	EXPORT PHONE_TYPE := MODULE
+		EXPORT PHONE_TYPE_HOME := 'HOME';
+		EXPORT PHONE_TYPE_CELL := 'CELL';
+		EXPORT PHONE_TYPE_WORK := 'WORK';
+	END;	
 	
 END;

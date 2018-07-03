@@ -114,8 +114,12 @@ export batch_records (marriage_divorce_v2_Services.input.batch_params configData
 												 FilterByDate (Left, Right),
 												 keep (1), limit (0));
 											  
-  recs_fltr_with_alerts := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(filtered_out, alert_flags, Statements, Marriage_divorce_v2_Services.Layouts.batch_out_pre,configData.FFDOptionsMask),
-	                            filtered_out);
+  out_fcra_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(filtered_out, alert_flags, Statements, Marriage_divorce_v2_Services.Layouts.batch_out_pre,configData.FFDOptionsMask);
+	                            
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_out_fcra := FFD.Mac.InquiryLexidBatch(clean_in, out_fcra_with_alerts, Marriage_divorce_v2_Services.Layouts.batch_out_pre, 0);
+  
+  recs_fltr_with_alerts := IF(IsFCRA, ds_out_fcra, filtered_out);
 
 	sequenced_out := PROJECT(recs_fltr_with_alerts, TRANSFORM(marriage_divorce_v2_Services.layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 	recs_out := PROJECT(sequenced_out, Marriage_divorce_v2_Services.layouts.batch_out);	

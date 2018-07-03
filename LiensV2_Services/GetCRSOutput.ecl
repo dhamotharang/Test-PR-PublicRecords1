@@ -20,7 +20,7 @@ export GetCRSOutput (
 	ds_ffd := LiensV2_Services.fn_doFcraCompliance(party_in, case_in,
 		history_in, ds_slim_pc, inFFDOptionsMask);
   
-	ds_party_raw_pre :=  if(IsFCRA,group(sort(ds_ffd._party,acctno),acctno), party_in);
+	ds_party_raw_pre :=  if(IsFCRA, group(sort(ds_ffd._party,acctno),acctno), party_in);
 	ds_case_raw_pre  :=  if(IsFCRA, ds_ffd._case, case_in);
 	ds_history_raw   :=  if(IsFCRA, ds_ffd._history, history_in);
 

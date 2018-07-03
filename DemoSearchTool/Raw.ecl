@@ -331,49 +331,5 @@ EXPORT Raw :=
 
         RETURN ds_multiBizAtAddrRecs;
       END;  // end fn_getMultiBizAtAddressRecs
-/*
-    EXPORT fn_getLegacyBdidsNotInHeader(DATASET(DemoSearchTool.Layouts.Ids_rec) ds_BizIds) := 
-      FUNCTION
-        ds_bdidsNotInHeader :=
-          PROJECT(ds_BizIds,
-            TRANSFORM(DemoSearchTool.Layouts.finalPlusSorting_rec,
-                      SELF.PersonInformation := [],  
-                      SELF.BusinessInformation := 
-                        PROJECT(LEFT, 
-                          TRANSFORM(iesp.demoSearchTool.t_BusinessInformation,
-                                    SELF.BusinessId := (STRING)LEFT.bdid,
-                                    SELF := [])),
-                      SELF := LEFT,  // bdid
-                      SELF := []));
-        RETURN ds_bdidsNotInHeader;
-      END;  // end fn_getLegacyBdidsNotInHeader
-
-    EXPORT fn_getBipIdsNotInHeader(DATASET(DemoSearchTool.Layouts.Ids_rec) ds_BizIds) := 
-      FUNCTION
-        ds_bipIdsNotInHeader :=
-          PROJECT(ds_BizIds,
-            TRANSFORM(DemoSearchTool.Layouts.finalPlusSorting_rec,
-                      SELF.PersonInformation := [],  
-                      SELF.BusinessInformation := 
-                        PROJECT(LEFT, 
-                          TRANSFORM(iesp.demoSearchTool.t_BusinessInformation,
-                                    SELF.BusinessIds.SeleId := LEFT.SeleId;
-                                    SELF.BusinessIds.OrgId  := LEFT.OrgId;
-                                    SELF.BusinessIds.UltId  := LEFT.UltId;
-                                    SELF := [])),
-                      SELF := LEFT,  // SELE, ORG & ULT Ids
-                      SELF := []));
-        RETURN ds_bipIdsNotInHeader;
-      END;  // end fn_getBipIdsNotInHeader
-
-    EXPORT fn_getDTCDidsNotInHeader(DATASET(DemoSearchTool.Layouts.Ids_rec) ds_BizIds) := 
-      FUNCTION
-        RETURN dataset([],DemoSearchTool.Layouts.finalPlusSorting_rec);
-      END;  // end fn_getDTCDidsNotInHeader
-
-    EXPORT fn_getPersonDidsNotInHeader(DATASET(DemoSearchTool.Layouts.Ids_rec) ds_BizIds) := 
-      FUNCTION
-        RETURN dataset([],DemoSearchTool.Layouts.finalPlusSorting_rec);
-      END;  // end fn_getPersonDidsNotInHeader
-*/      
+     
     END;  // END Module
