@@ -3,7 +3,7 @@
 export Build_All(
     string	pversion
    ,string	pDirectory	= '/data/hds_180/CourtLink/20090804'
-   ,string	pServerIP	= 'alalpedata10.risk.regn.net'
+   ,string	pServerIP	= 'uspr-edata10.risk.regn.net'
    ,string	pFilename	= 'docket.txt'
    ,string	pGroupName	= _Dataset().groupname                                                    
    ,boolean	pIsTesting	= false

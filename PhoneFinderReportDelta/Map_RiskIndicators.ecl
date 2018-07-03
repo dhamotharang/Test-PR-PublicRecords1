@@ -14,7 +14,7 @@ EXPORT Map_RiskIndicators(string8 version) := FUNCTION
 	
 	mapRiskIndMain 	:= project(inFile, trRInd(left));
 	concatFile			:= mapRiskIndMain + PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main;	
-	ddConcat 				:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
+	ddConcat 				:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, phone_id, -(date_added+time_added), local), transaction_id, sequence_number, phone_id, local);
 
 	return ddConcat;  
 

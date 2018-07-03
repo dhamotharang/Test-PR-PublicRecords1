@@ -1161,6 +1161,10 @@
 				trim(kword, left, right) = 'RSSRE-DIR3-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR3_WC,
 				trim(kword, left, right) = 'ITGPDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITGPDP,
 				trim(kword, left, right) = 'IMOF-WMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMOF_WMD,
+				trim(kword, left, right) = 'ARMJHR-W' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMJHR_W,
+				trim(kword, left, right) = 'US-SST' =>SubGroup_Constants.numKeywordsID.KEYWORD_US_SST,
+				trim(kword, left, right) = 'BRCNEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRCNEP,
+				trim(kword, left, right) = 'MXASF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXASF,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

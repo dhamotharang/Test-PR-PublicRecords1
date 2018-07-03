@@ -1,4 +1,4 @@
-IMPORT DemoSearchTool, iesp, ut;
+﻿IMPORT DemoSearchTool, iesp, ut;
 
 EXPORT IParams := 
   MODULE
@@ -63,7 +63,11 @@ EXPORT IParams :=
         (searchBy.BusinessDataset.RegistrationsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.RegistrationsCount)) AND
         (searchBy.BusinessDataset.RegisteredAgentsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.RegisteredAgentsCount)) AND
         (searchBy.BusinessDataset.UCCFilingsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.UCCFilingsCount)) AND
-        (searchBy.BusinessDataset.WatercraftsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.WatercraftsCount));
+        (searchBy.BusinessDataset.WatercraftsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.WatercraftsCount)) AND
+								(searchBy.BusinessDataset.MARILicensesCount = '' OR ut.isNumeric(searchBy.BusinessDataset.MARILicensesCount)) AND
+								(searchBy.BusinessDataset.PublicSanctnsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.PublicSanctnsCount)) AND
+								(searchBy.BusinessDataset.NonPublicSanctnsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.NonPublicSanctnsCount)) AND
+								(searchBy.BusinessDataset.FreddieMacSanctnsCount = '' OR ut.isNumeric(searchBy.BusinessDataset.FreddieMacSanctnsCount));
       END;
       
     fn_ValididateInputCountsPerson(iesp.demosearchtool.t_DemoSearchToolSearchBy SearchBy) :=
@@ -100,7 +104,11 @@ EXPORT IParams :=
         (searchBy.PersonDataset.SexualOffenderCount = '' OR ut.isNumeric(searchBy.PersonDataset.SexualOffenderCount)) AND
         (searchBy.PersonDataset.SSNsCount = '' OR ut.isNumeric(searchBy.PersonDataset.SSNsCount)) AND
         (searchBy.PersonDataset.WatercraftsCount = '' OR ut.isNumeric(searchBy.PersonDataset.WatercraftsCount)) AND
-        (searchBy.PersonDataset.ThirdDegreeRelativesCount = '' OR ut.isNumeric(searchBy.PersonDataset.ThirdDegreeRelativesCount));
+        (searchBy.PersonDataset.ThirdDegreeRelativesCount = '' OR ut.isNumeric(searchBy.PersonDataset.ThirdDegreeRelativesCount)) AND
+				    (searchBy.PersonDataset.MARILicensesCount = '' OR ut.isNumeric(searchBy.PersonDataset.MARILicensesCount)) AND
+								(searchBy.PersonDataset.PublicSanctnsCount = '' OR ut.isNumeric(searchBy.PersonDataset.PublicSanctnsCount)) AND
+								(searchBy.PersonDataset.NonPublicSanctnsCount = '' OR ut.isNumeric(searchBy.PersonDataset.NonPublicSanctnsCount)) AND
+								(searchBy.PersonDataset.FreddieMacSanctnsCount = '' OR ut.isNumeric(searchBy.PersonDataset.FreddieMacSanctnsCount));
       END; 
 
     EXPORT fn_checkForInputFailures(iesp.demosearchtool.t_DemoSearchToolSearchBy SearchBy,

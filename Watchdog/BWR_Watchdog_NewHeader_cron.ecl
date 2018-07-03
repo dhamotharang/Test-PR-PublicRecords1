@@ -24,7 +24,7 @@ ECL3 :=
 //**Get WU List
 
 
-getwulist := nothor(workunitservices.WorkunitList ( lowwuid := '',jobname := 'Watchdog*' ,username := 'skasavajjala_prod'));
+getwulist := nothor(workunitservices.WorkunitList ( lowwuid := '',jobname := 'Watchdog*' ,username := 'mgould_prod'));
 
 getnew := topn( sort ( getwulist,-wuid),1,-wuid );
 
