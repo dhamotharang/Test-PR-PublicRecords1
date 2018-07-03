@@ -231,4 +231,7 @@
 		
 		//Appriss Integration
 		STRING1 Releasable;
+		
+		//BuyCrash Release 6
+    STRING10 Date_Report_Submitted;
 END;
