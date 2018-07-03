@@ -440,7 +440,9 @@
 		STRING3 Page_Count;
 		STRING1 is_delete;
 		STRING8 last_update_date;
-		STRING3 Contrib_source;
+		STRING3 Contrib_Source;
+		//BuyCrash Release 6
+		STRING10 Date_Report_Submitted;
 	END;
 
 	EXPORT persn := RECORD
@@ -1612,7 +1614,10 @@
 			
 	//BuyCrash Project KY Integration
 
-	  STRING3 Contrib_source;  
+	  STRING3 Contrib_source; 
+		
+			//BuyCrash Release 6
+		STRING10 date_report_submitted;
 	END;
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
