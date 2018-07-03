@@ -134,6 +134,7 @@ dataset([
 ,{  57, '',   '20180402' ,  '20180402', '', '',         '',         'Ingested S56 base + BH-449 patch. BH-458 -- BIP Build 57 - April 2018'}
 ,{  58, '',   '20180501' ,  '20180501', '', '',         '',         'Ingested S57 base + BH-333 patch. BH-459 -- BIP Build 58 - May 2018'}
 ,{  59, '',   '20180601' ,  '20180601', '', '',         '',         'Ingested S58 base. BH-460 -- BIP Build 59 - June 2018'}
+,{  60, '',   '20180702' ,  '20180702', '', '',         '',         'Ingested S59 base. BH-478 -- BIP Build 60 - July 2018'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
