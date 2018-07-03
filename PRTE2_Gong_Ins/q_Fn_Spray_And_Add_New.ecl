@@ -1,19 +1,23 @@
-﻿/* *****************************************************************************************
-PRTE2_Gong_Ins.U_Fn_Special_Spray_Boca_Layout
-This is because Linda handed us some data in the final Boca layout and no one noticed.
-So I have to convert it to our layout too.  Differences from the standard Fn_Spray_And_Build_BaseMain:
-1. We spray a CSV file which is in Boca layout
-2. We read that temp CSV file
-3. We transform it into our Layouts.Alpha_CSV_Layout (note all 'x' fields were lost!)
-4. We save this as a new Files.Gong_Base_CSV
-5. We also save the sprayed in file as the Boca base (since that's how it originally was)
+﻿/* ********* NOT ACTIVE YET ************* DO WE NEED THIS AT ALL IN BOCA? ******************
+PRTE2_Gong_Ins.Fn_Spray_And_Add_New
 
- *** We have lost any special Alpha-only CSV fields and need to refill them.
+********** WARNING ********* WARNING ************* WARNING *********** WARNING *********
+I put an add_new in here but we have no idea what field initialization may be needed.
+We created this initial data by working with Linda to gather production records and replace PII
+SO -- maybe??  in the future we won't do add_new, but instead will do gather prod and replace PII???
+Please consider these to be initial but not ready for use until we determine how to proceed:
+PRTE2_Gong_Ins.BWR_Spray_Add_New	AND 	PRTE2_Gong_Ins.Fn_Spray_And_Add_New
+********** WARNING ********* WARNING ************* WARNING *********** WARNING *********
+
 ***************************************************************************************** */
 
-IMPORT ut, RoxieKeyBuild, Address, PRTE2, PRTE2_Common,PromoteSupers;
+IMPORT PRTE2_Gong_Ins, ut, RoxieKeyBuild, Address, PRTE2, PRTE2_Common, PromoteSupers;
 
-EXPORT U_Fn_Special_Spray_Boca_Layout(STRING CSVName, STRING fileVersion, STRING overridePath='') := FUNCTION
+EXPORT Fn_Spray_And_Add_New(STRING CSVName, STRING fileVersion, BOOLEAN isProdBase=TRUE, STRING overridePath='') := FUNCTION
+
+			Files := PRTE2_Gong_Ins.Files;
+			Constants := PRTE2_Gong_Ins.Constants;
+			
 			SourcePathForCSV := IF(overridePath<>'',overridePath,Constants.SourcePathForCSV);
 			sprayFile    := FileServices.SprayVariable(Constants.LandingZoneIP,						// file LZ
 																								SourcePathForCSV+CSVName, 					// path to file on landing zone
@@ -31,36 +35,35 @@ EXPORT U_Fn_Special_Spray_Boca_Layout(STRING CSVName, STRING fileVersion, STRING
 																								FALSE												  			// do not compress
 																								);																					 
 
-			// Read the CSV data but in the final BOCA_LAYOUT that Linda created
-			oddball_Boca_Lay_Spray := Files.SPRAYED_DS_BOCALAY;
+			// PRTE2.CleanFields(Files.SPRAYED_DS, new_CSV_Base);
+			new_CSV_Base := Files.SPRAYED_DS;
 			
-			// appendIf5 := PRTE2_Common.Functions.appendIf5;
 			// *********************************************************************************************************************
 			// transform data of CSV usinf clean address (simulate action of RMPO on request sent).
 			// *********************************************************************************************************************
-			Layouts.Alpha_CSV_Layout Clean_Address_Transform(oddball_Boca_Lay_Spray L) := TRANSFORM
-					SELF.xSponsor := L.cust_name,
-					SELF.xBug_Num := L.bug_num,
+			Layouts.Alpha_CSV_Layout Clean_Address_Transform(new_CSV_Base L) := TRANSFORM
+				appendIf4 := PRTE2_Common.Functions.appendIf4;		
+				// UNKNOWN:  Are there any fields to initialize in GONG???
 				SELF := L;
 				SELF := [];
 			END;
 
-			// In this case - it will convert the Boca base into our layout, but note: it lost any 'x' field values.
-			newBase := PROJECT(oddball_Boca_Lay_Spray, Clean_Address_Transform(LEFT) );
+			DS_New_Initialized := PROJECT(new_CSV_Base, Clean_Address_Transform(LEFT) );
 
+			Existing_DS := IF(isProdBase, Files.Gong_Base_CSV_DS_Prod, Files.Gong_Base_CSV_DS); 
+
+			newBase := Existing_DS + DS_New_Initialized;
+			
 			PromoteSupers.Mac_SF_BuildProcess(newBase, Files.Gong_Base_CSV, buildBase);
-			PromoteSupers.Mac_SF_BuildProcess(oddball_Boca_Lay_Spray, Files.Gong_Base_SF, BuildBCBase);
-			// Skipping the Boca transform and build.
+			BuildBase2 := PRTE2_Gong_Ins.Proc_Build_Compatible_Base;		// This reads the base created above.
 			// --------------------------------------------------
 			delSprayedFile  := FileServices.DeleteLogicalFile (Files.FILE_SPRAY);
 			// --------------------------------------------------
-			AlphaNewBase := Files.Gong_Base_CSV_DS;
-			// --------------------------------------------------
-
 			sequentialSteps	:= SEQUENTIAL (
 															sprayFile,
-															buildBase,  BuildBCBase,
-															delSprayedFile, output(AlphaNewBase)
+															buildBase,
+															BuildBase2, 
+															delSprayedFile,
 															);
 
 			RETURN sequentialSteps;
