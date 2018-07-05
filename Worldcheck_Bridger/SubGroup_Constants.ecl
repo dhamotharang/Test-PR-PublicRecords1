@@ -1061,7 +1061,9 @@
 		export string KEYWORD_IMOF_WMD							:= '749';
 		export string KEYWORD_ARMJHR_W							:= '750';
 		export string KEYWORD_US_SST								:= '751';
-
+		export string KEYWORD_BRCNEP								:= '752';
+		export string KEYWORD_MXASF									:= '753';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
