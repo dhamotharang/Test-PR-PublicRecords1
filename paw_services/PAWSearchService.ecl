@@ -55,7 +55,7 @@
 */
 /*--INFO-- Returns PAW (People at Work) records.*/
 export PAWSearchService := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	boolean negate_true_defaults := false : STORED('ECL_NegateTrueDefaults'); // internal ECL use only
 	boolean return_waf := true : STORED('ReturnAlsoFound');
   // Bug: 45732:  Pulled tempmodids from the PAW_Services.PAWSearchService_Records.val
