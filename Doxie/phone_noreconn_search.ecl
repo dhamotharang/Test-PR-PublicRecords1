@@ -70,8 +70,8 @@ if the permission is set. Try Qsent data if nothing found above.
 IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C;
 
 EXPORT phone_noreconn_search := MACRO 
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
-	
+	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_phone_noreconn_search();
 
