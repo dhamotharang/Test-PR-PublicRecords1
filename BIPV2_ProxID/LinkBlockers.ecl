@@ -29,6 +29,7 @@ SHARED bp := OverLinks;
      AND (LEFT.ebr_file_number = RIGHT.ebr_file_number OR RIGHT.ebr_file_number = (TYPEOF(RIGHT.ebr_file_number))'')
      AND (LEFT.company_fein = RIGHT.company_fein OR RIGHT.company_fein = (TYPEOF(RIGHT.company_fein))'')
      AND LEFT.cnp_name = RIGHT.cnp_name
+     AND (LEFT.company_name_type_derived = RIGHT.company_name_type_derived OR RIGHT.company_name_type_derived = (TYPEOF(RIGHT.company_name_type_derived))'')
      AND (LEFT.cnp_number = RIGHT.cnp_number OR RIGHT.cnp_number = (TYPEOF(RIGHT.cnp_number))'')
      AND (LEFT.cnp_btype = RIGHT.cnp_btype OR RIGHT.cnp_btype = (TYPEOF(RIGHT.cnp_btype))'')
      AND (LEFT.company_phone = RIGHT.company_phone OR RIGHT.company_phone = (TYPEOF(RIGHT.company_phone))'')

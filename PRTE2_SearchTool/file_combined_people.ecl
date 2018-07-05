@@ -1,7 +1,10 @@
 ﻿import data_services, prte2_bankruptcy, prte2_corp, prte2_globalwatchlists,prte2_corp,prte2_doc,prte2_death_master,ut,
 	prte2_gong,prte2_dlv2,prte2_email_data,prte2_faa,prte2_foreclosure,prte2_lnproperty,prte2_sexoffender,PRTE2_liens,Risk_Indicators,
 	prte2_paw,doxie_build,Relationship,prte2_vehicle,prte2_watercraft,prte2_prof_licensev2, header, std, doxie,prte2_header,BIPV2,
-	prte2_marriage_divorce,LiensV2, RoxieKeyBuild, prte2_phonesplus, AddressReport_Services, personReports,PRTE2_Infutor;
+	prte2_marriage_divorce,LiensV2, RoxieKeyBuild, prte2_phonesplus, AddressReport_Services, personReports,PRTE2_Infutor, 
+	prte2_doc_images, prte2_sexoffender_images, prte2_Prof_License_Mari, prte2_sanctn, prte2_sanctn_np;
+	
+	
 EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := function
 
 		bk := prte2_bankruptcy.keys.key_bankruptcyv3_did(FCRA);
@@ -149,10 +152,10 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 															Dataset([],PRTE2_SearchTool.Layouts.Layout_People),
 															project(dedup(rel1(title in Header.relative_titles.set_FirstDegreeRelative),did1,did2,ALL), from_rel1(left)));//no fcra relatives
 
-		SHARED relative1 := distribute(Relationship.file_relative(title in Header.relative_titles.set_FirstDegreeRelative), hash(did1, did2));
+		relative1 := distribute(Relationship.file_relative(title in Header.relative_titles.set_FirstDegreeRelative), hash(did1, did2));
 
 //Find second degree relatives.  Block case of second degree relative being self.
-		shared first_second_dg_rels := join(	relative1, 
+		first_second_dg_rels := join(	relative1, 
 																																							relative1, 
 																																							left.did2 = right.did1 and left.did1 != right.did2,
 																																							transform({unsigned6 did1, unsigned6 did2}, self.did1 := left.did1, self.did2 := right.did2)
@@ -168,7 +171,8 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 								local);
 		r6 := project(r4 + r5,{	unsigned6 did1,unsigned6 did2,boolean dg1:= false});
 		r7 := rollup(sort(r6, did1,did2,local), transform({	unsigned6 did1,unsigned6 did2,boolean dg1:= false}, self.dg1 := true, self := left), did1, did2);
-		shared second_dg_rels := r7(dg1 = false);
+		
+		second_dg_rels := r7(dg1 = false);
 		PRTE2_SearchTool.Layouts.Layout_People from_rel3(second_dg_rels le) := transform
 			self.Second_Degree_Relatives_cnt   := 1;
 			self.did := le.did1;
@@ -338,11 +342,59 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 		end;
 		hri_ssns := project(hri_ssn(did != 0), from_hri_ssn(left));
 
+
+// Integer	DocImages_cnt
+		// d_image := prte2_doc_images.Keys.DID;
+		// Layouts.Layout_People from_doc_images(d_image le) := transform
+			// self.did := le.did;
+			// self.DocImages_cnt := 1;				   
+		// end;
+		// d_images := if(FCRA, Dataset([],Layouts.Layout_People),project(d_image,from_doc_images(left)));//There's no FCRA doc images data
+	
+// Integer SexOffenderImages_cnt
+		// o_image := prte2_sexoffender_images.Keys.DID;
+		// Layouts.Layout_People from_offender_images(o_image le) := transform
+			// self.did := le.did;
+			// self.SexOffenderImages_cnt := 1;				   
+		// end;
+		// o_images := if(FCRA, Dataset([],Layouts.Layout_People),project(o_image,from_offender_images(left)));//There's no FCRA sex offender images data
+	
+// Integer MARI_License_cnt
+		mari := prte2_prof_license_mari.Keys.key_did(FCRA);
+		Layouts.Layout_People from_mari(mari le) := transform
+			self.did := (unsigned6)le.did;
+			self.MARI_License_cnt := 1;
+		end;
+		maris := project(mari,from_mari(left)); 
+		
+// Integer Public Sanctn
+   pub_sanctn := prte2_sanctn.Keys.did;
+				Layouts.Layout_People from_pub_sanctn(pub_sanctn le) := transform
+				self.did := (unsigned6)le.did;
+				self.Public_Sanctn_cnt := 1;
+		end;
+		pub_sanctns := if(FCRA, Dataset([],Layouts.Layout_People),project(pub_sanctn, from_pub_sanctn(left))); //There's no FCRA sanctn data
+		
+
+// Integer NonPuble Sanctn
+		nonpub_sanctn := prte2_sanctn_np.keys.midex_rpt_nbr(did != 0, dbcode = 'N');
+				Layouts.Layout_People from_nonpub_sanctn(nonpub_sanctn le) := transform
+				self.did := (unsigned6)le.did;
+				self.NonPublic_Sanctn_cnt := 1;
+		end;
+		nonpub_sanctns := if(FCRA, Dataset([],Layouts.Layout_People),project(nonpub_sanctn, from_nonpub_sanctn(left))); //There's no FCRA doc sanctn data
+
+// Integer FreddieMac
+freddie_mac := prte2_sanctn_np.keys.midex_rpt_nbr(did != 0, dbcode = 'F');
+				Layouts.Layout_People from_freddie_mac(freddie_mac le) := transform
+				self.did := (unsigned6)le.did;
+				self.FreddieMac_Sanctn_cnt := 1;
+		end;
+		freddie_macs := if(FCRA, Dataset([],Layouts.Layout_People),project(freddie_mac, from_freddie_mac(left))); //There's no FCRA doc images data
+
 		combined_people := (bks + cps + cs + dms + gns + ds + ems + fas + fcls + gwls + ps + nbhrs + liens +  hri_addrs +
-		evcs + ss + d_paw +hs + vs + ms + pls + gwlos + cdocs + has + hssns + rel1s + rel3s + assocs + akas + mdvs + jdgs +
-		pplss + nods + regas + hri_ssns + rel4s)(did<>0);
-
-
+																						evcs + ss + d_paw +hs + vs + ms + pls + gwlos + cdocs + has + hssns + rel1s + rel3s + assocs + akas + mdvs + jdgs +
+																						pplss + nods + regas + hri_ssns + rel4s + maris + pub_sanctns + nonpub_sanctns + freddie_macs)(did<>0);
 
 		comb_cnts_d := distribute(combined_people, hash(did));
 
@@ -384,6 +436,10 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 				Integer Addresses_cnt := sum(group,comb_cnts_d.Addresses_cnt   );
 				Integer SSN_Cnt := sum(group,comb_cnts_d.SSN_Cnt   );
 				Integer Third_Degree_Relatives_cnt := sum(group,comb_cnts_d.Third_Degree_Relatives_cnt);
+				Integer MARI_License_cnt := sum(group,comb_cnts_d.MARI_License_cnt );
+				Integer Public_Sanctn_cnt := sum(group,comb_cnts_d.Public_Sanctn_cnt );
+				Integer NonPublic_Sanctn_cnt := sum(group,comb_cnts_d.NonPublic_Sanctn_cnt );
+				Integer FreddieMac_Sanctn_cnt := sum(group,comb_cnts_d.FreddieMac_Sanctn_cnt );
 		end;      
 							 
 
@@ -417,9 +473,9 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 		
 
 		demorecs 	:= dataset([	
-									{888800000005,1,1,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,false,true ,false,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,1,1,1,[{1}],[{1}],1,1},
-									{888800000029,2,2,2,2,2,2,2,2,2,false,2,2,2,2,2,2,false,true ,true ,2,2,2,2,2,2,2,false,2,2,2,2,2,2,2,2,2, [{1},{2}], [{1},{2}],2,2},
-									{888800000046,3,3,3,3,3,3,3,3,3,false,3,3,3,3,3,3,true ,false,false,3,3,3,3,3,3,3,true ,3,3,3,3,3,3,3,3,3,[{1},{2},{3}],[{1},{2},{3}],3,3}], 
+									{888800000005,1,1,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,false,true ,false,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,1,1,1,1,1,1,1,[{1}],[{1}],1,1},
+									{888800000029,2,2,2,2,2,2,2,2,2,false,2,2,2,2,2,2,false,true ,true ,2,2,2,2,2,2,2,false,2,2,2,2,2,2,2,2,2,2,2,2,2, [{1},{2}], [{1},{2}],2,2},
+									{888800000046,3,3,3,3,3,3,3,3,3,false,3,3,3,3,3,3,true ,false,false,3,3,3,3,3,3,3,true ,3,3,3,3,3,3,3,3,3,3,3,3,3, [{1},{2},{3}],[{1},{2},{3}],3,3}], 
 									people_grouped_layout2)
 									;
 		ds_people :=  demorecs  + people_j;
