@@ -1,4 +1,4 @@
-﻿IMPORT progressive_phone, addrBest, PhonesFeedback_Services, ut, PhonesFeedback, phone_shell, doxie;
+﻿IMPORT progressive_phone, addrBest, PhonesFeedback_Services, ut, PhonesFeedback, phone_shell, doxie, doxie_crs, iesp, suppress;
 
 // function that returns waterfall phone data
 
@@ -54,8 +54,20 @@ EXPORT fn_progressivePhone := MODULE
 
 		// Rollup results by did since more than one did can be searched on via progessive phone lookup
 		ProgPhoneRolled := ROLLUP(ProgPhoneGroup, GROUP, RollPhones(LEFT,ROWS(LEFT)));
-
+           //output(progPhoneRolled, named('progPhoneRolled'));
 		RETURN ProgPhoneRolled;
 	END;
-	
+	EXPORT CompReportAddProgPhones( DATASET(doxie.layout_references) inDids,
+													   doxie.iParam.ProgressivePhoneParams pp_mod = module(doxie.iParam.ProgressivePhoneParams)end,
+													    string32 appTypeValue
+													  ) := FUNCTION
+			// function takes in a set of 1 or more DID values and returns progressive Phone (waterfall v8 phones) section
+		       didValues := dedup(sort(inDids, did), did);					 
+                  progPhone := byDIDonly(didValues,  pp_mod);	
+                  pinfo := progPhone.phoneinfo;                 	
+                    // add suppression here		
+                    Suppress.MAC_Suppress(pInfo,pInfoPulled,appTypeValue,Suppress.Constants.LinkTypes.DID,DID);									
+                   pPhoneRecs := iesp.transform_progressive_phones(pInfoPulled,pp_mod.ReturnPhoneScore, pp_mod.ScoreModel);                 				
+        RETURN (pPhoneRecs);												
+     END;														
 END;

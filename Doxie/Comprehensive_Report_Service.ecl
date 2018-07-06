@@ -226,6 +226,14 @@ docr := IF (CriminalRecordVersion in [0,1] and Include_CriminalRecords_val, doxi
 imar := IF (IncludeImages_val,images.image_fullrecords);
 transaction_hist := if(IncludeTransactionHistory,doxie.TransactionHistory_Records(dids)[1]);
 
+// mods for comp report phase 2
+// new waterfall phone additions:
+BOOLEAN   IncludeProgressivePhone  := FALSE : STORED('IncludeProgressivePhone');
+ProgPhone_mod     := doxie.iParam.getProgressivePhoneParams();
+progressivePhones := if (IncludeProgressivePhone, doxie.fn_progressivePhone.CompReportAddProgPhones(dids, progPhone_mod,application_type_value));												
+// comment                                                                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^
+// comment                                                                                                                                                                                         from doxie.MAC_Header_Field_Declare above                         
+
 tempmod := module(project(AutoStandardI.GlobalModule(),CriminalRecords_Services.IParam.report,opt))
     export string14 did := (string) dids[1].did;
     export string25 doc_number   := '' ;
@@ -251,6 +259,7 @@ outrec patch(cent l) := transform
 	self.images_children:= global(imar);
 	self.DOC2_children := global(docr2);
 	self.TransactionHistory := global(transaction_hist);
+	self.progressive_Phones := global(progressivePhones);	
 	self := l;
 end;
 
