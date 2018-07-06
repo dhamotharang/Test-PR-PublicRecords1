@@ -4,9 +4,15 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 										FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 
 		//**
-		//** Collect external batch services data
+		//** Collect external batch services data if IsOnline is FALSE
 		//**
-		SHARED ds_reportFromBatchServices := FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in, batch_params);
+		SHARED ds_reportFromBatchServices := IF(~batch_params.IsOnline,
+																						FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in, batch_params),
+																						PROJECT(ds_batch_in,TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
+																																				SELF.batchin_rec := LEFT,
+																																				SELF := [])
+																									)
+																						);
 		
 		//**
 		EXPORT ds_payload := FraudGovPlatform_Services.Raw_Records(ds_batch_in, batch_params.GlobalCompanyId, batch_params.IndustryType, batch_params.ProductCode);

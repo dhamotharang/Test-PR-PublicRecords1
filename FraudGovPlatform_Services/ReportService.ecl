@@ -129,9 +129,11 @@ EXPORT ReportService() := MACRO
 
 	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
 	
+	BOOLEAN isValidDate := FraudGovPlatform_Services.Functions.IsValidInputDate(reportBy.DOB);
+	
 	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
-	//for searches, not just card detais.
-	isValidInput := inputCount = 1 OR ~Options.IsOnline;
+	//for searches, not just card details.
+	isValidInput := inputCount = 1 OR ~Options.IsOnline AND isValidDate;	
 
 	// **************************************************************************************
 	// Append DID for Input PII

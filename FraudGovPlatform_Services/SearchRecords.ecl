@@ -177,30 +177,36 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.EmailAddress :=  contri_best_rec.EmailAddress;
 		SELF.NoOfClusters := L.NumberOfClusters;
 
-		numOfDeltabaseTransactions := MAP( 
-				 L.fragment = Fragment_Types_const.PERSON_FRAGMENT => COUNT(ds_delta_recentTransactions(UniqueId = L.fragment_value)),
-				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => COUNT(ds_delta_recentTransactions(SSN = L.fragment_value)),
-				 L.fragment = Fragment_Types_const.NAME_FRAGMENT => COUNT(
+		ds_recentTransactions := MAP( 
+				 L.fragment = Fragment_Types_const.PERSON_FRAGMENT => ds_delta_recentTransactions(UniqueId = L.fragment_value),
+				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => ds_delta_recentTransactions(SSN = L.fragment_value),
+				 L.fragment = Fragment_Types_const.NAME_FRAGMENT => 
 															ds_delta_recentTransactions(
 																		Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
-																						STD.Str.CleanSpaces(Name.Last),'') = STD.Str.CleanSpaces(L.fragment_value))),
+																						STD.Str.CleanSpaces(Name.Last),'') = STD.Str.CleanSpaces(L.fragment_value)),
 																						
-				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => COUNT(
+				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 															ds_delta_recentTransactions(
 					  												(STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
 															  		Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
 																																STD.Str.CleanSPaces(PhysicalAddress.State), 
 																																STD.Str.CleanSPaces(PhysicalAddress.Zip5))
-																		) = STD.Str.CleanSPaces(L.fragment_value))),
+																		) = STD.Str.CleanSPaces(L.fragment_value)),
 																		
-				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => COUNT(ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value)),
-				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => COUNT(ds_delta_recentTransactions(IpAddress = L.fragment_value)),
-				 R.NoOfRecentTransactions);
+				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value),
+				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_delta_recentTransactions(IpAddress = L.fragment_value),
+				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
+
+		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
+
+		numOfDeltabaseTransactions := COUNT(ds_recentTransactions);
 		
 		SELF.NoOfRecentTransactions := numOfDeltabaseTransactions;
 		SELF.NoOfTransactions := R.NoOfTransactions + numOfDeltabaseTransactions; //Total velocity count.
 		SELF.NoOfKnownRisks := R.NoOfKnownRisks; //Total Known Risk count.
-		SELF.LastActivityDate := iesp.ECL2ESP.toDate(L.LastActivityDate);
+		SELF.LastActivityDate := IF(numOfDeltabaseTransactions = 0,
+									iesp.ECL2ESP.toDate(L.LastActivityDate),
+									ds_recentTransactions_sorted[1].EventDate);
 		SELF.LastKnownRiskDate := iesp.ECL2ESP.toDate(L.LastKnownRiskDate); //Highest Knownrisk date.
 		SELF.NVPs := CHOOSEN(L.NVPs, iesp.Constants.FraudGov.MAX_COUNT_NVP);
 		SELF := [];
@@ -214,6 +220,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		
 	ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
 	
+	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
 	// output(adlDIDFound, named('adlDIDFound'));
@@ -229,7 +236,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
-	 //output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
+	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
 	 //output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
