@@ -202,14 +202,14 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		SELF.PHN_PHONE_1    	:= ut.CleanPhone(pInput.BUS_PHONE)[1..10];
 	
 		//Populating Address fields		
-		TempAddress1_1        := IF(func_is_address(TrimNAME_OFFICE)= TRUE,TrimNAME_OFFICE,TrimAddress1_1);
-		TempAddress1_2        := IF(func_is_address(TrimNAME_OFFICE)= TRUE,TrimAddress1_1,TrimAddress1_2);
-		preAddress1_1					:= TempAddress1_1 + ' ' + TempAddress1_2;
+		TempAddress1_1        := IF(TrimNAME_OFFICE<>'' and Prof_License_Mari.func_is_address(TrimNAME_OFFICE)= TRUE,TrimNAME_OFFICE,TrimAddress1_1);
+		TempAddress1_2        := IF(TrimNAME_OFFICE <> '' and Prof_License_Mari.func_is_address(TrimNAME_OFFICE)= TRUE,TrimAddress1_1,TrimAddress1_2);
+		preAddress1_1					:= TRIM(REGEXREPLACE(CompNames,TempAddress1_1,'') + ' ' + REGEXREPLACE(CompNames,TempAddress1_2,''));
 		preAddress1_2					:= TrimCity1 + ' ' + TrimState1 + ' ' + TrimZip1;		
 		preAddress2_1					:= TrimAddress2_1 + ' ' + TrimAddress2_2;
 		preAddress2_2					:= TrimCity2 + ' ' + TrimState2 + ' ' + TrimZip2;
 
-		tmpAddress1_1					:= REGEXREPLACE(CompNames,IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_1,preAddress1_1),'');
+		tmpAddress1_1					:= IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_1,preAddress1_1);
 		tmpAddress1_2					:= IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_2,preAddress1_2);
 		tmpAddress2_1					:= IF(tmpAddress1_1=preAddress2_1,'',preAddress2_1);
 		tmpAddress2_2					:= IF(tmpAddress1_2=preAddress2_2,'',preAddress2_2);
