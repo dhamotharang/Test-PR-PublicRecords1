@@ -797,7 +797,7 @@ j_raw_fcra_offset_roxie := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_FCRA_DID
 j_raw_fcra_offset_thor := join(distribute(clam_pre_Inquiries, hash64(shell_input.did)), 
 						distribute(pull(Inquiry_AccLogs.Key_FCRA_DID), hash64(appended_adl)), 
 						left.shell_input.did<>0 and (left.shell_input.did=right.appended_adl) and
-						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate + 200, bsversion) and
+						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, '', /*left.historydateTimeStamp*/ left.historydate + 200, bsversion) and
 						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra_offset(left, right),
@@ -814,7 +814,7 @@ j_fcra_corrections_offset_roxie := join(clam_pre_Inquiries, fcra.Key_Override_In
 
 j_fcra_corrections_offset_thor := join(clam_pre_Inquiries, pull(fcra.Key_Override_Inquiries_ffid), 
 						right.flag_file_id in left.inquiries_correct_ffid and
-						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate + 200, bsversion),	
+						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, '', /*left.historydateTimeStamp,*/ left.historydate + 200, bsversion),	
 						add_inquiry_corrections_fcra_offset(left, right),
 						left outer, LOCAL, ALL);	
 

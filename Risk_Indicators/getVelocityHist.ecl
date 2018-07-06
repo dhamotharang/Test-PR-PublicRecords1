@@ -1,4 +1,4 @@
-import riskwise, ut, doxie;
+﻿import riskwise, ut, doxie;
 
 export getVelocityHist(GROUPED DATASET(iid_constants.layout_outx) iid2, boolean isFCRA, unsigned1 dppa,
 												string50 DataRestriction, unsigned1 BSversion, boolean onThor=false) := FUNCTION
@@ -411,14 +411,14 @@ ADLinfo_fcra := join(ADLinfo_fcra_orig, age_hist, left.did=right.did and left.se
 ADLinfo := if(isFCRA, ADLinfo_fcra, ADLinfo_nonfcra);
 
 // Pull the header information and filter for unique and useable addresses
-iid_header := UNGROUP(PROJECT(iid, TRANSFORM(layouts.layout_header_plus_hist_date, self.historydate := left.historydate, SELF := LEFT.h)));
+iid_header := UNGROUP(PROJECT(iid, TRANSFORM(layouts.layout_header_plus_hist_date, self.seq := left.seq, self.historydate := left.historydate, SELF := LEFT.h)));
 iid_header_filtered := iid_header (dt_first_seen != 0, dt_last_seen != 0, prim_name[1..6] != 'PO BOX');
-iid_header_clean := DEDUP(SORT(iid_header_filtered, did, dt_first_seen, dt_last_seen, prim_range, prim_name, zip), dt_first_seen, dt_last_seen, prim_range, prim_name, zip);
+iid_header_clean := DEDUP(SORT(iid_header_filtered, seq, did, dt_first_seen, dt_last_seen, prim_range, prim_name, zip), seq, did, dt_first_seen, dt_last_seen, prim_range, prim_name, zip);
 // Calculate the address stability
 stabilityHistorical := Risk_Indicators.getAddrStabilityHist(iid_header_clean, onThor);
 
 // Now join the calculated stability back with the original DID's.
-ADLStability := JOIN(ADLinfo, stabilityHistorical, LEFT.did = RIGHT.did, TRANSFORM(iid_constants.layout_outx, SELF.mobility_indicator := (STRING)RIGHT.stability; SELF := LEFT), LEFT OUTER, LOOKUP);
+ADLStability := JOIN(ADLinfo, stabilityHistorical, LEFT.did = RIGHT.did AND LEFT.seq=RIGHT.seq, TRANSFORM(iid_constants.layout_outx, SELF.mobility_indicator := (STRING)RIGHT.stability; SELF := LEFT), LEFT OUTER, LOOKUP);
 
 iid_constants.layout_outx joinEm(iid le, ADLStability ri) := transform
 	self.ssns_per_adl := ri.ssns_per_adl;
