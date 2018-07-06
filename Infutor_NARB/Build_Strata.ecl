@@ -15,9 +15,9 @@ EXPORT Build_Strata(
 	Strata.mac_CreateXMLStats(dUpdate.dInputNoGrouping					,Infutor_NARB._Constants().Name	,'Input'	   ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildInputNoGrouping_Strata					,'View'				,'Population'	,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueInputNoGrouping		,Infutor_NARB._Constants().Name	,'Input'	   ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildInputUniqueNoGrouping_Strata		,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dNoGrouping								,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildNoGrouping_Strata								,'View'				,'Population'	,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dCleanAddressState				,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildCleanAddressState_Strata				,'address.st'	,'Population'	,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dCleanAddressState				,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildCleanAddressState_Strata				,'Clean_State','Population'	,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueNoGrouping					,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildUniqueNoGrouping_Strata					,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'address.st'	,'Uniques'		,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Infutor_NARB._Constants().Name	,'base_file' ,pversion	,Infutor_NARB.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'Clean_State','Uniques'		,,pIsTesting,pOverwrite);
 
 	full_build := PARALLEL(
 		 BuildInputNoGrouping_Strata			
