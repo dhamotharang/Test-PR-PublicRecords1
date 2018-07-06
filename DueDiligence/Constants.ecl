@@ -101,7 +101,11 @@ EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
 EXPORT UNKNOWN_OFFENSES         := [ UNKNOWN, '' ];   
- 
+
+
+EXPORT INCARCERATION_TEXT := 'Incarceration';
+EXPORT PAROLE_TEXT := 'Parole';
+EXPORT PROBATION_TEXT := 'Probation'; 
 
 // ---- 
 // ---- constants used for Offender Level

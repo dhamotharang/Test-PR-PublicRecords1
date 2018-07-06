@@ -273,121 +273,7 @@ EXPORT Layouts := MODULE
 		STRING naicCodes;
 	END;
 
-
- //---                                                                          ---
- //--- This is all of the criminal data we have for each DID and each offense   ---
- //--- So there are multiple rows for each DID.                                 ---
- //--- data collected came from key-offenders, key-offenses, offenders-risk-key ---
- //--- and key-punishments                                                      ---
- //---                                                                          ---
-	EXPORT CriminalOffenseLayout_by_DIDOffense  := RECORD
-		unsigned4	seq := 0;
-		UNSIGNED6 DID;
-		string60 	offender_key;      // offenders key
-		unsigned4 historydate; 
-		UNSIGNED4 DateToUse; 
-		UNSIGNED3 NumOfDaysAgo;  
-    
-    //case details
-    string35 	caseNum;                     // Key_Offenders_Risk.case_num
-    string50  courtType;                   // Key_Offenders.datasource
-    string3   num_of_counts;               // Key_Offenses.num_of_counts
-    string75  charge;                      // Key_Offenders_Risk.offense.court_off_desc_1
-    string40  courtDispDesc1;              // Key_Offenders_Risk.offense.court_disp_desc_1
-		string40  courtDispDesc2;              // Key_Offenders_Risk.offense.court_disp_desc_2
-    
-    //offense details
-    STRING35  caseType;                    // Key_Offenders.case_type_desc
-    STRING35  arrestLevel;                 // Key_Court_Offenses.arr_off_lev_mapped 
-    string1   untouchedOffenseScore;
-    string1   offenseScore;                // values are 'U' or null = UNKOWN, 'M'= Misdemeanor, 'F'= Felony, 'T' = TRAFFIC, 'I'=Infraction.
-    string5   courtOffenseLevel;           // values are documented in a spreadsheet. 
-    
-    //offense locations
-    STRING25  offenseState;                // Key_Offenders_Risk.orig_state
-    STRING30  offenseCounty;               // Key_Offenders_Risk.county_of_origin
-    STRING    courtCounty;                 // Key_Offenses.court_county
-    STRING50  offenseCity;                 // Key_Offenses.offenseTown
-    STRING    agency;                      // Key_Court_Offenses.le_agency_desc
-           
-    //offense dates
-    string8   offenseDate;                 // Key_Offenders_Risk.offense.off_date
-		string8   arrestDate;                  // Key_Offenders_Risk.offense.arr_date
-    string8   courtDispDate;               // Key_Offenders_Risk.offense.court_disp_date
-    string8   sentenceDate;                // Key_Offenders_Risk.offense.sent_date
-		string8   appealDate;                  // Key_Offenders_Risk.offense.appeal_date
-    STRING8   incarcerationDate;
-    STRING8   incarcerationReleaseDate;
-    
-    //additional offense details
-    /*  To determine whether any of these 3 conditions were EVER TRUE - follow the code in getIndCriminal */
-		string1   Ever_incarc_offenders;       // pulled from key_ offenders
-		string1   Ever_incarc_offenses;        // pulled from key_ offenses
-		string1   Ever_incarc_punishments;     // pulled from key_ punishment
-    /*  To determine whether any of these 3 condition are CURRENTLY TRUE - Use logic similar to the VOO function */
-		string1   Curr_incarc_offenders;        // Key_Offenses.curr_incar_flag
-		string1   Curr_incarc_offenses;         // Key_Offenses.stc_desc_2
-		string1   Curr_incarc_punishments;      // Key_Punishment.latest_adm_dt
-    STRING1   currentProbation;             // Key_Offenders.curr_prob_flag
-    STRING    probationSentence;            // Key_Court_Offenses.sent_probation
-    
-    //offender description/info
-    string30  race;                        // Key_Offenders_Risk.race_desc
-    string1   sex;                         // Key_Offenders_Risk.sex
-    string50  hairColor;                   // Key_Offenders_Risk.hair_color_desc
-    string15  eyeColor;                    // Key_Offenders_Risk.eye_color_desc
-    string3   height;                      // Key_Offenders_Risk.height
-    string3   weight;                      // Key_Offenders_Risk.weight
-    string2   citizenship;                 // Key_Offenders_Risk.citizenship
-    
-    //other details
-    UNSIGNED4 legalEventTypeCode;       // Code/Weight from RegularExpressions
-    STRING1   stateFederalData;            //Constant of S = State  or F = Federal
-    string8   earliestOffenseDate;         // in order to calculate how old this date is I need to send we clean it before using it.
-		string8   untouchedearliestOffenseDate;  // if we need to show this in the report it should be the uncleaned date.
-    string20  courtStatute;                // Key_Offenders_Risk.offense.court_statute
-		string70  courtStatuteDesc;            // Key_Offenders_Risk.offense.court_statute_desc
-    
-    string1 	curr_parole_flag;            // pulled from the offenders key
-    string1 	curr_parole_punishments;     // pulled from the key_ punishment
-    
-		
-    
-
-
   
-		string1   convictionFlag; 
-		string1   trafficFlag;
-		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
-		
-		string20  caseTypeDesc;                // ***???
-
-		string30  stc_desc_2;                  // offenses key  --- pulled but not used, except for verification
-		string35  court_off_lev_mapped;        // Court_Offenses key
-    
-    //temp
-    // string8   caseDate;
-    // string8   vendorUploadedDate;
-	 
-	END;
-	
- //---                                                                          ---
- //--- These counts are all of the data we have for each offense but it is      ---
- //--- rolled up to a single DID                                                ---
- //---                                                                          ---
-	EXPORT TrafficOffensesCounts := RECORD                            
-	 /* CONVICTED TRAFFIC VIOLATIONS */ 
-		unsigned2   ConvictedTraffic2T_OVNYR;                           //*** Convicted Traffic Violations over 3 years
-		unsigned2   ConvictedTraffic2T_NYR;                             //*** Convicted Traffic Violations in the past 3 years
-		unsigned2   ConvictedTraffic2T_Ever;                            //*** Convicted Traffic Violations EVER
-    /*  CONVICTED INFRACTIONS VIOLATIONS */    
-		unsigned2   ConvictedInfractions2I_OVNYR;                       //*** Convicted Infractions over 3 years
-		unsigned2   ConvictedInfractions2I_NYR;                         //*** Convicted Infractions in the past 3 years
-		unsigned2   ConvictedInfractions2I_Ever;                        //*** Convicted Infractions EVER
-    //Non Convicted traffic and infractions ever
-    UNSIGNED2   NonConvictedTraffic1T_Ever;
-    UNSIGNED2   NonConvictedInfraction1I_Ever;    
-  END;  
 	
 	EXPORT CivilOffensesCounts := RECORD                               
 	/* LIENS and JUDGMENTS and EVICTIONS */  
@@ -401,53 +287,7 @@ EXPORT Layouts := MODULE
 		unsigned2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
 		unsigned2   evictionsCnt;                                       //*** evictions EVER
 	END;  
-	
-	EXPORT CriminalOffensesCounts := RECORD                            
-	/* CONVICTED NON-TRAFFIC VIOLATIONS */  
-		unsigned2   ConvictedFelonyCount4F_OVNYR;                          //*** Convicted Felony counts over 3 years ago 
-		unsigned2   ConvictedFelonyCount4F_NYR;                          //*** Convicted Felony counts in past 3 years
-		unsigned2   ConvictedFelonyCount4F_Ever;                         //*** Convicted Felony counts EVER
 		
-		unsigned2   ConvictedUnknownCount4U_OVNYR;                         //*** Convicted Unknown counts over 3 years ago
-		unsigned2   ConvictedUnknownCount4U_NYR;                         //*** Convicted Unknown counts in past 3 years
-		unsigned2   ConvictedUnknownCount4U_Ever;                        //*** Convicted Unknown counts EVER
-		
-		unsigned2   ConvictedMisdemeanorCount4M_OVNYR;                     //*** Convicted Misdemeanor counts over 3 years ago 
-		unsigned2   ConvictedMisdemeanorCount4M_NYR;                     //*** Convicted Misdemeanor counts in past 3 years
-		unsigned2   ConvictedMisdemeanorCount4M_Ever;                    //*** Convicted Misdemeanor counts EVER
-		
-		/* NON-CONVICTED NON-TRAFFIC VIOLATIONS */ 
-		unsigned2   NonConvictedFelonyCount3F_OVNYR;                       //*** Non-Convicted Felony counts over 3 years ago
-		unsigned2   NonConvictedFelonyCount3F_NYR;                       //*** Non-Convicted Felony counts in past 3 years
-		unsigned2   NonConvictedFelonyCount3F_EVER;                        //*** Non-Convicted Felony count EVER
-		
-		unsigned2   NonConvictedUnknownCount3U_OVNYR;                      //*** Non-Convicted Unknown counts over 3 years ago
-		unsigned2   NonConvictedUnknownCount3U_NYR;                      //*** Non-Convicted Unknown counts in past N# of years
-		unsigned2   NonConvictedUnknownCount3U_EVER;                     //*** Non-Convicted Unknown counts EVER
-		
-		unsigned2   NonConvictedMisdemeanorCount3M_OVNYR;                  //*** Non-Convicted Misdemeanor counts over 3 years ago
-		unsigned2   NonConvictedMisdemeanorCount3M_NYR;                  //*** Non-Convicted Misdemeanor counts in past N# of years
-		unsigned2   NonConvictedMisdemeanorCount3M_EVER;                   //*** Non-Convicted Misdemeanor count EVER
-	END;   
-	
-	EXPORT IncarcaratedParoleFlags := RECORD                           
-    /* Incarcarated and Parole Evidence of */    
-		BOOLEAN     EverIncarcer;                                       //*** Ever incarcerated
-		BOOLEAN     CurrIncarcer;                                       //*** Currently incarcerated  
-		BOOLEAN     CurrParole;                                         //*** Currently on Parole	
-	END;
-  
-	
-	EXPORT DerogatoryEvents := RECORD 
-	  /* Incarcarated and Parole counts */    
-		 IncarcaratedParoleFlags;  
-		 CriminalOffensesCounts;
-		 TrafficOffensesCounts;  
-     BOOLEAN noEvidenceOfConvictedStateCrim;
-     BOOLEAN noEvidenceOfTrafficOrInfraction;
-		/* TOTAL OF ALL OFFENSES  */  
-		unsigned2   ALLOffensesForThisDID;                            //*** All Criminal Offenses EVER.
-	END;
 	
 	EXPORT GeographicRiskLayout := RECORD 
 		STRING12    buildgeolink;
@@ -483,21 +323,6 @@ EXPORT Layouts := MODULE
 	 BOOLEAN vacant;
    STRING1 addressType;
 	END;	
-	
-	
-  
-  EXPORT BusinessLegalSummary := RECORD 
-    UNSIGNED3   BusFelonyConviction_4F;
-    UNSIGNED3   BusFelonyNonConviction_3F;
-    UNSIGNED3   BusMisdemeanorConviction_4M;
-    UNSIGNED3   BusMisdemeanorNonConviction_3M;
-    UNSIGNED3   BusUnknownConviction_4U;
-    UNSIGNED3   BusUnknownNonConviction_3U;
-    UNSIGNED3   BusTrafficConviction_2T;
-    UNSIGNED3   BusTrafficNonConviction_1T; 
-    UNSIGNED3   BusInfractionConviction_2I;
-    UNSIGNED3   BusInfractionNonConviction_1I;
-  END;
 	
 	
 	EXPORT LayoutAgent := RECORD
@@ -562,7 +387,6 @@ EXPORT Layouts := MODULE
     DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
-    BusinessLegalSummary;
     DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
     STRING parentCompanyName;
@@ -608,6 +432,80 @@ EXPORT Layouts := MODULE
 		STRING phone;
 		Address;
 	END;
+  
+  EXPORT CriminalSources := RECORD
+    STRING offenseCharge;
+    STRING7 offenseConviction;
+    STRING1 offenseChargeLevelCalculated;
+    STRING offenseChargeLevelReported;
+    STRING25 source;
+    STRING courtDisposition1;
+    STRING courtDisposition2;
+    UNSIGNED4 offenseReportedDate;
+    UNSIGNED4 offenseArrestDate;
+    UNSIGNED4 offenseCourtDispDate;
+    UNSIGNED4 offenseAppealDate;
+    UNSIGNED4 offenseSentenceDate;
+    UNSIGNED4 offenseSentenceStartDate;
+    UNSIGNED4 DOCConvictionOverrideDate;
+    UNSIGNED4 DOCScheduledReleaseDate;
+    UNSIGNED4 DOCActualReleaseDate;
+    STRING DOCInmateStatus;
+    STRING DOCParoleStatus;
+    STRING offenseMaxTerm;
+    DATASET({STRING120 name}) partyNames;
+  END;
+  
+  EXPORT CriminalOffenses := RECORD
+    //fields used for attribute calculation - calc based on roll of sources
+    BOOLEAN atr_currentlyIncarceratedOrParoled;
+    BOOLEAN attr_felonyPast3Yrs;
+    BOOLEAN attr_felonyOver3Yrs;
+    BOOLEAN attr_previouslyIncarcerated;
+    BOOLEAN attr_uncategorizedConvictionPast3Yrs;
+    BOOLEAN attr_uncategorizedConvictionOver3Yrs;
+    BOOLEAN attr_misdemeanorConvictionPast3Yrs;
+    BOOLEAN attr_misdemeanorConvictionOver3Yrs;
+    
+    BOOLEAN attr_legalEventCat9;
+    BOOLEAN attr_legalEventCat8;
+    BOOLEAN attr_legalEventCat7;
+    BOOLEAN attr_legalEventCat6;
+    BOOLEAN attr_legalEventCat5;
+    BOOLEAN attr_legalEventCat4;
+    BOOLEAN attr_legalEventCat3;
+    BOOLEAN attr_legalEventCat2;
+    
+    //Top Level Data
+    STRING50 state;
+    STRING25 source;
+    STRING caseNumber;
+    STRING offenseStatute;
+    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED offenseDDLegalEventTypeCode;
+    STRING offenseCharge;
+    STRING1 offenseDDChargeLevelCalculated;
+    STRING offenseChargeLevelReported; 
+    STRING7 offenseConviction;
+    STRING15 offenseIncarcerationProbationParole;
+    STRING7 offenseTrafficRelated;
+    
+    //Additional details
+    STRING30 county;
+    STRING40 countyCourt;
+    STRING40 city;
+    STRING50 agency;
+    STRING30 race;
+    STRING7 sex;
+    STRING15 hairColor;
+    STRING15 eyeColor;
+    STRING3 height;
+    STRING3 weight;
+    
+    //Source info
+    DATASET(CriminalSources) sources;
+  END;
 	
 	
 	EXPORT RelatedParty := RECORD
@@ -616,18 +514,15 @@ EXPORT Layouts := MODULE
 		STRING10 usResidencyFlags;
 		STRING2 legalEventTypeScore;
 		STRING10 legalEventTypeFlags;
-    STRING2 trafficInfractionScore;
-    STRING10 trafficInfractionFlags;
     STRING2 stateCriminalLegalEventsScore;
     STRING10 stateCriminalLegalEventsFlags;
     STRING2 civilLegalEventsScore;
     STRING10 civilLegalEventsFlags;
-    DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
 		UNSIGNED3 numOfLicenses;
 		DATASET(Licenses) licenses; //{MAXCOUNT(DueDiligence.Constants.MAX_LICENSES)};
-		DATASET(CriminalOffenseLayout_by_DIDOffense) partyOffenses;    //***these are listed at the offense level for each DID
+    DATASET(CriminalOffenses) indOffenses;
 	END;
 
 	
@@ -671,7 +566,6 @@ EXPORT Layouts := MODULE
     
     DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
 
-		// unsigned2 	CountOwnProp;                                       //populated in DueDiligence.getBusProperty - 
 		UNSIGNED4		filingDate;	
 		BOOLEAN			sosFilingExists;												            //populated in DueDiligence.getBusSOSDetail
 		STRING2			residentialAddr;												            //populated in DueDiligence.getBusAsInd
