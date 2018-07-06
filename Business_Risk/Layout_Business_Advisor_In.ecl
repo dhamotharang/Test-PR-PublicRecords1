@@ -1,3 +1,5 @@
+﻿IMPORT Risk_Indicators;
+
 EXPORT Layout_Business_Advisor_In := RECORD
 	STRING30  AccountNumber;
 	STRING14  BDID;
@@ -48,4 +50,6 @@ EXPORT Layout_Business_Advisor_In := RECORD
 	string10 exactMatchLevel := '';
 	string50 DataRestrictionMask := '';
 	boolean	 _Blind := false;
+  
+  DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
 END;

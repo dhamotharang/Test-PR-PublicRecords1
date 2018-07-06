@@ -568,11 +568,14 @@ business_risk.Layout_Business_Advisor_In scoredata(df le) := TRANSFORM
 
 	self.DataRestrictionMask := DataRestriction;
 	self.ExactMatchLevel := ExactMatchLevel;
+  self.gateways := PROJECT(gateways_in, Risk_Indicators.Layout_Gateways_In);
 	SELF := [];
 END;
 
 // Pass the input dataset to the Score Controller (if necessary)
-scores := IF(EXISTS(model_url),Business_Risk.Score_Controller(model_url,PROJECT(df,scoredata(LEFT))));
+soapcall_request_date := PROJECT(df,scoredata(LEFT));
+
+scores := IF(EXISTS(model_url),Business_Risk.Score_Controller(model_url,soapcall_request_date));
 
 r combo(r le, scores ri) := TRANSFORM
 	SELF.models := ri.models;
