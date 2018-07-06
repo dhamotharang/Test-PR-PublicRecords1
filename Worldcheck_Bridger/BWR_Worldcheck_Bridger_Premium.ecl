@@ -1,6 +1,6 @@
 ﻿export BWR_Worldcheck_Bridger_Premium(file_date) := macro
 #OPTION('multiplePersistInstances',FALSE);
-#workunit('name','dataopsowner:alleja01 '+ 'Yogurt:WorldCheck Bridger Premium Plus - '+ file_date)
+
 #workunit('priority','high')
 //Inputs
 standard          := 'world-check.csv';
