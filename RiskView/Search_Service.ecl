@@ -1036,6 +1036,15 @@ input_ok := map(((
 				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
 				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport; 
 
+        
+        // for inquiry logging, populate the consumer section with the DID and input fields
+        // don't log the lexid if the person got a noscore
+        self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);
+        searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
+		    SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+        self.Result.Consumer.Inquiry.Phone10 := search.HomePhone;
+        self.Result.Consumer.Inquiry := search;      
+
 				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
 				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
 				ds_excep_blank := DATASET([], iesp.share.t_WsException); 

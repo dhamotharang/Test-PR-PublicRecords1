@@ -1898,6 +1898,10 @@ layout_working calculateSuppression( wAcctNo le, clam ri ) := TRANSFORM
 	); // if(isPrescreen, if(opt_out_hit, '1', '0'), ''),
 	self.v4_PrescreenOptOut := Models.Attributes_Master(ri,true).PrescreenOptOut(isPreScreen, opt_out_hit)	;
 	self.did := (string12)ri.did;
+  // if the transaction can't get a score, don't return the DID for logging the inquiry
+  self.inquiry_lexid := if(riskview.constants.noscore(ri.iid.nas_summary,ri.iid.nap_summary, ri.address_verification.input_address_information.naprop, ri.truedid), 
+  '', 
+  (string12)ri.did);
 	self := le;
 end;
 filtered_pre_screen_recs := join(wAcctNo, clam, left.seq=right.seq, calculateSuppression(left,right) );
