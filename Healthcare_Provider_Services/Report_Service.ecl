@@ -161,7 +161,7 @@
 import AutoStandardI,ingenix_natlprof,Prof_licensev2_services,doxie_files,doxie,iesp,PersonReports, address,Healthcare_Header_Services,ut;
 
 export Report_Service := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
  #onwarning(4207, ignore);
 	myConst := Healthcare_Header_Services.Constants;
 	// get XML input 

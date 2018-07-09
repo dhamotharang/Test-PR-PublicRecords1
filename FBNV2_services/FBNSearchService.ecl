@@ -58,7 +58,7 @@
 
 
 export FBNSearchService() := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('getBdidsbyExecutive',FALSE);
 
 	// output(FBNV2_Services.FBNV2_records, named('Results'));

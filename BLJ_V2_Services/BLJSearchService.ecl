@@ -65,7 +65,7 @@
 import doxie, liensv2_services, Text_Search, bankruptcyv2_Services;
 
 export BLJSearchService() := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     doxie.MAC_Header_Field_Declare(false);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
