@@ -22,6 +22,7 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 												'FEIN',
 												'TMSID',
 												'CaseNumber',
+												'CourtCode',
 												/*---- Person Name Fields ----*/
 												'UnParsedFullName',
 												'FirstName',
@@ -55,7 +56,8 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 												'ApplyNonsubjectRestrictions',
 												'SuppressWithdrawnBankruptcy',
 												'FFDOptionsMask',
-                        'EnableCaseNumberFilterSearch',
+                      'EnableCaseNumberFilterSearch',
+												'isAttorneySearch',
 												/*----  Pagination Fields ----*/
 												'MaxResults',
 												'MaxResultsThisTime',
