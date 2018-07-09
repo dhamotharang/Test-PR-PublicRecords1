@@ -112,6 +112,7 @@
 	<part name="IncludeSBFE" type="xsd:boolean"/>
  <part name="KeepLargeBusinesses" type="xsd:integer"/>
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
+	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
 */
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
@@ -197,7 +198,8 @@ EXPORT ProdData() := FUNCTION
 	'IncludeWatchlistSearch',
  'IncludeProfessionalLicense',
 	'KeepLargeBusinesses',
-	'OverrideExperianRestriction'
+	'OverrideExperianRestriction',
+  'gateways'
 	));
 	
 	/* ************************************************************************
@@ -285,8 +287,15 @@ EXPORT ProdData() := FUNCTION
 	UNSIGNED1 BIPBestAppend_In		 := Business_Risk_BIP.Constants.BIPBestAppend.Default : STORED('BIPBestAppend');
 	UNSIGNED1 OFAC_Version_In      := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold_In := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
-	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested_In := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
-	// Output Options
+
+layout_watchlists_temp := record
+    dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
+  end;
+
+  watchlist_options := dataset([],layout_watchlists_temp) : stored('Watchlists_Requested', few);
+  Watchlists_Requested_In := watchlist_options[1].WatchList;
+	
+  // Output Options
 	UNSIGNED4 OutputRecordCount_In := 100 : STORED('OutputRecordCount');
 	BOOLEAN IncludeAll_In							:= FALSE : STORED('IncludeAll');
 	BOOLEAN IncludeLinkingResults_In	:= FALSE : STORED('IncludeLinkingResults');
@@ -316,6 +325,8 @@ EXPORT ProdData() := FUNCTION
 	BOOLEAN IncludeCortera_In := FALSE : STORED('IncludeCortera');
 	UNSIGNED1 KeepLargeBusinesses_In  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN OverrideExperianRestriction_In := FALSE : STORED('OverrideExperianRestriction');
+
+  gateways_in := Gateway.Configuration.Get();
 
 	/* ************************************************************************
 	 *              Create the Appropriate Library Interface                  *
@@ -418,11 +429,13 @@ EXPORT ProdData() := FUNCTION
 		EXPORT UNSIGNED1	MarketingMode				:= MAX(MIN(MarketingMode_In, 1), 0);
 		EXPORT STRING50		AllowedSources			:= StringLib.StringToUpperCase(AllowedSources_In);
 		EXPORT UNSIGNED1	BIPBestAppend				:= MAX(MIN(BIPBestAppend_In, Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest), Business_Risk_BIP.Constants.BIPBestAppend.Default);
-		EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, 3), 0);
-		EXPORT REAL				Global_Watchlist_Threshold	:= MAX(MIN(Global_Watchlist_Threshold_In, 1), 0);
+		EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, 4), 0);
+    EXPORT DATASET(Gateway.Layouts.Config) Gateways 									:= gateways_in;
+		EXPORT REAL				Global_Watchlist_Threshold	:= if(OFAC_Version in [1, 2, 3], 0.84, 0.85);
 		EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_In;
 		EXPORT UNSIGNED1	KeepLargeBusinesses	:= MAX(MIN(KeepLargeBusinesses_In, 1), 0);
 		EXPORT BOOLEAN		OverrideExperianRestriction := OverrideExperianRestriction_In;
+    EXPORT BOOLEAN 		Include_OFAC 																		:= if(OFAC_Version = 1, false, true);
 	END;
 	
 	// Define the default interface for output options
@@ -458,6 +471,7 @@ EXPORT ProdData() := FUNCTION
 	outputs := MODULE(OutputInterface)
 		EXPORT UNSIGNED4 OutputRecordCount := OutputRecordCount_In;
 		EXPORT BOOLEAN IncludeAll := IncludeAll_In;
+		EXPORT INTEGER OFAC_Version := OFAC_Version_In;
 		EXPORT BOOLEAN IncludeABIUS := IncludeABIUS_In;
 		EXPORT BOOLEAN IncludeBankruptcy := IncludeBankruptcy_In;
 		EXPORT BOOLEAN IncludeBBB := IncludeBBB_In;
@@ -681,6 +695,8 @@ EXPORT ProdData() := FUNCTION
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/);
+                                                    
+   if(options.OFAC_Version = 4 and not exists(options.Gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 																										
 	// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 	DIDKept := ROLLUP(SORT(DIDAppend, Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
@@ -755,8 +771,8 @@ EXPORT ProdData() := FUNCTION
 	
 	cleanedInputSet := PROJECT(LinkIDsFound, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
 	
-	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}], 
-													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
+	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, outputs.OFAC_Version, outputs.IncludeWatchlist, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}], 
+													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, Unsigned1 OFAC_Version, BOOLEAN IncludeWatchlist, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
 	
 	kFetchLinkIDs := Business_Risk_BIP.Common.GetLinkIDs(LinkIDsFound);
 	kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);

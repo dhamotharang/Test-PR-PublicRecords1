@@ -376,10 +376,12 @@ model_name := map(InvalidGreenDotRequest = true		=> error('Invalid parameter inp
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
 	self.servicename := map(model_name = 'fd5609_2'                                  => '', //turn off all gateways for fd5609_2
                             model_name IN ['fp1303_1', 'fp1307_1'] and le.servicename = 'netacuity' => '', //turn off netacuity gateway for fp1303_1
-                            le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) not in Risk_Indicators.iid_constants.FAXML_WatchlistModels => '', 
+                            le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) = '' => le.servicename,
+                            le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) not in Risk_Indicators.iid_constants.FAXML_WatchlistModels => '',
                                                                                                                                                le.servicename);
 	self.url := map(model_name = 'fd5609_2'                                  => '',
                     model_name IN ['fp1303_1', 'fp1307_1'] and le.servicename = 'netacuity' => '',
+                    le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) = '' => le.url,
                     le.servicename = 'bridgerwlc' and OFACVersion = 4 and StringLib.StringToLowerCase(model_name) not in Risk_Indicators.iid_constants.FAXML_WatchlistModels => '',
                                                                                                                                                le.url); 
   self := le;																																								

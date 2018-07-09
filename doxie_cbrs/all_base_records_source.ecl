@@ -1,4 +1,4 @@
-IMPORT doxie_crs, doxie, business_header;
+﻿IMPORT doxie_crs, doxie, business_header;
 doxie_cbrs.mac_Selection_Declare()
 
 //
@@ -472,4 +472,4 @@ end;
 
 // need a dummy set of allowable sections/sources that can be asked for
 return project(nada, getall(left));
-END;
+END; 
