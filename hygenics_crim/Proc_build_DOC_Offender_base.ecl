@@ -255,11 +255,13 @@ addrProject 	:= project(all_names_addresses, addrPop(left),local):INDEPENDENT ;
 																 l.birthplace <> '' => trim(l.birthplace,left,right),
 																 '');
 
-		self.street_address_1		:= trim(l.street)+if(l.unit<>'',' APT: ',' ')+l.unit;
-		self.street_address_2		:= trim(trim(trim(l.city)+' '+trim(l.orig_state))+' '+trim(l.orig_zip));
-		self.street_address_3		:= '';
-		self.street_address_4		:= '';
-		self.street_address_5		:= '';
+
+    tempstreet              := trim(l.street)+if(l.unit<>'', ' APT: '+l.unit, '');
+    self.street_address_1	  := If(length(tempstreet)>25, tempstreet[1..25],tempstreet);
+    self.street_address_2  	:= If(length(tempstreet)>25, tempstreet[26..],'');
+    self.street_address_3	  := trim(l.city);
+    self.street_address_4  	:= trim(l.orig_state);
+    self.street_address_5	  := trim(l.orig_zip);
 		
 		self.race								:= if(length(trim(l.race))=1 , trim(l.race),'');
 		 
