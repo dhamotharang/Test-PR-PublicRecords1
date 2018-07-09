@@ -77,6 +77,8 @@ FUNCTION
 									right.ln_fares_id[1] not in LN_PropertyV2_Services.input.srcRestrict,
                   getFaresID3 (Left, Right), keep(500), LIMIT (10000)); // can be more than 100,000
 				
+	output(byAPN1, named('fn_byAPN1'));
+	output(byAPN2, named('fn_byAPN2'));
 
 	// Pick up current Tax Assesment data									
 	fares_raw := if(exists(indata(in_fares_unformatted_apn<>'')), byAPN1+byAPN2, byAddr);
@@ -115,7 +117,7 @@ FUNCTION
 						keyed(right.source_code_1 = 'O'),
 					get_address(LEFT,RIGHT), left outer, keep(500));
 													
-
+	output(sourceaddrs, named('fn_sourceaddrs'));
 
 	sourcessorted := dedup(sort(sourceaddrs,seq,source_code, address.prim_range, address.prim_name, address.sec_range, address.zip),
 					seq, source_code, address.prim_range, address.prim_name, address.sec_range, address.zip);
@@ -125,6 +127,7 @@ FUNCTION
 	maxHRIPer_Value := 50;
 	doxie.mac_AddHRIAddress(sourcessorted, sources_whri, address.zip, address.prim_name, address.suffix, address.predir, address.postdir, address.prim_range, address.sec_range);
 	
+	output(sources_whri, named('fn_sources_whri'));
 
 	avm_data := append_AVM_function(inData, doAVM);
 	
@@ -143,13 +146,17 @@ FUNCTION
 		self := L;
 	end;
 	
-	
+	output(avm_data, named('avm_data'));
+	output(withPropValue, named('fn_withPropValue'));
 	
 	empty_whriAddr := join(withPropValue, sources_whri,
 							left.reqdata.seq = Right.seq and
 							right.source_code[2] = 'P'   and
 						  (left.reqdata.in_state = '' or left.reqdata.in_state  = right.address.st),
 					    add_source_addr(LEFT,RIGHT), left outer,LIMIT(0));
+
+	output(empty_whriAddr, named('fn_empty_whriAddr'));
+
 	empty_whriAddr1 := LIMIT(empty_whriAddr,1,fail(310, doxie.ErrorCodes(310)));
 	
 	emptyResults add_mailing_addr(EmptyResults L, sources_whri R) := transform
