@@ -169,7 +169,7 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(in_rec.name_first <> '', cleaned_name.fname = in_rec.name_first, true) AND
 																			if(in_rec.name_middle <> '', cleaned_name.mname = in_rec.name_middle, true) AND
 																			if(in_rec.name_last <> '', cleaned_name.lname = in_rec.name_last, true) AND
-																			if(in_rec.addr <> '' , street_1 = in_rec.addr, true) AND
+																			if(in_rec.addr <> '' , address_1 = in_rec.addr, true) AND
 																			if(in_rec.prim_name <> '', 
 																				(clean_address.prim_range = in_rec.prim_range AND
 																				clean_address.prim_name = in_rec.prim_name AND
