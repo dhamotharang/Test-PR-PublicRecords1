@@ -218,7 +218,7 @@ MACRO
 		
 		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
 		                                                                                                       PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] 
-														                                                       and BillingId <>'' and LineIdentityConsentLevel != '';
+														                                                                                           and BillingId <>'' and LineIdentityConsentLevel <> 0;
 		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
 		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
 		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
