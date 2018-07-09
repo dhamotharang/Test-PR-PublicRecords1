@@ -8,7 +8,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     
     gateways := Gateway.Configuration.Get();    
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-    boolean showDisputedRecords := ShowConsumerStatements AND FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
+    boolean showDisputedRecords := FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
 
     layout_w_ffd := record    
       BatchServices.layout_BankruptcyV3_Batch_out; 

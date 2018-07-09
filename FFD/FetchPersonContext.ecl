@@ -83,7 +83,7 @@ EXPORT FetchPersonContext (DATASET(FFD.Layouts.DidBatch) dids,
                        SELF := RIGHT)); 
                        
   recs_filt := recs((~apply_group_filter OR datagroup in data_group_set)
-                    AND (ReturnAll OR RecordType IN FFD.Constants.RecordType.ComplianceRecordLevel));    
+                    AND (ReturnAll OR RecordType IN FFD.Constants.RecordType.ComplianceSet));    
   
   RETURN recs_filt;
 END;
