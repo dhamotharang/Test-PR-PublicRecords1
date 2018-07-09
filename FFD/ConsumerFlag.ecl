@@ -1,11 +1,12 @@
 ﻿IMPORT FCRA, FFD, iesp, PersonContext, STD;
+
 EXPORT ConsumerFlag := MODULE
 
-  BOOLEAN RaiseAlert (STRING record_type, FFD.layouts.ConsumerFlagsBatch in_flags) := 
-  (record_type = FFD.Constants.RecordType.FA AND in_flags.consumer_flags.alert_security_fraud <>'') OR
-  (record_type = FFD.Constants.RecordType.SF AND in_flags.consumer_flags.alert_security_freeze <>'') OR
-  (record_type = FFD.Constants.RecordType.IT AND in_flags.consumer_flags.alert_identity_theft <>'') OR
-  (record_type = FFD.Constants.RecordType.LH AND in_flags.consumer_flags.alert_legal_flag <>''); 
+  SHARED BOOLEAN RaiseAlert (STRING record_type, FFD.layouts.ConsumerFlagsBatch in_flags) := 
+    (record_type = FFD.Constants.RecordType.FA AND in_flags.consumer_flags.alert_security_fraud <>'') OR
+    (record_type = FFD.Constants.RecordType.SF AND in_flags.consumer_flags.alert_security_freeze <>'') OR
+    (record_type = FFD.Constants.RecordType.IT AND in_flags.consumer_flags.alert_identity_theft <>'') OR
+    (record_type = FFD.Constants.RecordType.LH AND in_flags.consumer_flags.alert_legal_flag <>''); 
   
   EXPORT  prepareAlertMessages (DATASET (FFD.Layouts.PersonContextBatch) PersonContext, 
                                 FFD.layouts.ConsumerFlagsBatch in_consumer_flags,
@@ -37,6 +38,7 @@ EXPORT ConsumerFlag := MODULE
   END;
   
   EXPORT prepareAlertMessagesBatch (DATASET(FFD.Layouts.PersonContextBatch) PersonContext,
+                                    DATASET(FFD.layouts.ConsumerFlagsBatch) ds_consumer_flags,
                                     INTEGER8 inFFDOptionsMask = 0) := FUNCTION
 
     returnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask); 
@@ -50,8 +52,16 @@ EXPORT ConsumerFlag := MODULE
                                   SELF.SectionId := ''; 
                                   SELF := LEFT));
 
+    // logic on what alerts should be reported for the subject is defined in ds_consumer_flags, using it to filter alerts accordingly
+    consumer_alerts_fltrd := JOIN(consumer_alerts, ds_consumer_flags,
+                                 LEFT.acctno = RIGHT.acctno AND LEFT.UniqueID = (UNSIGNED) RIGHT.UniqueID,
+                                 TRANSFORM(FFD.layouts.ConsumerStatementBatchFull,
+                                           SELF.RecordType := IF(RaiseAlert(LEFT.RecordType, RIGHT), LEFT.RecordType, SKIP),
+                                           SELF := LEFT),
+                                 KEEP(1), LIMIT(0));
+
     RETURN IF(returnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
-		          consumer_alerts);
+		          consumer_alerts_fltrd);
   END;
 
   STRING1 subject_has_alert := FFD.Constants.subject_has_alert;

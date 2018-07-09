@@ -132,7 +132,7 @@ export batch_records (marriage_divorce_v2_Services.input.batch_params configData
 			
 	// append the actual contents of each consumer statement		
 	consumer_statements_prep := IF(IsFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));	
-  consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, configData.FFDOptionsMask));                                               
+  consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
   consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	// store both records and statements under a single record structure

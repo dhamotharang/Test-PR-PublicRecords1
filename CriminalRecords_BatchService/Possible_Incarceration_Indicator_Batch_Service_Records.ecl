@@ -199,7 +199,7 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 			SELF := RIGHT));
 													 
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));	
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, configData.FFDOptionsMask));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 
 	FFD.MAC.PrepareResultRecordBatch(out, record_out, consumer_statements_alerts, CriminalRecords_BatchService.Layouts.batch_pii_out);	
