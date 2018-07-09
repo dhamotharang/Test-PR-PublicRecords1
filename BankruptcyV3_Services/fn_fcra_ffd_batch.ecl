@@ -94,7 +94,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
                   SELF := RIGHT));
                                                 
     consumer_statements_prep  := FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask);                                               
-    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, inFFDOptionsMask);                                               
+    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask);                                                
        
     consumer_statements_alerts := consumer_alerts + consumer_statements_prep;
     pre_result := PROJECT(ds_out_seq, BatchServices.layout_BankruptcyV3_Batch_out);  // project to non ffd layout    

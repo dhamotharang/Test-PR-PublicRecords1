@@ -126,7 +126,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 							 self := right));	
 	
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, params.FFDOptionsMask));
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, params.FFDOptionsMask));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, params.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	final_recs := if (IsFCRA, sequenced_out_fcra, sequenced_out);

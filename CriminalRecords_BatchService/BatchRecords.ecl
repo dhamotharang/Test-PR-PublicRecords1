@@ -133,7 +133,7 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 
 	// append the actual contents of each consumer statement
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, configData.FFDOptionsMask));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	results_out := PROJECT(results_out_raw, CriminalRecords_BatchService.Layouts.batch_out);

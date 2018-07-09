@@ -127,7 +127,7 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 																								 SELF := RIGHT));
 																								 
 		consumer_statements  := IF(isFCRA, FFD.prepareConsumerStatementsBatch(sd_out, pc_recs, configData.FFDOptionsMask));  // FCRA FFD statements
-    consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, configData.FFDOptionsMask));                                               
+    consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
     consumer_statements_alerts := consumer_statements + consumer_alerts;
 
 		EXPORT FFD_Statements := consumer_statements_alerts;  // FCRA FFD statements
