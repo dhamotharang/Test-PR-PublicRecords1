@@ -458,6 +458,7 @@ EXPORT Layouts := MODULE
     Batchshare.layouts.ShareErrors;
 		FFD.Layouts.ConsumerStatementBatch.SequenceNumber;
 		FFD.Layouts.ConsumerFlags;
+    string12 inquiry_lexid := '';
   end;
 	
 	export batch_out_pre :=record(batch_out)

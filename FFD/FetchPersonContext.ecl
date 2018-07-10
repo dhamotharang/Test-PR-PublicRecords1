@@ -31,7 +31,7 @@
                             FFD.Constants.RecordType.LH => IF(suppress_for_LH, FFD.Constants.AlertMessage.LegalHoldMessage, SKIP), // we should only return LH alert if we are suppressing results for it
                             FFD.Constants.RecordType.SF => FFD.Constants.AlertMessage.FreezeMessage,
                             FFD.Constants.RecordType.FA => FFD.Constants.AlertMessage.FraudMessage + 
-                                                IF(consumer_phone<>'', ' ' + FFD.Constants.AlertMessage.ConsumerPhoneMessage + consumer_phone,''),
+                                                IF(consumer_phone<>'', ' ' + FFD.Constants.AlertMessage.ConsumerPhoneMessage + consumer_phone + '.',''),
                             le.Content);
       SELF := le;
       SELF := [];
@@ -83,7 +83,7 @@ EXPORT FetchPersonContext (DATASET(FFD.Layouts.DidBatch) dids,
                        SELF := RIGHT)); 
                        
   recs_filt := recs((~apply_group_filter OR datagroup in data_group_set)
-                    AND (ReturnAll OR RecordType IN FFD.Constants.RecordType.ComplianceRecordLevel));    
+                    AND (ReturnAll OR RecordType IN FFD.Constants.RecordType.ComplianceSet));    
   
   RETURN recs_filt;
 END;

@@ -1,4 +1,4 @@
-Import Impulse_Email, ut, FCRA, thrive, riskwise, mdr;
+﻿Import Impulse_Email, ut, FCRA, thrive, riskwise, mdr;
 
 export Boca_Shell_Impulse_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide, integer bsversion, 
 		boolean isDirectToConsumerPurpose = false, boolean onThor=false) := FUNCTION
@@ -242,7 +242,7 @@ wThriveOffset_thor := join (distribute(ids_wide(did<>0), hash64(did)),
 		right.src = mdr.sourceTools.src_Thrive_PD  and
 		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate) + 20000) AND
 		(ut.daysapart((string)right.dt_first_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
-		append_thrive(left, right), LOCAL
+		append_thrive_offset(left, right), LOCAL
   );
 	
 wThriveOffset := if(onThor, wThriveOffset_thor, ungroup(wThriveOffset_roxie));

@@ -12,15 +12,13 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED6 did;
 	END; 
 	
-	EXPORT CommonGeographicLayout   := RECORD
-		DueDiligence.Layouts.BusOperLocationLayout;
-	END;
 	
+  
 	
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
 	 InternalSeqAndIdentifiersLayout;
-	 CommonGeographicLayout;
+	 DueDiligence.Layouts.CommonGeographicLayout;
 	END;
  
  
@@ -28,7 +26,7 @@ EXPORT LayoutsInternal := MODULE
 	EXPORT OperatingLocationLayout := RECORD
 		InternalSeqAndIdentifiersLayout;                                 
 		UNSIGNED3 addrCount;
-		DATASET(CommonGeographicLayout) locAddrs;
+		DATASET(DueDiligence.Layouts.CommonGeographicLayout) locAddrs;
 	END;
 	
 	
@@ -112,13 +110,14 @@ EXPORT LayoutsInternal := MODULE
    //person related
    BOOLEAN inquiredOwned;
    BOOLEAN spouseOwned;
+   DATASET(DueDiligence.Layouts.DIDAndName) ownerNames;
+   STRING1 vacancyIndicator;
 
    //business related
    UNSIGNED4 dateFirstSeen;
    UNSIGNED4 dateLastSeen;
    STRING120 ownerName;
-
-   
+ 
    //used for report by both person/business
    UNSIGNED4 historyDate;
    STRING50  addressType;
@@ -132,20 +131,7 @@ EXPORT LayoutsInternal := MODULE
    STRING4 assessedYear;
    INTEGER8 assessedTotalValue;
 
-   STRING10  prim_range;
-   STRING2   predir;
-   STRING28  prim_name;
-   STRING4   suffix;
-   STRING2   postdir;
-   STRING10  unit_desig;
-   STRING8   sec_range;
-   STRING25  p_city_name;
-   STRING25  v_city_name;
-   STRING2   st;
-   STRING5   zip;
-   STRING4   zip4;
-   STRING5   county;
-   STRING7   geo_blk;
+   DueDiligence.Layouts.AddressSlimDetail;
   END;					
 	
 	
@@ -255,20 +241,10 @@ END;
 	END;
 	
 	
-//------                                     ------
-//------   Criminal Offense details          ------
-//------                                     ------
-//------                                     ------
-	EXPORT CriminalDATASETLayout := RECORD
-  unsigned4		seq := 0;
-		unsigned6 	did;
-		string60 	offender_key; 
-		DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) DIDOffenses;
-	END;
 	
 	EXPORT CriminalOffenses := RECORD
 		InternalSeqAndIdentifiersLayout;
-		DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense offense;
+		DueDiligence.Layouts.CriminalOffenses offense;
 	END;
 	
 
@@ -297,7 +273,86 @@ END;
 	END;
   
 
-
+  
+  EXPORT IndCrimLayoutFinal := RECORD
+    InternalSeqAndIdentifiersLayout;
+    STRING sort_key;
+    STRING sort_eventTypeCodeFull;
+    DueDiligence.Layouts.CriminalOffenses
+  END;
+  
+  EXPORT IndCrimLayoutFlat := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 historyDate;
+    
+    //misc additional fields
+    STRING offenderKey;
+    STRING sort_key;
+    STRING sort_eventTypeCodeFull;
+    STRING8 temp_date;
+    UNSIGNED temp_category;
+    UNSIGNED4 temp_calcdFirstSeenDate;
+    STRING8 temp_firstReportedActivity; 
+    BOOLEAN temp_everIncarcerated;
+    
+    //event type category hits
+    BOOLEAN attr_legalEventCat9;
+    BOOLEAN attr_legalEventCat8;
+    BOOLEAN attr_legalEventCat7;
+    BOOLEAN attr_legalEventCat6;
+    BOOLEAN attr_legalEventCat5;
+    BOOLEAN attr_legalEventCat4;
+    BOOLEAN attr_legalEventCat3;
+    BOOLEAN attr_legalEventCat2;
+    
+    //Top Level Data
+    STRING50 state;
+    STRING25 source; //also used in source info
+    STRING caseNumber;
+    STRING offenseStatute;
+    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED offenseDDLegalEventTypeCode;
+    STRING offenseDDLegalEventTypeMapped;
+    STRING offenseCharge; //also used in source info
+    STRING1 offenseDDChargeLevelCalculated;
+    STRING offenseChargeLevelReported; //also used in source info
+    STRING7 offenseConviction; //also used in source info
+    STRING15 offenseIncarcerationProbationParole;
+    STRING7 offenseTrafficRelated;
+    
+    //Additional details
+    STRING30 county;
+    STRING40 countyCourt;
+    STRING40 city;
+    STRING50 agency;
+    STRING30 race;
+    STRING7 sex;
+    STRING15 hairColor;
+    STRING15 eyeColor;
+    STRING3 height;
+    STRING3 weight;
+    
+    //Source info
+    STRING1 offenseChargeLevelCalculated;
+    STRING courtDisposition1;
+    STRING courtDisposition2;
+    UNSIGNED4 offenseReportedDate;
+    UNSIGNED4 offenseArrestDate;
+    UNSIGNED4 offenseCourtDispDate;
+    UNSIGNED4 offenseAppealDate;
+    UNSIGNED4 offenseSentenceDate;
+    UNSIGNED4 offenseSentenceStartDate;
+    UNSIGNED4 DOCConvictionOverrideDate;
+    UNSIGNED4 DOCScheduledReleaseDate;
+    UNSIGNED4 DOCActualReleaseDate;
+    STRING DOCInmateStatus;
+    STRING DOCParoleStatus;
+    STRING offenseMaxTerm;
+    
+    //Party Names
+    STRING120 partyName;
+  END;
 
 
 END;

@@ -109,12 +109,15 @@ EXPORT Raw_ProfessionalLicenses :=
                                         // Bug# 182946 - Filter out records which have been superceded
                                         RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
                                                                   Midex_Services.Constants.RECORD_STATUS.SupercededMariRidNonUpdatingSource] AND
-																				IF(searchType = MIDEX_Services.Constants.COMP_SEARCH, 
-                                            RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.COMPANY OR
-                                            RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.BRANCH,
-                                            IF(searchType = MIDEX_Services.Constants.INDIV_SEARCH, 
+																				CASE(searchType,
+                                             MIDEX_Services.Constants.COMP_SEARCH => 
+                                               RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.COMPANY OR
+                                               RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.BRANCH,
+                                             MIDEX_Services.Constants.INDIV_SEARCH => 
                                                RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.INDIVIDUAL,
-                                            FALSE)),													
+                                             MIDEX_Services.Constants.ALL_LICENSES_SEARCH =>
+                                               TRUE,
+                                             FALSE),													
 																				TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
 																									SELF.data_source := RIGHT.std_source_desc,
 																									SELF.last_upd_date := RIGHT.last_upd_dte,
@@ -145,8 +148,13 @@ EXPORT Raw_ProfessionalLicenses :=
 																																				        RIGHT.nmls_id,RIGHT.orig_issue_dte}],
                                                                                 MIDEX_Services.Layouts.LicenseInfo_Layout),
                                                                       DATASET([], MIDEX_Services.Layouts.LicenseInfo_Layout)),         
-																									SELF.ssn := RIGHT.ssn_taxid_1,
-																									SELF.did := (UNSIGNED6)RIGHT.did,
+																									SELF.ssn := MAP(RIGHT.tax_type_1 = 'S' => RIGHT.ssn_taxid_1,
+                                                                  RIGHT.tax_type_2 = 'S' => RIGHT.ssn_taxid_2,
+                                                                                            ''),
+																									SELF.taxid := MAP(RIGHT.tax_type_1 = 'E' => RIGHT.ssn_taxid_1,
+                                                                    RIGHT.tax_type_2 = 'E' => RIGHT.ssn_taxid_2,
+                                                                                              ''),
+                                                  SELF.did := (UNSIGNED6)RIGHT.did,
 																									SELF.bdid := (UNSIGNED6)RIGHT.bdid,
 																									// If phone1 is all zeroes or blank use contact phone
 																									SELF.phone := IF(stringlib.stringfilterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
@@ -207,7 +215,12 @@ EXPORT Raw_ProfessionalLicenses :=
                                                     SELF.lic_status := RIGHT.std_status_desc,
                                                     SELF.lic_issue_date := RIGHT.orig_issue_dte,
                                                     SELF.lic_expir_date := RIGHT.expire_dte,
-                                                    SELF.ssn := RIGHT.ssn_taxid_1,
+                                                    SELF.ssn := MAP(RIGHT.tax_type_1 = 'S' => RIGHT.ssn_taxid_1,
+                                                                    RIGHT.tax_type_2 = 'S' => RIGHT.ssn_taxid_2,
+                                                                                              ''),
+																									  SELF.taxid := MAP(RIGHT.tax_type_1 = 'E' => RIGHT.ssn_taxid_1,
+                                                                      RIGHT.tax_type_2 = 'E' => RIGHT.ssn_taxid_2,
+                                                                                                ''),
                                                     SELF.dob := RIGHT.birth_dte,
                                                     SELF.did := (UNSIGNED6)RIGHT.did,
                                                     // If phone1 is all zeroes or blank use contact phone

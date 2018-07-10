@@ -447,22 +447,18 @@ EXPORT CommonBusiness := MODULE
 		
 		
 		
-		sortAgents := SORT(rollAddress, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
+		sortAgents := SORT(rollAddress, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), -agent.dateLastSeen);
 		groupAgents := GROUP(sortAgents, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
+    
+    maxAgents := DEDUP(groupAgents, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), KEEP(DueDiligence.Constants.MAX_REGISTERED_AGENTS));
 		
-		DueDiligence.LayoutsInternal.AgentLayout getMaxAgents(DueDiligence.LayoutsInternal.Agent agent, INTEGER c) := TRANSFORM, SKIP(c > DueDiligence.Constants.MAX_REGISTERED_AGENTS)
-			SELF.agents := PROJECT(agent, TRANSFORM(DueDiligence.Layouts.LayoutAgent,
-																							SELF := LEFT.agent;
-																							SELF := [];));
-			SELF := agent;
-			SELF := [];
-			
-		END;
+		formatAgents := PROJECT(UNGROUP(maxAgents), TRANSFORM(DueDiligence.LayoutsInternal.AgentLayout,
+                                                           SELF.agents := DATASET([TRANSFORM(DueDiligence.Layouts.LayoutAgent,
+                                                                                              SELF := LEFT.agent;
+                                                                                              SELF := [];)]);
+                                                           SELF := LEFT;));
 		
-
-		maxAgents := PROJECT(groupAgents, getMaxAgents(LEFT, COUNTER));
-		
-		sortMaxAgents := SORT(maxAgents, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
+		sortMaxAgents := SORT(formatAgents, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
 		
 		rollAgents := ROLLUP(sortMaxAgents,
 													LEFT.seq = RIGHT.seq AND
@@ -495,7 +491,7 @@ EXPORT CommonBusiness := MODULE
 																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
+																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.Layouts.CommonGeographicLayout,
 																																									SELF := RIGHT;
 																																									SELF := [];)])[1];
 																						SELF := LEFT;

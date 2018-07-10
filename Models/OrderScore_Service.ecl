@@ -207,12 +207,14 @@ export OrderScore_Service := MACRO
 		//notice this code is NOT the same as CBD!!!
 		//adding real time Inquiry searching
 		self.servicename := IF(genericModelName IN ['osn1504_0', 
-		                                            'osn1608_1'], 
+		                                            'osn1608_1', 
+		                                            'osn1803_1'], 
 																								le.servicename, '');
 																								
 		netCheck := if(StringLib.StringToLowerCase(le.servicename) = 'targus' OR 
 																		genericModelName NOT IN ['osn1504_0', 
-																		                         'osn1608_1'], 
+																		                         'osn1608_1', 
+																		                         'osn1803_1'], 
 																														 false, true);
 																		
 		self.url := if(netCheck or (stringlib.StringToLowerCase(trim(le.servicename)) in
@@ -268,7 +270,7 @@ export OrderScore_Service := MACRO
 	END;
 	settings := project( attributesIn, checkSettings(left, counter) );
 	
-	modelBSVersion := 51;
+	modelBSVersion := if (genericModelName in ['osn1803_1'],53 ,51);
 											
 	includeVehicles  := FALSE;
 	
@@ -590,6 +592,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 			self._type := map(
 				genericModelName = 'osn1504_0' => 'OSN1504_0',  // Flagship model
 				genericModelName = 'osn1608_1' => 'OSN1608_1',  // Vivid Seats custom model
+				genericModelName = 'osn1803_1' => 'OSN1803_1',  // Wallmart custom model
 				                                  '');
 			self.Value := (integer) le.score;
 			
@@ -606,6 +609,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	iesp.instantid.t_ModelSequencedRISets form_model(getScore le, string account_value) := TRANSFORM
 			self.Name := map(
 				genericModelName = 'osn1608_1' => 'OrderScoreOSN1608_1',
+				genericModelName = 'osn1803_1' => 'OrderScoreOSN1803_1',
 				'OrderScore');
 			self.scores := PROJECT(le, form_cscore(LEFT));
 	END;

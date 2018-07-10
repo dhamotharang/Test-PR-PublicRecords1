@@ -117,6 +117,7 @@ export BillingIndex := MODULE
 		export RVT1605_2			:= '203'; // Verizon - Wireless 
 		export RVC1703_1			:= '204'; // Rossman & Co //batch only
 		export RVC1801_1			:= '205'; // TSI //batch only
+		export RVT1705_1      := '206'; // Huntington	
 		
 	
 		// Chargeback Defender Version 1
@@ -187,5 +188,6 @@ export BillingIndex := MODULE
 		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100)	
 	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 
     export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  
+    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital 
 
 END;

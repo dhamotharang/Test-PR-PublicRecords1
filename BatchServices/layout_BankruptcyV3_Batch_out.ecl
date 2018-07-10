@@ -336,4 +336,5 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING8					comment_6_fdate;
 	STRING30				comment_6_desc;
 	FFD.Layouts.ConsumerFlags;
+  STRING12        inquiry_lexid := '';
 END;

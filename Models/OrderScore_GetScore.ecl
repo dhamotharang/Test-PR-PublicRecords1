@@ -1,4 +1,4 @@
-
+﻿
 import   Risk_Indicators, RiskWise;
 
 EXPORT OrderScore_GetScore (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,  
@@ -30,7 +30,11 @@ WantstoSeeEA                          := TRUE;
 		                                                                WantstoSeeBillToShipToDifferenceFlag,
 																																		isFCRA,
 																																		WantsToSeeEA),
-		genericModelName <> ''             => fail(Models.Layout_ModelOut, 'Invalid service/model input combination'),
+		genericModelName = 'osn1803_1'     => models.OSN1803_1_0( clam, IBICID, 
+		                                                                WantstoSeeBillToShipToDifferenceFlag,
+																																		isFCRA,
+																																		WantsToSeeEA),
+    genericModelName <> ''             => fail(Models.Layout_ModelOut, 'Invalid service/model input combination'),
 		                                      dataset( [], models.Layout_ModelOut )                                     // for transactions with an invalid modelname specified
 	                                        );																																										
 #END

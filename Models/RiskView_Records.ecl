@@ -1,7 +1,6 @@
-﻿
-IMPORT risk_indicators, Risk_Reporting, address, ut, fcra_opt_out, gateway, RiskView, iesp, riskwisefcra, Inquiry_AccLogs, Business_Risk_BIP, STD;
+﻿IMPORT risk_indicators, Risk_Reporting, address, ut, fcra_opt_out, gateway, RiskView, iesp, riskwisefcra, Inquiry_AccLogs, Business_Risk_BIP, STD;
 
-VALIDATING := False;
+VALIDATING := false;
 
 	Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix');
 
@@ -223,7 +222,7 @@ VALIDATING := False;
 			// custom v41
 			model_name IN ['rvc1210_1', 'rvt1212_1', 'rvg1302_1', 'rva1304_1', 'rva1304_2', 'rvg1304_1', 'rvg1304_2', 'rva1306_1', 'rva1305_1', 'rva1305_9',
 										 'rva1309_1', 'rva1310_1', 'rva1310_2', 'rva1310_3', 'rvt1307_3', 'rva1311_1', 'rva1311_2', 'rva1311_3','rvg1401_1', 'rvg1401_2', 
-										 'rvt1402_1', 'rvg1310_1', 'rvg1404_1', 'rvr1311_1','rvr1410_1','rvb1310_1', 'rvb1402_1', 'ied1002_0', 'rvt1605_1', 'rvt1605_2'] => 41,
+										 'rvt1402_1', 'rvg1310_1', 'rvg1404_1', 'rvr1311_1','rvr1410_1','rvb1310_1', 'rvb1402_1', 'ied1002_0', 'rvt1605_1', 'rvt1605_2', 'rvt1705_1'] => 41,
 			
 			1
 		);
@@ -271,7 +270,7 @@ VALIDATING := False;
 		// self is Layout_Input, which defines age as STRING3, so cast the appropriate values to that type.
 		// make age archivable
 		self.age := if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING3)ut.Age((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)),
 														(STRING3)age_value);
 		
 		self.phone10 := hphone_value;
@@ -393,7 +392,8 @@ VALIDATING := False;
 	Models.Layout_Reason_Codes form_rc2(Models.Layout_ModelOut le) := TRANSFORM
 		models36 := ['rvg1302_1', 'rva1304_1', 'rva1304_2', 'rvg1304_1', 'rvg1304_2', 'rva1306_1', 'rva1305_1', 'rva1305_9',
                  'rva1309_1', 'rva1310_1', 'rva1310_2', 'rva1310_3', 'rvt1307_3', 'rva1311_3', 'rvt1402_1', 'rvg1310_1',
-								 'rvg1404_1', 'rvr1311_1', 'rvr1410_1', 'rvb1310_1', 'rvb1402_1', 'pva1602_0', 'fxd1607_0', 'rvt1605_1', 'rvt1605_2'];  //for these newer models, logic is in the model itself for setting RC2 to 36 so don't overlay it here
+								 'rvg1404_1', 'rvr1311_1', 'rvr1410_1', 'rvb1310_1', 'rvb1402_1', 'pva1602_0', 'fxd1607_0', 'rvt1605_1', 
+                 'rvt1605_2','rvt1705_1'];  //for these newer models, logic is in the model itself for setting RC2 to 36 so don't overlay it here
 		self.reason_code        := map(
 			le.ri[2].hri <> '00' => le.ri[2].hri,
 			custom_model_name not in models36 and le.ri[1].hri NOT IN ['00', '35', '36'] => '36',
@@ -471,7 +471,7 @@ VALIDATING := False;
 
 	#if(VALIDATING)
 			// final := ungroup(Models.RVG1404_1_0(clam, isCalifornia));
-			// final := ungroup(Models.RVT1605_2_0(clam, isCalifornia));
+			 final := ungroup(Models.RVT1705_1_0(clam, isCalifornia));
 			// final := ungroup(Models.RVB1310_1_0(clam, false, true));
 	    // final := ungroup(Models.RVB1104_1_0(clam, false));
 	#else
@@ -611,6 +611,7 @@ VALIDATING := False;
 			model_name = 'ied1002_0' => ungroup(Models.IED1002_0_9(clam_to_run, isCalifornia)),
 			model_name = 'rvt1605_1' => ungroup(Models.RVT1605_1_0(clam_to_run, isCalifornia)),
 			model_name = 'rvt1605_2' => ungroup(Models.RVT1605_2_0(clam_to_run, isCalifornia)),
+			model_name = 'rvt1705_1' => ungroup(Models.RVT1705_1_0(clam_to_run, isCalifornia)),
 			dataset([], Models.Layout_ModelOut)
 			);
 		
@@ -729,6 +730,7 @@ VALIDATING := False;
 			model_name = 'ied1002_0' => 'IncomeIED10020', // Estimated Income
 			model_name = 'rvt1605_1' => 'TelecomRVT16051', // Equifax/Verizon
 			model_name = 'rvt1605_2' => 'TelecomRVT16052', // Equifax/Verizon
+			model_name = 'rvt1705_1' => 'TelecomRVT17051', // Huntington
 			
 
 			/***************/      
@@ -839,6 +841,7 @@ VALIDATING := False;
 			model_name='ied1002_0' => Risk_Indicators.BillingIndex.IED1002_0,
 			model_name='rvt1605_1' => Risk_Indicators.BillingIndex.RVT1605_1,
 			model_name='rvt1605_2' => Risk_Indicators.BillingIndex.RVT1605_2,
+			model_name='rvt1705_1' => Risk_Indicators.BillingIndex.RVT1705_1,
 			''
 		);
 				
@@ -857,7 +860,7 @@ VALIDATING := False;
 			'rva1104_0', 'rvp1104_0', 'rvt1104_0', 'rvb1104_0', 'rvc1112_0', 'rvg1106_1', 'rva1008_1', 'rvt1104_1', 'rvd1110_1', 'ied1106_1', 'rvr1104_2', 'rvg1201_1', 'rva707_1',         
 			'rva1007_1', 'rva1007_2', 'rvt1204_1', 'rvt1210_1', 'rvr1303_1', 'rvc1210_1', 'rvt1212_1', 'rvg1302_1', 'rva1304_1', 'rva1304_2', 'rvg1304_1', 'rvg1304_2', 'rva1306_1',
 			'rva1305_1', 'rva1305_9', 'rva1309_1', 'rva1310_1', 'rva1310_2', 'rva1310_3', 'rvt1307_3', 'rva1311_1', 'rva1311_2', 'rva1311_3','rvg1401_1', 'rvg1401_2', 'rvt1402_1',
-			'rvg1310_1', 'rvg1404_1', 'rvr1311_1','rvr1410_1','rvb1310_1','rvb1402_1', 'rvb1104_1', 'ied1002_0', 'pva1602_0', 'fxd1607_0', 'rvt1605_1', 'rvt1605_2'];  
+			'rvg1310_1', 'rvg1404_1', 'rvr1311_1','rvr1410_1','rvb1310_1','rvb1402_1', 'rvb1104_1', 'ied1002_0', 'pva1602_0', 'fxd1607_0', 'rvt1605_1', 'rvt1605_2', 'rvt1705_1'];  
 
 		models_result := if(test_data_enabled, testret, ret);
 		self.models := if(model_name in setModels, models_result, FAIL(dataset( [], Models.Layout_Model ), 'Invalid model: ' + model_name));
@@ -2822,7 +2825,8 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 		DATASET(Models.Layout_Model) models;
 		Layout_RVAttributesOut AttributeGroups;
 		dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
-	END;
+    iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[ecl_only]  // this is for FFD-523 to be compatible with all other public records fcra queries, even though it's redundant to the inputEcho section
+  END;
 
 
 	Models.Layout_Parameters CAParamsBlankout( Models.Layout_Parameters le ) := TRANSFORM
@@ -2847,7 +2851,28 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 		self.did := clam_to_run[1].did;
 		self.InputEcho := echo_in;										
 		self.models := le.models;
-		
+
+    // for inquiry logging, populate the consumer section with the DID and input fields
+    // if the person is a noScore, don't log the DID
+    self.Consumer.LexID := if(riskview.constants.noscore(clam_to_run[1].iid.nas_summary,clam_to_run[1].iid.nap_summary, clam_to_run[1].address_verification.input_address_information.naprop, clam_to_run[1].truedid), 
+        '', 
+        (string12)clam_to_run[1].did); 
+    
+    searchDOB := echo_in[1].dateofbirth;
+    SELF.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+    self.Consumer.Inquiry.Phone10 := echo_in[1].HomePhone;
+    self.Consumer.Inquiry.name.Full := echo_in[1].unparsedfullname;
+    self.Consumer.Inquiry.name.First := echo_in[1].firstname;
+    self.Consumer.Inquiry.name.Middle := echo_in[1].middlename;
+    self.Consumer.Inquiry.name.Last := echo_in[1].lastname;
+    self.Consumer.Inquiry.name.Suffix := echo_in[1].namesuffix;
+    self.Consumer.Inquiry.address.streetaddress1 := echo_in[1].streetaddress;
+    self.Consumer.Inquiry.address.city := echo_in[1].city;
+    self.Consumer.Inquiry.address.state := echo_in[1].state;
+    self.Consumer.Inquiry.address.zip5 := echo_in[1].zip;
+    self.Consumer.Inquiry.UniqueID := (string)clam_to_run[1].did;    
+    self.Consumer.Inquiry := echo_in[1];  
+        
 		self.AttributeGroups.AccountNumber := ri.AccountNumber;
 		self.AttributeGroups.AttributeGroup := if( inCalif, project( ri.AttributeGroup, CAAttributeGroupBlankout(left) ), ri.AttributeGroup );
 		self := [];

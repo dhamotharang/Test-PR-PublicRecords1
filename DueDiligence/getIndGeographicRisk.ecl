@@ -59,7 +59,7 @@ EXPORT getIndGeographicRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 																	SELF.CityRailStation           := RIGHT.CityRailStation;
 																	SELF.HIDTA                     := RIGHT.HIDTA;
 																	SELF.HIFCA                     := RIGHT.HIFCA;
-																	SELF.HighFelonNeighborhood     := RIGHT.HighFelonNeighborhood;
+                                  SELF.FipsCode                  := RIGHT.FipsCode;
                                   SELF.CountyName                := RIGHT.CountyName;  
 																	/*  Populate the rest of the Business Internal from the LEFT             */
 																	SELF := LEFT),

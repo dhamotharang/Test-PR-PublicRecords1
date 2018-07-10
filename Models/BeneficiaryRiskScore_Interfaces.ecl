@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Address, BatchDatasets, BatchShare;
 
 EXPORT BeneficiaryRiskScore_Interfaces := MODULE
@@ -32,7 +32,7 @@ EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	
 	// An instantiation of the Interface above. There can be other instantiations for different
 	// configurations or purposes. The values assigned below are obtained from Risk_Indicators.Boca_Shell.
-	EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions) := MODULE(IInstantIDConfig)
+	EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions, unsigned1 ofac_version_ = 1, boolean include_ofac_ = false, real global_watchlist_threshold_ = 0.84) := MODULE(IInstantIDConfig)
 		EXPORT BOOLEAN isFCRA              := FALSE;
 		EXPORT BOOLEAN ln_branded          := FALSE;
 		EXPORT BOOLEAN isUtility           := StringLib.StringToUpperCase(restrictions.industry_class) = 'UTILI';
@@ -42,10 +42,10 @@ EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 		EXPORT BOOLEAN from_biid           := FALSE;
 		EXPORT BOOLEAN excludeWatchlists   := FALSE;
 		EXPORT BOOLEAN from_IT1O           := FALSE;
-		EXPORT UNSIGNED1 ofac_version      := 1;
-		EXPORT BOOLEAN include_ofac        := FALSE;
+		EXPORT UNSIGNED1 ofac_version      := ofac_version_;
+		EXPORT BOOLEAN include_ofac        := include_ofac_;
 		EXPORT BOOLEAN include_additional_watchlists := FALSE;
-		EXPORT REAL watchlist_threshold    := 0.84;
+		EXPORT REAL watchlist_threshold    := global_watchlist_threshold_;
 		EXPORT INTEGER2 dob_radius         := -1;
 		EXPORT BOOLEAN includeRelativeInfo := TRUE;
 		EXPORT BOOLEAN includeDLInfo       := TRUE;

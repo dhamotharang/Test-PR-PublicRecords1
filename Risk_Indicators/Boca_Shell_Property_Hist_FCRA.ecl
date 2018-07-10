@@ -570,7 +570,7 @@ itera into2sales(itera le, itera ri) := transform
 															
 	self := le;
 end;
-distressed := rollup(itera(iter_seq<3), left.did=right.did and left.seq=right.seq, into2sales(left,right));		// already have 2 records per did and applicant sold recs
+distressed := rollup(itera(iter_seq<3), left.seq=right.seq and left.did=right.did, into2sales(left,right));		// already have 2 records per did and applicant sold recs
 
 //join test to deeds_added so we have 3 records with all info
 
@@ -587,7 +587,7 @@ layout_PropertyRecordPlus fillall(deeds_added le, distressed ri) := transform
 	
 	self := le;
 end;
-wDistressed := join(deeds_added, distressed, left.did=right.did, fillall(left,right), left outer);
+wDistressed := join(deeds_added, distressed, left.seq = right.seq and left.did=right.did, fillall(left,right), left outer);
 
 
 

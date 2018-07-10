@@ -109,4 +109,20 @@
 		RETURN __outf;
 	ENDMACRO;
 
+	EXPORT InquiryLexidBatch(__ds_input, __ds_results, __lout, __addl_options) := FUNCTIONMACRO
+  
+  __ds_out := JOIN(__ds_input, __ds_results,
+                        LEFT.acctno = RIGHT.acctno,
+                        TRANSFORM(__lout,
+                                SELF.acctno := IF((UNSIGNED) LEFT.did > 0 OR RIGHT.acctno<>'', LEFT.acctno, SKIP),
+                                SELF.inquiry_lexid := MAP(__addl_options>0 AND (UNSIGNED) RIGHT.inquiry_lexid > 0 => RIGHT.inquiry_lexid,  // if it was assigned already - keep it
+                                                           (UNSIGNED) LEFT.did > 0 => (STRING) LEFT.did,   // if resolved input Lexid available, use it for inquiry
+                                                           ''), 
+                                SELF:= RIGHT),
+                        LEFT OUTER,
+                        LIMIT(0));
+                        
+		RETURN __ds_out;
+	ENDMACRO;
+                        
 END;

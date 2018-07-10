@@ -1,4 +1,4 @@
-IMPORT iesp, DemoSearchTool;
+﻿IMPORT iesp, DemoSearchTool;
 
 EXPORT TestCaseSearchService_Records (DemoSearchTool.IParams.SearchIParams inMod ) := 
   FUNCTION
@@ -249,12 +249,12 @@ EXPORT TestCaseSearchService_Records (DemoSearchTool.IParams.SearchIParams inMod
           inMod.is_Biz_SearchBipKeys              => ds_DtcAndBothBizRecs,
           
           inMod.isPersonSearch AND
-          NOT inMod.is_Per_searchDirectToConsumer AND
+          inMod.is_Per_searchDirectToConsumer AND
           inMod.isBusinessSearch  AND
           inMod.is_Biz_SearchLegacyKeys           => ds_DtcAndLegacyBizRecs,
           
           inMod.isPersonSearch AND
-          NOT inMod.is_Per_searchDirectToConsumer AND
+          inMod.is_Per_searchDirectToConsumer AND
           inMod.isBusinessSearch  AND
           inMod.is_Biz_SearchBipKeys              => ds_DtcAndBipBizRecs,
           

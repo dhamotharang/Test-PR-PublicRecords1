@@ -1,10 +1,10 @@
-import doxie, doxie_crs, suppress, ut;
+﻿import doxie, doxie_crs, suppress, ut;
 
 doxie.MAC_Header_Field_Declare()
 
 ssns := dedup(doxie.comp_ssns((unsigned)ssn_unmasked > 0),ssn_unmasked,all);
 
-
+isCNSMR := ut.IndustryClass.is_Knowx;
 // Fetch the SSN information for all extent ssns
 ssn_info := doxie_crs.layout_SSN_Lookups;
 
@@ -42,11 +42,16 @@ ssn_info ssnm(ssn_temp_rec frm,doxie.Key_SSN_Map R) := transform
 	self.ssn_unmasked := frm.ssn_unmasked;
  end;
 
-result := join(ssn_w_legacy_info,doxie.Key_SSN_Map,
+result_SSN_info := join(ssn_w_legacy_info,doxie.Key_SSN_Map,
                keyed (left.ssn_unmasked[1..5] = Right.ssn5) AND
                keyed (left.ssn_unmasked[6..9] between Right.start_serial AND Right.end_serial), //between is inclusive
                ssnm(left,right),
                left outer, KEEP (1), limit (0)); //1:1 relation
+
+
+result_SSN_supressed := Project(ssn_w_legacy_info, transform(ssn_info, self := left, self := []));
+
+result := if(isCNSMR, result_SSN_supressed, result_SSN_info);
 
 result mask_ssn5(result l) := transform
 	self.ssn5_unmasked := l.ssn5;

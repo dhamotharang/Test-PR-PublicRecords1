@@ -72,14 +72,53 @@ export t_DDRTaxAssessmentValues := record
 end;
 		
 export t_DDRLegalSourceInfo := record
-	string OffenseDescription {xpath('OffenseDescription')};
-	boolean Convicted {xpath('Convicted')};
-	string OffenseType {xpath('OffenseType')};
-	string OffenseLevel {xpath('OffenseLevel')};
-	string CaseType {xpath('CaseType')};
+	string OffenseCharge {xpath('OffenseCharge')};
+	string7 OffenseConviction {xpath('OffenseConviction')};
+	string OffenseChargeLevelCalculated {xpath('OffenseChargeLevelCalculated')};
+	string OffenseChargeLevelReported {xpath('OffenseChargeLevelReported')};
+	string Source {xpath('Source')};
 	string CourtDisposition1 {xpath('CourtDisposition1')};
 	string CourtDisposition2 {xpath('CourtDisposition2')};
-	dataset(iesp.share.t_StringArrayItem) PartyNames {xpath('PartyNames/PartyName'), MAXCOUNT(1)};
+	iesp.share.t_Date OffenseReportedDate {xpath('OffenseReportedDate')};
+	iesp.share.t_Date OffenseArrestDate {xpath('OffenseArrestDate')};
+	iesp.share.t_Date OffenseCourtDispDate {xpath('OffenseCourtDispDate')};
+	iesp.share.t_Date OffenseAppealDate {xpath('OffenseAppealDate')};
+	iesp.share.t_Date OffenseSentenceDate {xpath('OffenseSentenceDate')};
+	iesp.share.t_Date OffenseSentenceStartDate {xpath('OffenseSentenceStartDate')};
+	iesp.share.t_Date DOCConvictionOverrideDate {xpath('DOCConvictionOverrideDate')};
+	iesp.share.t_Date DOCScheduledReleaseDate {xpath('DOCScheduledReleaseDate')};
+	iesp.share.t_Date DOCActualReleaseDate {xpath('DOCActualReleaseDate')};
+	string DOCInmateStatus {xpath('DOCInmateStatus')};
+	string DOCParoleStatus {xpath('DOCParoleStatus')};
+	string OffenseMaxTerm {xpath('OffenseMaxTerm')};
+	dataset(iesp.share.t_StringArrayItem) PartyNames {xpath('PartyNames/PartyName'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLegalPartyNames)};
+end;
+		
+export t_DDRLegalStateCriminal := record
+	string50 State {xpath('State')};
+	string25 Source {xpath('Source')};
+	string CaseNumber {xpath('CaseNumber')};
+	string OffenseStatute {xpath('OffenseStatute')};
+	iesp.share.t_Date OffenseDDFirstReported {xpath('OffenseDDFirstReported')};
+	iesp.share.t_Date OffenseDDLastReportedActivity {xpath('OffenseDDLastReportedActivity')};
+	string OffenseDDLegalEventTypeMapped {xpath('OffenseDDLegalEventTypeMapped')};
+	string OffenseCharge {xpath('OffenseCharge')};
+	string OffenseDDChargeLevelCalculated {xpath('OffenseDDChargeLevelCalculated')};
+	string OffenseChargeLevelReported {xpath('OffenseChargeLevelReported')};
+	string7 OffenseConviction {xpath('OffenseConviction')};
+	string15 OffenseIncarcerationProbationParole {xpath('OffenseIncarcerationProbationParole')};
+	string7 OffenseTrafficRelated {xpath('OffenseTrafficRelated')};
+	string30 County {xpath('County')};
+	string40 CountyCourt {xpath('CountyCourt')};
+	string40 City {xpath('City')};
+	string50 Agency {xpath('Agency')};
+	string30 Race {xpath('Race')};
+	string7 Sex {xpath('Sex')};
+	string15 HairColor {xpath('HairColor')};
+	string15 EyeColor {xpath('EyeColor')};
+	string3 Height {xpath('Height')};
+	string3 Weight {xpath('Weight')};
+	dataset(t_DDRLegalSourceInfo) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLegalSources)};
 end;
 		
 export t_DDRProperty := record
@@ -182,7 +221,7 @@ export t_DDRLegalEventCriminal := record
 	iesp.share.t_Date DOCActualReleaseDate {xpath('DOCActualReleaseDate')};
 	string DOCInmateStatus {xpath('DOCInmateStatus')};
 	string DOCParoleStatus {xpath('DOCParoleStatus')};
-	dataset(t_DDRLegalSourceInfo) Sources {xpath('Sources/Source'), MAXCOUNT(1)};
+	dataset(t_DDRLegalSourceInfo) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLegalSources)};
 end;
 		
 export t_DDRLegalSummary := record
@@ -265,8 +304,8 @@ end;
 export t_DDRAttributesOptions := record (iesp.share.t_BaseOption)
 	string32 AttributesVersionRequest {xpath('AttributesVersionRequest')};
 	iesp.share.t_Date HistoryDate {xpath('HistoryDate')};
-	boolean IncludeNews {xpath('IncludeNews')};
 	boolean DisplayText {xpath('DisplayText')};
+	boolean UseLexIDAsOverride {xpath('UseLexIDAsOverride')};//hidden[internal]
 	string IncludeSpecialAttributes {xpath('IncludeSpecialAttributes')}; //values['None','Online','Batch','']//hidden[internal]
 end;
 		

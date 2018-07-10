@@ -670,4 +670,5 @@ etc.
 		UNSIGNED6 borrower_2_dotid				 := 0;
 		STRING9   borrower_2_ssn           := '';			
 		FFD.Layouts.ConsumerFlags;	
+    STRING12  inquiry_lexid            := '';
 	END;

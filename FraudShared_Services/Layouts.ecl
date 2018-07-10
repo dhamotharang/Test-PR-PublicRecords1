@@ -184,4 +184,13 @@ EXPORT Layouts := MODULE
 			INTEGER velocity_score;
 	END;
 	
+	EXPORT layout_velocity_matches :=  RECORD
+			BatchShare.Layouts.ShareAcct;
+			UNSIGNED8 record_id;
+			STRING date;
+			STRING fragment;
+			DATASET({STRING fragmentType}) fragment_matches;
+			DATASET({STRING contributionType}) contributionType_matches;
+	END;
+	
 END;

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, MDR, ut;
+﻿﻿IMPORT iesp, Gateway, MDR, ut;
 EXPORT Constants :=
 MODULE
 
@@ -81,10 +81,11 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT UNSIGNED1 MaxSectionLimit	   := 35; 
 	END;
 	
-	// Porting phones constants
+	// Ported metadata phones constants
 	EXPORT PortingStatus:=
 	MODULE
 		EXPORT Disconnected := 'DE'; //SU-suspend
+		EXPORT UNSIGNED1 DisconnectedPhoneThreshold := 180; // no of days threshold for phone disconnect status
 	END;
 	
 	EXPORT SET OF STRING OTPVerifyTransactions := ['mfaverifyotp','mfaverifyotponce'];
@@ -145,8 +146,16 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING3 	optinDuration := 'ONG';
 	END;
 	
-	//Zumigo
-	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
+	EXPORT ConsentLevels := MODULE
+	  EXPORT UNSIGNED1 SingleConsumer := 2;
+	  EXPORT UNSIGNED1 FullConsumer   := 3;
+	END;
+	
+	EXPORT RiskRules := MODULE
+	  EXPORT UNSIGNED1 SimCardInfo  := 35;
+	  EXPORT UNSIGNED1 DeviceInfo   := 36;
+	END;
+	
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    

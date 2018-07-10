@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, iesp, ut;
+﻿IMPORT AutoStandardI, iesp, ut;
 
 EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) := 
   FUNCTION
@@ -48,7 +48,11 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     sanctPub_report := MIDEX_Services.Raw_Public.License.Report_View.by_midex_rpt_num(ds_Sanctreport_ids,in_mod.AlertVersion,in_mod.SearchType,in_mod.ssnmask,in_mod.applicationType);
 		
 		// Get Profesional License Mari report(s)
-		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, in_mod.AlertVersion, in_mod.ssnmask, in_mod.applicationType, in_mod.searchType);
+		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, 
+                                                                                              in_mod.AlertVersion, 
+                                                                                              in_mod.ssnmask, 
+                                                                                              in_mod.applicationType, 
+                                                                                              IF(in_mod.isLicenseOnlyReport,MIDEX_Services.Constants.ALL_LICENSES_SEARCH,in_mod.searchType));
 
 		nohash_results_raw := 
       CHOOSEN(DEDUP(sanctNP_report+sanctPub_report+profLic_report,ALL),iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES);

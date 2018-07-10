@@ -166,15 +166,17 @@ EXPORT fn_getadvsearch_raw_recs (
 	
 	//Applying the all AND filters based on all the Search Fields.
 	ds_recs_filtered := ds_payload_recs(if(in_rec.did <> 0, did = in_rec.did, true) AND
-																			if(in_rec.name_last <> '', raw_last_name = in_rec.name_last, true) AND
-																			if(in_rec.addr <> '' , street_1 = in_rec.addr, true) AND
+																			if(in_rec.name_first <> '', cleaned_name.fname = in_rec.name_first, true) AND
+																			if(in_rec.name_middle <> '', cleaned_name.mname = in_rec.name_middle, true) AND
+																			if(in_rec.name_last <> '', cleaned_name.lname = in_rec.name_last, true) AND
+																			if(in_rec.addr <> '' , address_1 = in_rec.addr, true) AND
 																			if(in_rec.prim_name <> '', 
 																				(clean_address.prim_range = in_rec.prim_range AND
 																				clean_address.prim_name = in_rec.prim_name AND
 																				clean_address.sec_range = in_rec.sec_range AND
 																				((clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st) OR clean_address.zip = in_rec.z5)),true) AND
 																			if(in_rec.ssn <> '', ssn = in_rec.ssn, true) AND
-																			if(in_rec.phoneno <> '', phone_number = in_rec.phoneno, true) AND
+																			if(in_rec.phoneno <> '', in_rec.phoneno IN [clean_phones.phone_number, clean_phones.cell_phone, clean_phones.work_phone], true) AND
 																			if(in_rec.HouseholdId <> '', household_id = in_rec.HouseholdId, true) AND
 																			if(in_rec.CustomerPersonId <> '', customer_person_id = in_rec.CustomerPersonId, true) AND
 																			if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '', 
@@ -203,7 +205,8 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(domainNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,2)) = email_user_domain, true) AND
 																			if(fullemail, email_address = STD.Str.CleanSpaces(in_rec.email_address), true) AND
 																			if(in_rec.dl_number <> '' AND in_rec.dl_state <> '',
-																					drivers_license = in_rec.dl_number AND drivers_license_state = in_rec.dl_state, true)
+																					drivers_license = in_rec.dl_number AND drivers_license_state = in_rec.dl_state, true) AND
+																			if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true)
 																		 );
 																		 
 	//AND filter with BankName , explicit join because we do not have BankName field in the payload. 
@@ -218,7 +221,7 @@ EXPORT fn_getadvsearch_raw_recs (
 																JOIN(ds_recs_filtered_bankname, ds_CountyIds,
 																	LEFT.record_id = RIGHT.record_id,
 																	TRANSFORM(LEFT)),
-																ds_recs_filtered);																
+																ds_recs_filtered_bankname);																
 																		 
   // *** No filtering in FraudGov
   ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered_final);
@@ -227,6 +230,7 @@ EXPORT fn_getadvsearch_raw_recs (
 
   ds_allPayloadRecs := ds_FilterThruMBS;
 	
+	// output(ds_auto_phone, named('ds_auto_phone'));
 	// output(ds_recs, named('ds_recs'));
 	// output(ds_recs_filtered, named('ds_recs_filtered'));
 	// output(ds_recs_filtered_final, named('ds_recs_filtered_final'));

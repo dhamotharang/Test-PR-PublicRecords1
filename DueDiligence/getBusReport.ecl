@@ -3,19 +3,18 @@
 EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
                             Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                             BIPV2.mod_sources.iParams linkingOptions,
-                            string6 DD_SSNMask,
-													  boolean DebugMode = FALSE
-											      ) := FUNCTION
+                            string6 DD_SSNMask) := FUNCTION
 													 
 
-	UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DD_SSNMask, DebugMode);
+	
+  UpdateBusnExecCriminalWithReport  := DueDiligence.reportBusExecCriminal(BusnData, DD_SSNMask);
 
 		
   //***This section is for Operating Locations  ***//
-	AddOperatingLocToReport    :=  DueDiligence.reportBusOperLocations(UpdateBusnExecCriminalWithReport, DebugMode);
+	AddOperatingLocToReport    :=  DueDiligence.reportBusOperLocations(UpdateBusnExecCriminalWithReport);
 
 	//***This section is for Operating Information  ***//
-	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport, DebugMode);
+	AddOperatingInfoToReport   :=  DueDiligence.reportBusOperatingInformation(AddOperatingLocToReport);
 	
   //***This section is for Registered Agents  ***//	
   addRegisteredAgents        := DueDiligence.reportBusRegisteredAgents(AddOperatingInfoToReport, options, linkingOptions);
@@ -37,15 +36,11 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-
-	// *********************
-
-	  // IF(DebugMode,      OUTPUT(CHOOSEN(UpdateBusnExecCriminalWithReport, 50),   NAMED('UpdateBusnExecCriminalWithReport')));		
-   	// IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingLocToReport, 50),     NAMED('AddOperatingLocToReportout')));		
-   	// IF(DebugMode,      OUTPUT(CHOOSEN(AddOperatingInfoToReport, 50),     NAMED('AddOperatingInfoToReport')));		
-   	// IF(DebugMode,      OUTPUT(CHOOSEN(addBestData, 50),                NAMED('addBestData')));		
-   	// IF(DebugMode,      OUTPUT(CHOOSEN(addShellShelf, 50),                NAMED('addShellShelf')));		
-    
+	// OUTPUT(CHOOSEN(UpdateBusnExecCriminalWithReport, 50),   NAMED('UpdateBusnExecCriminalWithReport'));		
+  // OUTPUT(CHOOSEN(AddOperatingLocToReport, 50),     NAMED('AddOperatingLocToReportout'));		
+  // OUTPUT(CHOOSEN(AddOperatingInfoToReport, 50),     NAMED('AddOperatingInfoToReport'));		
+  // OUTPUT(CHOOSEN(addBestData, 50),                NAMED('addBestData'));		
+  // OUTPUT(CHOOSEN(addShellShelf, 50),                NAMED('addShellShelf'));		
     
   // OUTPUT(addBestData, NAMED('addBestData'));  
   // OUTPUT(addExecutives, NAMED('addExecutives'));  

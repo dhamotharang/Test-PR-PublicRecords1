@@ -29,7 +29,7 @@
 /*--INFO-- This service searches all Mfind datafiles.*/
 
 export MFindSearchService := macro
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 Param := module(MFindV2_Services.InterFaces.VID) 
 	MFindV2_Services.Mac_stored();
 END;

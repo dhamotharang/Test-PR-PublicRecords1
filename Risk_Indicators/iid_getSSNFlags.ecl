@@ -74,7 +74,8 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 						
 	self.PWsocsvalflag := PWsocsvalflag_temp;
 	
-	socsRCISflag_temp := IF(Risk_Indicators.searchLegacySSN(le.ssn, le.did, isFCRA), '1', '0');
+	socsRCISflag_temp := IF(onThor, le.socsRCISflag,
+                        IF(Risk_Indicators.searchLegacySSN(le.ssn, le.did, isFCRA), '1', '0'));
 	SELF.socsRCISflag := socsRCISflag_temp;
 	
 	SELF.soclstate := IF(i = 1 or ssnCorrectionHit,ri.issue_state,le.soclstate);
@@ -310,8 +311,21 @@ got_SSNTable_fcra_roxie := join (inrec_DE_src, risk_indicators.key_ssn_table_v4_
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id, 
                    get_ssnTable_FCRA(left,right,1),left outer, ATMOST(keyed(left.ssn=right.ssn),500));
-									 
-got_SSNTable_fcra_thor_pre := join (distribute(inrec_DE_src(ssn<>''), hash64(ssn)), 
+
+key_legacy_ssn := if(isFCRA, doxie.Key_FCRA_legacy_ssn, doxie.Key_legacy_ssn);
+
+legacy_ssn_thor := join (distribute(inrec_DE_src(ssn<>'' and did<>0), hash64(ssn,did)), 
+									 distribute(pull(key_legacy_ssn), hash64(ssn, did)),
+                   (left.ssn=right.ssn) and (left.did=right.did),
+                   // trim((string12)right.ssn) not in left.ssn_correct_record_id,
+                   TRANSFORM(RECORDOF(left),
+                   SELF.socsRCISflag := if(right.ssn<>'' and right.did<>0,'1','0'),
+                   SELF := left)
+                   ,left outer, ATMOST(riskwise.max_atmost), KEEP(1), LOCAL) +
+                   PROJECT(inrec_DE_src(ssn='' or did=0), TRANSFORM(RECORDOF(LEFT),
+                   SELF.socsRCISflag := '0', SELF := LEFT));
+                   
+got_SSNTable_fcra_thor_pre := join (distribute(legacy_ssn_thor(ssn<>''), hash64(ssn)), 
 									 distribute(pull(risk_indicators.key_ssn_table_v4_filtered_fcra), hash64(ssn)),
                    (left.ssn=right.ssn) and
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id, 
@@ -334,7 +348,19 @@ got_SSNTableDL_fcra_roxie := join (got_SSNTable_fcra_roxie, risk_indicators.key_
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id,
                    get_ssnTable_FCRA(left,right,2),left outer, ATMOST( keyed(left.dl_number[1..9]=right.ssn),500));
 
-got_SSNTableDL_fcra_thor_pre := join (distribute(got_SSNTable_fcra_thor(dl_number <> ''), hash64(dl_number[1..9])), 
+
+legacy_ssn_thor_dl := join (distribute(got_SSNTable_fcra_thor(ssn<>'' and did<>0/* and dl_number <> ''*/), hash64(ssn,did)), 
+									 distribute(pull(key_legacy_ssn), hash64(ssn, did)),
+                   (left.ssn=right.ssn) and (left.did=right.did),
+                   // trim((string12)right.ssn) not in left.ssn_correct_record_id,
+                   TRANSFORM(RECORDOF(left),
+                   SELF.socsRCISflag := if(right.ssn<>'' and right.did<>0,'1','0'),
+                   SELF := left)
+                   ,left outer, ATMOST(riskwise.max_atmost), KEEP(1), LOCAL) +
+                   PROJECT(got_SSNTable_fcra_thor(ssn='' or did=0), TRANSFORM(RECORDOF(LEFT),
+                   SELF.socsRCISflag := '0', SELF := LEFT));
+                   
+got_SSNTableDL_fcra_thor_pre := join (distribute(legacy_ssn_thor_dl(dl_number <> ''), hash64(dl_number[1..9])), 
 									 distribute(pull(risk_indicators.key_ssn_table_v4_filtered_fcra), hash64(ssn)),
                    (left.dl_number[1..9]=right.ssn) and
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id,

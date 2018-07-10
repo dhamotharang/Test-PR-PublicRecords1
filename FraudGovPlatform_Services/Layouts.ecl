@@ -1,5 +1,5 @@
-﻿IMPORT BatchShare, BIPV2, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, patriot, risk_indicators, 
-			 riskwise, royalty;
+﻿IMPORT BatchShare, BIPV2, CriminalRecords_BatchService, DeathV2_Services, FraudShared, FraudShared_Services, 
+			 iesp, patriot, risk_indicators, riskwise, royalty;
 
 EXPORT Layouts := MODULE
 
@@ -53,16 +53,16 @@ EXPORT Layouts := MODULE
 	end;
 
  SHARED Batch_out_pre_rec := RECORD
-			BatchOut_risk;    
-   BatchShare.Layouts.ShareAcct;
-   FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
-   DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
-   DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
-   DATASET(combined_layouts) childRecs_RedFlag;
-		 DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
-   DATASET(Patriot.layout_batch_out) childRecs_Patriot;
-		 DATASET(Layout_InstandID_NuGenExt) childRecs_ciid;
-   DATASET(Velocities) childRecs_Velocities;
+		BatchOut_risk;    
+		BatchShare.Layouts.ShareAcct;
+		FraudShared_Services.Layouts.BatchIn_rec batchin_rec;
+		DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
+		DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
+		DATASET(combined_layouts) childRecs_RedFlag;
+		DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
+		DATASET(Patriot.layout_batch_out) childRecs_Patriot;
+		DATASET(Layout_InstandID_NuGenExt) childRecs_ciid;
+		DATASET(Velocities) childRecs_Velocities;
   END;
 	
 	EXPORT Batch_out_pre_w_raw := RECORD
@@ -225,13 +225,69 @@ EXPORT Layouts := MODULE
 	EXPORT LOG_Deltabase_Layout := RECORD
 		DATASET(LOG_Deltabase_Layout_Record) Records {XPATH('Records/Rec'), MAXCOUNT(1)};
 	END;
-	
+				
+	EXPORT Layout_delta_filter := RECORD
+		STRING10 ssn;
+		STRING10 dob;
+		UNSIGNED6 lex_id;
+		STRING100 name_first;
+		STRING60 name_middle;
+		STRING100 name_last;
+		STRING150 physical_address;
+		STRING30 physical_city;
+		STRING10 physical_state;
+		STRING10 physical_zip;
+		STRING15 mailing_address;
+		STRING30 mailing_city;
+		STRING2 mailing_state;
+		STRING5 mailing_zip;
+		STRING10 phone;
+		STRING25 ip_address;
+		STRING50 device_id;
+		STRING20 bank_account_number;
+		STRING2 dl_state;
+		STRING25 dl_number;
+		STRING10 geo_lat;
+		STRING11 geo_long;
+		UNSIGNED8 date_added;
+	END;
+
 	EXPORT fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
-		STRING60 fragment_value;
+		STRING100 fragment_value;
 		UNSIGNED3 file_type;
 		UNSIGNED4	LastActivityDate := 0;
 		UNSIGNED4	LastKnownRiskDate := 0;
 	END;
+	
+	EXPORT elementNidentity_uid_recs := RECORD
+		STRING60 entity_name;
+		STRING100 entity_value;
+		unsigned8 record_id;	
+		string70 tree_uid := '';
+		string70 entity_context_uid := '';
+	END;
+
+	EXPORT elementNidentity_score_recs := RECORD
+		fragment_w_value_recs;
+		string70 AnalyticsRecordId;
+		unsigned1 score;
+		string100 ClusterName;
+		unsigned1 NumberOfClusters;
+		unsigned1 NumberOfIdentities;
+		DATASET(iesp.share.t_NameValuePair) NVPs;
+	END;
+
+	EXPORT kel_filter_rec := RECORD
+			INTEGER gc_id;
+			INTEGER ind_type;
+			elementNidentity_uid_recs element;
+	END;
+	
+	EXPORT entity_information_recs := RECORD
+		STRING60 fragment;
+		STRING100 fragment_value;
+		iesp.fraudgovsearch.t_FraudGovSearchElementInformation;
+	END;	
 
 END;

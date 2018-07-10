@@ -17,8 +17,8 @@ export t_FraudGovPhoneInfo := record
 end;
 		
 export t_FraudGovReportOption := record (iesp.share.t_BaseReportOption)
-	boolean AppendBest {xpath('AppendBest')};
-	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};
+	boolean AppendBest {xpath('AppendBest')};//hidden[internal]
+	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};//hidden[internal]
 	boolean IsOnline {xpath('IsOnline')};//hidden[internal]
 	boolean IsIdentityTestRequest {xpath('IsIdentityTestRequest')};//hidden[internal]
 	boolean IsElementTestRequest {xpath('IsElementTestRequest')};//hidden[internal]
@@ -34,14 +34,14 @@ export t_FraudGovReportOption := record (iesp.share.t_BaseReportOption)
 	integer MaxCriminals {xpath('MaxCriminals')};//hidden[internal]
 	integer MaxRedFlags {xpath('MaxRedFlags')};//hidden[internal]
 	integer MaxGlobalWatchlists {xpath('MaxGlobalWatchlists')};//hidden[internal]
-	integer ReturnCount {xpath('ReturnCount')};
-	integer StartingRecord {xpath('StartingRecord')};
-	string Platform {xpath('Platform')};
+	integer ReturnCount {xpath('ReturnCount')};//hidden[internal]
+	integer StartingRecord {xpath('StartingRecord')};//hidden[internal]
+	string Platform {xpath('Platform')};//hidden[internal]
 	string AgencyVerticalType {xpath('AgencyVerticalType')};
 	string18 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
-	dataset(t_UInt2ArrayItem) ExcludedIndTypes {xpath('ExcludedIndTypes/ExcludedIndType'), MAXCOUNT(iesp.Constants.FDN.MAX_COUNT_EXCLUDE_IND_TYPES)};
-	dataset(t_UInt2ArrayItem) FileTypes {xpath('FileTypes/FileType'), MAXCOUNT(iesp.Constants.FDN.MAX_COUNT_FILE_TYPES)};
+	dataset(t_UInt2ArrayItem) ExcludedIndTypes {xpath('ExcludedIndTypes/ExcludedIndType'), MAXCOUNT(iesp.Constants.FDN.MAX_COUNT_EXCLUDE_IND_TYPES)};//hidden[internal]
+	dataset(t_UInt2ArrayItem) FileTypes {xpath('FileTypes/FileType'), MAXCOUNT(iesp.Constants.FDN.MAX_COUNT_FILE_TYPES)};//hidden[internal]
 	integer DeltaUse {xpath('DeltaUse')};//hidden[internal]
 	integer DeltaStrict {xpath('DeltaStrict')};//hidden[internal]
 end;
@@ -86,6 +86,7 @@ export t_FraudGovElementCardDetails := record
 	t_FraudGovScoreDetails ScoreDetails {xpath('ScoreDetails')};
 	integer NoOfIdentities {xpath('NoOfIdentities')};
 	integer NoOfRecentTransactions {xpath('NoOfRecentTransactions')};
+	integer NoOfClusters {xpath('NoOfClusters')};
 	iesp.share.t_Date LastActivityDate {xpath('LastActivityDate')};
 	dataset(iesp.share.t_NameValuePair) ElementNVPs {xpath('ElementNVPs/ElementNVP'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_NVP)};
 end;
@@ -109,7 +110,8 @@ export t_FraudGovIndicatorAttribute := record
 	string200 IndicatorTypeDescription {xpath('IndicatorTypeDescription')};
 	string10 DataType {xpath('DataType')};
 	string20 RiskLevel {xpath('RiskLevel')};
-	string20 DescriptionCode {xpath('DescriptionCode')};
+	string DescriptionCode {xpath('DescriptionCode')};
+	string DescriptionValue {xpath('DescriptionValue')};
 	string200 Description {xpath('Description')};
 	iesp.share.t_Date EventDate {xpath('EventDate')};
 end;
@@ -267,15 +269,15 @@ export t_FraudGovRecord := record
 	string1 IdentityResolved {xpath('IdentityResolved')};
 	unsigned6 LexID {xpath('LexID')};
 	t_FraudGovIdentityCardDetails IdentityCardDetails {xpath('IdentityCardDetails')};//hidden[internal]
-	iesp.fraudgovplatform.t_FraudGovBestInfo GovernmentBest {xpath('GovernmentBest')};
+	iesp.fraudgovplatform.t_FraudGovBestInfo GovernmentBest {xpath('GovernmentBest')};//hidden[internal]
 	t_FraudGovElementCardDetails ElementCardDetails {xpath('ElementCardDetails')};//hidden[internal]
 	dataset(t_FraudGovAssociatedAddress) AssociatedAddresses {xpath('AssociatedAddresses/AssociatedAddress'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_ADDRESS)};//hidden[internal]
 	dataset(t_FraudGovScoreBreakdown) ScoreBreakdown {xpath('ScoreBreakdown/Record'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_SCORE_BREAKDOWN)};//hidden[internal]
 	dataset(t_FraudGovIndicatorAttribute) IndicatorAttributes {xpath('IndicatorAttributes/IndicatorAttribute'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE)};//hidden[internal]
 	dataset(t_FraudGovClusterCardDetails) RelatedClusters {xpath('RelatedClusters/RelatedCluster'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_CLUSTER)};//hidden[internal]
 	dataset(t_FraudGovIdentityCardDetails) AssociatedIdentities {xpath('AssociatedIdentities/AssociatedIdentity'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY)};//hidden[internal]
-	dataset(t_FraudGovVelocity) Velocities {xpath('Velocities/Velocity'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_VELOCITY)};//hidden[internal]
-	dataset(t_FraudGovKnownRisk) KnownRisks {xpath('KnownRisks/KnownRisk'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK)};//hidden[internal]
+	dataset(t_FraudGovVelocity) Velocities {xpath('Velocities/Velocity'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_VELOCITY)};
+	dataset(t_FraudGovKnownRisk) KnownRisks {xpath('KnownRisks/KnownRisk'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK)};
 	dataset(t_FraudGovTimelineDetails) TimelineDetails {xpath('TimelineDetails/TimelineDetails'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_TIMELINE_DETAILS)};//hidden[internal]
 	t_FraudGovDeceased Deceased {xpath('Deceased')};//hidden[internal]
 	dataset(t_FraudGovCriminal) Criminals {xpath('Criminals/Criminal'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_CRIMINAL)};//hidden[internal]

@@ -181,6 +181,10 @@ export RiskViewReport_Service := MACRO
 			self.Result.Models := project(l.models, toRRmodel(left));
 			self.Result.Report := if(not exceptions, r);
 			self.Result.ConsumerStatements := l.ConsumerStatements;
+            
+      // for inquiry logging, populate the consumer section with the DID and input fields
+      self.Result.Consumer := l.Consumer;        
+      
 			self.Result := [];
 			self._header := [];
 		END;

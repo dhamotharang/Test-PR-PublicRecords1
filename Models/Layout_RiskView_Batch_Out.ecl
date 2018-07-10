@@ -1,4 +1,4 @@
-export Layout_RiskView_Batch_Out := RECORD
+﻿export Layout_RiskView_Batch_Out := RECORD
 	string20 acctno;
 	Layout_RVAttributes_Batch;
 	string3 index6;
@@ -47,4 +47,5 @@ export Layout_RiskView_Batch_Out := RECORD
 	string3 reason24; // score4_reason5;
 	string3 reason25; // score5_reason5;
 	string12 DID;  // internal field for troubleshooting and logging
+  STRING12 inquiry_lexid := '';
 END;

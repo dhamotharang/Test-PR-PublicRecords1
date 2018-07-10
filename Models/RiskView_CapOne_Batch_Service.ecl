@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RiskView CapOne Batch Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
@@ -195,6 +195,10 @@ END;
 Layout_working intoAttributes(attr le, clam rt) := TRANSFORM
 	self.seq := le.seq;
 	self.did := rt.did;
+  // if the transaction can't get a score, don't return the DID for logging the inquiry
+  self.inquiry_lexid := if(riskview.constants.noscore(rt.iid.nas_summary,rt.iid.nap_summary, rt.address_verification.input_address_information.naprop, rt.truedid), 
+  '', 
+  (string12)rt.did);
 	
 	// Version3
 	self.index11 := '6';

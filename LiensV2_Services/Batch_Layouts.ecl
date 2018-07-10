@@ -611,15 +611,16 @@ EXPORT Batch_Layouts := MODULE
 		
 	END;
 	
-	export fcra_batch_out := record(batch_out)
-		integer SequenceNumber := 0;
+	EXPORT fcra_batch_out := RECORD(batch_out)
+		INTEGER SequenceNumber := 0;
 		FFD.Layouts.ConsumerFlags;
-	 end;
+    STRING12 inquiry_lexid := '';
+	 END;
 
   // to assemble statements from all entities in the record in one place	
-	export fcra_batch_out_pre := record(fcra_batch_out)
-    dataset (FFD.Layouts.ConsumerStatementBatch) statements;
-	end;
+	EXPORT fcra_batch_out_pre := RECORD(fcra_batch_out)
+    DATASET (FFD.Layouts.ConsumerStatementBatch) statements;
+	END;
 	
 	
 	

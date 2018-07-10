@@ -36,13 +36,18 @@ EXPORT Functions := Module
 		myErr := iff(inRec.EntityType not in [Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Principles, Healthcare_Ganga.Constants.HCO, Healthcare_Ganga.Constants.Orgs],row({'111','APS'},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
-	EXPORT getInputWarnings (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs) := FUNCTION
+EXPORT getInputWarnings (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs) := FUNCTION
+		//Create ResponseDateTime
+		MyDate := STD.Date.CurrentDate(False); year1 := MyDate[1..4]; month1 := MyDate[5..6]; day1 := MyDate[7..8];
+		MyTime := STD.Date.CurrentTime(False); hour1 := STD.Date.hour(MyTime); minute1 := STD.Date.minute(MyTime); second1 := STD.Date.second(MyTime);
+		TistaDateTime := year1+'-'+month1+'-'+day1+'T'+hour1+':'+minute1+':'+second1+'Z';
+		
 		myWarnings := project(inRecs, transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																	self.acctno := left.acctno;
 																	self.Warnings := (Warning100Input(left)+Warning101Input(left)+Warning103Input(left)+
 																										Warning104Input(left)+Warning105Input(left)+Warning106Input(left)+
 																										Warning109Input(left)+Warning110Input(left)+Warning111Input(left))(Code<>'' or Source<>'');
-																	self.ResponseDateTime := (string)Std.Date.Today() + (string)STD.Date.CurrentTime(True);
+																	self.ResponseDateTime := TistaDateTime;
 																	self := left;
 																	self:=[];));
 		return myWarnings;

@@ -5,8 +5,6 @@ EXPORT MAC_DueDiligence_Service(reqName) := MACRO
   #WEBSERVICE(FIELDS(	
 										/*---- Request Fields ----*/
 										reqName,
-										/*---- Gateways ----*/
-										'Gateways',
 										/*---- Compliance Fields ----*/
 										'DataPermissionMask',
 										'DataRestrictionMask',

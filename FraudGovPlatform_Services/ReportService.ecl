@@ -7,7 +7,8 @@
 IMPORT BatchShare,FraudShared_Services,iesp,WSInput;
 
 EXPORT ReportService() := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
 	
@@ -128,9 +129,11 @@ EXPORT ReportService() := MACRO
 
 	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
 	
+	BOOLEAN isValidDate := FraudGovPlatform_Services.Functions.IsValidInputDate(reportBy.DOB);
+	
 	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
-	//for searches, not just card detais.
-	isValidInput := inputCount = 1 OR ~Options.IsOnline;
+	//for searches, not just card details.
+	isValidInput := inputCount = 1 OR ~Options.IsOnline AND isValidDate;	
 
 	// **************************************************************************************
 	// Append DID for Input PII

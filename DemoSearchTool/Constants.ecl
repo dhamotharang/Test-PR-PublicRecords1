@@ -1,4 +1,4 @@
-IMPORT DemoSearchTool;
+﻿IMPORT DemoSearchTool, Data_Services;
 
 EXPORT Constants := 
   MODULE
@@ -16,5 +16,5 @@ EXPORT Constants :=
     // used when neither Legacy or BIP keys search selection is made
     EXPORT BOOLEAN   SEARCH_BIP_KEYS_DEFAULT := TRUE; 
     
-		EXPORT SearchTool_Prefix := '~thor_data400::key::searchtool::';
+		EXPORT SearchTool_Prefix := Data_Services.default_data_location + 'thor_data400::key::searchtool::';
   END;

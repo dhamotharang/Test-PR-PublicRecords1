@@ -4,7 +4,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 
 	transforms := FCRAGateway_Services.TuFraudAlert_Transforms;
 	constants := FCRAGateway_Services.Constants;
-
+	return_matched_lexIDs_only := in_mod.ReturnMatchedUniqueIDsOnly;
 	//Create picklist request from input PII.
 	ds_plist_req := project(in_req, transforms.input_to_picklist(LEFT));
 
@@ -19,8 +19,9 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 	//for the rest since it's the same format the function macro requires.
 	consumer:= ds_compliance_data[1].Consumer;
 
-	//Call the credit gateway if we are allowed. (Have valid DID and not suppressed by credit alerts)
-	make_gateway_call := input_lexID > 0 AND NOT is_suppressed_by_alert;
+	//Call the credit gateway if have no suppression and (a valid lexID or we bypass lexID validation).
+	make_gateway_call :=  (~return_matched_lexIDs_only OR input_lexID > 0) AND ~is_suppressed_by_alert;
+
 	ds_tufa_soap_response := IF(make_gateway_call, Gateway.SoapCall_TuFraudAlert(in_req, in_mod.gateways, make_gateway_call));
 
 	//Verify response resolve to lexID with picklist.
@@ -41,10 +42,12 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 	validation_code_desc := constants.GetValidationCodeDesc(validation_code);
 	validation_ok := FCRAGateway_Services.Functions.IsValidationOk(validation_code);
 
-	//Only return report information if our lexIDs match, and we have no suppression from credit alerts.
-	return_results := validation_ok AND ~is_suppressed_by_alert;
-	//Only return consumer data if we are suppressed by it, or we have a valid lexID match.
-	return_consumer_data := is_suppressed_by_alert OR validation_ok;
+	//Only return report information if our lexIDs match or we bypass validation.
+	//The report will be empty if suppressed due to person context.
+	return_results := ~return_matched_lexIDs_only OR validation_ok;
+
+	//Only return consumer data if we are suppressed by it, or we have a valid lexID match, or we bypass the lexID match.
+	return_consumer_data := ~return_matched_lexIDs_only OR is_suppressed_by_alert OR validation_ok;
 
 	//Creates a final output and populates the credit information based on suppression.
 	FCRAGateway_Services.Layouts.tu_fraud_alert.records_out xtOut() := TRANSFORM

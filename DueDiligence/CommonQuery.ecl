@@ -118,9 +118,14 @@ EXPORT CommonQuery := MODULE
                               
 				requestedVersion := defaultVersion;
 				includeReport := requestedReport;
-				displayAttributeText := optionsIn.displayText;
+				displayAttributeText := optionsIn.displayText;       
+        
+        requestedSource := MAP(STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'NONE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.NONE,
+                                STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'ONLINE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.ONLINE,
+                                STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'BATCH' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.BATCH,
+                                DueDiligence.Constants.REQUESTED_SOURCE_ENUM.EMPTY);
 				
-				gateways := Gateway.Configuration.Get();
+				
 				
 				
 				wseq := PROJECT(requestIn, TRANSFORM({INTEGER4 seq, RECORDOF(requestIn)}, SELF.seq := COUNTER, SELF := LEFT));
@@ -363,15 +368,18 @@ EXPORT CommonQuery := MODULE
 		END;
 		
 		
-		EXPORT mac_GetBusinessOptionSettings := MACRO
+		EXPORT mac_GetBusinessOptionSettings(dppaIn, glbaIn, drmIn, dpmIn, industryIn) := MACRO
+    
+        industry := IF(TRIM(industryIn) = DueDiligence.Constants.EMPTY, Business_Risk_BIP.Constants.Default_IndustryClass, industryIn);
+        
 				
-				options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
+				busOptions := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 							// Clean up the Options and make sure that defaults are enforced
-							EXPORT UNSIGNED1 DPPA_Purpose := dppa;
-							EXPORT UNSIGNED1 GLBA_Purpose := glba;
-							EXPORT STRING50 DataRestrictionMask	:= TRIM(drm);
-							EXPORT STRING50 DataPermissionMask	:= TRIM(dpm);
-							EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(IF(TRIM(userIn.IndustryClass) <> DueDiligence.Constants.EMPTY, userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
+							EXPORT UNSIGNED1 DPPA_Purpose := dppaIn;
+							EXPORT UNSIGNED1 GLBA_Purpose := glbaIn;
+							EXPORT STRING50 DataRestrictionMask	:= TRIM(drmIn);
+							EXPORT STRING50 DataPermissionMask	:= TRIM(dpmIn);
+							EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(industry);
 							EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
 							EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
 							EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
@@ -379,21 +387,18 @@ EXPORT CommonQuery := MODULE
 							EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
 				END;
 
-				linkingOptions := MODULE(BIPV2.mod_sources.iParams)
-							EXPORT STRING DataRestrictionMask := Options.DataRestrictionMask; 
+				busLinkingOptions := MODULE(BIPV2.mod_sources.iParams)
+							EXPORT STRING DataRestrictionMask := busOptions.DataRestrictionMask; 
 							EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
 							EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
-							EXPORT BOOLEAN AllowAll := IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE);
-							EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE);
-							EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE);
-							EXPORT UNSIGNED1 DPPAPurpose := Options.DPPA_Purpose;
-							EXPORT UNSIGNED1 GLBPurpose := Options.GLBA_Purpose;
+							EXPORT BOOLEAN AllowAll := FALSE;
+							EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(busOptions.GLBA_Purpose, FALSE);
+							EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(busOptions.DPPA_Purpose, FALSE);
+							EXPORT UNSIGNED1 DPPAPurpose := busOptions.DPPA_Purpose;
+							EXPORT UNSIGNED1 GLBPurpose := busOptions.GLBA_Purpose;
 							EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
 							EXPORT BOOLEAN LNBranded := TRUE; // Not entirely certain what effect this has
-				END;
-        
-         
-				
+				END;		
 		ENDMACRO;
 		
 		
@@ -405,8 +410,8 @@ EXPORT CommonQuery := MODULE
 																																								2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft', LEFT.PerAssetOwnAircraft),
 																																								3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft', LEFT.PerAssetOwnWatercraft),
 																																								4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle', LEFT.PerAssetOwnVehicle),
-																																								5  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty', LEFT.PerAccessToFundsProperty),
-																																								6  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome', LEFT.PerAccessToFundsIncome),
+																																								5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome', LEFT.PerAccessToFundsIncome),
+                                                                                6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty', LEFT.PerAccessToFundsProperty),
 																																								7  => DueDiligence.Common.createNVPair('PerGeographic', LEFT.PerGeographic),
 																																								8  => DueDiligence.Common.createNVPair('PerMobility', LEFT.PerMobility),
 																																								9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal', LEFT.PerLegalStateCriminal),
@@ -418,7 +423,7 @@ EXPORT CommonQuery := MODULE
 																																								15 => DueDiligence.Common.createNVPair('PerIdentityRisk', LEFT.PerIdentityRisk),
 																																								16 => DueDiligence.Common.createNVPair('PerUSResidency', LEFT.PerUSResidency),
 																																								17 => DueDiligence.Common.createNVPair('PerMatchLevel', LEFT.PerMatchLevel),
-																																								18 => DueDiligence.Common.createNVPair('PerAssociatesIndex', LEFT.PerAssociatesIndex),
+																																								18 => DueDiligence.Common.createNVPair('PerAssociates', LEFT.PerAssociates),
 																																								19 => DueDiligence.Common.createNVPair('PerProfLicense', LEFT.PerProfLicense),
 																																											DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 
@@ -436,8 +441,8 @@ EXPORT CommonQuery := MODULE
 																																			2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag),
 																																			3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', LEFT.PerAssetOwnWatercraft_Flag),
 																																			4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', LEFT.PerAssetOwnVehicle_Flag),
-																																			5  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
-																																			6  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
+                                                                      5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
+																																			6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
 																																			7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
 																																			8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
 																																			9  => DueDiligence.Common.createNVPair('PerLegalStateCriminal_Flag', LEFT.PerLegalStateCriminal_Flag),
@@ -449,7 +454,7 @@ EXPORT CommonQuery := MODULE
 																																			15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
 																																			16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
 																																			17 => DueDiligence.Common.createNVPair('PerMatchLevel_Flag', LEFT.PerMatchLevel_Flag),
-																																			18 => DueDiligence.Common.createNVPair('PerAssociatesIndex_Flag', LEFT.PerAssociatesIndex_Flag),
+																																			18 => DueDiligence.Common.createNVPair('PerAssociates_Flag', LEFT.PerAssociates_Flag),
 																																			19 => DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag),
 																																						DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 		
@@ -476,14 +481,12 @@ EXPORT CommonQuery := MODULE
 																																										13 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
 																																										14 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
 																																										15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal', LEFT.BusLegalStateCriminal),
-																																										16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal', LEFT.BusLegalFederalCriminal),
+																																										16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal', LEFT.BusLegalFedCriminal),
 																																										17 => DueDiligence.Common.createNVPair('BusLegalCivil', LEFT.BusLegalCivil),
 																																										18 => DueDiligence.Common.createNVPair('BusLegalTraffInfr', LEFT.BusLegalTraffInfr),
 																																										19 => DueDiligence.Common.createNVPair('BusLegalTypes', LEFT.BusLegalTypes),
-																																										20 => DueDiligence.Common.createNVPair('BusLinkedBusFootprint', LEFT.BusLinkedBusFootprint),
-																																										21 => DueDiligence.Common.createNVPair('BusLinkedBusBEO', LEFT.BusLinkedBusIndex),
-																																										22 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
-																																										23 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
+																																										20 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
+																																										21 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
 																																													DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 																																																							
 				
@@ -510,14 +513,12 @@ EXPORT CommonQuery := MODULE
 																																				13 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
 																																				14 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
 																																				15 => DueDiligence.Common.createNVPair('BusLegalStateCriminal_Flag', LEFT.BusLegalStateCriminal_Flag),
-																																				16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal_Flag', LEFT.BusLegalFederalCriminal_Flag),
+																																				16 => DueDiligence.Common.createNVPair('BusLegalFedCriminal_Flag', LEFT.BusLegalFedCriminal_Flag),
 																																				17 => DueDiligence.Common.createNVPair('BusLegalCivil_Flag', LEFT.BusLegalCivil_Flag),
 																																				18 => DueDiligence.Common.createNVPair('BusLegalTraffInfr_Flag', LEFT.BusLegalTraffInfr_Flag),
 																																				19 => DueDiligence.Common.createNVPair('BusLegalTypes_Flag', LEFT.BusLegalTypes_Flag),
-																																				20 => DueDiligence.Common.createNVPair('BusLinkedBusFootprint_Flag', LEFT.BusLinkedBusFootprint_Flag),
-																																				21 => DueDiligence.Common.createNVPair('BusLinkedBusBEO_Flag', LEFT.BusLinkedBusIndex_Flag),
-																																				22 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
-																																				23 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
+																																				20 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
+																																				21 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
 																																							DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 												
 				RETURN businessFlags;

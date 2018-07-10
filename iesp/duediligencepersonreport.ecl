@@ -21,7 +21,7 @@ export t_DDRPersonInformation := record
 end;
 		
 export t_DDRPersonProperty := record (iesp.duediligenceshared.t_DDRProperty)
-	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) Owners {xpath('Owners/Owner'), MAXCOUNT(1)};
+	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxPropertyOwners)};
 	boolean Vacant {xpath('Vacant')};
 	boolean SubjectOwned {xpath('SubjectOwned')};
 	boolean SpouseOwned {xpath('SpouseOwned')};
@@ -29,7 +29,7 @@ end;
 		
 export t_DDRPersonPropertyOwnership := record
 	integer2 PropertyCurrentCount {xpath('PropertyCurrentCount')};
-	integer2 TaxAssessedValue {xpath('TaxAssessedValue')};
+	integer8 TaxAssessedValue {xpath('TaxAssessedValue')};
 	dataset(t_DDRPersonProperty) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxProperties)};
 end;
 		
@@ -37,13 +37,14 @@ export t_DDRPersonEconomicAttributeDetails := record
 	t_DDRPersonPropertyOwnership Property {xpath('Property')};
 end;
 		
-export t_DDRPersonProffesionalNetworkDetails := record
-	dataset(iesp.duediligenceshared.t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(1)};
+export t_DDRPersonProfessionalNetworkDetails := record
+	dataset(iesp.duediligenceshared.t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLicenses)};
 end;
 		
 export t_DDRPersonCriminalEvents := record
 	iesp.duediligenceshared.t_DDRLegalEventIndividual PersonInfo {xpath('PersonInfo')};
 	dataset(iesp.duediligenceshared.t_DDRLegalEventCriminal) CriminalEvents {xpath('CriminalEvents/CriminalEvent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
+	dataset(iesp.duediligenceshared.t_DDRLegalStateCriminal) Criminals {xpath('Criminals/Criminal'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
 end;
 		
 export t_DDRPersonLegalAttributeDetails := record
@@ -54,7 +55,7 @@ end;
 export t_DDRPersonAttributeDetails := record
 	t_DDRPersonLegalAttributeDetails Legal {xpath('Legal')};
 	t_DDRPersonEconomicAttributeDetails Economic {xpath('Economic')};
-	t_DDRPersonProffesionalNetworkDetails ProfessionalNetwork {xpath('ProfessionalNetwork')};
+	t_DDRPersonProfessionalNetworkDetails ProfessionalNetwork {xpath('ProfessionalNetwork')};
 end;
 		
 export t_DDRPersonReport := record

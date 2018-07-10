@@ -1,4 +1,4 @@
-IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services;	
+﻿IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services;	
 
 EXPORT Boca_Shell_Accident (GROUPED DATASET(layout_bocashell_neutral) bs,INTEGER bsversion=3) := FUNCTION
 
@@ -48,7 +48,7 @@ recsWithAlcDrug := JOIN(recsWithAccDate,FLAccidents_eCrash.Key_eCrash4,
 	LEFT OUTER,ATMOST(Riskwise.max_atmost),KEEP(100));
 
 layout_extended populateNumAccidents(layout_extended L) := TRANSFORM
-	isAccident := (UNSIGNED)L.accident_nbr!=0;
+	isAccident :=  trim(L.accident_nbr) NOT in ['', '0']; 
 	isFault := L.vehicle_fault_code = '1' AND isAccident;
   duiCodes := ['2','3','4','07','08','09'];
 	isDA := L.alcohol_drug   IN duiCodes OR

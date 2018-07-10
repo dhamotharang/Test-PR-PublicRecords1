@@ -1,4 +1,4 @@
-﻿IMPORT Address, BatchDatasets, FraudShared, risk_indicators, riskwise, UT;
+﻿IMPORT Address, BatchDatasets, FraudShared, Gateway, risk_indicators, riskwise, UT;
 
 EXPORT IParam := MODULE
   // Need to use BatchDatasets instead of BatchShare because of industry_class needed by DID lookup
@@ -9,10 +9,12 @@ EXPORT IParam := MODULE
 		EXPORT UNSIGNED3 DIDScoreThreshold;
 		EXPORT unsigned6 GlobalCompanyId;     // company (agency)
 		EXPORT unsigned2 IndustryType;        // company (agency) program i.e. SNAP, TANF, Medicaid, etc..
+		EXPORT string 	 IndustryTypeName;
 		EXPORT unsigned6 ProductCode;
 		EXPORT string    AgencyVerticalType;  // agency vertical type i.e. Tax, Health, Labor, etc..
 		EXPORT string18  AgencyCounty;        // agency location
 		EXPORT string2   AgencyState;         // agency location
+		EXPORT DATASET(Gateway.Layouts.Config)	Gateways := dataset ([], Gateway.Layouts.Config);
 		EXPORT integer 	 MaxVelocities;
 		EXPORT string 	  FraudPlatform;
 		EXPORT boolean  	ReturnDetailedRoyalties;
@@ -53,9 +55,10 @@ EXPORT IParam := MODULE
   // **************************************************************************************      
 	EXPORT getBatchParams() := FUNCTION
 
-		IndustryTypeName := '' : STORED('IndustryTypeName');
+		IndustryType_Name := '' : STORED('IndustryTypeName');
 		IndustryTypeCode := FraudShared.Key_MbsFdnIndType(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)
-																			(keyed(description = ut.CleanSpacesAndUpper(IndustryTypeName)))[1].ind_type;
+																			(keyed(description = ut.CleanSpacesAndUpper(IndustryType_Name)))[1].ind_type;
+		
 
 		base_params := BatchDatasets.IParams.getBatchParams();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
@@ -65,11 +68,12 @@ EXPORT IParam := MODULE
 			EXPORT unsigned3 DIDScoreThreshold  := 80		: STORED('DIDScoreThreshold');
 			EXPORT unsigned6 GlobalCompanyId    := 0		: STORED('GlobalCompanyId');
 			EXPORT unsigned2 IndustryType       := IndustryTypeCode;
+			EXPORT string 	 IndustryTypeName   := IndustryType_Name;
 			EXPORT unsigned6 ProductCode        := 0		: STORED('ProductCode');
 			EXPORT string 	 AgencyVerticalType := ''		: STORED('VerticalType');
 			EXPORT string18  AgencyCounty       := ''		: STORED('AgencyCounty');
 			EXPORT string2   AgencyState        := ''		: STORED('AgencyState');
-
+			EXPORT DATASET(Gateway.Layouts.Config) Gateways						:= 	dataset ([], Gateway.Layouts.Config) : STORED('Gateways');
 			EXPORT integer   MaxVelocities      := FraudGovPlatform_Services.Constants.MAX_VELOCITIES : STORED('MaxVelocities');
 			EXPORT string    FraudPlatform			:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM : STORED('FraudPlatform');
 			EXPORT BOOLEAN   ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');

@@ -22,8 +22,8 @@ EXPORT CONSTANTS := MODULE
 
  EXPORT AlertMessages := MODULE
     EXPORT IDTheftMessage           := 'The subject of this consumer report currently has an Identity Theft Alert on file preventing the return of some or all of the information you requested.';
-    EXPORT FraudMessage             := 'The subject of this consumer report currently has a Security Fraud Alert on file preventing the return of the information you requested.  If the consumer would like their Security Fraud Alert lifted please instruct them to call LexisNexis Risk Solutions Inc. at 800-456-1244';
-    EXPORT FreezeMessage            := 'The subject of this consumer report currently has a Security Freeze on file preventing the return of the information you requested.  If the consumer would like their Security Freeze lifted please instruct them to call LexisNexis Risk Solutions Inc. at 800-456-1244';
+    EXPORT FraudMessage             := 'The subject of this consumer report currently has a Security Fraud Alert on file preventing the return of the information you requested.  If the consumer would like their Security Fraud Alert lifted please instruct them to call LexisNexis Risk Solutions Inc. at 800-456-1244.';
+    EXPORT FreezeMessage            := 'The subject of this consumer report currently has a Security Freeze on file preventing the return of the information you requested.  If the consumer would like their Security Freeze lifted please instruct them to call LexisNexis Risk Solutions Inc. at 800-456-1244.';
     EXPORT ConsumerPhoneMessage     := 'The consumer has provided the following phone number for verification purposes: ';
  END;
 
