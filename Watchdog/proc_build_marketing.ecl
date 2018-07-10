@@ -1,6 +1,11 @@
 ﻿EXPORT proc_build_marketing :=  function
 
-#stored ('watchtype', 'marketing');
+//#stored ('watchtype', 'marketing');
+//changed from using #stored to just setting the variable.  Something has changed
+//at the platform level so in a Sequential 2 variables called watchtype can't be 
+//set at the same time.
+
+watchtype := 'marketing';
 
 import watchdog,ut,RoxieKeyBuild,Orbit3;
 
