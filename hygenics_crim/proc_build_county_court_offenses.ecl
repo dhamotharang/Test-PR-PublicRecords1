@@ -1508,12 +1508,16 @@ filtered_result := result_common(off_date <> '' or arr_date <> '' or  le_agency_
 														 // sent_court_fine, sent_probation,sent_consec,appeal_date, sent_addl_prov_desc_1,sent_addl_prov_desc_2,sent_agency_rec_cust,Probation_desc2,addl_sent_dates,
                              // restitution,community_service,parole,court_dt,court_county,local) ;
 														 
-sorted_rcommon            := sort(distribute(filtered_result,HASH(offender_key,vendor,source_file)),offender_key,vendor, source_file,court_off_desc_1,off_date,
-                             court_Case_number, /* arr_date,*/le_agency_desc,traffic_ticket_number,arr_disp_date,arr_off_desc_1,arr_off_desc_2,
-														 court_final_plea,court_desc, court_off_code,court_statute,court_off_desc_2, court_off_lev,court_disp_code, court_disp_desc_1,court_disp_desc_2,court_disp_date,
+sorted_rcommon            := sort(distribute(filtered_result,HASH(offender_key,vendor,source_file)),offender_key,vendor, source_file,
+                             StringLib.StringFilter(StringLib.StringToUpperCase(court_off_desc_1+court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+                             off_date,court_Case_number, /* arr_date,*/court_disp_desc_2,
+														 StringLib.StringFilter(StringLib.StringToUpperCase(court_disp_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+														 le_agency_desc,traffic_ticket_number,arr_disp_date,arr_off_desc_1,arr_off_desc_2,
+														 court_final_plea,court_desc, court_off_code,court_statute, court_off_lev,court_disp_code, 
+														 court_disp_date,
 														 offense_town,convict_dt,cty_conv,sent_date,sent_jail, sent_susp_time,sent_court_cost, 
 														 sent_court_fine, sent_probation,sent_consec,appeal_date, sent_addl_prov_desc_1,sent_addl_prov_desc_2,sent_agency_rec_cust,Probation_desc2,addl_sent_dates,
-                             restitution,community_service,parole,court_dt,court_county,local);														 
+                             restitution,community_service,parole,court_county,-court_dt,local);					//court date causing dups in FM									 
 
 sorted_rcommon rollupCrim(sorted_rcommon L, sorted_rcommon R) := TRANSFORM
                 self.arr_date             := if(l.arr_date              = '', r.arr_date      ,l.arr_date);
@@ -1558,16 +1562,24 @@ sorted_rcommon rollupCrim(sorted_rcommon L, sorted_rcommon R) := TRANSFORM
                 SELF   := L; 
 END;
 
+// offender_key,vendor, source_file,StringLib.StringFilter(StringLib.StringToUpperCase(court_off_desc_1+court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+// off_date,court_Case_number, /* arr_date,*/le_agency_desc,traffic_ticket_number,arr_disp_date,arr_off_desc_1,arr_off_desc_2,
+// court_final_plea,court_desc, court_off_code,court_statute, court_off_lev,court_disp_code, 
+// StringLib.StringFilter(StringLib.StringToUpperCase(court_disp_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+// court_disp_desc_2,court_disp_date,
+														 // offense_town,convict_dt,cty_conv,sent_date,sent_jail, sent_susp_time,sent_court_cost, 
+														 // sent_court_fine, sent_probation,sent_consec,appeal_date, sent_addl_prov_desc_1,sent_addl_prov_desc_2,sent_agency_rec_cust,Probation_desc2,addl_sent_dates,
+                             // restitution,community_service,parole,court_dt,court_county,local);		
 
 rollupCrimOut := ROLLUP(sorted_rcommon,  left.offender_key = right.offender_key and 
               trim(left.vendor)      = trim(right.vendor) and 
 							trim(left.source_file) = trim(right.source_file) and 
-							trim(left.court_off_desc_1)  = trim(right.court_off_desc_1) and 
-							//((left.court_off_desc_1    = right.court_off_desc_1) or  (right.court_off_desc_1 =''  and left.court_off_desc_1  ='')) and
-							//((left.court_statute_desc  = right.court_statute_desc) or (right.court_statute_desc=''            and left.court_statute_desc='')) and
-							//((left.court_statute       = right.court_statute) or (right.court_statute=''    and left.court_statute='')) and
+							StringLib.StringFilter(StringLib.StringToUpperCase(left.court_off_desc_1+left.court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') =StringLib.StringFilter(StringLib.StringToUpperCase(right.court_off_desc_1+right.court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') and
 							trim(left.off_date)     = trim(Right.off_date) and 
 							trim(left.court_Case_number) = trim(right.court_Case_number) and 
+						  (left.court_disp_desc_2 = right.court_disp_desc_2 or  right.court_disp_desc_2=''  or left.court_disp_desc_2 ='') and
+							(StringLib.StringFilter(StringLib.StringToUpperCase(left.court_disp_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') =StringLib.StringFilter(StringLib.StringToUpperCase(right.court_disp_desc_1),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') or right.court_disp_desc_1='' or left.court_disp_desc_1 ='')and							
+							
 							(left.le_agency_desc         = right.le_agency_desc   or   right.le_agency_desc   ='' or left.le_agency_desc  ='') and 
 							(left.traffic_ticket_number  = right.traffic_ticket_number or right.traffic_ticket_number =''             or left.traffic_ticket_number     ='') and 
 							(left.arr_disp_date          = right.arr_disp_date    or   right.arr_disp_date    ='' or left.arr_disp_date        ='') and 
@@ -1579,11 +1591,8 @@ rollupCrimOut := ROLLUP(sorted_rcommon,  left.offender_key = right.offender_key 
 								 ((left.court_off_code     = right.court_off_code   or   right.court_off_code   ='' or left.court_off_code   ='') and (right.court_statute  ='' and left.court_statute   ='')) OR
 								 ((left.court_statute      = right.court_statute    or   right.court_statute    ='' or left.court_statute    ='') and (right.court_off_code ='' and left.court_off_code  ='')) 
 							)              and
-							(left.court_off_desc_2  = right.court_off_desc_2 or   right.court_off_desc_2 =''  or left.court_off_desc_2  ='') and
 							(left.court_off_lev     = right.court_off_lev    or   right.court_off_lev    =''  or left.court_off_lev     ='') and
               (left.court_disp_code   = right.court_disp_code  or   right.court_disp_code  =''  or left.court_disp_code   ='') and
-							(left.court_disp_desc_1 = right.court_disp_desc_1 or  right.court_disp_desc_1=''  or left.court_disp_desc_1 ='') and
-							(left.court_disp_desc_2 = right.court_disp_desc_2 or  right.court_disp_desc_2=''  or left.court_disp_desc_2 ='') and
 							(left.court_disp_date   = right.court_disp_date   or  right.court_disp_date  =''  or left.court_disp_date   ='') and
 							(left.offense_town      = right.offense_town      or  right.offense_town     =''  or left.offense_town      ='') and
 							(left.convict_dt        = right.convict_dt        or  right.convict_dt       =''  or left.convict_dt        ='') and
@@ -1604,11 +1613,15 @@ rollupCrimOut := ROLLUP(sorted_rcommon,  left.offender_key = right.offender_key 
 							(left.restitution        = right.restitution      or  right.restitution       ='' or left.restitution       ='') and
 							(left.community_service  = right.community_service or  right.community_service='' or left.community_service ='') and
               (left.parole             = right.parole           or  right.parole            ='' or left.parole            ='') and
-							(left.court_dt           = right.court_dt         or  right.court_dt          ='' or left.court_dt          ='') and
+							//(left.court_dt           = right.court_dt         or  right.court_dt          ='' or left.court_dt          ='') and
 							(left.court_county       = right.court_county     or  right.court_county      ='' or left.court_county      ='') ,
 							
 							rollupCrim(LEFT,RIGHT),local) : persist ('~thor200_144::persist::hygenics::crimtemp::HD::county::offenses');
+							
+Set_offender_key:=[//'FM4884167878826446502372013CF002543A0010020130808',             
+                     'FE330909699634058488800014069CF10A20000811'        ];
 
-
+// output(sorted_rcommon(offender_key in Set_offender_key));
+// output(rollupCrimOut(offender_key in Set_offender_key));
 // result_dedup                := dedup(rollupCrimOut, record,EXCEPT num_of_counts, local)  : persist ('~thor200_144::persist::hygenics::crim::HD::county::offense');
 export proc_build_county_court_offenses :=  rollupCrimOut; 
