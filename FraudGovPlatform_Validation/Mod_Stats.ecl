@@ -408,8 +408,8 @@ END;
 			self.RecordsTotal :=count(infile);
 			self.ErrorCount		:=mx;
 			self.RecordsRejected :=mx;
-			self.field 			:='Customer_Account_Number,Customer_state,customer_program,Customer_Agency_Vertical_Type,Customer_County';
-			self.value 			:=trim(l.Customer_Account_Number,left,right)+','+l.Customer_state+','+l.Customer_program+','+l.Customer_Agency_Vertical_Type+','+l.Customer_County;
+			self.field 			:='Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type';
+			self.value 			:=trim(l.Customer_Account_Number,left,right)+','+l.Customer_program+','+l.Customer_Agency_Vertical_Type;
 			self:=l;
 		end;
 
@@ -421,7 +421,7 @@ END;
 								,min_seq:=min(group,seq)
 								,err_cnt:=count(group)
 								,withRC
-      					},filedate,filetime,field,Customer_Account_Number,customer_state,customer_program,Customer_Agency_Vertical_Type,few),filedate,filetime,-err_cnt);
+      					},filedate,filetime,field,Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type,few),filedate,filetime,-err_cnt);
 
 						;
 
