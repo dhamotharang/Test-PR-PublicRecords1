@@ -438,7 +438,16 @@ export temp := module
 			unsigned1		bdid_score:= 0;
 			BIPV2.IDlayouts.l_xlink_ids;
 	  end;
-		
+
+		export NonMatchID :=record
+			unsigned6 did;
+			unsigned8 record_id;
+			string20 	fname;
+			string20 	lname;
+			string20 	name_suffix;
+			string9 	ssn;
+			unsigned4 dob;
+		end;		
  end; 
 
 END;
