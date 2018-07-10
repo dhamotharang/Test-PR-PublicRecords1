@@ -1,4 +1,5 @@
-﻿EXPORT Mod_Collisions(DATASET(Layouts.Temp.NonMatchID) FileBase) := Module
+﻿IMPORT FraudShared;
+EXPORT Mod_Collisions(DATASET(FraudShared.Layouts.Base.Main) FileBase) := Module
 
 SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED ssn_threashold:=threashold;
@@ -11,10 +12,10 @@ Mac_find_collisions(
 										FileBase
 										,matchset
 										,1
-										,fname, lname, name_suffix
+										,raw_First_Name, raw_Last_Name, raw_Orig_Suffix
 										,ssn, dob
 										,DID
-										,layout_slim
+										,FraudShared.Layouts.Base.Main
 										,dsOut
 										,ssn_threashold.High
 										,dob_threashold.High
@@ -28,10 +29,10 @@ Mac_find_collisions(
 										FileBase
 										,matchset
 										,5
-										,fname, lname, name_suffix
+										,raw_First_Name, raw_Last_Name, raw_Orig_Suffix
 										,ssn, dob
 										,DID
-										,layout_slim
+										,FraudShared.Layouts.Base.Main
 										,dsOut
 										,ssn_threashold.Medium
 										,dob_threashold.High
@@ -48,26 +49,24 @@ export
 concat_srt
 					:=
 							sort(concat_all
-										,fname
-										,lname
-										,name_suffix
+										,raw_First_Name
+										,raw_Last_Name
+										,raw_Orig_Suffix
 										,ssn
 										,dob
 										,pri
 										,did
 										)
-										:persist('~otto::persist::concat_srt')
 										;
 concat_ddp
 					:=
 							dedup(concat_srt
-										,fname
-										,lname
-										,name_suffix
+										,raw_First_Name
+										,raw_Last_Name
+										,raw_Orig_Suffix
 										,ssn
 										,dob
 										)
-										:persist('~otto::persist::concat_ddp')
 										;
 
 EXPORT matches := concat_ddp;

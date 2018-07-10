@@ -3,12 +3,12 @@
 	infile
 	,matchset
 	,priority_
-	,fname_field = 'fname'
-	,lname_field = 'lname'
-	,name_suffix_field = 'name_suffix'
-	,ssn_field = 'ssn'
-	,dob_field = 'dob'
-	,DID_field	= 'did'
+	,fname_field = 'raw_First_Name'
+	,lname_field = 'raw_Last_Name'
+	,name_suffix_field = 'raw_Orig_Suffix'
+	,ssn_field = 'SSN'
+	,dob_field = 'DOB'
+	,DID_field	= 'DID'
 	,outrec
 	,outfile
 	,ssn_threshold
@@ -45,21 +45,13 @@ matchChars:=
 					+if('H' in matchset,'H','')
 					;
 
-ssn_value(string9 l, string9 r) :=
-  MAP( l='' or r='' => 0
-       ,l = r      => 3
-			,(unsigned)l % 10000 = (unsigned)r % 10000 AND 
-						(((unsigned)l div 10000) = 0 OR ((unsigned)r div 10000) = 0)  => 1
-       ,ut.stringsimilar(l,r) < 4 or ut.stringsimilar(r,l) < 4 => 3-min(ut.stringsimilar(l,r),ut.stringsimilar(r,l))
-       ,-10 );
-
 inf_dis:=distribute(infile
 		(
 		#if('S' in matchset)
 			(unsigned)ssn_field>0,
 		#end
 		#if('D' in matchset)
-			dob_field>0,
+			(unsigned)dob_field>0,
 		#end
 		 fname_field<>'',
 		 lname_field<>''
