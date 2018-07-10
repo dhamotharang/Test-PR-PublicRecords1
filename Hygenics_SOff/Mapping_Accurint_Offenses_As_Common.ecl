@@ -40,7 +40,7 @@ end;
 o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 
 // Add offense_persistent_id
-
+// output(o1(seisint_primary_key ='C2COSOR6270924709894374124' ));
 	o1 addOPID(o1 l):= transform
 			
 		String 	filterField(String s) := FUNCTION
@@ -56,14 +56,23 @@ o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 		Voffense_description 				:= filterField(l.offense_description);
 		Vsentence_description 			:= filterField(l.sentence_description);
 		
-		self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		Vconviction_jurisdiction    := filterField(l.conviction_jurisdiction);
+		VCourt                			:= filterField(l.Court);
+		VOffense_category           := filterField(l.Offense_category);
+		VArrest_date                := filterField(l.Arrest_date);
 		
-		//self.offense_persistent_id := hash64(trim(trim(trim(trim(trim(trim(trim(l.seisint_primary_key, left, right) + trim(l.conviction_date, left, right), left, right) + trim(l.offense_date, left, right), left, right) + trim(l.offense_code_or_statute, left, right), left, right) + trim(l.court_case_number, left, right), left, right) + trim(l.victim_gender, left, right), left, right) + trim(l.victim_age, left, right), left, right));
+		self.offense_persistent_id 	:= hash64(
+		                                      trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number +'X'+ Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description +
+		                                      Vconviction_jurisdiction + VCourt + VOffense_category + VArrest_date
+		                                     ); 
+		// self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		
 		self := l;
 	end;
 
 oPId_Added := project(o1, addOPID(left));
 
+// output(oPId_Added(seisint_primary_key ='C2COSOR6270924709894374124' ));
 /*
 // Add offense_persistent_id
 
@@ -75,8 +84,9 @@ oPId_Added := project(o1, addOPID(left));
 oPId_Added := project(o1, addOPID(left));
 */
 // Added dedup to the enture record to get rid of duplicate records
+// output(count(oPId_Added),named('Before'));
 o2 := dedup(oPId_Added(offense_description != ''),hash):persist('~thor40_241::persist::sex_offender_offenses_dedup');
-
+// output(count(o2),named('after'));
 // Classify offense categories
 //Find First Offense
 o2 defCategory(o2 l):= transform
@@ -3154,15 +3164,6 @@ o2 defCategory(o2 l):= transform
 						'TIME.|'+
 						'D0222007CR000271|'+
 						'D0392016CR005553|'+
-						
-						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+
-						'A|'+
-						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+
-						'ELUDING|'+
-						'LCD_DS|'+
-						'T17-A 253\\(1\\) \\(B\\)|'+
-						
-						
 						
 						'16-6-4-\\(B\\)'						
 						,						
