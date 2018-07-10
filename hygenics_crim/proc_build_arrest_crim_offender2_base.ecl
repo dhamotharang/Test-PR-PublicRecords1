@@ -272,14 +272,14 @@ with_ssn						:= all_clean_name_addr;
 	 self.dob_alias					:= '';
 	 self.place_of_birth		:= trim(trim(l.birthcity)+' '+ l.birthplace);
 
-	 self.street_address_1	//:= trim(l.street)+if(l.unit<>'', ' '+l.unit, '');
-	                        :=  map(l.sourcename='NORTH_CAROLINA_MECKLENBURG_COUNTY_ARRESTS' and regexfind('([A-Za-z]+)( NC$)',trim(l.street)) 
+
+   tempstreet             :=  map(l.sourcename='NORTH_CAROLINA_MECKLENBURG_COUNTY_ARRESTS' and regexfind('([A-Za-z]+)( NC$)',trim(l.street)) 
 	                                       	 => regexreplace('([A-Za-z]+)( NC$)',trim(l.street),''),l.street+if(l.unit<>'', ' '+l.unit, ''));	
-																					 
-	 self.street_address_2	:= trim(trim(trim(l.city)+' '+trim(l.orig_state))+' '+trim(l.orig_zip));
-	 self.street_address_3	:= '';
-	 self.street_address_4	:= '';
-	 self.street_address_5	:= '';
+   self.street_address_1	:= If(length(tempstreet)>25, tempstreet[1..25],tempstreet);
+   self.street_address_2	:= If(length(tempstreet)>25, tempstreet[26..],'');
+   self.street_address_3	:= trim(l.city);
+   self.street_address_4	:= trim(l.orig_state);
+   self.street_address_5	:= trim(l.orig_zip);
 	 
 	 self.race				  		:= if(length(trim(l.race))=1 and regexfind('[A-Z]', l.race, 0)<>'' , trim(l.race), '');
 	 
