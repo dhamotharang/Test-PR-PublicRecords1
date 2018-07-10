@@ -352,7 +352,7 @@ END;
 									
 	END;
 	
-	//InquiryLog MBS validation
+	//InquiryLog MBS validation - ONLY DELTABASE!!!
 	
 	EXPORT ValidateInputWithMBS(string fname, string pSeparator, string pTerminator):= module
 		shared infile:=dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,
@@ -360,11 +360,8 @@ END;
 		
 		shared InqMbs := join(infile,FraudShared.Files().Input.MBS.sprayed(status = 1)
 										,left.Customer_Account_Number =(string)right.gc_id
-										and left.Customer_State = right.customer_state
-										and FraudGovPlatform.Functions.ind_type_fn(left.Customer_Program) = right.ind_type
 										and FraudGovPlatform.Functions.file_type_fn('IDDT') = right.file_type
-										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-										and left.Customer_County = right.Customer_County 
+										and FraudGovPlatform.Functions.ind_type_fn(left.Customer_Program) = right.ind_type
 										,transform({string20 Customer_Account_Number,string1		Customer_Program,string2		customer_state,string		customer_agency_vertical_type, string3 Customer_County,unsigned4 seq}
 										,self.Customer_Account_Number:=left.Customer_Account_Number,
 										,self.Customer_State:=left.customer_state
