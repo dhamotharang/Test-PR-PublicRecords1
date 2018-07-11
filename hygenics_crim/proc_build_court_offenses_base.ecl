@@ -1254,12 +1254,12 @@ end;
 
 result_common 	:= project(j_final, to_court_offenses(left));
 
-sorted_rcommon	:= sort(result_common, off_date, court_Case_number, -court_off_desc_1, 
-						-court_final_plea, -court_off_code,
-						-court_off_lev, -court_statute, 
-						court_disp_date, -court_disp_desc_1,
-                        -sent_jail, sent_date, -sent_court_cost, -sent_court_fine, -sent_probation, -le_agency_desc, local);
+sorted_rcommon	:= sort(result_common, off_date, court_Case_number, StringLib.StringFilter(StringLib.StringToUpperCase(court_off_desc_1+court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 
+						            court_final_plea,court_off_lev, court_statute,court_off_code,	court_disp_date, court_disp_desc_1,court_disp_desc_2,
+                        sent_jail, sent_date, sent_court_cost, sent_court_fine, sent_probation, le_agency_desc, local);
 
+
+												
 sorted_rcommon rollupCrim(sorted_rcommon L, sorted_rcommon R) := TRANSFORM
 	self.le_agency_desc				:= if(l.le_agency_desc = '', r.le_agency_desc, l.le_agency_desc);
 	self.court_final_plea			:= if(l.court_final_plea = '', r.court_final_plea, l.court_final_plea);
@@ -1282,30 +1282,59 @@ END;
 
 rollupCrimOut := ROLLUP(sorted_rcommon,
                         left.offender_key = right.offender_key and 
-												trim(left.court_off_desc_1)  = trim(right.court_off_desc_1) and 
-												trim(left.off_date)          = trim(Right.off_date) and 
+												StringLib.StringFilter(StringLib.StringToUpperCase(left.court_off_desc_1+left.court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') = StringLib.StringFilter(StringLib.StringToUpperCase(right.court_off_desc_1+right.court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') and
+												trim(left.off_date)          = trim(Right.off_date) and 	
 												trim(left.court_Case_number) = trim(right.court_Case_number) and
+												(left.court_final_plea   = right.court_final_plea   or  right.court_final_plea  =''	or left.court_final_plea   ='') and
+												(left.court_off_lev      = right.court_off_lev      or  right.court_off_lev     =''	or left.court_off_lev      ='') and
+												(left.court_statute      = right.court_statute      or  right.court_statute     =''	or left.court_statute      ='') and
+												(left.court_off_code     = right.court_off_code     or  right.court_off_code    =''	or left.court_off_code     ='') and
+												
+												(left.court_disp_date   = right.court_disp_date   or  right.court_disp_date  =''	or left.court_disp_date   ='') and
 												(left.court_disp_desc_1 =	right.court_disp_desc_1 or  right.court_disp_desc_1=''  or left.court_disp_desc_1 ='') and
 												(left.court_disp_desc_2 =	right.court_disp_desc_2 or  right.court_disp_desc_2='' 	or left.court_disp_desc_2 ='') and
-												(left.court_disp_date   = right.court_disp_date   or  right.court_disp_date  =''	or left.court_disp_date   ='') and
-												(left.sent_date 				=	right.sent_date 		    or  right.sent_date 		   =''	or left.sent_date 		    ='') 
-												
+												(left.sent_jail 				=	right.sent_jail 		    or  right.sent_jail 		   =''	or left.sent_jail 		    ='') and	
+												(left.sent_date 				=	right.sent_date 		    or  right.sent_date 		   =''	or left.sent_date 		    ='') and													
+												(left.sent_court_cost 	=	right.sent_court_cost 	or  right.sent_court_cost  =''	or left.sent_court_cost 	='') and	
+												(left.sent_court_fine 	=	right.sent_court_fine 	or  right.sent_court_fine  =''	or left.sent_court_fine 	='') and	
+												(left.sent_probation 		=	right.sent_probation 		or  right.sent_probation 	 =''	or left.sent_probation 		='') and	
+												(left.le_agency_desc 		=	right.le_agency_desc 		or  right.le_agency_desc 	 =''	or left.le_agency_desc 		='') 	
 												, 
 												rollupCrim(LEFT,RIGHT),local);
 
+// output(sorted_rcommon   (offender_key ='TB10543803824862588689')); 
+// output(rollupCrimOut   (offender_key ='TB10543803824862588689')); 
 result_sort 	:= sort(rollupCrimOut, offender_key,vendor,state_origin,source_file,off_comp,off_delete_flag,off_date,arr_date, 
-                                     le_agency_cd,le_agency_desc,le_agency_case_number,
+                                     le_agency_cd,le_agency_case_number,
 																		 traffic_ticket_number,traffic_dl_no,traffic_dl_st,
 																		 arr_off_code,arr_off_desc_1,arr_off_desc_2,arr_off_type_cd,arr_off_type_desc,arr_off_lev,arr_statute,arr_statute_desc,arr_disp_date,arr_disp_code,arr_disp_desc_1,arr_disp_desc_2,
 																		 pros_refer_cd, pros_refer,pros_assgn_cd, pros_assgn,pros_chg_rej, pros_off_code, pros_off_desc_1, pros_off_desc_2,pros_off_type_cd, pros_off_type_desc,pros_off_lev, pros_act_filed, 
-																		 court_case_number, court_cd,court_desc,court_appeal_flag, court_final_plea, court_off_code, court_off_desc_1, court_off_desc_2,court_off_type_cd, court_off_type_desc,
-																		 court_off_lev, court_statute, court_additional_statutes, court_disp_date,court_disp_code, court_disp_desc_1, court_disp_desc_2,
-																		 sent_date, sent_jail, sent_susp_time,sent_court_cost,sent_court_fine,sent_susp_court_fine, sent_probation,sent_addl_prov_code, sent_addl_prov_desc_1,
+																		 court_case_number, court_cd,court_desc,court_appeal_flag, court_final_plea, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(court_off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(court_off_desc_1+court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 court_off_type_cd, court_off_type_desc, court_off_lev, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(court_statute),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+																		 court_additional_statutes, court_disp_date,court_disp_code, court_disp_desc_1, court_disp_desc_2,
+																		 sent_date,  sent_susp_time,sent_court_cost,sent_susp_court_fine, sent_addl_prov_code, sent_addl_prov_desc_1,
                                      sent_addl_prov_desc_2,sent_consec, sent_agency_rec_cust_ori, sent_agency_rec_cust,appeal_date,
-																		 appeal_off_disp,appeal_final_decision,-num_of_counts,local);
+																		 appeal_off_disp,appeal_final_decision,-num_of_counts,-sent_jail,-sent_probation,-le_agency_desc,-sent_court_fine,local);
 																		 
-//Pull only those records that have a vendor code assigned																		 
-result_dedup 	:= dedup(result_sort(trim(vendor, left, right)<>''), record,EXCEPT num_of_counts, local)  : persist ('~thor200_144::persist::hygenics::crim::aoc_offense');
-
+//Pull only those records that have a vendor code assigned	
+//several dups due to courtoffCode, Sentence_Jail, sent_probation	le_agency_desc,																 
+result_dedup 	:= dedup(result_sort(trim(vendor, left, right)<>''), offender_key,vendor,state_origin,source_file,off_comp,off_delete_flag,off_date,arr_date, 
+                                     le_agency_cd,le_agency_case_number,
+																		 traffic_ticket_number,traffic_dl_no,traffic_dl_st,
+																		 arr_off_code,arr_off_desc_1,arr_off_desc_2,arr_off_type_cd,arr_off_type_desc,arr_off_lev,arr_statute,arr_statute_desc,arr_disp_date,arr_disp_code,arr_disp_desc_1,arr_disp_desc_2,
+																		 pros_refer_cd, pros_refer,pros_assgn_cd, pros_assgn,pros_chg_rej, pros_off_code, pros_off_desc_1, pros_off_desc_2,pros_off_type_cd, pros_off_type_desc,pros_off_lev, pros_act_filed, 
+																		 court_case_number, court_cd,court_desc,court_appeal_flag, court_final_plea, 
+																		 //StringLib.StringFilter(StringLib.StringToUpperCase(court_off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),		
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(court_off_desc_1+court_off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 court_off_type_cd, court_off_type_desc, court_off_lev, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(court_statute),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	 																		 
+																		 court_additional_statutes, court_disp_date,court_disp_code, court_disp_desc_1, court_disp_desc_2,
+																		 sent_date, /*sent_jail,*/ sent_susp_time,sent_court_cost,sent_susp_court_fine, sent_addl_prov_code, sent_addl_prov_desc_1,
+                                     sent_addl_prov_desc_2,sent_consec, sent_agency_rec_cust_ori, sent_agency_rec_cust,appeal_date,
+																		 appeal_off_disp,appeal_final_decision,local)  : persist ('~thor200_144::persist::hygenics::crim::aoc_offense');
+// output(result_dedup   (offender_key ='PY100068169064275890542003CT00005120030605'));
 export proc_build_court_offenses_base := result_dedup;
 

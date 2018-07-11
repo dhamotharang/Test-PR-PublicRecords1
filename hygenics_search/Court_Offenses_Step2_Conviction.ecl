@@ -1,4 +1,4 @@
-import hygenics_crim, CrimSrch, lib_stringlib;
+﻿import hygenics_crim, CrimSrch, lib_stringlib;
 
 	hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory tJoinForConvictionFlag(hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory pOffense, Layout_Conviction_Lookup pLookup) := transform
 		self.fcra_conviction_flag		:= if(pOffense.FCRA_Conviction_Flag = 'Y',
@@ -14,7 +14,7 @@ import hygenics_crim, CrimSrch, lib_stringlib;
 dCourtOffensesConvictionByDisp	:= Court_Offenses_Step1_Traffic(Vendor not in sCourt_Vendors_With_Conviction_Based_Upon_Sent_Date);
 
 dCourtOffensesConvictionByDisp1	:= join(dCourtOffensesConvictionByDisp, File_Conviction_Lookup(Court_Disp_Desc<>''),
-																		trim(lib_stringlib.stringlib.stringtouppercase(left.Court_Disp_Desc_1)) = trim(lib_stringlib.stringlib.stringtouppercase(right.Court_Disp_Desc)),
+																		trim(lib_stringlib.stringlib.stringtouppercase(lib_stringlib.stringlib.stringfilterout(left.Court_Disp_Desc_1,'.-\''))) = trim(lib_stringlib.stringlib.stringtouppercase(lib_stringlib.stringlib.stringfilterout(right.Court_Disp_Desc,'.-\''))),
 																		tJoinForConvictionFlag(left,right),left outer, lookup);
 //Commented the redundant statements										
 // dCourtOffensesConvictionByDisp2	:= join(dCourtOffensesConvictionByDisp1,File_Conviction_Lookup(Court_Disp_Desc<>''),
