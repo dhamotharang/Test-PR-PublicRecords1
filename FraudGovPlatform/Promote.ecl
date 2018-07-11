@@ -44,17 +44,6 @@ module
 		 STD.File.FinishSuperFileTransaction()
 		);
 
-		export MBS_Used2Sprayed := SEQUENTIAL(
-		 STD.File.StartSuperFileTransaction(),
-		 STD.File.AddSuperfile(FraudShared.Filenames().input.mbsfdnccid.sprayed			, FraudShared.Filenames().input.mbsfdnccid.used				, addcontents :=true),
-		 STD.File.AddSuperfile(FraudShared.Filenames().input.mbsfdnhhid.sprayed			, FraudShared.Filenames().input.mbsfdnhhid.used				, addcontents :=true),
-		 STD.File.AddSuperfile(FraudShared.Filenames().input.mbsmarketappend.sprayed	, FraudShared.Filenames().input.mbsmarketappend.used		, addcontents :=true),
-		 STD.File.ClearSuperFile(FraudShared.Filenames().input.mbsfdnccid.used, false),
-		 STD.File.ClearSuperFile(FraudShared.Filenames().input.mbsfdnhhid.used, false),
-		 STD.File.ClearSuperFile(FraudShared.Filenames().input.mbsmarketappend.used, false),		 
-		 STD.File.FinishSuperFileTransaction()
-		);
-
 	end;
 	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
