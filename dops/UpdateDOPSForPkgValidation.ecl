@@ -151,7 +151,7 @@ EXPORT UpdateDOPSForPkgValidation(
 	end;
 
 	export RunUpdate() := function
-		dUpdateInfo := UpdateInfo() : failure(
+		dUpdateInfo := dedup(UpdateInfo(),record) : failure(
 															fileservices.sendemail(
 																				dops.constants.rptemail(l_locationflag)
 																				,'KEY INFO UPDATE DOPS DB:'+ l_dopsdatasetname+':'+l_buildversion+':'+l_clusterflag+':FAILED'
