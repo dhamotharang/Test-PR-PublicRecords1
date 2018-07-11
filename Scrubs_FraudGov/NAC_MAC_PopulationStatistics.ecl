@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT NAC_MAC_PopulationStatistics(infile,Ref='',Input_Customer_Account_Number = '',Input_Customer_County = '',Input_Customer_State = '',Input_Customer_Agency_Vertical_Type = '',Input_Customer_Program = '',Input_LexID = '',Input_raw_Full_Name = '',Input_raw_First_name = '',Input_raw_Last_Name = '',Input_SSN = '',Input_Drivers_License_State = '',Input_Drivers_License_Number = '',Input_Street_1 = '',Input_City = '',Input_State = '',Input_Zip = '',Input_did = '',OutFile) := MACRO
+EXPORT NAC_MAC_PopulationStatistics(infile,Ref='',Input_SearchAddress1StreetAddress1 = '',Input_SearchAddress1StreetAddress2 = '',Input_SearchAddress1City = '',Input_SearchAddress1State = '',Input_SearchAddress1Zip = '',Input_SearchAddress2StreetAddress1 = '',Input_SearchAddress2StreetAddress2 = '',Input_SearchAddress2City = '',Input_SearchAddress2State = '',Input_SearchAddress2Zip = '',Input_SearchCaseId = '',Input_enduserip = '',Input_CaseID = '',Input_ClientFirstName = '',Input_ClientMiddleName = '',Input_ClientLastName = '',Input_ClientPhone = '',Input_ClientEmail = '',OutFile) := MACRO
   IMPORT SALT39,Scrubs_FraudGov;
   #uniquename(of)
   %of% := RECORD
@@ -8,106 +8,112 @@ EXPORT NAC_MAC_PopulationStatistics(infile,Ref='',Input_Customer_Account_Number 
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
     SELF.fields :=
-    #IF( #TEXT(Input_Customer_Account_Number)='' )
+    #IF( #TEXT(Input_SearchAddress1StreetAddress1)='' )
       '' 
     #ELSE
-        IF( le.Input_Customer_Account_Number = (TYPEOF(le.Input_Customer_Account_Number))'','',':Customer_Account_Number')
+        IF( le.Input_SearchAddress1StreetAddress1 = (TYPEOF(le.Input_SearchAddress1StreetAddress1))'','',':SearchAddress1StreetAddress1')
     #END
  
-+    #IF( #TEXT(Input_Customer_County)='' )
++    #IF( #TEXT(Input_SearchAddress1StreetAddress2)='' )
       '' 
     #ELSE
-        IF( le.Input_Customer_County = (TYPEOF(le.Input_Customer_County))'','',':Customer_County')
+        IF( le.Input_SearchAddress1StreetAddress2 = (TYPEOF(le.Input_SearchAddress1StreetAddress2))'','',':SearchAddress1StreetAddress2')
     #END
  
-+    #IF( #TEXT(Input_Customer_State)='' )
++    #IF( #TEXT(Input_SearchAddress1City)='' )
       '' 
     #ELSE
-        IF( le.Input_Customer_State = (TYPEOF(le.Input_Customer_State))'','',':Customer_State')
+        IF( le.Input_SearchAddress1City = (TYPEOF(le.Input_SearchAddress1City))'','',':SearchAddress1City')
     #END
  
-+    #IF( #TEXT(Input_Customer_Agency_Vertical_Type)='' )
++    #IF( #TEXT(Input_SearchAddress1State)='' )
       '' 
     #ELSE
-        IF( le.Input_Customer_Agency_Vertical_Type = (TYPEOF(le.Input_Customer_Agency_Vertical_Type))'','',':Customer_Agency_Vertical_Type')
+        IF( le.Input_SearchAddress1State = (TYPEOF(le.Input_SearchAddress1State))'','',':SearchAddress1State')
     #END
  
-+    #IF( #TEXT(Input_Customer_Program)='' )
++    #IF( #TEXT(Input_SearchAddress1Zip)='' )
       '' 
     #ELSE
-        IF( le.Input_Customer_Program = (TYPEOF(le.Input_Customer_Program))'','',':Customer_Program')
+        IF( le.Input_SearchAddress1Zip = (TYPEOF(le.Input_SearchAddress1Zip))'','',':SearchAddress1Zip')
     #END
  
-+    #IF( #TEXT(Input_LexID)='' )
++    #IF( #TEXT(Input_SearchAddress2StreetAddress1)='' )
       '' 
     #ELSE
-        IF( le.Input_LexID = (TYPEOF(le.Input_LexID))'','',':LexID')
+        IF( le.Input_SearchAddress2StreetAddress1 = (TYPEOF(le.Input_SearchAddress2StreetAddress1))'','',':SearchAddress2StreetAddress1')
     #END
  
-+    #IF( #TEXT(Input_raw_Full_Name)='' )
++    #IF( #TEXT(Input_SearchAddress2StreetAddress2)='' )
       '' 
     #ELSE
-        IF( le.Input_raw_Full_Name = (TYPEOF(le.Input_raw_Full_Name))'','',':raw_Full_Name')
+        IF( le.Input_SearchAddress2StreetAddress2 = (TYPEOF(le.Input_SearchAddress2StreetAddress2))'','',':SearchAddress2StreetAddress2')
     #END
  
-+    #IF( #TEXT(Input_raw_First_name)='' )
++    #IF( #TEXT(Input_SearchAddress2City)='' )
       '' 
     #ELSE
-        IF( le.Input_raw_First_name = (TYPEOF(le.Input_raw_First_name))'','',':raw_First_name')
+        IF( le.Input_SearchAddress2City = (TYPEOF(le.Input_SearchAddress2City))'','',':SearchAddress2City')
     #END
  
-+    #IF( #TEXT(Input_raw_Last_Name)='' )
++    #IF( #TEXT(Input_SearchAddress2State)='' )
       '' 
     #ELSE
-        IF( le.Input_raw_Last_Name = (TYPEOF(le.Input_raw_Last_Name))'','',':raw_Last_Name')
+        IF( le.Input_SearchAddress2State = (TYPEOF(le.Input_SearchAddress2State))'','',':SearchAddress2State')
     #END
  
-+    #IF( #TEXT(Input_SSN)='' )
++    #IF( #TEXT(Input_SearchAddress2Zip)='' )
       '' 
     #ELSE
-        IF( le.Input_SSN = (TYPEOF(le.Input_SSN))'','',':SSN')
+        IF( le.Input_SearchAddress2Zip = (TYPEOF(le.Input_SearchAddress2Zip))'','',':SearchAddress2Zip')
     #END
  
-+    #IF( #TEXT(Input_Drivers_License_State)='' )
++    #IF( #TEXT(Input_SearchCaseId)='' )
       '' 
     #ELSE
-        IF( le.Input_Drivers_License_State = (TYPEOF(le.Input_Drivers_License_State))'','',':Drivers_License_State')
+        IF( le.Input_SearchCaseId = (TYPEOF(le.Input_SearchCaseId))'','',':SearchCaseId')
     #END
  
-+    #IF( #TEXT(Input_Drivers_License_Number)='' )
++    #IF( #TEXT(Input_enduserip)='' )
       '' 
     #ELSE
-        IF( le.Input_Drivers_License_Number = (TYPEOF(le.Input_Drivers_License_Number))'','',':Drivers_License_Number')
+        IF( le.Input_enduserip = (TYPEOF(le.Input_enduserip))'','',':enduserip')
     #END
  
-+    #IF( #TEXT(Input_Street_1)='' )
++    #IF( #TEXT(Input_CaseID)='' )
       '' 
     #ELSE
-        IF( le.Input_Street_1 = (TYPEOF(le.Input_Street_1))'','',':Street_1')
+        IF( le.Input_CaseID = (TYPEOF(le.Input_CaseID))'','',':CaseID')
     #END
  
-+    #IF( #TEXT(Input_City)='' )
++    #IF( #TEXT(Input_ClientFirstName)='' )
       '' 
     #ELSE
-        IF( le.Input_City = (TYPEOF(le.Input_City))'','',':City')
+        IF( le.Input_ClientFirstName = (TYPEOF(le.Input_ClientFirstName))'','',':ClientFirstName')
     #END
  
-+    #IF( #TEXT(Input_State)='' )
++    #IF( #TEXT(Input_ClientMiddleName)='' )
       '' 
     #ELSE
-        IF( le.Input_State = (TYPEOF(le.Input_State))'','',':State')
+        IF( le.Input_ClientMiddleName = (TYPEOF(le.Input_ClientMiddleName))'','',':ClientMiddleName')
     #END
  
-+    #IF( #TEXT(Input_Zip)='' )
++    #IF( #TEXT(Input_ClientLastName)='' )
       '' 
     #ELSE
-        IF( le.Input_Zip = (TYPEOF(le.Input_Zip))'','',':Zip')
+        IF( le.Input_ClientLastName = (TYPEOF(le.Input_ClientLastName))'','',':ClientLastName')
     #END
  
-+    #IF( #TEXT(Input_did)='' )
++    #IF( #TEXT(Input_ClientPhone)='' )
       '' 
     #ELSE
-        IF( le.Input_did = (TYPEOF(le.Input_did))'','',':did')
+        IF( le.Input_ClientPhone = (TYPEOF(le.Input_ClientPhone))'','',':ClientPhone')
+    #END
+ 
++    #IF( #TEXT(Input_ClientEmail)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ClientEmail = (TYPEOF(le.Input_ClientEmail))'','',':ClientEmail')
     #END
 ;
   END;
