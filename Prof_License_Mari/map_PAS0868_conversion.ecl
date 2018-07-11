@@ -302,7 +302,7 @@ END;
 		temp_preaddr1_rm_corp := TRIM(IF(tmpGetCorpName<>'',REGEXREPLACE(tmpGetCorpName,temp_preaddr1_rm_dba,''),temp_preaddr1_rm_dba),LEFT,RIGHT);
 		temp_preaddr1_rm_contact := IF(tmpGetContactName<>'',REGEXREPLACE(tmpGetContactName,temp_preaddr1_rm_corp,''),temp_preaddr1_rm_corp);
 		temp_preaddr1_rm_misc := REGEXREPLACE('(CENTURY 21[A-Z&\\- ]+ [INC|COMPANY])', temp_preaddr1_rm_contact, '');
-		temp_preaddr1_rm_misc1:= REGEXREPLACE('(^.* INC)', temp_preaddr1_rm_misc, '');
+		temp_preaddr1_rm_misc1:= REGEXREPLACE('(^.* INC$|^.* INC\\.$|^.* INC\\.? )', temp_preaddr1_rm_misc, '');
 		cln_preaddr1					:= StringLib.StringCleanSpaces(REGEXREPLACE('(DBA |C/O |ATTN -)', temp_preaddr1_rm_misc1, ''));
 		cln_preaddr2	 				:= StringLib.StringCleanSpaces(
 		                           IF(TrimCity='*','',TrimCity) + ' ' +
