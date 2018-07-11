@@ -93,35 +93,42 @@ string ReverseGen(string s) :=
 			REGEXFIND('^(0)\'[A-Z]', s) => 'O'+s[2..],	
 	s);
 
-	rgxAKA0 := '^([A-Z]+), ([A-Z]+) AKA +(.+)$';
-	rgxAKA1 := '^([A-Z]+) +AKA +[^,]+, *(.+)$';
-	rgxAKA2 := '^([^,]+), *([A-Z]+) +AKA +(.+)$';
-	rgxAKA3 := '^([A-Z]+) +AKA, +(.+)$';
-	rgxAKA4 := '^([A-Z]+), ([A-Z]+ [A-Z]+) AKA +(.+)$';
-	rgxAKA5 := '^([A-Z]+), ([A-Z]+ [A-Z]+ [A-Z]+) AKA +(.+)$';
-	rgxAKA6 := '^([A-Z ,]+)([(/]AKA[ ,][^)]+\\)?)$';
+	rgxAKA0 := '^([A-Z]+), ([A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA1 := '^([A-Z]+) +(AKA|FKA|NKA) +[^,]+, *(.+)$';
+	rgxAKA2 := '^([^,]+), *([A-Z]+) +(AKA|FKA|NKA) +(.+)$';
+	rgxAKA3 := '^([A-Z]+) +(AKA|FKA|NKA), +(.+)$';
+	rgxAKA4 := '^([A-Z]+), ([A-Z]+ [A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA5 := '^([A-Z]+), ([A-Z]+ [A-Z]+ [A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA6 := '^([A-Z ,]+)([(/](AKA|FKA|NKA)[ ,][^)]+\\)?)$';
+	rgxAKA7 := '\\b(AKA|FKA|NKA)[ ,]*$';
+	rgxAKA8 := '^([A-Z]+ [A-Z]+( [A-Z]+)?) (AKA|FKA|NKA) ([A-Z]+ [A-Z]+( [A-Z]+)?)$';
 	rgxJohnDoe1 := '^(JOHN|JANE) DOE AKA +(.+)$';
 string RemoveAKA(string s) := MAP(
-	s[1..4] in ['AKA ','FKA '] => s[5..],
-	s[1..4] in ['AKA,','FKA,'] => TRIM(s[5..],LEFT),
+	s[1..4] in ['AKA ','FKA ','NKA '] => s[5..],
+	s[1..4] in ['AKA,','FKA,','NKA,'] => TRIM(s[5..],LEFT),
+	// 'JOHN DOE AKA BARSHEE, M JOHNSON';
+	REGEXFIND(rgxJohnDoe1, s) => REGEXREPLACE(rgxJohnDoe1, s, '$2'),
 	// ORTEGA, ROBERT JOE AKA BOBB
 	REGEXFIND(rgxAKA0, s) => REGEXREPLACE(rgxAKA0, s, '$1, $2'),
 	//STONE AKA GRAVEEN, BETTY JANE
-	REGEXFIND(rgxAKA1, s) => REGEXREPLACE(rgxAKA1, s, '$1, $2'),
+	REGEXFIND(rgxAKA1, s) => REGEXREPLACE(rgxAKA1, s, '$1, $3'),
 	//ORTIZ, RAYMOND AKA (BOZO)
 	REGEXFIND(rgxAKA2, s) => REGEXREPLACE(rgxAKA2, s, '$1, $2'),
 	//'ORTIZ AKA, BOZO';
-	REGEXFIND(rgxAKA3, s) => REGEXREPLACE(rgxAKA3, s, '$1, $2'),
+	REGEXFIND(rgxAKA3, s) => REGEXREPLACE(rgxAKA3, s, '$1, $3'),
 	//'ORTIZ, RAYMOND JAMES AKA BOZO';
 	REGEXFIND(rgxAKA4, s) => REGEXREPLACE(rgxAKA4, s, '$1, $2'),
 	//DELEE, OTIS D THOMPSON AKA DORO
 	REGEXFIND(rgxAKA5, s) => REGEXREPLACE(rgxAKA4, s, '$1, $2'),
 	// 'BRADFORD, JAMES S (AKA, JIMBO BRADFORD)';
 	REGEXFIND(rgxAKA6, s) => REGEXREPLACE(rgxAKA6, s, '$1'),
-	// 'JOHN DOE AKA BARSHEE, M JOHNSON';
-	REGEXFIND(rgxJohnDoe1, s) => REGEXREPLACE(rgxJohnDoe1, s, '$2'),
+	// 'BRADFORD, JAMES S (AKA)';
+	REGEXFIND(rgxAKA7, s) => Std.Str.ExcludeLastWord(s),
+	// LAURIA A AQUILINA FKA LAURIE A. DABNEY                                                                                                                
+	REGEXFIND(rgxAKA8, s) => REGEXREPLACE(rgxAKA8, s, '$1 & $4'),
 
-	StringLib.StringFind(s, ' AKA ', 1) > 0 => StringLib.StringFindReplace(s, ' AKA ', ' '),
+	REGEXFIND('( (AKA|FKA|NKA) )', s) => REGEXREPLACE('( (AKA|FKA|NKA) )', s, ' '),
+	//StringLib.StringFind(s, ' AKA ', 1) > 0 => StringLib.StringFindReplace(s, ' AKA ', ' '),
 	StringLib.StringFind(s, '-AKA-', 1) > 0 => StringLib.StringFindReplace(s, '-AKA-', '-'),
 	REGEXFIND('(/AKA)$', s) => REGEXREPLACE('(/AKA)$', s, ''),
 	REGEXFIND('([A-Z])/AKA\\b', s) => REGEXREPLACE('([A-Z])/AKA\\b', s, '$1 '),
@@ -394,7 +401,8 @@ rgxDualMissingAmp2 := '^[A-Z]+ +[A-Z]+ +([A-Z]{2,}) +[A-Z]+ +[A-Z]+ +\\1+$';
 rgxDualMissingAmp3 := '^[A-Z]+ +[A-Z]+ +(TR|TTEE|TRUSTEE|JTRS) +[A-Z]+ +[A-Z]+ +\\1+$';
 rgxDualMissingAmpFix3 := '^([A-Z]+ +[A-Z]+) +[A-Z]+ +([A-Z]+ +[A-Z]+) +[A-Z]+$';
 
-FixupDual(string s) := MAP(
+FixupDual(string s) := 
+	MAP(
 			REGEXFIND('\\b(AND,)', s) => Std.Str.FindReplace(s, ' AND,', ' AND '),
 			REGEXFIND('\\bAND\\b', s) => s,
 			REGEXFIND(rgxDualMissingAmp1, s) => REGEXREPLACE(rgxDualMissingAmpFix, s, '$1&$2'),
