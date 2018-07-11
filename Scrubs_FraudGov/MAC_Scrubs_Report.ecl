@@ -3,14 +3,14 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,version,inputFile,MemailLi
 	folder						:=	#EXPAND(myFolder);
 	inFile						:=	inputFile;
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	scope_datasetName		:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
 	profilename				:=	'Scrubs_FraudGov_'+scopename+'_v'+version;
 	
 	myEmail		:=	_Control.MyInfo.EmailAddressNotify;		//	Email address to send notifications
 	// F	:=	inFile(process_date=filedate);						//	Records to scrub
 	F	:=	inFile;																				//	Records to scrub
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
-	N	:=	S.FromNone(table(F,Scrubs_FraudGov.NAC_Layout_NAC));																//	Generate the error flags
+	N	:=	S.FromNone(F);																//	Generate the error flags
 	U :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
 	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(scopename+'_ErrorSummary'));										//	Show errors by field and type
 	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(scopename+'_EyeballSomeErrors'));		//	Just eyeball some errors
