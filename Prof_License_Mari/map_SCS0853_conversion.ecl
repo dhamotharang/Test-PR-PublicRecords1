@@ -1,4 +1,4 @@
-//******************************************************************************************
+﻿//******************************************************************************************
 //Converting South Carolina Real Estate Appraisers Board Real Estate Appraisers License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 //******************************************************************************************
@@ -13,7 +13,11 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
-	
+	CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE |^.* LLC)';
+	C_O_Ind    := '(C/O |C/O:|ATTN:|ATTN: |ATTN|ATTENTION:|ATT:|CO/)';
+	AddressSet := '(SUITE|DRIVE| DR$| ROAD| RD$|BLVD| STREET$| ST$|APT |APT.| AVE | AVE$| AVENUE| COURT| LANE| PLACE | PLACE$| SUITE| PL$| PL.| WAY$| TER$|' +
+                'CIRCLE$| ISLE | PARKWAY| PIKE|PO BOX|LN$| NW$| NE$| CT$| CT.| DR.|CENTURY 21| HIGHWAY| NW$)';
+
 	//Dataset reference files for lookup joins
 	Cmvtranslation					:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
 	oCmvtranslation					:= OUTPUT(Cmvtranslation);
@@ -50,25 +54,25 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		SELF.TYPE_CD					:= 'MD';
 
 		//Process names and address
-		TrimNAME_FIRST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FIRST_NAME);
-		TrimNAME_MID 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MID_NAME);
-		TrimNAME_LAST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LAST_NAME);
-		TrimNAME_PREFX        := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.TITLE);
-		TrimLic_Type					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LICENSE_DESC);
-		TrimNAME_ORG					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FULL_NAME);
-		TrimNAME_OFFICE 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME);
+		TrimNAME_FIRST 				:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		TrimNAME_MID 					:= ut.CleanSpacesAndUpper(pInput.MID_NAME);
+		TrimNAME_LAST 				:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
+		TrimNAME_PREFX        := ut.CleanSpacesAndUpper(pInput.TITLE);
+		TrimLic_Type					:= ut.CleanSpacesAndUpper(pInput.LICENSE_DESC);
+		TrimNAME_ORG					:= ut.CleanSpacesAndUpper(pInput.FULL_NAME);
+		TrimNAME_OFFICE 			:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
 
-		TrimAddress1_1				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_ADDRESS_1);
-		TrimAddress1_2				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_ADDRESS_2);
-		TrimCity1							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_CITY);
-		TrimState1						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_STATE);
-		TrimZip1							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_ZIP);	
-		TrimAddress2_1				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIN_ADDRESS_1);
-		TrimAddress2_2				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIN_ADDRESS_2);
-		TrimCity2							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIN_CITY);
-		TrimState2						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIN_STATE);
-		TrimZip2							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MAIN_ZIP);	
-		Trim_SLNUM						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM);
+		TrimAddress1_1				:= ut.CleanSpacesAndUpper(pInput.BUS_ADDRESS_1);
+		TrimAddress1_2				:= ut.CleanSpacesAndUpper(pInput.BUS_ADDRESS_2);
+		TrimCity1							:= ut.CleanSpacesAndUpper(pInput.BUS_CITY);
+		TrimState1						:= ut.CleanSpacesAndUpper(pInput.BUS_STATE);
+		TrimZip1							:= ut.CleanSpacesAndUpper(pInput.BUS_ZIP);	
+		TrimAddress2_1				:= ut.CleanSpacesAndUpper(pInput.MAIN_ADDRESS_1);
+		TrimAddress2_2				:= ut.CleanSpacesAndUpper(pInput.MAIN_ADDRESS_2);
+		TrimCity2							:= ut.CleanSpacesAndUpper(pInput.MAIN_CITY);
+		TrimState2						:= ut.CleanSpacesAndUpper(pInput.MAIN_STATE);
+		TrimZip2							:= ut.CleanSpacesAndUpper(pInput.MAIN_ZIP);	
+		Trim_SLNUM						:= ut.CleanSpacesAndUpper(pInput.SLNUM);
 		
 		// License Information - SC license search website shows license # without prefix, thus not included here either.
 		//Used by 20150121												 
@@ -116,7 +120,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		set_active_status 		:= ['A','CG','CGM','CR','CRM','L','LM'];
 		set_inactive_status 	:= ['IA','ICG','ICGM','ICR','ICRM','IL','ILM'];  
 		//uncomment for 20130307, 20130509, 20130606-20140718
-		SELF.RAW_LICENSE_STATUS := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATUS);
+		SELF.RAW_LICENSE_STATUS := ut.CleanSpacesAndUpper(pInput.STATUS);
 		tmpLicenseStatus 			:= IF(pInput.EXPDT != '' AND tmpExpireDate>pVersion AND TRIM(SELF.RAW_LICENSE_TYPE) in set_active_status,
 		                            'ACTIVE',
 																'INACTIVE');																																	
@@ -172,8 +176,18 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		SELF.DBA_FLAG		    	:= IF(SELF.NAME_DBA != '',1,0);
 	  
 		TempNAME_OFFICE       := IF(func_is_address(TrimNAME_OFFICE)= TRUE,'',TrimNAME_OFFICE);
-		ParsedOfficeName 			:= Prof_License_Mari.fnCleanNames.ExtractCleanOfficeName(TempNAME_OFFICE, '');
+		
+		getOFFICE_NAME				:= MAP(REGEXFIND(C_O_Ind, TrimAddress1_1) AND NOT REGEXFIND(AddressSet, TrimAddress1_1)=> TrimAddress1_1,
+		                             REGEXFIND(C_O_Ind, TrimAddress1_2) AND NOT REGEXFIND(AddressSet, TrimAddress1_2)=> TrimAddress1_2,
+																 REGEXFIND(CompNames, TrimAddress1_1) AND NOT REGEXFIND(AddressSet, TrimAddress1_1)=> TrimAddress1_1,
+																 REGEXFIND(CompNames, TrimAddress1_2) AND NOT REGEXFIND(AddressSet, TrimAddress1_2)=> TrimAddress1_2,
+																 NOT REGEXFIND('[0-9]',TrimAddress1_1) AND NOT REGEXFIND(AddressSet,TrimAddress1_1) AND TrimAddress1_1 <>'' => TrimAddress1_1,																 
+																 TempNAME_OFFICE);
+																 
+		ParsedOfficeName 			:= Prof_License_Mari.fnCleanNames.ExtractCleanOfficeName(getOFFICE_NAME, '');
 		TmpNAME_OFFICE  	    := TRIM(ParsedOfficeName[3..102], LEFT, RIGHT);
+		
+		
 		SELF.NAME_OFFICE      := MAP(TRIM(TmpNAME_OFFICE,ALL) = TRIM(ConcatNAME_FULL,ALL) => '',
 		                             TRIM(TmpNAME_OFFICE,ALL) = TRIM(tmpFullName,ALL) => '',
 																 TRIM(TmpNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST, ALL) => '',
@@ -188,14 +202,14 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		SELF.PHN_PHONE_1    	:= ut.CleanPhone(pInput.BUS_PHONE)[1..10];
 	
 		//Populating Address fields		
-		TempAddress1_1        := IF(func_is_address(TrimNAME_OFFICE)= TRUE,TrimNAME_OFFICE,TrimAddress1_1);
-		TempAddress1_2        := IF(func_is_address(TrimNAME_OFFICE)= TRUE,TrimAddress1_1,TrimAddress1_2);
-		preAddress1_1					:= TempAddress1_1 + ' ' + TempAddress1_2;
+		TempAddress1_1        := IF(TrimNAME_OFFICE<>'' and Prof_License_Mari.func_is_address(TrimNAME_OFFICE)= TRUE,TrimNAME_OFFICE,TrimAddress1_1);
+		TempAddress1_2        := IF(TrimNAME_OFFICE <> '' and Prof_License_Mari.func_is_address(TrimNAME_OFFICE)= TRUE,TrimAddress1_1,TrimAddress1_2);
+		preAddress1_1					:= TRIM(REGEXREPLACE(CompNames,TempAddress1_1,'') + ' ' + REGEXREPLACE(CompNames,TempAddress1_2,''));
 		preAddress1_2					:= TrimCity1 + ' ' + TrimState1 + ' ' + TrimZip1;		
 		preAddress2_1					:= TrimAddress2_1 + ' ' + TrimAddress2_2;
 		preAddress2_2					:= TrimCity2 + ' ' + TrimState2 + ' ' + TrimZip2;
 
-		tmpAddress1_1					:= REGEXREPLACE('(^.* & COMPANY|SERVICES, LLC|C/O .* SERVIC|C/O .* RESOURCES)',IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_1,preAddress1_1),'');
+		tmpAddress1_1					:= IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_1,preAddress1_1);
 		tmpAddress1_2					:= IF(TRIM(preAddress1_1+preAddress1_2)='',preAddress2_2,preAddress1_2);
 		tmpAddress2_1					:= IF(tmpAddress1_1=preAddress2_1,'',preAddress2_1);
 		tmpAddress2_2					:= IF(tmpAddress1_2=preAddress2_2,'',preAddress2_2);
@@ -213,7 +227,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1			:= TRIM(clnAddrAddr1[115..116]);
    	SELF.ADDR_ZIP5_1			:= TRIM(clnAddrAddr1[117..121]);
    	SELF.ADDR_ZIP4_1			:= clnAddrAddr1[122..125];
-		SELF.ADDR_CNTY_1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BUS_COUNTY);
+		SELF.ADDR_CNTY_1			:= ut.CleanSpacesAndUpper(pInput.BUS_COUNTY);
 	  SELF.ADDR_BUS_IND			:= IF(clnAddrAddr1!='','B','');
 
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr2[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr2[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr2[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr2[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr2[45..46],LEFT,RIGHT);																	
