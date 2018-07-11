@@ -4,7 +4,7 @@ export Build_all(string pversion, boolean pUseProd = false) := function
 wl:=nothor(WorkunitServices.WorkunitList('',jobname:='Yogurt:Enclarity as Ingenix Build*'))(state in ['blocked','running','wait']);
 if(exists(wl),fail('Enclarity as Ingenix Build is running'));
 
-spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
+spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd)); 
 
 built := sequential(
 					spray_,
