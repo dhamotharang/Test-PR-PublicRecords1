@@ -8177,7 +8177,7 @@ export WordTokens := DATASET(
 {'SHAREHOLDERS',2},
 {'GM',2},
 {'FLORIDA HOME',2},
-{'FKA',2},
+//{'FKA',2},
 {'BUGLE CORP',2},
 {'HOT WATER',2},
 {'TROPICALS',2},
