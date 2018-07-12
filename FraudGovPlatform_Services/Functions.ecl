@@ -806,7 +806,7 @@ EXPORT Functions := MODULE
 	EXPORT IsValidInputDate(iesp.share.t_Date date) := FUNCTION
 		date_int := iesp.ECL2ESP.DateToInteger(date);
 		
-		return STD.Date.IsValidDate(date_int) OR date_int = 0;
+		return (STD.Date.IsValidDate(date_int) AND date_int <= STD.Date.Today()) OR date_int = 0;
 	END;
 
 END;
