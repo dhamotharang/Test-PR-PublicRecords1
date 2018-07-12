@@ -1153,6 +1153,19 @@
 				trim(kword, left, right) = 'ECB' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECB,
 				trim(kword, left, right) = 'CAATSA228-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAATSA228_WC,
 				trim(kword, left, right) = 'ESMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESMA,
+				trim(kword, left, right) = 'PHPDEA' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHPDEA,
+				trim(kword, left, right) = 'PLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PLPOL,
+				trim(kword, left, right) = 'ILISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILISA,
+				trim(kword, left, right) = 'RSSRE-DIR2-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR2_WC,
+				trim(kword, left, right) = 'RSSRE-DIR1-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR1_WC,
+				trim(kword, left, right) = 'RSSRE-DIR3-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR3_WC,
+				trim(kword, left, right) = 'ITGPDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITGPDP,
+				trim(kword, left, right) = 'IMOF-WMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMOF_WMD,
+				trim(kword, left, right) = 'ARMJHR-W' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMJHR_W,
+				trim(kword, left, right) = 'US-SST' =>SubGroup_Constants.numKeywordsID.KEYWORD_US_SST,
+				trim(kword, left, right) = 'BRCNEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRCNEP,
+				trim(kword, left, right) = 'MXASF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXASF,
+				trim(kword, left, right) = 'JPMHLW' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPMHLW,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

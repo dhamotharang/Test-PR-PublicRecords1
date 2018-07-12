@@ -1,4 +1,4 @@
-EXPORT fn_CleanParsedNames(inFile, 
+﻿EXPORT fn_CleanParsedNames(inFile, 
 		firstname='fname',middlename='mname',lastname='lname',namesuffix='name_suffix',
 		fullname='fullname',
 		nameid = 'nid',
@@ -44,7 +44,7 @@ r := RECORD
   NID.Common.xNID __nid;
 END;
 
-	new_layout xform(r L, Nid.Layout_Repository R) := TRANSFORM
+	new_layout xform(new_layout L, Nid.Layout_Repository R) := TRANSFORM
 		self.namType 	:= R.nametype;
 		self.nameid		:= R.NID;
 		self.fullname	:= R.name;
@@ -64,6 +64,28 @@ END;
 		
 		self := L;
 	END;
+	
+	new_layout xform1(r L, Nid.Layout_Repository R) := TRANSFORM
+		self.namType 	:= R.nametype;
+		self.nameid		:= L.__NID;
+		self.fullname	:= R.name;
+		
+		self._title		:= R.cln_title;
+		self._fname		:= R.cln_fname;
+		self._mname		:= R.cln_mname;
+		self._lname		:= R.cln_lname;
+		self._suffix	  := R.cln_suffix;
+		self._title2		:= R.cln_title2;
+		self._fname2		:= R.cln_fname2;
+		self._mname2		:= R.cln_mname2;
+		self._lname2		:= R.cln_lname2;
+		self._suffix2   := R.cln_suffix2;
+		
+		self._name_ind := R.nameind;
+
+		self := L;
+	END;
+
 	
 	new_layout xform2(new_layout L) := TRANSFORM
 		name := Nid.ReconstructName(L.firstname,L.middlename,L.lastname, L.namesuffix);
@@ -92,20 +114,25 @@ END;
 		self := L;
 	END;	
 
-dsin := DISTRIBUTE(
+	dsin := DISTRIBUTE(
 			PROJECT(inFile(TRIM(firstname + middlename + lastname)<>''), TRANSFORM(r,
 				SELF.__nid := 
 					Nid.Common.fGetNIDParsed(LEFT.firstname,LEFT.middlename,LEFT.lastname,LEFT.namesuffix);
 				SELF := LEFT),LOCAL),
 			__nid);
+
+		matches1 := JOIN(dsin,  Nid.Overrides(false) ,
+						LEFT.__nid = RIGHT.NID,
+						xform1(LEFT, RIGHT),
+						LOOKUP, FEW, LEFT OUTER);
 					
-	matches := JOIN(dsin, SORT(Nid.Overrides(false) + 
+		matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), 
 											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
-											nid, -derivation, LOCAL),
-					LEFT.__nid	= RIGHT.Nid,
+						LEFT.nameid = RIGHT.NID,
 						xform(LEFT, RIGHT),
-						LOCAL, KEEP(1), NOSORT(RIGHT), LEFT OUTER)
-						: INDEPENDENT;
+						LOCAL, KEEP(1), LEFT OUTER);
+						
+		matches := matches1(namType<>'') + matches2 : INDEPENDENT;
 
   ds1 := SORT(matches(nameid=0),firstname,middlename,lastname,namesuffix, LOCAL) : INDEPENDENT;
 	nomatchdedup := DEDUP(ds1,firstname,middlename,lastname,namesuffix, LOCAL);

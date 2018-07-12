@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 EXPORT ConsumerProfile_layouts := MODULE
 	export in_key := RECORD
 		string20 dataset_name;
@@ -32,15 +32,15 @@ EXPORT ConsumerProfile_layouts := MODULE
 		string32 ssnInfo_issuedLocation;
 		string8	ssnInfo_issuedStartDate;
 		string8 ssnInfo_issuedEndDate;
-		string2 hri;
+		string4 hri;
 		string100 hri_desc;
-		string2 hri2;
+		string4 hri2;
 		string100 hri2_desc;
-		string2 hri3;
+		string4 hri3;
 		string100 hri3_desc;
-		string2 hri4;
+		string4 hri4;
 		string100 hri4_desc;
-		string2 hri5;
+		string4 hri5;
 		string100 hri5_desc;
 		string consumerstatement;
 		string alertcode;

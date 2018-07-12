@@ -4,8 +4,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 15;
  
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alnum','invalid_date','invalid_name','invalid_suffix','invalid_zip','invalid_state','invalid_phone','invalid_ip');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alnum' => 2,'invalid_date' => 3,'invalid_name' => 4,'invalid_suffix' => 5,'invalid_zip' => 6,'invalid_state' => 7,'invalid_phone' => 8,'invalid_ip' => 9,0);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alnum','invalid_date','invalid_name','invalid_suffix','invalid_zip5','invalid_zip4','invalid_state','invalid_phone','invalid_ip');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alnum' => 2,'invalid_date' => 3,'invalid_name' => 4,'invalid_suffix' => 5,'invalid_zip5' => 6,'invalid_zip4' => 7,'invalid_state' => 8,'invalid_phone' => 9,'invalid_ip' => 10,0);
  
 EXPORT MakeFT_invalid_alpha(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.,'); // Only allow valid symbols
@@ -47,12 +47,19 @@ END;
 EXPORT InValidFT_invalid_suffix(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.,'))),~(LENGTH(TRIM(s)) >= 0));
 EXPORT InValidMessageFT_invalid_suffix(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.,'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_zip(SALT38.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_zip5(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_zip(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 5));
-EXPORT InValidMessageFT_invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0..5'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_zip5(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5));
+EXPORT InValidMessageFT_invalid_zip5(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0,5'),SALT38.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_zip4(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_invalid_zip4(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 4));
+EXPORT InValidMessageFT_invalid_zip4(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0,4'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -112,13 +119,13 @@ EXPORT Make_state(SALT38.StrType s0) := MakeFT_invalid_state(s0);
 EXPORT InValid_state(SALT38.StrType s) := InValidFT_invalid_state(s);
 EXPORT InValidMessage_state(UNSIGNED1 wh) := InValidMessageFT_invalid_state(wh);
  
-EXPORT Make_zipcode(SALT38.StrType s0) := MakeFT_invalid_zip(s0);
-EXPORT InValid_zipcode(SALT38.StrType s) := InValidFT_invalid_zip(s);
-EXPORT InValidMessage_zipcode(UNSIGNED1 wh) := InValidMessageFT_invalid_zip(wh);
+EXPORT Make_zipcode(SALT38.StrType s0) := MakeFT_invalid_zip5(s0);
+EXPORT InValid_zipcode(SALT38.StrType s) := InValidFT_invalid_zip5(s);
+EXPORT InValidMessage_zipcode(UNSIGNED1 wh) := InValidMessageFT_invalid_zip5(wh);
  
-EXPORT Make_zipplus4(SALT38.StrType s0) := MakeFT_invalid_zip(s0);
-EXPORT InValid_zipplus4(SALT38.StrType s) := InValidFT_invalid_zip(s);
-EXPORT InValidMessage_zipplus4(UNSIGNED1 wh) := InValidMessageFT_invalid_zip(wh);
+EXPORT Make_zipplus4(SALT38.StrType s0) := MakeFT_invalid_zip4(s0);
+EXPORT InValid_zipplus4(SALT38.StrType s) := InValidFT_invalid_zip4(s);
+EXPORT InValidMessage_zipplus4(UNSIGNED1 wh) := InValidMessageFT_invalid_zip4(wh);
  
 EXPORT Make_phone(SALT38.StrType s0) := MakeFT_invalid_phone(s0);
 EXPORT InValid_phone(SALT38.StrType s) := InValidFT_invalid_phone(s);

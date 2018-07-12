@@ -1,42 +1,78 @@
-﻿import DOPSGrowthCheck,STD,ut;
-export CalculateStats(PackageName='', KeyRef, KeyFile='',indexfields, VersionCert='', VersionProd='') := functionmacro 
-STD.FILE.CreateSuperFile('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats',,true);
-STD.FILE.CreateSuperFile('~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats',,true);
-LoadKey:=index(#expand(KeyRef),KeyFile);
+﻿
+export CalculateStats(PackageName='',recref,InputKeyNickName, in_base='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionBase, VersionFather,willPublish=true, iskey=true) := functionmacro 
+import DOPSGrowthCheck,STD,ut;
+#IF(iskey=false)
+	BaseFile:=dataset(in_base,#expand(recref),thor);
+	#ELSE	
+	LoadKeyNew:=index(#expand(recref),in_base);
+	BaseFile:=pull(LoadKeyNew);
+#END;
 
-PullKey:=pull(LoadKey);
+NumRecs:=count(BaseFile);
 
-NumRecs:=count(PullKey);
-
-ut.hasField(PullKey,did,hasDID);
-ut.hasField(PullKey,ProxID,hasProxID);
-ut.hasField(PullKey,SeleID,hasSeleID);
+ut.hasField(BaseFile,did,hasDID);
+ut.hasField(BaseFile,ProxID,hasProxID);
+ut.hasField(BaseFile,SeleID,hasSeleID);
 #DECLARE(CommaString);
 #DECLARE(FieldCount);
 #SET(CommaString,'');
 #SET(FieldCount,0);
-ut.hasField(PullKey,Date_Last_Seen,hasDate_Last_Seen);
-ut.hasField(PullKey,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
-ut.hasField(PullKey,Process_Date,hasProcess_Date);
-ut.hasField(PullKey,Filedate,hasFiledate);
+ut.hasField(BaseFile,Date_Last_Seen,hasDate_Last_Seen);
+ut.hasField(BaseFile,Date_Vendor_Last_Seen,hasDate_Vendor_Last_Seen);
+ut.hasField(BaseFile,Process_Date,hasProcess_Date);
+ut.hasField(BaseFile,Filedate,hasFiledate);
+
+DistFile:=distribute(BaseFile,hash(#expand(PersistentRecIDField)));
 
 #IF(hasDID)
-UniqueDID:=(string)count(dedup(sort(distribute(PullKey,hash(did)),did,local),did,local));
+UniqueDID:=(string)count(table(DistFile,{did},did,merge));
 #ELSE
 UniqueDID:='n/a';
 #END
 #IF(hasProxID)
-UniqueProxID:=(string)count(dedup(sort(distribute(PullKey,hash(ProxID)),ProxID,local),ProxID,local));
+UniqueProxID:=(string)count(table(DistFile,{ProxID},ProxID,merge));
 #ELSE
 UniqueProxID:='n/a';
 #END
 #IF(hasSeleID)
-UniqueSeleID:=(string)count(dedup(sort(distribute(PullKey,hash(SeleID)),SeleID,local),SeleID,local));
+UniqueSeleID:=(string)count(table(DistFile,{SeleID},SeleID,merge));
 #ELSE
 UniqueSeleID:='n/a';
 #END
-UniqueIndex:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),#expand(indexfields),local),#expand(indexfields),local));
+//Calculate Custom Field Stats
+#IF(PersistentRecIDField!='')
+UniquePersistentRecID:=(string)count(table(DistFile,{#expand(PersistentRecIDField)},#expand(PersistentRecIDField),merge));
+#ELSE
+UniquePersistentRecID:='n/a';
+#END
+#IF(EmailField!='')
+UniqueEmail:=(string)count(table(DistFile,{#expand(EmailField)},#expand(EmailField),merge));
+#ELSE
+UniqueEmail:='n/a';
+#END
+#IF(PhoneField!='')
+UniquePhone:=(string)count(table(DistFile,{#expand(PhoneField)},#expand(PhoneField),merge));
+#ELSE
+UniquePhone:='n/a';
+#END
+#IF(SSNField!='')
+UniqueSSN:=(string)count(table(DistFile,{#expand(SSNField)},#expand(SSNField),merge));
+#ELSE
+UniqueSSN:='n/a';
+#END
+#IF(FEINField!='')
+UniqueFein:=(string)count(table(DistFile,{#expand(FEINField)},#expand(FEINField),merge));
+#ELSE
+UniqueFein:='n/a';
+#END
+#IF(indexfields!='')
+//Calculate Index Stats
+UniqueIndex:=(string)count(table(DistFile,{#expand(indexfields)},#expand(indexfields),merge));
+#ELSE
+UniqueIndex:='n/a';
+#END
 
+//Remove Date Fields
 #IF(hasDate_Last_Seen)
     #IF(%FieldCount%>0)
 		#APPEND(CommaString,',');
@@ -64,70 +100,56 @@ UniqueIndex:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfield
     #APPEND(CommaString,'Filedate');
 #END 
 #IF(%FieldCount%>0)
-RemoveDates:=project(PullKey,transform(recordof(PullKey)-[%CommaString%],Self:=Left;));
+RemoveDates:=project(BaseFile,transform(recordof(BaseFile)-[%CommaString%],Self:=Left;));
 #ELSE 
-RemoveDates:=PullKey;
+RemoveDates:=BaseFile;
 #END 
-UniquePayload:=(string)count(dedup(sort(distribute(PullKey,hash(#expand(indexfields))),record,local),record,local));
+UniquePayload:=(string)count(dedup(sort(distribute(RemoveDates,hash(#expand(indexfields))),record,local),record,local));
 
-NewEntry:=dataset([{PackageName,KeyFile,VersionCert,NumRecs,UniqueDID,UniqueProxID,UniqueSeleID,UniqueIndex,UniquePayload}],DOPSGrowthCheck.layouts.Unique_Stats_Layout);
-OldRecords:=dataset('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats',DOPSGrowthCheck.layouts.Unique_Stats_Layout,thor,__compressed__,opt);
+NewEntry:=dataset([
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','NumRecs',NumRecs,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueDID',UniqueDID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueProxID',UniqueProxID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueEmail',UniqueEmail,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePhone',UniquePhone,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSSN',UniqueSSN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueIndex',UniqueIndex,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePayload',UniquePayload,'B','N'}
+],DOPSGrowthCheck.layouts.Stats_Layout);
+OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
-IdentifyProdRecord:=OldRecords(KeyName=KeyFile and Version=VersionProd);
+IdentifyProdRecord:=OldRecords(KeyNickName=InputKeyNickName and CurrVersion=VersionFather and RecType='B');
 
-//#IF(exists(IdentifyProdRecord))
 
-OldDeltaRecords:=dataset('~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats',DOPSGrowthCheck.layouts.Basic_Delta_Stats,thor,__compressed__,opt);
 
-DOPSGrowthCheck.layouts.Basic_Delta_Stats tCalculateDelTaStats(DOPSGrowthCheck.layouts.Unique_Stats_Layout L ,DOPSGrowthCheck.layouts.Unique_Stats_Layout R):= transform
-                    Self.delta_num_recs:=(string)((((real)L.Num_Recs-(real)R.Num_Recs)/(real)R.Num_Recs)*100);
-                    Self.delta_unique_did:=if(L.unique_did='n/a','n/a',(string)((((real)L.unique_did-(real)R.unique_did)/(real)R.unique_did)*100));
-                    Self.delta_unique_proxid:=if(L.unique_proxid='n/a','n/a',(string)((((real)L.unique_proxid-(real)R.unique_proxid)/(real)R.unique_proxid)*100));
-                    Self.delta_unique_seleid:=if(L.unique_seleid='n/a','n/a',(string)((((real)L.unique_seleid-(real)R.unique_seleid)/(real)R.unique_seleid)*100));
-                    Self.delta_unique_index:=if(L.unique_index='n/a','n/a',(string)((((real)L.unique_index-(real)R.unique_index)/(real)R.unique_index)*100));
-                    Self.delta_unique_payload:=if(L.unique_payload='n/a','n/a',(string)((((real)L.unique_payload-(real)R.unique_payload)/(real)R.unique_payload)*100));
-                    Self.CertVersion:=L.Version;
-                    Self.ProdVersion:=R.Version;
+DOPSGrowthCheck.layouts.Stats_Layout tCalculateDelTaStats(DOPSGrowthCheck.layouts.Stats_Layout L ,DOPSGrowthCheck.layouts.Stats_Layout R):= transform
+                    Self.results:=(string)((((real)L.results-(real)R.results)/(real)R.results)*100);
+                    Self.CurrVersion:=L.CurrVersion;
+                    Self.PrevVersion:=R.CurrVersion;
+                    Self.RecType:='D';
+                    Self.Passed:='n/a';
                     Self:=L;
                 end;
-NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyName=Right.KeyName,tCalculateDelTaStats(left,right));
+NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyNickName=Right.KeyNickName and Left.Stat_Name=Right.Stat_Name,tCalculateDelTaStats(left,right));
 //output(NewDeltaStat,named('NewDeltaStat'));
 
-Publish:=sequential(
-            output(NewEntry+OldRecords,,'~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats'+workunit,thor,compressed),
-            output(OldDeltaRecords+NewDeltaStat,,'~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats'+workunit,thor,compressed)
-            );
-ClearFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.ClearSuperFile('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats',true),
-                      STD.FILE.ClearSuperFile('~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats',true),
-                      STD.File.FinishSuperFileTransaction()
-                     );
+NewFile:=if(exists(IdentifyProdRecord),NewDeltaStat+NewEntry,NewEntry);
+
+Publish:=output(NewFile,,'~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+InputKeyNickName,thor,compressed,overwrite);
+
 AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats','~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats'+workunit),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats','~thor_data400::DeltaStats::'+PackageName+'::BasicDeltaStats'+workunit),
+                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::IndividualFileStats::using','~thor_data400::DeltaStats::IndividualFileStats::using::'+workunit+InputKeyNickName),
                       STD.File.FinishSuperFileTransaction()
                      );
 
-Publish2:=output(NewEntry+OldRecords,,'~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats'+workunit,thor,compressed);
-ClearFile2:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.ClearSuperFile('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats',true),
-                      STD.File.FinishSuperFileTransaction()
-                     );
-AddFile2:=sequential(STD.FILE.StartSuperFileTransaction(),
-                      STD.FILE.AddSuperFile('~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats','~thor_data400::DeltaStats::'+PackageName+'::IndividualFileStats'+workunit),
-                      STD.File.FinishSuperFileTransaction()
-                     );
-
-
-return if(exists(IdentifyProdRecord),
-    sequential(
-    Publish,
-    ClearFile,
-    AddFile),
-    sequential(
-    Publish2,
-    ClearFile2,
-    AddFile2)
-);
-
+#IF(willPublish=false)
+return output(NewFile);
+#ELSE
+return sequential(
+		Publish,
+    AddFile);
+#END
 endmacro;

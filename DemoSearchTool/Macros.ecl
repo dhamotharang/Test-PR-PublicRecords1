@@ -1,4 +1,4 @@
-EXPORT Macros := 
+﻿EXPORT Macros := 
   MODULE
     
     EXPORT mac_JoinPersonKeys() :=
@@ -144,6 +144,24 @@ EXPORT Macros :=
         IF( LEFT.Per_SSNsCount  = 0,
             LEFT.Per_SSNsCount  = RIGHT.SSN_Cnt,
             LEFT.Per_SSNsCount <= RIGHT.SSN_Cnt ) 
+        AND
+				//Adding new dataset
+        IF( LEFT.Per_MARILicensesCount  = 0,
+            LEFT.Per_MARILicensesCount  = RIGHT.mari_license_cnt,
+            LEFT.Per_MARILicensesCount <= RIGHT.mari_license_cnt )
+ 						AND
+        IF( LEFT.Per_PublicSanctnsCount  = 0,
+            LEFT.Per_PublicSanctnsCount  = RIGHT.public_sanctn_cnt,
+            LEFT.Per_PublicSanctnsCount <= RIGHT.public_sanctn_cnt )
+						AND
+        IF( LEFT.Per_NonPublicSanctnsCount  = 0,
+            LEFT.Per_NonPublicSanctnsCount  = RIGHT.nonpublic_sanctn_cnt,
+            LEFT.Per_NonPublicSanctnsCount <= RIGHT.nonpublic_sanctn_cnt )
+						AND
+        IF( LEFT.Per_FreddieMacSanctnsCount  = 0,
+            LEFT.Per_FreddieMacSanctnsCount  = RIGHT.freddiemac_sanctn_cnt,
+            LEFT.Per_FreddieMacSanctnsCount <= RIGHT.freddiemac_sanctn_cnt )
+						
       ENDMACRO;
     
     EXPORT mac_JoinBizKeys() :=
@@ -239,6 +257,23 @@ EXPORT Macros :=
         IF( LEFT.Biz_WatercraftsCount = 0,
             LEFT.Biz_WatercraftsCount  = RIGHT.Watercraft_cnt,
             LEFT.Biz_WatercraftsCount <= RIGHT.Watercraft_cnt )
+								AND
+				//Adding new datasets				
+								IF( LEFT.Biz_MARILicensesCount  = 0,
+            LEFT.Biz_MARILicensesCount  = RIGHT.mari_license_cnt,
+            LEFT.Biz_MARILicensesCount <= RIGHT.mari_license_cnt )
+ 						AND
+        IF( LEFT.Biz_PublicSanctnsCount  = 0,
+            LEFT.Biz_PublicSanctnsCount  = RIGHT.public_sanctn_cnt,
+            LEFT.Biz_PublicSanctnsCount <= RIGHT.public_sanctn_cnt )
+						AND
+        IF( LEFT.Biz_NonPublicSanctnsCount  = 0,
+            LEFT.Biz_NonPublicSanctnsCount  = RIGHT.nonpublic_sanctn_cnt,
+            LEFT.Biz_NonPublicSanctnsCount <= RIGHT.nonpublic_sanctn_cnt )
+						AND
+        IF( LEFT.Biz_FreddieMacSanctnsCount  = 0,
+            LEFT.Biz_FreddieMacSanctnsCount  = RIGHT.freddiemac_sanctn_cnt,
+            LEFT.Biz_FreddieMacSanctnsCount <= RIGHT.freddiemac_sanctn_cnt )
       ENDMACRO;
 
     EXPORT mac_xfmCombinedPersonKeyFields (rw_in) := 

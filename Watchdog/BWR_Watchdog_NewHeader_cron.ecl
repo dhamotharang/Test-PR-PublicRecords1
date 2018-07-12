@@ -8,7 +8,7 @@ ECL1(string wtype,string build_type) :=
 +'#workunit(\'protect\', \'true\');\n'
 +'#workunit(\'priority\', \'high\');\n'
 +'#workunit (\'priority\',12);\n'
-+'#workunit(\'name\', \'Watchdog '+wtype+' Base Build '+ut.GetDate+ '\');\n'
++'#workunit(\'name\', \'Yogurt:Watchdog '+wtype+' Base Build '+ut.GetDate+ '\');\n'
 +'Sequential(Watchdog.BWR_Run_Watchdog(\''+build_type+'\'),Watchdog.UpdateWdogHdrFile(\''+wtype+'\',true), notify(\'Watchdog build with New Header can progress\',\'*\'));\n' ;
 
 
@@ -17,14 +17,14 @@ ECL3 :=
 
 '#option(\'multiplePersistInstances\',FALSE);\n'
 +'#workunit(\'protect\', \'true\');\n'
-+'#workunit(\'name\', \'Watchdog key Build '+ut.GetDate+ '\');\n'
++'#workunit(\'name\', \'Yogurt:Watchdog key Build '+ut.GetDate+ '\');\n'
 +'#workunit(\'priority\', \'high\');\n'
 +'Sequential(Watchdog.Proc_build_Keys , Watchdog.Proc_build_FCRA_keys , notify(\'Watchdog Marketing build can progress\',\'*\'));\n' ;
 
 //**Get WU List
 
 
-getwulist := nothor(workunitservices.WorkunitList ( lowwuid := '',jobname := 'Watchdog*' ,username := 'skasavajjala_prod'));
+getwulist := nothor(workunitservices.WorkunitList ( lowwuid := '',jobname := 'Watchdog*' ,username := 'mgould_prod'));
 
 getnew := topn( sort ( getwulist,-wuid),1,-wuid );
 
