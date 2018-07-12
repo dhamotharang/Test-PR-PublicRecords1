@@ -506,20 +506,22 @@ Case Number + City + State + Attorney First Name +Attorney Last Name
 Case Number + Court Location
  */
  
-  EXPORT checkCaseNumMinInput(STRING CaseNumber, STRING fname, 
-                              STRING lname, STRING9 ssn, STRING2 state, UNSIGNED6 did,
-															   STRING city,STRING companyname, STRING courtcode,BOOLEAN isAttorney 
+   EXPORT checkCaseNumMinInput(STRING CaseNumber, STRING fname, 
+                               STRING lname, STRING9 ssn, STRING2 state, UNSIGNED6 did,
+                               STRING city,STRING companyname, STRING courtcode,BOOLEAN isAttorney 
 																 
 															   ) :=
-    IF ((CaseNumber != '') AND 
-        (DID = 0) AND 
-        (fname = '' OR lname = '' OR state = '' OR (isAttorney and City = '')) AND 
-        (LENGTH(TRIM(ssn,LEFT,RIGHT)) != 9) AND
-				 (isAttorney and (city = '' OR state = '' OR CompanyName = '')) AND
-				 (CourtCode = '' )
-				,
-        ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET,
-        0 /* no error code */
+    IF ( (CaseNumber != '') AND 
+         (
+            (DID != 0) OR
+            (LENGTH(TRIM(ssn,LEFT,RIGHT)) = 9) OR
+            (CourtCode != '' ) OR
+            (~isAttorney and fname != '' and lname != '' and state != '') OR
+            (isAttorney and state != '' and city != '' and  ((fname != '' and  lname != '') OR companyname != '') )
+          )   
+				 ,
+        0,/* no error code */
+        ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET
        );
 
 END;
