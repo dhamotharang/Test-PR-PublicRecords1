@@ -114,7 +114,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		SELF.ClusterName := RIGHT.label_,
 																		SELF.NumberOfClusters := COUNT(ds_raw_cluster_recs(	entity_name = LEFT.fragment AND
 																																												entity_value = LEFT.fragment_value)),
-																		SELF.NumberOfIdentities := RIGHT.person_count_,
+																		SELF.NumberOfIdentities := RIGHT.cl_identity_count_,
 																		SELF.NVPs := CHOOSEN( PROJECT(RIGHT.flags, 
 																														TRANSFORM(iesp.share.t_NameValuePair,
 																															SELF.Name := LEFT.indicator,
@@ -136,7 +136,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																							LEFT.entity_value);
 											SELF.score := LEFT.score_,
 											SELF.ClusterName := LEFT.label_,
-											SELF.NoOfIdentities := LEFT.person_count_,
+											SELF.NoOfIdentities := LEFT.cl_identity_count_,
 											SELF.NVPs := CHOOSEN(PROJECT(LEFT.flags, 
 																						TRANSFORM(iesp.share.t_NameValuePair,
 																							SELF.Name := LEFT.indicator,
@@ -182,19 +182,24 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.SSN_FRAGMENT => ds_delta_recentTransactions(SSN = L.fragment_value),
 				 L.fragment = Fragment_Types_const.NAME_FRAGMENT => 
 															ds_delta_recentTransactions(
-																		Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
-																						STD.Str.CleanSpaces(Name.Last),'') = STD.Str.CleanSpaces(L.fragment_value)),
+																		STD.Str.ToUpperCase(
+																						Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
+																						STD.Str.CleanSpaces(Name.Last),'')) = STD.Str.ToUpperCase(STD.Str.CleanSpaces(L.fragment_value))),
 																						
 				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 															ds_delta_recentTransactions(
-					  												(STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
-															  		Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
-																																STD.Str.CleanSPaces(PhysicalAddress.State), 
-																																STD.Str.CleanSPaces(PhysicalAddress.Zip5))
-																		) = STD.Str.CleanSPaces(L.fragment_value)),
+					  													STD.Str.ToUpperCase(
+																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
+															  					Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
+																											STD.Str.CleanSPaces(PhysicalAddress.State), 
+																											STD.Str.CleanSPaces(PhysicalAddress.Zip5))
+																						) = STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),
 																		
 				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value),
 				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_delta_recentTransactions(IpAddress = L.fragment_value),
+				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => ds_delta_recentTransactions(BankInformation1.BankAccountNumber = L.fragment_value OR
+				 																							   BankInformation2.BankAccountNumber = L.fragment_value),
+				 L.fragment = Fragment_Types_const.DEVICE_ID_FRAGMENT => ds_delta_recentTransactions(DeviceId = L.fragment_value),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
