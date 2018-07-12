@@ -35,8 +35,6 @@
 										'IncludeNameVariations',
 										'IncludeParentChild',
 										'IncludePatriotAct',
-                    'OFACversion',
-                    'gateways',
 										'IncludeProfessionalLicenses',
 										'IncludeProperties',
 										'IncludeReversePhone',

@@ -472,4 +472,4 @@ end;
 
 // need a dummy set of allowable sections/sources that can be asked for
 return project(nada, getall(left));
-END; 
+END;
