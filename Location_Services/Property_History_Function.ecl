@@ -148,9 +148,6 @@ FUNCTION
 	// make sure there is no more than one unique address per seq
 	cttab := table(empty_whriAddr, {unsigned seq := reqData.seq, unsigned ct := count(group)}, reqData.seq);
 	nonUniqueAddress := exists(cttab(ct > 1));
-
-	//empty_whriAddr1 := LIMIT(empty_whriAddr,1,fail(310, doxie.ErrorCodes(310)));
-	//empty_whriAddr1 := empty_whriAddr;
 	
 	emptyResults add_mailing_addr(EmptyResults L, sources_whri R) := transform
 		self.mailing_Address := R.address;
