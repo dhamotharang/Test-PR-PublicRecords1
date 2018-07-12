@@ -1,4 +1,4 @@
-﻿import _Control,header,Roxiekeybuild; 
+﻿import _Control,header,Roxiekeybuild,dops; 
 
 elist:=         'gabriel.marcan@lexisnexisrisk.com'
              + ',Debendra.Kumar@lexisnexisrisk.com'
@@ -9,7 +9,7 @@ elist:=         'gabriel.marcan@lexisnexisrisk.com'
 // // // // // // // // // FullHeader DOPS update
 
 // h_version := Header.version_build;
-h_version := '20180320';
+h_version := '20180522';
 
 dops.updateversion('SourceKeys'           ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PersonHeaderKeys'     ,h_version,elist,,'N'); // header // Header
@@ -43,6 +43,7 @@ dops.updateversion('FCRA_RiskTableKeys'  ,rt_version,elist,,'F'); // orbit: FCRA
 // Previous runs:
 // --------------
 
+// 20180522 W20180621-131050
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-141513#/stub/Summary 
 // 20170221 W20180320-130359, http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-083453#/stub/Summary
 // 20170130 

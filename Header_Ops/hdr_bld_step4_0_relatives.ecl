@@ -1,3 +1,4 @@
+﻿import header,ut;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -9,6 +10,7 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
+// #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 Header.proc_postHeaderBuilds.relatives; 
 // XADL2 and re-ADL external sources must have completed successfuly
 // in previous step before relatives build starts.
@@ -16,3 +18,5 @@ Header.proc_postHeaderBuilds.relatives;
 // to free up temporary space during the build or the sorts will fail.
 // Estimated THOR time: 36-48hrs
 // header.version_build
+
+// 20180522 W20180614-144751

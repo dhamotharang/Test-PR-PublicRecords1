@@ -1,6 +1,4 @@
-IMPORT header_avb,header;
-
-
+﻿IMPORT header_avb, header, _control;
 
 EXPORT run_stats(boolean incremental=false, string versionBuild,string operatorEmailList) := FUNCTION
 
@@ -17,6 +15,7 @@ statsEmailRecepients:=
          +',Cody.Fouts@lexisnexisrisk.com'
          +',Gavin.Witz@lexisnexisrisk.com'
          +',Ayeesha.Kayttala@lexisnexisrisk.com'
+         +',Debendra.Kumar@lexisnexisrisk.com'
          +if(~incremental,
                  ',michael.gould@lexisnexis.com'
                 +',manish.shah@lexisnexis.com'
@@ -55,5 +54,6 @@ run_stats(incremental,header.version_build,operatorEmailList);
 // whether a new header_raw needs to be copyed to Alpharetta
 // Estimated THOR time: 20Min
 
+// 20180526 W20180702-091910
 // 20180423 
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-123412#/stub/Summary

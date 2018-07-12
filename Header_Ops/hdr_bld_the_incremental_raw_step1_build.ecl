@@ -1,10 +1,9 @@
 ﻿IMPORT header,std;
-#stored ('versionBuild', '20180501'   ); 
-run_date :=              '20180501'    ;
-operatorEmailList :=  'gabriel.marcan@lexisnexisrisk.com'        
-                    +',Debendra.Kumar@lexisnexisrisk.com';
-
-extraNotifyEmailList := ',jose.bello@lexisnexisrisk.com';
+#stored ('versionBuild', '20180710'   ); 
+run_date :=              '20180710'    ;
+                    
+operatorEmailList    := Header.email_list.BocaDevelopersEx;
+extraNotifyEmailList := '';
 
 // /* STEP1 */ Header.BWR_IngestSetup(operatorEmailList,false /* skip action */); // ** run on hthor ** // RUN FALSE TO DO ACTIONS. DO NOT SKIP! RUN THE SUPERFILE UPDATE
 // /* STEP2 */ Header.Inputs_Set(); // NOT hthor NOT. Must use regular thor!!
@@ -13,6 +12,64 @@ extraNotifyEmailList := ',jose.bello@lexisnexisrisk.com';
 
 // -------------------------------------------------------------------------------
 /*
+20180710
+1 - W20180710-103035
+2 - W20180710-103326
+3 - W20180710-105408
+4 - W20180710-105530
+
+20180703
+1 - W20180619-111119
+2 - W20180703-094250
+3 - W20180703-095859
+4 - W20180703-100237
+
+20180626(Monthly)
+1 - W20180626-122000
+2 - W20180626-122121
+3 - W20180626-124456
+4 - W20180626-124711
+
+20180619
+1 - W20180619-111119
+2 - W20180619-111527
+3 - W20180619-113551
+4 - W20180619-115600
+
+20180612
+1 - W20180605-103200
+2 - W20180605-103526
+3 - W20180605-105359
+4 - W20180607-090747
+
+20180605
+1 - W20180605-103200
+2 - W20180605-103526
+3 - W20180605-105359
+4 - W20180607-090747
+
+20180529
+1 - W20180529-123810
+2 - W20180529-130206
+3 - W20180529-130206
+4 - W20180601-091153
+
+20180522
+1 - W20180522-094848
+2 - W20180522-100154
+3 - W20180522-112236
+4 - W20180522-112506
+
+20180515
+1 - http://prod_esp.br.seisint.com:8010/?Wuid=W20180515-093619&Widget=WUDetailsWidget#/stub/Summary
+2 - W20180515-094104
+3 - http://prod_esp.br.seisint.com:8010/?Wuid=W20180515-104128&Widget=WUDetailsWidget#/stub/Summary
+4 - W20180515-105736
+
+20180508
+W20180509-091235
+W20180508-094842
+W20180508-094536
 
 20180501
 http://prod_esp.br.seisint.com:8010/?Wuid=W20180501-235912&Widget=WUDetailsWidget#/stub/Summary

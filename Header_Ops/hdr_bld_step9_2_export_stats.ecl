@@ -138,16 +138,16 @@ end;
 // ****************************************************************************************** //
 // RUNS: (on p_svc_person_header or gmarcan_prod because header.stats is sandboxed)
 
-hVersion := '20180423' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
+hVersion := '20180626' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
                                     //,fileservices.SuperFileContents('~thor_data400::base::header')[1].name,0);
 
 // output(hVersion,named('hVersion'));
 // CHECK hVersion (above) < -- !!! *** READ THIS BEFORE RUNNING !!!
 // NB: DO NOT UPDATE STATS FILE IF PREVIOUS VERSION NOT FULLY UPDATED (IE ALL 3 RUNS DONE)
 
-generateStats(hVersion).onbm; // NOTHOR (ingest)     // TEST add_ingest_stats
+// generateStats(hVersion).onbm; // NOTHOR (ingest)     // TEST add_ingest_stats
 // generateStats(hVersion).onts; // NOTHOR (synced)     // TEST sync stats
-// generateStats(hVersion).otsg; // YES THOR (syned)    // TEST singeleton
+generateStats(hVersion).otsg; // YES THOR (syned)    // TEST singeleton
 
 // generateStats(hVersion).add_ingest_stats; // (run on hthor / NOTHOR)
 // generateStats(hVersion).add_nothor;      // (run on hthor / NOTHOR)
@@ -165,6 +165,11 @@ Singlerons
 Sync stats
 Ingest
 20180423
+
+20180522
+W20180625-110653
+W20180625-110745
+W20180625-112254
 
 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180426-082232#/stub/Summary
 

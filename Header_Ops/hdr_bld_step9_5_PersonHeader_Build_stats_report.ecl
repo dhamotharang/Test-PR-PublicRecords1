@@ -1,11 +1,11 @@
 ﻿// see bottom for latest runs
 // Run on: hthor p_svc_person_header
 
-import ut;
+import ut, std, dops,zz_gmarcan, _control;
 emailRecipients := 'gabriel.marcan@lexisnexisrisk.com'
                                     +';Debendra.Kumar@lexisnexisrisk.com'
-									+';Jose.Bello@lexisnexisrisk.com'
-                                    +';Joseph.Lezcano@lexisnexisrisk.com'
+									// +';Jose.Bello@lexisnexisrisk.com'
+                                    // +';Joseph.Lezcano@lexisnexisrisk.com'
 									// +';Jennifer.Butts@lexisnexisrisk.com'
 									// s+';Jessica.Mills@lexisnexisrisk.com'
 									 ;
@@ -138,6 +138,8 @@ STD.System.Email.SendEmailAttachText(
 // Previous runs
 // -------------
 
+// 20180522 W20180629-135531
+// 20180423 W20180604-141816 
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180502-131853#/stub/Summary
 // 20180221 W20180418-123548
 // 20180130 W20180316-105226

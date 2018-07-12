@@ -48,7 +48,8 @@ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filed
 ,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::ssn'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::ssn4'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo(  '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::zip_pr'),named('file_copy_log'),extend)
-,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::relative',,'D20170831-220542'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::relative'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::sup::rid'),named('file_copy_log'),extend)
 
 ,output(Get_DFUInfo(   '~thor_data400::key::header::'+filedate+'::relatives_v3'),named('file_copy_log'),extend)
 ,output(Get_DFUInfo( '~thor_data400::base::insurance_header::'+filedate+'::relative',,'D20170901-061429'),named('file_copy_log'),extend)
@@ -60,7 +61,7 @@ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filed
 ,output(Get_DFUInfo('~thor_data400::key::fcra::header::'+filedate+'::addr_unique_expanded'),named('file_copy_log'),extend)
 );
 
-getInfo('20180320'); // run on hthor
+getInfo('20180522'); // run on hthor
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\header_dfu_info_copy_from_alpha.ecl
 // run on hthor (svc_person_header is ok)
@@ -68,7 +69,8 @@ getInfo('20180320'); // run on hthor
 // Previous runs
 // -------------
 /*
-
+0522 W20180620-102701
+0423 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180518-103952#/stub/Summary
 0320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180414-141748#/stub/Summary
 
 // */

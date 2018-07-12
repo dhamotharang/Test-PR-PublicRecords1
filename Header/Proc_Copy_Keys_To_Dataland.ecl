@@ -1,4 +1,4 @@
-IMPORT std,data_services;
+﻿IMPORT std,data_services;
 
 EXPORT Proc_Copy_Keys_To_Dataland := MODULE
 
@@ -7,8 +7,9 @@ SHARED getLogical1f(string sf) := STD.File.SuperFileContents(sf)[1].name;
 SHARED getLogical1 (string sf) := getLogical1f(sf)[STD.Str.find(getLogical1f(sf),'thor',1)..];
 shared getLogical1i(string sf) := getLogical1(STD.Str.FindReplace(sf,'qa','inc'));
 
-SHARED elist :=  'gabriel.marcan@lexisnexisrisk.com;'
-         +'aleida.lima@lexisnexisrisk.com'
+SHARED elist :=  'gabriel.marcan@lexisnexisrisk.com'
+         +',aleida.lima@lexisnexisrisk.com'
+         +',Debendra.Kumar@lexisnexisrisk.com'
          ;
 
 dClstr := '	thor400_dev';//'thor400_sta01_2';

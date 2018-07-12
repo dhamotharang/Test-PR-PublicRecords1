@@ -225,9 +225,8 @@ supression_status_report := sequential(output_as_is_files);
 
 // /* STEP 1 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
 // /* STEP 2 */ add_alpha_suppressions; 
-// /* STEP 3 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
-// /* STEP 4 build key   see W:\Workspaces\BWR_PublicRecordsHdr\hdr_bld_step9_3_update_supression_key.ecl */
-/* STEP 5 */ promote; // thor 
+/* STEP 3 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
+
 /*
 
 version
@@ -237,13 +236,25 @@ version
 (u)pdate file
 (c)heck before
 
+20180522
+
+W20180615-105332
+W20180615-105734
+W20180615-110234
+
+
 201804xx
 
 p
-b
-c
-u
+b http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180521-095347#/stub/Summary
+c http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180513-110707#/stub/Summary
+u http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180513-110527#/stub/Summary
 c 142/4 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-150202#/stub/Summary
+
+20180423
+
+u
+c 283/19 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180513-110338#/stub/Summary
 
 20180320
 

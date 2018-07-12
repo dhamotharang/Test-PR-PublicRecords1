@@ -1,4 +1,4 @@
-﻿import header,ut;
+﻿import ut,header;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -11,12 +11,9 @@
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
-Header.proc_postHeaderBuilds.XADLkeys;
-// builds a) XADL2 keys b)re-ADL external sources c)XADL1 base files.
-// a and b must have completed successfuly before
-// relatives may start.
-// Estimated THOR time: XADL2 keys 24hrs
-// External re-ADL 4-6hrs
-// XADL1 base files 48-72hrs
-
-//20180522 W20180613-150451
+Header.proc_postHeaderBuilds.FCRAheader;
+// re-ADLs FCRA EN, builds FCRA header flavor and keys.
+// While it may be run as soon as a new header base file is ready,
+// be mindfull of queue activity to avoid THOR time competiton.
+// Like Power search boolean, this is one of the last packages to be QA'd.
+// Estimated THOR time: 24hrs

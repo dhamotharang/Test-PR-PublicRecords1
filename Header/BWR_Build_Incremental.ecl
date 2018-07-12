@@ -11,58 +11,29 @@ import header,std,_control;
 #OPTION ('implicitGroupSubSort',FALSE);
 
 EXPORT BWR_Build_Incremental(string operatorEmailList, string extraNotifyEmailList, string filedate) := FUNCTION
-basename:='~thor_data400::base::header_raw_incremental';
 
-the_new_monthly := '~'+fileservices.SuperFileContents('~thor_data400::base::header_raw')[1].name;
+in_raw         := nothor(fileservices.SuperFileContents('~thor_data400::in::hdr_raw',1)[1].name); // ( thor_data400::in::quickhdr_raw )
+monthly_ingest := nothor(fileservices.SuperFileContents('~thor_data400::base::header_raw',1)[1].name);
+today := (STRING8)Std.Date.Today();
 
-// *******************************************************************************************
-
-in_raw:=nothor(fileservices.SuperFileContents('~thor_data400::in::hdr_raw',1)[1].name); // ( thor_data400::in::quickhdr_raw )
-
-file_version(string super) := function
-        
-        sub:=stringlib.stringfind(super,((STRING8)Std.Date.Today())[1..2],1);
-output(dataset([{super,sub,super[sub+4..sub+5]}],{string s1, string s2, string s3}),
-            named('log'),extend);        
-        return super[sub+4..sub+5];
-        
+file_version(string super) := function        
+  sub:=stringlib.stringfind(super,today[1..2],1);
+  return super[sub+4..sub+5];        
 end;
 
-the_eq_file_for_this_month_is_available:=not(((STRING8)Std.Date.Today())[5..6]<>file_version(in_raw));
+the_eq_file_for_this_month_is_available := today[5..6] = file_version(in_raw);
+the_full_ingest_for_this_month_is_completed := today[5..6] = file_version(monthly_ingest);
 
-monthly_ingest :=nothor(fileservices.SuperFileContents('~thor_data400::base::header_raw',1)[1].name);
-the_full_ingest_for_this_month_is_completed := not(((STRING8)Std.Date.Today())[5..6]<>file_version(monthly_ingest));
-
-run_full_monthly_ingest                         :=  STD.System.Email.sendemail(operatorEmailList,'PLEASE RUN FULL MONTHLY HEADER !!','');
-run_the_weekly_header_ingest(string filedate)    :=  Header.proc_Header(operatorEmailList, extraNotifyEmailList).Ingest_Incremental(filedate);
-
-report_conditions:= output(dataset([
-
-                                {'in_raw',in_raw},
-                                {'this_month',((STRING8)Std.Date.Today())[5..6]},
-                                {'the_eq_file_for_this_month_is_available',if(the_eq_file_for_this_month_is_available,'Yes','No')},
-                                {'the_full_ingest_for_this_month_is_completed',if(the_full_ingest_for_this_month_is_completed,'Yes','No')}
-                
-                                    ],{string param, string value}),named('Ingest_Status'));
+run_full_monthly_ingest                       :=  STD.System.Email.sendemail(operatorEmailList,'PLEASE RUN FULL MONTHLY HEADER !!','');
+run_the_weekly_header_ingest(string filedate) :=  Header.proc_Header(operatorEmailList, extraNotifyEmailList).Ingest_Incremental(filedate);
 
 run_build(string filedate) := if(the_eq_file_for_this_month_is_available
-                                AND not(the_full_ingest_for_this_month_is_completed),
-                
-                                run_full_monthly_ingest,
-                                run_the_weekly_header_ingest(filedate)
-                               );
+                                 AND not(the_full_ingest_for_this_month_is_completed),                
+                              run_full_monthly_ingest,
+                              run_the_weekly_header_ingest(filedate)
+                              );
 
-// ************************************************************************************************************************  
-// NB: Update BOTH #stored AND run_date BEFORE kicking off !! No need to update version_build
-
-run_date :=              filedate    ;
-
-versionBuild := header.version_build : stored('versionBuild');  
-check_date(string filedate):= if(filedate<>versionBuild,fail('filedate and versionBuild MUST match'));
-
-go(string filedate)  :=  sequential(check_date(filedate), report_conditions, run_build(filedate));
-
-return go(run_date);
+return run_build(filedate);
 
 end;
 

@@ -1,7 +1,4 @@
-﻿IMPORT header_avb,header;
-
-
-
+﻿IMPORT header_avb,header,_control;
 EXPORT run_stats(string oEList, boolean incremental=false, string versionBuild) := FUNCTION
 
 wuname := 'Create Raw Header Stats: '+ versionBuild;
@@ -10,19 +7,7 @@ wuname := 'Create Raw Header Stats: '+ versionBuild;
 #WORKUNIT('name', wuname);
 #OPTION('AllowedClusters','thor400_66 ,thor400_44');
 
-statsEmailRecepients:=
-
-        'gabriel.marcan@lexisnexisrisk.com'
-         +',jose.bello@lexisnexisrisk.com'
-         +',Cody.Fouts@lexisnexisrisk.com'
-         +',Gavin.Witz@lexisnexisrisk.com'
-         +',Ayeesha.Kayttala@lexisnexisrisk.com'
-         +if(~incremental,
-                 ',michael.gould@lexisnexis.com'
-                +',manish.shah@lexisnexis.com'
-                +',aleida.lima@lexisnexis.com','')
-         +',Manjunath.Venkataswamy@lexisnexisrisk.com'
-        ;
+statsEmailRecepients:= if(incremental, Header.email_list.statsInc, Header.email_list.statsMon);
 
 send_email(string msg):=fileservices.sendemail(
                                                 statsEmailRecepients
@@ -43,9 +28,8 @@ run_rel_avb:= output(_control.fSubmitNewWorkunit('Relative_AVB.BWR_proc_BuildDat
 return sequential(stats, if(~incremental,run_rel_avb));
 END;
 
-oEList:='gabriel.marcan@lexisnexisrisk.com;Debendra.Kumar@lexisnexisrisk.com';
 boolean incremental:=true;
-run_stats(oEList,incremental,'20180501');
+run_stats(Header.email_list.BocaDevelopers,incremental,'20180710');
 
 // run on p_svc_person_header: Header_AVB.Stat is sandboxed
 // run on thor (eg 44) 
@@ -62,6 +46,10 @@ run_stats(oEList,incremental,'20180501');
 
 Previous runs
 -------------
+20180703 W20180705-161249
+20180619 W20180620-185112
+20180612 W20180615-110316
+20180508 W20180510-103137
 20180501 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180503-182425#/stub/Summary
 20180418 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-103607#/stub/Summary
 20180417 

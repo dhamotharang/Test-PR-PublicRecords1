@@ -1,4 +1,4 @@
-﻿IMPORT Orbit3;
+﻿IMPORT Orbit3,_control;
 
 EXPORT orbit_update_entries(string filedate, string createORupdate) := function
 
@@ -60,10 +60,10 @@ EXPORT orbit_update_entries(string filedate, string createORupdate) := function
  
 end;
 
-filedate := '20180423'; // RUN ON HTHOR
+filedate := '20180522'; // RUN ON HTHOR
 // filedate := header.version_build;
-orbit_update_entries(filedate,'create');
-// orbit_update_entries(filedate,'update');
+// orbit_update_entries(filedate,'create');
+orbit_update_entries(filedate,'update');
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\personheader_create_orbit_entries.ecl
 /*
@@ -73,6 +73,7 @@ version
 create entries
 update for QA
 
+20180522 W20180621-161729
 20180423
 
 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180425-095340#/stub/Summary

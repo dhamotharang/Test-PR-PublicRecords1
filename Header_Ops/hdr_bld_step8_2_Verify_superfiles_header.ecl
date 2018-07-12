@@ -18,6 +18,7 @@ output(choosen(header.verify_keys('PersonAncillaryKeys'),1000),	named('PersonAnc
 
 //(run on hthor)
 
+// 0522 W20180620-134609
 // 0320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-140712#/stub/Summary
 // 0221 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-094152#/stub/Summary 
 // 0130 W20180306-122403

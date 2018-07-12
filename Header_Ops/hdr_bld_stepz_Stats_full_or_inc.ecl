@@ -229,7 +229,7 @@ end;
 // ***********************************************************************************************************************
 // RUN ON HTHOR !
 percent_nbm_change_threshold:=100;
-forceNewVersion:='20180501'; // eg 20170430 // instead of manually checking version on line ~48/49
+forceNewVersion:='20180710'; // eg 20170430 // instead of manually checking version on line ~48/49
 HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 
 // RUN THIS BWR BEFORE THE ACTUAL STAT REPORT FOR ALPHARETTA AND CHECK REPORT_FINAL
@@ -239,6 +239,11 @@ HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 // Previous runs
 // ----------------
 /*
+20180703 W20180705-144333
+20180619 W20180620-090230
+20180612 W20180613-111722
+20180515 W20180516-082321
+20180508 W20180510-080110
 20180501 http://prod_esp.br.seisint.com:8010/?Wuid=W20180502-210034&Widget=WUDetailsWidget#/stub/Summary
 20180423 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180426-081933#/stub/Summary
 20180418 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-102626#/stub/Summary

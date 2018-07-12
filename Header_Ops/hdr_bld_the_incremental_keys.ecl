@@ -1,8 +1,8 @@
 ﻿#WORKUNIT('name','Update Incremental linking keys');
 #stored ('buildname', 'header_incremental_keys'   ); 
-#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'/*;Debendra.Kumar@lexisnexisrisk.com'*/);
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com');
 string  emailList  := ''  :stored('emailList');
-import Header,_control;
+import Header,_control,std,InsuranceHeader;
 
 wk:=workunit;
 wServer:= _control.ThisEnvironment.ESP_IPAddress;
@@ -44,7 +44,7 @@ update_all:=    sequential(
                 Header.Proc_Copy_From_Alpha_Incrementals().deploy,
                 output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after')),
                 header.LogBuild.single('COMPLETED:iUpdate')
-                ):failure(std.system.Email.SendEmail(emailList,'FAILED:iDid:'+workunit,''));
+                ):failure(std.system.Email.SendEmail(emailList,'FAILED:iUpdate:'+workunit,''));
 
 
 // /* STEP 1 */ icheck; // HTHOR;
@@ -55,6 +55,43 @@ update_all:=    sequential(
 /* STEP 6 */ Header.Proc_Copy_Keys_To_Dataland.Incrementals; // DATALAND HTHOR
 
 /*
+20180703
+W20180710-093133
+W20180710-093329
+W20180710-102929
+W20180710-103001-5
+W20180710-104658
+W20180710-105346
+
+20180621
+W20180702-113902
+W20180702-113922
+W20180702-130323
+W20180702-130438
+W20180702-134411
+W20180702-134521
+
+20180618
+W20180622-100905
+W20180622-101019
+W20180622-132905
+W20180622-133002
+W20180622-135201
+
+20180605
+W20180613-112029
+W20180613-114141
+W20180613-124529
+W20180613-142132
+W20180613-143925
+
+20180504
+http://dataland_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-135757#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-134822#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-130147#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-124314#/stub/Summary
+http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180515-124230#/stub/Summary
+
 
 20180502
 http://dataland_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180504-090857#/stub/Summary

@@ -1,18 +1,9 @@
 ﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers,InsuranceHeader_xLink;
 
 export proc_postHeaderBuilds := module
-
 		
-		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'
-											    +',jose.bello@lexisnexisrisk.com'
-                                                ;
-
-		shared elist_build_in_qa            :=  elist_owners
-                                                + ',Aleida.Lima@lexisnexisrisk.com'
-                                                + ',manish.shah@lexisnexisrisk.com'
-                                                + ',Cody.Fouts@lexisnexisrisk.com'
-                                                ;
-
+		shared elist_owners 				:=  Header.email_list.BocaDevelopersEx;
+		shared elist_build_in_qa            :=  elist_owners + Header.email_list.AlphaDevelopers + Header.email_list.AlphaDevelopersEx;
         SHARED elist_fcra                   :=  elist_owners
                                                 + ',Sudhir.Kasavajjala@lexisnexisrisk.com'
                                                 + ',Wenhong.Ma@lexisnexisrisk.com'
@@ -55,8 +46,7 @@ export proc_postHeaderBuilds := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 		thor1:='thor400_44';
 		thor2:='thor400_66';
 
@@ -75,8 +65,8 @@ export proc_postHeaderBuilds := module
 		failed:=step+' failed';
 		export XADLkeys := sequential(
                                          header.LogBuild.single('Started :'+step)
-                                        ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
@@ -134,7 +124,6 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    );
 		#stored ('build_operator', _control.MyInfo.EmailAddressNotify );
 
 		step:='Yogurt:'+Header.version_build+' Header, slimsorts, and relative Keys';
@@ -172,8 +161,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 		step:=Header.version_build+' Move header_raw and source keys to prod';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
@@ -202,8 +190,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 		step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
@@ -226,8 +213,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 
 		step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
 		#WORKUNIT('name', step);

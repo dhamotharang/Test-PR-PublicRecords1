@@ -1,3 +1,4 @@
+﻿import ut,header;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -9,7 +10,7 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
-
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 // DO NOT RUN BEFORE A PENDING INCREMENTAL KEY UPDATE (RUN THAT FIRST)
 
 Header.proc_postHeaderBuilds.finalize;
@@ -22,4 +23,5 @@ Header.proc_postHeaderBuilds.finalize;
 // over five years old utility records as per vendor agreement
 // Estimated THOR time: 1hrs
 
+//W20180619-085633
 // 0130 W20180302-134423, W20180302-140235

@@ -86,7 +86,8 @@ r_nbm2 := record
 	count_            := count(group);
 end;
 ta2 := sort(table(oNMNHRM, r_nbm2, src, few), -count_);
-Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
+// Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
+submit_strata:=Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
 output(ta2, all, named('no_basic_match_monthly'));
 
 ut.MAC_Sequence_Records(oNMNHR,uid,outfile1);
@@ -154,6 +155,9 @@ patched3  := patched2( ~(rid>mxr_monthly AND pflag1='A' AND fname='' AND lname='
 
 output(table(newblanks,{src,cnt:=count(group)},src,few),named('BlankedNewRecordsRemoved'),all);
 
-export final := patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+// export final := patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+pre_final:= patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+export final := when(pre_final,submit_strata);
+
 
 end;

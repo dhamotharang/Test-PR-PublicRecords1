@@ -1,3 +1,4 @@
+﻿import std,header;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -10,13 +11,10 @@
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 
-operatorEmailList :=  'gabriel.marcan@lexisnexisrisk.com'        
-                    +',Debendra.Kumar@lexisnexisrisk.com';
+operatorEmailList :=  Header.email_list.BocaDevelopersEx;
+extraNotifyEmailList := '';
 
-extraNotifyEmailList := ',jose.bello@lexisnexisrisk.com';
-
-
-Header.proc_Header(operatorEmailList + extraNotifyEmailList,extraNotifyEmailList).STEP1;
+Header.proc_Header(operatorEmailList,extraNotifyEmailList).STEP1;
 
 // CHECK / UPDATE header.version_build;
 
@@ -25,3 +23,6 @@ Header.proc_Header(operatorEmailList + extraNotifyEmailList,extraNotifyEmailList
 // BasicMatch Stats for unusual source spikes/drops or new sources
 // *** CONTINUE ONLY AFTER STATS HAVE BEEN SATISFACTORILY REVIEWED ****
 // Estimated THOR time: 24-48hrs
+
+//20180626 W20180626-125705
+//20180522 W20180522-115502
