@@ -649,14 +649,12 @@ END;
 	// transactions/sale.buyers/hri_ssn/ssn
 	// transactions/sale.sellers/hri_ssn/ssn
 	
-	output(byAPN1, named('fn_byAPN1'));
-	output(byAPN2, named('fn_byAPN2'));
-	output(sourceaddrs, named('fn_sourceaddrs'));
-	output(sources_whri, named('fn_sources_whri'));
-	output(avm_data, named('avm_data'));
-	output(withPropValue, named('fn_withPropValue'));
-	output(empty_whriAddr, named('fn_empty_whriAddr'));
-	output(cttab, named('fn_cttab'));
+	// output(byAPN1, named('phf_byAPN1'));
+	// output(byAPN2, named('phf_byAPN2'));
+	// output(sourceaddrs, named('phf_sourceaddrs'));
+	// output(sources_whri, named('phf_sources_whri'));
+	// output(empty_whriAddr, named('phf_empty_whriAddr'));
+	// output(cttab, named('phf_cttab'));
 	// output(indata, named('phf_indata') );
 	// output(emptyResults, named('phf_emptyResults'));
 	// output(avm_data, named('phf_avm_data'));

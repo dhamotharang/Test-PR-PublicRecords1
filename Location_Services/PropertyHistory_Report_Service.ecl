@@ -89,8 +89,6 @@ export PropertyHistory_Report_Service := MACRO
 //   wild (postdir), keyed (suffix), keyed (sec_range!=''), keyed (source_code_2 = 'P'));
 						
 	inD := wsec + testsec;
-
-	output(choosen(inD, 100), named('inD'));
 	
 	if (count(inD) = 0, fail(310, doxie.ErrorCodes(310)));
 	
