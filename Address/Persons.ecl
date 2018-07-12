@@ -130,6 +130,8 @@ shared rgxLFMaFML :=
 '^(' + rgxLast + ') +' + '([A-Z]+) +([A-Z]+ )?'+ rgxConnector + ' *([A-Z]+) +([A-Z]+ )?\\1$';
 shared rgxFMLaFML := 
 '^' + rgxBasic + ' +' + '([A-Z]+) +(' + rgxLast + ') *'+ rgxConnector + ' *([A-Z]+) +([A-Z]+) +\\3$';
+shared rgxFMLaFML2 := 
+'^' + rgxBasic + ' +' + '([A-Z]+) +(' + rgxLast + ') *'+ rgxConnector + ' *([A-Z]+) +([A-Z]+) +([A-Z]+)$';
 shared rgxFMLcFML := 
 '^' + rgxBasic + ' +' + '([A-Z]+) +(' + rgxLast + ') *, *([A-Z]+) +([A-Z]+) +([A-Z]+)$';
 shared rgxLFMaLFM := 
@@ -393,7 +395,7 @@ export NameFormat := ENUM(integer2, NoName=0,
 	// dual name formats
 		LFaF, LFaFS, LFiaFi, LFiaFiL, FiMiaFiL, LFiaFiMi, LFiMiaFiMi, LFaFM, FSaFL, FLaFM, FLaFL, LFaFL, FMiaFL, FMaFL, FMLaFM, LFMaFM, FMLaFL, FMiSaFL, LFiSaI, LSFaFM, LSFMaFM, FLSaFM,
 		LFMiaFM, LFMiaF,
-		LcFMaF, LcFMaFMM, LcSFaFMM, LcFMiMiaFMM, LcFMaFMS, LFMaFML, FMLaFML, FMLcFML, LFMaLFM, LFMaLFM2, LFMaLFM2S, LFMaFMS, LFMaFiMiL,
+		LcFMaF, LcFMaFMM, LcSFaFMM, LcFMiMiaFMM, LcFMaFMS, LFMaFML, FMLaFML, FMLaFML2, FMLcFML, LFMaLFM, LFMaLFM2, LFMaLFM2S, LFMaFMS, LFMaFiMiL,
 		LFMaFiMiI, LFMaFMiI, FMLaIFI, FLSaIFI, LFMiaIFI, FMaFML, LFaLFM, LFaLFM2, LFaFMiMi, LFaLF, LFaLF1, LFaLcF, FMSaFML, FMaFLS, LFaFMS, FaFL, FiaFiL,
 		FaFML, FaFMLS, FMaFMLS, FaFLS, LcFaF, LcFaFM, LcFMSaFMM, LFMSaFMM, LcFaLcF, LcFaLcFM, LcFMaLcF, 
 		LcFMaLcFM, LcFMSaLcFM, LcFMaLcFS, LScFMaFML,
@@ -621,14 +623,14 @@ DualNameFormatConnector(string s) := MAP(
 		REGEXFIND(rgxFMaFL, s) => NameFormat.FMaFL,
 		// L F M & L F M	(dual)
 		REGEXFIND(rgxLFMaLFM, s) => NameFormat.LFMaLFM,
+		// F M L & I F I	(dual)
+		REGEXFIND(rgxFMLaIFI, s) => NameFormat.FMLaIFI,
 		// F M L & F M L	(dual)
 		REGEXFIND(rgxFMLaFML, s) => NameFormat.FMLaFML,
-		// F M L S & Fi Mi L	(dual)
+		// F M L & F M L	(dual)
 		REGEXFIND(rgxLFMaFiMiL, s) => NameFormat.LFMaFiMiL,
 		// F L S & I F I	(dual)
 		REGEXFIND(rgxFLSaIFI, s) => NameFormat.FLSaIFI,
-		// F M L & I F I	(dual)
-		REGEXFIND(rgxFMLaIFI, s) => NameFormat.FMLaIFI,
 		// F M L & Fi Mi L	(dual)
 		REGEXFIND(rgxLFMaFMiI, s) => NameFormat.LFMaFMiI,
 		// F M L & Fi Mi L	(dual)
@@ -651,6 +653,8 @@ DualNameFormatConnector(string s) := MAP(
 		REGEXFIND(rgxLSFaFM, s, NOCASE) => NameFormat.LSFaFM,
 		// L S F & F (M)	(dual)
 		REGEXFIND(rgxLSFMaFM, s, NOCASE) => NameFormat.LSFMaFM,
+		// F M L & F M L	(dual)
+		REGEXFIND(rgxFMLaFML2, s) => NameFormat.FMLaFML2,
 		// L F Mi & F	(dual)
 		REGEXFIND(rgxLFMiaF, s) => NameFormat.LFMiaF,
 		// L F Mi & F (M)	(dual)
@@ -1080,6 +1084,7 @@ export string16 WhichFormat(NameFormat n) := CASE(n,
 			NameFormat.LSFaFM =>	'LSFaFM',
 			NameFormat.LSFMaFM =>	'LSFMaFM',
 			NameFormat.FMLaFML =>	'FMLaFML',
+			NameFormat.FMLaFML2 =>	'FMLaFML2',
 			NameFormat.FMLcFML =>	'FMLcFML',
 			NameFormat.LFMSaFML =>	'LFMSaFML',
 			NameFormat.FMLSaFML =>	'FMLSaFML',
@@ -1265,20 +1270,6 @@ shared string1 GetNameOrderFML(string rgx, string s, integer2 posf1, integer2 po
 				segs in ['LLF','XLF','BLF','LLB'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posm1)), 'L', 'U'),
 				segs in ['XFL','XBL'] => IF(nameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posl1)), 'L', 'F'),
 				segs in ['BFB'] => if(clue in ['l','L'], 'L', 'F'),
-				/*IsFirstNameEx(REGEXFIND(rgx, s, posf1)) AND IsLastNameExOrHyphenated(REGEXFIND(rgx, s, posl1))
-						=> 'F',
-				IsLastNameEx(REGEXFIND(rgx, s, posf1)) AND IsFirstNameOrInitial(REGEXFIND(rgx, s, posm1))
-						AND IsFirstNameOrInitial(REGEXFIND(rgx, s, posl1))
-						=> 'L',
-				IsFirstNameEx(REGEXFIND(rgx, s, posf1)) AND IsFirstNameOrInitial(REGEXFIND(rgx, s, posm1))
-						=> 'F',
-				IsLastNameEx(REGEXFIND(rgx, s, posl2)) AND IsFirstNameOrInitial(REGEXFIND(rgx, s, posf2))
-						=> 'L',
-				IsFirstNameEx(REGEXFIND(rgx, s, posf1)) AND IsLastNameExOrHyphenated(REGEXFIND(rgx, s, posm1))
-						=> 'F',
-				IsFirstNameEx(REGEXFIND(rgx, s, posf2)) AND IsFirstNameEx(REGEXFIND(rgx, s, posm2))
-						=> 'L',
-				IsLastNameExOrHyphenated(REGEXFIND(rgx, s, posl1)) => 'F',*/
 				clue in ['l','L'] => 'L',
 				'F'
 				//GetNameOrder(rgx, s, posf1, posf2, posl1, posl2, clue, posm1, posm2)
@@ -1511,6 +1502,14 @@ shared string65 FormatNameFL(string rgx, string name, integer fn, integer lnm) :
 	blank20 +
 	FilterLName(REGEXFIND(rgx, name,lnm)) +
 	blank5;
+	
+shared string65 GetFormatNameFL(string rgx, string name, integer fn, integer lnm, string1 clue='U') := 
+			CASE(GetNameOrderFL(rgx, name, fn, lnm, lnm, fn, clue),
+										'F' => FormatNameFL(rgx, name, fn, lnm),
+										'L' => FormatNameFL(rgx, name, lnm, fn),
+										FormatNameFL(rgx, name, fn, lnm)
+									);		
+	
 shared string65 FormatNameFLS(string rgx, string name, integer fn, integer lnm, integer sn) := 
  (string20)REGEXFIND(rgx, name, fn) +
 	blank20 +
@@ -1522,6 +1521,15 @@ shared string65 FormatNameFML(string rgx, string name, integer fn, integer mn, i
 	(string20)FilterMName(TRIM(REGEXFIND(rgx, name, mn),LEFT,RIGHT)) +
 	FilterLName(REGEXFIND(rgx, name, lnm)) +
 	blank5;
+	
+shared string65 GetFormatNameFML(string rgx, string s, integer fn, integer mn, integer lnm, string1 clue='U') := 
+
+			CASE(GetNameOrderFML(rgx, s, fn, mn, lnm, fn, clue, mn, lnm),
+										'F' => FormatNameFML(rgx, s, fn, mn, lnm),
+										'L' => FormatNameFML(rgx, s, mn, lnm, fn),
+										'U' => FormatNameFML(rgx, s, lnm, fn, mn),
+										FormatNameFML(rgx,s, fn, mn, lnm)
+									);
 	
 shared string65 FormatNameFMLorFLS(string rgx, string name, integer fn, integer mn, integer lnm, integer sfx) := 
 	IF(IsSureSuffix(REGEXFIND(rgx, name, sfx)), FormatNameFLS(rgx, name, fn, lnm, sfx), FormatNameFML(rgx, name, fn, mn, lnm)); 
@@ -1858,6 +1866,11 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 			NameFormat.FLaFM =>		FormatNameFL(rgxFLaFM, s, 1, 2),
 			NameFormat.FSaFL =>		FormatNameFLS(rgxFSaFL, s, 1, 5, 2),
 			NameFormat.FMLaFML  =>	FormatNameFML(rgxFMLaFML, s, 1, 2, 3),
+			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 1, 3, 3, 1, 'U', 2, 3),
+																'F' => FormatNameFML(rgxFMLaFML2, s, 1, 2, 3),
+																'L' => FormatNameFML(rgxFMLaFML2, s, 2, 3, 1),
+																'U' => FormatNameFML(rgxFMLaFML2, s, 3, 1, 2),
+																FormatNameFML(rgxFMLaFML2, s, 1, 2, 3)),
 			NameFormat.FMLcFML  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 1, 2, 3, 1, 'U', 2, 3),
 										'F' => FormatNameFML(rgxFMLcFML, s, 1, 2, 3),
 										'L' => FormatNameFML(rgxFMLcFML, s, 2, 3, 1),
@@ -1866,9 +1879,15 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 									),
 			NameFormat.LFMSaFML  =>	FormatNameFMLS(rgxLFMSaFML, s, 4, 5, 1, 6),
 			NameFormat.FMLSaFML  =>	FormatNameFMLS(rgxFMLSaFML, s, 1, 2, 3, 6),
-			NameFormat.LFMaLFM  =>	IF(IsSureGen(REGEXFIND(rgxLFMaLFM, s, 4)),
-															FormatNameFLS(rgxLFMaLFM, s, 5, 1, 4),
-															FormatNameFML(rgxLFMaLFM, s, 4, 5, 1)),
+			NameFormat.LFMaLFM  =>	MAP(
+																IsSureGen(REGEXFIND(rgxLFMaLFM, s, 4)) => FormatNameFLS(rgxLFMaLFM, s, 5, 1, 4),
+																LENGTH(TRIM(REGEXFIND(rgxLFMaLFM, s, 5))) = 1 => FormatNameFML(rgxLFMaLFM, s, 4, 5, 1),
+																CASE(GetNameOrderFML(rgxLFMaLFM, s, 1, 4, 5, 1, 'L', 5, 4),
+																		'F' => FormatNameFML(rgxLFMaLFM, s, 1, 4, 5),
+																		'L' => FormatNameFML(rgxLFMaLFM, s, 4, 5, 1),
+																		'U' => FormatNameFML(rgxLFMaLFM, s, 4, 5, 1),
+																		FormatNameFML(rgxLFMaLFM, s, 4, 5, 1)
+																)),
 			NameFormat.FLSaIFI =>	FormatNameFLS(rgxFLSaIFI, s, 1, 2, 5),
 			NameFormat.LFMiaIFI =>	FormatNameFML(rgxLFMiaIFI, s, 2, 3, 1),
 			NameFormat.FMLaIFI =>	FormatNameFML(rgxFMLaIFI, s, 1, 2, 3),
@@ -1876,8 +1895,8 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 			NameFormat.LFMaFiMiI =>	FormatNameFML(rgxLFMaFiMiI, s, 4, 5, 1),
 			NameFormat.LFMaFiMiL =>	FormatNameFML(rgxLFMaFiMiL, s, 4, 5, 1),
 			NameFormat.LFMaFMS =>	FormatNameFML(rgxLFMaFMS, s, 4, 5, 1),
-			NameFormat.LFMaLFM2 => 	IF(IsSureGen(REGEXFIND(rgxLFMaLFM2, s, 4)),
-															FormatNameFLS(rgxLFMaLFM2, s, 5, 1, 4),
+			NameFormat.LFMaLFM2 => 	IF(IsSureGen(REGEXFIND(rgxLFMaLFM2, s, 5)),
+															FormatNameFLS(rgxLFMaLFM2, s, 4, 1, 5),
 										CASE(GetNameOrderFML(rgxLFMaLFM2, s, 1, 4, 5, 1, 'U', 4, 5),
 										'F' => FormatNameFML(rgxLFMaLFM2, s, 1, 4, 5),
 										'L' => FormatNameFML(rgxLFMaLFM2, s, 4, 5, 1),
@@ -1936,7 +1955,7 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 			NameFormat.LFaLF	 =>	FormatNameFL(rgxLFaLF, s, 4, 1),
 			NameFormat.LFaLF1	 =>	FormatNameFL(rgxLFaLF1, s, 4, 1),
 			NameFormat.LFaLcF	 =>	FormatNameFL(rgxLFaLcF, s, 4, 1),
-			NameFormat.LFaLFM =>	FormatNameFL(rgxLFaLFM, s, 2, 1),
+			NameFormat.LFaLFM =>	GetFormatNameFL(rgxLFaLFM, s, 2, 1),
 			NameFormat.LFaLFM2 =>	FormatNameFL(rgxLFaLFM2, s, 4, 1),
 			NameFormat.LFaFMiMi =>	FormatNameFL(rgxLFaFMiMi, s, 4, 1),
 			NameFormat.FMaFML =>	CASE(GetNameOrder2Names(ExtractNameTypes2(rgxFMaFML, s, 1, 2)),
@@ -2026,6 +2045,12 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 			NameFormat.FLaFM =>		FormatNameFML(rgxFLaFM, s, 6, 8, 2),
 			NameFormat.FSaFL =>		FormatNameFL(rgxFSaFL, s, 4, 5),
 			NameFormat.FMLaFML  =>	FormatNameFML(rgxFMLaFML, s, 7, 8, 3),
+			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 7, 8, 9, 7, 'U', 8, 9),
+																'F' => FormatNameFML(rgxFMLaFML2, s, 7, 8, 9),
+																'L' => FormatNameFML(rgxFMLaFML2, s, 8, 9, 7),
+																'U' => FormatNameFML(rgxFMLaFML2, s, 9, 7, 8),
+																FormatNameFML(rgxFMLaFML2, s, 7, 8, 9)),
+			//NameFormat.FMLaFML2  =>	FormatNameFML(rgxFMLaFML2, s, 7, 8, 9),
 			NameFormat.FMLcFML  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 6, 7, 8, 6, 'f', 7, 8),
 										'F' => FormatNameFML(rgxFMLcFML, s, 6, 7, 8),
 										'L' => FormatNameFML(rgxFMLcFML, s, 7, 8, 6),
@@ -2034,7 +2059,19 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 									),
 			NameFormat.LFMSaFML  =>	FormatNameFML(rgxLFMSaFML, s, 8, 9, 1),
 			NameFormat.FMLSaFML  =>	FormatNameFML(rgxFMLSaFML, s, 8, 9, 10),
-			NameFormat.LFMaLFM  =>	FormatNameFML(rgxLFMaLFM, s, 7, 9, 1),
+			NameFormat.LFMaLFM  =>		IF(
+																		LENGTH(TRIM(REGEXFIND(rgxLFMaLFM, s, 9))) = 0,
+																			CASE(GetNameOrderFL(rgxLFMaLFM, s, 1, 7, 7, 1, 'L'),
+																			'F' => FormatNameFL(rgxLFMaLFM, s, 1, 7),
+																			'L' => FormatNameFL(rgxLFMaLFM, s, 7, 1),
+																			FormatNameFL(rgxLFMaLFM, s, 7, 1)),
+																		CASE(GetNameOrderFML(rgxLFMaLFM, s, 1, 7, 9, 1, 'L', 7, 9),
+																		'F' => FormatNameFML(rgxLFMaLFM, s, 1, 7, 9),
+																		'L' => FormatNameFML(rgxLFMaLFM, s, 7, 9, 1),
+																		'U' => FormatNameFML(rgxLFMaLFM, s, 7, 9, 1),
+																		FormatNameFML(rgxLFMaLFM, s, 7, 9, 1)
+																)),
+			
 			NameFormat.FLSaIFI =>	FormatNameFML(rgxFLSaIFI, s, 8, 9, 2),
 			NameFormat.LFMiaIFI =>	FormatNameFML(rgxLFMiaIFI, s, 6, 7, 1),
 			NameFormat.FMLaIFI =>	FormatNameFML(rgxFMLaIFI, s, 8, 9, 3), 
@@ -2125,7 +2162,7 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 			NameFormat.LFaLF	 =>	FormatNameFL(rgxLFaLF, s, 6, 1),
 			NameFormat.LFaLF1	 =>	FormatNameFL(rgxLFaLF1, s, 9, 6),
 			NameFormat.LFaLcF	 =>	FormatNameFL(rgxLFaLcF, s, 9, 6),
-			NameFormat.LFaLFM =>	FormatNameFML(rgxLFaLFM, s, 4, 5, 1),
+			NameFormat.LFaLFM =>	GetFormatNameFML(rgxLFaLFM, s, 1, 4, 5),
 			NameFormat.LFaLFM2 =>	FormatNameFML(rgxLFaLFM2, s, 9, 10, 6),
 			NameFormat.LFaFMiMi =>	FormatNameFMML(rgxLFaFMiMi, s, 6, 9, 10, 1),
 			NameFormat.FMaFML =>	CASE(GetNameOrderFML(rgxFMaFML, s, 4, 6, 6, 4, 'F', 5, 5),
@@ -2210,6 +2247,7 @@ shared set of NameFormat ValidatedDualNameFormats := [
 				NameFormat.FMLSaFML,
 				NameFormat.FMLaFL,
 				NameFormat.FMLaFML,
+				NameFormat.FMLaFML2,
 				NameFormat.FMLaIFI,
 				NameFormat.FMLcFML,
 				NameFormat.FMSaFML,
@@ -2901,9 +2939,11 @@ export string GetNameSegments(string s1, integer2 fmtx=0) := FUNCTION
 			NameFormat.FMaFL => ExtractNameTypes2I(rgxFMaFL, s, 1, 3) + '&' + ExtractNameTypes2I(rgxFMaFL, s, 5, 7),
 			NameFormat.FLSaFM => ExtractNameTypes2I(rgxFLSaFM, s, 1, 2) + '&' + ExtractNameTypes2I(rgxFLSaFM, s, 7, 9),
 			NameFormat.LcFMiMiaFMM =>	ExtractNameTypes4(rgxLcFMiMiaFMM, s, 4, 5, 6, 1) +'%'+ExtractNameTypes4(rgxLcFMiMiaFMM, s, 8, 9, 10, 1), 		
+			NameFormat.LFMaLFM => ExtractNameTypes3(rgxLFMaLFM, s, 1, 4, 5) +'&'+ ExtractNameTypes3(rgxLFMaLFM, s, 7, 8, 1),
 			'***'
 		);
 END;
+         
 
 /*	
 export string8 NameOrder(string name, integer2 fmtx=0, string1 hint='U') := FUNCTION
