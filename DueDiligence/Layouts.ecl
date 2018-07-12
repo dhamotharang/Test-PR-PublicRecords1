@@ -458,7 +458,7 @@ EXPORT Layouts := MODULE
   
   EXPORT CriminalOffenses := RECORD
     //fields used for attribute calculation - calc based on roll of sources
-    BOOLEAN atr_currentlyIncarceratedOrParoled;
+    BOOLEAN attr_currentlyIncarceratedOrParoled;
     BOOLEAN attr_felonyPast3Yrs;
     BOOLEAN attr_felonyOver3Yrs;
     BOOLEAN attr_previouslyIncarcerated;

@@ -278,6 +278,7 @@ END;
     InternalSeqAndIdentifiersLayout;
     STRING sort_key;
     STRING sort_eventTypeCodeFull;
+    UNSIGNED1 temp_chargeLevelCalcWeight;
     DueDiligence.Layouts.CriminalOffenses
   END;
   
@@ -293,7 +294,7 @@ END;
     UNSIGNED temp_category;
     UNSIGNED4 temp_calcdFirstSeenDate;
     STRING8 temp_firstReportedActivity; 
-    BOOLEAN temp_everIncarcerated;
+    BOOLEAN temp_previouslyIncarcerated;
     
     //event type category hits
     BOOLEAN attr_legalEventCat9;

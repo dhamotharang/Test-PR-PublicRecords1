@@ -16,8 +16,8 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
     //lets figure out the unique party names - grab all source data along with top level data used to tie back the source data
     formatForAttrCalcs := PROJECT(rawCriminalData, TRANSFORM({DueDiligence.LayoutsInternal.IndCrimLayoutFinal -sources, DueDiligence.Layouts.CriminalSources -partyNames, STRING120 partyName},
                                                           
-                                                              SELF.atr_currentlyIncarceratedOrParoled := TRIM(LEFT.offenseIncarcerationProbationParole) IN [DueDiligence.Constants.INCARCERATION_TEXT, DueDiligence.Constants.PAROLE_TEXT];
-                                                              SELF.attr_previouslyIncarcerated := LEFT.temp_everIncarcerated;
+                                                              SELF.attr_currentlyIncarceratedOrParoled := TRIM(LEFT.offenseIncarcerationProbationParole) IN [DueDiligence.Constants.INCARCERATION_TEXT, DueDiligence.Constants.PAROLE_TEXT];
+                                                              SELF.attr_previouslyIncarcerated := LEFT.temp_previouslyIncarcerated;
                                                               
                                                               
                                                               criminalActivityDate := DueDiligence.Common.DaysApartWithZeroEmptyDate(LEFT.offenseDDFirstReportedActivity, (STRING)LEFT.historyDate);
@@ -56,7 +56,13 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                                                          LEFT.offenseTrafficRelated = DueDiligence.Constants.NO AND
                                                                                                          criminalActivityDate > past3Years;
 
-
+                                                              SELF.temp_chargeLevelCalcWeight := CASE(LEFT.offenseChargeLevelCalculated,
+                                                                                                          DueDiligence.Constants.FELONY => 1,
+                                                                                                          DueDiligence.Constants.MISDEMEANOR => 2,
+                                                                                                          DueDiligence.Constants.TRAFFIC => 3,
+                                                                                                          DueDiligence.Constants.INFRACTION => 4,
+                                                                                                          5);
+                                                                                                      
                                                               SELF := LEFT;                                                            
                                                               SELF := [];));
                                                             
@@ -67,7 +73,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                             SELF := LEFT;));
 
     //sort and roll parties by all sources, to get a list of the party names and to remove duplicate source data
-    sortPartyNames := SORT(transformPartyNames, seq, did, ultID, orgID, seleID, source, sort_key, sort_eventTypeCodeFull, offenseDDChargeLevelCalculated, offenseDDFirstReportedActivity, offenseCharge, 
+    sortPartyNames := SORT(transformPartyNames, seq, did, ultID, orgID, seleID, source, sort_key, sort_eventTypeCodeFull, offenseDDFirstReportedActivity, offenseCharge, 
                             offenseConviction, offenseChargeLevelReported, courtDisposition1, courtDisposition2, offenseReportedDate, offenseArrestDate, offenseCourtDispDate, 
                             offenseAppealDate, offenseSentenceDate, offenseSentenceStartDate, DOCConvictionOverrideDate, DOCScheduledReleaseDate, DOCActualReleaseDate, DOCInmateStatus, 
                             DOCParoleStatus, offenseMaxTerm);
@@ -80,7 +86,6 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                               LEFT.seleID = RIGHT.seleID AND
                               LEFT.sort_key = RIGHT.sort_key AND
                               LEFT.sort_eventTypeCodeFull = RIGHT.sort_eventTypeCodeFull AND
-                              LEFT.offenseDDChargeLevelCalculated = RIGHT.offenseDDChargeLevelCalculated AND
                               LEFT.offenseDDFirstReportedActivity = RIGHT.offenseDDFirstReportedActivity AND
                               LEFT.offenseCharge = RIGHT.offenseCharge AND
                               LEFT.offenseConviction = RIGHT.offenseConviction AND
@@ -111,7 +116,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                           SELF.sources := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalSources, SELF := LEFT;)]);
                                                           SELF := LEFT;));
                                                             
-    sortSources := SORT(transformSources, seq, did, ultID, orgID, seleID, source, sort_key, sort_eventTypeCodeFull, offenseDDChargeLevelCalculated, -offenseDDFirstReportedActivity);
+    sortSources := SORT(transformSources, seq, did, ultID, orgID, seleID, source, sort_key, -offenseDDFirstReportedActivity, temp_chargeLevelCalcWeight, -offenseDDLegalEventTypeCode, -offenseDDLastReportedActivity, offenseCharge);
     
     rollSources := ROLLUP(sortSources,
                               LEFT.seq = RIGHT.seq AND
@@ -121,8 +126,6 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                               LEFT.seleID = RIGHT.seleID AND
                               LEFT.source = RIGHT.source AND
                               LEFT.sort_key = RIGHT.sort_key AND
-                              LEFT.sort_eventTypeCodeFull = RIGHT.sort_eventTypeCodeFull AND
-                              LEFT.offenseDDChargeLevelCalculated = RIGHT.offenseDDChargeLevelCalculated AND
                               LEFT.offenseDDFirstReportedActivity = RIGHT.offenseDDFirstReportedActivity,
                               TRANSFORM(RECORDOF(LEFT),
                                         // grab top level - first populated value or greatest value
@@ -162,7 +165,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                         
                                         
                                         //roll attribute logic per the sources
-                                        SELF.atr_currentlyIncarceratedOrParoled := LEFT.atr_currentlyIncarceratedOrParoled OR RIGHT.atr_currentlyIncarceratedOrParoled;
+                                        SELF.attr_currentlyIncarceratedOrParoled := LEFT.attr_currentlyIncarceratedOrParoled OR RIGHT.attr_currentlyIncarceratedOrParoled;
                                         SELF.attr_previouslyIncarcerated := LEFT.attr_previouslyIncarcerated OR RIGHT.attr_previouslyIncarcerated;
 
                                         SELF.attr_felonyPast3Yrs := LEFT.attr_felonyPast3Yrs OR RIGHT.attr_felonyPast3Yrs;                          
@@ -188,7 +191,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 
 
     //roll up all offenses now by person
-    formatCrimData := PROJECT(rollSources, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout,  BOOLEAN atr_currentlyIncarceratedOrParoled,
+    formatCrimData := PROJECT(rollSources, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout,  BOOLEAN attr_currentlyIncarceratedOrParoled,
                                                                           BOOLEAN attr_felonyPast3Yrs, BOOLEAN attr_felonyOver3Yrs, BOOLEAN attr_previouslyIncarcerated,
                                                                           BOOLEAN attr_uncategorizedConvictionPast3Yrs, BOOLEAN attr_uncategorizedConvictionOver3Yrs,
                                                                           BOOLEAN attr_misdemeanorConvictionPast3Yrs, BOOLEAN attr_misdemeanorConvictionOver3Yrs, 
@@ -211,7 +214,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                             LEFT.orgID = RIGHT.orgID AND
                             LEFT.seleID = RIGHT.seleID,
                             TRANSFORM(RECORDOF(LEFT),
-                                      SELF.atr_currentlyIncarceratedOrParoled := LEFT.atr_currentlyIncarceratedOrParoled OR RIGHT.atr_currentlyIncarceratedOrParoled;
+                                      SELF.attr_currentlyIncarceratedOrParoled := LEFT.attr_currentlyIncarceratedOrParoled OR RIGHT.attr_currentlyIncarceratedOrParoled;
                                       SELF.attr_felonyPast3Yrs := LEFT.attr_felonyPast3Yrs OR RIGHT.attr_felonyPast3Yrs;
                                       SELF.attr_felonyOver3Yrs := LEFT.attr_felonyOver3Yrs OR RIGHT.attr_felonyOver3Yrs;
                                       SELF.attr_previouslyIncarcerated := LEFT.attr_previouslyIncarcerated OR RIGHT.attr_previouslyIncarcerated;
@@ -243,7 +246,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                         SELF.indv.inquiredDID := LEFT.did;
                                                        
                                                         /*PerLegalStateCriminal*/
-                                                        SELF.indv.currentIncarcerationOrParole := LEFT.atr_currentlyIncarceratedOrParoled;
+                                                        SELF.indv.currentIncarcerationOrParole := LEFT.attr_currentlyIncarceratedOrParoled;
                                                         SELF.indv.felonyPast3Yrs := LEFT.attr_felonyPast3Yrs;
                                                         SELF.indv.felonyOver3Yrs := LEFT.attr_felonyOver3Yrs;
                                                         SELF.indv.previousIncarceration := LEFT.attr_previouslyIncarcerated;
@@ -296,6 +299,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
     // OUTPUT(rollPartyNames, NAMED('rollPartyNames'));
     
     // OUTPUT(transformSources, NAMED('transformSources'));
+    // OUTPUT(sortSources, NAMED('sortSources'));
     // OUTPUT(rollSources, NAMED('rollSources'));
     
     // OUTPUT(formatCrimData, NAMED('formatCrimData'));
