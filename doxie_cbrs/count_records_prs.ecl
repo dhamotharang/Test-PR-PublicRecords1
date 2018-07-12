@@ -1,4 +1,4 @@
-﻿import doxie, business_header, doxie_cbrs_raw, Gateway, LN_PropertyV2_Services;
+﻿import doxie, business_header, doxie_cbrs_raw, LN_PropertyV2_Services;
 doxie_cbrs.mac_Selection_Declare()
 
 unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, unsigned3 count_simple) :=
@@ -6,7 +6,7 @@ unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, 
 		 count_simple,
 		 count_shown);
 
-export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, Dataset(Gateway.Layouts.Config) gateway, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.84) := dataset([{
+export count_records_prs(dataset(doxie_cbrs.layout_references) bdids) := dataset([{
 	get_Count(
 		Include_CorporationFilings_val,
 		Max_CorporationFilings_val,
@@ -28,7 +28,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, Dataset(Ga
 	(unsigned3)count(doxie_cbrs.lien_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.judgement_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.bankruptcy_records_prs(bdids)),
-	(unsigned3)count(doxie_cbrs.Patriot_records(gateway, ofac_version, include_ofac, global_watchlist_threshold)),
+	(unsigned3)count(doxie_cbrs.Patriot_records),
 	get_Count(
 		Include_UCCFilings_val,
 		Max_UCCFilings_val,
