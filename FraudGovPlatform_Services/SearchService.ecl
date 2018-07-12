@@ -142,7 +142,7 @@ EXPORT SearchService() := MACRO
 														first_row,
 														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
 
-	IF(~isValidDate, FAIL(301,doxie.ErrorCodes(303)));
+	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
 
 	IF (isMinimumInput, 
 				OUTPUT(results, named('Results')),

@@ -522,4 +522,4 @@ res := project(nada, getall(left));
 
 return res;
 
-END; 
+END;

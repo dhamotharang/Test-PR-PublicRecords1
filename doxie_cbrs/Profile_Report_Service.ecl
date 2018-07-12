@@ -44,8 +44,6 @@
 	<part name="IncludeParentChild" type="xsd:boolean"/>
 	<part name="IncludeHRI" type="xsd:boolean"/>
 	<part name="IncludePatriotAct" type="xsd:boolean"/>
-	<part name="OFACversion" type="xsd:unsignedInt"/>
-  <part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="MaxPatriotAct" type="xsd:unsignedInt"/>
 	<part name="IncludeBBB" type="xsd:boolean"/>
 	<part name="MaxBBB" type="xsd:unsignedInt"/>
@@ -60,7 +58,7 @@
 </message>
 */
 
-IMPORT Royalty, WSInput, Risk_Indicators, Gateway;
+IMPORT Royalty, WSInput;
 
 EXPORT Profile_Report_Service := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
@@ -72,25 +70,9 @@ EXPORT Profile_Report_Service := MACRO
 		#stored('useSupergroupPropertyAddress',false);
 		#constant('AlwaysCompute',true);
 		#constant('useLevels',true);
-    
-    unsigned1 ofac_version      := 1        : stored('OFACVersion');
-    include_ofac := if(ofac_version = 1, false, true);
-    global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
-    
-    gateways_in := Gateway.Configuration.Get();
-
-Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-	self.servicename := if(ofac_version = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
-	self.url := if(ofac_version = 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
-	self := le;
-end;
-gateways := project(gateways_in, gw_switch(left));
-
-if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
-    
 		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
-		all_recs_prs :=doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs, gateways, ofac_version, include_ofac, global_watchlist_threshold);
+		all_recs_prs :=doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_profile_property l):= transform
 		self := l;

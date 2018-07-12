@@ -37,7 +37,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       SELF.orgID := LEFT.orgID;
                                       SELF.seleID := LEFT.seleID;
                                       
-                                      SELF.historyDate := LEFT.historydate;
+                                      SELF.historyDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate);
                                       
                                       SELF.offenderKey := RIGHT.offender_key;
                                       
@@ -149,7 +149,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                         LENGTH(IncarBegin_date) = 6 => incarBegDateYearMonth + '01',
                                                                         DueDiligence.Constants.EMPTY);
                                                                         
-                                        SELF.temp_everIncarcerated  := IncarBegin_date_compare <> DueDiligence.Constants.EMPTY AND IncarBegin_date_compare < (STRING8)LEFT.historydate;
+                                        SELF.temp_previouslyIncarcerated  := IncarBegin_date_compare <> DueDiligence.Constants.EMPTY AND IncarBegin_date_compare < (STRING8)LEFT.historydate;
                                         
                                         //additional data
                                         SELF.city := RIGHT.offensetown;
@@ -175,9 +175,9 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                             SELF.docInmateStatus := RIGHT.cur_stat_inm_desc;
                                             SELF.docParoleStatus := RIGHT.par_cur_stat_desc; 
                                             
-                                            SELF.temp_everIncarcerated := LEFT.temp_everIncarcerated OR 
-                                                                          (RIGHT.latest_adm_dt <> DueDiligence.Constants.EMPTY AND 
-                                                                           RIGHT.latest_adm_dt < (STRING8)LEFT.historydate);
+                                            SELF.temp_previouslyIncarcerated := LEFT.temp_previouslyIncarcerated OR 
+                                                                                (RIGHT.latest_adm_dt <> DueDiligence.Constants.EMPTY AND 
+                                                                                 RIGHT.latest_adm_dt < (STRING8)LEFT.historydate);
                                             
                                             SELF := LEFT;),
                                   LEFT OUTER);                                   
