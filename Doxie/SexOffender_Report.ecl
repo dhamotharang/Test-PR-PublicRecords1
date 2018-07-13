@@ -16,7 +16,7 @@
 import WSInput, doxie;
 
 export sexoffender_report := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #stored('IncludeNonRegisteredAltAddresses',true);
 
 WSInput.MAC_SexOffender_Report()

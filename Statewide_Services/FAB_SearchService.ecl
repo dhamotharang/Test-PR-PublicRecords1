@@ -86,7 +86,7 @@ FAB StateWide Service. If the Jurisdiction is not specified, this service return
 IMPORT doxie, FAB_Statewide, FAP_Statewide;
 
 EXPORT FAB_SearchService() := MACRO
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#OPTION ('optimizeProjects', FALSE);
 	
 	#STORED('PenaltThreshold', 10);
