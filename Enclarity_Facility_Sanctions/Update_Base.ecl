@@ -1,4 +1,4 @@
-IMPORT Address, Ut, lib_STRINGlib, _Control, business_header,_Validate, mdr,
+﻿IMPORT Address, Ut, lib_STRINGlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services, Enclarity_facility_sanctions, Scrubs;
 
@@ -85,17 +85,17 @@ EXPORT Update_Base (STRING pVersion, BOOLEAN pUseProd = FALSE) := MODULE
 		cleanedNames := NORMALIZE(d_rid_seq, 3, tNormCompany(LEFT,counter));
 		
 		cleanedAddr	:= Enclarity_facility_sanctions.Proc_Get_AID.facility_sanctions(cleanedNames);
-		
-		//get BDID, lnfid	
-		withBDID	:= Enclarity_facility_sanctions.Proc_Get_Company_IDs.facility_sanctions(cleanedAddr);		
-	
+			
 		//Add to previous base
 		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity_facility_sanctions.Filenames(pVersion, pUseProd).facility_sanctions_lBaseTemplate_built)) = 0
-												 ,withBDID
-												 ,withBDID + hist_base);	
+												 ,cleanedAddr
+												 ,cleanedAddr + hist_base);	
 												 
+		//get BDID, lnfid	
+		withBDID	:= Enclarity_facility_sanctions.Proc_Get_Company_IDs.facility_sanctions(base_and_update);		
+
 		temp_add_severity	:= RECORD
-			{base_and_update};
+			{withBDID};
 			string1 severity	:= '0';
 		END;
 		
