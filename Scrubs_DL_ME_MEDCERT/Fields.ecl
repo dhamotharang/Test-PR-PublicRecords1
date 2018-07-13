@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 79;
  
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_Past_Date','invalid_General_Date','invalid_process_date','invalid_orig_credential_type','invalid_orig_lname','invalid_orig_fname','invalid_Alpha','invalid_mandatory','invalid_orig_state','invalid_orig_zip','invalid_zip5','invalid_zip4','invalid_boolean','invalid_orig_sex','invalid_Num','invalid_orig_hair','invalid_orig_eyes','invalid_orig_dlstat','invalid_orig_dlclass','invalid_orig_photo','invalid_Alpha_Numeric','invalid_orig_endorsements','invalid_orig_comm_driv_status','invalid_clean_name_first','invalid_clean_name_middle','invalid_clean_name_last','invalid_clean_postdir','invalid_clean_cart','invalid_clean_lot','invalid_clean_lot_order','invalid_clean_dpbc','invalid_clean_chk_digit','invalid_clean_fips_state','invalid_clean_fips_county','invalid_clean_geo','invalid_clean_msa','invalid_clean_geo_match','invalid_clean_err_stat');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_Past_Date' => 1,'invalid_General_Date' => 2,'invalid_process_date' => 3,'invalid_orig_credential_type' => 4,'invalid_orig_lname' => 5,'invalid_orig_fname' => 6,'invalid_Alpha' => 7,'invalid_mandatory' => 8,'invalid_orig_state' => 9,'invalid_orig_zip' => 10,'invalid_zip5' => 11,'invalid_zip4' => 12,'invalid_boolean' => 13,'invalid_orig_sex' => 14,'invalid_Num' => 15,'invalid_orig_hair' => 16,'invalid_orig_eyes' => 17,'invalid_orig_dlstat' => 18,'invalid_orig_dlclass' => 19,'invalid_orig_photo' => 20,'invalid_Alpha_Numeric' => 21,'invalid_orig_endorsements' => 22,'invalid_orig_comm_driv_status' => 23,'invalid_clean_name_first' => 24,'invalid_clean_name_middle' => 25,'invalid_clean_name_last' => 26,'invalid_clean_postdir' => 27,'invalid_clean_cart' => 28,'invalid_clean_lot' => 29,'invalid_clean_lot_order' => 30,'invalid_clean_dpbc' => 31,'invalid_clean_chk_digit' => 32,'invalid_clean_fips_state' => 33,'invalid_clean_fips_county' => 34,'invalid_clean_geo' => 35,'invalid_clean_msa' => 36,'invalid_clean_geo_match' => 37,'invalid_clean_err_stat' => 38,0);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_Past_Date','invalid_General_Date','invalid_process_date','invalid_orig_credential_type','invalid_orig_lname','invalid_orig_fname','invalid_Alpha','invalid_mandatory','invalid_orig_state','invalid_orig_zip','invalid_zip5','invalid_zip4','invalid_boolean','invalid_orig_sex','invalid_Num','invalid_orig_hair','invalid_orig_eyes','invalid_orig_dlstat','invalid_orig_dlclass','invalid_Alpha_Numeric','invalid_orig_endorsements','invalid_orig_comm_driv_status','invalid_clean_name_first','invalid_clean_name_middle','invalid_clean_name_last','invalid_clean_cart','invalid_clean_lot','invalid_clean_lot_order','invalid_clean_dpbc','invalid_clean_chk_digit','invalid_clean_fips_state','invalid_clean_fips_county','invalid_clean_geo','invalid_clean_msa','invalid_clean_geo_match','invalid_clean_err_stat');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_Past_Date' => 1,'invalid_General_Date' => 2,'invalid_process_date' => 3,'invalid_orig_credential_type' => 4,'invalid_orig_lname' => 5,'invalid_orig_fname' => 6,'invalid_Alpha' => 7,'invalid_mandatory' => 8,'invalid_orig_state' => 9,'invalid_orig_zip' => 10,'invalid_zip5' => 11,'invalid_zip4' => 12,'invalid_boolean' => 13,'invalid_orig_sex' => 14,'invalid_Num' => 15,'invalid_orig_hair' => 16,'invalid_orig_eyes' => 17,'invalid_orig_dlstat' => 18,'invalid_orig_dlclass' => 19,'invalid_Alpha_Numeric' => 20,'invalid_orig_endorsements' => 21,'invalid_orig_comm_driv_status' => 22,'invalid_clean_name_first' => 23,'invalid_clean_name_middle' => 24,'invalid_clean_name_last' => 25,'invalid_clean_cart' => 26,'invalid_clean_lot' => 27,'invalid_clean_lot_order' => 28,'invalid_clean_dpbc' => 29,'invalid_clean_chk_digit' => 30,'invalid_clean_fips_state' => 31,'invalid_clean_fips_county' => 32,'invalid_clean_geo' => 33,'invalid_clean_msa' => 34,'invalid_clean_geo_match' => 35,'invalid_clean_err_stat' => 36,0);
  
 EXPORT MakeFT_invalid_Past_Date(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
@@ -130,13 +130,6 @@ END;
 EXPORT InValidFT_invalid_orig_dlclass(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'1|2|3|A|B|C|'))));
 EXPORT InValidMessageFT_invalid_orig_dlclass(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('1|2|3|A|B|C|'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_orig_photo(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'N|Y|Z'); // Only allow valid symbols
-  RETURN  s1;
-END;
-EXPORT InValidFT_invalid_orig_photo(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'N|Y|Z'))));
-EXPORT InValidMessageFT_invalid_orig_photo(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('N|Y|Z'),SALT38.HygieneErrors.Good);
- 
 EXPORT MakeFT_invalid_Alpha_Numeric(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
@@ -174,13 +167,6 @@ EXPORT MakeFT_invalid_clean_name_last(SALT38.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_invalid_clean_name_last(SALT38.StrType s,SALT38.StrType clean_name_first,SALT38.StrType clean_name_middle) := WHICH(~Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names(s,clean_name_first,clean_name_middle)>0);
 EXPORT InValidMessageFT_invalid_clean_name_last(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_clean_postdir(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'E|N|S|W'); // Only allow valid symbols
-  RETURN  s1;
-END;
-EXPORT InValidFT_invalid_clean_postdir(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'E|N|S|W'))));
-EXPORT InValidMessageFT_invalid_clean_postdir(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('E|N|S|W'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_clean_cart(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
