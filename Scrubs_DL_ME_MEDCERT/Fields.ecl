@@ -36,13 +36,13 @@ EXPORT InValidMessageFT_invalid_orig_credential_type(UNSIGNED1 wh) := CHOOSE(wh,
 EXPORT MakeFT_invalid_orig_lname(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_orig_lname(SALT38.StrType s,SALT38.StrType clean_name_first) := WHICH(~Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names(s,clean_name_first)>0);
+EXPORT InValidFT_invalid_orig_lname(SALT38.StrType s,SALT38.StrType orig_fname) := WHICH(~Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names(s,orig_fname)>0);
 EXPORT InValidMessageFT_invalid_orig_lname(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_orig_fname(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_orig_fname(SALT38.StrType s,SALT38.StrType Clean_name_last) := WHICH(~Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names(s,Clean_name_last)>0);
+EXPORT InValidFT_invalid_orig_fname(SALT38.StrType s,SALT38.StrType orig_lname) := WHICH(~Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names(s,orig_lname)>0);
 EXPORT InValidMessageFT_invalid_orig_fname(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_ME_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_Alpha(SALT38.StrType s0) := FUNCTION
@@ -259,11 +259,11 @@ EXPORT InValid_orig_id_terminal_date(SALT38.StrType s) := InValidFT_invalid_Past
 EXPORT InValidMessage_orig_id_terminal_date(UNSIGNED1 wh) := InValidMessageFT_invalid_Past_Date(wh);
  
 EXPORT Make_orig_lname(SALT38.StrType s0) := MakeFT_invalid_orig_lname(s0);
-EXPORT InValid_orig_lname(SALT38.StrType s,SALT38.StrType clean_name_first) := InValidFT_invalid_orig_lname(s,clean_name_first);
+EXPORT InValid_orig_lname(SALT38.StrType s,SALT38.StrType orig_fname) := InValidFT_invalid_orig_lname(s,orig_fname);
 EXPORT InValidMessage_orig_lname(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_lname(wh);
  
 EXPORT Make_orig_fname(SALT38.StrType s0) := MakeFT_invalid_orig_fname(s0);
-EXPORT InValid_orig_fname(SALT38.StrType s,SALT38.StrType Clean_name_last) := InValidFT_invalid_orig_fname(s,Clean_name_last);
+EXPORT InValid_orig_fname(SALT38.StrType s,SALT38.StrType orig_lname) := InValidFT_invalid_orig_fname(s,orig_lname);
 EXPORT InValidMessage_orig_fname(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_fname(wh);
  
 EXPORT Make_orig_mi(SALT38.StrType s0) := MakeFT_invalid_Alpha(s0);
