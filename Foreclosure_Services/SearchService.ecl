@@ -56,7 +56,7 @@
 IMPORT iesp, AutoStandardI, doxie;
 
 EXPORT SearchService := MACRO
-  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   ds_in := DATASET ([], iesp.foreclosure.t_ForeclosureSearchRequest) : STORED ('ForeclosureSearchRequest', FEW);
   first_row := ds_in[1] : independent;
 

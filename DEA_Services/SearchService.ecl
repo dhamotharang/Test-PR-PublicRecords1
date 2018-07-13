@@ -38,7 +38,7 @@
 IMPORT iesp, AutoStandardI, doxie;
 
 EXPORT SearchService := MACRO
-  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #constant('SearchGoodSSNOnly',TRUE);
   #constant('SearchIgnoresAddressOnly',TRUE);
   #constant('getBdidsbyExecutive',FALSE);

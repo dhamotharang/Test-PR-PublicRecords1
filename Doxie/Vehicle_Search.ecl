@@ -50,7 +50,7 @@
 /*--INFO-- This service searches the vehicle file.*/
 
 export Vehicle_Search := MACRO
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #STORED('ScoreThreshold',10);
 
 doxie.MAC_Header_Field_Declare()

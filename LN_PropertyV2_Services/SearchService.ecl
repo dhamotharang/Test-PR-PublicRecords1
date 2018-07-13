@@ -88,7 +88,7 @@
 */
 
 export SearchService() := macro
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
  	INTEGER Max_Results := iesp.constants.MAX_COUNT_SEARCH_RESPONSE_RECORDS;
 	#STORED('ReturnCount',Max_Results); // For iesp.ECL2ESP.Marshall
 
