@@ -1,10 +1,4 @@
-﻿#WORKUNIT('name','Yogurt:Score Attribute and Outcome Daily Build');
-#WORKUNIT('priority','high');  
-#OPTION('allowedClusters', 'thor400_44');
-#OPTION('AllowAutoQueueSwitch', true);
-
-
-IMPORT ut;
+﻿IMPORT ut;
 EXPORT Proc_BuildAll(string version = ut.getdate) := 
 
 SEQUENTIAL(
