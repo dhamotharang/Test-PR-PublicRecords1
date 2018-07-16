@@ -63,7 +63,7 @@
 IMPORT doxie, text_search, WSInput;
 
 EXPORT DLSearchService() := MACRO
-	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_DLSearchService();
 	

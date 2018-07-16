@@ -11,7 +11,7 @@
 import iesp,doxie;
 
 EXPORT ReportService := MACRO
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#onwarning(4207, ignore);
 	
 	rec_in		:= iesp.criminalimagereport.t_CriminalImageReportRequest;

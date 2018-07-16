@@ -48,7 +48,7 @@
 import internetdomain_services, iesp, AutoStandardI;
 
 export SearchService := macro
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     //read ESP input values into ECL "standard" names
 		// iesp.ECL2ESP.MAC_ReadESPInput();
 

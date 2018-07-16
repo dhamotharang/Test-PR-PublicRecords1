@@ -63,7 +63,7 @@
 
 
 export LiensSearchService() := macro
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);

@@ -16,7 +16,7 @@ export BankruptcyReportService(
 	) :=
 		macro
 		
-		  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+		  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		//The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_BankruptcyV2_Services_ReportService();
 	

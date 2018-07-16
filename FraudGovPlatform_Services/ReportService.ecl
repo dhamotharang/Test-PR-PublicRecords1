@@ -7,7 +7,7 @@
 IMPORT BatchShare,FraudShared_Services,iesp,WSInput;
 
 EXPORT ReportService() := MACRO
-  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();

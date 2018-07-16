@@ -34,7 +34,7 @@
 
 EXPORT DEASearchService := MACRO
 
-#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #constant('SearchGoodSSNOnly',true);
 #constant('SearchIgnoresAddressOnly',true);
 #constant('getBdidsbyExecutive',FALSE);
