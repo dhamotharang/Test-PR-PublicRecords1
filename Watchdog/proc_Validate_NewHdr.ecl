@@ -33,10 +33,10 @@ shared ihdrkey := nothor(FileServices.GetSuperfilesubname ('~thor400_66::key::in
 														
 
  
- export  out := map ( curkeydate[1..8] <> wdogdate => true,
-                          curkeydate[1..8] = wdogdate  and curkeydate[1..8] <> hdrprod_version[1..8] => true,
+ export  out := map ( curkeydate[1..8] <> wdogdate[1..8] => true,
+                          curkeydate[1..8] = wdogdate[1..8]  and curkeydate[1..8] <> hdrprod_version[1..8] => true,
                             false ) ;
-	shared cmpinputs := if ( out = true /*and wdogdate = fcrahdrdate*/ and wdogdate = 	ihdrdate, Output('ALL_INPUT_VERSIONS_ARE_IN_SYNC'), fail('INPUT_FILES_OUT_OF_SYNC'));											
+	shared cmpinputs := if ( out = true /*and wdogdate = fcrahdrdate*/ and wdogdate[1..8] = 	ihdrdate, Output('ALL_INPUT_VERSIONS_ARE_IN_SYNC'), fail('INPUT_FILES_OUT_OF_SYNC'));											
 
 	ds := dataset('~thor_data400::watchdog::header_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
