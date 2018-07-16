@@ -20,7 +20,7 @@ SampleRecs := choosen(sort(TransunionCred.Files.Base,record),1000);
 sequential(
 			DoBuild
 			,output(SampleRecs)
-			,Orbit3.Proc_Orbit3_CreateBuild_npf(version,'TransunionCred')
+			,Orbit3.Proc_Orbit3_CreateBuild_npf('TransunionCred',version)
 			,_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Transunion_Monthly\');\r\n'+
 																	'Scrubs_Transunion_Monthly.proc_generate_report();','thor400_66')
 			)
