@@ -1,4 +1,4 @@
-﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,orbit3;
+﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl;
 
 export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
 
@@ -17,11 +17,6 @@ export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lex
 	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'F');
 	dops_QH       := roxiekeybuild.updateversion('QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
 	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
-	
-// Build Orbit Entries
-  oQH_nonfcra := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Quick Header',filedate,'N', ,true,true);	
-	oQH_fcra    := Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA_Quick_Header',filedate,'F', ,true,true);	
-	oQH_qhs     := Orbit3.proc_Orbit3_CreateBuild_AddItem ('QHsourceKeys',filedate,'N', ,true,true);	
 	
 	EQ_records_in0 := header.fn_preprocess(true);
 	
