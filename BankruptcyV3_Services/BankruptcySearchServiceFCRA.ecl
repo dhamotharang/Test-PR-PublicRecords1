@@ -229,7 +229,7 @@ export BankruptcySearchServiceFCRA(
                                              lname_value,ssn_value,state_val,(unsigned6)did_value,
 																						    input_city_value, company_name , court_code, is_Attorney_Search);
                                              
-    if(EnableCaseNumFilter and CaseNumberErrorCode != 0,  
+    if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
 
     if(EnableCaseNumFilter and count(final(matched_party.did != final[1].matched_party.did)) > 0,  
