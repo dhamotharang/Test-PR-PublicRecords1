@@ -13,7 +13,7 @@ accept_sk_to_qa		:= Proc_Accept_SK_to_QA;
 accept_sk_to_qa_LD:= Proc_Accept_SK_to_QA_LinkIDs;
 output_new_recs		:= Query_New_Records;
 send_email 				:= Send_Build_Completion_Email(filedate);
-updatedops    	  := RoxieKeyBuild.updateversion('EBRKeys',filedate,_Control.MyInfo.EmailAddressNotify,,'N|BN');
+updatedops    	  := RoxieKeyBuild.updateversion('EBRKeys',filedate,_Control.MyInfo.EmailAddressNotify,,'N');
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('EBR',(filedate),'N'); 
 
 
