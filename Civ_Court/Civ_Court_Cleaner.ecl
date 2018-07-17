@@ -1,4 +1,4 @@
-import Civ_Court, Address,ut;
+﻿import Civ_Court, Address,ut;
 
 export Civ_Court_Cleaner(infile,outfile) := macro
 
@@ -11,7 +11,7 @@ Civil_Court.Layout_In_Party %tParty%(infile input) := Transform
 
 				
 %preCleanName%		:= StringLib.StringFilter(StringLib.StringToUpperCase(input.entity_1),
-					   ' -\'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); 
+					   ' -&\'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); 
 
 %CleanName%			:= if(civ_court.fIsCompany(%preCleanName%)<>true,
 						map(input.entity_nm_format_1= 'F' => Address.CleanPersonFMl73(%preCleanName%)
