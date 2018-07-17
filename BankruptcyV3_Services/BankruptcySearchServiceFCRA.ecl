@@ -24,8 +24,6 @@
   <!-- CaseNumber -->
   <part name="EnableCaseNumberFilterSearch" type="xsd:boolean"/>
   <part name="CaseNumber"         type="xsd:string"/>
-  <part name="isAttorneySearch"     type="xsd:boolean"/>
-  <part name="CourtCode"    type="xsd:string"/>
   
   <part name="FilingJurisdiction"  type='xsd:string'/>  
   
@@ -56,8 +54,7 @@
   <part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
   <part name="NonSubjectSuppression" type="xsd:unsignedInt" default="2"/> <!-- [1,2,3] -->
   <part name="ApplyNonsubjectRestrictions" type="xsd:boolean"/> 
-  <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
- 
+  <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/> 
 </message>
 */
 /*--INFO-- This service searches the Bankruptcyv3 files.*/
@@ -86,8 +83,6 @@ export BankruptcySearchServiceFCRA(
     integer1 cname_sort    := 0 : stored('CompanyNameSort');
     boolean suppress_withdrawn_bankruptcy  := false   : stored('SuppressWithdrawnBankruptcy');
     boolean Enable_CaseNumFilterSrch  := false   : stored('EnableCaseNumberFilterSearch');
-		string court_code := '' : stored('CourtCode');
-		boolean is_Attorney_Search := false : stored('isAttorneySearch');
     
     //Check if the customer is a Collections customer
     fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
@@ -125,11 +120,7 @@ export BankruptcySearchServiceFCRA(
                                                                      in_lname := lname_value,
                                                                      in_fname := fname_value,
                                                                      in_case_number := CaseNumber_value,
-                                                                     in_did := input_did,
-																																		         in_city := input_city_value,
-																																						  isAttorneySearch := is_Attorney_Search,
-																																							in_court_code := court_code,
-																																							in_cname := company_name);
+                                                                     in_did := input_did);
     rec_out := record
       bankruptcyv3_services.layouts.layout_rollup, 
       Text_Search.Layout_ExternalKey,
@@ -223,11 +214,10 @@ export BankruptcySearchServiceFCRA(
                     self:= left));
                     
     final := if(suppress_results_due_alerts, dataset([], rec_out), all_results);          
-     
+        
     CaseNumberErrorCode := 
       FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value, fname_value,
-                                             lname_value,ssn_value,state_val,(unsigned6)did_value,
-																						    input_city_value, company_name , court_code, is_Attorney_Search);
+                                             lname_value,ssn_value,state_val,(unsigned6)did_value);
                                              
     if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
