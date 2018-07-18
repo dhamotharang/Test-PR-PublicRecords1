@@ -2,8 +2,11 @@
 
   #workunit('protect',true);
   #workunit('name','Yogurt:AddressCleaner Build Data '+ addresscleaner_monthly_testing.version);
+	  //#option('AllowedClusters','thor400_30,thor400_20,thor400_60');
+	//#option('AllowedClusters','thor400_20,thor400_30,thor400_60');
   #OPTION('multiplePersistInstances',FALSE);
-////# Jul7 USDir 20180710, Canada 20180710, Navteq 201805
+//  #option('AllowAutoQueueSwitch',TRUE);
+////# March USDir 20180613, Canada 20180613, Navteq 201305
 	
 fileservices.RemoveOwnedSubFiles('~thor400_data::addresscleaner::monthly::processed');	
 fileservices.clearsuperfile('~thor400_data::addresscleaner::monthly::processed');

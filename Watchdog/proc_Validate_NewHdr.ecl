@@ -40,7 +40,7 @@ shared ihdrkey := nothor(FileServices.GetSuperfilesubname ('~thor400_66::key::in
 
 	ds := dataset('~thor_data400::watchdog::header_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
-shared check_submitted := if ( out = true , count( ds( hdr_version = wdogdate[1..8] and issubmitted = 'Y' and ishdrnew = true)),
+shared check_submitted := if ( out = true , count( ds( hdr_version = wdogdate and issubmitted = 'Y' and ishdrnew = true)),
                                     count( ds( hdr_version = ut.GetDate and issubmitted = 'Y' and ishdrnew = false))
 											 );
 											 
