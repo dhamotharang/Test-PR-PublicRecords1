@@ -100,7 +100,7 @@ MODULE
 	EXPORT ZumigoIdentity := MODULE
 		EXPORT subjectName := RECORD
 			UNSIGNED6 lexid;
-			STRING20 	nameType;
+			STRING40 	nameType;
 			STRING20 	first_name;
 			STRING20 	middle_name;
 			STRING20 	last_name;		
@@ -116,9 +116,14 @@ MODULE
 			UNSIGNED6 busdot_id;
 			STRING120 business_name;
 		END;
+
+		SHARED email := RECORD
+			STRING40  emailType;
+			STRING50 email_address;
+		END;		
 		
 		EXPORT address := RECORD
-			STRING20 	addressType;
+			STRING40 	addressType;
 			BatchServices.Layouts.layout_batch_common_address;
 		END;
 		EXPORT subjectVerificationRequest := RECORD
@@ -128,6 +133,7 @@ MODULE
 			subjectName;
 			business;
 			address;
+			email;
 		END;
 
 		EXPORT zIn := RECORD
@@ -136,6 +142,7 @@ MODULE
 			STRING MobileDeviceNumber;
 			iesp.zumigo_identity.t_ZIdNameToVerify Name;
 			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
+			iesp.zumigo_identity.t_ZIdEmailToVerify Email;
 		END;
 		
 		EXPORT zOutEmail := RECORD

@@ -7,17 +7,18 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 
 	Constants := PhoneOwnership.Constants;
 	Functions := PhoneOwnership.Functions;	
-	today := STD.Date.Today();
+
 	dsSubmittedAccts := DEDUP(SORT(batch_in_wREAB,acctno),acctno);
 	PhoneOwnership.Layouts.BatchOut formatCNAM(Phones.Layouts.AccuDataCNAM l, PhoneOwnership.Layouts.BatchOut r):= TRANSFORM
 		validCNAMResponse := l.listingname<>'' AND l.listingname<>'ERROR';
 		SELF.acctno := r.acctno;
 		SELF.AppendedListingName := IF(validCNAMResponse,l.listingname,'');
-		SELF.AppendedLastDate := IF(validCNAMResponse,today,0);			
+		SELF.AppendedLastDate := IF(validCNAMResponse,Functions.TODAY,0);			
 		SELF.AppendedDID := (STRING)l.did;
 		SELF.AppendedFirstName := l.fname;
 		SELF.AppendedMiddleName := '';
 		SELF.AppendedSurname := l.lname;
+		// cleaning listing name to perform a partial business name match below.
 		SELF.AppendedCompanyName := IF(l.fname<>'' AND l.lname<>'',Phones.Functions.GetCleanCompanyName(l.listingname),'');
 		SELF.validatedRecord := l.availabilityindicator = 0 AND validCNAMResponse AND l.privateflag = 0;
 		SELF.source_category := IF(validCNAMResponse, r.source_category+Constants.CNAM, r.source_category);
@@ -26,7 +27,7 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		badNumber := STD.Str.ToLowerCase(l.error_desc) = 'missingorinvalidbtn';
 		SELF.subj2own_relationship := IF(badNumber,Constants.Relationship.INVALID,'');
 		SELF.LexisNexisMatchCode := IF(badNumber,Constants.LNMatch.INVALID,'');	
-		SELF.reason_codes := IF(badNumber,Constants.Reason_Codes.INVALID_NUMBER,'');
+		SELF.reason_codes := IF(badNumber,Constants.Reason_Codes.INVALID_NUMBER,r.reason_codes); //this is to account for phone status from Zumigo
 		SELF.ownership_index := IF(badNumber,Constants.Ownership.enumIndex.INVALID,Constants.Ownership.enumIndex.UNDETERMINED); //marked undetermined until connected with a known identity
 		SELF.DotID := 0;
 		SELF.EmpID := 0;
@@ -45,7 +46,10 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.AppendedCity := '';
 		SELF.AppendedStateCode := '';
 		SELF.AppendedZipCode := '';	
-		SELF.AppendedZipCodeExtension := '';	
+		SELF.AppendedZipCodeExtension := '';
+		SELF.AppendedEmailAddress:='';	
+		//If we have disconnect info but Accudata returns a valid name then we update disconnect_status to indicate that disconnect info is POSSIBLY old.
+		SELF.disconnect_status := IF(r.disconnect_status<>'' AND (l.fname<>'' OR l.lname<>''),Constants.DisconnectStatus.HISTORIC_DISCONNECT,r.disconnect_status);
 		SELF := l;
 		SELF := r;	
 	END;
@@ -81,7 +85,7 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 											l.subj2own_relationship='' => r.subj2own_relationship,
 											l.subj2own_relationship);										
 		lastnameMatch := l.name_last = l.AppendedSurname;
-		relationalMatch := MAP(STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR lastnameMatch => Constants.LNMatch.RELATIVE,
+		relationalMatch := MAP(STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR (lastnameMatch AND l.name_first <> l.AppendedFirstName) => Constants.LNMatch.RELATIVE,
 								businessMatch OR r.subj2own_relationship IN Constants.BUSINESS_RELATIONS => Constants.LNMatch.EMPLOYER,
 								'');
 		addressMatch := IF(Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(
@@ -104,9 +108,9 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 						l.ownership_index);
 		SELF.ownership_index := ownership;
 		SELF.ownership_likelihood := Functions.getOwnershipValue(ownership);
-		SELF.reason_codes := MAP(fullNameMatch OR relationalMatch<>'' => Constants.Reason_Codes.MATCH,
-								r.LexisNexisMatchCode<>'' => r.reason_codes,
-								l.reason_codes);
+		SELF.reason_codes := MAP(fullNameMatch OR relationalMatch<>''=>Constants.Reason_Codes.MATCH,
+								l.AppendedFirstName<>'' OR l.AppendedSurname<>'' => Constants.Reason_Codes.NO_MATCH,
+								'')+ l.reason_codes;
 		SELF.DotID := IF(businessMatch,r.DotID,0);
 		SELF.EmpID := IF(businessMatch,r.EmpID,0);
 		SELF.POWID := IF(businessMatch,r.POWID,0);

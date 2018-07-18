@@ -46,12 +46,20 @@ EXPORT Layouts := MODULE
 		UNSIGNED rid;
 		STRING company_name;
 	END;
+
+	EXPORT Emails := RECORD
+		UNSIGNED6 did;
+		STRING50 clean_email;
+		STRING8 date_first_seen;
+		STRING8 date_last_seen;
+	END;
 	
 	EXPORT Phone_Relationship := RECORD
 		PhonesCommon;
 		UNSIGNED titleno;
 		BOOLEAN isDeceased;
 		BOOLEAN isFirstDegree;
+		STRING50 emailAddress;
 	END;	
 
 	EXPORT BatchOut := RECORD
@@ -61,6 +69,7 @@ EXPORT Layouts := MODULE
 		STRING20 	AppendedFirstName;
 		STRING20 	AppendedMiddleName;
 		STRING20 	AppendedSurname;
+		STRING50 	AppendedEmailAddress;
 		BOOLEAN	 	validatedRecord;	//internal - to identify gateway confirmation.	
 		STRING10 	phone;
 		STRING120 	AppendedCompanyName;
@@ -105,6 +114,7 @@ EXPORT Layouts := MODULE
 		STRING		source; // used to preserve data source references
 		STRING		source_category; 
 		STRING		error_desc;
+		INTEGER 	TotalZumigoScore;
 		Batchshare.Layouts.ShareErrors;		
 		BatchIn - acctno;
 	END;
