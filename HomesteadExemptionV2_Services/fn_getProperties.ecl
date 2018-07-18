@@ -309,10 +309,12 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 			SELF.Ownership_Record.did           :=RIGHT.did,
 			SELF.Ownership_Record.ln_fares_id   :=RIGHT.ln_fares_id,
 			SELF.Ownership_Record.owner_did     :=RIGHT.owner_did,
+			SELF.Ownership_Record.owner_bdid    :=RIGHT.owner_bdid,
 			SELF.Ownership_Record.name_first    :=RIGHT.name_first,
 			SELF.Ownership_Record.name_middle   :=RIGHT.name_middle,
 			SELF.Ownership_Record.name_last     :=RIGHT.name_last,
 			SELF.Ownership_Record.name_suffix   :=RIGHT.name_suffix,
+			SELF.Ownership_Record.company_name  :=RIGHT.company_name,
 			SELF.Ownership_Record.sale_date     :=RIGHT.sale_date,
 			SELF.Ownership_Record.contract_date :=RIGHT.contract_date,
 			SELF.Ownership_Record.isCurrentOwner:=RIGHT.isCurrentOwner,
@@ -324,7 +326,18 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 	// APPEND PROPERTIES TO WORK RECORD
 
 	HomesteadExemptionV2_Services.Layouts.workRec denormPropRecs(ds_work_in L,DATASET(HomesteadExemptionV2_Services.Layouts.propertyRec) R) := TRANSFORM
-		SELF.property_records:=PROJECT(R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.propertyRec,SELF:=LEFT));
+		// RESERVE _1 BATCH OUTPUT FIELDS FOR INPUT ADDRESS ONLY
+		HomesteadExemptionV2_Services.Layouts.propertyRec inputAddrProp() := TRANSFORM
+			SELF.acctno:=L.acctno;
+			SELF.did:=L.did;
+			SELF.property_id:='INPUT ADDR PLACE HOLDER RECORD';
+			SELF.property_rank:=HomesteadExemptionV2_Services.Constants.INPUT_ADDR;
+			SELF.sortby_date:=L.tax_year+'0000';
+			SELF:=[];
+		END;
+		hasInputAddrProp:=EXISTS(R(property_rank=HomesteadExemptionV2_Services.Constants.INPUT_ADDR));
+		InputPropertyIfExists:=IF(hasInputAddrProp,DATASET([],HomesteadExemptionV2_Services.Layouts.propertyRec),DATASET([inputAddrProp()]));
+		SELF.property_records:=PROJECT(InputPropertyIfExists+R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.propertyRec,SELF:=LEFT));
 		SELF:=L;
 	END;
 
