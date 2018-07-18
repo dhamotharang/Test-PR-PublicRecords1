@@ -1,4 +1,4 @@
-import address, CrimSrch, ut, lib_stringlib, doxie_build, hygenics_search;
+﻿import address, CrimSrch, ut, lib_stringlib, doxie_build, hygenics_search;
 
 //offender := doxie_files.File_Offenders;
 
@@ -96,11 +96,16 @@ offender := project(offder, reformatOld(left));
 
 //offense := doxie_files.file_offenses;
 //offense := doxie_build.file_offenses_keybuilding;
-offense 	:= dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat);
+offense_ds 	:= dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat);
+Offense := Prep_Build.PB_File_Offenses(offense_ds);
 
 //court_offense := doxie_files.file_court_offenses;
 //court_offense := doxie_build.file_courtoffenses_keybuilding;
-court_offense := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate, hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat);
+court_offense_ds := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate, hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat);
+court_offense := Prep_Build.PB_File_CourtOffenses(court_offense_ds);
+
+
+
 
 offense_fields := record
 	court_offense.process_date;

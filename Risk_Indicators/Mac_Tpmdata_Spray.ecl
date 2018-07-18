@@ -1,6 +1,6 @@
-﻿import roxiekeybuild,ut,strata,Risk_Indicators,_Control,Scrubs_TelcordiaTPM, dops;
+﻿import roxiekeybuild,strata,Risk_Indicators,_Control,Scrubs_TelcordiaTPM, dops;
 
-export Mac_Tpmdata_Spray(sourceIP,filedate,group_name) := 
+export Mac_Tpmdata_Spray(filedate) := 
 macro
 #uniquename(spray_tpmdata)
 #uniquename(preprocess_tpmdata)
