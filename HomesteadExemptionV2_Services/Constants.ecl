@@ -34,4 +34,6 @@ EXPORT Constants := MODULE
 	EXPORT TOO_MANY_SUBJECTS  := 'ID'; // = Multiple identities (subjects) associated to a LexID';
 	EXPORT INSUFFICIENT_INPUT := 'MI'; // = Lacking minimum input';
 
+	EXPORT NO_INFO := 'NO INFO';
+
 END;
