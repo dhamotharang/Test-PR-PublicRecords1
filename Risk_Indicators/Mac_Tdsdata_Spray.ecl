@@ -21,11 +21,11 @@ macro
 string sourceIP := if ( _Control.ThisEnvironment.Name = 'Dataland', _Control.IPAddress.bctlpedata12,_Control.IPAddress.bctlpedata11 );
 string group_name := thorlib.group();
 string filename := filedate[1..6];
-string sourcefile := '/data/thor_back5/local_data/telcordia_tds/sources/'+filedate+'/' + filename ;
+string sourcefile := '/data/thor_back5/local_data/telcordia_tds/sources/'+filedate+'/' + filename + '.txt' ;
 
-%spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'',group_name,'~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);%TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
+%spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'',group_name,'~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);/*transforms the raw file into the input file*/
 %TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
-%updatedops% 				:= dops.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|BN');
+%updatedops% 				:= dops.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|B');
 
 
 %super_tdsdata% := sequential(FileServices.StartSuperFileTransaction(),
