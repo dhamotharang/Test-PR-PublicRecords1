@@ -92,10 +92,15 @@ MACRO
 		EXPORT STRING20  Usecase                        := '': STORED('LineIdentityUseCase');
 		EXPORT STRING3 	 ProductCode                    := '': STORED('ProductCode');
 		EXPORT STRING8	 BillingId                      := '': STORED('BillingId');
+
+        BOOLEAN   ActiveDeviceRules     := EXISTS(RiskIndicators(RiskId IN [PhoneFinder_Services.Constants.RiskRules.SimCardInfo, PhoneFinder_Services.Constants.RiskRules.DeviceInfo] and active));
+		      BOOLEAN   ValidConsentInquiry   := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or (LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer  
+					                                                                                                                     and ActiveDeviceRules);		
+		
 		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-																												                                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] and
-                                                                                                         BillingId <>'' and LineIdentityConsentLevel <> 0;
-				
+		                                                                                                       PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] 
+														                                                       and BillingId <>'' and ValidConsentInquiry;
+
 				     BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly := DirectMarketing AND TransactionType = PhoneFinder_Services.Constants.TransType.BASIC;
 		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES

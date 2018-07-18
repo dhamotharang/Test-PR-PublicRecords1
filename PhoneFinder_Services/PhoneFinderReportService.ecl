@@ -214,11 +214,14 @@ MACRO
 		EXPORT STRING60 _LoginId   := '': STORED('_LoginId');
 		EXPORT STRING60 BillingCode   := pfUser.BillingCode;
 		EXPORT STRING   TransactionId := '': STORED('_TransactionId');
-		 		
+			   BOOLEAN   ActiveDeviceRules     := EXISTS(RiskIndicators(RiskId IN [PhoneFinder_Services.Constants.RiskRules.SimCardInfo, PhoneFinder_Services.Constants.RiskRules.DeviceInfo] and active));
+		
+		       BOOLEAN   ValidConsentInquiry   := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer or (LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer  
+					                                                                                                                       and ActiveDeviceRules);		
 		
 		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
 		                                                                                                       PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] 
-														                                                                                           and BillingId <>'' and LineIdentityConsentLevel <> 0;
+														                                                                                           and BillingId <>'' and ValidConsentInquiry;
 		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
 		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
 		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
