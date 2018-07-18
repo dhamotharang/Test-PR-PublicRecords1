@@ -2,7 +2,7 @@
 This function gets Relatives, Employers, Associates, and Businesses (REAB) for accounts with input for 
 firstname, lastname, and (DID or SSN or full address or DOB).
 */
-IMPORT BIPV2,BIPV2_Build,DeathV2_Services,Doxie,Doxie_Raw,Header,MDR,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,MDR,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 	Constants := PhoneOwnership.Constants;
 	//REA Utilities
@@ -79,6 +79,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF.subj2own_relationship := Constants.Relationship.EMPLOYER,
 										SELF.dt_first_seen:=(STRING)RIGHT.dt_first_seen,
 										SELF.dt_last_seen:=(STRING)RIGHT.dt_last_seen,
+										SELF.src:=RIGHT.source,
 										SELF:=RIGHT,
 										SELF:=LEFT,
 										SELF:=[]),
@@ -101,6 +102,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF.suffix:=RIGHT.addr_suffix,
 										SELF.dt_first_seen:=(STRING)RIGHT.dt_first_seen,
 										SELF.dt_last_seen:=(STRING)RIGHT.dt_last_seen,
+										SELF.src:=RIGHT.source,
 										SELF:=RIGHT,
 										SELF:=LEFT,
 										SELF:=[]),										 
@@ -113,17 +115,19 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 		SELF := r;
 		SELF := [];
 	END;										 							 
-	dsEmployer := ROLLUP(SORT(dsPOE + dsPAW,acctno,did,bdid,-dt_last_seen,dt_first_seen),
+	dsEmployerUnfiltered := ROLLUP(SORT(dsPOE + dsPAW,acctno,did,bdid,-dt_last_seen,dt_first_seen),
 						LEFT.acctno=RIGHT.acctno AND
 						LEFT.did=RIGHT.did AND
 						LEFT.bdid=RIGHT.bdid,
 						rollEmployer(LEFT,RIGHT)); 
+	// remove royalty sources					
+	dsEmployer := dsEmployerUnfiltered(src NOT IN BatchServices.WorkPlace_Constants.WP_ROYALTY_SOURCE_SET);
 	// *** Business
 	ds_results_w_acct := 	BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(PROJECT(subjectDIDs,TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,SELF.contact_did:=LEFT.did,SELF:=[]))).uid_results_w_acct;
 	ds_BIPIDs := PROJECT(ds_results_w_acct,TRANSFORM( BIPV2.IDlayouts.l_xlink_ids,
 														SELF := LEFT));
 	bizContacts := BIPV2_Build.key_contact_linkids.kFetch(ds_BIPIDs,'S');	
-	dsBiz 		:= JOIN(needREA,bizContacts(contact_did<>0 AND source<>MDR.SourceTools.src_Dunn_Bradstreet),
+	dsBiz 		:= JOIN(needREA,bizContacts(contact_did<>0),
 						LEFT.did = RIGHT.contact_did,	
 						TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 									SELF.acctno := LEFT.acctno,
@@ -170,6 +174,29 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 		SELF:=[];
 	END;
 	sequencedREAB	:= ITERATE(sortedREAB,seqREAB(LEFT,RIGHT));
+	//append Email for relative
+	dsEmails := doxie.email_records (PROJECT(sequencedREAB,doxie.layout_references),
+														inMod.ssn_mask, inMod.ApplicationType,FALSE,inMod.industryclass);
+	nonRoyaltyEmails := dsEmails(src NOT in	SET(codes.Key_Codes_V3(file_name	=	'EMAIL_SOURCES',field_name	=	'ROYALTY'),code));
+	layout_emails := RECORD
+		dsEmails.did;
+		DATASET(PhoneOwnership.Layouts.Emails) emails {MAXCOUNT(Constants.MAX_EMAILS_PER_PERSON)};
+	END;														
+
+	layout_emails getEmails (EmailService.Assorted_Layouts.layout_report_rollup l) := TRANSFORM 
+		SELF.DID := l.DID;
+		SELF.emails := CHOOSEN(PROJECT(l.emails, TRANSFORM(PhoneOwnership.Layouts.Emails,SELF.DID := l.DID,SELF:=LEFT)),Constants.MAX_EMAILS_PER_PERSON);
+	END;
+	REABwEmail := PROJECT(nonRoyaltyEmails, getEmails(LEFT));
+
+	dsBestEmails := DEDUP(SORT(PROJECT(REABwEmail.emails,PhoneOwnership.Layouts.Emails),DID,-date_last_seen,date_first_seen),DID);
+
+	sequencedREABwEmail := JOIN(sequencedREAB,dsBestEmails,
+								LEFT.DID = RIGHT.DID,
+								TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
+								SELF.emailAddress := RIGHT.clean_email,
+								SELF:=LEFT),
+								LEFT OUTER, KEEP(1));																		
 	
 	#IF(PhoneOwnership.Constants.Debug.REAB)			
 		// OUTPUT(dBatchIn,NAMED('dBatchInREA'));
@@ -190,6 +217,8 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 		OUTPUT(dsEmployer,NAMED('dsEmployer'));
 		// OUTPUT(REAB,NAMED('REAB'));
 		OUTPUT(sequencedREAB,NAMED('sequencedREAB'));
+		OUTPUT(dsEmails,NAMED('dsEmails'));
+		OUTPUT(sequencedREABwEmail,NAMED('sequencedREABwEmail'));
 	#END
-	RETURN sequencedREAB;
+	RETURN sequencedREABwEmail;
 END;	
