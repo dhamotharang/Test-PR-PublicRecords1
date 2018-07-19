@@ -38,7 +38,11 @@ EXPORT SearchService() := MACRO
 														searchBy.BankInformation.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
 														(iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') OR
 														searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
-	
+
+	BOOLEAN isValidDate := FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.DOB) AND
+						   FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionStartDate) AND
+						   FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionEndDate);
+
 	//Checking that gc_id, industry type, and product code have some values - they are required.
 	IF(FraudGovUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
 	IF(FraudGovUser.IndustryTypeName = '', FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_INDUSTRY_TYPE));
@@ -137,6 +141,9 @@ EXPORT SearchService() := MACRO
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
 														first_row,
 														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
+
+	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
+
 	IF (isMinimumInput, 
 				OUTPUT(results, named('Results')),
 				FAIL(301,doxie.ErrorCodes(301))

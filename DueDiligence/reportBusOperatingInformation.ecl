@@ -1,7 +1,6 @@
 ﻿IMPORT BIPv2, iesp, DueDiligence;
 
-EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
-                                             boolean DebugMode = FALSE) := FUNCTION
+EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData) := FUNCTION
                                              
   
 	//all reporting sources

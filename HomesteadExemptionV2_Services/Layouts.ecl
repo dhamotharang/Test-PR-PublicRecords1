@@ -176,13 +176,22 @@ EXPORT Layouts := MODULE
 		addrMin inputAddr;
 	END;
 
+	EXPORT hmstdYearRec:=RECORD
+		STRING4 tax_year;
+		STRING1  hmstdExmptn;
+		STRING25 exmptn1;
+		STRING25 exmptn2;
+		STRING25 exmptn3;
+		STRING25 exmptn4;
+	END;
+
 	EXPORT taxYearRec:=RECORD
 		STRING4 tax_year;
 	END;
 
 	EXPORT propParentRec:=RECORD
 		propIdRec;
-		DATASET(taxYearRec) hmstdExmptns;
+		DATASET(hmstdYearRec) hmstdExmptns;
 		BOOLEAN hasHmstdExmptn;
 		INTEGER1 cntHmstdExmptns;
 		STRING4 firstHmstdExmptn;

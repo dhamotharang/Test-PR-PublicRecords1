@@ -521,14 +521,14 @@ EXPORT Common := MODULE
 
 	
 	
-  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, string40 courtDispDesc1, string40 courtDispDesc2, string35 arr_off_lev_mapped, 	string35 court_off_lev_mapped) := FUNCTION
+  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, string40 courtDispDesc1, string40 courtDispDesc2, string35 offenseChargeLevelReported) := FUNCTION
 		
 		//***Does the field "courtOffenseLevel" map to any of the listed FELONY or MISDEMEANOR codes***// 
 		boolean MapsToFelony         := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
 		boolean MapsToMisdemeanor    := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
 		
 		//***Can we find the keyword 'FELONY' in the field "charge" ***// 
-		STRING  TextStringConcatenated   := charge + courtDispDesc1 + courtDispDesc2 + arr_off_lev_mapped + court_off_lev_mapped;   
+		STRING  TextStringConcatenated   := charge + courtDispDesc1 + courtDispDesc2 + offenseChargeLevelReported;   
 		boolean foundTheWordFelony       := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_FELONY, 1);
 		boolean foundTheWordReduced      := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_REDUCED, 1);
 		
@@ -610,7 +610,7 @@ EXPORT Common := MODULE
 	
 	EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION
 		
-		execOffenses := NORMALIZE(relatedParty, LEFT.party.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
+		execOffenses := NORMALIZE(relatedParty, LEFT.party.indOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
 																																								SELF.ultID := LEFT.UltID;
 																																								SELF.orgID := LEFT.OrgID;
 																																								SELF.seleID := LEFT.SeleID;

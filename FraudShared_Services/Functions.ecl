@@ -293,35 +293,18 @@ EXPORT Functions := MODULE
 		RETURN ds_velocity_recs_found;
 		
 	END;
-	
-	EXPORT getFragmentMatchTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
-															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
-															 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
-	
-		rec_velocity_matches :=  RECORD
-			BatchShare.Layouts.ShareAcct;
-			UNSIGNED8 record_id;
-			STRING date;
-			DATASET({STRING fragmentType}) fragment_matches;
-			DATASET({STRING contributionType}) contributionType_matches;
-		END;
 
-		layout_velocity_in_temp := RECORD
-			BatchShare.Layouts.ShareAcct;
-			UNSIGNED8 record_id;
-			STRING fragment;
-			STRING date;
-			DATASET({STRING contributionType}) contributionType_matches;
-		END;
-		
-		rec_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
-																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM
+	EXPORT getMatchedEntityTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
+															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload) := FUNCTION	
+
+		FraudShared_Services.Layouts.layout_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
+																																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM	
 			SELF.acctno := l.acctno;
 			SELF.date := r.event_date;
 			SELF.record_id := r.record_id;
 					
-			person :=  IF(l.did <> 0 AND 
-										l.did = r.did, 
+			person :=  IF(l.did <> 0 AND
+										l.did = r.did,
 										DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT}], 
 												{STRING fragmentType}));
 												
@@ -350,7 +333,7 @@ EXPORT Functions := MODULE
 															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip),
 															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}],
 																	{STRING fragmentType}));
-		
+
 			mailing_address_1 := 	IF(	l.mailing_addr <> '', 
 																l.mailing_addr, 
 																l.mailing_prim_range + ' ' + l.mailing_predir + ' ' + l.mailing_prim_name + ' ' + 
@@ -401,6 +384,46 @@ EXPORT Functions := MODULE
 												 DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.GEOLOCATION_FRAGMENT}], 
 														{STRING fragmentType}));
 									
+			SELF.fragment_matches := person + name + ssn + physicalAddress + mailingAddress + IPAddress + 
+															 phone + deviceID + driversLicenseNumber + bankAccountNumber + geolocation;
+
+			SELF := [];
+		END; // END OF TRANSFORM															 
+		
+		// this set of recs has to be generated based on rows each customer has access to and match in some way with 
+		// their request criteria.
+		ds_entity_matches := JOIN(ds_batch_in, ds_payload,
+													LEFT.acctno = RIGHT.acctno,
+													xform_velocity_matches(LEFT, RIGHT),
+													LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+																		
+		FraudShared_Services.Layouts.layout_velocity_in xnorm_fragment(FraudShared_Services.Layouts.layout_velocity_matches l, 
+																																	 {STRING fragmentType} r) := TRANSFORM
+			SELF.acctno := l.acctno;
+			SELF.fragment :=  r.fragmentType;
+			SELF.date := (INTEGER) l.date;
+			SELF.record_id := l.record_id;
+			SELF :=  l;
+			SELF := [];
+		END;
+
+		entity_recs_norm := NORMALIZE(ds_entity_matches, LEFT.fragment_matches, xnorm_fragment(LEFT,  RIGHT));
+		
+		return entity_recs_norm;
+	END;
+	
+	EXPORT getFragmentMatchTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
+															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
+															 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+		
+		matchedEntityTypes := getMatchedEntityTypes(ds_batch_in, ds_payload);
+		
+		FraudShared_Services.Layouts.layout_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
+																																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM
+			SELF.acctno := l.acctno;
+			SELF.date := r.event_date;
+			SELF.record_id := r.record_id;
+									
 			customer := IF(batch_params.GlobalCompanyId = r.classification_permissible_use_access.gc_id, 
 											DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER}], {STRING contributionType}));
 			
@@ -408,57 +431,48 @@ EXPORT Functions := MODULE
 													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_PROGRAM}], {STRING contributionType}));
 			
 			agencyState := IF(batch_params.AgencyState = r.classification_source.customer_state,
-													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.AGENCY_STATE}], {STRING contributionType}));
+											DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.AGENCY_STATE}], {STRING contributionType}));
 													
 			customerVertical := IF(batch_params.AgencyVerticalType = r.classification_source.customer_vertical,
-													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_VERTICAL}], {STRING contributionType}));													
-			
-			SELF.fragment_matches := person + name + ssn + physicalAddress + mailingAddress + IPAddress + 
-															 phone + deviceID + driversLicenseNumber + bankAccountNumber + geolocation;
-											 
+														DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_VERTICAL}], {STRING contributionType}));													
+
 			SELF.contributionType_matches := customer + customerProgram + agencyState + customerVertical;
 														
 			SELF := [];
 		END; // END OF TRANSFORM
-
-		// this set of recs has to be generated based on rows each customer has access to and match in some way with 
-		// their request criteria.
-		ds_velocity_matches := JOIN(ds_batch_in, ds_payload,
-																LEFT.acctno = RIGHT.acctno,
-																		xform_velocity_matches(LEFT, RIGHT));
+		
+		ds_velocity_matches := JOIN(ds_batch_in, ds_payload, 
+															LEFT.acctno = RIGHT.acctno,
+															xform_velocity_matches(LEFT, RIGHT),
+															LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
 																		
-		layout_velocity_in_temp xnorm_fragment(rec_velocity_matches l, {STRING fragmentType} r) := TRANSFORM
-			SELF.acctno := l.acctno;
-			SELF.fragment :=  r.fragmentType;
-			SELF.date := l.date;
-			SELF.contributionType_matches := l.contributionType_matches;
-			SELF.record_id := l.record_id;
-			SELF :=  l;
-			SELF := [];
-		END;
-
-		fragment_recs_norm := NORMALIZE(ds_velocity_matches, LEFT.fragment_matches, xnorm_fragment(LEFT,  RIGHT));
-
-		FraudShared_Services.layouts.layout_velocity_in xnorm_contributionType(layout_velocity_in_temp l, 
-																															      {STRING contributionType} r) := TRANSFORM
+	  ds_entity_velocity_match := JOIN(matchedEntityTypes, ds_velocity_matches,
+																	LEFT.acctno = RIGHT.acctno AND
+																	LEFT.record_id = RIGHT.record_id,																	
+																	TRANSFORM(FraudShared_Services.Layouts.layout_velocity_matches,
+																		SELF.date := (STRING) LEFT.date,
+																		SELF := LEFT,
+																		SELF := RIGHT,
+																		SELF := []),
+																		LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+																		
+		FraudShared_Services.layouts.layout_velocity_in xnorm_contributionType(FraudShared_Services.Layouts.layout_velocity_matches l, 
+																																					 {STRING contributionType} r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			SELF.fragment :=  l.fragment;
-			SELF.date := (INTEGER)l.date;
+			SELF.date := (INTEGER) l.date;
 			SELF.contributionType := r.contributionType;
 			SELF :=  l;
 			SELF := [];
 		END;
 
-		contributionType_recs_norm := NORMALIZE(fragment_recs_norm, 
+		contributionType_recs_norm := NORMALIZE(ds_entity_velocity_match, 
 																			LEFT.contributionType_matches, 
 																					xnorm_contributionType(LEFT,  RIGHT));
 																								
 		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
 			OUTPUT(ds_velocity_matches, NAMED('ds_velocity_matches'));
 		#END
-		
-		// output(ds_velocity_matches, named('ds_velocity_matches'));
-		// output(fragment_recs_norm, named('fragment_recs_norm'));
 		
 		RETURN contributionType_recs_norm;
 		

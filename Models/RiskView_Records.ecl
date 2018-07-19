@@ -2825,7 +2825,8 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 		DATASET(Models.Layout_Model) models;
 		Layout_RVAttributesOut AttributeGroups;
 		dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
-	END;
+    iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[ecl_only]  // this is for FFD-523 to be compatible with all other public records fcra queries, even though it's redundant to the inputEcho section
+  END;
 
 
 	Models.Layout_Parameters CAParamsBlankout( Models.Layout_Parameters le ) := TRANSFORM
@@ -2850,7 +2851,28 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 		self.did := clam_to_run[1].did;
 		self.InputEcho := echo_in;										
 		self.models := le.models;
-		
+
+    // for inquiry logging, populate the consumer section with the DID and input fields
+    // if the person is a noScore, don't log the DID
+    self.Consumer.LexID := if(riskview.constants.noscore(clam_to_run[1].iid.nas_summary,clam_to_run[1].iid.nap_summary, clam_to_run[1].address_verification.input_address_information.naprop, clam_to_run[1].truedid), 
+        '', 
+        (string12)clam_to_run[1].did); 
+    
+    searchDOB := echo_in[1].dateofbirth;
+    SELF.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+    self.Consumer.Inquiry.Phone10 := echo_in[1].HomePhone;
+    self.Consumer.Inquiry.name.Full := echo_in[1].unparsedfullname;
+    self.Consumer.Inquiry.name.First := echo_in[1].firstname;
+    self.Consumer.Inquiry.name.Middle := echo_in[1].middlename;
+    self.Consumer.Inquiry.name.Last := echo_in[1].lastname;
+    self.Consumer.Inquiry.name.Suffix := echo_in[1].namesuffix;
+    self.Consumer.Inquiry.address.streetaddress1 := echo_in[1].streetaddress;
+    self.Consumer.Inquiry.address.city := echo_in[1].city;
+    self.Consumer.Inquiry.address.state := echo_in[1].state;
+    self.Consumer.Inquiry.address.zip5 := echo_in[1].zip;
+    self.Consumer.Inquiry.UniqueID := (string)clam_to_run[1].did;    
+    self.Consumer.Inquiry := echo_in[1];  
+        
 		self.AttributeGroups.AccountNumber := ri.AccountNumber;
 		self.AttributeGroups.AttributeGroup := if( inCalif, project( ri.AttributeGroup, CAAttributeGroupBlankout(left) ), ri.AttributeGroup );
 		self := [];

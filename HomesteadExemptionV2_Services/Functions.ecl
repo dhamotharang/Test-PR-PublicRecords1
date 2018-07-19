@@ -255,17 +255,17 @@ EXPORT Functions := MODULE
 
 	/************************************************/
 	EXPORT getPropertyID(HomesteadExemptionV2_Services.Layouts.addrMin addr, STRING APN) := FUNCTION
-		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.sec_range+addr.p_city_name+addr.st+addr.z5,ALL);
+		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.p_city_name+addr.st+addr.z5,ALL);
 		hasMinAddr:=(addr.prim_range!='' OR ut.isPOBox(addr.prim_name) OR ut.isRR(addr.prim_name))
 			 AND addr.prim_name!='' AND ((addr.p_city_name!='' AND addr.st!='') OR addr.z5!='');
 		RETURN IF(hasMinAddr,smashedAddr,APN);
 	END;
 
 	/************************************************/
-	EXPORT compare2Addresses(HomesteadExemptionV2_Services.Layouts.addrMin addr1,HomesteadExemptionV2_Services.Layouts.addrMin addr2) := FUNCTION
+	EXPORT compare2Addresses(HomesteadExemptionV2_Services.Layouts.addrMin addr1, HomesteadExemptionV2_Services.Layouts.addrMin addr2, BOOLEAN includeSecondaryRange=TRUE) := FUNCTION
 		RETURN addr1.prim_range=addr2.prim_range AND addr1.prim_name=addr2.prim_name AND
 			((addr1.p_city_name=addr2.p_city_name AND addr1.st=addr2.st) OR addr1.z5=addr2.z5) AND
-			Addr1.sec_range=Addr2.sec_range;
+			IF(includeSecondaryRange,addr1.sec_range=addr2.sec_range,TRUE);
 	END;
 
 	/************************************************/

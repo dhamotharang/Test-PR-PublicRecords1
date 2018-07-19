@@ -1,4 +1,4 @@
-import gong, iesp;
+﻿import gong, iesp;
 
 EXPORT WorkPlace_Layouts := MODULE
 
@@ -197,6 +197,7 @@ EXPORT WorkPlace_Layouts := MODULE
 	EXPORT email := RECORD
     string12  did            := '';
     string200 clean_email    := '';
+		STRING2 email_src				 := '';
     string8   date_last_seen := '';
 	END;
 
@@ -207,6 +208,9 @@ EXPORT WorkPlace_Layouts := MODULE
 		string200 email_address1        := '';
 		string200 email_address2        := '';
 		string200 email_address3        := '';
+		STRING2 email_src1        			:= '';
+		STRING2 email_src2        			:= '';
+		STRING2 email_src3        			:= '';
   END;
 
   // This is the final layout of the batch service
@@ -264,6 +268,9 @@ EXPORT WorkPlace_Layouts := MODULE
     string200 email1                  := '';  // only if requested
     string200 email2                  := '';  //  "   "     "
     string200 email3                  := '';  //  "   "     "
+		STRING2 email_src1        				:= '';
+		STRING2 email_src2        				:= '';
+		STRING2 email_src3        				:= '';
     // NOTE: additional workplacelocator (history) fields are populated only when requested.
     string12  addl_wpl_bdid_1          := ''; // For internal use only, not be returned to customer
     string120 addl_wpl_comp_name_1     := '';
@@ -361,7 +368,10 @@ EXPORT WorkPlace_Layouts := MODULE
     string200 spouse_email1                 := '';  // only if requested
     string200 spouse_email2                 := '';  //  "   "      "
     string200 spouse_email3                 := '';  //  "   "      " 
-
+		STRING2 spouse_email_src1        				:= '';
+		STRING2 spouse_email_src2        				:= '';
+		STRING2 spouse_email_src3        				:= '';	
+		
 		//spouse future use fields
 		// Product manager originally wanted these "reserved**" field names in the output, 
 		// but that approach was changed effective 05/17/2011 roxie release.  

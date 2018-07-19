@@ -1,4 +1,4 @@
-import doxie_crs,doxie,LN_PropertyV2_Services;
+﻿import doxie_crs,doxie,LN_PropertyV2_Services;
 
 export all_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
 

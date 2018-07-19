@@ -91,7 +91,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
 												SELF := RIGHT));
 
 	consumer_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs, inFFDOptionsMask);	
-  consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, inFFDOptionsMask);                                               
+  consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask);                                               
   consumer_statements_alerts_pre := consumer_statements_prep + consumer_alerts;
 	
 	//Actual project to the final batch out 

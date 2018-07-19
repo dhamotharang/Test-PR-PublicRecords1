@@ -1,4 +1,4 @@
-import patriot,GlobalWatchLists,doxie,business_header;
+﻿import patriot,GlobalWatchLists,doxie,business_header;
 
 doxie_cbrs.mac_Selection_Declare()
 

@@ -644,7 +644,7 @@ EXPORT Functions := MODULE
 		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 		File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;													
 	
-		ds_fragment_recs := FraudShared_Services.Functions.getFragmentMatchTypes(ds_freg_recs_in, ds_payload, batch_params);
+		ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload);
 
 		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
 																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
@@ -801,6 +801,12 @@ EXPORT Functions := MODULE
 		ds_scoreBreakdowns_dedup := DEDUP(SORT(ds_scoreBreakdowns,IndicatorTypeCode,PopulationType,-Value),IndicatorTypeCode,PopulationType);
 
 		return ds_scoreBreakdowns_dedup;
+	END;
+	
+	EXPORT IsValidInputDate(iesp.share.t_Date date) := FUNCTION
+		date_int := iesp.ECL2ESP.DateToInteger(date);
+		
+		return (STD.Date.IsValidDate(date_int) AND date_int <= STD.Date.Today()) OR date_int = 0;
 	END;
 
 END;

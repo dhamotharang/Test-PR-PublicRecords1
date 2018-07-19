@@ -200,7 +200,7 @@ EXPORT mod_Deltabase_Functions := MODULE
 			//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
 			//Also added failsafe...if we can't get the environment variable, we default it to yesterday
 			last_data_build_date := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
-																											(STRING)yesterday) + '000000');
+																											(STRING)yesterday)[1..8] + '000000');
 			
 			db_records := deltadata(batch_params.GlobalCompanyId,batch_params.IndustryTypeName,last_data_build_date);
 			

@@ -390,8 +390,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			SELF.StateCityZip := '';
 			SELF.listing_type := '';
 			//SELF.HistoryFlag := '';
-			SELF.Current := L.Current;
-			SELF.AddressType := L.AddressType;	
+			SELF.Current := if(pa.Current <> '', pa.Current, oa.Current);
+			SELF.AddressType := if(pa.AddressType <> '', pa.AddressType, oa.AddressType);
 		END;  // AddressRollup
 
 		BOOLEAN fuzzyMatch(STRING s1, STRING s2) := (s1 = s2 OR fn_NormalizedEditDistance(s1, s2) > 80);

@@ -1,4 +1,4 @@
-/* TO BE DONE:
+﻿/* TO BE DONE:
    1. Future enhancement to further assist when new sources are added: 
       a. Contact Vern about about adding all the source specific fields currently used 
          to the POE base data file, so they are then included on the did key file.
@@ -725,6 +725,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	                       transform(WorkPlace_Layouts.final,
 														// fields from right zoom did key file, see zoom.layouts.keybuild
                             self.email1         := if(includeEmail,right.rawfields.email_address,''),
+														SELF.email_src1			:= if(includeEmail AND RIGHT.rawfields.email_address <>'',LEFT.SOURCE,''),
 														// rest of the fields from the left (POE payload) converting some
 														self.did            := (string) left.did,
 														self.company_bdid   := (string) left.bdid,
@@ -763,12 +764,19 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																													    if(right.cont_email_address<>'',
 																													       right.cont_email_address,
 																																 '')),
-																													 ''), 
+																													 ''),
+                           self.email_src1               := IF(includeEmail AND (RIGHT.corp_email_address<>'' OR RIGHT.cont_email_address<>''), 
+																															 LEFT.SOURCE,
+																														   ''),
                            self.email2               := if(includeEmail,
 														                               if(right.corp_email_address<>'',
 																													    right.cont_email_address,
 																															''),
 																													 ''),
+											     self.email_src2               := IF(includeEmail AND RIGHT.corp_email_address<>'', 
+																															 LEFT.SOURCE,
+																														   ''),
+																													 
 											     // rest of the fields from the left (POE did key) converting some
 													 self.did            := (string) left.did,
 													 self.company_bdid   := (string) left.bdid,
@@ -787,6 +795,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	                           transform(WorkPlace_Layouts.final,
 														   // fields from right POEsFromEmails did key file, see POEsFromEmails.layouts.keybuild
                                self.email1 := if(includeEmail,right.clean_email,''),
+                               SELF.email_src1 := IF(includeEmail AND RIGHT.clean_email <>'',RIGHT.email_src,''),
 														   // rest of the fields from the left (POE slimmed) converting some
 														   self.did            := (string) left.did,
 														   self.company_bdid   := (string) left.bdid,
@@ -804,6 +813,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	                           transform(WorkPlace_Layouts.final,
 														   // fields from oneclick did key file, see oneclick_data.layouts.keybuild
                                self.email1         := if(includeEmail,right.rawfields.EmailAddress,''),
+                               SELF.email_src1     := IF(includeEmail AND RIGHT.rawfields.EmailAddress <>'',LEFT.SOURCE,''),
 											         // rest of the fields from the left (POE did key) converting some
 														   self.did            := (string) left.did,
 														   self.company_bdid   := (string) left.bdid,
@@ -821,6 +831,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	                           transform(WorkPlace_Layouts.final,
 														   // fields from sales channel did key file
                                self.email1         := if(includeEmail,right.rawfields.email,''),
+															 SELF.email_src1     := IF(includeEmail AND RIGHT.rawfields.email<>'',LEFT.SOURCE,''),
 														   self.did            := (string) left.did,
 														   self.company_bdid   := (string) left.bdid,
                                self.date_last_seen := (string) left.dt_last_seen,
@@ -837,6 +848,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	                       transform(WorkPlace_Layouts.final,
 														// fields from right thrive did key file, see thrive.layouts.base
                             self.email1         := if(includeEmail,right.Email,''),
+														SELF.email_src1 := IF(includeEmail AND RIGHT.Email <>'',RIGHT.src,''),
 														// rest of the fields from the left (POE payload) converting some
 														self.did            := (string) left.did,
 														self.company_bdid   := (string) left.bdid,
@@ -1050,6 +1062,9 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 		self.email_address1        := L.clean_email;
 		self.email_address2        := RL[2].clean_email;
 		self.email_address3        := RL[3].clean_email;
+		SELF.email_src1			   := L.email_src;
+		SELF.email_src2			   := RL[2].email_src;
+		SELF.email_src3			   := RL[3].email_src;
 	end;
 	
   ds_email_combined := rollup(group(ds_email_deduped,did),
@@ -1071,13 +1086,20 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 															                   uc(left.email1),
 																								 uc(right.email_address1));
 													    self.email1 := temp_email1,
+															SELF.email_src1 := IF(left.email1<>'', LEFT.email_src1, RIGHT.email_src1);
                               temp_email2 := if (left.email2<>'',
 															                   uc(left.email2),
 																								 if(uc(right.email_address1)<>uc(temp_email1),
 																								    uc(right.email_address1),
 																										if(uc(right.email_address2)<>uc(temp_email1),
 																										   uc(right.email_address2),'')));
-														  self.email2 := temp_email2,
+														  self.email2 := temp_email2,														
+															SELF.email_src2 := IF(LEFT.email2<>'',
+																										LEFT.email_src2,
+																											CASE(temp_email2, 
+																													 uc(RIGHT.email_address1)=> RIGHT.email_src1,
+																													 uc(RIGHT.email_address2)=> RIGHT.email_src2,
+																								  				 ''));
                               temp_email3 := if (left.email3<>'',
 															                   uc(left.email3),
 																								 if(uc(right.email_address1)<>uc(temp_email1) AND
@@ -1090,6 +1112,13 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																								          uc(right.email_address3)<>uc(temp_email2),
 																											 uc(right.email_address3),''))));
 															self.email3 := temp_email3,
+															SELF.email_src3 := IF(LEFT.email3<>'',
+																									 LEFT.email_src3,
+																									 CASE(temp_email3,
+																												uc(RIGHT.email_address1)=> RIGHT.email_src1,
+																												uc(RIGHT.email_address2)=> RIGHT.email_src2,
+																												uc(RIGHT.email_address3)=> RIGHT.email_src3,
+																												''));
 														  // keep the rest of the fields from the left
                               self        := left), 
 												    left outer,  // keep all the recs from the left ds
@@ -1158,7 +1187,10 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
                               self.spouse_prof_license_status    := right.prof_license_status,
                               self.spouse_email1                 := right.email1,
                               self.spouse_email2                 := right.email2,
-                              self.spouse_email3                 := right.email3
+                              self.spouse_email3                 := right.email3,
+															self.spouse_email_src1             := right.email_src1,
+                              self.spouse_email_src2             := right.email_src2,
+                              self.spouse_email_src3             := right.email_src3
 															),
                             inner, // keep only recs that exist on both left & right
 											      limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
@@ -1242,6 +1274,9 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
                                  self.spouse_email1                 := if(output_spouse, right.spouse_email1,''),
                                  self.spouse_email2                 := if(output_spouse, right.spouse_email2,''),
                                  self.spouse_email3                 := if(output_spouse, right.spouse_email3,''),
+																 self.spouse_email_src1             := if(output_spouse, right.spouse_email_src1,''),
+																 self.spouse_email_src2             := if(output_spouse, right.spouse_email_src2,''),
+																 self.spouse_email_src3             := if(output_spouse, right.spouse_email_src3,''),
                                  // handle the case where there is only spouse (right) 
 																 // and no subject (left) data.
 			                           self.acctno := if(left.acctno<>'',left.acctno,right.acctno),

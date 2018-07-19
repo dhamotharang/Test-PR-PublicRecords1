@@ -1,10 +1,12 @@
-import doxie, ut, doxie_crs, suppress, header;
+﻿import doxie, ut, doxie_crs, suppress, header;
 
 export fn_SSN_Records(
 	dataset(doxie.layout_best) best_info_mult,
 	boolean checkRNA = false
 	) :=
 FUNCTION
+
+isCNSMR := ut.IndustryClass.is_Knowx;
 
 doxie.MAC_Header_Field_Declare() //did_value, ssn_value, ssn_mask_value
 doxie.MAC_Selection_Declare() //Include_AKAs_val, Include_Imposters_val
@@ -133,11 +135,15 @@ ssn_info ssnm(p_sum frm,doxie.Key_SSN_Map R) := transform
 	self.valid := Suppress.dateCorrect.valid(frm.ssn, valid);
   end;
 
-result := join (ssn_w_legacy_info, doxie.Key_SSN_Map,
+result_SSN_info := join (ssn_w_legacy_info, doxie.Key_SSN_Map,
                 keyed (left.ssn[1..5] = Right.ssn5) AND
                 keyed (left.ssn[6..9] between Right.start_serial AND Right.end_serial),
                 ssnm (Left, Right),
                 LEFT OUTER, KEEP (1), limit (0)); //1 : 1 relation
+
+result_SSN_supressed := Project(ssn_w_legacy_info, transform(ssn_info, self := left, self:= []));
+
+result := if(isCNSMR, result_SSN_supressed, result_SSN_info);
 
 out_f := sort(result,did,-cnt,ssn,-length(trim(fname)));
 

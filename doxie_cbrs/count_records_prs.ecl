@@ -1,4 +1,4 @@
-import doxie, business_header, doxie_cbrs_raw, LN_PropertyV2_Services;
+﻿import doxie, business_header, doxie_cbrs_raw, LN_PropertyV2_Services;
 doxie_cbrs.mac_Selection_Declare()
 
 unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, unsigned3 count_simple) :=

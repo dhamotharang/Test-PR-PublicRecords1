@@ -266,16 +266,16 @@ EXPORT Transforms := MODULE
 
 	EXPORT iesp.fraudgovreport.t_FraudGovTimelineDetails xform_timeline_details(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
 		
-		ds_home_phone := IF(L.phone_number <> '',
-												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_HOME, L.phone_number, L.phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+		ds_home_phone := IF(L.clean_phones.phone_number <> '',
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_HOME, L.clean_phones.phone_number, L.phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
 												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
 												);
-		ds_cell_phone := IF(L.cell_phone <> '', 
-												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_CELL, L.cell_phone, L.cell_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+		ds_cell_phone := IF(L.clean_phones.cell_phone <> '', 
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_CELL, L.clean_phones.cell_phone, L.cell_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
 												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
 												);
-		ds_work_phone := IF(L.work_phone <> '',
-												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_WORK, L.work_phone, L.work_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
+		ds_work_phone := IF(L.clean_phones.work_phone <> '',
+												ROW({FraudGovConst.PHONE_TYPE.PHONE_TYPE_WORK, L.clean_phones.work_phone, L.work_phone_risk_code}, iesp.fraudgovreport.t_FraudGovPhoneInfo), 
 												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
 												);
 
@@ -431,7 +431,7 @@ EXPORT Transforms := MODULE
 					//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
 					//Also added failsafe...if we can't get the environment variable, we default it to yesterday
 					SELF.date_added := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
-																											(STRING)yesterday) + '000000');
+																											(STRING)yesterday)[1..8] + '000000');
 
 				END;
 	
