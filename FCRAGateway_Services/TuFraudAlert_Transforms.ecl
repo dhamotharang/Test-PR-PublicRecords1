@@ -72,7 +72,7 @@ EXPORT TuFraudAlert_Transforms := MODULE
 		SELF.SearchBy.Name.Last := name.LastName;
 		SELF.SearchBy.Name.Suffix := name.GenerationCode;
 		SELF.SearchBy.SSN := L.RespSubjects[1].RespPersonalInfo.SocialSecurityNumber;
-		SELF.SearchBy.Address.StreetAddress1 := address.HouseNumber;
+		SELF.SearchBy.Address.StreetNumber := address.HouseNumber;
 		SELF.SearchBy.Address.StreetName := address.StreetName;
 		SELF.SearchBy.Address.StreetSuffix := address.StreetType;
 		SELF.SearchBy.Address.UnitNumber := address.UnitNumber;
@@ -87,8 +87,7 @@ EXPORT TuFraudAlert_Transforms := MODULE
 		Only work with the non-estimated DOB
 		*/
 		dob := TRIM(L.RespSubjects[1].RespPersonalInfo.DateOfBirth, ALL);
-		SELF.SearchBy.DOB := IF(LENGTH(dob) = 8,
-			DATASET([{dob[3..4], dob[5..6], dob[7..8]}], iesp.share.t_Date))[1];
+		SELF.SearchBy.DOB := IF(LENGTH(dob) = 8, iesp.ECL2ESP.toDatestring8(dob));
 
 		SELF := [];
 	END;

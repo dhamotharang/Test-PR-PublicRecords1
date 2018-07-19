@@ -72,7 +72,6 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 
 	#IF(constants.Debug.TuFraudAlertRecords)
 		OUTPUT(ds_compliance_data, NAMED('ds_compliance_data'));
-		OUTPUT(ds_gateway_request, NAMED('ds_gateway_request'));
 		OUTPUT(ds_tufa_soap_response, NAMED('ds_tufa_soap_response'));
 		OUTPUT(ds_tufa_recs, NAMED('ds_tufa_recs'));
 	#END
