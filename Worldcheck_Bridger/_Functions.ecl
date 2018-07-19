@@ -1167,6 +1167,7 @@
 				trim(kword, left, right) = 'MXASF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXASF,
 				trim(kword, left, right) = 'JPMHLW' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPMHLW,
 				trim(kword, left, right) = 'GEGOV' =>SubGroup_Constants.numKeywordsID.KEYWORD_GEGOV,
+				trim(kword, left, right) = 'ZAFSCA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFSCA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
