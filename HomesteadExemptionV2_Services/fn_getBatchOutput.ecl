@@ -139,11 +139,24 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		SELF.assessment_owner_occupied        :=assessment[1].owner_occupied;
 		SELF.assessment_land_usage            :=assessment[1].standardized_land_use_code;
 		SELF.assessment_tax_year              :=IF(assessment[1].tax_year!='',assessment[1].tax_year,assessment[1].assessed_value_year);
-		SELF.assess_homestead_exemption_flag  :=assessment[1].homestead_homeowner_exemption;
-		SELF.assess_tax_exemption1_desc       :=assessment[1].tax_exemption1_desc;
-		SELF.assess_tax_exemption2_desc       :=assessment[1].tax_exemption2_desc;
-		SELF.assess_tax_exemption3_desc       :=assessment[1].tax_exemption3_desc;
-		SELF.assess_tax_exemption4_desc       :=assessment[1].tax_exemption4_desc;
+
+		// ROLLUP EXEMPTIONS
+		previousYears:=HomesteadExemptionV2_Services.Functions.previousYears(L.inputTaxYear,HomesteadExemptionV2_Services.Constants.HOMESTEAD_YEARS);
+		hmstdYearRecs:=L.hmstdExmptns(tax_year IN SET(previousYears,year));
+		hmstdRollRecs:=ROLLUP(SORT(hmstdYearRecs,-tax_year),TRUE,TRANSFORM(HomesteadExemptionV2_Services.Layouts.hmstdYearRec,
+			SELF.hmstdExmptn:=IF(LEFT.hmstdExmptn!='',LEFT.hmstdExmptn,RIGHT.hmstdExmptn),
+			SELF.exmptn1:=IF(LEFT.exmptn1!='',LEFT.exmptn1,RIGHT.exmptn1),
+			SELF.exmptn2:=IF(LEFT.exmptn2!='',LEFT.exmptn2,RIGHT.exmptn2),
+			SELF.exmptn3:=IF(LEFT.exmptn3!='',LEFT.exmptn3,RIGHT.exmptn3),
+			SELF.exmptn4:=IF(LEFT.exmptn4!='',LEFT.exmptn4,RIGHT.exmptn4),
+			SELF:=LEFT
+		));
+
+		SELF.assess_homestead_exemption_flag  :=IF(L.hasHmstdExmptn,hmstdRollRecs[1].hmstdExmptn,assessment[1].homestead_homeowner_exemption);
+		SELF.assess_tax_exemption1_desc       :=IF(L.hasHmstdExmptn,hmstdRollRecs[1].exmptn1,assessment[1].tax_exemption1_desc);
+		SELF.assess_tax_exemption2_desc       :=IF(L.hasHmstdExmptn,hmstdRollRecs[1].exmptn2,assessment[1].tax_exemption2_desc);
+		SELF.assess_tax_exemption3_desc       :=IF(L.hasHmstdExmptn,hmstdRollRecs[1].exmptn3,assessment[1].tax_exemption3_desc);
+		SELF.assess_tax_exemption4_desc       :=IF(L.hasHmstdExmptn,hmstdRollRecs[1].exmptn4,assessment[1].tax_exemption4_desc);
 
 		// MISC INFO
 		SELF.homestead_exemption_claimed:=IF(L.hasHmstdExmptn,'Y',IF(hasAssessment,'N',''));
@@ -192,18 +205,26 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		SELF.relative_addr_match:=IF(EXISTS(relatives),'Y','N');
 
 		// VEHICLES
-		vehicles:=DEDUP(SORT(L.vehicle_records(hasCurrAddrMatch),VIN,-DataSource),VIN);
-		SELF.vehicle_reg_addr_match:=IF(EXISTS(vehicles),'Y','N');
-		SELF.vehicle_reg_count:=COUNT(vehicles);
+		vehicleCurrent:=DEDUP(SORT(L.vehicle_records(isCurrent),VIN,-DataSource),VIN);
+		vehicleAddrMatch:=DEDUP(SORT(L.vehicle_records(hasCurrAddrMatch),VIN,-DataSource),VIN);
+		SELF.vehicle_reg_addr_match:=MAP(
+			NOT EXISTS(vehicleCurrent) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO CURRENT VEHICLE RECORDS
+			EXISTS(vehicleAddrMatch) => 'Y', // CURRENT VEHICLE RECORD WITH ADDR MATCH
+			'N'); // CURRENT VEHICLE NO ADDR MATCH
+		SELF.vehicle_reg_count:=COUNT(vehicleAddrMatch); // COUNT CURRENT VEHICLES WITH ADDR MATCH
 
 		// DRIVER
-		SELF.driver_addr_match:=IF(EXISTS(L.driver_records),'Y','N');
-		SELF.driver_state:=L.driver_records[1].st;
+		driverAddrMatch:=SORT(L.driver_records(hasCurrAddrMatch),-lic_issue_date);
+		SELF.driver_addr_match:=MAP(
+			NOT EXISTS(L.driver_records) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO DRIVER RECORDS
+			EXISTS(driverAddrMatch) => 'Y', // CURRENT DRIVER RECORD WITH ADDR MATCH
+			'N'); // DRIVER RECORDS CURRENT AND/OR EXPIRED
 
 		// VOTER
-		SELF.voter_reg_addr_match:=IF(EXISTS(L.voter_records),'Y','N');
-		SELF.voter_reg_state:=L.voter_records[1].source_state;
-		SELF.voter_reg_last_vote_year:=L.voter_records[1].LastDateVote;
+		SELF.voter_reg_addr_match:=MAP(
+			NOT EXISTS(L.voter_records) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO VOTER RECORDS
+			EXISTS(L.voter_records(hasAddrMatch)) => 'Y', // HAS VOTER RECORD WITH ADDR MATCH
+ 			'N');
 	END;
 
 	HomesteadExemptionV2_Services.Layouts.batchWorkRec batchRecords(HomesteadExemptionV2_Services.Layouts.workRec L) := TRANSFORM
@@ -243,13 +264,31 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		SELF.death_confirmed        :=MAP(dcsdRec.vorp_code='V'=>'Verified',dcsdRec.vorp_code='P'=>'Proof','');
 		// INPUT PROPERTY NOT OWNED
 		SELF.input_addr_owner_1_lexid       :=L.Ownership_Record.owner_did;
+		SELF.input_addr_owner_1_bdid        :=L.Ownership_Record.owner_bdid;
 		SELF.input_addr_owner_1_first_name  :=L.Ownership_Record.name_first;
 		SELF.input_addr_owner_1_middle_name :=L.Ownership_Record.name_middle;
 		SELF.input_addr_owner_1_last_name   :=L.Ownership_Record.name_last;
 		SELF.input_addr_owner_1_suffix      :=L.Ownership_Record.name_suffix;
+		SELF.input_addr_owner_1_company_name:=L.Ownership_Record.company_name;
 		SELF.input_addr_sale_date           :=L.Ownership_Record.sale_date;
 		SELF.input_addr_contract_date       :=L.Ownership_Record.contract_date;
-		SELF.input_subject_still_owner      :=IF(L.Ownership_Record.owner_did!=0,IF(L.Ownership_Record.isCurrentOwner,'Y','N'),'');
+		SELF.input_subject_still_owner      :=IF(L.Ownership_Record.owner_did!=0 OR L.Ownership_Record.owner_bdid!=0,IF(L.Ownership_Record.isCurrentOwner,'Y','N'),'');
+
+		// ALWAYS OUTPUT CURRENT DRIVER STATE
+		driver_records:=SORT(NORMALIZE(L.property_records,LEFT.driver_records,TRANSFORM(HomesteadExemptionV2_Services.Layouts.driverRec,SELF:=RIGHT)),-lic_issue_date);
+		driverAddrMatch:=driver_records(hasCurrAddrMatch);
+		driverCurrent:=driver_records(isCurrent);
+		SELF.driver_state:=MAP(
+			EXISTS(driverAddrMatch) => driverAddrMatch[1].st, // CURRENT DRIVER STATE WITH ADDR MATCH
+			EXISTS(driverCurrent) => driverCurrent[1].st, // CURRENT DRIVER STATE
+			''); // NO DRIVER RECORDS OR EXPIRED RECORDS
+
+		// ALWAYS OUTPUT MOST RECENT VOTER INFO
+		voter_records:=NORMALIZE(L.property_records,LEFT.voter_records,TRANSFORM(HomesteadExemptionV2_Services.Layouts.voterRec,SELF:=RIGHT));
+		voterLastVote:=SORT(voter_records,-LastDateVote);
+		SELF.voter_reg_state:=voterLastVote[1].source_state; // LAST VOTER STATE
+		SELF.voter_reg_last_vote_year:=voterLastVote[1].LastDateVote; // LAST VOTER YEAR
+
 		// MAX PROPERTY RECORDS
 		SELF.property_records:=CHOOSEN(PROJECT(SORT(L.property_records,property_rank,-sortby_date),propertyRecords(LEFT)),in_mod.MaxProperties);
 	END;

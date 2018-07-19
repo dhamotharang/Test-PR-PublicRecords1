@@ -1,4 +1,4 @@
-import Address, AutokeyB2,AutoStandardI,BatchServices, BatchShare, Doxie, Doxie_Raw, MX_Services,  ut, VehicleV2_Services;
+﻿import Address, AutokeyB2,AutoStandardI,BatchServices, BatchShare, Doxie, Doxie_Raw, MX_Services,  ut, VehicleV2_Services;
 
 export Functions := module
 	// re: PENALIZATION
@@ -11,7 +11,7 @@ export Functions := module
 	// re: ADDITIONAL PENALIZATION
 	// NOTE: fn_penalize_dl and fn_penalize_plate attribute were created, the default penalty increase used was 2
 	// -------------------------------------------------------------------------------------------------------------
-	// "For each possible subject, conduct a Driver’s License search.  If input DL does not match 
+	// "For each possible subject, conduct a Driver's License search.  If input DL does not match 
 	// any DLs for a subject, then increase the penalty score for that subject" (Section 4.1-9).
 	//
 	// And, "[f]or each possible subject, conduct an in-house MVR search.  If the input plate and 
@@ -329,10 +329,12 @@ END;
 				
 			return match_code;
 		end;
-		export fixDate(integer indate) := function
-		//takes an integer date 19951203, 19951200, 19950000 and make a date mm/yy/yyyy
+
+	export fixDate(integer indate) := function
+		//takes an integer date 19951203, 19951200, 19950000 or 199512, 199500 or 1995 and make a date mm/yy/yyyy
 		sdob := (string)indate;
-    fixdob := map (sdob[5..8]='0000' => sdob[1..4],
+    fixdob := map ((sdob[5..8]='0000' or sdob[5..8]='00  ' or sdob[5..8]='    ') //need to also account for 6 digit yyyy00 & yyyy only dates from header
+                               =>   sdob[1..4],
 		           sdob[7..8]='00' =>   sdob[1..6],
 		           sdob[1..8]);
 
@@ -344,6 +346,7 @@ END;
     return convDob;				
     
   end;
+
 	export fn_get_gender_desc(string1 genderLetter) := function
 	   return map(genderLetter ='M' => 'Male', 
 		            genderLetter ='F' => 'Female',

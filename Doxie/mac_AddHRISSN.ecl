@@ -1,5 +1,8 @@
-export mac_AddHRISSN(infile, outfile, justIssueInfo, max_num='20') := macro
+﻿export mac_AddHRISSN(infile, outfile, justIssueInfo, max_num='20') := macro
 import ut,codes,suppress, risk_indicators;
+
+#uniquename(isCNSMR)
+%isCNSMR% := ut.IndustryClass.is_Knowx;
 
 #uniquename(recentRec)
 %recentRec% := RECORD
@@ -52,13 +55,19 @@ END;
   Self := L;
 end;
 
-#uniquename(ssn_validity)
-%ssn_validity% := join (%ssn_w_legacy_info%, doxie.Key_SSN_Map,
+#uniquename(ssn_validity_info)
+%ssn_validity_info% := join (%ssn_w_legacy_info%, doxie.Key_SSN_Map,
                         keyed (left.ssn[1..5] = Right.ssn5) AND
                         keyed (left.ssn[6..9] between Right.start_serial AND Right.end_serial),
                         %getValidation% (Left, Right),
                         LEFT OUTER, KEEP (1), limit (0)); //1 : 1 relation
-										
+
+#uniquename(ssn_validity_supressed)
+%ssn_validity_supressed%	:= Project(%ssn_w_legacy_info%, transform(%recentRec%, self := left, self := []));
+
+#uniquename(ssn_validity)
+%ssn_validity%	:= if(%isCNSMR%, %ssn_validity_supressed%, %ssn_validity_info%);					
+				
 #uniquename(addSsnRisk)
 infile %addSsnRisk%(%recentRec% le, risk_indicators.key_ssn_table_v4_2 ri) :=
 TRANSFORM

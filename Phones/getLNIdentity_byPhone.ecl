@@ -7,7 +7,13 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 									UNSIGNED1 DPPAPurpose = 0,
 									STRING DataRestrictionMask = '',
 									STRING Industryclass = '') := FUNCTION
-	dsUniquePhones := DEDUP(SORT(dsPhones,phone,acctno),phone);													
+
+	
+	dsUniquePhones := DEDUP(SORT(dsPhones,phone,acctno),phone);	
+	// Future development to exclude landlines from phonesPlus lookup and wireless from gong lookup
+	//constLandline := Phones.Constants.PhoneServiceType.Landline[1];
+	//dsLandlines := dsUniquePhones(append_phone_type IN ['',constLandline]);
+	//dsOtherPhones := dsUniquePhones(append_phone_type<>constLandline);
 	//landlines
 	dsGong := JOIN(dsUniquePhones,Gong.key_history_phone,
 					KEYED(LEFT.phone[4..10] = RIGHT.p7) AND 
@@ -42,7 +48,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 	dsIndividualwPhones := 	dsGongPhones + dsPhonesPlus;
 	
 	// business lookup
-	businessRequest := DEDUP(SORT(dsIndividualwPhones + PROJECT(dsPhones,TRANSFORM(Phones.Layouts.PhoneIdentity,SELF:=LEFT,SELF:=[])),phone,-dt_last_seen,dt_first_seen),phone);
+	businessRequest := DEDUP(SORT(dsIndividualwPhones + dsPhones,phone,-dt_last_seen,dt_first_seen),phone);
 	dsBusinesPhones := PROJECT(businessRequest,TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,
 														SELF.phone10:=LEFT.phone,
 														SELF.company_name:=IF(LEFT.companyname<>'',LEFT.companyname,LEFT.listed_name),
@@ -53,6 +59,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 														SELF.Contact_mname:=LEFT.mname,
 														SELF.Contact_lname:=LEFT.lname,
 														SELF.Contact_did:=LEFT.did,
+														SELF.hsort:=TRUE, // bip requirement - always make true
 														SELF:=LEFT,SELF:=[]));
 	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.																		
 	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).data2_;	
@@ -69,7 +76,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		SELF.proxid := IF(l.proxid=0,r.proxid,l.proxid);
 		SELF.powid := IF(l.powid=0,r.powid,l.powid);
 		SELF.company_bdid := IF(l.company_bdid=0,r.company_bdid,l.company_bdid);
-		SELF.company_name := Phones.Functions.GetCleanCompanyName(IF(l.company_name='',r.company_name,l.company_name));
+		SELF.cnp_name := IF(l.cnp_name ='',r.cnp_name ,l.cnp_name);
 		SELF.company_status_derived := IF(l.company_status_derived='',r.company_status_derived,l.company_status_derived);
 		SELF.fname := IF(l.fname='',r.fname,l.fname);
 		SELF.mname := IF(l.mname='',r.mname,l.mname);
@@ -88,7 +95,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		SELF.phone  				:= l.phone;
 		SELF.dt_first_seen  := (STRING)r.dt_first_seen;
 		SELF.dt_last_seen   := (STRING)r.dt_last_seen;
-		SELF.CompanyName	  := r.Company_Name;
+		SELF.CompanyName	  := r.cnp_name;
 		SELF.listing_type_bus := Phones.Constants.ListingType.Business;
 		SELF.ActiveFlag 		:= r.company_status_derived;
 		SELF	:=	r;
@@ -128,7 +135,7 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		OUTPUT(dsPhonesPlus,NAMED('dsPhonesPlus'));	
 		OUTPUT(businessRequest,NAMED('businessRequest'));	
 		// OUTPUT(dsBusinesPhones,NAMED('dsBusinesPhones'));			
-		OUTPUT(dsBipData2,NAMED('dsBipData2'));	
+		// OUTPUT(dsBipData2,NAMED('dsBipData2'));	
 		OUTPUT(dsBips,NAMED('dsBips'));		
 		OUTPUT(dsRolledRaw,NAMED('dsRolledRaw'),all);	
 		OUTPUT(dsBusinessInfo,NAMED('dsBusinessInfo'));	

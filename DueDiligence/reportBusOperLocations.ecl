@@ -85,14 +85,22 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
 				       
 
 															
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-   UpdateBusnOperLocWithReport := DENORMALIZE(BusnData, BusOperLocChildDataset,
-	                                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-											                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := COUNT(LEFT.operatingLocations);
-                                                        //OperatingLocations is the NESTED CHILD DATASET  
-                                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations := LEFT.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations  + RIGHT.BusOperLocRiskChild;
-                                                        SELF := LEFT;));  
+	 sortedOperLocChildDS := SORT(UNGROUP(BusOperLocChildDataset), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+   rollOperLocChildDs := ROLLUP(sortedOperLocChildDS,
+                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                                TRANSFORM(RECORDOF(LEFT),
+                                          SELF.BusOperLocRiskChild := LEFT.BusOperLocRiskChild + RIGHT.BusOperLocRiskChild;
+                                          SELF := LEFT;));      
+                                          
+                              
+   updateBusnOperLocWithReport := JOIN(BusnData, rollOperLocChildDs,
+                                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocationCount := COUNT(LEFT.operatingLocations);
+                                                  SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessLocations.OperatingLocations := RIGHT.BusOperLocRiskChild;
+                                                  SELF := LEFT;),
+                                       LEFT OUTER);
+ 
 		
 		
 		  																													
@@ -111,5 +119,5 @@ EXPORT reportBusOperLocations(DATASET(DueDiligence.layouts.Busn_Internal) BusnDa
    // OUTPUT(BusOperLocChildDataset, NAMED('BusOperLocChildDataset'));
      
 
-	RETURN UpdateBusnOperLocWithReport;
+	RETURN updateBusnOperLocWithReport;
 END;

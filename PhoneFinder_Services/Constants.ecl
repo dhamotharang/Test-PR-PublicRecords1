@@ -150,6 +150,12 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	  EXPORT UNSIGNED1 SingleConsumer := 2;
 	  EXPORT UNSIGNED1 FullConsumer   := 3;
 	END;
+	
+	EXPORT RiskRules := MODULE
+	  EXPORT UNSIGNED1 SimCardInfo  := 35;
+	  EXPORT UNSIGNED1 DeviceInfo   := 36;
+	END;
+	
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    

@@ -111,7 +111,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 			
 		// consumer statements dataset contains information about disputed records as well as Statements.
 		consumer_statements_prep := FFD.prepareConsumerStatementsBatch(ds_statements, pc_recs, inFFDOptionsMask);
-    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, inFFDOptionsMask);                                               
+    consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask);                                               
     consumer_statements_alerts_pre := consumer_statements_prep + consumer_alerts;
 		
 		ds_JL_recs_flat := PROJECT(ds_flat_with_inquiry, LiensV2_Services.Batch_Layouts.fcra_batch_out);

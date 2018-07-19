@@ -1,4 +1,4 @@
-EXPORT MAC_Profile_Report_Service := MACRO
+﻿EXPORT MAC_Profile_Report_Service := MACRO
 #WEBSERVICE(FIELDS(	
 										/*---- Compliance Fields ----*/
 										'ApplicationType',

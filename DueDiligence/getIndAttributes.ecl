@@ -25,8 +25,11 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get the best data for the individual if do not have it
 	indBest := DueDiligence.getIndBestData(didFound, dppa, glba, includeReport);
   
+  //get estimated income
+  indEstIncome := DueDiligence.getIndEstimatedIncome(indBest);
+  
   //get geographic risk of the inquired individual's address  
-  indGeoRisk := DueDiligence.getIndGeographicRisk(indBest, dppa, glba, includeReport);
+  indGeoRisk := DueDiligence.getIndGeographicRisk(indEstIncome, dppa, glba, includeReport);
   
   //get proffessional license
   indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk);
@@ -44,11 +47,10 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   indProperty := DueDiligence.getIndProperty(indSSNData, dataRestrictionMask);
   
   //get legal information
-  indCriminalData := DueDiligence.getIndLegalEvents(indProperty, includeReport);
+  indCriminalData := DueDiligence.getIndLegalEvents(indProperty);
   
   //if a person report is being requested, populate the report
-  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indCriminalData, ssnMask),
-                                      indCriminalData);
+  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indCriminalData, ssnMask), indCriminalData);
 	
 	
 	//populate the attributes and flags
@@ -62,6 +64,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(didFound, NAMED('didFound')));
 	IF(debugMode, OUTPUT(noDIDFound, NAMED('noDIDFound')));
 	IF(debugMode, OUTPUT(indBest, NAMED('indBest')));
+	IF(debugMode, OUTPUT(indEstIncome, NAMED('indEstIncome')));
 	IF(debugMode, OUTPUT(indGeoRisk, NAMED('indGeoRisk')));
 	IF(debugMode, OUTPUT(indProfLic, NAMED('indProfLic')));
 	IF(debugMode, OUTPUT(indRelatives, NAMED('indRelatives')));
@@ -69,6 +72,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
 	IF(debugMode, OUTPUT(indProperty, NAMED('indProperty')));
 	IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
+	IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
 	IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
 
 

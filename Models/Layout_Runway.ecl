@@ -299,6 +299,14 @@ string2 OSN1608_1_0_reason4 := '';
 string2 OSN1608_1_0_reason5 := '';
 string2 OSN1608_1_0_reason6 := '';
 
+String3 OSN1803_1_0_score := '';
+string2 OSN1803_1_0_reason1 := '';
+string2 OSN1803_1_0_reason2 := '';
+string2 OSN1803_1_0_reason3 := '';
+string2 OSN1803_1_0_reason4 := '';
+string2 OSN1803_1_0_reason5 := '';
+string2 OSN1803_1_0_reason6 := '';
+
 String3 CDN604_0_0_score := '';
 string2 CDN604_0_0_reason1 := '';
 string2 CDN604_0_0_reason2 := '';

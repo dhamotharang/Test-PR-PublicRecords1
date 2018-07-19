@@ -91,8 +91,7 @@
 		BOOLEAN		atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
 		BOOLEAN		atleastOneBEOOrParentRegisteredVoter;
     /* Criminal Evidence flags*/                                    
-		BOOLEAN     BEOevidenceOfCurrentIncarceration;                // Level 9
-		BOOLEAN     BEOevidenceOfCurrentParole;                       // Level 9
+		BOOLEAN     BEOevidenceOfCurrentIncarcerationOrParole;        // Level 9
 		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 - at least one 4F - in last 3 years
 		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7 - at least one 4F - older than 3 years
 		BOOLEAN     BEOevidenceOfPreviousIncarceration;               // Level 6
@@ -101,16 +100,6 @@
 		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3 - at least one 4U - older than 3 years
 		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2 - at lease one 4M - older than 3 years
     BOOLEAN     BEONoEvidenceOfStateCriminal;
-    /* Traffic & Infraction Evidence flags*/                                    
-		BOOLEAN     BEOevidenceOf3TrafficNYR;                         // Level 9 - 3 or more traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf2TrafficNYR;                         // Level 8 - 1 or 2    traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsNYR;                     // Level 7 - 3 or more infractions in last 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsNYR;                     // Level 6 - 1 or 2    infractions in last 3 years
-		BOOLEAN     BEOevidenceOf3TrafficOlderNYR;                    // Level 5 - 3 or more traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf2TrafficOlderNYR;                    // Level 4 - 1 or 2    traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsOlderNYR;                // Level 3 - 3 or more infractions older than 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsOlderNYR;                // Level 2 - 1 or 2    infractions older than 3 years
-    BOOLEAN     BEONoEvidenceOfTrafficOrInfraction;
   END;
   
   
@@ -139,15 +128,6 @@
 		BOOLEAN			atleastOneCategory4;
 		BOOLEAN			atleastOneCategory3;
 		BOOLEAN			atleastOneCategory2;
-    /*PerLegalTrafficInfractions*/
-    BOOLEAN     threePlusTrafConvictPast3Yrs;
-    BOOLEAN     twoOrLessTrafConvictPast3Yrs;
-    BOOLEAN     threePlusInfractConvictPast3Yrs;
-    BOOLEAN     twoOrLessInfractConvictPast3Yrs;
-    BOOLEAN     threePlusTrafConvictOver3Yrs;
-    BOOLEAN     twoOrLessTrafConvictOver3Yrs;
-    BOOLEAN     threePlusInfractConvictOver3Yrs;
-    BOOLEAN     twoOrLessInfractConvictOver3Yrs;
     /*PerLegalCivil*/
     BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;
@@ -180,6 +160,8 @@
 		BOOLEAN			atleastOneInactiveFinRealEstate;		            //populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneInactiveMedical;					            //populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
+    /*PerAccessToFundsIncome*/
+    UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
   END;
 
 END;

@@ -55,11 +55,16 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 
 	// JOIN DEEDS AND ASSESSMENTS
 
-	HomesteadExemptionV2_Services.Layouts.taxYearRec gatherHmstdExmptns(HomesteadExemptionV2_Services.Layouts.assessmentSlim L) := TRANSFORM
+	HomesteadExemptionV2_Services.Layouts.hmstdYearRec gatherHmstdExmptns(HomesteadExemptionV2_Services.Layouts.assessmentSlim L) := TRANSFORM
 		hasExmptn:=L.homestead_homeowner_exemption='Y' OR	L.tax_exemption1_code='D' OR
 			L.tax_exemption2_code='D' OR L.tax_exemption3_code='D' OR L.tax_exemption4_code='D';
 		tax_year:=IF(L.tax_year!='',L.tax_year,L.assessed_value_year);
 		SELF.tax_year:=IF(hasExmptn AND tax_year!='',tax_year,SKIP);
+		SELF.hmstdExmptn:=L.homestead_homeowner_exemption;
+		SELF.exmptn1:=L.tax_exemption1_desc;
+		SELF.exmptn2:=L.tax_exemption2_desc;
+		SELF.exmptn3:=L.tax_exemption3_desc;
+		SELF.exmptn4:=L.tax_exemption4_desc;
 	END;
 
 	HomesteadExemptionV2_Services.Layouts.taxYearRec gatherSeenDates(HomesteadExemptionV2_Services.Layouts.assessmentSlim L) := TRANSFORM
@@ -72,7 +77,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 		hasAssessments:=EXISTS(R.assessment_records.assessments(isAssessee));
 		isInputAddress:=IF(hasDeedRecords,L.isInputAddress,R.isInputAddress);
 
-		hmstdExmptns:=DEDUP(SORT(PROJECT(R.assessment_records.assessments(isAssessee),gatherHmstdExmptns(LEFT)),tax_year),tax_year);
+		hmstdExmptns:=DEDUP(SORT(PROJECT(R.assessment_records.assessments(isAssessee),gatherHmstdExmptns(LEFT)),tax_year,-hmstdExmptn,-exmptn1),tax_year);
 		cntHmstdExmptns:=COUNT(hmstdExmptns);
 		firstHmstdExmptn:=MIN(hmstdExmptns,tax_year);
 		lastHmstdExmptn:=MAX(hmstdExmptns,tax_year);
@@ -264,8 +269,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 
 	HomesteadExemptionV2_Services.Layouts.propertyRec appendDrivers
 		(HomesteadExemptionV2_Services.Layouts.propertyRec L,DATASET(HomesteadExemptionV2_Services.Layouts.propDriverRec) R) := TRANSFORM
-			drivers:=SORT(R.drivers(hasCurrAddrMatch),-lic_issue_date);
-			SELF.driver_records:=PROJECT(drivers,TRANSFORM(HomesteadExemptionV2_Services.Layouts.driverRec,SELF:=LEFT));
+			SELF.driver_records:=PROJECT(R.drivers,TRANSFORM(HomesteadExemptionV2_Services.Layouts.driverRec,SELF:=LEFT));
 			SELF:=L;
 	END;
 
@@ -281,8 +285,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 
 	HomesteadExemptionV2_Services.Layouts.propertyRec appendVoters
 		(HomesteadExemptionV2_Services.Layouts.propertyRec L,DATASET(HomesteadExemptionV2_Services.Layouts.propVoterRec) R) := TRANSFORM
-			voters:=SORT(R.voters(hasAddrMatch),-LastDateVote);
-			SELF.voter_records:=PROJECT(voters,TRANSFORM(HomesteadExemptionV2_Services.Layouts.voterRec,SELF:=LEFT));
+			SELF.voter_records:=PROJECT(R.voters,TRANSFORM(HomesteadExemptionV2_Services.Layouts.voterRec,SELF:=LEFT));
 			SELF:=L;
 	END;
 
@@ -306,10 +309,12 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 			SELF.Ownership_Record.did           :=RIGHT.did,
 			SELF.Ownership_Record.ln_fares_id   :=RIGHT.ln_fares_id,
 			SELF.Ownership_Record.owner_did     :=RIGHT.owner_did,
+			SELF.Ownership_Record.owner_bdid    :=RIGHT.owner_bdid,
 			SELF.Ownership_Record.name_first    :=RIGHT.name_first,
 			SELF.Ownership_Record.name_middle   :=RIGHT.name_middle,
 			SELF.Ownership_Record.name_last     :=RIGHT.name_last,
 			SELF.Ownership_Record.name_suffix   :=RIGHT.name_suffix,
+			SELF.Ownership_Record.company_name  :=RIGHT.company_name,
 			SELF.Ownership_Record.sale_date     :=RIGHT.sale_date,
 			SELF.Ownership_Record.contract_date :=RIGHT.contract_date,
 			SELF.Ownership_Record.isCurrentOwner:=RIGHT.isCurrentOwner,
@@ -321,7 +326,18 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 	// APPEND PROPERTIES TO WORK RECORD
 
 	HomesteadExemptionV2_Services.Layouts.workRec denormPropRecs(ds_work_in L,DATASET(HomesteadExemptionV2_Services.Layouts.propertyRec) R) := TRANSFORM
-		SELF.property_records:=PROJECT(R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.propertyRec,SELF:=LEFT));
+		// RESERVE _1 BATCH OUTPUT FIELDS FOR INPUT ADDRESS ONLY
+		HomesteadExemptionV2_Services.Layouts.propertyRec inputAddrProp() := TRANSFORM
+			SELF.acctno:=L.acctno;
+			SELF.did:=L.did;
+			SELF.property_id:='INPUT ADDR PLACE HOLDER RECORD';
+			SELF.property_rank:=HomesteadExemptionV2_Services.Constants.INPUT_ADDR;
+			SELF.sortby_date:=L.tax_year+'0000';
+			SELF:=[];
+		END;
+		hasInputAddrProp:=EXISTS(R(property_rank=HomesteadExemptionV2_Services.Constants.INPUT_ADDR));
+		InputPropertyIfExists:=IF(hasInputAddrProp,DATASET([],HomesteadExemptionV2_Services.Layouts.propertyRec),DATASET([inputAddrProp()]));
+		SELF.property_records:=PROJECT(InputPropertyIfExists+R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.propertyRec,SELF:=LEFT));
 		SELF:=L;
 	END;
 

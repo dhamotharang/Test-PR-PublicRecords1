@@ -380,7 +380,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		
 	// consumer statements dataset contains information about disputed records as well as Statements.
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask));
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, inFFDOptionsMask));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 
 	BatchShare.MAC_RestoreAcctno(ds_ready, consumer_statements_alerts, consumer_statements_acctno,false,false);

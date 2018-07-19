@@ -799,10 +799,28 @@ self.OSN1608_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_OSN1608_1_0, named('with_OSN1608_1_0'));	
 
+
+/*  Custom model for Wallmart within Order Score  */  
+OSN1803_1_0_score :=  models.OSN1803_1_0(group(clambtst,bill_to_out.seq), IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);   
+with_OSN1803_1_0	:= join(with_OSN1608_1_0, OSN1803_1_0_score,                                     //Join this set of reason codes with the previous set 
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.OSN1803_1_0_score := right.score;
+self.OSN1803_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.OSN1803_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.OSN1803_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.OSN1803_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.OSN1803_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.OSN1803_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_OSN1803_1_0, named('with_OSN1803_1_0'));	
+
+
+
 CDN604_0_0_score := Models.CDN604_0_0 (group(clambtst,bill_to_out.seq), ofac);
 // output(CDN604_0_0_score, named('CDN604_0_0_score'));
 
-with_CDN604_0_0	:= join(with_OSN1608_1_0, CDN604_0_0_score,
+with_CDN604_0_0	:= join(with_OSN1803_1_0, CDN604_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.cdn604_0_0_score := right.score;
@@ -4903,6 +4921,15 @@ self.OSN1608_1_0_reason3	:= if(model_environment in [1,3], left.OSN1608_1_0_reas
 self.OSN1608_1_0_reason4	:= if(model_environment in [1,3], left.OSN1608_1_0_reason4	, '');
 self.OSN1608_1_0_reason5	:= if(model_environment in [1,3], left.OSN1608_1_0_reason5	, '');
 self.OSN1608_1_0_reason6	:= if(model_environment in [1,3], left.OSN1608_1_0_reason6	, '');
+
+/*  This is the custom model for Wallmart within the Order Score Product  */    
+self.OSN1803_1_0_score	:= if(model_environment in [1,3], left.OSN1803_1_0_score	, '');
+self.OSN1803_1_0_reason1	:= if(model_environment in [1,3], left.OSN1803_1_0_reason1	, '');
+self.OSN1803_1_0_reason2	:= if(model_environment in [1,3], left.OSN1803_1_0_reason2	, '');
+self.OSN1803_1_0_reason3	:= if(model_environment in [1,3], left.OSN1803_1_0_reason3	, '');
+self.OSN1803_1_0_reason4	:= if(model_environment in [1,3], left.OSN1803_1_0_reason4	, '');
+self.OSN1803_1_0_reason5	:= if(model_environment in [1,3], left.OSN1803_1_0_reason5	, '');
+self.OSN1803_1_0_reason6	:= if(model_environment in [1,3], left.OSN1803_1_0_reason6	, '');
 
 self.CDN604_1_0_score	:= if(model_environment in [1,3], left.CDN604_1_0_score	, '');
 
