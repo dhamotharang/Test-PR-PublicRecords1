@@ -157,8 +157,7 @@ FUNCTION
 	
 	emptyWHRI := join(empty_whriAddr, sources_whri,
 					left.reqdata.seq = right.seq and
-					right.source_code[2] = 'O' and 
-					(left.reqdata.in_state = '' or left.reqdata.in_state  = right.address.st),
+					right.source_code[2] = 'O',
 				add_mailing_addr(LEFT,RIGHT), left outer, keep(1));
 				
 				
@@ -658,7 +657,7 @@ END;
 	// output(withPropValue, named('phf_withPropValue'));	
   // output(withPropValue, named('phf_withPropValue'));
 
-	if (nonUniqueAddress, fail('Too many records found'));
+	if (nonUniqueAddress, fail(203, doxie.ErrorCodes(203)));
 	return out_pull8;
 
 END;
