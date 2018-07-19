@@ -1,8 +1,10 @@
 ﻿export IPAddress 
  :=
   module
-	export  string  bctlpedata10    :=  'bctlpedata10.risk.regn.net';     // 10.121.149.192
-	export  string  bctlpedata11    :=  'bctlpedata11.risk.regn.net';     // 10.121.149.193
+	/*export  string  bctlpedata10    :=  'bctlpedata10.risk.regn.net';     // 10.121.149.192
+	export  string  bctlpedata11    :=  'bctlpedata11.risk.regn.net';     // 10.121.149.193*/
+	export  string  bctlpedata10    :=  'uspr-edata10.risk.regn.net';     // 10.121.149.192 (primary - bctlpedata10); 10.195.76.30 (secondary - alalpedata10)
+ 	export  string  bctlpedata11    :=  'uspr-edata11.risk.regn.net';     // 10.121.149.193 (primary - bctlpedata11); 10.195.76.31 (secondary - alalpedata11)
 	export  string  bctlpedata12    :=  'bctlpedata12.risk.regn.net';     // 10.121.149.194
 	export	string	edata10			    :=	'edata10-bld.br.seisint.com';			// 10.150.13.201
 	export	string	edata11			    :=	'edata11-bld.br.seisint.com';			// 10.150.12.242

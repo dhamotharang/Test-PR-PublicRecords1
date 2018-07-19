@@ -76,15 +76,16 @@ EXPORT LeadIntegrity_Validation(STRING8 date_in, STRING part_in) := MODULE
 
 				dset_Input := DISTRIBUTE(DATASET('~in::marketmagnifier::leadintegrity::'+lead_integrity_input_suffix,
 																			   LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout,
-																				 CSV(HEADING(SINGLE),SEPARATOR(','))),HASH64(lexid));
-									 
+																				 CSV(HEADING(0),SEPARATOR('|')))(acctno<>'acctno'),HASH64(lexid));
+
 				dset_output := DISTRIBUTE(DATASET('~out::base::ar::' + lead_integrity_output_suffix,
 																					Layout_LeadIntegrity_Attr_Output,
-																				  CSV(HEADING(SINGLE),SEPARATOR('|'),quote('"'))),HASH64(lexid));
+																				  CSV(HEADING(0),SEPARATOR('|'),quote('"'))),HASH64(lexid));
 
 				dset_validate_input_output := JOIN(dset_Input, dset_output,
-																					 LEFT.lexid = RIGHT.lexid and
-																					 LEFT.seq = RIGHT.seq, LOCAL);	
+																					 LEFT.lexid = RIGHT.lexid// and
+																					 // LEFT.seq = RIGHT.seq
+																					 , LOCAL);	
 				
 				dset_CurrAddrDwellType := dset_output(CurrAddrDwellType NOT IN ['-1','F','G','H','M','P','R','S','U','']);
 				dset_Curraddrapplicantowned := dset_output(Curraddrapplicantowned NOT IN ['0','1','-1','']);

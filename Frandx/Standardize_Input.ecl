@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, _Validate;
+﻿import Address, Ut, lib_stringlib, _Control, _Validate;
 
 export Standardize_Input :=
 module
@@ -35,9 +35,11 @@ module
 			//////////////////////////////////////////////////////////////////////////////////////																																												 
 			self.prep_addr_line1										:= addr1;
 			self.prep_addr_line_last								:= addr2;
+			
+			CleanDate																:= ut.date_slashed_MMDDYYYY_to_YYYYMMDD(l.frn_start_date);
                                           
-			self.dt_first_seen											:= if(_validate.date.fIsValid(l.frn_start_date),(unsigned4)l.frn_start_date, 0);
-			self.dt_last_seen												:= if(_validate.date.fIsValid(l.frn_start_date),(unsigned4)l.frn_start_date, 0);
+			self.dt_first_seen											:= if(_validate.date.fIsValid(CleanDate),(unsigned4)CleanDate, 0);
+			self.dt_last_seen												:= if(_validate.date.fIsValid(CleanDate),(unsigned4)CleanDate, 0);
 			self.dt_vendor_first_reported						:= (unsigned4)pversion;
 			self.dt_vendor_last_reported						:= (unsigned4)pversion;
 						

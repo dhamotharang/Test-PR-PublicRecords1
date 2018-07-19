@@ -1,4 +1,4 @@
-import tools, _control;
+﻿import tools, _control;
 
 export fSprayFiles(
 
@@ -46,7 +46,7 @@ function
 		,''                                                            
 		,'VARIABLE'                                                         
 		,''                                                     
-		,_Dataset().max_record_size * 180
+		,_Dataset().max_record_size * 200
 		,'~~~~~'
 		,'</personData>'
 		,'~~~~@@'
