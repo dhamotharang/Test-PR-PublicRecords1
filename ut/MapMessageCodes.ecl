@@ -27,6 +27,6 @@ export varstring MapMessageCodes(integer c) :=
 						ut.constants_MessageCodes.DEMO_SEARCH_TOOL_INVAILD_BIZ_COUNT      => 'Demo Search Tool: Invalid search. You must enter a count of at least 2 when searching for multiple businesses at an address.',
 						ut.constants_MessageCodes.DEMO_SEARCH_TOOL_INVAILD_SEARCH_TYPE    => 'Demo Search Tool: You must enter a valid search type: Person, business, Multi Businesses at an address.',
 						ut.constants_MessageCodes.DEMO_SEARCH_TOOL_INVAILD_SEARCH_INPUT   => 'Demo Search Tool: You must enter a valid integer for the counts.',
-						ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET      => 'FCRA Case Num Search: Minimum search input not met. Please enter case number + 9 digit SSN; case number + first name + last name + state OR case number + UniqueId OR Case Number + City + State + Attorney Name OR Case Number + Court Location.',
+						ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET      => 'FCRA Case Num Search: Minimum search input not met. Please enter case number + 9 digit SSN; case number + first name + last name + state OR case number + UniqueId.',
 						ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED  => 'FCRA Case Num Search: Not enough information. Please enter more input fields to narrow to one person.',  
       '');
