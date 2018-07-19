@@ -472,6 +472,8 @@ export Main         :=
 	string10					clean_SSN :='';
 	string10					clean_Zip :='';
 	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
+
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
 	string1						Ethnicity := '';
@@ -669,6 +671,7 @@ export keybuild
 	string10					clean_SSN :='';
 	string10					clean_Zip :='';
 	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';

@@ -268,14 +268,22 @@ EXPORT Functions :=  MODULE
 		RETURN file_type_v;
 	END;
 	EXPORT ind_type_fn(string1 customer_program) := function
-		ind_type_v := map(
+		import _Control;
+		ind_type_dev_v := map(
 											 customer_program = 'S' => 1292,
 											 customer_program = 'M' => 1302,
 											 customer_program = 'U' => 1321,
 											 customer_program = 'N' => 1312,
 											 0
 											);
-		RETURN ind_type_v;
+		ind_type_prod_v := map(
+											 customer_program = 'S' => 1014,
+											 customer_program = 'M' => 1024,
+											 customer_program = 'U' => 1321,
+											 customer_program = 'N' => 1312,
+											 0
+											);
+		RETURN if(_Control.ThisEnvironment.Name='Dataland',ind_type_dev_v,ind_type_prod_v);
 	END;
 
 	EXPORT new_addresses(pInputFile) := 
@@ -395,6 +403,8 @@ EXPORT Functions :=  MODULE
 			RETURN Refresh_Address_Cache;
 
 	ENDMACRO;
+	
+	EXPORT LastRingID := MAX(FraudShared.Files().Base.Main.Built(DID >= FraudGovPlatform.Constants().FirstRingID), DID):independent;
 
 END; 
 			
