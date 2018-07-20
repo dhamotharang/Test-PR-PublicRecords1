@@ -1,6 +1,6 @@
 // Function to build a property history record set. 
 
-import codes, address, ln_propertyv2, doxie, ut, risk_indicators, doxie_cbrs, LN_PropertyV2_Services, Suppress,
+import codes, address, Advo, ln_propertyv2, doxie, ut, risk_indicators, doxie_cbrs, LN_PropertyV2_Services, Suppress,
        STD;
 
 todays_date := (string) STD.Date.Today();
@@ -114,17 +114,13 @@ FUNCTION
 						wild(right.source_code_2) and
 						keyed(right.source_code_1 = 'O'),
 					get_address(LEFT,RIGHT), left outer, keep(500));
-													
 
-
-	sourcessorted := dedup(sort(sourceaddrs,seq,source_code, address.prim_range, address.prim_name, address.sec_range, address.zip),
-					seq, source_code, address.prim_range, address.prim_name, address.sec_range, address.zip);
-	
-	
+	sourcessorted := dedup(sort(sourceaddrs, seq, source_code, address.prim_range, address.prim_name, address.zip, -address.sec_range),
+					seq, source_code, address.prim_range, address.prim_name, address.zip, 
+					left.address.sec_range = right.address.sec_range or right.address.sec_range = '');
 
 	maxHRIPer_Value := 50;
 	doxie.mac_AddHRIAddress(sourcessorted, sources_whri, address.zip, address.prim_name, address.suffix, address.predir, address.postdir, address.prim_range, address.sec_range);
-	
 
 	avm_data := append_AVM_function(inData, doAVM);
 	
@@ -143,14 +139,15 @@ FUNCTION
 		self := L;
 	end;
 	
-	
-	
 	empty_whriAddr := join(withPropValue, sources_whri,
 							left.reqdata.seq = Right.seq and
-							right.source_code[2] = 'P'   and
+							right.source_code[2] = 'P' and 
 						  (left.reqdata.in_state = '' or left.reqdata.in_state  = right.address.st),
 					    add_source_addr(LEFT,RIGHT), left outer,LIMIT(0));
-	empty_whriAddr1 := LIMIT(empty_whriAddr,1,fail(310, doxie.ErrorCodes(310)));
+
+	// make sure there is no more than one unique address per seq
+	cttab := table(empty_whriAddr, {unsigned seq := reqData.seq, unsigned ct := count(group)}, reqData.seq);
+	nonUniqueAddress := exists(cttab(ct > 1));
 	
 	emptyResults add_mailing_addr(EmptyResults L, sources_whri R) := transform
 		self.mailing_Address := R.address;
@@ -158,7 +155,7 @@ FUNCTION
 		self := L;
 	end;
 	
-	emptyWHRI := join(empty_whriAddr1, sources_whri,
+	emptyWHRI := join(empty_whriAddr, sources_whri,
 					left.reqdata.seq = right.seq and
 					right.source_code[2] = 'O',
 				add_mailing_addr(LEFT,RIGHT), left outer, keep(1));
@@ -648,11 +645,19 @@ END;
 	// transactions/sale.buyers/hri_ssn/ssn
 	// transactions/sale.sellers/hri_ssn/ssn
 	
+	// output(byAPN1, named('phf_byAPN1'));
+	// output(byAPN2, named('phf_byAPN2'));
+	// output(sourceaddrs, named('phf_sourceaddrs'));
+	// output(sources_whri, named('phf_sources_whri'));
+	// output(empty_whriAddr, named('phf_empty_whriAddr'));
+	// output(cttab, named('phf_cttab'));
 	// output(indata, named('phf_indata') );
 	// output(emptyResults, named('phf_emptyResults'));
 	// output(avm_data, named('phf_avm_data'));
 	// output(withPropValue, named('phf_withPropValue'));	
   // output(withPropValue, named('phf_withPropValue'));
+
+	if (nonUniqueAddress, fail(203, doxie.ErrorCodes(203)));
 	return out_pull8;
 
 END;
