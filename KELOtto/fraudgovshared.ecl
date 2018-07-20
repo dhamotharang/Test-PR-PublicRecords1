@@ -7,17 +7,21 @@ This is specifically to work around the massive skews because of the input data.
 
 CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgov(clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and did > 0),
                                    KELOtto.SharingRules, 
-                       LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
+                       //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
+                       
+                       HASH32(TRIM(LEFT.Customer_Id) + '|' + TRIM((STRING)LEFT.classification_Permissible_use_access.Ind_type))=RIGHT.sourcecustomerhash,
                        TRANSFORM(
                          {
                            RECORDOF(LEFT),
                            UNSIGNED SourceCustomerFileInfo,
                            UNSIGNED AssociatedCustomerFileInfo,
                          },
-                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
-                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
-                           SELF := LEFT), LOOKUP, MANY)
-/*                           
+                           SELF.SourceCustomerFileInfo := RIGHT.sourcecustomerhash,
+                           SELF.AssociatedCustomerFileInfo := RIGHT.targetcustomerhash,
+//                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
+//                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
+                           SELF := LEFT), LOOKUP, MANY) 
+                           /*
 (did in 
 [
 1866498437,229517290,1087197263,2308576643,193851693630,1271418440,102648498593,99641229116,160817499539,
@@ -88,7 +92,9 @@ CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgov(clean_address.prim_range != 
 000503942122,
 010412123969
 ] 
-or ssn in ['595637941','589650781','770703763'])*/
+or ssn in ['595637941','589650781','770703763'])
+*/
                            : PERSIST('~temp::deleteme27');
+                           
                            
 EXPORT FraudGovShared := CustomerAddressPersonPrep1;

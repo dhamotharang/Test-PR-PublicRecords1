@@ -6,14 +6,6 @@ EXPORT Build_Base_Main (
 	) := 
 module
 
-	 // Apply AID logic to everything.  
-	 
-  // dAppendAID     := Standardize_Entity.address(pBaseFile) : persist(Persistnames.AppendAID);
-	// dAppendPhone   := Standardize_Entity.Phone (dAppendAID);
-
-	// Add DID, BDID 
-	// NewBase        := Append_IDs.fAll(dAppendPhone);
-													
 	// Rollup Main Base 
 	pDataset_sort := sort(pBaseFile , record, -dt_last_seen,-process_date);
 			

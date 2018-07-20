@@ -13,7 +13,7 @@ EXPORT macPivotLiteV2(d,f,g):=FUNCTIONMACRO
         #SET(i,%'{@label}'%)
       #ELSE
         #SET(FieldName, %'{@label}'%)
-        #IF(%'i'%='' AND Std.Str.Find(g, %'FieldName'%) > 0)
+        #IF(%'i'%='' AND Std.Str.Find(Std.Str.ToLowerCase(g), %'FieldName'%) > 0)
           #APPEND(o,'+TABLE('+#TEXT(d)+',{'+#TEXT(f)+';STRING field:=\''+%'{@label}'%+'\';STRING200 value:=(STRING)'+%'{@label}'%+';UNSIGNED s:='+%'n'%+'})\n')
           #SET(n,%n%+1)
         #ELSE
@@ -24,7 +24,7 @@ EXPORT macPivotLiteV2(d,f,g):=FUNCTIONMACRO
       #END
     #END
   #END
-  #SET(o,'PROJECT(SORT('+%'o'%[2..]+','+#TEXT(f)+',s, skew(1)),{RECORDOF(LEFT)-[s]})');
+  #SET(o,'PROJECT(SORT(DISTRIBUTE('+%'o'%[2..]+', HASH32(s)),'+#TEXT(f)+',s, skew(1), LOCAL),{RECORDOF(LEFT)-[s]})');
 
   RETURN %o%;
 ENDMACRO;

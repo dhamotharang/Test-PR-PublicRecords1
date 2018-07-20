@@ -27,5 +27,3 @@ export Create_Supers :=
 	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::delete::inquirylogs');	
 
 	// Std.File.CreateSuperFile('~thor_data400::Scrubs_FraudGov::Log');
-	// Std.File.CreateSuperFile('~thor_data400::out::fraudgov::NewHeader_flag');
-	// Std.File.CreateSuperFile('~thor_data400::out::fraudgov::refreshaddresses_flag');	

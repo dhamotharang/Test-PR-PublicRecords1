@@ -12,8 +12,8 @@ EXPORT macPivotOttoOutput(indata,fieldlist,outputfieldlist):=FUNCTIONMACRO
   d1 := PROJECT(d, TRANSFORM({RECORDOF(LEFT), UNSIGNED8 EntityHash}, SELF.EntityHash := %EntityHash%, SELF := LEFT));
   d2 := RAMPS_Functions.macPivotLiteV2(d1, EntityHash, outputfieldlist);
   d3 := PROJECT(d2, TRANSFORM({RECORDOF(LEFT), STRING indicatortype, STRING indicatordescription, STRING Label, STRING FieldType, UNSIGNED RiskLevel}, 
-	                 SELF.indicatordescription := MAP(LEFT.field[1..3] = 'cl_' => 'Cluster', MAP(LEFT.field[1..3] = 'vl_' => 'Velocity', MAP(LEFT.field[1..3] = 'kr_' => 'Known Risk', 'Identity'))),
-									 SELF.indicatortype := MAP(LEFT.field[1..3] = 'cl_' => 'CL', MAP(LEFT.field[1..3] = 'vl_' => 'VL', MAP(LEFT.field[1..3] = 'kr_' => 'KR', 'ID'))),
+	                 SELF.indicatordescription := MAP(LEFT.field[1..3] = 'cl_' => 'Cluster', MAP(LEFT.field[1..3] = 'vl_' => 'Velocity', MAP(LEFT.field[1..3] = 'kr_' => 'Known Risk', MAP(LEFT.field[1..3] = 'id_' => 'Identity', 'unk')))),
+									 SELF.indicatortype := MAP(LEFT.field[1..3] = 'cl_' => 'CL', MAP(LEFT.field[1..3] = 'vl_' => 'VL', MAP(LEFT.field[1..3] = 'kr_' => 'KR', MAP(LEFT.field[1..3] = 'id_' => 'ID', 'unk')))),
 									 SELF.RiskLevel := RANDOM() % 4;
 									 
                    SELF.Label := TRIM(Std.Str.ToCapitalCase(Std.Str.FindReplace(LEFT.Field, '_', ' ')), LEFT), 

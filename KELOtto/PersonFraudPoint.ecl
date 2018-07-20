@@ -12,8 +12,9 @@ PersonFraudPointRec := RECORD
   string3 v2_inputaddrageoldest;
   string2 v2_inputaddrdwelltype;
   string3 v2_divssnidentitycountnew;
+  string errorcode;
  END;
 
-EXPORT PersonFraudPointPrep := PULL(DATASET('~foreign::10.173.44.105::thor_data::out::frodgov_iddt_20180301_fp', PersonFraudPointRec, THOR));
+EXPORT PersonFraudPointPrep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::fraudpoint', PersonFraudPointRec, THOR));
 
 EXPORT PersonFraudPoint := JOIN(KELOtto.CustomerLexId, PersonFraudPointPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));

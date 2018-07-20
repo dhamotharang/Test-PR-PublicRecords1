@@ -24,19 +24,19 @@
           // Track whether this is the beginning of a record
           #SET(BeginRecord, %@IsRecord%=1)
             #IF (%@IsDataset%=1)
-                #IF (NOT REGEXFIND('{$',%'Code'%) )
+                #IF (NOT REGEXFIND('\\{$',%'Code'%) )
                   #APPEND(Code,',')
                 #END
                 #APPEND(Code, 'DATASET ' + %'@label'% + ' := TABLE(' + %'Prefix'% + '.' + %'@label'% + ', {')
             #ELSE
               #IF (%BeginRecord%)
-                #IF (NOT REGEXFIND('{$',%'Code'%) )
+                #IF (NOT REGEXFIND('\\{$',%'Code'%) )
                   #APPEND(Code,',')
                 #END
                 #APPEND(Code, '{')
               #END
               #IF (%@IsEnd%=0 AND %@IsRecord%=0)
-                #IF (NOT REGEXFIND('{$',%'Code'%))
+                #IF (NOT REGEXFIND('\\{$',%'Code'%))
                   #APPEND(Code,',')
                 #END
                 #APPEND(Code, 'TYPEOF(' + %'Prefix'% + '.' + %'@label'% + ') ' + %'@label'% + ' := ' + %'Prefix'% + '.' + %'@label'%)

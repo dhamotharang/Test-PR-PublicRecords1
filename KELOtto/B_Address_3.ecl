@@ -6,14 +6,14 @@ EXPORT B_Address_3 := MODULE
   SHARED VIRTUAL TYPEOF(E_Address.__Result) __E_Address := E_Address.__Result;
   SHARED VIRTUAL TYPEOF(B_Person_4.__ENH_Person_4) __ENH_Person_4 := B_Person_4.__ENH_Person_4;
   SHARED VIRTUAL TYPEOF(E_Person_Address.__Result) __E_Person_Address := E_Person_Address.__Result;
-  SHARED __EE18018 := __E_Address;
-  SHARED __EE18161 := __E_Person_Address;
-  SHARED __EE19221 := __EE18161(__NN(__EE18161.Location_) AND __NN(__EE18161.Subject_));
-  SHARED __EE18177 := __ENH_Person_4;
-  SHARED __EE18419 := __EE18177(__EE18177.In_Customer_Population_ = 1);
-  __JC19239(E_Person_Address.Layout __EE19221, B_Person_4.__ST4013_Layout __EE18419) := __EEQP(__EE19221.Subject_,__EE18419.UID);
-  SHARED __EE19240 := JOIN(__EE19221,__EE18419,__JC19239(LEFT,RIGHT),TRANSFORM(E_Person_Address.Layout,SELF:=LEFT),HASH,KEEP(1));
-  SHARED __ST18325_Layout := RECORD
+  SHARED __EE21554 := __E_Address;
+  SHARED __EE21718 := __E_Person_Address;
+  SHARED __EE22912 := __EE21718(__NN(__EE21718.Location_) AND __NN(__EE21718.Subject_));
+  SHARED __EE21734 := __ENH_Person_4;
+  SHARED __EE21991 := __EE21734(__EE21734.In_Customer_Population_ = 1);
+  __JC22930(E_Person_Address.Layout __EE22912, B_Person_4.__ST9143_Layout __EE21991) := __EEQP(__EE22912.Subject_,__EE21991.UID);
+  SHARED __EE22931 := JOIN(__EE22912,__EE21991,__JC22930(LEFT,RIGHT),TRANSFORM(E_Person_Address.Layout,SELF:=LEFT),HASH,KEEP(1));
+  SHARED __ST21892_Layout := RECORD
     KEL.typ.ntyp(E_Address.Typ) UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
@@ -21,18 +21,20 @@ EXPORT B_Address_3 := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE19266 := PROJECT(__EE19240,TRANSFORM(__ST18325_Layout,SELF.UID := LEFT.Location_,SELF := LEFT));
-  SHARED __ST18347_Layout := RECORD
+  SHARED __EE22957 := PROJECT(__EE22931,TRANSFORM(__ST21892_Layout,SELF.UID := LEFT.Location_,SELF := LEFT));
+  SHARED __ST21914_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_Address_ := 0;
     KEL.typ.ntyp(E_Address.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE19279 := PROJECT(__CLEANANDDO(__EE19266,TABLE(__EE19266,{KEL.typ.int C_O_U_N_T___Person_Address_ := COUNT(GROUP),UID},UID,MERGE)),__ST18347_Layout);
-  SHARED __ST18627_Layout := RECORD
+  SHARED __EE22970 := PROJECT(__CLEANANDDO(__EE22957,TABLE(__EE22957,{KEL.typ.int C_O_U_N_T___Person_Address_ := COUNT(GROUP),UID},UID,MERGE)),__ST21914_Layout);
+  SHARED __ST22209_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
+    KEL.typ.nbool _addresspobox_;
+    KEL.typ.nbool _addresscmra_;
     KEL.typ.nint Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -44,8 +46,8 @@ EXPORT B_Address_3 := MODULE
     KEL.typ.nstr Postal_City_;
     KEL.typ.nstr Vanity_City_;
     KEL.typ.nstr State_;
-    KEL.typ.nint Z_I_P_;
-    KEL.typ.nint Z_I_P4_;
+    KEL.typ.nstr Zip_;
+    KEL.typ.nstr Zip4_;
     KEL.typ.nstr Carrier_Route_Number_;
     KEL.typ.nstr Carrier_Route_Sortation_At_Z_I_P_;
     KEL.typ.nint Line_Of_Travel_;
@@ -61,23 +63,26 @@ EXPORT B_Address_3 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
+    KEL.typ.ndataset(E_Address.Hri_List_Layout) Hri_List_;
     KEL.typ.int C_O_U_N_T___Person_Address_ := 0;
     KEL.typ.ntyp(E_Address.Typ) U_I_D__1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC19285(E_Address.Layout __EE18018, __ST18347_Layout __EE19279) := __EEQP(__EE18018.UID,__EE19279.UID);
-  __ST18627_Layout __JT19285(E_Address.Layout __l, __ST18347_Layout __r) := TRANSFORM
+  __JC22976(E_Address.Layout __EE21554, __ST21914_Layout __EE22970) := __EEQP(__EE21554.UID,__EE22970.UID);
+  __ST22209_Layout __JT22976(E_Address.Layout __l, __ST21914_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE19286 := JOIN(__EE18018,__EE19279,__JC19285(LEFT,RIGHT),__JT19285(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST3581_Layout := RECORD
+  SHARED __EE22977 := JOIN(__EE21554,__EE22970,__JC22976(LEFT,RIGHT),__JT22976(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST8811_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
+    KEL.typ.nbool _addresspobox_;
+    KEL.typ.nbool _addresscmra_;
     KEL.typ.nint Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -89,8 +94,8 @@ EXPORT B_Address_3 := MODULE
     KEL.typ.nstr Postal_City_;
     KEL.typ.nstr Vanity_City_;
     KEL.typ.nstr State_;
-    KEL.typ.nint Z_I_P_;
-    KEL.typ.nint Z_I_P4_;
+    KEL.typ.nstr Zip_;
+    KEL.typ.nstr Zip4_;
     KEL.typ.nstr Carrier_Route_Number_;
     KEL.typ.nstr Carrier_Route_Sortation_At_Z_I_P_;
     KEL.typ.nint Line_Of_Travel_;
@@ -106,10 +111,11 @@ EXPORT B_Address_3 := MODULE
     KEL.typ.nstr Geo_Match_;
     KEL.typ.nstr A_C_E_Cleaner_Error_Code_;
     KEL.typ.nbool _is_Additional_;
-    KEL.typ.int Person_Count_ := 0;
+    KEL.typ.ndataset(E_Address.Hri_List_Layout) Hri_List_;
+    KEL.typ.int Identity_Count_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Address_3 := PROJECT(__EE19286,TRANSFORM(__ST3581_Layout,SELF.Person_Count_ := LEFT.C_O_U_N_T___Person_Address_,SELF := LEFT));
+  EXPORT __ENH_Address_3 := PROJECT(__EE22977,TRANSFORM(__ST8811_Layout,SELF.Identity_Count_ := LEFT.C_O_U_N_T___Person_Address_,SELF := LEFT));
 END;

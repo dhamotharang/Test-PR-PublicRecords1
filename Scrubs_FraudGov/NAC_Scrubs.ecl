@@ -30,6 +30,7 @@ EXPORT NAC_Scrubs := MODULE
   END;
   EXPORT  Bitmap_Layout := RECORD(NAC_Layout_NAC)
     UNSIGNED8 ScrubsBits1;
+    UNSIGNED8 ScrubsCleanBits1;
   END;
 EXPORT FromNone(DATASET(NAC_Layout_NAC) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
@@ -114,6 +115,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
     Rules_NoErrors := 0;
+    Rules_WithEdits := 0;
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
@@ -121,6 +123,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
     SELF.Rules_WithErrors := IF(le.SearchAddress1StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchCaseId_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enduserip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.CaseID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientFirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientMiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientLastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientPhone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientEmail_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF.Rules_WithEdits := IF(le.SearchAddress1State_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1State_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1State_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.enduserip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.enduserip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_LENGTHS_WouldModifyCount > 0, 1, 0);
     SELF := le;
   END;
   EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
@@ -194,7 +197,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'rule:Number_Perfect_Rules:SUMMARY'
           ,'rule:Number_OnFail_Rules:SUMMARY'
           ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,NAC_Fields.InvalidMessage_SearchAddress1StreetAddress1(1)
           ,NAC_Fields.InvalidMessage_SearchAddress1StreetAddress2(1)
@@ -220,7 +225,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Rules without errors'
           ,'Rules with possible edits'
           ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.SearchAddress1StreetAddress1_ALLOW_ErrorCount
           ,le.SearchAddress1StreetAddress2_ALLOW_ErrorCount
@@ -246,7 +253,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.Rules_NoErrors
           ,NumRulesWithPossibleEdits
           ,le.AnyRule_WithErrorsCount
-          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount
+          ,le.AnyRule_WithEditsCount
+          ,le.Rules_WithEdits,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.SearchAddress1StreetAddress1_ALLOW_ErrorCount
           ,le.SearchAddress1StreetAddress2_ALLOW_ErrorCount
@@ -272,9 +281,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
           ,0
           ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
-          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithEditsCount/SELF.recordstotal * 100)
+          ,IF(NumRulesWithPossibleEdits = 0, 0, le.Rules_WithEdits/NumRulesWithPossibleEdits * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 9,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;

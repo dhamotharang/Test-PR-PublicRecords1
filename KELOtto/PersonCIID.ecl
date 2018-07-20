@@ -360,9 +360,14 @@ newr:=RECORD
   string3 cvicustomscore;
   string1 instantidversion;
   string errorcode;
+	STRING Hri;
  END;
 
 
-PersonCIIDAttr := PROJECT(PULL(dataset('~foreign::10.173.44.105::thor_data::out::frodgov_iddt_20180301_ciid_v2',r,flat)), TRANSFORM(newr, self.did := (UNSIGNED8)left.did, SELF := LEFT));
+PersonCIIDAttr := PROJECT(PULL(dataset('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::ciid',r,flat)), 
+              TRANSFORM(newr, self.did := (UNSIGNED8)left.did, 
+							SELF.Hri := TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20),
+							SELF := LEFT));
+							
 EXPORT PersonCIID := JOIN(KELOtto.CustomerLexId, PersonCIIDAttr, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
 

@@ -18,19 +18,19 @@ module
 		return in_ddp;
 	ENDMACRO;	
 	
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.identitydata)) > 0 and PSkipIdentityData = false, 
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::identitydata')) > 0 and PSkipIdentityData = false, 
 													Files(pversion).Sprayed.IdentityData, 
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)   
-											+ if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.deltabase)) > 0  and PSkipDeltabase = false,
+											+ if ( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::deltabase')) > 0  and PSkipDeltabase = false,
 													Build_Prepped_Deltabase(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)	
-											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.nac)) > 0 and PSkipNAC = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)
-											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Prepped.inquirylogs)) > 0 and PSkipInquiryLogs = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::inquirylogs')) > 0 and PSkipInquiryLogs = false, 
 													Build_Prepped_InquiryLogs(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											);

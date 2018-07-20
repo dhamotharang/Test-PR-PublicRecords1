@@ -6,6 +6,7 @@ output(KELOtto.KelFiles.CustomerAddress,, '~gov::otto::customeraddress', overwri
 output(KELOtto.KelFiles.PersonStats,, '~gov::otto::personstats', overwrite);
 output(KELOtto.KelFiles.PersonEvents,, '~gov::otto::personevents', overwrite);
 output(KELOtto.KelFiles.CustomerStats,, '~gov::otto::customerstats', overwrite);
+output(KELOtto.KelFiles.CustomerStatsPivot,, '~gov::otto::customerstats_pivot', overwrite);
 
 output(KELOtto.KelFiles.FullCluster,,'~gov::otto::fullgraph', overwrite);
 output(KELOtto.KelFiles.EntityStats,, '~gov::otto::entitystats', overwrite);

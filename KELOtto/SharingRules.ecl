@@ -1,6 +1,8 @@
 ﻿#constant('Platform','FraudGov');
 import Fraudshared;
-OttoRulesPrep := Fraudshared.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed;
+
+OttoRulesPrep := Fraudshared.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed(inclusion_type = 'GCID' AND status = 1);
+
 // Map the fdn id to customer id
 FdnToCustomerID := TABLE(KELOtto.fraudgov, {classification_permissible_use_access.fdn_file_info_id, Customer_Id, classification_Permissible_use_access.Ind_type}, classification_permissible_use_access.fdn_file_info_id, Customer_Id, classification_Permissible_use_access.Ind_type, FEW);
 
@@ -26,11 +28,20 @@ SelfSharing := PROJECT(TABLE(OttoRules/* + TempSharingRules*/, {fdn_ind_type_gc_
 OttoSharingFinal := OttoRules + SelfSharing;
 
 // Only sharing rules for customers that actually have data?
-OttoSharingFinalWithCustomerID := DEDUP(SORT(JOIN(OttoSharingFinal, FdnToCustomerID, LEFT.fdn_ind_type_gc_id_inclusion=RIGHT.fdn_file_info_id, LOOKUP, MANY, LEFT OUTER), fdn_ind_type_gc_id_inclusion, fdn_file_info_id),fdn_ind_type_gc_id_inclusion, fdn_file_info_id);
+//OttoSharingFinalWithCustomerID := DEDUP(SORT(JOIN(OttoSharingFinal, FdnToCustomerID, LEFT.fdn_ind_type_gc_id_inclusion=RIGHT.fdn_file_info_id, LOOKUP, MANY, LEFT OUTER), fdn_ind_type_gc_id_inclusion, fdn_file_info_id),fdn_ind_type_gc_id_inclusion, fdn_file_info_id);
 
 // For customers that aren't sharing fill in their GCID from the inclusion_id;
-OttoSharingUsingInclusionId := PROJECT(OttoSharingFinalWithCustomerID, TRANSFORM(RECORDOF(LEFT), SELF.customer_id := MAP((UNSIGNED)LEFT.customer_id = 0 and (UNSIGNED)LEFT.inclusion_id > 0 => (STRING)LEFT.inclusion_id, LEFT.customer_id), SELF := LEFT));
-// 282 shares the same gcid as 272 and causes issues.
 
-EXPORT SharingRules := OttoSharingFinalWithCustomerID(fdn_ind_type_gc_id_inclusion in [372,342,332,312,861,382,322] and customer_id != ''); 
+// Add source gcid-hash
+
+OttoSharingUsingInclusionId1 := PROJECT(OttoSharingFinal(inclusion_id > 0), 
+                                TRANSFORM({RECORDOF(LEFT), INTEGER TargetCustomerHash}, 
+                                  SELF.TargetCustomerHash := HASH32(LEFT.inclusion_id + '|' + LEFT.ind_type), SELF := LEFT));
+
+OttoSharingUsingInclusionId2 := JOIN(OttoSharingUsingInclusionId1, OttoSharingUsingInclusionId1, 
+                                LEFT.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
+                                TRANSFORM({RECORDOF(LEFT), INTEGER SourceCustomerHash}, 
+                                  SELF.SourceCustomerHash := RIGHT.TargetCustomerHash, SELF := LEFT), KEEP(1));
+
+EXPORT SharingRules := DEDUP(SORT(OttoSharingUsingInclusionId2, SourceCustomerHash, TargetCustomerHash), SourceCustomerHash, TargetCustomerHash); //OttoSharingFinalWithCustomerID(fdn_ind_type_gc_id_inclusion in [372,342,332,312,861,382,322] and customer_id != ''); 
 

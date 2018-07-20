@@ -318,14 +318,23 @@ fraudgov_layout := RECORD,maxlength(60000)
   string10 investigator_id;
  END;
 
-fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::20180529_anonymized::main',fraudgov_layout,THOR));
+//fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::20180529_anonymized::main',fraudgov_layout,THOR));
+fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::main',fraudgov_layout,THOR));
 
 // Prep!!!
 // Add an address id (rawaid is always 0)
-fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, TRANSFORM({RECORDOF(LEFT), UNSIGNED8 OttoAddressId}, SELF.OttoAddressId := HASH32(LEFT.address_1, LEFT.address_2), SELF := LEFT));
+// email id
+// ipaddress id
+
+fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
+                       TRANSFORM({RECORDOF(LEFT), UNSIGNED8 OttoAddressId, UNSIGNED8 OttoIpAddressId, UNSIGNED8 OttoEmailId}, 
+											 SELF.OttoAddressId := HASH32(LEFT.address_1, LEFT.address_2),
+											 SELF.OttoIpAddressId := HASH32(LEFT.ip_address), 
+											 SELF.OttoEmailId := HASH32(LEFT.email_address), 
+											 SELF := LEFT));
 
 // trim the data down for R&D speed.
-fraudgov_dataset := fraudgov_dataset_base;//(did % 7 in [0,1,2]);
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date < 20180407);// and did % 200 in [0] OR did = 899999999550);
 
 
 // Lets FAKE SOME CUSTOMERS!!!!!

@@ -3,15 +3,16 @@ IMPORT Std;
 
 // Take the sharing, join to customer people
 
+
 EXPORT AddressPersonAssociations := MODULE
-	DateOverLapThreshold := 30; // days
-	BlankSsnSet := ['','000000000','199999999','799999999'];
-	HighFrequencyAddressThreshold := 10;
-	HighFrequencyAddressCutoff := 50;
+	SHARED DateOverLapThreshold := 30; // days
+	SHARED BlankSsnSet := ['','000000000','199999999','799999999'];
+	SHARED HighFrequencyAddressThreshold := 10;
+  SHARED HighFrequencyAddressCutoff := 20;
 
-	Sharing := KELOtto.SharingRules;
+	SHARED Sharing := KELOtto.SharingRules;
 
-	IdentityRec := RECORD
+	SHARED IdentityRec := RECORD
 		UNSIGNED8 AddressHash,
 		KELOtto.fraudgov.address_1, 
 		KELOtto.fraudgov.address_2,
@@ -23,34 +24,44 @@ EXPORT AddressPersonAssociations := MODULE
 		KELOtto.fraudgov.dob,
 		KELOtto.fraudgov.event_date
 	END;
-
-	SharedEvents := JOIN(KELOtto.fraudgov(did > 0 and clean_address.prim_range != '' and clean_address.prim_name != '' and clean_address.p_city_name != ''), Sharing, 
-											RIGHT.fdn_file_info_id=LEFT.classification_permissible_use_access.fdn_file_info_id, 
-											TRANSFORM({RECORDOF(RIGHT), IdentityRec, STRING CleanAddressString, UNSIGNED2 EventMonth}, 
+ 
+  // JOIN All Shared Events
+	EXPORT SharedEvents := JOIN(KELOtto.fraudgovshared(did > 0 and clean_address.prim_range != '' and clean_address.prim_name != '' and clean_address.p_city_name != ''), DEDUP(SORT(Sharing, targetcustomerhash), targetcustomerhash),
+                              LEFT.associatedcustomerfileinfo = RIGHT.targetcustomerhash,
+											TRANSFORM({RECORDOF(LEFT), INTEGER customer_id_,	INTEGER industry_type_, IdentityRec, STRING CleanAddressString, UNSIGNED2 EventMonth}, 
+																SELF.customer_id_ := (INTEGER)RIGHT.inclusion_id,
+																SELF.industry_type_ := (INTEGER)RIGHT.ind_type,
 																SELF.AddressHash := LEFT.OttoAddressId;//HASH32(LEFT.clean_address.prim_range,LEFT.clean_address.predir,LEFT.clean_address.prim_name,LEFT.clean_address.addr_suffix,LEFT.clean_address.postdir,LEFT.clean_address.unit_desig,LEFT.clean_address.sec_range,LEFT.clean_address.p_city_name,LEFT.clean_address.st,LEFT.clean_address.zip),
 																SELF.EventMonth := (UNSIGNED)LEFT.event_date DIV 100,
 																SELF.CleanAddressString := TRIM(LEFT.clean_address.prim_range) + ' ' + TRIM(LEFT.clean_address.predir) + ' ' + TRIM(LEFT.clean_address.prim_name) + ' ' + TRIM(LEFT.clean_address.addr_suffix) + ' ' + TRIM(LEFT.clean_address.sec_range) + ' ' + TRIM(LEFT.clean_address.p_city_name),
 																SELF.cell_phone := LEFT.clean_phones.cell_phone,
-																SELF := LEFT, SELF := RIGHT),
-											LOOKUP);
-
-	DistributedAddressEventsPrep := DISTRIBUTE(SharedEvents, AddressHash);
-
-	HighFrequencyAddresses := TABLE(
-															DEDUP(SORT(SharedEvents, fdn_ind_type_gc_id_inclusion, did), fdn_ind_type_gc_id_inclusion, did), 
-															{fdn_ind_type_gc_id_inclusion, AddressHash, CleanAddressString, EventMonth, HighFrequencyAddressExclude := MAP(count(group)>HighFrequencyAddressCutoff => 1,0), HighFrequencyAddressFlag := MAP(count(group)>=HighFrequencyAddressThreshold=>1,0)}, 
-															 fdn_ind_type_gc_id_inclusion, AddressHash, CleanAddressString, EventMonth, MERGE);
+																SELF := LEFT), LOOKUP);
+	
+	DistributedAddressEventsPrep1 := DISTRIBUTE(SharedEvents, AddressHash);
+  // Dedup so we have one Event\Transaction
+	EXPORT DistributedAddressEventsPrep := DEDUP(SORT(DistributedAddressEventsPrep1, AssociatedCustomerFileInfo, record_id, LOCAL), AssociatedCustomerFileInfo, record_id, LOCAL);
+ 
+   
+  // Dedup to get one Event per Customer
+	
+  // Addresses with a LOT of dids
+	EXPORT HighFrequencyAddresses := TABLE(
+															DEDUP(SORT(DistributedAddressEventsPrep, AssociatedCustomerFileInfo, did), AssociatedCustomerFileInfo, did), 
+															{AssociatedCustomerFileInfo, AddressHash, CleanAddressString, EventMonth, HighFrequencyAddressExclude := MAP(count(group)>HighFrequencyAddressCutoff => 1,0), HighFrequencyAddressFlag := MAP(count(group)>=HighFrequencyAddressThreshold=>1,0)}, 
+															 AssociatedCustomerFileInfo, AddressHash, CleanAddressString, EventMonth, MERGE);
 
 	DistributedAddressEvents := JOIN(DistributedAddressEventsPrep, HighFrequencyAddresses(HighFrequencyAddressExclude=0),
-																LEFT.fdn_ind_type_gc_id_inclusion=RIGHT.fdn_ind_type_gc_id_inclusion AND LEFT.AddressHash=RIGHT.AddressHash AND LEFT.EventMonth=RIGHT.EventMonth,
+																LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.AddressHash=RIGHT.AddressHash AND LEFT.EventMonth=RIGHT.EventMonth,
 																TRANSFORM({RECORDOF(LEFT), RIGHT.HighFrequencyAddressFlag}, SELF := LEFT, SELF := RIGHT), LOOKUP);
 
 
-	AddressMatch := JOIN(DistributedAddressEvents, DistributedAddressEvents, 
-										LEFT.did != RIGHT.did AND LEFT.fdn_ind_type_gc_id_inclusion=RIGHT.fdn_ind_type_gc_id_inclusion AND LEFT.AddressHash = RIGHT.AddressHash AND 
+	EXPORT AddressMatch := JOIN(DistributedAddressEvents, DistributedAddressEvents, 
+										LEFT.did != RIGHT.did AND LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.AddressHash = RIGHT.AddressHash AND 
 										ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < DateOverLapThreshold,
 										TRANSFORM({
-											LEFT.fdn_ind_type_gc_id_inclusion,
+											LEFT.AssociatedCustomerFileInfo,
+											LEFT.customer_id_,
+                      LEFT.industry_type_,											
 											LEFT.AddressHash,    
 											UNSIGNED2 EventMonth,
 											IdentityRec Person,
@@ -93,7 +104,9 @@ EXPORT AddressPersonAssociations := MODULE
 
 	EXPORT PersonAddressMatches := TABLE(AddressMatch(DistanceDays <= DateOverLapThreshold), 
 													 {
-														fdn_ind_type_gc_id_inclusion,
+														AssociatedCustomerFileInfo,
+														customer_id_,
+														industry_type_,
 														UNSIGNED8 AddressHash := Person.AddressHash,                         
 														FromPersonLexId := person.did,
 														ToPersonLexId := associatedperson.did,
@@ -108,15 +121,18 @@ EXPORT AddressPersonAssociations := MODULE
 														ToPersonEntityContextUid := '_01' + (STRING)associatedperson.did,
                             STRING Label := TRIM(Person.address_1) + ', ' + TRIM(Person.address_2),
 													 },
-														person.AddressHash, person.did,associatedperson.did, MERGE);
+														AssociatedCustomerFileInfo, person.AddressHash, person.did,associatedperson.did, MERGE);
 
 														 
-	PersonAddressMatchStatsPrep := TABLE(PersonAddressMatches, {
+	EXPORT PersonAddressMatchStatsPrep1 := TABLE(PersonAddressMatches, {
 														ContributoryRecords := 1,
 														// Switching it back to the fdn_file_info_id for consistency in the KEL
-														fdn_ind_type_gc_id_inclusion,
+														AssociatedCustomerFileInfo,
+														customer_id_,
+														industry_type_,
 														FromPersonLexId,
 														ToPersonLexId,
+														INTEGER1 SelfMatch := 0;
 														INTEGER1 SameAddressEmailMatch := MAX(GROUP, SameAddressEmailMatch),
 														INTEGER1 SameAddressSsnMatch := MAX(GROUP, SameAddressSsnMatch),
 														INTEGER1 SameAddressPhoneNumberMatch := MAX(GROUP, SameAddressPhoneNumberMatch),
@@ -127,10 +143,27 @@ EXPORT AddressPersonAssociations := MODULE
 														FromPersonEntityContextUid,
 														ToPersonEntityContextUid
 														},
-														fdn_ind_type_gc_id_inclusion, FromPersonLexId, ToPersonLexId, MERGE) : PERSIST('~temp::deleteme31');
+														AssociatedCustomerFileInfo, FromPersonLexId, ToPersonLexId, MERGE);
+
+  // Unique List of Customer People
+	
+  EXPORT CustomerDids := TABLE(KELOtto.fraudgovshared(did > 0), {AssociatedCustomerFileInfo, INTEGER customer_id_ := customer_id,	industry_type_ := classification_permissible_use_access.Ind_type, did, PersonEntityContextUid := '_01' + (STRING)did}, 
+	                           customer_id,classification_permissible_use_access.Ind_type, associatedcustomerfileinfo, did, MERGE);
+																
+  SHARED PersonAddressMatchStatsPrep2 := PROJECT(CustomerDids, TRANSFORM(RECORDOF(PersonAddressMatchStatsPrep1), 
+	                                    SELF.SelfMatch := 1,
+                                      SELF.FromPersonLexId := LEFT.did,
+														          SELF.FromPersonEntityContextUid := LEFT.PersonEntityContextUid,
+                                      SELF.ToPersonLexId := LEFT.did,
+														          SELF.ToPersonEntityContextUid := LEFT.PersonEntityContextUid,
+																			SELF := LEFT, SELF := []));
+
+
+	SHARED PersonAddressMatchStatsPrep := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
 														 
 	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep(
 			// Rules for a valid association
+			SelfMatch = 1 OR
 			sameaddressemailmatch = 1 OR 
 			sameaddressssnmatch = 1 OR 
 			sameaddressphonenumbermatch = 1 OR
@@ -148,6 +181,5 @@ EXPORT AddressPersonAssociations := MODULE
 
 
 	//fdn_ind_type_gc_id_inclusion, unsigned6 fdn_file_info_id});
-
-
+ 
 END;
