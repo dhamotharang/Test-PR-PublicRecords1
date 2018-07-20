@@ -2,59 +2,81 @@
 EXPORT NAC_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 17;
-  EXPORT NumRulesFromFieldType := 17;
+  EXPORT NumRules := 32;
+  EXPORT NumRulesFromFieldType := 32;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 17;
-  EXPORT NumFieldsWithPossibleEdits := 0;
-  EXPORT NumRulesWithPossibleEdits := 0;
+  EXPORT NumFieldsWithRules := 18;
+  EXPORT NumFieldsWithPossibleEdits := 6;
+  EXPORT NumRulesWithPossibleEdits := 17;
   EXPORT Expanded_Layout := RECORD(NAC_Layout_NAC)
-    UNSIGNED1 Customer_Account_Number_Invalid;
-    UNSIGNED1 Customer_County_Invalid;
-    UNSIGNED1 Customer_State_Invalid;
-    UNSIGNED1 Customer_Agency_Vertical_Type_Invalid;
-    UNSIGNED1 Customer_Program_Invalid;
-    UNSIGNED1 LexID_Invalid;
-    UNSIGNED1 raw_Full_Name_Invalid;
-    UNSIGNED1 raw_First_name_Invalid;
-    UNSIGNED1 raw_Last_Name_Invalid;
-    UNSIGNED1 SSN_Invalid;
-    UNSIGNED1 Drivers_License_State_Invalid;
-    UNSIGNED1 Drivers_License_Number_Invalid;
-    UNSIGNED1 Street_1_Invalid;
-    UNSIGNED1 City_Invalid;
-    UNSIGNED1 State_Invalid;
-    UNSIGNED1 Zip_Invalid;
-    UNSIGNED1 did_Invalid;
+    UNSIGNED1 SearchAddress1StreetAddress1_Invalid;
+    UNSIGNED1 SearchAddress1StreetAddress2_Invalid;
+    UNSIGNED1 SearchAddress1City_Invalid;
+    UNSIGNED1 SearchAddress1State_Invalid;
+    BOOLEAN SearchAddress1State_wouldClean;
+    UNSIGNED1 SearchAddress1Zip_Invalid;
+    BOOLEAN SearchAddress1Zip_wouldClean;
+    UNSIGNED1 SearchAddress2StreetAddress1_Invalid;
+    UNSIGNED1 SearchAddress2StreetAddress2_Invalid;
+    UNSIGNED1 SearchAddress2City_Invalid;
+    UNSIGNED1 SearchAddress2State_Invalid;
+    BOOLEAN SearchAddress2State_wouldClean;
+    UNSIGNED1 SearchAddress2Zip_Invalid;
+    BOOLEAN SearchAddress2Zip_wouldClean;
+    UNSIGNED1 SearchCaseId_Invalid;
+    UNSIGNED1 enduserip_Invalid;
+    BOOLEAN enduserip_wouldClean;
+    UNSIGNED1 CaseID_Invalid;
+    UNSIGNED1 ClientFirstName_Invalid;
+    UNSIGNED1 ClientMiddleName_Invalid;
+    UNSIGNED1 ClientLastName_Invalid;
+    UNSIGNED1 ClientPhone_Invalid;
+    BOOLEAN ClientPhone_wouldClean;
+    UNSIGNED1 ClientEmail_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(NAC_Layout_NAC)
     UNSIGNED8 ScrubsBits1;
+    UNSIGNED8 ScrubsCleanBits1;
   END;
 EXPORT FromNone(DATASET(NAC_Layout_NAC) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.Customer_Account_Number_Invalid := NAC_Fields.InValid_Customer_Account_Number((SALT39.StrType)le.Customer_Account_Number);
-    SELF.Customer_County_Invalid := NAC_Fields.InValid_Customer_County((SALT39.StrType)le.Customer_County);
-    SELF.Customer_State_Invalid := NAC_Fields.InValid_Customer_State((SALT39.StrType)le.Customer_State);
-    SELF.Customer_Agency_Vertical_Type_Invalid := NAC_Fields.InValid_Customer_Agency_Vertical_Type((SALT39.StrType)le.Customer_Agency_Vertical_Type);
-    SELF.Customer_Program_Invalid := NAC_Fields.InValid_Customer_Program((SALT39.StrType)le.Customer_Program);
-    SELF.LexID_Invalid := NAC_Fields.InValid_LexID((SALT39.StrType)le.LexID);
-    SELF.raw_Full_Name_Invalid := NAC_Fields.InValid_raw_Full_Name((SALT39.StrType)le.raw_Full_Name);
-    SELF.raw_First_name_Invalid := NAC_Fields.InValid_raw_First_name((SALT39.StrType)le.raw_First_name);
-    SELF.raw_Last_Name_Invalid := NAC_Fields.InValid_raw_Last_Name((SALT39.StrType)le.raw_Last_Name);
-    SELF.SSN_Invalid := NAC_Fields.InValid_SSN((SALT39.StrType)le.SSN);
-    SELF.Drivers_License_State_Invalid := NAC_Fields.InValid_Drivers_License_State((SALT39.StrType)le.Drivers_License_State);
-    SELF.Drivers_License_Number_Invalid := NAC_Fields.InValid_Drivers_License_Number((SALT39.StrType)le.Drivers_License_Number);
-    SELF.Street_1_Invalid := NAC_Fields.InValid_Street_1((SALT39.StrType)le.Street_1);
-    SELF.City_Invalid := NAC_Fields.InValid_City((SALT39.StrType)le.City);
-    SELF.State_Invalid := NAC_Fields.InValid_State((SALT39.StrType)le.State);
-    SELF.Zip_Invalid := NAC_Fields.InValid_Zip((SALT39.StrType)le.Zip);
-    SELF.did_Invalid := NAC_Fields.InValid_did((SALT39.StrType)le.did);
+    SELF.SearchAddress1StreetAddress1_Invalid := NAC_Fields.InValid_SearchAddress1StreetAddress1((SALT39.StrType)le.SearchAddress1StreetAddress1);
+    SELF.SearchAddress1StreetAddress2_Invalid := NAC_Fields.InValid_SearchAddress1StreetAddress2((SALT39.StrType)le.SearchAddress1StreetAddress2);
+    SELF.SearchAddress1City_Invalid := NAC_Fields.InValid_SearchAddress1City((SALT39.StrType)le.SearchAddress1City);
+    SELF.SearchAddress1State_Invalid := NAC_Fields.InValid_SearchAddress1State((SALT39.StrType)le.SearchAddress1State);
+    SELF.SearchAddress1State := IF(SELF.SearchAddress1State_Invalid=0 OR NOT withOnfail, le.SearchAddress1State, (TYPEOF(le.SearchAddress1State))''); // ONFAIL(BLANK)
+    SELF.SearchAddress1State_wouldClean :=  SELF.SearchAddress1State_Invalid > 0;
+    SELF.SearchAddress1Zip_Invalid := NAC_Fields.InValid_SearchAddress1Zip((SALT39.StrType)le.SearchAddress1Zip);
+    SELF.SearchAddress1Zip := IF(SELF.SearchAddress1Zip_Invalid=0 OR NOT withOnfail, le.SearchAddress1Zip, (TYPEOF(le.SearchAddress1Zip))''); // ONFAIL(BLANK)
+    SELF.SearchAddress1Zip_wouldClean :=  SELF.SearchAddress1Zip_Invalid > 0;
+    SELF.SearchAddress2StreetAddress1_Invalid := NAC_Fields.InValid_SearchAddress2StreetAddress1((SALT39.StrType)le.SearchAddress2StreetAddress1);
+    SELF.SearchAddress2StreetAddress2_Invalid := NAC_Fields.InValid_SearchAddress2StreetAddress2((SALT39.StrType)le.SearchAddress2StreetAddress2);
+    SELF.SearchAddress2City_Invalid := NAC_Fields.InValid_SearchAddress2City((SALT39.StrType)le.SearchAddress2City);
+    SELF.SearchAddress2State_Invalid := NAC_Fields.InValid_SearchAddress2State((SALT39.StrType)le.SearchAddress2State);
+    SELF.SearchAddress2State := IF(SELF.SearchAddress2State_Invalid=0 OR NOT withOnfail, le.SearchAddress2State, (TYPEOF(le.SearchAddress2State))''); // ONFAIL(BLANK)
+    SELF.SearchAddress2State_wouldClean :=  SELF.SearchAddress2State_Invalid > 0;
+    SELF.SearchAddress2Zip_Invalid := NAC_Fields.InValid_SearchAddress2Zip((SALT39.StrType)le.SearchAddress2Zip);
+    SELF.SearchAddress2Zip := IF(SELF.SearchAddress2Zip_Invalid=0 OR NOT withOnfail, le.SearchAddress2Zip, (TYPEOF(le.SearchAddress2Zip))''); // ONFAIL(BLANK)
+    SELF.SearchAddress2Zip_wouldClean :=  SELF.SearchAddress2Zip_Invalid > 0;
+    SELF.SearchCaseId_Invalid := NAC_Fields.InValid_SearchCaseId((SALT39.StrType)le.SearchCaseId);
+    SELF.enduserip_Invalid := NAC_Fields.InValid_enduserip((SALT39.StrType)le.enduserip);
+    SELF.enduserip := IF(SELF.enduserip_Invalid=0 OR NOT withOnfail, le.enduserip, (TYPEOF(le.enduserip))''); // ONFAIL(BLANK)
+    SELF.enduserip_wouldClean :=  SELF.enduserip_Invalid > 0;
+    SELF.CaseID_Invalid := NAC_Fields.InValid_CaseID((SALT39.StrType)le.CaseID);
+    SELF.ClientFirstName_Invalid := NAC_Fields.InValid_ClientFirstName((SALT39.StrType)le.ClientFirstName);
+    SELF.ClientMiddleName_Invalid := NAC_Fields.InValid_ClientMiddleName((SALT39.StrType)le.ClientMiddleName);
+    SELF.ClientLastName_Invalid := NAC_Fields.InValid_ClientLastName((SALT39.StrType)le.ClientLastName);
+    SELF.ClientPhone_Invalid := NAC_Fields.InValid_ClientPhone((SALT39.StrType)le.ClientPhone);
+    SELF.ClientPhone := IF(SELF.ClientPhone_Invalid=0 OR NOT withOnfail, le.ClientPhone, (TYPEOF(le.ClientPhone))''); // ONFAIL(BLANK)
+    SELF.ClientPhone_wouldClean :=  SELF.ClientPhone_Invalid > 0;
+    SELF.ClientEmail_Invalid := NAC_Fields.InValid_ClientEmail((SALT39.StrType)le.ClientEmail);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),NAC_Layout_NAC);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.Customer_Account_Number_Invalid << 0 ) + ( le.Customer_County_Invalid << 1 ) + ( le.Customer_State_Invalid << 2 ) + ( le.Customer_Agency_Vertical_Type_Invalid << 3 ) + ( le.Customer_Program_Invalid << 4 ) + ( le.LexID_Invalid << 5 ) + ( le.raw_Full_Name_Invalid << 6 ) + ( le.raw_First_name_Invalid << 7 ) + ( le.raw_Last_Name_Invalid << 8 ) + ( le.SSN_Invalid << 9 ) + ( le.Drivers_License_State_Invalid << 10 ) + ( le.Drivers_License_Number_Invalid << 11 ) + ( le.Street_1_Invalid << 12 ) + ( le.City_Invalid << 13 ) + ( le.State_Invalid << 14 ) + ( le.Zip_Invalid << 15 ) + ( le.did_Invalid << 16 );
+    SELF.ScrubsBits1 := ( le.SearchAddress1StreetAddress1_Invalid << 0 ) + ( le.SearchAddress1StreetAddress2_Invalid << 1 ) + ( le.SearchAddress1City_Invalid << 2 ) + ( le.SearchAddress1State_Invalid << 3 ) + ( le.SearchAddress1Zip_Invalid << 5 ) + ( le.SearchAddress2StreetAddress1_Invalid << 7 ) + ( le.SearchAddress2StreetAddress2_Invalid << 8 ) + ( le.SearchAddress2City_Invalid << 9 ) + ( le.SearchAddress2State_Invalid << 10 ) + ( le.SearchAddress2Zip_Invalid << 12 ) + ( le.SearchCaseId_Invalid << 14 ) + ( le.enduserip_Invalid << 15 ) + ( le.CaseID_Invalid << 17 ) + ( le.ClientFirstName_Invalid << 18 ) + ( le.ClientMiddleName_Invalid << 20 ) + ( le.ClientLastName_Invalid << 22 ) + ( le.ClientPhone_Invalid << 24 ) + ( le.ClientEmail_Invalid << 26 );
+    SELF.ScrubsCleanBits1 := ( IF(le.SearchAddress1State_wouldClean, 1, 0) << 0 ) + ( IF(le.SearchAddress1Zip_wouldClean, 1, 0) << 1 ) + ( IF(le.SearchAddress2State_wouldClean, 1, 0) << 2 ) + ( IF(le.SearchAddress2Zip_wouldClean, 1, 0) << 3 ) + ( IF(le.enduserip_wouldClean, 1, 0) << 4 ) + ( IF(le.ClientPhone_wouldClean, 1, 0) << 5 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -63,23 +85,30 @@ END;
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,NAC_Layout_NAC);
   Expanded_Layout into(h le) := TRANSFORM
-    SELF.Customer_Account_Number_Invalid := (le.ScrubsBits1 >> 0) & 1;
-    SELF.Customer_County_Invalid := (le.ScrubsBits1 >> 1) & 1;
-    SELF.Customer_State_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.Customer_Agency_Vertical_Type_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.Customer_Program_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.LexID_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.raw_Full_Name_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.raw_First_name_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.raw_Last_Name_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.SSN_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.Drivers_License_State_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.Drivers_License_Number_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.Street_1_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.City_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.State_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.Zip_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.did_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.SearchAddress1StreetAddress1_Invalid := (le.ScrubsBits1 >> 0) & 1;
+    SELF.SearchAddress1StreetAddress2_Invalid := (le.ScrubsBits1 >> 1) & 1;
+    SELF.SearchAddress1City_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.SearchAddress1State_Invalid := (le.ScrubsBits1 >> 3) & 3;
+    SELF.SearchAddress1Zip_Invalid := (le.ScrubsBits1 >> 5) & 3;
+    SELF.SearchAddress2StreetAddress1_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.SearchAddress2StreetAddress2_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.SearchAddress2City_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.SearchAddress2State_Invalid := (le.ScrubsBits1 >> 10) & 3;
+    SELF.SearchAddress2Zip_Invalid := (le.ScrubsBits1 >> 12) & 3;
+    SELF.SearchCaseId_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.enduserip_Invalid := (le.ScrubsBits1 >> 15) & 3;
+    SELF.CaseID_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.ClientFirstName_Invalid := (le.ScrubsBits1 >> 18) & 3;
+    SELF.ClientMiddleName_Invalid := (le.ScrubsBits1 >> 20) & 3;
+    SELF.ClientLastName_Invalid := (le.ScrubsBits1 >> 22) & 3;
+    SELF.ClientPhone_Invalid := (le.ScrubsBits1 >> 24) & 3;
+    SELF.ClientEmail_Invalid := (le.ScrubsBits1 >> 26) & 1;
+    SELF.SearchAddress1State_wouldClean := le.ScrubsCleanBits1 >> 0;
+    SELF.SearchAddress1Zip_wouldClean := le.ScrubsCleanBits1 >> 1;
+    SELF.SearchAddress2State_wouldClean := le.ScrubsCleanBits1 >> 2;
+    SELF.SearchAddress2Zip_wouldClean := le.ScrubsCleanBits1 >> 3;
+    SELF.enduserip_wouldClean := le.ScrubsCleanBits1 >> 4;
+    SELF.ClientPhone_wouldClean := le.ScrubsCleanBits1 >> 5;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -88,35 +117,79 @@ END;
 EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   r := RECORD
     TotalCnt := COUNT(GROUP); // Number of records in total
-    Customer_Account_Number_ALLOW_ErrorCount := COUNT(GROUP,h.Customer_Account_Number_Invalid=1);
-    Customer_County_ALLOW_ErrorCount := COUNT(GROUP,h.Customer_County_Invalid=1);
-    Customer_State_ALLOW_ErrorCount := COUNT(GROUP,h.Customer_State_Invalid=1);
-    Customer_Agency_Vertical_Type_ALLOW_ErrorCount := COUNT(GROUP,h.Customer_Agency_Vertical_Type_Invalid=1);
-    Customer_Program_ALLOW_ErrorCount := COUNT(GROUP,h.Customer_Program_Invalid=1);
-    LexID_ALLOW_ErrorCount := COUNT(GROUP,h.LexID_Invalid=1);
-    raw_Full_Name_ALLOW_ErrorCount := COUNT(GROUP,h.raw_Full_Name_Invalid=1);
-    raw_First_name_ALLOW_ErrorCount := COUNT(GROUP,h.raw_First_name_Invalid=1);
-    raw_Last_Name_ALLOW_ErrorCount := COUNT(GROUP,h.raw_Last_Name_Invalid=1);
-    SSN_ALLOW_ErrorCount := COUNT(GROUP,h.SSN_Invalid=1);
-    Drivers_License_State_ALLOW_ErrorCount := COUNT(GROUP,h.Drivers_License_State_Invalid=1);
-    Drivers_License_Number_ALLOW_ErrorCount := COUNT(GROUP,h.Drivers_License_Number_Invalid=1);
-    Street_1_ALLOW_ErrorCount := COUNT(GROUP,h.Street_1_Invalid=1);
-    City_ALLOW_ErrorCount := COUNT(GROUP,h.City_Invalid=1);
-    State_ALLOW_ErrorCount := COUNT(GROUP,h.State_Invalid=1);
-    Zip_ALLOW_ErrorCount := COUNT(GROUP,h.Zip_Invalid=1);
-    did_ALLOW_ErrorCount := COUNT(GROUP,h.did_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.Customer_Account_Number_Invalid > 0 OR h.Customer_County_Invalid > 0 OR h.Customer_State_Invalid > 0 OR h.Customer_Agency_Vertical_Type_Invalid > 0 OR h.Customer_Program_Invalid > 0 OR h.LexID_Invalid > 0 OR h.raw_Full_Name_Invalid > 0 OR h.raw_First_name_Invalid > 0 OR h.raw_Last_Name_Invalid > 0 OR h.SSN_Invalid > 0 OR h.Drivers_License_State_Invalid > 0 OR h.Drivers_License_Number_Invalid > 0 OR h.Street_1_Invalid > 0 OR h.City_Invalid > 0 OR h.State_Invalid > 0 OR h.Zip_Invalid > 0 OR h.did_Invalid > 0);
+    SearchAddress1StreetAddress1_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress1StreetAddress1_Invalid=1);
+    SearchAddress1StreetAddress2_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress1StreetAddress2_Invalid=1);
+    SearchAddress1City_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress1City_Invalid=1);
+    SearchAddress1State_LEFTTRIM_ErrorCount := COUNT(GROUP,h.SearchAddress1State_Invalid=1);
+    SearchAddress1State_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.SearchAddress1State_Invalid=1 AND h.SearchAddress1State_wouldClean);
+    SearchAddress1State_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress1State_Invalid=2);
+    SearchAddress1State_ALLOW_WouldModifyCount := COUNT(GROUP,h.SearchAddress1State_Invalid=2 AND h.SearchAddress1State_wouldClean);
+    SearchAddress1State_LENGTHS_ErrorCount := COUNT(GROUP,h.SearchAddress1State_Invalid=3);
+    SearchAddress1State_LENGTHS_WouldModifyCount := COUNT(GROUP,h.SearchAddress1State_Invalid=3 AND h.SearchAddress1State_wouldClean);
+    SearchAddress1State_Total_ErrorCount := COUNT(GROUP,h.SearchAddress1State_Invalid>0);
+    SearchAddress1Zip_LEFTTRIM_ErrorCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=1);
+    SearchAddress1Zip_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=1 AND h.SearchAddress1Zip_wouldClean);
+    SearchAddress1Zip_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=2);
+    SearchAddress1Zip_ALLOW_WouldModifyCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=2 AND h.SearchAddress1Zip_wouldClean);
+    SearchAddress1Zip_LENGTHS_ErrorCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=3);
+    SearchAddress1Zip_LENGTHS_WouldModifyCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid=3 AND h.SearchAddress1Zip_wouldClean);
+    SearchAddress1Zip_Total_ErrorCount := COUNT(GROUP,h.SearchAddress1Zip_Invalid>0);
+    SearchAddress2StreetAddress1_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress2StreetAddress1_Invalid=1);
+    SearchAddress2StreetAddress2_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress2StreetAddress2_Invalid=1);
+    SearchAddress2City_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress2City_Invalid=1);
+    SearchAddress2State_LEFTTRIM_ErrorCount := COUNT(GROUP,h.SearchAddress2State_Invalid=1);
+    SearchAddress2State_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.SearchAddress2State_Invalid=1 AND h.SearchAddress2State_wouldClean);
+    SearchAddress2State_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress2State_Invalid=2);
+    SearchAddress2State_ALLOW_WouldModifyCount := COUNT(GROUP,h.SearchAddress2State_Invalid=2 AND h.SearchAddress2State_wouldClean);
+    SearchAddress2State_LENGTHS_ErrorCount := COUNT(GROUP,h.SearchAddress2State_Invalid=3);
+    SearchAddress2State_LENGTHS_WouldModifyCount := COUNT(GROUP,h.SearchAddress2State_Invalid=3 AND h.SearchAddress2State_wouldClean);
+    SearchAddress2State_Total_ErrorCount := COUNT(GROUP,h.SearchAddress2State_Invalid>0);
+    SearchAddress2Zip_LEFTTRIM_ErrorCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=1);
+    SearchAddress2Zip_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=1 AND h.SearchAddress2Zip_wouldClean);
+    SearchAddress2Zip_ALLOW_ErrorCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=2);
+    SearchAddress2Zip_ALLOW_WouldModifyCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=2 AND h.SearchAddress2Zip_wouldClean);
+    SearchAddress2Zip_LENGTHS_ErrorCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=3);
+    SearchAddress2Zip_LENGTHS_WouldModifyCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid=3 AND h.SearchAddress2Zip_wouldClean);
+    SearchAddress2Zip_Total_ErrorCount := COUNT(GROUP,h.SearchAddress2Zip_Invalid>0);
+    SearchCaseId_ALLOW_ErrorCount := COUNT(GROUP,h.SearchCaseId_Invalid=1);
+    enduserip_LEFTTRIM_ErrorCount := COUNT(GROUP,h.enduserip_Invalid=1);
+    enduserip_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.enduserip_Invalid=1 AND h.enduserip_wouldClean);
+    enduserip_ALLOW_ErrorCount := COUNT(GROUP,h.enduserip_Invalid=2);
+    enduserip_ALLOW_WouldModifyCount := COUNT(GROUP,h.enduserip_Invalid=2 AND h.enduserip_wouldClean);
+    enduserip_Total_ErrorCount := COUNT(GROUP,h.enduserip_Invalid>0);
+    CaseID_ALLOW_ErrorCount := COUNT(GROUP,h.CaseID_Invalid=1);
+    ClientFirstName_LEFTTRIM_ErrorCount := COUNT(GROUP,h.ClientFirstName_Invalid=1);
+    ClientFirstName_ALLOW_ErrorCount := COUNT(GROUP,h.ClientFirstName_Invalid=2);
+    ClientFirstName_Total_ErrorCount := COUNT(GROUP,h.ClientFirstName_Invalid>0);
+    ClientMiddleName_LEFTTRIM_ErrorCount := COUNT(GROUP,h.ClientMiddleName_Invalid=1);
+    ClientMiddleName_ALLOW_ErrorCount := COUNT(GROUP,h.ClientMiddleName_Invalid=2);
+    ClientMiddleName_Total_ErrorCount := COUNT(GROUP,h.ClientMiddleName_Invalid>0);
+    ClientLastName_LEFTTRIM_ErrorCount := COUNT(GROUP,h.ClientLastName_Invalid=1);
+    ClientLastName_ALLOW_ErrorCount := COUNT(GROUP,h.ClientLastName_Invalid=2);
+    ClientLastName_Total_ErrorCount := COUNT(GROUP,h.ClientLastName_Invalid>0);
+    ClientPhone_LEFTTRIM_ErrorCount := COUNT(GROUP,h.ClientPhone_Invalid=1);
+    ClientPhone_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.ClientPhone_Invalid=1 AND h.ClientPhone_wouldClean);
+    ClientPhone_ALLOW_ErrorCount := COUNT(GROUP,h.ClientPhone_Invalid=2);
+    ClientPhone_ALLOW_WouldModifyCount := COUNT(GROUP,h.ClientPhone_Invalid=2 AND h.ClientPhone_wouldClean);
+    ClientPhone_LENGTHS_ErrorCount := COUNT(GROUP,h.ClientPhone_Invalid=3);
+    ClientPhone_LENGTHS_WouldModifyCount := COUNT(GROUP,h.ClientPhone_Invalid=3 AND h.ClientPhone_wouldClean);
+    ClientPhone_Total_ErrorCount := COUNT(GROUP,h.ClientPhone_Invalid>0);
+    ClientEmail_ALLOW_ErrorCount := COUNT(GROUP,h.ClientEmail_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.SearchAddress1StreetAddress1_Invalid > 0 OR h.SearchAddress1StreetAddress2_Invalid > 0 OR h.SearchAddress1City_Invalid > 0 OR h.SearchAddress1State_Invalid > 0 OR h.SearchAddress1Zip_Invalid > 0 OR h.SearchAddress2StreetAddress1_Invalid > 0 OR h.SearchAddress2StreetAddress2_Invalid > 0 OR h.SearchAddress2City_Invalid > 0 OR h.SearchAddress2State_Invalid > 0 OR h.SearchAddress2Zip_Invalid > 0 OR h.SearchCaseId_Invalid > 0 OR h.enduserip_Invalid > 0 OR h.CaseID_Invalid > 0 OR h.ClientFirstName_Invalid > 0 OR h.ClientMiddleName_Invalid > 0 OR h.ClientLastName_Invalid > 0 OR h.ClientPhone_Invalid > 0 OR h.ClientEmail_Invalid > 0);
+    AnyRule_WithEditsCount := COUNT(GROUP, h.SearchAddress1State_wouldClean OR h.SearchAddress1Zip_wouldClean OR h.SearchAddress2State_wouldClean OR h.SearchAddress2Zip_wouldClean OR h.enduserip_wouldClean OR h.ClientPhone_wouldClean);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
     Rules_NoErrors := 0;
+    Rules_WithEdits := 0;
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.Customer_Account_Number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_County_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_Agency_Vertical_Type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_Program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LexID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_Full_Name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_First_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_Last_Name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Drivers_License_State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Drivers_License_Number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.SearchAddress1StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1State_Total_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1Zip_Total_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2State_Total_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2Zip_Total_ErrorCount > 0, 1, 0) + IF(le.SearchCaseId_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enduserip_Total_ErrorCount > 0, 1, 0) + IF(le.CaseID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientFirstName_Total_ErrorCount > 0, 1, 0) + IF(le.ClientMiddleName_Total_ErrorCount > 0, 1, 0) + IF(le.ClientLastName_Total_ErrorCount > 0, 1, 0) + IF(le.ClientPhone_Total_ErrorCount > 0, 1, 0) + IF(le.ClientEmail_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.Customer_Account_Number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_County_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_Agency_Vertical_Type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Customer_Program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LexID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_Full_Name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_First_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_Last_Name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Drivers_License_State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Drivers_License_Number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.SearchAddress1StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1State_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1State_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2StreetAddress2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2State_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2State_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2Zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.SearchCaseId_ALLOW_ErrorCount > 0, 1, 0) + IF(le.enduserip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.enduserip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.CaseID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientFirstName_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ClientFirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientMiddleName_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ClientMiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientLastName_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ClientLastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientPhone_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ClientPhone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ClientPhone_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ClientEmail_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF.Rules_WithEdits := IF(le.SearchAddress1State_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1State_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1State_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress1Zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2State_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SearchAddress2Zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.enduserip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.enduserip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ClientPhone_LENGTHS_WouldModifyCount > 0, 1, 0);
     SELF := le;
   END;
   EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
@@ -130,31 +203,32 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.Customer_Account_Number_Invalid,le.Customer_County_Invalid,le.Customer_State_Invalid,le.Customer_Agency_Vertical_Type_Invalid,le.Customer_Program_Invalid,le.LexID_Invalid,le.raw_Full_Name_Invalid,le.raw_First_name_Invalid,le.raw_Last_Name_Invalid,le.SSN_Invalid,le.Drivers_License_State_Invalid,le.Drivers_License_Number_Invalid,le.Street_1_Invalid,le.City_Invalid,le.State_Invalid,le.Zip_Invalid,le.did_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,NAC_Fields.InvalidMessage_Customer_Account_Number(le.Customer_Account_Number_Invalid),NAC_Fields.InvalidMessage_Customer_County(le.Customer_County_Invalid),NAC_Fields.InvalidMessage_Customer_State(le.Customer_State_Invalid),NAC_Fields.InvalidMessage_Customer_Agency_Vertical_Type(le.Customer_Agency_Vertical_Type_Invalid),NAC_Fields.InvalidMessage_Customer_Program(le.Customer_Program_Invalid),NAC_Fields.InvalidMessage_LexID(le.LexID_Invalid),NAC_Fields.InvalidMessage_raw_Full_Name(le.raw_Full_Name_Invalid),NAC_Fields.InvalidMessage_raw_First_name(le.raw_First_name_Invalid),NAC_Fields.InvalidMessage_raw_Last_Name(le.raw_Last_Name_Invalid),NAC_Fields.InvalidMessage_SSN(le.SSN_Invalid),NAC_Fields.InvalidMessage_Drivers_License_State(le.Drivers_License_State_Invalid),NAC_Fields.InvalidMessage_Drivers_License_Number(le.Drivers_License_Number_Invalid),NAC_Fields.InvalidMessage_Street_1(le.Street_1_Invalid),NAC_Fields.InvalidMessage_City(le.City_Invalid),NAC_Fields.InvalidMessage_State(le.State_Invalid),NAC_Fields.InvalidMessage_Zip(le.Zip_Invalid),NAC_Fields.InvalidMessage_did(le.did_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.SearchAddress1StreetAddress1_Invalid,le.SearchAddress1StreetAddress2_Invalid,le.SearchAddress1City_Invalid,le.SearchAddress1State_Invalid,le.SearchAddress1Zip_Invalid,le.SearchAddress2StreetAddress1_Invalid,le.SearchAddress2StreetAddress2_Invalid,le.SearchAddress2City_Invalid,le.SearchAddress2State_Invalid,le.SearchAddress2Zip_Invalid,le.SearchCaseId_Invalid,le.enduserip_Invalid,le.CaseID_Invalid,le.ClientFirstName_Invalid,le.ClientMiddleName_Invalid,le.ClientLastName_Invalid,le.ClientPhone_Invalid,le.ClientEmail_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,NAC_Fields.InvalidMessage_SearchAddress1StreetAddress1(le.SearchAddress1StreetAddress1_Invalid),NAC_Fields.InvalidMessage_SearchAddress1StreetAddress2(le.SearchAddress1StreetAddress2_Invalid),NAC_Fields.InvalidMessage_SearchAddress1City(le.SearchAddress1City_Invalid),NAC_Fields.InvalidMessage_SearchAddress1State(le.SearchAddress1State_Invalid),NAC_Fields.InvalidMessage_SearchAddress1Zip(le.SearchAddress1Zip_Invalid),NAC_Fields.InvalidMessage_SearchAddress2StreetAddress1(le.SearchAddress2StreetAddress1_Invalid),NAC_Fields.InvalidMessage_SearchAddress2StreetAddress2(le.SearchAddress2StreetAddress2_Invalid),NAC_Fields.InvalidMessage_SearchAddress2City(le.SearchAddress2City_Invalid),NAC_Fields.InvalidMessage_SearchAddress2State(le.SearchAddress2State_Invalid),NAC_Fields.InvalidMessage_SearchAddress2Zip(le.SearchAddress2Zip_Invalid),NAC_Fields.InvalidMessage_SearchCaseId(le.SearchCaseId_Invalid),NAC_Fields.InvalidMessage_enduserip(le.enduserip_Invalid),NAC_Fields.InvalidMessage_CaseID(le.CaseID_Invalid),NAC_Fields.InvalidMessage_ClientFirstName(le.ClientFirstName_Invalid),NAC_Fields.InvalidMessage_ClientMiddleName(le.ClientMiddleName_Invalid),NAC_Fields.InvalidMessage_ClientLastName(le.ClientLastName_Invalid),NAC_Fields.InvalidMessage_ClientPhone(le.ClientPhone_Invalid),NAC_Fields.InvalidMessage_ClientEmail(le.ClientEmail_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
-          ,CHOOSE(le.Customer_Account_Number_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Customer_County_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Customer_State_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Customer_Agency_Vertical_Type_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Customer_Program_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.LexID_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.raw_Full_Name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.raw_First_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.raw_Last_Name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.SSN_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Drivers_License_State_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Drivers_License_Number_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Street_1_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.City_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.State_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.Zip_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.did_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'Customer_Account_Number','Customer_County','Customer_State','Customer_Agency_Vertical_Type','Customer_Program','LexID','raw_Full_Name','raw_First_name','raw_Last_Name','SSN','Drivers_License_State','Drivers_License_Number','Street_1','City','State','Zip','did','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.Customer_Account_Number,(SALT39.StrType)le.Customer_County,(SALT39.StrType)le.Customer_State,(SALT39.StrType)le.Customer_Agency_Vertical_Type,(SALT39.StrType)le.Customer_Program,(SALT39.StrType)le.LexID,(SALT39.StrType)le.raw_Full_Name,(SALT39.StrType)le.raw_First_name,(SALT39.StrType)le.raw_Last_Name,(SALT39.StrType)le.SSN,(SALT39.StrType)le.Drivers_License_State,(SALT39.StrType)le.Drivers_License_Number,(SALT39.StrType)le.Street_1,(SALT39.StrType)le.City,(SALT39.StrType)le.State,(SALT39.StrType)le.Zip,(SALT39.StrType)le.did,'***SALTBUG***');
+          ,CHOOSE(le.SearchAddress1StreetAddress1_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress1StreetAddress2_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress1City_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress1State_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.SearchAddress1Zip_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.SearchAddress2StreetAddress1_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress2StreetAddress2_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress2City_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.SearchAddress2State_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.SearchAddress2Zip_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.SearchCaseId_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.enduserip_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.CaseID_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.ClientFirstName_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.ClientMiddleName_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.ClientLastName_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.ClientPhone_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.ClientEmail_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'SearchAddress1StreetAddress1','SearchAddress1StreetAddress2','SearchAddress1City','SearchAddress1State','SearchAddress1Zip','SearchAddress2StreetAddress1','SearchAddress2StreetAddress2','SearchAddress2City','SearchAddress2State','SearchAddress2Zip','SearchCaseId','enduserip','CaseID','ClientFirstName','ClientMiddleName','ClientLastName','ClientPhone','ClientEmail','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_alphanumeric','invalid_ip','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_phone','invalid_email','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.SearchAddress1StreetAddress1,(SALT39.StrType)le.SearchAddress1StreetAddress2,(SALT39.StrType)le.SearchAddress1City,(SALT39.StrType)le.SearchAddress1State,(SALT39.StrType)le.SearchAddress1Zip,(SALT39.StrType)le.SearchAddress2StreetAddress1,(SALT39.StrType)le.SearchAddress2StreetAddress2,(SALT39.StrType)le.SearchAddress2City,(SALT39.StrType)le.SearchAddress2State,(SALT39.StrType)le.SearchAddress2Zip,(SALT39.StrType)le.SearchCaseId,(SALT39.StrType)le.enduserip,(SALT39.StrType)le.CaseID,(SALT39.StrType)le.ClientFirstName,(SALT39.StrType)le.ClientMiddleName,(SALT39.StrType)le.ClientLastName,(SALT39.StrType)le.ClientPhone,(SALT39.StrType)le.ClientEmail,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,17,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,18,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -165,107 +239,119 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'Customer_Account_Number:invalid_numeric:ALLOW'
-          ,'Customer_County:invalid_alphanumeric:ALLOW'
-          ,'Customer_State:invalid_alphanumeric:ALLOW'
-          ,'Customer_Agency_Vertical_Type:invalid_alphanumeric:ALLOW'
-          ,'Customer_Program:invalid_alphanumeric:ALLOW'
-          ,'LexID:invalid_numeric:ALLOW'
-          ,'raw_Full_Name:invalid_alphanumeric:ALLOW'
-          ,'raw_First_name:invalid_alphanumeric:ALLOW'
-          ,'raw_Last_Name:invalid_alphanumeric:ALLOW'
-          ,'SSN:invalid_alphanumeric:ALLOW'
-          ,'Drivers_License_State:invalid_alphanumeric:ALLOW'
-          ,'Drivers_License_Number:invalid_alphanumeric:ALLOW'
-          ,'Street_1:invalid_alphanumeric:ALLOW'
-          ,'City:invalid_alphanumeric:ALLOW'
-          ,'State:invalid_alphanumeric:ALLOW'
-          ,'Zip:invalid_alphanumeric:ALLOW'
-          ,'did:invalid_numeric:ALLOW'
+          ,'SearchAddress1StreetAddress1:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress1StreetAddress2:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress1City:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress1State:invalid_state:LEFTTRIM','SearchAddress1State:invalid_state:ALLOW','SearchAddress1State:invalid_state:LENGTHS'
+          ,'SearchAddress1Zip:invalid_zip:LEFTTRIM','SearchAddress1Zip:invalid_zip:ALLOW','SearchAddress1Zip:invalid_zip:LENGTHS'
+          ,'SearchAddress2StreetAddress1:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress2StreetAddress2:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress2City:invalid_alphanumeric:ALLOW'
+          ,'SearchAddress2State:invalid_state:LEFTTRIM','SearchAddress2State:invalid_state:ALLOW','SearchAddress2State:invalid_state:LENGTHS'
+          ,'SearchAddress2Zip:invalid_zip:LEFTTRIM','SearchAddress2Zip:invalid_zip:ALLOW','SearchAddress2Zip:invalid_zip:LENGTHS'
+          ,'SearchCaseId:invalid_alphanumeric:ALLOW'
+          ,'enduserip:invalid_ip:LEFTTRIM','enduserip:invalid_ip:ALLOW'
+          ,'CaseID:invalid_alphanumeric:ALLOW'
+          ,'ClientFirstName:invalid_name:LEFTTRIM','ClientFirstName:invalid_name:ALLOW'
+          ,'ClientMiddleName:invalid_name:LEFTTRIM','ClientMiddleName:invalid_name:ALLOW'
+          ,'ClientLastName:invalid_name:LEFTTRIM','ClientLastName:invalid_name:ALLOW'
+          ,'ClientPhone:invalid_phone:LEFTTRIM','ClientPhone:invalid_phone:ALLOW','ClientPhone:invalid_phone:LENGTHS'
+          ,'ClientEmail:invalid_email:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
           ,'rule:Number_Perfect_Rules:SUMMARY'
           ,'rule:Number_OnFail_Rules:SUMMARY'
           ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
-          ,NAC_Fields.InvalidMessage_Customer_Account_Number(1)
-          ,NAC_Fields.InvalidMessage_Customer_County(1)
-          ,NAC_Fields.InvalidMessage_Customer_State(1)
-          ,NAC_Fields.InvalidMessage_Customer_Agency_Vertical_Type(1)
-          ,NAC_Fields.InvalidMessage_Customer_Program(1)
-          ,NAC_Fields.InvalidMessage_LexID(1)
-          ,NAC_Fields.InvalidMessage_raw_Full_Name(1)
-          ,NAC_Fields.InvalidMessage_raw_First_name(1)
-          ,NAC_Fields.InvalidMessage_raw_Last_Name(1)
-          ,NAC_Fields.InvalidMessage_SSN(1)
-          ,NAC_Fields.InvalidMessage_Drivers_License_State(1)
-          ,NAC_Fields.InvalidMessage_Drivers_License_Number(1)
-          ,NAC_Fields.InvalidMessage_Street_1(1)
-          ,NAC_Fields.InvalidMessage_City(1)
-          ,NAC_Fields.InvalidMessage_State(1)
-          ,NAC_Fields.InvalidMessage_Zip(1)
-          ,NAC_Fields.InvalidMessage_did(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress1StreetAddress1(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress1StreetAddress2(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress1City(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress1State(1),NAC_Fields.InvalidMessage_SearchAddress1State(2),NAC_Fields.InvalidMessage_SearchAddress1State(3)
+          ,NAC_Fields.InvalidMessage_SearchAddress1Zip(1),NAC_Fields.InvalidMessage_SearchAddress1Zip(2),NAC_Fields.InvalidMessage_SearchAddress1Zip(3)
+          ,NAC_Fields.InvalidMessage_SearchAddress2StreetAddress1(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress2StreetAddress2(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress2City(1)
+          ,NAC_Fields.InvalidMessage_SearchAddress2State(1),NAC_Fields.InvalidMessage_SearchAddress2State(2),NAC_Fields.InvalidMessage_SearchAddress2State(3)
+          ,NAC_Fields.InvalidMessage_SearchAddress2Zip(1),NAC_Fields.InvalidMessage_SearchAddress2Zip(2),NAC_Fields.InvalidMessage_SearchAddress2Zip(3)
+          ,NAC_Fields.InvalidMessage_SearchCaseId(1)
+          ,NAC_Fields.InvalidMessage_enduserip(1),NAC_Fields.InvalidMessage_enduserip(2)
+          ,NAC_Fields.InvalidMessage_CaseID(1)
+          ,NAC_Fields.InvalidMessage_ClientFirstName(1),NAC_Fields.InvalidMessage_ClientFirstName(2)
+          ,NAC_Fields.InvalidMessage_ClientMiddleName(1),NAC_Fields.InvalidMessage_ClientMiddleName(2)
+          ,NAC_Fields.InvalidMessage_ClientLastName(1),NAC_Fields.InvalidMessage_ClientLastName(2)
+          ,NAC_Fields.InvalidMessage_ClientPhone(1),NAC_Fields.InvalidMessage_ClientPhone(2),NAC_Fields.InvalidMessage_ClientPhone(3)
+          ,NAC_Fields.InvalidMessage_ClientEmail(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
           ,'Rules without errors'
           ,'Rules with possible edits'
           ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.Customer_Account_Number_ALLOW_ErrorCount
-          ,le.Customer_County_ALLOW_ErrorCount
-          ,le.Customer_State_ALLOW_ErrorCount
-          ,le.Customer_Agency_Vertical_Type_ALLOW_ErrorCount
-          ,le.Customer_Program_ALLOW_ErrorCount
-          ,le.LexID_ALLOW_ErrorCount
-          ,le.raw_Full_Name_ALLOW_ErrorCount
-          ,le.raw_First_name_ALLOW_ErrorCount
-          ,le.raw_Last_Name_ALLOW_ErrorCount
-          ,le.SSN_ALLOW_ErrorCount
-          ,le.Drivers_License_State_ALLOW_ErrorCount
-          ,le.Drivers_License_Number_ALLOW_ErrorCount
-          ,le.Street_1_ALLOW_ErrorCount
-          ,le.City_ALLOW_ErrorCount
-          ,le.State_ALLOW_ErrorCount
-          ,le.Zip_ALLOW_ErrorCount
-          ,le.did_ALLOW_ErrorCount
+          ,le.SearchAddress1StreetAddress1_ALLOW_ErrorCount
+          ,le.SearchAddress1StreetAddress2_ALLOW_ErrorCount
+          ,le.SearchAddress1City_ALLOW_ErrorCount
+          ,le.SearchAddress1State_LEFTTRIM_ErrorCount,le.SearchAddress1State_ALLOW_ErrorCount,le.SearchAddress1State_LENGTHS_ErrorCount
+          ,le.SearchAddress1Zip_LEFTTRIM_ErrorCount,le.SearchAddress1Zip_ALLOW_ErrorCount,le.SearchAddress1Zip_LENGTHS_ErrorCount
+          ,le.SearchAddress2StreetAddress1_ALLOW_ErrorCount
+          ,le.SearchAddress2StreetAddress2_ALLOW_ErrorCount
+          ,le.SearchAddress2City_ALLOW_ErrorCount
+          ,le.SearchAddress2State_LEFTTRIM_ErrorCount,le.SearchAddress2State_ALLOW_ErrorCount,le.SearchAddress2State_LENGTHS_ErrorCount
+          ,le.SearchAddress2Zip_LEFTTRIM_ErrorCount,le.SearchAddress2Zip_ALLOW_ErrorCount,le.SearchAddress2Zip_LENGTHS_ErrorCount
+          ,le.SearchCaseId_ALLOW_ErrorCount
+          ,le.enduserip_LEFTTRIM_ErrorCount,le.enduserip_ALLOW_ErrorCount
+          ,le.CaseID_ALLOW_ErrorCount
+          ,le.ClientFirstName_LEFTTRIM_ErrorCount,le.ClientFirstName_ALLOW_ErrorCount
+          ,le.ClientMiddleName_LEFTTRIM_ErrorCount,le.ClientMiddleName_ALLOW_ErrorCount
+          ,le.ClientLastName_LEFTTRIM_ErrorCount,le.ClientLastName_ALLOW_ErrorCount
+          ,le.ClientPhone_LEFTTRIM_ErrorCount,le.ClientPhone_ALLOW_ErrorCount,le.ClientPhone_LENGTHS_ErrorCount
+          ,le.ClientEmail_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
           ,le.Rules_NoErrors
           ,NumRulesWithPossibleEdits
           ,le.AnyRule_WithErrorsCount
-          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount
+          ,le.AnyRule_WithEditsCount
+          ,le.Rules_WithEdits,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
-          ,le.Customer_Account_Number_ALLOW_ErrorCount
-          ,le.Customer_County_ALLOW_ErrorCount
-          ,le.Customer_State_ALLOW_ErrorCount
-          ,le.Customer_Agency_Vertical_Type_ALLOW_ErrorCount
-          ,le.Customer_Program_ALLOW_ErrorCount
-          ,le.LexID_ALLOW_ErrorCount
-          ,le.raw_Full_Name_ALLOW_ErrorCount
-          ,le.raw_First_name_ALLOW_ErrorCount
-          ,le.raw_Last_Name_ALLOW_ErrorCount
-          ,le.SSN_ALLOW_ErrorCount
-          ,le.Drivers_License_State_ALLOW_ErrorCount
-          ,le.Drivers_License_Number_ALLOW_ErrorCount
-          ,le.Street_1_ALLOW_ErrorCount
-          ,le.City_ALLOW_ErrorCount
-          ,le.State_ALLOW_ErrorCount
-          ,le.Zip_ALLOW_ErrorCount
-          ,le.did_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.SearchAddress1StreetAddress1_ALLOW_ErrorCount
+          ,le.SearchAddress1StreetAddress2_ALLOW_ErrorCount
+          ,le.SearchAddress1City_ALLOW_ErrorCount
+          ,le.SearchAddress1State_LEFTTRIM_ErrorCount,le.SearchAddress1State_ALLOW_ErrorCount,le.SearchAddress1State_LENGTHS_ErrorCount
+          ,le.SearchAddress1Zip_LEFTTRIM_ErrorCount,le.SearchAddress1Zip_ALLOW_ErrorCount,le.SearchAddress1Zip_LENGTHS_ErrorCount
+          ,le.SearchAddress2StreetAddress1_ALLOW_ErrorCount
+          ,le.SearchAddress2StreetAddress2_ALLOW_ErrorCount
+          ,le.SearchAddress2City_ALLOW_ErrorCount
+          ,le.SearchAddress2State_LEFTTRIM_ErrorCount,le.SearchAddress2State_ALLOW_ErrorCount,le.SearchAddress2State_LENGTHS_ErrorCount
+          ,le.SearchAddress2Zip_LEFTTRIM_ErrorCount,le.SearchAddress2Zip_ALLOW_ErrorCount,le.SearchAddress2Zip_LENGTHS_ErrorCount
+          ,le.SearchCaseId_ALLOW_ErrorCount
+          ,le.enduserip_LEFTTRIM_ErrorCount,le.enduserip_ALLOW_ErrorCount
+          ,le.CaseID_ALLOW_ErrorCount
+          ,le.ClientFirstName_LEFTTRIM_ErrorCount,le.ClientFirstName_ALLOW_ErrorCount
+          ,le.ClientMiddleName_LEFTTRIM_ErrorCount,le.ClientMiddleName_ALLOW_ErrorCount
+          ,le.ClientLastName_LEFTTRIM_ErrorCount,le.ClientLastName_ALLOW_ErrorCount
+          ,le.ClientPhone_LEFTTRIM_ErrorCount,le.ClientPhone_ALLOW_ErrorCount,le.ClientPhone_LENGTHS_ErrorCount
+          ,le.ClientEmail_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
           ,0
           ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
-          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithEditsCount/SELF.recordstotal * 100)
+          ,IF(NumRulesWithPossibleEdits = 0, 0, le.Rules_WithEdits/NumRulesWithPossibleEdits * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 9,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
@@ -295,62 +381,65 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'Customer_Account_Number:' + getFieldTypeText(h.Customer_Account_Number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Customer_County:' + getFieldTypeText(h.Customer_County) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Customer_State:' + getFieldTypeText(h.Customer_State) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Customer_Agency_Vertical_Type:' + getFieldTypeText(h.Customer_Agency_Vertical_Type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Customer_Program:' + getFieldTypeText(h.Customer_Program) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'LexID:' + getFieldTypeText(h.LexID) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'raw_Full_Name:' + getFieldTypeText(h.raw_Full_Name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'raw_First_name:' + getFieldTypeText(h.raw_First_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'raw_Last_Name:' + getFieldTypeText(h.raw_Last_Name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'SSN:' + getFieldTypeText(h.SSN) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Drivers_License_State:' + getFieldTypeText(h.Drivers_License_State) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Drivers_License_Number:' + getFieldTypeText(h.Drivers_License_Number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Street_1:' + getFieldTypeText(h.Street_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'City:' + getFieldTypeText(h.City) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'State:' + getFieldTypeText(h.State) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'Zip:' + getFieldTypeText(h.Zip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'did:' + getFieldTypeText(h.did) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'SearchAddress1StreetAddress1:' + getFieldTypeText(h.SearchAddress1StreetAddress1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress1StreetAddress2:' + getFieldTypeText(h.SearchAddress1StreetAddress2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress1City:' + getFieldTypeText(h.SearchAddress1City) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress1State:' + getFieldTypeText(h.SearchAddress1State) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress1Zip:' + getFieldTypeText(h.SearchAddress1Zip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress2StreetAddress1:' + getFieldTypeText(h.SearchAddress2StreetAddress1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress2StreetAddress2:' + getFieldTypeText(h.SearchAddress2StreetAddress2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress2City:' + getFieldTypeText(h.SearchAddress2City) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress2State:' + getFieldTypeText(h.SearchAddress2State) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchAddress2Zip:' + getFieldTypeText(h.SearchAddress2Zip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'SearchCaseId:' + getFieldTypeText(h.SearchCaseId) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'enduserip:' + getFieldTypeText(h.enduserip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'CaseID:' + getFieldTypeText(h.CaseID) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ClientFirstName:' + getFieldTypeText(h.ClientFirstName) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ClientMiddleName:' + getFieldTypeText(h.ClientMiddleName) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ClientLastName:' + getFieldTypeText(h.ClientLastName) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ClientPhone:' + getFieldTypeText(h.ClientPhone) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ClientEmail:' + getFieldTypeText(h.ClientEmail) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.populated_Customer_Account_Number_cnt
-          ,le.populated_Customer_County_cnt
-          ,le.populated_Customer_State_cnt
-          ,le.populated_Customer_Agency_Vertical_Type_cnt
-          ,le.populated_Customer_Program_cnt
-          ,le.populated_LexID_cnt
-          ,le.populated_raw_Full_Name_cnt
-          ,le.populated_raw_First_name_cnt
-          ,le.populated_raw_Last_Name_cnt
-          ,le.populated_SSN_cnt
-          ,le.populated_Drivers_License_State_cnt
-          ,le.populated_Drivers_License_Number_cnt
-          ,le.populated_Street_1_cnt
-          ,le.populated_City_cnt
-          ,le.populated_State_cnt
-          ,le.populated_Zip_cnt
-          ,le.populated_did_cnt,0);
+          ,le.populated_SearchAddress1StreetAddress1_cnt
+          ,le.populated_SearchAddress1StreetAddress2_cnt
+          ,le.populated_SearchAddress1City_cnt
+          ,le.populated_SearchAddress1State_cnt
+          ,le.populated_SearchAddress1Zip_cnt
+          ,le.populated_SearchAddress2StreetAddress1_cnt
+          ,le.populated_SearchAddress2StreetAddress2_cnt
+          ,le.populated_SearchAddress2City_cnt
+          ,le.populated_SearchAddress2State_cnt
+          ,le.populated_SearchAddress2Zip_cnt
+          ,le.populated_SearchCaseId_cnt
+          ,le.populated_enduserip_cnt
+          ,le.populated_CaseID_cnt
+          ,le.populated_ClientFirstName_cnt
+          ,le.populated_ClientMiddleName_cnt
+          ,le.populated_ClientLastName_cnt
+          ,le.populated_ClientPhone_cnt
+          ,le.populated_ClientEmail_cnt,0);
       SELF.rulepcnt := CHOOSE(c
-          ,le.populated_Customer_Account_Number_pcnt
-          ,le.populated_Customer_County_pcnt
-          ,le.populated_Customer_State_pcnt
-          ,le.populated_Customer_Agency_Vertical_Type_pcnt
-          ,le.populated_Customer_Program_pcnt
-          ,le.populated_LexID_pcnt
-          ,le.populated_raw_Full_Name_pcnt
-          ,le.populated_raw_First_name_pcnt
-          ,le.populated_raw_Last_Name_pcnt
-          ,le.populated_SSN_pcnt
-          ,le.populated_Drivers_License_State_pcnt
-          ,le.populated_Drivers_License_Number_pcnt
-          ,le.populated_Street_1_pcnt
-          ,le.populated_City_pcnt
-          ,le.populated_State_pcnt
-          ,le.populated_Zip_pcnt
-          ,le.populated_did_pcnt,0);
+          ,le.populated_SearchAddress1StreetAddress1_pcnt
+          ,le.populated_SearchAddress1StreetAddress2_pcnt
+          ,le.populated_SearchAddress1City_pcnt
+          ,le.populated_SearchAddress1State_pcnt
+          ,le.populated_SearchAddress1Zip_pcnt
+          ,le.populated_SearchAddress2StreetAddress1_pcnt
+          ,le.populated_SearchAddress2StreetAddress2_pcnt
+          ,le.populated_SearchAddress2City_pcnt
+          ,le.populated_SearchAddress2State_pcnt
+          ,le.populated_SearchAddress2Zip_pcnt
+          ,le.populated_SearchCaseId_pcnt
+          ,le.populated_enduserip_pcnt
+          ,le.populated_CaseID_pcnt
+          ,le.populated_ClientFirstName_pcnt
+          ,le.populated_ClientMiddleName_pcnt
+          ,le.populated_ClientLastName_pcnt
+          ,le.populated_ClientPhone_pcnt
+          ,le.populated_ClientEmail_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,17,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,18,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -366,7 +455,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := NAC_Delta(prevDS, PROJECT(h, NAC_Layout_NAC));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),17,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),18,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

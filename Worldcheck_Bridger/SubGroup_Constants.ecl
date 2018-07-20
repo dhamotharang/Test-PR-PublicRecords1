@@ -1065,6 +1065,7 @@
 		export string KEYWORD_MXASF									:= '753';
 		export string KEYWORD_JPMHLW								:= '754';
 		export string KEYWORD_GEGOV									:= '755';
+		export string KEYWORD_ZAFSCA								:= '756';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

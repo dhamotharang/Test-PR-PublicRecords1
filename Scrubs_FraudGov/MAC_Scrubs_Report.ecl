@@ -1,10 +1,10 @@
 ﻿import FraudShared;
-EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
+EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,version,inputFile,MemailList)	:=	FUNCTIONMACRO
 	folder						:=	#EXPAND(myFolder);
 	inFile						:=	inputFile;
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
-	profilename				:=	'Scrubs_FraudGov_'+scopename;
+	scope_datasetName		:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	profilename				:=	'Scrubs_FraudGov_'+scopename+'_v'+version;
 	
 	myEmail		:=	_Control.MyInfo.EmailAddressNotify;		//	Email address to send notifications
 	// F	:=	inFile(process_date=filedate);						//	Records to scrub
@@ -76,8 +76,8 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	
 	PcntErroredRec					:= (String)((decimal5_2)((((real)ErroredRecords)/((real)TotalRecs))*100));
 	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
-	bitfile_name		:=	'~thor_data::'+scope_datasetName+'_Scrubs_Bits';
-	processedfile_name		:=	'~thor_data::'+scope_datasetName+'_Processed_File';
+	bitfile_name					:= FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::' + scope_datasetName+'_Scrubs_Bits';
+	processedfile_name		:= FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::' + scope_datasetName+'_Processed_File';
 	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'+filedate)); // long term storage
 	DS  := DATASET(bitfile_name,S.Bitmap_Layout,FLAT); // Read in my data (which has bitmap appended
 	//This will translate the bitmap(s)
@@ -107,11 +107,11 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	//Submits Profile's stats to Orbit
 	
 	
-	SuperFile				:='~thor_data400::Scrubs_FraudGov::Log';
-	Super_Log_File	:='~thor_data400::Scrubs_FraudGov::FraudGov::Log';
-	SuperFile_Entries	:=	dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
+	SuperFile				:= FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::' + scopename;
+	Super_Log_File		:= SuperFile + '::' + scopename + '_' + BuildDate;
+	SuperFile_Entries	:=	 dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
-	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull_'+filedate)),
+	Create_New_File	:=	 sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull_'+filedate)),
 																																																						 STD.File.StartSuperFileTransaction(),
 																																																						 STD.File.RemoveSuperFile(SuperFile,Super_Log_File,true),
 																																																						 STD.File.FinishSuperFileTransaction());
