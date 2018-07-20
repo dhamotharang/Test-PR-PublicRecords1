@@ -105,6 +105,7 @@ module
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
+		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -125,6 +126,7 @@ module
 			CIID.dAll_filenames +
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
+			FraudPoint.dAll_filenames +
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
 			kel_personevents.dAll_filenames + 

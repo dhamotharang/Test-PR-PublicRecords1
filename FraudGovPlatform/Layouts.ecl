@@ -1,5 +1,4 @@
 ﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC,CriminalRecords_BatchService,DeathV2_Services;
-
 EXPORT Layouts := MODULE
 
 	EXPORT Sprayed := module
@@ -473,7 +472,7 @@ Export PII	:=RECORD
   string25 drivers_license;
   string2 drivers_license_state;
   string10 home_phone;
-  string10 work_phone;
+  string10 work_phone_;
   string25 ip_address;
 
 END;
@@ -667,6 +666,22 @@ Export CIID := RECORD
  Export Death	:= RECORD
  DeathV2_Services.Layouts.BatchOut;
  string errorcode;
+ END;
+ 
+ Export FraudPoint	:= RECORD
+	unsigned6 did;
+	string2 v2_SourceRiskLevel;
+	string3 v2_AssocSuspicousIdentitiesCount;
+	string3 v2_assoccreditbureauonlycount;
+	string2 v2_ValidationAddrProblems;
+	string2 v2_ValidationIPProblems;
+	string2 v2_IPState;
+	string2 v2_IPCountry;
+	string2 v2_IPContinent;
+	string3 v2_InputAddrAgeOldest;
+	string2 v2_InputAddrDwellType;
+	string3 v2_divssnidentitycountnew;
+  string errorcode;
  END;
  
 END;
