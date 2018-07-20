@@ -72,7 +72,7 @@ MACRO
 		EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
 		EXPORT BOOLEAN   IncludePhoneMetadata := FALSE : STORED('IncludePhoneMetadata');  
     
-		EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
+		EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata and ~Doxie.DataRestriction.AccuData and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
 		                                                                                     PhoneFinder_Services.Constants.TransType.Ultimate,
 																																												 PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
 					    BOOLEAN   RealtimeData 			 := FALSE : STORED('UseDeltabase');
@@ -106,7 +106,8 @@ MACRO
 		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 		                 UseInHousePhoneMetadata_internal	 := FALSE : STORED('UseInHousePhoneMetadata');
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
-
+  EXPORT BOOLEAN   UseAccuData_CNAM        := UseInHousePhoneMetadata and ~Doxie.DataRestriction.AccuData and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
+	                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate];
 	END;
 	
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,

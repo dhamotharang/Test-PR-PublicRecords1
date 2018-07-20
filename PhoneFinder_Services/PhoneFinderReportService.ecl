@@ -173,7 +173,7 @@ MACRO
 		EXPORT BOOLEAN   UseLastResort      		:= doxie.DataPermission.use_LastResort and TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
 		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent and TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
 		EXPORT BOOLEAN   UseQSent           		:= ~doxie.DataRestriction.QSent and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate];
-		EXPORT BOOLEAN   UseAccuData_OCN        := pfOptions.IncludePhoneMetadata and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
+		EXPORT BOOLEAN   UseAccuData_OCN        := pfOptions.IncludePhoneMetadata and ~Doxie.DataRestriction.AccuData and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
 		                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate,
 		                                                                                                  PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];
 		EXPORT BOOLEAN   UseTargus          		:= ~doxie.DataRestriction.PhoneFinderTargus and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
@@ -226,6 +226,8 @@ MACRO
 		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
 		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
+		EXPORT BOOLEAN   UseAccuData_CNAM        := UseInHousePhoneMetadata and ~Doxie.DataRestriction.AccuData and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
+	                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate];
 	END;
 
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,

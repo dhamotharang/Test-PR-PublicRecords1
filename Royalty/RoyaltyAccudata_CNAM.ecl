@@ -16,14 +16,13 @@ EXPORT RoyaltyAccudata_CNAM := MODULE
 			RETURN dRoyalOut;		
   ENDMACRO;
  
-
-  EXPORT GetBatchRoyaltiesByAcctno(dInF, fSource='source', fPhone='phone', fAcctno='acctno') := 
+	  EXPORT GetBatchRoyaltiesByAcctno(dInP, fSource='source', fPhone='phone', fAcctno='acctno') := 
 	FUNCTIONMACRO
 
 		// we're counting hits by phone
-		dIn := DEDUP(SORT(dInF(fSource = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2), fPhone, fAcctno), fPhone);
+		dDupRecs := DEDUP(SORT(dInP(fSource = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2), fPhone, fAcctno), fPhone);
 
-		Royalty.Layouts.RoyaltyForBatch tPrepForRoyalty(recordof(dInF) l, integer c) :=
+		Royalty.Layouts.RoyaltyForBatch tPrepForRoyalty(recordof(dInP) l, integer c) :=
 		TRANSFORM
 			SELF.acctno							:= l.fAcctno;
 			SELF.royalty_type_code	:= Royalty.Constants.RoyaltyCode.ACCUDATA_CNAM_CNM2;
@@ -31,11 +30,10 @@ EXPORT RoyaltyAccudata_CNAM := MODULE
 			SELF.royalty_count 			:= c; 
 			SELF.non_royalty_count 	:= 0;
 		END;
-		dRoyaltiesByAcctno := PROJECT(dIn, tPrepForRoyalty(LEFT, 1));	
+		dRoyaltiesByAcctno := PROJECT(dDupRecs, tPrepForRoyalty(LEFT, 1));	
 		
 		RETURN SORT(dRoyaltiesByAcctno,fAcctno);
 		
   ENDMACRO;
-	
 END;
 

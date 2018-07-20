@@ -75,6 +75,7 @@ MODULE
 		EXPORT BOOLEAN   DirectMarketingSourcesOnly        := FALSE;
 		EXPORT INTEGER   MaxOtherPhones := 0;
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	           := FALSE;
+		EXPORT BOOLEAN   UseAccuData_CNAM		 := FALSE; // accudata cnam gateway call	
 	END;
 
 	EXPORT AKParams :=
