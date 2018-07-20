@@ -104,6 +104,7 @@ module
 		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
+		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
@@ -122,7 +123,8 @@ module
 			AddressCache.dAll_filenames +
 			Pii.dAll_filenames +
 			CIID.dAll_filenames +
-			Crim.dAll_filenames + 
+			Crim.dAll_filenames +
+			Death.dAll_filenames +
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
 			kel_personevents.dAll_filenames + 
