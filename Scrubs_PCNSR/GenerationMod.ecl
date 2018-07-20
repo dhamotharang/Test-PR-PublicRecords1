@@ -42,7 +42,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'MODULE:Scrubs_PCNSR\n'
     + 'FILENAME:PCNSR\n'
     + '\n'
-    + 'FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& )\n'
+    + 'FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& )\n'
     + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789. )\n'
     + 'FIELDTYPE:Invalid_CRSORT:ENUM(D|B|C|A|)\n'
     + 'FIELDTYPE:Invalid_LotOrder:ENUM(A|D)\n'

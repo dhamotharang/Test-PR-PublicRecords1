@@ -8,11 +8,11 @@ EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Char','In
 EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_Char' => 1,'Invalid_Num' => 2,'Invalid_CRSORT' => 3,'Invalid_LotOrder' => 4,'Invalid_RecType' => 5,'Invalid_DemographicIndicator' => 6,'Invalid_Gender' => 7,'Invalid_LocationType' => 8,'Invalid_TelephoneNumberType' => 9,'Invalid_TimeZone' => 10,'Invalid_YN' => 11,'Invalid_HomeownerCode' => 12,'Invalid_Source' => 13,0);
  
 EXPORT MakeFT_Invalid_Char(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Char(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '))));
-EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Char(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '))));
+EXPORT InValidMessageFT_Invalid_Char(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.\'/& '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Num(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789. '); // Only allow valid symbols
