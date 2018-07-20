@@ -8,7 +8,7 @@ MODULE
 	EXPORT UNSIGNED1 MaxGatewayMatches   := 100;
 	EXPORT UNSIGNED1 MaxTUGatewayResults := 30;
 	EXPORT UNSIGNED1 MaxPhoneMatches     := 10;
-	EXPORT UNSIGNED1 MaxRoyalties        := 10; // ATT_LIBD
+	EXPORT UNSIGNED1 MaxRoyalties        := 11; 
 	EXPORT INTEGER   MaxOtherPhones      := 5; // MaxOtherPhones default
 	
 	

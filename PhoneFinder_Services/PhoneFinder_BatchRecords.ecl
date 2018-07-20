@@ -169,6 +169,7 @@ MODULE
    		BOOLEAN vAccudata_ocnExists := ri.typeflag = Phones.Constants.TypeFlag.AccuData_OCN; // accudata_ocn royalty
    		BOOLEAN vZumigoExists     := ri.rec_source = Phones.Constants.GatewayValues.ZumigoIdentity; // Zumigo royalty
    		BOOLEAN vATT_LIBDExists   := ri.src = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime; // ATT_LIBD royalty
+   		BOOLEAN vAccudata_cnamExists   := ri.subj_phone_type_new = MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2; // accudata_cnam royalty
    		
    		SELF.royalty_type_1 := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_type_1);
    		SELF.royalty_src_1  := IF(vLastResortExists,MDR.sourceTools.src_wired_Assets_Royalty,le.royalty_src_1);
@@ -185,10 +186,12 @@ MODULE
    		SELF.royalty_src_7  := IF(vEquifaxExists,MDR.sourceTools.src_EQUIFAX,le.royalty_type_7);
    		SELF.royalty_type_8 := IF(vAccudata_ocnExists,Royalty.Constants.RoyaltyType.ACCUDATA_OCN_LNP,le.royalty_type_8); // accudata_ocn royalty
    		SELF.royalty_src_8  := IF(vAccudata_ocnExists,MDR.sourceTools.src_Phones_Accudata_OCN_LNP,le.royalty_src_8); // accudata_ocn royalty
-			SELF.royalty_type_9 := IF(vZumigoExists,Royalty.Constants.RoyaltyType.ZUMIGO_IDENTITY,le.royalty_type_9); 
-			SELF.royalty_src_9  := IF(vZumigoExists,MDR.sourceTools.src_Zumigo_GetLineId,le.royalty_src_9);
-			SELF.royalty_type_10 := IF(vATT_LIBDExists, Royalty.Constants.RoyaltyType.ATT_IAP_DQ_IRS, le.royalty_type_10); 
-			SELF.royalty_src_10  := IF(vATT_LIBDExists, Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime, le.royalty_src_10);
+			  SELF.royalty_type_9 := IF(vZumigoExists,Royalty.Constants.RoyaltyType.ZUMIGO_IDENTITY,le.royalty_type_9); 
+			  SELF.royalty_src_9  := IF(vZumigoExists,MDR.sourceTools.src_Zumigo_GetLineId,le.royalty_src_9);
+			  SELF.royalty_type_10 := IF(vATT_LIBDExists, Royalty.Constants.RoyaltyType.ATT_IAP_DQ_IRS, le.royalty_type_10); 
+			  SELF.royalty_src_10  := IF(vATT_LIBDExists, Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime, le.royalty_src_10);
+			  SELF.royalty_type_11 := IF(vAccudata_cnamExists, Royalty.Constants.RoyaltyType.ACCUDATA_CNAM_CNM2, le.royalty_type_11); 
+			  SELF.royalty_src_11  := IF(vAccudata_cnamExists, MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2, le.royalty_src_11);
    		SELF                := le;
  END;
    	
@@ -209,6 +212,7 @@ MODULE
  dRoyaltiesAccudata_ocn     := Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
  dRoyaltyZumGetIden         := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
  dRoyalty_ATT_LIDB          := Royalty.RoyaltyATT.GetBatchRoyaltiesByAcctno(dFilteringInHousePhoneData_typeflag, src, phone, acctno);	
+ dRoyaltiesAccudata_CNAM    := Royalty.RoyaltyAccudata_CNAM.GetBatchRoyaltiesByAcctno(dFilteringInHousePhoneData_typeflag, subj_phone_type_new);
  
  dRoyaltiesByAcctno := 
    		if(inMod.UseLastResort, dRoyaltiesLastResort) + 
@@ -218,6 +222,7 @@ MODULE
    		if(inMod.UseAccudata_OCN, dRoyaltiesAccudata_ocn) +	 //accudata_ocn
    		if(inMod.UseZumigoIdentity, dRoyaltyZumGetIden) +	 //zumigo
     	if(inMod.UseInHousePhoneMetadata, dRoyalty_ATT_LIDB) + // ATT_LIBD
+			  if(inMod.UseAccuData_CNAM, dRoyaltiesAccudata_CNAM) +
    		dataset([], Royalty.Layouts.RoyaltyForBatch);
 
  // Create RoyaltySet to be returned
