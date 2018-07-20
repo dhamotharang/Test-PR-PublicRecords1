@@ -44,7 +44,7 @@ EXPORT Constants := MODULE
 	export unsigned2 MaxCountIncomeRiskHRI := 25; // ~18 from biid + 5 new ones from includes both : 
 	                                              // business risk HRI codes and 
 	                                              // 5 new ones in income risk
-  export unsigned1 MaxResponseExceptions := 4;
+  export unsigned1 MaxResponseExceptions := 20;
 	export unsigned2 MaxCountHealthCareConsolidatedSearch := 1000;
   
 	export unsigned2 MAX_REPORT_SOURCES := 1;
@@ -1631,6 +1631,12 @@ EXPORT Constants := MODULE
 	export SNA := module
 		export MaxBusinessReturn		:= 8000;
 		export MaxSIC_CODES := 12;
+	end;
+
+	//Socio Constants
+	export Socio := module
+		export Max_Scores := 10;
+		export Max_Invalids := 10;
 	end;
 	
 	// Taxpayer info, AKA Txbus?
