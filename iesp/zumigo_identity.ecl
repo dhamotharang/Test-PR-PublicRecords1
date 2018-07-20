@@ -22,6 +22,12 @@ export t_ZIdIdentityOptions := record (iesp.share.t_BaseOption)
 	boolean DeviceHistory {xpath('DeviceHistory')};
 end;
 		
+export t_ZIdConsumerData := record
+	string BillingPostalCode {xpath('BillingPostalCode')};
+	string Ssn4 {xpath('Ssn4')};
+	iesp.share.t_Date BirthMmDd {xpath('BirthMmDd')};
+end;
+		
 export t_ZIdNameToVerify := record
 	string NameType {xpath('NameType')};
 	string FirstName {xpath('FirstName')};
@@ -53,6 +59,7 @@ end;
 export t_ZIdIdentitySearch := record
 	string MobileDeviceNumber {xpath('MobileDeviceNumber')};
 	zumigo_share.t_ZIdConsent Consent {xpath('Consent')};
+	t_ZIdConsumerData ConsumerData {xpath('ConsumerData')};
 	t_ZIdValidateValues NameAddrValidation {xpath('NameAddrValidation')};
 end;
 		
