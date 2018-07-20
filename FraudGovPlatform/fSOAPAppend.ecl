@@ -1,12 +1,26 @@
 ﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models;
-EXPORT fSOAPAppend	:= MODULE
+EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
 Shared threads			:= 2;
 
 Shared base := Fraudshared.Files().Base.Main.built;
 
-Shared pii_base	:= Files().base.pii.built;
+shared pii_current := Files().base.pii.built; //pii current build
+
+shared pii_previous := Files().base.pii.qa;			//pii previous build
+
+shared pii_updates := Join(pii_current,pii_previous,left=right,left only); //pii updates
+
+Shared pii_base	:= if(UpdatePii,pii_updates,pii_current); //pii soap input
+
+shared ciid_base				:= Files().base.ciid.qa;
+
+shared crim_base				:= Files().base.crim.qa;
+
+shared death_base 			:= Files().base.death.qa;
+
+shared fraudpoint_base	:= Files().base.fraudpoint.qa;
 
 Export Pii := Module
 
@@ -32,7 +46,10 @@ Export Pii := Module
 									);
 
 		pdist:=distribute(pbase(did>0),hash(did));
-	Export All :=dedup(pdist,record,all);
+		pdedup:=dedup(pdist,record,all);
+	 
+	 Export All := pdedup;
+	 
 End;
 
 EXPORT CIID		:= MODULE
@@ -178,9 +195,10 @@ soap_results := soapcall(	soap_in,
 						// (errorcode='')
 						;
 
-p:=project(soap_results,Layouts.CIID);
+p	:=	dedup(project(soap_results,Layouts.CIID),record,all);
 
-Export All	:= p;
+ciid_combine	:= dedup((p + ciid_base),record,all);
+Export All		:= if(updatepii, ciid_combine,p); 
 
 END;
 
@@ -251,7 +269,10 @@ soap_results := soapcall( soap_input,
 						)
 						(offender_key<>'')
 						;
-Export All := Project(soap_results,Layouts.Crim);
+p:=dedup(project(soap_results,Layouts.Crim),record,all);
+
+crim_combine	:= dedup((p + crim_base),record,all);
+Export All		:= if(updatepii, crim_combine,p);
 									
 END;
 
@@ -314,8 +335,11 @@ soapResponse := soapcall( soap_input,
 						)
 						(matchcode<>'')
 						;
-Export All := Project(soapResponse,Layouts.Death);
-						
+p := dedup(Project(soapResponse,Layouts.Death),record,all);
+
+Death_combine	:= dedup((p + death_base),record,all);
+Export All		:= if(updatepii, Death_combine,p);		
+				
 END;
 
 EXPORT FraudPoint	:= MODULE
@@ -407,12 +431,12 @@ soap_results := soapcall(	soap_in,
 						// (errorcode='')
 						;
 						
-fp	:= project(soap_results
-							,Transform(Layouts.FraudPoint
-									,self.did	:=(unsigned)left.acctno
-									,self:=left));
+fp	:= dedup(project(soap_results	,Transform(Layouts.FraudPoint
+																	,self.did	:=(unsigned)left.acctno
+																	,self:=left)),record,all);
 
-Export All := fp;
+Fp_combine	:= dedup((fp + fraudpoint_base),record,all);
+Export All		:= if(updatepii, Fp_combine,fp);	
 
 END;
 

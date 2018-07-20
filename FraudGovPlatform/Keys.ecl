@@ -5,7 +5,7 @@ export Keys(
 
 ) := module
 	
-	shared Base_ClusterDetails 						:= PROJECT(KELOtto.KelFiles.FullCluster	, TRANSFORM(Layouts_key.ClusterDetails	,SELF.exp1_:=topn(LEFT.exp1_ , 255,LEFT.exp1_.entity_context_uid_),SELF:=LEFT ));
+	shared Base_ClusterDetails 						:= PROJECT(KELOtto.KelFiles.FullCluster	, TRANSFORM(Layouts_key.ClusterDetails	,SELF.exp1_:=topn(LEFT.exp1_ , 255,LEFT.exp1_.entity_context_uid_),self.zip_ := (integer8) LEFT.zip_ ,SELF:=LEFT ));
 	shared Base_ElementPivot 							:= PROJECT(KelOtto.KelFiles.EntityStats, Layouts_Key.ElementPivot);
 	shared Base_ScoreBreakdown 						:= PROJECT(KelOtto.KelFiles.ScoreBreakdown, Layouts_Key.ScoreBreakdown);
 
