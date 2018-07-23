@@ -1,4 +1,4 @@
-﻿import _Control, FCRA,suppress, FFD, LN_PropertyV2_Services;
+﻿import _Control, FCRA,suppress, FFD, LN_PropertyV2_Services, D2C;
 onThor := _Control.Environment.OnThor;
 
 k_search(boolean isFCRA = false)		:= keys.search(isFCRA);
@@ -15,7 +15,8 @@ export dataset(l_raw) fn_get_parties_raw(
 	boolean isFCRA = false,
 	dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
   dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-  integer8 inFFDOptionsMask = 0
+  integer8 inFFDOptionsMask = 0,
+	 boolean isCNSMR = false
 ) := function
 // canned data for testing
   // _canned :=  _data_canned.Corrections (project(in_fids,LN_PropertyV2_Services.layouts.search_fid));
@@ -29,7 +30,8 @@ export dataset(l_raw) fn_get_parties_raw(
 	ds_raw_roxie := join(
 		in_fids, k_search(isFCRA),
 	  keyed(left.ln_fares_id = right.ln_fares_id)
-		and ~((string)right.persistent_record_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
+		and ~((string)right.persistent_record_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA)
+		and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
 		transform(l_raw, self.search_did := left.search_did,self:=right, self := []),
 		keep(2*max_parties), 
 		atmost(max_raw)
