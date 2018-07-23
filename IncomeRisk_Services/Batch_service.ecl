@@ -14,6 +14,7 @@
 		<part name="ModelName" type="xsd:string"/>
 		
 	  <part name="Include_ALL_Watchlist" type="xsd:boolean"/>
+	  <part name="Include_ALLV4_Watchlist" type="xsd:boolean"/>
 	  <part name="Include_BES_Watchlist" type="xsd:boolean"/>
 	  <part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
   	<part name="Include_DTC_Watchlist" type="xsd:boolean"/>
@@ -37,7 +38,7 @@
 //    <part name="businessRisk"    type = "tns:XmlDataSet" cols="70" rows="25"/>
 // 		<part name="ERISalaryReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />	
 //
-import doxie, address, business_risk, risk_indicators, incomeRisk_services, iesp, batchservices,gateway;
+import doxie, address, business_risk, risk_indicators, incomeRisk_services, iesp, batchservices,gateway, OFAC_XG5;
 export Batch_Service() := macro
 		
 	// Can't have duplicate definitions of Stored with different default values, 
@@ -149,6 +150,7 @@ export Batch_Service() := macro
     // string gateways_in_eri := gateways_in (servicename = 'erisalary')[1].url;
 
 		boolean Include_ALL_Watchlist:= false : stored('Include_ALL_Watchlist');
+		boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 		boolean Include_BES_Watchlist:= false : stored('Include_BES_Watchlist');
 		boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
 		boolean Include_DTC_Watchlist:= false : stored('Include_DTC_Watchlist');
@@ -168,6 +170,7 @@ export Batch_Service() := macro
 
 		dWL := dataset([], iesp.share.t_StringArrayItem) +
 		if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+		if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
 		if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
 		if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
 		if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -191,6 +194,9 @@ export Batch_Service() := macro
 		eri_in_w_acctno := incomeRisk_Services.raw.batch_view.setERIGatewayRequest(batch_in_tmp);				
 		
 		eri_gtway_results_w_acct_no := incomeRisk_services.raw.batch_view.eri_gateway(eri_in_w_acctno, gateways_in);
+    
+    IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 		// this is modeled after business_Risk.InstantID_Batch_Service_records(
 		biidBatch_recs := IncomeRisk_Services.ReportService_records.records(

@@ -64,6 +64,7 @@
 
 	<!-- ----------[ Watchlists ]---------- -->
 	<part name="Include_ALL_Watchlist"  type="xsd:boolean"/>
+	<part name="Include_ALLV4_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_BES_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_BIS_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
@@ -97,7 +98,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Patriot, Risk_Indicators, Royalty, STD;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Patriot, Risk_Indicators, Royalty, STD;
 
 EXPORT InstantID20_Batch_Service() := MACRO
 
@@ -164,6 +165,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		'PoBoxCompliance',
 		'UseDOBFilter',
 		'Include_ALL_Watchlist',
+		'Include_ALLV4_Watchlist',
 		'Include_BES_Watchlist',
 		'Include_BIS_Watchlist',
 		'Include_CFTC_Watchlist',
@@ -199,6 +201,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 
 		// 1. Construct a Watchlist dataset.
 		boolean Include_ALL_Watchlist := false : stored('Include_ALL_Watchlist');
+    boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 		boolean Include_BES_Watchlist := false : stored('Include_BES_Watchlist');
 		boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
 		boolean Include_DTC_Watchlist := false : stored('Include_DTC_Watchlist');
@@ -231,6 +234,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 
 		dWL := dataset([], iesp.share.t_StringArrayItem) +
 				if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+        if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
 				if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
 				if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
 				if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -300,6 +304,9 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE              := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
+
+  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 		// 5. Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These 
 		// parameters should be global so figure them out here and pass around appropriately.

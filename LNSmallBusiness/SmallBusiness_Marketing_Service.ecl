@@ -203,9 +203,11 @@ SmallBusinessMarketingRequest XML:
 &lt;/lnsmallbusiness.SmallBusiness_Marketing_ServiceRequest&gt;
 </pre>
 */
+
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
-IMPORT Address, Business_Risk_BIP, Gateway, IESP, Risk_Reporting, UT, Models, Inquiry_AccLogs, STD;
+
+IMPORT Address, Business_Risk_BIP, Gateway, IESP, Risk_Reporting, UT, Models, Inquiry_AccLogs, STD, OFAC_XG5;
 
 EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	/* ************************************************************************
@@ -390,6 +392,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 	STRING32 TestDataTableName		 := users.TestDataTableName;
 	BOOLEAN IncludeTargusGateway   := FALSE;
 	BOOLEAN RunTargusGateway       := FALSE;
+
+	IF( OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
+		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 	
 	// SmallBusinessAttrV1 (etc) is a valid input
 	AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));

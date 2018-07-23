@@ -1,4 +1,4 @@
-﻿﻿import address, ADVO, Business_Header_SS, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp,
+﻿import address, ADVO, Business_Header_SS, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp,
 			 IntlIID, YellowPages, gateway, Royalty, MDR, census_data, OFAC_XG5, Risk_Reporting, STD, Inquiry_AccLogs;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
@@ -174,6 +174,9 @@ unsigned6 UniqueId := 0 : stored('UniqueId');
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeCLoverride := false : stored('IncludeCLoverride');
 boolean SearchSicNAICSCodes := false : STORED('SearchSicNAICSCodes');
+
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 // If OFACVersion is set to 2 or 3, check whether include_ofac = false and include_additional_watchlists 
 // = false and watchlists_requested is empty. If they are, set include_ofac = true and include_
