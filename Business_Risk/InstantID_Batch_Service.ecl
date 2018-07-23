@@ -24,6 +24,7 @@
 	<part name="IncludeDLVerification" type="xsd:boolean"/>
 	<part name="AttributesVersionRequest" type="xsd:string"/>	
 	<part name="Include_ALL_Watchlist" type="xsd:boolean"/>
+	<part name="Include_ALLV4_Watchlist" type="xsd:boolean"/>
 	<part name="Include_BES_Watchlist" type="xsd:boolean"/>
 	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
 	<part name="Include_DTC_Watchlist" type="xsd:boolean"/>
@@ -114,7 +115,7 @@
 */
 
 export InstantID_Batch_Service() := macro
-import doxie, address, AutoStandardI,OFAC_XG5;
+import doxie, address, AutoStandardI, OFAC_XG5;
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
@@ -162,6 +163,7 @@ gateways_in := Gateway.Configuration.Get();
 STRING AttributesVersionRequest := '' : STORED('AttributesVersionRequest');
 IncludeRepAttributes := StringLib.StringToUpperCase(AttributesVersionRequest) IN ['BIIDATTRIBUTESV1'];
 boolean Include_ALL_Watchlist:= false : stored('Include_ALL_Watchlist');
+boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 boolean Include_BES_Watchlist:= false : stored('Include_BES_Watchlist');
 boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
 boolean Include_DTC_Watchlist:= false : stored('Include_DTC_Watchlist');
@@ -194,6 +196,7 @@ boolean Include_PMLJ_Watchlist:= false : stored('Include_PMLJ_Watchlist');
 
 dWL := dataset([], iesp.share.t_StringArrayItem) +
 if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
 if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
 if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
 if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -227,6 +230,8 @@ watchlists_request := dWL(value<>'');
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 ret := Business_Risk.InstantID_Batch_Service_records(//risk_indicators.Layout_Gateways_In  
 																gateways_in,

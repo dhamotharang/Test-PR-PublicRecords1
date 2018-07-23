@@ -226,6 +226,8 @@ boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 unsigned1 AppendBest := 1;	// search best file
 
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 in_city_name := stringlib.stringtouppercase(city);
 in_st		 := stringlib.stringtouppercase(state);

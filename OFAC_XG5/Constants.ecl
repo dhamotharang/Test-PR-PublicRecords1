@@ -1,4 +1,4 @@
-EXPORT Constants := module
+﻿EXPORT Constants := module
 
 
 EXPORT ENTITYtype (INTEGER ID) := 
@@ -167,48 +167,55 @@ export AKAType (INTEGER ID) :=
 	export  VendorRecFlag									:= 'VENDOR';
 	export 	OFACSDN												:= 'OFAC SDN.BDF';
 	export 	CountryFiles									:= 'CDF';
+	export 	ErrorMsg_OFACversion := 'OFAC version does not support ALLV4.';
+
+	export	string	wlALLV4 :=	'ALLV4'; // FROM PRODUCT MANAGEMENT "ALLV4 WILL MEAN ALLV4 AVAILABLE LISTS. For use only when OFACverion is 4."
 	
 	export DBNames_rec := RECORD
 		string dbname;
 	end;
+
 	export WCOFACNames := dataset([ 
-												  {'OFAC NON-SDN ENTITIES.BDF'},
+												 {'OFAC NON-SDN ENTITIES.BDF'},
 												 {'OFAC SDN ADDITIONS AND MODIFICATIONS.BDF'},			
 												 {'OFAC SDN.BDF'},
 												 {'OFAC SANCTIONS.CDF'}	
 												 // {'OFAC ENHANCEMENTS - ENTITIES.BDF'}	,		// ROYALTY charge - ACCUITY	not used
 												 // {'OFAC ENHANCEMENTS - COUNTRIES.CDF'}			// ROYALTY charge - ACCUITY	not used									
 												 ], DBNames_rec);   	//=> 'OFAC'	
-												  // req 1.6
- export WCOAddtnlFiles := dataset([{'AUSTRALIA DEPT OF FOREIGN AFFAIRS AND TRADE.BDF'},												
-												 {'COMMODITY FUTURES TRADING COMMISSION SANCTIONS.BDF'},												
-												 {'DTC DEBARRED PARTIES.BDF'},												
-												 {'BUREAU OF INDUSTRY AND SECURITY.BDF'},												
-												 {'EU CONSOLIDATED LIST.BDF'},												
-												 {'FBI MOST WANTED.BDF'},												
-												 {'FBI TOP TEN MOST WANTED.BDF'},												
-												 {'FBI HIJACK SUSPECTS.BDF'},
-												 {'FBI MOST WANTED TERRORISTS.BDF'},												
-												 {'FBI SEEKING INFORMATION.BDF'},												
-												 {'FOREIGN AGENTS REGISTRATIONS.BDF'},												
-												 {'BANK OF ENGLAND CONSOLIDATED LIST.BDF'},
-												 {'HONG KONG MONETARY AUTHORITY.BDF'},												
-												 {'MONETARY AUTHORITY OF SINGAPORE.BDF'},												
-												 {'OSFI CONSOLIDATED LIST.BDF'},												
-												 {'PRIMARY MONEY LAUNDERING CONCERN.BDF'},												
-												 {'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS.CDF'},												
-												 {'TERRORIST EXCLUSION LIST.BDF'},
-												 {'OFAC SDN.BDF'},  //  goes with SDT - Terrorist Exclusion List
-												 {'UNAUTHORIZED BANKS.BDF'},												
-												 {'UN CONSOLIDATED LIST.BDF'},												
-												 {'WORLD BANK INELIGIBLE FIRMS.BDF'},									
-												 {'OSFI COUNTRY.CDF'}	,														
-												 {'OFFSHORE FINANCIAL CENTERS.CDF'}	,								
-												 {'FATF FINANCIAL ACTION TASK FORCE.CDF'}	,								
-												 {'FATF DEFICIENT JURISDICTIONS - COUNTRIES.CDF'},								
-												 {'HM TREASURY SANCTIONS.CDF'}
-												 // {'WorldCompliance - Politically Exposed Persons.BDF'}									
-												 ], DBNames_rec);																	
+
+ export WCOAddtnlFiles_ALL := WCOFACNames + 
+        dataset([{'BANK OF ENGLAND CONSOLIDATED LIST.BDF'},
+            {'BUREAU OF INDUSTRY AND SECURITY.BDF'},
+            {'CHIEFS OF STATE AND FOREIGN CABINET MEMBERS.BDF'},
+            {'COMMODITY FUTURES TRADING COMMISSION SANCTIONS.BDF'},
+            {'DTC DEBARRED PARTIES.BDF'},
+            {'EU CONSOLIDATED LIST.BDF'},
+            {'FBI TOP TEN MOST WANTED.BDF'},
+            {'FOREIGN AGENTS REGISTRATIONS.BDF'},
+            {'HM TREASURY SANCTIONS.CDF'},
+            {'OSFI CONSOLIDATED LIST.BDF'},
+            {'OSFI COUNTRY.CDF'},
+            {'TERRORIST EXCLUSION LIST.BDF'},
+            {'UN CONSOLIDATED LIST.BDF'},
+            {'UNAUTHORIZED BANKS.BDF'},
+            {'WORLD BANK INELIGIBLE FIRMS.BDF'}												
+												], DBNames_rec);
+
+ export WCOAddtnlFiles_ALLV4 := WCOAddtnlFiles_ALL +
+          dataset([{'AUSTRALIA DEPT OF FOREIGN AFFAIRS AND TRADE.BDF'},												
+            {'FATF Financial Action Task Force.CDF'},
+            {'FATF DEFICIENT JURISDICTIONS - COUNTRIES.CDF'},
+            {'FBI MOST WANTED.BDF'},
+            {'FBI HIJACK SUSPECTS.BDF'},
+            {'FBI MOST WANTED TERRORISTS.BDF'},
+            {'FBI SEEKING INFORMATION.BDF'},
+            {'HONG KONG MONETARY AUTHORITY.BDF'},
+            {'MONETARY AUTHORITY OF SINGAPORE.BDF'},
+            {'OFFSHORE FINANCIAL CENTERS.CDF'},
+            {'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS.CDF'},
+            {'PRIMARY MONEY LAUNDERING CONCERN.BDF'}								
+            ], DBNames_rec);																	
 
 EXPORT PtyKeyPrefix (STRING Sourcename, string ENTITYTYPE = '') := 
 												map( 
@@ -236,7 +243,7 @@ EXPORT PtyKeyPrefix (STRING Sourcename, string ENTITYTYPE = '') :=
 												 Sourcename = 'OSFI CONSOLIDATED LIST.BDF' and ENTITYTYPE = '2'	=> 'OCI', 
 												 Sourcename = 'OSFI CONSOLIDATED LIST.BDF' and ENTITYTYPE <> '2'		=> 'OCE', 
 												 Sourcename = 'PRIMARY MONEY LAUNDERING CONCERN.BDF'	=> 'PMLC'	,									
-												 Sourcename =  'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS.CDF'   => 'PRMLJ',												
+												 Sourcename = 'PRIMARY MONEY LAUNDERING CONCERN - JURISDICTIONS.CDF'   => 'PRMLJ',												
 												 Sourcename = 'UNAUTHORIZED BANKS.BDF'		=>  'OCC'		,								
 												 Sourcename =  'UN CONSOLIDATED LIST.BDF'	and ENTITYTYPE = '2'	=>  'AQI',  // 'AQO''BRO' 'BROW'										
 												 Sourcename =  'UN CONSOLIDATED LIST.BDF'	and ENTITYTYPE <> '2' 	=>  'AQO',  // 'AQO''BRO' 'BROW'										

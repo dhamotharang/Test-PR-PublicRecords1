@@ -16,6 +16,8 @@
  </message>
 */
 
+import OFAC_XG5;
+
 export Patriot_Batch := MACRO
 
 in_format := patriot.Layout_batch_in;
@@ -47,6 +49,9 @@ end;
 
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
+
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 in_format capitalize(in_format le) :=
 TRANSFORM
