@@ -262,8 +262,9 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get the watchlist results.  To simplify watchlist searching we are only supporting the custom watchlist set (Could include 'ALL', 'OFA', 'OFC', 'OSC', 'BES', 'CFT', etc etc) - See Patriot.WL_Include_Keys for the full list.
 	// By doing this it eliminates all of the extra OFAC_Only/Include_OFAC/Include_Additional_Watchlists input options that really can be accomplished with the Watchlists_Requested input dataset
 	OFAC_Only := FALSE;
-  Include_OFAC := FALSE;
-	Include_Additional_Watchlists := FALSE;
+	Include_OFAC_Temp := if(options.OFAC_Version = 1, false, true);
+	Include_OFAC := Include_OFAC_Temp;
+  Include_Additional_Watchlists := FALSE;
 	Skip_Company_Search := TRUE; // No need to search for company watchlist info - these are people
 	DOB_Radius := -1;
 	// Don't attempt to grab watchlists unless we actually have some in the list...
