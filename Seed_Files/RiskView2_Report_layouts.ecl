@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 
 EXPORT RiskView2_Report_layouts := MODULE
 
@@ -109,6 +109,9 @@ EXPORT RiskView2_Report_layouts := MODULE
 		string4 lastaction_year;
 		string2 lastaction_month;
 		string2 lastaction_day;
+		string4 lastseen_year;
+		string2 lastseen_month;
+		string2 lastseen_day;
 		string30 StatementID;
 	end;
 			
