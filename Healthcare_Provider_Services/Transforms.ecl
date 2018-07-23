@@ -1,6 +1,6 @@
 import doxie,iesp, Lib_BridgerScore, AutoStandardI,NPPES,Healthcare_Header_Services;
 
-EXPORT Transforms := MODULE
+EXPORT Transforms :=  MODULE
 	export iesp.healthcare.t_HealthCareBusinessAddress processAddress(doxie.ingenix_provider_module.ingenix_addr_rpt_rec inAddr):= TRANSFORM
 		self.address := iesp.ECL2ESP.SetAddress(inAddr.prov_clean_prim_name, inAddr.prov_clean_prim_range, inAddr.prov_clean_predir, inAddr.prov_clean_postdir,
            inAddr.prov_clean_addr_suffix, inAddr.prov_clean_unit_desig, inAddr.prov_clean_sec_range, inAddr.prov_clean_p_city_name,
@@ -392,7 +392,7 @@ end;
 		self.Src_5:=inRec.sources[5].Src;
 		nameChildren := inRec.Names(CompanyName<>'' or LastName <>'');
 		self.Name_1_namePenalty:=(string)nameChildren[1].namePenalty;
-		self.Name_1_CompanyName:=nameChildren[1].CompanyName;
+		self.Name_1_CompanyName:=if(nameChildren[1].LastName = '',nameChildren[1].CompanyName,'');
 		self.Name_1_FirstName:=nameChildren[1].FirstName;
 		self.Name_1_MiddleName:=nameChildren[1].MiddleName;
 		self.Name_1_LastName:=nameChildren[1].LastName;
@@ -400,7 +400,7 @@ end;
 		self.Name_1_Title:=nameChildren[1].Title;
 		self.Name_1_Gender:=nameChildren[1].Gender;
 		self.Name_2_namePenalty:=if(nameChildren[2].CompanyName<>'' or nameChildren[2].LastName <> '',(string)nameChildren[2].namePenalty,'');
-		self.Name_2_CompanyName:=nameChildren[2].CompanyName;
+		self.Name_2_CompanyName:=if(nameChildren[2].LastName ='',nameChildren[2].CompanyName,'');
 		self.Name_2_FirstName:=nameChildren[2].FirstName;
 		self.Name_2_MiddleName:=nameChildren[2].MiddleName;
 		self.Name_2_LastName:=nameChildren[2].LastName;
@@ -408,7 +408,7 @@ end;
 		self.Name_2_Title:=nameChildren[2].Title;
 		self.Name_2_Gender:=nameChildren[2].Gender;
 		self.Name_3_namePenalty:=if(nameChildren[3].CompanyName<>'' or nameChildren[3].LastName <> '',(string)nameChildren[3].namePenalty,'');
-		self.Name_3_CompanyName:=nameChildren[3].CompanyName;
+		self.Name_3_CompanyName:=if(nameChildren[3].LastName ='',nameChildren[3].CompanyName,'');
 		self.Name_3_FirstName:=nameChildren[3].FirstName;
 		self.Name_3_MiddleName:=nameChildren[3].MiddleName;
 		self.Name_3_LastName:=nameChildren[3].LastName;
@@ -416,7 +416,7 @@ end;
 		self.Name_3_Title:=nameChildren[3].Title;
 		self.Name_3_Gender:=nameChildren[3].Gender;
 		self.Name_4_namePenalty:=if(nameChildren[4].CompanyName<>'' or nameChildren[4].LastName <> '',(string)nameChildren[4].namePenalty,'');
-		self.Name_4_CompanyName:=nameChildren[4].CompanyName;
+		self.Name_4_CompanyName:=if(nameChildren[4].LastName ='',nameChildren[4].CompanyName,'');
 		self.Name_4_FirstName:=nameChildren[4].FirstName;
 		self.Name_4_MiddleName:=nameChildren[4].MiddleName;
 		self.Name_4_LastName:=nameChildren[4].LastName;
@@ -424,7 +424,7 @@ end;
 		self.Name_4_Title:=nameChildren[4].Title;
 		self.Name_4_Gender:=nameChildren[4].Gender;
 		self.Name_5_namePenalty:=if(nameChildren[5].CompanyName<>'' or nameChildren[5].LastName <> '',(string)nameChildren[5].namePenalty,'');
-		self.Name_5_CompanyName:=nameChildren[5].CompanyName;
+		self.Name_5_CompanyName:=if(nameChildren[5].LastName ='',nameChildren[5].CompanyName,'');
 		self.Name_5_FirstName:=nameChildren[5].FirstName;
 		self.Name_5_MiddleName:=nameChildren[5].MiddleName;
 		self.Name_5_LastName:=nameChildren[5].LastName;
