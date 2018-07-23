@@ -1,4 +1,4 @@
-﻿﻿import tools;
+﻿import tools;
 
 export Filenames(
 
@@ -101,6 +101,12 @@ module
 		export IdentityData := tools.mod_FilenamesBuild(Template('IdentityData'),pversion);
 		export KnownFraud 	:= tools.mod_FilenamesBuild(Template('KnownFraud'),pversion);
 		export AddressCache	:= tools.mod_FilenamesBuild(Template('AddressCache'),pversion);
+		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
+		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
+		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
+		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
+		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
+
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
 		export kel_personstats			:= tools.mod_FilenamesBuild(Template('kel::personstats'),pversion);
@@ -115,6 +121,12 @@ module
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
+			AddressCache.dAll_filenames +
+			Pii.dAll_filenames +
+			CIID.dAll_filenames +
+			Crim.dAll_filenames +
+			Death.dAll_filenames +
+			FraudPoint.dAll_filenames +
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
 			kel_personevents.dAll_filenames + 
