@@ -59,6 +59,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint,Layouts.FraudPoint,FraudPoint);
 	end;
 
-
+	export OutputF := module
+		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
+	end;
 	
 end;

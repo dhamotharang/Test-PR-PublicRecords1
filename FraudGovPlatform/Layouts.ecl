@@ -412,7 +412,13 @@ EXPORT Layouts := MODULE
 		END;
 	END;
 
-
+	export OutputF := module
+		export FraudgovInfoRec			:= RECORD
+			string8 PreviousVersion;
+			string8 NewVersion;
+			string Status;
+		END;
+	end;
 
 export temp := module 
 	 

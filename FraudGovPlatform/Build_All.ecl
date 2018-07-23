@@ -1,4 +1,4 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation, STD;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation,STD;
 
 export Build_All(
 
@@ -20,7 +20,7 @@ export Build_All(
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
 	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
 	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
-  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
+	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
 	,boolean                                    	pUpdateIdentityDataFlag		= _Flags.Update.IdentityData
 	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
@@ -37,17 +37,20 @@ module
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	export input_portion := sequential(
-			Build_Input(
+			fraudgovInfo(pversion,'START_INPUT_FILES').PostStatus
+			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
 			 ).All
 			,HeaderInfo.Post
 			,AddressesInfo(pversion).Post				 
+			,fraudgovInfo(pversion,'END_INPUT_FILES').PostStatus				 
 	);
 
 	export base_portion := sequential(
-		  Build_Base(
+			fraudgovInfo(pversion,'START_BASE_FILES').PostStatus
+		  	,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
@@ -65,6 +68,7 @@ module
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
 			).All
+			,fraudgovInfo(pversion,'END_BASE_FILES').postFinish
 			,notify('BASE FILES COMPLETE','*')
 			,notify('Build_FraudGov_PII_SOAP_Appends','*')
 			
@@ -83,7 +87,7 @@ module
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
+		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 	
 	
 	export full_build := sequential(

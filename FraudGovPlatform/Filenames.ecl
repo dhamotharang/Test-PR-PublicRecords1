@@ -75,8 +75,8 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Prepped := module
 		export identitydata 		:= FraudGov_Prefix('in') + 'passed::identitydata';
-		export deltabase 				:= FraudGov_Prefix('in') + 'passed::deltabase';		
-		export nac 						:= FraudGov_Prefix('in') + 'passed::nac';		
+		export deltabase 			:= FraudGov_Prefix('in') + 'passed::deltabase';		
+		export nac 					:= FraudGov_Prefix('in') + 'passed::nac';		
 		export inquirylogs 			:= FraudGov_Prefix('in') + 'passed::inquirylogs';		
 		export knownfraud 			:= FraudGov_Prefix('in') + 'passed::knownfraud';		
 	end;
@@ -86,9 +86,10 @@ module
 	// -- Output Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module
-		export NewHeader 				:= FraudGov_Prefix('out') + 'NewHeader_flag';
+		export NewHeader 			:= FraudGov_Prefix('out') + 'NewHeader_flag';
+		export FraudgovInfoFn		:= FraudGov_Prefix('out') + 'NewFraudgov_flag';
 		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';	
-		export Scrubs_FraudGov 	:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
+		export Scrubs_FraudGov 		:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
 	end;
 
 	//////////////////////////////////////////////////////////////////
