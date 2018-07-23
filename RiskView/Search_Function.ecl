@@ -1,4 +1,5 @@
-﻿import AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -33,9 +34,7 @@ EXPORT Search_Function(
 	integer2 ReportingPeriod, 
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
-	boolean exception_score_reason = FALSE,
-	boolean onThor = FALSE
-) := function
+	boolean exception_score_reason = FALSE) := function
 
 
 boolean   isPreScreenPurpose := StringLib.StringToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -86,25 +85,46 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	SELF.in_zipCode := le.Z5;
 	self.in_country := '';
 	//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
-	self.prim_range 	:= IF(onThor, '', address.cleanFields(clean_addr).prim_range);
-	self.predir 			:= IF(onThor, '', address.cleanFields(clean_addr).predir);
-	self.prim_name 		:= IF(onThor, '', address.cleanFields(clean_addr).prim_name);
-	self.addr_suffix 	:= IF(onThor, '', address.cleanFields(clean_addr).addr_suffix);
-	self.postdir 			:= IF(onThor, '', address.cleanFields(clean_addr).postdir);
-	self.unit_desig 	:= IF(onThor, '', address.cleanFields(clean_addr).unit_desig);
-	self.sec_range 		:= IF(onThor, '', address.cleanFields(clean_addr).sec_range);
-	self.p_city_name 	:= IF(onThor, '', address.cleanFields(clean_addr).v_city_name);  // use v_city_name 90..114 to match all other scoring products
-	self.st 					:= IF(onThor, '', address.cleanFields(clean_addr).st);
-	self.z5 					:= IF(onThor, '', address.cleanFields(clean_addr).zip);
-	self.zip4 				:= IF(onThor, '', address.cleanFields(clean_addr).zip4);
-	self.lat 					:= IF(onThor, '', address.cleanFields(clean_addr).geo_lat);
-	self.long 				:= IF(onThor, '', address.cleanFields(clean_addr).geo_long);
-	self.addr_type 		:= IF(onThor, '', address.cleanFields(clean_addr).rec_type);
-	self.addr_status 	:= IF(onThor, '', address.cleanFields(clean_addr).err_stat);
-	self.county 			:= IF(onThor, '', clean_addr[143..145]);  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
-	self.geo_blk 			:= IF(onThor, '', address.cleanFields(clean_addr).geo_blk);
-	self.country 			:= '';
-	
+  #IF(onThor)
+    self.prim_range 	:= '';
+    self.predir 			:= '';
+    self.prim_name 		:= '';
+    self.addr_suffix 	:= '';
+    self.postdir 			:= '';
+    self.unit_desig 	:= '';
+    self.sec_range 		:= '';
+    self.p_city_name 	:= '';
+    self.st 					:= '';
+    self.z5 					:= '';
+    self.zip4 				:= '';
+    self.lat 					:= '';
+    self.long 				:= '';
+    self.addr_type 		:= '';
+    self.addr_status 	:= '';
+    self.county 			:= '';
+    self.geo_blk 			:= '';
+    self.country 			:= '';
+	#ELSE
+    self.prim_range   := address.cleanFields(clean_addr).prim_range;
+    self.predir 			:= address.cleanFields(clean_addr).predir;
+    self.prim_name 		:= address.cleanFields(clean_addr).prim_name;
+    self.addr_suffix 	:= address.cleanFields(clean_addr).addr_suffix;
+    self.postdir 			:= address.cleanFields(clean_addr).postdir;
+    self.unit_desig 	:= address.cleanFields(clean_addr).unit_desig;
+    self.sec_range 		:= address.cleanFields(clean_addr).sec_range;
+    self.p_city_name 	:= address.cleanFields(clean_addr).v_city_name;  // use v_city_name 90..114 to match all other scoring products
+    self.st 					:= address.cleanFields(clean_addr).st;
+    self.z5 					:= address.cleanFields(clean_addr).zip;
+    self.zip4 				:= address.cleanFields(clean_addr).zip4;
+    self.lat 					:= address.cleanFields(clean_addr).geo_lat;
+    self.long 				:= address.cleanFields(clean_addr).geo_long;
+    self.addr_type 		:= address.cleanFields(clean_addr).rec_type;
+    self.addr_status 	:= address.cleanFields(clean_addr).err_stat;
+    self.county 			:= clean_addr[143..145];  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
+    self.geo_blk 			:= address.cleanFields(clean_addr).geo_blk;
+    self.country 			:= '';
+  #END
+  
 	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
 	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
 	history_date := if(le.historydateTimeStamp='', risk_indicators.iid_constants.default_history_date, (unsigned)le.historydateTimeStamp[1..6]);
@@ -164,7 +184,11 @@ END;
 
 bsprep_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT)): PERSIST('~BOCASHELLFCRA::cleaned_inputs');
 
-bsprep := IF(onThor, bsprep_thor, bsprep_roxie);
+#IF(onThor)
+	bsprep := bsprep_thor;
+#ELSE
+	bsprep := bsprep_roxie;
+#END
 
 RiskView.Layouts.Layout_Custom_Inputs getCustomInputs(RiskView.Layouts.layout_riskview_input le) := TRANSFORM
 	SELF.Seq := le.Seq; // This should match the Seq number of BSPrep/Model Results
@@ -187,7 +211,7 @@ end;
 LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 											bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '');
-										
+                    
 Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
 
 bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
@@ -238,7 +262,7 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=ADL_Based_Shell, datarestriction:=datarestriction, BSOptions:=BSOptions,
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
-		IncludeLnJ :=IncludeLnJ, onThor := onThor,
+		IncludeLnJ :=IncludeLnJ,
     ReportingPeriod := ReportingPeriod 
 	);
 	

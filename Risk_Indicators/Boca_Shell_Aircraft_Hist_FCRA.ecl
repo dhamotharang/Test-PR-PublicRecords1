@@ -1,9 +1,10 @@
 ﻿/*2013-05-28T13:07:02Z (Michele Walklin_prod)
 code review AML
 */
-import faa, riskwise, ut;
+import _Control, faa, riskwise, ut;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Aircraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, BOOLEAN onThor = FALSE) := FUNCTION
+export Boca_Shell_Aircraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
@@ -40,7 +41,12 @@ reg_ids_thor_did := join (distribute(ids_only(did!=0), hash64(did)),
                  riskwise.max_atmost), LOCAL);
 reg_ids_thor := group(sort(reg_ids_thor_did + project(ids_only(did=0), transform(layout_reg_ids, self := LEFT, self := [])),seq),seq);
 
-reg_ids := if(onThor, reg_ids_thor, reg_ids_roxie);
+#IF(onThor)
+	reg_ids := reg_ids_thor;
+#ELSE
+	reg_ids := reg_ids_roxie;
+#END
+
 // now fetch main registration records;
 key_ids := faa.key_aircraft_id (true);
 
@@ -66,7 +72,11 @@ reg_raw_thor_pre := join (distribute(reg_ids(aircraft_id != 0), hash64(aircraft_
                  left outer, keep (1), limit (0), LOCAL);
 reg_raw_thor := group(sort(reg_raw_thor_pre + project(reg_ids(aircraft_id=0), transform(layout_reg_ids, self := LEFT, self := [])), seq),seq);
 
-reg_raw := if(onThor, reg_raw_thor, reg_raw_roxie);
+#IF(onThor)
+	reg_raw := reg_raw_thor;
+#ELSE
+	reg_raw := reg_raw_roxie;
+#END
 
 // combine and take only "latest" first-seen registration record for each aircraft
 aircrafts := dedup (sort (reg_raw, seq, n_number, -date_first_seen), seq, n_number);

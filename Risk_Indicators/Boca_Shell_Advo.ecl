@@ -1,8 +1,9 @@
-﻿import advo, riskwise, ut, fcra;
+﻿import _Control, advo, riskwise, ut, fcra;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Advo(GROUPED DATASET(layout_bocashell_neutral) clam_pre_ADVO, 
 											boolean isFCRA, string50 DataRestrictionMask, boolean isPreScreen,
-											integer bsVersion, boolean onThor=false) := FUNCTION
+											integer bsVersion) := FUNCTION
 
 // they wanted to change value of blank in the data to an S to distinguish between a simplified carrier route and a miss on advo
 simplified_carrier_rt := 'S'; 
@@ -58,7 +59,11 @@ with_advo1_thor := join(distribute(clam_pre_ADVO, hash64(Address_Verification.In
 					left outer,
 					atmost(riskwise.max_atmost), LOCAL);
 					
-with_advo1 := if(onThor, group(sort(with_advo1_thor, seq), seq), with_advo1_roxie);
+#IF(onThor)
+	with_advo1 := group(sort(with_advo1_thor, seq), seq);
+#ELSE
+	with_advo1 := with_advo1_roxie;
+#END
 
 with_advo1_deduped :=  dedup(sort(with_advo1, seq, did, Address_Verification.Input_Address_Information.zip5,Address_Verification.Input_Address_Information.prim_range,
 															Address_Verification.Input_Address_Information.prim_name, Address_Verification.Input_Address_Information.addr_suffix, 
@@ -110,7 +115,11 @@ with_advo2_thor := join(distribute(with_advo1_deduped, hash64(Address_Verificati
 					getAdvo2(LEFT,RIGHT), left outer,
 					atmost(riskwise.max_atmost), LOCAL);
 
-with_advo2 := if(onThor, group(sort(with_advo2_thor,seq),seq), with_advo2_roxie);
+#IF(onThor)
+	with_advo2 := group(sort(with_advo2_thor,seq),seq);
+#ELSE
+	with_advo2 := with_advo2_roxie;
+#END
 
 with_advo2_deduped :=  dedup(sort(with_advo2, seq, did, Address_Verification.Address_History_1.zip5,Address_Verification.Address_History_1.prim_range,
 															Address_Verification.Address_History_1.prim_name, Address_Verification.Address_History_1.addr_suffix, 
@@ -164,8 +173,12 @@ with_advo3_thor := join(distribute(with_advo2_deduped, hash64(Address_Verificati
 					getAdvo3(LEFT, RIGHT), left outer,
 					atmost(riskwise.max_atmost), LOCAL);
 					
-with_advo3 := if(onThor, group(sort(with_advo3_thor,seq),seq), with_advo3_roxie);
-		
+#IF(onThor)
+	with_advo3 := group(sort(with_advo3_thor,seq),seq);
+#ELSE
+	with_advo3 := with_advo3_roxie;
+#END
+
 with_advo3_deduped :=  dedup(sort(with_advo3, seq, did, Address_Verification.Address_History_2.zip5,Address_Verification.Address_History_2.prim_range,
 															Address_Verification.Address_History_2.prim_name, Address_Verification.Address_History_2.addr_suffix, 
 															Address_Verification.Address_History_2.predir, Address_Verification.Address_History_2.postdir, 
@@ -211,7 +224,11 @@ advo_corrections_data_thor := join(clam_pre_ADVO(advo_correct_ffid <> []),
 					transform(FCRA.Layout_Override_ADVO, self := right),
 					KEEP(100), LOCAL, ALL);
 					
-advo_corrections_data := if(onThor, advo_corrections_data_thor, advo_corrections_data_roxie);
+#IF(onThor)
+	advo_corrections_data := advo_corrections_data_thor;
+#ELSE
+	advo_corrections_data := advo_corrections_data_roxie;
+#END
 
 Layout_Advo_Raw := RECORD
 	FCRA.Layout_Override_ADVO; 
@@ -255,8 +272,12 @@ advo_raw_data_thor := join(distribute(normed_addresses(z5!='' and prim_range!=''
 						left.postdir = right.postdir and
 						left.sec_range = right.sec_range,riskwise.max_atmost), LOCAL);	
 
-advo_raw_data := if(onThor, group(sort(advo_raw_data_thor, seq),seq), advo_raw_data_roxie);
-															
+#IF(onThor)
+	advo_raw_data := group(sort(advo_raw_data_thor, seq),seq);
+#ELSE
+	advo_raw_data := advo_raw_data_roxie;
+#END
+
 advo_raw_deduped := dedup(sort(advo_raw_data, seq, zip,prim_range,
 															prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen, record), 
 															seq, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range	);
@@ -311,7 +332,11 @@ with_advo1_fcra_thor := join(distribute(clam_pre_ADVO, hash64(Address_Verificati
 					not in left.ADVO_correct_record_id),
 					getAdvo1FCRA(LEFT,RIGHT), left outer, keep(1), LOCAL);
 					
-with_advo1_fcra := if(onThor, with_advo1_fcra_thor, with_advo1_fcra_roxie);
+#IF(onThor)
+	with_advo1_fcra := with_advo1_fcra_thor;
+#ELSE
+	with_advo1_fcra := with_advo1_fcra_roxie;
+#END
 
 Risk_Indicators.Layout_Boca_Shell getAdvo2FCRA(with_advo1_fcra le, advo_fcra_data_rolled ri) := TRANSFORM
 	// Take all the Advo fields/check corrections (if addr_flags are populated, that means we need to use that value because a correction was made									
@@ -360,7 +385,11 @@ with_advo2_fcra_thor := join(distribute(with_advo1_fcra, hash64(Address_Verifica
 					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo2FCRA(LEFT,RIGHT), left outer, keep(1), LOCAL);				
 
-with_advo2_fcra := if(onThor, with_advo2_fcra_thor, with_advo2_fcra_roxie);
+#IF(onThor)
+	with_advo2_fcra := with_advo2_fcra_thor;
+#ELSE
+	with_advo2_fcra := with_advo2_fcra_roxie;
+#END
 
 Risk_Indicators.Layout_Boca_Shell getAdvo3FCRA(with_advo2_fcra le, advo_fcra_data_rolled ri) := TRANSFORM
 	// Take all the Advo fields/check corrections (if addr_flags are populated, that means we need to use that value because a correction was made									
@@ -409,7 +438,11 @@ with_advo3_fcra_thor := join(distribute(with_advo2_fcra, hash64(Address_Verifica
 					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo3FCRA(LEFT,RIGHT), left outer, keep(1), LOCAL);	
 	
-with_advo3_fcra := if(onThor, with_advo3_fcra_thor, with_advo3_fcra_roxie);
+#IF(onThor)
+	with_advo3_fcra := with_advo3_fcra_thor;
+#ELSE
+	with_advo3_fcra := with_advo3_fcra_roxie;
+#END
 
 // don't search ADVO on address 3 unless running shell version 5.0 and higher
 with_advo_fcra := if(bsversion>=50, with_advo3_fcra,with_advo2_fcra);

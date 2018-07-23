@@ -1,4 +1,5 @@
-import RiskWise, Risk_Indicators, header, doxie, ut, address, std;
+﻿import _Control, RiskWise, Risk_Indicators, header, doxie, ut, address, std;
+onThor := _Control.Environment.OnThor;
 
 /***************************************************/
 /******************** CONSTANTS ********************/
@@ -30,7 +31,7 @@ unassigned_cap := 772;
 
 /***************************************************/
 
-export SSNCodes( dataset(riskwise.layouts.layout_ssn_in) indata, boolean isFCRA=false, boolean onThor=false ) := FUNCTION
+export SSNCodes( dataset(riskwise.layouts.layout_ssn_in) indata, boolean isFCRA=false ) := FUNCTION
 	layout_temp := record
 		RiskWise.layouts.layout_ssn_out;
 		boolean decs;
@@ -89,8 +90,12 @@ export SSNCodes( dataset(riskwise.layouts.layout_ssn_in) indata, boolean isFCRA=
 																			getCurrentInfo(LEFT,RIGHT),
 																			left outer, atmost(left.inssn[1..5]=right.ssn5, riskwise.max_atmost), LOCAL);
 
-	withCurrentInfo := if(onThor, withCurrentInfo_thor, withCurrentInfo_roxie);
-	
+	#IF(onThor)
+    withCurrentInfo := withCurrentInfo_thor;
+  #ELSE
+    withCurrentInfo := withCurrentInfo_roxie;
+  #END
+
 	layout_temp AreaGroupRoll( layout_temp le, layout_temp ri ) := TRANSFORM
 		self := if( (integer)le.inssn[6..9] between le.start_serial and le.end_serial, le, ri );
 	END;
@@ -119,7 +124,11 @@ export SSNCodes( dataset(riskwise.layouts.layout_ssn_in) indata, boolean isFCRA=
 																		getPrevInfo(LEFT,RIGHT),
 																		left outer, atmost(left.prev_group=right.ssn5, riskwise.max_atmost), LOCAL);																	
 
-	withPrevInfo := if(onThor, withPrevInfo_thor, withPrevInfo_roxie);
+	#IF(onThor)
+		withPrevInfo := withPrevInfo_thor;
+	#ELSE
+		withPrevInfo := withPrevInfo_roxie;
+	#END
 
 	layout_temp PrevGroupRoll( layout_temp le, layout_temp ri ) := TRANSFORM
 		self := if( (integer)le.prev_end > (integer)ri.prev_end, le, ri ); // take the later of the two end dates

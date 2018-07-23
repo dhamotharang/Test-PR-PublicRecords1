@@ -27,8 +27,7 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
 													unsigned3 in_LastSeenThreshold = iid_constants.oneyear,
 													string20 in_CompanyID = '',
 													string50 in_DataPermission=iid_constants.default_DataPermission,
-													boolean in_IncludeNAPData = false,
-													boolean onThor = false
+													boolean in_IncludeNAPData = false
 													) :=
 FUNCTION
 
@@ -117,7 +116,7 @@ seq_map := join( indata1, indata,
 								in_runSSNCodes, in_runBestAddrCheck, in_runChronoPhoneLookup, in_runAreaCodeSplitSearch, // optimization options	
 								in_allowCellphones, in_ExactMatchLevel, in_DataRestriction, in_CustomDataFilter, in_runDLverification,
 								watchlists_requested, DOBMatchOptions, in_EverOccupant_PastMonths, in_EverOccupant_StartDate, in_append_best,
-								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, onThor);
+								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData);
 
 	iid_results := base;
 	

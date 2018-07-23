@@ -1,4 +1,7 @@
-﻿import didville, did_add, doxie, suppress, gateway;
+﻿/*2017-06-01T19:41:18Z (laura Weiner_prod)
+RR-11357: realtime 5.0 FCRA Boca Shell on Thor
+*/
+import didville, did_add, doxie, suppress, gateway;
 
 // this function will take the input data, append the DID and do all default values in layout output
 EXPORT iid_getDID_prepOutput_THOR(DATASET(risk_indicators.layout_input) indata, unsigned1 dppa, unsigned1 glb, 
@@ -34,17 +37,25 @@ EXPORT iid_getDID_prepOutput_THOR(DATASET(risk_indicators.layout_input) indata, 
  
  // if the input has the DID already, don't send that input record through the didappend again
 	already_has_did := PROJECT(indata(did<>0), TRANSFORM(didville.Layout_Did_OutBatch, SELF := LEFT));
-	all_dids := IF(isFCRA, didprep_TEMP, ungroup(resu + already_has_did)); // If it is FCRA, don't try to append a DID so that non-FCRA files aren't needed.
+  all_dids := IF(isFCRA, didprep_TEMP, ungroup(resu + already_has_did)); // If it is FCRA, don't try to append a DID so that non-FCRA files aren't needed.
 	unique_dids := dedup(sort(project(distribute(all_dids, hash64(did)),transform(doxie.layout_references,self:=left)), did, LOCAL), did, LOCAL);
 
 	// all_dids := didprep_TEMP;  // JUST USE THE INPUT FILE DIDS TO AVOID ANY DID APPEND LOGIC FOR THIS INITIAL THOR TEST
-
-	bestSSNappended := PROJECT(all_dids, TRANSFORM(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, 
+	bestSSN := risk_indicators.collection_shell_mod.getBestCleaned(unique_dids, 
+																																	DataRestriction, 
+																																	GLB_Purpose:=1, //is this right??
+																																	clean_address:=false); // don't need clean address, just the best SSN
+	
+	bestSSNappended := join(distribute(all_dids, hash64(did)), 
+													distribute(bestSSN, hash64(did)), 
+													left.did<>0 and left.did=right.did,
+												TRANSFORM(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, 
+																	SELF.best_ssn := right.ssn,
 																	SELF.did_ct := 1,
-																	SELF := LEFT,
-																	SELF := []));
-																		
- 	risk_indicators.layout_output inputToOutLayout(indata le, bestSSNappended rt) := transform
+																	SELF := left), left outer, keep(1), LOCAL);
+	withBestSSN := if(append_best=0, project(all_dids, transform(Risk_Indicators.Layouts.Layout_Neutral_DID_Service, self.did_ct:=1, self := left)),	bestSSNappended);
+
+ 	risk_indicators.layout_output inputToOutLayout(indata le, withBestSSN rt) := transform
 		self.did := rt.did;
 
 		self.score := rt.score;
@@ -58,14 +69,14 @@ EXPORT iid_getDID_prepOutput_THOR(DATASET(risk_indicators.layout_input) indata, 
 		self.dobscore := 255;
 		self.addrscore := 255;
 		self.cmpyscore := 255;
-		self.didcount := 1;
+		self.didcount := if(rt.did<>0, 1, 0);
 		
 		self.BestSSN := rt.best_ssn;
 		self := le;
 		self := [];
 	end;
 
-	did_from_input := join(indata, bestSSNappended, left.seq=right.seq, inputToOutLayout(LEFT, RIGHT));
+	did_from_input := join(indata, withBestSSN, left.seq=right.seq, inputToOutLayout(LEFT, RIGHT));
 
 	appType := Suppress.Constants.ApplicationTypes.DEFAULT;
 	// search1_by_did := false;

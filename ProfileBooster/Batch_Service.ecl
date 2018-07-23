@@ -31,7 +31,7 @@ EXPORT Batch_Service() := FUNCTION
   domodel := TRIM(TRIM(stringlib.stringtouppercase(Custom_Model),LEFT),RIGHT) IN setvalidmodels;
   
   
-  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, false, domodel);  
+  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, domodel);  
 
 
 

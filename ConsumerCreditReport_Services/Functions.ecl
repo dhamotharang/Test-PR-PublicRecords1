@@ -229,7 +229,7 @@ EXPORT Functions := MODULE
 
 		ds_withPersonContext := PROJECT(ds_ccr_resp(UniqueId1=UniqueId2),xformPersonContext(LEFT));
 
-		ds_LiensJudgments := Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(in_mod.bsVersion,0,GROUP(ds_input,seq),TRUE,,GROUP(ds_withPersonContext,seq));
+		ds_LiensJudgments := Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(in_mod.bsVersion,0,GROUP(ds_input,seq),TRUE,GROUP(ds_withPersonContext,seq));
 
 		ds_input_shell := PROJECT(ds_LiensJudgments,TRANSFORM(RiskView.Layouts.shell_NoScore,
 			SELF.trueDid:=TRUE;

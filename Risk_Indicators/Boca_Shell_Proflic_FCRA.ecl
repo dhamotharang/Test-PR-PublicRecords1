@@ -1,7 +1,8 @@
-﻿import prof_licenseV2, FCRA, riskwise, ut, RiskView;
+﻿import _Control, prof_licenseV2, FCRA, riskwise, ut, RiskView;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
-				boolean isPrescreen, boolean isDirectToConsumerPurpose = false, boolean onThor = false) := FUNCTION
+				boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 myGetDate := proflic_build_date;
@@ -69,8 +70,12 @@ PL_correct_thor := join(ids_only, pull(FCRA.key_override_proflic_ffid),
 											isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))),
 										PL_corr(left, right),left outer, LOCAL, ALL);
 										
-PL_correct := if(onThor, PL_correct_thor, PL_correct_roxie);
-										
+#IF(onThor)
+	PL_correct := PL_correct_thor;
+#ELSE
+	PL_correct := PL_correct_roxie;
+#END
+
 key_did := prof_licenseV2.Key_Proflic_Did (true);
 
 PL_Plus_temp PL_FCRA(PL_correct le, key_did rt) := transform
@@ -132,11 +137,15 @@ license_recs1_thor_did := join(distribute(PL_correct(did!=0), hash64(did)),
 		
 license_recs1_thor := license_recs1_thor_did + PL_correct(did=0);
 
-license_recs_original := if(onThor, ungroup(PL_correct + license_recs1_thor), ungroup(PL_correct + license_Recs1_roxie));
+#IF(onThor)
+	license_recs_original := ungroup(PL_correct + license_recs1_thor);
+#ELSE
+	license_recs_original := ungroup(PL_correct + license_Recs1_roxie);
+#END
 
 isFCRA := true;
 
-mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen, onThor);
+mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
 // ie, date_first_seen is newer than the expire date
@@ -239,7 +248,11 @@ with_category_v5_thor := join(rolled_licenses_pre, pull(LicenseType_Key),
 		(left.license_type=right.license_type), 	
 			getv5category(LEFT,RIGHT), left outer, atmost(100), keep(1), MANY LOOKUP);
 			
-with_category_v5 := if(onThor, with_category_v5_thor, with_category_v5_roxie);		
+#IF(onThor)
+	with_category_v5 := with_category_v5_thor;
+#ELSE
+	with_category_v5 := with_category_v5_roxie;
+#END
 
 rolled_licenses := if(bsversion >= 4, with_category_v5, rolled_licenses_pre);
 

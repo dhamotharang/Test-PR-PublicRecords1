@@ -1,6 +1,7 @@
-import american_student_list, FCRA, Riskwise, AlloyMedia_student_list;
+﻿import _Control, american_student_list, FCRA, Riskwise, AlloyMedia_student_list;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean onThor=false ) := FUNCTION
+export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion) := FUNCTION
 
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;
@@ -43,8 +44,12 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 		right.flag_file_id in left.student_correct_ffid,
 		student_corr(left, right), LOCAL, ALL);
 		
-	student_correct := if(onThor, student_correct_thor, student_correct_roxie);
-	
+	#IF(onThor)
+		student_correct := student_correct_thor;
+	#ELSE
+		student_correct := student_correct_roxie;
+	#END
+  
 	student_file_roxie := join(ids_only, american_student_list.key_DID_FCRA, 
 			left.did!=0
 			and keyed(left.did=right.l_did)
@@ -59,8 +64,12 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 			and (string)right.key not in left.student_correct_record_id,
 			student(left, right), atmost(left.did=right.l_did, 100), LOCAL);
 			
-	student_file := student_correct + if(onThor, student_file_thor, ungroup(student_file_roxie));		
-
+	#IF(onThor)
+		student_file := student_correct + student_file_thor;
+	#ELSE
+		student_file := student_correct + ungroup(student_file_roxie);
+	#END
+  
 	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
 		self := map(
 		
@@ -183,8 +192,11 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
     transform(recordof(AlloyMedia_student_list.Key_DID_FCRA), self := right, self := []), 
 		ALL, LOCAL);
 		
-	alloy_correct1 := if(onThor, alloy_correct1_thor, alloy_correct1_roxie);
-	
+	#IF(onThor)
+		alloy_correct1 := alloy_correct1_thor;
+	#ELSE
+		alloy_correct1 := alloy_correct1_roxie;
+	#END
 	alloy_correct := join(ids_only(did<>0), alloy_correct1, left.did=right.did, alloy_main(left,right));
 
 	alloy_file_roxie := join(ids_only, AlloyMedia_student_list.Key_DID_FCRA, 
@@ -201,8 +213,12 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
     and (trim(right.sequence_number) + trim(right.key_code) + (string)right.rawaid) not in left.student_correct_record_id,
 		alloy_main(left, right), atmost(left.did=right.did, 100), LOCAL);	
 
-	alloy_file := alloy_correct + if(onThor, alloy_file_thor, ungroup(alloy_file_roxie));
-	
+	#IF(onThor)
+		alloy_file := alloy_correct + alloy_file_thor;
+	#ELSE
+		alloy_file := alloy_correct + ungroup(alloy_file_roxie);
+	#END
+  
 	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq,record /* use record to avoid indeterminate code */), roll(left,right), seq),seq);
 	return student_all;
 end;

@@ -1,4 +1,5 @@
-﻿import riskwise, did_add, ut, risk_indicators, NID, gateway;
+﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway;
+onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, 
@@ -10,8 +11,7 @@ export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_addr
 													string20 companyID,
 													unsigned2 EverOccupant_PastMonths=0,
 													unsigned4 EverOccupant_StartDate = 99999999,
-													boolean IncludeNAPData = false,
-													boolean onThor = false
+													boolean IncludeNAPData = false
 												) := function
 
 ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
@@ -62,7 +62,7 @@ end;
 
 phone_input := normalize(withInquiriesNAP,2, prep_phones(left, counter));
 
-dirs_by_phone := riskwise.getDirsByPhone(ungroup(phone_input), gateways, dppa, glb, isFCRA, BSOptions, lastSeenThreshold, ExactMatchLevel, companyID, onThor);
+dirs_by_phone := riskwise.getDirsByPhone(ungroup(phone_input), gateways, dppa, glb, isFCRA, BSOptions, lastSeenThreshold, ExactMatchLevel, companyID);
 
 
 risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_by_phone ri) := transform
@@ -265,7 +265,12 @@ biggestrec_history_thor_nophone := project(with_InquiriesNAP_noPhone,
 biggestrec_history_thor := group(sort(biggestrec_history_thor_pre + biggestrec_history_thor_nophone, seq, -phone_date_last_seen, dirslast,dirsfirst,dirscmpy, record/*,-dirs_addrscore*/), seq);
 
 biggestrec_history_roxie_sort := IF(IsFCRA, sort(biggestrec_history_roxie,seq, -phone_date_last_seen, dirslast,dirsfirst,dirscmpy, record), biggestrec_history_roxie);
-biggestrec_history := if(onThor, biggestrec_history_thor, biggestrec_history_roxie_sort);					
+
+#IF(onThor)
+	biggestrec_history := biggestrec_history_thor;
+#ELSE
+	biggestrec_history := biggestrec_history_roxie_sort;
+#END
 
 phone_velocity := risk_indicators.iid_roll_PhoneVelocity(biggestrec_history);
 
@@ -459,7 +464,11 @@ wphonerec_history_thor_nowphone := project(biggestrec_rolled(wphone10=''), trans
 					
 wphonerec_history_thor := wphonerec_history_thor_pre + wphonerec_history_thor_nowphone;
 
-wphonerec_history := if(onThor, group(sort(wphonerec_history_thor, seq, local), seq, local), wphonerec_history_roxie);
+#IF(onThor)
+	wphonerec_history := group(sort(wphonerec_history_thor, seq, local), seq, local);
+#ELSE
+	wphonerec_history := wphonerec_history_roxie;
+#END
 
 rollphonerecs := rollup(wphonerec_history,true,roll_phone_trans(left,right));
 

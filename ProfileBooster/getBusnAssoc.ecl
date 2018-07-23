@@ -1,7 +1,7 @@
-﻿IMPORT paw, riskwise, ut, risk_indicators, AML, MDR;
+﻿IMPORT _Control, paw, riskwise, ut, risk_indicators, AML, MDR;
+onThor := _Control.Environment.OnThor;
 
-export getBusnAssoc( DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim,
-													 boolean onthor) := FUNCTION;
+export getBusnAssoc( DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION;
 
 
 ProfileBooster.Layouts.Layout_PB_Slim_PAW append_contact_id(pbslim le, paw.key_did rt) := transform
@@ -27,7 +27,11 @@ with_contactID_thor := join(
 								append_contact_id(left, right),
 								atmost(riskwise.max_atmost), keep(100), local);
 								
-with_contactID := if(onThor, with_contactID_thor, with_contactID_roxie);
+#IF(onThor)
+	with_contactID := with_contactID_thor;
+#ELSE
+	with_contactID := with_contactID_roxie;
+#END
 
 
 ProfileBooster.Layouts.Layout_PB_Slim_PAW append_paw_details(with_contactID le, paw.Key_contactid rt) := transform
@@ -74,8 +78,12 @@ pawTitle_thor := join(
 								 atmost(left.contact_id=right.contact_id,riskwise.max_atmost), keep(1),
 	local); 
 
-pawTitle := if(onThor, pawTitle_thor, pawTitle_roxie);
-								 
+#IF(onThor)
+	pawTitle := pawTitle_thor;
+#ELSE
+	pawTitle := pawTitle_roxie;
+#END
+
 SortPAW :=  sort(pawTitle, seq, did2, -dt_last_seen);
 
 ProfileBooster.Layouts.Layout_PB_Slim_PAW rollPAW(SortPAW le, SortPAW ri) := TRANSFORM

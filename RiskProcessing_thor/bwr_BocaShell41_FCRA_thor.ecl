@@ -10,7 +10,8 @@
 //   check that the data restrictions are set appropriately, specifically  EN and EQ
 //   eyeball is how many records you want to see on output, similar to record_limit except this is your intermediate result output count
 
-IMPORT address, AID, AutoStandardI, Gateway, Risk_Indicators, RiskWise, ut;
+IMPORT _Control, address, AID, AutoStandardI, Gateway, Risk_Indicators, RiskWise, ut;
+onThor := _Control.Environment.OnThor;
 
 //====================================================
 //=============== Configurable options =============== 
@@ -22,7 +23,6 @@ string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares,
 // Commenting out LastSeenThreshhold since it doesn't get passed through the FCRA shell
 // unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 history_date   := 0; // if this is set to 0, use historydateYYYYMM on input file. Use this historydate if it is > 0.
-onThor := TRUE; // TRUE = use thor (distributed) logic. FALSE = use keyed joins.
  
 //===================  input-output files  ======================
 infile_name :=  '~tfuerstenberg::in::wellsfargo_2377_app_in';
@@ -166,24 +166,44 @@ layout_acctno iidPrep( inds_dist le) := TRANSFORM
 	SELF.in_state         := le.St;
 	SELF.in_zipCode       := le.Z5;
 		//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
-	SELF.prim_range    := IF(onThor, '', clean_a2[1..10]);
-	SELF.predir        := IF(onThor, '',clean_a2[11..12]);
-	SELF.prim_name     := IF(onThor, '',clean_a2[13..40]);
-	SELF.addr_suffix   := IF(onThor, '',clean_a2[41..44]);
-	SELF.postdir       := IF(onThor, '',clean_a2[45..46]);
-	SELF.unit_desig    := IF(onThor, '',clean_a2[47..56]);
-	SELF.sec_range     := IF(onThor, '',clean_a2[57..65]);
-	SELF.p_city_name   := IF(onThor, '',clean_a2[90..114]);
-	SELF.st            := IF(onThor, '',clean_a2[115..116]);
-	SELF.z5            := IF(onThor, '',clean_a2[117..121]);
-	SELF.zip4          := IF(onThor, '',clean_a2[122..125]);
-	SELF.lat           := IF(onThor, '',clean_a2[146..155]);
-	SELF.long          := IF(onThor, '',clean_a2[156..166]);
-	SELF.addr_type     := IF(onThor, '',clean_a2[139]);
-	SELF.addr_status   := IF(onThor, '',clean_a2[179..182]);
-	SELF.county        := IF(onThor, '',clean_a2[143..145]);
-	SELF.geo_blk       := IF(onThor, '',clean_a2[171..177]);
-
+  #IF(OnThor)  
+    SELF.prim_range    := '';
+    SELF.predir        := '';
+    SELF.prim_name     := '';
+    SELF.addr_suffix   := '';
+    SELF.postdir       := '';
+    SELF.unit_desig    := '';
+    SELF.sec_range     := '';
+    SELF.p_city_name   := '';
+    SELF.st            := '';
+    SELF.z5            := '';
+    SELF.zip4          := '';
+    SELF.lat           := '';
+    SELF.long          := '';
+    SELF.addr_type     := '';
+    SELF.addr_status   := '';
+    SELF.county        := '';
+    SELF.geo_blk       := '';
+  #ELSE
+  	SELF.prim_range    := clean_a2[1..10];
+    SELF.predir        := clean_a2[11..12];
+    SELF.prim_name     := clean_a2[13..40];
+    SELF.addr_suffix   := clean_a2[41..44];
+    SELF.postdir       := clean_a2[45..46];
+    SELF.unit_desig    := clean_a2[47..56];
+    SELF.sec_range     := clean_a2[57..65];
+    SELF.p_city_name   := clean_a2[90..114];
+    SELF.st            := clean_a2[115..116];
+    SELF.z5            := clean_a2[117..121];
+    SELF.zip4          := clean_a2[122..125];
+    SELF.lat           := clean_a2[146..155];
+    SELF.long          := clean_a2[156..166];
+    SELF.addr_type     := clean_a2[139];
+    SELF.addr_status   := clean_a2[179..182];
+    SELF.county        := clean_a2[143..145];
+    SELF.geo_blk       := clean_a2[171..177];
+  #END
+  
 	SELF.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.dl_number));
 	SELF.dl_state  := StringLib.StringToUppercase(le.dl_state);
 
@@ -247,14 +267,18 @@ END;
 
 iid_prep_acct_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT));
 
-iid_prep_acct := IF(onThor, iid_prep_acct_thor, iid_prep_acct_roxie);
+#IF(onThor)
+	iid_prep_acct := iid_prep_acct_thor;
+#ELSE
+	iid_prep_acct := iid_prep_acct_roxie;
+#END
 
 iid_prep := PROJECT( iid_prep_acct, Risk_Indicators.Layout_Input );
 	
 clam := risk_indicators.Boca_Shell_Function_FCRA( iid_prep, gateways, dppa, glb, isUtility, ln_branded, 
 					require2ele, includeRel, includeDL, includeVeh, includeDerog, ofac_only, suppressNearDups, from_biid, excludeWatchlists, 
 					from_IT1O, ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, bsversion, isPreScreen, doScore, nugen, 
-					ADL_Based_Shell := false, DataRestriction := DataRestrictionMask, IN_AppendBest := AppendBest, BSOptions := BSOptions, DataPermission := DataPermission, onThor := onThor);
+					ADL_Based_Shell := false, DataRestriction := DataRestrictionMask, IN_AppendBest := AppendBest, BSOptions := BSOptions, DataPermission := DataPermission);
 
 layout_final := record
 	STRING AccountNumber;

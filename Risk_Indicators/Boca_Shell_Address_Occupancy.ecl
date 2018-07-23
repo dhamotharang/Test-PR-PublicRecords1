@@ -1,6 +1,7 @@
-﻿import header, riskwise, address, ut;
+﻿import _Control, header, riskwise, address, ut;
+onThor := _Control.Environment.OnThor;
 
-EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, boolean isFCRA, boolean onThor = false) := function
+EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, boolean isFCRA) := function
 
 	temp := record
 		unsigned seq;
@@ -97,8 +98,12 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 	(left.did=right.s_did) and right.date_first_seen < left.historydate, 
 	getAddrHistory(LEFT,RIGHT), atmost(left.did=right.s_did, riskwise.max_atmost), keep(100), LOCAL);
 	
-	with_addr_history := if(onThor, group(sort(with_addr_history_thor, seq), seq), with_addr_history_roxie);
-	
+	#IF(onThor)
+    with_addr_history := group(sort(with_addr_history_thor, seq), seq);
+  #ELSE
+    with_addr_history := with_addr_history_roxie;
+  #END
+
 	// waterfall logic for selecting the occupied address
 	occupancy_sorted := group(
 		sort(with_addr_history, seq, 

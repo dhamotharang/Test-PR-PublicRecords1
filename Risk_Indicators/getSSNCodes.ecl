@@ -1,11 +1,11 @@
-import riskwise,address;
+﻿import riskwise,address;
 
-export getSSNCodes(dataset(RiskWise.layouts.layout_ssn_in) indata, boolean isFCRA=false, boolean onThor=false) := function
+export getSSNCodes(dataset(RiskWise.layouts.layout_ssn_in) indata, boolean isFCRA=false) := function
 	
 	// make codes_in a filtered dataset of only records that have social present on input 
 	// to avoid running all of this code on empty socials
 	good_indata := indata(trim(ssn)<>'');
-	codes_out := Risk_Indicators.SSNCodes( good_indata, isFCRA, onThor );
+	codes_out := Risk_Indicators.SSNCodes( good_indata, isFCRA );
 
 	riskwise.layout_socl formatOutdata(good_indata le, codes_out rt) := TRANSFORM
 		self.seq := le.seq;	

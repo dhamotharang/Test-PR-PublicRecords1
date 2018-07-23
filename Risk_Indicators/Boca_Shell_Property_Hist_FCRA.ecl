@@ -1,9 +1,9 @@
-﻿IMPORT ut, RiskWise, LN_PropertyV2;
+﻿IMPORT _Control, ut, RiskWise, LN_PropertyV2;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Hist_FCRA (GROUPED DATASET(Layout_PropertyRecord) p_address,
                                       GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
-																			boolean includeRelatives = true,
-                                      boolean onThor = FALSE) := FUNCTION											
+																			boolean includeRelatives = true) := FUNCTION											
 
 boolean isFCRA := true;
 
@@ -74,7 +74,11 @@ property_by_address_thor := JOIN (distribute(p_address(prim_name<>''), hash64(pr
              SELF := LEFT,
              SELF := []));
            
-property_by_address := if(onThor, property_by_address_thor, UNGROUP(property_by_address_roxie));
+#IF(onThor)
+	property_by_address := property_by_address_thor;
+#ELSE
+	property_by_address := UNGROUP(property_by_address_roxie);
+#END
 
 layout_PropertyRecordPlus get_property_by_did(Layout_Boca_Shell_ids le, recordof(LN_PropertyV2.key_property_did(isFCRA)) ri) := TRANSFORM
 	SELF.own_fares_id := ri.ln_fares_id;
@@ -99,7 +103,11 @@ property_by_did_thor := JOIN (distribute(ids(did<>0), hash64(did)),
 			 KEEP(100), ATMOST((LEFT.did=RIGHT.s_did),
 				 RiskWise.max_atmost), LOCAL);
 
-property_by_did := if(onThor, property_by_did_thor, UNGROUP(property_by_did_roxie));
+#IF(onThor)
+	property_by_did := property_by_did_thor;
+#ELSE
+	property_by_did := UNGROUP(property_by_did_roxie);
+#END
 
 layout_PropertyRecordPlus roll_property_fid(layout_PropertyRecordPlus le, layout_PropertyRecordPlus ri) := TRANSFORM
 	SELF.isrelat := le.isrelat OR ri.isrelat;
@@ -191,7 +199,11 @@ property_searched_thor := group(sort(JOIN (distribute(property_fid, hash64(own_f
 				     ), LOCAL)(prim_name<>'' AND zip5<>''),
                                 seq),seq);
 
-property_searched := if(onThor, property_searched_thor, property_searched_roxie);
+#IF(onThor)
+	property_searched := property_searched_thor;
+#ELSE
+	property_searched := property_searched_roxie;
+#END
 
 layout_PropertyRecordPlus roll_prop_searched(layout_PropertyRecordPlus le, layout_PropertyRecordPlus ri) := TRANSFORM
 	SELF.NAPROP := MAX(le.naprop,ri.naprop);
@@ -421,7 +433,11 @@ pre_Assessments_added_thor := JOIN (distribute(property_searched, hash64(own_far
                               LEFT.own_fares_id[2]='A', 
                               add_assess_FCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST((LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost), LOCAL);
 
-pre_Assessments_added := if(onThor, group(sort(pre_Assessments_added_thor, seq),seq), pre_Assessments_added_roxie);
+#IF(onThor)
+	pre_Assessments_added := group(sort(pre_Assessments_added_thor, seq),seq);
+#ELSE
+	pre_Assessments_added := pre_Assessments_added_roxie;
+#END
 
 assessments_added := rollup(sort(pre_assessments_added, own_fares_id, prim_name, prim_range, zip5, sec_range, dataSrce), roll_prop_searched(LEFT,RIGHT), own_fares_id, prim_name, prim_range, zip5, sec_range);
 
@@ -540,7 +556,11 @@ pre_Deeds_added_thor := JOIN (distribute(assessments_added, hash64(own_fares_id)
 								LEFT OUTER, keep(100), 
 								ATMOST( (LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost), LOCAL);
 
-pre_Deeds_added := if(onThor, group(sort(pre_Deeds_added_thor,seq),seq), pre_Deeds_added_roxie);
+#IF(onThor)
+	pre_Deeds_added := group(sort(pre_Deeds_added_thor,seq),seq);
+#ELSE
+	pre_Deeds_added := pre_Deeds_added_roxie;
+#END
 
 deeds_added := rollup(sort(pre_deeds_added,prim_name,prim_range,zip5,sec_range, dataSrce,own_fares_id),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
 

@@ -1,6 +1,7 @@
-import avm_v2, census_data, FCRA, riskwise, ut, codes;
+﻿import _Control, avm_v2, census_data, FCRA, riskwise, ut, codes;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
+export Boca_Shell_AVM_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
 
 // full_history_date := risk_indicators.iid_constants.full_history_date(history_date);
 
@@ -31,7 +32,11 @@ avm_corr_thor := join(ids_wide, pull(FCRA.Key_Override_AVM_FFID),
 									(right.flag_file_id in left.avm_correct_ffid),
 									avm_correct(left, right), left outer, keep(1), ALL, LOCAL);
 
-avm_corr := if(onThor, avm_corr_thor, avm_corr_roxie);
+#IF(onThor)
+	avm_corr := avm_corr_thor;
+#ELSE
+	avm_corr := avm_corr_roxie;
+#END
 
 Layout_AVM_Plus add_AVM(ids_wide le, avm_v2.Key_AVM_Address_FCRA ri) := transform
 	full_history_date := iid_constants.full_history_date(le.historydate);
@@ -97,7 +102,11 @@ avm1_thor := join(distribute(ids_wide, hash64(address_verification.input_address
 												left.address_verification.input_address_information.prim_range=right.prim_range and
 												left.address_verification.input_address_information.sec_range=right.sec_range, riskwise.max_atmost), keep(100), LOCAL);
 
-avm1 := if(onThor, avm1_thor, ungroup(avm1_roxie));
+#IF(onThor)
+	avm1 := avm1_thor;
+#ELSE
+	avm1 := ungroup(avm1_roxie);
+#END
 
 // when choosing which AVM to output if the addr returns more than 1 result, 
 // always pick the record with the most recent recording date and secondarily the most recent assessed value year
@@ -166,7 +175,12 @@ avm2_thor := join(distribute(avms1, hash64(address_history_1.prim_name,
 												left.address_history_1.prim_range=right.prim_range and
 												left.address_history_1.sec_range=right.sec_range, riskwise.max_atmost), keep(100), LOCAL);												
 
-avm2 := if(onThor, avm2_thor, ungroup(avm2_roxie));
+#IF(onThor)
+	avm2 := avm2_thor;
+#ELSE
+	avm2 := ungroup(avm2_roxie);
+#END
+
 // when choosing which AVM to output if the addr returns more than 1 result, 
 // always pick the record with the most recent recording date and secondarily the most recent assessed value year
 // all_avms2 := group(sort(avm2, avm.seq, -AVM.Input_Address_Information.avm_recording_date, -AVM.Input_Address_Information.avm_assessed_value_year), avm.seq);
@@ -237,15 +251,23 @@ avm3_thor := join(distribute(avms2, hash64(address_history_2.prim_name,
 												left.address_history_2.prim_range=right.prim_range and
 												left.address_history_2.sec_range=right.sec_range, riskwise.max_atmost), keep(100), LOCAL);
 
-avm3 := if(onThor, avm3_thor, ungroup(avm3_roxie));
-												
+#IF(onThor)
+	avm3 := avm3_thor;
+#ELSE
+	avm3 := ungroup(avm3_roxie);
+#END
+
 // when choosing which AVM to output if the addr returns more than 1 result, 
 // always pick the record with the most recent recording date and secondarily the most recent assessed value year
 // all_avms3 := group(sort(avm3, avm.seq, -avm.Input_Address_Information.avm_recording_date, -avm.Input_Address_Information.avm_assessed_value_year), avm.seq);
 all_avms3_roxie := group(sort(avm3, avm.seq, -avm.Address_History_2.avm_recording_date, -avm.Address_History_2.avm_assessed_value_year), avm.seq);
 all_avms3_thor := group(sort(distribute(avm3, hash64(avm.seq)), avm.seq, -avm.Address_History_2.avm_recording_date, -avm.Address_History_2.avm_assessed_value_year, LOCAL), avm.seq, LOCAL);
 
-all_avms3 := if(onThor, all_avms3_thor, all_avms3_roxie);
+#IF(onThor)
+	all_avms3 := all_avms3_thor;
+#ELSE
+	all_avms3 := all_avms3_roxie;
+#END
 
 avms3 := rollup(all_avms3, true, transform(Layout_AVM_Plus, self := left));
 	
@@ -327,7 +349,11 @@ medians_thor := join(distribute(fipsNorm),
 																left.fips_code=right.fips_geo_12, getMedians(left,right), 
 																left outer, atmost(riskwise.max_atmost), MANY LOOKUP);
 																
-medians := if(onThor, group(sort(distribute(medians_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), medians_roxie);													
+#IF(onThor)
+	medians := group(sort(distribute(medians_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+#ELSE
+	medians := medians_roxie;
+#END
 
 Layout_AVM rollMedians(medians le, medians ri) := transform
 	self.Input_Address_Information.avm_median_fips_level := MAX(le.Input_Address_Information.avm_median_fips_level, ri.Input_address_information.avm_median_fips_level);
@@ -372,7 +398,12 @@ fullavm_thor := join(distribute(avms3, hash64(avm.seq)),
 										 distribute(rolledMedians, hash64(seq)), 
 										 left.avm.seq=right.seq, addMedians(left,right), left outer, LOCAL);
 
-fullavm := if(onThor, group(sort(fullavm_thor, seq, local), seq, local), fullavm_roxie);
+#IF(onThor)
+	fullavm :=  group(sort(fullavm_thor, seq, local), seq, local);
+#ELSE
+	fullavm := fullavm_roxie;
+#END
+
 Layout_Address_AVM intoblank(fullavm le, integer i) := transform
 	self.avm_median_fips_level := CHOOSE(i, le.input_Address_Information.avm_median_fips_level,
 																					le.Address_history_1.avm_median_fips_level,

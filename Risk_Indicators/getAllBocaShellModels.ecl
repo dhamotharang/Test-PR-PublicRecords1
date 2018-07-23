@@ -1,14 +1,15 @@
-﻿/*2015-11-09T22:10:46Z (Xuran Yan)
-Simplified last modification
-*/
-import models, easi, riskwise, _Control;
+﻿import models, easi, riskwise, _Control;
+onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellModels(grouped dataset(risk_indicators.Layout_Boca_Shell) bsData_pre, 
 	boolean isFCRA, 
-	dataset(easi.layout_census) easi_census,
-	boolean onThor = false) := function
+	dataset(easi.layout_census) easi_census) := function
 
-bsData := if(onThor, group(sort(distribute(bsData_pre, hash64(seq)), seq, local), seq, local), bsData_pre);
+#IF(onThor)
+	bsData := group(sort(distribute(bsData_pre, hash64(seq)), seq, local), seq, local);
+#ELSE
+	bsData := bsData_pre;
+#END
 
 // compile time on roxie is dramatically better without models included.  
 // 95% of the time you don't need them included in your test anyway, so just turn them off
@@ -223,101 +224,162 @@ input_ok := if((
 	
 	self := le;
 end;
-wAuto := if(onThor,
-						join(BSdata, distribute(rvAuto, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,1), left outer, local),
-						join(BSdata, rvAuto, left.seq=right.seq, doModels(LEFT,RIGHT,1), left outer));
-wBank := if(onThor,
-						join(wAuto, distribute(rvBank, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,2), left outer, local),
-						join(wAuto, rvBank, left.seq=right.seq, doModels(LEFT,RIGHT,2), left outer));
-wRetail := if(onThor,
-						join(wBank, distribute(rvRetail, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,3), left outer, local),
-						join(wBank, rvRetail, left.seq=right.seq, doModels(LEFT,RIGHT,3), left outer));
-wTelecom := if(onThor,
-						join(wRetail, distribute(rvTelecom, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,4), left outer, local),
-						join(wRetail, rvTelecom, left.seq=right.seq, doModels(LEFT,RIGHT,4), left outer));
-wBank2 := if(onThor,
-						join(wTelecom, distribute(rvBank2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,5), left outer, local),
-						join(wTelecom, rvBank2, left.seq=right.seq, doModels(LEFT,RIGHT,5), left outer));
-wRetail2 := if(onThor,
-						join(wBank2, distribute(rvRetail2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,6), left outer, local),
-						join(wBank2, rvRetail2, left.seq=right.seq, doModels(LEFT,RIGHT,6), left outer));
-wAuto2 := if(onThor,
-						join(wRetail2, distribute(rvAuto2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,7), left outer, local),
-						join(wRetail2, rvAuto2, left.seq=right.seq, doModels(LEFT,RIGHT,7), left outer));
-wTelecom2 := if(onThor,
-						join(wAuto2, distribute(rvTelecom2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,8), left outer, local),
-						join(wAuto2, rvTelecom2, left.seq=right.seq, doModels(LEFT,RIGHT,8), left outer));
-wMoney2 := if(onThor,
-						join(wTelecom2, distribute(rvMoney2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,12), left outer, local),
-						join(wTelecom2, rvMoney2, left.seq=right.seq, doModels(LEFT,RIGHT,12), left outer));
-wPrescreen2 := if(onThor,
-						join(wMoney2, distribute(rvPrescreen2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,13), left outer, local),
-						join(wMoney2, rvPrescreen2, left.seq=right.seq, doModels(LEFT,RIGHT,13), left outer));
 
-wBank3 := if(onThor,
-						join(wPrescreen2, distribute(rvBank3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,14), left outer, local),
-						join(wPrescreen2, rvBank3, left.seq=right.seq, doModels(LEFT,RIGHT,14), left outer));
-wRetail3 := if(onThor,
-						join(wBank3, distribute(rvRetail3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,15), left outer, local),
-						join(wBank3, rvRetail3, left.seq=right.seq, doModels(LEFT,RIGHT,15), left outer));
-wAuto3 := if(onThor,
-						join(wRetail3, distribute(rvAuto3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,16), left outer, local),
-						join(wRetail3, rvAuto3, left.seq=right.seq, doModels(LEFT,RIGHT,16), left outer));
-wTelecom3 := if(onThor,
-						join(wAuto3, distribute(rvTelecom3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,17), left outer, local),
-						join(wAuto3, rvTelecom3, left.seq=right.seq, doModels(LEFT,RIGHT,17), left outer));
-wMoney3 := if(onThor,
-						join(wTelecom3, distribute(rvMoney3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,18), left outer, local),
-						join(wTelecom3, rvMoney3, left.seq=right.seq, doModels(LEFT,RIGHT,18), left outer));
-wPrescreen3 := if(onThor,
-						join(wMoney3, distribute(rvPrescreen3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,19), left outer, local),
-						join(wMoney3, rvPrescreen3, left.seq=right.seq, doModels(LEFT,RIGHT,19), left outer));
+#IF(onThor)
+	wAuto := join(BSdata, distribute(rvAuto, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,1), left outer, local);
+#ELSE
+	wAuto := join(BSdata, rvAuto, left.seq=right.seq, doModels(LEFT,RIGHT,1), left outer);
+#END
+#IF(onThor)
+	wBank := join(wAuto, distribute(rvBank, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,2), left outer, local);
+#ELSE
+	wBank := join(wAuto, rvBank, left.seq=right.seq, doModels(LEFT,RIGHT,2), left outer);
+#END
+#IF(onThor)
+	wRetail := join(wBank, distribute(rvRetail, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,3), left outer, local);
+#ELSE
+	wRetail := join(wBank, rvRetail, left.seq=right.seq, doModels(LEFT,RIGHT,3), left outer);
+#END
+#IF(onThor)
+	wTelecom := join(wRetail, distribute(rvTelecom, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,4), left outer, local);
+#ELSE
+	wTelecom := join(wRetail, rvTelecom, left.seq=right.seq, doModels(LEFT,RIGHT,4), left outer);
+#END
+#IF(onThor)
+	wBank2 := join(wTelecom, distribute(rvBank2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,5), left outer, local);
+#ELSE
+	wBank2 := join(wTelecom, rvBank2, left.seq=right.seq, doModels(LEFT,RIGHT,5), left outer);
+#END
 
-wBank4      := if(onThor,
-						join(wPrescreen3, distribute(rvBank4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,20), left outer, local),
-						join(wPrescreen3, rvBank4, left.seq=right.seq, doModels(LEFT,RIGHT,20), left outer));
-wRetail4    := if(onThor,
-						join(wBank4, distribute(rvRetail4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,21), left outer, local),
-						join(wBank4, rvRetail4, left.seq=right.seq, doModels(LEFT,RIGHT,21), left outer));
-wAuto4      := if(onThor,
-						join(wRetail4, distribute(rvAuto4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,22), left outer, local),
-						join(wRetail4, rvAuto4, left.seq=right.seq, doModels(LEFT,RIGHT,22), left outer));
-wTelecom4   := if(onThor,
-						join(wAuto4, distribute(rvTelecom4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,23), left outer, local),
-						join(wAuto4, rvTelecom4, left.seq=right.seq, doModels(LEFT,RIGHT,23), left outer));
-wMoney4     := if(onThor,
-						join(wTelecom4, distribute(rvMoney4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,24), left outer, local),
-						join(wTelecom4, rvMoney4, left.seq=right.seq, doModels(LEFT,RIGHT,24), left outer));
-wPrescreen4 := if(onThor,
-						join(wMoney4, distribute(rvPrescreen4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,25), left outer, local),
-						join(wMoney4, rvPrescreen4, left.seq=right.seq, doModels(LEFT,RIGHT,25), left outer));
+#IF(onThor)
+	wRetail2 := join(wBank2, distribute(rvRetail2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,6), left outer, local);
+#ELSE
+	wRetail2 := join(wBank2, rvRetail2, left.seq=right.seq, doModels(LEFT,RIGHT,6), left outer);
+#END
 
-wBank5      := if(onThor,
-						join(wPrescreen4, distribute(rvBank5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,26), left outer, local),
-						join(wPrescreen4, rvBank5, left.seq=right.seq, doModels(LEFT,RIGHT,26), left outer));
-wAuto5      := if(onThor,
-						join(wBank5, distribute(rvAuto5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,27), left outer, local),
-						join(wBank5, rvAuto5, left.seq=right.seq, doModels(LEFT,RIGHT,27), left outer));
-wTelecom5   := if(onThor,
-						join(wAuto5, distribute(rvTelecom5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,28), left outer, local),
-						join(wAuto5, rvTelecom5, left.seq=right.seq, doModels(LEFT,RIGHT,28), left outer));
-wMoney5     := if(onThor,
-						join(wTelecom5, distribute(rvMoney5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer, local),
-						join(wTelecom5, rvMoney5, left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer));
-wCrossInd5  := if(onThor,
-						join(wMoney5, distribute(rvCrossInd5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer, local),
-						join(wMoney5, rvCrossInd5, left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer));
+#IF(onThor)
+	wAuto2 := join(wRetail2, distribute(rvAuto2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,7), left outer, local);
+#ELSE
+	wAuto2 := join(wRetail2, rvAuto2, left.seq=right.seq, doModels(LEFT,RIGHT,7), left outer);
+#END
+#IF(onThor)
+	wTelecom2 := join(wAuto2, distribute(rvTelecom2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,8), left outer, local);
+#ELSE
+	wTelecom2 := join(wAuto2, rvTelecom2, left.seq=right.seq, doModels(LEFT,RIGHT,8), left outer);
+#END
+#IF(onThor)
+	wMoney2 := join(wTelecom2, distribute(rvMoney2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,12), left outer, local);
+#ELSE
+	wMoney2 := join(wTelecom2, rvMoney2, left.seq=right.seq, doModels(LEFT,RIGHT,12), left outer);
+#END
+#IF(onThor)
+	wPrescreen2 := join(wMoney2, distribute(rvPrescreen2, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,13), left outer, local);
+#ELSE
+	wPrescreen2 := join(wMoney2, rvPrescreen2, left.seq=right.seq, doModels(LEFT,RIGHT,13), left outer);
+#END
+#IF(onThor)
+	wBank3 := join(wPrescreen2, distribute(rvBank3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,14), left outer, local);
+#ELSE
+	wBank3 := join(wPrescreen2, rvBank3, left.seq=right.seq, doModels(LEFT,RIGHT,14), left outer);
+#END
+#IF(onThor)
+	wRetail3 := join(wBank3, distribute(rvRetail3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,15), left outer, local);
+#ELSE
+	wRetail3 := join(wBank3, rvRetail3, left.seq=right.seq, doModels(LEFT,RIGHT,15), left outer);
+#END
+#IF(onThor)
+	wAuto3 := join(wRetail3, distribute(rvAuto3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,16), left outer, local);
+#ELSE
+	wAuto3 := join(wRetail3, rvAuto3, left.seq=right.seq, doModels(LEFT,RIGHT,16), left outer);
+#END
+#IF(onThor)
+	wTelecom3 := join(wAuto3, distribute(rvTelecom3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,17), left outer, local);
+#ELSE
+	wTelecom3 := join(wAuto3, rvTelecom3, left.seq=right.seq, doModels(LEFT,RIGHT,17), left outer);
+#END
+#IF(onThor)
+	wMoney3 := join(wTelecom3, distribute(rvMoney3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,18), left outer, local);
+#ELSE
+	wMoney3 := join(wTelecom3, rvMoney3, left.seq=right.seq, doModels(LEFT,RIGHT,18), left outer);
+#END
+#IF(onThor)
+	wPrescreen3 := join(wMoney3, distribute(rvPrescreen3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,19), left outer, local);
+#ELSE
+	wPrescreen3 := join(wMoney3, rvPrescreen3, left.seq=right.seq, doModels(LEFT,RIGHT,19), left outer);
+#END
+
+#IF(onThor)
+	wBank4 := join(wPrescreen3, distribute(rvBank4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,20), left outer, local);
+#ELSE
+	wBank4 := join(wPrescreen3, rvBank4, left.seq=right.seq, doModels(LEFT,RIGHT,20), left outer);
+#END
+#IF(onThor)
+	wRetail4 := join(wBank4, distribute(rvRetail4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,21), left outer, local);
+#ELSE
+	wRetail4 := join(wBank4, rvRetail4, left.seq=right.seq, doModels(LEFT,RIGHT,21), left outer);
+#END
+#IF(onThor)
+	wAuto4 := join(wRetail4, distribute(rvAuto4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,22), left outer, local);
+#ELSE
+	wAuto4 := join(wRetail4, rvAuto4, left.seq=right.seq, doModels(LEFT,RIGHT,22), left outer);
+#END
+#IF(onThor)
+	wTelecom4 := join(wAuto4, distribute(rvTelecom4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,23), left outer, local);
+#ELSE
+	wTelecom4 := join(wAuto4, rvTelecom4, left.seq=right.seq, doModels(LEFT,RIGHT,23), left outer);
+#END
+#IF(onThor)
+	wMoney4 := join(wTelecom4, distribute(rvMoney4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,24), left outer, local);
+#ELSE
+	wMoney4 := join(wTelecom4, rvMoney4, left.seq=right.seq, doModels(LEFT,RIGHT,24), left outer);
+#END
+#IF(onThor)
+	wPrescreen4 := join(wMoney4, distribute(rvPrescreen4, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,25), left outer, local);
+#ELSE
+	wPrescreen4 := join(wMoney4, rvPrescreen4, left.seq=right.seq, doModels(LEFT,RIGHT,25), left outer);
+#END
+#IF(onThor)
+	wBank5 := join(wPrescreen4, distribute(rvBank5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,26), left outer, local);
+#ELSE
+	wBank5 := join(wPrescreen4, rvBank5, left.seq=right.seq, doModels(LEFT,RIGHT,26), left outer);
+#END
+#IF(onThor)
+	wAuto5 := join(wBank5, distribute(rvAuto5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,27), left outer, local);
+#ELSE
+	wAuto5 := join(wBank5, rvAuto5, left.seq=right.seq, doModels(LEFT,RIGHT,27), left outer);
+#END
+#IF(onThor)
+	wTelecom5 := join(wAuto5, distribute(rvTelecom5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,28), left outer, local);
+#ELSE
+	wTelecom5 := join(wAuto5, rvTelecom5, left.seq=right.seq, doModels(LEFT,RIGHT,28), left outer);
+#END
+#IF(onThor)
+	wMoney5 := join(wTelecom5, distribute(rvMoney5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer, local);
+#ELSE
+	wMoney5 := join(wTelecom5, rvMoney5, left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer);
+#END
+#IF(onThor)
+	wCrossInd5 := join(wMoney5, distribute(rvCrossInd5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer, local);
+#ELSE
+	wCrossInd5 := join(wMoney5, rvCrossInd5, left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer);
+#END
 
 // FRAUD MODELS
-wFD3 := if(onThor,
-						join(BSdata, distribute(fd3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,9), left outer, local),
-						join(BSdata, fd3, left.seq=right.seq, doModels(LEFT,RIGHT,9), left outer));
-wFD6 := if(onThor,
-						join(wFD3, distribute(fd6, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,10), left outer, local),
-						join(wFD3, fd6, left.seq=right.seq, doModels(LEFT,RIGHT,10), left outer));
-wFP := if(onThor,
-						join(wFD6, distribute(fp, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,11), left outer, local),
-						join(wFD6, fp, left.seq=right.seq, doModels(LEFT,RIGHT,11), left outer));
+#IF(onThor)
+	wFD3 := join(BSdata, distribute(fd3, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,9), left outer, local);
+#ELSE
+	wFD3 := join(BSdata, fd3, left.seq=right.seq, doModels(LEFT,RIGHT,9), left outer);
+#END
+#IF(onThor)
+	wFD6 := join(wFD3, distribute(fd6, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,10), left outer, local);
+#ELSE
+	wFD6 := join(wFD3, fd6, left.seq=right.seq, doModels(LEFT,RIGHT,10), left outer);
+#END
+#IF(onThor)
+	wFP := join(wFD6, distribute(fp, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,11), left outer, local);
+#ELSE
+	wFP := join(wFD6, fp, left.seq=right.seq, doModels(LEFT,RIGHT,11), left outer);
+#END
 
 // need a special join for FP1109_0 because the layout is different (it has indices)
 Layout_Boca_Shell doFP1109Model(Layout_Boca_Shell le, models.layouts.layout_fp1109 ri) := transform
@@ -337,9 +399,12 @@ Layout_Boca_Shell doFP1109Model(Layout_Boca_Shell le, models.layouts.layout_fp11
 	
 	self := le;
 end;
-wFP2 := if(onThor,
-					join(wFP, distribute(fp2, hash64(seq)), left.seq=right.seq, doFP1109Model(LEFT,RIGHT), left outer, local),
-					join(wFP, fp2, left.seq=right.seq, doFP1109Model(LEFT,RIGHT), left outer));
+
+#IF(onThor)
+	wFP2 := join(wFP, distribute(fp2, hash64(seq)), left.seq=right.seq, doFP1109Model(LEFT,RIGHT), left outer, local);
+#ELSE
+	wFP2 := join(wFP, fp2, left.seq=right.seq, doFP1109Model(LEFT,RIGHT), left outer);
+#END
 
 // new Flagship models for Fraudpoint 3 - same output as FP1109
 Layout_Boca_Shell doFP31505Model(Layout_Boca_Shell le, models.layouts.layout_fp1109 ri) := transform
@@ -359,9 +424,12 @@ Layout_Boca_Shell doFP31505Model(Layout_Boca_Shell le, models.layouts.layout_fp1
 	
 	self := le;
 end;
-wFP3 := if(onThor,
-						join(wFP2, distribute(fp3, hash64(seq)), left.seq=right.seq, doFP31505Model(LEFT,RIGHT), left outer, local),
-						join(wFP2, fp3, left.seq=right.seq, doFP31505Model(LEFT,RIGHT), left outer));
+
+#IF(onThor)
+	wFP3 := join(wFP2, distribute(fp3, hash64(seq)), left.seq=right.seq, doFP31505Model(LEFT,RIGHT), left outer, local);
+#ELSE
+	wFP3 := join(wFP2, fp3, left.seq=right.seq, doFP31505Model(LEFT,RIGHT), left outer);
+#END
 
 Layout_Boca_Shell doFP3FDN1505Model(Layout_Boca_Shell le, models.layouts.layout_fp1109 ri) := transform
 	self.fd_scores.fraudpoint_V3_FDN := ri.score;
@@ -380,9 +448,12 @@ Layout_Boca_Shell doFP3FDN1505Model(Layout_Boca_Shell le, models.layouts.layout_
 	
 	self := le;
 end;
-wFP3_FDN := if(onThor,
-							join(wFP3, distribute(fp3_FDN, hash64(seq)), left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer, local),
-							join(wFP3, fp3_FDN, left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer));
+
+#IF(onThor)
+	wFP3_FDN := join(wFP3, distribute(fp3_FDN, hash64(seq)), left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer, local);
+#ELSE
+	wFP3_FDN := join(wFP3, fp3_FDN, left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer);
+#END
 
 wModels1 := if(isFCRA, wCrossInd5, wFP3_FDN);
 
