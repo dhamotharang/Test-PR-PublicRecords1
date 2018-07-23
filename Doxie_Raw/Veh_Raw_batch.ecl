@@ -1,4 +1,4 @@
-import doxie_raw, doxie, ut, VehicleV2, Vehiclev2_services, autokey, autokeyb2;
+﻿import doxie_raw, doxie, ut, VehicleV2, Vehiclev2_services, autokey, autokeyb2;
 
 outrec := doxie_Raw.Layout_VehRawBatchInput.out_layout;
 
@@ -6,6 +6,8 @@ export outrec Veh_Raw_batch(grouped dataset(outrec) inputs,
 														boolean DoFail = false, boolean IsCRS = false,
 														boolean ExcludeLessors = false, boolean include_non_regulated_data = false) := 
 FUNCTION
+
+isCNSMR := ut.IndustryClass.is_Knowx;
 
 dk0 := doxie_Raw.Layout_VehRawBatchInput.input_w_keys;
 
@@ -178,8 +180,13 @@ F10 := join(F9, vehiclev2.Key_Vehicle_Party_Key,left.sequence_key='' and
 				xt(left,'','',right.sequence_key,0,''),keep(Vehiclev2_services.Constant.VEHICLE_PER_KEY),left outer);
 
 
-F11 := dedup(project(group( sort(F10(vehicle_key<>''),vehicle_key,iteration_key,sequence_key),
+F11_veh_info := dedup(project(group( sort(F10(vehicle_key<>''),vehicle_key,iteration_key,sequence_key),
 	vehicle_key,iteration_key,sequence_key), dk0), all);
+
+F11_veh_info_supressed := dedup(project(group( sort(F0(vehicle_key<>''),vehicle_key,iteration_key,sequence_key),
+	vehicle_key,iteration_key,sequence_key), dk0), all);
+	
+F11 := if(isCNSMR, F11_veh_info_supressed, F11_veh_info);
 
 //***** Use the seq_nos to get the veh info
 FT := PROJECT(Vehiclev2_services.Fn_Find(F11,TRUE,excludelessors,,,include_non_regulated_data).v1_ret,outrec);

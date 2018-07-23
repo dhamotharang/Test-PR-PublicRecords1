@@ -1,6 +1,7 @@
 ﻿IMPORT MDR;
 EXPORT Constants := MODULE
 
+	EXPORT Is_CNSMR := 'CNSMR'; //Industry class for D2C 
 	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
 		
 	EXPORT CCWRestrictedSources := [
