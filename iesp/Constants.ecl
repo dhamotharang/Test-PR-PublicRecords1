@@ -1320,11 +1320,11 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxPorts := 100;
 		export unsigned1 MaxSpoofs := 100;
 		export unsigned1 MaxOTPs := 100;
+		export unsigned1 MaxInquiries := 100;
 		export unsigned1 MaxPRIRules := 20;
 		export unsigned1 MaxAlerts := 20;
 		export unsigned1 MaxAlertMessages := 20;
 	end;
-	
   // Phone History Report
 	export unsigned2 PhoneHistoryMaxRecords :=500;
   export unsigned2 PhoneInfoMessages := 1;
