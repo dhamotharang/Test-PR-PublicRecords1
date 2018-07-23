@@ -56,12 +56,12 @@ EXPORT LayoutsInternalReport := MODULE
 
 
 
- 
 
-  
-  // ------                                                                            ------
-  // ------ define a simple list of BEO's with Criminal Events                         ------
-  // ------ ********************************************************                   ------ 
+ 
+// ------                                                                             ------
+// ------    define an intermediate layout to hold information about these executives ------ 
+// ------    that have criminal activity                                              ------
+// ------    this list has executives and all of it's child datasets including party  ------
   EXPORT FlatListOfIndividualsWithCriminalLayout := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
     DueDiligence.Layouts.SlimIndividual;
@@ -74,14 +74,14 @@ EXPORT LayoutsInternalReport := MODULE
 	// ------   these list just the offenses and nothing about the person charged        ------
   // ------   *********************************************************************    ------
 	EXPORT ReportingOfIndvCriminalChildDatasetLayout    := RECORD
-	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;  
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;      //*  This is the LINKID number of the parent  
 	 iesp.duediligenceshared.t_DDRLegalEventIndividual;
 	 string ExecTitle;
    DATASET(iesp.duediligenceshared.t_DDRLegalStateCriminal)  criminalChildDS;
 	END;
- 
-
-	
+  // ------                                                                       ------
+  // ------ define the internal ChildDataset for the Legal Events section report  ------
+	// ------                                                                       ------
 	EXPORT BusAircraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
 		DATASET(iesp.duediligenceshared.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAircraft)};
@@ -193,5 +193,21 @@ EXPORT LayoutsInternalReport := MODULE
    STRING1    NameType;                   // D = Debtor   C = Creditor
 	 iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions;  
 	END; 
-    
+  
+  EXPORT Associated_Businesses := RECORD
+    /* this will be the Link id's of the Inquired Business      */
+		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout InquiredBus;
+    /* this will be the link id's of the Associated Businesses of the BEO  */   
+    DueDiligence.Layouts.Busn_Input Busn_Info;  
+    unsigned4 HistoryDate;
+    string50 AssociatedBusinessName;
+    string50 AssociatedLEXID;    
+  END;  
+  
+  EXPORT ReportingOfBEOAssociatedBus := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout  AssociatedBusLINKID;
+    DATASET (iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+  END;
+  
 END;

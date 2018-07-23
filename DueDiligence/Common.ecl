@@ -521,24 +521,36 @@ EXPORT Common := MODULE
 
 	
 	
-  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, string40 courtDispDesc1, string40 courtDispDesc2, string35 offenseChargeLevelReported) := FUNCTION
+  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, STRING40 courtDispDesc1, STRING40 courtDispDesc2, STRING35 offenseChargeLevelReported, STRING1 trafficFlag) := FUNCTION
 		
-		//***Does the field "courtOffenseLevel" map to any of the listed FELONY or MISDEMEANOR codes***// 
-		boolean MapsToFelony         := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
-		boolean MapsToMisdemeanor    := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
+		//Does the field "courtOffenseLevel" map to any of the listed FELONY, MISDEMEANOR, TRAFFIC, or INFRACCTION codes 
+		BOOLEAN MapsToFelony := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
+		BOOLEAN MapsToMisdemeanor := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
+		BOOLEAN MapsToTraffic := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setTRAFFIC;
+		BOOLEAN MapsToInfraction := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setINFRACTION;
 		
-		//***Can we find the keyword 'FELONY' in the field "charge" ***// 
-		STRING  TextStringConcatenated   := charge + courtDispDesc1 + courtDispDesc2 + offenseChargeLevelReported;   
-		boolean foundTheWordFelony       := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_FELONY, 1);
-		boolean foundTheWordReduced      := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_REDUCED, 1);
+		//check to see if we can find key words
+		STRING  TextStringConcatenated := charge + courtDispDesc1 + courtDispDesc2 + offenseChargeLevelReported;  
+    
+		BOOLEAN foundFelonyKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.FELONY_NOT_REDUCED, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundMisdemeanorKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_MISDEMEANOR, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundTrafficKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_TRAFFIC, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundInfractionKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_INFRACTION, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    
 		
-		ReturnValue      := MAP(
-		                        MapsToFelony => DueDiligence.Constants.FELONY,
-														MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
-														foundTheWordFelony AND ~foundTheWordReduced  => DueDiligence.Constants.FELONY,             
-		                        DueDiligence.Constants.UNKNOWN);
+    
+		returnValue := MAP(MapsToFelony => DueDiligence.Constants.FELONY,
+                        foundFelonyKeyWord => DueDiligence.Constants.FELONY,
+                        MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
+                        MapsToTraffic => DueDiligence.Constants.TRAFFIC,
+                        MapsToInfraction => DueDiligence.Constants.INFRACTION,
+                        trafficFlag = DueDiligence.Constants.YES => DueDiligence.Constants.TRAFFIC,
+                        foundMisdemeanorKeyWord => DueDiligence.Constants.MISDEMEANOR,
+                        foundTrafficKeyWord => DueDiligence.Constants.TRAFFIC,
+                        foundInfractionKeyWord => DueDiligence.Constants.INFRACTION,
+                        DueDiligence.Constants.UNKNOWN);
 		
-		RETURN ReturnValue;
+		RETURN returnValue;
 	END;	
 	
 

@@ -2,7 +2,7 @@
 
 EXPORT getIndKRILegalStateCriminal(DueDiligence.Layouts.Indv_Internal indv) := FUNCTION
 
-		/* PERSON LEGAL STATE CRIMINAL */ 
+		/* PERSON STATE LEGAL EVENT */ 
 		legalStateCriminalFlag9 := IF(indv.currentIncarcerationOrParole, 'T', 'F');                                                            		 
 		legalStateCriminalFlag8 := IF(indv.felonyPast3Yrs, 'T', 'F');                                		 
 		legalStateCriminalFlag7 := IF(indv.felonyOver3Yrs, 'T', 'F');  
@@ -21,9 +21,9 @@ EXPORT getIndKRILegalStateCriminal(DueDiligence.Layouts.Indv_Internal indv) := F
 		
 		legalStateCriminalConcat_Final := legalStateCriminalConcat + legalStateCriminalFlag0;
 
-		perLegalStateCriminal_Flag := legalStateCriminalConcat_Final;
-		perLegalStateCriminal  := (STRING)(10-STD.Str.Find(legalStateCriminalConcat_Final, 'T', 1)); 
+		perStateLegalEvent_Flag := legalStateCriminalConcat_Final;
+		perStateLegalEvent  := (STRING)(10-STD.Str.Find(legalStateCriminalConcat_Final, 'T', 1)); 
 		
 		
-		RETURN DueDiligence.Common.createNVPair(perLegalStateCriminal, perLegalStateCriminal_Flag);
+		RETURN DueDiligence.Common.createNVPair(perStateLegalEvent, perStateLegalEvent_Flag);
 END;

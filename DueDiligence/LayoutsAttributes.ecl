@@ -128,7 +128,7 @@
 		BOOLEAN			atleastOneCategory4;
 		BOOLEAN			atleastOneCategory3;
 		BOOLEAN			atleastOneCategory2;
-    /*PerLegalCivil*/
+    /*PerCivilLegalEvent*/
     BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsPast3Yrs;
@@ -137,7 +137,7 @@
     BOOLEAN     five2NineLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     one2TwoLiensJudgementsEvictionsOver3Yrs;
-    /*PerLegalStateCriminal*/
+    /*PerStateLegalEvent*/
     BOOLEAN     currentIncarcerationOrParole;
     BOOLEAN     felonyPast3Yrs;
     BOOLEAN     felonyOver3Yrs;
