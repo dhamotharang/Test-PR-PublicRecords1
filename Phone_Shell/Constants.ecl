@@ -31,7 +31,7 @@
 	//if position 24 is populated then do not run Equifax	
 	EXPORT posEquifaxRestriction := 24;
 	
-	EXPORT Default_PhoneScore := 306;
+	EXPORT Default_PhoneScore := 217;
 	
 	EXPORT EquiaxDRMCheck(string DataRestrictionMask) := (DataRestrictionMask[posEquifaxRestriction] = '0' or DataRestrictionMask[posEquifaxRestriction] = '');
 

@@ -1,10 +1,12 @@
-/*2014-11-16T00:19:09Z (Nathan Koubsky)
+﻿/*2014-11-16T00:19:09Z (Nathan Koubsky)
 Added core roxie ip
 */
 import risk_indicators, Phone_Shell, Data_Services;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
+
+ export prod_batch_analytics_roxie := 'http://10.176.71.36:9856';  // use this VIP starting week of 2018-02-12
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
@@ -234,9 +236,13 @@ export shortcuts := module
 	// The following are used for Phone Shell model validation - Boca Shell Version 41.  Join by Account Number AND Gathered Phone to get a unique record for validation. 95,000 inputs = 987,090 phones
 	// Unique Join for full layout: Input_Echo.AcctNo AND Gathered_Phone
 //file is too old so need to recreate if need it
-	// export validation_phone_shell95k_41 := dataset('~bpahl::validation::phone_shell_w20131217-152013.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+//	// export validation_phone_shell95k_41 := dataset('~bpahl::validation::phone_shell_w20131217-152013.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_41_gatewaysoff := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_off_tmppsw20180522-155400.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_41_gatewayson := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_on_tmppsw20180522-155230.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
 	// Unique Join for modeling layout: AcctNo AND Gathered_Ph
-	export validation_phone_shell95k_modelinglayout_41 := dataset('~bpahl::validation::phone_shell_modelinglayout_w20131217-152013.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+	// // export validation_phone_shell95k_modelinglayout_41 := dataset('~bpahl::validation::phone_shell_modelinglayout_w20131217-152013.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_modelinglayout_41_gatewaysoff := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_off_modelinglayout_w20180522-155400.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_modelinglayout_41_gatewayson := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_on_modelinglayout_w20180522-155230.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
 
 	// for converting PRII files from Nick's team to layout_batch_in:
 	export PRII2Batch( dataset(prii_layout) prii_in ) := FUNCTION
