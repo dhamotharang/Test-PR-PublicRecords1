@@ -1,4 +1,5 @@
-﻿import risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA, gateway;
+﻿import _Control, risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA, gateway;
+onThor := _Control.Environment.OnThor;
 
 export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_input,  
 															unsigned1 glb, 
@@ -7,8 +8,7 @@ export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_in
 															string datarestriction, 
 															string datapermission, 
 															integer bsversion,
-															unsigned8 BSOptions,
-															boolean onThor = false) := FUNCTION
+															unsigned8 BSOptions) := FUNCTION
 
 // a few of the functions in here need the input in layout_output instead of layout_outx
 // iid_input := project(iid, transform(risk_indicators.layout_output, self := left));
@@ -114,7 +114,11 @@ header_by_address_thor_addr := join(distribute(iid_input(prim_name!='' and z5!='
 																		keep(2000), LOCAL);
 header_by_address_thor := header_by_address_thor_addr + PROJECT(iid_input(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, SELF := LEFT, SELF := []));
 
-header_by_address := if(onThor, header_by_address_thor, header_by_address_roxie);
+#IF(onThor)
+	header_by_address := header_by_address_thor;
+#ELSE
+	header_by_address := header_by_address_roxie;
+#END
 
 // SSN per Address counts
 counts_per_ssn_roxie := table(header_by_address, {seq, did, ssn_from_addr,
@@ -129,8 +133,11 @@ counts_per_ssn_thor := table(distribute(header_by_address, hash64(seq,did)), {se
 															_ssns_per_addr_created_6months := count(group, ssns_per_addr_created_6months>0)
 															}, seq, did, ssn_from_addr, local);	
 
-counts_per_ssn := if(onThor, counts_per_ssn_thor, counts_per_ssn_roxie);
-
+#IF(onThor)
+	counts_per_ssn := counts_per_ssn_thor;
+#ELSE
+	counts_per_ssn := counts_per_ssn_roxie;
+#END
 
 ssns_per_addr_counts_roxie := table(counts_per_ssn, {seq, did, 
 															ssns_per_addr := count(group, _ssns_per_addr>0),
@@ -144,7 +151,11 @@ ssns_per_addr_counts_thor := table(distribute(counts_per_ssn, hash64(seq,did)), 
 															ssns_per_addr_created_6months := count(group, _ssns_per_addr_created_6months>0)}, 
 															seq, did, local);
 									
-ssns_per_addr_counts := if(onThor, ssns_per_addr_counts_thor, ssns_per_addr_counts_roxie);
+#IF(onThor)
+	ssns_per_addr_counts := ssns_per_addr_counts_thor;
+#ELSE
+	ssns_per_addr_counts := ssns_per_addr_counts_roxie;
+#END
 
 // ADL per address counts
 counts_per_adl_roxie := table(header_by_address, {seq, did, DID_from_srch, historydate,
@@ -158,7 +169,12 @@ counts_per_adl_thor := table(distribute(header_by_address, hash64(seq, did)), {s
 															_adls_per_addr_current := count(group, adls_per_addr_current>0),
 															_adls_per_addr_created_6months := count(group, adls_per_addr_created_6months>0),
 															}, seq, did, DID_from_srch, historydate, local);	
-counts_per_adl := if(onThor, counts_per_adl_thor, counts_per_adl_roxie);
+                              
+#IF(onThor)
+	counts_per_adl := counts_per_adl_thor;
+#ELSE
+	counts_per_adl := counts_per_adl_roxie;
+#END
 
 adls_per_addr_counts_roxie := table(counts_per_adl, {seq, did, 
 															adls_per_addr := count(group, _adls_per_addr>0),
@@ -172,8 +188,12 @@ adls_per_addr_counts_thor := table(distribute(counts_per_adl, hash64(seq,did)), 
 															adls_per_addr_created_6months := count(group, _adls_per_addr_created_6months>0)}, 
 															seq, did, local);
 
-adls_per_addr_counts := if(onThor, adls_per_addr_counts_thor, adls_per_addr_counts_roxie);
-															
+#IF(onThor)
+	adls_per_addr_counts := adls_per_addr_counts_thor;
+#ELSE
+	adls_per_addr_counts := adls_per_addr_counts_roxie;
+#END
+
 with_ssn_per_addr_counts := join(iid_input, ssns_per_addr_counts, left.seq=right.seq and left.did=right.did, 
 		transform(risk_indicators.layout_output, 
 			self.ssns_per_addr := risk_indicators.iid_constants.capVelocity(right.ssns_per_addr); 
@@ -189,7 +209,7 @@ with_adls_per_addr_counts := join(with_ssn_per_addr_counts, adls_per_addr_counts
 			self := left), left outer);
 
 phone_counts_per_best_addr := Risk_Indicators.iid_getAddressInfo(iid_input, glb, isFCRA, require2ele, bsversion, isUtility,
-ExactMatchLevel, LastSeenThreshold, BSOptions, onThor);
+ExactMatchLevel, LastSeenThreshold, BSOptions);
 											
 with_best_address_counts := join(with_adls_per_addr_counts, phone_counts_per_best_addr,	left.seq=right.seq,
 		transform(risk_indicators.layout_output, 
@@ -203,7 +223,7 @@ with_best_address_counts := join(with_adls_per_addr_counts, phone_counts_per_bes
 
 // for optimization, set bsoptions := 0 and bsversion := 40 for this function call
 best_ssn_flags := risk_indicators.iid_getSSNFlags(iid_input, dppa, glb, isFCRA, runSSNCodes, 
-											ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission, onThor );
+											ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );
 
 with_best_ssn_flags := join(with_best_address_counts, best_ssn_flags, left.seq=right.seq,
 		transform(risk_indicators.layout_output,
@@ -224,8 +244,8 @@ with_best_ssn_flags := join(with_best_address_counts, best_ssn_flags, left.seq=r
 // now get the phone flags							
 runAreaCodeSplitSearch := false;
 
-best_zip_flags := risk_indicators.iid_getZipFlags(iid_input, onThor);
-best_phone_flags := risk_indicators.iid_getPhoneAddrFlags(best_zip_flags, isFCRA, runAreaCodeSplitSearch, bsversion, onThor);
+best_zip_flags := risk_indicators.iid_getZipFlags(iid_input);
+best_phone_flags := risk_indicators.iid_getPhoneAddrFlags(best_zip_flags, isFCRA, runAreaCodeSplitSearch, bsversion);
 
 with_best_phone_flags := join(with_best_ssn_flags, best_phone_flags, left.seq=right.seq,
 		transform(risk_indicators.layout_output,
@@ -247,7 +267,7 @@ allowcellphones := false;  // not going to targus gateway for this function anyw
 companyId := '';
 
 best_phoneInfo := risk_indicators.iid_getPhoneInfo(group(with_best_phone_flags, seq), gateways, dppa, glb, isfcra, require2ele, bsversion,
-		allowcellphones, exactmatchlevel, lastseenthreshold, bsoptions, companyID, onThor := onThor);  // leave the rest of the parameters as the defaults
+		allowcellphones, exactmatchlevel, lastseenthreshold, bsoptions, companyID);  // leave the rest of the parameters as the defaults
 
 with_best_phoneInfo := best_phoneInfo;
 		
@@ -260,7 +280,7 @@ with_best_phoneInfo := best_phoneInfo;
 
 // now calculate the hriskaddrflag on the best address.  
 // first need the zipclass
-bestaddr_zipclass := risk_indicators.iid_getZipFlags(iid_input, onThor);
+bestaddr_zipclass := risk_indicators.iid_getZipFlags(iid_input);
 
 layout_output_tmp := record
 	risk_indicators.layout_output;
@@ -335,7 +355,12 @@ with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
 				ATMOST(left.z5=right.z5 and left.prim_name=right.prim_name and left.addr_suffix=right.suffix and
 					  left.predir=right.predir and left.postdir=right.postdir and left.prim_range=right.prim_range, RiskWise.max_atmost), keep(100), LOCAL));
 
-with_bestaddr_hriskaddrflag_tmp := if(onThor, group(sort(with_bestaddr_hriskaddrflag_tmp_thor, seq, LOCAL), seq, LOCAL), with_bestaddr_hriskaddrflag_tmp_roxie);
+#IF(onThor)
+	with_bestaddr_hriskaddrflag_tmp := group(sort(with_bestaddr_hriskaddrflag_tmp_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	with_bestaddr_hriskaddrflag_tmp := with_bestaddr_hriskaddrflag_tmp_roxie;
+#END
+
 with_bestaddr_hriskaddrflag_tmp_sorted := sort(with_bestaddr_hriskaddrflag_tmp, seq, -hriskaddrflag);						
 with_bestaddr_hriskaddrflag_rolled := rollup(with_bestaddr_hriskaddrflag_tmp_sorted, left.seq = right.seq, flagroll(left,right));
 

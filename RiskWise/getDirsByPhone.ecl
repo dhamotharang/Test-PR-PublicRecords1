@@ -1,9 +1,9 @@
-﻿import risk_indicators, gong, ut, targus, LIB_Date, FCRA, Inquiry_AccLogs, PhonesPlus_V2, gateway, nid;
-
+﻿import _Control, risk_indicators, gong, ut, targus, LIB_Date, FCRA, Inquiry_AccLogs, PhonesPlus_V2, gateway, nid;
+onThor := _Control.Environment.OnThor;
 
 export getDirsByPhone(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,
 											boolean isFCRA=false, unsigned BSOptions=0, unsigned lastSeenThreshold=risk_indicators.iid_constants.oneyear, 
-											string ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel, string companyID='', boolean onThor=false) := function
+											string ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel, string companyID='') := function
 											
 glb_ok := Risk_Indicators.iid_constants.glb_ok(glb, isFCRA);											
 
@@ -21,8 +21,12 @@ gong_correct_thor := join(input(gong_correct_ffid<>[]), pull(FCRA.Key_Override_G
 												(right.flag_file_id in left.gong_correct_ffid),
 												gong_corr(left, right), LOCAL, ALL);
 												
-gong_correct := if(onThor, gong_correct_thor, gong_correct_roxie);
-												
+#IF(onThor)
+	gong_correct := gong_correct_thor;
+#ELSE
+	gong_correct := gong_correct_roxie;
+#END
+
 Layout_Dirs_Phone add_gong(input le, gong.key_history_phone rt) := transform
 	self.src := 'GH';
 	self := rt;
@@ -37,8 +41,12 @@ g_history_non_fcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(pho
 										 (right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),									 
 									add_gong(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
-g_history_non_fcra := if(onThor, g_history_non_fcra_thor, g_history_non_fcra_roxie);									
-									
+#IF(onThor)
+	g_history_non_fcra := g_history_non_fcra_thor;
+#ELSE
+	g_history_non_fcra := g_history_non_fcra_roxie;
+#END
+
 g_history_fcra_roxie := join(input, gong.Key_FCRA_History_Phone,
 										trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]) and
 									  trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id,
@@ -50,8 +58,12 @@ g_history_fcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phone10
 									  trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id,
 									add_gong(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
-g_history_fcra := if(onThor, g_history_fcra_thor, g_history_fcra_roxie);
-									
+#IF(onThor)
+	g_history_fcra := g_history_fcra_thor;
+#ELSE
+	g_history_fcra := g_history_fcra_roxie;
+#END
+
 g_history := if(isFCRA, g_history_fcra, g_history_non_fcra);			
 
 combined := ungroup(gong_correct + g_history);
@@ -101,8 +113,12 @@ targus_wp_nonfcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phon
 														 (right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),
 													add_targus(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
-targus_wp_nonfcra := if(onThor, targus_wp_nonfcra_thor, targus_wp_nonfcra_roxie);
-									
+#IF(onThor)
+	targus_wp_nonfcra := targus_wp_nonfcra_thor;
+#ELSE
+	targus_wp_nonfcra := targus_wp_nonfcra_roxie;
+#END
+
 targus_wp_fcra_roxie := join(input, targus.Key_Targus_FCRA_Phone,
 												trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),
 											add_targus(left,right), ATMOST(keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100));
@@ -112,8 +128,12 @@ targus_wp_fcra_thor := join(distribute(input(trim(phone10)!=''), hash64(phone10)
 											(right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),
 											add_targus(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
-targus_wp_fcra := if(onThor, targus_wp_fcra_thor, targus_wp_fcra_roxie);
-											
+#IF(onThor)
+	targus_wp_fcra := targus_wp_fcra_thor;
+#ELSE
+	targus_wp_fcra := targus_wp_fcra_roxie;
+#END
+
 targus_wp := if(isFCRA, targus_wp_fcra, targus_wp_nonfcra);			
 
 
@@ -158,8 +178,12 @@ phonesPlusNonFcraTemp_thor := join(distribute(input(trim(phone10)!=''), hash64(p
 										(GLB_ok OR TRIM(right.glb_dppa_flag) not in ['G','B']),									 
 									addPP(left,right), ATMOST((left.phone10=right.cellphone),RiskWise.max_atmost),keep(100), LOCAL);
 									
-phonesPlusNonFcraTemp := if(onThor, phonesPlusNonFcraTemp_thor, phonesPlusNonFcraTemp_roxie);
-									
+#IF(onThor)
+	phonesPlusNonFcraTemp := phonesPlusNonFcraTemp_thor;
+#ELSE
+	phonesPlusNonFcraTemp := phonesPlusNonFcraTemp_roxie;
+#END
+
 phonesPlusNonFcra := if((BSOptions & risk_indicators.iid_constants.BSOptions.IsInstantIDv1) > 0 and ~isFCRA, phonesPlusNonFcraTemp);							
 
 			

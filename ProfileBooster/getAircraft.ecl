@@ -1,6 +1,7 @@
-﻿IMPORT faa, RiskWise, ut, Risk_Indicators;
+﻿IMPORT _Control, faa, RiskWise, ut, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getAircraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
+EXPORT getAircraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 ACIdsKey := faa.key_aircraft_did(false);
 
@@ -22,8 +23,11 @@ ACIds_thor := join(distribute(PBslim, did2),
 							addAircraftIDs(left,right),
 							atmost(riskwise.max_atmost), local);
 							
-ACIds := if(onThor, ACIds_thor, ACIds_roxie);
-
+#IF(onThor)
+	ACIds := ACIds_thor;
+#ELSE
+	ACIds := ACIds_roxie;
+#END
 							
 ACDetailsKey := faa.key_aircraft_id(false);
 
@@ -50,8 +54,12 @@ ACDetails_thor := join(distribute(ACIds, aircraft_id),
 							addAircraftDetails(left,right),
 							atmost(left.aircraft_id=right.aircraft_id, riskwise.max_atmost), local);
 							
-ACDetails := if(onThor, acdetails_thor, acdetails_roxie);						
-						
+#IF(onThor)
+	ACDetails := ACDetails_thor;
+#ELSE
+	ACDetails := ACDetails_roxie;
+#END
+
 SortACdetails :=  sort(ACDetails, seq, did2, aircraft_id);
 
 ProfileBooster.Layouts.Layout_PB_Slim_aircraft rollAircrafts(ACDetails le, ACDetails ri) := TRANSFORM

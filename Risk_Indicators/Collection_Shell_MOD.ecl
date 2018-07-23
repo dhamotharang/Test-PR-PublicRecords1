@@ -1,4 +1,5 @@
-import doxie, doxie_files, risk_indicators, riskwise, watchdog, ut,CriminalRecords_Services;
+﻿import _Control, doxie, doxie_files, risk_indicators, riskwise, watchdog, ut,CriminalRecords_Services;
+onThor := _Control.Environment.OnThor;
 
 export Collection_Shell_MOD := module
 
@@ -232,7 +233,7 @@ export best_rec := record
 	string7 geo_blk := '';
 end;
 
-export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 DataRestriction, integer GLB_Purpose, boolean clean_address=true, boolean onThor=false)  := function
+export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 DataRestriction, integer GLB_Purpose, boolean clean_address=true)  := function
 	// permitted if not specifically restricted
 	experian_permitted := DataRestriction[risk_indicators.iid_constants.posExperianRestriction]<>risk_indicators.iid_constants.sTrue;
   IndustryClass := '';
@@ -315,7 +316,12 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 										left.did != 0 and (left.did = right.did),
 										get_watchdog_non_glb(LEFT,RIGHT),left outer, keep(1), LOCAL)));
 										
-	best_data := if(onThor, best_data_thor, best_data_roxie);									
+  #IF(onThor)
+		best_data := best_data_thor;
+	#ELSE
+		best_data := best_data_roxie;
+	#END
+  
 	return best_data;
 
 end;

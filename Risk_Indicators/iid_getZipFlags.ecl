@@ -1,6 +1,7 @@
-import riskwise, risk_indicators;
+﻿import _Control, riskwise, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-export iid_getZipFlags(grouped DATASET(risk_indicators.Layout_output) inrec, boolean onThor=false) := function
+export iid_getZipFlags(grouped DATASET(risk_indicators.Layout_output) inrec) := function
 
 risk_indicators.layout_output addZipClass(risk_indicators.layout_output le, riskwise.Key_CityStZip rt) := transform	
 	// addr_flags will be populated if there was a correction record.  use this result
@@ -35,7 +36,11 @@ wZipClass_thor := join(distribute(inrec, hash64(in_zipCode)),
 				right.zip5=left.in_zipCode and trim(left.in_zipCode)!='',
 				addZipClass(left, right), left outer, ATMOST(right.zip5=left.in_zipCode,RiskWise.max_atmost), LOCAL);
 				
-wZipClass := if(onThor, group(sort(wZipClass_thor, seq, local), seq, local), wZipClass_roxie);
+#IF(onThor)
+	wZipClass := group(sort(wZipClass_thor, seq, local), seq, local);
+#ELSE
+	wZipClass := wZipClass_roxie;
+#END
 
 risk_indicators.layout_output zipRoll(risk_indicators.layout_output le, risk_indicators.layout_output ri) := transform
 	self.ziptypeflag := IF(le.ziptypeflag  not in ['4','5'], le.ziptypeflag, ri.ziptypeflag);

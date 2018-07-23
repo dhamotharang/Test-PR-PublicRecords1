@@ -1,7 +1,8 @@
-﻿import prof_licenseV2, riskwise, ut, RiskView;
+﻿import _Control, prof_licenseV2, riskwise, ut, RiskView;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, 
-			boolean isPrescreen, boolean isDirectToConsumerPurpose = false, boolean onThor = false) := FUNCTION
+			boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 
@@ -75,11 +76,15 @@ license_recs_original_thor_did := join(distribute(ids_only(did!=0), hash64(did))
 											
 license_recs_original_thor := GROUP(SORT(DISTRIBUTE(license_recs_original_thor_did + PROJECT(ids_only(did=0), TRANSFORM(PL_Plus_temp, SELF := LEFT, SELF := [])), HASH64(seq)), seq, LOCAL), seq, LOCAL);
 
-license_recs_original := if(onThor, license_recs_original_thor, license_recs_original_roxie);
+#IF(onThor)
+	license_recs_original := license_recs_original_thor;
+#ELSE
+	license_recs_original := license_recs_original_roxie;
+#END
 
 isFCRA := true;
 
-mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen, onThor);
+mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
 // ie, date_first_seen is newer than the expire date
@@ -183,8 +188,12 @@ with_category_v5_thor := join(rolled_licenses_pre, pull(LicenseType_Key),
 			getv5category(LEFT,RIGHT), 
 		left outer, atmost(100), keep(1), MANY LOOKUP);
 		
-with_category_v5 := if(onThor, with_category_v5_thor, with_category_v5_roxie);		
-			
+#IF(onThor)
+	with_category_v5 := with_category_v5_thor;
+#ELSE
+	with_category_v5 := with_category_v5_roxie;
+#END
+
 rolled_licenses := if(bsversion >= 4, with_category_v5, rolled_licenses_pre);
 			
 PL_Plus_temp roll_licenses2(PL_Plus_temp le, PL_Plus_temp rt) := transform

@@ -1,5 +1,6 @@
-﻿import doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
+﻿import _Control, doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
 	models, AID_Build;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,
@@ -9,8 +10,7 @@ export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(Layout_output) iid,
 								boolean IsFCRA = FALSE,
 								unsigned1 BSversion = 1, boolean nugen = false,
 								string50 DataRestriction=iid_constants.default_DataRestriction,
-								unsigned8 BSOptions,
-								boolean onThor = false
+								unsigned8 BSOptions
 								) := function
 
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
@@ -69,9 +69,15 @@ TRANSFORM
 	self.iid := le;
 
 	SELF.Available_Sources.DL := Risk_Indicators.Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st)); 
-	SELF.Available_Sources.Voter := if(onThor and BSversion>=50, false,Risk_Indicators.Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate)); //if running on thor, calculate in separate join
-	
-	// Input Check
+  
+  #IF(onThor)
+     //if running on thor for bsversion >= 50, calculate in separate join to improve performance. Earlier versions are okay since they're checking set instead of key.
+    SELF.Available_Sources.Voter := if(BSversion>=50, false,Risk_Indicators.Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate));
+  #ELSE
+    SELF.Available_Sources.Voter := Risk_Indicators.Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate); 
+  #END
+
+  // Input Check
 	SELF.Input_Validation.FirstName := le.fname<>'';
 	SELF.Input_Validation.LastName := le.lname<>'';
 	SELF.Input_Validation.Address := le.in_streetAddress<>'';
@@ -533,7 +539,11 @@ p_tmp_thor_50 := JOIN(p_tmp_noThorDL, VotersV2.Key_Voters_States(isFCRA),
 									 SELF.Available_Sources.Voter := RIGHT.state <> '';
 									 SELF := LEFT), LEFT OUTER, LOOKUP);
 									 
-p_tmp := group(sort(if(onThor and BSversion>=50,p_tmp_thor_50, p_tmp_noThorDL) , seq), seq);					
+#IF(onThor)
+	p_tmp := group(sort(if(BSversion>=50,p_tmp_thor_50, p_tmp_noThorDL) , seq), seq);
+#ELSE
+	p_tmp := group(sort(p_tmp_noThorDL , seq), seq);
+#END
 
 p:=project(p_tmp, transform(relrec, self := left));
 
@@ -567,7 +577,11 @@ RawAid_addrHist1_thor_pre := join(distribute(p_tmp(rawAid_2 != 0), hash64(rawAid
 
 RawAid_addrHist1_thor := group(sort(RawAid_addrHist1_thor_pre + project(p_tmp(rawAid_2 = 0), transform(aid_layout, self := left, self := [])), seq), seq);
 
-RawAid_addrHist1 := if(onThor, RawAid_addrHist1_thor, RawAid_addrHist1_roxie);
+#IF(onThor)
+	RawAid_addrHist1 := RawAid_addrHist1_thor;
+#ELSE
+	RawAid_addrHist1 := RawAid_addrHist1_roxie;
+#END
 
 aid_layout getRawAid(RawAid_addrHist1 le, aid_key ri) := transform
 	self.AH1_rec_type := le.AH1_rec_type;//Address_History_1
@@ -590,8 +604,12 @@ RawAid_addrHist_thor_pre := join(distribute(RawAid_addrHist1(rawaid_3 != 0), has
 
 RawAid_addrHist_thor := group(sort(RawAid_addrHist_thor_pre + RawAid_addrHist1(rawaid_3 = 0), seq), seq);
 
-RawAid_addrHist := if(onThor, RawAid_addrHist_thor, RawAid_addrHist_roxie);
-										
+#IF(onThor)
+	RawAid_addrHist := RawAid_addrHist_thor;
+#ELSE
+	RawAid_addrHist := RawAid_addrHist_roxie;
+#END
+
 relrec getDwell(RawAid_addrHist le) := transform
 	// get dwelltype for address history 1
 	a1_val := Risk_Indicators.MOD_AddressClean.street_address('',le.address_verification.address_history_1.prim_range,le.address_verification.address_history_1.predir,
@@ -652,10 +670,16 @@ wAptCount_thor_addr := join(distribute(wDwell(trim(shell_input.prim_name)<>''), 
 								(left.shell_input.predir=right.predir),
 								addAptCount(left,right), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
 wAptCount_thor := group(sort(wAptCount_thor_addr + wDwell(trim(shell_input.prim_name)=''),seq),seq);
-wAptCount := if(BSversion>2, if(onThor, wAptCount_thor, wAptCount_roxie), wDwell);
-										
+
+#IF(onThor)
+	wAptCount := if(BSversion>2, wAptCount_thor, wDwell);
+#ELSE
+	wAptCount := if(BSversion>2, wAptCount_roxie, wDwell);
+#END
+
+
 // get infutor by phone for bocashell 3
-infutor_phone := if(BSversion>2, Risk_Indicators.Boca_Shell_Infutor_phone(wAptCount, isFCRA, BSVersion, onThor), wAptCount);	
+infutor_phone := if(BSversion>2, Risk_Indicators.Boca_Shell_Infutor_phone(wAptCount, isFCRA, BSVersion), wAptCount);	
 
 												
 // get accident data for boca shell 3 - not for FCRA
@@ -751,7 +775,12 @@ pre_relatives_thor := group(sort(join(distribute(wUtil, hash64(seq)),
 													 distribute(ids, hash64(seq)), 
 													 left.seq = right.seq, combo_p_and_id(LEFT,RIGHT), left outer, local), seq, local), seq, local);
 
-pre_relatives := if(onThor, pre_relatives_thor, pre_relatives_roxie);
+#IF(onThor)
+	pre_relatives := pre_relatives_thor;
+#ELSE
+	pre_relatives := pre_relatives_roxie;
+#END
+
 // slimmed down the layout to reduce the memory usage in this bit of code, don't need full bocashell layout to calculate the relatives flags
 relatives_slim := record
 	relrec.seq;
@@ -839,7 +868,11 @@ idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did
 														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);
 
-idheader1 := if(onThor, idheader1_thor, idheader1_roxie);
+#IF(onThor)
+	idheader1 := idheader1_thor;
+#ELSE
+	idheader1 := idheader1_roxie;
+#END
 
 // idheader := if(isFCRA, pre_relatives(isrelat), idheader1);	// dont call the header for fcra because there will never be a relative
 idheader := idheader1;	// dont call the header for fcra because there will never be a relative
@@ -881,8 +914,12 @@ suspicious_identities_realtime_thor := group(sort(join(distribute(relative_adls,
 	(left.did=right.did),
 	getSuspiciousIds(LEFT,RIGHT), atmost(riskwise.max_atmost), keep(1), LOCAL),did),did);
 			
-suspicious_identities_realtime := if(onThor, suspicious_identities_realtime_thor, suspicious_identities_realtime_roxie);
-			
+#IF(onThor)
+	suspicious_identities_realtime := suspicious_identities_realtime_thor;
+#ELSE
+	suspicious_identities_realtime := suspicious_identities_realtime_roxie;
+#END
+
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 // if the record is default_history_date or same month as today, run production_realtime_mode
 production_realtime_mode := relative_adls[1].historydate=risk_indicators.iid_constants.default_history_date or
@@ -1131,13 +1168,17 @@ Property_with_census3b_thor := group(sort(JOIN(Property_with_census3a_thor, Dist
 							(left.Address_Verification.Address_History_2.geo_blk[1..4] = right.tract[1..4]), 
 						get_property_census(LEFT,RIGHT,3,true), LEFT OUTER, keep(1), LOCAL), seq), seq);
 
-Property_with_census3b := if(onThor, Property_with_census3b_thor, Property_with_census3b_roxie);
+#IF(onThor)
+	Property_with_census3b := Property_with_census3b_thor;
+#ELSE
+	Property_with_census3b := Property_with_census3b_roxie;
+#END
 
 With_or_without_census := IF(isFCRA, pre_relatives, Property_with_census3b);
 
-Risk_Indicators.MAC_testHRIAddress (With_or_without_census, Input_Address_Information, Prop_HRI_InputAddress, IsFCRA, onThor);
-Risk_Indicators.MAC_testHRIAddress (Prop_HRI_InputAddress, Address_History_1, Prop_HRI_AddressHistory_1, IsFCRA, onThor);
-Risk_Indicators.MAC_testHRIAddress (Prop_HRI_AddressHistory_1, Address_History_2, Prop_HRI_AddressHistory_2, IsFCRA, onThor);
+Risk_Indicators.MAC_testHRIAddress (With_or_without_census, Input_Address_Information, Prop_HRI_InputAddress, IsFCRA);
+Risk_Indicators.MAC_testHRIAddress (Prop_HRI_InputAddress, Address_History_1, Prop_HRI_AddressHistory_1, IsFCRA);
+Risk_Indicators.MAC_testHRIAddress (Prop_HRI_AddressHistory_1, Address_History_2, Prop_HRI_AddressHistory_2, IsFCRA);
 
 // output(iid, named('iid'));
 // output(p, named('p'));

@@ -1,6 +1,7 @@
-﻿IMPORT Drivers, VehicleV2, RiskWise, ut, MDR, risk_indicators;
+﻿IMPORT _Control, Drivers, VehicleV2, RiskWise, ut, MDR, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getVehicles(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
+EXPORT getVehicles(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 kvd := VehicleV2.key_vehicle_did;
  
@@ -24,8 +25,12 @@ vehRecs_thor :=  join(distribute(PBslim, did2),
 												 atmost(left.did2 = right.append_did, riskwise.max_atmost),
 												 local);
 
-vehRecs := if(onThor, vehRecs_thor, vehRecs_roxie);												 
-												 
+#IF(onThor)
+	vehRecs := vehRecs_thor;
+#ELSE
+	vehRecs := vehRecs_roxie;
+#END
+
 vehPartyKey := VehicleV2.Key_Vehicle_Party_Key;
 											
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles  add_party(vehRecs le, vehPartyKey ri) := TRANSFORM
@@ -60,8 +65,12 @@ vehPartyRecs_thor :=  join(distribute(vehRecs, hash64(vehicle_key, iteration_key
 											add_party(LEFT,RIGHT),
 											local);	
 
-vehPartyRecs := if(onThor, vehPartyRecs_thor, vehPartyRecs_roxie);
-											
+#IF(onThor)
+	vehPartyRecs := vehPartyRecs_thor;
+#ELSE
+	vehPartyRecs := vehPartyRecs_roxie;
+#END
+
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles add_Vehicles_main(vehPartyRecs le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
 	gotMain := ri.vehicle_key <> '';
 	SELF.year_make := if(gotMain, ri.Best_Model_Year, '');
@@ -94,8 +103,11 @@ vehMainRecs_thor := JOIN(distribute(vehPartyRecs, hash64(vehicle_key, iteration_
 										add_Vehicles_main(LEFT,RIGHT), atmost(riskwise.max_atmost),
 										local);
 										
-vehMainRecs := if(onThor, vehMainRecs_thor, vehMainRecs_roxie);
-																	
+#IF(onThor)
+	vehMainRecs := vehMainRecs_thor;
+#ELSE
+	vehMainRecs := vehMainRecs_roxie;
+#END
 
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles rollVins(vehMainRecs le, vehMainRecs ri) := TRANSFORM
 	self.months_first_reg	:= max(le.months_first_reg, ri.months_first_reg);	//save oldest registration

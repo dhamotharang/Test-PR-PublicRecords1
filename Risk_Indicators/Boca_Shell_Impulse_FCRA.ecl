@@ -1,7 +1,8 @@
-﻿Import Impulse_Email, ut, FCRA, thrive, riskwise, mdr;
+﻿Import _Control, Impulse_Email, ut, FCRA, thrive, riskwise, mdr;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Impulse_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide, integer bsversion, 
-		boolean isDirectToConsumerPurpose = false, boolean onThor=false) := FUNCTION
+		boolean isDirectToConsumerPurpose = false) := FUNCTION
 
 Layout_Impulse := RECORD
 	unsigned4 seq;
@@ -45,7 +46,11 @@ impulse_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Impulse_FFID),
 												isDirectToConsumerPurpose = false, //if true don't return any impulse data
 												impulse_corr(left, right), keep(1), LOCAL, ALL);
 
-impulse_correct := if(onThor, impulse_correct_thor, impulse_correct_roxie);
+#IF(onThor)
+	impulse_correct := impulse_correct_thor;
+#ELSE
+	impulse_correct := impulse_correct_roxie;
+#END
 
 Layout_Impulse addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID_FCRA ri) := transform
 	myGetDate := iid_constants.myGetDate(le.historydate);
@@ -90,7 +95,11 @@ wImpulse_thor := join(distribute(ids_wide, hash64(did)),
 														isDirectToConsumerPurpose = false,
 														addImpulse(left,right), left outer, LOCAL);
 
-wImpulse := if(onThor, wImpulse_thor, ungroup(wImpulse_roxie));
+#IF(onThor)
+	wImpulse := wImpulse_thor;
+#ELSE
+	wImpulse := ungroup(wImpulse_roxie);
+#END
 
 //for BS 5.3 - join to Impulse a second time using history date + 2 years in order to populate the offset history date counts
 Layout_Impulse addImpulseOffset(ids_wide le, Impulse_Email.Key_Impulse_DID_FCRA ri) := transform
@@ -139,7 +148,11 @@ wImpulseOffset_thor := join(distribute(ids_wide, hash64(did)),
 														isDirectToConsumerPurpose = false,
 														addImpulseOffset(left,right), left outer, LOCAL);
 
-wImpulseOffset := if(onThor, wImpulseOffset_thor, ungroup(wImpulseOffset_roxie));
+#IF(onThor)
+	wImpulseOffset := wImpulseOffset_thor;
+#ELSE
+	wImpulseOffset := ungroup(wImpulseOffset_roxie);
+#END
 
 combined := if(bsversion >= 53, ungroup(impulse_correct + wImpulse + wImpulseOffset), ungroup(impulse_correct + wImpulse));
 combo_impulse := group( sort ( combined, seq, siteid, -last_seen_date), seq);
@@ -196,7 +209,11 @@ wThrive_thor := join (distribute(ids_wide(did<>0), hash64(did)),
 		append_thrive(left, right), LOCAL
   );
 	
-wThrive := if(onThor, wThrive_thor, ungroup(wThrive_roxie));
+#IF(onThor)
+	wThrive := wThrive_thor;
+#ELSE
+	wThrive := ungroup(wThrive_roxie);
+#END
 
 //for BS 53 join to Thrive a second time using history date + 2 years in order to populate the offset history date counts
 Layout_Impulse append_thrive_offset(ids_wide le, key_main rt) := transform
@@ -245,8 +262,12 @@ wThriveOffset_thor := join (distribute(ids_wide(did<>0), hash64(did)),
 		append_thrive_offset(left, right), LOCAL
   );
 	
-wThriveOffset := if(onThor, wThriveOffset_thor, ungroup(wThriveOffset_roxie));
-	
+#IF(onThor)
+	wThriveOffset := wThriveOffset_thor;
+#ELSE
+	wThriveOffset := ungroup(wThriveOffset_roxie);
+#END
+
 paydayrecords := map(bsversion>=53	=> ungroup(combo_impulse + wThrive + wThriveOffset), 
 										 bsversion>=50	=> ungroup(combo_impulse + wThrive), 
 																			 ungroup(combo_impulse));  // only use impulse for shell versions prior to 5.0

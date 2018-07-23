@@ -1,12 +1,10 @@
-﻿/*2014-01-15T20:58:21Z (Todd  Steil_Prod)
-updates for CIID enhancements per bug 122860
-*/
-import risk_indicators, riskwise, ut, NID;
+﻿import _Control, risk_indicators, riskwise, ut, NID;
+onThor := _Control.Environment.OnThor;
 
 export iid_getChronologyPhones(grouped dataset(risk_indicators.Layout_Output) somedata, 
 					boolean from_IT1O=false, 
 					string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
-					boolean isFCRA, UNSIGNED8 BSOptions, UNSIGNED1 glb, boolean OnThor=false) := function
+					boolean isFCRA, UNSIGNED8 BSOptions, UNSIGNED1 glb) := function
 
 
 ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
@@ -34,9 +32,14 @@ chrono_inputs_temp := ungroup(NORMALIZE(somedata,3,prep_chronology(LEFT, COUNTER
 
 chrono_inputs_roxie := dedup(sort(chrono_inputs_temp, prim_name,z5,prim_range, sec_range), prim_name, z5, prim_range, sec_range);
 chrono_inputs_thor := dedup(sort(distribute(chrono_inputs_temp, hash64(prim_range, prim_name,z5)), prim_name,z5,prim_range, sec_range, LOCAL), prim_name, z5, prim_range, sec_range, LOCAL);
-chrono_inputs := if(onThor, chrono_inputs_thor, chrono_inputs_roxie);
 
-chrono_phones := riskwise.getDirsByAddr(chrono_inputs, isFCRA, glb, BSOptions, onThor);
+#IF(onThor)
+	chrono_inputs := chrono_inputs_thor;
+#ELSE
+	chrono_inputs := chrono_inputs_roxie;
+#END
+
+chrono_phones := riskwise.getDirsByAddr(chrono_inputs, isFCRA, glb, BSOptions);
 
 risk_indicators.layout_output eqfsphonetrans(risk_indicators.layout_output l, riskwise.Layout_Dirs_Address r, INTEGER i) := transform
 	
@@ -165,7 +168,11 @@ eqfsphonerecs_history_thor_pre := join(distribute(somedata(chronoprim_name<> '' 
 eqfsphonerecs_history_thor := group(sort(eqfsphonerecs_history_thor_pre + 
 									project(somedata(chronoprim_name= '' OR chronozip=''), transform(recordof(left), self.chronophone_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 
-eqfsphonerecs_history :=  sort(if(onThor,eqfsphonerecs_history_thor,eqfsphonerecs_history_roxie), seq, did, -chronophone, record);
+#IF(onThor)
+	eqfsphonerecs_history := sort(eqfsphonerecs_history_thor, seq, did, -chronophone, record);
+#ELSE
+	eqfsphonerecs_history := sort(eqfsphonerecs_history_roxie, seq, did, -chronophone, record);
+#END
 
 risk_indicators.layout_output rollphone1(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left1 := iid_constants.tscore(le.chronophone_namematch) >= iid_constants.tscore(ri.chronophone_namematch);						// only takes phones that match last and address
@@ -214,7 +221,11 @@ eqfsphonerecs2_history_thor_pre := join(distribute(eqfsphonerecs_rolled(chronopr
 eqfsphonerecs2_history_thor := group(sort(eqfsphonerecs2_history_thor_pre + 
 						project(eqfsphonerecs_rolled(chronoprim_name2= '' OR chronozip2=''),transform(recordof(left), self.chronophone2_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 
-eqfsphonerecs2_history := sort(if(onThor, eqfsphonerecs2_history_thor, eqfsphonerecs2_history_roxie), seq, did, -chronophone2, record);
+#IF(onThor)
+	eqfsphonerecs2_history := sort(eqfsphonerecs2_history_thor, seq, did, -chronophone2, record);
+#ELSE
+	eqfsphonerecs2_history := sort(eqfsphonerecs2_history_roxie, seq, did, -chronophone2, record);
+#END
 
 risk_indicators.layout_output rollphone2(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left2 := iid_constants.tscore(le.chronophone2_namematch) >= iid_constants.tscore(ri.chronophone2_namematch);
@@ -261,8 +272,12 @@ eqfsphonerecs3_history_thor_pre := join(distribute(eqfsphonerecs2_rolled(chronop
 eqfsphonerecs3_history_thor := group(sort(eqfsphonerecs3_history_thor_pre + 
 					project(eqfsphonerecs2_rolled(chronoprim_name3='' OR chronozip3=''),transform(recordof(left), self.chronophone3_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 						 
-eqfsphonerecs3_history := sort(if(onThor, eqfsphonerecs3_history_thor,eqfsphonerecs3_history_roxie), seq, did, -chronophone3, record);						 
-	
+#IF(onThor)
+	eqfsphonerecs3_history := sort(eqfsphonerecs3_history_thor, seq, did, -chronophone3, record);
+#ELSE
+	eqfsphonerecs3_history := sort(eqfsphonerecs3_history_roxie, seq, did, -chronophone3, record);
+#END
+
 risk_indicators.layout_output rollphone3(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left3 := iid_constants.tscore(le.chronophone3_namematch) >= iid_constants.tscore(ri.chronophone3_namematch);							
 	SELF.chronophone3 := if(take_left3, le.chronophone3, ri.chronophone3);

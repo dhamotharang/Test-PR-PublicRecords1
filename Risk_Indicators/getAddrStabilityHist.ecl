@@ -3,9 +3,10 @@
  * A majority of this code has been adapted from Risk_Indicators.ADL_Risk_Table
  */
 
-IMPORT Risk_Indicators, ut, STD;
+IMPORT _Control, Risk_Indicators, ut, STD;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_hist_date) input, boolean onThor=false) := FUNCTION
+EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_hist_date) input) := FUNCTION
 	
 	mobi := RECORD
 		integer2 currentYear;
@@ -59,8 +60,13 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
 	// Rollup into records for a particular DID
   hdr_currSorted_roxie := SORT(hdr_current, seq, did, -dt_first_seen, -dt_last_seen);
 	hdr_currSorted_thor := SORT(distribute(hdr_current, hash64(seq, did)), seq, did, -dt_first_seen, -dt_last_seen, LOCAL);
-	hdr_currSorted := if(onThor, hdr_currSorted_thor, hdr_currSorted_roxie);
-	
+
+	#IF(onThor)
+		hdr_currSorted := hdr_currSorted_thor;
+	#ELSE
+		hdr_currSorted := hdr_currSorted_roxie;
+	#END
+  
   mobi everRoll(mobi le, mobi ri) := TRANSFORM		
     first_iteration := le.tot_stay_last2 = -1;
 

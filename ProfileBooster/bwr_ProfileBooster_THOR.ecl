@@ -1,13 +1,14 @@
-// *****************************************************************************************************************
+﻿// *****************************************************************************************************************
 // RUN THIS SCRIPT ON 400 WAY THOR TO OPTIMIZE PERFORMANCE
 // 1.  COPY ALL PUBLIC RECORD KEYS THAT PROFILE BOOSTER USES TO THE THOR400_STA CLUSTER
 // 2.  MAKE SURE UT.FOREIGN_PROD IS SANDBOXED TO '~' SO YOU'RE READING ALL DATA LOCALLY
 // 3.  IF YOU'RE RUNNING A FILE LESS THAN 1 MILLION RECORDS, JUST RUN THE BATCH SERVICE INSTEAD OF THIS THOR JOB
+// 4.  onThor is set in _Control.Environment.onThor -- toggle this value as necessary.
 // *****************************************************************************************************************
 
+import _Control, Address, Risk_Indicators;
+onThor := _Control.Environment.onThor;
 
-onThor := true;
-// onThor := false;
 #workunit('name', 'profile booster ' + 	if(onThor, 'thor ', 'roxie ') );
 
 
@@ -82,7 +83,7 @@ ds_in := dataset ('~thor400::in::profile_booster::' + test_file_name, layout_fil
 																	self.street_addr := street_address;
 																	self := left ) );
 																		
-	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, onThor);  
+	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest);  
 	output(choosen(attributes, eyeball_count), named('Search_Function_attributes'));
 		 
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform
@@ -266,6 +267,12 @@ ds_in := dataset ('~thor400::in::profile_booster::' + test_file_name, layout_fil
 		self.v1_RaAOccProfLicMmbrCnt									:= le.attributes.version1.RaAOccProfLicMmbrCnt;
 		self.v1_RaAOccBusinessAssocMmbrCnt						:= le.attributes.version1.RaAOccBusinessAssocMmbrCnt;
 		self.v1_RaAInterestSportPersonMmbrCnt					:= le.attributes.version1.RaAInterestSportPersonMmbrCnt;
+    self.v1_PPCurrOwnedAutoVIN                    := le.attributes.version1.PPCurrOwnedAutoVIN;
+    self.v1_PPCurrOwnedAutoYear                   := le.attributes.version1.PPCurrOwnedAutoYear;
+    self.v1_PPCurrOwnedAutoMake                   := le.attributes.version1.PPCurrOwnedAutoMake;
+    self.v1_PPCurrOwnedAutoModel                  := le.attributes.version1.PPCurrOwnedAutoModel;
+    self.v1_PPCurrOwnedAutoSeries                 := le.attributes.version1.PPCurrOwnedAutoSeries;
+    self.v1_PPCurrOwnedAutoType                   := le.attributes.version1.PPCurrOwnedAutoType;
 	end;	
 			 
 	search_function_with_acctno := join(attributes, PB_wSeq, 

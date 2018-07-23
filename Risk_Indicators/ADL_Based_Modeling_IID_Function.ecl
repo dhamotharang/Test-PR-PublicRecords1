@@ -1,4 +1,5 @@
-﻿import gong, riskwise, address, ut, FCRA,gateway;
+﻿import _Control, gong, riskwise, address, ut, FCRA,gateway;
+onThor := _Control.Environment.OnThor;
 
 // this function will be used on Neutral roxie only
 export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) indata,
@@ -21,8 +22,7 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		integer2 dob_radius = -1,
 																		string50 DataRestriction=iid_constants.default_DataRestriction,
 																		unsigned8 BSOptions=0,
-																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-																		boolean onThor = false
+																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
 																		) := function		
 
 
@@ -33,14 +33,19 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 	with_DID_roxie := risk_indicators.iid_getDID_prepOutput(indata, DPPA_Purpose, GLB_Purpose, isFCRA, 2 ,DataRestriction, append_best, gateways, BSOptions);
 	with_DID_thor := risk_indicators.iid_getDID_prepOutput_THOR(indata, DPPA_Purpose, GLB_Purpose, isFCRA, 2 ,DataRestriction, append_best, gateways, BSOptions); 
 	
-	with_DID := if(onThor, with_DID_thor, with_DID_roxie);
+  #IF(onThor)
+    with_DID := with_DID_thor;
+  #ELSE
+    with_DID := with_DID_roxie;
+  #END
+
 	// output(with_did);
 
 // ====================================================================
 // step 2.  append most recent address and when available, populate blank ssn and dob																								
 // ====================================================================
 
-	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, bsversion := BSversion, dataRestriction:=DataRestriction, onThor:=onThor);
+	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, bsversion := BSversion, dataRestriction:=DataRestriction);
 	// output(with_header, named('with_header'));
 
 	DoAddressAppend := Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeAddressAppend, BSOptions);
@@ -200,7 +205,7 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 	// Only if we are running the Address Append do we want to access the Address Hierarchy key/logic. Passing in 5.0 for the BSVersion to ensure that this continues to work for RiskView V3.
 	Address_Hierarchy_Results := IF(DoAddressAppend = FALSE, 
 					DATASET([], Risk_indicators.iid_constants.layout_outx), // Need to add GROUP here to avoid an error with the different branches having different grouping conditions
-					UNGROUP(Risk_Indicators.IID_Append_Address_Hierarchy(with_header, isFCRA, 50, onThor))); 
+					UNGROUP(Risk_Indicators.IID_Append_Address_Hierarchy(with_header, isFCRA, 50))); 
 	
 	Address_Hierarchy := ROLLUP(SORT(Address_Hierarchy_Results, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT)); // We just care about the best address fields from this layout - and the best address is the same for all records belonging to input seq, so just rollup and keep the first record per result
 	
@@ -267,7 +272,11 @@ gong_correct_thor := join(best_of_header(gong_correct_ffid<>[]), pull(FCRA.Key_O
 												(right.flag_file_id in left.gong_correct_ffid),
 												add_gong_corr(left, right), LOCAL, ALL);
 												
-gong_correct := if(onThor, gong_correct_thor, gong_correct_roxie);
+#IF(onThor)
+	gong_correct := gong_correct_thor;
+#ELSE
+	gong_correct := gong_correct_roxie;
+#END
 
 // search gong file for phones we may not have found on header search
 temp add_gong(temp le, gong.Key_History_did rt) := transform
@@ -309,8 +318,12 @@ with_gong_did1_thor := join(distribute(best_of_header, hash64(did)),
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), keep(100), LOCAL);
 
-with_gong_did1 := if(onThor, with_gong_did1_thor, with_gong_did1_roxie);
-									
+#IF(onThor)
+	with_gong_did1 := with_gong_did1_thor;
+#ELSE
+	with_gong_did1 := with_gong_did1_roxie;
+#END
+
 with_gong_did := if(isFCRA, gong_correct + with_gong_did1, with_gong_did1);
 									
 // output(with_gong_did, named('with_gong_did'));	
@@ -412,8 +425,7 @@ iid_results := risk_indicators.InstantID_Function(iid_prep,
 										dob_radius,
 										bsversion,
 										in_DataRestriction := DataRestriction,
-										in_BSOptions := BSOptions,
-										onThor := onThor);
+										in_BSOptions := BSOptions);
 
 
 iid_results_with_flags := group( sort(

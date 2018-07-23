@@ -1,6 +1,7 @@
-﻿import riskwise, ut, gong, FCRA;
+﻿import _Control, riskwise, ut, gong, FCRA;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
+export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
 
 Layout_Gong := RECORD
 	unsigned4 seq;
@@ -59,7 +60,12 @@ gong_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Gong_FFID),
 												right.flag_file_id in left.gong_correct_ffid,
 												gong_corr(left, right), LOCAL, ALL);
 
-gong_correct := if(onThor, gong_correct_thor, gong_correct_roxie);
+#IF(onThor)
+	gong_correct := gong_correct_thor;
+#ELSE
+	gong_correct := gong_correct_roxie;
+#END
+
 Layout_Gong addPhone(ids_wide le, gong.Key_FCRA_History_did ri) := transform	
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historyDate);
 	self.gong_did.gong_ADL_dt_first_seen_full := ri.dt_first_seen;
@@ -106,7 +112,11 @@ gong_by_did_thor := join(distribute(ids_wide, hash64(did)),
 													and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 													addPhone(LEFT,RIGHT), left outer, atmost(left.did=right.l_did, Riskwise.max_atmost), keep(100), LOCAL);
 
-gong_by_did := if(onThor, gong_by_did_thor, ungroup(gong_by_did_roxie));
+#IF(onThor)
+	gong_by_did := gong_by_did_thor;
+#ELSE
+	gong_by_did := ungroup(gong_by_did_roxie);
+#END
 
 combined1 := gong_correct + gong_by_did;
 
@@ -135,11 +145,20 @@ combined_thor := 	join(distribute(combined1, hash64(gongPhone[1..6])),
 	getCombined(LEFT, RIGHT),	
 	left outer, keep(1), LOCAL)	;	
 	
-combined := if(onThor, combined_thor, combined_roxie);	
+#IF(onThor)
+	combined := combined_thor;
+#ELSE
+	combined := combined_roxie;
+#END
+
 combo_roxie := group( sort ( combined, seq), seq);									
 combo_thor := group( sort ( distribute(combined, hash64(seq)), seq, LOCAL), seq, LOCAL);									
-combo := if(onThor, combo_thor, combo_roxie);
 
+#IF(onThor)
+	combo := combo_thor;
+#ELSE
+	combo := combo_roxie;
+#END
 
 // bocashell 3 gong field rollups
 Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
@@ -183,7 +202,12 @@ Layout_Gong joinDateAddr(Layout_Gong le, Layout_Gong ri) := transform
 END;
 datephoneaddr_roxie := join(getgongdates, getgongaddr, left.seq=right.seq, joinDateAddr(LEFT,RIGHT), left outer, lookup);
 datephoneaddr_thor := group(join(getgongdates, getgongaddr, left.seq=right.seq, joinDateAddr(LEFT,RIGHT), left outer), seq);
-datephoneaddr := if(onThor, datephoneaddr_thor, datephoneaddr_roxie);
+
+#IF(onThor)
+	datephoneaddr := datephoneaddr_thor;
+#ELSE
+	datephoneaddr := datephoneaddr_roxie;
+#END
 
 Layout_Gong joinDateAddrFirst(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_first_ct := ri.gong_did.gong_did_first_ct;
@@ -191,7 +215,12 @@ Layout_Gong joinDateAddrFirst(Layout_Gong le, Layout_Gong ri) := transform
 END;
 datephoneaddrfirst_roxie := join(datephoneaddr, getGongFirst, left.seq=right.seq, joinDateAddrFirst(LEFT,RIGHT), left outer, lookup);
 datephoneaddrfirst_thor := group(join(datephoneaddr, getGongFirst, left.seq=right.seq, joinDateAddrFirst(LEFT,RIGHT), left outer), seq);
-datephoneaddrfirst := if(onThor, datephoneaddrfirst_thor, datephoneaddrfirst_roxie);
+
+#IF(onThor)
+	datephoneaddrfirst := datephoneaddrfirst_thor;
+#ELSE
+	datephoneaddrfirst := datephoneaddrfirst_roxie;
+#END
 
 Layout_Gong joinDateAddrFirstLast(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_last_ct := ri.gong_did.gong_did_last_ct;
@@ -199,7 +228,12 @@ Layout_Gong joinDateAddrFirstLast(Layout_Gong le, Layout_Gong ri) := transform
 END;
 datephoneaddrfirstlast_roxie := join(datephoneaddrfirst, getGongLast, left.seq=right.seq, joinDateAddrFirstLast(LEFT,RIGHT), left outer, lookup);
 datephoneaddrfirstlast_thor := group(join(datephoneaddrfirst, getGongLast, left.seq=right.seq, joinDateAddrFirstLast(LEFT,RIGHT), left outer), seq);
-datephoneaddrfirstlast := if(onThor, datephoneaddrfirstlast_thor, datephoneaddrfirstlast_roxie);
+
+#IF(onThor)
+	datephoneaddrfirstlast := datephoneaddrfirstlast_thor;
+#ELSE
+	datephoneaddrfirstlast := datephoneaddrfirstlast_roxie;
+#END
 
 // now calculate the invalid counts
 phone_slim := RECORD
@@ -236,7 +270,12 @@ invalidGong_thor := group(JOIN (datephoneaddrfirstlast, invalid_phone_counts,
                        LEFT.seq = RIGHT.seq,
 											 addInvalidGong(LEFT,RIGHT),
 											 LEFT OUTER), seq);
-invalidGong := if(onThor, invalidGong_thor, invalidGong_roxie);											 
+
+#IF(onThor)
+	invalidGong := invalidGong_thor;
+#ELSE
+	invalidGong := invalidGong_roxie;
+#END
 
 return invalidGong;
 END;

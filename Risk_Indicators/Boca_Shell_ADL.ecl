@@ -1,7 +1,8 @@
-import riskwise, ut, STD;
+﻿import _Control, riskwise, ut, STD;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_ADL (GROUPED DATASET(layout_output) iid, boolean isFCRA, unsigned1 dppa,
-					string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, boolean onThor=FALSE) := function
+					string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction) := function
 
 dppa_ok := iid_constants.dppa_ok(dppa, isFCRA);
 
@@ -75,8 +76,12 @@ ADLinfo_nonfcra_thor := group(join(distribute(iid, hash64(did)),
 														 left.did != 0 and (left.did=right.did), addADL(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL), seq, did);
 								
-ADLinfo_nonfcra := IF(onThor, ADLinfo_nonfcra_thor, ADLinfo_nonfcra_roxie);
-								
+#IF(onThor)
+	ADLinfo_nonfcra := ADLinfo_nonfcra_thor;
+#ELSE
+	ADLinfo_nonfcra := ADLinfo_nonfcra_roxie;
+#END
+
 layout_output addADL_FCRA(iid le, risk_indicators.key_FCRA_ADL_Risk_Table_v4_filtered ri) := transform
 	// determine which section of the table is permitted for use based on the data restriction mask
 	header_version := map(DataRestriction[iid_constants.posEquifaxRestriction]=iid_constants.sFalse and
@@ -147,7 +152,11 @@ ADLinfo_fcra_thor := group(join(distribute(iid, hash64(did)),
 													left.did != 0 and (left.did=right.did), addADL_FCRA(LEFT,RIGHT), left outer, 
 								ATMOST(RiskWise.max_atmost), KEEP(1), LOCAL),seq,did);
 
-ADLinfo_fcra := IF(onThor, ADLinfo_fcra_thor, ADLinfo_fcra_roxie);
+#IF(onThor)
+	ADLinfo_fcra := ADLinfo_fcra_thor;
+#ELSE
+	ADLinfo_fcra := ADLinfo_fcra_roxie;
+#END
 
 ADLinfo := if(isFCRA, ADLinfo_fcra, ADLinfo_nonfcra);						
 								

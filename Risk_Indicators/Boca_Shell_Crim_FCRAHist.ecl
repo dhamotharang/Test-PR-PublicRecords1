@@ -1,7 +1,8 @@
-﻿import doxie_files, ut, doxie, fcra, liensv2, riskwise, Risk_Indicators;
+﻿import _Control, doxie_files, ut, doxie, fcra, liensv2, riskwise, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiens, boolean onThor = false) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiens) := FUNCTION
 
 	fcra_offenders_key := doxie_files.Key_Offenders(true);
 	fcra_offenses_key := doxie_files.Key_Offenses(true);
@@ -19,7 +20,12 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 		dismissed_roxie := exists(dismissed_offense) or exists(dismissed_court_offense);
     // set dismissed to false if running on thor. we will handle the logic in separate joins to improve performance, since doing the keyed searches takes forever on a large ds.
 		dismissed_thor := false;
-		dismissed := if(onThor, dismissed_thor, dismissed_roxie);
+
+    #IF(onThor)
+      dismissed := dismissed_thor;
+    #ELSE
+      dismissed := dismissed_roxie;
+    #END
     
 		myGetDate := iid_constants.myGetDate(le.historydate);
 		criminal_count := (INTEGER)((unsigned6)ri.did<>0 and not dismissed);
@@ -99,8 +105,12 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
                           LEFT.seq = RIGHT.seq, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, LOCAL);
 	doc_added_crim_thor := group(sort(distribute(doc_added_crim_thor_not_dismissed2 + other_thor_recs, hash64(seq)), seq, local), seq, local);
 	
-	doc_added_crim := if(onThor, doc_added_crim_thor, doc_added_crim_roxie);
-	
+	#IF(onThor)
+		doc_added_crim := doc_added_crim_thor;
+	#ELSE
+		doc_added_crim := doc_added_crim_roxie;
+	#END
+  
 	//for BS 5.3, join again using history date + 2 years in order to populate the new offset criminal_count12 fields
 	Risk_Indicators.Layouts_Derog_Info.layout_extended add_doc_FCRA_offset(Risk_Indicators.Layouts_Derog_Info.layout_extended le, fcra_offenders_key ri) := TRANSFORM
 		dismissed_offense := choosen(
@@ -112,7 +122,12 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 		dismissed_roxie := exists(dismissed_offense) or exists(dismissed_court_offense);
     // set dismissed to false if running on thor. we will handle the logic in separate joins to improve performance, since doing the keyed searches takes forever on a large ds.
 		dismissed_thor := false;
-		dismissed := if(onThor, dismissed_thor, dismissed_roxie);
+
+    #IF(onThor)
+      dismissed := dismissed_thor;
+    #ELSE
+      dismissed := dismissed_roxie;
+    #END
     
 		myGetDate := iid_constants.myGetDate(le.historydate);
 		
@@ -165,8 +180,13 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
                           LEFT.seq = RIGHT.seq, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, LOCAL);
                           
 	doc_added_crim_offset_thor := group(sort(distribute(doc_added_crim_offset_not_dismissed2+ other_thor_recs_offset, hash64(seq)), seq, local), seq, local);
-	doc_added_crim_offset := if(onThor, doc_added_crim_offset_thor, doc_added_crim_offset_roxie);
-	
+
+	#IF(onThor)
+		doc_added_crim_offset := doc_added_crim_offset_thor;
+	#ELSE
+		doc_added_crim_offset := doc_added_crim_offset_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_extended roll_doc_offset(Risk_Indicators.Layouts_Derog_Info.layout_extended le, Risk_Indicators.Layouts_Derog_Info.layout_extended ri) :=
 	TRANSFORM
 		sameCrim := le.crim_case_num=ri.crim_case_num;

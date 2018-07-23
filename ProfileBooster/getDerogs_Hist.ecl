@@ -1,7 +1,9 @@
-import doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators;
+﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
+
 //Note - this function mimics Bocashell derogs function with mods made specific to Profile Booster. 
 //			 Only a portion of fields returned here are actually used in PB and the others could be removed at some point.
-export getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids, boolean onThor) := FUNCTION
+export getDerogs_Hist (GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids) := FUNCTION
 															 
 bans_did := BankruptcyV3.key_bankruptcyV3_did();
 bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();
@@ -49,7 +51,12 @@ bankrupt_added_roxie := JOIN(ids, bans_did ,keyed(LEFT.did=RIGHT.did), add_bankr
 bankrupt_added_thor := JOIN(distribute(ids, did), 
 														distribute(pull(bans_did), did) ,LEFT.did=RIGHT.did, add_bankrupt_keys(LEFT,RIGHT), LEFT OUTER, atmost(riskwise.max_atmost), KEEP(100), 
 														local);
-bankrupt_added := if(onThor, bankrupt_added_thor, ungroup(bankrupt_added_roxie));
+
+#IF(onThor)
+	bankrupt_added := bankrupt_added_thor;
+#ELSE
+	bankrupt_added := ungroup(bankrupt_added_roxie);
+#END
 
 layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRANSFORM
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
@@ -100,7 +107,11 @@ bankrupt_full_thor1 := JOIN (distribute(bankrupt_added(bk_tmsid<>''), hash64(bk_
 bankrupt_full_thor2 := bankrupt_added(bk_tmsid='');
 bankrupt_full_thor := bankrupt_full_thor1 + bankrupt_full_thor2; // put all the records missing tmsid back together with the records with tmsid populated
 				
-bankrupt_full := if(onThor, bankrupt_full_thor, bankrupt_full_roxie);				
+#IF(onThor)
+	bankrupt_full := bankrupt_full_thor;
+#ELSE
+	bankrupt_full := bankrupt_full_roxie;
+#END
 
 layout_extended roll_bankrupt(layout_extended le, layout_extended ri) := TRANSFORM
 	sameBankruptcy := le.case_num=ri.case_num AND le.court_code=ri.court_code;
@@ -169,7 +180,12 @@ liens_added_thor := JOIN(
 			distribute(pull(kld), did), LEFT.did=RIGHT.did, add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100),
 					ATMOST(Riskwise.max_atmost), 
 					local);
-liens_added := if(onThor, liens_added_thor, liens_added_roxie);
+
+#IF(onThor)
+	liens_added := liens_added_thor;
+#ELSE
+	liens_added := liens_added_roxie;
+#END
 
 layout_extended get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
@@ -261,7 +277,12 @@ liens_full_thor1 := JOIN (
 	local);
 liens_full_thor2 := liens_added(rmsid='');
 liens_full_thor := liens_full_thor1 + liens_full_thor2; // put the records with missing rmsid back together with those that have rmsid populated
-liens_full := if(onThor, liens_full_thor, liens_full_roxie);
+
+#IF(onThor)
+	liens_full := liens_full_thor;
+#ELSE
+	liens_full := liens_full_roxie;
+#END
 
 layout_extended get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := transform
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
@@ -445,8 +466,12 @@ liens_main_thor1 := JOIN(
 liens_main_thor2 := liens_full(rmsid='' and tmsid='');
 liens_main_thor := liens_main_thor1 + liens_main_thor2;
 
-liens_main := if(onThor, liens_main_thor, liens_main_roxie);		
-	
+#IF(onThor)
+	liens_main := liens_main_thor;
+#ELSE
+	liens_main := liens_main_roxie;
+#END
+
 layout_extended roll_liens(layout_extended le, layout_extended ri) := TRANSFORM
 	sameLien := le.tmsid=ri.tmsid and le.rmsid=ri.rmsid;
 
@@ -642,8 +667,11 @@ doc_added_thor1 := JOIN (
 doc_added_empty_did := liens_rolled(did=0);
 doc_added_thor := doc_added_thor1 + doc_added_empty_did;
 
-doc_added := if(onThor, doc_added_thor, doc_added_roxie);
-
+#IF(onThor)
+	doc_added := doc_added_thor;
+#ELSE
+	doc_added := doc_added_roxie;
+#END
 									 
 layout_extended roll_crim_counts(doc_added le, doc_added ri) :=
 TRANSFORM
@@ -718,7 +746,11 @@ wFID_thor := join(
 						left outer, atmost(riskwise.max_atmost), keep(50), 
 	local);
 						
-wFID := if(onThor, wFID_thor, wFID_roxie);
+#IF(onThor)
+	wFID := wFID_thor;
+#ELSE
+	wFID := wFID_roxie;
+#END
 
 layout_extended add_foreclosure_flag(layout_extended le, kforf rt) := transform
 	self.BJL.last_foreclosure_date := rt.recording_date;
@@ -742,7 +774,12 @@ all_foreclosures_thor1 := join(
 						left outer, atmost(left.fid=right.fid, riskwise.max_atmost), keep(50),
 	local);
 all_foreclosures_thor := all_foreclosures_thor1 + wFID(fid='');  // add back the records with blank FID						
-all_foreclosures := if(onThor, all_foreclosures_thor, all_foreclosures_roxie);						
+
+#IF(onThor)
+	all_foreclosures := all_foreclosures_thor;
+#ELSE
+	all_foreclosures := all_foreclosures_roxie;
+#END
 
 wForeclosures := dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did);
 

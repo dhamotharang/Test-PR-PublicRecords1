@@ -1,5 +1,6 @@
 ﻿IMPORT _Control, ut, iesp, Insurance_iesp, InsuranceContext_iesp, 
 			InsuranceLog_iesp,iesp.Constants, PersonContext;
+onThor := _Control.Environment.OnThor;
 
 EXPORT FUNCTIONS := MODULE
 
@@ -120,7 +121,7 @@ EXPORT FUNCTIONS := MODULE
     
   END;//PerformDeltabaseCall
   
-	EXPORT PerformGetRoxieKeyData(DATASET(PCL.Layout_PCRequestStatus) dsPCValidSearchRecs, BOOLEAN onThor = FALSE) := FUNCTION
+	EXPORT PerformGetRoxieKeyData(DATASET(PCL.Layout_PCRequestStatus) dsPCValidSearchRecs) := FUNCTION
 		
 		dsSearchLexID := dsPCValidSearchRecs(LexID > ''); //filter out from the search dataset all search records that do not have LexID.
 		dsSearchRecID := dsPCValidSearchRecs(RecID1 > ''); //filter out all from the search dataset all search records that don't have at least RecID1
@@ -137,8 +138,12 @@ EXPORT FUNCTIONS := MODULE
 										      TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
                           KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0), LOCAL);
 			
-		dsResultLexID := if(onThor, dsResultLexID_thor, dsResultLexID_roxie);
-		
+		#IF(onThor)
+      dsResultLexID := dsResultLexID_thor;
+    #ELSE
+      dsResultLexID := dsResultLexID_roxie;
+    #END
+    
     //perform a join on RecID1 - RecID4 to get all matches that match on the search key RecID1 - 4.
 		//This key is needed to find all record level matching on RecID1 - 4 searches when we don't know the LexID
 		//they belong too.
@@ -159,8 +164,12 @@ EXPORT FUNCTIONS := MODULE
 													TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
 													KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0), LOCAL);
 		
-		dsResultRecID := if(onThor, dsResultRecID_thor, dsResultRecID_roxie);
-		
+		#IF(onThor)
+      dsResultRecID := dsResultRecID_thor;
+    #ELSE
+      dsResultRecID := dsResultRecID_roxie;
+    #END
+
     //combine the results from the two joins and then sort and dedup on the key fields. 
 		//We will have duplicates in the two joins we need to get rid of.
     dsSrtRoxieKeyRecs := SORT(dsResultLexID + dsResultRecID,LexID,RecID1,RecID2,RecID3,RecID4,StatementId);

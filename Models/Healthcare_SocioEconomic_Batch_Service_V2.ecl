@@ -234,10 +234,9 @@ if(ofacVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(R
  	
  	//Profile Booster Search Function Contants
 	Profilebooster_AttributesVersionRequest := Models.Healthcare_Constants_V2.default_Profilebooster_AttributesVersionRequest;
-	onThor := Models.Healthcare_Constants_V2.default_onThor;
 
 	//Calling Profile Booster Search Function and fetching the attributes
-	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest, onThor);  
+	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest);  
 	//output(	pb_attributes, named('pb_attributes') );
 	//Combining Lead Integrity and Profile Booster attributes
 	Combined_LI_PB_Attributes := 	Join(rawResults_final, pb_attributes, left.seq=(string)right.seq, transform(Models.Layouts_Healthcare_V2.layout_SocioEconomic_LI_PB_combined,

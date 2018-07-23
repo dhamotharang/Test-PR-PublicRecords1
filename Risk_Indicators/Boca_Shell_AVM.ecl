@@ -1,6 +1,7 @@
-import avm_V2, riskwise, ut;
+﻿import _Control, avm_V2, riskwise, ut;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM(GROUPED DATASET(layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
+export Boca_Shell_AVM(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
 
 Layout_AVM := RECORD
 	unsigned4 seq;
@@ -77,8 +78,12 @@ avm1_thor := join(
 								atmost(riskwise.max_atmost), keep(100), 
 				local);
 
-avm1 := if(onThor, avm1_thor, ungroup(avm1_roxie));  // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
-												
+#IF(onThor)
+	avm1 := avm1_thor;
+#ELSE
+	avm1 := ungroup(avm1_roxie); // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
+#END
+
 // when choosing which AVM to output if the addr returns more than 1 result, 
 // always pick the record with the most recent recording date and secondarily the most recent assessed value year
 all_avms1 := group(sort(avm1, avm.seq, -AVM.Input_Address_Information.avm_recording_date, -AVM.Input_Address_Information.avm_assessed_value_year), avm.seq);
@@ -144,8 +149,11 @@ distribute(pull(avm_v2.Key_AVM_Address), hash64(prim_name, st, zip, prim_range))
 								atmost(riskwise.max_atmost), keep(100),
 	local);
 
-avm2 := if(onThor, avm2_thor, ungroup(avm2_roxie)); // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
-												
+#IF(onThor)
+	avm2 := avm2_thor;
+#ELSE
+	avm2 := ungroup(avm2_roxie); // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
+#END
 												
 
 // when choosing which AVM to output if the addr returns more than 1 result, 
@@ -216,8 +224,12 @@ distribute(pull(avm_v2.Key_AVM_Address), hash64(prim_name, st, zip, prim_range))
 								atmost(riskwise.max_atmost), keep(100), 
 	local);
 												
-avm3 := if(onThor, avm3_thor, ungroup(avm3_roxie));  // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
-			
+#IF(onThor)
+	avm3 := avm3_thor;
+#ELSE
+	avm3 := ungroup(avm3_roxie); // to get both sides of the branch to have same grouping, remove group here.  grouping the dataset below by avm.seq
+#END
+
 // when choosing which AVM to output if the addr returns more than 1 result, 
 // always pick the record with the most recent recording date and secondarily the most recent assessed value year
 all_avms3 := group(sort(avm3, seq, -address_history_2.avm_recording_date, -address_history_2.avm_assessed_value_year), seq);
@@ -306,9 +318,13 @@ medians_thor := join(
 	left.fips_code=right.fips_geo_12, getMedians(left,right), left outer, atmost(riskwise.max_atmost),
 	local);
 
-											// adding sort and group here for THOR version prior to rollup
-medians := if(onThor, group(sort(medians_thor, seq), seq), medians_roxie);	
-				
+// adding sort and group here for THOR version prior to rollup
+#IF(onThor)
+	medians := group(sort(medians_thor, seq), seq);
+#ELSE
+	medians := medians_roxie;
+#END
+
 								
 Layout_AVM rollMedians(medians le, medians ri) := transform
 	self.Input_Address_Information.avm_median_fips_level := MAX(le.Input_Address_Information.avm_median_fips_level, ri.Input_address_information.avm_median_fips_level);
