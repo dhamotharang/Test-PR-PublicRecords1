@@ -23,6 +23,8 @@
   <part name="IncludeOtherPhoneRiskIndicators" type="xsd:boolean" default="false"/>
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
   <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
+  <part name="VerifyPhoneName" type="xsd:boolean" default="false"/>
+  <part name="VerifyPhoneNameAddress" type="xsd:boolean" default="false"/>
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
@@ -106,8 +108,10 @@ MACRO
 		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 		                 UseInHousePhoneMetadata_internal	 := FALSE : STORED('UseInHousePhoneMetadata');
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
-  EXPORT BOOLEAN   UseAccuData_CNAM        := UseInHousePhoneMetadata and ~Doxie.DataRestriction.AccuData and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
-	                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate];
+        
+		EXPORT BOOLEAN   VerifyPhoneName        :=  false : STORED('VerifyPhoneName');
+		EXPORT BOOLEAN   VerifyPhoneNameAddress :=  false : STORED('VerifyPhoneNameAddress');
+    
 	END;
 	
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,
@@ -121,6 +125,7 @@ MACRO
    OUTPUT(results,named('Results'));
    OUTPUT(royalties,named('RoyaltySet'));
    OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+   
 
 ENDMACRO;
 

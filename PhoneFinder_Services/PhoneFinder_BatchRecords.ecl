@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut;
+﻿IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut, doxie;
 
 EXPORT PhoneFinder_BatchRecords(DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn,
 																PhoneFinder_Services.iParam.ReportParams      inMod,
@@ -9,6 +9,7 @@ MODULE
 	BatchShare.MAC_ProcessInput(dIn,SHARED dProcessInput);
 	
 	SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+	SHARED doVerify := inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName;
 	
 	// Format to common batch input layout
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2BatchCommonInput(dProcessInput pInput) :=
@@ -24,12 +25,10 @@ MODULE
 
   dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
 			
-		// DIDs	
+	// DIDs	
 	dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
-	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone = ''), true) + 
-											           PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone != '')));							
-																																														
-	
+	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and (homephone = '' or (homephone != '' and doVerify))), true) + 
+											           PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone != '')));
 	PhoneFinder_Services.Layouts.BatchInAppendAcctno tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																													PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
 	TRANSFORM
@@ -53,7 +52,6 @@ MODULE
 	
 	// Need to keep records where we uniquely identified a DID
 	SHARED dAppendDIDs := DEDUP(SORT(dAppendDIDs_,acctno),acctno);
-	
 	// Split the input dataset into two depending on the input criteria
 	SHARED dAppendDIDsFormat := PROJECT(dAppendDIDs(err_search = 0),
 																			TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,
@@ -62,10 +60,10 @@ MODULE
 																								SELF           := LEFT));
 	SHARED dInPhone   := dAppendDIDsFormat(homephone != '');
 	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment);
-	
+
 	// Append best info
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
-	Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dinBestInfo,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);
+	Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dinBestInfo,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);	
 	// Search inhouse phone sources and gateways when phone number is provided
 	dPhoneSearchResults := PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways);	
 	
@@ -119,18 +117,18 @@ MODULE
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
  
- PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
+  PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
 	DidSearchResults	:=UNGROUP(dSearchResultsUnfilteredFinal(acctno NOT IN SET(dInPhone,acctno)));
+
+	dinBestDID := if(doVerify, dAppendDIDsFormat);// for lexid verification
+	
 	// Format to batch out layout
-	SHARED dFormat2Batch := IF( EXISTS(dInPhone),
-															PhoneFinder_Services.Functions.FormatResults2Batch( dAppendDIDs(phone != '' and err_search = 0),inMod,
-																																									DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID),
-																																									PhoneSearchResults,TRUE)) +
-													IF( EXISTS(dInNoPhone),
-															PhoneFinder_Services.Functions.FormatResults2Batch( dAppendDIDs(phone = '' and err_search = 0),inMod,
-																																									dinBestInfo,DidSearchResults,FALSE));
+	SHARED dFormat2Batch := IF(EXISTS(dInPhone) OR doVerify,
+															PhoneFinder_Services.Functions.FormatResults2Batch(dAppendDIDs(phone != '' and err_search = 0), inMod,	dinBestDID,	PhoneSearchResults,TRUE)) +
+													  IF( EXISTS(dInNoPhone),
+															PhoneFinder_Services.Functions.FormatResults2Batch(dAppendDIDs(phone = '' and err_search = 0), inMod,	dinBestInfo, DidSearchResults,FALSE));
  	
- // Royalties
+  // Royalties
   dSearchResultsFilter := dSearchRecs_pre(typeflag != Phones.Constants.TypeFlag.DataSource_PV);   	
  // Sort and dedup data
  dResultsDIDDedup   := DEDUP(SORT(dSearchResultsFilter(did != 0),acctno,did,phone,-dt_last_seen,RECORD),acctno,did,phone);

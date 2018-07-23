@@ -44,73 +44,19 @@ MODULE
 	
  END;
  
-	EXPORT getNameMatch(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
-											iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, 
-											BOOLEAN phoneticMatch = FALSE,
-											string bestDID = ''
-											) :=	FUNCTION								
-	
-	  
-		firstName := StringLib.StringToUpperCase(pSearchBy.Name.First);
-		lastName := StringLib.StringToUpperCase(pSearchBy.Name.Last);
-		// performing a lexid , name match
-
-   valid_did := (UNSIGNED) bestDID > 0 ;
-		 dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND 
-														metaphonelib.DMetaPhone1(Name.Last) = metaphonelib.DMetaPhone1(lastName))),
-														dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND Name.Last = lastName)));
-		
-    vRec := TOPN(dRec, 1, -LastSeenWithPrimaryPhone); 
-   
-		RETURN vRec;
+ EXPORT getPhoneActive(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
+                       PhoneFinder_Services.iParam.ReportParams inMod, 
+                       DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn_with_bestDIDs                       
+                       ) :=	FUNCTION
 			
-	END;
-	
-	EXPORT getNameAddressMatch(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
-														 iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, 
-														 BOOLEAN phoneticMatch = FALSE,
-														 string bestDID = ''
-														 ) := FUNCTION
-														 
-											 
-  firstName     := StringLib.StringToUpperCase(pSearchBy.Name.First);
-		lastName			:= StringLib.StringToUpperCase(pSearchBy.Name.Last);
-		streetNumber	:= pSearchBy.Address.StreetNumber;
-		streetName 		:= StringLib.StringToUpperCase(pSearchBy.Address.StreetName);
-		city 					:= StringLib.StringToUpperCase(pSearchBy.Address.City);
-		state 				:= StringLib.StringToUpperCase(pSearchBy.Address.State);
-		zip 					:= pSearchBy.Address.Zip5;
-		
-     valid_did := (UNSIGNED) bestDID > 0 ;
-		// For a positive result, there must be a match on lexid, name (first, last) AND city/state OR zip.
-		//for targus, verifying by city, state and zip (as targus data is blank sometimes)
-		dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND 
-									metaphonelib.DMetaPhone1(Name.Last) = metaphonelib.DMetaPhone1(lastName) AND
-									((vendor_id = MDR.sourceTools.src_Targus_Gateway AND RecentAddress.StreetNumber = '' AND RecentAddress.StreetName = '') OR
-									(RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName)) AND 
-									((RecentAddress.City = city AND RecentAddress.State = state) OR RecentAddress.Zip5 = zip))),								
-								 dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND Name.Last = lastName AND
-								 ((vendor_id = MDR.sourceTools.src_Targus_Gateway AND RecentAddress.StreetNumber = '' AND RecentAddress.StreetName = '') OR
-									(RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName)) AND 
-									((RecentAddress.City = city AND RecentAddress.State = state) OR RecentAddress.Zip5 = zip))));
-																											
-		vRec := TOPN(dRec, 1, -LastSeenWithPrimaryPhone); 
-		
-	 RETURN vRec;
-		
-	END;
-	
-	EXPORT getPhoneActive(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
-												PhoneFinder_Services.iParam.ReportParams inMod, 
-												iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy) :=	FUNCTION
-			today:= (STRING)Std.Date.Today();		
-     // If at least one address component was supplied, it is a name/address match.		
-		CheckNameAddress := pSearchby.Address.StreetNumber <> '' OR pSearchBy.Address.StreetName <> '' OR pSearchBy.Address.City <> '' OR 
-														pSearchBy.Address.State <> '' OR pSearchBy.Address.Zip5 <> '';
-	  CheckName:= pSearchBy.Name.First<>'' OR pSearchBy.Name.Last<>'';
+     today:= (STRING)Std.Date.Today();		
+     // If at least one address component was supplied, it is a name/address match.
+     CheckNameAddress := dIn_with_bestDIDs[1].prim_range <> '' OR dIn_with_bestDIDs[1].prim_name <> '' OR dIn_with_bestDIDs[1].p_city_name <> '' OR 
+			                   dIn_with_bestDIDs[1].st <> '' OR dIn_with_bestDIDs[1].z5 <> '';
+     CheckName:= dIn_with_bestDIDs[1].name_first<>'' OR dIn_with_bestDIDs[1].name_last<>'';
 			
-   	vRec := MAP(checkNameAddress => getNameAddressMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch), 
-      						CheckName  =>	getNameMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch),
+   	vRec := MAP(checkNameAddress => PhoneFinder_Services.GetVerified_Recs.getNameAddressMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch), 
+      						CheckName  =>	PhoneFinder_Services.GetVerified_Recs.getNameMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
 									dIdentitiesInfo);
 		
 /* 		vRec := IF(checkNameAddress, getNameAddressMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch), 
@@ -134,21 +80,20 @@ MODULE
 		RETURN activeRec;
 				
 	END;
-
-	EXPORT getVerifyRecs(	DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
+  
+ EXPORT getVerifyRecs(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
 												PhoneFinder_Services.iParam.ReportParams inMod, 
-												iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy,
-												string best_did) := FUNCTION
+												DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn_with_bestDIDs) := FUNCTION
   	
-		vRec := MAP(inMod.VerifyPhoneName => getNameMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch, best_did),
-								inMod.VerifyPhoneNameAddress => getNameAddressMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch, best_did),
-								inMod.VerifyPhoneIsActive => getPhoneActive(dIdentitiesInfo, inMod, pSearchBy),
+		vRec := MAP(inMod.VerifyPhoneName => PhoneFinder_Services.GetVerified_Recs.getNameMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
+								inMod.VerifyPhoneNameAddress => PhoneFinder_Services.GetVerified_Recs.getNameAddressMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
+								inMod.VerifyPhoneIsActive => getPhoneActive(dIdentitiesInfo, inMod, dIn_with_bestDIDs),
 								DATASET([], RECORDOF(dIdentitiesInfo)));
 					
 		RETURN vRec;
 
 	END;
-
+ 
 	EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
 																																'0' => PhoneFinder_Services.Constants.PhoneType.Landline,
 																																'1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
@@ -845,7 +790,7 @@ MODULE
 	END;
 	
 	// Format search results to IESP layout
-	EXPORT FormatResults2IESP(pSearchBy,inMod,dInNoPhoneBestInfo,dSearchResultsUnfiltered,isPhoneSearch) :=
+	EXPORT FormatResults2IESP(pSearchBy, inMod, dInNoPhoneBestInfo, dSearchResultsUnfiltered, isPhoneSearch) :=
 	FUNCTIONMACRO
 		IMPORT Address,Doxie,iesp,Suppress, ut;
 	dSearchResults := dSearchResultsUnfiltered; // temp change until Product verifies impact of the filter
@@ -876,8 +821,32 @@ MODULE
 
 		phoneEntered := pSearchBy.PhoneNumber != ''; 
 		
-		best_did := (string)dInNoPhoneBestInfo[1].did;
-		vRec := PhoneFinder_Services.Functions.getVerifyRecs(dIdentitiesInfo, inMod, pSearchBy, best_did);	
+	PhoneFinder_Services.Layouts.BatchIn rawinput_with_BestDids() := TRANSFORM
+				self.acctno      := '1';
+				self.name_first  := pSearchBy.Name.first;
+				self.name_middle := pSearchBy.Name.middle;
+				self.name_last   := pSearchBy.Name.last;
+				self.name_suffix := pSearchBy.Name.suffix;
+				self.prim_range  := pSearchBy.Address.streetNumber;
+				self.predir      := pSearchBy.Address.streetPreDirection;
+				self.prim_name   := pSearchBy.Address.streetName;
+				self.addr_suffix := pSearchBy.Address.streetSuffix;
+				self.postdir     := pSearchBy.Address.streetPostDirection;
+				self.unit_desig  := pSearchBy.Address.unitDesignation;
+				self.sec_range   := pSearchBy.Address.unitNumber;
+				self.p_city_name := pSearchBy.Address.city;
+				self.st          := pSearchBy.Address.state;
+				self.z5          := pSearchBy.Address.zip5;
+				self.z4          := pSearchBy.Address.zip4;
+				self.phone       := pSearchBy.PhoneNumber;
+				self.did         := (UNSIGNED)dInNoPhoneBestInfo[1].did;
+				self.ssn         := pSearchBy.ssn;
+	
+	END;
+
+ 	dIn_with_bestDIDs := DATASET([rawinput_with_BestDids()]); // Raw input for verification with best did
+	
+	 vRec := PhoneFinder_Services.Functions.getVerifyRecs(dIdentitiesInfo, inMod, dIn_with_bestDIDs);
 																		
 		hasMatch := EXISTS(vRec);
 										
@@ -908,10 +877,10 @@ MODULE
 			SELF:= le;
 			SELF := [];
 			
-		END;
-		
+		END;		
 		vrec_identities := PROJECT(vRec, xFormIdentity(LEFT));
-    dIdentitiesInfo2 := IF(doVerify and exists(vrec_identities), vrec_identities, dIdentitiesInfo);	
+  
+  dIdentitiesInfo2 := IF(doVerify and exists(vrec_identities), vrec_identities, dIdentitiesInfo);	
 		/* End phone verification */
  		Suppress.MAC_Suppress(dInNoPhoneBestInfo, dBestInfoSuppress,
    													inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);	
@@ -975,6 +944,7 @@ MODULE
    				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo_PhoneSearch'));
    				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo_PhoneSearch'));
    				OUTPUT(dFormat2PhoneFinderSearch,NAMED('dFormat2PhoneFinderSearch_PhoneSearch'));
+   				OUTPUT(dInNoPhoneBestInfo,NAMED('dInNoPhoneBestInfo'));
    			#ELSE
    				OUTPUT(dPhoneHistRecs,NAMED('dPhoneHistRecs'));
    				OUTPUT(dPrimaryPhoneRecs,NAMED('dPrimaryPhoneRecs'));
@@ -986,7 +956,7 @@ MODULE
    				OUTPUT(dFormat2PhoneFinderSearch,NAMED('dFormat2PhoneFinderSearch'));
    			#END
    		#END
-  
+
 		RETURN Records;
 	ENDMACRO;
 	
@@ -1018,6 +988,29 @@ MODULE
 			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
 			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
+	 
+		doVerification := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
+			
+		verifiedRecs:= PhoneFinder_Services.GetVerified_Recs.getVerifyRecs(inMod, dIdentitiesInfo, dIn); // Using the shared code for both report and batch verification 
+				
+ 		 PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp tPhoneInfo2(PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp le, PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp ri) := TRANSFORM
+   		  HasMatch := (le.acctno = ri.acctno);
+   		  SELF.VerificationStatus.PhoneVerificationDescription := MAP(le.Number = '' => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
+   																inMod.VerifyPhoneNameAddress AND   HasMatch=> PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
+   																inMod.VerifyPhoneName AND HasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
+   																doVerification AND ~(HasMatch)  => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
+   																'');
+   
+   		  SELF.VerificationStatus.PhoneVerified := HasMatch AND (inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
+   			 SELF               := le;
+   		END;
+   		
+   		verifiedPhoneInfo :=   JOIN(dPrimaryPhoneInfo, VerifiedRecs,
+   								           LEFT.acctno = RIGHT.acctno,
+   								           tPhoneInfo2(LEFT, RIGHT),
+   								           LEFT OUTER, LIMIT(0),KEEP(1));	
+
+  dPrimaryPhoneInfo2 := IF(doVerification, VerifiedPhoneInfo, dPrimaryPhoneInfo);												
 		
 		pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendAcctno pInput) :=
 		TRANSFORM
@@ -1026,7 +1019,6 @@ MODULE
 		END;
 		
 		dFormat2Denorm := PROJECT(dIn,tFormat2Denorm(LEFT));
-		
 		// Denormalize identities
 		pf.PhoneFinder.TempOut tDenormIdentity(pf.PhoneFinder.TempOut le,pf.PhoneFinder.IdentityIesp ri) :=
 		TRANSFORM
@@ -1046,8 +1038,29 @@ MODULE
 			SELF               := [];
 		END;
 		
+  dIdentitiesInfo xFormIdentity(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp le) := TRANSFORM  
+				
+    SELF.FirstSeenWithPrimaryPhone := le.FirstSeenWithPrimaryPhone;
+	   SELF.LastSeenWithPrimaryPhone := le.LastSeenWithPrimaryPhone;
+	   SELF:= le;
+        
+		END;
+    
+  final_verifiedRecs := PROJECT(verifiedRecs, xFormIdentity(LEFT));  
+		
+  unverified_recs :=   JOIN(dIdentitiesInfo, final_verifiedRecs,
+   							                  LEFT.acctno = RIGHT.acctno and
+   							                  LEFT.phone  = RIGHT.phone,
+   							                  TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp, SELF := LEFT),
+   							                  LEFT ONLY); 
+                                                      
+  final_vrec_identities :=  unverified_recs + final_verifiedRecs;                                                  
+	 
+	dIdentitiesInfo2 := IF(doVerification and exists(final_vrec_identities), final_vrec_identities, dIdentitiesInfo);
+	 /* End phone verification */		
+		
 		dIdentityDenorm := DENORMALIZE( dFormat2Denorm,
-																		dIdentitiesInfo,
+																		dIdentitiesInfo2,
 																		LEFT.acctno = RIGHT.acctno,
 																		tDenormIdentity(LEFT,RIGHT));
 		
@@ -1070,6 +1083,7 @@ MODULE
 		// Primary phone info
 		pf.PhoneFinder.TempOut tPhoneInfo(pf.PhoneFinder.TempOut le,pf.PhoneFinder.PhoneIesp ri) :=
 		TRANSFORM
+
 			SELF.identity_info := SORT(le.identity_info, -iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone));
 			SELF.phone_info    := ri;
 			SELF               := le;
@@ -1082,12 +1096,11 @@ MODULE
 		#END
 		
 		dPhoneIdentity := JOIN( dDenormAll,
-														dPrimaryPhoneInfo,
+														dPrimaryPhoneInfo2,
 														LEFT.acctno = RIGHT.acctno,
 														tPhoneInfo(LEFT,RIGHT),
 														LEFT OUTER,
 														LIMIT(0),KEEP(1)); //Only one record per acctno exists on the left and right
-		
 		// Primary identity
 		#IF(isPhoneSearch)
 			dFormat2BatchReady := dPhoneIdentity;
@@ -1120,8 +1133,8 @@ MODULE
 				SELF                                                    := [];
 			END;
 			
-			dPrimaryIdentityIesp := JOIN( dBestInfoSuppress,
-																		dIdentitiesInfo,
+			dPrimaryIdentityIesp := JOIN(dBestInfoSuppress,
+																		dIdentitiesInfo2,
 																		LEFT.acctno = RIGHT.acctno and
 																		LEFT.did    = (UNSIGNED)RIGHT.UniqueId,
 																		tPrimaryIdentityIesp(LEFT,RIGHT),
@@ -1134,12 +1147,12 @@ MODULE
 				SELF                  := le;
 			END;
 			
-			dPrimaryIdentity := JOIN( dPhoneIdentity,
-																dPrimaryIdentityIesp,
-																LEFT.acctno = RIGHT.acctno,
-																tPrimaryIdentity(LEFT,RIGHT),
-																FULL OUTER,
-																LIMIT(1,SKIP));
+			dPrimaryIdentity := JOIN(dPhoneIdentity,
+									dPrimaryIdentityIesp,
+									LEFT.acctno = RIGHT.acctno,
+									tPrimaryIdentity(LEFT,RIGHT),
+									FULL OUTER,
+									LIMIT(1,SKIP));
 			
 			dFormat2BatchReady := dPrimaryIdentity;
 		#END
@@ -1406,21 +1419,23 @@ MODULE
 			SELF.Destination_SpoofedCount           := spoofing.Destination.SpoofedCount;
 			SELF.Destination_FirstSpoofedDate       := iesp.ECL2ESP.DateToInteger(spoofing.Destination.FirstSpoofedDate);
 			SELF.Destination_LastSpoofedDate        := iesp.ECL2ESP.DateToInteger(spoofing.Destination.LastSpoofedDate);		
-			SELF.Source_Spoofed                			:= spoofing.Source.Spoofed;
-			SELF.Source_SpoofedCount           			:= spoofing.Source.SpoofedCount;
-			SELF.Source_FirstSpoofedDate       			:= iesp.ECL2ESP.DateToInteger(spoofing.Source.FirstSpoofedDate);
-			SELF.Source_LastSpoofedDate        			:= iesp.ECL2ESP.DateToInteger(spoofing.Source.LastSpoofedDate);				
-			SELF.FirstEventSpoofedDate        			:= iesp.ECL2ESP.DateToInteger(spoofing.FirstEventSpoofedDate);				
-			SELF.LastEventSpoofedDate         			:= iesp.ECL2ESP.DateToInteger(spoofing.LastEventSpoofedDate);				
+			SELF.Source_Spoofed                	    := spoofing.Source.Spoofed;
+			SELF.Source_SpoofedCount           	    := spoofing.Source.SpoofedCount;
+			SELF.Source_FirstSpoofedDate       	    := iesp.ECL2ESP.DateToInteger(spoofing.Source.FirstSpoofedDate);
+			SELF.Source_LastSpoofedDate        	    := iesp.ECL2ESP.DateToInteger(spoofing.Source.LastSpoofedDate);				
+			SELF.FirstEventSpoofedDate              := iesp.ECL2ESP.DateToInteger(spoofing.FirstEventSpoofedDate);				
+			SELF.LastEventSpoofedDate               := iesp.ECL2ESP.DateToInteger(spoofing.LastEventSpoofedDate);				
 			SELF.TotalSpoofedCount                  := spoofing.TotalSpoofedCount;
-			SELF.OTPMatch					                  := phoneInfo.OneTimePassword.OTP;
-			SELF.OTPCount					                  := phoneInfo.OneTimePassword.OTPCount;
-			SELF.LastOTPStatus		                  := phoneInfo.OneTimePassword.LastOTPStatus;
-			SELF.FirstOTPDate					         			:= iesp.ECL2ESP.DateToInteger(phoneInfo.OneTimePassword.FirstOTPDate);					
-			SELF.LastOTPDate					         			:= iesp.ECL2ESP.DateToInteger(phoneInfo.OneTimePassword.LastOTPDate);					
-			SELF.PhoneRiskIndicator					        := phoneInfo.PhoneRiskIndicator;					
-			SELF.OTPRIFailed								        := phoneInfo.OTPRIFailed;	
-			SELF.CallForwardingIndicator						:= phoneInfo.CallForwardingIndicator;				
+			SELF.OTPMatch                           := phoneInfo.OneTimePassword.OTP;
+			SELF.OTPCount                           := phoneInfo.OneTimePassword.OTPCount;
+			SELF.LastOTPStatus                      := phoneInfo.OneTimePassword.LastOTPStatus;
+			SELF.FirstOTPDate                       := iesp.ECL2ESP.DateToInteger(phoneInfo.OneTimePassword.FirstOTPDate);					
+			SELF.LastOTPDate                        := iesp.ECL2ESP.DateToInteger(phoneInfo.OneTimePassword.LastOTPDate);					
+			SELF.PhoneRiskIndicator                 := phoneInfo.PhoneRiskIndicator;					
+			SELF.OTPRIFailed                        := phoneInfo.OTPRIFailed;	
+			SELF.CallForwardingIndicator            := phoneInfo.CallForwardingIndicator;				
+			SELF.PhoneVerificationDescription       := phoneInfo.VerificationStatus.PhoneVerificationDescription;				
+			SELF.PhoneVerified                      := phoneInfo.VerificationStatus.PhoneVerified;				
 			SELF                                    := phoneInfo.GeoLocation;
 			SELF                                    := ocInfo.Address;
 			SELF                                    := ocInfo;

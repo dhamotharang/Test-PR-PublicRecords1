@@ -126,10 +126,8 @@ MODULE
   verifyInputDID := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
   dinBestDID := 	if(verifyInputDID, dInDIDs,DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID));// for lexid verification
   EXPORT dFormat2IESP := IF(~vPhoneBlank OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress,
-            														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy,inMod,
-            																																						  dinBestDID, 
-            																																							dSearchResultsUnfiltered,TRUE),
-            														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy,inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
+            														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod, dinBestDID, dSearchResultsUnfiltered,TRUE),
+            														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
 																				
 		//Deltabase Logging Dataset
 	 EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, inMod, InputEcho);																		
