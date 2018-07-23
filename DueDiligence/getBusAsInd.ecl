@@ -81,8 +81,6 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF := LEFT;),
 															LEFT OUTER);
 													
-	
-	
 	/*Taken from Business_Risk_BIP.getConsumerHeader*/
 	// Grab all DID's associated with that SSN (FEIN) 
 	feinSsn_dids := JOIN(indata, doxie.Key_Header_SSN, //Input Business FEIN Matches Header SSN
@@ -122,17 +120,40 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																SELF := [];),
 											ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 																	
-	uniqueDIDs := ROLLUP(SORT(feinSsn_dids, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), 
+	// ------                                                                                    ------
+	// ------ The FEIN is assigned via IRS and SSN's are assigned via Social Security            ------
+	// ------ Administration                                                                     ------
+	// ------ The IRS does not intentionally assign a TIN that is the same as SSN                ------
+  // ------ but it does happen.  Attempt to find these cases through this logic                ------
+	// ------                                                                                    ------		
+  
+  uniqueDIDs := ROLLUP(SORT(feinSsn_dids, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), 
 												#EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
 												LEFT.did = RIGHT.did,
 												TRANSFORM({RECORDOF(LEFT)},
 																		SELF.feinMatched := LEFT.feinMatched OR RIGHT.feinMatched;
-																		SELF.fein := MAP(LEFT.feinMatched => LEFT.fein,
-																											RIGHT.feinMatched => RIGHT.fein,
-																											DueDiligence.Constants.EMPTY);
-																		SELF := LEFT;));
+																		SELF.fein        := MAP(LEFT.feinMatched => LEFT.fein,
+																											     RIGHT.feinMatched => RIGHT.fein,
+																											                          DueDiligence.Constants.EMPTY);
+																		SELF             := LEFT;));
+                                    
+  SimpleBusinessExecutives   := DueDiligence.CommonBusiness.getexecs(indata);   											
 																			
-	consumerHeaderDidRaw := JOIN(uniqueDIDs, doxie.Key_Header, 
+	//keep only rows where FEIN is an SSN AND SSN belongs to one of the Business Executives listed in the Inquired Business
+  FEINisSSNofBEO     := JOIN (SimpleBusinessExecutives, uniqueDIDs,
+                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+												   LEFT.did = RIGHT.did,
+                           TRANSFORM({RECORDOF(RIGHT)},
+                               SELF    := RIGHT;), 
+                           KEEP(1), ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));  
+                           
+                           
+  // -----                                                                                     ------
+  // ----- If the FEIN is an SSN of a BEO then continue looking up information for this DID    ------
+  // -----                                                                                     ------
+  
+																			
+	consumerHeaderDidRaw := JOIN(FEINisSSNofBEO, doxie.Key_Header, 
 																LEFT.did > 0 AND 
 																KEYED(LEFT.did = RIGHT.s_did) AND
 																((INTEGER)LEFT.fein > 0 AND LEFT.fein = RIGHT.ssn) AND 
@@ -197,7 +218,9 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							SELF.busFEINLinkedPersonAddr := MAX(LEFT.busFEINLinkedPersonAddr, RIGHT.busFEINLinkedPersonAddr);
 																							SELF.feinPersonNameMatch := MAX(LEFT.feinPersonNameMatch, RIGHT.feinPersonNameMatch);
 																							SELF := LEFT));
-																							
+	//******
+  //***
+  //******
 	addFeinMatchNameAddr := JOIN(addResidentialAddr, consumerHeaderDidCounts,
 																#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
@@ -308,6 +331,10 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// OUTPUT(feinSsn_dids, NAMED('feinSsn_dids'));
 	// OUTPUT(uniqueDIDs, NAMED('uniqueDIDs'));
+  
+  // OUTPUT(SimpleBusinessExecutives, NAMED('SimpleBusinessExecutives'));
+	// OUTPUT(FEINisSSNofBEO, NAMED('FEINisSSNofBEO'));
+  
 	// OUTPUT(consumerHeaderDidRaw, NAMED('consumerHeaderDidRaw'));
 	// OUTPUT(consumerHeaderDidFiltRecs, NAMED('consumerHeaderDidFiltRecs'));
 	// OUTPUT(consumerHeaderDidStats, NAMED('consumerHeaderDidStats'));
