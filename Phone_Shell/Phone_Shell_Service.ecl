@@ -30,7 +30,7 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="DataPermissionMask" type="xsd:string"/>
+ <part name="DataPermissionMask" type="xsd:string"/>
 	<part name="Phone_Restriction_Mask" type="xsd:integer"/>
 	<part name="EnableTargusGateway" type="xsd:boolean"/>
 	<part name="EnableTransUnionGateway" type="xsd:boolean"/>
@@ -43,9 +43,9 @@
 	<part name="RelocationsMaxDaysAfter" type="xsd:integer"/>
 	<part name="RelocationsTargetRadius" type="xsd:integer"/>
 	<part name="VerticalMarket" type="xsd:string"/>
-  <part name="IndustryClass_In" type="xsd:string"/>
-  <part name="IncludeLastResort" type="xsd:boolean"/>
-  <part name="IncludePhonesFeedback" type="xsd:boolean"/>
+ <part name="IndustryClass_In" type="xsd:string"/>
+ <part name="IncludeLastResort" type="xsd:boolean"/>
+ <part name="IncludePhonesFeedback" type="xsd:boolean"/>
 	<part name="EnforceTestAccounts" type="xsd:boolean"/>
 	<part name="SX_Match_Restriction_Limit" type="xsd:integer"/>
 	<part name="Strict_APSX_Match" type="xsd:boolean"/>
@@ -68,7 +68,8 @@
 	<part name="BocaShell_DOB_Radius" type="xsd:integer"/>
 	<part name="BocaShell_Watchlist_Threshold" type="xsd:string"/>
 	<part name="BlankOutDuplicatePhones" type="xsd:boolean"/>
-  <part name="Phone_Score_Model" type="xsd:string"/>
+ <part name="Phone_Score_Model" type="xsd:string"/>
+ <part name="ModelVersion" type="xsd:string"/>
 
 	<part name="UsePremiumSource_A" type="xsd:boolean"/>
 	<part name="PremiumSource_A_limit" type="xsd:integer"/>
@@ -205,7 +206,8 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 'BocaShell_DOB_Radius',
                 'BocaShell_Watchlist_Threshold',
                 'BlankOutDuplicatePhones',
-                 'Phone_Score_Model',
+                'Phone_Score_Model',
+                'ModelVersion',
                 'UsePremiumSource_A',
                 'PremiumSource_A_limit',
                 'Batch_Input',
@@ -288,12 +290,14 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	INTEGER BocaShell_DOB_Radius 										:= -1 : STORED('BocaShell_DOB_Radius');
 	REAL4 BocaShell_Watchlist_Threshold 						:= 0.84 : STORED('BocaShell_Watchlist_Threshold');
 	STRING25 Phone_Score_Model_Temp									:= '' : STORED('Phone_Score_Model');
+ STRING2 ModelVersion_Temp               := '' : STORED('ModelVersion');
 	BOOLEAN BlankOutDuplicatePhones									:= FALSE :STORED('BlankOutDuplicatePhones');
 	
 	BOOLEAN UsePremiumSource_A											:= FALSE :STORED('UsePremiumSource_A');
 	INTEGER PremiumSource_A_limit										:= Phone_Shell.Constants.maxEQP_Phones :STORED('PremiumSource_A_limit');
-  BOOLEAN RunRelocation														:= FALSE :STORED('RunRelocation');
+ BOOLEAN RunRelocation														:= FALSE :STORED('RunRelocation');
 	Phone_Score_Model := StringLib.StringToUpperCase(Phone_Score_Model_Temp);
+ ModelVersion      := StringLib.StringToUpperCase(ModelVersion_Temp);
 
 	//ensure that the user selects Equifax(phonemart data) and that the DRM is not set
 	allowPremiumSource_A:= UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
@@ -374,8 +378,19 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	//As we don't have a way to call the gateway at the record level. It's at the dataset level.
 
 	model_results := MAP(Phone_Score_Model not in ['PHONESCORE_V2','COLLECTIONSCORE_V3'] => results,	// If no models called, just return the shell and attributes
-											 allowPremiumSource_A   => Phone_Shell.PhoneScore_cp3_v2(results, Score_Threshold), 
-											 Phone_Shell.PhoneScore_wf8_v2(results, Score_Threshold)); 
+											           ModelVersion in ['V2'] and allowPremiumSource_A                 => Phone_Shell.PhoneScore_cp3_v2(results, Score_Threshold), 
+											           ModelVersion in ['V2'] and not allowPremiumSource_A             => Phone_Shell.PhoneScore_wf8_v2(results, Score_Threshold), 
+                      // Basically, ModelVersion = V2 calls the old models (above). This is the ONLY way to call the old v2 models. 
+                      // Anything else in ModelVersion (blank, V3, XYZ, etc) will call the new v3 models (below).
+                      allowPremiumSource_A                                            => Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold),
+											                                                                              Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold)
+                     ); 
+
+// for debug, pick model
+//model_results := Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold); 
+// model_results := Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold); 
+
+// for debug, comment out the rest (start comment-out section)
 
 	//need to limit the Equifax hits ...do here as we now have the equifax hits scored....want highest scores to be in the limit
 	//if EQP and other sources, that is fine as we would have returned those hits even without the EQP.........
@@ -398,5 +413,9 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	//output(model_results, named('model_results'));
 	
 	RETURN OUTPUT(final_results, NAMED('Results'));
+// end debug comment-out section
+
+// debug return
+// RETURN OUTPUT(model_results, NAMED('Results'));
 
 END;
