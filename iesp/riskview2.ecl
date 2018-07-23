@@ -79,6 +79,7 @@ export t_Rv2ReportFilingRecord := record
 	string16 Status {xpath('Status')};
 	iesp.share.t_Date FilingDate {xpath('FilingDate')};
 	iesp.share.t_Date LastActionDate {xpath('LastActionDate')};
+ iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	unsigned ConsumerStatementId {xpath('ConsumerStatementId')};
 end;
 		

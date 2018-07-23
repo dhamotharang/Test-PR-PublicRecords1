@@ -1,4 +1,4 @@
-import iesp, Seed_Files, Address, risk_indicators, RiskWise;
+﻿import iesp, Seed_Files, Address, risk_indicators, RiskWise;
 
 // for now this only supports a single input record -- that's what the fcradataservice restricts too...
 
@@ -136,6 +136,9 @@ EXPORT Report_TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData,
 		self.LastActionDate.year := (integer)le.lastaction_year;
 		self.LastActionDate.month := (integer)le.lastaction_month;
 		self.LastActionDate.day := (integer)le.lastaction_day;
+		self.DateLastSeen.year := (integer)le.lastseen_year;
+		self.DateLastSeen.month := (integer)le.lastseen_month;
+		self.DateLastSeen.day := (integer)le.lastseen_day;
 		self := le;
 		self := [];
 	END;
