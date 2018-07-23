@@ -1,4 +1,4 @@
-/* *********************************************************
+﻿/* *********************************************************
 ************************************************************
 ** The intermediate logs return the product ID that gets  **
 ** set by the To_LOG_Boca_Shell function. This works      **
@@ -41,6 +41,8 @@ EXPORT ProductID := MODULE
 	EXPORT AML__AML_Service := Accurint;
 	EXPORT Business_Risk__InstantID_Service := Accurint;
 	EXPORT Business_Risk__InstantID_20_Service := Accurint;
+	EXPORT BusinessCredit_Services__BCD_SmallBizCombinedReport := Accurint;
+  EXPORT BusinessCredit_Services__BCD_BusinessSearch := Accurint;
 	EXPORT BusinessCredit_Services__CreditReportService := Accurint;
 	EXPORT LNSmallBusiness__SmallBusiness_Service := Accurint;
 	EXPORT LNSmallBusiness__SmallBusiness_BIP_Service := Accurint;
