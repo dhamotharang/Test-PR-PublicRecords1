@@ -126,27 +126,6 @@ MODULE
             														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod, dinBestDID, dSearchResultsUnfiltered,TRUE),
             														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
 																				
-
- verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
-            	
- // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
- MAP(~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
-     vPhoneBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203,doxie.ErrorCodes(203)), //FAIL the service if no records exists
-     // If phoneFinder were to run as a verification tool, only one type of verification should be selected.
-     // If more than one type of verification is selected, fail the service.			
-     // Verification request requires a complete phone number.			
-     verifyRequest > 1																=> FAIL(100,PhoneFinder_Services.Constants.ErrorCodes(100)),
-     ((BOOLEAN)verifyRequest AND ~vIsPhone10)				=> FAIL(101,PhoneFinder_Services.Constants.ErrorCodes(101))); 
-            
- /*Phone verification is a "phone only" search, even if the phone is blank.  If the phone is blank, the 
-  verification will fail and the appropriate status will be returned. */
- verifyInputDID := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
- dinBestDID := 	if(verifyInputDID, dInDIDs,DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID));// for lexid verification
- EXPORT dFormat2IESP := IF(~vPhoneBlank OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress,
-               														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy,inMod,
-               																																						  dinBestDID, 
-               																																							dSearchResultsUnfiltered,TRUE),
-               														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy,inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
    																				
  //Deltabase Logging Dataset
  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, inMod, InputEcho);																		
