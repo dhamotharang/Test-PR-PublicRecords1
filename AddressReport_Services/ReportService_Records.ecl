@@ -1,7 +1,7 @@
-IMPORT census_data,location_services,AddressReport_Services,doxie_cbrs,ut, suppress,
+﻿IMPORT census_data,location_services,AddressReport_Services,doxie_cbrs,ut, suppress,
 			 DriversV2_Services,VehicleV2_Services,Doxie_Raw,LiensV2_Services,header,Gong,
 			 BankruptcyV2_Services,doxie, iesp, AutoStandardI,Address,LN_PropertyV2_Services,
-			 BIPV2, hunting_fishing_services, STD, VehicleV2;
+			 BIPV2, hunting_fishing_services, STD, VehicleV2, D2C;
 
 EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 															boolean IsFCRA = false):=function
@@ -12,6 +12,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	AI					:=AutoStandardI.InterfaceTranslator;
 	clean_addr	:=ai.clean_address.val (project (param, AI.clean_address.params));
 	split_addr	:=Address.CleanFields(clean_addr);
+	isCNSMR := param.IndustryClass = D2C.Constants.Is_CNSMR;
 
 	AddressReport_Services.Layouts.slim_address into_srch() := transform
 		self.prim_range 	:= split_addr.prim_range;
@@ -88,7 +89,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	lj_IDs 					:= liensv2_services.Autokey_ids(,true,false,false, false);
 	LiensJudgments	:= LiensV2_Services.liens_raw.report_view.by_tmsid(project(lj_IDs,liensv2_services.layout_tmsid),param.ssn_mask,,,,,param.applicationType);
 	veh_ids_for_addr := VehicleV2_Services.autokey_ids(false,true,true);
-	vehicles 				:= VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(veh_ids_for_addr);
+	vehicles 				:= if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(veh_ids_for_addr));
 																
 	bk_ids 					:= BankruptcyV2_Services.bankruptcy_ids(dataset([],doxie.layout_references),
 																													dataset([],doxie_cbrs.layout_references),
@@ -225,8 +226,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
   string8 FiveYearsBack  := (string8) (current_date - 50000); // subtract 5 from yyyy portion
 		
   // Get report formatted recs for the res/addr vehicle ids to be used
-  vehicle_recs_resaddr_vehraw := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
-															    									veh_ids_for_resaddr_touse);
+  vehicle_recs_resaddr_vehraw := if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
+															    									veh_ids_for_resaddr_touse));
 
   // Filter to only keep recs out of Vehicle_raw that are "current" or 
 	// ones where the registration latest expiration date is within the last 5 years.
@@ -238,9 +239,9 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
  	//Get report formatted rec out of vehicle_raw for the neighbor DIDs.
 	veh_ids_for_nbrdids     := VehicleV2_Services.Vehicle_raw.get_vehicle_keys_from_dids(nbr_dids);
-  vehicle_recs_nbr_vehraw := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
+  vehicle_recs_nbr_vehraw := if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
 																								veh_ids_for_nbrdids)
-																								(is_current); //filter for only "current" ones
+																								(is_current)); //filter for only "current" ones
 
   // Combine resident/rpt addr vehicle_raw recs kept with neighbor vehicle_raw recs
 	vehicle_recs    := vehicle_recs_resaddr_vehraw_kept + vehicle_recs_nbr_vehraw;
