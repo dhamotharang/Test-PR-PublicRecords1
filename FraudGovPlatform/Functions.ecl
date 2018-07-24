@@ -404,7 +404,7 @@ EXPORT Functions :=  MODULE
 
 	ENDMACRO;
 	
-	EXPORT LastRingID := MAX(FraudShared.Files().Base.Main.Built(DID >= FraudGovPlatform.Constants().FirstRingID), DID):independent;
+	EXPORT LastRinID := MAX(FraudShared.Files().Base.Main.Built(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 
 END; 
 			

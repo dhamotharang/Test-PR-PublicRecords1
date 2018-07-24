@@ -26,12 +26,22 @@ module
 			,sequential(output('fraudgov_build_version Not Changed', named('fraudgovInfoNotChanged'))));
 
 		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{pversion, pversion, pstatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				dataset([{pversion, pversion, 'ERROR'}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
 				fn,
-				Finishfraudgov,
+				WriteErrorFound,
 				2
 				,,
 				true);
+
+		PromoteSupers.MAC_SF_BuildProcess(
+				dataset([{pversion, pversion, pstatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				fn,
+				WriteNoErrors,
+				2
+				,,
+				true);
+
+		Finishfraudgov := IF(Mac_TestRinID(pversion)='E',WriteErrorFound, WriteNoErrors);
 
 		EXPORT postFinish := sequential(Finishfraudgov, output('fraudgov_build_version Finished', named('fraudgovInfoFinished')));
 
