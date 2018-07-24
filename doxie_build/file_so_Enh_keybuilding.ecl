@@ -112,10 +112,10 @@ GLBFile      := join(RawFileDids, best_address_glb,  left.did = right.did, AddAl
 NonGLBFile   := join(RawFileDids, best_address_nonglb, left.did = right.did, AddAltDetailsNonGLB(left,right), hash);
 BestResults  := GLBFile + NonGLBFile;
 
-
+loadfile:=pull(Relationship.key_relatives_v3)(type in ['PERSONAL','TRANS CLOSURE'] and confidence in ['MEDIUM','HIGH']);
 // Create relatives table **********
 //  Add relatives linking table
-SORelativesLinkTable := join(distribute(RawFileDids,hash(did)), distribute(relationship.file_relative,hash(did1)), left.did = right.did1,local);
+SORelativesLinkTable := join(distribute(RawFileDids,hash(did)), distribute(loadfile,hash(did1)), left.did = right.did1,local);
 
 
 //  Get relatives best address
