@@ -1,4 +1,4 @@
-Import watercraft, watercraft_infutor;
+﻿Import watercraft, watercraft_infutor;
 
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -191,6 +191,6 @@ ds_watercraft_dedup := dedup(ds_map_to_watercraft,
 															watercraft_length);
 
 //Count of records that were filtered due to blank names
-output(count(ds_watercraft_in(trim(fname,all) = '' and trim(lname,all) = '')),named('BlankNamesFiltered'));
+output(count(ds_watercraft_in(trim(fname,all) = '' and trim(lname,all) = '')),named('BlankNamesFiltered2'));
 
 EXPORT Map_watercraft_infutor_base :=	ds_watercraft_dedup;
