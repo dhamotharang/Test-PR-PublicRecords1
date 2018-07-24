@@ -1,4 +1,4 @@
-/* ************************************************************************************
+﻿/* ************************************************************************************
 PRTE2_Liens_Ins_Ins.Files
 
 For the moment both we and Boca code are referencing Cross_Module_Files for file naming conventions.
@@ -44,6 +44,16 @@ EXPORT Files := MODULE
 			EXPORT party_TmpFile_DS			:=	DATASET(party_TmpFile_Name, PRTE2_Liens_Ins.Layouts.BaseParty_in,
 																									CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')))(tmsid != 'tmsid');
 
+		// ------------ NEW GENERATED ADDING PROCESS -- this is not in the CSV layout, but a Boca-type Layout.
+		// We do NOT create thor files - just use temp CSV --- NOTE: Linda handed over with tab deliminated not comma
+			SHARED GeneratedLayouts := PRTE2_Liens_Ins.Layouts_Generate_Data;
+			EXPORT TmpGeneratedMAIN_Name	:=	SPRAY_MODULE_NAME + 'G_main' + '::' +  WORKUNIT;
+			EXPORT TmpGeneratedMAIN_DS		:=	DATASET(TmpGeneratedMAIN_Name, GeneratedLayouts.GeneratedAdd_MAIN_in,
+																									CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(tmsid != 'tmsid');
+			EXPORT TmpGeneratedPARTY_Name	:=	SPRAY_MODULE_NAME + 'G_party' + '::' +  WORKUNIT;
+			EXPORT TmpGeneratedPARTY_DS		:=	DATASET(TmpGeneratedPARTY_Name, GeneratedLayouts.GeneratedAdd_PARTY_in,
+																									CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(tmsid != 'tmsid');
+
 	// ******** SPRAY FILES ************************************************************************
 
 	// ******** IN FILES ************************************************************************ 
@@ -73,6 +83,12 @@ EXPORT Files := MODULE
 			EXPORT Main_DS_Prod					:= DATASET(Main_Name_Prod, Layouts.Boca_main_base, THOR);
 			EXPORT Party_Name_Prod			:= Add_Foreign_prod(Party_Name_SF);
 			EXPORT Party_Base_DS_Prod		:= DATASET(Party_Name_Prod, Layouts.Boca_party_base, THOR);
+
+			// Just used this waiting for code migration of new layout, not checking in Layouts_Old, sandbox only.
+			// EXPORT Main_IN_DS_Prod_OLD			:= DATASET(Main_IN_Name_Prod, Layouts_OLD.BaseMain_in_raw, THOR);
+			// EXPORT Party_IN_DS_Prod_OLD			:= DATASET(Party_IN_Name_Prod, Layouts_OLD.BaseParty_in, THOR);
+			// EXPORT Main_DS_Prod_OLD					:= DATASET(Main_Name_Prod, Layouts_OLD.Boca_main_base, THOR);
+			// EXPORT Party_Base_DS_Prod_OLD		:= DATASET(Party_Name_Prod, Layouts_OLD.Boca_party_base, THOR);
 
 			// Not needed often but handy if we need to despray a father or grandfather "IN" version.
 			EXPORT Main_Father_Prod			:= Add_Foreign_prod('prct::IN::ct::LiensV2_Alpha::main_father');

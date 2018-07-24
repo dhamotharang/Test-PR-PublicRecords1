@@ -10,8 +10,8 @@ Base_Main_in		:= PRTE2_Liens.files.MainStatus(TMSID <> ''); //Spreadsheet passed
 Base_Party_in 	:= PRTE2_Liens.files.SprayParty(TMSID <> ''); //Spreadsheet passed blank records
 
 //Insurance data - Already processed using PRTE2_Liens_Ins.BWR_Spray_Both_Files
-Base_Main_Ins 	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Main, PRTE2_Liens.Layouts.main_base, THOR);
-Base_Party_Ins	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Party, PRTE2_Liens.Layouts.party_base, THOR);
+Base_Main_Ins 	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Main, PRTE2_Liens.Layouts.main_base_ext, THOR);
+Base_Party_Ins	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Party, PRTE2_Liens.Layouts.party_base_ext, THOR);
 
 //Create TMSID/RMSID, Persist ID
 PRTE2_Liens.Layouts.main_base_ext PopulateID(Base_Main_in L) := TRANSFORM
@@ -168,7 +168,7 @@ END;
 
 pAppendPersist	:= PROJECT(fPartyAll, AddPersist(LEFT));
 
-//combine Boca & Insurance data
+//combine Boca & Insurance data - insurance data s/b in the *_ext layouts anyway but project just to be sure.
 concatMain := pCreateMainIDs + PROJECT(Base_Main_Ins, TRANSFORM(PRTE2_Liens.Layouts.main_base_ext, SELF := LEFT; SELF := []));
 concatParty := pAppendPersist + PROJECT(Base_Party_Ins, TRANSFORM(PRTE2_Liens.Layouts.party_base_ext, SELF := LEFT; SELF := []));
 
