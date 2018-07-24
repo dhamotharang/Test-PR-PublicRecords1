@@ -1,7 +1,7 @@
 ﻿import ut,dops;
 EXPORT proc_Validate_NewHdr := module
 
-
+//changed so that wdoghdr which is the version only uses the date portion. [1..8]
 
 curkey := nothor(FileServices.GetSuperfilesubname ('~thor_data400::key::header_qa',1)) ;
 
@@ -39,7 +39,6 @@ shared ihdrkey := nothor(FileServices.GetSuperfilesubname ('~thor400_66::key::in
 	shared cmpinputs := if ( out = true /*and wdogdate = fcrahdrdate*/ and wdogdate[1..8] = 	ihdrdate, Output('ALL_INPUT_VERSIONS_ARE_IN_SYNC'), fail('INPUT_FILES_OUT_OF_SYNC'));											
 
 	ds := dataset('~thor_data400::watchdog::header_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
-
 shared check_submitted := if ( out = true , count( ds( hdr_version = wdogdate and issubmitted = 'Y' and ishdrnew = true)),
                                     count( ds( hdr_version = ut.GetDate and issubmitted = 'Y' and ishdrnew = false))
 											 );
