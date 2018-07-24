@@ -46,6 +46,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep1_dlnumber := le.InputEcho.in_rep1_dlnumber;
 				SELF.rep1_dlstate := le.InputEcho.in_rep1_dlstate;
 				SELF.rep1_email := le.InputEcho.in_rep1_email;
+        SELF.rep1_lexID := le.InputEcho.rep1_lexid;
 				
 				// Authorized Rep 2 input information
 				SELF.rep2_titlename := le.InputEcho.in_rep2_title;
@@ -65,6 +66,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep2_dlnumber := le.InputEcho.in_rep2_dlnumber;
 				SELF.rep2_dlstate := le.InputEcho.in_rep2_dlstate;
 				SELF.rep2_email := le.InputEcho.in_rep2_email;
+        SELF.rep2_lexID := le.InputEcho.rep2_lexid;
 				
 				// Authorized Rep 3 input information
 				SELF.rep3_titlename := le.InputEcho.in_rep3_title;
@@ -84,6 +86,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep3_dlnumber := le.InputEcho.in_rep3_dlnumber;
 				SELF.rep3_dlstate := le.InputEcho.in_rep3_dlstate;
 				SELF.rep3_email := le.InputEcho.in_rep3_email;
+        SELF.rep3_lexID := le.InputEcho.rep3_lexid;
 				
 				// Authorized Rep 4 input information
 				SELF.rep4_titlename := le.InputEcho.in_rep4_title;
@@ -103,6 +106,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep4_dlnumber := le.InputEcho.in_rep4_dlnumber;
 				SELF.rep4_dlstate := le.InputEcho.in_rep4_dlstate;
 				SELF.rep4_email := le.InputEcho.in_rep4_email;
+        SELF.rep4_lexID := le.InputEcho.rep4_lexid;
 				
 				// Authorized Rep 5 input information
 				SELF.rep5_titlename := le.InputEcho.in_rep5_title;
@@ -122,6 +126,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep5_dlnumber := le.InputEcho.in_rep5_dlnumber;
 				SELF.rep5_dlstate := le.InputEcho.in_rep5_dlstate;
 				SELF.rep5_email := le.InputEcho.in_rep5_email;
+        SELF.rep5_lexID := le.InputEcho.rep5_lexid;
 				
 				// Verified input fields
 				SELF.vercmpy := IF( le.Verification.ver_name_indicator = '1', le.VerifiedEcho.bus_ver_name, le.VerifiedEcho.bus_ver_altname );
