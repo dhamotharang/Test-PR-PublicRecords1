@@ -1,4 +1,6 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
+﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
+
+export Build_base(string ver) := module 
 
 #IF (IsFullUpdate = false)
 	TrnUn_credit := Files.update_in;
@@ -39,9 +41,9 @@ Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 																),left,right);
 
 	self.dt_first_seen            := CHOOSE(C,(unsigned)l.date_address_reported,0,0,0);
-	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)version,0);
-	self.dt_vendor_first_reported := (unsigned)version;
-	self.dt_vendor_last_reported  := (unsigned)version;
+	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)ver,0);
+	self.dt_vendor_first_reported := (unsigned)ver;
+	self.dt_vendor_last_reported  := (unsigned)ver;
 	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)(STRING8)Std.Date.Today()
 																				,(unsigned)l.Date_of_Birth
 																				,0);
@@ -258,9 +260,11 @@ candidates		:=base_and_delete(IsDelete=false and IsUpdating=true and Deceased_In
 not_candidates:=base_and_delete(IsDelete=true  or  IsUpdating=false or Deceased_Indicator_Flag =  'Y' or  IsCurrent=false);
 TransunionCred_out:=project(candidates
 															,transform(layouts.base
-																	,self.dt_last_seen:=if((unsigned)version > left.dt_first_seen, (unsigned)version, left.dt_last_seen)
+																	,self.dt_last_seen:=if((unsigned)ver > left.dt_first_seen, (unsigned)ver, left.dt_last_seen)
 																	,self:=left
 																	))
 																	+ not_candidates;
 
-export Build_base := TransunionCred_out;
+export All := TransunionCred_out;
+
+end;
