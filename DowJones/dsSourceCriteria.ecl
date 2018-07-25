@@ -1635,5 +1635,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/898 Burma/Myanmar List','1621'},
 {'EC 2018/899 Venezuela List','1622'},
 {'NSDC (Ukraine) Special Economic and Other Restrictive Measures (Sanctions) - 14 May 2018','1623'},
-{'US Department of State CAATSA Section 315 - US Coast Guard List of Prohibited Vessels','1624'}
+{'US Department of State CAATSA Section 315 - US Coast Guard List of Prohibited Vessels','1624'},
+{'NSDC (Ukraine) Special Economic and Other Restrictive Measures (Sanctions) - 21 June 2018','1625'},
+{'EC (CFSP) 2018/1000 ISIL (Da\'esh) and Al-Qaida List','1626'},
+{'EC 2018/999 ISIL (Da\'esh) and Al-Qaida List','1627'}
 ],r);

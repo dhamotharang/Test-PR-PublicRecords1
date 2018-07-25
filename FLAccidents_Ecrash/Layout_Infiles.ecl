@@ -455,6 +455,8 @@
 		STRING Contrib_source;
 		//BuyCrash Release 6
 		STRING Date_Report_Submitted;
+		//CrashLogic Release 4
+	  STRING1 Releasable;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)

@@ -1,9 +1,14 @@
-import ut,Orbit3,_Control;
+﻿import ut,Orbit3,_Control;
 export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
 
 	tokenval := orbit3.GetToken() : independent;
 
 	create_build := orbit3.CreateBuild(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode : independent;
+									
+	get_buildinst := Orbit3.GetBuildInstance(buildname,
 									Buildvs,
 									tokenval,		
 									).retcode : independent;
@@ -29,7 +34,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 		get_build_candidates := 	Orbit3.GetBuildCandidates(buildname,
 									Buildvs,
 									tokenval,
-									create_build.BuildId) ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
+									get_buildinst.BuildId) ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
 									
 		 get_new_build_candidates := project(get_build_candidates,transform( Orbit3.Layouts.OrbitBuildInstancenewLayout , self := left));
 									
@@ -80,7 +85,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 		
 	
 	run_additem :=  sequential( 
-												       output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add'),EXTEND),
+												       output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname),EXTEND),
 															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,sendemail('ADD_ITEMS','SUCCESS')),sendemail('NO_ITEMS_FOUND','FAIL'))
 										 
 									      );
@@ -90,8 +95,11 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 	return 
 		if( runcreatebuild,
 							
-								if ( runaddcomponentsonly,
-									       run_additem,
+								if ( runaddcomponentsonly, 
+								       if ( get_buildinst.Status = 'Success',
+									                                 run_additem,
+																									 Output('Build Instance does not exist in Orbit for Build Name -- '+buildname +', Build Version --'+Buildvs)
+													 ),
 											     
 	                      Sequential
 								         (
@@ -113,7 +121,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 																					 )
 														),
 													 if ( skipaddcomponents,	
-										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add')),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
+										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname)),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
 														     
 										                                   run_additem
 																																

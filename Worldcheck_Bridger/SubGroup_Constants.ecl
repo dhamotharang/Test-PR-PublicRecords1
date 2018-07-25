@@ -1062,7 +1062,14 @@
 		export string KEYWORD_ARMJHR_W							:= '750';
 		export string KEYWORD_US_SST								:= '751';
 		export string KEYWORD_BRCNEP								:= '752';
-
+		export string KEYWORD_MXASF									:= '753';
+		export string KEYWORD_JPMHLW								:= '754';
+		export string KEYWORD_GEGOV									:= '755';
+		export string KEYWORD_ZAFSCA								:= '756';
+		export string KEYWORD_SVSSF									:= '757';
+		export string KEYWORD_USJVNKA								:= '758';
+		export string KEYWORD_USMDOB								:= '759';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
