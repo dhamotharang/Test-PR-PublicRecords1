@@ -15,13 +15,13 @@
 			Quick Documentation to run the thor build:
 
 				Tapeload02b Dir	: business\infutor_business_data
-				Unix Directory	: bctlpedata11:/data/hds_180/infutor_narb/data/<folder date>
+				Unix Directory	: bctlpedata11:/data/hds_180/Infutor_NARB/data/<folder date>
 				Thor Module			: Infutor_NARB
 				Orbit Build			: Infutor_NARB
 				Frequency				: Monthly - Full Unload 
 				
 				1.	The folder on tapeload02b and the zip files contents are to be copied into the data directory under
-            the infutor_narb folder on bctlpedata11. Unzip the 52 *.txt files in to the same directory as the zip files.
+            the Infutor_NARB folder on bctlpedata11. Unzip the 52 *.txt files in to the same directory as the zip files.
             After unzipping, the 52 *.txt files will be picked up by the spray process and put on thor in 1 file.
 				2.	Next, open Infutor_NARB._BWR_Build_All in a builder window.  Change the pversion to to the date that 
             matches the folder date on bctlpedata11. 
@@ -37,7 +37,7 @@
 						3. Builds LinkID Keys
             4. Runs Scrubs Plus on the new base file
 						5. Builds Strata
-						6. Runs BIPStats
+						6. Runs BIPStats -- This step is commented out until the BIP team puts the macro into Production
             7. Create QA Samples
 						8. Updates DOPS
 						
