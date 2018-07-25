@@ -172,7 +172,11 @@ built := sequential(
 						,FileServices.FinishSuperFileTransaction()
 						)
 						,Basic_stats.Show_me_the_output
-				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
+				): success(sequential(
+										Send_Email(pversion,pUseProd).BuildSuccess)
+										,RoxieKeyBuild.updateversion('EnclarityKeys',pversion,_Control.MyInfo.EmailAddressNotify,,'N')) 
+				 , failure(send_email(pversion,pUseProd).BuildFailure
+				
 
 );
 
