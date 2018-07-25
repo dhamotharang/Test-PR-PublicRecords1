@@ -132,8 +132,8 @@ export asses_records(
 
 
   rec add_statement_ids ( rec l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-    skip(~showDisputedRecords and r.isdisputed) 
-      self.statementids := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+    skip((~showDisputedRecords and r.isdisputed) or (~ShowConsumerStatements and exists(R.StatementIDs))) 
+      self.statementids := r.StatementIDs;
       self.isdisputed :=  r.isdisputed;
       self := L;
   end;

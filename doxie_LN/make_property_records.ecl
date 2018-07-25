@@ -1,4 +1,4 @@
-import doxie_ln, doxie_crs, ut, doxie, FCRA, LN_PropertyV2, suppress, ffd;
+﻿import doxie_ln, doxie_crs, ut, doxie, FCRA, LN_PropertyV2, suppress, ffd;
 
 // ar, dr -- "base" deeds/assess records.
 // For fcra-side ar, dr -- fcra-compliant "base" records;
@@ -131,8 +131,8 @@ pcp1 := pcp0 + join(pc, search_over, left.ln_fares_id = right.ln_fares_id and le
 										search_tr_name (left, right));										
 
 name_rec addStatementIds ( name_rec l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-	skip(~showDisputedRecords and r.isdisputed) 
-		self.statementids := if(ShowConsumerStatements,dedup(l.statementids + r.statementids, all),FFD.Constants.BlankStatements); // l from DG.ASSESSMENT or DG.DEED
+	skip((~showDisputedRecords and r.isdisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+		self.statementids := dedup(l.statementids + r.statementids, all); // l from DG.ASSESSMENT or DG.DEED
 		self.isdisputed :=	l.isdisputed or r.isdisputed; 
 		self := l;
 end;

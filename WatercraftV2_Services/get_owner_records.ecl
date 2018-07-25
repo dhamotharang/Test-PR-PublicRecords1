@@ -94,9 +94,9 @@ EXPORT get_owner_records(
 	// FCRA FFD ----------------------------------------------------------------------------------------------------------------
 	// Remove or mark Disputed rows & add StatementIDs
 	owner_rec xformDs (owner_rec L, FFD.Layouts.PersonContextBatchSlim R) := TRANSFORM,
-		skip(~ShowDisputedRecords and R.isDisputed) 
+		skip((~ShowDisputedRecords and R.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
 		SELF.isDisputed :=  r.isDisputed ;
-		SELF.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+		SELF.StatementIDs := r.StatementIDs;
 		SELF := L;
 	END;
 

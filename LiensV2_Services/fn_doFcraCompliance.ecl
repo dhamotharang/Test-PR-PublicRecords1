@@ -1,4 +1,4 @@
-/* This function does the disputes and adds the ststementIDs dataset */
+﻿/* This function does the disputes and adds the ststementIDs dataset */
 import FFD, LiensV2_Services;
 
 EXPORT  fn_doFcraCompliance ( GROUPED DATASET (LiensV2_Services.layout_lien_party_raw) ds_party_raw_grouped, //join with key_party_id
@@ -17,8 +17,8 @@ EXPORT  fn_doFcraCompliance ( GROUPED DATASET (LiensV2_Services.layout_lien_part
 	
 	liensv2_services.layout_lien_party_raw xformLienParty
 													(LiensV2_Services.layout_lien_party_raw L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-				skip(~ShowDisputedRecords and R.isDisputed)
-				self.StatementIDs := if(ShowConsumerStatements, R.StatementIds,FFD.Constants.BlankStatements);
+				skip((~ShowDisputedRecords and R.isDisputed) or (~ShowConsumerStatements and exists(R.StatementIDs)))
+				self.StatementIDs := R.StatementIds;
 				self.IsDisputed   := R.isDisputed;
 				self := L;
 	end;
@@ -34,8 +34,8 @@ EXPORT  fn_doFcraCompliance ( GROUPED DATASET (LiensV2_Services.layout_lien_part
 	// case
 	LiensV2_Services.layout_liens_case_extended xformLiencase
 													(LiensV2_Services.layout_liens_case_extended L, FFD.Layouts.PersonContextBatchSlim R ) := transform,
-			skip(~ShowDisputedRecords and R.isDisputed)
-				self.StatementIDs := if(ShowConsumerStatements, R.StatementIds,FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and R.isDisputed) or (~ShowConsumerStatements and exists(R.StatementIDs)))
+				self.StatementIDs :=  R.StatementIds;
 				self.IsDisputed   := R.isDisputed;
 				self := L;
 	end;
@@ -74,8 +74,8 @@ EXPORT  fn_doFcraCompliance ( GROUPED DATASET (LiensV2_Services.layout_lien_part
 																							self := right));				 
 				 
 	flat_history_rec xformLienHistory(flat_history_rec L, FFD.Layouts.PersonContextBatchSlim R) := transform,
-	skip(~ShowDisputedRecords and r.isDisputed)
-		self.StatementIDs := if(ShowConsumerStatements, R.StatementIds,FFD.Constants.BlankStatements);
+	skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(R.StatementIDs)))
+		self.StatementIDs := R.StatementIds;
 		self.IsDisputed   := R.isDisputed;
 		self              := L;
 	end;

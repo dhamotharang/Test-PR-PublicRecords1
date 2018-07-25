@@ -1,4 +1,4 @@
-import atf, iesp, Census_Data, FCRA, FFD, ATF_Services;
+﻿import atf, iesp, Census_Data, FCRA, FFD, ATF_Services;
 
 export Raw := module
 
@@ -93,8 +93,8 @@ export Raw := module
 				
 			ATF_Services.Layouts.rawrec xformStatements( atf_Services.Layouts.rawrec l , 
 																									 FFD.Layouts.PersonContextBatchSlim r ) := transform,
-					skip(~ShowDisputedRecords and r.isDisputed )
-					self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+					skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+					self.StatementIDs := r.StatementIDs;
 					self.IsDisputed   := r.IsDisputed;
 					self := l;
 			end;
