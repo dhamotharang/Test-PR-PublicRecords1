@@ -1,4 +1,4 @@
-﻿import versioncontrol, _control, ut, tools;
+﻿import versioncontrol, _control, ut, tools, Roxiekeybuild;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 wl:=nothor(WorkunitServices.WorkunitList('',jobname:='Yogurt:Enclarity as Ingenix Build*'))(state in ['blocked','running','wait']);
@@ -173,8 +173,8 @@ built := sequential(
 						)
 						,Basic_stats.Show_me_the_output
 				): success(sequential(
-										Send_Email(pversion,pUseProd).BuildSuccess)
-										,RoxieKeyBuild.updateversion('EnclarityKeys',pversion,_Control.MyInfo.EmailAddressNotify,,'N')) 
+										RoxieKeyBuild.updateversion('EnclarityKeys',pversion,_Control.MyInfo.EmailAddressNotify,,'N')
+										,Send_Email(pversion,pUseProd).BuildSuccess))
 				 , failure(send_email(pversion,pUseProd).BuildFailure
 				
 
