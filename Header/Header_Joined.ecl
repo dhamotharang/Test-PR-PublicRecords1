@@ -1,4 +1,4 @@
-import header,ut,address,mdr,idl_header,watchdog,strata,AID;
+﻿import header,ut,address,mdr,idl_header,watchdog,strata,AID,STD;
 
 export header_joined(string versionBuild=Header.version_build) := module
 
@@ -21,7 +21,7 @@ end;
 
 //Basic  Match - a one to one join - basic assumption here is:
  //that there are absolutely no duplicates in the left nor the right side
-j_all :=  join(PHin, NHRin,
+j_all_new :=  join(PHin, NHRin,
 				left.src        =right.src         and
 // Bug: 173413
 // this change is in conjunction with other changes made in:
@@ -54,9 +54,14 @@ j_all :=  join(PHin, NHRin,
 				,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist('~thor_data400::persist::hbm::'+ versionBuild,expire(60));
-			
+				): persist(                     '~thor_data400::persist::hbm::'+ versionBuild ,expire(60),REFRESH(FALSE));
+
+j_all:= if(nothor(std.file.fileexists(  '~thor_data400::persist::hbm::'+ versionBuild )) 
+                         ,dataset(      '~thor_data400::persist::hbm::'+ versionBuild ,header.Layout_New_Records,thor)
+                         ,j_all_new);
+
 outf_noID := dedup(j_all,record,all,local);
+
 oNMNHR    := outf_noID(rid=0);
 oMNHR     := outf_noID(rid>0);
 
@@ -74,7 +79,7 @@ output(ta1, all, named('no_basic_match_incremental'));
 //these are the records not seen before since the previous monthly build
 mxr_monthly := max(Header.File_Latest_Header_Raw(FALSE),rid);
 oNMNHRM := oNMNHR+oMNHR(rid>mxr_monthly);
-
+output(mxr_monthly,named('max_rid_previous_month'));
 r_nbm2 := record
 	oNMNHRM.src;
 	string30 src_desc := mdr.sourcetools.translatesource(oNMNHRM.src);
@@ -95,7 +100,7 @@ header.Layout_Header to_form(outf l) := transform
 	self := l;
 end;
 
-new_month_joined := project(outf,to_form(left));
+new_month_joined := when(project(outf,to_form(left)),output(mxr,named('mxr')));
 
 Header.Layout_header blank_pflag(inPHR l) := transform
 	self.pflag1 := ''; // old rolled header records - no longer Reported (NLR)
@@ -105,12 +110,20 @@ end;
 //append NLR
 pnew := project(inPHR,blank_pflag(left))(header.Blocked_data_new()) + new_month_joined;
 
-duplicate_rids_with_bad_pii := table(dedup(sort(pnew,rid,zip,fname,lname)
-            ,(LEFT.zip='' OR RIGHT.zip='' OR LEFT.zip=RIGHT.zip) AND
-             (LEFT.fname='' OR RIGHT.fname='' OR LEFT.fname=RIGHT.fname) AND
-             (LEFT.lname='' OR RIGHT.lname='' OR LEFT.lname=RIGHT.lname)
-            
-            ),{rid,cnt:=count(group)},rid)(cnt>1);
+dpnew:=dedup(sort(distribute(pnew,hash32(rid,zip,fname,lname)),rid,zip,fname,lname,local),rid,zip,fname,lname,ORDERED(true),local);
+
+nneq(string s1, string s2) := if (s1<>'' AND s2<>'' AND s1<>s2,true,false);
+
+{dpnew} chk(dpnew L, dpnew R) :=transform, skip(~(L.rid=R.rid AND 
+																																															( nneq(L.zip,R.zip) OR 
+																																															  nneq(L.zip,R.zip) OR
+																																																 nneq(L.zip,R.zip)   )
+																																														))
+  self:=R
+
+end;
+
+duplicate_rids_with_bad_pii:=iterate(dpnew,chk(LEFT,RIGHT),local);
 
 output(duplicate_rids_with_bad_pii,named('duplicate_rids_with_bad_pii'));
 output(count(duplicate_rids_with_bad_pii),named('cnt_duplicate_rids_with_bad_pii'));

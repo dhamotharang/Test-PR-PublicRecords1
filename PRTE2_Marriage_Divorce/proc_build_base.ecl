@@ -1,4 +1,4 @@
-﻿IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2, ut, PromoteSupers, Address, STD, PRTE2;
+﻿IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2, ut, PromoteSupers, Address, STD, PRTE2, NID;
 
 EXPORT proc_build_base := FUNCTION
 
@@ -68,7 +68,7 @@ Layouts.Main_Base_out NormBase(Main_Clean le, integer c) := TRANSFORM
 																		+ le.marriage_duration_cd
 																		+ le.marriage_duration);
 	
-  self.party1_age			:= if(le.cust_name <> '' and le.party1_age = '', (string)ut.Age((integer)le.party1_dob), le.party1_age);
+ self.party1_age			:= if(le.cust_name <> '' and le.party1_age = '', (string)ut.Age((integer)le.party1_dob), le.party1_age);
 	self.party2_age			:= if(le.cust_name <> '' and le.party2_age = '', (string)ut.Age((integer)le.party2_dob), le.party2_age);
 	SELF          			:= le;
 	SELF := [];
@@ -130,73 +130,88 @@ END;
 n_prep_rec := NORMALIZE(Main_Clean(party1_name<>''),IF(trim(left.party2a_name) <> '',4,
 																										IF(trim(left.party1_alias) <> '',3,
 																										IF(trim(left.party2_name) <> '',2,1))),t_did_prep_rec(left,counter));
+
+//Added NID cleaner to clean FULL Names better
+NID.Mac_CleanFullNames(n_prep_rec, FileClnName, nameasis,  _nameorder := 'L',	,includeInRepository:=false, normalizeDualNames:=false);
 																				 
 //Clean Name/Address
-Layouts.Search_Base_ext ClnNameAddr(n_prep_rec le) := TRANSFORM
+Layouts.Search_Base_ext ClnNameAddr(FileClnName le) := TRANSFORM
 	SELF.dt_first_seen						:= le.dt_first_seen;
-  SELF.dt_last_seen							:= le.dt_last_seen;
-  SELF.dt_vendor_first_reported	:= le.dt_vendor_first_reported;
-  SELF.dt_vendor_last_reported	:= le.dt_vendor_last_reported;
-	string73 v_pname_party 				:= IF(le.nameasis_name_format = 'L' or STD.Str.Find(le.nameasis,',',1) > 0, address.CleanPersonLFM73(le.nameasis),	address.CleanPersonFML73(le.nameasis));
+ SELF.dt_last_seen							:= le.dt_last_seen;
+ SELF.dt_vendor_first_reported	:= le.dt_vendor_first_reported;
+ SELF.dt_vendor_last_reported	:= le.dt_vendor_last_reported;
+
+//Some names are not cleaning at all, added legacy cleaner
+isBlankClnName := length(std.str.cleanspaces(le.cln_title + le.cln_fname + le.mname + le.cln_lname + le.cln_suffix)) = 0;
+string73 v_pname_party 				:= IF(isBlankClnName and le.nameasis_name_format = 'L' or STD.Str.Find(le.nameasis,',',1) > 0,
+																																						address.CleanPersonLFM73(le.nameasis), 
+																																						address.CleanPersonFML73(le.nameasis)
+																																		);											
+																																		 
+	SELF.title								:= if(NOT isBlankClnName,le.cln_title,v_pname_party[1..5]);
+ SELF.fname	      	:= if(NOT isBlankClnName,le.cln_fname, v_pname_party[6..25]);      
+ SELF.mname	      	:= if(NOT isBlankClnName,le.cln_mname,v_pname_party[26..45]);      
+ SELF.lname	      	:= if(NOT isBlankClnName,le.cln_lname,v_pname_party[46..65]);
+ SELF.name_suffix		:= if(NOT isBlankClnName,le.cln_suffix,v_pname_party[66..70]);
+ 
 	string182 v_clean_addr 				:= address.cleanaddress182(le.party_addr,le.party_csz);
-	
-	SELF.title				:= v_pname_party[1..5];
-	SELF.fname				:= v_pname_party[6..25];
-	SELF.mname				:= v_pname_party[26..45];
-	SELF.lname				:= v_pname_party[46..65];
-	SELF.name_suffix	:= v_pname_party[66..70];
-	
-	SELF.prim_range		:= v_clean_addr[1..10];
-	SELF.predir				:= v_clean_addr[11..12];
-	SELF.prim_name		:= v_clean_addr[13..40];
-	SELF.suffix				:= v_clean_addr[41..44];
-	SELF.postdir			:= v_clean_addr[45..46];
+ SELF.prim_range		:= v_clean_addr[1..10];
+	SELF.predir						:= v_clean_addr[11..12];
+	SELF.prim_name			:= v_clean_addr[13..40];
+	SELF.suffix						:= v_clean_addr[41..44];
+	SELF.postdir					:= v_clean_addr[45..46];
 	SELF.unit_desig		:= v_clean_addr[47..56];
- 	SELF.sec_range		:= v_clean_addr[57..64];
+ SELF.sec_range			:= v_clean_addr[57..64];
 	SELF.p_city_name	:= v_clean_addr[65..89];
- 	SELF.v_city_name	:= v_clean_addr[90..114];
-	SELF.st						:= IF(v_clean_addr[115..116]<>'', v_clean_addr[115..116], le.orig_residence_st);
-	SELF.zip					:= v_clean_addr[117..121];
-	SELF.zip4					:= v_clean_addr[122..125];
-	SELF.cart					:= v_clean_addr[126..129];
+ SELF.v_city_name	:= v_clean_addr[90..114];
+	SELF.st										:= IF(v_clean_addr[115..116]<>'', v_clean_addr[115..116], le.orig_residence_st);
+	SELF.zip									:= v_clean_addr[117..121];
+	SELF.zip4								:= v_clean_addr[122..125];
+	SELF.cart								:= v_clean_addr[126..129];
 	SELF.cr_sort_sz		:= v_clean_addr[130..130];
- 	SELF.lot					:= v_clean_addr[131..134];
-	SELF.lot_order		:= v_clean_addr[135..135];
-	SELF.dbpc					:= v_clean_addr[136..137];
-	SELF.chk_digit		:= v_clean_addr[138..138];
-	SELF.rec_type			:= v_clean_addr[139..140];
-	SELF.county				:= v_clean_addr[141..145];
-	SELF.geo_lat			:= v_clean_addr[146..155];
-	SELF.geo_long			:= v_clean_addr[156..166];
-	SELF.msa					:= v_clean_addr[167..170];
-	SELF.geo_blk			:= v_clean_addr[171..177];
-	SELF.geo_match		:= v_clean_addr[178..178];
-	SELF.err_stat			:= v_clean_addr[179..182];
+ SELF.lot									:= v_clean_addr[131..134];
+	SELF.lot_order			:= v_clean_addr[135..135];
+	SELF.dbpc								:= v_clean_addr[136..137];
+	SELF.chk_digit			:= v_clean_addr[138..138];
+	SELF.rec_type				:= v_clean_addr[139..140];
+	SELF.county						:= v_clean_addr[141..145];
+	SELF.geo_lat					:= v_clean_addr[146..155];
+	SELF.geo_long				:= v_clean_addr[156..166];
+	SELF.msa									:= v_clean_addr[167..170];
+	SELF.geo_blk					:= v_clean_addr[171..177];
+	SELF.geo_match			:= v_clean_addr[178..178];
+	SELF.err_stat				:= v_clean_addr[179..182];
+	
 	SELF.persistent_record_id	:= HASH64(le.record_id +','
-																		+ le.vendor +','
-																		+	le.party_type +','
-																		+	le.which_party +','
-																		+	le.nameasis +','
-																		+	le.nameasis_name_format +','
-																		+ le.party_addr +','
-																		+ le.party_csz +','
-																		+ le.dob +','
-																		+ le.age +','
-																		+ le.birth_state +','
-																		+ le.race +','
-																		+ le.party_county +','
-																		+ le.previous_marital_status +','
-																		+ le.how_marriage_ended +','
-																		+ le.times_married +','
-																		+ le.last_marriage_end_dt
-																			);
-	SELF.DID			:= IF(TRIM(le.cust_name) <> '',
-										Prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, le.link_ssn, le.link_dob, le.CUST_NAME),le.DID);
+																																			+ le.vendor +','
+																																			+	le.party_type +','
+																																			+	le.which_party +','
+																																			+	le.nameasis +','
+																																			+	le.nameasis_name_format +','
+																																			+ le.party_addr +','
+																																			+ le.party_csz +','
+																																			+ le.dob +','
+																																			+ le.age +','
+																																			+ le.birth_state +','
+																																			+ le.race +','
+																																			+ le.party_county +','
+																																			+ le.previous_marital_status +','
+																																			+ le.how_marriage_ended +','
+																																			+ le.times_married +','
+																																			+ le.last_marriage_end_dt
+																																		 );
+	SELF := le;
+	END;
+	
+	dsCleanNameAddr:= PROJECT(FileClnName, ClnNameAddr(LEFT));
+
+Layouts.Search_Base_ext  AppendDid(dsCleanNameAddr le) := TRANSFORM
+	SELF.DID			:= IF(TRIM(le.cust_name) <> '', Prte2.fn_AppendFakeID.did(le.fname, le.lname, le.link_ssn, le.link_dob, le.CUST_NAME),le.DID);
 	SELF.age			:= if(le.cust_name <> '' and le.age = '', (string)ut.Age((integer)le.dob), le.age);									
 	SELF	:= le;
 END;
 
-pClnSearch	:= PROJECT(n_prep_rec(trim(nameasis) <> ''), ClnNameAddr(left));
+pClnSearch	:= PROJECT(	dsCleanNameAddr(trim(nameasis) <> ''), AppendDid(left));
 dClnSearch	:= DEDUP(SORT(pClnSearch,record_id, did, nameasis, prim_range, prim_name, v_city_name, st, zip), did, nameasis, prim_range, prim_name, v_city_name, st, zip);
 
 //Build Base files

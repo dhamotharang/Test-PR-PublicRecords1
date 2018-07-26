@@ -11,7 +11,7 @@ EXPORT proc_cleanup(
 functionmacro
 
   ecl		  := '#workunit(\'name\',\'BIPV2_Build.cleanup @version@\');\n#workunit(\'protect\' ,true);\n' + 'BIPV2_Build.cleanup(\'' + pversion + '\');\n';
-  cluster := if(Tools._Constants.IsDataland,'infinband_hthor','hthor');
+  cluster := _Control.Config.LocalHthor;
   
   kickBuild := wk_ut.mac_ChainWuids(ecl,1,1,pversion,,cluster,pOutputEcl := false,pUniqueOutput := 'Proc_Cleanup',pNotifyEmails := BIPV2_Build.mod_email.emailList
   ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::proc_cleanup'

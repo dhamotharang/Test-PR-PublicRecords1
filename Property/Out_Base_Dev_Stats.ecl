@@ -1,4 +1,4 @@
-import property,strata;
+﻿import property,strata;
 
 export Out_Base_Dev_Stats(string filedate) := function
 	ds_fore := Property.file_foreclosure_building;
@@ -518,14 +518,14 @@ export Out_Base_Dev_Stats(string filedate) := function
   
  
 	zOrig_Stats_cnt := output(count(tStats));
-	zOrig_Stats 		:= output(tStats);
+
 		
 	STRATA.createXMLStats(tStats,'Property','ForeclosureV1',filedate,'kgummadi@seisint.com;jtrost@seisint.com',zPopulation_Stats,'View','Population',false,true,true);
 
-	STRATA.createAsHeaderStats(property.Foreclosure_as_Header(property.File_Foreclosure_Base_v2),'Property','Foreclosure',filedate,'kgummadi@seisint.com;jtrost@seisint.com',zAs_Header_Stats);
+	STRATA.createAsHeaderStats(property.Foreclosure_as_Header(property.File_Foreclosure_Base_v2),'Property','Foreclosure',filedate,'kgummadi@seisint.com;jtrost@seisint.com',zAs_Header_Stats,true);
 
 	return parallel( zOrig_Stats_cnt,
-									 zOrig_Stats,
+									// zOrig_Stats,
 									 zPopulation_Stats,
 									 zAs_Header_Stats
 									//,zRunAsBusinessHeaderStats

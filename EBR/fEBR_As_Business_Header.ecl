@@ -1,9 +1,15 @@
-IMPORT Business_Header, ut,mdr;
+﻿IMPORT Business_Header, ut,mdr;
 
 export fEBR_As_Business_Header(dataset(layout_0010_header_base) pInput, boolean IsPRCT = false) :=
 function
-
-	EBR_base := pInput;
+	//*** Filtering the EBR quarterly "20171205" extract records (with process_date of 20171206) getting ingested into legacy business header.
+	//*** Filtering the EBR quarterly "20180307" extract records (with process_date of 20180308) getting ingested into legacy business header.
+	//*** Filtering the EBR quarterly "20180604" extract records (with process_date of 20180605) getting ingested into legacy business header.
+	EBR_base := pInput(~(process_date = '20171206' and process_date_first_seen = 20171206 and process_date_last_seen = 20171206) and
+										 ~(process_date = '20180308' and process_date_first_seen = 20180308 and process_date_last_seen = 20180308) and
+										 ~(process_date = '20180308' and process_date_first_seen = 20171206 and process_date_last_seen = 20180308) and
+										 ~(process_date = '20180605' and process_date_first_seen = 20180605 and process_date_last_seen = 20180605)
+										);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// -- Add unique record id to EBR file

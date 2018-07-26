@@ -1,4 +1,4 @@
-/*
+﻿/*
 Process to Verify Phone data agains insurance phone data and File One
 
 ===============================================================================================================
@@ -18,15 +18,15 @@ After the current process has determined what is above and below the line, match
 		o	Match insurance by DID and phone
 						?	There is a file with only the insurance phone records we are allowed to use ready to be pulled from Boca
 						?	If match is to a record above the line, update the rules field to indicate the record matched insurance.  
-						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = ‘G’, and update the rules field to indicate the record matched insurance
+						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the record matched insurance
 		o	Match File One by DID and 3 digits
 						?	If match is to a record above the line, update the rules field to indicate the records matched File One
-						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = ‘G’, and update the rules field to indicate the records matched File One
+						?	If match is to a record below the line, set it above the line, set dppa_glb_flag = G, and update the rules field to indicate the records matched File One
 
 -	For the records that were below the line and moved above, propagate above the line to other records for the same phone and household.
 ===============================================================================================================
 */
-import Experian_Phones, ut;
+import Experian_Phones, ut, PhoneMart,_control;
 EXPORT Fn_Phone_Verification(dataset(recordof(Layout_Phonesplus_Base)) phplus_in) := function
 
 // remote insurance verification file
@@ -39,18 +39,23 @@ iver_rec := RECORD
   boolean is_latest;
  END;
 //ins prod
-ins := dataset('~foreign::10.194.12.1::thor400_64::persist::for_phone_verification', iver_rec , thor);
+
+
+ins := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 //ins dataland
 //ins := dataset('~foreign::10.194.10.1::thor400_72::persist::for_phone_verification', iver_rec , thor);
 
-file1_ := pull(experian_phones.Key_Did);
-file1 := file1_(pin_did > 0 and 
+//file1_ := pull(experian_phones.Key_Did);
+file1_ := pull(PhoneMart.key_phonemart_did);
+/*file1 := file1_(pin_did > 0 and 
 								is_current and
 								//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 								(phone_type = 'C' or
-								(phone_type = 'N' and date_last_seen > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00)) )));
-
-//Match to Insurance
+								(phone_type = 'N' and date_last_seen > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00)) )));*/
+								
+								
+file1 := file1_(did > 0);
+//Match to Insurance;
 Layout_Phonesplus_Base t_ins_match (phplus_in le, ins ri) := transform
 is_match := le.cellphone = ri.phone and le.did = ri.did and 
 						//only use cellphones and non-cellphones when the date_last_seen is within 3 years
@@ -86,11 +91,15 @@ ins_match := join(distribute(phplus_in, hash(cellphone)),
 
 //Match to File One
 Layout_Phonesplus_Base t_file1_match (ins_match le, file1 ri) := transform
-is_match := le.cellphone[8..10] = ri.phone_digits and le.did = ri.pin_did and
+/*is_match := le.cellphone = ri.phone and le.did = ri.did and
 						//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
-						(ri.date_last_seen  > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
-
+						(ri.date_last_seen  > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));*/
+						
+is_match := le.cellphone = ri.phone and le.did = ri.did and
+						//only use cellphones and non-cellphones when the date_last_seen is within 1 year
+						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
+						(ri.dt_last_seen  > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
 
 FileOne_Verified_Above_rule := if(is_match and le.in_flag, true, false);
 FileOne_Verified_Below_rule := if(is_match and ~le.in_flag, true, false);
@@ -110,14 +119,21 @@ self := le;
 end;
 
 
-file1_match_ := join(distribute(ins_match (did > 0), hash(did)),
+/*file1_match_ := join(distribute(ins_match (did > 0), hash(did)),
 								  dedup(sort(distribute(file1, hash(pin_did)), pin_did, phone_digits, -date_last_seen, local), pin_did, phone_digits, local),
 									left.cellphone[8..10] = right.phone_digits and
 									left.did = right.pin_did,
 									t_file1_match(left, right),
 									local,
-									left outer);
+									left outer);*/
 
+file1_match_ := join(distribute(ins_match (did > 0), hash(did)),
+								  dedup(sort(distribute(file1, hash(did)), did, phone, -dt_last_seen, local), did, phone, local),
+									left.cellphone = right.phone and
+									left.did = right.did,
+									t_file1_match(left, right),
+									local,
+									left outer);
 file1_match := file1_match_ + ins_match(did = 0);
 
 match_ai (unsigned rules):= phonesplus_v2.Translation_Codes.fFlagIsOn(rules, phonesplus_v2.Translation_Codes.rules_bitmap_code('Ins-Verified-Above'));

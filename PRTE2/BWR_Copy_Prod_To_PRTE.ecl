@@ -1,4 +1,4 @@
-//This process copies all the keys for a chosen datasets from production to
+﻿//This process copies all the keys for a chosen datasets from production to
 //the current system, renames them to start with 'PRTE::KEY::', and puts them 
 //in superfiles.  If the superfiles do not exist they are created.
 
@@ -21,9 +21,7 @@ Export BWR_Copy_Prod_To_PRTE := Function
 				{'TelcordiaTpmKeys'},
 				{'FCRA_TelcordiaTpmKeys'},
 				{'Vina_VinKeys'},
-				{'TestSeedKeys'},
-				{'PhonesMetadataKeys'},
-				{'PhoneFraudKeys'}
+				{'TestSeedKeys'}
 				],
 				{string datasetName});
 /////////////////////////////////////////////////////////////////////////

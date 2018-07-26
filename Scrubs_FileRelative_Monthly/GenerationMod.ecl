@@ -1,0 +1,248 @@
+﻿// Machine-readable versions of the spec file and subsets thereof
+IMPORT SALT39;
+EXPORT GenerationMod := MODULE(SALT39.iGenerationMod)
+ 
+  // SALT Version info
+  EXPORT salt_VERSION := 'V3.9.0';
+  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
+ 
+  // Core module configuration values
+  EXPORT spc_MODULE := 'Scrubs_FileRelative_Monthly';
+  EXPORT spc_NAMESCOPE := '';
+  EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
+  EXPORT spc_IDNAME := ''; // cluster id (input)
+  EXPORT spc_IDFIELD := ''; // cluster id (output)
+  EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'File';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,type,confidence,did1,did2,cohabit_score,cohabit_cnt,coapt_score,coapt_cnt,copobox_score,copobox_cnt,cossn_score,cossn_cnt,copolicy_score,copolicy_cnt,coclaim_score,coclaim_cnt,coproperty_score,coproperty_cnt,bcoproperty_score,bcoproperty_cnt,coforeclosure_score,coforeclosure_cnt,bcoforeclosure_score,bcoforeclosure_cnt,colien_score,colien_cnt,bcolien_score,bcolien_cnt,cobankruptcy_score,cobankruptcy_cnt,bcobankruptcy_score,bcobankruptcy_cnt,covehicle_score,covehicle_cnt,coexperian_score,coexperian_cnt,cotransunion_score,cotransunion_cnt,coenclarity_score,coenclarity_cnt,coecrash_score,coecrash_cnt,bcoecrash_score,bcoecrash_cnt,cowatercraft_score,cowatercraft_cnt,coaircraft_score,coaircraft_cnt,comarriagedivorce_score,comarriagedivorce_cnt,coucc_score,coucc_cnt,lname_score,phone_score,dl_nbr_score,total_cnt,total_score,cluster,generation,gender,lname_cnt,rel_dt_first_seen,rel_dt_last_seen,overlap_months,hdr_dt_first_seen,hdr_dt_last_seen,age_first_seen,isanylnamematch,isanyphonematch,isearlylnamematch,iscurrlnamematch,ismixedlnamematch,ssn1,ssn2,dob1,dob2,current_lname1,current_lname2,early_lname1,early_lname2,addr_ind1,addr_ind2,r2rdid,r2cnt,personal,business,other,title';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
+ 
+  // The entire spec file
+  EXPORT spcString :=
+    'OPTIONS:-gh\n'
+    + 'MODULE:Scrubs_FileRelative_Monthly\n'
+    + 'FILENAME:File\n'
+    + '//Uncomment up to NINES for internal or external adl\n'
+    + '//IDFIELD:EXISTS:<NameOfIDField>\n'
+    + '//RIDFIELD:<NameOfRidField>\n'
+    + '//RECORDS:<NumberOfRecordsInDataFile>\n'
+    + '//POPULATION:<ExpectedNumberOfEntitiesInDataFile>\n'
+    + '//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>\n'
+    + '//Uncomment Process if doing external adl\n'
+    + '//PROCESS:<ProcessName>\n'
+    + '//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields\n'
+    + '//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking\n'
+    + '//FUZZY can be used to create new types of FUZZY linking\n'
+    + '\n'
+    + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n'
+    + 'FIELDTYPE:Invalid_Num:ALLOW(0123456789)\n'
+    + '\n'
+    + 'FIELDTYPE:type:LIKE(Invalid_Alpha):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:confidence:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:did1:SPACES( ):LIKE(Invalid_Num):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:did2:SPACES( ):LIKE(Invalid_Num):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cohabit_score:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cohabit_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coapt_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coapt_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:copobox_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:copobox_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cossn_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cossn_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:copolicy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:copolicy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coclaim_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coclaim_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coproperty_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coproperty_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoproperty_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoproperty_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coforeclosure_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coforeclosure_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoforeclosure_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoforeclosure_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:colien_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:colien_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcolien_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcolien_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cobankruptcy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cobankruptcy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcobankruptcy_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcobankruptcy_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:covehicle_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:covehicle_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coexperian_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coexperian_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cotransunion_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cotransunion_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coenclarity_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0):WORDS(0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coenclarity_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0):WORDS(0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coecrash_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coecrash_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoecrash_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:bcoecrash_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cowatercraft_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0):WORDS(0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cowatercraft_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coaircraft_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coaircraft_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:comarriagedivorce_score:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:comarriagedivorce_cnt:SPACES( ):LIKE(Invalid_Num):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coucc_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:coucc_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:lname_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2,1,3):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:phone_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,2):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:dl_nbr_score:SPACES( ):ALLOW(-0123456789):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:total_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(1,2):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:total_score:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,3,4):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:cluster:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ_):LENGTHS(4,8,6,7):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:generation:SPACES( ):ALLOW( OSY):LENGTHS(1,2,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:gender:SPACES( ):ALLOW( FM):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:lname_cnt:SPACES( ):LIKE(Invalid_Num):LENGTHS(1,0,2):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:rel_dt_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,8):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:rel_dt_last_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(0,8):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:overlap_months:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:hdr_dt_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(8):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:hdr_dt_last_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(8):WORDS(1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:age_first_seen:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,0,1):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:isanylnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:isanyphonematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:isearlylnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:iscurrlnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:ismixedlnamematch:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:ssn1:SPACES( ):LIKE(Invalid_Num):LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:ssn2:SPACES( ):LIKE(Invalid_Num):LENGTHS(9,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:dob1:SPACES( ):LIKE(Invalid_Num):LENGTHS(8,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:dob2:SPACES( ):LIKE(Invalid_Num):LENGTHS(8,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:current_lname1:SPACES( ):ALLOW(-ABCDEFGHIJKLMNOPQRSTUVWXYZ):WORDS(1,2):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:current_lname2:SPACES( ):ALLOW(-ABCDEFGHIJKLMNOPQRSTUVWXYZ):WORDS(1,2):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:early_lname1:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,2):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:early_lname2:SPACES( ):LIKE(Invalid_Alpha):WORDS(1,2):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:addr_ind1:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:addr_ind2:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:r2rdid:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:r2cnt:SPACES( ):LIKE(Invalid_Num):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:personal:SPACES( ):ALLOW( 01):LENGTHS(1,0):WORDS(1,0):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:business:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:other:SPACES( ):ALLOW( 01):LENGTHS(0,1):WORDS(0,1):ONFAIL(CLEAN)\n'
+    + 'FIELDTYPE:title:SPACES( ):LIKE(Invalid_Num):LENGTHS(2,1):WORDS(1):ONFAIL(CLEAN)\n'
+    + '\n'
+    + '\n'
+    + 'FIELD:type:LIKE(type):TYPE(STRING15):0,0\n'
+    + 'FIELD:confidence:LIKE(confidence):TYPE(STRING10):0,0\n'
+    + 'FIELD:did1:LIKE(did1):TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:did2:LIKE(did2):TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:cohabit_score:LIKE(cohabit_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cohabit_cnt:LIKE(cohabit_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coapt_score:LIKE(coapt_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coapt_cnt:LIKE(coapt_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:copobox_score:LIKE(copobox_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:copobox_cnt:LIKE(copobox_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cossn_score:LIKE(cossn_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cossn_cnt:LIKE(cossn_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:copolicy_score:LIKE(copolicy_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:copolicy_cnt:LIKE(copolicy_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coclaim_score:LIKE(coclaim_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coclaim_cnt:LIKE(coclaim_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coproperty_score:LIKE(coproperty_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coproperty_cnt:LIKE(coproperty_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoproperty_score:LIKE(bcoproperty_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoproperty_cnt:LIKE(bcoproperty_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coforeclosure_score:LIKE(coforeclosure_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coforeclosure_cnt:LIKE(coforeclosure_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoforeclosure_score:LIKE(bcoforeclosure_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoforeclosure_cnt:LIKE(bcoforeclosure_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:colien_score:LIKE(colien_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:colien_cnt:LIKE(colien_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcolien_score:LIKE(bcolien_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcolien_cnt:LIKE(bcolien_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cobankruptcy_score:LIKE(cobankruptcy_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cobankruptcy_cnt:LIKE(cobankruptcy_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcobankruptcy_score:LIKE(bcobankruptcy_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcobankruptcy_cnt:LIKE(bcobankruptcy_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:covehicle_score:LIKE(covehicle_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:covehicle_cnt:LIKE(covehicle_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coexperian_score:LIKE(coexperian_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coexperian_cnt:LIKE(coexperian_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cotransunion_score:LIKE(cotransunion_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cotransunion_cnt:LIKE(cotransunion_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coenclarity_score:LIKE(coenclarity_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coenclarity_cnt:LIKE(coenclarity_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coecrash_score:LIKE(coecrash_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coecrash_cnt:LIKE(coecrash_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoecrash_score:LIKE(bcoecrash_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:bcoecrash_cnt:LIKE(bcoecrash_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cowatercraft_score:LIKE(cowatercraft_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cowatercraft_cnt:LIKE(cowatercraft_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coaircraft_score:LIKE(coaircraft_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coaircraft_cnt:LIKE(coaircraft_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:comarriagedivorce_score:LIKE(comarriagedivorce_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:comarriagedivorce_cnt:LIKE(comarriagedivorce_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coucc_score:LIKE(coucc_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:coucc_cnt:LIKE(coucc_cnt):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:lname_score:LIKE(lname_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:phone_score:LIKE(phone_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:dl_nbr_score:LIKE(dl_nbr_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:total_cnt:LIKE(total_cnt):TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:total_score:LIKE(total_score):TYPE(INTEGER2):0,0\n'
+    + 'FIELD:cluster:LIKE(cluster):TYPE(STRING10):0,0\n'
+    + 'FIELD:generation:LIKE(generation):TYPE(STRING2):0,0\n'
+    + 'FIELD:gender:LIKE(gender):TYPE(STRING1):0,0\n'
+    + 'FIELD:lname_cnt:LIKE(lname_cnt):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:rel_dt_first_seen:LIKE(rel_dt_first_seen):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:rel_dt_last_seen:LIKE(rel_dt_last_seen):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:overlap_months:LIKE(overlap_months):TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:hdr_dt_first_seen:LIKE(hdr_dt_first_seen):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:hdr_dt_last_seen:LIKE(hdr_dt_last_seen):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:age_first_seen:LIKE(age_first_seen):TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:isanylnamematch:LIKE(isanylnamematch):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:isanyphonematch:LIKE(isanyphonematch):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:isearlylnamematch:LIKE(isearlylnamematch):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:iscurrlnamematch:LIKE(iscurrlnamematch):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:ismixedlnamematch:LIKE(ismixedlnamematch):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:ssn1:LIKE(ssn1):TYPE(STRING9):0,0\n'
+    + 'FIELD:ssn2:LIKE(ssn2):TYPE(STRING9):0,0\n'
+    + 'FIELD:dob1:LIKE(dob1):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:dob2:LIKE(dob2):TYPE(UNSIGNED4):0,0\n'
+    + 'FIELD:current_lname1:LIKE(current_lname1):TYPE(STRING28):0,0\n'
+    + 'FIELD:current_lname2:LIKE(current_lname2):TYPE(STRING28):0,0\n'
+    + 'FIELD:early_lname1:LIKE(early_lname1):TYPE(STRING28):0,0\n'
+    + 'FIELD:early_lname2:LIKE(early_lname2):TYPE(STRING28):0,0\n'
+    + 'FIELD:addr_ind1:LIKE(addr_ind1):TYPE(STRING2):0,0\n'
+    + 'FIELD:addr_ind2:LIKE(addr_ind2):TYPE(STRING2):0,0\n'
+    + 'FIELD:r2rdid:LIKE(r2rdid):TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:r2cnt:LIKE(r2cnt):TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:personal:LIKE(personal):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:business:LIKE(business):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:other:LIKE(other):TYPE(BOOLEAN1):0,0\n'
+    + 'FIELD:title:LIKE(title):TYPE(UNSIGNED1):0,0\n'
+    + '//CONCEPT statements should be used to group together interellated fields; such as address\n'
+    + '//RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
+    + '//SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'
+    + '//LINKPATH is used to define access paths for external linking'
+    ;
+ 
+  // Structured values
+  EXPORT linkpaths := DATASET([
+    ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
+ 
+END;
+

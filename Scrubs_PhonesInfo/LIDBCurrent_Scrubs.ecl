@@ -1,6 +1,6 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT39,STD;
 EXPORT LIDBCurrent_Scrubs := MODULE
-
+ 
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 2;
   EXPORT NumRulesFromFieldType := 2;
@@ -17,8 +17,8 @@ EXPORT LIDBCurrent_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(LIDBCurrent_Layout_PhonesInfo) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.reference_id_Invalid := LIDBCurrent_Fields.InValid_reference_id((SALT38.StrType)le.reference_id);
-    SELF.phone_Invalid := LIDBCurrent_Fields.InValid_phone((SALT38.StrType)le.phone);
+    SELF.reference_id_Invalid := LIDBCurrent_Fields.InValid_reference_id((SALT39.StrType)le.reference_id);
+    SELF.phone_Invalid := LIDBCurrent_Fields.InValid_phone((SALT39.StrType)le.phone);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -65,8 +65,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT39.StrType ErrorMessage;
+    SALT39.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -77,7 +77,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.phone_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'reference_id','phone','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_RefID','Invalid_Num','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.reference_id,(SALT38.StrType)le.phone,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.reference_id,(SALT39.StrType)le.phone,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,2,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -85,7 +85,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(LIDBCurrent_Layout_PhonesInfo) prevDS = DATASET([], LIDBCurrent_Layout_PhonesInfo), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -135,19 +135,19 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
     END;
     j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
-
+ 
     // field population stats
     mod_hygiene := LIDBCurrent_hygiene(PROJECT(h, LIDBCurrent_Layout_PhonesInfo));
     hygiene_summaryStats := mod_hygiene.Summary('');
@@ -155,7 +155,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -171,9 +171,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := '';
     END;
     FieldPopStats := NORMALIZE(hygiene_summaryStats,2,xNormHygieneStats(LEFT,COUNTER,'POP'));
-
+ 
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -183,7 +183,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := 0;
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
-
+ 
     mod_Delta := LIDBCurrent_Delta(prevDS, PROJECT(h, LIDBCurrent_Layout_PhonesInfo));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),2,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
@@ -192,33 +192,33 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
     DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
     DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
-
+ 
     RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
 END;
-
+ 
 EXPORT StandardStats(DATASET(LIDBCurrent_Layout_PhonesInfo) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
-
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, LIDBCurrent_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+ 
+  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, LIDBCurrent_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
-
+ 
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
   tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
-
+ 
   scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
                                                DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
-
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+ 
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;

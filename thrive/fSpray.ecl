@@ -1,8 +1,8 @@
-import lib_fileservices,_control,lib_stringlib,Versioncontrol;
+﻿import lib_fileservices,_control,lib_stringlib,Versioncontrol;
 
 export fSpray(string version, boolean pUseProd = false)	:=	module
 export pd := DATASET([
- 	{'bctlpedata11.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+ 	{_control.IPAddress.bctlpedata11	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_2/thrive/build/'+version[..8]+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'*PD*.csv'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      
@@ -18,7 +18,7 @@ export pd := DATASET([
 
 
 export lt := DATASET([
- 	{'bctlpedata11.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+ 	{_control.IPAddress.bctlpedata11	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_2/thrive/build/'+version[..8]+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'*LT*.csv'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      

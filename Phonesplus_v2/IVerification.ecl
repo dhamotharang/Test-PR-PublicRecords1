@@ -1,19 +1,19 @@
-/* 1.5	R	Requirement: Insurance Phone Verification Append 
-An extract from the “Boca” data platform shall be created, sent to the “Insurance” data platform for phone verification, and loaded in the “Boca” data platform according to the following specifications:
-1.	The “Boca” extract file shall contain the following information:
+﻿/* 1.5	R	Requirement: Insurance Phone Verification Append 
+An extract from the Boca data platform shall be created, sent to the Insurance data platform for phone verification, and loaded in the Boca data platform according to the following specifications:
+1.	The Boca extract file shall contain the following information:
         LexID, Phone, Source Code (This is an indicator of how the phone was determined to be associated with the given LexID)
-2.	The “Boca” extract file shall contain phone / LexID combinations from the following sources:
+2.	The Boca extract file shall contain phone / LexID combinations from the following sources:
         PhonesPlus and GONG / Electronic Directory Assistance
-3.	The “Boca” extract file shall gather phone / LexID combinations according to the following logic:
+3.	The Boca extract file shall gather phone / LexID combinations according to the following logic:
        	Phone / LexID, Phone / Spouse, Phone / Household ID
-4.	Each record in the “Boca” extract file shall be used to search the “Insurance” data platform by LexID to determine if the “Insurance” data platform verifies the given phone is associated with the given LexID.
-5.	Only the contributory, non public record sourced information in the “Insurance” data platform shall be used to determine if the “Insurance” data platform verifies the phone is associated with the given LexID.
+4.	Each record in the Boca extract file shall be used to search the Insurance data platform by LexID to determine if the Insurance data platform verifies the given phone is associated with the given LexID.
+5.	Only the contributory, non public record sourced information in the Insurance data platform shall be used to determine if the Insurance data platform verifies the phone is associated with the given LexID.
 6.	This gateway shall utilize the Insurance Header restriction table to exclude the use of information from restricted customers.
 7.	Each Source Code that pertains to a Phone / LexID combination shall be preserved.
 8.	For each Phone / LexID combination that is verified by the Insurance Header, the date the Insurance Header first saw the LexID / Phone combination and the date the Insurance Header last saw the LexID / Phone combination shall be preserved.
-9.	The “Boca” extract file with the appended “Insurance” data platform verification information shall be fabricated in the “Boca” data platform as a new file and shall be used to populate the Insurance Header Verification attribute in the Phone Shell.
+9.	The Boca extract file with the appended Insurance data platform verification information shall be fabricated in the Boca data platform as a new file and shall be used to populate the Insurance Header Verification attribute in the Phone Shell.
 10.	The Insurance phone verification process shall be executed on at least a monthly basis but weekly or with each PhonesPlus update is preferred.
-11.	The field names, internal documentation, and external documentation related to this process shall refer to this capability as “internally corroborated” and shall not mention the use of the Insurance header.
+11.	The field names, internal documentation, and external documentation related to this process shall refer to this capability as internally corroborated and shall not mention the use of the Insurance header.
 12.	All products that leverage the Insurance Phone verification asset shall certify and log a valid GLB permissible purpose prior to accessing the asset.
 
 Implementation:
@@ -23,7 +23,7 @@ Implementation:
 4- Keep history of the data that has been verified
 */
 
-import gong_v2, doxie, ut,didville;
+import gong_v2, doxie, ut,didville,_Control;
 shared reformat(ds, ds_source, record_type, did_field, orig_did_field, phone_field) := functionmacro
 #uniquename(t_reformat)
 File_Iverification.layout t_reformat(ds le) := transform
@@ -159,7 +159,7 @@ iver_rec := RECORD
   boolean is_latest;
  END;
 
-remote_ds := dataset('~foreign::10.194.12.1::thor400_64::persist::for_phone_verification', iver_rec , thor);
+remote_ds := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 
 remote_ds_t := project(remote_ds, {iver_rec, unsigned hhid := 0});
 

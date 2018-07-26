@@ -1,0 +1,15 @@
+﻿OPTIONS:-gh 
+MODULE:Scrubs_Phonesinfo
+FILENAME:Phonesinfo
+NAMESCOPE:DeactRaw2
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 \n)
+FIELDTYPE:Invalid_TimeStamp:ALLOW(0123456789- \n) 
+
+FIELD:msisdn:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:timestamp:LIKE(Invalid_TimeStamp):TYPE(STRING):0,0
+FIELD:changeid:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:operatorid:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:msisdneid:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:msisdnnew:LIKE(Invalid_Num):TYPE(STRING):0,0
+FIELD:filename:TYPE(STRING255):0,0

@@ -1,6 +1,52 @@
-export Layout_In_TX_Harris :=
+﻿export Layout_In_TX_Harris := MODULE
 
-record
+export raw := record
+string13 CASNUM;
+string4  CRT;
+string3  CS;
+string9  FILDT;
+string9  JUDDT;
+string31 CASETYPE;
+string41 STYLE_PLAINTIFF;
+string41 STYLE_DEFENDANT;
+string51 PLAINTIFF_NAME;
+string7  pltfSTRNM;
+string36 pltfSTRNAM;
+string5  pltfAPT;
+string36 pltfCITY;
+string3  pltfST;
+string10 pltfZIP;
+string11 pltfPHN;
+string51 pltATY_NAME;
+string9  pltATY_BAR;
+string7  pltatySTRNM;
+string36 pltatySTRNAM;
+string5  pltatyAPT;
+string36 pltatyCITY;
+string3  pltatyST;
+string10 pltatyZIP;
+string11 pltatyPHN;
+string51 DEFENDANT_NAME;
+string7  defSTRNM;
+string36 defSTRNAM;
+string5  defAPT;
+string36 defCITY;
+string3  defST;
+string10 defZIP;
+string11 defPHN;
+string51 defATY_NAME;
+string9  defATY_BAR;
+string7  defATYSTRNM;
+string36 defATYSTRNAM;
+string5  defATYAPT;
+string36 defATYCITY;
+string3  defATYST;
+string10 defATYZIP;
+string11 defATYPHN;
+string96 unk_code;
+end;
+
+export common := record
 string filler1;
 string filler2;
 string filler3;
@@ -46,4 +92,6 @@ string defATYCITY;
 string defATYST;
 string defATYZIP;
 string defATYPHN;
+end;
+
 end;

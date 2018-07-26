@@ -1,4 +1,4 @@
-Import Data_Services, PRTE2_Liens, liensv2, Doxie, ut;
+﻿Import Data_Services, PRTE2_Liens, liensv2, Doxie, ut;
 
 export 	Key_liens_main_ID(boolean isFCRA = false) := FUNCTION
 
@@ -52,18 +52,36 @@ new_layout_liens_main := RECORD, MAXLENGTH(32766)
 	BOOLEAN	bCBFlag	:=	FALSE;
 	UNSIGNED8 persistent_record_id :=0 ; 
 	DATASET(Liensv2.layout_liens_main_module.layout_filing_status) filing_status;
+	STRING2  Filing_Type_ID  :=       '';
+  STRING8  Collection_Date :=       '';
+  STRING45 CaseLinkID      :=       '';
+  STRING50 TMSID_old       :=       '';
+  STRING50 RMSID_old       :=       '';
+  BOOLEAN  CaseLinkID_Prop_Flag :=  FALSE;
 END;
 
 get_recs_newLayout			:=	PROJECT(get_recs,
 															TRANSFORM(new_layout_liens_main,
 																SELF.bCBFlag	:=	FALSE;
-																SELF					:=	LEFT;
+															  Self.Filing_Type_ID  :=       '';
+                                Self.Collection_Date :=       '';
+                                Self.CaseLinkID      :=       '';
+                                Self.TMSID_old       :=       '';
+                                Self.RMSID_old       :=       '';
+                                Self.CaseLinkID_Prop_Flag :=  FALSE;
+																SELF			          	:=	LEFT;
 															)
 														);
 get_recs_newLayout_FCRA	:=	PROJECT(get_recs,
 															TRANSFORM(new_layout_liens_main,
 																SELF.bCBFlag	:=	TRUE;
-																SELF					:=	LEFT;
+																Self.Filing_Type_ID  :=       '';
+                                Self.Collection_Date :=       '';
+                                Self.CaseLinkID      :=       '';
+                                Self.TMSID_old       :=       '';
+                                Self.RMSID_old       :=       '';
+                                Self.CaseLinkID_Prop_Flag :=  FALSE;
+																SELF					       :=	LEFT;
 															)
 														);
 														

@@ -5,7 +5,9 @@ IMPORT STD;
 
 EXPORT Functions := MODULE
 
-		EXPORT Pick1(STRING s1,STRING s2) := IF(s1='',s2,s1);
+		EXPORT Pick1(STRING s1,STRING s2) := IF(TRIM(s1,left,right)='',TRIM(s2),TRIM(s1));
+		EXPORT Pick1Int(INTEGER s1,INTEGER s2) := IF(s1=0,s2,s1);
+		EXPORT Pick1Unsign(UNSIGNED s1,UNSIGNED s2) := IF(s1=0,s2,s1);
 		EXPORT appendIFDot2(STRING s1,STRING s2) := IF(TRIM(s1)<>'' AND TRIM(S2)<>'', TRIM(s1)+'.'+TRIM(s2),Pick1(s1,s2));
 		EXPORT appendIFDot4(STRING s1,STRING s2,STRING s3,STRING s4) := appendIFDot2(appendIFDot2(s1,s2),appendIFDot2(s3,s4));
 

@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take CO Uniform Consumer raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI, SCANK, and PL_BASE development.
 //************************************************************************************************************* */	
@@ -54,6 +54,8 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		STRING4		ADDR_ZIP4_1;
 		STRING1		ADDR_BUS_IND;
 		UNSIGNED1	OOC_IND_1;
+		STRING80  NAME_OFFICE;
+		STRING2   OFFICE_PARSE;
 	END;
 	
 	//Reformat and clean addresses
@@ -89,15 +91,16 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 															 Address.IsCityName(temp_one_name) OR temp_one_name IN city_names   				=> temp_one_name,
 															 '');
 		temp_addr						:= REGEXREPLACE(',$',TRIM(REGEXREPLACE(TRIM(tempcity)+'[ ]*,$', temp_addr_city,''),LEFT,RIGHT),'');
-		address							:= TRIM(temp_addr,LEFT,RIGHT);
+		address							:= TRIM(REGEXREPLACE('C/O.*$',temp_addr,''),LEFT,RIGHT);
 		citystatezip				:= tempcity + ', ' + tempstate + ' ' + temp_zip;
 		clnAddress					:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(address,citystatezip);
-		SELF.ADDR_ADDR1_1		:= IF(SELF.OOC_IND_1=1,
-		                          REGEXFIND('(^.{30,45})[ |,](.*$)',address1_1,1),
-															StringLib.StringCleanSpaces(TRIM(clnAddress[1..10],LEFT,RIGHT)+' '+TRIM(clnAddress[11..12],LEFT,RIGHT)+' '+TRIM(clnAddress[13..40],LEFT,RIGHT)+' '+TRIM(clnAddress[41..44],LEFT,RIGHT)+' '+TRIM(clnAddress[45..46],LEFT,RIGHT)));
-		SELF.ADDR_ADDR2_1		:= IF(SELF.OOC_IND_1=1,
-		                          REGEXFIND('(^.{30,45})[ |,](.*$)',address1_1,2),
-															StringLib.StringCleanSpaces(TRIM(clnAddress[47..56],LEFT,RIGHT)+' '+TRIM(clnAddress[57..64],LEFT,RIGHT))); 
+		
+		tmpADDR_ADDR1_1			:= StringLib.StringCleanSpaces(TRIM(clnAddress[1..10],LEFT,RIGHT)+' '+TRIM(clnAddress[11..12],LEFT,RIGHT)+' '+TRIM(clnAddress[13..40],LEFT,RIGHT)
+		                        +' '+TRIM(clnAddress[41..44],LEFT,RIGHT)+' '+TRIM(clnAddress[45..46],LEFT,RIGHT));																	
+	  tmpADDR_ADDR2_1			:= StringLib.StringCleanSpaces(TRIM(clnAddress[47..56],LEFT,RIGHT)+' '+TRIM(clnAddress[57..64],LEFT,RIGHT));
+
+		SELF.ADDR_ADDR1_1		:= IF(SELF.OOC_IND_1=1,REGEXFIND('(^.{30,45})[ |,](.*$)',address1_1,1),tmpADDR_ADDR1_1);
+		SELF.ADDR_ADDR2_1		:= IF(SELF.OOC_IND_1=1,REGEXFIND('(^.{30,45})[ |,](.*$)',address1_1,2),tmpADDR_ADDR2_1); 
 		SELF.ADDR_CITY_1		:= IF(SELF.OOC_IND_1=1,'',
 		                          IF(TRIM(clnAddress[65..89])='',tempcity,TRIM(clnAddress[65..89])));
 		SELF.ADDR_STATE_1		:= IF(SELF.OOC_IND_1=1,'',
@@ -106,7 +109,15 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		                          IF(TRIM(clnAddress[117..121])='',temp_zip,TRIM(clnAddress[117..121])));
 		SELF.ADDR_ZIP4_1		:= IF(SELF.OOC_IND_1=1,'',TRIM(clnAddress[122..125]));
 		SELF.ADDR_BUS_IND		:= IF(address1_1<>'','B','');
-		SELF								:= L;
+		
+				//Extract Office name from address
+		TmpOffice  := IF(regexfind('C/O.*$',temp_addr),regexfind('^.(.*) C/O (.*)',temp_addr,2),'');
+		SELF.NAME_OFFICE := TRIM(TmpOffice,LEFT,RIGHT);
+		tempOffParse     := MAP(prof_license_mari.func_is_company(TmpOffice)= TRUE AND TmpOffice != ' '=> 'GR',
+											 		  prof_license_mari.func_is_company(TmpOffice)= FALSE AND TmpOffice != ' ' => 'MD',
+														'');
+		SELF.OFFICE_PARSE:= tempOffParse; 		
+		SELF						 := L;
 	END;
 
 	clean_uccc_3 := PROJECT(clean_uccc_2, reformatAddress(LEFT));                
@@ -157,7 +168,8 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		
 	  // Identified DBA names
 		SELF.NAME_ORG_ORIG		:= TrimOrgName;
-		SELF.NAME_MARI_ORG		:= IF(SELF.NAME_ORG != '',getCorpOnly,'');
+		SELF.NAME_OFFICE      := L.NAME_OFFICE;
+		SELF.NAME_MARI_ORG		:= IF(SELF.NAME_ORG != '',getCorpOnly,SELF.NAME_OFFICE);
 		SELF.NAME_FORMAT			:= 'F';
 	
 	  // Identified DBA names
@@ -177,6 +189,7 @@ EXPORT map_COS0632_conversion(STRING pVersion) := FUNCTION
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 		SELF.NAME_DBA_ORIG		:= IF(SELF.NAME_DBA = '','',std_org_name[slashchar+1..]);		 //get names without DBA names
 		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != '',temp_dba,'');
+		
 		
 		//All records from website are Supervised Lender Licenses. Replace license_type with 'SL'	
 		SELF.STD_LICENSE_TYPE	:= 'SL';

@@ -1,8 +1,8 @@
-IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
+﻿IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;
 	   
 EXPORT spray_NJS0033(STRING filedate) := MODULE
 	
-	#workunit('name','Spray NJS0033');
+	#workunit('name','Yogurt: Spray NJS0033');
 	SHARED code						        := 'NJS0033';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';
   SHARED superfile_apr 					:= destination + 'using::' + 'apr';

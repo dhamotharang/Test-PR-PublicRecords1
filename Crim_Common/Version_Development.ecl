@@ -1,1 +1,1 @@
-﻿export Version_Development := '20180110';
+﻿export Version_Development := '20180705';

@@ -1,4 +1,4 @@
-IMPORT STD, GlobalWatchLists, GlobalWatchLists_Preprocess, ut, Data_Services;
+﻿IMPORT STD, GlobalWatchLists, GlobalWatchLists_Preprocess, ut, Data_Services;
 
 //Base File
 ProdBase := dataset('~thor_data400::base::globalwatchlists',Globalwatchlists.Layout_GlobalWatchLists,flat);
@@ -17,7 +17,7 @@ DeniedPersonsraw := GlobalWatchLists_Preprocess.Files.dsDeniedPersons; //raw
 DeniedPersonsbase:= ProdBase(source = 'US Bureau of Industry and Security - Denied Person List');
 
 jDP := join(DeniedPersonsraw,DeniedPersonsbase,
-            STD.Str.FindReplace(if(length(TRIM(left.Name, left, right)) > 54
+            STD.Str.FindReplace(if(length(TRIM(left.Name, left, right)) > 54 and STD.Str.Find(TRIM(left.Name, left, right), ',', 1) > 1
 																,TRIM(left.Name, left, right)[1..STD.Str.Find(TRIM(left.Name, left, right), ',', 1)-1]
 																,TRIM(left.Name, left, right)), '"', '')[1..10] = trim(right.orig_pty_name)[1..10] and 
 						STD.date.ConvertDateFormatMultiple(left.eff_date,fmtsin,fmtout) = right.effective_date,

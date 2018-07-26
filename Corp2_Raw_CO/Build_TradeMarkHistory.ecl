@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_co, tools, versioncontrol;
+﻿IMPORT corp2, corp2_mapping, corp2_raw_co, tools, versioncontrol;
 
 EXPORT Build_TradeMarkHistory(
 	STRING		pFileDate,
@@ -16,7 +16,7 @@ EXPORT Build_TradeMarkHistory(
 	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMExpired   	 		= Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmExpired.logical,
 	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMRegistration 	= Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmRegistration.logical,
 	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMRenewal   			= Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmRenewal.logical,
-	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMTransfer   	 	= Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmTransfer.logical,
+	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMTransfer   	 	= if(Corp2_Raw_CO._Flags(pfiledate,ptmfiledate,pUseProd).Input.tmTransfer, Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmTransfer.logical, dataset([], Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)),
 	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMWithdraw   	 	= Corp2_Raw_CO.Files(pfiledate,ptmfiledate,pversion,pUseProd).Input.tmWithdraw.logical,
 	DATASET(Corp2_Raw_CO.Layouts.TradeMarkLayoutIn)		pTMHistory		 	 	= IF(Corp2_Raw_CO._Flags().Base.TMHistory, Corp2_Raw_CO.Files(,,,pUseOtherEnvironment := FALSE).Base.TMHistory.qa, DATASET([], Corp2_Raw_CO.Layouts.TradeMarkLayoutIn))
 ) := MODULE

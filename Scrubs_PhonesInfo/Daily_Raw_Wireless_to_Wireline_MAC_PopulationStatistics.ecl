@@ -1,9 +1,9 @@
-﻿
+﻿ 
 EXPORT Daily_Raw_Wireless_to_Wireline_MAC_PopulationStatistics(infile,Ref='',Input_phone = '',Input_lf = '',Input_filename = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_PhonesInfo;
+  IMPORT SALT39,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -13,13 +13,13 @@ EXPORT Daily_Raw_Wireless_to_Wireline_MAC_PopulationStatistics(infile,Ref='',Inp
     #ELSE
         IF( le.Input_phone = (TYPEOF(le.Input_phone))'','',':phone')
     #END
-
+ 
 +    #IF( #TEXT(Input_lf)='' )
       '' 
     #ELSE
         IF( le.Input_lf = (TYPEOF(le.Input_lf))'','',':lf')
     #END
-
+ 
 +    #IF( #TEXT(Input_filename)='' )
       '' 
     #ELSE

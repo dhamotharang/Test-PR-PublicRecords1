@@ -1,9 +1,9 @@
-IMPORT FraudGovPlatform;
-EXPORT InvalidDelimiterErrorReport(string fname):=module
+﻿IMPORT FraudGovPlatform;
+EXPORT InvalidDelimiterErrorReport(string fname, string pSeparator, string pTerminator):=module
 
-rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([]),quote([]),terminator(Mod_Sets.validTerminators))));
+rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([]),quote([]),terminator(pTerminator))));
 
-		dDelimiter	:=Mod_Stats.ValidateDelimiter(fname).ValidationResults(ReportName='delimiter');
+		dDelimiter	:=Mod_Stats.ValidateDelimiter(fname,pSeparator,pTerminator).ValidationResults(ReportName='delimiter');
 
 		InvalidDelimiterFound:=exists( dDelimiter(err='F1') );
 
@@ -74,7 +74,7 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 										+ 'F1 = ERROR - NO VALID DELIMITER\n'
 										;
 
-EXPORT BODY := fname
+EXPORT BODY := if(regexfind('inquirylog',fname,nocase),regexreplace('\\_[a-z0-9]*',fname,'',nocase),fname)
 						+'\n'+ HeaderLine1
 						+'\n'+ HeaderLine2
 						+'\n'+ HeaderLine3

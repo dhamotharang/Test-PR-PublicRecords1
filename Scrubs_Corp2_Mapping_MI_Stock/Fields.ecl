@@ -1,224 +1,230 @@
-IMPORT ut,SALT30;
+﻿IMPORT SALT38;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
+EXPORT NumFields := 40;
+ 
 // Processing for each FieldType
-EXPORT SALT30.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_charter_nbr','invalid_stock_authorized_nbr');
-EXPORT FieldTypeNum(SALT30.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_charter_nbr' => 6,'invalid_stock_authorized_nbr' => 7,0);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_charter_nbr','invalid_stock_authorized_nbr');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_charter_nbr' => 6,'invalid_stock_authorized_nbr' => 7,0);
  
-EXPORT MakeFT_invalid_corp_key(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+EXPORT MakeFT_invalid_corp_key(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_corp_key(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 4));
-EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT30.HygieneErrors.NotLength('4..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_key(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 4));
+EXPORT InValidMessageFT_invalid_corp_key(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT38.HygieneErrors.NotLength('4..'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corp_vendor(SALT30.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corp_vendor(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corp_vendor(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['26']);
-EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('26'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corp_vendor(SALT38.StrType s) := WHICH(((SALT38.StrType) s) NOT IN ['26']);
+EXPORT InValidMessageFT_invalid_corp_vendor(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInEnum('26'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_state_origin(SALT30.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_state_origin(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_state_origin(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['MI']);
-EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('MI'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_state_origin(SALT38.StrType s) := WHICH(((SALT38.StrType) s) NOT IN ['MI']);
+EXPORT InValidMessageFT_invalid_state_origin(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInEnum('MI'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mandatory(SALT30.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mandatory(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mandatory(SALT30.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotLength('1..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mandatory(SALT38.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotLength('1..'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_date(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_date(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0);
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('0123456789'),SALT30.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0);
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_charter_nbr(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+EXPORT MakeFT_invalid_charter_nbr(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_charter_nbr(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT30.HygieneErrors.NotLength('1..'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_charter_nbr(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_charter_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT38.HygieneErrors.NotLength('1..'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_stock_authorized_nbr(SALT30.StrType s0) := FUNCTION
-  s1 := SALT30.stringfilter(s0,'0123456789ABDEFGHILMNORSTQUWX '); // Only allow valid symbols
+EXPORT MakeFT_invalid_stock_authorized_nbr(SALT38.StrType s0) := FUNCTION
+  s1 := SALT38.stringfilter(s0,'0123456789ABDEFGHILMNORSTQUWX '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_stock_authorized_nbr(SALT30.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT30.StringFilter(s,'0123456789ABDEFGHILMNORSTQUWX '))));
-EXPORT InValidMessageFT_invalid_stock_authorized_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInChars('0123456789ABDEFGHILMNORSTQUWX '),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_stock_authorized_nbr(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789ABDEFGHILMNORSTQUWX '))));
+EXPORT InValidMessageFT_invalid_stock_authorized_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789ABDEFGHILMNORSTQUWX '),SALT38.HygieneErrors.Good);
  
-EXPORT SALT30.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','stock_ticker_symbol','stock_exchange','stock_type','stock_class','stock_shares_issued','stock_authorized_nbr','stock_par_value','stock_nbr_par_shares','stock_change_ind','stock_change_date','stock_voting_rights_ind','stock_convert_ind','stock_convert_date','stock_change_in_cap','stock_tax_capital','stock_total_capital','stock_addl_info','stock_stock_description','stock_stock_series','stock_non_par_value_flag','stock_additional_stock','stock_shares_proportion_to_ohio_for_foreign_license','stock_share_credits','stock_authorized_capital','stock_stock_paid_in_capital','stock_pay_higher_stock_fees','stock_actual_amt_invested_in_state','stock_share_exchange_during_merger','stock_date_stock_limit_approved','stock_number_of_shares_paid_for','stock_total_value_of_shares_paid_for','stock_sharesofbeneficialinterest','stock_beneficialsharevalue');
-EXPORT FieldNum(SALT30.StrType fn) := CASE(fn,'corp_key' => 1,'corp_vendor' => 2,'corp_vendor_county' => 3,'corp_vendor_subcode' => 4,'corp_state_origin' => 5,'corp_process_date' => 6,'corp_sos_charter_nbr' => 7,'stock_ticker_symbol' => 8,'stock_exchange' => 9,'stock_type' => 10,'stock_class' => 11,'stock_shares_issued' => 12,'stock_authorized_nbr' => 13,'stock_par_value' => 14,'stock_nbr_par_shares' => 15,'stock_change_ind' => 16,'stock_change_date' => 17,'stock_voting_rights_ind' => 18,'stock_convert_ind' => 19,'stock_convert_date' => 20,'stock_change_in_cap' => 21,'stock_tax_capital' => 22,'stock_total_capital' => 23,'stock_addl_info' => 24,'stock_stock_description' => 25,'stock_stock_series' => 26,'stock_non_par_value_flag' => 27,'stock_additional_stock' => 28,'stock_shares_proportion_to_ohio_for_foreign_license' => 29,'stock_share_credits' => 30,'stock_authorized_capital' => 31,'stock_stock_paid_in_capital' => 32,'stock_pay_higher_stock_fees' => 33,'stock_actual_amt_invested_in_state' => 34,'stock_share_exchange_during_merger' => 35,'stock_date_stock_limit_approved' => 36,'stock_number_of_shares_paid_for' => 37,'stock_total_value_of_shares_paid_for' => 38,'stock_sharesofbeneficialinterest' => 39,'stock_beneficialsharevalue' => 40,0);
+EXPORT SALT38.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','stock_ticker_symbol','stock_exchange','stock_type','stock_class','stock_shares_issued','stock_authorized_nbr','stock_par_value','stock_nbr_par_shares','stock_change_ind','stock_change_date','stock_voting_rights_ind','stock_convert_ind','stock_convert_date','stock_change_in_cap','stock_tax_capital','stock_total_capital','stock_addl_info','stock_stock_description','stock_stock_series','stock_non_par_value_flag','stock_additional_stock','stock_shares_proportion_to_ohio_for_foreign_license','stock_share_credits','stock_authorized_capital','stock_stock_paid_in_capital','stock_pay_higher_stock_fees','stock_actual_amt_invested_in_state','stock_share_exchange_during_merger','stock_date_stock_limit_approved','stock_number_of_shares_paid_for','stock_total_value_of_shares_paid_for','stock_sharesofbeneficialinterest','stock_beneficialsharevalue');
+EXPORT SALT38.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','stock_ticker_symbol','stock_exchange','stock_type','stock_class','stock_shares_issued','stock_authorized_nbr','stock_par_value','stock_nbr_par_shares','stock_change_ind','stock_change_date','stock_voting_rights_ind','stock_convert_ind','stock_convert_date','stock_change_in_cap','stock_tax_capital','stock_total_capital','stock_addl_info','stock_stock_description','stock_stock_series','stock_non_par_value_flag','stock_additional_stock','stock_shares_proportion_to_ohio_for_foreign_license','stock_share_credits','stock_authorized_capital','stock_stock_paid_in_capital','stock_pay_higher_stock_fees','stock_actual_amt_invested_in_state','stock_share_exchange_during_merger','stock_date_stock_limit_approved','stock_number_of_shares_paid_for','stock_total_value_of_shares_paid_for','stock_sharesofbeneficialinterest','stock_beneficialsharevalue');
+EXPORT FieldNum(SALT38.StrType fn) := CASE(fn,'corp_key' => 0,'corp_vendor' => 1,'corp_vendor_county' => 2,'corp_vendor_subcode' => 3,'corp_state_origin' => 4,'corp_process_date' => 5,'corp_sos_charter_nbr' => 6,'stock_ticker_symbol' => 7,'stock_exchange' => 8,'stock_type' => 9,'stock_class' => 10,'stock_shares_issued' => 11,'stock_authorized_nbr' => 12,'stock_par_value' => 13,'stock_nbr_par_shares' => 14,'stock_change_ind' => 15,'stock_change_date' => 16,'stock_voting_rights_ind' => 17,'stock_convert_ind' => 18,'stock_convert_date' => 19,'stock_change_in_cap' => 20,'stock_tax_capital' => 21,'stock_total_capital' => 22,'stock_addl_info' => 23,'stock_stock_description' => 24,'stock_stock_series' => 25,'stock_non_par_value_flag' => 26,'stock_additional_stock' => 27,'stock_shares_proportion_to_ohio_for_foreign_license' => 28,'stock_share_credits' => 29,'stock_authorized_capital' => 30,'stock_stock_paid_in_capital' => 31,'stock_pay_higher_stock_fees' => 32,'stock_actual_amt_invested_in_state' => 33,'stock_share_exchange_during_merger' => 34,'stock_date_stock_limit_approved' => 35,'stock_number_of_shares_paid_for' => 36,'stock_total_value_of_shares_paid_for' => 37,'stock_sharesofbeneficialinterest' => 38,'stock_beneficialsharevalue' => 39,0);
+EXPORT SET OF SALT38.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['ENUM'],[],[],['ENUM'],['ALLOW','CUSTOM'],['ALLOW','LENGTHS'],[],[],[],[],[],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_corp_key(SALT30.StrType s0) := MakeFT_invalid_corp_key(s0);
-EXPORT InValid_corp_key(SALT30.StrType s) := InValidFT_invalid_corp_key(s);
+EXPORT Make_corp_key(SALT38.StrType s0) := MakeFT_invalid_corp_key(s0);
+EXPORT InValid_corp_key(SALT38.StrType s) := InValidFT_invalid_corp_key(s);
 EXPORT InValidMessage_corp_key(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_key(wh);
  
-EXPORT Make_corp_vendor(SALT30.StrType s0) := MakeFT_invalid_corp_vendor(s0);
-EXPORT InValid_corp_vendor(SALT30.StrType s) := InValidFT_invalid_corp_vendor(s);
+EXPORT Make_corp_vendor(SALT38.StrType s0) := MakeFT_invalid_corp_vendor(s0);
+EXPORT InValid_corp_vendor(SALT38.StrType s) := InValidFT_invalid_corp_vendor(s);
 EXPORT InValidMessage_corp_vendor(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_vendor(wh);
  
-EXPORT Make_corp_vendor_county(SALT30.StrType s0) := s0;
-EXPORT InValid_corp_vendor_county(SALT30.StrType s) := FALSE;
+EXPORT Make_corp_vendor_county(SALT38.StrType s0) := s0;
+EXPORT InValid_corp_vendor_county(SALT38.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_vendor_subcode(SALT30.StrType s0) := s0;
-EXPORT InValid_corp_vendor_subcode(SALT30.StrType s) := FALSE;
+EXPORT Make_corp_vendor_subcode(SALT38.StrType s0) := s0;
+EXPORT InValid_corp_vendor_subcode(SALT38.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_subcode(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_state_origin(SALT30.StrType s0) := MakeFT_invalid_state_origin(s0);
-EXPORT InValid_corp_state_origin(SALT30.StrType s) := InValidFT_invalid_state_origin(s);
+EXPORT Make_corp_state_origin(SALT38.StrType s0) := MakeFT_invalid_state_origin(s0);
+EXPORT InValid_corp_state_origin(SALT38.StrType s) := InValidFT_invalid_state_origin(s);
 EXPORT InValidMessage_corp_state_origin(UNSIGNED1 wh) := InValidMessageFT_invalid_state_origin(wh);
  
-EXPORT Make_corp_process_date(SALT30.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_process_date(SALT30.StrType s) := InValidFT_invalid_date(s);
+EXPORT Make_corp_process_date(SALT38.StrType s0) := MakeFT_invalid_date(s0);
+EXPORT InValid_corp_process_date(SALT38.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_corp_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
-EXPORT Make_corp_sos_charter_nbr(SALT30.StrType s0) := MakeFT_invalid_charter_nbr(s0);
-EXPORT InValid_corp_sos_charter_nbr(SALT30.StrType s) := InValidFT_invalid_charter_nbr(s);
+EXPORT Make_corp_sos_charter_nbr(SALT38.StrType s0) := MakeFT_invalid_charter_nbr(s0);
+EXPORT InValid_corp_sos_charter_nbr(SALT38.StrType s) := InValidFT_invalid_charter_nbr(s);
 EXPORT InValidMessage_corp_sos_charter_nbr(UNSIGNED1 wh) := InValidMessageFT_invalid_charter_nbr(wh);
  
-EXPORT Make_stock_ticker_symbol(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_ticker_symbol(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_ticker_symbol(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_ticker_symbol(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_ticker_symbol(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_exchange(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_exchange(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_exchange(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_exchange(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_exchange(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_type(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_type(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_type(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_type(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_class(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_class(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_class(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_class(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_class(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_shares_issued(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_shares_issued(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_shares_issued(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_shares_issued(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_shares_issued(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_authorized_nbr(SALT30.StrType s0) := MakeFT_invalid_stock_authorized_nbr(s0);
-EXPORT InValid_stock_authorized_nbr(SALT30.StrType s) := InValidFT_invalid_stock_authorized_nbr(s);
+EXPORT Make_stock_authorized_nbr(SALT38.StrType s0) := MakeFT_invalid_stock_authorized_nbr(s0);
+EXPORT InValid_stock_authorized_nbr(SALT38.StrType s) := InValidFT_invalid_stock_authorized_nbr(s);
 EXPORT InValidMessage_stock_authorized_nbr(UNSIGNED1 wh) := InValidMessageFT_invalid_stock_authorized_nbr(wh);
  
-EXPORT Make_stock_par_value(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_par_value(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_par_value(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_par_value(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_par_value(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_nbr_par_shares(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_nbr_par_shares(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_nbr_par_shares(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_nbr_par_shares(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_nbr_par_shares(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_change_ind(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_change_ind(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_change_ind(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_change_ind(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_change_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_change_date(SALT30.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_stock_change_date(SALT30.StrType s) := InValidFT_invalid_date(s);
-EXPORT InValidMessage_stock_change_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
+EXPORT Make_stock_change_date(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_change_date(SALT38.StrType s) := 0;
+EXPORT InValidMessage_stock_change_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_voting_rights_ind(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_voting_rights_ind(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_voting_rights_ind(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_voting_rights_ind(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_voting_rights_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_convert_ind(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_convert_ind(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_convert_ind(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_convert_ind(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_convert_ind(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_convert_date(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_convert_date(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_convert_date(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_convert_date(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_convert_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_change_in_cap(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_change_in_cap(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_change_in_cap(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_change_in_cap(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_change_in_cap(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_tax_capital(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_tax_capital(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_tax_capital(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_tax_capital(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_tax_capital(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_total_capital(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_total_capital(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_total_capital(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_total_capital(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_total_capital(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_addl_info(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_addl_info(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_addl_info(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_addl_info(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_addl_info(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_stock_description(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_stock_description(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_stock_description(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_stock_description(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_stock_description(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_stock_series(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_stock_series(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_stock_series(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_stock_series(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_stock_series(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_non_par_value_flag(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_non_par_value_flag(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_non_par_value_flag(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_non_par_value_flag(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_non_par_value_flag(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_additional_stock(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_additional_stock(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_additional_stock(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_additional_stock(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_additional_stock(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_shares_proportion_to_ohio_for_foreign_license(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_shares_proportion_to_ohio_for_foreign_license(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_shares_proportion_to_ohio_for_foreign_license(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_shares_proportion_to_ohio_for_foreign_license(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_shares_proportion_to_ohio_for_foreign_license(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_share_credits(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_share_credits(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_share_credits(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_share_credits(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_share_credits(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_authorized_capital(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_authorized_capital(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_authorized_capital(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_authorized_capital(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_authorized_capital(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_stock_paid_in_capital(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_stock_paid_in_capital(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_stock_paid_in_capital(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_stock_paid_in_capital(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_stock_paid_in_capital(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_pay_higher_stock_fees(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_pay_higher_stock_fees(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_pay_higher_stock_fees(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_pay_higher_stock_fees(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_pay_higher_stock_fees(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_actual_amt_invested_in_state(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_actual_amt_invested_in_state(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_actual_amt_invested_in_state(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_actual_amt_invested_in_state(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_actual_amt_invested_in_state(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_share_exchange_during_merger(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_share_exchange_during_merger(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_share_exchange_during_merger(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_share_exchange_during_merger(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_share_exchange_during_merger(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_date_stock_limit_approved(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_date_stock_limit_approved(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_date_stock_limit_approved(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_date_stock_limit_approved(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_date_stock_limit_approved(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_number_of_shares_paid_for(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_number_of_shares_paid_for(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_number_of_shares_paid_for(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_number_of_shares_paid_for(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_number_of_shares_paid_for(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_total_value_of_shares_paid_for(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_total_value_of_shares_paid_for(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_total_value_of_shares_paid_for(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_total_value_of_shares_paid_for(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_total_value_of_shares_paid_for(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_sharesofbeneficialinterest(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_sharesofbeneficialinterest(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_sharesofbeneficialinterest(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_sharesofbeneficialinterest(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_sharesofbeneficialinterest(UNSIGNED1 wh) := '';
  
-EXPORT Make_stock_beneficialsharevalue(SALT30.StrType s0) := s0;
-EXPORT InValid_stock_beneficialsharevalue(SALT30.StrType s) := FALSE;
+EXPORT Make_stock_beneficialsharevalue(SALT38.StrType s0) := s0;
+EXPORT InValid_stock_beneficialsharevalue(SALT38.StrType s) := 0;
 EXPORT InValidMessage_stock_beneficialsharevalue(UNSIGNED1 wh) := '';
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT30,Scrubs_Corp2_Mapping_MI_Stock;
+  IMPORT SALT38,Scrubs_Corp2_Mapping_MI_Stock;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -278,7 +284,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_stock_sharesofbeneficialinterest;
     BOOLEAN Diff_stock_beneficialsharevalue;
     UNSIGNED Num_Diffs;
-    SALT30.StrType Val {MAXLENGTH(1024)};
+    SALT38.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -322,7 +328,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_stock_total_value_of_shares_paid_for := le.stock_total_value_of_shares_paid_for <> ri.stock_total_value_of_shares_paid_for;
     SELF.Diff_stock_sharesofbeneficialinterest := le.stock_sharesofbeneficialinterest <> ri.stock_sharesofbeneficialinterest;
     SELF.Diff_stock_beneficialsharevalue := le.stock_beneficialsharevalue <> ri.stock_beneficialsharevalue;
-    SELF.Val := (SALT30.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT38.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_corp_key,1,0)+ IF( SELF.Diff_corp_vendor,1,0)+ IF( SELF.Diff_corp_vendor_county,1,0)+ IF( SELF.Diff_corp_vendor_subcode,1,0)+ IF( SELF.Diff_corp_state_origin,1,0)+ IF( SELF.Diff_corp_process_date,1,0)+ IF( SELF.Diff_corp_sos_charter_nbr,1,0)+ IF( SELF.Diff_stock_ticker_symbol,1,0)+ IF( SELF.Diff_stock_exchange,1,0)+ IF( SELF.Diff_stock_type,1,0)+ IF( SELF.Diff_stock_class,1,0)+ IF( SELF.Diff_stock_shares_issued,1,0)+ IF( SELF.Diff_stock_authorized_nbr,1,0)+ IF( SELF.Diff_stock_par_value,1,0)+ IF( SELF.Diff_stock_nbr_par_shares,1,0)+ IF( SELF.Diff_stock_change_ind,1,0)+ IF( SELF.Diff_stock_change_date,1,0)+ IF( SELF.Diff_stock_voting_rights_ind,1,0)+ IF( SELF.Diff_stock_convert_ind,1,0)+ IF( SELF.Diff_stock_convert_date,1,0)+ IF( SELF.Diff_stock_change_in_cap,1,0)+ IF( SELF.Diff_stock_tax_capital,1,0)+ IF( SELF.Diff_stock_total_capital,1,0)+ IF( SELF.Diff_stock_addl_info,1,0)+ IF( SELF.Diff_stock_stock_description,1,0)+ IF( SELF.Diff_stock_stock_series,1,0)+ IF( SELF.Diff_stock_non_par_value_flag,1,0)+ IF( SELF.Diff_stock_additional_stock,1,0)+ IF( SELF.Diff_stock_shares_proportion_to_ohio_for_foreign_license,1,0)+ IF( SELF.Diff_stock_share_credits,1,0)+ IF( SELF.Diff_stock_authorized_capital,1,0)+ IF( SELF.Diff_stock_stock_paid_in_capital,1,0)+ IF( SELF.Diff_stock_pay_higher_stock_fees,1,0)+ IF( SELF.Diff_stock_actual_amt_invested_in_state,1,0)+ IF( SELF.Diff_stock_share_exchange_during_merger,1,0)+ IF( SELF.Diff_stock_date_stock_limit_approved,1,0)+ IF( SELF.Diff_stock_number_of_shares_paid_for,1,0)+ IF( SELF.Diff_stock_total_value_of_shares_paid_for,1,0)+ IF( SELF.Diff_stock_sharesofbeneficialinterest,1,0)+ IF( SELF.Diff_stock_beneficialsharevalue,1,0);
   END;
 // Now need to remove bad pivots from comparison

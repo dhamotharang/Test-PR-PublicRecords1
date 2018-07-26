@@ -5,7 +5,6 @@ export SO_By_Key :=
 'C2NV',  // Do Not Remove This Entry
 'C2MS',
 'C2PR',
-'C2KS',
 'C2HI'
 ];
 

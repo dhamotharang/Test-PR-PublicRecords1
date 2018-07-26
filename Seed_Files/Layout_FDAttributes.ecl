@@ -1,4 +1,4 @@
-Layout_Version1 := RECORD
+﻿Layout_Version1 := RECORD
 	unsigned4 SSNFirstSeen;
 	unsigned4 DateLastSeen;
 	boolean   isRecentUpdate;
@@ -544,6 +544,8 @@ Layout_version201 := record
 	string2	IDVerSSNDriversLicense;
 	string2	SourceVehicleRegistration;
 	string2	SourceDriversLicense;
+	string2	IdentityDriversLicenseComp	:= '';
+	
 end;
 
 export Layout_FDAttributes := RECORD

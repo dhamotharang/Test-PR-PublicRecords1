@@ -1,4 +1,4 @@
-import liensv2, address;
+﻿import liensv2, address;
 
 export layout_liens_party_for_hogan := record
 
@@ -13,6 +13,7 @@ string orig_lname := '';
 string orig_fname := '';
 string orig_mname := '';
 string orig_suffix := '';
+STRING8	DOB	:=	'';
 string9 tax_id := '';
 string9 ssn := '';
 address.Layout_Clean_Name;

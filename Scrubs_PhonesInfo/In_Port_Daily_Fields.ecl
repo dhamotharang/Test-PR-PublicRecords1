@@ -1,130 +1,119 @@
-﻿IMPORT SALT38;
+﻿IMPORT SALT39;
 EXPORT In_Port_Daily_Fields := MODULE
-
+ 
 EXPORT NumFields := 10;
-
+ 
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Action_Code','Invalid_Num','Invalid_Num_Blank','Invalid_DCT','Invalid_TOS','Invalid_Port_Date','Invalid_ISO2','Invalid_Filename');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'Invalid_Action_Code' => 1,'Invalid_Num' => 2,'Invalid_Num_Blank' => 3,'Invalid_DCT' => 4,'Invalid_TOS' => 5,'Invalid_Port_Date' => 6,'Invalid_ISO2' => 7,'Invalid_Filename' => 8,0);
-
-EXPORT MakeFT_Invalid_Action_Code(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'AUD#cE'); // Only allow valid symbols
+EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Action_Code','Invalid_Num','Invalid_Num_Blank','Invalid_DCT','Invalid_TOS','Invalid_Port_Date','Invalid_ISO2','Invalid_Filename');
+EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Action_Code' => 1,'Invalid_Num' => 2,'Invalid_Num_Blank' => 3,'Invalid_DCT' => 4,'Invalid_TOS' => 5,'Invalid_Port_Date' => 6,'Invalid_ISO2' => 7,'Invalid_Filename' => 8,0);
+ 
+EXPORT MakeFT_Invalid_Action_Code(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'AUD#cE'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Action_Code(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'AUD#cE'))));
-EXPORT InValidMessageFT_Invalid_Action_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('AUD#cE'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_Num(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Action_Code(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'AUD#cE'))));
+EXPORT InValidMessageFT_Invalid_Action_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('AUD#cE'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Num(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_Num_Blank(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'0123456789 '); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Num_Blank(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num_Blank(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_Invalid_Num_Blank(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789 '),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_DCT(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'ECTBN'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Num_Blank(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
+EXPORT InValidMessageFT_Invalid_Num_Blank(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_DCT(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'ECTBN'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_DCT(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ECTBN'))));
-EXPORT InValidMessageFT_Invalid_DCT(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ECTBN'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_TOS(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'MGOU'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_DCT(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ECTBN'))));
+EXPORT InValidMessageFT_Invalid_DCT(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ECTBN'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_TOS(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'MGOU'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_TOS(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'MGOU'))));
-EXPORT InValidMessageFT_Invalid_TOS(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('MGOU'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_Port_Date(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'0123456789 /:-'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_TOS(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'MGOU'))));
+EXPORT InValidMessageFT_Invalid_TOS(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('MGOU'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Port_Date(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'0123456789 /:-'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Port_Date(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789 /:-'))));
-EXPORT InValidMessageFT_Invalid_Port_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789 /:-'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_ISO2(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_Port_Date(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 /:-'))));
+EXPORT InValidMessageFT_Invalid_Port_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 /:-'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_ISO2(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_ISO2(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
-EXPORT InValidMessageFT_Invalid_ISO2(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT38.HygieneErrors.Good);
-
-EXPORT MakeFT_Invalid_Filename(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'); // Only allow valid symbols
+EXPORT InValidFT_Invalid_ISO2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_Invalid_ISO2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_Invalid_Filename(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Filename(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'))));
-EXPORT InValidMessageFT_Invalid_Filename(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'),SALT38.HygieneErrors.Good);
-
-
-EXPORT SALT38.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'action_code','country_code','phone','dial_type','spid','service_type','routing_code','porting_dt','country_abbr','filename');
-EXPORT SALT38.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'action_code','country_code','phone','dial_type','spid','service_type','routing_code','porting_dt','country_abbr','filename');
-EXPORT FieldNum(SALT38.StrType fn) := CASE(fn,'action_code' => 0,'country_code' => 1,'phone' => 2,'dial_type' => 3,'spid' => 4,'service_type' => 5,'routing_code' => 6,'porting_dt' => 7,'country_abbr' => 8,'filename' => 9,0);
-EXPORT SET OF SALT38.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
+EXPORT InValidFT_Invalid_Filename(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'))));
+EXPORT InValidMessageFT_Invalid_Filename(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.:'),SALT39.HygieneErrors.Good);
+ 
+EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'action_code','country_code','phone','dial_type','spid','service_type','routing_code','porting_dt','country_abbr','filename');
+EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'action_code','country_code','phone','dial_type','spid','service_type','routing_code','porting_dt','country_abbr','filename');
+EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'action_code' => 0,'country_code' => 1,'phone' => 2,'dial_type' => 3,'spid' => 4,'service_type' => 5,'routing_code' => 6,'porting_dt' => 7,'country_abbr' => 8,'filename' => 9,0);
+EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
-
+ 
 //Individual field level validation
-
-
-EXPORT Make_action_code(SALT38.StrType s0) := MakeFT_Invalid_Action_Code(s0);
-EXPORT InValid_action_code(SALT38.StrType s) := InValidFT_Invalid_Action_Code(s);
+ 
+EXPORT Make_action_code(SALT39.StrType s0) := MakeFT_Invalid_Action_Code(s0);
+EXPORT InValid_action_code(SALT39.StrType s) := InValidFT_Invalid_Action_Code(s);
 EXPORT InValidMessage_action_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Action_Code(wh);
-
-
-EXPORT Make_country_code(SALT38.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_country_code(SALT38.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_country_code(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_country_code(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_country_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
-
-
-EXPORT Make_phone(SALT38.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_phone(SALT38.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_phone(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_phone(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_phone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
-
-
-EXPORT Make_dial_type(SALT38.StrType s0) := MakeFT_Invalid_DCT(s0);
-EXPORT InValid_dial_type(SALT38.StrType s) := InValidFT_Invalid_DCT(s);
+ 
+EXPORT Make_dial_type(SALT39.StrType s0) := MakeFT_Invalid_DCT(s0);
+EXPORT InValid_dial_type(SALT39.StrType s) := InValidFT_Invalid_DCT(s);
 EXPORT InValidMessage_dial_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_DCT(wh);
-
-
-EXPORT Make_spid(SALT38.StrType s0) := MakeFT_Invalid_Num(s0);
-EXPORT InValid_spid(SALT38.StrType s) := InValidFT_Invalid_Num(s);
+ 
+EXPORT Make_spid(SALT39.StrType s0) := MakeFT_Invalid_Num(s0);
+EXPORT InValid_spid(SALT39.StrType s) := InValidFT_Invalid_Num(s);
 EXPORT InValidMessage_spid(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num(wh);
-
-
-EXPORT Make_service_type(SALT38.StrType s0) := MakeFT_Invalid_TOS(s0);
-EXPORT InValid_service_type(SALT38.StrType s) := InValidFT_Invalid_TOS(s);
+ 
+EXPORT Make_service_type(SALT39.StrType s0) := MakeFT_Invalid_TOS(s0);
+EXPORT InValid_service_type(SALT39.StrType s) := InValidFT_Invalid_TOS(s);
 EXPORT InValidMessage_service_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_TOS(wh);
-
-
-EXPORT Make_routing_code(SALT38.StrType s0) := MakeFT_Invalid_Num_Blank(s0);
-EXPORT InValid_routing_code(SALT38.StrType s) := InValidFT_Invalid_Num_Blank(s);
+ 
+EXPORT Make_routing_code(SALT39.StrType s0) := MakeFT_Invalid_Num_Blank(s0);
+EXPORT InValid_routing_code(SALT39.StrType s) := InValidFT_Invalid_Num_Blank(s);
 EXPORT InValidMessage_routing_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Num_Blank(wh);
-
-
-EXPORT Make_porting_dt(SALT38.StrType s0) := MakeFT_Invalid_Port_Date(s0);
-EXPORT InValid_porting_dt(SALT38.StrType s) := InValidFT_Invalid_Port_Date(s);
+ 
+EXPORT Make_porting_dt(SALT39.StrType s0) := MakeFT_Invalid_Port_Date(s0);
+EXPORT InValid_porting_dt(SALT39.StrType s) := InValidFT_Invalid_Port_Date(s);
 EXPORT InValidMessage_porting_dt(UNSIGNED1 wh) := InValidMessageFT_Invalid_Port_Date(wh);
-
-
-EXPORT Make_country_abbr(SALT38.StrType s0) := MakeFT_Invalid_ISO2(s0);
-EXPORT InValid_country_abbr(SALT38.StrType s) := InValidFT_Invalid_ISO2(s);
+ 
+EXPORT Make_country_abbr(SALT39.StrType s0) := MakeFT_Invalid_ISO2(s0);
+EXPORT InValid_country_abbr(SALT39.StrType s) := InValidFT_Invalid_ISO2(s);
 EXPORT InValidMessage_country_abbr(UNSIGNED1 wh) := InValidMessageFT_Invalid_ISO2(wh);
-
-
-EXPORT Make_filename(SALT38.StrType s0) := MakeFT_Invalid_Filename(s0);
-EXPORT InValid_filename(SALT38.StrType s) := InValidFT_Invalid_Filename(s);
+ 
+EXPORT Make_filename(SALT39.StrType s0) := MakeFT_Invalid_Filename(s0);
+EXPORT InValid_filename(SALT39.StrType s) := InValidFT_Invalid_Filename(s);
 EXPORT InValidMessage_filename(UNSIGNED1 wh) := InValidMessageFT_Invalid_Filename(wh);
-
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT38,Scrubs_PhonesInfo;
+  IMPORT SALT39,Scrubs_PhonesInfo;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -154,7 +143,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_country_abbr;
     BOOLEAN Diff_filename;
     UNSIGNED Num_Diffs;
-    SALT38.StrType Val {MAXLENGTH(1024)};
+    SALT39.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -168,7 +157,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_porting_dt := le.porting_dt <> ri.porting_dt;
     SELF.Diff_country_abbr := le.country_abbr <> ri.country_abbr;
     SELF.Diff_filename := le.filename <> ri.filename;
-    SELF.Val := (SALT38.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT39.StrType)evaluate(le,pivot_exp);
     SELF.Num_Diffs := 0+ IF( SELF.Diff_action_code,1,0)+ IF( SELF.Diff_country_code,1,0)+ IF( SELF.Diff_phone,1,0)+ IF( SELF.Diff_dial_type,1,0)+ IF( SELF.Diff_spid,1,0)+ IF( SELF.Diff_service_type,1,0)+ IF( SELF.Diff_routing_code,1,0)+ IF( SELF.Diff_porting_dt,1,0)+ IF( SELF.Diff_country_abbr,1,0)+ IF( SELF.Diff_filename,1,0);
   END;
 // Now need to remove bad pivots from comparison

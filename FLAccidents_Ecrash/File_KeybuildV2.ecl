@@ -1,7 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////
 //Expand Florida file 
 /////////////////////////////////////////////////////////////////
-import FLAccidents,ut;
+import FLAccidents,ut, STD;
 
 export File_KeybuildV2 := module 
 
@@ -461,7 +461,7 @@ AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((tri
 export Alpha  :=  AlphaOtherVendors + AlphaCoplogic;
 export out    := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
 
-shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
 export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
 
 end; 

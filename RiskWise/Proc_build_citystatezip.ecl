@@ -1,4 +1,4 @@
-﻿import  RoxieKeyBuild,ut,Data_Services, doxie,_control, Orbit3;
+﻿import  RoxieKeyBuild,ut,Data_Services, doxie,_control, Orbit3,Scrubs_CityStateZip;
 export Proc_build_citystatezip(string filedate) := function
 
 //Spray file to Thor
@@ -23,5 +23,5 @@ orbit_update 						:= sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem('CitySta
 																																	,Orbit3.proc_Orbit3_CreateBuild_AddItem('CityStateZip',filedate,'F'));
 
 //Run build on Thor
-return sequential(spray_add_file, a_key1, mv_a_key1, mv_a_key_qa1, a_key2, mv_a_key2, mv_a_key_qa2, UpdateRoxiePage, sample_citystatezip, STRATA(filedate), orbit_update, send_email);
+return sequential(spray_add_file, a_key1, mv_a_key1, mv_a_key_qa1, a_key2, mv_a_key2, mv_a_key_qa2, UpdateRoxiePage, sample_citystatezip, STRATA(filedate), Scrubs_CityStateZip.fnRunScrubs(filedate,''),orbit_update, send_email);
 end;

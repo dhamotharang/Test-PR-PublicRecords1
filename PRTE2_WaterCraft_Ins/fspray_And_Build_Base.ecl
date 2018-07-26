@@ -33,97 +33,51 @@ EXPORT fspray_And_Build_Base(STRING lzFilePath, STRING fileVersion) := FUNCTION
 	
 	All_Slim_SubFile_Upper := PRTE2_Common.mac_ConvertToUpperCase(	Datasets.All_Slim_SubFile , fname, mname, lname);
 	
-	PromoteSupers.Mac_SF_BuildProcess(All_Slim_SubFile_Upper, Files.SuperFile.Internal_All_Slim_Name, build_internal_base,,,TRUE);
+	PickOne(STRING s1, STRING s2) := IF(TRIM(s1,left,right)<>'',s1,s2);
+	
+	// Expand the slim dataset to include default columns doing MINIMAL changes during full build this is because data out there is so bad
+   // later we may want more initializing in case addresses were modified, etc...
+	AllSlimInitialized						:= PROJECT(All_Slim_SubFile_Upper, 
+																					TRANSFORM(Layouts.BaseInput_Slim_Common, 
+																										bestHullNumber 	:= PickOne(LEFT.hull_number_Main, LEFT.hull_number_cg);
+																										bestSourceCode 	:= PickOne(LEFT.source_code_Main, LEFT.source_code_CG);
+																										SELF.Watercraft_key	:= IF(LEFT.Watercraft_key <> '', LEFT.Watercraft_key, bestHullNumber) ;
+																										SELF.sequence_key	:= IF(LEFT.sequence_key <> '', LEFT.sequence_key, LEFT.date_vendor_last_reported) ;
+																										SELF.source_code_CG := IF(LEFT.source_code_CG <> '', LEFT.source_code_CG, bestSourceCode) ;
+																										SELF 								:= LEFT; 
+																										SELF 								:= [];));
+	
+	// ***********************************************************************************************
+	// *** before we save the Boca expanded layout, save the slim (Nancy's spreadsheet) version ******
+	// ***********************************************************************************************
+	
+	// ******************************************************************************************
+	// *** saving the slim (Nancy's spreadsheet) version of the data ****************************
+	PromoteSupers.Mac_SF_BuildProcess(AllSlimInitialized, Files.SuperFile.Internal_All_Slim_Name, build_internal_base,,,TRUE);
 
+	//TODO stop building the secondary slim once I know it's not needed.
 	// associate to superfile (and move older files into older generation superfiles)
-	RoxieKeyBuild.Mac_SF_BuildProcess_V2(All_Slim_SubFile_Upper,
+	RoxieKeyBuild.Mac_SF_BuildProcess_V2(AllSlimInitialized,
 																			 Files.Input_Prefix, 
 																		   Files.AllData_Slim_Suffix, 
 																			 fileVersion, buildBaseFileSlim, 3);
-	
-	AllDataExpanded					:= PROJECT(Datasets.All_Slim, 
-																						TRANSFORM(Layouts.Base, 
+																			 
+	// ******************************************************************************************
+	// ******************************************************************************************
+	// ******************************************************************************************
+	AllDataExpanded							:= PROJECT(AllSlimInitialized, 
+																					TRANSFORM(Layouts.Base, 
 																										SELF.persistent_record_id := COUNTER;
-																										
-																										bestHullNumber 	:= IF(LEFT.hull_number_Main<>'', LEFT.hull_number_Main, LEFT.hull_number_cg);
-																										bestSourceCode 	:= IF(LEFT.source_code_Main<>'', LEFT.source_code_Main, LEFT.source_code_CG);
-																										bestHistoryFlag 	:= IF(LEFT.history_flag_Main<>'', LEFT.history_flag_Main, LEFT.history_flag_Search);
-																										today 							:= PRTE2_Common.Constants.TodayString; 
-																										isValidLastReport := LEFT.date_vendor_last_reported<>'' AND STD.Date.IsValidDate((UNSIGNED4) LEFT.date_vendor_last_reported);
-																										bestTodayDate			:= IF(isValidLastReport, LEFT.date_vendor_last_reported, today);
-																										todayLess30				:= ut.date_math(bestTodayDate,-30);
-																										todayLess60				:= ut.date_math(bestTodayDate,-60);
-																										todayL30Plus3y		:= ut.date_add('3Y', todayLess30);
-																																									
-																										SELF.Watercraft_key	:= IF(LEFT.Watercraft_key <> '', LEFT.Watercraft_key, bestHullNumber);
-																										SELF.sequence_key	:= IF(LEFT.sequence_key <> '', LEFT.sequence_key, bestTodayDate);
-																										SELF.history_flag_Search	:= IF(LEFT.history_flag_Search <> '', LEFT.history_flag_Search, bestHistoryFlag);
-																										// SELF.history_flag_Main	:= IF(LEFT.history_flag_Main <> '', LEFT.history_flag_Main, bestHistoryFlag);
+																										bestHullNumber 	:= PickOne(LEFT.hull_number_main, LEFT.hull_number_cg);
+																										bestSourceCode 	:= PickOne(LEFT.source_code_Main, LEFT.source_code_CG);
+																										bestHistoryFlag 	:= PickOne(LEFT.history_flag_Main, LEFT.history_flag_Search);
 																										SELF.Source_code  	:= bestSourceCode; 
 																										SELF.history_flag 	:= bestHistoryFlag;
 																										SELF.Hull_number  	:= bestHullNumber;
-																										SELF.source_code_CG	:= bestSourceCode;
-																										SELF.source_code_Search	:= bestSourceCode;
-																										SELF.date_first_seen := todayLess60;
-																										SELF.date_last_seen := todayLess60;
-																										SELF.registration_date := todayLess30;
-																										SELF.registration_expiration_date := todayLess30;
-																										SELF.date_vendor_first_reported := todayL30Plus3y;
-																										SELF.date_vendor_last_reported := bestTodayDate;
-																										
-																										//TODO JAN 2018 - noticed that the DIDs in the old data aren't real - someday fix DIDs
-																										SELF.did_score := IF(TRIM(LEFT.did,left,right)<>'','97','');
-
-																										// Data folks will be filling title,fname,mname... fields, but not orig_name, so back fill this
-																										origNameCalc1 			:= PRTE2_Common.Functions.appendIF5(LEFT.title,LEFT.fname,LEFT.mname,LEFT.lname,LEFT.name_suffix);
-																										origNameCalc  			:= ut.CleanSpacesAndUpper(origNameCalc1);
-																										SELF.orig_name 		:= origNameCalc;
-																										//Clean name for new records only
-																										// Boca build overwrites all name clean fields when it does a name clean using orig_name, but do it so base file sees it too
-																										cleanedName 								:= Address.CleanPersonFML73_fields(origNameCalc);
-																										SELF.title							:= IF(trim(LEFT.orig_fein) = '',cleanedName.title,'');
-																										SELF.fname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.fname,'');
-																										SELF.mname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.mname,'');
-																										SELF.lname							:= IF(trim(LEFT.orig_fein) = '',cleanedName.lname,'');
-																										SELF.name_suffix				:= IF(trim(LEFT.orig_fein) = '',cleanedName.name_suffix,'');
-																										SELF.name_cleaning_score:= IF(trim(LEFT.orig_fein) = '',cleanedName.name_score,'');
-																										// should never happen but may as well...
-																										self.company_name				:= IF(trim(LEFT.orig_fein) != '', origNameCalc,'');
-
-																										// Data folks will be filling orig_address fields so populate the clean fields.
-																										origAddressLine	:= PRTE2_Common.Functions.appendIF(LEFT.orig_address_1,LEFT.orig_address_2);
-																										cleanAddress			:= PRTE2_Common.Clean_Address.FromLine(origAddressLine, LEFT.orig_city, LEFT.orig_state, LEFT.orig_zip, '');
-																										// Jan 2018 - decided to just leave orig_address_1 and 2 alone - keep as-is. (all orig_ fields leave as-is)
-																										SELF.prim_range			:=	cleanAddress.prim_range;		//string10
-																										SELF.predir						:=	cleanAddress.predir;				//string2
-																										SELF.prim_name				:=	cleanAddress.prim_name;			//string28
-																										SELF.suffix						:=	cleanAddress.addr_suffix;		//string4
-																										SELF.postdir					:=	cleanAddress.postdir;				//string2
-																										SELF.unit_desig			:=	cleanAddress.unit_desig;		//string10
-																										SELF.sec_range				:=	cleanAddress.sec_range;			//string8
-																										SELF.p_city_name			:=	cleanAddress.v_city_name;		//string25
-																										SELF.v_city_name			:=	cleanAddress.v_city_name;		//string25
-																										SELF.st									:=	cleanAddress.st;						//string2
-																										SELF.zip5							:=	cleanAddress.zip;						//string5
-																										SELF.zip4							:=	cleanAddress.zip4;					//string4
-																										SELF.cart							:=	cleanAddress.cart;					//string4
-																										SELF.cr_sort_sz			:=	cleanAddress.cr_sort_sz;		//string1
-																										SELF.lot								:=	cleanAddress.lot;						//string4
-																										SELF.lot_order				:=	cleanAddress.lot_order;			//string1
-																										SELF.dpbc							:=	cleanAddress.dbpc;					//string2
-																										SELF.chk_digit				:=	cleanAddress.chk_digit;			//string1
-																										SELF.rec_type					:=	cleanAddress.rec_type;			//string2
-																										SELF.ace_fips_st 		:=	cleanAddress.fips_state;		//string2
-																										SELF.ace_fips_county 	:=	cleanAddress.fips_county;		//string3
-																										SELF.geo_lat 					:=	cleanAddress.geo_lat;				//string10
-																										SELF.geo_long 				:=	cleanAddress.geo_long;			//string11
-																										SELF.msa								:=	cleanAddress.msa;						//string4
-																										SELF.geo_blk					:=	cleanAddress.geo_blk;				//string7
-																										SELF.geo_match				:=	cleanAddress.geo_match;			//string1
-																										SELF.err_stat					:=	cleanAddress.err_stat;			//string4
 																										SELF 										:= LEFT; 
 																										SELF 										:= [];));
 
+	
 	// associate expanded file to superfile (and move older files into older generation superfiles)
 	RoxieKeyBuild.Mac_SF_BuildProcess_V2(AllDataExpanded,
 																			 Files.Base_Prefix, 

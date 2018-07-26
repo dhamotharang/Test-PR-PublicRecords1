@@ -29,7 +29,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	
 	C_O_Ind := '(C/O |ATTN: |ATTN )';
 	//Following license types are defined as GR in Rodney's input file - REBO, MLO, SMCU, MBMBE, MBMBE
-	GR_Ind	:= ['SM','SMBO','SMCUSO','MB','MBBO','MBCUSO','MBMBE', 'MBMBEB','REC','FREDC','FREDI', 'REBO','TP','NP','SMCU'];
+	GR_Ind	:= ['SM','SMBO','SMCUSO','MB','MBBO','MBCUSO','MBMBE', 'MBMBEB','REC','FREDC','FREDI', 'REBO','TP','NP','SMCU','CILA','CILAB'];
 	
 	MD_Ind	:= ['LO','MLO','CGREAR','CGREA','CGREAT','CRREAR','CRREA','LRREAR','LRREA','RREAA','BRKM',
 	            'REB','REPB','REAB','REMS','FRES','RES','OM','LRREAT','SOLE','CRREAT','TLO', 'ACGO','ACRO','TMLO','ALRO'];
@@ -285,18 +285,20 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
    																			'CERT GENERAL R E APPRAISER - OUT OF STATE' => 'ACGO',
    																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STA' => 'ACRO',
    																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STATE' => 'ACRO',
-																			  	'TEMPORARY LOAN ORIGINATOR' => 'TLO',
-	                     'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', 																			  // Add new type 10/21/2014	
-                      'LICENSED RESIDENTIAL R E APPRASIER - OUT OF STAT' => 'ALRO',  
-																				  'THIRD PARTY PROCESSER' => 'TP',
-																				  'NOT FOR PROFIT 501C3' => 'NP',
-																			  	'REAL ESTATE PRINCIPAL BROKER' => 'REPB',
-																			  	'REAL ESTATE ASSOCIATE BROKER' => 'REAB',
-																		  		'REAL ESTATE MANAGEMENT LEVEL SALESPERSON' => 'REMS',
-																	  			'REAL ESTATE MANAGEMENT LEVEL BROKER' => 'BRKM',
-																	  			'SECOND MORTGAGE CREDIT UNION SERVICE ORG EXEMPTION' => 'SMCU',
+																		  	'TEMPORARY LOAN ORIGINATOR' => 'TLO',
+	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', 																			  // Add new type 10/21/2014	
+                                        'LICENSED RESIDENTIAL R E APPRAISER - OUT OF STAT' => 'ALRO',  
+																			  'THIRD PARTY PROCESSER' => 'TP',
+																			  'NOT FOR PROFIT 501C3' => 'NP',
+																		  	'REAL ESTATE PRINCIPAL BROKER' => 'REPB',
+																		  	'REAL ESTATE ASSOCIATE BROKER' => 'REAB',
+																	  		'REAL ESTATE MANAGEMENT LEVEL SALESPERSON' => 'REMS',
+																  			'REAL ESTATE MANAGEMENT LEVEL BROKER' => 'BRKM',
+																  			'SECOND MORTGAGE CREDIT UNION SERVICE ORG EXEMPTION' => 'SMCU',
+																				'CONSUMER INSTALLMENT LOAN ACT' => 'CILA',
+																				'CONSUMER INSTALLMENT LOAN ACT BRANCH OFFICE' => 'CILAB',
   															 				''),LEFT,RIGHT);
-
+    // SELF.std_license_desc := prepLIC_TYPE;
 	  //Use the first qualifier of license # as std license type
 		SELF.STD_LICENSE_TYPE 	 := tmpLIC_TYPE;
 		
@@ -812,7 +814,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA					:= IF(REGEXFIND('[0-9]+\\-[0-9]+',cleanNAME_DBA),' ',cleanNAME_DBA);
 		SELF.NAME_DBA_SUFX		:= StringLib.StringFilterOut(Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA),'.');
 		SELF.DBA_FLAG					:= IF(SELF.NAME_DBA != '',1,0);	
-		SELF.NAME_OFFICE			:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
+		SELF.NAME_OFFICE			:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));		
 		SELF.NAME_MARI_ORG		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
 		SELF.NAME_MARI_DBA		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(StdNAME_DBA,'/',' '));
 		SELF.ADDR_ADDR1_1			:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR1_1));

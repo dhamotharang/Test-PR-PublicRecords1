@@ -1,12 +1,13 @@
 ﻿/*2014-11-16T00:19:09Z (Nathan Koubsky)
 Added core roxie ip
 */
-import risk_indicators, Phone_Shell, ut;
+import risk_indicators, Phone_Shell, Data_services;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
 
-export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
+// export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
+export prod_batch_analytics_roxie := 'http://10.176.71.36:9856';  // use this VIP starting week of 2018-02-12
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
@@ -105,7 +106,7 @@ export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
 		string employername;
 	END;
 
-	export IPs     := dataset( ut.foreign_dataland + 'thor_data400::in::ips__layout_ip2o', riskwise.Layout_IP2O, csv(quote('"'), heading(1)) );
+	export IPs     := dataset( Data_services.foreign_dataland + 'thor_data400::in::ips__layout_ip2o', riskwise.Layout_IP2O, csv(quote('"'), heading(1)) );
 
 	export test_login_ids := ['RSKW0000','RSKW0010','webapp_roxie_test','amexdevxml', 'BurkeWSADL', 'eqngdevxml', 'falosdevxml', 'ndanamprod_realroxie', 'repubdevxml', 'webapp_roxie_qateam', 'ln_api_ivs2'];
 	export test_company_ids := ['1385345','1006061','1448650','1488800','1028725','1104341','1357055','1005199', '1216650'];		
@@ -176,13 +177,13 @@ export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
 		STRING score := '';
 	END;
 
-	export validation_input_file108 := dataset(ut.foreign_dataland + 'thor50_dev::in::validation_input_108', s, thor );
-	export validation_input_file108_csv := dataset(ut.foreign_dataland + 'thor50_dev02::in::validation_input_108_csv', s, csv(quote('"'), heading(single) ) );
+	export validation_input_file108 := dataset(Data_services.foreign_dataland + 'thor50_dev::in::validation_input_108', s, thor );
+	export validation_input_file108_csv := dataset(Data_services.foreign_dataland + 'thor50_dev02::in::validation_input_108_csv', s, csv(quote('"'), heading(single) ) );
 	
-	export testseed_input_file := dataset(ut.foreign_dataland + 'thor_data50::in::testseed_input_file', ts, thor);
+	export testseed_input_file := dataset(Data_services.foreign_dataland + 'thor_data50::in::testseed_input_file', ts, thor);
 	
 	// As of 10/1/2013 contains 633,301 unique records
-	EXPORT input_file := DATASET(ut.foreign_dataland + 'bpahl::out::sample_input_file_PROTECTED.csv', s, CSV(HEADING(single), QUOTE('"')));
+	EXPORT input_file := DATASET(Data_services.foreign_dataland + 'bpahl::out::sample_input_file_PROTECTED.csv', s, CSV(HEADING(single), QUOTE('"')));
 	// Run this code to get a list of DataSources and counts available in our Input_File:
 	// OUTPUT(Riskwise.shortcuts.input_file_sources, NAMED('Input_File_Source_Table'));
 	EXPORT input_file_sources := SORT(TABLE(input_file, {STRING DataSource := input_file.DataSource, UNSIGNED8 DataSourceRecordCount := COUNT(GROUP), UNSIGNED8 TotalFileCount := COUNT(input_file), REAL8 PercentOfFullFile := (COUNT(GROUP) / COUNT(input_file)) * 100}, DataSource), -DataSourceRecordCount, DataSource);
@@ -208,13 +209,26 @@ export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
 		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements;	
 		string200 errorcode;
 	end;
+
+	EXPORT ox53 := RECORD
+		Risk_Indicators.layout_bocashell_53temp;
+	END;
 	
 // keeping a copy of these shells on dataland thor50_dev cluster and prod pound_option_thor cluster
-	export validation_fcra_shell108k_41    := dataset( ut.foreign_dataland + 'thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_41 := dataset( ut.foreign_dataland + 'thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_fcra_shell108k_41    := dataset( Data_services.foreign_dataland + 'thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_41 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
 	
-	export validation_fcra_shell108k_50    := dataset( ut.foreign_dataland + 'thor50_dev::out::fcrashell50_validation_108k__w20150506-140238',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_50 := dataset( ut.foreign_dataland + 'thor50_dev::out::nonfcrashell50_validation_108k__w20150506-125241-1',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_fcra_shell108k_50    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell50_validation_108k__w20180214-115527',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_50 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell50_validation_108k__w20171003-125613_layout_50temp',  ox50, csv(quote('"'), maxlength(15000)) );
+
+// since the 52 shell files weren't created until after 53 was already in, both sets of files are in the same layout, which is why they can all use the 'ox53' layout above.
+	export validation_fcra_shell108k_52    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_validation_108k__w20171212-093750',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell52_validation_108k__w20171212-095636',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_adl_validation_108k__w20171212-103356',  ox53, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_53    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_validation_108k__w20171212-091317',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell53_validation_108k__W20171212-101115',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_adl_validation_108k__w20171212-102405',  ox53, csv(quote('"'), maxlength(15000)) );
 	
 //commented out since the layout has changed too much. If need, recreate	
 	// export	ox50btst := record

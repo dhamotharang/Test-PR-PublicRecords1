@@ -1,122 +1,32 @@
-import versioncontrol,tools;
+﻿import versioncontrol,tools;
 
-export Filenames(string pversion = '', boolean pUseProd = false) := module
+export Filenames(string pVersion = '', boolean pFCRA = false, boolean pDaily = true) := module
 
-  export Accurint_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Accurint::built';
-	export Accurint_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Accurint::@version@';
-	export Accurint_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Accurint::@version@';		
-	export Accurint_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Accurint';
-	export Accurint_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Accurint::history';
-	export Accurint_Base
-		:= tools.mod_FilenamesBuild(Accurint_lBaseTemplate, pversion);
-  
-	export Custom_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Custom::built';
-	export Custom_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Custom::@version@';
-	export Custom_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Custom::@version@';		
-	export Custom_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Custom';
-	export Custom_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Custom::history';
-	export Custom_Base
-		:= tools.mod_FilenamesBuild(Custom_lBaseTemplate, pversion);
+	shared fcra 			:= if(pFCRA, '::fcra::', '::nonfcra::');
+	shared bldtype		:= if(pDaily, 'daily::', 'weekly::');
 		
-	export Banko_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Banko::built';
-	export Banko_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Banko::@version@';
-	export Banko_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Banko::@version@';		
-	export Banko_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Banko';
-	export Banko_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Banko::history';
-	export Banko_Base
-		:= tools.mod_FilenamesBuild(Banko_lBaseTemplate, pversion);	
+	shared INQL_lBase 							:= INQL_v2._Constants.prefix + 'base::' + INQL_v2._Constants.DatasetName + fcra;
+	shared INQL_lBaseTemplate				:= INQL_lBase + bldtype + '@version@';
+	export INQL_Base								:= tools.mod_FilenamesBuild(INQL_lBaseTemplate, pVersion);
+	export INQL_Base_Daily_history	:= INQL_lBase + 'daily::history';
+	export INQL_Base_In_Bldg				:= INQL_lBase + if(pDaily, 'In_Bldg_Daily', 'In_Bldg_Weekly');	
 	
-	export Batch_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Batch::built';
-	export Batch_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Batch::@version@';
-	export Batch_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Batch::@version@';		
-	export Batch_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Batch';
-	export Batch_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Batch::history';
-	export Batch_Base
-		:= tools.mod_FilenamesBuild(Batch_lBaseTemplate, pversion);
+	shared SBA_lBase 					:= INQL_v2._Constants.prefix + 'base::SBA' + fcra;
+	shared SBA_lBaseTemplate	:= SBA_lBase + bldtype + '@version@';
+	export SBA_Base						:= tools.mod_FilenamesBuild(SBA_lBaseTemplate, pVersion);
 	
-	export BatchR3_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::BatchR3::built';
-	export BatchR3_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::BatchR3::@version@';
-	export BatchR3_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::BatchR3::@version@';		
-	export BatchR3_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::BatchR3';
-	export BatchR3_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::BatchR3::history';
-	export BatchR3_Base
-		:= tools.mod_FilenamesBuild(BatchR3_lBaseTemplate, pversion);
-		
-	export Bridger_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Bridger::built';
-	export Bridger_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Bridger::@version@';
-	export Bridger_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Bridger::@version@';		
-	export Bridger_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Bridger';
-	export Bridger_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Bridger::history';
-	export Bridger_Base
-		:= tools.mod_FilenamesBuild(Bridger_lBaseTemplate, pversion);
+	shared Batch_PIIs_lBase 					:= INQL_v2._Constants.prefix + 'base::Batch_PIIs' + fcra;
+	shared Batch_PIIs_lBaseTemplate	  := Batch_PIIs_lBase + bldtype + '@version@';
+	export Batch_PIIs_Base						:= tools.mod_FilenamesBuild(Batch_PIIs_lBaseTemplate, pVersion);	
 	
-	export Riskwise_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Riskwise::built';
-	export Riskwise_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::Riskwise::@version@';
-	export Riskwise_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::Riskwise::@version@';		
-	export Riskwise_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Riskwise';
-	export Riskwise_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::Riskwise::history';
-	export Riskwise_Base
-		:= tools.mod_FilenamesBuild(Riskwise_lBaseTemplate, pversion);
+	shared MBS_Deconfliction_lBase 					:= INQL_v2._Constants.prefix + 'base::mbs::Deconfliction' + fcra;
+	shared MBS_Deconfliction_lBaseTemplate	:= MBS_Deconfliction_lBase + bldtype + '@version@';
+	export MBS_Deconfliction_Base						:= tools.mod_FilenamesBuild(MBS_Deconfliction_lBaseTemplate, pVersion);
 	
-	export IDM_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::IDM::built';
-	export IDM_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::IDM::@version@';
-	export IDM_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::IDM::@version@';		
-	export IDM_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::IDM';
-	export IDM_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::IDM::history';
-	export IDM_Base
-		:= tools.mod_FilenamesBuild(IDM_lBaseTemplate, pversion);
-		
-	export SBA_lBaseTemplate_built
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::SBA::built';
-	export SBA_lBaseTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::SBA::@version@';
-	export SBA_lKeyTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::SBA::@version@';		
-	export SBA_lInputTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::SBA';
-	export SBA_lInputHistTemplate
-		:= _Dataset(pUseProd).thor_cluster_files + 'in::' 	+ _Dataset().name + '::SBA::history';
-	export SBA_Base
-		:= tools.mod_FilenamesBuild(SBA_lBaseTemplate, pversion);
-		
+	shared MBS_Transaction_lBase 					:= INQL_v2._Constants.prefix + 'base::mbs::Transaction' + fcra;
+	shared MBS_Transaction_lBaseTemplate	:= MBS_Transaction_lBase + bldtype + '@version@';
+	export MBS_Transaction_Base						:= tools.mod_FilenamesBuild(MBS_Transaction_lBaseTemplate, pVersion);
+    
+  export DeployedDelta := INQL_v2._Constants.prefix + 'out' + fcra + 'last_delta_deployed';
+	
 end;

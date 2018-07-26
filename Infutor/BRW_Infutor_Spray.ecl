@@ -1,7 +1,7 @@
-import infutor, _Control;
+﻿import infutor, _Control;
 
 STRING filedate := infutor.version_dev;
-#workunit('name','Infutor Spray - '+infutor.version_dev);
+#workunit('name','dataowner:goulmi01 Yogurt:Infutor Spray -' +filedate);//infutor.version_dev);
 #OPTION('AllowedClusters','hthor');
 
 #OPTION('multiplePersistInstances',FALSE);

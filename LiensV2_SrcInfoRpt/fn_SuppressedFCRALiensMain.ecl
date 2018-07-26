@@ -1,4 +1,5 @@
-﻿IMPORT	LiensV2_SrcInfoRpt, LiensV2;
+﻿//	Needed in file_liens_fcra_main
+IMPORT	LiensV2_SrcInfoRpt, LiensV2;
 EXPORT	fn_SuppressedFCRALiensMain	:=	FUNCTION
 
 	dSuppressedJurisdictions	:=	LiensV2_SrcInfoRpt.Files().SuppressedJurisdictions;

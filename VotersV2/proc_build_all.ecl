@@ -1,10 +1,10 @@
-// Process to build the Voters Registration Files.
+﻿// Process to build the Voters Registration Files.
 //-------------------------------------------------------------------
 // Note: The vendor layout for the vote history will change annualy. 
 // Please pay special attention to the layout changes and notify
 // data fabrication team.
 //-------------------------------------------------------------------
-import orbit_report,Lib_FileServices, STRATA, PromoteSupers, roxiekeybuild, risk_indicators, _control;
+import orbit_report,Lib_FileServices, STRATA, PromoteSupers, roxiekeybuild, risk_indicators, _control, Scrubs, Scrubs_Voters, tools, STD, ut;
 
 export proc_build_all(string filedate) := function
 
@@ -35,13 +35,15 @@ export proc_build_all(string filedate) := function
 
 	return if(thorlib.wuid()[2..5] <= VotersV2._Flags.stop_year,
 	          sequential(build_base,
-											 build_keys,
-											 build_gender,
-											 parallel(update_dops,build_stats),
-											 SampleRecs,
-											 send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
-											 getretval),
-						sequential(
+                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
+                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_Reg' ,'Base_Reg' ,filedate,mailTarget),
+										build_keys,
+										build_gender,
+										parallel(update_dops,build_stats),
+										SampleRecs,
+										send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
+										getretval),
+					 sequential(
 							send_mail('STOP IMMEDIATELY - Emerges Voters Build',
 												'It has been a year since Data Fabrication has verified that the layout ' +
 													 'has not changed.  Do NOT sandbox the year, in order to get this build ' +

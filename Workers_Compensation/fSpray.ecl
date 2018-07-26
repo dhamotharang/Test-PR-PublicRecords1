@@ -1,4 +1,4 @@
-import lib_fileservices,_control,lib_stringlib;
+﻿import lib_fileservices,_control,lib_stringlib;
 
 export fSpray(string filedate)	:=	function
 	CreateSuper		:=	FileServices.CreateSuperFile(Filenames().Input.Sprayed,false);
@@ -6,13 +6,13 @@ export fSpray(string filedate)	:=	function
 	CreateSuperfileIfNotExist := 	if(NOT FileServices.SuperFileExists(Filenames().Input.Sprayed),CreateSuper); 
 
 	do_spray :=	if(COUNT(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,
-								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.txt')(size>0)) >0,
+								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.csv')(size>0)) >0,
 								FileServices.SprayVariable(_control.IPAddress.bctlpedata11,
-								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/'+'*.txt',
-								,'\t',,,'thor400_60',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
+								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/'+'*.csv',
+								,'\t',,,'thor400_66',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
 																			
 	addSuper :=	if (COUNT(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,
-								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.txt')(size>0)) >0,
+								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.csv')(size>0)) >0,
 								FileServices.AddSuperFile(Filenames().Input.Sprayed, 
 								cluster+'in::'+ _Dataset().name + '::'+filedate));
 										 	

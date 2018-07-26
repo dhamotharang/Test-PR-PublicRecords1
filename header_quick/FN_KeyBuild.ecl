@@ -201,8 +201,9 @@ apply_title0 := apply_title_(header.Blocked_data_new());
 apply_title := dedup(distribute(Header.fn_blank_phone(apply_title0,true),hash(did)),all,local);
 apply_PID  := header.fn_persistent_record_ID(apply_title, true);
 fix_dates := header.fn_fix_dates(apply_PID,true);
-header.macGetCleanAddr(fix_dates, RawAID, true, head_out); 
-PromoteSupers.mac_sf_buildprocess(head_out,'~thor_data400::base::quick_header',build_qh_base,2,,true);
+header.macGetCleanAddr(fix_dates, RawAID, true, cln_addr);
+header.Mac_dedup_header(cln_addr,head_out,'QH'); 
+PromoteSupers.mac_sf_buildprocess(head_out,'~thor_data400::base::quick_header',build_qh_base,3,,true);
 
 //just keys
 autoKeys := header_quick.FN_AutokeyBuild(file_header_quick_skip_PID, filedate);

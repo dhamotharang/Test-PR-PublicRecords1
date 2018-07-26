@@ -1,4 +1,4 @@
-export Layout_Liens_Hogan := record
+﻿export Layout_Liens_Hogan := record
 
    string8 process_date;
    string10 orig_RMSID;
@@ -45,7 +45,7 @@ export Layout_Liens_Hogan := record
    string5  CTYRESID;
    string2  STL_TYPE;
    string1  VOL_INVOL;		//	This field now represents and INSURANCE_RELATED_RECORD 0=FALSE, 1=TRUE
-	 string50 EMPLOYER_NAME;
+			string50 EMPLOYER_NAME;
    string50 court_desc;
    string50 filingtype_desc;
    string182 clean_defendent_addr;
@@ -56,5 +56,10 @@ export Layout_Liens_Hogan := record
    string70  clean_plaintiff_cname ;
    string73  clean_atty_pname ;
    string70  clean_atty_cname ;
-	 
+			STRING8	DOB;
+			STRING8	Collection_Date;
+			STRING45	CaseLinkID;
+			string50 TMSID_old;
+			string50 RMSID_old;
+			BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
 end;

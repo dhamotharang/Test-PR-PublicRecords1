@@ -31,7 +31,8 @@ functionmacro
   + ',@pSkipStrata@\n'        
   + ',@pSkipSeleidRelative@\n'
   + ');';
-  cluster := if(tools._constants.IsDataland ,'infinband_hthor'  ,'hthor');// tools.fun_Groupname('20',false);
+  import _control;
+  cluster := _Control.Config.LocalHthor;// tools.fun_Groupname('20',false);
   
   fbool(boolean pinput) := if(pinput = true,'true','false');
   

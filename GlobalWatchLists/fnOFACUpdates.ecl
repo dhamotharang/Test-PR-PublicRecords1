@@ -1,3 +1,4 @@
+﻿import ut;
 EXPORT fnOFACUpdates(string filedate) := function
 
 dnew := GlobalWatchLists.File_GlobalWatchLists;
@@ -7,17 +8,8 @@ dprev := dataset('~thor_data400::base::globalwatchlists_father',GlobalWatchLists
 //Get the current updates to OFAC
 
 joinrec := record
- STRING20 pty_key;
-	STRING60 source;
-	STRING350 orig_pty_name;
-	STRING350 orig_vessel_name;
-	STRING100 country;
-  STRING10  name_type;
-	STRING50 addr_1;
-	STRING50 addr_2;
-	STRING50 addr_3;
-	STRING350 cname;
-	  STRING10 date_updated;
+ GlobalWatchLists.Layout_GlobalWatchLists;
+ 	  STRING10 date_updated;
 		STRING1 add_delflag;
 end;
 
@@ -53,8 +45,10 @@ dremove := Join ( distribute(dnew,hash(pty_key,source)),
 									 local);
 									 
 dboth := dUpdates + dremove  ;
+
+dUpdates_new := dataset( '~thor_200::in::globalwatchlists_updates', joinrec ,flat);
 									 
-outall := Sequential(  output(dboth,,'~thor_200::in::globalwatchlists_updates_'+filedate,overwrite),
+outall := Sequential(   output(dedup(sort(dboth+dUpdates_new,pty_key),all),,'~thor_200::in::globalwatchlists_updates_'+filedate,compressed,overwrite),
                        FileServices.StartSuperFileTransaction(),
 											 FileServices.AddSuperfile( '~thor_200::in::globalwatchlists_updates','~thor_200::in::globalwatchlists_updates_'+filedate),
 											 FileServices.FinishSuperfileTransaction()

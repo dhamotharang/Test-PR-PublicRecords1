@@ -1,4 +1,4 @@
-import liensv2;
+﻿import liensv2;
 
 
 Layout_Liens_Hogan_temp := record
@@ -173,6 +173,13 @@ self.certificate_number		:= L.othercase;
 self.legal_lot := lot;
 self.legal_block := block;
 self.bCBFlag	:=	IF(l.VOL_INVOL='1',TRUE,FALSE);
+SELF.DOB	:=	L.DOB;
+SELF.Filing_Type_ID	:=	L.FILETYPEID;
+SELF.Collection_Date	:=	L.Collection_Date;
+SELF.CaseLinkID	:=	L.CaseLinkID;
+SELF.TMSID_old	:=	L.TMSID_old;
+SELF.RMSID_old	:=	L.RMSID_old;
+SELF.CaseLinkID_Prop_Flag	:=	FALSE;
 end;
 
 export Mapping_Hogan := project(filein_join, main_mapping_format(left));

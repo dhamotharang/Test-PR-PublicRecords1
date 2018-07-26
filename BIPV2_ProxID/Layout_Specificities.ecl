@@ -56,6 +56,11 @@ EXPORT cnp_name_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+EXPORT company_name_type_derived_ChildRec := RECORD
+  TYPEOF(l.company_name_type_derived) company_name_type_derived;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT cnp_number_ChildRec := RECORD
   TYPEOF(l.cnp_number) cnp_number;
   UNSIGNED8 cnt;
@@ -192,6 +197,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 cnp_name_switch;
   REAL4 cnp_name_maximum;
   DATASET(cnp_name_ChildRec) nulls_cnp_name {MAXCOUNT(100)};
+  REAL4 company_name_type_derived_specificity;
+  REAL4 company_name_type_derived_switch;
+  REAL4 company_name_type_derived_maximum;
+  DATASET(company_name_type_derived_ChildRec) nulls_company_name_type_derived {MAXCOUNT(100)};
   REAL4 cnp_number_specificity;
   REAL4 cnp_number_switch;
   REAL4 cnp_number_maximum;

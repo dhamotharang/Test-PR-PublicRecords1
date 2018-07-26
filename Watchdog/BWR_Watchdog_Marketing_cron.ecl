@@ -1,4 +1,4 @@
-import ut,dops,header,std;
+﻿import ut,dops,header,std;
 #workunit('name','Start Watchdog Marketing build');
  
 ECL1 := 
@@ -24,7 +24,7 @@ validate_statecount := count(getnew ( state = 'completed' ));
 statusemail := FileServices.sendemail('michael.gould@lexisnexisrisk.com,sudhir.kasavajjala@lexisnexis.com','Watchdog Job Update' +ut.GetDate, 'Watchdog Marketing build is on hold due to : 1 previous WU not in completed state or '+'\n'+' 2: Last build was not  deployed to cert .Please view '+getnew[1].wuid);
 
 
-LaunchJobs := Sequential(header.fSubmitNewWorkunit(ECL1, 'thor400_60'));
+LaunchJobs := Sequential(header.fSubmitNewWorkunit(ECL1, 'thor400_66_eclcc'));
 												
 
 Sequential( std.system.debug.sleep(300000), if ( validate_statecount = 1  ,Sequential(LaunchJobs) ,Sequential('Watchdog Marketing build is on hold ',statusemail)  )) : when(event ('Watchdog Marketing build can progress','*'));

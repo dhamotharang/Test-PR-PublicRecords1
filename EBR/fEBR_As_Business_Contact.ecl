@@ -1,11 +1,18 @@
-import Business_Header, ut,address,mdr;
+﻿import Business_Header, ut,address,mdr;
 
 export fEBR_As_Business_Contact(dataset(layout_0010_header_base) pInputHeaderBase, dataset(Layout_5610_Demographic_Data_Base) pInputDemoBase, boolean isPRCT = false) :=
 function
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// -- Input Files to process
 	//////////////////////////////////////////////////////////////////////////////////////////////
-	demo_base 		:= pInputDemoBase;
+	//*** Filtering the EBR quarterly "20171205" extract records (with process_date of 20171206) getting ingested into legacy business header.
+	//*** Filtering the EBR quarterly "20180307" extract records (with process_date of 20180308) getting ingested into legacy business header.
+	//*** Filtering the EBR quarterly "20180604" extract records (with process_date of 20180605) getting ingested into legacy business header.
+	demo_base 		:= pInputDemoBase(~(process_date = '20171206' and process_date_first_seen = 20171206 and process_date_last_seen = 20171206) and
+																  ~(process_date = '20180308' and process_date_first_seen = 20180308 and process_date_last_seen = 20180308) and
+																	~(process_date = '20180308' and process_date_first_seen = 20171206 and process_date_last_seen = 20180308) and
+																	~(process_date = '20180605' and process_date_first_seen = 20180605 and process_date_last_seen = 20180605)
+																 );
 
 	layout_BH_contact 	:= Business_Header.Layout_Business_Contact_Full_New;
 

@@ -1,70 +1,68 @@
-import FraudGovPlatform_Validation,_Control,FraudGovPlatform,FraudShared,STD;
-IP:=FraudGovPlatform_Validation.Constants.LandingZoneServer;
-RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
-destinationGroup := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev','thor400_30');
-pVersion := '20170613';
+﻿import FraudShared, FraudGovPlatform_Validation, FraudGovPlatform, _Control, Orbit3, Scrubs_MBS, STD, Scrubs_FraudGov;
+
 #CONSTANT	('Platform','FraudGov');
+#workunit('priority','high');
+pVersion := '20180306';
 
-// 1.) Create Supers
-		// FraudGovPlatform.Create_Supers;
+//create_build
+		create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion);
 
-// 2.) Spray Files
-		// FraudGovPlatform_Validation.SprayAndQualifyInput(pVersion,IP,RootDir,destinationGroup);
+// Spray MBS
+		spray_mbs := sequential(
+			  FraudShared.SprayMBSFiles(pversion := pVersion,pGroupName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30'), pDirectory := FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase)
+			, Scrubs_MBS.BuildSCRUBSReport(pversion)  
+		);
+
+// Spray Inputs
+		spray_inputs := sequential(
+			  FraudGovPlatform_Validation.SprayAndQualifyInput(pVersion)
+			, FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pVersion)
+			, FraudGovPlatform_Validation.SprayAndQualifyNAC(pVersion)
+		);
+
+// Build Inputs
+		build_inputs := sequential(
+			  FraudGovPlatform.Build_Input_KnownFraud(pVersion).all
+			, FraudGovPlatform.Build_Input_IdentityData(pVersion).all
+			, STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACPassed, TRUE)
+			, STD.File.ClearSuperFile(FraudGovPlatform.Filenames().Sprayed._NACRejected, TRUE)				
+			, Scrubs_FraudGov.BuildSCRUBSReport(pversion)
+		);
+
+// Build Base
+		build_bases := sequential (
+			  FraudGovPlatform.Build_Base_KnownFraud(pVersion).all
+			, FraudGovPlatform.Build_Base_IdentityData(pVersion).all
+			, FraudGovPlatform.Build_Base_AddressCache(pVersion).all
+			, FraudGovPlatform.Promote().buildfiles.Built2QA
+		);
+
+// Build Main Base				
+		build_main := FraudGovPlatform.MapToCommon( pversion ,FraudGovPlatform.Files().Base.IdentityData.Built ,FraudGovPlatform.Files().Base.KnownFraud.Built).Build_Base_Main.All;
+
+// Build Keys
+		build_keys := sequential(
+			  FraudGovPlatform.Build_All(pVersion).Build_Key_Files
+			, FraudShared.Promote().buildfiles.Built2QA
+			, FraudShared.Promote().buildfiles.cleanup
+			, FraudShared.Promote().Inputfiles.Sprayed2Using
+			, FraudShared.Promote().Inputfiles.Using2Used				
+		);
+
 		
-		// Spray MBS Files
-		//FraudShared.SprayMBSFiles(pversion := pVersion);
-
-// 3.) Build Inputs
-		// FraudGovPlatform.Build_Input_IdentityData(pVersion).all;
-
-// 4.) Build Base
-		// FraudGovPlatform.Build_Base_IdentityData( pVersion , FraudGovPlatform.Files().Base.IdentityData.Built , FraudGovPlatform.Files().Input.IdentityData.Sprayed , FraudGovPlatform._Flags.Update.IdentityData ).all;
-		// FraudGovPlatform.Promote().buildfiles.Built2QA;
+// Build All
 		
-// 5.) Build Main Base		
-		FraudGovPlatform.MapToCommon( pversion ,FraudGovPlatform.Files().Base.IdentityData.Built ,FraudGovPlatform.Files().Base.KnownFraud.Built ).Build_Base_Main.All;
-
-// 6.) Build Keys
-		// FraudGovPlatform.Build_All(pVersion).Build_Key_Files
+		build_fraudgov := sequential(
+					  #workunit('name','FRAUDGOV DATA BUILD ' + pVersion)
+					, FraudGovPlatform.Create_Supers
+					, create_build
+					, spray_mbs
+					, spray_inputs
+					, build_inputs
+					, build_bases
+					, build_main
+					, build_keys			
+		);		
 		
-// 7.) Finalize
-		// FraudShared.Promote().buildfiles.Built2QA;
-		// FraudShared.Promote().buildfiles.cleanup;
-		// FraudShared.Promote().Inputfiles.Sprayed2Using;
-		// FraudShared.Promote().Inputfiles.Using2Used;				
-
-
-// 8.) Reset All
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::passed::IdentityData', true);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::rejected::identitydata', true);
-		// STD.File.ClearSuperFile('~thor_data400::base::fraudgov::built::IdentityData', true);
-		// STD.File.ClearSuperFile('~thor_data400::base::fraudgov::qa::IdentityData', true);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::IdentityData', true);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::IdentityData', true);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::sprayed::IdentityData', true);	
-		// STD.File.ClearSuperFile('~thor_data400::base::fraudgov::father::IdentityData', true);	
-		// STD.File.ClearSuperFile('~thor_data400::base::fraudgov::delete::IdentityData', true);	
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::sprayed::bypassed_identitydata', true);	
-		// output(dataset([],FraudGovPlatform.Layouts.base.IdentityData),,'~thor_data400::base::fraudgov::20170501::IdentityData', compressed, OVERWRITE);
-		// STD.File.AddSuperFile('~thor_data400::base::fraudgov::built::IdentityData','~thor_data400::base::fraudgov::20170501::IdentityData');
-
-// 9.) Rollback MBS
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbs', '~thor_data400::in::fraudgov::used::mbs', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbsnewgcidexclusion', '~thor_data400::in::fraudgov::used::mbsnewgcidexclusion', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbsindtypeexclusion', '~thor_data400::in::fraudgov::used::mbsindtypeexclusion', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbsproductinclude', '~thor_data400::in::fraudgov::used::mbsproductinclude', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbssourcegcexclusion', '~thor_data400::in::fraudgov::used::mbssourcegcexclusion', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbsfdnindtype', '~thor_data400::in::fraudgov::used::mbsfdnindtype', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbstablecol', '~thor_data400::in::fraudgov::used::mbstablecol', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbscolvaldesc', '~thor_data400::in::fraudgov::used::mbscolvaldesc', addcontents := true);
-		// STD.File.AddSuperFile('~thor_data400::in::fraudgov::sprayed::mbsfdnmasteridindtypeinclusion', '~thor_data400::in::fraudgov::used::mbsfdnmasteridindtypeinclusion', addcontents := true);
-
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbs', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbsnewgcidexclusion', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbsindtypeexclusion', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbsproductinclude', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbssourcegcexclusion', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbsfdnindtype', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbstablecol', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbscolvaldesc', false);
-		// STD.File.ClearSuperFile('~thor_data400::in::fraudgov::used::mbsfdnmasteridindtypeinclusion', false);
+		build_fraudgov;
+			
