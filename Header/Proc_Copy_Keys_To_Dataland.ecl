@@ -15,7 +15,7 @@ dClstr := '	thor400_dev';//'thor400_sta01_2';
 
 SHARED copy(string fl1, string fl2=fl1) :=
     if(~STD.File.FileExists('~'+fl2),
-       std.file.copy(fp+fl1,dClstr,'~'+fl2,compress:=true),
+       std.file.copy(fp+fl1,dClstr,'~'+fl2,compress:=true,allowoverwrite :=true),
        output(dataset([{'File Already exists:'+fl2}],{string info}),named('copy_report'),extend)
        );
 
