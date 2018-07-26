@@ -108,10 +108,13 @@ MACRO
 		EXPORT INTEGER   MaxOtherPhones		 := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 		                 UseInHousePhoneMetadata_internal	 := FALSE : STORED('UseInHousePhoneMetadata');
 		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
+  EXPORT BOOLEAN   UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~Doxie.DataRestriction.AccuData AND TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,
+	                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate];
+    
         
 		EXPORT BOOLEAN   VerifyPhoneName        :=  false : STORED('VerifyPhoneName');
 		EXPORT BOOLEAN   VerifyPhoneNameAddress :=  false : STORED('VerifyPhoneNameAddress');
-    
+ 
 	END;
 	
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,
