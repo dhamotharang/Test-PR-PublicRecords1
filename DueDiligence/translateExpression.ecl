@@ -32,7 +32,7 @@ EXPORT translateExpression := MODULE
       UNSIGNED4   expressionWeight; //unique identifier used as a weight
       STRING      expressionToUse;
       UNSIGNED1   expressionCategory; 
-      STRING50    expressionText;     
+      STRING100    expressionText;     
     END;
     
 
@@ -92,7 +92,7 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.TAX_OFFENSES, 				    DueDiligence.RegularExpressions.EXPRESSION_TAX_OFFENSES, 			      LEVEL_7, 		'Tax Offenses'},
                                     {ExpressionEnum.EMBEZZLEMENT, 				    DueDiligence.RegularExpressions.EXPRESSION_EMBEZZLEMENT, 			      LEVEL_7, 		'Embezzlement'},
                                     {ExpressionEnum.FORGERY, 					        DueDiligence.RegularExpressions.EXPRESSION_FORGERY, 				        LEVEL_7, 		'Forgery'},
-                                    {ExpressionEnum.CHECK_FRAUD, 				      DueDiligence.RegularExpressions.EXPRESSION_CHECK_FRAUD, 		      	LEVEL_7, 		'CheckFraud/BadCheck'},
+                                    {ExpressionEnum.CHECK_FRAUD, 				      DueDiligence.RegularExpressions.EXPRESSION_CHECK_FRAUD, 		      	LEVEL_7, 		'Check Fraud/Bad Check'},
                                     {ExpressionEnum.FRAUD, 						        DueDiligence.RegularExpressions.EXPRESSION_FRAUD, 					        LEVEL_7, 		'Fraud'},
                                     {ExpressionEnum.DRUG_OFFENSES, 				    DueDiligence.RegularExpressions.EXPRESSION_DRUG_OFFENSES, 			    LEVEL_8, 		'Drugs'},
                                     {ExpressionEnum.WEAPONS_OFFENSES, 			  DueDiligence.RegularExpressions.EXPRESSION_WEAPONS_OFFENSES, 		    LEVEL_8, 		'Weapons'},
