@@ -257,14 +257,11 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                                                                                 LEFT.offenseTrafficRelated),
                                                                                                LEFT.temp_offenseScore);
                                                                        
-                                              
-                                                                      SELF.offenseDDChargeLevelCalculated := calcdOffenseScore; 
-                                                                      SELF.offenseChargeLevelCalculated := calcdOffenseScore;
-                                                  
+                                                                                               
                                                                       
                                                                       //calculate the event type levels for each offense
                                                                       charge := LEFT.offenseCharge;
-                                                                      offenseLevel := LEFT.offenseDDChargeLevelCalculated;
+                                                                      offenseLevel := calcdOffenseScore;
                                                                       category := LEFT.temp_category;
                                                                       traffic := LEFT.offenseTrafficRelated;
                                                                  
@@ -301,6 +298,9 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                       
                                                                       SELF.offenseDDFirstReportedActivity := firstReportedActivityString;
                                                                       SELF.temp_firstReportedActivity := firstReportedActivityString;
+                                                                      
+                                                                      SELF.offenseDDChargeLevelCalculated := calcdOffenseScore; 
+                                                                      SELF.offenseChargeLevelCalculated := calcdOffenseScore;
  
                                                                       SELF := LEFT;));
     
