@@ -318,6 +318,23 @@ EXPORT CommonBusiness := MODULE
 		RETURN party;
 	END;
 	
+  
+  EXPORT getDIDLessExecs(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
+
+		DIDLessparty := NORMALIZE(inquiredBus, LEFT.DIDlessExecs, TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
+																													SELF.party := RIGHT;
+																													SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+																													SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+																													SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+																													SELF := LEFT;
+																													SELF := [];));
+	
+		RETURN DIDLessparty;
+	END;
+  
+  
+  
+  
 	EXPORT getRegisteredAgents(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 		
 		agent := NORMALIZE(inquiredBus, LEFT.registeredAgents, TRANSFORM(DueDiligence.LayoutsInternal.Agent,

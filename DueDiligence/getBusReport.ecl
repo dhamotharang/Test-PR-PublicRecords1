@@ -25,8 +25,11 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   //***This section is for Business Executives ***//
   addExecutives              := DueDiligence.reportBusExecs(addBestData, options, linkingOptions);
   
+  //***This section will add Business Executives that were not included in Attribute logic due to the DID not being populated in contacts key ***//
+  addDIDLessExecutives       := DueDiligence.reportBusDIDLessExecs(addExecutives);  
+  
   //***This section is for Shell Shelf Information ***//
-  addShellShelf              := DueDiligence.reportBusShellShelf(addExecutives);
+  addShellShelf              := DueDiligence.reportBusShellShelf(addDIDLessExecutives);
   
   //***This section is for Property ***//
   addProperty              := DueDiligence.reportBusProperty(addShellShelf);
@@ -44,6 +47,7 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
     
   // OUTPUT(addBestData, NAMED('addBestData'));  
   // OUTPUT(addExecutives, NAMED('addExecutives'));  
+  // OUTPUT(addDIDLessExecutives, NAMED('addDIDLessExecutives'));  
 
 
 	RETURN addProperty;
