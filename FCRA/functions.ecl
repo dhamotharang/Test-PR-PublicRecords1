@@ -497,14 +497,32 @@ EXPORT functions := MODULE
 		return if(exists(PUIDS), ids_set, []);
 	end;
 
-  EXPORT checkCaseNumMinInput(STRING CaseNumber, STRING fname, 
-                              STRING lname, STRING9 ssn, STRING2 state, UNSIGNED6 did) :=
-    IF ((CaseNumber != '') AND 
-        (DID = 0) AND 
-        (fname = '' OR lname = '' OR state = '') AND 
-        (LENGTH(TRIM(ssn,LEFT,RIGHT)) != 9),
-        ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET,
-        0 /* no error code */
+
+/* 
+Case Number + DID
+Case Number + SSN
+Case Number + First Name + Last Name + State
+Case Number + City + State + Attorney Company Name
+Case Number + City + State + Attorney First Name +Attorney Last Name
+Case Number + Court Location
+ */
+ 
+   EXPORT checkCaseNumMinInput(STRING CaseNumber, STRING fname, 
+                               STRING lname, STRING9 ssn, STRING2 state, UNSIGNED6 did,
+                               STRING city,STRING attorney_name, STRING courtcode 
+																 
+															   ) :=
+    IF ( (CaseNumber != '') AND 
+         (
+            (DID != 0) OR
+            (LENGTH(TRIM(ssn,LEFT,RIGHT)) = 9) OR
+            (CourtCode != '' ) OR
+            (fname != '' and lname != '' and state != '') OR
+            ( state != '' and city != '' and  attorney_name != '') 
+          )   
+				 ,
+        0,/* no error code */
+        ut.constants_MessageCodes.FCRA_CASE_NUMBER_MIN_INPUT_NOT_MET
        );
 
 END;

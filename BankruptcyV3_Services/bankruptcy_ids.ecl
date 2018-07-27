@@ -1,4 +1,4 @@
-import AutoKeyI,AutoStandardI,AutoHeaderI, doxie;
+﻿import AutoKeyI,AutoStandardI,AutoHeaderI, doxie;
 import autokeyb2,bankruptcyv2,bankruptcyv3,doxie_cbrs;
 doxie_cbrs.mac_Selection_Declare();
 
@@ -8,7 +8,8 @@ export bankruptcy_ids(
 	dataset(bankruptcyv3_services.layouts.layout_tmsid_ext) in_tmsids,
 	unsigned in_limit,
 	string1 in_party_type = '',
-	boolean isFCRA = false
+	boolean isFCRA = false,
+  boolean isCaseNumberSearch
 	) :=
 		function
 			get_tmsids_from_bdids(
@@ -57,7 +58,7 @@ export bankruptcy_ids(
 							keyed(left.filing_jurisdiction = '' or left.filing_jurisdiction = right.filing_state),
 							transform(bankruptcyv3_services.layouts.layout_tmsid_ext,
 								self := right,
-								self := left),
+								self := left),  
 							keep(1000));
 						ded := sort(dedup(sort(res,tmsid,if(isdeepdive,1,0)),tmsid),if(isdeepdive,1,0),tmsid);
 						return if(in_limit = 0,ded,choosen(ded,in_limit));
@@ -136,6 +137,7 @@ export bankruptcy_ids(
 					tmsid_value != '' =>
 						dataset([{tmsid_value,false}],bankruptcyv3_services.layouts.layout_tmsid_ext),
 					isCRS or isLRS => dataset([],bankruptcyv3_services.layouts.layout_tmsid_ext),
+         isCaseNumberSearch and isFCRA => by_cnum, 
 				project(by_auto,bankruptcyv3_services.layouts.layout_tmsid_ext) 
 					+
 					get_tmsids_from_bdids(project(abdids,bankruptcyv3_services.layouts.layout_bdid_ext)) +
