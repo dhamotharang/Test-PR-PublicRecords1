@@ -1,4 +1,4 @@
-// PRTE2_Liens_Ins.proc_build_base
+﻿// PRTE2_Liens_Ins.proc_build_base
 
 IMPORT PRTE2_Liens_Ins, PRTE2_Liens, LiensV2, ut, PromoteSupers, NID, Address, BIPV2, STD;
 
@@ -13,6 +13,7 @@ layout_filing_status := LiensV2.layout_liens_main_module.layout_filing_status;
 mainLayout trxMain(Main_In L) := TRANSFORM
 		SELF.filing_status := ROW(L, layout_filing_status);
 		SELF := L;
+		SELF := [];
 END;
 mainFinalDS := PROJECT(Main_In, trxMain(LEFT));
 
@@ -20,15 +21,10 @@ mainFinalDS := PROJECT(Main_In, trxMain(LEFT));
 // **********************************************************************************************************************
 // From here down it's the Boca code with file name changes on the PromoteSupers calls and with some reference changes
 // for inputs like mainFinalDS and Party_In - all the rest of the code is the same.
-// Except - I'm going to activate the address cleaning code that was commented out.
 // **********************************************************************************************************************
-//Create TMSID/RMSID, Persist ID
-
-// -------------------------------------------------------------------------------------------------
 mainLayout PopulateID(mainFinalDS L) := TRANSFORM
-	
-		self.process_date					:= (STRING8)Std.Date.Today();
-		self.persistent_record_id := 	HASH64(trim(L.tmsid,left,right)+ ','+
+			SELF.process_date					:= (STRING8)Std.Date.Today();
+			SELF.persistent_record_id := 	HASH64(trim(L.tmsid,left,right)+ ','+
 																					trim(L.rmsid,left,right)+  ','+
 																					trim(L.record_code,left,right)+  ','+
 																					trim(L.date_vendor_removed ,left,right)+  ','+
@@ -70,15 +66,19 @@ mainLayout PopulateID(mainFinalDS L) := TRANSFORM
 																					trim(L.legal_borough ,left,right)+  ','+
 																					trim(L.certificate_number ,left,right)+ ','+
 																					trim(L.filing_status[1].filing_status ,left,right)+trim(L.filing_status[1].filing_status_desc,left,right));
-	self := L;
+			SELF := L;
+			SELF := [];
 END;
 pCreateMainIDs := DEDUP(PROJECT(mainFinalDS, PopulateID(left)),ALL);
 
 															
-// -------------------------------------------------------------------------------------------------
-//Add Persistent Record ID/Clean names --future use
+// **********************************************************************************************************************
+//Add Persistent Record ID/Clean names/address was done in the spray file
+// **********************************************************************************************************************
 PRTE2_Liens_Ins.Layouts.Boca_party_base xfmNamesAddr(Party_In L) := TRANSFORM
-		self.persistent_record_id := hash64(trim(l.tmsid,left,right)+','+
+			SELF.Bug_Num := l.xBug_num;
+			SELF.cust_name := l.xSponsor;
+			SELF.persistent_record_id := hash64(trim(l.tmsid,left,right)+','+
 																		trim(l.rmsid,left,right)+','+
 																		trim(l.orig_full_debtorname,left,right)+','+
 																		trim(l.orig_name ,left,right)+','+
@@ -100,59 +100,17 @@ PRTE2_Liens_Ins.Layouts.Boca_party_base xfmNamesAddr(Party_In L) := TRANSFORM
 																		trim(l.phone ,left,right)+ ','+
 																		trim(l.name_type ,left,right) +','+ trim(l.bdid,left,right) +','+trim(l.did,left,right)+','+trim(l.zip,left,right)
 																		+trim(l.fname,left,right)+','+trim(l.lname,left,right)+','+trim(l.mname,left,right)+','+trim(l.name_suffix,left,right) +','+ trim(l.zip4,left,right)); // orig name has multiple names 
-	//clean name
-		TempPname					:= Address.CleanPersonFML73(L.orig_name);
-		self.title				:= TempPname[1..5];
-		self.fname				:= TempPname[6..25];
-		self.mname				:= TempPname[26..45];
-		self.lname				:= TempPname[46..65];
-		self.name_suffix	:= IF(l.orig_suffix <> '',l.orig_suffix, TempPname[66..70]);
-		self.name_score		:= TempPname[71..73];
 
-		// no businesses
-		self.cname				:= '';  	// IF(L.orig_name = '', ut.CleanSpacesAndUpper(L.orig_full_debtorname),'');
-		SELF.BDID 				:= '';		// no businesses
-		SELF.tax_id 			:= '';		// no businesses		// NOTE: SSN field is persons only, tax_id is business only. these are always separate
-		
-		//clean address
-		TempAddr					:= Address.CleanAddress182(TRIM(L.orig_address1,left,right),
-																					TRIM(L.orig_city,left,right) + ', '+TRIM(L.orig_state,left,right) +' '+ TRIM(L.orig_zip5,left,right)+TRIM(L.orig_zip4,left,right)
-																					);
-
-		self.prim_range 		:= TempAddr[1..10];
-		self.predir     		:= TempAddr[11..12];
-		self.prim_name			:= TempAddr[13..40];
-		self.addr_suffix		:= TempAddr[41..44];
-		self.postdir				:= TempAddr[45..46];
-		self.unit_desig			:= TempAddr[47..56];
-		self.sec_range			:= TempAddr[57..64];
-		self.p_city_name		:= TempAddr[65..89];
-		self.v_city_name		:= TempAddr[90..114];
-		self.st							:= TempAddr[115..116];
-		self.zip						:= TempAddr[117..121];
-		self.zip4						:= TempAddr[122..125];
-		self.cart						:= TempAddr[126..129];
-		self.cr_sort_sz			:= TempAddr[130];
-		self.lot						:= TempAddr[131..134];
-		self.lot_order			:= TempAddr[135];
-		self.dbpc						:= TempAddr[136..137];
-		self.chk_digit			:= TempAddr[138];
-		self.rec_type				:= TempAddr[139..140];
-		self.county					:= TempAddr[143..145];	
-		self.geo_lat				:= TempAddr[146..155];
-		self.geo_long				:= TempAddr[156..166];
-		self.msa						:= TempAddr[167..170];
-		self.geo_match			:= TempAddr[178];
-		self.err_stat				:= TempAddr[179..182];
-
-		self := L;
+				// address and name already cleaned during spray.
+				SELF := L;
+				SELF := [];
 	END;
 
-pCleanNameAddr := DEDUP(PROJECT(Party_In, xfmNamesAddr(left)),ALL);
+pCreatePartyIDs := DEDUP(PROJECT(Party_In, xfmNamesAddr(left)),ALL);
 
 // -------------------------------------------------------------------------------------------------
 PromoteSupers.Mac_SF_BuildProcess(pCreateMainIDs, Files.Main_Name_SF, build_main_base);
-PromoteSupers.Mac_SF_BuildProcess(pCleanNameAddr, Files.Party_Name_SF, build_party_base);
+PromoteSupers.Mac_SF_BuildProcess(pCreatePartyIDs, Files.Party_Name_SF, build_party_base);
 
 // -------------------------------------------------------------------------------------------------
 EXPORT proc_build_base := SEQUENTIAL(build_main_base, build_party_base);
