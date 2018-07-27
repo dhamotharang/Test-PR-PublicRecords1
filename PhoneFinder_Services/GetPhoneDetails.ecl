@@ -79,14 +79,13 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 	                      phone, acctno),
 												      phone);		
 	gateway_cfg := dGateways(Gateway.Configuration.IsAccuDataCNAM(servicename))[1];
-	dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM);
+ gateway_URL := gateway_cfg.url;	 
+	boolean makeGatewayCall := gateway_URL != '';
+	dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM AND makeGatewayCall);
 	
 	PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
 	                                                            iesp.accudata_accuname.t_AccudataCnamResponseEx r) := TRANSFORM
-	isAvailable := r.response.AccudataReport.TransactionType<>'' AND 
-									 r.response.AccudataReport.Reply.AvailabilityIndicator = 0 AND 
-									 r.response.AccudataReport.Reply.PresentationIndicator = 0 AND 
-									 r.response.AccudataReport.ErrorMessage=''; 
+	
 	callerName	:= STD.Str.ToUpperCase(r.response.AccudataReport.Reply.CallingName);
 	errorMessage := IF(r.response._header.Message<>'',r.response._header.Message,r.response.AccudataReport.ErrorMessage);
  SELF.RealTimePhone_Ext.GenericName := callerName;
@@ -95,9 +94,12 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 	SELF := l;
 	
 	END; 
- dDetailedPhoneInfo	  := JOIN(dDetailedCarrierInfo, dAccuDataCNAM,
+ dDetailedPhoneInfo	  := IF (EXISTS(dAccuDataCNAM), 
+                         JOIN(dDetailedCarrierInfo, dAccuDataCNAM,
                          LEFT.phone    = RIGHT.response.AccudataReport.Phone,
-												             getaccu_data(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
+												             getaccu_data(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
+                         dDetailedCarrierInfo);
+                                     
 
 	RETURN dDetailedPhoneInfo;
 	END;
