@@ -84,6 +84,22 @@ MODULE
 		EXPORT BOOLEAN IncludeRiskIndicators := FALSE;
 		EXPORT BOOLEAN IsGetMetaData := FALSE;
 	END;
+    
+		EXPORT PhoneVerificationParams := 
+		INTERFACE
+		  EXPORT BOOLEAN PhoneticMatch;
+		  EXPORT BOOLEAN VerifyPhoneName;
+		  EXPORT BOOLEAN VerifyPhoneNameAddress;
+		  EXPORT BOOLEAN VerifyPhoneIsActive;  
+		  EXPORT INTEGER DateFirstSeenThreshold;
+		  EXPORT INTEGER DateLastSeenThreshold;
+		  EXPORT INTEGER LengthOfTimeThreshold;
+		  EXPORT BOOLEAN UseDateFirstSeenVerify;
+		  EXPORT BOOLEAN UseDateLastSeenVerify;
+		  EXPORT BOOLEAN UseLengthOfTimeVerify;
+		  EXPORT BOOLEAN IsPhone7Search;
+  END;
+
  
  EXPORT GetSearchParams(iesp.phonefinder.t_PhoneFinderSearchOption pfOptions,
                      iesp.share.t_User  pfUser) := FUNCTION
