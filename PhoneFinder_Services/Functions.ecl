@@ -44,56 +44,6 @@ MODULE
 	
  END;
  
- EXPORT getPhoneActive(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
-                       PhoneFinder_Services.iParam.ReportParams inMod, 
-                       DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn_with_bestDIDs                       
-                       ) :=	FUNCTION
-			
-     today:= (STRING)Std.Date.Today();		
-     // If at least one address component was supplied, it is a name/address match.
-     CheckNameAddress := dIn_with_bestDIDs[1].prim_range <> '' OR dIn_with_bestDIDs[1].prim_name <> '' OR dIn_with_bestDIDs[1].p_city_name <> '' OR 
-			                   dIn_with_bestDIDs[1].st <> '' OR dIn_with_bestDIDs[1].z5 <> '';
-     CheckName:= dIn_with_bestDIDs[1].name_first<>'' OR dIn_with_bestDIDs[1].name_last<>'';
-			
-   	vRec := MAP(checkNameAddress => PhoneFinder_Services.GetVerified_Recs.getNameAddressMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch), 
-      						CheckName  =>	PhoneFinder_Services.GetVerified_Recs.getNameMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
-									dIdentitiesInfo);
-		
-/* 		vRec := IF(checkNameAddress, getNameAddressMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch), 
-   																 getNameMatch(dIdentitiesInfo, pSearchBy, inMod.PhoneticMatch));
-*/
-		sDateFirstSeen := iesp.ECL2ESP.DateToString(vRec[1].FirstSeenWithPrimaryPhone);
-		sDateLastSeen := iesp.ECL2ESP.DateToString(vRec[1].LastSeenWithPrimaryPhone);
-			
-		timeWithPrimaryPhone := (STRING)ut.DaysApart(sDateFirstSeen, sDateLastSeen);
-		dateLastSeenFromToday := (STRING)ut.DaysApart(today, sDateLastSeen);
-		dateFirstSeenFromToday := (STRING)ut.DaysApart(today, sDateFirstSeen);
-													
-		dateFirstSeenOk := ~inMod.UseDateFirstSeenVerify OR (INTEGER)dateFirstSeenFromToday > inMod.dateFirstSeenThreshold;											
-		dateLastSeenOk := ~inMod.UseDateLastSeenVerify OR (INTEGER)dateLastSeenFromToday > inMod.dateLastSeenThreshold;				
-		lengthOfTimeOk := ~inMod.UseLengthOfTimeVerify OR (INTEGER)timeWithPrimaryPhone > inMod.lengthOfTimeThreshold;	
-													
-		phoneIsActive := dateLastSeenOk AND dateFirstSeenOk AND lengthOfTimeOk;
-
-		activeRec := IF(phoneIsActive, vRec, DATASET([], RECORDOF(dIdentitiesInfo)));
-
-		RETURN activeRec;
-				
-	END;
-  
- EXPORT getVerifyRecs(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
-												PhoneFinder_Services.iParam.ReportParams inMod, 
-												DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn_with_bestDIDs) := FUNCTION
-  	
-		vRec := MAP(inMod.VerifyPhoneName => PhoneFinder_Services.GetVerified_Recs.getNameMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
-								inMod.VerifyPhoneNameAddress => PhoneFinder_Services.GetVerified_Recs.getNameAddressMatch(dIdentitiesInfo, dIn_with_bestDIDs, inMod.PhoneticMatch),
-								inMod.VerifyPhoneIsActive => getPhoneActive(dIdentitiesInfo, inMod, dIn_with_bestDIDs),
-								DATASET([], RECORDOF(dIdentitiesInfo)));
-					
-		RETURN vRec;
-
-	END;
- 
 	EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
 																																'0' => PhoneFinder_Services.Constants.PhoneType.Landline,
 																																'1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
@@ -790,7 +740,7 @@ MODULE
 	END;
 	
 	// Format search results to IESP layout
-	EXPORT FormatResults2IESP(pSearchBy, inMod, dInNoPhoneBestInfo, dSearchResultsUnfiltered, isPhoneSearch) :=
+	EXPORT FormatResults2IESP(pSearchBy, inMod, dInBestInfo, dSearchResultsUnfiltered, isPhoneSearch) :=
 	FUNCTIONMACRO
 		IMPORT Address,Doxie,iesp,Suppress, ut;
 	dSearchResults := dSearchResultsUnfiltered; // temp change until Product verifies impact of the filter
@@ -821,33 +771,9 @@ MODULE
 
 		phoneEntered := pSearchBy.PhoneNumber != ''; 
 		
-	PhoneFinder_Services.Layouts.BatchIn rawinput_with_BestDids() := TRANSFORM
-				self.acctno      := '1';
-				self.name_first  := pSearchBy.Name.first;
-				self.name_middle := pSearchBy.Name.middle;
-				self.name_last   := pSearchBy.Name.last;
-				self.name_suffix := pSearchBy.Name.suffix;
-				self.prim_range  := pSearchBy.Address.streetNumber;
-				self.predir      := pSearchBy.Address.streetPreDirection;
-				self.prim_name   := pSearchBy.Address.streetName;
-				self.addr_suffix := pSearchBy.Address.streetSuffix;
-				self.postdir     := pSearchBy.Address.streetPostDirection;
-				self.unit_desig  := pSearchBy.Address.unitDesignation;
-				self.sec_range   := pSearchBy.Address.unitNumber;
-				self.p_city_name := pSearchBy.Address.city;
-				self.st          := pSearchBy.Address.state;
-				self.z5          := pSearchBy.Address.zip5;
-				self.z4          := pSearchBy.Address.zip4;
-				self.phone       := pSearchBy.PhoneNumber;
-				self.did         := (UNSIGNED)dInNoPhoneBestInfo[1].did;
-				self.ssn         := pSearchBy.ssn;
-	
-	END;
-
- 	dIn_with_bestDIDs := DATASET([rawinput_with_BestDids()]); // Raw input for verification with best did
-	
-	 vRec := PhoneFinder_Services.Functions.getVerifyRecs(dIdentitiesInfo, inMod, dIn_with_bestDIDs);
-																		
+		vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);   
+		vRec := PhoneFinder_Services.GetVerifiedRecs(vmod).verify(dIdentitiesInfo, pSearchBy, (STRING)dInBestInfo[1].did);
+																
 		hasMatch := EXISTS(vRec);
 										
 		dPrimaryPhoneInfo xFormDetails() := TRANSFORM
@@ -882,7 +808,7 @@ MODULE
   
   dIdentitiesInfo2 := IF(doVerify and exists(vrec_identities), vrec_identities, dIdentitiesInfo);	
 		/* End phone verification */
- 		Suppress.MAC_Suppress(dInNoPhoneBestInfo, dBestInfoSuppress,
+ 		Suppress.MAC_Suppress(dInBestInfo, dBestInfoSuppress,
    													inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);	
    											
    		iesp.phonefinder.t_PhoneIdentityInfo tPrimaryIdentity(dBestInfoSuppress le,dIdentitiesInfo ri) :=
@@ -991,18 +917,18 @@ MODULE
 	 
 		doVerification := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
 			
-		verifiedRecs:= PhoneFinder_Services.GetVerified_Recs.getVerifyRecs(inMod, dIdentitiesInfo, dIn); // Using the shared code for both report and batch verification 
+		vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);
+		verifiedRecs := PhoneFinder_Services.GetVerifiedRecs(vmod).verifyBatch(dIdentitiesInfo, dIn);
 				
  		 PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp tPhoneInfo2(PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp le, PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp ri) := TRANSFORM
-   		  HasMatch := (le.acctno = ri.acctno);
+   		  HasMatch := (le.acctno = ri.acctno) and ri.acctno != '';
    		  SELF.VerificationStatus.PhoneVerificationDescription := MAP(le.Number = '' => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
    																inMod.VerifyPhoneNameAddress AND   HasMatch=> PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
    																inMod.VerifyPhoneName AND HasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
-   																doVerification AND ~(HasMatch)  => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
-   																'');
+   																PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified);
    
-   		  SELF.VerificationStatus.PhoneVerified := HasMatch AND (inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
-   			 SELF               := le;
+   		  SELF.VerificationStatus.PhoneVerified := HasMatch AND doVerification;
+   		  SELF               := le;
    		END;
    		
    		verifiedPhoneInfo :=   JOIN(dPrimaryPhoneInfo, VerifiedRecs,
@@ -1456,6 +1382,7 @@ MODULE
 				OUTPUT(dDenormAll,NAMED('dDenormAll_PhoneSearch'));
 				OUTPUT(dPhoneIdentity,NAMED('dPhoneIdentity_PhoneSearch'));
 				OUTPUT(dFormat2BatchReady,NAMED('dFormat2BatchReady_PhoneSearch'));
+				OUTPUT(verifiedRecs,NAMED('verifiedRecs_PhoneSearch'));
  			#ELSE				
    				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo'));
    				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo'));
