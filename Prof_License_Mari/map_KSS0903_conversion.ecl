@@ -60,7 +60,7 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 			
 			//License Information 
 			tmpLicenseNbr := IF(LENGTH(TRIM(pInput.LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.LICENSE_NUMBER,8,1), pInput.LICENSE_NUMBER);
-			tmpCmpnyNbr	  := IF(LENGTH(TRIM(pInput.COMPANY_LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.COMPANY_LICENSE_NUMBER,8,1), pInput.COMPANY_LICENSE_NUMBER);
+			tmpCmpnyNbr	  := IF(TRIM(pInput.COMPANY_LICENSE_NUMBER) != '' and LENGTH(TRIM(pInput.COMPANY_LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.COMPANY_LICENSE_NUMBER,8,1), pInput.COMPANY_LICENSE_NUMBER);
 			TrimLicenseType := ut.CleanSpacesAndUpper(pInput.LICENSE_TYPE);
 			TmpLicenseType  := MAP(TrimLicenseType = 'SALESPERSON'=>'SP',
 			                       TrimLicenseType = 'BROKER'=>'BR',

@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	BIPV2_Best_SBFE,	BIPV2_Best,	BIPV2_Best_Proxid,	BIPV2,	
+﻿IMPORT	Business_Credit,	BIPV2_Best_SBFE,	BIPV2_Best,	BIPV2_Best_Proxid,	BIPV2,	
 				VersionControl,	ut, STD;
 EXPORT	proc_build_base(STRING	pVersion	,
 												Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
@@ -41,7 +41,8 @@ EXPORT	proc_build_base(STRING	pVersion	,
                                                                                       
 	EXPORT	full_build	:=
 				SEQUENTIAL(
-					IF(NOTHOR(STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed))>0,
+					IF(NOTHOR( STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed)
+              +	STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Using))>0,
 						SEQUENTIAL(
 							Promote(pversion).inputfiles.Sprayed2Using
 							,Build_Denormalized_File
