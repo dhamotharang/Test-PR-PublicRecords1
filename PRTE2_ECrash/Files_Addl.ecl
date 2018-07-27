@@ -30,7 +30,8 @@ NormAddlRpt := project(EcrashAndCru(work_type_id not in ['2','3']),
 																				self := left, self := [])); 
 
 crash_accnbr_base_norm := (EcrashAndCru + NormAddlRpt + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname+cname <>'')) (trim(accident_nbr,left,right)<>'');
-EXPORT ds_accnbrv1 	:= project(crash_accnbr_base_norm, transform(layouts.ecrashv2_accnbrv1, self.l_accnbr := left.accident_nbr, self := left, self:= []));
+
+EXPORT ds_accnbrv1 	:= project(crash_accnbr_base_norm, transform(layouts.ecrashv2_accnbrv1, self.l_accnbr := left.accident_nbr, self.date_report_submitted:='', self := left, self:= []));
 
 //Key Accnbr
 Ecrash 			:= File_KeybuildV2.out(report_code in ['EA','TM','TF']);

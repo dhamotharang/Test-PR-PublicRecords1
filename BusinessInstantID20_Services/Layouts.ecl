@@ -1,4 +1,4 @@
-IMPORT BIPV2, Risk_Indicators, SALT28;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28;
 
 EXPORT Layouts := MODULE
 
@@ -18,8 +18,8 @@ EXPORT Layouts := MODULE
 		STRING2   State := '';
 		STRING9   Zip := '';
 		STRING9   FEIN := '';
-		STRING14  Phone10 := '';
-		STRING14  Fax_Number := '';
+		STRING10  Phone10 := '';
+		STRING10  Fax_Number := '';
 		STRING16  IPAddr := '';
 		STRING120 CompanyURL := '';	
 	END;
@@ -42,12 +42,12 @@ EXPORT Layouts := MODULE
 		STRING25  Rep1_City := '';
 		STRING2   Rep1_State := '';
 		STRING9   Rep1_Zip := '';
-		STRING11  Rep1_SSN := '';
-		STRING10  Rep1_DateOfBirth := '';
+		STRING9   Rep1_SSN := '';
+		STRING8   Rep1_DateOfBirth := '';
 		STRING3   Rep1_Age := '';
 		STRING25  Rep1_DLNumber := '';
 		STRING2   Rep1_DLState := '';
-		STRING14  Rep1_Phone10 := '';
+		STRING10  Rep1_Phone10 := '';
 		STRING100 Rep1_Email := '';
 		UNSIGNED6 Rep1_LexID := 0;
 		// Authorized Representative 2 Information
@@ -63,12 +63,12 @@ EXPORT Layouts := MODULE
 		STRING25  Rep2_City := '';
 		STRING2   Rep2_State := '';
 		STRING9   Rep2_Zip := '';
-		STRING11  Rep2_SSN := '';
-		STRING10  Rep2_DateOfBirth := '';
+		STRING9   Rep2_SSN := '';
+		STRING8   Rep2_DateOfBirth := '';
 		STRING3   Rep2_Age := '';
 		STRING25  Rep2_DLNumber := '';
 		STRING2   Rep2_DLState := '';
-		STRING14  Rep2_Phone10 := '';
+		STRING10  Rep2_Phone10 := '';
 		STRING100 Rep2_Email := '';
 		UNSIGNED6 Rep2_LexID := 0;
 		// Authorized Representative 3 Information
@@ -84,12 +84,12 @@ EXPORT Layouts := MODULE
 		STRING25  Rep3_City := '';
 		STRING2   Rep3_State := '';
 		STRING9   Rep3_Zip := '';
-		STRING11  Rep3_SSN := '';
-		STRING10  Rep3_DateOfBirth := '';
+		STRING9   Rep3_SSN := '';
+		STRING8   Rep3_DateOfBirth := '';
 		STRING3   Rep3_Age := '';
 		STRING25  Rep3_DLNumber := '';
 		STRING2   Rep3_DLState := '';
-		STRING14  Rep3_Phone10 := '';
+		STRING10  Rep3_Phone10 := '';
 		STRING100 Rep3_Email := '';
 		UNSIGNED6 Rep3_LexID := 0;
 		// Authorized Representative 4 Information
@@ -105,12 +105,12 @@ EXPORT Layouts := MODULE
 		STRING25  Rep4_City := '';
 		STRING2   Rep4_State := '';
 		STRING9   Rep4_Zip := '';
-		STRING11  Rep4_SSN := '';
-		STRING10  Rep4_DateOfBirth := '';
+		STRING9   Rep4_SSN := '';
+		STRING8   Rep4_DateOfBirth := '';
 		STRING3   Rep4_Age := '';
 		STRING25  Rep4_DLNumber := '';
 		STRING2   Rep4_DLState := '';
-		STRING14  Rep4_Phone10 := '';
+		STRING10  Rep4_Phone10 := '';
 		STRING100 Rep4_Email := '';
 		UNSIGNED6 Rep4_LexID := 0;
 		// Authorized Representative 5 Information
@@ -126,12 +126,12 @@ EXPORT Layouts := MODULE
 		STRING25  Rep5_City := '';
 		STRING2   Rep5_State := '';
 		STRING9   Rep5_Zip := '';
-		STRING11  Rep5_SSN := '';
-		STRING10  Rep5_DateOfBirth := '';
+		STRING9   Rep5_SSN := '';
+		STRING8   Rep5_DateOfBirth := '';
 		STRING3   Rep5_Age := '';
 		STRING25  Rep5_DLNumber := '';
 		STRING2   Rep5_DLState := '';
-		STRING14  Rep5_Phone10 := '';
+		STRING10  Rep5_Phone10 := '';
 		STRING100 Rep5_Email := '';
 		UNSIGNED6 Rep5_LexID := 0;
 	END;
@@ -177,12 +177,12 @@ EXPORT Layouts := MODULE
 		STRING25  City           := '';
 		STRING2   State          := '';
 		STRING9   Zip            := '';
-		STRING11  SSN            := '';
-		STRING10  DateOfBirth    := '';
+		STRING9   SSN            := '';
+		STRING8   DateOfBirth    := '';
 		STRING3   Age            := '';
 		STRING25  DLNumber       := '';
 		STRING2   DLState        := '';
-		STRING14  Phone10        := '';
+		STRING10  Phone10        := '';
 		STRING100 Email          := '';
 		UNSIGNED6 LexID          := 0;	
 	END;
@@ -232,8 +232,8 @@ EXPORT Layouts := MODULE
 		STRING2 in_bus_state;
 		STRING9 in_bus_zip;		
 		STRING9 in_bus_fein;
-		STRING14 in_bus_phone10;
-		STRING14 in_bus_fax;
+		STRING10 in_bus_phone10;
+		STRING10 in_bus_fax;
 		STRING16 in_bus_ipaddr;
 		STRING120 in_bus_url;
 		// Authorized Rep 1 input information
@@ -248,10 +248,10 @@ EXPORT Layouts := MODULE
 		STRING25 in_rep1_city;
 		STRING2 in_rep1_state;
 		STRING9 in_rep1_zip;
-		STRING11 in_rep1_ssn;
-		STRING10 in_rep1_dob;
+		STRING9 in_rep1_ssn;
+		STRING8 in_rep1_dob;
 		STRING3 in_rep1_age;
-		STRING14 in_rep1_phone10;
+		STRING10 in_rep1_phone10;
 		STRING25 in_rep1_dlnumber;
 		STRING2 in_rep1_dlstate;
 		STRING100 in_rep1_email;
@@ -267,10 +267,10 @@ EXPORT Layouts := MODULE
 		STRING25 in_rep2_city;
 		STRING2 in_rep2_state;
 		STRING9 in_rep2_zip;
-		STRING11 in_rep2_ssn;
-		STRING10 in_rep2_dob;
+		STRING9 in_rep2_ssn;
+		STRING8 in_rep2_dob;
 		STRING3 in_rep2_age;
-		STRING14 in_rep2_phone10;
+		STRING10 in_rep2_phone10;
 		STRING25 in_rep2_dlnumber;
 		STRING2 in_rep2_dlstate;
 		STRING100 in_rep2_email;
@@ -286,10 +286,10 @@ EXPORT Layouts := MODULE
 		STRING25 in_rep3_city;
 		STRING2 in_rep3_state;
 		STRING9 in_rep3_zip;
-		STRING11 in_rep3_ssn;
-		STRING10 in_rep3_dob;
+		STRING9 in_rep3_ssn;
+		STRING8 in_rep3_dob;
 		STRING3 in_rep3_age;
-		STRING14 in_rep3_phone10;
+		STRING10 in_rep3_phone10;
 		STRING25 in_rep3_dlnumber;
 		STRING2 in_rep3_dlstate;
 		STRING100 in_rep3_email;
@@ -305,10 +305,10 @@ EXPORT Layouts := MODULE
 		STRING25 in_rep4_city;
 		STRING2 in_rep4_state;
 		STRING9 in_rep4_zip;
-		STRING11 in_rep4_ssn;
-		STRING10 in_rep4_dob;
+		STRING9 in_rep4_ssn;
+		STRING8 in_rep4_dob;
 		STRING3 in_rep4_age;
-		STRING14 in_rep4_phone10;
+		STRING10 in_rep4_phone10;
 		STRING25 in_rep4_dlnumber;
 		STRING2 in_rep4_dlstate;
 		STRING100 in_rep4_email;
@@ -324,10 +324,10 @@ EXPORT Layouts := MODULE
 		STRING25 in_rep5_city;
 		STRING2 in_rep5_state;
 		STRING9 in_rep5_zip;
-		STRING11 in_rep5_ssn;
-		STRING10 in_rep5_dob;
+		STRING9 in_rep5_ssn;
+		STRING8 in_rep5_dob;
 		STRING3 in_rep5_age;
-		STRING14 in_rep5_phone10;
+		STRING10 in_rep5_phone10;
 		STRING25 in_rep5_dlnumber;
 		STRING2 in_rep5_dlstate;
 		STRING100 in_rep5_email;
@@ -349,8 +349,8 @@ EXPORT Layouts := MODULE
 		STRING2 bus_st; // in_bus_state
 		STRING9 bus_z5; // in_bus_zip
 		STRING9 bus_fein; // in_bus_fein
-		STRING14 bus_phone10; // in_bus_phone10
-		STRING14 bus_fax; // in_bus_fax
+		STRING10 bus_phone10; // in_bus_phone10
+		STRING10 bus_fax; // in_bus_fax
 		STRING16 bus_ipaddr; // in_bus_ipaddr
 		STRING120 bus_url; // in_bus_url
 		// Authorized Rep 1 input information
@@ -364,13 +364,14 @@ EXPORT Layouts := MODULE
 		STRING25 rep1_city_name; // in_rep1_city
 		STRING2 rep1_st; // in_rep1_state
 		STRING9 rep1_z5; // in_rep1_zip
-		STRING11 rep1_ssn; // in_rep1_ssn
-		STRING10 rep1_dob; // in_rep1_dob
+		STRING9 rep1_ssn; // in_rep1_ssn
+		STRING8 rep1_dob; // in_rep1_dob
 		STRING3 rep1_age; // in_rep1_age
-		STRING14 rep1_phone10; // in_rep1_phone10
+		STRING10 rep1_phone10; // in_rep1_phone10
 		STRING25 rep1_dlnumber; // in_rep1_dlnumber
 		STRING2 rep1_dlstate; // in_rep1_dlstate
 		STRING100 rep1_email; // in_rep1_email
+    UNSIGNED6 rep1_lexID;
 		// Authorized Rep 2 input information
 		STRING5 rep2_titlename; // in_rep2_title
 		STRING120 rep2_fullname; // in_rep2_full
@@ -382,13 +383,14 @@ EXPORT Layouts := MODULE
 		STRING25 rep2_city_name; // in_rep2_city
 		STRING2 rep2_st; // in_rep2_state
 		STRING9 rep2_z5; // in_rep2_zip
-		STRING11 rep2_ssn; // in_rep2_ssn
-		STRING10 rep2_dob; // in_rep2_dob
+		STRING9 rep2_ssn; // in_rep2_ssn
+		STRING8 rep2_dob; // in_rep2_dob
 		STRING3 rep2_age; // in_rep2_age
-		STRING14 rep2_phone10; // in_rep2_phone10
+		STRING10 rep2_phone10; // in_rep2_phone10
 		STRING25 rep2_dlnumber; // in_rep2_dlnumber
 		STRING2 rep2_dlstate; // in_rep2_dlstate
 		STRING100 rep2_email; // in_rep2_email
+    UNSIGNED6 rep2_lexID;
 		// Authorized Rep 3 input information
 		STRING5 rep3_titlename; // in_rep3_title
 		STRING120 rep3_fullname; // in_rep3_full
@@ -400,13 +402,14 @@ EXPORT Layouts := MODULE
 		STRING25 rep3_city_name; // in_rep3_city
 		STRING2 rep3_st; // in_rep3_state
 		STRING9 rep3_z5; // in_rep3_zip
-		STRING11 rep3_ssn; // in_rep3_ssn
-		STRING10 rep3_dob; // in_rep3_dob
+		STRING9 rep3_ssn; // in_rep3_ssn
+		STRING8 rep3_dob; // in_rep3_dob
 		STRING3 rep3_age; // in_rep3_age
-		STRING14 rep3_phone10; // in_rep3_phone10
+		STRING10 rep3_phone10; // in_rep3_phone10
 		STRING25 rep3_dlnumber; // in_rep3_dlnumber
 		STRING2 rep3_dlstate; // in_rep3_dlstate
 		STRING100 rep3_email; // in_rep3_email
+    UNSIGNED6 rep3_lexID;
 		// Authorized Rep 4 input information
 		STRING5 rep4_titlename; // in_rep4_title
 		STRING120 rep4_fullname; // in_rep4_full
@@ -418,13 +421,14 @@ EXPORT Layouts := MODULE
 		STRING25 rep4_city_name; // in_rep4_city
 		STRING2 rep4_st; // in_rep4_state
 		STRING9 rep4_z5; // in_rep4_zip
-		STRING11 rep4_ssn; // in_rep4_ssn
-		STRING10 rep4_dob; // in_rep4_dob
+		STRING9 rep4_ssn; // in_rep4_ssn
+		STRING8 rep4_dob; // in_rep4_dob
 		STRING3 rep4_age; // in_rep4_age
-		STRING14 rep4_phone10; // in_rep4_phone10
+		STRING10 rep4_phone10; // in_rep4_phone10
 		STRING25 rep4_dlnumber; // in_rep4_dlnumber
 		STRING2 rep4_dlstate; // in_rep4_dlstate
 		STRING100 rep4_email; // in_rep4_email
+    UNSIGNED6 rep4_lexID;
 		// Authorized Rep 5 input information
 		STRING5 rep5_titlename; // in_rep5_title
 		STRING120 rep5_fullname; // in_rep5_full
@@ -436,13 +440,14 @@ EXPORT Layouts := MODULE
 		STRING25 rep5_city_name; // in_rep5_city
 		STRING2 rep5_st; // in_rep5_state
 		STRING9 rep5_z5; // in_rep5_zip
-		STRING11 rep5_ssn; // in_rep5_ssn
-		STRING10 rep5_dob; // in_rep5_dob
+		STRING9 rep5_ssn; // in_rep5_ssn
+		STRING8 rep5_dob; // in_rep5_dob
 		STRING3 rep5_age; // in_rep5_age
-		STRING14 rep5_phone10; // in_rep5_phone10
+		STRING10 rep5_phone10; // in_rep5_phone10
 		STRING25 rep5_dlnumber; // in_rep5_dlnumber
 		STRING2 rep5_dlstate; // in_rep5_dlstate
 		STRING100 rep5_email; // in_rep5_email
+    UNSIGNED6 rep5_lexID;
 	END;
 	
 	EXPORT CleanInputLayout := RECORD // CleanInput

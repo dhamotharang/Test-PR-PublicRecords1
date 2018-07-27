@@ -1,10 +1,10 @@
-﻿import versioncontrol, _control, ut, tools;
+﻿import versioncontrol, _control, ut, tools, Roxiekeybuild;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 wl:=nothor(WorkunitServices.WorkunitList('',jobname:='Yogurt:Enclarity as Ingenix Build*'))(state in ['blocked','running','wait']);
 if(exists(wl),fail('Enclarity as Ingenix Build is running'));
 
-spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
+spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd)); 
 
 built := sequential(
 					spray_,
@@ -14,7 +14,6 @@ built := sequential(
 											Build_base.build_base_prov_birthdate(pversion,pUseProd).prov_birthdate_all,
 											Build_base.build_base_license(pversion,pUseProd).license_all,
 											Build_base.build_base_npi(pversion,pUseProd).npi_all,
-											Update_base(pversion,pUseProd).modified_license_base,											
 											Build_base.build_base_DEA(pversion,pUseProd).dea_all,
 											Build_base.build_base_address(pversion,pUseProd).address_all,
 											Build_base.build_base_sanction(pversion,pUseProd).sanction_all,
@@ -173,7 +172,11 @@ built := sequential(
 						,FileServices.FinishSuperFileTransaction()
 						)
 						,Basic_stats.Show_me_the_output
-				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
+				): success(sequential(
+										RoxieKeyBuild.updateversion('EnclarityKeys',pversion,_Control.MyInfo.EmailAddressNotify,,'N')
+										,Send_Email(pversion,pUseProd).BuildSuccess))
+				 , failure(send_email(pversion,pUseProd).BuildFailure
+				
 
 );
 

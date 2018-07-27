@@ -1,8 +1,7 @@
-﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_MI,
+﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_ME_MEDCERT, Scrubs_DL_MI, 
         Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TN_CONV, 
 				Scrubs_DL_TN_WDL, Scrubs_DL_TX, Scrubs_DL_WI; 
        //,Scrubs_DL_NC_CHG
-			 // ,Scrubs_DL_ME_MEDCERT
        // ,Scrubs_DL_MO
 			 // ,Scrubs_DL_MO_MEDCERT
 			 // ,Scrubs_DL_WY_MEDCERT 
@@ -71,7 +70,7 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
   EXPORT FL          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_FL',         'In_FL',         'DL_FL');
   EXPORT LA          := Temp_NoReport();
   EXPORT MA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MA',         'In_MA',         'DL_MA');
-  EXPORT ME_MEDCERT  := Temp_NoReport();
+  EXPORT ME_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_ME_MEDCERT', 'In_ME_MEDCERT', 'DL_ME_MEDCERT');
   EXPORT MI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MI',         'In_MI',         'DL_MI');
   EXPORT MO          := Temp_NoReport();
   EXPORT MO_MEDCERT  := Temp_NoReport();
@@ -84,8 +83,7 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
   EXPORT WI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WI',         'In_WI',         'DL_WI');
   EXPORT WY_MEDCERT  := Temp_NoReport();
 
-  // EXPORT LA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_LA',         'In_LA',         'DL_LA');
-  // EXPORT ME_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_ME_MEDCERT', 'In_ME_MEDCERT', 'DL_ME_MEDCERT');
+  // EXPORT LA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_LA',         'In_LA',         'DL_LA');  
   // EXPORT MO          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO',         'In_MO',         'DL_MO');
   // EXPORT MO_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO_MEDCERT', 'In_MO_MEDCERT', 'DL_MO_MEDCERT');
   // EXPORT WY_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WY_MEDCERT', 'In_WY_MEDCERT', 'DL_WY_MEDCERT');
