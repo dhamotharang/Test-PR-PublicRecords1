@@ -30,7 +30,7 @@ inputs tra(inputs l) := transform
 	udid := (unsigned6)l.did;
 	
 	comp_prop_count := doxie.Fn_comp_prop_count(udid,,,,ln_branded_value,probation_override_value);
-	veh_cnt := doxie.Fn_veh_count(udid,dateval,dppa_purpose,glb_purpose,ln_branded_value,probation_override_value);
+	veh_cnt := doxie.Fn_veh_count(udid,dateval,dppa_purpose,glb_purpose,ln_branded_value,probation_override_value,, isCNSMR);
 	dl_cnt := doxie.Fn_dl_count(udid,dateval,dppa_purpose,glb_purpose,ln_branded_value,probation_override_value);
 	Relationship.Layout_GetRelationship.DIDs_layout prep_did() := transform
 		SELF.did := udid;
