@@ -3,7 +3,7 @@
 EXPORT Spray(
 	 STRING		pversion			= ''
 	,STRING		pServerIP			= 'uspr-edata11.risk.regn.net'
-	,STRING		pDirectory		= '/data/hds_180/infutor_narb/data/' + pversion[1..8]
+	,STRING		pDirectory		= '/data/hds_180/Infutor_NARB/data/' + pversion[1..8]
 	,STRING		pFileType			= 'NARB3_1_*.txt'
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )																		
 	,BOOLEAN	pIsTesting		= FALSE

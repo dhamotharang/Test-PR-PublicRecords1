@@ -99,7 +99,7 @@ EXPORT Update_Base (STRING pVersion, BOOLEAN pUseProd = FALSE) := MODULE
 			string1 severity	:= '0';
 		END;
 		
-		base_expanded	:= PROJECT(base_and_update, transform(temp_add_severity
+		base_expanded	:= PROJECT(withBDID, transform(temp_add_severity
 										,self.ln_derived_rein_date:=if(left.record_type = 'C',''   ,left.ln_derived_rein_date)
 										,self.ln_derived_rein_flag:=if(left.record_type = 'C',false,left.ln_derived_rein_flag)
 										,self:=left

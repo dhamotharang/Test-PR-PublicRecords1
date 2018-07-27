@@ -14,29 +14,37 @@ NAMESCOPE:NAC
 // BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
 // FUZZY can be used to create new types of FUZZY linking
 FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(0,4..):ONFAIL(BLANK)
-FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='!+&,./#()_)
-FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( -:)
+FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='`!+&,./#()_)
+FIELDTYPE:invalid_email:ALLOW(-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,8):ONFAIL(BLANK)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)
+FIELDTYPE:invalid_zip:ALLOW(-0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,5..):ONFAIL(BLANK)
+FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)
+FIELDTYPE:invalid_ssn:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,9):ONFAIL(BLANK)
+FIELDTYPE:invalid_phone:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,10..):ONFAIL(BLANK)
+FIELDTYPE:invalid_ip:ALLOW(.0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:ONFAIL(BLANK)
+FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( <>{}[]-^='`!+&,./#()_)
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0. If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
-FIELD:Customer_Account_Number:TYPE(string20):LIKE(invalid_numeric):0,0 
-FIELD:Customer_County:TYPE(string3):LIKE(invalid_alphanumeric):0,0
-FIELD:Customer_State:TYPE(string2):LIKE(invalid_alphanumeric):0,0
-FIELD:Customer_Agency_Vertical_Type:TYPE(string):LIKE(invalid_alphanumeric):0,0
-FIELD:Customer_Program:TYPE(string1):LIKE(invalid_alphanumeric):0,0
-FIELD:LexID:TYPE(unsigned6):LIKE(invalid_numeric):0,0
-FIELD:raw_Full_Name:TYPE(string60):LIKE(invalid_alphanumeric):0,0
-FIELD:raw_First_name:TYPE(string100):LIKE(invalid_alphanumeric):0,0
-FIELD:raw_Last_Name:TYPE(string100):LIKE(invalid_alphanumeric):0,0
-FIELD:SSN:TYPE(string9):LIKE(invalid_alphanumeric):0,0
-FIELD:Drivers_License_State:TYPE(string2):LIKE(invalid_alphanumeric):0,0
-FIELD:Drivers_License_Number:TYPE(string25):LIKE(invalid_alphanumeric):0,0
-FIELD:Street_1:TYPE(string70):LIKE(invalid_alphanumeric):0,0
-FIELD:City:TYPE(string30):LIKE(invalid_alphanumeric):0,0
-FIELD:State:TYPE(string2):LIKE(invalid_alphanumeric):0,0
-FIELD:Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0
-FIELD:did:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:SearchAddress1StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress1StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress1City:TYPE(string30):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress1State:TYPE(string2):LIKE(invalid_state):0,0 
+FIELD:SearchAddress1Zip:TYPE(string9):LIKE(invalid_zip):0,0
+FIELD:SearchAddress2StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress2StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress2City:TYPE(string30):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress2State:TYPE(string2):LIKE(invalid_state):0,0
+FIELD:SearchAddress2Zip:TYPE(string9):LIKE(invalid_zip):0,0
+FIELD:SearchCaseId:TYPE(string20):LIKE(invalid_alphanumeric):0,0
+FIELD:enduserip:TYPE(string15):LIKE(invalid_ip):0,0
+FIELD:CaseID:TYPE(string20):LIKE(invalid_alphanumeric):0,0
+FIELD:ClientFirstName:TYPE(string25):LIKE(invalid_name):0,0
+FIELD:ClientMiddleName:TYPE(string25):LIKE(invalid_name):0,0
+FIELD:ClientLastName:TYPE(string30):LIKE(invalid_name):0,0
+FIELD:ClientPhone:TYPE(string10):LIKE(invalid_phone):0,0
+FIELD:ClientEmail:TYPE(string256):LIKE(invalid_email):0,0
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file
