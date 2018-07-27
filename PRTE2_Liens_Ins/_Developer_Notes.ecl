@@ -36,7 +36,9 @@ Confirmed with Shannon:
 We need to create unique filing_number values.
 tmsid = keep first 2-3 initials (CA, MA,etc) + keep any record type (WRIT,CHSUP,etc) + our new filing_number
 
-
+Aaron discussion:
+TMSID: source / filing # / amout of lien / {state / county / [OKC Court code]} {translates to a specific court}
+RMSID: source / filing # / amout of lien / state / county / [CJ=civil judge, ST=state tax lien]
 ***************************************************************************************************************************************
 
 Notes from Shannon:
