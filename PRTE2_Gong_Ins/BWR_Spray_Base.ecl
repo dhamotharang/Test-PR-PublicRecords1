@@ -11,7 +11,7 @@ IMPORT ut, PRTE2_Gong_Ins, PRTE2_Common;
 #workunit('name', 'Alpha PRCT GONG File Spray');
 
 STRING fileVersion := PRTE2_Common.Constants.TodayString+'';
-CSVName := 'Gong_Base_NewLayout3_20180530.csv';
+CSVName := 'Gong_Ins_BaseV2Conv_PROD_20180703.csv';
 
 BuildFile := PRTE2_Gong_Ins.Fn_Spray_And_Build_BaseMain( CSVName, fileVersion );
 
