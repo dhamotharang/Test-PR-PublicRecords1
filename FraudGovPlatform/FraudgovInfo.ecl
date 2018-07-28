@@ -41,7 +41,11 @@ module
 				,,
 				true);
 
-		Finishfraudgov := IF(Mac_TestRinID(pversion)='E',WriteErrorFound, WriteNoErrors);
+		Finishfraudgov := 	MAP(	Mac_TestRinID(pversion)		= 'E' => WriteErrorFound,
+									Mac_TestRecordID(pversion)	= 'E' => WriteErrorFound,
+									WriteNoErrors
+							);
+		
 
 		EXPORT postFinish := sequential(Finishfraudgov, output('fraudgov_build_version Finished', named('fraudgovInfoFinished')));
 

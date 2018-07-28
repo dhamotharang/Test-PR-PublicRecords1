@@ -414,8 +414,8 @@ EXPORT Layouts := MODULE
 
 	export OutputF := module
 		export FraudgovInfoRec			:= RECORD
-			string8 PreviousVersion;
-			string8 NewVersion;
+			string PreviousVersion;
+			string NewVersion;
 			string Status;
 		END;
 	end;
