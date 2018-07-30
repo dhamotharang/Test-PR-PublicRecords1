@@ -15,14 +15,15 @@ IDsLinda := ['17272013003100','17271233003396','17271233004331','17272093001033'
 desprayNameMain	:= 'Liens_MainV2_PROD_'+dateString+'.csv';
 desprayNameParty	:= 'Liens_PartyV2_PROD_'+dateString+'.csv';
 
-Export_Main0		:=	SORT(PRTE2_Liens_Ins.Files.Main_IN_DS_Prod_OLD,tmsid); //Prod file.
-Export_Party0		:=	SORT(PRTE2_Liens_Ins.Files.Party_IN_DS_Prod_OLD,tmsid); //Prod file.
+// These use the old layouts to read the current prod base files.
+Export_Main0		:=	SORT(PRTE2_Liens_Ins.Utilities.Files.Main_IN_DS_Prod_OLD,tmsid); //Prod file.
+Export_Party0		:=	SORT(PRTE2_Liens_Ins.Utilities.Files.Party_IN_DS_Prod_OLD,tmsid); //Prod file.
 
 // -----------------------------------------------------
 Export_Main := PROJECT(Export_Main0,TRANSFORM(
 																			PRTE2_Liens_Ins.Layouts.BaseMain_in_raw,
-																			// SELF.bug_num := IF(tmsid in IDsLinda,'CT-1677','DF-22454'),
-																			// SELF.Cust_Name := 'IN_PR',
+																			SELF.bug_num := IF(LEFT.tmsid in IDsLinda,'CT-1677','DF-22454'),
+																			SELF.Cust_Name := 'IN_PR',
 																			SELF := LEFT,
 																			SELF := []));
 Export_Party := PROJECT(Export_Party0,TRANSFORM(
