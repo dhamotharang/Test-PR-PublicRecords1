@@ -87,7 +87,6 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
  
- SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
 														
  ds_in_accu := IF(IsPhoneRiskAssessment,
 	                 project(dedup(sort(dSearchRecs, acctno), acctno),
@@ -99,7 +98,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	                                                                                          AccuDataGateway[1]);	
 	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	SHARED ported_phones := IF(IsReturnMetadata, 
+	SHARED ported_phones := IF(inMod.IncludePorting, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
 															              dSearchRecs);																	 
    
@@ -108,11 +107,12 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 
 	SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
 
-	dSearchResultsUnfiltered := IF(IsReturnMetadata
+	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
 																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
 																																	,Zum_final);
     // restriction added here if plugin from batch is set to true ....
-		//  if not then don't do any restrictions.																																	
+		//  if not then don't do any restrictions.											
+
  dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
