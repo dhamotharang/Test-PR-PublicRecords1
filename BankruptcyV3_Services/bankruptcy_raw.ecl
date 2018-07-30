@@ -1,5 +1,5 @@
 ﻿import doxie, doxie_cbrs, Alerts, AutoStandardI, BankruptcyV3_Services,
-       NID, Std, ut, address;
+       NID, Std, ut;
 
 export bankruptcy_raw(boolean isFCRA = false) :=
 	module
@@ -18,27 +18,16 @@ export bankruptcy_raw(boolean isFCRA = false) :=
 			string1 in_party_type = '',
 			string2 in_filing_jurisdiction = '',
 			boolean suppress_withdrawn_bankruptcy = false,
-     boolean EnableCaseNumberFilter = false,
-     string2 in_state = '',
-     string9 in_ssn = '',
-     string50 in_lname = '',
-     string30 in_fname = '',
-     string25 in_case_number = '',
-     unsigned6 in_did = 0,
-			string25 in_city = '',
-			string120 in_attorney_name  = '',  // This can be an Attorney Person or Attorney Company name 
-			string10 in_court_code = ''
+      boolean EnableCaseNumberFilter = false,
+      string2 in_state = '',
+      string9 in_ssn = '',
+      string50 in_lname = '',
+      string30 in_fname = '',
+      string25 in_case_number = '',
+      unsigned6 in_did = 0
 			) :=
 				function
-      
-      AttorneyCompanyName :=  in_attorney_name; 
-      cleaned_AttorneyPersonName := Address.CleanPerson73_fields(in_attorney_name);
-      AttorneyPersonName_First :=  cleaned_AttorneyPersonName.fname;
-      AttorneyPersonName_Last := cleaned_AttorneyPersonName.lname;
-
-     
-        
-				temp_results1 := bankruptcyv3_services.fn_rollup(empty_dids,empty_bdids,empty_tmsids,0,in_ssn_mask,true,,in_party_type,in_filing_jurisdiction, isFCRA, in_SSNLast4,false,'','',applicationType,EnableCaseNumberFilter);
+					temp_results1 := bankruptcyv3_services.fn_rollup(empty_dids,empty_bdids,empty_tmsids,0,in_ssn_mask,true,,in_party_type,in_filing_jurisdiction, isFCRA, in_SSNLast4,false,'','',applicationType);
 					
 					// FCRA overrides
 					temp_results_corr := BankruptcyV3_Services.fn_fcra_correct(temp_results1);
@@ -46,53 +35,18 @@ export bankruptcy_raw(boolean isFCRA = false) :=
 					temp_results_raw := BankruptcyV3_Services.fn_add_withdrawn_status(temp_results2, isFCRA, suppress_withdrawn_bankruptcy);
 					
           // When the case number is input, filter the results to remove any records that don't contain the case number
-           temp_results_raw_with_case_number := temp_results_raw( case_number = Std.Str.ToUpperCase(in_case_number) OR 
-                                                                  full_case_number = Std.Str.ToUpperCase(in_case_number));
-          SameLocation(ds_debtors, input_state, input_city) := functionmacro
-                           return
-                             (EXISTS(ds_debtors.addresses(st = input_state)) OR filing_jurisdiction = input_state ) AND
-                             (EXISTS(ds_debtors.addresses(p_city_name = input_city)) OR court_location = input_city );
-                       endmacro;
-                                           
-          
-          SameName(pp, Attorney_First, Attorney_Last, Attorney_Company) := functionmacro
-                          return  
-                            (NID.PreferredFirstNew(pp.fname) = NID.PreferredFirstNew(Attorney_First) AND 
-                             pp.lname = Attorney_Last)
-                             OR
-                             pp.cname = Attorney_Company;
-                    endmacro;
-                                       
-           
-           attorney_name_search :=  temp_results_raw_with_case_number(
-                      (matched_party.party_type = 'A') AND 
-                      SameLocation (debtors, in_state, in_city) AND
-                      SameName (matched_party.parsed_party, AttorneyPersonName_First, AttorneyPersonName_Last, AttorneyCompanyName));
-                      
-                                       
-           temp_results_filtered_by_input :=  
-           MAP(
-                in_ssn != '' => 
-                  temp_results_raw_with_case_number(EXISTS(debtors(in_ssn IN [ssn,app_ssn,ssnmatch]))),
-                  
-                in_did != 0  =>
-                  temp_results_raw_with_case_number((unsigned6)matched_party.did = in_did),
-                  
-                in_fname != ''  and in_lname != '' => 
-                 temp_results_raw_with_case_number(
-                                     NID.PreferredFirstNew(matched_party.parsed_party.fname) = NID.PreferredFirstNew(in_fname) AND 
-                                     matched_party.parsed_party.lname = in_lname AND 
-                                    (EXISTS(debtors.addresses(st = in_state)) OR filing_jurisdiction = in_state )
-                                    ),
-                in_attorney_name != ''  => attorney_name_search ,										 
-                                       
-								 in_court_code != '' =>
-										temp_results_raw_with_case_number(court_code  = in_court_code),  
-               
-                dataset([],recordof(temp_results_raw_with_case_number))
-            );
-            									
-    
+          temp_results_filtered_by_input :=  
+           MAP(in_ssn != '' => 
+                  temp_results_raw((case_number = Std.Str.ToUpperCase(in_case_number) OR full_case_number = Std.Str.ToUpperCase(in_case_number)) AND 
+                                   (EXISTS(debtors(in_ssn IN [ssn,app_ssn,ssnmatch])))),
+               in_did != 0  =>
+                  temp_results_raw((case_number = Std.Str.ToUpperCase(in_case_number) OR full_case_number = Std.Str.ToUpperCase(in_case_number)) AND 
+                                   (unsigned6)matched_party.did = in_did),
+                  temp_results_raw((case_number = Std.Str.ToUpperCase(in_case_number) OR full_case_number = Std.Str.ToUpperCase(in_case_number)) AND 
+                                     NID.PreferredFirstNew(matched_party.parsed_party.fname, TRUE) = NID.PreferredFirstNew(Std.Str.ToUpperCase(in_fname), TRUE) AND 
+                                     matched_party.parsed_party.lname = Std.Str.ToUpperCase(in_lname) AND 
+                                    (EXISTS(debtors.addresses(st = Std.Str.ToUpperCase(in_state))) OR filing_jurisdiction = Std.Str.ToUpperCase(in_state) )));
+
           temp_results :=
             if(EnableCaseNumberFilter,
                temp_results_filtered_by_input,

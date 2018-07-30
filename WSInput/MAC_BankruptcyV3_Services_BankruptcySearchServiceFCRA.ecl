@@ -22,9 +22,6 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 												'FEIN',
 												'TMSID',
 												'CaseNumber',
-                     'CourtCode',
-                     /*---- Attorney Name Fields ----*/
-                     'AttorneyName',
 												/*---- Person Name Fields ----*/
 												'UnParsedFullName',
 												'FirstName',
