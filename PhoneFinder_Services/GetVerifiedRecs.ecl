@@ -2,9 +2,8 @@
 
 EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
 
-  SHARED matchName ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
-    (R.did>0 AND (UNSIGNED) L.UniqueId = R.did) 
-    OR
+   SHARED matchName ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
+    ((R.did>0 AND (UNSIGNED) L.UniqueId = R.did) OR
     ( 
       NID.mod_PFirstTools.PFLeqPFR(L.Name.First, STD.STR.ToUpperCase(R.name_first)) AND                            
       (
@@ -12,10 +11,11 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
         OR
         (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.Name.Last) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
       )
-    );      
+    ));      
 
-  SHARED matchNameAddress ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R)  := 
-    matchName(L, R) AND 
+  SHARED matchNameAddress ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R)  :=
+   ((R.did>0 AND (UNSIGNED) L.UniqueId = R.did) OR
+    ((matchName(L, R) AND 
     (
       (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.RecentAddress.StreetNumber = '' AND L.RecentAddress.StreetName = '') 
       OR      
@@ -27,7 +27,7 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
           (L.RecentAddress.Zip5 = R.z5)
         )
       )
-    );
+    ))));
 
   SHARED matchPhoneActive($.Layouts.PhoneFinder.IdentityIesp L) := 
   FUNCTION
