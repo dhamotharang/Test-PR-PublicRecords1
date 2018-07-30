@@ -8,7 +8,8 @@ EXPORT fSprays := MODULE
 
 
 	//***************************************************************************************************************************
-	// PRTE2_Liens_Ins.fSprays.fSpray_Main()
+	// Main doesn't need initialization or transformation EXCEPT we flag all records to have bcbflag:=TRUE
+	//***************************************************************************************************************************
 	EXPORT fSpray_Main (STRING CSVName) := FUNCTION
 
 			sprayFile    := FileServices.SprayVariable(Constants.LandingZoneIP,					// file LZ
@@ -48,8 +49,11 @@ EXPORT fSprays := MODULE
 	END;
 	//***************************************************************************************************************************
 
+
+
 	//***************************************************************************************************************************
-	// PRTE2_Liens_Ins.fSprays.fSpray_Party()
+	// PARTY needs initialization - Address cleaning, name fields, etc
+	//***************************************************************************************************************************
 	EXPORT fSpray_Party(STRING CSVName)  := FUNCTION
 
 			sprayFile    := FileServices.SprayVariable(Constants.LandingZoneIP,					// file LZ
@@ -76,17 +80,20 @@ EXPORT fSprays := MODULE
 																	TRANSFORM({newpartyData},
 																			// ------------------ clean / prepare name fields ----------------------
 																				TempPname					:= Address.CleanPersonFML73(LEFT.orig_full_debtorname);
-																				self.title				:= TempPname[1..5];
-																				self.fname				:= TempPname[6..25];
-																				self.mname				:= TempPname[26..45];
-																				self.lname				:= TempPname[46..65];
-																				self.name_suffix	:= IF(LEFT.orig_suffix <> '',LEFT.orig_suffix, TempPname[66..70]);
+
+																				// If data team has filled in the main name fields don't replace them.
+																				self.title				:= IF(LEFT.title<>'',LEFT.title,TempPname[1..5]);
+																				self.fname				:= IF(LEFT.fname<>'',LEFT.fname,TempPname[6..25]);
+																				self.mname				:= IF(LEFT.mname<>'',LEFT.mname,TempPname[26..45]);
+																				self.lname				:= IF(LEFT.lname<>'',LEFT.lname,TempPname[46..65]);
+																				self.name_suffix	:= IF(LEFT.name_suffix<>'',LEFT.name_suffix, TempPname[66..70]);
+																				
 																				self.name_score		:= TempPname[71..73];
-																				SELF.orig_name := ''; 	// not used.
-																				SELF.orig_fname := IF(LEFT.orig_fname<>'',LEFT.orig_fname,SELF.fname);
-																				SELF.orig_mname := IF(LEFT.orig_mname<>'',LEFT.orig_mname,SELF.mname);
-																				SELF.orig_lname := IF(LEFT.orig_lname<>'',LEFT.orig_lname,SELF.lname);
-																				SELF.orig_suffix := IF(LEFT.orig_suffix<>'',LEFT.orig_suffix,SELF.name_suffix);
+																				SELF.orig_name 		:= ''; 	// not used.
+																				SELF.orig_fname 	:= IF(LEFT.orig_fname<>'',LEFT.orig_fname,SELF.fname);
+																				SELF.orig_mname 	:= IF(LEFT.orig_mname<>'',LEFT.orig_mname,SELF.mname);
+																				SELF.orig_lname 	:= IF(LEFT.orig_lname<>'',LEFT.orig_lname,SELF.lname);
+																				SELF.orig_suffix	:= IF(LEFT.orig_suffix<>'',LEFT.orig_suffix,SELF.name_suffix);
 
 																			// ------------------ no businesses so just blank fields ----------------------
 																				self.cname				:= '';  	// IF(LEFT.orig_name = '', ut.CleanSpacesAndUpper(LEFT.orig_full_debtorname),'');
