@@ -1638,5 +1638,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'US Department of State CAATSA Section 315 - US Coast Guard List of Prohibited Vessels','1624'},
 {'NSDC (Ukraine) Special Economic and Other Restrictive Measures (Sanctions) - 21 June 2018','1625'},
 {'EC (CFSP) 2018/1000 ISIL (Da\'esh) and Al-Qaida List','1626'},
-{'EC 2018/999 ISIL (Da\'esh) and Al-Qaida List','1627'}
+{'EC 2018/999 ISIL (Da\'esh) and Al-Qaida List','1627'},
+{'EC (CFSP) 2018/1016 Democratic People\'s Republic of Korea List','1628'},
+{'EC 2018/1009 Democratic People\'s Republic of Korea List','1629'},
+{'EC 2018/1033 ISIL (Da\'esh) and Al-Qaida List','1630'}
 ],r);

@@ -3,7 +3,7 @@
 export Build_All(
 
 	 string															pversion
-	,string													    pDirectory			= '/data/hds_180/infutor_narb/data/' + pversion[1..8]
+	,string													    pDirectory			= '/data/hds_180/Infutor_NARB/data/' + pversion[1..8]
 	,string															pServerIP				= 'uspr-edata11.risk.regn.net'
 	,string															pFilename				= 'NARB3_1_*.txt'
 	,string															pGroupName			= STD.System.Thorlib.Group( )
@@ -24,7 +24,7 @@ function
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
-		,BIPStats (pversion)
+		//,BIPStats (pversion) -- commenting out until the BIP team moves the code to Production
 		,QA_Records()
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
