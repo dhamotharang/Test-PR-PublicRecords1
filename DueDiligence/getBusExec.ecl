@@ -150,7 +150,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                      SELF      := LEFT;));
                                                      
   //this routine will update the Business Internal with a new DATASET of DIDlessBEO's to bus internal and adding them to list of BEO's in the report 
-  UpdateInData      := DueDiligence.getBusExecWithNoDID(addExecs, DIDLessExecs, sortExecsWithDID);  
+  UpdateInData      := DueDiligence.getBusExecWithNoDID(getExecResidency, DIDLessExecs, sortExecsWithDID);  
 
 	
 	// OUTPUT(execsRawSeq, NAMED('execsRawSeq'));
