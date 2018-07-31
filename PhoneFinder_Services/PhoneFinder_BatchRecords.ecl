@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut, doxie;
+﻿IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut;
 
 EXPORT PhoneFinder_BatchRecords(DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn,
 																PhoneFinder_Services.iParam.ReportParams      inMod,
@@ -28,7 +28,7 @@ MODULE
 	// DIDs	
 	dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
 	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and (homephone = '' or (homephone != '' and doVerify))), true) + 
-											           PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone != '')));
+						 PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput(did = 0 and homephone != '')));
 	PhoneFinder_Services.Layouts.BatchInAppendAcctno tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																													PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
 	TRANSFORM
@@ -43,12 +43,12 @@ MODULE
 		SELF             := le;
 	END;
 	
-	dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
-															dGetDIDs,
-															LEFT.acctno = RIGHT.acctno,
-															tDIDs(LEFT,RIGHT),
-															LEFT OUTER,
-															LIMIT(PhoneFinder_Services.Constants.MaxDIDs,SKIP));
+dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
+					dGetDIDs(did_count = 1), //Filter out records which got multiple DIDs
+					LEFT.acctno = RIGHT.acctno,
+					tDIDs(LEFT,RIGHT),
+					LEFT OUTER,
+					LIMIT(PhoneFinder_Services.Constants.MaxDIDs, SKIP));
 	
 	// Need to keep records where we uniquely identified a DID
 	SHARED dAppendDIDs := DEDUP(SORT(dAppendDIDs_,acctno),acctno);
@@ -87,7 +87,6 @@ MODULE
 	
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
  
- SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
 														
  ds_in_accu := IF(IsPhoneRiskAssessment,
 	                 project(dedup(sort(dSearchRecs, acctno), acctno),
@@ -99,7 +98,7 @@ MODULE
 	                                                                                          AccuDataGateway[1]);	
 	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	SHARED ported_phones := IF(IsReturnMetadata, 
+	SHARED ported_phones := IF(inMod.IncludePorting, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
 															              dSearchRecs);																	 
    
@@ -108,11 +107,12 @@ MODULE
 
 	SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
 
-	dSearchResultsUnfiltered := IF(IsReturnMetadata
+	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
 																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
 																																	,Zum_final);
     // restriction added here if plugin from batch is set to true ....
-		//  if not then don't do any restrictions.																																	
+		//  if not then don't do any restrictions.											
+
  dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
@@ -127,7 +127,6 @@ MODULE
 															PhoneFinder_Services.Functions.FormatResults2Batch(dAppendDIDs(phone != '' and err_search = 0), inMod,	dinBestDID,	PhoneSearchResults,TRUE)) +
 													  IF( EXISTS(dInNoPhone),
 															PhoneFinder_Services.Functions.FormatResults2Batch(dAppendDIDs(phone = '' and err_search = 0), inMod,	dinBestInfo, DidSearchResults,FALSE));
- 	
   // Royalties
   dSearchResultsFilter := dSearchRecs_pre(typeflag != Phones.Constants.TypeFlag.DataSource_PV);   	
  // Sort and dedup data
@@ -154,7 +153,7 @@ MODULE
 		                                                            SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
 		                                                            SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
 																																                              0, LEFT.phone_source),
-																																                              SELf := LEFT)), dResultsDedupRecs);	
+																																                              SELF := LEFT)), dResultsDedupRecs);	
  
  PhoneFinder_Services.Layouts.PhoneFinder.BatchOut tPopulateRoyalty(PhoneFinder_Services.Layouts.PhoneFinder.BatchOut le,PhoneFinder_Services.Layouts.PhoneFinder.Final ri) :=
  TRANSFORM
