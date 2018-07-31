@@ -1,17 +1,33 @@
-IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
- 
+IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie, SALT37 ;
+
+EXPORT File_headers_inc_FCRA(dataset(header.layout_header) hdr) := FUNCTION
+
  Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key; 
  
  KeyPayloadInc:= INDEX(Key,InsuranceHeader_xLink.KeyNames('INC').header_super);
+ 
+ layout_hdr_with_effective_dates := RECORD
+    {hdr};
+ 	UNSIGNED4 DT_EFFECTIVE_FIRST, 
+	UNSIGNED4 DT_EFFECTIVE_LAST; 
+end;
 
- hr0 := header.File_header_raw_latest.File(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V');
+ hr  := DISTRIBUTE(hdr(header.Blocked_data()), HASH(rid));
  
- hr  := DISTRIBUTE(hr0(header.Blocked_data()), HASH(rid));
- 
+// latest no incremental (LEFT ONLY)
+nonIncpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
+                                  ,LEFT.rid = RIGHT.source_rid AND 
+                                   LEFT.src = RIGHT.src[4..5]
+                                  ,TRANSFORM ({hr}, SELF := LEFT)
+                                  ,LEFT ONLY
+                                  
+                                  , LOCAL);
+
+// latest incrementals and suppressions (inner) - transfer flags and setup effective dates
  Incpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
                                   ,LEFT.rid = RIGHT.source_rid AND 
                                    LEFT.src = RIGHT.src[4..5]
-                                  ,TRANSFORM({hr},
+                                  ,TRANSFORM(layout_hdr_with_effective_dates,
                                    SELF.did := RIGHT.did;
                                    SELF.jflag2 := RIGHT.ambiguous;		
                                    SELF.src := RIGHT.src[4..5];
@@ -60,7 +76,15 @@ IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
                                    SELF.address_ind:=0;  
                                    SELF.name_ind:=0;  
                                    SELF.persistent_record_ID := 0,
+                                   
+                                   SELF.DT_EFFECTIVE_FIRST := RIGHT.DT_EFFECTIVE_FIRST,
+                                   SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
 
                                    ),local) ; 
 
-EXPORT File_headers_inc_FCRA := Incpayload;
+suppressed := SALT37.MAC_DatasetAsOf(Incpayload, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
+ 
+ all_fcra := nonIncpayload + project(suppressed,{{suppressed}-[DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST] });
+
+return all_fcra;
+END;
