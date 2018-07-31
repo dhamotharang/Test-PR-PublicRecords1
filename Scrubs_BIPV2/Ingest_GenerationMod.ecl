@@ -1,10 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT39;
-EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
+IMPORT SALT311;
+EXPORT Ingest_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.9.0';
-  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
@@ -22,7 +22,7 @@ EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
   EXPORT spc_FILENAME := 'BIPV2';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,source_expanded,source,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,rcid,company_bdid,company_name,company_name_type_raw,company_rawaid,company_address_prim_range,company_address_predir,company_address_prim_name,company_address_addr_suffix,company_address_postdir,company_address_unit_desig,company_address_sec_range,company_address_p_city_name,company_address_v_city_name,company_address_st,company_address_zip,company_address_zip4,company_address_cart,company_address_cr_sort_sz,company_address_lot,company_address_lot_order,company_address_dbpc,company_address_chk_digit,company_address_rec_type,company_address_fips_state,company_address_fips_county,company_address_geo_lat,company_address_geo_long,company_address_msa,company_address_geo_blk,company_address_geo_match,company_address_err_stat,company_address_type_raw,company_address_category,company_address_country_code,company_fein,best_fein_indicator,company_phone,phone_type,company_org_structure_raw,company_incorporation_date,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4,company_naics_code5,company_ticker,company_ticker_exchange,company_foreign_domestic,company_url,company_inc_state,company_charter_number,company_filing_date,company_status_date,company_foreign_date,event_filing_date,company_name_status_raw,company_status_raw,dt_first_seen_company_name,dt_last_seen_company_name,dt_first_seen_company_address,dt_last_seen_company_address,vl_id,current,source_record_id,glb,dppa,phone_score,match_company_name,match_branch_city,match_geo_city,duns_number,source_docid,is_contact,dt_first_seen_contact,dt_last_seen_contact,contact_did,contact_name_title,contact_name_fname,contact_name_mname,contact_name_lname,contact_name_name_suffix,contact_name_name_score,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob,contact_status_raw,contact_email,contact_email_username,contact_email_domain,contact_phone,cid,contact_score,from_hdr,company_department,company_aceaid,company_name_type_derived,company_address_type_derived,company_org_structure_derived,company_name_status_derived,company_status_derived,proxid_status_private,powid_status_private,seleid_status_private,orgid_status_private,ultid_status_private,proxid_status_public,powid_status_public,seleid_status_public,orgid_status_public,ultid_status_public,contact_type_derived,contact_job_title_derived,contact_status_derived,address_type_derived,is_vanity_name_derived';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,source_expanded,source,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,rcid,company_bdid,company_name,company_name_type_raw,company_rawaid,company_address_prim_range,company_address_predir,company_address_prim_name,company_address_addr_suffix,company_address_postdir,company_address_unit_desig,company_address_sec_range,company_address_p_city_name,company_address_v_city_name,company_address_st,company_address_zip,company_address_zip4,company_address_cart,company_address_cr_sort_sz,company_address_lot,company_address_lot_order,company_address_dbpc,company_address_chk_digit,company_address_rec_type,company_address_fips_state,company_address_fips_county,company_address_geo_lat,company_address_geo_long,company_address_msa,company_address_geo_blk,company_address_geo_match,company_address_err_stat,company_address_type_raw,company_address_category,company_address_country_code,company_fein,best_fein_indicator,company_phone,phone_type,company_org_structure_raw,company_incorporation_date,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4,company_naics_code5,company_ticker,company_ticker_exchange,company_foreign_domestic,company_url,company_inc_state,company_charter_number,company_filing_date,company_status_date,company_foreign_date,event_filing_date,company_name_status_raw,company_status_raw,dt_first_seen_company_name,dt_last_seen_company_name,dt_first_seen_company_address,dt_last_seen_company_address,vl_id,current,source_record_id,glb,dppa,phone_score,match_company_name,match_branch_city,match_geo_city,duns_number,source_docid,is_contact,dt_first_seen_contact,dt_last_seen_contact,contact_did,contact_name_title,contact_name_fname,contact_name_lname,contact_name_lname,contact_name_name_suffix,contact_name_name_score,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob,contact_status_raw,contact_email,contact_email_username,contact_email_domain,contact_phone,cid,contact_score,from_hdr,company_department,company_aceaid,company_name_type_derived,company_address_type_derived,company_org_structure_derived,company_name_status_derived,company_status_derived,proxid_status_private,powid_status_private,seleid_status_private,orgid_status_private,ultid_status_private,proxid_status_public,powid_status_public,seleid_status_public,orgid_status_public,ultid_status_public,contact_type_derived,contact_job_title_derived,contact_status_derived,address_type_derived,is_vanity_name_derived';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -60,6 +60,7 @@ EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
     + '\n'
     + '//FIELDTYPE DEFINITIONS\n'
     + 'FIELDTYPE:invalid_mandatory:CUSTOM(Scrubs_BIPV2.Functions.fn_populated_strings>0)\n'
+    + 'FIELDTYPE:invalid_mandatory_numeric:CUSTOM(Scrubs_BIPV2.Functions.fn_numeric>0)\n'
     + 'FIELDTYPE:invalid_empty:ENUM(0|)\n'
     + 'FIELDTYPE:invalid_boolean:ENUM(N|Y|)\n'
     + 'FIELDTYPE:invalid_boolean_1:ENUM(1|)\n'
@@ -110,6 +111,7 @@ EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
     + 'FIELDTYPE:invalid_company_status_raw:CUSTOM(Scrubs_BIPV2.Functions.fn_str2_only_if_str1>0,company_status_derived)\n'
     + 'FIELDTYPE:invalid_duns_number:CUSTOM(Scrubs_BIPV2.Functions.fn_numeric_opt_size>0,9)\n'
     + 'FIELDTYPE:invalid_is_contact:CUSTOM(Scrubs_BIPV2.Functions.fn_contact>0,contact_name_fname,contact_name_lname)\n'
+    + 'FIELDTYPE:invalid_contact_did:CUSTOM(Scrubs_BIPV2.Functions.fn_contact_did>0,contact_name_fname,contact_name_lname)\n'
     + 'FIELDTYPE:invalid_contact_name_fname:CUSTOM(Scrubs_BIPV2.Functions.fn_str1_xor_str2>0,contact_name_lname)\n'
     + 'FIELDTYPE:invalid_contact_name_lname:CUSTOM(Scrubs_BIPV2.Functions.fn_str1_xor_str2>0,contact_name_fname)\n'
     + 'FIELDTYPE:invalid_contact_type_raw:CUSTOM(Scrubs_BIPV2.Functions.fn_str2_only_if_str1>0,contact_type_derived)\n'
@@ -204,7 +206,7 @@ EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
     + 'FIELD:dt_last_seen_company_address:TYPE(UNSIGNED4):LIKE(invalid_opt_pastdate8):0,0\n'
     + 'FIELD:vl_id:TYPE(STRING34):LIKE(invalid_mandatory):0,0\n'
     + 'FIELD:current:TYPE(BOOLEAN1):LIKE(invalid_boolean_1):0,0\n'
-    + 'FIELD:source_record_id:TYPE(UNSIGNED8):LIKE(invalid_mandatory):0,0\n'
+    + 'FIELD:source_record_id:TYPE(UNSIGNED8):LIKE(invalid_mandatory_numeric):0,0\n'
     + 'FIELD:glb:TYPE(BOOLEAN1):LIKE(invalid_boolean_1):0,0\n'
     + 'FIELD:dppa:TYPE(BOOLEAN1):LIKE(invalid_boolean_1):0,0\n'
     + 'FIELD:phone_score:TYPE(UNSIGNED2):0,0\n'
@@ -216,11 +218,13 @@ EXPORT Ingest_GenerationMod := MODULE(SALT39.iGenerationMod)
     + 'FIELD:is_contact:TYPE(BOOLEAN1):LIKE(invalid_is_contact):0,0\n'
     + 'FIELD:dt_first_seen_contact:TYPE(UNSIGNED4):LIKE(invalid_opt_pastdate8):0,0\n'
     + 'FIELD:dt_last_seen_contact:TYPE(UNSIGNED4):LIKE(invalid_opt_pastdate8):0,0\n'
-    + 'FIELD:contact_did:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0\n'
+    + 'FIELD:contact_did:TYPE(UNSIGNED6):LIKE(invalid_contact_did):0,0\n'
     + 'FIELD:contact_name_title:TYPE(STRING5):0,0\n'
     + 'FIELD:contact_name_fname:TYPE(STRING20):LIKE(invalid_contact_name_fname):0,0\n'
-    + 'FIELD:contact_name_mname:TYPE(STRING20):0,0\n'
+    + '// FIELD:contact_name_fname:TYPE(STRING20):0,0\n'
+    + '// FIELD:contact_name_mname:TYPE(STRING20):0,0\n'
     + 'FIELD:contact_name_lname:TYPE(STRING20):LIKE(invalid_contact_name_lname):0,0\n'
+    + 'FIELD:contact_name_lname:TYPE(STRING20):0,0\n'
     + 'FIELD:contact_name_name_suffix:TYPE(STRING5):0,0\n'
     + 'FIELD:contact_name_name_score:TYPE(STRING3):LIKE(invalid_percentage):0,0\n'
     + 'FIELD:contact_type_raw:TYPE(STRING50):LIKE(invalid_contact_type_raw):0,0\n'

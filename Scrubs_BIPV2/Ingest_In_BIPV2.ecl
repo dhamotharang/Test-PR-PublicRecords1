@@ -2,7 +2,17 @@
 
 STRING8 sVersion := BIPV2.KeySuffix;
 rIn_Layout := BIPV2.Layout_Business_Linking_Full;
-dIngest_In := DATASET(BIPV2.Filenames(sVersion).Source_Ingest.new, rIn_Layout, THOR);
+dIngest_In := DATASET(BIPV2.Filenames(sVersion,TRUE).Source_Ingest.new, rIn_Layout, THOR);
+
+tbl_layout := RECORD
+   string80		company_url;
+   boolean    is_valid := TRUE;
+END;
+
+dLookupTbl := DEDUP(PROJECT(dIngest_In, TRANSFORM(tbl_layout, SELF.company_url := LEFT.source, SELF := [])),ALL);
+
+tbl_layout tCreateLookup(rIn_Layout L) := TRANSFORM
+
 
 Scrubs_BIPV2.Ingest_Layout_BIPV2 tFlatten(rIn_Layout l) := TRANSFORM
    SELF.source_expanded                   := MDR.sourceTools.TranslateSource(L.source);
@@ -33,6 +43,7 @@ Scrubs_BIPV2.Ingest_Layout_BIPV2 tFlatten(rIn_Layout l) := TRANSFORM
    SELF.company_address_geo_blk           := L.company_address.geo_blk;
    SELF.company_address_geo_match         := L.company_address.geo_match;
    SELF.company_address_err_stat          := L.company_address.err_stat;
+   SELF.company_url                       := L.company_url;
    SELF.contact_name_title                := L.contact_name.title;
    SELF.contact_name_fname                := L.contact_name.fname;
    SELF.contact_name_mname                := L.contact_name.mname;

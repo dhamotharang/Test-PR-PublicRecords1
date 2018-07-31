@@ -291,8 +291,9 @@ EXPORT Functions := MODULE
   //fn_url: 	returns true or false based on validity of the url
   //****************************************************************************
   EXPORT fn_url(STRING url) := FUNCTION
-	  // RETURN IF(STD.System.Util.ResolveHostName(url) != '0.0.0.0', 1, 0);
-	  RETURN 1;
+    url_clean := regexreplace('\\s+', url, '');  //Remove all the whitespace which is invalid in an url
+	  // RETURN IF(url_clean = '', 1, IF(STD.System.Util.ResolveHostName(url_clean) != '0.0.0.0', 1, 0));
+	  RETURN IF(url_clean = '', 1, 1);
 	END;
 
   //****************************************************************************
@@ -336,6 +337,16 @@ EXPORT Functions := MODULE
      RETURN IF((BOOLEAN)is_contact,
                IF(LENGTH(TRIM(fname + lname, ALL)) > 0, 1, 0),
                1);
+  END;
+
+  //****************************************************************************
+  //fn_contact_did: 	returns 1 if did empty or is numeric and
+  //                fname and/or lname are populated
+  //****************************************************************************
+  EXPORT fn_contact_did(STRING did, STRING fname, STRING lname) := FUNCTION
+     RETURN IF((UNSIGNED)did > 0 AND LENGTH(TRIM(fname + lname, ALL)) > 0,
+               1,
+               IF((UNSIGNED)did = 0 AND TRIM(fname + lname, ALL) = '', 1, 0));
   END;
 
   //****************************************************************************

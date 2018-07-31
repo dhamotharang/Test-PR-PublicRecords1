@@ -1,4 +1,4 @@
-﻿IMPORT SALT39,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs_BIPV2,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Ingest_Scrubs := MODULE
  
@@ -110,99 +110,99 @@ EXPORT Ingest_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Ingest_Layout_BIPV2) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.source_Invalid := Ingest_Fields.InValid_source((SALT39.StrType)le.source);
-    SELF.dt_first_seen_Invalid := Ingest_Fields.InValid_dt_first_seen((SALT39.StrType)le.dt_first_seen,(SALT39.StrType)le.dt_last_seen);
-    SELF.dt_last_seen_Invalid := Ingest_Fields.InValid_dt_last_seen((SALT39.StrType)le.dt_last_seen);
-    SELF.dt_vendor_first_reported_Invalid := Ingest_Fields.InValid_dt_vendor_first_reported((SALT39.StrType)le.dt_vendor_first_reported,(SALT39.StrType)le.dt_vendor_last_reported);
-    SELF.dt_vendor_last_reported_Invalid := Ingest_Fields.InValid_dt_vendor_last_reported((SALT39.StrType)le.dt_vendor_last_reported);
-    SELF.rcid_Invalid := Ingest_Fields.InValid_rcid((SALT39.StrType)le.rcid);
-    SELF.company_bdid_Invalid := Ingest_Fields.InValid_company_bdid((SALT39.StrType)le.company_bdid);
-    SELF.company_name_Invalid := Ingest_Fields.InValid_company_name((SALT39.StrType)le.company_name);
-    SELF.company_name_type_raw_Invalid := Ingest_Fields.InValid_company_name_type_raw((SALT39.StrType)le.company_name_type_raw,(SALT39.StrType)le.company_name_type_derived);
-    SELF.company_rawaid_Invalid := Ingest_Fields.InValid_company_rawaid((SALT39.StrType)le.company_rawaid);
-    SELF.company_address_predir_Invalid := Ingest_Fields.InValid_company_address_predir((SALT39.StrType)le.company_address_predir);
-    SELF.company_address_prim_name_Invalid := Ingest_Fields.InValid_company_address_prim_name((SALT39.StrType)le.company_address_prim_name);
-    SELF.company_address_postdir_Invalid := Ingest_Fields.InValid_company_address_postdir((SALT39.StrType)le.company_address_postdir);
-    SELF.company_address_p_city_name_Invalid := Ingest_Fields.InValid_company_address_p_city_name((SALT39.StrType)le.company_address_p_city_name,(SALT39.StrType)le.company_address_v_city_name);
-    SELF.company_address_v_city_name_Invalid := Ingest_Fields.InValid_company_address_v_city_name((SALT39.StrType)le.company_address_v_city_name,(SALT39.StrType)le.company_address_p_city_name);
-    SELF.company_address_st_Invalid := Ingest_Fields.InValid_company_address_st((SALT39.StrType)le.company_address_st);
-    SELF.company_address_zip_Invalid := Ingest_Fields.InValid_company_address_zip((SALT39.StrType)le.company_address_zip);
-    SELF.company_address_zip4_Invalid := Ingest_Fields.InValid_company_address_zip4((SALT39.StrType)le.company_address_zip4);
-    SELF.company_address_cart_Invalid := Ingest_Fields.InValid_company_address_cart((SALT39.StrType)le.company_address_cart);
-    SELF.company_address_cr_sort_sz_Invalid := Ingest_Fields.InValid_company_address_cr_sort_sz((SALT39.StrType)le.company_address_cr_sort_sz);
-    SELF.company_address_lot_Invalid := Ingest_Fields.InValid_company_address_lot((SALT39.StrType)le.company_address_lot);
-    SELF.company_address_lot_order_Invalid := Ingest_Fields.InValid_company_address_lot_order((SALT39.StrType)le.company_address_lot_order);
-    SELF.company_address_dbpc_Invalid := Ingest_Fields.InValid_company_address_dbpc((SALT39.StrType)le.company_address_dbpc);
-    SELF.company_address_chk_digit_Invalid := Ingest_Fields.InValid_company_address_chk_digit((SALT39.StrType)le.company_address_chk_digit);
-    SELF.company_address_rec_type_Invalid := Ingest_Fields.InValid_company_address_rec_type((SALT39.StrType)le.company_address_rec_type);
-    SELF.company_address_fips_state_Invalid := Ingest_Fields.InValid_company_address_fips_state((SALT39.StrType)le.company_address_fips_state);
-    SELF.company_address_fips_county_Invalid := Ingest_Fields.InValid_company_address_fips_county((SALT39.StrType)le.company_address_fips_county);
-    SELF.company_address_geo_lat_Invalid := Ingest_Fields.InValid_company_address_geo_lat((SALT39.StrType)le.company_address_geo_lat);
-    SELF.company_address_geo_long_Invalid := Ingest_Fields.InValid_company_address_geo_long((SALT39.StrType)le.company_address_geo_long);
-    SELF.company_address_msa_Invalid := Ingest_Fields.InValid_company_address_msa((SALT39.StrType)le.company_address_msa);
-    SELF.company_address_geo_blk_Invalid := Ingest_Fields.InValid_company_address_geo_blk((SALT39.StrType)le.company_address_geo_blk);
-    SELF.company_address_geo_match_Invalid := Ingest_Fields.InValid_company_address_geo_match((SALT39.StrType)le.company_address_geo_match);
-    SELF.company_address_err_stat_Invalid := Ingest_Fields.InValid_company_address_err_stat((SALT39.StrType)le.company_address_err_stat);
-    SELF.company_address_type_raw_Invalid := Ingest_Fields.InValid_company_address_type_raw((SALT39.StrType)le.company_address_type_raw,(SALT39.StrType)le.company_address_type_derived);
-    SELF.company_fein_Invalid := Ingest_Fields.InValid_company_fein((SALT39.StrType)le.company_fein);
-    SELF.best_fein_indicator_Invalid := Ingest_Fields.InValid_best_fein_indicator((SALT39.StrType)le.best_fein_indicator);
-    SELF.company_phone_Invalid := Ingest_Fields.InValid_company_phone((SALT39.StrType)le.company_phone);
-    SELF.phone_type_Invalid := Ingest_Fields.InValid_phone_type((SALT39.StrType)le.phone_type);
-    SELF.company_org_structure_raw_Invalid := Ingest_Fields.InValid_company_org_structure_raw((SALT39.StrType)le.company_org_structure_raw,(SALT39.StrType)le.company_org_structure_derived);
-    SELF.company_incorporation_date_Invalid := Ingest_Fields.InValid_company_incorporation_date((SALT39.StrType)le.company_incorporation_date);
-    SELF.company_sic_code1_Invalid := Ingest_Fields.InValid_company_sic_code1((SALT39.StrType)le.company_sic_code1);
-    SELF.company_sic_code2_Invalid := Ingest_Fields.InValid_company_sic_code2((SALT39.StrType)le.company_sic_code2);
-    SELF.company_sic_code3_Invalid := Ingest_Fields.InValid_company_sic_code3((SALT39.StrType)le.company_sic_code3);
-    SELF.company_sic_code4_Invalid := Ingest_Fields.InValid_company_sic_code4((SALT39.StrType)le.company_sic_code4);
-    SELF.company_sic_code5_Invalid := Ingest_Fields.InValid_company_sic_code5((SALT39.StrType)le.company_sic_code5);
-    SELF.company_naics_code1_Invalid := Ingest_Fields.InValid_company_naics_code1((SALT39.StrType)le.company_naics_code1);
-    SELF.company_naics_code2_Invalid := Ingest_Fields.InValid_company_naics_code2((SALT39.StrType)le.company_naics_code2);
-    SELF.company_naics_code3_Invalid := Ingest_Fields.InValid_company_naics_code3((SALT39.StrType)le.company_naics_code3);
-    SELF.company_naics_code4_Invalid := Ingest_Fields.InValid_company_naics_code4((SALT39.StrType)le.company_naics_code4);
-    SELF.company_naics_code5_Invalid := Ingest_Fields.InValid_company_naics_code5((SALT39.StrType)le.company_naics_code5);
-    SELF.company_ticker_Invalid := Ingest_Fields.InValid_company_ticker((SALT39.StrType)le.company_ticker,(SALT39.StrType)le.company_ticker_exchange);
-    SELF.company_ticker_exchange_Invalid := Ingest_Fields.InValid_company_ticker_exchange((SALT39.StrType)le.company_ticker_exchange,(SALT39.StrType)le.company_ticker);
-    SELF.company_foreign_domestic_Invalid := Ingest_Fields.InValid_company_foreign_domestic((SALT39.StrType)le.company_foreign_domestic);
-    SELF.company_url_Invalid := Ingest_Fields.InValid_company_url((SALT39.StrType)le.company_url);
-    SELF.company_inc_state_Invalid := Ingest_Fields.InValid_company_inc_state((SALT39.StrType)le.company_inc_state);
-    SELF.company_filing_date_Invalid := Ingest_Fields.InValid_company_filing_date((SALT39.StrType)le.company_filing_date);
-    SELF.company_status_date_Invalid := Ingest_Fields.InValid_company_status_date((SALT39.StrType)le.company_status_date);
-    SELF.company_foreign_date_Invalid := Ingest_Fields.InValid_company_foreign_date((SALT39.StrType)le.company_foreign_date);
-    SELF.event_filing_date_Invalid := Ingest_Fields.InValid_event_filing_date((SALT39.StrType)le.event_filing_date);
-    SELF.company_name_status_raw_Invalid := Ingest_Fields.InValid_company_name_status_raw((SALT39.StrType)le.company_name_status_raw);
-    SELF.company_status_raw_Invalid := Ingest_Fields.InValid_company_status_raw((SALT39.StrType)le.company_status_raw,(SALT39.StrType)le.company_status_derived);
-    SELF.dt_first_seen_company_name_Invalid := Ingest_Fields.InValid_dt_first_seen_company_name((SALT39.StrType)le.dt_first_seen_company_name);
-    SELF.dt_last_seen_company_name_Invalid := Ingest_Fields.InValid_dt_last_seen_company_name((SALT39.StrType)le.dt_last_seen_company_name);
-    SELF.dt_first_seen_company_address_Invalid := Ingest_Fields.InValid_dt_first_seen_company_address((SALT39.StrType)le.dt_first_seen_company_address);
-    SELF.dt_last_seen_company_address_Invalid := Ingest_Fields.InValid_dt_last_seen_company_address((SALT39.StrType)le.dt_last_seen_company_address);
-    SELF.vl_id_Invalid := Ingest_Fields.InValid_vl_id((SALT39.StrType)le.vl_id);
-    SELF.current_Invalid := Ingest_Fields.InValid_current((SALT39.StrType)le.current);
-    SELF.source_record_id_Invalid := Ingest_Fields.InValid_source_record_id((SALT39.StrType)le.source_record_id);
-    SELF.glb_Invalid := Ingest_Fields.InValid_glb((SALT39.StrType)le.glb);
-    SELF.dppa_Invalid := Ingest_Fields.InValid_dppa((SALT39.StrType)le.dppa);
-    SELF.duns_number_Invalid := Ingest_Fields.InValid_duns_number((SALT39.StrType)le.duns_number);
-    SELF.is_contact_Invalid := Ingest_Fields.InValid_is_contact((SALT39.StrType)le.is_contact,(SALT39.StrType)le.contact_name_fname,(SALT39.StrType)le.contact_name_lname);
-    SELF.dt_first_seen_contact_Invalid := Ingest_Fields.InValid_dt_first_seen_contact((SALT39.StrType)le.dt_first_seen_contact);
-    SELF.dt_last_seen_contact_Invalid := Ingest_Fields.InValid_dt_last_seen_contact((SALT39.StrType)le.dt_last_seen_contact);
-    SELF.contact_did_Invalid := Ingest_Fields.InValid_contact_did((SALT39.StrType)le.contact_did);
-    SELF.contact_name_fname_Invalid := Ingest_Fields.InValid_contact_name_fname((SALT39.StrType)le.contact_name_fname,(SALT39.StrType)le.contact_name_lname);
-    SELF.contact_name_lname_Invalid := Ingest_Fields.InValid_contact_name_lname((SALT39.StrType)le.contact_name_lname,(SALT39.StrType)le.contact_name_fname);
-    SELF.contact_name_name_score_Invalid := Ingest_Fields.InValid_contact_name_name_score((SALT39.StrType)le.contact_name_name_score);
-    SELF.contact_type_raw_Invalid := Ingest_Fields.InValid_contact_type_raw((SALT39.StrType)le.contact_type_raw,(SALT39.StrType)le.contact_type_derived);
-    SELF.contact_job_title_raw_Invalid := Ingest_Fields.InValid_contact_job_title_raw((SALT39.StrType)le.contact_job_title_raw,(SALT39.StrType)le.contact_job_title_derived);
-    SELF.contact_ssn_Invalid := Ingest_Fields.InValid_contact_ssn((SALT39.StrType)le.contact_ssn);
-    SELF.contact_dob_Invalid := Ingest_Fields.InValid_contact_dob((SALT39.StrType)le.contact_dob);
-    SELF.contact_status_raw_Invalid := Ingest_Fields.InValid_contact_status_raw((SALT39.StrType)le.contact_status_raw);
-    SELF.contact_phone_Invalid := Ingest_Fields.InValid_contact_phone((SALT39.StrType)le.contact_phone);
-    SELF.from_hdr_Invalid := Ingest_Fields.InValid_from_hdr((SALT39.StrType)le.from_hdr);
-    SELF.company_name_type_derived_Invalid := Ingest_Fields.InValid_company_name_type_derived((SALT39.StrType)le.company_name_type_derived,(SALT39.StrType)le.company_name_type_raw);
-    SELF.company_address_type_derived_Invalid := Ingest_Fields.InValid_company_address_type_derived((SALT39.StrType)le.company_address_type_derived,(SALT39.StrType)le.company_address_type_raw);
-    SELF.company_org_structure_derived_Invalid := Ingest_Fields.InValid_company_org_structure_derived((SALT39.StrType)le.company_org_structure_derived,(SALT39.StrType)le.company_org_structure_raw);
-    SELF.company_name_status_derived_Invalid := Ingest_Fields.InValid_company_name_status_derived((SALT39.StrType)le.company_name_status_derived,(SALT39.StrType)le.company_name_status_raw);
-    SELF.company_status_derived_Invalid := Ingest_Fields.InValid_company_status_derived((SALT39.StrType)le.company_status_derived,(SALT39.StrType)le.company_status_raw);
-    SELF.contact_type_derived_Invalid := Ingest_Fields.InValid_contact_type_derived((SALT39.StrType)le.contact_type_derived,(SALT39.StrType)le.contact_type_raw);
-    SELF.contact_job_title_derived_Invalid := Ingest_Fields.InValid_contact_job_title_derived((SALT39.StrType)le.contact_job_title_derived,(SALT39.StrType)le.contact_job_title_raw);
-    SELF.contact_status_derived_Invalid := Ingest_Fields.InValid_contact_status_derived((SALT39.StrType)le.contact_status_derived,(SALT39.StrType)le.contact_status_raw);
+    SELF.source_Invalid := Ingest_Fields.InValid_source((SALT311.StrType)le.source);
+    SELF.dt_first_seen_Invalid := Ingest_Fields.InValid_dt_first_seen((SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen);
+    SELF.dt_last_seen_Invalid := Ingest_Fields.InValid_dt_last_seen((SALT311.StrType)le.dt_last_seen);
+    SELF.dt_vendor_first_reported_Invalid := Ingest_Fields.InValid_dt_vendor_first_reported((SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported);
+    SELF.dt_vendor_last_reported_Invalid := Ingest_Fields.InValid_dt_vendor_last_reported((SALT311.StrType)le.dt_vendor_last_reported);
+    SELF.rcid_Invalid := Ingest_Fields.InValid_rcid((SALT311.StrType)le.rcid);
+    SELF.company_bdid_Invalid := Ingest_Fields.InValid_company_bdid((SALT311.StrType)le.company_bdid);
+    SELF.company_name_Invalid := Ingest_Fields.InValid_company_name((SALT311.StrType)le.company_name);
+    SELF.company_name_type_raw_Invalid := Ingest_Fields.InValid_company_name_type_raw((SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_name_type_derived);
+    SELF.company_rawaid_Invalid := Ingest_Fields.InValid_company_rawaid((SALT311.StrType)le.company_rawaid);
+    SELF.company_address_predir_Invalid := Ingest_Fields.InValid_company_address_predir((SALT311.StrType)le.company_address_predir);
+    SELF.company_address_prim_name_Invalid := Ingest_Fields.InValid_company_address_prim_name((SALT311.StrType)le.company_address_prim_name);
+    SELF.company_address_postdir_Invalid := Ingest_Fields.InValid_company_address_postdir((SALT311.StrType)le.company_address_postdir);
+    SELF.company_address_p_city_name_Invalid := Ingest_Fields.InValid_company_address_p_city_name((SALT311.StrType)le.company_address_p_city_name,(SALT311.StrType)le.company_address_v_city_name);
+    SELF.company_address_v_city_name_Invalid := Ingest_Fields.InValid_company_address_v_city_name((SALT311.StrType)le.company_address_v_city_name,(SALT311.StrType)le.company_address_p_city_name);
+    SELF.company_address_st_Invalid := Ingest_Fields.InValid_company_address_st((SALT311.StrType)le.company_address_st);
+    SELF.company_address_zip_Invalid := Ingest_Fields.InValid_company_address_zip((SALT311.StrType)le.company_address_zip);
+    SELF.company_address_zip4_Invalid := Ingest_Fields.InValid_company_address_zip4((SALT311.StrType)le.company_address_zip4);
+    SELF.company_address_cart_Invalid := Ingest_Fields.InValid_company_address_cart((SALT311.StrType)le.company_address_cart);
+    SELF.company_address_cr_sort_sz_Invalid := Ingest_Fields.InValid_company_address_cr_sort_sz((SALT311.StrType)le.company_address_cr_sort_sz);
+    SELF.company_address_lot_Invalid := Ingest_Fields.InValid_company_address_lot((SALT311.StrType)le.company_address_lot);
+    SELF.company_address_lot_order_Invalid := Ingest_Fields.InValid_company_address_lot_order((SALT311.StrType)le.company_address_lot_order);
+    SELF.company_address_dbpc_Invalid := Ingest_Fields.InValid_company_address_dbpc((SALT311.StrType)le.company_address_dbpc);
+    SELF.company_address_chk_digit_Invalid := Ingest_Fields.InValid_company_address_chk_digit((SALT311.StrType)le.company_address_chk_digit);
+    SELF.company_address_rec_type_Invalid := Ingest_Fields.InValid_company_address_rec_type((SALT311.StrType)le.company_address_rec_type);
+    SELF.company_address_fips_state_Invalid := Ingest_Fields.InValid_company_address_fips_state((SALT311.StrType)le.company_address_fips_state);
+    SELF.company_address_fips_county_Invalid := Ingest_Fields.InValid_company_address_fips_county((SALT311.StrType)le.company_address_fips_county);
+    SELF.company_address_geo_lat_Invalid := Ingest_Fields.InValid_company_address_geo_lat((SALT311.StrType)le.company_address_geo_lat);
+    SELF.company_address_geo_long_Invalid := Ingest_Fields.InValid_company_address_geo_long((SALT311.StrType)le.company_address_geo_long);
+    SELF.company_address_msa_Invalid := Ingest_Fields.InValid_company_address_msa((SALT311.StrType)le.company_address_msa);
+    SELF.company_address_geo_blk_Invalid := Ingest_Fields.InValid_company_address_geo_blk((SALT311.StrType)le.company_address_geo_blk);
+    SELF.company_address_geo_match_Invalid := Ingest_Fields.InValid_company_address_geo_match((SALT311.StrType)le.company_address_geo_match);
+    SELF.company_address_err_stat_Invalid := Ingest_Fields.InValid_company_address_err_stat((SALT311.StrType)le.company_address_err_stat);
+    SELF.company_address_type_raw_Invalid := Ingest_Fields.InValid_company_address_type_raw((SALT311.StrType)le.company_address_type_raw,(SALT311.StrType)le.company_address_type_derived);
+    SELF.company_fein_Invalid := Ingest_Fields.InValid_company_fein((SALT311.StrType)le.company_fein);
+    SELF.best_fein_indicator_Invalid := Ingest_Fields.InValid_best_fein_indicator((SALT311.StrType)le.best_fein_indicator);
+    SELF.company_phone_Invalid := Ingest_Fields.InValid_company_phone((SALT311.StrType)le.company_phone);
+    SELF.phone_type_Invalid := Ingest_Fields.InValid_phone_type((SALT311.StrType)le.phone_type);
+    SELF.company_org_structure_raw_Invalid := Ingest_Fields.InValid_company_org_structure_raw((SALT311.StrType)le.company_org_structure_raw,(SALT311.StrType)le.company_org_structure_derived);
+    SELF.company_incorporation_date_Invalid := Ingest_Fields.InValid_company_incorporation_date((SALT311.StrType)le.company_incorporation_date);
+    SELF.company_sic_code1_Invalid := Ingest_Fields.InValid_company_sic_code1((SALT311.StrType)le.company_sic_code1);
+    SELF.company_sic_code2_Invalid := Ingest_Fields.InValid_company_sic_code2((SALT311.StrType)le.company_sic_code2);
+    SELF.company_sic_code3_Invalid := Ingest_Fields.InValid_company_sic_code3((SALT311.StrType)le.company_sic_code3);
+    SELF.company_sic_code4_Invalid := Ingest_Fields.InValid_company_sic_code4((SALT311.StrType)le.company_sic_code4);
+    SELF.company_sic_code5_Invalid := Ingest_Fields.InValid_company_sic_code5((SALT311.StrType)le.company_sic_code5);
+    SELF.company_naics_code1_Invalid := Ingest_Fields.InValid_company_naics_code1((SALT311.StrType)le.company_naics_code1);
+    SELF.company_naics_code2_Invalid := Ingest_Fields.InValid_company_naics_code2((SALT311.StrType)le.company_naics_code2);
+    SELF.company_naics_code3_Invalid := Ingest_Fields.InValid_company_naics_code3((SALT311.StrType)le.company_naics_code3);
+    SELF.company_naics_code4_Invalid := Ingest_Fields.InValid_company_naics_code4((SALT311.StrType)le.company_naics_code4);
+    SELF.company_naics_code5_Invalid := Ingest_Fields.InValid_company_naics_code5((SALT311.StrType)le.company_naics_code5);
+    SELF.company_ticker_Invalid := Ingest_Fields.InValid_company_ticker((SALT311.StrType)le.company_ticker,(SALT311.StrType)le.company_ticker_exchange);
+    SELF.company_ticker_exchange_Invalid := Ingest_Fields.InValid_company_ticker_exchange((SALT311.StrType)le.company_ticker_exchange,(SALT311.StrType)le.company_ticker);
+    SELF.company_foreign_domestic_Invalid := Ingest_Fields.InValid_company_foreign_domestic((SALT311.StrType)le.company_foreign_domestic);
+    SELF.company_url_Invalid := Ingest_Fields.InValid_company_url((SALT311.StrType)le.company_url);
+    SELF.company_inc_state_Invalid := Ingest_Fields.InValid_company_inc_state((SALT311.StrType)le.company_inc_state);
+    SELF.company_filing_date_Invalid := Ingest_Fields.InValid_company_filing_date((SALT311.StrType)le.company_filing_date);
+    SELF.company_status_date_Invalid := Ingest_Fields.InValid_company_status_date((SALT311.StrType)le.company_status_date);
+    SELF.company_foreign_date_Invalid := Ingest_Fields.InValid_company_foreign_date((SALT311.StrType)le.company_foreign_date);
+    SELF.event_filing_date_Invalid := Ingest_Fields.InValid_event_filing_date((SALT311.StrType)le.event_filing_date);
+    SELF.company_name_status_raw_Invalid := Ingest_Fields.InValid_company_name_status_raw((SALT311.StrType)le.company_name_status_raw);
+    SELF.company_status_raw_Invalid := Ingest_Fields.InValid_company_status_raw((SALT311.StrType)le.company_status_raw,(SALT311.StrType)le.company_status_derived);
+    SELF.dt_first_seen_company_name_Invalid := Ingest_Fields.InValid_dt_first_seen_company_name((SALT311.StrType)le.dt_first_seen_company_name);
+    SELF.dt_last_seen_company_name_Invalid := Ingest_Fields.InValid_dt_last_seen_company_name((SALT311.StrType)le.dt_last_seen_company_name);
+    SELF.dt_first_seen_company_address_Invalid := Ingest_Fields.InValid_dt_first_seen_company_address((SALT311.StrType)le.dt_first_seen_company_address);
+    SELF.dt_last_seen_company_address_Invalid := Ingest_Fields.InValid_dt_last_seen_company_address((SALT311.StrType)le.dt_last_seen_company_address);
+    SELF.vl_id_Invalid := Ingest_Fields.InValid_vl_id((SALT311.StrType)le.vl_id);
+    SELF.current_Invalid := Ingest_Fields.InValid_current((SALT311.StrType)le.current);
+    SELF.source_record_id_Invalid := Ingest_Fields.InValid_source_record_id((SALT311.StrType)le.source_record_id);
+    SELF.glb_Invalid := Ingest_Fields.InValid_glb((SALT311.StrType)le.glb);
+    SELF.dppa_Invalid := Ingest_Fields.InValid_dppa((SALT311.StrType)le.dppa);
+    SELF.duns_number_Invalid := Ingest_Fields.InValid_duns_number((SALT311.StrType)le.duns_number);
+    SELF.is_contact_Invalid := Ingest_Fields.InValid_is_contact((SALT311.StrType)le.is_contact,(SALT311.StrType)le.contact_name_fname,(SALT311.StrType)le.contact_name_lname);
+    SELF.dt_first_seen_contact_Invalid := Ingest_Fields.InValid_dt_first_seen_contact((SALT311.StrType)le.dt_first_seen_contact);
+    SELF.dt_last_seen_contact_Invalid := Ingest_Fields.InValid_dt_last_seen_contact((SALT311.StrType)le.dt_last_seen_contact);
+    SELF.contact_did_Invalid := Ingest_Fields.InValid_contact_did((SALT311.StrType)le.contact_did,(SALT311.StrType)le.contact_name_fname,(SALT311.StrType)le.contact_name_lname);
+    SELF.contact_name_fname_Invalid := Ingest_Fields.InValid_contact_name_fname((SALT311.StrType)le.contact_name_fname,(SALT311.StrType)le.contact_name_lname);
+    SELF.contact_name_lname_Invalid := Ingest_Fields.InValid_contact_name_lname((SALT311.StrType)le.contact_name_lname,(SALT311.StrType)le.contact_name_fname);
+    SELF.contact_name_name_score_Invalid := Ingest_Fields.InValid_contact_name_name_score((SALT311.StrType)le.contact_name_name_score);
+    SELF.contact_type_raw_Invalid := Ingest_Fields.InValid_contact_type_raw((SALT311.StrType)le.contact_type_raw,(SALT311.StrType)le.contact_type_derived);
+    SELF.contact_job_title_raw_Invalid := Ingest_Fields.InValid_contact_job_title_raw((SALT311.StrType)le.contact_job_title_raw,(SALT311.StrType)le.contact_job_title_derived);
+    SELF.contact_ssn_Invalid := Ingest_Fields.InValid_contact_ssn((SALT311.StrType)le.contact_ssn);
+    SELF.contact_dob_Invalid := Ingest_Fields.InValid_contact_dob((SALT311.StrType)le.contact_dob);
+    SELF.contact_status_raw_Invalid := Ingest_Fields.InValid_contact_status_raw((SALT311.StrType)le.contact_status_raw);
+    SELF.contact_phone_Invalid := Ingest_Fields.InValid_contact_phone((SALT311.StrType)le.contact_phone);
+    SELF.from_hdr_Invalid := Ingest_Fields.InValid_from_hdr((SALT311.StrType)le.from_hdr);
+    SELF.company_name_type_derived_Invalid := Ingest_Fields.InValid_company_name_type_derived((SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.company_name_type_raw);
+    SELF.company_address_type_derived_Invalid := Ingest_Fields.InValid_company_address_type_derived((SALT311.StrType)le.company_address_type_derived,(SALT311.StrType)le.company_address_type_raw);
+    SELF.company_org_structure_derived_Invalid := Ingest_Fields.InValid_company_org_structure_derived((SALT311.StrType)le.company_org_structure_derived,(SALT311.StrType)le.company_org_structure_raw);
+    SELF.company_name_status_derived_Invalid := Ingest_Fields.InValid_company_name_status_derived((SALT311.StrType)le.company_name_status_derived,(SALT311.StrType)le.company_name_status_raw);
+    SELF.company_status_derived_Invalid := Ingest_Fields.InValid_company_status_derived((SALT311.StrType)le.company_status_derived,(SALT311.StrType)le.company_status_raw);
+    SELF.contact_type_derived_Invalid := Ingest_Fields.InValid_contact_type_derived((SALT311.StrType)le.contact_type_derived,(SALT311.StrType)le.contact_type_raw);
+    SELF.contact_job_title_derived_Invalid := Ingest_Fields.InValid_contact_job_title_derived((SALT311.StrType)le.contact_job_title_derived,(SALT311.StrType)le.contact_job_title_raw);
+    SELF.contact_status_derived_Invalid := Ingest_Fields.InValid_contact_status_derived((SALT311.StrType)le.contact_status_derived,(SALT311.StrType)le.contact_status_raw);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -394,7 +394,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     is_contact_CUSTOM_ErrorCount := COUNT(GROUP,h.is_contact_Invalid=1);
     dt_first_seen_contact_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_first_seen_contact_Invalid=1);
     dt_last_seen_contact_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_last_seen_contact_Invalid=1);
-    contact_did_ALLOW_ErrorCount := COUNT(GROUP,h.contact_did_Invalid=1);
+    contact_did_CUSTOM_ErrorCount := COUNT(GROUP,h.contact_did_Invalid=1);
     contact_name_fname_CUSTOM_ErrorCount := COUNT(GROUP,h.contact_name_fname_Invalid=1);
     contact_name_lname_CUSTOM_ErrorCount := COUNT(GROUP,h.contact_name_lname_Invalid=1);
     contact_name_name_score_CUSTOM_ErrorCount := COUNT(GROUP,h.contact_name_name_score_Invalid=1);
@@ -421,9 +421,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
   END;
   SummaryStats0 := IF(Glob, TABLE(h,r), TABLE(h,r,source_expanded,FEW));
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.source_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rcid_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_rawaid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_rec_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_blk_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_fein_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.best_fein_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_incorporation_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_exchange_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_domestic_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_url_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_inc_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vl_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.current_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_record_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.glb_ENUM_ErrorCount > 0, 1, 0) + IF(le.dppa_ENUM_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_name_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_name_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_ssn_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.from_hdr_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_derived_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.source_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rcid_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_rawaid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_rec_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_blk_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_fein_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.best_fein_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_incorporation_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_exchange_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_domestic_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_url_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_inc_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vl_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.current_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_record_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.glb_ENUM_ErrorCount > 0, 1, 0) + IF(le.dppa_ENUM_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_did_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_name_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_ssn_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.from_hdr_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_derived_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.source_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rcid_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_rawaid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_rec_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_blk_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_fein_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.best_fein_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_incorporation_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_exchange_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_domestic_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_url_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_inc_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vl_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.current_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_record_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.glb_ENUM_ErrorCount > 0, 1, 0) + IF(le.dppa_ENUM_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.contact_name_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_name_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_ssn_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.from_hdr_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_derived_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.source_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rcid_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_bdid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_rawaid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_address_p_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_v_city_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_st_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cart_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_cr_sort_sz_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_lot_order_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_address_dbpc_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_chk_digit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_rec_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_fips_county_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_lat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_long_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_msa_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_blk_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_geo_match_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_err_stat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_fein_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.best_fein_indicator_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_incorporation_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_sic_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code3_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_naics_code5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_ticker_exchange_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_domestic_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_url_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_inc_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_foreign_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.event_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_company_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.vl_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.current_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_record_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.glb_ENUM_ErrorCount > 0, 1, 0) + IF(le.dppa_ENUM_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_contact_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_did_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_name_name_score_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_ssn_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_raw_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.from_hdr_ENUM_ErrorCount > 0, 1, 0) + IF(le.company_name_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_address_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_org_structure_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_status_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_type_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_job_title_derived_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contact_status_derived_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -433,8 +433,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT39.StrType ErrorMessage;
-    SALT39.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  le.source_expanded;
@@ -515,7 +515,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.is_contact_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_first_seen_contact_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_last_seen_contact_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.contact_did_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.contact_did_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.contact_name_fname_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.contact_name_lname_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.contact_name_name_score_Invalid,'CUSTOM','UNKNOWN')
@@ -535,8 +535,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,CHOOSE(le.contact_job_title_derived_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.contact_status_derived_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'source','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','rcid','company_bdid','company_name','company_name_type_raw','company_rawaid','company_address_predir','company_address_prim_name','company_address_postdir','company_address_p_city_name','company_address_v_city_name','company_address_st','company_address_zip','company_address_zip4','company_address_cart','company_address_cr_sort_sz','company_address_lot','company_address_lot_order','company_address_dbpc','company_address_chk_digit','company_address_rec_type','company_address_fips_state','company_address_fips_county','company_address_geo_lat','company_address_geo_long','company_address_msa','company_address_geo_blk','company_address_geo_match','company_address_err_stat','company_address_type_raw','company_fein','best_fein_indicator','company_phone','phone_type','company_org_structure_raw','company_incorporation_date','company_sic_code1','company_sic_code2','company_sic_code3','company_sic_code4','company_sic_code5','company_naics_code1','company_naics_code2','company_naics_code3','company_naics_code4','company_naics_code5','company_ticker','company_ticker_exchange','company_foreign_domestic','company_url','company_inc_state','company_filing_date','company_status_date','company_foreign_date','event_filing_date','company_name_status_raw','company_status_raw','dt_first_seen_company_name','dt_last_seen_company_name','dt_first_seen_company_address','dt_last_seen_company_address','vl_id','current','source_record_id','glb','dppa','duns_number','is_contact','dt_first_seen_contact','dt_last_seen_contact','contact_did','contact_name_fname','contact_name_lname','contact_name_name_score','contact_type_raw','contact_job_title_raw','contact_ssn','contact_dob','contact_status_raw','contact_phone','from_hdr','company_name_type_derived','company_address_type_derived','company_org_structure_derived','company_name_status_derived','company_status_derived','contact_type_derived','contact_job_title_derived','contact_status_derived','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_source','invalid_dt_first_seen','invalid_opt_pastdate8','invalid_dt_vendor_first_reported','invalid_pastdate8','invalid_empty','invalid_mandatory','invalid_mandatory','invalid_company_name_type_raw','invalid_company_rawaid','invalid_direction','invalid_mandatory','invalid_direction','invalid_company_address_p_city_name','invalid_company_address_v_city_name','invalid_st','invalid_zip5','invalid_zip4','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dpbc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_company_address_type_raw','invalid_company_fein','invalid_best_fein_indicator','invalid_company_phone','invalid_phone_type','invalid_company_org_structure_raw','invalid_opt_pastdate8','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_company_ticker','invalid_company_ticker_exchange','invalid_company_foreign_domestic','invalid_company_url','invalid_company_inc_state','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_company_name_status_raw','invalid_company_status_raw','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_mandatory','invalid_boolean_1','invalid_mandatory','invalid_boolean_1','invalid_boolean_1','invalid_duns_number','invalid_is_contact','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_numeric','invalid_contact_name_fname','invalid_contact_name_lname','invalid_percentage','invalid_contact_type_raw','invalid_contact_job_title_raw','invalid_contact_ssn','invalid_contact_dob','invalid_contact_status_raw','invalid_contact_phone','invalid_boolean','invalid_company_name_type_derived','invalid_company_address_type_derived','invalid_company_org_structure_derived','invalid_company_name_status_derived','invalid_company_status_derived','invalid_contact_type_derived','invalid_contact_job_title_derived','invalid_contact_status_derived','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.source,(SALT39.StrType)le.dt_first_seen,(SALT39.StrType)le.dt_last_seen,(SALT39.StrType)le.dt_vendor_first_reported,(SALT39.StrType)le.dt_vendor_last_reported,(SALT39.StrType)le.rcid,(SALT39.StrType)le.company_bdid,(SALT39.StrType)le.company_name,(SALT39.StrType)le.company_name_type_raw,(SALT39.StrType)le.company_rawaid,(SALT39.StrType)le.company_address_predir,(SALT39.StrType)le.company_address_prim_name,(SALT39.StrType)le.company_address_postdir,(SALT39.StrType)le.company_address_p_city_name,(SALT39.StrType)le.company_address_v_city_name,(SALT39.StrType)le.company_address_st,(SALT39.StrType)le.company_address_zip,(SALT39.StrType)le.company_address_zip4,(SALT39.StrType)le.company_address_cart,(SALT39.StrType)le.company_address_cr_sort_sz,(SALT39.StrType)le.company_address_lot,(SALT39.StrType)le.company_address_lot_order,(SALT39.StrType)le.company_address_dbpc,(SALT39.StrType)le.company_address_chk_digit,(SALT39.StrType)le.company_address_rec_type,(SALT39.StrType)le.company_address_fips_state,(SALT39.StrType)le.company_address_fips_county,(SALT39.StrType)le.company_address_geo_lat,(SALT39.StrType)le.company_address_geo_long,(SALT39.StrType)le.company_address_msa,(SALT39.StrType)le.company_address_geo_blk,(SALT39.StrType)le.company_address_geo_match,(SALT39.StrType)le.company_address_err_stat,(SALT39.StrType)le.company_address_type_raw,(SALT39.StrType)le.company_fein,(SALT39.StrType)le.best_fein_indicator,(SALT39.StrType)le.company_phone,(SALT39.StrType)le.phone_type,(SALT39.StrType)le.company_org_structure_raw,(SALT39.StrType)le.company_incorporation_date,(SALT39.StrType)le.company_sic_code1,(SALT39.StrType)le.company_sic_code2,(SALT39.StrType)le.company_sic_code3,(SALT39.StrType)le.company_sic_code4,(SALT39.StrType)le.company_sic_code5,(SALT39.StrType)le.company_naics_code1,(SALT39.StrType)le.company_naics_code2,(SALT39.StrType)le.company_naics_code3,(SALT39.StrType)le.company_naics_code4,(SALT39.StrType)le.company_naics_code5,(SALT39.StrType)le.company_ticker,(SALT39.StrType)le.company_ticker_exchange,(SALT39.StrType)le.company_foreign_domestic,(SALT39.StrType)le.company_url,(SALT39.StrType)le.company_inc_state,(SALT39.StrType)le.company_filing_date,(SALT39.StrType)le.company_status_date,(SALT39.StrType)le.company_foreign_date,(SALT39.StrType)le.event_filing_date,(SALT39.StrType)le.company_name_status_raw,(SALT39.StrType)le.company_status_raw,(SALT39.StrType)le.dt_first_seen_company_name,(SALT39.StrType)le.dt_last_seen_company_name,(SALT39.StrType)le.dt_first_seen_company_address,(SALT39.StrType)le.dt_last_seen_company_address,(SALT39.StrType)le.vl_id,(SALT39.StrType)le.current,(SALT39.StrType)le.source_record_id,(SALT39.StrType)le.glb,(SALT39.StrType)le.dppa,(SALT39.StrType)le.duns_number,(SALT39.StrType)le.is_contact,(SALT39.StrType)le.dt_first_seen_contact,(SALT39.StrType)le.dt_last_seen_contact,(SALT39.StrType)le.contact_did,(SALT39.StrType)le.contact_name_fname,(SALT39.StrType)le.contact_name_lname,(SALT39.StrType)le.contact_name_name_score,(SALT39.StrType)le.contact_type_raw,(SALT39.StrType)le.contact_job_title_raw,(SALT39.StrType)le.contact_ssn,(SALT39.StrType)le.contact_dob,(SALT39.StrType)le.contact_status_raw,(SALT39.StrType)le.contact_phone,(SALT39.StrType)le.from_hdr,(SALT39.StrType)le.company_name_type_derived,(SALT39.StrType)le.company_address_type_derived,(SALT39.StrType)le.company_org_structure_derived,(SALT39.StrType)le.company_name_status_derived,(SALT39.StrType)le.company_status_derived,(SALT39.StrType)le.contact_type_derived,(SALT39.StrType)le.contact_job_title_derived,(SALT39.StrType)le.contact_status_derived,'***SALTBUG***');
+    SELF.FieldType := CHOOSE(c,'invalid_source','invalid_dt_first_seen','invalid_opt_pastdate8','invalid_dt_vendor_first_reported','invalid_pastdate8','invalid_empty','invalid_mandatory','invalid_mandatory','invalid_company_name_type_raw','invalid_company_rawaid','invalid_direction','invalid_mandatory','invalid_direction','invalid_company_address_p_city_name','invalid_company_address_v_city_name','invalid_st','invalid_zip5','invalid_zip4','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dpbc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_company_address_type_raw','invalid_company_fein','invalid_best_fein_indicator','invalid_company_phone','invalid_phone_type','invalid_company_org_structure_raw','invalid_opt_pastdate8','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_company_ticker','invalid_company_ticker_exchange','invalid_company_foreign_domestic','invalid_company_url','invalid_company_inc_state','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_company_name_status_raw','invalid_company_status_raw','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_mandatory','invalid_boolean_1','invalid_mandatory_numeric','invalid_boolean_1','invalid_boolean_1','invalid_duns_number','invalid_is_contact','invalid_opt_pastdate8','invalid_opt_pastdate8','invalid_contact_did','invalid_contact_name_fname','invalid_contact_name_lname','invalid_percentage','invalid_contact_type_raw','invalid_contact_job_title_raw','invalid_contact_ssn','invalid_contact_dob','invalid_contact_status_raw','invalid_contact_phone','invalid_boolean','invalid_company_name_type_derived','invalid_company_address_type_derived','invalid_company_org_structure_derived','invalid_company_name_status_derived','invalid_company_status_derived','invalid_contact_type_derived','invalid_contact_job_title_derived','invalid_contact_status_derived','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.source,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.rcid,(SALT311.StrType)le.company_bdid,(SALT311.StrType)le.company_name,(SALT311.StrType)le.company_name_type_raw,(SALT311.StrType)le.company_rawaid,(SALT311.StrType)le.company_address_predir,(SALT311.StrType)le.company_address_prim_name,(SALT311.StrType)le.company_address_postdir,(SALT311.StrType)le.company_address_p_city_name,(SALT311.StrType)le.company_address_v_city_name,(SALT311.StrType)le.company_address_st,(SALT311.StrType)le.company_address_zip,(SALT311.StrType)le.company_address_zip4,(SALT311.StrType)le.company_address_cart,(SALT311.StrType)le.company_address_cr_sort_sz,(SALT311.StrType)le.company_address_lot,(SALT311.StrType)le.company_address_lot_order,(SALT311.StrType)le.company_address_dbpc,(SALT311.StrType)le.company_address_chk_digit,(SALT311.StrType)le.company_address_rec_type,(SALT311.StrType)le.company_address_fips_state,(SALT311.StrType)le.company_address_fips_county,(SALT311.StrType)le.company_address_geo_lat,(SALT311.StrType)le.company_address_geo_long,(SALT311.StrType)le.company_address_msa,(SALT311.StrType)le.company_address_geo_blk,(SALT311.StrType)le.company_address_geo_match,(SALT311.StrType)le.company_address_err_stat,(SALT311.StrType)le.company_address_type_raw,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.best_fein_indicator,(SALT311.StrType)le.company_phone,(SALT311.StrType)le.phone_type,(SALT311.StrType)le.company_org_structure_raw,(SALT311.StrType)le.company_incorporation_date,(SALT311.StrType)le.company_sic_code1,(SALT311.StrType)le.company_sic_code2,(SALT311.StrType)le.company_sic_code3,(SALT311.StrType)le.company_sic_code4,(SALT311.StrType)le.company_sic_code5,(SALT311.StrType)le.company_naics_code1,(SALT311.StrType)le.company_naics_code2,(SALT311.StrType)le.company_naics_code3,(SALT311.StrType)le.company_naics_code4,(SALT311.StrType)le.company_naics_code5,(SALT311.StrType)le.company_ticker,(SALT311.StrType)le.company_ticker_exchange,(SALT311.StrType)le.company_foreign_domestic,(SALT311.StrType)le.company_url,(SALT311.StrType)le.company_inc_state,(SALT311.StrType)le.company_filing_date,(SALT311.StrType)le.company_status_date,(SALT311.StrType)le.company_foreign_date,(SALT311.StrType)le.event_filing_date,(SALT311.StrType)le.company_name_status_raw,(SALT311.StrType)le.company_status_raw,(SALT311.StrType)le.dt_first_seen_company_name,(SALT311.StrType)le.dt_last_seen_company_name,(SALT311.StrType)le.dt_first_seen_company_address,(SALT311.StrType)le.dt_last_seen_company_address,(SALT311.StrType)le.vl_id,(SALT311.StrType)le.current,(SALT311.StrType)le.source_record_id,(SALT311.StrType)le.glb,(SALT311.StrType)le.dppa,(SALT311.StrType)le.duns_number,(SALT311.StrType)le.is_contact,(SALT311.StrType)le.dt_first_seen_contact,(SALT311.StrType)le.dt_last_seen_contact,(SALT311.StrType)le.contact_did,(SALT311.StrType)le.contact_name_fname,(SALT311.StrType)le.contact_name_lname,(SALT311.StrType)le.contact_name_name_score,(SALT311.StrType)le.contact_type_raw,(SALT311.StrType)le.contact_job_title_raw,(SALT311.StrType)le.contact_ssn,(SALT311.StrType)le.contact_dob,(SALT311.StrType)le.contact_status_raw,(SALT311.StrType)le.contact_phone,(SALT311.StrType)le.from_hdr,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.company_address_type_derived,(SALT311.StrType)le.company_org_structure_derived,(SALT311.StrType)le.company_name_status_derived,(SALT311.StrType)le.company_status_derived,(SALT311.StrType)le.contact_type_derived,(SALT311.StrType)le.contact_job_title_derived,(SALT311.StrType)le.contact_status_derived,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,93,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -544,7 +544,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Ingest_Layout_BIPV2) prevDS = DATASET([], Ingest_Layout_BIPV2)):= FUNCTION
   // field error stats
-    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := le.source_expanded;
@@ -616,14 +616,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,'dt_last_seen_company_address:invalid_opt_pastdate8:CUSTOM'
           ,'vl_id:invalid_mandatory:CUSTOM'
           ,'current:invalid_boolean_1:ENUM'
-          ,'source_record_id:invalid_mandatory:CUSTOM'
+          ,'source_record_id:invalid_mandatory_numeric:CUSTOM'
           ,'glb:invalid_boolean_1:ENUM'
           ,'dppa:invalid_boolean_1:ENUM'
           ,'duns_number:invalid_duns_number:CUSTOM'
           ,'is_contact:invalid_is_contact:CUSTOM'
           ,'dt_first_seen_contact:invalid_opt_pastdate8:CUSTOM'
           ,'dt_last_seen_contact:invalid_opt_pastdate8:CUSTOM'
-          ,'contact_did:invalid_numeric:ALLOW'
+          ,'contact_did:invalid_contact_did:CUSTOM'
           ,'contact_name_fname:invalid_contact_name_fname:CUSTOM'
           ,'contact_name_lname:invalid_contact_name_lname:CUSTOM'
           ,'contact_name_name_score:invalid_percentage:CUSTOM'
@@ -825,7 +825,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.is_contact_CUSTOM_ErrorCount
           ,le.dt_first_seen_contact_CUSTOM_ErrorCount
           ,le.dt_last_seen_contact_CUSTOM_ErrorCount
-          ,le.contact_did_ALLOW_ErrorCount
+          ,le.contact_did_CUSTOM_ErrorCount
           ,le.contact_name_fname_CUSTOM_ErrorCount
           ,le.contact_name_lname_CUSTOM_ErrorCount
           ,le.contact_name_name_score_CUSTOM_ErrorCount
@@ -926,7 +926,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.is_contact_CUSTOM_ErrorCount
           ,le.dt_first_seen_contact_CUSTOM_ErrorCount
           ,le.dt_last_seen_contact_CUSTOM_ErrorCount
-          ,le.contact_did_ALLOW_ErrorCount
+          ,le.contact_did_CUSTOM_ErrorCount
           ,le.contact_name_fname_CUSTOM_ErrorCount
           ,le.contact_name_lname_CUSTOM_ErrorCount
           ,le.contact_name_name_score_CUSTOM_ErrorCount
@@ -944,7 +944,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.company_status_derived_CUSTOM_ErrorCount
           ,le.contact_type_derived_CUSTOM_ErrorCount
           ,le.contact_job_title_derived_CUSTOM_ErrorCount
-          ,le.contact_status_derived_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.contact_status_derived_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -958,12 +958,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -980,7 +980,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := le.Source;
@@ -1075,7 +1075,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,'contact_did:' + getFieldTypeText(h.contact_did) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'contact_name_title:' + getFieldTypeText(h.contact_name_title) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'contact_name_fname:' + getFieldTypeText(h.contact_name_fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'contact_name_mname:' + getFieldTypeText(h.contact_name_mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'contact_name_lname:' + getFieldTypeText(h.contact_name_lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'contact_name_lname:' + getFieldTypeText(h.contact_name_lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'contact_name_name_suffix:' + getFieldTypeText(h.contact_name_name_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'contact_name_name_score:' + getFieldTypeText(h.contact_name_name_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -1204,7 +1204,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_contact_did_cnt
           ,le.populated_contact_name_title_cnt
           ,le.populated_contact_name_fname_cnt
-          ,le.populated_contact_name_mname_cnt
+          ,le.populated_contact_name_lname_cnt
           ,le.populated_contact_name_lname_cnt
           ,le.populated_contact_name_name_suffix_cnt
           ,le.populated_contact_name_name_score_cnt
@@ -1333,7 +1333,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_contact_did_pcnt
           ,le.populated_contact_name_title_pcnt
           ,le.populated_contact_name_fname_pcnt
-          ,le.populated_contact_name_mname_pcnt
+          ,le.populated_contact_name_lname_pcnt
           ,le.populated_contact_name_lname_pcnt
           ,le.populated_contact_name_name_suffix_pcnt
           ,le.populated_contact_name_name_score_pcnt
@@ -1376,7 +1376,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,128,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := le.Source;
@@ -1401,14 +1401,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(Ingest_Layout_BIPV2) inFile, BOOLEAN doErrorOverall = TRUE, BOOLEAN doErrorPerSrc = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedPerSource := FromExpanded(expandedFile, FALSE);
   mod_fromexpandedOverall := FromExpanded(expandedFile, TRUE);
   scrubsSummaryPerSource := mod_fromexpandedPerSource.SummaryStats;
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_BIPV2, Ingest_Fields, 'RECORDOF(scrubsSummaryOverall)', 'source_expanded');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_BIPV2, Ingest_Fields, 'RECORDOF(scrubsSummaryOverall)', 'source_expanded');
   scrubsSummaryPerSource_Standard := NORMALIZE(scrubsSummaryPerSource, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'src', 'src'));
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
@@ -1422,7 +1422,7 @@ EXPORT StandardStats(DATASET(Ingest_Layout_BIPV2) inFile, BOOLEAN doErrorOverall
   	                                                       SORT(tErrsPerSource, src, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.source = RIGHT.src AND LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
   scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
@@ -1430,11 +1430,11 @@ EXPORT StandardStats(DATASET(Ingest_Layout_BIPV2) inFile, BOOLEAN doErrorOverall
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryPerSource_Standard_GeneralErrs := IF(doErrorPerSrc, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryPerSource, source_expanded, myTimeStamp, 'src', 'src'));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryPerSource_Standard_GeneralErrs := IF(doErrorPerSrc, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryPerSource, source_expanded, myTimeStamp, 'src', 'src'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryPerSource_Standard_addErr & scrubsSummaryPerSource_Standard_GeneralErrs & scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
