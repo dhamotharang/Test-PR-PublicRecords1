@@ -1,28 +1,31 @@
-EXPORT Process_xIDL_Layouts(BOOLEAN incremental=FALSE) := MODULE
+﻿EXPORT Process_xIDL_Layouts(BOOLEAN incremental=FALSE) := MODULE
  
-IMPORT SALT37,IDL_Header /*HACK*/,STD;
+IMPORT SALT37,STD,IDL_Header; /*PHACK01*/
 SHARED h := File_InsuranceHeader;//The input file
 SHARED h0 := PROJECT(h,TRANSFORM(recordof(left),
 	isUt := IDL_Header.SourceTools.SourceIsUtility(LEFT.src);
 	SELF.ssn:=IF(isUt,'',LEFT.ssn);
 	SELF.ssn_ind:=IF(isUt,'',LEFT.ssn_ind);
-	SELF:=LEFT));//The input file /*HACK*/
+	SELF:=LEFT));//The input file /*PHACK02*/
  
-EXPORT KeyName := KeyNames().header_super; /*HACK*/
+EXPORT KeyName := KeyNames().header_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::meow';
  
-EXPORT Key := INDEX(h0,{DID},{h0},KeyName); /*HACK*/
+EXPORT Key := INDEX(h0,{DID},{h0},KeyName); /*PHACK03*/
 // Create key to get from historic versions of higher order keys
  
-EXPORT KeyIDHistoryName := KeyNames().id_history_super; /*HACK*/
+EXPORT KeyIDHistoryName := KeyNames().id_history_super; /*PHACK07*/
  
 EXPORT KeyIDHistoryName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::sup::RID';
  
 EXPORT AssignCurrentKeyIDHistoryToSuperFile := FileServices.AddSuperFile(KeyIDHistoryName_sf,KeyIDHistoryName);
  
 EXPORT ClearKeyIDHistorySuperFile := SEQUENTIAL(FileServices.CreateSuperFile(KeyIDHistoryName_sf,,TRUE),FileServices.ClearSuperFile(KeyIDHistoryName_sf));
-  SHARED sIDHist := TABLE(h,{DID, RID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST}, RID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, DID,MERGE);
+  SHARED sIDHistInc := TABLE(h,{DID, RID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST}, RID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, DID,MERGE);
+SHARED sIDHistFull := InsuranceHeader_xLink.IdHistoryFull(h);
+SHARED sIDHist := IF(incremental, sIDHistInc, sIDHistFull);/*PHACK09*/ 
+
  
 EXPORT KeyIDHistory := INDEX(sIDHist,{RID},{sIDHist},KeyIDHistoryName);
  
@@ -30,7 +33,7 @@ EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyNa
  
 EXPORT ClearKeySuperFile := SEQUENTIAL(FileServices.CreateSuperFile(KeyName_sf,,TRUE),FileServices.ClearSuperFile(KeyName_sf));
  
-EXPORT Key0Name := KeyNames().header0_super; /*HACK*/
+EXPORT Key0Name := KeyNames().header0_super; /*PHACK08*/
  
 EXPORT Key0Name_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::meow::DID0';
  
@@ -49,7 +52,9 @@ EXPORT MAC_GenerateMergedKey(in_superfileIn, in_outfileName, in_minDate, in_repl
     UNSIGNED4 modifyDate;
   END;
   Layout_modifyDate xModified(childFiles L) := TRANSFORM
-    SELF.modifyDate := (UNSIGNED4)(STD.Str.FindReplace(STD.File.GetLogicalFileAttribute('~' + L.name,'modified'),'-','')[1..8]);
+    //SELF.modifyDate := (UNSIGNED4)(STD.Str.FindReplace(STD.File.GetLogicalFileAttribute('~' + L.name,'modified'),'-','')[1..8]);
+SELF.modifyDate   := (UNSIGNED4)L.name[STD.Str.Find(L.name,'_xlink',1) + 8..IF(STD.Str.Find(L.name,'did',1)> 0 , STD.Str.Find(L.name,'did',1), STD.Str.Find(L.name,'idl',1)) -3]; /*PHACK10*/
+
     SELF := L;
   END;
   childFiles_withDates := NOTHOR(PROJECT(childFiles, xModified(LEFT)));
@@ -80,8 +85,8 @@ EXPORT id_stream_layout := RECORD
     UNSIGNED4 KeysUsed := 0;
     UNSIGNED4 KeysFailed := 0;
     BOOLEAN IsTruncated := FALSE;
-    TYPEOF(h.did) DID;
-    TYPEOF(h.rid)  RID:= 0; // Unique record ID for external file
+    TYPEOF(h.did) DID; /*PHACK05*/
+    TYPEOF(h.rid)  RID/*PHACK11*/ := 0; // Unique record ID for external file
 END;
 SHARED id_stream_layout_plus := RECORD(id_stream_layout)
   KeyIDHistory.DT_EFFECTIVE_FIRST;
@@ -120,7 +125,7 @@ EXPORT Fetch_Stream(DATASET(id_stream_layout) d) := FUNCTION
       SELF := ri;
       SELF := le;
     END;
-    J0 := JOIN( d,k,(LEFT.DID = RIGHT.DID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(Config.JoinLimit)); // Ignore excess records without erroring
+    J0 := JOIN( d,k,(LEFT.DID = RIGHT.DID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0));/*PHACK06*/ // Ignore excess records without erroring
     J1 := SALT37.MAC_DatasetAsOf(J0, RID, DID, UniqueId, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
     J  := J1(DID > 0) & JOIN(d, J1(DID > 0), LEFT.UniqueId = RIGHT.UniqueId AND LEFT.DID = RIGHT.DID, TRANSFORM(RECORDOF(RIGHT), SELF := LEFT, SELF := []), LEFT ONLY);
     RETURN J;
@@ -135,7 +140,7 @@ EXPORT Fetch_Stream_Expanded(DATASET(id_stream_layout) d) := FUNCTION
 END;
  
 EXPORT MAC_Fetch_Batch(infile, In_DID, In_UniqueID, asIndex = TRUE) := FUNCTIONMACRO
-  IMPORT SALT37,IDL_Header /*HACK*/,InsuranceHeader_xLink;
+  IMPORT SALT37,InsuranceHeader_xLink;
   payloadKey := InsuranceHeader_xLink.Process_xIDL_Layouts().Key;
   idHistKey := InsuranceHeader_xLink.Process_xIDL_Layouts().KeyIDHistory;
   outLayout := RECORD
@@ -163,10 +168,10 @@ EXPORT MAC_Fetch_Batch(infile, In_DID, In_UniqueID, asIndex = TRUE) := FUNCTIONM
   END;
  
   infile_emptyResult := PROJECT(infile, emptyResult(LEFT));
-  JEntKeyed0 := JOIN(infile_emptyResult, payloadKey, LEFT.inputDID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER);
+  JEntKeyed0 := JOIN(infile_emptyResult, payloadKey, LEFT.inputDID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0));/*PHACK12*/
   JEntKeyed1 := SALT37.MAC_DatasetAsof(JEntKeyed0, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
   JEntKeyed  := JEntKeyed1(DID > 0) & JOIN(infile_emptyResult, JEntKeyed1(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.DID, TRANSFORM(LEFT), LEFT ONLY);
-  JEntPull0 := JOIN(infile_emptyResult, PULL(payloadKey), LEFT.inputDID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH);
+  JEntPull0 := JOIN(infile_emptyResult, PULL(payloadKey), LEFT.inputDID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH, KEEP(10000), LIMIT(0));/*PHACK12*/
   JEntPull1 := SALT37.MAC_DatasetAsof(JEntPull0, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
   JEntPull  := JEntPull1(DID > 0) & JOIN(infile_emptyResult, JEntPull1(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.inputDID = RIGHT.DID, TRANSFORM(LEFT), LEFT ONLY, HASH);
  
@@ -185,10 +190,10 @@ EXPORT MAC_Fetch_Batch(infile, In_DID, In_UniqueID, asIndex = TRUE) := FUNCTIONM
   resultsIDHist_found := resultsIDHist(DID > 0);
   resultsIDHist_notfound := resultsIDHist(DID = 0);
  
-  JRecKeyed_20 := JOIN(resultsIDHist_found, payloadKey, LEFT.DID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER);
+  JRecKeyed_20 := JOIN(resultsIDHist_found, payloadKey, LEFT.DID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0));/*PHACK12*/
   JRecKeyed_21 := SALT37.MAC_DatasetAsof(JRecKeyed_20, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
   JRecKeyed_2  := JRecKeyed_21(DID > 0) & JOIN(resultsIDHist_found, JRecKeyed_21(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.DID = RIGHT.DID, TRANSFORM(LEFT), LEFT ONLY);
-  JRecPull_20 := JOIN(resultsIDHist_found, PULL(payloadKey), LEFT.DID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH);
+  JRecPull_20 := JOIN(resultsIDHist_found, PULL(payloadKey), LEFT.DID = RIGHT.DID, xJoinPayload(LEFT,RIGHT), LEFT OUTER, HASH, KEEP(10000), LIMIT(0));/*PHACK12*/
   JRecPull_21 := SALT37.MAC_DatasetAsof(JRecPull_20, RID, DID, In_UniqueID, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', TRUE);
   JRecPull_2  := JRecPull_21(DID > 0) & JOIN(resultsIDHist_found, JRecPull_21(DID > 0), LEFT.In_UniqueID = RIGHT.In_UniqueID AND LEFT.DID = RIGHT.DID, TRANSFORM(LEFT), LEFT ONLY, HASH);
  
@@ -202,7 +207,7 @@ EXPORT InputLayout := RECORD
   SALT37.UIDType UniqueId; // This had better be unique or it will all break horribly
   UNSIGNED2 MaxIDs := 50; // Maximum number of candidate IDs
   UNSIGNED2 LeadThreshold := 0; // Maximum distance from best to worst (0 => no pruning)
-  BOOLEAN disableForce := InsuranceHeader_xLink.Config.DOB_NotUseForce;
+  BOOLEAN disableForce := InsuranceHeader_xLink.Config.DOB_NotUseForce;/*HACK18*/
   h.SNAME;
   h.FNAME;
   h.MNAME;
@@ -240,13 +245,13 @@ EXPORT InputLayout := RECORD
   SALT37.UIDType Entered_DID := 0; // Allow user to enter DID to pull data
 END;
  
-EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.ST <> (TYPEOF(le.ST))'' AND Fields.InValid_ST((SALT37.StrType)le.ST)=0 OR le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.SSN5 <> (TYPEOF(le.SSN5))'' AND Fields.InValid_SSN5((SALT37.StrType)le.SSN5)=0 AND le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 OR le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 OR le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 AND le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 OR le.SRC <> (TYPEOF(le.SRC))'' AND Fields.InValid_SRC((SALT37.StrType)le.SRC)=0 AND le.SOURCE_RID <> (TYPEOF(le.SOURCE_RID))'' AND Fields.InValid_SOURCE_RID((SALT37.StrType)le.SOURCE_RID)=0 OR le.DL_NBR <> (TYPEOF(le.DL_NBR))'' AND Fields.InValid_DL_NBR((SALT37.StrType)le.DL_NBR)=0 AND le.DL_STATE <> (TYPEOF(le.DL_STATE))'' AND Fields.InValid_DL_STATE((SALT37.StrType)le.DL_STATE)=0 OR le.PHONE <> (TYPEOF(le.PHONE))'' AND Fields.InValid_PHONE((SALT37.StrType)le.PHONE)=0 OR le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.fname2 <> (TYPEOF(le.fname2))'' AND Fields.InValid_fname2((SALT37.StrType)le.fname2)=0 AND le.lname2 <> (TYPEOF(le.lname2))'' AND Fields.InValid_lname2((SALT37.StrType)le.lname2)=0;
+EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.ST <> (TYPEOF(le.ST))'' AND Fields.InValid_ST((SALT37.StrType)le.ST)=0 OR le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.SSN5 <> (TYPEOF(le.SSN5))'' AND Fields.InValid_SSN5((SALT37.StrType)le.SSN5)=0 AND le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 OR le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 OR le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 AND le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 OR le.SRC <> (TYPEOF(le.SRC))'' AND Fields.InValid_SRC((SALT37.StrType)le.SRC)=0 AND le.SOURCE_RID <> (TYPEOF(le.SOURCE_RID))'' AND Fields.InValid_SOURCE_RID((SALT37.StrType)le.SOURCE_RID)=0 OR le.DL_NBR <> (TYPEOF(le.DL_NBR))'' AND Fields.InValid_DL_NBR((SALT37.StrType)le.DL_NBR)=0 AND le.DL_STATE <> (TYPEOF(le.DL_STATE))'' AND Fields.InValid_DL_STATE((SALT37.StrType)le.DL_STATE)=0 OR le.PHONE <> (TYPEOF(le.PHONE))'' AND Fields.InValid_PHONE((SALT37.StrType)le.PHONE)=0 OR le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.fname2 <> (TYPEOF(le.fname2))'' AND Fields.InValid_fname2((SALT37.StrType)le.fname2)=0 AND le.lname2 <> (TYPEOF(le.lname2))'' AND Fields.InValid_lname2((SALT37.StrType)le.lname2)=0;
 EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not have field
   h.DID;
   INTEGER2 Weight; // Specificity attached to this match
   UNSIGNED2 Score := 0; // Chances of being correct as a percentage
   SALT37.UIDType Reference := 0;//Presently for batch
-  TYPEOF(h.rid)  RID:= 0;
+  TYPEOF(h.rid)  RID/*PHACK11*/ := 0;
   BOOLEAN ForceFailed := FALSE;
   TYPEOF(h.SNAME) SNAME := (TYPEOF(h.SNAME))'';
   INTEGER2 SNAMEWeight := 0;
@@ -650,7 +655,7 @@ LayoutScoredFetch FixScores(LayoutScoredFetch le, aggregateRec ri) := TRANSFORM
   SELF.fname2Weight := MAP( ri.fname2Weight=0 OR le.fname2_match_code=SALT37.MatchCode.ExactMatch => le.fname2Weight,MIN(le.fname2Weight,ri.fname2Weight-1) );
   SELF.lname2Weight := MAP( ri.lname2Weight=0 OR le.lname2_match_code=SALT37.MatchCode.ExactMatch => le.lname2Weight,MIN(le.lname2Weight,ri.lname2Weight-1) );
   INTEGER2 Weight := MAX(0,SELF.DERIVED_GENDERWeight) + MAX(0,SELF.SSN5Weight) + MAX(0,SELF.SSN4Weight) + MAX(0,SELF.DOBWeight) + MAX(0,SELF.PHONEWeight) + MAX(0,SELF.DL_STATEWeight) + MAX(0,SELF.DL_NBRWeight) + MAX(0,SELF.SRCWeight) + MAX(0,SELF.SOURCE_RIDWeight) + MAX(SELF.MAINNAMEWeight,MAX(0,SELF.FNAMEWeight) + MAX(0,SELF.MNAMEWeight) + MAX(0,SELF.LNAMEWeight)) + MAX(0,SELF.SNAMEWeight) + MAX(0,SELF.PRIM_RANGEWeight) + MAX(0,SELF.SEC_RANGEWeight) + MAX(0,SELF.PRIM_NAMEWeight) + MAX(0,SELF.CITYWeight) + MAX(0,SELF.STWeight) + MAX(0,SELF.ZIPWeight) + MAX(0,SELF.fname2Weight) + MAX(0,SELF.lname2Weight);
-  SELF.Weight := Weight; /*HACK*/
+  SELF.Weight := Weight; /*PHACK04*/
   SELF := le;
 END;
  
@@ -666,7 +671,7 @@ EXPORT CombineAllScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disableFo
   r0 := ROLLUP( SORT( GROUP( SORT ( DISTRIBUTE(In_Data,HASH(reference)),Reference, LOCAL ), Reference, LOCAL),DID),LEFT.DID=RIGHT.DID,Combine_Scores(LEFT,RIGHT,In_disableForce))(SALT37.DebugMode OR ~ForceFailed);
   r1 := AdjustScoresForNonExactMatches(UNGROUP(r0));
   R2 := ROLLUP( TOPN(r1,100,-Weight),GROUP, Create_Output(LEFT,ROWS(LEFT)) );
-  SALT37.MAC_External_AddPcnt(R2,LayoutScoredFetch,Results,OutputLayout_Batch,29,R3);/*HACK*/
+  SALT37.MAC_External_AddPcnt(R2,LayoutScoredFetch,Results,OutputLayout_Batch,29,R3);/*HACK16*/
   RETURN r3;
 END;
 EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disableForce = TRUE) := FUNCTION
@@ -675,11 +680,11 @@ EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disa
   RETURN DEDUP( SORT( rolled, Reference, -weight, LOCAL ), Reference, KEEP(Config.LinkpathCandidateCount),LOCAL);
 END;
 EXPORT KeysUsedToText(UNSIGNED4 k) := FUNCTION
-  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'NAME,','') + IF(k&(1<<2)<>0,'ADDRESS,','') + IF(k&(1<<3)<>0,'SSN,','') + IF(k&(1<<4)<>0,'SSN4,','') + IF(k&(1<<5)<>0,'DOB,','') + IF(k&(1<<6)<>0,'ZIP_PR,','') + IF(k&(1<<7)<>0,'SRC_RID,','') + IF(k&(1<<8)<>0,'DLN,','') + IF(k&(1<<9)<>0,'PH,','') + IF(k&(1<<10)<>0,'LFZ,','') + IF(k&(1<<11)<>0,'RELATIVE,','');
+  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'NAME,','') + IF(k&(1<<2)<>0,'ADDRESS,','') + IF(k&(1<<3)<>0,'SSN,','') + IF(k&(1<<4)<>0,'SSN4,','') + IF(k&(1<<5)<>0,'DOB,','') + IF(k&(1<<6)<>0,'DOBF,','') + IF(k&(1<<7)<>0,'ZIP_PR,','') + IF(k&(1<<8)<>0,'SRC_RID,','') + IF(k&(1<<9)<>0,'DLN,','') + IF(k&(1<<10)<>0,'PH,','') + IF(k&(1<<11)<>0,'LFZ,','') + IF(k&(1<<12)<>0,'RELATIVE,','');
   RETURN list[1..LENGTH(TRIM(list))-1]; // Strim last ,
 end;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
-  TYPEOF(h.did) DID;
+  TYPEOF(h.did) DID; /*PHACK05*/
   DATASET(SALT37.Layout_FieldValueList) DERIVED_GENDER_Values := DATASET([],SALT37.Layout_FieldValueList);
   DATASET(SALT37.Layout_FieldValueList) SSN5_Values := DATASET([],SALT37.Layout_FieldValueList);
   DATASET(SALT37.Layout_FieldValueList) SSN4_Values := DATASET([],SALT37.Layout_FieldValueList);
