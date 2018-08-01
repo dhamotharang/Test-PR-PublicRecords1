@@ -633,6 +633,9 @@ module
 				//or	(MDR.sourceTools.SourceIsVickers(pInput.source))
 				// -- Jira DF-18364 - Business Header - Flush-n-fill Gong Neustar business records due to bad Source_group
 				//or	(MDR.sourceTools.sourceIsGong_Business(pInput.source) and pInput.source_group[1..4] = 'NEU-')
+				// -- JIRA# DF-22524 - Business Header/PAW - Bad PA Corps addresses 
+				// -- JIRA# DF-22502 - PA Corps contact addresses are skewed
+				or (MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.dt_last_seen = 20180521)
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -967,6 +970,9 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '2108024717    C90883103' and trim(pInput.prim_name) = 'PO BOX 6')
 				// -- JIRA - DF-21988 - Consumer Advocacy - Linking Dispute LexID 1533124325 - Mary Lloyd
 				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsFBNV2_Hist_Choicepoint(pInput.source)) and trim(pInput.vendor_id) in ['CP3345616258597945683', '76327426'] and trim(pInput.fname) = 'MARY' and trim(pInput.lname) = 'LLOYD')
+				// -- JIRA# DF-22524 - Business Header/PAW - Bad PA Corps addresses 
+				// -- JIRA# DF-22502 - PA Corps contact addresses are skewed
+				or (MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.dt_last_seen = 20180521)
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1223,6 +1229,8 @@ module
 				or	(pInput.did = 724864388)
 				// -- JIRA: DF-20795 - Consumer disputing association with a company
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
+				// -- JIRA: DF-22583 - Consumer Dispute - PAW record to be removed
+				or  (mdr.sourceTools.SourceIsZoom(pInput.source) and pInput.did = 1743066322 and pInput.bdid = 975644 and trim(pInput.fname) = 'KARLA' and trim(pInput.lname) = 'MITCHELL' and trim(pInput.mname) = '')
 			
 				;
 
