@@ -83,6 +83,7 @@ MODULE
 		EXPORT BOOLEAN IncludeOTP := FALSE;
 		EXPORT BOOLEAN IncludeRiskIndicators := FALSE;
 		EXPORT BOOLEAN IsGetMetaData := FALSE;
+		EXPORT BOOLEAN IsGetPortedData := FALSE;
 	END;
     
 		EXPORT PhoneVerificationParams := 
@@ -201,8 +202,8 @@ MODULE
    										                                                           DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
    	EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
    		                                                                                  UserRules, allRules);
-   	
-		  EXPORT BOOLEAN   IsGetMetaData                      := IncludePorting OR IncludeSpoofing OR IncludeOTP OR IncludeRiskIndicators; 
+   	EXPORT BOOLEAN   IsGetPortedData                   := IncludePorting OR IncludePhoneMetadata; 
+		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR IncludeSpoofing OR IncludeOTP OR IncludeRiskIndicators; 
 			        BOOLEAN   RealTimedata 			 		                := pfOptions.UseDeltabase : STORED('UseDeltabase');						 	
 			 EXPORT BOOLEAN   UseDeltabase 					                 := IF(IsGetMetaData
 			                                                          ,RealTimedata
@@ -304,7 +305,8 @@ MODULE
    	EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
    		                                                                                  UserRules, allRules);	
 	
-		  EXPORT BOOLEAN   IsGetMetaData                      := IncludePorting OR IncludeSpoofing OR IncludeOTP OR IncludeRiskIndicators; 
+		  EXPORT BOOLEAN   IsGetPortedData                    := IncludePorting OR IncludePhoneMetadata; 
+		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR IncludeSpoofing OR IncludeOTP OR IncludeRiskIndicators; 
 			        BOOLEAN   RealtimeData 			                   := FALSE : STORED('UseDeltabase');					 	
 			 EXPORT BOOLEAN   UseDeltabase 					                 := IF(IsGetMetaData
 			                                                          ,RealTimedata

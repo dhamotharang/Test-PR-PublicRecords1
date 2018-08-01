@@ -98,7 +98,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	                                                                                          AccuDataGateway[1]);	
 	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	SHARED ported_phones := IF(inMod.IncludePorting, 
+	SHARED ported_phones := IF(inMod.IsGetPortedData, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
 															              dSearchRecs);																	 
    
