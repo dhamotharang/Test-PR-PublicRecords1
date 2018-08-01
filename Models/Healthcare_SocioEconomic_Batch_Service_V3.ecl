@@ -22,6 +22,8 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 
 	string DataRestriction := '' : stored('DataRestrictionMask');
 	string50 DataPermission := '' : stored('DataPermissionMask');
+	IF(DataRestriction='', FAIL('A blank DataRestrictionMask value is supplied.'));
+	IF(DataPermission='', FAIL('A blank DataPermissionMask value is supplied.'));
 
 	unsigned3 history_date := 999999; //Default if input is 0
 
