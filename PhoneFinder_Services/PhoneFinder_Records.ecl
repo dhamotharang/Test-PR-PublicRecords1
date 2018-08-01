@@ -92,7 +92,7 @@ MODULE
  dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
 	
 	// get ported info
-	SHARED dPorted_Phones := IF(inMod.IncludePorting, 
+	SHARED dPorted_Phones := IF(inMod.IsGetPortedData, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,dAccu_inport(port_end_dt <> 0)),
 															              dSearchRecs);
 	 
