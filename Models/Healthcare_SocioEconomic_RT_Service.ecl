@@ -194,7 +194,8 @@ IMPORT iesp;
 
 	DataRestrictionMask_in := (string) TRIM(first_row.user.DataRestrictionMask, LEFT, RIGHT);
 	DataPermissionMask_in := (string) TRIM(first_row.user.DataPermissionMask, LEFT, RIGHT);
-
+	IF(DataRestrictionMask_in=_blank, FAIL('A blank DataRestrictionMask value is supplied.'));
+	IF(DataPermissionMask_in=_blank, FAIL('A blank DataPermissionMask value is supplied.'));
 	// Calling Socio core
   	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, coreResults);
   	// OUTPUT(coreResults, NAMED('coreResults'));
