@@ -13,6 +13,7 @@
       // i.	How many of those apparent humans are LexID’d?
       // b.	How many Active SELEIDs have the Guarantor field(s) populated with apparent non-humans?
 // 3.	Same Qs above to INACTIVE and DEFUNCT SELEIDS. 
+Import Bipv2, business_credit;
 bh := bipv2.CommonBase.ds_base;
 bh_active := bh(seleid_status_private = '');
 bh_active_d := dedup(sort(distribute(bh_active,hash(seleid)),seleid,local),seleid,local);
