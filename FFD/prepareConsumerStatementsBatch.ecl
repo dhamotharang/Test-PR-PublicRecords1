@@ -56,9 +56,18 @@ EXPORT  prepareConsumerStatementsBatch (DATASET (FFD.layouts.ConsumerStatementBa
   // TODO: find out if there are possible duplicates here;
   //       consider using KEEP (1) in joins above, if feasible
 	
+  Combined_statements := Rstatements + Disputes + CSstatements;
 	
+  // in case of Legal hold alert no consumer statements are to be returned
+  LegalHoldFlags := ds_pc(RecordType = FFD.Constants.RecordType.LH);
+  
+  // suppress statements if account has legal hold alert
+  filtered_statements := JOIN(Combined_statements, LegalHoldFlags, LEFT.acctno = RIGHT.acctno, TRANSFORM(LEFT), LEFT ONLY);
+  
+  all_statements := IF(EXISTS(LegalHoldFlags), filtered_statements, Combined_statements);
+  
   StatementsAndDisputes := IF(ReturnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
-	                            Rstatements + Disputes + CSstatements);  																						 
+	                            all_statements);  																						 
 
   RETURN StatementsAndDisputes;
 END;
