@@ -536,6 +536,8 @@ export Functions := MODULE
 					keys_report_date := eCrash_Services.Constants.Format_Report_Creation_Date(l.creation_date);
 					self.DateReportCreated := IF(l.isDelta, l.date_added[1..10], keys_report_date);
 					self.OfficerBadgeNumber := l.officer_id;
+					self.VendorReportID := l.vendor_report_id;
+					self.DateReportSubmitted := iesp.ECL2ESP.toDatestring8(l.Date_Report_submitted);
 					self:=[]
 					END;
 					
