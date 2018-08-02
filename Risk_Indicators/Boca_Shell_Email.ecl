@@ -1,12 +1,12 @@
-﻿import email_data, riskwise, ut, fcra, mdr;
+﻿import _Control, email_data, riskwise, ut, fcra, mdr;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Email(GROUPED DATASET(layout_bocashell_neutral) clam_pre_email_in, 
 	boolean isFCRA, 
 	integer bsversion,
 	unsigned3 LastSeenThreshold = iid_constants.oneyear,
-	unsigned8 BSOptions=0,
-	boolean onThor=false
-) := FUNCTION
+	unsigned8 BSOptions=0
+  ) := FUNCTION
 
 
 
@@ -163,7 +163,11 @@ email_recs_nonfcra_minus_behavior_thor := join(distribute(clam_pre_email, hash64
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 
-email_recs_nonfcra_minus_behavior := if(onThor, email_recs_nonfcra_minus_behavior_thor, ungroup(email_recs_nonfcra_minus_behavior_roxie));						
+#IF(onThor)
+	email_recs_nonfcra_minus_behavior := email_recs_nonfcra_minus_behavior_thor;
+#ELSE
+	email_recs_nonfcra_minus_behavior := ungroup(email_recs_nonfcra_minus_behavior_roxie);
+#END
 
 email_recs_nonfcra_roxie := join(clam_pre_email, email_data.key_did,
 						left.did<>0 and 
@@ -184,9 +188,11 @@ email_recs_nonfcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 						
-email_recs_non_fcra := ungroup(if(onThor, email_recs_nonfcra_thor, ungroup(email_recs_nonfcra_roxie)));						
-
-
+#IF(onThor)
+	email_recs_non_fcra := email_recs_nonfcra_thor;
+#ELSE
+	email_recs_non_fcra := ungroup(email_recs_nonfcra_roxie);
+#END
 
 emailfile_raw_fcra_roxie := join(clam_pre_email, email_data.Key_Did_FCRA,
 						left.did<>0 and 
@@ -211,8 +217,11 @@ emailfile_raw_fcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						left outer,
 						atmost(left.did=right.did, riskwise.max_atmost), keep(1000), LOCAL);
 
-emailfile_raw_fcra := if(onThor, emailfile_raw_fcra_thor, ungroup(emailfile_raw_fcra_roxie));
-
+#IF(onThor)
+	emailfile_raw_fcra := emailfile_raw_fcra_thor;
+#ELSE
+	emailfile_raw_fcra := ungroup(emailfile_raw_fcra_roxie);
+#END
 
 emailrec add_email_corrections(clam_pre_email le, fcra.Key_Override_Email_Data_ffid rt) := transform
 	self.seq := le.seq;
@@ -276,8 +285,12 @@ emailfile_corrections_fcra_thor := join(clam_pre_email,
 						add_email_corrections(left, right),
 						keep(1000), LOCAL, ALL);
 
-emailfile_corrections_fcra := if(onThor, emailfile_corrections_fcra_thor, emailfile_corrections_fcra_roxie);						
-						
+#IF(onThor)
+	emailfile_corrections_fcra := emailfile_corrections_fcra_thor;
+#ELSE
+	emailfile_corrections_fcra := emailfile_corrections_fcra_roxie;
+#END
+
 email_recs_fcra := 	ungroup(emailfile_raw_fcra + emailfile_corrections_fcra);
 
 emailfile := if(isFCRA, email_recs_fcra, email_recs_non_fcra);		
@@ -327,7 +340,11 @@ with_source_counts_thor := join(distribute(rolled_emails_counts, hash64(seq)),
 			left.seq=right.seq,
 			getSourceCounts(LEFT,RIGHT), LOCAL);
 
-with_source_counts := if(onThor, with_source_counts_thor, with_source_counts_roxie);
+#IF(onThor)
+	with_source_counts := with_source_counts_thor;
+#ELSE
+	with_source_counts := with_source_counts_roxie;
+#END
 
 emailrec roll_identity_source_counts(emailrec le, emailrec rt) := transform
 		self.email_source_list := trim(le.email_source_list) + rt.email_source_list + ',';
@@ -416,10 +433,11 @@ with_reverse_email_lookup_thor := join(distribute(clam_pre_email, hash64(shell_i
 	add_reverse_email_verification(left, right), 
 		atmost(riskwise.max_atmost), keep(1000), left outer, LOCAL);
 		
-with_reverse_email_lookup := if(onThor, group(sort(with_reverse_email_lookup_thor,seq),seq), with_reverse_email_lookup_roxie);
-
-
-
+#IF(onThor)
+	with_reverse_email_lookup := group(sort(with_reverse_email_lookup_thor,seq),seq);
+#ELSE
+	with_reverse_email_lookup := with_reverse_email_lookup_roxie;
+#END
 
 reverse_source_stats := table(with_reverse_email_lookup, {seq, email_src,
 											ver_level_per_source := max(group, (integer)Reverse_Email.Verification_level),

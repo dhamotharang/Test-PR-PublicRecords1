@@ -1,4 +1,4 @@
-EXPORT	Constants	:=
+﻿EXPORT	Constants	:=
 MODULE
 
 	export	boolean	BUILD_BID_KEYS	:=	true;
@@ -11,6 +11,7 @@ MODULE
 	EXPORT STRING LIMIT_ERROR_MESSAGE := 'Search is too broad. Too many results.';
 	
 	export	string	wlALL		:=	'ALL';  		// FROM PRODUCT MANAGEMENT "ALL WILL MEAN ALL AVAILABLE LISTS"
+	export	string	wlALLV4		:=	'ALLV4';  		// Includes ALL Plus Additional V4 Lists"
 	//export	string	wlADD		:=	'ADD';  	// Additional list from above,without ofac
 	//export	string	wlALLP	:=	'ALLP';  	// include all of the lists below
 

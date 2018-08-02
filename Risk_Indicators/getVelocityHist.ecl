@@ -1,17 +1,22 @@
-﻿import riskwise, ut, doxie;
+﻿import _Control, riskwise, ut, doxie;
+onThor := _Control.Environment.OnThor;
 
 export getVelocityHist(GROUPED DATASET(iid_constants.layout_outx) iid2, boolean isFCRA, unsigned1 dppa,
-												string50 DataRestriction, unsigned1 BSversion, boolean onThor=false) := FUNCTION
+												string50 DataRestriction, unsigned1 BSversion) := FUNCTION
 
 iid_roxie := group(sort(iid2,seq,did),seq,did);
 
 iid_thor := group(sort(distribute(iid2, hash64(seq,did)),seq,did, LOCAL),seq,did, LOCAL);
 
-iid := if(onThor, iid_thor, iid_roxie);
+#IF(onThor)
+	iid := iid_thor;
+#ELSE
+	iid := iid_roxie;
+#END
 
 dppa_ok := iid_constants.dppa_ok(dppa, isFCRA);
 
-age_hist := Risk_Indicators.getAgeHist(iid, onThor);
+age_hist := Risk_Indicators.getAgeHist(iid);
 
 
 counts_per_ssn := table(iid, {seq, historydate, did, ssn_from_did,
@@ -81,8 +86,13 @@ counts_per_address_thor := table(distribute(addresses_deduped, hash64(seq,did)),
 												_addrs_last24 := count(group, addrs_last24>0),
 												_addrs_last36 := count(group, addrs_last36>0),												
 												}, seq, did, addr_from_did, LOCAL);
-counts_per_address := if(onThor, counts_per_address_thor, counts_per_address_roxie);
-												
+
+#IF(onThor)
+	counts_per_address := counts_per_address_thor;
+#ELSE
+	counts_per_address := counts_per_address_roxie;
+#END
+
 addr_counts_by_seq_did := table(counts_per_address, {
 												seq, did,
 												addrs_per_adl := count(group, _addrs_per_adl >0),
@@ -118,7 +128,11 @@ rolled_ssn_addr_roxie := join(rolled_ssns, rolled_addrs, left.seq=right.seq and 
 rolled_ssn_addr_thor := join(distribute(rolled_ssns, hash64(seq,did)), distribute(rolled_addrs, hash64(seq,did)), 
 															left.seq=right.seq and left.did=right.did, joinRolls(LEFT,RIGHT), left outer, LOCAL);
 
-rolled_ssn_addr := if(onThor, rolled_ssn_addr_thor, rolled_ssn_addr_roxie);
+#IF(onThor)
+	rolled_ssn_addr := rolled_ssn_addr_thor;
+#ELSE
+	rolled_ssn_addr := rolled_ssn_addr_roxie;
+#END
 
 // add addrs per dl, vo, pl here
 addrs_per_src := record
@@ -190,7 +204,11 @@ with_ssa_thor := JOIN(distribute(ss((length(trim(invalid_ssn_from_did))<>4) and 
 														 get_ssa(LEFT,RIGHT), 
 														 LEFT OUTER, keep(1), LOCAL);
 														 
-with_ssa := GROUP(SORT(IF(OnThor, with_ssa_thor, with_ssa_roxie), seq,did), seq,did);														 
+#IF(onThor)
+	with_ssa := GROUP(SORT(with_ssa_thor, seq,did), seq,did);
+#ELSE
+	with_ssa := GROUP(SORT(with_ssa_roxie, seq,did), seq,did);
+#END
 
 iid_constants.layout_outx count_invalid_ssns_per_did(iid_constants.layout_outx le, iid_constants.layout_outx ri) := transform
 	self.invalid_ssns_per_adl := iid_constants.capVelocity(le.invalid_ssns_per_adl + ri.invalid_ssns_per_adl);
@@ -324,7 +342,11 @@ rolled_ssn_addr_lname_thor := join(distribute(jInvalids2, hash64(seq, did)),
 																	 left.seq=right.seq and left.did=right.did, 
 																	 addLnames(LEFT,RIGHT), left outer, LOCAL);
 
-rolled_ssn_addr_lname := if(onThor, rolled_ssn_addr_lname_thor, rolled_ssn_addr_lname_roxie);
+#IF(onThor)
+	rolled_ssn_addr_lname := rolled_ssn_addr_lname_thor;
+#ELSE
+	rolled_ssn_addr_lname := rolled_ssn_addr_lname_roxie;
+#END
 
 iid_constants.layout_outx addADL(rolled_ssn_addr le, key_ADL_Risk_Table_v4 ri) := transform
 	// determine which section of the table is permitted for use based on the data restriction mask
@@ -358,7 +380,11 @@ ADLinfo_nonfcra_orig_thor := join(distribute(rolled_ssn_addr_lname, hash64(did))
 							left.did != 0 and(left.did=right.did), 
 							addADL(LEFT,RIGHT), left outer, atmost(Riskwise.max_atmost), keep(1), LOCAL);	
 							
-ADLinfo_nonfcra_orig := IF(onThor, ADLinfo_nonfcra_orig_thor, ADLinfo_nonfcra_orig_roxie);
+#IF(onThor)
+	ADLinfo_nonfcra_orig := ADLinfo_nonfcra_orig_thor;
+#ELSE
+	ADLinfo_nonfcra_orig := ADLinfo_nonfcra_orig_roxie;
+#END
 
 ADLinfo_nonfcra := join(ADLinfo_nonfcra_orig, age_hist, left.did=right.did and left.seq = right.seq,
 							transform(recordof(ADLinfo_nonfcra_orig), self.inferred_age := right.inferred_age_hist, 
@@ -400,8 +426,12 @@ ADLinfo_fcra_orig_thor := join(distribute(rolled_ssn_addr_lname, hash64(did)),
 															 (left.did=right.did), 
 							addADL_FCRA(LEFT,RIGHT), left outer, atmost(Riskwise.max_atmost), keep(1), LOCAL);								
 							
-ADLinfo_fcra_orig := IF(onThor, ADLinfo_fcra_orig_thor, ADLinfo_fcra_orig_roxie);
-					
+#IF(onThor)
+	ADLinfo_fcra_orig := ADLinfo_fcra_orig_thor;
+#ELSE
+	ADLinfo_fcra_orig := ADLinfo_fcra_orig_roxie;
+#END
+
 ADLinfo_fcra := join(ADLinfo_fcra_orig, age_hist, left.did=right.did and left.seq = right.seq,
 							transform(recordof(ADLinfo_nonfcra_orig), self.inferred_age := right.inferred_age_hist, 
 																									 self.reported_dob := right.reported_dob_hist,
@@ -415,7 +445,7 @@ iid_header := UNGROUP(PROJECT(iid, TRANSFORM(layouts.layout_header_plus_hist_dat
 iid_header_filtered := iid_header (dt_first_seen != 0, dt_last_seen != 0, prim_name[1..6] != 'PO BOX');
 iid_header_clean := DEDUP(SORT(iid_header_filtered, seq, did, dt_first_seen, dt_last_seen, prim_range, prim_name, zip), seq, did, dt_first_seen, dt_last_seen, prim_range, prim_name, zip);
 // Calculate the address stability
-stabilityHistorical := Risk_Indicators.getAddrStabilityHist(iid_header_clean, onThor);
+stabilityHistorical := Risk_Indicators.getAddrStabilityHist(iid_header_clean);
 
 // Now join the calculated stability back with the original DID's.
 ADLStability := JOIN(ADLinfo, stabilityHistorical, LEFT.did = RIGHT.did AND LEFT.seq=RIGHT.seq, TRANSFORM(iid_constants.layout_outx, SELF.mobility_indicator := (STRING)RIGHT.stability; SELF := LEFT), LEFT OUTER, LOOKUP);

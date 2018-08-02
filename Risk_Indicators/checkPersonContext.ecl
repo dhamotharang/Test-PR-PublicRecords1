@@ -1,11 +1,12 @@
-﻿import Gateway, PersonContext, risk_indicators, iesp, ut;
+﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, ut;
+onThor := _Control.Environment.OnThor;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
 // Search PersonContext.GetPersonContext by LexID to find out if the consumer has any disputes on file.  
 // Eventually PersonContext will also contain information about security freeze, fraud alert, id theft flag as well
 
 EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, 
-		DATASET (Gateway.Layouts.Config) gateways, BOOLEAN onThor=FALSE, integer BSversion=1) := function
+		DATASET (Gateway.Layouts.Config) gateways, integer BSversion=1) := function
 
 URL := gateways(stringlib.StringToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
 
@@ -33,7 +34,11 @@ dsResponseRecords_roxie := dedup(
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
 dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
 
-dsResponseRecords := if(onThor, dsResponseRecords_thor, dsResponseRecords_roxie);
+#IF(onThor)
+	dsResponseRecords := dsResponseRecords_thor;
+#ELSE
+	dsResponseRecords := dsResponseRecords_roxie;
+#END
 
 temp_statements := record
 	unsigned LexID;

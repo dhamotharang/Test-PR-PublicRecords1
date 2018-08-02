@@ -1,4 +1,5 @@
-﻿import doxie, did_add, ut, riskwise, address, gateway, watchdog;
+﻿import _Control, doxie, did_add, ut, riskwise, address, gateway, watchdog;
+onThor := _Control.Environment.OnThor;
 
 // this function will first append the BEST fname, lname, phone and ssn
 // then perform the necessary searching and counting logic to calculate velocity counters for each of those elements
@@ -10,8 +11,7 @@ EXPORT Boca_Shell_BestPII_Data(grouped dataset(risk_indicators.Layout_Boca_Shell
 	integer bsversion,
 	string datarestrictionmask, 
 	string datapermissionmask,
-	unsigned8 BSOptions,
-	boolean onThor = false
+	unsigned8 BSOptions
 	) := function
 
 gateways := dataset([], Gateway.Layouts.Config); // set this to nothing for now until we can prove any of this logic needs gateway info 
@@ -19,7 +19,7 @@ gateways := dataset([], Gateway.Layouts.Config); // set this to nothing for now 
 best_prep := project(bsData, transform(doxie.layout_references, self.did := if(left.truedid, left.did, 0)) );  // only map the DID if we have truedid
 best_prep_deduped := ungroup(dedup(sort(best_prep, did), did));
 
-outfile := risk_indicators.Collection_Shell_MOD.getBestCleaned(best_prep_deduped, DataRestrictionMask, GLBPurpose, false, onThor);
+outfile := risk_indicators.Collection_Shell_MOD.getBestCleaned(best_prep_deduped, DataRestrictionMask, GLBPurpose, false);
 
 // get the best fname, lname, ssn, phone from the appropriate best file based upon environment and datarestrictions
 withBest_nonfcra := join(bsData, outfile,
@@ -36,7 +36,12 @@ withBest_FCRA_noEQ_thor := join(distribute(bsData, hash64(did)),
 	(left.did=right.did),
 	transform(risk_indicators.Layout_Boca_Shell,
 		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
-withBest_FCRA_noEQ := if(onThor, GROUP(SORT(withBest_FCRA_noEQ_thor, seq, LOCAL), seq, LOCAL), withBest_FCRA_noEQ_roxie);
+
+#IF(onThor)
+	withBest_FCRA_noEQ := GROUP(SORT(withBest_FCRA_noEQ_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	withBest_FCRA_noEQ := withBest_FCRA_noEQ_roxie;
+#END
 
 withBest_FCRA_noEN_roxie := join(bsData, Watchdog.Key_Watchdog_FCRA_nonEN, keyed(left.did=right.did),
 	transform(risk_indicators.Layout_Boca_Shell,
@@ -48,8 +53,12 @@ withBest_FCRA_noEN_thor := join(distribute(bsData, hash64(did)),
 	transform(risk_indicators.Layout_Boca_Shell,
 		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
 
-withBest_FCRA_noEN := if(onThor, GROUP(SORT(withBest_FCRA_noEN_thor, seq, LOCAL), seq, LOCAL), withBest_FCRA_noEN_roxie);
-		
+#IF(onThor)
+	withBest_FCRA_noEN := GROUP(SORT(withBest_FCRA_noEN_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	withBest_FCRA_noEN := withBest_FCRA_noEN_roxie;
+#END
+
 // based upon the datarestrictionmask, either use the copy without equifax data or the copy without experian data		
 withBest_FCRA := if(datarestrictionmask[risk_indicators.iid_constants.posEquifaxRestriction]='1', withBest_FCRA_noEQ, withBest_FCRA_noEN);
 		
@@ -138,7 +147,7 @@ inquiries_prep := project(iid_prep, transform(risk_indicators.layout_bocashell_n
 	self := left;
 	self := [];) );
 	
-best_inquiries := if(isFCRA, risk_indicators.Boca_Shell_Inquiries_FCRA(inquiries_prep, bsoptions, bsversion, gateways, onThor),
+best_inquiries := if(isFCRA, risk_indicators.Boca_Shell_Inquiries_FCRA(inquiries_prep, bsoptions, bsversion, gateways),
 														risk_indicators.Boca_Shell_Inquiries(inquiries_prep, bsoptions, bsversion, gateways, datapermissionmask) );
 
 with_best_inquiries := join(with_match_flags, best_inquiries, left.seq=right.seq,
@@ -163,7 +172,7 @@ with_best_inquiries := join(with_match_flags, best_inquiries, left.seq=right.seq
 		self := left), left outer, keep(1));
 
 // get the flags and counts for the rest of the best_flags section
-IID_best_flags := risk_indicators.get_IID_Best_Flags(iid_prep, GLBPurpose, DPPApurpose, isFCRA, datarestrictionmask, datapermissionmask, bsversion, bsoptions, onThor);
+IID_best_flags := risk_indicators.get_IID_Best_Flags(iid_prep, GLBPurpose, DPPApurpose, isFCRA, datarestrictionmask, datapermissionmask, bsversion, bsoptions);
 
 with_best_flags := join(with_best_inquiries, IID_best_flags, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell,

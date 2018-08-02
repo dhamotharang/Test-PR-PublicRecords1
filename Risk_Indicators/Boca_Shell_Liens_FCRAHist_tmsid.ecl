@@ -1,7 +1,8 @@
-﻿import doxie_files, ut, doxie, fcra, liensv2, riskwise, Risk_Indicators;
- 
+﻿import _Control, doxie_files, ut, doxie, fcra, liensv2, riskwise, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
+
 export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_Bankruptcy, boolean onThor = false) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_Bankruptcy) := FUNCTION
  
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
 
@@ -22,8 +23,11 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 											(LEFT.did=RIGHT.did),
 											add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100), LOCAL);
                       
-	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);	
-  
+	#IF(onThor)
+		liens_added := group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		liens_added := liens_added_roxie;
+	#END
 	Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER get_liens_FCRA(Risk_Indicators.Layouts_Derog_Info.layout_extended le, liensv2.key_liens_party_id_FCRA ri) := TRANSFORM
 		self.tmsid := if(ri.tmsid='', '', le.tmsid);	
 		self.rmsid := if(ri.rmsid='', '', le.rmsid);
@@ -56,10 +60,14 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 											get_liens_FCRA(LEFT,RIGHT), LEFT OUTER,
 											ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
 
-	liens_party_raw_thor := group(sort(distribute(liens_party_raw_thor_rmsid + liens_party_raw_roxie(rmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
+	liens_party_raw_thor := group(sort(distribute(liens_party_raw_thor_rmsid + liens_party_raw_thor_rmsid(rmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
-
+	#IF(onThor)
+		liens_party_raw := liens_party_raw_thor;
+	#ELSE
+		liens_party_raw := liens_party_raw_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_extended_plus_TOGETHER get_evictions(liens_party_raw le, liensV2.key_liens_main_ID_FCRA ri) := transform
 		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
 		releasedDate := (string) le.date_last_seen;
@@ -346,7 +354,11 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 
   evictions_thor := group(sort(distribute(evictions_thor_pre + liens_party_raw(rmsid='' or tmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-  evictions := if(onThor, evictions_thor, evictions_roxie);
+	#IF(onThor)
+		evictions := evictions_thor;
+	#ELSE
+		evictions := evictions_roxie;
+	#END
   
 	liensWithDesc := ungroup(evictions(ftd = '1'));
  
@@ -730,8 +742,11 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
                   SELF := []))), 
             hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-	liens_full_offset := if(onThor, liens_full_offset_thor, liens_full_offset_roxie);
-
+	#IF(onThor)
+		liens_full_offset := liens_full_offset_thor;
+	#ELSE
+		liens_full_offset := liens_full_offset_roxie;
+	#END
 
 	Risk_Indicators.Layouts_Derog_Info.layout_export get_evictions_offset(Risk_Indicators.Layouts_Derog_Info.layout_export le, liensV2.key_liens_main_ID_FCRA ri) := transform
 		myGetDate 			:= iid_constants.myGetDate(le.historydate);
@@ -824,7 +839,11 @@ export Boca_Shell_Liens_FCRAHist_tmsid (integer bsVersion, unsigned8 BSOptions=0
 																		project(liens_full_offset(rmsid='' or tmsid=''), transform(Risk_Indicators.Layouts_Derog_Info.layout_export,
 																						self.ftd := '0', self := left, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);											
 	
-	evictions_offset := if(onThor, evictions_offset_thor, evictions_offset_roxie);
+	#IF(onThor)
+		evictions_offset := evictions_offset_thor;
+	#ELSE
+		evictions_offset := evictions_offset_roxie;
+	#END
   
 	liensWithDesc_offset := ungroup(evictions_offset(ftd = '1'));
 	 

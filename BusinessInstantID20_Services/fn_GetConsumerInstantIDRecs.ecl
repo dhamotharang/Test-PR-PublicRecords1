@@ -216,20 +216,15 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			model_url := DATASET([], Models.Layout_Score_Chooser);
 			gateways_in := Gateway.Configuration.Get();
 
-			// UNTIL we get clarification from Product, turn off Gateway calls here in CIID.
-/*			
-			Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-				self.servicename := map(IncludeTargus3220 and le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
-																le.servicename = 'bridgerxg5' and OFAC_version <> 4 => '',
-																le.servicename);
-				self.url := map(IncludeTargus3220 and le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
-													le.servicename = 'bridgerxg5' and OFAC_version <> 4 => '',
-													le.url); 
-				self := le;
-			end;
-			gateways := project(gateways_in, gw_switch(left));
-*/
-			gateways := DATASET( [], Gateway.Layouts.Config );
+      // Configure Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we 
+      // get clarification from Product, turn off all other Gateway calls here in CIID.
+      Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+        self.servicename := if(le.servicename = 'bridgerwlc' and OFAC_version = 4, le.servicename, '');
+        self.url         := if(le.servicename = 'bridgerwlc' and OFAC_version = 4, le.url, ''); 
+        self := le;								
+      end;
+      
+      gateways := project(gateways_in, gw_switch(left));
 			
 			rec := record
 				unsigned4 seq;

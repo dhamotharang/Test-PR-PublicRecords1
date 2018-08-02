@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_BIP_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, Phones, Risk_Indicators, RiskWise, Royalty, Suspicious_Fraud_LN, UT, Royalty;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Indicators, RiskWise, Royalty, Suspicious_Fraud_LN, UT, Royalty;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -177,6 +177,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
+
+	IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
+		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	Gateways 										:= Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 	BOOLEAN  ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');

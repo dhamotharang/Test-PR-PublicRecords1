@@ -120,8 +120,7 @@ with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSv
 	END;
 	with_overrides := PROJECT(with_did, add_flags(LEFT));
 
-onThor := false;
-with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, onThor, BSversion), with_did);
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion), with_did);
 	
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded,
 															suppressNearDups, isFCRA, bsversion,

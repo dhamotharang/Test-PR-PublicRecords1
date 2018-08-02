@@ -1,6 +1,7 @@
-import prof_licenseV2, riskwise, ut, ProfileBooster, Risk_Indicators;
+﻿import _Control, prof_licenseV2, riskwise, ut, ProfileBooster, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
 
-export getProfLic(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
+export getProfLic(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 
@@ -36,7 +37,11 @@ distribute(pull(key_did(stringlib.stringtouppercase(source_st) not in ProfileBoo
 											addProfLic(left,right), left outer, atmost(left.did2=right.did,riskwise.max_atmost),
 		local);
 
-license_recs_original := if(onThor, license_recs_original_thor, license_recs_original_roxie);
+#IF(onThor)
+	license_recs_original := license_recs_original_thor;
+#ELSE
+	license_recs_original := license_recs_original_roxie;
+#END
 
 preMari := group(project(PBslim,  
 												transform(Risk_Indicators.Layout_Boca_Shell_ids,
@@ -48,7 +53,7 @@ preMari := group(project(PBslim,
 isFCRA 			:= false;
 isPreScreen := false;
 
-mari_data := risk_indicators.Boca_Shell_Mari(preMari, isFCRA, isPreScreen, onThor);
+mari_data := risk_indicators.Boca_Shell_Mari(preMari, isFCRA, isPreScreen);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
 // ie, date_first_seen is newer than the expire date
@@ -109,8 +114,13 @@ with_category_v5_thor1 := join(
 			self := left), left outer, atmost(100), keep(1),
 		local);
 with_category_v5_thor := with_category_v5_thor1 + rolled_licenses2(license_type='');  // add back the records with empty license type
-with_category_v5 := if(onThor, group(with_category_v5_thor, seq, did2), with_category_v5_roxie);
-	
+
+#IF(onThor)
+	with_category_v5 := group(with_category_v5_thor, seq, did2);
+#ELSE
+	with_category_v5 := with_category_v5_roxie;
+#END
+
  // output(PBslim, named('PBslim'));
  // output(license_recs_original, named('license_recs_original'));
  // output(mari_recs, named('mari_recs'));

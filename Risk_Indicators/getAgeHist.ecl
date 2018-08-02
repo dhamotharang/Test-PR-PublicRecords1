@@ -1,9 +1,6 @@
-﻿/*2012-11-29T16:21:23Z (Michele Walklin)
-Inital check-in
-*/
-import riskwise, ut, header, doxie, Risk_indicators, MDR;
+﻿import riskwise, ut, header, doxie, Risk_indicators, MDR;
 
-export getAgeHist(GROUPED DATASET(Risk_Indicators.iid_constants.layout_outx) iid2, boolean onThor = false) := FUNCTION
+export getAgeHist(GROUPED DATASET(Risk_Indicators.iid_constants.layout_outx) iid2) := FUNCTION
 
 default_first_seen := 999999;
 

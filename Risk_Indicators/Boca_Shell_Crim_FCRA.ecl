@@ -1,7 +1,8 @@
-import doxie_files, ut, doxie, fcra, riskwise, Risk_Indicators, STD;
+﻿import _Control, doxie_files, ut, doxie, fcra, riskwise, Risk_Indicators, STD;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Crim_FCRA (integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_BankLiens, boolean onThor=false) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_BankLiens) := FUNCTION
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;	
@@ -54,8 +55,12 @@ export Boca_Shell_Crim_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 								(LEFT.did=RIGHT.did),
 								get_crim(LEFT,RIGHT), LEFT OUTER, KEEP(1), LOCAL);
 								
-	w_crim := if(onThor, group(sort(distribute(w_crim_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), w_crim_roxie);
-
+	#IF(onThor)
+		w_crim := group(sort(distribute(w_crim_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		w_crim := w_crim_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus correct_crim (Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le) :=	TRANSFORM
 		SELF.BJL.criminal_count := le.BJL.criminal_count + COUNT (le.crim_corrections);
 		SELF := le;

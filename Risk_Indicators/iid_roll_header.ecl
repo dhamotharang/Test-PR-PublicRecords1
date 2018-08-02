@@ -1,8 +1,9 @@
-﻿import risk_indicators, ut;
+﻿import _Control, risk_indicators, ut;
+onThor := _Control.Environment.OnThor;
 
 export iid_roll_header(grouped DATASET(risk_indicators.layout_output) all_header, boolean suppressNearDups=false,
 											 unsigned1 BSversion, boolean experian_batch_feed=false, boolean isFCRA=false,
-											 unsigned8 BSOptions, boolean onThor=false) := function
+											 unsigned8 BSOptions) := function
 
 betterAddresses := risk_indicators.Grade_Addresses_Function(all_header);
 noNearDups := JOIN(all_header, betterAddresses,
@@ -19,7 +20,12 @@ header_addresses := IF(suppressNearDups, noNearDups, all_header);
 ug := ungroup(header_addresses);
 gh_roxie := group(sort(ug, seq,did), seq, did);
 gh_thor := group(sort(distribute(ug, hash64(seq,did)),seq,did, local), seq, did, local);
-gh := if(onThor, gh_thor, gh_roxie);
+
+#IF(onThor)
+	gh := gh_thor;
+#ELSE
+	gh := gh_roxie;
+#END
 
 RetainInputDID 		:= ((BSOptions & Risk_Indicators.iid_constants.BSOptions.RetainInputDID) > 0);
 EnableEmergingID 	:= ((BSOptions & Risk_Indicators.iid_constants.BSOptions.EnableEmergingID) > 0);
@@ -668,8 +674,12 @@ did_sort_thor := map(IsInstantIDv1 and EnableEmergingID => sort(distribute(ugRem
 																											sort(distribute(ugRemoveVer2, hash64(seq)), seq, if(did=0, 281474976710655, did), local) // original legacy version of sorting prior to InstantID v1
 								);				
 								
-did_sort := if(onThor, did_sort_thor, did_sort_roxie);
-								
+#IF(onThor)
+	did_sort := did_sort_thor;
+#ELSE
+	did_sort := did_sort_roxie;
+#END
+
 gRemoveVer2 := group(did_sort, seq);
 
  
@@ -885,7 +895,11 @@ grp_source_stats_roxie := group(sort(source_stats, seq, did, first_seen_at_sourc
 
 grp_source_stats_thor := group(sort(distribute(source_stats, hash64(seq, did)), seq, did, first_seen_at_source, src, local), seq, did, local);
 
-grp_source_stats := if(onThor, grp_source_stats_thor, grp_source_stats_roxie);
+#IF(onThor)
+	grp_source_stats := grp_source_stats_thor;
+#ELSE
+	grp_source_stats := grp_source_stats_roxie;
+#END
 
 tf_source_stats := project(grp_source_stats,
 						transform(temp_rec,

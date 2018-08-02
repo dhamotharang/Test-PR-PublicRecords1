@@ -25,39 +25,85 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
     END;
     
     
- 
- 
- 
-    offenderData := JOIN(individuals, doxie_files.Key_Offenders(),
-                          RIGHT.sdid = LEFT.did,
-                          TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
-                                      SELF.seq := LEFT.seq;
-                                      SELF.did := LEFT.did;
-                                      SELF.ultID := LEFT.ultID;
-                                      SELF.orgID := LEFT.orgID;
-                                      SELF.seleID := LEFT.seleID;
-                                      
-                                      SELF.historyDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate);
-                                      
-                                      SELF.offenderKey := RIGHT.offender_key;
-                                      
-                                      SELF.race := RIGHT.race_desc;
-                                      SELF.sex := RIGHT.sex;
-                                      SELF.hairColor := RIGHT.hair_color_desc;
-                                      SELF.eyeColor := RIGHT.eye_color_desc;
-                                      SELF.height := RIGHT.height;
-                                      SELF.weight := RIGHT.weight;
-                                      SELF.partyName := RIGHT.pty_nm;
-                                      
-                                      SELF.county := RIGHT.county_of_origin;
-                                      SELF.countyCourt := RIGHT.case_court;
-                                      SELF.offenseIncarcerationProbationParole := MAP(RIGHT.curr_incar_flag = 'Y' => DueDiligence.Constants.INCARCERATION_TEXT,
-                                                                                       RIGHT.curr_parole_flag = 'Y' => DueDiligence.Constants.PAROLE_TEXT,
-                                                                                       RIGHT.curr_probation_flag = 'Y' => DueDiligence.Constants.PROBATION_TEXT,
-                                                                                       DueDiligence.Constants.EMPTY);
 
-                                      SELF := [];));
-                                      
+ 
+ 
+    getOffenderData := JOIN(individuals, doxie_files.Key_Offenders(),
+                            KEYED(RIGHT.sdid = LEFT.did),
+                            TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
+                                        SELF.seq := LEFT.seq;
+                                        SELF.did := LEFT.did;
+                                        SELF.ultID := LEFT.ultID;
+                                        SELF.orgID := LEFT.orgID;
+                                        SELF.seleID := LEFT.seleID;
+                                        
+                                        SELF.historyDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate);
+                                        
+                                        SELF.offenderKey := RIGHT.offender_key;
+                                        
+                                        SELF.race := RIGHT.race_desc;
+                                        SELF.sex := RIGHT.sex;
+                                        SELF.hairColor := RIGHT.hair_color_desc;
+                                        SELF.eyeColor := RIGHT.eye_color_desc;
+                                        SELF.height := RIGHT.height;
+                                        SELF.weight := RIGHT.weight;
+                                        SELF.partyName := RIGHT.pty_nm;
+                                        
+                                        SELF.county := RIGHT.county_of_origin;
+                                        SELF.countyCourt := RIGHT.case_court;
+                                        SELF.offenseIncarcerationProbationParole := MAP(RIGHT.curr_incar_flag = 'Y' => DueDiligence.Constants.INCARCERATION_TEXT,
+                                                                                         RIGHT.curr_parole_flag = 'Y' => DueDiligence.Constants.PAROLE_TEXT,
+                                                                                         RIGHT.curr_probation_flag = 'Y' => DueDiligence.Constants.PROBATION_TEXT,
+                                                                                         DueDiligence.Constants.EMPTY);
+
+                                        SELF := [];),
+                            ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                            KEEP(DueDiligence.Constants.MAX_KEEP));
+     
+    dedupOffenders := DEDUP(getOffenderData, ALL); 
+        
+        
+    getOffenderRiskData := JOIN(individuals, doxie_files.key_offenders_risk(),
+                                LEFT.did != 0 AND 
+                                KEYED(LEFT.did = RIGHT.sdid),
+                                TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
+                                          SELF.seq := LEFT.seq;
+                                          SELF.did := LEFT.did;
+                                          SELF.ultID := LEFT.ultID;
+                                          SELF.orgID := LEFT.orgID;
+                                          SELF.seleID := LEFT.seleID;
+                                          
+                                          SELF.offenderKey := RIGHT.offender_key;
+                                                                                  
+                                          SELF.offenseTrafficRelated := RIGHT.traffic_flag;
+                                          SELF.offenseConviction := RIGHT.conviction_flag;
+                                          
+                                          // additional data
+                                          SELF.temp_offenseScore := RIGHT.offense_score;  
+                                          
+                                          SELF := [];),
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                              KEEP(DueDiligence.Constants.MAX_KEEP));    
+                              
+     dedupOffenderRisk := DEDUP(getOffenderRiskData, ALL);                          
+                              
+                              
+    //because an individual could have NUMEROUS offenses, join by did first then join the data together to work with a smaller subset of data
+    offenderData := JOIN(dedupOffenders, dedupOffenderRisk,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.did = RIGHT.did AND
+                          LEFT.ultID = RIGHT.ultID AND
+                          LEFT.orgID = RIGHT.orgID AND
+                          LEFT.seleID = RIGHT.seleID AND
+                          LEFT.offenderKey = RIGHT.offenderKey,
+                          TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
+                                    SELF.temp_offenseScore := RIGHT.temp_offenseScore;
+                                    SELF.offenseTrafficRelated := RIGHT.offenseTrafficRelated;
+                                    SELF.offenseConviction := RIGHT.offenseConviction;
+                                    SELF := LEFT;),
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                          KEEP(DueDiligence.Constants.MAX_KEEP),
+                          LEFT OUTER);
                                       
                                      
     addNonDOCData := JOIN(offenderData, doxie_files.Key_Court_Offenses(),
@@ -85,7 +131,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       SELF.offenseCharge := IF(RIGHT.data_type = '5', RIGHT.arr_off_desc_1, RIGHT.court_off_desc_1);
                                       SELF.offenseChargeLevelReported := IF(RIGHT.data_type = '2', RIGHT.court_off_lev_mapped, RIGHT.arr_off_lev_mapped);
                                       SELF.offenseDDLastReportedActivity := MAX((UNSIGNED)RIGHT.off_date, (UNSIGNED)RIGHT.arr_date, 
-                                                                                (UNSIGNED)RIGHT.court_disp_date, (UNSIGNED)RIGHT.sent_date);                                          
+                                                                                (UNSIGNED)RIGHT.court_disp_date, (UNSIGNED)RIGHT.sent_date);     
+                                      SELF.offenseDDLastCourtDispDate := (UNSIGNED)RIGHT.court_disp_date;
                                      
                                      
                                       
@@ -103,7 +150,12 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       SELF.courtDisposition1 := RIGHT.court_disp_desc_1;
                                       SELF.courtDisposition2 := RIGHT.court_disp_desc_2;
                                       
-                                      SELF := LEFT;));                                 
+                                      //misc data - used in calculating offense score
+                                      SELF.temp_courtOffLevel := RIGHT.court_off_lev;
+                                      
+                                      SELF := LEFT;),
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                          KEEP(DueDiligence.Constants.MAX_KEEP));                                 
   
   
     addDOCDataOffense := JOIN(offenderData, doxie_files.Key_Offenses(),
@@ -163,7 +215,9 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                         //source data
                                         SELF.offenseMaxTerm := RIGHT.max_term_desc;
 
-                                        SELF := LEFT;));
+                                        SELF := LEFT;),
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                              KEEP(DueDiligence.Constants.MAX_KEEP));
                                         
                                         
     addDOCDataPunishment := JOIN(addDOCDataOffense, doxie_files.Key_Punishment(),
@@ -180,128 +234,46 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                                  RIGHT.latest_adm_dt < (STRING8)LEFT.historydate);
                                             
                                             SELF := LEFT;),
+                                  ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
+                                  KEEP(DueDiligence.Constants.MAX_KEEP),
                                   LEFT OUTER);                                   
 
 
     allOffenseData := addNonDOCData + addDOCDataPunishment;
+    
     dedupAllOffenseData := DEDUP(allOffenseData, ALL); 
 
 
-    addOffenderRiskData := JOIN(dedupAllOffenseData, doxie_files.key_offenders_risk(),
-                                LEFT.did != 0 AND 
-                                KEYED(LEFT.did = RIGHT.sdid) AND
-                                LEFT.offenderKey = RIGHT.offender_key,
-                                TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
-                                          
-                                          offenseScore := RIGHT.offense_score;
-                                          
-                                          calcdOffenseScore := IF(offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES,
-                                                                   DueDiligence.Common.LookAtOther(RIGHT.offense.court_off_lev,                 
-                                                                                                    RIGHT.offense.court_off_desc_1, 
-                                                                                                    RIGHT.offense.court_disp_desc_1, 
-                                                                                                    RIGHT.offense.court_disp_desc_2,
-                                                                                                    LEFT.offenseChargeLevelReported),
-                                                                   offenseScore);
-                                                                   
-                                          
-                                          SELF.offenseDDChargeLevelCalculated := calcdOffenseScore; 
-                                          SELF.offenseChargeLevelCalculated := calcdOffenseScore;
-                                          SELF.offenseTrafficRelated := RIGHT.traffic_flag;
-                                          SELF.offenseConviction := RIGHT.conviction_flag;
-                                          
-                                          SELF.caseNumber := STD.Str.FilterOut(IF(LEFT.caseNumber = DueDiligence.Constants.EMPTY, RIGHT.case_num, LEFT.caseNumber), '-');
-                                          
-                                          // additional data
-                                          SELF.source := IF(LEFT.source = DueDiligence.Constants.EMPTY, RIGHT.case_type_desc, LEFT.source);
-                                          
-                                          SELF := LEFT;),
-                                LEFT OUTER);
-
-    dedupAllWithOffenderRisk := DEDUP(addOffenderRiskData, ALL);
     
-    addLegalEventType := PROJECT(dedupAllWithOffenderRisk, TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
-                                                  
-                                                                      expression := DueDiligence.RegularExpressions(LEFT.offenseCharge, 
-                                                                                                                    LEFT.offenseDDChargeLevelCalculated, 
-                                                                                                                    LEFT.offenseTrafficRelated);
+    addLegalEventType := PROJECT(dedupAllOffenseData, TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
+    
+                                                                      //calculate the offense score for each offense
+                                                                      calcdOffenseScore := IF(LEFT.temp_offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES,
+                                                                                               DueDiligence.Common.LookAtOther(LEFT.temp_courtOffLevel,                 
+                                                                                                                                LEFT.offenseCharge,
+                                                                                                                                LEFT.courtDisposition1,
+                                                                                                                                LEFT.courtDisposition2,
+                                                                                                                                LEFT.offenseChargeLevelReported,
+                                                                                                                                LEFT.offenseTrafficRelated),
+                                                                                               LEFT.temp_offenseScore);
+                                                                       
+                                                                                               
+                                                                      
+                                                                      //calculate the event type levels for each offense
+                                                                      charge := LEFT.offenseCharge;
+                                                                      offenseLevel := calcdOffenseScore;
+                                                                      category := LEFT.temp_category;
+                                                                      traffic := LEFT.offenseTrafficRelated;
+                                                                 
                                                                     
-                                                                      typeLevel_9 := MAX(expression.foundCorruptionOrBribery,
-                                                                                          expression.foundLaundering,
-                                                                                          expression.foundOrganizedCrime,
-                                                                                          expression.foundTerror,
-                                                                                          expression.foundIdentityTheft,
-                                                                                          expression.foundCounterfeit,
-                                                                                          expression.foundFalsePretense,
-                                                                                          expression.foundInterceptCommunication,
-                                                                                          expression.foundInsiderTrading,
-                                                                                          expression.foundTreasonOrEspionage,
-                                                                                          expression.foundExtortion,
-                                                                                          expression.foundConcealmentOfFunds,
-                                                                                          expression.foundHijacking,
-                                                                                          expression.foundWire,               
-                                                                                          expression.foundChopShop);
-                                                                                                                                
-                                                                      typeLevel_8 := MAX(expression.foundTraffickingOrSmuggling,
-                                                                                          expression.foundExplosives,
-                                                                                          expression.foundWeapons,
-                                                                                          expression.foundDrugs,
-                                                                                          expression.foundDistributionManufacturingTransportation);
-                                                                                                                                
-                                                                      typeLevel_7 := MAX(expression.foundFraud,                 
-                                                                                         expression.foundCheckFraud,          
-                                                                                         expression.foundForgery,              
-                                                                                         expression.foundEmbezzlement,         
-                                                                                         expression.foundTaxOffenses);      
-                                                                                                                                
-                                                                      typeLevel_6 := MAX(expression.foundGrandLarceny,
-                                                                                         expression.foundBankRobbery,
-                                                                                         expression.foundArmedRobbery,
-                                                                                         expression.foundRobbery,
-                                                                                         expression.foundFelonlyTheft,
-                                                                                         expression.foundMisdemeanorTheft,
-                                                                                         expression.foundLarceny,
-                                                                                         expression.foundOrganizedRetailTheft,
-                                                                                         expression.foundArson,
-                                                                                         expression.foundBurglary,
-                                                                                         expression.foundBreakingAndEntering,
-                                                                                         expression.foundMurderHomocideManslaughter,   
-                                                                                         expression.foundAssultWithIntentToKill,       
-                                                                                         expression.foundKidnappingOrAbduction);  
-                                                                                                                                
-                                                                      typeLevel_5 := MAX(expression.foundSolicitation,
-                                                                                         expression.foundPorn,
-                                                                                         expression.foundProstitution,
-                                                                                         expression.foundSexualAssaultAndBattery,
-                                                                                         expression.foundSexualAbuse,
-                                                                                         expression.foundStatutoryRape,
-                                                                                         expression.foundRape,
-                                                                                         expression.foundMolestation);
-                                                                                                                                
-                                                                      typeLevel_4 := MAX(expression.foundAggravatedAssaultOrBattery,
-                                                                                          expression.foundAssaultWithDeadlyWeapon,
-                                                                                          expression.foundAssault,
-                                                                                          expression.foundDomesticViolence,
-                                                                                          expression.foundAnimalFighting,
-                                                                                          expression.foundStalkingOrHarassment,
-                                                                                          expression.foundCyberStalking,
-                                                                                          expression.foundViolateRestrainingOrder,
-                                                                                          expression.foundResistingArrest,
-                                                                                          expression.foundPropertyDestruction,
-                                                                                          expression.foundVandalism);
-                                                                                                                                
-                                                                      typeLevel_3 := MAX(expression.foundPerjury,
-                                                                                         expression.foundObstruction,
-                                                                                         expression.foundTampering,
-                                                                                         expression.foundComputerOffenses,
-                                                                                         expression.foundGamblingOrBitcoin);
-                                                                                                                                
-                                                                      typeLevel_2 := MAX(expression.foundShoplifting,
-                                                                                          expression.foundAlienOffenses,
-                                                                                          expression.foundTrafficOffenses,
-                                                                                          expression.foundDUI,
-                                                                                          expression.foundTrespassing,
-                                                                                          expression.foundDisorderlyConduct,
-                                                                                          expression.foundPublicIntoxication);
+                                                                      typeLevel_9 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_9);
+                                                                      typeLevel_8 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_8);                                                                                                                                
+                                                                      typeLevel_7 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_7);                                                                                                                                
+                                                                      typeLevel_6 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_6);                                                                                                                                
+                                                                      typeLevel_5 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_5);                                                                                                                                
+                                                                      typeLevel_4 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_4);                                                                                                                                
+                                                                      typeLevel_3 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_3);                                                                                                                                
+                                                                      typeLevel_2 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_2);
                                                                       
                                                                       legalSubCategory := MAX(typeLevel_9, typeLevel_8, typeLevel_7, typeLevel_6,
                                                                                               typeLevel_5, typeLevel_4, typeLevel_3, typeLevel_2);
@@ -321,11 +293,14 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                       SELF.sort_eventTypeCodeFull := MAP(legalSubCategory > 0 => (STRING)legalSubCategory,
                                                                                                          LEFT.temp_category = 1099511627776 => LEFT.offenseCharge,
                                                                                                          (STRING)LEFT.temp_category);
-                                                                             
+                                                                            
                                                                       firstReportedActivityString := IF(LEFT.temp_date = DueDiligence.Constants.EMPTY, (STRING)LEFT.temp_calcdFirstSeenDate, LEFT.temp_date);     
                                                                       
                                                                       SELF.offenseDDFirstReportedActivity := firstReportedActivityString;
                                                                       SELF.temp_firstReportedActivity := firstReportedActivityString;
+                                                                      
+                                                                      SELF.offenseDDChargeLevelCalculated := calcdOffenseScore; 
+                                                                      SELF.offenseChargeLevelCalculated := calcdOffenseScore;
  
                                                                       SELF := LEFT;));
     
@@ -340,13 +315,16 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
     
 
 
+    // OUTPUT(getOffenderData, NAMED('getOffenderData'));
+    // OUTPUT(dedupOffenders, NAMED('dedupOffenders'));
+    // OUTPUT(getOffenderRiskData, NAMED('getOffenderRiskData'));
+    // OUTPUT(dedupOffenderRisk, NAMED('dedupOffenderRisk'));
     // OUTPUT(offenderData, NAMED('offenderData'));
     // OUTPUT(addNonDOCData, NAMED('addNonDOCData'));
     // OUTPUT(addDOCDataOffense, NAMED('addDOCDataOffense'));
     // OUTPUT(addDOCDataPunishment, NAMED('addDOCDataPunishment'));
     // OUTPUT(dedupAllOffenseData, NAMED('dedupAllOffenseData'));
-    // OUTPUT(addOffenderRiskData, NAMED('addOffenderRiskData'));
-    // OUTPUT(dedupAllWithOffenderRisk, NAMED('dedupAllWithOffenderRisk'));
+
     // OUTPUT(addLegalEventType, NAMED('addLegalEventType'));
     // OUTPUT(crimCleanDate, NAMED('crimCleanDate'));
     // OUTPUT(crimFilter, NAMED('crimFilter'));

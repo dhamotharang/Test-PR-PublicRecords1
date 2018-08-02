@@ -1,7 +1,8 @@
-import Prof_License_Mari, riskwise;
+﻿import _Control, Prof_License_Mari, riskwise;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Mari(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
-											boolean isFCRA, boolean isPreScreen, boolean onThor=false) := FUNCTION
+											boolean isFCRA, boolean isPreScreen) := FUNCTION
 
 key_main := Prof_License_Mari.key_did(isFCRA) ;
 rec_main := recordof (key_main);
@@ -46,7 +47,11 @@ distribute(pull(key_main(std_source_upd not in risk_indicators.iid_constants.res
 		keep(100), local
   );
 
-raw_data := if(onThor, group(raw_data_thor, seq), raw_data_roxie);
+#IF(onThor)
+	raw_data := group(raw_data_thor, seq);
+#ELSE
+	raw_data := raw_data_roxie;
+#END
 
 sorted_mari := sort(raw_data, seq, -issue_date, -expiration_date, -license_nbr, license_st);
 

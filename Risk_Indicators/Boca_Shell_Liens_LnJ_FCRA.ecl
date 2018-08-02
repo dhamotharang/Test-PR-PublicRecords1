@@ -1,10 +1,11 @@
-﻿import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD, PersonContext;
- 
+﻿import _Control, doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD, PersonContext;
+onThor := _Control.Environment.OnThor;
+
 export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
-		boolean IncludeLnJ = false, boolean onThor = false, 
+		boolean IncludeLnJ = false, 
 		GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
-  integer2 ReportingPeriod = 84 ) := function
+    integer2 ReportingPeriod = 84 ) := function
  
 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
@@ -38,9 +39,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											LEFT.did=RIGHT.did,
 											add_liens(LEFT,RIGHT), LEFT OUTER, atmost(riskwise.max_atmost), keep(100), local);
 											
-	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);			
-											
-										
+	#IF(onThor)
+		liens_added := group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		liens_added := liens_added_roxie;
+	#END
+  
 	MAC_liensParty_transform(trans_name, key_liens_party) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ le, key_liens_party ri) := TRANSFORM
@@ -89,8 +93,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working, self := left, self := [])), seq, local), seq, local);
 
 	//we want the earliest date filed so order party info to keep that info
-	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
-
+	#IF(onThor)
+		liens_party_raw := liens_party_raw_thor;
+	#ELSE
+		liens_party_raw := liens_party_raw_roxie;
+	#END
+  
 	unique_ffids := dedup(sort(liens_added,did), did);
 	 
 	liens_party_overrides_roxie := JOIN (unique_ffids, fcra.key_Override_liensv2_party_ffid,
@@ -111,8 +119,11 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL								
 											get_liensparty_corrections(LEFT, RIGHT), ALL, LOCAL);
 					
-	liens_party_overrides := if(onThor, liens_party_overrides_thor, liens_party_overrides_roxie);
-
+	#IF(onThor)
+		liens_party_overrides := liens_party_overrides_thor;
+	#ELSE
+		liens_party_overrides := liens_party_overrides_roxie;
+	#END
 
 	MAC_liensMain_transform(trans_name, key_liens_main) := MACRO	
 
@@ -374,7 +385,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 												
 	liens_main_raw_thor := group(sort(liens_main_raw_thor_pre + liens_party_raw(rmsid='' or tmsid=''), seq, local), seq, local);
 								
- liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
+ 	#IF(onThor)
+		liens_main_raw := liens_main_raw_thor;
+	#ELSE
+		liens_main_raw := liens_main_raw_roxie;
+	#END
+  
 	liens_main_overrides_roxie := JOIN(liens_party_overrides, fcra.key_Override_liensv2_main_ffid,
             exists(left.lien_correct_ffid) and
             keyed(right.flag_file_id IN left.lien_correct_ffid) and
@@ -390,8 +406,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
             right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50, 
 												get_liens_main_corrections(LEFT,RIGHT), ALL);
 												
-	liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrides_roxie);
-
+	#IF(onThor)
+		liens_main_overrides := liens_main_overrides_thor;
+	#ELSE
+		liens_main_overrides := liens_main_overrides_roxie;
+	#END
+  
 	liensWithDesc := ungroup(liens_main_raw(ljType !='')) + ungroup(liens_main_overrides(ljType !=''));//FileTypeDesc != '');
 //get smallest date first seen for each tmsid
  liensTmsidDF := DEDUP(SORT(liensWithDesc, did, tmsid, (integer) DateFiled), did, tmsid);
@@ -533,7 +553,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							ATMOST((LEFT.rmsid=RIGHT.rmsid) AND 
 							(left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
 
- liensWplainTiff := if(onThor, liensWplainTiff_thor, ungroup(liensWplainTiff_roxie));
+ 	#IF(onThor)
+		liensWplainTiff := liensWplainTiff_thor;
+	#ELSE
+		liensWplainTiff := ungroup(liensWplainTiff_roxie);
+	#END
+  
 	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, DateLastSeen), TMSID, name_type, KEEP(1));
 	liens_fuller := JOIN(liens_filtered_DF, liensWplainTiff_duped,
 		LEFT.Tmsid = RIGHT.Tmsid and 

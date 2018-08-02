@@ -420,10 +420,10 @@ MODULE
 		stdName := STD.Str.Filter(STD.Str.ToUpperCase(XMLDECODE(trim(name, left, right))), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 		return stdName;
 	END;
-	EXPORT BOOLEAN isPassZumigo(UNSIGNED zumigoScore):= FUNCTION
+	EXPORT BOOLEAN isPassZumigo(INTEGER zumigoScore):= FUNCTION
 		RETURN	zumigoScore BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
 	END;
-	EXPORT BOOLEAN isValidZumigo(UNSIGNED zumigoScore):= FUNCTION
+	EXPORT BOOLEAN isValidZumigo(INTEGER zumigoScore):= FUNCTION
 		RETURN	zumigoScore BETWEEN 0 AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
 	END;	
 	EXPORT GetCleanCompanyName(STRING inputCompanyName) := FUNCTION

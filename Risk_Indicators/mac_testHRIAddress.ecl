@@ -1,4 +1,4 @@
-EXPORT mac_testHRIAddress (infile, addr_field, outfile, isFCRA, onThor=false) := MACRO
+﻿EXPORT mac_testHRIAddress (infile, addr_field, outfile, isFCRA) := MACRO
 
 IMPORT Risk_Indicators, ut;
 
@@ -69,5 +69,10 @@ END;
 										 infile(Address_Verification.addr_field.zip5 = '' OR Address_Verification.addr_field.prim_name = ''));
 
 
-outfile := if(onThor, group(%outfile_thor%, seq), %outfile_roxie%);
+#IF(onThor)
+	outfile := group(%outfile_thor%, seq);
+#ELSE
+	outfile := %outfile_roxie%;
+#END
+
 ENDMACRO;

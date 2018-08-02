@@ -62,6 +62,11 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                                                           DueDiligence.Constants.TRAFFIC => 3,
                                                                                                           DueDiligence.Constants.INFRACTION => 4,
                                                                                                           5);
+                                                                                                          
+
+                                                              SELF.validate_trafficRelated := LEFT.offenseTrafficRelated;
+                                                              SELF.validate_category := LEFT.temp_category;
+                                                              SELF.validate_eventType := DueDiligence.translateExpression.expressionTextByEnum(LEFT.offenseDDLegalEventTypeCode);
                                                                                                       
                                                               SELF := LEFT;                                                            
                                                               SELF := [];));
@@ -134,6 +139,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                         SELF.caseNumber := firstPopulatedString(caseNumber);
                                         SELF.offenseStatute := firstPopulatedString(offenseStatute);
                                         SELF.offenseDDLastReportedActivity := MAX(LEFT.offenseDDLastReportedActivity, RIGHT.offenseDDLastReportedActivity);
+                                        SELF.offenseDDLastCourtDispDate := MAX(LEFT.offenseDDLastCourtDispDate, RIGHT.offenseDDLastCourtDispDate);
                                         SELF.offenseDDLegalEventTypeCode := MAX(LEFT.offenseDDLegalEventTypeCode, RIGHT.offenseDDLegalEventTypeCode);
                                         SELF.offenseCharge := IF(STD.Str.ToUpperCase(TRIM(LEFT.offenseCharge)) IN ['', 'NOT SPECIFIED', 'OTHER'], RIGHT.offenseCharge, LEFT.offenseCharge);
                                         
@@ -245,7 +251,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                         SELF.indv.seq := LEFT.seq;
                                                         SELF.indv.inquiredDID := LEFT.did;
                                                        
-                                                        /*PerLegalStateCriminal*/
+                                                        /*PerStateLegalEvent*/
                                                         SELF.indv.currentIncarcerationOrParole := LEFT.attr_currentlyIncarceratedOrParoled;
                                                         SELF.indv.felonyPast3Yrs := LEFT.attr_felonyPast3Yrs;
                                                         SELF.indv.felonyOver3Yrs := LEFT.attr_felonyOver3Yrs;

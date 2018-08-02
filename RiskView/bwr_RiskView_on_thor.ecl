@@ -21,8 +21,7 @@
 
 IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut;
 
-// onThor := TRUE;	//Use thor logic (distributed data)
-onThor := FALSE;  //Use roxie logic (Keyed JOINS): Use this for testing small batches to make sure everything is working.
+onThor := _Control.Environment.OnThor; // If onThor needs to be toggled, change it in _Control.Environment.OnThor 
 
 #WORKUNIT('name', 'RiskView 5.0 ' + 	if(onThor, 'thor ', 'roxie ') );
 #STORED('did_add_force', if(onThor, 'thor', 'roxi') );  // stored parameter used inside the DID append macro to determine which version of the macro to use
@@ -275,8 +274,7 @@ Search_Results := riskview.Search_Function(valid_inputs,
  ReportingPeriod, // xNJJx
 	IncludeLnJ,
 	RetainInputDID,
-  exception_score_reason,
-	onThor
+  exception_score_reason
 	);
 
 Results := JOIN(batchin_with_seq, search_results, LEFT.seq=RIGHT.seq,

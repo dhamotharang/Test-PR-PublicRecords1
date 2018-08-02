@@ -1,8 +1,8 @@
-﻿IMPORT FCRA, ut, RiskWise, ln_propertyv2;
+﻿IMPORT _Control, FCRA, ut, RiskWise, ln_propertyv2;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_FCRA (GROUPED DATASET(layout_PropertyRecord) addresses,
-                                 GROUPED DATASET(Layout_Boca_Shell_ids) ids,
-                                 boolean onThor=false) := FUNCTION
+                                 GROUPED DATASET(Layout_Boca_Shell_ids) ids) := FUNCTION
 
 calc_napprop (boolean f,boolean l,boolean a) :=
   MAP (~a	=> 0, ~f AND ~l => 1, f AND ~l => 2, ~f AND l => 3, 4);
@@ -142,8 +142,12 @@ by_addr_thor := join(distribute(p_address(prim_name != '', zip5 != ''), hash64(p
 			      ), LOCAL
 	       );
          
- by_addr := if(onThor, by_addr_thor, by_addr_roxie) + p_address(prim_name = '' or zip5 = '');
- 
+#IF(onThor)
+	by_addr := by_addr_thor + p_address(prim_name = '' or zip5 = '');
+#ELSE
+	by_addr := by_addr_roxie + p_address(prim_name = '' or zip5 = '');
+#END
+  
 layout_PropertyRecordPlus join_did(ids L, ln_propertyv2.key_prop_ownership_FCRA_V4 R) := transform
 	self.own_fares_id := '';
 	self.occupant_owned := R.occupant_owned;
@@ -206,7 +210,11 @@ by_did_thor := JOIN (distribute(ids(did!=0), hash64(did)),
                 NOT EXISTS (Right.fares (ln_fare_id IN Left.prop_correct_lnfare)),
                 join_did (LEFT,RIGHT), KEEP(500), ATMOST((left.did = right.did), RiskWise.max_atmost), LOCAL);
 
-by_did := if(onThor, by_did_thor, by_did_roxie);
+#IF(onThor)
+	by_did := by_did_thor;
+#ELSE
+	by_did := by_did_roxie;
+#END
 
 all_props := UNGROUP (by_addr + by_did);
 
@@ -278,8 +286,12 @@ new_props_thor := GROUP(SORT(JOIN (distribute(ids(did!=0), hash64(did)),
                    (Left.did = Right.did),
                    GetCorrected (Left, Right), ATMOST((Left.did = Right.did), RiskWise.max_atmost), LOCAL), seq),seq);
 
-new_props := if(onThor, new_props_thor, new_props_roxie);
-                   
+#IF(onThor)
+	new_props := new_props_thor;
+#ELSE
+	new_props := new_props_roxie;
+#END
+
 all_corrected :=  new_props + all_props;
 
 together := GROUP (SORT (all_corrected, seq, prim_range, prim_name, sec_range, zip5, datasrce), seq);

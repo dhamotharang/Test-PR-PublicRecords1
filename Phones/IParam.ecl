@@ -37,6 +37,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN 	NameAddressValidation := FALSE;
 		EXPORT BOOLEAN	NameAddressInfo := FALSE;
 		EXPORT BOOLEAN	AccountInfo := FALSE;
+		EXPORT BOOLEAN	AccountStatusInfo := FALSE;
 		EXPORT BOOLEAN	CarrierInfo := FALSE;
 		EXPORT BOOLEAN	CallHandlingInfo := FALSE;
 		EXPORT BOOLEAN	DeviceInfo := FALSE;

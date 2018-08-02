@@ -391,7 +391,9 @@ EXPORT Layouts := MODULE
 		BatchShare.Layouts.ShareDid;
 		LN_PropertyV2_Services.layouts.fid.ln_fares_id;
 		UNSIGNED6 owner_did;
+		UNSIGNED6 owner_bdid;
 		BatchShare.Layouts.ShareName;
+		STRING120 company_name;
 		LN_PropertyV2_Services.layouts.assess.sales_info.narrow.sale_date;
 		LN_PropertyV2_Services.layouts.deeds.legal_info.narrow.contract_date;
 		BOOLEAN isCurrentOwner;
@@ -440,13 +442,18 @@ EXPORT Layouts := MODULE
 		STRING8   death_confirmed;	// vorp_code 'V' = 'Verified', 'P' = 'Proof'
 		// Populate WHEN input property is not currently owned
 		UNSIGNED6 input_addr_owner_1_lexid;
+		UNSIGNED6 input_addr_owner_1_bdid;
 		STRING20  input_addr_owner_1_first_name;
 		STRING20  input_addr_owner_1_middle_name;
 		STRING20  input_addr_owner_1_last_name;
 		STRING5   input_addr_owner_1_suffix;
+		STRING120 input_addr_owner_1_company_name;
 		STRING8   input_addr_sale_date;
 		STRING8   input_addr_contract_date;
 		STRING1   input_subject_still_owner;
+		STRING2   driver_state;
+		STRING2   voter_reg_state;
+		STRING4   voter_reg_last_vote_year;
 	END;
 
 	EXPORT propertyOutRec:=RECORD
@@ -598,15 +605,12 @@ EXPORT Layouts := MODULE
 		// Populate WHEN record(s) hasAddrMatch
 		STRING1   relative_addr_match;
 		// Populate WHEN record(s) isCurrent AND NOT isExpired AND hasNameMatch AND hasAddrMatch
-		STRING1   vehicle_reg_addr_match;
+		STRING7   vehicle_reg_addr_match;
 		INTEGER   vehicle_reg_count;
 		// Populate WHEN record isCurrent AND NOT isExpired AND hasAddrMatch
-		STRING1   driver_addr_match;
-		STRING2   driver_state;
+		STRING7   driver_addr_match;
 		// Populate WHEN most recent Voter record by latest vote date hasAddrMatch
-		STRING1   voter_reg_addr_match;
-		STRING2   voter_reg_state;
-		STRING4   voter_reg_last_vote_year;
+		STRING7   voter_reg_addr_match;
 	END;
 
 	EXPORT batchWorkPropRec:=RECORD

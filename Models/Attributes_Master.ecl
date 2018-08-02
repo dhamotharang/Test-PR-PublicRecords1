@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std;
+﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std; 
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -2602,7 +2602,13 @@ export string2 InquiryCollections12Month	:= if(not clam.truedid, '-1', checkbool
 
 export string3 SSNSubjectCount := if(not clam.truedid or InputProvidedSSN='0', '-1', capS( (string)clam.velocity_counters.adls_per_ssn_seen_18months, capZero, cap255) );
 export string2	SSNDeceased	:= map(not clam.truedid or InputProvidedSSN='0' => '-1', clam.iid.decsflag='1' => '1', '0');
-export string8 SSNDateLowIssued := if(not clam.truedid or InputProvidedSSN='0' or trim(clam.iid.socllowissue)='' or clam.iid.socllowissue = '20110625'  , '-1', clam.iid.socllowissue);
+
+export string8 SSNDateLowIssued := if(not clam.truedid 
+                                        or InputProvidedSSN='0' 
+                                        or trim(clam.iid.socllowissue)='' or trim(clam.iid.socllowissue)='0'
+                                        or clam.iid.socllowissue = '20110625'  , '-1', clam.iid.socllowissue);
+// export string8 SSNDateLowIssued := if(TRIM(SSNDateLowIssued1)='' OR SSNDateLowIssued1 = '0' ,'-1', SSNDateLowIssued1);
+                                     
 export string2	SSNProblems_v5	:= map(not clam.truedid or InputProvidedSSN='0' 								=> '-1',  // not input
 								clam.iid.decsflag='1' 		=> '5',   // deceased SSN
 								clam.iid.socsdobflag='1'	=> '4',  	// issued prior to DOB

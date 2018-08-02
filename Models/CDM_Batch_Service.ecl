@@ -183,7 +183,8 @@ clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility,
 	  *     Gather Deceased Results:        *
    *************************************** */
 deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
-deathDIDKey := doxie.key_death_masterV2_ssa_DID;   
+deathDIDKey := doxie.key_death_masterV2_ssa_DID;
+deathHDRKey := doxie.key_Header;   
 
 layout_decd := record
  string decd_src1;
@@ -205,6 +206,14 @@ layout_decd getDIDDecd(clam le, deathDIDkey ri) := transform
  self.decd_firstseen_dts := ri.filedate;
  SELF := le;
 END;
+
+layout_decd getHDRDecd(clam le, deathHDRKey ri) := transform
+ self.decd_src1 := ri.src;
+ self.decd_srcs := ri.src;
+ self.decd_firstseen_dts := (string)ri.dt_first_seen;
+ self := le;
+end;
+
 
 SSN_Decd := join(clam, deathssnkey, 
                    length(left.shell_input.ssn)=9 and keyed(left.shell_input.ssn = right.ssn) 
@@ -228,6 +237,15 @@ DID_Decd := JOIN(clam, deathdidkey,
                 );
 //output(DID_Decd,named('DID_Deceased'));
 
+HDR_Decd := JOIN(clam, deathhdrkey,
+                   left.did<>0 and keyed(left.did=right.s_did)
+                     and ((right.dod <> 0 and right.dod < left.historydate)
+                       or (right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate))
+                     and (right.src = 'DS'),
+                   getHDRDecd(left,right), left outer, atmost(riskwise.max_atmost)
+                 );
+//output(HDR_Decd,named('HDR_Deceased'));
+
 layout_decd combine_decd(layout_decd le, layout_decd ri) := transform
   self.decd_srcs := le.decd_srcs + if(le.decd_src1 != ri.decd_srcs, ',' + ri.decd_srcs, '');
   self.decd_src1 := ri.decd_srcs;
@@ -235,7 +253,7 @@ layout_decd combine_decd(layout_decd le, layout_decd ri) := transform
   self := le;
 end;
 
-deceased_combo := ungroup(SSN_Decd+DID_Decd);
+deceased_combo := ungroup(SSN_Decd+DID_Decd+HDR_Decd);
 //output(deceased_combo,named('Deceased_Combo'));
 
 alldeceasedrecs := sort(deceased_combo,seq,decd_srcs,decd_firstseen_dts);
@@ -273,6 +291,7 @@ noLNameInput   := not le.input_validation.lastname;
 
 // orig source code lists from sheet provided by AJ
 // these codes are used with the ver_x_sources part in the header_summary of the clam
+// and with the death keys for the deceased results
 credit_sources    := ['EQ', 'EN'];
 credit_combo_srcs := ['TN', 'TS', 'TU']; // note that TN/TS/TU only count as 1 source if multiple of them are present
 

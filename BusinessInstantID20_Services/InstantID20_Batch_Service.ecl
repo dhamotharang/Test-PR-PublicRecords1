@@ -64,6 +64,7 @@
 
 	<!-- ----------[ Watchlists ]---------- -->
 	<part name="Include_ALL_Watchlist"  type="xsd:boolean"/>
+	<part name="Include_ALLV4_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_BES_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_BIS_Watchlist"  type="xsd:boolean"/>
 	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
@@ -97,7 +98,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Patriot, Risk_Indicators, Royalty, STD;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Patriot, Risk_Indicators, Royalty, STD;
 
 EXPORT InstantID20_Batch_Service() := MACRO
 
@@ -164,6 +165,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		'PoBoxCompliance',
 		'UseDOBFilter',
 		'Include_ALL_Watchlist',
+		'Include_ALLV4_Watchlist',
 		'Include_BES_Watchlist',
 		'Include_BIS_Watchlist',
 		'Include_CFTC_Watchlist',
@@ -199,6 +201,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 
 		// 1. Construct a Watchlist dataset.
 		boolean Include_ALL_Watchlist := false : stored('Include_ALL_Watchlist');
+    boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 		boolean Include_BES_Watchlist := false : stored('Include_BES_Watchlist');
 		boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
 		boolean Include_DTC_Watchlist := false : stored('Include_DTC_Watchlist');
@@ -231,6 +234,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 
 		dWL := dataset([], iesp.share.t_StringArrayItem) +
 				if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+        if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
 				if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
 				if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
 				if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -287,7 +291,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT UNSIGNED1	MarketingMode				 := MAX(MIN(_MarketingMode, 1), 0);
 			EXPORT STRING50		AllowedSources			 := STD.Str.ToUpperCase(_AllowedSources);
 			EXPORT UNSIGNED1	BIPBestAppend				 := IF(_BIPBestAppend BETWEEN Business_Risk_BIP.Constants.BIPBestAppend.Default AND Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest, _BIPBestAppend, Business_Risk_BIP.Constants.BIPBestAppend.Default);
-			EXPORT UNSIGNED1	OFAC_Version				 := MAX(MIN(_OFAC_Version, 3), 0);
+			EXPORT UNSIGNED1	OFAC_Version				 := MAX(MIN(_OFAC_Version, BusinessInstantID20_Services.Constants.MAX_OFAC_VERSION), 0);
 			EXPORT BOOLEAN    IncludeTargusGateway := _IncludeTargusGateway;
 			EXPORT REAL				Global_Watchlist_Threshold	     := MAX(MIN(_Global_Watchlist_Threshold, 1), 0);
 			EXPORT BOOLEAN    OverRideExperianRestriction      := MAP( _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
@@ -300,6 +304,9 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE              := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
+
+  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 		// 5. Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These 
 		// parameters should be global so figure them out here and pass around appropriately.
@@ -334,7 +341,10 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			
 		IF( _ForRetroTesting AND NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
-		
+
+		IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
+			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+    
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
 	
 		// 8. Pass all input to BIID 2.0 logic.

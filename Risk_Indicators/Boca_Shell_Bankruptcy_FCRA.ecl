@@ -1,8 +1,8 @@
-﻿import doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
-
+﻿import _Control, doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0, 
-				GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections, boolean onThor=false) := function
+				GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
@@ -32,8 +32,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		atmost(riskwise.max_atmost), left OUTER, KEEP(10), LOCAL);
 	bankrupt_added_thor := group(sort(w_corrections(did=0) + bankrupt_added_thor_did, did, LOCAL), did, LOCAL);
 
-	bankrupt_added := IF(onThor, bankrupt_added_thor, bankrupt_added_roxie);
-
+	#IF(onThor)
+		bankrupt_added := bankrupt_added_thor;
+	#ELSE
+		bankrupt_added := bankrupt_added_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus getWithdrawnCheck(bankrupt_added le, bans_Withdrawn_Status ri) := TRANSFORM
 		// blank out the TMSID if found on withdrawn key so the next join doesn't hit the search file
 		// per the requirements document, we only want to remove the withdrawn bankruptcy on version 3.0 and higher
@@ -56,8 +60,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							left outer, atmost(riskwise.max_atmost), keep(1), LOCAL) +
 							bankrupt_added(bk_tmsid='');
 							
-	bankrupt_added_after_withdrawn_check := if(onThor, group(sort(bankrupt_added_after_withdrawn_check_thor, seq),seq), bankrupt_added_after_withdrawn_check_roxie);						
-							
+	#IF(onThor)
+		bankrupt_added_after_withdrawn_check := group(sort(bankrupt_added_after_withdrawn_check_thor, seq),seq);
+	#ELSE
+		bankrupt_added_after_withdrawn_check := bankrupt_added_after_withdrawn_check_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus get_bankrupt_FCRA (Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, 
 		bans_search ri) := TRANSFORM
 		myGetDate := iid_constants.myGetDate(le.historydate);
@@ -119,8 +127,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							LEFT OUTER, keep(100), LOCAL);
 	bankrupt_full_thor := group(sort(bankrupt_added_after_withdrawn_check(bk_tmsid = '') + bankrupt_full_thor_tmsid, seq), seq);
 
-	bankrupt_full := if(onThor, bankrupt_full_thor, bankrupt_full_roxie);
-
+	#IF(onThor)
+		bankrupt_full := bankrupt_full_thor;
+	#ELSE
+		bankrupt_full := bankrupt_full_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus roll_bankrupt(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, 
 		Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus ri) := TRANSFORM
 		sameBankruptcy := le.case_num=ri.case_num AND le.court_code=ri.court_code;

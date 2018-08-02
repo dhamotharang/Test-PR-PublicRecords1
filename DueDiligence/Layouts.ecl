@@ -16,7 +16,7 @@ EXPORT Layouts := MODULE
 	
 /* Output of DueDiligence.getBusBIPId */  
 	EXPORT LinkID_Results := RECORD
-		UNSIGNED4 Seq       := 0;
+		UNSIGNED6 Seq       := 0;
 		BOOLEAN BIPIDSourceInput;                       // Indicates if the BIP IDs were returned from the append process or input
 		LinkIDs PowID;
 		LinkIDs ProxID;
@@ -129,16 +129,14 @@ EXPORT Layouts := MODULE
 		STRING10 PerGeographic_Flag;
 		STRING2 PerMobility;
 		STRING10 PerMobility_Flag;
-		STRING2 PerLegalStateCriminal;
-		STRING10 PerLegalStateCriminal_Flag;
-    STRING2 PerLegalFedCriminal;
-		STRING10 PerLegalFedCriminal_Flag;
-		STRING2 PerLegalCivil;
-		STRING10 PerLegalCivil_Flag;
-		STRING2 PerLegalTraffInfr;
-		STRING10 PerLegalTraffInfr_Flag;
-		STRING2 PerLegalTypes;
-		STRING10 PerLegalTypes_Flag;
+		STRING2 PerStateLegalEvent;
+		STRING10 PerStateLegalEvent_Flag;
+    STRING2 PerFederalLegalEvent;
+		STRING10 PerFederalLegalEvent_Flag;
+		STRING2 PerCivilLegalEvent;
+		STRING10 PerCivilLegalEvent_Flag;
+		STRING2 PerOffenseType;
+		STRING10 PerOffenseType_Flag;
 		STRING2 PerAgeRange;
 		STRING10 PerAgeRange_Flag;
 		STRING2 PerIdentityRisk;
@@ -184,16 +182,14 @@ EXPORT Layouts := MODULE
 		STRING10 BusShellShelf_Flag;
 		STRING2 BusMatchLevel;
 		STRING10 BusMatchLevel_Flag;
-		STRING2 BusLegalStateCriminal;
-		STRING10 BusLegalStateCriminal_Flag;
-    STRING2 BusLegalFedCriminal;
-    STRING10 BusLegalFedCriminal_Flag;
-		STRING2 BusLegalCivil;
-		STRING10 BusLegalCivil_Flag;
-		STRING2 BusLegalTraffInfr;
-		STRING10 BusLegalTraffInfr_Flag;
-		STRING2 BusLegalTypes;
-		STRING10 BusLegalTypes_Flag;
+		STRING2 BusStateLegalEvent;
+		STRING10 BusStateLegalEvent_Flag;
+    STRING2 BusFederalLegalEvent;
+    STRING10 BusFederalLegalEvent_Flag;
+		STRING2 BusCivilLegalEvent;
+		STRING10 BusCivilLegalEvent_Flag;
+		STRING2 BusOffenseType;
+		STRING10 BusOffenseType_Flag;
 		STRING2 BusBEOProfLicense;
 		STRING10 BusBEOProfLicense_Flag;
 		STRING2 BusBEOUSResidency;
@@ -216,7 +212,6 @@ EXPORT Layouts := MODULE
 		STRING5 	suffix;
 		STRING9   ssn;
 		STRING8   dob;
-    BOOLEAN   useLexIDAsOverride;
 		
 		STRING120   streetAddress1;
 		STRING120   streetAddress2;
@@ -240,7 +235,7 @@ EXPORT Layouts := MODULE
 	EXPORT BatchOut := RECORD
 		UNSIGNED4 seq;
     STRING30 acctNo;
-    BOOLEAN lexIDVerified;
+    BOOLEAN lexIDChanged;
 		PerAttributes;
 		BusAttributes;
 	END;
@@ -371,26 +366,7 @@ EXPORT Layouts := MODULE
     DATASET(DIDAndName) propertyOwners;
   END;
 	
-	EXPORT BusReportDetails := RECORD
-    DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
-    DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
-    BOOLEAN FEINSourceContainsE5;
-    STRING  FEIN_Masked_For_Report;
-    UNSIGNED3 FEINSourcesCnt;   
-    DATASET(FEINLayoutSources) FEINSources;
-    UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
-    UNSIGNED3 BetterBusCnt;           //***among all of the Shell Shelf Sources - Better Business Bureau is 1 of them
-    UNSIGNED3 UtilityCnt;             //***among all of the Shell Shelf Sources - Utilities is 1 of them
-    UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
-    UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
-    STRING2 CompanyIncorpState;
-    DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
-    DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
-    UNSIGNED4 dateVendorFirstReported;
-    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
-    DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
-    STRING parentCompanyName;
-	END;
+	
   
   EXPORT IndReportDetails := RECORD
     STRING9 bestSSN;
@@ -435,12 +411,12 @@ EXPORT Layouts := MODULE
   
   EXPORT CriminalSources := RECORD
     STRING offenseCharge;
-    STRING7 offenseConviction;
+    STRING1 offenseConviction;
     STRING1 offenseChargeLevelCalculated;
-    STRING offenseChargeLevelReported;
+    STRING35 offenseChargeLevelReported;
     STRING25 source;
-    STRING courtDisposition1;
-    STRING courtDisposition2;
+    STRING50 courtDisposition1;
+    STRING50 courtDisposition2;
     UNSIGNED4 offenseReportedDate;
     UNSIGNED4 offenseArrestDate;
     UNSIGNED4 offenseCourtDispDate;
@@ -450,10 +426,15 @@ EXPORT Layouts := MODULE
     UNSIGNED4 DOCConvictionOverrideDate;
     UNSIGNED4 DOCScheduledReleaseDate;
     UNSIGNED4 DOCActualReleaseDate;
-    STRING DOCInmateStatus;
-    STRING DOCParoleStatus;
-    STRING offenseMaxTerm;
+    STRING50 DOCInmateStatus;
+    STRING50 DOCParoleStatus;
+    STRING30 offenseMaxTerm;
     DATASET({STRING120 name}) partyNames;
+    
+    //used for file validation
+    STRING1 validate_trafficRelated;
+    UNSIGNED8 validate_category;
+    STRING validate_eventType;
   END;
   
   EXPORT CriminalOffenses := RECORD
@@ -477,29 +458,30 @@ EXPORT Layouts := MODULE
     BOOLEAN attr_legalEventCat2;
     
     //Top Level Data
-    STRING50 state;
+    STRING2 state;
     STRING25 source;
-    STRING caseNumber;
-    STRING offenseStatute;
+    STRING35 caseNumber;
+    STRING35 offenseStatute;
     STRING8 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED4 offenseDDLastCourtDispDate;
     UNSIGNED offenseDDLegalEventTypeCode;
     STRING offenseCharge;
     STRING1 offenseDDChargeLevelCalculated;
-    STRING offenseChargeLevelReported; 
-    STRING7 offenseConviction;
-    STRING15 offenseIncarcerationProbationParole;
-    STRING7 offenseTrafficRelated;
+    STRING35 offenseChargeLevelReported; 
+    STRING1 offenseConviction;
+    STRING13 offenseIncarcerationProbationParole;
+    STRING1 offenseTrafficRelated;
     
     //Additional details
-    STRING30 county;
-    STRING40 countyCourt;
-    STRING40 city;
-    STRING50 agency;
-    STRING30 race;
-    STRING7 sex;
-    STRING15 hairColor;
-    STRING15 eyeColor;
+    STRING county;
+    STRING countyCourt;
+    STRING city;
+    STRING agency;
+    STRING race;
+    STRING1 sex;
+    STRING hairColor;
+    STRING eyeColor;
     STRING3 height;
     STRING3 weight;
     
@@ -525,22 +507,46 @@ EXPORT Layouts := MODULE
     DATASET(CriminalOffenses) indOffenses;
 	END;
 
+  EXPORT BusReportDetails := RECORD
+    DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
+    BOOLEAN FEINSourceContainsE5;
+    STRING  FEIN_Masked_For_Report;
+    UNSIGNED3 FEINSourcesCnt;   
+    DATASET(FEINLayoutSources) FEINSources;
+    UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
+    UNSIGNED3 BetterBusCnt;           //***among all of the Shell Shelf Sources - Better Business Bureau is 1 of them
+    UNSIGNED3 UtilityCnt;             //***among all of the Shell Shelf Sources - Utilities is 1 of them
+    UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
+    UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
+    STRING2 CompanyIncorpState;
+    DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    UNSIGNED4 dateVendorFirstReported;
+    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+    DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+    STRING parentCompanyName;
+    UNSIGNED2   DIDlessBEOCount; 
+    DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExecWithNoDID
+	END;
+
+
 	
 	EXPORT Indv_Internal := Record
-		UNSIGNED4	 seq := 0;
-		UNSIGNED4	 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
-		UNSIGNED4		historyDateRaw;										//cleaned date used to calc history date
-		BOOLEAN 			inputAddressProvided;
-		BOOLEAN				fullInputAddressProvided;
+		UNSIGNED4 seq := 0;
+		UNSIGNED4 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
+		UNSIGNED4 historyDateRaw;										    //cleaned date used to calc history date
+		BOOLEAN inputAddressProvided;
+		BOOLEAN fullInputAddressProvided;
     Indv_Input indvRawInput;
-		Indv_Input	indvCleanInput;
+		Indv_Input indvCleanInput;
     GeographicRiskLayout; 
-		UNSIGNED6		inquiredDID;
-		RelatedParty 		individual;																								//populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
-		UNSIGNED4 	numberOfSpouses;																							
+		UNSIGNED6 inquiredDID;
+		RelatedParty individual;											  //populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
+		UNSIGNED4 numberOfSpouses;																							
 		DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
-		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			//populated in DueDiligence.getIndRelatives
-		STRING2				indvType;                         					    //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
+		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+		STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
 		
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
@@ -561,8 +567,8 @@ EXPORT Layouts := MODULE
 		STRING2			relatedDegree;					 								            //IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec
 		UNSIGNED2		linkBusCount;
 		DATASET(Busn_Input) linkedBusinesses {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};	//populated in DueDiligence.getBusLinkedBus
-		UNSIGNED2		execCount;
-		DATASET(RelatedParty) execs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
+		UNSIGNED2		execCount;                           
+		DATASET(RelatedParty) execs        {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
     
     DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
 

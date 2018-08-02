@@ -1,6 +1,7 @@
-import faa, FCRA, riskwise, ut;
+﻿import _Control, faa, FCRA, riskwise, ut;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Aircraft_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, boolean onThor=false) := FUNCTION
+export Boca_Shell_Aircraft_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 // for riskview attributes v5 requirements, modify version 3,4,5 attributes to calculate the age of aircraft attributes based upon build dates instead of today's date.
 aircraft_build_date := Risk_Indicators.get_Build_date('faa_build_version');
@@ -43,7 +44,11 @@ reg_ids_thor_did := join (distribute(ids_only(did!=0), hash64(did)),
                  riskwise.max_atmost), LOCAL);
 reg_ids_thor := group(sort(reg_ids_thor_did + project(ids_only(did=0), transform(layout_reg_ids, self := LEFT, self := [])),seq),seq);
 
-reg_ids := if(onThor, reg_ids_thor, reg_ids_roxie);
+#IF(onThor)
+	reg_ids := reg_ids_thor;
+#ELSE
+	reg_ids := reg_ids_roxie;
+#END
 
 // now fetch main registration records; suppressing overrides, if any
 key_ids := faa.key_aircraft_id (true);
@@ -71,7 +76,11 @@ reg_raw_thor_pre := join (distribute(reg_ids(aircraft_id!=0), hash64(aircraft_id
                  left outer, keep (1), limit (0), LOCAL);
 reg_raw_thor := group(sort(reg_raw_thor_pre + project(reg_ids(aircraft_id=0), transform(Riskwise.Layouts.Layout_Aircraft_Plus, self := LEFT, self := [])), seq),seq);
 
-reg_raw := if(onThor, reg_raw_thor, reg_raw_roxie);
+#IF(onThor)
+	reg_raw := reg_raw_thor;
+#ELSE
+	reg_raw := reg_raw_roxie;
+#END
 
 // Get corrections (same transform as above, just different input)
 Riskwise.Layouts.Layout_Aircraft_Plus GetCorrections (Layout_Boca_Shell_ids le, fcra.key_override_faa.aircraft ri) := transform
@@ -90,7 +99,11 @@ reg_corrected_thor := join (ids_only(air_correct_ffid<>[]), pull(fcra.key_overri
                        Right.flag_file_id IN Left.air_correct_ffid,
                        GetCorrections (Left, Right), LOCAL, ALL); // Note: inner join
 											 
-reg_corrected := if(onThor, reg_corrected_thor, reg_corrected_roxie);
+#IF(onThor)
+	reg_corrected := reg_corrected_thor;
+#ELSE
+	reg_corrected := reg_corrected_roxie;
+#END
 
 // combine and take only "latest" first-seen registration record for each aircraft
 combined := ungroup (reg_raw + reg_corrected);

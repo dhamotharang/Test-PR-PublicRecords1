@@ -1,6 +1,7 @@
-﻿import Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, address, AID_Build;
+﻿import _Control, Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, address, AID_Build;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell, boolean onThor=false) := FUNCTION
+EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell) := FUNCTION
 
 	isFCRA := false;
 	nines	 := 9999999;
@@ -41,8 +42,12 @@ address_rank_key := header.key_addr_hist(isFCRA);
 										right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 										getInfutor(left,right), left outer, KEEP(100), local);
 
-	wInfutorCid := if(onThor, wInfutorcid_thor, wInfutorcid_roxie);
-
+	#IF(onThor)
+		wInfutorCid := wInfutorCid_thor;
+	#ELSE
+		wInfutorCid := wInfutorCid_roxie;
+	#END
+  
 //search Gong by DID to verify input name, address, phone
 	Layouts.Layout_PB_Shell getGong(PBShell le, gonghistorydid_key ri) := transform	
 		self.firstscore 	:= Risk_Indicators.FnameScore(le.fname, ri.name_first);
@@ -70,8 +75,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 										left.did=right.l_did and
 										right.dt_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate),
 										getGong(left,right), left outer, KEEP(100), local);
-	wGong := if(onThor, wGong_thor, wGong_roxie);
-										
+
+	#IF(onThor)
+		wGong := wGong_thor;
+	#ELSE
+		wGong := wGong_roxie;
+	#END
+  
 //search header by DID to verify input name, address, phone, SSN	
 	ProfileBooster.Layouts.Layout_PB_Shell getHeader(ProfileBooster.Layouts.Layout_PB_Shell le, header_key ri) := transform
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
@@ -130,8 +140,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 										right.src in MDR.sourcetools.set_Marketing_header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), local);
-	wHeader := if(onThor, wHeader_thor, wHeader_roxie);
 
+	#IF(onThor)
+		wHeader := wHeader_thor;
+	#ELSE
+		wHeader := wHeader_roxie;
+	#END
+  
 	ProfileBooster.Layouts.Layout_PB_Shell getQHeader(ProfileBooster.Layouts.Layout_PB_Shell le, quickheader_key ri) := transform
 		self.firstscore 			:= Risk_Indicators.FnameScore(le.fname, ri.fname);
 		self.firstcount 			:= (integer)Risk_Indicators.iid_constants.g(self.firstscore);
@@ -188,8 +203,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 										right.src in MDR.sourcetools.set_Marketing_header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getQHeader(left, right), keep(200), local);
-	wQHeader := if(onThor, wQHeader_thor, wQHeader_roxie);
 
+	#IF(onThor)
+		wQHeader := wQHeader_thor;
+	#ELSE
+		wQHeader := wQHeader_roxie;
+	#END
+  
 //sort all verification records by seq
 	sortVer := sort(ungroup(wInfutorCid + wGong + wHeader + wQHeader), seq);
 
@@ -279,8 +299,12 @@ address_rank_key := header.key_addr_hist(isFCRA);
 													left.hdr_prim_range = right.prim_range and
 													left.hdr_prim_name = right.prim_name,
 													getAddrSeq(LEFT,RIGHT), left outer, local);
-	wAddrSeq := if(onThor, wAddrSeq_thor, wAddrSeq_roxie);
-	
+
+	#IF(onThor)
+		wAddrSeq := wAddrSeq_thor;
+	#ELSE
+		wAddrSeq := wAddrSeq_roxie;
+	#END
 
 //each unique address now has assigned sequence. drop any bad addresses (0 or 9x), sort by seq / address seq and keep only first two.
 	// dedupAddrs := dedup(sort(wAddrSeq(address_history_seq <> 255), seq, address_history_seq),seq, keep(2));
@@ -317,8 +341,11 @@ address_rank_key := header.key_addr_hist(isFCRA);
 															append_addr_type(left,right), 
 															left outer, atmost(riskwise.max_atmost), keep(1), local);
 															
-	with_hdr_addr_cache := if(onThor, group(with_hdr_addr_cache_thor, seq), with_hdr_addr_cache_roxie);
-
+	#IF(onThor)
+		with_hdr_addr_cache := group(with_hdr_addr_cache_thor, seq);
+	#ELSE
+		with_hdr_addr_cache := with_hdr_addr_cache_roxie;
+	#END
 
 	withAddrs := join(wVerification, with_hdr_addr_cache,  
 												left.seq = right.seq,

@@ -661,8 +661,8 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
     
     // SCORE THE PHONES
     model_results  := if(version = v_enum.CP_V3,
-															Phone_Shell.PhoneScore_cp3_v2(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
-															Phone_Shell.PhoneScore_wf8_v2(phones_with_attrs));//v_enum.WFP_V8
+															Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, Phone_Shell.Constants.Default_PhoneScore),
+															Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs));//v_enum.WFP_V8
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
       (ph_type = 'EDAFLA' OR ph_type = 'EDAFA' OR ph_type = 'EDALA' => 'ES', 

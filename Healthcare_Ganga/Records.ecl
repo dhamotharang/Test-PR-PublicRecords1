@@ -25,7 +25,8 @@ EXPORT Records := Module
 																					self.st := left.State;
 																					self.z5 := left.Zip5;
 																					self.zip4 := left.Zip4;
-																					self.comp_name:= STD.Str.ToUpperCase(left.BusinessName);
+																					self.comp_name:= map(left.LegalName <> '' => STD.Str.ToUpperCase(left.LegalName),
+																															STD.Str.ToUpperCase(left.BusinessName));
 																					self.TaxID := left.taxid;
 																					self.IsIndividualSearch := left.EntityType in [Healthcare_Ganga.Constants.HCP,
 																																																	Healthcare_Ganga.Constants.Principles];
@@ -43,7 +44,7 @@ EXPORT Records := Module
 		refmt := reformatInput(inRecs);
 		getRaw := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := choosen(Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right)), 1);
 		return final;
 	END;
 	
@@ -52,7 +53,7 @@ EXPORT Records := Module
 		refmt := reformatInput(inRecs);
 		getRaw := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := choosen(Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right)), 1);
 		return final;
 	END;
 	
@@ -136,7 +137,7 @@ EXPORT Records := Module
 		refmt := reformatInput(inRecs);
 		getRaw := Healthcare_Header_Services.Records.getRecordsBusiness(refmt,cfg);
 		getRawAppend := Project(getRaw,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout, self:=left));
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := choosen(Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right)), 1);
 		return final;
 	END;
 	
@@ -203,11 +204,11 @@ EXPORT Records := Module
 																self.DoingBusinessAs	:= if(left.NPIRaw[1].EntityInformation.CompanyNameAKA <> '',left.NPIRaw[1].EntityInformation.CompanyNameAKA,lbn);
 																self.FaxNumber := addr(FaxNumber<>'')[1].FaxNumber;
 																self:=right;),left outer,keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record);
-		final := sort(dedup(sort(join(joinData, inrecs, left.acctno = right.acctno, 
+		final := choosen(sort(dedup(sort(join(joinData, inrecs, left.acctno = right.acctno,
 										transform(Healthcare_Ganga.Layouts.IdentityOutput,
 															self.EntityType := right.EntityType;
 															self.RecordIdentifier := right.RecordIdentifier;
-															self := left;),keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid);
+															self := left;),keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid), 1);
 		return final;
 	END;
 	Export getAllRecords (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION

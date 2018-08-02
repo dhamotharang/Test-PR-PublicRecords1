@@ -1,9 +1,9 @@
-﻿import advo, riskwise, models, ut;
+﻿import _Control, advo, riskwise, models, ut;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Address_History(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, 
 																	boolean isFCRA,
-																	string50 datarestrictionmask,
-																	boolean onThor=FALSE) := function
+																	string50 datarestrictionmask) := function
 
 advo_permitted := datarestrictionmask[risk_indicators.iid_constants.posADVORestriction]<>'1';
 
@@ -50,8 +50,12 @@ with_advo_college_thor := with_advo_college_thor_pre +
                               self.address_history_summary.address_history_advo_college_hit := (LEFT.chrono_addr_flags.deliveryStatus<>'' and LEFT.chrono_addr_flags.deliveryStatus='C');
                               self := left));
 
-with_advo_college := IF(onThor, with_advo_college_thor, with_advo_college_roxie);				
-																										
+#IF(onThor)
+	with_advo_college := with_advo_college_thor;
+#ELSE
+	with_advo_college := with_advo_college_roxie;
+#END
+
 // output(choosen(j1(advo_college_hit=1), eyeball), named('college_address_hits'));
 // deduped_advo_college := dedup(sort(j1, seq, did, -address_history_summary.address_history_advo_college_hit), seq, did);
 
@@ -207,8 +211,12 @@ removeDFS := record
 end;
 t_roxie := table(p, removeDFS, h.did, few);
 t_thor := table(distribute(p, hash64(h.did)), removeDFS, h.did, local);
-t := if(onThor, t_thor, t_roxie);
 
+#IF(onThor)
+	t := t_thor;
+#ELSE
+	t := t_roxie;
+#END
 
 temprec checkDFS(p le, t ri) := transform
 	self.did := if((le.h_dt_first_seen=0 and ri.dfsnzcount>0) OR (le.h.src in ['TU','TS'] and ri.ntutscount>0), skip, le.h.did);
@@ -219,7 +227,11 @@ j5_roxie := group(sort(join(p, t, left.h.did=right.did, checkDFS(left,right)),se
 j5_thor := group(sort(join(distribute(p, hash64(did)), distribute(t, hash64(did)), 
 											left.h.did=right.did, checkDFS(left,right), local),seq, did, local),seq, did, local);
 
-j5 := if(onThor, j5_thor, j5_roxie);
+#IF(onThor)
+	j5 := j5_thor;
+#ELSE
+	j5 := j5_roxie;
+#END
 
 // count the number of source codes per DID, also count the number of address per DID
 temprec countSRS(j5 le, j5 ri) := transform
@@ -236,7 +248,11 @@ end;
 j2_roxie := group(sort(join(j5, r2, left.seq=right.seq and left.h.did=right.h.did, popSC(left,right), left outer, keep(1)),seq, did), seq, did);
 j2_thor := group(sort(join(j5, r2, left.seq=right.seq and left.h.did=right.h.did, popSC(left,right), left outer, keep(1),local),seq, did, local), seq, did, local);
 
-j2 := if(onThor, j2_thor, j2_roxie);
+#IF(onThor)
+	j2 := j2_thor;
+#ELSE
+	j2 := j2_roxie;
+#END
 
 test1 := sort(j2,seq,did,addrkey);
 
@@ -255,7 +271,11 @@ end;
 j3_roxie := group(sort(join(j2, r3, left.seq=right.seq and left.h.did=right.h.did, popAC(left,right), left outer, keep(1)),seq, did), seq, did);
 j3_thor := group(sort(join(j2, r3, left.seq=right.seq and left.h.did=right.h.did, popAC(left,right), left outer, keep(1), local),seq, did, local), seq, did, local);
 
-j3 := if(onThor, j3_thor, j3_roxie);
+#IF(onThor)
+	j3 := j3_thor;
+#ELSE
+	j3 := j3_roxie;
+#END
 
 // sort by earliest first seen date and latest last seen date
 s2 := sort(j3, seq, h.did, addrkey, h_dt_first_seen, -h.dt_last_seen);
@@ -460,7 +480,11 @@ j_final_thor := group(join(distribute(pre_join, hash64(seq, did)), distribute(p6
 										left.seq=right.seq and left.did=right.did,
 										into_final(left, right), left outer, local), seq, LOCAL);		
 										
-j_final := if(onThor, j_final_thor, j_final_roxie);		
+#IF(onThor)
+	j_final := j_final_thor;
+#ELSE
+	j_final := j_final_roxie;
+#END
 
 return j_final;
 

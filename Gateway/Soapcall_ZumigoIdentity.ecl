@@ -24,10 +24,11 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF.Options.NameAddressValidation	:= inMod.NameAddressValidation OR inMod.NameAddressInfo;
 		SELF.Options.NameAddressInfo		:= inMod.NameAddressInfo;
 		SELF.Options.AccountInfo			:= inMod.AccountInfo;
+		SELF.Options.AccountStatusInfo		:= inMod.AccountStatusInfo;
 		SELF.Options.CarrierInfo			:= inMod.CarrierInfo;
 		SELF.Options.CallHandlingInfo		:= inMod.CallHandlingInfo;
 		SELF.Options.DeviceInfo				:= inMod.DeviceInfo;
-		SELF.Options.DeviceChangeOption			:= inMod.DeviceChangeOption;
+		SELF.Options.DeviceChangeOption		:= inMod.DeviceChangeOption;
 		SELF.Options.DeviceHistory			:= inMod.DeviceHistory;
 		SELF.SearchBy.Consent.OptInType		:= STD.Str.ToLowerCase(inMod.OptInType);
 		SELF.SearchBy.Consent.OptInMethod	:= STD.Str.ToUpperCase(inMod.OptInMethod);

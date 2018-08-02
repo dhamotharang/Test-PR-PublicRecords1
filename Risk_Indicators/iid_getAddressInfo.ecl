@@ -1,11 +1,11 @@
-﻿import riskwise, did_add, ut, UtilFile, risk_indicators, NID;
+﻿import _Control, riskwise, did_add, ut, UtilFile, risk_indicators, NID;
+onThor := _Control.Environment.OnThor;
 
 export iid_getAddressInfo(grouped dataset(risk_indicators.Layout_Output ) flagrecs, unsigned1 glb, boolean isFCRA, 
 											boolean require2Ele, integer BSversion, boolean isUtility,
 											string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
 											unsigned3 LastSeenThreshold = iid_constants.oneyear,
-											unsigned8 BSOptions,
-											boolean onThor = false
+											unsigned8 BSOptions
 										) := function
 
 ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
@@ -18,7 +18,7 @@ ExactAddrZip5andPrimRange := ExactMatchLevel[iid_constants.posExactAddrZip5andPr
 
 orig_input := project(flagrecs, transform(Risk_Indicators.Layouts.layout_input_plus_overrides, self:=left));
 
-dirs_by_addr := riskwise.getDirsByAddr(dedup(ungroup(orig_input), prim_name, z5, prim_range, sec_range), isFCRA, glb, BSOptions, onThor);
+dirs_by_addr := riskwise.getDirsByAddr(dedup(ungroup(orig_input), prim_name, z5, prim_range, sec_range), isFCRA, glb, BSOptions);
 
 risk_indicators.layout_output phoneByAddress(risk_indicators.layout_output l, dirs_by_addr r) := transform
 	firstmatch_score := risk_indicators.FnameScore(l.fname, r.name_first);
@@ -170,9 +170,12 @@ phonerecsByaddr_history_thor := join(distribute(flagrecs, hash64(prim_name, z5, 
 						       RiskWise.max_atmost),
 					       keep(300), LOCAL);
 								 
-phonerecsByaddr_history := if(onThor, 
-																group(sort(distribute(phonerecsByaddr_history_thor, hash64(seq)), seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record, LOCAL),seq, LOCAL), 
-																sort(phonerecsByaddr_history_roxie, seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record));
+
+#IF(onThor)
+	phonerecsByaddr_history := group(sort(distribute(phonerecsByaddr_history_thor, hash64(seq)), seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record, LOCAL),seq, LOCAL);
+#ELSE
+	phonerecsByaddr_history := sort(phonerecsByaddr_history_roxie, seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record);
+#END
 
 phonerecsByaddr := phonerecsByaddr_history;	
 
@@ -445,7 +448,11 @@ utiliRecsByAddr_thor := if (isFCRA, PhoneRecsByAddr_rolled,
 					  (left.z5=right.zip) and keyed(left.prim_range=right.prim_range) and 
 					  (left.sec_range=right.sec_range), 100), LOCAL),seq),seq));
 						
-utiliRecsByAddr := if(onThor, utiliRecsByAddr_thor, utiliRecsByAddr_roxie);
+#IF(onThor)
+	utiliRecsByAddr := utiliRecsByAddr_thor;
+#ELSE
+	utiliRecsByAddr := utiliRecsByAddr_roxie;
+#END
 
 utiliRecsByAddr_rolled := if (isFCRA, utiliRecsByAddr,
 						rollup(utiliRecsByAddr,true,roll_addr_trans(left,right)));

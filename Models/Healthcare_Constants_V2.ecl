@@ -1,4 +1,4 @@
-EXPORT Healthcare_Constants_V2 := MODULE
+﻿EXPORT Healthcare_Constants_V2 := MODULE
 	export authorized_DPPA := 0;
 	export authorized_GLBA := 6;
 	export default_DataRestriction := '000000000000010000000000000000'; 
@@ -7,5 +7,4 @@ EXPORT Healthcare_Constants_V2 := MODULE
 	export default_BocaShell_Version := 41;
 	export default_ProfileBooster_Version := 1; //or v1/V1
 	export default_ProfileBooster_AttributesVersionRequest := 'PBATTRV1';
-	export default_onThor := false;
 END;

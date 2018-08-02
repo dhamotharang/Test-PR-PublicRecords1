@@ -78,6 +78,7 @@ inputs tra(inputs l) := transform
 										FLAccidents_eCrash.Key_eCrash2v,
 										LEFT.accident_nbr=RIGHT.l_acc_nbr,LEFT OUTER,KEEP(1),LIMIT(0)); 
 
+//Blanking out to be compliant with D2C; Key data should not go through 
 	accidents := if(~isCNSMR, accidents_ecrash);
 
 	accidentNbrs := DEDUP(SORT(accidents,accident_nbr,report_code),accident_nbr,report_code);

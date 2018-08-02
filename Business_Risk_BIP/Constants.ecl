@@ -67,6 +67,8 @@ EXPORT Constants := MODULE
 	EXPORT TwoYear											:= 731;
 	EXPORT FirstSBFELoadDate						:= '20151012';
 	
+  EXPORT MAX_OFAC_VERSION             := 4;
+  
 	// Various JOIN condition limits
 	EXPORT Limit_BusHeader							:= 25000; // Default for Business Header kFetch
 	EXPORT Limit_Assessments						:= 15000; // Maximum number of assessments allowed

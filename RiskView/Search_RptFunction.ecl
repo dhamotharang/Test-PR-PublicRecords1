@@ -106,6 +106,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			self.FilingDate := iesp.ECL2ESP.toDate((integer)l.orig_filing_date);
 			laDate := if( (integer)l.pdate_last_seen > (integer)l.release_date, (integer)l.pdate_last_seen, (integer)l.release_date);
 			self.LastActionDate := iesp.ECL2ESP.toDate(laDate);
+   self.DateLastSeen := iesp.ECL2ESP.toDate((integer)l.VendorDateLastSeen);
 			//self.ConsumerStatementId := l.ConsumerStatementId;
 			self := [];
 		END;
@@ -376,7 +377,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		// OUTPUT (aircrafts.pilot_registrations, NAMED ('pilot_registration'));
 		// OUTPUT (aircrafts.pilot_certificates, NAMED ('pilot_certificate'));
 //		 output(aircraftreport, named('aircrafts'));
-//		 output(liensdata, named('liensdata'));
+//		 output(liensdata, named('liensdata')); 
 //		 output(bankruptcies, named('bankruptcies'));
 //		 OUTPUT (criminalrecs,      NAMED ('offenders'));
 //		 output(amstudentrecs, named('americanstuden'));

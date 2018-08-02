@@ -174,8 +174,8 @@
 		UNSIGNED1	_LinkSearchLevel                 := IF( option.LinkSearchLevel = 0         , Business_Risk_BIP.Constants.LinkSearch.Default         , option.LinkSearchLevel );
 		UNSIGNED1	_MarketingMode                   := IF( option.MarketingMode = 0           , Business_Risk_BIP.Constants.Default_MarketingMode      , option.MarketingMode );
 		UNSIGNED1	_BusShellVersion                 := IF( option.BusShellVersion = 0         , Business_Risk_BIP.Constants.BusShellVersion_v22        , option.BusShellVersion );
-		STRING50	_AllowedSources                   := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
-		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , 2, option.OFACVersion );
+		STRING50	_AllowedSources                  := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
+		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION, option.OFACVersion );
 		REAL      _Global_Watchlist_Threshold      := IF( option.GlobalWatchlistThreshold = 0, Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold, option.GlobalWatchlistThreshold );
 		UNSIGNED6	_HistoryDate                     := IF( option.HistoryDate = 0             , 999999, option.HistoryDate );
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
@@ -248,7 +248,7 @@
 		#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 		#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
 		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
-		#STORED('OFAC_Version'       ,2);
+		#STORED('OFAC_Version'       ,BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION);
 		#STORED('Global_Watchlist_Threshold',Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold);
 
 		UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');

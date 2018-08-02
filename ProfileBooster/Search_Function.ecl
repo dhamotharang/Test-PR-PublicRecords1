@@ -1,11 +1,11 @@
-﻿import 	address, Address_Attributes, avm_v2, dma, doxie, Gateway, iesp, LN_PropertyV2_Services, mdr, ProfileBooster, 
+﻿import 	_Control, address, Address_Attributes, avm_v2, dma, doxie, Gateway, iesp, LN_PropertyV2_Services, mdr, ProfileBooster, 
 				Riskwise, Risk_Indicators, ut, Relationship, aid, std;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In, 
 																						string50 DataRestrictionMask,
 																						string50 DataPermissionMask,
 																						string8 AttributesVersion, 
-																						boolean onThor=false,
                                             boolean domodel=false) := FUNCTION
 
 	isFCRA 			:= false;
@@ -154,12 +154,13 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 
 	iid_prep_thor := project(my_dataset_with_address_cache, prep_for_thor(left));									 
 										 
-iid_prep := if(onThor, iid_prep_thor, iid_prep_roxie);
-
-did_prepped_output := if(onThor,
-	ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions)),
-	ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions))
-	);
+#IF(onThor)
+	iid_prep := iid_prep_thor;
+  did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+#ELSE
+	iid_prep :=iid_prep_roxie;
+  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+#END
 
 // ********************************************************************
 // Get the DID and Append the Input Account Number
@@ -206,9 +207,13 @@ donotmail_key := dma.key_DNM_Name_Address;
 		setDNMFlag(left,right), left outer, keep(1), local
 	);
 	
-	withDoNotMail := if(onThor, withDoNotMail_thor, withDoNotMail_roxie);
-	
-  withVerification := ProfileBooster.getVerification(withDoNotMail, onThor);
+	#IF(onThor)
+		withDoNotMail := withDoNotMail_thor;
+	#ELSE
+		withDoNotMail := withDoNotMail_roxie;
+	#END
+  
+  withVerification := ProfileBooster.getVerification(withDoNotMail);
 
 //Search Death Master by DID. Set 2 dates (1 with SSA permission and 1 not) and choose appropriately 
 	ProfileBooster.Layouts.Layout_PB_Shell getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_DID ri) := transform
@@ -230,8 +235,12 @@ donotmail_key := dma.key_DNM_Name_Address;
 									left.DID = right.l_did,
 									getDeceasedDID(left, right), left outer, keep(200), local);
 
-	withDeceasedDID := if(onThor, withDeceasedDID_thor, withDeceasedDID_roxie);
-	
+	#IF(onThor)
+		withDeceasedDID := withDeceasedDID_thor;
+	#ELSE
+		withDeceasedDID := withDeceasedDID_roxie;
+	#END
+  
 	sortedDeceased := sort(withDeceasedDID, seq);
 
 //rollup by Deceased matches and keep whichever record has a DOD
@@ -265,8 +274,11 @@ donotmail_key := dma.key_DNM_Name_Address;
 	// ;	
 	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
-	withInfutor := if(onThor, withInfutor_thor, withInfutor_roxie);
-	
+	#IF(onThor)
+		withInfutor := withInfutor_thor;
+	#ELSE
+		withInfutor := withInfutor_roxie;
+	#END
 
 //get business count for the input address
 ProfileBooster.Layouts.Layout_PB_Shell getInputBus(withInfutor le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
@@ -302,7 +314,11 @@ withInputBus_thor_hits := join(distribute(with_infutor_inputaddrpopulated, hash6
 		atmost(10000), local);
 withInputBus_thor := withInputBus_thor_hits + with_infutor_inputaddr_notpopulated;	// add back the records that didn't have input address populated
 	
-withInputBus := if(onthor, withInputBus_thor, withInputBus_roxie);
+#IF(onThor)
+	withInputBus := withInputBus_thor;
+#ELSE
+	withInputBus := withInputBus_roxie;
+#END
 
 //get business count for prospect's current address
 ProfileBooster.Layouts.Layout_PB_Shell  getCurrBus(withInputBus le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
@@ -341,8 +357,12 @@ withCurrBus_thor_hits := join(
 		atmost(RiskWise.max_atmost), local);
 withCurrBus_thor := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;// add back the records that didn't have current address populated
 
-withCurrBus := if(onThor, withCurrBus_thor, withCurrBus_roxie);		
-		
+#IF(onThor)
+	withCurrBus := withCurrBus_thor;
+#ELSE
+	withCurrBus := withCurrBus_roxie;
+#END
+
 //get household members (DIDs) by doing inner join of the HHID to the HHID_Did key
 ProfileBooster.Layouts.Layout_PB_Shell add_household_members(ProfileBooster.Layouts.Layout_PB_Shell le, doxie.Key_HHID_Did rt) := transform
 		self.DID2			:= rt.DID;
@@ -365,8 +385,13 @@ end;
 												add_household_members(left, right),
 												keep(300), local);		
 	hhDIDs_thor := hhDIDs_thor_hits + withCurrBus(hhid=0);	// add back the records with no hhid										
-	hhDIDs := if(onThor, hhDIDs_thor, hhDIDs_roxie);
 
+	#IF(onThor)
+		hhDIDs := hhDIDs_thor;
+	#ELSE
+		hhDIDs := hhDIDs_roxie;
+	#END
+  
 //get relatives (DIDs) by doing inner join 
 	withCurrBus_dedp := dedup(sort(withCurrBus,did), did);
 	RelativeMax := 300;
@@ -390,8 +415,11 @@ end;
 																	self := left), 
 														local);
 														
-	relativeDIDs := if(onThor, relativeDIDs_thor, relativeDIDs_roxie);
-
+	#IF(onThor)
+		relativeDIDs := relativeDIDs_thor;
+	#ELSE
+		relativeDIDs := relativeDIDs_roxie;
+	#END
 
 //merge Prospect rec, Household recs, Relatives recs into one file
 	allDIDs := withCurrBus + hhDIDs + relativeDIDs;
@@ -401,8 +429,13 @@ end;
 	
 	distributed_allDIDs := distribute(allDIDs, hash(seq, did2));
 	unique_DIDs_thor := dedup(sort(distributed_allDIDs, seq, DID2, rec_type, local), seq, DID2, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
-	uniqueDIDs := if(onThor, unique_DIDs_thor, unique_DIDs_roxie);
-	
+
+	#IF(onThor)
+		uniqueDIDs := unique_DIDs_thor;
+	#ELSE
+		uniqueDIDs := unique_DIDs_roxie;
+	#END
+  
 //slim down the uniqueDIDs records to create a smaller layout to pass into all of the following searches
 	slimShell := project(uniqueDIDs,  
 												transform(ProfileBooster.Layouts.Layout_PB_Slim,
@@ -410,7 +443,7 @@ end;
 
 //--------- Get age of household members and relatives -------------//
 
-	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2), onThor); //we already have age of prospect so exclude them here
+	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2)); //we already have age of prospect so exclude them here
 		
 	dedupHH 	 	:= dedup(sort(ageRecs(rec_type=ProfileBooster.Constants.recType.Relative), seq, HHID), seq, HHID); 
 
@@ -440,7 +473,7 @@ end;
 	dk := choosen(doxie.key_max_dt_last_seen, 1);
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6]+'01';
 
-	studentRecs := ProfileBooster.getStudent(slimShell, onThor);
+	studentRecs := ProfileBooster.getStudent(slimShell);
 	
 	withStudent := join(withAge, studentRecs,
 												left.seq = right.seq and
@@ -478,7 +511,7 @@ end;
 																	
 //--------- Watercraft-------------//
 
-	watercraftRecs := ProfileBooster.getWatercraft(slimShell, onThor);
+	watercraftRecs := ProfileBooster.getWatercraft(slimShell);
 	
 	withWatercraft := join(withStudent, watercraftRecs,
 												left.seq = right.seq and
@@ -501,7 +534,7 @@ end;
 																	
 //--------- Aircraft -------------//
 
-	aircraftRecs := ProfileBooster.getAircraft(slimShell, onThor);
+	aircraftRecs := ProfileBooster.getAircraft(slimShell);
 	
 	withAircraft := join(withWatercraft, aircraftRecs,
 												left.seq = right.seq and
@@ -525,7 +558,7 @@ end;
 
 //--------- Vehicles -------------//
 
-	vehicleRecs := ProfileBooster.getVehicles(slimShell, onThor);
+	vehicleRecs := ProfileBooster.getVehicles(slimShell);
 	
 	withVehicles := join(withAircraft, vehicleRecs,
 												left.seq = right.seq and
@@ -568,7 +601,7 @@ end;
 																	self.historydate 	:= left.historydate;
 																	self 							:= [])), seq);
 	
-	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs, onThor);
+	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs);
 
 	withDerogs := join(withVehicles, derogRecs,
 												left.seq = right.seq and
@@ -668,7 +701,7 @@ end;
 
 //--------- Professional License -------------//
 
-	profLicRecs := ProfileBooster.getProfLic(slimShell, onThor);
+	profLicRecs := ProfileBooster.getProfLic(slimShell);
 	
 	withProfLic := join(withDerogs, profLicRecs,
 												left.seq = right.seq and
@@ -682,7 +715,7 @@ end;
 
 //--------- People at Work -------------//
 
-	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell, onThor);
+	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell);
 	
 	withBusnAssoc := join(withProfLic, busnAssocRecs,
 												left.seq = right.seq and
@@ -697,7 +730,7 @@ end;
 
 //--------- Outdoor sports -------------//
 
-	sportsRecs := ProfileBooster.getSports(slimShell, onThor);
+	sportsRecs := ProfileBooster.getSports(slimShell);
 	
 	withSports_temp := join(withBusnAssoc, sportsRecs,
 												left.seq = right.seq and
@@ -708,8 +741,12 @@ end;
 																	self.RaAInterestSportPersonMmbrCnt	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.sportsInterest = 1, 1, 0); 
 																	self := left), left outer, parallel);
 	with_Sports_thor := withSports_temp : PERSIST('~PROFILEBOOSTER::with_Sports_thor') ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
-	withSports := if(onThor, with_Sports_thor, withSports_temp);																	
 
+	#IF(onThor)
+		withSports := with_Sports_thor;
+	#ELSE
+		withSports := withSports_temp;
+	#END
 
 //--------- Property -------------//
 
@@ -832,7 +869,7 @@ end;
 	from_PB     := true; 
 	ViewDebugs := false;
 	
-	prop_common := Risk_Indicators.Boca_Shell_Property_Common(p_address, ids_only(did<>0), includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, ViewDebugs, from_PB, onThor);
+	prop_common := Risk_Indicators.Boca_Shell_Property_Common(p_address, ids_only(did<>0), includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, ViewDebugs, from_PB);
 	
 
 ProfileBooster.Layouts.Layout_PB_Shell append_property(ProfileBooster.Layouts.Layout_PB_Shell le, prop_common rt) := transform
@@ -934,8 +971,12 @@ prop_common_distr := distribute(prop_common, did);
 												;
 	// : PERSIST('~PROFILEBOOSTER::withProperty_thor');// remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
-	withProperty := if(onThor, withProperty_thor, withProperty_roxie);
-	
+	#IF(onThor)
+		withProperty := withProperty_thor;
+	#ELSE
+		withProperty := withProperty_roxie;
+	#END
+  
 	withProperty_distributed := distribute(withProperty, seq);
 	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local); //within DID, sort most recent sold property to top
 
@@ -1016,7 +1057,7 @@ prop_common_distr := distribute(prop_common, did);
 																	
 																	self 							:= [])), seq);				
 
-	AVMrecs := Risk_Indicators.Boca_Shell_AVM(preAVM, onThor);
+	AVMrecs := Risk_Indicators.Boca_Shell_AVM(preAVM);
 
 	withAVM := join(rolledProperty, AVMrecs,
 												left.seq = right.seq and
@@ -1161,8 +1202,11 @@ prop_common_distr := distribute(prop_common, did);
 									atmost(RiskWise.max_atmost), keep(100), 
 			local);
 
-	avm1Owned := if(onThor, group(avm1Owned_thor, seq), avm1Owned_roxie);
-	
+	#IF(onThor)
+		avm1Owned := group(avm1Owned_thor, seq);
+	#ELSE
+		avm1Owned := avm1Owned_roxie;
+	#END
 									
 	// when choosing which AVM to output if the addr returns more than 1 result, 
 	// always pick the record with the most recent recording date and secondarily the most recent assessed value year

@@ -1,6 +1,7 @@
-import InfutorCID, ut, riskwise, FCRA;
+﻿import _Control, InfutorCID, ut, riskwise, FCRA;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Infutor_Phone(GROUPED DATASET(layout_bocashell_neutral) bs, boolean isFCRA, INTEGER BSVersion, boolean onThor=false) := FUNCTION
+export Boca_Shell_Infutor_Phone(GROUPED DATASET(layout_bocashell_neutral) bs, boolean isFCRA, INTEGER BSVersion) := FUNCTION
 
 layout_bocashell_neutral getInfutor(bs le, InfutorCID.Key_Infutor_Phone ri) := transform	
 	firstscore := FnameScore(le.shell_input.fname, ri.fname);
@@ -38,7 +39,11 @@ infutor_correct_thor := join(bs(infutor_correct_ffid <> []), FCRA.Key_Override_I
 												right.flag_file_id in left.infutor_correct_ffid,
 												getInfutor(left, row(right,recordof(InfutorCID.Key_Infutor_Phone))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
 
-infutor_correct := if(onThor, infutor_correct_thor, infutor_correct_roxie);
+#IF(onThor)
+	infutor_correct := infutor_correct_thor;
+#ELSE
+	infutor_correct := infutor_correct_roxie;
+#END
 
 Infutor_key := if(isFCRA, InfutorCID.Key_Infutor_Phone_FCRA, InfutorCID.Key_Infutor_Phone);
 
@@ -58,14 +63,22 @@ wInfutor_thor_phone := join(distribute(	bs(trim(shell_input.phone10) <> ''), has
 
 wInfutor_thor := wInfutor_thor_phone + bs(trim(shell_input.phone10)='');
 
-wInfutor := if(onThor, wInfutor_thor, wInfutor_roxie);
+#IF(onThor)
+	wInfutor := wInfutor_thor;
+#ELSE
+	wInfutor := wInfutor_roxie;
+#END
 
 combined := if(isFCRA, ungroup(infutor_correct + wInfutor), ungroup(wInfutor));
 combo_roxie := group( sort ( combined, seq), seq);										
 combo_thor := group(sort(distribute(combined, hash64(seq)), seq, local), seq, local);
 
-combo := if(onThor, combo_thor, combo_roxie);							
-							
+#IF(onThor)
+	combo := combo_thor;
+#ELSE
+	combo := combo_roxie;
+#END
+
 layout_bocashell_neutral rollInfutor(layout_bocashell_neutral le, layout_bocashell_neutral ri) := transform
 	self.infutor_phone.infutor_date_first_seen := MIN(le.infutor_phone.infutor_date_first_seen, ri.infutor_phone.infutor_date_first_seen);
 	self.infutor_phone.infutor_date_last_seen := MAX(le.infutor_phone.infutor_date_last_seen, ri.infutor_phone.infutor_date_last_seen);

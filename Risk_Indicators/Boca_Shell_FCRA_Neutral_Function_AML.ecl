@@ -1,4 +1,5 @@
-﻿import doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models;
+﻿import _Control, doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_Function_AML(grouped DATASET(Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,

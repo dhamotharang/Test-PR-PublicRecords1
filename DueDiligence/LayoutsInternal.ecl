@@ -3,7 +3,7 @@
 EXPORT LayoutsInternal := MODULE
 
  EXPORT InternalSeqAndIdentifiersLayout := RECORD
-		UNSIGNED4 seq;
+		UNSIGNED6 seq;
 		UNSIGNED6 ultID;
 		UNSIGNED6 orgID;
 		UNSIGNED6 seleID;
@@ -241,7 +241,7 @@ END;
 	END;
 	
 	
-	
+//------                                     ------
 	EXPORT CriminalOffenses := RECORD
 		InternalSeqAndIdentifiersLayout;
 		DueDiligence.Layouts.CriminalOffenses offense;
@@ -272,8 +272,8 @@ END;
     DATASET(DueDiligence.Layouts.FEINLayoutSources) Sources;    
 	END;
   
-
   
+
   EXPORT IndCrimLayoutFinal := RECORD
     InternalSeqAndIdentifiersLayout;
     STRING sort_key;
@@ -281,7 +281,7 @@ END;
     UNSIGNED1 temp_chargeLevelCalcWeight;
     DueDiligence.Layouts.CriminalOffenses
   END;
-  
+
   EXPORT IndCrimLayoutFlat := RECORD
     InternalSeqAndIdentifiersLayout;
     UNSIGNED4 historyDate;
@@ -295,6 +295,8 @@ END;
     UNSIGNED4 temp_calcdFirstSeenDate;
     STRING8 temp_firstReportedActivity; 
     BOOLEAN temp_previouslyIncarcerated;
+    STRING1 temp_offenseScore;
+    STRING5 temp_courtOffLevel;
     
     //event type category hits
     BOOLEAN attr_legalEventCat9;
@@ -313,6 +315,7 @@ END;
     STRING offenseStatute;
     STRING8 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED4 offenseDDLastCourtDispDate;
     UNSIGNED offenseDDLegalEventTypeCode;
     STRING offenseDDLegalEventTypeMapped;
     STRING offenseCharge; //also used in source info

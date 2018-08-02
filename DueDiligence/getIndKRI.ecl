@@ -181,13 +181,13 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
     
     /* PERSON STATE CRIMINAL */
     //is populated in DueDiligence.getIndKRILegalStateCriminal, which is ultimately called in DueDiligence.getIndCriminal
-		SELF.PerLegalStateCriminal := le.individual.stateCriminalLegalEventsScore;
-    SELF.PerLegalStateCriminal_Flag := le.individual.stateCriminalLegalEventsFlags;
+		SELF.PerStateLegalEvent := le.individual.stateCriminalLegalEventsScore;
+    SELF.PerStateLegalEvent_Flag := le.individual.stateCriminalLegalEventsFlags;
     
     /* LEGAL EVENT TYPES  */
     //is populated in DueDiligence.getIndKRILegalEventType,  
-		SELF.PerLegalTypes := le.individual.legalEventTypeScore;
-    SELF.PerLegalTypes_Flag := le.individual.legalEventTypeFlags;
+		SELF.PerOffenseType := le.individual.legalEventTypeScore;
+    SELF.PerOffenseType_Flag := le.individual.legalEventTypeFlags;
 	
 		
 		SELF := le;
@@ -213,16 +213,16 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							SELF.PerGeographic_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerMobility_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							SELF.PerLegalStateCriminal := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerLegalStateCriminal_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerLegalFedCriminal := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerLegalFedCriminal_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerLegalCivil := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerLegalCivil_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerStateLegalEvent := INVALID_INDIVIDUAL_SCORE;
+                                              SELF.PerStateLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              // SELF.PerFederalLegalEvent := INVALID_INDIVIDUAL_SCORE;
+                                              // SELF.PerFederalLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							// SELF.PerCivilLegalEvent := INVALID_INDIVIDUAL_SCORE;
+																							// SELF.PerCivilLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerLegalTraffInfr := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerLegalTraffInfr_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							SELF.PerLegalTypes := INVALID_INDIVIDUAL_SCORE;
-																							SELF.PerLegalTypes_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerOffenseType := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerOffenseType_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerHighRiskNewsProfiles := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerHighRiskNewsProfiles_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;

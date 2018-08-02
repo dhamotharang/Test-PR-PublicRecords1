@@ -21,6 +21,7 @@
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
 	<part name="IncludeAuthRepInBIPAppend" type="xsd:boolean"/>
 	<part name="Include_ALL_Watchlist" type="xsd:boolean"/>
+	<part name="Include_ALLV4_Watchlist" type="xsd:boolean"/>
 	<part name="Include_BES_Watchlist" type="xsd:boolean"/>
 	<part name="Include_CFTC_Watchlist" type="xsd:boolean"/>
 	<part name="Include_DTC_Watchlist" type="xsd:boolean"/>
@@ -54,7 +55,7 @@
 /*--INFO-- Business Shell Batch Service - This is the Batch Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, iesp, UT, Cortera, Risk_Indicators, patriot;
+IMPORT Business_Risk_BIP, Gateway, iesp, UT, Cortera, Risk_Indicators, patriot, OFAC_XG5;
 
 EXPORT Business_Shell_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -81,6 +82,7 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	'OverrideExperianRestriction',
 	'IncludeAuthRepInBIPAppend',
 	'Include_ALL_Watchlist',
+	'Include_ALLV4_Watchlist',
 	'Include_BES_Watchlist',
 	'Include_CFTC_Watchlist',
 	'Include_DTC_Watchlist',
@@ -143,6 +145,7 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 
   boolean Include_ALL_Watchlist:= false : stored('Include_ALL_Watchlist');
+  boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
   boolean Include_BES_Watchlist:= false : stored('Include_BES_Watchlist');
   boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
   boolean Include_DTC_Watchlist:= false : stored('Include_DTC_Watchlist');
@@ -175,6 +178,7 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 
   dWL := dataset([], iesp.share.t_StringArrayItem) +
   if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+  if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
   if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
   if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
   if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -207,6 +211,9 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
   Watchlists_Requested := dWL(value<>'');
   
   if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+  
+  IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 	
 	/* ************************************************************************
 	 *                   Get the Business Shell Results                       *

@@ -1,6 +1,7 @@
-﻿IMPORT Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
+﻿IMPORT _Control, Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onThor) := FUNCTION
+EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 //search header by DID to pick up DOB and calculate age and also append HHID to each rec	
 	ProfileBooster.Layouts.Layout_PB_Slim_header getHeader(PBslim le, Doxie.Key_Header ri) := transform
@@ -26,7 +27,11 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 										right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(ut.limits.HEADER_PER_DID),  local);
 
-	withHeader := if(onThor, withHeader_thor, withHeader_roxie);
+  #IF(onThor)
+    withHeader := withHeader_thor;
+  #ELSE
+    withHeader := withHeader_roxie;
+  #END
 
 	ProfileBooster.Layouts.Layout_PB_Slim_header getQHeader(PBslim le, header_quick.key_DID ri) := transform
 		// age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob));
@@ -53,8 +58,13 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 										right.dt_first_seen < left.historydate,
 										getQHeader(left, right), keep(200), local);
 
-	withQHeader := if(onThor, withQHeader_thor, withQHeader_roxie);
-	
+	#IF(onThor)
+    withQHeader := withQHeader_thor;
+  #ELSE
+    withQHeader := withQHeader_roxie;
+  #END
+
+
 //sort header records by seq and DID2
 	sortHeader := sort(withHeader + withQHeader, seq, DID2, -dt_last_seen, -dt_first_seen);  //sort most recent first to get the most recent geoLink in the rollup below
 
@@ -82,9 +92,12 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 								transform(ProfileBooster.Layouts.Layout_PB_Slim_header, 
 									self.med_hhinc	:= (integer)right.med_hhinc,
 									self 						:= left), ATMOST(Riskwise.max_atmost), KEEP(1), local);
-	withCensus := ungroup(if(onThor, withCensus_thor, withCensus_roxie));
 	
-
+  #IF(onThor)
+    withCensus := ungroup(withCensus_thor);
+  #ELSE
+    withCensus := ungroup(withCensus_roxie);
+  #END
 	
 // output(withHeader, named('withHeader'));
 // output(withQHeader, named('withQHeader'));

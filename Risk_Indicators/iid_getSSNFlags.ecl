@@ -1,5 +1,6 @@
-﻿import risk_indicators, suppress, ut, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship;
+﻿import _Control, risk_indicators, suppress, ut, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship;
 import STD;
+onThor := _Control.Environment.OnThor;
 
 export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean runSSNCodes=false,
@@ -7,8 +8,7 @@ export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, uns
 							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							UNSIGNED1 BSversion = 3, 
 							unsigned8 BSOptions=0,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-							boolean onThor=false) := function
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
 
 glb_ok := iid_constants.glb_ok(glb, isFCRA);
 
@@ -74,8 +74,12 @@ layout_output_DE_src trans_name (layout_output_DE_src le, key_ssntable ri, INTEG
 						
 	self.PWsocsvalflag := PWsocsvalflag_temp;
 	
-	socsRCISflag_temp := IF(onThor, le.socsRCISflag,
-                        IF(Risk_Indicators.searchLegacySSN(le.ssn, le.did, isFCRA), '1', '0'));
+	#IF(onThor)
+		socsRCISflag_temp := le.socsRCISflag;
+	#ELSE
+		socsRCISflag_temp := IF(Risk_Indicators.searchLegacySSN(le.ssn, le.did, isFCRA), '1', '0');
+	#END
+  
 	SELF.socsRCISflag := socsRCISflag_temp;
 	
 	SELF.soclstate := IF(i = 1 or ssnCorrectionHit,ri.issue_state,le.soclstate);
@@ -372,8 +376,11 @@ got_SSNTableDL_fcra_thor := group(sort(distribute(got_SSNTableDL_fcra_thor_pre +
 																				self.dlsocsdobflag := '2',
 																				self := left)), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-got_SSNTableDL_fcra := if(onThor, got_SSNTableDL_fcra_thor, got_SSNTableDL_fcra_roxie);
-	
+#IF(onThor)
+	got_SSNTableDL_fcra := got_SSNTableDL_fcra_thor;
+#ELSE
+	got_SSNTableDL_fcra := got_SSNTableDL_fcra_roxie;
+#END
 	
 deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
 
@@ -424,8 +431,6 @@ got_death_fcra_thor_pre := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
 
 got_death_fcra_thor := got_death_fcra_thor_pre + got_SSNTableDL_fcra(ssn='');
-
-//got_death_fcra := if(onThor, got_death_fcra_thor, got_death_fcra_roxie);
 									 
 got_SSNTable_corr_roxie := join(got_death_fcra_roxie, FCRA.Key_Override_SSN_Table_FFID,
 																			keyed(right.flag_file_id in left.ssn_correct_ffid),
@@ -437,8 +442,12 @@ got_SSNTable_corr_thor_pre := join(got_death_fcra_thor(count(ssn_correct_ffid)>0
 
 got_SSNTable_corr_thor := group(sort(distribute(got_SSNTable_corr_thor_pre + got_death_fcra_thor(count(ssn_correct_ffid)=0), hash64(seq)), seq, LOCAL), seq, LOCAL);
 																			
-got_SSNTable_corr := if(onThor,got_SSNTable_corr_thor, got_SSNTable_corr_roxie);
-																			
+#IF(onThor)
+	got_SSNTable_corr := got_SSNTable_corr_thor;
+#ELSE
+	got_SSNTable_corr := got_SSNTable_corr_roxie;
+#END
+
 got_SSNTable_corr_dedup := dedup(sort(got_SSNTable_corr, seq, ssn, deathSource, -deceasedfirst, -deceasedDate, -deceasedDOB), seq, ssn);
 
 risk_indicators.layout_output tfSSNTable_corr_proj(got_SSNTable_corr_dedup le) := transform
@@ -494,8 +503,12 @@ got_death_nonfcra_thor := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(s
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
 									 
-got_death_nonfcra := if(onThor, group(sort(got_death_nonfcra_thor, seq),seq), got_death_nonfcra_roxie);									 
-									 
+#IF(onThor)
+	got_death_nonfcra := group(sort(got_death_nonfcra_thor, seq),seq);
+#ELSE
+	got_death_nonfcra := got_death_nonfcra_roxie;
+#END
+
 got_death_nonfcra_dedup := dedup(sort(got_death_nonfcra, seq, ssn, deathSource, -deceasedfirst, -deceasedDate, -deceasedDOB), seq, ssn);
 
 risk_indicators.layout_output tfdeath_nonfcra_proj(got_death_nonfcra_dedup le) := transform
@@ -551,8 +564,12 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 						left outer,
 						atmost(riskwise.max_atmost), keep(100), LOCAL);
 						
-		multiple_use_ssns_with_wildcard_did := if(onThor, group(sort(multiple_use_ssns_with_wildcard_did_thor, seq), seq), multiple_use_ssns_with_wildcard_did_roxie);
-		
+    #IF(onThor)
+      multiple_use_ssns_with_wildcard_did := group(sort(multiple_use_ssns_with_wildcard_did_thor, seq), seq);
+    #ELSE
+      multiple_use_ssns_with_wildcard_did := multiple_use_ssns_with_wildcard_did_roxie;
+    #END
+  
 		iids_dedp := dedup(sort(ungroup(multiple_use_ssns_with_wildcard_did)(did<>0),did), did);
 		justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
@@ -653,8 +670,12 @@ got_SSNMap_thor_pre := join(distribute(ssn_table_results(ssn<>'' or ssn_correct_
 got_SSNMap_thor := got_SSNMap_thor_pre + 
 										project(ssn_table_results(ssn= '' and ssn_correct_ffid=[]), transform(recordof(left), self.socllowissue := '', self.soclhighissue := '', self := left));
 						
-got_SSNMap := if(onThor, got_SSNMap_thor, got_SSNMap_roxie);
-						
+#IF(onThor)
+	got_SSNMap := got_SSNMap_thor;
+#ELSE
+	got_SSNMap := got_SSNMap_roxie;
+#END
+
 got_SSNMapDL_roxie := join(got_SSNMap, SSNMapKey,
 																(left.dl_number!='') and
 																keyed(left.dl_number[1..5]=right.ssn5) AND
@@ -675,14 +696,18 @@ got_SSNMapDL_thor_pre := join(distribute(got_SSNMap(dl_number<>''), hash64(dl_nu
 																
 got_SSNMapDL_thor := got_SSNMapDL_thor_pre + got_SSNMap(dl_number='');
 
-got_SSNMapDL := if(onThor, got_SSNMapDL_thor,  got_SSNMapDL_roxie);
+#IF(onThor)
+	got_SSNMapDL := got_SSNMapDL_thor;
+#ELSE
+	got_SSNMapDL := got_SSNMapDL_roxie;
+#END
 
 // pluck the deceased value from ssn_table already done and send that through to ssnCodes function			
 codes_in := ungroup( project(ssn_table_results, transform(RiskWise.layouts.layout_ssn_in,
 									self.deceased := left.decsflag='1',  
 									self := left)) );
 									
-socl := risk_indicators.getSSNCodes(codes_in, isFCRA, onThor);
+socl := risk_indicators.getSSNCodes(codes_in, isFCRA);
 			
 risk_indicators.layout_output add_ssncodes(got_SSNMapDL le, socl rt) := transform
 	self.inputsocscharflag := map(le.ssn='' => '6', // ssn empty
@@ -700,12 +725,21 @@ with_socs_codes_thor := join(distribute(got_SSNMapDL, hash64(seq)),
 														 left.seq=right.seq, 
 														 add_ssncodes(left,right), left outer, LOCAL);						
 
-with_socs_codes := if(onThor, with_socs_codes_thor, with_socs_codes_roxie);
+#IF(onThor)
+	with_socs_codes := with_socs_codes_thor;
+#ELSE
+	with_socs_codes := with_socs_codes_roxie;
+#END
 
 ssn_flags_roxie := group(sort(if(runSSNCodes, with_socs_codes, got_SSNMapDL), seq),seq);  // to optimize query latency, only turn on runSSNCodes when needed	
 ssn_flags_thor := group(sort(if(runSSNCodes, with_socs_codes, got_SSNMapDL), seq, LOCAL), seq, LOCAL); 
 
-ssn_flags := if(onThor, ssn_flags_thor, ssn_flags_roxie);
+#IF(onThor)
+	ssn_flags := ssn_flags_thor;
+#ELSE
+	ssn_flags := ssn_flags_roxie;
+#END
+
 risk_indicators.layout_output checkDC(risk_indicators.layout_output L) := transform
 	dcNeeded := Suppress.dateCorrect.do(L.ssn).needed;
 	self.socsvalflag		:= if(dcNeeded, '0', L.socsvalflag);

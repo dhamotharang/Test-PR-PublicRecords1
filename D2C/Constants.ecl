@@ -1,7 +1,11 @@
 ﻿IMPORT MDR;
 EXPORT Constants := MODULE
 
+ EXPORT Is_CNSMR := 'CNSMR'; //Industry class for D2C 
 	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
+	EXPORT src_Property_Fares := 'F'; //Property Assessments & Deeds(Fares)
+	EXPORT src_Property_Fares_supplemental := 'S'; //Property Assessments & Deeds supplemental(Fares)
+
 		
 	EXPORT CCWRestrictedSources := [
 		MDR.sourceTools.src_EMerge_CCW_NY
@@ -125,6 +129,9 @@ EXPORT PhonesPlusV2RestrictedSources := [
 		mdr.sourceTools.src_MO_Experian_Veh, mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_MO_Watercraft,
 		mdr.sourceTools.src_Wired_Assets_Royalty, mdr.sourceTools.src_Wired_Assets_Owned, mdr.sourceTools.src_ZUtil_Work_Phone,
 		mdr.sourceTools.src_ZUtilities, mdr.sourceTools.src_InquiryAcclogs, mdr.sourceTools.src_TU_CreditHeader];
+//------------------------------------------------------------------------------------------------------//
+
+EXPORT LNPropertyV2RestrictedSources := [src_Property_Fares, src_Property_Fares_supplemental];
 //------------------------------------------------------------------------------------------------------//
 /*	PersonHeaderKeys 
 		Keys :  

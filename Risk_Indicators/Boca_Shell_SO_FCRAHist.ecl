@@ -1,7 +1,8 @@
-﻿import ut, fcra, riskwise, SexOffender, SexOffender_Services, Risk_Indicators;
+﻿import _Control, ut, fcra, riskwise, SexOffender, SexOffender_Services, Risk_Indicators;
+onThor := _Control.Environment.OnThor;
  
 export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
-	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiensCrim, boolean onThor = false) := FUNCTION
+	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiensCrim) := FUNCTION
 
 	insurance_fcra_filter := (BSOptions & iid_constants.BSOptions.InsuranceFCRAMode) > 0;
 	//Adding Sex Offenders
@@ -16,8 +17,12 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 		distribute(pull(fcra_sex_offender_did_key), hash64(did)), 
 		(left.did = right.did), atmost(SexOffender_Services.Constants.MAX_RECS_PERDID), LOCAL);
 		
-	spk_ids := if(onThor, group(sort(distribute(spk_ids_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), spk_ids_roxie);
-	
+	#IF(onThor)
+		spk_ids := group(sort(distribute(spk_ids_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		spk_ids := spk_ids_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_extended add_doc_FCRA_SO(spk_ids le, fcra_sex_offender_spk_key ri) := TRANSFORM
 		// only need 1 of the offense records for that offender key to be "dismissed" to throw this record out
 		// dismissed := false; //there are no ct_disp_desc fields for SO (was blank for SO records in prior combined FCRA key)
@@ -44,8 +49,12 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 										KEEP(10), ATMOST(LEFT.seisint_primary_key=RIGHT.sspk, 
 										riskwise.max_atmost), LOCAL);
 
-	doc_added_soff := if(onThor, group(sort(distribute(doc_added_soff_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), doc_added_soff_roxie);
-	
+	#IF(onThor)
+		doc_added_soff := group(sort(distribute(doc_added_soff_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		doc_added_soff := doc_added_soff_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_extended roll_doc(Risk_Indicators.Layouts_Derog_Info.layout_extended le, Risk_Indicators.Layouts_Derog_Info.layout_extended ri) :=
 	TRANSFORM
 		sameCrim := le.crim_case_num=ri.crim_case_num;

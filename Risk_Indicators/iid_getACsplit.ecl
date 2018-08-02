@@ -1,6 +1,7 @@
-import riskwise, risk_indicators;
+﻿import _Control, riskwise, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-export iid_getACsplit(grouped dataset(risk_indicators.layout_output) somedata, boolean isFCRA, boolean onThor=false) := function
+export iid_getACsplit(grouped dataset(risk_indicators.layout_output) somedata, boolean isFCRA) := function
 
 AC_Key := if(isFCRA, risk_indicators.Key_FCRA_AreaCode_Change_plus, risk_indicators.Key_AreaCode_Change_plus);
 
@@ -39,7 +40,12 @@ ac_split_thor_nophone := PROJECT(somedata(LENGTH(TRIM(phone10))<>10), TRANSFORM(
 																
 ac_split_thor := ac_split_thor_phone + ac_split_thor_nophone;
 
-ac_split := if(onThor, ac_split_thor, ac_split_roxie);								
+#IF(onThor)
+	ac_split := ac_split_thor;
+#ELSE
+	ac_split := ac_split_roxie;
+#END
+		
 return group(sort(ac_split,seq),seq);
 
 end;

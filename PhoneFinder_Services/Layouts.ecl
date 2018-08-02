@@ -29,7 +29,6 @@ MODULE
 
 		UNSIGNED6 did;
 	END;
-	
 	EXPORT BatchInAppendAcctno :=
 	RECORD(BatchIn)
 		STRING20 orig_acctno; // [internal]
@@ -632,6 +631,8 @@ MODULE
 			BOOLEAN OTPRIFailed;
 			%Alerts%
 			STRING15 CallForwardingIndicator;
+			string100 PhoneVerificationDescription;
+			boolean PhoneVerified;
 			STRING   CallerID;
 			STRING   CompanyNumber;
 			STRING   Name;

@@ -1,6 +1,7 @@
-﻿import watercraft, riskwise, ut, fcra;
+﻿import _Control, watercraft, riskwise, ut, fcra;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Watercraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion, boolean onThor = false) := FUNCTION
+export Boca_Shell_Watercraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion) := FUNCTION
 
 restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 string8 watercraft_build_date := Risk_Indicators.get_Build_date('watercraft_build_version');
@@ -41,7 +42,11 @@ watercraft_recs_thor_did := join(distribute(ids_only(did!=0), hash64(did)),
 watercraft_recs_thor := GROUP(SORT(distribute(watercraft_recs_thor_did + project(ids_only(did=0), transform(riskwise.layouts.Layout_Watercraft_Plus,
 												self.watercraft_build_date := watercraft_build_date, self := LEFT, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-watercraft_recs := if(onThor, watercraft_recs_thor, watercraft_recs_roxie);
+#IF(onThor)
+	watercraft_recs := watercraft_recs_thor;
+#ELSE
+	watercraft_recs := watercraft_recs_roxie;
+#END
 
 riskwise.layouts.Layout_Watercraft_Plus roll_watercraft(riskwise.layouts.Layout_Watercraft_Plus le, riskwise.layouts.Layout_Watercraft_Plus ri) := transform
 	self.watercraft_count := le.watercraft_count+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count);  // don't increment if the key is a duplicate

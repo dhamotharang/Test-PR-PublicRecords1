@@ -1,7 +1,8 @@
-﻿import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
- 
+﻿import _Control, doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+onThor := _Control.Environment.OnThor;
+
 export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
-		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_bankruptcy, boolean onThor=false) := function
+		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_bankruptcy) := function
  
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
@@ -22,8 +23,12 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											LEFT.did=RIGHT.did,
 											add_liens(LEFT,RIGHT), LEFT OUTER, atmost(riskwise.max_atmost), keep(100), LOCAL);
 											
-	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);	
-
+	#IF(onThor)
+		liens_added := group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+	#ELSE
+		liens_added := liens_added_roxie;
+	#END
+  
 	MAC_liensParty_transform(trans_name, key_liens_party) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, key_liens_party ri) := TRANSFORM
@@ -123,8 +128,12 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 
 	liens_party_raw_thor := group(sort(distribute(liens_party_raw_thor_rmsid + liens_added(rmsid=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
-
+	#IF(onThor)
+		liens_party_raw := liens_party_raw_thor;
+	#ELSE
+		liens_party_raw := liens_party_raw_roxie;
+	#END
+  
 	unique_ffids := dedup(sort(liens_added,did), did);
 	 
 	liens_party_overrides_roxie := JOIN (unique_ffids, fcra.key_Override_liensv2_party_ffid,
@@ -143,8 +152,12 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											FCRA.lien_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type='D',
 											get_liensparty_corrections(LEFT, RIGHT), ALL, LOCAL);
 					
-	liens_party_overrides := if(onThor, liens_party_overrides_thor, liens_party_overrides_roxie);
-
+	#IF(onThor)
+		liens_party_overrides := liens_party_overrides_thor;
+	#ELSE
+		liens_party_overrides := liens_party_overrides_roxie;
+	#END
+  
 	MAC_liensMain_transform(trans_name, key_liens_main) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.Layout_derog_process_plus_ftd trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, key_liens_main ri) := transform
@@ -355,8 +368,12 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 																		project(liens_party_raw(rmsid='' or tmsid=''), transform(Risk_Indicators.Layouts_Derog_Info.Layout_derog_process_plus_ftd,
 																						self.ftd := '0', self := left, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-	liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
-												
+	#IF(onThor)
+		liens_main_raw := liens_main_raw_thor;
+	#ELSE
+		liens_main_raw := liens_main_raw_roxie;
+	#END
+  
 	liens_main_overrides_roxie := JOIN(liens_party_overrides, fcra.key_Override_liensv2_main_ffid,
 											exists(left.lien_correct_ffid) and
 											keyed(right.flag_file_id IN left.lien_correct_ffid),  
@@ -368,7 +385,11 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											(right.flag_file_id IN left.lien_correct_ffid),  
 												get_liens_main_corrections(LEFT,RIGHT), ALL);
 											
-liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrides_roxie);
+#IF(onThor)
+	liens_main_overrides := liens_main_overrides_thor;
+#ELSE
+	liens_main_overrides := liens_main_overrides_roxie;
+#END
 
 	liens_full := group(ungroup(liens_main_raw(ftd ='1') + liens_main_overrides(ftd ='1')), did);
 

@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_cbrs, VehicleV2, ut, NID, MDR, Address, STD;
+﻿IMPORT doxie, doxie_cbrs, VehicleV2, ut, NID, MDR, Address, STD, D2C;
 
 EXPORT Raw := MODULE
 
@@ -6,13 +6,14 @@ EXPORT Raw := MODULE
 							VehicleV2_Services.IParam.reportParams in_mod,
 								DATASET(doxie.layout_references) in_dids,
 								UNSIGNED in_LIMIT = 0) := FUNCTION
-										
+		
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
 		lookup_value := in_mod.lookupValue;
 		
 		lookupwithexclude := lookup_value | IF(in_mod.excludeLessors, doxie.lookup_bit(Vehiclev2_services.lookup_bit.no_lessors), 0);
 																
 		key := VehicleV2.key_vehicle_did;
-		vks := JOIN(DEDUP(SORT(in_dids,did),did),key,
+		vks_vehicleV2_info := JOIN(DEDUP(SORT(in_dids,did),did),key,
 						KEYED(LEFT.did = RIGHT.append_did) AND
 						(in_mod.getMinors or RIGHT.is_minor=FALSE) AND
 						(lookupwithexclude = 0 or 
@@ -23,7 +24,9 @@ EXPORT Raw := MODULE
 																														orig_name_type <> '2' ), 
 														10000, skip ))),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
-						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_DID, skip));			
+						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_DID, skip));		
+					
+		vks := if(~isCNSMR, vks_vehicleV2_info);
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
 	end;
@@ -31,7 +34,8 @@ EXPORT Raw := MODULE
 	EXPORT VehicleV2_Services.Layout_Vehicle_Key get_vehicle_keys_from_vehkey (
       DATASET(VehicleV2_Services.Layout_Vehicle_Key) in_veh_keys,
 			UNSIGNED in_LIMIT = 0,BOOLEAN get_minors = TRUE,BOOLEAN include_non_regulated_sources = FALSE):= FUNCTION
-			
+		
+		Boolean isCNSMR := ut.IndustryClass.is_Knowx;
 		key := vehiclev2.Key_Vehicle_Main_Key;
 		key_party := Vehiclev2.Key_Vehicle_Party_Key;
 		
@@ -44,9 +48,11 @@ EXPORT Raw := MODULE
 				TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,self := RIGHT),
 				LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_KEY, skip));
 		ded := DEDUP(vks,all);
-		w_seq := JOIN(ded,key_party,KEYED(LEFT.vehicle_key=RIGHT.vehicle_key)
+		w_seq_info := JOIN(ded,key_party,KEYED(LEFT.vehicle_key=RIGHT.vehicle_key)
 		AND KEYED(LEFT.iteration_key=RIGHT.iteration_key) AND (get_minors or not (ut.age((integer)RIGHT.orig_dob) between 1 AND 17)),
 		TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,self.sequence_key := RIGHT.sequence_key,self := LEFT), LIMIT(10000,skip));
+		
+		w_seq := if(~isCNSMR, w_seq_info);
 		ded_w_seq := DEDUP(w_seq,all);
 		return if(in_LIMIT=0,ded_w_seq,choosen(ded_w_seq,in_LIMIT));
 	end;
@@ -56,14 +62,17 @@ EXPORT Raw := MODULE
 																DATASET(doxie_cbrs.layout_references) in_bdids,
 																UNSIGNED in_LIMIT = 0) := FUNCTION
 		
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
 		lookup_value := in_mod.lookupValue;
 	  key := VehicleV2.key_vehicle_bdid;
-		vks := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
+		vks_info := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
 						KEYED(LEFT.bdid = RIGHT.append_bdid) AND
 						(lookup_value = 0 or EXISTS( LIMIT( vehiclev2.Key_Vehicle_Party_Key((UNSIGNED6)append_bdid = LEFT.bdid AND vehicle_key = RIGHT.vehicle_key
 							AND iteration_key=RIGHT.iteration_key AND sequence_key = RIGHT.sequence_key AND orig_name_type <> '2' ), 10000, skip ))),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_BDID,skip));
+  		
+  vks := if(~isCNSMR, vks_info);		
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
 	end;
@@ -74,18 +83,21 @@ EXPORT Raw := MODULE
 				 UNSIGNED in_LIMIT = 0,
 					 string13 dl_num ='',	
 					 string20 Vehicle_Num ='') := FUNCTION
-									 
+		
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
     key := VehicleV2.key_vehicle_VIN;
 		key_party := Vehiclev2.Key_Vehicle_Party_Key;
 		vks0 := JOIN(DEDUP(SORT(in_VIN,vin),vin),key,
 		        KEYED(LEFT.vin = RIGHT.vin),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT, self.sequence_key := ''),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_VIN,fail(11, doxie.ErrorCodes(11))));
-		vks1 := JOIN(DEDUP(SORT(in_VIN,vin),vin),key,
+		vks1_info := JOIN(DEDUP(SORT(in_VIN,vin),vin),key,
 		        KEYED(LEFT.vin = RIGHT.vin),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT, self.sequence_key := ''),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_VIN,skip));						
 		
+	
+		vks1 := if(~isCNSMR, vks1_info);
 		string did_value := in_mod.didValue;
 		
 		vks	:= if(EXISTS(vks1)or did_value<>'' or dl_num<>'' or vehicle_Num <> '',vks1,vks0);			
@@ -101,12 +113,17 @@ EXPORT Raw := MODULE
 	EXPORT get_vehicle_keys_from_title(
 															 DATASET(VehicleV2_Services.Layouts.Layout_Vehicle_Title_Number_New) in_ttl,
 															 UNSIGNED in_LIMIT = 0) := FUNCTION
-    key := VehicleV2.key_vehicle_title_number;
-		vks := JOIN(DEDUP(SORT(in_ttl,Ttl_Number),Ttl_Number),key,
+  
+	Boolean isCNSMR := ut.IndustryClass.is_Knowx;    
+		key := VehicleV2.key_vehicle_title_number;
+		vks_info := JOIN(DEDUP(SORT(in_ttl,Ttl_Number),Ttl_Number),key,
 		        KEYED(LEFT.Ttl_Number = RIGHT.ttl_number) AND (LEFT.state_origin=RIGHT.state_origin
 						or LEFT.state_origin =''),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_TITLE,fail(11, doxie.ErrorCodes(11))));
+						
+		
+		vks := if(~isCNSMR, vks_info);
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
 	end;
@@ -114,12 +131,17 @@ EXPORT Raw := MODULE
 	EXPORT get_vehicle_keys_from_dl_number(
 															 DATASET(VehicleV2_Services.Layouts.Layout_Vehicle_DL_Number_New) in_dlnum,
 															 UNSIGNED in_LIMIT = 0,BOOLEAN get_minors=FALSE) := FUNCTION
+															 
+		Boolean isCNSMR := ut.IndustryClass.is_Knowx;													 
     key := VehicleV2.key_vehicle_dl_number;
-		vks := JOIN(DEDUP(SORT(in_dlnum,DL_Number),DL_Number),key,
+		vks_info := JOIN(DEDUP(SORT(in_dlnum,DL_Number),DL_Number),key,
 		        KEYED(LEFT.DL_Number = RIGHT.DL_number) AND
 						(get_minors or RIGHT.is_minor=FALSE),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_DL_NUMBER,fail(11, doxie.ErrorCodes(11))));
+		
+	
+		vks := if(~isCNSMR, vks_info);
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
 	end;
@@ -141,6 +163,8 @@ EXPORT Raw := MODULE
 			 UNSIGNED starting_record = 1, 
 			 UNSIGNED MAX_results = 9999,string1 state_type ='C'
 			 ) := module
+			 
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;	 
 		key := VehicleV2.key_vehicle_lic_plate;
 		pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l,r);	
 		
@@ -156,7 +180,7 @@ EXPORT Raw := MODULE
 			left outer,
 			LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_BLUR_LICENSE,fail(11, doxie.ErrorCodes(11)))
 		);
-		
+
 		// output(in_lic_plate, 	named('in_lic_plate'));	// DEBUG
 		// output(in_blur,				named('in_blur'));			// DEBUG
 		// output(in_unblurred, 	named('in_unblurred'));	// DEBUG
@@ -173,13 +197,15 @@ EXPORT Raw := MODULE
 						lic_plate_mac()
 						,TRANSFORM(VehicleV2_Services.Layouts.lic_plate_key_payload_fields_New, self := RIGHT),
 						LIMIT(0),keep(in_LIMIT+1));
-		vks:= JOIN(DEDUP(SORT(in_lic,lic_plate),lic_plate),key,
+		vks_info:= JOIN(DEDUP(SORT(in_lic,lic_plate),lic_plate),key,
 		        KEYED(LEFT.lic_plate<>'' AND LEFT.lic_plate = RIGHT.license_plate) AND 
 						lic_plate_mac()
 						,TRANSFORM(VehicleV2_Services.Layouts.lic_plate_key_payload_fields_New, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_LIC_PLATE,fail(11, doxie.ErrorCodes(11))));
 
-
+  
+	 
+		vks := if(~isCNSMR, vks_info);
 		vks_leading_bool := EXISTS(LIMIT(vks_leading0,in_LIMIT,skip));
 		vks_leading	:= map( vks_leading_bool=>vks_leading0,
 												EXISTS(vks_leading0) => fail(vks_leading0, 11, doxie.ErrorCodes(11))); 
@@ -207,6 +233,8 @@ EXPORT Raw := MODULE
 					 UNSIGNED starting_record = 1,
 					 UNSIGNED MAX_results = 9999
 					 ) := MODULE
+					 
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;			 
     key := VehicleV2.key_vehicle_reverse_lic_plate;
 		pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l,r);	
 		l_lic_cast := record
@@ -214,11 +242,14 @@ EXPORT Raw := MODULE
 			VehicleV2_Services.Layouts.Layout_Vehicle_Lic_Plate_New AND not lic_plate;
 		end;
 		in_lic_cast := PROJECT(in_lic_plate, l_lic_cast);
-		vks_trailing := JOIN(DEDUP(SORT(in_lic_cast,lic_plate),lic_plate),key,
+		vks_trailing_info := JOIN(DEDUP(SORT(in_lic_cast,lic_plate),lic_plate),key,
 		        KEYED(LEFT.lic_plate <> '' AND LEFT.lic_plate = RIGHT.reverse_license_plate[1..length(trim(LEFT.lic_plate,LEFT,RIGHT))]) AND 
 						lic_plate_mac()
 						,TRANSFORM(VehicleV2_Services.Layouts.lic_plate_key_payload_fields_New, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_LIC_PLATE,fail(11, doxie.ErrorCodes(11))));
+			
+			
+			vks_trailing := if(~isCNSMR, vks_trailing_info);			
 		// state_type param is hardcoded to 'C' because moxie doesn't do reverse license plate
 		// lookups so this code is only called by roxie queries AND in roxie queries we don't want
 		// to LIMIT results based on which state matches
@@ -234,7 +265,7 @@ EXPORT Raw := MODULE
 	EXPORT get_vehicle_report(
 		VehicleV2_Services.IParam.reportParams in_mod,
 		GROUPED DATASET(VehicleV2_Services.Layout_Vehicle_Key) in_veh_keys,
-														STRING in_ssn_mask_type = '') := FUNCTION			
+														STRING in_ssn_mask_type = '') := FUNCTION												
 		RETURN PROJECT(VehicleV2_Services.Functions.GetVehicleReport(in_mod, in_veh_keys, in_ssn_mask_type), VehicleV2_Services.Layout_Report);
 	END;
 	
@@ -314,6 +345,7 @@ EXPORT Raw := MODULE
 		BOOLEAN get_minors=FALSE
 	) := FUNCTION
 
+  Boolean isCNSMR := inMod.IndustryClass = D2C.Constants.Is_CNSMR; 
   	addr1:=IF(inMod.addr!='',inMod.addr,address.Addr1FromComponents(
 			inMod.prim_range,inMod.predir,inMod.prim_name,inMod.suffix,inMod.postdir,'',inMod.sec_range));
 		addr2:=address.Addr2FromComponents(inMod.city,inMod.state,inMod.zip);
@@ -338,7 +370,7 @@ EXPORT Raw := MODULE
 			SELF:=R;
 		END;
 
-		rawVehKeys:=JOIN(srchAddrRecs,VehicleV2.Key_Vehicle_MFD_Srch,
+		rawVehKeys_info:=JOIN(srchAddrRecs,VehicleV2.Key_Vehicle_MFD_Srch,
 			KEYED(LEFT.zip5=RIGHT.zip5) AND
 			KEYED(LEFT.prim_range=RIGHT.prim_range) AND
 			KEYED(LEFT.prim_name=RIGHT.prim_name) AND
@@ -349,7 +381,8 @@ EXPORT Raw := MODULE
 			(get_minors or RIGHT.is_minor=FALSE),
 			filterBySecRng(LEFT,RIGHT),
 			LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_MFD_ADDR,FAIL(11,doxie.ErrorCodes(11))));
-
+  
+  rawVehKeys := if(~isCNSMR, rawVehKeys_info); 
 		RETURN DEDUP(SORT(rawVehKeys,RECORD),RECORD);
 	END;
 

@@ -57,10 +57,9 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							SELF := LEFT;
 																							SELF := [];));
 
-
-
-
-	sortPulledExecs := SORT(pulledExecs(isExec AND relatedParty.did > 0), seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, title, partyLastSeen, partyFirstSeen);
+    
+ //Send the Executives that have DID's listed in the Contacts Key through the attribute logic.   The attribute logic relies on having a DID to do all the look ups against the keys 
+	sortPulledExecs  := SORT(pulledExecs(isExec AND relatedParty.did > 0), seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, title, partyLastSeen, partyFirstSeen);
 	dedupPulledExecs := DEDUP(sortPulledExecs, seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, title, partyLastSeen, partyFirstSeen);
 															
 	rollPulledExecsWithDID := ROLLUP(dedupPulledExecs,
@@ -139,9 +138,22 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		LEFT OUTER);
 																		
 	
-	getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);																	
+	getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);	
+  
+  //these DIDless BEO's cannot be sent them through the attribute logic - but will be added to the report
+  DIDLessExecs          := PROJECT(pulledExecs(isExec and relatedParty.did = 0), TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.RelatedParty relatedparty, 
+                                                                                     STRING title, 
+                                                                                     UNSIGNED4 partyFirstSeen, 
+                                                                                     UNSIGNED4 partyLastSeen, 
+                                                                                     BOOLEAN isExec},
+                                                     SELF.did  := LEFT.relatedparty.did;         //***expecting this to be zero                                                     
+                                                     SELF      := LEFT;));
+                                                     
+  //this routine will update the Business Internal with a new DATASET of DIDlessBEO's to bus internal and adding them to list of BEO's in the report 
+  UpdateInData      := DueDiligence.getBusExecWithNoDID(getExecResidency, DIDLessExecs, sortExecsWithDID);  
 
 	
+	// OUTPUT(execsRawSeq, NAMED('execsRawSeq'));
 	// OUTPUT(pulledExecs, NAMED('pulledExecs'));
 	// OUTPUT(sortPulledExecs, NAMED('sortPulledExecs'));
 	// OUTPUT(dedupPulledExecs, NAMED('dedupPulledExecs'));
@@ -154,11 +166,13 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(groupExecs, NAMED('groupExecs'));
 	// OUTPUT(getMaxExecutives, NAMED('getMaxExecutives'));
 	// OUTPUT(rollAllExecs, NAMED('rollAllExecs'));
-	
+	// OUTPUT(addExecs, NAMED('addExecs'));
 	// OUTPUT(getExecResidency, NAMED('getExecResidency'));
-	// OUTPUT(getExecResidency, NAMED('getExecResidency'));
+  // OUTPUT(DIDLessExecs, NAMED('DIDLessExecs'));
+	// OUTPUT(UpdateInData, NAMED('UpdateInData'));
 	
 	
-	RETURN getExecResidency;
+	
+	RETURN UpdateInData;
 
 END;

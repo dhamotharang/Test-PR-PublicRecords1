@@ -32,7 +32,7 @@
 
 // #OPTION('expandSelectCreateRow', TRUE);
 IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
-       Gateway, IESP, MDR, Phones, Royalty, UT, Inquiry_AccLogs, Risk_Reporting, STD;
+       Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, UT, Inquiry_AccLogs, Risk_Reporting, STD;
 
 EXPORT SmallBusiness_BIP_Combined_Service := 
   MACRO 
@@ -172,6 +172,9 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     BOOLEAN   Include_TargusGateway   := FALSE : STORED('IncludeTargusGateway');
     BOOLEAN   Run_TargusGateway       := FALSE : STORED('RunTargusGatewayAnywayForTesting');
     DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested_ := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
+
+    IF( OFAC_Version_ != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested_, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
     /* ****************************************************************************
      *                        Prepare input Data                                  *

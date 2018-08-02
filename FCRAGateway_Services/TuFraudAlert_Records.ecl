@@ -6,8 +6,8 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 	constants := FCRAGateway_Services.Constants;
 	return_matched_lexIDs_only := in_mod.ReturnMatchedUniqueIDsOnly;
 	//Create picklist request from input PII.
-	ds_plist_req := project(in_req, transforms.input_to_picklist(LEFT));
-
+	user := ROW(transforms.in_mod_to_user(in_mod));
+	ds_plist_req := PROJECT(in_req, transforms.input_to_picklist(LEFT, user));
 	//Retrieve credit alerts, consumer statements, freeze information, and ensure we can resolve to a did.
 	ds_compliance_data := FCRAGateway_Services.GetComplianceData(ds_plist_req, in_mod);
 	input_lexID := (unsigned6)ds_compliance_data[1].consumer.lexID;
@@ -25,7 +25,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 	ds_tufa_soap_response := IF(make_gateway_call, Gateway.SoapCall_TuFraudAlert(in_req, in_mod.gateways, make_gateway_call));
 
 	//Verify response resolve to lexID with picklist.
-	ds_tufa_with_picklist_recs := IF(make_gateway_call, FCRAGateway_Services.GetTufaPicklistVerification(ds_tufa_soap_response));
+	ds_tufa_with_picklist_recs := IF(make_gateway_call, FCRAGateway_Services.GetTufaPicklistVerification(ds_tufa_soap_response, user));
 
 	//Get royalties from ds_tufa_with_picklist_recs.
 	ds_royalties := Royalty.RoyaltyTuFraudAlert.GetRoyalties(ds_tufa_with_picklist_recs);
@@ -72,7 +72,6 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 
 	#IF(constants.Debug.TuFraudAlertRecords)
 		OUTPUT(ds_compliance_data, NAMED('ds_compliance_data'));
-		OUTPUT(ds_gateway_request, NAMED('ds_gateway_request'));
 		OUTPUT(ds_tufa_soap_response, NAMED('ds_tufa_soap_response'));
 		OUTPUT(ds_tufa_recs, NAMED('ds_tufa_recs'));
 	#END

@@ -1,7 +1,7 @@
+﻿Import _Control, Risk_indicators, Header, RiskWise, AID_Build;
+onThor := _Control.Environment.OnThor;
 
-Import Risk_indicators, Header, RiskWise, AID_Build;
-
-EXPORT iid_GetMilitaryAddr(grouped Dataset(Risk_indicators.iid_constants.layout_outx) HeaderIn, boolean OnThor=false) := FUNCTION;
+EXPORT iid_GetMilitaryAddr(grouped Dataset(Risk_indicators.iid_constants.layout_outx) HeaderIn) := FUNCTION;
 
 AddrLayout := RECORD
 	risk_indicators.Layout_Input; 
@@ -49,8 +49,12 @@ MilitaryEverZip_ungrouped_thor := join(distribute(JustAddr, hash64(hdr.zip)),
 										
 MilitaryEverZip_thor := GROUP(SORT(distribute(MilitaryEverZip_ungrouped_thor, hash64(seq, did)), seq, did, LOCAL), seq, did, LOCAL);					
 										
-MilitaryEverZip := IF(OnThor, MilitaryEverZip_thor, MilitaryEverZip_roxie); 										
-										
+#IF(onThor)
+	MilitaryEverZip := MilitaryEverZip_thor;
+#ELSE
+	MilitaryEverZip := MilitaryEverZip_roxie;
+#END
+
 //  for latency concerns in instantid, just use the zip lookup for now 
 // and come back to add the address lookup when the AID key is ready in August release
 MilitaryEver := MilitaryEverZip;  
@@ -101,9 +105,12 @@ MilitaryOut_thor := group(join(distribute(HeaderIn, hash64(seq, did)), DIDMilita
 										,
 										AddMilityflag(left,right), LOCAL), seq, did, LOCAL);
 
+#IF(onThor)
+	MilitaryOut := MilitaryOut_thor;
+#ELSE
+	MilitaryOut := MilitaryOut_roxie;
+#END
 
-MilitaryOut := if(onThor, MilitaryOut_thor, MilitaryOut_roxie);
-										
 // output(HeaderIn, named('HeaderIn'));
 // output(JustAddr, named('JustAddr'));
 // output(IsMilitaryAddr, named('IsMilitaryAddr'));

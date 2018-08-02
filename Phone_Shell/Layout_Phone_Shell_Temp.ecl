@@ -355,7 +355,7 @@ END;
 
 EXPORT Phone_Shell_Layout := RECORD
 	Layout_Phone_Shell_Plus - Raw_Input - Clean_Input - Clam Phone_Shell;
-	Risk_Indicators.Layout_Boca_Shell - LnJ_datasets Boca_Shell;
+	Risk_Indicators.Layout_Boca_Shell - LnJ_datasets - consumerstatements Boca_Shell;
 END;
 
 END;

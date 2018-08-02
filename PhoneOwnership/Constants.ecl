@@ -1,10 +1,13 @@
-﻿EXPORT Constants := MODULE
+﻿IMPORT std;
+EXPORT Constants := MODULE
 	EXPORT SearchLevel := ENUM(BASIC = 0,PREMIUM = 1,ULTIMATE = 2); 
 	EXPORT STRING LIDB := 'LIDB;'; 
 	EXPORT STRING CNAM := 'CNAM;'; 
 	EXPORT STRING CARRIER := 'Carrier;'; 
 	EXPORT STRING ATTPhone := 'AT&T'; 
 	EXPORT STRING Delimiter := '; ';
+	EXPORT UNSIGNED1 MAX_EMAILS_PER_PERSON := 20;
+	
 	EXPORT LNMatch := MODULE
 		EXPORT STRING1 INVALID := 'I'; //created for internal use - to consistently use a single character - will be outputted as INV
 		EXPORT STRING1 NONE := 'O';    //created for internal use - to consistently use a single character - will be outputted as NON
@@ -24,6 +27,7 @@
 	EXPORT UseCaseValues := ['OTPCFD','IdentityFraud','TCPA','GeoLocation'];
 	EXPORT Ownership := MODULE
 		EXPORT STRING INVALID := 'Invalid';
+		EXPORT STRING NONE := 'None';
 		EXPORT STRING LOW := 'Low';
 		EXPORT STRING UNDETERMINED := 'Undetermined';		
 		EXPORT STRING MEDIUM := 'Medium';
@@ -43,12 +47,16 @@
 		EXPORT STRING RELATIVE := 'Possible Relative';
 		EXPORT STRING ROOMMATE := 'Possible Roommate';		
 		EXPORT STRING NONE 	   := 'No Relationship Found';
-		EXPORT STRING NO_IDENTITY := 'Owner Identity Unavailable ';
+		EXPORT STRING NO_IDENTITY := 'Owner Identity Unavailable';
+		EXPORT STRING NO_OWNER := 'No Valid Owner';
 		EXPORT STRING INVALID  := 'Number Invalid';
 	END;	
 	EXPORT BUSINESS_RELATIONS := [Relationship.EMPLOYER,Relationship.BUSINESS];
 	EXPORT DisconnectStatus := MODULE
+		EXPORT STRING CONFIRMED_DISCONNECTED := 'LINE DISCONNECT';
+		EXPORT STRING CONFIRMED_SUSPENDED := 'LINE SUSPENDED';
 		EXPORT STRING DISCONNECTED := 'POSSIBLE DISCONNECT';
+		EXPORT STRING HISTORIC_DISCONNECT := 'POSSIBLE HISTORIC DISCONNECT';
 		EXPORT STRING UNDETERMINED := 'POSSIBLE DISCONNECT/PORTING';
 		EXPORT STRING UNKNOWN := '';
 	END;	
@@ -58,6 +66,8 @@
 		EXPORT STRING NO_IDENTITY := '3,';
 		EXPORT STRING INVALID_NUMBER := '4';//will be a standalone reason.
 		EXPORT STRING DISCONNECTED := '5,';
+		EXPORT STRING CONFIRMED_DISCONNECTED := '6,';
+		EXPORT STRING CONFIRMED_SUSPENDED := '7,';
 	END;		
 	
 	EXPORT STRING BAD_NUMBER := 'lidb: bad querynumber;'; //ATT LIDB error

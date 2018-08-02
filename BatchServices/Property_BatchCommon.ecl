@@ -8,7 +8,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 														 STRING BIPFetchLevel = 'S'):= FUNCTION
 														 
 		#OPTION('optimizeProjects', TRUE);
-		
+		isCNSMR := ut.IndustryClass.is_Knowx;
 		// Constants.
 		
 		TOO_MANY_MATCHES              := AutokeyB2_batch.Constants.FAILED_TOO_MANY_MATCHES;		
@@ -87,7 +87,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
     ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
 		p := BatchServices.Property_BatchService_Records(ds_batch_in, record_types, party_type, nSS, isFCRA, 
-																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags);
+																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags, isCNSMR);
 		 
 		// obtain the match codes from the soap inputs.
 		boolean nameMatch_value :=    p.NameMatch_value;

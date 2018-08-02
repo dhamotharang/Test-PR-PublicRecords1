@@ -1,4 +1,4 @@
-import FCRA, FFD, LN_PropertyV2_Services;
+﻿import FCRA, FFD, LN_PropertyV2_Services, D2C;
 
 k_assessor(boolean isFCRA = false)	:= LN_PropertyV2_Services.keys.assessor(isFCRA);
 k_fares			:= keys.addl_fares_t;
@@ -16,7 +16,8 @@ export dataset(l_raw) fn_get_assessments_raw(
 	boolean isFCRA = false,
 	dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
   dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-  integer8 inFFDOptionsMask = 0
+  integer8 inFFDOptionsMask = 0,
+	 boolean isCNSMR = false
 ) := function
 // canned data for testing
   // _canned :=  _data_canned.Corrections (in_sids);
@@ -30,7 +31,8 @@ export dataset(l_raw) fn_get_assessments_raw(
 	ds_raw0 := join(
 		in_sids, k_assessor(isFCRA),
 	  keyed(left.ln_fares_id = right.ln_fares_id)
-		and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA),
+		and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.search_did ),record_id) and isFCRA)
+		and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
 		transform(l_raw,self:=left,self:=right,self:=[]),
 		limit(max_raw)
 	);
@@ -81,6 +83,6 @@ export dataset(l_raw) fn_get_assessments_raw(
 	);
 	
 	results := project(ds_raw3, transform(l_raw,self.sortby_date:=Raw.assess_recency(left);self:=left));
-	
+
 	return results;
 end;

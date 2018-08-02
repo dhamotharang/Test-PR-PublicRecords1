@@ -413,7 +413,7 @@ export Raw := MODULE
 		accRpt1_add_childds := PROJECT(accRpt0, addChildDatasets(LEFT))
 						(in_mod.dateVal=0 OR (UNSIGNED3)MIN(flcrash_time_location,accident_date[1..6]) <= in_mod.dateVal);
 						
-	
+	 //Blanking out to be compliant with D2C; Key data should not go through 
 	 accRpt1 := IF(~isCNSMR, accRpt1_add_childds);
 	 
 		accRpt2 := PROJECT(accRpt1,suppressDL(LEFT,in_mod.mask_dl));

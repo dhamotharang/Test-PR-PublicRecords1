@@ -23,6 +23,8 @@
  </message>
 */
 
+import OFAC_XG5;
+
 export Patriot_Search := MACRO
 
 // new temporary input field for KeyBank so that we can change the OFAC version to 3 for them, currently it is defaulted to 2.
@@ -73,6 +75,8 @@ end;
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
 
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 in_data := GROUP(SORTED(DATASET([{'1',1,Stringlib.StringToUpperCase(firstname_value),
 																				Stringlib.StringToUpperCase(middlename_value),

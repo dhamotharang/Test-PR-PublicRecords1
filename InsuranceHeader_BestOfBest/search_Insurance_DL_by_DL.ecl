@@ -1,4 +1,5 @@
-Import InsuranceHeader_PostProcess, InsuranceHeader_BestOfBest, Risk_Indicators, riskwise, drivers;
+﻿Import _Control, InsuranceHeader_PostProcess, InsuranceHeader_BestOfBest, Risk_Indicators, riskwise, drivers;
+onThor := _Control.Environment.OnThor;
 
 //*************************************************************************************************
 //This function searches Insurance Header information, we can't return that raw data to customers!!
@@ -10,7 +11,7 @@ Import InsuranceHeader_PostProcess, InsuranceHeader_BestOfBest, Risk_Indicators,
 //*************************************************************************************************
 
 EXPORT search_Insurance_DL_by_DL(grouped DATASET(InsuranceHeader_BestOfBest.Layouts.InsuranceDL_Layout_Input) indata, integer dppa, boolean isFCRA=false,
-																 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, boolean onThor=false) := function
+																 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
 
 // check that user has permissible purpose to see DL data
 	//dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa, isFCRA);
@@ -46,7 +47,11 @@ InsuranceDL_by_DL_thor_pre := join(distribute(indata(dl_number<>'' and  dl_st<>'
 InsuranceDL_by_DL_thor := group(InsuranceDL_by_DL_thor_pre + project(indata(dl_number='' or  dl_st=''), 
 										transform(InsuranceHeader_BestOfBest.Layouts.InsuranceDL_DL_Output, SELF := LEFT, SELF := [])), seq);
 
-InsuranceDL_by_DL := if(onThor, InsuranceDL_by_DL_thor, InsuranceDL_by_DL_roxie);
+#IF(onThor)
+	InsuranceDL_by_DL := InsuranceDL_by_DL_thor;
+#ELSE
+	InsuranceDL_by_DL := InsuranceDL_by_DL_roxie;
+#END
 
 return InsuranceDL_by_DL;
 
