@@ -1,6 +1,6 @@
 ﻿import VersionControl,_Control;
 
-export Spray := module
+export Spray(string ver) := module
 
 // export Load := DATASET([
  	// {_Control.IPAddress.bctlpedata11
@@ -25,7 +25,7 @@ export load := DATASET([
  	,'~thor_data400::in::FCRA::ExperianCred_load_@version@'    
  	,[{'~thor_data400::in::FCRA::ExperianCred_load'}]    
  	,'thor400_66'
-	,version
+	,ver
 	,'S[0-9]{3}'
  	}
 ], VersionControl.Layout_Sprays.Info);
@@ -38,7 +38,7 @@ export Updates := DATASET([
  	,'~thor_data400::in::FCRA::ExperianCred_updates_@version@'    
  	,[{'~thor_data400::in::FCRA::ExperianCred_updates'}]    
  	,'thor400_66'
-	,version
+	,ver
 	,'S[0-9]{3}'
  	}
 ], VersionControl.Layout_Sprays.Info);
@@ -51,7 +51,7 @@ export Deletes := DATASET([
  	,'~thor_data400::in::FCRA::ExperianCred_deletes_@version@'    
  	,[{'~thor_data400::in::FCRA::ExperianCred_deletes'}]    
  	,'thor400_66'
-	,version
+	,ver
  	}
 ], VersionControl.Layout_Sprays.Info);
 
@@ -63,7 +63,7 @@ export Deceased := DATASET([
  	,'~thor_data400::in::FCRA::ExperianCred_deceased_@version@'    
  	,[{'~thor_data400::in::FCRA::ExperianCred_deceased'}]    
  	,'thor400_66'
-	,version
+	,ver
  	}
 ], VersionControl.Layout_Sprays.Info);
 
