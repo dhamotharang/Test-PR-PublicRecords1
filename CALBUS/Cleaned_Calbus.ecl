@@ -109,6 +109,7 @@ export Cleaned_Calbus(string8 pdate, string8 fdate) := function
 	self.DISTRICT_BRANCH              := stringlib.StringToUpperCase(trim(l.DISTRICT_BRANCH,left,right));
 	self.ACCOUNT_NUMBER               := trim(l.ACCOUNT_NUMBER,left,right);
 	self.sub_account_number           := trim(l.sub_account_number,left,right);
+	self.account_type 							  := stringlib.StringToUpperCase(trim(l.account_type,left,right));           
 	self.DISTRICT                     := stringlib.StringToUpperCase(trim(l.DISTRICT,left,right));
 	self.FIRM_NAME                    := stringlib.StringToUpperCase(trim(l.FIRM_NAME,left, right));
 	self.OWNER_NAME                   := stringlib.StringToUpperCase(trim(l.OWNER_NAME,left, right));
