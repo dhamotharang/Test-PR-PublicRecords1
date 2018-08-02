@@ -49,8 +49,8 @@ export dataset(l_raw) fn_get_assessments_raw(
 //---------------------------------------FCRA FFD----------------------------------------------------------------	
 // Remove or mark Disputed md & add StatementIDs
 	l_raw xformAssess ( l_raw L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(R.StatementIDs))) 
+			self.StatementIDs := r.StatementIDs;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 	end;

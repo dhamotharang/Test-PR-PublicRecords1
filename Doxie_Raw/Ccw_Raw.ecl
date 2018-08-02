@@ -54,8 +54,8 @@ export Ccw_Raw(
    ccw_fcra := raw + ccw_override_st;
 	 
 	 out_rec addStatementIDs(out_rec L, FFD.Layouts.PersonContextBatchSlim R) := transform,
-	 skip(~showDisputedRecords and r.isDisputed)
-		self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+	 skip((~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.StatementIDs := r.StatementIDs;
 		self.isDisputed :=	r.isDisputed;
 		self := L;
    end;

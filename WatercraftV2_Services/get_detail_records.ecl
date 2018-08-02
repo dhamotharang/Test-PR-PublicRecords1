@@ -1,4 +1,4 @@
-IMPORT doxie, watercraft, FCRA, ut, FFD;
+﻿IMPORT doxie, watercraft, FCRA, ut, FFD;
 
 EXPORT get_detail_records(
 	dataset(WatercraftV2_Services.Layouts.search_watercraftkey) in_watercraftkeys,
@@ -68,9 +68,9 @@ EXPORT get_detail_records(
 	// FCRA FFD ----------------------------------------------------------------------------------------------------------------
 	// Remove or mark Disputed rows & add StatementIDs
 	layout_keyfile_plus xformDisp(layout_keyfile_plus L, FFD.Layouts.PersonContextBatchSlim R) := TRANSFORM,
-		SKIP(~ShowDisputedRecords and R.isDisputed)
+		SKIP((~ShowDisputedRecords and R.isDisputed) or (~ShowConsumerStatements and exists(R.StatementIDs)))
 		SELF.isDisputed :=  R.isDisputed;
-		SELF.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+		SELF.StatementIDs := R.StatementIDs;
 		SELF := L;
 	END;
 

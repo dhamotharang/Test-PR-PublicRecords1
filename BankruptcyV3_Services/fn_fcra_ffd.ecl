@@ -1,4 +1,4 @@
-/* This function gets Full File Disclosure records for BK FCRA search and report services. */
+﻿/* This function gets Full File Disclosure records for BK FCRA search and report services. */
 
 import bankruptcyv3, FFD, BankruptcyV3_Services;
 
@@ -18,9 +18,8 @@ export fn_fcra_ffd(dataset(BankruptcyV3_Services.layouts.layout_rollup) ds_recs,
 	
 	// ffd for debtor records for matched party did
   rec_w_tms xformStatements( rec_w_tms l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-   			skip(~ShowDisputedRecords and r.isDisputed)
-   						
-   					self.StatementIds := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+   			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+   					self.StatementIds := r.StatementIDs;
    					self.IsDisputed   := r.isDisputed;
    					self := l;
   end;
@@ -62,9 +61,8 @@ export fn_fcra_ffd(dataset(BankruptcyV3_Services.layouts.layout_rollup) ds_recs,
 	
 	// ffd for main records for matched party did
 	BankruptcyV3_Services.layouts.layout_rollup xmainStatements( layout_w_did l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-						
-					self.StatementIds := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+					self.StatementIds := r.StatementIDs;
 					self.IsDisputed   := r.isDisputed;
 					self := l;
 			end;

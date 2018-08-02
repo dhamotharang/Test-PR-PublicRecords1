@@ -1,4 +1,4 @@
-// IMPORTANT: at this point this is strictly FCRA attribute (non-FCRA is implemented in /bk_records)
+﻿// IMPORTANT: at this point this is strictly FCRA attribute (non-FCRA is implemented in /bk_records)
 
 import ut, codes, Riskwise, FCRA, bankrupt, Bankruptcyv3_Services, 
        bankruptcyv3, iesp, suppress, FFD, STD;
@@ -303,8 +303,8 @@ boolean showDisputedRecords := FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptio
 boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
 bankrupt.layout_bk_crs_main appendMainStatementIDs(bk_search_working l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-	skip(~showDisputedRecords and r.isDisputed)
-		self.StatementIds := if(showConsumerStatements, r.StatementIDs, FFD.Constants.BlankStatements);
+	skip((~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.StatementIds := r.StatementIDs;
 		self.IsDisputed := r.isDisputed;
 		self := l.bk_main;
 end;
@@ -318,8 +318,8 @@ f_main :=
 		left outer, keep(1), limit(0));		
 		 
 bankrupt.layout_bk_crs_search addDebtorStatementIds(bk_search_working l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-	skip(~showDisputedRecords and r.isDisputed)
-		self.StatementIds := if(showConsumerStatements, r.StatementIDs, FFD.Constants.BlankStatements);
+	skip((~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.StatementIds := r.StatementIDs;
 		self.IsDisputed := r.isDisputed;
 		self := l;		
 end;

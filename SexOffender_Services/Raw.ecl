@@ -1,4 +1,4 @@
-import AutoStandardI,doxie,SexOffender,Suppress,iesp,ut,AID_Build,
+﻿import AutoStandardI,doxie,SexOffender,Suppress,iesp,ut,AID_Build,
 			 FCRA, BatchServices, FFD, Std, Address;
 
 export Raw := module
@@ -64,9 +64,8 @@ export Raw := module
 			//*****************FFD***************************************************************************************************
 			SexOffender_Services.Layouts.raw_rec xformStatements( SexOffender_Services.Layouts.raw_rec l, 
 																																FFD.Layouts.PersonContextBatchSlim r ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed)
-						
-					self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+					self.StatementIDs := r.StatementIds;
 					self.IsDisputed   := r.isDisputed;
 					self := l;
 			end;
@@ -123,9 +122,8 @@ export Raw := module
 			//***************************************FFD****************************************************
 			SexOffender_Services.Layouts.rec_offense_raw xformStatements( SexOffender_Services.Layouts.rec_offense_raw l, 
 																																FFD.Layouts.PersonContextBatchSlim r ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed)
-						
-					self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+					self.StatementIDs := r.StatementIds;
 					self.IsDisputed   := r.isDisputed;
 					self := l;
 			end;
