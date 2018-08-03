@@ -87,29 +87,27 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
  
-														
- ds_in_accu := IF(IsPhoneRiskAssessment,
-	                 project(dedup(sort(dSearchRecs, acctno), acctno),
-									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
-									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
+	dAccuIn  := dSearchRecs(isprimaryphone OR batch_in.homephone<>'');
+  
+ dDupAccuIn := PROJECT(DEDUP(SORT(dAccuIn, acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in);
 									 
  AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
- SHARED accu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
+ SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(dDupAccuIn,
 	                                                                                          AccuDataGateway[1]);	
-	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
+	accu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	SHARED ported_phones := IF(inMod.IsGetPortedData, 
+	SHARED dPorted_phones := IF(inMod.IsGetPortedData, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
 															              dSearchRecs);																	 
    
-	SHARED Zum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(ported_phones, dinBestInfo, inMod, dGateways);
-	SHARED Zumigo_recs:= Zum_gw_recs.Zumigo_GLI;
+	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_phones, dinBestInfo, inMod, dGateways);
+	SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI;
 
-	SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
+	SHARED dZum_final := if(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_phones);
 
 	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
-																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
-																																	,Zum_final);
+																																	,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
+																																	,dZum_final);
     // restriction added here if plugin from batch is set to true ....
 		//  if not then don't do any restrictions.											
 
@@ -117,7 +115,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
  
-  PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
+ PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
 	DidSearchResults	:=UNGROUP(dSearchResultsUnfilteredFinal(acctno NOT IN SET(dInPhone,acctno)));
 
 	dinBestDID := if(doVerify, dAppendDIDsFormat);// for lexid verification
@@ -141,10 +139,10 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
    	
  SHARED dResultsDedup := dResultsDIDDedup + dResultsNoDIDDedup;
    	
- accu_royalty := project(accu_porting, transform(PhoneFinder_Services.Layouts.PhoneFinder.Final, self.acctno := left.acctno, self.typeflag := left.typeflag, 
+ accu_royalty := project(dAccu_porting, transform(PhoneFinder_Services.Layouts.PhoneFinder.Final, self.acctno := left.acctno, self.typeflag := left.typeflag, 
    																				self.phone := left.phone, self := [])); // accudata_ocn royalty
 																					
- SHARED dResultsDedup_More := dResultsDedup + accu_royalty + Zum_final;	
+ SHARED dResultsDedup_More := dResultsDedup + accu_royalty + dZum_final;	
    	
  SHARED dResultsDedupRecs := dResultsDedup_More + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
  
@@ -207,7 +205,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
  dRoyaltiesEquifax			:= Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, subj_phone_type_new,,,MDR.sourceTools.src_EQUIFAX);
  Accu_OCN_ddp               := dedup(sort(dResultsDedup_More,acctno, typeflag), acctno, typeflag);
  dRoyaltiesAccudata_ocn     := Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
- dRoyaltyZumGetIden         := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
+ dRoyaltyZumGetIden         := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(dZum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
  dRoyalty_ATT_LIDB          := Royalty.RoyaltyATT.GetBatchRoyaltiesByAcctno(dFilteringInHousePhoneData_typeflag, src, phone, acctno);	
  dRoyaltiesAccudata_CNAM    := Royalty.RoyaltyAccudata_CNAM.GetBatchRoyaltiesByAcctno(dFilteringInHousePhoneData_typeflag, subj_phone_type_new);
  
@@ -225,7 +223,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
  // Create RoyaltySet to be returned
  EXPORT dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, inMod.DetailedRoyalties);
  
- Zumigo_log_records := DATASET([{Zum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
+ Zumigo_log_records := DATASET([{dZum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
  
  EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zumigo_log_records, DATASET([],Phones.Layouts.ZumigoIdentity.zDeltabaseLog));
 END;
