@@ -1,52 +1,37 @@
 ﻿IMPORT PromoteSupers,FraudGovPlatform;
 EXPORT fraudgovInfo(
-		string pversion = '', 
-		string pstatus  = ''
+		string pVersion = '', 
+		string pStatus  = ''
 ):= 
 module
 	
 		SHARED fn := filenames().OutputF.FraudgovInfoFn;
 
 		SHARED fi_d := dataset(fn,FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec,flat,opt);
-		EXPORT PreviousVersion := fi_d[1].PreviousVersion;
-		EXPORT Status := fi_d[1].Status;
-		SHARED IsNew 	:= if(nothor(fileservices.fileExists(fn)), PreviousVersion <> pversion, true);
+		EXPORT PreviousVersion := if(fi_d[1].PreviousVersion != '', fi_d[1].PreviousVersion, pVersion);
+		EXPORT CurrentStatus := fi_d[1].Status;
+		SHARED IsNew 	:= if(nothor(fileservices.fileExists(fn)), PreviousVersion <> pVersion or CurrentStatus <> pStatus, true);
 
 
 		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{PreviousVersion, pversion, pstatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				dataset([{PreviousVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
 				fn,
-				PostNewfraudgov,
+				WriteFile,
 				2
 				,,
 				true);
 				
-		EXPORT postStatus := if(	IsNew
-			,sequential(PostNewfraudgov, output('fraudgov_build_version Changed', named('fraudgovInfoChanged')))
+		EXPORT postNewStatus := if(	IsNew
+			,sequential(WriteFile, output('fraudgov_build_version Changed', named('fraudgovInfoChanged')))
 			,sequential(output('fraudgov_build_version Not Changed', named('fraudgovInfoNotChanged'))));
 
 		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{pversion, pversion, 'ERROR'}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				dataset([{pVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
 				fn,
-				WriteErrorFound,
+				FixFile,
 				2
 				,,
 				true);
-
-		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{pversion, pversion, pstatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
-				fn,
-				WriteNoErrors,
-				2
-				,,
-				true);
-
-		Finishfraudgov := 	MAP(	Mac_TestRinID(pversion)		= 'E' => WriteErrorFound,
-									Mac_TestRecordID(pversion)	= 'E' => WriteErrorFound,
-									WriteNoErrors
-							);
-		
-
-		EXPORT postFinish := sequential(Finishfraudgov, output('fraudgov_build_version Finished', named('fraudgovInfoFinished')));
-
+				
+		EXPORT fixStatus := sequential(FixFile, output('fraudgov_build_version Fixed', named('fraudgovInfoFixed')));
 END;

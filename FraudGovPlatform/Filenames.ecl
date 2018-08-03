@@ -71,18 +71,6 @@ module
 	end;
 
 	//////////////////////////////////////////////////////////////////
-	// -- Prepped Filename Versions
-	//////////////////////////////////////////////////////////////////
-	export Prepped := module
-		export identitydata 		:= FraudGov_Prefix('in') + 'passed::identitydata';
-		export deltabase 			:= FraudGov_Prefix('in') + 'passed::deltabase';		
-		export nac 					:= FraudGov_Prefix('in') + 'passed::nac';		
-		export inquirylogs 			:= FraudGov_Prefix('in') + 'passed::inquirylogs';		
-		export knownfraud 			:= FraudGov_Prefix('in') + 'passed::knownfraud';		
-	end;
-	
-	
-	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module

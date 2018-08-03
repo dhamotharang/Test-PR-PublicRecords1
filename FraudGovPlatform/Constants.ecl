@@ -31,5 +31,9 @@ MODULE
   EXPORT  word_characters       := ' A | ABC | AN | AND | ANY | AS | AT | BUT | BY | ETC | FOR | FROM | IN | NA | OF | ON | OR | OTH | OTHER | PER | THAN | THE | THEN | TO | UP | WITH ';
 
 	EXPORT FirstRinID			:= 900000000000;
+	
+	EXPORT validDelimiter		:= '~|~';
+	EXPORT validTerminators	:= '~<EOL>~';
+	EXPORT validQuotes			:= '\'\'';
 
 END;

@@ -9,5 +9,5 @@ FUNCTION
 	dst := dedup(st, raw_First_Name, raw_Last_Name, dob, did);
 	tdst := table(dst, {did; cnt := count(group)}, did , few);
 	// Find Duplicate RinIDs on 2 or more different People
- 	return if (exists(tdst(tdst.cnt > 1)), 'E', ''); //E = Error Found
+ 	return if (exists(tdst(tdst.cnt > 1)), 'Failed', 'Passed'); //E = Error Found
 END;

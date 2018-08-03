@@ -301,7 +301,7 @@ EXPORT Functions :=  MODULE
 		FraudGovPlatform.Layouts.Base.AddressCache CleanAddress( prepped_Addresses l,  FraudGovPlatform.Layouts.Base.AddressCache r) := TRANSFORM 
 					Clean_Address_182								:= if (l.address_id  = r.address_id, '' ,address.CleanAddress182(l.address_1, l.address_2));
 					SELF.address_id								:= if (l.address_id  = r.address_id, r.address_id ,l.address_id);
-					SELF.address_cleaned						:= if (l.address_id  = r.address_id, r.address_cleaned, (unsigned4)ut.GetDate);
+					SELF.address_cleaned						:= if (l.address_id  = r.address_id, r.address_cleaned, (unsigned4)(String8)Std.Date.Today());
 					SELF.address_1									:= if (l.address_id  = r.address_id, r.address_1, l.address_1);
 					SELF.address_2									:= if (l.address_id  = r.address_id, r.address_2, l.address_2);
 					SELF.clean_address.prim_range			:= if (l.address_id  = r.address_id, r.clean_address.prim_range, 	Clean_Address_182[1..10])		; //prim_range

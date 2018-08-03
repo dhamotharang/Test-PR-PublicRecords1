@@ -5,5 +5,5 @@ EXPORT Mac_TestRecordID(
 ) := 
 FUNCTION
 	t := table(pBaseMainFile, {record_id; cnt := count(group)}, record_id );
- 	return if (exists(t(t.cnt > 1)), 'E', ''); //E = Error Found
+ 	return if (exists(t(t.cnt > 1)), 'Failed', 'Passed'); //E = Error Found
 END;

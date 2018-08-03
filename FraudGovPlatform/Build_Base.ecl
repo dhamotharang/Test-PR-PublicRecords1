@@ -1,6 +1,5 @@
-﻿﻿import tools,FraudShared;
-
-export Build_Base(
+﻿IMPORT FraudShared, tools;
+EXPORT Build_Base(
 
 	 string	pversion
 	,boolean	PSkipIdentityDataBase	= false 
