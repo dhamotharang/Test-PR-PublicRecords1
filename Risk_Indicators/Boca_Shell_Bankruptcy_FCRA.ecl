@@ -98,6 +98,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.bk_count36 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(3));
 		SELF.BJL.bk_count60 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(5));
 		SELF.BJL.bk_chapter := ri.chapter;
+		SELF.bk_chapters := dataset([{ri.chapter}], risk_indicators.Layouts_Derog_Info.layout_bk_chapter);
 		SELF.bk_disp_date := MAX((INTEGER)ri.date_filed, 
 				if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));
 		SELF := le;
@@ -144,6 +145,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		SELF.bjl.filing_type := IF (takeLeft, le.bjl.filing_type, ri.bjl.filing_type);
 		SELF.bjl.disposition := IF (takeLeft, le.bjl.disposition, ri.bjl.disposition);
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
+		SELF.bk_chapters :=  le.bk_chapters + ri.bk_chapters;  
 
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
 		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy, 0, ri.BJL.filing_count120);
@@ -189,6 +191,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			SELF.case_num := RIGHT.case_num;
 			SELF.court_code := RIGHT.court_code;
 			SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
+      self.bk_chapters := dedup(left.bk_chapters);
 			SELF := LEFT),
 		LEFT OUTER);
 	w_bk := if(bsVersion < 50, w_bk_tmp, group(w_bk_rolled_disp, seq));
@@ -226,7 +229,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			self := le;
 		END;
 		w_bk_correct := PROJECT(w_bk, correct_bk(LEFT));
-		
+		    
 		RETURN w_bk_correct;
 END;
 		

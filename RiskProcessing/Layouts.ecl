@@ -1,4 +1,4 @@
-import risk_indicators;
+﻿import risk_indicators;
 
 export Layouts := module
 
@@ -292,7 +292,7 @@ end;
 export layout_internal_shell_noDatasets := record
 	unsigned8 time_ms := 0;
 	STRING AccountNumber;
-	risk_indicators.Layout_Boca_Shell -LnJ_datasets - ConsumerStatements  ;
+	risk_indicators.Layout_Boca_Shell -LnJ_datasets - ConsumerStatements - bk_chapters ;
 	string errorcode;
 end;
 
