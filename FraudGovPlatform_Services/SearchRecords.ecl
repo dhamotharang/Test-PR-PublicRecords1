@@ -134,7 +134,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 											SELF.ElementValue := IF(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
 																							REGEXREPLACE('@@@',LEFT.entity_value,', '), 
 																							LEFT.entity_value);
-											SELF.score := LEFT.score_,
+											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,
 											SELF.NoOfIdentities := LEFT.cl_identity_count_,
 											SELF.NVPs := CHOOSEN(PROJECT(LEFT.flags, 

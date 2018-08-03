@@ -1,5 +1,5 @@
 ﻿IMPORT Address, AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform, FraudGovPlatform_Services, 
-				FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, ut;
+				FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, Suppress, ut;
 
 EXPORT Functions := MODULE
 	
@@ -14,7 +14,7 @@ EXPORT Functions := MODULE
 		
 		ds_instantIDRaw := raw_.getInstantIDRaw(ds_batch_in);
 		
-		recs_RedFlag := raw_.GetRedFlags(ds_batch_in, ds_instantIDRaw);
+		recs_RedFlag := raw_.GetRedFlags(ds_batch_in, ds_instantIDRaw); 
 		recs_CIID := raw_.GetCIID(ds_batch_in, ds_instantIDRaw);
 		
 		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_Compilation(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
@@ -338,15 +338,12 @@ EXPORT Functions := MODULE
 		
 		FraudGovPlatform_Services.Layouts.BatchOut_rec xfm_pre_batchout(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L) := TRANSFORM
 			SELF.Seq := L.batchin_rec.Seq;
-			SELF.LexID := L.batchin_rec.did;
-			SELF.identity_resolved := IF(L.batchin_rec.did <> 0 , 'Y', 'N');
-			
 			unsigned4 VEL_CNT := COUNT(L.childRecs_Velocities);
 			SELF.velocity_exceeded_cnt := VEL_CNT;
 			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, STD.Str.CleanSpaces(L.childRecs_Velocities[1].description), '');
 			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, STD.Str.CleanSpaces(L.childRecs_Velocities[2].description), '');
 			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, STD.Str.CleanSpaces(L.childRecs_Velocities[3].description), '');
-
+			
 			SELF := L;
 			SELF := [];
 		END;
@@ -382,6 +379,9 @@ EXPORT Functions := MODULE
 		END;
 		
 		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(batch_params.GLBPurpose);
+		
+		//Mask DOB when requested.
+		unsigned1 dob_mask_value := Suppress.date_mask_math.MaskIndicator(batch_params.DOBMask);		
 
 		ds_best := DidVille.did_service_common_function(ds_best_in,
 																										appends_value			:= FraudGovPlatform_Services.Constants.append_l,
@@ -394,7 +394,10 @@ EXPORT Functions := MODULE
 																										DRM_val						:= batch_params.DataRestrictionMask,
 																										GetSSNBest				:= TRUE);
 		
-		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM																									
+		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM	
+			dob_ := iesp.ECL2ESP.toDate((integer) L.best_dob);
+			masked_dob := iesp.ECL2ESP.ApplyDateMask(dob_, dob_mask_value);
+			
 			SELF.UniqueId := (string) L.did;  
 			SELF.Name.Prefix := L.best_title; 
 			SELF.Name.First := L.best_fname; 
@@ -402,7 +405,7 @@ EXPORT Functions := MODULE
 			SELF.Name.Last := L.best_lname; 
 			SELF.Name.Suffix := L.best_name_suffix;
 			SELF.SSN := (string) L.best_ssn;
-			SELF.DOB := iesp.ECL2ESP.toDate((integer)L.best_dob);
+			SELF.DOB := masked_dob;
 			SELF.Address := iesp.ECL2ESP.SetAddress('',
 																							'', 
 																							'', 
@@ -682,6 +685,7 @@ EXPORT Functions := MODULE
 		unsigned2 IndustryType := batch_params.IndustryType;
 		
 		temp_rec := RECORD
+			STRING20 acctno;
 			STRING60 entity_name;
 			STRING60 entity_value;
 			RECORDOF(FraudGovPlatform.Key_ClusterDetails);
@@ -701,8 +705,9 @@ EXPORT Functions := MODULE
 																	LEFT.entity_context_uid = RIGHT.entity_context_uid_),
 																#END
 													TRANSFORM(temp_rec,
+														SELF.acctno := LEFT.acctno,
 														SELF.entity_name := LEFT.entity_name,
-														SELF.entity_value := LEFT.entity_value, 
+														SELF.entity_value := LEFT.entity_value,
 														SELF := RIGHT),
 													LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 

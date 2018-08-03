@@ -76,6 +76,7 @@ EXPORT Utilities := MODULE
 															SELF := LEFT));
 		
 		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
+		Entity_Type_Identifier := FraudGovPlatform_Services.Constants.KelEntityIdentifier;
 		// All the commneted Fragment Types in the below project are not supported as of now (in MVP), However, 
 		// ... they will be supported for the final product. 
 		analytics_uids := PROJECT(ds_entityNameValue, 
@@ -83,15 +84,15 @@ EXPORT Utilities := MODULE
 													uid := MAP(	// LEFT.entity_name = Fragment_Types_const.DEVICE_ID_FRAGMENT
 																			// LEFT.entity_name = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
 																			// LEFT.entity_name = Fragment_Types_const.GEOLOCATION_FRAGMENT
-																			LEFT.entity_name = Fragment_Types_const.IP_ADDRESS_FRAGMENT => '_18' + HASH32(LEFT.entity_value),
+																			LEFT.entity_name = Fragment_Types_const.IP_ADDRESS_FRAGMENT => Entity_Type_Identifier._IPADDRESS + HASH32(LEFT.entity_value),
 																			// LEFT.entity_name = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT
 																			// LEFT.entity_name = Fragment_Types_const.NAME_FRAGMENT
-																			LEFT.entity_name = Fragment_Types_const.PERSON_FRAGMENT => '_01' + LEFT.entity_value,
-																			LEFT.entity_name = Fragment_Types_const.PHONE_FRAGMENT => '_16' + LEFT.entity_value,
+																			LEFT.entity_name = Fragment_Types_const.PERSON_FRAGMENT => Entity_Type_Identifier._LEXID + LEFT.entity_value,
+																			LEFT.entity_name = Fragment_Types_const.PHONE_FRAGMENT => Entity_Type_Identifier._PHONENO + LEFT.entity_value,
 																			//Calculating the tree_uid for the physical address value. Calculation is '_09'+HASH(address_1,address_2)
 																			LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
-																					'_09' + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1),regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
-																			LEFT.entity_name = Fragment_Types_const.SSN_FRAGMENT => '_15' +  LEFT.entity_value,
+																					Entity_Type_Identifier._PHYSICAL_ADDRESS + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1),regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
+																			LEFT.entity_name = Fragment_Types_const.SSN_FRAGMENT => Entity_Type_Identifier._SSN +  LEFT.entity_value,
 																			// LEFT.entity_name = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => '' + LEFT.entity_value,
 																			'');
 													SELF.tree_uid := uid;
@@ -99,5 +100,12 @@ EXPORT Utilities := MODULE
 													SELF := LEFT));
 		RETURN analytics_uids;
 	END;
-
+	
+	EXPORT GetRiskLevel (integer RiskScore) := FUNCTION
+		risk_level := MAP(RiskScore > 0 AND  RiskScore <= 25 => 'LOW',
+											RiskScore > 25 AND  RiskScore <= 75 => 'MEDIUM',
+											RiskScore > 75 => 'HIGH', 
+											'');
+		return risk_level;
+	END;
 END;

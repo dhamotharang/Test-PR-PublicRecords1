@@ -261,11 +261,12 @@ EXPORT Layouts := MODULE
 	END;
 	
 	EXPORT elementNidentity_uid_recs := RECORD
+		STRING20 acctno;
 		STRING60 entity_name;
 		STRING100 entity_value;
-		unsigned8 record_id;	
-		string70 tree_uid := '';
-		string70 entity_context_uid := '';
+		UNSIGNED8 record_id;	
+		STRING70 tree_uid := '';
+		STRING70 entity_context_uid := '';
 	END;
 
 	EXPORT elementNidentity_score_recs := RECORD
