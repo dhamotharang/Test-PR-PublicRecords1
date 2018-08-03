@@ -182,7 +182,7 @@
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
 		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
-		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
+		BOOLEAN   _include_additional_watchlists   := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]; 
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
 				
@@ -279,9 +279,9 @@
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
 		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
-		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
+		BOOLEAN   _include_additional_watchlists := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE];
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
 		
 		// The following attributes are included in the service interface by requirement, but aren't used yet.
