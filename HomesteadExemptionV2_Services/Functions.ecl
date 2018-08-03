@@ -255,7 +255,7 @@ EXPORT Functions := MODULE
 
 	/************************************************/
 	EXPORT getPropertyID(HomesteadExemptionV2_Services.Layouts.addrMin addr, STRING APN) := FUNCTION
-		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.p_city_name+addr.st+addr.z5,ALL);
+		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.st+addr.z5,ALL);
 		hasMinAddr:=(addr.prim_range!='' OR ut.isPOBox(addr.prim_name) OR ut.isRR(addr.prim_name))
 			 AND addr.prim_name!='' AND ((addr.p_city_name!='' AND addr.st!='') OR addr.z5!='');
 		RETURN IF(hasMinAddr,smashedAddr,APN);
