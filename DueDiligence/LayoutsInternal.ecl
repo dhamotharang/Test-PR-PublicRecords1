@@ -98,10 +98,7 @@ EXPORT LayoutsInternal := MODULE
   END;
 
 
-//------                                      ------
-//------  BusPropertyOwnedWithDetails         ------
-//------  Populated with data for the report  ------
-//------                                      ------
+
   EXPORT PropertySlimLayout := RECORD
    InternalSeqAndIdentifiersLayout; 
    STRING12  LNFaresId;
@@ -133,8 +130,25 @@ EXPORT LayoutsInternal := MODULE
 
    DueDiligence.Layouts.AddressSlimDetail;
   END;					
+  
 	
-	
+  
+  EXPORT WatercraftSlimLayout := RECORD
+   InternalSeqAndIdentifiersLayout; 
+   STRING30 watercraftKey;		//used to get watercraft details
+	 STRING30 sequenceKey;			//used to get watercraft details
+	 STRING2 stateOrigin;			//used to get watercraft details
+  
+   UNSIGNED4 historyDate;
+   DueDiligence.Layouts.WatercraftDataLayout;
+  END;	
+  
+  EXPORT SharedWatercraftSlim := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 totalWatercraft;
+    UNSIGNED2 maxWatercraftLength;
+    DATASET(DueDiligence.Layouts.WatercraftDataLayout) allWatercraft;
+  END;
 
 //------                                      ------
 //------                                      ------
@@ -146,30 +160,21 @@ EXPORT LayoutsInternal := MODULE
 		string15		Iteration_Key;
 		string2			Source_Code;
 		string1     Orig_name_type;
-		string25		Orig_VIN;                       //*** VIN
-		string4			Orig_Year;                      //*** Year
 		string5			Orig_Make_Code;                 //???
-		string36		Orig_Make_Desc;                 //*** Make
 		string3			Orig_Series_Code;
 		string25		Orig_Series_Desc;               //*** class type?
 		string3			Orig_Model_Code;                //???
-		string30		Orig_Model_Desc;                //*** Model
-		unsigned6   Vina_Price;                     //*** base price
 		UNSIGNED4   historyDateYYYYMMDD;
 		unsigned4   sl_vehicleCount  := 0;
-		string30    license_Plate_Type;            //*** reg license plate type desc
-		string50    Class_Type;
-		/*  Registration */
-		string2     Registered_State;                     //*** Title State
-	 integer2    Registered_Year;                      //*** Title Year
-		integer2    Registered_Month;                     //*** Title Month
-		integer2    Registered_Day; 
-		/*  Title        */  
-		string2     Title_State;                     //*** Title State
-	 integer2    Title_Year;                      //*** Title Year
-		integer2    Title_Month;                     //*** Title Month
-		integer2    Title_Day;                       //*** Title Day  
+		DueDiligence.Layouts.VehicleDataLayout;
  END;		
+ 
+ EXPORT SharedVehicleSlim := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 totalvehicleCount;
+    UNSIGNED2 maxBasePrice;
+    DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles;
+  END;
 
 
 //------                                      ------

@@ -7,12 +7,12 @@
 		UNSIGNED2 	CurrPropOwnedCount;                                 //populated in DueDiligence.getBusProperty
 		UNSIGNED2 	CountSoldProp;                                      //populated in DueDiligence.getBusProperty
     /* BusAssetOwnWatercraft */ 
-		UNSIGNED2 	WatercraftCount;                                    //populated in DueDiligence.getBusWatercraft 
-		UNSIGNED2  	Watercraftlength;                                   //populated in DueDiligence.getBusWatercraft 
+		UNSIGNED2 	WatercraftCount;                                    //populated in DueDiligence.getSharedWatercraft 
+		UNSIGNED2  	Watercraftlength;                                   //populated in DueDiligence.getSharedWatercraft 
     /* BusAssetOwnAircraft */
 		UNSIGNED2 	AircraftCount;                                      //populated in DueDiligence.getBusAircraft
     /* BusAssetOwnVehicle */
-		UNSIGNED2 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
+		UNSIGNED3 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
 		UNSIGNED6  	VehicleBaseValue;
     /*BusSOSAgeRange*/  
 		UNSIGNED4  	sosIncorporationDate;										            //populated in DueDiligence.getBusSOSDetail
@@ -81,30 +81,33 @@
 		BOOLEAN			atleastOneBEOInCategory2;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			BEOsHaveNoConvictionsOrCategoryHits;                //populated in DueDiligence.getBusLegalEvents
     /*BusUSResidency*/
-		BOOLEAN		atleastOneBEOInvalidSSN;
-		BOOLEAN		atleastOneBEOAssocITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEODOBPriorToParentSSN;
-		BOOLEAN   atleastOneBEOParentWithITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEONoParentsOrNeitherHaveSSNITIN;
-		BOOLEAN		atleastOneBEOPublicRecordsLess3YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOOrParentRegisteredVoter;
+		BOOLEAN		  atleastOneBEOInvalidSSN;
+		BOOLEAN		  atleastOneBEOAssocITINOrImmigrantSSN;
+		BOOLEAN		  atleastOneBEODOBPriorToParentSSN;
+		BOOLEAN     atleastOneBEOParentWithITINOrImmigrantSSN;
+		BOOLEAN		  atleastOneBEONoParentsOrNeitherHaveSSNITIN;
+		BOOLEAN		  atleastOneBEOPublicRecordsLess3YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOOrParentRegisteredVoter;
     /* Criminal Evidence flags*/                                    
 		BOOLEAN     BEOevidenceOfCurrentIncarcerationOrParole;        // Level 9
-		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 - at least one 4F - in last 3 years
-		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7 - at least one 4F - older than 3 years
+		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 
+		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7
 		BOOLEAN     BEOevidenceOfPreviousIncarceration;               // Level 6
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5 - at least one 4U - in the last 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4 - at least one 4M - in the last 3 years
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3 - at least one 4U - older than 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2 - at lease one 4M - older than 3 years
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2
     BOOLEAN     BEONoEvidenceOfStateCriminal;
   END;
   
   
   //These are used stricly to calculate the attribute values in getIndKRI
   EXPORT PersonAttributeValues := RECORD
+    /*PerAssetOwnWatercraft*/ 
+		UNSIGNED2 	watercraftCount;                                  //populated in DueDiligence.getSharedWatercraft 
+		UNSIGNED2  	watercraftLength;                                 //populated in DueDiligence.getSharedWatercraft 
     /*PerUSResidency*/
 		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
 		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader
@@ -162,6 +165,9 @@
 		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
     /*PerAccessToFundsIncome*/
     UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
+    /* PerAssetOwnVehicle */
+		UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
+		UNSIGNED6  	VehicleBaseValue;
   END;
 
 END;

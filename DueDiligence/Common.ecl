@@ -218,7 +218,7 @@ EXPORT Common := MODULE
 		
 	EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
 		
-		isEarlierThanArchiveDate := fieldDate < archiveDate AND fieldDate > 0;
+		isEarlierThanArchiveDate := fieldDate <= archiveDate AND fieldDate > 0;
 
 		RETURN isEarlierThanArchiveDate;
 	END;

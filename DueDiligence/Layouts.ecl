@@ -42,8 +42,8 @@ EXPORT Layouts := MODULE
   END;
 
 	EXPORT Address := RECORD
-		STRING   streetAddress1;
-		STRING   streetAddress2;
+		STRING120   streetAddress1;
+		STRING120   streetAddress2;
 		AddressSlimDetail;
 		STRING4  cart;	
 		STRING1  cr_sort_sz;
@@ -69,33 +69,33 @@ EXPORT Layouts := MODULE
 	END;
   
   EXPORT Shared_Input := RECORD
-    STRING lexID;
+    STRING15 lexID;
 		STRING30 accountNumber;
     Address address;
-    STRING phone;
+    STRING14 phone;  //to account if input comes in (xxx) xxx-xxxx
     UNSIGNED6 inputSeq;
   END;
 
 	EXPORT Busn_Input := RECORD
 		LinkID_Results BIP_IDs;
 		Shared_Input;
-		STRING companyName;
-		STRING altCompanyName;
-		STRING fein;
+		STRING120 companyName;
+		STRING120 altCompanyName;
+		STRING11 fein;
 	END;
 
 	EXPORT Indv_Input := RECORD
 		Shared_Input;
 		STRING3 nameInputOrder;
 		Name name;		
-		STRING ssn;
+		STRING11 ssn; //to account if input comes in xxx-xx-xxxx
 		STRING8 dob;
 	END;
 
 
 	EXPORT Input := RECORD
 		BOOLEAN validRequest;
-		STRING errorMessage;
+		STRING200 errorMessage;
 		BOOLEAN addressProvided;
 		BOOLEAN fullAddressProvided;
 		UNSIGNED4 seq;
@@ -205,11 +205,7 @@ EXPORT Layouts := MODULE
 		STRING120 altCompanyName;
 		STRING11  taxID;
 		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
-		STRING120 fullName;
-		STRING20 	firstName;
-		STRING20 	middleName;
-		STRING20 	lastName;
-		STRING5 	suffix;
+		Name;
 		STRING9   ssn;
 		STRING8   dob;
 		
@@ -231,7 +227,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED4	HistoryDateYYYYMMDD;
 	END;
 
-//***Coordinate these changes witht the batch team ***//
+  //***Coordinate these changes witht the batch team ***//
 	EXPORT BatchOut := RECORD
 		UNSIGNED4 seq;
     STRING30 acctNo;
@@ -264,40 +260,40 @@ EXPORT Layouts := MODULE
 		BOOLEAN otherHighRiskIndustExists;
 		BOOLEAN moderateRiskIndustExists;
 		BOOLEAN lowRiskIndustExists;
-		STRING sicCodes;
-		STRING naicCodes;
+		STRING800 sicCodes;
+		STRING800 naicCodes;
 	END;
 
   
 	
 	EXPORT CivilOffensesCounts := RECORD                               
-	/* LIENS and JUDGMENTS and EVICTIONS */  
-		unsigned2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
-		unsigned2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
-		unsigned2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
+	  /* LIENS and JUDGMENTS and EVICTIONS */  
+		UNSIGNED2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
+		UNSIGNED2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
+		UNSIGNED2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
     
-    unsigned2   liensReleasedCnt;                                   //*** liens released EVER
+    UNSIGNED2   liensReleasedCnt;                                   //*** liens released EVER
 		
-		unsigned2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
-		unsigned2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
-		unsigned2   evictionsCnt;                                       //*** evictions EVER
+		UNSIGNED2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
+		UNSIGNED2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
+		UNSIGNED2   evictionsCnt;                                       //*** evictions EVER
 	END;  
 		
 	
 	EXPORT GeographicRiskLayout := RECORD 
 		STRING12    buildgeolink;
 		STRING3	    EasiTotCrime;
-		STRING      CityState;
+		STRING28    CityState;
     STRING5     FipsCode;  
     STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk 
-		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
 	END;  	
 	
  
@@ -338,46 +334,7 @@ EXPORT Layouts := MODULE
     STRING  vl_id;     
 	END;
   
-  EXPORT DIDAndName := RECORD
-    UNSIGNED6 did;
-    Name;
-  END;
-  
-  EXPORT PropertyDataLayout := RECORD
-    Address;
-    STRING50 addressType;
-    STRING8   purchaseDate; 
-    INTEGER8  purchasePrice;
-    INTEGER2  lengthOfOwnership;
-    STRING4 assessedYear;
-    INTEGER8 assessedValue;
-  END;
-  
-  EXPORT BusPropertyDataLayout := RECORD
-    PropertyDataLayout;
-    STRING120 ownerName;
-  END;
-  
-  EXPORT IndPropertyDataLayout := RECORD
-    PropertyDataLayout;
-    BOOLEAN inquiredOwned;
-    BOOLEAN spouseOwned;
-    STRING1 ownerOccupied;
-    DATASET(DIDAndName) propertyOwners;
-  END;
-	
-	
-  
-  EXPORT IndReportDetails := RECORD
-    STRING9 bestSSN;
-    STRING10 bestPhone;
-    UNSIGNED4 bestDOB;
-    Name bestName;
-		Address bestAddress;
-    DATASET(IndPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
-  END;
-	
-	EXPORT Positions := RECORD
+  EXPORT Positions := RECORD
 		UNSIGNED4 firstSeen;
 		UNSIGNED4 lastSeen;
 		STRING title;
@@ -399,18 +356,23 @@ EXPORT Layouts := MODULE
 		BOOLEAN blastPilot;
 		BOOLEAN other;
 	END;
-	
-	EXPORT SlimIndividual := RECORD
+    
+  EXPORT DIDAndName := RECORD
+    UNSIGNED6 did;
+    Name;
+  END;
+  
+  EXPORT SlimIndividual := RECORD
 		DIDAndName;
 		UNSIGNED2 score;		//did score
 		STRING9 ssn;
 		UNSIGNED4 dob;
-		STRING phone;
+		STRING10 phone;
 		Address;
 	END;
   
   EXPORT CriminalSources := RECORD
-    STRING offenseCharge;
+    STRING75 offenseCharge;
     STRING1 offenseConviction;
     STRING1 offenseChargeLevelCalculated;
     STRING35 offenseChargeLevelReported;
@@ -434,7 +396,7 @@ EXPORT Layouts := MODULE
     //used for file validation
     STRING1 validate_trafficRelated;
     UNSIGNED8 validate_category;
-    STRING validate_eventType;
+    STRING100 validate_eventType;
   END;
   
   EXPORT CriminalOffenses := RECORD
@@ -465,8 +427,8 @@ EXPORT Layouts := MODULE
     STRING8 offenseDDFirstReportedActivity;
     UNSIGNED4 offenseDDLastReportedActivity;
     UNSIGNED4 offenseDDLastCourtDispDate;
-    UNSIGNED offenseDDLegalEventTypeCode;
-    STRING offenseCharge;
+    UNSIGNED1 offenseDDLegalEventTypeCode;
+    STRING75 offenseCharge;
     STRING1 offenseDDChargeLevelCalculated;
     STRING35 offenseChargeLevelReported; 
     STRING1 offenseConviction;
@@ -475,22 +437,21 @@ EXPORT Layouts := MODULE
     
     //Additional details
     STRING county;
-    STRING countyCourt;
-    STRING city;
-    STRING agency;
-    STRING race;
+    STRING50 countyCourt;
+    STRING25 city;
+    STRING50 agency;
+    STRING30 race;
     STRING1 sex;
-    STRING hairColor;
-    STRING eyeColor;
+    STRING15 hairColor;
+    STRING5 eyeColor;
     STRING3 height;
     STRING3 weight;
     
     //Source info
     DATASET(CriminalSources) sources;
   END;
-	
-	
-	EXPORT RelatedParty := RECORD
+  
+  EXPORT RelatedParty := RECORD
 		SlimIndividual;
 		STRING2 usResidencyScore;
 		STRING10 usResidencyFlags;
@@ -504,14 +465,85 @@ EXPORT Layouts := MODULE
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
 		UNSIGNED3 numOfLicenses;
 		DATASET(Licenses) licenses; //{MAXCOUNT(DueDiligence.Constants.MAX_LICENSES)};
-    DATASET(CriminalOffenses) indOffenses;
+    DATASET(CriminalOffenses) indOffenses;   //{MAXCOUNT(DueDiligence.Constants.MAX_OFFENSES)};
 	END;
-
-  EXPORT BusReportDetails := RECORD
+  
+  EXPORT PropertyDataLayout := RECORD
+    Address;
+    STRING50 addressType;
+    STRING8   purchaseDate; 
+    INTEGER8  purchasePrice;
+    INTEGER2  lengthOfOwnership;
+    STRING4 assessedYear;
+    INTEGER8 assessedValue;
+  END;
+  
+  EXPORT BusPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    STRING120 ownerName;
+  END;
+  
+  EXPORT IndPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    STRING1 ownerOccupied;
+    DATASET(DIDAndName) propertyOwners;
+  END;
+  
+  EXPORT WatercraftDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) watercraftOwners;
+    UNSIGNED8 purchasePrice;
+    STRING4 year;
+		STRING30 make;
+		STRING30 model;
+    STRING vesselType;
+    STRING propulsion;
+    STRING hullTypeDescription;
+    STRING2 titleState;   //TO REMOVE AFTER WEB
+    UNSIGNED2 vesselLengthFeet;
+    UNSIGNED2 vesselLengthInches;
+    UNSIGNED2 vesselTotalLength;	 
+    UNSIGNED4 oldestTitleDate;
+    UNSIGNED4 newestTitleDate;
+    STRING registrationNumber;
+    UNSIGNED4 oldestRegistrationDate;
+    UNSIGNED4 newestRegistrationDate;
+    STRING2 registrationState;
+  END;
+  
+  EXPORT VehicleDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) vehicleOwners;
+    /* data that describes the vehicle */
+    string25		Orig_VIN;                        
+		string4			Orig_Year;
+    string36		Orig_Make_Desc; 
+    string30		Orig_Model_Desc;
+    string30    license_Plate_Type; 
+    string50    Class_Type;
+    unsigned6   Vina_Price; 
+    /* title  */  
+    string2     Title_State;                   
+	  integer2    Title_Year;                      
+		integer2    Title_Month;                     
+		integer2    Title_Day;                    
+    /* registration */  
+    string2     Registered_State;                    
+	  integer2    Registered_Year;                    
+		integer2    Registered_Month;                  
+		integer2    Registered_Day; 
+	END;
+  
+	EXPORT BusReportDetails := RECORD
     DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
-    STRING  FEIN_Masked_For_Report;
+    STRING9  FEIN_Masked_For_Report;
     UNSIGNED3 FEINSourcesCnt;   
     DATASET(FEINLayoutSources) FEINSources;
     UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
@@ -527,13 +559,25 @@ EXPORT Layouts := MODULE
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
     STRING parentCompanyName;
     UNSIGNED2   DIDlessBEOCount; 
-    DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExecWithNoDID
+    DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
 	END;
-
-
+  
+  EXPORT IndReportDetails := RECORD
+    STRING9 bestSSN;
+    STRING10 bestPhone;
+    UNSIGNED4 bestDOB;
+    Name bestName;
+		Address bestAddress;
+    DATASET(IndPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(WatercraftDataLayout) perWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
+    DATASET(VehicleDataLayout)    perVehicle   {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
+  END;
+	
+	
+  
 	
 	EXPORT Indv_Internal := Record
-		UNSIGNED4 seq := 0;
+		UNSIGNED6 seq := 0;
 		UNSIGNED4 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
 		UNSIGNED4 historyDateRaw;										    //cleaned date used to calc history date
 		BOOLEAN inputAddressProvided;
@@ -557,7 +601,7 @@ EXPORT Layouts := MODULE
 
 
 	EXPORT Busn_Internal := Record
-		UNSIGNED4	  seq := 0;
+		UNSIGNED6	  seq := 0;
 		UNSIGNED4	  historydate;
 		BOOLEAN 		inputAddressProvided;
 		BOOLEAN			fullInputAddressProvided;
@@ -567,8 +611,8 @@ EXPORT Layouts := MODULE
 		STRING2			relatedDegree;					 								            //IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec
 		UNSIGNED2		linkBusCount;
 		DATASET(Busn_Input) linkedBusinesses {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};	//populated in DueDiligence.getBusLinkedBus
-		UNSIGNED2		execCount;                           
-		DATASET(RelatedParty) execs        {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
+		UNSIGNED2		execCount;
+		DATASET(RelatedParty) execs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
     
     DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
 
@@ -581,28 +625,20 @@ EXPORT Layouts := MODULE
 		SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic -- ATTRIBUTE AND OTHER LAYOUTS??
 		UNSIGNED3		numOfSicNaic;
 		DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		UNSIGNED3		numOfRegAgents;
+		
+    UNSIGNED3		numOfRegAgents;
 		DATASET(LayoutAgent) registeredAgents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};		//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		
 		/* BusMatchLevel  */ 
 		INTEGER2		weight;                                             //populated in -------------------------- 
 		
-		unsigned4   SOSLastReported;																								
-		unsigned2 	CorpStateCount;													
-		unsigned4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
-		STRING1     dwelltype := '';
-		STRING1     hriskaddrflag := '';
-		string5     FIPsCode;
-		string2	    src := '';
-		
+											
+		UNSIGNED4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
+		STRING5     FIPsCode;
+
 		/*BusGeographicRisk*/
 		GeographicRiskLayout;   
-		
-		string30  	ShellBusnIndvalues;
-		unsigned1   ShellIndCount;
-		boolean     ShelfBusn;
-		BOOLEAN		  PotentialNIS;
-		boolean     ExecSNNMatch;
+
 	  /* Civil Offenses   */   
 		CivilOffensesCounts  Business;
 
