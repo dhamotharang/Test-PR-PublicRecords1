@@ -202,7 +202,6 @@ end;
 export t_DDRBusinessExecutiveCriminalEvents := record
 	iesp.duediligenceshared.t_DDRLegalEventIndividual ExecutiveOfficer {xpath('ExecutiveOfficer')};
 	string ExecTitle {xpath('ExecTitle')};
-	dataset(iesp.duediligenceshared.t_DDRLegalEventCriminal) CriminalEvents {xpath('CriminalEvents/CriminalEvent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
 	dataset(iesp.duediligenceshared.t_DDRLegalStateCriminal) Criminals {xpath('Criminals/Criminal'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
 end;
 		

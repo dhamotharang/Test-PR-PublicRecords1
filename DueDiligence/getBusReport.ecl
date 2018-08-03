@@ -32,7 +32,10 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   addShellShelf              := DueDiligence.reportBusShellShelf(addDIDLessExecutives);
   
   //***This section is for Property ***//
-  addProperty              := DueDiligence.reportBusProperty(addShellShelf);
+  addProperty := DueDiligence.reportBusProperty(addShellShelf);
+  
+  //***This section is for Watercraft ***//
+  addWatercraft := DueDiligence.reportBusWatercraft(addProperty);
  
 																													
 													 
@@ -50,5 +53,5 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // OUTPUT(addDIDLessExecutives, NAMED('addDIDLessExecutives'));  
 
 
-	RETURN addProperty;
+	RETURN addWatercraft;
 END;

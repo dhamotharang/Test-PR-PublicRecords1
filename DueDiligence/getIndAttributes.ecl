@@ -46,8 +46,14 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   //get property information
   indProperty := DueDiligence.getIndProperty(indSSNData, dataRestrictionMask);
   
+  //get watercraft information
+  indWatercraft := DueDiligence.getIndWatercraft(indProperty);
+  
+  //get vehicle information
+  indVehicle := DueDiligence.getIndVehicle(indWatercraft, dataRestrictionMask);
+  
   //get legal information
-  indCriminalData := DueDiligence.getIndLegalEvents(indProperty);
+  indCriminalData := DueDiligence.getIndLegalEvents(indVehicle);
   
   //if a person report is being requested, populate the report
   indReportData :=  IF(includeReport, DueDiligence.getIndReport(indCriminalData, ssnMask), indCriminalData);
@@ -71,6 +77,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(indHeader, NAMED('indHeader')));
 	IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
 	IF(debugMode, OUTPUT(indProperty, NAMED('indProperty')));
+	IF(debugMode, OUTPUT(indWatercraft, NAMED('indWatercraft')));
+	IF(debugMode, OUTPUT(indVehicle, NAMED('indVehicle')));
 	IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
 	IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
 	IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));

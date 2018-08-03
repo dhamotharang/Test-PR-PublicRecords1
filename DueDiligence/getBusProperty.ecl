@@ -2,9 +2,7 @@
 
 EXPORT getBusProperty(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-											 BIPV2.mod_sources.iParams linkingOptions,
-											 boolean DebugMode = FALSE
-											 ) := FUNCTION
+											 BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
 
   // ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
@@ -125,24 +123,15 @@ EXPORT getBusProperty(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData,
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	 IF(DebugMode,     OUTPUT(CHOOSEN(BusnKeys, 10),              NAMED('Sample_BusnKeys_for_Property')));    	   	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyRaw_with_seq, 10),  NAMED('Sample_PropertyStep1_ALL')));
-	 IF(DebugMode,     OUTPUT(COUNT  (PropertyRaw_with_seq),       NAMED('HowManyPropertyStep1')));
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_Filtered, 100),     NAMED('Sample_Property_Filtered_Step2')));
-	 IF(DebugMode,     OUTPUT(COUNT  (Property_Filtered),          NAMED('HowManyPropertyAfterFilter')));
-
-
+  // OUTPUT(PropertyRaw_with_seq, NAMED('PropertyRaw_with_seq'));
+  // OUTPUT(propertyCleanDates, NAMED('propertyCleanDates'));
+  // OUTPUT(Property_Filtered, NAMED('Property_Filtered'));
    
-   // OUTPUT(PropertyRaw_with_seq, NAMED('PropertyRaw_with_seq'));
-   // OUTPUT(propertyCleanDates, NAMED('propertyCleanDates'));
-   // OUTPUT(Property_Filtered, NAMED('Property_Filtered'));
-   
-   // OUTPUT(formatProperty, NAMED('formatProperty'));
-   // OUTPUT(propertyDeduped, NAMED('propertyDeduped'));
-   // OUTPUT(propDetails, NAMED('propDetails'));
-   // OUTPUT(reportProp, NAMED('reportProp'));
-   // OUTPUT(UpdateBusnOwnedProperty, NAMED('UpdateBusnOwnedProperty'));
-
+  // OUTPUT(formatProperty, NAMED('formatProperty'));
+  // OUTPUT(propertyDeduped, NAMED('propertyDeduped'));
+  // OUTPUT(propDetails, NAMED('propDetails'));
+  // OUTPUT(reportProp, NAMED('reportProp'));
+  // OUTPUT(UpdateBusnOwnedProperty, NAMED('UpdateBusnOwnedProperty'));
 
 
 	RETURN UpdateBusnOwnedProperty;

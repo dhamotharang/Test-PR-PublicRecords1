@@ -52,7 +52,7 @@ EXPORT reportSharedLegal := MODULE
                                                            SELF.OffenseStatute := LEFT.offenseStatute;
                                                            SELF.OffenseDDFirstReported := iesp.ECL2ESP.toDatestring8(LEFT.offenseDDFirstReportedActivity);
                                                            SELF.OffenseDDLastReportedActivity := iesp.ECL2ESP.toDate(LEFT.offenseDDLastReportedActivity);
-                                                           // SELF.OffenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseDDLastCourtDispDate);
+                                                           SELF.OffenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseDDLastCourtDispDate);
                                                            SELF.OffenseDDLegalEventTypeMapped := DueDiligence.translateExpression.expressionTextByEnum(LEFT.offenseDDLegalEventTypeCode);
                                                            SELF.OffenseCharge := LEFT.offenseCharge;
                                                            SELF.OffenseDDChargeLevelCalculated := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.offenseDDChargeLevelCalculated);
@@ -81,7 +81,6 @@ EXPORT reportSharedLegal := MODULE
                                                                                    TRANSFORM(iesp.duediligenceshared.t_DDRLegalSourceInfo,
                                                                                               SELF.OffenseCharge := LEFT.offenseCharge;
                                                                                               SELF.OffenseConviction := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.offenseConviction);
-                                                                                              SELF.OffenseChargeLevelCalculated := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.offenseChargeLevelCalculated);
                                                                                               SELF.OffenseChargeLevelReported := LEFT.offenseChargeLevelReported;
                                                                                               SELF.Source := LEFT.source;
                                                                                               SELF.CourtDisposition1 := LEFT.courtDisposition1;
