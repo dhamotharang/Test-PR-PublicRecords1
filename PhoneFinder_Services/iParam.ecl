@@ -125,13 +125,10 @@ MODULE
    		EXPORT STRING    DataPermissionMask 		:= globalMod.DataPermissionMask;
    		EXPORT STRING6   DOBMask             	:= AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
    		EXPORT STRING6   SSNMask            		:= AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-   		EXPORT BOOLEAN   UseLastResort      		:= doxie.DataPermission.use_LastResort AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
-   		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
+   	 EXPORT BOOLEAN   UseLastResort      		:= doxie.DataPermission.use_LastResort AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
+   		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;	
    		EXPORT BOOLEAN   UseQSent           		:= ~doxie.DataRestriction.QSent AND TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate];
-   		EXPORT BOOLEAN   UseAccuData_OCN     := pfOptions.IncludePhoneMetadata AND ~Doxie.DataRestriction.AccuData AND TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,
-   		                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate,
-   		                                                                                                  PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];
-   		EXPORT BOOLEAN   UseTargus          		:= ~doxie.DataRestriction.PhoneFinderTargus AND TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
+   	
    		EXPORT BOOLEAN   UseEquifax         		:= ~doxie.DataRestriction.EquifaxPhoneMart AND TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
    		EXPORT BOOLEAN   useWaterfallv6					  := FALSE : STORED('useWaterfallv6');	// internal
    		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 																			 
@@ -208,6 +205,15 @@ MODULE
 			 EXPORT BOOLEAN   UseDeltabase 					                 := IF(IsGetMetaData
 			                                                          ,RealTimedata
 																							                                        ,FALSE);		
+    
+    IncludeAccudataOCN_internal                         := pfOptions.IncludeAccudataOCN: STORED('IncludeAccudataOCN');
+    EXPORT BOOLEAN   UseAccuData_OCN                    := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN_internal) AND 
+                                                           ~Doxie.DataRestriction.AccuData; 
+                                                           
+    IncludeTargus_internal                              := pfOptions.IncludeTargus: STORED('IncludeTargus');    
+    EXPORT BOOLEAN   UseTargus          		              := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR IncludeTargus_internal) AND 
+                                                           ~doxie.DataRestriction.PhoneFinderTargus;                                                      
+    
 		END;
 			
 			RETURN in_params;
