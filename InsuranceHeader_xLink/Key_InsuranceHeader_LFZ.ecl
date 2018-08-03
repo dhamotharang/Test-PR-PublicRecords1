@@ -1,8 +1,8 @@
 ﻿IMPORT SALT37,std;
-EXPORT Key_InsuranceHeader_LFZ(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit=Config.LFZ_MAXBLOCKLIMIT) := MODULE/*HACK*/
+EXPORT Key_InsuranceHeader_LFZ(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.LFZ_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //LNAME:FNAME:ZIP:+:CITY:PRIM_RANGE:PRIM_NAME:SSN5:SSN4:MNAME:SEC_RANGE:SNAME:DOB:ST
-EXPORT KeyName := KeyNames().LFZ_super; /*HACK*/
+EXPORT KeyName := KeyNames().LFZ_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::LFZ';
  
@@ -84,10 +84,10 @@ s := Specificities(File_InsuranceHeader).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((LNAME NOT IN SET(s.nulls_LNAME,LNAME) AND LNAME <> (TYPEOF(LNAME))''),(FNAME NOT IN SET(s.nulls_FNAME,FNAME) AND FNAME <> (TYPEOF(FNAME))''),(ZIP NOT IN SET(s.nulls_ZIP,ZIP) AND ZIP <> (TYPEOF(ZIP))'')),layout),WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Project out the fields in match candidates required for this Name()
 SHARED DataForKey := project(DataForKey0, transform(layout,	BOOLEAN emptyConcept :=  left.CITY = '' and 	left.PRIM_NAME = '';  
-		// 10-19 => zipweight/3 or 20 and greater => zipweight/4 
+	 // 10-19 => zipweight/3 or 20 and greater => zipweight/4 
 		self.ZIP_weight100 := IF (emptyConcept AND left.ZIP_weight100 >=1000 AND left.ZIP_weight100<2000,  
 					left.ZIP_weight100/3, IF (emptyConcept AND left.ZIP_weight100>=2000, left.ZIP_weight100/4, left.ZIP_weight100)); 
-		self := left)); /*HACK*/
+		self := left)); /*HACK15*/
  
 EXPORT Key := INDEX(DataForKey,{DataForKey},{BOOLEAN IsIncremental := incremental},KeyName);
  
@@ -122,7 +122,7 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
-EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.LFZ_MAXBLOCKLIMIT, aBlockLimit);
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.LFZ_MAXBLOCKLIMIT, aBlockLimit);/*HACK24a*/
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0;
 KeyRec := RECORDOF(Key);
  
@@ -130,16 +130,16 @@ EXPORT RawFetch(TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME
     STEPPED( LIMIT( Key(
           KEYED(( LNAME = param_LNAME AND param_LNAME <> (TYPEOF(LNAME))''))
       AND KEYED(( FNAME = param_FNAME AND param_FNAME <> (TYPEOF(FNAME))''))
-      AND KEYED(( ZIP = param_ZIP AND param_ZIP <> (TYPEOF(ZIP))''))),MAX_BLOCKLIMIT /*HACK*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+      AND KEYED(( ZIP = param_ZIP AND param_ZIP <> (TYPEOF(ZIP))''))),MAX_BLOCKLIMIT/*HACK24b*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
 EXPORT ScoredDIDFetch(TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.ZIP) param_ZIP = (TYPEOF(h.ZIP))'',TYPEOF(h.CITY) param_CITY = (TYPEOF(h.CITY))'',TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',UNSIGNED4 param_DOB,TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetch(param_LNAME,param_LNAME_len,param_FNAME,param_FNAME_len,param_ZIP);
  
   Process_xIDL_Layouts().LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 10; // Set bitmap for keys used
+    SELF.keys_used := 1 << 11; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
-    SELF.keys_failed := IF(le.DID = 0, 1 << 10, 0); // Set bitmap for key failed
+    SELF.keys_failed := IF(le.DID = 0, 1 << 11, 0); // Set bitmap for key failed
     SELF.LNAME_match_code := match_methods(File_InsuranceHeader).match_LNAME(le.LNAME,param_LNAME,le.LNAME_len,param_LNAME_len,TRUE);
     SELF.LNAMEWeight := (50+MAP (
            le.LNAME = param_LNAME  => le.LNAME_weight100,
@@ -293,7 +293,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
  
   Process_xIDL_Layouts().LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 10; // Set bitmap for keys used
+    SELF.keys_used := 1 << 11; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.LNAME_match_code := match_methods(File_InsuranceHeader).match_LNAME(le.LNAME,ri.LNAME,le.LNAME_len,ri.LNAME_len,TRUE);
@@ -433,11 +433,6 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J5 := PROJECT(J4(keys_poisoned > 0), Process_xIDL_Layouts().apply_poison(LEFT)) & J4(keys_poisoned = 0);
   DD := DISTRIBUTE(outdups,HASH(__Shadow_Ref)); // Restore dups driven in local mode
   SALT37.MAC_Dups_Restore(J5,DD,J6,Reference,TRUE)
-	// output(j0, named('j0'));
-	// output(j3, named('j3'));
-	// output(j4, named('j4'));
-	// output(j5, named('j5'));
-	// output(j6, named('j6'));
   RETURN J6;
 END;
 // Now the sloppier macro to allow processing of an 'arbitrary' file

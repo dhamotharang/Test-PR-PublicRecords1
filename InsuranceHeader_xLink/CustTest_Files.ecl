@@ -1,4 +1,4 @@
-IMPORT ut, data_services, _control;
+﻿IMPORT ut, data_services, _control;
 
 EXPORT CustTest_Files(STRING fileVersion) := MODULE
 
@@ -19,6 +19,7 @@ EXPORT CustTest_Files(STRING fileVersion) := MODULE
 	EXPORT ssn_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::DOBF';
 	EXPORT zip_pr_super		:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::SRC_RID';
 	EXPORT dln_super			:= prefix + '::' + KeySuperfile + '::' + 'DID::Refs::DLN';
@@ -37,6 +38,7 @@ EXPORT CustTest_Files(STRING fileVersion) := MODULE
 	EXPORT ssn_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_father		:= prefix + '::' + keyFather + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DOBF';
 	EXPORT zip_pr_father	:= prefix + '::' + keyFather + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::SRC_RID';
 	EXPORT dln_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DLN';
@@ -55,6 +57,7 @@ EXPORT CustTest_Files(STRING fileVersion) := MODULE
 	EXPORT ssn_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::DOBF';
 	EXPORT zip_pr_logical		:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::SRC_RID';
 	EXPORT dln_logical			:= prtePrefix + '::' + buildDate + '::' + 'DID::Refs::DLN';
