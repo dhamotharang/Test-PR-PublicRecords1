@@ -214,17 +214,10 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			model_url := PROJECT(model_url_pre, Models.Layout_Score_Chooser);
 */
 			model_url := DATASET([], Models.Layout_Score_Chooser);
-			gateways_in := Gateway.Configuration.Get();
 
-      // Configure Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we 
+      // Allow Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we 
       // get clarification from Product, turn off all other Gateway calls here in CIID.
-      Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-        self.servicename := if(le.servicename = 'bridgerwlc' and OFAC_version = 4, le.servicename, '');
-        self.url         := if(le.servicename = 'bridgerwlc' and OFAC_version = 4, le.url, ''); 
-        self := le;								
-      end;
-      
-      gateways := project(gateways_in, gw_switch(left));
+      gateways := Options.Gateways; 
 			
 			rec := record
 				unsigned4 seq;
