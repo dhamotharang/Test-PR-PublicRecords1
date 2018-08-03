@@ -7,7 +7,7 @@
 IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	WSInput.MAC_FraudGovPlatform_Services_SearchService();
 
 	ds_in					:= DATASET([],iesp.fraudgovsearch.t_FraudGovSearchRequest) : STORED('FraudGovSearchRequest', FEW);
@@ -20,7 +20,7 @@ EXPORT SearchService() := MACRO
 	#STORED('GlobalCompanyId', FraudGovUser.GlobalCompanyId);
 	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
 	#STORED('ProductCode',FraudGovUser.ProductCode); 
-	#STORED('FraudPlatform', Options.Platform);
+	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline', Options.IsOnline);
 
 	// *********************************Validation*******************************************

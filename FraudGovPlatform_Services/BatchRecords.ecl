@@ -48,15 +48,43 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 														
 		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_w_velocities(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L,
 																																				   DATASET(FraudGovPlatform_Services.Layouts.velocities) R) := TRANSFORM
+			SELF.LexID := L.batchin_rec.did;
+			SELF.identity_resolved := IF(L.batchin_rec.did <> 0 , 'Y', 'N');			
 			SELF.batchin_rec := L;
 			SELF.childRecs_Velocities := R;
 			SELF := L; 
 			SELF := [];
 		END;
+		
+		ds_results_w_velocities := DENORMALIZE(ds_w_known_frauds, ds_Velocities, 
+																						LEFT.acctno = RIGHT.acctno,
+																						GROUP,
+																						xfm_w_velocities(LEFT, ROWS(RIGHT)),
+																						LEFT OUTER);
 
-		EXPORT ds_results_w_velocities := DENORMALIZE(ds_w_known_frauds, ds_Velocities, 
-																				LEFT.acctno = RIGHT.acctno,
-																				GROUP,
-																				xfm_w_velocities(LEFT, ROWS(RIGHT)),
-																				LEFT OUTER);		
+		//Creating the tree_uid and entity_context_uid for fetching scores from kel keys. 
+		ds_entityNameUID := PROJECT(ds_results_w_velocities(identity_resolved = 'Y'), 
+													TRANSFORM(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs,
+														SELF.acctno := LEFT.acctno,
+														SELF.entity_name := FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT, 
+														SELF.entity_value := (string) LEFT.LexID,
+														// SELF.record_id := '';
+														SELF.tree_uid := FraudGovPlatform_Services.Constants.KelEntityIdentifier._LEXID + (string) LEFT.LexID;
+														SELF.entity_context_uid := FraudGovPlatform_Services.Constants.KelEntityIdentifier._LEXID + (string) LEFT.LexID,
+														SELF := []));
+
+		/* Returning Score for records for which identity_resolved = Y*/
+		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
+		ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
+
+		ds_results_w_scores := JOIN(ds_results_w_velocities, ds_cluster_recs_scores, 
+																LEFT.acctno = RIGHT.acctno,
+																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
+																		SELF.risk_score := RIGHT.Score_,
+																		SELF.risk_level := FraudGovPlatform_Services.Utilities.GetRiskLevel(RIGHT.Score_),
+																		SELF := LEFT),
+																		LEFT OUTER
+																);
+		
+		EXPORT ds_results := ds_results_w_scores;
 END;

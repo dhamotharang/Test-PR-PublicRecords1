@@ -1,23 +1,26 @@
-﻿IMPORT Address, BatchDatasets, FraudShared, Gateway, risk_indicators, riskwise, UT;
+﻿IMPORT BatchDatasets, FraudShared, Gateway, risk_indicators, riskwise, UT;
 
 EXPORT IParam := MODULE
-  // Need to use BatchDatasets instead of BatchShare because of industry_class needed by DID lookup
+  
   EXPORT BatchParams := INTERFACE (BatchDatasets.IParams.BatchParams)
 		EXPORT boolean   AppendBest := true;
 		EXPORT boolean   TestVelocityRules := false;
 		EXPORT boolean   IsOnline := false;
 		EXPORT UNSIGNED3 DIDScoreThreshold;
-		EXPORT unsigned6 GlobalCompanyId;     // company (agency)
-		EXPORT unsigned2 IndustryType;        // company (agency) program i.e. SNAP, TANF, Medicaid, etc..
-		EXPORT string 	 IndustryTypeName;
+		EXPORT unsigned6 GlobalCompanyId;	// company (agency)
+		EXPORT unsigned2 IndustryType;	// company (agency) program code i.e. 1292, 1321 etc..
+		EXPORT string 	 IndustryTypeName; // company (agency) program code i.e. SNAP, UNEMPLOYMENT, MEDICAID, etc..
 		EXPORT unsigned6 ProductCode;
-		EXPORT string    AgencyVerticalType;  // agency vertical type i.e. Tax, Health, Labor, etc..
-		EXPORT string18  AgencyCounty;        // agency location
-		EXPORT string2   AgencyState;         // agency location
-		EXPORT DATASET(Gateway.Layouts.Config)	Gateways := dataset ([], Gateway.Layouts.Config);
+		EXPORT string    AgencyVerticalType;	// agency vertical type i.e. Tax, Health, Labor, etc..
+		EXPORT string18  AgencyCounty;	// agency location
+		EXPORT string2   AgencyState;	// agency location
+		EXPORT DATASET	(Gateway.Layouts.Config)	Gateways := dataset ([], Gateway.Layouts.Config);
 		EXPORT integer 	 MaxVelocities;
-		EXPORT string 	  FraudPlatform;
-		EXPORT boolean  	ReturnDetailedRoyalties;
+		EXPORT integer 	 MaxKnownFrauds;
+		EXPORT string		 FraudPlatform;
+		EXPORT boolean   ReturnDetailedRoyalties;
+		EXPORT string6 	 DOBMask := 'NONE';
+		
 		//InstantID
 		EXPORT boolean IIDVersionOverride;
 		EXPORT string1 IIDVersion := '0';
@@ -59,7 +62,6 @@ EXPORT IParam := MODULE
 		IndustryTypeCode := FraudShared.Key_MbsFdnIndType(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)
 																			(keyed(description = ut.CleanSpacesAndUpper(IndustryType_Name)))[1].ind_type;
 		
-
 		base_params := BatchDatasets.IParams.getBatchParams();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT boolean   TestVelocityRules	:= false: STORED('TestVelocityRules'); // this option is internal to roxie. added to toggle between test/actual velocity rules. 
@@ -73,10 +75,12 @@ EXPORT IParam := MODULE
 			EXPORT string 	 AgencyVerticalType := ''		: STORED('VerticalType');
 			EXPORT string18  AgencyCounty       := ''		: STORED('AgencyCounty');
 			EXPORT string2   AgencyState        := ''		: STORED('AgencyState');
-			EXPORT DATASET(Gateway.Layouts.Config) Gateways						:= 	dataset ([], Gateway.Layouts.Config) : STORED('Gateways');
 			EXPORT integer   MaxVelocities      := FraudGovPlatform_Services.Constants.MAX_VELOCITIES : STORED('MaxVelocities');
+			EXPORT integer   MaxKnownFrauds     := FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS : STORED('MaxKnownFrauds');
 			EXPORT string    FraudPlatform			:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM : STORED('FraudPlatform');
 			EXPORT BOOLEAN   ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
+			EXPORT DATASET(Gateway.Layouts.Config) Gateways	:= 	dataset ([], Gateway.Layouts.Config) : STORED('Gateways');
+			EXPORT string6 	 DOBMask := 'NONE' : STORED('DOBMask');
 
 			//InstantID
 			EXPORT boolean IIDVersionOverride := FALSE	: STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
@@ -86,9 +90,9 @@ EXPORT IParam := MODULE
 			EXPORT unsigned1 lowestAllowedVersion := FraudGovPlatform_Services.Constants.lowestAllowedVersion;	// lowest allowed version according to product, unless the IIDVersionOveride is true
 			EXPORT unsigned1 maxAllowedVersion := FraudGovPlatform_Services.Constants.lowestAllowedVersion;	// maximum allowed version as of 1/28/2014
 
-			EXPORT actualIIDVersion := MAP((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-			IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
-			(unsigned)IIDversion); // they can override, give them whatever they asked for
+			EXPORT actualIIDVersion := MAP(	(unsigned1)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
+																			IIDVersionOverride = false => MIN(MAX((unsigned1)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
+																			(unsigned1)IIDversion); // they can override, give them whatever they asked for
 			EXPORT boolean IsInstantID := FraudGovPlatform_Services.Constants.IsInstantID;
 			EXPORT DATASET(riskwise.layouts.reasoncode_settings) reasoncode_settings := DATASET([{IsInstantID, actualIIDVersion, EnableEmergingID}],riskwise.layouts.reasoncode_settings);
 			EXPORT boolean IsPOBoxCompliant := false : STORED('PoBoxCompliance');
@@ -112,8 +116,8 @@ EXPORT IParam := MODULE
 			EXPORT unsigned1 RedFlag_version := 1 : STORED('RedFlag_version');		
 			EXPORT	unsigned3 history_date := 999999 : STORED('HistoryDateYYYYMM');			
 			EXPORT string3 NameInputOrder := '' : STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
-
 			EXPORT string20 search_type := 'BOTH' : STORED('search_type');
+			
 			//Following fields are specific to FraudGovPlatform_Services.SearchService.
 			EXPORT string10 ProgramCode := '' : STORED('ProgramCode');
 			EXPORT string20 HouseholdId := '' : STORED('HouseholdId');
