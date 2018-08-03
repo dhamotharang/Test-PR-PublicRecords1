@@ -153,7 +153,7 @@ export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_i
 	onThor := Models.Healthcare_Constants_Core.default_onThor;
 
 	//Calling Profile Booster Search Function and fetching the attributes
-	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest, onThor);  
+	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest);  
 	//Combining Lead Integrity and Profile Booster attributes
 	Combined_LI_PB_Attributes := 	Join(rawResults_final, pb_attributes, left.seq=(string)right.seq, transform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined,
 					self.acctno := left.acctno;
