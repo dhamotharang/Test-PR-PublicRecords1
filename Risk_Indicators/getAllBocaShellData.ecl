@@ -834,6 +834,7 @@ bsplus add_back_derogs(Layout_Boca_Shell le, derogs_w_rel_crims ri) := TRANSFORM
 	// check for not relative and did is main did for multiple did situations
 	mainDid := if(BSversion>2, ~ri.isrelat and le.did=ri.did, ~ri.isrelat);	// not sure a difference but making sure old versions work as they were
 	SELF.BJL := IF(mainDid,ri.BJL,le.BJL);
+  self.bk_chapters := IF(mainDid,ri.bk_chapters,le.bk_chapters);
 	self.bjl_populated := if (mainDid, true, false);
 	SELF.Relatives.relative_bankrupt_count := (INTEGER)(ri.isrelat AND ri.BJL.bankrupt);
 	SELF.Relatives.relative_criminal_count := (INTEGER)(ri.isrelat AND ri.BJL.criminal_count>0);

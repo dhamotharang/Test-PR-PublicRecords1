@@ -27,6 +27,12 @@ export shortcuts := module
 	export Dev194 := 'http://roxiedevvip3.sc.seisint.com:9876';  // dev roxie 194
 	export Dev196 := 'http://roxiedataqa.sc.seisint.com:9876';  // dev roxie 196
 	
+  export dev154 := 'http://dev154vip.hpcc.risk.regn.net:9876'; // dev roxie 154
+	export Dev155 := 'http://dev155vip.hpcc.risk.regn.net:9876';  // dev roxie 155
+	export Dev156 := 'http://dev156vip.hpcc.risk.regn.net:9876';  // dev roxie 156
+	export Dev157 := 'http://dev157vip.hpcc.risk.regn.net:9876';  // dev roxie 157
+	export Dev158 := 'http://dev158vip.hpcc.risk.regn.net:9876';  // dev roxie 158
+    
 	// keep these 4 around just in case there are any scripts using them
 	export Dev64RoxieIP := dev190;
 	export Dev64 := dev190; 
@@ -204,7 +210,7 @@ export shortcuts := module
 	EXPORT ox50_in := RECORD
 		unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 		INTEGER version := 0;
-		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements;	
+		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements - bk_chapters;	
 		string200 errorcode;
 	end;
 	
