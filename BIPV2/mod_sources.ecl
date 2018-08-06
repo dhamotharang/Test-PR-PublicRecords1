@@ -1,4 +1,4 @@
-// mod_sources
+﻿// mod_sources
 // 1. various ways to retrieve a bitmap corresponding to one or more sources
 // 2. lists of sources included in header, and partitioned vs. citizen
 
@@ -416,6 +416,7 @@ export mod_sources := module
 		,MDR.sourceTools.set_TXBUS					// S18
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
+    ,MDR.sourceTools.set_Cortera        // S61
 	];
 
 	// These sources participate in the header build, but are excluded
