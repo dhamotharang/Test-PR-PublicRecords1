@@ -251,6 +251,12 @@ EXPORT Layouts := MODULE
 		STRING11 geo_long;
 		UNSIGNED8 date_added;
 	END;
+	
+	EXPORT response_deltabase_layout := RECORD                         
+		DATASET(LOG_Deltabase_Layout_Record) deltaFields {XPATH('Records/Rec')};
+		STRING  RecsReturned {XPATH('RecsReturned')};
+		INTEGER responsetime {XPATH('Latency')};
+	END;	
 
 	EXPORT fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;

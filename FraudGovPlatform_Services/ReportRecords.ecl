@@ -47,7 +47,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 	
 		ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
 
-		ds_delta_recentActivity := mod_Deltabase_Functions.getDeltabaseReportRecords(ds_batch_in_extended, batch_params);
+		ds_delta_recentActivity := mod_Deltabase_Functions(batch_params).getDeltabaseReportRecords(ds_batch_in_extended);
 
 		ds_recentTransactions_sorted := SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day);
 

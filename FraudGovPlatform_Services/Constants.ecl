@@ -40,7 +40,7 @@
   //=================================================================
   //  Delta base read & SOAPCALL related limits
   //=================================================================
-  EXPORT limiter      := ' LIMIT 50 ; ';
+  EXPORT limiter      := ' LIMIT 1000; ';
   EXPORT read_retry   := 2;  
   EXPORT read_timeout := 75; 
   EXPORT maxRecs      := 100;

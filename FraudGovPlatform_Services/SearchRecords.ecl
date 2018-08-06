@@ -151,7 +151,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 	
 
-	ds_delta_recentTransactions := mod_Deltabase_Functions.getDeltabaseSearchRecords(batch_params);											
+	ds_delta_recentTransactions := mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();											
 																		
 	//Assembling all the pieces together to form search response.	
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs L, ds_fragment_tab_Recs R)  := TRANSFORM

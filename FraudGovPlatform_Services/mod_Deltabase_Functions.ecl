@@ -1,77 +1,103 @@
 ﻿IMPORT Address, FraudGovPlatform_Services, FraudShared, FraudShared_Services, Gateway, iesp, lib_thorlib, mysql, STD, ut;
 
-EXPORT mod_Deltabase_Functions := MODULE
-
-		SHARED GetRecentTimelineDetails(DATASET(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record) ds_delta_records) := FUNCTION
-
-		iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails(
-										FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record L) := TRANSFORM
-										
-			date_added := (INTEGER)(L.date_added[1..8]);
-			SELF.IsRecentActivity := TRUE;
-			SELF.FileType := 3;
-			SELF.GlobalCompanyId := (INTEGER)L.gc_id;
-			SELF.TransactionId := (STRING)L.cust_transaction_id;
-			SELF.HouseHoldId := L.case_id;
-			SELF.CustomerPersonId := L.client_uid;
-			SELF.EventDate.Year := STD.Date.Year(date_added);
-			SELF.EventDate.Month := STD.Date.Month(date_added);
-			SELF.EventDate.Day := STD.Date.Day(date_added);
-			SELF.IndustryTypeDescription := L.program_name;
-			SELF.ReportedBy := L.inquiry_source;
-			SELF.ActivityReason := L.inquiry_reason;
-			SELF.UniqueId := (STRING)L.lex_id;
-			SELF.Name.Full := L.name_full;
-			SELF.Name.First := L.name_first;
-			SELF.Name.Middle := L.name_middle;
-			SELF.Name.Last := L.name_last;
-			SELF.Name.Suffix := L.name_suffix;
-			SELF.Name.Prefix := L.name_prefix;
-			SELF.SSN := L.ssn;
-			SELF.DOB.Year := IF(L.dob <> '', STD.Date.Year((INTEGER)L.dob), 0);
-			SELF.DOB.Month := IF(L.dob <> '', STD.Date.Month((INTEGER)L.dob), 0);
-			SELF.DOB.Day := IF(L.dob <> '', STD.Date.Day((INTEGER)L.dob), 0);
-			SELF.PhysicalAddress.StreetAddress1 := L.physical_address;		
-			SELF.PhysicalAddress.City := L.physical_city;
-			SELF.PhysicalAddress.State := L.physical_state;
-			SELF.PhysicalAddress.Zip5 := L.physical_zip;
-			SELF.PhysicalAddress.County := L.physical_county;
-			SELF.MailingAddress.StreetAddress1 := L.mailing_address;
-			SELF.MailingAddress.City := L.mailing_city;
-			SELF.MailingAddress.State := L.mailing_state;
-			SELF.MailingAddress.Zip5 := L.mailing_zip;
-			SELF.MailingAddress.County := L.mailing_county;
-			SELF.Phones := IF(L.phone <> '',
-												ROW({FraudGovPlatform_Services.Constants.PHONE_TYPE.PHONE_TYPE_HOME, L.phone,''}, iesp.fraudgovreport.t_FraudGovPhoneInfo),
-												ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
-												);
-			SELF.EmailAddress := L.email_address;
-			SELF.DriversLicense.DriversLicenseNumber := L.dl_number;
-			SELF.DriversLicense.DriversLicenseState := L.dl_state;
-			SELF.BankInformation1.BankAccountNumber := L.bank_account_number;
-			SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number;
-			SELF.IpAddress := L.ip_address;
-			SELF.DeviceId := L.device_id;
-			SELF.GeoLocation.Latitude := L.geo_lat;
-			SELF.GeoLocation.Longitude := L.geo_long;
-			SELF := [];
+EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
+		
+		SHARED Layout_LogDeltabase := FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record;
+		SHARED Layout_DeltabaseSelect := FraudShared_Services.Layouts.t_DeltaBaseSelectRequest;
+		SHARED Layout_DeltabaseResponse := FraudGovPlatform_Services.Layouts.response_deltabase_layout;
+		SHARED serviceUrl := batch_params.gateways(servicename = Gateway.Constants.ServiceName.FraudGovDeltabase)[1].Url;
+		
+		SHARED DeltabaseSoapcall(DATASET(Layout_DeltabaseSelect) readDeltabase) := FUNCTION
+			
+			Layout_DeltabaseResponse failRead(Layout_DeltabaseSelect L) := TRANSFORM
+				SELF := [];
+			END;
+			
+			soapcall_out := IF(serviceUrl  <> '', 
+												SOAPCALL(	readDeltabase,
+																	serviceUrl,
+																	'DeltaBasePreparedSql',
+																	Layout_DeltabaseSelect,
+																	FraudShared_Services.Layouts.into_in(LEFT),
+																	DATASET(Layout_DeltabaseResponse),
+																	XPATH('DeltaBaseSelectResponse'),
+																	ONFAIL(failRead(LEFT)),
+																	RETRY(FraudShared_Services.Constants.read_retry),
+																	TIMEOUT(FraudShared_Services.Constants.read_timeout),
+																	TRIM, 
+																	LOG), 
+												DATASET([], Layout_DeltabaseResponse));		
+												
+			return soapcall_out;
 		END;
+
+		SHARED GetRecentTimelineDetails(DATASET(Layout_LogDeltabase) ds_delta_records) := FUNCTION
+
+			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( Layout_LogDeltabase L) := TRANSFORM
+				date_added := (INTEGER)(L.date_added[1..8]);
+				SELF.IsRecentActivity := TRUE;
+				SELF.FileType := 3;
+				SELF.GlobalCompanyId := (INTEGER)L.gc_id;
+				SELF.TransactionId := (STRING)L.cust_transaction_id;
+				SELF.HouseHoldId := L.case_id;
+				SELF.CustomerPersonId := L.client_uid;
+				SELF.EventDate.Year := STD.Date.Year(date_added);
+				SELF.EventDate.Month := STD.Date.Month(date_added);
+				SELF.EventDate.Day := STD.Date.Day(date_added);
+				SELF.IndustryTypeDescription := L.program_name;
+				SELF.ReportedBy := L.inquiry_source;
+				SELF.ActivityReason := L.inquiry_reason;
+				SELF.UniqueId := (STRING)L.lex_id;
+				SELF.Name.Full := L.name_full;
+				SELF.Name.First := L.name_first;
+				SELF.Name.Middle := L.name_middle;
+				SELF.Name.Last := L.name_last;
+				SELF.Name.Suffix := L.name_suffix;
+				SELF.Name.Prefix := L.name_prefix;
+				SELF.SSN := L.ssn;
+				SELF.DOB.Year := IF(L.dob <> '', STD.Date.Year((INTEGER)L.dob), 0);
+				SELF.DOB.Month := IF(L.dob <> '', STD.Date.Month((INTEGER)L.dob), 0);
+				SELF.DOB.Day := IF(L.dob <> '', STD.Date.Day((INTEGER)L.dob), 0);
+				SELF.PhysicalAddress.StreetAddress1 := L.physical_address;		
+				SELF.PhysicalAddress.City := L.physical_city;
+				SELF.PhysicalAddress.State := L.physical_state;
+				SELF.PhysicalAddress.Zip5 := L.physical_zip;
+				SELF.PhysicalAddress.County := L.physical_county;
+				SELF.MailingAddress.StreetAddress1 := L.mailing_address;
+				SELF.MailingAddress.City := L.mailing_city;
+				SELF.MailingAddress.State := L.mailing_state;
+				SELF.MailingAddress.Zip5 := L.mailing_zip;
+				SELF.MailingAddress.County := L.mailing_county;
+				SELF.Phones := IF(L.phone <> '',
+													ROW({FraudGovPlatform_Services.Constants.PHONE_TYPE.PHONE_TYPE_HOME, L.phone,''}, iesp.fraudgovreport.t_FraudGovPhoneInfo),
+													ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+													);
+				SELF.EmailAddress := L.email_address;
+				SELF.DriversLicense.DriversLicenseNumber := L.dl_number;
+				SELF.DriversLicense.DriversLicenseState := L.dl_state;
+				SELF.BankInformation1.BankAccountNumber := L.bank_account_number;
+				SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number;
+				SELF.IpAddress := L.ip_address;
+				SELF.DeviceId := L.device_id;
+				SELF.GeoLocation.Latitude := L.geo_lat;
+				SELF.GeoLocation.Longitude := L.geo_long;
+				SELF := [];
+			END;
 
 		ds_timeline_recent_activity := PROJECT(ds_delta_records,xForm_getTimeLineDetails(LEFT));
 
 		return ds_timeline_recent_activity;
 	END;
 	
-	SHARED DeltabaseMBSFilter(DATASET(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record) deltabase_recs, 
-													FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+	SHARED DeltabaseMBSFilter(DATASET(Layout_LogDeltabase) deltabase_recs) := FUNCTION
 			
 			Layout_Deltabase_w_product_code := RECORD
 				INTEGER product_code;
 				INTEGER ind_type_id;
-				FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record deltadata;
+				Layout_LogDeltabase deltadata;
 			END;			
 			
-			Layout_Deltabase_w_product_code xForm_AddProductCode(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record L) := TRANSFORM
+			Layout_Deltabase_w_product_code xForm_AddProductCode(Layout_LogDeltabase L) := TRANSFORM
 				SELF.product_code := batch_params.ProductCode;
 				SELF.ind_type_id := batch_params.IndustryType;
 				SELF.deltadata := L;
@@ -79,12 +105,11 @@ EXPORT mod_Deltabase_Functions := MODULE
 			
 			delta_w_filter := PROJECT(deltabase_recs, xForm_AddProductCode(LEFT));
 			
-			
 			delta_mbs_filtered := JOIN(delta_w_filter, FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM),
 																KEYED(LEFT.deltadata.gc_id = (STRING)RIGHT.gc_id AND
 																			LEFT.ind_type_id = RIGHT.ind_type) AND
 																		  RIGHT.product_include = FraudShared_Services.Constants.PRODUCT_INCLUDE_CODE_ALL,
-																TRANSFORM(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record,
+																TRANSFORM(Layout_LogDeltabase,
 																					SELF := LEFT.deltadata),
 																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)
 																);
@@ -92,13 +117,14 @@ EXPORT mod_Deltabase_Functions := MODULE
 			return delta_mbs_filtered;
 	END;
 
-	EXPORT getDeltabaseReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) in_recs, 
-																	FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
-	
-			first_row := in_recs[1];
-			
-			db_url := batch_params.gateways(ServiceName=FraudGovPlatform_Services.Constants.DELTABASE_ESP_GATEWAY_NAME)[1].Url;	
-			
+	EXPORT getDeltabaseReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) in_recs) := FUNCTION
+
+			/*
+			----------------------------------------------------------------------------------------------------------------------------------
+			CODING IN THE COMMENT IS NO LONGE USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
+			ARE GOING TO CALL GATEWAY ESP VIA SOAPCALL TO ACCESS DELTABASE RECORDS.
+			STILL KEEPING IT AS COMMENTED, IN CASE WE SWITCH BACK TO EARLIER METHOD IN FUTURE....
+			----------------------------------------------------------------------------------------------------------------------------------	
 			//Parsing db_url variable. ESP sends in the complete Deltabase login information in one string
 			//String format: 'HTTPS://[username]:[password]@[database_location]:[port_number]'
 			//The below regexfind statements parse db_url based on the above format
@@ -117,7 +143,7 @@ EXPORT mod_Deltabase_Functions := MODULE
 			// Parametrized SQL query 
 			// each "?" corresponds to a field of the "filter" dataset (in the same field order as in the dataset's layout)
 			// that was passed in to this function			
-			dataset(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record) deltadata(
+			dataset(Layout_LogDeltabase) deltadata(
 																	integer gc_id,
 																	string ind_type_name,
 																	FraudGovPlatform_Services.Layouts.Layout_delta_filter filter
@@ -147,20 +173,67 @@ EXPORT mod_Deltabase_Functions := MODULE
 			ENDEMBED;
 			
 			db_records := deltadata(batch_params.GlobalCompanyId,batch_params.IndustryTypeName,query_filter);
+			*/
 			
-			db_records_filtered := DeltabaseMBSFilter(db_records, batch_params);
+			query_filter:= PROJECT(in_recs,FraudGovPlatform_Services.Transforms.xform_getDeltabaseQueryParams(LEFT));
+		
+			Layout_DeltabaseSelect xRead_report(FraudGovPlatform_Services.Layouts.Layout_delta_filter L) := TRANSFORM
+				SELF.Select := 	
+					'SELECT * FROM delta_fraudgov.delta_identity WHERE '
+					+ ' gc_id = ' + batch_params.GlobalCompanyId
+					+ ' AND program_name = ' + FraudShared_Services.Utilities.dqString(batch_params.IndustryTypeName)
+					+ ' AND date_added >= "' + L.date_added + '"'
+					+ ' AND ( '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.ssn) + ') > 0 AND ssn= ' + FraudShared_Services.Utilities.dqString(L.ssn) + ') OR ' 
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.dob)+ ') > 0 AND dob= ' + FraudShared_Services.Utilities.dqString(L.dob)+ ' ) OR '
+					+ ' (' + L.lex_id + ' <> 0 AND lex_id= ' + L.lex_id + ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_first)+ ') > 0 AND name_first= ' + FraudShared_Services.Utilities.dqString(L.name_first)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_middle)+ ') > 0 AND name_middle= ' + FraudShared_Services.Utilities.dqString(L.name_middle)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_last)+ ') > 0 AND name_last= ' + FraudShared_Services.Utilities.dqString(L.name_last)+ ') OR '
+					+ ' (	length(' + FraudShared_Services.Utilities.dqString(L.physical_address)+ ') > 0 AND physical_address= ' + FraudShared_Services.Utilities.dqString(L.physical_address)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_city)+ ') > 0 AND physical_city= ' + FraudShared_Services.Utilities.dqString(L.physical_city)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_state)+ ') > 0 AND physical_state= ' + FraudShared_Services.Utilities.dqString(L.physical_state)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_zip)+ ') > 0 AND physical_zip= ' + FraudShared_Services.Utilities.dqString(L.physical_zip)+ ') OR '
+					+ ' (	length(' + FraudShared_Services.Utilities.dqString(L.mailing_address)+ ') > 0 AND mailing_address= ' + FraudShared_Services.Utilities.dqString(L.mailing_address)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_city)+ ') > 0 AND mailing_city= ' + FraudShared_Services.Utilities.dqString(L.mailing_city)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_state)+ ') > 0 AND mailing_state= ' + FraudShared_Services.Utilities.dqString(L.mailing_state)+ ' AND '
+					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_zip)+ ') > 0 AND mailing_zip= ' + FraudShared_Services.Utilities.dqString(L.mailing_zip)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.phone)+ ') > 0 AND phone= ' + FraudShared_Services.Utilities.dqString(L.phone)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.ip_address)+ ') > 0 AND ip_address= ' + FraudShared_Services.Utilities.dqString(L.ip_address)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.device_id)+ ') > 0 AND device_id= ' + FraudShared_Services.Utilities.dqString(L.device_id)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.bank_account_number)+ ') > 0 AND bank_account_number= ' + FraudShared_Services.Utilities.dqString(L.bank_account_number)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.dl_state) + ') > 0 AND dl_state= ' + FraudShared_Services.Utilities.dqString(L.dl_state) + ' AND '
+					+	'	 length(' + FraudShared_Services.Utilities.dqString(L.dl_number)+ ') >0 AND dl_number= ' + FraudShared_Services.Utilities.dqString(L.dl_number)+ ') OR '
+					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.geo_lat) + ') > 0 AND geo_lat= ' + FraudShared_Services.Utilities.dqString(L.geo_lat) + ' AND '
+					+ '  length(' + FraudShared_Services.Utilities.dqString(L.geo_long) + ') > 0 AND geo_long= ' + FraudShared_Services.Utilities.dqString(L.geo_long) + ')	'	
+					+ ' )'
+					+ FraudGovPlatform_Services.Constants.limiter;
+			END;
+			 
+			readDeltabase :=	PROJECT(query_filter, xRead_report(LEFT));
+			
+			soapcall_out := DeltabaseSoapcall(readDeltabase);
 
-			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered);
+			Layout_LogDeltabase NormIt_report(Layout_LogDeltabase R) := TRANSFORM
+				SELF := R;
+			END;
 			
-			// OUTPUT(db_records,NAMED('Delta_Recs'));
-			// OUTPUT(db_records_filtered,NAMED('Delta_Filtered_MBS'));
-			// OUTPUT(ds_timeline_records,NAMED('Delta_Timeline'));
+			deltabase_recs_norm := NORMALIZE(soapcall_out, LEFT.deltaFields, NormIt_report(RIGHT));	
+			db_records_filtered := DeltabaseMBSFilter(deltabase_recs_norm);
+			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered); 
 
 			return ds_timeline_records;
 	END;
 	
-	EXPORT getDeltabaseSearchRecords(FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+	EXPORT getDeltabaseSearchRecords() := FUNCTION
 			
+			/*
+			----------------------------------------------------------------------------------------------------------------------------------
+			CODING IN THE COMMENT IS NO LONGE USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
+			ARE GOING TO CALL GATEWAY ESP VIA SOAPCALL TO ACCESS DELTABASE RECORDS.
+			STILL KEEPING IT AS COMMENTED, IN CASE WE SWITCH BACK TO EARLIER METHOD IN FUTURE....
+			----------------------------------------------------------------------------------------------------------------------------------	
+
 			db_url := batch_params.gateways(ServiceName=FraudGovPlatform_Services.Constants.DELTABASE_ESP_GATEWAY_NAME)[1].Url;
 			
 			//Parsing db_url variable. ESP sends in the complete Deltabase login information in one string
@@ -178,7 +251,7 @@ EXPORT mod_Deltabase_Functions := MODULE
 			// Info for line 200 (commenting here because everything in the EMBED structure is interpreted as MySQL code)
 			// Parametrized SQL query 
 			// the "?" corresponds to the "lastBuildDate" parameter passed in to this function
-			dataset(FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record) deltadata(
+			dataset(Layout_LogDeltabase) deltadata(
 								integer gc_id,
 								string ind_type_name,
 								integer lastBuildDate) := 
@@ -203,15 +276,35 @@ EXPORT mod_Deltabase_Functions := MODULE
 																											(STRING)yesterday)[1..8] + '000000');
 			
 			db_records := deltadata(batch_params.GlobalCompanyId,batch_params.IndustryTypeName,last_data_build_date);
+			*/
 			
-			db_records_filtered := DeltabaseMBSFilter(db_records, batch_params);
-
+			yesterday := STD.Date.AdjustDate(STD.Date.Today(),0,0,-1);			
+			
+			//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
+			//Also added failsafe...if we can't get the environment variable, we default it to yesterday
+			last_data_build_date := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
+																											(STRING)yesterday)[1..8] + '000000');			
+		
+			Layout_DeltabaseSelect xRead_search() := TRANSFORM
+				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
+					+ ' gc_id = ' + batch_params.GlobalCompanyId
+					+ ' AND program_name = ' + FraudShared_Services.Utilities.dqString(TRIM(batch_params.IndustryTypeName))
+					+ ' AND date_added >= ' + last_data_build_date
+					+ FraudGovPlatform_Services.Constants.limiter;
+			END;
+			
+			readDeltabase := DATASET([xRead_search()]);
+			
+			soapcall_out := DeltabaseSoapcall(readDeltabase);
+																		
+			Layout_LogDeltabase NormIt(Layout_LogDeltabase R) := TRANSFORM
+				SELF := R;
+			END;
+			
+			deltabase_recs_norm := NORMALIZE(soapcall_out, LEFT.deltaFields, NormIt(RIGHT));																					
+			db_records_filtered := DeltabaseMBSFilter(deltabase_recs_norm);
 			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered);
 			
-			 // OUTPUT(db_records,NAMED('Delta_Recs'));
-			 // OUTPUT(db_records_filtered,NAMED('Delta_Filtered_MBS'));
-			 // OUTPUT(ds_timeline_records,NAMED('Delta_Timeline'));
-
 			return ds_timeline_records;
 	END;
 	
