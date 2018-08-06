@@ -164,7 +164,7 @@
 		UNSIGNED1	_DPPA_Purpose        := IF(TRIM(users.DLPurpose) != ''     , (INTEGER)users.DLPurpose , DPPAPurpose_stored);
 		UNSIGNED1	_GLBA_Purpose        := IF(TRIM(users.GLBPurpose) != ''    , (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 		STRING    _DataRestrictionMask := IF( users.DataRestrictionMask != '', users.DataRestrictionMask, DataRestrictionMask_stored );
-		STRING    _DataPermissionMask  := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
+		STRING    __DataPermissionMask := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
 		STRING5	  _IndustryClass       := MAP( users.IndustryClass != '' => users.IndustryClass, option.IndustryClass != '' => option.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass );
 		BOOLEAN   _TestData_Enabled    := users.TestDataEnabled OR option.TestDataEnabled;
 		STRING    _TestData_TableName  := IF( users.TestDataTableName != '', users.TestDataTableName, option.TestDataTableName );
@@ -185,6 +185,8 @@
 		BOOLEAN   _include_additional_watchlists   := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]; 
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
+    
+    STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				
 		// Per Product Mgmt guidance:
 		//   o  turn off Gateway calls to Targus
@@ -261,10 +263,11 @@
 
 		_Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 
+		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		UNSIGNED1	_DPPA_Purpose        := DPPAPurpose_stored;
 		UNSIGNED1	_GLBA_Purpose        := GLBPurpose_stored;
 		STRING  	_DataRestrictionMask := DataRestrictionMask_stored;
-		STRING  	_DataPermissionMask  := DataPermissionMask_stored;
+		STRING  	_DataPermissionMask  := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(DataPermissionMask_stored, _BIID20ProductType);
 		STRING5	  _IndustryClass       := STD.Str.ToUpperCase(TRIM( IndustryClass_stored, LEFT, RIGHT ));
 		UNSIGNED6	_HistoryDate         := 999999 : STORED('HistoryDate');
 		UNSIGNED1	_LinkSearchLevel     := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
@@ -280,7 +283,6 @@
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
 		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
-		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		BOOLEAN   _include_additional_watchlists := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE];
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
 		
