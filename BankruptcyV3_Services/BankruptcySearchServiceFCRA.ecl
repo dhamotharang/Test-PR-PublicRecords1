@@ -24,6 +24,8 @@
   <!-- CaseNumber -->
   <part name="EnableCaseNumberFilterSearch" type="xsd:boolean"/>
   <part name="CaseNumber"         type="xsd:string"/>
+  <part name="AttorneyName"     type="xsd:string"/>
+  <part name="CourtCode"    type="xsd:string"/>
   
   <part name="FilingJurisdiction"  type='xsd:string'/>  
   
@@ -68,12 +70,16 @@ export BankruptcySearchServiceFCRA(
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA();
     
+    
+  
+    
     doxie.MAC_Header_Field_Declare(true);
     #constant('SearchIgnoresAddressOnly',true);
     #stored('ScoreThreshold',10);
     #stored('PenaltThreshold',10);
     #constant('DisplayMatchedParty',true);
     #constant('NoDeepDive', true);
+    
     
     /* fetch sorting params */
     integer1 state_sort   := 0 : stored('StateSort');
@@ -83,6 +89,15 @@ export BankruptcySearchServiceFCRA(
     integer1 cname_sort    := 0 : stored('CompanyNameSort');
     boolean suppress_withdrawn_bankruptcy  := false   : stored('SuppressWithdrawnBankruptcy');
     boolean Enable_CaseNumFilterSrch  := false   : stored('EnableCaseNumberFilterSearch');
+    string attorney_name_pre := '' : stored('AttorneyName');
+    string attorney_name := Std.Str.ToUpperCase(attorney_name_pre);
+    string court_code_pre := '' : stored('CourtCode');
+    string court_code := Std.Str.ToUpperCase(court_code_pre);
+    string state_value_ucase := Std.Str.ToUpperCase(state_val); 
+    string CaseNumber_value_ucase := Std.Str.ToUpperCase(if(Enable_CaseNumFilterSrch,
+                                                            STD.Str.FindReplace(CaseNumber_value,'-',''),
+                                                            CaseNumber_value));
+
     
     //Check if the customer is a Collections customer
     fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
@@ -103,7 +118,7 @@ export BankruptcySearchServiceFCRA(
     //if more than one DID is found this call will fail the service with desired error message
     unsigned6 input_did := (unsigned6) did_value;
 
-    EnableCaseNumFilter := CaseNumber_value != '' and Enable_CaseNumFilterSrch;
+    EnableCaseNumFilter := CaseNumber_value_ucase != '' and Enable_CaseNumFilterSrch;
     // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
     gateways := Gateway.Configuration.Get();
     picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, ~EnableCaseNumFilter and returnByDidOnly and (input_did = 0)); 
@@ -115,12 +130,15 @@ export BankruptcySearchServiceFCRA(
                                                                      in_filing_jurisdiction := FilingJurisdiction_value,
                                                                      suppress_withdrawn_bankruptcy := suppress_withdrawn_bankruptcy,
                                                                      EnableCaseNumberFilter := EnableCaseNumFilter,  
-                                                                     in_state := state_val,
+                                                                     in_state := state_value_ucase,
                                                                      in_ssn := ssn_value,
                                                                      in_lname := lname_value,
                                                                      in_fname := fname_value,
-                                                                     in_case_number := CaseNumber_value,
-                                                                     in_did := input_did);
+                                                                     in_case_number := CaseNumber_value_ucase,
+                                                                     in_did := input_did,
+                                                                     in_city := city_value,
+                                                                     in_Attorney_Name := Attorney_Name,
+                                                                     in_court_code := court_code);
     rec_out := record
       bankruptcyv3_services.layouts.layout_rollup, 
       Text_Search.Layout_ExternalKey,
@@ -216,15 +234,17 @@ export BankruptcySearchServiceFCRA(
     final := if(suppress_results_due_alerts, dataset([], rec_out), all_results);          
         
     CaseNumberErrorCode := 
-      FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value, fname_value,
-                                             lname_value,ssn_value,state_val,(unsigned6)did_value);
+      FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value_ucase, fname_value,
+                                             lname_value,ssn_value,state_value_ucase,(unsigned6)did_value,
+																						      city_value, attorney_name , court_code);
                                              
-    if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
+    if(EnableCaseNumFilter and CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
 
     if(EnableCaseNumFilter and count(final(matched_party.did != final[1].matched_party.did)) > 0,  
-       FAIL(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED, 
-            ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
+          FAIL(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED, 
+               ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
+
 
     // get FFD statements
     // Consumer Level statements will always be returned along with any alert messages.
