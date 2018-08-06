@@ -51,6 +51,7 @@ export Constants := module
 		export String40 SearchAlertID := 'SP_SEARCHALERTID'; // referenced in Inquiry_Services
 		export String40 SearchIdentityVelocityId := 'SP_SEARCHIDENTITYVELOCITYID'; // referenced in Inquiry_Services
 		export String40 FDNDeltabase		:= 'delta_fdn';				//FDN Search
+		export String40 FraudGovDeltabase := 'delta_esp';
 		export String40 PhonesMetaData		:= 'delta_phonefinder';				//Phone Finder service metadata - porting/spoof/otp
 		// FCRA Full File Disclosure person context deltabase
 		export String40 delta_personcontext	:= 'delta_personcontext';				//FCRA Full File Disclosure
