@@ -42,17 +42,23 @@ EXPORT ReportServiceFCRA  := macro
 	
 	wss_out := WorkforceSolutionServices.Records(ds_in, in_mod);
 	wssRecords := project(wss_out.GwResponse[1].Response.EvsResponse,
-												WorkforceSolutionServices.transforms.toRecords(left , wss_out.Did, first_row.user.ssnmask,first_row.user.dobmask ));
+												WorkforceSolutionServices.transforms.toRecords(left , wss_out.Lexid, first_row.user.ssnmask,first_row.user.dobmask ));
 // We may even blank out exceptions .... 	
 	//tHeader := row(iesp.ECL2ESP.GetHeaderRow(), transform(iesp.share.t_ResponseHeader, self.Exceptions := wss_out.Exceptions; self := left));
-	tHeader := iesp.ECL2ESP.GetHeaderRow();
 	
 	iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportResponse xtOut() := transform
-		self._header := tHeader;
+			//Keep the response status, message, and exceptions but use the query transactionID and queryID
+			SELF._header := PROJECT(iesp.ECL2ESP.GetHeaderRow(), TRANSFORM(iesp.share.t_ResponseHeader,
+				SELF.status := wss_out.eq_header.status,
+				SELF.message := wss_out.eq_header.message,
+				SELF.exceptions := wss_out.eq_header.exceptions,
+				SELF := LEFT
+			));
 		Self.Validation := wss_out.Validation;
 		self.VerificationOfEmploymentReportRecord := wssRecords;
-		self.ConsumerStatements := wss_out.Statements;
-		self.ConsumerAlerts := [];
+		self.ConsumerStatements := wss_out.ConsumerStatements;
+		self.ConsumerAlerts := wss_out.ConsumerAlerts;
+		self.Consumer := wss_out.Consumer;
 		self := [];
 	end;
 	results := row(xtOut());
