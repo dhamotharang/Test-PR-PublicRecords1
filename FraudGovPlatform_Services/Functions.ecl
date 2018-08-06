@@ -545,6 +545,12 @@ EXPORT Functions := MODULE
 		
 		common_ds := PROJECT(ds_in, createCommonDs(LEFT));
 		
+		today := STD.Date.CurrentDate(True);
+		time := STD.Date.CurrentTime(True);
+		today_str :=  intformat(STD.Date.Year(today),4,1)  + '-' + intformat(STD.Date.Month(today),2,1) + '-' + 
+									intformat(STD.Date.Day(today),2,1)   + ' ' + intformat(STD.Date.Hour(time),2,1)   + ':' + 
+									intformat(STD.Date.Minute(time),2,1) + ':' + intformat(STD.Date.Second(time),2,1);
+		
 		FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record xform_deltabase_log(commonRecord L):= TRANSFORM
 			SELF.gc_id := (STRING)L.FraudGovUser.GlobalCompanyId;
 			SELF.program_name := L.FraudGovUser.IndustryTypeName;
@@ -622,7 +628,7 @@ EXPORT Functions := MODULE
 			SELF.dl_number := L.reportBy.DriversLicense.DriversLicenseNumber;
 			SELF.geo_lat := L.reportBy.GeoLocation.Latitude;
 			SELF.geo_long := L.reportBy.GeoLocation.Longitude;
-			SELF.date_added := STD.Date.CurrentDate(True);
+			SELF.date_added := today_str;
 			SELF := L;
 			SELF := [];
 		END;
@@ -811,7 +817,7 @@ EXPORT Functions := MODULE
 	EXPORT IsValidInputDate(iesp.share.t_Date date) := FUNCTION
 		date_int := iesp.ECL2ESP.DateToInteger(date);
 		
-		return (STD.Date.IsValidDate(date_int) AND date_int <= STD.Date.Today()) OR date_int = 0;
+		return STD.Date.IsValidDate(date_int) OR date_int = 0;
 	END;
 
 END;

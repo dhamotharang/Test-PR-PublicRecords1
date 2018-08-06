@@ -131,7 +131,7 @@ EXPORT ReportService() := MACRO
 	
 	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
 	//for searches, not just card details.
-	isValidInput := (inputCount = 1 OR ~Options.IsOnline) AND isValidDate;	
+	isValidInput := (inputCount = 1 OR ~Options.IsOnline) AND isValidDate;
 
 	// **************************************************************************************
 	// Append DID for Input PII
