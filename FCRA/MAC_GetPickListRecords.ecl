@@ -1,4 +1,4 @@
-EXPORT MAC_GetPickListRecords(request_in, picklist_out, no_fail = false) := macro
+﻿EXPORT MAC_GetPickListRecords(request_in, picklist_out, no_fail = false) := macro
 import Gateway;
 
 	gateways := Gateway.Configuration.Get();
@@ -21,7 +21,7 @@ import Gateway;
 	// convert an input into pick list input format
 	#uniquename (picklist_request);
 	#uniquename (SetPickListInput);
-	iesp.person_picklist.t_PersonPickListRequest %SetPickListInput% (request_in L) := transform
+	iesp.person_picklist.t_PersonPickListRequest %SetPickListInput% (recordof(request_in) L) := transform
 		self.options.ReturnUniqueIdsOnly := true;
 		self := L;
 		self := [];
