@@ -51,7 +51,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 
 		ds_recentTransactions_sorted := SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day);
 
-		numOfDeltabaseTransactions := COUNT(ds_delta_recentActivity);
+		numOfDeltabaseTransactions := COUNT(ds_delta_recentActivity);	
 
 		/* Returning Element or Identity Score and related clusters and related identities. */
 		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
@@ -159,9 +159,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF.ScoreDetails.Score := RIGHT.score_,
 																				SELF := LEFT),
 																			LEFT OUTER, LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-												
+
 		
- 		/* Returning the Timeline Data */
+		/* Returning the Timeline Data */
 		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_delta_recentActivity;
 		ds_timeline_sorted := SORT(ds_timeline, IsRecentActivity, FileType , record);
 		
@@ -257,7 +257,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
 		// output(ds_entityNameUID, named('ds_entityNameUID'));
 		// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
-		// output(ds_delta_recentActivity,named('ds_delta_recentActivity'));
 		// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
 		// output(ds_ElementcardDetail_w_score, named('ds_ElementcardDetail_w_score'));
 		// output(ds_cluster_proj, named('ds_cluster_proj'));

@@ -219,7 +219,7 @@ EXPORT Layouts := MODULE
 		STRING25 dl_number;
 		STRING10 geo_lat;
 		STRING11 geo_long;
-		UNSIGNED8 date_added;
+		STRING20 date_added;
 	END;
 
 	EXPORT LOG_Deltabase_Layout := RECORD
