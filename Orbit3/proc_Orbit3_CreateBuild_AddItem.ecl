@@ -121,7 +121,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 																					 )
 														),
 													 if ( skipaddcomponents,	
-										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname)),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
+										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname),EXTEND),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
 														     
 										                                   run_additem
 																																
