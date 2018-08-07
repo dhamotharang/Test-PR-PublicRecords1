@@ -1,5 +1,5 @@
-IMPORT BIPV2, AutoStandardI, BizLinkFull, tools;
-EXPORT Key_LinkIds := MODULE
+﻿IMPORT BIPV2, AutoStandardI, BizLinkFull, tools;
+EXPORT Key_LinkIds := MODULE 
   // DEFINE THE INDEX
 	shared superfile_name		      := keynames(,pUseOtherEnvironment := tools._Constants.IsDataland).LinkIds.qa;
 	shared superfile_name_Built		:= keynames(,pUseOtherEnvironment := tools._Constants.IsDataland).LinkIds.built;
@@ -55,6 +55,25 @@ EXPORT Key_LinkIds := MODULE
 		ds_masked := BIPV2.mod_sources.applyMasking(ds, in_mod, permits, '');
 		return ds_masked;
 	endmacro;
+	
+	// Removes record data matching the permit bitmask
+	shared filterSrcCode(ds, permits, ds_src='', codeBmap) := functionmacro
+		ds_filt := ds(permits & codeBmap <> 0);
+		#IF(#TEXT(ds_src)='')
+			return ds_filt;
+		#ELSE
+      // function instead of transform: need to check complicated SKIP condition.
+			ds_filt xform (ds_filt L) := function
+        ds_src_filt := L.ds_src (BIPV2.mod_sources.src2bmap(source) & codeBmap <> 0);
+        ds_filt xTransform := transform, skip (~exists(ds_src_filt))
+  				self.ds_src := ds_src_filt;
+	  			self := L;
+		  	end;
+        return xTransform;
+      end;
+			return project(ds_filt, xform(left)); //Using a SKIP in the transform was giving a syntax error and hence, had to use to this EXISTS filter condition
+		#END
+	endmacro;
 	//DEFINE THE INDEX ACCESS
 export kFetch2(
 	dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs,
@@ -86,6 +105,32 @@ FUNCTION
 	// output(ds_fetched, named('ds_fetched'));
 	return if(IncludeStatus, ds_wstatus , project(ds_restricted, transform({recordof(ds_wstatus)}, self.isActive := false, self.IsDefunct := false, self := left)));
 END;
+
+export kFetch2Marketing(
+	dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs,
+	string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID, 
+	unsigned2 ScoreThreshold = 0,								
+	BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
+	boolean IncludeStatus = true,
+	JoinLimit=25000,
+	unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
+	) :=
+FUNCTION
+	allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
+	ds := kfetch2(inputs, Level, ScoreThreshold, in_mod, IncludeStatus, JoinLimit, JoinType);
+	recordof(ds) apply_src_filter(recordof(ds) L) := transform
+		// NOTE: These filter the "sources" child dataset when applicable, but not all sections have that
+		self.company_name			:= filterSrcCode(L.company_name,    company_name_data_permits,    sources, allowCodeBmap);
+		self.company_address:= filterSrcCode(L.company_address, company_address_data_permits,        , allowCodeBmap);
+		self.company_phone		:= filterSrcCode(L.company_phone,   company_phone_data_permits,          , allowCodeBmap);
+		self.company_fein			:= filterSrcCode(L.company_fein,    company_fein_data_permits,    sources, allowCodeBmap);
+		self.company_url			 := filterSrcCode(L.company_url,     company_url_data_permits,            , allowCodeBmap);
+		self.company_incorporation_date := filterSrcCode(L.company_incorporation_date, company_incorporation_date_permits, sources, allowCodeBmap);
+		self := L;
+	end;
+	return project(ds, apply_src_filter(left));
+END;
+
 // Depricated version of the above kFetch2
 export kFetch(
 	dataset(BIPV2.IDlayouts.l_xlink_ids) inputs,
