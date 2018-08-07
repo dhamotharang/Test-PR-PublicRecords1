@@ -230,6 +230,7 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 	HomesteadExemptionV2_Services.Layouts.batchWorkRec batchRecords(HomesteadExemptionV2_Services.Layouts.workRec L) := TRANSFORM
 		// LEXID
 		SELF.acctno:=L.acctno;
+		SELF.clientid:=L.orig_clientid;
 		SELF.lexid:=L.did;
 		SELF.lexid_score:=L.score;
 		SELF.exception:=IF(L.error_code!=0,'Y','');
