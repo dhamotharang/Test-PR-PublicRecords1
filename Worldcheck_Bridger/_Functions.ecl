@@ -1177,6 +1177,7 @@
 				trim(kword, left, right) = 'KRFSC' =>SubGroup_Constants.numKeywordsID.KEYWORD_KRFSC,
 				trim(kword, left, right) = 'LBISF' =>SubGroup_Constants.numKeywordsID.KEYWORD_LBISF,
 				trim(kword, left, right) = 'JPJSDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJSDA,
+				trim(kword, left, right) = 'USSSR' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSSR,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
