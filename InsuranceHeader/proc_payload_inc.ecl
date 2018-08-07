@@ -1,5 +1,4 @@
-﻿// Bob comment
-EXPORT proc_payload_inc(STRING FILEDATE) := FUNCTION
+﻿EXPORT proc_payload_inc(STRING FILEDATE) := FUNCTION
 
 IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
  
