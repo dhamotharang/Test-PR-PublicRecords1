@@ -79,7 +79,7 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 												~isFoundOutputDid => validation_code.OUTPUT_DID_NOTFOUND,
 												(isFoundInputDid and isFoundOutputDid and InputDid <> OutputDid) => validation_code.DID_MISMATCH, 
 												(InputDid = OutputDid) and isFoundInputDid => validation_code.DID_MATCH,
-											6);
+											validation_code.NONE);
 									
     isSuccess := StatusCode = 0 ;
 		
@@ -101,11 +101,12 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 
 
 		message := 	STD.STr.RemoveSuffix(trim(EquifaxStatusMessage),'.')+' ('+ EquifaxStatusCode +').';
-		validation_row := row(
-										transform(iesp.share.t_CodeMap,
-															self.Code := (string) StatusCode;
-															self.Description := WorkforceSolutionServices.Constants.GetValidationCodeDesc(StatusCode,message);
-															)
+    validation_code_desc := WorkforceSolutionServices.Constants.GetValidationCodeDesc(StatusCode, message);
+		validation_row := ROW(
+                          TRANSFORM(iesp.share.t_CodeMap,
+                                    SELF.Code := IF(validation_code_desc<>'', (STRING) StatusCode, '');  // status codes without description are used for internal purpose and excluded from reporting
+                                    SELF.Description := validation_code_desc;
+                                    )
 										);
 
 		// Prepare the output. If data is blanked makes sure to fill the output message.

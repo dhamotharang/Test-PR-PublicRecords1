@@ -16,7 +16,7 @@
 		{ValidationCode.INPUT_DID_NOTFOUND, 'No Hit/No Charge: LN could not find a unique LexID for the customer input information.'},
 		{ValidationCode.OUTPUT_DID_NOTFOUND, 'No Hit/No Charge: LN could not find a unique LexID for the output information coming back from the Vendor.'},
 		{ValidationCode.DID_MISMATCH, 'No Hit/No Charge: Mismatch. The LexID captured on input did not match the LexID resolved to from the Vendor\'s output.'},
-		{ValidationCode.NO_CALL, 'No Hit/No Charge: Consumer Alert in place for this consumer.'},
+		{ValidationCode.NO_CALL, ''}, //No Hit/No Charge: Consumer Alert in place for this consumer.
 		{ValidationCode.INVALID_RESPONSE, 'No Hit/No Charge: '}
   	], {UNSIGNED code, STRING description});
 
