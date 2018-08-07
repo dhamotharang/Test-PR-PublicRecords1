@@ -2,18 +2,6 @@
 
 export Spray(string ver) := module
 
-// export Input := DATASET([
- 	// {'edata11-bld.br.seisint.com'										
- 	// ,'/data_lib_2_hus2/Experian/non-fcra/' + ver   //Location to be determined                  
- 	// ,'*.dat'                           
- 	// ,'1701'                                                             
- 	// ,'~thor_dell400::in::experiancred::cpchf@ver@'    
- 	// ,[{'~thor_data400::in::experiancred'}]    
- 	// ,'thor400_30'
-	// ,ver
-                      
- 	// }
-	
 export ip 		:= _control.IPAddress.bctlpedata11;
 export path 	:= '/data/data_lib_2_hus2/Experian/non-fcra/in/' + ver;
 
@@ -22,7 +10,7 @@ export Input := DATASET([
                ,path   //Location to be determined                  
                 ,'*.dat'                           
                 ,'1701'                                                             
-                ,'~thor_dell400::in::experiancred::cpchf' + ver + '_@ver@'    
+                ,'~thor_dell400::in::experiancred::cpchf' + ver + '_' + ver    
                 ,[{'~thor_data400::in::experiancred'}]    
                 ,'thor400_44'
                 ,ver
@@ -38,7 +26,7 @@ export Delete := DATASET([
 								,path   //Location to be determined                               
 								,'DPINS'                           
 								,'101'                                                             
-								,'~thor_dell400::in::experiancred_delete::cpchf@ver@'    
+								,'~thor_dell400::in::experiancred_delete::cpchf' + ver    
 								,[{'~thor_data400::in::experiancred_delete'}]    
 								,'thor400_44'
 								,ver
@@ -52,7 +40,7 @@ export Deceased := DATASET([
 									,path   //Location to be determined                               
 									,'DEC'                           
 									,'101'                                                             
-									,'~thor_dell400::in::experiancred_deceased::cpchf@ver@'    
+									,'~thor_dell400::in::experiancred_deceased::cpchf' + ver
 									,[{'~thor_data400::in::experiancred_deceased'}]    
 									,'thor400_44'
 									,ver
