@@ -4,6 +4,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT inputRec:=RECORD
 		BatchShare.Layouts.ShareAcct;
+		STRING20 clientid;
 		STRING100 name_full;
 		BatchShare.Layouts.ShareName;
 		BatchShare.Layouts.SharePII;
@@ -14,11 +15,13 @@ EXPORT Layouts := MODULE
 
 	EXPORT workRecSlim:=RECORD
 		BatchShare.Layouts.ShareAcct;
-		STRING20 link_acctno;
+		STRING20 clientid;
+		STRING20 link_clientid;
 		BatchShare.Layouts.ShareDid;
 		UNSIGNED2 score;
-		inputRec AND NOT acctno;
+		inputRec AND NOT [acctno,clientid];
 		STRING20 orig_acctno;
+		STRING20 orig_clientid;
 		Batchshare.Layouts.ShareErrors;
 		STRING12 exception_code;
 	END;
@@ -157,7 +160,7 @@ EXPORT Layouts := MODULE
 		STRING80 property_id;
 		UNSIGNED2 property_rank;
 		STRING8 sortby_date;
-		workRecSlim.link_acctno;
+		workRecSlim.link_clientid;
 		DATASET(didRec) dids;
 		BatchShare.Layouts.ShareName;
 		addrSlim;
@@ -167,7 +170,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT fidSrchRec:=RECORD
 		BatchShare.Layouts.ShareAcct;
-		workRecSlim.link_acctno;
+		workRecSlim.link_clientid;
 		LN_PropertyV2_Services.layouts.search_fid;
 		propIdRec.inputTaxYear;
 		propIdRec.inputTaxState;
@@ -411,6 +414,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT ownerOutRec:=RECORD
 		STRING20  acctno;
+		STRING20  clientid;
 		UNSIGNED6 lexid;
 		UNSIGNED2 lexid_score;
 		STRING1   exception; // blank WHEN error code = 0 ELSE 'Y'
