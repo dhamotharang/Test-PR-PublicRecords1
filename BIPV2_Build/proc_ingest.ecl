@@ -102,10 +102,63 @@ export proc_ingest(STRING omitDisposition='') := module
 		END;
 	END;
 	
+	shared suppressedData := dataset(BIPV2_Files.files_suppressions().sfFileName,BIPV2.ManualSuppression.Layout_Suppression,thor,opt);
 	shared ingest_results := PROJECT(BIPV2_Ingest.Ingest().AllRecords, TRANSFORM(BIPV2.CommonBase.Layout, SELF.ingest_status:=BIPV2_Ingest.Ingest().RTToText(LEFT.__Tpe), SELF:=LEFT));
-  SHARED ds_re_DID   := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
-  SHARED ds_setsos   := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
-	SHARED ds_ingested := project(ds_setsos,recordof(BIPV2_Ingest.In_BASE));  
+	SHARED ds_re_DID      := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
+	SHARED ds_setsos      := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
+
+	SHARED ds_removesuppressed := join(ds_setsos, suppressedData(not removed),
+	                                   left.source = right.source and
+															left.fname = right.fname and
+															left.mname = right.mname and
+															left.lname = right.lname and
+															left.name_suffix = right.name_suffix and
+															left.cnp_name = right.cnp_name and
+															left.cnp_number = right.cnp_number and
+															left.cnp_store_number = right.cnp_store_number and
+															left.prim_range = right.prim_range and
+															left.predir = right.predir and
+															left.prim_name = right.prim_name and
+															left.addr_suffix = right.addr_suffix and
+															left.postdir = right.postdir and
+															left.unit_desig = right.unit_desig and
+															left.sec_range = right.sec_range and
+															left.v_city_name = right.v_city_name and
+															left.st = right.st and
+															left.zip = right.zip and
+															left.active_duns_number = right.active_duns_number and
+															left.active_enterprise_number = right.active_enterprise_number and
+															left.ebr_file_number = right.ebr_file_number and
+															left.active_domestic_corp_key = right.active_domestic_corp_key and
+															left.foreign_corp_key = right.foreign_corp_key and
+															left.unk_corp_key = right.unk_corp_key and
+															left.company_fein = right.company_fein and
+															left.company_phone = right.company_phone and
+															left.company_sic_code1 = right.company_sic_code1 and
+															left.company_sic_code2 = right.company_sic_code2 and
+															left.company_sic_code3 = right.company_sic_code3 and
+															left.company_sic_code4 = right.company_sic_code4 and
+															left.company_sic_code5 = right.company_sic_code5 and
+															left.company_naics_code1 = right.company_naics_code1 and
+															left.company_naics_code2 = right.company_naics_code2 and
+															left.company_naics_code3 = right.company_naics_code3 and
+															left.company_naics_code4 = right.company_naics_code4 and
+															left.company_naics_code5 = right.company_naics_code5 and
+															left.company_ticker = right.company_ticker and
+															left.company_ticker_exchange = right.company_ticker_exchange and
+															left.company_foreign_domestic = right.company_foreign_domestic and
+															left.company_url = right.company_url and
+															left.company_inc_state = right.company_inc_state and
+															left.company_charter_number = right.company_charter_number and
+															left.vl_id = right.vl_id and
+															left.duns_number = right.duns_number and
+															left.contact_ssn = right.contact_ssn and
+															left.contact_dob = right.contact_dob and					
+															left.company_name = right.company_name and
+															left.contact_dob = right.contact_dob and
+															left.contact_email = right.contact_email,
+								                  transform(left), left only, lookup);
+	SHARED ds_ingested := project(ds_removesuppressed,recordof(BIPV2_Ingest.In_BASE));  
 	// SHARED ds_ingested := project(dataset('~thor_data400::bipv2_ingest::out_20161216',bipv2.CommonBase.layout,thor),recordof(BIPV2_Ingest.In_BASE));  
 
 	SHARED xt_src_status	:= TABLE(ds_ingested, {source, STRING50 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source), ingest_status, UNSIGNED cnt:=COUNT(GROUP)}, source, ingest_status, MERGE);
