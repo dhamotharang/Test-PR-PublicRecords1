@@ -1075,6 +1075,7 @@
 		export string KEYWORD_KRFSC									:= '763';
 		export string KEYWORD_LBISF									:= '764';
 		export string KEYWORD_JPJSDA								:= '765';
+		export string KEYWORD_USSSR									:= '766';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
