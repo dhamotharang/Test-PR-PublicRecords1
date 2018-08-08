@@ -247,8 +247,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																			                  PerAssetOwnVehicle_Flag2,
 																			                  PerAssetOwnVehicle_Flag1);
 
-    SELF.PerAssetOwnVehicle_Flag    :=  perGeoRisk_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
-		SELF.PerAssetOwnVehicle         := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
+    SELF.PerAssetOwnVehicle_Flag    :=  PerAssetOwnVehicle_Flag_Final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+		SELF.PerAssetOwnVehicle         := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
 
     //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
     
