@@ -641,9 +641,9 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 
 #END
 // output(historydate, NAMED('historydate'));
- output(searchresults, NAMED('searchresults'));
+ //output(searchresults, NAMED('searchresults'));
 // output(historydate, NAMED('historydate'));
-//output(PBResults, NAMED('Results'));
+  output(PBResults, NAMED('Results'));
 
 ENDMACRO;
 
