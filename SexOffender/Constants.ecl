@@ -48,7 +48,7 @@ export Constants := module
 		export unsigned8 UNLAWFUL_COMMUNICATION_MINOR:= 8388608;
 	END;
 
-	//DF-21836 Blank out following fields in thor_data400::key::sexoffender::fcra::spkpublic_qa
+	// DF-21836 Blank out following fields in thor_data400::key::sexoffender::fcra::spkpublic_qa
 	export fields_to_clear_spkpublic := 'addl_comments_1,addl_comments_2,age,build_type,corrective_lense_flag,dna,dob_aka,doc_number,employer,employer_address_1,' +
 										 'employer_address_2,employer_address_3,employer_address_4,employer_address_5,employer_comments,employer_county,' +
 										 'employer_phone,ethnicity,fbi_number,fingerprint_date,fingerprint_link,image_date,image_link,intnet_email_address_1,' +
@@ -79,7 +79,7 @@ export Constants := module
 										 'shoe_size,skin_tone,ssn,st_id_number,temp_lodge_address_1,' +
 										 'temp_lodge_address_2,temp_lodge_address_3,temp_lodge_address_4,temp_lodge_address_5,temp_lodge_county,temp_lodge_phone';
 
-	//DF-21836 Blank out following fields in thor_data400::key::sexoffender::fcra::offenses_public_qa
+	// DF-21836 Blank out following fields in thor_data400::key::sexoffender::fcra::offenses_public_qa
 	export fields_to_clear_offenses_public := 'arrest_date,arrest_warrant,conviction_date,conviction_jurisdiction,court,court_case_number,offense_category,' +
 										 'offense_code_or_statute,offense_date,offense_description,offense_description_2,sentence_description,sentence_description_2,' +
 										 'victim_age,victim_gender,victim_minor,victim_relationship';

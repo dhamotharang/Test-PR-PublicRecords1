@@ -5,7 +5,7 @@
 	// DF-21844 Following fields need to be deprecated in thor_data400::key::watercraft::fcra::sid_qa.
 	export fields_to_clear_sid := 'company_name,gender,orig_fips,orig_province,phone_2,title';
 
-	// DF-21844 Following fields need to be deprecated in thor_data400::key::watercraft::fcra::cid_qa
+	// DF-21844 Following fields need to be deprecated in thor_data400::key::watercraft::fcra::cid_qa.
 	export fields_to_clear_cid := 'call_sign,date_expires,date_issued,doc_certificate_status,flag,hailing_port,hailing_port_province,' +
 										 'hailing_port_state,home_port_name,home_port_province,home_port_state,hull_builder_name,hull_design_type,' +
 										 'hull_identification_number,hull_material,imo_number,itc_breadth,itc_depth,itc_gross_tons,itc_net_tons,' +

@@ -1,7 +1,6 @@
-﻿import roxiekeybuild,autokey,doxie,strata;
+﻿import roxiekeybuild,autokey,doxie;
 
 export Build_Keys (filedate) := function
-
 
 // build index files
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(email_data.key_did, 
@@ -88,9 +87,6 @@ RoxieKeyBuild.Mac_SK_Move_V2('~thor_200::key::email_data::autokey::@version@::St
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_200::key::email_data::autokey::@version@::CityStName','Q',mv_autokey_city);
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_200::key::email_data::autokey::@version@::Zip','Q',mv_autokey_zip);
 
-// DF-21686 Show counts of blanked out fields in thor_200::key::email_data::fcra::qa::did
-cnt_email_data_did_key_fcra := OUTPUT(strata.macf_pops(Email_Data.Key_Did_FCRA,,,,,,FALSE,['orig_ip']));
-
 
 return sequential(sequential(build_autokeys,mv_autokey_payload,build_keys),
 									parallel(mv_autokey_ssn,
@@ -98,7 +94,6 @@ return sequential(sequential(build_autokeys,mv_autokey_payload,build_keys),
 													 mv_autokey_addr,
 													 mv_autokey_stnam,
 													 mv_autokey_city,
-													 mv_autokey_zip),
-									cnt_email_data_did_key_fcra);
+													 mv_autokey_zip) );
 
 end;

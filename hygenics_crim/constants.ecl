@@ -9,7 +9,7 @@ export constants(string filedate) := module
 	export ak_dataset := hygenics_crim.File_offenders_autokey;
   export skip_set		:= ['B','P'];
 	
-	// DF-21868 followings are fields to be deprecated in thor_200::key::criminal_offenders::fcra::qa::did
+	// DF-21868 followings are fields to be deprecated in thor_200::key::criminal_offenders::fcra::qa::did.
 	export fields_to_clear_offenders := '_3g_offender,ace_fips_county,ace_fips_st,age,case_type,citizenship,clean_errors,' +
 																							'county_of_birth,current_residence_county,dle_num,dob_alias,eye_color,fbi_num,hair_color,' +
 																							'height,image_link,ins_num,legal_residence_county,party_status,place_of_birth,race,' +
