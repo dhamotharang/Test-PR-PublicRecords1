@@ -7,10 +7,8 @@ export key_aircraft_id(boolean isFCRA = false) := function
 										Data_Services.Data_location.Prefix('FAA')+'thor_data400::key::faa::FCRA::aircraft_id_',
                     Data_Services.Data_location.Prefix('FAA')+'thor_Data400::key::aircraft_id_');
 
-	//DF-21779 Clear following fields for FCRA aircraft_id key
-	fields_to_clear := 'certification,compname,country,eng_mfr_mdl,fract_owner,last_action_date,orig_county,region,status_code,title,' +
-										 'type_engine,type_registrant';
-	ut.MAC_CLEAR_FIELDS(df, df_cleared, fields_to_clear);
+	//DF-21779 Clear speicifed fields in thor_data400::key::faa::fcra::aircraft_id_qa 
+	ut.MAC_CLEAR_FIELDS(df, df_cleared, faa.Constants.fields_to_clear_aircraft);
 	
 	df_new := IF (IsFCRA,
 								df_cleared,
