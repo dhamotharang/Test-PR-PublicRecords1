@@ -64,7 +64,7 @@ end;
 #uniquename(zAsHeaderOut2)
 %tStats% := table(ds, %headerLayout%, src, few);
 
-strata.createXMLStats(%tStats%, pBuildName, pBuildSubSet, pVersionName, pEmailNotifyList, %zAsHeaderOut1%, 'AsHeader', 'Population')  
+strata.createXMLStats(%tStats%, pBuildName, pBuildSubSet, pVersionName, pEmailNotifyList, %zAsHeaderOut1%, 'AsHeader', 'Population',,,pOmit_Output_To_Screen)
 
 #uniquename(dNGADL_as_header_hygiene)
 

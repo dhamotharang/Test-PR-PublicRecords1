@@ -23,7 +23,7 @@
 				, LEFT, RIGHT);	
 	
 	export	xNID	fGetNID(string name, integer derivation=0)	:=
-						if(derivation=0,HASH64(TRIM(name,LEFT,RIGHT)),
+						if(derivation=0,HASH64(TRIM(name[1..150],LEFT,RIGHT)),
 										HASH64(TRIM(name,LEFT,RIGHT),derivation));
 	string TrimName(string name) := FUNCTION
 		t := TRIM(name);

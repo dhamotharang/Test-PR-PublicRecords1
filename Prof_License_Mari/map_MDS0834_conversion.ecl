@@ -31,7 +31,7 @@ EXPORT map_MDS0834_conversion(STRING pVersion) := FUNCTION
 	//Remove bad records before processing
 	//There is a record Stacie Testman which will be identified as bad name, but is is a valid record.
 	ValidFile						:= apr(StringLib.StringToUpperCase(TRIM(first_name,LEFT,RIGHT)+' '+TRIM(last_name,LEFT,RIGHT))='STACIE TESTERMAN' OR
-														 (TRIM(first_name,LEFT,RIGHT)+TRIM(last_name,LEFT,RIGHT) != ' '
+														 (TRIM(first_name,LEFT,RIGHT)+TRIM(last_name,LEFT,RIGHT) + TRIM(name_full,LEFT,RIGHT) != ' '
 															AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(LAST_NAME))));
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5000)
@@ -101,8 +101,10 @@ EXPORT map_MDS0834_conversion(STRING pVersion) := FUNCTION
 		// 1.) Replacing D/B/A with  '|' to separate ORG_NAME & DBA
 		// 2.) Handle AKA Names to First, Middle Last Format
 		// 3.) Standardized corporation suffixes
-		tempTrimName					:= ut.CleanSpacesAndUpper(pInput.first_name) + ' ' +
-														 ut.CleanSpacesAndUpper(pInput.last_name);
+		tempTrimName					:= IF(ut.CleanSpacesAndUpper(pInput.first_name + pInput.last_name) <> '', 
+		                            ut.CleanSpacesAndUpper(pInput.first_name) + ' ' + ut.CleanSpacesAndUpper(pInput.last_name),
+																ut.CleanSpacesAndUpper(pInput.name_full));
+														 
 		tempTrimNameFix  			:= IF(tempTrimName[1..3]= 'C/O', TRIM(tempTrimName[4..],LEFT,RIGHT),tempTrimName);  //remove leading c/o
 		tempTrimNameFix2 			:= IF(tempTrimNameFix[1..4]= 'DBA ', TRIM(tempTrimNameFix[5..],LEFT,RIGHT),tempTrimNameFix); //remove leading dba
 		tempTrimNameFix3 			:= stringlib.stringfindreplace(tempTrimNameFix2,'/DBA ',' DBA ');

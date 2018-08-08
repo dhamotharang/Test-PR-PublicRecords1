@@ -83,8 +83,9 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	//This will translate the bitmap(s)
 	T := S.FromBits(DS);	// Use the FromBits module; makes my bitmap datafile easier to get to read
 	TranslateBitmap	:=	OUTPUT(T);
-	
-	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
+	NumRemovedRecs := '';
+	WU := '';
+	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry_'+filedate));
 
 	EmailReport:=if(MemailList <>'' , fileservices.sendEmail(MemailList,

@@ -1,12 +1,12 @@
-import ut, addresscleaner_monthly_testing, address;
+﻿import ut, addresscleaner_monthly_testing, address;
 
   #workunit('protect',true);
-  #workunit('name','AddressCleaner Build Data '+ addresscleaner_monthly_testing.version);
+  #workunit('name','Yogurt:AddressCleaner Build Data '+ addresscleaner_monthly_testing.version);
 	  //#option('AllowedClusters','thor400_30,thor400_20,thor400_60');
-	#option('AllowedClusters','thor400_20,thor400_30,thor400_60');
+	//#option('AllowedClusters','thor400_20,thor400_30,thor400_60');
   #OPTION('multiplePersistInstances',FALSE);
-  #option('AllowAutoQueueSwitch',TRUE);
-# March USDir 201603, Canada Feb2016, Navteq Apr2015
+//  #option('AllowAutoQueueSwitch',TRUE);
+////# March USDir 20180613, Canada 20180613, Navteq 201305
 	
 fileservices.RemoveOwnedSubFiles('~thor400_data::addresscleaner::monthly::processed');	
 fileservices.clearsuperfile('~thor400_data::addresscleaner::monthly::processed');
@@ -126,7 +126,7 @@ dProjP			:= PROJECT ( d , TransP ( LEFT ) )	;
 
 //CleanAddress182(const string addrline, const string lastline,string server = '',unsigned2 port = 0)			 
  c TransC (d X) := TRANSFORM
-        Clean  		:= address.CleanAddress182(TRIM(X.line1,RIGHT,LEFT),TRIM(X.line2,RIGHT,LEFT),'postalclean18.br.seisint.com',21000);
+        Clean  		:= address.CleanAddress182(TRIM(X.line1,RIGHT,LEFT),TRIM(X.line2,RIGHT,LEFT),'Bctlppostalclean18.risk.regn.net',21000);
 STRING5   v_zip       		:= Clean[117..121];
 STRING4   v_zip4      		:= Clean[122..125];			 
 SELF.crange     := Clean[1..10];

@@ -3,10 +3,10 @@ export	Constants	:=
 module
 	export	string		LandingZoneServer					:=	_control.IPAddress.bair_batchlz01;
 	export	string		LandingZonePathBase				:=	'/data/otto/';
-	export	string		LandingZoneFilePathRgx		:=	'^[0-9]+/ready';
-	export	string		InqLogLandingZonePathBase	:=	'/data/super_credit/fraudgov/in/deltabase/dev/';
+	export	string		LandingZoneFilePathRgx			:=	'^[0-9]+/ready';
+	export	string		DeltaLandingZonePathBase		:=	'/data/super_credit/fraudgov/in/deltabase/dev/';
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
-	export	string 		MBSLandingZonePathBase			:='/data/super_credit/fraudgov/in/mbs/dev/';
+	export	string 		MBSLandingZonePathBase			:='/data/super_credit/fraudgov/in/mbs/dev';
 	export NOC_MSG
 		:=
 		'** NOC **\n\n'

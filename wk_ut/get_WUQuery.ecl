@@ -126,7 +126,10 @@ module
     ,xpath('WUQueryResponse')
   );
   
-  export results :=  if(wk_ut.Is_Valid_Wuid(pWuid)  ,dsoap_results  ,dataset([],WUQueryResponse_Record));
+  export results :=  if(wk_ut.Is_Valid_Wuid(pWuid) OR                       // search by wuid
+                       (pStartDate<>'' AND pEndDate<>'')                    // OR search by date range
+                       ,dsoap_results  ,dataset([],WUQueryResponse_Record));
+											 
 
 export dnorm := normalize(results,left.Workunits,transform(eclworkunit,self := right));
 

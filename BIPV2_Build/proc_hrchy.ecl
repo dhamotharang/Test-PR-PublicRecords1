@@ -1,14 +1,18 @@
-import BIPV2;
+﻿import BIPV2;
 import BIPV2_Testing,wk_ut,tools,_control,bipv2_build;
 
 EXPORT proc_hrchy(
     pversion    = 'BIPV2.KeySuffix'
+   ,pcluster    = 'BIPV2_Build._Constants().Groupname'
    ,pOutputEcl  = false
+   ,pIsTesting  = 'false'
 ) := 
 functionmacro
 
-  ecl2run   := '#workunit(\'name\',\'BIPV2_Build.build_hrchy  @version@\');\n#workunit(\'priority\',\'high\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n' + 'BIPV2_Build.build_hrchy(\'@version@\' ,,,,,false  ).runIter;';
-  cluster   := BIPV2_Build._Constants().Groupname;
+  ecl2run   :=  '#workunit(\'name\',\'BIPV2_Build.build_hrchy  @version@\');\n#workunit(\'priority\',\'high\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n' 
+              + 'BIPV2_Build.build_hrchy(\'@version@\' ,,,,,false,,' 
+              + if(pIsTesting = false,'false','true') + '  ).runIter;';
+  cluster   := pcluster;
   
   setresults := 
   ['Records_With_Lgid3 count_records_has_lgid','Proxids_With_Lgid3 count_proxids_has_lgid'
@@ -31,4 +35,3 @@ functionmacro
   return kickBuild;
 
 endmacro;
-

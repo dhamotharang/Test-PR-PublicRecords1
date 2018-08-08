@@ -33,6 +33,10 @@ shared bk_mrtg_new_fname 	  := data_services.Data_location.Prefix('NONAMEGIVEN')
 shared okc_currency_report := dedup(SORT(LN_PropertyV2_Fast.Files_Vendor_Rpts.currencyreport_bk,
 																				FIPS,DOC_TYPE,/*key,*/-ut.ConvertDate(/*run_date*/KEYED_REC_THRU_DATE_IN_SITEX,'%m/%d/%Y','%Y%m%d')),
 																		FIPS,DOC_TYPE/*key*/);
+shared currency_report_cl := dedup(SORT(LN_PropertyV2_Fast.Files_Vendor_Rpts.currencyreport_clo,
+																				FIPS,DOC_TYPE,/*key,*/-ut.ConvertDate(/*run_date*/KEYED_REC_THRU_DATE_IN_SITEX,'%m/%d/%Y','%Y%m%d')),
+																		    FIPS,DOC_TYPE/*key*/);
+																		
 shared okc_assessor_currency_report := dedup(SORT(LN_PropertyV2_Fast.Files_Vendor_Rpts.assessorcurrencyreport_bk,
 																									fips,-filedate),
 																							fips);
@@ -982,6 +986,7 @@ ds_t1 := project(ds, transform(ly_common,
                               self := left));
 
 #if(rpttype in ['C','D'])
+// output(ds_t1);
 ds_t2	:= join(ds_t1(county_name<>''),okc_currency_report,
 //** Keeping state and county name commented out in case there's need to change from FIPS to state county **
 													//trim(right.st)	= trim(left.state_code)  and 
@@ -994,7 +999,13 @@ ds_t2	:= join(ds_t1(county_name<>''),okc_currency_report,
 													left outer, few);
 ds_tdee := ds_t2(source in ['BK','OKC']);
 ds_tmtg	:= ds_t2(source in ['BK-MTG','OKC-MTG']);
-ds_tall	:= ds_t2(source not in ['BK','OKC','BK-MTG','OKC-MTG']);
+ds_tall	:= ds_t2(source not in ['BK','OKC','BK-MTG','OKC-MTG','FRS']);
+//Populated the FRS entries in the report using the Core logic report VC 
+ds_tfrc:= join(ds_t1(county_name<>'' and source		= 'FRS'),currency_report_cl(),
+													  (integer)left.fips_code= (integer)right.fips/*key[1..5]*/ ,
+													transform(ly_common,self:=right,self:=left),
+													left outer, few);
+// output(ds_tfrc(source		= 'FRS' and (integer)fips_code in Set_fips_code),named('AfterJoinFRSRecWithCLCurrReport'))	;												
 ds_rdee	:= rollup(sort(ds_tdee,fips_code,/*state_code,county_name,*/source),
 													left.fips_code	= right.fips_code and
 													//left.state_code	= right.state_code and
@@ -1009,7 +1020,7 @@ ds_rmtg	:= rollup(sort(ds_tmtg,fips_code,/*state_code,county_name,*/source),
 													//								= trim(regexreplace('-',left.county_name,''),all) and
 													(left.source		= 'BK-MTG' and 
 													right.source		= 'OKC-MTG'),transform(ly_common,self:=left));
-ds_t3		:= sort(ds_rdee+ds_rmtg+ds_tall,fips_code,/*state_code,county_name,*/source,-file_pdate/*max_build_version*/);
+ds_t3		:= sort(ds_rdee+ds_rmtg+ds_tall+ds_tfrc,fips_code,/*state_code,county_name,*/source,-file_pdate/*max_build_version*/);
 
 tbdeed:=f_aggregate_deed((LN_PropertyV2.File_deed+LN_PropertyV2_Fast.files.base.deed_mortg)(process_date<=pversion));
 
@@ -1117,6 +1128,7 @@ endmacro;
 
 //Deed Rpt by County and delivery_date
 shared deed_days_apart_stats_all := fn_append_county_data(f_aggregate_data(raw_deed_slim, fips, 'D', ''));
+
 export deed_days_apart_stats_all_updated := sort(t_reformat(deed_days_apart_stats_all(recordcount > 0), 'D', 'fips'), /*state_code, county_name, */fips_code, file_pdate/*max_delivery_date*/);
 export deed_days_apart_stats_all_condensed := sort(t_reformat(deed_days_apart_stats_all(recordcount > 0), 'C', 'fips'), /*state_code, county_name, */fips_code, file_pdate/*max_delivery_date*/);
 

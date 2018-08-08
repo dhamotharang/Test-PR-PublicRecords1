@@ -1,4 +1,4 @@
-import address,Corp2,Corp2_mapping,Corp2_raw_al,Corp2_raw_ar,Corp2_raw_az,Corp2_raw_co,Corp2_raw_ct,Corp2_raw_dc, Corp2_raw_fl, Corp2_raw_ga,Corp2_raw_hi,Corp2_raw_ia,Corp2_raw_il,Corp2_raw_ks,
+﻿import address,Corp2,Corp2_mapping,Corp2_raw_al,Corp2_raw_ar,Corp2_raw_az,Corp2_raw_co,Corp2_raw_ct,Corp2_raw_dc, Corp2_raw_fl, Corp2_raw_ga,Corp2_raw_hi,Corp2_raw_ia,Corp2_raw_il,Corp2_raw_ks,
 			 Corp2_raw_la,Corp2_raw_id,Corp2_raw_in,Corp2_raw_ky,Corp2_raw_ma,Corp2_raw_md,Corp2_raw_me,Corp2_raw_mi,Corp2_raw_mn,Corp2_raw_mo,Corp2_raw_ms,Corp2_raw_mt,Corp2_raw_nd,Corp2_raw_nc,
 			 Corp2_raw_ne,Corp2_raw_nh,Corp2_raw_nm,Corp2_raw_nv,Corp2_raw_oh,Corp2_raw_ok,Corp2_raw_or,corp2_raw_pa,Corp2_raw_ri,Corp2_raw_sc,Corp2_raw_sd,Corp2_raw_tn,Corp2_raw_tx,Corp2_raw_ut,
 			 Corp2_raw_va,Corp2_raw_vt,Corp2_raw_wa,Corp2_raw_wi,Corp2_raw_wv,Corp2_raw_wy,ut;
@@ -10,14 +10,14 @@ export fCleanAddress(string pStateOrigin,string pStateOriginDesc,string pAddr1 =
 		//							 AddressLine2(City + State + Zip) that can be passed
 		//							 into the address cleaner.
 		//********************************************************************
-		shared UC_StateOrigin			:= ut.fn_RemoveSpecialChars(Corp2.t2u(pStateOrigin));
-		shared UC_StateOriginDesc	:= ut.fn_RemoveSpecialChars(Corp2.t2u(pStateOriginDesc));
-		shared UC_Addr1 					:= ut.fn_RemoveSpecialChars(Corp2.t2u(pAddr1));
-		shared UC_Addr2						:= ut.fn_RemoveSpecialChars(Corp2.t2u(pAddr2));
-		shared UC_City		 				:= ut.fn_RemoveSpecialChars(Corp2.t2u(pCity));
-		shared UC_State						:= ut.fn_RemoveSpecialChars(Corp2.t2u(pState));
-		shared UC_Zip							:= ut.fn_RemoveSpecialChars(Corp2.t2u(pZip));
-		shared UC_Country 				:= ut.fn_RemoveSpecialChars(Corp2.t2u(pCountry));
+		shared UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pStateOriginDesc));
+		shared UC_Addr1 					:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pAddr1));
+		shared UC_Addr2						:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pAddr2));
+		shared UC_City		 				:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pCity));
+		shared UC_State						:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pState));
+		shared UC_Zip							:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pZip));
+		shared UC_Country 				:= corp2_mapping.fn_RemoveSpecialChars(Corp2.t2u(pCountry));
 
 		shared alpha							:= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		shared alpha_numeric			:= '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

@@ -1,4 +1,4 @@
-IMPORT Seed_Files, riskview;
+﻿IMPORT Seed_Files, riskview;
 
 CountForDatasets := 2;
 //Liens for layout - define up to 2
@@ -15,6 +15,7 @@ CountForDatasets := 2;
 				#APPEND(Liens,
 							'string30 Liens' + %'cntLiens'% + '_Seq;' +
 							'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
+       'string2 Liens' + %'cntLiens'% + '_LienTypeID;' +
 							'string50 Liens' + %'cntLiens'% + '_LienType;' +
 							'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
 							'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
@@ -24,7 +25,8 @@ CountForDatasets := 2;
 							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
 							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
 							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
-							'string2 Liens' + %'cntLiens'% + '_AgencyState;');										
+							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
+       'unsigned Liens' + %'cntLiens'% + '_ConsumerStatementId;');
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -43,6 +45,7 @@ CountForDatasets := 2;
 				#APPEND(Jgmts,
 						'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
 						'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
+      'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
 						'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
 						'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
 						'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
@@ -56,7 +59,9 @@ CountForDatasets := 2;
 						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
 						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
 						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
-						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;');										
+						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +	
+      'unsigned Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;');
+      
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END

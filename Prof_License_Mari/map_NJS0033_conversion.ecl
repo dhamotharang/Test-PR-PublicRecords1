@@ -1,4 +1,4 @@
-/* Converting New Jersey Department of Law and Public Safety / Multiple Professions Licenses File to MARI common layout
+﻿/* Converting New Jersey Department of Law and Public Safety / Multiple Professions Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
@@ -54,7 +54,7 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state
 	mari_dest						:= '~thor_data400::in::proflic_mari::';
-  #workunit('name','Prof License MARI - ' + code);	
+  #workunit('name','Yogurt: Prof License MARI - ' + code);	
 	
 	//NJ appraiser input file
 	apr									:= Prof_License_Mari.files_NJS0033.apr(REGEXFIND('Real Estate Appraisers',PROF_ID,NOCASE));

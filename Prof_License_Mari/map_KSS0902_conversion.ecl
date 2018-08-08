@@ -1,4 +1,4 @@
-//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
+﻿//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
 //  professional license (BASE) layout to be used for MARI and PL_BASE development.
 //	05/05/2015 T.George - New Development
 //************************************************************************************************************* */	
@@ -6,7 +6,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt: map_KSS0902_conversion');
 	code 		:= 'KSS0902';
 	src_cd	:= 'S0902';
 	src_st	:= 'KS';	//License state

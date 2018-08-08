@@ -1,4 +1,4 @@
-Import ut, std, corp2, data_services, versioncontrol, Tools, Scrubs, Corp2_Mapping, Corp2_Raw_PA, Scrubs_Corp2_Mapping_PA_Main, Scrubs_Corp2_Mapping_PA_Event;
+﻿Import ut, std, corp2, data_services, versioncontrol, Tools, Scrubs, Corp2_Mapping, Corp2_Raw_PA, Scrubs_Corp2_Mapping_PA_Main, Scrubs_Corp2_Mapping_PA_Event;
 
 export PA := MODULE; 
 
@@ -115,30 +115,16 @@ export PA := MODULE;
 			self.corp_inc_state 						  := state_origin;
 			self.corp_ln_name_type_cd         := if (corp2.t2u(input.nametypeid) <> '4' ,Corp2_Raw_PA.Functions.GetNameTypCd(input.nametypeid) ,'');
 			self.corp_ln_name_type_desc       := Corp2_Raw_PA.Functions.GetNameTypDesc(input.nametypeid,input.nametypedesc);
-			
-			corpAddTyp := if(corp2.t2u(input.AddressTypeID) not in ['14','15','18'] ,true ,false);		
-			self.corp_address1_type_cd        := if (corpAddTyp and Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
-																						  ,Corp2_Raw_PA.Functions.GetAddrCd(input.AddressTypeID) ,'');
-			self.corp_address1_type_desc      := if (corpAddTyp and Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
-																						  ,Corp2_Raw_PA.Functions.GetAddrDesc(input.AddressTypeID,input.AddressTypeDesc) ,'');
-			self.corp_address1_line1          := if (corpAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine1 ,'');
-			self.corp_address1_line2          := if (corpAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine2 ,'');
-			self.corp_address1_line3          := if (corpAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine3	,'');	 
-			self.corp_prep_addr1_line1        := if (corpAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLine1, '');	
-			self.corp_prep_addr1_last_line    := if (corpAddTyp	,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLastLine,'');	
-			
-			raAddTyp   := if(corp2.t2u(input.AddressTypeID) in ['14','15','18'] ,true ,false);
-			self.corp_ra_address_type_cd      := if (raAddTyp and Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
-			                                        ,case(corp2.t2u(input.AddressTypeID), '14'=>'14', '15'=>'15', '18'=>'R', '') ,'');
-			self.corp_ra_address_type_desc    := if (raAddTyp and Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
-																							,case(corp2.t2u(input.AddressTypeID),'14'=>'PREVIOUS REGISTERED MAILING', '15'=>'PREVIOUS REGISTERED OFFICE', '18'=>corp2.t2u(input.AddressTypeDesc),'') ,'');
-			self.corp_ra_address_line1        := if (raAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine1 ,'');
-			self.corp_ra_address_line2        := if (raAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine2 ,'');
-			self.corp_ra_address_line3        := if (raAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine3 ,'');	 
-			self.ra_prep_addr_line1           := if (raAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLine1, '');	
-			self.ra_prep_addr_last_line       := if (raAddTyp ,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLastLine	,'');																				
+			self.corp_address1_type_cd        := if ( Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
+																						   ,Corp2_Raw_PA.Functions.GetAddrCd(input.AddressTypeID) ,'');
+			self.corp_address1_type_desc      := if ( Corp2_Mapping.fAddressExists(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).ifAddressExists
+																						   ,Corp2_Raw_PA.Functions.GetAddrDesc(input.AddressTypeID,input.AddressTypeDesc) ,'');
+			self.corp_address1_line1          := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine1;
+			self.corp_address1_line2          := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine2;
+			self.corp_address1_line3          := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).AddressLine3	;	 
+			self.corp_prep_addr1_line1        := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLine1;	
+			self.corp_prep_addr1_last_line    := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.address2,input.address3,input.city,input.state,input.zip,input.country).PrepAddrLastLine;	
 			self.corp_ra_full_name            := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.registeredagentname).BusinessName;
-			
 			self.corp_agent_county            := corp2.t2u(input.county);
 			self.corp_inc_county              := if(corp2.t2u(input.countyofincorporation) <> ''
 																						 ,corp2.t2u(input.countyofincorporation) ,corp2.t2u(input.county));
@@ -290,7 +276,7 @@ export PA := MODULE;
 												   transform(corp2_raw_pa.layouts.jFilCorp_TempLay,
 													           self.EntityID := right.EntityID;
 																		 self := left; self := right; self := []; ),
-																		 left outer,	local	);
+																		 left outer,	local	): independent;	
 	
 	ARtypes := ['100','101','148','149','245','258','286','298','311','319','356'];	
 		
@@ -417,8 +403,6 @@ export PA := MODULE;
 																							corp_name_status_cd_invalid            <> 0 or
 																							corp_address1_type_cd_invalid      		 <> 0 or
 																							corp_address1_type_desc_invalid      	 <> 0 or
-																							corp_ra_address_type_cd_invalid        <> 0 or
-																							corp_ra_address_type_desc_invalid      <> 0 or
 																							cont_type_cd_invalid      						 <> 0 or
 																							cont_type_desc_invalid                 <> 0 or
 																							cont_address_type_cd_invalid           <> 0 or
@@ -459,8 +443,6 @@ export PA := MODULE;
 																								corp_name_status_cd_invalid            = 0 and
 																								corp_address1_type_cd_invalid      		 = 0 and
 																								corp_address1_type_desc_invalid      	 = 0 and
-																								corp_ra_address_type_cd_invalid        = 0 and
-																								corp_ra_address_type_desc_invalid      = 0 and
 																								cont_type_cd_invalid      						 = 0 and
 																								cont_type_desc_invalid                 = 0 and
 																								cont_address_type_cd_invalid           = 0 and

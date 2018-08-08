@@ -85,6 +85,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('[/~()]', files,nocase)
 																				or regexfind('10.173.231.12',files,nocase)
 																				or regexfind('10.241.20.205',files,nocase)
+																				or regexfind('10.241.50.45',files,nocase)
 																				or regexfind('thor_data400::in::seq',files,nocase)
 																				or regexfind('^file::.*$',files,nocase)
 																				)) ,files),record);

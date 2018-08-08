@@ -1,4 +1,4 @@
-export fn_rollup(dataset(recordof(marriage_divorce_v2.layout_mar_div_intermediate)) int0)
+﻿export fn_rollup(dataset(recordof(marriage_divorce_v2.layout_mar_div_intermediate)) int0)
 	:=
 function
  
@@ -43,6 +43,9 @@ recordof(int0)  rollup_repeating_records(recordof(int0) le, recordof(int0) ri) :
  
  self.marriage_city := if(le.marriage_city<>'',le.marriage_city,ri.marriage_city);
  self.divorce_city  := if(le.divorce_city<>'',le.divorce_city,ri.divorce_city);
+
+ //DF-21262 use persistent_record_id from earlier vendor_first_seen_date
+ self.persistent_record_id := if(le.dt_vendor_first_reported > ri.dt_vendor_first_reported, ri.persistent_record_id, le.persistent_record_id);
 								 
  self.touched   := if(le.touched<>'',le.touched,ri.touched);
   

@@ -1,4 +1,4 @@
-IMPORT BIPV2, Risk_Indicators, SALT28;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28;
 
 EXPORT Layouts := MODULE
 
@@ -371,6 +371,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep1_dlnumber; // in_rep1_dlnumber
 		STRING2 rep1_dlstate; // in_rep1_dlstate
 		STRING100 rep1_email; // in_rep1_email
+    UNSIGNED6 rep1_lexID;
 		// Authorized Rep 2 input information
 		STRING5 rep2_titlename; // in_rep2_title
 		STRING120 rep2_fullname; // in_rep2_full
@@ -389,6 +390,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep2_dlnumber; // in_rep2_dlnumber
 		STRING2 rep2_dlstate; // in_rep2_dlstate
 		STRING100 rep2_email; // in_rep2_email
+    UNSIGNED6 rep2_lexID;
 		// Authorized Rep 3 input information
 		STRING5 rep3_titlename; // in_rep3_title
 		STRING120 rep3_fullname; // in_rep3_full
@@ -407,6 +409,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep3_dlnumber; // in_rep3_dlnumber
 		STRING2 rep3_dlstate; // in_rep3_dlstate
 		STRING100 rep3_email; // in_rep3_email
+    UNSIGNED6 rep3_lexID;
 		// Authorized Rep 4 input information
 		STRING5 rep4_titlename; // in_rep4_title
 		STRING120 rep4_fullname; // in_rep4_full
@@ -425,6 +428,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep4_dlnumber; // in_rep4_dlnumber
 		STRING2 rep4_dlstate; // in_rep4_dlstate
 		STRING100 rep4_email; // in_rep4_email
+    UNSIGNED6 rep4_lexID;
 		// Authorized Rep 5 input information
 		STRING5 rep5_titlename; // in_rep5_title
 		STRING120 rep5_fullname; // in_rep5_full
@@ -443,6 +447,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep5_dlnumber; // in_rep5_dlnumber
 		STRING2 rep5_dlstate; // in_rep5_dlstate
 		STRING100 rep5_email; // in_rep5_email
+    UNSIGNED6 rep5_lexID;
 	END;
 	
 	EXPORT CleanInputLayout := RECORD // CleanInput

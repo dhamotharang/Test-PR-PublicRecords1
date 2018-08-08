@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_raw_mt;
+﻿IMPORT corp2, corp2_raw_mt;
 	
 EXPORT Functions := MODULE
 
@@ -8,7 +8,7 @@ EXPORT Functions := MODULE
 		EXPORT invalid_name_type_code(STRING s, STRING recordOrigin) := FUNCTION
       
 			 isValidCD := map(recordOrigin = 'T'        => true, //Contact recs have blank name type codes
-											  s in ['01','03','06'] => true,
+											  s in ['01','03','06','10'] => true,
 											  false);
 									
 			 RETURN if(isValidCD,1,0);
