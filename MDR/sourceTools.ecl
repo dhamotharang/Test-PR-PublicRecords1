@@ -209,6 +209,7 @@ MODULE
 	export src_Enclarity								 := '64';
 	export src_Entiera 									 := 'ET';	
 	export src_Equifax                   := 'EQ';
+	export src_Equifax_Business_Data     := 'Z1';
 	export src_Equifax_Quick             := 'QH';
 	export src_Equifax_Weekly            := 'WH';
 	export src_Eq_Employer               := 'QQ';
@@ -1651,7 +1652,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_EMerge_Master             := [src_EMerge_Master             ];
 	export set_Employee_Directories      := [src_Employee_Directories      ];
 	export set_Enclarity								 := [src_Enclarity								 ];
-	export set_Entiera                   := [src_Entiera                   ];	
+	export set_Entiera                   := [src_Entiera                   ];		
+	export set_Equifax_Business_Data     := [src_Equifax_Business_Data     ];	
 	export set_Equifax_Direct            := [src_Equifax                   ];
 	export set_Equifax_Quick             := [src_Equifax_Quick             ];
 	export set_Equifax_Weekly            := [src_Equifax_Weekly            ];
@@ -2169,6 +2171,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsEnclarity									(string  sr) := sr							 in set_Enclarity									 ;
 	export SourceIsEntiera                    (string  sr) := sr               in set_Entiera                    ;
 	export SourceIsEquifax                    (string  sr) := sr               in set_Equifax                    ;
+	export SourceIsEquifax_Business_Data      (string  sr) := sr               in set_Equifax_Business_Data      ;
 	export SourceIsEquifax_Direct             (string  sr) := sr               in set_Equifax_Direct             ;
 	export SourceIsEquifax_Quick              (string  sr) := sr               in set_Equifax_Quick              ;
 	export SourceIsEquifax_Weekly             (string  sr) := sr               in set_Equifax_Weekly             ;
@@ -2694,6 +2697,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Enclarity									,'Enclarity'																								 }
 		,{src_Entiera       						,'Entiera'                                       						 }
 		,{src_Equifax                   ,'Equifax'                                                   }
+		,{src_Equifax_Business_Data     ,'Equifax Business Data'                                                     }
 		,{src_Equifax_Quick             ,'Equifax Quick'                                             }
 		,{src_Equifax_Weekly            ,'Equifax Weekly'                                            }
 		,{src_Eq_Employer               ,'Eq Employer'                                               }
@@ -3198,7 +3202,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Employee_Directories      => 'Employee Directories'   
 		,src_Enclarity								 => 'Enclarity National Provider/Sanctions'
 		,src_Entiera       						 => 'Entiera'                                       				
-		,src_Equifax                   => 'Equifax'                                              
+		,src_Equifax                   => 'Equifax'
+		,src_Equifax_Business_Data     => 'Equifax Business Data'                                             
 		,src_Equifax_Quick             => 'Equifax Quick'                                        
 		,src_Equifax_Weekly            => 'Equifax Weekly'                                       
 		,src_Eq_Employer               => 'Eq Employer'
