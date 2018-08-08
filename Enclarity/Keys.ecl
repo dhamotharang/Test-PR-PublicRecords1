@@ -1,4 +1,4 @@
-import doxie, tools;
+﻿import doxie, tools;
 
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
 
@@ -24,7 +24,20 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	shared dea_Base_gk							:= dea_Base(group_key <> '');
 	shared dea_Base_dea							:= dea_Base(dea_num <> '');
 
-	shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// Modification 20180703 - Sometime this year, the MO nurse practitioner licensing boards stopped providing updated records when a
+	// provider surrendered their license, or it was revoked, or any other reason it became expired prematurely.  Expired licenses no
+	// longer appear in the list provided by the board, so the absence of a previously issued license from this list implies it is 
+	// expired.  For the purposes of this build, since the license record was previously received with a future expiration date 
+	// that could now be erroneous, the license_base build was changed to create an additional "persist" file to wipe out what is
+	// assumed to be bad expiration dates, and then the key created from that base.  It is important to know that the original license
+	// base still contains the expiration dates, so this means that the key and the base file will not match for the qualifying records.
+	// The modified code for this additional persist file can be found in Enclarity.Update_base.Modified_License_base.
+	
+	make_lic_base	:= 									Update_Base(pversion,pUseProd).Modified_License_Base; 
+	
+	shared license_base							:= make_lic_base;  
+	// shared license_base							:= dataset('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + pversion, enclarity.Layouts.license_base, thor);
 	shared lic_Base_gk							:= license_Base(group_key <> '');
 	shared lic_Base_lic							:= license_Base(lic_num_in <> '');
 
@@ -131,4 +144,5 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('specialty_base		,{group_key,spec_code	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_group_key_spec_code		,specialty_group_key_spec_code	 );
 	tools.mac_FilesIndex('specialty_base		,{spec_desc,group_key	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_spec_desc_group_key		,specialty_spec_desc_group_key	 );
 			
+	
 end;

@@ -1,4 +1,4 @@
-﻿import ut,roxiekeybuild, doxie_files, promotesupers,std,dops, strata;
+﻿import ut,roxiekeybuild, doxie_files, promotesupers,std,dops;
 
 export proc_build_keys(string version_date) := function
 
@@ -105,16 +105,6 @@ export proc_build_keys(string version_date) := function
 	update_faa_version := dops.updateversion('FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'N|BN');
 	update_faa_fcra_version := dops.updateversion('FCRA_FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'F');
 
-	// DF-21779 Show counts of blanked out fields in thor_data400::key::faa::fcra::aircraft_id
-	cnt_faa_aircraft_id_fcra := OUTPUT(strata.macf_pops(faa.key_aircraft_id(true),,,,,,FALSE,['certification','compname','country','eng_mfr_mdl',
-																											'fract_owner','last_action_date','orig_county','region','status_code','title',
-																											'type_engine','type_registrant']));
-	// Show counts of blanked out fields in thor_data400::key::faa::fcra::aircraft_info_qa
-	cnt_faa_aircraft_info_fcra := OUTPUT(strata.macf_pops(faa.key_aircraft_info(true),,,,,,FALSE,['aircraft_category_code','aircraft_cruising_speed','aircraft_weight',
-	                                                    'amateur_certification_code','lf','number_of_engines','number_of_seats','type_engine']));
-	// Show counts of blanked out fields in thor_data400::key::faa::fcra::engine_info_qa
-	cnt_faa_engine_info_fcra := OUTPUT(strata.macf_pops(faa.key_engine_info(true),,,,,,FALSE,['fuel_consumed','lf']));
-
 	final := sequential(
 		do_airmen,
 		do_aircraft,
@@ -125,8 +115,7 @@ export proc_build_keys(string version_date) := function
 		proc_build_keys_bdid(version_date).build_airmen_autokeys,
 		parallel(d,e,f,g,h),
 		proc_build_keys_bdid(version_date).mv_keys,
-		parallel(update_faa_version,update_faa_fcra_version),
-		parallel(cnt_faa_aircraft_id_fcra,cnt_faa_aircraft_info_fcra,cnt_faa_engine_info_fcra) ) : success(send_succ_msg), failure(send_fail_msg);
+		parallel(update_faa_version,update_faa_fcra_version)) : success(send_succ_msg), failure(send_fail_msg);
 	
 	return final;
 

@@ -1,4 +1,4 @@
-﻿import tools;
+﻿import tools,bipv2_build;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Send_Emails(
 	
@@ -6,8 +6,8 @@ export Send_Emails(
 	,boolean							pUseOtherEnvironment 		= false
 	,boolean							pShouldUpdateRoxiePage	= true
 	,dataset(lay_builds)	pBIPV2FullKeys					= keynames(pversion).dall_filenames
-	,string								pEmailList							= 'laverne.bentley@lexisnexis.com,5615731227@txt.att.net'
-	,string								pRoxieEmailList					= 'laverne.bentley@lexisnexis.com,5615731227@txt.att.net'
+	,string								pEmailList							= bipv2_build.mod_email.emailList
+	,string								pRoxieEmailList					= bipv2_build.mod_email.emailList
 	,string								pBuildName							= 'BIPV2 Xlink'
 	,string								pBuildMessage						= 'Base Files Finished'
 	,string							  pUseVersion							= 'qa'

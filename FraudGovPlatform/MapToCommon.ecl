@@ -40,8 +40,8 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;
-		self.Household_ID := (unsigned8) left.Case_ID;
-		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := left.Client_ID;
 		self:= left; 
 		self:= [];
 	)); 
@@ -65,28 +65,22 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;		
-		self.Household_ID := (unsigned8) left.Case_ID;
-		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := left.Client_ID;
 		self:= left; 
 		self:= [];
 	)); 
 	
-// Append MBS classification attributes 
-		seed_In := FraudGovPlatform.testseed.test_lexid	+ FraudGovPlatform.testseed.test_ssn	+ FraudGovPlatform.testseed.test_ip ;
-		Fraudshared.layouts.base.main seedprep (seed_In l,integer c) := transform
-																		self.source_rec_id := max(inBaseIdentityData,source_rec_id) +c;
-																		self:=l;
-																		self:=[];
-																		end;
-		seed_Out := Project(seed_In,seedprep(left,counter));
-  CombinedClassification := Functions.Classification(IdentityData + KnownFraud + If(Fraudshared.Platform.Source = 'FraudGov'  ,seed_Out)) ; 
+	// Append MBS classification attributes 
+	CombinedClassification := Functions.Classification(IdentityData + KnownFraud) ; 
 	
 	// append rid 
-	
+	// Filter header records
+	NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+ 
+	// Append RingID
+	NewBaseRingID := Append_RingID (NewBaseRid);
 
- // Filter header records
- NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
-
- EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
+	EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRingID);
 
 END;

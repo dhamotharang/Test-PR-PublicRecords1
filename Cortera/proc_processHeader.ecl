@@ -3,7 +3,7 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 
 
 
-		ds := PROJECT(hdr, TRANSFORM(Cortera.Layout_Header_Out,
+		ds1 := PROJECT(hdr, TRANSFORM(Cortera.Layout_Header_Out,
 									self.processdate := STD.Date.Today( );
 									self.version := version;
 									self.current := true;
@@ -18,6 +18,8 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 									self := [];
 									)
 								);
+								
+		ds := Cortera.FixFirstSeen(ds1);
 								
 		us := ds(country='US');
 									

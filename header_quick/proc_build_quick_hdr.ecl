@@ -1,9 +1,7 @@
-﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl;
+﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3;
 
-export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Scoring_QA@risk.lexisnexis.com') := function
+export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
 
-	name:='Quick Header build '+filedate;
-	#workunit('name', name);
 	
 	versionCheck := if(filedate[1..6] = ut.GetDate[1..6] and (header.Sourcedata_month.v_version[1..6] = filedate[1..6] or header.Sourcedata_month.v_eq_as_of_date[1..6] = filedate[1..6]),
 											output('The version dates are good'),
@@ -19,6 +17,14 @@ export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lex
 	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'F');
 	dops_QH       := roxiekeybuild.updateversion('QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
 	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
+	
+// Update Orbit with the correct entries in build in progress mode.
+
+  oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_QuickHeaderKeys',filedate,'F', ,true,true);	
+  oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true,true);	
+  oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true,true);	
+  oQH_nonitems  := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N',runaddcomponentsonly := true);
+  oQHS_nonitems := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N',runaddcomponentsonly := true);
 	
 	EQ_records_in0 := header.fn_preprocess(true);
 	
@@ -166,6 +172,7 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 										,Proc_Accept_SRC_toQA(filedate)
 										,proc_build_ssn_suppression(filedate)
 										,proc_build_current_wa_residents_file 
+										,SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs,oQH_nonitems,oQHS_nonitems)
 	  								//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 										);										 
 end;

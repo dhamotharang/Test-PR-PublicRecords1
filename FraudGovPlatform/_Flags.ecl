@@ -18,17 +18,19 @@ module
 			export IdentityData     := count(nothor(FileServices.SuperFileContents(Filenames().Base.IdentityData             	.QA))) > 0;
 			export KnownFraud     	:= count(nothor(FileServices.SuperFileContents(Filenames().Base.KnownFraud             		.QA))) > 0;
 			export Main             := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main  				.QA))) > 0;
+			export Pii	            := count(nothor(FileServices.SuperFileContents(Filenames().Base.Pii  											.QA))) > 0;
 		end;
 	end;
 
 // put the conditions when to update individual Base files. 
 
-  export Update := module
+	export Update := module
 		export IdentityData       := FileExists.Input.IdentityData and FileExists.Base.IdentityData;
 		export KnownFraud       	:= FileExists.Input.KnownFraud and FileExists.Base.KnownFraud;
 		export Main          			:= FileExists.Input.IdentityData and FileExists.Base.Main;
-		end;
-  export Skipped := module
+		export Pii          			:= FileExists.Base.Main and FileExists.Base.Pii;
+	end;
+	export Skipped := module
 		export IdentityData       := ~FileExists.Input.IdentityData ;
 		export KnownFraud       	:= ~FileExists.Input.KnownFraud ;
 	end;

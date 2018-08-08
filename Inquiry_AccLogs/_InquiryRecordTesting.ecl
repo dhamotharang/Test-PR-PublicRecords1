@@ -1,4 +1,4 @@
-import ut, watchdog, did_add, header, did_add, address, lib_fileservices, lib_stringlib, ut, header_slimsort, didville, watchdog, idl_header;;
+﻿import ut, watchdog, did_add, header, did_add, address, lib_fileservices, lib_stringlib, ut, header_slimsort, didville, watchdog, idl_header;;
 
 /****** SAMPLE CODE *********************************************************************************************/
 /*
@@ -75,7 +75,8 @@ export WatchDog_PersonData(set of string pVertical = [''], set of string pIndust
 
 wu_ := if(paramwu_ <> '', paramwu_, workunit);
 
-filtDates := PULL(inquiry_acclogs.Key_Inquiry_DID(search_info.datetime[1..8] between start_date and end_date));
+// added inquiry_acclogs.Key_Inquiry_DID_Update to the input 
+filtDates := (PULL(inquiry_acclogs.Key_Inquiry_DID) + pull(inquiry_acclogs.Key_Inquiry_DID_Update)) (search_info.datetime[1..8] between start_date and end_date);
 
 filtADL := filtdates(person_q.appended_adl > 0);
 

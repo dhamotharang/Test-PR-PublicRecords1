@@ -238,7 +238,7 @@ dProxidMatches:=PROJECT(dRawResultsNormed,TRANSFORM({LEFT.uniqueid;STRING proxid
   SELF:=LEFT;
 ));
 
-dSeleProxids:=THISMODULE.Process_Biz_Layouts.KeyproxidUp(ultid=e_seleid AND orgid=e_seleid AND seleid=e_seleid);
+dSeleProxids:=THISMODULE.Process_Biz_Layouts.KeyseleidUp(keyed(seleid=e_seleid)); // 20180329 JA: replaced KeyproxidUp(ultid=e_seleid AND orgid=e_seleid AND seleid=e_seleid);
 dLinkIDs:=BIPV2_Best.Key_LinkIds.kfetch(
   inputs:=DEDUP(PROJECT(dSeleProxids,BIPV2.IDlayouts.l_xlink_ids),ALL),
   Level:=BIPV2.IDconstants.Fetch_Level_PROXID
@@ -253,7 +253,7 @@ lSlimmed:=RECORD
   DATASET({STRING sic_code;}) sic_codes;
   DATASET({STRING naics_code;}) naics_codes;
 END;
-dSlimmed:=PROJECT(dLinkIDs,TRANSFORM(lSlimmed,
+dSlimmed:=PROJECT(dLinkIDs(proxid <> 0),TRANSFORM(lSlimmed, // 20180329 JA: added filter proxid <> 0 because change to KeyseleidUp means dLinkIDs includes rollup record at sele level, and we don't need hyperlink to non-existant proxid
   SELF.proxid__html:=BIPV2.Hyperlink().BIPHeader(LEFT.proxid);
   SELF.names:=PROJECT(LEFT.company_name,TRANSFORM(RECORDOF(lSlimmed.names),SELF.name:=LEFT.company_name;));
   SELF.addresses:=PROJECT(LEFT.company_address,TRANSFORM(RECORDOF(lSlimmed.addresses),SELF.prim_range:=LEFT.company_prim_range;SELF.prim_name:=LEFT.company_prim_name;SELF.sec_range:=LEFT.company_sec_range;SELF.city:=LEFT.company_p_city_name;SELF.st:=LEFT.company_st;SELF.zip:=LEFT.company_zip5;));

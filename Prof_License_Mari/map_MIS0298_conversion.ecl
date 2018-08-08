@@ -5,7 +5,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, NID;
 
 EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
-#workunit('name','map_MIS0298_conversion');
+#workunit('name','Yogurt: map_MIS0298_conversion');
 	code 								:= 'MIS0298';
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state

@@ -1,5 +1,5 @@
-// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
-#workunit('name','map_MNS0869_conversion'); 
+﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
+#workunit('name','Yogurt: map_MNS0869_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION

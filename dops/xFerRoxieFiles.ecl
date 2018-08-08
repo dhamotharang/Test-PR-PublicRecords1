@@ -37,7 +37,7 @@ EXPORT xFerRoxieFiles(
 											,boolean MoveToLive = false
 											,boolean spawnWU = true
 											,string roxieip = _Control.RoxieEnv.prod_batch_neutral
-											,string srcthoresp = '10.241.30.202'
+											,string srcthoresp = 'prod_esp.br.seisint.com'
 											,string srcthordali = 'prod_dali.br.seisint.com'
 											,string srcthorespport = '8010'
 											,set of string srcthorclusters = ['thor400_20'
@@ -53,6 +53,7 @@ EXPORT xFerRoxieFiles(
 											,string roxiecertesp = '10.173.235.23'
 											,string roxiecerttarget = 'roxie_130'
 											,boolean useRoxieToGetSubFilenames = true
+											,boolean isFullRefresh = false
 											) := module
 		
 		export isAddSubFileSuffix := if (suffixSuperName <> ''
@@ -110,14 +111,14 @@ EXPORT xFerRoxieFiles(
 			end;
 		
 			dFilesReadyForLive := if (useRoxieToGetSubFilenames
-																,join(dFilesToMove
+																,dedup(sort(join(dFilesToMove
 																			,dPackageKeys
 																			,stringlib.StringToLowerCase(regexreplace('_'+suffixSuperName
 																													,regexreplace('::'+suffixSuperName+'::',left.superfile, '::qa::',nocase),
 																														'_qa',nocase)) = stringlib.StringToLowerCase(right.superfile)
 																																
 																			,xFilesReadyForLive(left,right)
-																		)
+																		),superfile,subfile),record)
 																,GetSubFilesFromThor()
 																
 																);
@@ -129,22 +130,23 @@ EXPORT xFerRoxieFiles(
 
 			dtFilesToMove := table(dFilesReadyForLive,rtFilesToMove,superfile, few);
 
-			rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dtFilesToMove r) := transform
+			rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dFilesReadyForLive r) := transform
 				
-				self.cnt := r.scnt;
-				self.superfile := if (suffixSuperName <> '', stringlib.StringToLowerCase(regexreplace('_qa'
-																													,regexreplace('::qa::',l.superfile, '::'+suffixSuperName+'::'),
+				self.cnt := if(l.superfile = stringlib.StringToLowerCase(regexreplace('_qa'
+																													,regexreplace('::qa::',r.superfile, '::'+suffixSuperName+'::'),
 																														'_'+suffixSuperName
-																																)), stringlib.StringToLowerCase(l.superfile));
+																																)), l.cnt + 1, 1);
+				self.superfile := if (suffixSuperName <> '', stringlib.StringToLowerCase(regexreplace('_qa'
+																													,regexreplace('::qa::',r.superfile, '::'+suffixSuperName+'::'),
+																														'_'+suffixSuperName
+																																)), stringlib.StringToLowerCase(r.superfile));
 				self.subfile := if (~addSubFileSuffix
-																,l.subfile
-																,l.subfile + '_' + suffixSuperName);
+																,r.subfile
+																,r.subfile + '_' + suffixSuperName);
 				self := l;
 			end;
 		
-			dGroupSubFiles := join(dFilesReadyForLive
-															,dtFilesToMove
-															,stringlib.StringToLowerCase(left.superfile) = stringlib.StringToLowerCase(right.superfile)
+			dGroupSubFiles := iterate(dFilesReadyForLive
 															,pGroupSubFiles(left,right));
 		
 			return dGroupSubFiles;
@@ -238,7 +240,19 @@ EXPORT xFerRoxieFiles(
 													,fileservices.clearsuperfile('~'+superfile+'_cert')
 												)
 											))
-										
+									,nothor(apply(global(dFilesReadyForStaging,few),
+										sequential
+											(
+												if ( ~fileservices.superfileexists('~'+superfile)
+															,fileservices.createsuperfile('~'+superfile))
+												,if (isFullRefresh,
+																sequential
+																						(fileservices.RemoveOwnedSubFiles('~'+superfile,true)
+																							,fileservices.clearsuperfile('~'+superfile)
+																						)
+														)
+											)
+										))
 									,if (~MoveToLive
 											,nothor(apply(global(dFilesReadyForStaging,few),
 												sequential
@@ -285,6 +299,7 @@ EXPORT xFerRoxieFiles(
 																		
 																		)
 																	)
+														,output('~'+subfile)
 														)
 													))
 											)

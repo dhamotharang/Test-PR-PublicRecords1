@@ -1,4 +1,4 @@
-#workunit('name', 'FLAccident Spray Input')
+﻿#workunit('name', 'FLAccident Spray Input')
 //use to spray files to land. If the destination is prod, the 4th parameter of 
 //the fileservices.sprayfixed function should be 'thor_data400'
 
@@ -20,7 +20,7 @@ export FLCrash_SprayInput( string		filedate,
 	 boolean	pIsTesting	= false
 	,string		pServer			= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12 ,  _control.IPAddress.bctlpedata11 )
 	,string		pDir				= '/data/super_credit/flcrash/new_data/build'
-	,string		pGroupName	= FLAccidents_Ecrash._datasets().groupname 
+	,string		pGroupName	= thorlib.group() 
 
 ) :=
 function
@@ -68,18 +68,16 @@ function
 
 	spry_raw:=DATASET([
 
-		 {pServer,pDir,'*violation*.csv' 			,0 ,lfile('dot'				      ),[{sfile('flcrash0'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*event*.csv' 		,0 ,lfile('event'			      ),[{sfile('flcrash1'	    )}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*vehicle*.csv' 			,0 ,lfile('vehicle'				  ),[{sfile('flcrash2v'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*trailer*.csv' 			,0 ,lfile('trailer'				  ),[{sfile('flcrash3v'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*driver*.csv' 			  ,0 ,lfile('driver'					),[{sfile('flcrash4'				)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*passenger*.csv' 			  ,0 ,lfile('passenger'				  ),[{sfile('flcrash5'			  )}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		// ,{pServer,pDir,'*_pedestrian_*.txt' 			  ,0 ,lfile('pedestrian'				  ),[{sfile('flcrash6'			  )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*non_motorist*.csv' 			  ,0 ,lfile('pedestrian'				  ),[{sfile('flcrash6'			  )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*property_*.csv' 			    ,0 ,lfile('property'				    ),[{sfile('flcrash7'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-    // ,	{pServer,pDir,'*_comveh_*.txt' 			  ,0 ,lfile('comveh'				    ),[{sfile('flcrash8'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*motor_*.csv' 			  ,0 ,lfile('comveh'				    ),[{sfile('flcrash8'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
-		,{pServer,pDir,'*witness*.csv' 			  ,0 ,lfile('witness'				    ),[{sfile('flcrash9'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		 {pServer,pDir,'Violation*.csv' 			,0 ,lfile('dot'				      ),[{sfile('flcrash0'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Event*.csv' 		,0 ,lfile('event'			      ),[{sfile('flcrash1'	    )}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Vehicle*.csv' 			,0 ,lfile('vehicle'				  ),[{sfile('flcrash2v'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Trailer*.csv' 			,0 ,lfile('trailer'				  ),[{sfile('flcrash3v'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Driver*.csv' 			  ,0 ,lfile('driver'					),[{sfile('flcrash4'				)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Passenger*.csv' 			  ,0 ,lfile('passenger'				  ),[{sfile('flcrash5'			  )}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'NonMotorist*.csv' 			  ,0 ,lfile('pedestrian'				  ),[{sfile('flcrash6'			  )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Property*.csv' 			    ,0 ,lfile('property'				    ),[{sfile('flcrash7'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'MotorCarrier*.csv' 			  ,0 ,lfile('comveh'				    ),[{sfile('flcrash8'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
+		,{pServer,pDir,'Witness*.csv' 			  ,0 ,lfile('witness'				    ),[{sfile('flcrash9'			    )}],pGroupName,'','[0-9]{8}','VARIABLE','',8192,'\\,','\\n,\\r\\n','"',false}
 
 		
 		 	], VersionControl.Layout_Sprays.Info);

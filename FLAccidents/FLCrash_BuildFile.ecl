@@ -1,4 +1,4 @@
-import ut, did_add, header_slimsort, didville, business_header_ss, business_header,watchdog,lib_stringlib,AID,idl_header,Address, BIPV2;
+﻿import ut, did_add, header_slimsort, didville, business_header_ss, business_header,watchdog,lib_stringlib,AID,idl_header,Address, BIPV2;
 
 // Don't forget to update the Version Development attribute with the new build date
 #workunit ('name', 'Build FLCrash Base Files');
@@ -550,16 +550,16 @@ outf9 := project(flc9_did_file, flc9_get_didout(left));
 ////////////////////////////////////////////////////////////////////////////////////////
 // Output Files
 ////////////////////////////////////////////////////////////////////////////////////////
-ut.mac_sf_buildprocess(flaccidents.infile_flcrash0_v2, '~thor_data400::base::flcrash0', build_flc0,2); 
-ut.mac_sf_buildprocess(flaccidents.infile_flcrash1, '~thor_data400::base::flcrash1', build_flc1, 2);
-ut.mac_sf_buildprocess(outf2v, '~thor_data400::base::flcrash2v', build_flc2v, 2);
-ut.mac_sf_buildprocess(flaccidents.infile_flcrash3v_v2, '~thor_data400::base::flcrash3v', build_flc3v, 2);
-ut.mac_sf_buildprocess(outf4, '~thor_data400::base::flcrash4', build_flc4, 2);
-ut.mac_sf_buildprocess(outf5, '~thor_data400::base::flcrash5', build_flc5, 2);
-ut.mac_sf_buildprocess(outf6, '~thor_data400::base::flcrash6', build_flc6, 2);
-ut.mac_sf_buildprocess(outf7, '~thor_data400::base::flcrash7', build_flc7, 2);
-ut.mac_sf_buildprocess(flaccidents.infile_flcrash8, '~thor_data400::base::flcrash8', build_flc8, 2);
-ut.mac_sf_buildprocess(outf9, '~thor_data400::base::flcrash9', build_flc9, 2);
+ut.mac_sf_buildprocess(flaccidents.infile_flcrash0_v2, '~thor_data400::base::flcrash0', build_flc0,2,,true); 
+ut.mac_sf_buildprocess(flaccidents.infile_flcrash1, '~thor_data400::base::flcrash1', build_flc1, 2,,true);
+ut.mac_sf_buildprocess(outf2v, '~thor_data400::base::flcrash2v', build_flc2v, 2,,true);
+ut.mac_sf_buildprocess(flaccidents.infile_flcrash3v_v2, '~thor_data400::base::flcrash3v', build_flc3v, 2,,true);
+ut.mac_sf_buildprocess(outf4, '~thor_data400::base::flcrash4', build_flc4, 2,,true);
+ut.mac_sf_buildprocess(outf5, '~thor_data400::base::flcrash5', build_flc5, 2,,true);
+ut.mac_sf_buildprocess(outf6, '~thor_data400::base::flcrash6', build_flc6, 2,,true);
+ut.mac_sf_buildprocess(outf7, '~thor_data400::base::flcrash7', build_flc7, 2,,true);
+ut.mac_sf_buildprocess(flaccidents.infile_flcrash8, '~thor_data400::base::flcrash8', build_flc8, 2,,true);
+ut.mac_sf_buildprocess(outf9, '~thor_data400::base::flcrash9', build_flc9, 2,,true);
 
 												
 export flcrash_buildfile :=

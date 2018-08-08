@@ -1,4 +1,4 @@
-export NameIndicators := module
+﻿export NameIndicators := module
 
 		export Unknown  := 000b;			// Not Cleaned
 		export Person_  := 001b;			// Person
@@ -14,15 +14,11 @@ export NameIndicators := module
 		export DerivedName2  := 000000010000b;		// second Individual name Derived from dual name
 		export MaleName  	 := 000000100000b;		// Male Name
 		export FemaleName 	 := 000001000000b;		// Female Name
-		export Alias 		 := 000010000000b;		// Name is an alias (AKA ...)
+		export Alias 		 := 000010000000b;		// Name is an alias (AKA, FKA, NKA, ...)
 		export SingularName  := 000100000000b;		// Recognizable part of dual name. MR & MRS A JONES, A JONES ET UX
 		export Standalone 	 := 001000000000b;		// Standalone last name (no first or middle)
 		export PartialName 	 := 010000000000b;		// Partial name (no last name)
 		export Trustee 		 := 100000000000b;		// Name is a trustee
-
-		export EthinicityMask := 1110000000000000b;		// 
-		export EthnicityTypes := enum(Undetermined=0,SpanishName=1,ArabicName=2,IndianName=3,
-															HebrewName=4,AsianName=5);
 
 		shared NameTypeBits := 111b;		// nametype bit map
 		

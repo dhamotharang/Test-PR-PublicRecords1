@@ -23,7 +23,7 @@ EXPORT Fn_Spray_Alpharetta_Spreadsheet(STRING CSVName, STRING fileVersion, STRIN
 																								Constants.CSVSprayFieldSeparator,		// field separator(s)
 																								Constants.CSVSprayLineSeparator,		// line separator(s)
 																								Constants.CSVSprayQuote,						// text quote character
-																								ThorLib.Cluster(),									// destination THOR cluster
+																								ThorLib.GROUP(),									// destination THOR cluster
 																								Files.Alpha_Spray_Name,
 																								-1,												  				// -1 means no timeout
 																									,													  			// use default ESP server IP port

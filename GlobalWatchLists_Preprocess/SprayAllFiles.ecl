@@ -1,4 +1,4 @@
-import std, _control, GlobalWatchLists_Preprocess;
+﻿import std, _control, GlobalWatchLists_Preprocess;
 
 sfBankOfEngland 						:= root + 'bank_of_england';
 sfDebarredParties 					:= root + 'debarred_parties';
@@ -138,11 +138,11 @@ EXPORT SprayAllFiles := SEQUENTIAL
 						
 						//------EU terrorist list-----//
 						IF(NOT STD.File.FileExists(sfEUterroristPersons +'::'+ Versions.EUTerrorist_Version)
-						,sprayFile('data/eu_terrorist_list' + '/' + Versions.EUTerrorist_Version + '_' + 'data', Versions.EUTerrorist_Version + '_' + 'text_output_persons.csv', '\t', 'eu_terrorist_list::persons::' + Versions.EUTerrorist_Version)
+						,sprayFile('data/eu_terrorist_list' + '/' + Versions.EUTerrorist_Version + '_' + 'data', Versions.EUTerrorist_Version + '_' + 'text_output_persons.csv', '|', 'eu_terrorist_list::persons::' + Versions.EUTerrorist_Version)
 						,OUTPUT('EU terrorist list Persons - Excluded from Spray list')),
 
 						IF(NOT STD.File.FileExists(sfEUterroristGroups +'::'+ Versions.EUTerrorist_Version)
-						,sprayFile('data/eu_terrorist_list' + '/' + Versions.EUTerrorist_Version + '_' + 'data', Versions.EUTerrorist_Version + '_' + 'text_output_Groups.csv', '\t', 'eu_terrorist_list::groups::' + Versions.EUTerrorist_Version)
+						,sprayFile('data/eu_terrorist_list' + '/' + Versions.EUTerrorist_Version + '_' + 'data', Versions.EUTerrorist_Version + '_' + 'text_output_Groups.csv', '|', 'eu_terrorist_list::groups::' + Versions.EUTerrorist_Version)
 						,OUTPUT('EU terrorist list Groups - Excluded from Spray list')),
 						
 						//------Foreign Agents registration-----//
