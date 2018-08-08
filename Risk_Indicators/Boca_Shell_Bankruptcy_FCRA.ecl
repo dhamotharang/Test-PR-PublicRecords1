@@ -145,7 +145,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		SELF.bjl.filing_type := IF (takeLeft, le.bjl.filing_type, ri.bjl.filing_type);
 		SELF.bjl.disposition := IF (takeLeft, le.bjl.disposition, ri.bjl.disposition);
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
-		SELF.bk_chapters :=  le.bk_chapters + ri.bk_chapters;  
+		SELF.bk_chapters :=  IF(sameBankruptcy, le.bk_chapters, le.bk_chapters + ri.bk_chapters);  
 
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
 		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy, 0, ri.BJL.filing_count120);
@@ -191,7 +191,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			SELF.case_num := RIGHT.case_num;
 			SELF.court_code := RIGHT.court_code;
 			SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
-      self.bk_chapters := dedup(left.bk_chapters);
+      self.bk_chapters := dedup(sort(left.bk_chapters, chapter));
 			SELF := LEFT),
 		LEFT OUTER);
 	w_bk := if(bsVersion < 50, w_bk_tmp, group(w_bk_rolled_disp, seq));
@@ -229,7 +229,8 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			self := le;
 		END;
 		w_bk_correct := PROJECT(w_bk, correct_bk(LEFT));
-		    
+		
+    
 		RETURN w_bk_correct;
 END;
 		
