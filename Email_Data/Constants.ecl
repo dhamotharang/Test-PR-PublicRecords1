@@ -13,7 +13,7 @@ export Constants (string filedate = '') := module
 	export ak_typeStr	:= 'BC';
 	export STRING srcType:= 'email_data';
 	
-	//DF-21686 specify fields to be blanked out in thor_200::key::email_data::fcra::qa::did for FCRA Consumer Data Field Deprecation
+	//DF-21686 specify fields to be blanked out in thor_200::key::email_data::fcra::qa::did
 	export fields_to_clear := 'orig_ip';
 
 end;
