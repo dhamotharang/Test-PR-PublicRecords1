@@ -260,6 +260,7 @@ MODULE
 	export src_INFOUSA_ABIUS_USABIZ      := 'IA';
 	export src_INFOUSA_DEAD_COMPANIES    := 'IC'; // Aka DEADCO
 	export src_INFOUSA_IDEXEC            := 'II';
+	export src_Infutor_NARB              := 'Z2';
 	export src_InfutorCID								 := 'IR';
 	export src_InfutorTRK                := 'IF';
 	export src_InfutorNarc               := '1F';
@@ -1705,6 +1706,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_INFOUSA_ABIUS_USABIZ      := [src_INFOUSA_ABIUS_USABIZ      ];
 	export set_INFOUSA_DEAD_COMPANIES    := [src_INFOUSA_DEAD_COMPANIES    ];
 	export set_INFOUSA_IDEXEC            := [src_INFOUSA_IDEXEC            ];
+	export set_Infutor_NARB              := [src_Infutor_NARB              ];
 	export set_InfutorCID								 := [src_InfutorCID		       			 ];
 	export set_InfutorTRK								 := [src_InfutorTRK		       			 ];
 	export set_InfutorNarc               := [src_InfutorNarc               ];
@@ -2231,6 +2233,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsINFOUSA_ABIUS_USABIZ       (string  sr) := sr               in set_INFOUSA_ABIUS_USABIZ       ;
 	export SourceIsINFOUSA_DEAD_COMPANIES     (string  sr) := sr               in set_INFOUSA_DEAD_COMPANIES     ;
 	export SourceIsINFOUSA_IDEXEC             (string  sr) := sr               in set_INFOUSA_IDEXEC             ;
+	export SourceIsInfutor_NARB               (string  sr) := sr               in set_Infutor_NARB               ;
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
@@ -2697,7 +2700,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Enclarity									,'Enclarity'																								 }
 		,{src_Entiera       						,'Entiera'                                       						 }
 		,{src_Equifax                   ,'Equifax'                                                   }
-		,{src_Equifax_Business_Data     ,'Equifax Business Data'                                                     }
+		,{src_Equifax_Business_Data      ,'Equifax Business Data'                                    }
 		,{src_Equifax_Quick             ,'Equifax Quick'                                             }
 		,{src_Equifax_Weekly            ,'Equifax Weekly'                                            }
 		,{src_Eq_Employer               ,'Eq Employer'                                               }
@@ -2748,7 +2751,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_INFOUSA_ABIUS_USABIZ      ,'INFOUSA ABIUS(USABIZ)'                                     }
 		,{src_INFOUSA_DEAD_COMPANIES    ,'INFOUSA DEAD COMPANIES'                                    }
 		,{src_INFOUSA_IDEXEC            ,'INFOUSA IDEXEC'                                            }
-	  ,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
+	  ,{src_Infutor_NARB              ,'Infutor NARB - Name and Address Resource Business'         }
+		,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
@@ -3203,7 +3207,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Enclarity								 => 'Enclarity National Provider/Sanctions'
 		,src_Entiera       						 => 'Entiera'                                       				
 		,src_Equifax                   => 'Equifax'
-		,src_Equifax_Business_Data     => 'Equifax Business Data'                                             
+		,src_Equifax_Business_Data     => 'Equifax Business Data'                                               
 		,src_Equifax_Quick             => 'Equifax Quick'                                        
 		,src_Equifax_Weekly            => 'Equifax Weekly'                                       
 		,src_Eq_Employer               => 'Eq Employer'
@@ -3254,6 +3258,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_INFOUSA_ABIUS_USABIZ      => 'INFOUSA ABIUS(USABIZ)'                                
 	  ,src_INFOUSA_DEAD_COMPANIES    => 'INFOUSA DEAD COMPANIES'                               
 	  ,src_INFOUSA_IDEXEC            => 'INFOUSA IDEXEC'                                       
+		,src_Infutor_NARB              => 'Infutor NARB - Name and Address Resource Business'
 		,src_InfutorCID	 							 => 'Infutor CID - Phones'                                 
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'
