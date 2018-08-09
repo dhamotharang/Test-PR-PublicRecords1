@@ -97,15 +97,5 @@ EXPORT Functions := MODULE
 		RETURN IF(LENGTH(trim(zip4, all)) = 4 AND Stringlib.StringFilterOut(trim(zip4, all), '0123456789') = '', 1, 0);
 
 	END;
-
-	//****************************************************************************
-	//fn_full_zip: returns true or false based upon whether or not there is
-	// a 9-digit or 5-digit numeric value.
-	//****************************************************************************
-	EXPORT fn_full_zip(STRING zip) := function 
-
-		RETURN IF(LENGTH(trim(zip, all)) in [ 5,9] AND Stringlib.StringFilterOut(trim(zip, all), '0123456789') = '', 1, 0);
-
-	END;
 	
 END; 

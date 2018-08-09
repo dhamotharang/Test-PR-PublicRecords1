@@ -1,25 +1,47 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT raw_GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT raw_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_Calbus';
   EXPORT spc_NAMESCOPE := 'raw';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'Calbus';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,district_branch,account_number,sub_account_number,district,account_type,firm_name,owner_name,business_street,business_city,business_state,business_zip_5,business_zip_plus_4,business_country_name,start_date,ownership_code';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_Calbus\n'
     + 'FILENAME:Calbus \n'
-    + 'NAMESCOPE:raw \n'
+    + 'NAMESCOPE:raw\n'
     + '// Uncomment up to NINES for internal or external adl\n'
     + '// IDFIELD:EXISTS:<NameOfIDField>\n'
     + '// RIDFIELD:<NameOfRidField>\n'
@@ -42,7 +64,6 @@ EXPORT raw_GenerationMod := MODULE
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs_Calbus.Functions.fn_verify_state>0)   \n'
     + 'FIELDTYPE:invalid_zip_5:CUSTOM(Scrubs_Calbus.Functions.fn_verify_zip5>0)\n'
     + 'FIELDTYPE:invalid_zip_plus_4:CUSTOM(Scrubs_Calbus.Functions.fn_verify_zip4>0)\n'
-    + 'FIELDTYPE:invalid_full_zip:CUSTOM(Scrubs_Calbus.Functions.fn_full_zip>0)\n'
     + 'FIELDTYPE:invalid_country_name:ALLOW(USA|)\n'
     + 'FIELDTYPE:invalid_start_date:CUSTOM(Scrubs_Calbus.Functions.fn_general_date>0)\n'
     + 'FIELDTYPE:invalid_ownership_code:ALLOW(B|C|D|E|F|G|K|L|O|P|R|S|T|V|)\n'
@@ -59,7 +80,6 @@ EXPORT raw_GenerationMod := MODULE
     + 'FIELD:business_state:TYPE(STRING2):LIKE(invalid_state):0,0\n'
     + 'FIELD:business_zip_5:TYPE(STRING5):LIKE(invalid_zip_5):0,0\n'
     + 'FIELD:business_zip_plus_4:TYPE(STRING4):LIKE(invalid_zip_plus_4):0,0\n'
-    + 'FIELD:business_foreign_zip:TYPE(STRING7):LIKE(invalid_full_zip):0,0\n'
     + 'FIELD:business_country_name:TYPE(STRING35):LIKE(invalid_country_name):0,0\n'
     + 'FIELD:start_date:TYPE(STRING8):LIKE(invalid_start_date):0,0\n'
     + 'FIELD:ownership_code:TYPE(STRING1):LIKE(invalid_ownership_code):0,0\n'
@@ -75,3 +95,4 @@ EXPORT raw_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

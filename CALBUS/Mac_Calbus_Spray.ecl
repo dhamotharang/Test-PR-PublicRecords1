@@ -37,7 +37,7 @@ macro
 %Message_super_file%   := output('Cleaned file version already exist in the superFile   --' + Calbus.Constants.Cluster + 'in::Calbus::Superfile3');
 
 %spray_main% 					 := FileServices.SprayFixed(Source_IP,source_path + file_name,%recSize%,group_name,Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate,-1,,,true,true);
-%scrub_file% 				   := CALBUS.Scrub_Calbus('20180723').Report;
+%scrub_file% 				   := CALBUS.Scrub_Calbus(filedate).Report;
 %check_rawFile_exist%  := if (not FileServices.FileExists(Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate),%spray_main%,%Message_raw_file% );
 %out_clen%   					 := output(Calbus.Cleaned_Calbus(process_date, filedate),,Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned',overwrite);
 %cleaned_ds% 					 := if (not FileServices.FileExists(Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned'),%out_clen%,%Message_clean_file%);

@@ -1,9 +1,9 @@
 ﻿ 
-EXPORT raw_MAC_PopulationStatistics(infile,Ref='',Input_district_branch = '',Input_account_number = '',Input_sub_account_number = '',Input_district = '',Input_account_type = '',Input_firm_name = '',Input_owner_name = '',Input_business_street = '',Input_business_city = '',Input_business_state = '',Input_business_zip_5 = '',Input_business_zip_plus_4 = '',Input_business_foreign_zip = '',Input_business_country_name = '',Input_start_date = '',Input_ownership_code = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_Calbus;
+EXPORT raw_MAC_PopulationStatistics(infile,Ref='',Input_district_branch = '',Input_account_number = '',Input_sub_account_number = '',Input_district = '',Input_account_type = '',Input_firm_name = '',Input_owner_name = '',Input_business_street = '',Input_business_city = '',Input_business_state = '',Input_business_zip_5 = '',Input_business_zip_plus_4 = '',Input_business_country_name = '',Input_start_date = '',Input_ownership_code = '',OutFile) := MACRO
+  IMPORT SALT311,Scrubs_Calbus;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -78,12 +78,6 @@ EXPORT raw_MAC_PopulationStatistics(infile,Ref='',Input_district_branch = '',Inp
       '' 
     #ELSE
         IF( le.Input_business_zip_plus_4 = (TYPEOF(le.Input_business_zip_plus_4))'','',':business_zip_plus_4')
-    #END
- 
-+    #IF( #TEXT(Input_business_foreign_zip)='' )
-      '' 
-    #ELSE
-        IF( le.Input_business_foreign_zip = (TYPEOF(le.Input_business_foreign_zip))'','',':business_foreign_zip')
     #END
  
 +    #IF( #TEXT(Input_business_country_name)='' )
