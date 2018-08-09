@@ -3,10 +3,11 @@
 every_10_min := '*/10 0-23 * * *';
 IP:=Constants.LandingZoneServer;
 RootDir := Constants.MBSLandingZonePathBase;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
 
 lECL1 :=
- 'wuname := \'FraudGov MBS Input Prep\';\n'
+ 'import ut;\n'
++'wuname := \'FraudGov MBS Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -26,16 +27,16 @@ lECL1 :=
 +'		,sequential(FraudShared.SprayMBSFiles(\''+IP+'\',\''+RootDir+'\',pVersion := version))\n'
 +'	);\n'
 ;
-output(lECL1);
-// #WORKUNIT('protect',true);
-// #WORKUNIT('name', 'FraudGov Input Prep Schedule');
 
-// d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-// if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			// : WHEN(CRON(every_10_min))
-			// ,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			// ,'FraudGov Input Prep SCHEDULE failure'
-																			// ,Constants.NOC_MSG
-																			// ));
+#WORKUNIT('protect',true);
+#WORKUNIT('name', 'FraudGov Input Prep Schedule');
+
+d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
+if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
+			: WHEN(CRON(every_10_min))
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+																			,'FraudGov Input Prep SCHEDULE failure'
+																			,Constants.NOC_MSG
+																			));
 																			
 																

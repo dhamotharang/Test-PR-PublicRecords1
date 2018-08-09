@@ -1,6 +1,6 @@
-import roxiekeybuild,ut;
+﻿import roxiekeybuild,Scrubs_TelcordiaTDS,dops;
 
-export Mac_Tdsdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_20\'',email_target='\' \'') := 
+export Mac_Tdsdata_Spray(filedate) := 
 macro
 #uniquename(spray_tdsdata)
 #uniquename(super_tdsdata)
@@ -18,10 +18,14 @@ macro
 #uniquename(send_failure_msg)
 #uniquename(updatedops)
 #uniquename(TDS_transform)
+string sourceIP := if ( _Control.ThisEnvironment.Name = 'Dataland', _Control.IPAddress.bctlpedata12,_Control.IPAddress.bctlpedata11 );
+string group_name := thorlib.group();
+string filename := filedate[1..6];
+string sourcefile := '/data/thor_back5/local_data/telcordia_tds/sources/'+filedate+'/' + filename + '.txt' ;
 
-%spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_20','~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);
+%spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'',group_name,'~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);/*transforms the raw file into the input file*/
 %TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
-%updatedops% 				:= RoxieKeyBuild.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|BN');
+%updatedops% 				:= dops.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|B');
 
 
 %super_tdsdata% := sequential(FileServices.StartSuperFileTransaction(),
@@ -39,7 +43,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_tds,'~t
 
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_tds','~thor_data400::key::telcordia::'+filedate+'::tds',key1_built,true);
 
-ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
+RoxieKeyBuild.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 
 %move_them% := sequential(key1,key1_built,out1);
 
@@ -52,7 +56,7 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate))
+sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate),Scrubs_TelcordiaTDS.fnRunScrubs(filedate,''))
  : success(parallel(%send_succ_msg%,%send_success_msg%)),
    failure(parallel(%send_fail_msg%,%send_failure_msg%));
 

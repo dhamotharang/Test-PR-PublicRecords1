@@ -1,0 +1,23 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_TelcordiaTDS
+FILENAME:TelcordiaTDS
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+FIELDTYPE:Invalid_Coctype:ENUM(EOC|PMC|SP2|RCC|VOI|SP1|)
+FIELDTYPE:Invalid_Letter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
+FIELDTYPE:Invalid_Wireless:ENUM(L|W|S|)
+
+
+FIELD:npa:LIKE(Invalid_Num):TYPE(STRING3):0,0
+FIELD:nxx:LIKE(Invalid_Num):TYPE(STRING3):0,0
+FIELD:tb:LIKE(Invalid_Num):TYPE(STRING1):0,0
+FIELD:state:LIKE(Invalid_Letter):TYPE(STRING2):0,0
+FIELD:timezone:LIKE(Invalid_Num):TYPE(STRING1):0,0
+FIELD:coctype:LIKE(Invalid_Coctype):TYPE(STRING3):0,0
+FIELD:ssc:LIKE(Invalid_Char):TYPE(STRING4):0,0
+FIELD:wireless_ind:LIKE(Invalid_Wireless):TYPE(STRING4):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

@@ -1,5 +1,5 @@
 ﻿//#workunit('name', 'Yoguart::FEDEX-NOHIT Build');
-import _control,ut,Orbit3;
+import _control,ut,Orbit3, lib_Datalib;
 
 #workunit ('priority','high');
 #workunit	('priority',11);
@@ -28,13 +28,13 @@ export	proc_fedex_build_all(string	version_date) := function
 													,Orbit3.proc_Orbit3_CreateBuild ( 'FedEx',version_date,'N')
 													,output('No Orbit Entries Needed for weekend builds'))
 	                        ,fileservices.Despray('~thor200::out::fedex::dupes_v1'
-												  , 'bctlpedata10.risk.regn.net'
-												  , '/data/hds_4/FedEx/out/fedex_dupes_all.csv',,,,true), 
-													fileservices.Despray('~thor200::out::fedex::new_dupes_v1'
-												  , 'bctlpedata10.risk.regn.net'
-												  , '/data/hds_4/FedEx/out/fedex_dupes_new.csv',,,,true),
-													fileservices.Despray('~thor200::out::fedex::new_uniques_v1'
-												  , 'bctlpedata10.risk.regn.net'
+		  									  , _Control.IPAddress.bctlpedata10 
+												  , '/data/hds_4/FedEx/out/fedex_dupes_all.csv',,,,true)
+													,fileservices.Despray('~thor200::out::fedex::new_dupes_v1'
+													,_Control.IPAddress.bctlpedata10
+ 												  , '/data/hds_4/FedEx/out/fedex_dupes_new.csv',,,,true)
+													,fileservices.Despray('~thor200::out::fedex::new_uniques_v1'
+													,_Control.IPAddress.bctlpedata10
 												  , '/data/hds_4/FedEx/out/fedex_new_records.csv',,,,true)
 													,send_email);
 end;

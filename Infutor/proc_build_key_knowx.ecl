@@ -1,4 +1,4 @@
-/*2011-05-02T22:11:45Z (Cecelie Guyton)
+﻿/*2011-05-02T22:11:45Z (Cecelie Guyton)
 test 76599
 */
 import doxie, RoxieKeyBuild, ut, header;
@@ -24,5 +24,5 @@ export proc_build_key_knowx := sequential(
 									parallel(hdr_if_knowx, teaser_did, teaser_search), 
 									parallel(mv_hdr_if_knowx, mv_teaser_did, mv_teaser_search), 
 									parallel(mv_hdr_if_knowx_qa, mv_hdr_did_qa, mv_hdr_search_qa),
-									RoxieKeybuild.updateversion('InfutorKeys',filedate,'cguyton@seisint.com',,'N|B')
+									RoxieKeybuild.updateversion('InfutorKeys',filedate,'goulmi01@lexisnexisrisk.com',,'N|B')
 									);

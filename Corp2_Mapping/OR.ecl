@@ -1,4 +1,4 @@
-import corp2, corp2_mapping, corp2_raw_or, scrubs_corp2_mapping_or_ar, scrubs, scrubs_corp2_mapping_or_event,
+﻿import corp2, corp2_mapping, corp2_raw_or, scrubs_corp2_mapping_or_ar, scrubs, scrubs_corp2_mapping_or_event,
 			 scrubs_corp2_mapping_or_main, std, tools, ut, versioncontrol;
 			 
 export OR := MODULE; 
@@ -21,7 +21,7 @@ export OR := MODULE;
 		BusinessTypesList						:= ['MAILING ADDRESS','PRINCIPAL PLACE OF BUSINESS','RECORDS OFFICE','RESERVED NAME','REGISTERED NAME','VALID RECORD'];
 		RATypesList									:= ['AUTHORIZED REPRESENTATIVE','REGISTERED AGENT'];
 		BusinessRAList							:= BusinessTypesList + RATypesList;
-		ContactTypesList						:= ['APPLICANT','CORRESPONDENT','GENERAL PARTNER','MANAGER','MANAGING PARTNER','MEMBER','NONFILEABLE CORRESPONDENT','PARTNER','PRESIDENT','REGISTRANT','SECRETARY','TRUSTEE'];
+		ContactTypesList						:= ['APPLICANT','CORRESPONDENT','GENERAL PARTNER','INDIVIDUAL WITH DIRECT KNOWLEDGE','MANAGER','MANAGING PARTNER','MEMBER','NONFILEABLE CORRESPONDENT','PARTNER','PRESIDENT','REGISTRANT','SECRETARY','TRUSTEE'];
 		AllTypesList								:= AnnualReportTypeList + BusinessTypesList + RATypesList + ContactTypesList;
 
 		//********************************************************************
@@ -770,7 +770,7 @@ export OR := MODULE;
 																							,AR_ErrorSummary
 																							,AR_ScrubErrorReport
 																							,AR_SomeErrorValues	
-																							,AR_SubmitStats
+																						  ,AR_SubmitStats
 																					);
 
 		//********************************************************************

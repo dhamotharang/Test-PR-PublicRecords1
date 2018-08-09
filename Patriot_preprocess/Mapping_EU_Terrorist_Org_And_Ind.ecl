@@ -1,9 +1,9 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 individuals := DATASET('~thor::in::globalwatchlists::eu_terrorist_list::persons', 
                               layout_EU_terrorist_org_and_ind.layout_individual, 
-														   CSV(separator('\t'),quote('"'),terminator(['\n', '\r\n']),heading(1)));	
+														   CSV(separator('|'),quote('"'),terminator(['\n', '\r\n']),heading(1)));	
 //output(individual, named('individual'));
 
 groups := DATASET('~thor::in::globalwatchlists::eu_terrorist_list::groups', 

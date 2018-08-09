@@ -90,8 +90,8 @@ build_acclogs :=
 					if(~newfiles, output('No New Files'),
 						sequential(
 									output(version, named('Building_Version'));
-									output(nothor(FileServices.SuperFileContents(data_services.foreign_logs + 'thor100_21::in::accurint_acclogs_cc')), named('Input_Files'));
-									output(nothor(FileServices.SuperFileContents(data_services.foreign_logs + 'thor100_21::in::accurint_acclogs_cc_preprocess')), named('Upcoming_Files'));
+									output(nothor(FileServices.SuperFileContents('~thor_data400::in::accurint_acclogs_cc')), named('Input_Files'));
+									// output(nothor(FileServices.SuperFileContents('~thor_data400::in::accurint_acclogs_cc_preprocess')), named('Upcoming_Files'));
 									ACCURINT_acclogs.File_Deconfliction.buildfile;
 									update_base; update_trans;
 									nothor(base_super); nothor(trans_super);

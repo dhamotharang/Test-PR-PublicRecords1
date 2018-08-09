@@ -1,8 +1,12 @@
+﻿/*2015-04-02T17:22:34Z (Metzmaier, AJ (RIS-DAY))
+Bug 108818 - Code changes due to layout rework and/or additional validation.
+*/
 import _Validate, Address, ut, lib_stringlib;
 
-export Cleaned_Voters(string source_state, string filedate) := function
+export Cleaned_Voters(string filedate) := function
 
-	In_Voters_File  := VotersV2.File_Voters_In(source_state, filedate);
+//Barb O'Neill changed for DOPS-461
+	In_Voters_File  := VotersV2.File_Voters_In();
 
 	In_Voter_Layout := VotersV2.Layout_Voters_In;
 
@@ -27,6 +31,7 @@ export Cleaned_Voters(string source_state, string filedate) := function
 		the_mail_state         := ut.fnTrim2Upper(l.mail_state);
 		the_mail_zip           := StringLib.StringFilter(l.mail_zip, '0123456789');
 		the_state_code         := ut.fnTrim2Upper(l.state_code);
+		
 		the_file_acquired_date := if(_Validate.Date.fIsValid(l.file_acquired_date) and
 		                                _Validate.Date.fIsValid(l.file_acquired_date, _Validate.Date.Rules.DateInPast),
 		                             l.file_acquired_date,
@@ -135,9 +140,10 @@ export Cleaned_Voters(string source_state, string filedate) := function
 		self.source                := 'EMERGES';
 		self.file_id               := 'VOTE'; 
 		self.vendor_id             := trim(l.EMID_number,left,right);
-		self.source_state          := if(the_state_code = '', 
-										                 ut.fnTrim2Upper(source_state),
-										                 the_state_code);
+		
+		self.source_state          := if(the_state_code = '', the_res_state,
+										                 the_state_code);																		 
+													
 		self.source_code           := ut.fnTrim2Upper(l.source_code);
 		self.prefix_title          := ut.fnTrim2Upper(l.prefix_title);
 		self.last_name             := the_last_name;

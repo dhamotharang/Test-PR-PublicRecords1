@@ -2,30 +2,30 @@
 
 */
 import ut, VersionControl,lib_stringlib,lib_fileservices,_control,orbit3,std;
-export Build_all(string version=version) := function
+export Build_all(string ver=version) := function
 
 //-----------Spray input and delete files
 #IF (IsFullUpdate = false)
 spray_it := sequential(
-											VersionControl.fSprayInputFiles(Spray.Updates)
-											,VersionControl.fSprayInputFiles(Spray.Deletes)
-											,VersionControl.fSprayInputFiles(Spray.Deceased)
+											VersionControl.fSprayInputFiles(Spray(ver).Updates)
+											,VersionControl.fSprayInputFiles(Spray(ver).Deletes)
+											,VersionControl.fSprayInputFiles(Spray(ver).Deceased)
 											);
 #ELSE
-spray_it := VersionControl.fSprayInputFiles(Spray.Load);
+spray_it := VersionControl.fSprayInputFiles(Spray(ver).Load);
 #END
 
+Base := Build_base(ver).all;
+ut.MAC_SF_BuildProcess(Base,Superfile_List.Base, FCRA_ExperianCred,2,,true);
 
-ut.MAC_SF_BuildProcess(Build_base,Superfile_List.Base, FCRA_ExperianCred,2,,true);
+zDoPopulationStats := Strata(ver);
 
-zDoPopulationStats := Strata;
+updates 		:= STD.File.RemoteDirectory(Spray(ver).ip, Spray(ver).path,'D*LEXNEX*FCRA.dat');
+deletes 		:= STD.File.RemoteDirectory(Spray(ver).ip, Spray(ver).path,'DPINS');
+deceased  	:= STD.File.RemoteDirectory(Spray(ver).ip, Spray(ver).path,'DEC');
+loads  			:= STD.File.RemoteDirectory(Spray(ver).ip, Spray(ver).path,'D*LEXNEX*EXP*FCRA.dat');
 
-updates 		:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'D*LEXNEX*FCRA.dat');
-deletes 		:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'DPINS');
-deceased  	:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'DEC');
-loads  			:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'D*LEXNEX*EXP*FCRA.dat');
-
-DEL_EXT_FILE := nothor(apply(updates + deletes + deceased + loads, STD.File.DeleteExternalFile(Spray.ip, Spray.path + '/' + name)));
+DEL_EXT_FILE := nothor(apply(updates + deletes + deceased + loads, STD.File.DeleteExternalFile(Spray(ver).ip, Spray(ver).path + '/' + name)));
 
 built := sequential(
 					spray_it

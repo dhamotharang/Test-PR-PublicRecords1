@@ -1043,7 +1043,40 @@
 		export string KEYWORD_DPRK_WC								:= '731';
 		export string KEYWORD_QANCTC								:= '732';
 		export string KEYWORD_SECO_VE								:= '733';
-
+		export string KEYWORD_IDKPK									:= '734';
+		export string KEYWORD_OFAC_UKR13662					:= '735';
+		export string KEYWORD_FINBI									:= '736';
+		export string KEYWORD_PAMEF_CNBC						:= '737';
+		export string KEYWORD_LVSCS									:= '738';
+		export string KEYWORD_ECB										:= '739';
+		export string KEYWORD_CAATSA228_WC					:= '740';
+		export string KEYWORD_ESMA									:= '741';
+		export string KEYWORD_PHPDEA								:= '742';
+		export string KEYWORD_PLPOL									:= '743';
+		export string KEYWORD_ILISA									:= '744';
+		export string KEYWORD_RSSRE_DIR2_WC					:= '745';
+		export string KEYWORD_RSSRE_DIR1_WC					:= '746';
+		export string KEYWORD_RSSRE_DIR3_WC					:= '747';
+		export string KEYWORD_ITGPDP								:= '748';
+		export string KEYWORD_IMOF_WMD							:= '749';
+		export string KEYWORD_ARMJHR_W							:= '750';
+		export string KEYWORD_US_SST								:= '751';
+		export string KEYWORD_BRCNEP								:= '752';
+		export string KEYWORD_MXASF									:= '753';
+		export string KEYWORD_JPMHLW								:= '754';
+		export string KEYWORD_GEGOV									:= '755';
+		export string KEYWORD_ZAFSCA								:= '756';
+		export string KEYWORD_SVSSF									:= '757';
+		export string KEYWORD_USJVNKA								:= '758';
+		export string KEYWORD_USMDOB								:= '759';
+		export string KEYWORD_BNAMBD								:= '760';
+		export string KEYWORD_USFDA									:= '761';
+		export string KEYWORD_WORLDBANK_ND					:= '762';
+		export string KEYWORD_KRFSC									:= '763';
+		export string KEYWORD_LBISF									:= '764';
+		export string KEYWORD_JPJSDA								:= '765';
+		export string KEYWORD_USSSR									:= '766';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

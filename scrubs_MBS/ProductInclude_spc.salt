@@ -8,7 +8,7 @@ NAMESCOPE:ProductInclude
 // RECORDS:<NumberOfRecordsInDataFile>
 // POPULATION:<ExpectedNumberOfEntitiesInDataFile>
 // NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
-// Uncomment Process if doing external adl
+// Uncomment Process if doing external adl 
 // PROCESS:<ProcessName>
 // FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
 // BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
@@ -28,4 +28,4 @@ FIELD:user_changed:TYPE(STRING30):0,0
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file
-// LINKPATH is used to define access paths for external linking
+// LINKPATH is used to define access paths for external linking 

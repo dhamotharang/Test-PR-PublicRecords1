@@ -1,0 +1,60 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FraudGov
+FILENAME:InquiryLogs
+NAMESCOPE:InquiryLogs 
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LENGTHS(0,4..):ONFAIL(BLANK)
+FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( <>{}[]-^='`!+&,./#()_)
+FIELDTYPE:invalid_email:ALLOW(-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:invalid_date:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,8..):ONFAIL(BLANK)
+FIELDTYPE:invalid_numeric:ALLOW(0123456789)
+FIELDTYPE:invalid_zip:ALLOW(-0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,5..):ONFAIL(BLANK)
+FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,2):ONFAIL(BLANK)
+FIELDTYPE:invalid_ssn:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,9):ONFAIL(BLANK)
+FIELDTYPE:invalid_phone:ALLOW(0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:LENGTHS(0,10..):ONFAIL(BLANK)
+FIELDTYPE:invalid_ip:ALLOW(.0123456789):SPACES( <>{}[]-^='`!+&,./#()_):LEFTTRIM:ONFAIL(BLANK)
+FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( <>{}[]-^='`!+&,./#()_)
+FIELDTYPE:invalid_decimal:ALLOW(-.,0123456789)
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0. If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+FIELD:transaction_id:TYPE(string):LIKE(invalid_alphanumeric):0,0 
+FIELD:datetime:TYPE(string):LIKE(invalid_date):0,0 
+FIELD:full_name:TYPE(string):LIKE(invalid_name):0,0 
+FIELD:title:TYPE(string):LIKE(invalid_alphanumeric):0,0
+FIELD:fname:TYPE(string):LIKE(invalid_name):0,0
+FIELD:mname:TYPE(string):LIKE(invalid_name):0,0
+FIELD:lname:TYPE(string):LIKE(invalid_name):0,0
+FIELD:name_suffix:TYPE(string):LIKE(invalid_alphanumeric):0,0
+FIELD:ssn:TYPE(string):LIKE(invalid_ssn):0,0
+FIELD:appended_ssn:TYPE(string):LIKE(invalid_ssn):0,0
+FIELD:address:TYPE(string):LIKE(invalid_alphanumeric):0,0
+FIELD:city:TYPE(string):LIKE(invalid_alphanumeric):0,0
+FIELD:state:TYPE(string):LIKE(invalid_state):0,0
+FIELD:zip:TYPE(string):LIKE(invalid_zip):0,0
+FIELD:fips_county:TYPE(string3):LIKE(invalid_alphanumeric):0,0
+FIELD:personal_phone:TYPE(string):LIKE(invalid_phone):0,0
+FIELD:dob:TYPE(string):LIKE(invalid_date):0,0
+FIELD:email_address:TYPE(string):LIKE(invalid_email):0,0
+FIELD:dl_st:TYPE(string):LIKE(invalid_state):0,0
+FIELD:dl:TYPE(string):LIKE(invalid_alphanumeric):0,0
+FIELD:ipaddr:TYPE(string):LIKE(invalid_ip):0,0
+FIELD:geo_lat:TYPE(string10):LIKE(invalid_decimal):0,0
+FIELD:geo_long:TYPE(string11):LIKE(invalid_decimal):0,0
+FIELD:Source:TYPE(string):LIKE(invalid_alphanumeric):0,0
+
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

@@ -1,6 +1,6 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_WA_Main
-FILENAME:In_WA
+FILENAME:In_WA 
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
 //RIDFIELD:<NameOfRidField>
@@ -14,59 +14,63 @@ FILENAME:In_WA
 //FUZZY can be used to create new types of FUZZY linking
 
 //FIELDTYPE DEFINITIONS
-FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
-FIELDTYPE:invalid_optional_date:ALLOW(0123456789):LENGTHS(0,1,8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
-FIELDTYPE:invalid_corp_key:ALLOW(0123456789-):LENGTHS(10,11,12)
-FIELDTYPE:invalid_corp_vendor:ENUM(53)
-FIELDTYPE:invalid_state_origin:ENUM(WA)
-FIELDTYPE:invalid_charter:ALLOW(0123456789):LENGTHS(7,8,9)
-FIELDTYPE:invalid_mandatory:LENGTHS(1..)
-FIELDTYPE:invalid_name_type_cd:ENUM(01|07| )
-FIELDTYPE:invalid_name_type_desc:ENUM(LEGAL|RESERVED| )
-FIELDTYPE:invalid_corp_status_desc:ENUM(ACTIVE|INACTIVE|FEDERAL BANK| )
-FIELDTYPE:invalid_forgn_dom_code:ENUM(D|F| )
-FIELDTYPE:invalid_orig_org_structure_cd:ENUM(3LP|AUT|BNK|CAS|COP|CRU|FBS|FMA|FRA|GRG|INS|LLC|LLP|LTD|MAS|MMC|PBC|PLC|PRO|PUB|REG|SAL|SOL|FMA|MAS|MIL|MIN|MMC|PBC|PLC|PRO|PUB|REG|RFN|SAL|SOL|SPC| )
-FIELDTYPE:invalid_for_profit_ind:ENUM(N|Y| )
-FIELDTYPE:invalid_recordOrigin:ENUM(C|T)
-FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid__date:ALLOW(0123456789):LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
+FIELDTYPE:invalid__optional_date:ALLOW(0123456789):LENGTHS(0,1,8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
+FIELDTYPE:invalid__corp_key:ALLOW(0123456789-):LENGTHS(10,11,12)
+FIELDTYPE:invalid__corp_vendor:ENUM(53|53|53)
+FIELDTYPE:invalid__state_origin:ENUM(WA|WA)
+FIELDTYPE:invalid__charter:ALLOW(0123456789):LENGTHS(7,8,9)
+FIELDTYPE:invalid__mandatory:LENGTHS(1..)
+FIELDTYPE:invalid__name_type_cd:CUSTOM(Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_code>0,recordOrigin)
+FIELDTYPE:invalid__name_type_desc:CUSTOM(Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_desc>0,recordOrigin)
+FIELDTYPE:invalid__forgn_dom_code:ENUM(D|F| )
+FIELDTYPE:invalid__orig_org_structure_cd:CUSTOM(Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_org_structure_cd>0)
+FIELDTYPE:invalid__for_profit_ind:ENUM(N|Y| )
+FIELDTYPE:invalid__recordOrigin:ENUM(C|T)
+FIELDTYPE:invalid__alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid__alphablankhyphen:ALLOW( -ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid__merger_desc:ENUM(MERGER|MERGER NON-SURVIVOR| )
 
 //FIELD DEFINITIONS
-DATEFIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:corp_ra_dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:corp_ra_dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
-DATEFIELD:corp_process_date:TYPE(STRING8):LIKE(invalid_date):0,0
-DATEFIELD:corp_inc_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-DATEFIELD:corp_forgn_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-DATEFIELD:corp_dissolved_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-FIELD:corp_key:TYPE(STRING30):LIKE(invalid_corp_key):0,0
-FIELD:corp_orig_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter):0,0
-FIELD:corp_vendor:TYPE(STRING2):LIKE(invalid_corp_vendor):0,0
-FIELD:corp_state_origin:TYPE(STRING2):LIKE(invalid_state_origin):0,0
-FIELD:corp_legal_name:TYPE(STRING350):LIKE(invalid_mandatory):0,0
-FIELD:corp_inc_state:TYPE(STRING2):LIKE(invalid_state_origin):0,0
-FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablank):0,0
-FIELD:corp_foreign_domestic_ind:TYPE(STRING1):LIKE(invalid_forgn_dom_code):0,0
-FIELD:corp_for_profit_ind:TYPE(STRING1):LIKE(invalid_for_profit_ind):0,0
-FIELD:corp_ln_name_type_cd:TYPE(STRING2):LIKE(invalid_name_type_cd):0,0
-FIELD:corp_ln_name_type_desc:TYPE(STRING30):LIKE(invalid_name_type_desc):0,0
-FIELD:corp_orig_org_structure_cd:TYPE(STRING8):LIKE(invalid_orig_org_structure_cd):0,0
-FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid_corp_status_desc):0,0
-FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
-
+DATEFIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:corp_ra_dt_first_seen:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:corp_ra_dt_last_seen:TYPE(UNSIGNED4):LIKE(invalid__date):0,0
+DATEFIELD:corp_process_date:TYPE(STRING8):LIKE(invalid__date):0,0
+DATEFIELD:corp_inc_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+DATEFIELD:corp_forgn_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+DATEFIELD:corp_dissolved_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+DATEFIELD:corp_merger_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+FIELD:corp_key:TYPE(STRING30):LIKE(invalid__corp_key):0,0
+FIELD:corp_orig_sos_charter_nbr:TYPE(STRING32):LIKE(invalid__charter):0,0
+FIELD:corp_vendor:TYPE(STRING2):LIKE(invalid__corp_vendor):0,0
+FIELD:corp_state_origin:TYPE(STRING2):LIKE(invalid__state_origin):0,0
+FIELD:corp_legal_name:TYPE(STRING350):LIKE(invalid__mandatory):0,0
+FIELD:corp_inc_state:TYPE(STRING2):LIKE(invalid__state_origin):0,0
+FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
+FIELD:corp_foreign_domestic_ind:TYPE(STRING1):LIKE(invalid__forgn_dom_code):0,0
+FIELD:corp_for_profit_ind:TYPE(STRING1):LIKE(invalid__for_profit_ind):0,0
+FIELD:corp_ln_name_type_cd:TYPE(STRING2):LIKE(invalid__name_type_cd):0,0
+FIELD:corp_ln_name_type_desc:TYPE(STRING30):LIKE(invalid__name_type_desc):0,0
+FIELD:corp_orig_org_structure_cd:TYPE(STRING8):LIKE(invalid__orig_org_structure_cd):0,0
+FIELD:corp_orig_org_structure_desc:TYPE(STRING60):LIKE(invalid__alphablankhyphen):0,0
+FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
+FIELD:corp_merger_desc:TYPE(STRING250):LIKE(invalid__merger_desc):0,0
+FIELD:cont_title1_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
+FIELD:recordorigin:TYPE(STRING1):LIKE(invalid__recordOrigin):0,0
+  
 //Fields not being Scrubbed
-// DATEFIELD:corp_filing_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_status_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_merger_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_ra_resign_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_term_exist_exp:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:cont_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_name_status_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// DATEFIELD:corp_name_reservation_expiration_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
-// FIELD:corp_orig_bus_type_cd:TYPE(STRING8):LIKE(invalid_orig_bus_type_cd):0,0
-// FIELD:corp_status_cd:TYPE(STRING8):LIKE(invalid_corp_status_cd):0,0
+// DATEFIELD:corp_filing_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:corp_status_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:corp_ra_resign_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:corp_term_exist_exp:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:cont_effective_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:corp_name_status_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// DATEFIELD:corp_name_reservation_expiration_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
+// FIELD:corp_orig_bus_type_cd:TYPE(STRING8):LIKE(invalid__orig_bus_type_cd):0,0
+// FIELD:corp_status_cd:TYPE(STRING8):LIKE(invalid__corp_status_cd):0,0
 // FIELD:corp_forgn_state_cd:TYPE(STRING3):0,0
 // FIELD:corp_ra_full_name:TYPE(STRING100):0,0
 // FIELD:corp_standing:TYPE(STRING1):0,0
@@ -78,7 +82,7 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_fed_tax_id:TYPE(STRING32):0,0
 // FIELD:corp_state_tax_id:TYPE(STRING32):0,0
 // FIELD:corp_term_exist_cd:TYPE(STRING8):0,0
-// DATEFIELD:corp_ra_effective_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+// DATEFIELD:corp_ra_effective_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
 // FIELD:corp_term_exist_desc:TYPE(STRING60):0,0
 // FIELD:corp_forgn_sos_charter_nbr:TYPE(STRING32):0,0
 // FIELD:corp_forgn_fed_tax_id:TYPE(STRING32):0,0
@@ -86,8 +90,6 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_forgn_term_exist_cd:TYPE(STRING8):0,0
 // FIELD:corp_forgn_term_exist_exp:TYPE(STRING8):0,0
 // FIELD:corp_forgn_term_exist_desc:TYPE(STRING60):0,0
-// FIELD:corp_orig_org_structure_desc:TYPE(STRING60):0,0
-
 // FIELD:corp_filing_cd:TYPE(STRING8):0,0
 // FIELD:corp_filing_desc:TYPE(STRING60):0,0
 // FIELD:corp_supp_key:TYPE(STRING30):0,0
@@ -144,7 +146,6 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:cont_fname:TYPE(STRING20):0,0
 // FIELD:cont_mname:TYPE(STRING20):0,0
 // FIELD:cont_lname:TYPE(STRING20):0,0
-// FIELD:cont_title1_desc:TYPE(STRING60):0,0
 // FIELD:cont_title2_desc:TYPE(STRING60):0,0
 // FIELD:cont_title3_desc:TYPE(STRING60):0,0
 // FIELD:cont_title4_desc:TYPE(STRING60):0,0
@@ -154,7 +155,7 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:cont_dob:TYPE(STRING8):0,0
 // FIELD:cont_status_cd:TYPE(STRING8):0,0
 // FIELD:cont_status_desc:TYPE(STRING60):0,0
-// DATEFIELD:corp_renewal_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+// DATEFIELD:corp_renewal_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
 // FIELD:cont_effective_cd:TYPE(STRING1):0,0
 // FIELD:cont_effective_desc:TYPE(STRING60):0,0
 // FIELD:cont_addl_info:TYPE(STRING350):0,0
@@ -200,7 +201,6 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_date_of_organization_meeting:TYPE(STRING8):0,0
 // FIELD:corp_delayed_effective_date:TYPE(STRING8):0,0
 // FIELD:corp_directors_from_to:TYPE(STRING10):0,0
-
 // FIELD:corp_farm_exemptions:TYPE(STRING30):0,0
 // FIELD:corp_farm_qual_date:TYPE(STRING10):0,0
 // FIELD:corp_farm_status_cd:TYPE(STRING1):0,0
@@ -226,7 +226,6 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_merged_corporation_id:TYPE(STRING32):0,0
 // FIELD:corp_merged_fein:TYPE(STRING9):0,0
 // FIELD:corp_merger_allowed_flag:TYPE(STRING1):0,0
-// FIELD:corp_merger_description:TYPE(STRING250):0,0
 // FIELD:corp_merger_effective_date:TYPE(STRING8):0,0
 // FIELD:corp_merger_id:TYPE(STRING32):0,0
 // FIELD:corp_merger_indicator:TYPE(STRING1):0,0
@@ -235,12 +234,9 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_merger_type_converted_to_description:TYPE(STRING100):0,0
 // FIELD:corp_naics_description:TYPE(STRING60):0,0
 // FIELD:corp_name_effective_date:TYPE(STRING8):0,0
-
-
 // FIELD:corp_name_reservation_number:TYPE(STRING32):0,0
 // FIELD:corp_name_reservation_type:TYPE(STRING100):0,0
 // FIELD:corp_name_status_cd:TYPE(STRING5):0,0
-
 // FIELD:corp_name_status_description:TYPE(STRING50):0,0
 // FIELD:corp_nonprofitirsapprovedpurpose:TYPE(STRING):0,0
 // FIELD:corp_nonprofitsolicitdonations:TYPE(STRING1):0,0
@@ -299,7 +295,6 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:cont_nondislosure:TYPE(STRING1):0,0
 // FIELD:cont_prep_addr_line1:TYPE(STRING100):0,0
 // FIELD:cont_prep_addr_last_line:TYPE(STRING50):0,0
-
 // FIELD:corp_ra_fname:TYPE(STRING20):0,0
 // FIELD:corp_ra_mname:TYPE(STRING20):0,0
 // FIELD:corp_ra_lname:TYPE(STRING20):0,0
@@ -311,7 +306,7 @@ FIELD:recordorigin:TYPE(STRING1):LIKE(invalid_recordOrigin):0,0
 // FIELD:corp_public_or_private_ind:TYPE(STRING1):0,0
 // FIELD:corp_sic_code:TYPE(STRING8):0,0
 // FIELD:corp_naic_code:TYPE(STRING8):0,0
-// DATEFIELD:corp_name_reservation_date:TYPE(STRING8):LIKE(invalid_optional_date):0,0
+// DATEFIELD:corp_name_reservation_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0
 // FIELD:corp_orig_bus_type_desc:TYPE(STRING350):0,0
 // FIELD:corp_entity_desc:TYPE(STRING350):0,0
 // FIELD:corp_certificate_nbr:TYPE(STRING32):0,0

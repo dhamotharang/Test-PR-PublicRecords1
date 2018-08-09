@@ -32,7 +32,7 @@ EXPORT Mod_stats := MODULE
 
 		r tr0(r l):=transform
 			self.FileName   :=trim(fname);
-			self.FileState  :=if(regexfind('Inquirylogs',fname,nocase),'NA',stringlib.stringtouppercase(fname[1..2]));
+			self.FileState  :=if(regexfind('Deltabase',fname,nocase),'NA',stringlib.stringtouppercase(fname[1..2]));
 			self.FileDate   :=regexfind('([0-9])\\w+',fname, 0)[1..8];
 			self.FileTime   :=regexfind('([0-9])\\w+',fname, 0)[10..15];
 			self.RecordsTotal :=mx;
@@ -104,7 +104,7 @@ END;
 
 			r tr0(r l):=transform
 				self.FileName   :=trim(fname);
-				self.FileState  :=if(regexfind('Inquirylogs',fname,nocase),'NA',stringlib.stringtouppercase(fname[1..2]));
+				self.FileState  :=if(regexfind('Deltabase',fname,nocase),'NA',stringlib.stringtouppercase(fname[1..2]));
 				self.FileDate   :=regexfind('([0-9])\\w+',fname, 0)[1..8];
 				self.FileTime   :=regexfind('([0-9])\\w+',fname, 0)[10..15];
 				self.RecordsTotal :=mx;
@@ -116,11 +116,11 @@ END;
 			numberOfColumns	:=	MAP (
 												 STD.Str.Contains( fname, 'IdentityData',	true )	=> Mod_Sets.IdentityData_numberOfColumns
 												,STD.Str.Contains( fname, 'KnownFraud'	,	true )	=> Mod_Sets.KnownFraud_numberOfColumns
-												,STD.Str.Contains( fname, 'InquiryLogs'	,	true )	=> Mod_Sets.InquiryLogs_numberOfColumns
+												,STD.Str.Contains( fname, 'Deltabase'	,	true )	=> Mod_Sets.Deltabase_numberOfColumns
 												,0
 									);
 			
-			validDelimiter := MAP (	STD.Str.Contains( fname, 'InquiryLogs'	,	true )	=> Mod_Sets.validDelimiterInqLog,
+			validDelimiter := MAP (	STD.Str.Contains( fname, 'Deltabase'	,	true )	=> Mod_Sets.validDelimiterDeltabase,
 													FraudGovPlatform_Validation.Mod_Sets.validDelimiter	);
 			
 			
@@ -204,21 +204,19 @@ END;
 			r tr1(withRC l, integer c):=transform
 
 				self.field:=choose(c
-													,'Client_ID'
+													,'Customer_Account_Number'
 													,'Customer_State'
-													,'customer_county'
+													,'Customer_County'
 													,'Customer_Agency_Vertical_Type'
 													,'Customer_Program'
 													,'reported_date'
 													,'lexid'
-													,'full_name'
-													,'First_name'
-													,'Last_Name'
+													,'raw_full_name'
+													,'raw_First_name'
+													,'raw_Last_Name'
 													,'SSN'
 													,'full_address'
-													,'physical_address'
-													,'physical_address_1'
-													,'Physical_Address_2'
+													,'street_1'
 													,'City'
 													,'State'
 													,'Zip'
@@ -227,20 +225,19 @@ END;
 													);
 
 				self.value:=choose(c
-													,l.Client_ID
+													,l.Customer_Account_Number
 													,l.Customer_State
-													,l.customer_county
+													,l.Customer_County
 													,l.Customer_Agency_Vertical_Type
 													,l.Customer_Program
 													,l.reported_date
 													,l.lexid
-													,l.full_name
-													,l.First_name
-													,l.Last_Name
+													,l.raw_full_name
+													,l.raw_First_name
+													,l.raw_Last_Name
 													,l.SSN
 													,l.full_address
-													,l.physical_address
-													,l.physical_address_1
+													,l.street_1
 													,l.City
 													,l.State
 													,l.Zip
@@ -249,38 +246,29 @@ END;
 													);
 
 				self.err:=choose(c
-										,if(l.Client_ID <>'','','E001')
+										,if(l.Customer_Account_Number <>'','','E001')
 										,if(STD.Str.ToUpperCase(l.Customer_State)	in Mod_Sets.States,'','E003')
 										,if(l.Customer_County <>'','','E001')
 										,if(STD.Str.ToUpperCase(l.Customer_Agency_Vertical_Type) in Mod_Sets.Agency_Vertical_Type,'','E004')
 										,if(STD.Str.ToUpperCase(l.Customer_Program) in Mod_Sets.IES_Benefit_Type ,'','E005')
-										,if(STD.Str.Contains( fname, 'KnownFraud|InquiryLogs',	true )	
+										,if(STD.Str.Contains( fname, 'KnownFraud|Deltabase',	true )	
 																		,if(length(trim(l.reported_date,left,right))=8,'','E002'),'')								
 										,'' //lexid
 										,''	//fullname
-										,if(regexreplace('0',l.lexid,'')	<>'' or (l.First_name <>'' or l.full_name <>''),'','E001')	
-										,if(regexreplace('0',l.lexid,'')	<>'' or (l.Last_Name <>'' or l.full_name <>''),'','E001')
+										,if(regexreplace('0',l.lexid,'')	<>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
+										,if(regexreplace('0',l.lexid,'')	<>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
 										,if(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
 													(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>''),'','E006')
-										,''	//full_address (InquiryLogs)
-										,''	//physical_address (InquiryLogs)
-										,''	//physical_address_1
+										,''	//full_address (Deltabase)
+										,''	//physical_address (Deltabase)
+										,''	//street_1
 										,''	//City
-										,if(STD.Str.Contains( fname, 'InquiryLogs',	true )
-   												,if(l.full_address <>'' or 
-																(l.physical_address <>'' and 
-																		if(l.city <>''
-																			,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) or
-																				length(trim(l.Zip,left,right)) in [9,5] )
-																			,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) and
-																				length(trim(l.Zip,left,right)) in [9,5] )))																,'','W002')
-   												,if(l.physical_address_1 <>'' and 
-																	if(l.city <>''
-																		,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) or
-																				length(trim(l.Zip,left,right)) in [9,5] )
-																		,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) and
-																				length(trim(l.Zip,left,right)) in [9,5] ))																,'','W002')
-   												)
+										,if(l.street_1 <>'' and 
+													if(l.city <>''
+														,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) or
+																length(trim(l.Zip,left,right)) in [9,5] )
+														,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) and
+																length(trim(l.Zip,left,right)) in [9,5] )),'','W002')
 										,''	//zip
 										,'' //Drivers_License_Number
 										,'' //Drivers_License_State
@@ -309,8 +297,8 @@ END;
 																			{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.KnownFraud},
 																			CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
 																			
-				SHARED DS_InquiryLogs			:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
-																			{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.InquiryLogs},
+				SHARED DS_DeltaBase			:= dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname,
+																			{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.Deltabase},
 																			CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
 
 				Validate_IdentityData := 	ValidateInputs(	fname, 
@@ -320,13 +308,13 @@ END;
 																	project(DS_KnownFraud, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
 
 
-				Validate_InquiryLogs 	:= 	ValidateInputs(	fname, 
-																	project(DS_InquiryLogs, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
+				Validate_Deltabase 	:= 	ValidateInputs(	fname, 
+																	project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
 
 				SHARED ErrorsFound	:=	MAP (
 												 STD.Str.Contains( fname, 'IdentityData',	true )	=> Validate_IdentityData
 												,STD.Str.Contains( fname, 'KnownFraud'	,	true )	=> Validate_KnownFraud
-												,STD.Str.Contains( fname, 'InquiryLogs'	,	true )	=> Validate_InquiryLogs
+												,STD.Str.Contains( fname, 'Deltabase'	,	true )	=> Validate_Deltabase
 									);
 									
 				comb:=
@@ -364,23 +352,26 @@ END;
 									
 	END;
 	
-	//InquiryLog MBS validation
+	//InquiryLog MBS validation - ONLY DELTABASE!!!
 	
 	EXPORT ValidateInputWithMBS(string fname, string pSeparator, string pTerminator):= module
 		shared infile:=dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,
-									FraudGovPlatform.Layouts.Sprayed.InquiryLogs,CSV(separator([pSeparator]),quote([]),terminator(pTerminator)));
+									FraudGovPlatform.Layouts.Sprayed.Deltabase,CSV(separator([pSeparator]),quote([]),terminator(pTerminator)));
 		
-		shared InqMbs := join(infile,FraudShared.Files().Input.MBS.sprayed(status = 1)
-										,left.client_id =(string)right.gc_id
-										and left.Customer_State = right.customer_state
-										and FraudGovPlatform.Functions.ind_type_fn(left.Customer_Program) = right.ind_type
-										and FraudGovPlatform.Functions.file_type_fn('IDDT') = right.file_type
-										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-										// and left.customer_county = right.customer_county 
-										,transform({string20 client_id,string1		Customer_Program,string2		customer_state,string		customer_agency_vertical_type,unsigned4 seq}
-										,self.Client_ID:=left.Client_id,
-										,self.Customer_State:=left.customer_state
-										,self.Customer_Agency_Vertical_Type:=left.Customer_Agency_Vertical_Type
+		infile_r := record
+			infile;
+			unsigned3		file_type;
+			unsigned6		ind_type;			
+		end;
+		
+		p1 := project(infile, transform(infile_r, self.file_type := 3; self.ind_type := FraudGovPlatform.Functions.ind_type_fn(left.customer_program); self := left;));
+		
+		shared InqMbs := join(p1,FraudShared.Files().Input.MBS.sprayed(status = 1)
+										,left.Customer_Account_Number =(string)right.gc_id
+										and left.ind_type = right.ind_type
+										and left.file_type = right.file_type
+										,transform({string20 Customer_Account_Number,string1		Customer_Program,string2		customer_state,string		customer_agency_vertical_type, string3 Customer_County,unsigned4 seq}
+										,self.Customer_Account_Number:=left.Customer_Account_Number,
 										,self.Customer_Program:=left.customer_program
 										,self.seq := counter
 										,self:=left),left only);
@@ -417,8 +408,8 @@ END;
 			self.RecordsTotal :=count(infile);
 			self.ErrorCount		:=mx;
 			self.RecordsRejected :=mx;
-			self.field 			:='Client_id,Customer_state,customer_program,Customer_Agency_Vertical_Type';
-			self.value 			:=trim(l.Client_id,left,right)+','+l.Customer_state+','+l.Customer_program+','+l.Customer_Agency_Vertical_Type;
+			self.field 			:='Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type';
+			self.value 			:=trim(l.Customer_Account_Number,left,right)+','+l.Customer_program+','+l.Customer_Agency_Vertical_Type;
 			self:=l;
 		end;
 
@@ -430,7 +421,7 @@ END;
 								,min_seq:=min(group,seq)
 								,err_cnt:=count(group)
 								,withRC
-      					},filedate,filetime,field,client_id,customer_state,customer_program,Customer_Agency_Vertical_Type,few),filedate,filetime,-err_cnt);
+      					},filedate,filetime,field,Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type,few),filedate,filetime,-err_cnt);
 
 						;
 

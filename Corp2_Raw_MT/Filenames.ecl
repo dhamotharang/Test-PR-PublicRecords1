@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools, Corp2_Raw_MT;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE

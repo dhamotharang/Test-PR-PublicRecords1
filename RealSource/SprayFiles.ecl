@@ -6,7 +6,7 @@ EXPORT SprayFiles(
 	STRING		pServerIP				= IF(_control.thisenvironment.name='Dataland',
 																_control.IPAddress.bctlpedata12,
 																_control.IPAddress.bctlpedata11),
-  STRING		pDirectory			= '/data/hds_180/RealSource/'+pVersionDate,
+  STRING		pDirectory			= '/data/hds_180/RealSource/data/'+pVersionDate,
 	STRING		pGroupName			=	_Constants().groupname,															
 	BOOLEAN		pIsTesting			=	FALSE,
 	BOOLEAN		pOverwrite			=	TRUE,

@@ -1,4 +1,4 @@
-IMPORT Drivers, VehicleV2, RiskWise, ut, MDR;
+﻿IMPORT Drivers, VehicleV2, RiskWise, ut, MDR;
 
 EXPORT getVehicles(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
 
@@ -67,12 +67,20 @@ ProfileBooster.Layouts.Layout_PB_Slim_vehicles add_Vehicles_main(vehPartyRecs le
 	SELF.year_make := if(gotMain, ri.Best_Model_Year, '');
 	SELF.make := if(gotMain, ri.Best_Make_Code, '');
 	SELF.model := if(gotMain, ri.Best_Model_Code, '');
-	SELF.vin := if(gotMain, ri.orig_vin, '');
 	SELF.vina_veh_type := if(gotMain, ri.vina_veh_type, '');
+	
+	self.PPCurrOwnedAutoVIN := if(gotMain, ri.orig_vin, '');
+	self.PPCurrOwnedAutoYear  := if(gotMain, ri.orig_year, '');
+	self.PPCurrOwnedAutoMake := if(gotMain, ri.orig_make_desc, '');
+	self.PPCurrOwnedAutoModel := if(gotMain, ri.orig_model_desc, '');
+	self.PPCurrOwnedAutoSeries := if(gotMain, ri.vina_series_desc, '');
+	self.PPCurrOwnedAutoType := if(gotMain, ri.orig_body_desc, '');	
+	
 	SELF.vehicleCount := if(gotMain and le.totalcount > 0, if(ri.vina_veh_type <> 'M', 1, 0), 0);
 	SELF.motorcycleCount := if(gotMain and le.totalcount > 0, if(ri.vina_veh_type = 'M', 1, 0), 0);
 	SELF := le;
 END;
+
 
 vehMainRecs_roxie := JOIN(vehPartyRecs, VehicleV2.Key_Vehicle_Main_Key,
 										keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
@@ -92,13 +100,23 @@ vehMainRecs := if(onThor, vehMainRecs_thor, vehMainRecs_roxie);
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles rollVins(vehMainRecs le, vehMainRecs ri) := TRANSFORM
 	self.months_first_reg	:= max(le.months_first_reg, ri.months_first_reg);	//save oldest registration
 	self.months_last_reg	:= min(le.months_last_reg, ri.months_last_reg);	  //save newest registration
+	
+	self.PPCurrOwnedAutoVIN := ri.PPCurrOwnedAutoVIN; // since records are sorted earliest to latest, and we want the details from the latest, take the right
+	self.PPCurrOwnedAutoYear  := ri.PPCurrOwnedAutoYear;
+	self.PPCurrOwnedAutoMake := ri.PPCurrOwnedAutoMake;
+	self.PPCurrOwnedAutoModel := ri.PPCurrOwnedAutoModel;
+	self.PPCurrOwnedAutoSeries := ri.PPCurrOwnedAutoSeries;
+	self.PPCurrOwnedAutoType := ri.PPCurrOwnedAutoType;
+	
 	self								 	:= le;
 END;
 
 // first rollup by vin to get the earliest first and latest last registration and to avoid inflating the vehicleCount and motorcycleCount in the next rollup
-vehDedup :=  rollup(sort(vehMainRecs, seq, did2, vin, -months_first_reg, -months_last_reg), 
-										 left.seq = right.seq and left.did2 = right.did2 and left.vin=right.vin,
+vehDedup :=  rollup(sort(vehMainRecs, seq, did2, PPCurrOwnedAutoVIN, -months_first_reg, -months_last_reg), 
+										 left.seq = right.seq and left.did2 = right.did2 and left.PPCurrOwnedAutoVIN=right.PPCurrOwnedAutoVIN,
 										 rollVins(left, right));
+
+vehSort := sort(vehDedup, seq, did2, months_last_reg, months_first_reg, PPCurrOwnedAutoVIN);  // get the details from the latest registration
 										 
 ProfileBooster.Layouts.Layout_PB_Slim_vehicles rollVehicles(vehDedup le, vehDedup ri) := TRANSFORM
 	self.vehicleCount 	  := le.vehicleCount + ri.vehicleCount;	
@@ -108,13 +126,14 @@ ProfileBooster.Layouts.Layout_PB_Slim_vehicles rollVehicles(vehDedup le, vehDedu
 	self								 	:= le;
 END;
 
-RolledVeh :=  rollup(vehDedup, left.seq = right.seq and left.did2 = right.did2,
+RolledVeh :=  rollup(vehSort, left.seq = right.seq and left.did2 = right.did2,
 										 rollVehicles(left, right));
 										
 // output(PBslim, named('PBslim'));
 // output(vehRecs, named('vehRecs'));
 // output(vehPartyRecs, named('vehPartyRecs'));
 // output(vehMainRecs, named('vehMainRecs'));
+// output(vehSort, named('vehSort'));
 // output(vehDedup, named('vehDedup'));
 // output(RolledVeh, named('RolledVeh'));
 

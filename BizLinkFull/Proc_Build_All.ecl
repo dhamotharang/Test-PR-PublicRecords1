@@ -2,6 +2,7 @@
 EXPORT Proc_Build_All(
    string   pversion
   ,boolean  pPromote2QA = true
+  ,boolean  pDo_Strata  = true//tools._Constants.IsBocaProd
 ) :=
 function
   shared specs  := specificities(File_BizHead);
@@ -13,8 +14,8 @@ function
   Buildsup_seleid                := tools.macf_writeindex('Process_Biz_Layouts.KeyseleidUp ,knames.sup_seleid               .new'      );
   Buildsup_orgid                 := tools.macf_writeindex('Process_Biz_Layouts.KeyorgidUp  ,knames.sup_orgid                .new'      );
   Buildsup_rcid                  := tools.macf_writeindex('Process_Biz_Layouts.KeyIDHistory,knames.sup_rcid                 .new'      );
-  Buildrefs                      := tools.macf_writeindex('Key_BizHead_.Key                ,knames.refs                     .new'      );  
-  Buildwords                     := tools.macf_writeindex('Key_BizHead_.ValueKey           ,knames.words                    .new'      );
+//  Buildrefs                      := tools.macf_writeindex('Key_BizHead_.Key                ,knames.refs                     .new'      );  
+//  Buildwords                     := tools.macf_writeindex('Key_BizHead_.ValueKey           ,knames.words                    .new'      );
   Buildrefs_l_cnpname            := tools.macf_writeindex('Key_BizHead_L_CNPNAME.Key       ,knames.refs_l_cnpname           .new'      );
   Buildrefs_l_cnpname_zip        := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ZIP.Key   ,knames.refs_l_cnpname_zip       .new'      );
   Buildrefs_l_cnpname_st         := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ST.Key    ,knames.refs_l_cnpname_st        .new'      );
@@ -36,7 +37,7 @@ function
   Buildwheel_city_clean          := tools.macf_writeindex('Wheel.Key_city_clean            ,knames.wheel_city_clean         .new'      );
   Buildwheel_quick_city_clean    := tools.macf_writeindex('Wheel.KeyQuick_city_clean       ,knames.wheel_quick_city_clean   .new'      );
   returnresult := sequential(
-     bizlinkfull._dostrata_ID_Check(File_BizHead,pversion)
+     if(pDo_Strata = true  ,bizlinkfull._dostrata_ID_Check(File_BizHead,pversion))
     ,BuildSpecs
     ,if(not tools.fun_DoAllFilesExist.fNamesBuilds(knames.dall_filenames)
       ,sequential(

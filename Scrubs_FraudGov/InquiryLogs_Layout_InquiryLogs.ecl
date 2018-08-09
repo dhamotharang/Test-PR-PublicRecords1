@@ -1,0 +1,26 @@
+﻿EXPORT InquiryLogs_Layout_InquiryLogs := record
+	string transaction_id := '';
+	string datetime := '';	
+	string full_name := '';	
+	string title := '';	
+	string fname := '';		
+	string mname := '';		
+	string lname := '';		
+	string name_suffix := '';	
+	string ssn := '';			
+	string appended_ssn := '';
+	string address := '';		
+	string city := '';		
+	string state := '';		
+	string zip := '';			
+	string3 fips_county := '';	
+	string personal_phone := '';
+	string dob := '';			
+	string email_address := '';
+	string dl_st := '';		
+	string dl := '';			
+	string ipaddr := '';		
+	string10 geo_lat := '';		
+	string11 geo_long := '';	
+	string Source := '';		
+end;

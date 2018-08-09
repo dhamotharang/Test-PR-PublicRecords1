@@ -1,4 +1,4 @@
-export Layout_In_Document
+﻿export Layout_In_Document
  := 
   record
 	string8		process_date;

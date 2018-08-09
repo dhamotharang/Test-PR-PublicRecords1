@@ -22,8 +22,8 @@ FIELDTYPE:invalid_numeric:ALLOW(0123456789)
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
 FIELD:cc_id:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
 FIELD:gc_id:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
-FIELD:account_id:TYPE(STRING30):LIKE(invalid_alphanumeric):0,0
+FIELD:account_id:TYPE(STRING30):LIKE(invalid_alphanumeric):0,0 
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file
-// LINKPATH is used to define access paths for external linking
+// LINKPATH is used to define access paths for external linking 

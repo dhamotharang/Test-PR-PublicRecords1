@@ -23,8 +23,8 @@ FIELD:status:TYPE(UNSIGNED3):LIKE(invalid_numeric):0,0
 FIELD:date_added:TYPE(STRING20):0,0
 FIELD:user_added:TYPE(STRING30):0,0
 FIELD:date_changed:TYPE(STRING20):0,0
-FIELD:user_changed:TYPE(STRING30):0,0
+FIELD:user_changed:TYPE(STRING30):0,0 
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file
-// LINKPATH is used to define access paths for external linking
+// LINKPATH is used to define access paths for external linking 

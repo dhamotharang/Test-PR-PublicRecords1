@@ -1,4 +1,4 @@
-//this program project the records from flcrash2v,4,5,6,7,9 to standard format,
+﻿//this program project the records from flcrash2v,4,5,6,7,9 to standard format,
 //add accident date from flcrash0, and write them into a file
 
 import flaccidents, ut;
@@ -112,6 +112,6 @@ flc_search_out := join(flc_search_file, dep_base_file0,
                        left.accident_nbr = right.accident_nbr,
 				   get_acc_date(left,right), left outer, hash);
 
-ut.MAC_SF_BuildProcess(dedup(flc_search_out,all), '~thor_data400::base::flcrash_did', build_flcrash_did, 2);
+ut.MAC_SF_BuildProcess(dedup(flc_search_out,all), '~thor_data400::base::flcrash_did', build_flcrash_did, 2,,true);
 				  
 export flcrash_builddidfile := build_flcrash_did;

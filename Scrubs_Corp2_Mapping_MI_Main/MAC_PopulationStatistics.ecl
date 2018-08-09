@@ -1,9 +1,9 @@
- 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_key = '',Input_corp_supp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_legal_name = '',Input_corp_ln_name_type_cd = '',Input_corp_ln_name_type_desc = '',Input_corp_supp_nbr = '',Input_corp_name_comment = '',Input_corp_address1_type_cd = '',Input_corp_address1_type_desc = '',Input_corp_address1_line1 = '',Input_corp_address1_line2 = '',Input_corp_address1_line3 = '',Input_corp_address1_effective_date = '',Input_corp_address2_type_cd = '',Input_corp_address2_type_desc = '',Input_corp_address2_line1 = '',Input_corp_address2_line2 = '',Input_corp_address2_line3 = '',Input_corp_address2_effective_date = '',Input_corp_phone_number = '',Input_corp_phone_number_type_cd = '',Input_corp_phone_number_type_desc = '',Input_corp_fax_nbr = '',Input_corp_email_address = '',Input_corp_web_address = '',Input_corp_filing_reference_nbr = '',Input_corp_filing_date = '',Input_corp_filing_cd = '',Input_corp_filing_desc = '',Input_corp_status_cd = '',Input_corp_status_desc = '',Input_corp_status_date = '',Input_corp_standing = '',Input_corp_status_comment = '',Input_corp_ticker_symbol = '',Input_corp_stock_exchange = '',Input_corp_inc_state = '',Input_corp_inc_county = '',Input_corp_inc_date = '',Input_corp_anniversary_month = '',Input_corp_fed_tax_id = '',Input_corp_state_tax_id = '',Input_corp_term_exist_cd = '',Input_corp_term_exist_exp = '',Input_corp_term_exist_desc = '',Input_corp_foreign_domestic_ind = '',Input_corp_forgn_state_cd = '',Input_corp_forgn_state_desc = '',Input_corp_forgn_sos_charter_nbr = '',Input_corp_forgn_date = '',Input_corp_forgn_fed_tax_id = '',Input_corp_forgn_state_tax_id = '',Input_corp_forgn_term_exist_cd = '',Input_corp_forgn_term_exist_exp = '',Input_corp_forgn_term_exist_desc = '',Input_corp_orig_org_structure_cd = '',Input_corp_orig_org_structure_desc = '',Input_corp_for_profit_ind = '',Input_corp_public_or_private_ind = '',Input_corp_sic_code = '',Input_corp_naic_code = '',Input_corp_orig_bus_type_cd = '',Input_corp_orig_bus_type_desc = '',Input_corp_entity_desc = '',Input_corp_certificate_nbr = '',Input_corp_internal_nbr = '',Input_corp_previous_nbr = '',Input_corp_microfilm_nbr = '',Input_corp_amendments_filed = '',Input_corp_acts = '',Input_corp_partnership_ind = '',Input_corp_mfg_ind = '',Input_corp_addl_info = '',Input_corp_taxes = '',Input_corp_franchise_taxes = '',Input_corp_tax_program_cd = '',Input_corp_tax_program_desc = '',Input_corp_ra_full_name = '',Input_corp_ra_fname = '',Input_corp_ra_mname = '',Input_corp_ra_lname = '',Input_corp_ra_suffix = '',Input_corp_ra_title_cd = '',Input_corp_ra_title_desc = '',Input_corp_ra_fein = '',Input_corp_ra_ssn = '',Input_corp_ra_dob = '',Input_corp_ra_effective_date = '',Input_corp_ra_resign_date = '',Input_corp_ra_no_comp = '',Input_corp_ra_no_comp_igs = '',Input_corp_ra_addl_info = '',Input_corp_ra_address_type_cd = '',Input_corp_ra_address_type_desc = '',Input_corp_ra_address_line1 = '',Input_corp_ra_address_line2 = '',Input_corp_ra_address_line3 = '',Input_corp_ra_phone_number = '',Input_corp_ra_phone_number_type_cd = '',Input_corp_ra_phone_number_type_desc = '',Input_corp_ra_fax_nbr = '',Input_corp_ra_email_address = '',Input_corp_ra_web_address = '',Input_corp_prep_addr1_line1 = '',Input_corp_prep_addr1_last_line = '',Input_corp_prep_addr2_line1 = '',Input_corp_prep_addr2_last_line = '',Input_ra_prep_addr_line1 = '',Input_ra_prep_addr_last_line = '',Input_cont_filing_reference_nbr = '',Input_cont_filing_date = '',Input_cont_filing_cd = '',Input_cont_filing_desc = '',Input_cont_type_cd = '',Input_cont_type_desc = '',Input_cont_full_name = '',Input_cont_fname = '',Input_cont_mname = '',Input_cont_lname = '',Input_cont_suffix = '',Input_cont_title1_desc = '',Input_cont_title2_desc = '',Input_cont_title3_desc = '',Input_cont_title4_desc = '',Input_cont_title5_desc = '',Input_cont_fein = '',Input_cont_ssn = '',Input_cont_dob = '',Input_cont_status_cd = '',Input_cont_status_desc = '',Input_cont_effective_date = '',Input_cont_effective_cd = '',Input_cont_effective_desc = '',Input_cont_addl_info = '',Input_cont_address_type_cd = '',Input_cont_address_type_desc = '',Input_cont_address_line1 = '',Input_cont_address_line2 = '',Input_cont_address_line3 = '',Input_cont_address_effective_date = '',Input_cont_address_county = '',Input_cont_phone_number = '',Input_cont_phone_number_type_cd = '',Input_cont_phone_number_type_desc = '',Input_cont_fax_nbr = '',Input_cont_email_address = '',Input_cont_web_address = '',Input_corp_acres = '',Input_corp_action = '',Input_corp_action_date = '',Input_corp_action_employment_security_approval_date = '',Input_corp_action_pending_code = '',Input_corp_action_pending_desc = '',Input_corp_action_statement_of_intent_date = '',Input_corp_action_tax_dept_approval_date = '',Input_corp_acts2 = '',Input_corp_acts3 = '',Input_corp_additional_principals = '',Input_corp_address_office_type = '',Input_corp_agent_commercial = '',Input_corp_agent_country = '',Input_corp_agent_county = '',Input_corp_agent_status_cd = '',Input_corp_agent_status_desc = '',Input_corp_agent_id = '',Input_corp_agent_assign_date = '',Input_corp_agriculture_flag = '',Input_corp_authorized_partners = '',Input_corp_cmt = '',Input_corp_consent_flag_for_protected_name = '',Input_corp_converted = '',Input_corp_converted_from = '',Input_corp_country_of_formation = '',Input_corp_date_of_organization_meeting = '',Input_corp_delayed_effective_date = '',Input_corp_directors_from_to = '',Input_corp_dissolved_date = '',Input_corp_farm_exemptions = '',Input_corp_farm_qual_date = '',Input_corp_farm_status_cd = '',Input_corp_farm_status_desc = '',Input_corp_farm_status_date = '',Input_corp_fiscal_year_month = '',Input_corp_foreign_fiduciary_capacity_in_state = '',Input_corp_governing_statute = '',Input_corp_hasmembers = '',Input_corp_hasvestedmanagers = '',Input_corp_home_incorporated_county = '',Input_corp_home_state_name = '',Input_corp_is_professional = '',Input_corp_isnonprofitirsapproved = '',Input_corp_last_renewal_date = '',Input_corp_last_renewal_year = '',Input_corp_license_type = '',Input_corp_llc_managed_cd = '',Input_corp_llc_managed_desc = '',Input_corp_management_desc = '',Input_corp_management_type = '',Input_corp_manager_managed = '',Input_corp_merged_corporation_id = '',Input_corp_merged_fein = '',Input_corp_merger_allowed_flag = '',Input_corp_merger_date = '',Input_corp_merger_desc = '',Input_corp_merger_effective_date = '',Input_corp_merger_id = '',Input_corp_merger_indicator = '',Input_corp_merger_name = '',Input_corp_merger_type_converted_to_code = '',Input_corp_merger_type_converted_to_desc = '',Input_corp_naics_desc = '',Input_corp_name_effective_date = '',Input_corp_name_reservation_date = '',Input_corp_name_reservation_expiration_date = '',Input_corp_name_reservation_nbr = '',Input_corp_name_reservation_type = '',Input_corp_name_status_cd = '',Input_corp_name_status_date = '',Input_corp_name_status_desc = '',Input_corp_nonprofitirsapprovedpurpose = '',Input_corp_nonprofitsolicitdonations = '',Input_corp_nbr_of_amendments = '',Input_corp_nbr_of_initial_llc_members = '',Input_corp_nbr_of_partners = '',Input_corp_operatingagreement = '',Input_corp_opt_in_llc_act_desc = '',Input_corp_opt_in_llc_act_ind = '',Input_corp_organizational_comments = '',Input_corp_original_business_type = '',Input_corp_partner_contributions_total = '',Input_corp_partner_terms = '',Input_corp_percentage_voters_required_to_approve_amendments = '',Input_corp_profession = '',Input_corp_province = '',Input_corp_public_mutual_corporation = '',Input_corp_purpose = '',Input_corp_ra_required_flag = '',Input_corp_registered_counties = '',Input_corp_regulated_ind = '',Input_corp_renewal_date = '',Input_corp_standing_other = '',Input_corp_survivor_corporation_id = '',Input_corp_tax_base = '',Input_corp_tax_standing = '',Input_corp_termination_code = '',Input_corp_termination_desc = '',Input_corp_termination_date = '',Input_corp_trademark_classification_nbr = '',Input_corp_trademark_first_use_date = '',Input_corp_trademark_first_use_date_in_state = '',Input_corp_trademark_business_mark_type = '',Input_corp_trademark_cancelled_date = '',Input_corp_trademark_class_desc1 = '',Input_corp_trademark_class_desc2 = '',Input_corp_trademark_class_desc3 = '',Input_corp_trademark_class_desc4 = '',Input_corp_trademark_class_desc5 = '',Input_corp_trademark_class_desc6 = '',Input_corp_trademark_disclaimer1 = '',Input_corp_trademark_disclaimer2 = '',Input_corp_trademark_expiration_date = '',Input_corp_trademark_filing_date = '',Input_corp_trademark_keywords = '',Input_corp_trademark_logo = '',Input_corp_trademark_name_expiration_date = '',Input_corp_trademark_nbr = '',Input_corp_trademark_renewal_date = '',Input_corp_trademark_status = '',Input_corp_trademark_used_1 = '',Input_corp_trademark_used_2 = '',Input_corp_trademark_used_3 = '',Input_cont_owner_percentage = '',Input_cont_country = '',Input_cont_country_mailing = '',Input_cont_nondislosure = '',Input_cont_prep_addr_line1 = '',Input_cont_prep_addr_last_line = '',Input_recordorigin = '',OutFile) := MACRO
-  IMPORT SALT34,Scrubs_Corp2_Mapping_MI_Main;
+﻿
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_key = '',Input_corp_supp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_legal_name = '',Input_corp_ln_name_type_cd = '',Input_corp_ln_name_type_desc = '',Input_corp_supp_nbr = '',Input_corp_name_comment = '',Input_corp_address1_type_cd = '',Input_corp_address1_type_desc = '',Input_corp_address1_line1 = '',Input_corp_address1_line2 = '',Input_corp_address1_line3 = '',Input_corp_address1_effective_date = '',Input_corp_address2_type_cd = '',Input_corp_address2_type_desc = '',Input_corp_address2_line1 = '',Input_corp_address2_line2 = '',Input_corp_address2_line3 = '',Input_corp_address2_effective_date = '',Input_corp_phone_number = '',Input_corp_phone_number_type_cd = '',Input_corp_phone_number_type_desc = '',Input_corp_fax_nbr = '',Input_corp_email_address = '',Input_corp_web_address = '',Input_corp_filing_reference_nbr = '',Input_corp_filing_date = '',Input_corp_filing_cd = '',Input_corp_filing_desc = '',Input_corp_status_cd = '',Input_corp_status_desc = '',Input_corp_status_date = '',Input_corp_standing = '',Input_corp_status_comment = '',Input_corp_ticker_symbol = '',Input_corp_stock_exchange = '',Input_corp_inc_state = '',Input_corp_inc_county = '',Input_corp_inc_date = '',Input_corp_anniversary_month = '',Input_corp_fed_tax_id = '',Input_corp_state_tax_id = '',Input_corp_term_exist_cd = '',Input_corp_term_exist_exp = '',Input_corp_term_exist_desc = '',Input_corp_foreign_domestic_ind = '',Input_corp_forgn_state_cd = '',Input_corp_forgn_state_desc = '',Input_corp_forgn_sos_charter_nbr = '',Input_corp_forgn_date = '',Input_corp_forgn_fed_tax_id = '',Input_corp_forgn_state_tax_id = '',Input_corp_forgn_term_exist_cd = '',Input_corp_forgn_term_exist_exp = '',Input_corp_forgn_term_exist_desc = '',Input_corp_orig_org_structure_cd = '',Input_corp_orig_org_structure_desc = '',Input_corp_for_profit_ind = '',Input_corp_public_or_private_ind = '',Input_corp_sic_code = '',Input_corp_naic_code = '',Input_corp_orig_bus_type_cd = '',Input_corp_orig_bus_type_desc = '',Input_corp_entity_desc = '',Input_corp_certificate_nbr = '',Input_corp_internal_nbr = '',Input_corp_previous_nbr = '',Input_corp_microfilm_nbr = '',Input_corp_amendments_filed = '',Input_corp_acts = '',Input_corp_partnership_ind = '',Input_corp_mfg_ind = '',Input_corp_addl_info = '',Input_corp_taxes = '',Input_corp_franchise_taxes = '',Input_corp_tax_program_cd = '',Input_corp_tax_program_desc = '',Input_corp_ra_full_name = '',Input_corp_ra_fname = '',Input_corp_ra_mname = '',Input_corp_ra_lname = '',Input_corp_ra_suffix = '',Input_corp_ra_title_cd = '',Input_corp_ra_title_desc = '',Input_corp_ra_fein = '',Input_corp_ra_ssn = '',Input_corp_ra_dob = '',Input_corp_ra_effective_date = '',Input_corp_ra_resign_date = '',Input_corp_ra_no_comp = '',Input_corp_ra_no_comp_igs = '',Input_corp_ra_addl_info = '',Input_corp_ra_address_type_cd = '',Input_corp_ra_address_type_desc = '',Input_corp_ra_address_line1 = '',Input_corp_ra_address_line2 = '',Input_corp_ra_address_line3 = '',Input_corp_ra_phone_number = '',Input_corp_ra_phone_number_type_cd = '',Input_corp_ra_phone_number_type_desc = '',Input_corp_ra_fax_nbr = '',Input_corp_ra_email_address = '',Input_corp_ra_web_address = '',Input_corp_prep_addr1_line1 = '',Input_corp_prep_addr1_last_line = '',Input_corp_prep_addr2_line1 = '',Input_corp_prep_addr2_last_line = '',Input_ra_prep_addr_line1 = '',Input_ra_prep_addr_last_line = '',Input_cont_filing_reference_nbr = '',Input_cont_filing_date = '',Input_cont_filing_cd = '',Input_cont_filing_desc = '',Input_cont_type_cd = '',Input_cont_type_desc = '',Input_cont_full_name = '',Input_cont_fname = '',Input_cont_mname = '',Input_cont_lname = '',Input_cont_suffix = '',Input_cont_title1_desc = '',Input_cont_title2_desc = '',Input_cont_title3_desc = '',Input_cont_title4_desc = '',Input_cont_title5_desc = '',Input_cont_fein = '',Input_cont_ssn = '',Input_cont_dob = '',Input_cont_status_cd = '',Input_cont_status_desc = '',Input_cont_effective_date = '',Input_cont_effective_cd = '',Input_cont_effective_desc = '',Input_cont_addl_info = '',Input_cont_address_type_cd = '',Input_cont_address_type_desc = '',Input_cont_address_line1 = '',Input_cont_address_line2 = '',Input_cont_address_line3 = '',Input_cont_address_effective_date = '',Input_cont_address_county = '',Input_cont_phone_number = '',Input_cont_phone_number_type_cd = '',Input_cont_phone_number_type_desc = '',Input_cont_fax_nbr = '',Input_cont_email_address = '',Input_cont_web_address = '',Input_corp_acres = '',Input_corp_action = '',Input_corp_action_date = '',Input_corp_action_employment_security_approval_date = '',Input_corp_action_pending_cd = '',Input_corp_action_pending_desc = '',Input_corp_action_statement_of_intent_date = '',Input_corp_action_tax_dept_approval_date = '',Input_corp_acts2 = '',Input_corp_acts3 = '',Input_corp_additional_principals = '',Input_corp_address_office_type = '',Input_corp_agent_commercial = '',Input_corp_agent_country = '',Input_corp_agent_county = '',Input_corp_agent_status_cd = '',Input_corp_agent_status_desc = '',Input_corp_agent_id = '',Input_corp_agent_assign_date = '',Input_corp_agriculture_flag = '',Input_corp_authorized_partners = '',Input_corp_comment = '',Input_corp_consent_flag_for_protected_name = '',Input_corp_converted = '',Input_corp_converted_from = '',Input_corp_country_of_formation = '',Input_corp_date_of_organization_meeting = '',Input_corp_delayed_effective_date = '',Input_corp_directors_from_to = '',Input_corp_dissolved_date = '',Input_corp_farm_exemptions = '',Input_corp_farm_qual_date = '',Input_corp_farm_status_cd = '',Input_corp_farm_status_desc = '',Input_corp_farm_status_date = '',Input_corp_fiscal_year_month = '',Input_corp_foreign_fiduciary_capacity_in_state = '',Input_corp_governing_statute = '',Input_corp_has_members = '',Input_corp_has_vested_managers = '',Input_corp_home_incorporated_county = '',Input_corp_home_state_name = '',Input_corp_is_professional = '',Input_corp_is_non_profit_irs_approved = '',Input_corp_last_renewal_date = '',Input_corp_last_renewal_year = '',Input_corp_license_type = '',Input_corp_llc_managed_ind = '',Input_corp_llc_managed_desc = '',Input_corp_management_desc = '',Input_corp_management_type = '',Input_corp_manager_managed = '',Input_corp_merged_corporation_id = '',Input_corp_merged_fein = '',Input_corp_merger_allowed_flag = '',Input_corp_merger_date = '',Input_corp_merger_desc = '',Input_corp_merger_effective_date = '',Input_corp_merger_id = '',Input_corp_merger_indicator = '',Input_corp_merger_name = '',Input_corp_merger_type_converted_to_cd = '',Input_corp_merger_type_converted_to_desc = '',Input_corp_naics_desc = '',Input_corp_name_effective_date = '',Input_corp_name_reservation_date = '',Input_corp_name_reservation_expiration_date = '',Input_corp_name_reservation_nbr = '',Input_corp_name_reservation_type = '',Input_corp_name_status_cd = '',Input_corp_name_status_date = '',Input_corp_name_status_desc = '',Input_corp_non_profit_irs_approved_purpose = '',Input_corp_non_profit_solicit_donations = '',Input_corp_nbr_of_amendments = '',Input_corp_nbr_of_initial_llc_members = '',Input_corp_nbr_of_partners = '',Input_corp_operating_agreement = '',Input_corp_opt_in_llc_act_desc = '',Input_corp_opt_in_llc_act_ind = '',Input_corp_organizational_comments = '',Input_corp_partner_contributions_total = '',Input_corp_partner_terms = '',Input_corp_percentage_voters_required_to_approve_amendments = '',Input_corp_profession = '',Input_corp_province = '',Input_corp_public_mutual_corporation = '',Input_corp_purpose = '',Input_corp_ra_required_flag = '',Input_corp_registered_counties = '',Input_corp_regulated_ind = '',Input_corp_renewal_date = '',Input_corp_standing_other = '',Input_corp_survivor_corporation_id = '',Input_corp_tax_base = '',Input_corp_tax_standing = '',Input_corp_termination_cd = '',Input_corp_termination_desc = '',Input_corp_termination_date = '',Input_corp_trademark_classification_nbr = '',Input_corp_trademark_first_use_date = '',Input_corp_trademark_first_use_date_in_state = '',Input_corp_trademark_business_mark_type = '',Input_corp_trademark_cancelled_date = '',Input_corp_trademark_class_desc1 = '',Input_corp_trademark_class_desc2 = '',Input_corp_trademark_class_desc3 = '',Input_corp_trademark_class_desc4 = '',Input_corp_trademark_class_desc5 = '',Input_corp_trademark_class_desc6 = '',Input_corp_trademark_disclaimer1 = '',Input_corp_trademark_disclaimer2 = '',Input_corp_trademark_expiration_date = '',Input_corp_trademark_filing_date = '',Input_corp_trademark_keywords = '',Input_corp_trademark_logo = '',Input_corp_trademark_name_expiration_date = '',Input_corp_trademark_nbr = '',Input_corp_trademark_renewal_date = '',Input_corp_trademark_status = '',Input_corp_trademark_used_1 = '',Input_corp_trademark_used_2 = '',Input_corp_trademark_used_3 = '',Input_cont_owner_percentage = '',Input_cont_country = '',Input_cont_country_mailing = '',Input_cont_nondislosure = '',Input_cont_prep_addr_line1 = '',Input_cont_prep_addr_last_line = '',Input_recordorigin = '',OutFile) := MACRO
+  IMPORT SALT311,Scrubs_Corp2_Mapping_MI_Main;
   #uniquename(of)
   %of% := RECORD
-    SALT34.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -986,10 +986,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_action_employment_security_approval_date = (TYPEOF(le.Input_corp_action_employment_security_approval_date))'','',':corp_action_employment_security_approval_date')
     #END
  
-+    #IF( #TEXT(Input_corp_action_pending_code)='' )
++    #IF( #TEXT(Input_corp_action_pending_cd)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_action_pending_code = (TYPEOF(le.Input_corp_action_pending_code))'','',':corp_action_pending_code')
+        IF( le.Input_corp_action_pending_cd = (TYPEOF(le.Input_corp_action_pending_cd))'','',':corp_action_pending_cd')
     #END
  
 +    #IF( #TEXT(Input_corp_action_pending_desc)='' )
@@ -1088,10 +1088,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_authorized_partners = (TYPEOF(le.Input_corp_authorized_partners))'','',':corp_authorized_partners')
     #END
  
-+    #IF( #TEXT(Input_corp_cmt)='' )
++    #IF( #TEXT(Input_corp_comment)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_cmt = (TYPEOF(le.Input_corp_cmt))'','',':corp_cmt')
+        IF( le.Input_corp_comment = (TYPEOF(le.Input_corp_comment))'','',':corp_comment')
     #END
  
 +    #IF( #TEXT(Input_corp_consent_flag_for_protected_name)='' )
@@ -1190,16 +1190,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_governing_statute = (TYPEOF(le.Input_corp_governing_statute))'','',':corp_governing_statute')
     #END
  
-+    #IF( #TEXT(Input_corp_hasmembers)='' )
++    #IF( #TEXT(Input_corp_has_members)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_hasmembers = (TYPEOF(le.Input_corp_hasmembers))'','',':corp_hasmembers')
+        IF( le.Input_corp_has_members = (TYPEOF(le.Input_corp_has_members))'','',':corp_has_members')
     #END
  
-+    #IF( #TEXT(Input_corp_hasvestedmanagers)='' )
++    #IF( #TEXT(Input_corp_has_vested_managers)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_hasvestedmanagers = (TYPEOF(le.Input_corp_hasvestedmanagers))'','',':corp_hasvestedmanagers')
+        IF( le.Input_corp_has_vested_managers = (TYPEOF(le.Input_corp_has_vested_managers))'','',':corp_has_vested_managers')
     #END
  
 +    #IF( #TEXT(Input_corp_home_incorporated_county)='' )
@@ -1220,10 +1220,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_is_professional = (TYPEOF(le.Input_corp_is_professional))'','',':corp_is_professional')
     #END
  
-+    #IF( #TEXT(Input_corp_isnonprofitirsapproved)='' )
++    #IF( #TEXT(Input_corp_is_non_profit_irs_approved)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_isnonprofitirsapproved = (TYPEOF(le.Input_corp_isnonprofitirsapproved))'','',':corp_isnonprofitirsapproved')
+        IF( le.Input_corp_is_non_profit_irs_approved = (TYPEOF(le.Input_corp_is_non_profit_irs_approved))'','',':corp_is_non_profit_irs_approved')
     #END
  
 +    #IF( #TEXT(Input_corp_last_renewal_date)='' )
@@ -1244,10 +1244,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_license_type = (TYPEOF(le.Input_corp_license_type))'','',':corp_license_type')
     #END
  
-+    #IF( #TEXT(Input_corp_llc_managed_cd)='' )
++    #IF( #TEXT(Input_corp_llc_managed_ind)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_llc_managed_cd = (TYPEOF(le.Input_corp_llc_managed_cd))'','',':corp_llc_managed_cd')
+        IF( le.Input_corp_llc_managed_ind = (TYPEOF(le.Input_corp_llc_managed_ind))'','',':corp_llc_managed_ind')
     #END
  
 +    #IF( #TEXT(Input_corp_llc_managed_desc)='' )
@@ -1328,10 +1328,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_merger_name = (TYPEOF(le.Input_corp_merger_name))'','',':corp_merger_name')
     #END
  
-+    #IF( #TEXT(Input_corp_merger_type_converted_to_code)='' )
++    #IF( #TEXT(Input_corp_merger_type_converted_to_cd)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_merger_type_converted_to_code = (TYPEOF(le.Input_corp_merger_type_converted_to_code))'','',':corp_merger_type_converted_to_code')
+        IF( le.Input_corp_merger_type_converted_to_cd = (TYPEOF(le.Input_corp_merger_type_converted_to_cd))'','',':corp_merger_type_converted_to_cd')
     #END
  
 +    #IF( #TEXT(Input_corp_merger_type_converted_to_desc)='' )
@@ -1394,16 +1394,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_name_status_desc = (TYPEOF(le.Input_corp_name_status_desc))'','',':corp_name_status_desc')
     #END
  
-+    #IF( #TEXT(Input_corp_nonprofitirsapprovedpurpose)='' )
++    #IF( #TEXT(Input_corp_non_profit_irs_approved_purpose)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_nonprofitirsapprovedpurpose = (TYPEOF(le.Input_corp_nonprofitirsapprovedpurpose))'','',':corp_nonprofitirsapprovedpurpose')
+        IF( le.Input_corp_non_profit_irs_approved_purpose = (TYPEOF(le.Input_corp_non_profit_irs_approved_purpose))'','',':corp_non_profit_irs_approved_purpose')
     #END
  
-+    #IF( #TEXT(Input_corp_nonprofitsolicitdonations)='' )
++    #IF( #TEXT(Input_corp_non_profit_solicit_donations)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_nonprofitsolicitdonations = (TYPEOF(le.Input_corp_nonprofitsolicitdonations))'','',':corp_nonprofitsolicitdonations')
+        IF( le.Input_corp_non_profit_solicit_donations = (TYPEOF(le.Input_corp_non_profit_solicit_donations))'','',':corp_non_profit_solicit_donations')
     #END
  
 +    #IF( #TEXT(Input_corp_nbr_of_amendments)='' )
@@ -1424,10 +1424,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_nbr_of_partners = (TYPEOF(le.Input_corp_nbr_of_partners))'','',':corp_nbr_of_partners')
     #END
  
-+    #IF( #TEXT(Input_corp_operatingagreement)='' )
++    #IF( #TEXT(Input_corp_operating_agreement)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_operatingagreement = (TYPEOF(le.Input_corp_operatingagreement))'','',':corp_operatingagreement')
+        IF( le.Input_corp_operating_agreement = (TYPEOF(le.Input_corp_operating_agreement))'','',':corp_operating_agreement')
     #END
  
 +    #IF( #TEXT(Input_corp_opt_in_llc_act_desc)='' )
@@ -1446,12 +1446,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
       '' 
     #ELSE
         IF( le.Input_corp_organizational_comments = (TYPEOF(le.Input_corp_organizational_comments))'','',':corp_organizational_comments')
-    #END
- 
-+    #IF( #TEXT(Input_corp_original_business_type)='' )
-      '' 
-    #ELSE
-        IF( le.Input_corp_original_business_type = (TYPEOF(le.Input_corp_original_business_type))'','',':corp_original_business_type')
     #END
  
 +    #IF( #TEXT(Input_corp_partner_contributions_total)='' )
@@ -1544,10 +1538,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_corp_tax_standing = (TYPEOF(le.Input_corp_tax_standing))'','',':corp_tax_standing')
     #END
  
-+    #IF( #TEXT(Input_corp_termination_code)='' )
++    #IF( #TEXT(Input_corp_termination_cd)='' )
       '' 
     #ELSE
-        IF( le.Input_corp_termination_code = (TYPEOF(le.Input_corp_termination_code))'','',':corp_termination_code')
+        IF( le.Input_corp_termination_cd = (TYPEOF(le.Input_corp_termination_cd))'','',':corp_termination_cd')
     #END
  
 +    #IF( #TEXT(Input_corp_termination_desc)='' )

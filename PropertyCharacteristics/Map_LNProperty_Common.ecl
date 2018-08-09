@@ -1,7 +1,89 @@
-import	Address,AID,AID_Build,Codes,LN_PropertyV2,ut;
+﻿import	Address,AID,AID_Build,Codes,LN_PropertyV2,ut;
 
-dTax						:=	distribute(LN_PropertyV2.File_Assessment,hash32(ln_fares_id));
-dAddlFaresTax		:=	distribute(Ln_PropertyV2.File_addl_Fares_tax,hash32(ln_fares_id));
+//JIRA DF-21659 Bad Square Footage Data Correction - begin
+dTaxOrig	:=	distribute(LN_PropertyV2.File_Assessment,hash32(ln_fares_id));
+layoutTaxLayout := ln_propertyv2.layout_property_common_model_base;
+
+
+
+//blank out building_area for the records that match criteria
+layoutTaxLayout	tBlankBuildingArea(dTaxOrig le)	:= 
+transform
+	self.building_area := if(trim(le.building_area) <> '' 	and (trim(le.sales_price)=trim(le.building_area) or trim(le.prior_sales_price)=trim(le.building_area)),'',le.building_area);
+	self.building_area1 := if(trim(le.building_area1) <> '' 	and (trim(le.sales_price)=trim(le.building_area1) or trim(le.prior_sales_price)=trim(le.building_area1)),'',le.building_area1);
+	self.building_area2 := if(trim(le.building_area2) <> '' 	and (trim(le.sales_price)=trim(le.building_area2) or trim(le.prior_sales_price)=trim(le.building_area2)),'',le.building_area2);
+	self.building_area3 := if(trim(le.building_area3) <> '' 	and (trim(le.sales_price)=trim(le.building_area3) or trim(le.prior_sales_price)=trim(le.building_area3)),'',le.building_area3);
+	self.building_area4 := if(trim(le.building_area4) <> '' 	and (trim(le.sales_price)=trim(le.building_area4) or trim(le.prior_sales_price)=trim(le.building_area4)),'',le.building_area4);
+	self.building_area5 := if(trim(le.building_area5) <> '' 	and (trim(le.sales_price)=trim(le.building_area5) or trim(le.prior_sales_price)=trim(le.building_area5)),'',le.building_area5);
+	self.building_area6 := if(trim(le.building_area6) <> '' 	and (trim(le.sales_price)=trim(le.building_area6) or trim(le.prior_sales_price)=trim(le.building_area6)),'',le.building_area6);
+	self.building_area7 := if(trim(le.building_area7) <> '' 	and (trim(le.sales_price)=trim(le.building_area7) or trim(le.prior_sales_price)=trim(le.building_area7)),'',le.building_area7);
+	self		:=	le;
+end;
+
+dTaxBadSF := project(dTaxOrig(process_date < '20180329' //only want to update old records that have been verified as incorrect
+																														and vendor_source_flag = 'F' 
+																														and state_code = 'NJ'								
+																														and trim(county_name) in (['UNION','HUDSON'])
+																														and(
+																																			(trim(building_area) <> '' 	and (trim(sales_price)=trim(building_area) or trim(prior_sales_price)=trim(building_area)))
+																																			or
+																																			(trim(building_area1) <> '' and (trim(sales_price)=trim(building_area1) or trim(prior_sales_price)=trim(building_area1)))
+																																			or
+																																			(trim(building_area2) <> '' and (trim(sales_price)=trim(building_area2) or trim(prior_sales_price)=trim(building_area2)))
+																																			or
+																																			(trim(building_area3) <> '' and (trim(sales_price)=trim(building_area3) or trim(prior_sales_price)=trim(building_area3)))
+																																			or
+																																			(trim(building_area4) <> '' and (trim(sales_price)=trim(building_area4) or trim(prior_sales_price)=trim(building_area4)))
+																																				or
+																																			(trim(building_area5) <> '' and (trim(sales_price)=trim(building_area5) or trim(prior_sales_price)=trim(building_area5)))
+																																			or
+																																			(trim(building_area6) <> '' and (trim(sales_price)=trim(building_area6) or trim(prior_sales_price)=trim(building_area6)))
+																																			or
+																																			(trim(building_area7) <> '' and (trim(sales_price)=trim(building_area7) or trim(prior_sales_price)=trim(building_area7)))
+																																	)
+																														)
+																						,tBlankBuildingArea(left), local);
+	
+dTaxGoodSF 	:= join(dTaxOrig, dTaxBadSF, LEFT.ln_fares_id = RIGHT.ln_fares_id, LOCAL, LEFT ONLY);
+
+dTax := dTaxBadSF + dTaxGoodSF;
+
+//blank out fares_living_area_square_feet for records that match criteria
+dAddlFaresTaxOrig		:=	distribute(Ln_PropertyV2.File_addl_Fares_tax,hash32(ln_fares_id));
+layoutAddlFaresTax := LN_PropertyV2.layout_addl_fares_tax;
+
+layoutCombined := RECORD
+layoutTaxLayout;
+layoutAddlFaresTax - ln_fares_id;
+END;
+
+layoutCombined	tCombine(dTaxOrig	le,dAddlFaresTaxOrig	ri)	:=
+transform
+	self := le;
+	self	:=	ri;
+end;
+
+dCombined	:=	join(dTaxOrig,
+										dAddlFaresTaxOrig,
+										left.ln_fares_id	=	right.ln_fares_id,
+										tCombine(left,right),
+										inner,
+										local
+									);
+
+dAddlFaresTaxBadSF := project(dCombined(process_date < '20180329' //only want to update old records that have been verified as incorrect
+																														and vendor_source_flag = 'F' 
+																														and length(trim(fares_living_square_feet)) > 0 
+																														and state_code = 'NJ'								
+																														and trim(county_name) in (['UNION','HUDSON'])
+																														and(trim(sales_price)=trim(fares_living_square_feet)or trim(prior_sales_price)=trim(fares_living_square_feet)))
+																						,TRANSFORM(layoutAddlFaresTax,	SELF.fares_living_square_feet := '';	SELF := LEFT;));
+
+dAddlFaresTaxGoodSF 	:= join(dAddlFaresTaxOrig, dAddlFaresTaxBadSF, LEFT.ln_fares_id = RIGHT.ln_fares_id, LOCAL, LEFT ONLY);							
+																			
+dAddlFaresTax := dAddlFaresTaxBadSF + dAddlFaresTaxGoodSF;																								
+//JIRA DF-21659 Bad Square Footage Data Correction - end
+
 dDeeds					:=	distribute(LN_PropertyV2.File_Deed(current_record	=	'Y'),hash32(ln_fares_id));
 dAddlFaresDeeds	:=	distribute(Ln_PropertyV2.File_addl_Fares_deed,hash32(ln_fares_id));
 dSearch					:=	LN_PropertyV2.File_Search_DID(source_code	in	['BP','OP']);

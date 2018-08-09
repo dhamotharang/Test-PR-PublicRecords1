@@ -13,11 +13,12 @@ ds_sort := sort(ds_dist,record_id,local);
 // main layout now includes extra fields; only want license information
 slim_mar_div := project(ds_sort,TRANSFORM(marriage_divorce_v2.layout_mar_div_base_slim,SELF := LEFT));
 
-//key_name := Data_services.Data_location.Prefix('marriage') + if(isFCRA, KeyName_fcra, KeyName) + doxie.Version_SuperKey + '::id_main';
-key_name := Data_services.Data_location.Prefix('marriage') + if(isFCRA, KeyName_fcra, KeyName) + '20141027' + '::id_main';
+key_name := Data_services.Data_location.Prefix('marriage') + if(isFCRA, KeyName_fcra, KeyName) + doxie.Version_SuperKey + '::id_main';
 										
 return_file		:= INDEX(slim_mar_div,{record_id},{slim_mar_div},key_name);
 														
 return(return_file); 
 
 end;				   
+   
+				   

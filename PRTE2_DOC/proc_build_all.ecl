@@ -1,13 +1,15 @@
-IMPORT PRTE2_DOC;
+﻿IMPORT PRTE2_DOC;
 
-EXPORT proc_build_all(string filedate) := FUNCTION
-
-	build_base_file	:=	PRTE2_DOC.proc_build_base(filedate);
-
-	build_keys :=	PRTE2_DOC.proc_build_keys(filedate);
-
-	return_val := 	sequential(	build_base_file, build_keys) ;
-
-	return return_val;
+EXPORT proc_build_all(string filedate, boolean skipTest = false) := FUNCTION
+	do_all := 	sequential(fspray,	
+																							proc_build_base(filedate), 
+																							fn_DeltaBaseFile(filedate),   //* Added File Compare to flag major changes
+																							if(skipTest = true,											//* If Major changes exist, fail build
+																										if(fn_BaseFileCheck(filedate)=true,OUTPUT('Reverify base files'), OUTPUT('No Major Change during File Compare')
+																										)),
+																							proc_build_keys(filedate)
+																							);
+	return do_all;
 
 END;
+	

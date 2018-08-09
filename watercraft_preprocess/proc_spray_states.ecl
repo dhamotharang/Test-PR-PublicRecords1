@@ -1,4 +1,4 @@
-/*Note - Spray format command:
+﻿/*Note - Spray format command:
 Watercraft_preprocess.proc_spray_states(Version, FolderDate, InfolinkQtr);
 Watercraft_preprocess.proc_spray_states('20150107','14q2','Q2');*/
 
@@ -359,7 +359,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'MS*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,584 																		// record_size
+			,566 																		// record_size DF-19984 Layout change, record length change from 584 to 566
 			,'~thor_data400::in::watercraft_ms_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_ms'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname

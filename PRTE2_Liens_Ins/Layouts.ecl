@@ -1,4 +1,4 @@
-// PRTE2_Liens_Ins.Layouts
+﻿// PRTE2_Liens_Ins.Layouts
 
 IMPORT PRTE2_Liens, LiensV2, BIPV2;
 
@@ -10,7 +10,8 @@ EXPORT Layouts := MODULE
 							LiensV2.layout_liens_main_module.layout_liens_main and not filing_status;
 			    We'd rather have our CSV Base layout not alter without warning if they change their layout 
 				******************************************************************************************** */
-					
+
+			// ------------ Alpha Base Main Spreadsheet Layout --------------------
 			EXPORT BaseMain_in_raw := RECORD
 					string50 tmsid;
 					string50 rmsid;
@@ -58,13 +59,43 @@ EXPORT Layouts := MODULE
 					unsigned8 persistent_record_id;
 					string filing_status;
 					string filing_status_desc;
+					string filing_typ_code;	//Added July 2018
+					string courtID;					//Added July 2018
 					string10 cust_test_data_type;
 					string1 age_data_flag;
 					string15 ln_product_tie;
 					string15 ln_product_notes;
+					string bug_num;					//Added July 2018
+					string cust_name;				//Added July 2018
+			END;			
+			// ---------------------------------------------------------------------
+
+			// Names have been changed so those fields just move as needed between the two formats.
+			EXPORT Alpha_Common := RECORD
+					string12 did;							// switched to unsigned to match final Boca file and make transforms easier
+					STRING xSponsor:='';			// send to cust_name 
+					STRING xbug_num:='';
+					STRING xAmbest:='';
+					STRING5 title;			// renamed to keep the Boca field
+					STRING20 fname;			// renamed to keep the Boca field
+					STRING20 mname;			// renamed to keep the Boca field
+					STRING20 lname;				// renamed to keep the Boca field
+					STRING5 name_suffix;			// renamed to keep the Boca field
+					// NOTE: Need to build listed_name from first+middle+last above.
+					STRING link_dob:='';					// renamed to keep the Boca field
+					STRING9 SSN;					// renamed to keep the Boca field
+					STRING1 xGender:='';
+					STRING orig_address1;				// renamed to keep the Boca field
+					STRING orig_city;
+					STRING orig_state;
+					STRING orig_zip5;
+					STRING orig_zip4:='';
+					STRING xDLState:='';
+					STRING xDLN:='';
 			END;
-			
-			EXPORT Baseparty_in := RECORD
+
+			// The main Party fields that will be needed but we'll OR this with Alpha_Common for a final Spreadsheet layout.
+			EXPORT Baseparty_in_Required := RECORD
 					LiensV2.layout_liens_party and not persistent_record_id;
 					string9 app_SSN := '';
 					string9 app_tax_id := '';
@@ -74,21 +105,28 @@ EXPORT Layouts := MODULE
 					STRING10	CUST_TEST_DATA_TYPE := '';
 					STRING1		AGE_DATA_FLAG := '';
 					STRING15	LN_PRODUCT_TIE := '';
-					STRING15	LN_PRODUCT_NOTES := '';					
+					STRING15	LN_PRODUCT_NOTES := '';	
+					STRING bug_num;
+					STRING cust_name;
+					STRING link_dob;
+					STRING link_ssn;
+					STRING link_inc_date;
+					STRING link_fein;					
 			END;
-			
-			// Do we need to bother with this????
-			// EXPORT BaseStatus_in 	:= PRTE2_Liens.Layouts.BaseStatus_in;
 
-			//Base Key files
-			EXPORT Boca_main_base 	:= PRTE2_Liens.Layouts.main_base;
-			EXPORT Boca_party_base 	:= PRTE2_Liens.Layouts.party_base;
-			//LinkIDs key layout
+			// ------------ Alpha Base PARTY Spreadsheet Layout --------------------
+			EXPORT Baseparty_in := RECORD
+					Alpha_Common OR Baseparty_in_Required;
+			END;
+			// ---------------------------------------------------------------------
+			
+			// --------------- Boca Build - Final Base Layouts ---------------------
+			EXPORT Boca_main_base 	:= PRTE2_Liens.Layouts.main_base_ext;
+			EXPORT Boca_party_base 	:= PRTE2_Liens.Layouts.party_base_ext;
+
 			EXPORT LinkIDSKey			:= PRTE2_Liens.Layouts.LinkIDSKey;
 			
-			// Do we need to bother with this????
-			// EXPORT status_base 		:= BaseStatus_in;
-			
 			EXPORT layout_filing_status := LiensV2.layout_liens_main_module.layout_filing_status;
+			// ---------------------------------------------------------------------
 			
 END;
