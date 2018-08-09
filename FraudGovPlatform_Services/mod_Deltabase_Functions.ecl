@@ -34,16 +34,16 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		SHARED GetRecentTimelineDetails(DATASET(Layout_LogDeltabase) ds_delta_records) := FUNCTION
 
 			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( Layout_LogDeltabase L) := TRANSFORM
-				date_added := (INTEGER)(L.date_added[1..8]);
+				
 				SELF.IsRecentActivity := TRUE;
 				SELF.FileType := 3;
 				SELF.GlobalCompanyId := (INTEGER)L.gc_id;
 				SELF.TransactionId := (STRING)L.cust_transaction_id;
 				SELF.HouseHoldId := L.case_id;
 				SELF.CustomerPersonId := L.client_uid;
-				SELF.EventDate.Year := STD.Date.Year(date_added);
-				SELF.EventDate.Month := STD.Date.Month(date_added);
-				SELF.EventDate.Day := STD.Date.Day(date_added);
+				SELF.EventDate.Year := (INTEGER)(L.date_added[1..4]);
+				SELF.EventDate.Month := (INTEGER)(L.date_added[6..7]);
+				SELF.EventDate.Day := (INTEGER)(L.date_added[9..10]);
 				SELF.IndustryTypeDescription := L.program_name;
 				SELF.ReportedBy := L.inquiry_source;
 				SELF.ActivityReason := L.inquiry_reason;
