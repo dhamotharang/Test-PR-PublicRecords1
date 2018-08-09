@@ -153,7 +153,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.filing_type := IF (takeLeft, le.bjl.filing_type, ri.bjl.filing_type);//le.BJL.filing_type;
 		SELF.BJL.disposition := IF (takeLeft, le.bjl.disposition, ri.bjl.disposition);//le.BJL.disposition;
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
-    SELF.bk_chapters :=  le.bk_chapters + ri.bk_chapters; 
+    SELF.bk_chapters :=  IF(sameBankruptcy, le.bk_chapters, le.bk_chapters + ri.bk_chapters);  
 		
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
 		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy,0,ri.BJL.filing_count120);

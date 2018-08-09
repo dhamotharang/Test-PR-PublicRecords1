@@ -26,7 +26,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string7  case_num; // bk extras
 		string30 sor_number;  // sex offender extra
 		unsigned4 bk_disp_date;
-    DATASET(layout_bk_chapter) bk_chapters {MAXCOUNT(10)};
+    DATASET(layout_bk_chapter) bk_chapters {MAXCOUNT(50)};
     
 	END;
 	
