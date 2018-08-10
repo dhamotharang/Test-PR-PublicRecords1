@@ -20,13 +20,13 @@ EXPORT Scrub_Calbus(STRING pversion) := MODULE
 		persist_name				:=	'~persist::'+myFolder+'_orbit_stats';
 		Orbit_stats					:=	U.OrbitStats():PERSIST(persist_name);
 		OrbitReport					:=	OUTPUT(Orbit_stats,ALL,NAMED('OrbitReport'+datasetName));
-		OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,ALL,NAMED('OrbitReportSummary'+datasetName));
+		OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStatsPost310(,,Orbit_stats).SummaryStats,ALL,NAMED('OrbitReportSummary'+datasetName));
 
 		//Submits Profile's stats to Orbit
-		SubmitStats					:=	Scrubs.OrbitProfileStats(myFolder,'ScrubsAlerts',Orbit_stats,BuildDate,datasetName).SubmitStats;
-		dScrubsWithExamples	:=	Scrubs.OrbitProfileStats(myFolder,'ScrubsAlerts',Orbit_stats,BuildDate,datasetName).CompareToProfile_with_examples;
+		SubmitStats					:=	Scrubs.OrbitProfileStatsPost310(myFolder,'ScrubsAlerts',Orbit_stats,BuildDate,datasetName).SubmitStats;
+		dScrubsWithExamples	:=	Scrubs.OrbitProfileStatsPost310(myFolder,'ScrubsAlerts',Orbit_stats,BuildDate,datasetName).CompareToProfile_with_examples;
 		//Creates Profile's alert template for Orbit - can be copied and imported into Orbit; Only required if rules in Orbit change
-		// AlertsCSVTemplate	     := Scrubs.OrbitProfileStats(myFolder,'ScrubsAlerts', Orbit_stats, BuildDate, datasetName).ProfileAlertsTemplate;
+		// AlertsCSVTemplate	     := Scrubs.OrbitProfileStatsPost310(myFolder,'ScrubsAlerts', Orbit_stats, BuildDate, datasetName).ProfileAlertsTemplate;
 		scrubsAlert					:=	dScrubsWithExamples(RejectWarning = 'Y');
 		scrubsAttachment		:=	Scrubs.fn_email_attachment(scrubsAlert);
 		mailfile						:=	FileServices.SendEmailAttachData(_Control.MyInfo.EmailAddressNotify
