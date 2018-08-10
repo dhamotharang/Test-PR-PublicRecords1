@@ -1,3 +1,3 @@
-import ut;
+﻿import ut, STD;
 	
-export version :=  '20140918';
+export version :=  ut.GetDate : independent;

@@ -20,6 +20,7 @@ MODULE
 	EXPORT	STRING	vStatesFileName					:=	Death_Master.Constants('').Cluster	+ 'in::states_deathm_Prepped';
 	EXPORT	STRING	vDeletesFileName				:=	Death_Master.Constants('').Cluster	+	'in::death_master_delete';
 	EXPORT	STRING	vDeletesDIDFileName			:=	Death_Master.Constants('').Cluster	+	'in::death_master_delete_did';
+	EXPORT	STRING	vResurrections						:=	Death_Master.Constants('').Cluster	+	'base::resurrections_death_masterV3';
 
 	EXPORT	California		:= 	IF(NOTHOR(FileServices.GetSuperFileSubCount(vCaliforniaFileName) <> 0),
 																			DATASET(vCaliforniaFileName,Death_Master.Layout_States.California,
@@ -61,6 +62,7 @@ MODULE
 	EXPORT	States_File					:=	DATASET(vStatesFileName,Header.layout_death_master_supplemental,FLAT);
 	EXPORT	Deletes							:=	DATASET(vDeletesFileName,Death_Master.Layouts.Deletes,THOR);
 	EXPORT	Deletes_DID					:=	DATASET(vDeletesDIDFileName,Death_Master.Layouts.DID_V1,THOR);
+	EXPORT	Resurrections		:=	DATASET(vResurrections,	{Header.Layout_Did_Death_MasterV3;	STRING1 resurrect;},THOR);
 
 	// To manually suppress a record add the the record in V3 Format to this dataset.
 	EXPORT	dSuppressRecs				:=	Death_Master.File_Death_Master_Suppression;

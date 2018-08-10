@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_raw_wy;
+﻿IMPORT corp2, corp2_raw_wy;
 	
 EXPORT Functions := MODULE
 	
@@ -91,6 +91,7 @@ EXPORT Functions := MODULE
 															uc_s = 'CONTACT'																=> true,
 															uc_s = 'CORRESPONDENT'													=> true,
 															uc_s = 'GENERAL PARTNER'												=> true,
+															uc_s = 'INDIVIDUAL WITH DIRECT KNOWLEDGE'		  	=> true,
 															uc_s = 'MANAGER'																=> true,
 															uc_s = 'MANAGING PARTNER'												=> true,
 															uc_s = 'MEMBER'																	=> true,
@@ -132,6 +133,7 @@ EXPORT Functions := MODULE
 																	'CORRESPONDENT'													=> true,
 																	'GENERAL PARTNER'												=> true,
 																	'IMAGE ANNUAL REPORT'										=> true,
+																	'INDIVIDUAL WITH DIRECT KNOWLEDGE'			=> true,
 																	'MAILING ADDRESS'												=> true,
 																	'MANAGER'																=> true,
 																	'MANAGING PARTNER'											=> true,

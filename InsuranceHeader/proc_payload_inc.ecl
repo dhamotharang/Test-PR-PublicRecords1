@@ -6,7 +6,7 @@ IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
  
  KeyPayloadInc:= INDEX(Key,InsuranceHeader_xLink.KeyNames('INC').header_super);
 
- hr0 := DATASET('~thor_data400::base::header_raw_incremental',header.layout_header_v2, thor);
+ hr0 := header.File_header_raw_latest.File;
  
  hr  := DISTRIBUTE(hr0(header.Blocked_data()), HASH(rid));
  

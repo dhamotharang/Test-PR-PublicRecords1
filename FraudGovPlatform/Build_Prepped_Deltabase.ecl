@@ -14,12 +14,12 @@ FUNCTION
 	IdentityData MapIDDT(Deltabase L) := TRANSFORM 
 			
 			SELF.Customer_Name	:= '';
-			SELF.Customer_Account_Number	:= L.Customer_Account_Number; 
-			SELF.Customer_State		:= L.Customer_State;
-			SELF.Customer_County	:= '001';//L.Customer_County; 
+			SELF.Customer_Account_Number	:= '248283691'; 
+			SELF.Customer_State		:= 'FL';
+			SELF.Customer_County	:= '000';//L.Customer_County; 
 			SELF.Customer_Agency	:= ''; 														
-			SELF.Customer_Agency_Vertical_Type	:= L.customer_agency_vertical_type; 
-			SELF.Customer_Program	:= L.Customer_Program; 
+			SELF.Customer_Agency_Vertical_Type	:= 'S'; 
+			SELF.Customer_Program	:= 'S'; 
 			SELF.Customer_Job_ID	:= ''; 
 			SELF.Batch_Record_ID	:= ''; 
 			SELF.Transaction_ID_Number	:= L.Transaction_ID_Number; 

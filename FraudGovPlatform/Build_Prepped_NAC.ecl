@@ -62,7 +62,7 @@ MODULE
 			SELF.Client_ID							:= '';
 			SELF.Head_of_Household_indicator	:= ''; 
 			SELF.Relationship_Indicator		:= ''; 
-			SELF.IP_Address						:= '';
+			SELF.IP_Address						:= l.enduserip;
 			SELF.Device_ID							:= ''; 
 			SELF.Unique_number					:= ''; 
 			SELF.MAC_Address						:= ''; 

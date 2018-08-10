@@ -45,7 +45,7 @@ EXPORT GenerationMod := MODULE
     + '// FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137\n'
     + '//FIELD:source:CARRY:0,0\n'
     + 'FIELD:company_name_type_raw:CARRY:0,0\n'
-    + 'FIELD:company_name_type_derived:CARRY:0,0\n'
+    + 'FIELD:company_name_type_derived:WEIGHT(0.001):PROP:2,0\n'
     + 'FIELD:cnp_hasnumber:CARRY:0,0\n'
     + 'FIELD:cnp_number:FORCE:PROP:15,0\n'
     + '//FIELD:cnp_btype:FORCE(--):2,1  CO and inc for same name forced apart here\n'

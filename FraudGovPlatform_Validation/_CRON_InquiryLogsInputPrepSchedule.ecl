@@ -2,7 +2,7 @@
 
 every_day := '0 5 * * *';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
 lECL1 :=
  'import ut;\n'
 +'wuname := \'FraudGov InquiryLogs Input Prep\';\n'

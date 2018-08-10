@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_MI_Main
 FILENAME:In_MI
 //Uncomment up to NINES for internal or external adl
@@ -25,7 +25,7 @@ FIELDTYPE:invalid_Y_N:ENUM(Y|N)
 FIELDTYPE:invalid_type_cd:CUSTOM(Scrubs_Corp2_Mapping_MI_Main.Functions.invalid_ln_name_type_cd>0,recordorigin)
 FIELDTYPE:invalid_type_desc:CUSTOM(Scrubs_Corp2_Mapping_MI_Main.Functions.invalid_ln_name_type_desc>0,recordorigin)
 FIELDTYPE:invalid_org_structure_desc:CUSTOM(Scrubs_Corp2_Mapping_MI_Main.Functions.invalid_org_structure_desc>0)
-FIELDTYPE:invalid_status_comment:ALLOW( /-();,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ) 
+FIELDTYPE:invalid_status_comment:ALLOW( /-();:,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ) 
 FIELDTYPE:invalid_status:ENUM(INACTIVE|ACTIVE)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)
 FIELDTYPE:invalid_recordorigin:ENUM(C|T)
@@ -196,7 +196,7 @@ FIELD:corp_acres:TYPE(STRING50):0,0
 FIELD:corp_action:TYPE(STRING10):0,0
 FIELD:corp_action_date:TYPE(STRING10):0,0
 FIELD:corp_action_employment_security_approval_date:TYPE(STRING8):0,0
-FIELD:corp_action_pending_code:TYPE(STRING1):0,0
+FIELD:corp_action_pending_cd:TYPE(STRING1):0,0
 FIELD:corp_action_pending_desc:TYPE(STRING50):0,0
 FIELD:corp_action_statement_of_intent_date:TYPE(STRING8):0,0
 FIELD:corp_action_tax_dept_approval_date:TYPE(STRING8):0,0
@@ -213,7 +213,7 @@ FIELD:corp_agent_id:TYPE(STRING8):0,0
 FIELD:corp_agent_assign_date:TYPE(STRING8):0,0
 FIELD:corp_agriculture_flag:TYPE(STRING1):0,0
 FIELD:corp_authorized_partners:TYPE(STRING):0,0
-FIELD:corp_cmt:TYPE(STRING2):0,0
+FIELD:corp_comment:TYPE(STRING2):0,0
 FIELD:corp_consent_flag_for_protected_name:TYPE(STRING1):0,0
 FIELD:corp_converted:TYPE(STRING1):0,0
 FIELD:corp_converted_from:TYPE(STRING50):0,0
@@ -230,16 +230,16 @@ FIELD:corp_farm_status_date:TYPE(STRING10):0,0
 FIELD:corp_fiscal_year_month:TYPE(STRING8):0,0
 FIELD:corp_foreign_fiduciary_capacity_in_state:TYPE(STRING1):0,0
 FIELD:corp_governing_statute:TYPE(STRING20):0,0
-FIELD:corp_hasmembers:TYPE(STRING1):0,0
-FIELD:corp_hasvestedmanagers:TYPE(STRING1):0,0
+FIELD:corp_has_members:TYPE(STRING1):0,0
+FIELD:corp_has_vested_managers:TYPE(STRING1):0,0
 FIELD:corp_home_incorporated_county:TYPE(STRING60):0,0
 FIELD:corp_home_state_name:TYPE(STRING30):0,0
 FIELD:corp_is_professional:TYPE(STRING1):0,0
-FIELD:corp_isnonprofitirsapproved:TYPE(STRING1):0,0
+FIELD:corp_is_non_profit_irs_approved:TYPE(STRING1):0,0
 FIELD:corp_last_renewal_date:TYPE(STRING8):0,0
 FIELD:corp_last_renewal_year:TYPE(STRING4):0,0
 FIELD:corp_license_type:TYPE(STRING1):0,0
-FIELD:corp_llc_managed_cd:TYPE(STRING1):0,0
+FIELD:corp_llc_managed_ind:TYPE(STRING1):0,0
 FIELD:corp_llc_managed_desc:TYPE(STRING100):0,0
 FIELD:corp_management_desc:TYPE(STRING50):0,0
 FIELD:corp_management_type:TYPE(STRING1):0,0
@@ -253,7 +253,7 @@ FIELD:corp_merger_effective_date:TYPE(STRING8):0,0
 FIELD:corp_merger_id:TYPE(STRING32):0,0
 FIELD:corp_merger_indicator:TYPE(STRING1):0,0
 FIELD:corp_merger_name:TYPE(STRING100):0,0
-FIELD:corp_merger_type_converted_to_code:TYPE(STRING4):0,0
+FIELD:corp_merger_type_converted_to_cd:TYPE(STRING4):0,0
 FIELD:corp_merger_type_converted_to_desc:TYPE(STRING100):0,0
 FIELD:corp_naics_desc:TYPE(STRING60):0,0
 FIELD:corp_name_effective_date:TYPE(STRING8):0,0
@@ -264,16 +264,15 @@ FIELD:corp_name_reservation_type:TYPE(STRING100):0,0
 FIELD:corp_name_status_cd:TYPE(STRING5):0,0
 FIELD:corp_name_status_date:TYPE(STRING8):0,0
 FIELD:corp_name_status_desc:TYPE(STRING50):0,0
-FIELD:corp_nonprofitirsapprovedpurpose:TYPE(STRING):0,0
-FIELD:corp_nonprofitsolicitdonations:TYPE(STRING1):0,0
+FIELD:corp_non_profit_irs_approved_purpose:TYPE(STRING):0,0
+FIELD:corp_non_profit_solicit_donations:TYPE(STRING1):0,0
 FIELD:corp_nbr_of_amendments:TYPE(UNSIGNED6):0,0
 FIELD:corp_nbr_of_initial_llc_members:TYPE(STRING):0,0
 FIELD:corp_nbr_of_partners:TYPE(UNSIGNED6):0,0
-FIELD:corp_operatingagreement:TYPE(STRING1):0,0
+FIELD:corp_operating_agreement:TYPE(STRING1):0,0
 FIELD:corp_opt_in_llc_act_desc:TYPE(STRING50):0,0
 FIELD:corp_opt_in_llc_act_ind:TYPE(STRING1):0,0
 FIELD:corp_organizational_comments:TYPE(STRING250):0,0
-FIELD:corp_original_business_type:TYPE(STRING2):0,0
 FIELD:corp_partner_contributions_total:TYPE(INTEGER8):0,0
 FIELD:corp_partner_terms:TYPE(STRING):0,0
 FIELD:corp_percentage_voters_required_to_approve_amendments:TYPE(STRING):0,0
@@ -289,7 +288,7 @@ FIELD:corp_standing_other:TYPE(STRING50):0,0
 FIELD:corp_survivor_corporation_id:TYPE(STRING32):0,0
 FIELD:corp_tax_base:TYPE(STRING1):0,0
 FIELD:corp_tax_standing:TYPE(STRING50):0,0
-FIELD:corp_termination_code:TYPE(STRING2):0,0
+FIELD:corp_termination_cd:TYPE(STRING2):0,0
 FIELD:corp_termination_desc:TYPE(STRING100):0,0
 FIELD:corp_termination_date:TYPE(STRING8):0,0
 FIELD:corp_trademark_classification_nbr:TYPE(STRING10):0,0

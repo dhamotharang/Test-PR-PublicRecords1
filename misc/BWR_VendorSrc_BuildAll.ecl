@@ -1,4 +1,4 @@
-EXPORT BWR_VendorSrc_BuildAll(version) := MACRO
+﻿EXPORT BWR_VendorSrc_BuildAll(version) := MACRO
 
 #WORKUNIT('name','VendorSrc load ' + version);
 

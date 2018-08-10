@@ -4,26 +4,26 @@ EXPORT SprayAndQualifyDeltabase(
 	STRING version,
 	STRING ip	= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10),
 	STRING rootDir = '/data/super_credit/fraudgov/in/deltabase/dev/', 
-	STRING destinationGroup = IF(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_44')
+	STRING destinationGroup = IF(_Control.ThisEnvironment.Name  <> 'Prod_Thor','thor400_dev','thor400_44')
 ) := FUNCTION
 
 dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, rootDir + version[1..8], '*.txt')):INDEPENDENT;
 dsFileListSorted := SORT(dsFileList,modified);
 fname_temp	:=dsFileListSorted[1].Name:independent;
-fname	:='Deltabase_'+version+'.txt';
+fname	:='delta_identity_'+version+'.txt';
 
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := 'Deltabase';
 
 FileFound:=EXISTS(dsFileListSorted);
 ReportFileFound:=IF(FileFound
-					,OUTPUT('Found File To Spray',NAMED('Found_File_To_Spray'))
-					,OUTPUT('No File To Spray',NAMED('No_File_To_Spray'))
+					,OUTPUT('Found File To Spray',NAMED('Deltabase_Found_File_To_Spray'))
+					,OUTPUT('No File To Spray',NAMED('Deltabase_No_File_To_Spray'))
 					);
 
 IsEmptyFile:=dsFileListSorted[1].size = 0;
 
-FileSprayed 					:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
+FileSprayed 				:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 Deltabase_Passed		:= FraudGovPlatform.Filenames().Sprayed._DeltabasePassed;
 Deltabase_Rejected	:= FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected;
 
@@ -67,12 +67,12 @@ ExcessiveInvalidRecordsFound := EXISTS(FileStats(err[1]='E',RecWithErrors/Record
 InvalidMbsRecordsFound := EXISTS(ValidateInputMbs);
 					
 MoveToPass :=
-		SEQUENTIAL(	OUTPUT('File '+fname+' content accepted',NAMED('File_content_accepted')),
+		SEQUENTIAL(	OUTPUT('File '+fname+' content accepted',NAMED('Deltabase_File_content_accepted')),
 							fileservices.AddSuperfile(Deltabase_Passed,FileSprayed),
 							Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiterDeltabase, mod_sets.validTerminatorsDeltabase));
 															
 MoveToReject := 
-		SEQUENTIAL(	OUTPUT('File '+fname+' contains fatal errors.  File will be rejected',NAMED('File_content_rejected')),
+		SEQUENTIAL(	OUTPUT('File '+fname+' contains fatal errors.  File will be rejected',NAMED('Deltabase_File_content_rejected')),
 							fileservices.AddSuperfile(Deltabase_Rejected,FileSprayed));	
 											 					
 ReportExcessiveInvalidRecords := 	
@@ -92,7 +92,7 @@ ReportInvalidNumberOfColumns :=
 							Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns(mod_sets.validDelimiterDeltabase, mod_sets.validTerminatorsDeltabase));
 
 ReportEmptyFile := 
-		SEQUENTIAL (	OUTPUT('File '+ip+rootDir + version +'/'+ fname+' empty',NAMED('File_empty')),
+		SEQUENTIAL (	OUTPUT('File '+ip+rootDir + version +'/'+ fname+' empty',NAMED('Deltabase_File_empty')),
 							Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert);
 outputwork
 			:=

@@ -58,8 +58,6 @@ IMPORT Anchor, AID, address, bipv2;
 		//Not currently utilized but BIP fields will be a future project
 	EXPORT Base_w_bip	:= RECORD
 		Base;
-		unsigned8 BDID;
-		unsigned8 BDID_Score;
 		bipv2.IDlayouts.l_xlink_ids;
 	END;
 	

@@ -1,4 +1,4 @@
-import std,_control;
+﻿import std,_control;
 
 EXPORT Proc_Copy_ProfileBooster_FromAlpha(string Version) := FUNCTION
 
@@ -10,7 +10,7 @@ EXPORT Proc_Copy_ProfileBooster_FromAlpha(string Version) := FUNCTION
 srce 				:= '~in::marketmagnifier::profileboosterin::' + Version;
 destGrp 		:= 'thor400_44';
 destsrce 		:= '~in::marketmagnifier::profileboosterin::' + Version;
-sourceDali 	:= '10.194.12.1';
+sourceDali 	:= '10.194.112.105';
       
 
  mycopy := fileservices.Copy(srce           // const varstring sourceLogicalName,                        

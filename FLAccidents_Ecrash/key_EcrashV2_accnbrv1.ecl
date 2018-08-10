@@ -182,7 +182,8 @@ export key_EcrashV2_accnbrv1 := index(dep_accnbr_base
 									 contrib_source,
 									 creation_date,
 									 officer_id,
-									 Releasable
+									 Releasable,
+									 Date_Report_Submitted
 									 }
 							     ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
 							 		 // ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-﻿Import Gong, Ut;
+Import Gong, Ut;
 
 #OPTION ('multiplePersistInstances', FALSE);
 
@@ -14,12 +14,7 @@ EXPORT Map_Disconnect_Gong_History(string version) := function
 	fdate := fd[34..41];
 	
 	//Concat Address Fields
-	dslayout := record
-			ds;
-			string address1;
-	end;
-
-	dslayout addA(ds l):= transform
+	PhonesInfo.Layout_Deact_GH.History addA(ds l):= transform
 			self.address1 		:= StringLib.StringCleanSpaces(l.prim_range+' '+l.predir+' '+l.prim_name+' '+l.suffix);
 			self := l;
 	end;
@@ -184,11 +179,12 @@ EXPORT Map_Disconnect_Gong_History(string version) := function
 	//Exclude Deact Records Where Deact/React Start/End_Dt = Current Date (Potential Gong History Update Record)//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	filterDate			:= ddPortMatch(fd[34..41] not in [((string)deact_start_dt)[1..8], ((string)deact_end_dt)[1..8], ((string)react_start_dt)[1..8], ((string)react_end_dt)[1..8]]);
-	filterOut				:= ddPortMatch(fd[34..41] in [((string)deact_start_dt)[1..8], ((string)deact_end_dt)[1..8], ((string)react_start_dt)[1..8], ((string)react_end_dt)[1..8]]):persist('~thor_data400::persist::gong_history_deact_sameDay');
+	filterSameDay		:= ddPortMatch(fd[34..41] in [((string)deact_start_dt)[1..8], ((string)deact_end_dt)[1..8], ((string)react_start_dt)[1..8], ((string)react_end_dt)[1..8]]):persist('~thor_data400::persist::gong_history_deact_sameDay');
+	filterSameDayOut:= choosen(filterSameDay, 500);
 
 	//Output Base File
 	ghFile 						:= output(filterDate,,'~thor_data400::base::phones::disconnect_gh_main_'+version, overwrite, __compressed__);
-	allFiles					:= sequential(ghHistoryFile, ghFile, output(filterOut));
+	allFiles					:= sequential(ghHistoryFile, ghFile, output(filterSameDayOut));
 	
 return allFiles;
 

@@ -1,4 +1,4 @@
-Official_Records.Layout_Moxie_Document tDocumentInToOut(Official_Records.Layout_In_Document pInput)
+﻿Official_Records.Layout_Moxie_Document tDocumentInToOut(Official_Records.Layout_In_Document pInput)
  :=
   transform
 	self			:= pInput;

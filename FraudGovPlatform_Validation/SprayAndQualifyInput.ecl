@@ -3,7 +3,7 @@
 EXPORT SprayAndQualifyInput(string version,
 	string ip = FraudGovPlatform_Validation.Constants.LandingZoneServer,
 	string rootDir = FraudGovPlatform_Validation.Constants.LandingZonePathBase, 
-	string destinationGroup = if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30')) := function
+	string destinationGroup = if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44')) := function
 
 
 ready    := rootDir+'ready/';
@@ -28,8 +28,8 @@ MoveSprayingToDone  :=nothor(FileServices.MoveExternalFile(IP,spraying+fname,don
 
 FileFound:=exists(dsFileListSorted);
 ReportFileFound:=if(FileFound
-					,output('Found File To Spray',named('Found_File_To_Spray'))
-					,output('No File To Spray',named('No_File_To_Spray'))
+					,output('Found File To Spray',named('Contributory_Found_File_To_Spray'))
+					,output('No File To Spray',named('Contributory_No_File_To_Spray'))
 					);
 
 IsEmptyFile:=dsFileListSorted[1].size = 0;
@@ -77,7 +77,7 @@ RecWithErrors := 	Mod_Stats.ValidateInputFields(fname,mod_sets.validDelimiter, m
 ExcessiveInvalidRecordsFound:= exists(FileStats(err[1]='E',RecWithErrors/RecordsTotal>treshld_));
 					
 MoveToPass:=sequential(
-										 output('File '+fname+' content accepted',named('File_content_accepted'))
+										 output('File '+fname+' content accepted',named('Contributory_File_content_accepted'))
 										,MoveSprayingToDone
 										,map(
 													 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
@@ -87,7 +87,7 @@ MoveToPass:=sequential(
 						);
 															
 MoveToReject:=sequential(
-											 output('File '+fname+' contains fatal errors.  File will be rejected',named('File_content_rejected'))
+											 output('File '+fname+' contains fatal errors.  File will be rejected',named('Contributory_File_content_rejected'))
 											,MoveSprayingToError
 											,map(
 														 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
@@ -112,7 +112,7 @@ ReportInvalidNumberOfColumns := sequential (
 		);
 
 ReportEmptyFile := sequential (
-				 output('File '+ip+ready+fname+' empty',named('File_empty'))
+				 output('File '+ip+ready+fname+' empty',named('Contributory_File_empty'))
 				,MoveReadyToError
 				,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert
 		);

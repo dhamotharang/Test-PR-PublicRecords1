@@ -1,5 +1,5 @@
-import 	address, Address_Attributes, avm_v2, dma, doxie, Gateway, iesp, LN_PropertyV2_Services, mdr, ProfileBooster, 
-				Riskwise, Risk_Indicators, ut, Relationship, aid;
+﻿import 	address, Address_Attributes, avm_v2, dma, doxie, Gateway, iesp, LN_PropertyV2_Services, mdr, ProfileBooster, 
+				Riskwise, Risk_Indicators, ut, Relationship, aid, std;
 
 EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In, 
 																						string50 DataRestrictionMask,
@@ -14,7 +14,7 @@ EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In,
 	bsversion := 50;
 	append_best := 0;	
 	gateways    := dataset([],Gateway.Layouts.Config);
-	todaysdate	:= ut.GetDate;
+	todaysdate	:= (STRING8)Std.Date.Today();
 	nines		 		:= 9999999;
 
 // ********************************************************************
@@ -547,7 +547,16 @@ end;
 																	self.RaAPPCurrOwnerMmbrCnt				 := if(left.rec_type = ProfileBooster.Constants.recType.Relative, if(right.vehicleCount + right.motorcycleCount > 0, 1, left.RaAPPCurrOwnerMmbrCnt), left.RaAPPCurrOwnerMmbrCnt);
 																	self.RaAPPCurrOwnerAutoMmbrCnt 		 := if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.vehicleCount > 0, 1, 0);
 																	self.RaAPPCurrOwnerMtrcycleMmbrCnt := if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.motorcycleCount > 0, 1, 0);
-																	self := left), left outer, parallel);	
+		
+																	SELF.PPCurrOwnedAutoVIN := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoVIN, '');
+																	self.PPCurrOwnedAutoYear  := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoYear, '');
+																	self.PPCurrOwnedAutoMake := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoMake, '');
+																	self.PPCurrOwnedAutoModel := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoModel, '');
+																	self.PPCurrOwnedAutoSeries := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoSeries, '');
+																	self.PPCurrOwnedAutoType := if(left.rec_type=ProfileBooster.Constants.recType.Prospect, right.PPCurrOwnedAutoType, '');
+	
+																	self := left																	
+																	), left outer, parallel);	
 
 //--------- Derogs -------------//
 
@@ -927,7 +936,7 @@ prop_common_distr := distribute(prop_common, did);
 	withProperty := if(onThor, withProperty_thor, withProperty_roxie);
 	
 	withProperty_distributed := distribute(withProperty, seq);
-	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local); //within DID, sort most recent sold property to top
+	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local,HINT(spillCompressorType(FLZ))); //within DID, sort most recent sold property to top
 
 	ProfileBooster.Layouts.Layout_PB_Shell rollProperty(sortedProperty le, sortedProperty ri) := TRANSFORM
 		same_prop := le.owned_prim_range=ri.owned_prim_range and le.owned_prim_name=ri.owned_prim_name;

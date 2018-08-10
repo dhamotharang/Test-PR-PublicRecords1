@@ -1,4 +1,4 @@
-// Function to getroxie keys from dops database
+﻿// Function to getroxie keys from dops database
 // Function will return a dataset with superkey name and logical key name
 // The logical key name is a template for example
 		// ~thor_data400::key::lnproperty::LNPropertyV2Keys_DATE::did
@@ -28,7 +28,7 @@ export GetRoxieKeys(string datasetname,string location,string eflag, string bool
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,eflag),
+				dops.constants.prboca.serviceurl(dopsenv,eflag,location),
 				'GetRoxieKeys',
 				InputRec,
 				dataset(outrec),

@@ -9,9 +9,9 @@ EXPORT UpdateDops(STRING current_version, boolean skipDOPS=FALSE, string emailTo
 
  NoUpdate := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
 
- updatedops_fcra  := PRTE.UpdateVersion('FCRA_OverrideKeys',current_version,notifyEmail,'B','F','N');
+ updatedops  := PRTE.UpdateVersion('OverrideKeys',current_version,notifyEmail,'B','F','N');
 		
- PerformUpdateOrNot := IF(doDOPS,updatedops_fcra,NoUpdate);
+ PerformUpdateOrNot := IF(doDOPS,updatedops,NoUpdate);
  
  		
  RETURN PerformUpdateOrNot;
