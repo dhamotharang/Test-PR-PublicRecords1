@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Data_Services;
+﻿IMPORT _Control, Data_Services, faa;
 
 EXPORT Constants := MODULE
 
@@ -44,12 +44,7 @@ EXPORT Constants := MODULE
 
 
 //DF-21803:FCRA Consumer Data Fields Depreciation
-		EXPORT key_airmen_cert_set := 'ratings';
-		EXPORT key_airmen_did_set  := 'ace_fips_st,country,region,title';
-		EXPORT key_aircraft_id_set	:= 'ace_fips_st,certification,compname,country,current_flag,dotid,' +
-																																'dotscore,dotweight,empid,empscore,empweight,eng_mfr_mdl,'+
-																																'fract_owner,last_action_date,orgid,orgscore,orgweight,orig_county,'+
-																																'powid,powscore,powweight,proxid,proxscore,proxweight,region,'+
-																																'seleid,selescore,seleweight,status_code,title,type_engine,'+
-																																'type_registrant,ultid,ultscore,ultweight';
+		EXPORT key_airmen_cert_set := faa.Constants.fields_to_clear_pilot_certificate;
+		EXPORT key_airmen_did_set  := faa.Constants.fields_to_clear_pilot_registration;
+		EXPORT key_aircraft_id_set	:= faa.Constants.fields_to_clear_aircraft_registration;
 END;	

@@ -15,6 +15,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_aircraft_reg_nnum,		Constant
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_aircraft_linkids.Key,	Constants.KEY_PREFIX+'aircraft_linkids',	Constants.KEY_PREFIX+filedate+'::aircraft_linkids',	k9);
 
 //Copying Reference Keys
+// DF-21779: Copying Prod Keys which should be depreciated.
 key_aircraft_info	:= 	STD.File.copy(Constants.thor_cluster_Files+	'key::faa_aircraft_info_qa',tools.fun_Clustername_DFU(), Constants.KEY_PREFIX+filedate+'::aircraft_info',,,,,true,,,true);
 key_engine_info  	:= 	STD.File.copy(Constants.thor_cluster_Files+	'key::faa_engine_info_qa',tools.fun_Clustername_DFU('02'), Constants.KEY_PREFIX+filedate+'::engine_info',,,,,true,,,true);
 
@@ -102,16 +103,13 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 
 
 //DF-21803:FCRA Consumer Data Fields Depreciation
-cnt_faa_airmen_cert_fcra := OUTPUT(strata.macf_pops(Keys.key_Certifications(true),,,,,,FALSE,['ratings']));
-cnt_faa_airmen_did_fcra 	:= OUTPUT(strata.macf_pops(Keys.key_airmen_did(true),,,,,,FALSE,['ace_fips_st','country','region','title']));
+cnt_faa_airmen_cert_fcra := OUTPUT(strata.macf_pops(Keys.key_Certifications(true),,,,,,FALSE,['ratings']), named('cnt_faa_airmen_cert_fcra'));
+cnt_faa_airmen_did_fcra 	:= OUTPUT(strata.macf_pops(Keys.key_airmen_did(true),,,,,,FALSE,['ace_fips_st','country','region','title']), named('cnt_faa_airmen_did_fcra'));
 cnt_faa_aircraft_id_fcra := OUTPUT(strata.macf_pops(Keys.key_aircraft_id(true),,,,,,FALSE,
-																																		['ace_fips_st','certification','compname','country','current_flag','dotid',
-																																			'dotscore','dotweight','empid','empscore','empweight','eng_mfr_mdl',
-																																			'fract_owner','last_action_date','orgid','orgscore','orgweight','orig_county',
-																																			'powid','powscore','powweight','proxid','proxscore','proxweight','region',
-																																			'seleid','selescore','seleweight','status_code','title','type_engine',
-																																			'type_registrant','ultid','ultscore','ultweight']
-																																			));
+																																		['ace_fips_st','certification','compname','country','fract_owner',
+																																		'last_action_date','lf','orig_county','region','status_code','title',
+																																		'type_registrant']),named('cnt_faa_aircraft_id_fcra'));
+																																		
 
 
 // -- Build Autokeys
