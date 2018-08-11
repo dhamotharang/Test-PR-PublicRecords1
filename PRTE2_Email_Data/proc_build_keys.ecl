@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata;
 
 EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
 is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
@@ -32,6 +32,9 @@ To_qa	:=	parallel(mv_qa1, mv_qa2, fcra_mv_qa1);
 // -- Build Autokeys
 build_autokeys 	:= Keys.autokeys(filedate);
 
+//DF-22112 FCRA Consumer Data Field Depreciation
+cnt_email_data_fcra := OUTPUT(strata.macf_pops(Keys.key_did(true),,,,,,FALSE,['orig_ip']), named('CNT_EMAIL_DATA_FCRA'));
+
 
 //---------- making DOPS optional and only in PROD build -------------------------------													
 		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
@@ -48,6 +51,7 @@ buildKey	:=	sequential(
 												,Move_keys
 												,to_qa
 												,build_autokeys
+												,cnt_email_data_fcra
 												,PerformUpdateOrNot
 												);	
 
