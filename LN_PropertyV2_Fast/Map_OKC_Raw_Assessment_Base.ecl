@@ -1,4 +1,4 @@
-/*2014-08-27T05:15:11Z (Gabriel Marcan_prod)
+﻿/*2014-08-27T05:15:11Z (Gabriel Marcan_prod)
 fast property build 0.7 - see bugzilla https://bugzilla.seisint.com/show_bug.cgi?id=163383
 */
 IMPORT aid,ln_propertyv2,Tools,ut,Address,Census_Data,nid;
@@ -277,7 +277,7 @@ EXPORT Map_OKC_Raw_Assessment_Base(string	pVersionDate,
 		// Populate fipscode
 		common.layout_pre_temp_assessment tJoinFips(common.layout_pre_temp_assessment L,
 																												recordof(Census_Data.File_Fips2County) R)  := TRANSFORM
-			self.fips_code			:=	R.state_fips	+	R.county_fips;
+			self.fips_code			:=	IF(trim(L.fips_code, left, right) = '', R.state_fips	+	R.county_fips, L.fips_code); //DF-22234 only replace fips_code by census data value if it's not provided by the vendor
 			self								:=	L;
 		END;
 		

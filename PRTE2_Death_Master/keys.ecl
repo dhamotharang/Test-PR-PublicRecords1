@@ -1,4 +1,4 @@
-IMPORT PRTE2_DEATH_MASTER, doxie,mdr;
+﻿IMPORT PRTE2_DEATH_MASTER, doxie,mdr,ut;
 EXPORT keys := MODULE
 
 	EXPORT Key_Death_Master_ssa_Did 	:= index(FILES.DID_Dead_With_County(TRUE)((unsigned6)did != 0),
@@ -32,7 +32,8 @@ EXPORT keys := MODULE
 			   {unsigned6 l_did := (integer)did},{Files.Bldg_Dead_With_County_FCRA(FALSE)},
 			   constants.KeyName_death_master + 'fcra::did_death_masterv2_'+doxie.Version_SuperKey);
 
-	EXPORT key_death_masterv2_ssa_did_fcra := index(Files.Bldg_Dead_With_County_FCRA(TRUE),
+
+	EXPORT key_death_masterv2_ssa_did_fcra := Index(Files.Bldg_Dead_With_County_FCRA(TRUE),
 		{unsigned6 l_did := (integer)did},{Files.Bldg_Dead_With_County_FCRA(TRUE)},
 		constants.KeyName_death_master + 'fcra::did_death_masterv2_ssa_'+doxie.Version_SuperKey);
 
@@ -60,7 +61,6 @@ EXPORT keys := MODULE
 	EXPORT key_ssn_ssa(boolean isFCRA) := function
 
 			dm_base := files.File_DeathMaster_Building(LENGTH(TRIM(ssn))=9);
-	
 			// for reference, this is the list of the new sources being added to Death Master
 			// which we want to make sure are excluded from FCRA key until shell 5.0 goes live
 			// src_Death_Tributes 	:= 'TR';
@@ -80,8 +80,12 @@ EXPORT keys := MODULE
 				mdr.sourceTools.src_Death_OH
 			];
 			
+			//DF-22303: FCRA Consumer Data Field Depreciation:FCRA_DeathMasterSSAKeys
+			ut.MAC_CLEAR_FIELDS(dm_base, dm_base_cleared, prte2_death_master.constants.fields_to_clear);
+			
 			// to match what we have in SSN Table for now, only use DE source for FCRA	
-			fcra_base := dm_base(trim(src) in mdr.sourceTools.set_scoring_FCRA and trim(src) not in mdr.sourceTools.set_scoring_FCRA_retro_test);
+			fcra_base := dm_base_cleared(trim(src) in mdr.sourceTools.set_scoring_FCRA and trim(src) not in mdr.sourceTools.set_scoring_FCRA_retro_test);
+			
 			base := if(isFCRA, fcra_base, dm_base);
 
 			key_name := if(isFCRA, 
