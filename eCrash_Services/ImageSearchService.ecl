@@ -108,7 +108,6 @@ EXPORT ImageSearchService() := FUNCTION
 			agency_state_abbr = SuperReportRow[1].jurisdiction_state 
 			AND agency_name = SuperReportRow[1].jurisdiction
 		)	
-		AND mbsi_agency_id = SuperReportRow[1].jurisdiction_nbr
 	);
 	AgencyAppendOverwriteFlag := AgencyInfo[1].append_overwrite_flag;
 	

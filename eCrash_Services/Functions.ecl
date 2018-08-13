@@ -537,7 +537,9 @@ export Functions := MODULE
 					self.DateReportCreated := IF(l.isDelta, l.date_added[1..10], keys_report_date);
 					self.OfficerBadgeNumber := l.officer_id;
 					self.VendorReportID := l.vendor_report_id;
-					self.DateReportSubmitted := iesp.ECL2ESP.toDatestring8(l.Date_Report_submitted);
+					self.DateReportSubmitted.Year := (integer)l.Date_Report_submitted[1..4];
+					self.DateReportSubmitted.Month := (integer)l.Date_Report_submitted[6..7];
+					self.DateReportSubmitted.Day := (integer)l.Date_Report_submitted[9..10];
 					self:=[]
 					END;
 					
