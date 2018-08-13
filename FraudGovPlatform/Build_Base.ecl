@@ -1,10 +1,13 @@
-﻿import tools,FraudShared;
+﻿﻿import tools,FraudShared;
 
 export Build_Base(
 
 	 string	pversion
 	,boolean	PSkipIdentityDataBase	= false 
-	,boolean	PSkipKnownFraudBase	= false 
+	,boolean	PSkipKnownFraudBase	= false
+	,boolean	PSkipAddressCacheBase	= false
+	,boolean	PSkipMainBase = false
+	,boolean	PSkipKelBase	 = false
 	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.QA
 	
   ,dataset(Layouts.Base.IdentityData)	pBaseIdentityDataFile	=	Files().Base.IdentityData.QA
@@ -14,6 +17,7 @@ export Build_Base(
 	,dataset(Layouts.Base.KnownFraud)	pBaseKnownFraudFile	=	Files().Base.KnownFraud.QA
 	,dataset(Layouts.Input.KnownFraud)	pUpdateKnownFraudFile	=	Files().Input.KnownFraud.Sprayed
 	,boolean	pUpdateKnownFraudFlag	= _Flags.Update.KnownFraud
+	
 
 ) :=
 module
@@ -35,11 +39,13 @@ module
 					,pBaseKnownFraudFile
 					,pUpdateKnownFraudFile
 					,pUpdateKnownFraudflag
-					).All)
-			 )
-			 ,MapToCommon(
-					 pversion
-					).Build_Base_Main.All
+					).All)		 
+			 )			 
+			 , if(PSkipKelBase , output('KnownFraud base skipped'),Build_Base_Kel(pversion).All)		 					 
+			 , if(PSkipAddressCacheBase , output('AddressCache base skipped'),Build_Base_AddressCache(pversion).All)
+			 , Promote(pversion).buildfiles.New2Built
+			 , if(PSkipMainBase, output('Main base skipped'), MapToCommon(pversion).Build_Base_Main.All)
+			 , Promote(pversion).buildfiles.Built2QA			 
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );

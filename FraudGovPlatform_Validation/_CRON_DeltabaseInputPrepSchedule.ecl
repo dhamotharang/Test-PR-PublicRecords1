@@ -2,7 +2,7 @@
 
 every_day := '0 5 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-RootDir := Constants.InqLogLandingZonePathBase;
+RootDir := Constants.DeltaLandingZonePathBase;
 
 ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
 

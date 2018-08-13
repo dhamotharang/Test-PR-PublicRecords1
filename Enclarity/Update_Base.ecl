@@ -1897,9 +1897,11 @@ end;
 														self					:= left),
 													left outer, local);
 	
-		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367');
+		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
 		
-		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367');
+		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
 		
 		clear_exp_stat	:= project(mo_apn, 
 																transform(enclarity.Layouts.license_base,
@@ -1909,8 +1911,8 @@ end;
 																	self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
 																	self										:= left));
 																	
-		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
-															group_key, lic_state, lic_num, lic_end_date, lic_status, local);
+		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
+															group_key, lic_state, lic_num, lic_begin_date, local);
 
 		Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
@@ -1922,8 +1924,8 @@ end;
 										LEFT.group_key 			= RIGHT.group_key 			AND 
 										LEFT.lic_state 			= RIGHT.lic_state				AND				
 										LEFT.lic_num				= RIGHT.lic_num					AND						
-										LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	
-										LEFT.lic_status			= RIGHT.lic_status		  AND
+										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	
+										// LEFT.lic_status			= RIGHT.lic_status		  AND
 										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
 										LEFT.record_type		= RIGHT.record_type,
 										t_rollup(LEFT,RIGHT),LOCAL);
@@ -1934,6 +1936,10 @@ end;
 																	group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
 										persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
 										
+		// RETURN non_mo_apn;
+		// RETURN roll_mo_lic;
+		// RETURN mo_apn;
+		// RETURN sort_clear_exp_stat;
 		RETURN dedup_recombined_provs;
 	END;
 	

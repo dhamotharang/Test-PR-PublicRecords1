@@ -12,29 +12,47 @@ module
 	export llogicalautoTmplt		  :=  Platform.autokeytemplate();
 
 	export Main := module
-		export ID                    			:= tools.mod_FilenamesBuild(lTemplate('ID'),pversion);
-		export DID                   			:= tools.mod_FilenamesBuild(lTemplate('DID'),pversion);
-		export BDID                  			:= tools.mod_FilenamesBuild(lTemplate('BDID'),pversion);
-		export Email                 			:= tools.mod_FilenamesBuild(lTemplate('Email'),pversion);
-		export Ip                    			:= tools.mod_FilenamesBuild(lTemplate('IP'),pversion);
-		export ProfessionalID        			:= tools.mod_FilenamesBuild(lTemplate('ProfessionalID'),pversion);
-		export DeviceID              			:= tools.mod_FilenamesBuild(lTemplate('DeviceID'),pversion);
-		export TIN                   			:= tools.mod_FilenamesBuild(lTemplate('TIN'),pversion);
-		export NPI                   			:= tools.mod_FilenamesBuild(lTemplate('NPI'),pversion);
-		export AppProviderID         			:= tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
-		export LNPID                 			:= tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
-    export Mbs                   			:= tools.mod_FilenamesBuild(lTemplate('Mbs'),pversion);
-    export MbsIndTypeExclusion   			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
-    export MbsProductInclude     			:= tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
-    export MbsFDNMasterID        			:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
-    export MbsFDNMasterIDExcl    			:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
-		export MbsFDNMasterIDIndTypIncl   := tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
-		export MbsVelocityRules         	:= tools.mod_FilenamesBuild(lTemplate('MbsVelocityRules'),pversion);
-  	export LinkIds               			:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
-		export DriversLicense        			:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
-		export BankAccount           			:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
-
+		export ID												:= tools.mod_FilenamesBuild(lTemplate('ID'),pversion);
+		export DID											:= tools.mod_FilenamesBuild(lTemplate('DID'),pversion);
+		export BDID											:= tools.mod_FilenamesBuild(lTemplate('BDID'),pversion);
+		export Email										:= tools.mod_FilenamesBuild(lTemplate('Email'),pversion);
+		export Ip												:= tools.mod_FilenamesBuild(lTemplate('IP'),pversion);
+		export ProfessionalID						:= tools.mod_FilenamesBuild(lTemplate('ProfessionalID'),pversion);
+		export DeviceID									:= tools.mod_FilenamesBuild(lTemplate('DeviceID'),pversion);
+		export TIN											:= tools.mod_FilenamesBuild(lTemplate('TIN'),pversion);
+		export NPI											:= tools.mod_FilenamesBuild(lTemplate('NPI'),pversion);
+		export AppProviderID						:= tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
+		export LNPID										:= tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
+		export Mbs											:= tools.mod_FilenamesBuild(lTemplate('Mbs'),pversion);
+		export MbsIndTypeExclusion			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
+		export MbsProductInclude				:= tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
+		export MbsFDNMasterID						:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
+		export MbsFDNMasterIDExcl				:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
+		export MbsFDNMasterIDIndTypIncl	:= tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
+		export MbsVelocityRules					:= tools.mod_FilenamesBuild(lTemplate('MbsVelocityRules'),pversion);
+		export MbsFdnIndType						:= tools.mod_FilenamesBuild(lTemplate('MbsFdnIndType'),pversion);
+		export MbsDeltaBase							:= tools.mod_FilenamesBuild(lTemplate('MbsDeltaBase'),pversion);
+		export LinkIds									:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
+		export DriversLicense						:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
+		export BankAccount							:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
+		export CityState								:= tools.mod_FilenamesBuild(lTemplate('CityState'),pversion);
+		export Zip											:= tools.mod_FilenamesBuild(lTemplate('Zip'),pversion);
+		export CustomerID								:= tools.mod_FilenamesBuild(lTemplate('CustomerID'),pversion);
+		export County										:= tools.mod_FilenamesBuild(lTemplate('County'),pversion);
+		export ReportedDate							:= tools.mod_FilenamesBuild(lTemplate('ReportedDate'),pversion);
+		export SerialNumber							:= tools.mod_FilenamesBuild(lTemplate('SerialNumber'),pversion);
+		export MACAddress								:= tools.mod_FilenamesBuild(lTemplate('MACAddress'),pversion);
+		export Host											:= tools.mod_FilenamesBuild(lTemplate('Host'),pversion);
+		export User											:= tools.mod_FilenamesBuild(lTemplate('User'),pversion);
+		export HouseholdID							:= tools.mod_FilenamesBuild(lTemplate('HouseholdID'),pversion);
+		export CustomerProgram					:= tools.mod_FilenamesBuild(lTemplate('CustomerProgram'),pversion);
+		export AmountPaid								:= tools.mod_FilenamesBuild(lTemplate('AmountPaid'),pversion);
+		export BankRoutingNumber				:= tools.mod_FilenamesBuild(lTemplate('BankRoutingNumber'),pversion);
+		export BankName									:= tools.mod_FilenamesBuild(lTemplate('BankName'),pversion);
+		export ISP											:= tools.mod_FilenamesBuild(lTemplate('ISP'),pversion);
+		export IPRange									:= tools.mod_FilenamesBuild(lTemplate('IPRange'),pversion);
 				
+			
 		export dAll_filenames :=
 		    ID.dAll_filenames +
 			 	DID.dAll_filenames +
@@ -54,9 +72,27 @@ module
 				MbsFDNMasterIDExcl.dAll_filenames +
 				MbsFDNMasterIDIndTypIncl.dAll_filenames +
 				If(Platform.Source = 'FraudGov'  ,MbsVelocityRules.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,MbsFdnIndType.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,MbsDeltaBase.dAll_filenames) +				
 				DriversLicense.dAll_filenames +
 				BankAccount.dAll_filenames +
-				LinkIds.dAll_filenames ;
+				LinkIds.dAll_filenames +
+				If(Platform.Source = 'FraudGov'  ,CityState.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,Zip.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,CustomerID.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,County.dAll_filenames) + 
+				If(Platform.Source = 'FraudGov'  ,ReportedDate.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,SerialNumber.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,MACAddress.dAll_filenames) + 
+				If(Platform.Source = 'FraudGov'  ,Host.dAll_filenames) + 
+				If(Platform.Source = 'FraudGov'  ,User.dAll_filenames) + 
+				If(Platform.Source = 'FraudGov'  ,HouseholdID.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,CustomerProgram.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'  ,AmountPaid.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'	 ,BankRoutingNumber.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'	 ,BankName.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'	 ,ISP.dAll_filenames) +
+				If(Platform.Source = 'FraudGov'	 ,IPRange.dAll_filenames);
 		end;
 	
 		
@@ -78,7 +114,7 @@ module
 	export FEIN2 					  := tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'FEIN2'															  ,pversion	,llogicalautoTmplt				+ 'FEIN2'														  );
 	export stnameb2 				:= tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'stnameb2'														,pversion	,llogicalautoTmplt				+ 'stnameb2'													);
 	export zipb2 						:= tools.mod_FilenamesBuild(llogicalautoTmplt			+ 'zipb2'																,pversion	,llogicalautoTmplt				+ 'zipb2'															);
- 
+
 
 
 	export dAll_filenames :=

@@ -52,7 +52,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 
 #uniquename(update_version)
 
-%update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N|BN');
+%update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N');
 
 /******Comment out the dops update and orbit for GWL on  Insurance end -- DF - 21830
 #uniquename(update_alpha_version)
