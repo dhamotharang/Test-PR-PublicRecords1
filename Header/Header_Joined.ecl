@@ -9,7 +9,7 @@ inNHR := header.New_Header_Records()(header.Blocked_data_new())
 header.macGetCleanAddr(inNHR, RawAID, true, inNHR_addr_recleaned);
 NHRin := distribute(inNHR_addr_recleaned,hash(prim_name,zip,lname));
 
-inPHR0 := Header.File_header_raw_latest.File(~header.IsOldUtil(versionBuild));
+inPHR0 := Header.File_header_raw_latest.File(~header.IsOldUtil(versionBuild,,,,7));
 inPHR  := inPHR0(header.Blocked_data_new());
 PHin   := distribute(inPHR,hash(prim_name,zip,lname));
 
@@ -140,7 +140,7 @@ header.macGetCleanAddr(merged_with_prim, RawAID, true, merged_with_prim_addr_rec
 
 merged_addr_recleaned := merged_no_prim + merged_with_prim_addr_recleaned;
 
-OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild));
+OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild,,,,7));
 patched:=Header.fn_clear_deletion_candidates(merged_addr_recleaned + OldUtil,versionBuild);//****** remove PII off deleted records
 
 patched1:=header.fn_fix_dates(patched,,versionBuild);
