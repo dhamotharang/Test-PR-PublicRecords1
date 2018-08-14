@@ -74,6 +74,12 @@ EXPORT Key_LinkIds := MODULE
 			return project(ds_filt, xform(left)); //Using a SKIP in the transform was giving a syntax error and hence, had to use to this EXISTS filter condition
 		#END
 	endmacro;
+
+ export kfetch2_layout := {                          
+							unsigned2 fetch_error_code;
+							BIPV2.IDLayouts.l_xlink_ids2.UniqueID;
+							BIPV2_Best.Key_Linkids.KeyPlus};
+							
 	//DEFINE THE INDEX ACCESS
 export kFetch2(
 	dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs,

@@ -365,6 +365,8 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   export keyfather      := keyvs().father     ;
   export keygrandfather := keyvs().grandfather;
   
+	 export kfetch_layout :={BIPV2_Build.key_contact_linkids.Key};
+	
   //DEFINE THE INDEX ACCESS
   export kFetch(
                   dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
