@@ -1,4 +1,4 @@
-﻿import roxiekeybuild,autokey,doxie,marriage_divorce_v2;
+﻿import roxiekeybuild,autokey,doxie,marriage_divorce_v2, DOPSGrowthCheck, dops;
 
 export proc_build_keys(string filedate) := function
 
@@ -49,7 +49,19 @@ build_keys := sequential(
 
 build_autokeys := marriage_divorce_v2.proc_build_autokeys(filedate);
 
-return sequential(build_keys,build_autokeys);
+GetDops := dops.GetDeployedDatasets('P', 'B', 'F');
+OnlyMDV2:=GetDops(datasetname='FCRA_MDV2Keys');
+father_filedate :=  OnlyMDV2[1].buildversion;																		
+set of string InputSet_MDV2 := ['record_id','dt_first_seen','dt_vendor_first_reported','filing_type','filing_subtype','vendor','source_file','state_origin','number_of_children','marriage_filing_dt','marriage_dt','marriage_city','marriage_county','place_of_marriage','type_of_ceremony','marriage_filing_number','marriage_docket_volume','divorce_filing_dt','divorce_dt','divorce_docket_volume','divorce_filing_number','divorce_city','divorce_county','grounds_for_divorce','marriage_duration_cd','marriage_duration','persistent_record_id'];
+set of string Persistent_ID_MDV2 := ['filing_subtype','state_origin','party1_name','party1_alias','party1_dob','party1_birth_state','party1_age','party1_race','party1_addr1','party1_csz','party1_county','party1_previous_marital_status','party1_how_marriage_ended','party1_times_married','party1_last_marriage_end_dt','party2_name','party2_alias','party2_dob','party2_birth_state','party2_age','party2_race','party2_addr1','party2_csz','party2_county','party2_previous_marital_status','party2_how_marriage_ended','party2_times_married','party2_last_marriage_end_dt','number_of_children','marriage_filing_dt','marriage_dt','marriage_city','marriage_county','place_of_marriage','type_of_ceremony','marriage_filing_number','marriage_docket_volume','divorce_filing_dt','divorce_dt','divorce_docket_volume','divorce_filing_number','divorce_city','divorce_county','grounds_for_divorce','marriage_duration_cd','marriage_duration'	];	
+DeltaCommands:=sequential(
+DOPSGrowthCheck.CalculateStats(	'FCRA_MDV2Keys','marriage_divorce_v2.key_mar_div_id_main(true)','key_MDV2_FCRA','~thor_data400::key::mar_div::fcra::'+filedate+'::id_main','record_id','persistent_record_id','','','','',filedate,father_filedate),
+DOPSGrowthCheck.DeltaCommand('~thor_data400::key::mar_div::fcra::'+filedate+'::id_main', '~thor_data400::key::mar_div::fcra::'+father_filedate+'::id_main', 'FCRA_MDV2Keys', 'key_MDV2_FCRA', 'marriage_divorce_v2.key_mar_div_id_main(true)', 'persistent_record_id', filedate, father_filedate, InputSet_MDV2),
+DOPSGrowthCheck.ChangesByField('~thor_data400::key::mar_div::fcra::'+filedate+'::id_main','~thor_data400::key::mar_div::fcra::'+father_filedate+'::id_main','FCRA_MDV2Keys','key_MDV2_FCRA','marriage_divorce_v2.key_mar_div_id_main(true)','persistent_record_id','',filedate,father_filedate),
+DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::mar_div::base',  '~thor_data400::base::mar_div::base_father',  'FCRA_MDV2Keys',  'key_MDV2_FCRA',  'marriage_divorce_v2.layout_mar_div_base',  'persistent_record_id',  Persistent_ID_MDV2,  Persistent_ID_MDV2,  filedate,  father_filedate,,  false)
+);
+
+return sequential(build_keys,build_autokeys,DeltaCommands);
 
 end;
 
