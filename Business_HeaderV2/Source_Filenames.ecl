@@ -1,4 +1,4 @@
-IMPORT  
+﻿IMPORT  
 	 acf
 	,advo
 	,ak_busreg
@@ -116,7 +116,7 @@ module
 	export liens_party_Superior					:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::liens::party::superior'     									);
 	export ms_workers_comp 							:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::ms_workers_comp'           										);
 	export or_workers										:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::or_workers_comp'           										);
-	export oshair												:= VersionControl.mBuildFilenameVersionsOld(prod + OSHAIR.cluster[2..] + 'out::oshair::inspection_cleaned'			        										);
+	export oshair												:= VersionControl.mBuildFilenameVersionsOld(prod + OSHAIR.cluster[2..] + 'base::oshair::qa::inspection'			          );
 	export phonesplus										:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::phonesplus'		             										);
 	export professional_licenses				:= VersionControl.mBuildFilenameVersionsOld(prod + 'thor_data400::base::prof_licenses_AID'             										);
 	export propSearch										:= VersionControl.mBuildFilenameVersions(prod + 'thor_data400::base::ln_propertyv2::search'						);
