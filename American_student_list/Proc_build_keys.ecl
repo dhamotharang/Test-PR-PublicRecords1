@@ -1,4 +1,4 @@
-//Build keys for American Student List and move to QA.
+﻿//Build keys for American Student List and move to QA.
 //Bug ticket #116301 - incorrect field length for county field for DID key, but key not used so removing keybuild
 import ut, RoxieKeyBuild, _control;
 

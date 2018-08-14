@@ -59,9 +59,9 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT))(TRIM(EMAIL) <> ''); //removes invalid records
 	
 	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' 
-																			OR STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0 OR LENGTH(ZipCode)<5);
+																			OR STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0 OR LENGTH(ZipCode)<5 OR TRIM(state) = '');
 	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != ''
-																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0);
+																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0 AND LENGTH(ZipCode)=5 AND TRIM(state) != '');
 	
 	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
