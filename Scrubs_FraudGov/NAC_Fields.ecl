@@ -1,11 +1,11 @@
 ﻿IMPORT SALT39;
 EXPORT NAC_Fields := MODULE
  
-EXPORT NumFields := 17;
+EXPORT NumFields := 18;
  
 // Processing for each FieldType
-EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alphanumeric','invalid_date','invalid_numeric');
-EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alphanumeric' => 2,'invalid_date' => 3,'invalid_numeric' => 4,0);
+EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alphanumeric','invalid_email','invalid_date','invalid_numeric','invalid_zip','invalid_state','invalid_ssn','invalid_phone','invalid_ip','invalid_name');
+EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'invalid_alpha' => 1,'invalid_alphanumeric' => 2,'invalid_email' => 3,'invalid_date' => 4,'invalid_numeric' => 5,'invalid_zip' => 6,'invalid_state' => 7,'invalid_ssn' => 8,'invalid_phone' => 9,'invalid_ip' => 10,'invalid_name' => 11,0);
  
 EXPORT MakeFT_invalid_alpha(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
@@ -15,20 +15,28 @@ EXPORT InValidFT_invalid_alpha(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGT
 EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'),SALT39.HygieneErrors.NotLength('0,4..'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphanumeric(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'!+&,./#()_'); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_alphanumeric(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'!+&,./#()_'))));
-EXPORT InValidMessageFT_invalid_alphanumeric(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'!+&,./#()_'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alphanumeric(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'`!+&,./#()_'))));
+EXPORT InValidMessageFT_invalid_alphanumeric(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_email(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_invalid_email(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('-_.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 -:'); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' -:',' ') ); // Insert spaces but avoid doubles
-  RETURN  s2;
+  s1 := SALT39.stringfilter(s0,'0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
 END;
-EXPORT InValidFT_invalid_date(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 -:'))));
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 -:'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 <>{}[]-^=\'`!+&,./#()_'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8));
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.NotLength('0,8'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -37,81 +45,139 @@ END;
 EXPORT InValidFT_invalid_numeric(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789'))));
 EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789'),SALT39.HygieneErrors.Good);
  
-EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'Customer_Account_Number','Customer_County','Customer_State','Customer_Agency_Vertical_Type','Customer_Program','LexID','raw_Full_Name','raw_First_name','raw_Last_Name','SSN','Drivers_License_State','Drivers_License_Number','Street_1','City','State','Zip','did');
-EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'Customer_Account_Number','Customer_County','Customer_State','Customer_Agency_Vertical_Type','Customer_Program','LexID','raw_Full_Name','raw_First_name','raw_Last_Name','SSN','Drivers_License_State','Drivers_License_Number','Street_1','City','State','Zip','did');
-EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'Customer_Account_Number' => 0,'Customer_County' => 1,'Customer_State' => 2,'Customer_Agency_Vertical_Type' => 3,'Customer_Program' => 4,'LexID' => 5,'raw_Full_Name' => 6,'raw_First_name' => 7,'raw_Last_Name' => 8,'SSN' => 9,'Drivers_License_State' => 10,'Drivers_License_Number' => 11,'Street_1' => 12,'City' => 13,'State' => 14,'Zip' => 15,'did' => 16,0);
-EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT MakeFT_invalid_zip(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'-0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_zip(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'-0123456789 <>{}[]-^=\'`!+&,./#()_'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) >= 5));
+EXPORT InValidMessageFT_invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('-0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.NotLength('0,5..'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_state(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_state(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
+EXPORT InValidMessageFT_invalid_state(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_ssn(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_ssn(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 <>{}[]-^=\'`!+&,./#()_'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 9));
+EXPORT InValidMessageFT_invalid_ssn(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.NotLength('0,9'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_phone(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_phone(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 <>{}[]-^=\'`!+&,./#()_'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) >= 10));
+EXPORT InValidMessageFT_invalid_phone(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.NotLength('0,10..'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_ip(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'.0123456789 <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_ip(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'.0123456789 <>{}[]-^=\'`!+&,./#()_'))));
+EXPORT InValidMessageFT_invalid_ip(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('.0123456789 <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_name(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'); // Only allow valid symbols
+  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' <>{}[]-^=\'`!+&,./#()_',' ') ); // Insert spaces but avoid doubles
+  s3 := TRIM(s2,LEFT); // Left trim
+  RETURN  s3;
+END;
+EXPORT InValidFT_invalid_name(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'))));
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'),SALT39.HygieneErrors.Good);
+ 
+EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'SearchAddress1StreetAddress1','SearchAddress1StreetAddress2','SearchAddress1City','SearchAddress1State','SearchAddress1Zip','SearchAddress2StreetAddress1','SearchAddress2StreetAddress2','SearchAddress2City','SearchAddress2State','SearchAddress2Zip','SearchCaseId','enduserip','CaseID','ClientFirstName','ClientMiddleName','ClientLastName','ClientPhone','ClientEmail');
+EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'SearchAddress1StreetAddress1','SearchAddress1StreetAddress2','SearchAddress1City','SearchAddress1State','SearchAddress1Zip','SearchAddress2StreetAddress1','SearchAddress2StreetAddress2','SearchAddress2City','SearchAddress2State','SearchAddress2Zip','SearchCaseId','enduserip','CaseID','ClientFirstName','ClientMiddleName','ClientLastName','ClientPhone','ClientEmail');
+EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'SearchAddress1StreetAddress1' => 0,'SearchAddress1StreetAddress2' => 1,'SearchAddress1City' => 2,'SearchAddress1State' => 3,'SearchAddress1Zip' => 4,'SearchAddress2StreetAddress1' => 5,'SearchAddress2StreetAddress2' => 6,'SearchAddress2City' => 7,'SearchAddress2State' => 8,'SearchAddress2Zip' => 9,'SearchCaseId' => 10,'enduserip' => 11,'CaseID' => 12,'ClientFirstName' => 13,'ClientMiddleName' => 14,'ClientLastName' => 15,'ClientPhone' => 16,'ClientEmail' => 17,0);
+EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_Customer_Account_Number(SALT39.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_Customer_Account_Number(SALT39.StrType s) := InValidFT_invalid_numeric(s);
-EXPORT InValidMessage_Customer_Account_Number(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
+EXPORT Make_SearchAddress1StreetAddress1(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress1StreetAddress1(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress1StreetAddress1(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_Customer_County(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Customer_County(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Customer_County(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress1StreetAddress2(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress1StreetAddress2(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress1StreetAddress2(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_Customer_State(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Customer_State(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Customer_State(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress1City(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress1City(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress1City(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_Customer_Agency_Vertical_Type(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Customer_Agency_Vertical_Type(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Customer_Agency_Vertical_Type(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress1State(SALT39.StrType s0) := MakeFT_invalid_state(s0);
+EXPORT InValid_SearchAddress1State(SALT39.StrType s) := InValidFT_invalid_state(s);
+EXPORT InValidMessage_SearchAddress1State(UNSIGNED1 wh) := InValidMessageFT_invalid_state(wh);
  
-EXPORT Make_Customer_Program(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Customer_Program(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Customer_Program(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress1Zip(SALT39.StrType s0) := MakeFT_invalid_zip(s0);
+EXPORT InValid_SearchAddress1Zip(SALT39.StrType s) := InValidFT_invalid_zip(s);
+EXPORT InValidMessage_SearchAddress1Zip(UNSIGNED1 wh) := InValidMessageFT_invalid_zip(wh);
  
-EXPORT Make_LexID(SALT39.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_LexID(SALT39.StrType s) := InValidFT_invalid_numeric(s);
-EXPORT InValidMessage_LexID(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
+EXPORT Make_SearchAddress2StreetAddress1(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress2StreetAddress1(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress2StreetAddress1(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_raw_Full_Name(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_raw_Full_Name(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_raw_Full_Name(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress2StreetAddress2(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress2StreetAddress2(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress2StreetAddress2(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_raw_First_name(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_raw_First_name(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_raw_First_name(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress2City(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchAddress2City(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchAddress2City(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_raw_Last_Name(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_raw_Last_Name(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_raw_Last_Name(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress2State(SALT39.StrType s0) := MakeFT_invalid_state(s0);
+EXPORT InValid_SearchAddress2State(SALT39.StrType s) := InValidFT_invalid_state(s);
+EXPORT InValidMessage_SearchAddress2State(UNSIGNED1 wh) := InValidMessageFT_invalid_state(wh);
  
-EXPORT Make_SSN(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_SSN(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_SSN(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchAddress2Zip(SALT39.StrType s0) := MakeFT_invalid_zip(s0);
+EXPORT InValid_SearchAddress2Zip(SALT39.StrType s) := InValidFT_invalid_zip(s);
+EXPORT InValidMessage_SearchAddress2Zip(UNSIGNED1 wh) := InValidMessageFT_invalid_zip(wh);
  
-EXPORT Make_Drivers_License_State(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Drivers_License_State(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Drivers_License_State(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_SearchCaseId(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_SearchCaseId(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_SearchCaseId(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_Drivers_License_Number(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Drivers_License_Number(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Drivers_License_Number(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_enduserip(SALT39.StrType s0) := MakeFT_invalid_ip(s0);
+EXPORT InValid_enduserip(SALT39.StrType s) := InValidFT_invalid_ip(s);
+EXPORT InValidMessage_enduserip(UNSIGNED1 wh) := InValidMessageFT_invalid_ip(wh);
  
-EXPORT Make_Street_1(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Street_1(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Street_1(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_CaseID(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
+EXPORT InValid_CaseID(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
+EXPORT InValidMessage_CaseID(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_City(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_City(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_City(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_ClientFirstName(SALT39.StrType s0) := MakeFT_invalid_name(s0);
+EXPORT InValid_ClientFirstName(SALT39.StrType s) := InValidFT_invalid_name(s);
+EXPORT InValidMessage_ClientFirstName(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
  
-EXPORT Make_State(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_State(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_State(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_ClientMiddleName(SALT39.StrType s0) := MakeFT_invalid_name(s0);
+EXPORT InValid_ClientMiddleName(SALT39.StrType s) := InValidFT_invalid_name(s);
+EXPORT InValidMessage_ClientMiddleName(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
  
-EXPORT Make_Zip(SALT39.StrType s0) := MakeFT_invalid_alphanumeric(s0);
-EXPORT InValid_Zip(SALT39.StrType s) := InValidFT_invalid_alphanumeric(s);
-EXPORT InValidMessage_Zip(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
+EXPORT Make_ClientLastName(SALT39.StrType s0) := MakeFT_invalid_name(s0);
+EXPORT InValid_ClientLastName(SALT39.StrType s) := InValidFT_invalid_name(s);
+EXPORT InValidMessage_ClientLastName(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
  
-EXPORT Make_did(SALT39.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_did(SALT39.StrType s) := InValidFT_invalid_numeric(s);
-EXPORT InValidMessage_did(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
+EXPORT Make_ClientPhone(SALT39.StrType s0) := MakeFT_invalid_phone(s0);
+EXPORT InValid_ClientPhone(SALT39.StrType s) := InValidFT_invalid_phone(s);
+EXPORT InValidMessage_ClientPhone(UNSIGNED1 wh) := InValidMessageFT_invalid_phone(wh);
+ 
+EXPORT Make_ClientEmail(SALT39.StrType s0) := MakeFT_invalid_email(s0);
+EXPORT InValid_ClientEmail(SALT39.StrType s) := InValidFT_invalid_email(s);
+EXPORT InValidMessage_ClientEmail(UNSIGNED1 wh) := InValidMessageFT_invalid_email(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -134,47 +200,49 @@ export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_cou
 Bad_Pivots := %t2%(Cnt>100);
 #uniquename(dl)
   %dl% := RECORD
-    BOOLEAN Diff_Customer_Account_Number;
-    BOOLEAN Diff_Customer_County;
-    BOOLEAN Diff_Customer_State;
-    BOOLEAN Diff_Customer_Agency_Vertical_Type;
-    BOOLEAN Diff_Customer_Program;
-    BOOLEAN Diff_LexID;
-    BOOLEAN Diff_raw_Full_Name;
-    BOOLEAN Diff_raw_First_name;
-    BOOLEAN Diff_raw_Last_Name;
-    BOOLEAN Diff_SSN;
-    BOOLEAN Diff_Drivers_License_State;
-    BOOLEAN Diff_Drivers_License_Number;
-    BOOLEAN Diff_Street_1;
-    BOOLEAN Diff_City;
-    BOOLEAN Diff_State;
-    BOOLEAN Diff_Zip;
-    BOOLEAN Diff_did;
+    BOOLEAN Diff_SearchAddress1StreetAddress1;
+    BOOLEAN Diff_SearchAddress1StreetAddress2;
+    BOOLEAN Diff_SearchAddress1City;
+    BOOLEAN Diff_SearchAddress1State;
+    BOOLEAN Diff_SearchAddress1Zip;
+    BOOLEAN Diff_SearchAddress2StreetAddress1;
+    BOOLEAN Diff_SearchAddress2StreetAddress2;
+    BOOLEAN Diff_SearchAddress2City;
+    BOOLEAN Diff_SearchAddress2State;
+    BOOLEAN Diff_SearchAddress2Zip;
+    BOOLEAN Diff_SearchCaseId;
+    BOOLEAN Diff_enduserip;
+    BOOLEAN Diff_CaseID;
+    BOOLEAN Diff_ClientFirstName;
+    BOOLEAN Diff_ClientMiddleName;
+    BOOLEAN Diff_ClientLastName;
+    BOOLEAN Diff_ClientPhone;
+    BOOLEAN Diff_ClientEmail;
     UNSIGNED Num_Diffs;
     SALT39.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
-    SELF.Diff_Customer_Account_Number := le.Customer_Account_Number <> ri.Customer_Account_Number;
-    SELF.Diff_Customer_County := le.Customer_County <> ri.Customer_County;
-    SELF.Diff_Customer_State := le.Customer_State <> ri.Customer_State;
-    SELF.Diff_Customer_Agency_Vertical_Type := le.Customer_Agency_Vertical_Type <> ri.Customer_Agency_Vertical_Type;
-    SELF.Diff_Customer_Program := le.Customer_Program <> ri.Customer_Program;
-    SELF.Diff_LexID := le.LexID <> ri.LexID;
-    SELF.Diff_raw_Full_Name := le.raw_Full_Name <> ri.raw_Full_Name;
-    SELF.Diff_raw_First_name := le.raw_First_name <> ri.raw_First_name;
-    SELF.Diff_raw_Last_Name := le.raw_Last_Name <> ri.raw_Last_Name;
-    SELF.Diff_SSN := le.SSN <> ri.SSN;
-    SELF.Diff_Drivers_License_State := le.Drivers_License_State <> ri.Drivers_License_State;
-    SELF.Diff_Drivers_License_Number := le.Drivers_License_Number <> ri.Drivers_License_Number;
-    SELF.Diff_Street_1 := le.Street_1 <> ri.Street_1;
-    SELF.Diff_City := le.City <> ri.City;
-    SELF.Diff_State := le.State <> ri.State;
-    SELF.Diff_Zip := le.Zip <> ri.Zip;
-    SELF.Diff_did := le.did <> ri.did;
+    SELF.Diff_SearchAddress1StreetAddress1 := le.SearchAddress1StreetAddress1 <> ri.SearchAddress1StreetAddress1;
+    SELF.Diff_SearchAddress1StreetAddress2 := le.SearchAddress1StreetAddress2 <> ri.SearchAddress1StreetAddress2;
+    SELF.Diff_SearchAddress1City := le.SearchAddress1City <> ri.SearchAddress1City;
+    SELF.Diff_SearchAddress1State := le.SearchAddress1State <> ri.SearchAddress1State;
+    SELF.Diff_SearchAddress1Zip := le.SearchAddress1Zip <> ri.SearchAddress1Zip;
+    SELF.Diff_SearchAddress2StreetAddress1 := le.SearchAddress2StreetAddress1 <> ri.SearchAddress2StreetAddress1;
+    SELF.Diff_SearchAddress2StreetAddress2 := le.SearchAddress2StreetAddress2 <> ri.SearchAddress2StreetAddress2;
+    SELF.Diff_SearchAddress2City := le.SearchAddress2City <> ri.SearchAddress2City;
+    SELF.Diff_SearchAddress2State := le.SearchAddress2State <> ri.SearchAddress2State;
+    SELF.Diff_SearchAddress2Zip := le.SearchAddress2Zip <> ri.SearchAddress2Zip;
+    SELF.Diff_SearchCaseId := le.SearchCaseId <> ri.SearchCaseId;
+    SELF.Diff_enduserip := le.enduserip <> ri.enduserip;
+    SELF.Diff_CaseID := le.CaseID <> ri.CaseID;
+    SELF.Diff_ClientFirstName := le.ClientFirstName <> ri.ClientFirstName;
+    SELF.Diff_ClientMiddleName := le.ClientMiddleName <> ri.ClientMiddleName;
+    SELF.Diff_ClientLastName := le.ClientLastName <> ri.ClientLastName;
+    SELF.Diff_ClientPhone := le.ClientPhone <> ri.ClientPhone;
+    SELF.Diff_ClientEmail := le.ClientEmail <> ri.ClientEmail;
     SELF.Val := (SALT39.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_Customer_Account_Number,1,0)+ IF( SELF.Diff_Customer_County,1,0)+ IF( SELF.Diff_Customer_State,1,0)+ IF( SELF.Diff_Customer_Agency_Vertical_Type,1,0)+ IF( SELF.Diff_Customer_Program,1,0)+ IF( SELF.Diff_LexID,1,0)+ IF( SELF.Diff_raw_Full_Name,1,0)+ IF( SELF.Diff_raw_First_name,1,0)+ IF( SELF.Diff_raw_Last_Name,1,0)+ IF( SELF.Diff_SSN,1,0)+ IF( SELF.Diff_Drivers_License_State,1,0)+ IF( SELF.Diff_Drivers_License_Number,1,0)+ IF( SELF.Diff_Street_1,1,0)+ IF( SELF.Diff_City,1,0)+ IF( SELF.Diff_State,1,0)+ IF( SELF.Diff_Zip,1,0)+ IF( SELF.Diff_did,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_SearchAddress1StreetAddress1,1,0)+ IF( SELF.Diff_SearchAddress1StreetAddress2,1,0)+ IF( SELF.Diff_SearchAddress1City,1,0)+ IF( SELF.Diff_SearchAddress1State,1,0)+ IF( SELF.Diff_SearchAddress1Zip,1,0)+ IF( SELF.Diff_SearchAddress2StreetAddress1,1,0)+ IF( SELF.Diff_SearchAddress2StreetAddress2,1,0)+ IF( SELF.Diff_SearchAddress2City,1,0)+ IF( SELF.Diff_SearchAddress2State,1,0)+ IF( SELF.Diff_SearchAddress2Zip,1,0)+ IF( SELF.Diff_SearchCaseId,1,0)+ IF( SELF.Diff_enduserip,1,0)+ IF( SELF.Diff_CaseID,1,0)+ IF( SELF.Diff_ClientFirstName,1,0)+ IF( SELF.Diff_ClientMiddleName,1,0)+ IF( SELF.Diff_ClientLastName,1,0)+ IF( SELF.Diff_ClientPhone,1,0)+ IF( SELF.Diff_ClientEmail,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -187,23 +255,24 @@ Bad_Pivots := %t2%(Cnt>100);
   %Closest% := DEDUP(SORT(%DiffL%,Val,Num_Diffs,local),Val,local); // Join will have distributed by pivot_exp
 #uniquename(AggRec)
   %AggRec% := RECORD
-    Count_Diff_Customer_Account_Number := COUNT(GROUP,%Closest%.Diff_Customer_Account_Number);
-    Count_Diff_Customer_County := COUNT(GROUP,%Closest%.Diff_Customer_County);
-    Count_Diff_Customer_State := COUNT(GROUP,%Closest%.Diff_Customer_State);
-    Count_Diff_Customer_Agency_Vertical_Type := COUNT(GROUP,%Closest%.Diff_Customer_Agency_Vertical_Type);
-    Count_Diff_Customer_Program := COUNT(GROUP,%Closest%.Diff_Customer_Program);
-    Count_Diff_LexID := COUNT(GROUP,%Closest%.Diff_LexID);
-    Count_Diff_raw_Full_Name := COUNT(GROUP,%Closest%.Diff_raw_Full_Name);
-    Count_Diff_raw_First_name := COUNT(GROUP,%Closest%.Diff_raw_First_name);
-    Count_Diff_raw_Last_Name := COUNT(GROUP,%Closest%.Diff_raw_Last_Name);
-    Count_Diff_SSN := COUNT(GROUP,%Closest%.Diff_SSN);
-    Count_Diff_Drivers_License_State := COUNT(GROUP,%Closest%.Diff_Drivers_License_State);
-    Count_Diff_Drivers_License_Number := COUNT(GROUP,%Closest%.Diff_Drivers_License_Number);
-    Count_Diff_Street_1 := COUNT(GROUP,%Closest%.Diff_Street_1);
-    Count_Diff_City := COUNT(GROUP,%Closest%.Diff_City);
-    Count_Diff_State := COUNT(GROUP,%Closest%.Diff_State);
-    Count_Diff_Zip := COUNT(GROUP,%Closest%.Diff_Zip);
-    Count_Diff_did := COUNT(GROUP,%Closest%.Diff_did);
+    Count_Diff_SearchAddress1StreetAddress1 := COUNT(GROUP,%Closest%.Diff_SearchAddress1StreetAddress1);
+    Count_Diff_SearchAddress1StreetAddress2 := COUNT(GROUP,%Closest%.Diff_SearchAddress1StreetAddress2);
+    Count_Diff_SearchAddress1City := COUNT(GROUP,%Closest%.Diff_SearchAddress1City);
+    Count_Diff_SearchAddress1State := COUNT(GROUP,%Closest%.Diff_SearchAddress1State);
+    Count_Diff_SearchAddress1Zip := COUNT(GROUP,%Closest%.Diff_SearchAddress1Zip);
+    Count_Diff_SearchAddress2StreetAddress1 := COUNT(GROUP,%Closest%.Diff_SearchAddress2StreetAddress1);
+    Count_Diff_SearchAddress2StreetAddress2 := COUNT(GROUP,%Closest%.Diff_SearchAddress2StreetAddress2);
+    Count_Diff_SearchAddress2City := COUNT(GROUP,%Closest%.Diff_SearchAddress2City);
+    Count_Diff_SearchAddress2State := COUNT(GROUP,%Closest%.Diff_SearchAddress2State);
+    Count_Diff_SearchAddress2Zip := COUNT(GROUP,%Closest%.Diff_SearchAddress2Zip);
+    Count_Diff_SearchCaseId := COUNT(GROUP,%Closest%.Diff_SearchCaseId);
+    Count_Diff_enduserip := COUNT(GROUP,%Closest%.Diff_enduserip);
+    Count_Diff_CaseID := COUNT(GROUP,%Closest%.Diff_CaseID);
+    Count_Diff_ClientFirstName := COUNT(GROUP,%Closest%.Diff_ClientFirstName);
+    Count_Diff_ClientMiddleName := COUNT(GROUP,%Closest%.Diff_ClientMiddleName);
+    Count_Diff_ClientLastName := COUNT(GROUP,%Closest%.Diff_ClientLastName);
+    Count_Diff_ClientPhone := COUNT(GROUP,%Closest%.Diff_ClientPhone);
+    Count_Diff_ClientEmail := COUNT(GROUP,%Closest%.Diff_ClientEmail);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

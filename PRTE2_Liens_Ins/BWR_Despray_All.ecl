@@ -1,4 +1,4 @@
-/* *********************************************************************************************
+﻿/* *********************************************************************************************
  PRTE2_Liens_Ins.BWR_Despray_All
  This is for despraying base data to csv files
 ********************************************************************************************* */
@@ -9,14 +9,14 @@ IMPORT PRTE2_Liens_Ins, PRTE2_Common;
 STRING dateString := PRTE2_Common.Constants.TodayString+'';
 
 // ----- DEV DESPRAY ---------------------------------------------------------
-// desprayNameMain	:= 'Liens_Main_DEV_'+dateString+'.csv';
-// desprayNameParty	:= 'Liens_Party_DEV_'+dateString+'.csv';
+// desprayNameMain	:= 'Liens_MainV2_DEV_'+dateString+'.csv';
+// desprayNameParty	:= 'Liens_PartyV2_DEV_'+dateString+'.csv';
 // Export_Main		:=	SORT(PRTE2_Liens_Ins.Files.Main_IN_DS,tmsid);
 // Export_Party		:=	SORT(PRTE2_Liens_Ins.Files.Party_IN_DS,tmsid);
 // ---------------------------------------------------------------------------
 // ---- PROD DESPRAY ---------------------------------------------------------
-desprayNameMain	:= 'Liens_Main_PROD_'+dateString+'.csv';
-desprayNameParty	:= 'Liens_Party_PROD_'+dateString+'.csv';
+desprayNameMain	:= 'Liens_MainV2_PROD_'+dateString+'.csv';
+desprayNameParty	:= 'Liens_PartyV2_PROD_'+dateString+'.csv';
 Export_Main		:=	SORT(PRTE2_Liens_Ins.Files.Main_IN_DS_PROD,tmsid); //Prod file.
 Export_Party		:=	SORT(PRTE2_Liens_Ins.Files.Party_IN_DS_PROD,tmsid); //Prod file.
 // ---------------------------------------------------------------------------

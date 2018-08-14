@@ -1,4 +1,4 @@
-import FraudShared;
+﻿import FraudShared;
 EXPORT Constants(
 
 	BOOLEAN	pUseOtherEnvironment	= true
@@ -30,6 +30,6 @@ MODULE
 	EXPORT 	special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|\\.|;|_|#|%|&|\\*|<|>|/|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
   EXPORT  word_characters       := ' A | ABC | AN | AND | ANY | AS | AT | BUT | BY | ETC | FOR | FROM | IN | NA | OF | ON | OR | OTH | OTHER | PER | THAN | THE | THEN | TO | UP | WITH ';
 
-
+	EXPORT FirstRingID			:= 900000000000;
 
 END;

@@ -431,7 +431,7 @@ sortedOffender :=  sort(distribute(LNMain(),HASH(seisint_primary_key,vendor_code
                            professional_licenses_1 , professional_licenses_2 , professional_licenses_3 , professional_licenses_4 , professional_licenses_5 ,	
                            school , school_address_1 ,  school_address_2 , school_address_3 , school_address_4 ,  school_address_5 ,
                            school_county , school_phone , school_comments ,
-                           doc_number , sor_number , st_id_number , fbi_number , ncic_number , ssn , dob , dob_aka , age , dna , race , ethnicity , sex ,
+                           doc_number , sor_number , st_id_number , fbi_number , ncic_number , ssn , dob , dob_aka , dna , race , ethnicity , sex ,
                            hair_color , eye_color , height , weight ,  skin_tone ,  build_type ,  scars_marks_tattoos ,  shoe_size ,  corrective_lense_flag ,
                            addl_comments_1 , addl_comments_2 ,  orig_dl_number ,  orig_dl_state ,  orig_dl_link ,  orig_dl_date ,
 	                         passport_type ,  passport_code ,  passport_number ,  passport_first_name ,	 passport_given_name ,  passport_nationality ,  passport_dob ,					
@@ -446,7 +446,7 @@ sortedOffender :=  sort(distribute(LNMain(),HASH(seisint_primary_key,vendor_code
 													 prim_range ,predir ,prim_name ,addr_suffix ,postdir ,unit_desig ,sec_range ,p_city_name ,st ,zip5 ,													 
 													 rawaid,
                            curr_incar_flag ,   curr_parole_flag ,   curr_probation_flag ,	 fcra_conviction_flag ,	 fcra_traffic_flag ,	 fcra_date ,	 fcra_date_type ,
-	                         conviction_override_date ,	 conviction_override_date_type ,	 offense_score ,- offender_id ,local);
+	                         conviction_override_date ,	 conviction_override_date_type ,	 offense_score ,- offender_id, - age ,local);
 	 
 dedupedOffender:= dedup(sortedOffender,
                            seisint_primary_key,  vendor_code ,   source_file ,	 offender_persistent_id,
@@ -472,7 +472,7 @@ dedupedOffender:= dedup(sortedOffender,
                            professional_licenses_1 , professional_licenses_2 , professional_licenses_3 , professional_licenses_4 , professional_licenses_5 ,	
                            school , school_address_1 ,  school_address_2 , school_address_3 , school_address_4 ,  school_address_5 ,
                            school_county , school_phone , school_comments ,// offender_id ,
-                           doc_number , sor_number , st_id_number , fbi_number , ncic_number , ssn , dob , dob_aka , age , dna , race , ethnicity , sex ,
+                           doc_number , sor_number , st_id_number , fbi_number , ncic_number , ssn , dob , dob_aka , dna , race , ethnicity , sex ,
                            hair_color , eye_color , height , weight ,  skin_tone ,  build_type ,  scars_marks_tattoos ,  shoe_size ,  corrective_lense_flag ,
                            addl_comments_1 , addl_comments_2 ,  orig_dl_number ,  orig_dl_state ,  orig_dl_link ,  orig_dl_date ,
 	                         passport_type ,  passport_code ,  passport_number ,  passport_first_name ,	 passport_given_name ,  passport_nationality ,  passport_dob ,					
