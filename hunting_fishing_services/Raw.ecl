@@ -1,4 +1,4 @@
-import eMerges, FCRA, ut, Census_Data, FFD;
+﻿import eMerges, FCRA, ut, Census_Data, FFD;
 
 export Raw := MODULE
 	export byDIDs(dataset(hunting_fishing_services.layouts.search_did) in_dids, boolean isFCRA = false) := function
@@ -44,9 +44,8 @@ export Raw := MODULE
 			
 			hunting_fishing_services.Layouts.raw_rec xformStatements( hunting_fishing_services.Layouts.raw_rec l, 
 																																FFD.Layouts.PersonContextBatchSlim r ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed)
-						
-					self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+					self.StatementIDs := r.StatementIDs;
 					self.IsDisputed   := r.isDisputed;
 					self := l;
 			end;

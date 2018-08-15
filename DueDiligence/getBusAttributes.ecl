@@ -48,7 +48,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get attribute data for the inquired business
 	busProperty    := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
 
-	busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
+	busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
 
 	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
 	

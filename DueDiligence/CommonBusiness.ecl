@@ -358,6 +358,18 @@ EXPORT CommonBusiness := MODULE
 		
 		RETURN agent;
 	END;
+  
+  EXPORT getInquiredChildDataset(inquiredBus, dsNameFromInquired) := FUNCTIONMACRO
+    child := NORMALIZE(inquiredBus, dsNameFromInquired, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, RECORDOF(RIGHT)},
+                                                                      SELF.seq := LEFT.seq;
+                                                                      SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                                                      SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                                                      SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                                                      SELF := RIGHT;
+                                                                      SELF := [];));
+		
+		RETURN child;
+  ENDMACRO;
 	
 	EXPORT getOperatingLocations(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus) := FUNCTION
 		

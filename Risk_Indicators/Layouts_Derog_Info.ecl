@@ -8,6 +8,10 @@ EXPORT Layouts_Derog_Info := MODULE
 		Layouts.Layout_Liens Liens;
 	END;
 	
+  EXPORT layout_bk_chapter := record
+    string3 chapter;
+  end;
+  
 	EXPORT 	layout_derog_process_plus := RECORD
 		layout_derog_process;
 		DATASET(fcra.Layout_Override_bk_filing) bk_corrections {MAXCOUNT(100)};
@@ -22,6 +26,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		string7  case_num; // bk extras
 		string30 sor_number;  // sex offender extra
 		unsigned4 bk_disp_date;
+    DATASET(layout_bk_chapter) bk_chapters {MAXCOUNT(50)};
+    
 	END;
 	
 	EXPORT layout_extended := RECORD
@@ -38,6 +44,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string30 sor_number; // sex offender extra
 		unsigned4 bk_disp_date;
     string60 offender_key;
+    DATASET(layout_bk_chapter) bk_chapters {MAXCOUNT(10)};
 	END;	
 	
   EXPORT 	layout_extended_plus_ftd := record

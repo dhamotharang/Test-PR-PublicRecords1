@@ -101,6 +101,20 @@ EXPORT ConsumerFlag := MODULE
       SELF.consumer_flags.alert_legal_flag := IF(le.consumer_flags.alert_legal_flag<>'',le.consumer_flags.alert_legal_flag, ri.consumer_flags.alert_legal_flag);
   END;
     
+  FFD.layouts.ConsumerFlagsBatch  xf_filter_alerts(FFD.layouts.ConsumerFlagsBatch le) := TRANSFORM
+      is_legal_hold := le.consumer_flags.alert_legal_flag <> '' AND le.suppress_records;
+      SELF.suppress_records := le.suppress_records;
+      // supress all in case of LH
+      SELF.has_record_statement := IF(is_legal_hold, FALSE, le.has_record_statement);
+      SELF.has_consumer_statement := IF(is_legal_hold, FALSE, le.has_consumer_statement);
+      SELF.consumer_flags.alert_legal_flag := le.consumer_flags.alert_legal_flag;
+      SELF.consumer_flags.alert_cnsmr_statement := '';  
+      SELF.consumer_flags.alert_security_freeze := IF(is_legal_hold, '', le.consumer_flags.alert_security_freeze);
+      SELF.consumer_flags.alert_security_fraud := IF(is_legal_hold, '', le.consumer_flags.alert_security_fraud);
+      SELF.consumer_flags.alert_identity_theft := IF(is_legal_hold, '', le.consumer_flags.alert_identity_theft);
+      SELF := le;
+  END;
+    
   EXPORT getAlertIndicators (DATASET (FFD.Layouts.PersonContextBatch) PersonContext,
                              INTEGER in_permissible_purpose = FCRA.FCRAPurpose.NoPermissiblePurpose,
                              INTEGER8 inFFDOptionsMask = 0) := FUNCTION
@@ -118,6 +132,8 @@ EXPORT ConsumerFlag := MODULE
     rolled_alerts := ROLLUP(srt_alerts, LEFT.acctno = RIGHT.acctno AND LEFT.UniqueID = RIGHT.UniqueID, 
                            xf_roll_alerts(LEFT,RIGHT));
 
-    RETURN rolled_alerts;                       
+    filtered_alerts := PROJECT(rolled_alerts, xf_filter_alerts(LEFT));
+
+    RETURN filtered_alerts;                       
  END;                          
 END;

@@ -1,4 +1,4 @@
-import iesp, patriot;
+﻿import iesp, patriot;
 
 EXPORT FormatXG5_ResponseFlat (DATASET(OFAC_XG5.Layout.ResponseRec) responseXG5) := FUNCTION
 													
@@ -58,17 +58,22 @@ EntityMatchFLAT := RECORD
 END;
 
 
-PrepDenormEntity := project(NonErrorRecs.entityRec, 
+PrepDenormEntity_pre := project(NonErrorRecs.entityRec, 
 														transform(EntityMatchFLAT, self := left, 
 																														self := []));
+
+PrepDenormEntity := DEDUP( PrepDenormEntity_pre, RECORD, ALL, HASH );
+
 AKARecord := RECORD
 	OFAC_XG5.Layout.AKABestMatches ;
 END;
 
-BestAKA := project(NonErrorRecs, 
+BestAKA_pre := project(NonErrorRecs, 
 									transform(AKARecord,
 									BestAKA := left.akaRec(bestId = akaID);
 									self := BestAKA[1]));
+
+BestAKA := DEDUP( BestAKA_pre, RECORD, ALL, HASH );
 									
 AddBestAKA := join(prepDenormEntity, BestAKA, 
 									left.blockID = right.blockID and left.EntitySeq = right.EntitySeq,
@@ -124,7 +129,9 @@ AddressMatchPlus GetAddressParts(OFAC_XG5.Layout.AddressMatches le) :=  TRANSFOR
 	self := le;
 END;																														
 
-PrepAddress := project(NonErrorRecs.addrRec(addresstype <> 0), GetAddressParts(left));
+PrepAddress_pre := project(NonErrorRecs.addrRec(addresstype <> 0), GetAddressParts(left));
+
+PrepAddress := DEDUP( PrepAddress_pre, RECORD, ALL, HASH );
 
 AddressMatchPlus normAddrs(PrepAddress le, integer File_counter) := TRANSFORM
 	self.AddrValue := if(File_counter = 1, le.addr1,  le.addr2);
@@ -262,9 +269,26 @@ patriot.layout_batch_out formatOut(NonErrorRecs le , DenormAddr ri) :=  TRANSFOR
 	self := [];
 END;
 
-filled_outXG5Flat := join(NonErrorRecs, AddRemarks,  
+filled_outXG5Flat_pre := join(NonErrorRecs, AddRemarks,  
 											left.blockid = right.blockid and
 											left.entityseq = right.entityseq, formatOut(LEFT, right), left outer);
+
+filled_outXG5Flat := DEDUP( filled_outXG5Flat_pre, RECORD, ALL, HASH );
+
+// OUTPUT( NonErrorRecs, NAMED('NonErrorRecs') );
+// OUTPUT( PrepDenormEntity, NAMED('PrepDenormEntity') );
+// OUTPUT( BestAKA, NAMED('BestAKA') );
+// OUTPUT( AddBestAKA, NAMED('AddBestAKA') );
+// OUTPUT( PrepAddress, NAMED('PrepAddress') );
+// OUTPUT( normAddress, NAMED('normAddress') );
+// OUTPUT( alladdress, NAMED('alladdress') );
+// OUTPUT( DenormAddr, NAMED('DenormAddr') );
+// OUTPUT( normMatchIDRemarks, NAMED('normMatchIDRemarks') );
+// OUTPUT( normDescRemarks, NAMED('normDescRemarks') );
+// OUTPUT( normEntityRemarks, NAMED('normEntityRemarks') );
+// OUTPUT( AllRemarks, NAMED('AllRemarks') );
+// OUTPUT( AddRemarks, NAMED('AddRemarks') );
+// OUTPUT( filled_outXG5Flat, NAMED('filled_outXG5Flat') );
 
 RETURN filled_outXG5Flat;
 

@@ -13,7 +13,7 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		isOwner:=L.isCurrentOwner OR L.isTaxYearOwner;
 		propertyInDateRange:=L.inputTaxYear BETWEEN MIN(L.seenDates,tax_year) AND MAX(L.seenDates,tax_year) OR L.lastSeen <= L.inputTaxYear;
 		SELF.acctno:=IF(L.property_rank<=HomesteadExemptionV2_Services.Constants.INPUT_ADDR OR (isOwner AND propertyInDateRange) OR in_mod.IncludePrevOwnedProps,L.acctno,SKIP);
-		SELF.property_rank:=L.property_rank DIV 10;
+		SELF.property_rank:=IF(L.property_rank<=HomesteadExemptionV2_Services.Constants.ASSESS_ONLY,L.property_rank DIV 10,SKIP);
 
 		// MOST RECENT DEED RECORD
 		deed:=SORT(L.deed_records.deeds(isBuyerBorrower,sortby_date[1..4]<=L.inputTaxYear),-sortby_date,-vendor_source_flag);
@@ -230,6 +230,7 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 	HomesteadExemptionV2_Services.Layouts.batchWorkRec batchRecords(HomesteadExemptionV2_Services.Layouts.workRec L) := TRANSFORM
 		// LEXID
 		SELF.acctno:=L.acctno;
+		SELF.clientid:=L.orig_clientid;
 		SELF.lexid:=L.did;
 		SELF.lexid_score:=L.score;
 		SELF.exception:=IF(L.error_code!=0,'Y','');

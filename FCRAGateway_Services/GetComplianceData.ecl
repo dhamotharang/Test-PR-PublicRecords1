@@ -15,7 +15,8 @@ EXPORT GetComplianceData(DATASET(iesp.person_picklist.t_PersonPickListRequest) p
 	ds_dids := dataset([{FFD.Constants.SingleSearchAcctno, plist_did}], FFD.Layouts.DidBatch);
 	ds_person_context := IF(plist_did > 0,
 		FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.Person, params.FFDOptionsMask));
-	ds_consumer_statements := FFD.prepareConsumerStatements(ds_person_context);
+	boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(params.FFDOptionsMask);
+	ds_consumer_statements := if(ShowConsumerStatements, FFD.prepareConsumerStatements(ds_person_context),FFD.Constants.BlankConsumerStatements);
 
 	//Check if we need to suppress the report due to credit alerts.
 	alert_indicators := FFD.ConsumerFlag.getAlertIndicators(ds_person_context, params.FCRAPurpose, params.FFDOptionsMask)[1];

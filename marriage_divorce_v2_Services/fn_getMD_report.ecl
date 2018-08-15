@@ -1,4 +1,4 @@
-import marriage_divorce_v2_Services, ut, Codes, Census_Data, AutoStandardI, suppress, address, fcra, FFD;
+﻿import marriage_divorce_v2_Services, ut, Codes, Census_Data, AutoStandardI, suppress, address, fcra, FFD;
 
 l_result	:= marriage_divorce_v2_Services.layouts.result.wide_tmp;
 l_id			:= marriage_divorce_v2_Services.layouts.expanded_id; //layouts.l_id;
@@ -72,8 +72,8 @@ export dataset(l_result) fn_getMD_report(
 	
 // Remove or mark Disputed md & add StatementIDs
 	rec_md_raw xformMD ( rec_md_raw L, FFD.Layouts.PersonContextBatchSlim R ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+			self.StatementIDs := r.StatementIds;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 	end;
@@ -118,8 +118,8 @@ export dataset(l_result) fn_getMD_report(
 	
 								
 	rec_party_raw xformParty ( rec_party_raw L, FFD.Layouts.PersonContextBatchSlim R ) := transform,
-	skip(~ShowDisputedRecords and r.isDisputed) 
-		self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+	skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+		self.StatementIDs := r.StatementIds;
 		self.isDisputed :=	r.isDisputed;
 		self := L;
 		self := [];

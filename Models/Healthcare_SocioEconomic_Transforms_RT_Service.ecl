@@ -604,7 +604,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		//Condition_1_2_Reject_DS;
 		Output_Condition_1_2_Reject_DS := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) > 0, Condition_1_2_Reject_DS(code<>0), EmptyExceptionDS);
 
-		Minor_Rej_Row := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) < 1 AND isMinor, ROW({_blank, Models.Healthcare_Constants_RT_Service.MemberGender_Rej_Code, _blank, Models.Healthcare_Constants_RT_Service.MemberGender_Rej_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow);
+		Minor_Rej_Row := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) < 1 AND isMinor, ROW({_blank, Models.Healthcare_Constants_RT_Service.Minor_Rej_Code, _blank, Models.Healthcare_Constants_RT_Service.Minor_Rej_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow);
 		Minor_Rej_DS := EmptyExceptionDS + Minor_Rej_Row;
 		Output_Condition_1_2_Minor_Reject_DS := Output_Condition_1_2_Reject_DS + Minor_Rej_DS;
 		return Output_Condition_1_2_Minor_Reject_DS(code<>0);

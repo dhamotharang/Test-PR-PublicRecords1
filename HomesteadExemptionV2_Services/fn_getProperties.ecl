@@ -7,7 +7,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 		KEYED(LEFT.did=RIGHT.s_did) AND	RIGHT.source_code_2='P',
 		TRANSFORM(HomesteadExemptionV2_Services.Layouts.fidSrchRec,
 			SELF.acctno       :=LEFT.acctno,
-			SELF.link_acctno  :=LEFT.link_acctno,
+			SELF.link_clientid :=LEFT.link_clientid,
 			SELF.ln_fares_id  :=RIGHT.ln_fares_id,
 			SELF.search_did   :=LEFT.did,
 			SELF.inputTaxYear :=LEFT.tax_year,
@@ -107,7 +107,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 		assess_sortby_date :=MAX(R.assessment_records.assessments(isAssessee),sortby_date);
 		SELF.sortby_date   :=MAX(deed_sortby_date,assess_sortby_date);
 
-		SELF.link_acctno   :=IF(hasDeedRecords,L.link_acctno,R.link_acctno);
+		SELF.link_clientid :=IF(hasDeedRecords,L.link_clientid,R.link_clientid);
 		SELF.dids          :=IF(hasDeedRecords,L.dids,R.dids);
 		SELF.inputTaxYear  :=IF(hasDeedRecords,L.inputTaxYear,R.inputTaxYear);
 		SELF.inputTaxState :=IF(hasDeedRecords,L.inputTaxState,R.inputTaxState);
@@ -170,7 +170,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 	// DEDUP PROPERTIES BY CO-OWNER
 
 	propLinkAcctRec:=RECORD
-		HomesteadExemptionV2_Services.Layouts.workRecSlim.link_acctno;
+		HomesteadExemptionV2_Services.Layouts.workRecSlim.link_clientid;
 		DATASET(HomesteadExemptionV2_Services.Layouts.propertyRec) property_records;
 	END;
 
@@ -188,7 +188,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 	prop_link_parent_recs:=DEDUP(PROJECT(ds_prop_join_recs,TRANSFORM(propLinkAcctRec,SELF:=LEFT,SELF:=[])),ALL);
 
 	prop_link_acct_recs:=DENORMALIZE(prop_link_parent_recs,ds_prop_join_recs,
-		LEFT.link_acctno=RIGHT.link_acctno,GROUP,removeJointOwnedProperties(LEFT,ROWS(RIGHT)));
+		LEFT.link_clientid=RIGHT.link_clientid,GROUP,removeJointOwnedProperties(LEFT,ROWS(RIGHT)));
 
 	ds_prop_recs:=NORMALIZE(prop_link_acct_recs,LEFT.property_records,
 		TRANSFORM(HomesteadExemptionV2_Services.Layouts.propertyRec,SELF:=RIGHT));

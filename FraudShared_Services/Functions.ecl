@@ -89,9 +89,9 @@ EXPORT Functions := MODULE
 				],FraudShared_Services.Layouts.layout_rules);
 															
 		// ds_rulesFraudGov :=  FraudShared.Key_Velocityrules(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)(KEYED(gc_id =  batch_params.GlobalCompanyId));
-		ds_rulesFraudGovBase 			:= FraudShared.Key_MBSVelocityrules(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)(KEYED(gc_id =  batch_params.GlobalCompanyId));
+		ds_rulesFraudGovBase := FraudShared.Key_MBSVelocityrules(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)(KEYED(gc_id =  batch_params.GlobalCompanyId));
 		ds_rulesFraudGovDefault := FraudShared.Key_MBSVelocityrules(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)(KEYED(gc_id =  0));//default rules are stored with gc_id=0
-		ds_rulesFraudGov 							:= IF(count(ds_rulesFraudGovBase) > 0, ds_rulesFraudGovBase, ds_rulesFraudGovDefault);
+		ds_rulesFraudGov := IF(count(ds_rulesFraudGovBase) > 0, ds_rulesFraudGovBase, ds_rulesFraudGovDefault);
 		
 		mbs_rulesFraudGov := PROJECT(ds_rulesFraudGov, TRANSFORM(FraudShared_Services.Layouts.layout_rules,
 																											 SELF.description := STD.Str.CleanSpaces(LEFT.description),
@@ -171,18 +171,26 @@ EXPORT Functions := MODULE
 			ds_buckets_out := MAP(allContrib => ds_buckets_contrib,
 													  useContributionType => ds_buckets_contrib, 
 														ds_buckets_no_contrib);	
-
+			
+			ds_buckets_out_group_all := GROUP(SORT(ds_buckets_out, acctno, fragment, contributionType, ruleNum), acctno, fragment, contributionType, ruleNum);
+			ds_buckets_out_group_notall := GROUP(SORT(ds_buckets_out, acctno, fragment, ruleNum), acctno, fragment, ruleNum);
+															
+			temp_rec := RECORD
+				ds_buckets_out.acctno;
+				ds_buckets_out.fragment; 
+				ds_buckets_out.contributionType;
+				ds_buckets_out.fragment_weight;
+				ds_buckets_out.category_weight;
+				ds_buckets_out.ruleNum;
+				ds_buckets_out.maxCnt;
+				ds_buckets_out.numDays;
+				ds_buckets_out.description;
+				foundCnt := COUNT(GROUP);
+			END;
+			
 			ds_velocity_cands := MAP(allContrib =>
-																	TABLE(ds_buckets_out,
-																	// don't really need contributionType, description or maxCnt here
-																	// but the datasets have to be the same size.
-																		{acctno, fragment, contributionType, fragment_weight, category_weight, 
-																		 ruleNum, maxCnt, numDays, description, foundCnt := COUNT(GROUP)},
-																		 acctno, fragment, ruleNum),
-																	TABLE(ds_buckets_out, 
-																		{acctno, fragment, contributionType, fragment_weight, category_weight, 
-																		 ruleNum, maxCnt, numDays, description, foundCnt := COUNT(GROUP)},
-																		 acctno, fragment, contributionType, ruleNum));
+																	TABLE(ds_buckets_out_group_notall, temp_rec),
+																	TABLE(ds_buckets_out_group_all, temp_rec));
 
 			ds_velocity_cands_temp := PROJECT(ds_velocity_cands, 
 																		TRANSFORM(FraudShared_Services.Layouts.layout_buckets_found,

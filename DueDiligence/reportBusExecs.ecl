@@ -137,7 +137,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                           //*** this is an INNER JOIN - so it will KEEP only matches  ***//                          
                           //*** at this time we are going to LIMIT the number matches ***//
                           //*** and KEEP the same number in the report                ***//
-                          LIMIT(100), KEEP(100));  
+                          ATMOST(100), KEEP(100));  
                           
   //Now while processing the associated businesses - SORT and eliminate duplicate LINKIDs  
   dedupBusMatches := DEDUP(SORT(busAssociations, Busn_Info.BIP_IDs.seq, Busn_info.BIP_IDs.UltID.LinkID, Busn_info.BIP_IDs.OrgID.LinkID, Busn_info.BIP_IDs.SeleID.LinkID), 

@@ -104,6 +104,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.bk_count36 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(3));
 		SELF.BJL.bk_count60 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(5));
 		SELF.BJL.bk_chapter := ri.chapter;
+    SELF.bk_chapters := dataset([{ri.chapter}], risk_indicators.Layouts_Derog_Info.layout_bk_chapter);
 		SELF.bk_disp_date := max((INTEGER)ri.date_filed, 
 				if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));
 		//these new fields for BS 5.3 are populated in the next join - default here
@@ -152,6 +153,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.filing_type := IF (takeLeft, le.bjl.filing_type, ri.bjl.filing_type);//le.BJL.filing_type;
 		SELF.BJL.disposition := IF (takeLeft, le.bjl.disposition, ri.bjl.disposition);//le.BJL.disposition;
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
+    SELF.bk_chapters :=  IF(sameBankruptcy, le.bk_chapters, le.bk_chapters + ri.bk_chapters);  
 		
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
 		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy,0,ri.BJL.filing_count120);

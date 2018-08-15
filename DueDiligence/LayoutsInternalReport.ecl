@@ -26,20 +26,6 @@ EXPORT LayoutsInternalReport := MODULE
 		STRING12	manufactureModelCode;		//used to get number of engines
   END;								
 
-  EXPORT BusWatercraftSlimLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
-		STRING30 watercraftKey;		//used to get watercraft details
-	  STRING30 sequenceKey;			//used to get watercraft details
-		STRING2 stateOrigin;			//used to get watercraft details
-		YearMakeModel;
-		STRING		vesselType;
-		UNSIGNED2 vesselLengthFeet;
-		UNSIGNED2 vesselLengthInches;
-		UNSIGNED2 vesselTotalLength;
-		STRING		propulsion;
-		VinTitleAndRegistration;
-		UNSIGNED2 watercraftCount;
-  END;
   
   EXPORT SharedPropertyLayout := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
@@ -47,6 +33,22 @@ EXPORT LayoutsInternalReport := MODULE
     DueDiligence.Layouts.GeographicRiskLayout;
   END;
 
+  
+  EXPORT SharedWatercraftLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DueDiligence.Layouts.DIDAndName) owners;
+    iesp.duediligenceshared.t_DDRWatercraft;
+  END;
+ 
+ EXPORT SharedVehicleLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DueDiligence.Layouts.DIDAndName) owners;
+    iesp.duediligenceshared.t_DDRMotorVehicle;
+  END;
 	
 	
 	EXPORT ListOfBusSourceLayout := RECORD

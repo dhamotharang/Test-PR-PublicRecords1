@@ -51,7 +51,7 @@ EXPORT getVerificationDataFromEquifax(dataset(iesp.employment_verification_fcra.
  
 
  Gateway_eq_evs := Gateways(Gateway.Configuration.IsEquifaxEVS(servicename))[1];
- gateway_results := gateway.SoapCall_EquifaxEVS(input_to_gateway,Gateway_eq_evs,makeGWCall);
+ gateway_results := if (makeGWCall, gateway.SoapCall_EquifaxEVS(input_to_gateway,Gateway_eq_evs,makeGWCall));
  //output(input_to_gateway,named('input_to_gateway'));
 return(gateway_results);
 end;

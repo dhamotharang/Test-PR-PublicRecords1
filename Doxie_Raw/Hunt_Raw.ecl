@@ -1,4 +1,4 @@
-//============================================================================
+﻿//============================================================================
 // Attribute: Hunt_raw.  Used by view source service and comp-report.
 // Function to get hunting and fishing records by did.
 // Return: dataset.  Layout: plusdid.
@@ -54,8 +54,8 @@ export Hunt_Raw(dataset(Doxie.layout_references) dids,
 		hunt_fcra := raw + hunt_override_st;
 
 		out_rec xformAddStatementIDs(out_rec l, FFD.Layouts.PersonContextBatchSlim r) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed)
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIDs,
 			self.isDisputed := r.isDisputed,
 			self := l
 		end;

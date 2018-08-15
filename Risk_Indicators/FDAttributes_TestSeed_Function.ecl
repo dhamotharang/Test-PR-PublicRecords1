@@ -8,6 +8,8 @@ FUNCTION
 	
 	
 	Models.Layout_FraudAttributes create_output(inData le, Seed_Files.Key_FDAttributes ri) := TRANSFORM
+    //RQ-14267: append a fake DID to testseed records. Make sure we hit the testseed key by checking fname for non blank.
+    self.input.DID := if(ri.fname <> '', Risk_Indicators.iid_constants.fn_CreateFakeDID((string)le.fname, (string)le.lname), 0);
 		self.input := le;
 		self.accountnumber := account_value;
 		self.version1 := ri.version1;

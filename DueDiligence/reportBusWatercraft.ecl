@@ -1,64 +1,54 @@
-﻿IMPORT codes, DueDiligence, faa, iesp, BIPv2;
+﻿IMPORT DueDiligence, iesp;
 
-EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData, 
-													 DATASET(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout) watercraftSlim) := FUNCTION
-
-
-	//group slimmed dataset by seq and linkIDs so counter can count per group
-	groupSlim := GROUP(watercraftSlim, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-
-	
-	//Transform to limit the number of data in our dataset
-	DueDiligence.LayoutsInternalReport.BusWatercraftReportChildren getReportChildren(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout wsl, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxWatercraft)
-		SELF.water := PROJECT(wsl, TRANSFORM(iesp.duediligenceshared.t_DDRWatercraft,
-																				SELF.yearMakeModel.year := LEFT.year;
-																				SELF.yearMakeModel.make := LEFT.make;
-																				SELF.yearMakeModel.model := LEFT.model;
-                                        
-																				SELF.vesselType.detailType := LEFT.vesselType;
-                                        
-																				SELF.lengthFeet := LEFT.vesselLengthFeet;
-																				SELF.lengthInches := LEFT.vesselLengthInches;
-																				SELF.title.state := LEFT.titleState;
-																				SELF.title.date.year := (INTEGER)LEFT.titleDate[1..4];
-                                        SELF.title.date.month := (INTEGER)LEFT.titleDate[5..6];
-                                        SELF.title.date.day := (INTEGER)LEFT.titleDate[7..8];
-																				
-                                        SELF.registration.state := LEFT.registrationState;
-                                        SELF.registration.date.year := (INTEGER)LEFT.registrationDate[1..4];
-                                        SELF.registration.date.month := (INTEGER)LEFT.registrationDate[5..6];
-                                        SELF.registration.date.day := (INTEGER)LEFT.registrationDate[7..8];
-																																																											
-																				SELF.VINNumber.vin := LEFT.vin;
-                                        SELF.Propulsion := LEFT.propulsion;
-
-																				SELF := [];));
-		SELF := wsl;
-	END;
-	
-
-	//convert to iesp layout
-	watercraftChild := PROJECT(groupSlim, getReportChildren(LEFT, COUNTER));	
-
-	addWatercraftToReport := DENORMALIZE(inData, watercraftChild,
-																				LEFT.seq = RIGHT.seq AND
-																				LEFT.busn_info.BIP_IDs.UltID.LinkID = RIGHT.ultID AND
-																				LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
-																				LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
-																				TRANSFORM(DueDiligence.layouts.Busn_Internal,
-																									SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.WatercraftCount  := LEFT.watercraftCount,
-																									SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.Watercrafts := LEFT.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.Watercrafts + RIGHT.water;
-																									SELF := LEFT;));
-												
+EXPORT reportBusWatercraft(DATASET(DueDiligence.Layouts.Busn_Internal) inData) := FUNCTION
 
 
+	 transBusWater := PROJECT(inData, TRANSFORM(DueDiligence.LayoutsInternal.SharedWatercraftSlim,
+                                              SELF.seq := LEFT.seq;
+                                              SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
+                                              SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
+                                              SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+                                              
+                                              SELF.allWatercraft := LEFT.busWatercraft;
+                                              SELF := [];));
+                                                
 
-	// OUTPUT(groupSlim, NAMED('groupSlim'));
-	// OUTPUT(watercraftChild, NAMED('watercraftChild'));
-	// OUTPUT(addWatercraftToReport, NAMED('addWatercraftToReport'));
-	
-	
-	RETURN addWatercraftToReport;
+    sharedReportWaterData := DueDiligence.reportSharedWatercraft(transBusWater);
+
+    reportWater := PROJECT(sharedReportWaterData, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, iesp.duediligencebusinessreport.t_DDRBusinessWatercraftOwnership},
+                                                            SELF.seq := LEFT.seq;
+                                                            SELF.ultID := LEFT.ultID;
+                                                            SELF.orgID := LEFT.orgID;
+                                                            SELF.seleID := LEFT.seleID;
+                                                            SELF.watercrafts := DATASET([TRANSFORM(iesp.duediligenceshared.t_DDRWatercraft, SELF := LEFT;)]);
+                                                            SELF := [];));
+                                                                                                    
+    rollReportWater := ROLLUP(SORT(reportWater, seq, ultID, orgID, seleID),
+                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.watercrafts := LEFT.watercrafts + RIGHT.watercrafts;
+                                        SELF := LEFT;));
+    
+    // add formatted report data to the report
+    addWatercraftToReport := JOIN(inData, rollReportWater,
+                                  #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                  TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                            SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.Watercrafts := RIGHT.watercrafts;
+                                            SELF.BusinessReport.BusinessAttributeDetails.Economic.Watercraft.WatercraftCount := LEFT.watercraftCount;
+                                            SELF := LEFT;),
+                                  LEFT OUTER,
+                                  ATMOST(1));
+                                  
+
+
+    // OUTPUT(transBusWater, NAMED('transBusWater'));
+    // OUTPUT(sharedReportWaterData, NAMED('sharedReportWaterData'));
+    // OUTPUT(reportWater, NAMED('reportWater'));
+    // OUTPUT(rollReportWater, NAMED('rollReportWater'));
+    // OUTPUT(addWatercraftToReport, NAMED('addWatercraftToReport'));
+    
+    
+    RETURN addWatercraftToReport;
 
 END;   
 	

@@ -6,48 +6,50 @@ EXPORT Functions := MODULE
 
 			workRec:=RECORD
 				HomesteadExemptionV2_Services.Layouts.workRecSlim;
-				STRING20 clientID;
+				STRING20 tmpID;
 				BOOLEAN hasLink;
 			END;
 
 			workLinkRec:=RECORD
-				HomesteadExemptionV2_Services.Layouts.workRecSlim.link_acctno;
+				HomesteadExemptionV2_Services.Layouts.workRecSlim.link_clientid;
 				DATASET(workRec) work_records;
 			END;
 
 			workRec seqInput(ds_input_recs L,INTEGER C) := TRANSFORM
 				SELF.acctno:=(STRING)C;
 				SELF.orig_acctno:=L.acctno;
-				clientID:=REGEXFIND('^([^a-z]+)',L.acctno,1);
-				hasLink:=LENGTH(TRIM(L.acctno))=(LENGTH(TRIM(clientID))+1);
-				SELF.clientID:=IF(hasLink,clientID,L.acctno);
+				SELF.clientid:=(STRING)C;
+				SELF.orig_clientid:=L.clientid;
+				tmpID:=REGEXFIND('^([^a-z]+)',L.clientid,1);
+				hasLink:=LENGTH(TRIM(L.clientid))=(LENGTH(TRIM(tmpID))+1);
+				SELF.tmpID:=IF(hasLink,tmpID,L.clientid);
 				SELF.hasLink:=hasLink;
 				SELF:=L;
 				SELF:=[];
 			END;
 
-			// IDENTIFY LINKED ACCOUNT NUMBERS - EXAMPLE (200 200a 200b)
+			// IDENTIFY LINKED CLIENT NUMBERS - EXAMPLE (200 200a 200b)
 			workLinkRec linkRecords(workRec L, DATASET(workRec) R) := TRANSFORM
 				all_recs:=DATASET([L],workRec)+R;
-				roll_recs:=ROLLUP(PROJECT(all_recs,TRANSFORM({STRING s},SELF.s:=LEFT.acctno)),
+				roll_recs:=ROLLUP(PROJECT(all_recs,TRANSFORM({STRING s},SELF.s:=LEFT.clientid)),
 					TRUE,TRANSFORM({STRING s},SELF.s:=TRIM(LEFT.s)+'.'+TRIM(RIGHT.s)));
-				link_acctno:=roll_recs[1].s;
-				SELF.link_acctno:=link_acctno;
-				SELF.work_records:=PROJECT(all_recs,TRANSFORM(workRec,SELF.link_acctno:=link_acctno,SELF:=LEFT));
+				link_clientid:=roll_recs[1].s;
+				SELF.link_clientid:=link_clientid;
+				SELF.work_records:=PROJECT(all_recs,TRANSFORM(workRec,SELF.link_clientid:=link_clientid,SELF:=LEFT));
 			END;
 
 			ds_sequenced:=PROJECT(ds_input_recs,seqInput(LEFT,COUNTER));
 
 			// CHECK FOR ORPHANS
 			ds_verifyCnt:=PROJECT(ds_sequenced,TRANSFORM(workRec,
-				SELF.hasLink:=IF(NOT LEFT.hasLink,LEFT.hasLink,COUNT(ds_sequenced(clientID=LEFT.clientID))>1),
+				SELF.hasLink:=IF(NOT LEFT.hasLink,LEFT.hasLink,COUNT(ds_sequenced(tmpID=LEFT.tmpID))>1),
 				SELF:=LEFT));
 
 			ds_linked:=DENORMALIZE(ds_verifyCnt(NOT haslink),ds_verifyCnt(hasLink),
-				LEFT.orig_acctno=RIGHT.clientID,GROUP,linkRecords(LEFT,ROWS(RIGHT)));
+				LEFT.orig_clientid=RIGHT.tmpID,GROUP,linkRecords(LEFT,ROWS(RIGHT)));
 
 			ds_normalized:=NORMALIZE(ds_linked,LEFT.work_records,TRANSFORM(workRec,
-				SELF.link_acctno:=IF(RIGHT.link_acctno!='',RIGHT.link_acctno,RIGHT.acctno),SELF:=RIGHT));
+				SELF.link_clientid:=IF(RIGHT.link_clientid!='',RIGHT.link_clientid,RIGHT.acctno),SELF:=RIGHT));
 
 			// OUTPUT(ds_sequenced,NAMED('ds_sequenced'));
 			// OUTPUT(ds_verifyCnt,NAMED('ds_verifyCnt'));
@@ -255,7 +257,7 @@ EXPORT Functions := MODULE
 
 	/************************************************/
 	EXPORT getPropertyID(HomesteadExemptionV2_Services.Layouts.addrMin addr, STRING APN) := FUNCTION
-		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.p_city_name+addr.st+addr.z5,ALL);
+		smashedAddr:=TRIM(addr.prim_range+addr.prim_name+addr.st+addr.z5,ALL);
 		hasMinAddr:=(addr.prim_range!='' OR ut.isPOBox(addr.prim_name) OR ut.isRR(addr.prim_name))
 			 AND addr.prim_name!='' AND ((addr.p_city_name!='' AND addr.st!='') OR addr.z5!='');
 		RETURN IF(hasMinAddr,smashedAddr,APN);

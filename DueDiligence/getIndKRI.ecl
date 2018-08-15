@@ -87,6 +87,31 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 		self.PerAssetOwnProperty := (STRING)(10 - STD.Str.Find(perAssetOwnProperty_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
+    /* PERSON ASSET OWNED WATERCRAFT */
+    perAssetOwnWatercraft_Flag9 := IF(le.watercraftCount > 0 AND le.watercraftlength >= 200, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnWatercraft_Flag8 := IF(le.watercraftCount > 0 AND le.watercraftlength BETWEEN 100 AND 199, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnWatercraft_Flag7 := IF(le.watercraftCount > 0 AND le.watercraftlength BETWEEN 50  AND 99, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssetOwnWatercraft_Flag6 := IF(le.watercraftCount >= 6, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                            
+    perAssetOwnWatercraft_Flag5 := IF(le.watercraftCount BETWEEN 4 AND 5, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                  
+    perAssetOwnWatercraft_Flag4 := IF(le.watercraftCount = 3, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                             
+    perAssetOwnWatercraft_Flag3 := IF(le.watercraftCount = 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                             
+    perAssetOwnWatercraft_Flag2 := IF(le.watercraftCount = 1, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                             
+    perAssetOwnWatercraft_Flag1 := IF(le.watercraftCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                             
+    
+    perAssetOwnWatercraft_Flag_final := calcFinalFlagField(perAssetOwnWatercraft_Flag9,
+                                                          perAssetOwnWatercraft_Flag8,
+                                                          perAssetOwnWatercraft_Flag7,
+                                                          perAssetOwnWatercraft_Flag6,
+                                                          perAssetOwnWatercraft_Flag5,
+                                                          perAssetOwnWatercraft_Flag4,
+                                                          perAssetOwnWatercraft_Flag3,
+                                                          perAssetOwnWatercraft_Flag2,
+                                                          perAssetOwnWatercraft_Flag1); 
+    
+    self.PerAssetOwnWatercraft_Flag :=  perAssetOwnWatercraft_Flag_final;                                           
+		self.PerAssetOwnWatercraft := (STRING)(10 - STD.Str.Find(perAssetOwnWatercraft_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    
+    
     /* PERSON ACCESS TO FUNDS PROPERTY */
     perAccessToFundsProperty_Flag9 := IF(le.ownedPropCount > 0 AND le.totalAssesedValue >= 15000000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
     perAccessToFundsProperty_Flag8 := IF(le.ownedPropCount > 0 AND le.totalAssesedValue BETWEEN 5000000 AND 14999999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
@@ -111,6 +136,31 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
     SELF.PerAccessToFundsProperty_Flag := perAccessToFundsProperty_Flag_final;
 		SELF.PerAccessToFundsProperty := (STRING)(10 - STD.Str.Find(perAccessToFundsProperty_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
+    
+    
+    /* PERSON ACCESS TO FUNDS INCOME */
+    perAccessToFundsIncome_Flag9 := IF(le.estimatedIncome > 250000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag8 := IF(le.estimatedIncome BETWEEN 200000 AND 250000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag7 := IF(le.estimatedIncome BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag6 := IF(le.estimatedIncome BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag5 := IF(le.estimatedIncome BETWEEN 80000 AND 99999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag4 := IF(le.estimatedIncome BETWEEN 60000 AND 79999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag3 := IF(le.estimatedIncome BETWEEN 40000 AND 59999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag2 := IF(le.estimatedIncome BETWEEN 20000 AND 39999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag1 := IF(le.estimatedIncome BETWEEN 0 AND 19999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    
+    perAccessToFundsIncome_Flag_final := calcFinalFlagField(perAccessToFundsIncome_Flag9,
+                                                            perAccessToFundsIncome_Flag8,
+                                                            perAccessToFundsIncome_Flag7,
+                                                            perAccessToFundsIncome_Flag6,
+                                                            perAccessToFundsIncome_Flag5,
+                                                            perAccessToFundsIncome_Flag4,
+                                                            perAccessToFundsIncome_Flag3,
+                                                            perAccessToFundsIncome_Flag2,
+                                                            perAccessToFundsIncome_Flag1);
+    
+    SELF.PerAccessToFundsIncome_Flag := perAccessToFundsIncome_Flag_final;
+		SELF.PerAccessToFundsIncome := (STRING)(10 - STD.Str.Find(perAccessToFundsIncome_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
 
@@ -176,6 +226,29 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 		SELF.PerProfLicense := (STRING)(10-STD.Str.Find(professionalLicRiskConcat_Final, 'T', 1));
 		
 
+    /* ASSETS OWNED VEHICLE  */  
+		PerAssetOwnVehicle_Flag9 := If (le.VehicleCount  >  0 AND le.VehicleBaseValue >= 200000,'T','F');                  /* Set the Index value to 9 */
+		PerAssetOwnVehicle_Flag8 := IF (le.VehicleCount  >  0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999,'T','F');  /* Set the Index value to 8 */	
+		PerAssetOwnVehicle_Flag7 := IF (le.VehicleCount  >  0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999,'T','F');  /* Set the Index value to 7 */
+		PerAssetOwnVehicle_Flag6 := IF (le.VehicleCount  >= 150,'T','F');                                                  /* Set the Index value to 6 */
+		PerAssetOwnVehicle_Flag5 := IF (le.VehicleCount BETWEEN 50 AND 149,'T','F');                                       /* Set the Index value to 5 */
+		PerAssetOwnVehicle_Flag4 := IF (le.VehicleCount BETWEEN 25 AND 49,'T','F');                                        /* Set the Index value to 4 */
+		PerAssetOwnVehicle_Flag3 := IF (le.VehicleCount BETWEEN 10 AND 24,'T','F');                                        /* Set the Index value to 3 */
+		PerAssetOwnVehicle_Flag2 := IF (le.VehicleCount BETWEEN  1 AND  9,'T','F');                                        /* Set the Index value to 2  */
+		PerAssetOwnVehicle_Flag1 := IF (le.VehicleCount  = 0,'T','F');                                                     /* Set the Index value to 1 */
+	
+		PerAssetOwnVehicle_Flag_Final := calcFinalFlagField(PerAssetOwnVehicle_Flag9,
+																			                  PerAssetOwnVehicle_Flag8,
+																			                  PerAssetOwnVehicle_Flag7,
+																			                  PerAssetOwnVehicle_Flag6,
+																			                  PerAssetOwnVehicle_Flag5,
+																			                  PerAssetOwnVehicle_Flag4,
+																			                  PerAssetOwnVehicle_Flag3,
+																			                  PerAssetOwnVehicle_Flag2,
+																			                  PerAssetOwnVehicle_Flag1);
+
+    SELF.PerAssetOwnVehicle_Flag    :=  PerAssetOwnVehicle_Flag_Final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+		SELF.PerAssetOwnVehicle         := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
 
     //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
     
@@ -201,14 +274,14 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							SELF.PerAssetOwnProperty_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerAssetOwnAircraft := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerAssetOwnAircraft_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerAssetOwnWatercraft := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerAssetOwnWatercraft_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerAssetOwnVehicle := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerAssetOwnVehicle_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerAssetOwnWatercraft := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerAssetOwnWatercraft_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerAssetOwnVehicle := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerAssetOwnVehicle_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerAccessToFundsProperty := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerAccessToFundsProperty_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerAccessToFundsIncome := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerAccessToFundsIncome_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerAccessToFundsIncome := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerAccessToFundsIncome_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerGeographic := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerGeographic_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;

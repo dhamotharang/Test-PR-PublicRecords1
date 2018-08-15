@@ -6,13 +6,13 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING30				matchcode := '';
 	STRING30 				acctno;
 	BIPV2.IDlayouts.l_key_ids_bare;
-
-	BankruptcyV3_Services.layouts.layout_rollup
+	
+	BankruptcyV3_Services.layouts.layout_rollup 
 		and not [debtors, matched_party, attorneys, trustee, comment_history, status_history, docket_history, StatementIds, isDisputed];
-
+	
 	STRING1					method_dismiss;
 	STRING20				case_status;
-
+	
 	// debtor names
 	STRING2 				debtor_1_type;
 	STRING50				debtor_1_orig_name;
@@ -38,7 +38,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING30				debtor_2_mname;
 	STRING5 				debtor_2_name_suffix;
 
-	STRING2 				debtor_3_type;
+	STRING2 				debtor_3_type;			
 	STRING50				debtor_3_orig_name;
 	STRING50 				debtor_3_orig_lname;
 	STRING50 				debtor_3_orig_fname;
@@ -49,7 +49,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING50 				debtor_3_fname;
 	STRING30 				debtor_3_mname;
 	STRING5 				debtor_3_name_suffix;
-
+			
 	STRING2 				debtor_4_type;
 	STRING50				debtor_4_orig_name;
 	STRING50 				debtor_4_orig_lname;
@@ -61,7 +61,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING50 				debtor_4_fname;
 	STRING30 				debtor_4_mname;
 	STRING5 				debtor_4_name_suffix;
-
+	
 	STRING2 				debtor_5_type;
 	STRING50				debtor_5_orig_name;
 	STRING50 				debtor_5_orig_lname;
@@ -82,7 +82,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING5					debtor_orig_zip5;
 	STRING4					debtor_orig_zip4;
 	STRING10        		debtor_prim_range;
-	STRING2         		debtor_predir;
+	STRING2         		debtor_predir;		
 	STRING28        		debtor_prim_name;
 	STRING4         		debtor_addr_suffix;
 	STRING2         		debtor_postdir;
@@ -95,7 +95,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING4         		debtor_zip4;
 	STRING10				debtor_phone;
 	STRING4					debtor_phone_tz;
-
+	
 	// debtors extras
 	STRING1					debtor_type_1;
 	STRING12				debtor_did;
@@ -133,13 +133,13 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING8					debtor_datevacated;
 	STRING8					debtor_datetransferred;
 	STRING12				debtor_activityreceipt;
-
+	
 	STRING10				debtor_withdrawnid;
 	STRING8					debtor_withdrawndate;
 	STRING8					debtor_withdrawndispositiondate;
 	STRING35				debtor_withdrawndisposition;
 	// STRING debtor_person_filter_id;
-
+	
 	// matched party
 	STRING2 				matched_party_type;
 	STRING50 				matched_party_orig_name;
@@ -158,7 +158,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING5					matched_party_orig_zip5;
 	STRING4					matched_party_orig_zip4;
 	STRING10        		matched_party_prim_range;
-	STRING2         		matched_party_predir;
+	STRING2         		matched_party_predir;		
 	STRING28        		matched_party_prim_name;
 	STRING4         		matched_party_addr_suffix;
 	STRING2         		matched_party_postdir;
@@ -169,7 +169,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING2         		matched_party_st;
 	STRING5         		matched_party_zip;
 	STRING4         		matched_party_zip4;
-
+			
 	// attorney
 	STRING2 				atty_party_type_1;
 	STRING12				atty_did;
@@ -178,7 +178,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING9					atty_ssn;
 	STRING9					atty_app_tax_id;
 	STRING9					atty_tax_id;
-
+			
 	STRING50				atty_1_orig_name;
 	STRING50 				atty_1_orig_lname;
 	STRING50 				atty_1_orig_fname;
@@ -196,7 +196,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING5					atty_1_orig_zip5;
 	STRING4					atty_1_orig_zip4;
 	STRING10        		atty_1_prim_range;
-	STRING2         		atty_1_predir;
+	STRING2         		atty_1_predir;		
 	STRING28       			atty_1_prim_name;
 	STRING4         		atty_1_addr_suffix;
 	STRING2         		atty_1_postdir;
@@ -207,11 +207,11 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING2         		atty_1_st;
 	STRING5         		atty_1_zip;
 	STRING4         		atty_1_zip4;
-	STRING10   				atty_1_phone;
+	STRING10   				atty_1_phone; 
 	STRING4	 				atty_1_phone_tz;
 	STRING10				atty_1_fax;
 	STRING250				atty_1_email;
-
+			
 	STRING50				atty_2_orig_name;
 	STRING50 				atty_2_orig_lname;
 	STRING50 				atty_2_orig_fname;
@@ -229,7 +229,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING5					atty_2_orig_zip5;
 	STRING4					atty_2_orig_zip4;
 	STRING10        		atty_2_prim_range;
-	STRING2         		atty_2_predir;
+	STRING2         		atty_2_predir;		
 	STRING28        		atty_2_prim_name;
 	STRING4         		atty_2_addr_suffix;
 	STRING2         		atty_2_postdir;
@@ -240,11 +240,11 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING2         		atty_2_st;
 	STRING5         		atty_2_zip;
 	STRING4         		atty_2_zip4;
-	STRING10   				atty_2_phone;
+	STRING10   				atty_2_phone; 
 	STRING4	 				atty_2_phone_tz;
 	STRING10				atty_2_fax;
 	STRING250				atty_2_email;
-
+			
 	// trustee
 	STRING12 				trustee_did;
 	STRING12				trustee_id;
@@ -288,7 +288,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING1         		trustee_geo_match;
 	STRING4         		trustee_err_stat;
 	STRING10 				trustee_phone;
-
+		
 	// court
 	string10				moxie_court;
 	string35				court_addr;
@@ -307,7 +307,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	string7					hoganID;
 	string4					court;
 	string1					court_active;
-
+			
 	// status history
 	STRING8					status_1_date;
 	STRING30				status_1_type;
@@ -321,7 +321,7 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING30 				status_5_type;
 	STRING8					status_6_date;
 	STRING30				status_6_type;
-
+			
 	// comment history
 	STRING8					comment_1_fdate;
 	STRING30				comment_1_desc;
@@ -336,6 +336,5 @@ export layout_BankruptcyV3_Batch_out := RECORD
 	STRING8					comment_6_fdate;
 	STRING30				comment_6_desc;
 	FFD.Layouts.ConsumerFlags;
-	STRING1         alert_data_under_dispute := '';
   STRING12        inquiry_lexid := '';
 END;

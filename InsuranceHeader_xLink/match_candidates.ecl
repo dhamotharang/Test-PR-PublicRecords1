@@ -1,9 +1,9 @@
-// Begin code to produce match candidates
+﻿// Begin code to produce match candidates
 IMPORT SALT37;
 EXPORT match_candidates(DATASET(layout_InsuranceHeader) ih,BOOLEAN incremental=FALSE) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := InsuranceHeader_xLink.Specificities(ih).input_file_np;
-SHARED thin_table := DISTRIBUTE(TABLE(h00,{RID,SNAME,FNAME,FNAME_len,MNAME,MNAME_len,LNAME,LNAME_len,DERIVED_GENDER,PRIM_RANGE,PRIM_RANGE_len,PRIM_NAME,PRIM_NAME_len,SEC_RANGE,CITY,ST,ZIP,SSN5,SSN5_len,SSN4,SSN4_len,DOB_year,DOB_month,DOB_day,PHONE,DL_STATE,DL_NBR,SRC,SOURCE_RID,DT_FIRST_SEEN,DT_LAST_SEEN,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST,MAINNAME,FULLNAME,ADDR1,LOCALE,ADDRESS,DID}),HASH(DID));
+SHARED thin_table := DISTRIBUTE(TABLE(h00,{RID,SNAME,FNAME,FNAME_len,MNAME,MNAME_len,LNAME,LNAME_len,DERIVED_GENDER,PRIM_RANGE,PRIM_RANGE_len,PRIM_NAME,PRIM_NAME_len,SEC_RANGE,CITY,ST,ZIP,SSN5,SSN5_len,SSN4,SSN4_len,DOB_year,DOB_month,DOB_day,PHONE,DL_STATE,DL_NBR,DL_NBR_len,SRC,SOURCE_RID,DT_FIRST_SEEN,DT_LAST_SEEN,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST,MAINNAME,FULLNAME,ADDR1,LOCALE,ADDRESS,DID}),HASH(DID));
  
 //Prepare for field propagations ...
 PrePropCounts := RECORD
@@ -51,6 +51,7 @@ SHARED layout_withpropvars := RECORD
   UNSIGNED1 SSN4_prop := 0;
   UNSIGNED1 DOB_prop := 0;
   UNSIGNED1 PHONE_prop := 0;
+  UNSIGNED1 DL_NBR_prop := 0;
   UNSIGNED1 SRC_prop := 0;
   UNSIGNED1 MAINNAME_prop := 0;
   UNSIGNED1 FULLNAME_prop := 0;
@@ -138,13 +139,22 @@ layout_withpropvars take_PHONE(with_props le,PHONE_props ri) := TRANSFORM
   END;
 SHARED pj14 := JOIN(pj14002,PHONE_props,left.DID=right.DID,take_PHONE(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
+SALT37.mac_prop_field(with_props(DL_NBR NOT IN SET(s.nulls_DL_NBR,DL_NBR)),DL_NBR,DID,DL_NBR_props); // For every DID find the best FULL DL_NBR
+layout_withpropvars take_DL_NBR(with_props le,DL_NBR_props ri) := TRANSFORM
+  SELF.DL_NBR := IF ( le.DL_NBR IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DID<>(TYPEOF(ri.DID))'', ri.DL_NBR, le.DL_NBR );
+  SELF.DL_NBR_prop := le.DL_NBR_prop + IF ( le.DL_NBR IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DL_NBR NOT IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
+  SELF.DL_NBR_len := IF ( le.DL_NBR IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DID<>(TYPEOF(ri.DID))'', LENGTH(TRIM(ri.DL_NBR)), le.DL_NBR_len );
+  SELF := le;
+  END;
+SHARED pj16 := JOIN(pj14,DL_NBR_props,left.DID=right.DID,take_DL_NBR(left,right),LEFT OUTER,HASH,HINT(parallel_match));
+ 
 SALT37.mac_prop_field(with_props(SRC NOT IN SET(s.nulls_SRC,SRC)),SRC,DID,SRC_props); // For every DID find the best FULL SRC
 layout_withpropvars take_SRC(with_props le,SRC_props ri) := TRANSFORM
   SELF.SRC := IF ( le.SRC IN SET(s.nulls_SRC,SRC) and ri.DID<>(TYPEOF(ri.DID))'', ri.SRC, le.SRC );
   SELF.SRC_prop := le.SRC_prop + IF ( le.SRC IN SET(s.nulls_SRC,SRC) and ri.SRC NOT IN SET(s.nulls_SRC,SRC) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj17 := JOIN(pj14,SRC_props,left.DID=right.DID,take_SRC(left,right),LEFT OUTER,HASH,HINT(parallel_match));
+SHARED pj17 := JOIN(pj16,SRC_props,left.DID=right.DID,take_SRC(left,right),LEFT OUTER,HASH,HINT(parallel_match));
 SHARED RES_prp := RES_prop5;
  
 pj17 do_computes(pj17 le) := TRANSFORM
@@ -303,6 +313,8 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
   BOOLEAN DL_STATE_isnull := (h0.DL_STATE  IN SET(s.nulls_DL_STATE,DL_STATE) OR h0.DL_STATE = (TYPEOF(h0.DL_STATE))''); // Simplify later processing 
   INTEGER2 DL_NBR_weight100 := 0; // Contains 100x the specificity
   BOOLEAN DL_NBR_isnull := (h0.DL_NBR  IN SET(s.nulls_DL_NBR,DL_NBR) OR h0.DL_NBR = (TYPEOF(h0.DL_NBR))''); // Simplify later processing 
+  UNSIGNED DL_NBR_cnt := 0; // Number of instances with this particular field value
+  UNSIGNED DL_NBR_e1_cnt := 0; // Number of names instances matching this one by edit distance
   INTEGER2 SRC_weight100 := 0; // Contains 100x the specificity
   BOOLEAN SRC_isnull := (h0.SRC  IN SET(s.nulls_SRC,SRC) OR h0.SRC = (TYPEOF(h0.SRC))''); // Simplify later processing 
   INTEGER2 SOURCE_RID_weight100 := 0; // Contains 100x the specificity
@@ -479,6 +491,8 @@ layout_candidates add_SOURCE_RID(layout_candidates le,Specificities(ih).SOURCE_R
 END;
 SALT37.MAC_Choose_JoinType(j3,s.nulls_SOURCE_RID,Specificities(ih).SOURCE_RID_values_persisted,SOURCE_RID,SOURCE_RID_weight100,add_SOURCE_RID,j2);
 layout_candidates add_DL_NBR(layout_candidates le,Specificities(ih).DL_NBR_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.DL_NBR_cnt := ri.cnt;
+  SELF.DL_NBR_e1_cnt := ri.e1_cnt;
   SELF.DL_NBR_weight100 := MAP (le.DL_NBR_isnull => 0, patch_default and ri.field_specificity=0 => s.DL_NBR_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;

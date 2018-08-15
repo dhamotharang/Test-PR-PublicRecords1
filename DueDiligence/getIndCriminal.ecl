@@ -153,7 +153,10 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                         SELF.offenseChargeLevelReported := firstPopulatedString(offenseChargeLevelReported);
                                         SELF.offenseConviction := IF(LEFT.offenseConviction = DueDiligence.Constants.Yes, LEFT.offenseConviction, RIGHT.offenseConviction);
                                         SELF.offenseIncarcerationProbationParole := firstPopulatedString(offenseIncarcerationProbationParole); 
-                                        SELF.offenseTrafficRelated := IF(LEFT.offenseTrafficRelated = DueDiligence.Constants.Yes, LEFT.offenseTrafficRelated, RIGHT.offenseTrafficRelated);
+                                        SELF.offenseTrafficRelated := MAP(LEFT.offenseTrafficRelated = 'N' OR RIGHT.offenseTrafficRelated = 'N' => 'N',
+                                                                          LEFT.offenseTrafficRelated = 'Y' OR RIGHT.offenseTrafficRelated = 'Y' => 'Y',
+                                                                          LEFT.offenseTrafficRelated = DueDiligence.Constants.EMPTY => RIGHT.offenseTrafficRelated,
+                                                                          LEFT.offenseTrafficRelated);
                                        
                                               
                                               

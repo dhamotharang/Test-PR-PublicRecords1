@@ -219,7 +219,7 @@ EXPORT Layouts := MODULE
 		STRING25 dl_number;
 		STRING10 geo_lat;
 		STRING11 geo_long;
-		UNSIGNED8 date_added;
+		STRING20 date_added;
 	END;
 
 	EXPORT LOG_Deltabase_Layout := RECORD
@@ -251,6 +251,12 @@ EXPORT Layouts := MODULE
 		STRING11 geo_long;
 		UNSIGNED8 date_added;
 	END;
+	
+	EXPORT response_deltabase_layout := RECORD                         
+		DATASET(LOG_Deltabase_Layout_Record) deltaFields {XPATH('Records/Rec')};
+		STRING  RecsReturned {XPATH('RecsReturned')};
+		INTEGER responsetime {XPATH('Latency')};
+	END;	
 
 	EXPORT fragment_w_value_recs := RECORD
 		FraudShared_Services.layouts.layout_velocity_in;
@@ -261,11 +267,12 @@ EXPORT Layouts := MODULE
 	END;
 	
 	EXPORT elementNidentity_uid_recs := RECORD
+		STRING20 acctno;
 		STRING60 entity_name;
 		STRING100 entity_value;
-		unsigned8 record_id;	
-		string70 tree_uid := '';
-		string70 entity_context_uid := '';
+		UNSIGNED8 record_id;	
+		STRING70 tree_uid := '';
+		STRING70 entity_context_uid := '';
 	END;
 
 	EXPORT elementNidentity_score_recs := RECORD

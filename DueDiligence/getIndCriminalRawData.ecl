@@ -79,7 +79,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                           SELF.offenseConviction := RIGHT.conviction_flag;
                                           
                                           // additional data
-                                          SELF.temp_offenseScore := RIGHT.offense_score;  
+                                          SELF.temp_offenseScore := RIGHT.offense_score; 
+                                          SELF.caseNumber := STD.Str.FilterOut(RIGHT.case_num, '-');
                                           
                                           SELF := [];),
                               ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
@@ -100,6 +101,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                     SELF.temp_offenseScore := RIGHT.temp_offenseScore;
                                     SELF.offenseTrafficRelated := RIGHT.offenseTrafficRelated;
                                     SELF.offenseConviction := RIGHT.offenseConviction;
+                                    SELF.caseNumber := RIGHT.caseNumber;
                                     SELF := LEFT;),
                           ATMOST(DueDiligence.Constants.MAX_ATMOST_OFFENSES), 
                           KEEP(DueDiligence.Constants.MAX_KEEP),
@@ -121,13 +123,15 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       
                                       SELF.temp_calcdFirstSeenDate := earliestDate4;
                                       
+                                      agencyCaseNumberPopulated := TRIM(RIGHT.le_agency_case_number) <> DueDiligence.Constants.EMPTY;
+                                      agencyCaseNumber := IF(agencyCaseNumberPopulated, STD.Str.FilterOut(RIGHT.le_agency_case_number, '-'), LEFT.caseNumber);
                                       
                                                                  
                                       //top level data
                                       SELF.state := RIGHT.state_origin;
                                       SELF.source := mapCourtCaseTypes(RIGHT.data_type);
                                       SELF.offenseStatute := RIGHT.court_statute;
-                                      SELF.caseNumber := STD.Str.FilterOut(IF(RIGHT.data_type = '5', RIGHT.le_agency_case_number, DueDiligence.Constants.EMPTY), '-');
+                                      SELF.caseNumber := IF(RIGHT.data_type = '5', agencyCaseNumber, LEFT.caseNumber);
                                       SELF.offenseCharge := IF(RIGHT.data_type = '5', RIGHT.arr_off_desc_1, RIGHT.court_off_desc_1);
                                       SELF.offenseChargeLevelReported := IF(RIGHT.data_type = '2', RIGHT.court_off_lev_mapped, RIGHT.arr_off_lev_mapped);
                                       SELF.offenseDDLastReportedActivity := MAX((UNSIGNED)RIGHT.off_date, (UNSIGNED)RIGHT.arr_date, 
@@ -184,7 +188,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                         
                                         SELF.offenseChargeLevelReported := RIGHT.off_lev;
                                         SELF.offenseCharge := RIGHT.off_desc_1;
-                                        SELF.caseNumber := STD.Str.FilterOut(RIGHT.case_num, '-');
+                                        SELF.caseNumber := IF(TRIM(RIGHT.case_num) <> DueDiligence.Constants.EMPTY, STD.Str.FilterOut(RIGHT.case_num, '-'), LEFT.caseNumber);
                                         
                                         //get incarceration dates to determine if ever incarcerated
                                         posBeg := stringlib.stringfind(RIGHT.stc_desc_2, 'Date:', 1);                //format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'

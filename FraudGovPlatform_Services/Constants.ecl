@@ -40,7 +40,7 @@
   //=================================================================
   //  Delta base read & SOAPCALL related limits
   //=================================================================
-  EXPORT limiter      := ' LIMIT 50 ; ';
+  EXPORT limiter      := ' LIMIT 1000; ';
   EXPORT read_retry   := 2;  
   EXPORT read_timeout := 75; 
   EXPORT maxRecs      := 100;
@@ -250,4 +250,11 @@
 		EXPORT PHONE_TYPE_WORK := 'WORK';
 	END;	
 	
+	EXPORT KelEntityIdentifier := MODULE
+		EXPORT STRING _LEXID := '_01';
+		EXPORT STRING _PHYSICAL_ADDRESS := '_09';
+		EXPORT STRING _SSN := '_15';
+		EXPORT STRING _PHONENO := '_16';
+		EXPORT STRING _IPADDRESS := '_18';
+	END;	
 END;

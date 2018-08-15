@@ -1,8 +1,8 @@
 ﻿IMPORT SALT37,std;
-EXPORT Key_InsuranceHeader_NAME(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit=Config.NAME_MAXBLOCKLIMIT) := MODULE/*HACK*/
+EXPORT Key_InsuranceHeader_NAME(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.NAME_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //FNAME:LNAME:ST:?:DERIVED_GENDER:SNAME:MNAME:SSN5:SSN4:+:PRIM_RANGE:PRIM_NAME:SEC_RANGE:CITY:DOB
-EXPORT KeyName := KeyNames().NAME_super; /*HACK*/
+EXPORT KeyName := KeyNames().NAME_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::NAME';
  
@@ -110,10 +110,10 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
-EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.NAME_MAXBLOCKLIMIT, aBlockLimit);
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.NAME_MAXBLOCKLIMIT, aBlockLimit);/*HACK24a*/
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.ST <> (TYPEOF(le.ST))'' AND Fields.InValid_ST((SALT37.StrType)le.ST)=0;
 KeyRec := RECORDOF(Key);
-
+ 
 EXPORT RawFetch(TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'') := 
     STEPPED( LIMIT( Key(
           KEYED(( FNAME = param_FNAME AND param_FNAME <> (TYPEOF(FNAME))''))
@@ -123,7 +123,7 @@ EXPORT RawFetch(TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME
       AND KEYED(( SNAME = (TYPEOF(SNAME))'' OR param_SNAME = (TYPEOF(SNAME))'' OR SNAME = param_SNAME ))
       AND ( (MNAME[1..LENGTH(TRIM(param_MNAME))] = param_MNAME OR param_MNAME[1..LENGTH(TRIM(MNAME))] = MNAME) OR Config.WithinEditN(MNAME,MNAME_len,param_MNAME,param_MNAME_len,2, 0) )
       AND ( SSN5 = (TYPEOF(SSN5))'' OR param_SSN5 = (TYPEOF(SSN5))'' OR Config.WithinEditN(SSN5,SSN5_len,param_SSN5,param_SSN5_len,1, 0) )
-      AND ( SSN4 = (TYPEOF(SSN4))'' OR param_SSN4 = (TYPEOF(SSN4))'' OR Config.WithinEditN(SSN4,SSN4_len,param_SSN4,param_SSN4_len,1, 0) )),MAX_BLOCKLIMIT /*HACK*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+      AND ( SSN4 = (TYPEOF(SSN4))'' OR param_SSN4 = (TYPEOF(SSN4))'' OR Config.WithinEditN(SSN4,SSN4_len,param_SSN4,param_SSN4_len,1, 0) )),MAX_BLOCKLIMIT/*HACK24b*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
 EXPORT ScoredDIDFetch(TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.CITY) param_CITY = (TYPEOF(h.CITY))'',UNSIGNED4 param_DOB,BOOLEAN param_disableForce = FALSE) := FUNCTION

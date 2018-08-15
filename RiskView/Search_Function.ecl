@@ -638,15 +638,14 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean has200Score := hasScore('200') or Alerts200 ;
 	boolean has222Score := hasScore('222');
 	
-	boolean chapter7bankruptcy := trim(rt.bjl.bk_chapter)='7' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter9bankruptcy := trim(rt.bjl.bk_chapter)='9' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter11bankruptcy := trim(rt.bjl.bk_chapter)='11' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter12bankruptcy := trim(rt.bjl.bk_chapter)='12' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter13bankruptcy := trim(rt.bjl.bk_chapter)='13' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter15bankruptcy := trim(rt.bjl.bk_chapter) in ['15', '304'] AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+  boolean chapter7bankruptcy := '7' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
+	boolean chapter9bankruptcy := '9' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter11bankruptcy := '11' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter12bankruptcy := '12' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
+	boolean chapter13bankruptcy := '13' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter15bankruptcy := (  '15' in set(rt.bk_chapters, chapter) or 
+                                   '304' in set(rt.bk_chapters, chapter)  ) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
 	
-	
-
 	hasBankruptcyAlert := chapter7bankruptcy or chapter9bankruptcy or chapter11bankruptcy or chapter12bankruptcy or chapter13bankruptcy or chapter15bankruptcy;
 		
 	// currently there are only 6 conditions to trigger an alert, but leaving room in the batch layout for up to 10 alerts to be returned.

@@ -6,7 +6,11 @@ EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In,
 																						string50 DataRestrictionMask,
 																						string50 DataPermissionMask,
 																						string8 AttributesVersion, 
-                                            boolean domodel=false) := FUNCTION
+                                            boolean domodel=false,
+                                            string modelname = ''
+                                            ) := FUNCTION
+
+BOOLEAN DEBUG := FALSE;
 
 	isFCRA 			:= false;
 	GLBA 				:= 0;
@@ -68,6 +72,9 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');
 		self := [];
 	END;
+
+
+
 
 	iid_prep_roxie := PROJECT(PB_In, into(left));	
 
@@ -212,7 +219,7 @@ donotmail_key := dma.key_DNM_Name_Address;
 	#ELSE
 		withDoNotMail := withDoNotMail_roxie;
 	#END
-  
+	
   withVerification := ProfileBooster.getVerification(withDoNotMail);
 
 //Search Death Master by DID. Set 2 dates (1 with SSA permission and 1 not) and choose appropriately 
@@ -240,7 +247,7 @@ donotmail_key := dma.key_DNM_Name_Address;
 	#ELSE
 		withDeceasedDID := withDeceasedDID_roxie;
 	#END
-  
+	
 	sortedDeceased := sort(withDeceasedDID, seq);
 
 //rollup by Deceased matches and keep whichever record has a DOD
@@ -279,7 +286,7 @@ donotmail_key := dma.key_DNM_Name_Address;
 	#ELSE
 		withInfutor := withInfutor_roxie;
 	#END
-
+	
 //get business count for the input address
 ProfileBooster.Layouts.Layout_PB_Shell getInputBus(withInfutor le, Address_Attributes.key_AML_addr ri)  := TRANSFORM
 		self.ResInputBusinessCnt 	:= ri.biz_cnt;
@@ -362,7 +369,7 @@ withCurrBus_thor := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;
 #ELSE
 	withCurrBus := withCurrBus_roxie;
 #END
-
+		
 //get household members (DIDs) by doing inner join of the HHID to the HHID_Did key
 ProfileBooster.Layouts.Layout_PB_Shell add_household_members(ProfileBooster.Layouts.Layout_PB_Shell le, doxie.Key_HHID_Did rt) := transform
 		self.DID2			:= rt.DID;
@@ -429,7 +436,7 @@ end;
 	
 	distributed_allDIDs := distribute(allDIDs, hash(seq, did2));
 	unique_DIDs_thor := dedup(sort(distributed_allDIDs, seq, DID2, rec_type, local), seq, DID2, local);//   : PERSIST('~PROFILEBOOSTER::unique_DIDs_thor');  // remove persists because low on disk space and it's rebuilding persist file each time anyway
-
+	
 	#IF(onThor)
 		uniqueDIDs := unique_DIDs_thor;
 	#ELSE
@@ -976,7 +983,7 @@ prop_common_distr := distribute(prop_common, did);
 	#ELSE
 		withProperty := withProperty_roxie;
 	#END
-  
+	
 	withProperty_distributed := distribute(withProperty, seq);
 	sortedProperty :=  sort(withProperty, seq, did2, -sale_date_by_did, -owned_prim_range, -owned_prim_name, local); //within DID, sort most recent sold property to top
 
@@ -1207,7 +1214,7 @@ prop_common_distr := distribute(prop_common, did);
 	#ELSE
 		avm1Owned := avm1Owned_roxie;
 	#END
-									
+	
 	// when choosing which AVM to output if the addr returns more than 1 result, 
 	// always pick the record with the most recent recording date and secondarily the most recent assessed value year
 	avms1Owned := dedup(sort(avm1Owned, seq, did, prim_range, prim_name, zip, -Input_Address_Information.avm_recording_date, -Input_Address_Information.avm_assessed_value_year),
@@ -1405,11 +1412,23 @@ prop_common_distr := distribute(prop_common, did);
 	withHHIncome := ProfileBooster.HHestimatedIncome(withIncome); //for production
 	
 	withBankingExperiance := ProfileBooster.getBankingExperiance (withHHIncome);
-	
+#IF(DEBUG)
+  //Model that is being tested goes here
+  // with_mover_model := profilebooster.PB1708_1_0(withBankingExperiance);
+ with_mover_model := profilebooster.PB1708_1_0(withBankingExperiance);
+ 
+#ELSE
   with_mover_model := if(domodel,
-                        profilebooster.PBM1803_0_1_score(withBankingExperiance, iid_prep),
+                        CASE(modelname,
+                        //'PB1708_1' => profilebooster.PB1708_1_0(withBankingExperiance, iid_prep),
+                        'PB1708_1' => profilebooster.PB1708_1_0(withBankingExperiance),
+                        'PBM1803_0' => profilebooster.PBM1803_0_1_score(withBankingExperiance, iid_prep),
+                        
+                                      DATASET([],ProfileBooster.Layouts.Layout_PB_BatchOut)),
                         withBankingExperiance);
-	
+#END                        
+                      
+     
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 // output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
 		
@@ -1419,8 +1438,9 @@ prop_common_distr := distribute(prop_common, did);
  
   // output(slimShell,,'~dvstemp::out::profilebooster::slimshell_' + thorlib.wuid());
 	
-	// output(iid_prep, named('iid_prep'));
-  // output(with_DID, named('with_DID'));
+	  //output(with_mover_model, named('with_mover_model'));
+	 // output(iid_prep, named('iid_prep'));
+   // output(with_DID, named('with_DID'));
   // output(withDoNotMail, named('withDoNotMail'));
   // output(withVerification, named('withVerification'));
   // output(withDeceasedDID, named('withDeceasedDID'));
@@ -1479,10 +1499,10 @@ prop_common_distr := distribute(prop_common, did);
   // output(finalRollup, named('finalRollup'));
   // output(withRelaIncome, named('withRelaIncome'));
   // output(withRelaHHcnt, named('withRelaHHcnt'));
-  // output(attributes, named('attributes'));
+   //output(attributes, named('attributes'));
   // output(withIncome, named('withIncome'));
   // output(withHHIncome, named('withHHIncome'));
-	// output( withBankingExperiance, named('withBankingExperiance'));
+	 //output( withBankingExperiance, named('withBankingExperiance'));
 /* ********************/
 
 return with_mover_model;	

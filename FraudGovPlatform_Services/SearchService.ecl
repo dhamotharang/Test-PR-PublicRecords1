@@ -7,7 +7,7 @@
 IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	WSInput.MAC_FraudGovPlatform_Services_SearchService();
 
 	ds_in					:= DATASET([],iesp.fraudgovsearch.t_FraudGovSearchRequest) : STORED('FraudGovSearchRequest', FEW);
@@ -20,7 +20,7 @@ EXPORT SearchService() := MACRO
 	#STORED('GlobalCompanyId', FraudGovUser.GlobalCompanyId);
 	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
 	#STORED('ProductCode',FraudGovUser.ProductCode); 
-	#STORED('FraudPlatform', Options.Platform);
+	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline', Options.IsOnline);
 
 	// *********************************Validation*******************************************
@@ -127,21 +127,32 @@ EXPORT SearchService() := MACRO
 
 	//Adding Options.IsTestRequest. When Options.IsTestRequest = TRUE, the service returns mockedup data in the
 	//... roxie response, to help ESP and Web to continue with the development until we find a real way to return the data.
-	search_records := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
+	tmp := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
+	search_records := tmp.ds_results;
+	adlDIDFound := tmp.adlDIDFound;
+	ds_adl_in := tmp.ds_adl_in;
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
-			SELF.RecordCount := COUNT(search_records);
+			SELF.RecordCount := COUNT(search_records),
 			SELF.InputEcho:= SearchBy,
 			SELF.Records	:= search_records
 	END;
 
-	results := DATASET([final_transform_t_FraudGovSearchResponse()]) ;
+	results := DATASET([final_transform_t_FraudGovSearchResponse()]);
+	
+	delta_log_input := PROJECT(first_row,TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRequest,
+																				SELF.SearchBy.UniqueId := IF(LEFT.SearchBy.UniqueId = '' AND adlDIDFound = TRUE,
+																																		(STRING)ds_adl_in[1].did,
+																																		LEFT.SearchBy.UniqueId),
+																				SELF := LEFT
+																			));
 
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
-														first_row,
+														delta_log_input,
 														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
-
+														
+														
 	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
 
 	IF (isMinimumInput, 

@@ -1,4 +1,4 @@
-import iesp, codes, AutoStandardI, corrections, fcra, doxie_files, FFD, STD, CriminalRecords_Services;
+﻿import iesp, codes, AutoStandardI, corrections, fcra, doxie_files, FFD, STD, CriminalRecords_Services;
 
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
 
@@ -98,8 +98,8 @@ export Functions := module
 // ------------------------------------------------FCRA FFD ----------------------------------		
 		offense_ds_rec xformDSOffense( offense_rec l, 
 														 FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements); // ignore the statementids & dispute indicator of offender 
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIds;  
 			self.IsDisputed   := r.IsDisputed;
 			self := l;
 		end;
@@ -147,8 +147,8 @@ export Functions := module
 // ------------------------------------------------FCRA FFD ----------------------------------
 		court_ds_rec xformDSCourtOffense( court_rec l, 
 																			FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements);
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIds;
 			self.IsDisputed   := r.IsDisputed; 
 			self := l;
 		end;
@@ -194,8 +194,8 @@ export Functions := module
 // ------------------------------------------------FCRA FFD ----------------------------------
 		punishment_ds_rec xformDSPunishment( punishment_rec l, 
 																			FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements); // ignore the statementids & dispute indicator of offender 
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIds; 
 			self.IsDisputed   := r.IsDisputed; 
 			self := l;
 		end;
@@ -234,8 +234,8 @@ export Functions := module
 		// ------------------------------------------------FCRA FFD ----------------------------------
 		activity_ds_rec xformDSActivity( activity_rec l, 
 																			FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements); 
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIds; 
 			self.IsDisputed   := r.IsDisputed; 
 			self := l;
 		end;

@@ -48,10 +48,6 @@ EXPORT FetchPersonContext (DATASET(FFD.Layouts.DidBatch) dids,
                            INTEGER8 inFFDOptionsMask = FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS    // by default consumer statements are not filtered                       
                           ) := FUNCTION
 
-  BOOLEAN showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-	BOOLEAN isBatch := EXISTS(dids(acctno <> FFD.Constants.SingleSearchAcctno));
-  BOOLEAN ReturnAll := showConsumerStatements OR isBatch;
-
   delta_url := TRIM (gateways (Gateway.Configuration.IsDeltaPersoncontext(servicename))[1].URL, LEFT, RIGHT);
   
   BOOLEAN apply_group_filter := EXISTS(data_group_set);
@@ -82,8 +78,7 @@ EXPORT FetchPersonContext (DATASET(FFD.Layouts.DidBatch) dids,
                        SELF.acctno := LEFT.acctno, 
                        SELF := RIGHT)); 
                        
-  recs_filt := recs((~apply_group_filter OR datagroup in data_group_set)
-                    AND (ReturnAll OR RecordType IN FFD.Constants.RecordType.ComplianceSet));    
+  recs_filt := recs(~apply_group_filter OR datagroup in data_group_set);    
   
-  RETURN recs_filt;
+  RETURN IF(EXISTS(dids(did>0)), recs_filt, DATASET([],FFD.Layouts.PersonContextBatch));
 END;
