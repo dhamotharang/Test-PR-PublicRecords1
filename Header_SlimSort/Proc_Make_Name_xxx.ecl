@@ -1,5 +1,5 @@
 import PromoteSupers, header,header_slimsort;
-export Proc_Make_Name_xxx(string src_cluster, string dest_cluster2) := function
+export Proc_Make_Name_xxx(string src_cluster, string dest_cluster2, string dest_cluster3) := function
 
 //****** Build Base Files
 
@@ -34,6 +34,14 @@ header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_Zip_Age_Ssn4',src_cluster, de
 header_slimsort.Mac_SF_CopyProcess('BASE::HSS_household',src_cluster, dest_cluster2, copy_household2_)
 header_slimsort.Mac_SF_CopyProcess('BASE::HSS_name_source',src_cluster, dest_cluster2, copy_nmsrc2_)
 
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_Dayob',src_cluster, dest_cluster3, copy_dayob3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_SSN',src_cluster, dest_cluster3, copy_ssn3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_Address',src_cluster, dest_cluster3, copy_addr3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_phone',src_cluster, dest_cluster3, copy_phone3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_Name_Zip_Age_Ssn4',src_cluster, dest_cluster3, copy_fuzzy3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_household',src_cluster, dest_cluster3, copy_household3_)
+header_slimsort.Mac_SF_CopyProcess('BASE::HSS_name_source',src_cluster, dest_cluster3, copy_nmsrc3_)
+
 copy_files := parallel(
 	copy_dayob2_,
 	copy_ssn2_,
@@ -41,7 +49,15 @@ copy_files := parallel(
 	copy_phone2_,
 	copy_Fuzzy2_,
 	copy_household2_,
-	copy_nmsrc2_
+	copy_nmsrc2_,
+
+	copy_dayob3_,
+	copy_ssn3_,
+	copy_addr3_,
+	copy_phone3_,
+	copy_Fuzzy3_,
+	copy_household3_,
+	copy_nmsrc3_
 );
 
 full_files := sequential(base_files,copy_files);
