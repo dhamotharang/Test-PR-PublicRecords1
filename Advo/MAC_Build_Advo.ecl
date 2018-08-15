@@ -1,4 +1,4 @@
-import advo,uspis_hotlist,_Control, Orbit3, dops;
+﻿import advo,uspis_hotlist,_Control, Orbit3, dops;
 
 export MAC_Build_Advo (
 
@@ -11,9 +11,6 @@ export MAC_Build_Advo (
 	,pSkipUSPIS						= 'true'
 	
 ) := MACRO
-  #workunit('protect',true);
-	#workunit('name',Advo._Dataset().Name + ' build ' + pversion);
-	#workunit('priority','high');
 
 	DoBuild := Advo.Build_All(pversion,pAdvoversion,pAdvoSprayDirectory,pUSPISSprayDirectory,pSourceIP,pSkipAdvo,pSkipUSPIS);
 
@@ -23,11 +20,13 @@ export MAC_Build_Advo (
   NewRecs := distribute(DedupRecs,HASH(SampleRecs.date_last_seen,SampleRecs.prim_range,SampleRecs.cleanaid,SampleRecs.dpbc_digit,SampleRecs.chk_digit));
   FIRST1000 := choosen(NewRecs,1000);
 	movetoResearch := Advo.AddtoReseachSF;
-	idops := dops.updateversion('CDSKeys',pversion,'michael.gould@lexisnexisrisk.com,Gavin.Witz@lexisnexisrisk.com,insdataops@LexisNexisRisk.com',,'N',,,'A');
+	idops := dops.updateversion('CDSKeys',pversion,'michael.gould@lexisnexisrisk.com,Sudhir.Kasavajjala@lexisnexisrisk.com,insdataops@LexisNexisRisk.com',,'N',,,'A');
   ldops :=  sequential(dops.updateversion('CDSKeys',pversion,'michael.gould@lexisnexisrisk.com',,'N'),
                 dops.updateversion('FCRA_CDSKeys',pversion,'michael.gould@lexisnexisrisk.com',,'F'));
-	buildOrbit := sequential(Orbit3.proc_Orbit3_CreateBuild('CDS',pversion,'N'),
-	                         Orbit3.proc_Orbit3_CreateBuild ('FCRA CDS',pversion,'F'));
+	buildOrbit := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('CDS',pversion,'N'),
+	                         Orbit3.proc_Orbit3_CreateBuild ('FCRA CDS',pversion,'F'),
+													 
+							  );
 
 	sequential(
 				DoBuild
