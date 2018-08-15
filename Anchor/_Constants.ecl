@@ -1,4 +1,4 @@
-﻿IMPORT tools, STD;
+IMPORT tools, STD; 
 EXPORT _Constants(
 	BOOLEAN	pUseOtherEnvironment	= FALSE
 ) :=
