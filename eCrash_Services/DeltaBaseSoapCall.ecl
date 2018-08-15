@@ -90,7 +90,7 @@ EXPORT DeltaBaseSoapCall(IParam.searchrecords in_mod) := MODULE
 				
 				self.unit_number					:= DeltaRecord.unitNumber;
 				self.officer_id						:= DeltaRecord.officerID;
-				self.date_report_submitted          := dolFormat(DeltaRecord.date_report_submitted) ;
+				self.date_report_submitted          := DeltaRecord.date_report_submitted;
 				self := [];
 		END;
 		
