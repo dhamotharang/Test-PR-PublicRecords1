@@ -8,7 +8,7 @@ export ManualSuppression := module
 	end;
 	
 	export inRec2 := record
-		BIPV2.CommonBase.Layout.ProxID;
+		typeof(BIPV2.CommonBase.Layout.ProxID) inId;
 	end;
 
 	export slimRec := record
@@ -80,24 +80,19 @@ export ManualSuppression := module
 		string10 contact_phone;
 	end;
 	
-	export Layout_Suppression := record
-		BIPV2.CommonBase.Layout;
-		string25  userid;
-		unsigned4 dt_added;		
-		boolean removed;
-	end;
+
 	
 	export getHdrbyRcid(dataset(inRec) inDS) := function
 		hdrRecs    := BIPV2.CommonBase.DS_STATIC;
 		matchRidDS := join(hdrRecs,inDS,
                         left.rcid = right.rcid,
-                        transform(Layout_Suppression,self := left, self := []),lookup);
+                        transform(BIPV2_Files.files_suppressions().Layout_Suppression,self := left, self := []),lookup);
 		return matchRidDS;
 	end;		
 	
-	export createLogicalFile(dataset(Layout_Suppression) inRecs) := function
+	export createLogicalFile(dataset(BIPV2_Files.files_suppressions().Layout_Suppression) inRecs) := function
 		newFileName := BIPV2_Files.files_suppressions().filename;
-		oldData     := dataset(BIPV2_Files.files_suppressions().sfFileName,Layout_Suppression,thor,opt);
+		oldData     := BIPV2_Files.files_suppressions().ds_suppressions;
 		newData     := inRecs;
 		allData     := oldData + newData;
 		distData    := distribute(allData, hash32(rcid));
@@ -107,7 +102,7 @@ export ManualSuppression := module
 		return a;
 	end;
 
-	export createLogicalFileRemovedData(dataset(Layout_Suppression) inRecs) := function
+	export createLogicalFileRemovedData(dataset(BIPV2_Files.files_suppressions().Layout_Suppression) inRecs) := function
 		newFileName := BIPV2_Files.files_suppressions().filename;
 		allData     := inRecs;
 		distData    := distribute(allData, hash32(rcid));
@@ -127,11 +122,11 @@ export ManualSuppression := module
 	export addCandidates(dataset(inRec) inDs) := function
 		recsToSuppress  := getHdrbyRcid(inDs);
 		addTrackingInfo := project(recsToSuppress,
-		                           transform(Layout_Suppression,
-                                          self.userid   := lib_thorlib.thorlib.jobowner();
-                                          self.dt_added := (unsigned4)lib_thorlib.thorlib.wuid()[2..9];
-								                      self.removed  := false;
-								                      self          := left));
+		                           transform(BIPV2_Files.files_suppressions().Layout_Suppression,
+                                          self.userid     := lib_thorlib.thorlib.jobowner();
+                                          self.dt_added   := (unsigned4)lib_thorlib.thorlib.wuid()[2..9];
+								                      self.suppressed := true;
+								                      self            := left));
 								                      
 		a                := createLogicalFile(addTrackingInfo);
 		b                := updateSuppressedSuperFile();
@@ -143,7 +138,7 @@ export ManualSuppression := module
 	export candidatesByProxID(dataset(inRec2) inDs) := function
 		hdr        := BIPV2.CommonBase.DS_STATIC;
 		recs       := join(hdr,inDS,
-                        left.proxid = right.proxid,
+                        left.proxid = right.inId,
                         transform(slimRec,self := left), lookup);
 		return recs;
 	end;
@@ -151,7 +146,7 @@ export ManualSuppression := module
 	export candidatesBySeleID(dataset(inRec2) inDs) := function
 		hdr        := BIPV2.CommonBase.DS_STATIC;
 		recs       := join(hdr,inDS,
-                        left.seleid = right.proxid,
+                        left.seleid = right.inId,
                         transform(slimRec,self := left), lookup);
 		return recs;
 	end;
@@ -159,20 +154,20 @@ export ManualSuppression := module
 	export candidatesByLGID3(dataset(inRec2) inDs) := function
 		hdr        := BIPV2.CommonBase.DS_STATIC;
 		recs       := join(hdr,inDS,
-                        left.lgid3 = right.proxid,
+                        left.lgid3 = right.inId,
                         transform(slimRec,self := left), lookup);
 		return recs;
 	end;
 	
 	export removeCandidates(dataset(inRec) inDs) := function
-		suppressedData   := dataset(BIPV2_Files.files_suppressions().sfFileName,Layout_Suppression,thor,opt);
+		suppressedData   :=  BIPV2_Files.files_suppressions().ds_suppressions;
 		removeRecs       := join(suppressedData, inDs,
 		                         left.rcid = right.rcid,
                               transform(recordof(left),
-						                         self.removed  := if(right.rcid > 0, true, false),
-                                        self.userid   := if(right.rcid > 0, lib_thorlib.thorlib.jobowner(), left.userid),
-                                        self.dt_added := if(right.rcid > 0, (unsigned4)lib_thorlib.thorlib.wuid()[2..9], left.dt_added),
-								                    self          := left,
+						                         self.suppressed := if(right.rcid > 0, false, true),
+                                        self.userid     := if(right.rcid > 0, lib_thorlib.thorlib.jobowner(), left.userid),
+                                        self.dt_added   := if(right.rcid > 0, (unsigned4)lib_thorlib.thorlib.wuid()[2..9], left.dt_added),
+								                    self            := left,
 								                    ), left outer, hash);
 						
 		a                := createLogicalFileRemovedData(removeRecs);

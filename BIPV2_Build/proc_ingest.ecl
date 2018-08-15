@@ -102,13 +102,12 @@ export proc_ingest(STRING omitDisposition='') := module
 		END;
 	END;
 	
-	shared suppressedData := dataset(BIPV2_Files.files_suppressions().sfFileName,BIPV2.ManualSuppression.Layout_Suppression,thor,opt);
+	shared suppressedData := BIPV2_Files.files_suppressions().ds_suppressions;
 	shared ingest_results := PROJECT(BIPV2_Ingest.Ingest().AllRecords, TRANSFORM(BIPV2.CommonBase.Layout, SELF.ingest_status:=BIPV2_Ingest.Ingest().RTToText(LEFT.__Tpe), SELF:=LEFT));
 	SHARED ds_re_DID      := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
 	SHARED ds_setsos      := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
 
-	SHARED ds_removesuppressed := join(ds_setsos, suppressedData(not removed),
-	                                   left.source = right.source and
+	SHARED ds_removesuppressed := join(ds_setsos, suppressedData(suppressed), 
 															left.fname = right.fname and
 															left.mname = right.mname and
 															left.lname = right.lname and
@@ -134,16 +133,6 @@ export proc_ingest(STRING omitDisposition='') := module
 															left.unk_corp_key = right.unk_corp_key and
 															left.company_fein = right.company_fein and
 															left.company_phone = right.company_phone and
-															left.company_sic_code1 = right.company_sic_code1 and
-															left.company_sic_code2 = right.company_sic_code2 and
-															left.company_sic_code3 = right.company_sic_code3 and
-															left.company_sic_code4 = right.company_sic_code4 and
-															left.company_sic_code5 = right.company_sic_code5 and
-															left.company_naics_code1 = right.company_naics_code1 and
-															left.company_naics_code2 = right.company_naics_code2 and
-															left.company_naics_code3 = right.company_naics_code3 and
-															left.company_naics_code4 = right.company_naics_code4 and
-															left.company_naics_code5 = right.company_naics_code5 and
 															left.company_ticker = right.company_ticker and
 															left.company_ticker_exchange = right.company_ticker_exchange and
 															left.company_foreign_domestic = right.company_foreign_domestic and
@@ -158,6 +147,7 @@ export proc_ingest(STRING omitDisposition='') := module
 															left.contact_dob = right.contact_dob and
 															left.contact_email = right.contact_email,
 								                  transform(left), left only, lookup);
+											   
 	SHARED ds_ingested := project(ds_removesuppressed,recordof(BIPV2_Ingest.In_BASE));  
 	// SHARED ds_ingested := project(dataset('~thor_data400::bipv2_ingest::out_20161216',bipv2.CommonBase.layout,thor),recordof(BIPV2_Ingest.In_BASE));  
 
