@@ -32,9 +32,9 @@ delete_deletes := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) =
 												,output('no_delete_this_time')
 ,FileServices.ClearSuperFile(Superfile_List.deletes));
 
-PromoteSupers.Mac_SF_BuildProcess(Build_base,Superfile_List.Base, TransunionCred,2,,true);
+PromoteSupers.Mac_SF_BuildProcess(TransunionCred.Build_base(ver).all,Superfile_List.Base, TransunionCred,2,,true);
 
-zDoPopulationStats := Strata;
+zDoPopulationStats := Strata(ver);
 
 built := sequential(
 					spray_it,

@@ -34,6 +34,7 @@ MODULE
 	export src_Accurint_Trade_Show       := 'AT';
 	export src_ACF                       := 'CF';  // America's Corporate Financial Directory
 	export src_Acquiredweb 							 := 'AW';
+	export src_Acquiredweb_plus					 := 'AP';	 // AcquiredWeb Plus - Business names and email addresses
   export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. – ADVO file 
 	export src_AHA                       := 'AH';  // American Hospital Association for Organization master repositry
 	export src_Aircrafts                 := 'AR';  // Aircraft registrations from the FAA
@@ -804,12 +805,12 @@ MODULE
 	export set_email	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt								, src_thrive_pd									,src_Ibehavior               , src_AlloyMedia_consumer,  src_SalesChannel, src_Datagence
-		,src_InfutorNare					,src_Anchor													,src_RealSource];
+		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus];
 		
 	export set_email_poe	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer
-		,src_InfutorNare			,src_Anchor											,src_RealSource];
+		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus];
 		
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
@@ -1482,7 +1483,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Accurint_Sex_offender     := [src_Accurint_Sex_offender     ];
 	export set_Accurint_Trade_Show       := [src_Accurint_Trade_Show       ];
 	export set_ACF                       := [src_ACF                       ];
-	export set_Acquiredweb               := [src_Acquiredweb               ];	
+	export set_Acquiredweb               := [src_Acquiredweb               ];
+	export set_Acquiredweb_plus					 := [src_Acquiredweb_plus					 ];
   export set_advo_valassis	           := [src_advo_valassis             ]; 
 	export set_AHA                       := [src_AHA											 ];  
 	export set_Aircrafts                 := [src_Aircrafts                 ];
@@ -2523,6 +2525,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Accurint_Trade_Show       ,'Accurint Trade Show'                                       }
 		,{src_ACF                       ,'ACF - America\'s Corporate Financial Directory'            }
 		,{src_Acquiredweb      					,'Acquired Web'                                       			 }
+		,{src_Acquiredweb_plus					,'Acquired Web Business'																		 }
 	  ,{src_advo_valassis             ,'US Postal Service Via Valassis Communications, Inc. - ADVO'  }
 		,{src_AHA                       ,'AHA - American Hospital Association'      			           }
 	  ,{src_Aircrafts                 ,'Aircrafts'                                                 }
@@ -3028,7 +3031,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Accurint_Sex_offender     => 'Accurint Sex offender'                                
 		,src_Accurint_Trade_Show       => 'Accurint Trade Show'                                  
 		,src_ACF                       => 'ACF - America\'s Corporate Financial Directory'       
-		,src_Acquiredweb      				 => 'Acquired Web'                                       	
+		,src_Acquiredweb      				 => 'Acquired Web' 
+		,src_Acquiredweb_plus					 =>	'Acquired Web Business'
     ,src_advo_valassis         		 => 'US Postal Service Via Valassis Communications, Inc. - ADVO'
 		,src_AHA                       => 'AHA - American Hospital Association'       
 		,src_Aircrafts                 => 'Aircrafts'                                            

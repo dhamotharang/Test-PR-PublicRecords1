@@ -1168,6 +1168,15 @@
 				trim(kword, left, right) = 'JPMHLW' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPMHLW,
 				trim(kword, left, right) = 'GEGOV' =>SubGroup_Constants.numKeywordsID.KEYWORD_GEGOV,
 				trim(kword, left, right) = 'ZAFSCA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFSCA,
+				trim(kword, left, right) = 'SVSSF' =>SubGroup_Constants.numKeywordsID.KEYWORD_SVSSF,
+				trim(kword, left, right) = 'USJVNKA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USJVNKA,
+				trim(kword, left, right) = 'USMDOB' =>SubGroup_Constants.numKeywordsID.KEYWORD_USMDOB,
+				trim(kword, left, right) = 'BNAMBD' =>SubGroup_Constants.numKeywordsID.KEYWORD_BNAMBD,
+				trim(kword, left, right) = 'USFDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USFDA,
+				trim(kword, left, right) = 'WORLDBANK-ND' =>SubGroup_Constants.numKeywordsID.KEYWORD_WORLDBANK_ND,
+				trim(kword, left, right) = 'KRFSC' =>SubGroup_Constants.numKeywordsID.KEYWORD_KRFSC,
+				trim(kword, left, right) = 'LBISF' =>SubGroup_Constants.numKeywordsID.KEYWORD_LBISF,
+				trim(kword, left, right) = 'JPJSDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJSDA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

@@ -1920,11 +1920,11 @@ end;
 			SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
 		END;
 
-		roll_mo_lic := ROLLUP(sort_clear_exp_stat,
+		roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
 										LEFT.group_key 			= RIGHT.group_key 			AND 
 										LEFT.lic_state 			= RIGHT.lic_state				AND				
 										LEFT.lic_num				= RIGHT.lic_num					AND						
-										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	
+										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
 										// LEFT.lic_status			= RIGHT.lic_status		  AND
 										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
 										LEFT.record_type		= RIGHT.record_type,
