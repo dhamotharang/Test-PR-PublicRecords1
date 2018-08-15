@@ -205,8 +205,8 @@ END;
 		STRING6    										source                            := '';
 		UNSIGNED6   									rcid                              := 0;
 	 	BIPV2.IDlayouts.l_xlink_ids;
-		UNSIGNED6											did													      := 0;
-	  UNSIGNED1											did_score										      := 0;
+		// UNSIGNED6											did													      := 0;
+	  // UNSIGNED1											did_score										      := 0;
 		UNSIGNED4 										dt_first_seen								      := 0;
 	  UNSIGNED4 										dt_last_seen								      := 0;
 	  UNSIGNED4 										dt_vendor_first_reported		      := 0;
@@ -271,8 +271,8 @@ END;
 			STRING5			zip5;
 			STRING2			state;
 			STRING10		phone;
-			UNSIGNED6		did         := 0;
-			UNSIGNED1		did_score		:= 0;
+			// UNSIGNED6		did         := 0;
+			// UNSIGNED1		did_score		:= 0;
 	  END;
 
 	  EXPORT BIPSlim := RECORD

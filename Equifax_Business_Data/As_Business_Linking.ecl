@@ -60,7 +60,6 @@ EXPORT As_Business_Linking (
 				self.dt_vendor_first_reported    := l.dt_vendor_last_reported;
 				self.current					           := true;
 				self.dppa						             := false;
-				self.contact_did                 := l.did;
         self.company_foreign_domestic := if(l.EFX_FOREIGN = '', 'D', 'F'); 
         self.company_charter_number := '';
         self.company_filing_date := 0;  

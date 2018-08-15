@@ -6,8 +6,8 @@ EXPORT Email_Notification_Lists(
 			
   tools.mod_Email_Notification_Lists(
 		 _Control.MyInfo.EmailAddressNotify	
-	  ,_Control.MyInfo.EmailAddressNotify + ';barbara.oneill@lexisnexisrisk.com;'/* + '<data ops eng>@lexisnexisrisk.com;'*/	
-	  ,_Control.MyInfo.EmailAddressNotify + ';barbara.oneill@lexisnexisrisk.com;'/* + '<data ops eng>@lexisnexisrisk.com;'*/
-	  ,_Control.MyInfo.EmailAddressNotify + ';' + roxiekeybuild.Email_Notification_List + ';barbara.oneill@lexisnexisrisk.com' /* + '<data ops eng>@lexisnexisrisk.com;'*/		
+	  ,_Control.MyInfo.EmailAddressNotify + ';barbara.oneill@lexisnexisrisk.com;' + 'Melanie.Jackson@lexisnexisrisk.com;'
+	  ,_Control.MyInfo.EmailAddressNotify + ';barbara.oneill@lexisnexisrisk.com;' + 'Melanie.Jackson@lexisnexisrisk.com;'
+	  ,_Control.MyInfo.EmailAddressNotify + ';' + roxiekeybuild.Email_Notification_List + ';barbara.oneill@lexisnexisrisk.com' + 'Melanie.Jackson@lexisnexisrisk.com;'	
 	  ,pIsTesting
 	 );

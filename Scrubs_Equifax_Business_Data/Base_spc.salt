@@ -102,8 +102,6 @@ FIELD:orgweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,0
 FIELD:ultid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
 FIELD:ultscore:TYPE(UNSIGNED2):LIKE(invalid_percentage):0,0
 FIELD:ultweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,00
-FIELD:did:TYPE(UNSIGNED6):LIKE(invalid_zero_integer):0,0
-FIELD:did_score:TYPE(UNSIGNED1):LIKE(invalid_zero_integer):0,0
 
 //These could change once we get the fixed vendor data !!!!!!!!!!
 //Check logic on all date validations

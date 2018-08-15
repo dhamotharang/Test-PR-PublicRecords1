@@ -12,7 +12,7 @@ IMPORT Equifax_Business_Data,SALT37;
   OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
   OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
-  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  // OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
   OUTPUT(h.ClusterCounts,NAMED('ClusterCounts'),ALL); // Breakdown by size of clusters
   OUTPUT(h.ClusterSrc,NAMED('ClusterSrc'),ALL); // Breakdown of source distribution in clusters
   OUTPUT(h.SrcProfiles,NAMED('SrcProfiles'),ALL); // Which sources contribute values to a cluster
@@ -58,8 +58,6 @@ IMPORT Equifax_Business_Data,SALT37;
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultid,Examples),NAMED('ultidBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultscore,Examples),NAMED('ultscoreBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultweight,Examples),NAMED('ultweightBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,did,Examples),NAMED('didBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,did_score,Examples),NAMED('did_scoreBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_first_seen,Examples),NAMED('dt_first_seenBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_last_seen,Examples),NAMED('dt_last_seenBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_vendor_first_reported,Examples),NAMED('dt_vendor_first_reportedBysource'));

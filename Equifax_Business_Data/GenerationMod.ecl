@@ -33,8 +33,6 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:ultid:DERIVED:0,0\n'
     + 'FIELD:ultscore:DERIVED:0,0\n'
     + 'FIELD:ultweight:DERIVED:0,0\n'
-    + 'FIELD:did:DERIVED:0,0\n'
-    + 'FIELD:did_score:DERIVED:0,0\n'
     + 'FIELD:dt_first_seen:DERIVED:0,0\n'
     + 'FIELD:dt_last_seen:DERIVED:0,0\n'
     + 'FIELD:dt_vendor_first_reported:DERIVED:0,0\n'
