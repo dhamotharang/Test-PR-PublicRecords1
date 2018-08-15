@@ -1646,5 +1646,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/1087 Democratic People\'s Republic of Korea List','1632'},
 {'EC 2018/1072 Ukraine List','1633'},
 {'EC 2018/1074 Democratic People\'s Republic of Korea List','1634'},
-{'PBC Operations Office (Beijing) Administrative Penalties','1635'}
+{'PBC Operations Office (Beijing) Administrative Penalties','1635'},
+{'EC (CFSP) 2018/1084 EU Terrorism List','1636'},
+{'EC 2018/1071 Terrorism List','1637'}
 ],r);

@@ -17,6 +17,7 @@ export Prefix(string serviceName='NoNameGiven') := function
 	return	trim(case (trim(servicename),
 	              'person_slimsorts' 	=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
 															,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
+															,ThorLib.Group() = 'thor400_36' => '~thor400_36::'
 																					, ''),	
 								'person_xADL2'     	=> '',
 								'IDL_Header'        => ut.foreign_aprod,

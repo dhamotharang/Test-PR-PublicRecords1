@@ -49,6 +49,7 @@ export proc_postHeaderBuilds := module
 		
 		thor1:='thor400_44';
 		thor2:='thor400_66';
+		thor3:='thor400_36';
 
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
@@ -56,7 +57,7 @@ export proc_postHeaderBuilds := module
 		bld_Transunion_Ptrak := Header.build_tucs_did
 		: success(sequential(output('TS/TN completed'),header.msg('TS/TN completed',elist_owners).good))
 		;
-		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2)
+		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2, thor3)
 		: success(sequential(output('XADL1keys completed'),header.msg('XADL1keys completed',elist_owners).good))
 		;
 		step:='Yogurt:'+Header.version_build+' XADL keys and externals base files';

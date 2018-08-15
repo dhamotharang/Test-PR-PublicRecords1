@@ -1,11 +1,11 @@
-/********************************************************************************************************** 
+﻿/********************************************************************************************************** 
 	Name: 			Constants
 	Created On: 07/15/2013
 	By: 				ssivasubramanian
 	Desc: 			Holds the non-functional constants needed by the water craft build module 	
 ***********************************************************************************************************/
 
-IMPORT _Control, ut, PRTE2_Common, PRTE2_Watercraft, fcra;
+IMPORT _Control, ut, PRTE2_Common, PRTE2_Watercraft, fcra, watercraft, data_services;
 	 
 EXPORT Constants := MODULE	
 	
@@ -26,5 +26,9 @@ EXPORT Constants := MODULE
 // Support
 	EXPORT EmailTargetFail				:= PRTE2_Common.Email.EmailTargetFail;	 
 	EXPORT EmailTargetSuccess			:= PRTE2_Common.Email.EmailTargetSuccess;
+
+  EXPORT fields_to_clear_sid    := watercraft.Constants.fields_to_clear_sid;
+	EXPORT fields_to_clear_cid		:= watercraft.Constants.fields_to_clear_cid;
+	EXPORT fields_to_clear_wid		:= watercraft.Constants.fields_to_clear_wid;
 		
 END;

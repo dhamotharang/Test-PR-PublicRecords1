@@ -1,4 +1,4 @@
-﻿pversion 	:= 	'20180723'										;		// modify to current date
+﻿pversion 	:= 	'20180806'										;		// modify to current date
 
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation

@@ -20,11 +20,9 @@ export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lex
 	
 // Update Orbit with the correct entries in build in progress mode.
 
-  oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_QuickHeaderKeys',filedate,'F', ,true,true);	
-  oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true,true);	
-  oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true,true);	
-  oQH_nonitems  := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N',runaddcomponentsonly := true);
-  oQHS_nonitems := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N',runaddcomponentsonly := true);
+  oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
+  oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
+  oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
 	
 	EQ_records_in0 := header.fn_preprocess(true);
 	
