@@ -286,10 +286,10 @@ EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN i
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 // This is an unfortunate artefact of the old Comp Report (and a weird code, having said that):
-// doxie.ssn_records doesn't contain "best" record, so here I have to add it to AKAs
+// doxie/ssn_records doesn't contain "best" record, so here I have to add it to AKAs
 // (see also #14515)
-// I believe it is still better than what was here before (calls to both doxie.ssn_records and doxie.ssn_persons)
-// Eventually, doxie.ssn_records MUST be modified to return all persons, and all this code will be gone.
+// I believe it is still better than what was here before (calls to both doxie/ssn_records and doxie/ssn_persons)
+// Eventually, doxie/ssn_records MUST be modified to return all persons, and all this code will be gone.
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 aka_best := Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
