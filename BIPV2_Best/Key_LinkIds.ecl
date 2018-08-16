@@ -78,7 +78,7 @@ EXPORT Key_LinkIds := MODULE
  export kfetch2_layout := {                          
 							unsigned2 fetch_error_code;
 							BIPV2.IDLayouts.l_xlink_ids2.UniqueID;
-							BIPV2_Best.Key_Linkids.KeyPlus};
+							KeyPlus};
 							
 	//DEFINE THE INDEX ACCESS
 export kFetch2(
