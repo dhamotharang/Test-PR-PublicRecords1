@@ -3,16 +3,16 @@
 STRING8 sVersion := BIPV2.KeySuffix;
 rIn_Layout := BIPV2.Layout_Business_Linking_Full;
 dIngest_In := DATASET(BIPV2.Filenames(sVersion,TRUE).Source_Ingest.new, rIn_Layout, THOR);
+// dIngest_In := ENTH(DATASET(BIPV2.Filenames(sVersion,TRUE).Source_Ingest.new, rIn_Layout, THOR), 1000); //For Testing Only
 
-tbl_layout := RECORD
-   string80		company_url;
-   boolean    is_valid := TRUE;
-END;
+// tbl_layout := RECORD
+   // string80		company_url;
+   // boolean    is_valid := TRUE;
+// END;
 
-dLookupTbl := DEDUP(PROJECT(dIngest_In, TRANSFORM(tbl_layout, SELF.company_url := LEFT.source, SELF := [])),ALL);
+// dLookupTbl := DEDUP(PROJECT(dIngest_In, TRANSFORM(tbl_layout, SELF.company_url := LEFT.source, SELF := [])),ALL);
 
-tbl_layout tCreateLookup(rIn_Layout L) := TRANSFORM
-
+// tbl_layout tCreateLookup(rIn_Layout L) := TRANSFORM
 
 Scrubs_BIPV2.Ingest_Layout_BIPV2 tFlatten(rIn_Layout l) := TRANSFORM
    SELF.source_expanded                   := MDR.sourceTools.TranslateSource(L.source);

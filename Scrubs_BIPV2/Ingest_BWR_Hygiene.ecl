@@ -112,7 +112,6 @@ IMPORT Scrubs_BIPV2,SALT311;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_title,Examples),NAMED('contact_name_titleBysource_expanded'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_fname,Examples),NAMED('contact_name_fnameBysource_expanded'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_lname,Examples),NAMED('contact_name_lnameBysource_expanded'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_lname,Examples),NAMED('contact_name_lnameBysource_expanded'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_name_suffix,Examples),NAMED('contact_name_name_suffixBysource_expanded'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_name_name_score,Examples),NAMED('contact_name_name_scoreBysource_expanded'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source_expanded,contact_type_raw,Examples),NAMED('contact_type_rawBysource_expanded'));
