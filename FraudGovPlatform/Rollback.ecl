@@ -1,12 +1,14 @@
 ﻿import tools, STD, FraudShared;
 
-export Rollback  :=
+export Rollback(
+	string	pversion	= 	''
+)  :=
 module
 
-	Shared PreviousVersion := FraudGovInfo().PreviousVersion;
+	Shared PreviousVersion := if(pversion	= 	'', FraudGovInfo().PreviousVersion,pversion);
 	
 	Export clear_input_files := sequential(
-
+		
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Input.IdentityData.Sprayed, false),
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Input.KnownFraud.Sprayed, false),      
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Input.bypassed_identitydata.Sprayed, false),		
@@ -22,22 +24,33 @@ module
 		STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built, false),
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.addresscache.Built, false),         
 
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.pii.Built, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.ciid.Built, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.death.Built, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.fraudpoint.Built, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.crim.Built, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.pii.Built, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.ciid.Built, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.death.Built, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.fraudpoint.Built, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.crim.Built, false),
 
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.IdentityData.QA, false),	
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.KnownFraud.QA, false),      
 		STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.QA, false),
 		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.addresscache.QA, false),
 		
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.pii.QA, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.ciid.QA, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.death.QA, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.fraudpoint.QA, false),
-		// STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.crim.QA, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.pii.QA, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.ciid.QA, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.death.QA, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.fraudpoint.QA, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.crim.QA, false),
+
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.IdentityData.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.KnownFraud.Father, false),
+		STD.File.ClearSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.addresscache.Father, false),         
+
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.pii.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.ciid.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.death.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.fraudpoint.Father, false),
+		STD.File.ClearSuperFile(Filenames(PreviousVersion).Base.crim.Father, false),		
 	);
 	
 
@@ -55,28 +68,28 @@ module
 		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.KnownFraud.Built		,Filenames(PreviousVersion).Base.KnownFraud.New),	
 		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built		,FraudShared.Filenames(PreviousVersion).Base.Main.New),	
 		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.addresscache.Built		,Filenames(PreviousVersion).Base.addresscache.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.pii.Built		,Filenames(PreviousVersion).Base.pii.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.ciid.Built		,Filenames(PreviousVersion).Base.ciid.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.death.Built		,Filenames(PreviousVersion).Base.death.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.fraudpoint.Built		,Filenames(PreviousVersion).Base.fraudpoint.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.crim.Built		,Filenames(PreviousVersion).Base.crim.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.pii.Built		,Filenames(PreviousVersion).Base.pii.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.ciid.Built		,Filenames(PreviousVersion).Base.ciid.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.death.Built		,Filenames(PreviousVersion).Base.death.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.fraudpoint.Built		,Filenames(PreviousVersion).Base.fraudpoint.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.crim.Built		,Filenames(PreviousVersion).Base.crim.New),	
 
 		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.IdentityData.QA		,Filenames(PreviousVersion).Base.IdentityData.New),	
 		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.KnownFraud.QA		,Filenames(PreviousVersion).Base.KnownFraud.New),	
 		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.QA		,FraudShared.Filenames(PreviousVersion).Base.Main.New),	
 		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.addresscache.QA		,Filenames(PreviousVersion).Base.addresscache.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.pii.QA		,Filenames(PreviousVersion).Base.pii.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.ciid.QA		,Filenames(PreviousVersion).Base.ciid.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.death.QA		,Filenames(PreviousVersion).Base.death.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.fraudpoint.QA		,Filenames(PreviousVersion).Base.fraudpoint.New),	
-		// STD.File.AddSuperFile(Filenames(PreviousVersion).Base.crim.QA		,Filenames(PreviousVersion).Base.crim.New),			
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.pii.QA		,Filenames(PreviousVersion).Base.pii.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.ciid.QA		,Filenames(PreviousVersion).Base.ciid.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.death.QA		,Filenames(PreviousVersion).Base.death.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.fraudpoint.QA		,Filenames(PreviousVersion).Base.fraudpoint.New),	
+		STD.File.AddSuperFile(Filenames(PreviousVersion).Base.crim.QA		,Filenames(PreviousVersion).Base.crim.New),			
 	);
 	
 	Export inputFiles := sequential(
 		STD.File.StartSuperFileTransaction(),
 		clear_input_files,
 		rollback_input_files,
-		STD.File.FinishSuperFileTransaction()
+		STD.File.FinishSuperFileTransaction(),
 	);
 	
 	Export baseFiles := sequential(
@@ -88,8 +101,8 @@ module
 		STD.File.FinishSuperFileTransaction()
 	);
 	
-	Export All := map(	FraudgovInfo().CurrentStatus = 'Input_Phase' => inputFiles,
-									FraudgovInfo().CurrentStatus in  ['Base_Phase','Base_Completed'] => baseFiles									
+	Export All := map(	FraudgovInfo().CurrentStatus = 'Input_Phase' 									=> 	sequential(inputFiles, 	Send_Emails(pversion).BuildFailure),
+									FraudgovInfo().CurrentStatus in  ['Base_Phase','Base_Completed'] 	=> 	sequential(baseFiles, 	Send_Emails(pversion).BuildFailure)									
 								);
 end;
 

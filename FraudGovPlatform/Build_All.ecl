@@ -37,7 +37,7 @@ module
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	export input_portion := sequential(
-			fraudgovInfo(pversion,'Input_Phase').postNewStatus
+			FraudgovInfo(pversion,'Input_Phase').postNewStatus
 			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
@@ -48,7 +48,7 @@ module
 	);
 
 	export base_portion := sequential(
-			fraudgovInfo(pversion,'Base_Phase').postNewStatus
+			FraudgovInfo(pversion,'Base_Phase').postNewStatus
 		  	,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
@@ -67,7 +67,7 @@ module
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
 			).All
-			,fraudgovInfo(pversion,'Base_Completed').postNewStatus
+			,FraudgovInfo(pversion,'Base_Completed').postNewStatus
 			,notify('Base_Completed','*')
 			,notify('Build_FraudGov_PII_SOAP_Appends','*')
 			
@@ -75,7 +75,8 @@ module
 	
 
 	export Build_FraudShared_Keys := sequential(
-		  FraudShared.Build_Keys(
+			FraudgovInfo(pversion,'Base_Completed').SetPreviousVersion
+			,FraudShared.Build_Keys(
 			 pversion
 			,pBaseMainBuilt
 			).All
@@ -88,9 +89,11 @@ module
 			,FraudShared.Promote().buildfiles.cleanup	
 		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 
-	export keys_portion := if(Mac_TestBuild(pversion) = 'Passed' and Mac_TestRecordID(pversion) = 'Passed' and Mac_TestRinID(pversion) = 'Passed', 
+	export keys_portion := if(		Mac_TestBuild(pversion) 			= 'Passed' and 
+												Mac_TestRecordID(pversion) 	= 'Passed' and 
+												Mac_TestRinID(pversion) 			= 'Passed', 
 												Build_FraudShared_Keys, 
-												Rollback.All);
+												Rollback(pversion).All);
 	
 	export full_build := sequential(
 		 Spray_MBS

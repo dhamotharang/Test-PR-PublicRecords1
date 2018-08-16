@@ -28,10 +28,10 @@ module
 		PromoteSupers.MAC_SF_BuildProcess(
 				dataset([{pVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
 				fn,
-				FixFile,
+				WritePreviousVersion,
 				2
 				,,
 				true);
 				
-		EXPORT fixStatus := sequential(FixFile, output('fraudgov_build_version Fixed', named('fraudgovInfoFixed')));
+		EXPORT SetPreviousVersion := sequential(WritePreviousVersion, output('fraudgov_build_version Fixed', named('fraudgovInfoFixed')));
 END;
