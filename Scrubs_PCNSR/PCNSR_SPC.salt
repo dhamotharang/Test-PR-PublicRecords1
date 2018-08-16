@@ -2,10 +2,10 @@
 MODULE:Scrubs_PCNSR
 FILENAME:PCNSR
 
-FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.'/& )
-FIELDTYPE:Invalid_Num:ALLOW(0123456789. )
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\(\)-.'/& )
+FIELDTYPE:Invalid_Num:ALLOW(-0123456789. )
 FIELDTYPE:Invalid_CRSORT:ENUM(D|B|C|A|)
-FIELDTYPE:Invalid_LotOrder:ENUM(A|D)
+FIELDTYPE:Invalid_LotOrder:ENUM(A|D|)
 FIELDTYPE:Invalid_RecType:ENUM(S|H|HD|P|SD|F|R|RD|UD|G|GD|)
 FIELDTYPE:Invalid_DemographicIndicator:ENUM(B|Z|N|)
 FIELDTYPE:Invalid_Gender:ENUM(M|F|U|)
@@ -20,7 +20,7 @@ FIELD:title:LIKE(Invalid_Char):TYPE(STRING5):0,0
 FIELD:fname:LIKE(Invalid_Char):TYPE(STRING20):0,0
 FIELD:mname:LIKE(Invalid_Char):TYPE(STRING20):0,0
 FIELD:lname:LIKE(Invalid_Char):TYPE(STRING20):0,0
-FIELD:name_suffix:LIKE(Invalid_Num):TYPE(STRING5):0,0
+FIELD:name_suffix:TYPE(STRING5):0,0
 FIELD:name_score:LIKE(Invalid_Char):TYPE(STRING3):0,0
 FIELD:fname_orig:LIKE(Invalid_Char):TYPE(STRING15):0,0
 FIELD:mname_orig:LIKE(Invalid_Char):TYPE(STRING1):0,0
