@@ -291,9 +291,10 @@ EXPORT Functions := MODULE
   //fn_url: 	returns true or false based on validity of the url
   //****************************************************************************
   EXPORT fn_url(STRING url) := FUNCTION
-    url_clean := regexreplace('\\s+', url, '');  //Remove all the whitespace which is invalid in an url
+    bad_urls := '^n/?a$|^[\\d\\-\\l\\u\\h,;:]+(\\.)?$';
+    // url_clean := regexreplace('\\s+', url, '');  //Remove all the whitespace which is invalid in an url
 	  // RETURN IF(url_clean = '', 1, IF(STD.System.Util.ResolveHostName(url_clean) != '0.0.0.0', 1, 0));
-	  RETURN IF(url_clean = '', 1, 1);
+	  RETURN IF(REGEXFIND(bad_urls, TRIM(url), NOCASE), 0, 1);
 	END;
 
   //****************************************************************************
