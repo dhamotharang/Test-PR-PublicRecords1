@@ -51,6 +51,8 @@
   <part name="IncludeWeaponLaw"                   type="xsd:boolean"/>
   <part name="IncludeOther"                       type="xsd:boolean"/>
 	<part name="IncludeCannotClassify"              type="xsd:boolean"/>
+	<part name="IncludeWarrantFugitive"             type="xsd:boolean"/>
+	<part name="IncludeObstructResist"              type="xsd:boolean"/>
 
 </message>
 */

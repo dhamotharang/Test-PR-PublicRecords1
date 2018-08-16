@@ -12,9 +12,9 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN MatchSSN      			:= FALSE;  
 		EXPORT BOOLEAN MatchDOB						:= FALSE;
     // v---- 06/13/2017, offense categories filtering enhancement ----v
-	  // 43 booleans total; 
-		//      1 for each of the 42 LN standard offense categories in hygenics_crim._functions.ctg_***, 
-		// plus 1 extra to indicate if any 1 of the 42 were set on.
+	  // 45 booleans total;
+		//      1 for each of the 44 LN standard offense categories in hygenics_crim._functions.ctg_***,
+		// plus 1 extra to indicate if any 1 of the 44 were set on.
     EXPORT BOOLEAN IncludeArson           := FALSE;
 	  EXPORT BOOLEAN IncludeAssaultAgg      := FALSE;
     EXPORT BOOLEAN IncludeAssaultOther	  := FALSE;
@@ -57,6 +57,8 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN IncludeWeaponLaw       := FALSE;
     EXPORT BOOLEAN IncludeOther           := FALSE;
 	  EXPORT BOOLEAN IncludeCannotClassify  := FALSE;
+    EXPORT BOOLEAN IncludeWarrantFugitive := FALSE;
+    EXPORT BOOLEAN IncludeObstructResist  := FALSE;
 		EXPORT BOOLEAN IncludeAtLeast1Offense := FALSE;
 	END;
 
@@ -109,9 +111,11 @@ EXPORT IParam := MODULE
       EXPORT BOOLEAN IncludeTrespass        := FALSE : STORED('Includetrespass');
       EXPORT BOOLEAN IncludeWeaponLaw       := FALSE : STORED('Includeweaponlaw');
       EXPORT BOOLEAN IncludeOther           := FALSE : STORED('Includeother');
-	    EXPORT BOOLEAN IncludeCannotClassify  := FALSE : STORED('Includecannotclassify'); // #42
+      EXPORT BOOLEAN IncludeCannotClassify  := FALSE : STORED('Includecannotclassify');
+      EXPORT BOOLEAN IncludeWarrantFugitive := FALSE : STORED('Includewarrantfugitive');
+      EXPORT BOOLEAN IncludeObstructResist  := FALSE : STORED('Includeobstructresist');
 
-      // Check if any of the 42 individual Include*** input switches were set on/requested
+      // Check if any of the 44 individual Include*** input switches were set on/requested
       EXPORT BOOLEAN IncludeAtLeast1Offense := IncludeArson          or 
 	                                             IncludeAssaultAgg     or 
                                                IncludeAssaultOther   or 
@@ -153,7 +157,9 @@ EXPORT IParam := MODULE
                                                IncludeTrespass       or     
                                                IncludeWeaponLaw      or        
                                                IncludeOther          or                      
-	                                             IncludeCannotClassify;
+                                               IncludeCannotClassify or
+                                               IncludeWarrantFugitive or
+                                               IncludeObstructResist;
 	  END;
 			
 		RETURN param_mod;
