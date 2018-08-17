@@ -235,7 +235,7 @@ EXPORT Records := Module
 		GoodResults := join(getInputWarnings,getOutputWarnings,left.acctno=right.acctno,
 																								transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																									self.acctno := left.acctno;
-																									self.Warnings := dedup(sort(left.Warnings + if(exists(right.Warnings), right.Warnings, dataset([{'199','LN'}], Healthcare_Ganga.Layouts.WarningsOutput)),record),record);
+																									self.Warnings := dedup(sort(left.Warnings + if(exists(right.Warnings) AND right.EntityType <> '', right.Warnings, dataset([{'199','LN'}], Healthcare_Ganga.Layouts.WarningsOutput)),record),record);
 																									self.ResponseDateTime := left.ResponseDateTime;
 																									self := right;),left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
 		FinalGoodResults := sort(GoodResults+getInvalidInputWarnings, acctno);
