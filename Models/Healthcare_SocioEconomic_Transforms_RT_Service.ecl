@@ -600,7 +600,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		// Condition_1_Reject_DS;
 		Condition_2_Reject_DS := EmptyExceptionDS + Name_First_Rej_Row + Name_Last_Rej_Row + street_addr_Rej_Row + p_City_name_Rej_Row+ Z5_Rej_Row + MemberGender_Rej_Row + DOB_Rej_Row + ST_name_Rej_Row;
 		// Condition_2_Reject_DS;
-		Condition_1_2_Reject_DS := IF(Met_MinInput_Condition_1 = TRUE or Met_MinInput_Condition_2 = TRUE, EmptyExceptionDS,IF(Met_MinInput_Condition_2 = FALSE, Condition_2_Reject_DS,IF(Met_MinInput_Condition_2 = TRUE AND Met_MinInput_Condition_1 = FALSE, EmptyExceptionDS,Condition_1_Reject_DS)));
+		Condition_1_2_Reject_DS := IF(Met_MinInput_Condition_1 = TRUE or Met_MinInput_Condition_2 = TRUE, EmptyExceptionDS,IF(Met_MinInput_Condition_2 = FALSE AND Cleaned_Member_Input.SSN_in=_blank, Condition_2_Reject_DS,IF(Met_MinInput_Condition_2 = TRUE AND Met_MinInput_Condition_1 = FALSE, EmptyExceptionDS,Condition_1_Reject_DS)));
 		//Condition_1_2_Reject_DS;
 		Output_Condition_1_2_Reject_DS := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) > 0, Condition_1_2_Reject_DS(code<>0), EmptyExceptionDS);
 
