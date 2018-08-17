@@ -14,16 +14,15 @@ function
 
 	full_build :=
 	sequential(
-		// Create_Supers
-		Output(pversion,NAMED('Version_date'))
-		//,RemoteCopyInfile	(pFilename,pGroupName,pRemoteIp)
-		//,Build_Base				(pversion,pIsTesting,pSprayedFile	)
-		//,Build_Keys				(pversion															).all
-		//,Build_Strata			(pversion	,pOverwrite,,,	pIsTesting	)
-		//,Promote().Inputfiles.using2used
-		//,Promote().Buildfiles.Built2QA
-	  //,Orbit3.proc_Orbit3_CreateBuild_npf('CCLUE',pversion)
-//	 ): success(email_notification_success), failure(email_notification_failure);
+		 Create_Supers
+		,Output(pversion,NAMED('Version_date'))
+		,RemoteCopyInfile	(pFilename,pGroupName,pRemoteIp)
+		,Build_Base				(pversion,pIsTesting,pSprayedFile	)
+		,Build_Keys				(pversion															).all
+		,Build_Strata			(pversion	,pOverwrite,,,	pIsTesting	)
+		,Promote().Inputfiles.using2used
+		,Promote().Buildfiles.Built2QA
+	  ,Orbit3.proc_Orbit3_CreateBuild_npf('CCLUE',pversion)
    ): success(Send_Emails(pversion,,not pIsTesting).BuildSuccess), failure(send_emails(pversion,,not pIsTesting).buildfailure);	
 	
 		
