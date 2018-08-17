@@ -28,7 +28,10 @@ doit := SEQUENTIAL(
 	if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'
 										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'Y','N',l_isprodready:='Y')
 										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'N','N')
-			)
+			),
+	if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
+							Nac_v2.CreateOrbitEntry(version)),
+	Nac.fn_Strata(version)
 );
 
 return doit;

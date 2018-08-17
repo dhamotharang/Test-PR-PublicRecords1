@@ -1,7 +1,7 @@
-Import ut, std, _Validate;
+﻿Import ut, std, _Validate;
 
 
-NormalizeName(string s) := (string)Std.Uni.CleanAccents(Std.Str.FindReplace(Std.Str.CleanSpaces(s),'Â¿','?'));
+NormalizeName(string s) := (string)Std.Uni.CleanAccents(Std.Str.FindReplace(Std.Str.CleanSpaces(s),'¿','?'));
 
 fixupMsg(string msg) := If(msg[1]='\n', msg[2..], msg);
 
@@ -224,7 +224,7 @@ EXPORT Validate := MODULE
 				));
 /**
 1.       If an address field is missing or corrupted, but the address cleans OK, then no error message will be issued. However, we will issue a warning message.
-2.       If all the address fields are populated with â€œgoodâ€ data (i.e., no bad characters), then there will be no error, even if the address could not be cleaned.
+2.       If all the address fields are populated with “good” data (i.e., no bad characters), then there will be no error, even if the address could not be cleaned.
 3.       HOMELESS and GENERAL DELIVERY addresses will not result in error or warning messages
 4.       Missing street is just a warning
 **/
