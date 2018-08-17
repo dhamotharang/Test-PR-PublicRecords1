@@ -175,6 +175,10 @@ EXPORT fn_getadvsearch_raw_recs (
 																				clean_address.prim_name = in_rec.prim_name AND
 																				clean_address.sec_range = in_rec.sec_range AND
 																				((clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st) OR clean_address.zip = in_rec.z5)),true) AND
+																			if(in_rec.p_city_name <> '' AND in_rec.st <> '', 
+																					clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st,
+																					true) AND
+																			if(in_rec.z5 <> '', clean_address.zip = in_rec.z5, true) AND
 																			if(in_rec.ssn <> '', ssn = in_rec.ssn, true) AND
 																			if(in_rec.phoneno <> '', in_rec.phoneno IN [clean_phones.phone_number, clean_phones.cell_phone, clean_phones.work_phone], true) AND
 																			if(in_rec.HouseholdId <> '', household_id = in_rec.HouseholdId, true) AND

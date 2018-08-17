@@ -81,20 +81,22 @@ EXPORT Utilities := MODULE
 		// ... they will be supported for the final product. 
 		analytics_uids := PROJECT(ds_entityNameValue, 
 												TRANSFORM(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs,
-													uid := MAP(	// LEFT.entity_name = Fragment_Types_const.DEVICE_ID_FRAGMENT
-																			// LEFT.entity_name = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
-																			// LEFT.entity_name = Fragment_Types_const.GEOLOCATION_FRAGMENT
-																			LEFT.entity_name = Fragment_Types_const.IP_ADDRESS_FRAGMENT => Entity_Type_Identifier._IPADDRESS + HASH32(LEFT.entity_value),
-																			// LEFT.entity_name = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT
-																			// LEFT.entity_name = Fragment_Types_const.NAME_FRAGMENT
-																			LEFT.entity_name = Fragment_Types_const.PERSON_FRAGMENT => Entity_Type_Identifier._LEXID + LEFT.entity_value,
-																			LEFT.entity_name = Fragment_Types_const.PHONE_FRAGMENT => Entity_Type_Identifier._PHONENO + LEFT.entity_value,
+													uid := CASE(LEFT.entity_name,
+																			// Fragment_Types_const.DEVICE_ID_FRAGMENT
+																			// Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
+																			// Fragment_Types_const.GEOLOCATION_FRAGMENT
+																			Fragment_Types_const.IP_ADDRESS_FRAGMENT => Entity_Type_Identifier._IPADDRESS + HASH32(LEFT.entity_value),
+																			// Fragment_Types_const.MAILING_ADDRESS_FRAGMENT
+																			// Fragment_Types_const.NAME_FRAGMENT
+																			Fragment_Types_const.PERSON_FRAGMENT => Entity_Type_Identifier._LEXID + LEFT.entity_value,
+																			Fragment_Types_const.PHONE_FRAGMENT => Entity_Type_Identifier._PHONENO + LEFT.entity_value,
 																			//Calculating the tree_uid for the physical address value. Calculation is '_09'+HASH(address_1,address_2)
-																			LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
+																			Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 																					Entity_Type_Identifier._PHYSICAL_ADDRESS + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1),regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
-																			LEFT.entity_name = Fragment_Types_const.SSN_FRAGMENT => Entity_Type_Identifier._SSN +  LEFT.entity_value,
-																			// LEFT.entity_name = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => '' + LEFT.entity_value,
+																			Fragment_Types_const.SSN_FRAGMENT => Entity_Type_Identifier._SSN +  LEFT.entity_value,
+																			// Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => '' + LEFT.entity_value,
 																			'');
+
 													SELF.tree_uid := uid;
 													SELF.entity_context_uid := uid;
 													SELF := LEFT));
