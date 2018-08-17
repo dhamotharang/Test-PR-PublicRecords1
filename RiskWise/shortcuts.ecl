@@ -213,14 +213,40 @@ export shortcuts := module
 		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements - bk_chapters;	
 		string200 errorcode;
 	end;
+  
+	EXPORT ox53 := RECORD
+		Risk_Indicators.layout_bocashell_53temp;
+	END;
+
+	EXPORT ox54 := RECORD
+		Risk_Indicators.layout_bocashell_54temp;
+	END;
+
+  EXPORT ox41ADL := RECORD
+    Risk_Indicators.layout_bocashell_41ADLtemp;
+  END;
 	
 // keeping a copy of these shells on dataland thor50_dev cluster and prod pound_option_thor cluster
-	export validation_fcra_shell108k_41    := dataset( '~thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_41 := dataset( '~thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
-	
-	export validation_fcra_shell108k_50    := dataset( '~thor50_dev::out::fcrashell50_validation_108k__w20150506-140238',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_50 := dataset( '~thor50_dev::out::nonfcrashell50_validation_108k__w20150506-125241-1',  ox50, csv(quote('"'), maxlength(15000)) );
-	
+	export validation_fcra_shell108k_41    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell41_validation_108k__w20180510-094626',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_41 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
+  export validation_fcraADL_shell108k_41 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell41_adl_validation_108k__w20180328-104402',  ox41ADL, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_50    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell50_validation_108k__w20180214-115527',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_50 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell50_validation_108k__w20171003-125613_layout_50temp',  ox50, csv(quote('"'), maxlength(15000)) );
+
+// since the 52 shell files weren't created until after 53 was already in, both sets of files are in the same layout, which is why they can all use the 'ox53' layout above.
+	export validation_fcra_shell108k_52    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_validation_108k__w20171212-093750',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell52_validation_108k__w20171212-095636',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_adl_validation_108k__w20180410-162819',  ox54, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_53    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_validation_108k__w20171212-091317',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell53_validation_108k__W20171212-101115',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_adl_validation_108k__w20171212-102405',  ox53, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_54    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell54_validation_108k__w20180426-163345',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_54 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell54_validation_108k__w20180426-161125',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_54 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell54_adl_validation_108k__w20180426-164321',  ox54, csv(quote('"'), maxlength(15000)) );
+
 //commented out since the layout has changed too much. If need, recreate	
 	// export	ox50btst := record
 		// unsigned8 time_ms := 0;
