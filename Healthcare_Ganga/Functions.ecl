@@ -38,9 +38,9 @@ EXPORT Functions := Module
 	END;
 EXPORT getInputWarnings (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs) := FUNCTION
 		//Create ResponseDateTime
-		MyDate := STD.Date.CurrentDate(False); year1 := MyDate[1..4]; month1 := MyDate[5..6]; day1 := MyDate[7..8];
-		MyTime := STD.Date.CurrentTime(False); hour1 := STD.Date.hour(MyTime); minute1 := STD.Date.minute(MyTime); second1 := STD.Date.second(MyTime);
-		TistaDateTime := year1+'-'+month1+'-'+day1+'T'+hour1+':'+minute1+':'+second1+'Z';
+		MyDate := STD.Date.CurrentDate(False); year := MyDate[1..4]; month := MyDate[5..6]; day := MyDate[7..8];
+		MyTime := STD.Date.CurrentTime(False); hour := MyTime[1..2]; minute := MyTime[3..4]; second := MyTime[5..6];
+		TistaDateTime := year+'-'+month+'-'+day+'T'+hour+':'+minute+':'+second+'Z';
 		
 		myWarnings := project(inRecs, transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																	self.acctno := left.acctno;
