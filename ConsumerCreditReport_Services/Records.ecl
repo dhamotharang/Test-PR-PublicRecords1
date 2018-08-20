@@ -30,7 +30,7 @@ EXPORT Records (DATASET(ConsumerCreditReport_Services.Layouts.inputRec) ds_input
  ds_flags := IF(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
  
 	ds_ccr_LiensJudgments := IF(in_mod.FetchLiensJudgments AND isFCRA,
-		ConsumerCreditReport_Services.Functions.append_LiensJudgments(ds_ccr_UniqueId, in_mod, ds_flags),
+		ConsumerCreditReport_Services.Functions.append_LiensJudgments(ds_ccr_UniqueId, in_mod, ds_flags, pc_recs),
 		ds_ccr_UniqueId);
 
 	ds_rejects := ConsumerCreditReport_Services.Functions.format_Rejects(ds_work_recs(error_code>0));
