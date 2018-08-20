@@ -29,7 +29,7 @@ export Functions := MODULE
  
   EXPORT Bitmap_all_includes (CriminalRecords_BatchService.IParam.batch_params configData) := FUNCTION
  
-   // Examine each of the 42 Include* input option and set on it's corresponding offense_category bit value
+   // Examine each of the 44 Include* input option and set on it's corresponding offense_category bit value
   unsigned8 bit_arson          := if(configData.IncludeArson,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Arson),0);
   unsigned8 bit_assaultagg     := if(configData.IncludeAssaultAgg,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_aggr),0);
   unsigned8 bit_assaultother   := if(configData.IncludeAssaultOther,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_other),0);
@@ -72,6 +72,8 @@ export Functions := MODULE
   unsigned8 bit_weaponlaw      := if(configData.IncludeWeaponLaw,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Weapon_Law_Violations),0);
   unsigned8 bit_other          := if(configData.IncludeOther,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),0);
   unsigned8 bit_cannotclassify := if(configData.IncludeCannotClassify,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified),0);
+  unsigned8 bit_warrantfugitive := if(configData.IncludeWarrantFugitive,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Warrant_Fugitive),0);
+  unsigned8 bit_obstructresist := if(configData.IncludeObstructResist,hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Obstruct_Resist),0);
 
   // Once all Include***s are checked & bit_***s are set, do a bitwise "OR" on all the individual 
 	// values to create a bitmap representing all of the requested ones.
@@ -88,7 +90,8 @@ export Functions := MODULE
                                    bit_robberyres   | bit_soforce      | bit_sononforce    | 
                                    bit_shoplift     | bit_stolenprop   | bit_terrorist     | 
                                    bit_theft        | bit_traffic      | bit_trespass      | 
-                                   bit_weaponlaw    | bit_other        | bit_cannotclassify;
+                                   bit_weaponlaw    | bit_other        | bit_cannotclassify|
+                                   bit_warrantfugitive | bit_obstructresist;
 																	 
   RETURN bitmap_all;
  END;
