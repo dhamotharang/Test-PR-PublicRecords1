@@ -113,9 +113,9 @@ EXPORT getBusProperty(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData,
                                   LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,												
                                   TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
                                             SELF.CurrPropOwnedCount := RIGHT.ownCnt;
-                                            SELF.PropTaxValue       := RIGHT.totalPropertySumAssedValue;
-                                            SELF.CountSoldProp      := RIGHT.soldCnt;
-                                            SELF.properties         := RIGHT.propReport;
+                                            SELF.PropTaxValue := RIGHT.totalPropertySumAssedValue;
+                                            SELF.CountSoldProp := RIGHT.soldCnt;
+                                            SELF.busProperties := RIGHT.propReport;
                                             SELF := LEFT),
                                   LEFT OUTER);
 

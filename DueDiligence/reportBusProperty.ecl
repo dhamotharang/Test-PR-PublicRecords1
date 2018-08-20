@@ -4,7 +4,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) inData) := 
 
 
     //pull property data from the inquired
-    listOfProperties := NORMALIZE(inData, LEFT.properties, TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,																												
+    listOfProperties := NORMALIZE(inData, LEFT.busProperties, TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,																												
                                                                     SELF.seq := LEFT.seq; 
                                                                     SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                     SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;

@@ -81,7 +81,7 @@ EXPORT RegularExpressions := MODULE
 		EXPORT EXPRESSION_AGGRAVATED_ASSAULT := '^(((?=.*(\\b|\\B)(AGG))((?=.*\\b(ASS))|(?=.*(\\b|\\B)(ASLT|BATT|BTRY))))|^(?=.*(\\b|\\B)((A\\s?\\&\\s?B)|AA\\/(DW|PO|SBI){1}|AAWW)))(?!.*(\\b|\\B)(S(E)?X)).*$';
 		EXPORT EXPRESSION_ASSAULT_DEADLY_WEAPON := '^(?=.*\\b(ASS))(?=.*(\\b|\\B)(DEAD|DANG|WEAP)).*$';
 		EXPORT EXPRESSION_ASSAULT := '^((?=.*\\b(ASS(?!IST)))|(?=.*(\\b|\\B)(BATT|ASLT|BTRY)))(?!.*(\\b|\\B)(HARAS)).*$';
-		EXPORT EXPRESSION_DOMESTIC_VIOLENCE := '^((?=.*(\\b|\\B)(DOMESTIC))(?!.*(\\b|\\B)(ANI|SECURITIES|DOMESTICALLY|FOWL|FISH|GAME)))|(?=.*(\\b|\\B)(FAMILY|VIOL)).*$';
+		EXPORT EXPRESSION_DOMESTIC_VIOLENCE := '^(((?=.*(\\b|\\B)(DOMESTIC))(?!.*(\\b|\\B)(ANI|SECURITIES|DOMESTICALLY|FOWL|FISH|GAME)))|((?=.*(\\b|\\B)(FAMILY))(?=.*(\\b|\\B)(VIOL)))).*$';
 		EXPORT EXPRESSION_ANIMAL_FIGHTING := '^(((?=.*(\\b|\\B)(ANIMA))(?=.*(\\b|\\B)(FIGHT)))|(?=.*(\\b|\\B)(COCKFIGHT))).*$';
 		EXPORT EXPRESSION_STALKING_HARASSMENT := '^(?=.*(\\b|\\B)(STALK|HAR(R)?AS|TERROR(IZE|ISTIC){1})).*$';
 		EXPORT EXPRESSION_CYBER_STALKING := '^(?=.*(\\b|\\B)(CYBER)).*$';

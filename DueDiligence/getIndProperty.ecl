@@ -111,7 +111,7 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                     SELF.ownedPropCount := RIGHT.ownCnt;
                                     SELF.totalAssesedValue := RIGHT.totalPropertySumAssedValue;
                                     SELF.previouslyOwnedPropCount := RIGHT.soldCnt;
-                                    SELF.properties := RIGHT.propReport;
+                                    SELF.perProperties := RIGHT.propReport;
                                     SELF := LEFT),
                           LEFT OUTER,
                           ATMOST(1));
