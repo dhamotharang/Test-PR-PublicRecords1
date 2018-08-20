@@ -1,6 +1,7 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 
-dFiling_combined := File_TX_Harris_in.Cleaned_Old(file_number <> '') +
+dFiling_combined := 
+                       // File_TX_Harris_in.Cleaned_Old(file_number <> '') +
                        File_TX_Harris_in.Cleaned(file_number <> '');
 dFiling_dist     := distribute(dFiling_combined, hash(FILE_NUMBER));
 dFiling_sort     := sort(dFiling_dist, record, local);
@@ -68,5 +69,5 @@ dSortFiling	:=SORT(DISTRIBUTE(project(dfiling,tfiling(left)),hash(tmsid))
 					
 dout        :=rollup(dSortFiling,rollupXform(left,right),
 					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_in+'persist::FBNV2::TXH::CONTACT');
+					:persist(cluster.cluster_out+'persist::FBNV2::TXH::CONTACT');
 export Mapping_FBN_TX_Harris_Contact :=dOut;

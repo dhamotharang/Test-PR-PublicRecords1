@@ -1,6 +1,7 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 
-dFiling			            := dedup(sort(File_CA_ventura_in.Cleaned_Old(BUSINESS_NAME<>'') +
+dFiling			            := dedup(sort(
+                                      // File_CA_ventura_in.Cleaned_Old(BUSINESS_NAME<>'') +
 																			File_CA_ventura_in.Cleaned( BUSINESS_NAME<>''),instrument_id,-process_date),all,except process_date);
 
 layout_common.Business_AID tFiling(dFiling pInput)
@@ -106,7 +107,9 @@ layout_common.Business_AID Trans_Rmsid(layout_common.Business_AID pLeft,string2 
 	 self                            :=pLeft;
 	 end;
 	 
-dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left))+FBNV2.Mapping_FBN_CA_Ventura_Business_xml,all),hash(tmsid)),
+dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left))
+              //+FBNV2.Mapping_FBN_CA_Ventura_Business_xml
+							,all),hash(tmsid)),
                   RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local);
 				  
 dRollup     :=rollup(dSortFiling,rollupXform(left,right),

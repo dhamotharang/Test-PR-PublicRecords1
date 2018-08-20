@@ -1,4 +1,4 @@
-import FBNv2,_validate,ut, address;
+﻿import FBNv2,_validate,ut, address, data_services;
 
  Fbn_in:=cleaned_fbn_experian_bdid;
 
@@ -91,7 +91,7 @@ Business						:=	project(Fbn_in,transHistFBN(left));
 			string1 lf; 
 		END; 
 		
-	fips_to_countyTable := dataset('~thor_data400::in::fips_to_counties',fips_to_countyLayout,flat); 
+	fips_to_countyTable := dataset(data_services.foreign_prod + 'thor_data400::in::fips_to_counties',fips_to_countyLayout,flat); 
 		
 		FBNv2.layout_common.Business_AID   findCountyName(Business L, fips_to_countyLayout r) := transform 
 				fips_county1 := L.fips_county; 

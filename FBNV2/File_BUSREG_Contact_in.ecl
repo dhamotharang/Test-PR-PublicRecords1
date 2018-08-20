@@ -1,9 +1,9 @@
-import ut,BusReg;
+﻿import ut,BusReg;
 	
 B := fbnv2.File_BUSREG_Company_in(br_id>0);
 Bd := dedup(sort(distribute(B,hash(br_id)),br_id,local),br_id,local);
 
-pBaseFile := BusReg.Files().Base.AID.QA;
+pBaseFile := BusReg.Files(,true).Base.AID.QA;
 C := BusReg.Split_Base(pBaseFile).Contacts(br_id>0);
 Cd := distribute(C,hash(br_id));
 

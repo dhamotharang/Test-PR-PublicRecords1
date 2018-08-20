@@ -1,4 +1,4 @@
-import ut,fbnv2,_validate,STD;
+﻿import ut,fbnv2,_validate,STD;
 					 
 Layout_temp :=RECORD
        STRING8 process_date;
@@ -229,7 +229,7 @@ layout_common.Business_AID  ROLLUPXform(layout_common.Business_AID pLEFT, layout
 	END;
 	
 dFiling		:=GROUP(SORT(DISTRIBUTE(DEDUP(PROJECT(
-									File_FL_Filing_in.Cleaned_Old +										
+									// File_FL_Filing_in.Cleaned_Old +										
 									File_FL_Filing_in.Cleaned,tfiling(LEFT )),ALL),
                                  HASH(orig_filing_number)),
 							orig_filing_number,EXPIRATION_DATE,LOCAL),
@@ -240,7 +240,7 @@ dFilingType :=UNGROUP(ITERATE(dFiling, tITERATEf(LEFT,RIGHT,COUNTER)));
 dPreInit    :=DEDUP(sort(dFilingType(filing_type[1]='I'),orig_filing_number,-filing_type_code,LOCAL),orig_filing_number,LOCAL);
 							 
 dGroupEven  :=GROUP(SORT(DISTRIBUTE(DEDUP(PROJECT(
-										File_FL_Event_in.Cleaned_Old(action_code<>'REN') +
+										// File_FL_Event_in.Cleaned_Old(action_code<>'REN') +
 										File_FL_Event_in.Cleaned(action_code<>'REN'), tevent(LEFT)),ALL,EXCEPT filing_date),
                                     HASH(orig_filing_number)),
 					     ORIG_FILING_NUMBER,FILING_DATE,IF(FILING_TYPE_CODE='CHF',0,1),LOCAL),

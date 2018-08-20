@@ -1,4 +1,4 @@
-import ut,fbnv2,address,_validate;
+﻿import ut,fbnv2,address,_validate;
 
 dFiling			            := dedup(File_InfoUSA_in,all,except process_date);
 //There is no owner address stead of using business Address
@@ -74,7 +74,9 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	    self := pLeft;
 	END;
 	
-dProj   	:=dedup(project(dfiling,tfiling(left))+FBNV2.Mapping_FBN_InfoUSA_Contact_Xml,all);
+dProj   	:=dedup(project(dfiling,tfiling(left))
+                          // +FBNV2.Mapping_FBN_InfoUSA_Contact_Xml
+													,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(tmsid)),
                    RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 

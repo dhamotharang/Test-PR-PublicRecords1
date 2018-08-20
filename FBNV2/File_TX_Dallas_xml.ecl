@@ -1,2 +1,2 @@
-//export File_TX_Dallas_xml := dataset('~thor_data400::in::FBNV2::xml2fix::TXD',layout_xml.TXD,flat);
-export File_TX_Dallas_xml := dataset('~thor_data400::in::fbnv2::tx_dallas_converted',layout_xml.TXD,flat);
+﻿//export File_TX_Dallas_xml := dataset('~thor_data400::in::FBNV2::xml2fix::TXD',layout_xml.TXD,flat);
+export File_TX_Dallas_xml := dataset(Cluster.Cluster_In +'in::fbnv2::tx_dallas_converted',layout_xml.TXD,flat);

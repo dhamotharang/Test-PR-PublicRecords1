@@ -1,6 +1,7 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 		
-dFiling			       := dedup(sort(File_CA_ventura_in.Cleaned_Old(BUSINESS_NAME<>'') +
+dFiling			       := dedup(sort(
+                                 // File_CA_ventura_in.Cleaned_Old(BUSINESS_NAME<>'') +
 																 File_CA_ventura_in.Cleaned(BUSINESS_NAME<>''),instrument_id,-process_date),all,except process_date);
 
 layout_common.contact_AID tFiling(dFiling pInput)
@@ -68,10 +69,12 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	    self := pLeft;
 	END;
 	
-dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left))+FBNV2.Mapping_FBN_CA_Ventura_Contact_xml,all),hash(tmsid))
+dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left))
+              // +FBNV2.Mapping_FBN_CA_Ventura_Contact_xml
+							,all),hash(tmsid))
 					,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 
 					
 dout        :=rollup(dSortFiling,rollupXform(left,right),
 					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_in+'persist::FBNv2::CA::ventura::CONTACT');
+					:persist(cluster.cluster_out+'persist::FBNv2::CA::ventura::CONTACT');
 export Mapping_FBN_CA_Ventura_Contact := dOut;

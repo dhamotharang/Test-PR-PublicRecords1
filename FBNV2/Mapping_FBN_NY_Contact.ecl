@@ -1,4 +1,4 @@
-import ut,fbnv2,address,_validate;
+﻿import ut,fbnv2,address,_validate;
 
 dFiling			            := dedup(File_NYC_in,all);
 
@@ -88,7 +88,9 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 		self := pLeft;
 	END;
 	
-dProj   	:=dedup(project(dfiling,tfiling(left))+Mapping_FBN_NY_Contact_Xml,all);
+dProj   	:=dedup(project(dfiling,tfiling(left))
+                          // +Mapping_FBN_NY_Contact_Xml
+													,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(tmsid)),
                    RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 

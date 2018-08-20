@@ -1,4 +1,4 @@
-
+﻿
 IMPORT FBNV2, ut, _validate;
 
 // Since we're always going to have old logic and new logic that's not so easily done in 1 transform,
@@ -28,9 +28,11 @@ cleaned_common_rec xform_new_to_common(Layout_File_TX_Harris_in.Cleaned L) := TR
   SELF := L;
 END;
 
-dOldFiling := PROJECT(File_TX_Harris_in.Cleaned_Old(FILE_NUMBER != ''), xform_old_to_common(LEFT));
+// dOldFiling := PROJECT(File_TX_Harris_in.Cleaned_Old(FILE_NUMBER != ''), xform_old_to_common(LEFT));
 dNewFiling := PROJECT(File_TX_Harris_in.Cleaned(FILE_NUMBER != ''), xform_new_to_common(LEFT));
-dFiling_combined := dOldFiling + dNewFiling;
+dFiling_combined := 
+                     // dOldFiling + 
+										 dNewFiling;
 dFiling_dist     := DISTRIBUTE(dFiling_combined, HASH(FILE_NUMBER));
 dFiling_sort     := SORT(dFiling_dist, RECORD, LOCAL);
 dFiling          := DEDUP(dFiling_sort, RECORD, LOCAL);

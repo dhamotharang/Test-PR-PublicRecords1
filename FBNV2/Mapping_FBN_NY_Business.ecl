@@ -1,4 +1,4 @@
-import ut,fbnv2,address,_validate;
+﻿import ut,fbnv2,address,_validate;
 
 dFiling			            := dedup(File_NYC_in(DOCKET_NUMBER <>'' and COURT_CODE<>'' and business_name<>'' ),all);
 
@@ -127,7 +127,9 @@ layout_common.Business_AID  rollupXform(layout_common.Business_AID pLeft, layout
 	END;
 	
 
-dProj   	:=dedup(project(dfiling,tfiling(left))+Mapping_FBN_NY_Business_Xml,all);
+dProj   	:=dedup(project(dfiling,tfiling(left))
+                          // +Mapping_FBN_NY_Business_Xml
+													,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(tmsid)),
                    RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 

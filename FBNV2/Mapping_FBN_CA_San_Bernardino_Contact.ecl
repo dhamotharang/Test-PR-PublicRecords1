@@ -1,4 +1,4 @@
-import ut,fbnv2,address,_validate;
+﻿import ut,fbnv2,address,_validate;
 
 dFiling			            := dedup(FBNV2.File_CA_San_Bernardino_xml(bus_name<>''),all);
 		
@@ -80,7 +80,7 @@ dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all),hash(tms
 					
 dout        :=rollup(dSortFiling,rollupXform(left,right),
 					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_in+'persist::FBNv2::CA::San_Bernardino::CONTACT');
+					:persist(cluster.cluster_out+'persist::FBNv2::CA::San_Bernardino::CONTACT');
 
 					 
 export Mapping_FBN_CA_San_Bernardino_contact      :=	dOut; 

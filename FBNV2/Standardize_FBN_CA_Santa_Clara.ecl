@@ -1,4 +1,4 @@
-import ut,fbnv2,address, lib_stringlib, VersionControl;
+﻿import ut,fbnv2,address, lib_stringlib, VersionControl;
 
 export Standardize_FBN_CA_Santa_Clara(	 
 	string									pversion
@@ -117,6 +117,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);
 	

@@ -1,4 +1,4 @@
-import FBNv2,_validate,ut, address;
+﻿import FBNv2,_validate,ut, address, data_services;
 Fbn_hist_in:=Cleaned_FBN_CP_HIST_Bdid;
         reformatDate(string rDate) := function
 			string8 newDate := rDate[5..]+rDate[1..2]+rDate[3..4];	
@@ -86,7 +86,7 @@ trimUpper(string s) := function
 			string1 lf;
 		END;
 		
-		fips_to_countyTable := dataset('~thor_data400::in::fips_to_counties',fips_to_countyLayout,flat);
+		fips_to_countyTable := dataset(data_services.foreign_prod + 'thor_data400::in::fips_to_counties',fips_to_countyLayout,flat);
 		
 		FBNv2.layout_common.Business_AID   findCountyName(Hist_Business l, fips_to_countyTable r) := transform
 		fips_county1 := L.fips_county;

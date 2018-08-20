@@ -1,4 +1,4 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 
 
 LAYOUT_TEMP
@@ -161,14 +161,16 @@ fbnv2.layout_common.contact_AID  rollupXform(fbnv2.layout_common.contact_AID pLe
 	    self := pLeft;
 	END;
 
-dEvent      := distribute(dedup(project(fbnv2.File_FL_Event_in.Cleaned_Old(action_code='ADD' or action_code='DEL' Or action_code='CHO') +
-																				fbnv2.File_FL_Event_in.Cleaned(action_code='ADD' or action_code='DEL' Or action_code='CHO'),
+// dEvent      := distribute(dedup(project(fbnv2.File_FL_Event_in.Cleaned_Old(action_code='ADD' or action_code='DEL' Or action_code='CHO') +
+																				// fbnv2.File_FL_Event_in.Cleaned(action_code='ADD' or action_code='DEL' Or action_code='CHO'),
+dEvent      := distribute(dedup(project(fbnv2.File_FL_Event_in.Cleaned(action_code='ADD' or action_code='DEL' Or action_code='CHO'),
 										tevent(left)),
 								all),
 						  hash(orig_filing_number));
 	
-dFiling	    := DISTRIBUTE(dedup(project(fbnv2.File_FL_Filing_in.Cleaned_Old(fic_owner_name<>'') +
-																				fbnv2.File_FL_Filing_in.Cleaned(fic_owner_name<>''),
+//dFiling	    := DISTRIBUTE(dedup(project(fbnv2.File_FL_Filing_in.Cleaned_Old(fic_owner_name<>'') +
+																				// fbnv2.File_FL_Filing_in.Cleaned(fic_owner_name<>''),
+dFiling	    := DISTRIBUTE(dedup(project(fbnv2.File_FL_Filing_in.Cleaned(fic_owner_name<>''),
                                         tfiling(left)),
 								all),
 						  hash(orig_filing_number));
@@ -186,7 +188,7 @@ dMerge      := sort(PROJECT(dFilingOnly+dEvent  ,tMerge(left)),record,local);
 					
 dout        := rollup(dMerge,rollupXform(left,right),
 					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_in+'persist::FBNV2::FL::contact');
+					:persist(cluster.cluster_out+'persist::FBNV2::FL::contact');
 				
 
 export Mapping_FBN_FL_Contact      :=	dOut;

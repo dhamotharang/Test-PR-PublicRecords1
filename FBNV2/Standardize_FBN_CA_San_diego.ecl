@@ -67,6 +67,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)		
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);	
 	

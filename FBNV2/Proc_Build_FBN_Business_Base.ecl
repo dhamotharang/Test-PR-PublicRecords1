@@ -1,19 +1,32 @@
-﻿import address,fbnv2, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog,MDR,aid,PromoteSupers;
+﻿IMPORT  address, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers;
 
-dBusiness   :=  ungroup(Mapping_FBN_BUSREG_Business)+
-								ungroup(Mapping_FBN_CA_Orange_Business)+
-								ungroup(Mapping_FBN_CA_San_Bernardino_Business)+
-								ungroup(Mapping_FBN_CA_San_Diego_Business)+
-								ungroup(Mapping_FBN_CA_Santa_Clara_Business)+
-								ungroup(Mapping_FBN_CA_Ventura_Business)+
-								// ungroup(Mapping_FBN_CORP2_Business)+
+export   Proc_Build_FBN_Business_Base(string source) := FUNCTION
+
+dBusinessInputs := 
+                   //commented sources have not been sent by vendor in a long time, unsure of format
+                   map(trim(source,left,right) in ['Filing','Event'] => ungroup(Mapping_FBN_FL_Business),
+									               // trim(source,left,right) = 'Dallas' => ungroup(Mapping_FBN_TXD_Business),
+				                         // trim(source,left,right) = 'InfoUSA'   => ungroup(Mapping_FBN_InfoUSA_Business),
+				                         // trim(source,left,right) = 'San_Bernardino'   => ungroup(Mapping_FBN_CA_San_Bernardino_Business),
+				                         trim(source,left,right) = 'San_Diego'   => ungroup(Mapping_FBN_CA_San_Diego_Business),
+																 trim(source,left,right) = 'Santa_Clara' => ungroup(Mapping_FBN_CA_Santa_Clara_Business),
+														     trim(source,left,right) = 'Harris' => ungroup(Mapping_FBN_TX_Harris_Business),
+														     // trim(source,left,right) = 'NY' => ungroup(Mapping_FBN_NY_Business),
+																 trim(source,left,right) = 'Orange' => ungroup(Mapping_FBN_CA_Orange_Business),
+																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Business));
+
+// previousBase := FBNV2.File_FBN_Business_Base_AID;
+Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
+	
+dBusinessBaseInputs :=  
+                ungroup(Mapping_FBN_BUSREG_Business)+	
+								//CP HIST data is quite old, perhaps this should be commented out
 								ungroup(Mapping_FBN_CP_HIST_Business)+
 								ungroup(Mapping_FBN_Experian_Business)+
-								ungroup(Mapping_FBN_FL_Business)+
-								ungroup(Mapping_FBN_InfoUSA_Business)+
-								ungroup(Mapping_FBN_NY_Business)+
-								ungroup(Mapping_FBN_TX_Harris_Business)+
-								ungroup(Mapping_FBN_TXD_Business);
+								// FBNV2.File_FBN_Business_Base_AID;
+								Previous_Base;
+
+dBusiness :=  dBusinessInputs + dBusinessBaseInputs;
 
 Layout_Bus_temp := record
 	unsigned8		unique_id;
@@ -27,10 +40,10 @@ end;
 
 dBusiness_w_ids := project(dBusiness, getUniqIds(left, counter));
 
-//////////////////////////////////////////////////////////////////////////////////////
-// -- Second, pass addresses to macro for cleaning
-// -- normalize address out into one file with address1, address2, type, and uniqueid, then pass to macro
-//////////////////////////////////////////////////////////////////////////////////////
+/*//////////////////////////////////////////////////////////////////////////////////
+-- Second, pass addresses to macro for cleaning
+-- normalize address out into one file with address1, address2, type, and uniqueid, then pass to macro
+//////////////////////////////////////////////////////////////////////////////////*/
 addresslayout :=
 record
 	unsigned8										unique_id			;	//	to tie back to original record
@@ -51,7 +64,7 @@ transform
 																				);
 	self.address2								:= choose(cnt	,l.prep_addr_line_last
 																						,l.prep_mail_addr_line_last
-																			 );           
+																			 ); 
 	self.rawaid									:= choose(cnt	,if(l.RawAid != 0, l.RawAid, 0)
 																						,if(l.mail_RawAid != 0, l.mail_RawAid, 0)
 																				);
@@ -76,7 +89,7 @@ unsigned4	lFlags 	:= AID.Common.eReturnValues.ACEAIDs | AID.Common.eReturnValues
 
 AID.MacAppendFromRaw_2Line(dBus_With_address, address1, address2, RawAID, dwithAID, lFlags);
 
-// -- match back to dStandardizedFirstPass and append address
+/*-- match back to dStandardizedFirstPass and append address*/
 dBusiness_w_ids_dist			 	:= distribute(dBusiness_w_ids	,unique_id);
 dAddressStandardized_dist		:= distribute(dwithAID		,unique_id);
 
@@ -102,18 +115,19 @@ transform
 	self.postdir						:= if(r.addr_type = 1	,aidwork_acecache.postdir	,l.postdir);
 	self.unit_desig					:= if(r.addr_type = 1	,aidwork_acecache.unit_desig	,l.unit_desig);
 	self.sec_range					:= if(r.addr_type = 1	,aidwork_acecache.sec_range	,l.sec_range);
-	//self.p_city_name			:= if(r.addr_type = 1	,aidwork_acecache.p_city_name	,l.p_city_name);
+	/*self.p_city_name			:= if(r.addr_type = 1	,aidwork_acecache.p_city_name	,l.p_city_name);*/
+	
 	self.v_city_name				:= if(r.addr_type = 1	,aidwork_acecache.v_city_name	,l.v_city_name);	
 	self.st									:= if(r.addr_type = 1	,aidwork_acecache.st	,l.st);
 	self.zip5								:= if(r.addr_type = 1	,aidwork_acecache.zip	,l.zip5);
 	self.zip4								:= if(r.addr_type = 1	,aidwork_acecache.zip4	,l.zip4);
 	
-	//self.cart								:= if(r.addr_type = 1	,aidwork_acecache.cart	,l.cart);
-	//self.cr_sort_sz					:= if(r.addr_type = 1	,aidwork_acecache.cr_sort_sz	,l.cr_sort_sz);
-	//self.lot								:= if(r.addr_type = 1	,aidwork_acecache.lot	,l.lot);
-	//self.lot_order					:= if(r.addr_type = 1	,aidwork_acecache.lot_order	,l.lot_order);
-	//self.dbpc								:= if(r.addr_type = 1	,aidwork_acecache.dbpc	,l.dbpc);
-	//self.chk_digit					:= if(r.addr_type = 1	,aidwork_acecache.chk_digit	,l.chk_digit);
+  /*self.cart								:= if(r.addr_type = 1	,aidwork_acecache.cart	,l.cart);
+	self.cr_sort_sz					:= if(r.addr_type = 1	,aidwork_acecache.cr_sort_sz	,l.cr_sort_sz);
+	self.lot								:= if(r.addr_type = 1	,aidwork_acecache.lot	,l.lot);
+	self.lot_order					:= if(r.addr_type = 1	,aidwork_acecache.lot_order	,l.lot_order);
+	self.dbpc								:= if(r.addr_type = 1	,aidwork_acecache.dbpc	,l.dbpc);
+	self.chk_digit					:= if(r.addr_type = 1	,aidwork_acecache.chk_digit	,l.chk_digit);*/	
 	self.addr_rec_type			:= if(r.addr_type = 1	,aidwork_acecache.rec_type	,l.addr_rec_type);
 	self.fips_state					:= if(r.addr_type = 1	,aidwork_acecache.fips_state	,l.fips_state);
 	self.fips_county				:= if(r.addr_type = 1	,aidwork_acecache.fips_county	,l.fips_county);
@@ -134,18 +148,19 @@ transform
 	self.Mail_postdir				:= if(r.addr_type = 2	,aidwork_acecache.postdir	,l.Mail_postdir);
 	self.Mail_unit_desig		:= if(r.addr_type = 2	,aidwork_acecache.unit_desig	,l.Mail_unit_desig);
 	self.Mail_sec_range			:= if(r.addr_type = 2	,aidwork_acecache.sec_range	,l.Mail_sec_range);
-	//self.Mail_p_city_name		:= if(r.addr_type = 2	,aidwork_acecache.p_city_name	,l.Mail_p_city_name);
+	
 	self.Mail_v_city_name		:= if(r.addr_type = 2	,aidwork_acecache.v_city_name	,l.Mail_v_city_name);	
 	self.Mail_st						:= if(r.addr_type = 2	,aidwork_acecache.st	,l.Mail_st);
 	self.Mail_zip5					:= if(r.addr_type = 2	,aidwork_acecache.zip	,l.Mail_zip5);
 	self.Mail_zip4					:= if(r.addr_type = 2	,aidwork_acecache.zip4	,l.Mail_zip4);
 	
-	//self.Mail_cart					:= if(r.addr_type = 2	,aidwork_acecache.cart	,l.Mail_cart);
-	//self.Mail_cr_sort_sz		:= if(r.addr_type = 2	,aidwork_acecache.cr_sort_sz	,l.Mail_cr_sort_sz);
-	//self.Mail_lot						:= if(r.addr_type = 2	,aidwork_acecache.lot	,l.Mail_lot);
-	//self.Mail_lot_order			:= if(r.addr_type = 2	,aidwork_acecache.lot_order	,l.Mail_lot_order);
-	//self.Mail_dbpc					:= if(r.addr_type = 2	,aidwork_acecache.dbpc	,l.Mail_dbpc);
-	//self.Mail_chk_digit			:= if(r.addr_type = 2	,aidwork_acecache.chk_digit	,l.Mail_chk_digit);
+
+	/*self.Mail_cart					:= if(r.addr_type = 2	,aidwork_acecache.cart	,l.Mail_cart);
+	self.Mail_cr_sort_sz		:= if(r.addr_type = 2	,aidwork_acecache.cr_sort_sz	,l.Mail_cr_sort_sz);
+	self.Mail_lot						:= if(r.addr_type = 2	,aidwork_acecache.lot	,l.Mail_lot);
+	self.Mail_lot_order			:= if(r.addr_type = 2	,aidwork_acecache.lot_order	,l.Mail_lot_order);
+	self.Mail_dbpc					:= if(r.addr_type = 2	,aidwork_acecache.dbpc	,l.Mail_dbpc);
+	self.Mail_chk_digit			:= if(r.addr_type = 2	,aidwork_acecache.chk_digit	,l.Mail_chk_digit);*/
 	self.Mail_addr_rec_type	:= if(r.addr_type = 2	,aidwork_acecache.rec_type	,l.Mail_addr_rec_type);
 	self.Mail_fips_state		:= if(r.addr_type = 2	,aidwork_acecache.fips_state	,l.Mail_fips_state);
 	self.Mail_fips_county		:= if(r.addr_type = 2	,aidwork_acecache.fips_county	,l.Mail_fips_county);
@@ -166,13 +181,13 @@ dBusiness_denom_Addr	:= denormalize(
 														,local
 													);
 													
-//**** End of AID process.
+/**** End of AID process.*/
 
-//** FBN builds,Base File by processing all raw-inputs each time
-//below we are using previous baseFile in order to populate "source_rec_id" to the records 
+/** FBN builds,Base File by processing all raw-inputs each time
+below we are using previous baseFile in order to populate "source_rec_id" to the records */
   
-Update_Base		  := distribute(dBusiness_denom_Addr, hash64(tmsid)); 
-Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
+Update_Base		  := distribute(dBusiness_denom_Addr, hash64(tmsid));
+// Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
 						
 Layout_Bus_temp     trans_get_src_recIDs(Layout_Bus_temp l,Layout_Common.Business_AID r):=transform
 self.source_rec_id := r.source_rec_id;
@@ -182,11 +197,11 @@ end;
 Append_recID:= join(Update_Base,Previous_Base,
 										trim(left.tmsid,left,right)                 =  trim(right.tmsid  ,left,right) and
 										trim(left.rmsid,left,right)                 =  trim(right.rmsid  ,left,right) and
-//*** removed all these clean address ids that can change overtime (due to improvements made to address cleaners) in tern effects the source record ids.
-//												 left.rawaid        										=  			right.rawaid  and
-//												 left.Mail_RawAID                       = 			right.Mail_RawAID and
-//												 left.ACEAID        										=  			right.ACEAID  and
-//												 left.Mail_ACEAID                       = 			right.Mail_ACEAID and 
+/*** removed all these clean address ids that can change overtime (due to improvements made to address cleaners) in tern effects the source record ids.
+												 left.rawaid        										=  			right.rawaid  and
+												 left.Mail_RawAID                       = 			right.Mail_RawAID and
+												 left.ACEAID        										=  			right.ACEAID  and
+												 left.Mail_ACEAID                       = 			right.Mail_ACEAID and */												 
 										trim(left.Filing_Jurisdiction,left,right)		=  trim(right.Filing_Jurisdiction,left,right) and
 										trim(left.FILING_NUMBER	,left,right)        =  trim(right.FILING_NUMBER  ,left,right) and
 												 left.Filing_date                       =       right.Filing_date  and
@@ -217,7 +232,7 @@ Append_recID:= join(Update_Base,Previous_Base,
 										trim(left.MAIL_ZIP,left,right)              =  trim(right.MAIL_ZIP  ,left,right) and
 												 left.SEQ_NO							              =  			right.SEQ_NO  ,
 							trans_get_src_recIDs(left,right),left outer,local);
-   //*** End of source rec_id logic 
+/*** End of source rec_id logic*/ 
 
 slim_cont_rec := record
 		Layout_Common.Contact_AID.tmsid;
@@ -253,11 +268,11 @@ ds_Company_Exd := join(	ds_company
                         ,local
                        );
 
-//**  Appending the BDID and BIPV2 Ids.                       
+/**  Appending the BDID and BIPV2 Ids.*/                       
 sBDIDMatchSet		   :=	['A','F','P'];
 
-// -- Add source code so can do a source match to business headers
-// -- Bug: 36599 - Business Header/Header Source code sync up 
+/*-- Add source code so can do a source match to business headers
+-- Bug: 36599 - Business Header/Header Source code sync up */
 ds_Company_Exd_source := table(ds_Company_Exd , { ds_Company_Exd ;string2 source := MDR.sourceTools.fFBNV2(tmsid)}); 
 	
 Business_Header_SS.MAC_Add_BDID_Flex(
@@ -293,7 +308,7 @@ Business_Header_SS.MAC_Add_BDID_Flex(
 );
 
 
-//deduping multiple xlinkID records & keeping only highest score xlinkID's for business records
+/*deduping multiple xlinkID records & keeping only highest score xlinkID's for business records*/
 dPostBDID_dedup			     := dedup(sort(distribute(dPostFlex, unique_id),unique_id,-proxscore,-selescore,-orgscore,-ultscore,-powscore,-empscore,-dotscore, local),unique_id, local);
 
 dWithBdids          := dPostBDID_dedup(BDID != 0);
@@ -336,11 +351,13 @@ end;
 rolledup_recs := rollup(ds_bdid_match, rolluprecs(left,right),
                         RECORD, except dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,source_rec_id, local);
 
-//*** appending the source record ids for the newer records.                                                                                                                                                   
+/*** appending the source record ids for the newer records.  */                                                                                                                                                 
 ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);                                                                                    
 										 
 dPostDIDandBDIDPersist	:=	out_file:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Business');
 					
 PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Business',Out, 3,pCompress:=true);
+				
+return out;	
 
-export  Proc_Build_FBN_Business_Base     :=	Out;
+END;

@@ -1,21 +1,32 @@
-﻿IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib;
+﻿IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib, CODES, ut;
 
-dContact  	:= 
-				ungroup(Mapping_FBN_BUSREG_Contact)+
-				ungroup(Mapping_FBN_CA_Orange_Contact)+
-				ungroup(Mapping_FBN_CA_San_Bernardino_Contact)+
-				ungroup(Mapping_FBN_CA_San_Diego_Contact)+
-				ungroup(Mapping_FBN_CA_Santa_Clara_Contact)+
-				ungroup(Mapping_FBN_CA_Ventura_Contact)+
-				// ungroup(Mapping_FBN_CORP2_Contact)+
-				ungroup(Mapping_FBN_CP_HIST_Contact) +
+export   Proc_Build_FBN_Contact_Base(string source) := FUNCTION
+
+dContactInputs  	:= 			
+                          //commented sources have not been sent from vendor in a long time, unsure of format
+				                  map(trim(source,left,right) in ['Filing','Event'] => ungroup(Mapping_FBN_FL_Contact),
+																 // trim(source,left,right) = 'Dallas' => ungroup(Mapping_FBN_TXD_Contact),
+				                         // trim(source,left,right) = 'InfoUSA'   => ungroup(Mapping_FBN_InfoUSA_Contact),
+				                         // trim(source,left,right) = 'San_Bernardino'   => ungroup(Mapping_FBN_CA_San_Bernardino_Contact),
+				                         trim(source,left,right) = 'San_Diego'   => ungroup(Mapping_FBN_CA_San_Diego_Contact),
+																 trim(source,left,right) = 'Santa_Clara' => ungroup(Mapping_FBN_CA_Santa_Clara_Contact),
+														     trim(source,left,right) = 'Harris' => ungroup(Mapping_FBN_TX_Harris_Contact),
+														     // trim(source,left,right) = 'NY' => ungroup(Mapping_FBN_NY_Contact),
+																 trim(source,left,right) = 'Orange' => ungroup(Mapping_FBN_CA_Orange_Contact),
+																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Contact));
+		
+				
+dContactBase := 
+        ungroup(Mapping_FBN_BUSREG_Contact)+
+				//ungroup(Mapping_FBN_CORP2_Contact)+	
+				//CP HIST data is quite old, perhaps this should be commented out
+				ungroup(Mapping_FBN_CP_HIST_Contact)+
 				ungroup(Mapping_FBN_Experian_Contact)+
-				ungroup(Mapping_FBN_FL_Contact)+
-				ungroup(Mapping_FBN_InfoUSA_Contact)+
-				ungroup(Mapping_FBN_NY_Contact)+
-				ungroup(Mapping_FBN_TX_Harris_Contact)+
-				ungroup(Mapping_FBN_TXD_Contact);
-
+				FBNV2.File_FBN_Contact_Base_AID;
+				                  
+				
+dContact := dContactInputs + dContactBase;
+	
 NID.Mac_CleanFullNames(dContact, cleaned_input, contact_name);
 
 FBNv2.layout_common.contact_AID add_clean_name(cleaned_input L) := TRANSFORM
@@ -28,7 +39,9 @@ FBNv2.layout_common.contact_AID add_clean_name(cleaned_input L) := TRANSFORM
 	                                L.nametype = 'B' => 'C',         // Company
                                   '');
 	prep_line1					 			:=	trim(lib_stringLib.StringLib.StringFindReplace(l.prep_addr_line1,	'STRE ET','STREET'),left,right);
-	self.prep_addr_line1			:=	prep_line1;
+  
+	self.prep_addr_line1			:=	prep_line1;																				
+	
 	SELF := L;
 END;
 
@@ -135,11 +148,12 @@ dPostBDID_reformat := project(dPostBDID, transform(recordof(dWithNoBusHdrSourceM
 dPostDIDandBDIDPersist	:=	dWithBusHdrSourceMatch
 						+   dPostBDID_reformat
 						+	dAppendSSN:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact');
-						
- 
 					
 PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Contact',Out, 3,pCompress:=true);
-//ut.MAC_SF_Build_standard(dPostDIDandBDIDPersist,cluster.cluster_out+'base::FBNv2::Contact',out,ut.GetDate);
+// ut.MAC_SF_Build_standard(dPostDIDandBDIDPersist,cluster.cluster_out+'base::FBNv2::Contact',out,ut.GetDate);
+		
+return out;		
+		
+END;				
 
-
-export Proc_Build_FBN_Contact_Base := out;
+// export Proc_Build_FBN_Contact_Base := out;

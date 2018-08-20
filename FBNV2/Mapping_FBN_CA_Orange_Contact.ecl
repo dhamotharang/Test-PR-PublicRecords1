@@ -1,8 +1,10 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 
-dFiling_Old							:= File_CA_Orange_in.Cleaned_Old;
-dFiling			            := dedup(dFiling_Old +
-																 File_CA_Orange_in.Cleaned,all);
+//dFiling_Old							:= File_CA_Orange_in.Cleaned_Old;
+// dFiling			            := dedup(dFiling_Old +
+																 // File_CA_Orange_in.Cleaned,all);
+
+dFiling			            := dedup(File_CA_Orange_in.Cleaned,all);
 
 layout_common.contact_AID tFiling(dFiling pInput)
    :=TRANSFORM
@@ -68,11 +70,13 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	    self := pLeft;
 	END;
 	
-dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all)+FBNV2.Mapping_FBN_CA_Orange_contact_Xml,hash(tmsid))
+dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all)
+          // +FBNV2.Mapping_FBN_CA_Orange_contact_Xml
+					,hash(tmsid))
 					,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 
 					
 dout        :=rollup(dSortFiling,rollupXform(left,right),
 					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_in+'persist::FBNv2::CA::ORANGE::CONTACT');
+					:persist(cluster.cluster_out+'persist::FBNv2::CA::ORANGE::CONTACT');
 
 export Mapping_FBN_CA_Orange_Contact      :=	dOut;

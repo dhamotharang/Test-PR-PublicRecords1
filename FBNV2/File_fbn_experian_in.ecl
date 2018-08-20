@@ -1,10 +1,11 @@
-  
+﻿IMPORT data_services;
+
 /********************************
 Before we grab this sprayed file we have to make sure that
 if we receive updates from Experian  
-we have to run “FBNV2.fsprayFBNfiles”  attribute passing file date 
+we have to run FBNV2.fsprayFBNfiles  attribute passing file date 
 for spray and to add new update raw files to this supper file 
-“thor_data400::in::experian::sprayed::fbn” .
+thor_data400::in::experian::sprayed::fbn .
 ********************************/
 
 trimUpper(string s) := function
@@ -12,7 +13,7 @@ trimUpper(string s) := function
 		  end;
 
 //we are excluding when Record_Code='Z'	because these records are blank records.	  
-valid_fbn_raw := sort(dataset('~thor_data400::in::experian::sprayed::fbn',fbnv2.Layout_fbn_experian.fbn_direct_raw,flat)(trimUpper(Record_Code)<>'Z'),filing_number, name_type);
+valid_fbn_raw := sort(dataset(data_services.foreign_prod +'thor_data400::in::experian::sprayed::fbn',fbnv2.Layout_fbn_experian.fbn_direct_raw,flat)(trimUpper(Record_Code)<>'Z'),filing_number, name_type);
 
 
 NewLayout	:=	record

@@ -1,4 +1,4 @@
-import ut,Census_Data,fbnv2,address,_validate;
+﻿import ut,Census_Data,fbnv2,address,_validate;
 
 dFiling			            := dedup(File_InfoUSA_in,all,except process_date);
 
@@ -134,7 +134,8 @@ dProj   	:= dedup(project(dfiling,tfiling(left)),all);
 dGetCounty  := join(dProj,Census_Data.Key_Fips2County,
                         left.BUS_state = right.state_code and
                         left.BUS_COUNTY = right.county_fips,
-						get_county(left, right))+Mapping_FBN_InfoUSA_Business_Xml;
+						get_county(left, right));
+						// +Mapping_FBN_InfoUSA_Business_Xml;
 			
 dSort       := SORT(Distribute(dGetCounty , hash(bus_name)), 
                    RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 

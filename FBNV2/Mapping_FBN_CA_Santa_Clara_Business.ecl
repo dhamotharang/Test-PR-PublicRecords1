@@ -1,6 +1,7 @@
-import ut,fbnv2,_validate;
+﻿import ut,fbnv2,_validate;
 
-dFiling			            := dedup(File_CA_Santa_clara_in.Cleaned_Old +
+dFiling			            := dedup(
+                                 // File_CA_Santa_clara_in.Cleaned_Old +
 																 File_CA_Santa_clara_in.Cleaned,all);
 
 layout_common.Business_AID tFiling(dFiling pInput)
@@ -122,7 +123,9 @@ layout_common.Business_AID  rollupXform(layout_common.Business_AID pLeft, layout
 	END;
 	
 
-dProj   	:=dedup(project(dfiling,tfiling(left))+Mapping_FBN_CA_Santa_Clara_Business_Xml,all);
+dProj   	:=dedup(project(dfiling,tfiling(left))
+            // +Mapping_FBN_CA_Santa_Clara_Business_Xml
+						,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(Orig_filing_number)),
                    RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 
