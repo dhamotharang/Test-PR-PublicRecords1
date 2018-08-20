@@ -1,4 +1,4 @@
-/*2011-08-08T21:29:29Z (Dave QI)
+﻿/*2011-08-08T21:29:29Z (Dave QI)
 use integer for max score from instead
 */
 /*--SOAP--
@@ -114,7 +114,7 @@ boolean isInputSufficient_limited_output :=
     did_value <> '' OR
    (SSN_value <> '' and isValidName ) OR
    (
-			isValidName AND City_val <> '' AND State_val <> '' AND
+			isValidName AND ((City_val <> '' AND State_val <> '') OR ( addr2_val <> '')) AND
       ( Addr1_val <> '' or (prange_value <> '' and pname_value <> '') )
    );
 
