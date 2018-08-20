@@ -84,6 +84,8 @@ MODULE
 		EXPORT BOOLEAN IncludeRiskIndicators := FALSE;
 		EXPORT BOOLEAN IsGetMetaData := FALSE;
 		EXPORT BOOLEAN IsGetPortedData := FALSE;
+		EXPORT BOOLEAN IncludeTransUnionIQ411 := FALSE;
+		EXPORT BOOLEAN IncludeTransUnionPVS := FALSE;
 	END;
     
 		EXPORT PhoneVerificationParams := 
@@ -126,10 +128,7 @@ MODULE
    		EXPORT STRING6   DOBMask             	:= AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
    		EXPORT STRING6   SSNMask            		:= AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
    	 EXPORT BOOLEAN   UseLastResort      		:= doxie.DataPermission.use_LastResort AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
-   		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;	
-   		EXPORT BOOLEAN   UseQSent           		:= ~doxie.DataRestriction.QSent AND TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate];
-   	
-   		EXPORT BOOLEAN   UseEquifax         		:= ~doxie.DataRestriction.EquifaxPhoneMart AND TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
+   		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent AND TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;	  	
    		EXPORT BOOLEAN   useWaterfallv6					  := FALSE : STORED('useWaterfallv6');	// internal
    		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 																			 
    		BOOLEAN          SubjectMetadata 		 		 := pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
@@ -168,8 +167,7 @@ MODULE
 														                                                                                           AND BillingId <>'' AND ValidConsentInquiry;
    		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
    		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
-   		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
-   		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent AND UseInHousePhoneMetadata_internal;
+   		                
 			  EXPORT BOOLEAN   UseAccuData_CNAM        := UseInHousePhoneMetadata AND ~Doxie.DataRestriction.AccuData AND TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,
 	                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate]; 
 //*****************************		RE-DESIGN data source options **************************
@@ -212,8 +210,27 @@ MODULE
                                                            
     IncludeTargus_internal                              := pfOptions.IncludeTargus: STORED('IncludeTargus');    
     EXPORT BOOLEAN   UseTargus          		              := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR IncludeTargus_internal) AND 
-                                                           ~doxie.DataRestriction.PhoneFinderTargus;                                                      
+                                                           ~doxie.DataRestriction.PhoneFinderTargus;   
     
+    IncludeEquifax_internal                              := pfOptions.IncludeEquifax: STORED('IncludeEquifax');    
+    EXPORT BOOLEAN   UseEquifax         		               := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR IncludeEquifax_internal) AND
+                                                            ~doxie.DataRestriction.EquifaxPhoneMart;
+    
+    SHARED IncludeTransUnionIQ411_internal                      := pfOptions.IncludeTransUnionIQ411: STORED('IncludeTransUnionIQ411');   
+    SHARED IncludeTransUnionPVS_internal                        := pfOptions.IncludeTransUnionPVS: STORED('IncludeTransUnionPVS'); 
+    
+    EXPORT IncludeTransUnionIQ411                        := (TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate] OR 
+                                                             IncludeTransUnionIQ411_internal) AND
+                                                            ~doxie.DataRestriction.QSent;  
+    EXPORT IncludeTransUnionPVS                          :=  (TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate] OR 
+                                                             IncludeTransUnionPVS_internal) AND
+                                                            ~doxie.DataRestriction.QSent;
+                                                            
+    EXPORT BOOLEAN   UseQSent           		               := IncludeTransUnionIQ411 OR IncludeTransUnionPVS;  
+                                                            
+     UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
+   		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := IncludeTransUnionPVS AND UseInHousePhoneMetadata_internal;
+                                                            
 		END;
 			
 			RETURN in_params;
@@ -317,6 +334,9 @@ MODULE
 			 EXPORT BOOLEAN   UseDeltabase 					                 := IF(IsGetMetaData
 			                                                          ,RealTimedata
 																							                                        ,FALSE);		
+    EXPORT IncludeTransUnionIQ411                       :=   UseQSent;                                                                               
+    EXPORT IncludeTransUnionPVS                         :=   UseQSent;                                                                               
+    
    
  END; 
 	 RETURN input_Mod;
