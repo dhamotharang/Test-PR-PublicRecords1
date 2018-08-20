@@ -64,11 +64,14 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
                         SELF            := LEFT));
 
     ds_nohash_withLicNMLSid_nonblank := ds_nohash_withLicNMLSid(LicNMLS_id != 0);
+		
     ds_nohash_withBlank_LicNMLSid    := 
       PROJECT(ds_nohash_withLicNMLSid(LicNMLS_id  = 0), MIDEX_Services.Layouts.LicenseReport_Layout);
-
+			
+    ds_nohash_withLicNMLSid_nonblankSorted := sort(ds_nohash_withLicNMLSid_nonblank, -last_upd_date);
+		
     nohash_resultsLicsRolled :=
-      ROLLUP(ds_nohash_withLicNMLSid_nonblank,
+      ROLLUP(ds_nohash_withLicNMLSid_nonblankSorted,
              LEFT.LicNMLS_id = RIGHT.LicNMLS_id, // rollup all licenses associated with nmls id into one report
              TRANSFORM(MIDEX_Services.Layouts.LicenseReport_RollupTempLayout,
                        SELF.Licenses            := LEFT.Licenses + RIGHT.Licenses,
@@ -180,13 +183,13 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     END;
     
 		deleted_results := DATASET([xfm_make_delete_record()]);
-		
+	
 		// If an alert report request and the document/report isn't found anymore, then return a record
 		// with the record deleted flag set to true.
 		rec_results := IF(in_mod.EnableAlert,
                       IF(EXISTS(hash_results),hash_results,deleted_results),
                       nohash_results);
-
+           
 		RETURN(rec_results);
 	END;
 	
