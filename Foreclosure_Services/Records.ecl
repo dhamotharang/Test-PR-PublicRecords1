@@ -1,4 +1,4 @@
-import AutoStandardI,Foreclosure_Services,doxie,Property,iesp,ut, BIPV2;
+﻿import AutoStandardI,Foreclosure_Services,doxie,Property,iesp,ut, BIPV2;
 
 export Records := module
 	export params := interface(
@@ -10,11 +10,10 @@ export Records := module
 		export string6 ssnmask;
 	end;
 	export val(params in_mod, boolean isNodSearch=false) := function
-	
 		// Get the IDs, pull the payload records and add Foreclosure_id.
 		ids := Foreclosure_services.SearchService_IDs.val(in_mod,isNodSearch);
 																 
-		recs:=Foreclosure_Services.Raw.GetRawRecs(ids,isNodSearch);
+		recs:=Foreclosure_Services.Raw.GetRawRecs(ids,isNodSearch, in_mod.IndustryClass);
 		// Calculate the penalty on the records
 
 		recs_plus_pen := project(recs,transform(Foreclosure_Services.Layouts.rawrec,

@@ -1,12 +1,15 @@
-IMPORT doxie, doxie_crs, iesp, Foreclosure_Services;
+﻿IMPORT doxie, doxie_crs, iesp, Foreclosure_Services;
 
 // NOD and foreclosure are in the same format, and the code accessing these data is essentially the same;
 
-EXPORT nod_foreclosure_records (dataset (doxie.layout_references) dids, string ssn_mask, string app_type):= MODULE
+EXPORT nod_foreclosure_records (dataset (doxie.layout_references) dids, string ssn_mask, string app_type,
+																																string5 industry_class = ''):= MODULE
 
+  
   shared nMod := module (Foreclosure_Services.Raw.params)
     export string6 ssnmask := ssn_mask;
     export string32 ApplicationType := app_type;
+		  export string5 IndustryClass := industry_class;
   end;
 
   // NOD is in the ESDL layout, jsut need to project it from report to search
