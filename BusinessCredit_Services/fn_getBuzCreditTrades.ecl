@@ -2,15 +2,16 @@
        iesp, LNSmallBusiness, STD, ut;
 
 EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod, 
-															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs
+															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs,
+															DATASET(recordof(Business_Credit_Scoring.Key_ScoringIndex().kFetch2(dataset([],BIPV2.IDlayouts.l_xlink_ids2)))) ScoringInfokfetch
+															, string8 bestCode
 														  ) := MODULE
 
 	SHARED todaysDate := std.Date.Today();
   // calculate the date one year  
   SHARED unsigned_DateOneYearAgo := todaysDate - 10000;
   
-  SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
-
+  SHARED  BuzCreditScoringRecs := ScoringInfokfetch;
 	// credit util 1.2.8/1.3.6
 	SHARED TradeRecs_Raw 		:=	JOIN(	buzCreditHeader_recs, Business_Credit.key_tradeline(), 
 																BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
@@ -172,7 +173,8 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	TradeRecs_dbt 		:=	TradeRecs_Active(DBT <> '');
 	prevYearDBT_AVG 	:= 	ROUND(AVE(BuzCreditScoringRecs(version >= prevYearStartDate and version <= prevYearEndDate), (integer)BuzCreditScoringRecs.DBT),2);
 
-	IndustryCode 			:=	BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds , inmod.DataPermissionMask , inmod.Include_BusinessCredit).bestIndustryCode[1].Best_Code;
+	//IndustryCode 			:=	BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds , inmod.DataPermissionMask , inmod.Include_BusinessCredit).bestIndustryCode[1].Best_Code;
+	industryCode              := bestCode;
 	SIC_Desc					:=	Codes.Key_SIC4(keyed(SIC4_Code = IndustryCode))[1].sic4_description;
 	NAICS_Desc				:= 	Codes.Key_NAICS(keyed(naics_code = IndustryCode))[1].naics_description;
 	IndustryDesc			:=	IF(SIC_Desc <> '' , SIC_Desc , NAICS_Desc);

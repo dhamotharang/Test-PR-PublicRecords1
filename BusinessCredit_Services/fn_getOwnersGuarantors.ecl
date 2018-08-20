@@ -1,8 +1,9 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, TopBusiness_Services, ut, std;
+﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, ut, std;
 
 EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inmod, 
 																DATASET(doxie.layout_references) ds_individualOwnerOnlyDids,
-																boolean buzCreditAccess = FALSE) := FUNCTION
+																boolean buzCreditAccess = FALSE
+																) := FUNCTION
 	
 	OwnrGuarRecs_raw 	:= Business_Credit.Key_TradelineGuarantor().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
 
@@ -25,7 +26,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 															SELF.SeleID := LEFT.SeleID,
 															SELF := []));
 	//bip best
-	busOwnerGuarRecs_Best 	 		:= BIPV2_Best.Key_LinkIds.Kfetch2(ds_busOwnerGuarLinkID, inmod.FetchLevel,,,false,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
+	busOwnerGuarRecs_Best 	 		:= BIPV2_Best.Key_LinkIds.Kfetch2(ds_busOwnerGuarLinkID, inmod.FetchLevel,,,false,BusinessCredit_Services.Constants.BestKfetchMaxLimit)(proxid = 0);
 	busOwnerGuarRecs_Best_proj	:= PROJECT(busOwnerGuarRecs_Best, TRANSFORM(BIPV2_Best.layouts.key, 
 																																		SELF := LEFT,
 																																		SELF := []));
