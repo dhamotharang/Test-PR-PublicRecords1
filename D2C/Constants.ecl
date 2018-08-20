@@ -5,6 +5,8 @@ EXPORT Constants := MODULE
 	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
 	EXPORT src_Property_Fares := 'F'; //Property Assessments & Deeds(Fares)
 	EXPORT src_Property_Fares_supplemental := 'S'; //Property Assessments & Deeds supplemental(Fares)
+	EXPORT vendor_CIVPABUCKS := 'CIV60'; //CIVPA-BUCKS-CIVIL-COURT  
+	EXPORT vendor_CIVTXHARRISCNTY := 'CIV90'; //CIVTX-HARRISCNTYCIVIL    
 
 		
 	EXPORT CCWRestrictedSources := [
@@ -132,6 +134,9 @@ EXPORT PhonesPlusV2RestrictedSources := [
 //------------------------------------------------------------------------------------------------------//
 
 EXPORT LNPropertyV2RestrictedSources := [src_Property_Fares, src_Property_Fares_supplemental];
+//------------------------------------------------------------------------------------------------------//
+
+EXPORT MDV2Restrictedvendors := [vendor_CIVPABUCKS, vendor_CIVTXHARRISCNTY];
 //------------------------------------------------------------------------------------------------------//
 /*	PersonHeaderKeys 
 		Keys :  
