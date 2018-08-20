@@ -10,6 +10,7 @@ SHARED linking_keys := dataset ( [
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::address',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dln',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dob',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dobf',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::lfz',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::name',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::ph',''},
@@ -90,10 +91,11 @@ end;
 // ************************************************************************************************************************************
 
 EXPORT Copy := sequential(
-
          nothor(apply(linking_keys+base_relative ,copy_files    (nm,src_name,'thor400_44','from_alpha1','thor_data400')))
-        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_66','local'     ,'thor400_66'  )))
-        ,nothor(apply(linking_keys+base_relative ,update_supers (ver(nm,'built', 'thor400_44')   , ver(nm,filedate)  )))
+        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_66','local'      ,'thor400_66'  )))
+        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_36','local'      ,'thor400_36'  )))
+        ,nothor(apply(linking_keys+base_relative ,update_supers (ver(nm,'built', 'thor400_44')         ,ver(nm,filedate))))
+        // nothor(apply(linking_keys(~regexfind('address|dln|dob', nm, nocase)) + base_relative ,update_supers (ver(nm,'built', 'thor400_44')         ,ver(nm,filedate))))
 );
 // ************************************************************************************************************************************
 
@@ -110,12 +112,14 @@ EXPORT MoveToQA :=sequential(
      nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_66'  ), ver(nm,filedate,'thor400_66'  )) ))
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor400_36'  )) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400')) ))
     ,nothor(apply(reltv_n_othr, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')) ))
     // This keey is built in Doxie.Proc_Header_Keys (not copied like the rest)
     ,                           update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400'))
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_66'  ), ver(ld,filedate,'thor_data400'))
+    ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
     ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true)) // Restore the incremental keys into the qa superfiles
     ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta','Dataland') // Copy and update new full keys in dataland
 );
