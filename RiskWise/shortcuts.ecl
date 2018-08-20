@@ -20,7 +20,8 @@ export shortcuts := module
 
 	export QA_neutral_roxieIP := 'http://roxieqavip.br.seisint.com:9876'; 
 
-  export core_roxieIP := 'http://10.176.68.187:9876/';
+  export core_96_roxieIP := 'http://10.176.68.187:9876/';
+  export core_97_roxieIP := 'http://10.176.68.184:9876/';
 
 	export dev190 := 'http://roxiedevvip.sc.seisint.com:9876'; // stu's roxie, 190
 	export Dev192 := 'http://roxiedevvip2.sc.seisint.com:9876';  // dev roxie 192

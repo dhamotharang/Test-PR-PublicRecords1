@@ -23,7 +23,33 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 
 	STRING	dataRestriction := Risk_indicators.iid_constants.default_DataRestriction : STORED('dataRestrictionMask');
   STRING 	dataPermission := Risk_Indicators.iid_constants.default_DataPermission : STORED('dataPermissionMask');
-
+  
+  //FBOP (Federal Bureau Of Prison) specific field
+  //FBOP Date Tolerance
+  UNSIGNED1 FBOP_DateTolerance := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateTolerance');
+  UNSIGNED1 FBOP_DateToleranceYearsPrior := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateToleranceYearsPrior');
+  
+  //FBOP Name Tolerance
+  BOOLEAN FBOP_includeRequiredExactInputLastName := FALSE : STORED('FBOP_IncludeExactInputLastName');
+  BOOLEAN FBOP_includeNicknames := FALSE : STORED('FBOP_IncludeNicknames');
+  UNSIGNED1 FBOP_nameOrderSearched := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_NameOrderSearched');
+  
+  //FBOP Age Tolerance
+  BOOLEAN FBOP_includeLexIDPrimaryDOBYear := FALSE : STORED('FBOP_IncludeLexIDPrimaryDOBYear');
+  BOOLEAN FBOP_includeDOBYearRadius := FALSE : STORED('FBOP_IncludeDOBYearRadius');
+  UNSIGNED1 FBOP_DOBNumberOfYearsRadius := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DOBNumberOfYearsRadius');
+  
+  //FBOP Address Tolerance
+  BOOLEAN FBOP_includeLexIDPrimaryAddressCounty := FALSE : STORED('FBOP_IncludeLexIDPrimaryAddressCounty');
+  BOOLEAN FBOP_includeLexIDHistoricalAddressesCountiesFoNumYearsPrior := FALSE : STORED('FBOP_IncludeLexIDHistoricalAddressCountyForNumYearsPrior');
+  UNSIGNED1 FBOP_historicalAddressCountyNumberYearsPrior := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_HistoricalAddressNumberOfYearsPrior');
+  
+  //FBOP FIPS/County Tolerance
+  UNSIGNED1 FBOP_FIPSCountyTolerance := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_FIPSCountyTolerance');
+  
+  
+  //Citizenship specific field
+  STRING modelName := DueDiligence.Constants.EMPTY : STORED('modelName');  
 
 
 
@@ -129,6 +155,8 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                               SELF.PerStateLegalEvent_Flag := RIGHT.PerStateLegalEvent_Flag;
                               SELF.PerFederalLegalEvent := RIGHT.PerFederalLegalEvent;
                               SELF.PerFederalLegalEvent_Flag := RIGHT.PerFederalLegalEvent_Flag;
+                              SELF.PerFederalLegalMatchLevel := RIGHT.PerFederalLegalMatchLevel;
+                              SELF.PerFederalLegalMatchLevel_Flag := RIGHT.PerFederalLegalMatchLevel_Flag;                              
                               SELF.PerCivilLegalEvent := RIGHT.PerCivilLegalEvent;
                               SELF.PerCivilLegalEvent_Flag := RIGHT.PerCivilLegalEvent_Flag;
                               SELF.PerOffenseType := RIGHT.PerOffenseType;
@@ -145,6 +173,8 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                               SELF.PerAssociates_Flag := RIGHT.PerAssociates_Flag;
                               SELF.PerProfLicense := RIGHT.PerProfLicense;
                               SELF.PerProfLicense_Flag := RIGHT.PerProfLicense_Flag;
+                              SELF.PerBusAssociations := RIGHT.PerBusAssociations;
+                              SELF.PerBusAssociations_Flag := RIGHT.PerBusAssociations_Flag;
                               
                               SELF := [];), 
                     LEFT OUTER);  	  
@@ -196,6 +226,8 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                               SELF.BusStateLegalEvent_Flag := RIGHT.BusStateLegalEvent_Flag;
                               SELF.BusFederalLegalEvent := RIGHT.BusFederalLegalEvent;
                               SELF.BusFederalLegalEvent_Flag := RIGHT.BusFederalLegalEvent_Flag;
+                              SELF.BusFederalLegalMatchLevel := RIGHT.BusFederalLegalMatchLevel;
+                              SELF.BusFederalLegalMatchLevel_Flag := RIGHT.BusFederalLegalMatchLevel_Flag;
                               SELF.BusCivilLegalEvent := RIGHT.BusCivilLegalEvent;
                               SELF.BusCivilLegalEvent_Flag := RIGHT.BusCivilLegalEvent_Flag;
                               SELF.BusOffenseType := RIGHT.BusOffenseType;
@@ -221,10 +253,23 @@ END;
 <message name="duediligence.duediligence_batch_service">
 	<part name="batch_in" sequence="1" type="tns:XmlDataset"/>
 	<part name="attributesversion" sequence="2" type="xsd:integer"/>
-	<part name="glbapurpose" sequence="5" type="xsd:integer"/>
-	<part name="dppapurpose" sequence="6" type="xsd:integer"/>
-	<part name="datarestriction" sequence="7" type="xsd:string"/>
-	<part name="datapermissionmask" sequence="8" type="xsd:string"/>
+	<part name="FBOP_DateTolerance" sequence="3" type="xsd:integer"/>
+	<part name="FBOP_DateToleranceYearsPrior" sequence="4" type="xsd:integer"/>
+	<part name="FBOP_IncludeExactInputLastName" sequence="5" type="xsd:boolean"/>
+	<part name="FBOP_IncludeNicknames" sequence="6" type="xsd:boolean"/>
+	<part name="FBOP_NameOrderSearched" sequence="7" type="xsd:integer"/>
+	<part name="FBOP_IncludeLexIDPrimaryDOBYear" sequence="8" type="xsd:boolean"/>
+	<part name="FBOP_IncludeDOBYearRadius" sequence="9" type="xsd:boolean"/>
+	<part name="FBOP_DOBNumberOfYearsRadius" sequence="10" type="xsd:integer"/>
+	<part name="FBOP_IncludeLexIDPrimaryAddressCounty" sequence="11" type="xsd:boolean"/>
+	<part name="FBOP_IncludeLexIDHistoricalAddressCountyForNumYearsPrior" sequence="12" type="xsd:boolean"/>
+	<part name="FBOP_HistoricalAddressNumberOfYearsPrior" sequence="13" type="xsd:integer"/>
+	<part name="FBOP_FIPSCountyTolerance" sequence="14" type="xsd:integer"/>
+	<part name="modelName" sequence="15" type="xsd:string"/>
+	<part name="glbapurpose" sequence="16" type="xsd:integer"/>
+	<part name="dppapurpose" sequence="17" type="xsd:integer"/>
+	<part name="datarestriction" sequence="18" type="xsd:string"/>
+	<part name="datapermissionmask" sequence="19" type="xsd:string"/>
 </message>
-*/
+*/          
 

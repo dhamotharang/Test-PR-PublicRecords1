@@ -29,10 +29,10 @@ EXPORT translateExpression := MODULE
                                   
                                   
     SHARED ExpressionDSLayout := RECORD
-      UNSIGNED4   expressionWeight; //unique identifier used as a weight
-      STRING      expressionToUse;
-      UNSIGNED1   expressionCategory; 
-      STRING100    expressionText;     
+      UNSIGNED4 expressionWeight; //unique identifier used as a weight
+      STRING expressionToUse;
+      UNSIGNED1 expressionCategory; 
+      STRING100 expressionText;     
     END;
     
 
@@ -49,28 +49,28 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.ALIEN_OFFENSES, 			    DueDiligence.RegularExpressions.EXPRESSION_ALIEN_OFFENSES,			    LEVEL_2, 		'Alien Offenses'},
                                     {ExpressionEnum.SHOPLIFTING, 				      DueDiligence.RegularExpressions.EXPRESSION_SHOPLIFTING, 			      LEVEL_2, 		'Shoplifting'},
                                     {ExpressionEnum.ORGANIZED_RETAIL_THEFT, 	DueDiligence.RegularExpressions.EXPRESSION_ORGANIZED_RETAIL_THEFT, 	LEVEL_2, 		'Organized Retail Theft'},
-                                    {ExpressionEnum.GAMBLING_BITCOIN, 			  DueDiligence.RegularExpressions.EXPRESSION_GAMBLING_BITCOIN, 		    LEVEL_3, 		'Gambling/Bitcoin'},
+                                    {ExpressionEnum.GAMBLING_BITCOIN, 			  DueDiligence.RegularExpressions.EXPRESSION_GAMBLING_BITCOIN, 		    LEVEL_3, 		'Gambling / Bitcoin'},
                                     {ExpressionEnum.COMPUTER_OFFENSES, 			  DueDiligence.RegularExpressions.EXPRESSION_COMPUTER_OFFENSES, 		  LEVEL_3, 		'Computer'},
                                     {ExpressionEnum.TAMPERING, 					      DueDiligence.RegularExpressions.EXPRESSION_TAMPERING, 				      LEVEL_3, 		'Tampering'},
                                     {ExpressionEnum.OBSTRUCTION, 				      DueDiligence.RegularExpressions.EXPRESSION_OBSTRUCTION, 			      LEVEL_3, 		'Obstruction'},
                                     {ExpressionEnum.PERJURY, 					        DueDiligence.RegularExpressions.EXPRESSION_PERJURY, 				        LEVEL_3, 		'Perjury'},
                                     {ExpressionEnum.VANDALISM, 				      	DueDiligence.RegularExpressions.EXPRESSION_VANDALISM, 				      LEVEL_4, 		'Vandalism'},
                                     {ExpressionEnum.PROPERTY_DESTRUCTION, 		DueDiligence.RegularExpressions.EXPRESSION_PROPERTY_DESTRUCTION, 	  LEVEL_4, 		'Destruction of Property'},
-                                    {ExpressionEnum.RESISTING_ARREST, 			  DueDiligence.RegularExpressions.EXPRESSION_RESISTING_ARREST, 		    LEVEL_4, 		'Resisting Arrest/Escape/Elude'},
+                                    {ExpressionEnum.RESISTING_ARREST, 			  DueDiligence.RegularExpressions.EXPRESSION_RESISTING_ARREST, 		    LEVEL_4, 		'Resisting Arrest / Escape / Elude'},
                                     {ExpressionEnum.VIOLATE_ORDER, 	          DueDiligence.RegularExpressions.EXPRESSION_VIOLATE_ORDER, 			    LEVEL_4, 	  'Violating Orders'},
                                     {ExpressionEnum.CYBER_STALKING, 			    DueDiligence.RegularExpressions.EXPRESSION_CYBER_STALKING, 			    LEVEL_4, 		'Cyber Stalking'},
-                                    {ExpressionEnum.STALKING_HARASSMENT, 		  DueDiligence.RegularExpressions.EXPRESSION_STALKING_HARASSMENT, 	  LEVEL_4, 		'Stalking/Harassment/Terrorize'},
+                                    {ExpressionEnum.STALKING_HARASSMENT, 		  DueDiligence.RegularExpressions.EXPRESSION_STALKING_HARASSMENT, 	  LEVEL_4, 		'Stalking / Harassment / Terrorize'},
                                     {ExpressionEnum.ANIMAL_FIGHTING, 			    DueDiligence.RegularExpressions.EXPRESSION_ANIMAL_FIGHTING, 		    LEVEL_4, 		'Animal Fighting'},
-                                    {ExpressionEnum.DOMESTIC_VIOLENCE, 			  DueDiligence.RegularExpressions.EXPRESSION_DOMESTIC_VIOLENCE, 		  LEVEL_4, 		'Domestic/Family Violence'},
+                                    {ExpressionEnum.DOMESTIC_VIOLENCE, 			  DueDiligence.RegularExpressions.EXPRESSION_DOMESTIC_VIOLENCE, 		  LEVEL_4, 		'Domestic / Family Violence'},
                                     {ExpressionEnum.ASSAULT, 					        DueDiligence.RegularExpressions.EXPRESSION_ASSAULT, 				        LEVEL_4, 		'Assault-All Types'},
                                     {ExpressionEnum.ASSAULT_DEADLY_WEAPON, 	  DueDiligence.RegularExpressions.EXPRESSION_ASSAULT_DEADLY_WEAPON, 	LEVEL_4, 	  'Assault with a Deadly Weapon'},
-                                    {ExpressionEnum.AGGRAVATED_ASSAULT, 	    DueDiligence.RegularExpressions.EXPRESSION_AGGRAVATED_ASSAULT, 	    LEVEL_4, 	  'Aggravated Assault/Battery'},
+                                    {ExpressionEnum.AGGRAVATED_ASSAULT, 	    DueDiligence.RegularExpressions.EXPRESSION_AGGRAVATED_ASSAULT, 	    LEVEL_4, 	  'Aggravated Assault / Battery'},
                                     {ExpressionEnum.BREAKING_AND_ENTERING, 		DueDiligence.RegularExpressions.EXPRESSION_BREAKING_AND_ENTERING, 	LEVEL_4, 		'Breaking and Entering'},
                                     {ExpressionEnum.BURGLARY, 					      DueDiligence.RegularExpressions.EXPRESSION_BURGLARY, 				        LEVEL_4, 		'Burglary'},
                                     {ExpressionEnum.ARSON, 						        DueDiligence.RegularExpressions.EXPRESSION_ARSON, 					        LEVEL_4, 		'Arson'},
-                                    {ExpressionEnum.KIDNAPPING, 	            DueDiligence.RegularExpressions.EXPRESSION_KIDNAPPING, 			        LEVEL_4, 	  'Kidnapping/Abduction'},
-                                    {ExpressionEnum.ASSULT_INTENT_TO_KILL, 	  DueDiligence.RegularExpressions.EXPRESSION_ASSULT_INTENT_TO_KILL, 	LEVEL_4, 	  'Assault with Intent to Kill/Intent to Kill/Deadly Conduct'},
-                                    {ExpressionEnum.MURDER, 	                DueDiligence.RegularExpressions.EXPRESSION_MURDER, 	                LEVEL_4, 	  'Murder/Homicide/Manslaughter'},
+                                    {ExpressionEnum.KIDNAPPING, 	            DueDiligence.RegularExpressions.EXPRESSION_KIDNAPPING, 			        LEVEL_4, 	  'Kidnapping / Abduction'},
+                                    {ExpressionEnum.ASSULT_INTENT_TO_KILL, 	  DueDiligence.RegularExpressions.EXPRESSION_ASSULT_INTENT_TO_KILL, 	LEVEL_4, 	  'Assault with Intent to Kill / Intent to Kill / Deadly Conduct'},
+                                    {ExpressionEnum.MURDER, 	                DueDiligence.RegularExpressions.EXPRESSION_MURDER, 	                LEVEL_4, 	  'Murder / Homicide / Manslaughter'},
                                     {ExpressionEnum.MOLESTATION, 				      DueDiligence.RegularExpressions.EXPRESSION_MOLESTATION, 			      LEVEL_5, 		'Molestation'},
                                     {ExpressionEnum.RAPE, 						        DueDiligence.RegularExpressions.EXPRESSION_RAPE, 					          LEVEL_5, 		'Rape'},
                                     {ExpressionEnum.STATUTORY_RAPE, 			    DueDiligence.RegularExpressions.EXPRESSION_STATUTORY_RAPE, 			    LEVEL_5, 		'Statutory Rape'},
@@ -92,19 +92,19 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.TAX_OFFENSES, 				    DueDiligence.RegularExpressions.EXPRESSION_TAX_OFFENSES, 			      LEVEL_7, 		'Tax Offenses'},
                                     {ExpressionEnum.EMBEZZLEMENT, 				    DueDiligence.RegularExpressions.EXPRESSION_EMBEZZLEMENT, 			      LEVEL_7, 		'Embezzlement'},
                                     {ExpressionEnum.FORGERY, 					        DueDiligence.RegularExpressions.EXPRESSION_FORGERY, 				        LEVEL_7, 		'Forgery'},
-                                    {ExpressionEnum.CHECK_FRAUD, 				      DueDiligence.RegularExpressions.EXPRESSION_CHECK_FRAUD, 		      	LEVEL_7, 		'Check Fraud/Bad Check'},
+                                    {ExpressionEnum.CHECK_FRAUD, 				      DueDiligence.RegularExpressions.EXPRESSION_CHECK_FRAUD, 		      	LEVEL_7, 		'Check Fraud / Bad Check'},
                                     {ExpressionEnum.FRAUD, 						        DueDiligence.RegularExpressions.EXPRESSION_FRAUD, 					        LEVEL_7, 		'Fraud'},
                                     {ExpressionEnum.DRUG_OFFENSES, 				    DueDiligence.RegularExpressions.EXPRESSION_DRUG_OFFENSES, 			    LEVEL_8, 		'Drugs'},
                                     {ExpressionEnum.WEAPONS_OFFENSES, 			  DueDiligence.RegularExpressions.EXPRESSION_WEAPONS_OFFENSES, 		    LEVEL_8, 		'Weapons'},
-                                    {ExpressionEnum.DIST_MANUF_TRANS, 	      DueDiligence.RegularExpressions.EXPRESSION_DIST_MANUF_TRANS, 	      LEVEL_8, 	  'Dist/Manuf/Trans/Delivery-Drugs or Weapons'},
-                                    {ExpressionEnum.EXPLOSIVES, 				      DueDiligence.RegularExpressions.EXPRESSION_EXPLOSIVES, 				      LEVEL_8, 		'Explosives/Destruction Devices'},
-                                    {ExpressionEnum.TRAFFICKING_SMUGGLING, 		DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING, 	LEVEL_8, 		'Trafficking/Smuggling'},
+                                    {ExpressionEnum.DIST_MANUF_TRANS, 	      DueDiligence.RegularExpressions.EXPRESSION_DIST_MANUF_TRANS, 	      LEVEL_8, 	  'Dist / Manuf / Trans / Delivery-Drugs or Weapons'},
+                                    {ExpressionEnum.EXPLOSIVES, 				      DueDiligence.RegularExpressions.EXPRESSION_EXPLOSIVES, 				      LEVEL_8, 		'Explosives / Destruction Devices'},
+                                    {ExpressionEnum.TRAFFICKING_SMUGGLING, 		DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING, 	LEVEL_8, 		'Trafficking / Smuggling'},
                                     {ExpressionEnum.CHOP_SHOP, 				      	DueDiligence.RegularExpressions.EXPRESSION_CHOP_SHOP, 				      LEVEL_9, 		'Chop Shop'},
                                     {ExpressionEnum.HIJACKING, 				      	DueDiligence.RegularExpressions.EXPRESSION_HIJACKING, 				      LEVEL_9, 		'Hijacking'},
                                     {ExpressionEnum.EXTORTION, 				      	DueDiligence.RegularExpressions.EXPRESSION_EXTORTION, 				      LEVEL_9, 		'Extortion'},
-                                    {ExpressionEnum.TREASON_ESPIONAGE, 		  	DueDiligence.RegularExpressions.EXPRESSION_TREASON_ESPIONAGE, 	  	LEVEL_9, 		'Treason/Espionage'},
-                                    {ExpressionEnum.INSIDER_TRADING, 			    DueDiligence.RegularExpressions.EXPRESSION_INSIDER_TRADING, 		    LEVEL_9, 		'Insider Trading/Manipulation'},
-                                    {ExpressionEnum.COMMUNICATE_WIRE_DEVICE, 	DueDiligence.RegularExpressions.EXPRESSION_COMMUNICATE_WIRE_DEVICE, LEVEL_9, 	  'Interception of Communication/Wiretapping'},
+                                    {ExpressionEnum.TREASON_ESPIONAGE, 		  	DueDiligence.RegularExpressions.EXPRESSION_TREASON_ESPIONAGE, 	  	LEVEL_9, 		'Treason / Espionage'},
+                                    {ExpressionEnum.INSIDER_TRADING, 			    DueDiligence.RegularExpressions.EXPRESSION_INSIDER_TRADING, 		    LEVEL_9, 		'Insider Trading / Manipulation'},
+                                    {ExpressionEnum.COMMUNICATE_WIRE_DEVICE, 	DueDiligence.RegularExpressions.EXPRESSION_COMMUNICATE_WIRE_DEVICE, LEVEL_9, 	  'Interception of Communication / Wiretapping'},
                                     {ExpressionEnum.COUNTERFEIT, 				      DueDiligence.RegularExpressions.EXPRESSION_COUNTERFEIT, 			      LEVEL_9, 		'Counterfeiting'},
                                     {ExpressionEnum.TERRORISM, 					      DueDiligence.RegularExpressions.EXPRESSION_TERRORISM, 					    LEVEL_9, 		'Links to Terrorism'},
                                     {ExpressionEnum.ORGANIZED_CRIME, 		    	DueDiligence.RegularExpressions.EXPRESSION_ORGANIZED_CRIME, 		    LEVEL_9, 		'Links to Organized Crime'},
