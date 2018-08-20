@@ -6,7 +6,7 @@ unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, 
 		 count_simple,
 		 count_shown);
 
-export count_records_prs(dataset(doxie_cbrs.layout_references) bdids) := dataset([{
+export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8) := dataset([{
 	get_Count(
 		Include_CorporationFilings_val,
 		Max_CorporationFilings_val,
@@ -28,7 +28,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids) := dataset
 	(unsigned3)count(doxie_cbrs.lien_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.judgement_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.bankruptcy_records_prs(bdids)),
-	(unsigned3)count(doxie_cbrs.Patriot_records),
+	(unsigned3)count(doxie_cbrs.Patriot_records(ofac_version, include_ofac, global_watchlist_threshold)),
 	get_Count(
 		Include_UCCFilings_val,
 		Max_UCCFilings_val,
