@@ -203,17 +203,20 @@ EXPORT Functions := MODULE
 
 	EXPORT append_LiensJudgments (DATASET(ConsumerCreditReport_Services.Layouts.ccrResp) ds_ccr_resp,
 																ConsumerCreditReport_Services.IParams.Params in_mod,
-                DATASET(FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile) := FUNCTION
+                DATASET(FCRA.Layout_override_flag) ds_flags,
+                DATASET(FFD.Layouts.PersonContextBatch) pc_recs) := FUNCTION
 
   flagfile := ds_flags(file_id=FCRA.FILE_ID.LIEN);
-
+  pc_dr_records := pc_recs(datagroup IN FFD.Constants.DataGroupSet.Liens, recordtype=FFD.Constants.RecordType.DR);
+  
 		Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus xformInput(ds_ccr_resp L) := TRANSFORM
    override_flags:=flagfile(did=L.UniqueId1);
+   DUD_flags := pc_dr_records(Lexid=L.UniqueId1);
 			SELF.seq:=(UNSIGNED)L.AccountNumber;
 			SELF.historyDate:=Risk_Indicators.iid_constants.default_history_date;
 			SELF.did:=(UNSIGNED)L.UniqueId1;
    SELF.lien_correct_ffid:=SET(override_flags,flag_file_id);
-   SELF.lien_correct_tmsid_rmsid :=SET(override_flags,record_id);
+   SELF.lien_correct_tmsid_rmsid :=SET(override_flags,record_id) + SET(DUD_flags, RecId1);
 			SELF:=[];
 		END;
 
