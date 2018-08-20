@@ -77,7 +77,9 @@ SHARED update_supers(string spr0, string newLogical) := function
                          'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
                          'thor400_44::key::insuranceheader_segmentation::did_ind_built',
                          'thor400_66::key::insuranceheader_segmentation::qa::did_ind'=>
-                         'thor400_66::key::insuranceheader_segmentation::did_ind_qa'
+                         'thor400_66::key::insuranceheader_segmentation::did_ind_qa',
+                         'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
                   ,spr0);
     return sequential(
         output(dataset([{spr,'~'+newLogical}],{string super, string new_logical}),named('cp_built_update'),extend)

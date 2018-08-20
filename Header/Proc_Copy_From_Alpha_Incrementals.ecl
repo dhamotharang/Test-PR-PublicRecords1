@@ -51,6 +51,11 @@ SHARED fc(string f1, string f2):= sequential(
 SHARED fc6(string f1, string f2):= sequential(
             output(dataset([{f1,'thor400_66',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
             if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_66',f2,,,,,true,true,,true))));
+
+SHARED fc8(string f1, string f2):= sequential(
+            output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+            if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
+            
 EXPORT copy_from_alpha := function
     
     // create a new blank file for the insuranceheader_segmentation key 
@@ -108,19 +113,19 @@ EXPORT copy_from_alpha := function
     ,fc6(fName(filedate, '::idl')                ,fName6(filedate, '::idl'))
     
     //copy to cluster - thor400_36
-    ,fc6(fName(filedate, '::did::refs::address') ,fName8(filedate, '::did::refs::address'))
-    ,fc6(fName(filedate, '::did::refs::dln')     ,fName8(filedate, '::did::refs::dln'))
-    ,fc6(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dob'))
-    ,fc6(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dobf')) //new key
-    ,fc6(fName(filedate, '::did::refs::lfz')     ,fName8(filedate, '::did::refs::lfz'))
-    ,fc6(fName(filedate, '::did::refs::name')    ,fName8(filedate, '::did::refs::name'))
-    ,fc6(fName(filedate, '::did::refs::ph')      ,fName8(filedate, '::did::refs::ph'))
-    ,fc6(fName(filedate, '::did::refs::relative'),fName8(filedate, '::did::refs::relative'))
-    ,fc6(fName(filedate, '::did::refs::ssn')     ,fName8(filedate, '::did::refs::ssn'))
-    ,fc6(fName(filedate, '::did::refs::ssn4')    ,fName8(filedate, '::did::refs::ssn4'))
-    ,fc6(fName(filedate, '::did::refs::zip_pr')  ,fName8(filedate, '::did::refs::zip_pr'))
-    ,fc6(fName(filedate, '::did::sup::rid')      ,fName8(filedate, '::did::sup::rid'))
-    ,fc6(fName(filedate, '::idl')                ,fName8(filedate, '::idl'))
+    ,fc8(fName(filedate, '::did::refs::address') ,fName8(filedate, '::did::refs::address'))
+    ,fc8(fName(filedate, '::did::refs::dln')     ,fName8(filedate, '::did::refs::dln'))
+    ,fc8(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dob'))
+    ,fc8(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dobf')) //new key
+    ,fc8(fName(filedate, '::did::refs::lfz')     ,fName8(filedate, '::did::refs::lfz'))
+    ,fc8(fName(filedate, '::did::refs::name')    ,fName8(filedate, '::did::refs::name'))
+    ,fc8(fName(filedate, '::did::refs::ph')      ,fName8(filedate, '::did::refs::ph'))
+    ,fc8(fName(filedate, '::did::refs::relative'),fName8(filedate, '::did::refs::relative'))
+    ,fc8(fName(filedate, '::did::refs::ssn')     ,fName8(filedate, '::did::refs::ssn'))
+    ,fc8(fName(filedate, '::did::refs::ssn4')    ,fName8(filedate, '::did::refs::ssn4'))
+    ,fc8(fName(filedate, '::did::refs::zip_pr')  ,fName8(filedate, '::did::refs::zip_pr'))
+    ,fc8(fName(filedate, '::did::sup::rid')      ,fName8(filedate, '::did::sup::rid'))
+    ,fc8(fName(filedate, '::idl')                ,fName8(filedate, '::idl'))
     );
 
 return copy_incremental_keys;
@@ -132,15 +137,18 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm):= 
               output(dataset([{'remove',fName('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'remove',fName4('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'remove',fName6('qa' ,kNm),currLgInc6(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'remove',fName8('qa' ,kNm),currLgInc8(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               
               output(dataset([{'remove',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'clear ',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'add   ',fName('inc',kNm),fName(fileDate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'add   ',fName('inc',kNm),fName6(fileDate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName('inc',kNm),fName8(fileDate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               
               output(dataset([{'add   ',fName( 'qa' ,kNm),fName(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
               output(dataset([{'add   ',fName6( 'qa' ,kNm),fName6(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+              output(dataset([{'add   ',fName8( 'qa' ,kNm),fName8(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
                       
               if(~test_copy, sequential(
                std.file.startsuperfiletransaction(),
@@ -164,6 +172,7 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm):= 
                if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
                if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(fileDate,kNml))),
                if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName6(fileDate,kNml))),
+               if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(fileDate,kNml))),
                
                // Add the new incrementals to the monthly regular lab keys qa superfiles
                std.file.AddSuperFile             (fName ('qa',kNm),fName (filedate,kNml)),
@@ -267,6 +276,7 @@ EXPORT deploy := sequential(
 
                 // The following can only copy after the key is built in Boca
                 fc6(fName(filedate, '::did')                ,fName6(filedate, '::did')),
+                fc8(fName(filedate, '::did')                ,fName8(filedate, '::did')),
                 update_inc_superfiles(),
                 udops,
                 orbit_update_entries('create'),
