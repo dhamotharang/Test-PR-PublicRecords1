@@ -919,9 +919,23 @@ MODULE
 			
 		vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);
 		verifiedRecs := PhoneFinder_Services.GetVerifiedRecs(vmod).verifyBatch(dIdentitiesInfo, dIn);
+		
+  PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp tPhoneInfo2(recordof(dIn) le, PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp ri) := TRANSFORM
+   SELF.acctno := le.acctno;
+   SELF.Number := le.phone;            
+   SELF.VerificationStatus.PhoneVerificationDescription := MAP(le.phone = '' => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
+                                                               ri.acctno = '' => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified, '');   
+   SELF.VerificationStatus.PhoneVerified := le.phone <> '';   
+   SELF := ri;
+  END;
+
+   dPhoneswVerificationStatus :=  JOIN(dIn, dPrimaryPhoneInfo,
+   								        LEFT.acctno = RIGHT.acctno,
+   								        tPhoneInfo2(LEFT, RIGHT),
+   								        LEFT OUTER, LIMIT(0),KEEP(1));
 				
- 		 PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp tPhoneInfo2(PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp le, PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp ri) := TRANSFORM
-   		  HasMatch := (le.acctno = ri.acctno) and ri.acctno != '';
+ 		 PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp updateVerificationStatus(PhoneFinder_Services.Layouts.PhoneFinder.PhoneIesp le, PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp ri) := TRANSFORM
+   		  HasMatch := ri.acctno != '' AND le.VerificationStatus.PhoneVerificationDescription = '';
    		  SELF.VerificationStatus.PhoneVerificationDescription := MAP(le.Number = '' => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
    																inMod.VerifyPhoneNameAddress AND   HasMatch=> PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
    																inMod.VerifyPhoneName AND HasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
@@ -931,9 +945,9 @@ MODULE
    		  SELF               := le;
    		END;
    		
-   		verifiedPhoneInfo :=   JOIN(dPrimaryPhoneInfo, VerifiedRecs,
+   		verifiedPhoneInfo :=   JOIN(dPhoneswVerificationStatus, VerifiedRecs,
    								           LEFT.acctno = RIGHT.acctno,
-   								           tPhoneInfo2(LEFT, RIGHT),
+   								           updateVerificationStatus(LEFT, RIGHT),
    								           LEFT OUTER, LIMIT(0),KEEP(1));	
 
   dPrimaryPhoneInfo2 := IF(doVerification, VerifiedPhoneInfo, dPrimaryPhoneInfo);												
@@ -1360,7 +1374,7 @@ MODULE
 			SELF.PhoneRiskIndicator                 := phoneInfo.PhoneRiskIndicator;					
 			SELF.OTPRIFailed                        := phoneInfo.OTPRIFailed;	
 			SELF.CallForwardingIndicator            := phoneInfo.CallForwardingIndicator;				
-			SELF.PhoneVerificationDescription       := phoneInfo.VerificationStatus.PhoneVerificationDescription;				
+			SELF.PhoneVerificationDescription       := phoneInfo.VerificationStatus.PhoneVerificationDescription;
 			SELF.PhoneVerified                      := phoneInfo.VerificationStatus.PhoneVerified;				
 			SELF                                    := phoneInfo.GeoLocation;
 			SELF                                    := ocInfo.Address;
@@ -1383,6 +1397,7 @@ MODULE
 				OUTPUT(dPhoneIdentity,NAMED('dPhoneIdentity_PhoneSearch'));
 				OUTPUT(dFormat2BatchReady,NAMED('dFormat2BatchReady_PhoneSearch'));
 				OUTPUT(verifiedRecs,NAMED('verifiedRecs_PhoneSearch'));
+				OUTPUT(verified_PrimaryPhoneInfo,NAMED('verified_PrimaryPhoneInfo'));
  			#ELSE				
    				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo'));
    				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo'));
@@ -1394,6 +1409,7 @@ MODULE
    				OUTPUT(dPrimaryIdentityIesp,NAMED('dPrimaryIdentityIesp'));
    				OUTPUT(dPrimaryIdentity,NAMED('dPrimaryIdentity'));
    				OUTPUT(dFormat2BatchReady,NAMED('dFormat2BatchReady'));
+   				OUTPUT(dFormat2BatchOut,NAMED('dFormat2BatchOut'));
 
 			#END
 		#END
