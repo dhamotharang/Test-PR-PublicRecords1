@@ -2165,7 +2165,8 @@ TRANSFORM
 		''
 	);
 
-	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1','fp1802_1','fp1705_1','fp1801_1'], true, IncludeRiskIndices);	
+	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1','fp1508_1',
+                                                'fp1802_1','fp1705_1','fp1801_1','fp1806_1'], true, IncludeRiskIndices);	
 
 	self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
 	self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
@@ -2197,6 +2198,7 @@ TRANSFORM
 													model_name = 'fp1802_1'	=> 'FraudPointFP1802_1',
                           model_name = 'fp1705_1'	=> 'FraudPointFP1705_1',
                           model_name = 'fp1801_1'	=> 'FraudPointFP1801_1',
+                          model_name = 'fp1806_1'	=> 'FraudPointFP1806_1',
                           																	 'FraudPoint');	
 
 	self.scores := project(le, form_fp3score(left));

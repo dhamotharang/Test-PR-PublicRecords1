@@ -1085,9 +1085,9 @@ INTEGER contains_i(     STRING haystack,     STRING needle ) := (INTEGER)(    ST
 
 //========================================================================================  
 //===   for round 1 validation set the sysdate to the same value seen in the validation file
-      sysdate := common.sas_date('20160501');	 
+//===     sysdate := common.sas_date('20160501');	 
 //===   for round 2 validation set the sysdate to the archive date
-//sysdate := common.sas_date(if(le.historydate=999999, (    STRING)ut.getdate, (    STRING6)le.historydate+'01'));
+ sysdate := common.sas_date(if(le.historydate=999999, (    STRING)ut.getdate, (    STRING6)le.historydate+'01'));
 //========================================================================================
 
 
