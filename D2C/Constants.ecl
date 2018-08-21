@@ -141,6 +141,12 @@ EXPORT LNPropertyV2RestrictedSources := [src_Property_Fares, src_Property_Fares_
 			thor_data400::key::header_qa
 		Source field : src
  */
+ 
+ //------------------------------------------------------------------------------------------------------//
+
+EXPORT PhonemetadataRestrictedSources := [ MDR.sourceTools.src_PhonesPorted_TCPA];
+
+ //------------------------------------------------------------------------------------------------------//
 
  EXPORT PersonHeaderRestrictedSources := [
 			MDR.sourceTools.src_WV_Watercraft,					
