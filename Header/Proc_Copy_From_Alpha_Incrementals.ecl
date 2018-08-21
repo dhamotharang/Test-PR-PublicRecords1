@@ -57,7 +57,34 @@ SHARED fc6(string f1, string f2):= sequential(
 SHARED fc8(string f1, string f2):= sequential(
             output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
             if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
-            
+
+EXPORT copy_addr_uniq_keys_from_alpha := function
+  
+  aDali := _control.IPAddress.aprod_thor_dali;
+  lc := '~foreign::' + aDali + '::';
+  get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+    
+  AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
+  AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
+  AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedate + '::addr_unique_expanded';
+
+  copyKeys := sequential(
+     fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
+    ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
+    );
+    
+  moveKeys := sequential(    
+        STD.File.StartSuperFileTransaction( )
+       ,STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true)) //Fcra
+       ,STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false)) //NFcra
+       ,STD.File.FinishSuperFileTransaction( )
+       );
+  
+  seq := sequential(copyKeys, moveKeys);
+  return seq;
+   
+END;    
+                
 EXPORT copy_from_alpha := function
     
     // create a new blank file for the insuranceheader_segmentation key 
@@ -97,13 +124,12 @@ EXPORT copy_from_alpha := function
     ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedate, '::did::refs::zip_pr'))
     ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedate, '::did::sup::rid'))
     ,fc(get_alogical(aPref+'header')             ,fName(filedate, '::idl'))
-    //,fc(lc + 'thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded' , 
     
     //copy to cluster - thor400_66
     ,fc6(fName(filedate, '::did::refs::address') ,fName6(filedate, '::did::refs::address'))
     ,fc6(fName(filedate, '::did::refs::dln')     ,fName6(filedate, '::did::refs::dln'))
     ,fc6(fName(filedate, '::did::refs::dob')     ,fName6(filedate, '::did::refs::dob'))
-    ,fc6(fName(filedate, '::did::refs::dob')     ,fName6(filedate, '::did::refs::dobf')) //new key
+    ,fc6(fName(filedate, '::did::refs::dobf')     ,fName6(filedate, '::did::refs::dobf')) //new key
     ,fc6(fName(filedate, '::did::refs::lfz')     ,fName6(filedate, '::did::refs::lfz'))
     ,fc6(fName(filedate, '::did::refs::name')    ,fName6(filedate, '::did::refs::name'))
     ,fc6(fName(filedate, '::did::refs::ph')      ,fName6(filedate, '::did::refs::ph'))
@@ -118,7 +144,7 @@ EXPORT copy_from_alpha := function
     ,fc8(fName(filedate, '::did::refs::address') ,fName8(filedate, '::did::refs::address'))
     ,fc8(fName(filedate, '::did::refs::dln')     ,fName8(filedate, '::did::refs::dln'))
     ,fc8(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dob'))
-    ,fc8(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dobf')) //new key
+    ,fc8(fName(filedate, '::did::refs::dobf')     ,fName8(filedate, '::did::refs::dobf')) //new key
     ,fc8(fName(filedate, '::did::refs::lfz')     ,fName8(filedate, '::did::refs::lfz'))
     ,fc8(fName(filedate, '::did::refs::name')    ,fName8(filedate, '::did::refs::name'))
     ,fc8(fName(filedate, '::did::refs::ph')      ,fName8(filedate, '::did::refs::ph'))
