@@ -94,7 +94,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
+		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com'    ); 
 
 		step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
 		#WORKUNIT('name', step);
