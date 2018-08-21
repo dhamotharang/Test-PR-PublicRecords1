@@ -2,10 +2,7 @@ IMPORT Data_Services,EQ_Hist,header;
 
 rec := EQ_Hist.Layout.current_raw;
 
-monthly_file :=	dataset(Data_Services.Data_location.Prefix('Equifax')+
-												'thor_data400::in::hdr_raw',rec,flat) +
-                dataset(Data_Services.Data_location.Prefix('Equifax')+
-												'thor_data400::in::hdr_supplement2',rec,flat);
+monthly_file :=	header.file_header_in().monthly_file;
 
 c1(ebcdic string1 _c) := header.Cid_Converter(_c);
 convert_cid(ebcdic string9  id) := c1(id[1])+c1(id[2])+c1(id[3])+c1(id[4])
