@@ -122,7 +122,7 @@ export FL := MODULE;
 			// *** If ann_cor_2nd_mail_state is blank then call CleanAddress182, else just fCleanAddress
 			add2Exists   := if(corp2.t2u(input.ann_cor_2nd_mail_add1+input.ann_cor_2nd_mail_add2+input.ann_cor_2nd_mail_city+input.ann_cor_2nd_mail_zip) <> '',true,false);
 			stateIsBlank := if(corp2.t2u(input.ann_cor_2nd_mail_state) = '',true,false);
-			string182 corpAddr2clean_address	:= if(add2Exists and stateIsBlank,Address.CleanAddress182(corp2.t2u(input.ann_cor_2nd_mail_add1+' '+input.ann_cor_2nd_mail_add2),corp2.t2u(input.ann_cor_2nd_mail_city+' '+input.ann_cor_2nd_mail_state+' '+input.ann_cor_2nd_mail_zip)),'');
+			string182 corpAddr2clean_address	:= if(add2Exists and stateIsBlank,Address.CleanAddress182(corp2.t2u(input.ann_cor_2nd_mail_add1+' '+input.ann_cor_2nd_mail_add2),corp2.t2u(input.ann_cor_2nd_mail_city+' '+input.ann_cor_2nd_mail_zip)),'');
 			corpAddr2City                     := if(corp2.t2u(corpAddr2clean_address[65..89]) <> ''   ,corpAddr2clean_address[65..89]   ,input.ann_cor_2nd_mail_city);
 			corpAddr2State                    := if(corp2.t2u(corpAddr2clean_address[115..116]) <> '' ,corpAddr2clean_address[115..116] ,input.ann_cor_2nd_mail_state);
 			self.corp_address2_type_cd        := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).ifAddressExists, 'M', '');			
