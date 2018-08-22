@@ -1,4 +1,4 @@
-﻿import iesp, lib_stringlib, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
+﻿import iesp, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
 
 export Functions := MODULE
 
@@ -114,8 +114,8 @@ export Functions := MODULE
 	
 	
 	EXPORT location_filter (dataset(recordof(eCrash_Services.Layouts.recs_with_penalty)) recs, eCrash_Services.IParam.searchrecords in_mod):=function
-				string CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
-				string loc_street := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
+				string CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+				string loc_street := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
 				recs_exact:= recs((CrossStreet='' or (eCrash_Services.Constants.contains_match(accident_cross_street,CrossStreet) or 
 																						 eCrash_Services.Constants.contains_match(accident_street,CrossStreet) or
 																						 eCrash_Services.Constants.contains_match(next_street,CrossStreet)))

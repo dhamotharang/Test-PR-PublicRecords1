@@ -1,16 +1,16 @@
-﻿IMPORT ut, iesp, Gateway, lib_stringlib;
+﻿IMPORT ut, iesp, Gateway, STD;
 
 
 //TODO eCrash team is a bit concerned that failures will simply act as though no delta records are found.
 // This silent fail could lead to customers simply not trusting the system because they don't get answers.
-EXPORT DeltaBaseSoapCall(IParam.searchrecords in_mod) := MODULE
+EXPORT DeltaBaseSoapCall(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
-		EXPORT EspServiceName := in_mod.SqlSearchEspNAME;
-		EXPORT EspServiceUrl := in_mod.SqlSearchEspURL;
-		EXPORT IsSafeToPerformSoap := EspServiceUrl <> '' AND EspServiceName <> '';
-		EXPORT eCrashRecordStructure := Layouts.eCrashRecordStructure;
+		SHARED EspServiceName := in_mod.SqlSearchEspNAME;
+		SHARED EspServiceUrl := in_mod.SqlSearchEspURL;
+		SHARED IsSafeToPerformSoap := EspServiceUrl <> '' AND EspServiceName <> '';
+		SHARED eCrashRecordStructure := Layouts.eCrashRecordStructure;
 
-		EXPORT Layouts.eCrashRecordStructure transformDeltaJoinedRecs(Layouts.DeltaJoinedRecord DeltaRecord) := TRANSFORM		
+		EXPORT eCrash_Services.Layouts.eCrashRecordStructure transformDeltaJoinedRecs(eCrash_Services.Layouts.DeltaJoinedRecord DeltaRecord) := TRANSFORM		
 				string CROSS_ST := IF(DeltaRecord.crossStreet = 'N/A','',DeltaRecord.crossStreet);
 				boolean IsaTFRecord := DeltaRecord.reportCode ='TF';
 				string IsReadyTmp := (STRING) DeltaRecord.isReadyForPublic;
@@ -26,7 +26,7 @@ EXPORT DeltaBaseSoapCall(IParam.searchrecords in_mod) := MODULE
 																												+intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
 
 				string date_of_birth := map(regexfind('-',DeltaRecord.dateOfBirth) and trim(DeltaRecord.dateOfBirth,left,right)[1..10] !='0000-00-00'
-																	=> lib_stringlib.StringLib.stringfilterout(trim(DeltaRecord.dateOfBirth,left,right),'-')
+																	=> STD.str.FilterOut(trim(DeltaRecord.dateOfBirth,left,right),'-')
 																			,regexfind('/',DeltaRecord.dateOfBirth)
 																				=> fSlashedMDYtoCYMD(DeltaRecord.dateOfBirth)
 																		,'');
@@ -94,20 +94,20 @@ EXPORT DeltaBaseSoapCall(IParam.searchrecords in_mod) := MODULE
 				self := [];
 		END;
 		
-		EXPORT Layouts.ImageData populateImageDataResult(Layouts.ImageData DeltaRecord) := TRANSFORM
+		EXPORT eCrash_Services.Layouts.ImageData populateImageDataResult(eCrash_Services.Layouts.ImageData DeltaRecord) := TRANSFORM
 			SELF.Blob := DeltaRecord.Blob;
 		END;
 		
-		EXPORT Layouts.AgencyDateRecord populateLastUploadDate(Layouts.DeltaBaseAgencyData DeltaRecord) := TRANSFORM
+		EXPORT eCrash_Services.Layouts.AgencyDateRecord populateLastUploadDate(eCrash_Services.Layouts.DeltaBaseAgencyData DeltaRecord) := TRANSFORM
 			SELF.lastUploadDate := DeltaRecord.lastUploadDate;
 			SELF := [];
 		END;
 		
-		EXPORT Layouts.SubsIncidentRecord populateSubsIncidentData(Layouts.DeltaBaseSubsIncidentData DeltaRecord) := TRANSFORM
+		EXPORT eCrash_Services.Layouts.SubsIncidentRecord populateSubsIncidentData(eCrash_Services.Layouts.DeltaBaseSubsIncidentData DeltaRecord) := TRANSFORM
 			SELF.incidentId := DeltaRecord.incidentId;
 		END;
 		
-		EXPORT Layouts.DocumentData populateDocumentData(Layouts.DeltaBaseDocumentData DeltaRecord) := TRANSFORM
+		EXPORT eCrash_Services.Layouts.DocumentData populateDocumentData(eCrash_Services.Layouts.DeltaBaseDocumentData DeltaRecord) := TRANSFORM
 			self := DeltaRecord;
 			self.isDelta := true;
 		END;
@@ -144,7 +144,7 @@ EXPORT DeltaBaseSoapCall(IParam.searchrecords in_mod) := MODULE
 			
 		ENDMACRO;
 		
-		EXPORT LookupIncidentPersons_Alias(Dataset(Layouts.R_DeltaBaseSelectRequest) SQLString_DS) := FUNCTION
+		EXPORT LookupIncidentPersons_Alias(Dataset(eCrash_Services.Layouts.R_DeltaBaseSelectRequest) SQLString_DS) := FUNCTION
 			RETURN LookupDeltabase_alias(SQLString_DS, transformDeltaJoinedRecs, DeltaBaseReportResponse);
 		END;
 		
