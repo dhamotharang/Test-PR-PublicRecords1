@@ -22,6 +22,6 @@ FUNCTION
 	b := COUNT(missingRecIDs);
 	c := (b/a)*100;	
 	
- 	return if (exists(tdst(tdst.cnt > 1)) and c > 1, 'Failed', 'Passed'); //E = Error Found
+ 	return if (exists(tdst(tdst.cnt > 1)) or c > 1, 'Failed', 'Passed'); //E = Error Found
 	
 END; 
