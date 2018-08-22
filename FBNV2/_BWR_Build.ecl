@@ -1,6 +1,6 @@
 ﻿IMPORT FBNV2;
 
-FBNV2.BWR_Build('/data/data_build_4/fbn/sources/ca/orange/archive/20180213.Jan_2018.txt','20180203','Orange');
+FBNV2.BWR_Build('/data/data_build_4/fbn/sources/ca/orange/archive/20180213.Jan_2018.txt','20180213','Orange');
 
 // FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/san_diego/20180212/RECL.P.OFFS.LEXI4201.VENDOR','20180212','San_Diego');
 // FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/santa_clara/archive/20180206_FBN-Listing_20180102-20180131.csv','20180206','Santa_Clara');
