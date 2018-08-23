@@ -1,8 +1,12 @@
-Import Data_Services, doxie, ut, mdr, standard, PRTE2_Email_Data, autokey, AutoKeyB2;
+﻿Import Data_Services, doxie, ut, mdr, standard, PRTE2_Email_Data, autokey, AutoKeyB2;
 
 EXPORT Keys  := MODULE
 
-export key_did(boolean IsFCRA = false) := index(if(IsFCRA, Files.FCRA_Email_did, Files.File_Key(did > 0)), {did}, {if(IsFCRA, Files.FCRA_Email_did, Files.File_Key)} - [did], Data_services.Data_location.Prefix('email_data') + if(isFCRA, Constants.key_prefix_fcra, constants.key_prefix) + doxie.Version_SuperKey + '::did');
+export key_did(boolean IsFCRA = false) := function
+ut.MAC_CLEAR_FIELDS(Files.FCRA_Email_did,FCRA_Email_did_cleared, 'orig_ip');
+dsFile := if(isFCRA, FCRA_Email_did_cleared,  Files.File_Key);
+	return index(dsFile(did > 0), {did}, {dsFile}, Data_services.Data_location.Prefix('email_data') + if(isFCRA, Constants.key_prefix_fcra, constants.key_prefix) + doxie.Version_SuperKey + '::did');
+end;	
 
 dedp_emailAddr := dedup(sort(distribute(Files.File_Key(clean_email <> ''), hash(did)) ,clean_email,did, if(clean_name.lname <> '' and clean_address.prim_range <> '', 1, if(clean_name.lname <>  '',  2, 3)), -date_last_seen, local),clean_email,did,local);
 EXPORT key_email_address := index(dedp_emailAddr,{clean_email},{dedp_emailAddr}	,Data_Services.Data_location.Prefix('email_data')+ Constants.key_prefix + doxie.Version_SuperKey+'::email_addresses');

@@ -1,6 +1,6 @@
-/*
+﻿/*
 Update Logic
-Only two possibilities, in that â€œUâ€ and â€œDâ€ Update Type values define the purpose of the record.
+Only two possibilities, in that “U” and “D” Update Type values define the purpose of the record.
 The purpose of this is to allow a state/program to flag a match/collision as already confirmed invalid for some valid reason.
 Because of the match criteria for twins in different cases would treat them as possible match/collision, 
   this is the means by which a state/program can flag such a match as already investigated and confirmed allowed or invalid.
