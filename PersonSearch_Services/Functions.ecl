@@ -1,5 +1,5 @@
-﻿import iesp,ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID,
-       PhonesFeedback_Services,PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
+﻿import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID, BankruptcyV3, FCRA, STD,
+       PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
 
 export Functions := MODULE
 	
@@ -105,7 +105,7 @@ export Functions := MODULE
        self._Type := IF(phoneSearch, 'phone', 'subject');
        self.DateFirstSeen := iesp.ECL2ESP.toDateYM(l.first_seen);
 			 self.DateLastSeen := iesp.ECL2ESP.toDateYM(l.last_seen);
-			 self.Age := ut.GetAgeI(l.dob);
+			 self.Age := ut.Age(l.dob);
 			 self.AgeAtDeath := IF(l.dod<>0 and l.dob<>0, (l.dod-l.dob) div 10000, 0);
 			 self.DeathVerificationCode := l.death_code;
 			 self.DOB := iesp.ECL2ESP.toDate(l.dob);
@@ -196,7 +196,7 @@ export Functions := MODULE
 		// fill in subjectSSNIndicator from codesV3
 		recs_ext lookup_code(recs_ext l, recordof(Codes.Key_Codes_V3) r) := transform
 			// CodesV3 has these in all uppercase but the ESP WSDL expects them as all lowercase
-			self.subjectSSNIndicator := Stringlib.StringToLowerCase(r.long_desc);
+			self.subjectSSNIndicator := STD.Str.ToLowerCase(r.long_desc);
 			self := l;
 		end;
 		
@@ -244,7 +244,7 @@ export Functions := MODULE
 		END;
 	
 		iesp.rollupbpssearch.t_RollupBpsSearchDate xformDates(Layouts.DatesRec l) := TRANSFORM
-			 self.Age := ut.GetAgeI(l.dob);
+			 self.Age := ut.Age(l.dob);
 			 self.AgeAtDeath := IF(l.dod<>0 and l.dob<>0, (l.dod-l.dob) div 10000, 0);
 			 self.DeathVerificationCode := l.death_code;
 			 self.DOB := iesp.ECL2ESP.toDate(l.dob);
@@ -574,7 +574,7 @@ export Functions := MODULE
 			good_dids := project(best_pen(penalt < score_threshold_value), doxie.layout_references);
 			good_recs := join(inrecs, good_dids, left.did = right.did);
 
-			unsigned8 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();
+			unsigned8 todays_date := (unsigned8)STD.Date.Today();
 			unsigned8 temp_dob_range_low := if(agehigh_val = 0, 19000101,
 													 ((todays_date div 10000 - agehigh_val - 1) * 10000) + ((todays_date % 10000) + 1));
 			unsigned8 temp_dob_range_high := if(agelow_val = 0, todays_date,
@@ -666,7 +666,7 @@ export Functions := MODULE
 
 			recs_filt8 := recs_filt7a(
 			                         (
-                                (addr_wild and Stringlib.StringWildMatch(prim_range, prange_wild_val, true))															
+                                (addr_wild and STD.Str.WildMatch(prim_range, prange_wild_val, true))															
 															 OR
 															 (addr_range and ((integer)prim_range between (integer)prange_beg_val and (integer)prange_end_val))
 															 OR 
@@ -688,7 +688,7 @@ export Functions := MODULE
 
 				ds_acircle := dataset(set_acircle,{integer4 zip});
 
-				acity := ds_acircle(stringlib.StringFind(ziplib.ZipToCities((string5)zip),tcity, 1)>0);
+				acity := ds_acircle(STD.Str.Find(ziplib.ZipToCities((string5)zip),tcity, 1)>0);
 				return acity;
 			END;
 			
@@ -697,7 +697,7 @@ export Functions := MODULE
 			END;
 			
 			tmp_rec checkCityName(tmp_rec l, string25 city) := TRANSFORM
-				self.zip := if(stringlib.StringFind(ziplib.ZipToCities((string5)l.zip),trim(city), 1)>0, l.zip, skip);
+				self.zip := if(STD.Str.Find(ziplib.ZipToCities((string5)l.zip),trim(city), 1)>0, l.zip, skip);
 			END;
 			
 			equiv_cities(string25 city1, string2 st1, string25 city2) := FUNCTION
@@ -719,8 +719,8 @@ export Functions := MODULE
 			
 			// bug 58585 -- allow candidate lnames to match any of the component lnames of a hyphenated input lname
 			// e.g., Smith-Wesson as input will match Smith or Wesson 
-			hyph_names := ut.stringSplit(lname_val, '-');
-			has_hyph := stringlib.stringfind(lname_val, '-', 1) > 0;
+			hyph_names := Std.Str.SplitWords(lname_val, '-');
+			has_hyph := STD.Str.Find(lname_val, '-', 1) > 0;
 			
 			lname_set_use := IF(has_hyph, lname_set_val + hyph_names, lname_set_val);
 			
@@ -731,9 +731,9 @@ export Functions := MODULE
 																		lname[1..length(trim(cleaned_lname_val))] = cleaned_lname_val)) or
 																		lname in lname_set_use or
 																		(in_mod.allowEditDist and 
-																			((stringlib.editDistance(lname, lname_val) <= 2) or
-																			 (stringlib.stringFind(trim(lname), trim(lname_val),1) > 0) or
-																			 (stringlib.stringfind(trim(lname_val), trim(lname),1) > 0))) or
+																			((STD.Str.EditDistance(lname, lname_val) <= 2) or
+																			 (STD.Str.Find(trim(lname), trim(lname_val),1) > 0) or
+																			 (STD.Str.Find(trim(lname_val), trim(lname),1) > 0))) or
 																	 // allow for name flips (even if only one name is present in the input)
 																	 // but only when the full ssn is an exact match
 																	 ((length(trim(ssn_value)) = 9 and ssn = ssn_value) and
@@ -747,7 +747,7 @@ export Functions := MODULE
 																									 fname in fname_set_val or
 																									 // only allow editDistance match if it wasn't an initial
 																									 (in_mod.allowEditDist and length(trim(fname_val)) > 1 and
-																										stringlib.editDistance(fname, fname_val) <= 1) or
+																										STD.Str.EditDistance(fname, fname_val) <= 1) or
 																									 // allow for name flips (even if only one name is present in the input)
 																									 // but only when the full ssn is an exact match
 																									 ((length(trim(ssn_value)) = 9 and ssn = ssn_value) and
@@ -1533,5 +1533,37 @@ export Functions := MODULE
 		
 		RETURN ds_in_with_fdninds;
 	END; // end of func_FdnCheckRollupRecs
+
+  // Function to check if bankruptcy exists for Pick list records
+  // We will have to use non-fcra key as pick list runs on neutral roxie
+  // After running pick list, customer will run FCRA bankruptcy search
+  // Hence, need to make sure that the bankruptcy record doesn't exceed the 7 year time limit
+  EXPORT GetBankruptcyFlag(DATASET(iesp.person_picklist.t_PersonPickListRecord) dIn) :=
+  FUNCTION
+    rPickListBankruptcy :=
+    RECORD(iesp.person_picklist.t_PersonPickListRecord)
+      BankruptcyV3.key_bankruptcyV3_did().tmsid;
+      boolean _HasBankruptcy := FALSE;
+    END;
+	
+    dBankruptcyIds := JOIN(dIn, BankruptcyV3.key_bankruptcyV3_did(),
+                            KEYED((unsigned)LEFT.UniqueId = RIGHT.did),
+                            TRANSFORM(rPickListBankruptcy,
+                                      SELF.tmsid := RIGHT.tmsid,
+                                      SELF       := LEFT),
+                            LEFT OUTER,
+                            LIMIT(0), KEEP(1));
+
+    dBankruptcyMain := JOIN(dBankruptcyIds, BankruptcyV3.key_bankruptcyV3_main_full(),
+                            KEYED(LEFT.tmsid = RIGHT.tmsid) AND fcra.bankrupt_is_ok((string)STD.Date.Today(), right.date_filed),
+                            TRANSFORM(rPickListBankruptcy,
+                                      SELF._HasBankruptcy := RIGHT.tmsid != '',
+                                      SELF.tmsid          := RIGHT.tmsid,
+                                      SELF                := LEFT),
+                            LEFT OUTER,
+                            LIMIT(0), KEEP(1));
+    
+    RETURN dBankruptcyMain;
+  END;
 
 end;
