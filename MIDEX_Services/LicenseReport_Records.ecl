@@ -53,9 +53,10 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
                                                                                               in_mod.ssnmask, 
                                                                                               in_mod.applicationType, 
                                                                                               IF(in_mod.isLicenseOnlyReport,MIDEX_Services.Constants.ALL_LICENSES_SEARCH,in_mod.searchType));
-
-		nohash_results_raw := 
-      CHOOSEN(DEDUP(sanctNP_report+sanctPub_report+profLic_report,ALL),iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES);
+																																															
+          // removed (Dedup, DS, all ) so as not to resort the data set that is returned from the 3 DS's being added together.
+		nohash_results_raw :=       
+		CHOOSEN(sanctNP_report+sanctPub_report+profLic_report,iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES);	
 
     ds_nohash_withLicNMLSid :=
       PROJECT(nohash_results_raw,
@@ -68,10 +69,8 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     ds_nohash_withBlank_LicNMLSid    := 
       PROJECT(ds_nohash_withLicNMLSid(LicNMLS_id  = 0), MIDEX_Services.Layouts.LicenseReport_Layout);
 			
-    ds_nohash_withLicNMLSid_nonblankSorted := sort(ds_nohash_withLicNMLSid_nonblank, -last_upd_date);
-		
     nohash_resultsLicsRolled :=
-      ROLLUP(ds_nohash_withLicNMLSid_nonblankSorted,
+			  ROLLUP(ds_nohash_withLicNMLSid_nonblank,
              LEFT.LicNMLS_id = RIGHT.LicNMLS_id, // rollup all licenses associated with nmls id into one report
              TRANSFORM(MIDEX_Services.Layouts.LicenseReport_RollupTempLayout,
                        SELF.Licenses            := LEFT.Licenses + RIGHT.Licenses,
@@ -184,6 +183,7 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     
 		deleted_results := DATASET([xfm_make_delete_record()]);
 	
+	 
 		// If an alert report request and the document/report isn't found anymore, then return a record
 		// with the record deleted flag set to true.
 		rec_results := IF(in_mod.EnableAlert,
