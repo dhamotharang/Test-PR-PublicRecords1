@@ -1,5 +1,8 @@
 ﻿//BWR to show using the remote linking function directly. 
-//Non-FCRA Alpha based products will want to use this approach. 
+//FCRA and Boca based products will want to use this approach. 
+IMPORT STD,_Control;
+
+IP_Address := InsuranceHeader_RemoteLinking.Constants.HEADER_SERVICE_ROXIE_IP;
 
 InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch Inquiry_Data(UNSIGNED C) := TRANSFORM
     SELF.ReferenceID := C;
@@ -160,7 +163,17 @@ InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch Inquiry_Data2(UNS
     SELF.DL_NBR_Res := '';
     SELF.AMBEST_Res := '';
 END;
-Input_Data := DATASET([Inquiry_Data(1)]) + DATASET([Inquiry_Data1(2)]) + DATASET([Inquiry_Data2(3)]);
+Input_Data := DATASET([Inquiry_Data(1)]) + DATASET([Inquiry_Data1(2)]) + DATASET([Inquiry_Data2(1)]);
+
 //Input_Data := Normalize(Input_Data1,34,Inquiry_Data(COUNTER)) + Normalize(Input_Data1,33,Inquiry_Data1(COUNTER + 34)) + Normalize(Input_Data1,33,Inquiry_Data2(COUNTER+67));
-output(Input_Data);
-InsuranceHeader_RemoteLinking.fn_RemoteLinking(Input_Data);
+
+out_rec := RECORD
+    STRING50 IPAddress;
+    STRING20 Enviroment;
+    BOOLEAN  checkpassed;
+  END;
+user_info := DATASET([{IP_Address,STD.Str.ToUpperCase(_Control.ThisEnvironment.RoxieEnv),STD.Str.ToUpperCase(_Control.ThisEnvironment.RoxieEnv) = 'PROD'}],out_rec);
+OUTPUT(user_info,NAMED('User_Info'));
+  
+
+InsuranceHeader_RemoteLinking.fn_RemoteLinking_Soapcall_Batch(Input_Data,IP_Address);
