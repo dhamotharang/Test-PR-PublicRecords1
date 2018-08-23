@@ -188,7 +188,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     ds_recs_validated_lexID := IF(dids_provided,
       JOIN(ds_recs, ds_all((unsigned6)did > 0),
         LEFT.acctno = RIGHT.acctno AND (unsigned6)LEFT.debtor_did = (unsigned6)RIGHT.did,
-        TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.alert_legal_flag := '', SELF := LEFT),
+        TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF := LEFT),
         KEEP(1), LIMIT(0)), ds_recs);
 
     //Retrieve FFD statements and apply suppression. This will also add alert flags.
@@ -199,7 +199,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
 
     results_pre  := sort(ds_recs_inquiry_lexID, acctno);
     //Again, filter out LH statements for now, this should be changed to default PC behaviour eventually.
-    consumer_statements  := sort(res.statements(recordType <> FFD.Constants.RecordType.LH), acctno);
+    consumer_statements  := sort(res.statements, acctno);
 
     ut.mac_TrimFields(results_pre, 'results_pre', results);
 

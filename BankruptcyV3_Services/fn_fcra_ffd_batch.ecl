@@ -75,8 +75,10 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     // records maybe suppressed due to alerts
     ds_out := FFD.Mac.ApplyConsumerAlertsBatch(recs_out, alert_flags, Statements, BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, inFFDOptionsMask, debtor_did, alert_data_under_dispute);
 
-    // Sequencing for FCRA FFD
-    ds_out_seq := PROJECT(ds_out, TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
+    // Sequencing for FCRA FFD. Also remove legal flag alert per project requirements.
+    ds_out_seq := PROJECT(ds_out, TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, SELF.SequenceNumber := COUNTER,
+     SELF.alert_legal_flag := '',
+     SELF := LEFT));
 
     // get statements
     consumer_statements := NORMALIZE(ds_out_seq, LEFT.Statements,
@@ -88,7 +90,8 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     consumer_statements_prep  := FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask);
     consumer_alerts  := FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask);
 
-    consumer_statements_alerts := consumer_alerts + consumer_statements_prep;
+    //LH consumer alerts are filtered out per project requirements.
+    consumer_statements_alerts := consumer_alerts(recordType <> FFD.Constants.RecordType.LH) + consumer_statements_prep;
     pre_result := PROJECT(ds_out_seq, BatchServices.layout_BankruptcyV3_Batch_out);  // project to non ffd layout
 
     FFD.MAC.PrepareResultRecordBatch(pre_result, final_results, consumer_statements_alerts, BatchServices.layout_BankruptcyV3_Batch_out); // prepare results and statements

@@ -132,7 +132,7 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   //which are to be kept for logging purposes.
   ds_batch_validated_lexID := JOIN(ds_batch, ds_batch_in_appended_plist((unsigned6)did > 0),
     LEFT.acctno = RIGHT.acctno AND (unsigned6)LEFT.debtor_did = (unsigned6)RIGHT.did,
-    TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.alert_legal_flag := '', SELF := LEFT),
+    TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF := LEFT),
     KEEP(1), LIMIT(0));
 
   //Apply FCRA FFD suppression and format the data to return user friendly statements.
@@ -144,7 +144,7 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   ds_batch_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_batch_in_appended_plist, ds_batch_ffd.records, BatchServices.layout_BankruptcyV3_Batch_out, 0);
 
   results_pre := sort(ds_batch_inquiry_lexID, acctno); // records in batch out layout
-  consumer_statements := sort(ds_batch_ffd.statements(recordType <> FFD.Constants.RecordType.LH), acctno); // statements
+  consumer_statements := sort(ds_batch_ffd.statements, acctno); // statements
   ut.mac_TrimFields(results_pre, 'results_pre', results);
 
 //DEBUG--------------------------------------------
