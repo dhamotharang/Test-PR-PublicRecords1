@@ -1,14 +1,13 @@
 ﻿IMPORT Address, Business_Credit, BusinessCredit_Services, iesp;
 
 EXPORT fn_getAdditionalInfo (BusinessCredit_Services.Iparam.reportrecords inmod,
-															DATASET(BusinessCredit_Services.Layouts.TopBusiness_BestSection) topBusiness_bestSection,
+                                                                                DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,															
 															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs
 														 ) := FUNCTION
 
+	topBusiness_bestrecs 	:= 	PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection)[1].BestSection.OtherCompanyNames;
+	CompanyNameVar_Sorted	:=	SORT(topBusiness_bestrecs, CompanyName, -DateLastSeen.Year, -DateLastSeen.Month, -DateLastSeen.Day, RECORD);	//Keeping the same sort order as Smartlinx Business Report.
 	
-	OtherCnames :=   topBusiness_bestSection[1].BestSection.OtherCompanyNames;
-	CompanyNameVar_Sorted	:=	SORT(OtherCnames, 
-														CompanyName, -DateLastSeen.Year, -DateLastSeen.Month, -DateLastSeen.Day, RECORD);	//Keeping the same sort order as Smartlinx Business Report.
 
 	buzCreditInformation 	:=	JOIN(buzCreditHeader_recs , Business_Credit.Key_BusinessInformation(), 
 																 BusinessCredit_Services.Macros.mac_JoinBusAccounts(), 
