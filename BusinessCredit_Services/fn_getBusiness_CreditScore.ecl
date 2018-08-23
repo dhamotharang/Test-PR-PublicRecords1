@@ -1,13 +1,12 @@
 ﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut, std;
 
 EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,
-																		DATASET(BusinessCredit_Services.Layouts.TopBusiness_BestSection) topBusiness_bestRecs,
-																		DATASET(doxie.layout_best) AuthRepBestRec,
-																		DATASET(RECORDOF(Business_Credit_Scoring.Key_ScoringIndex().kFetch2(DATASET([],BIPV2.IDlayouts.l_xlink_ids2)))) ScoringInfokfetch
+                                                                                                DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,																		
+																		DATASET(doxie.layout_best) AuthRepBestRec																		
 																		) := MODULE
 
-	
-	SHARED BuzCreditScoringRecs := ScoringInfokfetch;
+	SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds,inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
+	topBusiness_bestrecs 				:= PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection);	
 
 	// Adding min input check for Business & AuthRep. we only wanted to suppliment information from best file to analytics fxn when below check is not satisfied in the search.
 	// this is done to fix Score Mismatch between CreditReport and Analytics Score service
