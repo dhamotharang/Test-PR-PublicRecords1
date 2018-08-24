@@ -1,4 +1,4 @@
-OPTIONS:-gh -ga -gs2
+﻿OPTIONS:-gh -ga -gs2
 MODULE:BIPV2_ProxID
 FILENAME:DOT_Base
 
@@ -42,7 +42,7 @@ FIELD:cnp_name:TYPE(STRING250):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domesti
 // FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137
 //FIELD:source:CARRY:0,0
 FIELD:company_name_type_raw:CARRY:0,0
-FIELD:company_name_type_derived:CARRY:0,0
+FIELD:company_name_type_derived:WEIGHT(0.001):PROP:2,0
 FIELD:cnp_hasnumber:CARRY:0,0
 FIELD:cnp_number:FORCE:PROP:15,0
 //FIELD:cnp_btype:FORCE(--):2,1  CO and inc for same name forced apart here

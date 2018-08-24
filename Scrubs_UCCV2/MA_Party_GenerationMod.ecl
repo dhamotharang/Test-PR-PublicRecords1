@@ -1,18 +1,40 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT MA_Party_GenerationMod := MODULE
+IMPORT SALT39;
+EXPORT MA_Party_GenerationMod := MODULE(SALT39.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.0';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.9.0';
+  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_UCCV2';
   EXPORT spc_NAMESCOPE := 'MA_Party';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'UCCV2';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,tmsid,rmsid,orig_name,orig_lname,orig_fname,orig_mname,orig_suffix,duns_number,hq_duns_number,ssn,fein,incorp_state,corp_number,corp_type,orig_address1,orig_address2,orig_city,orig_state,orig_zip5,orig_zip4,orig_country,orig_province,orig_postal_code,foreign_indc,party_type,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,process_date,title,fname,mname,lname,name_suffix,name_score,company_name,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip5,zip4,county,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_st,ace_fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,bdid,did,did_score,bdid_score,source_rec_id,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,seleid,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight,prep_addr_line1,prep_addr_last_line,rawaid,aceaid,persistent_record_id';
+  EXPORT spc_HAS_TWOSTEP := FALSE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -49,7 +71,7 @@ EXPORT MA_Party_GenerationMod := MODULE
     + 'FIELDTYPE:invalid_orig_lname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_name,orig_fname)\n'
     + 'FIELDTYPE:invalid_orig_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_name,orig_lname)\n'
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_state>0)\n'
-    + 'FIELDTYPE:invalid_orig_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5>0)\n'
+    + 'FIELDTYPE:invalid_orig_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5_country>0,orig_country)\n'
     + 'FIELDTYPE:invalid_orig_country:CUSTOM(Scrubs_UCCV2.Functions.fn_country>0)\n'
     + 'FIELDTYPE:invalid_party_type:ENUM(D|S|A|N)\n'
     + 'FIELDTYPE:invalid_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,mname,lname,company_name)\n'
@@ -166,3 +188,4 @@ EXPORT MA_Party_GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

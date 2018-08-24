@@ -1,11 +1,18 @@
-﻿import BIPV2_PROXID,tools;
+﻿/*
+
+BIPV2_ProxID._fun_CompareService(930260601  ,930191835 );
+BIPV2_ProxID._fun_CompareService(930260601  ,930191835 ,'built'  ,true);
+
+*/
+
+import BIPV2_ProxID,tools;
 
 EXPORT _fun_CompareService(
 
    unsigned6  pProxid1
   ,unsigned6  pProxid2
-  ,string     pversion  = 'qa'
-  
+  ,string     pversion              = 'qa'
+  ,boolean    pUseOtherEnvironment  = false
 ) :=
 function
 
@@ -13,22 +20,22 @@ function
   unsigned8 Proxidone   := IF( pProxid1>pProxid2, pProxid1, pProxid2 );
   unsigned8 Proxidtwo   := IF( pProxid1>pProxid2, pProxid2, pProxid1 );
 
-  BFile := BIPV2_PROXID.In_DOT_Base;
-  kFile := BIPV2_PROXID.Keys(BFile,version);
+  BFile := BIPV2_ProxID.In_DOT_Base;
+  kFile := BIPV2_ProxID.Keys(BFile,version,pUseOtherEnvironment);
 
-  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_PROXID.match_candidates(BFile).layout_candidates,self := left,self := []));
-  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_PROXID.match_candidates(BFile).layout_candidates,self := left,self := []));
+  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
+  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   k     := KFile.Specificities_Key;
-  s     := GLOBAL(PROJECT(k,transform(BIPV2_PROXID.Layout_Specificities.R,self := left,self := []))[1]);
-  odlv  := BIPV2_PROXID.Debug(BFile,s).RolledEntities(odl);
-  odrv  := BIPV2_PROXID.Debug(BFile,s).RolledEntities(odr);
+  s     := GLOBAL(PROJECT(k,transform(BIPV2_ProxID.Layout_Specificities.R,self := left,self.cnp_name_MAXIMUM := left.cnp_name_max,self := []))[1]);
+  odlv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odl);
+  odrv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odr);
 
-  BIPV2_PROXID.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
+  BIPV2_ProxID.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
     SELF := le;
   END;
 
   am    := PROJECT(KFile.Attribute_Matches(Proxid1=Proxidone,Proxid2=Proxidtwo)+KFile.Attribute_Matches(Proxid1=Proxidtwo,Proxid2=Proxidone),ainto(LEFT));
-  mtch  := BIPV2_PROXID.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Proxidone,Proxidtwo,0,0}],BIPV2_PROXID.match_candidates(BFile).layout_matches),am);
+  mtch  := BIPV2_ProxID.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Proxidone,Proxidtwo,0,0}],BIPV2_ProxID.match_candidates(BFile).layout_matches),am);
 
   // get layout with the scores only for easier reading
   layouttools := tools.macf_LayoutTools(recordof(mtch),false,'^(?!.*?(left|right|skipped).*).*$',true);
@@ -69,7 +76,7 @@ function
                                                                                               ,self.skipped := left.child(    regexfind('_skipped$' ,fieldname,nocase))[1].fieldvalue
                                                                                               ,self := left
                                                          )),rid),{recordof(left) - rid - rollupid});
-  dnorm_specs_filt2 := dproj3(count(child(regexfind('^conf$',fieldname,nocase))) >0 or (unsigned)score != 0);
+  dnorm_specs_filt2 := dproj3(count(child(regexfind('^conf$',fieldname,nocase) or regexfind('cnp_name',fieldname,nocase))) >0 or (unsigned)score != 0);
   
 // 24 24 right_hist_enterprise_number  
 // 24 23 hist_enterprise_number_score 0 

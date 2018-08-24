@@ -107,6 +107,14 @@ export Keys(
 
 // Ip Range End
 
+//Mbs DeltaBase
+	
+	shared Base_MbsDeltaBase							:= Join(Files().Input.Mbs.Sprayed(status=1,regexfind('DELTA',fdn_file_code,nocase)),Files().Input.MbsFdnIndType.Sprayed(status=1)
+																							,left.ind_type=right.ind_type
+																							,Transform(Layouts_Key.Classification.Permissible_use_access,
+																										self.Ind_type_description:=ut.CleanSpacesAndUpper(right.description)
+																										,self:=left,self:=[]));
+
 	
 	shared pFileKeyFDNMasterID     				:= File_FDNMasterIDBuild.FDNMasterID;
   shared pFileKeyFDNMasterIDExcl 				:= File_FDNMasterIDBuild.FDNMasterIDExcl;
@@ -147,6 +155,7 @@ export Keys(
 	shared MbsFDNMasterIDIndTypIncl				:= project(pFileKeyFDNMasterIDIndTypIncl,FraudShared.Layouts_Key.MbsFdnMasterIDIndTypeIncl);  
 	shared BaseMbsVelocityRules						:= File_Velocityrules.Velocity_Key;  
 	shared BaseMbsFdnIndType        			:= project(Files().Input.MbsFdnIndType.Sprayed,Transform(Layouts_Key.MbsFdnIndType,self.description:=ut.CleanSpacesAndUpper(left.description),self:=left))(status=1);
+	shared BaseMbsDeltaBase        				:= Base_MbsDeltaBase;
 
  export Main := module
 	tools.mac_FilesIndex('BaseMain,{record_id, UID},{BaseMain}',KeyNames(pversion).Main.ID,ID);
@@ -187,6 +196,7 @@ export Keys(
 	tools.mac_FilesIndex('MbsFDNMasterIDIndTypIncl,{fdn_file_info_id},{MbsFDNMasterIDIndTypIncl}',KeyNames(pversion).Main.MbsFDNMasterIDIndTypIncl,MbsFDNMasterIDIndTypInclKey);
 	tools.mac_FilesIndex('BaseMbsVelocityRules,{gc_id},{BaseMbsVelocityRules}',KeyNames(pversion).Main.MbsVelocityRules,MbsVelocityRules);
 	tools.mac_FilesIndex('BaseMbsFdnIndType,{description},{BaseMbsFdnIndType}',KeyNames(pversion).Main.MbsFdnIndType,MbsFdnIndType);
+	tools.mac_FilesIndex('BaseMbsDeltaBase,{gc_id,ind_type},{BaseMbsDeltaBase}',KeyNames(pversion).Main.MbsDeltaBase,MbsDeltaBase);
 
 	end; 	
 end;

@@ -9,7 +9,7 @@ EXPORT SuppressConstants (string datasetname, boolean useLocal) := module
 																		,true
 																		,false);
 	
-	export thresholddate := '20180531000000';
+	export thresholddate := '20180831000000';
 	export ProdOrDev := if (~useLocal 
 													,if (dops.constants.ThorEnvironment = 'prod'
 																,'~'

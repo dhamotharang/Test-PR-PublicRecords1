@@ -1,4 +1,4 @@
-﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, header,Std, PromoteSupers;
+﻿IMPORT LN_PropertyV2_Fast,STD, RoxieKeyBuild,AVM_V2, _Control,Std, PromoteSupers;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT proc0_build_all(string8 process_date, boolean isFast, string emailRecipients) := FUNCTION
@@ -40,16 +40,14 @@ BUILD_QA_SMPL	:= 	LN_PropertyV2_Fast.New_records_sample(process_date,isFast);
 
 // Jira SLP-1
 ECLSpecificty := '#option(\'multiplePersistInstances\',FALSE);\n'
-							//	+'#OPTION(\'AllowedClusters\',\'thor400_44,thor400_60\');\n'
 								+'#workunit(\'protect\', \'true\');\n'
 								+'#workunit(\'name\', \'property.InsuranceKeybuild '+process_date+'\');\n'
 								+'SpecMod:= InsuranceHeader_Property_Transactions_DeedsMortgages.specificities(InsuranceHeader_Property_Transactions_DeedsMortgages.In_PROPERTY_TRANSACTION);\n'
 								+'SpecMod.Build;\n';
-SubmitSpecificty := header.fSubmitNewWorkunit(ECLSpecificty, 'thor400_44_eclcc');
+SubmitSpecificty := _Control.fSubmitNewWorkunit(ECLSpecificty, 'thor400_44_eclcc');
 
 //Jira DF-11862
 ECLClearbase := '#option(\'multiplePersistInstances\',FALSE);\n'
-					//			+'#OPTION(\'AllowedClusters\',\'thor400_44,thor400_60\');\n'
 								+'#workunit(\'name\', \'property.clearbase '+process_date+'\');\n'
 								+'BaseFileInUseByDelta := IF(FileServices.FileExists(\'~thor::property_base_being_written_by_delta\'),true,false);\n'
 								+'ReadyToClearBaseFile := IF(NOT(BaseFileInUseByDelta),notify(\'Ok_To_Clear_Property_Fast_Base\',\'*\'));\n'
@@ -60,7 +58,7 @@ ECLClearbase := '#option(\'multiplePersistInstances\',FALSE);\n'
 								+'LaunchEvent          := sequential(SubmitClearBaseFile,fail(\'Base Fast Cleared, Not an error\'));\n'
 								+'LaunchCron : when(cron (\'45 0-23/1 * * 1-5\'));\n'
 								+'LaunchEvent: when(event(\'Ok_To_Clear_Property_Fast_Base\',\'*\'),count(1));\n';
-SubmitClearBase	:= header.fSubmitNewWorkunit(ECLClearbase, 'thor400_44_eclcc');
+SubmitClearBase	:= _Control.fSubmitNewWorkunit(ECLClearbase, 'thor400_44_eclcc');
 
 mostcurrentlog	:= sort(LN_PropertyV2_Fast.BuildLogger.file,-version)[1];
 

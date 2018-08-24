@@ -1,6 +1,6 @@
 ﻿EXPORT functions_getRelationship := module
 
-	shared getRelScore(ROW(Layout_GetRelationship.InterfaceOuput) le, string curRel) :=
+	shared getRelScore(ROW(Layout_GetRelationship.InterfaceOutput_new) le, string curRel) :=
 		function
 			outScore := case(curRel,
 											 Constants.cohabit  					=> le.cohabit_score,
@@ -27,12 +27,14 @@
 											 Constants.coaircraft 				=> le.coaircraft_score,
 											 Constants.comarriagedivorce 	=> le.comarriagedivorce_score,
 											 Constants.coucc 							=> le.coucc_score,
+											 Constants.coclue                           => le.coclue_score,
+											 Constants.cocc                             => le.cocc_score,
 											 ERROR('Missing relationship type')
 											);
 		return outScore;
 	end;
 
-	shared getRelCnt(ROW(Layout_GetRelationship.InterfaceOuput) le, string curRel) :=
+	shared getRelCnt(ROW(Layout_GetRelationship.InterfaceOutput_new) le, string curRel) :=
 		function
 			outCnt := case(curRel,
 										 Constants.cohabit  					=> le.cohabit_cnt,
@@ -59,12 +61,14 @@
 										 Constants.coaircraft 				=> le.coaircraft_cnt,
 										 Constants.comarriagedivorce 	=> le.comarriagedivorce_cnt,
 										 Constants.coucc 							=> le.coucc_cnt,
+										 Constants.coclue                           => le.coclue_cnt,
+										 Constants.cocc                             => le.cocc_cnt,
 										 ERROR('Missing relationship type')
 										);
 		return outCnt;
 	end;
 
-	shared dataset(layout_output.normedRelTypeRec) getChildRecs(dataset(Layout_GetRelationship.interfaceOuput) rel_in) :=
+	shared dataset(layout_output.normedRelTypeRec) getChildRecs(dataset(Layout_GetRelationship.InterfaceOutput_new) rel_in) :=
 		function
 			childrecs := normalize(rel_in, count(Constants.setRels),
 														 transform(layout_output.normedRelTypeRec,
@@ -77,10 +81,10 @@
 		return childrecs(score <> 0 and cnt <> 0);
 	end;
 
-	export convertFlatToNeutral(dataset(Layout_GetRelationship.InterfaceOuput) rel_in) :=
+	export convertFlatToNeutral(dataset(Layout_GetRelationship.InterfaceOutput_new) rel_in) :=
 		function
 			childRecs := getChildRecs(rel_in);
-			Layout_GetRelationship.interfaceOutputNeutral deNorm(Layout_GetRelationship.InterfaceOuput L, dataset(layout_output.normedRelTypeRec) R) :=
+			Layout_GetRelationship.interfaceOutputNeutral deNorm(Layout_GetRelationship.InterfaceOutput_new L, dataset(layout_output.normedRelTypeRec) R) :=
 				transform
 					self.rels := project(R, transform(layout_output.relTypeRec, self := left));
 					self := L;
@@ -170,6 +174,93 @@
 																	couccRec := left.rels(rel_type = Constants.coucc)[1];
 																	self.coucc_score 							:= couccRec.score;
 																	self.coucc_cnt 								:= couccRec.cnt;
+																	self := left;
+																 ));
+		return relOut;
+	end;
+
+	export convertNeutralToFlat_new(dataset(Layout_GetRelationship.interfaceOutputNeutral) rel_in) :=
+		function
+			relOut := project(rel_in,
+												transform(Layout_GetRelationship.InterfaceOutput_new,
+																	cohabitRec := left.rels(rel_type = Constants.cohabit)[1];
+																	self.cohabit_score 						:= cohabitRec.score;
+																	self.cohabit_cnt 							:= cohabitRec.cnt;
+																	coaptRec := left.rels(rel_type = Constants.coapt)[1];
+																	self.coapt_score 							:= coaptRec.score;
+																	self.coapt_cnt 								:= coaptRec.cnt;
+																	copoboxRec := left.rels(rel_type = Constants.copobox)[1];
+																	self.copobox_score 						:= copoboxRec.score;
+																	self.copobox_cnt 							:= copoboxRec.cnt;
+																	cossnRec := left.rels(rel_type = Constants.cossn)[1];
+																	self.cossn_score 							:= cossnRec.score;
+																	self.cossn_cnt 								:= cossnRec.cnt;
+																	copolicyRec := left.rels(rel_type = Constants.copolicy)[1];
+																	self.copolicy_score 					:= copolicyRec.score;
+																	self.copolicy_cnt 						:= copolicyRec.cnt;
+																	coclaimRec := left.rels(rel_type = Constants.coclaim)[1];
+																	self.coclaim_score 						:= coclaimRec.score;
+																	self.coclaim_cnt 							:= coclaimRec.cnt;
+																	copropertyRec := left.rels(rel_type = Constants.coproperty)[1];
+																	self.coproperty_score 				:= copropertyRec.score;
+																	self.coproperty_cnt 					:= copropertyRec.cnt;
+																	bcopropertyRec := left.rels(rel_type = Constants.bcoproperty)[1];
+																	self.bcoproperty_score 				:= bcopropertyRec.score;
+																	self.bcoproperty_cnt 					:= bcopropertyRec.cnt;
+																	coforeclosureRec := left.rels(rel_type = Constants.coforeclosure)[1];
+																	self.coforeclosure_score 			:= coforeclosureRec.score;
+																	self.coforeclosure_cnt 				:= coforeclosureRec.cnt;
+																	bcoforeclosureRec := left.rels(rel_type = Constants.bcoforeclosure)[1];
+																	self.bcoforeclosure_score 		:= bcoforeclosureRec.score;
+																	self.bcoforeclosure_cnt 			:= bcoforeclosureRec.cnt;
+																	colienRec := left.rels(rel_type = Constants.colien)[1];
+																	self.colien_score 						:= colienRec.score;
+																	self.colien_cnt 							:= colienRec.cnt;
+																	bcolienRec := left.rels(rel_type = Constants.bcolien)[1];
+																	self.bcolien_score 						:= bcolienRec.score;
+																	self.bcolien_cnt 							:= bcolienRec.cnt;
+																	cobankruptcyRec := left.rels(rel_type = Constants.cobankruptcy)[1];
+																	self.cobankruptcy_score 			:= cobankruptcyRec.score;
+																	self.cobankruptcy_cnt 				:= cobankruptcyRec.cnt;
+																	bcobankruptcyRec := left.rels(rel_type = Constants.bcobankruptcy)[1];
+																	self.bcobankruptcy_score 			:= bcobankruptcyRec.score;
+																	self.bcobankruptcy_cnt 				:= bcobankruptcyRec.cnt;
+																	covehicleRec := left.rels(rel_type = Constants.covehicle)[1];
+																	self.covehicle_score 					:= covehicleRec.score;
+																	self.covehicle_cnt 						:= covehicleRec.cnt;
+																	coexperianRec := left.rels(rel_type = Constants.coexperian)[1];
+																	self.coexperian_score 				:= coexperianRec.score;
+																	self.coexperian_cnt 					:= coexperianRec.cnt;
+																	cotransunionRec := left.rels(rel_type = Constants.cotransunion)[1];
+																	self.cotransunion_score 			:= cotransunionRec.score;
+																	self.cotransunion_cnt 				:= cotransunionRec.cnt;
+																	coenclarityRec := left.rels(rel_type = Constants.coenclarity)[1];
+																	self.coenclarity_score 				:= coenclarityRec.score;
+																	self.coenclarity_cnt 					:= coenclarityRec.cnt;
+																	coecrashRec := left.rels(rel_type = Constants.coecrash)[1];
+																	self.coecrash_score 					:= coecrashRec.score;
+																	self.coecrash_cnt 						:= coecrashRec.cnt;
+																	bcoecrashRec := left.rels(rel_type = Constants.bcoecrash)[1];
+																	self.bcoecrash_score 					:= bcoecrashRec.score;
+																	self.bcoecrash_cnt 						:= bcoecrashRec.cnt;
+																	cowatercraftRec := left.rels(rel_type = Constants.cowatercraft)[1];
+																	self.cowatercraft_score 			:= cowatercraftRec.score;
+																	self.cowatercraft_cnt 				:= cowatercraftRec.cnt;
+																	coaircraftRec := left.rels(rel_type = Constants.coaircraft)[1];
+																	self.coaircraft_score 				:= coaircraftRec.score;
+																	self.coaircraft_cnt 					:= coaircraftRec.cnt;
+																	comarriagedivorceRec := left.rels(rel_type = Constants.comarriagedivorce)[1];
+																	self.comarriagedivorce_score  := comarriagedivorceRec.score;
+																	self.comarriagedivorce_cnt 		:= comarriagedivorceRec.cnt;
+																	couccRec := left.rels(rel_type = Constants.coucc)[1];
+																	self.coucc_score 							:= couccRec.score;
+																	self.coucc_cnt 								:= couccRec.cnt;
+																	coclueRec := left.rels(rel_type = Constants.coclue)[1];
+																	self.coclue_score 							:= coclueRec.score;
+																	self.coclue_cnt 								:= coclueRec.cnt;
+																	coccRec := left.rels(rel_type = Constants.cocc)[1];
+																	self.cocc_score 							:= coccRec.score;
+																	self.cocc_cnt 								:= coccRec.cnt;
 																	self := left;
 																 ));
 		return relOut;

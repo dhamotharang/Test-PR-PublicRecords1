@@ -1,13 +1,13 @@
 ﻿import ut, _validate;
 
-export cleaned_dl_tn_convpoints(string filedate) := function
+export Cleaned_DL_TN_ConvPoints(string filedate) := function
   
   conv_file       			:= driversv2.file_dl_tn_conv_raw(filedate);
-  layout_all_cln  			:= driversv2.layouts_dl_tn_in.Layout_TN_CP_All_Cleaned;
+  layout_all_cln  			:= driversv2.layouts_dl_tn_in.layout_tn_cp_all_cleaned;
 
 	layout_all_cln mapcleanconv(conv_file l) := transform,skip(l.dl_number = '')
 	
-	  self.process_date   := if(_validate.date.fisvalid(filedate),filedate,'');
+	  self.process_date   := if(_validate.date.fisvalid(l.process_date),l.process_date,'');
 		self.dl_number      := ut.cleanspacesandupper(l.dl_number);
 		self.birthdate      := if(_validate.date.fisvalid(l.birthdate) and
 	                            _validate.date.fisvalid(l.birthdate,_validate.date.rules.dateinpast),l.birthdate,'');		

@@ -2,7 +2,8 @@
 EXPORT Build_Input_KnownFraud(
 	  string		pversion
 	 ,boolean		PSkipKnownFraud	= false 
-	 ,boolean		PSkipNAC				= false	 
+	 ,boolean		PSkipNAC				= false	
+	 ,boolean		PSkipValidations	= true
 ) :=
 module
 
@@ -47,9 +48,13 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+
+		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
+		self.file_type := 1 ;
+		
 		source_input := if (l.source_input = '', 'KNFD',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := hash64(
+		SELF.unique_id := hash64(hashmd5(
 								ut.CleanSpacesAndUpper(l.customer_name) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_account_number) + ',' +  
 								ut.CleanSpacesAndUpper(l.customer_state) + ',' +  
@@ -167,7 +172,8 @@ module
 								ut.CleanSpacesAndUpper(l.mitigated_amount) + ',' +  
 								ut.CleanSpacesAndUpper(l.external_referral_or_casenumber) + ',' +  
 								ut.CleanSpacesAndUpper(l.cleared_fraud) + ',' +  
-								ut.CleanSpacesAndUpper(l.reason_cleared_code));	
+								ut.CleanSpacesAndUpper(l.reason_cleared_code)));	
+		self.Deltabase := if(l.source_input[1..9] = 'DELTABASE', 1, 0);
 		self:=l;
 		self:=[];
 	end;
@@ -176,7 +182,7 @@ module
 	
 
 	f1_errors:=f1
-			(	 
+			((	 
 					Customer_Account_Number =''
 				or	Customer_County =''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
@@ -184,16 +190,24 @@ module
 				or 	(Street_1='' and City='' and State='' and Zip='')
 				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
 				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
-				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE				
-			);
+				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
+			)and PSkipValidations = false);
+			
 
 	NotInMbs := join(	f1,
 						FraudShared.Files().Input.MBS.sprayed(status = 1)
 									,left.Customer_Account_Number =(string)right.gc_id
-									and left.Customer_State = right.customer_state
-									and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
-									and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-									and left.Customer_County = right.Customer_County,
+										and left.file_type = right.file_type 
+										and left.ind_type = right.ind_type AND 
+ 										( 
+											left.Deltabase = 1											
+											OR 
+											(	left.Deltabase = 0 AND
+												left.customer_State = right.Customer_State AND
+												left.Customer_County = right.Customer_County AND 	
+												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+											)
+										),																			
 									TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),LEFT ONLY,lookup);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
@@ -263,54 +277,12 @@ module
 									pTerminator := '~<EOL>~',
 									pQuote:= '');
 
-	Promote_Input_File := 
-		sequential(
-			 STD.File.StartSuperFileTransaction()
-			 //Promote Input Records
-			,STD.File.ClearSuperFile(Filenames().Input.KnownFraud.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.KnownFraud.Sprayed
-				,Filenames().Input.KnownFraud.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.KnownFraud.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.KnownFraud.Sprayed
-				,Filenames().Input.KnownFraud.New(pversion)
-			)
-			//Promote Bypass Records
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_KnownFraud.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_KnownFraud.Sprayed
-				,Filenames().Input.ByPassed_KnownFraud.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_KnownFraud.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_KnownFraud.Sprayed
-				,Filenames().Input.ByPassed_KnownFraud.New(pversion)
-			)
-			 //Promote AddressCache
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_KNFD.Sprayed
-				,Filenames().Input.AddressCache_KNFD.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_KNFD.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_KNFD.Sprayed
-				,Filenames().Input.AddressCache_KNFD.New(pversion)
-			)			
-			,STD.File.FinishSuperFileTransaction()	
-		);		
 // Return
 	export build_prepped := 
 			 sequential(
 				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
-				,Promote_Input_File
 		);
 		
 	export All :=

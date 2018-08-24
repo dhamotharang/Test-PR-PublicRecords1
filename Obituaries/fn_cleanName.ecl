@@ -1,9 +1,9 @@
-IMPORT Header, Address, ut, NID, Death_Master;
+﻿IMPORT Header, Address, ut, NID, Death_Master, STD;
 EXPORT fn_cleanName(DATASET(RECORDOF(Header.Layout_Did_Death_MasterV3)) obit) := FUNCTION 
 
 	RECORDOF(obit) tPrepObit(RECORDOF(obit) pInput) := TRANSFORM
 		// Clean up middle name first
-		mname_clean_null	:=	StringLib.StringToUpperCase(ut.AlphasOnly(Death_Master.fn_cleanNULL(pInput.mname)));
+		mname_clean_null	:=	StringLib.StringToUpperCase(STD.Str.Filter(Death_Master.fn_cleanNULL(pInput.mname),'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'));
 		mname_clean				:=	IF(TRIM(mname_clean_null) IN ['UNKNOWN'],'',TRIM(mname_clean_null));	
 		
 		// Clean rest of name

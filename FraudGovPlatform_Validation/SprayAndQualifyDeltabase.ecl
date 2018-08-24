@@ -4,13 +4,13 @@ EXPORT SprayAndQualifyDeltabase(
 	STRING version,
 	STRING ip	= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10),
 	STRING rootDir = '/data/super_credit/fraudgov/in/deltabase/dev/', 
-	STRING destinationGroup = IF(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44')
+	STRING destinationGroup = IF(_Control.ThisEnvironment.Name  <> 'Prod_Thor','thor400_dev','thor400_44')
 ) := FUNCTION
 
 dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, rootDir + version[1..8], '*.txt')):INDEPENDENT;
 dsFileListSorted := SORT(dsFileList,modified);
 fname_temp	:=dsFileListSorted[1].Name:independent;
-fname	:='Deltabase_'+version+'.txt';
+fname	:='delta_identity_'+version+'.txt';
 
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := 'Deltabase';
@@ -23,7 +23,7 @@ ReportFileFound:=IF(FileFound
 
 IsEmptyFile:=dsFileListSorted[1].size = 0;
 
-FileSprayed 					:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
+FileSprayed 				:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 Deltabase_Passed		:= FraudGovPlatform.Filenames().Sprayed._DeltabasePassed;
 Deltabase_Rejected	:= FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected;
 

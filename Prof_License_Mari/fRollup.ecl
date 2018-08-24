@@ -38,7 +38,7 @@ export fRollup(dataset(Prof_License_Mari.layouts.final) int0) := FUNCTION
 												name_dba,
 												bus_sec_range,
 												date_vendor_last_reported,
-												LOCAL);														
+												LOCAL);	
    
   Prof_License_Mari.layouts.final rollupXform(Prof_License_Mari.layouts.final l, Prof_License_Mari.layouts.final r) := transform
 			self.create_dte									:= (string)ut.EarliestDate((integer)l.create_dte,	(integer)r.create_dte);
@@ -53,6 +53,7 @@ export fRollup(dataset(Prof_License_Mari.layouts.final) int0) := FUNCTION
 			self.prev_mltreckey							:= if(l.last_upd_dte  > r.last_upd_dte,	r.prev_mltreckey, l.prev_mltreckey);
 			self.prev_cmc_slpk							:= if(l.last_upd_dte  > r.last_upd_dte,	r.prev_cmc_slpk, l.prev_cmc_slpk);
 			self.prev_pcmc_slpk							:= if(l.last_upd_dte  > r.last_upd_dte,	r.prev_pcmc_slpk, l.prev_pcmc_slpk);
+			self.persistent_record_id				:= if(l.last_upd_dte  > r.last_upd_dte,	r.persistent_record_id, l.persistent_record_id);
 	    self := r;
    end;
 	  

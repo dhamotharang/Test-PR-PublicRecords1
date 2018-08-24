@@ -1,6 +1,11 @@
-EXPORT proc_build_marketing :=  function
+﻿EXPORT proc_build_marketing :=  function
 
-#stored ('watchtype', 'marketing');
+//#stored ('watchtype', 'marketing');
+//changed from using #stored to just setting the variable.  Something has changed
+//at the platform level so in a Sequential 2 variables called watchtype can't be 
+//set at the same time.
+
+watchtype := 'marketing';
 
 import watchdog,ut,RoxieKeyBuild,Orbit3;
 
@@ -20,8 +25,8 @@ string8 filedate := fd[1].fdate : stored('filedate');
 
 set_inputs := output('Setting input files...') : success(watchdog.Input_set);
 
-send_bad_email := fileservices.SendEmail('skasavajjala@seisint.com','Watchdog-marketing Build FAILED','');
-send_email := fileservices.SendEmail('skasavajjala@seisint.com','Watchdog-marketing Build FINISHED','');
+send_bad_email := fileservices.SendEmail('michael.gould@lexisnexis.com,skasavajjala@seisint.com','Watchdog-marketing Build FAILED','');
+send_email := fileservices.SendEmail('michael.gould@lexisnexis.com,skasavajjala@seisint.com','Watchdog-marketing Build FINISHED','');
 updatedops          := RoxieKeyBuild.updateversion('MarketingHeaderKeys',filedate,'skasavajjala@seisint.com',,'N');
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Marketing Best',filedate);
 

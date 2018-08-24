@@ -1,4 +1,4 @@
-﻿Import obituaries,ut, VersionControl;
+﻿Import obituaries,ut, VersionControl,	PromoteSupers;
 
 EXPORT file_obituaries_in	:= function
 
@@ -11,14 +11,14 @@ Obituaries.layouts.layout_reor_tribute reorderFields(obituaries.layouts.obit_xml
 	 self.filedate		:=	(string8)file_date;
    self.person_id 	:=	ut.fn_RemoveSpecialChars(l.person_id);
 	 self.rec_type		:=	'';
-	 trimlname				:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.lname));
+	 trimlname				:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.lname));
    clnlname					:=	MAP ( 
 													stringlib.stringfind(trimlname,' JR',1) <>0 => trimlname[1..stringlib.stringfind(trimlname,' JR',1)],
 													stringlib.stringfind(trimlname,' SR',1) <>0 => trimlname[1..stringlib.stringfind(trimlname,' SR',1)],
 													stringlib.stringfind(trimlname,' I',1) <>0 => trimlname[1..stringlib.stringfind(trimlname,' I',1)],
 													stringlib.stringfind(trimlname,' II',1) <>0 => trimlname[1..stringlib.stringfind(trimlname,' II',1)],
 													trimlname );
-	trimsuffix				:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.suffix));
+	trimsuffix				:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.suffix));
   clnsuffix					:=	MAP ( 
 													trimsuffix<>'' => trimsuffix,
 													stringlib.stringfind(trimlname,' JR',1) <>0 => 'JR',
@@ -26,12 +26,12 @@ Obituaries.layouts.layout_reor_tribute reorderFields(obituaries.layouts.obit_xml
 													stringlib.stringfind(trimlname,' I',1) <>0 => 'I',
 													stringlib.stringfind(trimlname,' II',1) <>0 => 'II',
 													trimsuffix );
-	 self.prefix					:=	ut.fnTrim2Upper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.prefix),'.',''));
-   self.fname						:=	ut.fnTrim2Upper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.fname),'.',''));
-   self.mname						:=	ut.fnTrim2Upper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.mname),'.',''));
-   self.lname						:=	ut.fnTrim2Upper(clnlname);
-   self.name_suffix			:=	ut.fnTrim2Upper(stringlib.StringFindReplace(clnsuffix,'.',''));
-   self.gender					:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.gender));
+	 self.prefix					:=	ut.CleanSpacesAndUpper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.prefix),'.',''));
+   self.fname						:=	ut.CleanSpacesAndUpper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.fname),'.',''));
+   self.mname						:=	ut.CleanSpacesAndUpper(stringlib.StringFindReplace(ut.fn_RemoveSpecialChars(l.mname),'.',''));
+   self.lname						:=	ut.CleanSpacesAndUpper(clnlname);
+   self.name_suffix			:=	ut.CleanSpacesAndUpper(stringlib.StringFindReplace(clnsuffix,'.',''));
+   self.gender					:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.gender));
    self.age							:=	ut.fn_RemoveSpecialChars(l.age);
    self.birth_month			:=	intformat((integer)ut.fn_RemoveSpecialChars(l.birth_month),2,1);
    self.birth_day				:=	intformat((integer)ut.fn_RemoveSpecialChars(l.birth_day),2,1);
@@ -39,16 +39,16 @@ Obituaries.layouts.layout_reor_tribute reorderFields(obituaries.layouts.obit_xml
    self.death_month 		:=	intformat((integer)ut.fn_RemoveSpecialChars(l.death_month),2,1);
    self.death_day				:=	intformat((integer)ut.fn_RemoveSpecialChars(l.death_day),2,1);
    self.death_year			:=	intformat((integer)ut.fn_RemoveSpecialChars(l.death_year),4,1);
-   self.location_city		:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.location_city));
-   self.location_state	:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.location_state));
-   self.spouses_name		:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.spouses_name));
-   self.spouses_living_status := ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.spouses_living_status));
-   self.companions_name	:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.companions_name));
-   self.full_obit_text	:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.full_obit_text));
-   self.donation_text		:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.donation_text));
-   self.education_text	:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.education_text));
-   self.military_text		:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.military_text));
-   self.service_text		:=	ut.fnTrim2Upper(ut.fn_RemoveSpecialChars(l.service_text));
+   self.location_city		:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.location_city));
+   self.location_state	:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.location_state));
+   self.spouses_name		:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.spouses_name));
+   self.spouses_living_status := ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.spouses_living_status));
+   self.companions_name	:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.companions_name));
+   self.full_obit_text	:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.full_obit_text));
+   self.donation_text		:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.donation_text));
+   self.education_text	:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.education_text));
+   self.military_text		:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.military_text));
+   self.service_text		:=	ut.CleanSpacesAndUpper(ut.fn_RemoveSpecialChars(l.service_text));
 END;
 
 file_new_order := project(ds_raw_in(trim(person_id,left,right) != 'person_id'),reorderFields(left));
@@ -103,7 +103,7 @@ END;
 
 RollupTributes	:= Rollup(srt_combined,xformCombined(LEFT,RIGHT),person_id,LOCAL);
 
-ut.MAC_SF_BuildProcess(RollupTributes,'~thor_data400::base::obituary_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/true);
+PromoteSupers.MAC_SF_BuildProcess(RollupTributes,'~thor_data400::base::obituary_death_master',build_obituary_out,3, /*csvout*/false, /*compress*/true);
 
 return build_obituary_out;
 	

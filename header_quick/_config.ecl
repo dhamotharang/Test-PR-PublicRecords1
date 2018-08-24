@@ -1,8 +1,9 @@
 ﻿IMPORT _control,std,ut;
 EXPORT _config := MODULE
 
+    EXPORT data_location := _control.IPAddress.bctlpedata10;
     EXPORT sprayIP(string sourceIP) := map(
-                                            sourceIP = 'bctlpedata10' => _control.IPAddress.bctlpedata10,
+                                            sourceIP = 'bctlpedata10' => data_location,
                                             sourceIP
                                     );    
     
@@ -17,8 +18,8 @@ EXPORT _config := MODULE
     EXPORT get_v_eq_as_of_date := dataset(v_eq_as_of_date_file_name,{string v_eq_as_of_date},thor)[1].v_eq_as_of_date;
     
     
-    SHARED fst_monthly_file:=FileServices.remotedirectory(sprayIP(_control.IPAddress.bctlpedata10),sourcePath,monthly_files,false)[1].name;
-    SHARED fst_weekly_file:=FileServices.remotedirectory(sprayIP(_control.IPAddress.bctlpedata10),sourcePath,weekly_files,false)[1].name;
+    SHARED fst_monthly_file:=FileServices.remotedirectory(sprayIP(data_location),sourcePath,monthly_files,false)[1].name;
+    SHARED fst_weekly_file:=FileServices.remotedirectory(sprayIP(data_location),sourcePath,weekly_files,false)[1].name;
     
     SHARED newEquifaxMothlyHeaderDate := regexreplace('MONTHLY_HEADER_[C|E|S|W]_(.*).DAT',fst_monthly_file,'\\1');
     SHARED curEquifaxWeeklyHeaderDate := regexreplace('WEEKLY_HEADER_(.*).DAT',fst_weekly_file,'\\1');
@@ -32,7 +33,7 @@ EXPORT _config := MODULE
     
     
     // v_version
-    EXPORT set_v_version := if(isNewEquifaxMonthlyFile('bctlpedata10.risk.regn.net'),
+    EXPORT set_v_version := if(isNewEquifaxMonthlyFile(data_location),
                                  sequential(
                                      output(dataset([{newEquifaxMothlyHeaderDate}],{string v_version}),,v_version_file_name+'_'+workunit),
                                      std.file.startsuperfiletransaction(),
@@ -45,7 +46,7 @@ EXPORT _config := MODULE
                                  
     // v_eq_as_of_date
     
-    EXPORT set_v_eq_as_of_date := if(isNewEquifaxWeeklyFile('bctlpedata10.risk.regn.net'),
+    EXPORT set_v_eq_as_of_date := if(isNewEquifaxWeeklyFile(data_location),
                                     sequential(
                                          output(dataset([{newEquifaxWeeklyHeaderDate}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
                                          std.file.startsuperfiletransaction(),

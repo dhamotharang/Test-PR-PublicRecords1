@@ -69,7 +69,7 @@ emailN := fileservices.sendemail(_Control.MyInfo.EmailAddressNotify+ '; RoxieBui
 UpdateRoxiePage := RoxieKeybuild.updateversion('TxbusKeys', filedate, _control.MyInfo.EmailAddressNotify,,'N|B');
 
 //Update ORBIT
-orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('TXBUS',filedate,'N|B'); 
+orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('TXBUS',filedate,'N|B'); 
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Actions

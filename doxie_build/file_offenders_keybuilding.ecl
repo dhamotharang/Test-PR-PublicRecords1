@@ -1,3 +1,6 @@
-import corrections;
+﻿import corrections, hygenics_crim;
 
-export file_offenders_keybuilding := dataset('~thor_Data400::base::Corrections_Offenders_' + doxie_build.buildstate + '_BUILDING',corrections.layout_Offender,flat);
+		ds := dataset('~thor_Data400::base::Corrections_Offenders_' + doxie_build.buildstate + '_BUILDING'
+				,corrections.layout_Offender,flat);
+		
+export file_offenders_keybuilding := hygenics_crim.Prep_Build.PB_File_Offenders(ds);

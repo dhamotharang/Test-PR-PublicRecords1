@@ -99,8 +99,6 @@ EXPORT GenerationMod := MODULE(SALT38.iGenerationMod)
     + 'FIELD:current_rec:DERIVED:TYPE(BOOLEAN1):0,0\n'
     + '\n'
     + '//Future BIP addition\n'
-    + '// FIELD:bdid:DERIVED:TYPE(UNSIGNED8):0,0\n'
-    + '// FIELD:bdid_score:DERIVED:TYPE(UNSIGNED8):0,0\n'
     + '// FIELD:dotid:DERIVED:TYPE(UNSIGNED6):0,0\n'
     + '// FIELD:dotscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
     + '// FIELD:dotweight:DERIVED:TYPE(UNSIGNED2):0,0\n'

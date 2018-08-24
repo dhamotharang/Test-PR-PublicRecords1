@@ -1,4 +1,4 @@
-import Standard, address, BIPV2;
+﻿import Standard, address, BIPV2;
 
 export Layouts_Calbus := module
 
@@ -32,7 +32,7 @@ export Layouts_Calbus := module
 	end;
 	
 	// Record Length= 394
-  export Layout_raw := record
+  export Layout_raw_old2 := record
        string3	DISTRICT_BRANCH;
        string13	ACCOUNT_NUMBER;
        string3	DISTRICT;
@@ -61,6 +61,26 @@ export Layouts_Calbus := module
        string1	OWNERSHIP_CODE;
 	end;
 	
+	export Layout_raw := record
+    string3		district_branch;
+		string9		account_number;          
+		string5		sub_account_number;
+		string3		district;
+		string3		account_type;
+		string50	firm_name;
+		string50	owner_name;
+		string40	business_street ;
+		string30	business_city;
+		string2		business_state;
+		string5		business_zip_5;
+		string4		business_zip_plus_4;
+		string7		business_foreign_zip;
+		string35	business_country_name;
+		string8		start_date;
+		string1		ownership_code;
+	end;
+	
+	// Record Length= 257
 	export Layout_raw_crlf := record
 	   Layout_raw;
 	   string2 crlf;
@@ -137,11 +157,11 @@ export Layouts_Calbus := module
 			string3   Owner_name_score; 
   end;
 	
-	export Layout_Common := record
+	export Layout_Common_old2 := record
       string8   Process_date;
 			string8   dt_first_seen;
 			string8   dt_last_seen;
-			Layout_raw;
+			Layout_raw_old2;
 			string45  Tax_code_full_desc;
 			string100 Industry_code_desc;
 			string40  County_code_desc;
@@ -207,7 +227,91 @@ export Layouts_Calbus := module
 			string5   Owner_name_suffix;
 			string3   Owner_name_score; 
   end;
-
+  
+  export Layout_Common := record
+      string8   Process_date;
+			string8   dt_first_seen;
+			string8   dt_last_seen;
+			Layout_raw -account_number;
+			string13	account_number; // Retaining existing account number's length
+			string4	  tax_code_full;
+			string40	mailing_street;
+			string30	mailing_city;
+			string2	  mailing_state;
+			string5	  mailing_zip_5;
+			string4	  mailing_zip_plus_4;
+			string7	  mailing_foreign_zip;
+			string35	mailing_country_name;
+			string5	  industry_code;
+			string6   naics_code;
+      string2	  county_code;
+      string3	  city_code;
+			string45  Tax_code_full_desc;
+			string100 Industry_code_desc;
+			string40  County_code_desc;
+			string40  Ownership_code_desc;
+      string10 	Business_prim_range;      //Business clean address
+      string2   Business_predir;
+      string28 	Business_prim_name;
+      string4   Business_addr_suffix;
+      string2   Business_postdir;
+      string10 	Business_unit_desig;
+      string8   Business_sec_range;
+      string25 	Business_p_city_name;
+      string25 	Business_v_city_name;
+      string2   Business_st;
+      string5   Business_zip5;
+      string4   Business_zip4;
+      string4   Business_cart;
+      string1   Business_cr_sort_sz;
+      string4   Business_lot;
+      string1   Business_lot_order;
+      string2   Business_dpbc;
+      string1   Business_chk_digit;
+      string2   Business_addr_rec_type;
+      string2   Business_fips_state;
+      string3   Business_fips_county;
+      string10 	Business_geo_lat;
+      string11 	Business_geo_long;
+      string4   Business_cbsa;
+      string7   Business_geo_blk;
+      string1   Business_geo_match;
+      string4   Business_err_stat;
+			string10 	Mailing_prim_range;       //Mailing clean address
+      string2   Mailing_predir;
+      string28 	Mailing_prim_name;
+      string4   Mailing_addr_suffix;
+      string2   Mailing_postdir;
+      string10 	Mailing_unit_desig;
+      string8   Mailing_sec_range;
+      string25 	Mailing_p_city_name;
+      string25 	Mailing_v_city_name;
+      string2   Mailing_st;
+      string5   Mailing_zip5;
+      string4   Mailing_zip4;
+      string4   Mailing_cart;
+      string1   Mailing_cr_sort_sz;
+      string4   Mailing_lot;
+      string1   Mailing_lot_order;
+      string2   Mailing_dpbc;
+      string1   Mailing_chk_digit;
+      string2   Mailing_addr_rec_type;
+      string2   Mailing_fips_state;
+      string3   Mailing_fips_county;
+      string10 	Mailing_geo_lat;
+      string11 	Mailing_geo_long;
+      string4   Mailing_cbsa;
+      string7   Mailing_geo_blk;
+      string1   Mailing_geo_match;
+      string4   Mailing_err_stat;
+			string5   Owner_title;
+			string20  Owner_fname;
+			string20  Owner_mname;
+			string20  Owner_lname;
+			string5   Owner_name_suffix;
+			string3   Owner_name_score; 
+  end;
+   
   export Layout_AID_Common := record
 			unsigned8	raw_aid							:= 0;
 			unsigned8	ace_aid							:= 0;
@@ -217,7 +321,7 @@ export Layouts_Calbus := module
 			string50	prep_addr_line_last			;
 			string100 prep_mail_addr_line1		;
 			string50	prep_mail_addr_line_last;
-			Layout_Common											;  
+			Layout_Common											;   
   end;
 			
   export Layout_Bdid := record
@@ -233,16 +337,16 @@ export Layouts_Calbus := module
 			string9		ssn 					:= '';
 			Layout_Bdid;  
   end;
-	
+  
 	//** Layout that excludes the new AID fields for keys. 
 	export Layout_Keys := record
 			Layout_Base.did				;
 			Layout_Base.did_score ;
 			Layout_Base.ssn 			;
 			Layout_Bdid.bdid			;
-			Layout_Common					;
+			Layout_Common-sub_account_number-account_type; //excluding new vendor fields from keys 
 	end;
-  
+	
   export Layout_Autokeys := record
 			Layout_Base.bdid;
 			Layout_Base.did;

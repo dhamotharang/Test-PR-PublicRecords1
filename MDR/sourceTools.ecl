@@ -34,6 +34,7 @@ MODULE
 	export src_Accurint_Trade_Show       := 'AT';
 	export src_ACF                       := 'CF';  // America's Corporate Financial Directory
 	export src_Acquiredweb 							 := 'AW';
+	export src_Acquiredweb_plus					 := 'AP';	 // AcquiredWeb Plus - Business names and email addresses
   export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. – ADVO file 
 	export src_AHA                       := 'AH';  // American Hospital Association for Organization master repositry
 	export src_Aircrafts                 := 'AR';  // Aircraft registrations from the FAA
@@ -259,6 +260,7 @@ MODULE
 	export src_INFOUSA_ABIUS_USABIZ      := 'IA';
 	export src_INFOUSA_DEAD_COMPANIES    := 'IC'; // Aka DEADCO
 	export src_INFOUSA_IDEXEC            := 'II';
+	export src_Infutor_NARB              := 'Z2';
 	export src_InfutorCID								 := 'IR';
 	export src_InfutorTRK                := 'IF';
 	export src_InfutorNarc               := '1F';
@@ -803,12 +805,12 @@ MODULE
 	export set_email	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt								, src_thrive_pd									,src_Ibehavior               , src_AlloyMedia_consumer,  src_SalesChannel, src_Datagence
-		,src_InfutorNare					,src_Anchor													,src_RealSource];
+		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus];
 		
 	export set_email_poe	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer
-		,src_InfutorNare			,src_Anchor											,src_RealSource];
+		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus];
 		
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
@@ -1481,7 +1483,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Accurint_Sex_offender     := [src_Accurint_Sex_offender     ];
 	export set_Accurint_Trade_Show       := [src_Accurint_Trade_Show       ];
 	export set_ACF                       := [src_ACF                       ];
-	export set_Acquiredweb               := [src_Acquiredweb               ];	
+	export set_Acquiredweb               := [src_Acquiredweb               ];
+	export set_Acquiredweb_plus					 := [src_Acquiredweb_plus					 ];
   export set_advo_valassis	           := [src_advo_valassis             ]; 
 	export set_AHA                       := [src_AHA											 ];  
 	export set_Aircrafts                 := [src_Aircrafts                 ];
@@ -1703,6 +1706,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_INFOUSA_ABIUS_USABIZ      := [src_INFOUSA_ABIUS_USABIZ      ];
 	export set_INFOUSA_DEAD_COMPANIES    := [src_INFOUSA_DEAD_COMPANIES    ];
 	export set_INFOUSA_IDEXEC            := [src_INFOUSA_IDEXEC            ];
+	export set_Infutor_NARB              := [src_Infutor_NARB              ];
 	export set_InfutorCID								 := [src_InfutorCID		       			 ];
 	export set_InfutorTRK								 := [src_InfutorTRK		       			 ];
 	export set_InfutorNarc               := [src_InfutorNarc               ];
@@ -2228,6 +2232,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsINFOUSA_ABIUS_USABIZ       (string  sr) := sr               in set_INFOUSA_ABIUS_USABIZ       ;
 	export SourceIsINFOUSA_DEAD_COMPANIES     (string  sr) := sr               in set_INFOUSA_DEAD_COMPANIES     ;
 	export SourceIsINFOUSA_IDEXEC             (string  sr) := sr               in set_INFOUSA_IDEXEC             ;
+	export SourceIsInfutor_NARB               (string  sr) := sr               in set_Infutor_NARB               ;
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
@@ -2520,6 +2525,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Accurint_Trade_Show       ,'Accurint Trade Show'                                       }
 		,{src_ACF                       ,'ACF - America\'s Corporate Financial Directory'            }
 		,{src_Acquiredweb      					,'Acquired Web'                                       			 }
+		,{src_Acquiredweb_plus					,'Acquired Web Business'																		 }
 	  ,{src_advo_valassis             ,'US Postal Service Via Valassis Communications, Inc. - ADVO'  }
 		,{src_AHA                       ,'AHA - American Hospital Association'      			           }
 	  ,{src_Aircrafts                 ,'Aircrafts'                                                 }
@@ -2744,7 +2750,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_INFOUSA_ABIUS_USABIZ      ,'INFOUSA ABIUS(USABIZ)'                                     }
 		,{src_INFOUSA_DEAD_COMPANIES    ,'INFOUSA DEAD COMPANIES'                                    }
 		,{src_INFOUSA_IDEXEC            ,'INFOUSA IDEXEC'                                            }
-	  ,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
+	  ,{src_Infutor_NARB              ,'Infutor NARB - Name and Address Resource Business'         }
+		,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
@@ -3024,7 +3031,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Accurint_Sex_offender     => 'Accurint Sex offender'                                
 		,src_Accurint_Trade_Show       => 'Accurint Trade Show'                                  
 		,src_ACF                       => 'ACF - America\'s Corporate Financial Directory'       
-		,src_Acquiredweb      				 => 'Acquired Web'                                       	
+		,src_Acquiredweb      				 => 'Acquired Web' 
+		,src_Acquiredweb_plus					 =>	'Acquired Web Business'
     ,src_advo_valassis         		 => 'US Postal Service Via Valassis Communications, Inc. - ADVO'
 		,src_AHA                       => 'AHA - American Hospital Association'       
 		,src_Aircrafts                 => 'Aircrafts'                                            
@@ -3249,6 +3257,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_INFOUSA_ABIUS_USABIZ      => 'INFOUSA ABIUS(USABIZ)'                                
 	  ,src_INFOUSA_DEAD_COMPANIES    => 'INFOUSA DEAD COMPANIES'                               
 	  ,src_INFOUSA_IDEXEC            => 'INFOUSA IDEXEC'                                       
+		,src_Infutor_NARB              => 'Infutor NARB - Name and Address Resource Business'
 		,src_InfutorCID	 							 => 'Infutor CID - Phones'                                 
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'

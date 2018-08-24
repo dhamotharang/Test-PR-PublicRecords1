@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT NYC_Party_MAC_PopulationStatistics(infile,Ref='',Input_tmsid = '',Input_rmsid = '',Input_orig_name = '',Input_orig_lname = '',Input_orig_fname = '',Input_orig_mname = '',Input_orig_suffix = '',Input_duns_number = '',Input_hq_duns_number = '',Input_ssn = '',Input_fein = '',Input_incorp_state = '',Input_corp_number = '',Input_corp_type = '',Input_orig_address1 = '',Input_orig_address2 = '',Input_orig_city = '',Input_orig_state = '',Input_orig_zip5 = '',Input_orig_zip4 = '',Input_orig_country = '',Input_orig_province = '',Input_orig_postal_code = '',Input_foreign_indc = '',Input_party_type = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_last_reported = '',Input_dt_vendor_first_reported = '',Input_process_date = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_company_name = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_zip5 = '',Input_zip4 = '',Input_county = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dpbc = '',Input_chk_digit = '',Input_rec_type = '',Input_ace_fips_st = '',Input_ace_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_bdid = '',Input_did = '',Input_did_score = '',Input_bdid_score = '',Input_source_rec_id = '',Input_dotid = '',Input_dotscore = '',Input_dotweight = '',Input_empid = '',Input_empscore = '',Input_empweight = '',Input_powid = '',Input_powscore = '',Input_powweight = '',Input_proxid = '',Input_proxscore = '',Input_proxweight = '',Input_seleid = '',Input_selescore = '',Input_seleweight = '',Input_orgid = '',Input_orgscore = '',Input_orgweight = '',Input_ultid = '',Input_ultscore = '',Input_ultweight = '',Input_prep_addr_line1 = '',Input_prep_addr_last_line = '',Input_rawaid = '',Input_aceaid = '',Input_persistent_record_id = '',OutFile) := MACRO
-  IMPORT SALT38,Scrubs_UCCV2;
+  IMPORT SALT39,Scrubs_UCCV2;
   #uniquename(of)
   %of% := RECORD
-    SALT38.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
