@@ -253,7 +253,7 @@ FUNCTIONMACRO
 						if(length(STD.Str.CleanSpaces(regexreplace('-',l.zip,''))) in [5,9],l.zip,'')
 						,'');		
 		SELF.clean_dob				:= if (_Validate.Date.fIsValid(l.dob) and 
-														(unsigned)l.dob <= (unsigned)ut.GetDate,
+														(unsigned)l.dob <= (unsigned)(STRING8)Std.Date.Today(),
 														_validate.date.fCorrectedDateString(l.dob),
 														'00000000');	
 		SELF:=l;
