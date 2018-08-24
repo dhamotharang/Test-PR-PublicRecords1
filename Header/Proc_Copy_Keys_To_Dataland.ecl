@@ -25,6 +25,7 @@ SHARED sf_keysi := dataset([
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::address'},
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::dln'},
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::dob'},
+    {'thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf'},
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz'},
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::name'},
     {'thor_data400::key::insuranceheader_xlink::qa::did::refs::ph'},
@@ -68,6 +69,7 @@ dataset([
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::address'}
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln'}
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob'}
+,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf'}
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz'}
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::name'}
 ,{'~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph'}
