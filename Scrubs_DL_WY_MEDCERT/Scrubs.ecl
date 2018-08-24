@@ -3,17 +3,15 @@ IMPORT Scrubs_DL_WY_MEDCERT; // Import modules for FieldTypes attribute definiti
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 30;
-  EXPORT NumRulesFromFieldType := 30;
+  EXPORT NumRules := 26;
+  EXPORT NumRulesFromFieldType := 26;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 30;
+  EXPORT NumFieldsWithRules := 26;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_In_WY_MEDCERT)
     UNSIGNED1 append_process_date_Invalid;
     UNSIGNED1 orig_first_name_Invalid;
-    UNSIGNED1 orig_middle_name_Invalid;
-    UNSIGNED1 orig_last_name_Invalid;
     UNSIGNED1 mailing_street_addr_1_Invalid;
     UNSIGNED1 mailing_city_1_Invalid;
     UNSIGNED1 mailing_state_1_Invalid;
@@ -38,8 +36,6 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 med_cert_type_Invalid;
     UNSIGNED1 med_cert_expire_date_Invalid;
     UNSIGNED1 clean_name_first_Invalid;
-    UNSIGNED1 clean_name_middle_Invalid;
-    UNSIGNED1 clean_name_last_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Layout_In_WY_MEDCERT)
     UNSIGNED8 ScrubsBits1;
@@ -48,8 +44,6 @@ EXPORT FromNone(DATASET(Layout_In_WY_MEDCERT) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.append_process_date_Invalid := Fields.InValid_append_process_date((SALT38.StrType)le.append_process_date);
     SELF.orig_first_name_Invalid := Fields.InValid_orig_first_name((SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_middle_name,(SALT38.StrType)le.orig_last_name);
-    SELF.orig_middle_name_Invalid := Fields.InValid_orig_middle_name((SALT38.StrType)le.orig_middle_name,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_last_name);
-    SELF.orig_last_name_Invalid := Fields.InValid_orig_last_name((SALT38.StrType)le.orig_last_name,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_middle_name);
     SELF.mailing_street_addr_1_Invalid := Fields.InValid_mailing_street_addr_1((SALT38.StrType)le.mailing_street_addr_1);
     SELF.mailing_city_1_Invalid := Fields.InValid_mailing_city_1((SALT38.StrType)le.mailing_city_1);
     SELF.mailing_state_1_Invalid := Fields.InValid_mailing_state_1((SALT38.StrType)le.mailing_state_1);
@@ -73,15 +67,13 @@ EXPORT FromNone(DATASET(Layout_In_WY_MEDCERT) h) := MODULE
     SELF.med_cert_status_Invalid := Fields.InValid_med_cert_status((SALT38.StrType)le.med_cert_status);
     SELF.med_cert_type_Invalid := Fields.InValid_med_cert_type((SALT38.StrType)le.med_cert_type);
     SELF.med_cert_expire_date_Invalid := Fields.InValid_med_cert_expire_date((SALT38.StrType)le.med_cert_expire_date);
-    SELF.clean_name_first_Invalid := Fields.InValid_clean_name_first((SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.Clean_name_last);
-    SELF.clean_name_middle_Invalid := Fields.InValid_clean_name_middle((SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.Clean_name_last);
-    SELF.clean_name_last_Invalid := Fields.InValid_clean_name_last((SALT38.StrType)le.clean_name_last,(SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle);
+    SELF.clean_name_first_Invalid := Fields.InValid_clean_name_first((SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.clean_name_last);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_In_WY_MEDCERT);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.append_process_date_Invalid << 0 ) + ( le.orig_first_name_Invalid << 1 ) + ( le.orig_middle_name_Invalid << 2 ) + ( le.orig_last_name_Invalid << 3 ) + ( le.mailing_street_addr_1_Invalid << 4 ) + ( le.mailing_city_1_Invalid << 5 ) + ( le.mailing_state_1_Invalid << 6 ) + ( le.mailing_zip_code_1_Invalid << 7 ) + ( le.phys_street_addr_2_Invalid << 8 ) + ( le.phys_city_2_Invalid << 9 ) + ( le.phys_state_2_Invalid << 10 ) + ( le.phys_zip_code_2_Invalid << 11 ) + ( le.orig_dl_number_Invalid << 12 ) + ( le.orig_dob_Invalid << 13 ) + ( le.orig_code_1_Invalid << 14 ) + ( le.orig_code_2_Invalid << 15 ) + ( le.orig_code_3_Invalid << 16 ) + ( le.orig_code_4_Invalid << 17 ) + ( le.orig_code_5_Invalid << 18 ) + ( le.orig_code_6_Invalid << 19 ) + ( le.orig_code_7_Invalid << 20 ) + ( le.orig_code_8_Invalid << 21 ) + ( le.orig_issue_date_Invalid << 22 ) + ( le.orig_expire_date_Invalid << 23 ) + ( le.med_cert_status_Invalid << 24 ) + ( le.med_cert_type_Invalid << 25 ) + ( le.med_cert_expire_date_Invalid << 26 ) + ( le.clean_name_first_Invalid << 27 ) + ( le.clean_name_middle_Invalid << 28 ) + ( le.clean_name_last_Invalid << 29 );
+    SELF.ScrubsBits1 := ( le.append_process_date_Invalid << 0 ) + ( le.orig_first_name_Invalid << 1 ) + ( le.mailing_street_addr_1_Invalid << 2 ) + ( le.mailing_city_1_Invalid << 3 ) + ( le.mailing_state_1_Invalid << 4 ) + ( le.mailing_zip_code_1_Invalid << 5 ) + ( le.phys_street_addr_2_Invalid << 6 ) + ( le.phys_city_2_Invalid << 7 ) + ( le.phys_state_2_Invalid << 8 ) + ( le.phys_zip_code_2_Invalid << 9 ) + ( le.orig_dl_number_Invalid << 10 ) + ( le.orig_dob_Invalid << 11 ) + ( le.orig_code_1_Invalid << 12 ) + ( le.orig_code_2_Invalid << 13 ) + ( le.orig_code_3_Invalid << 14 ) + ( le.orig_code_4_Invalid << 15 ) + ( le.orig_code_5_Invalid << 16 ) + ( le.orig_code_6_Invalid << 17 ) + ( le.orig_code_7_Invalid << 18 ) + ( le.orig_code_8_Invalid << 19 ) + ( le.orig_issue_date_Invalid << 20 ) + ( le.orig_expire_date_Invalid << 21 ) + ( le.med_cert_status_Invalid << 22 ) + ( le.med_cert_type_Invalid << 23 ) + ( le.med_cert_expire_date_Invalid << 24 ) + ( le.clean_name_first_Invalid << 25 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -92,34 +84,30 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   Expanded_Layout into(h le) := TRANSFORM
     SELF.append_process_date_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.orig_first_name_Invalid := (le.ScrubsBits1 >> 1) & 1;
-    SELF.orig_middle_name_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.orig_last_name_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.mailing_street_addr_1_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.mailing_city_1_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.mailing_state_1_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.mailing_zip_code_1_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.phys_street_addr_2_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.phys_city_2_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.phys_state_2_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.phys_zip_code_2_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.orig_dl_number_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.orig_dob_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.orig_code_1_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.orig_code_2_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.orig_code_3_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.orig_code_4_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.orig_code_5_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.orig_code_6_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.orig_code_7_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.orig_code_8_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.orig_issue_date_Invalid := (le.ScrubsBits1 >> 22) & 1;
-    SELF.orig_expire_date_Invalid := (le.ScrubsBits1 >> 23) & 1;
-    SELF.med_cert_status_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.med_cert_type_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.med_cert_expire_date_Invalid := (le.ScrubsBits1 >> 26) & 1;
-    SELF.clean_name_first_Invalid := (le.ScrubsBits1 >> 27) & 1;
-    SELF.clean_name_middle_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.clean_name_last_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.mailing_street_addr_1_Invalid := (le.ScrubsBits1 >> 2) & 1;
+    SELF.mailing_city_1_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.mailing_state_1_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.mailing_zip_code_1_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.phys_street_addr_2_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.phys_city_2_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.phys_state_2_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.phys_zip_code_2_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.orig_dl_number_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.orig_dob_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.orig_code_1_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.orig_code_2_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.orig_code_3_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.orig_code_4_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.orig_code_5_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.orig_code_6_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.orig_code_7_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.orig_code_8_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.orig_issue_date_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.orig_expire_date_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.med_cert_status_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.med_cert_type_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.med_cert_expire_date_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.clean_name_first_Invalid := (le.ScrubsBits1 >> 25) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -130,8 +118,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     TotalCnt := COUNT(GROUP); // Number of records in total
     append_process_date_CUSTOM_ErrorCount := COUNT(GROUP,h.append_process_date_Invalid=1);
     orig_first_name_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_first_name_Invalid=1);
-    orig_middle_name_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_middle_name_Invalid=1);
-    orig_last_name_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_last_name_Invalid=1);
     mailing_street_addr_1_CUSTOM_ErrorCount := COUNT(GROUP,h.mailing_street_addr_1_Invalid=1);
     mailing_city_1_CUSTOM_ErrorCount := COUNT(GROUP,h.mailing_city_1_Invalid=1);
     mailing_state_1_CUSTOM_ErrorCount := COUNT(GROUP,h.mailing_state_1_Invalid=1);
@@ -156,9 +142,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     med_cert_type_ALLOW_ErrorCount := COUNT(GROUP,h.med_cert_type_Invalid=1);
     med_cert_expire_date_CUSTOM_ErrorCount := COUNT(GROUP,h.med_cert_expire_date_Invalid=1);
     clean_name_first_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_name_first_Invalid=1);
-    clean_name_middle_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_name_middle_Invalid=1);
-    clean_name_last_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_name_last_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.append_process_date_Invalid > 0 OR h.orig_first_name_Invalid > 0 OR h.orig_middle_name_Invalid > 0 OR h.orig_last_name_Invalid > 0 OR h.mailing_street_addr_1_Invalid > 0 OR h.mailing_city_1_Invalid > 0 OR h.mailing_state_1_Invalid > 0 OR h.mailing_zip_code_1_Invalid > 0 OR h.phys_street_addr_2_Invalid > 0 OR h.phys_city_2_Invalid > 0 OR h.phys_state_2_Invalid > 0 OR h.phys_zip_code_2_Invalid > 0 OR h.orig_dl_number_Invalid > 0 OR h.orig_dob_Invalid > 0 OR h.orig_code_1_Invalid > 0 OR h.orig_code_2_Invalid > 0 OR h.orig_code_3_Invalid > 0 OR h.orig_code_4_Invalid > 0 OR h.orig_code_5_Invalid > 0 OR h.orig_code_6_Invalid > 0 OR h.orig_code_7_Invalid > 0 OR h.orig_code_8_Invalid > 0 OR h.orig_issue_date_Invalid > 0 OR h.orig_expire_date_Invalid > 0 OR h.med_cert_status_Invalid > 0 OR h.med_cert_type_Invalid > 0 OR h.med_cert_expire_date_Invalid > 0 OR h.clean_name_first_Invalid > 0 OR h.clean_name_middle_Invalid > 0 OR h.clean_name_last_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.append_process_date_Invalid > 0 OR h.orig_first_name_Invalid > 0 OR h.mailing_street_addr_1_Invalid > 0 OR h.mailing_city_1_Invalid > 0 OR h.mailing_state_1_Invalid > 0 OR h.mailing_zip_code_1_Invalid > 0 OR h.phys_street_addr_2_Invalid > 0 OR h.phys_city_2_Invalid > 0 OR h.phys_state_2_Invalid > 0 OR h.phys_zip_code_2_Invalid > 0 OR h.orig_dl_number_Invalid > 0 OR h.orig_dob_Invalid > 0 OR h.orig_code_1_Invalid > 0 OR h.orig_code_2_Invalid > 0 OR h.orig_code_3_Invalid > 0 OR h.orig_code_4_Invalid > 0 OR h.orig_code_5_Invalid > 0 OR h.orig_code_6_Invalid > 0 OR h.orig_code_7_Invalid > 0 OR h.orig_code_8_Invalid > 0 OR h.orig_issue_date_Invalid > 0 OR h.orig_expire_date_Invalid > 0 OR h.med_cert_status_Invalid > 0 OR h.med_cert_type_Invalid > 0 OR h.med_cert_expire_date_Invalid > 0 OR h.clean_name_first_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -166,9 +150,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_middle_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_street_addr_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_code_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_street_addr_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_city_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_state_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_zip_code_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_code_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.med_cert_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_first_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_middle_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_last_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_street_addr_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_code_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_street_addr_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_city_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_state_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_zip_code_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_code_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.med_cert_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_first_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_middle_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_street_addr_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_code_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_street_addr_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_city_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_state_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_zip_code_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_code_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.med_cert_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_first_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_middle_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_last_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.append_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_street_addr_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_code_1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_street_addr_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_city_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_state_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phys_zip_code_2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dl_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_code_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_3_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_6_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_7_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_code_8_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_issue_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.med_cert_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.med_cert_expire_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_first_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -183,13 +167,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.append_process_date_Invalid,le.orig_first_name_Invalid,le.orig_middle_name_Invalid,le.orig_last_name_Invalid,le.mailing_street_addr_1_Invalid,le.mailing_city_1_Invalid,le.mailing_state_1_Invalid,le.mailing_zip_code_1_Invalid,le.phys_street_addr_2_Invalid,le.phys_city_2_Invalid,le.phys_state_2_Invalid,le.phys_zip_code_2_Invalid,le.orig_dl_number_Invalid,le.orig_dob_Invalid,le.orig_code_1_Invalid,le.orig_code_2_Invalid,le.orig_code_3_Invalid,le.orig_code_4_Invalid,le.orig_code_5_Invalid,le.orig_code_6_Invalid,le.orig_code_7_Invalid,le.orig_code_8_Invalid,le.orig_issue_date_Invalid,le.orig_expire_date_Invalid,le.med_cert_status_Invalid,le.med_cert_type_Invalid,le.med_cert_expire_date_Invalid,le.clean_name_first_Invalid,le.clean_name_middle_Invalid,le.clean_name_last_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_append_process_date(le.append_process_date_Invalid),Fields.InvalidMessage_orig_first_name(le.orig_first_name_Invalid),Fields.InvalidMessage_orig_middle_name(le.orig_middle_name_Invalid),Fields.InvalidMessage_orig_last_name(le.orig_last_name_Invalid),Fields.InvalidMessage_mailing_street_addr_1(le.mailing_street_addr_1_Invalid),Fields.InvalidMessage_mailing_city_1(le.mailing_city_1_Invalid),Fields.InvalidMessage_mailing_state_1(le.mailing_state_1_Invalid),Fields.InvalidMessage_mailing_zip_code_1(le.mailing_zip_code_1_Invalid),Fields.InvalidMessage_phys_street_addr_2(le.phys_street_addr_2_Invalid),Fields.InvalidMessage_phys_city_2(le.phys_city_2_Invalid),Fields.InvalidMessage_phys_state_2(le.phys_state_2_Invalid),Fields.InvalidMessage_phys_zip_code_2(le.phys_zip_code_2_Invalid),Fields.InvalidMessage_orig_dl_number(le.orig_dl_number_Invalid),Fields.InvalidMessage_orig_dob(le.orig_dob_Invalid),Fields.InvalidMessage_orig_code_1(le.orig_code_1_Invalid),Fields.InvalidMessage_orig_code_2(le.orig_code_2_Invalid),Fields.InvalidMessage_orig_code_3(le.orig_code_3_Invalid),Fields.InvalidMessage_orig_code_4(le.orig_code_4_Invalid),Fields.InvalidMessage_orig_code_5(le.orig_code_5_Invalid),Fields.InvalidMessage_orig_code_6(le.orig_code_6_Invalid),Fields.InvalidMessage_orig_code_7(le.orig_code_7_Invalid),Fields.InvalidMessage_orig_code_8(le.orig_code_8_Invalid),Fields.InvalidMessage_orig_issue_date(le.orig_issue_date_Invalid),Fields.InvalidMessage_orig_expire_date(le.orig_expire_date_Invalid),Fields.InvalidMessage_med_cert_status(le.med_cert_status_Invalid),Fields.InvalidMessage_med_cert_type(le.med_cert_type_Invalid),Fields.InvalidMessage_med_cert_expire_date(le.med_cert_expire_date_Invalid),Fields.InvalidMessage_clean_name_first(le.clean_name_first_Invalid),Fields.InvalidMessage_clean_name_middle(le.clean_name_middle_Invalid),Fields.InvalidMessage_clean_name_last(le.clean_name_last_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.append_process_date_Invalid,le.orig_first_name_Invalid,le.mailing_street_addr_1_Invalid,le.mailing_city_1_Invalid,le.mailing_state_1_Invalid,le.mailing_zip_code_1_Invalid,le.phys_street_addr_2_Invalid,le.phys_city_2_Invalid,le.phys_state_2_Invalid,le.phys_zip_code_2_Invalid,le.orig_dl_number_Invalid,le.orig_dob_Invalid,le.orig_code_1_Invalid,le.orig_code_2_Invalid,le.orig_code_3_Invalid,le.orig_code_4_Invalid,le.orig_code_5_Invalid,le.orig_code_6_Invalid,le.orig_code_7_Invalid,le.orig_code_8_Invalid,le.orig_issue_date_Invalid,le.orig_expire_date_Invalid,le.med_cert_status_Invalid,le.med_cert_type_Invalid,le.med_cert_expire_date_Invalid,le.clean_name_first_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_append_process_date(le.append_process_date_Invalid),Fields.InvalidMessage_orig_first_name(le.orig_first_name_Invalid),Fields.InvalidMessage_mailing_street_addr_1(le.mailing_street_addr_1_Invalid),Fields.InvalidMessage_mailing_city_1(le.mailing_city_1_Invalid),Fields.InvalidMessage_mailing_state_1(le.mailing_state_1_Invalid),Fields.InvalidMessage_mailing_zip_code_1(le.mailing_zip_code_1_Invalid),Fields.InvalidMessage_phys_street_addr_2(le.phys_street_addr_2_Invalid),Fields.InvalidMessage_phys_city_2(le.phys_city_2_Invalid),Fields.InvalidMessage_phys_state_2(le.phys_state_2_Invalid),Fields.InvalidMessage_phys_zip_code_2(le.phys_zip_code_2_Invalid),Fields.InvalidMessage_orig_dl_number(le.orig_dl_number_Invalid),Fields.InvalidMessage_orig_dob(le.orig_dob_Invalid),Fields.InvalidMessage_orig_code_1(le.orig_code_1_Invalid),Fields.InvalidMessage_orig_code_2(le.orig_code_2_Invalid),Fields.InvalidMessage_orig_code_3(le.orig_code_3_Invalid),Fields.InvalidMessage_orig_code_4(le.orig_code_4_Invalid),Fields.InvalidMessage_orig_code_5(le.orig_code_5_Invalid),Fields.InvalidMessage_orig_code_6(le.orig_code_6_Invalid),Fields.InvalidMessage_orig_code_7(le.orig_code_7_Invalid),Fields.InvalidMessage_orig_code_8(le.orig_code_8_Invalid),Fields.InvalidMessage_orig_issue_date(le.orig_issue_date_Invalid),Fields.InvalidMessage_orig_expire_date(le.orig_expire_date_Invalid),Fields.InvalidMessage_med_cert_status(le.med_cert_status_Invalid),Fields.InvalidMessage_med_cert_type(le.med_cert_type_Invalid),Fields.InvalidMessage_med_cert_expire_date(le.med_cert_expire_date_Invalid),Fields.InvalidMessage_clean_name_first(le.clean_name_first_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.append_process_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.orig_first_name_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_middle_name_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.orig_last_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.mailing_street_addr_1_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.mailing_city_1_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.mailing_state_1_Invalid,'CUSTOM','UNKNOWN')
@@ -213,14 +195,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.med_cert_status_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.med_cert_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.med_cert_expire_date_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.clean_name_first_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.clean_name_middle_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.clean_name_last_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'append_process_date','orig_first_name','orig_middle_name','orig_last_name','mailing_street_addr_1','mailing_city_1','mailing_state_1','mailing_zip_code_1','phys_street_addr_2','phys_city_2','phys_state_2','phys_zip_code_2','orig_dl_number','orig_dob','orig_code_1','orig_code_2','orig_code_3','orig_code_4','orig_code_5','orig_code_6','orig_code_7','orig_code_8','orig_issue_date','orig_expire_date','med_cert_status','med_cert_type','med_cert_expire_date','clean_name_first','clean_name_middle','clean_name_last','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_Past_Date','invalid_orig_first_name','invalid_orig_middle_name','invalid_orig_last_name','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_numeric','invalid_Past_Date','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_Past_Date','invalid_General_Date','invalid_med_cert_status','invalid_med_cert_type','invalid_General_Date','invalid_clean_name_first','invalid_clean_name_middle','invalid_clean_name_last','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.append_process_date,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_middle_name,(SALT38.StrType)le.orig_last_name,(SALT38.StrType)le.mailing_street_addr_1,(SALT38.StrType)le.mailing_city_1,(SALT38.StrType)le.mailing_state_1,(SALT38.StrType)le.mailing_zip_code_1,(SALT38.StrType)le.phys_street_addr_2,(SALT38.StrType)le.phys_city_2,(SALT38.StrType)le.phys_state_2,(SALT38.StrType)le.phys_zip_code_2,(SALT38.StrType)le.orig_dl_number,(SALT38.StrType)le.orig_dob,(SALT38.StrType)le.orig_code_1,(SALT38.StrType)le.orig_code_2,(SALT38.StrType)le.orig_code_3,(SALT38.StrType)le.orig_code_4,(SALT38.StrType)le.orig_code_5,(SALT38.StrType)le.orig_code_6,(SALT38.StrType)le.orig_code_7,(SALT38.StrType)le.orig_code_8,(SALT38.StrType)le.orig_issue_date,(SALT38.StrType)le.orig_expire_date,(SALT38.StrType)le.med_cert_status,(SALT38.StrType)le.med_cert_type,(SALT38.StrType)le.med_cert_expire_date,(SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.clean_name_last,'***SALTBUG***');
+          ,CHOOSE(le.clean_name_first_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'append_process_date','orig_first_name','mailing_street_addr_1','mailing_city_1','mailing_state_1','mailing_zip_code_1','phys_street_addr_2','phys_city_2','phys_state_2','phys_zip_code_2','orig_dl_number','orig_dob','orig_code_1','orig_code_2','orig_code_3','orig_code_4','orig_code_5','orig_code_6','orig_code_7','orig_code_8','orig_issue_date','orig_expire_date','med_cert_status','med_cert_type','med_cert_expire_date','clean_name_first','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_Past_Date','invalid_orig_name','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_numeric','invalid_Past_Date','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_Past_Date','invalid_General_Date','invalid_med_cert_status','invalid_med_cert_type','invalid_General_Date','invalid_clean_name','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.append_process_date,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.mailing_street_addr_1,(SALT38.StrType)le.mailing_city_1,(SALT38.StrType)le.mailing_state_1,(SALT38.StrType)le.mailing_zip_code_1,(SALT38.StrType)le.phys_street_addr_2,(SALT38.StrType)le.phys_city_2,(SALT38.StrType)le.phys_state_2,(SALT38.StrType)le.phys_zip_code_2,(SALT38.StrType)le.orig_dl_number,(SALT38.StrType)le.orig_dob,(SALT38.StrType)le.orig_code_1,(SALT38.StrType)le.orig_code_2,(SALT38.StrType)le.orig_code_3,(SALT38.StrType)le.orig_code_4,(SALT38.StrType)le.orig_code_5,(SALT38.StrType)le.orig_code_6,(SALT38.StrType)le.orig_code_7,(SALT38.StrType)le.orig_code_8,(SALT38.StrType)le.orig_issue_date,(SALT38.StrType)le.orig_expire_date,(SALT38.StrType)le.med_cert_status,(SALT38.StrType)le.med_cert_type,(SALT38.StrType)le.med_cert_expire_date,(SALT38.StrType)le.clean_name_first,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,30,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,26,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -232,9 +212,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
           ,'append_process_date:invalid_Past_Date:CUSTOM'
-          ,'orig_first_name:invalid_orig_first_name:CUSTOM'
-          ,'orig_middle_name:invalid_orig_middle_name:CUSTOM'
-          ,'orig_last_name:invalid_orig_last_name:CUSTOM'
+          ,'orig_first_name:invalid_orig_name:CUSTOM'
           ,'mailing_street_addr_1:invalid_mandatory:CUSTOM'
           ,'mailing_city_1:invalid_mandatory:CUSTOM'
           ,'mailing_state_1:invalid_state:CUSTOM'
@@ -258,9 +236,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'med_cert_status:invalid_med_cert_status:ALLOW'
           ,'med_cert_type:invalid_med_cert_type:ALLOW'
           ,'med_cert_expire_date:invalid_General_Date:CUSTOM'
-          ,'clean_name_first:invalid_clean_name_first:CUSTOM'
-          ,'clean_name_middle:invalid_clean_name_middle:CUSTOM'
-          ,'clean_name_last:invalid_clean_name_last:CUSTOM'
+          ,'clean_name_first:invalid_clean_name:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -271,8 +247,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := CHOOSE(c
           ,Fields.InvalidMessage_append_process_date(1)
           ,Fields.InvalidMessage_orig_first_name(1)
-          ,Fields.InvalidMessage_orig_middle_name(1)
-          ,Fields.InvalidMessage_orig_last_name(1)
           ,Fields.InvalidMessage_mailing_street_addr_1(1)
           ,Fields.InvalidMessage_mailing_city_1(1)
           ,Fields.InvalidMessage_mailing_state_1(1)
@@ -297,8 +271,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_med_cert_type(1)
           ,Fields.InvalidMessage_med_cert_expire_date(1)
           ,Fields.InvalidMessage_clean_name_first(1)
-          ,Fields.InvalidMessage_clean_name_middle(1)
-          ,Fields.InvalidMessage_clean_name_last(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -309,8 +281,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulecnt := CHOOSE(c
           ,le.append_process_date_CUSTOM_ErrorCount
           ,le.orig_first_name_CUSTOM_ErrorCount
-          ,le.orig_middle_name_CUSTOM_ErrorCount
-          ,le.orig_last_name_CUSTOM_ErrorCount
           ,le.mailing_street_addr_1_CUSTOM_ErrorCount
           ,le.mailing_city_1_CUSTOM_ErrorCount
           ,le.mailing_state_1_CUSTOM_ErrorCount
@@ -335,8 +305,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.med_cert_type_ALLOW_ErrorCount
           ,le.med_cert_expire_date_CUSTOM_ErrorCount
           ,le.clean_name_first_CUSTOM_ErrorCount
-          ,le.clean_name_middle_CUSTOM_ErrorCount
-          ,le.clean_name_last_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -347,8 +315,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.append_process_date_CUSTOM_ErrorCount
           ,le.orig_first_name_CUSTOM_ErrorCount
-          ,le.orig_middle_name_CUSTOM_ErrorCount
-          ,le.orig_last_name_CUSTOM_ErrorCount
           ,le.mailing_street_addr_1_CUSTOM_ErrorCount
           ,le.mailing_city_1_CUSTOM_ErrorCount
           ,le.mailing_state_1_CUSTOM_ErrorCount
@@ -372,9 +338,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.med_cert_status_ALLOW_ErrorCount
           ,le.med_cert_type_ALLOW_ErrorCount
           ,le.med_cert_expire_date_CUSTOM_ErrorCount
-          ,le.clean_name_first_CUSTOM_ErrorCount
-          ,le.clean_name_middle_CUSTOM_ErrorCount
-          ,le.clean_name_last_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.clean_name_first_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)

@@ -232,8 +232,8 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
     Fields.InValid_append_process_date((SALT38.StrType)le.append_process_date),
     Fields.InValid_orig_first_name((SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_middle_name,(SALT38.StrType)le.orig_last_name),
-    Fields.InValid_orig_middle_name((SALT38.StrType)le.orig_middle_name,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_last_name),
-    Fields.InValid_orig_last_name((SALT38.StrType)le.orig_last_name,(SALT38.StrType)le.orig_first_name,(SALT38.StrType)le.orig_middle_name),
+    Fields.InValid_orig_middle_name((SALT38.StrType)le.orig_middle_name),
+    Fields.InValid_orig_last_name((SALT38.StrType)le.orig_last_name),
     Fields.InValid_mailing_street_addr_1((SALT38.StrType)le.mailing_street_addr_1),
     Fields.InValid_mailing_city_1((SALT38.StrType)le.mailing_city_1),
     Fields.InValid_mailing_state_1((SALT38.StrType)le.mailing_state_1),
@@ -259,9 +259,9 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     Fields.InValid_med_cert_expire_date((SALT38.StrType)le.med_cert_expire_date),
     Fields.InValid_name_suffix((SALT38.StrType)le.name_suffix),
     Fields.InValid_clean_name_prefix((SALT38.StrType)le.clean_name_prefix),
-    Fields.InValid_clean_name_first((SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.Clean_name_last),
-    Fields.InValid_clean_name_middle((SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.Clean_name_last),
-    Fields.InValid_clean_name_last((SALT38.StrType)le.clean_name_last,(SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle),
+    Fields.InValid_clean_name_first((SALT38.StrType)le.clean_name_first,(SALT38.StrType)le.clean_name_middle,(SALT38.StrType)le.clean_name_last),
+    Fields.InValid_clean_name_middle((SALT38.StrType)le.clean_name_middle),
+    Fields.InValid_clean_name_last((SALT38.StrType)le.clean_name_last),
     Fields.InValid_clean_name_suffix((SALT38.StrType)le.clean_name_suffix),
     Fields.InValid_clean_name_score((SALT38.StrType)le.clean_name_score),
     0);
@@ -276,7 +276,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_Past_Date','invalid_orig_first_name','invalid_orig_middle_name','invalid_orig_last_name','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_numeric','invalid_Past_Date','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_Past_Date','invalid_General_Date','invalid_med_cert_status','invalid_med_cert_type','invalid_General_Date','Unknown','Unknown','invalid_clean_name_first','invalid_clean_name_middle','invalid_clean_name_last','Unknown','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_Past_Date','invalid_orig_name','Unknown','Unknown','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_mandatory','invalid_mandatory','invalid_state','invalid_zip5','invalid_numeric','invalid_Past_Date','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_orig_code','invalid_Past_Date','invalid_General_Date','invalid_med_cert_status','invalid_med_cert_type','invalid_General_Date','Unknown','Unknown','invalid_clean_name','Unknown','Unknown','Unknown','Unknown');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_append_process_date(TotalErrors.ErrorNum),Fields.InValidMessage_orig_first_name(TotalErrors.ErrorNum),Fields.InValidMessage_orig_middle_name(TotalErrors.ErrorNum),Fields.InValidMessage_orig_last_name(TotalErrors.ErrorNum),Fields.InValidMessage_mailing_street_addr_1(TotalErrors.ErrorNum),Fields.InValidMessage_mailing_city_1(TotalErrors.ErrorNum),Fields.InValidMessage_mailing_state_1(TotalErrors.ErrorNum),Fields.InValidMessage_mailing_zip_code_1(TotalErrors.ErrorNum),Fields.InValidMessage_phys_street_addr_2(TotalErrors.ErrorNum),Fields.InValidMessage_phys_city_2(TotalErrors.ErrorNum),Fields.InValidMessage_phys_state_2(TotalErrors.ErrorNum),Fields.InValidMessage_phys_zip_code_2(TotalErrors.ErrorNum),Fields.InValidMessage_orig_dl_number(TotalErrors.ErrorNum),Fields.InValidMessage_orig_dob(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_1(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_2(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_3(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_4(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_5(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_6(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_7(TotalErrors.ErrorNum),Fields.InValidMessage_orig_code_8(TotalErrors.ErrorNum),Fields.InValidMessage_orig_issue_date(TotalErrors.ErrorNum),Fields.InValidMessage_orig_expire_date(TotalErrors.ErrorNum),Fields.InValidMessage_med_cert_status(TotalErrors.ErrorNum),Fields.InValidMessage_med_cert_type(TotalErrors.ErrorNum),Fields.InValidMessage_med_cert_expire_date(TotalErrors.ErrorNum),Fields.InValidMessage_name_suffix(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_prefix(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_first(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_middle(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_last(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_suffix(TotalErrors.ErrorNum),Fields.InValidMessage_clean_name_score(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

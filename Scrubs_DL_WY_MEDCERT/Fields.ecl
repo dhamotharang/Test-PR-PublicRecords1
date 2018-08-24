@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 34;
  
 // Processing for each FieldType
-EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_Past_Date','invalid_General_Date','invalid_orig_first_name','invalid_orig_middle_name','invalid_orig_last_name','invalid_numeric','invalid_mandatory','invalid_state','invalid_zip5','invalid_orig_code','invalid_med_cert_status','invalid_med_cert_type','invalid_clean_name_first','invalid_clean_name_middle','invalid_clean_name_last');
-EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_Past_Date' => 1,'invalid_General_Date' => 2,'invalid_orig_first_name' => 3,'invalid_orig_middle_name' => 4,'invalid_orig_last_name' => 5,'invalid_numeric' => 6,'invalid_mandatory' => 7,'invalid_state' => 8,'invalid_zip5' => 9,'invalid_orig_code' => 10,'invalid_med_cert_status' => 11,'invalid_med_cert_type' => 12,'invalid_clean_name_first' => 13,'invalid_clean_name_middle' => 14,'invalid_clean_name_last' => 15,0);
+EXPORT SALT38.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_Past_Date','invalid_General_Date','invalid_orig_name','invalid_numeric','invalid_mandatory','invalid_state','invalid_zip5','invalid_orig_code','invalid_med_cert_status','invalid_med_cert_type','invalid_clean_name');
+EXPORT FieldTypeNum(SALT38.StrType fn) := CASE(fn,'invalid_Past_Date' => 1,'invalid_General_Date' => 2,'invalid_orig_name' => 3,'invalid_numeric' => 4,'invalid_mandatory' => 5,'invalid_state' => 6,'invalid_zip5' => 7,'invalid_orig_code' => 8,'invalid_med_cert_status' => 9,'invalid_med_cert_type' => 10,'invalid_clean_name' => 11,0);
  
 EXPORT MakeFT_invalid_Past_Date(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
@@ -20,23 +20,11 @@ END;
 EXPORT InValidFT_invalid_General_Date(SALT38.StrType s) := WHICH(~Scrubs_DL_WY_MEDCERT.Functions.fn_valid_general_Date(s)>0);
 EXPORT InValidMessageFT_invalid_General_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.Functions.fn_valid_general_Date'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_orig_first_name(SALT38.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_orig_name(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_orig_first_name(SALT38.StrType s,SALT38.StrType orig_middle_name,SALT38.StrType orig_last_name) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,orig_middle_name,orig_last_name)>0);
-EXPORT InValidMessageFT_invalid_orig_first_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_orig_middle_name(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_orig_middle_name(SALT38.StrType s,SALT38.StrType orig_first_name,SALT38.StrType orig_last_name) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,orig_first_name,orig_last_name)>0);
-EXPORT InValidMessageFT_invalid_orig_middle_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_orig_last_name(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_orig_last_name(SALT38.StrType s,SALT38.StrType orig_first_name,SALT38.StrType orig_middle_name) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,orig_first_name,orig_middle_name)>0);
-EXPORT InValidMessageFT_invalid_orig_last_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_orig_name(SALT38.StrType s,SALT38.StrType orig_middle_name,SALT38.StrType orig_last_name) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,orig_middle_name,orig_last_name)>0);
+EXPORT InValidMessageFT_invalid_orig_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
@@ -83,28 +71,16 @@ END;
 EXPORT InValidFT_invalid_med_cert_type(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'A|I|N|'))));
 EXPORT InValidMessageFT_invalid_med_cert_type(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('A|I|N|'),SALT38.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_clean_name_first(SALT38.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_clean_name(SALT38.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_clean_name_first(SALT38.StrType s,SALT38.StrType clean_name_middle,SALT38.StrType Clean_name_last) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,clean_name_middle,Clean_name_last)>0);
-EXPORT InValidMessageFT_invalid_clean_name_first(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_clean_name_middle(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_clean_name_middle(SALT38.StrType s,SALT38.StrType clean_name_first,SALT38.StrType Clean_name_last) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,clean_name_first,Clean_name_last)>0);
-EXPORT InValidMessageFT_invalid_clean_name_middle(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_clean_name_last(SALT38.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_clean_name_last(SALT38.StrType s,SALT38.StrType clean_name_first,SALT38.StrType clean_name_middle) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,clean_name_first,clean_name_middle)>0);
-EXPORT InValidMessageFT_invalid_clean_name_last(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_clean_name(SALT38.StrType s,SALT38.StrType clean_name_middle,SALT38.StrType clean_name_last) := WHICH(~Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names(s,clean_name_middle,clean_name_last)>0);
+EXPORT InValidMessageFT_invalid_clean_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.CustomFail('Scrubs_DL_WY_MEDCERT.functions.fn_chk_people_names'),SALT38.HygieneErrors.Good);
  
 EXPORT SALT38.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'append_process_date','orig_first_name','orig_middle_name','orig_last_name','mailing_street_addr_1','mailing_city_1','mailing_state_1','mailing_zip_code_1','phys_street_addr_2','phys_city_2','phys_state_2','phys_zip_code_2','orig_dl_number','orig_dob','orig_code_1','orig_code_2','orig_code_3','orig_code_4','orig_code_5','orig_code_6','orig_code_7','orig_code_8','orig_issue_date','orig_expire_date','med_cert_status','med_cert_type','med_cert_expire_date','name_suffix','clean_name_prefix','clean_name_first','clean_name_middle','clean_name_last','clean_name_suffix','clean_name_score');
 EXPORT SALT38.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'append_process_date','orig_first_name','orig_middle_name','orig_last_name','mailing_street_addr_1','mailing_city_1','mailing_state_1','mailing_zip_code_1','phys_street_addr_2','phys_city_2','phys_state_2','phys_zip_code_2','orig_dl_number','orig_dob','orig_code_1','orig_code_2','orig_code_3','orig_code_4','orig_code_5','orig_code_6','orig_code_7','orig_code_8','orig_issue_date','orig_expire_date','med_cert_status','med_cert_type','med_cert_expire_date','name_suffix','clean_name_prefix','clean_name_first','clean_name_middle','clean_name_last','clean_name_suffix','clean_name_score');
 EXPORT FieldNum(SALT38.StrType fn) := CASE(fn,'append_process_date' => 0,'orig_first_name' => 1,'orig_middle_name' => 2,'orig_last_name' => 3,'mailing_street_addr_1' => 4,'mailing_city_1' => 5,'mailing_state_1' => 6,'mailing_zip_code_1' => 7,'phys_street_addr_2' => 8,'phys_city_2' => 9,'phys_state_2' => 10,'phys_zip_code_2' => 11,'orig_dl_number' => 12,'orig_dob' => 13,'orig_code_1' => 14,'orig_code_2' => 15,'orig_code_3' => 16,'orig_code_4' => 17,'orig_code_5' => 18,'orig_code_6' => 19,'orig_code_7' => 20,'orig_code_8' => 21,'orig_issue_date' => 22,'orig_expire_date' => 23,'med_cert_status' => 24,'med_cert_type' => 25,'med_cert_expire_date' => 26,'name_suffix' => 27,'clean_name_prefix' => 28,'clean_name_first' => 29,'clean_name_middle' => 30,'clean_name_last' => 31,'clean_name_suffix' => 32,'clean_name_score' => 33,0);
-EXPORT SET OF SALT38.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[],[]);
+EXPORT SET OF SALT38.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],[],[],['CUSTOM'],[],[],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -113,17 +89,17 @@ EXPORT Make_append_process_date(SALT38.StrType s0) := MakeFT_invalid_Past_Date(s
 EXPORT InValid_append_process_date(SALT38.StrType s) := InValidFT_invalid_Past_Date(s);
 EXPORT InValidMessage_append_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_Past_Date(wh);
  
-EXPORT Make_orig_first_name(SALT38.StrType s0) := MakeFT_invalid_orig_first_name(s0);
-EXPORT InValid_orig_first_name(SALT38.StrType s,SALT38.StrType orig_middle_name,SALT38.StrType orig_last_name) := InValidFT_invalid_orig_first_name(s,orig_middle_name,orig_last_name);
-EXPORT InValidMessage_orig_first_name(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_first_name(wh);
+EXPORT Make_orig_first_name(SALT38.StrType s0) := MakeFT_invalid_orig_name(s0);
+EXPORT InValid_orig_first_name(SALT38.StrType s,SALT38.StrType orig_middle_name,SALT38.StrType orig_last_name) := InValidFT_invalid_orig_name(s,orig_middle_name,orig_last_name);
+EXPORT InValidMessage_orig_first_name(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_name(wh);
  
-EXPORT Make_orig_middle_name(SALT38.StrType s0) := MakeFT_invalid_orig_middle_name(s0);
-EXPORT InValid_orig_middle_name(SALT38.StrType s,SALT38.StrType orig_first_name,SALT38.StrType orig_last_name) := InValidFT_invalid_orig_middle_name(s,orig_first_name,orig_last_name);
-EXPORT InValidMessage_orig_middle_name(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_middle_name(wh);
+EXPORT Make_orig_middle_name(SALT38.StrType s0) := s0;
+EXPORT InValid_orig_middle_name(SALT38.StrType s) := 0;
+EXPORT InValidMessage_orig_middle_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_orig_last_name(SALT38.StrType s0) := MakeFT_invalid_orig_last_name(s0);
-EXPORT InValid_orig_last_name(SALT38.StrType s,SALT38.StrType orig_first_name,SALT38.StrType orig_middle_name) := InValidFT_invalid_orig_last_name(s,orig_first_name,orig_middle_name);
-EXPORT InValidMessage_orig_last_name(UNSIGNED1 wh) := InValidMessageFT_invalid_orig_last_name(wh);
+EXPORT Make_orig_last_name(SALT38.StrType s0) := s0;
+EXPORT InValid_orig_last_name(SALT38.StrType s) := 0;
+EXPORT InValidMessage_orig_last_name(UNSIGNED1 wh) := '';
  
 EXPORT Make_mailing_street_addr_1(SALT38.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_mailing_street_addr_1(SALT38.StrType s) := InValidFT_invalid_mandatory(s);
@@ -225,17 +201,17 @@ EXPORT Make_clean_name_prefix(SALT38.StrType s0) := s0;
 EXPORT InValid_clean_name_prefix(SALT38.StrType s) := 0;
 EXPORT InValidMessage_clean_name_prefix(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_name_first(SALT38.StrType s0) := MakeFT_invalid_clean_name_first(s0);
-EXPORT InValid_clean_name_first(SALT38.StrType s,SALT38.StrType clean_name_middle,SALT38.StrType Clean_name_last) := InValidFT_invalid_clean_name_first(s,clean_name_middle,Clean_name_last);
-EXPORT InValidMessage_clean_name_first(UNSIGNED1 wh) := InValidMessageFT_invalid_clean_name_first(wh);
+EXPORT Make_clean_name_first(SALT38.StrType s0) := MakeFT_invalid_clean_name(s0);
+EXPORT InValid_clean_name_first(SALT38.StrType s,SALT38.StrType clean_name_middle,SALT38.StrType clean_name_last) := InValidFT_invalid_clean_name(s,clean_name_middle,clean_name_last);
+EXPORT InValidMessage_clean_name_first(UNSIGNED1 wh) := InValidMessageFT_invalid_clean_name(wh);
  
-EXPORT Make_clean_name_middle(SALT38.StrType s0) := MakeFT_invalid_clean_name_middle(s0);
-EXPORT InValid_clean_name_middle(SALT38.StrType s,SALT38.StrType clean_name_first,SALT38.StrType Clean_name_last) := InValidFT_invalid_clean_name_middle(s,clean_name_first,Clean_name_last);
-EXPORT InValidMessage_clean_name_middle(UNSIGNED1 wh) := InValidMessageFT_invalid_clean_name_middle(wh);
+EXPORT Make_clean_name_middle(SALT38.StrType s0) := s0;
+EXPORT InValid_clean_name_middle(SALT38.StrType s) := 0;
+EXPORT InValidMessage_clean_name_middle(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_name_last(SALT38.StrType s0) := MakeFT_invalid_clean_name_last(s0);
-EXPORT InValid_clean_name_last(SALT38.StrType s,SALT38.StrType clean_name_first,SALT38.StrType clean_name_middle) := InValidFT_invalid_clean_name_last(s,clean_name_first,clean_name_middle);
-EXPORT InValidMessage_clean_name_last(UNSIGNED1 wh) := InValidMessageFT_invalid_clean_name_last(wh);
+EXPORT Make_clean_name_last(SALT38.StrType s0) := s0;
+EXPORT InValid_clean_name_last(SALT38.StrType s) := 0;
+EXPORT InValidMessage_clean_name_last(UNSIGNED1 wh) := '';
  
 EXPORT Make_clean_name_suffix(SALT38.StrType s0) := s0;
 EXPORT InValid_clean_name_suffix(SALT38.StrType s) := 0;

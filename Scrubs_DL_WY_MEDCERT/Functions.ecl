@@ -41,15 +41,16 @@ EXPORT Functions := MODULE
 
 	END;
 
-  //****************************************************************************
+ //****************************************************************************
 	//fn_chk_people_names: returns true only for names of alpha and with special characters 
-	// returns false** for blank Or only allowed special[-.'&]characters in names,nothing else!
+	//returns false** for blanks (OR) only special characters in names with no valid data
+	//returns false for names those have only* middle name!
 	//****************************************************************************
-	EXPORT fn_chk_people_names(STRING f, STRING m= '', STRING l= '' ) := FUNCTION
+	EXPORT fn_chk_people_names(STRING str1, STRING str2= '', STRING str3= '' ) := FUNCTION
 
 		PatternValidChar		:= '[A-Z]|\\x2D|\\x2E|\\x27|\\x26|\\x20';//alpha or with [-.'& space] these characters allowed
-		name								:= ut.CleanSpacesAndUpper(f) + ut.CleanSpacesAndUpper(m) + ut.CleanSpacesAndUpper(l);	
-		RETURN IF(regexreplace(PatternValidChar, name, '')!='' or regexreplace('\\x2D|\\x2E|\\x27|\\x26', name, '')='', 0, 1);
+		name_str						:= ut.CleanSpacesAndUpper(str1) + ut.CleanSpacesAndUpper(str2) + ut.CleanSpacesAndUpper(str3);	
+		RETURN IF(regexreplace(PatternValidChar, name_str, '')!='' or regexreplace('\\x2D|\\x2E|\\x27|\\x26', name_str, '')='', 0, 1);
 
 	END;
 
