@@ -44,7 +44,6 @@ EXPORT Functions := MODULE
  //****************************************************************************
 	//fn_chk_people_names: returns true only for names of alpha and with special characters 
 	//returns false** for blanks (OR) only special characters in names with no valid data
-	//returns false for names those have only* middle name!
 	//****************************************************************************
 	EXPORT fn_chk_people_names(STRING str1, STRING str2= '', STRING str3= '' ) := FUNCTION
 
