@@ -256,7 +256,11 @@ dSuppressRecs				:=
 	// LNK-1494	Non-FCRA - Alive Consumer marked as deceased
 				{/*'000000000000'*/'', 0, '20130524', ' ', ' ', /*'563392477'*/'', 'KHOURI              ', '    ', 'NABIL          ', 'ADIB           ', ' ', '20040116', '        ', '06', '     ', '     ', 'CA', '   ', '  ', 'Y', 'CAL', 'CA00000002765897', 'D0', 'N'},
 	//	LNK-1285	Ohio National Life - 1765801 Miguel Nunez Jr.
-    {'001691940595', 100, '20180619', ' ', ' ', '266712661', 'NUNEZ               ', '    ', 'MIGUEL         ', 'ANGEL          ', ' ', '20120903', '        ', '12', '33133', '     ', 'FL', '086', '  ', 'N', 'ENC', /*'001691940595NENC'*/'', '64', 'N'}
+    {'001691940595', 100, '20180619', ' ', ' ', '266712661', 'NUNEZ               ', '    ', 'MIGUEL         ', 'ANGEL          ', ' ', '20120903', '        ', '12', '33133', '     ', 'FL', '086', '  ', 'N', 'ENC', /*'001691940595NENC'*/'', '64', 'N'},
+	// LNK-1816 Consumer being reported with two DODs.
+		{/*'001856332815'*/'', 100, '20180621', ' ', ' ', '         ', 'NOTTINGHAM          ', '    ', 'RICHARD        ', 'E              ', ' ', '20180531', '19470210', '40', '     ', '     ', 'OK', '   ', '  ', 'N', 'OBD', 'OB00000040823558', 'OB', 'N'},
+	// LNK-1854	Overlinking of Death record to LexID 153361926277 Bennie
+		{/*'153361926277'*/'', 97, '20180629', 'A', 'A', '567180654', 'BENNIE              ', '    ', 'ANDREW         ', 'ADAIR          ', ' ', '19441219', '00000000', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'567180654B441219'*/'', 'DE', 'N'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

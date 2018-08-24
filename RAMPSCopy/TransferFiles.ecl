@@ -1,6 +1,7 @@
 ﻿import did_add, dops, lib_fileservices, STD, lib_stringlib;
 EXPORT TransferFiles(string destenv = '',integer noofgens = 2, boolean useeclcccluster = true) := module
 
+	
 	export clustertorun := if (useeclcccluster, STD.system.Job.Target(),'hthor');
 
 	export RoxiePackage(string esp, string port, string target, boolean iscopy = false) := function
@@ -383,7 +384,7 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2, boolean useeclccc
 																				,RAMPSCopy.constants(destenv).rFromEmail
 																			),
 																output(RAMPSCopy.WorkUnitModule(RAMPSCopy.constants(destenv).boca.srcesp,RAMPSCopy.constants(destenv).boca.port).fSubmitNewWorkunit(
-																	'#workunit(\'name\',\'Copy Files to RAMPS '+ stringlib.StringToUpperCase(destenv) +' thor\')\r\n'+
+																	'#workunit(\'name\',\''+ STD.system.Job.Name() +'\')\r\n'+
 																	'Rampscopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').begincopy : WHEN(CRON(\'0 17,21 * * *\'));',clustertorun))
 																)
 														);
