@@ -14,7 +14,6 @@ export Build_All(
 	,boolean															PSkipKnownFraudBase				= false 
 	,boolean															PSkipAddressCache					= false 
 	,boolean															PSkipMainBase           		= false 
-	,boolean															PSkipKelBase           		= false 
  	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
@@ -55,7 +54,6 @@ module
 				,PSkipKnownFraudBase
 				,PSkipAddressCache
 				,PSkipMainBase
-				,PSkipKelBase
 				//Base
 				,pBaseMainFile	
 				//IdentityData 
