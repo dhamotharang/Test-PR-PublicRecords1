@@ -1,5 +1,5 @@
 ﻿import header,relationship;
-r := relationship.file_relative;
+r := pull(Relationship.key_relatives_v3)(type in ['PERSONAL','TRANS CLOSURE'] and confidence in ['MEDIUM','HIGH']);
 
 rp := record
   unsigned6 person1;

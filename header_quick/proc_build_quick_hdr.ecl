@@ -170,7 +170,7 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 										,Proc_Accept_SRC_toQA(filedate)
 										,proc_build_ssn_suppression(filedate)
 										,proc_build_current_wa_residents_file 
-										,SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs,oQH_nonitems,oQHS_nonitems)
+										,SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs)
 	  								//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 										);										 
 end;
