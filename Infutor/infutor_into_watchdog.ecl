@@ -1,7 +1,7 @@
-import watchdog , header,ut ; 
+﻿import watchdog , header,ut ; 
 
 infutor_tracker_in := Infutor.File_Infutor_DID(did > 0  and name_type[1] ='O' and addr_type[1] ='O') ; 
-
+infutor_cversion := Infutor._config.get_cversion_dev;
 header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l,unsigned6 c) := transform
 
 	self.did := l.did;
