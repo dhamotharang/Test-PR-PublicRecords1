@@ -1,6 +1,7 @@
 ﻿import watchdog , header,ut ; 
 
 infutor_tracker_in := Infutor.File_Infutor_DID(did > 0  and name_type[1] ='O' and addr_type[1] ='O') ; 
+// ***  MAG 8/26/2018 - made change to get the current date from file as the attribute was deprecated
 infutor_cversion := Infutor._config.get_cversion_dev;
 header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l,unsigned6 c) := transform
 
@@ -12,8 +13,8 @@ header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l,
 	self.src := 'IF';
 	self.dt_first_seen := if( (unsigned3)l.last_activity_dt[1..6] < (unsigned3)l.effective_dt[1..6] , (unsigned3)l.last_activity_dt[1..6],  (unsigned3)l.effective_dt[1..6]); 
 	self.dt_last_seen :=  if( (unsigned3)l.last_activity_dt[1..6] < (unsigned3)l.effective_dt[1..6] ,(unsigned3)l.effective_dt[1..6], (unsigned3)l.last_activity_dt[1..6]);
-	self.dt_vendor_last_reported := (unsigned3)infutor.version[1..6];
-	self.dt_vendor_first_reported := (unsigned3)infutor.version[1..6];
+	self.dt_vendor_last_reported := (unsigned3)infutor_cversion [1..6];
+	self.dt_vendor_first_reported := (unsigned3)infutor_cversion [1..6];
 	self.dt_nonglb_last_seen := 0;
 	self.rec_type := '' ; // there are some old addresses in original address field
 	self.vendor_id := (qstring18)l.boca_id;
