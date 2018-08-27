@@ -3,7 +3,7 @@ EXPORT Proc_Build_Calbus_all(
 	STRING filedate,
 	STRING thorName,
 	STRING hostname,
-	STRING source = '/data/data_build_1/calbus/data/',
+	STRING source = '/data/data_build_1/calbus/data',
 	STRING filename
 ) := FUNCTION
 
