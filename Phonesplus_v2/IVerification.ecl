@@ -23,7 +23,7 @@ Implementation:
 4- Keep history of the data that has been verified
 */
 
-import gong_v2, doxie, ut,didville,_Control;
+import gong_v2, doxie, ut,didville,_Control,Relationship;
 shared reformat(ds, ds_source, record_type, did_field, orig_did_field, phone_field) := functionmacro
 #uniquename(t_reformat)
 
