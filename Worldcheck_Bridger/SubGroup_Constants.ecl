@@ -1078,6 +1078,7 @@
 		export string KEYWORD_USSSR									:= '766';
 		export string KEYWORD_INNHB									:= '767';
 		export string KEYWORD_PEMINJUS							:= '768';
+		export string KEYWORD_EUFSR_RUS_50_WC				:= '769';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
