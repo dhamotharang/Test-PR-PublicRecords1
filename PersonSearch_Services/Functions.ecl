@@ -1,5 +1,5 @@
-﻿import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID, BankruptcyV3, FCRA, STD,
-       PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
+﻿﻿import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID, BankruptcyV3, FCRA, STD,
+       BankruptcyV3_Services, PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
 
 export Functions := MODULE
 	
@@ -1552,9 +1552,19 @@ export Functions := MODULE
                                       SELF.tmsid := RIGHT.tmsid,
                                       SELF       := LEFT),
                             LEFT OUTER,
-                            LIMIT(0), KEEP(1));
+                            LIMIT(100, SKIP)); //Limiting to 100 so as to not pull "Too Many" attorney records limitng the performance
 
-    dBankruptcyMain := JOIN(dBankruptcyIds, BankruptcyV3.key_bankruptcyV3_main_full(),
+    // Join to party index and only look for debtors
+    dBankruptcyParty := JOIN(dBankruptcyIds, BankruptcyV3.key_bankruptcyv3_search_full_bip(),
+                              KEYED(LEFT.tmsid = RIGHT.tmsid) AND
+                              (unsigned)LEFT.UniqueId = (unsigned)RIGHT.did AND
+                              RIGHT.name_type = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR,
+                              TRANSFORM(rPickListBankruptcy, SELF := LEFT),
+                              LEFT OUTER,
+                              LIMIT(0), KEEP(1));
+
+    // Join to the main file to get the filing date information and check if it falls within the FCRA limits
+    dBankruptcyMain := JOIN(dBankruptcyParty, BankruptcyV3.key_bankruptcyV3_main_full(),
                             KEYED(LEFT.tmsid = RIGHT.tmsid) AND fcra.bankrupt_is_ok((string)STD.Date.Today(), right.date_filed),
                             TRANSFORM(rPickListBankruptcy,
                                       SELF._HasBankruptcy := RIGHT.tmsid != '',
@@ -1563,7 +1573,7 @@ export Functions := MODULE
                             LEFT OUTER,
                             LIMIT(0), KEEP(1));
     
-    RETURN dBankruptcyMain;
+    RETURN DEDUP(SORT(dBankruptcyMain, UniqueId, IF(_HasBankruptcy, 0, 1)), UniqueId);
   END;
 
 end;
