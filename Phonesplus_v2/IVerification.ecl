@@ -83,7 +83,7 @@ pplus_rollup := rollup(pplus_r, t_rollup_dts1(left, right),
 
 all_phones := dedup(sort(distribute((gong_rollup + pplus_rollup), hash(did)), did, phone, file_source, local), did, phone, local);
 //-----------------------get spouse
-rels_by_spouse := //doxie.Key_Relatives(prim_range = -7);
+rels_by_spouse := //doxie.Key_Relatives(prim_range = -7); VC: //v2 key is being sunset. DF-22765
                   Relationship.key_relatives_v3 (type in ['PERSONAL','TRANS CLOSURE'], confidence in ['MEDIUM','HIGH'], isanylnamematch, title in [2,3,4,8,9]);
 
 spouse_in_person1 := join(distribute(rels_by_spouse, hash(did1)),

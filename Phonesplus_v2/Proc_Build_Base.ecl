@@ -1,5 +1,5 @@
 ﻿import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
-#option('multiplePersistInstances',FALSE);
+#option('multiplePersistInstances',FALSE); //email_data attributes is overwriting this to false so setting it again here. DF-22765
 export Proc_build_base(string pversion,string emailList=''):=function
 //-------Concatenate all Pplus sources in a common layout---------------------------------
 pplus_sources := 
