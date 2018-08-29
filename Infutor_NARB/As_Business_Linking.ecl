@@ -65,7 +65,7 @@ EXPORT As_Business_Linking (
 				self.dt_first_seen               := l.dt_first_seen;
 				self.dt_last_seen                := l.dt_last_seen;
 				self.dt_vendor_last_reported     := l.dt_vendor_last_reported;
-				self.dt_vendor_first_reported    := l.dt_vendor_last_reported;
+				self.dt_vendor_first_reported    := l.dt_vendor_first_reported;
 				self.current					           := true;
 				self.dppa						             := false;
 				self.contact_did                 := l.did;

@@ -2,6 +2,7 @@
 #stored ('buildname', 'header_incremental_keys'   ); 
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com');
 string  emailList  := ''  :stored('emailList');
+string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Prasanna.Kolli@lexisnexisrisk.com';
 import Header,_control,std,InsuranceHeader;
 
 wk:=workunit;
@@ -30,7 +31,7 @@ update_inc_idl := sequential(
 
 filedate:=Header.Proc_Copy_From_Alpha_Incrementals().filedate;
 
-build_inc_key:= sequential(
+build_iDid := sequential(
                 header.LogBuild.single('STARTED:iDid'),
                 std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header'),
                 std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
@@ -39,9 +40,17 @@ build_inc_key:= sequential(
                 header.LogBuild.single('COMPLETED:iDid')
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iDid:'+workunit,wLink));
 
+build_fcra := sequential(
+                header.LogBuild.single('start:iFCRA'),
+                Doxie.Proc_FCRA_Doxie_keys_All(,true),
+                header.LogBuild.single('end:iFCRA'),
+                ):failure(std.system.Email.SendEmail(emailList,'FAILED:iFCRA:'+workunit,wLink));
+
+build_inc_key := sequential(build_iDid, build_fcra);
+
 update_all:=    sequential(
                 header.LogBuild.single('STARTED:iUpdate'),
-                Header.Proc_Copy_From_Alpha_Incrementals().deploy,
+                Header.Proc_Copy_From_Alpha_Incrementals().deploy(emailList,rpt_qa_email_list),
                 output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after')),
                 header.LogBuild.single('COMPLETED:iUpdate')
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iUpdate:'+workunit,''));

@@ -1,4 +1,4 @@
-IMPORT	AID_Build,	versioncontrol,	RoxieKeyBuild,	_control, STD,	BuildLogger;
+﻿IMPORT	AID_Build,	versioncontrol,	dops,	_control, STD,	BuildLogger, Orbit3;
 
 EXPORT	proc_Build_All(
 					STRING	pVersion		=	(STRING8)Std.Date.Today(),
@@ -10,7 +10,7 @@ EXPORT	proc_Build_All(
 #STORED ('job_name', _Dataset().Name+'Build');
 	
 	//	DOPS Commands (Non-FCRA & FCRA
-	EXPORT	dops_update				:=	RoxieKeyBuild.updateversion(
+	EXPORT	dops_update				:=	dops.updateversion(
 																	'AddressLineAIDKeys' 								//	Dataset name
 																	,pVersion														//	uversion
 																	,_Control.MyInfo.EmailAddressNotify	//	email_t
@@ -24,7 +24,7 @@ EXPORT	proc_Build_All(
 																	,																		//	updateflag = 'F'
 																	,																		//	dops.constants.dopsenvironment
 																); 															
-	EXPORT	dops_update_FCRA	:=	RoxieKeyBuild.updateversion(
+	EXPORT	dops_update_FCRA	:=	dops.updateversion(
 																	'FCRA_AddressLineAIDKeys' 					//	Dataset name
 																	,pVersion														//	uversion
 																	,_Control.MyInfo.EmailAddressNotify	//	email_t
@@ -39,6 +39,8 @@ EXPORT	proc_Build_All(
 																	,																		//	dops.constants.dopsenvironment
 																); 															
 
+	EXPORT	orbit_entry	:=	Orbit3.proc_Orbit3_CreateBuild('Address Line',pVersion,'N');
+	
 	//	All filenames associated with this Dataset
 	SHARED	dAll_filenames	:=	Keynames().dAll_filenames
 															// +	Keynames(,,TRUE).dAll_filenames	//	FCRA
@@ -59,6 +61,7 @@ EXPORT	proc_Build_All(
 			PARALLEL(
 				dops_update
 				// ,dops_update_FCRA
+				,orbit_entry
 			)
 		),
 		BuildLogger.PostEnd(FALSE),

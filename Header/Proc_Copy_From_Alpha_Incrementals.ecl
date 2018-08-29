@@ -240,15 +240,23 @@ elist:= _control.MyInfo.EmailAddressNotify
 // KEEP LINE BELOW UNTL you can make sure the named variables udops call is working properly
 // udops := Roxiekeybuild.updateversion('PersonLabKeys'        ,'20170901',elist,,'N',,,,,,'DR'); // header // PersonXLAB
 
-SHARED udops := dops.updateversion(
+SHARED udops := sequential(
+                dops.updateversion(
 
                                      l_datasetname:='PersonLabKeys' // Name of the package to update
                                     ,l_uversion   :=filedate        // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
-                                    ,l_updateflag :='DR'            // Delta Replace
-                                    );
+                                    ,l_updateflag :='DR'            // Delta Replace (must sepcify, because default is FULL)
+                                    ),
 
+                dops.updateversion(
+                                     l_datasetname:='FCRA_PersonHeaderKeys' // Name of the package to update
+                                    ,l_uversion   :=filedate                // Version to update to
+                                    ,l_email_t    :=elist                   // Who to email
+                                    ,l_inenvment  :='F'                     // FCRA
+                                  )
+                );
 
 SHARED orbit_update_entries(string createORupdate) := function
 
@@ -285,8 +293,14 @@ SHARED orbit_update_entries(string createORupdate) := function
     end;
     
     RETURN if (createORupdate='create',
-                        output(create_entry('PersonXLAB_Inc'            ,filedate)),
-                        output(update_entry('PersonXLAB_Inc'            ,filedate,'N'))
+                        sequential(
+                                output(create_entry('PersonXLAB_Inc'            ,filedate)),
+                                output(create_entry('FCRA_Header'               ,filedate))
+                        ),
+                        sequential(
+                                output(update_entry('PersonXLAB_Inc'            ,filedate,'N')),
+                                output(update_entry('FCRA_Header'               ,filedate,'N'))
+                        )
                );
  
 end;
@@ -300,7 +314,7 @@ EXPORT Refresh_copy :=  if(
 
 copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
 
-EXPORT deploy := sequential(
+EXPORT deploy(string emailList,string rpt_qa_email_list) := sequential(
 
                 // The following can only copy after the key is built in Boca
                 fc6(fName(filedate, '::did')                ,fName6(filedate, '::did')),
@@ -309,6 +323,20 @@ EXPORT deploy := sequential(
                 udops,
                 orbit_update_entries('create'),
                 orbit_update_entries('update'),
+                std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
+                     
+                     'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
+                    +'\n\n'
+                    +'PersonXLAB_Inc\n'
+                    +'FCRA_Header\n'
+                    +'\n'
+                    +'Deployment version: '+filedate+'\n'
+                    +'\n'
+                    +'Corespondiong Orbit entries have been created and updated.\n'
+                    +'\n'
+                    +'If you have any question or concerns please contact:\n'
+                    +emailList
+                    +'\nThank you,')
                 // copy_to_dataland;
 );
 END;
