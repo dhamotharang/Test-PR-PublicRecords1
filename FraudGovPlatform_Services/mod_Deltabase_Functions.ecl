@@ -5,6 +5,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		SHARED Layout_LogDeltabase := FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record;
 		SHARED Layout_DeltabaseSelect := FraudShared_Services.Layouts.t_DeltaBaseSelectRequest;
 		SHARED Layout_DeltabaseResponse := FraudGovPlatform_Services.Layouts.response_deltabase_layout;
+		SHARED Fraud_Platform := FraudShared_Services.Constants.Platform.FraudGov;
 		SHARED serviceUrl := batch_params.gateways(servicename = Gateway.Constants.ServiceName.FraudGovDeltabase)[1].Url;
 		
 		SHARED DeltabaseSoapcall(DATASET(Layout_DeltabaseSelect) readDeltabase) := FUNCTION
@@ -91,29 +92,130 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 	
 	SHARED DeltabaseMBSFilter(DATASET(Layout_LogDeltabase) deltabase_recs) := FUNCTION
 			
-			Layout_Deltabase_w_product_code := RECORD
-				INTEGER product_code;
-				INTEGER ind_type_id;
+			Layout_Deltabase_for_mbs := RECORD
+				UNSIGNED product_code;
+				UNSIGNED ind_type_id;
+				UNSIGNED fdn_file_info_id;
+				STRING100 fdn_file_code;
+				UNSIGNED product_include;
 				Layout_LogDeltabase deltadata;
 			END;			
 			
-			Layout_Deltabase_w_product_code xForm_AddProductCode(Layout_LogDeltabase L) := TRANSFORM
+			Layout_Deltabase_for_mbs xForm_AddProductCode(Layout_LogDeltabase L) := TRANSFORM
 				SELF.product_code := batch_params.ProductCode;
 				SELF.ind_type_id := batch_params.IndustryType;
 				SELF.deltadata := L;
+				SELF := [];
 			END;
 			
 			delta_w_filter := PROJECT(deltabase_recs, xForm_AddProductCode(LEFT));
 			
-			delta_mbs_filtered := JOIN(delta_w_filter, FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM),
-																KEYED(LEFT.deltadata.gc_id = (STRING)RIGHT.gc_id AND
-																			LEFT.ind_type_id = RIGHT.ind_type) AND
-																		  RIGHT.product_include = FraudShared_Services.Constants.PRODUCT_INCLUDE_CODE_ALL,
-																TRANSFORM(Layout_LogDeltabase,
-																					SELF := LEFT.deltadata),
+			mbs_delta_key := FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+			
+			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(Layout_Deltabase_for_mbs L, 
+																																			mbs_delta_key R) := TRANSFORM
+				SELF.Record_ID := (INTEGER)L.deltadata.cust_transaction_id;
+				SELF.Customer_ID := L.deltadata.gc_id;
+				SELF.Event_Date := L.deltadata.date_added[1..4] + L.deltadata.date_added[6..7] + L.deltadata.date_added[9..10];
+				SELF.Investigation_Referral_Case_ID := L.deltadata.case_id;
+				SELF.Customer_Person_ID := L.deltadata.client_uid;
+				SELF.SSN := L.deltadata.SSN;
+				SELF.DOB := L.deltadata.DOB;
+				SELF.UID := L.deltadata.lex_id;
+				SELF.raw_Full_name := L.deltadata.name_full;
+				SELF.raw_title := L.deltadata.name_prefix;
+				SELF.raw_first_name := L.deltadata.name_first;
+				SELF.raw_middle_name := L.deltadata.name_middle;
+				SELF.raw_last_name := L.deltadata.name_last;
+				SELF.raw_orig_suffix := L.deltadata.name_suffix;
+				SELF.Street_1 := L.deltadata.physical_address;
+				SELF.City := L.deltadata.physical_city;
+				SELF.State := L.deltadata.physical_state;
+				SELF.Zip := L.deltadata.physical_zip;
+				SELF.phone_number := L.deltadata.phone;
+				SELF.UltID := L.deltadata.UltID;
+				SELF.OrgID := L.deltadata.OrgId;
+				SELF.SeleID := L.deltadata.SeleID;
+				SELF.tin := L.deltadata.tin;
+				SELF.email_address := L.deltadata.email_address;
+				SELF.Appended_Provider_ID := L.deltadata.appendedProviderID;
+				SELF.lnpid := L.deltadata.lnpid;
+				SELF.npi := L.deltadata.NPI;
+				SELF.IP_Address := L.deltadata.ip_address;
+				SELF.Device_ID := L.deltadata.Device_ID;
+				SELF.Professional_ID := L.deltadata.professional_id;
+				SELF.bank_routing_number_1 := L.deltadata.bank_routing_number;
+				SELF.bank_account_number_1 := L.deltadata.bank_account_number;
+				SELF.Drivers_License := L.deltadata.dl_number;
+				SELF.Drivers_License_State := L.deltadata.dl_state;
+				SELF.GPS_coordinates := L.deltadata.geo_lat + ',' + L.deltadata.geo_long;
+				
+				SELF.classification_Permissible_use_access := R;
+
+				SELF := [];
+			END;
+			
+			delta_w_fdn_file_info := JOIN(delta_w_filter, mbs_delta_key,
+																	KEYED(LEFT.deltadata.gc_id = (STRING)RIGHT.gc_id) AND
+																				LEFT.deltadata.program_name = RIGHT.ind_type_description AND
+																				RIGHT.product_include = FraudShared_Services.Constants.PRODUCT_INCLUDE_CODE_ALL,
+																xform_create_mbs_in(LEFT,RIGHT),
 																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)
 																);
 																
+			payload_mbs_filtered := FraudShared_Services.FilterThruMBS(delta_w_fdn_file_info,batch_params.GlobalCompanyId,batch_params.IndustryType,
+																															batch_params.ProductCode, 
+																															DATASET([],iesp.frauddefensenetwork.t_FDNIndType),
+																															DATASET([],iesp.frauddefensenetwork.t_FDNFileType),
+																															fraud_platform);
+																															
+			Layout_LogDeltabase xForm_PayloadToDelta(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+				SELF.cust_transaction_id := (STRING)L.Record_ID;
+				SELF.gc_id := L.Customer_ID;
+				SELF.date_added := L.Event_Date;
+				SELF.case_id := L.Investigation_Referral_Case_ID;
+				SELF.client_uid := L.Customer_Person_ID;
+				SELF.SSN := L.SSN;
+				SELF.DOB := L.DOB;
+				SELF.lex_id := L.UID;
+				SELF.name_full := L.raw_Full_name;
+				SELF.name_prefix := L.raw_title;
+				SELF.name_first := L.raw_first_name;
+				SELF.name_middle := L.raw_middle_name;
+				SELF.name_last := L.raw_last_name;
+				SELF.name_suffix := L.raw_orig_suffix;
+				SELF.physical_address := L.Street_1;
+				SELF.physical_city := L.City;
+				SELF.physical_state := L.State;
+				SELF.physical_zip := L.Zip;
+				SELF.phone := L.phone_number;
+				SELF.UltID := L.UltID;
+				SELF.OrgId := L.OrgID;
+				SELF.SeleID := L.SeleID;
+				SELF.tin := L.tin;
+				SELF.email_address := L.email_address;
+				SELF.appendedProviderID := L.Appended_Provider_ID;
+				SELF.lnpid := L.lnpid;
+				SELF.NPI := L.npi;
+				SELF.ip_address := L.IP_Address;
+				SELF.Device_ID := L.Device_ID;
+				SELF.professional_id := L.Professional_ID;
+				SELF.bank_routing_number := L.bank_routing_number_1;
+				SELF.bank_account_number := L.bank_account_number_1;
+				SELF.dl_number := L.Drivers_License;
+				SELF.dl_state := L.Drivers_License_State;
+				SELF.geo_lat := regexfind('(.*),(.*)$',L.GPS_coordinates,1);
+				SELF.geo_long := regexfind('(.*),(.*)$',L.GPS_coordinates,2);
+				SELF := [];
+			END;
+			
+			delta_mbs_filtered := PROJECT(payload_mbs_filtered,xForm_PayloadToDelta(LEFT));
+																					
+			// output(deltabase_recs,named('deltabase_recs'));
+			// output(delta_w_fdn_file_info,named('delta_w_fdn_file_info'));
+			// output(payload_mbs_filtered,named('payload_mbs_filtered'));
+			// output(delta_mbs_filtered,named('delta_mbs_filtered'));
+			
 			return delta_mbs_filtered;
 	END;
 
@@ -180,9 +282,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			Layout_DeltabaseSelect xRead_report(FraudGovPlatform_Services.Layouts.Layout_delta_filter L) := TRANSFORM
 				SELF.Select := 	
 					'SELECT * FROM delta_fraudgov.delta_identity WHERE '
-					+ ' gc_id = ' + batch_params.GlobalCompanyId
-					+ ' AND program_name = ' + FraudShared_Services.Utilities.dqString(batch_params.IndustryTypeName)
-					+ ' AND date_added >= "' + L.date_added + '"'
+					+ ' date_added >= "' + L.date_added + '"'
 					+ ' AND ( '
 					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.ssn) + ') > 0 AND ssn= ' + FraudShared_Services.Utilities.dqString(L.ssn) + ') OR ' 
 					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.dob)+ ') > 0 AND dob= ' + FraudShared_Services.Utilities.dqString(L.dob)+ ' ) OR '
@@ -287,8 +387,8 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		
 			Layout_DeltabaseSelect xRead_search() := TRANSFORM
 				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
-					+ ' gc_id = ' + batch_params.GlobalCompanyId
-					+ ' AND program_name = ' + FraudShared_Services.Utilities.dqString(TRIM(batch_params.IndustryTypeName))
+					// + ' gc_id = ' + batch_params.GlobalCompanyId
+					// + ' AND program_name = ' + FraudShared_Services.Utilities.dqString(TRIM(batch_params.IndustryTypeName))
 					+ ' AND date_added >= ' + last_data_build_date
 					+ FraudGovPlatform_Services.Constants.limiter;
 			END;
