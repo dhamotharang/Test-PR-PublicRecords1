@@ -230,7 +230,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	// but when tracking use, using super 
 	////////////////////////////////////////////////////
 	export dGetInfo(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) 
-																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '');
+																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '' and length(datetime) = 14);
 	
 	////////////////////////////////////////////////////
 	// move all track logical files into "using" super
