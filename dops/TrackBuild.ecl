@@ -407,7 +407,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																					output(dDopsBTUpdate,named('ERRORS'))
 																					,STD.System.Email.SendEmail(toemaillist
 																						,'SOAPCALL ERRORS: Build Tracking job'
-																						,'Check ' + SU_FileTrackBuild(FileInfoPrefix) + '::persist, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
+																						,'Check ERRORS result, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
 																						,
 																						,
 																						,fromemail)
