@@ -389,7 +389,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
 					// + ' gc_id = ' + batch_params.GlobalCompanyId
 					// + ' AND program_name = ' + FraudShared_Services.Utilities.dqString(TRIM(batch_params.IndustryTypeName))
-					+ ' AND date_added >= ' + last_data_build_date
+					+ ' date_added >= ' + last_data_build_date
 					+ FraudGovPlatform_Services.Constants.limiter;
 			END;
 			
