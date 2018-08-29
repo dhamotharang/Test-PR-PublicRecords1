@@ -4,7 +4,7 @@
 IMPORT _control,address;
 
 srcIP											:=	_control.IPAddress.bctlpedata11;
-targetGrp									:=	'thor400_66';
+targetGrp									:=	'thor400_36';
 superfile_raw							:=	'~thor_data400::in::vehiclev2::di::oh_raw';
 superfile									:=	'~thor_data400::in::vehiclev2::di::oh';
 superfile_archive					:=	'~thor_data400::in::vehiclev2::di::oh_father';
