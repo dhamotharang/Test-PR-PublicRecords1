@@ -10,10 +10,10 @@ export proc_deathmaster_buildkey_ssa(string filedate) := function
 	set of string key_DeathMaster_InputSet:=['l_did','did','did_score','filedate','rec_type','rec_type_orig','ssn','lname','name_suffix','fname','mname','vorp_code','dod8','dob8','st_country_code','zip_lastres','zip_lastpayment','state','fipscounty','state_death_flag','death_rec_src','src','glb_flag','county_name'];
 
 	DeltaCommands:=sequential(
-	DOPSGrowthCheck.CalculateStats('FCRA_DeathMasterKeys','doxie.key_death_masterv2_did_fcra','key_death_master',filename,'l_did','state_death_id','','','','',filedate,father_filedate, false, true),
-	DOPSGrowthCheck.DeltaCommand(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',filedate,father_filedate,key_DeathMaster_InputSet, false, true),
-	DOPSGrowthCheck.ChangesByField(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id','',filedate,father_filedate, false, true),
-	DopsGrowthCheck.PersistenceCheck(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',key_DeathMaster_InputSet,key_DeathMaster_InputSet,filedate,father_filedate, false, true),
+	DOPSGrowthCheck.CalculateStats('FCRA_DeathMasterKeys','doxie.key_death_masterv2_did_fcra','key_death_master',filename,'l_did','state_death_id','','','','',filedate,father_filedate),
+	DOPSGrowthCheck.DeltaCommand(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',filedate,father_filedate,key_DeathMaster_InputSet),
+	DOPSGrowthCheck.ChangesByField(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id','',filedate,father_filedate),
+	DopsGrowthCheck.PersistenceCheck(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',key_DeathMaster_InputSet,key_DeathMaster_InputSet,filedate,father_filedate),
 	);
 
 	
