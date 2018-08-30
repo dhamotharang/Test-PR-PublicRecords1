@@ -43,8 +43,8 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.HouseHoldId := L.case_id;
 				SELF.CustomerPersonId := L.client_uid;
 				SELF.EventDate.Year := (INTEGER)(L.date_added[1..4]);
-				SELF.EventDate.Month := (INTEGER)(L.date_added[6..7]);
-				SELF.EventDate.Day := (INTEGER)(L.date_added[9..10]);
+				SELF.EventDate.Month := (INTEGER)(L.date_added[5..6]);
+				SELF.EventDate.Day := (INTEGER)(L.date_added[7..8]);
 				SELF.IndustryTypeDescription := L.program_name;
 				SELF.ReportedBy := L.inquiry_source;
 				SELF.ActivityReason := L.inquiry_reason;
