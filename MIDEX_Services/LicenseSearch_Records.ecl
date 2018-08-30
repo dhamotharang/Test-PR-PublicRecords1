@@ -30,18 +30,24 @@ EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod) :=
                                                                     lic_state,taxid,,,,did,,,,,,,,,,,
                                                                     nmls_info[1].NMLSId);
 
-    searchPenalty := MIDEX_Services.Functions.getPenalty(in_mod);
+		searchPenalty := MIDEX_Services.Functions.getPenalty(in_mod);
 
 		all_recs_kept := all_recs_penalt(penalt < searchPenalty OR exactMatch);
-
-    all_recs_sorted := IF(in_mod.CompanyName != '',
-                          SORT(all_recs_kept,penalt,~isCurrent,IF(SELEID != 0,1,2)),
-                          SORT(all_recs_kept,penalt,~isCurrent,IF(DID != 0,1,2)));
-    
+		            				
+		all_recs_sorted := IF (in_mod.CompanyName != '' and in_mod.firstName = '' and in_mod.middleName = '' and in_mod.lastName = '',								
+								SORT(all_recs_kept, if ( licensee_firstname = '', 0, 1), if( licensee_midname = '', 0, 1), if ( licensee_lastname = '', 0, 1),
+												penalt, ~isCurrent, IF (seleid !=0, 1,2) ),                                        
+								SORT(all_recs_kept,penalt,~isCurrent,IF(DID != 0,1,2))
+								); 																				
+  
 		alertUpdateHash_recs := PROJECT(all_recs_sorted,MIDEX_Services.Layouts.hash_layout);
 		
 		finalresults := MIDEX_Services.Functions.Format_licenseSearch_iesp(all_recs_sorted,alertUpdateHash_recs,in_mod);
-
+        // output(all_recs_penalt, named('all_recs_penalt'));
+	   // output(all_recs_kept, named('all_recs_kept'));
+        // output(all_recs_sorted_old, named('all_recs_sorted_old'));				
+	   // output(all_recs_sorted, named('all_recs_sorted'));
+		// output(alertUpdateHash_recs, named('alertUpdateHash_recs'));
 	  RETURN(finalresults);
 
 	END;
