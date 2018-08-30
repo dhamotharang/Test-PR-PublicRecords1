@@ -8,7 +8,7 @@ EXPORT DeltaBaseSoapCall(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		SHARED EspServiceName := in_mod.SqlSearchEspNAME;
 		SHARED EspServiceUrl := in_mod.SqlSearchEspURL;
 		SHARED IsSafeToPerformSoap := EspServiceUrl <> '' AND EspServiceName <> '';
-		SHARED eCrashRecordStructure := Layouts.eCrashRecordStructure;
+		SHARED eCrashRecordStructure := eCrash_Services.Layouts.eCrashRecordStructure;
 
 		EXPORT eCrash_Services.Layouts.eCrashRecordStructure transformDeltaJoinedRecs(eCrash_Services.Layouts.DeltaJoinedRecord DeltaRecord) := TRANSFORM		
 				string CROSS_ST := IF(DeltaRecord.crossStreet = 'N/A','',DeltaRecord.crossStreet);
@@ -113,7 +113,7 @@ EXPORT DeltaBaseSoapCall(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		END;
 
 		EXPORT LookupDeltabase(SQLString, Transformer, ResponseLayout) := FUNCTIONMACRO		
-			SqlDataset := DATASET([{SQLString}], Layouts.R_DeltaBaseSelectRequest);
+			SqlDataset := DATASET([{SQLString}], eCrash_Services.Layouts.R_DeltaBaseSelectRequest);
 			ShouldPerform := SQLString <> '' AND IsSafeToPerformSoap;			
 			Incidents := IF(ShouldPerform, 
 				Gateway.SoapCall_Deltabase(

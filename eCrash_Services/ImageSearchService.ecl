@@ -32,7 +32,7 @@ EXPORT ImageSearchService() := FUNCTION
   END;
 	
 	DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
-	DeltaBaseSql := RawDeltaBaseSQL(InModuleDeltaBase);
+	DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltaBase);
 	
 	Gateway.Layouts.Config ImageSoapCallGatewaysStructure := TRANSFORM
 		SELF.ServiceName := Gateway.Constants.ServiceName.EcrashImageRetrieval;
@@ -76,10 +76,10 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	ReportsDeltabaseResult := IF(
 		ReportHashKeysFromKey[1].Vendor_Code IN eCrash_Services.Constants.VENDOR_CODES_BYPASS_DELTABASE, 
-		Functions.getSupplementalsBypassDeltabase(
+		eCrash_Services.Functions.getSupplementalsBypassDeltabase(
 			ReportHashKeysFromKey
 		),
-		Functions.getSupplementalsDeltabase(
+		eCrash_Services.Functions.getSupplementalsDeltabase(
 			RequestReportId,
 			ReportHashKeysFromKey,
 			InModuleDeltaBase
