@@ -168,7 +168,7 @@ best_src_name_append := join(
 temp_lay1 := record
   unsigned6 linkid;
   string120 company_name;
-  unsigned1 company_name_data_permits;
+  unsigned2 company_name_data_permits; 
 end;
 best_src_name_append_p := distribute(project(best_src_name_append,transform(temp_lay1,
   self.company_name_data_permits := BIPV2.mod_sources.src2bmap(left.name_source, left.name_vl_id),
@@ -262,7 +262,7 @@ company_inc_dt_src := dedup(sort(join(
 ),linkid, company_incorporation_date, source,source_record_id, vl_id, local),linkid, company_incorporation_date, source,source_record_id, vl_id, local);
 temp_lay2 := record
   unsigned6 linkid;
-  unsigned1 company_incorporation_date_permits;
+  unsigned2 company_incorporation_date_permits;
 end;
 company_inc_dt_src_p := distribute(project(company_inc_dt_src, transform(temp_lay2, self.company_incorporation_date_permits := BIPV2.mod_sources.src2bmap(left.source, left.vl_id), self := left)), hash(linkid));
 aggr_company_inc_dt_src := rollup(company_inc_dt_src_p,left.linkid = right.linkid,transform(temp_lay2,

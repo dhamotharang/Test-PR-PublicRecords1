@@ -47,6 +47,6 @@ export propagate_did   		:= Fn_Propagate_Did(propagate_src_email);
 //-----Concatenate current base and previous base to create a final base with histor
 export rollup_with_history := Fn_Rollup_Base_History(propagate_did);
 //-----Concatenate current base and previoubase to create a final base with histor and misc emails
-export rollup_with_history_misc := Fn_Append_Misc(rollup_with_history) ;  
+// export rollup_with_history_misc := Fn_Append_Misc(rollup_with_history) ; // removed 8-3 bjd 
 
 end;

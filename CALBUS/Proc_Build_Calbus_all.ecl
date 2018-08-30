@@ -1,25 +1,35 @@
-import _Control, Orbit_report;
-export Proc_Build_Calbus_all(STRING filedate,STRING thorName,STRING hostName,STRING srcDir = '/data/data_build_1/calbus/data/') := function
+IMPORT _Control, Orbit_report;
+EXPORT Proc_Build_Calbus_all(
+	STRING filedate,
+	STRING thorName,
+	STRING hostname,
+	STRING source = '/data/data_build_1/calbus/data',
+	STRING filename
+) := FUNCTION
 
-//Clean input file.
-Mac_Calbus_Spray( hostName
-								 ,srcDir+filedate+'/'
-								 ,filedate
-								 ,filedate
-								 ,filedate+'.ACTIVE305.TXT'
-								 ,thorName
-								 ,DoClean );
+	//Clean input file.
+	Mac_Calbus_Spray( 
+		hostname,
+		source+'/',
+		filedate,
+		filedate,
+		filename,
+		thorName,
+		DoClean 
+	);
  
-//Start Build Process
-DoBuild := Proc_build_Calbus(filedate);
+	//Start Build Process
+	DoBuild := Proc_build_Calbus(filedate);
 
-//Do Orbit Report
-Orbit_report.calbus_stats(DoReport);
+	//Do Orbit Report
+	Orbit_report.calbus_stats(DoReport);
 
-retval := sequential(DoClean
-										 ,DoBuild
-										 ,DoReport
-										 ,SampleRecs
-										 ) : success(Send_Email(filedate).Build_Success), failure(Send_Email(filedate).Build_Failure);
-return retval;
-end;
+	retval := SEQUENTIAL(
+		DoClean,
+		DoBuild,
+		DoReport,
+		SampleRecs
+	) : SUCCESS(Send_Email(filedate).Build_Success), FAILURE(Send_Email(filedate).Build_Failure);
+
+	RETURN retval;
+END;

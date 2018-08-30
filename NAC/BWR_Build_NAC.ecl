@@ -1,4 +1,4 @@
-import Roxiekeybuild,ut;
+﻿import Roxiekeybuild,ut;
 export BWR_Build_NAC (string version,string ip,string rootDir) := function
 
 NewInput:=
@@ -31,7 +31,7 @@ return if(NewInput
 										,Roxiekeybuild.updateversion( datasetname:='NacKeys',uversion:=version[1..8],email_t:=alertList,inenvment:= 'N',auto_pkg:= 'Y',isprodready:='Y')
 										,Roxiekeybuild.updateversion( datasetname:='NacKeys',uversion:=version[1..8],email_t:=alertList,inenvment:= 'N')
 										)*/
-								,zDoPopulationStats
+								//,zDoPopulationStats
 								)
 			,sequential(NAC.Send_Email().Drupal
 								,output('No NAC Contributory Files Received.  No Collisions report will be produced.'
