@@ -227,15 +227,15 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 		
 
     /* ASSETS OWNED VEHICLE  */  
-		PerAssetOwnVehicle_Flag9 := If (le.VehicleCount  >  0 AND le.VehicleBaseValue >= 200000,'T','F');                  /* Set the Index value to 9 */
-		PerAssetOwnVehicle_Flag8 := IF (le.VehicleCount  >  0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999,'T','F');  /* Set the Index value to 8 */	
-		PerAssetOwnVehicle_Flag7 := IF (le.VehicleCount  >  0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999,'T','F');  /* Set the Index value to 7 */
-		PerAssetOwnVehicle_Flag6 := IF (le.VehicleCount  >= 150,'T','F');                                                  /* Set the Index value to 6 */
-		PerAssetOwnVehicle_Flag5 := IF (le.VehicleCount BETWEEN 50 AND 149,'T','F');                                       /* Set the Index value to 5 */
-		PerAssetOwnVehicle_Flag4 := IF (le.VehicleCount BETWEEN 25 AND 49,'T','F');                                        /* Set the Index value to 4 */
-		PerAssetOwnVehicle_Flag3 := IF (le.VehicleCount BETWEEN 10 AND 24,'T','F');                                        /* Set the Index value to 3 */
-		PerAssetOwnVehicle_Flag2 := IF (le.VehicleCount BETWEEN  1 AND  9,'T','F');                                        /* Set the Index value to 2  */
-		PerAssetOwnVehicle_Flag1 := IF (le.VehicleCount  = 0,'T','F');                                                     /* Set the Index value to 1 */
+		PerAssetOwnVehicle_Flag9 := If (le.VehicleCount > 0 AND le.VehicleBaseValue >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+		PerAssetOwnVehicle_Flag8 := IF (le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+		PerAssetOwnVehicle_Flag7 := IF (le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
+		PerAssetOwnVehicle_Flag6 := IF (le.VehicleCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
+		PerAssetOwnVehicle_Flag5 := IF (le.VehicleCount BETWEEN 8 AND 14, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    
+		PerAssetOwnVehicle_Flag4 := IF (le.VehicleCount BETWEEN 5 AND 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     
+		PerAssetOwnVehicle_Flag3 := IF (le.VehicleCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+		PerAssetOwnVehicle_Flag2 := IF (le.VehicleCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+		PerAssetOwnVehicle_Flag1 := IF (le.VehicleCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                   /* Set the Index value to 1 */
 	
 		PerAssetOwnVehicle_Flag_Final := calcFinalFlagField(PerAssetOwnVehicle_Flag9,
 																			                  PerAssetOwnVehicle_Flag8,

@@ -50,7 +50,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   indWatercraft := DueDiligence.getIndWatercraft(indProperty);
   
   //get vehicle information
-  indVehicle := DueDiligence.getIndVehicle(indWatercraft, dataRestrictionMask);
+  indVehicle := DueDiligence.getIndVehicle(indWatercraft, dppa);
   
   //get legal information
   indCriminalData := DueDiligence.getIndLegalEvents(indVehicle);
