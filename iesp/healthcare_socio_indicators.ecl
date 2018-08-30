@@ -23,11 +23,11 @@ export t_SocioIndicatorsMember := record
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
 	iesp.share.t_Date DOB {xpath('DOB')};
+	string8 Gender {xpath('Gender')};
 	string9 SSN {xpath('SSN')};
 	string10 HomePhone {xpath('HomePhone')};
 	string10 AlternatePhone {xpath('AlternatePhone')};
 	t_Admission Admission {xpath('Admission')};
-	string8 Gender {xpath('Gender')};
 end;
 		
 export t_SocioScore := record
@@ -582,8 +582,8 @@ export t_SocioAttributesV3 := record
 end;
 		
 export t_SocioIndicators := record
-	dataset(t_SocioScore) Scores {xpath('Scores/Score'), MAXCOUNT(iesp.Constants.Socio.Max_Scores)};
 	t_SocioAttributesV3 HealthAttributesV3 {xpath('HealthAttributesV3')};
+	dataset(t_SocioScore) Scores {xpath('Scores/Score'), MAXCOUNT(iesp.Constants.Socio.Max_Scores)};
 end;
 		
 export t_SocioInvalidField := record
@@ -592,7 +592,7 @@ export t_SocioInvalidField := record
 	string255 Reason {xpath('Reason')};
 end;
 		
-export t_SocioeconomicIndiatorsResponse := record
+export t_SocioeconomicIndicatorsResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	t_SocioIndicatorsOptions Options {xpath('Options')};
 	t_SocioIndicatorsMember Member {xpath('Member')};
@@ -600,15 +600,15 @@ export t_SocioeconomicIndiatorsResponse := record
 	dataset(t_SocioInvalidField) InvalidFields {xpath('InvalidFields/InvalidField'), MAXCOUNT(iesp.Constants.Socio.Max_Invalids)};
 end;
 		
-export t_SocioeconomicIndiatorsRequest := record (iesp.share.t_BaseRequest)
+export t_SocioeconomicIndicatorsRequest := record (iesp.share.t_BaseRequest)
 	iesp.healthcare_account_info.t_HealthcareConfigInput HealthcareConfig {xpath('HealthcareConfig')};//hidden[internal]
 	t_SocioIndicatorsOptions Options {xpath('Options')};
 	t_SocioIndicatorsMember Member {xpath('Member')};
 	iesp.healthcare_account_info.t_HealthcareContext AccountContext {xpath('AccountContext')};//hidden[ecl_only]
 end;
 		
-export t_SocioeconomicIndiatorsResponseEx := record
-	t_SocioeconomicIndiatorsResponse response {xpath('response')};
+export t_SocioeconomicIndicatorsResponseEx := record
+	t_SocioeconomicIndicatorsResponse response {xpath('response')};
 end;
 		
 
