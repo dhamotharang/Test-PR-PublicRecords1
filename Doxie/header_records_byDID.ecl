@@ -1,4 +1,4 @@
-import doxie, ut, header, infutor, STD, NID;
+﻿import doxie, ut, header, infutor, STD, NID;
 
 // Formerly the contents of doxie.header_records;  Allows for the passing of a dataset of DIDs,
 // rather than calling doxie\get_dids
@@ -13,7 +13,7 @@ export header_records_byDID(
 	boolean suppress_gong_noncurrent = false,
 	boolean ApplyBpsFilter = false,
 	boolean GongByDidOnly = false,
-	unsigned ReturnLimit = 20000,
+	unsigned ReturnLimit = Header.constants.ReturnLimit,
 	boolean checkRNA = false,
 	boolean isrollup = false,
 	boolean DoSearch = true) :=   // controls whether to search dailies or jsut fetch by DID right away 

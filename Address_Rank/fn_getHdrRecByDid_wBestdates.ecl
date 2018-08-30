@@ -1,6 +1,11 @@
 ﻿IMPORT Doxie, ut;
-EXPORT  fn_getHdrRecByDid_wBestdates(DATASET(doxie.layout_references_hh) dids_hh) := FUNCTION
-	hdr_recs  		:= doxie.header_records_byDID(dids_hh,true); //true to get Quick Header Data
+EXPORT  fn_getHdrRecByDid_wBestdates(DATASET(doxie.layout_references_hh) dids_hh,
+	                                   Address_Rank.IParams.BatchParams in_mod) := FUNCTION 
+  hdr_recs := 
+	   doxie.header_records_byDID(
+	    dids            := dids_hh,
+	    include_dailies := true, //true to get Quick Header Data
+	    ReturnLimit     := in_mod.MaxInterHdrRecs);
 	
 	RECORDOF(hdr_recs) getBestDates(hdr_recs l, hdr_recs r) := TRANSFORM
 		SELF.dt_first_seen := ut.min2(l.dt_first_seen, r.dt_first_seen);  //RQ-14100 fix
