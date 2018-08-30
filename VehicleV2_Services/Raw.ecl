@@ -7,7 +7,7 @@ EXPORT Raw := MODULE
 								DATASET(doxie.layout_references) in_dids,
 								UNSIGNED in_LIMIT = 0) := FUNCTION
 		
-		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;
 		lookup_value := in_mod.lookupValue;
 		
 		lookupwithexclude := lookup_value | IF(in_mod.excludeLessors, doxie.lookup_bit(Vehiclev2_services.lookup_bit.no_lessors), 0);
@@ -62,7 +62,7 @@ EXPORT Raw := MODULE
 																DATASET(doxie_cbrs.layout_references) in_bdids,
 																UNSIGNED in_LIMIT = 0) := FUNCTION
 		
-		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;
 		lookup_value := in_mod.lookupValue;
 	  key := VehicleV2.key_vehicle_bdid;
 		vks_info := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
@@ -84,7 +84,7 @@ EXPORT Raw := MODULE
 					 string13 dl_num ='',	
 					 string20 Vehicle_Num ='') := FUNCTION
 		
-		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;
     key := VehicleV2.key_vehicle_VIN;
 		key_party := Vehiclev2.Key_Vehicle_Party_Key;
 		vks0 := JOIN(DEDUP(SORT(in_VIN,vin),vin),key,
@@ -164,7 +164,7 @@ EXPORT Raw := MODULE
 			 UNSIGNED MAX_results = 9999,string1 state_type ='C'
 			 ) := module
 			 
-		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;	 
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;	 
 		key := VehicleV2.key_vehicle_lic_plate;
 		pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l,r);	
 		
@@ -234,7 +234,7 @@ EXPORT Raw := MODULE
 					 UNSIGNED MAX_results = 9999
 					 ) := MODULE
 					 
-		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.Is_CNSMR;			 
+		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;			 
     key := VehicleV2.key_vehicle_reverse_lic_plate;
 		pfe(string20 l, string20 r) := NID.mod_PFirstTools.SubLinPFR(l,r);	
 		l_lic_cast := record
@@ -345,7 +345,7 @@ EXPORT Raw := MODULE
 		BOOLEAN get_minors=FALSE
 	) := FUNCTION
 
-  Boolean isCNSMR := inMod.IndustryClass = D2C.Constants.Is_CNSMR; 
+  Boolean isCNSMR := inMod.IndustryClass = D2C.Constants.CNSMR; 
   	addr1:=IF(inMod.addr!='',inMod.addr,address.Addr1FromComponents(
 			inMod.prim_range,inMod.predir,inMod.prim_name,inMod.suffix,inMod.postdir,'',inMod.sec_range));
 		addr2:=address.Addr2FromComponents(inMod.city,inMod.state,inMod.zip);
