@@ -188,6 +188,8 @@ export BillingIndex := MODULE
 		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100)	
 	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 
     export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  
-    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital 
+    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital
+    //***leave 175 open for now - I believe it is reserved for another model in the pipeline ***//
+    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover
 
 END;

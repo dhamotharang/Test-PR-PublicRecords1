@@ -245,7 +245,7 @@ export ChargebackDefender_Service := MACRO
 	
 	ExcludeWatchLists := true;	// trying this out to save some time, doesn't seem to need it ever at this point.  will turn off ofac searching
 	
-	cbdParams := model_url(name='Models.ChargebackDefender_Service')[1].parameters;
+	cbdParams := model_url(StringLib.StringToLowerCase(name)='models.chargebackdefender_service')[1].parameters;
 	cbdParamsCap := PROJECT(cbdParams, TRANSFORM(RECORDOF(cbdParams), SELF.Name := StringLib.StringToUpperCase(LEFT.Name); SELF.Value := LEFT.Value; SELF := LEFT));
 	genericModelName := trim(StringLib.StringToLowerCase(cbdParamsCap(name='VERSION')[1].value));
 	

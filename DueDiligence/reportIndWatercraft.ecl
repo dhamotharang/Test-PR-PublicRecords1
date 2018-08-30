@@ -16,7 +16,9 @@ EXPORT reportIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) :
                                                             SELF.watercrafts := DATASET([TRANSFORM(iesp.duediligencepersonreport.t_DDRPersonWatercraft,
                                                                                                     SELF.OwnershipType.SubjectOwned := LEFT.inquiredOwned;
                                                                                                     SELF.OwnershipType.SpouseOwned := LEFT.spouseOwned;
-                                                                                                    // SELF.OwnershipType.OwnerInfo := LEFT.ownwers; //to add when added to iesp
+                                                                                                    SELF.OwnershipType.Owners := PROJECT(LEFT.owners, TRANSFORM(iesp.duediligenceshared.t_DDRPersonNameWithLexID,
+                                                                                                                                                                SELF.lexID := (STRING)LEFT.did;
+                                                                                                                                                                SELF.Name := iesp.ECL2ESP.SetName(LEFT.firstName, LEFT.middleName, LEFT.lastName, LEFT.suffix, DueDiligence.Constants.EMPTY))); //to add when added to iesp
                                                                                                     SELF := LEFT;)]);
                                                             SELF := LEFT;));
                                                                                                     

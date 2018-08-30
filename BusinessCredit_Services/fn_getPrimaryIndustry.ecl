@@ -1,9 +1,13 @@
 ﻿IMPORT AutoStandardI, BIPV2, Business_Credit, iesp, ut, MDR, BusinessCredit_Services;
-
+// efficiency here in last 2 params being defaulted
 EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids, 
 																	String DatapermissionMask, 
-																	Boolean IncludeBusinessCredit = FALSE //data team always pass in IncludeBusinessCredit = TRUE for this.
+																	Boolean IncludeBusinessCredit = FALSE, //data team always pass in IncludeBusinessCredit = TRUE for this.
+																	STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID
 																	) := MODULE
+																	// note:  in addition to this module being called from BusinessCredit_Services.CreditReport_Records
+																	// Business_Credit_Scoring.fn_GetDBTAverage calls this BusinessCredit_Services.fn_getPrimaryIndustry from thor side
+																	// thus last 2 params defaulted purposely.
 																	
 	// we need to select primary industry code from BIP unless Business is an SBFE Singleton, In which case use SBFE.
 	BOOLEAN buzCreditAccess	:= BusinessCredit_Services.Functions.fn_useBusinessCredit(DatapermissionMask ,IncludeBusinessCredit);	
@@ -19,10 +23,10 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 		UNSIGNED2 RecordCount := 1;
 	END;
 	
-	//Fetching Business Header Records.
-	ds_busHeaderRecs 		:= BIPV2.Key_BH_Linking_Ids.kfetch2(Linkids,BIPV2.IDconstants.Fetch_Level_SELEID,,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,TRUE); //We wanted to fetch all the records for Se level. 
-	ds_busHeaderRecsSlim := ds_busHeaderRecs(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC);	
-	ds_sbfeLinkRecs 		:= Business_Credit.Key_LinkIds().kfetch2(Linkids , BIPV2.IDconstants.Fetch_Level_SELEID,,DatapermissionMask);
+	//Fetching Business Header Records. //  efficiency remove additional kfetch here.
+	ds_busHeaderRecsSlim := BusinessCredit_Services.Functions.BipKfetch(Linkids,FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,DatapermissionMask).bipbusHeaderRecsSlim;
+	
+	ds_sbfeLinkRecs 		:=   BusinessCredit_Services.Functions.BipKfetch(Linkids, FETCHLEVEL,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,DatapermissionMask).BusCreditHeaderRecs;  
 
 	ds_sbfeSICNAICSRecs	:= JOIN(ds_sbfeLinkRecs , Business_Credit.Key_BusinessClassification(), 
 																			BusinessCredit_Services.Macros.mac_JoinBusAccounts(),  

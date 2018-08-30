@@ -66,7 +66,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.ELEMENT,
 																				SELF.ScoreDetails.ElementType := LEFT.fragment,
 																				SELF.ScoreDetails.ElementValue := IF(LEFT.fragment = FraudGovFragConst_.PHYSICAL_ADDRESS_FRAGMENT, 
-																																						REGEXREPLACE('@@@',LEFT.fragment_value,', '), 
+																																						FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.fragment_value),
 																																						LEFT.fragment_value);
 																				SELF.ScoreDetails.Score := RIGHT.Score_,
 																				SELF.NoOfIdentities := RIGHT.cl_identity_count_,
@@ -166,7 +166,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		ds_timeline_sorted := SORT(ds_timeline, IsRecentActivity, FileType , record);
 		
 		/* Returning the Associated Address Data  - This is based on the Timeline Records found above */
-		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_timeline_sorted);
+		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_payload);
 		
 		/* Returning the Indicator Attributes for Online Report */
 		ds_indicator_attribute := FraudGovPlatform_Services.Functions.GetIndicatorAttributes(ds_entityNameUID, batch_params);

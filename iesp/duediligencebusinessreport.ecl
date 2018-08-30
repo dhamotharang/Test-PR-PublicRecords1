@@ -142,6 +142,7 @@ export t_DDRBusinessOperatingInformation := record
 	dataset(t_DDRComponentsOfBusiness) BusinessNameVariations {xpath('BusinessNameVariations/Variation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
 	string FEIN {xpath('FEIN')};
 	boolean FEINIsSSN {xpath('FEINIsSSN')};
+	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) SSNAssociatedWithFEIN {xpath('SSNAssociatedWithFEIN/Item'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSSNAssociations)};
 	dataset(iesp.share.t_Name) SSNAssociatedWith {xpath('SSNAssociatedWith/Name'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSSNAssociations)};
 	boolean OperatesOutOfAHomeOffice {xpath('OperatesOutOfAHomeOffice')};
 	string Filing {xpath('Filing')};

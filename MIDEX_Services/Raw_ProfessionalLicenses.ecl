@@ -106,9 +106,10 @@ EXPORT Raw_ProfessionalLicenses :=
 										
 										prof_recsRaw := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
 																				KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
-                                        // Bug# 182946 - Filter out records which have been superceded
+                                        // Bug# 182946 - Filter out records which have been superceded							   
                                         RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
-                                                                  Midex_Services.Constants.RECORD_STATUS.SupercededMariRidNonUpdatingSource] AND
+                                                                  Midex_Services.Constants.RECORD_STATUS.SupercededMariRidNonUpdatingSource]												
+													AND
 																				CASE(searchType,
                                              MIDEX_Services.Constants.COMP_SEARCH => 
                                                RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.COMPANY OR
@@ -165,13 +166,17 @@ EXPORT Raw_ProfessionalLicenses :=
 																				LIMIT(MIDEX_Services.Constants.JOIN_LIMIT,SKIP));
                   
 									// Multiple and older versions of the same license are occurring, so sort/dedup on license 
-									// number and keep the most recent license.
-									profs_recsRaw_dedup := DEDUP(SORT(prof_recsRaw,mari_rid,Licenses[1].lic_number,-last_upd_date),mari_rid,Licenses[1].lic_number);
+									// number and keep the most recent license.								
+									
+									// sort  by -last_upd_date around dedup/sort added here to bubble the most recent to top before returning results
+									profs_recsRaw_dedup := SORT(DEDUP(SORT(prof_recsRaw,mari_rid,Licenses[1].lic_number,-last_upd_date),mari_rid,Licenses[1].lic_number), -last_upd_date);
+									
 									census_data.MAC_Fips2County_Keyed(profs_recsRaw_dedup,company_st,company_county_fips,company_county,prof_recs);
                                         
 									// get nmls info if it exists
 									prof_nmls_recs := MIDEX_Services.Functions.add_nmls_info(prof_recs);
 									prof_recsHash := PROJECT(prof_nmls_recs,MIDEX_Services.alert_calcs.calcLicenseReptHashes(LEFT,alertVersion));
+									
 									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,prof_recsHash,prof_nmls_recs));
 								END;
 					 END;
@@ -188,6 +193,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                           // Bug# 182946 - Filter out records which have been superceded
                                           RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
                                                                     Midex_Services.Constants.RECORD_STATUS.SupercededMariRidNonUpdatingSource],
+										       
                                           TRANSFORM(MIDEX_Services.Layouts.license_srch_layout,
                                                     SELF.mari_rid := RIGHT.mari_rid,
                                                     SELF.nmls_id := RIGHT.nmls_id,

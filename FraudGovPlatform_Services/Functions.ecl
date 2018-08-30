@@ -581,31 +581,26 @@ EXPORT Functions := MODULE
 			SELF.name_last := L.reportBy.Name.last;
 			SELF.name_suffix := L.reportBy.Name.suffix;
 			// If StreetAddress is empty, then use the parsed address fields
-			SELF.full_address := IF(L.reportBy.Address.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
-											L.reportBy.Address.StreetPreDirection,
-											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
-											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
-											L.reportBy.Address.UnitNumber),
-									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
-			SELF.physical_address := IF(L.reportBy.Address.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
-											L.reportBy.Address.StreetPreDirection,
-											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
-											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
-											L.reportBy.Address.UnitNumber),
-									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
+			Physical_address:= 	IF(L.reportBy.Address.StreetAddress1 = '',
+															Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
+																													L.reportBy.Address.StreetPreDirection,
+																													L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
+																													L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
+																													L.reportBy.Address.UnitNumber),
+															STD.Str.CleanSpaces(L.reportBy.Address.StreetAddress1) + ' ' + STD.Str.CleanSpaces(L.reportBy.Address.StreetAddress2));			
+			SELF.full_address := Physical_address;
+			SELF.physical_address := Physical_address;
 			SELF.physical_city := L.reportBy.Address.City;
 			SELF.physical_state := L.reportBy.Address.State;
 			SELF.physical_zip := L.reportBy.Address.Zip5;
 			SELF.physical_county := L.reportBy.Address.County;
 			SELF.mailing_address := IF(L.reportBy.MailingAddress.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.MailingAddress.StreetNumber, 
-											L.reportBy.MailingAddress.StreetPreDirection,
-											L.reportBy.MailingAddress.StreetName, L.reportBy.MailingAddress.StreetSuffix,
-											L.reportBy.MailingAddress.StreetPostDirection,L.reportBy.MailingAddress.UnitDesignation,
-											L.reportBy.MailingAddress.UnitNumber),
-									L.reportBy.MailingAddress.StreetAddress1 + ' ' + L.reportBy.MailingAddress.StreetAddress2);
+																	Address.Addr1FromComponents(L.reportBy.MailingAddress.StreetNumber, 
+																															L.reportBy.MailingAddress.StreetPreDirection,
+																															L.reportBy.MailingAddress.StreetName, L.reportBy.MailingAddress.StreetSuffix,
+																															L.reportBy.MailingAddress.StreetPostDirection,L.reportBy.MailingAddress.UnitDesignation,
+																															L.reportBy.MailingAddress.UnitNumber),
+																	STD.Str.CleanSpaces(L.reportBy.MailingAddress.StreetAddress1) + ' ' + STD.Str.CleanSpaces(L.reportBy.MailingAddress.StreetAddress2));
 			SELF.mailing_city := L.reportBy.MailingAddress.City;
 			SELF.mailing_state := L.reportBy.MailingAddress.State;
 			SELF.mailing_zip := L.reportBy.MailingAddress.Zip5;
@@ -659,17 +654,18 @@ EXPORT Functions := MODULE
 																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
 			
 			bank_account_number := IF(R.bank_account_number_1 <> '', R.bank_account_number_1 , R.bank_account_number_2);
-			SELF.fragment_value := MAP(	L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_account_number,
-																	L.fragment = Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
-																	L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => R.drivers_license,
-																	// L.fragment = Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
-																	L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => R.ip_address	,
-																	L.fragment = Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1) + ' ' + STD.Str.CleanSpaces(R.additional_address.address_2)),
-																	L.fragment = Fragment_Types_const.NAME_FRAGMENT => (R.cleaned_name.fname + ' ' + R.cleaned_name.lname),
-																	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
-																	L.fragment = Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
-																	L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
-																	L.fragment = Fragment_Types_const.SSN_FRAGMENT => R.ssn,
+			SELF.fragment_value := CASE(L.fragment,
+																	Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_account_number,
+																	Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
+																	Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => R.drivers_license,
+																	// Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
+																	Fragment_Types_const.IP_ADDRESS_FRAGMENT => R.ip_address	,
+																	Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1) + ' ' + STD.Str.CleanSpaces(R.additional_address.address_2)),
+																	Fragment_Types_const.NAME_FRAGMENT => (R.cleaned_name.fname + ' ' + R.cleaned_name.lname),
+																	Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
+																	Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
+																	Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
+																	Fragment_Types_const.SSN_FRAGMENT => R.ssn,
 																	'');
 			SELF.file_type := R.classification_Permissible_use_access.file_type;
 			SELF := L;
@@ -693,7 +689,7 @@ EXPORT Functions := MODULE
 		temp_rec := RECORD
 			STRING20 acctno;
 			STRING60 entity_name;
-			STRING60 entity_value;
+			STRING100 entity_value;
 			RECORDOF(FraudGovPlatform.Key_ClusterDetails);
 		END;											 		
 		
@@ -728,21 +724,56 @@ EXPORT Functions := MODULE
 		RETURN ds_clusterdetails_dedup;											 
 	ENDMACRO;	
 	
-	EXPORT getAssociatedAddresses (DATASET(iesp.fraudgovreport.t_FraudGovTimelineDetails) ds_timeline) := FUNCTION
+	EXPORT getAssociatedAddresses (DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payload) := FUNCTION
 		
-		ds_physicaladdress := PROJECT(ds_timeline,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
-																								SELF.AddressType := LEFT.AddressType,
-																								SELF.Address := LEFT.PhysicalAddress,
-																								SELF.RoofTopLatLong := LEFT.GeoLocation));
-																								
-		ds_Mailingaddress := PROJECT(ds_timeline,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
-																								SELF.AddressType := LEFT.AddressType,
-																								SELF.Address := LEFT.MailingAddress,
-																								SELF.RoofTopLatLong := LEFT.GeoLocation));
-																								
-		ds_address := DEDUP(SORT(ds_physicaladdress + ds_Mailingaddress, 
-												RoofTopLatLong.Latitude, RoofTopLatLong.Longitude), 
-									RoofTopLatLong.Latitude, RoofTopLatLong.Longitude);
+		ds_physicaladdress := PROJECT(ds_payload,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
+																								SELF.AddressType := LEFT.address_type,
+																								SELF.Address := iesp.ECL2ESP.SetAddress(LEFT.clean_address.prim_name, 
+																																												LEFT.clean_address.prim_range, 
+																																												LEFT.clean_address.predir, 
+																																												LEFT.clean_address.postdir, 
+																																												LEFT.clean_address.addr_suffix, 
+																																												LEFT.clean_address.unit_desig, 
+																																												LEFT.clean_address.sec_range, 
+																																												LEFT.clean_address.p_city_name, 
+																																												LEFT.clean_address.st, 
+																																												LEFT.clean_address.zip, 
+																																												LEFT.clean_address.zip4, 
+																																												'', 
+																																												'', 
+																																												LEFT.address_1, 
+																																												LEFT.address_2,
+																																												''),
+																								SELF.RoofTopLatLong.Latitude := LEFT.clean_address.geo_lat,
+																								SELF.RoofTopLatLong.Longitude := LEFT.clean_address.geo_long));
+		
+		ds_Mailingaddress := PROJECT(ds_payload,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
+																							SELF.AddressType := LEFT.additional_address.address_type,
+																							SELF.Address := iesp.ECL2ESP.SetAddress(LEFT.additional_address.clean_address.prim_name, 
+																																											LEFT.additional_address.clean_address.prim_range, 
+																																											LEFT.additional_address.clean_address.predir, 
+																																											LEFT.additional_address.clean_address.postdir, 
+																																											LEFT.additional_address.clean_address.addr_suffix, 
+																																											LEFT.additional_address.clean_address.unit_desig, 
+																																											LEFT.additional_address.clean_address.sec_range, 
+																																											LEFT.additional_address.clean_address.p_city_name, 
+																																											LEFT.additional_address.clean_address.st, 
+																																											LEFT.additional_address.clean_address.zip, 
+																																											LEFT.additional_address.clean_address.zip4, 
+																																											'', 
+																																											'', 
+																																											LEFT.additional_address.street_1, 
+																																											LEFT.additional_address.street_2,
+																																											''),
+																							SELF.RoofTopLatLong.Latitude := LEFT.additional_address.clean_address.geo_lat,
+																							SELF.RoofTopLatLong.Longitude := LEFT.additional_address.clean_address.geo_long));
+		
+		//Discarding the addresses which doesn't have RoofTopLatLong information in the data.
+		ds_address_w_geoloc := (ds_physicaladdress + ds_Mailingaddress)(RoofTopLatLong.Latitude <> '' OR RoofTopLatLong.Longitude <> '');
+		
+		ds_address := DEDUP(SORT(ds_address_w_geoloc, 
+															RoofTopLatLong.Latitude, RoofTopLatLong.Longitude), 
+												RoofTopLatLong.Latitude, RoofTopLatLong.Longitude);
 
 		RETURN ds_address;											 
 	END;	
@@ -818,6 +849,10 @@ EXPORT Functions := MODULE
 		date_int := iesp.ECL2ESP.DateToInteger(date);
 		
 		return STD.Date.IsValidDate(date_int) OR date_int = 0;
+	END;
+	
+	EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
+		return REGEXREPLACE('@@@',address,', ');
 	END;
 
 END;

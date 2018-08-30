@@ -44,6 +44,12 @@ EXPORT Records := Module
 		getRaw := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
 		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));
+		
+		// output(refmt, named('refmt'));
+		// output(getRaw, named('getRaw'));
+		// output(getRawAppend, named('getRawAppend'));
+		// output(final, named('final'));
+		
 		return final;
 	END;
 	
@@ -226,25 +232,43 @@ EXPORT Records := Module
 		ProcessHCO:= byHCO(doHCO,cfg);
 		ProcessOrgs := byOrgs(doOrgs,cfg);
 		
+		// output(ProcessPrinciple, named('ProcessPrinciple'));
+		// output(doPrinciple, named('doPrinciple'));
+		// output(ProcessHCP, named('ProcessHCP'));
+		// output(doHCP, named('doHCP'));
+		
 		GoodRecords := ProcessPrinciple+ProcessHCP+ProcessHCO+ProcessOrgs;
 		//Process input warnings
 		getInputWarnings := Healthcare_Ganga.Functions.getInputWarnings(doPrinciple+doHCP+doHCO+doOrgs);
 		getInvalidInputWarnings := Healthcare_Ganga.Functions.getInputWarnings(missingPrinciple+missingHCP+missingHCO+missingOrgs+missingType);
 		//Process output warnings
 		getOutputWarnings := Healthcare_Ganga.Functions.getOutputWarnings(GoodRecords);
+		
 		GoodResults := join(getInputWarnings,getOutputWarnings,left.acctno=right.acctno,
 																								transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																									self.acctno := left.acctno;
-																									self.Warnings := dedup(sort(left.Warnings + if(exists(right.Warnings), right.Warnings, dataset([{'199','LN'}], Healthcare_Ganga.Layouts.WarningsOutput)),record),record);
+																									self.Warnings := dedup(sort(left.Warnings + if(exists(right.Warnings) OR 
+																																																	right.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO], 
+																																																	right.Warnings, dataset([{Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis}], Healthcare_Ganga.Layouts.WarningsOutput)),record),record);
 																									self.ResponseDateTime := left.ResponseDateTime;
+																									self.EntityType := left.EntityType;
+																									self.RecordIdentifier := left.RecordIdentifier;
 																									self := right;),left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
 		FinalGoodResults := sort(GoodResults+getInvalidInputWarnings, acctno);
 		CatchNoHits := join(inRecs, FinalGoodResults, left.acctno = right.acctno, transform(left), left only);
 		FormatNoHits := project(CatchNoHits, transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																										self.acctno := left.acctno;
-																										self.Warnings := dataset([{'199','LN'}], Healthcare_Ganga.Layouts.WarningsOutput);
+																										self.Warnings := dataset([{Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis}], Healthcare_Ganga.Layouts.WarningsOutput);
 																										self := left));
 		Results := sort(FinalGoodResults + FormatNoHits, acctno);																								
+		// output(GoodRecords, named('GoodRecords'));
+		// output(getInputWarnings, named('getInputWarnings'));
+		// output(getOutputWarnings, named('getOutputWarnings'));
+		// output(GoodResults, named('GoodResults'));
+		// output(FinalGoodResults, named('FinalGoodResults'));
+		// output(CatchNoHits, named('CatchNoHits'));
+		// output(FormatNoHits, named('FormatNoHits'));
+		// output(Results, named('FinalResults'));
 		return Results;
 	END;
 END;

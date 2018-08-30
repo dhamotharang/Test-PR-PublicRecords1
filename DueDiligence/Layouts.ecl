@@ -133,6 +133,8 @@ EXPORT Layouts := MODULE
 		STRING10 PerStateLegalEvent_Flag;
     STRING2 PerFederalLegalEvent;
 		STRING10 PerFederalLegalEvent_Flag;
+    STRING2 PerFederalLegalMatchLevel;
+    STRING10 PerFederalLegalMatchLevel_Flag;
 		STRING2 PerCivilLegalEvent;
 		STRING10 PerCivilLegalEvent_Flag;
 		STRING2 PerOffenseType;
@@ -149,6 +151,8 @@ EXPORT Layouts := MODULE
 		STRING10 PerAssociates_Flag;
 		STRING2 PerProfLicense;
 		STRING10 PerProfLicense_Flag;
+    STRING2 PerBusAssociations;
+    STRING10 PerBusAssociations_Flag;
 	END;
 
   //ALSO USED BY BATCH - changing name will impact batch
@@ -186,6 +190,8 @@ EXPORT Layouts := MODULE
 		STRING10 BusStateLegalEvent_Flag;
     STRING2 BusFederalLegalEvent;
     STRING10 BusFederalLegalEvent_Flag;
+    STRING2 BusFederalLegalMatchLevel;
+    STRING10 BusFederalLegalMatchLevel_Flag;
 		STRING2 BusCivilLegalEvent;
 		STRING10 BusCivilLegalEvent_Flag;
 		STRING2 BusOffenseType;
@@ -201,9 +207,11 @@ EXPORT Layouts := MODULE
 		STRING30  acctNo;
 		STRING15  custType;
 		STRING15 	lexID;
+    
 		STRING120 companyName;
 		STRING120 altCompanyName;
 		STRING11  taxID;
+    
 		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
 		Name;
 		STRING9   ssn;
@@ -224,7 +232,13 @@ EXPORT Layouts := MODULE
 		STRING4  		zip4;
 
 		STRING10  phone;
-		UNSIGNED4	HistoryDateYYYYMMDD;
+		STRING10  phone2;
+		
+    STRING25 dlNumber;
+    STRING2 dlState;
+    
+    STRING100 emailAddress;
+    UNSIGNED4	HistoryDateYYYYMMDD;
 	END;
 
   //***Coordinate these changes witht the batch team ***//
@@ -234,6 +248,8 @@ EXPORT Layouts := MODULE
     BOOLEAN lexIDChanged;
 		PerAttributes;
 		BusAttributes;
+    STRING3 citizenshipScore;
+    DueDiligence.CitizenshipAttributes.LayoutAttributeValues;
 	END;
 	
 	EXPORT LayoutSICNAIC := RECORD
@@ -539,7 +555,7 @@ EXPORT Layouts := MODULE
 	END;
   
 	EXPORT BusReportDetails := RECORD
-    DATASET(BusPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
@@ -568,7 +584,7 @@ EXPORT Layouts := MODULE
     UNSIGNED4 bestDOB;
     Name bestName;
 		Address bestAddress;
-    DATASET(IndPropertyDataLayout) properties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) perWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(VehicleDataLayout)    perVehicle   {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
   END;
