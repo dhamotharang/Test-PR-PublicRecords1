@@ -445,6 +445,9 @@
 		STRING10 Date_Report_Submitted;
 		//CrashLogic Release 4
 	  STRING1 Releasable;
+		//Nucleus 
+		STRING50 Platform;
+		STRING40 Agency_Report_Number;
 	END;
 
 	EXPORT persn := RECORD
@@ -1608,7 +1611,7 @@
 		STRING100 cru_agency_name;
 		STRING20 VENDor_Report_Id;
 		STRING1  is_available_for_public;
-		STRING1  has_addENDum	;
+		STRING1  has_addendum	;
 		STRING10 report_agency_ori;
 		STRING20 report_status;
 		STRING20 ReportLinkID; 
@@ -1618,11 +1621,16 @@
 	  STRING3 Contrib_source; 
 		
 		//BuyCrash Release 6
-		STRING10 date_report_submitted;
+		STRING10 Date_Report_Submitted;
 		
 		//CrashLogic Release 4
 	  STRING1 Releasable;
+		
+		//Nucleus 
+		STRING50 Platform;
+		STRING40 Agency_Report_Number;
 	END;
+	
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
 		STRING11 Incident_ID;
