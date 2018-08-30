@@ -1,6 +1,27 @@
-IMPORT Address, AutoStandardI, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Business_Credit, doxie, iesp, Risk_Indicators, TopBusiness_Services, ut;
+﻿IMPORT Address, AutoStandardI, BIPV2, BIPV2_Best, Business_Credit, doxie, iesp, Risk_Indicators;
 
 EXPORT Functions := MODULE
+           // efficiency addition to move BIP and bus credit related kfetches into 1 place and pass in common params used in both.
+		 EXPORT bipkfetch(dataset(BIPV2.IDlayouts.l_xlink_ids2) BipLinkids,
+		                                             STRING1 FETCHLEVEL,
+							                   INTEGER FETCHLIMIT = 10000,
+									         STRING DataPermissionMask) := MODULE
+                      
+          // efficiency add true on END since not using for contacts skips the Suppression											
+		EXPORT BIPBusHeaderRecsSlim := BIPV2.Key_BH_Linking_Ids.kfetch(project(Biplinkids, transform(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
+		                                                                                                              ,FETCHLEVEL
+																						    ,
+																							,
+																							,FETCHLIMIT
+																							,TRUE
+																							,TRUE)
+											(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC); //restricting ER and Q3 experian sources
+		                                        			 
+	     EXPORT   BusCreditHeaderRecs :=  Business_Credit.Key_LinkIds().kfetch2(BIpLinkids
+			                                                                                                                              ,FETCHLEVEL
+																				                                    ,
+																										    ,DatapermissionMask);
+	END;
 
 	EXPORT fn_useBusinessCredit (STRING in_dataPermissionMask, BOOLEAN IncludeBusinessCredit ) := FUNCTION
 
@@ -126,7 +147,7 @@ EXPORT Functions := MODULE
 
 		BusinessIds := DATASET([initialize()]);
 		
-		BOOLEAN exists_BipHeader 			:= EXISTS(BIPV2_Best.Key_LinkIds.Kfetch2(BusinessIds,,,,false,TopBusiness_Services.Constants.BestKfetchMaxLimit));
+		BOOLEAN exists_BipHeader 			:= EXISTS(BIPV2_Best.Key_LinkIds.Kfetch2(BusinessIds, , , ,false,BusinessCredit_Services.Constants.BestKfetchMaxLimit));
 		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
 
 		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,

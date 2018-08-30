@@ -11,7 +11,7 @@ EXPORT GetPhones( DATASET(lBatchIn)                        dIn,
 									DATASET(Gateway.Layouts.Config)          dGateways = DATASET([],Gateway.Layouts.Config)) :=
 FUNCTION
 	targusGateway := dGateways(inMod.useTargus and Gateway.Configuration.isTargus(servicename))[1];
-	qSentGateway  := dGateways(inMod.useQSent and Gateway.Configuration.isQSentV2(servicename))[1];
+	qSentPVSGateway  := dGateways(inMod.IncludeTransUnionPVS and Gateway.Configuration.isQSentV2(servicename))[1];
 	
 	// Create module with autokey paramaters to pass to the batch function
 	akMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.AKParams,OPT))
@@ -96,7 +96,7 @@ FUNCTION
 	dReformat2Common := PROJECT(dPhoneCarrierInfo,tReformat2Common(LEFT));
 	
 	// QSent gateway data
-	dQSentPVS := qSentPhones.GetQSentPVSData(dIn,inMod,homephone,acctno,,qSentGateway);
+	dQSentPVS := IF(inMod.IncludeTransUnionPVS, qSentPhones.GetQSentPVSData(dIn,inMod,homephone,acctno,,qSentPVSGateway));
 	
 	// No need to send to gateway again if we didn't get a hit for PVS since TU does hit the SS gateway if no hits found in their database	
 	// If data source returned from QSent is 'PV' (typeFlag = 'P'), no need to hit the gateway again for phone details
@@ -107,12 +107,12 @@ FUNCTION
 	dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dQSentPrimaryPhoneNoDetails),
 																				qSentPhones.GetQSentPVSData(dQSentPrimaryPhoneNoDetails,
 																																		inMod,batch_in.homephone,batch_in.acctno,
-																																		TRUE,qSentGateway));
+																																		TRUE,qSentPVSGateway));
 	
 	dQSentCombined := dQSentPrimaryPhoneDetails + dQSentPrimaryPhoneNoDetails + dQSentAppendPrimaryPhoneDetails;
 	
 	// Get QSent gateway records only for ultimate transaction type
-	dQSentRecs := IF(inMod.useQSent and qSentGateway.url != '',dQSentCombined);
+	dQSentRecs := IF(inMod.IncludeTransUnionPVS and qSentPVSGateway.url != '',dQSentCombined);
 	
 	dInhousePhoneDetail	:= PhoneFinder_Services.GetPhoneDetails(PROJECT(dIn,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
 																																											SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.homephone,SELF:=[])), dGateways, inMod);

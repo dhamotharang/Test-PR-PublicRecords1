@@ -290,14 +290,12 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                               SELF.PerStateLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
                                               // SELF.PerFederalLegalEvent := INVALID_INDIVIDUAL_SCORE;
                                               // SELF.PerFederalLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              // SELF.PerFederalLegalMatchLevel := INVALID_INDIVIDUAL_SCORE;
+                                              // SELF.PerFederalLegalMatchLevel_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerCivilLegalEvent := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerCivilLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerLegalTraffInfr := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerLegalTraffInfr_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerOffenseType := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerOffenseType_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerHighRiskNewsProfiles := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerHighRiskNewsProfiles_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
@@ -310,6 +308,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							// SELF.PerAssociates_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerProfLicense := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerProfLicense_Flag := INVALID_INDIVIDUAL_FLAGS;
+                                              // SELF.PerBusAssociations := INVALID_INDIVIDUAL_SCORE;
+																							// SELF.PerBusAssociations_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF := LEFT;));
 
 

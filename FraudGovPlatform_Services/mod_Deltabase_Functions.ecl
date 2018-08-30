@@ -7,6 +7,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		SHARED Layout_DeltabaseResponse := FraudGovPlatform_Services.Layouts.response_deltabase_layout;
 		SHARED Fraud_Platform := FraudShared_Services.Constants.Platform.FraudGov;
 		SHARED serviceUrl := batch_params.gateways(servicename = Gateway.Constants.ServiceName.FraudGovDeltabase)[1].Url;
+		SHARED dqString := FraudShared_Services.Utilities.dqString;
 		
 		SHARED DeltabaseSoapcall(DATASET(Layout_DeltabaseSelect) readDeltabase) := FUNCTION
 			
@@ -37,7 +38,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( Layout_LogDeltabase L) := TRANSFORM
 				
 				SELF.IsRecentActivity := TRUE;
-				SELF.FileType := 3;
+				SELF.FileType := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
 				SELF.GlobalCompanyId := (INTEGER)L.gc_id;
 				SELF.TransactionId := (STRING)L.cust_transaction_id;
 				SELF.HouseHoldId := L.case_id;
@@ -223,7 +224,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 
 			/*
 			----------------------------------------------------------------------------------------------------------------------------------
-			CODING IN THE COMMENT IS NO LONGE USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
+			CODING IN THE COMMENT IS NO LONGER USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
 			ARE GOING TO CALL GATEWAY ESP VIA SOAPCALL TO ACCESS DELTABASE RECORDS.
 			STILL KEEPING IT AS COMMENTED, IN CASE WE SWITCH BACK TO EARLIER METHOD IN FUTURE....
 			----------------------------------------------------------------------------------------------------------------------------------	
@@ -284,28 +285,28 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 					'SELECT * FROM delta_fraudgov.delta_identity WHERE '
 					+ ' date_added >= "' + L.date_added + '"'
 					+ ' AND ( '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.ssn) + ') > 0 AND ssn= ' + FraudShared_Services.Utilities.dqString(L.ssn) + ') OR ' 
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.dob)+ ') > 0 AND dob= ' + FraudShared_Services.Utilities.dqString(L.dob)+ ' ) OR '
+					+ ' (length(' + dqString(L.ssn) + ') > 0 AND ssn= ' + dqString(L.ssn) + ') OR ' 
+					+ ' (length(' + dqString(L.dob)+ ') > 0 AND dob= ' + dqString(L.dob)+ ' ) OR '
 					+ ' (' + L.lex_id + ' <> 0 AND lex_id= ' + L.lex_id + ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_first)+ ') > 0 AND name_first= ' + FraudShared_Services.Utilities.dqString(L.name_first)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_middle)+ ') > 0 AND name_middle= ' + FraudShared_Services.Utilities.dqString(L.name_middle)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.name_last)+ ') > 0 AND name_last= ' + FraudShared_Services.Utilities.dqString(L.name_last)+ ') OR '
-					+ ' (	length(' + FraudShared_Services.Utilities.dqString(L.physical_address)+ ') > 0 AND physical_address= ' + FraudShared_Services.Utilities.dqString(L.physical_address)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_city)+ ') > 0 AND physical_city= ' + FraudShared_Services.Utilities.dqString(L.physical_city)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_state)+ ') > 0 AND physical_state= ' + FraudShared_Services.Utilities.dqString(L.physical_state)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.physical_zip)+ ') > 0 AND physical_zip= ' + FraudShared_Services.Utilities.dqString(L.physical_zip)+ ') OR '
-					+ ' (	length(' + FraudShared_Services.Utilities.dqString(L.mailing_address)+ ') > 0 AND mailing_address= ' + FraudShared_Services.Utilities.dqString(L.mailing_address)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_city)+ ') > 0 AND mailing_city= ' + FraudShared_Services.Utilities.dqString(L.mailing_city)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_state)+ ') > 0 AND mailing_state= ' + FraudShared_Services.Utilities.dqString(L.mailing_state)+ ' AND '
-					+ ' length(' + FraudShared_Services.Utilities.dqString(L.mailing_zip)+ ') > 0 AND mailing_zip= ' + FraudShared_Services.Utilities.dqString(L.mailing_zip)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.phone)+ ') > 0 AND phone= ' + FraudShared_Services.Utilities.dqString(L.phone)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.ip_address)+ ') > 0 AND ip_address= ' + FraudShared_Services.Utilities.dqString(L.ip_address)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.device_id)+ ') > 0 AND device_id= ' + FraudShared_Services.Utilities.dqString(L.device_id)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.bank_account_number)+ ') > 0 AND bank_account_number= ' + FraudShared_Services.Utilities.dqString(L.bank_account_number)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.dl_state) + ') > 0 AND dl_state= ' + FraudShared_Services.Utilities.dqString(L.dl_state) + ' AND '
-					+	'	 length(' + FraudShared_Services.Utilities.dqString(L.dl_number)+ ') >0 AND dl_number= ' + FraudShared_Services.Utilities.dqString(L.dl_number)+ ') OR '
-					+ ' (length(' + FraudShared_Services.Utilities.dqString(L.geo_lat) + ') > 0 AND geo_lat= ' + FraudShared_Services.Utilities.dqString(L.geo_lat) + ' AND '
-					+ '  length(' + FraudShared_Services.Utilities.dqString(L.geo_long) + ') > 0 AND geo_long= ' + FraudShared_Services.Utilities.dqString(L.geo_long) + ')	'	
+					+ ' (length(' + dqString(L.name_first)+ ') > 0 AND name_first= ' + dqString(L.name_first)+ ') OR '
+					+ ' (length(' + dqString(L.name_middle)+ ') > 0 AND name_middle= ' + dqString(L.name_middle)+ ') OR '
+					+ ' (length(' + dqString(L.name_last)+ ') > 0 AND name_last= ' + dqString(L.name_last)+ ') OR '
+					+ ' (	length(' + dqString(L.physical_address)+ ') > 0 AND physical_address= ' + dqString(L.physical_address)+ ' AND '
+					+ ' length(' + dqString(L.physical_city)+ ') > 0 AND physical_city= ' + dqString(L.physical_city)+ ' AND '
+					+ ' length(' + dqString(L.physical_state)+ ') > 0 AND physical_state= ' + dqString(L.physical_state)+ ' AND '
+					+ ' length(' + dqString(L.physical_zip)+ ') > 0 AND physical_zip= ' + dqString(L.physical_zip)+ ') OR '
+					+ ' (	length(' + dqString(L.mailing_address)+ ') > 0 AND mailing_address= ' + dqString(L.mailing_address)+ ' AND '
+					+ ' length(' + dqString(L.mailing_city)+ ') > 0 AND mailing_city= ' + dqString(L.mailing_city)+ ' AND '
+					+ ' length(' + dqString(L.mailing_state)+ ') > 0 AND mailing_state= ' + dqString(L.mailing_state)+ ' AND '
+					+ ' length(' + dqString(L.mailing_zip)+ ') > 0 AND mailing_zip= ' + dqString(L.mailing_zip)+ ') OR '
+					+ ' (length(' + dqString(L.phone)+ ') > 0 AND phone= ' + dqString(L.phone)+ ') OR '
+					+ ' (length(' + dqString(L.ip_address)+ ') > 0 AND ip_address= ' + dqString(L.ip_address)+ ') OR '
+					+ ' (length(' + dqString(L.device_id)+ ') > 0 AND device_id= ' + dqString(L.device_id)+ ') OR '
+					+ ' (length(' + dqString(L.bank_account_number)+ ') > 0 AND bank_account_number= ' + dqString(L.bank_account_number)+ ') OR '
+					+ ' (length(' + dqString(L.dl_state) + ') > 0 AND dl_state= ' + dqString(L.dl_state) + ' AND '
+					+	'	 length(' + dqString(L.dl_number)+ ') >0 AND dl_number= ' + dqString(L.dl_number)+ ') OR '
+					+ ' (length(' + dqString(L.geo_lat) + ') > 0 AND geo_lat= ' + dqString(L.geo_lat) + ' AND '
+					+ '  length(' + dqString(L.geo_long) + ') > 0 AND geo_long= ' + dqString(L.geo_long) + ')	'	
 					+ ' )'
 					+ FraudGovPlatform_Services.Constants.limiter;
 			END;
@@ -329,7 +330,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			
 			/*
 			----------------------------------------------------------------------------------------------------------------------------------
-			CODING IN THE COMMENT IS NO LONGE USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
+			CODING IN THE COMMENT IS NO LONGER USED. SINCE NOW INSTEAD OF DIRECT DELTA BASE LOOKUP FROM ROXIE, WE 
 			ARE GOING TO CALL GATEWAY ESP VIA SOAPCALL TO ACCESS DELTABASE RECORDS.
 			STILL KEEPING IT AS COMMENTED, IN CASE WE SWITCH BACK TO EARLIER METHOD IN FUTURE....
 			----------------------------------------------------------------------------------------------------------------------------------	
@@ -387,8 +388,6 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		
 			Layout_DeltabaseSelect xRead_search() := TRANSFORM
 				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
-					// + ' gc_id = ' + batch_params.GlobalCompanyId
-					// + ' AND program_name = ' + FraudShared_Services.Utilities.dqString(TRIM(batch_params.IndustryTypeName))
 					+ ' date_added >= ' + last_data_build_date
 					+ FraudGovPlatform_Services.Constants.limiter;
 			END;

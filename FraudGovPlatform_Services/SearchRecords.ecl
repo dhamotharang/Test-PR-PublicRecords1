@@ -133,7 +133,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 											//Cleaning out @@@ from LEFT.entity_value when ELEMNT is of type address,
 											// @@@ was addded to calcualte the matching HASH value for tree_uid
 											SELF.ElementValue := IF(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
-																							REGEXREPLACE('@@@',LEFT.entity_value,', '), 
+																							FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.entity_value),
 																							LEFT.entity_value);
 											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,

@@ -260,10 +260,10 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	//--------------------------------------------------------------------------------------------------------------
 	//--------------------------------------------------------------------------------------------------------------
 	// This is an unfortunate artefact of the old Comp Report (and a weird code, having said that):
-	// doxie.ssn_records doesn't contain "best" record, so here I have to add it to AKAs
+	// doxie/ssn_records doesn't contain "best" record, so here I have to add it to AKAs
 	// (see also #14515)
-	// I believe it is still better than what was here before (calls to both doxie.ssn_records and doxie.ssn_persons)
-	// Eventually, doxie.ssn_records MUST be modified to return all persons, and all this code will be gone.
+	// I believe it is still better than what was here before (calls to both doxie/ssn_records and doxie/ssn_persons)
+	// Eventually, doxie/ssn_records MUST be modified to return all persons, and all this code will be gone.
 	//--------------------------------------------------------------------------------------------------------------
 	//--------------------------------------------------------------------------------------------------------------
 	shared aka_best := PersonReports.Functions.GetSubjectBestAKA (project(bestrecs, transform(doxie_crs.layout_best_information, self := left, self := [])), src_deceased, in_params);

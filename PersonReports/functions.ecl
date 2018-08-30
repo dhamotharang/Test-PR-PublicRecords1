@@ -816,10 +816,10 @@ shared layout_names_HRI := record
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
     // This is an unfortunate artefact of the old Comp Report (and a weird code, having said that):
-    // doxie.ssn_records doesn't contain "best" record, so here I have to add it to AKAs
+    // doxie/ssn_records doesn't contain "best" record, so here I have to add it to AKAs
     // (see also #14515)
-    // I believe it is still better than what was here before (calls to both doxie.ssn_records and doxie.ssn_persons)
-    // Eventually, doxie.ssn_records MUST be modified to return all persons, and all this code will be gone
+    // I believe it is still better than what was here before (calls to both doxie/ssn_records and doxie/ssn_persons)
+    // Eventually, doxie/ssn_records MUST be modified to return all persons, and all this code will be gone
     // (down to "subj_names" below).
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
@@ -831,7 +831,7 @@ shared layout_names_HRI := record
       RETURN PROJECT(hri_ssn,TRANSFORM(iesp.share.t_RiskIndicator,SELF.RiskCode:=LEFT.hri,SELF.Description:=LEFT.desc));
     END;
 
-    // in part mimics transform "ssnm" from doxie.SSN_Records
+    // in part mimics transform "ssnm" from doxie/SSN_Records
     iesp.share.t_SSNInfoEx FormatSSN_2 (doxie.layout_best L, recordof (doxie.Key_SSN_Map) R) := TRANSFORM
       r_end := IF (R.end_date='20990101', 0, (unsigned4) R.end_date);
       Self.SSN := L.ssn;

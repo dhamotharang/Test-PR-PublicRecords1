@@ -255,6 +255,11 @@ EXPORT Constants := MODULE
 	export ChildIdentityFraud := module
 		export MaxPersonRecords := 3;
 	end;
+  
+  //Citizenship
+  export Citizenship := MODULE
+    export MaxAttributes := 27;
+  end;
 
   // Contact Plus
 	export Contact_Plus := module
@@ -421,7 +426,7 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      				:= 24;		
+		export unsigned2 MaxAttributes      				:= 25;		
     // export unsigned2 MaxMatchSummaries     		 	:= 20;
     // export unsigned2 MaxNewsProfiles       		 	:= 20;
     export unsigned2 MaxProperties         			:= 500;

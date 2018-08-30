@@ -196,10 +196,10 @@ EXPORT Layouts := MODULE
 		STRING10 physical_state;
 		STRING10 physical_zip;
 		STRING3 physical_county;
-		STRING15 mailing_address;
+		STRING150 mailing_address;
 		STRING30 mailing_city;
-		STRING2 mailing_state;
-		STRING5 mailing_zip;
+		STRING10 mailing_state;
+		STRING10 mailing_zip;
 		STRING3 mailing_county;
 		STRING10 phone;
 		BIPV2.IDlayouts.l_xlink_ids.UltID;

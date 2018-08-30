@@ -1,9 +1,12 @@
 ﻿IMPORT $, STD, NID, MDR, iesp, ut;
 
 EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
-
+   
+   SHARED matchDid ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
+    (R.did>0 AND (UNSIGNED) L.UniqueId = R.did);
+  
    SHARED matchName ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
-    ((R.did>0 AND (UNSIGNED) L.UniqueId = R.did) OR
+    (matchDid(L, R) OR
     ( 
       NID.mod_PFirstTools.PFLeqPFR(L.Name.First, STD.STR.ToUpperCase(R.name_first)) AND                            
       (
@@ -14,7 +17,7 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
     ));      
 
   SHARED matchNameAddress ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R)  :=
-   ((R.did>0 AND (UNSIGNED) L.UniqueId = R.did) OR
+   (matchDid(L, R) OR
     ((matchName(L, R) AND 
     (
       (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.RecentAddress.StreetNumber = '' AND L.RecentAddress.StreetName = '') 

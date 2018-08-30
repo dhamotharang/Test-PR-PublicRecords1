@@ -1,4 +1,4 @@
-﻿import marriage_divorce_v2_Services, ut, Codes, Census_Data, AutoStandardI, suppress, address, fcra, FFD;
+﻿import marriage_divorce_v2_Services, ut, Codes, Census_Data, AutoStandardI, suppress, address, fcra, FFD, D2C;
 
 l_result	:= marriage_divorce_v2_Services.layouts.result.wide_tmp;
 l_id			:= marriage_divorce_v2_Services.layouts.expanded_id; //layouts.l_id;
@@ -14,7 +14,7 @@ export dataset(l_result) fn_getMD_report(
 
 	boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 	boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
-
+ isCNSMR := ut.IndustryClass.is_knowx;
 	params 		:= marriage_divorce_v2_Services.input.params;
 	it 				:= AutoStandardI.InterfaceTranslator;
 	gm 				:= marriage_divorce_v2_Services.input.gm(isFCRA);
@@ -49,8 +49,8 @@ export dataset(l_result) fn_getMD_report(
 	md_raw_1 := join(
 		in_ids, marriage_divorce_v2_Services.keys.main(isFCRA),
 	  keyed(left.record_id = right.record_id)
-    and (~ut.IndustryClass.is_knowx or right.state_origin<>'OK')
-		and ~(isFCRA and (string)right.persistent_record_id in set(flags_main ((unsigned6)did=left.search_did), record_id)),
+    and (~isCNSMR or (right.state_origin<>'OK' and right.vendor not in D2C.Constants.MDV2Restrictedvendors))
+		  and ~(isFCRA and (string)right.persistent_record_id in set(flags_main ((unsigned6)did=left.search_did), record_id)),
 		keep (1), limit(0)
 	);
 	

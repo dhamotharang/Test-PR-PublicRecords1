@@ -125,7 +125,7 @@
 */
 /*--USES-- ut.input_xslt */
 
-IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, PersonReports, standard, suppress, header, BankruptcyV3;
+IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, PersonReports, standard, suppress, header, BankruptcyV3, FCRA, STD;
 
 export PickListService := MACRO
 	
@@ -328,21 +328,13 @@ export PickListService := MACRO
                                                    Self.UniqueId := intformat (Left.did, 12, 1), Self := [])));
 	
   records_pre := if (return_just_dids, sort (esdl_dids, UniqueId), sort (esdl_header, _Penalty, UniqueId));
-	
-	PersonPickListRecord_Bk_Flag := record(iesp.person_picklist.t_PersonPickListRecord)
-																					boolean _HasBankruptcy;
-	                                 end;
-	
-	records_bk := join(records_pre, BankruptcyV3.key_bankruptcyV3_did(),
-   	                      (unsigned)left.UniqueId = right.did, 
-												    transform( PersonPickListRecord_Bk_Flag,
-													    self._HasBankruptcy := right.did > 0,
-													    self := left),
-      											 left outer, limit(0),keep(1));
-														
+
+  records_bk := PersonSearch_Services.Functions.GetBankruptcyFlag(records_pre);														
+
   records_esdl := if(SortByBankruptcy,
-	             project(sort(records_bk,if(_HasBankruptcy,0,1),_Penalty, UniqueId),iesp.person_picklist.t_PersonPickListRecord),
-							  records_pre);
+                      project(sort(records_bk, if(_HasBankruptcy, 0, 1), _Penalty, UniqueId), iesp.person_picklist.t_PersonPickListRecord),
+                      records_pre);
+  
   // set up non-fatal messages
   ds_message := if (check_ri and ~ri_input_complete and exists (header_rolled (info_code & ri_info_code = ri_info_code)),
 // TODO:  I wouldn't want to reuse an error code, but it's not clear if the separate set of codes is feasible to have  
@@ -353,7 +345,7 @@ export PickListService := MACRO
   iesp.ECL2ESP.Marshall.Mac_Set (first_row.Options);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results (records_esdl, res_esdl, iesp.person_picklist.t_PersonPickListResponse, 
                                               , , SubjectTotalCount, Messages, ds_message);
-
+  
   // output (dids, named('dids'));
   // output (all_header_recs, named('header'));
   // output (header_rolled, named ('header_rolled'));

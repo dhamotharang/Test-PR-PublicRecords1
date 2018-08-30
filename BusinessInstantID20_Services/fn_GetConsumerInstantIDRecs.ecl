@@ -965,23 +965,39 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			post_dob_masking := project(post_ssn_mask2,mask_dobs(left));
 			
-			// Convert seq back to original sequence number; there will therefore be 1-5 records
-			// having the same seq #.
-			InstantID_records :=
+			InstantID_records_pre :=
 				JOIN(
 					ds_Normed, post_dob_masking,
 					LEFT.Seq = RIGHT.seq,
-					TRANSFORM( risk_indicators.Layout_InstantID_NuGenPlus,
-						SELF.seq := LEFT.OrigSeq,
+					TRANSFORM( { risk_indicators.Layout_InstantID_NuGenPlus, UNSIGNED4 OrigSeq },
+						SELF.OrigSeq := LEFT.OrigSeq,
+            SELF.seq := LEFT.seq,
 						SELF := RIGHT,
 						SELF := []
 					),
 					INNER
 				);
 
+      // Sort explicity to ensure Auth Reps (identified by "seq") are still in the same 
+      // order as were input.
+      InstantID_records_srtd := SORT( InstantID_records_pre, OrigSeq, seq );
+
+			// Convert seq back to original sequence number; there will therefore be 1-5 records
+			// having the same seq #. Slim off OrigSeq.
+      InstantID_records :=
+        PROJECT(
+          InstantID_records_srtd,
+          TRANSFORM( risk_indicators.Layout_InstantID_NuGenPlus, 
+            SELF.seq := LEFT.OrigSeq,
+						SELF := LEFT,
+          )
+        );
+      
 			// OUTPUT( ds_Normed, NAMED('ds_Normed') );
 			// OUTPUT( prep, NAMED('prep') );
 			// OUTPUT( post_dob_masking, NAMED('post_dob_masking') );
+      // OUTPUT( InstantID_records_pre, NAMED('InstantID_records_pre') );
+      // OUTPUT( InstantID_records_srtd, NAMED('InstantID_records_srtd') );
 
 		RETURN InstantID_records;
 	END;

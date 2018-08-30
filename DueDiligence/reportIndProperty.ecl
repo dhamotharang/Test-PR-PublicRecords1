@@ -4,7 +4,7 @@
 EXPORT reportIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION  
 
     //pull property data from the inquired  
-    listOfProperties := NORMALIZE(inData, LEFT.properties, TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,																												
+    listOfProperties := NORMALIZE(inData, LEFT.perProperties, TRANSFORM(DueDiligence.LayoutsInternalReport.SharedPropertyLayout,																												
                                                                       SELF.seq := LEFT.seq; 
                                                                       SELF.did := LEFT.inquiredDID;
                                                                       
@@ -134,6 +134,12 @@ EXPORT reportIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := 
                                                                                                     SELF.AreaRisk.Hifca := LEFT.HIFCA;
                                                                                                     SELF.AreaRisk.Hidta := LEFT.HIDTA; 
                                                                                                     SELF.AreaRisk.CrimeIndex := IF(LEFT.CountyHasHighCrimeIndex, 'HIGH', 'LOW'); 
+                                                                                                    
+                                                                                                    SELF.OwnershipType.SubjectOwned := LEFT.inquiredOwned;
+                                                                                                    SELF.OwnershipType.SpouseOwned := LEFT.spouseOwned;
+                                                                                                    SELF.OwnershipType.Owners := PROJECT(LEFT.ownerNames, TRANSFORM(iesp.duediligenceshared.t_DDRPersonNameWithLexID,
+                                                                                                                                                                    SELF.LexID := (STRING)LEFT.DID;
+                                                                                                                                                                    SELF.Name := iesp.ECL2ESP.SetName(LEFT.firstName, LEFT.middleName, LEFT.lastName, LEFT.suffix, DueDiligence.Constants.EMPTY)));
                                                                                                     
                                                                                                     SELF := [];)]);
                                                             

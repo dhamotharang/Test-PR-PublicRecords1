@@ -2,10 +2,10 @@
 
 EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportrecords inmod,
 																				DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,
-																				DATASET(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_busheaderRecs,
 																				DATASET(doxie.layout_best) AuthRepBestRec,
 																				DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs,
-																				boolean buzCreditAccess = FALSE
+																				boolean buzCreditAccess = FALSE,
+																				STRING8 BestCode
 																			 ):= FUNCTION
 
 		topBusiness_bestrecs_bip := PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection)[1].BestSection;
@@ -74,9 +74,17 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		corp_status			:= corp_status_srt[1].businessstatus;
 			
 		//getting ultimate ParentCompanyName
-		parentDS 				:= PROJECT(ds_busheaderRecs(ParentAboveSELE = TRUE),TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2, self.seleid := left.ultimate_proxid,self := []));
-		parentInfo			:= BIPV2_Best.Key_LinkIds.kfetch2(parentDS, inmod.FetchLevel,,,FALSE,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid=0);
-		parent_company	:= ParentInfo[1].company_name[1].company_name;
+	
+		// efficiency use parent section instead of hitting best again.
+		ParentInfo := Project(topBusinessRecs,  TRANSFORM(iesp.businesscreditreport.t_BusinessCreditTopBusinessRecord,
+		                                             SELF.ParentSection := LEFT.ParentSection;
+                                                       SELF := []																								 
+										));
+								         			        										 								             
+		ParentInfoCname := project(parentInfo[1].ParentSection, TRANSFORM(iesp.businesscreditreport.t_BusinessCreditParentSection,
+		                                                        SELF.CompanyName := LEFT.CompanyName;
+													self := []));	
+          
 		// information from sbfe
 		buzCredit_tradeline := JOIN(buzCreditHeader_recs , Business_Credit.key_tradeline(), 
 																BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
@@ -96,7 +104,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		legal_Business_Structure 	:= SORT(tradeline_slim_tab, -Record_Count, -Date_Account_Opened, -Cycle_End_Date)[1].Legal_Business_Structure;
 		business_structure_desc		:= BusinessCredit_Services.Functions.fn_BuzStructureDescription(legal_Business_Structure);
 
-		IndustryCode :=	BusinessCredit_Services.fn_getPrimaryIndustry(inmod.BusinessIds , inmod.DataPermissionMask , inmod.Include_BusinessCredit).bestIndustryCode[1].Best_Code;
+           IndustryCode := bestCode;		
 		SIC_Desc		 :=	Codes.Key_SIC4(KEYED(SIC4_Code = IndustryCode))[1].sic4_description; 
 		NAICS_Desc	 := Codes.Key_NAICS(KEYED(naics_code = IndustryCode))[1].naics_description;
 		IndustryDesc :=	IF(SIC_Desc <> '' , SIC_Desc , NAICS_Desc);
@@ -126,7 +134,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 			SELF.PrimaryIndustryCode				:= IndustryCode;
 			SELF.PrimaryIndustryDescription := IndustryDesc;
 			SELF.BusinessType								:= IF(buzCreditAccess, business_structure_desc, '');
-			SELF.ParentCompanyName 					:= parent_company;
+			SELF.ParentCompanyName 					:=   ParentInfoCname.CompanyName; 
 			SELF.sosActiveIndicator 				:= corp_status;
 			SELF.BusinessCreditIndicator 		:= BusinessCredit_Services.Functions.fn_BuzCreditIndicator(	topBusiness_bestrecs.BusinessIds.UltID, 
 																																																	topBusiness_bestrecs.BusinessIds.OrgID,
@@ -136,6 +144,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		END;
 
 		Business_BestInformation := DATASET([transform_t_BusinessCreditBestSection()]);
-    
+       // output(ParentInfoCname, named('ParentInfoCname'));
+			 // output(parentCompany, named('parentCompany'));
 		RETURN Business_BestInformation;
 END;

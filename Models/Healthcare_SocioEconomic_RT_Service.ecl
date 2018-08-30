@@ -244,6 +244,7 @@ IMPORT iesp;
 				self._Header.Exceptions := if(hasExceptions,
 																FinalException_DS(code<>0),
 																dataset([],iesp.share.t_WsException));
+				self._Header.QueryId := first_row.user.QueryId;
 				self:=[];
 	end;
 	results := dataset([format()]);
