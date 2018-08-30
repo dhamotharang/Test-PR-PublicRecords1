@@ -2,7 +2,7 @@
 IMPORT _control,lib_fileservices,Address;
 
  EXPORT Spray_Infutor_Motorcycle(string	pProcessDate,
-																 string	pGroupName	=	'thor400_66',
+																 string	pGroupName	=	'thor400_36',
 																 boolean	pOverwrite	=	true
 																 )	:=
  FUNCTION
