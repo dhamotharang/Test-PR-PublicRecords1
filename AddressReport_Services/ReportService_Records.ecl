@@ -12,7 +12,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	AI					:=AutoStandardI.InterfaceTranslator;
 	clean_addr	:=ai.clean_address.val (project (param, AI.clean_address.params));
 	split_addr	:=Address.CleanFields(clean_addr);
-	isCNSMR := param.IndustryClass = D2C.Constants.Is_CNSMR;
+	isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
 
 	AddressReport_Services.Layouts.slim_address into_srch() := transform
 		self.prim_range 	:= split_addr.prim_range;
