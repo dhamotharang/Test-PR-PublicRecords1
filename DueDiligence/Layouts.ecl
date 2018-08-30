@@ -534,6 +534,20 @@ EXPORT Layouts := MODULE
     BOOLEAN inquiredOwned;
     BOOLEAN spouseOwned;
     DATASET(DIDAndName) vehicleOwners;
+      
+    STRING30 licensePlateType;
+    STRING50 classType;
+    STRING4 year;
+    STRING36 make;
+    STRING30 model;
+    UNSIGNED6 basePrice;
+    STRING25 vin;
+    
+    STRING2 titleState;
+    STRING8 titleDate;
+    STRING2 registeredState;
+    STRING8 registeredDate;
+    
     /* data that describes the vehicle */
     string25		Orig_VIN;                        
 		string4			Orig_Year;
