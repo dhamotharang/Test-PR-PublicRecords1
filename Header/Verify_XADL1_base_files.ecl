@@ -65,22 +65,6 @@ dataset([
 ,{'~thor400_44::key::insuranceheader_xlink::qa::did::sup::rid'}
 ,{'~thor400_44::key::insuranceheader_xlink::qa::header'}
 ,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
-,{'~thor400_66::key::insuranceheader_segmentation::did_ind_qa'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::address'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::dln'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::dob'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::dobf'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::lfz'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::name'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::ph'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::relative'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::ssn'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::ssn4'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::refs::zip_pr'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::did::sup::rid'}
-,{'~thor400_66::key::insuranceheader_xlink::qa::header'}
-,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
 ,{'~thor400_36::key::insuranceheader_segmentation::did_ind_qa'}
 ,{'~thor400_36::key::insuranceheader_xlink::qa::did'}
 ,{'~thor400_36::key::insuranceheader_xlink::qa::did::refs::address'}
@@ -145,22 +129,6 @@ dataset([
 ,{'~thor400_44::BASE::HSS_household_prod'}
 ,{'~thor400_44::BASE::HSS_name_source_prod'}
 ,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
-,{'~thor400_66::BASE::HSS_Name_Dayob'}
-,{'~thor400_66::BASE::HSS_Name_SSN'}
-,{'~thor400_66::BASE::HSS_Name_Address'}
-,{'~thor400_66::BASE::HSS_Name_phone'}
-,{'~thor400_66::BASE::HSS_Name_Zip_Age_Ssn4'}
-,{'~thor400_66::BASE::HSS_household'}
-,{'~thor400_66::BASE::HSS_name_source'}
-,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
-,{'~thor400_66::BASE::HSS_Name_Dayob_prod'}
-,{'~thor400_66::BASE::HSS_Name_SSN_prod'}
-,{'~thor400_66::BASE::HSS_Name_Address_prod'}
-,{'~thor400_66::BASE::HSS_Name_phone_prod'}
-,{'~thor400_66::BASE::HSS_Name_Zip_Age_Ssn4_prod'}
-,{'~thor400_66::BASE::HSS_household_prod'}
-,{'~thor400_66::BASE::HSS_name_source_prod'}
-,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
 ,{'~thor_data400::base::header_raw_prod'}
 ,{'~thor_data400::base::header_raw'}
 ,{'~thor_data400::base::header_raw_built'}
@@ -224,22 +192,6 @@ dataset([
 ,{'~thor400_44::key::insuranceheader_xlink::temp::did::sup::rid'}
 ,{'~thor400_44::key::insuranceheader_xlink::temp::header'}
 ,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
-,{'~thor400_66::key::insuranceheader_segmentation::did_ind_temp'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::address'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::dln'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::dob'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::dobf'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::lfz'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::name'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::ph'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::relative'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::ssn'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::ssn4'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::refs::zip_pr'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::did::sup::rid'}
-,{'~thor400_66::key::insuranceheader_xlink::temp::header'}
-,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
 ,{'~thor400_36::key::insuranceheader_segmentation::did_ind_temp'}
 ,{'~thor400_36::key::insuranceheader_xlink::temp::did'}
 ,{'~thor400_36::key::insuranceheader_xlink::temp::did::refs::address'}
@@ -257,6 +209,7 @@ dataset([
 ,{'~thor400_36::key::insuranceheader_xlink::temp::header'}
 ,{'WWWWWWWWWWWWWWWWWWWWWWWWWWWW'}
 ],{string200 fn});
+
 
 t:=table(d,{sfn:=trim(fn),lfn:=if(STD.File.fileexists(fn),STD.File.SuperFileContents(fn))});
 
