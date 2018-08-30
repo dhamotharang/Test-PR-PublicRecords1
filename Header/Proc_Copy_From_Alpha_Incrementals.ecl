@@ -13,7 +13,6 @@ SHARED fName8(string mid, string kNm) := '~thor400_36::key::insuranceheader_xlin
 
 // Construct the incremental superfile per cluster
 SHARED currLgInc(string KNm) := '~'+ifname(fName('inc',kNm));
-SHARED currLgInc6(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'thor400_66');
 SHARED currLgInc8(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'thor400_36');
 
 
@@ -48,10 +47,6 @@ EXPORT ok_to_copy := version_date_ok and (~local_address_file_exists);
 SHARED fc(string f1, string f2):= sequential(
            output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
            if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
-
-SHARED fc6(string f1, string f2):= sequential(
-            output(dataset([{f1,'thor400_66',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-            if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_66',f2,,,,,true,true,,true))));
 
 SHARED fc8(string f1, string f2):= sequential(
             output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
