@@ -155,7 +155,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		// get WU state							
 		
 		dBuildInfo := dataset([{p_dopsdatasetname,p_buildversion,p_componentname
-												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime(true)
+												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime()
 												,p_vertical,p_location,'','',''}],rTrackBuild);
 		
 		return 	sequential
@@ -184,7 +184,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		
 		return sequential(
 										output('setting app value for '+p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname)
-										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime(true)+'|'+p_vertical+'|'+p_location)
+										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location)
 										);
 		
 	end;
@@ -230,7 +230,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	// but when tracking use, using super 
 	////////////////////////////////////////////////////
 	export dGetInfo(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) 
-																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '');
+																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '' and length(datetime) = 14);
 	
 	////////////////////////////////////////////////////
 	// move all track logical files into "using" super
@@ -402,12 +402,16 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																			,STD.File.RemoveOwnedSubFiles(SD_FileTrackBuild(FileInfoPrefix),true)
 																			,STD.File.FinishSuperFileTransaction()
 																		)
-																		,STD.System.Email.SendEmail(toemaillist
-																					,'SOAPCALL ERRORS: Build Tracking job'
-																					,'Check ' + SU_FileTrackBuild(FileInfoPrefix) + '::persist, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
-																					,
-																					,
-																					,fromemail)
+																		,sequential
+																				(
+																					output(dDopsBTUpdate,named('ERRORS'))
+																					,STD.System.Email.SendEmail(toemaillist
+																						,'SOAPCALL ERRORS: Build Tracking job'
+																						,'Check ERRORS result, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
+																						,
+																						,
+																						,fromemail)
+																				)
 																	)
 																,output('Nothing to track')
 														)

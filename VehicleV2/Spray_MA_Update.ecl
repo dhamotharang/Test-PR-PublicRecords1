@@ -2,7 +2,7 @@
 //This file is copied from Spray_Infutor_Vin. It reads the input directory and sprays all files in the directory to the target
 //location. The input files are with txt extention and delimited by tab.
 EXPORT Spray_MA_Update(string	pProcessDate,
-											 string	pGroupName	  =	'thor400_66',
+											 string	pGroupName	  =	'thor400_36',
 											 boolean	pOverwrite	=	true
 											)	:=
 FUNCTION

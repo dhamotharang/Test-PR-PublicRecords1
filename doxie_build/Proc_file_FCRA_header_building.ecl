@@ -1,5 +1,9 @@
 import header, lib_fileservices,_control,ut,AID,header_services,mdr,PromoteSupers;
 
+export Proc_file_FCRA_header_building(string filedate, boolean inc) := function
+
+typ:=if(inc,'inc','mnt');
+
 head := dataset('~thor_data400::Base::FCRA_HeaderKey_Building', header.Layout_Header, flat);
 
 ut.mac_suppress_by_phonetype(head,phone,st,phone_suppression,true,did);
@@ -44,17 +48,20 @@ DoBuild := distribute(full_out_suppress,hash(did));
 
 pre1 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::file_fcra_header_building_BUILDING')>0,
     output('Nothing added to Base::file_fcra_header_building_BUILDING'),
-    fileservices.addsuperfile('~thor_data400::Base::file_fcra_header_building_BUILDING','~thor_data400::base::fcra_header',,true));
+    fileservices.addsuperfile('~thor_data400::Base::file_fcra_header_building_BUILDING','~thor_data400::base::fcra_header_'+typ,,true));
 
-PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building',bld,2,,true,pVersion:=Header.version_build)
+PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building',bld,2,,true,pVersion:=filedate)
+PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building_mnt',bld_m,2,,true,pVersion:=filedate)
 
 post1 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILT'),
 		fileservices.addsuperfile('~thor_data400::base::file_fcra_header_building_BUILT','~thor_Data400::base::file_fcra_header_building_BUILDING',0,true),
 		fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILDING'));
 
-full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_fcra_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::fcra_header',1),
+full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_fcra_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::fcra_header_'+typ,1),
 		output('FCRA Header Base = BUILT. Nothing Done.'),
-		sequential(pre1, bld ,post1));
+		sequential(pre1, bld , if(~inc,bld_m),post1));
 
-export Proc_file_FCRA_header_building := full1;
+return full1;
+
+end;
