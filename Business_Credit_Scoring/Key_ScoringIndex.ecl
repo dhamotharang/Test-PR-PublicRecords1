@@ -1,7 +1,7 @@
-IMPORT	Business_Credit_Scoring, Business_Credit, Business_Header, BusinessCredit_Services, 
-				Risk_Indicators, BIPV2,	ut, iesp, Codes;
+﻿IMPORT	Business_Credit_Scoring, Business_Credit, Business_Header, BusinessCredit_Services, 
+				Risk_Indicators, BIPV2,	STD, iesp, Codes;
 
-EXPORT Key_ScoringIndex(	STRING	pVersion	=	ut.GetDate,
+EXPORT Key_ScoringIndex(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
 													BOOLEAN	pUseProd	=	FALSE)	:=	MODULE
 
 	SHARED	dKeyResult			:=	Business_Credit_Scoring.Files().ScoringIndex;
