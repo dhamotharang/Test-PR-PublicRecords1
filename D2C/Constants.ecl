@@ -146,6 +146,12 @@ EXPORT MDV2Restrictedvendors := [vendor_CIVPABUCKS, vendor_CIVTXHARRISCNTY];
 			thor_data400::key::header_qa
 		Source field : src
  */
+ 
+ //------------------------------------------------------------------------------------------------------//
+
+EXPORT PhonemetadataRestrictedSources := [ MDR.sourceTools.src_PhonesPorted_TCPA];
+
+ //------------------------------------------------------------------------------------------------------//
 
  EXPORT PersonHeaderRestrictedSources := [
 			MDR.sourceTools.src_WV_Watercraft,					
