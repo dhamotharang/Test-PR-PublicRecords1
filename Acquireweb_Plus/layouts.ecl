@@ -1,29 +1,6 @@
 ﻿EXPORT layouts := MODULE
   IMPORT AID, bipv2;
 
-	EXPORT layout_Acquireweb_Email_Individuals:=RECORD
-		STRING	AWID_Ind;
-		STRING	firstname;
-		STRING	lastname;
-		STRING	address1;
-		STRING	address2;
-		STRING	city;
-		STRING	state;
-		STRING	zip;
-		STRING	zip4;
-		STRING	Phone;
-		STRING	DOB;
-		STRING	IndExportDate;
-	END;
-
-	EXPORT layout_Acquireweb_Email_Emails:=RECORD
-		STRING	emailid;
-		STRING	AWID_Email;
-		STRING	email;
-		STRING	ACTIVECODE;
-		STRING	EmailExportDate;
-	END;
-	
 	EXPORT layout_clean_name := RECORD
 		STRING5 clean_title;
     STRING20 clean_fname;
@@ -61,31 +38,56 @@
     STRING1 clean_geo_match;
     STRING4 clean_err_stat;
 	END;
-
-	EXPORT layout_Acquireweb_Base:=RECORD
-	  // Information from the original files
+	
+//Business Build layouts	
+	EXPORT Business_raw:= RECORD
+	  STRING   AWID_Business;
+    // STRING   B2B_Indivifual;
+		STRING   FirstName;
+		STRING   LastName;
+		STRING   Title;
+		STRING   CompanyName;
+		STRING   Address1;
+		STRING   Address2;
+		STRING   City;
+		STRING   State;
+		STRING   Zip;
+		STRING   Zip4;
+		STRING   Email;
+  END;
+	
+	EXPORT Acquireweb_IPAddress:=RECORD
+		STRING	Zip;
+		STRING	Zip4;
+		STRING	IpAddress;
+	END;
+	
+	EXPORT Business_Base:=RECORD
+		unsigned6 rcid; //Used for Ingest process
+	  // Information from the raw files
     STRING awid;
-    STRING firstname;
-    STRING lastname;
-    STRING address1;
-    STRING address2;
-    STRING city;
-    STRING state;
-    STRING zip;
-    STRING zip4;
-    STRING phone;
-    STRING dob;
-    STRING emailid;
-    STRING email;
-    STRING activecode;
+		STRING FirstName;
+		STRING LastName;
+		STRING Title;
+		STRING CompanyName;
+		STRING Address1;
+		STRING Address2;
+		STRING City;
+		STRING State;
+		STRING Zip;
+		STRING Zip4;
+	  STRING emailid;
+		STRING Email;
+		STRING IPAddress;
 		
 		// Information harvested from the DID lookup process
     UNSIGNED8 did;
     UNSIGNED8 did_score;
 		UNSIGNED8 aid;
 		
-		// Information harvested from the CleanPersonFML73 function
-    layout_clean_name;
+		// Information harvested from the NID function
+    layout_clean_name - clean_name_score;
+		STRING clean_cname;
 		
 		// information harvested from the AID lookup process
     layout_clean_addr;
@@ -96,6 +98,11 @@
 		STRING8 date_vendor_first_reported;
 		STRING8 date_vendor_last_reported;
 		BOOLEAN current_rec;
+		STRING Source; //Distinguish Business(AP) from Individual(AW)
 	END;
-
+	
+	EXPORT Base_w_bip	:= RECORD
+		Business_Base;
+		bipv2.IDlayouts.l_xlink_ids;
+	END;
 END;
