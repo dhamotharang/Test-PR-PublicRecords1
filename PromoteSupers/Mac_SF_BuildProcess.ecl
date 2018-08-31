@@ -1,6 +1,3 @@
-/*2010-05-06T15:11:04Z (Krishna Gummadi)
-
-*/
 export	MAC_SF_BuildProcess(	thedataset,
 															basename,
 															seq_name,
@@ -8,7 +5,9 @@ export	MAC_SF_BuildProcess(	thedataset,
 															csvout = 'false',
 															pCompress = 'false',
 															pVersion	=	'\'\'',
-															pSeparator	=	'\',\''
+															pSeparator	=	'\',\'',
+															pQuote	=	'\'"\'',
+															pterminator	=	'\'\\n\''
 														)	:=
 macro
 
@@ -29,6 +28,10 @@ numgenerations is currently to be just 2 or 3
 
 #uniquename(sptr)
 %sptr% := pSeparator;
+#uniquename(qte)
+%qte% := pQuote;
+#uniquename(term)
+%term% := pTerminator;
 
 //only works on resubmit
 #uniquename(workalreadydone)
@@ -49,9 +52,9 @@ seq_name	:=	if(	%ng%	not in	[2,3],
 																		#end
 																	#else
 																		#if(pCompress != true)
-																			output(thedataset,,basename	+	'_'	+	%fileVersion%,overwrite,csv(separator(%sptr%),quote('"'),heading(single))),
+																			output(thedataset,,basename	+	'_'	+	%fileVersion%,           overwrite,csv(heading(single),separator(%sptr%),quote(%qte%),terminator(%term%))),
 																		#else
-																			output(thedataset,,basename	+	'_'	+	%fileVersion%,compressed,overwrite,csv(separator(%sptr%),quote('"'),heading(single))),
+																			output(thedataset,,basename	+	'_'	+	%fileVersion%,compressed,overwrite,csv(                separator(%sptr%),quote(%qte%),terminator(%term%))),
 																		#end
 																	#end
 																	FileServices.StartSuperFileTransaction(),
