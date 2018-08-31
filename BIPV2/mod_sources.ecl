@@ -46,7 +46,7 @@ export mod_sources := module
 	export string15	faux_vlid(string12 fid)			:= '---' + fid; // left-pad with 3 irrelevant characters
 	
 	
-	export unsigned exlusiveSrc2code(string2 src, string34 vl_id='') := map(
+	export unsigned exclusiveSrc2code(string2 src, string34 vl_id='') := map(
 		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
 		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
 		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
@@ -61,7 +61,7 @@ export mod_sources := module
 	
  export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
               
-	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exlusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
+	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	
 	shared l_code	:= {code c};
 	shared l_src	:= {string2 src};
@@ -119,7 +119,7 @@ export mod_sources := module
       boolean glb := ivals.GLB.ok(in_mod.GLBPurpose) OR ivals.GLB.HeaderIsPreGLB(0,dt_first_seen,src);
       
       boolean other_restrictions := case(
-                                          exlusiveSrc2code(src,vl_id),
+                                          exclusiveSrc2code(src,vl_id),
                                           code.DPPA						=> ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(src),ivals.DPPA.stored_value,,src),
                                           code.DNB						=> ivals.AllowAll OR dnbWillMask,
                                           code.EBR						=> ~ivals.DRM.EBR,
