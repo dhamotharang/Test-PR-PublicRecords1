@@ -333,6 +333,11 @@ EXPORT Layouts := MODULE
 			unsigned1		Deltabase := 0;
 			Provenance;
 		END;
+
+		EXPORT SourcesToAnonymize := RECORD
+			unsigned6			fdn_file_info_id;
+		END;
+		
 	END;
 
 
@@ -410,6 +415,7 @@ EXPORT Layouts := MODULE
 			string50       address_2 := '';
 			Address.Layout_Clean182_fips					clean_address;
 		END;
+		
 	END;
 
 	export OutputF := module

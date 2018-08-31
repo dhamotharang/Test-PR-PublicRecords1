@@ -79,8 +79,6 @@ module
 	NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
  
 	// Append RinID
-	NewBaseRinID := Append_RinID (NewBaseRid);
-
-	EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT NewBase := Append_RinID (NewBaseRid);
 
 END;
