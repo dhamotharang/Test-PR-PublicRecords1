@@ -38,14 +38,9 @@ IMPORT ut, watchdog, dx_BestRecords, doxie_files, Infutor, DeathV2_Services, Aut
 #uniquename(filter_eq)
 %filter_eq% := doxie.DataRestriction.isEQCHRestricted(drm);
 
-#uniquename(norm_input)
-%norm_input% := project(did_stream, 
-	transform({unsigned did}, 
-		self.did := (unsigned)left.did_field));
-
 #uniquename(outf)
-%outf% := dx_BestRecords.fn_get_best_records(%norm_input%, glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
-	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
+%outf% := project(dx_BestRecords.fn_get_best_records(did_stream, did_field, glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%), transform(bestlayout, self := left));
 	
 #uniquename(outfile_nominors)
 %outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,

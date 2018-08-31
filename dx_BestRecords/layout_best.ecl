@@ -1,4 +1,4 @@
-import dx_BestRecords;
+import dx_BestRecords, AID;
 
 export layout_best := record
   unsigned6    did := 0;
@@ -34,4 +34,6 @@ export layout_best := record
   unsigned1 age := 0;
   string1	  valid_ssn := '';
   STRING10     ADL_ind := '';
+	UNSIGNED3 addr_dt_first_seen := 0;	
+	AID.Common.xAID	RawAID := 0; 	
 end;
