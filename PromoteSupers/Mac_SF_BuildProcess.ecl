@@ -1,4 +1,4 @@
-export	MAC_SF_BuildProcess(	thedataset,
+﻿export	MAC_SF_BuildProcess(	thedataset,
 															basename,
 															seq_name,
 															numgenerations = '3',
@@ -7,7 +7,8 @@ export	MAC_SF_BuildProcess(	thedataset,
 															pVersion	=	'\'\'',
 															pSeparator	=	'\',\'',
 															pQuote	=	'\'"\'',
-															pterminator	=	'\'\\n\''
+															pTerminator	=	'\'\\n\'',
+															pHeading = '\'single\''
 														)	:=
 macro
 
@@ -32,7 +33,8 @@ numgenerations is currently to be just 2 or 3
 %qte% := pQuote;
 #uniquename(term)
 %term% := pTerminator;
-
+#uniquename(hdr)
+%hdr% := pHeading;
 //only works on resubmit
 #uniquename(workalreadydone)
 %workalreadydone%(string	sub)	:=	if(	pVersion	!=	'',
@@ -52,9 +54,9 @@ seq_name	:=	if(	%ng%	not in	[2,3],
 																		#end
 																	#else
 																		#if(pCompress != true)
-																			output(thedataset,,basename	+	'_'	+	%fileVersion%,           overwrite,csv(heading(single),separator(%sptr%),quote(%qte%),terminator(%term%))),
+																			output(thedataset,,basename	+	'_'	+	%fileVersion%,           overwrite,csv(heading(#expand(%hdr%)),separator(%sptr%),quote(%qte%),terminator(%term%))),
 																		#else
-																			output(thedataset,,basename	+	'_'	+	%fileVersion%,compressed,overwrite,csv(                separator(%sptr%),quote(%qte%),terminator(%term%))),
+																			output(thedataset,,basename	+	'_'	+	%fileVersion%,compressed,overwrite,csv(heading(#expand(%hdr%)),separator(%sptr%),quote(%qte%),terminator(%term%))),
 																		#end
 																	#end
 																	FileServices.StartSuperFileTransaction(),
