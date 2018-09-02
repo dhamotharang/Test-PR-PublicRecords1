@@ -2,7 +2,7 @@
 
 STRING8 sVersion := BIPV2.KeySuffix;
 rIn_Layout := BIPV2.Layout_Business_Linking_Full;
-dIngest_In := DATASET(BIPV2.Filenames(sVersion,TRUE).Source_Ingest.new, rIn_Layout, THOR);
+dIngest_In := DATASET(BIPV2.Filenames(sVersion).Source_Ingest.new, rIn_Layout, THOR);
 // dIngest_In := ENTH(DATASET(BIPV2.Filenames(sVersion,TRUE).Source_Ingest.new, rIn_Layout, THOR), 1000); //For Testing Only
 
 // tbl_layout := RECORD
