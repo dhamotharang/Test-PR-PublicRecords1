@@ -1943,6 +1943,8 @@ EXPORT Constants := MODULE
 	export unsigned2 WP_MAX_COUNT_SEARCH_RESPONSE_RECORDS        := 100;
 	export unsigned2 WP_PLUS_MAX_COUNT_SEARCH_RESPONSE_RECORDS   := 2000;
 	export unsigned2 WP_MAX_COUNT_SEARCH_RESPONSE_SINGLE_RECORD  := 1;
+	export unsigned2 WP_MAX_COUNT_ADDL_COMP  := 4;
+	export unsigned2 WP_MAX_COUNT_EMAIL_ADDR := 3;
 
 
   // *** Modules that refer to other modules above.

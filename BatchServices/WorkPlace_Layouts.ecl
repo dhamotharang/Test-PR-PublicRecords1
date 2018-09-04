@@ -17,14 +17,29 @@ EXPORT WorkPlace_Layouts := MODULE
     unsigned6  did       := 0;
 		unsigned6  spouseDid := 0;
 	END;
-
+	
+	EXPORT Email_Info := RECORD
+		string200 email1;
+		string200 email2;
+		string200 email3;
+		STRING2 email_src1;
+		STRING2 email_src2;
+		STRING2 email_src3;
+		string200 spouse_email1;
+		string200 spouse_email2;
+		string200 spouse_email3;
+		STRING2 spouse_email_src1;
+		STRING2 spouse_email_src2;
+		STRING2 spouse_email_src3;	
+	END;
+	
   // When online WorkPlace search is created, revise this layout to use the same layout for the
 	// batch service and all the needed online search service result fields (names, co addr, etc.)?
   EXPORT poe_didkey_slimmed := RECORD
     // The 6 fields below are not on the POE did key, 
 		// but are needed to assist in internal processing
     string20   acctno             := '';
-    unsigned1  source_order       := 255; // high value default in case source not found when do key lookup
+    unsigned1  source_order; // high value default in case source not found when do key lookup (default value is defined in BatchServices.WorkPlace_Constants.DEFAULT_SOURCE_ORDER)
     string1    spouse_indicator   := '';
 	  string10   company_phone2     := '';    // phone# for the company from EDA/gong data
 		string30   corp_key           := '';    // needed for corp data lookup
@@ -46,11 +61,22 @@ EXPORT WorkPlace_Layouts := MODULE
 		// company address fields stored in case there is no company name or addresss in the
 		// poe data and the phone# is used to look up company info on the gong history file.
 		string70   company_address     := '';
+		string10   company_prim_range  := '',
+		string2    company_predir      := '',		
+		string28   company_prim_name   := '',
+		string4    company_addr_suffix := '',		
+		string2    company_postdir     := '',		
+		string10   company_unit_desig  := '',
+		string8    company_sec_range   := '',
+		string5    company_zip5        := '',
+		string4    company_zip4        := '',
     string25   company_city        := '';
     string2    company_state       := '';
     string10   company_zip         := '';
     string10   company_phone1      := ''; // Work/Company phone# from vendor data if present
 		unsigned4  company_fein			   :=  0; // needed for self employed check
+		BOOLEAN from_PAW := FALSE;
+		Email_Info;
   END;
 
 	// PSS slimmed layout
@@ -116,24 +142,82 @@ EXPORT WorkPlace_Layouts := MODULE
     string120 addl_wpl_comp_name_1      := '';
 		string70  addl_wpl_comp_address1_1  := '';
     string70  addl_wpl_comp_address2_1  := ''; 
-    string25  addl_wpl_comp_city_1      := '';
-    string2   addl_wpl_comp_state_1     := '';
-    string10  addl_wpl_comp_zip_1       := '';
+		string10  addl_wpl_comp_prim_range1_1  := '',
+		string2   addl_wpl_comp_predir1_1      := '',		
+		string28  addl_wpl_comp_prim_name1_1   := '',
+		string4   addl_wpl_comp_addr_suffix1_1 := '',		
+		string2   addl_wpl_comp_postdir1_1     := '',		
+		string10  addl_wpl_comp_unit_desig1_1  := '',
+		string8   addl_wpl_comp_sec_range1_1   := '',
+		string25  addl_wpl_comp_city_1       := '';
+		string2   addl_wpl_comp_state_1      := '';
+		string10  addl_wpl_comp_zip_1        := '';
+		string5   addl_wpl_comp_zip5_1       := '',
+		string4   addl_wpl_comp_zip4_1       := '',
     string17  addl_wpl_phone1_1         := ''; 
     string10  addl_wpl_phone2_1         := ''; 
     string60  addl_wpl_status_1         := '';
     string8   addl_wpl_last_seen_date_1 := ''; // For internal use only, not be returned to customer
     string12  addl_wpl_bdid_2           := ''; // For internal use only, not be returned to customer
     string120 addl_wpl_comp_name_2      := '';
-		string70  addl_wpl_comp_address1_2  := '';
-    string70  addl_wpl_comp_address2_2  := '';
-    string25  addl_wpl_comp_city_2      := '';
-    string2   addl_wpl_comp_state_2     := '';
-    string10  addl_wpl_comp_zip_2       := '';
+		string70  addl_wpl_comp_address1_2   := '';
+		string70  addl_wpl_comp_address2_2   := '';
+		string10  addl_wpl_comp_prim_range1_2  := '',
+		string2   addl_wpl_comp_predir1_2      := '',		
+		string28  addl_wpl_comp_prim_name1_2   := '',
+		string4   addl_wpl_comp_addr_suffix1_2 := '',		
+		string2   addl_wpl_comp_postdir1_2     := '',		
+		string10  addl_wpl_comp_unit_desig1_2  := '',
+		string8   addl_wpl_comp_sec_range1_2   := '',
+		string25  addl_wpl_comp_city_2       := '';
+		string2   addl_wpl_comp_state_2      := '';
+		string10  addl_wpl_comp_zip_2        := '';
+		string5   addl_wpl_comp_zip5_2       := '',
+		string4   addl_wpl_comp_zip4_2       := '',
     string17  addl_wpl_phone1_2         := ''; 
     string10  addl_wpl_phone2_2         := ''; 
     string60  addl_wpl_status_2         := '';
     string8   addl_wpl_last_seen_date_2 := ''; // For internal use only, not be returned to customer
+		string12  addl_wpl_bdid_3            := ''; // For internal use only, not be returned to customer
+    string120 addl_wpl_comp_name_3       := '';
+		string70  addl_wpl_comp_address1_3   := '';
+		string70  addl_wpl_comp_address2_3   := '';
+		string10  addl_wpl_comp_prim_range1_3  := '',
+		string2   addl_wpl_comp_predir1_3      := '',		
+		string28  addl_wpl_comp_prim_name1_3   := '',
+		string4   addl_wpl_comp_addr_suffix1_3 := '',		
+		string2   addl_wpl_comp_postdir1_3     := '',		
+		string10  addl_wpl_comp_unit_desig1_3  := '',
+		string8   addl_wpl_comp_sec_range1_3   := '',
+		string25  addl_wpl_comp_city_3       := '';
+		string2   addl_wpl_comp_state_3      := '';
+		string10  addl_wpl_comp_zip_3        := '';
+		string5   addl_wpl_comp_zip5_3       := '',
+		string4   addl_wpl_comp_zip4_3       := '',
+		string17  addl_wpl_phone1_3          := ''; 
+    string10  addl_wpl_phone2_3          := ''; 
+    string60  addl_wpl_status_3          := '';
+		string8   addl_wpl_last_seen_date_3 := ''; // For internal use only, not be returned to customer
+		string12  addl_wpl_bdid_4            := ''; // For internal use only, not be returned to customer
+    string120 addl_wpl_comp_name_4       := '';
+		string70  addl_wpl_comp_address1_4   := '';
+    string70  addl_wpl_comp_address2_4   := '';
+		string10  addl_wpl_comp_prim_range1_4  := '',
+	  string2   addl_wpl_comp_predir1_4      := '',		
+	  string28  addl_wpl_comp_prim_name1_4   := '',
+	  string4   addl_wpl_comp_addr_suffix1_4 := '',		
+	  string2   addl_wpl_comp_postdir1_4     := '',		
+	  string10  addl_wpl_comp_unit_desig1_4  := '',
+	  string8   addl_wpl_comp_sec_range1_4   := '',
+    string25  addl_wpl_comp_city_4       := '';
+    string2   addl_wpl_comp_state_4      := '';
+    string10  addl_wpl_comp_zip_4        := '';
+		string5   addl_wpl_comp_zip5_4       := '',
+		string4   addl_wpl_comp_zip4_4       := '',
+    string17  addl_wpl_phone1_4          := ''; 
+    string10  addl_wpl_phone2_4          := ''; 
+    string60  addl_wpl_status_4          := '';
+		string8   addl_wpl_last_seen_date_4 := ''; // For internal use only, not be returned to customer
   END;
 
   // This layout is used for "looking up" phone#s by bdid on the EDA/gong bdid key file
@@ -265,12 +349,6 @@ EXPORT WorkPlace_Layouts := MODULE
     string60  parent_company_status   := '';
     string60  prof_license            := ''; 
     string45  prof_license_status     := '';
-    string200 email1                  := '';  // only if requested
-    string200 email2                  := '';  //  "   "     "
-    string200 email3                  := '';  //  "   "     "
-		STRING2 email_src1        				:= '';
-		STRING2 email_src2        				:= '';
-		STRING2 email_src3        				:= '';
     // NOTE: additional workplacelocator (history) fields are populated only when requested.
     string12  addl_wpl_bdid_1          := ''; // For internal use only, not be returned to customer
     string120 addl_wpl_comp_name_1     := '';
@@ -292,7 +370,27 @@ EXPORT WorkPlace_Layouts := MODULE
     string17  addl_wpl_phone1_2        := ''; 
     string10  addl_wpl_phone2_2        := ''; 
     string60  addl_wpl_status_2        := '';
-
+		string12  addl_wpl_bdid_3            := ''; // For internal use only, not be returned to customer
+    string120 addl_wpl_comp_name_3       := '';
+		string70  addl_wpl_comp_address1_3   := '';
+    string70  addl_wpl_comp_address2_3   := '';
+    string25  addl_wpl_comp_city_3       := '';
+    string2   addl_wpl_comp_state_3      := '';
+    string10  addl_wpl_comp_zip_3        := '';
+    string17  addl_wpl_phone1_3          := ''; 
+    string10  addl_wpl_phone2_3          := ''; 
+    string60  addl_wpl_status_3          := '';
+		string12  addl_wpl_bdid_4            := ''; // For internal use only, not be returned to customer
+    string120 addl_wpl_comp_name_4       := '';
+		string70  addl_wpl_comp_address1_4   := '';
+    string70  addl_wpl_comp_address2_4   := '';
+    string25  addl_wpl_comp_city_4       := '';
+    string2   addl_wpl_comp_state_4      := '';
+    string10  addl_wpl_comp_zip_4        := '';
+    string17  addl_wpl_phone1_4          := ''; 
+    string10  addl_wpl_phone2_4          := ''; 
+    string60  addl_wpl_status_4          := '';
+		Email_Info;
     //subject future use fields
 		// Product manager originally wanted these "reserved**" field names in the output, 
 		// but that approach was changed effective 05/17/2011 roxie release.  
@@ -365,13 +463,48 @@ EXPORT WorkPlace_Layouts := MODULE
     string60  spouse_parent_company_status  := '';
     string60  spouse_prof_license           := '';
     string45  spouse_prof_license_status    := '';
-    string200 spouse_email1                 := '';  // only if requested
-    string200 spouse_email2                 := '';  //  "   "      "
-    string200 spouse_email3                 := '';  //  "   "      " 
-		STRING2 spouse_email_src1        				:= '';
-		STRING2 spouse_email_src2        				:= '';
-		STRING2 spouse_email_src3        				:= '';	
-		
+
+		// NOTE: additional workplacelocator (history) fields are populated only when requested.
+		string12  spouse_addl_wpl_bdid_1          := ''; // For internal use only, not be returned to customer
+    string120 spouse_addl_wpl_comp_name_1     := '';
+		string70  spouse_addl_wpl_comp_address1_1 := '';
+    string70  spouse_addl_wpl_comp_address2_1 := '';
+    string25  spouse_addl_wpl_comp_city_1     := '';
+    string2   spouse_addl_wpl_comp_state_1    := '';
+    string10  spouse_addl_wpl_comp_zip_1      := '';
+    string17  spouse_addl_wpl_phone1_1        := ''; 
+    string10  spouse_addl_wpl_phone2_1        := ''; 
+    string60  spouse_addl_wpl_status_1        := '';
+    string12  spouse_addl_wpl_bdid_2          := ''; // For internal use only, not be returned to customer
+    string120 spouse_addl_wpl_comp_name_2     := '';
+		string70  spouse_addl_wpl_comp_address1_2 := '';
+    string70  spouse_addl_wpl_comp_address2_2 := '';
+    string25  spouse_addl_wpl_comp_city_2     := '';
+    string2   spouse_addl_wpl_comp_state_2    := '';
+    string10  spouse_addl_wpl_comp_zip_2      := '';
+    string17  spouse_addl_wpl_phone1_2        := ''; 
+    string10  spouse_addl_wpl_phone2_2        := ''; 
+    string60  spouse_addl_wpl_status_2        := '';
+		string12  spouse_addl_wpl_bdid_3            := ''; // For internal use only, not be returned to customer
+    string120 spouse_addl_wpl_comp_name_3       := '';
+		string70  spouse_addl_wpl_comp_address1_3   := '';
+    string70  spouse_addl_wpl_comp_address2_3   := '';
+    string25  spouse_addl_wpl_comp_city_3       := '';
+    string2   spouse_addl_wpl_comp_state_3      := '';
+    string10  spouse_addl_wpl_comp_zip_3        := '';
+    string17  spouse_addl_wpl_phone1_3          := ''; 
+    string10  spouse_addl_wpl_phone2_3          := ''; 
+    string60  spouse_addl_wpl_status_3          := '';
+		string12  spouse_addl_wpl_bdid_4            := ''; // For internal use only, not be returned to customer
+    string120 spouse_addl_wpl_comp_name_4       := '';
+		string70  spouse_addl_wpl_comp_address1_4   := '';
+    string70  spouse_addl_wpl_comp_address2_4   := '';
+    string25  spouse_addl_wpl_comp_city_4       := '';
+    string2   spouse_addl_wpl_comp_state_4      := '';
+    string10  spouse_addl_wpl_comp_zip_4        := '';
+    string17  spouse_addl_wpl_phone1_4          := ''; 
+    string10  spouse_addl_wpl_phone2_4          := ''; 
+    string60  spouse_addl_wpl_status_4          := '';
 		//spouse future use fields
 		// Product manager originally wanted these "reserved**" field names in the output, 
 		// but that approach was changed effective 05/17/2011 roxie release.  
