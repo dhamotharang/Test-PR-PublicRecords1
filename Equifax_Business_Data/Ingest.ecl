@@ -1,10 +1,11 @@
-﻿IMPORT SALT37,equifax_business_data;
+﻿IMPORT SALT37,Equifax_Business_Data;
 EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Layout_Base) Delta = DATASET([],Layout_Base)
-, DATASET(Layout_Base) dsBase = In_File // Change IN_Base to change input to ingest process
-, DATASET(RECORDOF(equifax_business_data.In_File))  infile = equifax_business_data.In_File
+, DATASET(Equifax_Business_Data.Layouts.Base) Delta = DATASET([],Equifax_Business_Data.Layouts.Base) //default empty file
+, DATASET(Equifax_Business_Data.Layouts.Base) dsBase 
+, DATASET(Equifax_Business_Data.Layouts.Base) infile 
 ) := MODULE
-  SHARED NullFile := DATASET([],Layout_Base); // Use to replace files you wish to remove 
+
+ SHARED NullFile := DATASET([],Equifax_Business_Data.Layouts.Base); // Use to replace files you wish to remove
  
   SHARED FilesToIngest := infile;
   In_Src_Cnt_Rec := RECORD
@@ -66,12 +67,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.clean_company_name := ri.clean_company_name; // Derived(NEW)
     SELF.clean_phone := ri.clean_phone; // Derived(NEW)
     SELF.clean_secondary_phone := ri.clean_secondary_phone; // Derived(NEW)
-    SELF.title := ri.title; // Derived(NEW)
-    SELF.fname := ri.fname; // Derived(NEW)
-    SELF.mname := ri.mname; // Derived(NEW)
-    SELF.lname := ri.lname; // Derived(NEW)
-    SELF.name_suffix := ri.name_suffix; // Derived(NEW)
-    SELF.name_score := ri.name_score; // Derived(NEW)
     SELF.prim_range := ri.prim_range; // Derived(NEW)
     SELF.predir := ri.predir; // Derived(NEW)
     SELF.prim_name := ri.prim_name; // Derived(NEW)
@@ -120,9 +115,10 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
              ,AT_CERTLEV9,AT_CERTLEV10,AT_CERTNUM1,AT_CERTNUM2,AT_CERTNUM3,AT_CERTNUM4,AT_CERTNUM5,AT_CERTNUM6,AT_CERTNUM7,AT_CERTNUM8
              ,AT_CERTNUM9,AT_CERTNUM10,AT_CERTEXP1,AT_CERTEXP2,AT_CERTEXP3,AT_CERTEXP4,AT_CERTEXP5,AT_CERTEXP6,AT_CERTEXP7,AT_CERTEXP8
              ,AT_CERTEXP9,AT_CERTEXP10,EFX_EXTRACT_DATE,EFX_MERCHANT_ID,EFX_PROJECT_ID,EFX_FOREIGN,Record_Update_Refresh_Date,EFX_DATE_CREATED,normCompany_Name,normCompany_Type
-             ,Norm_Geo_Precision,Norm_Corporate_Amount_Precision,Norm_Location_Amount_Precision,Norm_Public_Co_Indicator,Norm_Stock_Exchange,Norm_Telemarketablity_Score,Norm_Telemarketablity_Total_Indicator,Norm_Telemarketablity_Total_Score,Norm_Government1057_Entity,Norm_Merchant_Type
-             ,NormAddress_Type,Norm_Address,Norm_City,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec
-             ,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum,Norm_Ctryname,ALL);
+             ,Norm_Geo_Precision,Exploded_Desc_Corporate_Amount_Precision,Exploded_Desc_Location_Amount_Precision,Exploded_Desc_Public_Co_Indicator,Exploded_Desc_Stock_Exchange,Exploded_Desc_Telemarketablity_Score,Exploded_Desc_Telemarketablity_Total_Indicator,Exploded_Desc_Telemarketablity_Total_Score,Exploded_Desc_Government1057_Entity,Exploded_Desc_Merchant_Type
+             ,Exploded_Desc_Busstatcd,Exploded_Desc_CMSA,Exploded_Desc_Corpamountcd,Exploded_Desc_Corpamountprec,Exploded_Desc_Corpamounttp,Exploded_Desc_Corpempcd,Exploded_Desc_Ctrytelcd,NormAddress_Type,Norm_Address,Norm_City
+             ,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum
+             ,Norm_Ctryname,ALL);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP( SORT( GroupIngest0,__Tpe,rcid,seleid),TRUE,MergeData(LEFT,RIGHT)));
   // Existing Base: combine delta with base file
   GroupBase0 := GROUP( SALT37.MAC_DatasetAsOf(Base0+Delta0,rcid,seleid,,dt_effective_first,dt_effective_last,,'YYYYMMDD',TRUE),EFX_ID
@@ -145,9 +141,10 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
              ,AT_CERTLEV9,AT_CERTLEV10,AT_CERTNUM1,AT_CERTNUM2,AT_CERTNUM3,AT_CERTNUM4,AT_CERTNUM5,AT_CERTNUM6,AT_CERTNUM7,AT_CERTNUM8
              ,AT_CERTNUM9,AT_CERTNUM10,AT_CERTEXP1,AT_CERTEXP2,AT_CERTEXP3,AT_CERTEXP4,AT_CERTEXP5,AT_CERTEXP6,AT_CERTEXP7,AT_CERTEXP8
              ,AT_CERTEXP9,AT_CERTEXP10,EFX_EXTRACT_DATE,EFX_MERCHANT_ID,EFX_PROJECT_ID,EFX_FOREIGN,Record_Update_Refresh_Date,EFX_DATE_CREATED,normCompany_Name,normCompany_Type
-             ,Norm_Geo_Precision,Norm_Corporate_Amount_Precision,Norm_Location_Amount_Precision,Norm_Public_Co_Indicator,Norm_Stock_Exchange,Norm_Telemarketablity_Score,Norm_Telemarketablity_Total_Indicator,Norm_Telemarketablity_Total_Score,Norm_Government1057_Entity,Norm_Merchant_Type
-             ,NormAddress_Type,Norm_Address,Norm_City,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec
-             ,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum,Norm_Ctryname,ALL);
+             ,Norm_Geo_Precision,Exploded_Desc_Corporate_Amount_Precision,Exploded_Desc_Location_Amount_Precision,Exploded_Desc_Public_Co_Indicator,Exploded_Desc_Stock_Exchange,Exploded_Desc_Telemarketablity_Score,Exploded_Desc_Telemarketablity_Total_Indicator,Exploded_Desc_Telemarketablity_Total_Score,Exploded_Desc_Government1057_Entity,Exploded_Desc_Merchant_Type
+             ,Exploded_Desc_Busstatcd,Exploded_Desc_CMSA,Exploded_Desc_Corpamountcd,Exploded_Desc_Corpamountprec,Exploded_Desc_Corpamounttp,Exploded_Desc_Corpempcd,Exploded_Desc_Ctrytelcd,NormAddress_Type,Norm_Address,Norm_City
+             ,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum
+             ,Norm_Ctryname,ALL);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP( SORT( GroupBase0,__Tpe,rcid),TRUE,MergeData(LEFT,RIGHT)));
  
   Group0 := GROUP( AllBaseRecs0+AllIngestRecs0,EFX_ID
@@ -170,9 +167,10 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
              ,AT_CERTLEV9,AT_CERTLEV10,AT_CERTNUM1,AT_CERTNUM2,AT_CERTNUM3,AT_CERTNUM4,AT_CERTNUM5,AT_CERTNUM6,AT_CERTNUM7,AT_CERTNUM8
              ,AT_CERTNUM9,AT_CERTNUM10,AT_CERTEXP1,AT_CERTEXP2,AT_CERTEXP3,AT_CERTEXP4,AT_CERTEXP5,AT_CERTEXP6,AT_CERTEXP7,AT_CERTEXP8
              ,AT_CERTEXP9,AT_CERTEXP10,EFX_EXTRACT_DATE,EFX_MERCHANT_ID,EFX_PROJECT_ID,EFX_FOREIGN,Record_Update_Refresh_Date,EFX_DATE_CREATED,normCompany_Name,normCompany_Type
-             ,Norm_Geo_Precision,Norm_Corporate_Amount_Precision,Norm_Location_Amount_Precision,Norm_Public_Co_Indicator,Norm_Stock_Exchange,Norm_Telemarketablity_Score,Norm_Telemarketablity_Total_Indicator,Norm_Telemarketablity_Total_Score,Norm_Government1057_Entity,Norm_Merchant_Type
-             ,NormAddress_Type,Norm_Address,Norm_City,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec
-             ,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum,Norm_Ctryname,ALL);
+             ,Norm_Geo_Precision,Exploded_Desc_Corporate_Amount_Precision,Exploded_Desc_Location_Amount_Precision,Exploded_Desc_Public_Co_Indicator,Exploded_Desc_Stock_Exchange,Exploded_Desc_Telemarketablity_Score,Exploded_Desc_Telemarketablity_Total_Indicator,Exploded_Desc_Telemarketablity_Total_Score,Exploded_Desc_Government1057_Entity,Exploded_Desc_Merchant_Type
+             ,Exploded_Desc_Busstatcd,Exploded_Desc_CMSA,Exploded_Desc_Corpamountcd,Exploded_Desc_Corpamountprec,Exploded_Desc_Corpamounttp,Exploded_Desc_Corpempcd,Exploded_Desc_Ctrytelcd,NormAddress_Type,Norm_Address,Norm_City
+             ,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum
+             ,Norm_Ctryname,ALL);
   SHARED AllRecs0 := UNGROUP(ROLLUP( SORT( Group0,__Tpe,rcid),TRUE,MergeData(LEFT,RIGHT)));
 // seleid changed records
   seleidChangeNewRecs  := AllRecs0(seleidChange);

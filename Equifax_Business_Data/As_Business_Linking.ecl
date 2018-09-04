@@ -10,7 +10,7 @@ EXPORT As_Business_Linking (
 		//COMPANY MAPPING
 		business_header.layout_business_linking.linking_interface	trfMapBLInterface(Equifax_Business_Data.layouts.Base l) := transform																				
 																							 
-				self.source_record_id            := l.rcid;
+				self.source_record_id            := 0;
 				self.vl_id                       := trim(l.efx_id);
 				self.source                      := mdr.sourcetools.src_Equifax_Business_Data;        
 				self.company_phone               := l.clean_phone;
@@ -32,7 +32,8 @@ EXPORT As_Business_Linking (
         self.company_naics_code4 := l.EFX_SECNAICS3;
         self.company_naics_code5 := l.EFX_SECNAICS4;	
         //P = physical address, M = mailing address;
-        self.company_address_type_raw    		:= if(l.normAddress_Type = 'P', 'BUSINESS', 'MAILING');				
+        self.company_address_type_raw    		:= if(l.v_city_name<>'' Or l.st<>'' Or l.zip <>'',
+				                                         if(l.normAddress_Type = 'P', 'PHYSICAL', 'MAILING'),'');				
 				self.company_address.prim_range  := l.prim_range;
 				self.company_address.predir      := l.predir;
 				self.company_address.prim_name   := l.prim_name;
@@ -57,7 +58,7 @@ EXPORT As_Business_Linking (
 				self.dt_first_seen               := l.dt_first_seen;
 				self.dt_last_seen                := l.dt_last_seen;
 				self.dt_vendor_last_reported     := l.dt_vendor_last_reported;
-				self.dt_vendor_first_reported    := l.dt_vendor_last_reported;
+				self.dt_vendor_first_reported    := l.dt_vendor_first_reported;
 				self.current					           := true;
 				self.dppa						             := false;
         self.company_foreign_domestic := if(l.EFX_FOREIGN = '', 'D', 'F'); 

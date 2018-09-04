@@ -14,6 +14,6 @@ pversion 	:= '20150601'								 ;		// modify to current date
 #workunit('name', Equifax_Business_Data._Dataset().Name + ' Build ' + pversion);
 
 Equifax_Business_Data.Build_All(pversion, 
-                                '/data/temp/boneill/training/20180726/', 
-																_control.IPAddress.bctlpedata12, 
-																'LN_archive_Q*.txt');
+                                '/data/hds_180/Equifax_Business_Data', 
+																_control.IPAddress.bctlpedata11, 
+																'LN_archive_Q42015.txt');

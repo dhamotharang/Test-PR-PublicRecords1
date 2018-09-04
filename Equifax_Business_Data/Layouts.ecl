@@ -205,8 +205,6 @@ END;
 		STRING6    										source                            := '';
 		UNSIGNED6   									rcid                              := 0;
 	 	BIPV2.IDlayouts.l_xlink_ids;
-		// UNSIGNED6											did													      := 0;
-	  // UNSIGNED1											did_score										      := 0;
 		UNSIGNED4 										dt_first_seen								      := 0;
 	  UNSIGNED4 										dt_last_seen								      := 0;
 	  UNSIGNED4 										dt_vendor_first_reported		      := 0;
@@ -233,16 +231,24 @@ END;
     STRING10 			Norm_Ctrynum 														:= '';
     STRING100 		Norm_Ctryname 													:= '';
 		STRING10 			Norm_Geo_Precision 											:= '';
-		STRING9 			Norm_Corporate_Amount_Precision 				:= '';
-		STRING9 			Norm_Location_Amount_Precision 					:= '';
-		STRING8 			Norm_Public_Co_Indicator 								:= '';
-		STRING48			Norm_Stock_Exchange 										:= '';
-		STRING18 			Norm_Telemarketablity_Score 						:= '';
-		STRING25 			Norm_Telemarketablity_Total_Indicator 	:= '';
-		STRING18 			Norm_Telemarketablity_Total_Score 			:= '';
-		STRING21 			Norm_Government1057_Entity 							:= '';
-		STRING22 			Norm_Merchant_Type 											:= '';
-	  Address.Layout_Clean_Name; 
+		
+		STRING9 			Exploded_Desc_Corporate_Amount_Precision 				:= '';
+		STRING9 			Exploded_Desc_Location_Amount_Precision 					:= '';
+		STRING8 			Exploded_Desc_Public_Co_Indicator 								:= '';
+		STRING48			Exploded_Desc_Stock_Exchange 										:= '';
+		STRING18 			Exploded_Desc_Telemarketablity_Score 						:= '';
+		STRING25 			Exploded_Desc_Telemarketablity_Total_Indicator 	:= '';
+		STRING18 			Exploded_Desc_Telemarketablity_Total_Score 			:= '';
+		STRING21 			Exploded_Desc_Government1057_Entity 							:= '';
+		STRING22 			Exploded_Desc_Merchant_Type 											:= '';
+		STRING50      Exploded_Desc_Busstatcd                          := '';
+		STRING100     Exploded_Desc_CMSA                               := '';
+		STRING13      Exploded_Desc_Corpamountcd                       := '';
+		STRING50      Exploded_Desc_Corpamountprec                     := '';
+		STRING50      Exploded_Desc_Corpamounttp                       := '';
+		STRING9       Exploded_Desc_Corpempcd                          := '';
+		STRING100     Exploded_Desc_Ctrytelcd                          := '';
+		
 		Address.Layout_Clean182_fips; 
     STRING100   									clean_company_name                := '';		
 		string10											clean_phone												:='';
@@ -258,22 +264,6 @@ END;
 	// -- Temporary Layouts for processing
 	////////////////////////////////////////////////////////////////////////
 	EXPORT Temp := MODULE
-	
-	  EXPORT DidSlim := RECORD
-			UNSIGNED8		unique_id   := 0;
-			STRING20 		fname;
-			STRING20 		mname;
-			STRING20 		lname;
-			STRING5  		name_suffix;
-			STRING10  	prim_range;
-			STRING28		prim_name;
-			STRING8			sec_range;
-			STRING5			zip5;
-			STRING2			state;
-			STRING10		phone;
-			// UNSIGNED6		did         := 0;
-			// UNSIGNED1		did_score		:= 0;
-	  END;
 
 	  EXPORT BIPSlim := RECORD
 			UNSIGNED8		unique_id;
@@ -284,12 +274,8 @@ END;
 			STRING25 		city;   		      // p_city
 			STRING2			state;
 			STRING5			zip5;
-			STRING20 		fname;
-			STRING20 		mname;
-			STRING20 		lname;
 			STRING10		phone;
 			STRING      url;
-			STRING      email;
 			BIPV2.IDlayouts.l_xlink_ids;
 	  END;
 		

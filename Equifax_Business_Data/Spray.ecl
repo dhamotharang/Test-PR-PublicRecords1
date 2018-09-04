@@ -2,11 +2,11 @@
 
 EXPORT Spray(
 	 STRING		pversion			= ''
-	,STRING		pServerIP			= _control.IPAddress.bctlpedata12
-	,STRING		pDirectory		= '/data/hds_180/infutor_narb/data/' + pversion[1..8]
-	,STRING		pFileType			= 'Lexis_Nexis_Extract_*.txt'	
+	,STRING		pServerIP			= _control.IPAddress.bctlpedata11
+	,STRING		pDirectory		= '/data/equifax_business_data/' + pversion[1..8]
+	,STRING		pFileType			= ''	
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )	
-	,BOOLEAN	pIsTesting		= TRUE
+	,BOOLEAN	pIsTesting		= FALSE
 	,BOOLEAN	pOverwrite		= FALSE
 	,BOOLEAN	pExistSprayed	= _Flags.ExistCurrentSprayed
 	,STRING		pNameOutput		= _Constants().Name + ' Spray Info'	

@@ -15,9 +15,9 @@ EXPORT Build_Strata(
 	Strata.mac_CreateXMLStats(dUpdate.dInputNoGrouping					,Equifax_Business_Data._Constants().Name	,'Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildInputNoGrouping_Strata					,'View'				,'Population'	,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueInputNoGrouping		,Equifax_Business_Data._Constants().Name	,'Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildInputUniqueNoGrouping_Strata		,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dNoGrouping								,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildNoGrouping_Strata								,'View'				,'Population'	,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dCleanAddressState				,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildCleanAddressState_Strata				,'address.st'	,'Population'	,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dCleanAddressState				,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildCleanAddressState_Strata				,'Clean_State'	,'Population'	,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueNoGrouping					,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueNoGrouping_Strata					,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'address.st'	,'Uniques'		,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'Clean_State'	,'Uniques'		,,pIsTesting,pOverwrite);
 
 	full_build := PARALLEL(
 		 BuildInputNoGrouping_Strata			

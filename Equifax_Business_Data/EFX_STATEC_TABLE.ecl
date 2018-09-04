@@ -1,8 +1,8 @@
-﻿IMPORT Codes;
+﻿IMPORT Codes, ut;
 
 EXPORT EFX_STATEC_TABLE := 
 MODULE
-	EXPORT VARSTRING STATEC(STRING code) :=
+	EXPORT VARSTRING STATEC(STRING code) := ut.CleanSpacesAndUpper(
 	  MAP(
 		  code='2' => 'ALASKA',
       code='1' => 'ALABAMA',
@@ -64,27 +64,6 @@ MODULE
       code='70' => 'PALAU',
       code='78' => 'VIRGIN ISLANDS',       
 			 code='' => '',
-			 'INVALID');	 
-						 			 			
-export checkChanges :=
-	FUNCTION
-		
-	codes.Layout_Codes_V3 trans(codes.File_Codes_V3_in le) :=
-		TRANSFORM
-			translation := 
-				MAP(le.field_name = 'STATEC' =>	STATEC(le.code),
-				    '');
-	
-			SELF.code := IF(stringlib.StringCleanSpaces(le.long_desc)=
-                               stringlib.StringCleanSpaces(translation),SKIP,le.code);
-						 
-			SELF := le;
-		END;
-	
-	p := PROJECT(codes.File_Codes_V3_in(file_name='STATEC',field_name in ['STATEC']
-	),trans(LEFT));
-	RETURN p;
-		
-	END;
+			 'INVALID'));	 
 	
 END;

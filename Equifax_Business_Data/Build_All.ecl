@@ -2,9 +2,9 @@
 
 export Build_All(
 	 string															pversion	
-	,string															pDirectory			= '/data/equifax_business_data/' + pversion[1..8]
-	,string															pServerIP				= _control.IPAddress.bctlpedata12
-	,string															pFilename				= 'Lexis_Nexis_Extract_20180507.txt'
+	,string															pDirectory			= '/data/hds_180/Equifax_Business_Data' + pversion[1..8]
+	,string															pServerIP				= _control.IPAddress.bctlpedata11
+	,string															pFilename				= ''
   ,string															pGroupName			= STD.System.Thorlib.Group( )	  		
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																												
@@ -24,7 +24,7 @@ function
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
 		,Equifax_Business_Data.Promote().Inputfiles.using2used
 		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
-		// ,BIPStats(pversion) 
+		,BIPStats(pversion) 
 		,Equifax_Business_Data.QA_Records()
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);

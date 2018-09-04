@@ -1,8 +1,8 @@
-﻿IMPORT codes;
+﻿IMPORT codes, ut;
 
 EXPORT EFX_BUSSTATCD_TABLE := 
 MODULE
-	EXPORT VARSTRING BUSSTATCD(STRING code) :=
+	EXPORT VARSTRING BUSSTATCD(STRING code) := ut.CleanSpacesAndUpper(
 	  MAP(		
        code='1' => 'Individual/Sole Proprietor',
        code='2' => 'Partnership',
@@ -18,27 +18,6 @@ MODULE
        code='12' => 'Trust',
        code='13' => 'Limited Liability Limited Partnership (LLLP)',	
        code='' => '',
-			 'INVALID');	 
+			 'INVALID'));	 
 			
-export checkChanges :=
-	FUNCTION
-		
-	codes.Layout_Codes_V3 trans(codes.File_Codes_V3_in le) :=
-		TRANSFORM
-			translation := 
-				MAP(le.field_name = 'BUSSTATCD' =>	BUSSTATCD(le.code),
-				    '');
-	
-			SELF.code := IF(stringlib.StringCleanSpaces(le.long_desc)=
-                               stringlib.StringCleanSpaces(translation),SKIP,le.code);
-						 
-			SELF := le;
-		END;
-	
-	p := PROJECT(codes.File_Codes_V3_in(file_name='BUSSTATCD',field_name in ['BUSSTATCD']
-	),trans(LEFT));
-	RETURN p;
-		
-	END;			 
-
 END;	

@@ -41,10 +41,10 @@ FIELDTYPE:invalid_naics:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_naics >
 FIELDTYPE:invalid_url:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_url > 0)
 FIELDTYPE:invalid_address_type_code:ENUM(P|M)
 FIELDTYPE:invalid_norm_type:ENUM(D|L)
-FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\'-!#$%&*,./:;?@_{}~+=()^`><)
+FIELDTYPE:invalid_email:ALLOW( 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\'-!#$%&*,./:;?@_{}~+=()^`><)
 FIELDTYPE:invalid_yes_blank:ENUM(Y| )
 FIELDTYPE:invalid_business_size:ENUM(L|S|X)
-FIELDTYPE:invalid_cert_or_class:ENUM(Certified|Classified|CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|Classification|Certification|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| )
+FIELDTYPE:invalid_cert_or_class:ENUM(CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| )
 FIELDTYPE:invalid_current_future_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_current_future_date > 0)
 FIELDTYPE:invalid_current_past_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_current_past_date > 0)
 FIELDTYPE:invalid_future_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_future_date > 0)
@@ -52,10 +52,11 @@ FIELDTYPE:invalid_general_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_
 FIELDTYPE:invalid_past_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_past_Date > 0)
 FIELDTYPE:invalid_year_established:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_year_established > 0)
 FIELDTYPE:invalid_date_created:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_date_created > 0)
-FIELDTYPE:invalid_date_seen:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_date_seen > 0)
+FIELDTYPE:invalid_date_seen:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_current_past_date > 0)
+FIELDTYPE:invalid_reformated_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate > 0)
 
-FIELDTYPE:invalid_vendor_reported_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_reported_date > 0)
-FIELDTYPE:invalid_process_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_valid_process_date > 0)
+FIELDTYPE:invalid_vendor_reported_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_current_past_date > 0)
+FIELDTYPE:invalid_process_date:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_current_past_date > 0)
 
 FIELDTYPE:invalid_busstatcd:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_busstatcd>0)
 FIELDTYPE:invalid_cmsa:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_cmsa>0)
@@ -105,12 +106,12 @@ FIELD:ultweight:TYPE(UNSIGNED2):LIKE(invalid_numeric):0,00
 
 //These could change once we get the fixed vendor data !!!!!!!!!!
 //Check logic on all date validations
-FIELD:dt_first_seen:TYPE(STRING8):LIKE(invalid_date_seen):0,0
-FIELD:dt_last_seen:TYPE(STRING8):LIKE(invalid_date_seen):0,0
-FIELD:dt_vendor_first_reported:TYPE(STRING8):LIKE(invalid_vendor_reported_date):0,0
-FIELD:dt_vendor_last_reported:TYPE(STRING8):LIKE(invalid_vendor_reported_date):0,0
+FIELD:dt_first_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
+FIELD:dt_last_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
+FIELD:dt_vendor_first_reported:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
+FIELD:dt_vendor_last_reported:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
 
-FIELD:process_date:TYPE(STRING8):LIKE(invalid_process_date):0,0
+FIELD:process_date:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
 FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
 
 FIELD:normcompany_type:TYPE(STRING1):LIKE(invalid_norm_type):0,0

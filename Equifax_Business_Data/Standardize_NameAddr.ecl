@@ -4,13 +4,13 @@ EXPORT Standardize_NameAddr := MODULE
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// -- function: fStandardizeNames
-	// -- Standardizes people and company names and phone numbers
+	// -- Standardizes company names and phone numbers
 	//////////////////////////////////////////////////////////////////////////////////////
 	EXPORT fStandardizeNamesPhone(DATASET(Equifax_Business_Data.Layouts.Base) pPreProcessInput) :=	FUNCTION
 			
 		// -- Mapping Clean company name and clean phone numbers
 		Equifax_Business_Data.Layouts.Base tMapCleanCompanyName(pPreProcessInput L) := TRANSFORM   
-			SELF.clean_company_name := ut.CleanSpacesAndUpper(L.normCompany_Name);
+			SELF.clean_company_name := L.normCompany_Name;
 			SELF.clean_phone := ut.CleanPhone(L.EFX_PHONE); 
 			SELF.clean_secondary_phone := ut.CleanPhone(L.EFX_FAXPHONE);											 						
 			SELF								  := L;			
@@ -38,16 +38,15 @@ EXPORT Standardize_NameAddr := MODULE
 			cleanStreet  := REGEXREPLACE(InvalidPart,L.norm_Address,'');			
 			cleanCity    := L.norm_City;	
 			
-			prepAddrLast 	  :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(cleanCity) + 
-														IF(cleanCity <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
-													  IF(LENGTH(L.norm_Zip) >= 5, L.norm_Zip[1..5], ''));
+			prepAddrLast 	  :=	L.norm_City + 
+														IF(L.norm_City <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
+														L.norm_Zip[1..5];
 			
 			clean_AddrPrep	:= IF(prepAddrLast <> '', Address.CleanAddress182(cleanStreet, prepAddrLast), '');	
 			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
 																												 
 			SELF.prep_Addr_line1     := IF(L.NORM_CTRYISOCD = 'USA' 
 			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''
-																			and clean_AddrPrep not in ['','.'] 
 																			and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.'] 
 																			,Address.Addr1FromComponents(clean_AddrRec.prim_range,
 																																	 clean_AddrRec.predir,
@@ -59,8 +58,7 @@ EXPORT Standardize_NameAddr := MODULE
 																			,'');																																		
 																			
 			SELF.prep_Addr_line_last := IF(L.NORM_CTRYISOCD = 'USA' 
-			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''
-			                                and clean_AddrPrep not in ['','.']																		
+			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''												
 																		  ,Address.Addr2FromComponents(clean_AddrRec.p_city_name,
 																																	 clean_AddrRec.st,
 																																	 clean_AddrRec.zip)

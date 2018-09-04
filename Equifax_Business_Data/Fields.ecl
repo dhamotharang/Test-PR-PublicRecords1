@@ -1,8 +1,8 @@
 ﻿IMPORT SALT37;
 EXPORT Fields := MODULE
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_effective_first','dt_effective_last','process_date','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','record_type','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_STATE','EFX_STATEC','EFX_ZIPCODE','EFX_ZIP4','EFX_LAT','EFX_LON','EFX_GEOPREC','EFX_REGION','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSA','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_CONGRESS','EFX_SECADR','EFX_SECCTY','EFX_SECSTAT','EFX_STATEC2','EFX_SECZIP','EFX_SECZIP4','EFX_SECLAT','EFX_SECLON','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_CTRYTELCD','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_BUSSTATCD','EFX_WEB','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_CORPEMPCD','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTTP','EFX_CORPAMOUNTPREC','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PUBLIC','EFX_STKEXC','EFX_TCKSYM','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALSCORE','EFX_MRKT_TOTALIND','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_GOV1057','EFX_NONPROFIT','EFX_MERCTYPE','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED','normCompany_Name','normCompany_Type','Norm_Geo_Precision','Norm_Corporate_Amount_Precision','Norm_Location_Amount_Precision','Norm_Public_Co_Indicator','Norm_Stock_Exchange','Norm_Telemarketablity_Score','Norm_Telemarketablity_Total_Indicator','Norm_Telemarketablity_Total_Score','Norm_Government1057_Entity','Norm_Merchant_Type','NormAddress_Type','Norm_Address','Norm_City','Norm_State','Norm_StateC2','Norm_Zip','Norm_Zip4','Norm_Lat','Norm_Lon','Norm_Geoprec','Norm_Region','Norm_Ctryisocd','Norm_Ctrynum','Norm_Ctryname','clean_company_name','clean_phone','clean_secondary_phone','title','fname','mname','lname','name_suffix','name_score','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','cart','cr_sort_sz');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'dt_effective_first' => 0,'dt_effective_last' => 1,'process_date' => 2,'dotid' => 3,'dotscore' => 4,'dotweight' => 5,'empid' => 6,'empscore' => 7,'empweight' => 8,'powid' => 9,'powscore' => 10,'powweight' => 11,'proxid' => 12,'proxscore' => 13,'proxweight' => 14,'selescore' => 15,'seleweight' => 16,'orgid' => 17,'orgscore' => 18,'orgweight' => 19,'ultid' => 20,'ultscore' => 21,'ultweight' => 22,'dt_first_seen' => 23,'dt_last_seen' => 24,'dt_vendor_first_reported' => 25,'dt_vendor_last_reported' => 26,'record_type' => 27,'EFX_ID' => 28,'EFX_NAME' => 29,'EFX_LEGAL_NAME' => 30,'EFX_ADDRESS' => 31,'EFX_CITY' => 32,'EFX_STATE' => 33,'EFX_STATEC' => 34,'EFX_ZIPCODE' => 35,'EFX_ZIP4' => 36,'EFX_LAT' => 37,'EFX_LON' => 38,'EFX_GEOPREC' => 39,'EFX_REGION' => 40,'EFX_CTRYISOCD' => 41,'EFX_CTRYNUM' => 42,'EFX_CTRYNAME' => 43,'EFX_COUNTYNM' => 44,'EFX_COUNTY' => 45,'EFX_CMSA' => 46,'EFX_CMSADESC' => 47,'EFX_SOHO' => 48,'EFX_BIZ' => 49,'EFX_RES' => 50,'EFX_CMRA' => 51,'EFX_CONGRESS' => 52,'EFX_SECADR' => 53,'EFX_SECCTY' => 54,'EFX_SECSTAT' => 55,'EFX_STATEC2' => 56,'EFX_SECZIP' => 57,'EFX_SECZIP4' => 58,'EFX_SECLAT' => 59,'EFX_SECLON' => 60,'EFX_SECGEOPREC' => 61,'EFX_SECREGION' => 62,'EFX_SECCTRYISOCD' => 63,'EFX_SECCTRYNUM' => 64,'EFX_SECCTRYNAME' => 65,'EFX_CTRYTELCD' => 66,'EFX_PHONE' => 67,'EFX_FAXPHONE' => 68,'EFX_BUSSTAT' => 69,'EFX_BUSSTATCD' => 70,'EFX_WEB' => 71,'EFX_YREST' => 72,'EFX_CORPEMPCNT' => 73,'EFX_LOCEMPCNT' => 74,'EFX_CORPEMPCD' => 75,'EFX_LOCEMPCD' => 76,'EFX_CORPAMOUNT' => 77,'EFX_CORPAMOUNTCD' => 78,'EFX_CORPAMOUNTTP' => 79,'EFX_CORPAMOUNTPREC' => 80,'EFX_LOCAMOUNT' => 81,'EFX_LOCAMOUNTCD' => 82,'EFX_LOCAMOUNTTP' => 83,'EFX_LOCAMOUNTPREC' => 84,'EFX_PUBLIC' => 85,'EFX_STKEXC' => 86,'EFX_TCKSYM' => 87,'EFX_PRIMSIC' => 88,'EFX_SECSIC1' => 89,'EFX_SECSIC2' => 90,'EFX_SECSIC3' => 91,'EFX_SECSIC4' => 92,'EFX_PRIMSICDESC' => 93,'EFX_SECSICDESC1' => 94,'EFX_SECSICDESC2' => 95,'EFX_SECSICDESC3' => 96,'EFX_SECSICDESC4' => 97,'EFX_PRIMNAICSCODE' => 98,'EFX_SECNAICS1' => 99,'EFX_SECNAICS2' => 100,'EFX_SECNAICS3' => 101,'EFX_SECNAICS4' => 102,'EFX_PRIMNAICSDESC' => 103,'EFX_SECNAICSDESC1' => 104,'EFX_SECNAICSDESC2' => 105,'EFX_SECNAICSDESC3' => 106,'EFX_SECNAICSDESC4' => 107,'EFX_DEAD' => 108,'EFX_DEADDT' => 109,'EFX_MRKT_TELEVER' => 110,'EFX_MRKT_TELESCORE' => 111,'EFX_MRKT_TOTALSCORE' => 112,'EFX_MRKT_TOTALIND' => 113,'EFX_MRKT_VACANT' => 114,'EFX_MRKT_SEASONAL' => 115,'EFX_MBE' => 116,'EFX_WBE' => 117,'EFX_MWBE' => 118,'EFX_SDB' => 119,'EFX_HUBZONE' => 120,'EFX_DBE' => 121,'EFX_VET' => 122,'EFX_DVET' => 123,'EFX_8a' => 124,'EFX_8aEXPDT' => 125,'EFX_DIS' => 126,'EFX_SBE' => 127,'EFX_BUSSIZE' => 128,'EFX_LBE' => 129,'EFX_GOV' => 130,'EFX_FGOV' => 131,'EFX_GOV1057' => 132,'EFX_NONPROFIT' => 133,'EFX_MERCTYPE' => 134,'EFX_HBCU' => 135,'EFX_GAYLESBIAN' => 136,'EFX_WSBE' => 137,'EFX_VSBE' => 138,'EFX_DVSBE' => 139,'EFX_MWBESTATUS' => 140,'EFX_NMSDC' => 141,'EFX_WBENC' => 142,'EFX_CA_PUC' => 143,'EFX_TX_HUB' => 144,'EFX_TX_HUBCERTNUM' => 145,'EFX_GSAX' => 146,'EFX_CALTRANS' => 147,'EFX_EDU' => 148,'EFX_MI' => 149,'EFX_ANC' => 150,'AT_CERT1' => 151,'AT_CERT2' => 152,'AT_CERT3' => 153,'AT_CERT4' => 154,'AT_CERT5' => 155,'AT_CERT6' => 156,'AT_CERT7' => 157,'AT_CERT8' => 158,'AT_CERT9' => 159,'AT_CERT10' => 160,'AT_CERTDESC1' => 161,'AT_CERTDESC2' => 162,'AT_CERTDESC3' => 163,'AT_CERTDESC4' => 164,'AT_CERTDESC5' => 165,'AT_CERTDESC6' => 166,'AT_CERTDESC7' => 167,'AT_CERTDESC8' => 168,'AT_CERTDESC9' => 169,'AT_CERTDESC10' => 170,'AT_CERTSRC1' => 171,'AT_CERTSRC2' => 172,'AT_CERTSRC3' => 173,'AT_CERTSRC4' => 174,'AT_CERTSRC5' => 175,'AT_CERTSRC6' => 176,'AT_CERTSRC7' => 177,'AT_CERTSRC8' => 178,'AT_CERTSRC9' => 179,'AT_CERTSRC10' => 180,'AT_CERTLEV1' => 181,'AT_CERTLEV2' => 182,'AT_CERTLEV3' => 183,'AT_CERTLEV4' => 184,'AT_CERTLEV5' => 185,'AT_CERTLEV6' => 186,'AT_CERTLEV7' => 187,'AT_CERTLEV8' => 188,'AT_CERTLEV9' => 189,'AT_CERTLEV10' => 190,'AT_CERTNUM1' => 191,'AT_CERTNUM2' => 192,'AT_CERTNUM3' => 193,'AT_CERTNUM4' => 194,'AT_CERTNUM5' => 195,'AT_CERTNUM6' => 196,'AT_CERTNUM7' => 197,'AT_CERTNUM8' => 198,'AT_CERTNUM9' => 199,'AT_CERTNUM10' => 200,'AT_CERTEXP1' => 201,'AT_CERTEXP2' => 202,'AT_CERTEXP3' => 203,'AT_CERTEXP4' => 204,'AT_CERTEXP5' => 205,'AT_CERTEXP6' => 206,'AT_CERTEXP7' => 207,'AT_CERTEXP8' => 208,'AT_CERTEXP9' => 209,'AT_CERTEXP10' => 210,'EFX_EXTRACT_DATE' => 211,'EFX_MERCHANT_ID' => 212,'EFX_PROJECT_ID' => 213,'EFX_FOREIGN' => 214,'Record_Update_Refresh_Date' => 215,'EFX_DATE_CREATED' => 216,'normCompany_Name' => 217,'normCompany_Type' => 218,'Norm_Geo_Precision' => 219,'Norm_Corporate_Amount_Precision' => 220,'Norm_Location_Amount_Precision' => 221,'Norm_Public_Co_Indicator' => 222,'Norm_Stock_Exchange' => 223,'Norm_Telemarketablity_Score' => 224,'Norm_Telemarketablity_Total_Indicator' => 225,'Norm_Telemarketablity_Total_Score' => 226,'Norm_Government1057_Entity' => 227,'Norm_Merchant_Type' => 228,'NormAddress_Type' => 229,'Norm_Address' => 230,'Norm_City' => 231,'Norm_State' => 232,'Norm_StateC2' => 233,'Norm_Zip' => 234,'Norm_Zip4' => 235,'Norm_Lat' => 236,'Norm_Lon' => 237,'Norm_Geoprec' => 238,'Norm_Region' => 239,'Norm_Ctryisocd' => 240,'Norm_Ctrynum' => 241,'Norm_Ctryname' => 242,'clean_company_name' => 243,'clean_phone' => 244,'clean_secondary_phone' => 245,'title' => 246,'fname' => 247,'mname' => 248,'lname' => 249,'name_suffix' => 250,'name_score' => 251,'prim_range' => 252,'predir' => 253,'prim_name' => 254,'addr_suffix' => 255,'postdir' => 256,'unit_desig' => 257,'sec_range' => 258,'p_city_name' => 259,'v_city_name' => 260,'st' => 261,'cart' => 262,'cr_sort_sz' => 263,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_effective_first','dt_effective_last','process_date','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','record_type','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_STATE','EFX_STATEC','EFX_ZIPCODE','EFX_ZIP4','EFX_LAT','EFX_LON','EFX_GEOPREC','EFX_REGION','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSA','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_CONGRESS','EFX_SECADR','EFX_SECCTY','EFX_SECSTAT','EFX_STATEC2','EFX_SECZIP','EFX_SECZIP4','EFX_SECLAT','EFX_SECLON','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_CTRYTELCD','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_BUSSTATCD','EFX_WEB','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_CORPEMPCD','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTTP','EFX_CORPAMOUNTPREC','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PUBLIC','EFX_STKEXC','EFX_TCKSYM','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALSCORE','EFX_MRKT_TOTALIND','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_GOV1057','EFX_NONPROFIT','EFX_MERCTYPE','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED','normCompany_Name','normCompany_Type','Norm_Geo_Precision','Exploded_Desc_Corporate_Amount_Precision','Exploded_Desc_Location_Amount_Precision','Exploded_Desc_Public_Co_Indicator','Exploded_Desc_Stock_Exchange','Exploded_Desc_Telemarketablity_Score','Exploded_Desc_Telemarketablity_Total_Indicator','Exploded_Desc_Telemarketablity_Total_Score','Exploded_Desc_Government1057_Entity','Exploded_Desc_Merchant_Type','Exploded_Desc_Busstatcd','Exploded_Desc_CMSA','Exploded_Desc_Corpamountcd','Exploded_Desc_Corpamountprec','Exploded_Desc_Corpamounttp','Exploded_Desc_Corpempcd','Exploded_Desc_Ctrytelcd','NormAddress_Type','Norm_Address','Norm_City','Norm_State','Norm_StateC2','Norm_Zip','Norm_Zip4','Norm_Lat','Norm_Lon','Norm_Geoprec','Norm_Region','Norm_Ctryisocd','Norm_Ctrynum','Norm_Ctryname','clean_company_name','clean_phone','clean_secondary_phone','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','cart','cr_sort_sz');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'dt_effective_first' => 0,'dt_effective_last' => 1,'process_date' => 2,'dotid' => 3,'dotscore' => 4,'dotweight' => 5,'empid' => 6,'empscore' => 7,'empweight' => 8,'powid' => 9,'powscore' => 10,'powweight' => 11,'proxid' => 12,'proxscore' => 13,'proxweight' => 14,'selescore' => 15,'seleweight' => 16,'orgid' => 17,'orgscore' => 18,'orgweight' => 19,'ultid' => 20,'ultscore' => 21,'ultweight' => 22,'dt_first_seen' => 23,'dt_last_seen' => 24,'dt_vendor_first_reported' => 25,'dt_vendor_last_reported' => 26,'record_type' => 27,'EFX_ID' => 28,'EFX_NAME' => 29,'EFX_LEGAL_NAME' => 30,'EFX_ADDRESS' => 31,'EFX_CITY' => 32,'EFX_STATE' => 33,'EFX_STATEC' => 34,'EFX_ZIPCODE' => 35,'EFX_ZIP4' => 36,'EFX_LAT' => 37,'EFX_LON' => 38,'EFX_GEOPREC' => 39,'EFX_REGION' => 40,'EFX_CTRYISOCD' => 41,'EFX_CTRYNUM' => 42,'EFX_CTRYNAME' => 43,'EFX_COUNTYNM' => 44,'EFX_COUNTY' => 45,'EFX_CMSA' => 46,'EFX_CMSADESC' => 47,'EFX_SOHO' => 48,'EFX_BIZ' => 49,'EFX_RES' => 50,'EFX_CMRA' => 51,'EFX_CONGRESS' => 52,'EFX_SECADR' => 53,'EFX_SECCTY' => 54,'EFX_SECSTAT' => 55,'EFX_STATEC2' => 56,'EFX_SECZIP' => 57,'EFX_SECZIP4' => 58,'EFX_SECLAT' => 59,'EFX_SECLON' => 60,'EFX_SECGEOPREC' => 61,'EFX_SECREGION' => 62,'EFX_SECCTRYISOCD' => 63,'EFX_SECCTRYNUM' => 64,'EFX_SECCTRYNAME' => 65,'EFX_CTRYTELCD' => 66,'EFX_PHONE' => 67,'EFX_FAXPHONE' => 68,'EFX_BUSSTAT' => 69,'EFX_BUSSTATCD' => 70,'EFX_WEB' => 71,'EFX_YREST' => 72,'EFX_CORPEMPCNT' => 73,'EFX_LOCEMPCNT' => 74,'EFX_CORPEMPCD' => 75,'EFX_LOCEMPCD' => 76,'EFX_CORPAMOUNT' => 77,'EFX_CORPAMOUNTCD' => 78,'EFX_CORPAMOUNTTP' => 79,'EFX_CORPAMOUNTPREC' => 80,'EFX_LOCAMOUNT' => 81,'EFX_LOCAMOUNTCD' => 82,'EFX_LOCAMOUNTTP' => 83,'EFX_LOCAMOUNTPREC' => 84,'EFX_PUBLIC' => 85,'EFX_STKEXC' => 86,'EFX_TCKSYM' => 87,'EFX_PRIMSIC' => 88,'EFX_SECSIC1' => 89,'EFX_SECSIC2' => 90,'EFX_SECSIC3' => 91,'EFX_SECSIC4' => 92,'EFX_PRIMSICDESC' => 93,'EFX_SECSICDESC1' => 94,'EFX_SECSICDESC2' => 95,'EFX_SECSICDESC3' => 96,'EFX_SECSICDESC4' => 97,'EFX_PRIMNAICSCODE' => 98,'EFX_SECNAICS1' => 99,'EFX_SECNAICS2' => 100,'EFX_SECNAICS3' => 101,'EFX_SECNAICS4' => 102,'EFX_PRIMNAICSDESC' => 103,'EFX_SECNAICSDESC1' => 104,'EFX_SECNAICSDESC2' => 105,'EFX_SECNAICSDESC3' => 106,'EFX_SECNAICSDESC4' => 107,'EFX_DEAD' => 108,'EFX_DEADDT' => 109,'EFX_MRKT_TELEVER' => 110,'EFX_MRKT_TELESCORE' => 111,'EFX_MRKT_TOTALSCORE' => 112,'EFX_MRKT_TOTALIND' => 113,'EFX_MRKT_VACANT' => 114,'EFX_MRKT_SEASONAL' => 115,'EFX_MBE' => 116,'EFX_WBE' => 117,'EFX_MWBE' => 118,'EFX_SDB' => 119,'EFX_HUBZONE' => 120,'EFX_DBE' => 121,'EFX_VET' => 122,'EFX_DVET' => 123,'EFX_8a' => 124,'EFX_8aEXPDT' => 125,'EFX_DIS' => 126,'EFX_SBE' => 127,'EFX_BUSSIZE' => 128,'EFX_LBE' => 129,'EFX_GOV' => 130,'EFX_FGOV' => 131,'EFX_GOV1057' => 132,'EFX_NONPROFIT' => 133,'EFX_MERCTYPE' => 134,'EFX_HBCU' => 135,'EFX_GAYLESBIAN' => 136,'EFX_WSBE' => 137,'EFX_VSBE' => 138,'EFX_DVSBE' => 139,'EFX_MWBESTATUS' => 140,'EFX_NMSDC' => 141,'EFX_WBENC' => 142,'EFX_CA_PUC' => 143,'EFX_TX_HUB' => 144,'EFX_TX_HUBCERTNUM' => 145,'EFX_GSAX' => 146,'EFX_CALTRANS' => 147,'EFX_EDU' => 148,'EFX_MI' => 149,'EFX_ANC' => 150,'AT_CERT1' => 151,'AT_CERT2' => 152,'AT_CERT3' => 153,'AT_CERT4' => 154,'AT_CERT5' => 155,'AT_CERT6' => 156,'AT_CERT7' => 157,'AT_CERT8' => 158,'AT_CERT9' => 159,'AT_CERT10' => 160,'AT_CERTDESC1' => 161,'AT_CERTDESC2' => 162,'AT_CERTDESC3' => 163,'AT_CERTDESC4' => 164,'AT_CERTDESC5' => 165,'AT_CERTDESC6' => 166,'AT_CERTDESC7' => 167,'AT_CERTDESC8' => 168,'AT_CERTDESC9' => 169,'AT_CERTDESC10' => 170,'AT_CERTSRC1' => 171,'AT_CERTSRC2' => 172,'AT_CERTSRC3' => 173,'AT_CERTSRC4' => 174,'AT_CERTSRC5' => 175,'AT_CERTSRC6' => 176,'AT_CERTSRC7' => 177,'AT_CERTSRC8' => 178,'AT_CERTSRC9' => 179,'AT_CERTSRC10' => 180,'AT_CERTLEV1' => 181,'AT_CERTLEV2' => 182,'AT_CERTLEV3' => 183,'AT_CERTLEV4' => 184,'AT_CERTLEV5' => 185,'AT_CERTLEV6' => 186,'AT_CERTLEV7' => 187,'AT_CERTLEV8' => 188,'AT_CERTLEV9' => 189,'AT_CERTLEV10' => 190,'AT_CERTNUM1' => 191,'AT_CERTNUM2' => 192,'AT_CERTNUM3' => 193,'AT_CERTNUM4' => 194,'AT_CERTNUM5' => 195,'AT_CERTNUM6' => 196,'AT_CERTNUM7' => 197,'AT_CERTNUM8' => 198,'AT_CERTNUM9' => 199,'AT_CERTNUM10' => 200,'AT_CERTEXP1' => 201,'AT_CERTEXP2' => 202,'AT_CERTEXP3' => 203,'AT_CERTEXP4' => 204,'AT_CERTEXP5' => 205,'AT_CERTEXP6' => 206,'AT_CERTEXP7' => 207,'AT_CERTEXP8' => 208,'AT_CERTEXP9' => 209,'AT_CERTEXP10' => 210,'EFX_EXTRACT_DATE' => 211,'EFX_MERCHANT_ID' => 212,'EFX_PROJECT_ID' => 213,'EFX_FOREIGN' => 214,'Record_Update_Refresh_Date' => 215,'EFX_DATE_CREATED' => 216,'normCompany_Name' => 217,'normCompany_Type' => 218,'Norm_Geo_Precision' => 219,'Exploded_Desc_Corporate_Amount_Precision' => 220,'Exploded_Desc_Location_Amount_Precision' => 221,'Exploded_Desc_Public_Co_Indicator' => 222,'Exploded_Desc_Stock_Exchange' => 223,'Exploded_Desc_Telemarketablity_Score' => 224,'Exploded_Desc_Telemarketablity_Total_Indicator' => 225,'Exploded_Desc_Telemarketablity_Total_Score' => 226,'Exploded_Desc_Government1057_Entity' => 227,'Exploded_Desc_Merchant_Type' => 228,'Exploded_Desc_Busstatcd' => 229,'Exploded_Desc_CMSA' => 230,'Exploded_Desc_Corpamountcd' => 231,'Exploded_Desc_Corpamountprec' => 232,'Exploded_Desc_Corpamounttp' => 233,'Exploded_Desc_Corpempcd' => 234,'Exploded_Desc_Ctrytelcd' => 235,'NormAddress_Type' => 236,'Norm_Address' => 237,'Norm_City' => 238,'Norm_State' => 239,'Norm_StateC2' => 240,'Norm_Zip' => 241,'Norm_Zip4' => 242,'Norm_Lat' => 243,'Norm_Lon' => 244,'Norm_Geoprec' => 245,'Norm_Region' => 246,'Norm_Ctryisocd' => 247,'Norm_Ctrynum' => 248,'Norm_Ctryname' => 249,'clean_company_name' => 250,'clean_phone' => 251,'clean_secondary_phone' => 252,'prim_range' => 253,'predir' => 254,'prim_name' => 255,'addr_suffix' => 256,'postdir' => 257,'unit_desig' => 258,'sec_range' => 259,'p_city_name' => 260,'v_city_name' => 261,'st' => 262,'cart' => 263,'cr_sort_sz' => 264,0);
  
 //Individual field level validation
  
@@ -886,41 +886,69 @@ EXPORT Make_Norm_Geo_Precision(SALT37.StrType s0) := s0;
 EXPORT InValid_Norm_Geo_Precision(SALT37.StrType s) := 0;
 EXPORT InValidMessage_Norm_Geo_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Corporate_Amount_Precision(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Corporate_Amount_Precision(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Corporate_Amount_Precision(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Corporate_Amount_Precision(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corporate_Amount_Precision(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Corporate_Amount_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Location_Amount_Precision(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Location_Amount_Precision(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Location_Amount_Precision(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Location_Amount_Precision(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Location_Amount_Precision(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Location_Amount_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Public_Co_Indicator(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Public_Co_Indicator(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Public_Co_Indicator(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Public_Co_Indicator(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Public_Co_Indicator(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Public_Co_Indicator(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Stock_Exchange(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Stock_Exchange(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Stock_Exchange(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Stock_Exchange(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Stock_Exchange(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Stock_Exchange(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Telemarketablity_Score(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Telemarketablity_Score(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Telemarketablity_Score(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Telemarketablity_Score(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Score(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Telemarketablity_Total_Indicator(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Telemarketablity_Total_Indicator(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Telemarketablity_Total_Indicator(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Telemarketablity_Total_Indicator(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Indicator(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Total_Indicator(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Telemarketablity_Total_Score(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Telemarketablity_Total_Score(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Telemarketablity_Total_Score(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Telemarketablity_Total_Score(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Total_Score(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Government1057_Entity(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Government1057_Entity(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Government1057_Entity(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Government1057_Entity(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Government1057_Entity(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Government1057_Entity(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Merchant_Type(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Merchant_Type(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Norm_Merchant_Type(UNSIGNED1 wh) := '';
+EXPORT Make_Exploded_Desc_Merchant_Type(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Merchant_Type(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Merchant_Type(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Busstatcd(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Busstatcd(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Busstatcd(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_CMSA(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_CMSA(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_CMSA(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Corpamountcd(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamountcd(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Corpamountcd(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Corpamountprec(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamountprec(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Corpamountprec(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Corpamounttp(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamounttp(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Corpamounttp(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Corpempcd(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpempcd(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Corpempcd(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Exploded_Desc_Ctrytelcd(SALT37.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Ctrytelcd(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Exploded_Desc_Ctrytelcd(UNSIGNED1 wh) := '';
  
 EXPORT Make_NormAddress_Type(SALT37.StrType s0) := s0;
 EXPORT InValid_NormAddress_Type(SALT37.StrType s) := 0;
@@ -989,30 +1017,6 @@ EXPORT InValidMessage_clean_phone(UNSIGNED1 wh) := '';
 EXPORT Make_clean_secondary_phone(SALT37.StrType s0) := s0;
 EXPORT InValid_clean_secondary_phone(SALT37.StrType s) := 0;
 EXPORT InValidMessage_clean_secondary_phone(UNSIGNED1 wh) := '';
- 
-EXPORT Make_title(SALT37.StrType s0) := s0;
-EXPORT InValid_title(SALT37.StrType s) := 0;
-EXPORT InValidMessage_title(UNSIGNED1 wh) := '';
- 
-EXPORT Make_fname(SALT37.StrType s0) := s0;
-EXPORT InValid_fname(SALT37.StrType s) := 0;
-EXPORT InValidMessage_fname(UNSIGNED1 wh) := '';
- 
-EXPORT Make_mname(SALT37.StrType s0) := s0;
-EXPORT InValid_mname(SALT37.StrType s) := 0;
-EXPORT InValidMessage_mname(UNSIGNED1 wh) := '';
- 
-EXPORT Make_lname(SALT37.StrType s0) := s0;
-EXPORT InValid_lname(SALT37.StrType s) := 0;
-EXPORT InValidMessage_lname(UNSIGNED1 wh) := '';
- 
-EXPORT Make_name_suffix(SALT37.StrType s0) := s0;
-EXPORT InValid_name_suffix(SALT37.StrType s) := 0;
-EXPORT InValidMessage_name_suffix(UNSIGNED1 wh) := '';
- 
-EXPORT Make_name_score(SALT37.StrType s0) := s0;
-EXPORT InValid_name_score(SALT37.StrType s) := 0;
-EXPORT InValidMessage_name_score(UNSIGNED1 wh) := '';
  
 EXPORT Make_prim_range(SALT37.StrType s0) := s0;
 EXPORT InValid_prim_range(SALT37.StrType s) := 0;
@@ -1303,15 +1307,22 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_normCompany_Name;
     BOOLEAN Diff_normCompany_Type;
     BOOLEAN Diff_Norm_Geo_Precision;
-    BOOLEAN Diff_Norm_Corporate_Amount_Precision;
-    BOOLEAN Diff_Norm_Location_Amount_Precision;
-    BOOLEAN Diff_Norm_Public_Co_Indicator;
-    BOOLEAN Diff_Norm_Stock_Exchange;
-    BOOLEAN Diff_Norm_Telemarketablity_Score;
-    BOOLEAN Diff_Norm_Telemarketablity_Total_Indicator;
-    BOOLEAN Diff_Norm_Telemarketablity_Total_Score;
-    BOOLEAN Diff_Norm_Government1057_Entity;
-    BOOLEAN Diff_Norm_Merchant_Type;
+    BOOLEAN Diff_Exploded_Desc_Corporate_Amount_Precision;
+    BOOLEAN Diff_Exploded_Desc_Location_Amount_Precision;
+    BOOLEAN Diff_Exploded_Desc_Public_Co_Indicator;
+    BOOLEAN Diff_Exploded_Desc_Stock_Exchange;
+    BOOLEAN Diff_Exploded_Desc_Telemarketablity_Score;
+    BOOLEAN Diff_Exploded_Desc_Telemarketablity_Total_Indicator;
+    BOOLEAN Diff_Exploded_Desc_Telemarketablity_Total_Score;
+    BOOLEAN Diff_Exploded_Desc_Government1057_Entity;
+    BOOLEAN Diff_Exploded_Desc_Merchant_Type;
+    BOOLEAN Diff_Exploded_Desc_Busstatcd;
+    BOOLEAN Diff_Exploded_Desc_CMSA;
+    BOOLEAN Diff_Exploded_Desc_Corpamountcd;
+    BOOLEAN Diff_Exploded_Desc_Corpamountprec;
+    BOOLEAN Diff_Exploded_Desc_Corpamounttp;
+    BOOLEAN Diff_Exploded_Desc_Corpempcd;
+    BOOLEAN Diff_Exploded_Desc_Ctrytelcd;
     BOOLEAN Diff_NormAddress_Type;
     BOOLEAN Diff_Norm_Address;
     BOOLEAN Diff_Norm_City;
@@ -1329,12 +1340,6 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_clean_company_name;
     BOOLEAN Diff_clean_phone;
     BOOLEAN Diff_clean_secondary_phone;
-    BOOLEAN Diff_title;
-    BOOLEAN Diff_fname;
-    BOOLEAN Diff_mname;
-    BOOLEAN Diff_lname;
-    BOOLEAN Diff_name_suffix;
-    BOOLEAN Diff_name_score;
     BOOLEAN Diff_prim_range;
     BOOLEAN Diff_predir;
     BOOLEAN Diff_prim_name;
@@ -1573,15 +1578,22 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_normCompany_Name := le.normCompany_Name <> ri.normCompany_Name;
     SELF.Diff_normCompany_Type := le.normCompany_Type <> ri.normCompany_Type;
     SELF.Diff_Norm_Geo_Precision := le.Norm_Geo_Precision <> ri.Norm_Geo_Precision;
-    SELF.Diff_Norm_Corporate_Amount_Precision := le.Norm_Corporate_Amount_Precision <> ri.Norm_Corporate_Amount_Precision;
-    SELF.Diff_Norm_Location_Amount_Precision := le.Norm_Location_Amount_Precision <> ri.Norm_Location_Amount_Precision;
-    SELF.Diff_Norm_Public_Co_Indicator := le.Norm_Public_Co_Indicator <> ri.Norm_Public_Co_Indicator;
-    SELF.Diff_Norm_Stock_Exchange := le.Norm_Stock_Exchange <> ri.Norm_Stock_Exchange;
-    SELF.Diff_Norm_Telemarketablity_Score := le.Norm_Telemarketablity_Score <> ri.Norm_Telemarketablity_Score;
-    SELF.Diff_Norm_Telemarketablity_Total_Indicator := le.Norm_Telemarketablity_Total_Indicator <> ri.Norm_Telemarketablity_Total_Indicator;
-    SELF.Diff_Norm_Telemarketablity_Total_Score := le.Norm_Telemarketablity_Total_Score <> ri.Norm_Telemarketablity_Total_Score;
-    SELF.Diff_Norm_Government1057_Entity := le.Norm_Government1057_Entity <> ri.Norm_Government1057_Entity;
-    SELF.Diff_Norm_Merchant_Type := le.Norm_Merchant_Type <> ri.Norm_Merchant_Type;
+    SELF.Diff_Exploded_Desc_Corporate_Amount_Precision := le.Exploded_Desc_Corporate_Amount_Precision <> ri.Exploded_Desc_Corporate_Amount_Precision;
+    SELF.Diff_Exploded_Desc_Location_Amount_Precision := le.Exploded_Desc_Location_Amount_Precision <> ri.Exploded_Desc_Location_Amount_Precision;
+    SELF.Diff_Exploded_Desc_Public_Co_Indicator := le.Exploded_Desc_Public_Co_Indicator <> ri.Exploded_Desc_Public_Co_Indicator;
+    SELF.Diff_Exploded_Desc_Stock_Exchange := le.Exploded_Desc_Stock_Exchange <> ri.Exploded_Desc_Stock_Exchange;
+    SELF.Diff_Exploded_Desc_Telemarketablity_Score := le.Exploded_Desc_Telemarketablity_Score <> ri.Exploded_Desc_Telemarketablity_Score;
+    SELF.Diff_Exploded_Desc_Telemarketablity_Total_Indicator := le.Exploded_Desc_Telemarketablity_Total_Indicator <> ri.Exploded_Desc_Telemarketablity_Total_Indicator;
+    SELF.Diff_Exploded_Desc_Telemarketablity_Total_Score := le.Exploded_Desc_Telemarketablity_Total_Score <> ri.Exploded_Desc_Telemarketablity_Total_Score;
+    SELF.Diff_Exploded_Desc_Government1057_Entity := le.Exploded_Desc_Government1057_Entity <> ri.Exploded_Desc_Government1057_Entity;
+    SELF.Diff_Exploded_Desc_Merchant_Type := le.Exploded_Desc_Merchant_Type <> ri.Exploded_Desc_Merchant_Type;
+    SELF.Diff_Exploded_Desc_Busstatcd := le.Exploded_Desc_Busstatcd <> ri.Exploded_Desc_Busstatcd;
+    SELF.Diff_Exploded_Desc_CMSA := le.Exploded_Desc_CMSA <> ri.Exploded_Desc_CMSA;
+    SELF.Diff_Exploded_Desc_Corpamountcd := le.Exploded_Desc_Corpamountcd <> ri.Exploded_Desc_Corpamountcd;
+    SELF.Diff_Exploded_Desc_Corpamountprec := le.Exploded_Desc_Corpamountprec <> ri.Exploded_Desc_Corpamountprec;
+    SELF.Diff_Exploded_Desc_Corpamounttp := le.Exploded_Desc_Corpamounttp <> ri.Exploded_Desc_Corpamounttp;
+    SELF.Diff_Exploded_Desc_Corpempcd := le.Exploded_Desc_Corpempcd <> ri.Exploded_Desc_Corpempcd;
+    SELF.Diff_Exploded_Desc_Ctrytelcd := le.Exploded_Desc_Ctrytelcd <> ri.Exploded_Desc_Ctrytelcd;
     SELF.Diff_NormAddress_Type := le.NormAddress_Type <> ri.NormAddress_Type;
     SELF.Diff_Norm_Address := le.Norm_Address <> ri.Norm_Address;
     SELF.Diff_Norm_City := le.Norm_City <> ri.Norm_City;
@@ -1599,12 +1611,6 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_clean_company_name := le.clean_company_name <> ri.clean_company_name;
     SELF.Diff_clean_phone := le.clean_phone <> ri.clean_phone;
     SELF.Diff_clean_secondary_phone := le.clean_secondary_phone <> ri.clean_secondary_phone;
-    SELF.Diff_title := le.title <> ri.title;
-    SELF.Diff_fname := le.fname <> ri.fname;
-    SELF.Diff_mname := le.mname <> ri.mname;
-    SELF.Diff_lname := le.lname <> ri.lname;
-    SELF.Diff_name_suffix := le.name_suffix <> ri.name_suffix;
-    SELF.Diff_name_score := le.name_score <> ri.name_score;
     SELF.Diff_prim_range := le.prim_range <> ri.prim_range;
     SELF.Diff_predir := le.predir <> ri.predir;
     SELF.Diff_prim_name := le.prim_name <> ri.prim_name;
@@ -1619,7 +1625,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_cr_sort_sz := le.cr_sort_sz <> ri.cr_sort_sz;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_dotid,1,0)+ IF( SELF.Diff_dotscore,1,0)+ IF( SELF.Diff_dotweight,1,0)+ IF( SELF.Diff_empid,1,0)+ IF( SELF.Diff_empscore,1,0)+ IF( SELF.Diff_empweight,1,0)+ IF( SELF.Diff_powid,1,0)+ IF( SELF.Diff_powscore,1,0)+ IF( SELF.Diff_powweight,1,0)+ IF( SELF.Diff_proxid,1,0)+ IF( SELF.Diff_proxscore,1,0)+ IF( SELF.Diff_proxweight,1,0)+ IF( SELF.Diff_selescore,1,0)+ IF( SELF.Diff_seleweight,1,0)+ IF( SELF.Diff_orgid,1,0)+ IF( SELF.Diff_orgscore,1,0)+ IF( SELF.Diff_orgweight,1,0)+ IF( SELF.Diff_ultid,1,0)+ IF( SELF.Diff_ultscore,1,0)+ IF( SELF.Diff_ultweight,1,0)+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_STATE,1,0)+ IF( SELF.Diff_EFX_STATEC,1,0)+ IF( SELF.Diff_EFX_ZIPCODE,1,0)+ IF( SELF.Diff_EFX_ZIP4,1,0)+ IF( SELF.Diff_EFX_LAT,1,0)+ IF( SELF.Diff_EFX_LON,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_COUNTY,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_CONGRESS,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECSTAT,1,0)+ IF( SELF.Diff_EFX_STATEC2,1,0)+ IF( SELF.Diff_EFX_SECZIP,1,0)+ IF( SELF.Diff_EFX_SECZIP4,1,0)+ IF( SELF.Diff_EFX_SECLAT,1,0)+ IF( SELF.Diff_EFX_SECLON,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_GOV1057,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_EXTRACT_DATE,1,0)+ IF( SELF.Diff_EFX_MERCHANT_ID,1,0)+ IF( SELF.Diff_EFX_PROJECT_ID,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_Record_Update_Refresh_Date,1,0)+ IF( SELF.Diff_EFX_DATE_CREATED,1,0)+ IF( SELF.Diff_normCompany_Name,1,0)+ IF( SELF.Diff_normCompany_Type,1,0)+ IF( SELF.Diff_Norm_Geo_Precision,1,0)+ IF( SELF.Diff_Norm_Corporate_Amount_Precision,1,0)+ IF( SELF.Diff_Norm_Location_Amount_Precision,1,0)+ IF( SELF.Diff_Norm_Public_Co_Indicator,1,0)+ IF( SELF.Diff_Norm_Stock_Exchange,1,0)+ IF( SELF.Diff_Norm_Telemarketablity_Score,1,0)+ IF( SELF.Diff_Norm_Telemarketablity_Total_Indicator,1,0)+ IF( SELF.Diff_Norm_Telemarketablity_Total_Score,1,0)+ IF( SELF.Diff_Norm_Government1057_Entity,1,0)+ IF( SELF.Diff_Norm_Merchant_Type,1,0)+ IF( SELF.Diff_NormAddress_Type,1,0)+ IF( SELF.Diff_Norm_Address,1,0)+ IF( SELF.Diff_Norm_City,1,0)+ IF( SELF.Diff_Norm_State,1,0)+ IF( SELF.Diff_Norm_StateC2,1,0)+ IF( SELF.Diff_Norm_Zip,1,0)+ IF( SELF.Diff_Norm_Zip4,1,0)+ IF( SELF.Diff_Norm_Lat,1,0)+ IF( SELF.Diff_Norm_Lon,1,0)+ IF( SELF.Diff_Norm_Geoprec,1,0)+ IF( SELF.Diff_Norm_Region,1,0)+ IF( SELF.Diff_Norm_Ctryisocd,1,0)+ IF( SELF.Diff_Norm_Ctrynum,1,0)+ IF( SELF.Diff_Norm_Ctryname,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_phone,1,0)+ IF( SELF.Diff_clean_secondary_phone,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_fname,1,0)+ IF( SELF.Diff_mname,1,0)+ IF( SELF.Diff_lname,1,0)+ IF( SELF.Diff_name_suffix,1,0)+ IF( SELF.Diff_name_score,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_dotid,1,0)+ IF( SELF.Diff_dotscore,1,0)+ IF( SELF.Diff_dotweight,1,0)+ IF( SELF.Diff_empid,1,0)+ IF( SELF.Diff_empscore,1,0)+ IF( SELF.Diff_empweight,1,0)+ IF( SELF.Diff_powid,1,0)+ IF( SELF.Diff_powscore,1,0)+ IF( SELF.Diff_powweight,1,0)+ IF( SELF.Diff_proxid,1,0)+ IF( SELF.Diff_proxscore,1,0)+ IF( SELF.Diff_proxweight,1,0)+ IF( SELF.Diff_selescore,1,0)+ IF( SELF.Diff_seleweight,1,0)+ IF( SELF.Diff_orgid,1,0)+ IF( SELF.Diff_orgscore,1,0)+ IF( SELF.Diff_orgweight,1,0)+ IF( SELF.Diff_ultid,1,0)+ IF( SELF.Diff_ultscore,1,0)+ IF( SELF.Diff_ultweight,1,0)+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_STATE,1,0)+ IF( SELF.Diff_EFX_STATEC,1,0)+ IF( SELF.Diff_EFX_ZIPCODE,1,0)+ IF( SELF.Diff_EFX_ZIP4,1,0)+ IF( SELF.Diff_EFX_LAT,1,0)+ IF( SELF.Diff_EFX_LON,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_COUNTY,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_CONGRESS,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECSTAT,1,0)+ IF( SELF.Diff_EFX_STATEC2,1,0)+ IF( SELF.Diff_EFX_SECZIP,1,0)+ IF( SELF.Diff_EFX_SECZIP4,1,0)+ IF( SELF.Diff_EFX_SECLAT,1,0)+ IF( SELF.Diff_EFX_SECLON,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_GOV1057,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_EXTRACT_DATE,1,0)+ IF( SELF.Diff_EFX_MERCHANT_ID,1,0)+ IF( SELF.Diff_EFX_PROJECT_ID,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_Record_Update_Refresh_Date,1,0)+ IF( SELF.Diff_EFX_DATE_CREATED,1,0)+ IF( SELF.Diff_normCompany_Name,1,0)+ IF( SELF.Diff_normCompany_Type,1,0)+ IF( SELF.Diff_Norm_Geo_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Corporate_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Location_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Public_Co_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Stock_Exchange,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Government1057_Entity,1,0)+ IF( SELF.Diff_Exploded_Desc_Merchant_Type,1,0)+ IF( SELF.Diff_Exploded_Desc_Busstatcd,1,0)+ IF( SELF.Diff_Exploded_Desc_CMSA,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountprec,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamounttp,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpempcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Ctrytelcd,1,0)+ IF( SELF.Diff_NormAddress_Type,1,0)+ IF( SELF.Diff_Norm_Address,1,0)+ IF( SELF.Diff_Norm_City,1,0)+ IF( SELF.Diff_Norm_State,1,0)+ IF( SELF.Diff_Norm_StateC2,1,0)+ IF( SELF.Diff_Norm_Zip,1,0)+ IF( SELF.Diff_Norm_Zip4,1,0)+ IF( SELF.Diff_Norm_Lat,1,0)+ IF( SELF.Diff_Norm_Lon,1,0)+ IF( SELF.Diff_Norm_Geoprec,1,0)+ IF( SELF.Diff_Norm_Region,1,0)+ IF( SELF.Diff_Norm_Ctryisocd,1,0)+ IF( SELF.Diff_Norm_Ctrynum,1,0)+ IF( SELF.Diff_Norm_Ctryname,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_phone,1,0)+ IF( SELF.Diff_clean_secondary_phone,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -1852,15 +1858,22 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_normCompany_Name := COUNT(GROUP,%Closest%.Diff_normCompany_Name);
     Count_Diff_normCompany_Type := COUNT(GROUP,%Closest%.Diff_normCompany_Type);
     Count_Diff_Norm_Geo_Precision := COUNT(GROUP,%Closest%.Diff_Norm_Geo_Precision);
-    Count_Diff_Norm_Corporate_Amount_Precision := COUNT(GROUP,%Closest%.Diff_Norm_Corporate_Amount_Precision);
-    Count_Diff_Norm_Location_Amount_Precision := COUNT(GROUP,%Closest%.Diff_Norm_Location_Amount_Precision);
-    Count_Diff_Norm_Public_Co_Indicator := COUNT(GROUP,%Closest%.Diff_Norm_Public_Co_Indicator);
-    Count_Diff_Norm_Stock_Exchange := COUNT(GROUP,%Closest%.Diff_Norm_Stock_Exchange);
-    Count_Diff_Norm_Telemarketablity_Score := COUNT(GROUP,%Closest%.Diff_Norm_Telemarketablity_Score);
-    Count_Diff_Norm_Telemarketablity_Total_Indicator := COUNT(GROUP,%Closest%.Diff_Norm_Telemarketablity_Total_Indicator);
-    Count_Diff_Norm_Telemarketablity_Total_Score := COUNT(GROUP,%Closest%.Diff_Norm_Telemarketablity_Total_Score);
-    Count_Diff_Norm_Government1057_Entity := COUNT(GROUP,%Closest%.Diff_Norm_Government1057_Entity);
-    Count_Diff_Norm_Merchant_Type := COUNT(GROUP,%Closest%.Diff_Norm_Merchant_Type);
+    Count_Diff_Exploded_Desc_Corporate_Amount_Precision := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Corporate_Amount_Precision);
+    Count_Diff_Exploded_Desc_Location_Amount_Precision := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Location_Amount_Precision);
+    Count_Diff_Exploded_Desc_Public_Co_Indicator := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Public_Co_Indicator);
+    Count_Diff_Exploded_Desc_Stock_Exchange := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Stock_Exchange);
+    Count_Diff_Exploded_Desc_Telemarketablity_Score := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Telemarketablity_Score);
+    Count_Diff_Exploded_Desc_Telemarketablity_Total_Indicator := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Telemarketablity_Total_Indicator);
+    Count_Diff_Exploded_Desc_Telemarketablity_Total_Score := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Telemarketablity_Total_Score);
+    Count_Diff_Exploded_Desc_Government1057_Entity := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Government1057_Entity);
+    Count_Diff_Exploded_Desc_Merchant_Type := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Merchant_Type);
+    Count_Diff_Exploded_Desc_Busstatcd := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Busstatcd);
+    Count_Diff_Exploded_Desc_CMSA := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_CMSA);
+    Count_Diff_Exploded_Desc_Corpamountcd := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Corpamountcd);
+    Count_Diff_Exploded_Desc_Corpamountprec := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Corpamountprec);
+    Count_Diff_Exploded_Desc_Corpamounttp := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Corpamounttp);
+    Count_Diff_Exploded_Desc_Corpempcd := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Corpempcd);
+    Count_Diff_Exploded_Desc_Ctrytelcd := COUNT(GROUP,%Closest%.Diff_Exploded_Desc_Ctrytelcd);
     Count_Diff_NormAddress_Type := COUNT(GROUP,%Closest%.Diff_NormAddress_Type);
     Count_Diff_Norm_Address := COUNT(GROUP,%Closest%.Diff_Norm_Address);
     Count_Diff_Norm_City := COUNT(GROUP,%Closest%.Diff_Norm_City);
@@ -1878,12 +1891,6 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_clean_company_name := COUNT(GROUP,%Closest%.Diff_clean_company_name);
     Count_Diff_clean_phone := COUNT(GROUP,%Closest%.Diff_clean_phone);
     Count_Diff_clean_secondary_phone := COUNT(GROUP,%Closest%.Diff_clean_secondary_phone);
-    Count_Diff_title := COUNT(GROUP,%Closest%.Diff_title);
-    Count_Diff_fname := COUNT(GROUP,%Closest%.Diff_fname);
-    Count_Diff_mname := COUNT(GROUP,%Closest%.Diff_mname);
-    Count_Diff_lname := COUNT(GROUP,%Closest%.Diff_lname);
-    Count_Diff_name_suffix := COUNT(GROUP,%Closest%.Diff_name_suffix);
-    Count_Diff_name_score := COUNT(GROUP,%Closest%.Diff_name_score);
     Count_Diff_prim_range := COUNT(GROUP,%Closest%.Diff_prim_range);
     Count_Diff_predir := COUNT(GROUP,%Closest%.Diff_predir);
     Count_Diff_prim_name := COUNT(GROUP,%Closest%.Diff_prim_name);

@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_dt_effective_first = '',Input_dt_effective_last = '',Input_process_date = '',Input_dotid = '',Input_dotscore = '',Input_dotweight = '',Input_empid = '',Input_empscore = '',Input_empweight = '',Input_powid = '',Input_powscore = '',Input_powweight = '',Input_proxid = '',Input_proxscore = '',Input_proxweight = '',Input_selescore = '',Input_seleweight = '',Input_orgid = '',Input_orgscore = '',Input_orgweight = '',Input_ultid = '',Input_ultscore = '',Input_ultweight = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_record_type = '',Input_EFX_ID = '',Input_EFX_NAME = '',Input_EFX_LEGAL_NAME = '',Input_EFX_ADDRESS = '',Input_EFX_CITY = '',Input_EFX_STATE = '',Input_EFX_STATEC = '',Input_EFX_ZIPCODE = '',Input_EFX_ZIP4 = '',Input_EFX_LAT = '',Input_EFX_LON = '',Input_EFX_GEOPREC = '',Input_EFX_REGION = '',Input_EFX_CTRYISOCD = '',Input_EFX_CTRYNUM = '',Input_EFX_CTRYNAME = '',Input_EFX_COUNTYNM = '',Input_EFX_COUNTY = '',Input_EFX_CMSA = '',Input_EFX_CMSADESC = '',Input_EFX_SOHO = '',Input_EFX_BIZ = '',Input_EFX_RES = '',Input_EFX_CMRA = '',Input_EFX_CONGRESS = '',Input_EFX_SECADR = '',Input_EFX_SECCTY = '',Input_EFX_SECSTAT = '',Input_EFX_STATEC2 = '',Input_EFX_SECZIP = '',Input_EFX_SECZIP4 = '',Input_EFX_SECLAT = '',Input_EFX_SECLON = '',Input_EFX_SECGEOPREC = '',Input_EFX_SECREGION = '',Input_EFX_SECCTRYISOCD = '',Input_EFX_SECCTRYNUM = '',Input_EFX_SECCTRYNAME = '',Input_EFX_CTRYTELCD = '',Input_EFX_PHONE = '',Input_EFX_FAXPHONE = '',Input_EFX_BUSSTAT = '',Input_EFX_BUSSTATCD = '',Input_EFX_WEB = '',Input_EFX_YREST = '',Input_EFX_CORPEMPCNT = '',Input_EFX_LOCEMPCNT = '',Input_EFX_CORPEMPCD = '',Input_EFX_LOCEMPCD = '',Input_EFX_CORPAMOUNT = '',Input_EFX_CORPAMOUNTCD = '',Input_EFX_CORPAMOUNTTP = '',Input_EFX_CORPAMOUNTPREC = '',Input_EFX_LOCAMOUNT = '',Input_EFX_LOCAMOUNTCD = '',Input_EFX_LOCAMOUNTTP = '',Input_EFX_LOCAMOUNTPREC = '',Input_EFX_PUBLIC = '',Input_EFX_STKEXC = '',Input_EFX_TCKSYM = '',Input_EFX_PRIMSIC = '',Input_EFX_SECSIC1 = '',Input_EFX_SECSIC2 = '',Input_EFX_SECSIC3 = '',Input_EFX_SECSIC4 = '',Input_EFX_PRIMSICDESC = '',Input_EFX_SECSICDESC1 = '',Input_EFX_SECSICDESC2 = '',Input_EFX_SECSICDESC3 = '',Input_EFX_SECSICDESC4 = '',Input_EFX_PRIMNAICSCODE = '',Input_EFX_SECNAICS1 = '',Input_EFX_SECNAICS2 = '',Input_EFX_SECNAICS3 = '',Input_EFX_SECNAICS4 = '',Input_EFX_PRIMNAICSDESC = '',Input_EFX_SECNAICSDESC1 = '',Input_EFX_SECNAICSDESC2 = '',Input_EFX_SECNAICSDESC3 = '',Input_EFX_SECNAICSDESC4 = '',Input_EFX_DEAD = '',Input_EFX_DEADDT = '',Input_EFX_MRKT_TELEVER = '',Input_EFX_MRKT_TELESCORE = '',Input_EFX_MRKT_TOTALSCORE = '',Input_EFX_MRKT_TOTALIND = '',Input_EFX_MRKT_VACANT = '',Input_EFX_MRKT_SEASONAL = '',Input_EFX_MBE = '',Input_EFX_WBE = '',Input_EFX_MWBE = '',Input_EFX_SDB = '',Input_EFX_HUBZONE = '',Input_EFX_DBE = '',Input_EFX_VET = '',Input_EFX_DVET = '',Input_EFX_8a = '',Input_EFX_8aEXPDT = '',Input_EFX_DIS = '',Input_EFX_SBE = '',Input_EFX_BUSSIZE = '',Input_EFX_LBE = '',Input_EFX_GOV = '',Input_EFX_FGOV = '',Input_EFX_GOV1057 = '',Input_EFX_NONPROFIT = '',Input_EFX_MERCTYPE = '',Input_EFX_HBCU = '',Input_EFX_GAYLESBIAN = '',Input_EFX_WSBE = '',Input_EFX_VSBE = '',Input_EFX_DVSBE = '',Input_EFX_MWBESTATUS = '',Input_EFX_NMSDC = '',Input_EFX_WBENC = '',Input_EFX_CA_PUC = '',Input_EFX_TX_HUB = '',Input_EFX_TX_HUBCERTNUM = '',Input_EFX_GSAX = '',Input_EFX_CALTRANS = '',Input_EFX_EDU = '',Input_EFX_MI = '',Input_EFX_ANC = '',Input_AT_CERT1 = '',Input_AT_CERT2 = '',Input_AT_CERT3 = '',Input_AT_CERT4 = '',Input_AT_CERT5 = '',Input_AT_CERT6 = '',Input_AT_CERT7 = '',Input_AT_CERT8 = '',Input_AT_CERT9 = '',Input_AT_CERT10 = '',Input_AT_CERTDESC1 = '',Input_AT_CERTDESC2 = '',Input_AT_CERTDESC3 = '',Input_AT_CERTDESC4 = '',Input_AT_CERTDESC5 = '',Input_AT_CERTDESC6 = '',Input_AT_CERTDESC7 = '',Input_AT_CERTDESC8 = '',Input_AT_CERTDESC9 = '',Input_AT_CERTDESC10 = '',Input_AT_CERTSRC1 = '',Input_AT_CERTSRC2 = '',Input_AT_CERTSRC3 = '',Input_AT_CERTSRC4 = '',Input_AT_CERTSRC5 = '',Input_AT_CERTSRC6 = '',Input_AT_CERTSRC7 = '',Input_AT_CERTSRC8 = '',Input_AT_CERTSRC9 = '',Input_AT_CERTSRC10 = '',Input_AT_CERTLEV1 = '',Input_AT_CERTLEV2 = '',Input_AT_CERTLEV3 = '',Input_AT_CERTLEV4 = '',Input_AT_CERTLEV5 = '',Input_AT_CERTLEV6 = '',Input_AT_CERTLEV7 = '',Input_AT_CERTLEV8 = '',Input_AT_CERTLEV9 = '',Input_AT_CERTLEV10 = '',Input_AT_CERTNUM1 = '',Input_AT_CERTNUM2 = '',Input_AT_CERTNUM3 = '',Input_AT_CERTNUM4 = '',Input_AT_CERTNUM5 = '',Input_AT_CERTNUM6 = '',Input_AT_CERTNUM7 = '',Input_AT_CERTNUM8 = '',Input_AT_CERTNUM9 = '',Input_AT_CERTNUM10 = '',Input_AT_CERTEXP1 = '',Input_AT_CERTEXP2 = '',Input_AT_CERTEXP3 = '',Input_AT_CERTEXP4 = '',Input_AT_CERTEXP5 = '',Input_AT_CERTEXP6 = '',Input_AT_CERTEXP7 = '',Input_AT_CERTEXP8 = '',Input_AT_CERTEXP9 = '',Input_AT_CERTEXP10 = '',Input_EFX_EXTRACT_DATE = '',Input_EFX_MERCHANT_ID = '',Input_EFX_PROJECT_ID = '',Input_EFX_FOREIGN = '',Input_Record_Update_Refresh_Date = '',Input_EFX_DATE_CREATED = '',Input_normCompany_Name = '',Input_normCompany_Type = '',Input_Norm_Geo_Precision = '',Input_Norm_Corporate_Amount_Precision = '',Input_Norm_Location_Amount_Precision = '',Input_Norm_Public_Co_Indicator = '',Input_Norm_Stock_Exchange = '',Input_Norm_Telemarketablity_Score = '',Input_Norm_Telemarketablity_Total_Indicator = '',Input_Norm_Telemarketablity_Total_Score = '',Input_Norm_Government1057_Entity = '',Input_Norm_Merchant_Type = '',Input_NormAddress_Type = '',Input_Norm_Address = '',Input_Norm_City = '',Input_Norm_State = '',Input_Norm_StateC2 = '',Input_Norm_Zip = '',Input_Norm_Zip4 = '',Input_Norm_Lat = '',Input_Norm_Lon = '',Input_Norm_Geoprec = '',Input_Norm_Region = '',Input_Norm_Ctryisocd = '',Input_Norm_Ctrynum = '',Input_Norm_Ctryname = '',Input_clean_company_name = '',Input_clean_phone = '',Input_clean_secondary_phone = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_cart = '',Input_cr_sort_sz = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_dt_effective_first = '',Input_dt_effective_last = '',Input_process_date = '',Input_dotid = '',Input_dotscore = '',Input_dotweight = '',Input_empid = '',Input_empscore = '',Input_empweight = '',Input_powid = '',Input_powscore = '',Input_powweight = '',Input_proxid = '',Input_proxscore = '',Input_proxweight = '',Input_selescore = '',Input_seleweight = '',Input_orgid = '',Input_orgscore = '',Input_orgweight = '',Input_ultid = '',Input_ultscore = '',Input_ultweight = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_record_type = '',Input_EFX_ID = '',Input_EFX_NAME = '',Input_EFX_LEGAL_NAME = '',Input_EFX_ADDRESS = '',Input_EFX_CITY = '',Input_EFX_STATE = '',Input_EFX_STATEC = '',Input_EFX_ZIPCODE = '',Input_EFX_ZIP4 = '',Input_EFX_LAT = '',Input_EFX_LON = '',Input_EFX_GEOPREC = '',Input_EFX_REGION = '',Input_EFX_CTRYISOCD = '',Input_EFX_CTRYNUM = '',Input_EFX_CTRYNAME = '',Input_EFX_COUNTYNM = '',Input_EFX_COUNTY = '',Input_EFX_CMSA = '',Input_EFX_CMSADESC = '',Input_EFX_SOHO = '',Input_EFX_BIZ = '',Input_EFX_RES = '',Input_EFX_CMRA = '',Input_EFX_CONGRESS = '',Input_EFX_SECADR = '',Input_EFX_SECCTY = '',Input_EFX_SECSTAT = '',Input_EFX_STATEC2 = '',Input_EFX_SECZIP = '',Input_EFX_SECZIP4 = '',Input_EFX_SECLAT = '',Input_EFX_SECLON = '',Input_EFX_SECGEOPREC = '',Input_EFX_SECREGION = '',Input_EFX_SECCTRYISOCD = '',Input_EFX_SECCTRYNUM = '',Input_EFX_SECCTRYNAME = '',Input_EFX_CTRYTELCD = '',Input_EFX_PHONE = '',Input_EFX_FAXPHONE = '',Input_EFX_BUSSTAT = '',Input_EFX_BUSSTATCD = '',Input_EFX_WEB = '',Input_EFX_YREST = '',Input_EFX_CORPEMPCNT = '',Input_EFX_LOCEMPCNT = '',Input_EFX_CORPEMPCD = '',Input_EFX_LOCEMPCD = '',Input_EFX_CORPAMOUNT = '',Input_EFX_CORPAMOUNTCD = '',Input_EFX_CORPAMOUNTTP = '',Input_EFX_CORPAMOUNTPREC = '',Input_EFX_LOCAMOUNT = '',Input_EFX_LOCAMOUNTCD = '',Input_EFX_LOCAMOUNTTP = '',Input_EFX_LOCAMOUNTPREC = '',Input_EFX_PUBLIC = '',Input_EFX_STKEXC = '',Input_EFX_TCKSYM = '',Input_EFX_PRIMSIC = '',Input_EFX_SECSIC1 = '',Input_EFX_SECSIC2 = '',Input_EFX_SECSIC3 = '',Input_EFX_SECSIC4 = '',Input_EFX_PRIMSICDESC = '',Input_EFX_SECSICDESC1 = '',Input_EFX_SECSICDESC2 = '',Input_EFX_SECSICDESC3 = '',Input_EFX_SECSICDESC4 = '',Input_EFX_PRIMNAICSCODE = '',Input_EFX_SECNAICS1 = '',Input_EFX_SECNAICS2 = '',Input_EFX_SECNAICS3 = '',Input_EFX_SECNAICS4 = '',Input_EFX_PRIMNAICSDESC = '',Input_EFX_SECNAICSDESC1 = '',Input_EFX_SECNAICSDESC2 = '',Input_EFX_SECNAICSDESC3 = '',Input_EFX_SECNAICSDESC4 = '',Input_EFX_DEAD = '',Input_EFX_DEADDT = '',Input_EFX_MRKT_TELEVER = '',Input_EFX_MRKT_TELESCORE = '',Input_EFX_MRKT_TOTALSCORE = '',Input_EFX_MRKT_TOTALIND = '',Input_EFX_MRKT_VACANT = '',Input_EFX_MRKT_SEASONAL = '',Input_EFX_MBE = '',Input_EFX_WBE = '',Input_EFX_MWBE = '',Input_EFX_SDB = '',Input_EFX_HUBZONE = '',Input_EFX_DBE = '',Input_EFX_VET = '',Input_EFX_DVET = '',Input_EFX_8a = '',Input_EFX_8aEXPDT = '',Input_EFX_DIS = '',Input_EFX_SBE = '',Input_EFX_BUSSIZE = '',Input_EFX_LBE = '',Input_EFX_GOV = '',Input_EFX_FGOV = '',Input_EFX_GOV1057 = '',Input_EFX_NONPROFIT = '',Input_EFX_MERCTYPE = '',Input_EFX_HBCU = '',Input_EFX_GAYLESBIAN = '',Input_EFX_WSBE = '',Input_EFX_VSBE = '',Input_EFX_DVSBE = '',Input_EFX_MWBESTATUS = '',Input_EFX_NMSDC = '',Input_EFX_WBENC = '',Input_EFX_CA_PUC = '',Input_EFX_TX_HUB = '',Input_EFX_TX_HUBCERTNUM = '',Input_EFX_GSAX = '',Input_EFX_CALTRANS = '',Input_EFX_EDU = '',Input_EFX_MI = '',Input_EFX_ANC = '',Input_AT_CERT1 = '',Input_AT_CERT2 = '',Input_AT_CERT3 = '',Input_AT_CERT4 = '',Input_AT_CERT5 = '',Input_AT_CERT6 = '',Input_AT_CERT7 = '',Input_AT_CERT8 = '',Input_AT_CERT9 = '',Input_AT_CERT10 = '',Input_AT_CERTDESC1 = '',Input_AT_CERTDESC2 = '',Input_AT_CERTDESC3 = '',Input_AT_CERTDESC4 = '',Input_AT_CERTDESC5 = '',Input_AT_CERTDESC6 = '',Input_AT_CERTDESC7 = '',Input_AT_CERTDESC8 = '',Input_AT_CERTDESC9 = '',Input_AT_CERTDESC10 = '',Input_AT_CERTSRC1 = '',Input_AT_CERTSRC2 = '',Input_AT_CERTSRC3 = '',Input_AT_CERTSRC4 = '',Input_AT_CERTSRC5 = '',Input_AT_CERTSRC6 = '',Input_AT_CERTSRC7 = '',Input_AT_CERTSRC8 = '',Input_AT_CERTSRC9 = '',Input_AT_CERTSRC10 = '',Input_AT_CERTLEV1 = '',Input_AT_CERTLEV2 = '',Input_AT_CERTLEV3 = '',Input_AT_CERTLEV4 = '',Input_AT_CERTLEV5 = '',Input_AT_CERTLEV6 = '',Input_AT_CERTLEV7 = '',Input_AT_CERTLEV8 = '',Input_AT_CERTLEV9 = '',Input_AT_CERTLEV10 = '',Input_AT_CERTNUM1 = '',Input_AT_CERTNUM2 = '',Input_AT_CERTNUM3 = '',Input_AT_CERTNUM4 = '',Input_AT_CERTNUM5 = '',Input_AT_CERTNUM6 = '',Input_AT_CERTNUM7 = '',Input_AT_CERTNUM8 = '',Input_AT_CERTNUM9 = '',Input_AT_CERTNUM10 = '',Input_AT_CERTEXP1 = '',Input_AT_CERTEXP2 = '',Input_AT_CERTEXP3 = '',Input_AT_CERTEXP4 = '',Input_AT_CERTEXP5 = '',Input_AT_CERTEXP6 = '',Input_AT_CERTEXP7 = '',Input_AT_CERTEXP8 = '',Input_AT_CERTEXP9 = '',Input_AT_CERTEXP10 = '',Input_EFX_EXTRACT_DATE = '',Input_EFX_MERCHANT_ID = '',Input_EFX_PROJECT_ID = '',Input_EFX_FOREIGN = '',Input_Record_Update_Refresh_Date = '',Input_EFX_DATE_CREATED = '',Input_normCompany_Name = '',Input_normCompany_Type = '',Input_Norm_Geo_Precision = '',Input_Exploded_Desc_Corporate_Amount_Precision = '',Input_Exploded_Desc_Location_Amount_Precision = '',Input_Exploded_Desc_Public_Co_Indicator = '',Input_Exploded_Desc_Stock_Exchange = '',Input_Exploded_Desc_Telemarketablity_Score = '',Input_Exploded_Desc_Telemarketablity_Total_Indicator = '',Input_Exploded_Desc_Telemarketablity_Total_Score = '',Input_Exploded_Desc_Government1057_Entity = '',Input_Exploded_Desc_Merchant_Type = '',Input_Exploded_Desc_Busstatcd = '',Input_Exploded_Desc_CMSA = '',Input_Exploded_Desc_Corpamountcd = '',Input_Exploded_Desc_Corpamountprec = '',Input_Exploded_Desc_Corpamounttp = '',Input_Exploded_Desc_Corpempcd = '',Input_Exploded_Desc_Ctrytelcd = '',Input_NormAddress_Type = '',Input_Norm_Address = '',Input_Norm_City = '',Input_Norm_State = '',Input_Norm_StateC2 = '',Input_Norm_Zip = '',Input_Norm_Zip4 = '',Input_Norm_Lat = '',Input_Norm_Lon = '',Input_Norm_Geoprec = '',Input_Norm_Region = '',Input_Norm_Ctryisocd = '',Input_Norm_Ctrynum = '',Input_Norm_Ctryname = '',Input_clean_company_name = '',Input_clean_phone = '',Input_clean_secondary_phone = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_cart = '',Input_cr_sort_sz = '',OutFile) := MACRO
   IMPORT SALT37,Equifax_Business_Data;
   #uniquename(of)
   %of% := RECORD
@@ -1331,58 +1331,100 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_dt_effective_first
         IF( le.Input_Norm_Geo_Precision = (TYPEOF(le.Input_Norm_Geo_Precision))'','',':Norm_Geo_Precision')
     #END
  
-+    #IF( #TEXT(Input_Norm_Corporate_Amount_Precision)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Corporate_Amount_Precision)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Corporate_Amount_Precision = (TYPEOF(le.Input_Norm_Corporate_Amount_Precision))'','',':Norm_Corporate_Amount_Precision')
+        IF( le.Input_Exploded_Desc_Corporate_Amount_Precision = (TYPEOF(le.Input_Exploded_Desc_Corporate_Amount_Precision))'','',':Exploded_Desc_Corporate_Amount_Precision')
     #END
  
-+    #IF( #TEXT(Input_Norm_Location_Amount_Precision)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Location_Amount_Precision)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Location_Amount_Precision = (TYPEOF(le.Input_Norm_Location_Amount_Precision))'','',':Norm_Location_Amount_Precision')
+        IF( le.Input_Exploded_Desc_Location_Amount_Precision = (TYPEOF(le.Input_Exploded_Desc_Location_Amount_Precision))'','',':Exploded_Desc_Location_Amount_Precision')
     #END
  
-+    #IF( #TEXT(Input_Norm_Public_Co_Indicator)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Public_Co_Indicator)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Public_Co_Indicator = (TYPEOF(le.Input_Norm_Public_Co_Indicator))'','',':Norm_Public_Co_Indicator')
+        IF( le.Input_Exploded_Desc_Public_Co_Indicator = (TYPEOF(le.Input_Exploded_Desc_Public_Co_Indicator))'','',':Exploded_Desc_Public_Co_Indicator')
     #END
  
-+    #IF( #TEXT(Input_Norm_Stock_Exchange)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Stock_Exchange)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Stock_Exchange = (TYPEOF(le.Input_Norm_Stock_Exchange))'','',':Norm_Stock_Exchange')
+        IF( le.Input_Exploded_Desc_Stock_Exchange = (TYPEOF(le.Input_Exploded_Desc_Stock_Exchange))'','',':Exploded_Desc_Stock_Exchange')
     #END
  
-+    #IF( #TEXT(Input_Norm_Telemarketablity_Score)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Telemarketablity_Score)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Telemarketablity_Score = (TYPEOF(le.Input_Norm_Telemarketablity_Score))'','',':Norm_Telemarketablity_Score')
+        IF( le.Input_Exploded_Desc_Telemarketablity_Score = (TYPEOF(le.Input_Exploded_Desc_Telemarketablity_Score))'','',':Exploded_Desc_Telemarketablity_Score')
     #END
  
-+    #IF( #TEXT(Input_Norm_Telemarketablity_Total_Indicator)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Telemarketablity_Total_Indicator)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Telemarketablity_Total_Indicator = (TYPEOF(le.Input_Norm_Telemarketablity_Total_Indicator))'','',':Norm_Telemarketablity_Total_Indicator')
+        IF( le.Input_Exploded_Desc_Telemarketablity_Total_Indicator = (TYPEOF(le.Input_Exploded_Desc_Telemarketablity_Total_Indicator))'','',':Exploded_Desc_Telemarketablity_Total_Indicator')
     #END
  
-+    #IF( #TEXT(Input_Norm_Telemarketablity_Total_Score)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Telemarketablity_Total_Score)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Telemarketablity_Total_Score = (TYPEOF(le.Input_Norm_Telemarketablity_Total_Score))'','',':Norm_Telemarketablity_Total_Score')
+        IF( le.Input_Exploded_Desc_Telemarketablity_Total_Score = (TYPEOF(le.Input_Exploded_Desc_Telemarketablity_Total_Score))'','',':Exploded_Desc_Telemarketablity_Total_Score')
     #END
  
-+    #IF( #TEXT(Input_Norm_Government1057_Entity)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Government1057_Entity)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Government1057_Entity = (TYPEOF(le.Input_Norm_Government1057_Entity))'','',':Norm_Government1057_Entity')
+        IF( le.Input_Exploded_Desc_Government1057_Entity = (TYPEOF(le.Input_Exploded_Desc_Government1057_Entity))'','',':Exploded_Desc_Government1057_Entity')
     #END
  
-+    #IF( #TEXT(Input_Norm_Merchant_Type)='' )
++    #IF( #TEXT(Input_Exploded_Desc_Merchant_Type)='' )
       '' 
     #ELSE
-        IF( le.Input_Norm_Merchant_Type = (TYPEOF(le.Input_Norm_Merchant_Type))'','',':Norm_Merchant_Type')
+        IF( le.Input_Exploded_Desc_Merchant_Type = (TYPEOF(le.Input_Exploded_Desc_Merchant_Type))'','',':Exploded_Desc_Merchant_Type')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Busstatcd)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Busstatcd = (TYPEOF(le.Input_Exploded_Desc_Busstatcd))'','',':Exploded_Desc_Busstatcd')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_CMSA)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_CMSA = (TYPEOF(le.Input_Exploded_Desc_CMSA))'','',':Exploded_Desc_CMSA')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Corpamountcd)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Corpamountcd = (TYPEOF(le.Input_Exploded_Desc_Corpamountcd))'','',':Exploded_Desc_Corpamountcd')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Corpamountprec)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Corpamountprec = (TYPEOF(le.Input_Exploded_Desc_Corpamountprec))'','',':Exploded_Desc_Corpamountprec')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Corpamounttp)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Corpamounttp = (TYPEOF(le.Input_Exploded_Desc_Corpamounttp))'','',':Exploded_Desc_Corpamounttp')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Corpempcd)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Corpempcd = (TYPEOF(le.Input_Exploded_Desc_Corpempcd))'','',':Exploded_Desc_Corpempcd')
+    #END
+ 
++    #IF( #TEXT(Input_Exploded_Desc_Ctrytelcd)='' )
+      '' 
+    #ELSE
+        IF( le.Input_Exploded_Desc_Ctrytelcd = (TYPEOF(le.Input_Exploded_Desc_Ctrytelcd))'','',':Exploded_Desc_Ctrytelcd')
     #END
  
 +    #IF( #TEXT(Input_NormAddress_Type)='' )
@@ -1485,42 +1527,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_dt_effective_first
       '' 
     #ELSE
         IF( le.Input_clean_secondary_phone = (TYPEOF(le.Input_clean_secondary_phone))'','',':clean_secondary_phone')
-    #END
- 
-+    #IF( #TEXT(Input_title)='' )
-      '' 
-    #ELSE
-        IF( le.Input_title = (TYPEOF(le.Input_title))'','',':title')
-    #END
- 
-+    #IF( #TEXT(Input_fname)='' )
-      '' 
-    #ELSE
-        IF( le.Input_fname = (TYPEOF(le.Input_fname))'','',':fname')
-    #END
- 
-+    #IF( #TEXT(Input_mname)='' )
-      '' 
-    #ELSE
-        IF( le.Input_mname = (TYPEOF(le.Input_mname))'','',':mname')
-    #END
- 
-+    #IF( #TEXT(Input_lname)='' )
-      '' 
-    #ELSE
-        IF( le.Input_lname = (TYPEOF(le.Input_lname))'','',':lname')
-    #END
- 
-+    #IF( #TEXT(Input_name_suffix)='' )
-      '' 
-    #ELSE
-        IF( le.Input_name_suffix = (TYPEOF(le.Input_name_suffix))'','',':name_suffix')
-    #END
- 
-+    #IF( #TEXT(Input_name_score)='' )
-      '' 
-    #ELSE
-        IF( le.Input_name_score = (TYPEOF(le.Input_name_score))'','',':name_score')
     #END
  
 +    #IF( #TEXT(Input_prim_range)='' )

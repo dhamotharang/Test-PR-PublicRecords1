@@ -1,91 +1,69 @@
-﻿IMPORT Codes;
+﻿IMPORT Codes, ut, lib_stringlib;
 
 EXPORT EFX_STATE_TABLE := 
 MODULE
-	EXPORT VARSTRING STATE(string code) :=
+	EXPORT VARSTRING STATE(string code) := ut.CleanSpacesAndUpper(
 	  MAP(
-		  code='AK' => 'ALASKA',
-      code='AL' => 'ALABAMA',
-      code='AR' => 'ARKANSAS',
-      code='AZ' => 'ARIZONA',
-      code='CA' => 'CALIFORNIA',
-      code='CO' => 'COLORADO',
-      code='CT' => 'CONNECTICUT',
-      code='DC' => 'DISTRICT OF COLUMBIA',
-      code='DE' => 'DELAWARE',
-      code='FL' => 'FLORIDA',
-      code='GA' => 'GEORGIA',
-      code='HI' => 'HAWAII',
-      code='IA' => 'IOWA',
-      code='ID' => 'IDAHO',
-      code='IL' => 'ILLINOIS',
-      code='IN' => 'INDIANA',
-      code='KS' => 'KANSAS',
-      code='KY' => 'KENTUCKY',
-      code='LA' => 'LOUISIANA',
-      code='MA' => 'MASSACHUSETTS',
-      code='MD' => 'MARYLAND',
-      code='ME' => 'MAINE',
-      code='MI' => 'MICHIGAN',
-      code='MN' => 'MINNESOTA',
-      code='MO' => 'MISSOURI',
-      code='MS' => 'MISSISSIPPI',
-      code='MT' => 'MONTANA',
-      code='NC' => 'NORTH CAROLINA',
-      code='ND' => 'NORTH DAKOTA',
-      code='NE' => 'NEBRASKA',
-      code='NH' => 'NEW HAMPSHIRE',
-      code='NJ' => 'NEW JERSEY',
-      code='NM' => 'NEW MEXICO',
-      code='NV' => 'NEVADA',
-      code='NY' => 'NEW YORK',
-      code='OH' => 'OHIO',
-      code='OK' => 'OKLAHOMA',
-      code='OR' => 'OREGON',
-      code='PA' => 'PENNSYLVANIA',
-      code='RI' => 'RHODE ISLAND',
-      code='SC' => 'SOUTH CAROLINA',
-      code='SD' => 'SOUTH DAKOTA',
-      code='TN' => 'TENNESSEE',
-      code='TX' => 'TEXAS',
-      code='UT' => 'UTAH',
-      code='VA' => 'VIRGINIA',
-      code='VT' => 'VERMONT',
-      code='WA' => 'WASHINGTON',
-      code='WI' => 'WISCONSIN',
-      code='WV' => 'WEST VIRGINIA',
-      code='WY' => 'WYOMING',
-      code='AS' => 'AMERICAN SAMOA',
-      code='FM' => 'FEDERATED STATES OF MICRONESIA',
-      code='GU' => 'GUAM',
-      code='MH' => 'MARSHALL ISLANDS',
-      code='MP' => 'NORTHERN MARIANA ISLANDS',
-      code='PR' => 'PUERTO RICO',
-      code='PW' => 'PALAU',
-      code='VI' => 'VIRGIN ISLANDS',       
-			 code='' => '',
-			 'INVALID');	 
-			 
-			
-export checkChanges :=
-	FUNCTION
-		
-	codes.Layout_Codes_V3 trans(codes.File_Codes_V3_in le) :=
-		TRANSFORM
-			translation := 
-				MAP(le.field_name = 'STATE' =>	STATE(le.code),
-				    '');
-	
-			SELF.code := IF(stringlib.StringCleanSpaces(le.long_desc)=
-                               stringlib.StringCleanSpaces(translation),SKIP,le.code);
-						 
-			SELF := le;
-		END;
-	
-	p := PROJECT(codes.File_Codes_V3_in(file_name='STATE',field_name in ['STATE']
-	),trans(LEFT));
-	RETURN p;
-		
-	END;			 
+		  StringLib.StringToUppercase(code)='AK' => 'ALASKA',
+      StringLib.StringToUppercase(code)='AL' => 'ALABAMA',
+      StringLib.StringToUppercase(code)='AR' => 'ARKANSAS',
+      StringLib.StringToUppercase(code)='AZ' => 'ARIZONA',
+      StringLib.StringToUppercase(code)='CA' => 'CALIFORNIA',
+      StringLib.StringToUppercase(code)='CO' => 'COLORADO',
+      StringLib.StringToUppercase(code)='CT' => 'CONNECTICUT',
+      StringLib.StringToUppercase(code)='DC' => 'DISTRICT OF COLUMBIA',
+      StringLib.StringToUppercase(code)='DE' => 'DELAWARE',
+      StringLib.StringToUppercase(code)='FL' => 'FLORIDA',
+      StringLib.StringToUppercase(code)='GA' => 'GEORGIA',
+      StringLib.StringToUppercase(code)='HI' => 'HAWAII',
+      StringLib.StringToUppercase(code)='IA' => 'IOWA',
+      StringLib.StringToUppercase(code)='ID' => 'IDAHO',
+      StringLib.StringToUppercase(code)='IL' => 'ILLINOIS',
+      StringLib.StringToUppercase(code)='IN' => 'INDIANA',
+      StringLib.StringToUppercase(code)='KS' => 'KANSAS',
+      StringLib.StringToUppercase(code)='KY' => 'KENTUCKY',
+      StringLib.StringToUppercase(code)='LA' => 'LOUISIANA',
+      StringLib.StringToUppercase(code)='MA' => 'MASSACHUSETTS',
+      StringLib.StringToUppercase(code)='MD' => 'MARYLAND',
+      StringLib.StringToUppercase(code)='ME' => 'MAINE',
+      StringLib.StringToUppercase(code)='MI' => 'MICHIGAN',
+      StringLib.StringToUppercase(code)='MN' => 'MINNESOTA',
+      StringLib.StringToUppercase(code)='MO' => 'MISSOURI',
+      StringLib.StringToUppercase(code)='MS' => 'MISSISSIPPI',
+      StringLib.StringToUppercase(code)='MT' => 'MONTANA',
+      StringLib.StringToUppercase(code)='NC' => 'NORTH CAROLINA',
+      StringLib.StringToUppercase(code)='ND' => 'NORTH DAKOTA',
+      StringLib.StringToUppercase(code)='NE' => 'NEBRASKA',
+      StringLib.StringToUppercase(code)='NH' => 'NEW HAMPSHIRE',
+      StringLib.StringToUppercase(code)='NJ' => 'NEW JERSEY',
+      StringLib.StringToUppercase(code)='NM' => 'NEW MEXICO',
+      StringLib.StringToUppercase(code)='NV' => 'NEVADA',
+      StringLib.StringToUppercase(code)='NY' => 'NEW YORK',
+      StringLib.StringToUppercase(code)='OH' => 'OHIO',
+      StringLib.StringToUppercase(code)='OK' => 'OKLAHOMA',
+      StringLib.StringToUppercase(code)='OR' => 'OREGON',
+      StringLib.StringToUppercase(code)='PA' => 'PENNSYLVANIA',
+      StringLib.StringToUppercase(code)='RI' => 'RHODE ISLAND',
+      StringLib.StringToUppercase(code)='SC' => 'SOUTH CAROLINA',
+      StringLib.StringToUppercase(code)='SD' => 'SOUTH DAKOTA',
+      StringLib.StringToUppercase(code)='TN' => 'TENNESSEE',
+      StringLib.StringToUppercase(code)='TX' => 'TEXAS',
+      StringLib.StringToUppercase(code)='UT' => 'UTAH',
+      StringLib.StringToUppercase(code)='VA' => 'VIRGINIA',
+      StringLib.StringToUppercase(code)='VT' => 'VERMONT',
+      StringLib.StringToUppercase(code)='WA' => 'WASHINGTON',
+      StringLib.StringToUppercase(code)='WI' => 'WISCONSIN',
+      StringLib.StringToUppercase(code)='WV' => 'WEST VIRGINIA',
+      StringLib.StringToUppercase(code)='WY' => 'WYOMING',
+      StringLib.StringToUppercase(code)='AS' => 'AMERICAN SAMOA',
+      StringLib.StringToUppercase(code)='FM' => 'FEDERATED STATES OF MICRONESIA',
+      StringLib.StringToUppercase(code)='GU' => 'GUAM',
+      StringLib.StringToUppercase(code)='MH' => 'MARSHALL ISLANDS',
+      StringLib.StringToUppercase(code)='MP' => 'NORTHERN MARIANA ISLANDS',
+      StringLib.StringToUppercase(code)='PR' => 'PUERTO RICO',
+      StringLib.StringToUppercase(code)='PW' => 'PALAU',
+      StringLib.StringToUppercase(code)='VI' => 'VIRGIN ISLANDS',       
+			 StringLib.StringToUppercase(code)='' => '',
+			 'INVALID'));	 
 
 END;

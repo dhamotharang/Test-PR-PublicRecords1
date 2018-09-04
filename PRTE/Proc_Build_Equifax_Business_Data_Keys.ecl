@@ -1,6 +1,6 @@
 ﻿import	_control;
 
-export Proc_Build_Equifax_Business_Data_Keys(STRING pIndexVersion) := function
+export Proc_Build_Equifax_Business_Data_Keys(string pIndexVersion) := function
 
 rKeyEquifax_Business_Data__linkid	:= RECORD
 	unsigned6 ultid;
@@ -222,7 +222,9 @@ rKeyEquifax_Business_Data__linkid	:= RECORD
   string10 efx_project_id;
   string1 efx_foreign;
   string19 record_update_refresh_date;
+	string10 efx_date_created;
   string100 normcompany_name;
+	string1 normcompany_type;
   string1 normaddress_type;
   string75 norm_address;
   string75 norm_city;
@@ -237,12 +239,23 @@ rKeyEquifax_Business_Data__linkid	:= RECORD
   string3 norm_ctryisocd;
   string10 norm_ctrynum;
   string100 norm_ctryname;
-  string5 title;
-  string20 fname;
-  string20 mname;
-  string20 lname;
-  string5 name_suffix;
-  string3 name_score;
+  string10 norm_Geo_Precision;
+	string9 exploded_desc_Corporate_Amount_Precision;
+	string9 exploded_desc_Location_Amount_Precision;
+	string8 exploded_desc_Public_Co_Indicator;
+	string48 exploded_desc_Stock_Exchange;
+	string18 exploded_desc_Telemarketablity_Score;
+	string25 exploded_desc_Telemarketablity_Total_Indicator;
+	string18 exploded_desc_Telemarketablity_Total_Score;
+	string21 exploded_desc_Government1057_Entity;
+	string22 exploded_desc_Merchant_Type;	
+  string50 exploded_desc_Busstatcd;
+	string100 exploded_desc_CMSA;
+	string13 exploded_desc_Corpamountcd;
+	string50 exploded_desc_Corpamountprec;
+	string50 exploded_desc_Corpamounttp;
+	string9 exploded_desc_Corpempcd;
+	string100 exploded_desc_Ctrytelcd;
   string10 prim_range;
   string2 predir;
   string28 prim_name;
@@ -270,18 +283,13 @@ rKeyEquifax_Business_Data__linkid	:= RECORD
   string7 geo_blk;
   string1 geo_match;
   string4 err_stat;
-  string20 unit_flag_exp;
-  string20 relationship_code_exp;
   string100 clean_company_name;
   string10 clean_phone;
   string10 clean_secondary_phone;
-  string182 clean_addr;
   unsigned8 raw_aid;
   unsigned8 ace_aid;
   string100 prep_addr_line1;
   string50 prep_addr_line_last;
-  string100 prep_addr2_line1;
-  string50 prep_addr2_line_last;
   integer1 fp;
 end;
 

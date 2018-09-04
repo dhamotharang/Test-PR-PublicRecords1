@@ -17,7 +17,7 @@ EXPORT Functions := MODULE
   END;
 
 	//********************************************************************************
-	//fn_rcid:  returns true if is a 3 to 12 digit numeric value, else returns false
+	//fn_rcid:  returns true if it is a 1 to 15 digit numeric value, else returns false
 	//********************************************************************************
 	EXPORT fn_rcid(STRING s) := function    
 	  RETURN IF(LENGTH(s) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] AND Stringlib.StringFilterOut(s, '0123456789') = '', 1, 0);
@@ -121,31 +121,6 @@ EXPORT Functions := MODULE
   END;
 	
   //*******************************************************************************
-  //fn_valid_date_seen: 	returns true if valid current and/or past date, else false
-  //*******************************************************************************
-  EXPORT fn_valid_date_seen(STRING sDate) := FUNCTION
-		clean_date := sDate;
-    isValidDate := IF(LENGTH(clean_date) = 8 and clean_date <= ut.GetDate, TRUE, FALSE);
-    RETURN IF(isValidDate, 1, 0);
-  END;
-		
-  //*******************************************************************************
-  //fn_valid_first_reported_date: 	returns true if valid current and/or past date, else false
-  //*******************************************************************************
-  EXPORT fn_valid_reported_date(STRING sDate) := FUNCTION
-    isValidDate := IF(LENGTH(sDate) = 8 and sDate <= ut.GetDate, TRUE, FALSE);
-    RETURN IF(isValidDate, 1, 0);
-  END;		
-				
-  //*******************************************************************************
-  //fn_valid_process_date: 	returns true if valid current and/or past date, else false
-  //*******************************************************************************
-  EXPORT fn_valid_process_date(STRING sDate) := FUNCTION
-    isValidDate := IF(LENGTH(sDate) = 8 and sDate <= ut.GetDate, TRUE, FALSE);
-    RETURN IF(isValidDate, 1, 0);
-  END;		
-	
-  //*******************************************************************************
   //fn_valid_past_date: 	returns true if valid current and/or past date, else false
   //*******************************************************************************
   EXPORT fn_valid_past_date(STRING sDate) := FUNCTION
@@ -180,8 +155,17 @@ EXPORT Functions := MODULE
   //fn_valid_GeneralDate: 	returns true if valid date, else false
   //*******************************************************************************	
   EXPORT fn_valid_GeneralDate(string sDate) :=function
-		clean_date := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(sDate);    
+		clean_date := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(sDate);
 		isValidDate := IF(clean_date = '' or _validate.date.fIsValid(clean_date), TRUE, FALSE);
+		RETURN IF(isValidDate, 1, 0);
+  end;		
+	
+  //*******************************************************************************
+  //fn_valid_ReformatedDate: 	returns true if valid date, else false
+  //*******************************************************************************	
+  EXPORT fn_valid_ReformatedDate(string sDate) :=function
+		clean_date := sDate;
+		isValidDate := IF(clean_date = '0' or _validate.date.fIsValid(clean_date), TRUE, FALSE);
 		RETURN IF(isValidDate, 1, 0);
   end;	
 	
@@ -189,7 +173,8 @@ EXPORT Functions := MODULE
   //fn_numeric_or_blank: 	returns true if only populated with numbers or blanks
   //****************************************************************************  
 	EXPORT fn_numeric_or_blank(STRING nmbr) := FUNCTION
-    RETURN if(LENGTH(TRIM(nmbr, ALL)) < 10 and Stringlib.StringFilterOut(nmbr, '0123456789') = '' ,1 ,0);
+    // RETURN if(LENGTH(TRIM(nmbr, ALL)) < 10 and Stringlib.StringFilterOut(nmbr, '0123456789') = '' ,1 ,0);
+    RETURN if(LENGTH(TRIM(nmbr, ALL)) = 0 or Stringlib.StringFilterOut(nmbr, '0123456789') = '' ,1 ,0);
   END;
 	
    //****************************************************************************
@@ -225,7 +210,7 @@ EXPORT Functions := MODULE
 	//fn_url:  returns true if all the characters are valid, else returns false
 	//********************************************************************************
 	EXPORT fn_url(STRING s) := function    
-	  RETURN IF(Stringlib.StringFilterOut(s, ' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\'-!#$%&*,./:;?@_{}~+=()') = '', 1, 0);
+	  RETURN IF(Stringlib.StringFilterOut(s, ' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\'-!#$%&*,./:;?@_{}~+=()') = '', 1, 0);
   END;
 	
 	//****************************************************************************
@@ -238,11 +223,9 @@ EXPORT Functions := MODULE
 		
 	//****************************************************************************
 	//fn_naics:  returns true or false based upon whether or not there is
-  //                 an empty, 4-digit value.
+  //                 an empty or a numeric value.
 	//****************************************************************************
-	EXPORT fn_naics(STRING s) := function    
-	  // RETURN IF((s = '' or LENGTH(TRIM(s, ALL)) in [6]) AND Stringlib.StringFilterOut(s, ' 0123456789') = '', 1, 0);
-		// RETURN IF(s = '' AND Stringlib.StringFilterOut(s, ' 0123456789') = '', 1, 0);
+	EXPORT fn_naics(STRING s) := function
 		RETURN IF(Stringlib.StringFilterOut(s, ' 0123456789') = '', 1, 0);
   END;
 	

@@ -1,4 +1,4 @@
-﻿IMPORT business_header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, Business_HeaderV2;
+﻿IMPORT business_header, Header_Slimsort, Business_Header_SS, Business_HeaderV2;
 
 EXPORT Append_Ids := MODULE
 
@@ -21,9 +21,6 @@ EXPORT Append_Ids := MODULE
 		Equifax_Business_Data.Layouts.Temp.BIPSlim tSlimForBIPing(Equifax_Business_Data.Layouts.Temp.UniqueId L) := TRANSFORM
 			SELF.unique_id		    := L.unique_id;
 			SELF.company  		    := L.clean_company_name;
-	    SELF.fname            := L.fname;
-	    SELF.mname            := L.mname;
-	    SELF.lname            := L.lname;
 			SELF.prim_range       := L.prim_range;
 			SELF.prim_name        := L.prim_name;
 			SELF.sec_range        := L.sec_range;
@@ -32,7 +29,6 @@ EXPORT Append_Ids := MODULE
 			SELF.state            := L.st;
       SELF.phone            := L.clean_phone;     
 			SELF.url              := L.EFX_WEB;
-			SELF.email            := '';
 			SELF							    := [];
 		END;
 		
@@ -63,11 +59,7 @@ EXPORT Append_Ids := MODULE
 			,																			// default is to hit prod from dataland, and on prod hit prod.		
 			,BIPV2.xlink_only_set                 // Create LinkID's only
 			,url																	// Url
-			,email																// Email
 			,city                   							// City
-			,fname           											// fname
-			,mname         												// mname
-			,lname           											// lname
 		);
 		
     dBIP_dist           := DISTRIBUTE(dBIPOut(Ultid 	!= 0 OR 

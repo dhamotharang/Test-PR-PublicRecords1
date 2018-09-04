@@ -3,8 +3,8 @@ IMPORT Scrubs_Equifax_Business_Data; // Import modules for FieldTypes attribute 
 EXPORT Input_Fields := MODULE
  
 // Processing for each FieldType
-EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_legal_name','invalid_mandatory','invalid_zero_integer','invalid_record_type','invalid_numeric','invalid_numeric_or_blank','invalid_percentage','invalid_direction','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_st','invalid_zip5','invalid_zip4','invalid_phone','invalid_rcid','invalid_sic','invalid_naics','invalid_url','invalid_address_type_code','invalid_norm_type','invalid_email','invalid_yes_blank','invalid_business_size','invalid_cert_or_class','invalid_current_future_date','invalid_current_past_date','invalid_future_date','invalid_general_date','invalid_past_date','invalid_year_established','invalid_date_created','invalid_date_seen','invalid_vendor_reported_date','invalid_process_date','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_statec','invalid_stkexc');
-EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_legal_name' => 2,'invalid_mandatory' => 3,'invalid_zero_integer' => 4,'invalid_record_type' => 5,'invalid_numeric' => 6,'invalid_numeric_or_blank' => 7,'invalid_percentage' => 8,'invalid_direction' => 9,'invalid_cart' => 10,'invalid_cr_sort_sz' => 11,'invalid_lot' => 12,'invalid_lot_order' => 13,'invalid_dbpc' => 14,'invalid_chk_digit' => 15,'invalid_rec_type' => 16,'invalid_fips_state' => 17,'invalid_fips_county' => 18,'invalid_geo' => 19,'invalid_msa' => 20,'invalid_geo_blk' => 21,'invalid_geo_match' => 22,'invalid_err_stat' => 23,'invalid_raw_aid' => 24,'invalid_ace_aid' => 25,'invalid_st' => 26,'invalid_zip5' => 27,'invalid_zip4' => 28,'invalid_phone' => 29,'invalid_rcid' => 30,'invalid_sic' => 31,'invalid_naics' => 32,'invalid_url' => 33,'invalid_address_type_code' => 34,'invalid_norm_type' => 35,'invalid_email' => 36,'invalid_yes_blank' => 37,'invalid_business_size' => 38,'invalid_cert_or_class' => 39,'invalid_current_future_date' => 40,'invalid_current_past_date' => 41,'invalid_future_date' => 42,'invalid_general_date' => 43,'invalid_past_date' => 44,'invalid_year_established' => 45,'invalid_date_created' => 46,'invalid_date_seen' => 47,'invalid_vendor_reported_date' => 48,'invalid_process_date' => 49,'invalid_busstatcd' => 50,'invalid_cmsa' => 51,'invalid_corpamountcd' => 52,'invalid_corpamountprec' => 53,'invalid_corpamounttp' => 54,'invalid_corpempcd' => 55,'invalid_ctryisocd' => 56,'invalid_ctrynum' => 57,'invalid_ctrytelcd' => 58,'invalid_geoprec' => 59,'invalid_merctype' => 60,'invalid_mrkt_telescore' => 61,'invalid_mrkt_totalind' => 62,'invalid_mrkt_totalscore' => 63,'invalid_public' => 64,'invalid_statec' => 65,'invalid_stkexc' => 66,0);
+EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_legal_name','invalid_mandatory','invalid_zero_integer','invalid_record_type','invalid_numeric','invalid_numeric_or_blank','invalid_percentage','invalid_direction','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_st','invalid_zip5','invalid_zip4','invalid_phone','invalid_rcid','invalid_sic','invalid_naics','invalid_url','invalid_address_type_code','invalid_norm_type','invalid_email','invalid_yes_blank','invalid_business_size','invalid_cert_or_class','invalid_current_future_date','invalid_current_past_date','invalid_future_date','invalid_general_date','invalid_past_date','invalid_year_established','invalid_date_created','invalid_date_seen','invalid_reformated_date','invalid_vendor_reported_date','invalid_process_date','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_statec','invalid_stkexc');
+EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_legal_name' => 2,'invalid_mandatory' => 3,'invalid_zero_integer' => 4,'invalid_record_type' => 5,'invalid_numeric' => 6,'invalid_numeric_or_blank' => 7,'invalid_percentage' => 8,'invalid_direction' => 9,'invalid_cart' => 10,'invalid_cr_sort_sz' => 11,'invalid_lot' => 12,'invalid_lot_order' => 13,'invalid_dbpc' => 14,'invalid_chk_digit' => 15,'invalid_rec_type' => 16,'invalid_fips_state' => 17,'invalid_fips_county' => 18,'invalid_geo' => 19,'invalid_msa' => 20,'invalid_geo_blk' => 21,'invalid_geo_match' => 22,'invalid_err_stat' => 23,'invalid_raw_aid' => 24,'invalid_ace_aid' => 25,'invalid_st' => 26,'invalid_zip5' => 27,'invalid_zip4' => 28,'invalid_phone' => 29,'invalid_rcid' => 30,'invalid_sic' => 31,'invalid_naics' => 32,'invalid_url' => 33,'invalid_address_type_code' => 34,'invalid_norm_type' => 35,'invalid_email' => 36,'invalid_yes_blank' => 37,'invalid_business_size' => 38,'invalid_cert_or_class' => 39,'invalid_current_future_date' => 40,'invalid_current_past_date' => 41,'invalid_future_date' => 42,'invalid_general_date' => 43,'invalid_past_date' => 44,'invalid_year_established' => 45,'invalid_date_created' => 46,'invalid_date_seen' => 47,'invalid_reformated_date' => 48,'invalid_vendor_reported_date' => 49,'invalid_process_date' => 50,'invalid_busstatcd' => 51,'invalid_cmsa' => 52,'invalid_corpamountcd' => 53,'invalid_corpamountprec' => 54,'invalid_corpamounttp' => 55,'invalid_corpempcd' => 56,'invalid_ctryisocd' => 57,'invalid_ctrynum' => 58,'invalid_ctrytelcd' => 59,'invalid_geoprec' => 60,'invalid_merctype' => 61,'invalid_mrkt_telescore' => 62,'invalid_mrkt_totalind' => 63,'invalid_mrkt_totalscore' => 64,'invalid_public' => 65,'invalid_statec' => 66,'invalid_stkexc' => 67,0);
  
 EXPORT MakeFT_invalid_name(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -218,11 +218,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\\\'-!#$%&*,./:;?@_{}~+=()^`><'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\\\'-!#$%&*,./:;?@_{}~+=()^`><'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\\\'-!#$%&*,./:;?@_{}~+=()^`><'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -239,8 +239,8 @@ EXPORT InValidMessageFT_invalid_business_size(UNSIGNED1 wh) := CHOOSE(wh,SALT37.
 EXPORT MakeFT_invalid_cert_or_class(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_cert_or_class(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['Certified','Classified','CERTIFIED','CLASSIFIED','CLASSIFICATION','CERTIFICATION','Classification','Certification','SELF-CLASSIFIED/NON VERIFIED','OTHER CLASSIFICATIONS','UNKNOWN',' ']);
-EXPORT InValidMessageFT_invalid_cert_or_class(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('Certified|Classified|CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|Classification|Certification|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| '),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_cert_or_class(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['CERTIFIED','CLASSIFIED','CLASSIFICATION','CERTIFICATION','SELF-CLASSIFIED/NON VERIFIED','OTHER CLASSIFICATIONS','UNKNOWN',' ']);
+EXPORT InValidMessageFT_invalid_cert_or_class(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| '),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_current_future_date(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -287,20 +287,26 @@ EXPORT InValidMessageFT_invalid_date_created(UNSIGNED1 wh) := CHOOSE(wh,SALT37.H
 EXPORT MakeFT_invalid_date_seen(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_date_seen(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_date_seen(s)>0);
-EXPORT InValidMessageFT_invalid_date_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_date_seen'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date_seen(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_date_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_reformated_date(SALT37.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_reformated_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate(s)>0);
+EXPORT InValidMessageFT_invalid_reformated_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_vendor_reported_date(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_vendor_reported_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_reported_date(s)>0);
-EXPORT InValidMessageFT_invalid_vendor_reported_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_reported_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_vendor_reported_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_vendor_reported_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_process_date(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_process_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_process_date(s)>0);
-EXPORT InValidMessageFT_invalid_process_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_process_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_process_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_process_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_busstatcd(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -409,25 +415,25 @@ EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen
  
 //Individual field level validation
  
-EXPORT Make_dt_first_seen(SALT37.StrType s0) := MakeFT_invalid_date_seen(s0);
-EXPORT InValid_dt_first_seen(SALT37.StrType s) := InValidFT_invalid_date_seen(s);
-EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date_seen(wh);
+EXPORT Make_dt_first_seen(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_first_seen(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_last_seen(SALT37.StrType s0) := MakeFT_invalid_date_seen(s0);
-EXPORT InValid_dt_last_seen(SALT37.StrType s) := InValidFT_invalid_date_seen(s);
-EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_date_seen(wh);
+EXPORT Make_dt_last_seen(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_last_seen(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_vendor_first_reported(SALT37.StrType s0) := MakeFT_invalid_vendor_reported_date(s0);
-EXPORT InValid_dt_vendor_first_reported(SALT37.StrType s) := InValidFT_invalid_vendor_reported_date(s);
-EXPORT InValidMessage_dt_vendor_first_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_vendor_reported_date(wh);
+EXPORT Make_dt_vendor_first_reported(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_vendor_first_reported(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT InValidMessage_dt_vendor_first_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_vendor_last_reported(SALT37.StrType s0) := MakeFT_invalid_vendor_reported_date(s0);
-EXPORT InValid_dt_vendor_last_reported(SALT37.StrType s) := InValidFT_invalid_vendor_reported_date(s);
-EXPORT InValidMessage_dt_vendor_last_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_vendor_reported_date(wh);
+EXPORT Make_dt_vendor_last_reported(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_vendor_last_reported(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT InValidMessage_dt_vendor_last_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_process_date(SALT37.StrType s0) := MakeFT_invalid_process_date(s0);
-EXPORT InValid_process_date(SALT37.StrType s) := InValidFT_invalid_process_date(s);
-EXPORT InValidMessage_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_process_date(wh);
+EXPORT Make_process_date(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_process_date(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT InValidMessage_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
 EXPORT Make_record_type(SALT37.StrType s0) := MakeFT_invalid_record_type(s0);
 EXPORT InValid_record_type(SALT37.StrType s) := InValidFT_invalid_record_type(s);

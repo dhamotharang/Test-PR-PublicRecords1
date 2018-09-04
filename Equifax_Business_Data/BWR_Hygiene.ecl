@@ -12,7 +12,7 @@ IMPORT Equifax_Business_Data,SALT37;
   OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
   OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
-  // OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
   OUTPUT(h.ClusterCounts,NAMED('ClusterCounts'),ALL); // Breakdown by size of clusters
   OUTPUT(h.ClusterSrc,NAMED('ClusterSrc'),ALL); // Breakdown of source distribution in clusters
   OUTPUT(h.SrcProfiles,NAMED('SrcProfiles'),ALL); // Which sources contribute values to a cluster
@@ -255,15 +255,22 @@ IMPORT Equifax_Business_Data,SALT37;
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,normCompany_Name,Examples),NAMED('normCompany_NameBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,normCompany_Type,Examples),NAMED('normCompany_TypeBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Geo_Precision,Examples),NAMED('Norm_Geo_PrecisionBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Corporate_Amount_Precision,Examples),NAMED('Norm_Corporate_Amount_PrecisionBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Location_Amount_Precision,Examples),NAMED('Norm_Location_Amount_PrecisionBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Public_Co_Indicator,Examples),NAMED('Norm_Public_Co_IndicatorBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Stock_Exchange,Examples),NAMED('Norm_Stock_ExchangeBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Telemarketablity_Score,Examples),NAMED('Norm_Telemarketablity_ScoreBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Telemarketablity_Total_Indicator,Examples),NAMED('Norm_Telemarketablity_Total_IndicatorBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Telemarketablity_Total_Score,Examples),NAMED('Norm_Telemarketablity_Total_ScoreBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Government1057_Entity,Examples),NAMED('Norm_Government1057_EntityBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Merchant_Type,Examples),NAMED('Norm_Merchant_TypeBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Corporate_Amount_Precision,Examples),NAMED('Exploded_Desc_Corporate_Amount_PrecisionBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Location_Amount_Precision,Examples),NAMED('Exploded_Desc_Location_Amount_PrecisionBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Public_Co_Indicator,Examples),NAMED('Exploded_Desc_Public_Co_IndicatorBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Stock_Exchange,Examples),NAMED('Exploded_Desc_Stock_ExchangeBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Telemarketablity_Score,Examples),NAMED('Exploded_Desc_Telemarketablity_ScoreBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Telemarketablity_Total_Indicator,Examples),NAMED('Exploded_Desc_Telemarketablity_Total_IndicatorBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Telemarketablity_Total_Score,Examples),NAMED('Exploded_Desc_Telemarketablity_Total_ScoreBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Government1057_Entity,Examples),NAMED('Exploded_Desc_Government1057_EntityBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Merchant_Type,Examples),NAMED('Exploded_Desc_Merchant_TypeBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Busstatcd,Examples),NAMED('Exploded_Desc_BusstatcdBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_CMSA,Examples),NAMED('Exploded_Desc_CMSABysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Corpamountcd,Examples),NAMED('Exploded_Desc_CorpamountcdBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Corpamountprec,Examples),NAMED('Exploded_Desc_CorpamountprecBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Corpamounttp,Examples),NAMED('Exploded_Desc_CorpamounttpBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Corpempcd,Examples),NAMED('Exploded_Desc_CorpempcdBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Exploded_Desc_Ctrytelcd,Examples),NAMED('Exploded_Desc_CtrytelcdBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,NormAddress_Type,Examples),NAMED('NormAddress_TypeBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_Address,Examples),NAMED('Norm_AddressBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,Norm_City,Examples),NAMED('Norm_CityBysource'));
@@ -281,12 +288,6 @@ IMPORT Equifax_Business_Data,SALT37;
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,clean_company_name,Examples),NAMED('clean_company_nameBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,clean_phone,Examples),NAMED('clean_phoneBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,clean_secondary_phone,Examples),NAMED('clean_secondary_phoneBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,title,Examples),NAMED('titleBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,fname,Examples),NAMED('fnameBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,mname,Examples),NAMED('mnameBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,lname,Examples),NAMED('lnameBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,name_suffix,Examples),NAMED('name_suffixBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,name_score,Examples),NAMED('name_scoreBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,prim_range,Examples),NAMED('prim_rangeBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,predir,Examples),NAMED('predirBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,prim_name,Examples),NAMED('prim_nameBysource'));

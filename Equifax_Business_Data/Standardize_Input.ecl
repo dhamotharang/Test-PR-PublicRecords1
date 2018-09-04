@@ -23,7 +23,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 						 L.EFX_ADDRESS+L.EFX_CITY+L.EFX_STATE+L.EFX_ZIPCODE)
 						 or (L.EFX_ID = 'EFX_ID'))
 		
-        isPoBox := REGEXFIND('PO BOX|P.O. BOX',L.EFX_ADDRESS,NOCASE);		
+        isPoBox := REGEXFIND('PO BOX|P.O. BOX|P O BOX|P M B [0-9]+ BOX |P OBOX|PB BOX|PCS [0-9]+ BOX |PFC [0-9]+ BOX |PMB [0-9]+ BOX |PMB BOX|PO MBOX|PO OFFICE BOX|POM BOX|PONBOX|POO BOX|POP BOX|POST BOX|POST OFFICEBOX|POSTAGE BOX|POSTAL BOX|POSTBOX|POSTXBOX|POTBOX|PPP BOX|PSC [0-9]+ BOX|UAM BOX|UCSF BOX|UNIT [0-9]+ BOX',
+       				              L.EFX_ADDRESS,NOCASE);		
 		
         SELF.NormCompany_Name   := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_NAME)  
 																							,ut.CleanSpacesAndUpper(L.EFX_NAME)  
@@ -33,9 +34,9 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 				                                    ,if(L.EFX_NAME != L.EFX_LEGAL_NAME, 'D', 'L')
 																						,'L'
 																						,'L');
-				SELF.Norm_Address   := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_ADDRESS) 
+				SELF.Norm_Address   := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_ADDRESS)
+																					,ut.CleanSpacesAndUpper(L.EFX_SECADR) 
 				                                  ,ut.CleanSpacesAndUpper(L.EFX_ADDRESS)
-																					,ut.CleanSpacesAndUpper(L.EFX_SECADR)
 																					,ut.CleanSpacesAndUpper(L.EFX_SECADR));																												 
 				SELF.NormAddress_Type   := choose(cnt ,if(isPoBox,'M','P') 
 																							,'M'
@@ -94,16 +95,22 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 																							,ut.CleanSpacesAndUpper(EFX_GEOPREC_TABLE.GEOPREC(L.EFX_GEOPREC))
 				                                      ,ut.CleanSpacesAndUpper(EFX_GEOPREC_TABLE.GEOPREC(L.EFX_SECGEOPREC)));
 		    
-				SELF.Norm_Corporate_Amount_Precision := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTPREC_TABLE.CORPAMOUNTPREC(L.EFX_CORPAMOUNTPREC));
-				SELF.Norm_Location_Amount_Precision := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTPREC_TABLE.CORPAMOUNTPREC(L.EFX_LOCAMOUNTPREC));
-		    SELF.Norm_Public_Co_Indicator := ut.CleanSpacesAndUpper(EFX_PUBLIC_TABLE.PUBLIC(L.EFX_PUBLIC));
-		    SELF.Norm_Stock_Exchange := ut.CleanSpacesAndUpper(EFX_STKEXC_TABLE.STKEXC(L.EFX_STKEXC));
-		    SELF.Norm_Telemarketablity_Score := ut.CleanSpacesAndUpper(EFX_MRKT_TELESCORE_TABLE.MRKT_TELESCORE(L.EFX_MRKT_TELESCORE));
-		    SELF.Norm_Telemarketablity_Total_Indicator := ut.CleanSpacesAndUpper(EFX_MRKT_TOTALIND_TABLE.MRKT_TOTALIND(L.EFX_MRKT_TOTALIND));
-		    SELF.Norm_Telemarketablity_Total_Score := ut.CleanSpacesAndUpper(EFX_MRKT_TOTALSCORE_TABLE.MRKT_TOTALSCORE(L.EFX_MRKT_TOTALSCORE));
-		    SELF.Norm_Government1057_Entity := ut.CleanSpacesAndUpper(EFX_GOV1057_TABLE.GOV1057(L.EFX_GOV1057));			
-		    SELF.Norm_Merchant_Type := ut.CleanSpacesAndUpper(EFX_MERCTYPE_TABLE.MERCTYPE(L.EFX_MERCTYPE));			
-
+				SELF.Exploded_Desc_Corporate_Amount_Precision := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTPREC_TABLE.CORPAMOUNTPREC(L.EFX_CORPAMOUNTPREC));
+				SELF.Exploded_Desc_Location_Amount_Precision := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTPREC_TABLE.CORPAMOUNTPREC(L.EFX_LOCAMOUNTPREC));
+		    SELF.Exploded_Desc_Public_Co_Indicator := ut.CleanSpacesAndUpper(EFX_PUBLIC_TABLE.PUBLIC(L.EFX_PUBLIC));
+		    SELF.Exploded_Desc_Stock_Exchange := ut.CleanSpacesAndUpper(EFX_STKEXC_TABLE.STKEXC(L.EFX_STKEXC));
+		    SELF.Exploded_Desc_Telemarketablity_Score := ut.CleanSpacesAndUpper(EFX_MRKT_TELESCORE_TABLE.MRKT_TELESCORE(L.EFX_MRKT_TELESCORE));
+		    SELF.Exploded_Desc_Telemarketablity_Total_Indicator := ut.CleanSpacesAndUpper(EFX_MRKT_TOTALIND_TABLE.MRKT_TOTALIND(L.EFX_MRKT_TOTALIND));
+		    SELF.Exploded_Desc_Telemarketablity_Total_Score := ut.CleanSpacesAndUpper(EFX_MRKT_TOTALSCORE_TABLE.MRKT_TOTALSCORE(L.EFX_MRKT_TOTALSCORE));
+		    SELF.Exploded_Desc_Government1057_Entity := ut.CleanSpacesAndUpper(EFX_GOV1057_TABLE.GOV1057(L.EFX_GOV1057));			
+		    SELF.Exploded_Desc_Merchant_Type := ut.CleanSpacesAndUpper(EFX_MERCTYPE_TABLE.MERCTYPE(L.EFX_MERCTYPE));			
+				
+				SELF.Exploded_Desc_Busstatcd := ut.CleanSpacesAndUpper(EFX_BUSSTATCD_TABLE.BUSSTATCD(L.EFX_BUSSTATCD));
+				SELF.Exploded_Desc_CMSA := ut.CleanSpacesAndUpper(EFX_CMSA_TABLE.CMSA(L.EFX_CMSA));
+				SELF.Exploded_Desc_Corpamountcd := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTCD_TABLE.CORPAMOUNTCD(L.EFX_CORPAMOUNTCD)); 
+				SELF.Exploded_Desc_Corpamounttp := ut.CleanSpacesAndUpper(EFX_CORPAMOUNTTP_TABLE.CORPAMOUNTTP(L.EFX_CORPAMOUNTTP));
+				SELF.Exploded_Desc_Corpempcd := ut.CleanSpacesAndUpper(EFX_CORPEMPCD_TABLE.CORPEMPCD(L.EFX_CORPEMPCD));
+				SELF.Exploded_Desc_Ctrytelcd := ut.CleanSpacesAndUpper(EFX_CTRYTELCD_TABLE.CTRYTELCD(L.EFX_CTRYTELCD)); 
 				SELF			              := L;
 				SELF 									  := [];
 			end;
@@ -330,11 +337,9 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
  		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_created)
 			                                              AND date_created[1..4] >= '2001' 
 																										AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, 0);
-																										// AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, (UNSIGNED4)date_created);
 			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_created)
 			                                              AND date_created[1..4] >= '2001' 
 																										AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, 0);
-																										// AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, (UNSIGNED4)date_created);
 			SELF.dt_vendor_first_reported						:= IF(_validate.date.fIsValid(pversion[1..8]), (UNSIGNED4)pversion[1..8], 0);
 			SELF.dt_vendor_last_reported						:= IF(_validate.date.fIsValid(pversion[1..8]), (UNSIGNED4)pversion[1..8], 0);
 			
