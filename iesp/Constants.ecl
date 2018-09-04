@@ -1268,6 +1268,7 @@ EXPORT Constants := MODULE
 	EXPORT Order__Score := MODULE
 	  EXPORT UNSIGNED2 MaxAttributeVersionCount := 3;
 		EXPORT UNSIGNED2 MaxAttributes := 131;
+    EXPORT UNSIGNED2 MaxModelOptionsCount :=2;
 	END;
 
    // Oregon Workers Compensation (ORWORK)
