@@ -1375,7 +1375,7 @@ C=  304 => le.FP1806_1_0_score_diff,
 C=  305 => le.FP1710_1_0_score_diff,
 C= 	306 => le.RVC1805_1_0_score_diff,
 C= 	307 => le.RVC1805_2_0_score_diff,
-C= 	307 => le.OSN1803_1_0_score_diff,
+C= 	308 => le.OSN1803_1_0_score_diff,
 0);										
 end;
 
