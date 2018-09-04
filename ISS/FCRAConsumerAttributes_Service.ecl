@@ -121,6 +121,8 @@ export FCRAConsumerAttributes_Service := MACRO
 	optionsIn 	:= ds_in[1].options;
 	userIn 			:= ds_in[1].user;
 	
+  BOOLEAN OutputConsumerStatements := optionsIn.FFDOptionsMask[1] = '1';
+  
 	INTEGER3 history_date 						:= if(optionsIn.historyDateYYYYMM=0, 999999, optionsIn.historyDateYYYYMM);
 	STRING50 outOfBandDataRestriction := '' : STORED('DataRestrictionMask');
 	DataRestriction 	:= MAP(TRIM(userIn.DataRestrictionMask) <> ''       => userIn.DataRestrictionMask,
@@ -393,27 +395,23 @@ export FCRAConsumerAttributes_Service := MACRO
 
 	attributes := project(attributesIn, process_groups(LEFT));
 
-	did_statement := choosen(Consumerstatement.key.fcra.lexid(keyed(lexid=clamAndSeed[1].did)), 1);
-	ssn_statement := choosen(Consumerstatement.key.fcra.ssn(keyed(ssn=clamAndSeed[1].shell_input.ssn) and 
-													datalib.NameMatch (clamAndSeed[1].shell_Input.fname,  '',  clamAndSeed[1].shell_Input.lname, fname, '', lname) < 3),  // make sure the name on statement also matches the input name
-													1);
-	statementText := if(did_statement[1].cs_text<>'', did_statement[1].cs_text, ssn_statement[1].cs_text); 											
-
-	boolean hasConsumerStatement := clamAndSeed[1].consumerFlags.consumer_statement_flag;
-	ConsumerStatementText := if(hasConsumerStatement, statementText, ''); 
-
-	
- iesp.fcraconsumerattributesreport.t_FCRAConsumerAttributesReportResponse build_result(DATASET(iesp.FCRAconsumerattributesreport.t_FCRAConsumerAttributesReportGroup) le, string ri) := TRANSFORM
+	clam_statements := project(clamandseed[1].ConsumerStatements, transform(iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
+  empty_statements := DATASET( [], iesp.share_fcra.t_ConsumerStatement );
+  consumer_statements := if(OutputConsumerStatements, clam_statements, empty_statements);
+        
+ iesp.fcraconsumerattributesreport.t_FCRAConsumerAttributesReportResponse build_result( DATASET(iesp.FCRAconsumerattributesreport.t_FCRAConsumerAttributesReportGroup) le,
+                                                                                        DATASET(iesp.share_fcra.t_ConsumerStatement) rt
+ ) := TRANSFORM
 		self._Header := [];
 		self.Result.InputEcho := ds_in[1].searchby;
 		self.Result.AttributeGroups := le;
-		self.Result.ConsumerStatement := ri;
 		
-		
+    self.Result.ConsumerStatements := rt;	
+
 		self.Result := [];
  end;
  
-	res := ROW(build_result( attributes, ConsumerStatementText));
+	res := ROW(build_result( attributes, consumer_statements ));
 	
 	output(res, named('Results'));
 ENDMACRO;
