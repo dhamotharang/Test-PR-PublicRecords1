@@ -1,12 +1,10 @@
-﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_MI,
-        Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TX,
-				Scrubs_DL_WI; 
+﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_ME_MEDCERT, Scrubs_DL_MI, 
+        Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TN_CONV, 
+				Scrubs_DL_TN_WDL, Scrubs_DL_TX, Scrubs_DL_WI, Scrubs_DL_WY_MEDCERT; 
        //,Scrubs_DL_NC_CHG
-			 // ,Scrubs_DL_ME_MEDCERT
        // ,Scrubs_DL_MO
 			 // ,Scrubs_DL_MO_MEDCERT
-			 // ,Scrubs_DL_WY_MEDCERT 
-
+			 
 EXPORT Scrub_DL(STRING pversion) := MODULE
 
 	SHARED MAC_Scrubs_Report(BuildDate,myFolder,myFile,datasetName)	:=	FUNCTIONMACRO
@@ -71,7 +69,7 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
   EXPORT FL          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_FL',         'In_FL',         'DL_FL');
   EXPORT LA          := Temp_NoReport();
   EXPORT MA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MA',         'In_MA',         'DL_MA');
-  EXPORT ME_MEDCERT  := Temp_NoReport();
+  EXPORT ME_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_ME_MEDCERT', 'In_ME_MEDCERT', 'DL_ME_MEDCERT');
   EXPORT MI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MI',         'In_MI',         'DL_MI');
   EXPORT MO          := Temp_NoReport();
   EXPORT MO_MEDCERT  := Temp_NoReport();
@@ -82,19 +80,17 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
   EXPORT TN          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN',         'In_TN',         'DL_TN');
   EXPORT TX          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TX',         'In_TX',         'DL_TX');
   EXPORT WI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WI',         'In_WI',         'DL_WI');
-  EXPORT WY_MEDCERT  := Temp_NoReport();
+  EXPORT WY_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WY_MEDCERT', 'In_WY_MEDCERT', 'DL_WY_MEDCERT');
 
-  // EXPORT LA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_LA',         'In_LA',         'DL_LA');
-  // EXPORT ME_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_ME_MEDCERT', 'In_ME_MEDCERT', 'DL_ME_MEDCERT');
+  // EXPORT LA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_LA',         'In_LA',         'DL_LA');  
   // EXPORT MO          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO',         'In_MO',         'DL_MO');
   // EXPORT MO_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO_MEDCERT', 'In_MO_MEDCERT', 'DL_MO_MEDCERT');
-  // EXPORT WY_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WY_MEDCERT', 'In_WY_MEDCERT', 'DL_WY_MEDCERT');
 
-  //Convictions
+  //***************Convictions**************
   // EXPORT OH_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_OH_CONV',    'In_OH_CONV',    'DL_OH_CONV');
   // EXPORT MN_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MN_CONV',    'In_MN_CONV',    'DL_MN_CONV');
-  // EXPORT TN_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN_CONV',    'In_TN_CONV',    'DL_TN_CONV');
-  // EXPORT TN_WDL      := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN_WDL',     'In_TN_WDL',     'DL_TN_WDL');
+  EXPORT TN_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN_CONV', 'In_TN_CONV', 'DL_TN_CONV');
+  EXPORT TN_WDL      := MAC_Scrubs_Report(pversion, 'Scrubs_DL_TN_WDL', 'In_TN_WDL', 'DL_TN_WDL');
   // EXPORT WY_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_WY_CONV',    'In_WY_CONV',    'DL_WY_CONV');
 
   // EXPORT All := PARALLEL(CT, FL, LA, MA, ME_MEDCERT, MI, MO, //MO_BASIC, MO_ICISSU,

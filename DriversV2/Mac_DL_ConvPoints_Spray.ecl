@@ -48,6 +48,7 @@ macro
 #uniquename(stype)
 #uniquename(As_DL_CP_mapper)
 #uniquename(Create_As_DL_CP_Superfiles)
+#uniquename(scrub_files)
 
 #workunit('name', state + ' DrvLic Conviction/Points Spray');
 
@@ -248,7 +249,12 @@ macro
 																										DriversV2.Mapping_DL_TN_As_ConvPoints(filedate).Build_DL_TN_Suspension
 																										)
 														);
-
+														
+  %scrub_files% := case(%stype%
+												,'TN'        => DriversV2.Scrub_DL(filedate).TN_CONV
+	                      ,'TN_WDL'    => DriversV2.Scrub_DL(filedate).TN_WDL
+                        );
+						
 	%Create_Superfiles% := sequential(FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Superfile',false),
 									   FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Delete',false),
 									   FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Old',false)																	
@@ -316,9 +322,9 @@ macro
 						FileServices.DeleteLogicalFile(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_CP_update::raw_'+ filedate));
 
 
-	%do_super%  := sequential(output('do super 1...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main%, %raw_delete%);
+	%do_super%  := sequential(output('do super 1...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main%, %scrub_files%, %raw_delete%);
 
-	%do_super1% := sequential(output('do super 2...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main1%, %raw_delete%);
+	%do_super1% := sequential(output('do super 2...'),%CreateSuperFiles%, %deleteIfExist%, %spray_main%, %ds%, %Create_As_DL_CP_Superfiles%, %As_DL_CP_mapper%, %super_main1%, %scrub_files%, %raw_delete%);
 
 	%out_super% := if(clear_Super = 'N', sequential(%do_super%), sequential(%do_super1%));
 

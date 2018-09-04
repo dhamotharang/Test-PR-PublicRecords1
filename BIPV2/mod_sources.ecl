@@ -1,4 +1,4 @@
-// mod_sources
+﻿// mod_sources
 // 1. various ways to retrieve a bitmap corresponding to one or more sources
 // 2. lists of sources included in header, and partitioned vs. citizen
 
@@ -24,8 +24,9 @@ export mod_sources := module
 		PROP_FARES,			// 16
 		PROP_FIDELITY,	// 32
 		PROP_DAYTON,    // 64
-    MV_INFUTOR,			// 128
-    WC_INFUTOR			// 256
+  MV_INFUTOR,			// 128
+  WC_INFUTOR,			// 256
+  MARKETING_UNRESTRICTED // 512
 		);
 	
 	
@@ -45,7 +46,7 @@ export mod_sources := module
 	export string15	faux_vlid(string12 fid)			:= '---' + fid; // left-pad with 3 irrelevant characters
 	
 	
-	export unsigned src2code(string2 src, string34 vl_id='') := map(
+	export unsigned exclusiveSrc2code(string2 src, string34 vl_id='') := map(
 		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
 		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
 		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
@@ -58,7 +59,9 @@ export mod_sources := module
 		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
-	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(src2code(src,vl_id)); // called by SALT - becomes *_data_permits
+ export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
+              
+	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	
 	shared l_code	:= {code c};
 	shared l_src	:= {string2 src};
@@ -116,7 +119,7 @@ export mod_sources := module
       boolean glb := ivals.GLB.ok(in_mod.GLBPurpose) OR ivals.GLB.HeaderIsPreGLB(0,dt_first_seen,src);
       
       boolean other_restrictions := case(
-                                          src2code(src,vl_id),
+                                          exclusiveSrc2code(src,vl_id),
                                           code.DPPA						=> ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(src),ivals.DPPA.stored_value,,src),
                                           code.DNB						=> ivals.AllowAll OR dnbWillMask,
                                           code.EBR						=> ~ivals.DRM.EBR,
@@ -416,6 +419,7 @@ export mod_sources := module
 		,MDR.sourceTools.set_TXBUS					// S18
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
+    ,MDR.sourceTools.set_Cortera        // S61
 	];
 
 	// These sources participate in the header build, but are excluded

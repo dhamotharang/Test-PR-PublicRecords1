@@ -5,11 +5,9 @@ EXPORT Build_Input_IdentityData(
 	,boolean		PSkipNAC			= false	 
 	,boolean		PSkipDeltabase		= false	 
 	,boolean		PSkipInquiryLogs	= false	 
+	,boolean		PSkipValidations	= false
 ) :=
 module
-
-
-	
 
 	SHARED fn_dedup(inputs):=FUNCTIONMACRO
 		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
@@ -20,19 +18,19 @@ module
 		return in_ddp;
 	ENDMACRO;	
 	
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::identitydata')) > 0 and PSkipIdentityData = false, 
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0 and PSkipIdentityData = false, 
 													Files(pversion).Sprayed.IdentityData, 
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)   
-											+ if ( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::deltabase')) > 0  and PSkipDeltabase = false,
+											+ if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0  and PSkipDeltabase = false,
 													Build_Prepped_Deltabase(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)	
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::inquirylogs')) > 0 and PSkipInquiryLogs = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and PSkipInquiryLogs = false, 
 													Build_Prepped_InquiryLogs(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											);
@@ -59,9 +57,13 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+
+		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
+		self.file_type := 3 ;
+		
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := hash64(
+		SELF.unique_id := hash64(hashmd5(
 									ut.CleanSpacesAndUpper(l.Customer_Name) + ',' + 
 									ut.CleanSpacesAndUpper(l.Customer_Account_Number) + ',' + 
 									ut.CleanSpacesAndUpper(l.Customer_State) + ',' + 
@@ -120,7 +122,8 @@ module
 									ut.CleanSpacesAndUpper(l.Device_Type) + ',' + 
 									ut.CleanSpacesAndUpper(l.Device_identification_Provider) + ',' +  
 									ut.CleanSpacesAndUpper(l.geo_lat) + ',' + 
-									ut.CleanSpacesAndUpper(l.geo_long)); 		
+									ut.CleanSpacesAndUpper(l.geo_long))); 
+		self.Deltabase := if(l.source_input[1..9] = 'DELTABASE', 1, 0);
 		self:=l;
 		self:=[];
 	end;
@@ -128,7 +131,7 @@ module
 	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
 	
 	f1_errors:=f1
-			(	 
+			((	 
 					Customer_Account_Number = ''
 				or	Customer_County = ''
 				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
@@ -137,15 +140,30 @@ module
 				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
 				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
 				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
-			);
+			)and PSkipValidations = false);
 
+
+	MBS_Layout := Record
+		FraudShared.Layouts.Input.MBS;
+		unsigned1 Deltabase := 0;
+	end;
+	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+	
 	NotInMbs := join(f1,
-							FraudShared.Files().Input.MBS.sprayed(status = 1)
-										,left.Customer_Account_Number =(string)right.gc_id
-										and left.Customer_State = right.customer_state
-										and Functions.ind_type_fn(left.Customer_Program) = right.ind_type
-										and left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-										and left.Customer_County = right.Customer_County,
+								MBS,
+										left.Customer_Account_Number =(string)right.gc_id and
+										left.file_type = right.file_type and
+										left.ind_type = right.ind_type and
+										left.Deltabase = Right.Deltabase and
+										( 
+											 left.Deltabase = 1
+											OR 
+											(	left.Deltabase = 0 AND
+												left.customer_State = right.Customer_State AND
+												left.Customer_County = right.Customer_County AND 	
+												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+											)
+										),
 										TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
@@ -157,17 +175,17 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote := Constants().validQuotes);
 									
 	//Move only Valid Records
-	shared f1_dedup					:=	 join (f1,
-																							ByPassed_records,
-																							left.Unique_Id = right.Unique_Id,
-																							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
-																							left only);
+	shared f1_dedup :=	join (f1,
+											ByPassed_records,
+											left.Unique_Id = right.Unique_Id,
+											TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
+											left only);
 																							
 
 	shared new_addresses := Functions.New_Addresses(f1_dedup);
@@ -178,10 +196,10 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
 																							
 	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
@@ -211,59 +229,17 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
-	Promote_Input_File := 
-		sequential(
-			 STD.File.StartSuperFileTransaction()
-			 //Promote Input Records
-			,STD.File.ClearSuperFile(Filenames().Input.IdentityData.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.IdentityData.Sprayed
-				,Filenames().Input.IdentityData.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.IdentityData.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.IdentityData.Sprayed
-				,Filenames().Input.IdentityData.New(pversion)
-			)
-			//Promote Bypass Records
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_IdentityData.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_IdentityData.Sprayed
-				,Filenames().Input.ByPassed_IdentityData.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.ByPassed_IdentityData.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.ByPassed_IdentityData.Sprayed
-				,Filenames().Input.ByPassed_IdentityData.New(pversion)
-			)
-			 //Promote AddressCache
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Used, TRUE)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_IDDT.Sprayed
-				,Filenames().Input.AddressCache_IDDT.Used
-				,addcontents := true
-			)
-			,STD.File.ClearSuperFile(Filenames().Input.AddressCache_IDDT.Sprayed)
-			,STD.File.AddSuperfile(
-				 Filenames().Input.AddressCache_IDDT.Sprayed
-				,Filenames().Input.AddressCache_IDDT.New(pversion)
-			)
-			,STD.File.FinishSuperFileTransaction()	
-		);
 // Return
 	export build_prepped := 
 			 sequential(
 				 Build_Address_Cache
 				,Build_Input_File
 				,Build_Bypass_Records 
-				,Promote_Input_File
 		);
 		
 	export All :=

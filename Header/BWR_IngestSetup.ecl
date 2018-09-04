@@ -39,7 +39,7 @@ recReport := record
          
  end;
 // Checks if the deployment to CERT datetime of pck in PROD is before the modified timestamp of the logical file in the superfile
-isProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string superfilename,
+isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string superfilename,
                                              string buildingSuperfilename, string clstr) := function 
         pn0 := regexreplace('_F',roxie_package_name,'');
         pn1 := regexreplace('_G',pn0,'');
@@ -72,8 +72,11 @@ isProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string superfil
                         recReport);
         repNotInProd := if(logical_file_name<>'~',output(ds,named('input_did_NOT_make_prod_yet'),extend));
         repYesInProd := if(logical_file_name<>'~',output(ds,named('inputs_made_it_to_prod'),extend));
-        LikelyInProd:=(base_file_time_stamp<current_prod_roxie_cert_deployment_datetime);
-        return  when(LikelyInProd,
+        LikelyInProd :=(base_file_time_stamp<current_prod_roxie_cert_deployment_datetime);
+        currentFileTm:=STD.File.GetLogicalFileAttribute(hdr_ingst_building_content,'modified');
+        possbleFileTm:=STD.File.GetLogicalFileAttribute(logical_file_name,'modified');
+        Newer        := possbleFileTm>currentFileTm;
+        return  when(Newer and LikelyInProd,
                       if(LikelyInProd,repYesInProd,repNotInProd)
                      );
 
@@ -86,7 +89,7 @@ restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),nam
 
 // Reusable call to check packages vs. base file dates
 ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{pk,sp_name,
-                            if(isProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false)}],
+                            if(isNewerOrProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false)}],
                                         {string pk, string sp_name, boolean input_will_update});
 
 restore := 

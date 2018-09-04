@@ -34,6 +34,7 @@ MODULE
 	export src_Accurint_Trade_Show       := 'AT';
 	export src_ACF                       := 'CF';  // America's Corporate Financial Directory
 	export src_Acquiredweb 							 := 'AW';
+	export src_Acquiredweb_plus					 := 'AP';	 // AcquiredWeb Plus - Business names and email addresses
   export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. – ADVO file 
 	export src_AHA                       := 'AH';  // American Hospital Association for Organization master repositry
 	export src_Aircrafts                 := 'AR';  // Aircraft registrations from the FAA
@@ -805,12 +806,12 @@ MODULE
 	export set_email	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt								, src_thrive_pd									,src_Ibehavior               , src_AlloyMedia_consumer,  src_SalesChannel, src_Datagence
-		,src_InfutorNare					,src_Anchor													,src_RealSource];
+		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus];
 		
 	export set_email_poe	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer
-		,src_InfutorNare			,src_Anchor											,src_RealSource];
+		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus];
 		
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
@@ -1058,6 +1059,31 @@ MODULE
 		,src_UCCV2_WA_Hist						 ,src_Vickers										,src_Workers_Compensation			 ,src_OR_Worker_Comp
 		,src_ZOOM
 	]; 
+
+export set_Marketing_Restricted := [
+  src_Aircrafts,             src_AK_Corporations,        src_AL_Corporations,        src_AL_Watercraft,             src_AR_Corporations,
+  src_AR_Watercraft,         src_AZ_Corporations,        src_AZ_Watercraft,          src_BBB_Member,                src_BBB_Non_Member,
+  src_Business_Registration, src_CA_Corporations,        src_CA_Sales_Tax,           src_CO_Corporations,           src_CO_Watercraft,
+  src_CT_Corporations,       src_CT_Watercraft,          src_DC_Corporations,        src_DEA,                       src_Dunn_Bradstreet_Fein,  
+  src_EBR,                   src_FBNV2_CA_Orange_county, src_FBNV2_CA_San_Bernadino, src_FBNV2_CA_Santa_Clara,      src_FBNV2_CA_Ventura,
+  src_FBNV2_FL,              src_FBNV2_Hist_Choicepoint, src_FBNV2_INF,              src_FBNV2_New_York,            src_FBNV2_TX_Dallas,
+  src_FBNV2_TX_Harris,       src_FDIC,                   src_FL_Corporations,        src_GA_Corporations,           src_GA_Watercraft,
+  src_HI_Corporations,       src_IA_Corporations,        src_IA_Watercraft,          src_ID_Corporations,           src_IL_Corporations,      
+  src_IL_Watercraft,         src_IN_Corporations,        src_IRS_Non_Profit,         src_KS_Corporations,           src_KY_Corporations,
+  src_LA_Corporations,       src_LA_Experian_Veh,        src_Liens_v2,               src_LnPropV2_Lexis_Deeds_Mtgs, src_MA_Corporations,      
+  src_MA_Watercraft,         src_MD_Corporations,        src_ME_Corporations,        src_ME_Watercraft,             src_MI_Corporations,
+  src_MN_Corporations,       src_MN_Watercraft,          src_MO_Corporations,        src_MS_Corporations,           src_MS_Watercraft,
+  src_MT_Corporations,       src_NC_Corporations,        src_NC_Watercraft,          src_ND_Corporations,           src_ND_Veh,
+  src_NE_Corporations,       src_NH_Corporations,        src_NJ_Corporations,        src_NV_Corporations,           src_NV_Watercraft,
+  src_NY_Corporations,       src_NY_Watercraft,          src_OH_Veh,                 src_OH_Watercraft,             src_OK_Corporations,
+  src_OR_Corporations,       src_OR_Watercraft,          src_OSHAIR,                 src_PA_Corporations,           src_RI_Corporations,
+  src_SD_Corporations,       src_TN_Corporations,        src_TN_Watercraft,          src_TX_Corporations,           src_TX_Watercraft,
+  src_TXBUS,                 src_UCC,                    src_UCCV2,                  src_US_Coastguard,             src_UT_Corporations,
+  src_VA_Corporations,       src_VT_Corporations,        src_WI_Corporations,        src_WI_Watercraft,             src_WV_Corporations,
+  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,           src_Bankruptcy,               src_Experian_CRDB,
+	 src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
+ ];
+  
 
 	export set_NonDerog_FCRA_sources := [
 		src_Aircrafts              			,src_Airmen                 	,src_AK_Fishing_boats          ,src_AK_Perm_Fund                 	,
@@ -1483,7 +1509,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Accurint_Sex_offender     := [src_Accurint_Sex_offender     ];
 	export set_Accurint_Trade_Show       := [src_Accurint_Trade_Show       ];
 	export set_ACF                       := [src_ACF                       ];
-	export set_Acquiredweb               := [src_Acquiredweb               ];	
+	export set_Acquiredweb               := [src_Acquiredweb               ];
+	export set_Acquiredweb_plus					 := [src_Acquiredweb_plus					 ];
   export set_advo_valassis	           := [src_advo_valassis             ]; 
 	export set_AHA                       := [src_AHA											 ];  
 	export set_Aircrafts                 := [src_Aircrafts                 ];
@@ -2526,6 +2553,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Accurint_Trade_Show       ,'Accurint Trade Show'                                       }
 		,{src_ACF                       ,'ACF - America\'s Corporate Financial Directory'            }
 		,{src_Acquiredweb      					,'Acquired Web'                                       			 }
+		,{src_Acquiredweb_plus					,'Acquired Web Business'																		 }
 	  ,{src_advo_valassis             ,'US Postal Service Via Valassis Communications, Inc. - ADVO'  }
 		,{src_AHA                       ,'AHA - American Hospital Association'      			           }
 	  ,{src_Aircrafts                 ,'Aircrafts'                                                 }
@@ -3032,7 +3060,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Accurint_Sex_offender     => 'Accurint Sex offender'                                
 		,src_Accurint_Trade_Show       => 'Accurint Trade Show'                                  
 		,src_ACF                       => 'ACF - America\'s Corporate Financial Directory'       
-		,src_Acquiredweb      				 => 'Acquired Web'                                       	
+		,src_Acquiredweb      				 => 'Acquired Web' 
+		,src_Acquiredweb_plus					 =>	'Acquired Web Business'
     ,src_advo_valassis         		 => 'US Postal Service Via Valassis Communications, Inc. - ADVO'
 		,src_AHA                       => 'AHA - American Hospital Association'       
 		,src_Aircrafts                 => 'Aircrafts'                                            

@@ -1,5 +1,5 @@
-IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	Business_Credit,	BIPV2,	ut;
-EXPORT	fn_GetDBTAverage(	STRING pVersion	=	ut.GetDate,
+﻿IMPORT	Business_Credit_Scoring,	BusinessCredit_Services,	Business_Credit,	BIPV2,	STD;
+EXPORT	fn_GetDBTAverage(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 													DATASET(RECORDOF(Business_Credit.Layouts.SBFEAccountLayout)) pInput) := FUNCTION 
 
 	//	Calculate the DBT for all records 

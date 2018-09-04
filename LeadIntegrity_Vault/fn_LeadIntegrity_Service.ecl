@@ -1,7 +1,7 @@
 ﻿#workunit('name','Lead Integrity Attributes');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, UT, LeadIntegrity_Vault_Layout, LeadIntegrity, LeadIntegrity_Vault, LeadIntegrity_Vault.Constants, ADDRESS;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, UT, LeadIntegrity_Vault_Layout, LeadIntegrity_Vault, LeadIntegrity_Vault.Constants, ADDRESS;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -107,10 +107,12 @@ EXPORT fn_LeadIntegrity_Service (STRING8 date_in, STRING part_nbr, STRING filena
 						
 		//OUTPUT(CHOOSEN(LeadIntegrity_attributes(errorcode=''), eyeball), NAMED('LeadIntegrity_results'));
 		//OUTPUT(CHOOSEN(LeadIntegrity_attributes(errorcode<>''), eyeball), NAMED('LeadIntegrity_errors'));
-
-
-		LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Layout_Slimmed slim_v4( LeadIntegrity_attributes le ) := TRANSFORM
+		
+		Layout_LeadIntegrity_Layout_Slimmed := LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Layout_Slimmed;
+		
+		Layout_LeadIntegrity_Layout_Slimmed slim_v4( LeadIntegrity_attributes le ) := TRANSFORM
 		self.AccountNumber	:= le.Acctno	;
+		// self.Seq := (Integer)le.Seq;
 		self.AgeOldestRecord	:= le.v4_AgeOldestRecord	;
 		self.AgeNewestRecord	:= le.v4_AgeNewestRecord	;
 		self.RecentUpdate	:= le.v4_RecentUpdate	;
@@ -508,11 +510,11 @@ EXPORT fn_LeadIntegrity_Service (STRING8 date_in, STRING part_nbr, STRING filena
 		END;
 
 		final := Project(finalnolexid, Transform(finalLayout,
-																						 SELF.seq := (INTEGER)LEFT.accountnumber;
-																						 SELF.lexid := (INTEGER)LEFT.did;
-																						 SELF := LEFT));
+																				 SELF.seq := 0;
+																				 SELF.lexid := (INTEGER)LEFT.accountnumber;
+																				 SELF := LEFT));
 
-		LI_Output_File := output(final(accountnumber<>'accountnumber'),, outputFile, CSV(SEPARATOR('|'), TERMINATOR('\n'), QUOTE('"'), ASCII), overwrite, __COMPRESSED__);
+		LI_Output_File := output(final(accountnumber<>'acctno'),, outputFile, CSV(SEPARATOR('|'), TERMINATOR('\n'), QUOTE('"'), ASCII), overwrite, __COMPRESSED__);
 
 		// Validate Attributes Output
 

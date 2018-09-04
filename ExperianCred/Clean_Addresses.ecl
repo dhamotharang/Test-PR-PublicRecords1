@@ -1,6 +1,8 @@
-import ut,address;
+﻿import ut,address;
 
-norm_addr := ExperianCred.Normalize_Address;
+export Clean_Addresses(string ver):= module
+
+norm_addr := ExperianCred.Normalize_Address(ver).all;
 cache_addr := distribute(ExperianCred.Files.Cashed_Address_File, 
 			  hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)) :INDEPENDENT; 
 
@@ -49,9 +51,12 @@ END;
 
 addr_clean := project(addr_to_clean,t_clean_address(left)); 
 
-BuildCashAddress:= SEQUENTIAL(OUTPUT(addr_clean,,Superfile_List.Cache_Address_File + version ,overwrite,__compressed__);
+BuildCashAddress :=
+	SEQUENTIAL(OUTPUT(addr_clean,,Superfile_List.Cache_Address_File + ver ,overwrite,__compressed__);
 					FileServices.StartSuperFileTransaction(),				
-					FileServices.AddSuperFile(Superfile_List.Cache_Address_File,Superfile_List.Cache_Address_File + version),
+					FileServices.AddSuperFile(Superfile_List.Cache_Address_File,Superfile_List.Cache_Address_File + ver),
 					FileServices.FinishSuperFileTransaction());
 		   
-export Clean_Addresses := BuildCashAddress;
+export ALL := BuildCashAddress;
+ 
+END;

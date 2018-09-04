@@ -1,7 +1,6 @@
 ﻿#workunit('name', 'LeadIntegrity Service Test');
 // #workunit('cluster', 'hthor');
 
-IMPORT LeadIntegrity;
 IMPORT LeadIntegrity_Vault; 
 IMPORT LeadIntegrity_Vault_Layout; 
 IMPORT _Control, STD;

@@ -33,7 +33,9 @@ string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_ind
 string l_updateflag = 'F',
 string l_tagdelta = '',
 string l_dopsenv = dops.constants.dopsenvironment,
-boolean l_overrideupdateflag = false) := function
+boolean l_overrideupdateflag = false,
+string l_esp = dops.constants.esp(dops.constants.dopsenvironment),
+string l_espport = '8010') := function
 
 	// trim all string variables when a value is passed from a deprecated function/macro
 	// the values are being padded with space
@@ -109,7 +111,7 @@ boolean l_overrideupdateflag = false) := function
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H','')),
+				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H',''),l_inloc),
 				'iUpdateVersion',
 				InputRec,
 				outrec,
@@ -125,11 +127,29 @@ boolean l_overrideupdateflag = false) := function
 	missingkeys := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Missing Keys:' + builtkeys);
 
 	invaliddaliip := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dali IP Mismatch: lib_thorlib.thorlib.daliServers() = ' + dops.constants.daliip + ' does not match with ' + dops.constants.devdaliip + ' or ' + dops.constants.proddaliip);
-								
+	
+	clustertorun := if (regexfind('eclcc',STD.System.Job.Target()),
+													map( l_dopsenv = 'prod' => 'hthor_eclcc'
+															,l_dopsenv = 'dev' => 'hthor_dev_eclcc'
+															,'na'
+													)
+													,'hthor');
+	
+	/*spawnWUtoUpdateKeyInfo := output(dops.WorkUnitModule(l_esp,l_espport).fSubmitNewWorkunit
+																	(
+																		'#workunit(\'name\',\'KEY INFO UPDATE DOPS DB:'+ datasetname+':'+uversion+':'+inenvment+'\');\r\n'+
+																		'dops.UpdateDOPSForPkgValidation(\''+datasetname+'\',\''+uversion+'\',l_environmentflag:=\''+if(l_isprodready = 'Y','P','Q')+'\',l_clusterflag:=\''+inenvment+'\',l_locationflag:=\''+l_inloc+'\',l_dopsenv:=\''+l_dopsenv+'\',l_daliip := \''+l_indaliip+'\',l_email:=\''+l_email_t+'\').RunUpdate();'
+																		,dops.constants.hthorcluster(l_dopsenv))
+																	);*/
+
+	updatekeyinfo := dops.UpdateDOPSForPkgValidation(datasetname,uversion,l_environmentflag:=if(l_isprodready = 'Y','P','Q'),l_clusterflag:=inenvment,l_locationflag:=l_inloc,l_dopsenv:=l_dopsenv,l_daliip := l_indaliip,l_email:=l_email_t).RunUpdate();
+	
 	return if(dops.constants.dopsenvironment <> 'na'
 							,if (builtkeys <> ''
 									,missingkeys
-									,if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date))
+									,if(uversion[1..8] <= (string8)STD.Date.Today()
+													,sequential(output(updatekeyinfo),codeval)
+													,invalid_date))
 							,invaliddaliip);
 
 	

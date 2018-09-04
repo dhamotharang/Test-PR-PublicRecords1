@@ -42,7 +42,7 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 	   ,Proc_delete_persist
 	   ,Proc_clear_superfiles
 		 ,strata_rep
-		 	,Orbit3.Proc_Orbit3_CreateBuild_npf('TUC PTrak',update_filedate)
+		 	,Orbit3.Proc_Orbit3_CreateBuild_npf('TUCS PTrak',update_filedate)
 		 ,_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_TUCS\');\r\n'+
 																	'Scrubs_TUCS.proc_generate_report();','thor400_60')
 	);

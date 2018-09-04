@@ -220,7 +220,7 @@ macro
  	                     ,'FL'             => DriversV2.Scrub_DL(filedate).FL
 	                     // ,'LA'             => DriversV2.Scrub_DL(filedate).LA
 	                     ,'MA'             => DriversV2.Scrub_DL(filedate).MA
-	                     // ,'ME_MEDCERT'     => DriversV2.Scrub_DL(filedate).ME_MEDCERT
+	                     ,'ME_MEDCERT'     => DriversV2.Scrub_DL(filedate).ME_MEDCERT
 	                     ,'MI'             => DriversV2.Scrub_DL(filedate).MI
 	                     // ,'MO'             => DriversV2.Scrub_DL(filedate).MO
 	                     // ,'MO_MEDCERT'     => DriversV2.Scrub_DL(filedate).MO_MEDCERT
@@ -231,7 +231,7 @@ macro
 	                     ,'TN'             => DriversV2.Scrub_DL(filedate).TN
 	                     ,'TX'             => DriversV2.Scrub_DL(filedate).TX
 	                     ,'WI'             => DriversV2.Scrub_DL(filedate).WI
-	                     // ,'WY_MEDCERT'     => DriversV2.Scrub_DL(filedate).WY_MEDCERT
+	                     ,'WY_MEDCERT'     => DriversV2.Scrub_DL(filedate).WY_MEDCERT
                        );
 											  
 	%Create_CleanSuper% := FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_Clean_updates::Superfile',false);

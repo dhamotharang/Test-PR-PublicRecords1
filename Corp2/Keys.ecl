@@ -1,4 +1,4 @@
-import doxie, tools;
+﻿import doxie, tools, corp2_Mapping;
 
 //export Keys :=
 export Keys(const string pversion = '') :=
@@ -14,11 +14,12 @@ module
 
 shared Layout_Corp_Base_Dir := Corp2.Layout_Corporate_Direct_Corp_Base;
 shared Layout_Corp_Base_Linkids := Corp2.Layout_Corporate_Direct_Corp_Base_Linkids;
+
 //Cleanup Corp base file	
   Layout_Corp_Base_Linkids TFixCorpBase(CorpBaseAID L) := TRANSFORM
-	SELF.corp_legal_name := Corp2.fCleanupTextInput(L.corp_legal_name,'corp_legal_name');
-	SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
-    SELF := L;
+		SELF.corp_legal_name 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.corp_legal_name);
+		SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
+		SELF := L;
   END;
 	
 	export CorpBaseCleanLinkids := PROJECT(CorpBaseAID,TFixCorpBase(LEFT));
@@ -29,17 +30,18 @@ shared Layout_Corp_Base_Linkids := Corp2.Layout_Corporate_Direct_Corp_Base_Linki
 //Droping the cont records that have bad or blank contact name records as per #22540 	
 shared Layout_Cont_Base := Corp2.Layout_Corporate_Direct_Cont_Base;
 shared Layout_Cont_Base_Linkids := Corp2.Layout_Corporate_Direct_Cont_Base_Linkids;
+
   Layout_Cont_Base_Linkids TFixContBase(ContBaseAID L) := TRANSFORM,
-												skip(length(Corp2.fCleanupTextInput(L.cont_name,'alpha')) <= 1)
+												skip(length(Corp2_Mapping.fn_RemoveSpecialChars(L.cont_name)) <= 1)
 												
-	 SELF.corp_legal_name := Corp2.fCleanupTextInput(L.corp_legal_name,'corp_legal_name');
-	 SELF.cont_cname := Corp2.fCleanupTextInput(L.cont_cname,'other_names');
-	 SELF.cont_name  := Corp2.fCleanupTextInput(L.cont_name,'other_names');
-     SELF.cont_fname := Corp2.fCleanupTextInput(L.cont_fname,'clean_names');
-     SELF.cont_mname := Corp2.fCleanupTextInput(L.cont_mname,'clean_names');
-     SELF.cont_lname := Corp2.fCleanupTextInput(L.cont_lname,'clean_names');
-	 SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
-     SELF := L;
+		SELF.corp_legal_name 	:= Corp2_Mapping.fn_RemoveSpecialChars(L.corp_legal_name);
+		SELF.cont_cname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_cname);
+		SELF.cont_name 				:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_name);
+		SELF.cont_fname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_fname);
+		SELF.cont_mname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_mname);
+		SELF.cont_lname 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.cont_lname);
+		SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
+		SELF := L;
   END;
 	export ContBaseCleanLinkids := PROJECT(ContBaseAID,TFixContBase(LEFT));
 	export ContBaseClean := PROJECT(ContBaseCleanLinkids,Layout_Cont_Base);
