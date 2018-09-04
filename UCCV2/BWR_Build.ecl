@@ -4,7 +4,7 @@ export BWR_Build(string filedate) := FUNCTION
 
 //#workunit('name','UCC Rewrite Build CA,DnB, IL,TD,TH, NYC,TX, MA' );
 
-leMailTarget      := 'Abednego.Escobal@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,zhuang@seisint.com,christopher.brodeur@lexisnexisrisk.com,randy.reyes@lexisnexisrisk.com,intel357@bellsouth.net';
+leMailTarget      := 'Abednego.Escobal@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,zhuang@seisint.com,christopher.brodeur@lexisnexisrisk.com,randy.reyes@lexisnexisrisk.com';
 SuperfileParty    :=UCCv2.Cluster.Cluster_out+'base::UCC::Party';
 SuperFIleMain     :=UCCv2.Cluster.Cluster_out+'base::UCC::main';
 
