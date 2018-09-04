@@ -38,9 +38,14 @@ IMPORT ut, watchdog, dx_BestRecords, doxie_files, Infutor, DeathV2_Services, Aut
 #uniquename(filter_eq)
 %filter_eq% := doxie.DataRestriction.isEQCHRestricted(drm);
 
+// get appropriate best_records permission flag
+#uniquename(perm_flag)
+%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
+
 #uniquename(outf)
-%outf% := project(dx_BestRecords.fn_get_best_records(did_stream, did_field, glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
-	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%), transform(bestlayout, self := left));
+%outf% := project(dx_BestRecords.fn_get_best_records(did_stream, did_field, %perm_flag%), 
+	transform(bestlayout, self := left));
 	
 #uniquename(outfile_nominors)
 %outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,

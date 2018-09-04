@@ -1,7 +1,4 @@
-export fn_get_best_records(did_ds, did_field = 'did', glb_flag = 'false', 
-	nonblank_flag = 'false', utility_flag = 'false', pre_glb_flag = 'false', 
-	filter_exp_flag = 'false', filter_eq_flag = 'false', marketing_flag = 'false', 
-	cnsmr_flag = 'false') := functionmacro
+export fn_get_best_records(did_ds, did_field, perm_type_val) := functionmacro
 
 	import ut, watchdog, Infutor, doxie, dx_BestRecords;
 
@@ -25,37 +22,27 @@ export fn_get_best_records(did_ds, did_field = 'did', glb_flag = 'false',
 	local out_marketing_v2 := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.Key_Watchdog_marketing_V2);
 	local out_cnsmr := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Infutor.key_infutor_best_did);
 
-	local br_output := 
-		IF(marketing_flag, IF(pre_glb_flag, out_marketing_v2, out_marketing),
-		IF(cnsmr_flag, out_cnsmr,
-		IF(
-			nonblank_flag,
-			IF(
-				glb_flag,
-				MAP(utility_flag => out_glb_nonutil_nonblank,
-						filter_exp_flag and filter_eq_flag => out_glb_nonexp_noneq_nonblank, 
-						filter_exp_flag => out_glb_nonexp_nonblank,
-						filter_eq_flag => out_glb_noneq_nonblank,		
-						out_glb_nonblank
-						),
-				IF (pre_glb_flag,
-					out_nonglb_nonblank_v2,
-					out_nonglb_nonblank
-					)
-			),
-			IF(
-				glb_flag,
-				MAP(utility_flag => out_glb_nonutil,
-						filter_exp_flag and filter_eq_flag => out_glb_nonexp_noneq,
-						filter_exp_flag => out_glb_nonexp,
-						filter_eq_flag => out_glb_noneq,
-						out_glb),
-				IF(pre_glb_flag,
-					out_nonglb_v2,
-					out_nonglb
-				)
-			)
-		)));
+	// select correct join based on the input flag
+	// NOTE: we expect a valid value of type dx_BestRecords.Constants.perm_type
+	local br_output := map(
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb => out_glb, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonexperian => out_glb_nonexp, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonequifax => out_glb_noneq, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax => out_glb_nonexp_noneq, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonblank => out_glb_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonblank => out_glb_nonexp_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonequifax_nonblank => out_glb_noneq_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax_nonblank => out_glb_nonexp_noneq_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonutil => out_glb_nonutil, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.glb_nonutil_nonblank => out_glb_nonutil_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.nonglb => out_nonglb, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.nonglb_v2 => out_nonglb_v2, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.nonglb_nonblank => out_nonglb_nonblank, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.nonglb_nonblank_v2 => out_nonglb_nonblank_v2, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.marketing => out_marketing, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.marketing_v2 => out_marketing_v2, 
+		perm_type_val = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr, 
+		dataset([], dx_BestRecords.layout_best));
 
 	return br_output;
 
