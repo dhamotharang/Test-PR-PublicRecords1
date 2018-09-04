@@ -34,7 +34,7 @@ EXPORT fn_Run_LI_Controller(STRING8 date_inp = '') := Function
 												'The Workunit is '+WORKUNIT + '\n' +
 												'ErrorMessage is '+FAILMESSAGE + '\n\n';
 
-		Validationfailurebody := 'The LeadIntegrity Build did NOT kick off because of either the absence of MM Input files or an invalid Build Period: ' + build_period + '\n' +
+		Validationfailurebody := 'The LeadIntegrity Build did NOT kick off because of either the absence of All MM Input files or an invalid Build Period: ' + build_period + '\n' +
 														 'The Workunit is '+WORKUNIT + '\n';
 												
 		successsubject   := 'The LeadIntegrity Build completed for ' + build_period;
@@ -45,10 +45,13 @@ EXPORT fn_Run_LI_Controller(STRING8 date_inp = '') := Function
 		ds_files := nothor(STD.File.LogicalFileList(FILE_MASK, true, false, true)); 
 		inputFileCount := COUNT(ds_files);
 
+		output(build_period);
+		output(inputFileCount);
+
 		Final := IF(TRIM(build_period)='' OR inputFileCount < 15, 
 								Fileservices.Sendemail(Constants.TeamEmailList, failuresubject, Validationfailurebody),
 								SEQUENTIAL(RunLI_Attributes,
-													 Fileservices.Sendemail(Constants.TeamEmailList, successsubject, successbody)))
+													Fileservices.Sendemail(Constants.TeamEmailList, successsubject, successbody)))
 								:FAILURE(Fileservices.Sendemail(Constants.TeamEmailList, failuresubject, failurebody));
 												
 		Return Final;

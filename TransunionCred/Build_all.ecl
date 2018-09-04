@@ -34,7 +34,7 @@ delete_deletes := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) =
 
 PromoteSupers.Mac_SF_BuildProcess(TransunionCred.Build_base(ver).all,Superfile_List.Base, TransunionCred,2,,true);
 
-zDoPopulationStats := Strata(ver);
+zDoPopulationStats := Transunion.Strata(ver);
 
 built := sequential(
 					spray_it,
@@ -59,7 +59,6 @@ built := sequential(
 					,FileServices.FinishSuperFileTransaction()
 #END
 					,zDoPopulationStats
-					,Orbit3.Proc_Orbit3_CreateBuild_npf(ver,'TransunionCred')
 					);
 
 return built;

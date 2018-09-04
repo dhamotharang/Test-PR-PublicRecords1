@@ -72,6 +72,7 @@
 ,{'thor_data400::key::gsa::qa::did','','',''}
 ,{'thor_data400::key::dca::qa::linkids','','',''}
 ,{'thor_data400::key::corp2::qa::corp::linkids','','',''}
+,{'thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf','','',''}
 																	]
 															,rampscopy.layouts.filestocopy),,'~'+rampscopy.constants(destenv).dslistfile,overwrite);
 end;

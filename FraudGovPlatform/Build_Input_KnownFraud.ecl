@@ -3,7 +3,7 @@ EXPORT Build_Input_KnownFraud(
 	  string		pversion
 	 ,boolean		PSkipKnownFraud	= false 
 	 ,boolean		PSkipNAC				= false	
-	 ,boolean		PSkipValidations	= true
+	 ,boolean		PSkipValidations	= false
 ) :=
 module
 
@@ -17,11 +17,11 @@ module
 		return in_ddp;
 	ENDMACRO;
 	
-	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::KnownFraud')) > 0 and PSkipKnownFraud = false, 
+	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0 and PSkipKnownFraud = false, 
 													Files(pversion).Sprayed.KnownFraud, 
 													dataset([],{string75 fn { virtual(logicalfilename)},		FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										)    											
-									+ 	if	(nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
+									+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACKNFDUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)}, 	FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										);
@@ -219,14 +219,14 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
 
 	//Move only Valid Records
-	shared f1_dedup					:=	 join (	f1,
+	shared f1_dedup :=	join (	f1,
 											ByPassed_records,
 											left.Unique_Id = right.Unique_Id,
 											TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
@@ -240,10 +240,10 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 									
 	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
 	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
@@ -272,10 +272,10 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
 // Return
 	export build_prepped := 

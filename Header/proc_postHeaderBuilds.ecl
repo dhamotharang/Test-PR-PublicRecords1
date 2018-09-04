@@ -58,7 +58,7 @@ export proc_postHeaderBuilds := module
 		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
 
 		thor1:='thor400_44';
-		thor2:='thor400_66';
+		thor2:='thor400_36';
 
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
@@ -93,7 +93,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
+		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com'    ); 
 
 		step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
 		#WORKUNIT('name', step);

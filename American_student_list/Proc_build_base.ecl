@@ -1,4 +1,4 @@
-﻿import ut,
+﻿import ut, Std,
 			address,
 			PromoteSupers,
 			idl_header,
@@ -246,8 +246,8 @@
     SELF  := pInput;
 		
 	END;
-	
-	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + American_student_list.File_American_Student_DID_v2;
+previous := dataset(American_student_list.Thor_Cluster + 'base::american_student_list',American_student_list.layout_american_student_base_v2,thor);	
+	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + previous;
 	
 	//DF-20264 Suppress records in ASL suppression list
 	rsCleanAIDGood_Supp := American_student_list.fnExcludeSuppressedRecords(rsCleanAIDGood); 
@@ -400,6 +400,9 @@
 	
 	//ReKey
 	PriorityLayout:=record
+	  unsigned8		pid;
+	  string40		addr;
+		string23		college;		// temp for college name
 		Layout_American_Student_Base_v2;
 		string flag;
 	end;
@@ -417,16 +420,19 @@
 																																												TRIM(pInput.DOB_FORMATTED,left,right)
 																																										,'0123456789')))));
 				self.flag:=if(pInput.file_type='M','0','1');
+				self.addr := Std.Str.CleanSpaces(pInput.Address_1 + ' ' + pInput.Address_2);
+				self.college := pinput.COLLEGE_NAME[1..23];
+				self.pid := HASH64(pInput.FULL_NAME, pInput.ZIP, self.addr, pInput.DOB_FORMATTED, pInput.LN_COLLEGE_NAME, pInput.COLLEGE_MAJOR, pInput.telephone);
 				self	:= pInput;
 			END;
 			
 	
   rsKeyedFormattedPlusBase	:=	PROJECT(rsFormattedInputPlusBaseFileTiered, tReKeyBase(left));
 	
-	rsFormattedPlusBaseDist := distribute(rsKeyedFormattedPlusBase, hash(key));
+	//rsFormattedPlusBaseDist := distribute(rsKeyedFormattedPlusBase, hash(key));
 	
-	rsFormattedPlusBaseSort := sort(rsFormattedPlusBaseDist,key,-COLLEGE_NAME, -COLLEGE_MAJOR, FIRST_NAME, LAST_NAME,prim_range,prim_name,sec_range,z5,-telephone, -Process_Date,-flag,local);
-	output(rsFormattedPlusBaseSort,named('PreRollup'));
+	//rsFormattedPlusBaseSort := sort(rsFormattedPlusBaseDist,key,-COLLEGE_NAME, -COLLEGE_MAJOR, FIRST_NAME, LAST_NAME,prim_range,prim_name,sec_range,z5,-telephone, -Process_Date,-flag,local);
+	//output(rsFormattedPlusBaseSort,named('PreRollup'));
 	PriorityLayout  rollupXform(PriorityLayout L, PriorityLayout R) := transform
 		self.Process_Date    := if(L.Process_Date > R.Process_Date, L.Process_Date, R.Process_Date);
 		self.Date_First_Seen := if(L.Date_First_Seen > R.Date_First_Seen, R.Date_First_Seen, L.Date_First_Seen);
@@ -491,9 +497,18 @@
 		Self.NEW_INCOME_LEVEL	:=	if(L.Process_Date>R.Process_Date,
 																if(trim(L.NEW_INCOME_LEVEL,left,right)='',R.NEW_INCOME_LEVEL,L.NEW_INCOME_LEVEL),
 																if(trim(R.NEW_INCOME_LEVEL,left,right)='',L.NEW_INCOME_LEVEL,R.NEW_INCOME_LEVEL));
-		Self.FILE_TYPE	:=	if(L.Process_Date>R.Process_Date,
-																if(trim(L.FILE_TYPE,left,right)='',R.FILE_TYPE,L.FILE_TYPE),
-																if(trim(R.FILE_TYPE,left,right)='',L.FILE_TYPE,R.FILE_TYPE));
+	  
+		lftype := trim(L.FILE_TYPE, LEFT, RIGHT);
+		rftype := trim(R.FILE_TYPE, LEFT, RIGHT);
+		Self.FILE_TYPE	:=	if(L.Process_Date >= R.Process_Date,
+															MAP(	lftype in ['H','C'] => lftype,
+																		lftype='' OR rftype in ['H','C']  => rftype,
+																		lftype),
+															// else			
+															MAP(	rftype in ['H','C'] => rftype,
+																		rftype='' OR lftype in ['H','C']  => lftype,
+																		rftype)),
+	
 		Self.tier	:=	if(L.Process_Date>R.Process_Date,
 																if(trim(L.tier,left,right)='',R.tier,L.tier),
 																if(trim(R.tier,left,right)='',L.tier,R.tier));
@@ -510,7 +525,7 @@
 		self := L;
 	end;
 
-  rsFormattedPlusBaseRollup := rollup(rsFormattedPlusBaseSort,rollupXform(LEFT,RIGHT),
+  /*rsFormattedPlusBaseRollup := rollup(rsFormattedPlusBaseSort,rollupXform(LEFT,RIGHT),
 			LEFT.KEY = RIGHT.KEY AND
 			ut.NNEQ(LEFT.COLLEGE_NAME[1..23],RIGHT.COLLEGE_NAME[1..23]) AND
 			ut.NNEQ(LEFT.COLLEGE_MAJOR,RIGHT.COLLEGE_MAJOR) AND
@@ -522,8 +537,23 @@
 			Left.z5=right.z5 and
 			ut.NNEQ(LEFT.TELEPHONE,RIGHT.TELEPHONE),
 	local): INDEPENDENT;
+*/
+	f0d := distribute(rsKeyedFormattedPlusBase, hash32(FULL_NAME, zip, addr, dob_formatted));
+	f0s := sort(f0d,FULL_NAME,zip,addr,dob_formatted,LN_COLLEGE_NAME,COLLEGE_MAJOR,TELEPHONE, -Process_Date, local);
 
-	output(rsFormattedPlusBaseRollup,named('PostRollup'));
+
+rsFormattedPlusBaseRollup := rollup(f0s,rollupXform(LEFT,RIGHT),
+			LEFT.FULL_NAME = RIGHT.FULL_NAME AND
+			left.zip = right.zip,
+			left.addr=right.addr AND
+			left.dob_formatted=right.dob_formatted AND
+			ut.NNEQ(LEFT.LN_COLLEGE_NAME,RIGHT.LN_COLLEGE_NAME) AND
+			ut.NNEQ(LEFT.COLLEGE_MAJOR,RIGHT.COLLEGE_MAJOR) AND
+			ut.NNEQ(LEFT.TELEPHONE,RIGHT.TELEPHONE),
+			local
+	);
+
+	//output(rsFormattedPlusBaseRollup,named('PostRollup'));
 
 	//Separate records without a DID and flag them as 'I' (invalid for keys)											
 	//Set C (current) or H (historical) for records that have DID
@@ -557,11 +587,18 @@ dsSort			:= sort(rsCleanAID_DID_SSN_final_DID, hash(DID));
 	
 	rsCleanAID_DID_SSN_final_no_DID_flagged	:=	project(rsCleanAID_DID_SSN_final_no_DID_with_priority,transform(Layout_American_Student_Base_v2,self:=left;));
 
-	American_Student_List_base_flagged	:=	rsCleanAID_DID_SSN_final_DID_flagged + rsCleanAID_DID_SSN_final_no_DID_flagged; 
+	//American_Student_List_base_flagged	:=	rsCleanAID_DID_SSN_final_DID_flagged + rsCleanAID_DID_SSN_final_no_DID_flagged; 
 	
-	
-	
-	
-	PromoteSupers.Mac_SF_BuildProcess(American_Student_List_base_flagged,American_student_list.thor_cluster + 'base::american_student_list',build_base,,,true);
+	American_Student_List_base_flagged1 := rsCleanAID_DID_SSN_final_no_DID_with_priority + rsCleanAID_DID_SSN_final_DID_flagged_with_priority;
+	American_Student_List_base_flagged := PROJECT(American_Student_List_base_flagged1, TRANSFORM(Layout_American_Student_Base_v2,
+																		self.key := left.pid;
+																		self := left;));
+
+	//PromoteSupers.Mac_SF_BuildProcess(American_Student_List_base_flagged,American_student_list.thor_cluster + 'base::american_student_list',build_base,,,true);
 	// build_base:=output(American_Student_List_base_flagged,,'~thor_data400::base::american_student_list_'+workunit,all,thor,overwrite);
+	//export Proc_build_base := sequential(build_base, checkOrphanNames, checkOrphanTiers);//, checkOrphanNames, checkOrphanTiers
+	//export Proc_build_base := PROJECT(American_Student_List_base_flagged, TRANSFORM(Layout_American_Student_Base_v2,
+	//																	self.key := left.pid;
+	//																	self := left;));
+	PromoteSupers.Mac_SF_BuildProcess(American_Student_List_base_flagged,American_student_list.thor_cluster + 'base::american_student_list',build_base,,,true);
 	export Proc_build_base := sequential(build_base, checkOrphanNames, checkOrphanTiers);//, checkOrphanNames, checkOrphanTiers

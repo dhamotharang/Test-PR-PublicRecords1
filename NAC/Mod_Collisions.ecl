@@ -1,11 +1,11 @@
-EXPORT Mod_Collisions(string month) := Module
+﻿EXPORT Mod_Collisions(string month, DATASET(nac.Layouts.Base) FileBase=NAC.Files().BaseBadAddressRemoved) := Module
 
 SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED score_threashold:=threashold;
 SHARED ssn_threashold:=threashold;
 SHARED dob_threashold:=threashold;
 
-EXPORT FileBase:=NAC.Files().BaseBadAddressRemoved;
+//EXPORT FileBase:=NAC.Files().BaseBadAddressRemoved;
 
 //////////////////////////////////
 matchset:=['N','S','D'];

@@ -4,7 +4,7 @@ EXPORT Build_Prepped_InquiryLogs (
 ) :=
 FUNCTION
 
-	Shared Sprayed_InquiryLogs := Files(pversion).Sprayed.InquiryLogs;
+	Sprayed_InquiryLogs := Files(pversion).Sprayed.InquiryLogs;
 			
 	IdentityData := RECORD 
 		string75 fn { virtual(logicalfilename) };
