@@ -10,7 +10,7 @@ IMPORT iesp;
 #SET(BuildDate,(String)STD.Date.Today());
 	
 	//Get IESP input
-	ds_in := DATASET ([], iesp.healthcare_socio_indicators.t_SocioeconomicIndiatorsRequest) : STORED('SocioeconomicIndiatorsRequest', FEW);
+	ds_in := DATASET ([], iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest) : STORED('SocioeconomicIndicatorsRequest', FEW);
 	first_row := ds_in[1] : INDEPENDENT; //Since this is an ESP service, reading only one row.
 	// OUTPUT(first_row, NAMED('first_row'));
 	MemberInfo := first_row.Member;
@@ -85,8 +85,8 @@ IMPORT iesp;
 	// isReadmissionRequestValid;
 
 	AttributesFailMessage := IF(isAttributesRequestValid,_blank, Models.Healthcare_Constants_RT_Service.AttributesSubFailMessage);
-	ReadmissionFailMessage := IF(isReadmissionRequestValid,_blank,AttributesFailMessage + Models.Healthcare_Constants_RT_Service.ReadmissionSubFailMessage);
-	RequestFailedMessage := Models.Healthcare_Constants_RT_Service.SubInvalidRequest + ReadmissionFailMessage;
+	ReadmissionFailMessage := IF(isReadmissionRequestValid,_blank, Models.Healthcare_Constants_RT_Service.ReadmissionSubFailMessage);
+	RequestFailedMessage := Models.Healthcare_Constants_RT_Service.SubInvalidRequest + AttributesFailMessage + ReadmissionFailMessage;
 	
 	//Exception#1
 	SubscriptionFail_DS := EmptyExceptionDS0 + IF(isAttributesRequestValid = FALSE OR isReadmissionRequestValid = FALSE , ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, RequestFailedMessage}, iesp.share.t_WsException), _EmptyExceptionDSRow0);
@@ -233,7 +233,7 @@ IMPORT iesp;
 	hasExceptions := IF(COUNT(FinalException_DS(code<>0)) > 0, TRUE, FALSE);
 
 	//Add additional info into the response
-	iesp.healthcare_socio_indicators.t_SocioeconomicIndiatorsResponse format() := transform
+	iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsResponse format() := transform
 				self.Options := RequestOptions;
 				self.Member := MemberInfo;
 				self.Indicators := IF(hasExceptions, Empty_SocioIncicators_Attributes_Scores[1], SocioIncicators_Attributes_Scores[1]);
