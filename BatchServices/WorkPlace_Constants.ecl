@@ -1,4 +1,4 @@
-import MDR;
+﻿import MDR;
 
 export WorkPlace_Constants := module
 
@@ -7,7 +7,7 @@ export WorkPlace_Constants := module
 	  export unsigned1 KEEP_LIMIT           := 1;
     export unsigned4 JOIN_LIMIT           := 10000;
     export unsigned4 KEYED_JOIN_UNLIMITED := 0;
-	  export unsigned1 KEEP_HIST            := 2;
+	  export unsigned1 KEEP_HIST            := 4;
 	  export unsigned1 KEEP_EMAIL           := 3;
 	end;
 
@@ -70,5 +70,42 @@ export WorkPlace_Constants := module
 																			 'UNEMPLOYED DISABILIT',
 																			 'UNEMPLOYED_DISABILIT',
 	                                     'UNEMPLOYMENT'];
+																			 																					
+	PERSONAL_EMAIL_DOMAIN_SET := DATASET([{'GMAIL.COM'},
+																				{'AOL.COM'},
+																				{'HOTMAIL.COM'},
+																				{'YAHOO.COM'},
+																				{'MAIL.COM'},
+																				{'OUTLOOK.COM'},
+																				{'ICLOUD.COM'},
+																				{'INBOX.COM'},
+																				{'ZOHO.COM'},
+																				{'PROTONMAIL.COM'},
+																				{'COMCAST.NET'},
+																				{'LIVE.COM'},
+																				{'COX.NET'},
+																				{'VERIZON.NET'},
+																				{'GOOGLEMAIL.COM'},
+																				{'ATT.NET'},
+																				{'FACEBOOK.COM'},
+																				{'EARTHLINK.NET'},
+																				{'SKY.COM'},
+																				{'CHARTER.NET'},
+																				{'JUNO.COM'},
+																				{'MAC.COM'},
+																				{'REDIFFMAIL.COM'},
+																				{'YMAIL.COM'},
+																				{'SBCGLOBAL.NET'},
+																				{'ROCKETMAIL.COM'},
+																				{'FRONTIERNET.NET'},
+																				{'ME.COM'},
+																				{'BELLSOUTH.NET'},
+																				{'PRODIGY.NET'},
+																				{'PEOPLEPC.COM'},
+																				{'MINDSPRING.COM'}], {STRING domain});
+
+	EXPORT PERSONAL_EMAIL_DOMAIN_DCT  := DICTIONARY(PERSONAL_EMAIL_DOMAIN_SET,{domain});
+	
+	EXPORT UNSIGNED1 DEFAULT_SOURCE_ORDER:=255;
 																			 
 end;

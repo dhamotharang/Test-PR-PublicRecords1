@@ -1,4 +1,4 @@
-import BatchServices;
+﻿import BatchServices;
 
 // NOTE: Within this module a certain BatchServices.Workplace_Layouts is used.
 //       This is because the BatchServices.WorkPlace_BatchService attributes were 
@@ -9,24 +9,16 @@ EXPORT Layouts := MODULE
   // This layout is used for storing the fields needed from the POE key did file
   EXPORT poe_didkey_plus := RECORD
 	  BatchServices.WorkPlace_Layouts.poe_didkey_slimmed;
+	  BatchServices.WorkPlace_Layouts.addl_info_slimmed;
 		// name parts not already on BatchServices.WorkPlace_Layouts.poe_didkey_slimmed
    	string5  name_title	         := '',	
 	  string20 middle_name	       := '',	
 	  string5  name_suffix         := '',
-		// address parts not already on BatchServices.WorkPlace_Layouts.poe_didkey_slimmed
-    string10 company_prim_range  := '',
-    string2  company_predir      := '',		
-    string28 company_prim_name   := '',
-    string4  company_addr_suffix := '',		
-    string2  company_postdir     := '',		
-    string10 company_unit_desig  := '',
-    string8  company_sec_range   := '',
-		string5  company_zip5        := '',
-		string4  company_zip4        := '',
 		// additional fields to be included in the report service results
 		string255 company_description        := '';
     string12  parent_company_bdid        := ''; // For internal use only, not be returned to customer
     string120 parent_company_name        := '';
+    string120 parent_company_address     := '';		
     string10  parent_company_prim_range  := '',
     string2   parent_company_predir      := '',		
     string28  parent_company_prim_name   := '',
@@ -43,46 +35,7 @@ EXPORT Layouts := MODULE
     string60  parent_company_status      := '';
     string60  prof_license               := ''; 
     string45  prof_license_status        := '';
-    string12  addl_wpl_bdid_1            := ''; // For internal use only, not be returned to customer
-    string120 addl_wpl_comp_name_1       := '';
-		string70  addl_wpl_comp_address1_1   := '';
-    string10  addl_wpl_comp_prim_range1_1  := '',
-    string2   addl_wpl_comp_predir1_1      := '',		
-    string28  addl_wpl_comp_prim_name1_1   := '',
-    string4   addl_wpl_comp_addr_suffix1_1 := '',		
-    string2   addl_wpl_comp_postdir1_1     := '',		
-    string10  addl_wpl_comp_unit_desig1_1  := '',
-    string8   addl_wpl_comp_sec_range1_1   := '',
-    string70  addl_wpl_comp_address2_1   := ''; 
-    string25  addl_wpl_comp_city_1       := '';
-    string2   addl_wpl_comp_state_1      := '';
-    string10  addl_wpl_comp_zip_1        := '';
-		string5   addl_wpl_comp_zip5_1       := '',
-		string4   addl_wpl_comp_zip4_1       := '',
-    string17  addl_wpl_phone1_1          := ''; 
-    string10  addl_wpl_phone2_1          := ''; 
-    string60  addl_wpl_status_1          := '';
-    string8   addl_wpl_last_seen_date_1  := ''; // For internal use only, not be returned to customer
-    string12  addl_wpl_bdid_2            := ''; // For internal use only, not be returned to customer
-    string120 addl_wpl_comp_name_2       := '';
-		string70  addl_wpl_comp_address1_2   := '';
-    string10  addl_wpl_comp_prim_range1_2  := '',
-    string2   addl_wpl_comp_predir1_2      := '',		
-    string28  addl_wpl_comp_prim_name1_2   := '',
-    string4   addl_wpl_comp_addr_suffix1_2 := '',		
-    string2   addl_wpl_comp_postdir1_2     := '',		
-    string10  addl_wpl_comp_unit_desig1_2  := '',
-    string8   addl_wpl_comp_sec_range1_2   := '',
-    string70  addl_wpl_comp_address2_2   := '';
-    string25  addl_wpl_comp_city_2       := '';
-    string2   addl_wpl_comp_state_2      := '';
-    string10  addl_wpl_comp_zip_2        := '';
-		string5   addl_wpl_comp_zip5_2       := '',
-		string4   addl_wpl_comp_zip4_2       := '',
-    string17  addl_wpl_phone1_2          := ''; 
-    string10  addl_wpl_phone2_2          := ''; 
-    string60  addl_wpl_status_2          := '';
-    string8   addl_wpl_last_seen_date_2  := ''; // For internal use only, not be returned to customer
+
 		// Optional Secretary of State additional info fields
 		string350 sos_comp_name         := '';
  		string8   sos_name_as_of_date   := '';
@@ -135,6 +88,11 @@ EXPORT Layouts := MODULE
 	record(poe_didkey_plus)
 		unsigned4	dt_vendor_last_reported;
 	end;
+	
+	EXPORT Email_Layout:= RECORD
+		STRING200 EmailAddress;
+		STRING2 EmailSource;
+	END;
 	
   // This layout is used to slim down the SearchService or ReportService results to 
 	// just the source field which will be checked/counted for royalties.
