@@ -113,6 +113,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			
 			mbs_delta_key := FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
 			
+			//Transform into input format of FraudShared_Services.FilterThruMBS function
 			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(Layout_Deltabase_for_mbs L, 
 																																			mbs_delta_key R) := TRANSFORM
 				SELF.Record_ID := (INTEGER)L.deltadata.cust_transaction_id;
@@ -156,6 +157,8 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF := [];
 			END;
 			
+			//Get fdn permissible use access information (fdn file info id) from mbsdeltabase key for deltabase recs
+			//This is needed in order to run FraudShared_Services.FilterThruMBS to apply MBS sharing rules
 			delta_w_fdn_file_info := JOIN(delta_w_filter, mbs_delta_key,
 																	KEYED(LEFT.deltadata.gc_id = (STRING)RIGHT.gc_id) AND
 																				LEFT.deltadata.program_name = RIGHT.ind_type_description AND
