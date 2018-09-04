@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for BankruptcyV2_Services.BankruptcySearchService
+﻿// This service created to add Web Service fields for BankruptcyV2_Services.BankruptcySearchService
 
 EXPORT MAC_BankruptcyV2_Services_SearchService := MACRO
 
@@ -43,6 +43,8 @@ EXPORT MAC_BankruptcyV2_Services_SearchService := MACRO
                     'StrictMatch',
 										'NoDeepDive',
                     'PenaltThreshold',
-										'IncludeCriminalIndicators'
+										'IncludeCriminalIndicators',
+										'ChapterChoice',
+										'BusinessOnly'
 									));
 ENDMACRO;	
