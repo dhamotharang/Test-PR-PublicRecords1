@@ -106,14 +106,14 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
 EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.ADDRESS_MAXBLOCKLIMIT, aBlockLimit);/*HACK24a*/
-EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0;
+EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND EXISTS(le.ZIP_cases);
 KeyRec := RECORDOF(Key);
  
-EXPORT RawFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',TYPEOF(h.ZIP) param_ZIP = (TYPEOF(h.ZIP))'',TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'') := 
+EXPORT RawFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',DATASET(process_xIDL_layouts().layout_ZIP_cases) param_ZIP,TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'') := 
     STEPPED( LIMIT( Key(
           KEYED(( PRIM_RANGE = param_PRIM_RANGE AND param_PRIM_RANGE <> (TYPEOF(PRIM_RANGE))''))
       AND KEYED(( PRIM_NAME = param_PRIM_NAME AND param_PRIM_NAME <> (TYPEOF(PRIM_NAME))''))
-      AND KEYED(( ZIP = param_ZIP AND param_ZIP <> (TYPEOF(ZIP))''))
+      AND KEYED(( ZIP IN SET(param_ZIP,ZIP) AND EXISTS(param_ZIP)))
       AND ( SEC_RANGE = (TYPEOF(SEC_RANGE))'' OR param_SEC_RANGE = (TYPEOF(SEC_RANGE))'' OR SALT37.HyphenMatch(SEC_RANGE,param_SEC_RANGE,1)<=2 )
       AND (( (FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME OR param_FNAME[1..LENGTH(TRIM(FNAME))] = FNAME)  OR FNAME_PreferredName = fn_PreferredName(param_FNAME) OR metaphonelib.DMetaPhone1(FNAME)=metaphonelib.DMetaPhone1(param_FNAME) OR Config.WithinEditN(FNAME,FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK02*/ OR Config.WildMatch(FNAME,param_FNAME,FALSE) )
         AND ( (MNAME[1..LENGTH(TRIM(param_MNAME))] = param_MNAME OR param_MNAME[1..LENGTH(TRIM(MNAME))] = MNAME) OR Config.WithinEditN(MNAME,MNAME_len,param_MNAME,param_MNAME_len,2, 0) )
@@ -121,7 +121,7 @@ EXPORT RawFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))''
         OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)FNAME,FNAME_MAINNAME_weight100,true,0,false,FNAME_initial_char_weight100/*HACK11*/,1,0,FNAME_len,FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)MNAME,MNAME_MAINNAME_weight100,true,0,true,MNAME_initial_char_weight100,2,0,MNAME_len,MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LNAME,LNAME_MAINNAME_weight100,true,0,false,0,1,0,LNAME_len,LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,param_FNAME_len,(SALT37.StrType)param_MNAME,param_MNAME_len,(SALT37.StrType)param_LNAME,param_LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0)),MAX_BLOCKLIMIT/*HACK24b*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
-EXPORT ScoredDIDFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',TYPEOF(h.ZIP) param_ZIP = (TYPEOF(h.ZIP))'',TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.CITY) param_CITY = (TYPEOF(h.CITY))'',TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',UNSIGNED4 param_DOB,BOOLEAN param_disableForce = FALSE) := FUNCTION
+EXPORT ScoredDIDFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RANGE))'',TYPEOF(h.PRIM_RANGE_len) param_PRIM_RANGE_len = (TYPEOF(h.PRIM_RANGE_len))'',TYPEOF(h.PRIM_NAME) param_PRIM_NAME = (TYPEOF(h.PRIM_NAME))'',TYPEOF(h.PRIM_NAME_len) param_PRIM_NAME_len = (TYPEOF(h.PRIM_NAME_len))'',DATASET(process_xIDL_layouts().layout_ZIP_cases) param_ZIP,TYPEOF(h.SEC_RANGE) param_SEC_RANGE = (TYPEOF(h.SEC_RANGE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.CITY) param_CITY = (TYPEOF(h.CITY))'',TYPEOF(h.ST) param_ST = (TYPEOF(h.ST))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',UNSIGNED4 param_DOB,BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetch(param_PRIM_RANGE,param_PRIM_RANGE_len,param_PRIM_NAME,param_PRIM_NAME_len,param_ZIP,param_SEC_RANGE,param_FNAME,param_MNAME,param_LNAME,param_FNAME_len,param_MNAME_len,param_LNAME_len);
  
   Process_xIDL_Layouts().LayoutScoredFetch Score(RawData le) := TRANSFORM
@@ -138,11 +138,12 @@ EXPORT ScoredDIDFetch(TYPEOF(h.PRIM_RANGE) param_PRIM_RANGE = (TYPEOF(h.PRIM_RAN
            le.PRIM_NAME = param_PRIM_NAME  => le.PRIM_NAME_weight100,
           le.PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' OR param_PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' => 0,
           -0.531*le.PRIM_NAME_weight100))/100; 
-    SELF.ZIP_match_code := match_methods(File_InsuranceHeader).match_ZIP(le.ZIP,param_ZIP,TRUE);
+    SELF.ZIP_match_code := match_methods(File_InsuranceHeader).match_ZIP_el(le.ZIP,param_ZIP,TRUE);
     SELF.ZIPWeight := (50+MAP (
-           le.ZIP = param_ZIP  => le.ZIP_weight100,
-          le.ZIP = (TYPEOF(le.ZIP))'' OR param_ZIP = (TYPEOF(le.ZIP))'' => 0,
+           EXISTS(param_ZIP(le.ZIP=ZIP)) => le.ZIP_weight100 * param_ZIP(ZIP=le.ZIP)[1].weight/100.0,
+          le.ZIP = (TYPEOF(le.ZIP))'' OR ~EXISTS(param_ZIP) => 0,
           -1.000*le.ZIP_weight100))/100; 
+    SELF.ZIP_cases := DATASET([{le.ZIP,SELF.ZIPweight}],Process_xIDL_layouts().layout_ZIP_cases);
     SELF.SEC_RANGE_match_code := MAP(
            le.SEC_RANGE = (TYPEOF(le.SEC_RANGE))'' OR param_SEC_RANGE = (TYPEOF(param_SEC_RANGE))'' => SALT37.MatchCode.OneSideNull,
            le.PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' OR param_PRIM_NAME = (TYPEOF(param_PRIM_NAME))'' OR le.PRIM_NAME <> param_PRIM_NAME => 0, // Only valid if the context variable is equal
@@ -269,7 +270,7 @@ EXPORT InputLayout_Batch := RECORD
   TYPEOF(h.PRIM_RANGE_len) PRIM_RANGE_len := (TYPEOF(h.PRIM_RANGE_len))'';
   TYPEOF(h.PRIM_NAME) PRIM_NAME := (TYPEOF(h.PRIM_NAME))'';
   TYPEOF(h.PRIM_NAME_len) PRIM_NAME_len := (TYPEOF(h.PRIM_NAME_len))'';
-  TYPEOF(h.ZIP) ZIP := (TYPEOF(h.ZIP))'';
+  DATASET(InsuranceHeader_xLink.process_xIDL_layouts().layout_ZIP_cases) ZIP_cases := DATASET([],InsuranceHeader_xLink.process_xIDL_layouts().layout_ZIP_cases);
   TYPEOF(h.SEC_RANGE) SEC_RANGE := (TYPEOF(h.SEC_RANGE))'';
   SALT37.StrType MAINNAME := (SALT37.StrType)'';
   TYPEOF(h.FNAME) FNAME := (TYPEOF(h.FNAME))'';
@@ -301,11 +302,12 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
            le.PRIM_NAME = ri.PRIM_NAME  => le.PRIM_NAME_weight100,
           le.PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' OR ri.PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' => 0,
           -0.531*le.PRIM_NAME_weight100))/100; 
-    SELF.ZIP_match_code := match_methods(File_InsuranceHeader).match_ZIP(le.ZIP,ri.ZIP,TRUE);
+    SELF.ZIP_match_code := match_methods(File_InsuranceHeader).match_ZIP_el(le.ZIP,ri.ZIP_cases,TRUE);
     SELF.ZIPWeight := (50+MAP (
-           le.ZIP = ri.ZIP  => le.ZIP_weight100,
-          le.ZIP = (TYPEOF(le.ZIP))'' OR ri.ZIP = (TYPEOF(le.ZIP))'' => 0,
+           EXISTS(ri.ZIP_cases(le.ZIP=ZIP)) => le.ZIP_weight100 * ri.ZIP_cases(ZIP=le.ZIP)[1].weight/100.0,
+          le.ZIP = (TYPEOF(le.ZIP))'' OR ~EXISTS(ri.ZIP_cases) => 0,
           -1.000*le.ZIP_weight100))/100; 
+    SELF.ZIP_cases := DATASET([{le.ZIP,SELF.ZIPweight}],Process_xIDL_layouts().layout_ZIP_cases);
     SELF.SEC_RANGE_match_code := MAP(
            le.SEC_RANGE = (TYPEOF(le.SEC_RANGE))'' OR ri.SEC_RANGE = (TYPEOF(ri.SEC_RANGE))'' => SALT37.MatchCode.OneSideNull,
            le.PRIM_NAME = (TYPEOF(le.PRIM_NAME))'' OR ri.PRIM_NAME = (TYPEOF(ri.PRIM_NAME))'' OR le.PRIM_NAME <> ri.PRIM_NAME => 0, // Only valid if the context variable is equal
@@ -417,28 +419,29 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
     SELF.Weight := IF(le.DID = 0, 100, MAX(0,SELF.PRIM_RANGEWeight) + MAX(0,SELF.PRIM_NAMEWeight) + MAX(0,SELF.ZIPWeight) + MAX(0,SELF.SEC_RANGEWeight) + MAX(SELF.MAINNAMEWeight,MAX(0,SELF.FNAMEWeight) + MAX(0,SELF.MNAMEWeight) + MAX(0,SELF.LNAMEWeight)) + MAX(0,SELF.CITYWeight) + MAX(0,SELF.STWeight) + MAX(0,SELF.DERIVED_GENDERWeight) + MAX(0,SELF.SNAMEWeight) + MAX(0,SELF.DOBWeight));
     SELF := le;
   END;
-  Recs0 := Recs(PRIM_RANGE <> (TYPEOF(PRIM_RANGE))'',PRIM_NAME <> (TYPEOF(PRIM_NAME))'',ZIP <> (TYPEOF(ZIP))'');
+
+  Recs0 := Recs(PRIM_RANGE <> (TYPEOF(PRIM_RANGE))'',PRIM_NAME <> (TYPEOF(PRIM_NAME))'',EXISTS(ZIP_cases));
   SALT37.MAC_Dups_Note(Recs0,InputLayout_Batch,Recs1,outdups,Reference,Config.meow_dedup) // Whilst duplicates have been removed for the whole input; there may still be dups on a per linkpath basis
   J0 := JOIN(Recs1,Key,LEFT.PRIM_RANGE = RIGHT.PRIM_RANGE
      AND LEFT.PRIM_NAME = RIGHT.PRIM_NAME
-     AND LEFT.ZIP = RIGHT.ZIP
+     AND LEFT.ZIP_cases[1].ZIP = RIGHT.ZIP
      AND ( LEFT.SEC_RANGE = (TYPEOF(LEFT.SEC_RANGE))'' OR RIGHT.SEC_RANGE = (TYPEOF(RIGHT.SEC_RANGE))'' OR SALT37.HyphenMatch(LEFT.SEC_RANGE,RIGHT.SEC_RANGE,1)<=2  )
      AND (( ( 
         ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK05*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK09*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
           OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK13*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0) )),Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.PRIM_RANGE = RIGHT.PRIM_RANGE
      AND LEFT.PRIM_NAME = RIGHT.PRIM_NAME
-     AND LEFT.ZIP = RIGHT.ZIP,Config.ADDRESS_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
+     AND LEFT.ZIP_cases[1].ZIP = RIGHT.ZIP,Config.ADDRESS_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
   J1 := JOIN(Recs1,PULL(Key),LEFT.PRIM_RANGE = RIGHT.PRIM_RANGE
      AND LEFT.PRIM_NAME = RIGHT.PRIM_NAME
-     AND LEFT.ZIP = RIGHT.ZIP
+     AND LEFT.ZIP_cases[1].ZIP = RIGHT.ZIP
      AND ( LEFT.SEC_RANGE = (TYPEOF(LEFT.SEC_RANGE))'' OR RIGHT.SEC_RANGE = (TYPEOF(RIGHT.SEC_RANGE))'' OR SALT37.HyphenMatch(LEFT.SEC_RANGE,RIGHT.SEC_RANGE,1)<=2  )
      AND (( ( 
         ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK05*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK09*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
           OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK13*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0) )),Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.PRIM_RANGE = RIGHT.PRIM_RANGE
      AND LEFT.PRIM_NAME = RIGHT.PRIM_NAME
-     AND LEFT.ZIP = RIGHT.ZIP,Config.ADDRESS_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
+     AND LEFT.ZIP_cases[1].ZIP = RIGHT.ZIP,Config.ADDRESS_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
   J2 := IF(AsIndex,J0,J1);
   J3 := PROJECT(J2, Process_xIDL_Layouts().update_forcefailed(LEFT,In_disableForce));
   J4 := Process_xIDL_Layouts().CombineLinkpathScores(J3,In_disableForce); // Combine results and restrict number for one linkpath
@@ -458,7 +461,7 @@ IMPORT SALT37,InsuranceHeader_xLink;
     SELF.PRIM_RANGE_len := LENGTH(TRIM((TYPEOF(SELF.PRIM_RANGE))le.Input_PRIM_RANGE));
     SELF.PRIM_NAME := (TYPEOF(SELF.PRIM_NAME))le.Input_PRIM_NAME;
     SELF.PRIM_NAME_len := LENGTH(TRIM((TYPEOF(SELF.PRIM_NAME))le.Input_PRIM_NAME));
-    SELF.ZIP := (TYPEOF(SELF.ZIP))le.Input_ZIP;
+    SELF.ZIP_cases := le.Input_ZIP;
     #IF ( #TEXT(Input_SEC_RANGE) <> '' )
       SELF.SEC_RANGE := (TYPEOF(SELF.SEC_RANGE))le.Input_SEC_RANGE;
     #END
