@@ -1,4 +1,4 @@
-
+﻿
 //MATCHSET should be set of char1's indicating matchfields
 /*	'A' = Address
 	'F' = FEIN
@@ -501,7 +501,7 @@ import BIPV2,did_add;
 	%roxplus% := join(%infile_seq%, %roxout%,
 					left.temp_id = right.seq,
 					%postrox%(left, right), 
-					hash)
+					hash,local)
 					;
 // output(%infile_seq%, named('infile_seq'));
 // output(%roxplus%, named('roxplus'));

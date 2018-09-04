@@ -1,0 +1,12 @@
+﻿IMPORT ExecAtHomeV2;
+
+EXPORT Constants := 
+MODULE
+
+  EXPORT UNSIGNED1 BIP_MAX_MILE_RADIUS := 0;  // default
+	EXPORT STRING1 CURRENT_REC := 'C';  // 'C' = Current, 'H' = Historical
+  EXPORT UNSIGNED1 MAX_EMPLOYEES_PER_COMP := 1000;
+  EXPORT STRING OWNER := 'OWNER';
+  EXPORT PROFILE_BOOSTER_ATTR_NAME := 'PBATTRV1HHEIR'; //ProfileBooster.Constants.setValidAttributeVersions
+
+END;
