@@ -1,5 +1,5 @@
 ﻿IMPORT _Control, ut, iesp, Insurance_iesp, InsuranceContext_iesp, 
-			InsuranceLog_iesp,iesp.Constants, PersonContext;
+			InsuranceLog_iesp,iesp.Constants, PersonContext, FCRA;
 onThor := _Control.Environment.OnThor;
 
 EXPORT FUNCTIONS := MODULE
@@ -190,6 +190,51 @@ EXPORT FUNCTIONS := MODULE
 		RETURN dsRoxieKeyFinal;
 	END;// PerformGetRoxieKeyData
 
+  EXPORT PerformGetPCR( DATASET(PCL.Layout_PCRequestStatus) dsPCValidSearchRecs) := FUNCTION
+     
+    dsSearchLexID := dsPCValidSearchRecs((unsigned)LexID > 0); //filter out from the search dataset all search records that do not have LexID.
+
+    PCL.Layout_PCResponseRec map_pcr_fields(PCL.Layout_PCRequestStatus le, FCRA.Key_Override_PCR_DID rt) := transform
+      self.LexID := (string)rt.s_did;
+      self.RecID1 := '';
+      self.DataGroup := PersonContext.Constants.DataGroups.PERSON;
+      self.RecordType := map( (unsigned)rt.security_freeze=1 => PersonContext.Constants.RecordTypes.SF,
+                              (unsigned)rt.security_alert=1 => PersonContext.Constants.RecordTypes.FA,
+                              (unsigned)rt.id_theft_flag=1 => PersonContext.Constants.RecordTypes.IT,
+                              ''  );
+      date_created := rt.date_created;
+      self.DateAdded := date_created[1..4] + '-' + date_created[5..6] + '-' + date_created[7..8] + ' 00:00:00';
+      self.SourceSystem := 'PCR';  // I'd rather have this say PCR instead of DOST for these initial records since DOST system is going away
+      self.EventType := 'ADD';
+      SELF  := rt,
+      SELF  := [];
+    end;
+
+    //perform a join only on LexID key to get all matches that match the search LexID. 
+		dsResultLexID_roxie := JOIN(dsSearchLexID, FCRA.Key_Override_PCR_DID,
+		                      KEYED((unsigned)LEFT.LexID = RIGHT.s_did) and
+                          (unsigned)right.date_created<>0 and  // don't allow records that don't have date created populated
+                            ((unsigned)right.security_freeze=1 or (unsigned)right.security_alert=1 or (unsigned)right.id_theft_flag=1),  // we only care about the records for these 3 types
+										      map_pcr_fields(left, right),
+                          KEEP(iesp.Constants.PersonContext.MAX_RECORDS),atmost(iesp.Constants.PersonContext.MAX_RECORDS));
+
+		dsResultLexID_thor := JOIN(DISTRIBUTE(dsSearchLexID, HASH64((unsigned)LexID)), 
+													DISTRIBUTE(PULL(FCRA.Key_Override_PCR_DID), HASH64(s_did)),
+		                      ((unsigned)LEFT.LexID = RIGHT.s_did) and
+                          (unsigned)right.date_created<>0 and  // don't allow records that don't have date created populated
+                            ((unsigned)right.security_freeze=1 or (unsigned)right.security_alert=1 or (unsigned)right.id_theft_flag=1),  // we only care about the records for these 3 types
+										      map_pcr_fields(left, right),
+                          KEEP(iesp.Constants.PersonContext.MAX_RECORDS),atmost(iesp.Constants.PersonContext.MAX_RECORDS), LOCAL);
+			
+		#IF(onThor)
+      dsResultLexID := dsResultLexID_thor;
+    #ELSE
+      dsResultLexID := dsResultLexID_roxie;
+    #END
+    
+    RETURN dsResultLexID;
+  END;
+  
 	EXPORT PerformCombineDatasets(DATASET(PCL.Layout_PCRequestStatus) SK,  					//SK = Search Keys
 	                              DATASET(PCL.Layout_PCResponseRec) DB, 						//DB = Deltabase Results
 	                              DATASET(PCL.Layout_PCResponseRec) RK) := MODULE  	// RK= Roxie Keys Results
