@@ -19,7 +19,10 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.AppendedMiddleName := '';
 		SELF.AppendedSurname := l.lname;
 		// cleaning listing name to perform a partial business name match below.
-		SELF.AppendedCompanyName := IF(l.fname<>'' AND l.lname<>'',Phones.Functions.GetCleanCompanyName(l.listingname),'');
+		// l.listingname is sometimes private and include city and state rather than an actual name. 
+		// The name fields are populated only when there is a valid name. 
+		// We have no way of knowing if CallerID Name is a person or company prior to this line.
+		SELF.AppendedCompanyName := IF(l.fname<>'' OR l.lname<>'',Phones.Functions.GetCleanCompanyName(l.listingname),'');
 		SELF.validatedRecord := l.availabilityindicator = 0 AND validCNAMResponse AND l.privateflag = 0;
 		SELF.source_category := IF(validCNAMResponse, r.source_category+Constants.CNAM, r.source_category);
 		//report error results and mark any reported bad numbers.
@@ -63,7 +66,10 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.phone := l.phone;
 		noCallerName := l.AppendedFirstName = '' AND l.AppendedSurname = '' AND l.lexisnexismatchcode != Constants.LNMatch.INVALID;
 		businessMatch := r.AppendedCompanyName<>'' AND l.AppendedCompanyName[1..5] = r.AppendedCompanyName[1..5];
-		Match := r.seq > 0;
+		nameMatchValue:= Functions.CallerNameMatch(l.AppendedFirstName,l.AppendedSurname,r.AppendedFirstName,r.AppendedSurname);
+		fullNameMatch := nameMatchValue = Constants.NameMatch.FIRSTLAST; 
+		Subject := fullNameMatch AND r.subj2own_relationship = Constants.Relationship.SUBJECT;	
+		Match := fullNameMatch OR businessMatch;
 		SELF.AppendedListingName := l.AppendedListingName;
 		SELF.seq:= r.seq;
 		SELF.AppendedDID := IF(Match AND NOT businessMatch,r.AppendedDID,l.AppendedDID);
@@ -75,36 +81,34 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.AppendedLastDate := MAX(l.AppendedLastDate,r.AppendedLastDate);
 		SELF.AppendedFirstDate := IF(Match,(UNSIGNED)r.AppendedFirstDate,l.AppendedFirstDate);
 		SELF.AppendedRecordType := IF(businessMatch OR r.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,'');
-		inNameMatch := Functions.evaluateNameMatch(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname);
-		fullNameMatch := inNameMatch = Constants.NameMatch.FIRSTLAST; 	
 		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR //accounting for name match from accudata results - LexisNexisMatchCode
-										inNameMatch > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
-		recordMatch := Functions.evaluateNameMatch(l.AppendedFirstName,l.AppendedSurname,r.AppendedFirstName,r.AppendedSurname) = Constants.NameMatch.FIRSTLAST;								
-		SELF.subj2own_relationship := MAP(fullNameMatch => Constants.Relationship.SUBJECT,
-											r.subj2own_relationship='' => Constants.Relationship.NONE,
-											l.subj2own_relationship='' => r.subj2own_relationship,
-											l.subj2own_relationship);										
-		lastnameMatch := l.name_last = l.AppendedSurname;
-		relationalMatch := MAP(STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR (lastnameMatch AND l.name_first <> l.AppendedFirstName) => Constants.LNMatch.RELATIVE,
-								businessMatch OR r.subj2own_relationship IN Constants.BUSINESS_RELATIONS => Constants.LNMatch.EMPLOYER,
+										nameMatchValue > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
+		lastNameOnlyMatch := nameMatchValue = Constants.NameMatch.PARTIAL AND l.name_last IN [l.AppendedFirstName, l.AppendedSurname];										
+		SELF.subj2own_relationship := MAP(Subject => Constants.Relationship.SUBJECT,
+											l.subj2own_relationship<>'' => l.subj2own_relationship,
+											Match => r.subj2own_relationship,
+											lastNameOnlyMatch => Constants.Relationship.RELATIVE,
+											Constants.Relationship.NONE);				
+		relationalMatch := MAP(STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR lastNameOnlyMatch => Constants.LNMatch.RELATIVE,
+								businessMatch OR (fullNameMatch AND r.subj2own_relationship IN Constants.BUSINESS_RELATIONS) => Constants.LNMatch.EMPLOYER,
 								'');
-		addressMatch := IF(Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(
+		addressMatch := IF(Match AND Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(
 																						l.prim_range,l.prim_name,l.sec_range,
-																						r.prim_range,r.prim_name,r.sec_range,
-																						Risk_Indicators.AddrScore.zip_score(l.zip,r.zip),
-																						Risk_Indicators.AddrScore.citystate_score(l.p_city_name,l.st,r.p_city_name,r.st,''))),
+																						r.AppendedStreetNumber,r.AppendedStreetName,r.AppendedUnitNumber,
+																						Risk_Indicators.AddrScore.zip_score(l.zip,r.AppendedZipCode),
+																						Risk_Indicators.AddrScore.citystate_score(l.p_city_name,l.st,r.AppendedCity,r.AppendedStateCode,''))),
 																						Constants.LNMatch.ADDRESS,'');	
 		phoneMatch := IF(nameMatch<> '' OR relationalMatch <> '',Constants.LNMatch.PHONE,'');
 		SELF.LexisNexisMatchCode := MAP(l.LexisNexisMatchCode = Constants.LNMatch.INVALID => Constants.LNMatch.INVALID, 
-										recordMatch AND l.validatedRecord => nameMatch + relationalMatch + addressMatch + phoneMatch,
+										l.validatedRecord => nameMatch + relationalMatch + addressMatch + phoneMatch,
 										relationalMatch + phoneMatch); 
 		ownership := MAP(l.ownership_index=Constants.Ownership.enumIndex.INVALID => Constants.Ownership.enumIndex.INVALID,
-						fullNameMatch AND r.subj2own_relationship=Constants.Relationship.SUBJECT => Constants.Ownership.enumIndex.HIGH,
-						recordMatch AND r.subj2own_relationship = Constants.Relationship.RELATIVE => Constants.Ownership.enumIndex.MEDIUM,
-						(businessMatch OR recordMatch) AND r.subj2own_relationship <>'' => Constants.Ownership.enumIndex.MEDIUM_HIGH,
-						lastnameMatch => Constants.Ownership.enumIndex.MEDIUM,
+						Subject => Constants.Ownership.enumIndex.HIGH,
+						Match AND r.subj2own_relationship = Constants.Relationship.RELATIVE => Constants.Ownership.enumIndex.MEDIUM,
+						Match AND r.subj2own_relationship <>'' => Constants.Ownership.enumIndex.MEDIUM_HIGH,
+						lastNameOnlyMatch => Constants.Ownership.enumIndex.MEDIUM,
 						l.AppendedSurname='' OR l.AppendedFirstName='' => Constants.Ownership.enumIndex.UNDETERMINED,
-						NOT fullNameMatch AND NOT recordMatch AND NOT businessMatch AND l.AppendedListingName<>'' => Constants.Ownership.enumIndex.LOW,
+						NOT Match AND l.AppendedListingName<>'' => Constants.Ownership.enumIndex.LOW,
 						l.ownership_index);
 		SELF.ownership_index := ownership;
 		SELF.ownership_likelihood := Functions.getOwnershipValue(ownership);
@@ -131,29 +135,19 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.AppendedZipCodeExtension := IF(Match,r.AppendedZipCodeExtension,'');		
 		SELF := l;
 	END;
-	dsPhoneswCallerName := JOIN(dsAccuDataFormatted(AppendedFirstName<>'' AND AppendedSurname<>''),batch_in_wREAB,
+	dsPhoneswCallerName := JOIN(dsAccuDataFormatted,batch_in_wREAB,
 							LEFT.acctno=RIGHT.acctno AND
-							LEFT.phone=RIGHT.phone AND
-							//trying to match callerID with REAB info - hence names and company
-							((LEFT.AppendedFirstName = RIGHT.AppendedFirstName AND 
-							LEFT.AppendedSurname = RIGHT.AppendedSurname) OR
-							LEFT.AppendedCompanyName[1..5] = RIGHT.AppendedCompanyName[1..5]), //add a fuzzy match
+							LEFT.phone=RIGHT.phone, 
 							updateREABInfo(LEFT,RIGHT),
 							LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));
-	dsOtherPhones := JOIN(dsAccuDataFormatted(AppendedFirstName='' AND AppendedSurname=''),batch_in_wREAB,
-							LEFT.acctno=RIGHT.acctno AND
-							LEFT.phone=RIGHT.phone,
-							updateREABInfo(LEFT,RIGHT),
-							LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));  						
 
 	#IF(PhoneOwnership.Constants.Debug.AccuDataCNAM)
 		OUTPUT(batch_in_wREAB,NAMED('AccuDatabatch_in_wREAB'));
 		OUTPUT(dsCallerIDs,NAMED('dsCallerIDs'));
 		OUTPUT(dsAccuDataFormatted,NAMED('dsAccuDataFormatted'));
 		OUTPUT(dsPhoneswCallerName,NAMED('dsPhoneswCallerName'));
-		OUTPUT(dsOtherPhones,NAMED('dsOtherPhones'));
 	#END                            
 
-    RETURN dsPhoneswCallerName + dsOtherPhones;
+    RETURN dsPhoneswCallerName;
 
 END;

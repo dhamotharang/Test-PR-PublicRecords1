@@ -244,8 +244,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		gatewayResponse := zumigoSource OR STD.Str.Contains(l.source_category,Constants.CNAM,FALSE);	
 		ownershipStatus := IF(NOT gatewayResponse AND isDisconnected AND ownership > 2,ownership - 1, ownership);
 		SELF.ownership_index := ownershipStatus;
-		SELF.ownership_likelihood := MAP(zumigoSource =>l.ownership_likelihood,
-										confirmedDisconnected => Constants.Ownership.NONE,
+		SELF.ownership_likelihood := MAP(confirmedDisconnected => Constants.Ownership.NONE,
+										zumigoSource =>l.ownership_likelihood,
 										isInvalid => Constants.Ownership.INVALID,	
 										Functions.getOwnershipValue(ownershipStatus));			
 		SELF.subj2own_relationship := MAP(	confirmedDisconnected => Constants.Relationship.NO_OWNER,
