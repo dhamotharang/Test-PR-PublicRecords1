@@ -285,11 +285,13 @@ EXPORT Refresh_copy :=  if(
 
 copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
 
-EXPORT deploy(string emailList,string rpt_qa_email_list) := sequential(
-
-                // The following can only copy after the key is built in Boca
-                fc8(fName(filedate, '::did')                ,fName8(filedate, '::did')),
-                update_inc_superfiles(),
+EXPORT movetoQA := sequential(
+ // The following can only copy after the key is built in Boca
+        fc8(fName(filedate, '::did')                ,fName8(filedate, '::did')),
+        update_inc_superfiles()
+        );
+        
+EXPORT deploy(string emailList,string rpt_qa_email_list) := sequential(               
                 udops,
                 orbit_update_entries('create'),
                 orbit_update_entries('update'),
