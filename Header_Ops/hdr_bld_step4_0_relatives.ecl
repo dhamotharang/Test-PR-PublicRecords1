@@ -1,4 +1,4 @@
-﻿import header,ut;
+﻿import header,ut,dops;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -11,7 +11,13 @@
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 // #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
-Header.proc_postHeaderBuilds.relatives; 
+
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='BASE BUILD:RELATHHID';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+sequential(dlog,Header.proc_postHeaderBuilds.relatives);
+
 // XADL2 and re-ADL external sources must have completed successfuly
 // in previous step before relatives build starts.
 // This is a disk space hog.  Some self joins are broken into pieces

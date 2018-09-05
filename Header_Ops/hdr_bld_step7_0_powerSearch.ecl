@@ -1,4 +1,4 @@
-﻿import ut, header;
+﻿import ut, header,dops;
 
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
@@ -11,7 +11,13 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
-Header.proc_postHeaderBuilds.booleanSrch;
+
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='KEY BUILD:BOOLEAN';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,Header.proc_postHeaderBuilds.booleanSrch);
 // builds Power Search Boolean keys.
 // This is a disk space hog.  While it may be run as soon as
 // a new header base file is ready, it is recomende to wait

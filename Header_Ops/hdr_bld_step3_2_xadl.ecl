@@ -1,4 +1,4 @@
-﻿import header,ut;
+﻿import header,ut,dops;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -11,7 +11,13 @@
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
-Header.proc_postHeaderBuilds.XADLkeys;
+
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='BASE BUILD:XADL';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,Header.proc_postHeaderBuilds.XADLkeys);
 // builds a) XADL2 keys b)re-ADL external sources c)XADL1 base files.
 // a and b must have completed successfuly before
 // relatives may start.

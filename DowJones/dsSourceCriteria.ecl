@@ -1656,5 +1656,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/1138 ISIL (Da\'esh) and Al-Qaida List','1642'},
 {'Jersey Proscribed Terrorist Organizations','1643'},
 {'National Stock Exchange (NSE) India Defaulted Members','1644'},
-{'National Stock Exchange (NSE) India Expelled Members','1645'}
+{'National Stock Exchange (NSE) India Expelled Members','1645'},
+{'EC 2018/1204 ISIL (Da\'esh) and Al-Qaida List','1646'},
+{'Financial Markets Authority of New Zealand Warnings and Alerts','1647'}
 ],r);

@@ -1,4 +1,4 @@
-﻿import header, ut;
+﻿import header, ut,dops;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -14,7 +14,12 @@
 operatorEmailList :=  Header.email_list.BocaDevelopersEx;
 extraNotifyEmailList := '';
 
-Header.proc_Header(operatorEmailList,extraNotifyEmailList).STEP2;
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='BASE BUILD:SYNCROLLUP';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,Header.proc_Header(operatorEmailList,extraNotifyEmailList).STEP2);
 // syncs header_raw to LAB LexId. Outputs header_raw_syncd and final header base file.
 // Start it after receiving confirmation that iHeader linking has completed
 // and a new LAB pairs file is available for use in Boca.

@@ -1,4 +1,4 @@
-﻿IMPORT header_avb, header, _control;
+﻿IMPORT header_avb, header, _control,dops;
 
 EXPORT run_stats(boolean incremental=false, string versionBuild,string operatorEmailList) := FUNCTION
 
@@ -44,7 +44,13 @@ END;
 
 boolean incremental:=false;
 operatorEmailList:='gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com';
-run_stats(incremental,header.version_build,operatorEmailList);
+
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='STATS:INGEST';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,run_stats(incremental,header.version_build,operatorEmailList));
 
 // run on p_svc_person_header: Header_AVB.Stat is sandboxed
 // run on thor (eg 44) 

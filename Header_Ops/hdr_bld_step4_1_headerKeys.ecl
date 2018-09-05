@@ -1,4 +1,4 @@
-﻿import ut,header;
+﻿import ut,header,dops;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -10,8 +10,14 @@
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
-#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
-Header.proc_postHeaderBuilds.headerKeys;
+#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com');
+
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='KEY BUILD:nFCRA';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,Header.proc_postHeaderBuilds.headerKeys);
 //  Builds file_header_building and all header keys including
 // Relatives and XADL1.  It moves all except source keys to _QA
 // superfiles. It also builds and desprays DISTRIX Hash

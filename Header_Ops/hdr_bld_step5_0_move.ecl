@@ -1,4 +1,4 @@
-﻿import ut,header;
+﻿import ut,header,dops;
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -13,7 +13,12 @@
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 // DO NOT RUN BEFORE A PENDING INCREMENTAL KEY UPDATE (RUN THAT FIRST)
 
-Header.proc_postHeaderBuilds.finalize;
+build_version:= header.version_build;
+dops_datasetname:='PersonHeaderKeys';
+build_component:='KEY BUILD:MOVE';
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+
+sequential(dlog,Header.proc_postHeaderBuilds.finalize);
 //  *** ENSURE THAT QH IS NOT -IN PROCESS- BEFORE EXCECUTING ****
 // Moves header_raw to _PROD and source keys to _QA superfiles.
 // This is done manually to avoid collisions with Quick Header(QH).

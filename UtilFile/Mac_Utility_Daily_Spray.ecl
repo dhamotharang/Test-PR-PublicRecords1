@@ -1,4 +1,4 @@
-/*2015-05-29T23:55:02Z (Wendy Ma_prod)
+﻿/*2015-05-29T23:55:02Z (Wendy Ma_prod)
 skip adding daily canadian file to the superfile if it is empty
 */
 import RoxieKeybuild,misc2,idl_header,header,Orbit3;
@@ -18,10 +18,6 @@ macro
 	#uniquename(clean_phone)
 	#uniquename(baseout)
   #uniquename(ignore_compare)
-	#uniquename(daily_canadian)
-  #uniquename(daily_canadian_clean)
-  #uniquename(canadian_file)
-	#uniquename(canadian_cnt)
 
   #workunit('protect',true);
 	#workunit('priority','high');
@@ -35,33 +31,18 @@ macro
 	#if(utilfile.mod_newlayout.constant_usenewlayout)
 	%recordsize% := 466;
 	%spray_utils% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::eq_utils_new_'+filedate ,-1,,,true,true);
-	%daily_utils% := dataset('~thor_data400::in::eq_utils_new_'+filedate, UtilFile.layout_util.daily_in_new, flat);
+	%daily_utils% := dataset(data_services.foreign_prod + 'thor_data400::in::eq_utils_new_'+filedate, UtilFile.layout_util.daily_in_new, flat);
 	%daily_clean% := UtilFile.map_util_daily_new(%daily_utils%).util_daily_clean;
-	%daily_canadian% := UtilFile.map_util_daily_new(%daily_utils%).util_daily_canadian;
 	#else
 	%recordsize% := 470;
 	%spray_utils% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::eq_utils_raw_'+filedate ,-1,,,true,true);
 	%daily_utils% := dataset('~thor_data400::in::eq_utils_raw_'+filedate, UtilFile.layout_util.daily_in, flat);
 	 %daily_clean% := UtilFile.map_util_daily(%daily_utils%).util_daily_clean;
-	 %daily_canadian% := UtilFile.map_util_daily(%daily_utils%).util_daily_canadian;
 	#end
 	header.MAC_555_phones(%daily_clean%, work_phone, %daily_utils_clean_workphone%);
 	header.MAC_555_phones(%daily_utils_clean_workphone%, phone, %daily_utils_clean_phone0%);
     ut.mac_flipnames(%daily_utils_clean_phone0%,fname,mname,lname,%daily_utils_clean_phone%);
-	%clean_phone% := output(%daily_utils_clean_phone%,,'~thor_data400::in::eq_utils_cleanphone_'+filedate,__compressed__,overwrite);
-	%daily_canadian_clean% := output(%daily_canadian%,,'~thor_data400::in::eq_utils_canadian_'+filedate,__compressed__,overwrite);
-	//skip adding daily canadian file to the superfile if daily canadian file is empty
-%canadian_file% := dataset('~thor_data400::in::eq_utils_canadian_'+filedate, utilfile.Layout_Util.base, flat);
-%canadian_cnt% := count(%canadian_file%);
-	%super_utils% := sequential(
-	                if(utilfile.mod_newlayout.constant_usenewlayout,FileServices.AddSuperFile('~thor_data400::in::utility::full_daily_new', '~thor_data400::in::eq_utils_new_'+filedate),
-									output('switch to old layout'));
-									FileServices.AddSuperFile('~thor_data400::base::utility_file', '~thor_data400::in::eq_utils_cleanphone_'+filedate), 
-									FileServices.AddSuperFile('~thor_data400::in::utility::sprayed::daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate),
-								  if(%canadian_cnt% > 0, FileServices.AddSuperFile('~thor_data400::base::utility_canadian_file', '~thor_data400::in::eq_utils_canadian_'+filedate), output('canadian file empty')),
-									FileServices.AddSuperFile('~thor_data400::in::utility::full_daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate)
-								); 
-
+	
 	#uniquename(send_succ_msg)
 	#uniquename(send_fail_msg)
 
@@ -70,8 +51,18 @@ macro
 
 	//Add DID to daily file then move into did superfile for keys
 	#uniquename(did_daily)
-	%did_daily% := output(UtilFile.Daily_with_did,,'~thor_data400::in::utility::'+filedate+'::daily_did',overwrite, __Compressed__);
-	
+	%did_daily% := sequential(output(UtilFile.Daily_with_did(%daily_utils_clean_phone%).base,,'~thor_data400::in::eq_utils_cleanphone_'+filedate,overwrite, __Compressed__),
+
+	output(UtilFile.Daily_with_did(%daily_utils_clean_phone%).did,,'~thor_data400::in::utility::'+filedate+'::daily_did',overwrite, __Compressed__));
+	 
+	%super_utils% := sequential(
+	                if(utilfile.mod_newlayout.constant_usenewlayout,FileServices.AddSuperFile('~thor_data400::in::utility::full_daily_new', '~thor_data400::in::eq_utils_new_'+filedate),
+									output('switch to old layout'));
+								  FileServices.AddSuperFile('~thor_data400::base::utility_file', '~thor_data400::in::eq_utils_cleanphone_'+filedate), 
+									FileServices.AddSuperFile('~thor_data400::in::utility::sprayed::daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate),
+									FileServices.AddSuperFile('~thor_data400::in::utility::full_daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate)
+								); 
+
 	#uniquename(add_daily)
 	%add_daily% := fileservices.addsuperfile('~thor_data400::in::utility::daily_did','~thor_data400::in::utility::'+filedate+'::daily_did');
 	#uniquename(clear_daily)
@@ -168,15 +159,16 @@ macro
 	%orbit_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY'
 											,Orbit3.proc_Orbit3_CreateBuild ( 'FCRA_Utility',filedate,'F')
 											,output('No Orbit Entries Needed for weekend builds'));
-
- sequential(%spray_utils%, %clean_phone%, %daily_canadian_clean%, %super_utils%, %did_daily%,
  /*Scrubs Alerts and Reports*/					
+
+
+ sequential(%spray_utils%, %did_daily%,%super_utils%,
 %util_didScrubsReport%,
 					%out_daily_samples_util_type_1%,%out_daily_samples_util_type_2%,%out_daily_samples_util_type_3%,
 					%add_daily%, %clear_daily%, %run_redid%, %run_daily_redid%, %util_headerVer_update%,%build_phonetype%,
           %build_util_keys%, %build_util_bus_base%, %build_util_bus_keys%, %accept_keys%, %keys_relationship%,
-		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%, %util_daily_stats%, %updatedops%, %updatefcradops%,
-			%orbit_non_fcra%, %orbit_fcra%)
+		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%, %util_daily_stats%/*, %updatedops%, %updatefcradops%,
+			%orbit_non_fcra%, %orbit_fcra%*/)
 	 : success(%send_succ_msg%),
 		 failure(%send_fail_msg%); 
 

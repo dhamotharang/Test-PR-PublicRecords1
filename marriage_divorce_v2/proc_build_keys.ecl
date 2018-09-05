@@ -1,4 +1,4 @@
-﻿import roxiekeybuild,autokey,doxie,marriage_divorce_v2, DOPSGrowthCheck, dops;
+﻿import roxiekeybuild,autokey,doxie,marriage_divorce_v2, DOPSGrowthCheck, dops, strata;
 
 export proc_build_keys(string filedate) := function
 
@@ -38,17 +38,6 @@ Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::did',       'Q',mv_ma
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::id_main',   'Q',mv_mar_div_main_key_qa_fcra);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::id_search', 'Q',mv_mar_div_search_key_qa_fcra);
 
-build_keys := sequential(											
-													parallel(mar_div_did_key, mar_div_filing_key,	mar_div_main_key,	mar_div_search_key),
-													parallel(mv_mar_div_did_key,	mv_mar_div_filing_key,	mv_mar_div_main_key,	mv_mar_div_search_key),
-													parallel(mar_div_did_key_fcra,	mar_div_main_key_fcra,	 mar_div_search_key_fcra),
-													parallel(mv_mar_div_did_key_fcra,	mv_mar_div_main_key_fcra,	mv_mar_div_search_key_fcra),
-													parallel(mv_mar_div_did_key_qa,	mv_mar_div_filing_key_qa,	mv_mar_div_main_key_qa,	mv_mar_div_search_key_qa),
-													parallel(mv_mar_div_did_key_qa_fcra,	mv_mar_div_main_key_qa_fcra,	mv_mar_div_search_key_qa_fcra)
-													);
-
-build_autokeys := marriage_divorce_v2.proc_build_autokeys(filedate);
-
 GetDops := dops.GetDeployedDatasets('P', 'B', 'F');
 OnlyMDV2:=GetDops(datasetname='FCRA_MDV2Keys');
 
@@ -69,7 +58,28 @@ DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::mar_div::base',  '~thor_d
 DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::mar_div::search',  '~thor_data400::base::mar_div::search_father',  'FCRA_MDV2Keys',  'key_MDV2_search_FCRA',  'marriage_divorce_v2.layout_mar_div_search',  'persistent_record_id',  Persistent_Search_ID_MDV2,  Persistent_Search_ID_MDV2,  filedate,  father_filedate,true,  false)
 );
 
+// DF-21428,DF-21429 - Show counts of blanked out fields in thor_data400::key::mar_div::fcra::qa::id_main and thor_data400::key::mar_div::fcra::qa::id_search
+cnt_mdv2_id_main_fcra := OUTPUT(strata.macf_pops(marriage_divorce_v2.key_mar_div_id_main(true),,,,,,FALSE,['divorce_docket_volume','divorce_filing_dt',
+																								 'filing_subtype','grounds_for_divorce','marriage_docket_volume','marriage_duration','marriage_duration_cd',
+																								 'marriage_filing_dt','number_of_children','place_of_marriage','type_of_ceremony']));
+cnt_mdv2_id_search_fcra := OUTPUT(strata.macf_pops(marriage_divorce_v2.key_mar_div_id_search(true),,,,,,FALSE,['age','birth_state','how_marriage_ended','last_marriage_end_dt',
+                                                 'party_county','previous_marital_status','race','times_married','title']));
+build_keys := sequential(											
+													parallel(mar_div_did_key, mar_div_filing_key,	mar_div_main_key,	mar_div_search_key),
+													parallel(mv_mar_div_did_key,	mv_mar_div_filing_key,	mv_mar_div_main_key,	mv_mar_div_search_key),
+													parallel(mar_div_did_key_fcra,	mar_div_main_key_fcra,	 mar_div_search_key_fcra),
+													parallel(mv_mar_div_did_key_fcra,	mv_mar_div_main_key_fcra,	mv_mar_div_search_key_fcra),
+													parallel(mv_mar_div_did_key_qa,	mv_mar_div_filing_key_qa,	mv_mar_div_main_key_qa,	mv_mar_div_search_key_qa),
+													parallel(mv_mar_div_did_key_qa_fcra,	mv_mar_div_main_key_qa_fcra,	mv_mar_div_search_key_qa_fcra),
+													parallel(cnt_mdv2_id_main_fcra,cnt_mdv2_id_search_fcra)
+													);
+
+build_autokeys := marriage_divorce_v2.proc_build_autokeys(filedate);
+
+
 return sequential(build_keys,build_autokeys,DeltaCommands);
 
 end;
+
+
 
