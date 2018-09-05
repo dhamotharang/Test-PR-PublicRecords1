@@ -33,6 +33,11 @@ export layout_best := record
 	integer4			total_records := 0;
   unsigned1			age := 0;
   string1				valid_ssn := '';
+	string1				glb_name := '';
+	string1				glb_address := '';
+	string1				glb_dob := '';
+	string1				glb_ssn := '';
+	string1				glb_phone := '';
   STRING10			ADL_ind := '';
 	UNSIGNED3			addr_dt_first_seen := 0;	
 end;
