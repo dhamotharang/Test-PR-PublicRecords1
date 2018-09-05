@@ -1,5 +1,5 @@
-IMPORT	Business_Credit_Scoring,	Business_Credit,	VersionControl,	ut,	STD,	RiskWise;
-EXPORT	proc_build_base(	STRING	pVersion	=	ut.GetDate,
+﻿IMPORT	Business_Credit_Scoring,	Business_Credit,	VersionControl,	STD,	RiskWise;
+EXPORT	proc_build_base(	STRING	pVersion	=	(STRING8)STD.Date.Today(),
 													INTEGER	pThreads	=	Constants().threads,
 													STRING	pRoxieIP	=	Constants().RoxieIP)	:=	MODULE
 

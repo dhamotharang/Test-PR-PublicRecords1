@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -37,7 +37,7 @@ EXPORT Functions := MODULE
 																		'AREI','AREL','AS&L','AUTH','BAMD','BINC','BYL','CAAB','CALP','CANC','CAMP','CBIN','CBNP','CFLP','CINC',
 																		'CLLC','CMA','CMAP','CMER','CNP','CNSL','COI','CON','CONV','COPA','CORR','CROA','DESG','DISS','DLLP','DLP',
 																		'DLPC','DNAM','DNLP','DOPA','EXPI','FDBA','FDCV','FLLP','FLP','FNAM','FNLP','HINC','ICOP','IMU','IMU1',
-																		'INC','INCC','IRDM','IS&L','JDIS','JREI','JUDO','L3C','L3CF','LIQD','LLCC','LLCD','LLCF','LLP','LLPC',
+																		'INC','INCC','IRDM','IS&L','JDIS','JREI','JUDO','L3C','L3CF','LIQD','LLCC','LLCD','LLCF','LLCN','LLP','LLPC',
 																		'MDIS','MERD','MERG','MISC','NADR','NAME','NBAN','NCCV','NCOP','NIAM','NIAP','NICA','NINC','NIRE','NOP',
 																		'PASP','PLSP','PREI','RCCA','RCCC','RCCN','RCCP','RCLL','RCPC','RCPL','RDEV','RDNF','REG','REN','RESR','REV',
 																		'REVK','REVL','REVR','RINC','RLLC','RNSE','RNST','RREG','RSCH','RSGC','RSGD','RSGN','RSLP','RVLB','SHRX','SSID',

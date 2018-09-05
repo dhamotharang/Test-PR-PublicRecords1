@@ -1653,5 +1653,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/1126 Burma/Myanmar List','1639'},
 {'EC 2018/1115 South Sudan List','1640'},
 {'EC 2018/1117 Burma/Myanmar List','1641'},
-{'EC 2018/1138 ISIL (Da\'esh) and Al-Qaida List','1642'}
+{'EC 2018/1138 ISIL (Da\'esh) and Al-Qaida List','1642'},
+{'Jersey Proscribed Terrorist Organizations','1643'},
+{'National Stock Exchange (NSE) India Defaulted Members','1644'},
+{'National Stock Exchange (NSE) India Expelled Members','1645'},
+{'EC 2018/1204 ISIL (Da\'esh) and Al-Qaida List','1646'},
+{'Financial Markets Authority of New Zealand Warnings and Alerts','1647'}
 ],r);
