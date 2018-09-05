@@ -187,11 +187,7 @@ EXPORT Rollup_Base(DATASET(Equifax_Business_Data.Layouts.Base) pDataset) := FUNC
 												,AT_CERTEXP8
 												,AT_CERTEXP9
 												,AT_CERTEXP10
-												,EFX_EXTRACT_DATE
-												,EFX_MERCHANT_ID
-												,EFX_PROJECT_ID
 												,EFX_FOREIGN
-                        ,Record_Update_Refresh_Date
 												,EFX_DATE_CREATED
 												,NormCompany_Type
 												,NormAddress_Type
@@ -397,11 +393,7 @@ EXPORT Rollup_Base(DATASET(Equifax_Business_Data.Layouts.Base) pDataset) := FUNC
 												,AT_CERTEXP8
 												,AT_CERTEXP9
 												,AT_CERTEXP10
-												,EFX_EXTRACT_DATE
-												,EFX_MERCHANT_ID
-												,EFX_PROJECT_ID
 												,EFX_FOREIGN
-                        ,Record_Update_Refresh_Date
 												,EFX_DATE_CREATED
 												,NormCompany_Type
 												,NormAddress_Type
