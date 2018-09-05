@@ -24,7 +24,8 @@ function
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
 		,Equifax_Business_Data.Promote().Inputfiles.using2used
 		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
-		,BIPStats(pversion) 
+		//for future use
+		// ,BIPStats(pversion) 
 		,Equifax_Business_Data.QA_Records()
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
