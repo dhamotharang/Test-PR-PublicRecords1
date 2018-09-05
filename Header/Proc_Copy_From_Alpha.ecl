@@ -95,9 +95,9 @@ EXPORT Copy := sequential(
 // ************************************************************************************************************************************
 
 EXPORT copyOthers := sequential(
-
-       nothor(apply(additional_keys    ,copy_files     (nm,src_name,'thor400_44','from_alpha2','thor_data400')  ))
+        nothor(apply(additional_keys    ,copy_files     (nm,src_name,'thor400_44','from_alpha2','thor_data400')  ))
        ,nothor(apply(additional_keys    ,update_supers  (ver(nm,'built', 'thor_data400')   , ver(nm,filedate))    ))
+       ,nothor(Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(filedate))
 );
 // ************************************************************************************************************************************
 ld :='thor_data400::key::insuranceheader_xlink::<<version>>::did';
