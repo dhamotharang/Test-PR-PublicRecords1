@@ -5318,6 +5318,23 @@ self.FP1705_1_0_reason4	:= if(model_environment in [1,3], left.FP1705_1_0_reason
 self.FP1705_1_0_reason5	:= if(model_environment in [1,3], left.FP1705_1_0_reason5	, '');
 self.FP1705_1_0_reason6	:= if(model_environment in [1,3], left.FP1705_1_0_reason6	, '');
 
+
+self.FP1710_1_0_score	:= if(model_environment in [1,3], left.FP1710_1_0_score	, '');
+self.FP1710_1_0_reason1	:= if(model_environment in [1,3], left.FP1710_1_0_reason1	, '');
+self.FP1710_1_0_reason2	:= if(model_environment in [1,3], left.FP1710_1_0_reason2	, '');
+self.FP1710_1_0_reason3	:= if(model_environment in [1,3], left.FP1710_1_0_reason3	, '');
+self.FP1710_1_0_reason4	:= if(model_environment in [1,3], left.FP1710_1_0_reason4	, '');
+self.FP1710_1_0_reason5	:= if(model_environment in [1,3], left.FP1710_1_0_reason5	, '');
+self.FP1710_1_0_reason6	:= if(model_environment in [1,3], left.FP1710_1_0_reason6	, '');
+
+self.FP1806_1_0_score	:= if(model_environment in [1,3], left.FP1806_1_0_score	, '');
+self.FP1806_1_0_reason1	:= if(model_environment in [1,3], left.FP1806_1_0_reason1	, '');
+self.FP1806_1_0_reason2	:= if(model_environment in [1,3], left.FP1806_1_0_reason2	, '');
+self.FP1806_1_0_reason3	:= if(model_environment in [1,3], left.FP1806_1_0_reason3	, '');
+self.FP1806_1_0_reason4	:= if(model_environment in [1,3], left.FP1806_1_0_reason4	, '');
+self.FP1806_1_0_reason5	:= if(model_environment in [1,3], left.FP1806_1_0_reason5	, '');
+self.FP1806_1_0_reason6	:= if(model_environment in [1,3], left.FP1806_1_0_reason6	, '');
+
 self.FP1802_1_0_score	:= if(model_environment in [1,3], left.FP1802_1_0_score	, '');
 self.FP1802_1_0_reason1	:= if(model_environment in [1,3], left.FP1802_1_0_reason1	, '');
 self.FP1802_1_0_reason2	:= if(model_environment in [1,3], left.FP1802_1_0_reason2	, '');
