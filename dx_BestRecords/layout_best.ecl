@@ -24,6 +24,7 @@ export layout_best := record
 	qstring5			zip := '';
 	qstring4			zip4 := '';
 	unsigned3			addr_dt_last_seen := 0;
+	UNSIGNED3			addr_dt_first_seen := 0;
 	qstring8			DOD := '';
 	qstring17			Prpty_deed_id := '';
 	qstring22			Vehicle_vehnum := '';
@@ -38,6 +39,5 @@ export layout_best := record
 	string1				glb_dob := '';
 	string1				glb_ssn := '';
 	string1				glb_phone := '';
-  STRING10			ADL_ind := '';
-	UNSIGNED3			addr_dt_first_seen := 0;	
+  STRING10			ADL_ind := '';	
 end;
