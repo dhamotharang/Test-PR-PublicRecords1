@@ -45,11 +45,11 @@ FUNCTION
 	                                                                          BIPV2.IDconstants.Fetch_Level_SELEID,0, 
                                                 	                          marketingInMod);
 
-  // We want to keep the best (executive when applicable) DID record with the latest 
+  // We want to keep the best (executive when applicable) 'current' DID record with the latest 
   // last seen date. For the executive_ind_order field, the lower the number, the 
   // higher up in the company the executive is.  
   dsMarketingContactsDedup := 
-  DEDUP(SORT(dsMarketingContactsAll((~inMod.execsOnly OR executive_ind) AND contact_did != 0),
+  DEDUP(SORT(dsMarketingContactsAll(current AND contact_did != 0 AND (executive_ind OR ~inMod.execsOnly)),
              #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did,-dt_last_seen_contact,-executive_ind,executive_ind_order), 
         #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did); 
 
@@ -131,7 +131,7 @@ FUNCTION
   
   dsAllRecsSorted := 
   SORT(dsAllRecs, 
-       acctno,customer_id,IF(business_decision_maker_flag = 'Y',0,1),executive_ind_order,did);
+       (UNSIGNED)acctno,customer_id,IF(business_decision_maker_flag = 'Y',0,1),executive_ind_order,did);
   
   dsFinalLayout := 
   PROJECT(dsAllRecsSorted,ExecAtHomeV2.Layouts.layoutEahOutput);
