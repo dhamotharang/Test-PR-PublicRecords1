@@ -2,10 +2,10 @@
 
 EXPORT Constants := module
 
-		EXPORT in_prefix_name					:= '~prte::in::sanctn::';
-		EXPORT base_prefix_name				:=' ~prte::base::sanctn::';
+		EXPORT in_prefix_name					:='~prte::in::sanctn::';
+		EXPORT base_prefix_name				:='~prte::base::sanctn::';
 		
-		EXPORT key_prefix 						:= data_services.foreign_prod +'prte::key::sanctn::';
+		EXPORT key_prefix 						:= '~prte::key::sanctn::';
 		EXPORT superkeyname 					:= key_prefix+'@version@::';
 		
 	
