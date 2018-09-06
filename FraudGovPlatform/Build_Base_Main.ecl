@@ -41,10 +41,12 @@ module
 																							 
 	Shared Anonimized := Anonymize(Combined);
 	
-	Shared Demo_Data	:= Files(pversion).Input.DemoData.Sprayed;
+	Shared Demo_Data_Anon	:= Files(pversion).Input.DemoData.Sprayed;
+	Shared Demo_Data_Orig	:= Files(pversion).Input.DemoData.Used;
 	
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Orig.New,Combined+Demo_Data,Build_Base_File);
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,Anonimized+Demo_Data,Build_Base_File_Anonymized);
+	
+	tools.mac_WriteFile(Filenames(pversion).Base.Main_Orig.New,Combined+Demo_Data_Orig,Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,Anonimized+Demo_Data_Anon,Build_Base_File_Anonymized);
 	
 
 	export full_build :=
