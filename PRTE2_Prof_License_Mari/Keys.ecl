@@ -1,71 +1,32 @@
-import doxie_files, doxie, ut, Data_Services, fcra,PRTE2_Prof_License_Mari, BIPV2,autokey,AutoKeyB2,AutoKeyI;
+﻿import doxie_files, doxie, ut, Data_Services, fcra,PRTE2_Prof_License_Mari, BIPV2,autokey,AutoKeyB2,AutoKeyI;
 
 EXPORT Keys := module
 
-shared layout_disciplinary	:= RECORD, MAXLENGTH(8000)
-Layouts.disp_action - [cust_name,bug_name];
-END;
-
-shared dsDisciplinary := project(files.base_disp_actions, layout_disciplinary);
-shared dsDetail 			:= project(files.base_indiv_detail, {files.base_indiv_detail} - [cust_name,bug_name]);
-shared dsRegulatory 	:= project(files.base_reg_actions, {files.base_reg_actions} - [cust_name,bug_name]);
-
-export key_disciplinary		:= index(dsDisciplinary,{INDIVIDUAL_NMLS_ID},{dsDisciplinary},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::disciplinary_actions');
-export key_indv_detail		:= index(dsDetail,{INDIVIDUAL_NMLS_ID}, {dsDetail}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::individual_detail');
-export key_regulatory			:= index(dsRegulatory, {NMLS_ID,AFFIL_TYPE_CD}, {dsRegulatory}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::regulatory_actions');
+export key_disciplinary		:= index(files.dsDisciplinary,{INDIVIDUAL_NMLS_ID},{files.dsDisciplinary},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::disciplinary_actions');
+export key_indv_detail		:= index(files.dsDetail,{INDIVIDUAL_NMLS_ID}, {files.dsDetail}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::individual_detail');
+export key_regulatory			:= index(files.dsRegulatory, {NMLS_ID,AFFIL_TYPE_CD}, {files.dsRegulatory}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::regulatory_actions');
 
 
-//--Main Base Keys--//
-shared dsSearch 			:= project(files.base_search, {files.base_search} - [enh_did_src,cust_name,bug_name]);
-export key_bdid      	:= index(dedup(dsSearch(bdid != 0),all),{unsigned6 bdid := (unsigned6)dsSearch.bdid}	,{dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::bdid');
-export key_cmc_slpk	 	:= index(dsSearch, {CMC_SLPK,AFFIL_TYPE_CD,STD_SOURCE_UPD}, {dsSearch},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::cmc_slpk');
-export key_did(boolean IsFCRA = false) := index(dedup(dsSearch(did != 0), all),		
-																											{unsigned6 s_did := (unsigned6)dsSearch.did},{dsSearch}, 
+export key_bdid      	:= index(dedup(files.dsSearch(bdid != 0),all),{unsigned6 bdid := (unsigned6)files.dsSearch.bdid}	,{files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::bdid');
+export key_cmc_slpk	 	:= index(files.dsSearch, {CMC_SLPK,AFFIL_TYPE_CD,STD_SOURCE_UPD}, {files.dsSearch},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::cmc_slpk');
+export key_did(boolean IsFCRA = false) := index(dedup(files.dsSearch(did != 0), all),		
+																											{unsigned6 s_did := (unsigned6)files.dsSearch.did},{files.dsSearch}, 
 																											Data_services.Data_location.Prefix('mari') + if(isFCRA, constants.KEY_PREFIX + 'fcra::', constants.KEY_PREFIX) + doxie.Version_SuperKey + '::did');
 
-export key_nmls_id		:= index(dsSearch(nmls_id != 0), {nmls_id}, {dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::nmls_id');
-export key_mari_payload   := index(dsSearch, {mari_rid}, {dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::rid');
+export key_nmls_id		:= index(files.dsSearch(nmls_id != 0), {nmls_id}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::nmls_id');
+export key_mari_payload   := index(files.dsSearch, {mari_rid}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::rid');
 
 //Create LICENSE KEY
-export key_license_nbr		:= index(dedup(dsSearch(cln_license_nbr != ''), record), {cln_license_nbr, license_state},{dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::license_nbr');
-
-
-// Create TAXID_SSN Key
-slim_ssn := record
-unsigned6 mari_rid;
-string2		tax_type;
-string9		ssn_taxid;
-unsigned8 MLTRECKEY;
-unsigned8 CMC_SLPK;
-unsigned8 PCMC_SLPK;
-end;
-
-				
-slim_ssn  	xformTIN(recordof(dsSearch) L, integer cnt) := transform
-self.tax_type					:= 	choose(cnt,L.tax_type_1,L.tax_type_2);
-self.ssn_taxid				:= 	choose(cnt,L.ssn_taxid_1,L.ssn_taxid_2);
-self.mari_rid					:= L.mari_rid;
-self.mltreckey				:= L.mltreckey;
-self.cmc_slpk					:= L.cmc_slpk;		
-self.pcmc_slpk				:= L.pcmc_slpk;
-self	:=L;
-end;
-shared NormTIN_SSN := normalize(dsSearch(ssn_taxid_1 != '' or ssn_taxid_2 != ''),2,xformTIN(LEFT,COUNTER));
-
-shared dsSSN4	:=	project(NormTIN_SSN(tax_type = 'S' and ssn_taxid != ''),TRANSFORM(recordof(NormTIN_SSN), 
-																																											self.tax_type := 'S4', 
-																																											self.ssn_taxid := if(left.ssn_taxid != '' and left.ssn_taxid[6..9] != '0000', left.ssn_taxid[6..9],'');
-																																											self := left));
-TIN_SSN_comb := NormTIN_SSN(tax_type != 'S') + dsSSN4;
-shared dsTaxidSsn_dedup := dedup(TIN_SSN_comb(tax_type != '' and ssn_taxid != ''), record,all);
-export key_ssn_taxid		:= index(dsTaxidSsn_dedup, {ssn_taxid, tax_type}, {dsTaxidSsn_dedup}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX +doxie.Version_SuperKey+'::ssn_taxid');
+export key_license_nbr		:= index(dedup(files.dsSearch(cln_license_nbr != ''), record), {cln_license_nbr, license_state},{files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::license_nbr');
+			
+export key_ssn_taxid		:= index(files.dsTaxidSsn_dedup, {ssn_taxid, tax_type}, {files.dsTaxidSsn_dedup}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX +doxie.Version_SuperKey+'::ssn_taxid');
 
 
 // DEFINE THE LINKIDS INDEX
 EXPORT key_Linkids := MODULE 
 shared superfile_name	:= constants.KEY_PREFIX +'qa::linkids';
 
-BIPV2.IDmacros.mac_IndexWithXLinkIDs(dsSearch, k, superfile_name)
+BIPV2.IDmacros.mac_IndexWithXLinkIDs(files.dsSearch, k, superfile_name)
 export Key := k;
 
 	//DEFINE THE INDEX ACCESS
@@ -89,12 +50,7 @@ END;
 //CREATE AUTOKEYS
 export autokeys(string filedate) := function
 
-tempSlimRec := record
-Layouts.SlimRec;
-integer cnt;
-end;
-
-tempSlimRec  	xformSearch(recordof(dsSearch) L, integer cnt) := transform
+layouts.tempSlimRec  	xformSearch(recordof(files.dsSearch) L, integer cnt) := transform
 self.cnt := cnt;
 self.mari_rid							:= L.mari_rid;
 self.create_dte						:= L.create_dte;                  
@@ -145,7 +101,7 @@ self.foreign_nmls_id			:= L.foreign_nmls_id;
 self.federal_regulator		:= L.federal_regulator;
 self	:=L;
 end;
-NormNameAddr := dedup(sort(normalize(dsSearch,4,xformSearch(LEFT,COUNTER)), cnt), EXCEPT cnt, all, local);
+NormNameAddr := dedup(sort(normalize(files.dsSearch,4,xformSearch(LEFT,COUNTER)), cnt), EXCEPT cnt, all, local);
 
 //filter out 2nd record if address is blank
 dsBusAddr := NormNameAddr(cnt = 1 or (cnt = 3 and company <> ''));
@@ -156,7 +112,6 @@ ak_dataset := dedup(comb_recs,record,all,local);
 ak_keyname	:= Constants.ak_keyname;
 ak_logical	:= Constants.ak_logical(filedate);
 ak_setSkip	:= Constants.set_skip;
-// ak_typeStr	:= Constants.ak_typeStr;
 
 autokey.mac_useFakeIDs (ak_dataset, 
 												ds_withFakeID_AKB,
@@ -240,14 +195,6 @@ retval := sequential(bld_auto_keys,moveToQA);
 return retval;														
 end;
 
-
-auto_payload := RECORD
-unsigned6 fakeid;
-Layouts.SlimRec
-END;
-
-
-shared dsPayload := dataset([],auto_payload);
-export key_autokey_payload := index(dsPayload,{fakeid}, {dsPayload},Data_Services.Data_location.Prefix('mari')+ Constants.autokeyname + doxie.Version_SuperKey + '::payload');
+export key_autokey_payload := index(files.dsPayload,{fakeid}, {files.dsPayload},Data_Services.Data_location.Prefix('mari')+ Constants.autokeyname + doxie.Version_SuperKey + '::payload');
 
 end;
