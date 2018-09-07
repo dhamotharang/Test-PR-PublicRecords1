@@ -380,7 +380,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	        xform_roll_addl(WorkPlace_Layouts.poe_didkey_slimmed L,
 					                dataset(WorkPlace_Layouts.poe_didkey_slimmed) RL) := transform
 		self.did                       := L.did;
-	  self.addl_wpl_bdid_1           := (string) L.bdid; 
+	  self.addl_wpl_bdid_1           := IF(L.bdid != 0,(string) L.bdid,'') ; 
     self.addl_wpl_comp_name_1      := L.company_name;
 		self.addl_wpl_comp_address1_1  := L.company_address;
     self.addl_wpl_comp_city_1      := L.company_city;
@@ -390,7 +390,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
     self.addl_wpl_phone2_1         := L.company_phone2; 
 		self.addl_wpl_status_1         := L.company_status; 
     self.addl_wpl_last_seen_date_1 := (string) L.dt_last_seen;
-	  self.addl_wpl_bdid_2           := (string) RL[2].bdid; 
+	  self.addl_wpl_bdid_2           := IF(RL[2].bdid != 0,(string) RL[2].bdid,''); 
     self.addl_wpl_comp_name_2      := RL[2].company_name;
 		self.addl_wpl_comp_address1_2  := RL[2].company_address;
     self.addl_wpl_comp_city_2      := RL[2].company_city;
@@ -400,7 +400,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
     self.addl_wpl_phone2_2         := RL[2].company_phone2;
     self.addl_wpl_status_2         := RL[2].company_status;
     self.addl_wpl_last_seen_date_2 := (string) RL[2].dt_last_seen;
-		self.addl_wpl_bdid_3           := (string) RL[3].bdid; 
+		self.addl_wpl_bdid_3           := IF(RL[3].bdid != 0,(string) RL[3].bdid,''); 
 		self.addl_wpl_comp_name_3      := RL[3].company_name;
 		self.addl_wpl_comp_address1_3  := RL[3].company_address;
 		self.addl_wpl_comp_city_3      := RL[3].company_city;
@@ -410,7 +410,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 		self.addl_wpl_phone2_3         := RL[3].company_phone2;
 		self.addl_wpl_status_3         := RL[3].company_status;
 		self.addl_wpl_last_seen_date_3 := (string) RL[3].dt_last_seen;
-		self.addl_wpl_bdid_4           := (string) RL[4].bdid; 
+		self.addl_wpl_bdid_4           := IF(RL[4].bdid != 0,(string) RL[4].bdid,''); 
 		self.addl_wpl_comp_name_4      := RL[4].company_name;
 		self.addl_wpl_comp_address1_4  := RL[4].company_address;
 		self.addl_wpl_comp_city_4      := RL[4].company_city;
@@ -554,10 +554,11 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
  
 	ds_detail_spouse_waddl := if(IncludeAddl, 
 																join(ds_detail_spouse,ds_addl_combined,
-														        left.did = (string) right.did,
+														        left.spouse_did = (string) right.did,
 																	transform(WorkPlace_Layouts.final,
 																		// assign hist fields from right
-																		self.did 															:= left.did,
+																		self.did 															:= LEFT.did,
+																		self.spouse_did            					  := LEFT.spouse_did,
 																		self.spouse_addl_wpl_bdid_1           := RIGHT.addl_wpl_bdid_1, 
 																		self.spouse_addl_wpl_comp_name_1      := RIGHT.addl_wpl_comp_name_1,
 																		self.spouse_addl_wpl_comp_address1_1  := RIGHT.addl_wpl_comp_address1_1,
@@ -594,8 +595,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																		self.spouse_addl_wpl_phone1_4         := RIGHT.addl_wpl_phone1_4, 
 																		self.spouse_addl_wpl_phone2_4         := RIGHT.addl_wpl_phone2_4,
 																		self.spouse_addl_wpl_status_4         := RIGHT.addl_wpl_status_4,
-																	  self := right,
-																		// assign rest of fields from left
+																	 	// assign rest of fields from left
 																		self := left),
 																	left outer, // keep all recs from left whether they have hist or not
 																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)),
@@ -617,7 +617,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 18.2 Now join the detail spouse recs back to the ds of all acctnos with one did to
 	//      re-attach the acctnos to the dids and so that the same output results are returned
 	//      if the same input criteria was entered more than once with different acctnos.
-  ds_detail_spos_wacctno := join(ds_detail_spouse,ds_acctnos_dids_good,
+  ds_detail_spos_wacctno := join(ds_detail_spouse_waddl,ds_acctnos_dids_good,
                                   left.did = (string) right.did,
 	                               transform(WorkPlace_Layouts.final,
                                    // take orig acctno from right
@@ -682,42 +682,42 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																 self.spouse_email_src1             := if(output_spouse, right.spouse_email_src1,''),
 																 self.spouse_email_src2             := if(output_spouse, right.spouse_email_src2,''),
 																 self.spouse_email_src3             := if(output_spouse, right.spouse_email_src3,''),
-																 self.spouse_addl_wpl_bdid_1           := IF(output_spouse, RIGHT.addl_wpl_bdid_1, ''),
-																 self.spouse_addl_wpl_comp_name_1      := IF(output_spouse, RIGHT.addl_wpl_comp_name_1, ''),
-																 self.spouse_addl_wpl_comp_address1_1  := IF(output_spouse, RIGHT.addl_wpl_comp_address1_1, ''),
-																 self.spouse_addl_wpl_comp_city_1      := IF(output_spouse, RIGHT.addl_wpl_comp_city_1, ''),
-																 self.spouse_addl_wpl_comp_state_1     := IF(output_spouse, RIGHT.addl_wpl_comp_state_1, ''),
-																 self.spouse_addl_wpl_comp_zip_1       := IF(output_spouse, RIGHT.addl_wpl_comp_zip_1, ''),
-																 self.spouse_addl_wpl_phone1_1         := IF(output_spouse, RIGHT.addl_wpl_phone1_1, ''), 
-																 self.spouse_addl_wpl_phone2_1         := IF(output_spouse, RIGHT.addl_wpl_phone2_1, ''),
-																 self.spouse_addl_wpl_status_1         := IF(output_spouse, RIGHT.addl_wpl_status_1, ''),
-																 self.spouse_addl_wpl_bdid_2           := IF(output_spouse, RIGHT.addl_wpl_bdid_2, ''),
-																 self.spouse_addl_wpl_comp_name_2      := IF(output_spouse, RIGHT.addl_wpl_comp_name_2, ''),
-																 self.spouse_addl_wpl_comp_address1_2  := IF(output_spouse, RIGHT.addl_wpl_comp_address1_2, ''),
-																 self.spouse_addl_wpl_comp_city_2      := IF(output_spouse, RIGHT.addl_wpl_comp_city_2, ''),
-																 self.spouse_addl_wpl_comp_state_2     := IF(output_spouse, RIGHT.addl_wpl_comp_state_2, ''),
-																 self.spouse_addl_wpl_comp_zip_2       := IF(output_spouse, RIGHT.addl_wpl_comp_zip_2, ''),
-																 self.spouse_addl_wpl_phone1_2         := IF(output_spouse, RIGHT.addl_wpl_phone1_2, ''), 
-																 self.spouse_addl_wpl_phone2_2         := IF(output_spouse, RIGHT.addl_wpl_phone2_2, ''),
-																 self.spouse_addl_wpl_status_2         := IF(output_spouse, RIGHT.addl_wpl_status_2, ''),
-																 self.spouse_addl_wpl_bdid_3           := IF(output_spouse, RIGHT.addl_wpl_bdid_3, ''), 
-																 self.spouse_addl_wpl_comp_name_3      := IF(output_spouse, RIGHT.addl_wpl_comp_name_3, ''),
-																 self.spouse_addl_wpl_comp_address1_3  := IF(output_spouse, RIGHT.addl_wpl_comp_address1_3, ''),
-																 self.spouse_addl_wpl_comp_city_3      := IF(output_spouse, RIGHT.addl_wpl_comp_city_3, ''),
-																 self.spouse_addl_wpl_comp_state_3     := IF(output_spouse, RIGHT.addl_wpl_comp_state_3, ''),
-																 self.spouse_addl_wpl_comp_zip_3       := IF(output_spouse, RIGHT.addl_wpl_comp_zip_3, ''),
-																 self.spouse_addl_wpl_phone1_3         := IF(output_spouse, RIGHT.addl_wpl_phone1_3, ''), 
-																 self.spouse_addl_wpl_phone2_3         := IF(output_spouse, RIGHT.addl_wpl_phone2_3, ''),
-																 self.spouse_addl_wpl_status_3         := IF(output_spouse, RIGHT.addl_wpl_status_3, ''),
-																 self.spouse_addl_wpl_bdid_4           := IF(output_spouse, RIGHT.addl_wpl_bdid_4, ''), 
-																 self.spouse_addl_wpl_comp_name_4      := IF(output_spouse, RIGHT.addl_wpl_comp_name_4, ''),
-																 self.spouse_addl_wpl_comp_address1_4  := IF(output_spouse, RIGHT.addl_wpl_comp_address1_4, ''),
-																 self.spouse_addl_wpl_comp_city_4      := IF(output_spouse, RIGHT.addl_wpl_comp_city_4, ''),
-																 self.spouse_addl_wpl_comp_state_4     := IF(output_spouse, RIGHT.addl_wpl_comp_state_4, ''),
-																 self.spouse_addl_wpl_comp_zip_4       := IF(output_spouse, RIGHT.addl_wpl_comp_zip_4, ''),
-																 self.spouse_addl_wpl_phone1_4         := IF(output_spouse, RIGHT.addl_wpl_phone1_4, ''), 
-																 self.spouse_addl_wpl_phone2_4         := IF(output_spouse, RIGHT.addl_wpl_phone2_4, ''),
-																 self.spouse_addl_wpl_status_4         := IF(output_spouse, RIGHT.addl_wpl_status_4, ''),
+																 self.spouse_addl_wpl_bdid_1           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_1, ''),
+																 self.spouse_addl_wpl_comp_name_1      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_1, ''),
+																 self.spouse_addl_wpl_comp_address1_1  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_1, ''),
+																 self.spouse_addl_wpl_comp_city_1      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_1, ''),
+																 self.spouse_addl_wpl_comp_state_1     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_1, ''),
+																 self.spouse_addl_wpl_comp_zip_1       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_1, ''),
+																 self.spouse_addl_wpl_phone1_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_1, ''), 
+																 self.spouse_addl_wpl_phone2_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_1, ''),
+																 self.spouse_addl_wpl_status_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_1, ''),
+																 self.spouse_addl_wpl_bdid_2           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_2, ''),
+																 self.spouse_addl_wpl_comp_name_2      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_2, ''),
+																 self.spouse_addl_wpl_comp_address1_2  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_2, ''),
+																 self.spouse_addl_wpl_comp_city_2      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_2, ''),
+																 self.spouse_addl_wpl_comp_state_2     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_2, ''),
+																 self.spouse_addl_wpl_comp_zip_2       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_2, ''),
+																 self.spouse_addl_wpl_phone1_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_2, ''), 
+																 self.spouse_addl_wpl_phone2_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_2, ''),
+																 self.spouse_addl_wpl_status_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_2, ''),
+																 self.spouse_addl_wpl_bdid_3           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_3, ''), 
+																 self.spouse_addl_wpl_comp_name_3      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_3, ''),
+																 self.spouse_addl_wpl_comp_address1_3  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_3, ''),
+																 self.spouse_addl_wpl_comp_city_3      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_3, ''),
+																 self.spouse_addl_wpl_comp_state_3     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_3, ''),
+																 self.spouse_addl_wpl_comp_zip_3       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_3, ''),
+																 self.spouse_addl_wpl_phone1_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_3, ''), 
+																 self.spouse_addl_wpl_phone2_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_3, ''),
+																 self.spouse_addl_wpl_status_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_3, ''),
+																 self.spouse_addl_wpl_bdid_4           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_4, ''), 
+																 self.spouse_addl_wpl_comp_name_4      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_4, ''),
+																 self.spouse_addl_wpl_comp_address1_4  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_4, ''),
+																 self.spouse_addl_wpl_comp_city_4      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_4, ''),
+																 self.spouse_addl_wpl_comp_state_4     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_4, ''),
+																 self.spouse_addl_wpl_comp_zip_4       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_4, ''),
+																 self.spouse_addl_wpl_phone1_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_4, ''), 
+																 self.spouse_addl_wpl_phone2_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_4, ''),
+																 self.spouse_addl_wpl_status_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_4, ''),
 																 
                                  // handle the case where there is only spouse (right) 
 																 // and no subject (left) data.
