@@ -194,14 +194,12 @@ EXPORT FUNCTIONS := MODULE
      
     dsSearchLexID := dsPCValidSearchRecs((unsigned)LexID > 0); //filter out from the search dataset all search records that do not have LexID.
 
-    PCL.Layout_PCResponseRec map_pcr_fields(PCL.Layout_PCRequestStatus le, FCRA.Key_Override_PCR_DID rt) := transform
+    PCL.Layout_PCResponseRec map_pcr_fields(FCRA.Key_Override_PCR_DID rt, string recordType) := transform
       self.LexID := (string)rt.s_did;
       self.RecID1 := '';
       self.DataGroup := PersonContext.Constants.DataGroups.PERSON;
-      self.RecordType := map( (unsigned)rt.security_freeze=1 => PersonContext.Constants.RecordTypes.SF,
-                              (unsigned)rt.security_alert=1 => PersonContext.Constants.RecordTypes.FA,
-                              (unsigned)rt.id_theft_flag=1 => PersonContext.Constants.RecordTypes.IT,
-                              ''  );
+      self.RecordType := recordType;
+			self.Content := if(recordtype=PersonContext.Constants.RecordTypes.SF, PersonContext.Constants.security_freeze_default_codes, '');  
       date_created := rt.date_created;
       self.DateAdded := date_created[1..4] + '-' + date_created[5..6] + '-' + date_created[7..8] + ' 00:00:00';
       self.SourceSystem := 'PCR';  // I'd rather have this say PCR instead of DOST for these initial records since DOST system is going away
@@ -209,28 +207,41 @@ EXPORT FUNCTIONS := MODULE
       SELF  := rt,
       SELF  := [];
     end;
-
-    //perform a join only on LexID key to get all matches that match the search LexID. 
-		dsResultLexID_roxie := JOIN(dsSearchLexID, FCRA.Key_Override_PCR_DID,
+    
+    // first search the PCR key to get all records for a DID, transforming into the layout of the key
+		pcr_results_roxie := JOIN(dsSearchLexID, FCRA.Key_Override_PCR_DID,
 		                      KEYED((unsigned)LEFT.LexID = RIGHT.s_did) and
                           (unsigned)right.date_created<>0 and  // don't allow records that don't have date created populated
                             ((unsigned)right.security_freeze=1 or (unsigned)right.security_alert=1 or (unsigned)right.id_theft_flag=1),  // we only care about the records for these 3 types
-										      map_pcr_fields(left, right),
+										      transform(recordof(FCRA.Key_Override_PCR_DID), self := right),
                           KEEP(iesp.Constants.PersonContext.MAX_RECORDS),atmost(iesp.Constants.PersonContext.MAX_RECORDS));
 
-		dsResultLexID_thor := JOIN(DISTRIBUTE(dsSearchLexID, HASH64((unsigned)LexID)), 
+		pcr_results_thor := JOIN(DISTRIBUTE(dsSearchLexID, HASH64((unsigned)LexID)), 
 													DISTRIBUTE(PULL(FCRA.Key_Override_PCR_DID), HASH64(s_did)),
 		                      ((unsigned)LEFT.LexID = RIGHT.s_did) and
                           (unsigned)right.date_created<>0 and  // don't allow records that don't have date created populated
                             ((unsigned)right.security_freeze=1 or (unsigned)right.security_alert=1 or (unsigned)right.id_theft_flag=1),  // we only care about the records for these 3 types
-										      map_pcr_fields(left, right),
+										      transform(recordof(FCRA.Key_Override_PCR_DID), self := right),
                           KEEP(iesp.Constants.PersonContext.MAX_RECORDS),atmost(iesp.Constants.PersonContext.MAX_RECORDS), LOCAL);
-			
-		#IF(onThor)
-      dsResultLexID := dsResultLexID_thor;
+    
+    #IF(onThor)
+      pcr_results := pcr_results_thor;
     #ELSE
-      dsResultLexID := dsResultLexID_roxie;
+      pcr_results := pcr_results_roxie;
     #END
+    
+    // after we have all of those records in memory, join dsSearchLexID to those results...
+    // ... once for each different record type so that if a person has security freeze and id theft alert, they will get 2 records instead of just 1                     
+		security_freezes := project(pcr_results((unsigned)security_freeze=1),  // we only care about security freezes on this join
+										      map_pcr_fields(left, PersonContext.Constants.RecordTypes.SF));
+		
+    security_alerts := project(pcr_results((unsigned)security_alert=1),  // we only care about the security alerts on this join
+										      map_pcr_fields(left, PersonContext.Constants.RecordTypes.FA));
+                          
+    id_thefts := project(pcr_results((unsigned)id_theft_flag=1),  // we only care about the id_thefts on this join
+										      map_pcr_fields(left, PersonContext.Constants.RecordTypes.IT));
+                          
+		dsResultLexID := security_freezes + security_alerts + id_thefts;
     
     RETURN dsResultLexID;
   END;
