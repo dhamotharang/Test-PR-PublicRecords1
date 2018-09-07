@@ -33,10 +33,10 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			return soapcall_out;
 		END;
 
-		SHARED GetRecentTimelineDetails(DATASET(Layout_LogDeltabase) ds_delta_records) := FUNCTION
+		SHARED GetRecentTimelineDetails(DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_delta_records) := FUNCTION
 
-			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( Layout_LogDeltabase L) := TRANSFORM
-				
+			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+				/*
 				SELF.IsRecentActivity := TRUE;
 				SELF.FileType := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
 				SELF.GlobalCompanyId := (INTEGER)L.gc_id;
@@ -83,6 +83,52 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.DeviceId := L.device_id;
 				SELF.GeoLocation.Latitude := L.geo_lat;
 				SELF.GeoLocation.Longitude := L.geo_long;
+				*/
+				
+				SELF.IsRecentActivity := TRUE;
+				SELF.FileType := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
+				SELF.GlobalCompanyId := (INTEGER)L.Customer_ID;
+				SELF.TransactionId := (STRING)L.Record_ID;
+				SELF.HouseHoldId := L.Investigation_Referral_Case_ID;
+				SELF.CustomerPersonId := L.Customer_Person_ID;
+				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
+				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
+				SELF.EventDate.Day := (INTEGER)(L.Event_Date[7..8]);
+				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
+				SELF.ReportedBy := L.Type_of_Referral;
+				SELF.ActivityReason := L.Referral_reason;
+				SELF.UniqueId := (STRING)L.UID;
+				SELF.Name.Full := L.raw_Full_name;
+				SELF.Name.First := L.raw_first_name;
+				SELF.Name.Middle := L.raw_middle_name;
+				SELF.Name.Last := L.raw_last_name;
+				SELF.Name.Suffix := L.raw_orig_suffix;
+				SELF.Name.Prefix := L.raw_title;
+				SELF.SSN := L.ssn;
+				SELF.DOB.Year := IF(L.dob <> '', STD.Date.Year((INTEGER)L.dob), 0);
+				SELF.DOB.Month := IF(L.dob <> '', STD.Date.Month((INTEGER)L.dob), 0);
+				SELF.DOB.Day := IF(L.dob <> '', STD.Date.Day((INTEGER)L.dob), 0);
+				SELF.PhysicalAddress.StreetAddress1 := L.Street_1;		
+				SELF.PhysicalAddress.City := L.City;
+				SELF.PhysicalAddress.State := L.State;
+				SELF.PhysicalAddress.Zip5 := L.Zip;
+				SELF.MailingAddress.StreetAddress1 := L.additional_address.Street_1;
+				SELF.MailingAddress.City := L.additional_address.City;
+				SELF.MailingAddress.State := L.additional_address.State;
+				SELF.MailingAddress.Zip5 := L.additional_address.Zip;
+				SELF.Phones := IF(L.phone_number <> '',
+													ROW({FraudGovPlatform_Services.Constants.PHONE_TYPE.PHONE_TYPE_HOME, L.phone_number,''}, iesp.fraudgovreport.t_FraudGovPhoneInfo),
+													ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
+													);
+				SELF.EmailAddress := L.email_address;
+				SELF.DriversLicense.DriversLicenseNumber := L.Drivers_License;
+				SELF.DriversLicense.DriversLicenseState := L.Drivers_License_State;
+				SELF.BankInformation1.BankAccountNumber := L.bank_account_number_1;
+				SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number_1;
+				SELF.IpAddress := L.ip_address;
+				SELF.DeviceId := L.device_id;
+				SELF.GeoLocation.Latitude := regexfind('(.*),(.*)$',L.GPS_coordinates,1);
+				SELF.GeoLocation.Longitude := regexfind('(.*),(.*)$',L.GPS_coordinates,2);
 				SELF := [];
 			END;
 
@@ -93,7 +139,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 	
 	SHARED DeltabaseMBSFilter(DATASET(Layout_LogDeltabase) deltabase_recs) := FUNCTION
 			
-			Layout_Deltabase_for_mbs := RECORD
+			/*Layout_Deltabase_for_mbs := RECORD
 				UNSIGNED product_code;
 				UNSIGNED ind_type_id;
 				UNSIGNED fdn_file_info_id;
@@ -102,6 +148,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				Layout_LogDeltabase deltadata;
 			END;			
 			
+			//Not necessary anymore, needs to be removed
 			Layout_Deltabase_for_mbs xForm_AddProductCode(Layout_LogDeltabase L) := TRANSFORM
 				SELF.product_code := batch_params.ProductCode;
 				SELF.ind_type_id := batch_params.IndustryType;
@@ -109,48 +156,55 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF := [];
 			END;
 			
-			delta_w_filter := PROJECT(deltabase_recs, xForm_AddProductCode(LEFT));
+			delta_w_filter := PROJECT(deltabase_recs, xForm_AddProductCode(LEFT));*/
 			
 			mbs_delta_key := FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
 			
 			//Transform into input format of FraudShared_Services.FilterThruMBS function
-			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(Layout_Deltabase_for_mbs L, 
+			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(deltabase_recs L, 
 																																			mbs_delta_key R) := TRANSFORM
-				SELF.Record_ID := (INTEGER)L.deltadata.cust_transaction_id;
-				SELF.Customer_ID := L.deltadata.gc_id;
-				SELF.Event_Date := L.deltadata.date_added[1..4] + L.deltadata.date_added[6..7] + L.deltadata.date_added[9..10];
-				SELF.Investigation_Referral_Case_ID := L.deltadata.case_id;
-				SELF.Customer_Person_ID := L.deltadata.client_uid;
-				SELF.SSN := L.deltadata.SSN;
-				SELF.DOB := L.deltadata.DOB;
-				SELF.UID := L.deltadata.lex_id;
-				SELF.raw_Full_name := L.deltadata.name_full;
-				SELF.raw_title := L.deltadata.name_prefix;
-				SELF.raw_first_name := L.deltadata.name_first;
-				SELF.raw_middle_name := L.deltadata.name_middle;
-				SELF.raw_last_name := L.deltadata.name_last;
-				SELF.raw_orig_suffix := L.deltadata.name_suffix;
-				SELF.Street_1 := L.deltadata.physical_address;
-				SELF.City := L.deltadata.physical_city;
-				SELF.State := L.deltadata.physical_state;
-				SELF.Zip := L.deltadata.physical_zip;
-				SELF.phone_number := L.deltadata.phone;
-				SELF.UltID := L.deltadata.UltID;
-				SELF.OrgID := L.deltadata.OrgId;
-				SELF.SeleID := L.deltadata.SeleID;
-				SELF.tin := L.deltadata.tin;
-				SELF.email_address := L.deltadata.email_address;
-				SELF.Appended_Provider_ID := L.deltadata.appendedProviderID;
-				SELF.lnpid := L.deltadata.lnpid;
-				SELF.npi := L.deltadata.NPI;
-				SELF.IP_Address := L.deltadata.ip_address;
-				SELF.Device_ID := L.deltadata.Device_ID;
-				SELF.Professional_ID := L.deltadata.professional_id;
-				SELF.bank_routing_number_1 := L.deltadata.bank_routing_number;
-				SELF.bank_account_number_1 := L.deltadata.bank_account_number;
-				SELF.Drivers_License := L.deltadata.dl_number;
-				SELF.Drivers_License_State := L.deltadata.dl_state;
-				SELF.GPS_coordinates := L.deltadata.geo_lat + ',' + L.deltadata.geo_long;
+				SELF.Record_ID := (INTEGER)L.cust_transaction_id;
+				SELF.Customer_ID := L.gc_id;
+				SELF.Event_Date := L.date_added[1..4] + L.date_added[6..7] + L.date_added[9..10];
+				SELF.Investigation_Referral_Case_ID := L.case_id;
+				SELF.Customer_Person_ID := L.client_uid;
+				SELF.Type_of_Referral := L.inquiry_source;
+				SELF.Referral_Reason := L.inquiry_reason;
+				SELF.SSN := L.SSN;
+				SELF.DOB := L.DOB;
+				SELF.UID := L.lex_id;
+				SELF.raw_Full_name := L.name_full;
+				SELF.raw_title := L.name_prefix;
+				SELF.raw_first_name := L.name_first;
+				SELF.raw_middle_name := L.name_middle;
+				SELF.raw_last_name := L.name_last;
+				SELF.raw_orig_suffix := L.name_suffix;
+				SELF.Street_1 := L.physical_address;
+				SELF.City := L.physical_city;
+				SELF.State := L.physical_state;
+				SELF.Zip := L.physical_zip;
+				SELF.phone_number := L.phone;
+				SELF.UltID := L.UltID;
+				SELF.OrgID := L.OrgId;
+				SELF.SeleID := L.SeleID;
+				SELF.tin := L.tin;
+				SELF.email_address := L.email_address;
+				SELF.Appended_Provider_ID := L.appendedProviderID;
+				SELF.lnpid := L.lnpid;
+				SELF.npi := L.NPI;
+				SELF.IP_Address := L.ip_address;
+				SELF.Device_ID := L.Device_ID;
+				SELF.Professional_ID := L.professional_id;
+				SELF.bank_routing_number_1 := L.bank_routing_number;
+				SELF.bank_account_number_1 := L.bank_account_number;
+				SELF.Drivers_License := L.dl_number;
+				SELF.Drivers_License_State := L.dl_state;
+				SELF.GPS_coordinates := L.geo_lat + ',' + L.geo_long;
+				//mailing address
+				SELF.additional_address.Street_1 := L.mailing_address;
+				SELF.additional_address.City := L.mailing_city;
+				SELF.additional_address.State := L.mailing_state;
+				SELF.additional_address.Zip := L.mailing_zip;
 				
 				SELF.classification_Permissible_use_access := R;
 
@@ -159,9 +213,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			
 			//Get fdn permissible use access information (fdn file info id) from mbsdeltabase key for deltabase recs
 			//This is needed in order to run FraudShared_Services.FilterThruMBS to apply MBS sharing rules
-			delta_w_fdn_file_info := JOIN(delta_w_filter, mbs_delta_key,
-																	KEYED(LEFT.deltadata.gc_id = (STRING)RIGHT.gc_id) AND
-																				LEFT.deltadata.program_name = RIGHT.ind_type_description AND
+			delta_w_fdn_file_info := JOIN(deltabase_recs, mbs_delta_key,
+																	KEYED(LEFT.gc_id = (STRING)RIGHT.gc_id) AND
+																				LEFT.program_name = RIGHT.ind_type_description AND
 																				RIGHT.product_include = FraudShared_Services.Constants.PRODUCT_INCLUDE_CODE_ALL,
 																xform_create_mbs_in(LEFT,RIGHT),
 																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)
@@ -173,7 +227,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 																															DATASET([],iesp.frauddefensenetwork.t_FDNFileType),
 																															fraud_platform);
 																															
-			Layout_LogDeltabase xForm_PayloadToDelta(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			/*Layout_LogDeltabase xForm_PayloadToDelta(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
 				SELF.cust_transaction_id := (STRING)L.Record_ID;
 				SELF.gc_id := L.Customer_ID;
 				SELF.date_added := L.Event_Date;
@@ -213,14 +267,14 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF := [];
 			END;
 			
-			delta_mbs_filtered := PROJECT(payload_mbs_filtered,xForm_PayloadToDelta(LEFT));
+			delta_mbs_filtered := PROJECT(payload_mbs_filtered,xForm_PayloadToDelta(LEFT));*/
 																					
 			// output(deltabase_recs,named('deltabase_recs'));
 			// output(delta_w_fdn_file_info,named('delta_w_fdn_file_info'));
 			// output(payload_mbs_filtered,named('payload_mbs_filtered'));
-			// output(delta_mbs_filtered,named('delta_mbs_filtered'));
+			//output(payload_mbs_filtered,named('payload_mbs_filtered'));
 			
-			return delta_mbs_filtered;
+			return payload_mbs_filtered;
 	END;
 
 	EXPORT getDeltabaseReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) in_recs) := FUNCTION
@@ -324,7 +378,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			
 			deltabase_recs_norm := NORMALIZE(soapcall_out, LEFT.deltaFields, NormIt_report(RIGHT));	
 			db_records_filtered := DeltabaseMBSFilter(deltabase_recs_norm);
-			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered); 
+			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered);
+			
+			//output(ds_timeline_records,named('ds_timeline_records'));
 
 			return ds_timeline_records;
 	END;
