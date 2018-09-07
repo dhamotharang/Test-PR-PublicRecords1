@@ -1,5 +1,5 @@
 ﻿#workunit('name','DNM Monthly Build')
-import ut, DMA, _control, RoxieKeyBuild, Orbit3;
+import ut, DMA, _control, RoxieKeyBuild, Orbit3,Scrubs_DoNotMail;
 
 export proc_build_DNM(string sourceIP,string SourceFile,string fileDate,string groupName='thor400_44',string emailTarget=' ') :=
 function
@@ -64,6 +64,6 @@ function
 	orbit_update := Orbit3.proc_Orbit3_CreateBuild ('Do Not Mail',fileDate,'N');
 	
 	return sequential(sprayFile,addSuper,buildBase,buildKey,//updateVersion,buildClickdataFile, 
-	                                                                        qaRecs,Strata_Stats,qaEmail,orbit_update);
+	                                                                        qaRecs,Strata_Stats,qaEmail,Scrubs_DoNotMail.fnRunScrubs(fileDate,''), orbit_update);
 	
 end;
