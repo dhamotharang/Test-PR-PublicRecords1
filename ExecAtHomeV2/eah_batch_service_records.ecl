@@ -44,14 +44,17 @@ FUNCTION
   dsMarketingContactsAll := BIPV2_Build.key_contact_linkids.kFetchMarketing(dsMrktContactsLinkIdsLayout, 
 	                                                                          BIPV2.IDconstants.Fetch_Level_SELEID,0, 
                                                 	                          marketingInMod);
-
   // We want to keep the best (executive when applicable) 'current' DID record with the latest 
   // last seen date. For the executive_ind_order field, the lower the number, the 
-  // higher up in the company the executive is.  
+  // higher up in the company the executive is. 
+  // Jennifer wants to keep the record with the most information. Since we are keeping only
+  // current records; if a source/record does not contain the company title to rank by, 
+  // then those records will fall to the bottom.
   dsMarketingContactsDedup := 
   DEDUP(SORT(dsMarketingContactsAll(current AND contact_did != 0 AND (executive_ind OR ~inMod.execsOnly)),
-             #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did,-dt_last_seen_contact,-executive_ind,executive_ind_order), 
-        #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did); 
+             #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did,contact_job_title_derived = '',
+                     -dt_last_seen_contact,-executive_ind,executive_ind_order), 
+        #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did);
 
   // keep only max Employees per company for less processing
   dsMarketingContacts := 
