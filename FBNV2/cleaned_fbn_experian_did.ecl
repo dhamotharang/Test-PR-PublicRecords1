@@ -1,4 +1,4 @@
-
+﻿
 import  DID_Add, Business_Header_SS,Business_Header, ut,Header_Slimsort;
 
 matchSet := ['A','P'];
@@ -13,7 +13,7 @@ DID_Add.MAC_Match_Flex             // regular did macro
 		 75,                      //dids with a score below here will be dropped
 		 outDID				
 		)
-		export cleaned_fbn_experian_did  :=outDID :persist(cluster.cluster_out+'persist::FBNV2::CleanedFBN_Experian_did');
+		export cleaned_fbn_experian_did  :=outDID :persist(fbnv2.cluster.cluster_out+'persist::FBNV2::CleanedFBN_Experian_did');
 
 
 

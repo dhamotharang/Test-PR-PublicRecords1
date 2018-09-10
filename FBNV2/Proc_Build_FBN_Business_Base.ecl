@@ -13,17 +13,13 @@ dBusinessInputs :=
 														     trim(source,left,right) = 'Harris' => ungroup(Mapping_FBN_TX_Harris_Business),
 														     // trim(source,left,right) = 'NY' => ungroup(Mapping_FBN_NY_Business),
 																 trim(source,left,right) = 'Orange' => ungroup(Mapping_FBN_CA_Orange_Business),
-																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Business));
+																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Business),
+																 trim(source,left,right) = 'Experian' => ungroup(Mapping_FBN_Experian_Business));
 
-// previousBase := FBNV2.File_FBN_Business_Base_AID;
 Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
 	
 dBusinessBaseInputs :=  
                 ungroup(Mapping_FBN_BUSREG_Business)+	
-								//CP HIST data is quite old, perhaps this should be commented out
-								ungroup(Mapping_FBN_CP_HIST_Business)+
-								ungroup(Mapping_FBN_Experian_Business)+
-								// FBNV2.File_FBN_Business_Base_AID;
 								Previous_Base;
 
 dBusiness :=  dBusinessInputs + dBusinessBaseInputs;

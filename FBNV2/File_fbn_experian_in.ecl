@@ -1,4 +1,4 @@
-﻿IMPORT data_services;
+﻿IMPORT data_services, fbnv2;
 
 /********************************
 Before we grab this sprayed file we have to make sure that
@@ -12,9 +12,8 @@ trimUpper(string s) := function
 		  return trim(stringlib.StringToUppercase(s),left,right);
 		  end;
 
-//we are excluding when Record_Code='Z'	because these records are blank records.	  
-valid_fbn_raw := sort(dataset(data_services.foreign_prod +'thor_data400::in::experian::sprayed::fbn',fbnv2.Layout_fbn_experian.fbn_direct_raw,flat)(trimUpper(Record_Code)<>'Z'),filing_number, name_type);
-
+//we are excluding when Record_Code='Z'	because these records are blank records.  
+valid_fbn_raw := sort(dataset(Cluster.Cluster_In +'in::experian::sprayed::fbn',fbnv2.Layout_fbn_experian.fbn_direct_raw,flat)(trimUpper(Record_Code)<>'Z'),filing_number, name_type);
 
 NewLayout	:=	record
 	fbnv2.Layout_fbn_experian.fbn_direct_raw;

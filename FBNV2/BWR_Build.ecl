@@ -1,8 +1,8 @@
 ﻿import FBNV2, Lib_FileServices, Roxiekeybuild, _Control, orbit_report;
 
-export BWR_Build(string filename, string filedate, string source) := FUNCTION
+export BWR_Build(string filename, string filedate, string source, string sourceip) := FUNCTION
 
-#workunit('name', 'FBN Build Busreg, CA(5), CP Hist, Experian, FL, TX, NYC, InfoUSA' + fileDate);
+#workunit('name', 'FBN Build Busreg, CA(4), CP Hist, Experian, FL, TX' + fileDate);
  
 leMailTarget      := _control.MyInfo.EmailAddressNotify;
 
@@ -20,7 +20,8 @@ validateSource(string pSource) :=
 								trim(source,left,right) = 'Dallas'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),
 								trim(source,left,right) = 'InfoUSA'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),
 								trim(source,left,right) = 'San_Bernardino'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'NY'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),
+								trim(source,left,right) = 'NY'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),	
+								trim(source,left,right) = 'Experian'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),
 								FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));	
 
 buildkeys := parallel(FBNV2.proc_Build_Autokey(filedate,File_FBN_Business_Base,File_FBN_Contact_Base),
@@ -32,7 +33,7 @@ orbit_report.FBN_Stats(getretval);
 	  
 buildprocess := sequential(
 							validateSource(source),
-							fSprayInputFiles(filename,filedate,source),
+							fSprayInputFiles(filename,filedate,source,sourceip),
 							Proc_Build_FBN_Contact_Base(source), 
 							Proc_Build_FBN_Business_Base(source),
 							fSendMail('FBN Build Part 1 of 2','Base Files Build Complete, Starting Key Build'),

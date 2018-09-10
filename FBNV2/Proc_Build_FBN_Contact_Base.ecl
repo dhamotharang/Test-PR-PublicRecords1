@@ -13,15 +13,12 @@ dContactInputs  	:=
 														     trim(source,left,right) = 'Harris' => ungroup(Mapping_FBN_TX_Harris_Contact),
 														     // trim(source,left,right) = 'NY' => ungroup(Mapping_FBN_NY_Contact),
 																 trim(source,left,right) = 'Orange' => ungroup(Mapping_FBN_CA_Orange_Contact),
-																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Contact));
+																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Contact),
+																 trim(source,left,right) = 'Experian' => ungroup(Mapping_FBN_Experian_Contact));
 		
 				
 dContactBase := 
         ungroup(Mapping_FBN_BUSREG_Contact)+
-				//ungroup(Mapping_FBN_CORP2_Contact)+	
-				//CP HIST data is quite old, perhaps this should be commented out
-				ungroup(Mapping_FBN_CP_HIST_Contact)+
-				ungroup(Mapping_FBN_Experian_Contact)+
 				FBNV2.File_FBN_Contact_Base_AID;
 				                  
 				
@@ -154,6 +151,4 @@ PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_o
 		
 return out;		
 		
-END;				
-
-// export Proc_Build_FBN_Contact_Base := out;
+END;	

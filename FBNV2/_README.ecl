@@ -9,12 +9,11 @@
       - FL Events
       - FL Filings
       - TX Harris
+      - Experian Base
 
     Base Inputs
 
 			- BusReg Base
-      - Experian Base
-      - CP Hist Base
       - FBN Business Base
       - FBN Contact Base
 
@@ -26,7 +25,8 @@
       - TX Dallas
 
 			- CORP2 Cont Base
-      - CORP2 Corp Base     
+      - CORP2 Corp Base 
+      - CP Hist    
  
 	
 		Overview: Ficticious Business Names V2
@@ -54,6 +54,8 @@
 
         TX Harris      Monthly 			Sprayed Variable Txt File Delimited By '|'          Appx 6000
 
+        Experian       Monthly      Sprayed Fixed Position Txt File                     Appx 24000
+
         
 
 		The Build:
@@ -68,7 +70,8 @@
                         business\fbn\ca\santa_clara_(en)
                         business\fbn\ca\ventura_(en)\_<filedate>
                         business\fbn\ca\fl_(en)\<filedate>
-                        business\fbn\tx_(pn)\harris_county\_<filedate>
+                        business\fbn\tx_(pn)\harris_county\_<filedate>                        
+                        business\fbn\experian_(en)\_<filedate>
 
 				Unix Directories	: /data/data_build_4/fbn/sources/ca/orange/archive
                             /data/data_build_4/fbn/sources/ca/san_diego/<filedate>
@@ -77,6 +80,7 @@
                             /data/data_build_4/fbn/sources/fl/<filedate>
                             /data/data_build_4/fbn/sources/fl/<filedate>
                             /data/data_build_4/fbn/sources/tx/harris/<filedate>
+                            /data/data_build_4/fbn/sources/experian/<filedate>
 
 				Thor Module			: FBNV2
 				Frequency				: Variable due to when data is received from vendors.
@@ -86,16 +90,17 @@
 				2.	Next, open FBNV2._BWR_Build_All in a builder window.  Change 
             the directory/filename path, filedate, and source to the appropriate values.  
             See examples below.
-
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/san_diego/20180212/RECL.P.OFFS.LEXI4201.VENDOR','20180212','San_Diego');
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/santa_clara/archive/20180206_FBN-Listing_20180102-20180131.csv','20180206','Santa_Clara');
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/ventura/archive/20180208/Ventura_FBN_R_Jan2018.txt','20180208','Ventura');
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/fl/20171018/ficevt.txt','20171018','Event');
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/fl/20171018/ficfile.txt','20171018','Filing');
-							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/tx/harris/20170302/ASN*.txt','20170302','Harris');
+ 
+              FBNV2.BWR_Build('/data/data_build_4/fbn/sources/experian/','20161107','Experian',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/san_diego/20180212/RECL.P.OFFS.LEXI4201.VENDOR','20180212','San_Diego',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/santa_clara/archive/20180206_FBN-Listing_20180102-20180131.csv','20180206','Santa_Clara',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/ca/ventura/archive/20180208/Ventura_FBN_R_Jan2018.txt','20180208','Ventura',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/fl/20171018/ficevt.txt','20171018','Event',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/fl/20171018/ficfile.txt','20171018','Filing',sourceip);
+							FBNV2.BWR_Build ('/data/data_build_4/fbn/sources/tx/harris/20170302/ASN*.txt','20170302','Harris',sourceip);
  
 				3.  Execute it.  The build will spray the input data as well as incorporate the latest 
-            base records from BusReg, Experian, nd CP Hist Base records into the base records 
+            base records from BusReg into the base records 
             of the FBN Business and Contact Bases.
 				5.	The build will send you an email when it finishes successfully, or a fail email 
             if it fails.

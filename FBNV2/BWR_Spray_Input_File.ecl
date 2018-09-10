@@ -1,16 +1,35 @@
-﻿import FBNV2,_control;
+﻿import FBNV2,_control, std, lib_fileservices, _control;
 
 export BWR_Spray_Input_File (string filename,string filedate,string source) 
 		:= function
+		
+			leMailTarget      := _control.MyInfo.EmailAddressNotify;
+			
+		  fSendMail(string pSubject, string pBody)
+				:= lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);
+			
+			validateSource(string pSource) :=
+				map(trim(source,left,right) = 'Orange' => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
+								trim(source,left,right) = 'San_Diego'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
+								trim(source,left,right) = 'Santa_Clara'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
+								trim(source,left,right) = 'Ventura'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
+								trim(source,left,right) = 'Event'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
+								trim(source,left,right) = 'Filing'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
+								trim(source,left,right) = 'Harris'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
+								trim(source,left,right) = 'Dallas'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
+								trim(source,left,right) = 'InfoUSA'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source HasNot Been Sent By Vendor In A Long Time'),		
+								trim(source,left,right) = 'San_Bernardino'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),		
+								trim(source,left,right) = 'NY'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
+								FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));	
 
-				sourceip 					:= _control.IPAddress.bctlpedata11;
+				sourceip 					:= _control.IPAddress.bctlpedata12;
 				
 				superfilename 		:= FBNV2.Get_Input_Superfilename(source); 						
 				logicalfilename 	:= FBNV2.Get_Input_Superfilename(source)[1..length(trim(superfilename))-length('Sprayed')]+filedate;
 				reclength 				:= Get_Infile_Record_Length(source);
-				groupname 				:= IF(_Control.ThisEnvironment.name	= 'Dataland', 'thor400_dev01', 'thor400_44');
-
-        // Due to the file names changing with multiple loads, I shortened them up to give the greatest
+        groupName := STD.System.Thorlib.Group( );
+				
+        // Due to the file names changing with multiple loads, shortened them up to give the greatest
 				// chance to actually get them all.
 				doInstr	:= FileServices.SprayVariable(sourceip,
 											'/data/data_build_4/fbn/sources/tx/harris/'+filedate+'/'+'ASNI*.txt',
@@ -40,8 +59,10 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																 output('Source Parameter passed did not match the Sources, please check the source value passed.'));
 																 
 				create_super			:= FileServices.CreateSuperFile(superfilename,false);
-				add_super 				:= sequential(FileServices.StartSuperFileTransaction(),
-																				FileServices.ClearSuperFile(superfilename), 
+				add_super 				:= sequential(FileServices.RemoveOwnedSubFiles(superfilename),
+				                                FileServices.StartSuperFileTransaction(),
+																				// FileServices.ClearSuperFile(superfilename), 
+																				// FileServices.RemoveOwnedSubFiles(superfilename),
 																				fileservices.addsuperfile(superfilename,logicalfilename),
 																				FileServices.FinishSuperFileTransaction()
 																			 );
@@ -52,19 +73,20 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																 trim(source,left,right) = 'Ventura' => FBNV2.Standardize_FBN_CA_Ventura(filedate, ,FBNV2.File_CA_Ventura_in.raw),
 																 trim(source,left,right) = 'Harris' => FBNV2.Standardize_FBN_TX_Harris(filedate, ,FBNV2.File_TX_Harris_in.raw),
 																 trim(source,left,right) = 'Filing' => FBNV2.Standardize_FBN_FL.fPreProcessFiling(filedate, ,FBNV2.File_FL_Filing_in.raw),
-																 trim(source,left,right) = 'Event' => FBNV2.Standardize_FBN_FL.fPreProcessEvent(filedate, ,FBNV2.File_FL_Event_in.raw),
-																 output('Source Parameter passed did not match the Sources, please check the source value passed.')
+																 trim(source,left,right) = 'Event' => FBNV2.Standardize_FBN_FL.fPreProcessEvent(filedate, ,FBNV2.File_FL_Event_in.raw)
+																 // ,output('Source Parameter passed did not match the Sources, please check the source value passed.')
 																);
 				
 				
 				addExtractSuper		:= sequential(
+				                                FileServices.RemoveOwnedSubFiles(cluster.cluster_out + 'in::fbn_extract::sprayed::FL_Filing'),
 																				FileServices.StartSuperFileTransaction(),
-																				FileServices.ClearSuperFile(cluster.cluster_out + 'in::fbn_extract::sprayed::FL_Filing'),
 																				FileServices.AddSuperFile(cluster.cluster_out + 'in::fbn_extract::sprayed::FL_Filing', '~thor_data400::in::fbnv2::FL::Filing::'+filedate+'::Cleaned'),
 																				FileServices.FinishSuperFileTransaction()
 																			  );
 																				
-				retval 						:= sequential(spray_file,																				
+				retval 						:= sequential(validateSource(source),
+				                                spray_file,																				
 																				if(~FileServices.FileExists(superfilename), create_super),
 																				add_super,
 																				preprocess_file,
@@ -75,7 +97,3 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 		 return retval;
 		
 end;
-/*fbnv2.BWR_Spray_Input_File ('/data_build_4/fbn/sources/ca/san_diego/build/san_diego.d00','20060106','San_diego') 
-
-fbnv2.MAC_Spray_Input_Files('/data_build_4/fbn/sources/fl/build/Event.d00',
-                             'in::fbnv2::20061205::FL::filing','Event','thor_dataland_linux');*/
