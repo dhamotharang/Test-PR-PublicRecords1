@@ -1,4 +1,4 @@
-import header_services, business_header, AID, infutor, header, ut ;
+﻿import header_services, business_header, AID, infutor, header, ut ;
 
 
 EXPORT infutor_reflection_header(dataset(header.layout_header) ds_Xform) := function
@@ -31,6 +31,7 @@ header_services.Supplemental_Data.mac_verify(	'file_infutor_inj.txt',
 	header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l, integer c) := transform
 
 /* //check date validity by length, number values, and between 1901 and today */  
+  cversion_dev := infutor._config.get_cversion_dev; 
 
 Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDate[1..6];
 	self.did := l.did;
@@ -44,8 +45,8 @@ Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDat
 							 stringlib.stringtouppercase(l.addr_type) = 'P5' => (unsigned)l.prev5_addr_effective_dt[1..6],
 							 0);
 	self.dt_first_seen := map(l.addr_type='O' => (unsigned)l.effective_dt[1..6], self.dt_last_seen);
-	self.dt_vendor_last_reported := (unsigned)infutor.version_dev[1..6];
-	self.dt_vendor_first_reported := (unsigned)infutor.version_dev[1..6];
+	self.dt_vendor_last_reported := (unsigned)cversion_dev[1..6];
+	self.dt_vendor_first_reported := (unsigned)cversion_dev[1..6];
 	self.dt_nonglb_last_seen := 0;
 	self.vendor_id := (qstring18)l.boca_id;
 	self.dob := (integer4)l.orig_dob_dd_appended;

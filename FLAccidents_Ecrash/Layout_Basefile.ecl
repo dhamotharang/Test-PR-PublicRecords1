@@ -867,4 +867,8 @@
 	
 	//CrashLogic Release 4
 	STRING1 Releasable;
+	
+	//Nucleus 
+	STRING50 Platform;
+	STRING40 Agency_Report_Number;
 END;

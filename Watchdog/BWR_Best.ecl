@@ -4,7 +4,7 @@ DF-18485
 /*2016-09-22T21:14:50Z (Wendy Ma)
 DF-17551 add FCRA best append and build type for FCRA best 
 */
-import bankrupt,ut,STRATA,FCRA_list;
+import bankrupt,ut,STRATA,FCRA_list,STD;
 export BWR_Best(boolean isnewheader = false, string build_type = '') := function 
 
 string20 var1 := '' : stored('watchtype');
@@ -106,16 +106,21 @@ string WUID := '';
 end;
 
 ds := dataset( '~thor::wdog::wuinfo::'+var2,stored_wu,thor);
-dout := if ( nothor( fileservices.fileexists( '~thor::wdog::wuinfo::'+var2 )), 
+dout := if ( nothor( STD.File.fileexists( '~thor::wdog::wuinfo::'+var2 )), 
                  ds + dataset( [ { var2,workunit}],stored_wu ),
 								  dataset( [ { var2,workunit}],stored_wu ) 
 								 );
 
-dout_all :=  Sequential( output( dout ,,'~thor::wdog::wuinfo::'+var2+'_new',overwrite),
-                         if ( fileservices.fileexists( '~thor::wdog::wuinfo::'+var2 ) , fileservices.Deletelogicalfile('~thor::wdog::wuinfo::'+var2)), 
-												 fileservices.RenameLogicalFile('~thor::wdog::wuinfo::'+var2+'_new','~thor::wdog::wuinfo::'+var2));
-
-send_bad_email := fileservices.SendEmail('sudhir.kasavajjala@lexisnexis.com','Watchdog '+ var1 + ' Build Failed',workunit);
+dout_all :=  Sequential(                                                                                                     output( dout ,,'~thor::wdog::wuinfo::'+var2+'::'+workunit[2..8] ,overwrite),									                                                   
+																						                         if (~(STD.File.Fileexists ( '~thor::wdog::wuinfo::'+var2)),STD.File.createsuperfile(  '~thor::wdog::wuinfo::'+var2)),
+																										    if (~( STD.File.Fileexists ( '~thor::wdog::wuinfo::'+var2+'_father')),STD.File.createsuperfile(  '~thor::wdog::wuinfo::'+var2+'_father')),																				 
+																											 STD.File.StartSuperFileTransaction(),										
+																									         STD.File.AddSuperfile('~thor::wdog::wuinfo::'+var2+'_father' , '~thor::wdog::wuinfo::'+var2), 
+																										    STD.File.ClearSuperfile(  '~thor::wdog::wuinfo::'+var2,true),
+																										  	STD.File.AddSuperfile('~thor::wdog::wuinfo::'+var2  , '~thor::wdog::wuinfo::'+var2+'::'+workunit[2..8] ),
+																											STD.File.FinishSuperFileTransaction()
+									);
+send_bad_email := STD.System.Email.SendEmail('sudhir.kasavajjala@lexisnexis.com','Watchdog '+ var1 + ' Build Failed',workunit);
   	
  result:= sequential(if(build_type ='fcra_best_append', 
                      map(var1 = 'fcra_best_append' => Sequential(
@@ -133,7 +138,8 @@ send_bad_email := fileservices.SendEmail('sudhir.kasavajjala@lexisnexis.com','Wa
 										 var1 = 'fcra_best_nonEQ' => Sequential(
 										 fourteen,
 										 zBestFCRAnonEQ_Stats,
-										 notify('WATCHDOG FCRA BEST NONEQ BUILD COMPLETE','*'))),
+										 notify('WATCHDOG FCRA BEST NONEQ BUILD COMPLETE','*'))
+                     ,fail('Bad watchtype provided. Check for a Typo or bad build_type value (is this an nFCRA build?)')),
                      sequential(
                      prep_header
 										,prep_infutor

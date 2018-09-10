@@ -10,7 +10,7 @@
 							self.parsed := LEFT.parsed,
 							self := [];)),
 					Ent_id, -parsed);
-AddDOB := SORT(
+  AddDOB := SORT(
 						PROJECT(AdditionalDOB(Files.dsSanctionsDOB), TRANSFORM({unsigned8 Ent_ID,Layout_XG.layout_addlinfo},
 							self.Ent_ID := LEFT.Ent_id;
 							self.Type := 'DOB';
@@ -18,7 +18,8 @@ AddDOB := SORT(
 							self.parsed := LEFT.parsed,
 							self := [];)),
 					Ent_id, -parsed);
-	AddlSorted := SORT(DISTRIBUTE(addlInfo&links&dob&AddDOB, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL);
+	dobs := DEDUP(SORT(DISTRIBUTE(dob + AddDOB, ent_id), ent_id, parsed, LOCAL), ent_id, parsed, LOCAL);
+	AddlSorted := SORT(DISTRIBUTE(addlInfo + links + dobs, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL);
 							
 	pAddl := 
 			project(AddlSorted,					// leave out sanctions

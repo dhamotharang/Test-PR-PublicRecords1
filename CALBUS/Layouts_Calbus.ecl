@@ -311,6 +311,12 @@ export Layouts_Calbus := module
 			string5   Owner_name_suffix;
 			string3   Owner_name_score; 
   end;
+  
+  export Layout_Common1 := record // Retaining existing field's order 
+     Layout_Common_old2 ;
+	   string5 sub_account_number;
+	   string3 account_type;
+  end;
    
   export Layout_AID_Common := record
 			unsigned8	raw_aid							:= 0;
@@ -321,7 +327,7 @@ export Layouts_Calbus := module
 			string50	prep_addr_line_last			;
 			string100 prep_mail_addr_line1		;
 			string50	prep_mail_addr_line_last;
-			Layout_Common											;   
+			Layout_Common1										;   
   end;
 			
   export Layout_Bdid := record
@@ -344,7 +350,7 @@ export Layouts_Calbus := module
 			Layout_Base.did_score ;
 			Layout_Base.ssn 			;
 			Layout_Bdid.bdid			;
-			Layout_Common-sub_account_number-account_type; //excluding new vendor fields from keys 
+			Layout_Common1-sub_account_number-account_type; //excluding new vendor fields from keys 
 	end;
 	
   export Layout_Autokeys := record

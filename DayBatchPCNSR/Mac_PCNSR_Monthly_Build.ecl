@@ -1,4 +1,4 @@
-﻿import _control, Orbit3;
+﻿import _control, Orbit3, Scrubs_PCNSR;
 
 export Mac_PCNSR_Monthly_Build(build_date) := macro
 
@@ -33,6 +33,7 @@ sequential(	//%prebuild%,
 						%strata_stats%,
 						%update_dops%,
 						%sample%,
+						Scrubs_PCNSR.fnRunScrubs(build_date,''),
 						orbit_update
 					)
 endmacro;

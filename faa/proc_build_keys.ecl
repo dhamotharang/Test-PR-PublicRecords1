@@ -1,4 +1,4 @@
-﻿import ut,roxiekeybuild, doxie_files, promotesupers,std,dops;
+﻿import ut,roxiekeybuild, doxie_files, promotesupers,std,dops, strata,data_services;
 
 export proc_build_keys(string version_date) := function
 
@@ -115,7 +115,8 @@ export proc_build_keys(string version_date) := function
 		proc_build_keys_bdid(version_date).build_airmen_autokeys,
 		parallel(d,e,f,g,h),
 		proc_build_keys_bdid(version_date).mv_keys,
-		parallel(update_faa_version,update_faa_fcra_version)) : success(send_succ_msg), failure(send_fail_msg);
+		parallel(update_faa_version,update_faa_fcra_version),
+		faa.Verify_FCRA_Deprecated_Fields ) : success(send_succ_msg), failure(send_fail_msg);
 	
 	return final;
 

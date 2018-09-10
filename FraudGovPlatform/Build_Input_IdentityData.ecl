@@ -18,19 +18,19 @@ module
 		return in_ddp;
 	ENDMACRO;	
 	
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::identitydata')) > 0 and PSkipIdentityData = false, 
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0 and PSkipIdentityData = false, 
 													Files(pversion).Sprayed.IdentityData, 
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)   
-											+ if ( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::deltabase')) > 0  and PSkipDeltabase = false,
+											+ if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0  and PSkipDeltabase = false,
 													Build_Prepped_Deltabase(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)	
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::inquirylogs')) > 0 and PSkipInquiryLogs = false, 
+											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and PSkipInquiryLogs = false, 
 													Build_Prepped_InquiryLogs(pversion),
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											);
@@ -175,17 +175,17 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote := Constants().validQuotes);
 									
 	//Move only Valid Records
-	shared f1_dedup					:=	 join (f1,
-																							ByPassed_records,
-																							left.Unique_Id = right.Unique_Id,
-																							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
-																							left only);
+	shared f1_dedup :=	join (f1,
+											ByPassed_records,
+											left.Unique_Id = right.Unique_Id,
+											TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
+											left only);
 																							
 
 	shared new_addresses := Functions.New_Addresses(f1_dedup);
@@ -196,10 +196,10 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
 																							
 	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
@@ -229,10 +229,10 @@ module
 									pCompress	:= true,
 									pHeading := false,
 									pCsvout := true,
-									pSeparator := '~|~',
+									pSeparator := Constants().validDelimiter,
 									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+									pTerminator := Constants().validTerminators,
+									pQuote:= Constants().validQuotes);
 
 // Return
 	export build_prepped := 
