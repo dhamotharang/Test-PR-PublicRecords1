@@ -113,8 +113,8 @@ Export AK := Module
 											l.EntityNumber='124416'   and (corp2.t2u(l.Norm_corp_legal_name) = 'DR. CRAIG BGIN AND ASSOCIATES LLC.' or corp2.t2u(l.Norm_corp_legal_name)='DR. CRAIG BÃ©GIN AND ASSOCIATES LLC.')		=> 'DR. CRAIG BÉGIN AND ASSOCIATES LLC.',
 											l.EntityNumber='134375'   and  corp2.t2u(l.Norm_corp_legal_name) = '55Â° NORTH, INC.'																																																		=> '55 NORTH, INC.',
 											l.EntityNumber='99656'    and  corp2.t2u(l.Norm_corp_legal_name) = 'SHAKEELÃ¢Â¿Â¿S HALLMARK, LLC'																																												=> 'SHAKEEL\'S HALLMARK, LLC',
-											l.EntityNumber='10088797' and (corp2.t2u(l.Norm_corp_legal_name) = 'AIRMOBILEÂ® ALASKA CORP'																																														=> 'AIRMOBILE ALASKA CORP',
-											l.EntityNumber='10089497' and (corp2.t2u(l.Norm_corp_legal_name) = 'ANÃ¡ASKI KU.OO'																																																			=> 'ANÁASKI KU.OO',
+											l.EntityNumber='10088797' and  corp2.t2u(l.Norm_corp_legal_name) = 'AIRMOBILEÂ® ALASKA CORP'																																														=> 'AIRMOBILE ALASKA CORP',
+											l.EntityNumber='10089497' and  corp2.t2u(l.Norm_corp_legal_name) = 'ANÃ¡ASKI KU.OO'																																																			=> 'ANÁASKI KU.OO',
 											l.EntityNumber='10088448' and (corp2.t2u(l.Norm_corp_legal_name) = 'Ã…NGSTRÃ¶M IMAGING SOLUTIONS, LLC' or corp2.t2u(l.Norm_corp_legal_name)='ÃNGSTRÃ¶M IMAGING SOLUTIONS, LLC')					=> 'ÅNGSTRÖM IMAGING SOLUTIONS, LLC',
 											l.Norm_corp_legal_name);
 		self.Norm_corp_legal_name	:=	ut.fn_RemoveSpecialChars((string)Std.Uni.CleanAccents(TempName));
