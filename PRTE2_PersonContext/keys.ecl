@@ -2,7 +2,7 @@
 
 EXPORT keys := MODULE
 
-  EXPORT key_Lexid := INDEX(FILES.DS_out_LexID_sort, {LexID},  
+  EXPORT key_Lexid := INDEX(FILES.DS_out_LexID, {LexID},  
 	                    {RecID1,RecID2,RecID3,RecID4,CD_id,DataGroup,RecordType,DataTypeVersion,DateAdded,EventType,SourceSystem,StatementSequence,StatementID,Content},
 	                    constants.Lexid_Key + doxie.Version_SuperKey);
 	
