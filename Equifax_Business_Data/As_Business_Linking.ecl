@@ -68,17 +68,7 @@ EXPORT As_Business_Linking (
         self.company_foreign_date := 0;  
         self.event_filing_date := 0;  
         self.company_name_status_raw := '';
-        self.company_status_raw := '';   
-        //dates ????????
-				//EFX_YREST - Actual or estimated year the business was established.  This information 
-				//is typically obtained from the Secretary of State business registration, first 
-				//appearance of the business' web presence, or first yellow page listing date.
-				//EFX_DEADDT - The date to when Equifax initially identified this site as a high 
-				//probability of being out of business.  
-        // self.dt_first_seen_company_name := (INTEGER)l.EFX_YREST;
-        // self.dt_last_seen_company_name := (INTEGER)l.EFX_DEADDT;
-        // self.dt_first_seen_company_address := (INTEGER)l.EFX_YREST;
-        // self.dt_last_seen_company_address := (INTEGER)l.EFX_DEADDT;
+        self.company_status_raw := '';  
 				self.dt_first_seen_company_name := 0;
         self.dt_last_seen_company_name := 0;
         self.dt_first_seen_company_address := 0;
