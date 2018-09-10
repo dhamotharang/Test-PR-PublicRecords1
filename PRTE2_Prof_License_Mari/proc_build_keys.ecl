@@ -1,4 +1,4 @@
-import RoxieKeyBuild,PRTE, _control;
+﻿import RoxieKeyBuild,PRTE, _control, PRTE2_Common;
 
 export proc_build_keys(string filedate) := FUNCTION
 
@@ -64,17 +64,24 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 build_autokeys := Keys.autokeys(filedate);
 
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-updatedops   		 := PRTE.UpdateVersion('MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra  := PRTE.UpdateVersion('FCRA_MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
 
-// -- Actions
+is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
+
+ DOPS_Comment := OUTPUT('Skipping DOPS process');
+ updatedops := PRTE.UpdateVersion('MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+ updatedops_fcra := PRTE.UpdateVersion('FCRA_MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+
+PerformUpdateOrNot := IF(is_running_in_prod,
+ parallel(updatedops,updatedops_fcra),
+ DOPS_Comment);
+
 buildKey	:=	sequential(
 												 build_roxie_keys
 												,Move_keys
 												,to_qa
 												,build_autokeys
-												,parallel(updatedops,updatedops_fcra)
-												);	
+												,PerformUpdateOrNot);
+												
 
 return	buildKey;
 

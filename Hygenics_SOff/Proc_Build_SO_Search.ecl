@@ -1,4 +1,4 @@
-import hygenics_soff, doxie_build;
+﻿import hygenics_soff, doxie_build;
 
 export Proc_Build_SO_Search(string filedate) := function
 
