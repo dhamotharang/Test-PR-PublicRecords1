@@ -57,6 +57,8 @@ MODULE
     SELF := [];
   END;
 
+  // for non executives, the executive_ind_order field is not calculated and 
+  // thuse defaulting to 99 to move these records to the bottom of the sort order
   EXPORT ExecAtHomeV2.Layouts.expandedLayout xfmAddMktContactFields(ExecAtHomeV2.Layouts.expandedLayout l, 
                                                                     RECORDOF(BIPV2_Build.key_contact_linkids.kFetchMarketing) r) := 
   TRANSFORM
@@ -64,6 +66,7 @@ MODULE
     SELF.company_title := r.contact_job_title_derived; 
     SELF.business_decision_maker_flag := IF(r.Executive_ind,'Y','');  
     SELF.business_owner_flag := IF(r.contact_job_title_derived = ExecAtHomeV2.Constants.OWNER,'Y',''); 
+    SELF.executive_ind_order := IF(r.Executive_ind, r.executive_ind_order,99);
     SELF.person_best_phone := r.contact_phone;
     SELF.dob := (STRING8)r.contact_dob;  
     SELF.bdid := IF(l.bdid = 0,r.company_bdid,l.bdid);
