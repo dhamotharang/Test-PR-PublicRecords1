@@ -118,12 +118,12 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.PortingCode    := MAP(hasPort => 'Ported', 
 																 (NOT inMod.SubjectMetadataOnly OR l.isprimaryphone OR l.batch_in.homephone<>'')=> 'Not Ported',
 																 '');
-			SELF.PortingCount    := IF(inMod.IncludePorting,r.PortingCount,l.PortingCount);
-			SELF.PortingHistory  := IF(inMod.IncludePorting,CHOOSEN(SORT(r.PortingHistory,-PortEndDate),PhoneFinder_Services.Constants.MaxPortedMatches),l.PortingHistory);	
-			SELF.FirstPortedDate := IF(inMod.IncludePorting,r.FirstPortedDate,l.FirstPortedDate);		
-			SELF.LastPortedDate  := IF(inMod.IncludePorting,r.LastPortedDate,l.LastPortedDate);
-			SELF.NoContractCarrier  := IF(inMod.IncludePorting,r.NoContractCarrier,l.NoContractCarrier);
-			SELF.Prepaid				 := IF(inMod.IncludePorting,r.Prepaid,l.Prepaid);
+			SELF.PortingCount    := IF(inMod.ReturnPortingInfo,r.PortingCount,l.PortingCount);
+			SELF.PortingHistory  := IF(inMod.ReturnPortingInfo,CHOOSEN(SORT(r.PortingHistory,-PortEndDate),PhoneFinder_Services.Constants.MaxPortedMatches),l.PortingHistory);	
+			SELF.FirstPortedDate := IF(inMod.ReturnPortingInfo,r.FirstPortedDate,l.FirstPortedDate);		
+			SELF.LastPortedDate  := IF(inMod.ReturnPortingInfo,r.LastPortedDate,l.LastPortedDate);
+			SELF.NoContractCarrier  := IF(inMod.ReturnPortingInfo,r.NoContractCarrier,l.NoContractCarrier);
+			SELF.Prepaid				 := IF(inMod.ReturnPortingInfo,r.Prepaid,l.Prepaid);
 			deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
 			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react AND deact_thresholdcheck => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
 		                             ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active,
