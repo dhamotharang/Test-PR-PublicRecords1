@@ -1,4 +1,4 @@
-import doxie, doxie_build, ut, hygenics_search;
+﻿import doxie, doxie_build, ut, hygenics_search;
 
 export key_sexoffender_offenses (boolean IsFCRA = false) := function
 
