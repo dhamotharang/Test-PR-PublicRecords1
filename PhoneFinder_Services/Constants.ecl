@@ -27,12 +27,13 @@ MODULE
 	EXPORT UNSIGNED1 LIBD_LastActivityThreshold           := 60;
 
 	// Enum for TransactionType and Phone source
-	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3);
+	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3, Blank = 255);
  SHARED TransTypeCodes := DATASET([
        {TransType.Basic, 'BASIC'},
        {TransType.Premium, 'PREMIUM'},
        {TransType.Ultimate, 'ULTIMATE'},                    
-       {TransType.PhoneRiskAssessment, 'PHONERISKASSESSMENT'}
+       {TransType.PhoneRiskAssessment, 'PHONERISKASSESSMENT'},
+       {TransType.Blank, 'BLANK'}
        ], {unsigned1 tcode; string ttype;});
 
 TransCodeTypeDCT := DICTIONARY(TransTypeCodes, {tcode => ttype}); 
@@ -119,6 +120,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	EXPORT VARSTRING ErrorCodes(INTEGER c) :=
 		CASE(c,	100 => 'More than one verification type selected',
 						101 => 'No Phone number was entered for the verification request',
+      102 => 'No transaction type specified',
 					'Unspecified Failure');
 		
 	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN,
