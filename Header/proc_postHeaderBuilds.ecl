@@ -83,6 +83,7 @@ export proc_postHeaderBuilds := module
                                         // ,notify('Build_Relatives','*')
                                         ,build_slimsorts
                                         ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
+                                        ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(version)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_owners).good)
