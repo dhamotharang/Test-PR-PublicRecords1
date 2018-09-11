@@ -1,5 +1,5 @@
 ﻿// Process to build the PhonesFeedback files
-import Lib_FileServices, STRATA, PromoteSupers, dops;
+import Lib_FileServices, STRATA, PromoteSupers, dops,Scrubs_PhonesFeedback;
 export BWR_Build_PhonesFeedback(string filedate,string onlinefilename) := function
 #workunit('name','Yogurt: PhonesFeedback Daily Build - ' + filedate);
 #workunit('priority','high');
@@ -62,6 +62,7 @@ sequential (fSprayFilesOnline(onlinefilename),
 		   parallel(build_keys, build_stats),
 			 build_samples,
 		   dops_update,
+			 Scrubs_PhonesFeedback.fn_RunScrubs(filedate,''),
 			 // idops_update,
 			 // ORBITi,
        send_mail('PhonesFeedback Build Completed',

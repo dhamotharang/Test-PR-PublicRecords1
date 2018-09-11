@@ -95,8 +95,7 @@ EXPORT Copy := sequential(
 // ************************************************************************************************************************************
 
 EXPORT copyOthers := sequential(
-
-       nothor(apply(additional_keys    ,copy_files     (nm,src_name,'thor400_44','from_alpha2','thor_data400')  ))
+        nothor(apply(additional_keys    ,copy_files     (nm,src_name,'thor400_44','from_alpha2','thor_data400')  ))
        ,nothor(apply(additional_keys    ,update_supers  (ver(nm,'built', 'thor_data400')   , ver(nm,filedate))    ))
 );
 // ************************************************************************************************************************************
