@@ -1,7 +1,7 @@
 ﻿IMPORT MDR;
 EXPORT Constants := MODULE
 
- EXPORT Is_CNSMR := 'CNSMR'; //Industry class for D2C 
+ EXPORT CNSMR := 'CNSMR'; //Industry class for D2C 
 	EXPORT src_AK_commercial_fishing_vessels := 'WT'; //Alaska Commercial Fishing Vessels
 	EXPORT src_Property_Fares := 'F'; //Property Assessments & Deeds(Fares)
 	EXPORT src_Property_Fares_supplemental := 'S'; //Property Assessments & Deeds supplemental(Fares)
@@ -146,6 +146,12 @@ EXPORT MDV2Restrictedvendors := [vendor_CIVPABUCKS, vendor_CIVTXHARRISCNTY];
 			thor_data400::key::header_qa
 		Source field : src
  */
+ 
+ //------------------------------------------------------------------------------------------------------//
+
+EXPORT PhonemetadataRestrictedSources := [ MDR.sourceTools.src_PhonesPorted_TCPA];
+
+ //------------------------------------------------------------------------------------------------------//
 
  EXPORT PersonHeaderRestrictedSources := [
 			MDR.sourceTools.src_WV_Watercraft,					

@@ -1,22 +1,24 @@
 ﻿IMPORT InsuranceHeader_RemoteLinking.Constants AS constants;
 IMPORT InsuranceHeader_RemoteLinking.Layouts AS layouts;
+IMPORT STD;
 
 samp_size := 1000;
 num_nodes := 1;
 str_samp_size := trim((string)samp_size);
 roxieIP := constants.HEADER_SERVICE_ROXIE_IP;
-ver := 'dev194'; #workunit('name',ver + ', ' + str_samp_size + ' recs, ');//this is the 194
+ver := 'dev194'; #workunit('name',num_nodes + 'nodes, ' + str_samp_size + ' recs, ');//this is the 194
 serviceName := constants.HEADER_SERVICE_NAME;
 
-qaFn := '~remote_linking::test_set::1';
-qaDs := dedup(sort(dataset(qaFn,Layouts.ServiceInputLayout, thor), results_lexid),results_lexid);
+qaFn := '~remote_linking::test_set::2';
+qaDs := dedup(sort(dataset(qaFn,Layouts.ServiceInputLayout_Batch, thor), results_lexid),results_lexid);
 
 qaDs_enth := enth(sort(qaDs, hash(Inquiry_Lexid)), samp_size) : persist('~remote_linking::persist::testing::qaDs_enth_' + str_samp_size, expire(10));
 
-indata := distribute(qaDs_enth, random()%num_nodes);
+indata1 := distribute(qaDs_enth, random()%num_nodes);
 
+indata := project(indata1,transform(Layouts.Soapcall_Layout, self.input_data := LEFT));
 
-output_layout := Layouts.ServiceOutputLayout;
+output_layout := Layouts.ServiceOutputLayout_Batch;
         
 str_xpath := '_call_latency_ms';
       
@@ -49,9 +51,9 @@ OUTPUT(max(final, transaction_time), named('max_call_latency_ms'));
 OUTPUT(ave(final, transaction_time), named('ave_call_latency_ms'));
 
 sorted_time := sort(final,transaction_time);
-InsuranceHeader_RemoteLinking.Add_Medians(sorted_time,errorcode,transaction_time,median);
+// InsuranceHeader_RemoteLinking.Add_Medians(sorted_time,errorcode,transaction_time,median);
 InsuranceHeader_RemoteLinking.AppendNtile.ValueRange(sorted_time,transaction_time,100,outfile,percentile);
-OUTPUT(median[1].median, named('median_latency_ms'));
+// OUTPUT(median[1].median, named('median_latency_ms'));
 OUTPUT(percentile, named('percentiles'));
 OUTPUT(COUNT(FINAL(match=TRUE))/COUNT(FINAL), named('Hit_Rate'));
 OUTPUT(ave(final, conf), named('Avg_Score'));

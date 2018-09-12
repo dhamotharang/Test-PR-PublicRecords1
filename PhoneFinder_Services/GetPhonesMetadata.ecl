@@ -288,7 +288,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
 		// original approach : display Spoofing when IncludePhoneMetadata and transaction type = ultimate and phoneriskassesment
 	 //Re-design approach: display Spoofing info when IncludeSpoofing = true												
-	 dPhoneInfoUpdate_Spoofing := IF(inMod.IncludeSpoofing AND EXISTS(spoofInfo),
+	 dPhoneInfoUpdate_Spoofing := IF(inMod.ReturnSpoofingInfo AND EXISTS(spoofInfo),
 																																										dPhoneInfoWSpoofing,dPortedRecs);															
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process OTPs****************************************************
@@ -346,12 +346,12 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 																																												
 	//Append OTP results
 	PhoneFinder_Services.Layouts.PhoneFinder.Final mergeOTP(PhoneFinder_Services.Layouts.PhoneFinder.Final l,dvalidOTPwHistory r) := TRANSFORM
-			SELF.OTP 						     := IF(inMod.IncludeOTP,r.OTP,false);
-			SELF.OTPCount 			   := IF(inMod.IncludeOTP,r.OTPCount,0);
-			SELF.FirstOTPDate 	 := IF(inMod.IncludeOTP,r.FirstOTPDate,0);
-			SELF.LastOTPDate	 	 := IF(inMod.IncludeOTP,r.LastOTPDate,0);
-			SELF.LastOTPStatus 	:= IF(inMod.IncludeOTP,r.LastOTPStatus,false);
-			SELF.OTPHistory		  	:= IF(inMod.IncludeOTP,CHOOSEN(SORT(r.OTPHistory,-EventDate),PhoneFinder_Services.Constants.MaxOTPMatches),
+			SELF.OTP 						     := IF(inMod.ReturnOTPInfo,r.OTP,false);
+			SELF.OTPCount 			   := IF(inMod.ReturnOTPInfo,r.OTPCount,0);
+			SELF.FirstOTPDate 	 := IF(inMod.ReturnOTPInfo,r.FirstOTPDate,0);
+			SELF.LastOTPDate	 	 := IF(inMod.ReturnOTPInfo,r.LastOTPDate,0);
+			SELF.LastOTPStatus 	:= IF(inMod.ReturnOTPInfo,r.LastOTPStatus,false);
+			SELF.OTPHistory		  	:= IF(inMod.ReturnOTPInfo,CHOOSEN(SORT(r.OTPHistory,-EventDate),PhoneFinder_Services.Constants.MaxOTPMatches),
 																					DATASET([],PhoneFinder_Services.Layouts.PhoneFinder.OTPs));
 			SELF := l;
 			SELF := [];
@@ -366,7 +366,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 															LIMIT(0));	
 	 // original approach : display OTP when IncludePhoneMetadata
 	 //Re-design approach: display OTP info when IncludeOTP = true
-	dPhoneInfoUpdate_OTP := IF(inMod.IncludeOTP AND EXISTS(dvalidOTP), dPhoneInfowOTP, dPhoneInfoUpdate_Spoofing);
+	dPhoneInfoUpdate_OTP := IF(inMod.ReturnOTPInfo AND EXISTS(dvalidOTP), dPhoneInfowOTP, dPhoneInfoUpdate_Spoofing);
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process PRIs****************************************************
 	// ---------------------------------------------------------------------------------------------------------																

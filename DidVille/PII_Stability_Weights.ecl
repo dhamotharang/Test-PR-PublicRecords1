@@ -1,4 +1,4 @@
-IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
+﻿IMPORT InsuranceHeader_xLink,UT,IDLExternalLinking;
 
 /*
 This module is for the statistical analysis team to be able to run searches 
@@ -18,6 +18,7 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 		STRING5 SSN5;
 		STRING4 SSN4;
 		DidVille.Layout_Did_InBatch;
+		DATASET(InsuranceHeader_xLink.Process_xIDL_Layouts().layout_ZIP_cases) ZIP_cases;
 	END; 
 
 	EXPORT PII_weight_output_layout := RECORD
@@ -40,7 +41,9 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 		//Example W20161216-103856
 		interm := PROJECT(INPUT,TRANSFORM(PII_weight_interm_layout,
 											SELF.UniqueID := LEFT.seq; SELF.SSN5 := LEFT.SSN[1..5]; 
-											SELF.SSN4 := LEFT.SSN[6..9]; SELF:= LEFT));
+											SELF.SSN4 := LEFT.SSN[6..9]; 
+											SELF.ZIP_cases := Dataset([{LEFT.Z5, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) ;
+											SELF:= LEFT));
 											
 		InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(interm, 
 																						UniqueID, 
@@ -55,7 +58,7 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 																						sec_range,
 																						p_city_name,
 																						st,
-																						z5,
+																						ZIP_cases,
 																						ssn5,
 																						ssn4,
 																						dob, 

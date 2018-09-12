@@ -1,4 +1,4 @@
-import Address_Rank, AutoStandardI, Autokey_Batch, BatchServices, DeathV2_services, DriversV2, DriversV2_Services, doxie, 
+﻿import Address_Rank, AutoStandardI, Autokey_Batch, BatchServices, DeathV2_services, DriversV2, DriversV2_Services, doxie, 
 			 Header, ut, VehicleV2_Services, VotersV2_Services;
 
 ADDRESS_LABEL 		:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_Addr.full, opt);
@@ -81,43 +81,44 @@ export STR_Functions := MODULE
     addr_hrd_recs_by_did := dedup(sort(addr_hdr_recs_clean, did, dt_first_seen=0, dt_first_seen), did);
 		//*********************Get address history rank**********************/
 		Address_Rank.Layouts.Batch_in addrBestFormat(ds_best_recs_raw l, unsigned c) := transform
-			self.acctno				:= (string)c;
-			self.did 					:= l.did;
-			self.name_first 	:= l.fname;
-			self.name_middle 	:= l.mname;
-			self.name_last 		:= l.lname;
-			self.dob 					:= (string)l.dob;
-			self.addr_suffix	:= l.suffix;
-			self.p_city_name	:= l.city_name;
-			self.z5 					:= (string)l.zip;
+			self.acctno      := (string)c;
+			self.did         := l.did;
+			self.name_first  := l.fname;
+			self.name_middle := l.mname;
+			self.name_last   := l.lname;
+			self.dob         := (string)l.dob;
+			self.addr_suffix := l.suffix;
+			self.p_city_name := l.city_name;
+			self.z5          := (string)l.zip;
 			self := l;
 			self := [];
 		end;
 			
 		data_in := project(ds_best_recs_raw, addrBestFormat(left, counter));
 		mod_bestAddr_params := MODULE(Address_Rank.IParams.BatchParams) 
-			EXPORT BOOLEAN IncludeShortTermRental 	  := FALSE;
-			EXPORT BOOLEAN IncludeSTRSplitFlag 			  := FALSE;
+			EXPORT BOOLEAN IncludeShortTermRental := FALSE;
+			EXPORT BOOLEAN IncludeSTRSplitFlag    := FALSE;
+			EXPORT UNSIGNED MaxInterHdrRecs       := BatchServices.STR_Constants.Limits.MAX_interHdrRecs;
 		END;		
 		addr_ranked_recs := Address_Rank.fn_getRank_wMetadata(data_in,mod_bestAddr_params);
 		ds_best_addr := 
 			join(ds_best_recs_raw, addr_ranked_recs,
 						left.did = right.did,
 						transform(BatchServices.STR_Layouts.Best_Plus,
-											self.prim_range 				:= right.prim_range,
-											self.prim_name  				:= right.prim_name,
-											self.sec_range  				:= right.sec_range,
-											self.predir     				:= right.predir,
-											self.postdir    				:= right.postdir,
-											self.suffix     				:= right.suffix,
-											self.city_name	        := right.p_city_name,
-											self.st					        := right.st,
-											self.zip        				:= right.z5,
-											self.zip4        				:= right.zip4,
-											self.addr_dt_first_seen := (unsigned)right.addr_dt_first_seen,
-											self.addr_dt_last_seen 	:= (unsigned)right.addr_dt_last_seen,
-											self.isDeceased 				:= false,
-											self := left),
+							self.prim_range         := right.prim_range,
+							self.prim_name          := right.prim_name,
+							self.sec_range          := right.sec_range,
+							self.predir             := right.predir,
+							self.postdir            := right.postdir,
+							self.suffix             := right.suffix,
+							self.city_name          := right.p_city_name,
+							self.st                 := right.st,
+							self.zip                := right.z5,
+							self.zip4               := right.zip4,
+							self.addr_dt_first_seen := (unsigned)right.addr_dt_first_seen,
+							self.addr_dt_last_seen  := (unsigned)right.addr_dt_last_seen,
+							self.isDeceased         := false,
+							self := left),
 					 left outer, keep(1), limit(0));			
 					 
 		ds_best_recs := 

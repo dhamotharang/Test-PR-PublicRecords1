@@ -113,5 +113,6 @@ EXPORT CONSTANTS := MODULE
     EXPORT WATERCRAFT_DETAILS        := 'WATERCRAFT_DETAILS';
   END;
 
+	EXPORT security_freeze_default_codes := '110,112,114,115,118,121,127,129,132,211,212,214,216,218,219,220,221,222,223,224,225,226,227,228,230,231,233,234,235'; // all new codes, minus the collections purpose (113)
 END;
   

@@ -7,6 +7,7 @@ SHARED h := match_candidates(ih).candidates;
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
  
 /*HACK-O-MATIC*/ EXPORT Layout_Sample_Matches := RECORD,MAXLENGTH(32000)
+	TYPEOF(h.RemId) referenceID;
 	UNSIGNED2 Rule;
 	INTEGER2 Conf;
 	INTEGER2 Conf_Prop;
@@ -143,9 +144,10 @@ SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for 
 	INTEGER2 DERIVED_GENDER_prop_score;
 END;
 EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0) := TRANSFORM
-  SELF.Rule := c;
-  SELF.DID1 := le.DID;
-  SELF.DID2 := ri.DID;
+/*HACK-O-MATIC*/ SELF.ReferenceID := le.RemID;
+	SELF.Rule := c;
+	SELF.DID1 := le.RemLexid;
+	SELF.DID2 := ri.RemLexid;
   SELF.RID1 := le.RID;
   SELF.RID2 := ri.RID;
   SELF.DateOverlap := SALT37.fn_ComputeDateOverlap(((UNSIGNED)le.DT_FIRST_SEEN)*100,((UNSIGNED)le.DT_LAST_SEEN)*100,((UNSIGNED)ri.DT_FIRST_SEEN)*100,((UNSIGNED)ri.DT_LAST_SEEN)*100);

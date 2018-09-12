@@ -9,6 +9,7 @@ export riskview2 := MODULE
 export t_Rv2MLAGatewayInfo := record
 	string20 CustomerNumber {xpath('CustomerNumber')};
 	string10 SecurityCode {xpath('SecurityCode')};
+	string120 EndUserCompanyName {xpath('EndUserCompanyName')};
 end;
 		
 export t_Rv2TransactionContext := record
@@ -79,7 +80,7 @@ export t_Rv2ReportFilingRecord := record
 	string16 Status {xpath('Status')};
 	iesp.share.t_Date FilingDate {xpath('FilingDate')};
 	iesp.share.t_Date LastActionDate {xpath('LastActionDate')};
- iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	unsigned ConsumerStatementId {xpath('ConsumerStatementId')};
 end;
 		
@@ -290,7 +291,7 @@ export t_RiskView2LiensJudgmentsReportForLien := record
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
-	string2 LienTypeId {xpath('LienTypeId')};
+	string2 LienTypeID {xpath('LienTypeID')};
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
@@ -306,7 +307,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string50 JudgmentType {xpath('JudgmentType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
-	string2 JudgmentTypeId {xpath('JudgmentTypeId')};
+	string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string16 FilingDescription {xpath('FilingDescription')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};
@@ -336,7 +337,7 @@ export t_RiskView2Result := record
 	t_RiskView2Report Report {xpath('Report')};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	t_RiskView2LiensJudgmentsReport LiensJudgmentsReports {xpath('LiensJudgmentsReports')};
-	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[ecl_only]
+	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[__inq_hist_logging__]
 end;
 		
 export t_RiskView2Response := record

@@ -9,6 +9,7 @@ MODULE
 	BatchShare.MAC_ProcessInput(dIn,SHARED dProcessInput);
 	
 	SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+
 	SHARED doVerify := inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName;
 	
 	// Format to common batch input layout
@@ -59,7 +60,9 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 																								SELF.zip4      := LEFT.z4,
 																								SELF           := LEFT));
 	SHARED dInPhone   := dAppendDIDsFormat(homephone != '');
-	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment);
+ 
+ IsValidTransactionType	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
+	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment and ~IsValidTransactionType);
 
 	// Append best info
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
@@ -108,6 +111,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
 																																	,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
 																																	,dZum_final);
+                                                                  
     // restriction added here if plugin from batch is set to true ....
 		//  if not then don't do any restrictions.											
 

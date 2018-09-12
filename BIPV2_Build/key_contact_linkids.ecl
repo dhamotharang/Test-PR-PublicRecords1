@@ -1,7 +1,7 @@
-import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
+﻿import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
        ,acf,diversity_certification,govdata,gsa,insurance_certification,martindale_hubbell
 			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa
-			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools, data_services;
+			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress;
 EXPORT key_contact_linkids :=
 module
 													 //BIPV2.File_Business_Sources(source not in [mdr.sourcetools.src_Dunn_Bradstreet,mdr.sourcetools.src_zoom])
@@ -32,14 +32,15 @@ module
 	  unsigned8 rid:=0;
     BIPV2.IDlayouts.l_xlink_ids; 
     contacts_sources;
-		boolean executive_ind:=FALSE;
+		//boolean executive_ind:='';
+		boolean executive_ind:=False;
 		integer executive_ind_order:=0;
   end;
   
   shared ds1 := contacts_sources;
   
   shared ds_add_ids := project(ds1,r1);
-  shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_base(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
+  shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_built(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
     ,self                              := left  
     ,self.company_address.prim_range	 := left.prim_range	
     ,self.company_address.predir			 := left.predir			
@@ -352,7 +353,7 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   shared superfile_name := keynames(, tools._Constants.IsDataland).contact_linkids.QA;
 	//shared superfile_name := keynames().contact_linkids.QA;  //////Temp use only!!!!?????
 		
-  export dkeybuild      := contacts_bipd_pst;
+  export dkeybuild      := Suppress.applyRegulatory.applyContactBIPV2(contacts_bipd_pst);
   
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
   export Key := k;
@@ -364,6 +365,8 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   export keyfather      := keyvs().father     ;
   export keygrandfather := keyvs().grandfather;
   
+	 export kfetch_layout :={Key};
+	
   //DEFINE THE INDEX ACCESS
   export kFetch(
                   dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
@@ -379,6 +382,22 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 									BIPV2_Suppression.mac_contacts(ds_restricted, ds_suppressed_clean, ds_suppressed_dirty)
                   return ds_suppressed_clean;
 									
+  end;
+	
+	//DEFINE THE INDEX ACCESS
+  export kFetchMarketing(
+                  dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
+                  ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
+                  ,unsigned2 ScoreThreshold = 0
+                  ,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
+                  ,JoinLimit=25000
+                  ,boolean includeDMI=false
+                  ) :=
+  function   
+    kFetched := kfetch(inputs, Level, ScoreThreshold, in_mod, JoinLimit, includeDMI);
+		  allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
+			 marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
+    return marketingSuppressed;						
   end;
   
 end;

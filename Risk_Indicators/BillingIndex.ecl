@@ -119,6 +119,8 @@ export BillingIndex := MODULE
 		export RVC1801_1			:= '205'; // TSI //batch only
 		export RVT1705_1      := '206'; // Huntington	
 		
+    export RVC1805_1			:= '207'; // Phillips & Cohen //batch only (207 % 100 + 30 = 137)             
+    export RVC1805_2			:= '208'; // Phillips & Cohen //batch only (208 % 100 + 30 = 138)
 	
 		// Chargeback Defender Version 1
 		export CBD_v1 						:= '10';	// CDN712_0
@@ -185,11 +187,10 @@ export BillingIndex := MODULE
 		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
 		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)	
 		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)	
-		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100)	
-	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 
-    export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  
-    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital
-    //***leave 175 open for now - I believe it is reserved for another model in the pipeline ***//
-    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover
-
+		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100) (171 % 100 + 30 = 101)             
+	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 (172 % 100 + 30 = 102)             
+    export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  (173 % 100 + 30 = 103)             
+    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital (174 % 100 + 30 = 104)             
+    export FP1710_1     := '175'; //FP1710_1 - Fraudpoint 3.0 Custom Model for Borrow Works (175 % 100 + 30 = 105)
+    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover (176 % 100 + 30 = 106)             
 END;

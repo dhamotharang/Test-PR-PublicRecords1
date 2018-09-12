@@ -19,8 +19,10 @@ EXPORT reportIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := F
                                                             SELF.MotorVehicles := DATASET([TRANSFORM(iesp.duediligencepersonreport.t_DDRPersonVehicle,
                                                                                                 SELF.OwnershipType.SubjectOwned := LEFT.inquiredOwned;   //****go back and calculate this
                                                                                                 SELF.OwnershipType.SpouseOwned  := LEFT.spouseOwned;    //**** go back and calcluate this
-                                                                                                SELF := LEFT;
-                                                                                                SELF := [];)]); 
+                                                                                                SELF.OwnershipType.Owners := PROJECT(LEFT.owners, TRANSFORM(iesp.duediligenceshared.t_DDRPersonNameWithLexID,
+                                                                                                                                                            SELF.lexID := (STRING)LEFT.did;
+                                                                                                                                                            SELF.Name := iesp.ECL2ESP.SetName(LEFT.firstName, LEFT.middleName, LEFT.lastName, LEFT.suffix, DueDiligence.Constants.EMPTY))); //to add when added to iesp
+                                                                                                SELF := LEFT;)]); 
                                                             SELF := LEFT;));
                                                                                                     
                                                                                                     

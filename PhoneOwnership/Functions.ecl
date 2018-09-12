@@ -22,13 +22,13 @@ EXPORT Functions := MODULE
 	
 	EXPORT STRING getOwnershipValue(UNSIGNED ownershipIndex) := FUNCTION
 		RETURN CASE(ownershipIndex,
-								5 => 'High', //PhoneOwnership.Constants.Ownership.HIGH,
-								4 => 'Medium High', //PhoneOwnership.Constants.Ownership.MEDIUM_HIGH,
-								3 => 'Medium', //PhoneOwnership.Constants.Ownership.MEDIUM,
-								2 => 'Undetermined', //PhoneOwnership.Constants.Ownership.UNDETERMINED,
-								1 => 'Low', //PhoneOwnership.Constants.Ownership.LOW,
-								0 => 'Invalid', //PhoneOwnership.Constants.Ownership.INVALID,
-								'Undetermined'); //PhoneOwnership.Constants.Ownership.UNDETERMINED));													
+								5 => 'High',
+								4 => 'Medium High',
+								3 => 'Medium',
+								2 => 'Undetermined',
+								1 => 'Low', 
+								0 => 'Invalid',
+								'Undetermined');
 	END;		
 	EXPORT STRING getRelationship(UNSIGNED ownershipIndex) := FUNCTION
 		RETURN CASE(ownershipIndex,
@@ -45,14 +45,22 @@ EXPORT Functions := MODULE
 		RETURN STD.Metaphone.Primary(str);
 	END;
 
-	EXPORT evaluateNameMatch(STRING InputFName,STRING InputLName,STRING ResultFName,STRING ResultLName) := FUNCTION	
-			RETURN  MAP(InputFName<>'' AND InputLName<>'' AND
-									fuzzyString(InputFName) = fuzzyString(ResultFName) AND 
-									fuzzyString(InputLName) = fuzzyString(ResultLName) => PhoneOwnership.Constants.NameMatch.FIRSTLAST,
-								(InputFName != '' AND fuzzyString(InputFName) = fuzzyString(ResultFName)) OR 
-								(InputLName != '' AND fuzzyString(InputLName) = fuzzyString(ResultLName)) => PhoneOwnership.Constants.NameMatch.PARTIAL,
-								PhoneOwnership.Constants.NameMatch.NONE);	
-	END;
+EXPORT evaluateNameMatch(STRING LFName,STRING LLName,STRING RFName,STRING RLName, boolean flipFL = false) := FUNCTION  
+      fuzzyMatchFirstAndLast(STRING l_fname, STRING l_lname, STRING r_fname, STRING r_lname) := l_fname <> '' AND llname <> '' AND fuzzyString(l_fname) = fuzzyString(r_fname) AND fuzzyString(l_lname) = fuzzyString(r_lname);
+      fuzzyMatchFirstOrLast(STRING l_fname, STRING l_lname, STRING r_fname, STRING r_lname) := (l_fname <> '' AND fuzzyString(l_fname) = fuzzyString(r_fname)) OR (l_lname <> '' AND fuzzyString(l_lname) = fuzzyString(r_lname));
+      RETURN  MAP(
+          fuzzyMatchFirstAndLast(LFName, LLName, RFName, RLName) => PhoneOwnership.Constants.NameMatch.FIRSTLAST,
+          flipFL AND fuzzyMatchFirstAndLast(LFName, LLName, RLName, RFName) => PhoneOwnership.Constants.NameMatch.FIRSTLAST,
+          fuzzyMatchFirstOrLast(LFName, LLName, RFName, RLName) => PhoneOwnership.Constants.NameMatch.PARTIAL,
+          flipFL AND fuzzyMatchFirstOrLast(LFName, LLName, RLName, RFName) => PhoneOwnership.Constants.NameMatch.PARTIAL,
+          PhoneOwnership.Constants.NameMatch.NONE); 
+  END;
+
+  EXPORT callerNameMatch(STRING LFName, STRING LLName, STRING RFName, STRING RLName) := FUNCTION  
+      // CallerID is not consistent with the name order, hence check for any possible match for switch first and last names
+      RETURN evaluateNameMatch(LFName, LLName, RFName, RLName, TRUE);
+  END;  
+	
 
 	EXPORT checkOwnership(STRING subjectFName, STRING subjectLName,STRING resultFName, STRING resultLName,STRING LNMatchCode,STRING relationship) := FUNCTION
 		ownershipLevel := MAP(

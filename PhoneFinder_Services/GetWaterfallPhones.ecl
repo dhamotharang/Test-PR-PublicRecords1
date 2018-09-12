@@ -31,8 +31,8 @@ FUNCTION
 		EXPORT BOOLEAN IncludeLastResort     := ~isPhoneExists;
 	END;
 	
-	qSentPVSV2Gateway := dGateways(inMod.IncludeTransUnionPVS AND Gateway.Configuration.isQsentV2(servicename))[1];
-	qSentIQ411V2Gateway := dGateways(inMod.IncludeTransUnionIQ411 AND Gateway.Configuration.isQsentV2(servicename))[1];
+	qSentPVSV2Gateway := dGateways(inMod.UseTransUnionPVS AND Gateway.Configuration.isQsentV2(servicename))[1];
+	qSentIQ411V2Gateway := dGateways(inMod.UseTransUnionIQ411 AND Gateway.Configuration.isQsentV2(servicename))[1];
 		
 	BOOLEAN isWaterfallphonesearch := inMod.useWaterfallv6 OR isPhoneExists;
 	
@@ -56,7 +56,9 @@ FUNCTION
 															WFConstants.MaxSubjects,,inMod.UseEquifax,WFConstants.MaxPremiumSource);																										
 	dWaterfallPhoneSearch := AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,,,TRUE, TRUE);
 	
-	dWaterfallPhones := IF(isWaterfallphonesearch,dWaterfallPhoneSearch,dWaterfallPIISearch);
+	dWaterfallPhones_pre := IF(isWaterfallphonesearch,dWaterfallPhoneSearch,dWaterfallPIISearch);
+  
+ dWaterfallPhones := IF(inMod.UseInhousePhones, dWaterfallPhones_pre, dWaterfallPhones_pre(subj_phone_type_new = MDR.sourceTools.src_EQUIFAX));
 	
 	// Format to common layout
 	lFinal tWaterfall2Common(dIn le,dWaterfallPhones ri) :=
@@ -114,7 +116,7 @@ FUNCTION
 	dExcludePhones := PROJECT(dWaterfallPhones2Common,TRANSFORM(lExcludePhones,SELF.acctno := LEFT.batch_in.acctno,SELF := LEFT));
 	
 	// QSent gateway data - iQ411	
-	dWFQSentIQ411 := IF(EXISTS(dIn) AND EXISTS(dInBestInfo) AND inMod.IncludeTransUnionIQ411,
+	dWFQSentIQ411 := IF(EXISTS(dIn) AND EXISTS(dInBestInfo) AND inMod.UseTransUnionIQ411,
 											PhoneFinder_Services.GetQSentPhones.GetQSentIQ411Data(dInBestInfo,dExcludePhones,inMod,qSentIQ411V2Gateway));
 	
 	// Grab records from QSent where we didn't get a hit from waterfall
@@ -138,7 +140,7 @@ FUNCTION
 	// Since iQ411 service type doesn't return a PV record
 	dPrimaryPhones := dWFQSentPrimaryPhone + dWaterfallPrimaryPhone;
 	
-	dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.IncludeTransUnionPVS,
+	dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS,
 																		PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones,
 																																												inMod,phone,acctno,
 																																												TRUE,qSentPVSV2Gateway));
@@ -160,7 +162,9 @@ FUNCTION
 	dWFQSentRecs := IF(vHitQSent,dWFQSentCombined);
 	
 			
-  dWaterfallCombined := IF(~isPhoneExists AND vHitQSent,dWaterfallOtherPhones + dWFQSentRecs,dWaterfallPrimaryPhone + dWaterfallOtherPhones);
+  dWaterfallCombined := IF(~isPhoneExists AND vHitQSent,
+                          dWaterfallOtherPhones + dWFQSentRecs,
+                          dWaterfallPrimaryPhone + dWaterfallOtherPhones+ IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn));
 	 
 	 	dDidRecs := PROJECT(dWaterfallCombined, TRANSFORM(lFinal,
 																					                       SELF.phonestatus :=  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
