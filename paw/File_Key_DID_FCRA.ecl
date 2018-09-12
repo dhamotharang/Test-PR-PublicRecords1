@@ -34,10 +34,3 @@ ut.MAC_CLEAR_FIELDS(dBase_filtered, dbase_cleared_temp, fields_to_clear);
 dbase_cleared		:= DEDUP(dbase_cleared_temp);
 
 EXPORT File_Key_DID_FCRA := dbase_cleared;
-
-
-
-
-
-
-
