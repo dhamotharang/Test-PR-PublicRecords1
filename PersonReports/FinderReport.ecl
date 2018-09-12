@@ -10,7 +10,7 @@ EXPORT out_rec FinderReport (
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
-  isCNSMR := param.IndustryClass = D2C.Constants.Is_CNSMR;
+  isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
   // person records 
   pers := Person_records (dids, module (project (param, input.personal, opt)) end, IsFCRA);
 

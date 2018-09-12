@@ -30,7 +30,7 @@ export OrderScore_Service := MACRO
 			'gateways'));
 
 
-	BOOLEAN DEBUG := FALSE;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
+	BOOLEAN DEBUG := False;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
 	
 	BOOLEAN   ipid_only  := FALSE  : stored('ipid_only');
 
@@ -193,6 +193,16 @@ export OrderScore_Service := MACRO
 	//reserved for future use of the model options - similar to code below...I think
 	// cmGrade           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'grade';
 	// cmGradeValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmDeliverable           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'delivery';
+  // cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmTotal           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'total_amount';
+  // cmTotalValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  
+  
+  cmDeliverableOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'delivery');
+  cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(cmDeliverableOption[1].OptionValue));
+  cmTotalAmountOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'total_amount' );
+  cmTotalValue      := StringLib.StringToUpperCase(TRIM(cmTotalAmountOption[1].OptionValue));
 
   /* ***************************************
 	 *           Set Users Values:           *
@@ -546,7 +556,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 
 /*  Models will be validated and called in this OrderScore_GetScore */   
 	#If(DEBUG)
-	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);
+	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);
+	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue);
 			getScoreWAcct := record
 		    recordof(getScore);
 		    string30 account2 := '';
@@ -556,7 +567,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		             left.seq = right.seq * 2,                                           //this needs to be the seq # of the bill to
 		             transform(getScoreWAcct, self.Account2 := right.Account, self := left));
 	#ELSE
-	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);  
+	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName );  
+	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue );  
 	
 	
 // ****Add the Models to the output 

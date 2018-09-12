@@ -983,12 +983,13 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
       InstantID_records_srtd := SORT( InstantID_records_pre, OrigSeq, seq );
 
 			// Convert seq back to original sequence number; there will therefore be 1-5 records
-			// having the same seq #. Slim off OrigSeq.
+			// having the same seq #. Preserve the sequence number ("Rep_WhichOne") for each AR.
       InstantID_records :=
         PROJECT(
           InstantID_records_srtd,
-          TRANSFORM( risk_indicators.Layout_InstantID_NuGenPlus, 
+          TRANSFORM( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout, 
             SELF.seq := LEFT.OrigSeq,
+            SELF.Rep_WhichOne := LEFT.seq % 10;
 						SELF := LEFT,
           )
         );

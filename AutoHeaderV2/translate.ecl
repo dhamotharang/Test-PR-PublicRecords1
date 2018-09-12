@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, address, doxie, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
+﻿IMPORT AutoStandardI, address, doxie, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
 
 isFCRAval := false;
 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();
@@ -212,12 +212,13 @@ EXPORT translate := MODULE
 												
 		city_value := if (isValidCityStateClean, ca_city, input_city_value);
 
-		state_value := stringlib.StringToUpperCase(map(
+		state_value := if(is_saltFetch and state_val='' , '', 
+    stringlib.StringToUpperCase(map(
 				city_val='' and state_val='' and zip_val<>'' => ziplib.ZipToState2(zip_val),
 				state_val<>''                                => state_val,
 				isValidCityStateClean                        => ca_state,
 				zip_val <> ''                                => ziplib.ZipToState2(zip_val),
-				''));
+				'')));
 
 		prange_wild_value := if(addr_wild, addr_value [1..pos_space-1],'');
 		prange_beg_value := if (addr_range, (unsigned) addr_value [1.. if (addr_comma, pos_comma-1, pos_colon-1)], 0);
@@ -243,7 +244,8 @@ EXPORT translate := MODULE
 		
 		zip_val_to_use      := if((integer)ca_zip <> 0 or hasAlpha(ca_zip), ca_zip, '');	
 		Self.zip5           := if(is_saltFetch,
-		                            zip_val_to_use,  //if SALT flag is true using cleaned zip
+		                            IF(zip_val_to_use<>'',
+																																zip_val_to_use, zip_val),//if SALT flag is true using cleaned zip
 		                            zip_val);    //AutoStandardI.InterfaceTranslator.zip_val.val
 		
 		zipradius_value 	  := map(L.StrictMatch => 0,

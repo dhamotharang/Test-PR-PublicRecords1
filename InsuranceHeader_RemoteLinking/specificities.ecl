@@ -42,7 +42,10 @@ EXPORT input_layout := RECORD // project out required fields
   UNSIGNED4 ADDRESS := 0; // Place holder filled in by project
   UNSIGNED4 FULLNAME := 0; // Place holder filled in by project
   h.DL_STATE;
-  h.AMBEST;
+  /*HACK-O-MATIC*/ h.AMBEST;
+  h.remID;
+  h.remLexid;
+  h.remFlag;
 END;
 r := input_layout;
  

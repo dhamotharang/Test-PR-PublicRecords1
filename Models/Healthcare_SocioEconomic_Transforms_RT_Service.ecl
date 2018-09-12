@@ -58,7 +58,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	END;
 
 	//Modeled after HC Profile Search
-	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndiatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested) := TRANSFORM
+	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested) := TRANSFORM
 		SELF.transaction_id	:= L.AccountContext.Common.TransactionID;
 		SELF.billing_code	:= L.User.BillingCode;
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;

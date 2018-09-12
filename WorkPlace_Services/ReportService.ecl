@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WorkPlace_ReportService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"          type="xsd:byte"/>
@@ -24,7 +24,7 @@
 */
 /*--INFO-- Return WorkPlace information in a report format for a certain DID. */
 
-import iesp,AutoStandardI;
+import iesp,AutoStandardI, Royalty;
 
 export ReportService := macro
 
@@ -66,17 +66,28 @@ export ReportService := macro
    // certain xml tags (i.e. <TransactionId> are needed by ESP.
 	 // So an empty WPReportRecord is output below when the temp_results have no records.
   iesp.workplace.t_WorkPlaceReportResponse format() := transform
-	      temp_cnt := count(ds_temp_results);
-        self._Header         := iesp.ECL2ESP.GetHeaderRow(),
-        self.RecordCount     := temp_cnt, //count(ds_temp_results),
-        self.WPReportRecord  := if(temp_cnt>0,ds_temp_results[1])
-    end;
+			temp_cnt := count(ds_temp_results);
+			self._Header         := iesp.ECL2ESP.GetHeaderRow(),
+			self.RecordCount     := temp_cnt, //count(ds_temp_results),
+			self.WPReportRecord  := if(temp_cnt>0,ds_temp_results[1])
+   end;
   ds_results := dataset([format()]);
-
+									
+	// ds_results_slimmed := project(ds_results,
+																// transform(WorkPlace_Services.Layouts.result_sources,
+																	// self.source := left.WPReportRecord.SourceCode));
+									
+	// Royalty.MAC_RoyaltyWorkplace(ds_results_slimmed, temp_royalties);							
+	
+	Royalty.MAC_RoyaltyEmail(ds_results[1].WPReportRecord.EmailAddresses, email_royalties, EmailSource);
+	
+	// royalties:= temp_royalties + email_royalties;
+	
   //Uncomment line below as needed to assist in debugging
   //output(ds_temp_results,  named('ds_temp_results'));
   output(ds_results,named('Results'));
-
+	OUTPUT(email_royalties, NAMED('RoyaltySet'));	// Returning only email_royalties as royalties for WPL is yet to approved by billing team.
+																								// Royalties for WPL are calculated in Workplace_Services.SearchService.
  endmacro;
 
 /*

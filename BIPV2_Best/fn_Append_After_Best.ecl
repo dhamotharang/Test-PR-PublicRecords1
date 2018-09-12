@@ -1,4 +1,4 @@
-import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
+﻿import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
 EXPORT fn_Append_After_Best (linkid,best_file,pHrchyBase,pFips2County) := FUNCTIONMACRO
 bip_business_header := pHrchyBase;
 best_company_name_l := RECORD
@@ -103,11 +103,11 @@ slim_layout:=RECORD
 END;
 //--------------append dates
 company_names_ := project(bip_business_header (linkid > 0 ), transform(slim_layout, self.company_name := if(BIPV2_Best.fn_valid_cname(left.company_name,''), left.company_name, ''), self := left));
-company_names := sort(distribute(company_names_, hash(linkid)), linkid, cnp_name, cnp_number, cnp_btype, cnp_lowv, company_name, local);
+company_names := sort(distribute(company_names_, hash(linkid)), linkid, trim(cnp_name,all), cnp_number, cnp_btype, cnp_lowv, company_name, local);
 append_clean_name := join(
   distribute(norm_name, hash(linkid)),
   distribute(company_names, hash(linkid)),
-  left.linkid = right.linkid and trim(left.company_name, left, right) = trim(right.company_name, left, right),
+  left.linkid = right.linkid and trim(left.company_name, all) = trim(right.company_name, all),
   transform(
     best_company_name_l,
     self.company_name := trim(left.company_name, left, right),
@@ -118,14 +118,15 @@ append_clean_name := join(
 aggr_company_name_dts := rollup(
   company_names,
   left.linkid=right.linkid and
-  left.cnp_name=right.cnp_name and
+  trim(left.cnp_name,all)=trim(right.cnp_name,all) and
   left.cnp_number=right.cnp_number and
   left.cnp_btype=right.cnp_btype and
   left.cnp_lowv=right.cnp_lowv,
   TRANSFORM(
     recordof(company_names),
     self.dt_first_seen := ut.Min2(LEFT.dt_first_seen, RIGHT.dt_first_seen);
-    self.dt_last_seen := ut.Max2(LEFT.dt_last_seen, RIGHT.dt_last_seen);
+		//self.dt_last_seen := ut.Max2(LEFT.dt_last_seen, RIGHT.dt_last_seen);
+    self.dt_last_seen := Max(LEFT.dt_last_seen, RIGHT.dt_last_seen);
     self := RIGHT;
     self := LEFT;
   ),local
@@ -134,7 +135,7 @@ best_dts_append := join(
   distribute(append_clean_name,hash(linkid)),
   distribute(aggr_company_name_dts,hash(linkid)),
   left.linkid=right.linkid and
-  left.cnp_name=right.cnp_name and
+  trim(left.cnp_name,all)=trim(right.cnp_name,all) and
   left.cnp_number=right.cnp_number and
   left.cnp_btype=right.cnp_btype and
   left.cnp_lowv=right.cnp_lowv,
@@ -147,12 +148,12 @@ best_dts_append := join(
   ),local,left outer
 );
  //--------append source, source_record_id, vl_id for company name
-source_name := dedup(sort(distribute(company_names, hash(linkid)),linkid, cnp_name, cnp_number, cnp_btype, cnp_lowv, source, source_record_id, vl_id, local) ,linkid, cnp_name, cnp_number, cnp_btype, cnp_lowv, source, source_record_id, vl_id, local);
+source_name := dedup(sort(distribute(company_names, hash(linkid)),linkid, trim(cnp_name,all), cnp_number, cnp_btype, cnp_lowv, source, source_record_id, vl_id, local) ,linkid, trim(cnp_name,all), cnp_number, cnp_btype, cnp_lowv, source, source_record_id, vl_id, local);
 best_src_name_append := join(
   distribute(best_dts_append, hash(linkid)),
   distribute(source_name, hash(linkid)),
   left.linkid = right.linkid and
-  left.cnp_name  = right.cnp_name and
+  trim(left.cnp_name,all)  = trim(right.cnp_name,all) and
   left.cnp_number  = right.cnp_number and
   left.cnp_btype  = right.cnp_btype and
   left.cnp_lowv  = right.cnp_lowv,
@@ -167,20 +168,20 @@ best_src_name_append := join(
 temp_lay1 := record
   unsigned6 linkid;
   string120 company_name;
-  unsigned1 company_name_data_permits;
+  unsigned2 company_name_data_permits; 
 end;
 best_src_name_append_p := distribute(project(best_src_name_append,transform(temp_lay1,
   self.company_name_data_permits := BIPV2.mod_sources.src2bmap(left.name_source, left.name_vl_id),
   self := left)
 ),hash(linkid));
-aggr_company_name_src := rollup(best_src_name_append_p,left.linkid=right.linkid and left.company_name=right.company_name,TRANSFORM(temp_lay1,
+aggr_company_name_src := rollup(best_src_name_append_p,left.linkid=right.linkid and trim(left.company_name,all)=trim(right.company_name,all),TRANSFORM(temp_lay1,
   self.company_name_data_permits := LEFT.company_name_data_permits | RIGHT.company_name_data_permits;
   self := LEFT;
 ),local);
 company_name_permits := join(
   distribute(best_src_name_append, hash(linkid)),
   distribute(aggr_company_name_src, hash(linkid)),
-  left.linkid = right.linkid and left.company_name = right.company_name,
+  left.linkid = right.linkid and trim(left.company_name,all) = trim(right.company_name,all),
   transform(
     best_company_name_l,
     self.company_name_data_permits := right.company_name_data_permits,
@@ -240,7 +241,12 @@ company_address_flat := join(
   ),lookup,left outer
 );
 //-------append company_incorporation_date
-company_inc_dt := dedup(sort(distribute(company_names_(company_incorporation_date > 0), hash(linkid)), linkid, company_incorporation_date, local), linkid, local);
+isYearOnlyDate := company_names_.company_incorporation_date%10000 = 0;
+isYearMonthOnlyDate := company_names_.company_incorporation_date%100 = 0;
+isValidIncDate := company_names_.company_incorporation_date >=17641029; // 17641029 per Tim Bernhard: As far as the oldest date – let’s just draw a line with 17641029… There are some older, still existing cos, but I’m using the Hartford Courant as my oldest, valid date.
+company_inc_dt := dedup(sort(distribute(company_names_(isValidIncDate), hash(linkid)), linkid, isYearOnlyDate, isYearMonthOnlyDate, company_incorporation_date, local), linkid, local);
+
+
 company_inc_dt_src := dedup(sort(join(
   distribute(company_inc_dt, hash(linkid)),
   distribute(company_names_, hash(linkid)),
@@ -256,7 +262,7 @@ company_inc_dt_src := dedup(sort(join(
 ),linkid, company_incorporation_date, source,source_record_id, vl_id, local),linkid, company_incorporation_date, source,source_record_id, vl_id, local);
 temp_lay2 := record
   unsigned6 linkid;
-  unsigned1 company_incorporation_date_permits;
+  unsigned2 company_incorporation_date_permits;
 end;
 company_inc_dt_src_p := distribute(project(company_inc_dt_src, transform(temp_lay2, self.company_incorporation_date_permits := BIPV2.mod_sources.src2bmap(left.source, left.vl_id), self := left)), hash(linkid));
 aggr_company_inc_dt_src := rollup(company_inc_dt_src_p,left.linkid = right.linkid,transform(temp_lay2,

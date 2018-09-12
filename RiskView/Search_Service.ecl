@@ -195,7 +195,8 @@ export Search_Service := MACRO
 	BOOLEAN TestDataEnabled := users.TestDataEnabled;
 	STRING32 TestDataTableName := StringLib.StringToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
 	
-  STRING20 EndUserCompanyName 		:= users.EndUser.CompanyName;
+  //Used only by MLA
+  STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
   STRING20 SecurityCode 					:= context.MLAGatewayInfo.SecurityCode  ;
 	

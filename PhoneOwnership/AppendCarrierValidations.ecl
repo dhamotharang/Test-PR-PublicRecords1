@@ -46,9 +46,9 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 																SELF.st := LEFT.AppendedStateCode,
 																SELF.z5 := LEFT.AppendedZipCode,
 																SELF.zip4 := LEFT.AppendedZipCodeExtension,
+																SELF.county_name := '',
 																SELF.addressType:=LEFT.subj2own_relationship,
-																SELF:=LEFT, 
-																SELF:=[])),
+																SELF:=LEFT)),
 											DATASET([],Phones.Layouts.ZumigoIdentity.subjectVerificationRequest));
 	zMod := MODULE(Phones.IParam.inZumigoParams)
 		EXPORT STRING20 useCase := inMod.useCase;
@@ -73,19 +73,20 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 	// ValidatedRecord indicates thoses confirmed by Zumigo.
 	// Any match of firstname, lastname, or address is a confirmation and hence deemed as validated.
 	PhoneOwnership.Layouts.BatchOut appendZumigo(PhoneOwnership.Layouts.BatchOut l, Phones.Layouts.ZumigoIdentity.zOut r):= TRANSFORM
-		// Zumigo is currently returning -1 for score fields based on data submitted. 
-		// Hence identity fields should be populated with blanks below as expected. 
-		// Therefore no need for the additional isCancelled check.
-		isCancelled := r.account_status = Phones.Constants.PhoneStatus.CANCELLED;
-		isSuspended := r.account_status = Phones.Constants.PhoneStatus.SUSPENDED;
-		isActive := r.account_status = Phones.Constants.PhoneStatus.ACTIVE;
 		FirstNameMatch := Phones.Functions.isPassZumigo(r.first_name_score);
 		LastNameMatch  := Phones.Functions.isPassZumigo(r.last_name_score);
 		AddressMatch   := Phones.Functions.isPassZumigo(r.addr_score);
 		// business_name_score is only populated for AT&T and TMobile
 		BusinessNameMatch   := Phones.Functions.isPassZumigo(r.business_name_score);
 		EmailMatch   := Phones.Functions.isPassZumigo(r.email_address_score);
-		ZumigoMatch := FirstNameMatch OR LastNameMatch OR AddressMatch OR BusinessNameMatch OR EmailMatch OR isCancelled;
+		validPass := FirstNameMatch OR LastNameMatch OR AddressMatch OR BusinessNameMatch OR EmailMatch;
+		// Zumigo is currently returning -1 for score fields based on data submitted. 
+		// Hence identity fields should be populated with blanks below as expected. 
+		// Therefore no need for the additional isCancelled check.
+		isCancelled := r.account_status = Phones.Constants.PhoneStatus.CANCELLED;
+		isSuspended := r.account_status = Phones.Constants.PhoneStatus.SUSPENDED;
+		isActive := r.account_status = Phones.Constants.PhoneStatus.ACTIVE;
+		ZumigoMatch := validPass OR isCancelled;
 		FullNameMatch := FirstNameMatch AND LastNameMatch; 
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
@@ -111,7 +112,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		SELF.AppendedLastDate := IF(ZumigoMatch OR isSuspended OR isActive,PhoneOwnership.Functions.TODAY,l.AppendedLastDate);	
 		SELF.disconnect_status := MAP(isCancelled => Constants.DisconnectStatus.CONFIRMED_DISCONNECTED,
 										isSuspended => Constants.DisconnectStatus.CONFIRMED_SUSPENDED,
-										isActive AND l.disconnect_status<>'' => Constants.DisconnectStatus.HISTORIC_DISCONNECT,
+										(validPass OR isActive) AND l.disconnect_status<>'' => Constants.DisconnectStatus.HISTORIC_DISCONNECT,
 										l.disconnect_status);			
 		SELF.source_category := l.source_category + IF(ZumigoMatch OR isSuspended OR isActive,PhoneOwnership.Constants.CARRIER,'');
 		SELF.error_desc := l.error_desc + r.device_mgmt_status + IF(r.device_mgmt_status<>'',PhoneOwnership.Constants.DELIMITER,'');

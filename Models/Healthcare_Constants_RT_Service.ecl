@@ -16,8 +16,8 @@
 	// Error Messages Section
 	Export InvalidInput_Code := 303;
 	Export InvalidInput_Message := 'INVALID INPUT';
-	Export AttributesSubFailMessage := 'ATTRIBUTES OPTION IS NOT SUBSCRIBED';
-	Export ReadmissionSubFailMessage := 'READMISSION SCORE IS NOT SUBSCRIBED';
+	Export AttributesSubFailMessage := 'HEALTH ATTRIBUTESV3 IS NOT SUBSCRIBED. ';
+	Export ReadmissionSubFailMessage := 'READMISSION RISK SCORE IS NOT SUBSCRIBED. ';
 	Export SubInvalidRequest := 'INVALID REQUEST. ';
 	Export INTEGER Name_First_Rej_Code := 8;
 	Export Name_First_Rej_Message := 'INVALID OR BLANK FIRST NAME';

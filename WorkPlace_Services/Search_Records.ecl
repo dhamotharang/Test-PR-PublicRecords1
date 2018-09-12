@@ -1,4 +1,4 @@
-import Autokey_batch,AutoStandardI,BatchServices,doxie,iesp,MDR,POE,PSS,risk_indicators,suppress,ut,CriminalRecords_Services;
+﻿import Autokey_batch,AutoStandardI,BatchServices,doxie,iesp,MDR,POE,PSS,risk_indicators,suppress,ut,CriminalRecords_Services;
 
 export Search_Records := module
 	export params := interface(
@@ -118,12 +118,13 @@ export Search_Records := module
     ds_spouse_dids := if(IncludeSpouse,
 	                       WorkPlace_Services.Functions.getSpouseDids(ds_subject_dids));
     saved_spouse_did := ds_spouse_dids[1].lookupdid;
-
+		
+		ds_combined_dids_sorted := dedup(sort(ds_subject_dids + ds_spouse_dids,lookupdid),lookupdid);
+		
 	  //  5. Get all the POE and PSS recs for the subject & spouse dids
-    ds_poe_recs_slimmed := WorkPlace_Services.Functions.getPoeRecs(ds_subject_dids,  
-	                                                                 ds_spouse_dids);
+    ds_poe_recs_slimmed := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted);
 
-		ds_pss_recs_slimmed	:=	WorkPlace_Services.Functions.getPSSRecs(ds_subject_dids,ds_spouse_dids);
+		ds_pss_recs_slimmed	:=	WorkPlace_Services.Functions.getPSSRecs(ds_combined_dids_sorted);
 
     // 7.1 Combine POE & PSS slimmed recs into 1 dataset here and 
 	  //     join to POE source_hierarchy key file to assign the source_order.
