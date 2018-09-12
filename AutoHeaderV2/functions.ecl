@@ -1,4 +1,4 @@
-IMPORT watchdog, ut, AutoStandardI, NID, doxie, AutoHeaderV2;
+IMPORT watchdog, ut, AutoStandardI, NID, doxie, AutoHeaderV2, dx_BestRecords;
 
 EXPORT functions := MODULE
 
@@ -77,7 +77,7 @@ EXPORT functions := MODULE
       AutoheaderV2.layouts.search_out.index_hit;
     end;
 
-    srec tra(AutoheaderV2.layouts.search_out l, watchdog.Key_watchdog_glb r) := transform
+    srec tra(AutoheaderV2.layouts.search_out l, dx_BestRecords.layout_best r) := transform
       //change: take ssn-valid indicator from best, not from header
       boolean is_good_ssn := length(trim(temp_ssn_value)) = 9 and r.ssn = temp_ssn_value and r.valid_ssn = 'G';
       ss := 
@@ -118,7 +118,8 @@ EXPORT functions := MODULE
       self.index_hit := l.index_hit;
     end;
 
-    j := join(adv_references, watchdog.Key_watchdog_glb,
+    j := join(adv_references, 
+							dx_BestRecords.fn_get_best_records(adv_references, did, dx_BestRecords.Constants.perm_type.glb),
               keyed (left.did = right.did), 
               tra(left, right), KEEP (1), limit (0));
 

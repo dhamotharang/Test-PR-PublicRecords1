@@ -1,4 +1,4 @@
-import ut,doxie,NID,watchdog,autokey,header_quick,AutoHeaderV2,lib_metaphone;
+import ut,doxie,NID,watchdog,autokey,header_quick,AutoHeaderV2,lib_metaphone,dx_BestRecords;
 
 export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 
@@ -56,7 +56,7 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	p := p0+ IF((~temp_fuzzy_ssn OR temp_isCRS )	AND NOT EXISTS(p0) AND useSSnPartialFetch
 					,SSNPartial_Fetch);
 					
-	GoodSSNOnly := join(p, watchdog.Key_watchdog_glb,
+	GoodSSNOnly := join(p, dx_BestRecords.fn_get_best_records(p, did, dx_BestRecords.Constants.perm_type.glb),
 						keyed(left.did > 0 and left.did = right.did) and
 						right.valid_ssn = 'G' and
 						right.ssn = temp_ssn_value,
