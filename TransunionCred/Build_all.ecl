@@ -38,7 +38,7 @@ zDoPopulationStats := Strata(ver);
 
 built := sequential(
 					spray_it,
-		            consolidate_them,
+		      consolidate_them,
 #IF (IsFullUpdate = false)
 					spray_deletes,
 					TransunionCred
