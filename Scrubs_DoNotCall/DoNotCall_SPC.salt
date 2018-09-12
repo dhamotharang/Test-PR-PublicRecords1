@@ -1,0 +1,8 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_DoNotCall
+FILENAME:DoNotCall
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789):LENGTHS(10)
+
+FIELD:phonenumber:LIKE(Invalid_Num):TYPE(STRING10):0,0
+

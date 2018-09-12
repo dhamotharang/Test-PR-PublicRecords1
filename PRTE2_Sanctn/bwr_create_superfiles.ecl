@@ -1,7 +1,7 @@
 ﻿import promotesupers, roxiekeybuild, prte2_sanctn;
 
 promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'incident');
-promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'license_nbr');
+promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'license');
 promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'party');
 promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'party_aka_dba');
 promotesupers.mac_create_superfiles(prte2_sanctn.constants.base_prefix_name + 'rebuttal');

@@ -72,15 +72,13 @@ module
 	)); 
 	
 	// Append MBS classification attributes 
-	CombinedClassification := Functions.Classification(IdentityData + KnownFraud) ; 
+	CombinedClassification := Functions.Classification(IdentityData + KnownFraud); 
 	
 	// append rid 
 	// Filter header records
 	NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
  
-	// Append RingID
-	NewBaseRingID := Append_RingID (NewBaseRid);
-
-	EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRingID);
+	// Append RinID
+	EXPORT NewBase := Append_RinID (NewBaseRid);
 
 END;
