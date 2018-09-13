@@ -31,6 +31,6 @@ dBase_filtered 	      := paw.File_base_cleanAddr_keybuild(did>0 and source in PA
 fields_to_clear  := 'company_department,company_fein,dead_flag,dppa_state,title';
 
 ut.MAC_CLEAR_FIELDS(dBase_filtered, dbase_cleared_temp, fields_to_clear);
-dbase_cleared		:= DEDUP(dbase_cleared_temp);
+dbase_cleared		:= DEDUP(SORT(DISTRIBUTE(dbase_cleared_temp,did), RECORD, LOCAL), RECORD, LOCAL);
 
 EXPORT File_Key_DID_FCRA := dbase_cleared;
