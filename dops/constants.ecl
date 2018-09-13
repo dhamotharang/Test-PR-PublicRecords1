@@ -66,9 +66,9 @@ export constants := module
 																											(environment in healthcareset) and (l_loc in locationset)
 																																=> 'devdopsservices.risk.regn.net/hc'
 																											,environment not in healthcareset and l_loc = 'B'
-																																=> 'devdopsservices.risk.regn.net'
+																																=> 'devdopsservices.risk.regn.net/pr'
 																											,environment not in healthcareset and l_loc = 'A'
-																																=> 'devdopsservices.risk.regn.net'
+																																=> 'devdopsservices.risk.regn.net/ins'
 																											,'NA'
 																										)
 																									);
