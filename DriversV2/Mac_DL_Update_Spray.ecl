@@ -231,7 +231,7 @@ macro
 	                     ,'TN'             => DriversV2.Scrub_DL(filedate).TN
 	                     ,'TX'             => DriversV2.Scrub_DL(filedate).TX
 	                     ,'WI'             => DriversV2.Scrub_DL(filedate).WI
-	                     // ,'WY_MEDCERT'     => DriversV2.Scrub_DL(filedate).WY_MEDCERT
+	                     ,'WY_MEDCERT'     => DriversV2.Scrub_DL(filedate).WY_MEDCERT
                        );
 											  
 	%Create_CleanSuper% := FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_Clean_updates::Superfile',false);

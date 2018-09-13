@@ -59,7 +59,6 @@ built := sequential(
 					,FileServices.FinishSuperFileTransaction()
 #END
 					,zDoPopulationStats
-					,Orbit3.Proc_Orbit3_CreateBuild_npf(ver,'TransunionCred')
 					);
 
 return built;

@@ -23,7 +23,7 @@ functionmacro
   );  //kick off on dataland
 
   cluster44 := tools.fun_Groupname('44');
-  cluster66 := tools.fun_Groupname('66');
+  cluster36 := tools.fun_Groupname('36');
 
   email                 := BIPV2_Build.Send_Emails(pversion ,,not tools._constants.isdataland and pShouldUpdateDOPS);
   UpdateFullKeysDops    := email.BIPV2FullKeys.Roxie    ;
@@ -49,11 +49,11 @@ functionmacro
       ,UpdateFullKeysDops
       ,UpdateWeeklyKeysDops
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44).Built2QA )
-      ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster66).Built2QA )
+      ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36).Built2QA )
       ,if(pShouldDoDataland ,KickPromote2QADataland)
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 2)
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44,pDelete := true).Cleanup  )
-      ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster66,pDelete := true).Cleanup  )
+      ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36,pDelete := true).Cleanup  )
       ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,'^(?!.*?(wkhistory|precision|space|dashboard).*).*$',pDelete := true).Cleanup )
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 3)
     )

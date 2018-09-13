@@ -1,4 +1,4 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation, STD;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation,STD;
 
 export Build_All(
 
@@ -14,13 +14,12 @@ export Build_All(
 	,boolean															PSkipKnownFraudBase				= false 
 	,boolean															PSkipAddressCache					= false 
 	,boolean															PSkipMainBase           		= false 
-	,boolean															PSkipKelBase           		= false 
  	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
 	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
 	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
-  ,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
+	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
 	,boolean                                    	pUpdateIdentityDataFlag		= _Flags.Update.IdentityData
 	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
@@ -37,7 +36,8 @@ module
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	export input_portion := sequential(
-			Build_Input(
+			FraudgovInfo(pversion,'Input_Phase').postNewStatus
+			,Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
@@ -47,13 +47,13 @@ module
 	);
 
 	export base_portion := sequential(
-		  Build_Base(
+			FraudgovInfo(pversion,'Base_Phase').postNewStatus
+		  	,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
 				,PSkipAddressCache
 				,PSkipMainBase
-				,PSkipKelBase
 				//Base
 				,pBaseMainFile	
 				//IdentityData 
@@ -65,14 +65,16 @@ module
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
 			).All
-			,notify('BASE FILES COMPLETE','*')
+			,FraudgovInfo(pversion,'Base_Completed').postNewStatus
+			,notify('Base_Completed','*')
 			,notify('Build_FraudGov_PII_SOAP_Appends','*')
 			
 	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 	
 
-	export keys_portion := sequential(
-		  FraudShared.Build_Keys(
+	export Build_FraudShared_Keys := sequential(
+			FraudgovInfo(pversion,'Base_Completed').SetPreviousVersion
+			,FraudShared.Build_Keys(
 			 pversion
 			,pBaseMainBuilt
 			).All
@@ -83,8 +85,13 @@ module
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
-	
+		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
+
+	export keys_portion := if(		Mac_TestBuild(pversion) 			= 'Passed' and 
+												Mac_TestRecordID(pversion) 	= 'Passed' and 
+												Mac_TestRinID(pversion) 			= 'Passed', 
+												Build_FraudShared_Keys, 
+												Rollback(pversion).All);
 	
 	export full_build := sequential(
 		 Spray_MBS

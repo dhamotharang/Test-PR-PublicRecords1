@@ -1,4 +1,6 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID,_validate,NID;
+﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,_validate,NID;
+
+export Build_base(string ver) := module
 
 #IF (IsFullUpdate = true)
 	Exprn_credit := Files.load_in;
@@ -188,8 +190,8 @@ Layouts.base t_prep (Layouts.load L, INTEGER C):= TRANSFORM
 
 	self.dt_first_seen            := (unsigned)_validate.date.fCorrectedDateString(self.orig_crdt_ccyymmdd,false);
 	self.dt_last_seen             := (unsigned)_validate.date.fCorrectedDateString(self.orig_updt_ccyymmdd,false);
-	self.dt_vendor_first_reported := (unsigned)version;
-	self.dt_vendor_last_reported  := (unsigned)version;
+	self.dt_vendor_first_reported := (unsigned)ver;
+	self.dt_vendor_last_reported  := (unsigned)ver;
 
 	SELF.fname                    := self.orig_fname;
 	SELF.mname                    := self.orig_mname;
@@ -371,9 +373,11 @@ candidates		:=d_did_0(IsDelete=false and IsUpdating=true and IsDeceased=false an
 not_candidates:=d_did_0(IsDelete=true  or  IsUpdating=false or IsDeceased=true  or  IsCurrent=false);
 d_did:=project(candidates
 									,transform(layouts.base
-											,self.dt_last_seen:=if((unsigned)version > left.dt_first_seen, (unsigned)version, left.dt_last_seen)
+											,self.dt_last_seen:=if((unsigned)ver > left.dt_first_seen, (unsigned)ver, left.dt_last_seen)
 											,self:=left
 											))
 											+ not_candidates;
 
-export Build_base := d_did;
+export ALL := d_did;
+
+END;

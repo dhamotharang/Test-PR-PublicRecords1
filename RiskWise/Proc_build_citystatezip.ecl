@@ -15,7 +15,7 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::ZipCitySt','~thor_dat
 ut.mac_sk_move_v2('~thor_data400::key::ZipCitySt', 'Q',mv_a_key_qa2, 2);
 
 //DOPs update, QA Sample, STRATA, E-Mail
-UpdateRoxiePage         := Roxiekeybuild.updateversion('CityStZipKeys',filedate,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|F|BN');
+UpdateRoxiePage         := Roxiekeybuild.updateversion('CityStZipKeys',filedate,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N|F');
 sample_citystatezip 		:= CityStateZip_Sample;
 STRATA                  := STRATA_City_State_Zip;
 send_email              := fileservices.sendemail('Randy.Reyes@lexisnexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com; Abednego.Escobal@lexisnexisrisk.com','City State Zip','\nCity State Zip file received on ' + filedate);

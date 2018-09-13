@@ -39,7 +39,7 @@ EXPORT Layouts := MODULE
   STRING1   routing_number_status;
   STRING10  employer_tax_id;
   STRING8   institution_identifier;
-  STRING64  filler3;
+  STRING65  filler3;
 
  END;
 

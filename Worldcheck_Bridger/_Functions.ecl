@@ -1177,6 +1177,12 @@
 				trim(kword, left, right) = 'KRFSC' =>SubGroup_Constants.numKeywordsID.KEYWORD_KRFSC,
 				trim(kword, left, right) = 'LBISF' =>SubGroup_Constants.numKeywordsID.KEYWORD_LBISF,
 				trim(kword, left, right) = 'JPJSDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJSDA,
+				trim(kword, left, right) = 'USSSR' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSSR,
+				trim(kword, left, right) = 'INNHB' =>SubGroup_Constants.numKeywordsID.KEYWORD_INNHB,
+				trim(kword, left, right) = 'PEMINJUS' =>SubGroup_Constants.numKeywordsID.KEYWORD_PEMINJUS,
+				trim(kword, left, right) = 'EUFSR-RUS-50-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUFSR_RUS_50_WC,
+				trim(kword, left, right) = 'AIIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_AIIB,
+				trim(kword, left, right) = 'FRCNIL' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRCNIL,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

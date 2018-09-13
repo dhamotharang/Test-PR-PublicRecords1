@@ -1,6 +1,6 @@
-import infutor, RoxieKeyBuild, ut, header;
+﻿import infutor, RoxieKeyBuild, ut, header;
 
-filedate := infutor.version_dev;
+string9 filedate := trim(infutor._config.get_cversion_dev,all);
 //build best base
 build_best := infutor.infutor_best();
 

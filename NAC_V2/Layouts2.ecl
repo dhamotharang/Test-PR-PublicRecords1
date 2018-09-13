@@ -1,8 +1,8 @@
-IMPORT	address, Std;
+﻿IMPORT	address, Std;
 
 EXPORT Layouts2 := MODULE
 
-// Address Record â€“ AD01
+// Address Record – AD01
 export rAddress := RECORD
 	string4			RecordCode;
 	string2			ProgramState;
@@ -18,7 +18,7 @@ export rAddress := RECORD
 	string9			ZipCode;
 END;
 
-// State Contact Record â€“ SC01
+// State Contact Record – SC01
 export rStateContact := RECORD
 	string4			RecordCode;
 	string2			ProgramState;
@@ -34,7 +34,7 @@ export rStateContact := RECORD
 	string256		ContactEmail;
 END;
 
-// Case Record â€“ CA01
+// Case Record – CA01
 export rCase := RECORD
 	string4			RecordCode;
 	string2			ProgramState;
@@ -49,7 +49,7 @@ export rCase := RECORD
 	string256		Email;
 END;
 
-// Client/Individual Record â€“ CL01
+// Client/Individual Record – CL01
 export rClient := RECORD
 	string4			RecordCode;
 	string2			ProgramState;
@@ -84,7 +84,7 @@ export rClient := RECORD
 	string256		Email;
 END;
 
-// Exception Record â€“ EX01
+// Exception Record – EX01
 export rException := RECORD
 	string4			RecordCode;
 	string1			UpdateType;			// U = Add/Update, D = Delete

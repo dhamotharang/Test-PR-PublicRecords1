@@ -1,4 +1,4 @@
-import mdr, doxie, Data_Services;
+﻿import mdr, doxie, Data_Services, ut;
 
 EXPORT key_ssn_ssa(boolean isFCRA) := function
 
@@ -25,7 +25,10 @@ set_temp_fcra_exclude := [
 	
 // to match what we have in SSN Table for now, only use DE source for FCRA	
 fcra_base := dm_base(trim(src) in mdr.sourceTools.set_scoring_FCRA and trim(src) not in mdr.sourceTools.set_scoring_FCRA_retro_test);
-base := if(isFCRA, fcra_base, dm_base);
+//DF-21696 blank out specified fields in thor_data400::key::fcra::death_master_ssa::ssn_qa
+ut.MAC_CLEAR_FIELDS(fcra_base, fcra_base_cleared, Death_Master.Constants('').fields_to_clear);
+
+base := if(isFCRA, fcra_base_cleared, dm_base);
 
 key_name := if(isFCRA, 
 							data_services.data_location.prefix('Death')+'thor_data400::key::fcra::death_master_ssa::ssn_'+ doxie.Version_SuperKey,

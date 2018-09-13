@@ -60,6 +60,10 @@ module
 		export AddressCache_IDDT								:= tools.mod_FilenamesInput(Template('AddressCache_IDDT'),pversion);
 		export AddressCache_KNFD								:= tools.mod_FilenamesInput(Template('AddressCache_KNFD'),pversion);
 		
+		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
+		export SourcesToAnonymize							:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
+		
+		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
@@ -71,24 +75,13 @@ module
 	end;
 
 	//////////////////////////////////////////////////////////////////
-	// -- Prepped Filename Versions
-	//////////////////////////////////////////////////////////////////
-	export Prepped := module
-		export identitydata 		:= FraudGov_Prefix('in') + 'passed::identitydata';
-		export deltabase 				:= FraudGov_Prefix('in') + 'passed::deltabase';		
-		export nac 						:= FraudGov_Prefix('in') + 'passed::nac';		
-		export inquirylogs 			:= FraudGov_Prefix('in') + 'passed::inquirylogs';		
-		export knownfraud 			:= FraudGov_Prefix('in') + 'passed::knownfraud';		
-	end;
-	
-	
-	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module
-		export NewHeader 				:= FraudGov_Prefix('out') + 'NewHeader_flag';
+		export NewHeader 			:= FraudGov_Prefix('out') + 'NewHeader_flag';
+		export FraudgovInfoFn		:= FraudGov_Prefix('out') + 'NewFraudgov_flag';
 		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';	
-		export Scrubs_FraudGov 	:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
+		export Scrubs_FraudGov 		:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
 	end;
 
 	//////////////////////////////////////////////////////////////////
@@ -117,6 +110,9 @@ module
 		export kel_person_associations_stats		:= tools.mod_FilenamesBuild(Template('kel::person_associations_stats'),pversion);
 		export kel_person_associations_details	:= tools.mod_FilenamesBuild(Template('kel::person_associations_details'),pversion);
 		export kel_entity_scorebreakdown				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown'),pversion);
+		
+		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
+		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main'),pversion);
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
@@ -135,7 +131,9 @@ module
 			kel_entitystats.dAll_filenames + 			
 			kel_person_associations_stats.dAll_filenames +
 			kel_person_associations_details.dAll_filenames +
-			kel_entity_scorebreakdown.dAll_filenames 			
+			kel_entity_scorebreakdown.dAll_filenames + 
+ 			Main_Orig.dAll_filenames + 
+			Main_Anon.dAll_filenames
 			; 
 	
 	end;
