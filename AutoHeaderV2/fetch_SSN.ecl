@@ -57,7 +57,7 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 					,SSNPartial_Fetch);
 					
 	GoodSSNOnly := join(p, dx_BestRecords.fn_get_best_records(p, did, dx_BestRecords.Constants.perm_type.glb),
-						keyed(left.did > 0 and left.did = right.did) and
+						(left.did > 0 and left.did = right.did) and
 						right.valid_ssn = 'G' and
 						right.ssn = temp_ssn_value,
 						transform(left),

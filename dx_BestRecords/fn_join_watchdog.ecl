@@ -1,6 +1,6 @@
 export fn_join_watchdog(dids, d_field, key) := functionmacro
 
-		import dx_BestRecords;
+		import dx_BestRecords, ut;
 
 		return join(dids, key,
 			keyed(left.d_field = right.did),							

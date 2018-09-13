@@ -120,7 +120,7 @@ EXPORT functions := MODULE
 
     j := join(adv_references, 
 							dx_BestRecords.fn_get_best_records(adv_references, did, dx_BestRecords.Constants.perm_type.glb),
-              keyed (left.did = right.did), 
+              left.did = right.did, 
               tra(left, right), KEEP (1), limit (0));
 
     b := TOPN (j, 1, -score, did);
