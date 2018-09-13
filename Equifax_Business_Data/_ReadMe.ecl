@@ -13,7 +13,7 @@
 			Quick Documentation to run the thor build:
 
 				Tapeload Dir	: business\equifax_business_data
-				Unix Directory	: /data/equifax_business_data/<folder date>
+				Unix Directory	: /data/hds_180/Equifax_Business_Data/<folder date>
 				Thor Module			: Equifax_Business_Data
 				Orbit Build			: Equifax_Business_Data
 				Frequency				: Monthly Unload.
@@ -24,7 +24,7 @@
             After unzipping, the *.txt file will be picked up by the spray process and put 
             on thor.
 				2.	Next, open Equifax_Business_Data._BWR_Build_All in a builder window.  Change 
-            the pversion to to the date that matches the folder date. 
+            the pversion to to the date that matches the folder date and the file name to the *.txt file. 
 				3.  Execute it.
 				4.	In Orbit, create a build instance of the "Equifax_Business_Data" build.  Add the
             update file used in the build.  When the build finishes, update the production 

@@ -16,4 +16,4 @@ pversion 	:= '20150601'								 ;		// modify to current date
 Equifax_Business_Data.Build_All(pversion, 
                                 '/data/hds_180/Equifax_Business_Data', 
 																_control.IPAddress.bctlpedata11, 
-																'LN_archive_Q42015.txt');
+																'*.txt');

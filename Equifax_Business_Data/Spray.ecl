@@ -3,7 +3,7 @@
 EXPORT Spray(
 	 STRING		pversion			= ''
 	,STRING		pServerIP			= _control.IPAddress.bctlpedata11
-	,STRING		pDirectory		= '/data/equifax_business_data/' + pversion[1..8]
+	,STRING		pDirectory		= '/data/hds_180/Equifax_Business_Data' + pversion[1..8]
 	,STRING		pFileType			= ''	
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )	
 	,BOOLEAN	pIsTesting		= FALSE

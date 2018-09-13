@@ -35,8 +35,7 @@ EXPORT Standardize_NameAddr := MODULE
 														 
 			InvalidPart  := '%|UNKNOWN|UNKNOWN ADDRESS|PHYSICAL ADDRESS UNKNOWN|PYSICAL ADDRESS UNKNOWN|ADDRESS UNKNOWN|ADRESS UNKNOWN|UNKNOWN, UNKNOWN|ADDRESS UNKNOWN,|!|~';			
    				
-			cleanStreet  := REGEXREPLACE(InvalidPart,L.norm_Address,'');			
-			cleanCity    := L.norm_City;	
+			cleanStreet  := REGEXREPLACE(InvalidPart,L.norm_Address,'');
 			
 			prepAddrLast 	  :=	L.norm_City + 
 														IF(L.norm_City <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
