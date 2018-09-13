@@ -48,7 +48,7 @@ MODULE
 	
 	// Split the input DATASET into two depending on the input criteria
 	SHARED dInPhone   := dAppendDIDs(homephone != '');
-	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment and ~IsValidTransactionType);
+	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
@@ -107,11 +107,9 @@ MODULE
       																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
       																												,dZum_final);	
 
- inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR inMod.IncludeEquifax OR
-                     inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR inMod.NameAddressValidation OR 
-                     inMod.NameAddressInfo OR inMod.AccountInfo OR 
-                     inMod.CallHandlingInfo OR inMod.DeviceInfo OR inMod.DeviceChangeInfo OR 
-                     inMod.DeviceHistory OR inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing;
+ inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR 
+                     inMod.IncludeEquifax OR inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR 
+                     inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.IncludeZumigoOptions;
                   
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
