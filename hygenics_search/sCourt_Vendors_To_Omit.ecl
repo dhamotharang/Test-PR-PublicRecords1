@@ -312,6 +312,7 @@
 'PY', // WISCONSIN_ADMINISTRATOR_OF_THE_COURTS_TRAFFIC                                                       
 'PZ', // CALIFORNIA_GLENN_COUNTY                                                                             
 'QA', // WASHINGTON_JEFFERSON_COUNTY_ARRESTS                                                                 
+'QB', // WASHINGTON_KITSAP_COUNTY_ARRESTS                                                                    
 'QD', // WASHINGTON_PIERCE_COUNTY_ARRESTS                                                                    
 'QE', // WASHINGTON_THURSTON_COUNTY_ARRESTS                                                                  
 'QF', // WASHINGTON_WHATCOM_COUNTY_ARRESTS                                                                   
@@ -476,6 +477,7 @@
 'W0092', // LOUISIANA_ST_LANDRY_PARISH_SHERIFF_CW                                                               
 'W0093', // NORTH_CAROLINA_WAKE_FOREST_POLICE_DEPARTMENT_CW                                                     
 'W0097', // NEW_HAMPSHIRE_KEENE_POLICE_DEPARTMENT_CW                                                            
+'W0098', // MASSACHUSETTS_CAMBRIDGE_CW                                                                          
 'W0099', // MAINE_WELLS_POLICE_DEPARTMENT_CW                                                                    
 'W0102', // CALIFORNIA_KINGS_COUNTY_BOOKINGS_CW                                                                 
 'W0103', // CALIFORNIA_LAKE_COUNTY_BOOKINGS_CW                                                                  
