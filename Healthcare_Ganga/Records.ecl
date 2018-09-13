@@ -41,24 +41,24 @@ EXPORT Records := Module
 	//Record with 'P' entity type
 	byPrinciples (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
+		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));
-		
-		// output(refmt, named('refmt'));
-		// output(getRaw, named('getRaw'));
-		// output(getRawAppend, named('getRawAppend'));
-		// output(final, named('final'));
-		
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));				
 		return final;
 	END;
 	
 	//Record with 'I' entity type
 	byHCP (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
+		getRecordsIndividual := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
+		getRaw := join(refmt, getRecordsIndividual, left.acctno=right.acctno, transform(recordof(getRecordsIndividual), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));		
 		return final;
 	END;
 	
@@ -140,16 +140,22 @@ EXPORT Records := Module
 	//Records with 'O' entity type
 	byHCO (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Records.getRecordsBusiness(refmt,cfg);
+		getRecordsBusiness := Healthcare_Header_Services.Records.getRecordsBusiness(refmt,cfg);
+		getRaw := join(refmt, getRecordsBusiness, left.acctno=right.acctno, transform(recordof(getRecordsBusiness), 
+																																									self.acctno := left.acctno; 
+																																									self:=right; self:=left;), left outer);
 		getRawAppend := Project(getRaw,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout, self:=left));
-		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));	
 		return final;
 	END;
 	
 	//Records with 'M' entity type
 	byOrgs (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawPenalty := sort(Project(getRaw,transform(recordof(getRaw),
 																											np:=min(left.names,namepenalty);
 																											ap:=min(left.addresses,addrpenalty);
@@ -211,7 +217,7 @@ EXPORT Records := Module
 										transform(Healthcare_Ganga.Layouts.IdentityOutput,
 															self.EntityType := right.EntityType;
 															self.RecordIdentifier := right.RecordIdentifier;
-															self := left;),keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid);
+															self := left;), keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid);		
 		return final;
 	END;
 	Export getAllRecords (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
@@ -231,11 +237,6 @@ EXPORT Records := Module
 		ProcessHCP := byHCP(doHCP,cfg);
 		ProcessHCO:= byHCO(doHCO,cfg);
 		ProcessOrgs := byOrgs(doOrgs,cfg);
-		
-		// output(ProcessPrinciple, named('ProcessPrinciple'));
-		// output(doPrinciple, named('doPrinciple'));
-		// output(ProcessHCP, named('ProcessHCP'));
-		// output(doHCP, named('doHCP'));
 		
 		GoodRecords := ProcessPrinciple+ProcessHCP+ProcessHCO+ProcessOrgs;
 		//Process input warnings
@@ -260,15 +261,7 @@ EXPORT Records := Module
 																										self.acctno := left.acctno;
 																										self.Warnings := dataset([{Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis}], Healthcare_Ganga.Layouts.WarningsOutput);
 																										self := left));
-		Results := sort(FinalGoodResults + FormatNoHits, acctno);																								
-		// output(GoodRecords, named('GoodRecords'));
-		// output(getInputWarnings, named('getInputWarnings'));
-		// output(getOutputWarnings, named('getOutputWarnings'));
-		// output(GoodResults, named('GoodResults'));
-		// output(FinalGoodResults, named('FinalGoodResults'));
-		// output(CatchNoHits, named('CatchNoHits'));
-		// output(FormatNoHits, named('FormatNoHits'));
-		// output(Results, named('FinalResults'));
+		Results := sort(FinalGoodResults + FormatNoHits, acctno);
 		return Results;
 	END;
 END;

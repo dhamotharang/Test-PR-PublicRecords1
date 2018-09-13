@@ -1,39 +1,39 @@
 ﻿IMPORT Healthcare_Ganga,STD;
 EXPORT Functions := Module
 	Warning100Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff(inRec.RecordIdentifier = '',row({Healthcare_Ganga.Constants.Warnings.NoRecordIdentifier,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.RecordIdentifier = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoRecordIdentifier, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning101Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs, Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = '',row({Healthcare_Ganga.Constants.Warnings.NoLegalName,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs, Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoLegalName, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning103Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.TaxId = '',row({Healthcare_Ganga.Constants.Warnings.NoTaxId,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.TaxId = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoTaxId, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning104Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff(inRec.StreetAddress1 = '' OR inRec.City = '' OR inRec.State = '' OR inRec.Zip5 = '',row({Healthcare_Ganga.Constants.Warnings.NoAddress,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.StreetAddress1 = '' OR inRec.City = '' OR inRec.State = '' OR inRec.Zip5 = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoAddress, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning105Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.FirstName = '',row({Healthcare_Ganga.Constants.Warnings.NoFirstName,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.FirstName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoFirstName, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning106Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.LastName = '',row({Healthcare_Ganga.Constants.Warnings.NoLastName,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.LastName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoLastName, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning109Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.SSN = '',row({Healthcare_Ganga.Constants.Warnings.NoSSN,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.SSN = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoSSN, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning110Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff(inRec.NPI = '',row({Healthcare_Ganga.Constants.Warnings.NoNPI,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.NPI = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoNPI, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning111Input (Healthcare_Ganga.Layouts.IdentityInput inRec) := FUNCTION
-		myErr := iff(inRec.EntityType not in [Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Principles, Healthcare_Ganga.Constants.HCO, Healthcare_Ganga.Constants.Orgs],row({Healthcare_Ganga.Constants.Warnings.NoEntityType,Healthcare_Ganga.Constants.Input},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.EntityType not in [Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Principles, Healthcare_Ganga.Constants.HCO, Healthcare_Ganga.Constants.Orgs],row({trim(Healthcare_Ganga.Constants.Warnings.NoEntityType, all),trim(Healthcare_Ganga.Constants.Input, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 EXPORT getInputWarnings (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs) := FUNCTION
@@ -60,56 +60,56 @@ EXPORT getInputWarnings (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs)
 	End;	
 	
 	Warning100Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff(inRec.RecordIdentifier = '',row({Healthcare_Ganga.Constants.Warnings.NoRecordIdentifier,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.RecordIdentifier = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoRecordIdentifier, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	Warning101Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = '',row({Healthcare_Ganga.Constants.Warnings.NoLegalName,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoLegalName, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;		
 	Warning102Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.DoingBusinessAs = '',row({Healthcare_Ganga.Constants.Warnings.NoDoingBusinessAs,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.DoingBusinessAs = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoDoingBusinessAs, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;				
 	Warning103Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.TaxId = '',row({Healthcare_Ganga.Constants.Warnings.NoTaxId,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.TaxId = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoTaxId, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;		
 	Warning104Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff(inRec.StreetAddress1 = '' OR inRec.City = '' OR inRec.State = '' OR inRec.Zip5 = '',row({Healthcare_Ganga.Constants.Warnings.NoAddress,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.StreetAddress1 = '' OR inRec.City = '' OR inRec.State = '' OR inRec.Zip5 = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoAddress, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;		
 	Warning105Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.FirstName = '',row({Healthcare_Ganga.Constants.Warnings.NoFirstName,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.FirstName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoFirstName, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;		
 	Warning106Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.LastName = '',row({Healthcare_Ganga.Constants.Warnings.NoLastName,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.LastName = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoLastName, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning107Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.Gender = '',row({Healthcare_Ganga.Constants.Warnings.NoGender,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.Gender = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoGender, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning108Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND (inRec.Dob = '' OR inRec.Dob = '0'),row({Healthcare_Ganga.Constants.Warnings.NoDob,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND (inRec.Dob = '' OR inRec.Dob = '0'),row({trim(Healthcare_Ganga.Constants.Warnings.NoDob, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning109Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.SSN = '',row({Healthcare_Ganga.Constants.Warnings.NoSSN,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND inRec.SSN = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoSSN, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning110Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff(inRec.NPI = '',row({Healthcare_Ganga.Constants.Warnings.NoNPI,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.NPI = '',row({trim(Healthcare_Ganga.Constants.Warnings.NoNPI, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning111Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
-		myErr := iff(inRec.EntityType not in [Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCO,Healthcare_Ganga.Constants.Orgs],row({Healthcare_Ganga.Constants.Warnings.NoEntityType,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+		myErr := iff(inRec.EntityType not in [Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCO,Healthcare_Ganga.Constants.Orgs],row({trim(Healthcare_Ganga.Constants.Warnings.NoEntityType, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;	
 	Warning199Output (Healthcare_Ganga.Layouts.IdentityOutput inRec) := FUNCTION
 		myErr := iff(((inRec.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP]) AND (inRec.FirstName = '' OR inRec.LastName = '' OR inRec.SSN = '')) OR
-								 ((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = ''),row({Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
+								 ((inRec.EntityType in [Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO]) AND inRec.LegalName = ''),row({trim(Healthcare_Ganga.Constants.Warnings.NoHit, all),trim(Healthcare_Ganga.Constants.LexisNexis, all)},Healthcare_Ganga.Layouts.WarningsOutput),row({'',''},Healthcare_Ganga.Layouts.WarningsOutput));
 		return myErr;
 	END;
 	EXPORT getOutputWarnings(DATASET(Healthcare_Ganga.Layouts.IdentityOutput) inRecs) := FUNCTION
