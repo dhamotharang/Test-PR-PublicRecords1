@@ -1,5 +1,5 @@
-IMPORT	Business_Credit_Scoring,	Codes,	ut;
-EXPORT	fn_GetScoringIndex(	STRING pVersion	=	ut.GetDate)	:=	FUNCTION 
+﻿IMPORT	Business_Credit_Scoring,	Codes,	ut, STD;
+EXPORT	fn_GetScoringIndex(	STRING pVersion	=	(STRING8)Std.Date.Today())	:=	FUNCTION 
 
 	dDBTAverage	:=	Business_Credit_Scoring.Files().DBTAverage;
 	dScored			:=	Business_Credit_Scoring.Files().Scores;
@@ -17,7 +17,7 @@ EXPORT	fn_GetScoringIndex(	STRING pVersion	=	ut.GetDate)	:=	FUNCTION
 												LEFT.SeleID	=	RIGHT.SeleID,
 											TRANSFORM(RECORDOF(Business_Credit_Scoring.Layouts.rScoringIndex),
 												SELF.Version			:=	pVersion;
-												SELF.date_scored	:=	ut.GetDate;
+												SELF.date_scored	:=	(STRING8)Std.Date.Today();
 												SELF							:=	LEFT;
 												SELF							:=	RIGHT;
 												SELF							:=	[]),

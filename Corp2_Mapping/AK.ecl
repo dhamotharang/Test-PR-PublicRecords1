@@ -1,4 +1,4 @@
-Import ut, std, Tools, corp2, versioncontrol, Scrubs, Corp2_Raw_AK, Scrubs_Corp2_Mapping_AK_Main;
+﻿Import ut, std, Tools, corp2, versioncontrol, Scrubs, Corp2_Raw_AK, Scrubs_Corp2_Mapping_AK_Main;
   
 Export AK := Module 
  
@@ -62,6 +62,67 @@ Export AK := Module
 		self			           := l;
 	end;
 	normalizedCorp	:= normalize(norm1Corp, 2, norm2trf(left, counter));		
+	
+	corp2_raw_ak.layouts.normalizedCorp_layout TrfFixBadNames(corp2_raw_ak.layouts.normalizedCorp_layout l)	:=	transform
+		TempName	:=	map(l.EntityNumber='10004410' and (corp2.T2U(l.Norm_corp_legal_name) = 'HANNAH KHLMAN PHOTOGRAPHY LLC.' or corp2.t2u(l.Norm_corp_legal_name)='HANNAH KÃ¥HLMAN PHOTOGRAPHY LLC.')														=> 'HANNAH KÅHLMAN PHOTOGRAPHY LLC.',
+											l.EntityNumber='10012491' and  corp2.t2u(l.Norm_corp_legal_name) = 'NESTL PROFESSIONAL BEVERAGES'																																												=> 'NESTLÉ PROFESSIONAL BEVERAGES',
+											l.EntityNumber='10013258' and  corp2.t2u(l.Norm_corp_legal_name) = 'CRÃªPE CIRCLES' 																																																		=> 'CRÊPE CIRCLES',
+											l.EntityNumber='10014512' and  corp2.t2u(l.Norm_corp_legal_name) = 'KUDATAAN KAHÃ­DI'																																																		=> 'KUDATAAN KAHÍDI',
+											l.EntityNumber='10014700' and  corp2.t2u(l.Norm_corp_legal_name) = 'ELÃN PROPERTIES REI, LLC'																																														=> 'ELÁN PROPERTIES REI, LLC',
+											l.EntityNumber='10021057' and (corp2.t2u(l.Norm_corp_legal_name) = 'COZY BEAR CAF & EATING HOUSE'   or corp2.t2u(l.Norm_corp_legal_name)='COZY BEAR CAFÃ & EATING HOUSE')								=> 'COZY BEAR CAFÉ & EATING HOUSE',
+											l.EntityNumber='10026840' and  corp2.t2u(l.Norm_corp_legal_name) = 'ALASKA CHAPTER NO. 97 OF THE INSTITUTE OF REAL ESTATE MGMT. OF THE NAT\'L ASSOC. OF REALTORSÂ®, INC.' 							=> 'ALASKA CHAPTER NO. 97 OF THE INSTITUTE OF REAL ESTATE MGMT. OF THE NAT\'L ASSOC. OF REALTORS, INC.',
+											l.EntityNumber='10030098' and (corp2.t2u(l.Norm_corp_legal_name) = 'EÂ² CONSULTING LLC' or corp2.t2u(l.Norm_corp_legal_name)='E CONSULTING LLC')																				=> 'E2 CONSULTING LLC',
+											l.EntityNumber='10030331' and (corp2.t2u(l.Norm_corp_legal_name) = 'AVÃ© HOLISTIC HEALTH & CHIROPRACTIC LLC' or corp2.t2u(l.Norm_corp_legal_name)='AV HOLISTIC HEALTH & CHIROPRACTIC LLC')	=> 'AVÉ HOLISTIC HEALTH & CHIROPRACTIC LLC',
+											l.EntityNumber='10038329' and (corp2.t2u(l.Norm_corp_legal_name) = 'JENNIFER RENÃ© PHOTOGRAPHY LLC' or corp2.t2u(l.Norm_corp_legal_name)='JENNIFER REN PHOTOGRAPHY LLC')								=> 'JENNIFER RENÉ PHOTOGRAPHY LLC',
+											l.EntityNumber='10038520' and  corp2.t2u(l.Norm_corp_legal_name) = 'ON THE WAY CAF LLC'																																																	=> 'ON THE WAY CAFÉ LLC',
+											l.EntityNumber='10039672' and  corp2.t2u(l.Norm_corp_legal_name) = 'MORMOR AND SSTRE LLC'																																																=> 'MORMOR AND SOSTRE LLC',
+											l.EntityNumber='10045310' and (corp2.t2u(l.Norm_corp_legal_name) = 'AVANC ACCOUNTING, LLC' or corp2.t2u(l.Norm_corp_legal_name)='AVANCÃ© ACCOUNTING, LLC')															=> 'AVANCÉ ACCOUNTING, LLC',
+											l.EntityNumber='10053546' and (corp2.t2u(l.Norm_corp_legal_name) = 'GOLDEN WOLFWEALTH MANAGEMENT, LLC' or corp2.t2u(l.Norm_corp_legal_name)='GOLDEN WOLFÂ WEALTH MANAGEMENT, LLC')			=> 'GOLDEN WOLF WEALTH MANAGEMENT, LLC',
+											l.EntityNumber='10055830' and  corp2.t2u(l.Norm_corp_legal_name) = 'ORO DIAMANT'																																																				=> 'ORO DIAMANTÉ',
+											l.EntityNumber='10057816' and (corp2.t2u(l.Norm_corp_legal_name) = '9245-4362 QUBEC INC.' or corp2.t2u(l.Norm_corp_legal_name)='9245-4362 QUÃ©BEC INC.')																=> '9245-4362 QUÉBEC INC.',
+											l.EntityNumber='10057875' and (corp2.t2u(l.Norm_corp_legal_name) = 'DIX AU CARR INC.' or corp2.t2u(l.Norm_corp_legal_name)='DIX AU CARRÃ© INC.')																				=> 'DIX AU CARRÉ INC.',
+											l.EntityNumber='10060708' and (corp2.t2u(l.Norm_corp_legal_name) = 'ORO DIAMANT LLC' or corp2.t2u(l.Norm_corp_legal_name)='ORO DIAMANTÃ© LLC')																					=> 'ORO DIAMANTÉ LLC',
+											l.EntityNumber='10064692' and  corp2.t2u(l.Norm_corp_legal_name) = 'CHRIS SHELDEN ROLFINGÂ® LLC' 																																												=> 'CHRIS SHELDEN ROLFING LLC',
+											l.EntityNumber='10067364' and  corp2.t2u(l.Norm_corp_legal_name) = '64 N BREW' 																																																					=> '64 N BREW',
+											l.EntityNumber='10068911' and	 corp2.t2u(l.Norm_corp_legal_name) = 'MTIF PRODUCATIONS'  																																																=> 'MÔTIF PRODUCATIONS',
+											l.EntityNumber='10068911' and (corp2.t2u(l.Norm_corp_legal_name) = 'MTIF PRODUCTIONS' or corp2.t2u(l.Norm_corp_legal_name)='MÃ´TIF PRODUCTIONS')																				=> 'MÔTIF PRODUCTIONS',
+											l.EntityNumber='10072013' and (corp2.t2u(l.Norm_corp_legal_name) = 'MOES OVERHAUL & EQUIPMENT SERVICE LLC' or corp2.t2u(l.Norm_corp_legal_name)='MOEÂ¿S OVERHAUL & EQUIPMENT SERVICE LLC')	=> 'MOE\'S OVERHAUL & EQUIPMENT SERVICE LLC',
+											l.EntityNumber='10073327' and (corp2.t2u(l.Norm_corp_legal_name) = 'OOSIKS KISS, LLC' or corp2.t2u(l.Norm_corp_legal_name)='OOSIKÂ¿S KISS, LLC') 																				=> 'OOSIK\'S KISS, LLC',
+											l.EntityNumber='10073372' and (corp2.t2u(l.Norm_corp_legal_name) = 'PERSONALSERVICEREALTYLLC' or corp2.t2u(l.Norm_corp_legal_name)='PERSONALÂ SERVICEÂ REALTYÂ LLC')										=> 'PERSONAL SERVICE REALTY LLC',
+											l.EntityNumber='10073949' and (corp2.t2u(l.Norm_corp_legal_name) = 'BELLA CAF & BISTRO INC' or corp2.t2u(l.Norm_corp_legal_name)='BELLA CAFÃ© & BISTRO INC')		 												=> 'BELLA CAFÉ & BISTRO INC',
+											l.EntityNumber='10074034' and (corp2.t2u(l.Norm_corp_legal_name) = 'BLM LLC' or corp2.t2u(l.Norm_corp_legal_name)='BLÃ¼M LLC')																													=> 'BLÜM LLC',
+											l.EntityNumber='10075674' and (corp2.t2u(l.Norm_corp_legal_name) = 'DUBHDA PROPERTIES, LLC' or corp2.t2u(l.Norm_corp_legal_name)='Ã DUBHDA PROPERTIES, LLC')														=> 'Ó DUBHDA PROPERTIES, LLC',
+											l.EntityNumber='10075751' and  corp2.t2u(l.Norm_corp_legal_name) = 'RIÃ¦KT CONSULTING, LLC'																																															=> 'RIKT CONSULTING, LLC',
+											l.EntityNumber='10076263' and  corp2.t2u(l.Norm_corp_legal_name) = '60Â° NORTH SEAFOODS, LLC' 										 																																			=> '60 NORTH SEAFOODS, LLC',
+											l.EntityNumber='10076573' and  corp2.t2u(l.Norm_corp_legal_name) = 'ALASKA REALTORSÂ®'																																																	=> 'ALASKA REALTORS®',
+											l.EntityNumber='10076918' and  corp2.t2u(l.Norm_corp_legal_name) = 'KIMS KOREAN BBQ LLC'																																																=> 'KIM\'S KOREAN BBQ LLC',
+											l.EntityNumber='10078750' and (corp2.t2u(l.Norm_corp_legal_name) = 'BORIKN CRAVINGS' or corp2.t2u(l.Norm_corp_legal_name)='BORIKÃN CRAVINGS') 																					=> 'BORIKÉN CRAVINGS',
+											l.EntityNumber='10078940' and  corp2.t2u(l.Norm_corp_legal_name) = '61Âº NORTH PHOTOGRAPY BY BRYEN & LISA'																																							=> '61 NORTH PHOTOGRAPY BY BRYEN & LISA',
+											l.EntityNumber='100792' 	and  corp2.t2u(l.Norm_corp_legal_name) = 'SHAKEELÃ¢Â¿Â¿S GIFTS & NOVELTIES, LLC.'																																							=> 'SHAKEEL\'S GIFTS & NOVELTIES, LLC.',
+											l.EntityNumber='10081955' and (corp2.t2u(l.Norm_corp_legal_name) = 'LAO GACHO, LLC' or corp2.t2u(l.Norm_corp_legal_name)='LAÃ§O GAÃºCHO, LLC')																					=> 'LACO GAUCHO, LLC',
+											l.EntityNumber='10082423' and  corp2.t2u(l.Norm_corp_legal_name) = 'RICHS ALASKAN FLYING ADVENTURES L.L.C.'																																							=> 'RICH\'S ALASKAN FLYING ADVENTURES L.L.C.',
+											l.EntityNumber='10082777' and (corp2.t2u(l.Norm_corp_legal_name) = 'CHUGACH CHTEAU, LLC' or corp2.t2u(l.Norm_corp_legal_name)='CHUGACH CHÃ¢TEAU, LLC')																	=> 'CHUGACH CHATEAU, LLC',
+											l.EntityNumber='10083885' and (corp2.t2u(l.Norm_corp_legal_name) = 'E&B LIVING GARYS DREAM LLC' or corp2.t2u(l.Norm_corp_legal_name)='E&B LIVING GARYÂ¿S DREAM LLC')										=> 'E&B LIVING GARY\'S DREAM LLC',
+											l.EntityNumber='10084263' and (corp2.t2u(l.Norm_corp_legal_name) = 'HUBBARDS CUPBOARDS LLC' or corp2.t2u(l.Norm_corp_legal_name)='HUBBARDÂ¿S CUPBOARDS LLC')														=> 'HUBBARD\'S CUPBOARDS LLC',
+											l.EntityNumber='101392'   and (corp2.t2u(l.Norm_corp_legal_name) = '59° NORTH COHOUSING COMMUNITY ASSOCIATION, INC.' or corp2.t2u(l.Norm_corp_legal_name)='59Â° NORTH COHOUSING COMMUNITY ASSOCIATION, INC.') => '59 NORTH COHOUSING COMMUNITY ASSOCIATION, INC.',
+											l.EntityNumber='103460'   and (corp2.t2u(l.Norm_corp_legal_name) = 'KNSHA, INC.' or corp2.t2u(l.Norm_corp_legal_name)='KÃNSHA, INC.')																										=> 'KÃNSHA, INC.',
+											l.EntityNumber='108805'   and  corp2.t2u(l.Norm_corp_legal_name) = 'GARAGETOWN USAÂ¿ CONDOMINIUMS, SOUTH ANCHORAGE OWNERS ASSOCIATION INC.'																							=> 'GARAGETOWN USA CONDOMINIUMS, SOUTH ANCHORAGE OWNERS ASSOCIATION INC.',
+											l.EntityNumber='112462'   and  corp2.t2u(l.Norm_corp_legal_name) = 'KEITHÃ¢Â¿Â¿S THAWING, LLC'																																													=> 'KEITH\'S THAWING, LLC',
+											l.EntityNumber='115510'   and (corp2.t2u(l.Norm_corp_legal_name) = 'THOMPSONÃ¢Â¿Â¿S TECHNICAL SOLUTIONS' or corp2.t2u(l.Norm_corp_legal_name)='THOMPSONâS TECHNICAL SOLUTIONS')					=> 'THOMPSON\'S TECHNICAL SOLUTIONS',
+											l.EntityNumber='123282'   and (corp2.t2u(l.Norm_corp_legal_name) = 'F³ ENERGY SYSTEM, LLC' or corp2.t2u(l.Norm_corp_legal_name)='FÂ³ ENERGY SYSTEM, LLC')																=> 'F3 ENERGY SYSTEM, LLC',
+											l.EntityNumber='124416'   and (corp2.t2u(l.Norm_corp_legal_name) = 'DR. CRAIG BGIN AND ASSOCIATES LLC.' or corp2.t2u(l.Norm_corp_legal_name)='DR. CRAIG BÃ©GIN AND ASSOCIATES LLC.')		=> 'DR. CRAIG BÉGIN AND ASSOCIATES LLC.',
+											l.EntityNumber='134375'   and  corp2.t2u(l.Norm_corp_legal_name) = '55Â° NORTH, INC.'																																																		=> '55 NORTH, INC.',
+											l.EntityNumber='99656'    and  corp2.t2u(l.Norm_corp_legal_name) = 'SHAKEELÃ¢Â¿Â¿S HALLMARK, LLC'																																												=> 'SHAKEEL\'S HALLMARK, LLC',
+											l.EntityNumber='10088797' and  corp2.t2u(l.Norm_corp_legal_name) = 'AIRMOBILEÂ® ALASKA CORP'																																														=> 'AIRMOBILE ALASKA CORP',
+											l.EntityNumber='10089497' and  corp2.t2u(l.Norm_corp_legal_name) = 'ANÃ¡ASKI KU.OO'																																																			=> 'ANÁASKI KU.OO',
+											l.EntityNumber='10088448' and (corp2.t2u(l.Norm_corp_legal_name) = 'Ã…NGSTRÃ¶M IMAGING SOLUTIONS, LLC' or corp2.t2u(l.Norm_corp_legal_name)='ÃNGSTRÃ¶M IMAGING SOLUTIONS, LLC')					=> 'ÅNGSTRÖM IMAGING SOLUTIONS, LLC',
+											l.Norm_corp_legal_name);
+		self.Norm_corp_legal_name	:=	ut.fn_RemoveSpecialChars((string)Std.Uni.CleanAccents(TempName));
+		self	:=	l;
+	end;
+	
+	FixBadNames	:= project(normalizedCorp, TrfFixBadNames(left));
+
 	
 	//** Note **
   //  In the old mapper, they normalized on Entity Mailing and Entity Physical addresses
@@ -157,7 +218,7 @@ Export AK := Module
 			self														 := [];
 	end; 
 
-	MapCorpMain	:= project(normalizedCorp, CorpMainTransform(left));
+	MapCorpMain	:= project(FixBadNames, CorpMainTransform(left));
 	
 	// Join the Mapped Corporations and Raw Officials files on Entity Number
 	dedupCorp := DEDUP(SORT(DISTRIBUTE(MapCorpMain, hash(corp_orig_sos_charter_nbr)), corp_orig_sos_charter_nbr,local),	corp_orig_sos_charter_nbr,local);

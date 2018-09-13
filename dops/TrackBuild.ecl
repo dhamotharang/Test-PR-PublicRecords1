@@ -9,6 +9,8 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	////////////////////////////////////////////////////
 	export FileTrackBuildPrefix := '~dops::trackbuild::';
 	
+	export applicationname := 'DOPS_'; // '_' is important to separate application with sequence
+	
 	export fromemail := 'bocaroxiepackageteam@lexisnexisrisk.com';
 	export toemaillist := 'Anantha.Venkatachalam@lexisnexisrisk.com';
 	
@@ -41,6 +43,77 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		string emailid := '';
 		string thresholdinsecs := '';
 		string reason := '';
+	end;
+	
+	export rAppInfo := record
+		string wuid;
+		string application;
+		unsigned2 app_seq := 0;
+		string seqs := '';
+		string name;
+		string value;
+	end;
+	
+	/////////////////////////////////////////////////////
+	// ESP functions
+	/////////////////////////////////////////////////////
+	export fGetAppDataFromWUDetails(
+												string p_wuid
+												,string p_esp = localesp
+												,string p_port = '8010'
+												) := function
+		
+		rWUInfoDetailsRequest := record
+			string Wuid{xpath('Wuid')} := p_wuid;
+		end;
+		
+		rWUResponseAppValues := record
+			string Application{xpath('Application')};
+			string Name{xpath('Name')};
+			string Value{xpath('Value')};
+		end;
+		
+		rWUInfoDetailsResponse := record
+			string Wuid{xpath('Wuid')};
+			dataset(rWUResponseAppValues) AppValues {xpath('ApplicationValues/ApplicationValue')};
+		end;
+		
+		dWUInfoDetailsResponse := SOAPCALL('http://'+p_esp+':'+p_port+'/WsWorkunits'
+											// 'http://10.176.152.60:4546/'
+											,'WUInfoDetails'
+											,rWUInfoDetailsRequest
+											,dataset(rWUInfoDetailsResponse)
+											,xpath('WUInfoResponse/Workunit')
+											,LITERAL
+										 );
+		
+		rGetAppData := record
+			string wuid;
+			dataset(rWUResponseAppValues) AppValues;
+		end;
+		
+		rGetAppData xGetAppData(dWUInfoDetailsResponse l) := transform
+			self := l;
+		end;
+		
+		dGetAppData := project(dWUInfoDetailsResponse,xGetAppData(left));
+		
+		rAppInfo xNormKeyInfo(dGetAppData l, rWUResponseAppValues r) := transform
+			self.wuid := l.wuid;
+			self := r;
+		end;
+
+		dNormKeyInfo := normalize(dGetAppData,left.AppValues,xNormKeyInfo(left,right));
+		
+		rAppInfo xTokenizeAppInfo(dNormKeyInfo l) := transform
+			self.app_seq := (unsigned2)STD.Str.SplitWords(l.application,'_')[2];
+			self := l;
+		end;
+		
+		dTokenizeAppInfo := project(dNormKeyInfo,xTokenizeAppInfo(left));
+		
+		return dTokenizeAppInfo;
+		
 	end;
 	
 	////////////////////////////////////////////////////
@@ -82,7 +155,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 		// get WU state							
 		
 		dBuildInfo := dataset([{p_dopsdatasetname,p_buildversion,p_componentname
-												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime(true)
+												,WORKUNIT,(string)STD.Date.Today() + (string)STD.Date.CurrentTime()
 												,p_vertical,p_location,'','',''}],rTrackBuild);
 		
 		return 	sequential
@@ -96,11 +169,68 @@ EXPORT TrackBuild(string p_vertical = 'P'
 	end;
 	
 	////////////////////////////////////////////////////
+	// capture build information into WU details
+	// this function will be called by builds in BWR
+	////////////////////////////////////////////////////
+	export fSetInfoinWorktunit(string p_dopsdatasetname
+									,string p_buildversion
+									,string p_componentname
+									
+									) := function
+	
+		// isWorkunitExists := WORKUNIT in set(STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*'),wuid);
+		
+		seq_number := max(fGetAppDataFromWUDetails(WORKUNIT,localesp),app_seq)+1;
+		
+		return sequential(
+										output('setting app value for '+p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname)
+										,STD.System.Workunit.SetWorkunitAppValue(applicationname + (string)seq_number,'dopsmetrics',p_dopsdatasetname+'|'+p_buildversion+'|'+p_componentname+'|'+(string)STD.Date.Today() + (string)STD.Date.CurrentTime()+'|'+p_vertical+'|'+p_location)
+										);
+		
+	end;
+	
+	////////////////////////////////////////////////////
+	// Convert the information captured from WU into 
+	// rTrackBuild layout
+	////////////////////////////////////////////////////
+	export fConvertWUInfo() := function
+		dWUListWithAppInfo := STD.System.Workunit.WorkunitList(appvalues := applicationname+'*/*=*');
+		
+		rChildRecord := record
+			string wuid;
+			dataset(rAppInfo) appinfo;
+		end;
+		
+		rChildRecord xChildRecord(dWUListWithAppInfo l) := transform
+			self.wuid := l.wuid;
+			self.appinfo := fGetAppDataFromWUDetails(l.wuid);
+		end;
+		
+		dChildRecord := project(dWUListWithAppInfo,xChildRecord(left));
+		
+		rTrackBuild xNormChildRecord(dChildRecord l, rAppInfo r) := transform
+			self.datasetname := STD.Str.SplitWords(r.value,'|')[1];
+			self.buildversion := STD.Str.SplitWords(r.value,'|')[2];
+			self.componentname := STD.Str.SplitWords(r.value,'|')[3];
+			self.wuid := r.wuid;
+			self.datetime := STD.Str.SplitWords(r.value,'|')[4]; // time when the info was first captured
+			self.vertical := STD.Str.SplitWords(r.value,'|')[5]; 
+			self.location := STD.Str.SplitWords(r.value,'|')[6];
+			self := l;
+		end;
+		
+		dNormChildRecord := normalize(dChildRecord,left.appinfo,xNormChildRecord(left,right));
+		
+		return dNormChildRecord;
+		
+	end;
+	
+	////////////////////////////////////////////////////
 	// get the latest tracking info from prod super by default
 	// but when tracking use, using super 
 	////////////////////////////////////////////////////
 	export dGetInfo(string TrackBuildFile = SP_FileTrackBuild(FileInfoPrefix)) 
-																:= dataset(TrackBuildFile,rTrackBuild,thor,opt);
+																:= dataset(TrackBuildFile,rTrackBuild,thor,opt) + fConvertWUInfo()(vertical <> '' and location <> '' and length(datetime) = 14);
 	
 	////////////////////////////////////////////////////
 	// move all track logical files into "using" super
@@ -185,7 +315,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 			dataset(rBTList) btinfo{xpath('btlist')} := dBTList;
 			boolean isGetInfo{xpath('isGetInfo')} := isGetInfo;
 			string vertical{xpath('vertical')} := p_vertical;
-			string location{xpath('location')} := dops.constants.location;
+			string location{xpath('location')} := p_location;
 		end;
 		
 		rSOAPResponse := SOAPCALL(
@@ -272,12 +402,16 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																			,STD.File.RemoveOwnedSubFiles(SD_FileTrackBuild(FileInfoPrefix),true)
 																			,STD.File.FinishSuperFileTransaction()
 																		)
-																		,STD.System.Email.SendEmail(toemaillist
-																					,'SOAPCALL ERRORS: Build Tracking job'
-																					,'Check ' + SU_FileTrackBuild(FileInfoPrefix) + '::persist, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
-																					,
-																					,
-																					,fromemail)
+																		,sequential
+																				(
+																					output(dDopsBTUpdate,named('ERRORS'))
+																					,STD.System.Email.SendEmail(toemaillist
+																						,'SOAPCALL ERRORS: Build Tracking job'
+																						,'Check ERRORS result, for soapcall errors\n' + 'http://'+localesp+':8010/?Wuid='+WORKUNIT+'&Widget=WUDetailsWidget#/stub/Summary' + '\n'
+																						,
+																						,
+																						,fromemail)
+																				)
 																	)
 																,output('Nothing to track')
 														)

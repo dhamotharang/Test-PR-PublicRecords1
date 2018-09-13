@@ -1,4 +1,4 @@
-import ut, std, _validate, corp2, corp2_raw_fl, address, scrubs, corp2_mapping, versioncontrol, scrubs_corp2_mapping_fl_main, Scrubs_Corp2_Mapping_FL_Event, tools;
+﻿import ut, std, _validate, corp2, corp2_raw_fl, address, scrubs, corp2_mapping, versioncontrol, scrubs_corp2_mapping_fl_main, Scrubs_Corp2_Mapping_FL_Event, tools;
  
 export FL := MODULE; 
 	
@@ -106,33 +106,33 @@ export FL := MODULE;
 																					      ,'',Corp2_Raw_FL.Functions.decode_state(input.ann_state_country)));
 			self.corp_for_profit_ind 			    := map (corp2.t2u(input.ann_cor_filing_type) in ['DOMP','FORP']           => 'Y',
 																								corp2.t2u(input.ann_cor_filing_type) in ['DOMNP','FORNP','NPREG'] => 'N', '');
-			// *** If ann_cor_2nd_mail_state is blank then call CleanAddress182, else just fCleanAddress
-			add1Exists   := if(corp2.t2u(input.ann_cor_2nd_mail_add1+input.ann_cor_2nd_mail_add2+input.ann_cor_2nd_mail_city+input.ann_cor_2nd_mail_zip) <> '',true,false);
-			stateIsBlank := if(corp2.t2u(input.ann_cor_2nd_mail_state) = '',true,false);
-			string182 corpAddr1clean_address	:= if(add1Exists and stateIsBlank,Address.CleanAddress182(corp2.t2u(input.ann_cor_2nd_mail_add1+' '+input.ann_cor_2nd_mail_add2),corp2.t2u(input.ann_cor_2nd_mail_city+' '+input.ann_cor_2nd_mail_state+' '+input.ann_cor_2nd_mail_zip)),'');
-			corpAddr1City                := if(corp2.t2u(corpAddr1clean_address[65..89]) <> ''   ,corpAddr1clean_address[65..89]   ,input.ann_cor_2nd_mail_city);
-			corpAddr1State               := if(corp2.t2u(corpAddr1clean_address[115..116]) <> '' ,corpAddr1clean_address[115..116] ,input.ann_cor_2nd_mail_state);
-			self.corp_address1_type_cd        := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).ifAddressExists, 'L', '');			
-			self.corp_address1_type_desc      := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).ifAddressExists, 'PRINCIPAL', '');
-			self.corp_address1_line1			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).AddressLine1,'');
-			self.corp_address1_line2			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).AddressLine2,'');
-			self.corp_address1_line3			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).AddressLine3,'');
-			self.corp_prep_addr1_line1			  := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).PrepAddrLine1,'');
-			self.corp_prep_addr1_last_line	  := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr1City,corpAddr1State,input.ann_cor_2nd_mail_zip,input.ann_cor_2nd_mail_country).PrepAddrLastLine,'');
-  				
 			// *** No separate State field for new_princ_2nd_mail address (city and state are together in the city field), so they all need to go through CleanAddress182 to parse out city and state into separate fields
-			add2Exists := if(corp2.t2u(input.new_princ_2nd_mail_add1+input.new_princ_2nd_mail_add2+input.new_princ_2nd_mail_city+input.new_princ_2nd_mail_zip) <> '',true,false);
-			string182 corpAddr2clean_address	:= if(add2Exists,Address.CleanAddress182(corp2.t2u(input.new_princ_2nd_mail_add1+' '+input.new_princ_2nd_mail_add2),corp2.t2u(input.new_princ_2nd_mail_city+' '+input.new_princ_2nd_mail_zip)),'');
-			corpAddr2City                := if(add2Exists,corpAddr2clean_address[65..89],'');
-			corpAddr2State               := if(add2Exists,corpAddr2clean_address[115..116],'');
-			self.corp_address2_type_cd        := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).ifAddressExists, 'M', '');			
-			self.corp_address2_type_desc      := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).ifAddressExists, 'MAILING', '');
-			self.corp_address2_line1			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).AddressLine1,'');
-			self.corp_address2_line2			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).AddressLine2,'');
-			self.corp_address2_line3			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).AddressLine3,'');
-			self.corp_prep_addr2_line1			  := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).PrepAddrLine1,'');
-			self.corp_prep_addr2_last_line	  := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr2City,corpAddr2State,input.new_princ_2nd_mail_zip).PrepAddrLastLine,'');
-			
+			add1Exists := if(corp2.t2u(input.new_princ_2nd_mail_add1+input.new_princ_2nd_mail_add2+input.new_princ_2nd_mail_city+input.new_princ_2nd_mail_zip) <> '',true,false);
+			string182 corpAddr1clean_address	:= if(add1Exists,Address.CleanAddress182(corp2.t2u(input.new_princ_2nd_mail_add1+' '+input.new_princ_2nd_mail_add2),corp2.t2u(input.new_princ_2nd_mail_city+' '+input.new_princ_2nd_mail_zip)),'');
+			corpAddr1City                     := if(add1Exists,corpAddr1clean_address[65..89],'');
+			corpAddr1State                    := if(add1Exists,corpAddr1clean_address[115..116],'');
+			self.corp_address1_type_cd        := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).ifAddressExists, 'L', '');			
+			self.corp_address1_type_desc      := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).ifAddressExists, 'PRINCIPAL', '');
+			self.corp_address1_line1			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).AddressLine1,'');
+			self.corp_address1_line2			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).AddressLine2,'');
+			self.corp_address1_line3			    := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).AddressLine3,'');
+			self.corp_prep_addr1_line1			  := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).PrepAddrLine1,'');
+			self.corp_prep_addr1_last_line	  := if(self.corp_address1_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.new_princ_2nd_mail_add1,input.new_princ_2nd_mail_add2,corpAddr1City,corpAddr1State,input.new_princ_2nd_mail_zip).PrepAddrLastLine,'');
+
+			// *** If ann_cor_2nd_mail_state is blank then call CleanAddress182, else just fCleanAddress
+			add2Exists   := if(corp2.t2u(input.ann_cor_2nd_mail_add1+input.ann_cor_2nd_mail_add2+input.ann_cor_2nd_mail_city+input.ann_cor_2nd_mail_zip) <> '',true,false);
+			stateIsBlank := if(corp2.t2u(input.ann_cor_2nd_mail_state) = '',true,false);
+			string182 corpAddr2clean_address	:= if(add2Exists and stateIsBlank,Address.CleanAddress182(corp2.t2u(input.ann_cor_2nd_mail_add1+' '+input.ann_cor_2nd_mail_add2),corp2.t2u(input.ann_cor_2nd_mail_city+' '+input.ann_cor_2nd_mail_zip)),'');
+			corpAddr2City                     := if(corp2.t2u(corpAddr2clean_address[65..89]) <> ''   ,corpAddr2clean_address[65..89]   ,input.ann_cor_2nd_mail_city);
+			corpAddr2State                    := if(corp2.t2u(corpAddr2clean_address[115..116]) <> '' ,corpAddr2clean_address[115..116] ,input.ann_cor_2nd_mail_state);
+			self.corp_address2_type_cd        := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).ifAddressExists, 'M', '');			
+			self.corp_address2_type_desc      := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).ifAddressExists, 'MAILING', '');
+			self.corp_address2_line1			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).AddressLine1,'');
+			self.corp_address2_line2			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).AddressLine2,'');
+			self.corp_address2_line3			    := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).AddressLine3,'');
+			self.corp_prep_addr2_line1			  := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).PrepAddrLine1,'');
+			self.corp_prep_addr2_last_line	  := if(self.corp_address2_type_cd<>'',Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.ann_cor_2nd_mail_add1,input.ann_cor_2nd_mail_add2,corpAddr2City,corpAddr2State,input.ann_cor_2nd_mail_zip).PrepAddrLastLine,'');
+  				
 			// *** RA Addresses are ok, so CleanAddress182 not needed.  
 			self.corp_ra_address_type_cd      := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_ra_add1,'',input.ann_ra_city,input.ann_ra_state,input.ann_ra_zip5 + input.ann_ra_zip4).ifAddressExists, 'R', '');			
 			self.corp_ra_address_type_desc    := if(Corp2_Mapping.fAddressExists(state_origin,state_desc,input.ann_ra_add1,'',input.ann_ra_city,input.ann_ra_state,input.ann_ra_zip5 + input.ann_ra_zip4).ifAddressExists, 'REGISTERED OFFICE', '');

@@ -1,29 +1,27 @@
 ﻿EXPORT _fns_offense_category := module
    
-export In_Global_Exclude (string poffense_in,string pcategory ) := function 
-
+export is_Global_Exclude (string poffense_in,string pcategory ) := function 
 
 special_characters := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense           := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 vio_set            := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION';
-   Is_it := MAP(
-REGEXFIND('[/\\. ]CONSP[SIRACY\\.]*[/\\.  ]|CONSPIERACY|CONS[I]*PIRACY|CONSPRI[ER]+|CONSPRRE|CONSPIE[R]* TO'     ,poffense)   => 'Y',
+Is_it := MAP(
 
-REGEXFIND('WARRANT|BENCH WRT |LITTER|ACCOMPLIC|COMPLIC|APPEAL|WAOJ|GUTTER|CAPAIS|CAPIAS|ACCESRY|FOJ OTHER|CONSPIR|CONTEMPT|^[ ]*MTP[/ ]|^[ \\*]*MTR[\\*/ ]+|^[ ]*MTRP[/ ]' ,poffense)    => 'Y',
+REGEXFIND('LITTER|APPEAL|GUTTER|CAPAIS|CAPIAS|CONTEMPT|^[ ]*MTP[/ ]|^[ \\*]*MTR[\\*/ ]+|^[ ]*MTRP[/ ]' ,poffense)    => 'Y',
 							 
 stringlib.stringfind(poffense,'ARR'    ,1) <> 0 and 
 stringlib.stringfind(poffense,'DATA'   ,1) <> 0 and 
 stringlib.stringfind(poffense,'NOT'    ,1) <> 0 and 
 stringlib.stringfind(poffense,'REC'    ,1) <> 0 => 'Y',
 
-REGEXFIND(' CMTP| CNMTP| CNTMPT| BWP | BW[/ ]|VOP|V\\.O\\.P| V/P[/ ]|AID(.*)ABET| BW[I]* | V[ ]*O[ ]*C[ ]*C[/ ]| [SW]*VCC[/ ]| VOC[R]*[/ ]' ,poffense)    => 'Y', 
+REGEXFIND(' CMTP| CNMTP| CNTMPT|VOP|V\\.O\\.P| V/P[/ ]| BW[I]* | V[ ]*O[ ]*C[ ]*C[/ ]| [SW]*VCC[/ ]| VOC[R]*[/ ]' ,poffense)    => 'Y', 
 REGEXFIND('[/ ]VOCC[/ ]|[/ ][SW]*VCC[/ ]|[/ ]VOC[R]*[/ ]' ,poffense)  => 'Y', 
 							            
 REGEXFIND(' F\\.T\\.A|[/\\. ]FTA[/\\. ]' ,poffense) => 'Y',
 							 
-stringlib.stringfind(poffense,'AID'   ,1) <> 0     and
-stringlib.stringfind(poffense,'ABET'  ,1) <> 0     and
-REGEXFIND('ELIZABETH|BETH|LABET|HABET',poffense) => 'Y' ,		
+// stringlib.stringfind(poffense,'AID'   ,1) <> 0     and
+// stringlib.stringfind(poffense,'ABET'  ,1) <> 0     and
+// REGEXFIND('ELIZABETH|BETH|LABET|HABET',poffense) => 'Y' ,		
 							 
 stringlib.stringfind(poffense,'MOTION',1) <> 0  and 
 stringlib.stringfind(poffense,'TO'    ,1) <> 0  => 'Y',
@@ -72,22 +70,23 @@ stringlib.stringfind(poffense,'SENT' ,1) <> 0 => 'Y',
 REGEXFIND(vio_set+'|REV|RVK[D]*|REVO[CK]*|DISOBE' ,poffense)   and 
 stringlib.stringfind(poffense,'COND' ,1) <> 0 and    
 stringlib.stringfind(poffense,'REL'  ,1) <> 0 => 'Y',
+
 //Roger's comment on 7/27/16 QA review Global Expression Round 2
-stringlib.stringfind(poffense,'ABETTING' ,1) <> 0 and
-REGEXFIND('TURKEY|WILD ANIM|BEAR| DICE|FIREWORKS' ,poffense)    => 'Y',	
+// stringlib.stringfind(poffense,'ABETTING' ,1) <> 0 and //moved to other
+// REGEXFIND('TURKEY|WILD ANIM|BEAR| DICE|FIREWORKS' ,poffense)    => 'Y',	
 
 //Roger's comment QA review Global Expression Round 3 8/26/16
-stringlib.stringfind(poffense,'WRIT'   ,1) <> 0 and 
-stringlib.stringfind(poffense,'ATTACH' ,1) <> 0 and 
-REGEXFIND('BOD|OF'                                ,poffense)   => 'Y',	
+// stringlib.stringfind(poffense,'WRIT'   ,1) <> 0 and //moved to warrant_fug
+// stringlib.stringfind(poffense,'ATTACH' ,1) <> 0 and 
+// REGEXFIND('BOD|OF'                                ,poffense)   => 'Y',	
 
-REGEXFIND('V\\-O\\-P|AID & ABEDDING|OUT OF CO WRNT|WRIT OF HABEAS CORUPS',poffense)   => 'Y', 
+REGEXFIND('V\\-O\\-P|WRIT OF HABEAS CORUPS',poffense)   => 'Y', 
 
 //Roger's comment QA review Global Expression Round 4 9/23/16
-REGEXFIND('BE AN ACCESSORY|A[C]+ESS[ORY]* AFTER [THE ]*FACT ',poffense)   => 'Y',	
+// REGEXFIND('BE AN ACCESSORY|A[C]+ESS[ORY]* AFTER [THE ]*FACT ',poffense)   => 'Y',	//moved to other
 
-REGEXFIND('ACCESSORY TO|ACCESSORY AFTER'					 ,poffense)   and
-REGEXFIND('MURDER|HOMICIDE|SHOOT'                 ,poffense)   => 'Y',	
+// REGEXFIND('ACCESSORY TO|ACCESSORY AFTER'					 ,poffense)   and //moved to other
+// REGEXFIND('MURDER|HOMICIDE|SHOOT'                 ,poffense)   => 'Y',	
 
 REGEXFIND('V O P[\\-| ]'													 ,poffense)   => 'Y',	
 
@@ -104,15 +103,16 @@ stringlib.stringfind(poffense,' PTR ' ,1) <> 0                 => 'Y',
 
 //QA terrorist Threats  Round 5 10/14/16 Add INTERROG to global expression
 
-REGEXFIND('ACCESORY [\\-]* MURDER|ACCESSORY AFT[ER]* THE FAC|ACCESSORY BEFORE [THE ]*FACT|' +
-          'ACCESSORY [ATT ]*MURDER|ACCESSORY FELONY|INTERROG|ANS[W]*[\\.| ]INTERR',poffense)   => 'Y',	
+REGEXFIND(//'ACCESORY [\\-]* MURDER|ACCESSORY AFT[ER]* THE FAC|ACCESSORY BEFORE [THE ]*FACT|' +
+          //'ACCESSORY [ATT ]*MURDER|ACCESSORY FELONY|
+					'INTERROG|ANS[W]*[\\.| ]INTERR',poffense)   => 'Y',	
 //QA Update - Global Expression Round 6
 REGEXFIND('WRIT [OF ]*HABEAS CORPUS|HOLD FOR ANOTHER AGENCY|ZONING VIO|ZONING COMPLAINTS|' +
           'ZONING[/\\. ](.*) PERMIT[S]*|F/T PAY FINE[S]*|PETITION FOR|PETITION TO',poffense)   => 'Y',	
 
-REGEXFIND('ACCESSORY|ACCOMPLICE|CONSPIRE|CONSPIRACY'          ,poffense)   and
-REGEXFIND('ARSON|BRIBE|BURGLARY|FORGE|FRAUD|KIDNAP|ABDUCT|ROBBERY|ASSAULT|A&B|ASSLT|A\\.B\\.W\\.I\\.K|'+
-          'ABDGR|ASSLT|WOUNDING|AGG BATTERY|ABWIK|CHILD ABUSE',poffense)   => 'Y',
+// REGEXFIND('ACCESSORY|ACCOMPLICE|CONSPIRE|CONSPIRACY'          ,poffense)   and
+// REGEXFIND('ARSON|BRIBE|BURGLARY|FORGE|FRAUD|KIDNAP|ABDUCT|ROBBERY|ASSAULT|A&B|ASSLT|A\\.B\\.W\\.I\\.K|'+
+          // 'ABDGR|ASSLT|WOUNDING|AGG BATTERY|ABWIK|CHILD ABUSE',poffense)   => 'Y',
 					
 stringlib.stringfind(poffense,'FAIL'                          ,1) <> 0           and 
 stringlib.stringfind(poffense,'OFFEND'                        ,1) <> 0           and
@@ -123,7 +123,132 @@ REGEXFIND('REG|COMPLY|REPORT|CHANGE'                          ,poffense,0) <> ''
 
 return Is_it;							 
 end; 
+//--------------------------------------------------------------------------------------------------------------------------------------
 
+export Is_Obstruct_Resist(string poffense_in) := function //done
+
+special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
+poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+
+Obstruct_Resist   := 'FLEE|^HARB| HARBORING A RUNAWAY|OBSTR[UCTIONG]*|^OBS |RESIST|[/\\. ]OBST[/\\. ]|ROWOV ';
+Obst_Res_ecl      := 'PASSAGE|PASSAGEWA|WINDSH[IE]+LD|HIGHWAY| HWY |TRAFFIC|ROADWAY|STREET|STRT| WINDOW|PARK|VISIBILITY|TRANSIT|INTERSECTION|CROSSWALK|VIEW|LICENSE PLATE';
+
+
+leo_set           := 'POLIC|[/\\. ]LEO[/\\. ]|ENFORCEMENT|LAW ENF|OFFICER|[/\\. ]P[/]O[/\\. ]|PEACE';
+Is_it := MAP( 
+
+stringlib.stringfind(poffense ,'LAW'    ,1) <> 0        and        
+stringlib.stringfind(poffense ,'COMMAN' ,1) <> 0                and                                                                                                                                                                                                      
+stringlib.stringfind(poffense ,'DISREG' ,1) <> 0      => 'Y',  
+
+REGEXFIND('INT[/ ]'                      ,poffense) and             
+REGEXFIND('EMER[/ ]'                     ,poffense) and  
+stringlib.stringfind(poffense ,'CALL'    ,1) <> 0        => 'Y',
+
+// stringlib.stringfind(poffense ,'UNLAW'      ,1) <> 0 and                                                                                                      
+// (stringlib.stringfind(poffense ,'COND'      ,1) <> 0 or stringlib.stringfind(poffense ,'REMAIN'  ,1) <> 0 ) AND
+// stringlib.stringfind(poffense ,'SEX'        ,1) = 0 => 'Y',
+
+REGEXFIND('FAIL|AILL'                       ,poffense) and              
+stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0   and      
+stringlib.stringfind(poffense ,'REASONA'    ,1) <> 0   and                                                                                                      
+REGEXFIND('LAW|ORDE'                        ,poffense) => 'Y',     
+
+stringlib.stringfind(poffense ,'FAIL'       ,1) <> 0   and      
+stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0   and                                                                                                      
+(stringlib.stringfind(poffense ,'MOVE'      ,1) <> 0   or
+(stringlib.stringfind(poffense ,'LAW'       ,1) <> 0   and stringlib.stringfind(poffense ,'ORDER' ,1) <> 0   )
+)=> 'Y',       
+
+REGEXFIND('FAIL|OBEY'                       ,poffense) and              
+REGEXFIND('RENABLE|RENBLE'                  ,poffense) and
+stringlib.stringfind(poffense ,'LAW'        ,1) <> 0 => 'Y',   
+
+// REGEXFIND(leo_set                           ,poffense)   AND          
+// REGEXFIND('RADIO|SCAN|COMM|OBST|OBEY'       ,poffense)   AND
+// REGEXFIND('ELEC'                            ,poffense)   => 'Y',   
+   
+REGEXFIND(leo_Set                           ,poffense) and           
+REGEXFIND('CROSS |CROSSING|INTER W[/] |REFUSE|IMPEDE|IMPEDING|OBEDIENCE| FLENG |DISREGARD|DISREGAEDING| F[/]ID |COMPLY|COMPLIANCE|'+
+          ' FAI TO COMP|RESIST|[/\\. ]RESIS[/\\. ]|OBSTRUCT|HINDER|REFUSING|OBEY|FLEE',poffense)   
+  => 'Y',            
+
+REGEXFIND('ARR\\.|ARREST|POLIC|[/\\. ]LEO[/\\. ]|ENFORCEMENT|LAW ENF|OFFICER|[/\\. ]P[/]O[/\\. ]|PEACE' ,poffense) and
+REGEXFIND('EVAD|RESIST|ELUDE|FLEE|ALLUDING|[/\\. ]RES\\.[/\\. ]'                                        ,poffense) => 'Y',     
+			
+REGEXFIND('FALAE|[/\\. ]FALS[/\\. ]|FICTITIOUS|[/\\. ]FAIL[/\\. ]|FAILURE'                                                          ,poffense)   AND 
+REGEXFIND('INFORMATION|[/\\. ]INFO[/\\. ]|IDENTIFICATION|[/\\. ]ID[/\\. ]|LICENSE|[/\\. ]LIC[/\\. ]|[/\\. ]DL[/\\. ]|NAME|IDENTITY' ,poffense)   AND          
+REGEXFIND(leo_Set                                                                                                                   ,poffense)   => 'Y',
+
+REGEXFIND('DISOBED|DISARM|OPPOSE|OBSTG|FLSE STMNT'               ,poffense)   AND          
+REGEXFIND(leo_Set                                                ,poffense)   => 'Y',
+
+REGEXFIND('OBSTG|OBSTRUCT'               ,poffense)   AND          
+REGEXFIND('JUSTICE'                      ,poffense)   => 'Y',
+
+REGEXFIND(Obstruct_Resist                ,poffense)   AND
+~REGEXFIND(Obst_Res_ecl                  ,poffense)   => 'Y',	   						 
+
+
+REGEXFIND('HARBOR|[/\\. ]AID[/\\. ]|AIDING|CONCEAL|[/\\. ]CONCL[/\\. ]'               ,poffense)   AND          
+REGEXFIND('RUNAWAY|CRIMINAL|FUGITIVE|[/\\. ]FUG[IT]*[/\\. ]|FELON'                    ,poffense)   AND
+~REGEXFIND('CONCEAL(.*)WEA|ABET'                                                      ,poffense)=> 'Y',
+
+REGEXFIND('[/\\. ]ID[ENT]*[/\\. ]|IDENTIFY'           ,poffense)   AND          
+REGEXFIND('[/\\. ]FA[I]*L[/\\. ]|FAIL'                ,poffense)   AND 
+REGEXFIND('FUGITIVE|[/\\. ]FUG[IT]*[/\\. ]|[/\\. ]P[\\.-]O[/\\. ]|POLICE|LEO|OFFICER'          ,poffense)   => 'Y',
+ 
+REGEXFIND('INTERFER|HINDER '                ,poffense)   AND 
+REGEXFIND('JUSTICE|JUDICIAL|OFFICIAL ACTS|EMERGENCY|APPREHENSION|PROSECUTION|POLICE|[/\\. ]LEO[/\\. ]|HIDE EVID'          ,poffense)   => 'Y',
+
+REGEXFIND('FALSE'                                       ,poffense)   AND 
+REGEXFIND('REPORT|INFO|STATEMENT|STMT'                  ,poffense)   AND 
+REGEXFIND('LAW ENFORCE|[/\\. ]LEO[/\\. ]|POLICE|OFFICER',poffense)   => 'Y',
+
+REGEXFIND('FUG|FUGIT|ESCAP|PRISONER|CONVICT' ,poffense) and  
+REGEXFIND('FAIL (.*) ID|HARBOR| AID |AIDING|CONCEAL|CONCL' ,poffense) => 'Y',
+
+'N');
+return Is_it;
+end;
+
+//--------------------------------------------------------------------------------------------------------------------------------------
+
+export Is_Warrant_Fugitive(string poffense_in) := function //done
+
+special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
+poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+
+Warrant_Fugitive  := 'WARRANT|BENCH WRT |WAOJ| BWP | BW[/ ]| BW[I]* | V[ ]*O[ ]*C[ ]*C[/ ]| [SW]*VCC[/ ]|OUT OF CO WRNT|ESCAPE|'+
+                     '^ FUG|EXTRADITION|BENCH WARRANT|^ B[/]W[-/( ]|[/\\. ]WRNT[/\\. ]|[/\\. ]WRT[/\\. ]|WSP WRT|FUG WARR/OUT|FUGITIVE';
+WF_exc            := 'TAX';
+vio_set           := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION';     
+Is_it := MAP( 
+
+ REGEXFIND('FUG|FUGIT|ESCAP|PRISONER|CONVICT' ,poffense) and  
+ REGEXFIND('FAIL (.*) ID|HARBOR| AID |AIDING|CONCEAL|CONCL' ,poffense) => 'N', 
+ 
+stringlib.stringfind(poffense,'WRIT'        ,1) <> 0 and 
+stringlib.stringfind(poffense,'ATTACH'      ,1) <> 0 and 
+REGEXFIND('BOD|OF'                          ,poffense)   => 'Y',               
+
+stringlib.stringfind(poffense ,'ESCAP'      ,1) <> 0   and                   
+REGEXFIND('CORR|CUST |ARREST | PENAL| DOC |CONFIN| FEL |FUGITIVE' ,poffense)   => 'Y', 
+
+stringlib.stringfind(poffense ,'WRIT'      ,1) <> 0  and      
+stringlib.stringfind(poffense ,'BOD'       ,1) <> 0  and      
+stringlib.stringfind(poffense ,'ATTACH'    ,1) <> 0  => 'Y',              
+
+stringlib.stringfind(poffense ,'WRIT'      ,1) <> 0    and      
+stringlib.stringfind(poffense ,'OF'        ,1) <> 0    and                              
+REGEXFIND('ARREST|ARRST'                   ,poffense)  => 'Y',     
+
+REGEXFIND(Warrant_Fugitive                 ,poffense) and
+~REGEXFIND(WF_exc                          ,poffense) => 'Y',	   						 
+
+	'N');
+return Is_it;
+end;
 //-------------------------------------------------------------------------------------------------------------------------------------
 export Is_Arson(string poffense_in) := function
 
@@ -133,7 +258,7 @@ poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 Arson            := 'ARS0N|ARSON';
 Arson_exc        := 'LARS[0O]N|CARS[0O]N|PEARS[0O]N|PARS[0O]N|PARS[0O]NS|OSBURN|BURNET';
 
-Is_it := MAP( //In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP( //is_Global_Exclude(poffense,'other')='Y' => 'N',
 	             
 //trim(poffense) in _fmod_offense_category_list.ArsonList =>'Y',
 stringlib.stringfind(poffense,'BURN'   ,1) <> 0 and    
@@ -167,7 +292,7 @@ Robbery               := 'ROBB[EYING]+|ROB[B]+[RE]*R[Y]*|CAR[ ]*JACK[ING]*|AGG R
 Robbery_exc           := 'PROBATION|PROBHIB'; 
 comm                  := 'BANK|STORE|BUILD|BLDG|COMMERC|COMMER[CI]+AL|[/ ]BUS[/\\. ],BU[S]+IN|BUS[INS]+';
 	
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 	             
 REGEXFIND('ARM|ATT|PERSON|INTENT'    ,poffense)   and
 stringlib.stringfind(poffense,'ROB'   ,1) <> 0    and 
@@ -197,7 +322,7 @@ comm      := 'BANK|STORE|BUILD|BLDG|COMMERC|COMMER[CI]+AL|[/ ]BUS[/\\. ],BU[S]+I
 exclusion := 'PROBATION|PROBHIB|PRIVACY|TRES|TRSP';
 
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 	
 REGEXFIND('ARM|ATT|PERSON|INTENT'    ,poffense)   and
 stringlib.stringfind(poffense,'ROB'   ,1) <> 0    and 
@@ -223,12 +348,12 @@ Homicide1        := 'HOM[IO]C[IDE]*|MURDER|M[A]*NSL[AU]*G[HTER]*|AWDWIKISI|AWDWI
 Homicide2a       := 'KILL|DEATH|ADMINISTER|WILFUL';
 Homicide2b       := 'INTENT|CAUSE|RESULT|POISON|MURDER|HOMICIDE';
 
-Homicide_exc     := 'ALLIG$|ALLIGATOR|ANI[N]?MAL|ANIM$| ANTE$|ANTERLESS| BEAR|BIRD|CALF| CAT[TLE]|COW|DEER|[ |\\/|\\.]DOG[\\/|S| |$]| DOVE|DUCK| FOWL|GEESE|HORSE|MOOSE| OWL|PHEASANT|POULTRY|SPECIE[S|$]|TURKE[R]?Y|WATER[F]?OWL|WILDLIFE|WILD ANIM|[ |/]FISH';
+Homicide_exc     := 'ALLIG$|ALLIGATOR|ANI[N]?MAL|ANIM$| ANTE$|ANTERLESS| BEAR|BIRD|CALF| CAT[TLE]|COW|DEER|[ |\\/|\\.]DOG[\\/S \\$]| DOVE|DUCK| FOWL|GEESE|HORSE|MOOSE| OWL|PHEASANT|POULTRY|SPECIE[S|$]|TURKE[R]?Y|WATER[F]?OWL|WILDLIFE|WILD ANIM|[ |/]FISH';
 
 Ha               := 'ATMUR|A TO MUR|A[/]MUR |AG MUR|AT MUR|AT[/]MUR|MUR[/ ]2N|MUR 2ND|MUR[/ ]REIN|MUR W[/]MAL|MUR WO|MUR W/O REIN|MUR WITH MALICE|'+
                     'MUR WM|MUR[/ ]W[/]*O[/ ]MAL|MUR WOM|ACC[/]MUR|MUR[/]HAB|MUR[/ ]MAL|MUR[/]MOTOR|MUR[/]PO|MUR[/]W[/]M|MUR[/]W[/]MAL|MUR[/]WO'; 
 
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 							 
 //Roger's comment - QA Update - Homicide Round 3 8/26
@@ -358,7 +483,7 @@ Dwiexc_list	             :=  'AWDWI|BALDWIN|DWIPER|HARDWIRE|SANDWICH|BOARDWITH|D
 										 
 DUIexc_list	             :=  'TO[B]+AC|TA[B]+AC|TOPBAC';														 
 															 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 
 stringlib.stringfind(poffense,'BREATH'               ,1) <> 0 and
@@ -467,7 +592,7 @@ special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 Assault         := 'AA/DW|AGG/ASS|ABDGR|ABGEN|ABOFF|ABHAN|ABWIK|ABWITK|STRANGUL|AWDW|STRANGLE|784\\.03\\.1A2|784\\.03\\.1A1|AA[/]DW[/]FV|AA[/]DW/|AA[/]SBI[/]DW[/]FV|784.021.1A|DDLY CONDUCT|'+
-                   'PC 243 [BD] |PC 245 [AC] |FLEEING';
+                   'PC 243 [BD] |PC 245 [AC] ';
 									 
 Assault2        := 'A[\\.& ]+B[\\. ]+H[ \\.&]+A[\\. ]+N[\\. ]*|A[\\. ]+B[\\. ]+W[ \\.]+I[\\. ]+K[\\. ]*|A[\\. ]+B[\\. ]+W[\\. ]+I[\\. ]+T[\\. ]+K[\\. ]*';								 
 Assault3        := 'ASS[LAN]+UTL|ASSL|AS[SL]*AU[LK]*T|AS[S]+ULT |AS[S]+AULT| A[/]B |'+
@@ -495,7 +620,9 @@ Terrorist_ecl      := 'HARM|FALSE INFO|FALSE REPORT';
 TT2a := 'EXPLOSIV|BOMB|WEAP[ON]*|WPN|WEPON|MURD| GUN[ |/|$]|FIRE[ ]?ARM|F/ARM| ARMED|DESTRUCTIVE DEVICE';
 TT2b := 'TERR';
 
-Is_it := MAP( //In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
+Is_it := MAP( //is_Global_Exclude(poffense,'ASSAULT')='Y' or 
+              // Is_Obstruct_Resist(poffense) ='Y' or 
+							// Is_Warrant_Fugitive(poffense) ='Y' => 'N',
 														 
 stringlib.stringfind(poffense,'CRUELTY'   ,1) <> 0   and
 REGEXFIND('HORSE|ANIM|ANAIMAL|ANIAL|ANML|A[IMN]I+[MN]+[AL]*|CATS|PIT[ ]*BULL'        ,poffense)  => 'N',
@@ -712,7 +839,7 @@ export Is_Assault_other(string poffense_in) := function
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Assault         := 'SIMP BAT|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|[D]*OMESTI(.*) ABUSE|INTIMIDAT|RETALIATION|STRIKING  PERSON|243(E)(1)PC|ACT IN AGGRESSIVE MANOR|FLEE';
+Assault         := 'SIMP BAT|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|[D]*OMESTI(.*) ABUSE|INTIMIDAT|RETALIATION|STRIKING  PERSON|243(E)(1)PC|ACT IN AGGRESSIVE MANOR';
 Assault2        := '^[ ]*A[\\.& ]+B[\\.]* |^[ ]*A AND B |[ |^|\\.|/]A[ ]*&[ ]*B[ |\\.|$|/]|A[ ]*&[ ]*B$|'+
                    ' PC 242 | PC 422 |PC 653M A | PC 240 |PC 646\\.9 A |PC 273\\.5 A |PC 243 [CE] | PC 273D |PC 368 C |PC 368 B  1| 2919\\.25 | PC 148\\.9 A |'+
 									 '316\\.072 3| 31619351 |784\\.03\\.1A1|784\\.05 1 |784\\.05 2 ';
@@ -737,7 +864,9 @@ Terrorist_ecl      := 'HARM[ $/\\-]|FALSE INFO|FALSE REPORT';
 TT2a               := 'EXPLOSIVES|BOMB';
 TT2b               := 'TERR';
                                                                      
-Is_it := MAP(//In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'ASSAULT')='Y' or 
+             // Is_Obstruct_Resist(poffense)         ='Y' or 
+						 // Is_Warrant_Fugitive(poffense)        ='Y' => 'N',
 
 REGEXFIND('CRUELTY'                                                           ,poffense)  and
 REGEXFIND('HORSE|ANIM|ANAIMAL|ANIAL|ANML|A[IMN]I+[MN]+[AL]*|CATS|PIT[ ]*BULL' ,poffense)  => 'N',
@@ -877,17 +1006,17 @@ REGEXFIND('ENDANGER| ENDANG '           ,poffense) and
 REGEXFIND('CRIMINAL |FELONY| FEL |RISK' ,poffense) and 
 stringlib.stringfind(poffense ,'DEATH'  ,1) <> 0   => 'Y',	
 
-stringlib.stringfind(poffense ,'ARREST' ,1) <> 0   and
-REGEXFIND('EVAD|RESIST'                 ,poffense) and 
-~REGEXFIND(' AGG[R]* |AGGRAVATED'       ,poffense) => 'Y',								 
+// stringlib.stringfind(poffense ,'ARREST' ,1) <> 0   and
+// REGEXFIND('EVAD|RESIST'                 ,poffense) and 
+// ~REGEXFIND(' AGG[R]* |AGGRAVATED'       ,poffense) => 'Y',								 
 							 
 REGEXFIND(' CRIM[INAL ]+'               ,poffense)  and 
 stringlib.stringfind(poffense ,'ABUSE'  ,1) <> 0    and
 ~REGEXFIND(' AGG[R]* |AGGRAVATED| SX |FORFEITURE|CREDIT CARD|DEBIT CARD'       ,poffense)   => 'Y',
 
-(stringlib.stringfind(poffense ,'POLICE'  ,1) <> 0  or stringlib.stringfind(poffense ,'LEO'  ,1) <> 0 )   and
-REGEXFIND('CROSS |CROSSING|INTER W[/] |REFUSE|IMPEDE|IMPEDING|OBEDIENCE| FLENG |ENGAGE|ENGAGING|DISREGARD|DISREGAEDING| F[/]ID |COMPLY|COMPLIANCE| FAI TO COMP|TOUCH|STRIKE|STRIKING|TORMENT|RESIST| RESIS |PROFANITY AT|OPPOSING|OBSTRUCT',poffense) 
-  => 'Y',
+// (stringlib.stringfind(poffense ,'POLICE'  ,1) <> 0  or stringlib.stringfind(poffense ,'LEO'  ,1) <> 0 )   and
+// REGEXFIND('CROSS |CROSSING|INTER W[/] |REFUSE|IMPEDE|IMPEDING|OBEDIENCE| FLENG |ENGAGE|ENGAGING|DISREGARD|DISREGAEDING| F[/]ID |COMPLY|COMPLIANCE| FAI TO COMP|TOUCH|STRIKE|STRIKING|TORMENT|RESIST| RESIS |PROFANITY AT|OPPOSING|OBSTRUCT',poffense) 
+  // => 'Y',
 	
 stringlib.stringfind(poffense ,'OBSCENE'   ,1) <> 0 and
 REGEXFIND('[/\\. ]TELE[/\\. ] |TELEPHONE'  ,poffense)   => 'Y',
@@ -909,7 +1038,9 @@ Bribery                        := 'BRIB[EI][NGRY]*';
 	//Please add an exception to not select offenses that contain    BRIB and also contain SPORT.  
 Bri_excl                       := 'SPORT';
   
-Is_it := MAP( //In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP( //is_Global_Exclude(poffense,'other')='Y' or 
+              // Is_Obstruct_Resist(poffense) ='Y' or 
+							// Is_Warrant_Fugitive(poffense) ='Y' => 'N',
 
 stringlib.stringfind(poffense ,'UNLAW' ,1) <> 0 and
 stringlib.stringfind(poffense ,'COMP'  ,1) <> 0 and
@@ -943,7 +1074,7 @@ MVb := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|LARC|STEAL|TH[E]*FT|[/\\. ]TEFT[/\\. ]|[TH
 //Roger's comment QA Update - Theft Round 4 9/27/16. AIRCRAFT, WATERCRAFT, CRAFT, BOAT and VESSEL are not motor vehicles
 veh          := ' COMV |AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+|[/\\.& ]M[/]*V[/\\.& ]|[/\\.& ]M[\\. ]*V[/\\. ]| MVT[R]* | ATV ';
 
-Is_it        := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it        := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
                 
 REGEXFIND(' REC | RECEIVING| RCV | RCV\\.' ,poffense)   and 
 REGEXFIND(MVb                              ,poffense)   => 'N',
@@ -1016,7 +1147,7 @@ residence     := ' HABIT |[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENC
 
 //Roger's comment QA Update - Theft  Round 5 10/14/16
 comm    := 'BUILD|BLD[G| ]|COMMERC|COMMER[IC]+AL|[/ ]BUS[\\. ]|BU[S]+IN|BUS[INES]+|CHURCH|BANK|BUIDL';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 REGEXFIND(BBE_exc                    ,poffense)   and 
 ~REGEXFIND(residence + '|/JERRY'     ,poffense)   => 'N',
@@ -1097,7 +1228,7 @@ BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|VE[C
 BBE_exc1      := 'PRIVACY|BREAKAGE';                                                        
 					 
 comm    := 'BUILD|BLD[G| ]|COMMERC|COMMER[IC]+AL|[/ ]BUS[\\. ]|BU[S]+IN|BUS[INES]+|CHURCH|BANK|BUIDL';
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 			 
 (REGEXFIND(Burglary                   ,poffense)    OR 
  REGEXFIND(BreakAndEnter              ,poffense)  ) AND 
@@ -1189,7 +1320,7 @@ Larceny           := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|LARC|STEAL|TH[E]*FT|[/\\. ]T
 Larceny_exc       := 'CHILD STEAL|BURG|VE[C]*H|AUTO|MV|DECLARCATION|SHOPLIF[TING]*|SHOFLIFT|SAFECRACK';
 veh               := 'AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+| M[/]*V |[/\\. ]M[\\. ]*V[/\\. ]';
 
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 REGEXFIND(BBE_exc                                ,poffense)   and 
 ~REGEXFIND(veh                                   ,poffense)   => 'N',
@@ -1275,7 +1406,7 @@ poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 Computer_Crimes       := 'COMPU(.*) GRAND TH|COMPU(.*) TRAFF|COMPU(.*)R[ES]|COMPUTER| 2913\\.04 ';
 
 CC_exclude            := 'COMPUL|COMPUTER TRESP';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 			 
 REGEXFIND(Computer_Crimes               ,poffense)   and 
 REGEXFIND(CC_exclude                    ,poffense,0) = '' => 'Y',	          
@@ -1299,11 +1430,13 @@ Counterfeiting_Forgery  := 'FROG|FORG|FO[R]*GERY|FOEGE|FOERG|CTRFT|COUNTERF[IE]*
 
 Counterfeiting_Forgery2 := '^[ ](FRG[/ &\\.]|FRGD|FRGE|FRGING|FRGRY|FRGY|FRGNG)';	
 
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')  ='Y' or 
+               // Is_Obstruct_Resist(poffense)         ='Y' or 
+						   // Is_Warrant_Fugitive(poffense)        ='Y' => 'N',
 	
 REGEXFIND('FALSE|FLS|FAL|FICTI'          ,poffense)   and 
 REGEXFIND('[/\\. ]ID[ENIFVICATION]*[/\\. ]|[/\\. ]ID[ENTIFYING]*[/\\. ]| I[/]D ',poffense)   and 
-REGEXFIND('[/\\. ]AID[/\\. ]'            ,poffense,0) = '' and 
+//REGEXFIND('[/\\. ]AID[/\\. ]'            ,poffense,0) = '' and 
 REGEXFIND('SELL|SALE|DISTRIB|MANUF'      ,poffense)   => 'Y',							 
 
 stringlib.stringfind(poffense ,'UTTER'   ,1) <> 0     and 
@@ -1337,7 +1470,7 @@ Destruction_Damage_Vandalism   := 'VANDALISM|DESTROY|DESTRUCTION|GRAFFITI|CRIM[\
 Destruction_Damage_Vandalism2   := '^[ ](DAMAG|DAMAMGE|DAMATE|DAMATO|DAMDAGE|DAMEAGE|DAMG|DANAGE)';	
 		                                                
 damage := 'DAMAMGE|[/\\. ]DA[M]+[AGEING]*[/\\. ]|[/\\. ]DAM[AGES0-9]*[/\\. ]|[/\\. ]DMG[INGSE0-9]*[/\\. ]|DAMAG|DAMAGIN|DMGNG' ;
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',	
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',	
  
 //Roger's comment QA Update - Destruction Round 5 10/3
 REGEXFIND('LEAVE|LEAVING|[/\\. ]LV[/\\. ]|[/\\. ]LVE[/\\. ]|FAIL.*TO STOP|FAIL.*TO REMAIN|HIT AND RUN|HIT[/]RUN' ,poffense)   and
@@ -1498,7 +1631,7 @@ traff_list           := 'TRAFFIN|TRAFF[IN]*CIKING|TRAFFI[CK]+[IK]*NG|TRAFFING|TR
                                                         
 child_set            := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV';
 
-  Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+  Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 							 							 
 REGEXFIND('MANUF|SELLING|DIST\\.|SALE|MANUFACTURE|SELL',poffense)   and 
 stringlib.stringfind(poffense ,'FALSE'                 ,1) <> 0     and
@@ -1539,25 +1672,6 @@ REGEXFIND('ODOMETER| DUI | DWI |SHOPLIFT|CULTIVATED LAND' ,poffense)    => 'N', 
 stringlib.stringfind(poffense ,'BEV' ,1) <> 0  and        // DO not include offenses
 REGEXFIND('STAMP'                ,poffense)    => 'N',
 
-/*REGEXFIND(Drug_Narcotica         ,poffense)   and         // DO not include offenses that have speed and school
-stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
-stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',
-
-REGEXFIND(Drug_Narcoticb         ,poffense)   and         // DO not include offenses that have speed and school
-stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
-stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',
-
-REGEXFIND(Drug_Narcotic1         ,poffense)   and         //DO not include offenses that have speed and school
-stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
-stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',
-
-REGEXFIND(Drug_Narcotic2         ,poffense)   and         //DO not include offenses that have speed and school
-stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
-stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',
-
-REGEXFIND(Drug_Narcotic3         ,poffense)   and         //DO not include offenses that have speed and school
-stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
-stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',*/
 //Below stmt replaces the above
 stringlib.stringfind(poffense ,'SPEED'  ,1) <> 0 and
 stringlib.stringfind(poffense ,'SCHOOL' ,1) <> 0 => 'N',
@@ -1568,9 +1682,9 @@ REGEXFIND('DEL\\.|DEL |DELI[N]*Q|UNRULINESS',poffense)   and
 stringlib.stringfind(poffense ,'MINOR' ,1) <> 0 => 'N',
 
 //Roger's comment DUI File QA Check Round 7
-REGEXFIND('DRIV[E|I| |\\.]|BOATING|OPR|POSS[ |E]'		 ,poffense)   and
-REGEXFIND('CONT[ |/|\\.|R]|PRESURS|PERCURSOR|PRECUS|MISCELLANEOUS'  ,poffense)   and
-REGEXFIND('SUBS[T|\\.| |$]|SUB[\\.| |$]'              ,poffense)   and
+REGEXFIND('DRIV[EI \\.]|BOATING|OPR|POSS[ E]'		 ,poffense)   and
+REGEXFIND('CONT[ /\\.R]|PRESURS|PERCURSOR|PRECUS|MISCELLANEOUS'  ,poffense)   and
+REGEXFIND('SUBS[T \\.\\$]|SUB[\\.\\$ ]'              ,poffense)   and
 REGEXFIND('U/I|INFLUEN|UTI'              ,poffense,0) =  '' => 'Y',
 
 REGEXFIND(Drug_Narcotica         ,poffense)   and 
@@ -1845,7 +1959,7 @@ wpn_ecl_2											 := 'ROBB|THEFT|MURD|HOMI|BATT|BURG|BOMB(.)*THREAT|THREAT(.)
 wpn_2a               := 'CONCEAL|[/\\.  ]CONC[/\\.  ]';
 wpn_2b               := 'WEAPON|WEAP[ON]*[/\\. ]|FIREA|GUN[/\\.]|PIST|KNIFE|F[IRE ]+ARM|[/\\.  ]F.ARM|BOMB|EXPLOS';                       
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 							
 REGEXFIND('HOAX|FALSE|FALS\\.|WARN|SCARE|FIRE ',poffense)  and 
 stringlib.stringfind(poffense ,'BOMB'         ,1) <> 0     => 'N' ,
@@ -1950,7 +2064,7 @@ poffense := stringlib.stringtouppercase(poffense1);
 
 Stolen_Property_Offenses_Fence := 'REC(.*)ST[O]*L(.*)|^[ ]R[/\\. ]*S[/\\. ]*P[0-9/\\. ]|[ /]R[/]S[/]P[R/ ]|RCVESTOLPR|[ ]R[ ]S[ ]PRP| KCSP | RCSP | PC 496 |RECV STLN';
 STP_exc := '[0-9]+[/][0-9]+';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 // stringlib.stringfind(poffense ,'GRAND THEFT'     ,1) <> 0 => 'N',  
 
@@ -2015,7 +2129,7 @@ IT_exc        := 'D[AY]+S|SEX|REFUSAL|ACCID[ENT]*|REFUSAL|WEAR.*MASK|MASKED|RESI
 IT2           := 'CREDIT|CRED|CRD|DEBIT';
 IT_exc2       := 'USE|ABUSE|CHARGE|CHRG|FORG';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 stringlib.stringfind(poffense ,'NAME'    ,1) <> 0   and
 REGEXFIND('ASSAUME|ASSUM'              ,poffense)   => 'Y',
@@ -2104,7 +2218,9 @@ IT_exc2b1        := false_set;
 IT_exc2b2        := 'CHARGE|CHRG';
 			 
 		 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' or 
+              // Is_Obstruct_Resist(poffense) ='Y' or 
+							// Is_Warrant_Fugitive(poffense) ='Y' => 'N',
 
 Is_Identity_Theft(poffense)='Y' => 'Y',
 (REGEXFIND('ILL|UNLIC'                                   ,poffense)   OR 
@@ -2154,7 +2270,7 @@ stringlib.stringfind(poffense ,'MONEY'          ,1) <> 0   and
 stringlib.stringfind(poffense ,'LAUND'          ,1) <> 0   => 'Y',
 
 REGEXFIND('CONCEAL|CONCCEAL|CONCEAML|CONCELAM',poffense)   and 
-REGEXFIND('SHOPLIFT|[/\\. ]MERCH[/\\. ]|MERCH[ANDISE]+|OFFENDER|YOUTH|FUGITIVE|CHILD|WEAR.*MASK|MASKED'      ,poffense,0) = '' and 
+REGEXFIND('SHOPLIFT|[/\\. ]MERCH[/\\. ]|MERCH[ANDISE]+|OFFENDER|YOUTH|FUGITIVE|CHILD|WEAR.*MASK|MASKED|PRIS'      ,poffense,0) = '' and 
 Is_Weapon_Law_Violations(poffense)               ='N'  and 
 Is_Stolen_Property_Offenses_Fence(poffense)      ='N'  => 'Y',
 
@@ -2246,8 +2362,8 @@ REGEXFIND('[/\\. ]INFO[RMATION]*[/\\. ]|FALSE[ ]*INFO|STATEMENT|[/\\. ]STMT[/\\.
 						                    
 REGEXFIND(false_set+'|FICT'      ,poffense)   and 
 REGEXFIND('NAME|'+IDSET          ,poffense)   and
-stringlib.stringfind(poffense ,'AID'          ,1) = 0    and
-stringlib.stringfind(poffense ,'ABET'         ,1) = 0    => 'Y',
+~REGEXFIND('CAID| PUBLIC AID'    ,poffense)   => 'Y', 
+// stringlib.stringfind(poffense ,'ABET'         ,1) = 0    => 'Y',
 						 	     
 REGEXFIND(false_set              ,poffense)   and 	
 stringlib.stringfind(poffense    ,'PROCU' ,1) <> 0   and
@@ -2346,6 +2462,9 @@ REGEXFIND('EXP[I]*R[IERD]*|NO|INVALID|NO VALID|REQUIRED| REQ ' ,poffense) and
 stringlib.stringfind(poffense ,'MEDICAL'                       ,1) <> 0	 and	
 REGEXFIND('[/\\. ]CRD[/\\. ]|CARD|CERT|[/\\. ]CT[/\\. ]|CERTIFICATE| CAR | CER ',poffense) => 'Y',	
 
+stringlib.stringfind(poffense ,'FALSE'      ,1) <> 0    and      
+stringlib.stringfind(poffense ,'DECL'       ,1) <> 0     and                                                      
+REGEXFIND('OWN|OWENRSHIP|OWERSHIP|PAW[MN]' ,poffense,0) = '' => 'Y',
 
 'N');
 return Is_it;
@@ -2362,7 +2481,7 @@ Gambling                       := 'GAMBL[ING]*|GAMING|[/| ]BETTING|BOOKMAK[INGER
 gam1                           := ' SPORT';
 gam2                           := 'BRIB|GAM';
   
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
              REGEXFIND('[/\\. ]MAK[INGER]*[/\\. ]' ,poffense) and 	
              stringlib.stringfind(poffense ,'BOOK ',1) <> 0   => 'Y',
@@ -2396,7 +2515,7 @@ HumanTrafficking      := ' COMM[ERCIAL]*[/\\. ].*SEX| COMM[ERCIAL]*[/\\. ].*NUDI
 exc_HT                := 'BURG |ASSA[/|U]|A[S]*LT'; 
 
 child_set := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 REGEXFIND('TRANS[PORT]*[/\\. ]'    ,poffense)   and 
 stringlib.stringfind(poffense ,'MINOR',1) <> 0  and 
@@ -2444,8 +2563,11 @@ REGEXFIND('SOLIC|SOLICIT'                              ,poffense)   and
 REGEXFIND(child_set+'IMMORAL PURPOSES|IMMORAL PURPOSE' ,poffense)   => 'Y',
 
 REGEXFIND(HumanTrafficking                             ,poffense)   and
-~REGEXFIND(exc_HT                                      ,poffense)   => 'Y',						 
-									 
+~REGEXFIND(exc_HT                                      ,poffense)   => 'Y',				
+
+stringlib.stringfind(poffense ,'GANG'      ,1) <> 0	  and	
+REGEXFIND('CRIM|PARTIC|STREET|MEMBER|ACTIVITY|RECRUIT|DIRECT|PARTICIPATI|PROMOTION|PROMOTING|ENGAGE|ENGAGING'       ,poffense)   => 'Y',		 
+
 						       'N');
 return Is_it;
 end;
@@ -2461,7 +2583,7 @@ false_set             := 'FALSE|[/\\. ]FAL[STEIFYNG]*[/\\. ]|[/\\. ]FAL[SFEID]*[
 
 Kidnapping_Abduction  := 'PLACE OF CONFINE|CHILD STEALING|HIJACKING|AB[U]*D[U]*CT|KI[DA]+[N]*A[P]+ING|K[I]*DN[A]*P|HOSTAGE|KIDANP|KIDKNA|HIJACKIDNG|PC 236 |PC 207 A ';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 stringlib.stringfind(poffense ,'UNLAW'        ,1) <> 0   and 
 REGEXFIND('IMPRIS|RESTR|DENTEN|DETEN'         ,poffense) and  
@@ -2500,7 +2622,7 @@ shopl                   := '^[ ]*TH[E]*FT[ ]*SHOP|SHOP[L]+[OI]FT|SHOPFTING|[ ]SH
 Shopl_exc               := 'CHILD STEAL|BURG|VE[C]*H|AUTO|M/V|DECLARCATION|[/ ]M[/]*V[/ ]|CHOP|D[OCTO]*R SHOP|DRESS SHOP';
 
 Larceny                 := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|STEAL|SAFECRACK|TH[E]*FT';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',             					 
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',             					 
              	  
 					 
 						 REGEXFIND(Shopl ,poffense)   and 
@@ -2541,7 +2663,7 @@ E1b := 'MINOR|JUVE|CHILD';
 E2a := 'BREACH';
 E2b := 'PEAC[E]*';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 REGEXFIND(shopl                ,poffense)   => 'N',
 REGEXFIND('^IDENT| IDENT|^ID |IDENTIFY'    ,poffense)   and 
@@ -2679,13 +2801,21 @@ poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 PeepingTom   := 'PEEP|VOY[EU]|PRURIENT';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' or 
+             // Is_Obstruct_Resist(poffense) ='Y' or 
+						 // Is_Warrant_Fugitive(poffense) ='Y' => 'N',
              
-						       stringlib.stringfind(poffense ,'NUD'   ,1) <> 0   and
-									    stringlib.stringfind(poffense ,'CAPT'  ,1) <> 0   and
+						 stringlib.stringfind(poffense ,'NUD'   ,1) <> 0   and
+						 stringlib.stringfind(poffense ,'CAPT'  ,1) <> 0   and
              stringlib.stringfind(poffense ,'IMAG'  ,1) <> 0   => 'Y',
 
-             REGEXFIND(PeepingTom ,poffense,0)          <> '' => 'Y',	               
+             REGEXFIND(PeepingTom ,poffense,0)          <> '' => 'Y',	   
+						 
+						 REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]'         ,poffense)   and
+             stringlib.stringfind(poffense ,'CAPT'        ,1) <> 0     and
+             REGEXFIND('IMAGE|FILM|VIDEO'                 ,poffense)   and                
+             REGEXFIND('NONCONSENT'                       ,poffense)     => 'Y',      
+
 							 'N');
 return Is_it;
 end;
@@ -2697,7 +2827,7 @@ special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 Prostitution          := 'PROSI|PRSTIT|PROTIT|PROST|PIMP|PAND|PC 647 B |COMMERC.*SEX|SEX.*COMMERC|FORNICAT.*MONEY';
 P_exc                 := 'EXPAND|PANHAND';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 stringlib.stringfind(poffense ,'PROMOTE'     ,1) <> 0   and 
 stringlib.stringfind(poffense ,'SEX'         ,1) <> 0   and 
@@ -2723,17 +2853,17 @@ REGEXFIND('SEX'        						 ,poffense,0) <> '' and
 REGEXFIND('OFF|SEX OF'                		 ,poffense,0) <> '' and
 REGEXFIND('REG|CHG ADDR|ADDR|[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION|UPDATE|CHG |CHANG', poffense,0) <> ''	=> 'SONF',
 
-REGEXFIND('FAIL[EDTING]*[ |\\.|/|U]| FT[/| ]|F/T' 			  ,poffense,0) <> '' and
+REGEXFIND('FAIL[EDTING]*[ \\./U]| FT[ /]|F/T' 			  ,poffense,0) <> '' and
 REGEXFIND('COMP|CMPLY' ,poffense,0) <> '' and
 REGEXFIND('[/\\. ]SEX[UAL]*[/\\. ]|[/\\. ]SX[/\\. ]',poffense,0) <> '' and 
 REGEXFIND('OFF|REG'        ,poffense,0) <> ''    							  => 'SONF',
 				
-REGEXFIND('FAIL[ |\\.|/|U]| FT[/| ]|F/T' 			  ,poffense,0) <> '' and
+REGEXFIND('FAIL[ \\./U]| FT[/ ]|F/T' 			  ,poffense,0) <> '' and
 REGEXFIND('SEX' ,poffense,0) <> ''           AND
 REGEXFIND('REGISTER|REG[ |/|\\.]|REGIS[ |T|\\.]|RGSTR |REISTER |RGST |COMPLY|COMP|VERIFY|PROVIDE|'+
 					       'ADD |CHANGE|CHNG|CHG |IDENTIFY|POSSESS|PREVENT|ABUSE|PAY COST|MAINT RECORD' ,poffense,0) <> ''  							   => 'SONF',
 								 
-REGEXFIND('FAIL[ |\\.|/|U]| FT[/| ]|F/T' 			  ,poffense,0) <> '' and
+REGEXFIND('FAIL[ \\./U]| FT[/ ]|F/T' 			  ,poffense,0) <> '' and
 REGEXFIND('SEX' ,poffense,0) <> ''           AND
 REGEXFIND('OFF|PRED|VIOL|ASSLT' ,poffense,0) <> '' AND
 REGEXFIND('REG |REGISTER|REP[O]?RT|RPT|REP |RPRT|REPT|NOTIFY|GIV NOT|COMPLY|COMP |PROVIDE|'+
@@ -2742,7 +2872,7 @@ REGEXFIND('REG |REGISTER|REP[O]?RT|RPT|REP |RPRT|REPT|NOTIFY|GIV NOT|COMPLY|COMP
 REGEXFIND('FAILREGISTASSEXOFNDANULY|SEX OFFENDER FAIL TO'						,poffense,0) <> '' 								=> 'SONF',
 						  							
 REGEXFIND('STAT[A|U|O]*[T]*ORY|STAT |\\-STAT |STAT\\.|STATUTAORY' ,poffense,0) <> '' and
-REGEXFIND('SODOMY[\\-| ]|S[O]?DMY[\\-| |1]|RAPE[\\-|\\.| |1]+|INTERCOURSE|CARNAL[\\-| ]' ,poffense,0) <> ''   							  => 'SONF',
+REGEXFIND('SODOMY[ \\-]|S[O]?DMY[1 \\-]|RAPE[ \\-\\.1]+|INTERCOURSE|CARNAL[ \\-]' ,poffense,0) <> ''   							  => 'SONF',
 				 
 					'NA');
 	RETURN result;
@@ -2758,13 +2888,12 @@ poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 SexOffensesForcible   := 'AT[TE]*MP[T]*[/\\. ]CSC[/\\. ]|^[ ]*[/\\. ]ATT CSC[/\\. ]|^[ ]*[/\\. ]C[\\. ]*S[\\. ]*C[/\\. ]|DEG(.*)CSC|VOYEUR|VOYERISM|'+
                          'MOLES|RAPE|[/\\. ]SEX[/\\. ]|SODOM|SODOOMY|SODOBY|SODONY|PENETRAT[ION]*|INTERCOU| IDSI |LASC.*UNNATURAL|LEWD|LASCIVIOUS|L[/]L CONDUCT|SEXBAT|'+
                          'SEXUAL.*CONTACT|SEXUAL.*[/\\. ]COMM[/\\. ]|SEXUAL.*OFFENSE|SEXUAL.*EXPLOIT|SEXUAL.*IMPOS|SEXUAL.*[/\\. ]IMP[/\\. ]|SEXUAL.*FORC[EING]+|SEXUAL.*UNLAWFUL|AGGRAVATED.*SEXUAL|SEXUAL.*ABUSIVE|'+
-													            'PC 243\\.4 A |PC 288 [ABC] |PC 261 [A] | PC 220 ';
+												 'PC 243\\.4 A |PC 288 [ABC] |PC 261 [A] | PC 220 |'+
+												 'SEX.*IMPOSIT|IMPOSIT.*SEX|PC 647\\.6 [A] |PC 647\\.6 |PC 261.5 [CD] |FORNICAT|INCEST|[ ]IND[/]CHILD|[ ]IND[/]EXPOS|INDCE[/ ]EXPOS|INDEC[/ ]EXPOS|OBSC[/ ]EXPOS';//moved from Nonforcible
 
-
-
-SexOffensesForcible_exc := 'WRONG SEX|ALLIGATOR|STATU[T]*[AORY]+|INCEST|STAT RAPE|PERFORM|PORN|FILM|MOVIE|TECH|MATERI|CARJACKING|'+
-                           'IMPERSON|PROMOTE|PRODUCE|VIDEO|WILDLIFE|COIN|VEND|VE[C]*H|REPRODUC|AUTO| M[/]*V |PRODUCTION|PLATESEXP|'+
-													              'PAY COST|POSS PHOTO|SEX MAT|SEXUAL MATERIAL|PERF BY A CHILD|RECORD SEX ACT';
+SexOffensesForcible_exc := 'WRONG SEX|ALLIGATOR|STATU[T]*[AORY]+|STAT RAPE|PERFORM|PORN|MOVIE|TECH|MATERI|CARJACKING|'+
+                           'IMPERSON|PROMOTE|PRODUCE|WILDLIFE|COIN|VEND|VE[C]*H|REPRODUC|PRODUCTION|PLATESEXP|'+
+													 'PAY COST|POSS PHOTO|SEX MAT|SEXUAL MATERIAL|PERF BY A CHILD|RECORD SEX ACT|STATUTORY|AUTO| M[/]*V ';
 
 Assault         := 'ABDOM|ABDGR|ABGEN|ABOFF|ABHAN|ABWIK|ABWITK|BATTER|ASSL|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|DOM[.MESTIC ]+VIO|ABUSE|INTIMIDAT|PHYSICAL HARM|RETALIATION';
 Assault2        := '^[ ]*A[.& ]+B[.]* |^[ ]*A AND B | A[ ]*&[ ]*B |A[ ]*&[ ]*B$|A[.& ]+B[. ]+H[ .&]+A[. ]+N[. ]*|A[. ]+B[. ]+W[ .]+I[. ]+K[. ]*|A[. ]+B[. ]+W[ .]+I[. ]+T[. ]+K[. ]*';
@@ -2772,7 +2901,9 @@ Assault2        := '^[ ]*A[.& ]+B[.]* |^[ ]*A AND B | A[ ]*&[ ]*B |A[ ]*&[ ]*B$|
 assault_ext     := 'SEX|RAPE|MOLES|PENETRAT';
 child_set       := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\\. ]|[/\\. ]CH[I]*L[TDEF][/\\. ]|[/\\. ]CHLD[</\\. ]|[/\\. ]CHILED[/\\. ]| CHITL ';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' or 
+              // Is_Obstruct_Resist(poffense) ='Y' or 
+							// Is_Warrant_Fugitive(poffense) ='Y' => 'N',
 							 
 determine_SOF_SONF(poffense)='SONF' => 'N',
 
@@ -2781,16 +2912,17 @@ REGEXFIND('PARAPE'                                 ,poffense)   => 'N',
 REGEXFIND('THERAPE'                                ,poffense)   and 
 REGEXFIND('RAPE'                                   ,poffense)   => 'Y',
  
-REGEXFIND('LEWD|LASCIVIOUS|L[/]L CONDUCT|SEXBAT'       ,poffense)   => 'Y',
+REGEXFIND('LEWD|LASCIVIOUS|L[/]L CONDUCT|SEXBAT|L[&]L BEHAVIOR'       ,poffense)   => 'Y',
  
 REGEXFIND('LASC'                  ,poffense)   and 
 REGEXFIND('UNNATURAL'             ,poffense)   => 'Y', 							 
  
 REGEXFIND(child_set                                ,poffense)   and
-REGEXFIND('[/\\. ]L[&/]L[/\\. ]|LEWD'              ,poffense)   => 'Y',
+REGEXFIND('[/\\. ]L[&/]L[/\\. ]'                   ,poffense)   => 'Y',
  
 REGEXFIND(Assault2                                 ,poffense)   and
-REGEXFIND(assault_ext                              ,poffense)   => 'Y',
+REGEXFIND(assault_ext                              ,poffense)   and 
+~REGEXFIND(SexOffensesForcible_exc                 ,poffense)   => 'Y',
 
 REGEXFIND(SexOffensesForcible                      ,poffense)   and 
 REGEXFIND('FORC'                                   ,poffense)   => 'Y',	
@@ -2799,14 +2931,12 @@ REGEXFIND(SexOffensesForcible                      ,poffense)   and
 ~REGEXFIND(SexOffensesForcible_exc                 ,poffense)   => 'Y',	 
  
 REGEXFIND(Assault                                  ,poffense)   and 
-REGEXFIND(assault_ext                              ,poffense)    => 'Y',
+REGEXFIND(assault_ext                              ,poffense)   and 
+~REGEXFIND(SexOffensesForcible_exc                 ,poffense)   => 'Y',
  
 REGEXFIND('ATT |COMMIT|FORCIBLE'                   ,poffense)  and
 stringlib.stringfind(poffense ,' SODO '            ,1) <> 0     and 		 
 REGEXFIND('[/\\. ]STAT[/\\. ]|STAUTORY|STAT[AU][TAORY]+|STA[T]+O[TO]*R|STATRY',poffense,0) = '' => 'Y',							 
- 
-REGEXFIND('[/\\. ]SXOFF[/\\. ]|[/\\. ]SX OF[/\\. ]|SEX OFF[E]*ND'  ,poffense)  and 							 
-REGEXFIND('[/\\. ]REG[/\\. ]|REGISTER'             ,poffense)   => 'Y',
  
 REGEXFIND('CONTACT|SOLICIT|[/\\. ]SOL[CIT]*[/\\. ]',poffense)   and 
 REGEXFIND('MINOR.*W/INT'                           ,poffense)   and 
@@ -2844,6 +2974,52 @@ REGEXFIND(child_set                                ,poffense)   => 'Y',
 						 						 
 REGEXFIND('SOLIC|SOLICIT'                              ,poffense)   and
 REGEXFIND(child_set+'IMMORAL PURPOSES|IMMORAL PURPOSE' ,poffense)   => 'Y',
+
+//following expressions were moved from non-forcible to here
+REGEXFIND('[/\\. ]SEX[UAL]*[/\\. ]'                ,poffense)   and 
+REGEXFIND('VE[C]*H|AUTO|[/\\. ]M[/]*V[/\\. ]'      ,poffense)   and                   
+REGEXFIND('USE|HAVING|OFFEN'                       ,poffense)   => 'Y',
+                                                                                                                
+stringlib.stringfind(poffense ,'FAIL' ,1) <> 0     and
+stringlib.stringfind(poffense ,' HIV ',1) <> 0     and
+REGEXFIND('STATUS| STAT '             ,poffense)   => 'Y',
+       
+REGEXFIND('EXPOS|EXPOSURE|EXPOSING|EXPSING' ,poffense)   and 
+REGEXFIND('SEXUAL OR|SEX(.*)[ ]*(GEN|ORG[ANS]*|PARTS)',poffense)   => 'Y',                
+
+stringlib.stringfind(poffense ,'INDEC'      ,1) <> 0     and 
+REGEXFIND(child_set+'| U/[0-9][0-9]* '      ,poffense)  =>  'Y',      
+
+stringlib.stringfind(poffense ,'UNLAW',1) <> 0     and
+REGEXFIND('CONTACT|TOUCH'             ,poffense)   and
+REGEXFIND(child_set                   ,poffense)   => 'Y',                
+       
+REGEXFIND('SEX.*ABUSE|ABUSE.*SEX'    ,poffense)   and
+REGEXFIND(child_set                  ,poffense)   => 'Y',  
+
+REGEXFIND('UNLAW|UNLW'               ,poffense)   and
+stringlib.stringfind(poffense ,'COND',1) <> 0     and
+REGEXFIND('TOWARD|[/\\. ]TO[/\\. ]'  ,poffense)   and
+REGEXFIND(child_set                  ,poffense)   => 'Y',  
+       
+REGEXFIND('UNLAW|UNLW'                 ,poffense)   and
+stringlib.stringfind(poffense ,'TRAVEL',1) <> 0     and
+stringlib.stringfind(poffense ,'MEET'  ,1) <> 0     and
+REGEXFIND(child_set                    ,poffense)   => 'Y',
+
+REGEXFIND('CARNAL|MOLEST'              ,poffense)   and
+REGEXFIND(child_set+'|DAHGHTER| < |YOA|[/\\. ]YR[/\\. ]| Y | [0-1][0-7]Y |LESS THAN|[/\\. ]AGE[/\\. ]' ,poffense)     => 'Y', 
+
+REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]'         ,poffense)   and
+stringlib.stringfind(poffense ,'CAPT'        ,1) <> 0     and
+REGEXFIND('IMAGE|FILM|VIDEO'                 ,poffense)   and                          
+REGEXFIND('NONCONSENT'                       ,poffense)     => 'Y',                 
+
+stringlib.stringfind(poffense ,'CORRUPT'     ,1) <> 0     and
+REGEXFIND(child_set                          ,poffense)     => 'Y',
+       
+REGEXFIND('INDEC|INDCE|INDENC'                             ,poffense)   and
+REGEXFIND('[/\\. ]LIB[ERTYIES]*[/\\. ]|CONTACT|ASSAULT|[/\\. ]ASLT[/\\. ]|ASSLT|[/\\. ]A&B[/\\. ]|[/\\. ]A[/]B[/\\. ]|BATTERY|BATT |ASSAU|ASSUA'+child_set ,poffense)     => 'Y',            
 						 
 							 'N');
 return Is_it;
@@ -2855,54 +3031,57 @@ export Is_SexOffensesNon_forcible(string poffense_in) := function //done
 
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+  
     
-SexOffensesNon_forcible      := 'STAT[U/ ]*RAPE|STATSODOMY|STATE(.*)[ ]SEX[UAL]* OFF|STATE SEX[UAL]* [OPFFEC ]*REG|REGISTER SEXUAL|SEX.*IMPOSIT|IMPOSIT.*SEX|'+
-                                'PC 647\\.6 [A] |PC 647\\.6 |PC 290 [FG]  |PC 290.018 [B] |PC 261.5 [CD] |SEX OF.*CHG ADDR|FORNICAT|INCEST|^[ ]IND[/]CHILD|^[ ]IND[/]EXPOS';
+SexOffensesNon_forcible      := 'STAT[U/ ]*RAPE|STATSODOMY|STATE(.*)[ ]SEX[UAL]* OFF|STATE SEX[UAL]* [OPFFEC ]*REG|REGISTER SEXUAL|'+
+                                'PC 290 [FG]  |PC 290.018 [B] |SEX OF.*CHG ADDR';
 																	
 SexOffensesNon_forcible_exc  := 'BURG|OBSCENE|PERFORM|PORN|FILM|MOVIE|COMPUTER|TECH|MATERI|VIDEO|WORDS|GESTURES|PICTURE|PIC|LANGUAGE|PHOTOGRAPH|CONVERSATION|POSING|PHONE|LANUGAGE';
 
 child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\\. ]|[/\\. ]CH[I]*L[TDEF][/\\. ]|[/\\. ]CHLD[</\\. ]|[/\\. ]CHILED[/\\. ]| CHITL ';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' or 
+             // Is_Obstruct_Resist(poffense) ='Y' or 
+						 // Is_Warrant_Fugitive(poffense) ='Y' => 'N',
 	
 // Roger's comment - QA Update - Sex Offenses Non-Forcible
 determine_SOF_SONF(poffense)='SONF' => 'Y',	
 
-REGEXFIND('EXPOS|EXPOSURE|EXPOSING|EXPSING' ,poffense)   and 
-REGEXFIND('SEXUAL OR|SEX(.*)[ ]*(GEN|ORG[ANS]*|PARTS)',poffense)   => 'Y',                
+// REGEXFIND('EXPOS|EXPOSURE|EXPOSING|EXPSING' ,poffense)   and 
+// REGEXFIND('SEXUAL OR|SEX(.*)[ ]*(GEN|ORG[ANS]*|PARTS)',poffense)   => 'Y',                
 
-stringlib.stringfind(poffense ,'INDEC'      ,1) <> 0     and 
-REGEXFIND(child_set+'| U/[0-9][0-9]* '      ,poffense)  =>  'Y',       
+// stringlib.stringfind(poffense ,'INDEC'      ,1) <> 0     and 
+// REGEXFIND(child_set+'| U/[0-9][0-9]* '      ,poffense)  =>  'Y',       
 
-REGEXFIND('[/\\. ]SEX[UAL]*[/\\. ]'  ,poffense)   and 
-REGEXFIND('VE[C]*H|AUTO'             ,poffense)   and 
-REGEXFIND('USE|HAVING|OFFEN'         ,poffense)   => 'Y',
+// REGEXFIND('[/\\. ]SEX[UAL]*[/\\. ]'  ,poffense)   and 
+// REGEXFIND('VE[C]*H|AUTO'             ,poffense)   and 
+// REGEXFIND('USE|HAVING|OFFEN'         ,poffense)   => 'Y',
 							 
-stringlib.stringfind(poffense ,'FAIL' ,1) <> 0     and
-stringlib.stringfind(poffense ,' HIV ',1) <> 0     and
-REGEXFIND('STATUS| STAT '             ,poffense)   => 'Y',
+// stringlib.stringfind(poffense ,'FAIL' ,1) <> 0     and
+// stringlib.stringfind(poffense ,' HIV ',1) <> 0     and
+// REGEXFIND('STATUS| STAT '             ,poffense)   => 'Y',
        
-stringlib.stringfind(poffense ,'UNLAW',1) <> 0     and
-REGEXFIND('CONTACT|TOUCH'             ,poffense)   and
-REGEXFIND(child_set                   ,poffense)   => 'Y',
+// stringlib.stringfind(poffense ,'UNLAW',1) <> 0     and
+// REGEXFIND('CONTACT|TOUCH'             ,poffense)   and
+// REGEXFIND(child_set                   ,poffense)   => 'Y',
        
-REGEXFIND('SEX.*ABUSE|ABUSE.*SEX'    ,poffense)   and
-REGEXFIND(child_set                  ,poffense)   => 'Y',
+// REGEXFIND('SEX.*ABUSE|ABUSE.*SEX'    ,poffense)   and
+// REGEXFIND(child_set                  ,poffense)   => 'Y',
 
-REGEXFIND('UNLAW|UNLW'               ,poffense)   and
-stringlib.stringfind(poffense ,'COND',1) <> 0     and
-REGEXFIND('TOWARD|[/\\. ]TO[/\\. ]'  ,poffense)   and
-REGEXFIND(child_set                  ,poffense)   => 'Y',
+// REGEXFIND('UNLAW|UNLW'               ,poffense)   and
+// stringlib.stringfind(poffense ,'COND',1) <> 0     and
+// REGEXFIND('TOWARD|[/\\. ]TO[/\\. ]'  ,poffense)   and
+// REGEXFIND(child_set                  ,poffense)   => 'Y',
        
-REGEXFIND('UNLAW|UNLW'                 ,poffense)   and
-stringlib.stringfind(poffense ,'TRAVEL',1) <> 0     and
-stringlib.stringfind(poffense ,'MEET'  ,1) <> 0     and
-REGEXFIND(child_set                    ,poffense)   => 'Y',
+// REGEXFIND('UNLAW|UNLW'                 ,poffense)   and
+// stringlib.stringfind(poffense ,'TRAVEL',1) <> 0     and
+// stringlib.stringfind(poffense ,'MEET'  ,1) <> 0     and
+// REGEXFIND(child_set                    ,poffense)   => 'Y',
        
 REGEXFIND('[/\\. ]STAT[/\\. ]|STAUTORY|STAT[AU][TAORY]+|STA[T]+O[TO]*R|STATRY'    ,poffense)   and
 REGEXFIND('RAPE| SODO |SOD[O]*MY|INTERCOU|[/\\. ]SEX[USAL]*[/\\. ]|CARNAL|MOLEST' ,poffense)     							 => 'Y',	
 
-REGEXFIND('CARNAL|MOLEST'        							      ,poffense)   and
-REGEXFIND(child_set+'|DAHGHTER| < |YOA|[/\\. ]YR[/\\. ]| Y | [0-1][0-7]Y |LESS THAN|[/\\. ]AGE[/\\. ]' ,poffense)     => 'Y',
+// REGEXFIND('CARNAL|MOLEST'        							      ,poffense)   and
+// REGEXFIND(child_set+'|DAHGHTER| < |YOA|[/\\. ]YR[/\\. ]| Y | [0-1][0-7]Y |LESS THAN|[/\\. ]AGE[/\\. ]' ,poffense)     => 'Y',
        
 REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]'        		,poffense)   and
 REGEXFIND('MASSA'                             ,poffense)   => 'Y',
@@ -2911,17 +3090,16 @@ REGEXFIND('[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION' ,pof
 REGEXFIND('PARL|LICENSE|[/\\. ]LIC[ENCSE]*[/\\. ]'                          ,poffense)   and
 REGEXFIND('MASSA|MASG'                                                      ,poffense)     => 'Y',
 
-REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]'         ,poffense)   and
-REGEXFIND('CAPT'                             ,poffense)   and
-stringlib.stringfind(poffense ,'CAPT'        ,1) <> 0     and
-REGEXFIND('IMAGE|FILM'                       ,poffense)   and
-REGEXFIND('NONCONSENT'                       ,poffense)     => 'Y',
+// REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]'         ,poffense)   and
+// stringlib.stringfind(poffense ,'CAPT'        ,1) <> 0     and
+// REGEXFIND('IMAGE|FILM'                       ,poffense)   and
+// REGEXFIND('NONCONSENT'                       ,poffense)     => 'Y',
       
-stringlib.stringfind(poffense ,'CORRUPT'     ,1) <> 0     and
-REGEXFIND(child_set                          ,poffense)     => 'Y',
+// stringlib.stringfind(poffense ,'CORRUPT'     ,1) <> 0     and
+// REGEXFIND(child_set                          ,poffense)     => 'Y',
        
-REGEXFIND('INDEC|INDCE|INDENC'                             ,poffense)   and
-REGEXFIND('[/\\. ]LIB[ERTYIES]*[/\\. ]|CONTACT|'+child_set ,poffense)     => 'Y',
+// REGEXFIND('INDEC|INDCE|INDENC'                             ,poffense)   and
+// REGEXFIND('[/\\. ]LIB[ERTYIES]*[/\\. ]|CONTACT|'+child_set ,poffense)     => 'Y',
        							              
 REGEXFIND(SexOffensesNon_forcible ,poffense)   => 'Y',
 
@@ -2933,6 +3111,8 @@ stringlib.stringfind(poffense ,'REGISTRATION FORM',1) <> 0  and
 stringlib.stringfind(poffense ,'OFFENDER'         ,1) <> 0  and
 stringlib.stringfind(poffense ,'SUBMIT'           ,1) <> 0  => 'Y',  
    							 
+REGEXFIND('[/\\. ]SXOFF[/\\. ]|[/\\. ]SX OF[/\\. ]|SEX OFF[E]*ND'  ,poffense)  and 							 
+REGEXFIND('[/\\. ]REG[/\\. ]|REGISTER'             ,poffense)   => 'Y',
 
        'N');
 return Is_it;
@@ -2951,7 +3131,7 @@ Obscene               := 'OBSCENITY|OBSCEN|OBSC.*MAT';
 												
 exc_obsc              := 'LAMP|LANQUAGE|UTTER|LANG|[\\. ]LAN[DUAGE]*[\\. ]|[/\\. ]CALL[S]*[/\\. ]|PHON[E]*|[/\\. ]WORD[S]*[/\\. ]|[/\\. ]GEST[URES]*[/\\. ]|MESSAGE|BEHAV[IOR]* ';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' 	=> 'N',						 
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' 	=> 'N',						 
 
 							 
 REGEXFIND('[/\\. ]INDE[/\\. ]'                                ,poffense)    and
@@ -3038,7 +3218,7 @@ Terrorist_ecl      := 'HARM[ |$|/|\\-]|FALSE INFO';
 TT2a := 'EXPLOSIV|BOMB';
 TT2b := 'TERR';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',			
+Is_it := MAP(//is_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',			
 			 
  REGEXFIND('REVOC' 																			               ,poffense)   OR
 (REGEXFIND('PROBAT', poffense)   AND REGEXFIND('H[O]?LD|VIO[L]?', poffense)  ) => 'N',
@@ -3086,7 +3266,7 @@ ROV2a                          := 'RESTRAIN(.*) ORDER|PROT(.*) ORDER';
 ROV2b                          := 'VIOL';
 
 vio_set := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION';
-Is_it := MAP(//In_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',
 
 REGEXFIND('[/\\. ]TPO[/\\. ]|[/\\. ]T\\.P\\.O[/\\. ]' ,poffense)   and 
 REGEXFIND(vio_set                                     ,poffense)   => 'Y',
@@ -3143,7 +3323,7 @@ worthless_chks    := 'WORTHLESS CH|WORTHLESS CK|WORTHLESS [CDW]HECK[S]* |PASS(.*
 ck_set            := 'CH[A]*ECK|[/\\. ]C[E]*H[C]*K[S]*[/\\. ]|[/\\. ]CK[S]*[/\\. ]|[/\\. ]CHCK[/\\. ]|[/\\. ]CHEC[EKHS]*[/\\. ]|'+
                          '[/\\. ]CHE[DX]*K[/\\. ]|[/\\. ]CH[C]*EKC[/\\. ]|[/\\. ]CECK[/\\. ]';                                                                  
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 REGEXFIND('[/\\. ]NSF[S]*[-/\\. ]|[/\\. ]INSF[ ]*[FUNDS]+[-/\\. ]|[/\\. ]INSF[CHECK]*[-/\\. ]+|[/\\. ]INSF[FUNDS \\.]+C[HEC]*[CK][S0-9]*[-/\\. ]|[/\\. ]INSFC[HEC]*K[OU]'      ,poffense,0) <> '' => 'Y',
 REGEXFIND('[/\\. ]BAD[CHECK]+[-/\\. ]+|[/\\. ]BAD[ ]*+C[HEC]*[CK][S0-9]*[-/\\. ]|[/\\. ]BADC[HEC]*K[OUINSUF]+'      ,poffense,0) <> '' => 'Y',
@@ -3231,7 +3411,7 @@ poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 CurfewLoiteringVagrancyVio  := 'LOI[T]+|LOTIER|LOUTER|CURF|VAGRA|HOMELES|BEG[G]+IN|BEGG[EA]R|BEGG[/\\. ]|PC 653\\.22 A |HS 11532 A |856\\.021';
 
 Curfew_exc                  := 'EXPLOIT|BEGGINER|HABEGGER ';
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 stringlib.stringfind(poffense ,'PAN'      ,1) <> 0 AND 
 stringlib.stringfind(poffense ,'OCCUPANT' ,1) =  0 AND 
@@ -3289,7 +3469,7 @@ D2                := 'DRIV';
 D2a               := 'DRUNK';
 
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
              
 stringlib.stringfind(poffense ,'INTOX'             ,1) <> 0   and
 REGEXFIND('[/\\. ][IO]N[/\\. ]|ALONG|UPON'         ,poffense) and
@@ -3335,7 +3515,7 @@ fam_excl        := 'NON[ -]*FAMILY|TERR|ASS[AU]*LT|BATT|INCEST|SEX|PORN|RAPE|DEL
 
 fon2a := 'THREAT|ABUS[EING]+|CRUEL|ABANABON|DESERT|SUPPORT|NEGLECT|CONTRIB|ENDANGE';
 fon2b := 'FAMILY|CHILD|CHLD|MINOR|SPOUSE|DEPEND|FAM & HSH|FAM[/]HOUSE|FAMILY MEMBER';    
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 			 
 REGEXFIND('SODOM|RAPE'                 ,poffense)   and 
 stringlib.stringfind(poffense ,'THERAPEUTIC' ,1) = 0  => 'N',
@@ -3462,7 +3642,10 @@ liq_set      := '[/\\. ]LIQ[U]*M[0-9]|[/\\. ]LIQ[0UIOERS]*[/\\. ]|LIQUO[LR]';
 alc_set      := liq_set+'| ALC/|ALCAHOL|LACOHOL|ACOHOL|ALCOHOL|[/\\. ]AL[C]+[0OHLIC]*[/\\. ]|ALOCH|ALC[OH]+|ALCONHLIC|ALCIHOL| AALC[/]| OFALC[/]|ALCLOHOLIC';
 Intox        := alc_set+'|INOTXI[CATING]*[/\\. ]|BEER|INTOX|WINE|[/\\. ]QLCO[/\\. ]|[/\\. ]QALC[/\\. ]';
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' OR
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' OR
+             // Is_Obstruct_Resist(poffense) ='Y' or 
+						 // Is_Warrant_Fugitive(poffense) ='Y' => 'N',
+
 						       Is_Drunkenness(poffense)='Y'   OR     
 						       Is_DrivingUndertheInfluence(poffense)='Y'	=> 'N',
 
@@ -3706,7 +3889,7 @@ DC2b                := 'LANG|EXPOS|PHONE|WORDS|GESTU|PUBLIC|COND';
 DC2c                := 'OBSCEN';
 DC2d                := 'LANG|PHON|WORDS|GESTU|PUBLIC|COND|CALL|[/\\. ]E MAIL|EMAIL|MESSAGE'; 
 
-Is_it := MAP(//In_Global_Exclude(poffense,'other')='Y' => 'N',
+Is_it := MAP(//is_Global_Exclude(poffense,'other')='Y' => 'N',
 
 //this expression has to be above the  Is_LiquorLawViolations clause below. 
 REGEXFIND('DI[SC]*ORDERLY|DISORDER|[/\\. ]DIS[ORDER]*[/\\. ]' ,poffense)   and
@@ -3717,6 +3900,9 @@ REGEXFIND('[/\\. ]EXP[\\.0AIOSURE]*[/\\. ]|EXPOSURE'      ,poffense)   => 'Y',
 
 stringlib.stringfind(poffense ,'RIOT'                           ,1) <> 0     and
 REGEXFIND('COMMIT|UNLAW|AGG|INCITE|INCITING|COMMISSION|ENGAG'   ,poffense)   => 'Y', 
+
+stringlib.stringfind(poffense ,'CONTRI',1) <> 0  AND              
+REGEXFIND('DELI[N]*Q|[/\\. ]DEL[/\\. ]|DELINQUENCY' ,poffense)   => 'Y',
 
 Is_Assault_aggr(poffense)='Y'OR                   
 // Is_Assault_other(poffense)='Y'OR                   
@@ -3803,8 +3989,7 @@ stringlib.stringfind(poffense ,'YELLOW'        ,1) = 0     => 'Y',
 (stringlib.stringfind(poffense ,'EXPEL',1) <> 0  and stringlib.stringfind(poffense ,'SALIVA'       ,1) <> 0 )) and
 stringlib.stringfind(poffense ,'HOSPITA'        ,1) = 0     => 'Y',
 
-stringlib.stringfind(poffense ,'CONTRIB',1) <> 0  AND              
-REGEXFIND('DELI[N]*Q|[/\\. ]DEL[/\\. ]|DELINQUENCY' ,poffense)   => 'Y',
+
 
 'N');
 return Is_it;
@@ -3819,7 +4004,7 @@ poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 TrespassofRealProperty      := 'TRANSPAS|TRES[PASS]*|TRESSPASS|TR[ES]PASS|TREAPAS|TRSP[S]* |REFUS[ALING]+ TO LEAVE|810.09.2A|810.08.2A|810.09.2B|810.09.1A1|'+
                                'PC 602\\.5|PC 602 |PC 602\\.1 A |PC 369 I |PC 369I A ';
 
-Is_it := MAP( //In_Global_Exclude(poffense,'other')='Y'      OR
+Is_it := MAP( //is_Global_Exclude(poffense,'other')='Y'      OR
               // Is_Burglary_BreakAndEnter_res(poffense)='Y'  OR
 							       // Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR
 							       // Is_Burglary_BreakAndEnter_veh(poffense)='Y'  => 'N',
@@ -3861,6 +4046,7 @@ REGEXFIND('PRIVATE|PUBLIC'                                 ,poffense)   => 'Y',
 						 'N');
 return Is_it;
 end;
+
 //--------------------------------------------------------------------------------------------------------------------------------------
 
 export Is_traffic(string poffense_in) := function
@@ -3897,8 +4083,8 @@ traffic_list :=   ' TAG[ ]|12 P[OIN]*T| AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M/V
  traffic_list3 := 'SIGNAL|^ REV[.OKE ]+|^ SUSP|^ SURR|SEA[TL][ ]*B[EA]*LT|TRANSPORTER|TOLLWAY|TOO FAST|STO[P]+ING AFTER ACC|INFRACTION VC|'+
                   'UNREGISTERED|UNINSURED|UNSECURE(.*) LO\\]AD|UNSAFE BACKING|VIO(.*) REG|WINDSHIELD WIPERS|STARTING [AND\\&]+ BACKING|'+	
                   'WHEEL|WRONG SIDE|WRONG DIRECTION|WRONG WAY|WINDSHEILD|TINT|UNSIGNED REGISTRATION|YIELD|PK[0-9]+[ 0-9]+$|^ DUSP[- ]+| DUS[123][ STNRDH]+| DUS[0-9]{2}/[0-9]{2}|'+
-									         'HORN|FMCSR|FMCSK|PWC|MCV[-: ]|PEDEST|VSRL|U[-/ ]*TURN|RD[-/]SP|PARKING|RIDE|RIDING|DWLR|CFR[ ]*-|SIDE WINDOWS[-: ]+RESTRICT|'+
-									         'CRASH|USDOT | US DOT[ #]|^ DPS[-/ ]|ILLEGAL SUN[ ]*SHAD|WINDSHIELD[S]*[- ]+SIGN[,/ ]+COVERING[,/ ]+SUNSCREEN MATERIAL';
+									'HORN|FMCSR|FMCSK|PWC|MCV[-: ]|PEDEST|VSRL|U[-/ ]*TURN|RD[-/]SP|PARKING|RIDE|RIDING|DWLR|CFR[ ]*-|SIDE WINDOWS[-: ]+RESTRICT|'+
+									'CRASH|USDOT | US DOT[ #]|^ DPS[-/ ]|ILLEGAL SUN[ ]*SHAD|WINDSHIELD[S]*[- ]+SIGN[,/ ]+COVERING[,/ ]+SUNSCREEN MATERIAL';
 									 
 
  traffic_list4 := 'SUSPD[/\\. ]|SPD[/\\. ]|SPDG[/\\. ]|BOAT|BICYCLE|BIKE|CYCLING|D\\.[ ]*U\\.[ ]*S|D[/]U[/]S|D\\.[ ]*W\\.[ ]*[0OD][\\. ]*L|D[ ]*\\.[ ]*W[ ]*\\.[ I]*[OL]|D\\.[ ]*W\\.[ ]*[SR]|'+   
@@ -3911,7 +4097,7 @@ traffic_list :=   ' TAG[ ]|12 P[OIN]*T| AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M/V
                  'VC 14601\\.1 A |VC 16028 A |VC 27315 [DEF] VC 14601\\.5 A |VC 26708 A  1 |VC 26708\\.5|VC 22101 [AD] |VC 21461 A |VC 21461\\.5 |VC 14601\\.[25] A |'+
                  'VC 14601 A |VC 16028 C |VC 12951 A |VC 23103\\.5|VC 23103 |VC 22349 B |VC 16020 A |VC 5200 |VC 5200 A |VC 24252 A |VC 4454 A |VC 22451 A |'+
                  'VC 27007 |VC 21658 A | VC 23222 B |VC 2800\\.[12]|VC 27360 A |VC 27360\\.5 [AB] |VC 27360 B |VC 21212 A |VC 21755 |14601VC|VC 21460 A |VC 21460\\.5 C |VC 24250 |'+
-								 'VC 24400 |VC 24400 A | 74 55 B |VC 24603 [ABDE] |VC 24603 |VC 24002 [AB] |VC 22107 |VC 26710 |VC 21651 A |VC 2815 |VC 21453 B |VC 35551 A |VC 21801 A |316063 1 ';
+								 'VC 24400 |VC 24400 A | 74 55 B |VC 24603 [ABDE] |VC 24603 |VC 24002 [AB] |VC 22107 |VC 26710 |VC 21651 A |VC 2815 |VC 21453 B |VC 35551 A |VC 21801 A ';
 
  traffic_list7 :='VC 4462\\.5|VC 4462 B |VC 22406 [AB] |VC 21950 A |VC 23111|VC 27600|VC 21650 |VC 21650\\.1|VC 20001 |VC 21955 |VC 24600 [ABE] |VC 22348 [BC] |VC 22100 [AB] |VC 22400 A |'+
                  'VC 21804 A |VC 21802 A |487465 VBR|VC 27151 A |VC 31 |VC 21201 D |VC 27465 B |4507\\.02A|VC 21457 A |VC 5201 |VC 21718 A |VC 34506\\.3|VC 345063 |VC 23225 A |'+
@@ -3925,6 +4111,8 @@ traffic_list :=   ' TAG[ ]|12 P[OIN]*T| AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M/V
                   '316[\\.]*2952 2 | 316[\\.]*2953 | 316\\.520 1 | 316\\.605 | 316\\.610 | 316074 2 | 316085 2 | 316121 1 | 316121 4 | 316130 7 B | 3162952 2 | 316605 | 320\\.261 | 320\\.38 | 320021 | 320261 | 32038 |'+
                   '322[\\.]*031 1 | 322\\.19 | 4503\\.11 | 4503\\.21 | 4510\\.16A | 46\\.2 1003|322\\.03[\\. ]1| 169 475 2 |322\\.34 10 |17AAC25\\.210|169 06 5 A 3 III| 316130 11 |316614 4 A|DAC[/]IPS';
 
+ traffic_list9 := ' 316646 |316.063 1 |316063 1 ';
+ 
  exclude_list_traffic := 'DE[E]+R|DOG|FISH|WILD[ LIFE]*|SU[SP]*(.*) SENT|SEX|REGISTRY|OCCUPATION|PROBATION|VIO(.*) REGULATION|THEFT|VANDALISM|TRES[S]*PASS|TRAFFICING|TRAFFICKING|'+
 		                       'NARCOTIC|COCAIN|TRAFFIC[ /]DR[UG]+|CHILD TRAFFIC|TRAFFIC [HERO]*IN|TRAFFIC MAR|DRUG TRAFFIC|TRAFFIC NARC|TRAFFIC CRA[CK]+|'+
 								                 'TRAFFIC ECSTASY|AGG(.*)TRAFFIC|RSP|FIREARM|SWAN|ANTLERS|RABIES| DOE|FIREWORK';		
@@ -3935,56 +4123,13 @@ REGEXFIND('FAIL|FA[/]'                               ,poffense)  and
 REGEXFIND('SHOW|OBTAIN'                              ,poffense)  and 
 REGEXFIND(' DL | ID | CDL | OL |INSURANCE|DRIVER LICENSE|DRIV LIC| REG[ISTRATION]* '  ,poffense)   	=> 'Y', 
 						
-      //In_Global_Exclude(poffense,'other')='Y' => 'N',
-            
-						// Is_Arson(poffense)='Y' OR                        
-						// Is_Assault_aggr(poffense)='Y' OR                      
-						// Is_Assault_other(poffense)='Y' OR                      
-						// Is_Bribery(poffense)='Y' OR                      
-						// Is_Burglary_BreakAndEnter_res(poffense)='Y' OR
-						// Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR 
-						// Is_Burglary_BreakAndEnter_veh(poffense)='Y' OR 
-	  				// Is_Counterfeiting_Forgery(poffense)='Y' OR       
-						// Is_Destruction_Damage_Vandalism(poffense)='Y' OR
-						// Is_Drug_Narcotic(poffense)='Y' OR              
-						// Is_Fraud(poffense)='Y' OR                        
-						// Is_Gambling(poffense)='Y' OR 
-						// Is_Homicide(poffense)='Y' OR                     
-						// Is_Kidnapping_Abduction(poffense)='Y' OR         
-						// Is_Theft(poffense)='Y' OR   
-						// Is_Shoplifting(poffense)='Y' OR
-						// Is_Motor_Vehicle_Theft(poffense)='Y' OR          
-						// Is_Pornography(poffense)='Y' OR                  
-						// Is_Prostitution(poffense)='Y' OR                 
-						// Is_Robbery_res(poffense)='Y' OR    
-						// Is_Robbery_comm(poffense)='Y' OR    
-						// Is_SexOffensesForcible(poffense)='Y' OR          
-						// Is_SexOffensesNon_forcible(poffense)='Y' OR      
-						// Is_Stolen_Property_Offenses_Fence(poffense)='Y' OR
-						// Is_Weapon_Law_Violations(poffense)='Y' OR        
-						// Is_Identity_Theft(poffense)='Y' OR               
-						// Is_Computer_Crimes(poffense)='Y' OR              
-						// Is_Terrorist_Threats(poffense)='Y' OR            
-						// Is_Restraining_Order_Violations(poffense)='Y' OR 
-						// Is_BadChecks(poffense)='Y' OR                    
-						// Is_CurfewLoiteringVagrancyVio(poffense)='Y' OR   
-						// Is_DisorderlyConduct(poffense)='Y' OR            
-						// Is_DrivingUndertheInfluence(poffense)='Y' OR     
-						// Is_Drunkenness(poffense)='Y' OR                  
-						// Is_FamilyOffenses(poffense)='Y' OR     
-						// (Is_LiquorLawViolations(poffense)='Y' and REGEXFIND('^ TRAFFIC',poffense,0)='') OR          
-						// Is_TrespassofRealProperty(poffense)='Y' OR       
-						// Is_PeepingTom(poffense)='Y' OR                   
-						// Is_HumanTrafficking(poffense)='Y' =>  'N', 
-
-						
 REGEXFIND('WILD|ANIMAL|WOLF|RACCOON|HUNT|MONKEY|COUGAR|FARE|FISH|DEER|GAME|BOMB' ,poffense)    => 'N',
 
 //Roger's comments - QA Update - Traffic   Round 3 8/26/16		
 REGEXFIND('DRIV|OPR'                             		    ,poffense)   and
 REGEXFIND('U/INFLU|/U THE INFLU|/INFLUENCE|W/UND/INFLU',poffense)    => 'N',
 
-REGEXFIND('DRIV[E|I| |\\.]|BOATING|OPR'                ,poffense)   and
+REGEXFIND('DRIV[EI \\.]|BOATING|OPR'                ,poffense)   and
 stringlib.stringfind(poffense ,'INFLUEN'               ,1) <> 0     and
 REGEXFIND('UNDER|UND|WHILE|LIQUOR|ALCOH|DRUG|NAC|CONT[.]+SUB|SUB[.*]CONT',poffense)   => 'N',						
 
@@ -3996,14 +4141,15 @@ REGEXFIND('NO[T]? |EXPIRED|FAIL[ |E|U|/]|SUSPEND|NO |REQ[U| ]|WITHOUT|W/O',poffe
 stringlib.stringfind(poffense ,'HIT'               ,1) <> 0     and
 stringlib.stringfind(poffense ,'RUN'               ,1) <> 0     =>'Y',
 
+REGEXFIND(traffic_list9                             ,poffense)   => 'Y',
 // REGEXFIND('INFRACTION VC'                            ,poffense)   => 'Y',
 
 REGEXFIND('VEH| M[/]*V '                                ,poffense)   and
 REGEXFIND('COMM|SUSP|REVOC'                             ,poffense)   and
 REGEXFIND('[/\\. ]DR[/\\. ]|[/\\. ]OP[/\\. ]|OPER'      ,poffense)   => 'Y',
 
-REGEXFIND('SUSP|REVOC'                                  ,poffense)   and
-REGEXFIND(' DR[VING]*[/\\. ]|[/\\. ]DR[VING]*[/\\. ]'   ,poffense)   => 'Y',
+REGEXFIND('SUSP|REVOC|REVKD'                                  ,poffense)   and
+REGEXFIND(' DR[VING]*[/\\. ]|[/\\. ]DR[VING]*[/\\. ]|OPER'   ,poffense)   => 'Y',
 
 REGEXFIND('VEH| M[/]*V '                                ,poffense)   and
 REGEXFIND(' NO |NON|REQ|REST|DEF|IMPRO| ON | NO |ALL|OPER|VIEW| W[/]O |MISS| T[/]H ',poffense)   and
@@ -4122,7 +4268,7 @@ REGEXFIND('DR[/\\. ]|DR[IV][\\. ]|DR[IA]+VE|DRV[IN]*G[\\. ]|DRVE |[/\\. ]DRG[/\\
 	 (REGEXFIND('OFF[/\\. ]'                 ,poffense,0) <>'' and REGEXFIND('RDWAY|RDWY'                      ,poffense)   ) 
 )  => 'Y',
 						 
-REGEXFIND(' FMC | FOHS[\\( ]| FMFR | FTMFR | DECAL | FSRA | FTD[/ ]| DPS | EDXP | EDXPIRED',poffense) => 'Y',
+REGEXFIND(' FMC | FOHS[\\( ]| FMFR | FTMFR | DECAL | FSRA | FTD[/ ]| DPS | EDXP | EDXPIRED|HAZARDOUS BRAKE SYSTEM| W[/-]LIC SUSP|MOTOR VEHICLE TITLE ',poffense) => 'Y',
 
 REGEXFIND('EXPRI[R]*ED|EXPR[/ ]'                                ,poffense)   and
 REGEXFIND(' DISP[/ ]| DISP[/ ]|DISPLAY| DRVG | DSPLY '          ,poffense)   => 'Y',
@@ -4314,7 +4460,8 @@ REGEXFIND('FIN|FINANCIAL'                              ,poffense)   AND
 REGEXFIND('RESP|INSURANCE'                             ,poffense)    => 'Y',	
 						 
 REGEXFIND('DUTY|APPRO|F/[TO]*|F\\.TO|FT|F\\.T\\.| FL |DISRE|F[/-]T|FAI[L]| FA |FIAL|F[AI]*LURE|R[-]*O[-]*W|ROW|SIGN|DIS|F[-]T-[OS]|OBEY|RIGHT|FALI |FAL | FIL | FLD |WAY|TURN| RT'    ,poffense7,0) <> '' and
-stringlib.stringfind(poffense ,'YEILD'                 ,1) <> 0				 => 'Y',
+// stringlib.stringfind(poffense ,'YEILD'                 ,1) <> 0				 => 'Y',
+REGEXFIND('TRAFFIC LAW|YEILD'             ,poffense)   => 'Y',
 	
 REGEXFIND('UNAU|UNAT |UNSAF'                           ,poffense)   and
 REGEXFIND('VEH|MV|BOAT'                                ,poffense)   and
@@ -4570,23 +4717,13 @@ REGEXFIND(exclude_list_traffic                      ,poffense,0) = ''  => 'Y',
 REGEXFIND(traffic_list6                             ,poffense)   => 'Y',						 
 REGEXFIND(traffic_list7                             ,poffense)   => 'Y',	
 REGEXFIND(traffic_list8                             ,poffense)   => 'Y',	
+REGEXFIND(traffic_list9                             ,poffense)   => 'Y',
+//traffic9
 
 REGEXFIND(LIC1                                      ,poffense)   and
 REGEXFIND(exclude_list_traffic                      ,poffense,0) = ''  => 'Y',	 
 						 
-					/*	 REGEXFIND('^ [0-9][0-9].[0-9][05][ ]*$'           ,poffense)   => 'Y',
-       REGEXFIND('^ [0-9][0-9][/][0-9][05] RD[ ]*$'        ,poffense)   => 'Y',
- 						REGEXFIND('^ [0-9][0-9] IN [0-9][05][ ]*$'          ,poffense)   => 'Y',
-						 REGEXFIND('^ [0-9][0-9][/][0-9][05] DR[V]*[ ]*$'    ,poffense)   => 'Y',
-						 REGEXFIND('X[0-9][0-9][/][0-9][05][ ]*$'            ,poffense)   => 'Y',
-						 REGEXFIND('^ [0-9]+[/][0-9][50] (2ND|MPH)[ ]'       ,poffense)   => 'Y',
-						 REGEXFIND('^ [0-9]+[/][0-9][50] RECKLESS[ ]'        ,poffense)   => 'Y',						 
-						 REGEXFIND('^ RD[ ]*[0-9]+[/][0-9][50][ ]'           ,poffense)   => 'Y',
-						 REGEXFIND('^ [0-9][0-9][-][0-9][05][-]B[ ]*$'       ,poffense7,0) <> '' => 'Y',
-						 REGEXFIND('SP [-] [0-9][0-9][/][0-9][05][ ]*$'      ,poffense7,0) <> '' => 'Y',
-						 REGEXFIND('^ [0-9]+[/][0-9][50]-PT[ ]'              ,poffense7,0) <> '' => 'Y',			*/			 
-
-REGEXFIND('^ [0-9][0-9].[0-9][05][ ]*$|^ [0-9][0-9][/][0-9][05] RD[ ]*$|^ [0-9][0-9] IN [0-9][05][ ]*$|^ [0-9][0-9][/][0-9][05] DR[V]*[ ]*$|X[0-9][0-9][/][0-9][05][ ]*$|^ [0-9]+[/][0-9][50] (2ND|MPH)[ ]|^ [0-9]+[/][0-9][50] RECKLESS[ ]|^ RD[ ]*[0-9]+[/][0-9][50][ ]',poffense)   => 'Y',
+REGEXFIND('^ [0-9][0-9].[0-9][05][ ]*$|^ [0-9][0-9][/][0-9][05] RD[ ]*$|^ [0-9][0-9] IN [0-9][05][ ]*$|^ [0-9][0-9][/][0-9][05] DR[V]*[ ]*$|X[0-9][0-9][/][0-9][05][ ]*$|^ [0-9]+[/][0-9][50] (2ND|MPH)[ ]|^ [0-9]+[/][0-9][50] RECKLESS[ ]|RECKLESS[ ][0-9]+[/][0-9][50]|^ RD[ ]*[0-9]+[/][0-9][50][ ]',poffense)   => 'Y',
 REGEXFIND('^ [0-9][0-9][-][0-9][05][-]B[ ]*$|SP [-] [0-9][0-9][/][0-9][05][ ]*$|^ [0-9]+[/][0-9][50]-PT[ ]*',poffense7)   => 'Y',
 						 
 stringlib.stringfind(poffense ,'LIGHTED'                   ,1) <> 0	  and	
@@ -4633,8 +4770,7 @@ REGEXFIND('SUSPENSION|SUSPENDED|REVOC|REVOK'                ,poffense)    => 'Y'
 stringlib.stringfind(poffense ,'REAR'                       ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'LAMP'                       ,1) <> 0	  and
 stringlib.stringfind(poffense ,'REQ'                        ,1) <> 0	  and	
-stringlib.stringfind(poffense ,'VEH'                        ,1) <> 0	  => 'Y',				
-						 						 
+stringlib.stringfind(poffense ,'VEH'                        ,1) <> 0	  => 'Y',										 						 
 						 
 REGEXFIND('RECK|RECKLESS'                                   ,poffense)   AND
 stringlib.stringfind(poffense ,'OPER'                       ,1) <> 0	  and	
@@ -4660,8 +4796,16 @@ stringlib.stringfind(poffense ,'LINE'                       ,1) <> 0	  => 'Y',
 						 
 stringlib.stringfind(poffense ,'ATV'                        ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'OPER'                       ,1) <> 0	  and
-(stringlib.stringfind(poffense ,'STREET',1) <> 0	 or stringlib.stringfind(poffense ,'PARK' ,1) <> 0	) => 'Y',		             
+(stringlib.stringfind(poffense ,'STREET',1) <> 0	 or stringlib.stringfind(poffense ,'PARK' ,1) <> 0	) => 'Y',		 
+            
+stringlib.stringfind(poffense ,'FAIL'                    ,1) <> 0	  and	
+stringlib.stringfind(poffense ,'MOVE'                    ,1) <> 0	  and
+stringlib.stringfind(poffense ,'OVER'                    ,1) <> 0	  and	
+stringlib.stringfind(poffense ,'EMERGENCY'               ,1) <> 0	  => 'Y',
 
+stringlib.stringfind(poffense ,'MOTOR'                   ,1) <> 0	  and
+stringlib.stringfind(poffense ,'CARRIER'                 ,1) <> 0	  and	
+stringlib.stringfind(poffense ,'FAIL'                    ,1) <> 0	  => 'Y',
 						 'N');
 return Is_it;
 end;
@@ -4677,9 +4821,9 @@ Other1 :='POOL|CONVEY|PERMIS|PARK|LITTER|ACCOMPLIC|COMPLIC|APPEAL|INTERFER|TRAFF
          '^CF |^CM |CONSUMER|CUTTING|C[ ]*D[ ]*V|CONVERT|CONTEMPT|TAMPER|'+    
 		     'COCK(.*)FIGHT|DISTRIBUTE|DISTURBING|DANGER|FACILITAT|DISARM|CONVERSION|CONSERVATION|ESCAPE|CONSPIR';	  
 
-Other2:= 'DISRUPT[ING ]+PUB|DISRUPT[ING ]+MEET|DRAG RACING|DISMISS|HINDER|ELUDE|ESCAPE|ELDERLY|EXTRADITION|ENHANCEMENT|EXPOS|ELDER|'+			  
+Other2:= 'DISRUPT[ING ]+PUB|DISRUPT[ING ]+MEET|DRAG RACING|DISMISS|ELDERLY|EXTRADITION|ENHANCEMENT|EXPOS|ELDER|'+			  
 	        'FIRE|FAIL(.*) TO APPEAR|FUGITIVE|FORFEIT|FIGHTING(.*)PUBLIC|FLEE|FAIL(.*) TO PAY|'+	       		
-		       '^FURN|FEDERAL|^FUG|GRAND|RABIES|FISHING LIC|DOG VACCINATION|HEALTH|HABITUAL OFFENDER|^HARB|HAZARD|HARM|HARBORING A RUNAWAY|'+		      		
+		       '^FURN|FEDERAL|^FUG|GRAND|RABIES|FISHING LIC|DOG VACCINATION|HEALTH|HABITUAL OFFENDER|^HARB|HAZARD|HARM|HARBOR|'+		      		
 	        'ILL USE MIN|ILLEGAL|IMPORTUNING|LAW ENFORCEMENT|MORE THAN|^MOS|MISUSE|MAL.|MALICIOUS|CONTEMPT';				 
           
 Other3:= 'MAKING FALSE|MISCOND|NEGLECT|NON(.*)SUPPORT|PERJU|RESIST|OFFICER|OBSTR[UCTIONG]*|^OBS |'+	 
@@ -4713,54 +4857,53 @@ Other9:= 'PEDDL|ARREST|ARRST|LABEL|LABELING|REVOC|WRONG SEX|POSTPONEMENT|FUG WAR
 
 Is_it := MAP(
 						 
-						 //In_Global_Exclude(poffense,'other')='Y' => 'Y', //this stmt has to be before the other tests
+REGEXFIND('FAIL' ,poffense)   AND              
+REGEXFIND('SPEED|LANE|SIGNAL' ,poffense)   => 'N',
 
-             REGEXFIND('FAIL' ,poffense)   AND              
-						 REGEXFIND('SPEED|LANE|SIGNAL' ,poffense)   => 'N',
-
-             // Is_Arson(poffense)='Y' OR                        
-						 // Is_Assault_aggr(poffense)='Y' OR                      
-						 // Is_Assault_other(poffense)='Y' OR                      
-						 // Is_Bribery(poffense)='Y' OR					
-						 // Is_Burglary_BreakAndEnter_res(poffense)='Y' OR
-						 // Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR
-						 // Is_Burglary_BreakAndEnter_veh(poffense)='Y' OR
-						 // Is_Counterfeiting_Forgery(poffense)='Y' OR       
-						 // Is_Destruction_Damage_Vandalism(poffense)='Y' OR 
-						 // Is_Drug_Narcotic(poffense)='Y' OR                
+             Is_Arson(poffense)='Y' OR                        
+						 Is_Assault_aggr(poffense)='Y' OR                      
+						 Is_Assault_other(poffense)='Y' OR                      
+						 Is_Bribery(poffense)='Y' OR					
+						 Is_Burglary_BreakAndEnter_res(poffense)='Y' OR
+						 Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR
+						 Is_Burglary_BreakAndEnter_veh(poffense)='Y' OR
+						 Is_Counterfeiting_Forgery(poffense)='Y' OR       
+						 Is_Destruction_Damage_Vandalism(poffense)='Y' OR 
+						 Is_Drug_Narcotic(poffense)='Y' OR                
 						 // Is_Embezzlement(poffense)='Y' OR                 
 						 // Is_Extortion_Blackmail(poffense)='Y' OR						
-						 // Is_Fraud(poffense)='Y' OR                        
-						 // Is_Gambling(poffense)='Y' OR                     
-						 // Is_Homicide(poffense)='Y' OR                     
-						 // Is_Kidnapping_Abduction(poffense)='Y' OR   
-						 // Is_Theft(poffense)='Y' OR 						
-						 // Is_Shoplifting(poffense)='Y' OR 	
-						 // Is_Pornography(poffense)='Y' OR                  
-						 // Is_Prostitution(poffense)='Y' OR                 
-						 // Is_Robbery_res(poffense)='Y' OR                     
-						 // Is_Robbery_comm(poffense)='Y' OR
-						 // Is_SexOffensesForcible(poffense)='Y' OR          
-						 // Is_SexOffensesNon_forcible(poffense)='Y' OR      
-						 // Is_Stolen_Property_Offenses_Fence(poffense)='Y' OR						
-						 // Is_Weapon_Law_Violations(poffense)='Y' OR        
-						 // Is_Identity_Theft(poffense)='Y' OR               
-						 // Is_Computer_Crimes(poffense)='Y' OR 
-						 // Is_Terrorist_Threats(poffense)='Y' OR    	
-						 // Is_Restraining_Order_Violations(poffense)='Y' OR 		 				
-						 // Is_traffic(poffense)='Y' OR                      
-						 // Is_BadChecks(poffense)='Y' OR     						
-						 // Is_CurfewLoiteringVagrancyVio(poffense)='Y' OR 						
-						 // Is_DisorderlyConduct(poffense)='Y' OR            
-						 // Is_DrivingUndertheInfluence(poffense)='Y' OR     
-						 // Is_Drunkenness(poffense)='Y' OR					
-						 // Is_FamilyOffenses(poffense)='Y' OR     
-						 // Is_LiquorLawViolations(poffense)='Y' OR          
-						 // Is_TrespassofRealProperty(poffense)='Y' OR       
-						 // Is_PeepingTom(poffense)='Y' OR  
-						 // Is_Motor_Vehicle_Theft(poffense)='Y' OR 
-						 // Is_HumanTrafficking(poffense)='Y' =>                'N',  
-						   
+						 Is_Fraud(poffense)='Y' OR                        
+						 Is_Gambling(poffense)='Y' OR                     
+						 Is_Homicide(poffense)='Y' OR                     
+						 Is_Kidnapping_Abduction(poffense)='Y' OR   
+						 Is_Theft(poffense)='Y' OR 						
+						 Is_Shoplifting(poffense)='Y' OR 	
+						 Is_Pornography(poffense)='Y' OR                  
+						 Is_Prostitution(poffense)='Y' OR                 
+						 Is_Robbery_res(poffense)='Y' OR                     
+						 Is_Robbery_comm(poffense)='Y' OR
+						 Is_SexOffensesForcible(poffense)='Y' OR          
+						 Is_SexOffensesNon_forcible(poffense)='Y' OR      
+						 Is_Stolen_Property_Offenses_Fence(poffense)='Y' OR						
+						 Is_Weapon_Law_Violations(poffense)='Y' OR        
+						 Is_Identity_Theft(poffense)='Y' OR               
+						 Is_Computer_Crimes(poffense)='Y' OR 
+						 Is_Terrorist_Threats(poffense)='Y' OR    	
+						 Is_Restraining_Order_Violations(poffense)='Y' OR 		 				
+						 Is_traffic(poffense)='Y' OR                      
+						 Is_BadChecks(poffense)='Y' OR     						
+						 Is_CurfewLoiteringVagrancyVio(poffense)='Y' OR 						
+						 Is_DisorderlyConduct(poffense)='Y' OR            
+						 Is_DrivingUndertheInfluence(poffense)='Y' OR     
+						 Is_Drunkenness(poffense)='Y' OR					
+						 Is_FamilyOffenses(poffense)='Y' OR     
+						 Is_LiquorLawViolations(poffense)='Y' OR          
+						 Is_TrespassofRealProperty(poffense)='Y' OR       
+						 Is_PeepingTom(poffense)='Y' OR  
+						 Is_Motor_Vehicle_Theft(poffense)='Y' OR 
+						 Is_HumanTrafficking(poffense)='Y' OR
+						 Is_Obstruct_Resist(poffense)='Y'  OR  
+						 Is_Warrant_Fugitive(poffense)='Y'  =>                'N',
 						 
 REGEXFIND('UNL[-/ ]'                    ,poffense)   AND              
 stringlib.stringfind(poffense ,'CRIM'   ,1) <> 0	  and	
@@ -4775,9 +4918,9 @@ stringlib.stringfind(poffense ,'OFFEND' ,1) <> 0	  => 'Y',
 stringlib.stringfind(poffense ,'ZON'    ,1) <> 0	  and	
 REGEXFIND('VEH| M[/]*V |AUTO'           ,poffense) => 'Y',
 						
-stringlib.stringfind(poffense ,'LAW'    ,1) <> 0	  and	
-stringlib.stringfind(poffense ,'COMMAN' ,1) <> 0	  and													 
-stringlib.stringfind(poffense ,'DISREG' ,1) <> 0	  => 'Y',	
+// stringlib.stringfind(poffense ,'LAW'    ,1) <> 0	  and	 //moved to obstruct_resist
+// stringlib.stringfind(poffense ,'COMMAN' ,1) <> 0	  and													 
+// stringlib.stringfind(poffense ,'DISREG' ,1) <> 0	  => 'Y',	
 						 
 stringlib.stringfind(poffense ,'SOR'    ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'RESTR'  ,1) <> 0	  => 'Y',	
@@ -4792,26 +4935,27 @@ stringlib.stringfind(poffense ,'FTN'     ,1) <> 0	  and
 stringlib.stringfind(poffense ,' DMV '   ,1) <> 0	  and													 
 stringlib.stringfind(poffense ,'ADD'     ,1) <> 0	  => 'Y',	
 						       
-REGEXFIND('INT[/ ]'                      ,poffense) and             
-REGEXFIND('EMER[/ ]'                     ,poffense) and  
-stringlib.stringfind(poffense ,'CALL'    ,1) <> 0	  => 'Y',
+// REGEXFIND('INT[/ ]'                      ,poffense) and      //moved to obstruct_resist       
+// REGEXFIND('EMER[/ ]'                     ,poffense) and  
+// stringlib.stringfind(poffense ,'CALL'    ,1) <> 0	  => 'Y',
 						        
 REGEXFIND('KILL|TAKE'                       ,poffense) and              
 stringlib.stringfind(poffense ,'WRONG'      ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'SEX'        ,1) <> 0	  => 'Y',							 
       
-stringlib.stringfind(poffense ,'UNLAW'      ,1) <> 0	  and							 
-(stringlib.stringfind(poffense ,'COND'      ,1) <> 0 or stringlib.stringfind(poffense ,'REMAIN'  ,1) <> 0		 ) => 'Y',
+stringlib.stringfind(poffense ,'UNLAW'      ,1) <> 0	  and		//moved to obstruct_resist					 
+(stringlib.stringfind(poffense ,'COND'      ,1) <> 0 or stringlib.stringfind(poffense ,'REMAIN'  ,1) <> 0		 ) and 
+stringlib.stringfind(poffense ,'SEX|CHILD|MINOR'        ,1) = 0 => 'Y', 
 						 
 stringlib.stringfind(poffense ,'CARRY'      ,1) <> 0	  and	
 stringlib.stringfind(poffense ,' INS'       ,1) <> 0	  => 'Y',	
             
 REGEXFIND('^FTA |^FTA[ ]*\\$|^FTA[ ]*[/]'   ,poffense)    => 'Y',
 
-REGEXFIND('FAIL|AILL'                       ,poffense) and              
-stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0	  and	
-stringlib.stringfind(poffense ,'REASONA'    ,1) <> 0	  and							 
-REGEXFIND('LAW|ORDE'                        ,poffense) => 'Y',
+// REGEXFIND('FAIL|AILL'                       ,poffense) and    //moved to obstruct_resist          
+// stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0	  and	
+// stringlib.stringfind(poffense ,'REASONA'    ,1) <> 0	  and							 
+// REGEXFIND('LAW|ORDE'                        ,poffense) => 'Y',
              
 REGEXFIND('FAIL|F[/]T|^FL |^F[/]'           ,poffense)   AND              
 stringlib.stringfind(poffense ,'CARRY'      ,1) <> 0	  and	
@@ -4860,15 +5004,15 @@ stringlib.stringfind(poffense ,'FOOD'       ,1) <> 0	  and
 stringlib.stringfind(poffense ,'STAMP'      ,1) = 0	   and  
 stringlib.stringfind(poffense ,'STMP'       ,1) = 0    => 'Y',							 
 						   
-REGEXFIND('FAIL|OBEY'                       ,poffense) AND              
-REGEXFIND('RENABLE|RENBLE'                  ,poffense) AND
-stringlib.stringfind(poffense ,'LAW'        ,1) <> 0 => 'Y',
+// REGEXFIND('FAIL|OBEY'                       ,poffense) AND    //moved to obstruct_resist          
+// REGEXFIND('RENABLE|RENBLE'                  ,poffense) AND
+// stringlib.stringfind(poffense ,'LAW'        ,1) <> 0 => 'Y',
        			 
-stringlib.stringfind(poffense ,'FAIL'       ,1) <> 0	  and	
-stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0	  and							 
-(stringlib.stringfind(poffense ,'MOVE'      ,1) <> 0   OR
-	(stringlib.stringfind(poffense ,'LAW'      ,1) <> 0   AND stringlib.stringfind(poffense ,'ORDER' ,1) <> 0   )
-)=> 'Y',
+// stringlib.stringfind(poffense ,'FAIL'       ,1) <> 0	  and	   //moved to obstruct_resist
+// stringlib.stringfind(poffense ,'OBEY'       ,1) <> 0	  and							 
+// (stringlib.stringfind(poffense ,'MOVE'      ,1) <> 0   OR
+	// (stringlib.stringfind(poffense ,'LAW'      ,1) <> 0   AND stringlib.stringfind(poffense ,'ORDER' ,1) <> 0   )
+// )=> 'Y',
 	                       
 stringlib.stringfind(poffense ,'EXHAUST'    ,1) <> 0	  and	
 REGEXFIND('BATH|VENT'                       ,poffense) => 'Y',
@@ -4985,9 +5129,9 @@ stringlib.stringfind(poffense ,'CRUEL'      ,1) <> 0	  and
 REGEXFIND('FOWL|GAME|DOG|PETS|LIVESTOCK|GOOSE|HORSE|CAT|KITTEN|A[ANI]+[MA]+L|ANIM|A[NM]I[MN][AL]+|PONY|CHOW|TORTIS|ROTT[I]*|GOAT|PUP|'+
           'HOUND|SHEP|BIRDS|ROMULUS|LAB|K-9|PIT[ ]*BULL|TAB|PIG|LLAMA|DUCK|FERRET|PARROT|CHIHUAHUA|L[I]*VST[OC]*K|RO[T]+WEI|CANINE' ,poffense)   => 'Y',
 
-stringlib.stringfind(poffense ,'FALSE'      ,1) <> 0	  and	
-stringlib.stringfind(poffense ,'DECL'       ,1) <> 0	  and				 
-REGEXFIND('OWN|OWENRSHIP|OWERSHIP|PAW[MN]' ,poffense,0) = '' => 'Y',
+// stringlib.stringfind(poffense ,'FALSE'      ,1) <> 0	  and	
+// stringlib.stringfind(poffense ,'DECL'       ,1) <> 0	  and				 
+// REGEXFIND('OWN|OWENRSHIP|OWERSHIP|PAW[MN]' ,poffense,0) = '' => 'Y',
             
 stringlib.stringfind(poffense ,'UNL'       ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'USE'       ,1) <> 0	  and	
@@ -5033,8 +5177,8 @@ REGEXFIND('MUNI|CITY'                     ,poffense)   => 'Y',
 stringlib.stringfind(poffense,'BEACH'      ,1) <> 0	  and	
 REGEXFIND('HOUR|HR'                        ,poffense)   => 'Y',
             
-stringlib.stringfind(poffense ,'GANG'      ,1) <> 0	  and	
-REGEXFIND('CRIM|PARTIC|STREET|MEMBER|ACTIVITY|RECRUIT|DIRECT'       ,poffense)   => 'Y',
+// stringlib.stringfind(poffense ,'GANG'      ,1) <> 0	  and	
+// REGEXFIND('CRIM|PARTIC|STREET|MEMBER|ACTIVITY|RECRUIT|DIRECT'       ,poffense)   => 'Y',
             
 stringlib.stringfind(poffense ,'VIO'        ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'DEAL'       ,1) <> 0	  and							 
@@ -5126,8 +5270,16 @@ stringlib.stringfind(poffense ,'NO EMERGENCY'      ,1) <> 0	  and
 stringlib.stringfind(poffense ,'BUILDING'            ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'VIOL'        ,1) <> 0	  and							 
 REGEXFIND('CODE|OCCUPANCY STDS|OCCUPANCY STAND[ARDS]*',poffense)   								=> 'Y',
-								 
-						'N');
+
+//moved from global
+stringlib.stringfind(poffense,'AID'   ,1) <> 0     and
+stringlib.stringfind(poffense,'ABET'  ,1) <> 0     and
+REGEXFIND('ELIZABETH|BETH|LABET|HABET',poffense) => 'Y' ,  
+             
+REGEXFIND('AID(.*)ABET|ABETTING|AID & ABEDDING|ACCE[S]+ORY|ACCOMPLICE|CONSPIRE|CONSPIRACY|A[C]+ESS[ORY]* AFTER [THE ]*FACT ',poffense) => 'Y' ,  
+             
+ 
+'N');
                               		 
 return Is_it;
 end;
@@ -5166,7 +5318,7 @@ export Is_Unclassified(string poffense) := function
  rem_numAndOth := stringlib.stringfilterout(poffense,'0123456789-/() '); 	
  
   Is_it := MAP(
-	          //In_Global_Exclude(poffense,'other')='Y' => 'N',
+	          // is_Global_Exclude(poffense,'other')='Y' => 'N',
 	
             Is_Arson(poffense)='Y' OR                        
 						Is_Assault_aggr(poffense)='Y' OR                      
@@ -5210,8 +5362,10 @@ export Is_Unclassified(string poffense) := function
 						Is_FamilyOffenses(poffense)='Y' OR     
 						Is_LiquorLawViolations(poffense)='Y' OR          
 						Is_TrespassofRealProperty(poffense)='Y' OR       
-						Is_PeepingTom(poffense)='Y' OR      
+						Is_PeepingTom(poffense)='Y'       OR      
 						Is_HumanTrafficking(poffense)='Y' OR
+						Is_Obstruct_Resist(poffense)='Y'  OR  
+						Is_Warrant_Fugitive(poffense)='Y' OR
 						Is_Other(poffense)='Y' =>                'N', 
 						
 	             REGEXFIND('[A-Za-z]'   ,poffense,0) = ''  => 'Y',
@@ -5278,68 +5432,33 @@ bit_LiquorLawViolations            := IF(Is_LiquorLawViolations(poffense)='Y',  
 bit_TrespassofRealProperty         := IF(Is_TrespassofRealProperty(poffense)='Y',             bit_LiquorLawViolations |            hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_TrespassofRealProperty)        ,bit_LiquorLawViolations); 
 bit_PeepingTom                     := IF(Is_PeepingTom(poffense)='Y',                         bit_TrespassofRealProperty|          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_PeepingTom)                    ,bit_TrespassofRealProperty);
 bit_HumanTrafficking               := IF(Is_HumanTrafficking(poffense)='Y',                   bit_PeepingTom|                      hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Human_Trafficking)             ,bit_PeepingTom);
-//bit_Other                          := IF(Is_Other(poffense)='Y',                              bit_HumanTrafficking|                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other)                         ,bit_HumanTrafficking);
+// bit_Other                       := IF(Is_Other(poffense)='Y',                              bit_HumanTrafficking|                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other)                         ,bit_HumanTrafficking);
 bit_Unclassified                   := IF(Is_Unclassified(poffense)='Y',                       bit_HumanTrafficking|                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified)                  ,bit_HumanTrafficking);
-return bit_Unclassified;                                                                                                                                                                                                                                       
+bit_Obstruct_Resist                := IF(Is_Obstruct_Resist(poffense)='Y',                    bit_Unclassified|                    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Obstruct_Resist)               ,bit_Unclassified);
+bit_Warrant_Fugitive               := IF(Is_Warrant_Fugitive(poffense)='Y',                   bit_Obstruct_Resist|                 hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Warrant_Fugitive)              ,bit_Obstruct_Resist);
+
+return bit_Warrant_Fugitive;                                                                                                                                                                                                                                       
 end;
-/*
-export set_offense_category(string poffense) := function
-bit_Arson                          := IF(Is_Arson(poffense)='Y',                                                                   hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Arson),0);
-bit_Assault_aggr                   := IF(Is_Assault_aggr(poffense)='Y',                       bit_Arson   |                        hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_aggr)                  ,bit_Arson);
-bit_Assault_other                  := IF(Is_Assault_other(poffense)='Y',                      bit_Assault_aggr   |                 hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Assault_other)                 ,bit_Assault_aggr);
-bit_Bribery                        := IF(Is_Bribery(poffense)='Y',                            bit_Assault_other |                  hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Bribery)                       ,bit_Assault_other);
-bit_Burglary_BreakAndEnter_res     := IF(Is_Burglary_BreakAndEnter_res(poffense)='Y',         bit_Bribery |                        hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_res),    bit_Bribery);
-bit_Burglary_BreakAndEnter_comm    := IF(Is_Burglary_BreakAndEnter_comm(poffense)='Y' ,       bit_Burglary_BreakAndEnter_res |     hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_comm),   bit_Burglary_BreakAndEnter_res);
-bit_Burglary_BreakAndEnter_veh     := IF(Is_Burglary_BreakAndEnter_veh(poffense)='Y',         bit_Burglary_BreakAndEnter_comm |    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Burglary_BreakAndEnter_veh),    bit_Burglary_BreakAndEnter_comm);
-bit_Counterfeiting_Forgery         := IF(Is_Counterfeiting_Forgery(poffense)='Y',             bit_Burglary_BreakAndEnter_veh |     hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Counterfeiting_Forgery)        ,bit_Burglary_BreakAndEnter_veh);
-bit_Destruction_Damage_Vandalism   := IF(Is_Destruction_Damage_Vandalism(poffense)='Y',       bit_Counterfeiting_Forgery |         hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Destruction_Damage_Vandalism)  ,bit_Counterfeiting_Forgery);
-bit_Drug_Narcotic                  := IF(Is_Drug_Narcotic(poffense)='Y',                      bit_Destruction_Damage_Vandalism |   hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Drug_Narcotic)                 ,bit_Destruction_Damage_Vandalism);
-bit_Fraud                          := IF(Is_Fraud(poffense)='Y',                              bit_Drug_Narcotic |                  hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Fraud)                         ,bit_Drug_Narcotic);
-bit_Gambling                       := IF(Is_Gambling(poffense)='Y',                           bit_Fraud |                          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Gambling)                      ,bit_Fraud);
-bit_Homicide                       := IF(Is_Homicide(poffense)='Y',                           bit_Gambling |                       hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Homicide)                      ,bit_Gambling);
-bit_Kidnapping_Abduction           := IF(Is_Kidnapping_Abduction(poffense)='Y',               bit_Homicide |                       hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Kidnapping_Abduction)          ,bit_Homicide);
-bit_Theft                          := IF(Is_theft(poffense)='Y',                              bit_Kidnapping_Abduction |           hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Theft)                         ,bit_Kidnapping_Abduction);
-bit_Shoplifting                    := IF(Is_Shoplifting(poffense)='Y',                        bit_Theft |                          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Shoplifting)                   ,bit_Theft);
-bit_Motor_Vehicle_Theft            := IF(Is_Motor_Vehicle_Theft(poffense)='Y',                bit_Shoplifting |                    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Motor_Vehicle_Theft)           ,bit_Shoplifting);
-bit_Pornography                    := IF(Is_Pornography(poffense)='Y',                        bit_Motor_Vehicle_Theft |            hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Pornography)                   ,bit_Motor_Vehicle_Theft);
-bit_Prostitution                   := IF(Is_Prostitution(poffense)='Y',                       bit_Pornography |                    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Prostitution)                  ,bit_Pornography);
-bit_Robbery_res                    := IF(Is_Robbery_res(poffense)='Y',                        bit_Prostitution |                   hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Robbery_res)                   ,bit_Prostitution);
-bit_Robbery_comm                   := IF(Is_Robbery_comm(poffense)='Y',                       bit_Robbery_res |                    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Robbery_comm)                  ,bit_Robbery_res);
-bit_SexOffensesForcible            := IF(Is_SexOffensesForcible(poffense)='Y',                bit_Robbery_comm |                   hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_SexOffensesForcible)           ,bit_Robbery_comm);
-bit_SexOffensesNon_forcible        := IF(Is_SexOffensesNon_forcible(poffense)='Y',            bit_SexOffensesForcible |            hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_SexOffensesNon_forcible)       ,bit_SexOffensesForcible);
-bit_Stolen_Property_Offenses_Fence := IF(Is_Stolen_Property_Offenses_Fence(poffense)='Y',     bit_SexOffensesNon_forcible |        hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Stolen_Property_Offenses_Fence),bit_SexOffensesNon_forcible);
-bit_Weapon_Law_Violations		       := IF(Is_Weapon_Law_Violations(poffense)='Y',              bit_Stolen_Property_Offenses_Fence | hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Weapon_Law_Violations)         ,bit_Stolen_Property_Offenses_Fence);
-bit_Identity_Theft	               := IF(Is_Identity_Theft(poffense)='Y',                     bit_Weapon_Law_Violations |          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Identity_Theft)                ,bit_Weapon_Law_Violations);
-bit_Computer_Crimes                := IF(Is_Computer_Crimes(poffense)='Y',                    bit_Identity_Theft |                 hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Computer_Crimes)               ,bit_Identity_Theft);
-bit_Terrorist_Threats              := IF(Is_Terrorist_Threats(poffense)='Y',                  bit_Computer_Crimes |                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Terrorist_Threats)             ,bit_Computer_Crimes);
-bit_Restraining_Order_Violations   := IF(Is_Restraining_Order_Violations(poffense)='Y',       bit_Terrorist_Threats |              hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Restraining_Order_Violations)  ,bit_Terrorist_Threats);
-bit_traffic                        := IF(Is_traffic(poffense)='Y',                            bit_Restraining_Order_Violations |   hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_traffic)                       ,bit_Restraining_Order_Violations);
-bit_BadChecks                      := IF(Is_BadChecks(poffense)='Y',                          bit_traffic |                        hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_BadChecks)                     ,bit_traffic);
-bit_CurfewLoiteringVagrancyVio     := IF(Is_CurfewLoiteringVagrancyVio(poffense)='Y',         bit_BadChecks |                      hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_CurfewLoiteringVagrancyVio)    ,bit_BadChecks);
-bit_DisorderlyConduct              := IF(Is_DisorderlyConduct(poffense)='Y',                  bit_CurfewLoiteringVagrancyVio |     hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_DisorderlyConduct)             ,bit_CurfewLoiteringVagrancyVio);
-bit_DrivingUndertheInfluence       := IF(Is_DrivingUndertheInfluence(poffense)='Y',           bit_DisorderlyConduct |              hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_DrivingUndertheInfluence)      ,bit_DisorderlyConduct); 
-bit_Drunkenness                    := IF(Is_Drunkenness(poffense)='Y',                        bit_DrivingUndertheInfluence |       hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Drunkenness)                   ,bit_DrivingUndertheInfluence);
-bit_FamilyOffenses                 := IF(Is_FamilyOffenses(poffense)='Y',                     bit_Drunkenness |                    hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_FamilyOffenses)                ,bit_Drunkenness);  
-bit_LiquorLawViolations            := IF(Is_LiquorLawViolations(poffense)='Y',                bit_FamilyOffenses |                 hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_LiquorLawViolations)           ,bit_FamilyOffenses); 
-bit_TrespassofRealProperty         := IF(Is_TrespassofRealProperty(poffense)='Y',             bit_LiquorLawViolations |            hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_TrespassofRealProperty)        ,bit_LiquorLawViolations); 
-bit_PeepingTom                     := IF(Is_PeepingTom(poffense)='Y',                         bit_TrespassofRealProperty|          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_PeepingTom)                    ,bit_TrespassofRealProperty);
-bit_HumanTrafficking               := IF(Is_HumanTrafficking(poffense)='Y',                   bit_PeepingTom|                      hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Human_Trafficking)             ,bit_PeepingTom);
-bit_Other                          := IF(Is_Other(poffense)='Y',                              bit_HumanTrafficking|                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other)                         ,bit_HumanTrafficking);
-bit_Unclassified                   := IF(Is_Unclassified(poffense)='Y',                       bit_Other|                           hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified)                  ,bit_Other);
-return bit_Unclassified;                                                                                                                                                                                                                                       
-end;
-*/
+
 export set_offense_category_traffic(string poffense) := function
 bit_traffic      := IF(Is_traffic(poffense)='Y', hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_traffic) ,0);
 return bit_traffic;                                                                                                                                                                                                                                       
 end;
+
 export set_offense_category_other(string poffense) := function
 bit_other      := IF(Is_other(poffense)='Y', hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other) ,0);
 return bit_other;  
 end;
+
 export set_offense_category_Global(string poffense) := function
-bit_Global      := IF(In_Global_Exclude(poffense,'other')='Y', hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other) ,0);
+bit_Global      := IF(is_Global_Exclude(poffense,'other')='Y', hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other) ,0);
 return bit_Global;  
+end;
+
+export set_offense_category_warrant_Obstruct(string poffense) := function
+bit_Obstruct_Resist             := IF(Is_Obstruct_Resist(poffense)='Y',                               hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Obstruct_Resist)               ,0);
+bit_Warrant_Fugitive            := IF(Is_Warrant_Fugitive(poffense)='Y', bit_Obstruct_Resist|         hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Warrant_Fugitive)              ,bit_Obstruct_Resist);
+return bit_Warrant_Fugitive;                                                                                                                                                                                                                                       
 end;
 
 export Is_not_selected(string poffense) := function

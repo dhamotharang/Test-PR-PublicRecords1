@@ -1,4 +1,4 @@
-﻿import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report,dops;
+﻿import Official_Records, Lib_FileServices,RoxieKeybuild,orbit_report,dops,Scrubs_Official_Records;
 export BWR_Build_All_Moxie_Files := function
 #workunit('name','Official Records Build All' );
 
@@ -53,7 +53,8 @@ sequential
 	dops_update,
 	getretval,
 	official_records.QA_Key_Pull,
-	official_records.Extract_marriage_divorces
+	official_records.Extract_marriage_divorces,
+	Scrubs_Official_Records.fnRunScrubs(filedate,'')
 
  );
  

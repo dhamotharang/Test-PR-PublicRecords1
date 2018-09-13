@@ -19,7 +19,7 @@ lECL1 :=
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
-+'base	:= fileservices.superfilecontents(\'~thor_data400::base::fraudgov::built::main\');\n'
++'base	:= fileservices.superfilecontents(\'~thor_data400::base::fraudgov::built::main_orig\');\n'
 +'version	:= Std.Str.SplitWords(base[1].name,\'::\')[4];\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'

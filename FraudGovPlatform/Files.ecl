@@ -42,6 +42,9 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_IDDT,Layouts.Base.AddressCache,AddressCache_IDDT,'CSV',,'~<EOL>~','~|~',,,true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_KNFD,Layouts.Base.AddressCache,AddressCache_KNFD,'CSV',,'~<EOL>~','~|~',,,true);
 
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.SourcesToAnonymize,Layouts.Input.SourcesToAnonymize,SourcesToAnonymize);
+		
 		
 	end;
 	
@@ -57,8 +60,12 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim,Layouts.Crim,Crim);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death,Layouts.Death,Death);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint,Layouts.FraudPoint,FraudPoint);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Orig,FraudShared.Layouts.Base.Main,Main_Orig);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main_Anon,FraudShared.Layouts.Base.Main,Main_Anon);
 	end;
 
-
+	export OutputF := module
+		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
+	end;
 	
 end;
