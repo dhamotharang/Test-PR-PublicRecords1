@@ -1,4 +1,8 @@
-﻿EXPORT Layouts := MODULE
+﻿/* ************************************************************************************************
+PRTE2_BIPV2_BusHeader_Ins.Data_Research.Layouts
+************************************************************************************************ */
+
+EXPORT Layouts := MODULE
 import PRTE2_BIPV2_BusHeader_Ins.Data_Research;
 
 // ******************************************************************************************
@@ -370,5 +374,16 @@ import PRTE2_BIPV2_BusHeader_Ins.Data_Research;
 				string50 company_status_derived;
 		END;
 
+		EXPORT Sic_NAICS_Layout	:= RECORD
+				string8 SIC_code;
+				STRING SIC_Desc := '';
+				string6 NAICS_code;
+				STRING NAICS_Desc :='';
+		END;
 
+		EXPORT Sic_Lookup_Base := RECORD,maxLength(84)
+				string4 sic4_code;
+				string80 sic4_description;
+		END;
+ 
 END;
