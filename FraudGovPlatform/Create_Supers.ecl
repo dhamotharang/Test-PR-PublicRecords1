@@ -30,3 +30,7 @@ export Create_Supers :=
 	// Std.File.CreateSuperFile('~thor_data400::in::fraudgov::delete::inquirylogs');	
 
 	// Std.File.CreateSuperFile('~thor_data400::Scrubs_FraudGov::Log');
+	
+// tools.mod_Utilities.createallsupers(FraudGovPlatform.filenames().Input.DemoData.dAll_filenames);
+// tools.mod_Utilities.createallsupers(FraudGovPlatform.filenames().Input.SourcesToAnonymize.dAll_filenames);
+// tools.mod_Utilities.createallsupers(FraudGovPlatform.filenames().Base.Main_Orig.dAll_filenames);	

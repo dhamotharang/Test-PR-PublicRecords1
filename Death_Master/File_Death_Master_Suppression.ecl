@@ -260,7 +260,11 @@ dSuppressRecs				:=
 	// LNK-1816 Consumer being reported with two DODs.
 		{/*'001856332815'*/'', 100, '20180621', ' ', ' ', '         ', 'NOTTINGHAM          ', '    ', 'RICHARD        ', 'E              ', ' ', '20180531', '19470210', '40', '     ', '     ', 'OK', '   ', '  ', 'N', 'OBD', 'OB00000040823558', 'OB', 'N'},
 	// LNK-1854	Overlinking of Death record to LexID 153361926277 Bennie
-		{/*'153361926277'*/'', 97, '20180629', 'A', 'A', '567180654', 'BENNIE              ', '    ', 'ANDREW         ', 'ADAIR          ', ' ', '19441219', '00000000', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'567180654B441219'*/'', 'DE', 'N'}
+		{/*'153361926277'*/'', 97, '20180629', 'A', 'A', '567180654', 'BENNIE              ', '    ', 'ANDREW         ', 'ADAIR          ', ' ', '19441219', '00000000', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'567180654B441219'*/'', 'DE', 'N'},
+	// LNK-987 FW: Deceased data
+    {'000602512896', 100, '20180806', ' ', ' ', '         ', 'DE JORIA            ', 'II  ', 'JOHN           ', 'PAUL           ', ' ', '        ', '19650731', '41', '97132', '     ', 'OR', '071', '  ', 'N', 'TUN', /*'000602512896DTUN'*/'', 'TN', 'Y'},
+	//	LNK-579 Health Equity - Yolanda White - Showing DECEASED and is NOT
+    {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;
