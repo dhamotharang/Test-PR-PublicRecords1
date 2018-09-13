@@ -1,4 +1,5 @@
 ﻿/* ************************************************************************************** 
+PRTE2_Common_DevOnly.MAC_CrossTabCount
 simplify cross tab reports by a single field (later figure syntax for multiple fields.
 Returns a simplified table with two fields:  GroupBy and GroupCount
 ************************************************************************************** */

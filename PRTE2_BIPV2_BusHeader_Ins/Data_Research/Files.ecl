@@ -1,7 +1,12 @@
-﻿IMPORT ADDRESS, PRTE2_Common, PRTE2_BIPV2_BusHeader_Ins.Data_Research;
+﻿/* ************************************************************************************************
+PRTE2_BIPV2_BusHeader_Ins.Data_Research.Files
+************************************************************************************************ */
+
+IMPORT Codes, ADDRESS, PRTE2_Common, PRTE2_BIPV2_BusHeader_Ins.Data_Research;
 
 EXPORT Files := MODULE
 		EXPORT Add_Foreign_prod		:= PRTE2_Common.Constants.Add_Foreign_prod;
+		EXPORT PREFIX_BASE 				:= '~prct::research::bipv2::business_header::';
 
 		// PRCT BIP Header key to review.
 		EXPORT BIPHeaderLinkIDsPRCTName 		:= Add_Foreign_prod('~prte::key::bipv2::business_header::qa::linkids');
@@ -29,4 +34,16 @@ EXPORT Files := MODULE
 																									SELF.incorporation_date := LEFT.company_incorporation_date;
 																									SELF := LEFT
 																						));
+
+	
+		EXPORT SIC4_Lookup_Base := Codes.File_SIC4_Codes;
+		EXPORT NAICS_Base := Codes.File_NAICS_Codes;
+		EXPORT SIC4_Lookup_Key := Codes.Key_SIC4;
+		EXPORT NAICS_Lookup_Key := Codes.Key_NAICS;
+
+		EXPORT sic_naics_Study_Name	:= PREFIX_BASE+'sic_naics_study';
+		EXPORT sic_naics_Study_Name1	:= PREFIX_BASE+'sic_naics_study1';
+		EXPORT sic_naics_StudyDS := DATASET(sic_naics_Study_Name, Layouts.Sic_NAICS_Layout,THOR);
+		EXPORT sic_naics_StudyDS1 := DATASET(sic_naics_Study_Name1, Layouts.Sic_NAICS_Layout,THOR);
+
 END;
