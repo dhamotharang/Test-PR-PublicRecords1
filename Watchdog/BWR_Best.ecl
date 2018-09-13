@@ -116,7 +116,7 @@ dout_all :=  Sequential(                                                        
 																										    if (~( STD.File.Fileexists ( '~thor::wdog::wuinfo::'+var2+'_father')),STD.File.createsuperfile(  '~thor::wdog::wuinfo::'+var2+'_father')),																				 
 																											 STD.File.StartSuperFileTransaction(),										
 																									         STD.File.AddSuperfile('~thor::wdog::wuinfo::'+var2+'_father' , '~thor::wdog::wuinfo::'+var2), 
-																										    STD.File.ClearSuperfile(  '~thor::wdog::wuinfo::'+var2,true),
+																										    STD.File.ClearSuperfile(  '~thor::wdog::wuinfo::'+var2),
 																										  	STD.File.AddSuperfile('~thor::wdog::wuinfo::'+var2  , '~thor::wdog::wuinfo::'+var2+'::'+workunit[2..8] ),
 																											STD.File.FinishSuperFileTransaction()
 									);
