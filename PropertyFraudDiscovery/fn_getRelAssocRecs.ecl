@@ -1,4 +1,4 @@
-IMPORT Relationship,watchdog,Header,PAW,STD,ut;
+IMPORT Relationship,watchdog,Header,PAW,STD,ut,dx_BestRecords;
 
 EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 													IParams.BatchParams in_mod) := FUNCTION
@@ -26,7 +26,7 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 	#IF(CONSTANTS.DEBUG_RELATIONSHIPS)
 	getRelativeName(UNSIGNED6 did) := FUNCTION
 		didRecs:=DATASET([{did}],{UNSIGNED6 did});
-		wdRecs:=JOIN(didRecs,watchdog.Key_Watchdog_glb,KEYED(LEFT.did=RIGHT.did),KEEP(1));
+		wdRecs:=dx_BestRecords.fn_get_best_records(didRecs, did, dx_BestRecords.Constants.perm_type.glb);
 		RETURN STD.Str.CleanSpaces(wdRecs[1].fname+' '+wdRecs[1].lname+' '+wdRecs[1].name_suffix);
 	END;
 	#END
