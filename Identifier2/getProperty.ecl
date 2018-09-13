@@ -7,7 +7,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 								integer Ever_Owned_Input_Property_InPastNumberOfYears=0,
 								boolean IncludePropDetails=false) := function
 
-
 	kp := ln_propertyv2.key_prop_address_v4;
   key_did := LN_PropertyV2.key_Property_did(false);
   key_search := LN_PropertyV2.key_search_fid(false);
@@ -85,7 +84,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and ut.NNEQ(le.sec_range,ri.sec_range)
 		;
 
-		
 		fmatch( string onfile ) := id2common.isfirstmatch( le.fname, onfile );
 		lmatch( string onfile ) := le.lname=onfile;
 
@@ -105,28 +103,22 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			or ID2Common.EstateMatch( le.fname, le.lname, ri.cname )
 		;
 
-		// skip the join if this record isn't the owner
-		// if you're not the owner, we're not interested at this point in Identifer2
-		// only care to find out if you ever owned input property or currently own input property
-		self.fares_did := if(self.isowner, ri.did, skip);
-		// self.fares_did := ri.did;
+		// self.fares_did := if(self.isowner, ri.did, skip);
+		self.fares_did := ri.did;
 		
 		self := le;
 	END;
 	addr_filtered := join( with_fids, key_search,
 		left.ln_fares_id != ''
 			and keyed(left.ln_fares_id=right.ln_fares_id)
-			// and WILD(right.which_orig)
-			// and keyed(right.source_code_2='P'),
-			and right.source_code_2='P',
+			and right.source_code_2='P'
+      and right.source_code_1 in ['O','B'], 
 		address_filter(left,right),
 		atmost(riskwise.max_atmost)
 	);
-	
 
 	// DEED SECTION
 	deeds := join( addr_filtered, LN_PropertyV2.key_deed_fid(false),
-		// left.ln_fares_id[2]='D' and
 			keyed(left.ln_fares_id=right.ln_fares_id),
 		iesp.transform_property.deed_assess.format_deed_all(left,right), atmost(riskwise.max_atmost) );
 
@@ -144,8 +136,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 				)
 		;
 
-		
-		
 		self.EverOwnedInputProperty.deed    := if( ever_owned_input_property and everOwned, le.deed );
 		self.CurrentlyOwnInputProperty.deed := if( currently_own_input_property and le.isAddressMatch, le.deed ); // keep all deeds regardless of who is the owner, but they must be for the input property
 		self.isCurrentDeedOwner             := currently_own_input_property and le.isOwner and le.isAddressMatch;
@@ -158,17 +148,20 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 	deeds_populated := project( deeds, populateDeeds(left) );
 
 	boolean takeLeft( string le_lnfares, string ri_lnfares, unsigned3 le_datelast, unsigned3 ri_datelast ) :=
-		(le_lnfares != '' and ri_lnfares  = '') // take the left if it's the only one populated
-		or (le_lnfares != '' and ri_lnfares != '' and le_datelast > ri_datelast) // if both are ppoulated, only take left if it's newer
-		// if neither are populated or only the right is, then it'll be taken
+		(le_lnfares != '' and ri_lnfares  = '')                                   // take the left if it's the only one populated
+		or (le_lnfares != '' and ri_lnfares != '' and le_datelast >= ri_datelast) // or if both are ppoulated, take left if it's newer
+                                                                              // else if neither are populated or only the right is, then take the right
 	;
 
 	iesp.transform_property.working_layout deedRoll( iesp.transform_property.working_layout le, iesp.transform_property.working_layout ri ) := TRANSFORM
 		// for current ownership, pick the newer over older
- 		curr_takeLeft := takeleft( le.CurrentlyOwnInputProperty.deed.SourcePropertyRecordId, ri.CurrentlyOwnInputProperty.deed.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) or le.isOwner and not ri.isOwner;
+ 		curr_takeLeft := takeleft( le.CurrentlyOwnInputProperty.deed.SourcePropertyRecordId, ri.CurrentlyOwnInputProperty.deed.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) /*or le.isOwner and not ri.isOwner*/; 
 		self.isCurrentDeedOwner := if( curr_takeLeft, le.isCurrentDeedOwner, ri.isCurrentDeedOwner );
 		self.CurrentlyOwnInputProperty := if( curr_takeLeft, le.CurrentlyOwnInputProperty, ri.CurrentlyOwnInputProperty );
-
+		self.dt_last_seen := if( curr_takeLeft, le.dt_last_seen, ri.dt_last_seen );
+		self.isAddressMatch := if( curr_takeLeft, le.isAddressMatch, ri.isAddressMatch );
+		self.isDIDMatch := if( curr_takeLeft, le.isDIDMatch, ri.isDIDMatch );
+		self.isOwner := if( curr_takeLeft, le.isOwner, ri.isOwner );
 		
 		// newer record over older
  		ever_takeLeft := takeleft( le.EverOwnedInputProperty.deed.SourcePropertyRecordId, ri.EverOwnedInputProperty.deed.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) or le.isOwner and not ri.isOwner;
@@ -187,19 +180,15 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		self := le;
 	END;
-	deeds_sorted := sort( deeds_populated, deed.PropertyAddress.zip5, deed.PropertyAddress.StreetName, deed.PropertyAddress.StreetNumber, deed.PropertyAddress.UnitNumber, -dt_last_seen);
+	deeds_sorted := sort( deeds_populated, deed.PropertyAddress.zip5, deed.PropertyAddress.StreetName, deed.PropertyAddress.StreetNumber, deed.PropertyAddress.UnitNumber, -dt_last_seen, -isOwner);
 	deeds_rolled := rollup( deeds_sorted, true, deedRoll(left,right) );
-	// </DEEDS>
-
 
 
 	// ASSESSOR SECTION
 	assessors := join( addr_filtered, LN_PropertyV2.key_assessor_fid(false),
-		// left.ln_fares_id[2]='A' and
 			keyed(left.ln_fares_id=right.ln_fares_id),
-		iesp.transform_property.deed_assess.format_assess_all(left,right), atmost(riskwise.max_atmost) );
+      iesp.transform_property.deed_assess.format_assess_all(left,right), atmost(riskwise.max_atmost) );
 
-// /*
 	iesp.transform_property.working_layout populateAssessors( iesp.transform_property.working_layout le ) := TRANSFORM
 		ownedAny       := owned_any_property and le.isDIDMatch; // only poulate the OwnedAnyProperty if it's requested
 		everOwned      := le.isAddressMatch and le.isOwner
@@ -212,7 +201,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 					(integer)Std.Date.Today()) < Ever_Owned_Input_Property_InPastNumberOfYears
 				)
 		;
-		
 		
 		self.EverOwnedInputProperty.Assessment        := if( ever_owned_input_property and everOwned, le.assess );
 		self.CurrentlyOwnInputProperty.Assessment     := if( currently_own_input_property and le.isAddressMatch, le.assess ); // copy all assessments forward, but they must be the input property
@@ -236,9 +224,13 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		
 
-		curr_takeLeft := takeleft( le.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, ri.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) or le.isOwner and not ri.isOwner;
-		self.CurrentlyOwnInputProperty := if( curr_takeLeft, le.CurrentlyOwnInputProperty, ri.CurrentlyOwnInputProperty );;
-		self.isCurrentAssessorOwner := if( curr_takeLeft, le.isCurrentAssessorOwner, ri.isCurrentAssessorOwner );;
+		curr_takeLeft := takeleft( le.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, ri.CurrentlyOwnInputProperty.assessment.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) /*or le.isOwner and not ri.isOwner*/; 
+		self.CurrentlyOwnInputProperty := if( curr_takeLeft, le.CurrentlyOwnInputProperty, ri.CurrentlyOwnInputProperty );
+		self.isCurrentAssessorOwner := if( curr_takeLeft, le.isCurrentAssessorOwner, ri.isCurrentAssessorOwner );
+		self.dt_last_seen := if( curr_takeLeft, le.dt_last_seen, ri.dt_last_seen );
+		self.isAddressMatch := if( curr_takeLeft, le.isAddressMatch, ri.isAddressMatch );
+		self.isDIDMatch := if( curr_takeLeft, le.isDIDMatch, ri.isDIDMatch );
+		self.isOwner := if( curr_takeLeft, le.isOwner, ri.isOwner );
 		
 		ever_takeLeft := takeleft( le.EverOwnedInputProperty.assessment.SourcePropertyRecordId, ri.EverOwnedInputProperty.assessment.SourcePropertyRecordId, le.dt_last_seen, ri.dt_last_seen ) or le.isOwner and not ri.isOwner;
 		self.EverOwnedInputProperty := if( ever_takeLeft, le.EverOwnedInputProperty, ri.EverOwnedInputProperty );
@@ -250,9 +242,9 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		self := le;
 	END;
-	assessors_sorted := sort( assessors_populated, assess.PropertyAddress.zip5, assess.PropertyAddress.streetname, assess.PropertyAddress.streetnumber, assess.PropertyAddress.unitnumber, -dt_last_seen);
+  
+	assessors_sorted := sort( assessors_populated, assess.PropertyAddress.zip5, assess.PropertyAddress.streetname, assess.PropertyAddress.streetnumber, assess.PropertyAddress.unitnumber, -dt_last_seen, -isOwner);
 	assessors_rolled := rollup( assessors_sorted, true, assessorRoll(left,right) );
-// */
 
 
 	iesp.transform_property.working_layout combine_prop( iesp.transform_property.working_layout le, iesp.transform_property.working_layout ri ) := TRANSFORM
@@ -272,7 +264,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		self.EverOwnedInputProperty.RiskIndicators   := if( ever_owned_input_property and not ever_IsPropertyOwner, mkRI('EN'), blankRI );
 		self.EverOwnedInputProperty.StatusIndicators := if( ever_owned_input_property and     ever_IsPropertyOwner, mkRI('EF'), blankRI );
 
-
 		currentDeed       := le.isCurrentDeedOwner;
 		currentAssessor   := ri.isCurrentAssessorOwner;
 		deedDate     := le.dt_last_seen;
@@ -280,14 +271,13 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		self.CurrentlyOwnInputProperty.deed             := if( IncludePropDetails, le.CurrentlyOwnInputProperty.deed );
 		self.CurrentlyOwnInputProperty.assessment       := if( IncludePropDetails, ri.CurrentlyOwnInputProperty.assessment );
-		curr_IsPropertyOwner  := currentDeed and currentAssessor // don't care about the dates if the two most recent records are owned by the input individual
-			or currentDeed     and deedDate     >= assessorDate // otherwise, isPropertyOwner depends on the newest record
-			or currentAssessor and assessorDate >= deedDate
+		curr_IsPropertyOwner  := currentDeed and currentAssessor                         // set as current owner if the individual is on the most recent deed and assessor record
+			or (currentDeed     and (deedDate     >= assessorDate or ~ri.isAddressMatch))  // or is on the most recent deed and it is more recent than the assessor or there is no assessor for the prop 
+			or (currentAssessor and (assessorDate >= deedDate or ~le.isAddressMatch))      // or is on the most recent assessor and it is more recent than the deed or there is no deed for the prop
 		;
 		self.CurrentlyOwnInputProperty.IsPropertyOwner  := curr_IsPropertyOwner;
 		self.CurrentlyOwnInputProperty.RiskIndicators   := if( currently_own_input_property and not curr_IsPropertyOwner, mkRI('CN'), blankRI );
 		self.CurrentlyOwnInputProperty.StatusIndicators := if( currently_own_input_property and     curr_IsPropertyOwner, mkRI('CF'), blankRI );
-
 
 		any_IsPropertyOwner :=
 			le.OwnedAnyProperty.deed.PropertyAddress.zip5 != ''
@@ -317,5 +307,23 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 	combined := join( deeds_pop, assessors_pop, left.seq=right.seq, combine_prop(left,right) );
 
 	slimmed := project( combined, identifier2.layout_Identifier2 );
+ 
+  // output(owned_any_property, named('owned_any_property'));
+  // output(ever_owned_input_property, named('ever_owned_input_property'));
+  // output(currently_own_input_property, named('currently_own_input_property'));
+  // output(Ever_Owned_Input_Property_InPastNumberOfYears, named('Ever_Owned_Input_Property_InPastNumberOfYears'));
+  // output(fids_byAddr_fares, named('fids_byAddr_fares'));
+  // output(fids_byAddr_nofares, named('fids_byAddr_nofares'));
+  // output(fids_byAddr, named('fids_byAddr'));
+  // output(fids_byAddr_normed, named('fids_byAddr_normed'));
+  // output(fids_byDid, named('fids_byDid'));
+  // output(with_fids_dupes, named('with_fids_dupes'));
+  // output(with_fids, named('with_fids'));
+  // output(addr_filtered, named('addr_filtered'));
+  // output(deeds_sorted, named('deeds_sorted'));
+  // output(deeds_rolled, named('deeds_rolled'));  
+  // output(assessors_sorted, named('assessors_sorted'));
+  // output(assessors_rolled, named('assessors_rolled'));
+  
 	return slimmed;
 end;
