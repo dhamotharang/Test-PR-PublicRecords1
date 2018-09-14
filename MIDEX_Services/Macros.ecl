@@ -68,7 +68,7 @@
         namePenalt := AutoStandardI.LIBCALL_PenaltyI_Indv_name.val(mod_personName);
 
         didPenalt := MAP(in_mod.did = ''                               => 0,
-                         in_mod.did = (STRING)LEFT.uniqueID_layoutName => 0, 
+                         (UNSIGNED6)in_mod.did = (UNSIGNED6)LEFT.uniqueID_layoutName => 0, 
                          /* default */                                   99);
          
 				nmlsIDPenalt := MAP(in_mod.nmls_id = ''                              => 0, 
