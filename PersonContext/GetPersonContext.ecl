@@ -5,9 +5,8 @@ EXPORT GetPersonContext(PersonContext.Layouts.Layout_PCRequest rowPCReq) := FUNC
 	dsPCDB 					:= PersonContext.Functions.PerformDeltabaseCall(VSK.dsPCValidSearchRecs, VSK.isEmptySearchDs, rowPCReq.DeltabaseURL);
 
   dsPCR_results   := PersonContext.Functions.PerformGetPCR(VSK.dsPCValidSearchRecs);
-  // the UID in the PCR key maps to recID1 in the PersonContext layout
-  // put the PCR keys data and PersonContext deltabase results together and dedup.  keep the latest one
-  dsPCDB_plus_dsPCR := dedup(sort(dsPCDB + dsPCR_results, LexId, DataGroup, RecordType, EventType, RecId1, RecId2, RecId3, RecId4, -DateAdded), LexId, DataGroup, RecordType, EventType, RecId1, RecId2, RecId3, RecId4);  
+  // put the PCR keys data and PersonContext deltabase results together
+  dsPCDB_plus_dsPCR := dsPCDB + dsPCR_results;  
   
   dsRoxieKeyFinal := PersonContext.Functions.PerformGetRoxieKeyData(VSK.dsPCValidSearchRecs);
   CD 							:= PersonContext.Functions.PerformCombineDatasets(VSK.dsPCReqValidated, dsPCDB_plus_dsPCR, dsRoxieKeyFinal);
