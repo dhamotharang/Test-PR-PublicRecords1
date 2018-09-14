@@ -1,4 +1,4 @@
-﻿import  versioncontrol,DOPSGrowthCheck,dops;
+﻿import  versioncontrol,DOPSGrowthCheck,dops,strata;
 
 export Proc_Build_Keys(
 
@@ -56,6 +56,8 @@ function
 	sequential(
 		if(not VersionControl.DoAllFilesExist.fNamesBuilds(keygroupnames)
 			,build_keys
+       // DF-21739 - Show counts of blanked out fields in thor_data400::key::paw::qa::did_fcra
+       ,OUTPUT(strata.macf_pops(PAW.Key_DID_FCRA,,,,,,FALSE,['company_department','company_fein','dead_flag','dppa_state','title']))
 		)
 		,promote(pversion,'^(?!.*autokey).*$').new2built,
 		DeltaCommands
