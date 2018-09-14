@@ -10,7 +10,8 @@ EXPORT As_Business_Linking (
 		//COMPANY MAPPING
 		business_header.layout_business_linking.linking_interface	trfMapBLInterface(Equifax_Business_Data.layouts.Base l) := transform																				
 																							 
-				self.source_record_id            := 0;
+				self.source_record_id            := l.rcid;
+				self.rcid                        := 0;
 				self.vl_id                       := trim(l.efx_id);
 				self.source                      := mdr.sourcetools.src_Equifax_Business_Data;        
 				self.company_phone               := l.clean_phone;
@@ -85,10 +86,167 @@ EXPORT As_Business_Linking (
 		
 		from_base      := PROJECT(pBase, trfMapBLInterface(LEFT));
 
-    from_persist   := dedup(sort(distribute(from_base,hash(vl_id,company_name)),record, local),record, local)
+ // Roll Up - to eliminate duplicates and keep the oldest (first) source_record_id
+	  from_base_Dist := DISTRIBUTE(from_base, HASH(vl_id));
+	  from_base_Sort := SORT(from_base_Dist 
+				,rcid                        
+				,vl_id                       
+				,source                             
+				,company_phone               
+				,phone_score                       
+				,phone_type     						 
+				,company_rawaid			         
+				,company_name 			         		
+				,company_name_type_raw 			 
+				,company_sic_code1           
+				,company_sic_code2           
+				,company_sic_code3           
+				,company_sic_code4           
+				,company_sic_code5           
+				,company_org_structure_raw 
+        ,company_incorporation_date 
+        ,company_naics_code1 
+        ,company_naics_code2 
+        ,company_naics_code3 
+        ,company_naics_code4 
+        ,company_naics_code5 
+        ,company_address_type_raw    		
+				,company_address.prim_range  
+				,company_address.predir      
+				,company_address.prim_name   
+				,company_address.addr_suffix 
+				,company_address.postdir     
+				,company_address.unit_desig  
+				,company_address.sec_range   
+				,company_address.p_city_name 
+				,company_address.v_city_name 
+				,company_address.st          
+				,company_address.zip	       
+				,company_address.zip4        
+				,company_address.fips_state  
+				,company_address.fips_county 
+				,company_address.msa         
+				,company_address.geo_lat     
+				,company_address.geo_long    
+				,company_url								 
+				,company_ticker              
+				,company_ticker_exchange     
+				,company_inc_state           
+				,dt_first_seen               
+				,dt_last_seen                
+				,dt_vendor_last_reported     
+				,dt_vendor_first_reported    
+				,current					           
+				,dppa						             
+        ,company_foreign_domestic  
+        ,company_charter_number 
+        ,company_filing_date  
+        ,company_status_date  
+        ,company_foreign_date  
+        ,event_filing_date  
+        ,company_name_status_raw 
+        ,company_status_raw   
+				,dt_first_seen_company_name 
+        ,dt_last_seen_company_name 
+        ,dt_first_seen_company_address 
+        ,dt_last_seen_company_address 
+        ,match_company_name 
+        ,match_branch_city 
+        ,match_geo_city 
+				,company_fein 
+        ,duns_number 	
+				,contact_ssn 
+				,LOCAL );
+	
+	business_header.layout_business_linking.linking_interface RollupLinking(
+												 business_header.layout_business_linking.linking_interface L, 
+												 business_header.layout_business_linking.linking_interface R) := TRANSFORM
+	
+		Earliest_Date                 := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+		SELF.source_record_id					:= IF(Earliest_Date = L.dt_vendor_first_reported, L.source_record_id, R.source_record_id);  
+
+		SELF.dt_first_seen 						:= ut.EarliestDate(ut.EarliestDate(L.dt_first_seen, R.dt_first_seen)
+																						        ,ut.EarliestDate(L.dt_last_seen,  R.dt_last_seen));
+		SELF.dt_last_seen 						:= max(L.dt_last_seen, R.dt_last_seen);
+		SELF.dt_vendor_last_reported 	:= max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+		SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+		SELF                          := L;
+	END;
+
+	from_base_Rollup := ROLLUP(from_base_Sort ,RollupLinking(LEFT, RIGHT)
+				,rcid                        
+				,vl_id                       
+				,source                             
+				,company_phone               
+				,phone_score                       
+				,phone_type     						 
+				,company_rawaid			         
+				,company_name 			         		
+				,company_name_type_raw 			 
+				,company_sic_code1           
+				,company_sic_code2           
+				,company_sic_code3           
+				,company_sic_code4           
+				,company_sic_code5           
+				,company_org_structure_raw 
+        ,company_incorporation_date 
+        ,company_naics_code1 
+        ,company_naics_code2 
+        ,company_naics_code3 
+        ,company_naics_code4 
+        ,company_naics_code5 
+        ,company_address_type_raw    		
+				,company_address.prim_range  
+				,company_address.predir      
+				,company_address.prim_name   
+				,company_address.addr_suffix 
+				,company_address.postdir     
+				,company_address.unit_desig  
+				,company_address.sec_range   
+				,company_address.p_city_name 
+				,company_address.v_city_name 
+				,company_address.st          
+				,company_address.zip	       
+				,company_address.zip4        
+				,company_address.fips_state  
+				,company_address.fips_county 
+				,company_address.msa         
+				,company_address.geo_lat     
+				,company_address.geo_long    
+				,company_url								 
+				,company_ticker              
+				,company_ticker_exchange     
+				,company_inc_state           
+				,dt_first_seen               
+				,dt_last_seen                
+				,dt_vendor_last_reported     
+				,dt_vendor_first_reported    
+				,current					           
+				,dppa						             
+        ,company_foreign_domestic  
+        ,company_charter_number 
+        ,company_filing_date  
+        ,company_status_date  
+        ,company_foreign_date  
+        ,event_filing_date  
+        ,company_name_status_raw 
+        ,company_status_raw   
+				,dt_first_seen_company_name 
+        ,dt_last_seen_company_name 
+        ,dt_first_seen_company_address 
+        ,dt_last_seen_company_address 
+        ,match_company_name 
+        ,match_branch_city 
+        ,match_geo_city 
+				,company_fein 
+        ,duns_number 	
+				,contact_ssn 
+				,LOCAL );
+
+    from_persist   := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local)
 													 : persist(Equifax_Business_Data.persistnames().root + '::As_Business_Linking');											 
 		
-    from_nopersist := dedup(sort(distribute(from_base,hash(vl_id,company_name)),record, local),record, local);
+    from_nopersist := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local);
 													 													 													
     from_dedp      := if(IsPersist, from_persist, from_nopersist);
 

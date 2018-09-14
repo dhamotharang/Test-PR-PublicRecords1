@@ -35,6 +35,10 @@ IMPORT Equifax_Business_Data,SALT37;
   // These commented out lines will create crosstabs from the sourcefield to each individual field
   // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
    Examples := 10;
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_first_seen,Examples),NAMED('dt_first_seenBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_last_seen,Examples),NAMED('dt_last_seenBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_vendor_first_reported,Examples),NAMED('dt_vendor_first_reportedBysource'));
+  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_vendor_last_reported,Examples),NAMED('dt_vendor_last_reportedBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_effective_first,Examples),NAMED('dt_effective_firstBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_effective_last,Examples),NAMED('dt_effective_lastBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,process_date,Examples),NAMED('process_dateBysource'));
@@ -58,10 +62,6 @@ IMPORT Equifax_Business_Data,SALT37;
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultid,Examples),NAMED('ultidBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultscore,Examples),NAMED('ultscoreBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,ultweight,Examples),NAMED('ultweightBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_first_seen,Examples),NAMED('dt_first_seenBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_last_seen,Examples),NAMED('dt_last_seenBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_vendor_first_reported,Examples),NAMED('dt_vendor_first_reportedBysource'));
-  //  OUTPUT(SALT37.MAC_CrossTab(infile,source,dt_vendor_last_reported,Examples),NAMED('dt_vendor_last_reportedBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,record_type,Examples),NAMED('record_typeBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,EFX_ID,Examples),NAMED('EFX_IDBysource'));
   //  OUTPUT(SALT37.MAC_CrossTab(infile,source,EFX_NAME,Examples),NAMED('EFX_NAMEBysource'));

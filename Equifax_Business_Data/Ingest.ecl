@@ -6,7 +6,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 ) := MODULE
 
  SHARED NullFile := DATASET([],Equifax_Business_Data.Layouts.Base); // Use to replace files you wish to remove
- 
+
   SHARED FilesToIngest := infile;
   In_Src_Cnt_Rec := RECORD
     FilesToIngest.source;
@@ -30,6 +30,22 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
  
   SHARED WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
+    SELF.dt_first_seen := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_first_seen = 0 => ri.dt_first_seen,
+                     ri.__Tpe = 0 OR (unsigned)ri.dt_first_seen = 0 => le.dt_first_seen,
+                     (unsigned)le.dt_first_seen < (unsigned)ri.dt_first_seen => le.dt_first_seen, // Want the lowest non-zero value
+                     ri.dt_first_seen);
+    SELF.dt_last_seen := MAP ( le.__Tpe = 0 => ri.dt_last_seen,
+                     ri.__Tpe = 0 => le.dt_last_seen,
+                     (unsigned)le.dt_last_seen < (unsigned)ri.dt_last_seen => ri.dt_last_seen, // Want the highest value
+                     le.dt_last_seen);
+    SELF.dt_vendor_first_reported := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_vendor_first_reported = 0 => ri.dt_vendor_first_reported,
+                     ri.__Tpe = 0 OR (unsigned)ri.dt_vendor_first_reported = 0 => le.dt_vendor_first_reported,
+                     (unsigned)le.dt_vendor_first_reported < (unsigned)ri.dt_vendor_first_reported => le.dt_vendor_first_reported, // Want the lowest non-zero value
+                     ri.dt_vendor_first_reported);
+    SELF.dt_vendor_last_reported := MAP ( le.__Tpe = 0 => ri.dt_vendor_last_reported,
+                     ri.__Tpe = 0 => le.dt_vendor_last_reported,
+                     (unsigned)le.dt_vendor_last_reported < (unsigned)ri.dt_vendor_last_reported => ri.dt_vendor_last_reported, // Want the highest value
+                     le.dt_vendor_last_reported);
     SELF.dt_effective_first := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_effective_first = 0 => ri.dt_effective_first,
                      ri.__Tpe = 0 OR (unsigned)ri.dt_effective_first = 0 => le.dt_effective_first,
                      (unsigned)le.dt_effective_first < (unsigned)ri.dt_effective_first => le.dt_effective_first, // Want the lowest non-zero value
@@ -59,10 +75,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.ultid := ri.ultid; // Derived(NEW)
     SELF.ultscore := ri.ultscore; // Derived(NEW)
     SELF.ultweight := ri.ultweight; // Derived(NEW)
-    SELF.dt_first_seen := ri.dt_first_seen; // Derived(NEW)
-    SELF.dt_last_seen := ri.dt_last_seen; // Derived(NEW)
-    SELF.dt_vendor_first_reported := ri.dt_vendor_first_reported; // Derived(NEW)
-    SELF.dt_vendor_last_reported := ri.dt_vendor_last_reported; // Derived(NEW)
     SELF.record_type := ri.record_type; // Derived(NEW)
     SELF.clean_company_name := ri.clean_company_name; // Derived(NEW)
     SELF.clean_phone := ri.clean_phone; // Derived(NEW)
@@ -88,7 +100,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
-      SELF.dt_effective_first <> le.dt_effective_first OR SELF.dt_effective_last <> le.dt_effective_last => RecordType.Updated,
+      SELF.dt_first_seen <> le.dt_first_seen OR SELF.dt_last_seen <> le.dt_last_seen OR SELF.dt_vendor_first_reported <> le.dt_vendor_first_reported OR SELF.dt_vendor_last_reported <> le.dt_vendor_last_reported OR SELF.dt_effective_first <> le.dt_effective_first OR SELF.dt_effective_last <> le.dt_effective_last => RecordType.Updated,
       RecordType.Unchanged);
     SELF.__Tpe := IF(__Tpe0 <> RecordType.New AND (SELF.hardDeleteAdded OR SELF.seleidChange), RecordType.Updated, __Tpe0);
     SELF := le; // Take current version - noting update if needed

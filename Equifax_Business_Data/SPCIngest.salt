@@ -6,9 +6,14 @@ RIDFIELD:rcid:GENERATE
 SOURCEFIELD:source
 SOURCERIDFIELD:efx_id
 INGESTFILE:equifax_business_data_inputfile:NAMED(equifax_business_data.In_File)
+FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0
+FIELD:dt_last_seen:TYPE(UNSIGNED4):RECORDDATE(LAST):0,0
+FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0
+FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):RECORDDATE(LAST):0,0
 FIELD:dt_effective_first:RECORDDATE(FIRST):0,0
 FIELD:dt_effective_last:RECORDDATE(LAST):0,0
 INCREMENTAL:EFFECTIVEDATES(DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST)
+
 FIELD:process_date:DERIVED:0:0
 FIELD:dotid:DERIVED:0,0
 FIELD:dotscore:DERIVED:0,0
@@ -30,10 +35,6 @@ FIELD:orgweight:DERIVED:0,0
 FIELD:ultid:DERIVED:0,0
 FIELD:ultscore:DERIVED:0,0
 FIELD:ultweight:DERIVED:0,0
-FIELD:dt_first_seen:DERIVED:0,0
-FIELD:dt_last_seen:DERIVED:0,0
-FIELD:dt_vendor_first_reported:DERIVED:0,0
-FIELD:dt_vendor_last_reported:DERIVED:0,0
 FIELD:record_type:DERIVED:0,0
 
 FIELD:EFX_ID:0,0

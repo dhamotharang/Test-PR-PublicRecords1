@@ -51,6 +51,84 @@ END;
 
 Industry := NORMALIZE(Base,5,MapIndustry(LEFT,COUNTER));
 
-Industry_dedup := DEDUP(SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> ''),RECORD),RECORD);
-		
+// Industry_dedup := DEDUP(SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> ''),RECORD),RECORD);
+	
+Industry_sort := SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> '')
+	,bdid 										
+	,bdid_score								
+	,source       						
+	,source_docid  						
+	,source_rec_id            
+	,siccode       						
+	,naics        						
+	,industry_description 		
+	,business_description 		
+	,dt_first_seen						
+	,dt_last_seen							
+	,dt_vendor_first_reported	
+	,dt_vendor_last_reported	
+	,record_type							
+	,record_date							
+	,UltID										
+  ,OrgID										
+  ,SELEID										
+  ,ProxID										
+  ,POWID										
+  ,EmpID										
+  ,DotID										
+  ,UltScore									
+  ,OrgScore									
+  ,SELEScore								
+  ,ProxScore								
+  ,POWScore									
+  ,EmpScore									
+  ,DotScore									
+  ,UltWeight								
+  ,OrgWeight								
+  ,SELEWeight								
+  ,ProxWeight								
+  ,POWWeight								
+  ,EmpWeight								
+  ,DotWeight										
+	,LOCAL);
+
+Industry_dedup := DEDUP(Industry_sort
+	,bdid 										
+	,bdid_score								
+	,source       						
+	,source_docid  						
+	,source_rec_id            
+	,siccode       						
+	,naics        						
+	,industry_description 		
+	,business_description 		
+	,dt_first_seen						
+	,dt_last_seen							
+	,dt_vendor_first_reported	
+	,dt_vendor_last_reported	
+	,record_type							
+	,record_date							
+	,UltID										
+  ,OrgID										
+  ,SELEID										
+  ,ProxID										
+  ,POWID										
+  ,EmpID										
+  ,DotID										
+  ,UltScore									
+  ,OrgScore									
+  ,SELEScore								
+  ,ProxScore								
+  ,POWScore									
+  ,EmpScore									
+  ,DotScore									
+  ,UltWeight								
+  ,OrgWeight								
+  ,SELEWeight								
+  ,ProxWeight								
+  ,POWWeight								
+  ,EmpWeight								
+  ,DotWeight								
+	,LOCAL);
+	
 EXPORT As_Industry := Industry_dedup;
