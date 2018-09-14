@@ -419,7 +419,13 @@ export mod_sources := module
 		,MDR.sourceTools.set_TXBUS					// S18
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
-    ,MDR.sourceTools.set_Cortera        // S61
+    ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
+    ,MDR.sourceTools.set_CClue                // S62a
+    ,MDR.sourceTools.set_BBB                  // S62a
+    ,MDR.sourceTools.set_LnPropertyV2         // S62a
+    ,MDR.sourceTools.set_FDIC                 // S62a
+    ,MDR.sourceTools.set_bk                   // S62a
 	];
 
 	// These sources participate in the header build, but are excluded
