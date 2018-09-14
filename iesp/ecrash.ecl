@@ -86,6 +86,7 @@ export t_ECrashSearchRecordData := record (t_ECrashSearchShared)
 	string StateReportNumber {xpath('StateReportNumber')};
 	dataset(t_ECrashInvolvedParty) InvolvedParties {xpath('InvolvedParties/Party'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Involved_Parties)};
 	string SuperReportID {xpath('SuperReportID')};
+	string VendorReportId {xpath('VendorReportId')};
 	string ReportType {xpath('ReportType')};
 	dataset(t_ECrashDocument) Documents {xpath('Documents/Document'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Documents)};
 	integer Pages {xpath('Pages')};
@@ -96,6 +97,7 @@ export t_ECrashSearchRecordData := record (t_ECrashSearchShared)
 	string ContribSource {xpath('ContribSource')};
 	string DateReportCreated {xpath('DateReportCreated')};
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
+	iesp.share.t_Date DateReportSubmitted {xpath('DateReportSubmitted')};
 end;
 		
 export t_ECrashSearchRecord := record
@@ -121,10 +123,12 @@ export t_ECrashSearchRecord := record
 	string StateReportNumber {xpath('StateReportNumber')};
 	dataset(t_ECrashInvolvedParty) InvolvedParties {xpath('InvolvedParties/Party'), MAXCOUNT(iesp.Constants.eCrashMod.Max_Involved_Parties)};
 	string SuperReportID {xpath('SuperReportID')};
+	string VendorReportId {xpath('VendorReportId')};
 	string ReportType {xpath('ReportType')};
 	string ContribSource {xpath('ContribSource')};
 	string DateReportCreated {xpath('DateReportCreated')};
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
+	iesp.share.t_Date DateReportSubmitted {xpath('DateReportSubmitted')};
 end;
 		
 export t_ECrashSearchResponse := record

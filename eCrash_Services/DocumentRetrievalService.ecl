@@ -43,6 +43,7 @@ EXPORT DocumentRetrievalService() := FUNCTION
 	RequestReportId := ReportBy.ReportID;
 	DocumentType := ReportBy.DocumentType;
 	ColoredImage := Request[1].Options.ColoredImage;
+	Redact       := Request[1].Options.Redact;
 	
 	ErrorCodeImageOverflow := 404;
 	
@@ -59,7 +60,7 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		)
 	);
 	
-	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes,RequestReportId, ColoredImage));
+	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes,RequestReportId, ColoredImage, Redact));
 	
 	EmptyHeader := ROW(
 		TRANSFORM(

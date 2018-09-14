@@ -29,7 +29,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 		STRING RequestVendorCode,
 		iesp.share.t_Date RequestDateOfCrash,
 		BOOLEAN isOnlyTm,
-		BOOLEAN ColoredImage) := FUNCTION
+		BOOLEAN ColoredImage,
+		BOOLEAN Redact) := FUNCTION
 		
 		//special logic for 'KYCrashLogic'
 		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
@@ -71,6 +72,7 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := IncludeCoverPage;
 			SELF.Options.ColoredImage := ColoredImage;
+			SELF.Options.Redact       := Redact;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
@@ -89,13 +91,14 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	END;
 	
 	EXPORT GetDocumentImageRequest(
-		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId, BOOLEAN ColoredImage) := FUNCTION
+		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId, BOOLEAN ColoredImage, BOOLEAN Redact) := FUNCTION
 			
 		iesp.accident_image.t_AccidentImageRequest CreateRequest := TRANSFORM
 			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := true;
 			SELF.Options.ColoredImage := ColoredImage;
+			SELF.Options.Redact       := Redact;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
