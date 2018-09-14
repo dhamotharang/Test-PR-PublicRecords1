@@ -6,6 +6,7 @@ export retrievedocument := MODULE
 			
 export t_ECrashRetrieveDocumentOptions := record (iesp.share.t_BaseOption)
 	boolean ColoredImage {xpath('ColoredImage')};
+	boolean Redact {xpath('Redact')};
 end;
 		
 export t_ECrashRetrieveDocumentReportBy := record

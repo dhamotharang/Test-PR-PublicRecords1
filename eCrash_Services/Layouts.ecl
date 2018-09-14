@@ -149,6 +149,7 @@ EXPORT Layouts := MODULE
 			string pageCount{xpath('page_count')};
 			unsigned1 isDeleted{xpath('is_deleted')};
 			string12 officerID{xpath('officer_id')};
+			string10 date_report_submitted {xpath('date_report_submitted')};
 		END;
 
 		EXPORT DeltaPersonRecord := RECORD

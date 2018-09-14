@@ -67,8 +67,9 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		noCallerName := l.AppendedFirstName = '' AND l.AppendedSurname = '' AND l.lexisnexismatchcode != Constants.LNMatch.INVALID;
 		businessMatch := r.AppendedCompanyName<>'' AND l.AppendedCompanyName[1..5] = r.AppendedCompanyName[1..5];
 		nameMatchValue:= Functions.CallerNameMatch(l.AppendedFirstName,l.AppendedSurname,r.AppendedFirstName,r.AppendedSurname);
+		inputMatchValue:= Functions.CallerNameMatch(l.AppendedFirstName,l.AppendedSurname,r.name_first,r.name_last);
 		fullNameMatch := nameMatchValue = Constants.NameMatch.FIRSTLAST; 
-		Subject := fullNameMatch AND r.subj2own_relationship = Constants.Relationship.SUBJECT;	
+		Subject := inputMatchValue = Constants.NameMatch.FIRSTLAST;	
 		Match := fullNameMatch OR businessMatch;
 		SELF.AppendedListingName := l.AppendedListingName;
 		SELF.seq:= r.seq;
@@ -82,15 +83,15 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		SELF.AppendedFirstDate := IF(Match,(UNSIGNED)r.AppendedFirstDate,l.AppendedFirstDate);
 		SELF.AppendedRecordType := IF(businessMatch OR r.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,'');
 		nameMatch := IF(STD.Str.Contains(l.LexisNexisMatchCode,Constants.LNMatch.NAME,false) OR //accounting for name match from accudata results - LexisNexisMatchCode
-										nameMatchValue > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
-		lastNameOnlyMatch := nameMatchValue = Constants.NameMatch.PARTIAL AND l.name_last IN [l.AppendedFirstName, l.AppendedSurname];										
+										inputMatchValue > Constants.NameMatch.NONE,Constants.LNMatch.NAME,'');
+		lastNameOnlyMatch := inputMatchValue = Constants.NameMatch.PARTIAL AND l.name_last IN [l.AppendedFirstName, l.AppendedSurname];										
 		SELF.subj2own_relationship := MAP(Subject => Constants.Relationship.SUBJECT,
 											l.subj2own_relationship<>'' => l.subj2own_relationship,
 											Match => r.subj2own_relationship,
 											lastNameOnlyMatch => Constants.Relationship.RELATIVE,
 											Constants.Relationship.NONE);				
-		relationalMatch := MAP(STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR lastNameOnlyMatch => Constants.LNMatch.RELATIVE,
-								businessMatch OR (fullNameMatch AND r.subj2own_relationship IN Constants.BUSINESS_RELATIONS) => Constants.LNMatch.EMPLOYER,
+		relationalMatch := MAP(businessMatch OR (fullNameMatch AND r.subj2own_relationship IN Constants.BUSINESS_RELATIONS) => Constants.LNMatch.EMPLOYER,
+								fullNameMatch OR STD.Str.Contains(r.LexisNexisMatchCode,Constants.LNMatch.RELATIVE,false) OR lastNameOnlyMatch => Constants.LNMatch.RELATIVE,
 								'');
 		addressMatch := IF(Match AND Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(
 																						l.prim_range,l.prim_name,l.sec_range,
