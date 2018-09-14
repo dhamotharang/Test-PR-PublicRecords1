@@ -87,6 +87,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 					transform (AutoheaderV2.layouts.search_out, 
 					self.did := left.did, 
 					self.seq := left.reference,
+					self.score := left.score,
 					Self.fetch_hit := AutoHeaderV2.Constants.FetchHit.SALT, 	// maybe we should have a new fetch hit called SALT				
 					self.index_hit := left.keys_used, 
 					self.status := 0, 
