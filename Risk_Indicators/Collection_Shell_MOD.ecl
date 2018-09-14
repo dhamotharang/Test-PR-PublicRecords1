@@ -1,4 +1,6 @@
-﻿import _Control, doxie, doxie_files, risk_indicators, riskwise, watchdog, ut,CriminalRecords_Services;
+﻿import _Control, doxie, doxie_files, risk_indicators, riskwise, watchdog, ut,CriminalRecords_Services, 
+	dx_BestRecords;
+
 onThor := _Control.Environment.OnThor;
 
 export Collection_Shell_MOD := module
@@ -261,7 +263,18 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 	MAC_best_transform(get_watchdog_glb_nonExperian, watchdog.Key_Watchdog_GLB_nonExperian);
 	MAC_best_transform(get_watchdog_non_glb, watchdog.Key_Watchdog_nonglb);
 	MAC_best_transform(get_watchdog_nonglb_V2, watchdog.Key_Watchdog_nonglb_V2);
+	MAC_best_transform(get_best_layout, dx_BestRecords.layout_best);
 
+	wdog_perm := dx_BestRecords.fn_get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
+		utility_flag := (IndustryClass = ut.IndustryClass.UTILI_IC), 
+		filter_exp_flag := ~experian_permitted, 
+		pre_glb_flag := (DataRestriction[23] = '1'));
+
+	best_recs := dx_BestRecords.fn_get_best_records(deduped_dids, did, wdog_perm);
+
+	best_data_roxie := join(deduped_dids, best_recs, left.did != 0 and left.did = right.did, 
+		get_best_layout(left, right), left outer, keep(1));
+/*
 	best_data_roxie := if (ut.glb_ok(GLB_Purpose), 
 							 if(experian_permitted, 
 								if(IndustryClass = ut.IndustryClass.UTILI_IC,
@@ -285,7 +298,7 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 									join(deduped_dids, watchdog.Key_Watchdog_nonglb,
 										left.did != 0 and keyed(left.did = right.did),
 										get_watchdog_non_glb(LEFT,RIGHT),left outer, keep(1))));
-
+*/
 	best_data_thor := if (ut.glb_ok(GLB_Purpose), 
 							 if(experian_permitted, 
 								if(IndustryClass = ut.IndustryClass.UTILI_IC,
