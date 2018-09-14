@@ -48,7 +48,7 @@ MODULE
 	
 	// Split the input DATASET into two depending on the input criteria
 	SHARED dInPhone   := dAppendDIDs(homephone != '');
-	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment and ~IsValidTransactionType);
+	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
