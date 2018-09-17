@@ -74,9 +74,10 @@ export shortcuts := module
 	export gw_targus    := dataset( [{'targus','http://rw_data_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_netacuity := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_netacuityv4 := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
-	export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
+	export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4 := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+	
+  export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
 	export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
 	//deltabase gateways for Inquiries
 	export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
