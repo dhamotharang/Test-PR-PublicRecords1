@@ -707,8 +707,16 @@ export Brand_Layout := RECORD
 		vina_layout;
 		le_1_layout.le_1_Orig_Name;
 		le_1_layout.le_1_company_name;
+		le_1_Layout.le_1_fname;
+		le_1_Layout.le_1_mname;
+		le_1_Layout.le_1_lname;
+		le_1_Layout.le_1_name_suffix;
 		lh_1_layout.lh_1_Orig_Name;
 		lh_1_layout.lh_1_company_name;
+		lh_1_Layout.lh_1_fname;
+		lh_1_Layout.lh_1_mname;
+		lh_1_Layout.lh_1_lname;
+		lh_1_Layout.lh_1_name_suffix;
 		Layout_Report_Airbag_Safety;
 		Brand_Layout;
 	END;

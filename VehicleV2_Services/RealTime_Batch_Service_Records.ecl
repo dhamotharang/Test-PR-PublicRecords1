@@ -127,9 +127,17 @@ EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) in
 		LE_1 := R.lessors[1];
 		SELF.le_1_orig_name:=LE_1.Orig_Name;
 		SELF.le_1_company_name:=LE_1.append_clean_cname;
+		SELF.le_1_fname:=LE_1.fname;
+		SELF.le_1_mname:=LE_1.mname;
+		SELF.le_1_lname:=LE_1.lname;
+		SELF.le_1_name_suffix:=LE_1.name_suffix;
 		LH_1 := R.lienholders[1];
 		SELF.lh_1_orig_name:=LH_1.Orig_Name;
 		SELF.lh_1_company_name:=LH_1.append_clean_cname;
+		SELF.lh_1_fname:=LH_1.fname;
+		SELF.lh_1_mname:=LH_1.mname;
+		SELF.lh_1_lname:=LH_1.lname;
+		SELF.lh_1_name_suffix:=LH_1.name_suffix;
 		SELF.documenttypeCode :=R.documenttypecode;
 		SELF.safety_type:= R.safety_type;
 		SELF.airbags := R.airbags;
