@@ -426,7 +426,7 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      				:= 25;		
+		export unsigned2 MaxAttributes      				:= 21;		
     // export unsigned2 MaxMatchSummaries     		 	:= 20;
     // export unsigned2 MaxNewsProfiles       		 	:= 20;
     export unsigned2 MaxProperties         			:= 500;

@@ -1,4 +1,4 @@
-﻿IMPORT doxie, DueDiligence, Risk_Indicators;
+﻿IMPORT doxie, DueDiligence, Risk_Indicators, STD;
 
 
 EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
@@ -41,6 +41,8 @@ EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   SELF.individual.zip5 := IF(updateAddress, RIGHT.zip, LEFT.individual.zip5);
                                   SELF.individual.zip4 := IF(updateAddress, RIGHT.zip4, LEFT.individual.zip4);
                                   
+                                  SELF.inputSSN := LEFT.individual.ssn;
+                                  
                                   SELF.bestSSN := RIGHT.ssn;
                                   SELF.bestPhone := RIGHT.phone;
                                   SELF.bestDOB := RIGHT.dob;
@@ -62,6 +64,13 @@ EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   SELF.bestAddress.zip5 := RIGHT.zip;
                                   SELF.bestAddress.zip4 := RIGHT.zip4;
                                   
+                                  
+                                  validDOB := STD.Date.IsValidDate(RIGHT.dob);
+                                  validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
+
+                                  
+                                  SELF.estimatedAge := IF(validDOB AND validHistDate, STD.Date.YearsBetween(RIGHT.dob, LEFT.historyDate), 0);
+                                                                    
                                   SELF := LEFT;
                                   SELF := [];),
                         LEFT OUTER,
@@ -70,7 +79,7 @@ EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		
 		// OUTPUT(inData, NAMED('inData'));
 		// OUTPUT(uniqueDIDs, NAMED('uniqueDIDs'));
-		// OUTPUT(bestData, NAMED('bestData'));
+		// OUTPUT(bestData, NAMED('bestData'), overwrite);
 		// OUTPUT(addBestData, NAMED('addBestData'));
 
 		RETURN addBestData;
