@@ -204,6 +204,8 @@ EXPORT FUNCTIONS := MODULE
       self.DateAdded := date_created[1..4] + '-' + date_created[5..6] + '-' + date_created[7..8] + ' 00:00:00';
       self.SourceSystem := 'PCR';  // I'd rather have this say PCR instead of DOST for these initial records since DOST system is going away
       self.EventType := 'ADD';
+			self.CD_ID := rt.UID;
+			self.statementID := (unsigned)rt.UID;
       SELF  := rt,
       SELF  := [];
     end;
