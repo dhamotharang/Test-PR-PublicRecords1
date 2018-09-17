@@ -163,7 +163,8 @@ end;
 	#UNIQUENAME(allCandidates)
 	%allCandidates% := DEDUP(NORMALIZE(%file_out_final%,LEFT.results,%flatResult%(LEFT, RIGHT)), RECORD, ALL);
 	
-	OutFile := %allCandidates%;
+	OutFile := SORT(%allCandidates%, reference, -weight);
+
 // outfile := %res_out%;
 // output(%pr%, named('internal_layout'));
 // output(%res_out%, named('result_from_service'));
