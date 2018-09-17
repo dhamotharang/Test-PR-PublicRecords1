@@ -1,4 +1,4 @@
-﻿import Risk_Indicators;
+﻿import Risk_Indicators,riskwise;
 
 Layout_Version1 := RECORD
 	// Identity Authentication Attributes
@@ -537,5 +537,6 @@ export Layout_FraudAttributes := RECORD
 	Layout_IDAttributes IDAttributes;
 	Layout_version2 version2;
 	Layout_version201 version201;
+  riskwise.layouts.Paro_IT1O_layout ParoAttributes;
   string compromisedDL_hash;
 END;

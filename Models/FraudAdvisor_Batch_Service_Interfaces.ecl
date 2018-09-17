@@ -1,4 +1,4 @@
-EXPORT FraudAdvisor_Batch_Service_Interfaces := MODULE 
+﻿EXPORT FraudAdvisor_Batch_Service_Interfaces := MODULE 
 	
 	EXPORT Input := INTERFACE
 		export string 		ModelName_in ;
@@ -17,8 +17,9 @@ EXPORT FraudAdvisor_Batch_Service_Interfaces := MODULE
 		export boolean   usedobFilter ;
 		export integer2  dobradius ;
 		export unsigned1 RedFlag_version ;
-		export string 	DataRestriction ;
-		export string 	DataPermission ;
+		export string    DataRestriction ;
+		export string    DataPermission ;
+    export boolean   doParo_attrs ;
 	END;
 	
 END;
