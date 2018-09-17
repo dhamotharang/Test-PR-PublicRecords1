@@ -51,9 +51,12 @@ export constants := module
 	
 	export locationset := ['B','A']; 
 	
-	export gethost(string dopsenv, string environment = '', string l_loc  = location) := 
+	export gethost(string dopsenv, string environment = ''
+									,string l_loc  = location
+									,string l_testenv = 'NA') := 
 																								if (dopsenv = 'prod'
-																									,MAP (
+																									,if (l_testenv = 'NA'
+																										,MAP (
 																											(environment in healthcareset) and (l_loc in locationset)
 																																=> 'ushc-dopsservices.risk.regn.net'
 																											,environment not in healthcareset and l_loc = 'B'
@@ -61,6 +64,17 @@ export constants := module
 																											,environment not in healthcareset and l_loc = 'A'
 																																=> 'usins-dopsservices.risk.regn.net'
 																											,'NA'
+																											)
+																										,MAP (
+																												l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'DEV196'
+																																=> 'uspr-dopsservices.risk.regn.net/dev196'
+																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'CORE'
+																																=> 'uspr-dopsservices.risk.regn.net/core'
+																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'PRTE'
+																																=> 'uspr-dopsservices.risk.regn.net/prte'
+																												,'NA'
+																											)
+																											
 																										)
 																									,MAP (
 																											(environment in healthcareset) and (l_loc in locationset)
@@ -71,12 +85,13 @@ export constants := module
 																																=> 'devdopsservices.risk.regn.net/ins'
 																											,'NA'
 																										)
-																									);
+																								);
 	
 	export prboca := module
 		export serviceurl(string dopsenv
 								, string environment = ''
-								,string l_loc = location) := 'http://'+ trim(gethost(dopsenv,environment,l_loc),left,right)+ '/demodopsservice.asmx';
+								,string l_loc = location
+								,string l_testenv = 'NA') := 'http://'+ trim(gethost(dopsenv,environment,l_loc,l_testenv),left,right)+ '/demodopsservice.asmx';
 																																	
 	end;
 
