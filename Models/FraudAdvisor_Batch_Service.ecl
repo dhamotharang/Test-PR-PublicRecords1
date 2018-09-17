@@ -74,6 +74,7 @@ fp_batch_in := Models.FraudAdvisor_Batch_Service_Layouts.BatchInput;
 
 batchin := dataset([],fp_batch_in) 			: stored('batch_in',few);
 
+Boolean VALIDATION := False; //True for validation mode, false for production mode
 
 // module here inherits the interface & overrides it
  InputArgs := MODULE (Models.FraudAdvisor_Batch_Service_Interfaces.Input)
@@ -93,8 +94,10 @@ batchin := dataset([],fp_batch_in) 			: stored('batch_in',few);
 					export boolean   usedobFilter      := false : stored('UseDOBFilter');
 					export integer2  dobradius         := 2     : stored('DOBRadius');
 					export unsigned1 RedFlag_version   := 0 		: stored('RedFlag_version');
-					export string DataRestriction    	 := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-					export string DataPermission			 := risk_indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+					export string    DataRestriction   := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
+					export string    DataPermission    := risk_indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+          //This would correspond to requestedattributegroups = 'fraudpointattrvparo' in XML
+          export boolean   doParo_attrs      := false : stored('IncludeParoAttrs'); 
 		END;
 
 gateways_in := Gateway.Configuration.Get();
@@ -110,18 +113,21 @@ gateways := project(gateways_in, gw_switch(left));
 
 if(InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
-
 wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways);
- // output(wModel, NAMED('Results'));
-//coment out everthing below  if in validation 
-results := PROJECT(wModel, models.Layout_FD_Batch_Out);
-output(results, NAMED('Results'));
 
-BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
-dIPIn := PROJECT(batchin,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEFT.AcctNo; SELF.IPAddr:=LEFT.ip_addr;));
-dRoyaltiesByAcctno 	:= Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, wModel, TRUE);
-dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
-output(dRoyalties,NAMED('RoyaltySet'));
+#IF(VALIDATION)
+  output(wModel, NAMED('Results'));
+#ELSE
+ 
+  results := PROJECT(wModel, models.Layout_FD_Batch_Out);
+  output(results, NAMED('Results'));
+
+  BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
+  dIPIn := PROJECT(batchin,TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,SELF.AcctNo := LEFT.AcctNo; SELF.IPAddr:=LEFT.ip_addr;));
+  dRoyaltiesByAcctno 	:= Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways, dIPIn, wModel, TRUE);
+  dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
+  output(dRoyalties,NAMED('RoyaltySet'));
+#END
 
 ENDMACRO;
 // Models.FraudAdvisor_Batch_Service()
