@@ -149,12 +149,12 @@
     BOOLEAN     misdemeanorConvictionPast3Yrs;
     BOOLEAN     uncategorizedConvictionOver3Yrs;
     BOOLEAN     misdemeanorConvictionOver3Years;
-    /*PerAssetOwnProperty */
+    /*PerAssetOwnProperty*/
     UNSIGNED2   ownedPropCount;                                 //populated in DueDiligence.getIndProperty
     /*PerAccessToFundsProperty*/
     UNSIGNED6   totalAssesedValue;                              //populated in DueDiligence.getIndProperty
     UNSIGNED2   previouslyOwnedPropCount;                       //populated in DueDiligence.getIndProperty
-    /*PerProfessional License */
+    /*PerProfessional License*/
     BOOLEAN			atleastOneActiveLawAcct;					            	//populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneActiveFinRealEstate;		            	//populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneActiveMedical;						            //populated in DueDiligence.getIndProfessionalData
@@ -165,9 +165,11 @@
 		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
     /*PerAccessToFundsIncome*/
     UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
-    /* PerAssetOwnVehicle */
+    /*PerAssetOwnVehicle*/
 		UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
 		UNSIGNED6  	VehicleBaseValue;
+    /*PerAgeRange*/
+    INTEGER1   estimatedAge;
   END;
 
 END;

@@ -10,8 +10,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
                         BOOLEAN debugMode = FALSE) := FUNCTION
 																						 
 
-	INTEGER bsVersion := DueDiligence.Constants.DEFAULT_BS_VERSION;   //Use the default Boca Shell Version of 50 to get the default handling for getting our DID's
-	UNSIGNED8 bsOptions := DueDiligence.Constants.DEFAULT_BS_OPTIONS;
+	INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
+	UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
 	BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
 
 	
