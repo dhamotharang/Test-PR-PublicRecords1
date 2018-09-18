@@ -259,6 +259,7 @@ buildKey	:=	sequential( LN_PropertyV2_Fast.BuildLogger.update(filedate,'key_buil
 													parallel(Keys, Keys_fcra),
 												  parallel(Move_keys_orig, Move_keys_new),
 												  parallel(to_qa_orig, To_qa_fcra),
+													LN_PropertyV2_Fast.Proc_FCRA_Field_Deprecation_Stats(isFast),				//DF-21968
 													autokeys,
 													deeds_boolean_keys,
 													assessor_boolean_keys,																
