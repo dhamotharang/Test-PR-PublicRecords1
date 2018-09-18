@@ -115,10 +115,12 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 
                                 SELF.addressFirstReportedAge := 0;                   //*** next release
                                 SELF.timeSinceLastReportedNonBureau := 0;            //*** next release
-                                SELF.inputSSNRandomlyIssued := 0;                    //*** RS Reason code
-                                SELF.inputSSNRandomIssuedInvalid := 0;               //*** IS Reason code
-                                SELF.inputSSNIssuedToNonUS := 0;                     //*** 85 Reason Code
-                                SELF.inputSSNITIN := 0;                              //*** IT Reason Code
+                                
+                           //***Using the Boca Shell and Risk_Indicators.rcSet.isCode__ to set a true of false value for each ***     
+                                SELF.inputSSNRandomlyIssued      := IF(Risk_Indicators.rcSet.isCodeRS(RIGHT.shell_input.ssn, RIGHT.iid.socsvalflag, RIGHT.iid.socllowissue, RIGHT.iid.socsRCISflag), 1, 0);   //*** RS Reason code
+                                SELF.inputSSNRandomIssuedInvalid := IF(Risk_Indicators.rcSet.isCodeIS(RIGHT.shell_input.ssn, RIGHT.iid.socsvalflag, RIGHT.iid.socllowissue, RIGHT.iid.socsRCISflag), 1, 0);   //*** IS Reason code
+                                SELF.inputSSNIssuedToNonUS       := IF(Risk_Indicators.rcSet.isCode85(RIGHT.shell_input.ssn, RIGHT.iid.socllowissue), 1, 0);                                                  //*** 85 Reason Code
+                                SELF.inputSSNITIN                := IF(Risk_Indicators.rcSet.isCodeIT(RIGHT.shell_input.ssn), 1, 0);                                                                          //*** IT Reason Code
                                 
                             //***inputSSNInvalid 
                             
@@ -144,13 +146,15 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                                                              NULL);
                                 SELF.inputSSNIssuedPriorDOB := IF(rv_s65_ssn_prior_dob = NULL, NEG1, rv_s65_ssn_prior_dob);
                                 
-                                SELF.inputSSNAssociatedMultLexIDs := 0;             //*** MI Reason code 
-                                SELF.inputSSNReportedDeceased := 0;                 //*** O2 and DI Reason code
-                                SELF.inputSSNNotPrimaryLexID  := 0;                 //*** CL Reason code
-                                SELF.lexIDReportedDeceased := 0;                    //*** DI Reason code
+                                SELF.inputSSNAssociatedMultLexIDs := IF(Risk_Indicators.rcSet.isCodeMI(RIGHT.velocity_counters.adls_per_ssn_seen_18months), 1, 0);             //*** MI Reason code 
+                                isRC02                            := IF(Risk_Indicators.rcSet.isCode02(RIGHT.iid.decsflag), true, false); 
+                                isRCDI                            := IF(Risk_Indicators.rcSet.isCodeDI(RIGHT.iid.DIDdeceased), true, false);
+                                SELF.inputSSNReportedDeceased     := IF(isRC02 or isRCDI, 1, 0);                                                                               //*** O2 or DI Reason code
+                                SELF.inputSSNNotPrimaryLexID      := IF(Risk_Indicators.rcSet.isCodeCL(RIGHT.shell_input.ssn, RIGHT.iid.bestssn, RIGHT.iid.socsverlevel, RIGHT.iid.combo_ssn), 1, 0);    //*** CL Reason code
+                                SELF.lexIDReportedDeceased        := IF(Risk_Indicators.rcSet.isCodeDI(RIGHT.iid.DIDdeceased), 1, 0);                                          //*** DI Reason code
                                 
                                 
-                            //***lesIDBestSSNInvalid 
+                            //***lexIDBestSSNInvalid 
                                 best_ssn_valid                   := RIGHT.best_flags.best_ssn_valid;
                                 iv_best_ssn_invalid := map(
                                                            best_ssn_valid = '6' or best_ssn_valid = '7' or not(RIGHT.truedid)      => NULL,
