@@ -6,7 +6,7 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 	STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
 	STRING2 INVALID_INDIVIDUAL_SCORE := '-1';
 
-	//We have individuals with and without LEXID/DIDs
+	//we have individuals with and without LEXID/DIDs
 	withDIDs := indivs(individual.did <> DueDiligence.Constants.NUMERIC_ZERO);
 	noDIDs := indivs(individual.did = DueDiligence.Constants.NUMERIC_ZERO);
   
@@ -26,10 +26,6 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
   
   
 	DueDiligence.Layouts.Indv_Internal IndvKRIs(DueDiligence.Layouts.Indv_Internal le) := TRANSFORM
-  
-    /* PERSON LEXID/DID  */
-    // this is already populated by the DueDiligence.getIndDID  
-    SELF.PerLexID := (STRING)le.inquiredDID;
 		
 		/* PERSON US RESIDENCY */ 
 		usResidency := DueDiligence.getIndKRIResidency(le);
@@ -39,15 +35,15 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
     
     
     /* PERSON MATCH LEVEL (based on ADL Score) */  																																																	 
-		 PerMatchLevel_Flag9 := IF (le.individual.score < 21, 'T','F');                            /* Index value of 9 was set */
-		 PerMatchLevel_Flag8 := IF (le.individual.score BETWEEN 21 AND 30, 'T','F');               /* Index value of 8 was set */
-		 PerMatchLevel_Flag7 := IF (le.individual.score BETWEEN 31 AND 40, 'T','F');               /* Index value of 7 was set */
-		 PerMatchLevel_Flag6 := IF (le.individual.score BETWEEN 41 AND 50, 'T','F');               /* Index value of 6 was set */
-		 PerMatchLevel_Flag5 := IF (le.individual.score BETWEEN 51 AND 60, 'T','F');                /* Index value of 5 was set */
-		 PerMatchLevel_Flag4 := IF (le.individual.score BETWEEN 61 AND 70, 'T','F');                /* Index value of 4 was set */
-		 PerMatchLevel_Flag3 := IF (le.individual.score BETWEEN 71 AND 80, 'T','F');                /* Index value of 3 was set */
-		 PerMatchLevel_Flag2 := IF (le.individual.score BETWEEN 81 AND 90, 'T','F');                /* Index value of 2 was set */
-		 PerMatchLevel_Flag1 := IF (le.individual.score > 90, 'T','F');                             /* Index value of 1 was set */
+		 PerMatchLevel_Flag9 := IF (le.individual.score < 21, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            
+		 PerMatchLevel_Flag8 := IF (le.individual.score BETWEEN 21 AND 30, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag7 := IF (le.individual.score BETWEEN 31 AND 40, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag6 := IF (le.individual.score BETWEEN 41 AND 50, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag5 := IF (le.individual.score BETWEEN 51 AND 60, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag4 := IF (le.individual.score BETWEEN 61 AND 70, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag3 := IF (le.individual.score BETWEEN 71 AND 80, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag2 := IF (le.individual.score BETWEEN 81 AND 90, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
+		 PerMatchLevel_Flag1 := IF (le.individual.score > 90, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            
     
      PerMatchLevel_Flag_final := calcFinalFlagField(PerMatchLevel_Flag9,
                                                       PerMatchLevel_Flag8,
@@ -59,8 +55,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                       PerMatchLevel_Flag2,
                                                       PerMatchLevel_Flag1);
                                       
-    self.PerMatchLevel_Flag   :=  PerMatchLevel_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
-		self.PerMatchLevel         := (STRING)(10 - STD.Str.Find(PerMatchLevel_Flag_final, 'T', 1));       /* Set the level to the position of the first 'T' which is essentially the highest level. 
+    self.PerMatchLevel_Flag   :=  PerMatchLevel_Flag_final;                                            
+		self.PerMatchLevel         := (STRING)(10 - STD.Str.Find(PerMatchLevel_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));       
     
     /* PERSON ASSET OWNED PROPERTY */
     perAssetOwnProperty_Flag9 := IF(le.ownedPropCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
@@ -163,31 +159,42 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 		SELF.PerAccessToFundsIncome := (STRING)(10 - STD.Str.Find(perAccessToFundsIncome_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
+    /* PERSON AGE RANGE */
+    perAgeRange_Flag9 := IF(le.estimatedAge BETWEEN 1 AND 18, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag8 := IF(le.estimatedAge BETWEEN 19 AND 21, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag7 := IF(le.estimatedAge BETWEEN 22 AND 25, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag6 := IF(le.estimatedAge BETWEEN 26 AND 35, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag5 := IF(le.estimatedAge BETWEEN 36 AND 50, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag4 := IF(le.estimatedAge BETWEEN 51 AND 63, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag3 := IF(le.estimatedAge BETWEEN 64 AND 75, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag2 := IF(le.estimatedAge BETWEEN 76 AND 85, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAgeRange_Flag1 := IF(le.estimatedAge > 85, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    
+    perAgeRange_Flag_final := calcFinalFlagField(perAgeRange_Flag9,
+                                                            perAgeRange_Flag8,
+                                                            perAgeRange_Flag7,
+                                                            perAgeRange_Flag6,
+                                                            perAgeRange_Flag5,
+                                                            perAgeRange_Flag4,
+                                                            perAgeRange_Flag3,
+                                                            perAgeRange_Flag2,
+                                                            perAgeRange_Flag1);
+    
+    SELF.PerAgeRange_Flag := perAgeRange_Flag_final;
+		SELF.PerAgeRange := (STRING)(10 - STD.Str.Find(perAgeRange_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    
+    
 
     /* INDIVIDUAL GEOGRAPHIC RISK  */  
-		perGeoRisk_Flag9 := IF (le.CountyHasHighCrimeIndex   
-		                    AND le.CountyBordersForgeinJur
-											  AND (le.HIDTA OR le.HIFCA),      'T','F');                            /* Set the Index value to 9 */	
-												
-		perGeoRisk_Flag8 := IF (le.CityBorderStation 
-		                    OR  le.CityFerryCrossing  
-											  OR  le.CityRailStation ,         'T','F');                            /* Set the Index value to 8 */
-												
-		perGeoRisk_Flag7 := IF (le.CountyBordersForgeinJur,  'T','F');                            /* Set the Index value to 7 */
-		
-		perGeoRisk_Flag6 := IF (~le.CountyBordersForgeinJur 
-		                    AND  le.CountyBorderOceanForgJur, 'T','F');                           /* Set the Index value to 6 */
-												
-		perGeoRisk_Flag5 := IF (le.CountyHasHighCrimeIndex
-		                    AND (le.HIDTA OR le.HIFCA),       'T','F');                           /* Set the Index value to 5 */
-												
-		perGeoRisk_Flag4 := IF (le.CountyHasHighCrimeIndex,   'T','F');                           /* Set the Index value to 4 */
-		                                                                 
-		perGeoRisk_Flag3 := IF (le.HIFCA, 'T','F');                                               /* Set the Index value to 3 */
-		
-		perGeoRisk_Flag2 := IF (le.HIDTA, 'T','F');                                               /* Set the Index value to 2  */
-		
-		perGeoRisk_Flag1 := IF (~le.CountyHasHighCrimeIndex,'T','F');                             /* Set the Index value to 1 */
+		perGeoRisk_Flag9 := IF(le.CountyHasHighCrimeIndex AND le.CountyBordersForgeinJur AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            	
+		perGeoRisk_Flag8 := IF(le.CityBorderStation OR le.CityFerryCrossing OR le.CityRailStation, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           											
+		perGeoRisk_Flag7 := IF(le.CountyBordersForgeinJur, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);  
+		perGeoRisk_Flag6 := IF(~le.CountyBordersForgeinJur AND le.CountyBorderOceanForgJur, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           			
+		perGeoRisk_Flag5 := IF(le.CountyHasHighCrimeIndex AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           											
+		perGeoRisk_Flag4 := IF(le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                                                                   
+		perGeoRisk_Flag3 := IF(le.HIFCA, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                               
+		perGeoRisk_Flag2 := IF(le.HIDTA, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                               
+		perGeoRisk_Flag1 := IF(~le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                             
 	
 
 		perGeoRisk_Flag_final := calcFinalFlagField(perGeoRisk_Flag9,
@@ -200,42 +207,43 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                   perGeoRisk_Flag2, 
                                                   perGeoRisk_Flag1); 
 		
-		self.perGeographic_Flag   :=  perGeoRisk_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
-		self.perGeographic         := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, 'T', 1));          /* Set the index to the position of the first 'T'.  */
+		self.perGeographic_Flag := perGeoRisk_Flag_final;                                             
+		self.perGeographic := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));          
 			
 
     
 		/*INDIVIDUAL PROFESSIONAL LICENSE */
 		highRiskFound := le.atleastOneActiveLawAcct OR le.atleastOneActiveFinRealEstate OR le.atleastOneActiveMedical OR 
-																			le.atleastOneActiveBlastPilot OR le.atleastOneInactiveLawAcct OR le.atleastOneInactiveFinRealEstate OR 
-																			le.atleastOneInactiveMedical OR le.atleastOneInactiveBlastPilot;
-		professionalLicRisk9 := IF(le.atleastOneActiveLawAcct, 'T', 'F');
-		professionalLicRisk8 := IF(le.atleastOneActiveFinRealEstate, 'T', 'F');
-		professionalLicRisk7 := IF(le.atleastOneActiveMedical, 'T', 'F');
-		professionalLicRisk6 := IF(le.atleastOneActiveBlastPilot, 'T', 'F');
-		professionalLicRisk5 := IF(le.atleastOneInactiveLawAcct, 'T', 'F');
-		professionalLicRisk4 := IF(le.atleastOneInactiveFinRealEstate, 'T', 'F');
-		professionalLicRisk3 := IF(le.atleastOneInactiveMedical, 'T', 'F');
-		professionalLicRisk2 := IF(le.atleastOneInactiveBlastPilot, 'T', 'F');
-		professionalLicRisk1 := IF(highRiskFound = FALSE, 'T', 'F');
+                     le.atleastOneActiveBlastPilot OR le.atleastOneInactiveLawAcct OR le.atleastOneInactiveFinRealEstate OR 
+                     le.atleastOneInactiveMedical OR le.atleastOneInactiveBlastPilot;
+                                      
+		professionalLicRisk9 := IF(le.atleastOneActiveLawAcct, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk8 := IF(le.atleastOneActiveFinRealEstate, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk7 := IF(le.atleastOneActiveMedical, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk6 := IF(le.atleastOneActiveBlastPilot, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk5 := IF(le.atleastOneInactiveLawAcct, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk4 := IF(le.atleastOneInactiveFinRealEstate, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk3 := IF(le.atleastOneInactiveMedical, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk2 := IF(le.atleastOneInactiveBlastPilot, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		professionalLicRisk1 := IF(highRiskFound = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
 												
 		professionalLicRiskConcat_Final := calcFinalFlagField(professionalLicRisk9, professionalLicRisk8, professionalLicRisk7, professionalLicRisk6, 
                                                           professionalLicRisk5, professionalLicRisk4, professionalLicRisk3, professionalLicRisk2, professionalLicRisk1);
 		
 		SELF.PerProfLicense_Flag := professionalLicRiskConcat_Final;
-		SELF.PerProfLicense := (STRING)(10-STD.Str.Find(professionalLicRiskConcat_Final, 'T', 1));
+		SELF.PerProfLicense := (STRING)(10-STD.Str.Find(professionalLicRiskConcat_Final, DueDiligence.Constants.T_INDICATOR, 1));
 		
 
     /* ASSETS OWNED VEHICLE  */  
-		PerAssetOwnVehicle_Flag9 := If (le.VehicleCount > 0 AND le.VehicleBaseValue >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		PerAssetOwnVehicle_Flag8 := IF (le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		PerAssetOwnVehicle_Flag7 := IF (le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
-		PerAssetOwnVehicle_Flag6 := IF (le.VehicleCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
-		PerAssetOwnVehicle_Flag5 := IF (le.VehicleCount BETWEEN 8 AND 14, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    
-		PerAssetOwnVehicle_Flag4 := IF (le.VehicleCount BETWEEN 5 AND 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     
-		PerAssetOwnVehicle_Flag3 := IF (le.VehicleCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
-		PerAssetOwnVehicle_Flag2 := IF (le.VehicleCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
-		PerAssetOwnVehicle_Flag1 := IF (le.VehicleCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                   /* Set the Index value to 1 */
+		PerAssetOwnVehicle_Flag9 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+		PerAssetOwnVehicle_Flag8 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+		PerAssetOwnVehicle_Flag7 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
+		PerAssetOwnVehicle_Flag6 := IF(le.VehicleCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
+		PerAssetOwnVehicle_Flag5 := IF(le.VehicleCount BETWEEN 8 AND 14, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    
+		PerAssetOwnVehicle_Flag4 := IF(le.VehicleCount BETWEEN 5 AND 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     
+		PerAssetOwnVehicle_Flag3 := IF(le.VehicleCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+		PerAssetOwnVehicle_Flag2 := IF(le.VehicleCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+		PerAssetOwnVehicle_Flag1 := IF(le.VehicleCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
 	
 		PerAssetOwnVehicle_Flag_Final := calcFinalFlagField(PerAssetOwnVehicle_Flag9,
 																			                  PerAssetOwnVehicle_Flag8,
@@ -247,10 +255,16 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																			                  PerAssetOwnVehicle_Flag2,
 																			                  PerAssetOwnVehicle_Flag1);
 
-    SELF.PerAssetOwnVehicle_Flag    :=  PerAssetOwnVehicle_Flag_Final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
-		SELF.PerAssetOwnVehicle         := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
+    SELF.PerAssetOwnVehicle_Flag := PerAssetOwnVehicle_Flag_Final;                                             
+		SELF.PerAssetOwnVehicle := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));           
 
+    
+    
     //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
+    
+    /* PERSON LEXID/DID */
+    //is already populated in DueDiligence.getIndDID  
+    SELF.PerLexID := (STRING)le.inquiredDID;
     
     /* PERSON STATE CRIMINAL */
     //is populated in DueDiligence.getIndKRILegalStateCriminal, which is ultimately called in DueDiligence.getIndCriminal
@@ -296,8 +310,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 																							// SELF.PerCivilLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerOffenseType := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerOffenseType_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							// SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
 																							// SELF.PerIdentityRisk_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerUSResidency := INVALID_INDIVIDUAL_SCORE;

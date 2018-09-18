@@ -3,6 +3,15 @@
 
 EXPORT Common := MODULE
 
+  EXPORT firstPopulatedString(field) := FUNCTIONMACRO
+    RETURN IF(LEFT.field = '', RIGHT.field, LEFT.field);
+  ENDMACRO;
+  
+  EXPORT firstNonZeroNumber(field) := FUNCTIONMACRO
+    //so negative numbers would also be returned (ie -1)
+    RETURN IF(LEFT.field = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.field, LEFT.field);
+  ENDMACRO;
+
 	EXPORT createNVPair(STRING name, STRING val) := FUNCTION
 			
 			iesp.share.t_NameValuePair createPair(STRING n, STRING v) := TRANSFORM

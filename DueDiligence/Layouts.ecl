@@ -1,4 +1,4 @@
-﻿IMPORT iesp, SALT28;
+﻿IMPORT Citizenship, iesp, SALT28;
 
 EXPORT Layouts := MODULE
 
@@ -99,8 +99,10 @@ EXPORT Layouts := MODULE
 		BOOLEAN addressProvided;
 		BOOLEAN fullAddressProvided;
 		UNSIGNED4 seq;
+    UNSIGNED4 inputSeq;
 		UNSIGNED4 historyDateYYYYMMDD;
 		STRING10 requestedVersion;
+    Citizenship.Layouts.Input;
 		Busn_Input business;
 		Indv_Input individual;
 	END;
@@ -248,9 +250,9 @@ EXPORT Layouts := MODULE
     BOOLEAN lexIDChanged;
 		PerAttributes;
 		BusAttributes;
-    STRING3 citizenshipScore;
-    DueDiligence.CitizenshipAttributes.LayoutAttributeValues;
+    Citizenship.Layouts.LayoutScoreAndIndicators;
 	END;
+  
 	
 	EXPORT LayoutSICNAIC := RECORD
 		UNSIGNED4 DateFirstSeen;
@@ -593,6 +595,7 @@ EXPORT Layouts := MODULE
 	END;
   
   EXPORT IndReportDetails := RECORD
+    STRING9 inputSSN;
     STRING9 bestSSN;
     STRING10 bestPhone;
     UNSIGNED4 bestDOB;
@@ -676,5 +679,6 @@ EXPORT Layouts := MODULE
 		BusReportDetails;
     iesp.duediligencebusinessreport.t_DDRBusinessReport BusinessReport;
 	END;
+
 
 END;

@@ -14,17 +14,16 @@ EXPORT MAC_DueDiligence_Batch_Service := MACRO
                     'FBOP_NameOrderSearched',
                     'FBOP_IncludeLexIDPrimaryDOBYear',
                     'FBOP_IncludeDOBYearRadius',
-                    'FBOP_DOBNumberOfYearsRadius',
-                    'FBOP_IncludeLexIDPrimaryAddressCounty',
-                    'FBOP_IncludeLexIDHistoricalAddressCountyForNumYearsPrior',
-                    'FBOP_HistoricalAddressNumberOfYearsPrior',
-                    'FBOP_FIPSCountyTolerance',                    
+                    'FBOP_DOBNumberOfYearsRadius',                  
                     /*---- Citizenship Request Fields ----*/
                     'modelName',
 										/*---- Compliance Fields ----*/
 										'glbPurpose',
 										'dppaPurpose',
 										'dataRestrictionMask',
-										'dataPermissionMask'
+										'dataPermissionMask',
+                    /*---- Debug ----*/
+										'debugMode',
+										'modelValidation'
 									));
 ENDMACRO;
