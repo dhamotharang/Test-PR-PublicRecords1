@@ -265,10 +265,22 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 	MAC_best_transform(get_watchdog_nonglb_V2, watchdog.Key_Watchdog_nonglb_V2);
 	MAC_best_transform(get_best_layout, dx_BestRecords.layout_best);
 
-	wdog_perm := dx_BestRecords.fn_get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
-		utility_flag := (IndustryClass = ut.IndustryClass.UTILI_IC), 
+	/*wdog_perm := dx_BestRecords.fn_get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
+		utility_flag := false, 
 		filter_exp_flag := ~experian_permitted, 
-		pre_glb_flag := (DataRestriction[23] = '1'));
+		pre_glb_flag := (DataRestriction[23] = '1'));*/
+	wdog_perm := if(ut.glb_ok(GLB_Purpose), 
+							 if(experian_permitted, 
+								if(IndustryClass = ut.IndustryClass.UTILI_IC,
+									dx_BestRecords.Constants.perm_type.glb_nonutil,
+									dx_BestRecords.Constants.perm_type.glb),
+								 
+								dx_BestRecords.Constants.perm_type.glb_nonexperian ),
+											 
+							 // if glb isn't ok, use the nonglb key	 
+							 if(DataRestriction[23] = '1',
+									dx_BestRecords.Constants.perm_type.nonglb_v2,
+									dx_BestRecords.Constants.perm_type.nonglb));
 
 	best_recs := dx_BestRecords.fn_get_best_records(deduped_dids, did, wdog_perm);
 

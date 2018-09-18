@@ -42,6 +42,7 @@ export fn_get_best_records(did_ds, did_field, permission_type) := functionmacro
 		permission_type = dx_BestRecords.Constants.perm_type.marketing => out_marketing, 
 		permission_type = dx_BestRecords.Constants.perm_type.marketing_preglb => out_marketing_preglb, 
 		permission_type = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr);
+		out_glb);
 
 	return br_output;
 
