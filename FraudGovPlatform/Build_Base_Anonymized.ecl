@@ -1,8 +1,10 @@
-﻿import FraudShared, Anonymizer, Address,Std;
-EXPORT Anonymize (
-   dataset(FraudShared.Layouts.Base.Main) pBaseFile
+﻿import FraudShared, Anonymizer, Address,Std,tools;
+export Build_Base_Anonymized (
+   string pversion,
+   dataset(FraudShared.Layouts.Base.Main)  pBaseFile   = FraudShared.Files().Base.Main.Built
 ) := 
-function 
+module 
+
 	nodes				:= thorlib.nodes();	
 
 	Sources_To_Anonymize := Files().Input.SourcesToAnonymize.Sprayed;
@@ -77,8 +79,13 @@ function
 										transform(FraudShared.Layouts.Base.Main, self := left;),
 										left only);
 	
-	new_base := Base_Anonymized + Original_Data;
+	Shared new_base := Base_Anonymized + Original_Data;
 
+	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,new_base,Build_Base_File_Anonymized);
 
-	return new_base;
-End;
+	export All :=
+	if(tools.fun_IsValidVersion(pversion)
+		,Build_Base_File_Anonymized
+		,output('No Valid version parameter passed, skipping Build_Base_Anonymized atribute')
+	);
+end;

@@ -112,7 +112,7 @@ module
 		export kel_entity_scorebreakdown				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown'),pversion);
 		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
-		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main'),pversion);
+		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_Anon'),pversion);
 
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
