@@ -4,7 +4,7 @@ EXPORT Functions := MODULE
 
 
   //********************************************************************************
-	//fn_bdid:  returns true if is a 1 to 9 digit numeric value, else returns false
+	//fn_bdid:  returns true if is a 1 to 10 digit numeric value, else returns false
 	//********************************************************************************
 	EXPORT fn_bdid(STRING s) := function    
 	  RETURN IF(LENGTH(s) in [1,2,3,4,5,6,7,8,9,10] AND Stringlib.StringFilterOut(s, '0123456789') = '', 1, 0);
