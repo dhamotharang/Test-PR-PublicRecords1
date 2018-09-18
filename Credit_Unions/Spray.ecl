@@ -1,12 +1,12 @@
-import tools, _control;
+﻿import tools, _control;
 
 export Spray(
 
 	 string		pversion			= ''
-	,string		pServerIP			= _control.IPAddress.edata10
+	,string		pServerIP			= _control.IPAddress.bctlpedata10
 	,string		pDirectory		= '/data_build_5_2/credit_union/data'
 	,string		pFilename			= '*txt'
-	,string		pGroupName		= _Constants().groupname																		
+	,string		pGroupName		= _Constants().groupname	
 	,boolean	pIsTesting		= false
 	,boolean	pOverwrite		= false
 	,boolean	pExistSprayed	= _Flags.ExistCurrentSprayed
@@ -24,7 +24,7 @@ function
 	 	,Filenames().input.Template
 	 	,[ {Filenames().input.sprayed	}	]
 	 	,pGroupName
-		,''
+		,pversion
 		,'[0-9]{8}'
 		,'VARIABLE'
 		,''
