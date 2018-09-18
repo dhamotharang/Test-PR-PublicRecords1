@@ -1,9 +1,28 @@
-
-import versioncontrol, _control, ut, tools, RoxieKeyBuild;
+﻿
+import versioncontrol, _control, ut, tools, RoxieKeyBuild,dops,DOPSGrowthCheck;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_lt  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).lt);
 spray_pd  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).pd);
+
+GetDops:=dops.GetDeployedDatasets('P','B','F');
+OnlyThrive:=GetDops(datasetname='FCRA_ThriveKeys');
+
+father_filedate := OnlyThrive[1].buildversion;
+
+set of string Key_Thrive_InputSet:=['did','src','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','bdid','bdid_score','did_score','orig_fname','orig_mname','orig_lname','orig_addr','orig_city','orig_state','orig_zip5','orig_zip4','email','employer','income','pay_frequency','phone_work','phone_home','phone_cell','dob','monthsemployed','own_home','is_military','drvlic_state','monthsatbank','ip','yrsthere','besttime','credit','loanamt','loantype','ratetype','mortrate','ltv','propertytype','datecollected','title','fname','mname','lname','name_suffix','nid','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_st','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','rawaid','aceaid','clean_phone_work','clean_phone_home','clean_phone_cell','clean_dob'];
+
+
+CalculateStatsResults   :=  DOPSGrowthCheck.CalculateStats('FCRA_ThriveKeys','Thrive.Keys(pversion).Did_fcra.New','Key_Thrive','~thor_data400::key::thrive::fcra::' + pversion + '::did','did','persistent_record_id','','','','',pversion,father_filedate);	
+
+DeltaCommandResults     :=  DOPSGrowthCheck.DeltaCommand('~thor_data400::key::thrive::fcra::' + pversion + '::did','~thor_data400::key::thrive::fcra::' + father_filedate + '::did','FCRA_ThriveKeys','Key_Thrive','Thrive.Keys(pversion).Did_fcra.New','persistent_record_id',pversion,father_filedate,['persistent_record_id']);
+
+ChangesByFieldResults   :=  DOPSGrowthCheck.ChangesByField('~thor_data400::key::thrive::fcra::' + pversion + '::did','~thor_data400::key::thrive::fcra::' + father_filedate + '::did','FCRA_ThriveKeys','Key_Thrive','Thrive.Keys(pversion).Did_fcra.New','persistent_record_id','',pversion,father_filedate);
+
+PersistenceCheckResults :=  DopsGrowthCheck.PersistenceCheck('~thor_data400::key::thrive::fcra::' + pversion + '::did','~thor_data400::key::thrive::fcra::' + father_filedate + '::did','FCRA_ThriveKeys','Key_Thrive','Thrive.Keys(pversion).Did_fcra.New','persistent_record_id',Key_Thrive_InputSet,Key_Thrive_InputSet,pversion,father_filedate);
+
+
+DeltaCommands:=sequential(CalculateStatsResults,DeltaCommandResults,ChangesByFieldResults,PersistenceCheckResults);
 
 dops_update  := sequential(RoxieKeybuild.updateversion('ThriveKeys',pversion,'angela.herzberg@lexisneis.com; Melanie.Jackson@lexisnexis.com',,'N'));
 
@@ -22,6 +41,7 @@ built := sequential(
 					,FileServices.ClearSuperFile(Filenames(pversion,pUseProd).lInputPdTemplate)
 					,FileServices.FinishSuperFileTransaction()
 					,dops_update
+					,DeltaCommands
 				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 
 );
