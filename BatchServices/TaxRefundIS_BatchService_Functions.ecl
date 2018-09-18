@@ -1,4 +1,4 @@
-import Autokey_batch, Address, AddrBest, AutoStandardI, 
+﻿import Autokey_batch, Address, AddrBest, AutoStandardI, 
 Didville, CriminalRecords_BatchService, risk_indicators, riskwise,
 ut, iesp, NID, BatchShare, Models, STD, gateway, BatchServices;
 
@@ -716,8 +716,9 @@ export callFraudPoint2(unsigned1 GLBPurpose,unsigned1 DPPAPurpose,string DataRes
 					export boolean   usedobFilter      	:= false ;
 					export integer2  dobradius         	:= 2 ;
 					export unsigned1 RedFlag_version   	:= 0 ;
-					export string DataRestriction    	:= DataRestrictionMask; // 0000000000000000000 to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
-					export string DataPermission    	:= DataPermissionMask; 
+					export string DataRestriction       := DataRestrictionMask; // 0000000000000000000 to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
+					export string DataPermission        := DataPermissionMask; 
+          export boolean doParo_attrs         := false;
 		end;
 
 		// No gateways required
