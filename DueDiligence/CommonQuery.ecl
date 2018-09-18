@@ -44,6 +44,7 @@ EXPORT CommonQuery := MODULE
 																					SELF.phone := TRIM(personInfo.phone);
 																					SELF.ssn := TRIM(personInfo.ssn);
 																					SELF.accountNumber := TRIM(acctNo);
+                                          SELF.dob := (INTFORMAT(personInfo.dob.Year, 4, 1) + INTFORMAT(personInfo.dob.Month, 2, 1) + INTFORMAT(personInfo.dob.Day, 2, 1));
 																					SELF := [];)]);
 				#else
 						ind_in := DATASET([], DueDiligence.Layouts.Indv_Input);
