@@ -1,9 +1,10 @@
-import ut, header, mdr, census_data, Infutor;
+import ut, header, mdr, census_data, Infutor, doxie;
 
 export us_search :=
 FUNCTION
 
-doxie.mac_header_field_declare()
+doxie.mac_header_field_declare();
+mod_access := doxie.functions.GetGlobalDataAccessModule ();
 
 d := IF(reduced_data_value,GROUP(header_references(false), did));
 
@@ -24,7 +25,9 @@ doxie.layout_header_records %take%(d le, key_hp ri) := transform
 	self.src := ri.src;
 
 	// for efficiency, we know only non_glb
-	self.did := IF(ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src),ri.did,SKIP);
+//	self.did := IF(ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src),ri.did,SKIP);
+  pre_glb := mod_access.isHeaderPreGLB ((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src);
+	self.did := IF(pre_glb,ri.did,SKIP);
 	
 	SELF.dt_first_seen := ri.dt_first_seen;
 	SELF.dt_last_seen := ri.dt_last_seen;
@@ -58,9 +61,9 @@ ENDMACRO;
 
 usHeaderPretty_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out1)
 usHeaderPretty_MACRO(doxie.key_header,hdr_out1)
-us_headerPretty := if(industry_class_value ='CNSMR',infr_out1,hdr_out1);
+us_headerPretty := if(mod_access.industry_class ='CNSMR',infr_out1,hdr_out1);
 
-header.MAC_GlbClean_Header(us_headerPretty,headerCleaned);
+header.MAC_GlbClean_Header(us_headerPretty,headerCleaned, , , mod_access);
 
 // check we don't have too many records
 presRecs := limit(headerCleaned,10000,FAIL(11, doxie.ErrorCodes(11)));

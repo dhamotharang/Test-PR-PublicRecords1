@@ -71,9 +71,12 @@ MODULE
 	// Best info
 	EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
 	FUNCTION
+
+	  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+
 		dids := DEDUP(SORT(PROJECT(dIn,doxie.layout_references),did),did);
 		
-		dBestRecs := Doxie.best_records(dids,includeDOD:=true);
+		dBestRecs := Doxie.best_records(dids, includeDOD:=true, modAccess := mod_access);
 		
 		lBatchInDID tGetBestInfo(dIn le,dBestRecs ri) :=
 		TRANSFORM

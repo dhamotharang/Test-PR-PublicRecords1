@@ -20,8 +20,8 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
 	unsigned1	DPPA_Purpose,
 	boolean		probation_override_value, // for MAC_GlbClean_Header
 	boolean		no_scrub, // for MAC_GlbClean_Header
-	boolean		glb_ok,
-	boolean		dppa_ok,
+	boolean		glb_ok, //not used, delete, if refactoring
+	boolean		dppa_ok,  //not used, delete, if refactoring
 	string6		ssn_mask,
 	boolean   use_Max_Nbrhoods = true,
 	boolean   switch_Targetseq = true,
@@ -29,25 +29,29 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
 	boolean checkRNA = true
 ) := FUNCTION
 
-	// ================================================= generate candidate neighbors
+  //get missing access parameters from global
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT unsigned1 glb := GLB_Purpose;
+    EXPORT unsigned1 dppa := DPPA_Purpose;
+    EXPORT boolean probation_override := probation_override_value;
+    EXPORT string5 industry_class := industry_class_value;
+    EXPORT boolean no_scrub := ^.no_scrub;
+    EXPORT string ssn_mask := ^.ssn_mask;
+  END;  
+  
+  	// ================================================= generate candidate neighbors
 	cn_raw := doxie.nbr_records_cn(targetHR, proximity_radius, 
-	industry_class_value, // for MAC_GlbClean_Header
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value, // for MAC_GlbClean_Header
-	no_scrub, 								// for MAC_GlbC
-	glb_OK,
-	dppa_ok,
 	checkRNA,
 	mode,
-	Neighbor_Recency);
+	Neighbor_Recency,
+	mod_access);
 	// OUTPUT(cn_raw, named('cn_raw')); // DEBUG
 	
 	// process candidates for privacy -- this may SKIP records so it needs
 	// to be done before we get into selection and sequencing down below
 	//header.MAC_GlbClean_Header(cn_raw, cn_glb);
-	ssn_mask_value := ssn_mask;
-	suppress.MAC_Mask(cn_raw, cn, ssn, foo, true, false,, true);
+//	ssn_mask_value := mod_access.ssn_mask;
+	suppress.MAC_Mask(cn_raw, cn, ssn, foo, true, false,, true, , mod_access.ssn_mask);
 	// OUTPUT(cn, named('cn')); // DEBUG
 
 

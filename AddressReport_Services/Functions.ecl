@@ -602,6 +602,19 @@ end;
 
 export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_recs,
 											AddressReport_Services.input.params in_param) := function
+
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := in_param.glbPurpose;
+    EXPORT unsigned1 dppa := in_param.dppaPurpose;
+    EXPORT string DataPermissionMask := in_param.DataPermissionMask;
+    EXPORT string DataRestrictionMask := in_param.DataRestrictionMask;
+    EXPORT boolean ln_branded := in_param.lnbranded;
+    EXPORT string5 industry_class := in_param.industryclass;
+    EXPORT string32 application_type := in_param.applicationType;
+    EXPORT boolean no_scrub := in_param.raw;
+		EXPORT boolean show_minors := in_param.IncludeMinors OR (in_param.glbPurpose = 2);
+  END;
+
 	owner_key := LN_PropertyV2.key_ownership.addr();
 	id_rec1 := join(in_recs, owner_key,
 									keyed(left.prim_range = right.prim_range) and 
@@ -661,7 +674,9 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
 																self := left,
 																self.addr_dt_last_seen := (integer)left.dt_last_seen,
 																self := []));
-	ppl_rec	:= project(doxie.best_records(did_rec, , in_param.DPPAPurpose, in_param.GLBPurpose, false, false, , , true,checkRNA:=true, includeDOD:=true),
+
+//	ppl_rec	:= project(doxie.best_records(did_rec, , in_param.DPPAPurpose, in_param.GLBPurpose, false, false, , , true,checkRNA:=true, includeDOD:=true),
+	ppl_rec	:= project(doxie.best_records(did_rec, false, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access),
 											transform(AddressReport_Services.Layouts.possible_owner_layout,
 																self := left,
 																self := []));

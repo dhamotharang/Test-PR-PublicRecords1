@@ -5,7 +5,10 @@ unsigned1 MaxNames := 10 : stored('MaxNames');
 unsigned1 MaxAddr  := 10 : stored('MaxAddresses');
 unsigned1 MaxRecsPer  := 50 : stored('MaxRecordsPerCandidate');
 
-doxie.MAC_Header_Field_Declare()
+// doxie.MAC_Header_Field_Declare()
+mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+glb_ok := mod_access.isValidGLB ();
+dppa_ok := mod_access.isValidDPPA ();
 
 // nofold is added as a workaround and better be removed after HPCC-13292 is fixed
 ds := group(limit(NOFOLD(doxie.Get_Dids()),MaxCands,FAIL('Too Many Candidates - Query Aborted')),did,all);
@@ -16,7 +19,7 @@ header.layout_header take_right(doxie.key_header le) := transform
 
 t_data1 := JOIN(ds,doxie.key_header,left.did=right.s_did,take_right(right));
 
-header.MAC_GlbClean_Header(t_data1,t_data);
+header.MAC_GlbClean_Header(t_data1,t_data, , , mod_access);
 
 name_rec := record
   t_data.did;

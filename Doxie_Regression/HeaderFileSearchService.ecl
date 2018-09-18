@@ -42,11 +42,12 @@
 */
 /*--INFO-- This service searches the header file.*/
 import doxie,ut,suppress;
-export HeaderFileSearchService := MACRO
+export HeaderFileSearchService () := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #option('workflow', 0);
 unsigned4 StartTick := doxie_regression.TimeService.Ticks() : stored('StartTick');
-doxie.MAC_Header_Field_Declare()
+doxie.MAC_Header_Field_Declare() //MaxResults_val, SkipRecords_val, MaxResultsThisTime_val, did_only
+mod_access := doxie.functions.GetGlobalDataAccessModule ();
 
 unsigned4 rec_id := 0 : stored('recid');
 
@@ -65,10 +66,10 @@ PrettyLayout := record
   outf.dppa;
   unsigned4 first_seen := MAP ( outf.dt_first_seen > 0 and ( outf.dt_first_seen < outf.dt_vendor_first_reported or outf.dt_vendor_first_reported=0 )=> outf.dt_first_seen,
            outf.dt_vendor_first_reported > 0 => outf.dt_vendor_first_reported,
-		   ~glb_ok => outf.dt_nonglb_last_seen,
+		   ~mod_access.isValidGLB () => outf.dt_nonglb_last_seen,
            outf.dt_vendor_last_reported > 0 and outf.dt_vendor_last_reported < outf.dt_last_seen => outf.dt_vendor_last_reported,
            outf.dt_last_seen );
-  unsigned4 last_seen := MAP( ~glb_ok=>outf.dt_nonglb_last_seen,
+  unsigned4 last_seen := MAP( ~mod_access.isValidGLB ()=>outf.dt_nonglb_last_seen,
                               outf.dt_last_seen<>0 => outf.dt_last_seen,
 							  outf.dt_vendor_last_reported);
   outf.fname;
@@ -118,7 +119,7 @@ PrettyLayout := record
 ta2 := table(outf,PrettyLayout);
 
 ta2_dids := dedup(project(ta2, doxie.layout_references),all);
-ta2_best := doxie.best_records(ta2_dids);
+ta2_best := doxie.best_records(ta2_dids, modAccess := mod_access);
 
 PrettyLayout add_value(ta2 le, ta2_best ri) := transform
   self.dob := if (le.dob=0,ri.dob,le.dob);
@@ -130,8 +131,8 @@ PrettyLayout add_value(ta2 le, ta2_best ri) := transform
 
 jnd := join(ta2,ta2_best,left.did=right.did,add_value(left,right),left outer);
 
-ta3_pre := if( no_scrub, ta2, jnd );// Below replaces this filter (ssn NOT IN doxie.pullSSN);
-Suppress.MAC_Suppress(ta3_pre,ta3,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);
+ta3_pre := if( mod_access.no_scrub, ta2, jnd );// Below replaces this filter (ssn NOT IN doxie.pullSSN);
+Suppress.MAC_Suppress(ta3_pre,ta3,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 
 PrettyLayout add_lookups(ta3 le, doxie.Key_Did_Lookups ri) := transform
   self := ri;
@@ -168,7 +169,7 @@ END;
 debug_res := project(ta, addDebug(LEFT));
 
 MAP( did_only => output(DEDUP(table(doxie.header_records(), justdid), did)),
-     Raw_Records => output(outf),
+     mod_access.no_scrub => output(outf),
 	 output(debug_res, NAMED('Results')))
 
 ENDMACRO;

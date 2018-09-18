@@ -1,13 +1,23 @@
-import AutoStandardI,VehicleV2_Services,doxie,iesp;
+﻿import AutoStandardI,VehicleV2_Services,doxie,iesp;
 
 export Comp_RealTime_Vehicles (dataset(doxie.layout_references) dids,
 	dataset(Layout_Comp_Addresses) ds_addrs = dataset([],Layout_Comp_Addresses),
 	dataset(doxie.layout_NameDID) ds_names = dataset([],doxie.layout_NameDID)) := module
 
 shared  input_params := AutoStandardI.GlobalModule();
-shared	subj_Addrs := if(exists(ds_addrs),ds_addrs,doxie.Comp_Subject_Addresses(dids,,input_params.DPPApurpose,input_params.GLBpurpose,,,false,input_params.industryclass,,).addresses);
+//shared	subj_Addrs := if(exists(ds_addrs),ds_addrs,doxie.Comp_Subject_Addresses(dids,,input_params.DPPApurpose,input_params.GLBpurpose,,,false,input_params.industryclass,,).addresses);
+
+//TODO: not likely needed, but have to reset few values to be on the safe side:
+mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (input_params))
+                EXPORT unsigned3 date_threshold := 0;
+                EXPORT boolean ln_branded := FALSE;
+                EXPORT boolean probation_override := FALSE;
+              END;
+ 
+shared comp_subj := doxie.Comp_Subject_Addresses(dids, mod_access := mod_access);
+subj_Addrs := if(exists(ds_addrs),ds_addrs,comp_subj.addresses);
 shared	Addrs := topn(subj_addrs,2,-dt_last_seen);
-shared	Names := if(exists(ds_names),ds_names,topn(doxie.Comp_Subject_Addresses(dids,,input_params.DPPApurpose,input_params.GLBpurpose,,,false,input_params.industryclass,,).names,1,-name_occurences));
+shared	Names := if(exists(ds_names),ds_names,topn(comp_subj.names,1,-name_occurences));
 
 export load_module(string10 prim_range,string2 predir,string28 prim_name,string4 suffix,
 			    		string2 postdir,string8 sec_range,string25 city_name,string2 st,string5 zip) := function

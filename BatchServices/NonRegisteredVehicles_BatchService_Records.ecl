@@ -225,8 +225,11 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
 
   // 3. Check/clean the header records that were acquired.
-  doxie.MAC_Header_Field_Declare(); //needed for use by Header.MAC_GlbClean_Header & below
-	Header.MAC_GlbClean_Header(ds_hdr_recs_match_input,ds_hdr_recs_outglbclean);
+//  doxie.MAC_Header_Field_Declare(); //needed for use by Header.MAC_GlbClean_Header & below
+	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+  glb_ok :=  mod_access.isValidGLB ();
+  dppa_ok := mod_access.isValidDPPA ();
+	Header.MAC_GlbClean_Header(ds_hdr_recs_match_input,ds_hdr_recs_outglbclean, , , mod_access);
 
 
   // 4. Check header records to see if they are within the requested timeframe.
@@ -298,11 +301,12 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
 	// 5.2 Get the "Best" name,address,SSN info for each did.
 	ds_best_info_for_dids := doxie.best_records(ds_dids_projctd_dlr,
-																							DPPA_override := DPPA_Purpose,
-																							GLB_override  := GLB_Purpose,
+																							// DPPA_override := DPPA_Purpose,
+																							// GLB_override  := GLB_Purpose,
 																							doSuppress    := false,
 																							include_minors:= IncludeMinors,
-																							getSSNBest    := GetSSNBest
+																							getSSNBest    := GetSSNBest,
+																							modAccess := mod_access
 																						 );
 	addrBest_recs := BatchServices.NonRegisteredVehicles_BatchService_Functions.getRankedAddrBest(ds_best_info_for_dids);
 
@@ -368,9 +372,9 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 														);
 
   // 5.4 DID & SSN pulling/suppression and SSN masking.
-	Suppress.MAC_Suppress(ds_hdr_recs_wbest_raw,ds_hrwbr_pulled_dids,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Suppress(ds_hrwbr_pulled_dids,ds_hrwbr_pulled_ssns,application_type_value,Suppress.Constants.LinkTypes.SSN,occupant_ssn);
-	Suppress.MAC_Mask(ds_hrwbr_pulled_ssns,ds_hdr_recs_wbest,occupant_ssn,'',true, false,,,,ssn_mask_value);
+	Suppress.MAC_Suppress(ds_hdr_recs_wbest_raw,ds_hrwbr_pulled_dids,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(ds_hrwbr_pulled_dids,ds_hrwbr_pulled_ssns,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,occupant_ssn);
+	Suppress.MAC_Mask(ds_hrwbr_pulled_ssns,ds_hdr_recs_wbest,occupant_ssn,'',true, false,,,,mod_access.ssn_mask);
 
 
   // 6. Get in-house MVR data if requested.
@@ -410,9 +414,10 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 	// 6.4.2 Filter to check if the data is ok to use depending upon dppa_purpose, state_origin, etc.
 	//       NOTE: This coding was cloned from VehicleV2_Services.Functions.Get_VehicleSearch
 	//       and modified for use here.
-  dppa_purpose_x := DPPA_Purpose; // from doxie.MAC_Header_Field_Declare()
+  //dppa_purpose_x := DPPA_Purpose; // from doxie.MAC_Header_Field_Declare()
   ds_ihmvrs_vin_data_ok := ds_ihmvrs_vin_data(
-	            ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) and 
+//	            ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) and 
+							mod_access.isValidDPPAState (state_origin, , source_code) and
 							(includeNonRegulatedSources or source_code not in [MDR.sourceTools.src_infutor_veh,MDR.sourceTools.src_infutor_motorcycle_veh]));
  
   // 6.4.3 Join the dataset of all the vehicle/iteration/sequence keys for all the dids 

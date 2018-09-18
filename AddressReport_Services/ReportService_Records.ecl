@@ -59,26 +59,48 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	IF(COUNT(dedup(sort(recs,DID),DID))>MAX(AddressReport_Services.constants.MaxResidents,AddressReport_Services.constants.MaxProperties),FAIL(203,doxie.ErrorCodes(203)));
 	headerRecs 								:= project(recs, TRANSFORM(header.Layout_Header,self:=left,self:=[]));			 
-	no_scrub 									:= param.no_scrub;
-	glb_purpose 							:= param.glbPurpose;				
-	dppa_purpose 							:= param.dppapurpose;
-	industry_class_value 			:= param.industryclass;
-	probation_override_value	:= param.probationoverride;
-	glb_ok 										:= param.glb_ok;
-	dppa_ok 									:= param.dppa_ok;
+	//no_scrub 									:= param.no_scrub;
+	//glb_purpose 							:= param.glbPurpose;				
+	//dppa_purpose 							:= param.dppapurpose;
+	//industry_class_value 			:= param.industryclass;
+	//probation_override_value	:= param.probationoverride;
+//	glb_ok 										:= param.glb_ok; // can't take it from mod_access below, since I'm not sure how they were calculated
+//	dppa_ok 									:= param.dppa_ok;
+	// (in fact, they are taken from the input, so I can take them from mod_access)
 
-	Header.MAC_GlbClean_Header(headerRecs,Res_final);
+  //Some values are not provided in the input module; until that, has to make this call:
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT unsigned1 glb := param.glbPurpose;
+    EXPORT unsigned1 dppa := param.dppapurpose;
+    EXPORT string DataPermissionMask := param.DataPermissionMask;
+    EXPORT string DataRestrictionMask := param.DataRestrictionMask;
+    EXPORT boolean ln_branded := param.lnbranded;
+    EXPORT boolean probation_override := param.probationoverride;
+    EXPORT string5 industry_class := param.industryclass;
+    EXPORT string32 application_type := param.applicationType;
+    EXPORT boolean no_scrub := param.no_scrub;
+    EXPORT unsigned3 date_threshold := param.dateval;
+    EXPORT string ssn_mask := param.ssn_mask;
+  END;
+
+  glb_ok :=  mod_access.isValidGLB ();
+  dppa_ok := mod_access.isValidDPPA ();
+
+	Header.MAC_GlbClean_Header(headerRecs,Res_final, , , mod_access);
 	Res_recs_dedup		:= dedup(sort(Res_final,did, -dt_last_seen),did);
 	dids							:= project(Res_recs_dedup,doxie.layout_references);
 
 	//***************************************
-	Residents_all		:= doxie.best_records(dids, , dppa_purpose, glb_purpose, true, IsFCRA, , , true,, includeDOD:=true);
-											
-	perm_mod 				:= project(param,AutoStandardI.PermissionI_Tools.params);
-	AutoStandardI.PermissionI_Tools.val(perm_mod).GLB.mac_FilterOutMinors(Residents_all,Residents_Filtered,,perm_mod, dob);
 
-	Suppress.MAC_Suppress(Residents_Filtered,Residents_Filt_did,param.applicationType,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Suppress(Residents_Filt_did,Residents_Filt_did_ssn,param.applicationType,Suppress.Constants.LinkTypes.SSN,ssn);
+	//Residents_all		:= doxie.best_records(dids, , dppa_purpose, glb_purpose, true, IsFCRA, , , true,, includeDOD:=true);
+	Residents_all		:= doxie.best_records(dids, IsFCRA, , , true, , includeDOD:=true, modAccess := mod_access);
+
+	// perm_mod 				:= project(param,AutoStandardI.PermissionI_Tools.params);
+	// AutoStandardI.PermissionI_Tools.val(perm_mod).GLB.mac_FilterOutMinors(Residents_all,Residents_Filtered,,perm_mod, dob);
+  Residents_Filtered := doxie.functions.MAC_FilterOutMinors (Residents_all, , dob, mod_access.show_minors);
+
+	Suppress.MAC_Suppress(Residents_Filtered,Residents_Filt_did,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(Residents_Filt_did,Residents_Filt_did_ssn,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 
 	Residents				:= Residents_Filt_did_ssn;//Residents_Filtered;
 	Residents_final	:= choosen(sort(Residents,-addr_dt_last_seen),AddressReport_Services.constants.MaxResidents);
@@ -87,7 +109,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	Res_prior				:= AddressReport_Services.split_Residents(Residents_final,res_input,param).priorResidents;
 	cur_dids				:= project(Res_cur0, doxie.layout_references);
 	lj_IDs 					:= liensv2_services.Autokey_ids(,true,false,false, false);
-	LiensJudgments	:= LiensV2_Services.liens_raw.report_view.by_tmsid(project(lj_IDs,liensv2_services.layout_tmsid),param.ssn_mask,,,,,param.applicationType);
+	LiensJudgments	:= LiensV2_Services.liens_raw.report_view.by_tmsid(project(lj_IDs,liensv2_services.layout_tmsid),mod_access.ssn_mask,,,,,mod_access.application_type);
 	veh_ids_for_addr := VehicleV2_Services.autokey_ids(false,true,true);
 	vehicles 				:= if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(veh_ids_for_addr));
 																
@@ -96,7 +118,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																													dataset([],bankruptcyv2_services.layout_tmsid_ext),
 																													dataset([],BIPV2.IDlayouts.l_xlink_ids),,
 																													0);
-	Bankruptcies_all:= Doxie_Raw.bk_legacy_raw(,,bk_ids,,param.ssn_mask,'D');
+	Bankruptcies_all:= Doxie_Raw.bk_legacy_raw(,,bk_ids,,mod_access.ssn_mask,'D');
 																
 	dl_in_seq				:= DriversV2_Services.autokey_ids(,true,true);
 	dl_IDs1					:= project(dl_in_seq,DriversV2_Services.layouts.seq);
@@ -140,13 +162,13 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																					if(param.LocationReport, AddressReport_Services.constants.Neighbors_Per_NA, AddressReport_Services.constants.MaxNeighbors),
 																					if(param.LocationReport, AddressReport_Services.constants.NeighborRecency, AddressReport_Services.constants.MaxNeighbors),
 																					'',
-																					param.glbpurpose,
-																					param.DPPAPurpose,
+																					mod_access.glb,
+																					mod_access.dppa,
 																					false,
 																					true,
-																					param.glb_ok,
-																					param.dppa_ok,
-																					param.ssn_mask,
+																					glb_ok,
+																					dppa_ok,
+																					mod_access.ssn_mask,
 																					true,
 																					true,
 																					AddressReport_Services.constants.MaxProximity,
@@ -161,8 +183,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	
 	//Neighbors
 	nbr_dids 				:= project(Neighbors_recs, doxie.layout_references);
-	nbr_best				:= doxie.best_records(nbr_dids, , param.DPPAPurpose, param.GLBPurpose, false, IsFCRA, , , true,checkRNA:=true, includeDOD:=true)(dod = '');
-
+	nbr_best				:= doxie.best_records(nbr_dids, IsFCRA, , , true,checkRNA:=true, includeDOD:=true, modAccess := mod_access)(dod = '');
+	
 	//Current Residents and Neighbor dids
 	all_dids				:= cur_dids & nbr_dids;
 
@@ -283,7 +305,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	nbr_crim_recs		:= join(nbr_dids, crim_recs, left.did = (unsigned)right.UniqueId, transform(right));
 
 	//Sex Offenders - Residents and Neighbors
-	so_recs 				:= AddressReport_Services.functions.fSexOffenderRecords(all_dids, param.ApplicationType);
+	so_recs 				:= AddressReport_Services.functions.fSexOffenderRecords(all_dids, mod_access.application_type);
 	res_so_recs			:= join(cur_dids, so_recs, left.did = (unsigned)right.UniqueId, transform(iesp.sexualoffender.t_OffenderRecord, self := right)); // layout transformed- FFD FCRA
 	nbr_so_recs			:= join(nbr_dids, so_recs, left.did = (unsigned)right.UniqueId, transform(right));
 
@@ -295,7 +317,9 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	//Relatives and Associates
 	ra_recs 				:= doxie.relative_dids(cur_dids);
 	ra_dids					:= dedup(sort(project(ra_recs, transform(doxie.layout_references, self.did := left.person2)), did), did);
-	ra_best					:= doxie.best_records(ra_dids, , dppa_purpose, glb_purpose, false, IsFCRA, , , true,checkRNA:=true, includeDOD:=true)(dod = '');
+//	ra_best					:= doxie.best_records(ra_dids, , dppa_purpose, glb_purpose, false, IsFCRA, , , true,checkRNA:=true, includeDOD:=true)(dod = '');
+	ra_best					:= doxie.best_records(ra_dids, IsFCRA, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access)(dod = '');
+
 	relr						:= join(ra_recs(isRelative), ra_best, left.person2 = right.did, transform(AddressReport_Services.Layouts.rel_asst_layout, self := left, self := right));
 	assr						:= join(ra_recs(~isRelative), ra_best, left.person2 = right.did, transform(AddressReport_Services.Layouts.rel_asst_layout, self := left, self := right));
 		

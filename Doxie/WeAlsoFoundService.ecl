@@ -44,6 +44,7 @@ EXPORT WeAlsoFoundService := MACRO
   IF (Err, FAIL (11, doxie.ErrorCodes (11)));
 
   doxie.MAC_Header_Field_Declare(); // read glb, dppa
+  mod_access := doxie.functions.GetGlobalDataAccessModule ();
 
   // slim down to required fields
   slim_rec := RECORD
@@ -66,10 +67,11 @@ EXPORT WeAlsoFoundService := MACRO
 		doxie.layout_lookups.xcount.accident_count;
   END;
 
-  best_recs := doxie.best_records(dids,,dppa_purpose,glb_purpose,,,,false,true); 
+//  best_recs := doxie.best_records(dids,,dppa_purpose,glb_purpose,,,,false,true); 
+  best_recs := doxie.best_records(dids, doTimeZone := FALSE, useNonBlankKey := TRUE, modAccess := mod_access); 
   dids_adjust := join(dids,best_recs,left.did = right.did, transform (slim_rec, Self := Left, self := right, Self := []));
 
-  doxie.MAC_Add_WeAlsoFound (dids_adjust, res, GLB_Purpose, DPPA_Purpose, false);  // false: do not convert into string
+  doxie.MAC_Add_WeAlsoFound (dids_adjust, res, mod_access.glb, mod_access.dppa, false);  // false: do not convert into string
 
   IF (~ERR, OUTPUT (count (res), NAMED ('RecordsAvailable')));
   IF (~Err, OUTPUT (res, NAMED ('Results')));

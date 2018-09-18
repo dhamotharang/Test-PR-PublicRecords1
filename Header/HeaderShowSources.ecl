@@ -13,14 +13,28 @@ export HeaderShowSources(
 		boolean IncludeNonRegulatedWatercraftSources = false
 ) := FUNCTION
 
-boolean glb_ok := ut.glb_ok(glb_purpose);
-boolean dppa_ok := ut.dppa_ok(dppa_purpose);
+// canot use doxie.functions.GetGlobalDataAccessModule (); -- because of name conflicts
+mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  EXPORT unsigned1 glb := glb_purpose;
+  EXPORT unsigned1 dppa := dppa_purpose;
+  EXPORT string32 application_type := appType; //is it translated?
+  EXPORT unsigned3 datdate_threshold := dateVal;
+
+  // these are hardcoded for MAC_GlbClean_Header below; setting them here is a bit risky, since there's no guarantee
+  // that this module will be used in other calls, where values should be taken from global module, but this doesn't happen so far.
+  EXPORT boolean probation_override := FALSE;
+  EXPORT string5 industry_class := '';
+  EXPORT boolean no_scrub := FALSE;
+END;
+
+boolean glb_ok := mod_access.isValidGLB();
+boolean dppa_ok := mod_access.isValidDPPA();
 
 optionsMod := MODULE
-  EXPORT UNSIGNED1 GLBPurpose      := glb_purpose;
-  EXPORT UNSIGNED1 DPPAPurpose     := dppa_purpose;
-  EXPORT STRING32  ApplicationType := appType;
-  EXPORT UNSIGNED4 dateVal         := dateVal;
+  EXPORT UNSIGNED1 GLBPurpose      := mod_access.glb;
+  EXPORT UNSIGNED1 DPPAPurpose     := mod_access.dppa;
+  EXPORT STRING32  ApplicationType := mod_access.application_type;
+  EXPORT UNSIGNED4 dateVal         := mod_access.date_threshold;
   EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources    := IncludeNonRegulatedVehicleSources;
 	EXPORT BOOLEAN   IncludeNonRegulatedWatercraftSources := IncludeNonRegulatedWatercraftSources;
 END;
@@ -81,14 +95,20 @@ srcIDFromQHeader := join(withDIDFromQHeader,header.Key_Rid_SrcID(true,false),
 with_rid_all := srcIDFromHeader + srcIDFromQHeader;
 
 //filters for GLB, DPPA, headerSourceRestrictions
-with_rid_filtered := with_rid_all((glb_ok or ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
+// with_rid_filtered := with_rid_all((glb_ok or ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
+//                                    AND
+//                                    (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND ut.PermissionTools.dppa.state_ok(header.translateSource(src), dppa_purpose, src)))
+//                                    AND (NOT doxie.DataRestriction.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
+//                                   );
+with_rid_filtered := with_rid_all((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
                                    AND
-                                   (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND ut.PermissionTools.dppa.state_ok(header.translateSource(src), dppa_purpose, src)))
+                                   (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND 
+                                   mod_access.isValidDPPAState (header.translateSource(src), src)))
                                    AND (NOT doxie.DataRestriction.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
                                   );
 
 //pull records with restricted dids
-Suppress.MAC_Suppress(with_rid_filtered,with_rid,appType,Suppress.Constants.LinkTypes.DID,did);
+Suppress.MAC_Suppress(with_rid_filtered,with_rid,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
 
 // Separate header rids from quick header to do the join
 qhdr_rids := with_rid(rid >= Header.constants.QH_start_rid);
@@ -156,7 +176,7 @@ DEAV2_rid := IF ('DA' IN sources,
                         left.src='DA'and
                         keyed(left.uid=right.uid) and keyed(left.src=right.src),
                         transform(rid_rec,
-                                  self.dea_v2_child := Doxie_raw.DeaV2_Raw(,,PROJECT(right.dea_child,transform(Deav2_services.assorted_layouts.layout_search_IDs,self := left)),,,,appType),
+                                  self.dea_v2_child := Doxie_raw.DeaV2_Raw(,,PROJECT(right.dea_child,transform(Deav2_services.assorted_layouts.layout_search_IDs,self := left)),,,,mod_access.application_type),
                                   self := left),
                         left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                   DEA_rid);
@@ -338,10 +358,10 @@ end;
 
 hdr_rec := join(hdr_rid_all,doxie.Key_Header,keyed(left.did=right.s_did) and left.rid=right.rid,getheadall(right),LIMIT(ut.limits.HEADER_PER_DID,SKIP));
 
-string5 industry_class_value := '';
-boolean probation_override_value := false;
-boolean no_scrub := false;
-header.MAC_GlbClean_Header(hdr_rec,hdr_rec_cleaned);
+// string5 industry_class_value := '';
+// boolean probation_override_value := false;
+// boolean no_scrub := false;
+header.MAC_GlbClean_Header(hdr_rec,hdr_rec_cleaned, , , mod_access);
 ut.MAC_Slim_Back(hdr_rec_cleaned, doxie_raw.layout_header_raw, hdr_rec_ready);
 
 census_data.MAC_Fips2County_Keyed(hdr_rec_ready,st,county,county_name,hdr_rec_with_county_name);

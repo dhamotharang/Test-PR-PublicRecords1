@@ -1,14 +1,14 @@
 import doxie;
 
 doxie.MAC_Header_Field_Declare()
-string25	doc_val := '' : stored('DOCNumber');
-string2	doc_state := '' : stored('DOCState');
-string60	ofk_val := '' : stored('OffenderKey');
+// string25	doc_val := '' : stored('DOCNumber');
+// string2	doc_state := '' : stored('DOCState');
+// string60	ofk_val := '' : stored('OffenderKey');
 boolean 	report_reqd := false : stored('ReportReq');
 
-boolean off_reqd := report_reqd;
-boolean par_reqd := report_reqd;
-boolean pt_reqd  := report_reqd;
+// boolean off_reqd := report_reqd;
+// boolean par_reqd := report_reqd;
+// boolean pt_reqd  := report_reqd;
 boolean acts_reqd := report_reqd;
 
 //--------[ Fetch People and Events ]------------------

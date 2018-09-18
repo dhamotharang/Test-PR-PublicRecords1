@@ -2,12 +2,29 @@ IMPORT iesp, doxie_crs, Census_data, ut, Address, header, DidVille, doxie, Death
 
 EXPORT iesp.identitymanagementreport.t_IdmNeighborAddress NeighborsRecords(IdentityManagement_Services.IParam._report in_params, DATASET (doxie.layout_references) dids) := FUNCTION
 
+// some values are missing, take them from global:
+gmod := AutoStandardI.GlobalModule ();
+// ssn_mask has different type;
+// this is how I can project just selected values:
+mod_access := MODULE (PROJECT (in_params, doxie.IDataAccess, datapermissionmask, datarestrictionmask, ln_branded))
+  EXPORT unsigned1 glb := in_params.glbpurpose;
+  EXPORT unsigned1 dppa := in_params.dppapurpose;
+  EXPORT boolean probation_override := gmod.probationoverride;
+  EXPORT string5 industry_class := in_params.industryclass;
+  EXPORT string32 application_type := in_params.applicationtype;
+  EXPORT boolean no_scrub := gmod.raw;
+  EXPORT unsigned3 date_threshold := in_params.dateVal;
+  EXPORT boolean suppress_dmv := gmod.suppressDMVInfo;
+  EXPORT string ssn_mask := in_params.ssn_mask;
+  EXPORT unsigned1 dl_mask :=	gmod.dlmask;
+END;
 doxie_nbrs := doxie_crs.nbr_records(mode = 'C');
 nbr_dids := DEDUP(SORT(
 											PROJECT(UNGROUP(doxie_nbrs),TRANSFORM(doxie.layout_references, SELF.did := LEFT.did)),
 									did),did);
 
-best_akas := doxie.best_records (nbr_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, TRUE, , , , TRUE,header.constants.checkRNA);
+//best_akas := doxie.best_records (nbr_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, TRUE, , , , TRUE,header.constants.checkRNA);
+best_akas := doxie.best_records (nbr_dids, , , , TRUE, header.constants.checkRNA, modAccess := mod_access);
 
 subject_ssn_ds:= JOIN(dids, DidVille.key_did_ssn, KEYED(LEFT.did = RIGHT.did),
 											LIMIT(0), KEEP(IdentityManagement_Services.Constants.MaxSSNperDID));
@@ -36,7 +53,7 @@ iesp.identitymanagementreport.t_IdmIdentity GetDead (iesp.identitymanagementrepo
 	SELF := L; // copy about 25 fields
 END;
 
-rna_glb_ok := ut.glb_ok(in_params.GLBPurpose, header.constants.checkRNA);
+rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
 death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
 nbrs_correct_age := JOIN (fill_identities, doxie.key_death_masterV2_ssa_DID, 

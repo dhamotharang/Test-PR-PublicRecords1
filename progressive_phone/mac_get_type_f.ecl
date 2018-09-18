@@ -1,4 +1,5 @@
-export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, data_restriction_mask='', sx_match_restriction_limit) := macro
+//export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, data_restriction_mask='', sx_match_restriction_limit) := macro
+export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, sx_match_restriction_limit, modAccess) := macro
 
 import gong, progressive_phone, NID, ut, STD, watchdog;
 
@@ -18,7 +19,7 @@ import gong, progressive_phone, NID, ut, STD, watchdog;
 %best_city_st_name_key%	:=	watchdog.Key_Best_Name_City_State;
 
 #uniquename(blue_recs)
-progressive_phone.mac_get_blue(f_f_did, %blue_recs%, false, false, false, data_restriction_mask)
+progressive_phone.mac_get_blue(f_f_did, %blue_recs%, false, false, false, modAccess)
 
 #uniquename(f_six_months)
 %f_six_months% := %blue_recs%(src<>'' and ut.DaysApart(StringLib.GetDateYYYYMMDD(),(string6)dt_last_seen + '15')<=180

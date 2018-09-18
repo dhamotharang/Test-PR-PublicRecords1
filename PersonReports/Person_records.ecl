@@ -12,24 +12,38 @@ EXPORT Person_records (
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
 
+// Get values missing from the input from global.
+// Can't project from {input} because of different type of ssn_mask (string vs. string6);
+shared mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  EXPORT unsigned1 glb := in_params.GLBPurpose;
+  EXPORT unsigned1 dppa := in_params.DPPAPurpose;
+  EXPORT string DataPermissionMask := in_params.DataPermissionMask;
+  EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
+  EXPORT boolean ln_branded := in_params.ln_branded;
+  EXPORT string5 industry_class := in_params.industryclass;
+  EXPORT string32 application_type := in_params.applicationtype;
+  EXPORT unsigned3 date_threshold := in_params.dateVal;
+  EXPORT string ssn_mask := in_params.ssn_mask;
+END;
+
 shared input_dids_set := SET (dids, did);
-shared string6 ssn_mask_value := in_params.ssn_mask; // unfortunate artefact: used in some macro
+//shared string6 ssn_mask_value := in_params.ssn_mask; // unfortunate artefact: used in some macros
 
 
 shared fcra_csa_wrap :=FCRA.comp_subject (dids, 
-																					in_params.DPPAPurpose,
-																					in_params.GLBPurpose,
+																					mod_access.dppa,
+																					mod_access.glb,
 																					false, // exclude Gong so far
-																					in_params.industryclass,
+																					mod_access.industry_class,
 																					//in_params.dialcontactprecision
 																					, 
 																					/*Addresses_PerSubject*/,
 																					ds_flags,
 																					slim_pc_recs,
 																					in_params.FFDOptionsMask);
-																																							
-bestrecs_reg := doxie.best_records (dids, , in_params.DPPAPurpose, 
-																		in_params.GLBPurpose, true, IsFCRA, , , true, includeDOD:=true); // use non-blank key, see #39788
+// bestrecs_reg := doxie.best_records (dids, , in_params.DPPAPurpose, 
+// 																		in_params.GLBPurpose, true, IsFCRA, , , true, includeDOD:=true); // use non-blank key, see #39788
+bestrecs_reg := doxie.best_records (dids, IsFCRA, , , true, includeDOD:=true, modAccess := mod_access); // use non-blank key, see #39788
 																		
 shared bestrecs_ffd := if(IsFCRA, fcra_csa_wrap.best_record, 
 	project(bestrecs_reg, transform(doxie_crs.layout_best_information, self := left, self := [])));
@@ -54,8 +68,8 @@ shared idid := max(dids(did > 0), did);//dids has no more than 1 record here. se
 
 // ============================ a patch for death master records ============================
 // so far these are needed to access deceased records:
-glb_ok := ut.glb_ok (in_params.glbpurpose);
-rna_glb_ok := ut.glb_ok (in_params.glbpurpose, header.constants.checkRNA);
+glb_ok := mod_access.isValidGLB ();
+rna_glb_ok := mod_access.isValidGLB (header.constants.checkRNA);
 death_params := DeathV2_Services.IParam.GetDeathRestrictions(in_params);
 //NB: FCRA does not have permission to use/return RNA  
 
@@ -317,7 +331,7 @@ other_akas := project (join (all_persons, dids, left.did=right.did, keep (1)),
 			Self := Left, Self := []));
 
 subj_names := aka_best_dl & sort (other_akas, if (SSNInfo.Valid = 'yes', 0, 1));
-Suppress.MAC_Mask (subj_names, subj_names_suppress, SSNInfo.ssn, null, true, false);
+Suppress.MAC_Mask (subj_names, subj_names_suppress, SSNInfo.ssn, null, true, false, maskVal := mod_access.ssn_mask);
 
 EXPORT Akas := subj_names_suppress;
 
@@ -346,7 +360,8 @@ src_names := doxie.Comp_Names; //did, name, ssn
 // rel_dids := dedup (sort (project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2)),
                          // did), did);
 rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2));
-best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, IsFCRA, , , true,header.constants.checkRNA);
+//best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, IsFCRA, , , true,header.constants.checkRNA);
+best_akas := doxie.best_records (rel_dids, IsFCRA, , , true, header.constants.checkRNA, modAccess := mod_access);
 
 aka_src := if (in_params.use_bestaka_ra,
                project (best_akas, transform (PersonReports.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)),

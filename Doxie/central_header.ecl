@@ -13,7 +13,9 @@ EXPORT central_header (DATASET (doxie.layout_references) dids,
 boolean includeGeoLocation := false : stored('IncludeGeoLocation');
 boolean IncludePhoneMetadata := false : stored('IncludePhoneMetadata'); //For Accurint CompReport
 
-doxie.MAC_Header_Field_Declare(IsFCRA); //ssn_value, ssn_mask_value, ln_branded_value
+doxie.MAC_Header_Field_Declare(IsFCRA); //ssn_value, fname_value, lname_value, dial_contactprecision_value
+mod_access := doxie.functions.GetGlobalDataAccessModule ();
+
 doxie.MAC_Selection_Declare();
 
 // non-FCRA header data
@@ -21,7 +23,8 @@ idid := max(dids(did > 0, did < header.constants.QH_start_rid), did);//dids has 
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
 dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
 
-best_full := doxie.best_records (dids, , , , , FALSE, , , useNonBlankKey := true, getSSNBest := in_getSSNBest);
+//best_full := doxie.best_records (dids, , , , , FALSE, , , useNonBlankKey := true, getSSNBest := in_getSSNBest);
+best_full := doxie.best_records (dids, FALSE, useNonBlankKey := true, getSSNBest := in_getSSNBest, modAccess := mod_access);
 
 ssnr_pre := doxie.fn_ssn_records(best_full);
 
@@ -41,8 +44,8 @@ besr_pre := project(best_full,
 
 // FCRA header data -- based on the DIDs fetched from the neutral site.
 // All FCRA-relevant corrections are applied inside
-fcra_csa_wrap := FCRA.comp_subject (dids, dppa_purpose, glb_purpose, false, // exclude Gong so far
-                                    industry_class_value,
+fcra_csa_wrap := FCRA.comp_subject (dids, mod_access.dppa, mod_access.glb, false, // exclude Gong so far
+                                    mod_access.industry_class,
                                     dial_contactprecision_value, // *, Addresses_PerSubject * //
 																		, ds_flags, slim_pc_recs(datagroup in FFD.Constants.DataGroupSet.HDR), inFFDOptionsMask);
 
@@ -81,7 +84,7 @@ _addr_temp := if(includeGeoLocation, _addr_geo, _addr_verified);
 _addr := IF (IsFCRA, csa_addresses, _addr_temp);
 
 doxie.MAC_Add_UtilityConnection(_addr, doxie.Layout_Comp_Addr_Utility_Recs, //addr, 
-                                addr_util, TRUE, IsFCRA, glb_ok); // Appends Utility recs to subject address.
+                                addr_util, TRUE, IsFCRA, mod_access.isValidGLB()); // Appends Utility recs to subject address.
 																
 
 //adding address type for residence/business indicator comp report redesign
@@ -116,10 +119,10 @@ addr0 := if(IsFCRA,	addr_util , addr_nonfcra);
 resr := if (IsFCRA, fcra_csa_wrap.residents, doxie.Resident_Links);
 
 namr_unmasked := if (IsFCRA, fcra_csa_wrap.comp_names, doxie.comp_names);
-suppress.MAC_Mask(namr_unmasked,namr_masked,ssn,blank,true,false);
-namr0 := if (ln_branded_value, global(namr_unmasked), global(namr_masked));
+suppress.MAC_Mask(namr_unmasked,namr_masked,ssn,blank,true,false,maskVal := mod_access.ssn_mask);
+namr0 := if (mod_access.ln_branded, global(namr_unmasked), global(namr_masked));
 
-relationship.IParams.storeHighConfidence(application_type_value);
+relationship.IParams.storeHighConfidence(mod_access.application_type);
 relr0 := ungroup(doxie.relative_summary);
 assr0 := doxie_crs.associate_summary;
 nbrr := doxie.Historic_Nbr_Summary();
@@ -204,7 +207,7 @@ end;
 preSuppress := dataset ([Format ()]);
 //This is being added here to accomodate the Peoplewise product until such time as all the all the pullssn and pullid
 //changes are made to get everything on the new suppression, then this becomes redundant.
-Suppress.MAC_Suppress(preSuppress,postSuppress,application_type_value,suppress.constants.LinkTypes.DID,best_information_children[1].did);
+Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppress.constants.LinkTypes.DID,best_information_children[1].did);
 
 // this should be a temporary measure on FCRA side:
 

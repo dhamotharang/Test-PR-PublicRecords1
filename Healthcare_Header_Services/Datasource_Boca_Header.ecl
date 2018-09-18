@@ -1,13 +1,17 @@
 import Doxie,didville, header;
 EXPORT Datasource_Boca_Header := Module
 	Export get_boca_header_entity (dataset(Layouts.autokeyInput) input):= function
-			doxie.MAC_Header_Field_Declare()
+			// doxie.MAC_Header_Field_Declare()
+      mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+      glb_ok := mod_access.isValidGLB();
+      dppa_ok := mod_access.isValidDPPA();
+
 			//Get the dids for the input criteria
 			fmtInputToDidville := project(input,Transforms.convertToDidvilleBatch(left,false));
 			
 			hdrRecs := didville.did_service_common_function(fmtInputToDidville, 'BEST_ALL', 'BEST_ALL', 'ALL', true, 0, false, false, false, 
 																									false, false, false, 8,false,,TRUE, '', 0,
-																									IndustryClass_val := industry_class_val);
+																									IndustryClass_val := mod_access.industry_class);
 			results := join(input,hdrRecs, (integer)left.acctno=right.seq,
 											transform(Layouts.searchKeyResults, self.prov_id:=right.did; self.acctno:=left.acctno;self.src:=Constants.SRC_BOCA_PERSON_HEADER;self.isAutokeysResult:=true),
 											keep(Constants.MAX_RECS_ON_JOIN),limit(0)); 
@@ -18,7 +22,7 @@ EXPORT Datasource_Boca_Header := Module
 											transform(recordof(doxie.Key_Header), self := right), 
 											keep(Constants.MAX_RECS_ON_JOIN), limit(0)); 
 
-			Header.MAC_GlbClean_Header(base_data0, base_data_cleaned);
+			Header.MAC_GlbClean_Header(base_data0, base_data_cleaned, , , mod_access);
 		
 			base_data := join(dup_res, base_data_cleaned,
 												left.prov_id = right.s_did, 

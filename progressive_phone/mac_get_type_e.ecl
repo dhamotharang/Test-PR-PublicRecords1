@@ -1,4 +1,5 @@
-export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, glb_purpose=0, data_restriction_mask='',includeRelativeCell=false) := macro
+//export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, glb_purpose=0, data_restriction_mask='',includeRelativeCell=false) := macro
+export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, includeRelativeCell=false, modAccess) := macro
 
 import doxie_raw, didville, ut, NID, Header, STD;
 
@@ -13,8 +14,8 @@ import doxie_raw, didville, ut, NID, Header, STD;
 doxie_raw.Layout_RelativeRawBatchInput %get_rel%(f_e_did l) := transform
 	self.input.seq := l.seq;
 	self.input.did := l.did;
-	self.input.glb_purpose := GLB_Purpose;
-	self.input.dppa_purpose := DPPA_Purpose;
+	self.input.glb_purpose := modAccess.glb;
+	self.input.dppa_purpose := modAccess.dppa;
 	self.input.ln_branded_value := true;
 	self.input.include_relatives_val := true;
 	self.input.include_associates_val := true;
@@ -56,7 +57,7 @@ end;
 %f_rel_did% := project(%f_rel_match_w_title%, %get_rel_did%(left));
 
 #uniquename(blue_recs) 
-progressive_phone.mac_get_blue(%f_rel_did%, %blue_recs%, false, false, false, data_restriction_mask)
+progressive_phone.mac_get_blue(%f_rel_did%, %blue_recs%, false, false, false, modAccess)
 
 #uniquename(todays_date)
 %todays_date% := (string8) Std.Date.Today();
@@ -199,7 +200,7 @@ end;
 %g_in% := join(%f_rel_match_init%,f_e_acctno,left.seq = right.seq,transform(recordof(f_e_did),self.acctno :=right.acctno,self.did := left.person2,self := left,self := []));
 
 #uniquename(f_out_type_g_for_e)
-progressive_phone.mac_get_type_g(%g_in%, f_e_acctno, %f_out_type_g_for_e%, glb_purpose, data_restriction_mask)
+progressive_phone.mac_get_type_g(%g_in%, f_e_acctno, %f_out_type_g_for_e%, modAccess)
 
 #uniquename(f_g_to_e_ready)
 // the join below assigns the sequence number vs the account number to the acctno to be like the other relative rows																										

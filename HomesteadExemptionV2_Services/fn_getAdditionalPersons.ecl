@@ -3,15 +3,25 @@
 EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs,
 				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT unsigned1 glb := in_mod.GLBPurpose;
+    EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
+    EXPORT boolean ln_branded := in_mod.lnbranded;
+    EXPORT boolean probation_override := FALSE;
+    EXPORT string5 industry_class := in_mod.industryclass;
+    EXPORT boolean no_scrub := FALSE;
+    EXPORT string ssn_mask := in_mod.ssnmask;
+  END;
+
 	// REQUIRED FOR MAC_GlbClean_Header()
-	BOOLEAN no_scrub:=FALSE;
+	// BOOLEAN no_scrub:=FALSE;
 	BOOLEAN checkRNA:=TRUE;
-	BOOLEAN probation_override_value:=FALSE;
-	UNSIGNED1 GLB_Purpose:=in_mod.GLBPurpose;
-	UNSIGNED1	DPPA_Purpose:=in_mod.DPPAPurpose;
-	BOOLEAN glb_ok:=ut.glb_ok(GLB_Purpose,checkRNA);
-	BOOLEAN dppa_ok:=ut.dppa_ok(DPPA_Purpose,checkRNA);
-	STRING5 industry_class_value:=in_mod.industryclass;
+	// BOOLEAN probation_override_value:=FALSE;
+	UNSIGNED1 GLB_Purpose:=mod_access.glb; //MAC_GLB_DPPA_Clean_RNA
+	UNSIGNED1	DPPA_Purpose:=mod_access.dppa; //MAC_GLB_DPPA_Clean_RNA
+	BOOLEAN glb_ok:=mod_access.isValidGLB(checkRNA);
+	BOOLEAN dppa_ok:=mod_access.isValidDPPA(checkRNA);
+	// STRING5 industry_class_value:=in_mod.industryclass;
 
 	AutoheaderV2.layouts.search srchRec(ds_srch_recs L) := TRANSFORM
 		SELF.taddress.prim_range          := L.prim_range;
@@ -47,7 +57,7 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
 			LIMIT(ut.limits.HEADER_PER_DID,SKIP));
 
 		// APPLY DPPA AND GLB RESTRICTIONS AND DID SUPPRESSION
-		header.MAC_GlbClean_Header(ds_hdr_addr_dt,ds_hdr_glb_cln);
+		header.MAC_GlbClean_Header(ds_hdr_addr_dt,ds_hdr_glb_cln, , , mod_access);
 		header.MAC_GLB_DPPA_Clean_RNA(ds_hdr_glb_cln,ds_hdr_rna_cln);
 
 		ds_hdr_sort:=SORT(ds_hdr_rna_cln,did,-dt_last_seen,-dt_first_seen);

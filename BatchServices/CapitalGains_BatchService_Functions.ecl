@@ -1,4 +1,4 @@
-import Address,	Autokey_batch, AutokeyB2_batch, AutoKeyI, BatchServices, DidVille, doxie, gong_services, 
+import Address,	AutokeyB2_batch, AutoKeyI, BatchServices, DidVille, doxie, gong_services, 
        LN_PropertyV2, ut, DeathV2_Services, LN_PropertyV2_Services;
 
 layout_in 	:= BatchServices.CapitalGains_BatchService_Layouts.batch_in;
@@ -126,12 +126,19 @@ export CapitalGains_BatchService_Functions := module
 	
 	export appendBest(dataset(layout_flat) ds_recs, unsigned1 glbPurpose, unsigned1 dppaPurpose,boolean include_minors=false, boolean getSSNBest=true) := function		
 	
+    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))		
+      EXPORT unsigned1 glb := glbPurpose;
+      EXPORT unsigned1 dppa := dppaPurpose;
+      EXPORT boolean show_minors := include_minors OR (glbPurpose = 2);
+    END;
+
 		dids := dedup(sort(project(ds_recs(did>0), doxie.layout_references), did));
 		ds_best_recs := doxie.best_records(dids,
-																			 DPPA_override := dppaPurpose,
-																			 GLB_override  := glbPurpose,
+																			//  DPPA_override := dppaPurpose,
+																			//  GLB_override  := glbPurpose,
 																			 include_minors:= include_minors,
-																			 getSSNBest    := getSSNBest
+																			 getSSNBest    := getSSNBest,
+																			 modAccess := mod_access
 																			);
 		ds_recs_with_best := join(ds_recs, ds_best_recs, left.did = right.did,	
 						transform(layout_flat,	

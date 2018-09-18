@@ -1,4 +1,4 @@
-/*2015-10-26T18:54:10Z (Janielle Goolgar)
+﻿/*2015-10-26T18:54:10Z (Janielle Goolgar)
 Govt AddrBest ranking implementation
 */
 // This function finds latest 2 addressess after filtering out addresses that are in a detention center key and filtering out any 
@@ -8,9 +8,11 @@ Govt AddrBest ranking implementation
 				// An assumption is made that 1 address can only be 1 of these.
 				
  import Address,BatchShare,doxie,ERO,Risk_Indicators, ut; 
+
  export fn_add2Addrs( dataset(ERO_Services.Layouts.LookupId) in_ids = dataset([],ERO_Services.Layouts.LookupId),
-                              unsigned1 inGLBPurpose =0,
-															unsigned1 inDPPAPurpose=0) :=
+                              // unsigned1 inGLBPurpose =0,
+															// unsigned1 inDPPAPurpose=0) :=
+															doxie.IDataAccess modAccess) :=
 		function
 		   ids := record
 			    ERO_Services.Layouts.LookupId;
@@ -73,7 +75,15 @@ Govt AddrBest ranking implementation
 			 //then use denormalize to join them back to original records with acctno and did.
 		   dids_all := project(in_ids, doxie.layout_references);
 			 dids := dedup(sort(dids_all, did),did);
-		   addresses_all := doxie.Comp_Subject_Addresses(dids,,inDPPAPurpose,inGLBPurpose,,,true,'',,).addresses;			 
+			 //TODO: Why do we hardcode these values?
+       mod_access_local := MODULE (PROJECT (modAccess, doxie.IDataAccess))
+         EXPORT boolean ln_branded := FALSE;
+         EXPORT boolean probation_override := TRUE;
+         EXPORT boolean no_scrub := FALSE;
+         EXPORT string5 industry_class := '';
+       END;
+		   //addresses_all := doxie.Comp_Subject_Addresses(dids,,inDPPAPurpose,inGLBPurpose,,,true,'',,).addresses;			 
+		   addresses_all := doxie.Comp_Subject_Addresses(dids,,,,mod_access_local).addresses;			 
 			 ranked_bestAddr := ERO_Services.fn_getRankedBestAddr(addresses_all);
 			 
 			 maxHriPer_value := 5;
@@ -141,8 +151,8 @@ Govt AddrBest ranking implementation
 		
 
 			 header2dedup_rec rollupAddrs(header2dedup_rec l, header2dedup_rec r) := transform
-			    self.dt_last_seen1 := ut.max2(l.dt_last_seen1, r.dt_last_seen1);
-					self.dt_last_seen2 := ut.max2(l.dt_last_seen2, r.dt_last_seen2);
+			    self.dt_last_seen1 := MAX (l.dt_last_seen1, r.dt_last_seen1);
+					self.dt_last_seen2 := MAX (l.dt_last_seen2, r.dt_last_seen2);
 					self.addr1match := if (l.addr1match,l.addr1match,r.addr1match);
 					self.addr2match := if (l.addr2match,l.addr2match,r.addr2match);
 					self.isDetentionCenter := if (l.isDetentionCenter,l.isDetentionCenter,r.isDetentionCenter); 

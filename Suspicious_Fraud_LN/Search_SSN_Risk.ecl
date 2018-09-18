@@ -1,11 +1,13 @@
-IMPORT AutoKey, Death_Master, Doxie, Doxie_Files, Drivers, Header, Header_Quick, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, 
-Suspicious_Fraud_LN, UT,AutoStandardI,DeathV2_Services, Relationship;
+IMPORT AutoKey, Death_Master, Doxie, Doxie_Files, Drivers, Header, Header_Quick, /*Inquiry_AccLogs,*/ MDR, Risk_Indicators, RiskWise, 
+Suspicious_Fraud_LN, UT,AutoStandardI,DeathV2_Services, Relationship, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																			DATASET(Suspicious_Fraud_LN.layouts.Layout_SSN_Inquiries) Inquiries,
 																																			UNSIGNED1 DPPAPurpose,
 																																			UNSIGNED1 GLBPurpose,
 																																			STRING50 DataRestrictionMask) := FUNCTION
+  unsigned4 todays_date := STD.Date.Today ();
+
 	// SSN Indexed Keys Used
 	FullHeaderSSNKey := Doxie.Key_Header_SSN;
 	FastHeaderSSNKey := AutoKey.Key_SSN(Header_Quick.Str_AutoKeyName);
@@ -23,7 +25,13 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	threeMonths := ROUND(sixMonths / 2);
 	twoMonths := ROUND(sixMonths / 3);
 	
-	doxie.MAC_Header_Field_Declare()
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := GLBPurpose;
+    EXPORT unsigned1 dppa := DPPAPurpose;	
+    EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
+  END;
+  glb_ok := mod_access.isValidGLB();
+  dppa_ok := mod_access.isValidDPPA();
 	
 	// Temporary Header Layout - Used for Calculating Header Based Risk Codes
 	TempHeader := RECORD
@@ -36,7 +44,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		STRING5 Zip5 := '';
 		STRING3 Source := ''; // Source code on header
 		STRING8 DateOfBirth := ''; // Date of Birth on Header
-		STRING8 TodaysDate := ''; // Either ut.GetDate for realtime, or ArchiveDate for historical mode
+		STRING8 TodaysDate := ''; // Either ut/GetDate for realtime, or ArchiveDate for historical mode
 		STRING8 Date_First_Seen := ''; // Date record first seen on header
 		STRING8 Date_Last_Seen := ''; // Date record last seen on header
 		STRING6 Date_First_Age := ''; // Age of the header record calculated by first seen date
@@ -119,14 +127,14 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 
 	headerRecs := JOIN(uniqueHeaderSSN, FullHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
 																												translateSrc(RIGHT.src) NOT IN Risk_Indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA := FALSE) AND
-																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA := FALSE)) AND
-																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), DPPAPurpose, translateSrc(RIGHT.src)))) AND
+																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE)) AND
+																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(mod_access.dppa, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), mod_access.dppa, translateSrc(RIGHT.src)))) AND
 																												~Risk_Indicators.iid_constants.filtered_source(translateSrc(RIGHT.src), RIGHT.st) AND
 																												((RIGHT.dt_first_seen < LEFT.ArchiveDate AND RIGHT.dt_first_seen <> 0) 
 																														OR
 																												(RIGHT.dt_vendor_first_reported < LEFT.ArchiveDate AND RIGHT.dt_first_seen = 0)),
 																												transform(right), ATMOST(ut.Limits.Header_Per_DID));																								
-	Header.MAC_GlbClean_Header(headerRecs, headerRecsCleaned);
+	Header.MAC_GlbClean_Header(headerRecs, headerRecsCleaned, , , mod_access);
 	
 	// Get the header records for those DID's which match on SSN
 	HeaderDIDMac (TransformName, KeyName) := MACRO
@@ -200,8 +208,8 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 																		
 	fastHeaderDID := JOIN(uniqueHeaderSSN, FastHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
 																												translateSrc(RIGHT.src) NOT IN Risk_Indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA := FALSE) AND
-																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA := FALSE)) AND
-																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), DPPAPurpose, translateSrc(RIGHT.src)))) AND
+																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE)) AND
+																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(mod_access.dppa, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), mod_access.dppa, translateSrc(RIGHT.src)))) AND
 																												~Risk_Indicators.iid_constants.filtered_source(translateSrc(RIGHT.src), RIGHT.st) AND
 																												((RIGHT.dt_first_seen < LEFT.ArchiveDate AND RIGHT.dt_first_seen <> 0) 
 																														OR
@@ -438,7 +446,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		invalid := (UNSIGNED)(firstSeen[1..6]) > le.Clean_Input.ArchiveDate OR le.Clean_Input.SSN = '';
 		SELF.PossiblyRandomSSN := IF(invalid, FALSE, randomizedSocial);
 		SELF.SSNFirstIssued := IF(invalid, '-1', firstSeen);
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, (string) todays_date, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
 		ssnIssueAge := IF((UNSIGNED)firstSeen = 0, 0, UT.DaysApart(firstSeen, todaysDate));
 		SELF.SSNFirstIssuedAge := IF(invalid, 999999, ssnIssueAge);
 		SELF.DateFirstSeen := IF(invalid, '-1', firstSeen); // If seen before our archive date, blank this record
@@ -458,13 +466,13 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	TempDeadSSN getDeadPeople(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, DeathMasterKey ri) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.SSN := le.Clean_Input.SSN;
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, (INTEGER)ut.GetDate, (INTEGER)(le.Clean_Input.ArchiveDate + '01'));
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, (INTEGER)(le.Clean_Input.ArchiveDate + '01'));
 		SELF.DeadPerson := (INTEGER)ri.filedate > 0 AND (integer)ri.filedate <= todaysDate; // If we have a filedate, we have a dead person.  But only consider them dead if the filedate is older than the archivedate
 		SELF.FileDate := ri.filedate;
 	END;
 	
 	deadSSNsTemp := JOIN(Input, DeathMasterKey, LEFT.Clean_Input.SSN NOT IN ['0', ''] AND KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN)
-																			and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA := FALSE), deathparams),
+																			and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE), deathparams),
 																			getDeadPeople(LEFT, RIGHT), KEEP(500), ATMOST(RiskWise.max_atmost));
 	// Keep the earliest dead SSN date
 	deadSSNs := ROLLUP(SORT(deadSSNsTemp, Seq, SSN, FileDate), LEFT.Seq = RIGHT.Seq AND LEFT.SSN = RIGHT.SSN, TRANSFORM(TempDeadSSN, SELF.FileDate := MAP((UNSIGNED)LEFT.FileDate = 0	=> RIGHT.FileDate,
@@ -489,9 +497,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	TempMinorSSN getMinors(TempHeader le) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.SSN := le.SSN;
-		TodaysDate := IF(le.ArchiveDate = 999999, (UNSIGNED)UT.GetDate, (UNSIGNED)IF(LENGTH(TRIM((STRING)le.ArchiveDate)) = 6, ((STRING)le.ArchiveDate + '01'), (STRING)le.ArchiveDate));
+		TodaysDate := IF(le.ArchiveDate = 999999, todays_date, (UNSIGNED)IF(LENGTH(TRIM((STRING)le.ArchiveDate)) = 6, ((STRING)le.ArchiveDate + '01'), (STRING)le.ArchiveDate));
 		SELF.TodaysDate := (STRING)TodaysDate;
-		age := IF((UNSIGNED)le.DateOfBirth = 0, 999, UT.GetAgeI_asOf((UNSIGNED)le.DateOfBirth, TodaysDate)); // If we don't know DOB, set the age to unknown
+		age := IF((UNSIGNED)le.DateOfBirth = 0, 999, ut.Age((UNSIGNED)le.DateOfBirth, TodaysDate)); // If we don't know DOB, set the age to unknown
 		SELF.Age := (STRING)age;
 		SELF.IsAMinor := IF(age < 18, TRUE, FALSE); // If the Identity was < 18 at the time of ArchiveDate (Either today or historical), it's a minor
 		SELF.DateOfBirth := le.DateOfBirth; // The date of birth for this Identity (SSN/DID combo)

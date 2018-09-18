@@ -1,10 +1,9 @@
-import AutostandardI,doxie,driversv2,mdr;
+﻿import AutostandardI,doxie,driversv2,mdr;
 
 export Did_Score() := FUNCTION
 
 	inputmod := AutoStandardI.GlobalModule();
-	GLB_Purpose := AutoStandardI.InterfaceTranslator.GLB_Purpose.val(project(inputmod,AutoStandardI.InterfaceTranslator.GLB_Purpose.params));		
-	DPPA_Purpose := AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(project(inputmod,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));	
+  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (inputmod);
 	
 	zip_value := AutoStandardI.InterfaceTranslator.zip_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_value.params)); 
 
@@ -55,18 +54,23 @@ export Did_Score() := FUNCTION
 	did := ungroup(project(f_with_did(score>=score_threshold_value),doxie.layout_references));
 
 
-	br := doxie.best_records(did,
-											false,
-											dppa_purpose,
-											glb_purpose,,, doSuppress:=false,includeDOD:=true);
-
+	br := doxie.best_records(did, doSuppress:=false, includeDOD:=true, modAccess := mod_access);
 
 	// Get uncleaned records so that dt_first_seen may be pulled off any records. Later get passed through MAC_GlbClean_Header
+	// header_recs0 := doxie.mod_header_records(
+	// 	false,true,,,dppa_purpose,glb_purpose,,,false,'',,true).results(project(did,doxie.layout_references_hh));
+		//have to reset mod_access to ensure same call:
+	mod_access_local := MODULE (PROJECT (mod_access, doxie.IDataAccess))
+    EXPORT boolean ln_branded := FALSE;
+    EXPORT boolean probation_override := FALSE;
+    EXPORT boolean no_scrub := FALSE;
+    EXPORT unsigned3 date_threshold := 0;
+	END;
 	header_recs0 := doxie.mod_header_records(
-		false,true,,,dppa_purpose,glb_purpose,,,false,'',,true).results(project(did,doxie.layout_references_hh));
+		false,true,,,true, modAccess := mod_access_local).results(project(did,doxie.layout_references_hh));
 
 	// Get best address record
-	best_from_func := didville.BestAddress.Best_Recs(header_recs0,did,dppa_purpose,glb_purpose,'','',0,0);
+	best_from_func := didville.BestAddress.Best_Recs(header_recs0,did,mod_access.dppa,mod_access.glb,'','',0,0);
 
 
 
@@ -113,7 +117,7 @@ export Did_Score() := FUNCTION
 
 	didville.layout_Did_Score  w_dl(driversV2.Key_DL_DID r):=transform		
 		// The best dl addr score is in this field for matching_dl_w_scores_best until we compute dl_addr_score_best
-		self.score_dl_addr_any :=ut.max2(if((unsigned3) r.zip in zip_value,9,0),100-(10*doxie.FN_Tra_Penalty_Addr(r.predir,r.prim_range,r.prim_name,r.suffix,
+		self.score_dl_addr_any :=MAX(if((unsigned3) r.zip in zip_value,9,0),100-(10*doxie.FN_Tra_Penalty_Addr(r.predir,r.prim_range,r.prim_name,r.suffix,
 			r.postdir, r.sec_range,r.city,r.st,r.zip)));
 		self := [];
 	END;

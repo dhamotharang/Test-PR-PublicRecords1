@@ -1,19 +1,20 @@
-﻿import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
+﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
 	
-	inputParams := project(AutoStandardI.GlobalModule(),input.params,opt);
+//	inputParams := project(AutoStandardI.GlobalModule(),input.params,opt);
+	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
 
 	boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 	string20 Test_Data_Table_Name := ''  	: stored('TestDataTableName');
 
-	unsigned1 DPPA_Purpose := inputParams.dppapurpose;
-	unsigned1 GLB_Purpose := inputParams.glbpurpose;
+	unsigned1 DPPA_Purpose := mod_access.dppa;
+	unsigned1 GLB_Purpose := mod_access.glb;
 	
 	boolean IsFCRA := false;
 	boolean ln_branded := false;
-	string6 ssnMask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(inputParams,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-	unsigned1 dlMask := AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(inputParams,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
-	unsigned1 dob_mask_value := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(inputParams,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
+	string6 ssnMask := mod_access.ssn_mask;
+	unsigned1 dlMask := mod_access.dl_mask;
+	unsigned1 dob_mask_value := mod_access.dob_mask;
 	
 	unsigned3 Number_Of_Risk_Codes_Returned := 0 : stored('NumberOfRiskCodesReturned');
 	boolean	Use_CurrentlyOwnedProperty := false : stored('UseCurrentlyOwnedProperty');
@@ -59,7 +60,7 @@
 	unsigned6 UniqueId := 0 : STORED('UniqueId');
 	unsigned6 ID2UniqueId := UniqueId ;
 	unsigned3 history_date := 999999 			: stored('HistoryDateYYYYMM');
-	string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
+	string DataRestriction := mod_access.DataRestrictionMask;
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');	
 	// We want to turn on these IID options for Identifier 2 - don't need advo or uspis, they will always run
 	// #stored('SearchADVO', TRUE);

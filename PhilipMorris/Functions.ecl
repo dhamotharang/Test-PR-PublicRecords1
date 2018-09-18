@@ -1,4 +1,4 @@
-import Address, mdr, ut, doxie, header, suppress, iesp, AddrBest, DayBatchEDA, NID, doxie;
+import Address, mdr, doxie, header, suppress, iesp, AddrBest, DayBatchEDA, NID;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -636,16 +636,25 @@ export Functions := MODULE
 															 string5 industry_class_value = '',
 															 boolean maskSSN = false) := FUNCTION												
 		
-		dppa_ok := ut.dppa_ok(dppa_purpose);
-		glb_ok := ut.glb_ok(glb_purpose);
+		// Get missing permissions from global module
+		mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+		  EXPORT unsigned1 glb := glb_purpose;
+			EXPORT unsigned1 dppa := dppa_purpose;
+			EXPORT boolean probation_override := probation_override_value;
+			EXPORT string5 industry_class := industry_class_value;
+			EXPORT boolean no_scrub := probation_override_value; 
+			EXPORT string ssn_mask := ssn_mask_value;
+		END; 
+		dppa_ok := mod_access.isValidDPPA();
+		glb_ok := mod_access.isValidGLB();
 		//for testing purposes (batch mode only), i need to test with the inclusion
 		//of certain datasets that alghough not yet live, can be used (experian, tu)
 		//the only way for that option to be open if the macro is invoked is to 
-		//set no_scrub to true
-		no_scrub := probation_override_value;
+		//set no_scrub (above) to true
+		// no_scrub := probation_override_value;
 			
-		header.MAC_GlbClean_Header(rawRecords, cleanRecs)
-		suppress.MAC_Mask(cleanRecs, masked, ssn, blank, true, false);
+		header.MAC_GlbClean_Header(rawRecords, cleanRecs, , , mod_access);
+		suppress.MAC_Mask(cleanRecs, masked, ssn, blank, true, false, , , , mod_access.ssn_mask);
 
 		cleanedMasked := if(maskSSN, masked, cleanRecs);	
 		cleanedMaskedInputLayout := project (cleanedMasked, LT.Search.FullRecordNormWithHeaderData);

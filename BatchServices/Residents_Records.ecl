@@ -1,11 +1,17 @@
-IMPORT DOXIE, AutoStandardI, AutoHeaderI, header, ut;
+IMPORT DOXIE, AutoStandardI, header, ut;
+
 rec_batch_in := BatchServices.Layouts.Resident.cln_batch_in;
 rec_batch_out := BatchServices.Layouts.Resident.batch_out;
 export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interfaces.res_config in_mod ) := FUNCTION
+  glb_mod := AutoStandardI.GlobalModule();
+  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (glb_mod);
+  glb_ok :=  mod_access.isValidGLB ();
+  dppa_ok := mod_access.isValidDPPA ();
+
 // MultiUnitSearch boolean allows to search data and match whole building where sec_range should be necessary but isn't provided
 // MultiUnitSearch is used by Best Address reverse search only
 	boolean MultiUnitSearch := in_mod.MultiUnitSearch;
-  doxie.MAC_Header_Field_Declare();
+
 	res_key:=doxie.Key_Header_Address;
 	rec_hl := header.Layout_Header and not [lname,fname,mname,name_suffix,dob,dt_first_seen,dt_last_seen];
 	Res_rec := record
@@ -53,7 +59,7 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 											,
 										 get_Res(LEFT,RIGHT),LIMIT(0),keep(10000));
 	Res_final_all := if(MultiUnitSearch, Res_final_all1+Res_final_all2, Res_final_all1);
-	Header.MAC_GlbClean_Header(Res_final_all,Res_final0);
+	Header.MAC_GlbClean_Header(Res_final_all,Res_final0, , , mod_access);
 	res_final := project(res_final0, transform(Res_rec, self.dob := (string)left.dob, self := left));
 	s_res := sort(res_final,acctno,did);
  	s_res did_rolluptrans(s_res l,s_res r) := transform // accumalate the date range
@@ -87,7 +93,8 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 	
 	dd_dids := dedup(sort(filt_dids,did),did);
 	dids := project(dd_dids,doxie.layout_references);
-	Residents_all	:= doxie.best_records(dids, , DPPA_Purpose, GLB_Purpose, , , ,false,includeDOD:=true );
+//	Residents_all	:= doxie.best_records(dids, , DPPA_Purpose, GLB_Purpose, , , ,false,includeDOD:=true );
+  Residents_all := doxie.best_records(dids, , ,false, includeDOD:=true, modAccess := mod_access);
 	res_rec cp_trans(roll_dids l, residents_all r) := transform
 		self.gender := map ( r.title = 'MR' => 'M',
 												r.title = 'MS' => 'F',
@@ -133,7 +140,6 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 	// **************************************************************************************
 	// the changes below are part of best address enhancements to perform reverse search 
 	// per requirements, reverse search also needs to include address phone 
-	glb_mod := AutoStandardI.GlobalModule();
 	ds_in := project(upd_batch_in,
 					 transform(BatchServices.Layouts.RTPhones.rec_batch_RTPhones_input, 
 							self.orig_acctno:=left.acctno,

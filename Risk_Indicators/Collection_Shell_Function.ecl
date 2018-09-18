@@ -1,7 +1,16 @@
-import addrbest, AutoStandardI, doxie, mdr, RiskWise, Progressive_Phone, Paw, ut, watchdog;
+﻿import addrbest, doxie, mdr, RiskWise, Progressive_Phone, Paw, ut;
 
 export Collection_Shell_Function( dataset(risk_indicators.Layout_Input) progressive_prep, Risk_Indicators.Scoring_Parameters parameters) := FUNCTION
 
+mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  EXPORT unsigned1 glb := parameters.glb;
+  EXPORT unsigned1 dppa := parameters.dppa;	
+  EXPORT string DataPermissionMask := parameters.datapermission;
+  EXPORT string DataRestrictionMask := parameters.datarestriction;
+  EXPORT boolean ln_branded := parameters.ln_branded;
+  EXPORT boolean probation_override := FALSE; // was set up as a constant below
+  EXPORT unsigned3 date_threshold := 0;              // was set up as a constant below
+END;
 
 // get the DID for the input applicant, setting bsversion_temp := 2 so we don't ask for multiple DIDs
 bsversion_temp := 2;
@@ -96,8 +105,8 @@ w_phone_disconnects := join(w_seq, risk_indicators.key_phone_table_v2,
 w_phone_disconnect_flag := dedup(sort(w_phone_disconnects, acctno, seq, -active_phone), seq);
 // output(w_phone_disconnect_flag, named('w_phone_disconnect_flag'));		
 
-probation_override_value := false;
-dateval := 0;
+// probation_override_value := false;
+// dateval := 0;
 
 // put all the DIDs from the results into 1 bucket to be used for searching header and address history
 dids := ungroup(project(f_out, transform(Doxie.layout_references, self.did := left.did)) + project(applicant_input_with_did, transform(Doxie.layout_references, self.did := left.did)));
@@ -106,7 +115,8 @@ dids := ungroup(project(f_out, transform(Doxie.layout_references, self.did := le
 deduped_dids := dedup(dids);
 // output(deduped_dids, named('deduped_dids'));
 
-csa := doxie.Comp_Subject_Addresses(deduped_dids,dateVal,parameters.dppa, parameters.glb, parameters.ln_branded,parameters.includegong,probation_override_value);																						
+// csa := doxie.Comp_Subject_Addresses(deduped_dids,dateVal,parameters.dppa, parameters.glb, parameters.ln_branded,parameters.includegong,probation_override_value);																						
+csa := doxie.Comp_Subject_Addresses(deduped_dids, parameters.includegong,,,mod_access);																						
 doxie.MAC_Address_Rollup(csa.addresses, Risk_Indicators.collection_shell_mod.max_addresses, address_history)
 // output(address_history, named('address_history'));
 
@@ -213,15 +223,15 @@ shared_addresses := join(applicant_addr_history, address_history,
 																		self.dt_first_seen_did2 := right.dt_first_seen;
 																		self.dt_last_seen_did2 := right.dt_last_seen;
 																		
-																		max_common_first_seen := ut.max2(left.addr1.dt_first_seen, right.dt_first_seen);
-																		min_common_last_seen := ut.imin2(left.addr1.dt_last_seen, right.dt_last_seen);
+																		max_common_first_seen := MAX(left.addr1.dt_first_seen, right.dt_first_seen);
+																		min_common_last_seen := MIN(left.addr1.dt_last_seen, right.dt_last_seen);
 																		shared_address := (left.addr1.dt_first_seen between right.dt_first_seen and right.dt_last_seen) or 
 																									(left.addr1.dt_last_seen between right.dt_first_seen and right.dt_last_seen) or
 																									(right.dt_first_seen between left.addr1.dt_first_seen and left.addr1.dt_last_seen) or 
 																									(right.dt_last_seen between left.addr1.dt_first_seen and left.addr1.dt_last_seen);
 																		// only calculate the months if dates overlap and the overlapping first seen dates aren't 0, otherwise skip							
-																		self.TimeSinceSharedAddress := if(shared_address and max_common_first_seen<>0, (string)ut.imin2( Risk_Indicators.collection_shell_mod.months_apart(system_yearmonth, min_common_last_seen), Risk_Indicators.collection_shell_mod.cap4byte), skip);
-																		self.LengthSharedAddress := if(shared_address, (string)ut.imin2( Risk_Indicators.collection_shell_mod.months_apart(min_common_last_seen, max_common_first_seen), Risk_Indicators.collection_shell_mod.cap4byte), '');
+																		self.TimeSinceSharedAddress := if(shared_address and max_common_first_seen<>0, (string)MIN( Risk_Indicators.collection_shell_mod.months_apart(system_yearmonth, min_common_last_seen), Risk_Indicators.collection_shell_mod.cap4byte), skip);
+																		self.LengthSharedAddress := if(shared_address, (string)MIN( Risk_Indicators.collection_shell_mod.months_apart(min_common_last_seen, max_common_first_seen), Risk_Indicators.collection_shell_mod.cap4byte), '');
 																		),keep(10));  // may have more than 1 co-resident per address, but i'll start with 10 here as a guess
 // output(shared_addresses, named('shared_addresses'));
 

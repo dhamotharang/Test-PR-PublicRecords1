@@ -4,7 +4,8 @@ export mac_get_blue(f_get_blue_in,
                     check_same_apt_lname='false', 
 				check_same_apt_diff_lname='false',
 				header_phone_use='false',
-				data_restriction_mask='') := macro
+//				data_restriction_mask='',
+				modAccess) := macro
 import doxie,header, header_quick, progressive_phone,utilfile, ut, mdr, STD;
 
 #uniquename(header_key)
@@ -27,9 +28,9 @@ end;
 #uniquename(header_recs)
 %header_recs_raw% := join(f_get_blue_in, %header_key%,
                       keyed(left.did = right.s_did) and
-											~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, data_restriction_mask),
+											~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, modAccess.DataRestrictionMask),
 				              %by_header%(left, right), limit(ut.limits.HEADER_PER_DID,skip))(~mdr.Source_is_on_Probation(src));
-Header.MAC_GlbClean_Header(%header_recs_raw%, %header_recs_cleaned%);
+Header.MAC_GlbClean_Header(%header_recs_raw%, %header_recs_cleaned%, , , mod_access);
 %header_recs% := project(%header_recs_cleaned%, progressive_phone.layout_header_seq);
 
 #uniquename(by_quick_header)
@@ -142,10 +143,10 @@ end;
 					         prim_range, sec_range);
 
 #uniquename(f_get_same_apt_lname);
-progressive_phone.mac_get_same_apt_lname(%f_get_blue_w_date%, %f_get_same_apt_lname%, false, data_restriction_mask);
+progressive_phone.mac_get_same_apt_lname(%f_get_blue_w_date%, %f_get_same_apt_lname%, false, ModAccess.DataRestrictionMask);
 
 #uniquename(f_get_same_apt_diff_lname);
-progressive_phone.mac_get_same_apt_lname(%f_get_blue_w_date%, %f_get_same_apt_diff_lname%, true, data_restriction_mask);
+progressive_phone.mac_get_same_apt_lname(%f_get_blue_w_date%, %f_get_same_apt_diff_lname%, true, ModAccess.DataRestrictionMask);
 
 //make every last name availalbe - up to 5					   
 //need to patch dt_first_seen, dt_last_seen

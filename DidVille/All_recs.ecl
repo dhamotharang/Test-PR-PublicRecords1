@@ -1,6 +1,7 @@
 import didville, doxie, header, header_quick, utilfile, STD;
 
-doxie.MAC_Header_Field_Declare()
+  doxie.MAC_Header_Field_Declare(); //score_threshold_value, phonetics
+  mod_access := doxie.functions.GetGlobalDataAccessModule (); 
 
 	//basic id record
 	acc_did_rec := record
@@ -174,7 +175,7 @@ export All_recs := MODULE
 	tpl_flt_recs := didville.fun_filter_by_best_ssn(tpl_raw_recs, f_in_triple, score_threshold_value);
 
 
-	header.MAC_GlbClean_Header(tpl_flt_recs, tpl_clean_recs);
+	header.MAC_GlbClean_Header(tpl_flt_recs, tpl_clean_recs, , , mod_access);
 	
 	// switch did and rid fields so that mac_monitoring_best_addr works properly, i.e it
 	// dedups on the did field which is not really a did and the did is preserved in the rid field
@@ -212,7 +213,7 @@ export get_dbl(dataset(didville.layout_bestInfo_batchin) f_in_double) := FUNCTIO
 		 
 	dbl_flt_recs := didville.fun_filter_by_best_ssn(dbl_raw_recs, f_in_double, score_threshold_value);
 				 
-	header.MAC_GlbClean_Header(dbl_flt_recs, dbl_clean_recs);
+	header.MAC_GlbClean_Header(dbl_flt_recs, dbl_clean_recs, , , mod_access);
 	dbl_best_ready := project(dbl_clean_recs, transform({header.layout_header}, 
 																										 self.did := left.rid, self := left));
 	return dbl_best_ready;
@@ -220,7 +221,6 @@ export get_dbl(dataset(didville.layout_bestInfo_batchin) f_in_double) := FUNCTIO
 	END;	
 
 export get_sgl(dataset(didville.layout_bestInfo_batchin) f_in_single) := FUNCTION
-
 	//util only: get util recs by ssn and name
 	sgl_util_recs := didville.Fun_Get_UtilDaily_By_SSN(f_in_single, score_threshold_value);
 
@@ -228,7 +228,7 @@ export get_sgl(dataset(didville.layout_bestInfo_batchin) f_in_single) := FUNCTIO
 		 
 	sgl_flt_recs := didville.fun_filter_by_best_ssn(sgl_raw_recs, f_in_single, score_threshold_value);
 
-	header.MAC_GlbClean_Header(sgl_flt_recs, sgl_clean_recs);
+	header.MAC_GlbClean_Header(sgl_flt_recs, sgl_clean_recs, , , mod_access);
 	sgl_ready := project(sgl_clean_recs, 
 											 transform({header.layout_header},
 													 self.did := left.rid,self:=left));

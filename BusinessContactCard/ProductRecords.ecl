@@ -70,6 +70,8 @@ EXPORT ProductRecords := MODULE
 	// Names & Last Seens). We must rank and sort the contacts by their title. 
 	EXPORT contactsRecords(dataset(BusinessContactCard.Layouts.rec_contact) ds_contacts_in,
 												 BusinessContactCard.IParam.options in_mod) := function
+
+    mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 		UNRANKED_TITLE_VALUE := 100;
 																				
 		ds_contacts_ranked := JOIN(ds_contacts_in, doxie_cbrs.executive_titles,
@@ -88,7 +90,7 @@ EXPORT ProductRecords := MODULE
 		just_dids := DEDUP(SORT(PROJECT( ds_contacts_in, doxie.layout_references ), did), did);
 		
 		// Get the home address for each Contact and join it to the list of Contacts.
-		doxie.layout_best best_records := doxie.best_records(just_dids);
+		doxie.layout_best best_records := doxie.best_records(just_dids, modAccess := mod_access);
 		
 		ds_contacts_with_home_address := JOIN( ds_contacts, best_records,
 																					 LEFT.did = RIGHT.did,

@@ -1,6 +1,6 @@
 ﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
 
-doxie.MAC_Header_Field_Declare (true); // is FCRA
+// doxie.MAC_Header_Field_Declare (true); // is FCRA
 // reads: dppa_ok, glb_ok, probation_override_value, no_scrub, IsFCRA, ssn_mask_value, dl_mask_value
 
 doxie.MAC_Selection_Declare() //Include_AKAs_val, Include_Imposters_val
@@ -27,6 +27,11 @@ export comp_subject(dataset(doxie.layout_references) dids,
 										dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = dataset([], FFD.Layouts.PersonContextBatchSlim), 
 										integer8 inFFDOptionsMask = 0) :=
 MODULE
+
+shared mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule(true));
+shared glb_ok := mod_access.isValidGLB();
+shared dppa_ok := mod_access.isValidDPPA();
+
 
 head_all := riskwisefcra._header_data (dids, flagfile);
 
@@ -67,7 +72,7 @@ EXPORT boolean is_verified (doxie.IVerifyLexID subject_input) := function
 end;
 
 // boolean is passed to avoid a call to minors_hash index, which is absent on FCRA side
-header.MAC_GlbClean_Header (head_all_slim, head_all_clean, ,true);
+header.MAC_GlbClean_Header (head_all_slim, head_all_clean, ,true, mod_access);
 
 head_all_clean_fat := project (head_all_clean, rec_header);
 
@@ -163,7 +168,8 @@ doxie_crs.layout_best_information AppendBest (rec_header L) := transform
 end;
 best_append := project (best_header, AppendBest (Left));
 
-suppress.mac_mask(best_append, best_masked, ssn, dl_number, true, true, false, true);
+dl_mask_value := mod_access.dl_mask = 1;
+suppress.mac_mask(best_append, best_masked, ssn, dl_number, true, true, false, true, maskVal := mod_access.ssn_mask);
 
 EXPORT best_record := best_masked;
 
@@ -423,7 +429,7 @@ result := join (ssn_w_legacy_info, doxie.key_SSN_FCRA_map,
 
 out_f := sort(result,did,-cnt,ssn,-length(trim(fname)));
 
-suppress.MAC_Mask(out_f, out_mskd, ssn, blank, true, false,,true);
+suppress.MAC_Mask(out_f, out_mskd, ssn, blank, true, false,,true, maskVal := mod_access.ssn_mask);
 
 // best record used below was obtained from FCRA header-file
 
@@ -615,7 +621,7 @@ result := join(ssn_w_legacy_info,doxie.key_SSN_FCRA_map,
 
 result mask_ssn5(result l) := transform
   self.ssn5_unmasked := l.ssn5;
-  self.ssn5 := if(ssn_mask_value='ALL' or ssn_mask_value='FIRST5', 'xxxxx', l.ssn5);
+  self.ssn5 := if(mod_access.ssn_mask IN ['ALL', 'FIRST5'], 'xxxxx', l.ssn5);
   self := l;
 end;
 

@@ -11,7 +11,7 @@ export MAC_BestAppend(infile,
                       supply,
 											verify,
 											thresh_val,
-											glb,
+											glb_ok,
 											outfile,
 											marketing=false, 
                       fixed_DRM,
@@ -150,16 +150,16 @@ typeof(infile) add_flds_nonglb(infile le, NonGlbKeyFileToUse ri,string options) 
 	
   outfi := IF(marketing, IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi1mpglb), UNGROUP(outfi1m)),
 					 MAP(
-							 UseNonBlankKey	and glb and 												is_utility 	=> UNGROUP(outfinonutilnb),
-																	glb and 												is_utility 	=> UNGROUP(outfinonutil),						 
-						   UseNonBlankKey and glb and filter_exp and filter_eq						=> UNGROUP(outfi1nexpneqnb),	
-																	glb and filter_exp and filter_eq 					 	=> UNGROUP(outfi1nexpneq),		
-							 UseNonBlankKey and glb and filter_exp 													=> UNGROUP(outfi1nexpnb),
-																	glb and filter_exp 													=> UNGROUP(outfi1nexp),
-							 UseNonBlankKey and glb and filter_eq 													=> UNGROUP(outfi1neqnb),
-																	glb and filter_eq 													=> UNGROUP(outfi1neq),
-							 UseNonBlankKey	and glb 																				=> UNGROUP(outfi1nb),
-																	glb 																				=> UNGROUP(outfi1),							 
+							 UseNonBlankKey	and glb_ok and 												is_utility 	=> UNGROUP(outfinonutilnb),
+																	glb_ok and 												is_utility 	=> UNGROUP(outfinonutil),						 
+						   UseNonBlankKey and glb_ok and filter_exp and filter_eq						=> UNGROUP(outfi1nexpneqnb),	
+																	glb_ok and filter_exp and filter_eq 				 	=> UNGROUP(outfi1nexpneq),		
+							 UseNonBlankKey and glb_ok and filter_exp 												=> UNGROUP(outfi1nexpnb),
+																	glb_ok and filter_exp 												=> UNGROUP(outfi1nexp),
+							 UseNonBlankKey and glb_ok and filter_eq 													=> UNGROUP(outfi1neqnb),
+																	glb_ok and filter_eq 													=> UNGROUP(outfi1neq),
+							 UseNonBlankKey	and glb_ok 																				=> UNGROUP(outfi1nb),
+																	glb_ok 																				=> UNGROUP(outfi1),							 
 							 IF(UseNonBlankKey, IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi2PreGlbNonBlank), UNGROUP(outfi2NonBlank)),
 								IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi2PreGlb), UNGROUP(outfi2)))));
 			 
@@ -240,7 +240,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 	#uniquename(outfile_Death)
 	%outfile_death% := join(%outfile_noDeath%,doxie.key_death_masterV2_ssa_DID,
 																keyed(left.did = right.l_did)  and
-																not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb, %deathparams%),
+																not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, %deathparams%),
 																%fillDOD%(LEFT,RIGHT),left outer, KEEP(1), LIMIT(0));
   //determine whether we need to join to the deathmaster data for the DOD value
   include_DOD := if ( stringlib.stringfind(supply,'BEST_ALL',1)=0 and stringlib.stringfind(supply,'BEST_DOD',1)=0, FALSE, TRUE);
@@ -271,7 +271,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 
 	mid1b := join(outfile1,header_slimsort.key_did_Ssn_nonglb,left.did = right.did,get_max_ssn_ng(LEFT,RIGHT),left outer);
 
-	mid2 := dedup(sort(if (glb,mid1,mid1b),did,-ismatch,-freq),seq,did);
+	mid2 := dedup(sort(if (glb_ok,mid1,mid1b),did,-ismatch,-freq),seq,did);
 
 	typeof(infile) into_orig(mid2 L) := transform
 		self := l;
@@ -282,12 +282,26 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
   outfile_ := if (stringlib.stringfind(supply,'MAX_SSN',1) = 0,outfile1,mid3);
 	
 	didville.Mac_Common_Field_Declare();
+	// TODO: only ssn_mask_value is taken, and it'd be better to take it from global module, since it is called above anyway
 
-	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(glb_purpose_value,
-																														 dppa_purpose_value
-	                                                           ,fixed_DRM,appType
-																														 ,IndustryClass_val
-																														 ,ssn_mask_value
+  // need just a few things, so no projecting
+  mod_access := MODULE (doxie.IDataAccess)
+    EXPORT unsigned1 glb := glb_purpose_value;
+    EXPORT unsigned1 dppa := dppa_purpose_value;
+    EXPORT string DataRestrictionMask := fixed_DRM;
+    EXPORT string5 industry_class := IndustryClass_val;
+		EXPORT string32 application_type := appType;
+		EXPORT string ssn_mask := ssn_mask_value;
+    EXPORT dl_mask := dl_mask_val;
+		// input include_minors -- is it include only or dppa as well?
+  END;
+
+	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(//glb_purpose_value,
+																														 //dppa_purpose_value
+	                                                           //,fixed_DRM,appType
+																														 //,IndustryClass_val
+																														 //,ssn_mask_value
+																														 mod_access
 																														 ,include_minors
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										
@@ -297,9 +311,9 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
   outfile_2 := if(GetSSNBest, with_bestSSNs, outfile_);
 	
 	//**** Pull by DID and by both SSN fields
-	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,appType,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,appType,Suppress.Constants.LinkTypes.SSN,best_ssn);
-	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,appType,Suppress.Constants.LinkTypes.SSN,max_ssn);
+	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
+	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,max_ssn);
 
 	//**** Mask
 	suppress.MAC_Mask(outfile_pulled_MAX,	outfile_masked,	best_ssn,	nodl,true,false);

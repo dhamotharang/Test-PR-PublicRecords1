@@ -191,7 +191,18 @@ export SearchRecords := MODULE
 	END;
 	
 	SHARED  getCombinedRecords(IParam.searchParams aInputData) :=FUNCTION			
-			 
+
+    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+      EXPORT unsigned1 glb := aInputData.glbpurpose;
+	    EXPORT unsigned1 dppa := aInputData.dppapurpose;	
+      EXPORT string DataPermissionMask := aInputData.DataPermissionMask;
+      EXPORT boolean ln_branded := aInputData.lnbranded;
+      EXPORT string5 industry_class := aInputData.industryclass; 
+      EXPORT string32 application_type := aInputData.applicationtype;
+      EXPORT string ssn_mask := aInputData.ssnmask; 
+      EXPORT unsigned1 dl_mask :=	IF (aInputData.dl_mask, 1, 0);
+		END;	
+
 		STRING PermissibleUse:=Polk_Code_Translations.RealTimePermissibleUse(aInputData.RealTimePermissibleUse);
 		
 		tempmod:= module(project(aInputData,IParam.polkParams))					
@@ -207,8 +218,10 @@ export SearchRecords := MODULE
 		BOOLEAN isBestDataSearch := LENGTH(TRIM(polkOperation)) = 0 AND tempmod.ssn != '' AND
 					PermissibleUse not in Constant.POLK_PERMISSIBLE_NOT_NAMEADDR;
 				
-		bestRecords := doxie.best_records(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (aInputData)
-			 , , , , , , false,,includeDOD:=true ) ;
+		// bestRecords := doxie.best_records(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (aInputData)
+		// 	 , , , , , , false,,includeDOD:=true ) ;
+		bestRecords := doxie.best_records(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (aInputData),
+			                                doSuppress := false, includeDOD:=true, modAccess := mod_access);
 		
 		dids := project(bestRecords, doxie.layout_references_hh);
 		

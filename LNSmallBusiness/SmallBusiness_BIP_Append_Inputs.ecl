@@ -3,7 +3,15 @@
 // Will need to pass in some additional input params
 EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.InputWSeq) Input,
                         BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
-    
+
+  // Get values missing from the input from global.
+    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+      EXPORT unsigned1 glb :=linkingOptions.glbpurpose;
+      EXPORT unsigned1 dppa := linkingOptions.dppapurpose;
+      EXPORT string DataRestrictionMask := linkingOptions.DataRestrictionMask;
+      EXPORT boolean ln_branded := linkingOptions.lnbranded;
+    END;
+
     ds_SearchInput := PROJECT(Input(SeleID <> 0), TRANSFORM(BIPV2.IDFunctions.rec_SearchInput, 
         SELF.inSeleid      := (STRING)LEFT.SeleID,
         SELF.acctno        := (STRING)LEFT.seq,
@@ -64,10 +72,10 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
     Unique_Rep_LexIDs := DEDUP(SORT(Rep_LexIDs, DID), DID);
     
 		  authRep_BestRecs := doxie.best_records(Unique_Rep_LexIDs,
-                                             FALSE,  // use_global
-                                             linkingOptions.DPPAPurpose, 
-                                             linkingOptions.GLBPurpose,
-                                             FALSE,  // get_valid_ssn
+                                            //  FALSE,  // use_global
+                                            //  linkingOptions.DPPAPurpose, 
+                                            //  linkingOptions.GLBPurpose,
+                                            //  FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -75,7 +83,8 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
                                              FALSE,  // checkRNA
                                              FALSE,  // includeDOD
                                              FALSE,  // include_minors
-                                             FALSE   // getSSNBest
+                                             FALSE,   // getSSNBest
+                                             mod_access
                                             );
 
        

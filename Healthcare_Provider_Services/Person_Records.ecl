@@ -1,6 +1,9 @@
-import doxie,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, iesp,Risk_Indicators,header,Healthcare_Header_Services;
+import doxie,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
+
 export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData,dataset(doxie.layout_references) dsDids=dataset([],doxie.layout_references)) := MODULE
-	shared in_params:= MODULE(PROJECT(AutoStandardI.GlobalModule(), PersonReports.input.personal,opt)) 
+
+  shared gmod := AutoStandardI.GlobalModule();
+	shared in_params:= MODULE(PROJECT(gmod, PersonReports.input.personal,opt)) 
 		export unsigned1 neighborhoods := inputData.NeighborhoodCount;
 		export unsigned1 historical_neighborhoods := inputData.HistoricalNeighborhoodCount;
 		export unsigned1 relative_depth := inputData.RelativeDepth;
@@ -10,12 +13,29 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		export boolean include_BlankDOD := inputData.IncludeBlankDOD; // allows to return death records with no DOD
 	END;
 
+	shared mod_access := MODULE (doxie.IDataAccess)
+    EXPORT unsigned1 glb := in_params.glbpurpose;
+    EXPORT unsigned1 dppa := in_params.dppapurpose;
+    EXPORT string DataPermissionMask := in_params.DataPermissionMask;
+    EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
+    EXPORT boolean ln_branded := in_params.ln_branded;
+    EXPORT boolean probation_override := gmod.probationoverride;
+    EXPORT string5 industry_class := in_params.industryclass;
+    EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gmod,AutoStandardI.InterfaceTranslator.application_type_val.params));
+    EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));
+		EXPORT unsigned3 date_threshold := in_params.dateVal;
+    EXPORT boolean suppress_dmv := gmod.suppressDMVInfo;
+    EXPORT string ssn_mask := in_params.ssn_mask;
+    EXPORT unsigned1 dl_mask := IF (in_params.mask_dl, 1, 0);
+	END;
+
 	//Taken from PersonReports.Person_records modified to actually work correctly
 	shared input_dids_set := SET (dsDids, did);
-	shared string6 ssn_mask_value := in_params.ssn_mask; // unfortunate artefact: used in some macro
+//	shared string6 ssn_mask_value := mod_access.ssn_mask; // unfortunate artefact: used in some macro
 
 	// TODO: rename to src_bestrecords
-	EXPORT bestrecs := doxie.best_records (dsDids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true, includeDOD:=true); // use non-blank key, see #39788
+//	EXPORT bestrecs := doxie.best_records (dsDids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true, includeDOD:=true); // use non-blank key, see #39788
+	EXPORT bestrecs := doxie.best_records (dsDids, false, , , true, includeDOD:=true, modAccess := mod_access); // use non-blank key, see #39788
 
 	shared src_ssn_main := Healthcare_Provider_Services.Person_records_functions.fn_ssn_records (bestrecs,,dsDids); //doxie_crs.layout_ssn_records
 	export src_residents := if (in_params.include_residents,
@@ -26,9 +46,9 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 
 	// ============================ a patch for death master records ============================
 	// so far these are needed to access deceased records:
-	shared glb_ok := ut.glb_ok (in_params.glbpurpose);
-	shared rna_glb_ok := ut.glb_ok (in_params.glbpurpose, header.constants.checkRNA);
-	shared death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+	shared glb_ok := mod_access.isValidGLB ();
+	shared rna_glb_ok := mod_access.isValidDPPA (header.constants.checkRNA);
+	shared death_params := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
 
 	// Get all DIDs that will be used in the report; set "is subject" indicator for a subject
 	shared rec_did_owner := record (doxie.layout_references)
@@ -288,7 +308,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 																			Self.SubjectSSNIndicator := IF(Left.SSNInfo.SSN!='' and Left.SSNInfo.SSN=bestrecs[1].SSN,'yes','no'),
 																			Self := Left, Self := []));
 	shared subj_names := aka_best_dl & sort (other_akas, if (SSNInfo.Valid = 'yes', 0, 1));
-	Suppress.MAC_Mask (subj_names, shared subj_names_suppress, SSNInfo.ssn, null, true, false);
+	Suppress.MAC_Mask (subj_names, shared subj_names_suppress, SSNInfo.ssn, null, true, false, maskVal := mod_access.ssn_mask);
 
 	EXPORT Akas := subj_names_suppress;
 
@@ -316,9 +336,10 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// rel_dids := dedup (sort (project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2)),
 													 // did), did);
 	rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2));
-	best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true,header.constants.checkRNA);
+	//best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true,header.constants.checkRNA);
+  best_akas := doxie.best_records (rel_dids, false, , , true, checkRNA := header.constants.checkRNA, modAccess := mod_access);
 
-	export aka_src := if (in_params.use_bestaka_ra,
+		export aka_src := if (in_params.use_bestaka_ra,
 								 project (best_akas, transform (PersonReports.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)),
 								 project (src_names, transform (PersonReports.layouts.comp_names, Self.address_seq_no := 0; Self:=Left)));
 	// alternatively relative_records or relative_summary can be used, utilizing records' counts

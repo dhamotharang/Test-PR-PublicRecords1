@@ -4,6 +4,7 @@
 //  Race is most reported value and lastest date
 //  All others lastest date.
 IMPORT Header, Watchdog, ut, doxie, iesp;
+
 EXPORT fn_getAttributes(integer subjectDid, 
 												integer dppa_purpose = 0,
 												integer glb_purpose = 0,
@@ -12,8 +13,16 @@ EXPORT fn_getAttributes(integer subjectDid,
 												string industry_class_value = ''												
 												) := function
 	
-	dppa_ok := ut.dppa_ok(dppa_purpose);
-	glb_ok := ut.glb_ok(glb_purpose);												
+	mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT unsigned1 glb := glb_purpose;
+    EXPORT unsigned1 dppa := dppa_purpose;
+    EXPORT boolean probation_override := probation_override_value;
+    EXPORT string5 industry_class := industry_class_value;
+    EXPORT boolean no_scrub := ^.no_scrub;
+  END; 
+
+	dppa_ok := mod_access.isValidDPPA();
+	glb_ok := mod_access.isValidGLB();												
 
   //get single record from watchdogSupplemental key by DID (ie best supplemental)
 	attributes := Watchdog.Key_Supplemental(keyed(l_did = subjectDid));
@@ -94,13 +103,13 @@ EXPORT fn_getAttributes(integer subjectDid,
 	tmpSmts := project(aSmts,fillSmts(left));
 	
 	//apply DPPA and GLB restrictions
-	Header.MAC_GlbClean_Header(tmpGenders, outGenders);
-	Header.MAC_GlbClean_Header(tmpHairColors, outHaircolors);
-	Header.MAC_GlbClean_Header(tmpEyeColors, outEyecolors);
-	Header.MAC_GlbClean_Header(tmpHeights, outHeights);
-	Header.MAC_GlbClean_Header(tmpWeights, outWeights);
-	Header.MAC_GlbClean_Header(tmpRaces, outRaces);
-	Header.MAC_GlbClean_Header(tmpSmts, outSmts);
+	Header.MAC_GlbClean_Header(tmpGenders, outGenders, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpHairColors, outHaircolors, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpEyeColors, outEyecolors, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpHeights, outHeights, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpWeights, outWeights, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpRaces, outRaces, , , mod_access);
+	Header.MAC_GlbClean_Header(tmpSmts, outSmts, , , mod_access);
 	
 	//Sort to put "top ranked" value found on top as 1st record
 	//DL sourced values have highest rank followed by most recent found (exceptions are height and race).

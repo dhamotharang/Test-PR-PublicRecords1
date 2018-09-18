@@ -54,14 +54,24 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 	 /* ***************************************************************
 		* 						        	Get Blue Records						      			*
 	  *************************************************************** */
-	inputmod := AutoStandardI.GlobalModule();
-	industry_class_value :=  AutoStandardI.InterfaceTranslator.industry_class_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.industry_class_value.params)); 
-	dppa_ok := AutoStandardI.InterfaceTranslator.dppa_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.dppa_ok.params)); 
-	DPPA_Purpose := AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(project(inputmod,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));
-	probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.probation_override_value.params)); 
-	no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(inputmod,AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-	glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.glb_ok.params)); 
-	Progressive_Phone.Mac_Get_Blue(withRelativeDid, blueRecords, FALSE, FALSE, FALSE, DataRestrictionMask);
+	// inputmod := AutoStandardI.GlobalModule();
+	// industry_class_value :=  AutoStandardI.InterfaceTranslator.industry_class_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.industry_class_value.params)); 
+	// dppa_ok := AutoStandardI.InterfaceTranslator.dppa_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.dppa_ok.params)); 
+	// DPPA_Purpose := AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(project(inputmod,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));
+	// probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.probation_override_value.params)); 
+	// no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(inputmod,AutoStandardI.InterfaceTranslator.no_scrub.params)); 
+	// glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.glb_ok.params)); 
+	// Progressive_Phone.Mac_Get_Blue(withRelativeDid, blueRecords, FALSE, FALSE, FALSE, DataRestrictionMask);
+
+  // why input GLB, DPPA are not used?
+		
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
+  END;
+  glb_ok := mod_access.isValidGLB();
+  dppa_ok := mod_access.isValidDPPA();
+		
+	Progressive_Phone.Mac_Get_Blue(withRelativeDid, blueRecords, FALSE, FALSE, FALSE, mod_access);
 	
 	sixMonths := blueRecords(src <> '' AND ut.DaysApart(StringLib.GetDateYYYYMMDD(), (STRING6)dt_last_seen + '15') <= 180
 																			OR ut.DaysApart(StringLib.GetDateYYYYMMDD(), (STRING6)dt_vendor_last_reported + '15') <= 180);

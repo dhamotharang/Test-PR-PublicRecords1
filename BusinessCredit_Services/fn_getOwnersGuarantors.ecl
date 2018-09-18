@@ -1,10 +1,21 @@
-﻿IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, ut, std;
+IMPORT Address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE,  Business_Credit, BusinessCredit_Services, Doxie, iesp, ut, std, suppress;
 
 EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inmod, 
 																DATASET(doxie.layout_references) ds_individualOwnerOnlyDids,
 																boolean buzCreditAccess = FALSE
 																) := FUNCTION
-	
+
+  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := inmod.glbpurpose;
+    EXPORT unsigned1 dppa := inmod.dppapurpose;
+    EXPORT string DataPermissionMask := inmod.DataPermissionMask;
+    EXPORT string DataRestrictionMask := inmod.DataRestrictionMask;
+    EXPORT string32 application_type := inmod.ApplicationType;
+    EXPORT string ssn_mask := inmod.ssnmask;
+		//TODO: the input is not supposed to include untranslated value for dob-mask
+    EXPORT unsigned1 dob_mask := suppress.date_mask_math.MaskIndicator (inmod.dobmask);
+  END;
+
 	OwnrGuarRecs_raw 	:= Business_Credit.Key_TradelineGuarantor().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
 
 	BIPV2.IDlayouts.l_xlink_ids2 trans(BIPV2.IDlayouts.l_xlink_ids R) := TRANSFORM
@@ -81,7 +92,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																			TRANSFORM(RIGHT) , 
 																			LIMIT(BusinessCredit_Services.Constants.JOIN_LIMIT, SKIP));
 
-	ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup));
+	ds_IndOwnerGuar_Best 	:= IF(EXISTS(ds_IndOwnrGuarRecs_raw_dedup), doxie.best_records(ds_IndOwnrGuarRecs_raw_dedup, modAccess := mod_access));
 
 	iesp.businesscreditreport.t_BusinessCreditOwnerGuarantor trans_preFinalIndi(ds_IndOwnerGuarRecs_raw L , doxie.layout_best R) := TRANSFORM
     street_addr := Address.Addr1FromComponents(R.prim_range, R.predir, R.prim_name, R.suffix,

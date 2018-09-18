@@ -1,10 +1,11 @@
-﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
+import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
        PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
-doxie.MAC_Header_Field_Declare()
-doxie.MAC_Selection_Declare()
+doxie.MAC_Header_Field_Declare(); //isCRS, depth, glb_ok, dial_contactprecision_value, ...
+mod_access := doxie.functions.GetGlobalDataAccessModule ();
+doxie.MAC_Selection_Declare();
 
 con := ContactCard.constants;
 rec := ContactCard.layouts;
@@ -23,8 +24,8 @@ shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING
 //***** GET THE RELATIVES 
 //	depth is input to service and defaults to 1 by #stored('RelativeDepth',con.default_RelativeDepth) in ContactCard.ReportService,
 //	so we can have depth beyond 1 in allrel
-shared allrel := Doxie_Raw.relative_raw(dids,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,
-							                                     probation_override_value,true,true,
+shared allrel := Doxie_Raw.relative_raw(dids,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.ssn_mask,mod_access.ln_branded,
+							                                     mod_access.probation_override,true,true,
 							                                     Relative_Depth,max_relatives,isCRS);
 
 // rel is the group that i will actually consider relatives in the final output
@@ -42,15 +43,15 @@ shared relassocdids := join(rel, doxie.key_death_masterv2_ssa_did,
 
 //***** GET ALL THE HEADER RECORDS
 
-shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub,dial_contactprecision_value);
+shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids, , dial_contactprecision_value, , mod_access);
 
 shared head_nopull := csa.raw;
 
 
 	
 //***** PULL IDS
-Suppress.MAC_Suppress(head_nopull,head_pull1,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-Suppress.MAC_Suppress(head_pull1,head_pull2,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);
+Suppress.MAC_Suppress(head_nopull,head_pull1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+Suppress.MAC_Suppress(head_pull1,head_pull2,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 
 rna_IN := head_pull2(did<>subjectDID);
 header.MAC_GLB_DPPA_Clean_RNA(rna_in,head_pull2_rna);

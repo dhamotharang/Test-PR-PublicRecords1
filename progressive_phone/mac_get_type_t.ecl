@@ -1,4 +1,5 @@
-export mac_get_type_t(f_t_did, f_t_acctno, f_t_out, glb_purpose=0, data_restriction_mask='', dppa_purpose=0) := macro
+//export mac_get_type_t(f_t_did, f_t_acctno, f_t_out, glb_purpose=0, data_restriction_mask='', dppa_purpose=0) := macro
+export mac_get_type_t(f_t_did, f_t_acctno, f_t_out, modAccess) := macro
 		
 /*
  *  TRYHARDER TH search level
@@ -71,15 +72,15 @@ end;
 %f_t_out_raw% := join(f_t_did(did<>0), %ppl_did_key_t%,
                       left.did = right.l_did and
 											~Phones.Functions.IsPhoneRestricted(right.origstate, 
-																													glb_purpose,
-																													dppa_purpose,
-																													industry_class_value,
+																													modAccess.glb,
+																													modAccess.dppa,
+																													modAccess.industry_class,
 																													, //checkRNA
 																													right.datefirstseen,
 																													right.dt_nonglb_last_seen,
 																													right.rules,
 																													right.src_all,
-																													data_restriction_mask
+																													modAccess.DataRestrictionMask
 																												 ),
  	                 %by_phonesplus_did_t%(left, right),
 			       limit(ut.limits.PHONE_PER_PERSON * %incoming_rows_t%, skip));
@@ -125,21 +126,21 @@ end;
 %LR_raw_t%	:= join(f_t_did(did<>0), %LR_index_did_t%,
                      Keyed(left.did = right.l_did) and use_LR and 
 										 ~Phones.Functions.IsPhoneRestricted(right.origstate, 
-																												 glb_purpose,
-																												 dppa_purpose,
-																												 industry_class_value,
+																												 modAccess.glb,
+																												 modAccess.dppa,
+																												 modAccess.industry_class,
 																												 , //checkRNA
 																												 right.datefirstseen,
 																												 right.dt_nonglb_last_seen,
 																												 right.rules,
 																												 right.src_all,
-																												 data_restriction_mask
+																												 modAccess.DataRestrictionMask
 																												),
 										 %by_royalty_did_t%(left, right),
 									 limit(ut.limits.PHONE_PER_PERSON * %incoming_rows_t%, skip));
 			 
 #uniquename(f_t_out_raw_post_filter)	
-Header.MAC_Filter_Sources(%f_t_out_raw%,%f_t_out_raw_post_filter%,src,data_restriction_mask);									
+Header.MAC_Filter_Sources(%f_t_out_raw%,%f_t_out_raw_post_filter%,src,modAccess.DataRestrictionMask);									
 
 #uniquename(f_t_out_ready)				
 %f_t_out_ready% := project(%f_t_out_raw_post_filter%,%layout_with_c_score_t_src%); 
