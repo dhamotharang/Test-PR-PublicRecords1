@@ -1,4 +1,4 @@
-﻿import _Control,RoxieKeyBuild,PRTE,Orbit3;
+﻿import _Control,RoxieKeyBuild,PRTE,Orbit3,wk_ut;
 EXPORT run_build(string infiledate
 								,string eid
 								,string dserver = _control.IPAddress.bctlpedata10
@@ -17,6 +17,7 @@ EXPORT run_build(string infiledate
 														'Anantha.Venkatachalam@lexisnexis.com'
 														
 														);
+
 	shared send_email_with_eid := fileservices.sendemail(
 													fulldistlist,
 													if (isprte, 'PRTE ', '' ) + 'Override Build Succeeded ' + infiledate,
@@ -27,7 +28,7 @@ EXPORT run_build(string infiledate
 													distlist,
 													if (isprte, 'PRTE ', '' ) + 'Override Keys Roxie Build FAILED',
 													failmessage);
- 
+
 	export outflagfile := output(dataset([{WORKUNIT}],{string wuid}),,overrideflagfile,csv,overwrite);
  
 	export build_keys := Overrides.Build_Keys(infiledate, isprte);
@@ -51,10 +52,11 @@ EXPORT run_build(string infiledate
 															output('Not Prod environment to despray flag file')
 															);
 		
-		     orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild('RiskWise Overrides',(infiledate),'N'),
+		shared orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild('RiskWise Overrides',(infiledate),'N'),
 																		Orbit3.proc_Orbit3_CreateBuild('FCRA RiskWise Overrides',(infiledate),'F')
 																		);
-																			
+  export run_alphaSuppression := wk_ut.CreateWuid('Overrides.Build_SuppressionFile_Alpha('+infiledate+')' , Overrides.default_cluster); 
+	
 	export all := sequential
 											(
 													build_keys
@@ -67,6 +69,7 @@ EXPORT run_build(string infiledate
 																	,desprayflagfile
 																	)
 														)
+													, run_alphaSuppression 
 											) : success(send_email_with_eid),
 					failure(email_fail);
  
