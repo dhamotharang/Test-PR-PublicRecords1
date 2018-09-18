@@ -107,10 +107,10 @@ daily_plus_full := 	if(useaid, Full_BK_search_refresh + daily_file, fullbasefile
 
 daily_plus_full_dist := distribute(daily_plus_full,hash(tmsid));
 // Sort and Dedup locally
-//VC DF-23049: Replaced last_seen_date with process date. Last_seen is same as first seen in many instances and results in faulty rollup	
+
 full_sort  :=sort(daily_plus_full_dist,TMSID,orig_case_number,SSN,TAX_ID,
              fname,mname,lname,name_suffix,cname,prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name,v_city_name, st, zip, zip4, county,
-             name_type,debtor_type,-process_date,debtor_seq,local);   
+             name_type,debtor_type,-date_last_seen,debtor_seq,local);
 
 BankruptcyV2.Layout_bankruptcy_search_v3_supp_bip  rolluplatestparties(BankruptcyV2.Layout_bankruptcy_search_v3_supp_bip l, BankruptcyV2.Layout_bankruptcy_search_v3_supp_bip r) := transform
 		self.Date_First_Seen := formatearliestdates(l.Date_First_Seen,r.Date_First_Seen) ;
