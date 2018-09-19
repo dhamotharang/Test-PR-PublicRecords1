@@ -76,7 +76,10 @@ EXPORT Functions :=  MODULE
 										self.classification_source.Customer_County := right.classification_source.Customer_County; 
 										self.classification_source.Customer_Vertical := right.classification_source.Customer_Vertical; 
 										self.classification_Activity.Suspected_Discrepancy := right.classification_Activity.Suspected_Discrepancy; 
-										self.classification_Activity.Confidence_that_activity_was_deceitful := right.classification_Activity.Confidence_that_activity_was_deceitful; 
+										self.classification_Activity.Confidence_that_activity_was_deceitful := 
+														if( regexfind('DELTA', left.source, nocase)  ,	
+															left.classification_Activity.Confidence_that_activity_was_deceitful, 
+															right.classification_Activity.Confidence_that_activity_was_deceitful); 
 										self.classification_Activity.workflow_stage_committed := right.classification_Activity.workflow_stage_committed; 
 										self.classification_Activity.workflow_stage_detected := right.classification_Activity.workflow_stage_detected; 
 										self.classification_Activity.Channels := right.classification_Activity.Channels; 
@@ -121,7 +124,10 @@ EXPORT Functions :=  MODULE
 										self.classification_source.Primary_source_Entity_id                                    := right.Primary_source_Entity;
 										self.classification_source.Expectation_of_Victim_Entities_id                           := right.Expectation_of_Victim_Entities;
 										self.classification_Activity.Suspected_Discrepancy_id                                  := right.Suspected_Discrepancy;
-										self.classification_Activity.Confidence_that_activity_was_deceitful_id                 := right.Confidence_that_activity_was_deceitful;
+										self.classification_Activity.Confidence_that_activity_was_deceitful_id := 
+														if( regexfind('DELTA', left.source, nocase),
+															left.classification_Activity.Confidence_that_activity_was_deceitful_id, 
+															right.Confidence_that_activity_was_deceitful);
 										self.classification_Activity.workflow_stage_committed_id                               := right.workflow_stage_committed;
 										self.classification_Activity.workflow_stage_detected_id                                := right.workflow_stage_detected;
 										self.classification_Activity.Channels_id                                               := right.Channels;
@@ -269,21 +275,14 @@ EXPORT Functions :=  MODULE
 	END;
 	EXPORT ind_type_fn(string1 customer_program) := function
 		import _Control;
-		ind_type_dev_v := map(
-											 customer_program = 'S' => 1292,
-											 customer_program = 'M' => 1302,
-											 customer_program = 'U' => 1321,
-											 customer_program = 'N' => 1312,
-											 0
-											);
 		ind_type_prod_v := map(
 											 customer_program = 'S' => 1014,
 											 customer_program = 'M' => 1024,
-											 customer_program = 'U' => 1321,
+											 customer_program = 'U' => 1029,
 											 customer_program = 'N' => 1312,
 											 0
 											);
-		RETURN if(_Control.ThisEnvironment.Name='Dataland',ind_type_dev_v,ind_type_prod_v);
+		RETURN ind_type_prod_v;
 	END;
 
 	EXPORT new_addresses(pInputFile) := 

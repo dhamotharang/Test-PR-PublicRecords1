@@ -1,8 +1,9 @@
-﻿import tools, FraudShared,ut; 
+﻿import tools, FraudShared,ut, STD; 
 EXPORT MapToCommon  (
 	 string pversion
 	,dataset(Layouts.Base.IdentityData) inBaseIdentityData = Files().Base.IdentityData.Built
 	,dataset(Layouts.Base.KnownFraud) inBaseKnownFraud = Files().Base.KnownFraud.Built
+	,dataset(Layouts.Base.Deltabase) inBaseDeltabase = Files().Base.Deltabase.Built
 ) :=
 module  
 	
@@ -70,9 +71,57 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+
+	Export	Deltabase := project (inBaseDeltabase , transform(FraudShared.Layouts.Base.Main , 
+		self.Record_ID := left.source_rec_id;
+		self.customer_id := left.Customer_Account_Number;
+		self.Sub_Customer_ID := ''; 
+		self.ln_report_date := left.reported_date;
+		self.Fraud_Point_Score:= '';  
+		self.clean_business_name := ''; 
+		self.Rawlinkid := left.lexid;
+		v_datetime := STD.Str.FindReplace( STD.Str.FindReplace( left.reported_date,':',''),'-','');
+		v_date := v_datetime[1..8];
+		v_time := v_datetime[10..];
+		self.reported_date := v_date;
+		self.reported_time := v_time;
+		self.event_date := v_date;
+		self.reported_by := left.user_added;
+		self.ssn_risk_code := if(left.event_entity_1 = 'FULL_SSN' , left.event_type_1, '') ;
+		self.identity_risk_code := if(left.event_entity_1 = 'LEXID' , left.event_type_1, '') ;
+		self.physical_address_risk_code := if(left.event_entity_1 = 'PHYSICAL_ADDRESS' , left.event_type_1, '') ;
+		self.phone_risk_code := if(left.event_entity_1 = 'PHONE' , left.event_type_1, '') ;
+		self.ip_address_fraud_code := if(left.event_entity_1 = 'IP_ADDRESS' , left.event_type_1, '') ;
+		self.transaction_id := left.Transaction_ID_Number;
+		self.investigation_referral_case_id  := left.Case_ID;
+		self.additional_address.Street_1 := left.mailing_street_1; 
+		self.additional_address.Street_2 := '';
+		self.additional_address.City := left.Mailing_City;
+		self.additional_address.State := left.Mailing_State;
+		self.additional_address.Zip := left.Mailing_Zip;
+		self.additional_address.Address_Type := 'Mailing';
+		self.additional_address.address_1 := left.mailing_address_1;
+		self.additional_address.address_2 := left.mailing_address_2;		
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := (string)left.Client_uid;
+		self.classification_Activity.Confidence_that_activity_was_deceitful_id := (unsigned2)left.deceitful_confidence;
+		self:= left; 
+		self:= [];
+	)); 
+
+	JDeltaDC := join (Deltabase,
+								Constants().DeceiptfulConfidence,
+								left.classification_Activity.Confidence_that_activity_was_deceitful_id = right.Confidence_that_activity_was_deceitful_id,
+								transform(FraudShared.Layouts.Base.Main , 
+								self.classification_Activity.Confidence_that_activity_was_deceitful := if(left.classification_Activity.Confidence_that_activity_was_deceitful_id = right.Confidence_that_activity_was_deceitful_id, right.Confidence_that_activity_was_deceitful, '' ); self := left),
+								left outer,
+								lookup,
+								few
+								);
+
 	
 	// Append MBS classification attributes 
-	CombinedClassification := Functions.Classification(IdentityData + KnownFraud); 
+	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + JDeltaDC); 
 	
 	// append rid 
 	// Filter header records
