@@ -8,7 +8,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;		
 	
 	// flat layout for salt		
-	inLayout := {Insuranceheader_xLink.Layout_Person_xLink, dataset(InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) zips, string rel_fname, string rel_lname};
+	inLayout := {Insuranceheader_xLink.Layout_Person_xLink, string rel_fname, string rel_lname};
 	inDataOne :=  project(ds_search, 
 				transform(inLayout, 
 			self.did := 0;
@@ -25,14 +25,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.prim_range := left.taddress.prim_range;
 			self.prim_name := left.taddress.prim_name;
 			self.sec_range := left.taddress.sec_range; 
-			String5 theZip := left.taddress.zip5;		
-			unsigned1 zip_radius := left.taddress.zip_radius;			 			
-			zipDs := IF(left.taddress.zip_set=[], dataset([{left.taddress.zip5}],{Integer4 zip}), dataset(left.taddress.zip_set,{Integer4 zip}));
-			self.zips := project(zipDs, transform(InsuranceHeader_xLink.Process_xIDL_Layouts().layout_ZIP_cases,
-						 self.zip := INTFORMAT(left.zip, 5, 1);
-						 integer dist := ut.zip_Dist(theZip, (string5)left.zip)+1;			
-					  self.weight := IF(self.zip=theZip, 100, 100-((dist/zip_radius)*80))));
-					
+			self.zip := left.taddress.zip5;
 			self.phone := left.tphone.phone10;
 			self.UniqueID := left.seq;
 			self.rel_fname := left.tname.fname_rel_1;
@@ -46,16 +39,24 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.fname := ds_search[1].tname.fname;
 			self.mname := ds_search[1].tname.mname;
 			self.lname := ds_search[1].tname.lname;
+			// self.name_suffix := '';
 			self.city := IF(ds_search[1].taddress.city='', ds_search[1].taddress.city_other, ds_search[1].taddress.city);
 			self.state := IF(ds_search[1].taddress.state='', ds_search[1].taddress.state_prev_1, ds_search[1].taddress.state);
+			// self.prim_range := ds_search[1].taddress.prim_range;
+			// self.prim_name := ds_search[1].taddress.prim_name;
+			// self.sec_range := ds_search[1].taddress.sec_range; 
+			// self.zip := ds_search[1].taddress.zip5;
+			// self.phone := ds_search[1].tphone.phone10;
 			self.UniqueID := ds_search[1].seq;
+			// self.rel_fname := ds_search[1].tname.fname_rel_1;
+			// self.rel_lname := ds_search[1].tname.lname, 
 			 self := []));
 	inData := IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn, inDataOne);
 
 	
 	IDLExternalLinking.mac_xLinking_PS(inData, UniqueID, name_suffix , fname , mname , lname ,, 
 								 ,PRIM_NAME ,PRIM_RANGE ,SEC_RANGE ,city ,
-												 state , zips ,SSN ,DOB, PHONE,  , , 
+												 state , zip ,SSN ,DOB, PHONE,  , , 
 														rel_fname, rel_lname,outfile);
 																												
 		// ToDo: filter candidates for accurint based on phonetic, checkvariantes and strictMatches
