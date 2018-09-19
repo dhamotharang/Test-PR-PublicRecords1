@@ -1,4 +1,4 @@
-﻿// Alpharetta has the Input_Phone at the end of argument list, Distance default is 6
+// Alpharetta has the Input_Phone at the end of argument list, Distance default is 6
 // Change name to _Boca instead of new
 export mac_xLinking_on_thor_Boca (infile, IDL ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
@@ -84,10 +84,10 @@ IMPORT InsuranceHeader_xLink, ut;
 			self.ST := (typeof(SELF.ST))'';
 		#END
 		#IF ( #TEXT(Input_ZIP) <> '' )
-    SELF.ZIP_cases := DATASET([{le.Input_ZIP, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases); ;    
-  #ELSE
-     SELF.ZIP := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);    
-  #END
+			self.ZIP := (typeof(SELF.ZIP))le.Input_ZIP;
+		#ELSE
+			self.ZIP := (typeof(SELF.ZIP))'';
+		#END
 		#IF ( #TEXT(Input_SSN) <> '')
 			self.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
 			self.SSN4 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn4;
@@ -134,10 +134,15 @@ IMPORT InsuranceHeader_xLink, ut;
 		%pr% := project(%infile_seq_temp%,%into%(left)); // Into roxie input format
 	#uniquename(res_out)
 
+	// InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, uniqueID, , input_sname, input_fname, input_mname, input_lname, Input_Gender, 
+																// input_prim_range, input_prim_name, input_SEC_RANGE, input_CITY, input_ST, input_ZIP,																
+																// SSN5, SSN4, input_DOB, Input_PHONE, input_DL_STATE, input_DL_NBR,
+																// , , Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);
+
 	InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId, ,SNAME, fname, mname, lname, derived_gender, 
-																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP_cases,																
+																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP,																
 																SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
-																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);	
+																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);																
 
 	#UNIQUENAME(result_trim)
 	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, reference);
@@ -209,4 +214,67 @@ IMPORT InsuranceHeader_xLink, ut;
 													
 	
 	outFile := %result_v1%;
+	// output(%pr%, named('pr'));
+	// output(sort(%res_out%, reference), named('res_out'));
+	// output(sort(%result_trim%, reference), named('result_trim'));
+	// output(sort(%resultsDistance%, reference), named('resultsDistance'));
+	// output(sort(%resultsSeg%, reference), named('resultsSeg'));
+	// #uniquename(LayoutScoredFetch1)
+	// #uniquename(OutputLayout_Base1)
+	// #uniquename(OutputLayout_Batch1)
+	
+	// %LayoutScoredFetch1% := RECORD	
+		// string ind;
+		// INTEGER2 NAMEWEIGHT := 0;
+		// INTEGER2 ADDRWEIGHT := 0;
+		// INTEGER2 MAINNAMEWeight := 0;
+		// InsuranceHeader_xLink.Process_xIDL_Layouts.LayoutScoredFetch -mainnameweight; 
+		// STRING KEY_DESC;
+		// string xLink_matches;
+		// string matches_desc;
+		// string5 best_ssn5 := '';
+		// string4 best_ssn4 := '';
+		// unsigned4 best_dob := 0;
+		// boolean match_best_ssn := false;
+	// END;
+	
+	// %OutputLayout_Base1% := RECORD,MAXLENGTH(32000)
+  // BOOLEAN Verified := FALSE; // has found possible results
+  // BOOLEAN Ambiguous := FALSE; // has >= 20 dids within an order of magnitude of best
+  // BOOLEAN ShortList := FALSE; // has < 20 dids within an order of magnitude of best
+  // BOOLEAN Handful := FALSE; // has <6 IDs within two orders of magnitude of best
+  // BOOLEAN Resolved := FALSE; // certain with 3 nines of accuracy
+  // DATASET(%LayoutScoredFetch1%) Results;  
+// END;
+
+// %OutputLayout_Batch1% := RECORD(%OutputLayout_Base1%),MAXLENGTH(32006)
+		// SALT33.UIDType Reference;
+	// END;	
+
+
+// output(sort(project(%res_out%, transform(%OutputLayout_Batch1%, 
+			// res := project(choosen(left.results,4), transform(%LayoutScoredFetch1%, 
+					// self.key_desc := InsuranceHeader_xLink.Process_xIDL_Layouts.KeysUsedToText(left.keys_used);					
+					
+					// best_didRec := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind(did=left.did);
+					// self.ind := best_didRec[1].ind;
+					// self.best_ssn5 := InsuranceHeader_xLink.mod_SSNParse(best_didRec[1].ssn).ssn5,
+					// self.best_ssn4 := InsuranceHeader_xLink.mod_SSNParse(best_didRec[1].ssn).ssn4,														
+					// self.match_best_ssn := (left.ssn5_match_code=7 and left.ssn5 = self.best_ssn5 or left.ssn5weight=0) and 
+																	// (left.ssn4_match_code=7 and left.ssn4=self.best_ssn4) ;																	
+					// self.best_dob := best_didRec[1].dob;
+					
+					// #if (%hasMatches%) IDLExternalLinking.mac_matchCodes(left); #end									
+					// self.matches_desc := InsuranceHeader_xLink.fn_MatchesToText(self.xLink_matches);	
+					// self.did := if ((left.did > 140737488355328 
+															// and InsuranceHeader_xLink.Environment.Current=InsuranceHeader_xLink.Environment.Values.BOCA )or 
+														// (left.stweight > 7 and left.prim_name='' and left.prim_range = ''),
+															// skip, left.did);	
+					// self.nameweight := MAX(0, left.fnameweight) + MAX(0, left.mnameweight) + MAX(0, LEFT.lnameweight);
+					// self.mainnameweight := left.mainnameweight;
+					// self.addrweight := MAX(0, left.prim_rangeweight) + MAX(0, left.prim_nameweight) + MAX(0, left.sec_rangeweight) + 
+					// MAX(0, LEFT.stweight) + MAX(0, LEFT.cityweight)+ MAX(0, left.zipweight);					
+					// self := left));
+			// self.results := res;
+			// self := left)), reference));
 ENDMACRO;
