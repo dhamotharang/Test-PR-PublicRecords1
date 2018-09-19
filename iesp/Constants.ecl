@@ -2099,5 +2099,9 @@ EXPORT Constants := MODULE
   export DEMO_SEARCH_TOOL := MODULE
     export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 100;
   end;
+
+	 export PhoneMetadata := module
+		export UNSIGNED2 MaxPhoneMetadataRecords := 1000;
+	end;
 	
 END;
