@@ -6,8 +6,11 @@ EXPORT CitDDShared := MODULE
   EXPORT VALIDATION_INVALID_GLB := 'Not an allowable GLB permissible purpose';
   EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
   
+  //we want to use the standard BS Options used in the Boca Shell.  
   EXPORT INTEGER DEFAULT_BS_VERSION := 52;
-	EXPORT UNSIGNED8 DEFAULT_BS_OPTIONS := 0;
+	EXPORT UNSIGNED8 DEFAULT_BS_OPTIONS :=  (risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
+                                          risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity +
+                                          risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary);
   
   EXPORT PRODUCT_REQUESTED_ENUM := ENUM(UNSIGNED1, EMPTY=0, ATTRIBUTES_ONLY=1, CITIZENSHIP_ONLY=2, BOTH=3);
   
