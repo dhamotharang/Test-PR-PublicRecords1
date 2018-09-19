@@ -4,6 +4,7 @@ export Proc_BK_Preprocess(string filedate) := function
 	inDefendants := Bankruptcyv2.File_In_Defendants;
 	courtcodelookup := Bankruptcyv2.File_Lookup_CourtCode;
 	courtcaselookup := Bankruptcyv2.File_Lookup_Courtcase;
+
 	
 	// Cleaning case *************************
 	blank_string_set := [ 'INFORMATION UNAVAILABLE',
