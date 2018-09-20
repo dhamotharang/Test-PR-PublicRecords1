@@ -15,8 +15,17 @@ module
 											  transform(FraudShared.Layouts.Base.Main, self := left;),
 											  inner,
 											  LOOKUP);
-
-	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymizeSources,raw_first_name,raw_last_name,,,,raw_full_name);
+	
+	baseAndDemo := if(_Flags.UseDemoData, FraudShared.Files().Base.Main.Father + Files().Input.DemoData.Sprayed, FraudShared.Files().Base.Main.Father);
+	
+	anonymizeOnlyNewRecords := join ( pBaseFile,
+											  baseAndDemo,
+											  left.record_id = right.record_id,
+											  transform(FraudShared.Layouts.Base.Main, self := left;),
+											  left only);
+	
+	
+	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymizeOnlyNewRecords,raw_first_name,raw_last_name,,,,raw_full_name);
 	anonymizePerson1 :=Anonymizer.mac_AnonymizePerson(anonymizePerson,,,,ssn,dob,,clean_phones.cell_phone);
 	anonymizePerson2 :=Anonymizer.mac_AnonymizePerson(anonymizePerson1,cleaned_name.fname,cleaned_name.lname);
 	anonymizePerson3 :=Anonymizer.mac_AnonymizePerson(anonymizePerson2,,,,clean_ssn,clean_dob,,clean_phones.phone_number, Email_Address);
@@ -74,7 +83,7 @@ module
 	Base_Anonymized	:= Project(anonymizeAddress2,TrAddress(left));
 	
 	Original_Data := join(pBaseFile,
-										anonymizeSources,
+										anonymizeOnlyNewRecords,
 										left.record_id = right.record_id,
 										transform(FraudShared.Layouts.Base.Main, self := left;),
 										left only);
