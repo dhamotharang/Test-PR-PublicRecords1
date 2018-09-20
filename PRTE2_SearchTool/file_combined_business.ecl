@@ -258,7 +258,7 @@ Export file_combined_business(Boolean FCRA = false, Boolean legacy = true) := Fu
 		sanctn := if(	legacy,
 														project(prte2_sanctn.keys.midex_rpt_nbr(bdid != 0),
 																		transform({unsigned6 id, integer Public_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
-														project(prte2_sanctn.keys.LinkIds,
+														project(prte2_sanctn.keys.LinkIds.key,
 																		transform({unsigned6 id, integer Public_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
 		sanctns := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(sanctn,Layouts.Layout_Businesses));
 
