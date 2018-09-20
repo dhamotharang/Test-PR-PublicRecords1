@@ -67,16 +67,17 @@ EXPORT ConsumerFlag := MODULE
   STRING1 subject_has_alert := FFD.Constants.subject_has_alert;
   
   FFD.layouts.ConsumerFlagsBatch xf_prepare_alerts(FFD.Layouts.PersonContextBatch re,
-                                                    INTEGER purpose, BOOLEAN suppressIT) := TRANSFORM
+                                                    INTEGER purpose, BOOLEAN suppressIT, 
+                                                    BOOLEAN isReseller) := TRANSFORM
       is_security_fraud_alert := re.RecordType = FFD.Constants.RecordType.FA;
-      is_security_freeze := re.RecordType = FFD.Constants.RecordType.SF AND purpose IN re.set_FCRA_purpose;
+      is_security_freeze := ~isReseller AND re.RecordType = FFD.Constants.RecordType.SF AND purpose IN re.set_FCRA_purpose; // SF is not applicable to re-Sellers
       is_identity_theft := re.RecordType = FFD.Constants.RecordType.IT;
       
       SELF.acctno := re.acctno;
       SELF.UniqueID := re.LexID;
-      suppress_due_alerts := re.suppress_for_legal_hold OR is_security_fraud_alert 
+      suppress_due_alerts := re.suppress_for_legal_hold OR (~isReseller AND is_security_fraud_alert) 
                              OR is_security_freeze
-                             OR (is_identity_theft AND suppressIT);
+                             OR (is_identity_theft AND (suppressIT OR isReseller));
       SELF.suppress_records := suppress_due_alerts;                       
       SELF.has_record_statement := re.RecordType IN FFD.Constants.RecordType.StatementRecordLevel;                       
       SELF.has_consumer_statement := re.RecordType IN FFD.Constants.RecordType.StatementConsumerLevel;                       
@@ -108,7 +109,7 @@ EXPORT ConsumerFlag := MODULE
       SELF.has_record_statement := IF(is_legal_hold, FALSE, le.has_record_statement);
       SELF.has_consumer_statement := IF(is_legal_hold, FALSE, le.has_consumer_statement);
       SELF.consumer_flags.alert_legal_flag := le.consumer_flags.alert_legal_flag;
-      SELF.consumer_flags.alert_cnsmr_statement := '';  
+      SELF.consumer_flags.alert_cnsmr_statement := IF(is_legal_hold, '', le.consumer_flags.alert_cnsmr_statement);  
       SELF.consumer_flags.alert_security_freeze := IF(is_legal_hold, '', le.consumer_flags.alert_security_freeze);
       SELF.consumer_flags.alert_security_fraud := IF(is_legal_hold, '', le.consumer_flags.alert_security_fraud);
       SELF.consumer_flags.alert_identity_theft := IF(is_legal_hold, '', le.consumer_flags.alert_identity_theft);
@@ -117,7 +118,8 @@ EXPORT ConsumerFlag := MODULE
     
   EXPORT getAlertIndicators (DATASET (FFD.Layouts.PersonContextBatch) PersonContext,
                              INTEGER in_permissible_purpose = FCRA.FCRAPurpose.NoPermissiblePurpose,
-                             INTEGER8 inFFDOptionsMask = 0) := FUNCTION
+                             INTEGER8 inFFDOptionsMask = 0,
+                             BOOLEAN isReseller = FALSE) := FUNCTION
 
     BOOLEAN in_suppress_records_withIT := FFD.FFDMask.isSuppressRecordsWhenITAlert(inFFDOptionsMask);
     
@@ -125,7 +127,7 @@ EXPORT ConsumerFlag := MODULE
                                               FFD.Constants.RecordType.StatementRecordLevel,
                                               FFD.Constants.RecordType.StatementConsumerLevel]);
     
-    tr_alerts := PROJECT(pc_alerts, xf_prepare_alerts(LEFT, in_permissible_purpose, in_suppress_records_withIT));
+    tr_alerts := PROJECT(pc_alerts, xf_prepare_alerts(LEFT, in_permissible_purpose, in_suppress_records_withIT, isReseller));
     
     srt_alerts := SORT(tr_alerts, acctno, UniqueID);
                        

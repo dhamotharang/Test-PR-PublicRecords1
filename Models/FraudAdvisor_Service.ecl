@@ -1,7 +1,6 @@
-﻿﻿﻿//=============================================
-//===         FraudAdvisor_Service          === 
+﻿//=============================================
+//=========  FraudAdvisor_Service  ============
 //=============================================
-
 /*--SOAP--
 <message name="FraudAdvisorService">
 	<part name="DID" type="xsd:unsigned"/>
@@ -90,6 +89,7 @@ export FraudAdvisor_Service := MACRO
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
+#stored('SSNMask','');
 
 /* *********************************************
 	 *     Force the order on the WsECL page     *

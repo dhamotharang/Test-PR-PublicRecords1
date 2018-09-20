@@ -13,7 +13,7 @@ EXPORT ConstantsDeltaBase := MODULE
 		EXPORT Join_Columns 		:= 	' k.delta_key_id,k.date_added,k.report_code,k.jurisdiction_state,k.jurisdiction,k.case_identifier,k.state_report_number,' + 
 																'k.original_case_ident,k.original_st_rpt_num,k.date_of_loss,k.accident_location_street,k.accident_location_crossstreet,'+ 
 																'k.accident_location_nextstreet,k.agency_id,k.agency_ori,k.report_hashkey,k.has_coversheet,k.is_ready_for_public,k.vendor_code,'+
-																'k.report_link_id,k.report_type_id,k.contrib_source,k.officer_id, p.delta_key_id as pdelta_key_id,p.person_type,p.name_first,p.name_middle,p.name_last,' + 
+																'k.report_link_id,k.report_type_id,k.contrib_source,k.officer_id,k.vendor_report_id,k.date_report_submitted, p.delta_key_id as pdelta_key_id,p.person_type,p.name_first,p.name_middle,p.name_last,' + 
 																// 'p.name_suffix,p.dob,p.driver_license_number,p.address,p.city,p.state,p.zip_code,k.report_id,k.incident_id,k.is_deleted ';
 																'p.name_suffix,p.dob,p.driver_license_number,p.address,p.city,p.state,p.zip_code,p.vehicle_unit_number,k.report_id,k.incident_id,k.is_deleted,' +
 																// 'v.vin,v.tag_number,v.tag_state'; 

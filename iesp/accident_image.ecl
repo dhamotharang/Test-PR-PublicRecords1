@@ -32,6 +32,7 @@ export t_AccidentImageSearchOption := record (iesp.share.t_BaseSearchOption)
 	boolean IncludeCoverPage {xpath('IncludeCoverPage')};
 	boolean IyetekRedact {xpath('IyetekRedact')};
 	boolean ColoredImage {xpath('ColoredImage')};
+	boolean Redact {xpath('Redact')};
 end;
 		
 export t_AccidentImageResponse := record

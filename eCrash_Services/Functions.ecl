@@ -1,4 +1,4 @@
-﻿import iesp, lib_stringlib, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
+﻿import iesp, ut, FLAccidents_Ecrash, AutoStandardI, doxie, Std, eCrash_Services;
 
 export Functions := MODULE
 
@@ -113,9 +113,9 @@ export Functions := MODULE
 	end;
 	
 	
-	EXPORT location_filter (dataset(recordof(eCrash_Services.Layouts.recs_with_penalty)) recs, eCrash_Services.IParam.searchrecords in_mod):=function
-				string CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
-				string loc_street := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
+	EXPORT location_filter (dataset(eCrash_Services.Layouts.recs_with_penalty) recs, eCrash_Services.IParam.searchrecords in_mod):=function
+				string CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+				string loc_street := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
 				recs_exact:= recs((CrossStreet='' or (eCrash_Services.Constants.contains_match(accident_cross_street,CrossStreet) or 
 																						 eCrash_Services.Constants.contains_match(accident_street,CrossStreet) or
 																						 eCrash_Services.Constants.contains_match(next_street,CrossStreet)))
@@ -288,7 +288,7 @@ export Functions := MODULE
 
 		
 	EXPORT GetSuperReportIdFromDeltabase(STRING SqlQuery, eCrash_Services.IParam.searchrecords InMod) := FUNCTION
-		Parties := RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(SqlQuery);
+		Parties := eCrash_Services.RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(SqlQuery);
 		
 		RETURN MIN(Parties, report_id);
 	END;
@@ -349,8 +349,8 @@ export Functions := MODULE
 				)
 			);
 			
-			DeltaBaseSqlString := RecordsDeltaBase(InMod).deltaSQL.getImageRetrievalSql(ReportRecordForSql);
-			Parties := RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(DeltaBaseSqlString);
+			DeltaBaseSqlString := eCrash_Services.RecordsDeltaBase(InMod).deltaSQL.getImageRetrievalSql(ReportRecordForSql);
+			Parties := eCrash_Services.RecordsDeltaBase(InMod).DeltaService.LookupIncidentPersons(DeltaBaseSqlString);
 			ReportOwnerDriverDeduped := OwnerDriverDedup(Parties);
 			PayloadRecs := project(Payload,TRANSFORM(eCrash_Services.Layouts.eCrashRecordStructure, SELF:=LEFT, SELF := []));
 			
@@ -403,7 +403,7 @@ export Functions := MODULE
 
    EXPORT AssociatedReportsTransform (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, eCrash_Services.IParam.searchrecords in_mod) := FUNCTION
 	 
-		RawDocIn := RawDocument(in_mod);
+		RawDocIn := eCrash_Services.RawDocument(in_mod);
 		iesp.ecrash.t_ECrashSearchRecordData xformSearchRecordData(iesp.ecrash.t_ECrashSearchRecord l) := TRANSFORM
 	
 		  iesp.ecrash.t_ECrashDocument xform_Documents(eCrash_Services.Layouts.DocumentData l) := TRANSFORM
@@ -536,6 +536,10 @@ export Functions := MODULE
 					keys_report_date := eCrash_Services.Constants.Format_Report_Creation_Date(l.creation_date);
 					self.DateReportCreated := IF(l.isDelta, l.date_added[1..10], keys_report_date);
 					self.OfficerBadgeNumber := l.officer_id;
+					self.VendorReportID := l.vendor_report_id;
+					self.DateReportSubmitted.Year := (integer)l.Date_Report_submitted[1..4];
+					self.DateReportSubmitted.Month := (integer)l.Date_Report_submitted[6..7];
+					self.DateReportSubmitted.Day := (integer)l.Date_Report_submitted[9..10];
 					self:=[]
 					END;
 					
@@ -566,8 +570,8 @@ export Functions := MODULE
 		END;
 		
 		EXPORT GetImageDataFromDeltabase(SET OF STRING ReportIds, eCrash_Services.IParam.searchrecords InModuleDeltabase) := FUNCTION
-			DeltabaseService := DeltaBaseSoapCall(InModuleDeltabase);
-			DeltabaseSql := RawDeltaBaseSQL(InModuleDeltabase);
+			DeltabaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltabase);
+			DeltabaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltabase);
 			DeltabaseResponse := DeltabaseService.GetImageData(DeltabaseSql.GetTmImageSql(ReportIds));
 			
 			iesp.accident_image.t_AccidentImageResponseEx AccidentImageResponse := TRANSFORM
@@ -713,8 +717,8 @@ export Functions := MODULE
 			LIMIT(eCrash_Services.constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203)))
 		);	
 
-		DeltaBaseService := DeltaBaseSoapCall(InModuleDeltaBase);
-		DeltaBaseSql := RawDeltaBaseSQL(InModuleDeltaBase);				
+		DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
+		DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltaBase);				
 		
 		DeltaBaseDateAddedRaw := FLAccidents_Ecrash.Key_eCrashV2_DeltaDate(delta_text = 'DELTADATE');
 		DeltaBaseDateAdded := ut.date_math(DeltaBaseDateAddedRaw[1].date_added[1..8], -1);
@@ -911,7 +915,7 @@ export Functions := MODULE
 			RETURN result_recs;
 		END;
 		
-		EXPORT GetAgencySearchDs (IParam.searchrecords in_mod):=FUNCTION
+		EXPORT GetAgencySearchDs (eCrash_Services.IParam.searchrecords in_mod):=FUNCTION
 		
 			searchDs    := PROJECT(in_mod.agencies, transform(eCrash_Services.Layouts.SearchParameters, 
 																														self.vin := in_mod.VehicleVin;

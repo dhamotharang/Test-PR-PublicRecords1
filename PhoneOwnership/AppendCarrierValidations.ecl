@@ -130,7 +130,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 										inLNameMatch AND LastNameMatch AND NOT FirstNameMatch AND NOT AddressMatch => Constants.LNMatch.NAME + Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
 										LastNameMatch AND inputAddressMatch AND businessMatch='' AND AddressMatch => Constants.LNMatch.RELATIVE + Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
 										inputAddressMatch AND AddressMatch => Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
-										businessMatch='' AND LastNameMatch => Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
+										businessMatch='' AND (LastNameMatch OR AddressMatch OR EmailMatch) => Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
 										isCancelled => Constants.LNMatch.CELL,
 										l.LexisNexisMatchCode) + businessMatch;
 		SELF.reason_codes := MAP(fullNameMatch => Constants.Reason_Codes.MATCH,

@@ -147,6 +147,7 @@ MODULE
 		EXPORT STRING 	 ZumigoIdentity				 := 'Zumigo_GLI';
 		EXPORT STRING 	 ClientIDPrefix				 := 'LEXISNEXIS_';
 		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;
+		EXPORT STRING 	 TimeoutMessage 			 := 'timeout expired';
 	END;
 	// Zumigo Input Values
 	EXPORT ZumigoInputOptions :=
@@ -197,6 +198,5 @@ MODULE
 		EXPORT DISCONNECTED_CODE:= 'DE';
 
 	END;
-
-
+ 	
 END;

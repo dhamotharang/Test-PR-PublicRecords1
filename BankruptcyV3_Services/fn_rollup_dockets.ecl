@@ -1,4 +1,4 @@
-import bankruptcyv3, banko;
+﻿import bankruptcyv3, banko;
 
 export fn_rollup_dockets(
 	dataset(recordof(bankruptcyv3.key_bankruptcyv3_main_full())) in_records, boolean isFCRA, 
@@ -22,12 +22,12 @@ export fn_rollup_dockets(
 																	// ' '),
 											'&');
 		
-			temp_docket_evts := 
+      temp_docket_evts := 
 				join(
 					in_records,
 					k_dock,
 					left.tmsid[3..7] = right.court_code and left.tmsid[8..] = right.casekey
-					and EnteredDateFilter(),
+					and EnteredDateFilter() and right.casetype = BankruptcyV3_Services.consts.CASETYPE_BANKRUPTCY,
 					transform(
 						bankruptcyv3_services.layouts.layout_docket_ext,
 						self.DocketText := clean_docket_text(right.DocketText);

@@ -50,9 +50,9 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 	
   // Choose the search path
   fetched_dups1 := MAP (
-    SEARCH_RID                 => AutoHeaderV2.fetch_RID (ds_search_legacy),
+    SEARCH_RID                 => AutoHeaderV2.fetch_SaltID(ds_search), 
 		
-    SEARCH_DID                 => AutoHeaderV2.fetch_DID (ds_search_legacy),
+    SEARCH_DID                 => AutoHeaderV2.fetch_SaltID(ds_search), 
 
     SEARCH_ADDRESS             => AutoHeaderV2.fetch_address (ds_search_legacy, search_code) ,
 		
@@ -78,16 +78,15 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 // output(SEARCH_STATE_NAME, named('SEARCH_STATE_NAME'));	
 // output(fetched_dups, named('fetched_dups'));
 	
-  shared lib_dids := project(fetched_dups, transform(AutoheaderV2.layouts.search_out, 
-                                                     self.seq:= _row.seq,
+ shared lib_dids := project(fetched_dups, transform(AutoheaderV2.layouts.search_out, 
+                                                     self.seq:= _row.seq,																																																					
                                                      self     := left));
 																										 
 	EXPORT dataset (AutoHeaderV2.layouts.search_out) all_dids := lib_dids;
   																												
-  // output(fetched, named('fetched'));
   // choose best DIDs, if requested
   bd := if(_options.only_best_did, 
-           AutoheaderV2.functions.ChooseBestDID (lib_dids, ds_search), 
+           lib_dids(score>=75), 
            lib_dids);
 
   boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;

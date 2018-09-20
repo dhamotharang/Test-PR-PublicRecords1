@@ -5,8 +5,8 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 		
 		
 		
-		INTEGER bsVersion := DueDiligence.Constants.DEFAULT_BS_VERSION;
-		UNSIGNED8 bsOptions := DueDiligence.Constants.DEFAULT_BS_OPTIONS;
+		INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
+		UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
 		BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
 		
 		UNSIGNED1 dppa := options.DPPA_Purpose;

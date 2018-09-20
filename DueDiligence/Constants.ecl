@@ -3,6 +3,7 @@
 
 EXPORT Constants := MODULE
 
+EXPORT VERSION_0 := 0;
 EXPORT VERSION_3 := 3;
 
 EXPORT REQUESTED_SOURCE_ENUM := ENUM(UNSIGNED1, EMPTY=0, NONE=1, ONLINE=2, BATCH=3);
@@ -24,18 +25,15 @@ EXPORT INVALID := 'INVALID';
 EXPORT VALIDATION_INVALID_INDIVIDUAL := 'Minimum input information not met. Minimum input information is: \n (1)  First Name, Last Name, Street Address, City and State or Zip  OR \n (2)  First Name, Last Name, SSN  OR \n (3)  LexID';
 EXPORT VALIDATION_INVALID_BUSINESS := 'Minimum input information not met. Minimum input information is: \n (1)  Business Name, Street Address, City and State or Zip  OR \n (2)  Business Name, Tax ID OR \n (3)  LexID';
 EXPORT VALIDATION_INVALID_VERSION := 'Please enter a valid attributes version';
-EXPORT VALIDATION_INVALID_GLB := 'Not an allowable GLB permissible purpose';
-EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
+
 
 EXPORT DEFAULT_DPPA := 3;
 EXPORT DEFAULT_GLBA := 5;
 
-EXPORT DEFAULT_BS_VERSION := 50;
-EXPORT DEFAULT_BS_OPTIONS := 0;
 EXPORT DEFAULT_IS_FCRA := FALSE;
 
-EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 24;
-EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 25;
+EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 20;
+EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 21;
 
 EXPORT STRING_TRUE := 'TRUE';
 EXPORT STRING_FALSE := 'FALSE';
@@ -92,7 +90,7 @@ EXPORT FELONY                   := 'F';
 EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
-EXPORT UNKNOWN_OFFENSES         := [UNKNOWN, ''];   
+EXPORT UNKNOWN_OFFENSES         := [UNKNOWN, EMPTY];   
 
 
 EXPORT INCARCERATION_TEXT := 'Incarceration';
