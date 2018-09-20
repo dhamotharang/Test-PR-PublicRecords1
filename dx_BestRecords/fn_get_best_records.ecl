@@ -41,8 +41,7 @@ export fn_get_best_records(did_ds, did_field, perm_type_val) := functionmacro
 		perm_type_val = dx_BestRecords.Constants.perm_type.nonglb_nonblank_v2 => out_nonglb_nonblank_v2, 
 		perm_type_val = dx_BestRecords.Constants.perm_type.marketing => out_marketing, 
 		perm_type_val = dx_BestRecords.Constants.perm_type.marketing_v2 => out_marketing_v2, 
-		perm_type_val = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr, 
-		out_glb);
+		perm_type_val = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr);
 
 	return br_output;
 
