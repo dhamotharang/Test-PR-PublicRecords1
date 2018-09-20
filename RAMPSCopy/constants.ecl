@@ -42,7 +42,7 @@ EXPORT constants(string destenv) := module
 															stringlib.StringToUpperCase(destenv) = 'DR' => '10.194.100.151',
 															stringlib.StringToUpperCase(destenv) = 'QA' => '10.241.100.157',
 															stringlib.StringToUpperCase(destenv) = 'DEV' => '10.241.100.159',
-															'10.241.100.151'
+															'10.173.10.151'
 														);
 		export dstcluster := map
 															(
