@@ -220,6 +220,12 @@ EXPORT Layouts := MODULE
 		STRING10 geo_lat;
 		STRING11 geo_long;
 		STRING20 date_added;
+		UNSIGNED4 file_type;
+		STRING10 deceitful_confidence;
+		STRING30 user_added;
+		STRING250 reason_description;
+		STRING30 event_type_1;
+		STRING30 event_entity_1;
 	END;
 
 	EXPORT LOG_Deltabase_Layout := RECORD

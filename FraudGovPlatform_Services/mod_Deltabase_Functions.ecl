@@ -36,66 +36,23 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		SHARED GetRecentTimelineDetails(DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_delta_records) := FUNCTION
 
 			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
-				/*
-				SELF.IsRecentActivity := TRUE;
-				SELF.FileType := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
-				SELF.GlobalCompanyId := (INTEGER)L.gc_id;
-				SELF.TransactionId := (STRING)L.cust_transaction_id;
-				SELF.HouseHoldId := L.case_id;
-				SELF.CustomerPersonId := L.client_uid;
-				SELF.EventDate.Year := (INTEGER)(L.date_added[1..4]);
-				SELF.EventDate.Month := (INTEGER)(L.date_added[5..6]);
-				SELF.EventDate.Day := (INTEGER)(L.date_added[7..8]);
-				SELF.IndustryTypeDescription := L.program_name;
-				SELF.ReportedBy := L.inquiry_source;
-				SELF.ActivityReason := L.inquiry_reason;
-				SELF.UniqueId := (STRING)L.lex_id;
-				SELF.Name.Full := L.name_full;
-				SELF.Name.First := L.name_first;
-				SELF.Name.Middle := L.name_middle;
-				SELF.Name.Last := L.name_last;
-				SELF.Name.Suffix := L.name_suffix;
-				SELF.Name.Prefix := L.name_prefix;
-				SELF.SSN := L.ssn;
-				SELF.DOB.Year := IF(L.dob <> '', STD.Date.Year((INTEGER)L.dob), 0);
-				SELF.DOB.Month := IF(L.dob <> '', STD.Date.Month((INTEGER)L.dob), 0);
-				SELF.DOB.Day := IF(L.dob <> '', STD.Date.Day((INTEGER)L.dob), 0);
-				SELF.PhysicalAddress.StreetAddress1 := L.physical_address;		
-				SELF.PhysicalAddress.City := L.physical_city;
-				SELF.PhysicalAddress.State := L.physical_state;
-				SELF.PhysicalAddress.Zip5 := L.physical_zip;
-				SELF.PhysicalAddress.County := L.physical_county;
-				SELF.MailingAddress.StreetAddress1 := L.mailing_address;
-				SELF.MailingAddress.City := L.mailing_city;
-				SELF.MailingAddress.State := L.mailing_state;
-				SELF.MailingAddress.Zip5 := L.mailing_zip;
-				SELF.MailingAddress.County := L.mailing_county;
-				SELF.Phones := IF(L.phone <> '',
-													ROW({FraudGovPlatform_Services.Constants.PHONE_TYPE.PHONE_TYPE_HOME, L.phone,''}, iesp.fraudgovreport.t_FraudGovPhoneInfo),
-													ROW([], iesp.fraudgovreport.t_FraudGovPhoneInfo)
-													);
-				SELF.EmailAddress := L.email_address;
-				SELF.DriversLicense.DriversLicenseNumber := L.dl_number;
-				SELF.DriversLicense.DriversLicenseState := L.dl_state;
-				SELF.BankInformation1.BankAccountNumber := L.bank_account_number;
-				SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number;
-				SELF.IpAddress := L.ip_address;
-				SELF.DeviceId := L.device_id;
-				SELF.GeoLocation.Latitude := L.geo_lat;
-				SELF.GeoLocation.Longitude := L.geo_long;
-				*/
 				
 				SELF.IsRecentActivity := TRUE;
-				SELF.FileType := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
+				SELF.FileType := L.classification_Permissible_use_access.file_type;
 				SELF.GlobalCompanyId := (INTEGER)L.Customer_ID;
 				SELF.TransactionId := (STRING)L.Record_ID;
+				SELF.DeceitfulConfidenceId := (INTEGER)L.classification_Activity.Confidence_that_activity_was_deceitful_id;
 				SELF.HouseHoldId := L.Investigation_Referral_Case_ID;
 				SELF.CustomerPersonId := L.Customer_Person_ID;
+				SELF.EventType1 := L.Event_Type_1;
 				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
 				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
 				SELF.EventDate.Day := (INTEGER)(L.Event_Date[7..8]);
+				SELF.ReportedDateTime.Year := (INTEGER)(L.Event_Date[1..4]);
+				SELF.ReportedDateTime.Month := (INTEGER)(L.Event_Date[5..6]);
+				SELF.ReportedDateTime.Day := (INTEGER)(L.Event_Date[7..8]);
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
-				SELF.ReportedBy := L.Type_of_Referral;
+				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
 				SELF.ActivityReason := L.Referral_reason;
 				SELF.UniqueId := (STRING)L.UID;
 				SELF.Name.Full := L.raw_Full_name;
@@ -169,7 +126,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.Investigation_Referral_Case_ID := L.case_id;
 				SELF.Customer_Person_ID := L.client_uid;
 				SELF.Type_of_Referral := L.inquiry_source;
-				SELF.Referral_Reason := L.inquiry_reason;
+				SELF.Referral_Reason := L.reason_description;
 				SELF.SSN := L.SSN;
 				SELF.DOB := L.DOB;
 				SELF.UID := L.lex_id;
@@ -205,8 +162,14 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.additional_address.City := L.mailing_city;
 				SELF.additional_address.State := L.mailing_state;
 				SELF.additional_address.Zip := L.mailing_zip;
+				SELF.Event_Type_1 := L.Event_Type_1;
 				
+				SELF.classification_Permissible_use_access.user_added := L.user_added;
+				SELF.classification_Permissible_use_access.file_type := L.file_type;
 				SELF.classification_Permissible_use_access := R;
+				SELF.classification_Entity.entity_type := L.event_entity_1;
+				SELF.classification_Activity.Confidence_that_activity_was_deceitful_id := (INTEGER)L.deceitful_confidence;
+				SELF.classification_source.Industry_segment := L.program_name;
 
 				SELF := [];
 			END;
@@ -274,7 +237,8 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			// output(payload_mbs_filtered,named('payload_mbs_filtered'));
 			//output(payload_mbs_filtered,named('payload_mbs_filtered'));
 			
-			return payload_mbs_filtered;
+			// return payload_mbs_filtered;
+			return delta_w_fdn_file_info;
 	END;
 
 	EXPORT getDeltabaseReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) in_recs) := FUNCTION
@@ -382,7 +346,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			
 			//output(ds_timeline_records,named('ds_timeline_records'));
 
-			return ds_timeline_records;
+			return ds_timeline_records(FileType <> FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.StatusUpdate);
 	END;
 	
 	EXPORT getDeltabaseSearchRecords() := FUNCTION
