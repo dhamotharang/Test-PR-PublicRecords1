@@ -8,24 +8,24 @@ module
 	nodes				:= thorlib.nodes();	
 
 	Sources_To_Anonymize := Files().Input.SourcesToAnonymize.Sprayed;
+	Father_Data := FraudShared.Files().Base.Main.Father;
+	Demo_Data	:= Files().Input.DemoData.Sprayed;
+	FatherBaseAndDemo := if(_Flags.UseDemoData, Father_Data + Demo_Data, Father_Data);
 	
-	anonymizeSources := join ( pBaseFile,
+	anonymize_Only_New_Records := join ( pBaseFile,
+											  FatherBaseAndDemo,
+											  left.record_id = right.record_id,
+											  transform(FraudShared.Layouts.Base.Main, self := left;),
+											  left only);
+											  
+	anonymize_Only_Anonimized_Sources := join ( anonymize_Only_New_Records,
 											  Sources_To_Anonymize,
 											  left.classification_Permissible_use_access.fdn_file_info_id = right.fdn_file_info_id,
 											  transform(FraudShared.Layouts.Base.Main, self := left;),
 											  inner,
 											  LOOKUP);
 	
-	baseAndDemo := if(_Flags.UseDemoData, FraudShared.Files().Base.Main.Father + Files().Input.DemoData.Sprayed, FraudShared.Files().Base.Main.Father);
-	
-	anonymizeOnlyNewRecords := join ( pBaseFile,
-											  baseAndDemo,
-											  left.record_id = right.record_id,
-											  transform(FraudShared.Layouts.Base.Main, self := left;),
-											  left only);
-	
-	
-	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymizeOnlyNewRecords,raw_first_name,raw_last_name,,,,raw_full_name);
+	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymize_Only_Anonimized_Sources,raw_first_name,raw_last_name,,,,raw_full_name);
 	anonymizePerson1 :=Anonymizer.mac_AnonymizePerson(anonymizePerson,,,,ssn,dob,,clean_phones.cell_phone);
 	anonymizePerson2 :=Anonymizer.mac_AnonymizePerson(anonymizePerson1,cleaned_name.fname,cleaned_name.lname);
 	anonymizePerson3 :=Anonymizer.mac_AnonymizePerson(anonymizePerson2,,,,clean_ssn,clean_dob,,clean_phones.phone_number, Email_Address);
@@ -80,15 +80,21 @@ module
 											self:=l ;
 											end;
 
-	Base_Anonymized	:= Project(anonymizeAddress2,TrAddress(left));
+	New_Records_Anonymized	:= Project(anonymizeAddress2,TrAddress(left));
 	
-	Original_Data := join(pBaseFile,
-										anonymizeOnlyNewRecords,
+	Original_Father_And_Demo := join(FatherBaseAndDemo,
+									pBaseFile,
+									left.record_id = right.record_id,
+										transform(FraudShared.Layouts.Base.Main, self := left;),
+										left only);
+										
+	New_Records_Not_Anonimized := join(pBaseFile,
+										anonymize_Only_Anonimized_Sources,
 										left.record_id = right.record_id,
 										transform(FraudShared.Layouts.Base.Main, self := left;),
 										left only);
 	
-	Shared new_base := Base_Anonymized + Original_Data;
+	Shared new_base := Original_Father_And_Demo + New_Records_Anonymized + New_Records_Not_Anonimized;
 
 	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,new_base,Build_Base_File_Anonymized);
 
