@@ -137,7 +137,6 @@ headerCleaned := headerCleaned_2(~includedbyhhid) + HeaderHouseHoldsCleaned;
 phones := f(src='PH' AND did<>0); // just phones
 phones_dids := PROJECT(DEDUP(phones,did,all),TRANSFORM(doxie.layout_references, SELF.did := (unsigned)LEFT.did));
 
-//phones_bests := doxie.best_records(phones_dids,doSuppress:=false);
 phones_bests := doxie.best_records(phones_dids,doSuppress:=false, modAccess := mod_access);
 
 phones append_ssn(phones le, phones_bests ri) :=

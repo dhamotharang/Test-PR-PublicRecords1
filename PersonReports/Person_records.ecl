@@ -41,8 +41,7 @@ shared fcra_csa_wrap :=FCRA.comp_subject (dids,
 																					ds_flags,
 																					slim_pc_recs,
 																					in_params.FFDOptionsMask);
-// bestrecs_reg := doxie.best_records (dids, , in_params.DPPAPurpose, 
-// 																		in_params.GLBPurpose, true, IsFCRA, , , true, includeDOD:=true); // use non-blank key, see #39788
+
 bestrecs_reg := doxie.best_records (dids, IsFCRA, , , true, includeDOD:=true, modAccess := mod_access); // use non-blank key, see #39788
 																		
 shared bestrecs_ffd := if(IsFCRA, fcra_csa_wrap.best_record, 
@@ -360,7 +359,6 @@ src_names := doxie.Comp_Names; //did, name, ssn
 // rel_dids := dedup (sort (project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2)),
                          // did), did);
 rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2));
-//best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, IsFCRA, , , true,header.constants.checkRNA);
 best_akas := doxie.best_records (rel_dids, IsFCRA, , , true, header.constants.checkRNA, modAccess := mod_access);
 
 aka_src := if (in_params.use_bestaka_ra,

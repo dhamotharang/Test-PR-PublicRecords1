@@ -134,8 +134,6 @@ export CapitalGains_BatchService_Functions := module
 
 		dids := dedup(sort(project(ds_recs(did>0), doxie.layout_references), did));
 		ds_best_recs := doxie.best_records(dids,
-																			//  DPPA_override := dppaPurpose,
-																			//  GLB_override  := glbPurpose,
 																			 include_minors:= include_minors,
 																			 getSSNBest    := getSSNBest,
 																			 modAccess := mod_access

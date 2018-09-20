@@ -6,19 +6,9 @@ export inputs :=
 MODULE
 
 // Read and format some of the inputs
-// doxie.MAC_Header_Field_Declare()
-// export GLB_Purpose := AutoStandardI.InterfaceTranslator.GLB_Purpose.val(project(gmod,AutoStandardI.InterfaceTranslator.GLB_Purpose.params));		
-// export DPPA_Purpose := AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(project(gmod,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));	
 export maxresults_val := AutoStandardI.InterfaceTranslator.maxresults_val.val(project(gmod,AutoStandardI.InterfaceTranslator.maxresults_val.params));	
-// export ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gmod,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));	
-// export industry_class_value := AutoStandardI.InterfaceTranslator.industry_class_value.val(project(gmod,AutoStandardI.InterfaceTranslator.industry_class_value.params));	
-// export probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(gmod,AutoStandardI.InterfaceTranslator.probation_override_value.params));	
-// export no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));	
 
 EXPORT mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gmod);
-
-// export glb_ok := ut.glb_ok(GLB_Purpose);
-// export dppa_ok := ut.dppa_ok(DPPA_Purpose);
 
 export string4   ssn4_value := '' : STORED('SSN4');
 export unsigned2 yob_value := 0  : STORED('Yob');

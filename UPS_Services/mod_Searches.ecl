@@ -306,12 +306,7 @@ export mod_Searches := MODULE
 
 		export records(params in_mod) := FUNCTION
 
-			// dppaVal := AIT.DPPA_Purpose.val(project(in_mod, AIT.DPPA_Purpose.params));
-			// glbVal := AIT.GLB_Purpose.val(project(in_mod, AIT.GLB_Purpose.params));
-			// industryClass := AIT.industry_class_val.val(project(in_mod,AIT.industry_class_val.params));
-
       // {in_mod} is basically GlobalModule, but it doesn't define all fields required for projection.
-
       mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
         EXPORT unsigned1 glb := AIT.GLB_Purpose.val(project(in_mod,AIT.GLB_Purpose.params));
         EXPORT unsigned1 dppa := AIT.DPPA_Purpose.val(project(in_mod,AIT.DPPA_Purpose.params));
@@ -329,14 +324,7 @@ export mod_Searches := MODULE
 					doxie.mod_header_records(false, /* do daily/gong/quick search */
 																	 false, /* include dailies */
 																	 false, /* allow wildcard */
-																	//  0,     /* dateval */
-																	//  dppaVal,
-																	//  glbVal,
-																	//  false, /* ln_branded_value */
 																	 false,	/* include_gong */
-																	//  false, /* probation_override_value */
-																	//  industryClass,
-																	//  false, /* no scrub */
 																	 false, /* suppress_gong_noncurrent */
 																	 [],    /* daily_autokey_skipset */
 																	 false, /* AllowGongFallBack */
@@ -352,14 +340,7 @@ export mod_Searches := MODULE
 					doxie.mod_header_records(NOT EXISTS(dids),  /* do daily/gong/quick search */
 																	 NOT EXISTS(dids),  /* include dailies */
 																	 true,  /* allow wildcard */
-																	//  0,     /* dateval */
-																	//  dppaVal,
-																	//  glbVal,
-																	//  false, /* ln_branded_value */
 																	 NOT EXISTS(dids),	/* include_gong */
-																	//  false, /* probation_override_value */
-																	//  industryClass,
-																	//  false, /* no scrub */
 																	 false, /* suppress_gong_noncurrent */
 																	 [],    /* daily_autokey_skipset */
 																	 false, /* AllowGongFallBack */

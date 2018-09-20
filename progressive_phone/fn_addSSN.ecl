@@ -50,10 +50,6 @@ p_dids := dedup(sort(project(p_dids_extended, transform(doxie.layout_references_
 																	self.did := left.did, 
 																	self.includedByHHID := false)), did), did);
 
-// header_recs := doxie.mod_header_records(true, 
-// 																				daily_autokey_skipset := daily_autokey_skipset, 
-// 																				probation_override_value:= false).results(p_dids);
-
 header_recs := doxie.mod_header_records(true, 
 																				daily_autokey_skipset := daily_autokey_skipset,
                                         modAccess := mod_access 

@@ -76,14 +76,6 @@ if(
 	iterate(Main_Dn,tra(left,right))
 );
 
-// STRING5 industry_class_val := '' : STORED('IndustryClass');
-// industry_class_value := StringLib.StringToUpperCase (industry_class_val) : global;
-
-// get_csa0 := doxie.Comp_Subject_Addresses(dids, dateVal,
-// 	dppa_purpose, glb_purpose,
-// 	ln_branded_value, , 
-// 	probation_override_value, industry_class_value);
-
 get_csa0 := doxie.Comp_Subject_Addresses(dids, , , , mod_access);
 
 // enforce using [addresses] for FCRA-side queries

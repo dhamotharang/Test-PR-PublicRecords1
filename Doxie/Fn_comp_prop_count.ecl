@@ -27,10 +27,6 @@ FUNCTION
     EXPORT string5 industry_class := '';
   END;
 
-	// get_csa0 := doxie.Comp_Subject_Addresses(dids, 0,
-	// 1, 1,
-	// true, , 
-	// true, '');
 	get_csa0 := doxie.Comp_Subject_Addresses(dids, , , , mod_access);
 
 	csa_names := if(exists(names_in), names_in, get_csa0.names);

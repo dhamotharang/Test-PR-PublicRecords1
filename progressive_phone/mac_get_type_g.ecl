@@ -1,4 +1,3 @@
-//export mac_get_type_g(f_g_did, f_g_acctno, f_g_out, glb_purpose=0, data_restriction_mask='', dppa_purpose=0) := macro
 export mac_get_type_g(f_g_did, f_g_acctno, f_g_out, modAccess) := macro
 
 import Phones, phonesplus, doxie, ut, progressive_phone, Phonesplus_v2;

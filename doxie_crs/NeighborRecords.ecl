@@ -54,18 +54,6 @@
 		unsigned1 Neighbors_Per_NA := 6 : stored('NeighborsPerNA');
 		unsigned1 Neighbor_Recency := 3 : stored('NeighborRecency');								
 
-    // tempmod := module(AutoStandardI.DataRestrictionI.params)
-		//   export boolean AllowAll := false;
-		//   export boolean AllowDPPA := false;
-		//   export boolean AllowGLB := false;		  
-		// 	export string DataRestrictionMask := InmodDRM;
-		//   export unsigned1 DPPAPurpose := inmodDPPAPurpose;
-		//   export unsigned1 GLBPurpose := inmodGLBPurpose;
-		//   export boolean ignoreFares := false;
-		//   export boolean ignoreFidelity := false;
-		//   export boolean includeMinors := false;
-	  // end;
-		
     gmod := AutoStandardI.GlobalModule (isFCRA);
     mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (gmod))
       EXPORT unsigned1 glb := inmodGLBPurpose;
@@ -76,25 +64,8 @@
     glb_ok := mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();
 
-	  // unsigned1 dppa_purpose := tempmod.DPPAPurpose; 
-		// unsigned1 glb_purpose := tempmod.GLBPurpose; 
-		
-		// dppa_ok := AutoStandardI.PermissionI_Tools.val(tempmod).DPPA.ok(tempmod.DPPAPurpose);
-		// glb_ok :=  AutoStandardI.PermissionI_Tools.val(tempmod).GLB.ok(tempmod.GLBPurpose);
-    
-		// GM := AutoStandardI.GlobalModule(isFCRA);	    														 
-    // string5 industry_class_value := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(GM,
-		//              AutoStandardI.InterfaceTranslator.industry_class_val.params));    													 		
     unsigned1 dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(gmod,
 		              AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 
-    // boolean probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(GM,
-		//              AutoStandardI.InterfaceTranslator.probation_override_value.params));
-    // boolean ln_branded_value := AutoStandardI.InterfaceTranslator.ln_branded_value.val(project(GM,
-		//              AutoStandardI.InterfaceTranslator.ln_branded_value.params)); 									 
-    // boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(GM,
-		//              AutoStandardI.InterfaceTranslator.no_scrub.params)); 								 
-    // unsigned3 dateVal := AutoStandardI.InterfaceTranslator.dateVal.val(project(GM,
-		//              AutoStandardI.InterfaceTranslator.dateVal.params)); 								 
  								 
 		boolean Include_Neighbors := false : stored('Include_Neighbors');
 		boolean Include_Neighbors_val := include_neighbors;
@@ -106,11 +77,7 @@
 		////////////////		
 
 		// step #1  -> do equivalent to doxie_crs.nbr_records;
-		// call this :  doxie.Comp_Subject_Addresses
 		// and use results to then call equivalent of this : doxie_crs.nbr_records
-			  // csa := doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,
-        //                                      no_scrub,dial_contactprecision_value, Addresses_PerSubject);
-
 	  csa := doxie.Comp_Subject_Addresses(dids,, dial_contactprecision_value, Addresses_PerSubject, mod_access);
     // 
 	  headerRecs := csa.addresses;

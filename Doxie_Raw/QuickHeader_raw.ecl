@@ -38,7 +38,6 @@ END;
 
 dppa_ok := mod_access.isValidDPPA ();
 glb_ok := mod_access.isValidGLB ();
-// no_scrub := true;
 
 header.MAC_GlbClean_Header(comm, clean, , , mod_access);
 

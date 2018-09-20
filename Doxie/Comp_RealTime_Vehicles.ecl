@@ -5,7 +5,6 @@ export Comp_RealTime_Vehicles (dataset(doxie.layout_references) dids,
 	dataset(doxie.layout_NameDID) ds_names = dataset([],doxie.layout_NameDID)) := module
 
 shared  input_params := AutoStandardI.GlobalModule();
-//shared	subj_Addrs := if(exists(ds_addrs),ds_addrs,doxie.Comp_Subject_Addresses(dids,,input_params.DPPApurpose,input_params.GLBpurpose,,,false,input_params.industryclass,,).addresses);
 
 //TODO: not likely needed, but have to reset few values to be on the safe side:
 mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (input_params))

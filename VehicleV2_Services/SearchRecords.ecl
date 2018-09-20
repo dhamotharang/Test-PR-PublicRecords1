@@ -218,8 +218,6 @@ export SearchRecords := MODULE
 		BOOLEAN isBestDataSearch := LENGTH(TRIM(polkOperation)) = 0 AND tempmod.ssn != '' AND
 					PermissibleUse not in Constant.POLK_PERMISSIBLE_NOT_NAMEADDR;
 				
-		// bestRecords := doxie.best_records(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (aInputData)
-		// 	 , , , , , , false,,includeDOD:=true ) ;
 		bestRecords := doxie.best_records(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (aInputData),
 			                                doSuppress := false, includeDOD:=true, modAccess := mod_access);
 		

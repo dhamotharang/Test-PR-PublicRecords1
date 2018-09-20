@@ -1,4 +1,3 @@
-//export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, glb_purpose=0, data_restriction_mask='',includeRelativeCell=false) := macro
 export mac_get_type_e(f_e_did, f_e_acctno, f_e_out, includeRelativeCell=false, modAccess) := macro
 
 import doxie_raw, didville, ut, NID, Header, STD;

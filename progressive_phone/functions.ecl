@@ -224,10 +224,7 @@ EXPORT functions := MODULE
 
     did_stream := dataset([{did_value}],{unsigned6 did});
 
-//    doxie.mac_best_records(did_stream,did,h_addr, dppa_ok, glb_ok,,Doxie.DataRestriction.fixed_DRM,,include_DOD:=true);
     doxie.mac_best_records(did_stream,did,h_addr, dppa_ok, glb_ok,,mod_access.DataRestrictionMask,,include_DOD:=true);
-    // h_name := dedup(sort(doxie.Comp_Subject_Addresses(did_stream, DPPA_Purpose, GLB_Purpose,,,,false,,,).raw,
-                    // -lname,-fname,-mname),lname,fname,mname);
     h_name := dedup(sort(doxie.Comp_Subject_Addresses(did_stream, , , , mod_access).raw,
                     -lname,-fname,-mname),lname,fname,mname);
 

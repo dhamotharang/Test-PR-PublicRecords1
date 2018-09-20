@@ -41,13 +41,6 @@ EXPORT IdentityFraudReport (
   END;
 
 
-  //  shared header_obj := doxie.mod_header_records (
-  //                    false, true, false, 0, //DoSearch, include dailies, allow_wildcard, dateVal
-  //                    param.dppapurpose, param.glbpurpose, false, //ln_branded_value
-  //                    true, param.probation_override, //include_gong, probation_override_value
-  //                    '', false, false, // industry_class_value, no_scrub, suppress_gong_noncurrent
-  //                    [], false, false, true   // daily_autokey_skipset, AllowGongFallBack, ApplyBpsFilter, GongByDidOnly
-  //               );
  shared header_obj := doxie.mod_header_records (
                      false, true, false, //DoSearch, include dailies, allow_wildcard
                      true,               // include_gong
@@ -470,8 +463,6 @@ EXPORT IdentityFraudReport (
   // ========================================================================
   //     Get detailed relatives description (compare to ContactCard)
   // ========================================================================
-//            dateVal := 0;
-//            ln_branded_value := false;
             probation := false;
             Relative_Depth := 3;
             max_relatives := 0; //means all;

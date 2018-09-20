@@ -44,7 +44,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		STRING5 Zip5 := '';
 		STRING3 Source := ''; // Source code on header
 		STRING8 DateOfBirth := ''; // Date of Birth on Header
-		STRING8 TodaysDate := ''; // Either ut/GetDate for realtime, or ArchiveDate for historical mode
+		STRING8 TodaysDate := ''; // Either system date for realtime, or ArchiveDate for historical mode
 		STRING8 Date_First_Seen := ''; // Date record first seen on header
 		STRING8 Date_Last_Seen := ''; // Date record last seen on header
 		STRING6 Date_First_Age := ''; // Age of the header record calculated by first seen date

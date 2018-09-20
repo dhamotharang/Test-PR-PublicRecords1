@@ -93,7 +93,6 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 	
 	dd_dids := dedup(sort(filt_dids,did),did);
 	dids := project(dd_dids,doxie.layout_references);
-//	Residents_all	:= doxie.best_records(dids, , DPPA_Purpose, GLB_Purpose, , , ,false,includeDOD:=true );
   Residents_all := doxie.best_records(dids, , ,false, includeDOD:=true, modAccess := mod_access);
 	res_rec cp_trans(roll_dids l, residents_all r) := transform
 		self.gender := map ( r.title = 'MR' => 'M',

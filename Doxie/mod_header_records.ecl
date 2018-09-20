@@ -9,15 +9,7 @@ export mod_header_records(
 																						// or just use the input DIDs
 	boolean include_dailies = false, 					//these two parms from doxie.header_records
 	boolean allow_wildcard = false,
-      // dataset(Doxie.layout_references_hh) d,		//these from doxie.Comp_Subject_Addresses
-	// unsigned3 dateVal = 0,
-	// unsigned1 dppa_purpose = 0,
-	// unsigned1 glb_purpose = 0,
-	// boolean ln_branded_value = false,
 	boolean include_gong = true,
-	// boolean probation_override_value,
-	// string5 industry_class_value='UTILI',
-	// boolean no_scrub = false, //this is required for glb cleaning macro; safest default is false
 	boolean suppress_gong_noncurrent = false,
 	set of STRING1 daily_autokey_skipset=[],
 	boolean AllowGongFallBack = true,
@@ -33,8 +25,6 @@ shared unsigned1 glb_purpose := modAccess.glb;
 shared boolean probation_override_value := modAccess.probation_override;
 shared boolean no_scrub := modAccess.no_scrub;
 
-//shared dppa_ok := ut.dppa_ok(modAccess.dppa); //mac_glbClean_header
-//shared glb_ok := ut.glb_ok(modAccess.glb);
 shared dppa_ok := modAccess.isValidDPPA ();
 shared glb_ok := modAccess.isValidGLB ();
 shared boolean is_knowx := modAccess.isConsumer ();

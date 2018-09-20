@@ -14,14 +14,11 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
   END;
 
 	// REQUIRED FOR MAC_GlbClean_Header()
-	// BOOLEAN no_scrub:=FALSE;
 	BOOLEAN checkRNA:=TRUE;
-	// BOOLEAN probation_override_value:=FALSE;
 	UNSIGNED1 GLB_Purpose:=mod_access.glb; //MAC_GLB_DPPA_Clean_RNA
 	UNSIGNED1	DPPA_Purpose:=mod_access.dppa; //MAC_GLB_DPPA_Clean_RNA
 	BOOLEAN glb_ok:=mod_access.isValidGLB(checkRNA);
 	BOOLEAN dppa_ok:=mod_access.isValidDPPA(checkRNA);
-	// STRING5 industry_class_value:=in_mod.industryclass;
 
 	AutoheaderV2.layouts.search srchRec(ds_srch_recs L) := TRANSFORM
 		SELF.taddress.prim_range          := L.prim_range;

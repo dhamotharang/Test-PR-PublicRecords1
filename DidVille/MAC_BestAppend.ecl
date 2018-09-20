@@ -296,12 +296,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 		// input include_minors -- is it include only or dppa as well?
   END;
 
-	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(//glb_purpose_value,
-																														 //dppa_purpose_value
-	                                                           //,fixed_DRM,appType
-																														 //,IndustryClass_val
-																														 //,ssn_mask_value
-																														 mod_access
+	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(mod_access
 																														 ,include_minors
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										

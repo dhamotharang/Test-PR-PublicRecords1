@@ -6,8 +6,6 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 										BOOLEAN GetSSNBest=true) := function
    gm := AutoStandardI.GlobalModule(); //TODO: now only for IncludeMinors
 	 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gm);
-   //inglbPurpose :=  AutoStandardI.InterfaceTranslator.glb_purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.glb_purpose.params));
-   //indppaPurpose :=  AutoStandardI.InterfaceTranslator.dppa_purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.dppa_purpose.params));
 
 	 searchMod:= MODULE(PROJECT(gm, ERO_Services.IParam.searchParams,opt))	end;	
 	   // Set an adjusted did_limit to 1 just in case it gets accidently input as 0
@@ -252,10 +250,6 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 	//get best information from best file
 	ds_best :=  doxie.best_records(
 	               di            := best_dids
-	              // ,use_global    := true
-                // ,DPPA_override := indppapurpose
-				        // ,GLB_override  := inglbpurpose
-                // ,get_valid_ssn := false // get valid SSN: deprecated -- already in best file
                 ,IsFCRA        := false
                 ,doSuppress    := false // postpone masking until the very end
                 ,doTimeZone    := false // do not append time zone

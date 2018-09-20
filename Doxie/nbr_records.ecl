@@ -50,7 +50,6 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
 	// process candidates for privacy -- this may SKIP records so it needs
 	// to be done before we get into selection and sequencing down below
 	//header.MAC_GlbClean_Header(cn_raw, cn_glb);
-//	ssn_mask_value := mod_access.ssn_mask;
 	suppress.MAC_Mask(cn_raw, cn, ssn, foo, true, false,, true, , mod_access.ssn_mask);
 	// OUTPUT(cn, named('cn')); // DEBUG
 

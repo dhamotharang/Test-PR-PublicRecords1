@@ -20,8 +20,6 @@ EXPORT Person_records_functions := Module
 		doxie.MAC_Selection_Declare();
 		doxie.MAC_Header_Field_Declare();
     mod_access := doxie.functions.GetGlobalDataAccessModule ();
-		// csa := Doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,
-		// 																					 no_scrub,dial_contactprecision_value, Addresses_PerSubject);
 		csa := Doxie.Comp_Subject_Addresses(dids,,dial_contactprecision_value, Addresses_PerSubject, mod_access);
 		return csa;
 	END;

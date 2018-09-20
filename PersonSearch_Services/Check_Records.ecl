@@ -35,9 +35,6 @@ export Check_Records(DATASET(iesp.checkpersonsearch.t_CheckPersonSearchRequest) 
    DL2use := StringLib.StringToUpperCase(search_by.DriverLicense.LicenseNumber);
 	 DLState2use := StringLib.StringToUpperCase(search_by.DriverLicense.IssueState);
 	
-  //  glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params));  
-	//  ssnMask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params)); 
-	//  dob_mask_value := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params)); 
 	 SSN2use := AutoStandardI.InterfaceTranslator.ssn_value.val(project(gm, AutoStandardI.InterfaceTranslator.ssn_value.params));  
  	 lname_val := AutoStandardI.InterfaceTranslator.lname_value.val(project(gm,AutoStandardI.InterfaceTranslator.lname_value.params));
 	 lname_set_val := AutoStandardI.InterfaceTranslator.lname_set_value.val(project(gm,AutoStandardI.InterfaceTranslator.lname_set_value.params));

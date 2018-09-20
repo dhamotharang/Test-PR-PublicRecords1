@@ -17,7 +17,6 @@ shared layout_comp_names_w_title := record
 end;
 
 // Best records for subject_information, AKAs, Imposters -checkRNA = false for subject_info,AKA and TRUE for imposters
-//shared bestrecs := doxie.best_records(dids, , DPPA_Purpose, GLB_Purpose, true, false, , , true, checkrna);
 shared bestrecs := doxie.best_records(dids, false, , , true, checkrna, modAccess := mod_access);
 // Fetch records using SSN
 shared sslr := doxie.SSN_Lookups;
@@ -205,7 +204,6 @@ with_ssn_info get_dead(with_ssn_info l,doxie.key_death_masterv2_ssa_did r):=tran
 	self := [];
 END;
 
-//is_glb_ok := ut.glb_ok(GLB_Purpose,checkrna);
 is_glb_ok := mod_access.isValidGLB (checkrna);
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 

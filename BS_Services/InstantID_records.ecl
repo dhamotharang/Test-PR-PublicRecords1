@@ -15,7 +15,6 @@ dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactpre
 DIDs := project(iir(DID > 0), Doxie.layout_references);
 csa := 
 	doxie.Comp_Subject_Addresses(
-//		dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub,dial_contactprecision_value);    
     dids,,dial_contactprecision_value, , mod_access);
 
 //***** rollup the addrs and get them into the right layout

@@ -57,9 +57,7 @@ export Did_Score() := FUNCTION
 	br := doxie.best_records(did, doSuppress:=false, includeDOD:=true, modAccess := mod_access);
 
 	// Get uncleaned records so that dt_first_seen may be pulled off any records. Later get passed through MAC_GlbClean_Header
-	// header_recs0 := doxie.mod_header_records(
-	// 	false,true,,,dppa_purpose,glb_purpose,,,false,'',,true).results(project(did,doxie.layout_references_hh));
-		//have to reset mod_access to ensure same call:
+		//have to reset mod_access to ensure same call as was here before:
 	mod_access_local := MODULE (PROJECT (mod_access, doxie.IDataAccess))
     EXPORT boolean ln_branded := FALSE;
     EXPORT boolean probation_override := FALSE;

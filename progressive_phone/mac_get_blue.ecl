@@ -4,7 +4,6 @@ export mac_get_blue(f_get_blue_in,
                     check_same_apt_lname='false', 
 				check_same_apt_diff_lname='false',
 				header_phone_use='false',
-//				data_restriction_mask='',
 				modAccess) := macro
 import doxie,header, header_quick, progressive_phone,utilfile, ut, mdr, STD;
 

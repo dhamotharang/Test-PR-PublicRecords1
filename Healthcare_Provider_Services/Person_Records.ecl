@@ -31,10 +31,8 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 
 	//Taken from PersonReports.Person_records modified to actually work correctly
 	shared input_dids_set := SET (dsDids, did);
-//	shared string6 ssn_mask_value := mod_access.ssn_mask; // unfortunate artefact: used in some macro
 
 	// TODO: rename to src_bestrecords
-//	EXPORT bestrecs := doxie.best_records (dsDids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true, includeDOD:=true); // use non-blank key, see #39788
 	EXPORT bestrecs := doxie.best_records (dsDids, false, , , true, includeDOD:=true, modAccess := mod_access); // use non-blank key, see #39788
 
 	shared src_ssn_main := Healthcare_Provider_Services.Person_records_functions.fn_ssn_records (bestrecs,,dsDids); //doxie_crs.layout_ssn_records
@@ -336,7 +334,6 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// rel_dids := dedup (sort (project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2)),
 													 // did), did);
 	rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2));
-	//best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, false, , , true,header.constants.checkRNA);
   best_akas := doxie.best_records (rel_dids, false, , , true, checkRNA := header.constants.checkRNA, modAccess := mod_access);
 
 		export aka_src := if (in_params.use_bestaka_ra,

@@ -6,7 +6,6 @@ export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in,
 											 boolean royaltyout = FALSE, 
 											 boolean useBusinessIds = FALSE) :=  FUNCTION
 
-// doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare();
 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 glb_ok := mod_access.isValidGLB();

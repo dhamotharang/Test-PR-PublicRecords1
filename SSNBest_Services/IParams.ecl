@@ -37,7 +37,6 @@ EXPORT IParams := MODULE
 	//this function is called to set the interface parameters before calling SSNBest_Services.Functions.fetchSSNs_generic
 	//NOTE that you can also call the fetchSSN's functions via your default stored batch params as is done in the SSNBest
 	//batch service or call setSSNBestParams_byInMod below
-//	EXPORT setSSNBestParams(glb_,dppa_,DRM_,appType_,indClass_,ssnMask_,IncludeMinors_,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
 	EXPORT setSSNBestParams(mod_access,IncludeMinors_,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
     IMPORT BatchDatasets;
 

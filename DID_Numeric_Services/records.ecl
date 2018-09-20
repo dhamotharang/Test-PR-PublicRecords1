@@ -27,11 +27,8 @@ glb_purpose									:= mod_access.glb;
 maxresults_val 							:= inp.maxresults_val;
 ssn_mask_value 							:= mod_access.ssn_mask;
 AllowMultipleResults_value 	:= inp.AllowMultipleResults_value; 
-//industry_class_value 				:= inp.industry_class_value;
 glb_ok											:= mod_access.isValidGLB ();
 dppa_ok											:= mod_access.isValidDPPA ();
-//probation_override_value		:= inp.probation_override_value;
-//no_scrub										:= inp.no_scrub;
 thresh_value								:= inp.thresh_value;
 
 
@@ -173,16 +170,9 @@ did := PROJECT(key_res,doxie.layout_references);
 
 //***** SCORING (DO NOT CHECK PERMISSIONS) AND DISPLAY (CHECK PERMISSIONS)
 
-// Function for getting best records
-// get_br(dataset(doxie.layout_references) did,dppa,glb) :=
-// 		doxie.best_records(did,false,dppa,glb,,, doSuppress:=false);
-
-
 // Get best records with and without permissions. The one with permission checked will be used for field
 // display, the one without will be used to calculate address score
 
-//br := get_br(did,255,255);		
-//br_permission_check := get_br(did,dppa_purpose,glb_purpose);
 br_permission_check := doxie.best_records(did, doSuppress:=false, modAccess := mod_access);
 							
 // Pass in dppa and glb 255 so that we get all records back. We want all records so that we can have the best

@@ -93,7 +93,6 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		// roll up aka names that belong to same DID
 		akas_name_ready := rollup (grp_aka_ready, group, RollAKAName (Left, rows (Left)));
 		
-		// best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, , , , true,header.constants.checkRNA);
     best_akas := doxie.best_records (rel_dids, , , , true, header.constants.checkRNA, modAccess := mod_access);
 
 		unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.GetAge((string8) dob),0); //Quick function to get age

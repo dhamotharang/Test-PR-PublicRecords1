@@ -60,17 +60,6 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				glb_ok := mod_access.isValidGLB ();
 				dppa_ok := mod_access.isValidDPPA ();
 
-			  // no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(in_mod,AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-				
-				// glb_purpose := in_mod.glbPurpose;				
-				// dppa_purpose := in_mod.dppapurpose;
-				
-				// industry_class_value := in_mod.industryclass;
-        // probation_override_value := in_mod.probationoverride;
-				
-				// glb_ok := ut.glb_ok(glb_purpose);
-				// dppa_ok := ut.dppa_ok(dppa_Purpose);
-
 								// determine if unparsedfullname field was filled out or not and populate correct fields.
 				
 			  fullName := Address.CleanNameFields(Address.CleanPerson73(in_mod.unparsedFullName));
@@ -263,20 +252,6 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				glb_ok := mod_access.isValidGLB ();
 				dppa_ok := mod_access.isValidDPPA ();
 
-				// no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(in_mod,
-				//                                      AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-				
-				// glb_purpose := in_mod.glbPurpose;				
-				// dppa_purpose := in_mod.dppapurpose;
-				
-				// industry_class_value := in_mod.industryclass;
-        // probation_override_value := in_mod.probationoverride;
-				
-				// glb_ok := ut.glb_ok(glb_purpose);
-				// dppa_ok := ut.dppa_ok(dppa_Purpose);
-				
-				//in_recs2_did := project(in_recs2,{in_recs2.did});
-				
         // get did from master COA rec				
 		    doxie_ref_did_set2  := project(in_recs2, 
 						 transform(doxie.layout_references, 

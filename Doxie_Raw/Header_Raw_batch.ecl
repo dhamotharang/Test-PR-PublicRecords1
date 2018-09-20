@@ -8,12 +8,10 @@ export Header_Raw_batch(
 	) := 
 FUNCTION
 
-// doxie.mac_header_field_declare();
 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 glb_ok := mod_access.isValidGLB ();
 dppa_ok := mod_access.isValidDPPA ();
 
-//is_knowx := ut.IndustryClass.is_knowx;
 is_knowx := mod_access.isConsumer ();
 
 kh := IF(is_knowx,Infutor.Key_Header_Infutor_Knowx,Doxie.Key_Header);
@@ -52,9 +50,6 @@ Fetch1_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out)
 Fetch1_MACRO(doxie.Key_Header,hdr_out)
 fetch1 := if(is_knowx,infr_out,hdr_out);
 
-//used in MAC_GLbClean
-//string5 industry_class_value := '';
-//boolean no_scrub := false;
 mod_access_local := MODULE (PROJECT (mod_access, doxie.IDataAccess))
   EXPORT string5 industry_class := '';
   EXPORT boolean no_scrub := FALSE;

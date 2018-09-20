@@ -59,14 +59,6 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	IF(COUNT(dedup(sort(recs,DID),DID))>MAX(AddressReport_Services.constants.MaxResidents,AddressReport_Services.constants.MaxProperties),FAIL(203,doxie.ErrorCodes(203)));
 	headerRecs 								:= project(recs, TRANSFORM(header.Layout_Header,self:=left,self:=[]));			 
-	//no_scrub 									:= param.no_scrub;
-	//glb_purpose 							:= param.glbPurpose;				
-	//dppa_purpose 							:= param.dppapurpose;
-	//industry_class_value 			:= param.industryclass;
-	//probation_override_value	:= param.probationoverride;
-//	glb_ok 										:= param.glb_ok; // can't take it from mod_access below, since I'm not sure how they were calculated
-//	dppa_ok 									:= param.dppa_ok;
-	// (in fact, they are taken from the input, so I can take them from mod_access)
 
   //Some values are not provided in the input module; until that, has to make this call:
   mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
@@ -92,11 +84,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	//***************************************
 
-	//Residents_all		:= doxie.best_records(dids, , dppa_purpose, glb_purpose, true, IsFCRA, , , true,, includeDOD:=true);
-	Residents_all		:= doxie.best_records(dids, IsFCRA, , , true, , includeDOD:=true, modAccess := mod_access);
+	Residents_all := doxie.best_records(dids, IsFCRA, , , true, , includeDOD:=true, modAccess := mod_access);
 
-	// perm_mod 				:= project(param,AutoStandardI.PermissionI_Tools.params);
-	// AutoStandardI.PermissionI_Tools.val(perm_mod).GLB.mac_FilterOutMinors(Residents_all,Residents_Filtered,,perm_mod, dob);
   Residents_Filtered := doxie.functions.MAC_FilterOutMinors (Residents_all, , dob, mod_access.show_minors);
 
 	Suppress.MAC_Suppress(Residents_Filtered,Residents_Filt_did,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
@@ -317,7 +306,6 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	//Relatives and Associates
 	ra_recs 				:= doxie.relative_dids(cur_dids);
 	ra_dids					:= dedup(sort(project(ra_recs, transform(doxie.layout_references, self.did := left.person2)), did), did);
-//	ra_best					:= doxie.best_records(ra_dids, , dppa_purpose, glb_purpose, false, IsFCRA, , , true,checkRNA:=true, includeDOD:=true)(dod = '');
 	ra_best					:= doxie.best_records(ra_dids, IsFCRA, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access)(dod = '');
 
 	relr						:= join(ra_recs(isRelative), ra_best, left.person2 = right.did, transform(AddressReport_Services.Layouts.rel_asst_layout, self := left, self := right));

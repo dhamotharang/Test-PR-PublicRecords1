@@ -95,11 +95,6 @@ srcIDFromQHeader := join(withDIDFromQHeader,header.Key_Rid_SrcID(true,false),
 with_rid_all := srcIDFromHeader + srcIDFromQHeader;
 
 //filters for GLB, DPPA, headerSourceRestrictions
-// with_rid_filtered := with_rid_all((glb_ok or ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
-//                                    AND
-//                                    (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND ut.PermissionTools.dppa.state_ok(header.translateSource(src), dppa_purpose, src)))
-//                                    AND (NOT doxie.DataRestriction.isHeaderSourceRestricted(src, doxie.DataRestriction.fixed_DRM))
-//                                   );
 with_rid_filtered := with_rid_all((glb_ok or mod_access.isHeaderPreGLB((unsigned3)dt_nonglb_last_seen, (unsigned3)first_seen, src))
                                    AND
                                    (~mdr.SourceTools.SourceIsDPPA(src) OR (dppa_ok AND 
@@ -358,9 +353,6 @@ end;
 
 hdr_rec := join(hdr_rid_all,doxie.Key_Header,keyed(left.did=right.s_did) and left.rid=right.rid,getheadall(right),LIMIT(ut.limits.HEADER_PER_DID,SKIP));
 
-// string5 industry_class_value := '';
-// boolean probation_override_value := false;
-// boolean no_scrub := false;
 header.MAC_GlbClean_Header(hdr_rec,hdr_rec_cleaned, , , mod_access);
 ut.MAC_Slim_Back(hdr_rec_cleaned, doxie_raw.layout_header_raw, hdr_rec_ready);
 

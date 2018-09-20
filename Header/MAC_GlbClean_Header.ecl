@@ -46,10 +46,9 @@ END;
 %oformat% %into% (%dl_rec% le, codes.Key_Codes_V3 R) := TRANSFORM
   _dppa_ok := #if (batch) le. #end dppa_ok;
   _dppa    := #if (batch) le.dppa_purpose #else modAccess.dppa; #end;
-  //? TODO: intertingly enough, also skip for batch
+  //? TODO: interestingly enough, also skip for batch
   SELF.dppa := IF (le.dl_src = 0, FALSE, IF (_dppa_ok AND (R.file_name = ''), TRUE, SKIP));
 
-//  SELF.glb := ~ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)le.dt_nonglb_last_seen, (unsigned3)le.dt_first_seen, le.src);
   SELF.glb := ~modAccess.isHeaderPreGLB ((unsigned3)le.dt_nonglb_last_seen, (unsigned3)le.dt_first_seen, le.src);
 
   // if we filled in the ssn with a utility ssn and it's a utility customer, blank out
@@ -120,20 +119,17 @@ Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)
-//ut.PermissionTools.GLB.mac_FilterOutMinors(%Fetch3b%,%Fetch3c_minors_cleaned%,,,dob)
 %Fetch3c_minors_cleaned% := doxie.functions.MAC_FilterOutMinors (%Fetch3b%,,dob, modAccess.show_minors);
 %Fetch3c% := if (IsFCRA, %Fetch3b%, %Fetch3c_minors_cleaned%);
 
 // Filter out any specific source(s) based upon the DataRestrictionMask.
 // As of October 2009 only Experian Credit Header is possibly being filtered out.
 #uniquename(Fetch3d)
-//header.MAC_Filter_Sources(%Fetch3c%, , src, modAccess.DataRestrictionMask);
 %Fetch3d% := doxie.functions.MAC_FilterSources (%Fetch3c%, src, modAccess.DataRestrictionMask);
 
 #uniquename(Fetch3e0)
 #uniquename(Fetch3e)
 %Fetch3e0% := Header.FilterDMVInfo(%Fetch3d%);
-//%Fetch3e% := if(%suppressDMVInfo% and ~ut.IndustryClass.is_Knowx and ~isFCRA, %Fetch3e0%, %Fetch3d%);
 %Fetch3e% := if(%suppressDMVInfo% and modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
 
 outfile := %Fetch3e%(glb_ok or ~glb);

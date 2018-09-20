@@ -107,7 +107,6 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 					
 						
   // Fetch records from the best file; this will be the base for the subject's record to return
-  // best_recs := doxie.best_records(dids,,,,,,FALSE,FALSE);
   best_recs := doxie.best_records(dids, , FALSE, FALSE, modAccess := mod_access);
 	
 	// Transform only required fields						

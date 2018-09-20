@@ -675,7 +675,6 @@ export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_rec
 																self.addr_dt_last_seen := (integer)left.dt_last_seen,
 																self := []));
 
-//	ppl_rec	:= project(doxie.best_records(did_rec, , in_param.DPPAPurpose, in_param.GLBPurpose, false, false, , , true,checkRNA:=true, includeDOD:=true),
 	ppl_rec	:= project(doxie.best_records(did_rec, false, , , true, checkRNA:=true, includeDOD:=true, modAccess := mod_access),
 											transform(AddressReport_Services.Layouts.possible_owner_layout,
 																self := left,

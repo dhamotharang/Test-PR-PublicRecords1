@@ -168,7 +168,6 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 		self.dls := project(r(did=l.did),PersonSearch_Services.layouts.DlRec);
 	end;
 	MyDLDataset := rollup(group(MyDLResultsSlim,did),group,makechildDs(left, rows(left)));
-//	rna_ok := ut.dppa_ok(dppa_purpose,header.constants.checkRNA);
 	rna_ok := mod_access.isValidDPPA (header.constants.checkRNA);
 	doxie.Layout_Rollup.KeyRec MyDLTransform(doxie.Layout_Rollup.KeyRec inRec, PersonSearch_Services.Layouts.DlRecDataset dlInfoDetail) := TRANSFORM
 		SELF.dlrecs := if(~inRec.includedbyhhid or rna_ok,dlInfoDetail.dls);
@@ -562,7 +561,6 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	whichRids := join(tagrp, ta2, LEFT.did = RIGHT.did, getRids(LEFT));
 	srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record));
 
-//	best_recs := doxie.best_records(PROJECT(ta2,TRANSFORM(doxie.layout_references,SELF.did:=(unsigned)LEFT.did)),false,1,1,includeDOD:=true);
   mod_access_local := MODULE (mod_access)
 	  EXPORT unsigned1 glb := 1;
 	  EXPORT unsigned1 dppa := 1;

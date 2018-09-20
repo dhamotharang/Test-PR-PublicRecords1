@@ -67,7 +67,6 @@ EXPORT WeAlsoFoundService := MACRO
 		doxie.layout_lookups.xcount.accident_count;
   END;
 
-//  best_recs := doxie.best_records(dids,,dppa_purpose,glb_purpose,,,,false,true); 
   best_recs := doxie.best_records(dids, doTimeZone := FALSE, useNonBlankKey := TRUE, modAccess := mod_access); 
   dids_adjust := join(dids,best_recs,left.did = right.did, transform (slim_rec, Self := Left, self := right, Self := []));
 

@@ -651,7 +651,6 @@ export Functions := MODULE
 		//of certain datasets that alghough not yet live, can be used (experian, tu)
 		//the only way for that option to be open if the macro is invoked is to 
 		//set no_scrub (above) to true
-		// no_scrub := probation_override_value;
 			
 		header.MAC_GlbClean_Header(rawRecords, cleanRecs, , , mod_access);
 		suppress.MAC_Mask(cleanRecs, masked, ssn, blank, true, false, , , , mod_access.ssn_mask);

@@ -117,10 +117,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
      
       //GET Person Best Record for Auth Rep1
 		  authRep1_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID], Doxie.layout_references),
-                                            //  FALSE,  // use_global
-                                            //  SmallBizCombined_inmod.DPPAPurpose, 
-                                            //  SmallBizCombined_inmod.GLBAPurpose,
-                                            //  FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -163,10 +159,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
            
       //GET Person Best Record for Auth Rep2
 		  authRep2_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_2_LexID], Doxie.layout_references),
-                                            //  FALSE,  // use_global
-                                            //  SmallBizCombined_inmod.DPPAPurpose, 
-                                            //  SmallBizCombined_inmod.GLBAPurpose,
-                                            //  FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -207,10 +199,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                            );
       //GET Person Best Record for Auth Rep3
 		  authRep3_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_3_LexID], Doxie.layout_references),
-                                            //  FALSE,  // use_global
-                                            //  SmallBizCombined_inmod.DPPAPurpose, 
-                                            //  SmallBizCombined_inmod.GLBAPurpose,
-                                            //  FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone

@@ -1,14 +1,7 @@
 ﻿import ut, doxie;
 
 export Comp_Subject_Addresses(dataset(Doxie.layout_references) dids,
-															// unsigned3 dateVal = 0,
-															// unsigned1 dppa_purpose = 0,
-															// unsigned1 glb_purpose = 0,
-															// boolean ln_branded_value = false,
 															boolean include_gong = true,
-															// boolean probation_override_value,
-															// string5 industry_class_value='UTILI',
-															// boolean no_scrub=false,
 															unsigned1 dial_contactprecision_value = 4,
                               unsigned2 address_limit = 1000,
                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) :=

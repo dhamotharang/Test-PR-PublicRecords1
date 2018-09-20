@@ -1,7 +1,4 @@
-﻿/*2015-10-26T18:54:10Z (Janielle Goolgar)
-Govt AddrBest ranking implementation
-*/
-// This function finds latest 2 addressess after filtering out addresses that are in a detention center key and filtering out any 
+﻿// This function finds latest 2 addressess after filtering out addresses that are in a detention center key and filtering out any 
 // addressses that match input dedup addresses (up to 2).
 // NOTE: these filters can remove more than 2 addressess since matches are on prim_name, prim_range and zip.
 // Specific HRI for the addresses are looked up as well
@@ -10,8 +7,6 @@ Govt AddrBest ranking implementation
  import Address,BatchShare,doxie,ERO,Risk_Indicators, ut; 
 
  export fn_add2Addrs( dataset(ERO_Services.Layouts.LookupId) in_ids = dataset([],ERO_Services.Layouts.LookupId),
-                              // unsigned1 inGLBPurpose =0,
-															// unsigned1 inDPPAPurpose=0) :=
 															doxie.IDataAccess modAccess) :=
 		function
 		   ids := record
@@ -82,7 +77,6 @@ Govt AddrBest ranking implementation
          EXPORT boolean no_scrub := FALSE;
          EXPORT string5 industry_class := '';
        END;
-		   //addresses_all := doxie.Comp_Subject_Addresses(dids,,inDPPAPurpose,inGLBPurpose,,,true,'',,).addresses;			 
 		   addresses_all := doxie.Comp_Subject_Addresses(dids,,,,mod_access_local).addresses;			 
 			 ranked_bestAddr := ERO_Services.fn_getRankedBestAddr(addresses_all);
 			 

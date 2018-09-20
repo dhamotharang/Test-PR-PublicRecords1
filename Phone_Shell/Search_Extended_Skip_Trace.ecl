@@ -38,14 +38,6 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 	/* ***************************************************************
 		* 						        	Get Blue Records						      			*
 	  *************************************************************** */
-  // inputmod := AutoStandardI.GlobalModule();
-  // industry_class_value :=  AutoStandardI.InterfaceTranslator.industry_class_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.industry_class_value.params)); 
-  // dppa_ok := AutoStandardI.InterfaceTranslator.dppa_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.dppa_ok.params)); 
-  // DPPA_Purpose := AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(project(inputmod,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));
-  // probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.probation_override_value.params)); 
-  // no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(inputmod,AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-  // glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(inputmod,AutoStandardI.InterfaceTranslator.glb_ok.params));  
-
   mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
   END;

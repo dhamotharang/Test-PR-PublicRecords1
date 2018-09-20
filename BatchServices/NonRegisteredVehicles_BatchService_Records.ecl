@@ -225,7 +225,6 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
 
   // 3. Check/clean the header records that were acquired.
-//  doxie.MAC_Header_Field_Declare(); //needed for use by Header.MAC_GlbClean_Header & below
 	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
@@ -301,8 +300,6 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
 	// 5.2 Get the "Best" name,address,SSN info for each did.
 	ds_best_info_for_dids := doxie.best_records(ds_dids_projctd_dlr,
-																							// DPPA_override := DPPA_Purpose,
-																							// GLB_override  := GLB_Purpose,
 																							doSuppress    := false,
 																							include_minors:= IncludeMinors,
 																							getSSNBest    := GetSSNBest,
@@ -416,7 +413,6 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 	//       and modified for use here.
   //dppa_purpose_x := DPPA_Purpose; // from doxie.MAC_Header_Field_Declare()
   ds_ihmvrs_vin_data_ok := ds_ihmvrs_vin_data(
-//	            ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) and 
 							mod_access.isValidDPPAState (state_origin, , source_code) and
 							(includeNonRegulatedSources or source_code not in [MDR.sourceTools.src_infutor_veh,MDR.sourceTools.src_infutor_motorcycle_veh]));
  

@@ -1,4 +1,3 @@
-//export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, data_restriction_mask='', sx_match_restriction_limit) := macro
 export mac_get_type_f(f_f_did, f_f_acctno, f_f_out, sx_match_restriction_limit, modAccess) := macro
 
 import gong, progressive_phone, NID, ut, STD, watchdog;

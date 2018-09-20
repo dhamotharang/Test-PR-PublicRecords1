@@ -23,7 +23,6 @@ nbr_dids := DEDUP(SORT(
 											PROJECT(UNGROUP(doxie_nbrs),TRANSFORM(doxie.layout_references, SELF.did := LEFT.did)),
 									did),did);
 
-//best_akas := doxie.best_records (nbr_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, TRUE, , , , TRUE,header.constants.checkRNA);
 best_akas := doxie.best_records (nbr_dids, , , , TRUE, header.constants.checkRNA, modAccess := mod_access);
 
 subject_ssn_ds:= JOIN(dids, DidVille.key_did_ssn, KEYED(LEFT.did = RIGHT.did),

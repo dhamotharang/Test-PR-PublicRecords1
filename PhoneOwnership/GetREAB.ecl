@@ -68,7 +68,6 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 						LIMIT(Constants.MAX_RECORDS,SKIP));				
 										 
 	relativesDid := DEDUP(PROJECT(dsRelatives(did<>0),doxie.layout_references),did,ALL);
-//	dsRelativeBestRecs := Doxie.best_records(relativesDid,DPPA_override:=inMod.DPPAPurpose,GLB_override:=inMod.GLBPurpose);
 	dsRelativeBestRecs := Doxie.best_records(relativesDid, modAccess := mod_access);
 	ut.PermissionTools.GLB.mac_FilterOutMinors(dsRelativeBestRecs,dsRABest_noMinors,did,,dob);		
 	dsRelativesInfo := JOIN(dsRelatives,dsRABest_noMinors,

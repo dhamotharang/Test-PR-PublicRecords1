@@ -105,9 +105,6 @@ w_phone_disconnects := join(w_seq, risk_indicators.key_phone_table_v2,
 w_phone_disconnect_flag := dedup(sort(w_phone_disconnects, acctno, seq, -active_phone), seq);
 // output(w_phone_disconnect_flag, named('w_phone_disconnect_flag'));		
 
-// probation_override_value := false;
-// dateval := 0;
-
 // put all the DIDs from the results into 1 bucket to be used for searching header and address history
 dids := ungroup(project(f_out, transform(Doxie.layout_references, self.did := left.did)) + project(applicant_input_with_did, transform(Doxie.layout_references, self.did := left.did)));
 // output(dids, named('dids'));
@@ -115,7 +112,6 @@ dids := ungroup(project(f_out, transform(Doxie.layout_references, self.did := le
 deduped_dids := dedup(dids);
 // output(deduped_dids, named('deduped_dids'));
 
-// csa := doxie.Comp_Subject_Addresses(deduped_dids,dateVal,parameters.dppa, parameters.glb, parameters.ln_branded,parameters.includegong,probation_override_value);																						
 csa := doxie.Comp_Subject_Addresses(deduped_dids, parameters.includegong,,,mod_access);																						
 doxie.MAC_Address_Rollup(csa.addresses, Risk_Indicators.collection_shell_mod.max_addresses, address_history)
 // output(address_history, named('address_history'));

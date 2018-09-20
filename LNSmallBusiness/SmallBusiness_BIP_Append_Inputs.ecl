@@ -72,10 +72,6 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
     Unique_Rep_LexIDs := DEDUP(SORT(Rep_LexIDs, DID), DID);
     
 		  authRep_BestRecs := doxie.best_records(Unique_Rep_LexIDs,
-                                            //  FALSE,  // use_global
-                                            //  linkingOptions.DPPAPurpose, 
-                                            //  linkingOptions.GLBPurpose,
-                                            //  FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone

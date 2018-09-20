@@ -18,13 +18,6 @@ cnRec := doxie.layout_nbr_records_cn;
 export DATASET(cnRec) nbr_records_cn(
 	DATASET(targetRec) targetHR,
   unsigned1 proximity_radius = 10, 
-	// string5		industry_class_value, // for MAC_GlbClean_Header
-	// unsigned1 GLB_Purpose,
-	// unsigned1	DPPA_Purpose,
-	// boolean		probation_override_value, // for MAC_GlbClean_Header
-	// boolean		no_scrub, 								// for MAC_GlbC
-	// boolean		glbOK, //not used
-	// boolean		dppaok,  //not used
 	boolean checkRNA = true,  
 	string1		mode,												 // or part of results for the subject.
 	unsigned1 Neighbor_Recency,
@@ -111,9 +104,6 @@ export DATASET(cnRec) nbr_records_cn(
     // should we go to the best file to get the best name for the neighbors ?													
 		// clean the records when it still have the src and dates 
 	//TODO: why _ok are recalculated again here?	
-	//  glb_ok := ut.glb_ok(modAccess.glb,checkRNA);
-	//  dppa_ok := ut.dppa_ok(modAccess.dppa,checkRNA);
-
 	 glb_ok  := modAccess.isValidGLB (checkRNA);
 	 dppa_ok := modAccess.isValidDPPA (checkRNA);
 	 header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , ,modAccess);

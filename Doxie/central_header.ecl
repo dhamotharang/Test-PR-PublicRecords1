@@ -23,7 +23,6 @@ idid := max(dids(did > 0, did < header.constants.QH_start_rid), did);//dids has 
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
 dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
 
-//best_full := doxie.best_records (dids, , , , , FALSE, , , useNonBlankKey := true, getSSNBest := in_getSSNBest);
 best_full := doxie.best_records (dids, FALSE, useNonBlankKey := true, getSSNBest := in_getSSNBest, modAccess := mod_access);
 
 ssnr_pre := doxie.fn_ssn_records(best_full);

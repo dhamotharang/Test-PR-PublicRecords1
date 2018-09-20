@@ -126,11 +126,8 @@ export wdtg := module
 		
 		// get the header records for the target subject, and reduce to just zips
 		dids := dataset( [ targetDID ], doxie.layout_references );
-		// doxie.MAC_Header_Field_Declare();
 
     mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
-		// headerRecs := 
-		// 	doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub).addresses;
 		headerRecs := 
       doxie.Comp_Subject_Addresses(dids,mod_access := mod_access).addresses;
 		headerSort	:= sort(headerRecs,-dt_last_seen);
@@ -138,7 +135,6 @@ export wdtg := module
 		// output(headerSort, named('headerSort')); // DEBUG
 		
 		// get target names from the best record
-//		br := doxie.best_records (dids,,dppa_purpose,glb_purpose,,/*isfcra*/);
 		br := doxie.best_records (dids, modAccess := mod_access);
 		targetFirst := br[1].fname;
 		targetMiddle := br[1].mname;

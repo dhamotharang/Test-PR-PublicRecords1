@@ -20,7 +20,6 @@ EXPORT fn_relativeMatch(ERO_Services.Layouts.layout_extra_penalty   input_rec, u
 																				/*Relative_Depth*/1,/*max_relatives*/,/*isCRS*/,/*max_associates*/);
    relDids := project(relsFound(same_lname=true),transform(doxie.layout_references, self.did := left.person2));
 
-//   relNames := doxie.Comp_Subject_Addresses(RelDids,,,,,,true,,,).names;
    relNames := doxie.Comp_Subject_Addresses(RelDids,,,,mod_access).names;
    
 	 inputLast := trim(input_rec.Relative_Last_Name,all) <>'';

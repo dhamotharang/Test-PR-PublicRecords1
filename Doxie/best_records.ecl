@@ -2,10 +2,6 @@
 import AutoStandardI;
 
 export best_records(DATASET(doxie.layout_references) di,
-										// boolean use_global     = true,
-										// DPPA_override          = 0,
-										// GLB_override           = 0,
-										// boolean get_valid_ssn  = false, //deprecated
 										boolean IsFCRA         = false,
 										boolean doSuppress     = true,
 										boolean doTimeZone     = true,
@@ -17,11 +13,6 @@ export best_records(DATASET(doxie.layout_references) di,
 									  doxie.IDataAccess modAccess = MODULE (doxie.IDataAccess) END
                   ):=FUNCTION
 
-//doxie.mac_header_field_declare()
-
-// d := ut.dppa_ok (IF (use_global, DPPA_Purpose, dppa_override), checkRNA);
-// g := ut.glb_ok (IF (use_global, GLB_Purpose, glb_override), checkRNA);
-
 //Until macros are changed, need to declare these variables:
 boolean dl_mask_value := (modAccess.dl_mask = 1);
 glb_purpose := modAccess.glb;
@@ -31,13 +22,11 @@ mod_access := modAccess;
 d := modAccess.isValidDPPA (checkRNA);
 g := modAccess.isValidGLB (checkRNA);
 
-DRM := modAccess.DataPermissionMask;//doxie.DataRestriction.fixed_DRM;
+DRM := modAccess.DataPermissionMask;
 
 doxie.mac_best_records(di,did,o,d,g,useNonBlankKey,DRM,,,,includeDOD);
 
-ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(//GLB_override,DPPA_override,DRM,application_type_value
-													                                 //,industry_class_value,ssn_mask_value,include_minors
-																													 modAccess,
+ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(modAccess,
 																													 include_minors,
 																													 suppress_and_mask_:=FALSE, //since suppression is done later by all services that currently call getSSNBest
 																									         checkRNA_:= checkRNA);

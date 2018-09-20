@@ -25,7 +25,6 @@ doxie.layout_header_records %take%(d le, key_hp ri) := transform
 	self.src := ri.src;
 
 	// for efficiency, we know only non_glb
-//	self.did := IF(ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src),ri.did,SKIP);
   pre_glb := mod_access.isHeaderPreGLB ((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src);
 	self.did := IF(pre_glb,ri.did,SKIP);
 	

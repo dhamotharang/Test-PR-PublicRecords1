@@ -54,7 +54,6 @@ jd 	:= dedup(jd1, address_seq_no, keep(MaxResidentsPerAddr));
 
 //***** GATHER NAME/SSN/DOB INFO FOR THE DIDS WE FOUND
 dids := dedup(project(jd, doxie.layout_references));
-//b := doxie.best_records(dids,false,dppa_purpose,glb_purpose, , , , , , header.constants.checkRNA)
 b := doxie.best_records(dids, checkRNA := header.constants.checkRNA, modAccess := mod_access)
 			(dod = '');
 

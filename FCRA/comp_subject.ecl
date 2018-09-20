@@ -1,8 +1,5 @@
 ﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
 
-// doxie.MAC_Header_Field_Declare (true); // is FCRA
-// reads: dppa_ok, glb_ok, probation_override_value, no_scrub, IsFCRA, ssn_mask_value, dl_mask_value
-
 doxie.MAC_Selection_Declare() //Include_AKAs_val, Include_Imposters_val
 
 rec_header := RECORD

@@ -58,8 +58,6 @@ export STR_Functions := MODULE
     dppa_ok := mod_access.isValidDPPA ();
 		
 		ds_best_recs_raw := doxie.best_records(dids
-																					// ,DPPA_override := DPPA_Purpose
-																					// ,GLB_override  := GLB_Purpose
 																					 ,doSuppress    := false
 																					 ,include_minors:= in_mod.IncludeMinors
 																					 ,getSSNBest    := in_mod.GetSSNBest,

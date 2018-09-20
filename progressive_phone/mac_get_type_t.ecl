@@ -1,4 +1,3 @@
-//export mac_get_type_t(f_t_did, f_t_acctno, f_t_out, glb_purpose=0, data_restriction_mask='', dppa_purpose=0) := macro
 export mac_get_type_t(f_t_did, f_t_acctno, f_t_out, modAccess) := macro
 		
 /*
