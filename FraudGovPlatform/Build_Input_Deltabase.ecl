@@ -121,11 +121,11 @@ module
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+	MBS	:= FraudShared.Files().Input.MBS.sprayed;
 
 	
 	NotInMbs := join(f1,
-								MBS(Deltabase = 1),
+								MBS(status = 1),
 										left.Customer_Account_Number =(string)right.gc_id and
 										left.file_type = right.file_type and
 										left.ind_type = right.ind_type,

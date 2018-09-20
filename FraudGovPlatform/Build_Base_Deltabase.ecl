@@ -27,10 +27,10 @@ module
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+	MBS	:= FraudShared.Files().Input.MBS.sprayed;
 
 	DeltabaseSource := join(	DeltabaseUpdate,
-									MBS(Deltabase = 1), 
+									MBS(status = 1), 
 									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
 									left.file_type = right.file_type  AND
 									left.ind_type = right.ind_type
