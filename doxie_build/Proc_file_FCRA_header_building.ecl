@@ -58,7 +58,7 @@ post1 := sequential(
 		fileservices.addsuperfile('~thor_data400::base::file_fcra_header_building_BUILT','~thor_Data400::base::file_fcra_header_building_BUILDING',0,true),
 		fileservices.clearsuperfile('~thor_Data400::base::file_fcra_header_building_BUILDING'));
 
-full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_fcra_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::fcra_header_'+typ,1),
+full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::file_fcra_header_building_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::fcra_header'+typ,1),
 		output('FCRA Header Base = BUILT. Nothing Done.'),
 		sequential(pre1, bld , if(~inc,bld_m),post1));
 
