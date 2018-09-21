@@ -4,6 +4,7 @@ export Proc_BK_Preprocess(string filedate) := function
 	inDefendants := Bankruptcyv2.File_In_Defendants;
 	courtcodelookup := Bankruptcyv2.File_Lookup_CourtCode;
 	courtcaselookup := Bankruptcyv2.File_Lookup_Courtcase;
+
 	
 	// Cleaning case *************************
 	blank_string_set := [ 'INFORMATION UNAVAILABLE',
@@ -711,7 +712,7 @@ export Proc_BK_Preprocess(string filedate) := function
 									if(trim(l.ssnMSrc) = 'M' ,'MANUAL', 
 										if(trim(l.ssnMSrc) = 'O' ,'OKLAHOMA',   
 											if(trim(l.ssnMSrc) = 'T' ,'ACCURINT-COURT VERIFIED', ''))));
-		self.dcodeDesc     :=  if(trim(l.dCode) = '2' 	,'OPEN',
+		self.dcodeDesc     :=  if(trim(l.dCode) = '02' 	,'OPEN',
 									if(trim(l.dCode) = '15' ,'DISMISSED', 
 										if(trim(l.dCode) = '20' ,'DISCHARGED',   
 											if(trim(l.dCode) = '30' ,'CONVERSION',
