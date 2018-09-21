@@ -17,13 +17,10 @@ EXPORT iid_getDID_prepOutput_THOR(DATASET(risk_indicators.layout_input) indata, 
 	// SIMPLIFY ALL OF THIS LOGIC DOWN TO JUST APPENDING DID WHEN MISSING ON INPUT.  IF IT'S ALREADY POPULATED, USE THAT ONE IN THE THOR JOB
 	didprep := PROJECT(indata(did=0), TRANSFORM(didville.Layout_Did_OutBatch, SELF := LEFT));
 	
-	didprep_TEMP := PROJECT(indata, TRANSFORM(didville.Layout_Did_OutBatch, SELF := LEFT));
+	// didprep_TEMP := PROJECT(indata, TRANSFORM(didville.Layout_Did_OutBatch, SELF := LEFT));
 	
 	matchset_input := ['A','D','S','P','Z'];
-	
-	// HARD CODE TO USE THE THOR VERSION OF DID APPEND
-	#STORED('did_add_force', 'thor');
-	
+
 	did_Add.MAC_Match_Flex(didprep, matchset_input,
 												 SSN, DOB, fName, mname, LName, suffix, 
 												 prim_range, prim_name, sec_range, z5,
@@ -37,7 +34,7 @@ EXPORT iid_getDID_prepOutput_THOR(DATASET(risk_indicators.layout_input) indata, 
  
  // if the input has the DID already, don't send that input record through the didappend again
 	already_has_did := PROJECT(indata(did<>0), TRANSFORM(didville.Layout_Did_OutBatch, SELF := LEFT));
-  all_dids := IF(isFCRA, didprep_TEMP, ungroup(resu + already_has_did)); // If it is FCRA, don't try to append a DID so that non-FCRA files aren't needed.
+  all_dids := ungroup(resu + already_has_did);
 	unique_dids := dedup(sort(project(distribute(all_dids, hash64(did)),transform(doxie.layout_references,self:=left)), did, LOCAL), did, LOCAL);
 
 	// all_dids := didprep_TEMP;  // JUST USE THE INPUT FILE DIDS TO AVOID ANY DID APPEND LOGIC FOR THIS INITIAL THOR TEST
