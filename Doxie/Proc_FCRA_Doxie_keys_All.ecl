@@ -22,7 +22,7 @@ fcra_keys := doxie.proc_fcra_header_keys(filedate);
 									if(~inc,Header.Proc_re_did_FCRA_EN) // only run in monthly
                                     ,header.build_FCRA_header(filedate,inc)
 									,fcra_clr_super
-									,fcra_chk_build(if(inc,'inc','mnt'))
+									,fcra_chk_build(if(inc,'inc',''))
 									,fcra_fhb(inc)
 									,fcra_keys
 									,fcra_mv2QA
