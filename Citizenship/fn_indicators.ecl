@@ -25,10 +25,14 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                         RIGHT.name_verification.age = 0 => 0,
                                                                                            RIGHT.name_verification.age);                       
                           
-                          //*** emergenceAgeHeader ***
-                                earliest_header_date    := Citizenship.Ver_source_Function(False,
+                          //*** extract the dates needed from the Ver Source Sections of Boca Shell
+                                ver_sources_information   := Citizenship.Ver_source_Function(RIGHT.seq,
                                                                                            RIGHT.header_summary.ver_sources, 
-                                                                                           RIGHT.header_summary.ver_sources_first_seen_date); 
+                                                                                           RIGHT.header_summary.ver_sources_first_seen_date,
+                                                                                           RIGHT.header_summary.ver_sources_last_seen_date);
+                           //*** emergenceAgeHeader ***
+                                earliest_header_date_SAS := ver_sources_information[1..10];                                                           
+                                earliest_header_date     := (integer)earliest_header_date_SAS;  
                                 earliest_header_yrs     := if(min(sysdate, earliest_header_date) = NULL, NULL, 
                                                               if((sysdate - earliest_header_date) / 365.25 >= 0, 
                                                                  roundup((sysdate - earliest_header_date) / 365.25), 
@@ -48,9 +52,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.emergenceAgeHeader    := iv_header_emergence_age;     
                                 
                            //*** emergenceAgeBureau 
-                                earliest_bureau_date       := Citizenship.Ver_source_Function(True,
-                                                                                        RIGHT.header_summary.ver_sources, 
-                                                                                        RIGHT.header_summary.ver_sources_first_seen_date); 
+                                earliest_bureau_date_SAS   := ver_sources_information[12..21];
+                                earliest_bureau_date       := (integer)earliest_bureau_date_SAS;  
                                                                                                                                               
                                 earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL, 
                                                                  if((sysdate - earliest_bureau_date) / 365.25 >= 0, 
@@ -120,8 +123,17 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                            //*** addressFirstReportedAge       
                                 SELF.addressFirstReportedAge := 0;                   //*** 
                            
-                           //*** timeSinceLastReportedNonBureau 
-                                SELF.timeSinceLastReportedNonBureau := 0;            //***  
+                                num_of_cred_sources          := ver_sources_information[34..36];
+                                last_seen_credentialed_SAS   := ver_sources_information[23..32];
+                                last_seen_by_cred_source     := (integer)last_seen_credentialed_SAS;
+                                
+                                YRSinceLastReportedCredential := map(
+                                                                     not(RIGHT.truedid)                       => NULL,
+                                                                     last_seen_by_cred_source = NULL          => NULL,
+                                                                     (integer)num_of_cred_sources > 0         => round((sysdate - last_seen_by_cred_source) / 365.25),
+                                                                                                              -1);
+                           //*** timeSinceLastReportedNonBureau *** ATTENTION - SHOULD the name of this indicator needs to be changed to TimeSinceLastReportedCredentialed
+                                SELF.timeSinceLastReportedNonBureau := IF(YRSinceLastReportedCredential = NULL, NEG1, YRSinceLastReportedCredential);            //***  
                          
                            //*** Using the Boca Shell and Risk_Indicators.rcSet.isCode__ to set a true of false value for each ***  
                            //*** Use RS Reason code logic
@@ -191,6 +203,10 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.inputComponentDivRisk := IF(nf_fp_divrisktype = NULL, NEG1, nf_fp_divrisktype);
                           //*** anything else is left empty
                                 SELF := [];));
+                                
+ 
                                         
   RETURN indicators;
+  
+ 
 END;
