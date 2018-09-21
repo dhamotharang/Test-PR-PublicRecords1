@@ -2,7 +2,7 @@ import header, lib_fileservices,_control,ut,AID,header_services,mdr,PromoteSuper
 
 export Proc_file_FCRA_header_building(string filedate, boolean inc) := function
 
-typ:=if(inc,'inc','mnt');
+typ:=if(inc,'_inc','');
 
 head := dataset('~thor_data400::Base::FCRA_HeaderKey_Building', header.Layout_Header, flat);
 
@@ -48,7 +48,7 @@ DoBuild := distribute(full_out_suppress,hash(did));
 
 pre1 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::file_fcra_header_building_BUILDING')>0,
     output('Nothing added to Base::file_fcra_header_building_BUILDING'),
-    fileservices.addsuperfile('~thor_data400::Base::file_fcra_header_building_BUILDING','~thor_data400::base::fcra_header_'+typ,,true));
+    fileservices.addsuperfile('~thor_data400::Base::file_fcra_header_building_BUILDING','~thor_data400::base::fcra_header'+typ,,true));
 
 PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building',bld,2,,true,pVersion:=filedate)
 PromoteSupers.Mac_SF_BuildProcess(DoBuild,'~thor_data400::BASE::file_fcra_header_building_mnt',bld_m,2,,true,pVersion:=filedate)
