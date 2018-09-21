@@ -1,1 +1,0 @@
-﻿EXPORT default_cluster := 'thor400_36';

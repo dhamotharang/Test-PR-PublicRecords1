@@ -13,8 +13,8 @@ EXPORT Build_SuppressionFile_Alpha(STRING filedate) := FUNCTION
   PromoteSupers.MAC_SF_BuildProcess(GetRID,'~thor_data400::base::alpha_suppression_rid',bld_suppression ,3,,true);
   
 	distlistAlpha  :=  if (_Control.ThisEnvironment.Name = 'Prod_Thor',
-														'Anantha.Venkatachalam@lexisnexis.com,Darren.Knowles@lexisnexis.com,Melanie.Jackson@lexisnexis.com,Charlene.Ros@lexisnexis.com,Ayeesha.Kayttala@lexisnexisrisk.com,cody.fouts@lexisnexisrisk.com',
-														'Anantha.Venkatachalam@lexisnexis.com,Darren.Knowles@lexisnexis.com,Melanie.Jackson@lexisnexis.com,Charlene.Ros@lexisnexis.com,Ayeesha.Kayttala@lexisnexisrisk.com,cody.fouts@lexisnexisrisk.com'														
+														'Darren.Knowles@lexisnexis.com,Ayeesha.Kayttala@lexisnexisrisk.com,cody.fouts@lexisnexisrisk.com',
+														'Darren.Knowles@lexisnexis.com,Ayeesha.Kayttala@lexisnexisrisk.com,cody.fouts@lexisnexisrisk.com'														
 														);
 														
 												
