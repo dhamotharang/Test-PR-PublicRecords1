@@ -73,6 +73,7 @@ end;
 		
 export t_FCRAInquiryHistoryResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	string RoxieCluster {xpath('RoxieCluster')};
 	dataset(t_FCRAInquiryHistoryRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_RECORDS)};
 end;
 		

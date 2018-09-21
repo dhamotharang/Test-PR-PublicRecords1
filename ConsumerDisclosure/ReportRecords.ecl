@@ -66,7 +66,7 @@ FUNCTION
     SELF.AlloyMediaStudent := PROJECT(alloy_media_student_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAlloyMediaStudentData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.AmericanStudent := PROJECT(american_student_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAmericanStudentData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.ATF := PROJECT(atf_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceATFData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
-    SELF.AVM := PROJECT(avm_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAVMData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
+    SELF.AVM := PROJECT(avm_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAVMData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.Snapshotdata:= LEFT.Snapshotdata));
     SELF.AVMMedians := PROJECT(avm_median_recs, ConsumerDisclosure.Transforms.xformAVMMediansData(LEFT));
     SELF.Bankruptcy := PROJECT(bk_recs, ConsumerDisclosure.Transforms.xformBKData(LEFT));
     SELF.Criminal := PROJECT(crim_recs, ConsumerDisclosure.Transforms.xformCriminalData(LEFT));
