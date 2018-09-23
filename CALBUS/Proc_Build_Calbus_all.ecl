@@ -1,4 +1,4 @@
-IMPORT _Control, Orbit_report;
+﻿IMPORT _Control, Orbit_report;
 EXPORT Proc_Build_Calbus_all(
 	STRING filedate,
 	STRING thorName,
@@ -28,7 +28,8 @@ EXPORT Proc_Build_Calbus_all(
 		DoClean,
 		DoBuild,
 		DoReport,
-		SampleRecs
+		SampleRecs,
+		Promote
 	) : SUCCESS(Send_Email(filedate).Build_Success), FAILURE(Send_Email(filedate).Build_Failure);
 
 	RETURN retval;
