@@ -12,18 +12,19 @@ module
 	Demo_Data	:= Files().Input.DemoData.Sprayed;
 	FatherBaseAndDemo := if(_Flags.UseDemoData, Father_Data + Demo_Data, Father_Data);
 	
-	anonymize_Only_New_Records := join ( pBaseFile,
-											  FatherBaseAndDemo,
-											  left.record_id = right.record_id,
-											  transform(FraudShared.Layouts.Base.Main, self := left;),
-											  left only);
+	anonymize_Records_Never_Anonymized_Before := join ( distribute(pBaseFile,hash32(record_id)),
+																					  distribute(FatherBaseAndDemo,hash32(record_id)),
+																					  left.record_id = right.record_id,
+																					  transform(FraudShared.Layouts.Base.Main, self := left;),
+																					  left only,
+																					  local);
 											  
-	anonymize_Only_Anonimized_Sources := join ( anonymize_Only_New_Records,
-											  Sources_To_Anonymize,
-											  left.classification_Permissible_use_access.fdn_file_info_id = right.fdn_file_info_id,
-											  transform(FraudShared.Layouts.Base.Main, self := left;),
-											  inner,
-											  LOOKUP);
+	anonymize_Only_Anonimized_Sources := join ( anonymize_Records_Never_Anonymized_Before,
+																		  Sources_To_Anonymize,
+																		  (unsigned2)left.classification_Permissible_use_access.fdn_file_info_id = (unsigned2)right.fdn_file_info_id,
+																		  transform(FraudShared.Layouts.Base.Main, self := left;),
+																		  inner,
+																		  LOOKUP);
 	
 	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymize_Only_Anonimized_Sources,raw_first_name,raw_last_name,,,,raw_full_name);
 	anonymizePerson1 :=Anonymizer.mac_AnonymizePerson(anonymizePerson,,,,ssn,dob,,clean_phones.cell_phone);
@@ -80,21 +81,23 @@ module
 											self:=l ;
 											end;
 
-	New_Records_Anonymized	:= Project(anonymizeAddress2,TrAddress(left));
+	New_Records_Anonymized	:= Project(anonymizeAddress2,TrAddress(left), local);
 	
-	Original_Father_And_Demo := join(FatherBaseAndDemo,
-									pBaseFile,
-									left.record_id = right.record_id,
-										transform(FraudShared.Layouts.Base.Main, self := left;),
-										left only);
-										
-	New_Records_Not_Anonimized := join(pBaseFile,
+	New_Records_Not_Anonimized := join(distribute(pBaseFile,hash32(record_id)),
 										anonymize_Only_Anonimized_Sources,
 										left.record_id = right.record_id,
 										transform(FraudShared.Layouts.Base.Main, self := left;),
-										left only);
-	
-	Shared new_base := Original_Father_And_Demo + New_Records_Anonymized + New_Records_Not_Anonimized;
+										left only,
+										local);
+										
+	Original_Father := join(	distribute(Father_Data,hash32(record_id)), // Discard Demo Data here, since it will append later and can cause duplicates
+											distribute(pBaseFile,hash32(record_id)),
+											left.record_id = right.record_id,
+											transform(FraudShared.Layouts.Base.Main, self := left;),
+											left only,
+											local);	
+										
+	Shared new_base := Original_Father + New_Records_Anonymized + New_Records_Not_Anonimized;
 
 	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,new_base,Build_Base_File_Anonymized);
 
