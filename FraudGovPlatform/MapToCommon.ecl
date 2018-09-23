@@ -76,7 +76,6 @@ module
 		self.Record_ID := left.source_rec_id;
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
-		self.ln_report_date := left.reported_date;
 		self.Fraud_Point_Score:= '';  
 		self.clean_business_name := ''; 
 		self.Rawlinkid := left.lexid;
@@ -86,12 +85,14 @@ module
 		self.reported_date := v_date;
 		self.reported_time := v_time;
 		self.event_date := v_date;
+		self.ln_report_date := v_date;
+		self.LN_Report_Time := v_time;
 		self.reported_by := left.user_added;
-		self.ssn_risk_code := if(left.event_entity_1 = 'FULL_SSN' , left.event_type_1, '') ;
-		self.identity_risk_code := if(left.event_entity_1 = 'LEXID' , left.event_type_1, '') ;
-		self.physical_address_risk_code := if(left.event_entity_1 = 'PHYSICAL_ADDRESS' , left.event_type_1, '') ;
-		self.phone_risk_code := if(left.event_entity_1 = 'PHONE' , left.event_type_1, '') ;
-		self.ip_address_fraud_code := if(left.event_entity_1 = 'IP_ADDRESS' , left.event_type_1, '') ;
+		self.ssn_risk_code						:= if(left.event_entity_1 = 'FULL_SSN'				, left.event_type_1, '') ;
+		self.identity_risk_code				:= if(left.event_entity_1 = 'LEXID'					, left.event_type_1, '') ;
+		self.physical_address_risk_code	:= if(left.event_entity_1 = 'PHYSICAL_ADDRESS'	, left.event_type_1, '') ;
+		self.phone_risk_code					:= if(left.event_entity_1 = 'PHONE'					, left.event_type_1, '') ;
+		self.ip_address_fraud_code			:= if(left.event_entity_1 = 'IP_ADDRESS'			, left.event_type_1, '') ;
 		self.transaction_id := left.Transaction_ID_Number;
 		self.investigation_referral_case_id  := left.Case_ID;
 		self.additional_address.Street_1 := left.mailing_street_1; 
@@ -105,23 +106,17 @@ module
 		self.Household_ID := left.Case_ID;
 		self.Customer_Person_ID := (string)left.Client_uid;
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id := (unsigned2)left.deceitful_confidence;
+		self.classification_Activity.Confidence_that_activity_was_deceitful	:= FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY' and status = 1 and desc_value = (unsigned2)left.deceitful_confidence )[1].description;;
+		self.classification_Permissible_use_access.file_type := left.file_type;
+		self.classification_source.Source_type_id := left.file_type;
+		self.classification_source.Source_type := FraudShared.MBS_CVD(column_name = 'FILE_TYPE' and status = 1 and desc_value = (unsigned2)left.file_type )[1].description;;
 		self:= left; 
 		self:= [];
 	)); 
 
-	JDeltaDC := join (Deltabase,
-								Constants().DeceiptfulConfidence,
-								left.classification_Activity.Confidence_that_activity_was_deceitful_id = right.Confidence_that_activity_was_deceitful_id,
-								transform(FraudShared.Layouts.Base.Main , 
-								self.classification_Activity.Confidence_that_activity_was_deceitful := if(left.classification_Activity.Confidence_that_activity_was_deceitful_id = right.Confidence_that_activity_was_deceitful_id, right.Confidence_that_activity_was_deceitful, '' ); self := left),
-								left outer,
-								lookup,
-								few
-								);
 
-	
 	// Append MBS classification attributes 
-	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + JDeltaDC); 
+	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + Deltabase); 
 	
 	// append rid 
 	// Filter header records

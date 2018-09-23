@@ -360,6 +360,7 @@ EXPORT Layouts := MODULE
 			unsigned6 		did; 
 			unsigned1		did_score;
 			unsigned6		ind_type;
+			unsigned1		Deltabase := 1;
 			Provenance;
 			string12		cell_phone := '';
 		END;
@@ -465,8 +466,8 @@ EXPORT Layouts := MODULE
 			string100		Source;
 			unsigned8		source_rec_id;
 			unsigned6		ind_type;
+			string12		cell_phone := '';	
 			unsigned1		Deltabase := 1;
-			string12		cell_phone := '';			
 		END;
 
 		EXPORT AddressCache := record

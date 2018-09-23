@@ -27,13 +27,12 @@ module
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= FraudShared.Files().Input.MBS.sprayed;
+	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left))(Deltabase = 1);
 
 	DeltabaseSource := join(	DeltabaseUpdate,
-									MBS(status = 1), 
+									MBS, 
 									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
-									left.file_type = right.file_type  AND
-									left.ind_type = right.ind_type
+									left.ind_type = right.ind_type and left.Deltabase = right.Deltabase
 									,TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 

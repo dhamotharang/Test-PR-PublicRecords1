@@ -104,6 +104,7 @@ module
                                     ut.CleanSpacesAndUpper(l.reason_description) + ',' + 
                                     ut.CleanSpacesAndUpper(l.event_type_1) + ',' + 
                                     ut.CleanSpacesAndUpper(l.event_entity_1))); 
+		self.Deltabase := 1;					 
 		self:=l;
 		self:=[];
 	end;
@@ -116,18 +117,16 @@ module
 				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
 			)and PSkipValidations = false);
 
-
 	MBS_Layout := Record
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= FraudShared.Files().Input.MBS.sprayed;
+	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 
-	
+
 	NotInMbs := join(f1,
-								MBS(status = 1),
+								MBS(Deltabase = 1),
 										left.Customer_Account_Number =(string)right.gc_id and
-										left.file_type = right.file_type and
 										left.ind_type = right.ind_type,
 										TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors

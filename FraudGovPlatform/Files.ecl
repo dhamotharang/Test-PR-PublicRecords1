@@ -43,6 +43,7 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_Deltabase,Layouts.Input.Deltabase,ByPassed_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_IDDT,Layouts.Base.AddressCache,AddressCache_IDDT,'CSV',,'~<EOL>~','~|~',,,true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_KNFD,Layouts.Base.AddressCache,AddressCache_KNFD,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_Deltabase,Layouts.Base.AddressCache,AddressCache_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.SourcesToAnonymize,Layouts.Input.SourcesToAnonymize,SourcesToAnonymize);
