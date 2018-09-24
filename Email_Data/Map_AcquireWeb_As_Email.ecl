@@ -1,7 +1,7 @@
-import Acquireweb_Email, aid, address, ut,emailservice, mdr, _validate, entiera;
+﻿import Acquireweb_Email, aid, address, ut,emailservice, mdr, _validate, entiera;
 export Map_AcquireWeb_As_Email(version) := function
 //************Acquireweb is under develoment.  AID and other fields will be mapped when available
-with_email := Acquireweb_Email.files.file_Acquireweb_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0);
+with_email := Acquireweb_Email.files.file_Acquireweb_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 and current_rec = TRUE);
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,email);
@@ -12,7 +12,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.rec_src_all      					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_acquiredweb);
 	self.email_src_all    					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_acquiredweb);
 	self.email_src_num 							:= 1;
-	self.current_rec      					:= true;
+	self.current_rec      					:= input.current_rec;
 	self.did_type         					:= '';
 	self.activecode     						:= input.activecode;
 	self.orig_pmghousehold_id  			:= '';
@@ -68,8 +68,8 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.date_first_seen  					:= _validate.date.fCorrectedDateString(input.date_first_seen);
 	self.date_last_seen  						:= _validate.date.fCorrectedDateString(input.date_last_seen);
 	
-	self.Date_Vendor_First_Reported := (string) version;
-	self.Date_Vendor_Last_Reported  := (string) version;
+	self.Date_Vendor_First_Reported := input.date_vendor_first_reported;
+	self.Date_Vendor_Last_Reported  := input.date_vendor_last_reported;
 	self.append_email_username 						:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
 	self.append_domain 										:= stringlib.stringtouppercase(input.domain);
 	self.append_domain_type 								:= stringlib.stringtouppercase(input.domain_type);

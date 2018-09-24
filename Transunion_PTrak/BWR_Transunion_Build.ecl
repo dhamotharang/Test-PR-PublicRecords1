@@ -5,8 +5,6 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 #workunit('protect',true);
 #workunit('name','Yogurt:Transunion_PTrak Build ' + update_filedate);
 #workunit('priority','high');
- // #option('AllowedClusters','thor400_44,thor400_60');
-	//#option('AllowAutoSwitchQueue',TRUE);
 #OPTION('multiplePersistInstances',FALSE);
   
 
@@ -42,7 +40,8 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 	   ,Proc_delete_persist
 	   ,Proc_clear_superfiles
 		 ,strata_rep
-		 	,Orbit3.Proc_Orbit3_CreateBuild_npf('TUC PTrak',update_filedate)
+		 	,Orbit3.Proc_Orbit3_CreateBuild_npf('TUCS PTrak',update_filedate)
+			,Orbit3.proc_Orbit3_CreateBuild_AddItem ('TUCS PTrak',update_filedate,'N',runaddcomponentsonly := true)
 		 ,_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_TUCS\');\r\n'+
 																	'Scrubs_TUCS.proc_generate_report();','thor400_60')
 	);

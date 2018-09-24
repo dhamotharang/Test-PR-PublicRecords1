@@ -1,5 +1,6 @@
-﻿import DOPSGrowthCheck,STD,ut;
+﻿
 export CalculateStats(PackageName='',recref,InputKeyNickName, in_base='',indexfields,PersistentRecIDField='',EmailField='',PhoneField='',SSNField='',FEINField='', VersionBase, VersionFather,willPublish=true, iskey=true) := functionmacro 
+import DOPSGrowthCheck,STD,ut;
 #IF(iskey=false)
 	BaseFile:=dataset(in_base,#expand(recref),thor);
 	#ELSE	

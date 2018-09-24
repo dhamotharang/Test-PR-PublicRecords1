@@ -6,7 +6,7 @@
 	//#option('AllowedClusters','thor400_20,thor400_30,thor400_60');
   #OPTION('multiplePersistInstances',FALSE);
 //  #option('AllowAutoQueueSwitch',TRUE);
-////# March USDir 201803, Canada 201803, Navteq 201301
+////# March USDir 2018091, Canada 201809, Navteq 201808
 	
 fileservices.RemoveOwnedSubFiles('~thor400_data::addresscleaner::monthly::processed');	
 fileservices.clearsuperfile('~thor400_data::addresscleaner::monthly::processed');

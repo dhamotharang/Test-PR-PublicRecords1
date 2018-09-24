@@ -432,6 +432,8 @@ export Main         :=
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;
@@ -472,6 +474,8 @@ export Main         :=
 	string10					clean_SSN :='';
 	string10					clean_Zip :='';
 	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
+
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
 	string1						Ethnicity := '';
@@ -629,6 +633,8 @@ export keybuild
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;
@@ -669,6 +675,7 @@ export keybuild
 	string10					clean_SSN :='';
 	string10					clean_Zip :='';
 	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';

@@ -1,4 +1,4 @@
-import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
+﻿import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
 	
 	portFile 					:= PhonesInfo.File_Phones.Ported_Current; 																//Port File
 	lidbFile					:= PhonesInfo.File_LIDB.Response_Processed;																//LIDB File
@@ -99,11 +99,13 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 //////////////////////////////////////////////////////////////////////////////////////////	
 	srcApp := record
 		PhonesInfo.Layout_Common.portedMetadata_Main;
+		string name							:= '';
 		string src 							:= '';
 	end;
 	
 	srcApp trLidb(lidbFile l):= transform
 		self.source 									:= 'PB';
+		self.name											:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
 		self.vendor_first_reported_dt	:= l.dt_first_reported;
 		self.vendor_last_reported_dt	:= l.dt_last_reported;
 		self.point_code								:= trim(l.point_code, left, right);
@@ -124,35 +126,26 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 		lidbDelt;
 		unsigned8 dt_first_reported;
 		unsigned8	dt_last_reported;
+		string    name;
 		string 	  src;
 	end;
 
 	compNameRespLayout fixN(lidbDelt l):= transform		
 		self.dt_first_reported	:= (integer)l.date_file_loaded;	
 		self.dt_last_reported		:= (integer)l.date_file_loaded;
-		self.src 								:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
+		self.name								:= PhonesInfo._Functions.fn_standardName(l.carrier_name);
+		self.src 								:= PhonesInfo._Functions.fn_keyCarrier(l.carrier_name);
 		self 										:= l;
 	end;
 	
 	fixCarrier 								:= project(lidbDelt, fixN(left));
-	sort_carrier 							:= sort(distribute(fixCarrier, hash(src)), src, carrier_ocn, local);		
+	sort_carrier 							:= sort(distribute(fixCarrier, hash(name)), name, carrier_ocn, local);		
 	
 	//Prep Carrier Reference File w/ Service & Line Types
-	compNameLayout := record
-		PhonesInfo.Layout_common.sourceRefBase;
-		string src;
-	end;
-			
-	compNameLayout fixCN(PhonesInfo.Layout_common.sourceRefBase l):= transform		
-		self.src 								:= PhonesInfo._Functions.fn_standardName(l.name);
-		self 										:= l;
-	end;
-	
-	fixName 					:= project(srcRef, fixCN(left));
-	sort_name					:= sort(distribute(fixName, hash(src)), src, ocn, local);
+	sort_name									:= sort(distribute(srcRef, hash(name)), name, ocn, local);
 
 	//Join the Returned LIDB Response File with the Source File to Populate Service and Line Types
-	PhonesInfo.Layout_Common.portedMetadata_Main appDeltaSL(sort_carrier l, sort_name r):= transform
+	srcApp appDeltaSL(sort_carrier l, sort_name r):= transform
 		dt_added := stringlib.stringfilter(l.date_added, '0123456789')[1..14];	
 		self.reference_id								:= (string)(hash32(l.submitted_phonenumber));
 		self.source											:= 'PB';
@@ -174,12 +167,12 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 	end;
 
 	joinLidbDeltFields:= join(sort_carrier, sort_name,
-														left.src = right.src and
+														left.name = right.name and
 														left.carrier_ocn = right.ocn,
 														appDeltaSL(left, right), left outer, local);
 	
-	cmnLidbDelt				:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
-	srcLidbDelt				:= project(cmnLidbDelt, srcApp);
+	srcLidbDelt				:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
+	cmnLidbDelt				:= project(srcLidbDelt, PhonesInfo.Layout_Common.portedMetadata_Main);
 
 //////////////////////////////////////////////////////////////////////////////////////////	
 //Map Disconnect Base to Common Layout////////////////////////////////////////////////////	

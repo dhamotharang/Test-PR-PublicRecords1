@@ -1,9 +1,9 @@
-/*2011-05-02T22:11:45Z (Cecelie Guyton)
+﻿/*2011-05-02T22:11:45Z (Cecelie Guyton)
 test 76599
 */
-import doxie, RoxieKeyBuild, ut, header;
+import doxie, RoxieKeyBuild, ut, header,infutor;
 
-filedate := trim(infutor.version_dev, all);
+filedate := trim(Infutor._config.get_cversion_dev, all);
 
 /* Build Keys */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Infutor.Key_Header_Infutor_Knowx,'~thor_data400::key::header.adl.infutor.knowx','~thor_data400::key::header::'+filedate+'::adl.infutor.knowx',hdr_if_knowx);
@@ -24,5 +24,5 @@ export proc_build_key_knowx := sequential(
 									parallel(hdr_if_knowx, teaser_did, teaser_search), 
 									parallel(mv_hdr_if_knowx, mv_teaser_did, mv_teaser_search), 
 									parallel(mv_hdr_if_knowx_qa, mv_hdr_did_qa, mv_hdr_search_qa),
-									RoxieKeybuild.updateversion('InfutorKeys',filedate,'cguyton@seisint.com',,'N|B')
+									RoxieKeybuild.updateversion('InfutorKeys',filedate,'goulmi01@lexisnexisrisk.com',,'N|B')
 									);

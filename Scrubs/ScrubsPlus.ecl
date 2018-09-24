@@ -145,9 +145,9 @@ IMPORT tools,std,ut,SALT311;
 	
 	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
 	SuperFile:='~thor_data400::ScrubsPlus::log';
-	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+ScrubsProfileName;
+	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+Prefix;
 	
-	Create_New_File	:=	output(new_entry,,Super_Log_File,thor,overwrite,named(scope_datasetName+'_LogEntryFull'));
+	Create_New_File	:=	output(new_entry,,Super_Log_File,thor,overwrite,named(Prefix+'_LogEntryFull'));
 
 
 

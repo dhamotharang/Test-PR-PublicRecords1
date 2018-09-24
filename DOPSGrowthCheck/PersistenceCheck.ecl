@@ -1,6 +1,9 @@
 ﻿EXPORT PersistenceCheck(in_base,in_father,PackageName,InputKeyNickName,recref,rec_id,PersistentFields,DistSet,VersionBase,VersionFather,willPublish=true,iskey=true) := functionmacro
 import std;
-
+	Package:=PackageName;
+	Nickname:=InputKeyNickName;
+	Base:=VersionBase;
+	Father:=VersionFather;
 	#Declare(CommandString);
 	#declare(CommaString);
 	#Declare(numField);
@@ -76,7 +79,7 @@ import std;
 	#end
 	#APPEND(CommandString,',tCheckPersistence(Left,Right),local);\n');
 	#APPEND(CommandString,'ResultTable:=Table(dCheckPersistence,{Diff,NumRecsChanged:=count(group)},Diff,merge);\n');
-	#APPEND(CommandString,'AddMetaData:=project(ResultTable,transform(DopsGrowthCheck.layouts.PersistLayout,Self.PackageName:=\''+PackageName+'\';Self.KeyNickName:=\''+InputKeyNickName+'\';self.CurrVersion:=\''+VersionBase+'\';self.PrevVersion:=\''+VersionFather+'\';Self.Passed:=\'N\';Self.NumRecsChanged:=(string)Left.NumRecsChanged;Self:=left;));\n');
+	#APPEND(CommandString,'AddMetaData:=project(ResultTable,transform(DopsGrowthCheck.layouts.PersistLayout,Self.PackageName:=Package;Self.KeyNickName:=Nickname;self.CurrVersion:=Base;self.PrevVersion:=Father;Self.Passed:=\'N\';Self.NumRecsChanged:=(string)Left.NumRecsChanged;Self:=left;));\n');
 	
 	#APPEND(CommandString,'results:=OUTPUT(AddMetaData);\n');
 %CommandString%;

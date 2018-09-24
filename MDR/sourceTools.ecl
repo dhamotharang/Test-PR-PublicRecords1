@@ -34,6 +34,7 @@ MODULE
 	export src_Accurint_Trade_Show       := 'AT';
 	export src_ACF                       := 'CF';  // America's Corporate Financial Directory
 	export src_Acquiredweb 							 := 'AW';
+	export src_Acquiredweb_plus					 := 'AP';	 // AcquiredWeb Plus - Business names and email addresses
   export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. – ADVO file 
 	export src_AHA                       := 'AH';  // American Hospital Association for Organization master repositry
 	export src_Aircrafts                 := 'AR';  // Aircraft registrations from the FAA
@@ -209,6 +210,7 @@ MODULE
 	export src_Enclarity								 := '64';
 	export src_Entiera 									 := 'ET';	
 	export src_Equifax                   := 'EQ';
+	export src_Equifax_Business_Data     := 'Z1';
 	export src_Equifax_Quick             := 'QH';
 	export src_Equifax_Weekly            := 'WH';
 	export src_Eq_Employer               := 'QQ';
@@ -259,6 +261,7 @@ MODULE
 	export src_INFOUSA_ABIUS_USABIZ      := 'IA';
 	export src_INFOUSA_DEAD_COMPANIES    := 'IC'; // Aka DEADCO
 	export src_INFOUSA_IDEXEC            := 'II';
+	export src_Infutor_NARB              := 'Z2';
 	export src_InfutorCID								 := 'IR';
 	export src_InfutorTRK                := 'IF';
 	export src_InfutorNarc               := '1F';
@@ -803,12 +806,12 @@ MODULE
 	export set_email	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt								, src_thrive_pd									,src_Ibehavior               , src_AlloyMedia_consumer,  src_SalesChannel, src_Datagence
-		,src_InfutorNare					,src_Anchor													,src_RealSource];
+		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus];
 		
 	export set_email_poe	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer
-		,src_InfutorNare			,src_Anchor											,src_RealSource];
+		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus];
 		
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
@@ -1057,6 +1060,31 @@ MODULE
 		,src_ZOOM
 	]; 
 
+export set_Marketing_Restricted := [
+  src_Aircrafts,             src_AK_Corporations,        src_AL_Corporations,        src_AL_Watercraft,             src_AR_Corporations,
+  src_AR_Watercraft,         src_AZ_Corporations,        src_AZ_Watercraft,          src_BBB_Member,                src_BBB_Non_Member,
+  src_Business_Registration, src_CA_Corporations,        src_CA_Sales_Tax,           src_CO_Corporations,           src_CO_Watercraft,
+  src_CT_Corporations,       src_CT_Watercraft,          src_DC_Corporations,        src_DEA,                       src_Dunn_Bradstreet_Fein,  
+  src_EBR,                   src_FBNV2_CA_Orange_county, src_FBNV2_CA_San_Bernadino, src_FBNV2_CA_Santa_Clara,      src_FBNV2_CA_Ventura,
+  src_FBNV2_FL,              src_FBNV2_Hist_Choicepoint, src_FBNV2_INF,              src_FBNV2_New_York,            src_FBNV2_TX_Dallas,
+  src_FBNV2_TX_Harris,       src_FDIC,                   src_FL_Corporations,        src_GA_Corporations,           src_GA_Watercraft,
+  src_HI_Corporations,       src_IA_Corporations,        src_IA_Watercraft,          src_ID_Corporations,           src_IL_Corporations,      
+  src_IL_Watercraft,         src_IN_Corporations,        src_IRS_Non_Profit,         src_KS_Corporations,           src_KY_Corporations,
+  src_LA_Corporations,       src_LA_Experian_Veh,        src_Liens_v2,               src_LnPropV2_Lexis_Deeds_Mtgs, src_MA_Corporations,      
+  src_MA_Watercraft,         src_MD_Corporations,        src_ME_Corporations,        src_ME_Watercraft,             src_MI_Corporations,
+  src_MN_Corporations,       src_MN_Watercraft,          src_MO_Corporations,        src_MS_Corporations,           src_MS_Watercraft,
+  src_MT_Corporations,       src_NC_Corporations,        src_NC_Watercraft,          src_ND_Corporations,           src_ND_Veh,
+  src_NE_Corporations,       src_NH_Corporations,        src_NJ_Corporations,        src_NV_Corporations,           src_NV_Watercraft,
+  src_NY_Corporations,       src_NY_Watercraft,          src_OH_Veh,                 src_OH_Watercraft,             src_OK_Corporations,
+  src_OR_Corporations,       src_OR_Watercraft,          src_OSHAIR,                 src_PA_Corporations,           src_RI_Corporations,
+  src_SD_Corporations,       src_TN_Corporations,        src_TN_Watercraft,          src_TX_Corporations,           src_TX_Watercraft,
+  src_TXBUS,                 src_UCC,                    src_UCCV2,                  src_US_Coastguard,             src_UT_Corporations,
+  src_VA_Corporations,       src_VT_Corporations,        src_WI_Corporations,        src_WI_Watercraft,             src_WV_Corporations,
+  src_WV_Watercraft,         src_WY_Corporations,        src_WY_Watercraft,           src_Bankruptcy,               src_Experian_CRDB,
+	 src_Business_Credit,       src_DCA,                    src_Dunn_Bradstreet,        src_IRS_5500
+ ];
+  
+
 	export set_NonDerog_FCRA_sources := [
 		src_Aircrafts              			,src_Airmen                 	,src_AK_Fishing_boats          ,src_AK_Perm_Fund                 	,
 		src_American_Students_List      ,src_DEA                 			,src_Death_Master              ,src_Death_State                  	,src_Death_Restricted							,
@@ -1243,6 +1271,17 @@ export set_NonDerog_FCRA_sources_v50 := [
 	,src_Intrado										,src_Pcnsr											,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
 	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
 	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek];
+	
+	//DF-22944
+	export set_Phonesplus_Header := [
+		src_Equifax										,src_LnPropV2_Fares_Asrs				,src_Voters_v2								,src_American_Students_List
+		,src_Professional_License			,src_Certegy										,src_EMerge_Hunt							,src_EMerge_Master
+		,src_TU_CreditHeader					,src_LnPropV2_Lexis_Asrs				,src_KY_Watercraft						,src_EMerge_Boat
+		,src_VA_Watercraft						,src_NC_Watercraft							,src_EMerge_Cens							,src_Federal_Firearms
+		,src_EMerge_Fish							,src_Federal_Explosives					,src_MD_Watercraft						,src_Miscellaneous
+		,src_MO_Veh										,src_MO_DL											,src_MO_Experian_Veh					,src_Experian_Credit_Header
+		,src_MO_Watercraft						,src_LnPropV2_Lexis_Deeds_Mtgs 
+	];
 	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
 	
@@ -1481,7 +1520,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Accurint_Sex_offender     := [src_Accurint_Sex_offender     ];
 	export set_Accurint_Trade_Show       := [src_Accurint_Trade_Show       ];
 	export set_ACF                       := [src_ACF                       ];
-	export set_Acquiredweb               := [src_Acquiredweb               ];	
+	export set_Acquiredweb               := [src_Acquiredweb               ];
+	export set_Acquiredweb_plus					 := [src_Acquiredweb_plus					 ];
   export set_advo_valassis	           := [src_advo_valassis             ]; 
 	export set_AHA                       := [src_AHA											 ];  
 	export set_Aircrafts                 := [src_Aircrafts                 ];
@@ -1651,7 +1691,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_EMerge_Master             := [src_EMerge_Master             ];
 	export set_Employee_Directories      := [src_Employee_Directories      ];
 	export set_Enclarity								 := [src_Enclarity								 ];
-	export set_Entiera                   := [src_Entiera                   ];	
+	export set_Entiera                   := [src_Entiera                   ];		
+	export set_Equifax_Business_Data     := [src_Equifax_Business_Data     ];	
 	export set_Equifax_Direct            := [src_Equifax                   ];
 	export set_Equifax_Quick             := [src_Equifax_Quick             ];
 	export set_Equifax_Weekly            := [src_Equifax_Weekly            ];
@@ -1703,6 +1744,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_INFOUSA_ABIUS_USABIZ      := [src_INFOUSA_ABIUS_USABIZ      ];
 	export set_INFOUSA_DEAD_COMPANIES    := [src_INFOUSA_DEAD_COMPANIES    ];
 	export set_INFOUSA_IDEXEC            := [src_INFOUSA_IDEXEC            ];
+	export set_Infutor_NARB              := [src_Infutor_NARB              ];
 	export set_InfutorCID								 := [src_InfutorCID		       			 ];
 	export set_InfutorTRK								 := [src_InfutorTRK		       			 ];
 	export set_InfutorNarc               := [src_InfutorNarc               ];
@@ -2169,6 +2211,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsEnclarity									(string  sr) := sr							 in set_Enclarity									 ;
 	export SourceIsEntiera                    (string  sr) := sr               in set_Entiera                    ;
 	export SourceIsEquifax                    (string  sr) := sr               in set_Equifax                    ;
+	export SourceIsEquifax_Business_Data      (string  sr) := sr               in set_Equifax_Business_Data      ;
 	export SourceIsEquifax_Direct             (string  sr) := sr               in set_Equifax_Direct             ;
 	export SourceIsEquifax_Quick              (string  sr) := sr               in set_Equifax_Quick              ;
 	export SourceIsEquifax_Weekly             (string  sr) := sr               in set_Equifax_Weekly             ;
@@ -2228,6 +2271,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsINFOUSA_ABIUS_USABIZ       (string  sr) := sr               in set_INFOUSA_ABIUS_USABIZ       ;
 	export SourceIsINFOUSA_DEAD_COMPANIES     (string  sr) := sr               in set_INFOUSA_DEAD_COMPANIES     ;
 	export SourceIsINFOUSA_IDEXEC             (string  sr) := sr               in set_INFOUSA_IDEXEC             ;
+	export SourceIsInfutor_NARB               (string  sr) := sr               in set_Infutor_NARB               ;
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
@@ -2520,6 +2564,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Accurint_Trade_Show       ,'Accurint Trade Show'                                       }
 		,{src_ACF                       ,'ACF - America\'s Corporate Financial Directory'            }
 		,{src_Acquiredweb      					,'Acquired Web'                                       			 }
+		,{src_Acquiredweb_plus					,'Acquired Web Business'																		 }
 	  ,{src_advo_valassis             ,'US Postal Service Via Valassis Communications, Inc. - ADVO'  }
 		,{src_AHA                       ,'AHA - American Hospital Association'      			           }
 	  ,{src_Aircrafts                 ,'Aircrafts'                                                 }
@@ -2694,6 +2739,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Enclarity									,'Enclarity'																								 }
 		,{src_Entiera       						,'Entiera'                                       						 }
 		,{src_Equifax                   ,'Equifax'                                                   }
+		,{src_Equifax_Business_Data      ,'Equifax Business Data'                                    }
 		,{src_Equifax_Quick             ,'Equifax Quick'                                             }
 		,{src_Equifax_Weekly            ,'Equifax Weekly'                                            }
 		,{src_Eq_Employer               ,'Eq Employer'                                               }
@@ -2744,7 +2790,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_INFOUSA_ABIUS_USABIZ      ,'INFOUSA ABIUS(USABIZ)'                                     }
 		,{src_INFOUSA_DEAD_COMPANIES    ,'INFOUSA DEAD COMPANIES'                                    }
 		,{src_INFOUSA_IDEXEC            ,'INFOUSA IDEXEC'                                            }
-	  ,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
+	  ,{src_Infutor_NARB              ,'Infutor NARB - Name and Address Resource Business'         }
+		,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
@@ -3024,7 +3071,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Accurint_Sex_offender     => 'Accurint Sex offender'                                
 		,src_Accurint_Trade_Show       => 'Accurint Trade Show'                                  
 		,src_ACF                       => 'ACF - America\'s Corporate Financial Directory'       
-		,src_Acquiredweb      				 => 'Acquired Web'                                       	
+		,src_Acquiredweb      				 => 'Acquired Web' 
+		,src_Acquiredweb_plus					 =>	'Acquired Web Business'
     ,src_advo_valassis         		 => 'US Postal Service Via Valassis Communications, Inc. - ADVO'
 		,src_AHA                       => 'AHA - American Hospital Association'       
 		,src_Aircrafts                 => 'Aircrafts'                                            
@@ -3198,7 +3246,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Employee_Directories      => 'Employee Directories'   
 		,src_Enclarity								 => 'Enclarity National Provider/Sanctions'
 		,src_Entiera       						 => 'Entiera'                                       				
-		,src_Equifax                   => 'Equifax'                                              
+		,src_Equifax                   => 'Equifax'
+		,src_Equifax_Business_Data     => 'Equifax Business Data'                                               
 		,src_Equifax_Quick             => 'Equifax Quick'                                        
 		,src_Equifax_Weekly            => 'Equifax Weekly'                                       
 		,src_Eq_Employer               => 'Eq Employer'
@@ -3249,6 +3298,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_INFOUSA_ABIUS_USABIZ      => 'INFOUSA ABIUS(USABIZ)'                                
 	  ,src_INFOUSA_DEAD_COMPANIES    => 'INFOUSA DEAD COMPANIES'                               
 	  ,src_INFOUSA_IDEXEC            => 'INFOUSA IDEXEC'                                       
+		,src_Infutor_NARB              => 'Infutor NARB - Name and Address Resource Business'
 		,src_InfutorCID	 							 => 'Infutor CID - Phones'                                 
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'

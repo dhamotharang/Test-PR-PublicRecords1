@@ -1,9 +1,11 @@
-IMPORT Data_Services, Doxie;
+﻿IMPORT Data_Services, Doxie;
+
+//PHPR-154 - Add Indexed Fields
 
 inFile := project(PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main, PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Main-date_file_loaded);
 
 EXPORT Key_RiskIndicators	:= index(inFile
-																		,{transaction_id, sequence_number, phone_id, date_added, time_added}
+																		,{transaction_id}
 																		,{inFile}
-																		,'~thor_data400::key::deltabasephonefinder::riskindicators_'+doxie.Version_SuperKey);
+																		,'~thor_data400::key::phonefinderreportdelta::riskindicators_'+doxie.Version_SuperKey);
 																																	

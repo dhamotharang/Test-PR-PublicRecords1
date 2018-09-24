@@ -1059,7 +1059,29 @@
 		export string KEYWORD_RSSRE_DIR3_WC					:= '747';
 		export string KEYWORD_ITGPDP								:= '748';
 		export string KEYWORD_IMOF_WMD							:= '749';
-
+		export string KEYWORD_ARMJHR_W							:= '750';
+		export string KEYWORD_US_SST								:= '751';
+		export string KEYWORD_BRCNEP								:= '752';
+		export string KEYWORD_MXASF									:= '753';
+		export string KEYWORD_JPMHLW								:= '754';
+		export string KEYWORD_GEGOV									:= '755';
+		export string KEYWORD_ZAFSCA								:= '756';
+		export string KEYWORD_SVSSF									:= '757';
+		export string KEYWORD_USJVNKA								:= '758';
+		export string KEYWORD_USMDOB								:= '759';
+		export string KEYWORD_BNAMBD								:= '760';
+		export string KEYWORD_USFDA									:= '761';
+		export string KEYWORD_WORLDBANK_ND					:= '762';
+		export string KEYWORD_KRFSC									:= '763';
+		export string KEYWORD_LBISF									:= '764';
+		export string KEYWORD_JPJSDA								:= '765';
+		export string KEYWORD_USSSR									:= '766';
+		export string KEYWORD_INNHB									:= '767';
+		export string KEYWORD_PEMINJUS							:= '768';
+		export string KEYWORD_EUFSR_RUS_50_WC				:= '769';
+		export string KEYWORD_AIIB									:= '770';
+		export string KEYWORD_FRCNIL								:= '771';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

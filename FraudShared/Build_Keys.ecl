@@ -31,6 +31,7 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDIndTypInclKey.New'			,BuildMbsFDNMasterIDIndTypInclKey	 	);
 	tools.mac_WriteIndex('TheKeys.Main.MbsVelocityRules.New'								,BuildMbsVelocityRules	 						);
 	tools.mac_WriteIndex('TheKeys.Main.MbsFdnIndType.New'										,BuildMbsFdnIndType			 						);
+	tools.mac_WriteIndex('TheKeys.Main.MbsDeltaBase.New'										,BuildMbsDeltaBase			 						);
 	tools.mac_WriteIndex('TheKeys.Main.CityState.New'												,BuildCityStateKey	 								);
 	tools.mac_WriteIndex('TheKeys.Main.Zip.New'															,BuildZipKey	 											);
 	tools.mac_WriteIndex('TheKeys.Main.CustomerID.New'											,BuildCustomerIDKey	 								);
@@ -74,6 +75,7 @@ export Build_Keys(
 			,BuildMbsFDNMasterIDIndTypInclKey
 			,If(Platform.Source = 'FraudGov'  ,BuildMbsVelocityRules)
 			,If(Platform.Source = 'FraudGov'  ,BuildMbsFdnIndType)
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsDeltaBase)
 			,BuildLinkIdsKey
 			,If(Platform.Source = 'FraudGov'  ,BuildCityStateKey)
 			,If(Platform.Source = 'FraudGov'  ,BuildZipKey)

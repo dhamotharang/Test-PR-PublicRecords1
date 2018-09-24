@@ -6,78 +6,106 @@ EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
-    populated_Customer_Account_Number_cnt := COUNT(GROUP,h.Customer_Account_Number <> (TYPEOF(h.Customer_Account_Number))'');
-    populated_Customer_Account_Number_pcnt := AVE(GROUP,IF(h.Customer_Account_Number = (TYPEOF(h.Customer_Account_Number))'',0,100));
-    maxlength_Customer_Account_Number := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Account_Number)));
-    avelength_Customer_Account_Number := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Account_Number)),h.Customer_Account_Number<>(typeof(h.Customer_Account_Number))'');
-    populated_Customer_County_cnt := COUNT(GROUP,h.Customer_County <> (TYPEOF(h.Customer_County))'');
-    populated_Customer_County_pcnt := AVE(GROUP,IF(h.Customer_County = (TYPEOF(h.Customer_County))'',0,100));
-    maxlength_Customer_County := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_County)));
-    avelength_Customer_County := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_County)),h.Customer_County<>(typeof(h.Customer_County))'');
-    populated_Customer_State_cnt := COUNT(GROUP,h.Customer_State <> (TYPEOF(h.Customer_State))'');
-    populated_Customer_State_pcnt := AVE(GROUP,IF(h.Customer_State = (TYPEOF(h.Customer_State))'',0,100));
-    maxlength_Customer_State := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_State)));
-    avelength_Customer_State := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_State)),h.Customer_State<>(typeof(h.Customer_State))'');
-    populated_Customer_Agency_Vertical_Type_cnt := COUNT(GROUP,h.Customer_Agency_Vertical_Type <> (TYPEOF(h.Customer_Agency_Vertical_Type))'');
-    populated_Customer_Agency_Vertical_Type_pcnt := AVE(GROUP,IF(h.Customer_Agency_Vertical_Type = (TYPEOF(h.Customer_Agency_Vertical_Type))'',0,100));
-    maxlength_Customer_Agency_Vertical_Type := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Agency_Vertical_Type)));
-    avelength_Customer_Agency_Vertical_Type := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Agency_Vertical_Type)),h.Customer_Agency_Vertical_Type<>(typeof(h.Customer_Agency_Vertical_Type))'');
-    populated_Customer_Program_cnt := COUNT(GROUP,h.Customer_Program <> (TYPEOF(h.Customer_Program))'');
-    populated_Customer_Program_pcnt := AVE(GROUP,IF(h.Customer_Program = (TYPEOF(h.Customer_Program))'',0,100));
-    maxlength_Customer_Program := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Program)));
-    avelength_Customer_Program := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Customer_Program)),h.Customer_Program<>(typeof(h.Customer_Program))'');
-    populated_LexID_cnt := COUNT(GROUP,h.LexID <> (TYPEOF(h.LexID))'');
-    populated_LexID_pcnt := AVE(GROUP,IF(h.LexID = (TYPEOF(h.LexID))'',0,100));
-    maxlength_LexID := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.LexID)));
-    avelength_LexID := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.LexID)),h.LexID<>(typeof(h.LexID))'');
-    populated_raw_Full_Name_cnt := COUNT(GROUP,h.raw_Full_Name <> (TYPEOF(h.raw_Full_Name))'');
-    populated_raw_Full_Name_pcnt := AVE(GROUP,IF(h.raw_Full_Name = (TYPEOF(h.raw_Full_Name))'',0,100));
-    maxlength_raw_Full_Name := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_Full_Name)));
-    avelength_raw_Full_Name := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_Full_Name)),h.raw_Full_Name<>(typeof(h.raw_Full_Name))'');
-    populated_raw_First_name_cnt := COUNT(GROUP,h.raw_First_name <> (TYPEOF(h.raw_First_name))'');
-    populated_raw_First_name_pcnt := AVE(GROUP,IF(h.raw_First_name = (TYPEOF(h.raw_First_name))'',0,100));
-    maxlength_raw_First_name := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_First_name)));
-    avelength_raw_First_name := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_First_name)),h.raw_First_name<>(typeof(h.raw_First_name))'');
-    populated_raw_Last_Name_cnt := COUNT(GROUP,h.raw_Last_Name <> (TYPEOF(h.raw_Last_Name))'');
-    populated_raw_Last_Name_pcnt := AVE(GROUP,IF(h.raw_Last_Name = (TYPEOF(h.raw_Last_Name))'',0,100));
-    maxlength_raw_Last_Name := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_Last_Name)));
-    avelength_raw_Last_Name := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.raw_Last_Name)),h.raw_Last_Name<>(typeof(h.raw_Last_Name))'');
-    populated_SSN_cnt := COUNT(GROUP,h.SSN <> (TYPEOF(h.SSN))'');
-    populated_SSN_pcnt := AVE(GROUP,IF(h.SSN = (TYPEOF(h.SSN))'',0,100));
-    maxlength_SSN := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.SSN)));
-    avelength_SSN := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.SSN)),h.SSN<>(typeof(h.SSN))'');
-    populated_Drivers_License_State_cnt := COUNT(GROUP,h.Drivers_License_State <> (TYPEOF(h.Drivers_License_State))'');
-    populated_Drivers_License_State_pcnt := AVE(GROUP,IF(h.Drivers_License_State = (TYPEOF(h.Drivers_License_State))'',0,100));
-    maxlength_Drivers_License_State := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Drivers_License_State)));
-    avelength_Drivers_License_State := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Drivers_License_State)),h.Drivers_License_State<>(typeof(h.Drivers_License_State))'');
-    populated_Drivers_License_Number_cnt := COUNT(GROUP,h.Drivers_License_Number <> (TYPEOF(h.Drivers_License_Number))'');
-    populated_Drivers_License_Number_pcnt := AVE(GROUP,IF(h.Drivers_License_Number = (TYPEOF(h.Drivers_License_Number))'',0,100));
-    maxlength_Drivers_License_Number := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Drivers_License_Number)));
-    avelength_Drivers_License_Number := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Drivers_License_Number)),h.Drivers_License_Number<>(typeof(h.Drivers_License_Number))'');
-    populated_Street_1_cnt := COUNT(GROUP,h.Street_1 <> (TYPEOF(h.Street_1))'');
-    populated_Street_1_pcnt := AVE(GROUP,IF(h.Street_1 = (TYPEOF(h.Street_1))'',0,100));
-    maxlength_Street_1 := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Street_1)));
-    avelength_Street_1 := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Street_1)),h.Street_1<>(typeof(h.Street_1))'');
-    populated_City_cnt := COUNT(GROUP,h.City <> (TYPEOF(h.City))'');
-    populated_City_pcnt := AVE(GROUP,IF(h.City = (TYPEOF(h.City))'',0,100));
-    maxlength_City := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.City)));
-    avelength_City := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.City)),h.City<>(typeof(h.City))'');
-    populated_State_cnt := COUNT(GROUP,h.State <> (TYPEOF(h.State))'');
-    populated_State_pcnt := AVE(GROUP,IF(h.State = (TYPEOF(h.State))'',0,100));
-    maxlength_State := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.State)));
-    avelength_State := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.State)),h.State<>(typeof(h.State))'');
-    populated_Zip_cnt := COUNT(GROUP,h.Zip <> (TYPEOF(h.Zip))'');
-    populated_Zip_pcnt := AVE(GROUP,IF(h.Zip = (TYPEOF(h.Zip))'',0,100));
-    maxlength_Zip := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Zip)));
-    avelength_Zip := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Zip)),h.Zip<>(typeof(h.Zip))'');
-    populated_did_cnt := COUNT(GROUP,h.did <> (TYPEOF(h.did))'');
-    populated_did_pcnt := AVE(GROUP,IF(h.did = (TYPEOF(h.did))'',0,100));
-    maxlength_did := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.did)));
-    avelength_did := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.did)),h.did<>(typeof(h.did))'');
+    populated_transaction_id_cnt := COUNT(GROUP,h.transaction_id <> (TYPEOF(h.transaction_id))'');
+    populated_transaction_id_pcnt := AVE(GROUP,IF(h.transaction_id = (TYPEOF(h.transaction_id))'',0,100));
+    maxlength_transaction_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.transaction_id)));
+    avelength_transaction_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.transaction_id)),h.transaction_id<>(typeof(h.transaction_id))'');
+    populated_datetime_cnt := COUNT(GROUP,h.datetime <> (TYPEOF(h.datetime))'');
+    populated_datetime_pcnt := AVE(GROUP,IF(h.datetime = (TYPEOF(h.datetime))'',0,100));
+    maxlength_datetime := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.datetime)));
+    avelength_datetime := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.datetime)),h.datetime<>(typeof(h.datetime))'');
+    populated_full_name_cnt := COUNT(GROUP,h.full_name <> (TYPEOF(h.full_name))'');
+    populated_full_name_pcnt := AVE(GROUP,IF(h.full_name = (TYPEOF(h.full_name))'',0,100));
+    maxlength_full_name := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.full_name)));
+    avelength_full_name := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.full_name)),h.full_name<>(typeof(h.full_name))'');
+    populated_title_cnt := COUNT(GROUP,h.title <> (TYPEOF(h.title))'');
+    populated_title_pcnt := AVE(GROUP,IF(h.title = (TYPEOF(h.title))'',0,100));
+    maxlength_title := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.title)));
+    avelength_title := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.title)),h.title<>(typeof(h.title))'');
+    populated_fname_cnt := COUNT(GROUP,h.fname <> (TYPEOF(h.fname))'');
+    populated_fname_pcnt := AVE(GROUP,IF(h.fname = (TYPEOF(h.fname))'',0,100));
+    maxlength_fname := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.fname)));
+    avelength_fname := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.fname)),h.fname<>(typeof(h.fname))'');
+    populated_mname_cnt := COUNT(GROUP,h.mname <> (TYPEOF(h.mname))'');
+    populated_mname_pcnt := AVE(GROUP,IF(h.mname = (TYPEOF(h.mname))'',0,100));
+    maxlength_mname := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.mname)));
+    avelength_mname := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.mname)),h.mname<>(typeof(h.mname))'');
+    populated_lname_cnt := COUNT(GROUP,h.lname <> (TYPEOF(h.lname))'');
+    populated_lname_pcnt := AVE(GROUP,IF(h.lname = (TYPEOF(h.lname))'',0,100));
+    maxlength_lname := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.lname)));
+    avelength_lname := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.lname)),h.lname<>(typeof(h.lname))'');
+    populated_name_suffix_cnt := COUNT(GROUP,h.name_suffix <> (TYPEOF(h.name_suffix))'');
+    populated_name_suffix_pcnt := AVE(GROUP,IF(h.name_suffix = (TYPEOF(h.name_suffix))'',0,100));
+    maxlength_name_suffix := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.name_suffix)));
+    avelength_name_suffix := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.name_suffix)),h.name_suffix<>(typeof(h.name_suffix))'');
+    populated_ssn_cnt := COUNT(GROUP,h.ssn <> (TYPEOF(h.ssn))'');
+    populated_ssn_pcnt := AVE(GROUP,IF(h.ssn = (TYPEOF(h.ssn))'',0,100));
+    maxlength_ssn := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.ssn)));
+    avelength_ssn := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.ssn)),h.ssn<>(typeof(h.ssn))'');
+    populated_appended_ssn_cnt := COUNT(GROUP,h.appended_ssn <> (TYPEOF(h.appended_ssn))'');
+    populated_appended_ssn_pcnt := AVE(GROUP,IF(h.appended_ssn = (TYPEOF(h.appended_ssn))'',0,100));
+    maxlength_appended_ssn := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.appended_ssn)));
+    avelength_appended_ssn := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.appended_ssn)),h.appended_ssn<>(typeof(h.appended_ssn))'');
+    populated_address_cnt := COUNT(GROUP,h.address <> (TYPEOF(h.address))'');
+    populated_address_pcnt := AVE(GROUP,IF(h.address = (TYPEOF(h.address))'',0,100));
+    maxlength_address := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.address)));
+    avelength_address := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.address)),h.address<>(typeof(h.address))'');
+    populated_city_cnt := COUNT(GROUP,h.city <> (TYPEOF(h.city))'');
+    populated_city_pcnt := AVE(GROUP,IF(h.city = (TYPEOF(h.city))'',0,100));
+    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.city)));
+    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.city)),h.city<>(typeof(h.city))'');
+    populated_state_cnt := COUNT(GROUP,h.state <> (TYPEOF(h.state))'');
+    populated_state_pcnt := AVE(GROUP,IF(h.state = (TYPEOF(h.state))'',0,100));
+    maxlength_state := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.state)));
+    avelength_state := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.state)),h.state<>(typeof(h.state))'');
+    populated_zip_cnt := COUNT(GROUP,h.zip <> (TYPEOF(h.zip))'');
+    populated_zip_pcnt := AVE(GROUP,IF(h.zip = (TYPEOF(h.zip))'',0,100));
+    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.zip)));
+    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
+    populated_fips_county_cnt := COUNT(GROUP,h.fips_county <> (TYPEOF(h.fips_county))'');
+    populated_fips_county_pcnt := AVE(GROUP,IF(h.fips_county = (TYPEOF(h.fips_county))'',0,100));
+    maxlength_fips_county := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.fips_county)));
+    avelength_fips_county := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.fips_county)),h.fips_county<>(typeof(h.fips_county))'');
+    populated_personal_phone_cnt := COUNT(GROUP,h.personal_phone <> (TYPEOF(h.personal_phone))'');
+    populated_personal_phone_pcnt := AVE(GROUP,IF(h.personal_phone = (TYPEOF(h.personal_phone))'',0,100));
+    maxlength_personal_phone := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.personal_phone)));
+    avelength_personal_phone := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.personal_phone)),h.personal_phone<>(typeof(h.personal_phone))'');
+    populated_dob_cnt := COUNT(GROUP,h.dob <> (TYPEOF(h.dob))'');
+    populated_dob_pcnt := AVE(GROUP,IF(h.dob = (TYPEOF(h.dob))'',0,100));
+    maxlength_dob := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.dob)));
+    avelength_dob := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.dob)),h.dob<>(typeof(h.dob))'');
+    populated_email_address_cnt := COUNT(GROUP,h.email_address <> (TYPEOF(h.email_address))'');
+    populated_email_address_pcnt := AVE(GROUP,IF(h.email_address = (TYPEOF(h.email_address))'',0,100));
+    maxlength_email_address := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.email_address)));
+    avelength_email_address := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.email_address)),h.email_address<>(typeof(h.email_address))'');
+    populated_dl_st_cnt := COUNT(GROUP,h.dl_st <> (TYPEOF(h.dl_st))'');
+    populated_dl_st_pcnt := AVE(GROUP,IF(h.dl_st = (TYPEOF(h.dl_st))'',0,100));
+    maxlength_dl_st := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.dl_st)));
+    avelength_dl_st := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.dl_st)),h.dl_st<>(typeof(h.dl_st))'');
+    populated_dl_cnt := COUNT(GROUP,h.dl <> (TYPEOF(h.dl))'');
+    populated_dl_pcnt := AVE(GROUP,IF(h.dl = (TYPEOF(h.dl))'',0,100));
+    maxlength_dl := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.dl)));
+    avelength_dl := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.dl)),h.dl<>(typeof(h.dl))'');
+    populated_ipaddr_cnt := COUNT(GROUP,h.ipaddr <> (TYPEOF(h.ipaddr))'');
+    populated_ipaddr_pcnt := AVE(GROUP,IF(h.ipaddr = (TYPEOF(h.ipaddr))'',0,100));
+    maxlength_ipaddr := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.ipaddr)));
+    avelength_ipaddr := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.ipaddr)),h.ipaddr<>(typeof(h.ipaddr))'');
+    populated_geo_lat_cnt := COUNT(GROUP,h.geo_lat <> (TYPEOF(h.geo_lat))'');
+    populated_geo_lat_pcnt := AVE(GROUP,IF(h.geo_lat = (TYPEOF(h.geo_lat))'',0,100));
+    maxlength_geo_lat := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.geo_lat)));
+    avelength_geo_lat := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.geo_lat)),h.geo_lat<>(typeof(h.geo_lat))'');
+    populated_geo_long_cnt := COUNT(GROUP,h.geo_long <> (TYPEOF(h.geo_long))'');
+    populated_geo_long_pcnt := AVE(GROUP,IF(h.geo_long = (TYPEOF(h.geo_long))'',0,100));
+    maxlength_geo_long := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.geo_long)));
+    avelength_geo_long := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.geo_long)),h.geo_long<>(typeof(h.geo_long))'');
+    populated_Source_cnt := COUNT(GROUP,h.Source <> (TYPEOF(h.Source))'');
+    populated_Source_pcnt := AVE(GROUP,IF(h.Source = (TYPEOF(h.Source))'',0,100));
+    maxlength_Source := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.Source)));
+    avelength_Source := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.Source)),h.Source<>(typeof(h.Source))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
-    UNSIGNED LinkingPotential :=  + T.Populated_Customer_Account_Number_pcnt *   0.00 / 100 + T.Populated_Customer_County_pcnt *   0.00 / 100 + T.Populated_Customer_State_pcnt *   0.00 / 100 + T.Populated_Customer_Agency_Vertical_Type_pcnt *   0.00 / 100 + T.Populated_Customer_Program_pcnt *   0.00 / 100 + T.Populated_LexID_pcnt *   0.00 / 100 + T.Populated_raw_Full_Name_pcnt *   0.00 / 100 + T.Populated_raw_First_name_pcnt *   0.00 / 100 + T.Populated_raw_Last_Name_pcnt *   0.00 / 100 + T.Populated_SSN_pcnt *   0.00 / 100 + T.Populated_Drivers_License_State_pcnt *   0.00 / 100 + T.Populated_Drivers_License_Number_pcnt *   0.00 / 100 + T.Populated_Street_1_pcnt *   0.00 / 100 + T.Populated_City_pcnt *   0.00 / 100 + T.Populated_State_pcnt *   0.00 / 100 + T.Populated_Zip_pcnt *   0.00 / 100 + T.Populated_did_pcnt *   0.00 / 100;
+    UNSIGNED LinkingPotential :=  + T.Populated_transaction_id_pcnt *   0.00 / 100 + T.Populated_datetime_pcnt *   0.00 / 100 + T.Populated_full_name_pcnt *   0.00 / 100 + T.Populated_title_pcnt *   0.00 / 100 + T.Populated_fname_pcnt *   0.00 / 100 + T.Populated_mname_pcnt *   0.00 / 100 + T.Populated_lname_pcnt *   0.00 / 100 + T.Populated_name_suffix_pcnt *   0.00 / 100 + T.Populated_ssn_pcnt *   0.00 / 100 + T.Populated_appended_ssn_pcnt *   0.00 / 100 + T.Populated_address_pcnt *   0.00 / 100 + T.Populated_city_pcnt *   0.00 / 100 + T.Populated_state_pcnt *   0.00 / 100 + T.Populated_zip_pcnt *   0.00 / 100 + T.Populated_fips_county_pcnt *   0.00 / 100 + T.Populated_personal_phone_pcnt *   0.00 / 100 + T.Populated_dob_pcnt *   0.00 / 100 + T.Populated_email_address_pcnt *   0.00 / 100 + T.Populated_dl_st_pcnt *   0.00 / 100 + T.Populated_dl_pcnt *   0.00 / 100 + T.Populated_ipaddr_pcnt *   0.00 / 100 + T.Populated_geo_lat_pcnt *   0.00 / 100 + T.Populated_geo_long_pcnt *   0.00 / 100 + T.Populated_Source_pcnt *   0.00 / 100;
     T;
   END;
   RETURN TABLE(T,R1);
@@ -95,44 +123,51 @@ END;
 invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.FldNo := C;
   SELF.NumberOfRecords := le.NumberOfRecords;
-  SELF.FieldName := CHOOSE(C,'Customer_Account_Number','Customer_County','Customer_State','Customer_Agency_Vertical_Type','Customer_Program','LexID','raw_Full_Name','raw_First_name','raw_Last_Name','SSN','Drivers_License_State','Drivers_License_Number','Street_1','City','State','Zip','did');
-  SELF.populated_pcnt := CHOOSE(C,le.populated_Customer_Account_Number_pcnt,le.populated_Customer_County_pcnt,le.populated_Customer_State_pcnt,le.populated_Customer_Agency_Vertical_Type_pcnt,le.populated_Customer_Program_pcnt,le.populated_LexID_pcnt,le.populated_raw_Full_Name_pcnt,le.populated_raw_First_name_pcnt,le.populated_raw_Last_Name_pcnt,le.populated_SSN_pcnt,le.populated_Drivers_License_State_pcnt,le.populated_Drivers_License_Number_pcnt,le.populated_Street_1_pcnt,le.populated_City_pcnt,le.populated_State_pcnt,le.populated_Zip_pcnt,le.populated_did_pcnt);
-  SELF.maxlength := CHOOSE(C,le.maxlength_Customer_Account_Number,le.maxlength_Customer_County,le.maxlength_Customer_State,le.maxlength_Customer_Agency_Vertical_Type,le.maxlength_Customer_Program,le.maxlength_LexID,le.maxlength_raw_Full_Name,le.maxlength_raw_First_name,le.maxlength_raw_Last_Name,le.maxlength_SSN,le.maxlength_Drivers_License_State,le.maxlength_Drivers_License_Number,le.maxlength_Street_1,le.maxlength_City,le.maxlength_State,le.maxlength_Zip,le.maxlength_did);
-  SELF.avelength := CHOOSE(C,le.avelength_Customer_Account_Number,le.avelength_Customer_County,le.avelength_Customer_State,le.avelength_Customer_Agency_Vertical_Type,le.avelength_Customer_Program,le.avelength_LexID,le.avelength_raw_Full_Name,le.avelength_raw_First_name,le.avelength_raw_Last_Name,le.avelength_SSN,le.avelength_Drivers_License_State,le.avelength_Drivers_License_Number,le.avelength_Street_1,le.avelength_City,le.avelength_State,le.avelength_Zip,le.avelength_did);
+  SELF.FieldName := CHOOSE(C,'transaction_id','datetime','full_name','title','fname','mname','lname','name_suffix','ssn','appended_ssn','address','city','state','zip','fips_county','personal_phone','dob','email_address','dl_st','dl','ipaddr','geo_lat','geo_long','Source');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_transaction_id_pcnt,le.populated_datetime_pcnt,le.populated_full_name_pcnt,le.populated_title_pcnt,le.populated_fname_pcnt,le.populated_mname_pcnt,le.populated_lname_pcnt,le.populated_name_suffix_pcnt,le.populated_ssn_pcnt,le.populated_appended_ssn_pcnt,le.populated_address_pcnt,le.populated_city_pcnt,le.populated_state_pcnt,le.populated_zip_pcnt,le.populated_fips_county_pcnt,le.populated_personal_phone_pcnt,le.populated_dob_pcnt,le.populated_email_address_pcnt,le.populated_dl_st_pcnt,le.populated_dl_pcnt,le.populated_ipaddr_pcnt,le.populated_geo_lat_pcnt,le.populated_geo_long_pcnt,le.populated_Source_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_transaction_id,le.maxlength_datetime,le.maxlength_full_name,le.maxlength_title,le.maxlength_fname,le.maxlength_mname,le.maxlength_lname,le.maxlength_name_suffix,le.maxlength_ssn,le.maxlength_appended_ssn,le.maxlength_address,le.maxlength_city,le.maxlength_state,le.maxlength_zip,le.maxlength_fips_county,le.maxlength_personal_phone,le.maxlength_dob,le.maxlength_email_address,le.maxlength_dl_st,le.maxlength_dl,le.maxlength_ipaddr,le.maxlength_geo_lat,le.maxlength_geo_long,le.maxlength_Source);
+  SELF.avelength := CHOOSE(C,le.avelength_transaction_id,le.avelength_datetime,le.avelength_full_name,le.avelength_title,le.avelength_fname,le.avelength_mname,le.avelength_lname,le.avelength_name_suffix,le.avelength_ssn,le.avelength_appended_ssn,le.avelength_address,le.avelength_city,le.avelength_state,le.avelength_zip,le.avelength_fips_county,le.avelength_personal_phone,le.avelength_dob,le.avelength_email_address,le.avelength_dl_st,le.avelength_dl,le.avelength_ipaddr,le.avelength_geo_lat,le.avelength_geo_long,le.avelength_Source);
 END;
-EXPORT invSummary := NORMALIZE(summary0, 17, invert(LEFT,COUNTER));
+EXPORT invSummary := NORMALIZE(summary0, 24, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
 SALT39.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT39.StrType)le.Customer_Account_Number),TRIM((SALT39.StrType)le.Customer_County),TRIM((SALT39.StrType)le.Customer_State),TRIM((SALT39.StrType)le.Customer_Agency_Vertical_Type),TRIM((SALT39.StrType)le.Customer_Program),IF (le.LexID <> 0,TRIM((SALT39.StrType)le.LexID), ''),TRIM((SALT39.StrType)le.raw_Full_Name),TRIM((SALT39.StrType)le.raw_First_name),TRIM((SALT39.StrType)le.raw_Last_Name),TRIM((SALT39.StrType)le.SSN),TRIM((SALT39.StrType)le.Drivers_License_State),TRIM((SALT39.StrType)le.Drivers_License_Number),TRIM((SALT39.StrType)le.Street_1),TRIM((SALT39.StrType)le.City),TRIM((SALT39.StrType)le.State),TRIM((SALT39.StrType)le.Zip),IF (le.did <> 0,TRIM((SALT39.StrType)le.did), '')));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT39.StrType)le.transaction_id),TRIM((SALT39.StrType)le.datetime),TRIM((SALT39.StrType)le.full_name),TRIM((SALT39.StrType)le.title),TRIM((SALT39.StrType)le.fname),TRIM((SALT39.StrType)le.mname),TRIM((SALT39.StrType)le.lname),TRIM((SALT39.StrType)le.name_suffix),TRIM((SALT39.StrType)le.ssn),TRIM((SALT39.StrType)le.appended_ssn),TRIM((SALT39.StrType)le.address),TRIM((SALT39.StrType)le.city),TRIM((SALT39.StrType)le.state),TRIM((SALT39.StrType)le.zip),TRIM((SALT39.StrType)le.fips_county),TRIM((SALT39.StrType)le.personal_phone),TRIM((SALT39.StrType)le.dob),TRIM((SALT39.StrType)le.email_address),TRIM((SALT39.StrType)le.dl_st),TRIM((SALT39.StrType)le.dl),TRIM((SALT39.StrType)le.ipaddr),TRIM((SALT39.StrType)le.geo_lat),TRIM((SALT39.StrType)le.geo_long),TRIM((SALT39.StrType)le.Source)));
   SELF.FldNo := C;
 END;
-SHARED FldInv0 := NORMALIZE(h,17,Into(LEFT,COUNTER));
+SHARED FldInv0 := NORMALIZE(h,24,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
 SALT39.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
-  SELF.FldNo1 := 1 + (C / 17);
-  SELF.FldNo2 := 1 + (C % 17);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT39.StrType)le.Customer_Account_Number),TRIM((SALT39.StrType)le.Customer_County),TRIM((SALT39.StrType)le.Customer_State),TRIM((SALT39.StrType)le.Customer_Agency_Vertical_Type),TRIM((SALT39.StrType)le.Customer_Program),IF (le.LexID <> 0,TRIM((SALT39.StrType)le.LexID), ''),TRIM((SALT39.StrType)le.raw_Full_Name),TRIM((SALT39.StrType)le.raw_First_name),TRIM((SALT39.StrType)le.raw_Last_Name),TRIM((SALT39.StrType)le.SSN),TRIM((SALT39.StrType)le.Drivers_License_State),TRIM((SALT39.StrType)le.Drivers_License_Number),TRIM((SALT39.StrType)le.Street_1),TRIM((SALT39.StrType)le.City),TRIM((SALT39.StrType)le.State),TRIM((SALT39.StrType)le.Zip),IF (le.did <> 0,TRIM((SALT39.StrType)le.did), '')));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT39.StrType)le.Customer_Account_Number),TRIM((SALT39.StrType)le.Customer_County),TRIM((SALT39.StrType)le.Customer_State),TRIM((SALT39.StrType)le.Customer_Agency_Vertical_Type),TRIM((SALT39.StrType)le.Customer_Program),IF (le.LexID <> 0,TRIM((SALT39.StrType)le.LexID), ''),TRIM((SALT39.StrType)le.raw_Full_Name),TRIM((SALT39.StrType)le.raw_First_name),TRIM((SALT39.StrType)le.raw_Last_Name),TRIM((SALT39.StrType)le.SSN),TRIM((SALT39.StrType)le.Drivers_License_State),TRIM((SALT39.StrType)le.Drivers_License_Number),TRIM((SALT39.StrType)le.Street_1),TRIM((SALT39.StrType)le.City),TRIM((SALT39.StrType)le.State),TRIM((SALT39.StrType)le.Zip),IF (le.did <> 0,TRIM((SALT39.StrType)le.did), '')));
+  SELF.FldNo1 := 1 + (C / 24);
+  SELF.FldNo2 := 1 + (C % 24);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT39.StrType)le.transaction_id),TRIM((SALT39.StrType)le.datetime),TRIM((SALT39.StrType)le.full_name),TRIM((SALT39.StrType)le.title),TRIM((SALT39.StrType)le.fname),TRIM((SALT39.StrType)le.mname),TRIM((SALT39.StrType)le.lname),TRIM((SALT39.StrType)le.name_suffix),TRIM((SALT39.StrType)le.ssn),TRIM((SALT39.StrType)le.appended_ssn),TRIM((SALT39.StrType)le.address),TRIM((SALT39.StrType)le.city),TRIM((SALT39.StrType)le.state),TRIM((SALT39.StrType)le.zip),TRIM((SALT39.StrType)le.fips_county),TRIM((SALT39.StrType)le.personal_phone),TRIM((SALT39.StrType)le.dob),TRIM((SALT39.StrType)le.email_address),TRIM((SALT39.StrType)le.dl_st),TRIM((SALT39.StrType)le.dl),TRIM((SALT39.StrType)le.ipaddr),TRIM((SALT39.StrType)le.geo_lat),TRIM((SALT39.StrType)le.geo_long),TRIM((SALT39.StrType)le.Source)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT39.StrType)le.transaction_id),TRIM((SALT39.StrType)le.datetime),TRIM((SALT39.StrType)le.full_name),TRIM((SALT39.StrType)le.title),TRIM((SALT39.StrType)le.fname),TRIM((SALT39.StrType)le.mname),TRIM((SALT39.StrType)le.lname),TRIM((SALT39.StrType)le.name_suffix),TRIM((SALT39.StrType)le.ssn),TRIM((SALT39.StrType)le.appended_ssn),TRIM((SALT39.StrType)le.address),TRIM((SALT39.StrType)le.city),TRIM((SALT39.StrType)le.state),TRIM((SALT39.StrType)le.zip),TRIM((SALT39.StrType)le.fips_county),TRIM((SALT39.StrType)le.personal_phone),TRIM((SALT39.StrType)le.dob),TRIM((SALT39.StrType)le.email_address),TRIM((SALT39.StrType)le.dl_st),TRIM((SALT39.StrType)le.dl),TRIM((SALT39.StrType)le.ipaddr),TRIM((SALT39.StrType)le.geo_lat),TRIM((SALT39.StrType)le.geo_long),TRIM((SALT39.StrType)le.Source)));
   END;
-SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),17*17,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
-SHARED FldIds := DATASET([{1,'Customer_Account_Number'}
-      ,{2,'Customer_County'}
-      ,{3,'Customer_State'}
-      ,{4,'Customer_Agency_Vertical_Type'}
-      ,{5,'Customer_Program'}
-      ,{6,'LexID'}
-      ,{7,'raw_Full_Name'}
-      ,{8,'raw_First_name'}
-      ,{9,'raw_Last_Name'}
-      ,{10,'SSN'}
-      ,{11,'Drivers_License_State'}
-      ,{12,'Drivers_License_Number'}
-      ,{13,'Street_1'}
-      ,{14,'City'}
-      ,{15,'State'}
-      ,{16,'Zip'}
-      ,{17,'did'}],SALT39.MAC_Character_Counts.Field_Identification);
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),24*24,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED FldIds := DATASET([{1,'transaction_id'}
+      ,{2,'datetime'}
+      ,{3,'full_name'}
+      ,{4,'title'}
+      ,{5,'fname'}
+      ,{6,'mname'}
+      ,{7,'lname'}
+      ,{8,'name_suffix'}
+      ,{9,'ssn'}
+      ,{10,'appended_ssn'}
+      ,{11,'address'}
+      ,{12,'city'}
+      ,{13,'state'}
+      ,{14,'zip'}
+      ,{15,'fips_county'}
+      ,{16,'personal_phone'}
+      ,{17,'dob'}
+      ,{18,'email_address'}
+      ,{19,'dl_st'}
+      ,{20,'dl'}
+      ,{21,'ipaddr'}
+      ,{22,'geo_lat'}
+      ,{23,'geo_long'}
+      ,{24,'Source'}],SALT39.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
 EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
@@ -145,27 +180,34 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    InquiryLogs_Fields.InValid_Customer_Account_Number((SALT39.StrType)le.Customer_Account_Number),
-    InquiryLogs_Fields.InValid_Customer_County((SALT39.StrType)le.Customer_County),
-    InquiryLogs_Fields.InValid_Customer_State((SALT39.StrType)le.Customer_State),
-    InquiryLogs_Fields.InValid_Customer_Agency_Vertical_Type((SALT39.StrType)le.Customer_Agency_Vertical_Type),
-    InquiryLogs_Fields.InValid_Customer_Program((SALT39.StrType)le.Customer_Program),
-    InquiryLogs_Fields.InValid_LexID((SALT39.StrType)le.LexID),
-    InquiryLogs_Fields.InValid_raw_Full_Name((SALT39.StrType)le.raw_Full_Name),
-    InquiryLogs_Fields.InValid_raw_First_name((SALT39.StrType)le.raw_First_name),
-    InquiryLogs_Fields.InValid_raw_Last_Name((SALT39.StrType)le.raw_Last_Name),
-    InquiryLogs_Fields.InValid_SSN((SALT39.StrType)le.SSN),
-    InquiryLogs_Fields.InValid_Drivers_License_State((SALT39.StrType)le.Drivers_License_State),
-    InquiryLogs_Fields.InValid_Drivers_License_Number((SALT39.StrType)le.Drivers_License_Number),
-    InquiryLogs_Fields.InValid_Street_1((SALT39.StrType)le.Street_1),
-    InquiryLogs_Fields.InValid_City((SALT39.StrType)le.City),
-    InquiryLogs_Fields.InValid_State((SALT39.StrType)le.State),
-    InquiryLogs_Fields.InValid_Zip((SALT39.StrType)le.Zip),
-    InquiryLogs_Fields.InValid_did((SALT39.StrType)le.did),
+    InquiryLogs_Fields.InValid_transaction_id((SALT39.StrType)le.transaction_id),
+    InquiryLogs_Fields.InValid_datetime((SALT39.StrType)le.datetime),
+    InquiryLogs_Fields.InValid_full_name((SALT39.StrType)le.full_name),
+    InquiryLogs_Fields.InValid_title((SALT39.StrType)le.title),
+    InquiryLogs_Fields.InValid_fname((SALT39.StrType)le.fname),
+    InquiryLogs_Fields.InValid_mname((SALT39.StrType)le.mname),
+    InquiryLogs_Fields.InValid_lname((SALT39.StrType)le.lname),
+    InquiryLogs_Fields.InValid_name_suffix((SALT39.StrType)le.name_suffix),
+    InquiryLogs_Fields.InValid_ssn((SALT39.StrType)le.ssn),
+    InquiryLogs_Fields.InValid_appended_ssn((SALT39.StrType)le.appended_ssn),
+    InquiryLogs_Fields.InValid_address((SALT39.StrType)le.address),
+    InquiryLogs_Fields.InValid_city((SALT39.StrType)le.city),
+    InquiryLogs_Fields.InValid_state((SALT39.StrType)le.state),
+    InquiryLogs_Fields.InValid_zip((SALT39.StrType)le.zip),
+    InquiryLogs_Fields.InValid_fips_county((SALT39.StrType)le.fips_county),
+    InquiryLogs_Fields.InValid_personal_phone((SALT39.StrType)le.personal_phone),
+    InquiryLogs_Fields.InValid_dob((SALT39.StrType)le.dob),
+    InquiryLogs_Fields.InValid_email_address((SALT39.StrType)le.email_address),
+    InquiryLogs_Fields.InValid_dl_st((SALT39.StrType)le.dl_st),
+    InquiryLogs_Fields.InValid_dl((SALT39.StrType)le.dl),
+    InquiryLogs_Fields.InValid_ipaddr((SALT39.StrType)le.ipaddr),
+    InquiryLogs_Fields.InValid_geo_lat((SALT39.StrType)le.geo_lat),
+    InquiryLogs_Fields.InValid_geo_long((SALT39.StrType)le.geo_long),
+    InquiryLogs_Fields.InValid_Source((SALT39.StrType)le.Source),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
-Errors := NORMALIZE(h,17,NoteErrors(LEFT,COUNTER));
+Errors := NORMALIZE(h,24,NoteErrors(LEFT,COUNTER));
 ErrorRecordsTotals := RECORD
   Errors.FieldNum;
   Errors.ErrorNum;
@@ -174,8 +216,8 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := InquiryLogs_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,InquiryLogs_Fields.InValidMessage_Customer_Account_Number(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Customer_County(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Customer_State(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Customer_Agency_Vertical_Type(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Customer_Program(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_LexID(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_raw_Full_Name(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_raw_First_name(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_raw_Last_Name(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_SSN(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Drivers_License_State(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Drivers_License_Number(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Street_1(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_City(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_State(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Zip(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_did(TotalErrors.ErrorNum));
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_alphanumeric','invalid_date','invalid_name','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_alphanumeric','invalid_ssn','invalid_ssn','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_alphanumeric','invalid_phone','invalid_date','invalid_email','invalid_state','invalid_alphanumeric','invalid_ip','invalid_decimal','invalid_decimal','invalid_alphanumeric');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,InquiryLogs_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_datetime(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_full_name(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_title(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_fname(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_mname(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_lname(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_name_suffix(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_ssn(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_appended_ssn(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_address(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_city(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_state(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_zip(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_fips_county(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_personal_phone(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_dob(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_email_address(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_dl_st(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_dl(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_ipaddr(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_geo_lat(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_geo_long(TotalErrors.ErrorNum),InquiryLogs_Fields.InValidMessage_Source(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);

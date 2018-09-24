@@ -1,8 +1,8 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std;
 EXPORT Key_InsuranceHeader_SRC_RID(BOOLEAN incremental=FALSE) := MODULE
  
 //SRC:SOURCE_RID:?:FNAME:DOB:CITY:DERIVED_GENDER:SNAME:+:ST
-EXPORT KeyName := KeyNames().SRC_RID_super; /*HACK*/
+EXPORT KeyName := KeyNames().SRC_RID_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::SRC_RID';
  
@@ -90,9 +90,9 @@ EXPORT ScoredDIDFetch(TYPEOF(h.SRC) param_SRC = (TYPEOF(h.SRC))'',TYPEOF(h.SOURC
   RawData := RawFetch(param_SRC,param_SOURCE_RID,param_FNAME,param_FNAME_len,param_DOB,param_CITY,param_DERIVED_GENDER,param_SNAME);
  
   Process_xIDL_Layouts().LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 7; // Set bitmap for keys used
+    SELF.keys_used := 1 << 8; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
-    SELF.keys_failed := IF(le.DID = 0, 1 << 7, 0); // Set bitmap for key failed
+    SELF.keys_failed := IF(le.DID = 0, 1 << 8, 0); // Set bitmap for key failed
     SELF.SRC_match_code := match_methods(File_InsuranceHeader).match_SRC(le.SRC,param_SRC,TRUE);
     SELF.SRCWeight := (50+MAP (
            le.SRC = param_SRC  => le.SRC_weight100,
@@ -201,7 +201,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
  
   Process_xIDL_Layouts().LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 7; // Set bitmap for keys used
+    SELF.keys_used := 1 << 8; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.SRC_match_code := match_methods(File_InsuranceHeader).match_SRC(le.SRC,ri.SRC,TRUE);

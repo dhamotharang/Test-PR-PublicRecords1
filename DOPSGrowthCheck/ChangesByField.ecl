@@ -47,13 +47,18 @@ import std;
 	
 	DiffTable:=table(dDifferences,{Diff,cnt:=count(group)},Diff,merge);
 	
+	Package:=PackageName;
+	Nickname:=InputKeyNickName;
+	Base:=VersionBase;
+	Father:=VersionFather;
+	
 	#DECLARE(DatasetString);
 	#SET(DatasetString,'Results:=dataset([\n');
-	#APPEND(DatasetString,'{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
+	#APPEND(DatasetString,'{Package,Nickname,Base,Father,\'NoChange\',(string)(sum(DiffTable(Diff=\'\'),cnt)),\'N\'}\n');
 	#EXPORTXML(FieldList,recordof(DistNew));
 	#FOR(FieldList)
 		#FOR(field)
-			#APPEND(DatasetString,',{\''+PackageName+'\',\''+InputKeyNickName+'\',\''+VersionBase+'\',\''+VersionFather+'\',\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
+			#APPEND(DatasetString,',{Package,Nickname,Base,Father,\''+%'@name'%+'\',(string)(sum(DiffTable(STD.STR.FIND(Diff,\''+%'@name'%+'\',1)<>0),cnt)),\'N\'}\n');
 		#end
 	#end
 	#APPEND(DatasetString,'],DOPSGrowthCheck.layouts.FieldChangeLayout);');
