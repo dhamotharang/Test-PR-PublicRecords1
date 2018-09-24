@@ -31,8 +31,9 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(ClnUnprintable);
 	
 	//Filtering out BAD RECORDS
-	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+SLNUM+LAST_NAME+FULL_NAME) != '');
-	GoodNameRec							:= NonBlankName(OFFICENAME<>'NAME' AND NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
+	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+LAST_NAME+FULL_NAME) != '');
+	GoodNameRec							:= NonBlankName(ut.CleanSpacesAndUpper(OFFICENAME)<>'NAME' AND ut.CleanSpacesAndUpper(FULL_NAME)<>'NAME' AND 
+	                                        NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
 	
 	//Real Estate License to common MARIBASE layout
 	Prof_License_Mari.layouts.base			xformToCommon(GoodNameRec pInput) := TRANSFORM
