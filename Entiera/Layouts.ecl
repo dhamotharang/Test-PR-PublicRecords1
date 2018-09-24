@@ -1,4 +1,4 @@
-import	Address, AID;
+﻿import	Address, AID;
 
 export Layouts
  :=
@@ -71,6 +71,7 @@ export Layouts
 				string8			date_last_seen;
 				string8			date_vendor_first_reported;
 				string8			date_vendor_last_reported;
+				BOOLEAN 		current_rec;
 			end
 		 ;
 

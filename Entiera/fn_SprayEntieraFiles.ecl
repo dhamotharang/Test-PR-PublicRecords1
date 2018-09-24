@@ -95,6 +95,8 @@ export	fn_SprayEntieraFiles(
 																				__compressed__
 																			 );
 																																
+		zClearSuperfile	:=	lib_fileservices.FileServices.ClearSuperFile(Constants.PreppedFileSuperFileName);
+		
 		zAddToSuper	:=	lib_FileServices.FileServices.AddSuperFile(Constants.PreppedFileSuperFileName, lThorFileName);
 
 		zDeleteSprayed	:=	lib_FileServices.FileServices.DeleteLogicalFile(lTempFileName);
@@ -115,6 +117,7 @@ export	fn_SprayEntieraFiles(
 																	 zAppendDateOverwriteYes,
 																	 zAppendDateOverwriteNo
 																	),
+																zClearSuperfile,
 																zAddToSuper,
 																zDeleteSprayed,
 																zEmailDone
