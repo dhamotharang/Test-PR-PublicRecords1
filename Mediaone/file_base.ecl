@@ -1,4 +1,5 @@
-EXPORT file_base := MODULE
+﻿EXPORT file_base := MODULE
+	IMPORT Data_Services;
   EXPORT layout:=RECORD
     // Original Data
     STRING    email;
@@ -63,6 +64,7 @@ EXPORT file_base := MODULE
     STRING8  date_last_seen;
     STRING8  date_vendor_first_reported;
     STRING8  date_vendor_last_reported;
+		boolean		current_rec; //Added to distinguish historical records from new full file replacement
   END;
 	
 	EXPORT file:=DATASET('~thor::base::mediaone',layout,THOR);
