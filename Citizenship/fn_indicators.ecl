@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR;
+﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR, header;
 
 EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -8,12 +8,13 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
   MAX_SCORE := 999;
   COMMA     := '  ,';
   MODIFIER  := 'ie';
+  isFCRA    := false;
   
 //========================================================================================
 
   indicators := JOIN(cleanedInput, clam, 
                       LEFT.inputEcho.seq = RIGHT.seq, 
-                      TRANSFORM(Citizenship.Layouts.IndicatorLayout,  
+                      TRANSFORM({Citizenship.Layouts.IndicatorLayout, unsigned8 shell_dob_SAS;}, 
                                 SELF.seq      := LEFT.inputEcho.seq;
                                 SELF.inputSeq := IF(LEFT.inputEcho.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, LEFT.inputEcho.seq, LEFT.inputEcho.inputSeq);
                                 SELF.acctNo   := LEFT.inputEcho.individual.accountNumber;
@@ -33,12 +34,13 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                            //*** emergenceAgeHeader ***
                                 earliest_header_date_SAS := ver_sources_information[1..10];                                                           
                                 earliest_header_date     := (integer)earliest_header_date_SAS;  
-                                earliest_header_yrs     := if(min(sysdate, earliest_header_date) = NULL, NULL, 
+                                earliest_header_yrs      := if(min(sysdate, earliest_header_date) = NULL, NULL, 
                                                               if((sysdate - earliest_header_date) / 365.25 >= 0, 
                                                                  roundup((sysdate - earliest_header_date) / 365.25), 
                                                                  truncate((sysdate - earliest_header_date) / 365.25)));
                                 in_dob                  := RIGHT.shell_input.dob;
                                 _in_dob                 := Models.common.sas_date((STRING)(in_dob));
+                                SELF.shell_dob_SAS      := _in_dob;                      //***save for the next step 
                                 calc_dob                := if(_in_dob = NULL or sysdate = NULL, NULL, if ((sysdate - _in_dob) / 365.25 >= 0, 
                                                                roundup((sysdate - _in_dob) / 365.25), 
                                                                truncate((sysdate - _in_dob) / 365.25)));
@@ -120,7 +122,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
                                 SELF.reportedCurAddressYears := IF(rv_c13_curr_addr_lres = NULL, NEG1, rv_c13_curr_addr_lres);
                            
-                           //*** addressFirstReportedAge       
+                           //*** addressFirstReportedAge   - calculated after picking more information from the address hierarchy key   
                                 SELF.addressFirstReportedAge := 0;                   //*** 
                            
                                 num_of_cred_sources          := ver_sources_information[34..36];
@@ -205,8 +207,59 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF := [];));
                                 
  
+  Temp_addr_hist := JOIN(Indicators, header.key_addr_hist(isFCRA),      
+                           KEYED(LEFT.lexID = RIGHT.s_did), 
+                           TRANSFORM({unsigned4 seq, unsigned6 LexID_temp, unsigned8 dob_temp, unsigned8 address_first_seen_date, unsigned3 address_history_seq, unsigned3 age;},
+                                    SELF.seq                  := LEFT.seq;
+                                    SELF.LexID_temp           := RIGHT.s_did;
+                                    SELF.dob_temp             := LEFT.shell_dob_SAS;     //***Carry the date of birth forward so we can calc the age at when the address first reported
+                                    SELF.address_history_seq  := RIGHT.address_history_seq;
+                                    SELF.address_first_seen_date := RIGHT.date_first_seen;
+                                    SELF.age                  := 0;
+                                    SELF                      := LEFT;),
+                            ATMOST(DueDiligence.Constants.MAX_ATMOST_500), 
+                            KEEP(DueDiligence.Constants.MAX_KEEP)); 
+   Sort_addr_hist := SORT(Temp_addr_hist, seq, LexID_temp, address_history_seq); 
+                                     
+  //***We know have the address first reported date and dob for each did.                                      
+   Roll_addr_hist := ROLLUP(Sort_addr_hist,
+                            LEFT.seq        = RIGHT.seq  AND
+                            LEFT.LexID_temp = RIGHT.LexID_temp,
+                          TRANSFORM (RECORDOF(LEFT),
+                            SELF.seq                      := LEFT.seq;
+                            SELF.LexID_temp               := LEFT.LexID_temp;
+                            SELF.dob_temp                 := LEFT.dob_temp;
+                            SELF.address_first_seen_date  := MIN(LEFT.address_first_seen_date, RIGHT.address_first_seen_date);
+                            SELF.address_history_seq      := RIGHT.address_history_seq;   //***how many address did the person have
+                            SELF                          := LEFT;));
+                                    
+   
+   Final_Indicators := JOIN(Indicators, Roll_addr_hist,      
+                           LEFT.seq        = RIGHT.seq  AND
+                           LEFT.lexID      = RIGHT.LexID_temp,
+                         TRANSFORM (RECORDOF(LEFT),
+                            SELF.seq                      := LEFT.seq;
+                            SELF.lexID                    := LEFT.lexID;
+                            dob_temp                      := RIGHT.dob_temp;
+                            
+                            address_first_seen_temp      := (unsigned)RIGHT.address_first_seen_date;
+                            address_first_seen_SAS       := Models.common.sas_date((STRING)(address_first_seen_temp));
+                            calcAgeAtThisTime            := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
+                                                               if ((address_first_seen_SAS - dob_temp) / 365.25 >= 0, 
+                                                                    roundup((address_first_seen_SAS - dob_temp) / 365.25), 
+                                                                    truncate((address_first_seen_SAS - dob_temp) / 365.25)));
+                            
+                            SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL, NEG1, calcAgeAtThisTime);           //***this is the final answer
+                            SELF                          := LEFT;));
+                            
+                            
+                            
+   // output(CHOOSEN(temp_addr_hist, 50), NAMED('temp_addr_hist')); 
+   // output(CHOOSEN(Sort_addr_hist, 50), NAMED('Sort_addr_hist')); 
+   // output(CHOOSEN(Roll_addr_hist, 50), NAMED('Roll_addr_hist'));                                  
+                                    
                                         
-  RETURN indicators;
+  RETURN Final_Indicators;
   
  
 END;
