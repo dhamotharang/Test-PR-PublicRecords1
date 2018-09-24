@@ -26,10 +26,18 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
   END;
 	
 	//Send names to cleaner
+	
+		fmtsin := [
+		'%m/%d/%Y',
+		'%Y-%m-%d',
+		'%Y%m%d'
+	];
+	fmtout := '%Y%m%d';
+	
 	layout_name_clean tPrep(dsCleanOut L):= TRANSFORM
     SELF.date_vendor_first_reported := version;
     SELF.date_vendor_last_reported  := version;
-    SELF.date_first_seen            := Mediaone.fn_format_date(L.date_time);
+    SELF.date_first_seen            := STD.Date.ConvertDateFormatMultiple(L.date_time,fmtsin,fmtout);
     SELF.date_last_seen             := SELF.date_first_seen;
     SELF	:= L;
 		SELF	:= [];
