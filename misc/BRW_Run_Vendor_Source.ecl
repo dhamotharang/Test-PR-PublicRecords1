@@ -1,10 +1,10 @@
 ﻿import misc,Orbit3,STD,dops;
 
-pversion := '20180716';
+pversion := '20180924';
 #workunit('protect',true);
 #WORKUNIT('name','Yogurt:VendorSrc load ' + pversion + '');
 #workunit('priority','high');
-a := misc.fSpray_CourtLocation_File('CourtLocator-201800709.txt');
+a := misc.fSpray_CourtLocation_File('CollegeLocator_20180918181606.txt');
 b1 := Misc.fBuild_All_VendorSrc(pversion);
 b2 := output(SAMPLE(Misc.Files_VendorSrc(pversion).Combined_Base,50,1),named('samples'));
 c := DOPS.updateversion('VendorSourceKeys',pversion,'Michael.Gould@lexisnexis.com,Jose.Bello@lexisnexisrisk.com',,'N');
