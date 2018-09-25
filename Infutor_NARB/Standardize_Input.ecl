@@ -7,7 +7,38 @@ EXPORT Standardize_Input := MODULE
 	//////////////////////////////////////////////////////////////////////////////////////
 	EXPORT fPreProcess( DATASET(Infutor_NARB.Layouts.Sprayed_Input) pRawInput
 	                   ,STRING pversion) := FUNCTION
-	  
+		
+		// Vendor sends in some records that are duplicate on all fields except for validationdate,
+		// so we sort on the whole record ascending except for validation date and sort on 
+		// validationdate descending and then dedup so only the record with the latest (or non-blank)
+		// validationdate gets kept and processed.
+		distRaw  := DISTRIBUTE(pRawInput, HASH(pid));
+		sortRaw  := SORT(distRaw 
+											,pid								,record_id							,ein								,busname
+											,tradename					,house									,predirection				,street
+											,strtype						,postdirection					,apttype						,aptnbr
+											,city							  ,state									,zip5								,ziplast4
+											,dpc								,carrier_route					,address_type_code	,dpv_code
+											,mailable						,county_code						,censustract				,censusblockgroup
+											,censusblock				,congress_code					,msacode						,timezonecode
+											,latitude						,longitude							,url								,telephone
+											,toll_free_number		,fax										,sic1								,sic2
+											,sic3								,sic4										,sic5								,stdclass
+											,heading1						,heading2								,heading3						,heading4
+											,heading5						,business_specialty			,sales_code					,employee_code
+											,location_type			,parent_company					,parent_address			,parent_city
+											,parent_state		  	,parent_zip							,parent_phone				,stock_symbol
+											,stock_exchange			,public									,number_of_pcs			,square_footage
+											,business_type			,incorporation_state 		,minority						,woman
+											,government					,small									,home_office				,soho
+											,franchise					,phoneable							,prefix							,first_name
+											,middle_name				,surname								,suffix							,birth_year
+											,ethnicity					,gender									,email							,contact_title
+											,year_started				,date_added							,internal1					,dacd	
+											,-validationdate		
+											,LOCAL );
+		dedupRaw := DEDUP(sortRaw, record, except ValidationDate ,LOCAL);
+  
 		// Normalize on the three sets of company fields:  Company, Tradename/DBA, and Parent Company	
 		Infutor_NARB.Layouts.Base normTrf(Infutor_NARB.Layouts.Sprayed_Input L, unsigned1 cnt) := transform
 			,skip ( (cnt=2 and ut.CleanSpacesAndUpper(l.tradename) in ['',ut.CleanSpacesAndUpper(l.Busname)]) or
@@ -39,7 +70,7 @@ EXPORT Standardize_Input := MODULE
 				SELF			              := L;
 				SELF 									  := [];
 			end;
-	  normInput	:= normalize(pRawInput, 3, normTrf(left, counter));	
+	  normInput	:= normalize(dedupRaw, 3, normTrf(left, counter));	
 		
 			
     Infutor_NARB.Layouts.Base tPreProcess(Infutor_NARB.Layouts.Base L) := TRANSFORM
