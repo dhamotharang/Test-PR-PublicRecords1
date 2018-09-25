@@ -1,6 +1,6 @@
 ﻿//Build keys for American Student List and move to QA.
 //Bug ticket #116301 - incorrect field length for county field for DID key, but key not used so removing keybuild
-import ut, RoxieKeyBuild, _control;
+import ut, RoxieKeyBuild, _control, strata;
 
 export Proc_build_keys(string filedate) :=  
 function
@@ -91,6 +91,11 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2(
 									  
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::American_Student::@version@::Address', 'Q', mv_addr_key_QA);
 
+// DF-21719 - Show counts of blanked out fields in thor_data400::key::fcra::american_student::qa::did2
+cnt_asl_did2_fcra := OUTPUT(strata.macf_pops(American_student_list.key_DID_FCRA,,,,,,FALSE,['county_number','delivery_point_barcode','fips_county',
+																						 'gender','gender_code','head_of_household_first_name','head_of_household_gender','head_of_household_gender_code',
+																						 'income_level','income_level_code','new_income_level','new_income_level_code','telephone','title']));
+
 //_______________________________________________________________________________________________
 
 //Update Roxie Page with Key Version - Move to proc_build_all
@@ -125,6 +130,7 @@ return sequential(
 							  // mv_addr_key_QA
 							  ),
 							  // UpdateRoxiePage
+					 cnt_asl_did2_fcra
 					);	
 
 end;

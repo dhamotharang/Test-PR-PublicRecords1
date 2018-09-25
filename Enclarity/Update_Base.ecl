@@ -506,6 +506,8 @@ end;
 		h_base_d	:= sort(distribute(new_base_d(record_type = 'H' and addr_key <> ''), hash(group_key, addr_key)), group_key, addr_key, local);
 		
 		add_file	:= sort(distribute(enclarity.Files().address_base.built, hash(group_key)), group_key, local);
+		add_file_dedup := dedup(sort(distribute(enclarity.Files().address_base.built, hash(group_key, addr_key)), group_key, addr_key, record_type, local),group_key, addr_key, record_type, local); 
+
 		c_base_a	:= JOIN(c_base_d, add_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM(track_ancillaries
@@ -581,7 +583,7 @@ end;
 										,LOCAL);		
 										
 		h_base_a	:= JOIN(h_base_d,
-											sort(distribute(add_file, hash(group_key, addr_key)), group_key, addr_key, local)
+											add_file_dedup
 										,LEFT.group_key = RIGHT.group_key and
 										 LEFT.addr_key  = RIGHT.addr_key
 										,TRANSFORM(track_ancillaries
@@ -1146,46 +1148,23 @@ end;
 										
 		all_ssn := c_base_s + h_base_s;
 		sort_ssn	:= fn_rollup(all_ssn);
-		c_all_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and sloc_type = ''));
-		h_all_ssn	:= sort_ssn(record_type = 'H' and sloc_type <> '');
-
-		fac_file	:= sort(distribute(Enclarity.Files().facility_base.built, hash(group_key)), group_key, local);
-		c_base_f	:= JOIN(sort(distribute(c_all_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file
-										,LEFT.sloc_group_key = RIGHT.group_key
-										,TRANSFORM({all_ssn}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.sloc_type	:= RIGHT.type1
-											,SELF:=LEFT)
-										,LEFT OUTER
-										,LOCAL
-										);
-										
-		h_base_f	:= JOIN(sort(distribute(h_all_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file
-										,LEFT.sloc_group_key = RIGHT.group_key
-										,TRANSFORM({all_ssn}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.sloc_type	:= RIGHT.type1
-											,SELF:=LEFT)
-										,LEFT OUTER
-										,LOCAL
-										);
-
-		all_sloc := c_base_f + h_base_f;
-		sort_sloc	:= fn_rollup(all_sloc);
-		c_all_sloc	:= sort_sloc(record_type <> 'H' or (record_type = 'H' and billing_type = ''));
-		h_all_sloc	:= sort_sloc(record_type = 'H' and billing_type <> '');
 	
-		c_base_f1	:= JOIN(sort(distribute(c_all_sloc, hash(billing_group_key)), billing_group_key, local), fac_file
-										,LEFT.billing_group_key = RIGHT.group_key
-										,TRANSFORM({sort_sloc}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.billing_type	:= RIGHT.type1
-											,SELF:=LEFT)
+		fac_file	:= distribute(Enclarity.Files().facility_base.built, hash(group_key));
+    fac_file_dedup	:= dedup(sort(fac_file, group_key,record_type,type1, local),group_key,record_type,type1, local);
+
+    base_f	:= JOIN(sort(distribute(sort_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file_dedup
+										,LEFT.sloc_group_key = RIGHT.group_key
+										,TRANSFORM({sort_ssn}
+										,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+										,SELF.sloc_type	:= RIGHT.type1
+										,SELF:=LEFT)
 										,LEFT OUTER
 										,LOCAL
 										);
 		
-		h_base_f1	:= JOIN(sort(distribute(h_all_sloc, hash(billing_group_key)), billing_group_key, local), fac_file
+		sort_sloc	:= fn_rollup(base_f);
+	
+		base_f1	:= JOIN(sort(distribute(sort_sloc, hash(billing_group_key)), billing_group_key, local), fac_file_dedup
 										,LEFT.billing_group_key = RIGHT.group_key
 										,TRANSFORM({sort_sloc}
 											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
@@ -1195,8 +1174,7 @@ end;
 										,LOCAL
 										);
 								
-		all_bill	:= c_base_f1 + h_base_f1;
-		sort_bill	:= fn_rollup(all_bill);
+		sort_bill	:= fn_rollup(base_f1);
 		dist_bill	:= distribute(sort_bill, hash(group_key, prepped_name, addr_key, prepped_addr1, prepped_addr2, normed_name_rec_type, addr_phone, sloc_phone, sloc_group_key, billing_group_key));		
 		
 		Enclarity.Layouts.associate_base GetSourceRID(dist_bill L)	:= TRANSFORM

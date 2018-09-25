@@ -1673,6 +1673,7 @@ o2 defCategory(o2 l):= transform
 						'MLESTATIN F A MINR|'+
 						'ATTEMPTED USE F MINRS FR BSENE PURPSES|'+
 						'INDESCENT LIBERTIES WITH A MINR|'+
+						'UNDER/16 MIAMI DADE FL;|'+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -3165,6 +3166,17 @@ o2 defCategory(o2 l):= transform
 						'D0222007CR000271|'+
 						'D0392016CR005553|'+
 						
+            'NEW JERSEY;|'+
+						'ATTEMPT;|'+
+						'AGRAVETED;|'+
+						'38-12-14-A|'+
+						'NEW HAMPSHIRE|'+
+						'13A-6-64|'+
+						'22 021 A1 B\\(\\)|'+
+						'ATTEMPT;|'+
+						'632-A:2 II|'+
+						'INDICTMENT NUMBER CP870011443;|'+
+						
 						'16-6-4-\\(B\\)'						
 						,						
 						trim(l.offense_description, left, right),
@@ -3290,9 +3302,9 @@ o2 defCategory(o2 l):= transform
 						'USE OF COMMUNICATION SYSTEMS TO FACILITATE CERTAIN OFFENSES INVOLVING CHILDREN|'+
 						'W-CHILD|'+
 						'CALIFORNIA CONVICTION INVOLVING A 5 YR OLD FEMALE|'+
+            'UNDER/16 MIAMI DADE FL;|'+				
+						
 						'CONVICTED IN THE STATE OF IOWA FOR SEXUALLY ABUSING THREE MALE VICTIMS, AGES 5, 11, AND 15. SUBJECT'
-						
-						
 						
 						,
 						trim(l.offense_description, left, right),
