@@ -10,14 +10,17 @@ FUNCTION
 
   ValidSearchLexids := CHOOSEN(in_dids(did<>0),iesp.Constants.FCRAInqHist.MAX_LEXIDS); 
   
+  BOOLEAN FailOnSoapError := TRUE;
 	// person context/consumer statements
 	in_pc := IF(isFCRA,PROJECT(ValidSearchLexids, TRANSFORM(FFD.Layouts.DidBatch, SELF.acctno := (STRING) COUNTER, SELF.did := LEFT.did)));
-	pc_recs := IF(in_mod.SkipPersonContextCall,in_PersonContext,FFD.FetchPersonContext(in_pc, in_mod.gateways,[FFD.Constants.DataGroups.Inquiries]));
+  pc_resp := FFD.Functions.FetchPersonContextAsResponse(in_pc, in_mod.gateways,[FFD.Constants.DataGroups.Inquiries], in_mod.FFDOptionsMask, FailOnSoapError);
+  
+	pc_recs := IF(in_mod.SkipPersonContextCall,in_PersonContext, PROJECT(pc_resp.Records, FFD.Layouts.PersonContextBatch));
 
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
-	delta_IH_results	:= InquiryHistory.Functions.PerformDeltabaseCall(ValidSearchLexids, in_mod.gateways);
-  delta_IH_recs := PROJECT(delta_IH_results.response.Records, 
+	delta_IH_results	:= InquiryHistory.Functions.PerformDeltabaseCall(ValidSearchLexids, in_mod.gateways).response;
+  delta_IH_recs := PROJECT(delta_IH_results.Records, 
                            TRANSFORM(InquiryHistory.Layouts.inquiry_history_rec, 
                            SELF.UniqueId := (UNSIGNED) LEFT.LexId,  //For records pulled from index this is appended LexId. There are no appended LexId in Deltabase records, so we populate that field with string Lex_id logged for inquiry
                            SELF.isDeltabaseSource := TRUE,
@@ -62,24 +65,38 @@ FUNCTION
  // prepare results for output - we need to add status/message per input subject
   InquiryHistory.Layouts.inquiry_history_out xform_indv(doxie.layout_references L,
                                                             DATASET(InquiryHistory.Layouts.inquiry_history_rec) R) := TRANSFORM 
-            StatusCode := MAP(L.did = 0 => InquiryHistory.Constants.StatusCodes.NoSearchRecords,
-                              EXISTS(R) => InquiryHistory.Constants.StatusCodes.ResultsFound,
+            StatusCode := IF(EXISTS(R), InquiryHistory.Constants.StatusCodes.ResultsFound,
                                            InquiryHistory.Constants.StatusCodes.NoResultsFound);
             SELF.UniqueId := L.did;
             SELF.SearchStatus := StatusCode;
-            SELF.Message := InquiryHistory.Constants.GetStatusMesage(StatusCode);
+            SELF.Message := InquiryHistory.Constants.GetStatusMessage(StatusCode);
             SELF.IndividualResults := SORT(PROJECT(R, TRANSFORM(InquiryHistory.Layouts.inquiry_history_per_transaction, 
                                                                         SELF.LexID:=(STRING)LEFT.LexID, // should it be as appears in index lex_id field or appended_did?
                                                                         SELF:=LEFT)),
                                       -InquiryDate,TransactionID);
+            SELF:=[];                          
   END;
 
   res_grpd := DENORMALIZE(in_dids, final_IH_recs,   //keeping all input sunjects in the result, even if no IH data
                           LEFT.did = RIGHT.UniqueId, GROUP,
                           xform_indv(LEFT,ROWS(RIGHT)));
                           
-                      
-  res_vldt := SORT(res_grpd, UniqueId);
+  res_srtd := SORT(res_grpd, UniqueId);
+  
+  isPCSoapFail := ~in_mod.SkipPersonContextCall AND pc_resp._Header.Status = InquiryHistory.Constants.StatusCodes.SOAPError; 
+  isIHSoapFail := delta_IH_results._Header.Status = InquiryHistory.Constants.StatusCodes.SOAPError;
+  
+  InquiryHistory.Layouts.inquiry_history_out xform_onfail() := TRANSFORM 
+      _err_code := IF(isPCSoapFail, pc_resp._Header.Status, delta_IH_results._Header.Status);
+      SELF.SearchExceptions := IF(isIHSoapFail, delta_IH_results._Header.Exceptions) + IF(isPCSoapFail, pc_resp._Header.Exceptions);
+      SELF.SearchStatus := _err_code;
+      SELF.Message := InquiryHistory.Constants.GetStatusMessage(_err_code);
+      SELF := [];
+  END;
+  
+  res_soapfail := DATASET([xform_onfail()]);
+  
+  res_vldt := IF(isPCSoapFail OR isIHSoapFail, res_soapfail, res_srtd);
   
   //output(pc_recs, named('pc_recs'));
   //output(delta_IH_results, named('delta_IH_results'));

@@ -5,6 +5,7 @@ EXPORT CONSTANTS := MODULE
  EXPORT GetDateTimeGMT := std.Date.SecondsToString(Std.date.CurrentSeconds(FALSE), '%Y-%m-%d %H:%M:%S');
 
  EXPORT StatusCodes := MODULE
+    EXPORT  SoapError                     := '100';
     EXPORT  NoSearchRecords               := '401';
     EXPORT  ResultsFound                  := '501';
     EXPORT  NoResultsFound                := '503';
@@ -18,6 +19,7 @@ EXPORT CONSTANTS := MODULE
     EXPORT  NoResultsFoundMsg      := 'NO RESULTS FOUND';
     EXPORT  ESP_Method             := 'PersonContextDeltabase';
     EXPORT  ResultStructure        := 'PersonContextDeltabaseResponseEx';
+    EXPORT  SoapErrorMessage       := 'Soap connection error';
   END;
 
  EXPORT AlertMessages := MODULE
@@ -113,6 +115,6 @@ EXPORT CONSTANTS := MODULE
     EXPORT WATERCRAFT_DETAILS        := 'WATERCRAFT_DETAILS';
   END;
 
-	EXPORT security_freeze_default_codes := '110,112,114,115,118,121,127,129,132,211,212,214,216,218,219,220,221,222,223,224,225,226,227,228,230,231,233,234,235'; // all new codes, minus the collections purpose (113)
+	EXPORT security_freeze_default_purposes := '110,112,114,115,118,121,127,129,132,211,212,214,216,218,219,220,221,222,223,224,225,226,227,228,230,231,233,234,235'; // all new codes, minus the collections purpose (113)
 END;
   
