@@ -44,6 +44,7 @@ EXPORT orbit_update_entries(string filedate, string createORupdate) := function
                         create_entry('personAncillarykeys'   ,filedate)+
                         create_entry('Slimsorts'             ,filedate)+
                         create_entry('PowerSearchBoolean'    ,filedate)+
+                        create_entry('Remote Linking'        ,filedate)+
                         if(is_hash_month,   create_entry('Header Hashes'         ,filedate))
                         ,
                // createORupdate = 'update',
@@ -54,13 +55,14 @@ EXPORT orbit_update_entries(string filedate, string createORupdate) := function
                         update_entry('PersonXLAB'            ,filedate,'N')+
                         update_entry('personAncillarykeys'   ,filedate,'N')+
                         update_entry('Slimsorts'             ,filedate,'N')+
-                        update_bentry('PowerSearchBoolean'    ,filedate,'N|B')
+                        update_bentry('PowerSearchBoolean'   ,filedate,'N|B')+
+                        update_bentry('Remote Linking'       ,filedate,'N')
                );
     
  
 end;
 
-filedate := '20180522'; // RUN ON HTHOR
+filedate := '20180724'; // RUN ON HTHOR
 // filedate := header.version_build;
 // orbit_update_entries(filedate,'create');
 orbit_update_entries(filedate,'update');

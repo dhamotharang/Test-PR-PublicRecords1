@@ -276,7 +276,7 @@ send_report(dataset(recordof(seg_f)) ds,string emailList, string bVersion,string
 end;
 		
 wu := (string)STD.System.Job.WUID();
-emailList := 'Gabriel.Marcan@lexisnexisrisk.com';
+emailList := 'Gabriel.Marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com';
 
 getVname (string superfile, string v_end = ':') := FUNCTION
 
@@ -304,7 +304,7 @@ send_report(seg_m,emailList,mv,wu,'Marketing');
 //
 // Previous runs
 // -------------
-
+// 20180724 W20180907-113130
 /*
 
 20180320

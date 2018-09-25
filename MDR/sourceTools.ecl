@@ -1272,6 +1272,17 @@ export set_NonDerog_FCRA_sources_v50 := [
 	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
 	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek];
 	
+	//DF-22944
+	export set_Phonesplus_Header := [
+		src_Equifax										,src_LnPropV2_Fares_Asrs				,src_Voters_v2								,src_American_Students_List
+		,src_Professional_License			,src_Certegy										,src_EMerge_Hunt							,src_EMerge_Master
+		,src_TU_CreditHeader					,src_LnPropV2_Lexis_Asrs				,src_KY_Watercraft						,src_EMerge_Boat
+		,src_VA_Watercraft						,src_NC_Watercraft							,src_EMerge_Cens							,src_Federal_Firearms
+		,src_EMerge_Fish							,src_Federal_Explosives					,src_MD_Watercraft						,src_Miscellaneous
+		,src_MO_Veh										,src_MO_DL											,src_MO_Experian_Veh					,src_Experian_Credit_Header
+		,src_MO_Watercraft						,src_LnPropV2_Lexis_Deeds_Mtgs 
+	];
+	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
 	
 	export set_Prolic											:= [

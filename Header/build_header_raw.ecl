@@ -1,4 +1,4 @@
-import ut,mdr,PromoteSupers;
+﻿import ut,mdr,PromoteSupers;
 export build_header_raw(string filedate = Header.version_build,boolean incremental = FALSE) := function
 
 h:=distribute(header.Header_Joined(filedate).final,hash(did));
@@ -80,8 +80,9 @@ updateLatest := sequential(
                 fileservices.addsuperfile(header.File_header_raw_latest.fileName,
                                             if(incremental,basenamei, basename)+'_'+filedate));
                                             
-return sequential( Header.fn_blanked_pii(filedate)
-				  ,if(incremental,incremental_,full_)
+return sequential( 
+                   // Header.fn_blanked_pii(filedate)
+				  if(incremental,incremental_,full_)
 				  ,updateLatest);
 
 end;

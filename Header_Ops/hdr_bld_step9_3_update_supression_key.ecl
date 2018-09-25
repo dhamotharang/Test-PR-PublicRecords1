@@ -32,7 +32,7 @@ build_key(string filedatE) := sequential(
             ) :success(fileservices.sendemail('Debendra.Kumar@lexisnexisrisk.com;gabriel.marcan@lexisnexisrisk.com','pre_file_header_building COMPLETED Prod:'+workunit,''))
               ,failure(fileservices.sendemail('Debendra.Kumar@lexisnexisrisk.com;gabriel.marcan@lexisnexisrisk.com','pre_file_header_building !!FAILED! Prod:'+workunit,FAILMESSAGE));
 
-filedate := '20180522'; // RUN ON THOR (NOT ON hthor)
+filedate := '20180724'; // RUN ON THOR (NOT ON hthor)
 build_key(filedate);
 /* STEP 4 build key   see W:\Workspaces\BWR_PublicRecordsHdr\hdr_bld_step9_3_update_supression_key.ecl */ /* this needs to be run afterwards */
 // /* STEP 5 */ promote; // hthor /* this needs to be run afterwards */
@@ -43,4 +43,5 @@ build_key(filedate);
 // *** NOT HERE *** USE OTHER BWR *** NOT HERE *** USE OTHER BWR ***
 // |SEE OTHER BWR   | NOT IN THIS BWR|OTR BWR |
 
+//20180724 W20180907-103809
 //20180522 W20180629-114846

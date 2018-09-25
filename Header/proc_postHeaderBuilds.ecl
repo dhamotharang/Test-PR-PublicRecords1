@@ -59,7 +59,8 @@ export proc_postHeaderBuilds := module
 		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2)
 		: success(sequential(output('XADL1keys completed'),header.msg('XADL1keys completed',elist_owners).good))
 		;
-		step:='Yogurt:'+Header.version_build+' XADL keys and externals base files';
+		// step:='Yogurt:'+Header.version_build+' XADL keys and externals base files';
+		step:=Header.version_build+' XADL keys and externals base files';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -86,7 +87,8 @@ export proc_postHeaderBuilds := module
 		#stored ('version'  , header.version_build); 
 		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com'    ); 
 
-		step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
+		// step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
+		step:=Header.version_build+' Relative and HHID base files';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -111,10 +113,10 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
-                                            ,bld_relatives
+                                            // ,bld_relatives
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             // ,notify('Build_Header_Keys','*')
-                                            ,bld_relative_title
+                                            // ,bld_relative_title
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
@@ -127,7 +129,8 @@ export proc_postHeaderBuilds := module
 		#stored ('version'  , header.version_build); 
 		#stored ('build_operator', _control.MyInfo.EmailAddressNotify );
 
-		step:='Yogurt:'+Header.version_build+' Header, slimsorts, and relative Keys';
+		// step:='Yogurt:'+Header.version_build+' Header, slimsorts, and relative Keys';
+		step:=Header.version_build+' Header, slimsorts, and relative Keys';
 		#WORKUNIT('name', step);
 		
 		cmpltd
@@ -192,7 +195,8 @@ export proc_postHeaderBuilds := module
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
 		
-		step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
+		// step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
+		step:=Header.version_build+' FCRA Header and keys';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -216,7 +220,8 @@ export proc_postHeaderBuilds := module
 		#stored ('version'  , header.version_build); 
 		
 
-		step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
+		// step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
+		step:=Header.version_build+' PowerSearch Keys';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';

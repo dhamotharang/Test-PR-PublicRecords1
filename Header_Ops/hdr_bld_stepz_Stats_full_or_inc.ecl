@@ -8,8 +8,10 @@ header_get_wuid_results(filedate,res_name,out_rec,step) := FUNCTIONMACRO
 				w_e		:='W'+ut.date_math(workunit[2..9], 1)+'-000000';
 
 				job_name := CASE(step,
-												'ingest' => 'Yogurt:'+filedate+' Header*Ingest*',
-												'sync'   => 'Yogurt:'+filedate+' Header Sync;Rollup & Stats',
+												// 'ingest' => 'Yogurt:'+filedate+' Header*Ingest*',
+												'ingest' => '*' + filedate+' Header*Ingest*',
+												// 'sync'   => 'Yogurt:'+filedate+' Header Sync;Rollup & Stats',
+												'sync'   => '*' + filedate+' Header Sync;Rollup & Stats',
 												'');
 				
 				raw_wuids := wk_ut.get_WorkunitList(w_s,w_e,pJobname:=trim(job_name) ,pesp :=  esp);
@@ -219,9 +221,10 @@ report_final0			:= join(report_with_newHr, prod_src,LEFT.src=RIGHT.src
 
 report_final:=dedup(sort(report_final0,-abs_nbm_change_pct_of_newHr,-prod_cnt), except abs_nbm_change_pct_of_newHr, nbm_pct_prod_cnt,prod_cnt);
 
-rj:= output(sort(report_final,-abs_nbm_change_pct_of_newHr)
-(abs_nbm_change_pct_of_newHr>0.9
-OR pct_nbm_change>percent_nbm_change_threshold),named('significant_change_report'));
+rj:= output(sort(report_final,-abs_nbm_change_pct_of_newHr),named('significant_change_report'));
+// rj:= output(sort(report_final,-abs_nbm_change_pct_of_newHr)
+// (abs_nbm_change_pct_of_newHr>0.9
+// OR pct_nbm_change>percent_nbm_change_threshold),named('significant_change_report'));
 
 return sequential(ra,rb,rc,rd,re,rf,rg,rh,ri,rj);
 
@@ -229,7 +232,7 @@ end;
 // ***********************************************************************************************************************
 // RUN ON HTHOR !
 percent_nbm_change_threshold:=100;
-forceNewVersion:='20180710'; // eg 20170430 // instead of manually checking version on line ~48/49
+forceNewVersion:='20180919'; // eg 20170430 // instead of manually checking version on line ~48/49
 HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 
 // RUN THIS BWR BEFORE THE ACTUAL STAT REPORT FOR ALPHARETTA AND CHECK REPORT_FINAL
@@ -239,6 +242,12 @@ HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 // Previous runs
 // ----------------
 /*
+20180919 W20180921-231918
+20180911 W20180912-233418
+20180904 W20180905-135516
+20180828 W20180829-091938
+20180821 W20180823-095830-2
+20180814 W20180817-154408
 20180703 W20180705-144333
 20180619 W20180620-090230
 20180612 W20180613-111722

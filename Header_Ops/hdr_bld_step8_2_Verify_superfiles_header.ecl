@@ -9,15 +9,17 @@ output(choosen(header.verify_keys('PersonLabKeys')      ,1000),	named('PersonLab
 output(choosen(header.Verify_XADL1_base_files           ,1000),	named('XADLfiles')          ,all);
 output(choosen(header.verify_keys('SourceKeys')         ,1000),	named('SourceKeys')         ,all);
 output(choosen(header.verify_keys('PersonAncillaryKeys'),1000),	named('PersonAncillaryKeys'),all);
+output(header.verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'));
 // fileservices.sendemail('gabriel.marcan@lexisnexis.com'
 											 // ,'PersonHeader '+Header.version_build+' keys verification'
 											 // ,'Output has been created. See:'+workunit
 											// );
 // output(header.verify_keys('PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'));
-// output(header.verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'));
+
 
 //(run on hthor)
 
+// 0626 W20180717-111732
 // 0522 W20180620-134609
 // 0320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-140712#/stub/Summary
 // 0221 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-094152#/stub/Summary 

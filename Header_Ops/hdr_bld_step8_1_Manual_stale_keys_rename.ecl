@@ -1,6 +1,6 @@
 ﻿IMPORT tools,header;
 #workunit('name','Manual stale keys rename');
-filedate:='20180522';//header.version_build;
+filedate:='20180821';//header.version_build;
 all_packagekeys := DATASET([                                                                                                                                                                                                                              
 {'~thor_data400::key::header.rid_qa', '~thor_data400::key::header::'+filedate+'::rid'}  // put in the NEW version name                                                                                                                                                
 ], tools.Layout_SuperFilenames.inputlayout);                                                                                                                                                                                                                  
@@ -10,6 +10,8 @@ nothor(tools.fun_RenameFiles(all_packagekeys, false));        // true = testing
 /*
 Previous Runs
 ---------------
+20180821 W20180923-121024
+0626 W20180717-105854
 0522 W20180620-134200
 0320 http://prod_esp.br.seisint.com:8010/?Wuid=W20180419-140631&Widget=WUDetailsWidget#/stub/Summary
 // */

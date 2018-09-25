@@ -63,6 +63,9 @@ run; 					// first run the _report_before.       Once satisfied, run "run" on he
 
 // Previous Runs
 // ---------------
+// 20180821 W20180823-211441
+// 20180724 W20180730-095736
+// 20180626 W20180709-105536
 // 20180423 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180513-111252#/stub/Summary
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180403-123957#/stub/Summary
 // 20180221 W20180312-125034

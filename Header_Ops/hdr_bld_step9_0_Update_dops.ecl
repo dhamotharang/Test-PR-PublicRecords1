@@ -9,7 +9,7 @@ elist:=         'gabriel.marcan@lexisnexisrisk.com'
 // // // // // // // // // FullHeader DOPS update
 
 // h_version := Header.version_build;
-h_version := '20180522';
+h_version := '20180724';
 
 dops.updateversion('SourceKeys'           ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PersonHeaderKeys'     ,h_version,elist,,'N'); // header // Header
@@ -28,7 +28,7 @@ dops.updateversion('PowerSearchKeys'      ,h_version,elist,,'B'); // header // <
 // // // // // // // // // QuickHeader DOPS update
 
 qh_version := Header.Sourcedata_month.v_eq_as_of_date; // 'thor_data400::flag::version::equifax_weekly'
-// qh_version := '20171203a';
+// qh_version := '20180826';
 
 rt_version := qh_version;//+'a';
 // rt_version := '20171119a';
@@ -43,6 +43,8 @@ dops.updateversion('FCRA_RiskTableKeys'  ,rt_version,elist,,'F'); // orbit: FCRA
 // Previous runs:
 // --------------
 
+// 20180724 W20180827-111117, W20180827-112227
+// 20180626 W20180717-130929, W20180719-090656
 // 20180522 W20180621-131050
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-141513#/stub/Summary 
 // 20170221 W20180320-130359, http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-083453#/stub/Summary

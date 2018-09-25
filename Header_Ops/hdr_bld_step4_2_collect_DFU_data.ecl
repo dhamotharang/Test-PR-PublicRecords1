@@ -61,7 +61,7 @@ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filed
 ,output(Get_DFUInfo('~thor_data400::key::fcra::header::'+filedate+'::addr_unique_expanded'),named('file_copy_log'),extend)
 );
 
-getInfo('20180522'); // run on hthor
+getInfo('20180821'); // run on hthor
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\header_dfu_info_copy_from_alpha.ecl
 // run on hthor (svc_person_header is ok)
@@ -69,6 +69,7 @@ getInfo('20180522'); // run on hthor
 // Previous runs
 // -------------
 /*
+0821 W20180923-120649
 0522 W20180620-102701
 0423 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180518-103952#/stub/Summary
 0320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180414-141748#/stub/Summary

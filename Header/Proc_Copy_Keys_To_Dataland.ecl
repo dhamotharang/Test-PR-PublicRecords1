@@ -14,11 +14,13 @@ SHARED elist :=  'gabriel.marcan@lexisnexisrisk.com'
 
 dClstr := '	thor400_dev';//'thor400_sta01_2';
 
-SHARED copy(string fl1, string fl2=fl1) :=
-    if(~STD.File.FileExists('~'+fl2),
-       std.file.copy(fp+fl1,dClstr,'~'+fl2,compress:=true,allowoverwrite :=true),
-       output(dataset([{'File Already exists:'+fl2}],{string info}),named('copy_report'),extend)
-       );
+SHARED copy(string fl1, string fl2=fl1) :=  output(dataset([{'File Already exists:'+fl2}],{string info}),named('copy_report'),extend);
+    
+// SHARED copy(string fl1, string fl2=fl1) :=
+    // if(~STD.File.FileExists('~'+fl2),
+       // std.file.copy(fp+fl1,dClstr,'~'+fl2,compress:=true,allowoverwrite :=true),
+       // output(dataset([{'File Already exists:'+fl2}],{string info}),named('copy_report'),extend)
+       // );
 
 SHARED sf_keysi := dataset([
 
@@ -95,13 +97,14 @@ EXPORT Incrementals := sequential(
         ) : success ( STD.System.Email.SendEmail (elist,'Completed:Incremental linking key copy to dataland',workunit)),
             failure ( STD.System.Email.SendEmail (elist,'FAILED!:Incremental linking key copy to dataland',workunit));
 
+EXPORT Full := nothor(apply(sf_keys,copy(getLogical1(fp+nm))));
 
-EXPORT Full := sequential(
-            STD.System.Email.SendEmail (elist,'STARTED:Full linking keys copy to dataland',workunit),
-            nothor(apply(sf_keys,copy(getLogical1(fp+nm)))),
-            nothor(apply(sf_keys,update_supers(nm,getLogical1(fp+nm),true))),
-            output(verify_xadl_files)
-            ) : success ( STD.System.Email.SendEmail (elist,'Completed:Full linking key copy to dataland',workunit)),
-                failure ( STD.System.Email.SendEmail (elist,'FAILED!:Full linking key copy to dataland',workunit));
+// EXPORT Full := sequential(
+            // STD.System.Email.SendEmail (elist,'STARTED:Full linking keys copy to dataland',workunit),
+            // nothor(apply(sf_keys,copy(getLogical1(fp+nm)))),
+            // nothor(apply(sf_keys,update_supers(nm,getLogical1(fp+nm),true))),
+            // output(verify_xadl_files)
+            // ) : success ( STD.System.Email.SendEmail (elist,'Completed:Full linking key copy to dataland',workunit)),
+                // failure ( STD.System.Email.SendEmail (elist,'FAILED!:Full linking key copy to dataland',workunit));
 
 END;

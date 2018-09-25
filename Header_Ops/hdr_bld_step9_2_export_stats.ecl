@@ -125,9 +125,9 @@ generateStats(string hVersion) := module
                         + base_stats            // (sync)
                         + new_dids_by_source;   // (sync)
 
-            export onbm := output(dedup(No_Basic_Match,record,all),named('no_basic_match'));
-            export onts := output(dedup(sort(hd_stats,-value),except value,all)      ,named('hd_stats'      ));
-            export otsg := output(n_singletons  ,named('n_singletons'  ));
+            export onbm := output(dedup(No_Basic_Match,record,all),named('no_basic_match'), all);
+            export onts := output(dedup(sort(hd_stats,-value),except value,all)      ,named('hd_stats'      ), all);
+            export otsg := output(n_singletons  ,named('n_singletons'  ), all);
 
             export add_ingest_stats := sequential( onbm, header.stats.add( No_Basic_Match,'1' ));
             export add_nothor       := sequential( onts, header.stats.add( hd_stats      ,'2' ));
@@ -138,7 +138,7 @@ end;
 // ****************************************************************************************** //
 // RUNS: (on p_svc_person_header or gmarcan_prod because header.stats is sandboxed)
 
-hVersion := '20180626' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
+hVersion := '20180821' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
                                     //,fileservices.SuperFileContents('~thor_data400::base::header')[1].name,0);
 
 // output(hVersion,named('hVersion'));
@@ -147,7 +147,7 @@ hVersion := '20180626' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
 
 // generateStats(hVersion).onbm; // NOTHOR (ingest)     // TEST add_ingest_stats
 // generateStats(hVersion).onts; // NOTHOR (synced)     // TEST sync stats
-generateStats(hVersion).otsg; // YES THOR (syned)    // TEST singeleton
+// generateStats(hVersion).otsg; // YES THOR (syned)    // TEST singeleton
 
 // generateStats(hVersion).add_ingest_stats; // (run on hthor / NOTHOR)
 // generateStats(hVersion).add_nothor;      // (run on hthor / NOTHOR)
@@ -165,6 +165,16 @@ Singlerons
 Sync stats
 Ingest
 20180423
+
+20180724(run at the end of cycle post linking)
+W20180823-101813 //add_ingest_stats
+W20180823-101847 //add_nothor
+W20180823-101920 //add_thor
+
+20180626
+W20180717-133420
+W20180717-133454
+W20180717-133558
 
 20180522
 W20180625-110653

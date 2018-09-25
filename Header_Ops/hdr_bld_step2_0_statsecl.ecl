@@ -60,6 +60,7 @@ sequential(dlog,run_stats(incremental,header.version_build,operatorEmailList));
 // whether a new header_raw needs to be copyed to Alpharetta
 // Estimated THOR time: 20Min
 
-// 20180526 W20180702-091910
+// 20180724 W20180827-115225
+// 20180626 W20180702-091910
 // 20180423 
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-123412#/stub/Summary

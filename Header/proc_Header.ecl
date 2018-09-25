@@ -7,7 +7,8 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     
     shared today := (STRING8)Std.Date.Today();
 
-    step(string versionBuild):='Yogurt:'+versionBuild+' Header Ingest';
+    // step(string versionBuild):='Yogurt:'+versionBuild+' Header Ingest';
+    step(string versionBuild):=versionBuild+' Header Ingest';
         
     cmpltd(string versionBuild):=step(versionBuild)+' completed';
     failed(string versionBuild):=step(versionBuild)+' failed';
@@ -27,8 +28,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
             header.LogBuild.single('Started :'+step(versionBuild))           
            ,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
            ,check_eq_monthly_file_version
-           ,Header.Inputs_Sequence(incremental,versionBuild) 
-            //can we put this assert statement at the beginning or before sequencing
+           ,Header.Inputs_Sequence(incremental,versionBuild)
            ,Header.Inputs_List
            ,if(~incremental,header.build_source_key())
            ,Header.build_header_raw(versionBuild,incremental)
@@ -44,7 +44,8 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     #stored ('buildname', 'PersonHeader'   ); 
     #stored ('version'  , header.version_build); 
     
-    step:='Yogurt:'+Header.version_build+' Header Sync;Rollup & Stats';
+    // step:='Yogurt:'+Header.version_build+' Header Sync;Rollup & Stats';
+    step:=Header.version_build+' Header Sync;Rollup & Stats';
     #WORKUNIT('name', step);
     cmpltd:=step+' completed';
     failed:=step+' failed';

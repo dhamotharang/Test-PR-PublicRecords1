@@ -23,3 +23,7 @@ sequential(dlog,Header.proc_postHeaderBuilds.FCRAheader);
 // be mindfull of queue activity to avoid THOR time competiton.
 // Like Power search boolean, this is one of the last packages to be QA'd.
 // Estimated THOR time: 24hrs
+
+//20180724 W20180822-091428
+//20180626 W20180716-102256
+//20180522 W20180619-111003

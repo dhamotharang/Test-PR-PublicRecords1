@@ -1,4 +1,4 @@
-import _control, Orbit3;
+﻿import _control, Orbit3, Scrubs_PCNSR;
 
 export Mac_PCNSR_Monthly_Build(build_date) := macro
 
@@ -24,7 +24,7 @@ export Mac_PCNSR_Monthly_Build(build_date) := macro
 %strata_stats% := DayBatchPCNSR.Targus_Base_PCNSR_Stats(build_date);
 %update_dops% := roxiekeybuild.updateversion('PCNSRKeys',build_date,'kgummadi@seisint.com;cbrodeur@seisint.com',,'N');
 %sample% := output(choosen(DayBatchPCNSR.File_PCNSR_keybuild,100),named('PostProcessMainSample'));
-%orbit_update% := Orbit3.proc_Orbit3_CreateBuild_AddItem('PCNSR',(string)build_date,'N');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('PCNSR',(string)build_date,'N');
 
 sequential(	//%prebuild%,
 						%build_PCNSR_base% ,
@@ -33,6 +33,7 @@ sequential(	//%prebuild%,
 						%strata_stats%,
 						%update_dops%,
 						%sample%,
-						%orbit_update%
+						Scrubs_PCNSR.fnRunScrubs(build_date,''),
+						orbit_update
 					)
 endmacro;

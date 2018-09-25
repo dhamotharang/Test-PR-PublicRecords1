@@ -1,17 +1,68 @@
 ﻿IMPORT header,std;
-#stored ('versionBuild', '20180710'   ); 
-run_date :=              '20180710'    ;
+#stored ('versionBuild', '20180925'   ); 
+run_date :=              '20180925'    ;
                     
 operatorEmailList    := Header.email_list.BocaDevelopersEx;
 extraNotifyEmailList := '';
 
 // /* STEP1 */ Header.BWR_IngestSetup(operatorEmailList,false /* skip action */); // ** run on hthor ** // RUN FALSE TO DO ACTIONS. DO NOT SKIP! RUN THE SUPERFILE UPDATE
-// /* STEP2 */ Header.Inputs_Set(); // NOT hthor NOT. Must use regular thor!!
+/* STEP2 */ Header.Inputs_Set(); // NOT hthor NOT. Must use regular thor!!
+// /* STEP2.5 */ header_ops.fn_SetIKBInput();
 // /* STEP3 */ Header.BWR_IngestSetup(operatorEmailList,true);  // ** run on hthor ** SKIP THE SETUP (JUST CONFIRMING THE CHANGES)
-/* STEP4 */  Header.BWR_Build_Incremental(operatorEmailList, extraNotifyEmailList, run_date); // (run on regular thor)
+// /* STEP4 */  Header.BWR_Build_Incremental(operatorEmailList, extraNotifyEmailList, run_date); // (run on regular thor)
 
 // -------------------------------------------------------------------------------
 /*
+20180904
+1 - W20180904-150319
+2 - W20180904-150535
+2.5 - W20180904-160946
+3 - W20180904-162257
+4 - W20180904-163628
+
+20180828
+1 - W20180828-091226
+2 - W20180828-091447
+2.5 - W20180828-093729
+3 - W20180828-094005
+4 - W20180828-094229
+
+20180821
+1 - W20180821-111435
+2 - W20180821-111828
+3 - W20180821-122654
+4 - W20180821-124156
+
+20180814
+1 - W20180814-093618
+2 - W20180814-095413
+3 - W20180814-102714
+4 - W20180816-183632
+
+20180807
+1 - W20180807-094055
+2 - W20180807-094235
+3 - W20180807-101149
+4 - W20180807-132848
+
+20180730
+1 - W20180730-134907
+2 - W20180730-143442
+3 - W20180730-163732
+4 - W20180717-155949
+
+20180724
+1 - W20180724-095141
+2 - W20180724-095836
+3 - W20180717-155830
+4 - W20180717-155949
+
+20180717
+1 - W20180717-154118
+2 - W20180717-154342
+3 - W20180717-155830
+4 - W20180717-155949
+
 20180710
 1 - W20180710-103035
 2 - W20180710-103326

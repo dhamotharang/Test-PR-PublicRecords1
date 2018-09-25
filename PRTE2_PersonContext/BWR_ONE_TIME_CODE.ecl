@@ -22,7 +22,7 @@ EXPORT DO := FUNCTION
 MakeSuperKeys ('~prte::key::personcontext_deltakey::delta_key::lexid_@version@');
 MakeSuperKeys ('~prte::key::personcontext_deltakey::delta_key::recid_@version@');
 
-//MakeSuperFiles ('~PRTE::BASE::personcontext@version@');
+MakeSuperFiles ('~PRTE::BASE::personcontext@version@');
 
 RETURN 'SUCCESS';
 

@@ -21,9 +21,7 @@ module
 				,,
 				true);
 				
-		EXPORT postNewStatus := if(	IsNew
-			,sequential(WriteFile, output('fraudgov_build_version Changed', named('fraudgovInfoChanged')))
-			,sequential(output('fraudgov_build_version Not Changed', named('fraudgovInfoNotChanged'))));
+		EXPORT postNewStatus := if(	IsNew,WriteFile);
 
 		PromoteSupers.MAC_SF_BuildProcess(
 				dataset([{pVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 

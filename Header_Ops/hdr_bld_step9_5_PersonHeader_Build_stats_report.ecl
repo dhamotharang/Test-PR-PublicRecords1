@@ -137,7 +137,7 @@ STD.System.Email.SendEmailAttachText(
 // Run on: hthor p_svc_person_header
 // Previous runs
 // -------------
-
+// 20180724 W20180907-124234
 // 20180522 W20180629-135531
 // 20180423 W20180604-141816 
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180502-131853#/stub/Summary
