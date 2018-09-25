@@ -171,8 +171,8 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		boolean ported_line := ported_phone or  L.source IN Consts.set_ATT_LIDB;
 
 		//identifies both historic and current disconnect records
-		//is_deact can also be P - Ported
-		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE;  // and (L.is_deact = 'Y' OR L.is_deact = 'N');
+		//is_deact can also be P - Ported - we want to ignore P records because they don't represent true disconnects.
+		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
 		boolean number_swapped := L.phone_swap <> '';
 		boolean suspended := L.deact_code = Consts.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
 		boolean reactivated := L.is_react = 'Y'; //remove L.deact_code=Consts.SUSPENDED_CODE to include PX(suspension reacts) and PG(Gong additions)
