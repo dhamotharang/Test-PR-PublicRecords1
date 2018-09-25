@@ -109,7 +109,7 @@ MODULE
 
  inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR 
                      inMod.IncludeEquifax OR inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR 
-                     inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.IncludeZumigoOptions;
+                     inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.InputZumigoOptions;
                   
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	

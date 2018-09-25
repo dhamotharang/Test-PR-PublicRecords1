@@ -112,6 +112,7 @@ MODULE
   EXPORT BOOLEAN DeviceHistory                := FALSE;
   EXPORT BOOLEAN IncludeDeviceHistory         := FALSE;
   EXPORT BOOLEAN IncludeZumigoOptions         := FALSE;
+  EXPORT BOOLEAN InputZumigoOptions         := FALSE;
   
     
  
@@ -259,6 +260,11 @@ MODULE
     SHARED BOOLEAN full_consent   := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer;
     SHARED BOOLEAN single_consent := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer;
     
+    BOOLEAN hasActiveDeviceRules              := EXISTS(RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo OR 
+                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) AND active));
+                                    
+    SHARED BOOLEAN ValidConsentInquiry   := (full_consent OR single_consent)  AND hasActiveDeviceRules;	
+    
     EXPORT BOOLEAN NameAddressValidation             := pfOptions.IncludeZumigoOptions.NameAddressValidation: STORED('NameAddressValidation');
     EXPORT BOOLEAN IncludeNameAddressValidation      := full_consent AND 
                                                         (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR 
@@ -271,32 +277,29 @@ MODULE
     EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND
                                                         (TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
 		                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] OR CallHandlingInfo);    
-                                                                 
-    SHARED BOOLEAN hasActiveDeviceRules              := EXISTS(RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo OR 
-                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) AND active));
-                                                                         
+                                                                                                                                        
     // zumigo gateway is configured to turn deviceinfo to true when devicehistory is true
     EXPORT BOOLEAN DeviceHistory              := pfOptions.IncludeZumigoOptions.DeviceHistory: STORED('DeviceHistory');     
-    EXPORT BOOLEAN IncludeDeviceHistory       := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceHistory) AND
-                                                 hasActiveDeviceRules; 
+    EXPORT BOOLEAN IncludeDeviceHistory       :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceHistory) AND
+                                                 ValidConsentInquiry; 
     
-    EXPORT BOOLEAN DeviceInfo                 := DeviceHistory OR pfOptions.IncludeZumigoOptions.DeviceInfo: STORED('DeviceInfo');   
-    EXPORT BOOLEAN IncludeDeviceInfo          := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceInfo) AND
-                                                 hasActiveDeviceRules;    
+    EXPORT BOOLEAN DeviceInfo                 := pfOptions.IncludeZumigoOptions.DeviceInfo: STORED('DeviceInfo');   
+    EXPORT BOOLEAN IncludeDeviceInfo          :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceHistory OR DeviceInfo) AND
+                                                 ValidConsentInquiry;    
     
     EXPORT BOOLEAN DeviceChangeInfo           := pfOptions.IncludeZumigoOptions.DeviceChangeInfo: STORED('DeviceChangeInfo');   
-    EXPORT BOOLEAN IncludeDeviceChangeInfo    := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceChangeInfo) AND
-                                                 hasActiveDeviceRules;   
+    EXPORT BOOLEAN IncludeDeviceChangeInfo    :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceChangeInfo) AND
+                                                 ValidConsentInquiry;   
 		
-    EXPORT BOOLEAN IncludeZumigoOptions := NameAddressValidation OR
-                                           CallHandlingInfo OR DeviceInfo OR 
-                                           DeviceChangeInfo OR DeviceHistory;
-                                           
-		  BOOLEAN   ValidConsentInquiry   := full_consent OR (single_consent  AND hasActiveDeviceRules);		
+    EXPORT BOOLEAN IncludeZumigoOptions       := IncludeNameAddressValidation OR
+                                                 IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
+                                                 IncludeDeviceInfo OR IncludeDeviceHistory;                                        	
 		
-	   EXPORT BOOLEAN   UseZumigoIdentity	 := (TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT]  OR IncludeZumigoOptions) AND 
-                                                               ValidConsentInquiry  AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
+	   EXPORT BOOLEAN   UseZumigoIdentity	       := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
+     
+    EXPORT BOOLEAN InputZumigoOptions         := NameAddressValidation OR
+                                                 CallHandlingInfo OR DeviceInfo OR 
+                                                 DeviceChangeInfo OR DeviceHistory;
    
 		END;
 			
@@ -397,28 +400,32 @@ MODULE
    
     SHARED BOOLEAN full_consent   := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer;
     SHARED BOOLEAN single_consent := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer;
+    
+    BOOLEAN hasActiveDeviceRules         := EXISTS(RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo OR 
+                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) AND active));
+                                    
+    SHARED BOOLEAN ValidConsentInquiry   := (full_consent OR single_consent)  AND hasActiveDeviceRules;	
+    
     EXPORT BOOLEAN IncludeNameAddressValidation      := full_consent AND 
                                                         TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
                                                          
-    EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent;  
+    EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
+		                                                                                           PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];  
     
-    SHARED BOOLEAN hasActiveDeviceRules              := EXISTS(RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo OR 
-                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) AND active));
-                                                                         
     EXPORT BOOLEAN IncludeDeviceHistory       := TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate AND
-                                                 hasActiveDeviceRules; 
+                                                 ValidConsentInquiry; 
     
     EXPORT BOOLEAN IncludeDeviceInfo          := TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate AND
-                                                 hasActiveDeviceRules;    
+                                                 ValidConsentInquiry;    
  
     EXPORT BOOLEAN IncludeDeviceChangeInfo    := TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate AND
-                                                 hasActiveDeviceRules;                                                                          
-                             
-		      BOOLEAN   ValidConsentInquiry         := full_consent OR (single_consent  AND hasActiveDeviceRules);		
-		
-		EXPORT BOOLEAN   UseZumigoIdentity	         := doxie.DataPermission.use_ZumigoIdentity AND TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                                                                       PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] 
-														                                                       AND BillingId <>'' AND ValidConsentInquiry;
+                                                 ValidConsentInquiry;                                                                          
+    
+    EXPORT BOOLEAN IncludeZumigoOptions       := IncludeNameAddressValidation OR
+                                                 IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
+                                                 IncludeDeviceInfo OR IncludeDeviceHistory; 
+                                                 
+    EXPORT BOOLEAN   UseZumigoIdentity	       := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
 
                                                         
  END; 
