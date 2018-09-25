@@ -1,4 +1,4 @@
-﻿import idl_header;
+import InsuranceHeader_Salt_xIDL, idl_header;
 
 export Layouts := Module
 	export inputLayout := record (IDLExternalLinking.xIDLConstants.in_layout)

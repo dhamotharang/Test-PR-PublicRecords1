@@ -1,4 +1,4 @@
-﻿//*
+//*
 // Returns the LexID for each record in the infile
 // The field names in the infile are passed by parameter in this macro.
 
@@ -83,9 +83,9 @@ IDLExternalLinking.xIDLConstants.in_new_layout %into%(%infile_seq% le) := transf
     self.ST := (typeof(SELF.ST))'';
   #END
   #IF ( #TEXT(Input_ZIP) <> '' )
-    self.ZIP_cases := Dataset([{le.Input_Zip, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) ;
+    self.ZIP := (typeof(SELF.ZIP))le.Input_ZIP;
   #ELSE
-    self.ZIP_cases := Dataset([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) ;
+    self.ZIP := (typeof(SELF.ZIP))'';
   #END
   #IF ( #TEXT(Input_SSN) <> '' )
     self.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
