@@ -41,6 +41,7 @@ module
 	// -- JIRA - DF-21478 - Consumer Adv - Overlinked PAW/Business Contacts - LexID 1120761903
 	// -- JIRA - DF-22103 - Cons. Adv. - PAW Overlinking LexID 975637332 Gowda
 	// -- JIRA - DF-22156 - Cons. Adv. - PAW Overlinking - LexID 175941365 - Bell
+	// -- JIRA - DF-23058 - Paw and Bus Header Records to be removed
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -59,6 +60,7 @@ module
 																'1343528727   C354557740',		// JIRA - DF-21627
 																'1292818441   C344452260',		// JIRA - DF-21478
 																'1615571128   C368649983',		// JIRA - DF-22103
+																'1921742036    C71944602',		// JIRA - DF-23058
 																'1217197599C70371215'					// JIRA - DF-22156
 															 ];
 	
@@ -430,6 +432,14 @@ module
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.vl_id) in ['17794919'] and trim(pInput.fname) = 'TINA' and trim(pInput.lname) = 'TOPE')
 				// -- JIRA - DF-22882 - consumer has opted out but these records are still in PAW 
 				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsIL_Corporations(pInput.source)) and trim(pInput.vendor_id) in ['17-LLC-03428427','22388016','24834066'] and trim(pInput.lname) in ['RICCARDO','BRADLEY'])
+				// -- JIRA - DF-23058 - Consumer Dispute - Paw and Bus Header Records to be removed
+				or  (trim(pInput.fname) = 'BROCK' and trim(pInput.lname) = 'KORSAN' and trim(pInput.company_source_group) = 'L14000179431JAMES ROBERTS PAINTING')
+				// -- JIRA - DF-22874 - Consumer Dispute Paw records and old business header contact records to be removed
+				or  ((trim(pInput.company_source_group) in ['25817K-3 INC','42981866JD PROPERTIES'] or pInput.company_phone = 9492510650) and trim(pInput.fname) = 'YANA' and trim(pInput.lname) in ['ROSTOMYAN','ROSTOMIAN'])
+				// -- JIRA - DF-22999 - Consumer Dispute has a Paw record to be removed
+				or  (trim(pInput.vendor_id) = 'SKAV4337795' and pInput.company_phone = 6196591085 and trim(pInput.lname) = 'SPINO')
+				// -- JIRA - DF-23136 - FCRA PAW Linking - LexID 1386265060 Kiefer
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '84399STENSENG CONSULTING' and trim(pInput.lname) = 'KIEFER' and trim(pInput.fname) = 'MAX')
 				
 			;
 
@@ -985,6 +995,14 @@ module
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.vl_id) in ['17794919'] and trim(pInput.fname) = 'TINA' and trim(pInput.lname) = 'TOPE')
 				// -- JIRA - DF-22882 - consumer has opted out but these records are still in PAW 
 				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsIL_Corporations(pInput.source)) and trim(pInput.vendor_id) in ['17-LLC-03428427','22388016','24834066'] and trim(pInput.lname) in ['RICCARDO','BRADLEY'])
+				// -- JIRA - DF-23058 - Consumer Dispute - Paw and Bus Header Records to be removed
+				or  (trim(pInput.fname) = 'BROCK' and trim(pInput.lname) = 'KORSAN' and trim(pInput.company_source_group) = 'L14000179431JAMES ROBERTS PAINTING')
+				// -- JIRA - DF-22874 - Consumer Dispute Paw records and old business header contact records to be removed
+				or  ((trim(pInput.company_source_group) in ['25817K-3 INC','42981866JD PROPERTIES'] or pInput.company_phone = 9492510650) and trim(pInput.fname) = 'YANA' and trim(pInput.lname) in ['ROSTOMYAN','ROSTOMIAN'])
+				// -- JIRA - DF-22999 - Consumer Dispute has a Paw record to be removed
+				or  (trim(pInput.vendor_id) = 'SKAV4337795' and pInput.company_phone = 6196591085 and trim(pInput.lname) = 'SPINO')
+				// -- JIRA - DF-23136 - FCRA PAW Linking - LexID 1386265060 Kiefer
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '84399STENSENG CONSULTING' and trim(pInput.lname) = 'KIEFER' and trim(pInput.fname) = 'MAX')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
