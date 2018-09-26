@@ -55,7 +55,7 @@ EXPORT run_build(string infiledate
 		shared orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild('RiskWise Overrides',(infiledate),'N'),
 																		Orbit3.proc_Orbit3_CreateBuild('FCRA RiskWise Overrides',(infiledate),'F')
 																		);
-  export run_alphaSuppression := wk_ut.CreateWuid('Overrides.Build_SuppressionFile_Alpha('+infiledate+')' , STD.system.Job.Target() ); 
+  export run_alphaSuppression := wk_ut.CreateWuid('Overrides.Build_SuppressionFile_Alpha(\''+infiledate+'\')'  , STD.system.Job.Target() ); 
 	
 	export all := sequential
 											(
