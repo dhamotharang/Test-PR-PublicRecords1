@@ -33,7 +33,6 @@ export t_ZumigoOption := record
 	boolean NameAddressInfo {xpath('NameAddressInfo')};
 	boolean AccountInfo {xpath('AccountInfo')};
 	boolean CarrierInfo {xpath('CarrierInfo')};
-	boolean AcctStatusInfo {xpath('AcctStatusInfo')};
 	boolean CallHandlingInfo {xpath('CallHandlingInfo')};
 	boolean DeviceInfo {xpath('DeviceInfo')};
 	boolean DeviceChangeInfo {xpath('DeviceChangeInfo')};
@@ -60,7 +59,7 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IncludePhoneMetadata {xpath('IncludePhoneMetadata')};
 	boolean SubjectMetadataOnly {xpath('SubjectMetadataOnly')};
 	boolean UseDeltabase {xpath('UseDeltabase')};
-	boolean IncludeRiskIndicators {xpath('IncludeRiskIndicators')};//hidden[internal]
+	boolean IncludeRiskIndicators {xpath('IncludeRiskIndicators')};
 	dataset(t_PhoneFinderRiskIndicator) RiskIndicators {xpath('RiskIndicators/RiskIndicator'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPRIRules)};//hidden[internal]
 	boolean IncludeOtherPhoneRiskIndicators {xpath('IncludeOtherPhoneRiskIndicators')};
 	string LineIdentityUseCase {xpath('LineIdentityUseCase')};//hidden[internal]
@@ -68,7 +67,6 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer MaxOtherPhones {xpath('MaxOtherPhones')};
 	integer MaxIdentities {xpath('MaxIdentities')};
 	boolean UseInHousePhoneMetadata {xpath('UseInHousePhoneMetadata')};//hidden[internal]
-	boolean IncludeAccudataCNAM {xpath('IncludeAccudataCNAM')};//hidden[internal]
 	boolean IncludeAccudataOCN {xpath('IncludeAccudataOCN')};//hidden[internal]
 	boolean IncludeEquifax {xpath('IncludeEquifax')};//hidden[internal]
 	boolean IncludeInhousePhones {xpath('IncludeInhousePhones')};//hidden[internal]

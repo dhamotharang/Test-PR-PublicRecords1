@@ -16,7 +16,8 @@ MODULE
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
 
   SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
-
+  SHARED IsValidTransactionType	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
+  
   dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
 	
 	 useADL := vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
@@ -106,6 +107,12 @@ MODULE
       																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
       																												,dZum_final);	
 
+ inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR inMod.IncludeEquifax OR
+                     inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR inMod.NameAddressValidation OR 
+                     inMod.NameAddressInfo OR inMod.AccountInfo OR 
+                     inMod.CallHandlingInfo OR inMod.DeviceInfo OR inMod.DeviceChangeInfo OR 
+                     inMod.DeviceHistory OR inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing;
+                  
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
@@ -115,7 +122,9 @@ MODULE
        // If more than one type of verification is selected, fail the service.			
         // Verification request requires a complete phone number.			
       verifyRequest > 1																=> FAIL(100,PhoneFinder_Services.Constants.ErrorCodes(100)),
-      ((BOOLEAN)verifyRequest AND ~vIsPhone10)				=> FAIL(101,PhoneFinder_Services.Constants.ErrorCodes(101))); 
+      ((BOOLEAN)verifyRequest AND ~vIsPhone10)				=> FAIL(101,PhoneFinder_Services.Constants.ErrorCodes(101)),
+      //If no trasaction type selected and no data source option selected
+     IsValidTransactionType AND ~inputOptionCheck  => FAIL(102,PhoneFinder_Services.Constants.ErrorCodes(102))); 
          
       /*Phone verification is a "phone only" search, even if the phone is blank.  If the phone is blank, the 
       verification will fail and the appropriate status will be returned. */

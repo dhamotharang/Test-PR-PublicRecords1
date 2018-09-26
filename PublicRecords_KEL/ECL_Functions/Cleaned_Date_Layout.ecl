@@ -1,0 +1,20 @@
+﻿EXPORT Cleaned_Date_Layout := RECORD 
+	STRING8  DateAsNumsOnly; 
+	UNSIGNED2 result;  
+	BOOLEAN  Populated; 
+	BOOLEAN  YearFilled; 
+	BOOLEAN  MonthFilled; 
+	BOOLEAN  DayFilled; 
+	BOOLEAN  YearNonZero; 
+	BOOLEAN  MonthNonZero; 
+	BOOLEAN  DayNonZero; 
+	BOOLEAN  YearValid; 
+	BOOLEAN  MonthValid; 
+	BOOLEAN  DayValid; 
+	BOOLEAN  InPast; 
+	BOOLEAN  InvalidChars; 
+	BOOLEAN  ChronStateUnknown; 
+	BOOLEAN  DateValid; 
+	STRING8  ValidPortion_00; 
+	STRING8  ValidPortion_01; 
+END;

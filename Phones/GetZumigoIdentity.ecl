@@ -292,6 +292,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.sub_postal_code := l.z5;																									 
 		//source and optin fields will be blank for any record that was not sent to Zumigo. //eg. blank phones - can be filtered out later
 		SELF.transaction_id := r.transaction_id;
+		// ESP passes a LF in error message for timeouts that breaks batch results. Replacing message with abbreviated text.
+		SELF.device_mgmt_status := IF(STD.Str.StartsWith(STD.Str.ToLowerCase(r.device_mgmt_status),Phones.Constants.GatewayValues.TimeoutMessage),
+																Phones.Constants.GatewayValues.TimeoutMessage, r.device_mgmt_status);
 		SELF:= r;
 		SELF:=[]
 	END;

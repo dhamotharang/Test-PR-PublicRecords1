@@ -2,7 +2,7 @@
 EXPORT mac_xLinking_PS (infile, uID ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
 														Input_DOB = '', Input_Phone = '', Input_DL_STATE = '',Input_DL_NBR = '', 
-														Input_RelFname = '', Input_RelLname = '', outfile) := MACRO
+														Input_RelFname = '', Input_RelLname = '', outfile, weight_score= 30, distance= 3, segmentation=true) := MACRO
 
 	IMPORT InsuranceHeader_xLink;
 
@@ -62,9 +62,9 @@ EXPORT mac_xLinking_PS (infile, uID ='', Input_SNAME = '', Input_FNAME = '',Inpu
     SELF.ST := (TYPEOF(SELF.ST))'';
   #END
   #IF ( #TEXT(Input_ZIP) <> '' )
-    SELF.ZIP_cases := le.Input_ZIP;
+    SELF.ZIP := (TYPEOF(SELF.ZIP))le.Input_ZIP;
   #ELSE
-    SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
+    SELF.ZIP := (TYPEOF(SELF.ZIP))'';
   #END
   #IF ( #TEXT(Input_SSN) <> '' )
     SELF.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
@@ -120,23 +120,51 @@ end;
 																// SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
 																// , , , fname2, lname2, %res_out%, true, , , ,10000);
 	
+	
+	#UNIQUENAME(result_trim)
+	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, UniqueId);
+
+// select a DID base only on distance and make sure the score is 75 or greater	
+	#UNIQUENAME(trimLayout)
+	%trimLayout% := recordof(%result_trim%);
+	
+	#UNIQUENAME(resultsDistance)
+	IDLExternalLinking.mac_distance (%result_trim%, %resultsDistance%, weight_score, distance)
+	
+	#UNIQUENAME(forSegmentation)
+	%forSegmentation% := %resultsDistance%(xIDL=0);
+	
+	#UNIQUENAME(resultsSeg)
+	IDLExternalLinking.mac_segmentation(%forSegmentation%, %resultsSeg%, weight_score, distance);
+
+	#UNIQUENAME(isCustomerTest)
+	%isCustomerTest% := IDLExternalLinking.Constants.isCustomerTest;
+	
+	#UNIQUENAME(result)
+	%result% := IF (segmentation and ~%isCustomerTest%, %resultsDistance%(xIDL>0) + %resultsSeg%, %resultsDistance%); 
+	
 	// Prepare to return results for one DID only
 	#UNIQUENAME(resultsLayout)
-	%resultsLayout% := RECORDOF(%res_out%.results);	
+	%resultsLayout% := RECORDOF(%result%.results);	
+	
+	#UNIQUENAME(file_out_final)	
+	IDLExternalLinking.mac_score(%result%, %file_out_final%, weight_score, distance, true);
+	
+	/*****************************************/
 
 	#UNIQUENAME(flatResult)
-	%resultsLayout% %flatResult%(%res_out% L, %resultsLayout% R):=TRANSFORM									
+	%resultsLayout% %flatResult%(%file_out_final% L, %resultsLayout% R):=TRANSFORM									
 			res := project(r, TRANSFORM(%resultsLayout%, 
 					SELF := LEFT));
-				SELF.reference := l.uniqueid;					
-			// SELF.reference := l.reference;					
+			SELF.reference := l.reference;					
 		  SELF :=res;			
 	END;
 	
 	#UNIQUENAME(allCandidates)
-	%allCandidates% := DEDUP(NORMALIZE(%res_out%,LEFT.results,%flatResult%(LEFT, RIGHT)), RECORD, ALL);
+	%allCandidates% := DEDUP(NORMALIZE(%file_out_final%,LEFT.results,%flatResult%(LEFT, RIGHT)), RECORD, ALL);
 	
 	OutFile := SORT(%allCandidates%, reference, -weight);
+
 // outfile := %res_out%;
 // output(%pr%, named('internal_layout'));
 // output(%res_out%, named('result_from_service'));

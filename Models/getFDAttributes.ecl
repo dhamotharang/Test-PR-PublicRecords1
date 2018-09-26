@@ -1,13 +1,16 @@
-﻿import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD;
+﻿import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
 	grouped DATASET(Risk_Indicators.Layout_Output) iid,
 	string30 account_value,
 	dataset(riskwise.Layout_IP2O) ips,
 	string model_name='',
-	boolean suppressCompromisedDLs=false
+	boolean suppressCompromisedDLs=false,
+  unsigned1 DPPA=0, unsigned1 GLB=0,
+  string DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+  string DataPermission=risk_indicators.iid_constants.default_DataPermission,
+  string32 appType = ''
 	) := FUNCTION
-
 
 
 // =============== Get Easi Info =============
@@ -42,6 +45,7 @@ used_census := RECORD
 	string6 cartheft;
 	string6 burglary;
 	string6 totcrime;
+  string6 hhsize;
 END;
 
 Layout_EasiSeq := record
@@ -112,6 +116,12 @@ layout_bseasi add_ips(wiid le, ips ri) := transform
 end;
 
 wIPs := join(wiid, ips, left.seq=right.seq, add_ips(left,right), left outer);
+
+
+Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
+
+skiptrace_call := riskwise.skip_trace(Prep, DPPA, GLB, DataRestriction,appType, DataPermission);
+
 
 Models.Layout_FraudAttributes intoAttributes(wIPs le) := TRANSFORM
 
@@ -894,12 +904,132 @@ self.version201.IdentityDriversLicenseComp := map(
 	'1');  // no known issues
 
 self.compromisedDL_hash := compromised_DL_hash_value;
+
 	self := [];
 END;
 
-
-
 version1Temp := project(wIPs, intoAttributes(left));
+
+// For Paro estincome and hownstatusflag attributes
+xlayout := record
+  Integer seq;
+  unsigned6 DID;
+  STRING1 hownstatusflag := '';
+  STRING3 estincome := '';
+  STRING6 refresh_date :='';  // for demographic data rollup
+end;
+
+	xlayout get_household(wIPs le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
+		self.hownstatusflag := map(rt.own_rent='9' => '4',
+							  rt.own_rent in ['7','8'] => '3',
+							  rt.own_rent in ['1','2','3','4','5','6'] => '2',
+							  '0');
+		self.estincome := (string)round(((integer)rt.find_income_in_1000s)/1000);
+		self.refresh_date := rt.refresh_date;
+    self := le;
+	end;
+
+	hous_recs := join(wIPs, DayBatchPCNSR.Key_PCNSR_DID, 
+					left.did!=0 and keyed(left.did=right.did), 
+					get_household(left, right), left outer,
+          ATMOST(keyed(left.did=right.did), RiskWise.max_atmost), keep(50));
+
+  xlayout roll_hous(xlayout le, xlayout rt) := transform
+    self := if(le.refresh_date > rt.refresh_date, le, rt); 
+  end;
+	
+	groupedHouse   := group(sort(ungroup(hous_recs),seq),seq);
+	wHouseHold   := rollup(groupedHouse, true, roll_hous(left, right));
+// End for Paro estincome and hownstatusflag attributes
+
+// Logic taken from IT1O function so that we can match what Paro had
+dwelltype(STRING1 at) := MAP(at='F' => '', at='G' => 'S', at='H' => 'A', at='P' => 'E', at='R' => 'R', at='S' => '', '');					  		
+invalidSet := ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E423','E500','E501','E502','E503','E600'];
+ambiguousSet := ['E422','E425','E427','E428','E429','E430','E431','E504'];	
+addrvalflag(STRING4 stat) := MAP(stat IN invalidSet => 'N', stat IN ambiguousSet => 'M', stat = '' => '', 'V');
+
+Models.Layout_FraudAttributes intoParoAttrs(wIPs le, skiptrace_call rt) := TRANSFORM
+  self.input.historydate := le.historydate;
+	self.input := le.shell_input;
+	self.AccountNumber:= account_value;
+  
+  self.ParoAttributes.paro_bansmatchflag     := rt.bansmatchflag;
+  self.ParoAttributes.paro_banscasenum       := rt.banscasenum;
+  self.ParoAttributes.paro_bansprcode        := rt.bansprcode;
+  self.ParoAttributes.paro_bansdispcode      := rt.bansdispcode;
+  self.ParoAttributes.paro_bansdatefiled     := rt.bansdatefiled;
+  self.ParoAttributes.paro_bansfirst         := rt.bansfirst;
+  self.ParoAttributes.paro_bansmiddle        := rt.bansmiddle;
+  self.ParoAttributes.paro_banslast          := rt.banslast;
+  self.ParoAttributes.paro_banscnty          := rt.banscnty;
+  self.ParoAttributes.paro_bansecoaflag      := rt.bansecoaflag;
+  self.ParoAttributes.paro_decsflag          := rt.decsflag;
+  self.ParoAttributes.paro_decsdob           := rt.decsdob;
+  self.ParoAttributes.paro_decszip           := rt.decszip;
+  self.ParoAttributes.paro_decszip2          := rt.decszip2;
+  self.ParoAttributes.paro_decslast          := rt.decslast;
+  self.ParoAttributes.paro_decsfirst         := rt.decsfirst;
+  self.ParoAttributes.paro_decsdod           := rt.decsdod;
+  
+  // Logic taken from IT1O function so that we can match what Paro had
+  clean_input_addr := Risk_Indicators.MOD_AddressClean.clean_addr(le.iid_out.in_streetAddress, le.iid_out.in_city, le.iid_out.in_state, le.iid_out.in_zipcode);
+  a1 := Risk_Indicators.MOD_AddressClean.street_address('',le.iid_out.chronoprim_range,le.iid_out.chronopredir,le.iid_out.chronoprim_name,le.iid_out.chronosuffix,le.iid_out.chronopostdir, le.iid_out.chronounit_desig, le.iid_out.chronosec_range);
+  clean_addr := Risk_Indicators.MOD_AddressClean.clean_addr(a1, le.iid_out.chronocity, le.iid_out.chronostate, le.iid_out.chronozip);
+	in_av := addrvalflag(clean_input_addr[179..182]);
+  av := addrvalflag(if(a1='', clean_input_addr[179..182], clean_addr[179..182]));
+  
+  self.ParoAttributes.paro_inputaddrcharflag := map(le.iid_out.in_streetAddress = '' => '0',
+                                                  in_av in ['N', 'M'] => '1',  // this is different than address history records, where invalid or ambiguous = 'U'
+                                                  dwelltype(clean_input_addr[139]));
+  self.ParoAttributes.paro_inputsocscharflag := le.ssn_verification.validation.inputsocscharflag;
+  self.ParoAttributes.paro_correctsocs       := le.iid.correctssn;
+  self.ParoAttributes.paro_phonestatusflag   := (String)le.iid_out.chronoaddrscore;
+  self.ParoAttributes.paro_phone             := le.iid_out.chronophone;
+  self.ParoAttributes.paro_altareacode       := le.iid_out.altareacode;
+  self.ParoAttributes.paro_splitdate         := le.iid_out.areacodesplitdate;
+  self.ParoAttributes.paro_addrstatusflag    := map(a1='' => '0', // other address not found
+                                               Risk_Indicators.ga(Risk_Indicators.addrscore.AddressScore(clean_input_addr[1..10], clean_input_addr[13..40],
+                                               clean_input_addr[57..64], clean_addr[1..10], clean_addr[13..40], clean_addr[57..64])) => '1',  // same as input address
+                                               '2'); // different address than input
+  self.ParoAttributes.paro_addrcharflag      := map(le.iid_out.in_streetAddress = '' and a1 = '' => '0',
+                                               av in ['N', 'M'] => 'U',
+                                               dwelltype(if(a1='', clean_input_addr[139], clean_addr[139])));
+  self.ParoAttributes.paro_first             := le.iid_out.chronofirst;
+  self.ParoAttributes.paro_last              := le.iid_out.chronolast;
+  self.ParoAttributes.paro_addr              := if(a1='', Risk_Indicators.MOD_AddressClean.street_address('',clean_input_addr[1..10],clean_input_addr[11..12],clean_input_addr[13..40],clean_input_addr[41..44],
+                                                                                                     clean_input_addr[45..46],clean_input_addr[47..56],clean_input_addr[57..64]),
+                                                     Risk_Indicators.MOD_AddressClean.street_address('',clean_addr[1..10],clean_addr[11..12],clean_addr[13..40],clean_addr[41..44],
+                                                                                                        clean_addr[45..46],clean_addr[47..56],clean_addr[57..64]));
+  self.ParoAttributes.paro_city              := if(a1='',clean_input_addr[90..114],clean_addr[90..114]);
+  self.ParoAttributes.paro_state             := if(a1='',clean_input_addr[115..116],clean_addr[115..116]);
+  self.ParoAttributes.paro_zip               := if(a1='',clean_input_addr[117..125],clean_addr[117..125]);
+  self.ParoAttributes.paro_hownstatusflag    := ''; //will come from get_estincome join later
+  self.ParoAttributes.paro_estincome         := (string)round(((integer)le.inEasi.med_hhinc)/1000);
+  self.ParoAttributes.paro_median_hh_size    := le.inEasi.hhsize;
+  
+  self := [];
+END;
+
+ParoAttrsTemp := JOIN(wIPs, skiptrace_call,
+                      left.seq = right.seq,
+                      intoParoAttrs(LEFT, RIGHT),
+                      LEFT OUTER, ATMOST(RiskWise.max_atmost));
+
+Models.Layout_FraudAttributes get_estincome(Models.Layout_FraudAttributes le, xlayout rt) := TRANSFORM
+  self.ParoAttributes.paro_hownstatusflag := rt.hownstatusflag;
+  self.ParoAttributes.paro_estincome      := IF(rt.estincome != '0', rt.estincome, le.ParoAttributes.paro_estincome);
+  self := le;
+END;
+
+
+ParoAttrs := JOIN(ParoAttrsTemp, wHouseHold,
+                  left.input.seq = right.seq,
+                  get_estincome(LEFT, RIGHT),
+                  ATMOST(RiskWise.max_atmost));
+
+//The way this is structured, Paro will never be able to request other versions of attributes
+//and no one else can request Paro attributes.
+AttrVersion := IF(model_name IN ['msn1803_1','rsn804_1','msnrsn_1'], ParoAttrs, Version1Temp);
 
 
 Layout_WorkingCombo := RECORD
@@ -1048,7 +1178,7 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 	SELF := [];
 END;
 
-temp := JOIN(version1Temp, iid, LEFT.input.seq = RIGHT.seq, TRANSFORM(Layout_WorkingCombo, SELF.iid := RIGHT, SELF := LEFT));
+temp := JOIN(AttrVersion, iid, LEFT.input.seq = RIGHT.seq, TRANSFORM(Layout_WorkingCombo, SELF.iid := RIGHT, SELF := LEFT));
 
 out := PROJECT(temp, intoIDAttributes(LEFT));
 
@@ -1122,7 +1252,15 @@ Models.Layout_FraudAttributes POR_Flag( Risk_Indicators.Layout_Boca_Shell le, Mo
 END;
 
 out_por := join( clam, out, left.seq=right.input.seq, POR_Flag(left,right), keep(1) );
-// output (version1Temp, named ('version1Temp'), overwrite);
+
+// output (model_name, named ('model_name'), overwrite);
 // output (wIPs, named ('wIPs'), overwrite);
+// output (skiptrace_call, named ('skiptrace_call'), overwrite);
+// output (wHouseHold, named ('wHouseHold'), overwrite);
+// output (version1Temp, named ('version1Temp'), overwrite);
+// output (ParoAttrsTemp, named ('ParoAttrsTemp'), overwrite);
+// output (ParoAttrs, named ('ParoAttrs'), overwrite);
+// output (AttrVersion, named ('AttrVersion'), overwrite);
+
 return if( model_name='fp31203_1', out_por, out );
 END;
