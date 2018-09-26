@@ -1,11 +1,13 @@
-import ut;
+﻿// import ut;
+import ut, Data_Services;
 
 string_rec := record
 	emerges.layout_hunters_out;
   unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-ds_hunt	:= dataset('~thor_data400::base::emerges_hunt_building',string_rec,flat);
+// ds_hunt	:= dataset('~thor_data400::base::emerges_hunt_building',string_rec,flat);
+ds_hunt	:= dataset(Data_Services.foreign_prod + 'thor_data400::base::emerges_hunt_built',string_rec,flat);
 
 // Function for zero filling
 string9	fZeroFill(string pString)	:=	function

@@ -24,7 +24,9 @@ EXPORT fBuild_Key_Hunters_DID(BOOLEAN  IsFCRA = FALSE) := FUNCTION
                       'voterstatus,	whitejubherring,	work_phone';
                       
      ut.MAC_CLEAR_FIELDS(dBase_temp, dBase_FilterFCRA, fields_to_clear);
-     dBase		:= IF(isFCRA, DEDUP(dBase_FilterFCRA), dBase_temp);
+     dBase		:= IF(isFCRA,
+                    DEDUP(SORT(DISTRIBUTE(dBase_FilterFCRA,HASH64(did_out)), RECORD, LOCAL), RECORD, LOCAL),
+                    dBase_temp);
      
 		RETURN(dBase); 
 
