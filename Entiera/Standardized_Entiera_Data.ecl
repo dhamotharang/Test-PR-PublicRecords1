@@ -49,7 +49,7 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 		RETURN dPreProcess;
 	END;
 	
-	dPreProcess			:=	fPreProcess(entiera.Files.In_Prepped(Data_Services.foreign_prod + 'thor_200::in::entiera::20180528::email_addresses'));
+	dPreProcess			:=	fPreProcess(entiera.Files.In_Prepped());
 
 	//Send names to cleaner
 	NID.Mac_CleanParsedNames(dPreProcess, FileClnName, 
