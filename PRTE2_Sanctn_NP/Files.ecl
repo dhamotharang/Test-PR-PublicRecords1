@@ -13,21 +13,22 @@ export party_aka_dba_in			:= dataset(constants.in_prefix_name + 'party_aka_dba',
 //Base Files
 export base_incident					:= dataset(constants.base_prefix_name + 'incident',layouts.incident_base,thor);
 export base_incidentcode			:= dataset(constants.base_prefix_name +'incidentcode', layouts.incidentcode_base,thor);
-export base_incidenttext			:= dataset(constants.base_prefix_name +'ncidenttext', layouts.incidenttext_base,thor);
+export base_incidenttext			:= dataset(constants.base_prefix_name +'incidenttext', layouts.incidenttext_base,thor);
 export base_party							:= dataset(constants.base_prefix_name +'party', layouts.party_base,thor);
 export base_partytext					:= dataset(constants.base_prefix_name +'partytext', layouts.partytext_base,thor);
 export base_party_aka_dba			:= dataset(constants.base_prefix_name +'party_aka_dba', layouts.party_aka_dba_base,thor);
 
 // Key Files
-export tbl_bdid 					:= project(base_party(BDID != 0), transform(layouts.bdid_key, self.incident_num := (unsigned)left.incident_num, self := left));	
-export tbl_did 						:= project(base_party(did != 0), transform(layouts.did_key, self.incident_num := (unsigned)left.incident_num, self := left));	
+export tbl_bdid 					:= project(base_party(BDID != 0), transform(layouts.bdid_key, self.incident_num := left.incident_num, self := left));	
+export tbl_did 						:= project(base_party(did != 0), transform(layouts.did_key, self.incident_num := left.incident_num, self := left));	
 
-export dsIncident					:= dedup(project(base_incident(batch <> ''),transform(layouts.incident_key,self:=left)), record);
-export dsIncidentCd 			:= project(base_incidentcode(batch <> ''),transform(layouts.layout_Midex_cd,self:=left));																																				
-export dsIncidentText 		:= project(base_incidenttext(batch <> ''),transform(layouts.IncidentText_Key,self:=left));
+export dsIncident					:= dedup(project(base_incident,transform(layouts.incident_key,self:=left)), record);
+export dsIncidentCd 			:= project(base_incidentcode,transform(layouts.layout_Midex_cd,self:=left));																																				
+export dsIncidentText 		:= project(base_incidenttext,transform(layouts.IncidentText_Key,self:=left));
+export dsPartyText				:= project(base_partytext, transform(layouts.PartyText_key,self := left));
 
 layouts.License_Key 	xformStateCD(base_incidentcode L)  := TRANSFORM
-		self.incident_num 			:= (unsigned)L.incident_num,
+		self.incident_num 			:= L.incident_num,
 		self.PARTY_NUM					:= L.NUMBER;
 		self.LICENSE_NBR				:= trim(L.CODE_VALUE);
 		filterInvalidChar 			:= STD.Str.Filter(STD.Str.ToUpperCase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -37,7 +38,7 @@ layouts.License_Key 	xformStateCD(base_incidentcode L)  := TRANSFORM
 		self := L;
 END;          
 
-dsLicenseNbr := project(base_incidentcode(batch <> '' and trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER<>'' and (NOT REGEXFIND('NMLS',CODE_TYPE,NOCASE))),xformStateCD(left));	
+dsLicenseNbr := project(base_incidentcode(trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER<>'' and (NOT REGEXFIND('NMLS',CODE_TYPE,NOCASE))),xformStateCD(left));	
 dsLicenseNbr_dedup := dedup(dsLicenseNbr,RECORD);
 export dsLicenseNbr_filter := dsLicenseNbr_dedup(CLN_LICENSE_NUMBER != '');
 
@@ -59,27 +60,29 @@ layouts.License_Midex_Key 	xformCODES(base_incidentcode L)  := TRANSFORM
 		
 		tmp_incident_number := ut.rmv_ld_zeros(l.INCIDENT_NUM);
 		tmp_party_number := ut.rmv_ld_zeros(L.NUMBER);
-		cln_party_number := if(trim(tmp_party_number) = '0','',tmp_party_number);
+		cln_party_number := if(trim(tmp_party_number) = '0','0',tmp_party_number);
 		self.midex_rpt_nbr := STD.Str.CleanSpaces(trim(L.BATCH)+'-'
-																							+ tmp_incident_number +'-' 
+																							+ tmp_incident_number + if(cln_party_number <> '','-' ,'')
 																							+ cln_party_number);
 		self := L;
 END;          
 	
-export dsLicenseNbr_midex 				:= dedup(project(base_incidentcode(batch <> '' and trim(FIELD_NAME) != 'INTERNALCODE' AND CLN_LICENSE_NUMBER <>'' and  (NOT REGEXFIND('NMLS',CODE_TYPE,NOCASE))),xformCODES(left)), record);	
+export dsLicenseNbr_midex 				:= dedup(project(base_incidentcode(trim(FIELD_NAME) != 'INTERNALCODE' AND CLN_LICENSE_NUMBER <>'' and  (NOT REGEXFIND('NMLS',CODE_TYPE,NOCASE))),xformCODES(left)), record);	
 
 
 export dsPartyMidex := project(base_party(batch <> ''),transform(layouts.Party_Midex_Key,
 																											self.party_key := (string)left.party_key;
-																											temp_party_nbr := if(trim(left.PARTY_NUM) = '000','0',left.PARTY_NUM); 
+																											tmp_incident_number := ut.rmv_ld_zeros(left.INCIDENT_NUM);
+																											tmp_party_number := ut.rmv_ld_zeros(left.PARTY_NUM);
+																											cln_party_number := if(trim(tmp_party_number) = '0','0',tmp_party_number);
 																											self.midex_rpt_nbr := std.str.CleanSpaces(trim(left.BATCH) + '-'
-																																																+ trim(left.INCIDENT_NUM) + '-' 
-																																																+ trim(temp_party_nbr));
+																																																+ trim(tmp_incident_number) + if(cln_party_number <> '','-' ,'') 
+																																																+ trim(cln_party_number));
 																											self:=left));																																			
 
 
 layouts.NMLS_ID_key populateNMLSId(base_incidentcode L)  := TRANSFORM
-		SELF.incident_num 		:= (unsigned)L.incident_num,
+		SELF.incident_num 		:= L.incident_num,
 		SELF.NMLS_ID				  := L.CLN_LICENSE_NUMBER;
 		self.PARTY_NUM			  := L.NUMBER;
 		filterInvalidChar 	  := STD.Str.Filter(STD.Str.ToUpperCase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -87,16 +90,16 @@ layouts.NMLS_ID_key populateNMLSId(base_incidentcode L)  := TRANSFORM
 		self.LICENSE_TYPE			:= if(L.CODE_TYPE != '', L.CODE_TYPE, ut.CleanSpacesAndUpper(L.STD_TYPE_DESC));
 		tmp_incident_number 	:= ut.rmv_ld_zeros(l.INCIDENT_NUM);
 		tmp_party_number 			:= ut.rmv_ld_zeros(L.NUMBER);
-	  cln_party_number 			:= if(trim(tmp_party_number) = '0','',tmp_party_number);
+	  cln_party_number 			:= if(trim(tmp_party_number) = '0','0',tmp_party_number);
 	  self.MIDEX_RPT_NBR 		:= STD.Str.CleanSpaces(trim(L.BATCH)+'-' 
-																								+ tmp_incident_number +'-' 
+																								+ tmp_incident_number +if(cln_party_number <> '','-' ,'') 
 																								+ cln_party_number);
 		self := L;
 		SELF := [];
 END;          
 	
 
-dsLicenseNMLS := dedup(project(base_incidentcode(batch <> '' and trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER <>'' and REGEXFIND('NMLS',CODE_TYPE,NOCASE)),populateNMLSId(left)), record);	
+dsLicenseNMLS := dedup(project(base_incidentcode(trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER <>'' and REGEXFIND('NMLS',CODE_TYPE,NOCASE)),populateNMLSId(left)), record);	
 // dsLicenseNMLS_dedup := dedup(dsLicenseNMLS ,RECORD);
 export dsLicenseNMLS_filter := dsLicenseNMLS(NMLS_ID != '');
 
@@ -118,15 +121,15 @@ layouts.NMLS_MIDEX_Key 	xCODES(base_incidentcode L)  := TRANSFORM
 		
 		tmp_incident_number := ut.rmv_ld_zeros(l.INCIDENT_NUM);
 		tmp_party_number 		:= ut.rmv_ld_zeros(L.NUMBER);
-	  cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
+	  cln_party_number 		:= if(trim(tmp_party_number) = '0','0',tmp_party_number);
 	  self.midex_rpt_nbr 	:= std.str.CleanSpaces(trim(L.BATCH)+'-' 
-																							+ tmp_incident_number +'-' 
+																							+ tmp_incident_number +if(cln_party_number <> '','-' ,'') 
 																							+ cln_party_number);
 		SELF := L;
 		SELF := [];
 END;          
 	
-export dsNMLS_MIDEX := dedup(project(base_incidentcode(batch <> '' and trim(FIELD_NAME) != 'INTERNALCODE' AND CLN_LICENSE_NUMBER <>'' and REGEXFIND('NMLS',CODE_TYPE,NOCASE)),xCODES(left)), record);	
+export dsNMLS_MIDEX := dedup(project(base_incidentcode(trim(FIELD_NAME) != 'INTERNALCODE' AND CLN_LICENSE_NUMBER <>'' and REGEXFIND('NMLS',CODE_TYPE,NOCASE)),xCODES(left)), record);	
 
 
 export dsParty := project(base_party(batch <> ''),transform(layouts.Party_Key,
@@ -136,11 +139,11 @@ export dsParty := project(base_party(batch <> ''),transform(layouts.Party_Key,
 																								self:=left));
 
 
-export dsPartySSN := dedup(project(base_party(batch <> '' and SSN != ''),transform(layouts.SSN4_key,	self.ssn4 := LEFT.ssn[6..9];self      := LEFT; self :=[])), record);
+export dsPartySSN := dedup(project(base_party(SSN != ''),transform(layouts.SSN4_key,	self.ssn4 := LEFT.ssn[6..9];self      := LEFT; self :=[])), record);
 
-export dsPartyTIN := dedup(project(base_party(batch <> '' and TIN != ''),transform(layouts.TIN_Key, self:=left)), record);
+export dsPartyTIN := dedup(project(base_party(TIN != ''),transform(layouts.TIN_Key, self:=left)), record);
 
-export party_aka_dba_new	:= project(base_party_aka_dba(batch <> ''), TRANSFORM(layouts.PARTY_AKA_DBA_Key, SELF := LEFT));																																			
+export party_aka_dba_new	:= project(base_party_aka_dba, TRANSFORM(layouts.PARTY_AKA_DBA_Key, SELF := LEFT));																																			
 
 
 //Autokeys

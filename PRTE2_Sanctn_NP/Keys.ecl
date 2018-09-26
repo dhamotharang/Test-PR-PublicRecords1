@@ -46,7 +46,7 @@ export party 	:= index(files.dsParty, {BATCH,INCIDENT_NUM,PARTY_NUM}, {files.dsP
 											Data_Services.Data_location.Prefix('sanctn')+ constants.key_prefix + doxie.Version_SuperKey+'::party');
 
 // PARTYTEXT KEY																																			
-export partytext := index(files.base_partytext, {BATCH, INCIDENT_NUM, PARTY_NUM}, {files.base_partytext}, 
+export partytext := index(files.dsPartyText, {BATCH, INCIDENT_NUM, PARTY_NUM}, {files.dsPartyText}, 
 													Data_Services.Data_location.Prefix('sanctn')+ constants.key_prefix + doxie.Version_SuperKey+'::partytext');
 																																			
 // SSN4 KEY																																			

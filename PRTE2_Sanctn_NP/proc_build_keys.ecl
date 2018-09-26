@@ -7,7 +7,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.bdid,										C
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.did,										Constants.key_prefix+'did',								Constants.key_prefix+filedate+'::did',							key2);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident,								Constants.key_prefix+'incident',					Constants.key_prefix+filedate+'::incident',					key3);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incidentcode,						Constants.key_prefix+'incidentcode',			Constants.key_prefix+filedate+'::incidentcode',			key4);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident,								Constants.key_prefix+'incidenttext',			Constants.key_prefix+filedate+'::incidenttext',			key5);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incidenttext,						Constants.key_prefix+'incidenttext',			Constants.key_prefix+filedate+'::incidenttext',			key5);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_nbr,						Constants.key_prefix+'license_nbr',				Constants.key_prefix+filedate+'::license_nbr', 			key6);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_midex,					Constants.key_prefix+'license_midex',			Constants.key_prefix+filedate+'::license_midex', 		key7);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident_LinkIds.key,		Constants.key_prefix+'incident_linkids',	Constants.key_prefix+filedate+'::incident_linkids', key8);

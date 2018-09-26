@@ -22,7 +22,7 @@
 	dsNewIncident := CleanIncident(cust_name != '');
 	dsNewParty 		:= CleanParty(cust_name != '');
 
-	dfIncident 	:= project(dsNewIncident(prop_addr <> ''), transform(tempCombineLayout, 
+	dfIncident 	:= project(dsNewIncident, transform(tempCombineLayout, 
 												  self.inAddress	:= left.prop_Addr;
 												  self.inCity			:= left.prop_City;
 													self.inState		:= left.prop_State;
@@ -33,7 +33,7 @@
 													
 
 																																	
-	dfParty 		:= project(dsNewParty(address <> ''), transform(tempCombineLayout, 
+	dfParty 		:= project(dsNewParty, transform(tempCombineLayout, 
 													self.inAddress	:= left.Address;
 													self.inCity			:= left.City;
 													self.inState		:= left.State;
@@ -80,7 +80,7 @@
 															self := right.clean_address;
 															self := left;
 															self := [];
-															));
+															), left outer);
 
 
 // New Party Records
@@ -109,12 +109,12 @@
 															self := right.clean_address;
 															self := left;
 															self := [];
-															));
+															), left outer);
 
 
 
 prte2_sanctn_np.Layouts.incident_base		xformIncident(jIncident l) := transform
-		clean_name := if(L.SUBMITTER_NAME <> '',Address.CleanPersonLFM73(L.SUBMITTER_NAME), '');
+		clean_name := if(L.SUBMITTER_NAME <> '',Address.CleanPersonFML73(L.SUBMITTER_NAME), '');
 			self.title 						:= Address.CleanNameFields(clean_name).title;
 			self.fname 						:= Address.CleanNameFields(clean_name).fname;
 			self.mname 						:= Address.CleanNameFields(clean_name).mname;
@@ -187,12 +187,12 @@ pPartyText 		:= project(CleanPartyText, transform(layouts.partytext_base, self :
 pPartyAka	 		:= project(CleanPartyAKA, transform(layouts.party_aka_dba_base, self := left, self := []));
 
 
-PromoteSupers.MAC_SF_BuildProcess(dsParty, Constants.base_prefix_name + 'party', bld_base_party,,,true);
-PromoteSupers.MAC_SF_BuildProcess(dsIncident, Constants.base_prefix_name + 'incident', bld_base_incident,,,true);
-PromoteSupers.MAC_SF_BuildProcess(pLicenseBase, Constants.base_prefix_name + 'incidentcode', bld_base_incidentcode,,,true);
-PromoteSupers.MAC_SF_BuildProcess(pPartyAka, Constants.base_prefix_name + 'party_aka_dba', bld_base_party_aka,,,true);
-PromoteSupers.MAC_SF_BuildProcess(pIncidentText, Constants.base_prefix_name + 'incidenttext', bld_base_incident_text,,,true);
-PromoteSupers.MAC_SF_BuildProcess(pPartyText, Constants.base_prefix_name + 'partytext', bld_base_party_text,,,true);
+PromoteSupers.MAC_SF_BuildProcess(dsParty(batch <> ''), Constants.base_prefix_name + 'party', bld_base_party,,,true);
+PromoteSupers.MAC_SF_BuildProcess(dsIncident(batch <> ''), Constants.base_prefix_name + 'incident', bld_base_incident,,,true);
+PromoteSupers.MAC_SF_BuildProcess(pLicenseBase(batch <> ''), Constants.base_prefix_name + 'incidentcode', bld_base_incidentcode,,,true);
+PromoteSupers.MAC_SF_BuildProcess(pPartyAka(batch <> ''), Constants.base_prefix_name + 'party_aka_dba', bld_base_party_aka,,,true);
+PromoteSupers.MAC_SF_BuildProcess(pIncidentText(batch <> ''), Constants.base_prefix_name + 'incidenttext', bld_base_incident_text,,,true);
+PromoteSupers.MAC_SF_BuildProcess(pPartyText(batch <> ''), Constants.base_prefix_name + 'partytext', bld_base_party_text,,,true);
 
 
 EXPORT proc_build_base := sequential(bld_base_party, bld_base_incident, bld_base_incidentcode, bld_base_party_aka, bld_base_incident_text,bld_base_party_text );

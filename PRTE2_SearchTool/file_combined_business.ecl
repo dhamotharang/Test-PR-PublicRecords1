@@ -267,7 +267,7 @@ Export file_combined_business(Boolean FCRA = false, Boolean legacy = true) := Fu
  	sanctn_np := if(	legacy,
 														project(prte2_sanctn_np.keys.midex_rpt_nbr(bdid != 0, dbcode = 'N'),
 																		transform({unsigned6 id, integer NonPublic_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
-														project(prte2_sanctn_np.keys.linkids_party(dbcode = 'N'),
+														project(prte2_sanctn_np.keys.party_LinkIds.key(dbcode = 'N'),
 																		transform({unsigned6 id, integer NonPublic_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
 		sanctn_nps := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(sanctn_np,Layouts.Layout_Businesses));
 
@@ -276,7 +276,7 @@ Export file_combined_business(Boolean FCRA = false, Boolean legacy = true) := Fu
 		freddie_mac := if(	legacy,
 														project(prte2_sanctn_np.keys.midex_rpt_nbr(bdid != 0, dbcode = 'F'),
 																		transform({unsigned6 id, integer FreddieMac_Sanctn_cnt := 1, unsigned6 ultid :=0, unsigned6 orgid:=0}, self.id := left.bdid)),
-														project(prte2_sanctn_np.keys.linkids_party(dbcode = 'F'),
+														project(prte2_sanctn_np.keys.party_LinkIds.key(dbcode = 'F'),
 																		transform({unsigned6 id, integer FreddieMac_Sanctn_cnt := 1, unsigned6 ultid, unsigned6 orgid}, self.id := left.seleid, self.ultid := left.ultid, self.orgid := left.orgid)));			
 		freddie_macs := if(FCRA, Dataset([],Layouts.Layout_Businesses),project(freddie_mac,Layouts.Layout_Businesses));
 

@@ -210,16 +210,17 @@ end;
 	export bdid_key		:= record
 		UNSIGNED6  	BDID;
 		STRING8 		BATCH;
-		INTEGER 		INCIDENT_NUM;
+		string8 	incident_num;
 		STRING7 		PARTY_NUM;		
 	end;
 
 // DID KEY																																			
 	export did_key := record
 		UNSIGNED6  DID;	
-		STRING8 		BATCH;
-		INTEGER 		INCIDENT_NUM;
-		STRING7 		PARTY_NUM;		
+		STRING8 	BATCH;
+		string8 	incident_num;
+		STRING7 	PARTY_NUM;		
+		
 	end;
 
 	export incident_key			:= sanctn_mari.layouts_SANCTN_common.SANCTN_incident_base;
@@ -234,7 +235,7 @@ end;
 // License NBR Key
 	export License_Key := record
 		STRING8  BATCH;
-		INTEGER  iNCIDENT_NUM;
+		string8 	incident_num;
 		STRING7  PARTY_NUM;
 		string20 LICENSE_NBR;
 		STRING2  LICENSE_STATE;
@@ -263,7 +264,7 @@ end;
 // NMLS ID Key
 	export NMLS_ID_key := record
 		STRING8  BATCH;
-		INTEGER  iNCIDENT_NUM;
+		string8 	incident_num;
 		STRING7 	PARTY_NUM;
 		STRING2  	LICENSE_STATE;
 		STRING80 	LICENSE_TYPE;
@@ -309,9 +310,8 @@ end;
 
 
 // Party Text Key
-	export rKeySanctn__key__sanctn__np__partytext	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__partytext;
+	export PartyText_key	:= 	record
+		SANCTN_MARI.layouts_SANCTN_common.SANCTN_party_text;
 	END;
 
 
@@ -374,5 +374,7 @@ end;
 		string3  	name_score;
 		string100 cname;
 end;
+	
+	
 	
 end;
