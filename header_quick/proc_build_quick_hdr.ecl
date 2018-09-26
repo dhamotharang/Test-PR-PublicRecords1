@@ -1,4 +1,4 @@
-﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3;
+﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
 
 export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
 
@@ -164,6 +164,20 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 				    										fileservices.clearsuperfile('~thor400_84::in::eq_weekly')
 						  									);
   
+//Persistence and Growth Checks
+GetDops:=dops.GetDeployedDatasets('P','B','F');
+OnlyQuickHeader:=GetDops(datasetname='FCRA_QuickHeaderKeys ');
+father_filedate := OnlyQuickHeader[1].buildversion;
+set of string Key_QuickHeader_InputSet:=['fname','lname','name_suffix','prim_range','prim_name','sec_range','city_name','st','zip','dob','ssn','mname','phone','src'];
+header_quick_index := header_quick.FN_key_DID(dataset([],header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
+DeltaCommands:= sequential(
+	DOPSGrowthCheck.CalculateStats('FCRA_QuickHeaderKeys ','header_quick_index','Key_QuickHeader','~thor_data400::key::headerquick::fcra::'+filedate+'::did','did','persistent_record_ID','','','','',filedate,father_filedate,true,true),
+	DOPSGrowthCheck.DeltaCommand('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID',filedate,father_filedate,Key_QuickHeader_InputSet,true,true),
+	DOPSGrowthCheck.ChangesByField('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID','',filedate,father_filedate,true,true),
+	DopsGrowthCheck.PersistenceCheck('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID',Key_QuickHeader_InputSet,Key_QuickHeader_InputSet,filedate,father_filedate,true,true)
+);
+
+
 	return sequential(
 										 weekly_handling
 										,roxie_keys
@@ -172,5 +186,6 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 										,proc_build_current_wa_residents_file 
 										,SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs)
 	  								//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
+										,DeltaCommands
 										);										 
 end;
