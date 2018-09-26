@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild,autokey,ut,Prof_License_Mari,PRTE,strata;
+﻿import RoxieKeyBuild,autokey,ut,Prof_License_Mari,PRTE,strata,dops;
 
 
 export proc_build_keys(string filedate) := FUNCTION
@@ -102,8 +102,8 @@ build_autokeys := Prof_License_Mari.proc_build_autokeys(filedate);
 
 
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-updatedops   		:= RoxieKeyBuild.updateversion('MARIKeys',filedate,'terri.hardy-george@lexisnexis.com',,'N',);
-updatedops_fcra  := RoxieKeyBuild.updateversion('FCRA_MARIKeys',filedate,'terri.hardy-george@lexisnexis.com',,'F',);
+updatedops   		:= dops.updateversion('MARIKeys',filedate,'terri.hardy-george@lexisnexis.com',,'N',);
+updatedops_fcra  := dops.updateversion('FCRA_MARIKeys',filedate,'terri.hardy-george@lexisnexis.com',,'F',);
 
 // -- Build PRTE Keys
 build_prte     := PRTE.Proc_Build_MARI_Keys(filedate);
