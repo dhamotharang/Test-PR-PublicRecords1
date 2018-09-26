@@ -432,6 +432,8 @@ export Main         :=
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;
@@ -631,6 +633,8 @@ export keybuild
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;

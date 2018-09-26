@@ -4,7 +4,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Infutor_NARB.Layouts.Base) dsBase 
 , DATASET(Infutor_NARB.Layouts.Base) infile 
 ) := MODULE
-
   SHARED NullFile := DATASET([],Infutor_NARB.Layouts.Base); // Use to replace files you wish to remove
  
   SHARED FilesToIngest := infile;
@@ -51,10 +50,22 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.ultweight := ri.ultweight; // Derived - so take newest 
     SELF.did := ri.did; // Derived - so take newest 
     SELF.did_score := ri.did_score; // Derived - so take newest 
-    SELF.dt_first_seen := ri.dt_first_seen; // Derived - so take newest 
-    SELF.dt_last_seen := ri.dt_last_seen; // Derived - so take newest 
-    SELF.dt_vendor_first_reported := ri.dt_vendor_first_reported; // Derived - so take newest 
-    SELF.dt_vendor_last_reported := ri.dt_vendor_last_reported; // Derived - so take newest 
+    SELF.dt_first_seen := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_first_seen = 0 => ri.dt_first_seen,
+                     ri.__Tpe = 0 OR (unsigned)ri.dt_first_seen = 0 => le.dt_first_seen,
+                     (unsigned)le.dt_first_seen < (unsigned)ri.dt_first_seen => le.dt_first_seen, // Want the lowest non-zero value
+                     ri.dt_first_seen);
+    SELF.dt_last_seen := MAP ( le.__Tpe = 0 => ri.dt_last_seen,
+                     ri.__Tpe = 0 => le.dt_last_seen,
+                     (unsigned)le.dt_last_seen < (unsigned)ri.dt_last_seen => ri.dt_last_seen, // Want the highest value
+                     le.dt_last_seen);
+    SELF.dt_vendor_first_reported := MAP ( le.__Tpe = 0 OR (unsigned)le.dt_vendor_first_reported = 0 => ri.dt_vendor_first_reported,
+                     ri.__Tpe = 0 OR (unsigned)ri.dt_vendor_first_reported = 0 => le.dt_vendor_first_reported,
+                     (unsigned)le.dt_vendor_first_reported < (unsigned)ri.dt_vendor_first_reported => le.dt_vendor_first_reported, // Want the lowest non-zero value
+                     ri.dt_vendor_first_reported);
+    SELF.dt_vendor_last_reported := MAP ( le.__Tpe = 0 => ri.dt_vendor_last_reported,
+                     ri.__Tpe = 0 => le.dt_vendor_last_reported,
+                     (unsigned)le.dt_vendor_last_reported < (unsigned)ri.dt_vendor_last_reported => ri.dt_vendor_last_reported, // Want the highest value
+                     le.dt_vendor_last_reported);
     SELF.record_type := ri.record_type; // Derived - so take newest 
     SELF.clean_company_name := ri.clean_company_name; // Derived - so take newest 
     SELF.title := ri.title; // Derived - so take newest 
@@ -98,6 +109,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.__Tpe := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
+      SELF.dt_first_seen <> le.dt_first_seen OR SELF.dt_last_seen <> le.dt_last_seen OR SELF.dt_vendor_first_reported <> le.dt_vendor_first_reported OR SELF.dt_vendor_last_reported <> le.dt_vendor_last_reported => RecordType.Updated,
       RecordType.Unchanged);
     SELF := le; // Take current version - noting update if needed
   END;

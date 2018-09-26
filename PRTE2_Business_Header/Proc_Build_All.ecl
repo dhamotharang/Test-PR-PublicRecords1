@@ -27,7 +27,7 @@ export update_dops :=	iff(pShouldUpdateDOPS,
 															'BusinessHeaderKeys'								//	Package name
 															,pversion														//	Package version
 															,_control.MyInfo.EmailAddressNormal	//	Who to email with specifics
-															,'N'																//  auto_pkg (optional) -- don't use it
+															,'B'																//  inloc - 'B' - Boca, 'A' - Alpharetta
 															,'N'																//	N = Non-FCRA, F = FCRA
 															,'N'                                //	N = Do not also include boolean, Y = Include boolean, too
 														)

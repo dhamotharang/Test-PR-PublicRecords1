@@ -22,4 +22,6 @@
 																'OA1003118308','RA1899530999', //Issue Jira DF-16360
 																'RA0710774763','RA0841221121'  //Issue Jira DF-16550
 																,'DA0024208085','DA0188761116' //Jira DF-22032 - Request from Telra Moore due to bad zip code
+																,'RD0815495284' //Jira DF-23100, LNK-1286
+																,'OA1898221509FA1041', 'OA0800464583FA3193' //Jira DF-23100, LNK-704
 															];
