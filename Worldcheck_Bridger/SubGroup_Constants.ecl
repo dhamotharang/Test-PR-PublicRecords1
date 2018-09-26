@@ -1081,7 +1081,7 @@
 		export string KEYWORD_EUFSR_RUS_50_WC				:= '769';
 		export string KEYWORD_AIIB									:= '770';
 		export string KEYWORD_FRCNIL								:= '771';
-		// export string KEYWORD_PECG									:= '772';
+		export string KEYWORD_PECG									:= '772';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
