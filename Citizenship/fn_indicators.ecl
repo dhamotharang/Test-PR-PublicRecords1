@@ -123,7 +123,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.reportedCurAddressYears := IF(rv_c13_curr_addr_lres = NULL, NEG1, rv_c13_curr_addr_lres);
                            
                            //*** addressFirstReportedAge   - calculated after picking more information from the address hierarchy key   
-                                SELF.addressFirstReportedAge := 0;                   //*** 
+                                SELF.addressFirstReportedAge := -1;                   //*** 
                            
                                 num_of_cred_sources          := ver_sources_information[34..36];
                                 last_seen_credentialed_SAS   := ver_sources_information[23..32];
@@ -206,7 +206,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                           //*** anything else is left empty
                                 SELF := [];));
                                 
- 
+  //***Select only records that match.
   Temp_addr_hist := JOIN(Indicators, header.key_addr_hist(isFCRA),      
                            KEYED(LEFT.lexID = RIGHT.s_did), 
                            TRANSFORM({unsigned4 seq, unsigned6 LexID_temp, unsigned8 dob_temp, unsigned8 address_first_seen_date, unsigned3 address_history_seq, unsigned3 age;},
@@ -218,7 +218,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                     SELF.age                  := 0;
                                     SELF                      := LEFT;),
                             ATMOST(DueDiligence.Constants.MAX_ATMOST_500), 
-                            KEEP(DueDiligence.Constants.MAX_KEEP)); 
+                            KEEP(DueDiligence.Constants.MAX_KEEP));
+                            
    Sort_addr_hist := SORT(Temp_addr_hist, seq, LexID_temp, address_history_seq); 
                                      
   //***We know have the address first reported date and dob for each did.                                      
@@ -250,7 +251,9 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                     truncate((address_first_seen_SAS - dob_temp) / 365.25)));
                             
                             SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL, NEG1, calcAgeAtThisTime);           //***this is the final answer
-                            SELF                          := LEFT;));
+                            SELF                          := LEFT;),
+                            //***write the left even if there was a no match on the right.
+                         LEFT OUTER);
                             
                             
                             
