@@ -237,7 +237,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
    Final_Indicators := JOIN(Indicators, Roll_addr_hist,      
                            LEFT.seq        = RIGHT.seq  AND
                            LEFT.lexID      = RIGHT.LexID_temp,
-                         TRANSFORM (RECORDOF(LEFT),
+                         TRANSFORM (Citizenship.Layouts.IndicatorLayout,
                             SELF.seq                      := LEFT.seq;
                             SELF.lexID                    := LEFT.lexID;
                             dob_temp                      := RIGHT.dob_temp;
