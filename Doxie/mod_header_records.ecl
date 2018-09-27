@@ -47,7 +47,7 @@ MODULE
 		IF(include_dailies AND ~is_knowx, 
 			 IF(DoSearch, 
 					header_quick.fetch_records(d, include_dailies, allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
-doxie_Raw.QuickHeader_raw(d,modAccess.date_threshold,dppa_purpose,glb_purpose,,modAccess.ln_branded,, maskSSN:=false)));
+doxie_Raw.QuickHeader_raw(d,modAccess.date_threshold,dppa_purpose,glb_purpose,,modAccess.ln_branded,probation_override_value, maskSSN:=false)));
 
 	//***** FOR THOSE SEARCHING, EXPORT THE DIDS WE FOUND
 

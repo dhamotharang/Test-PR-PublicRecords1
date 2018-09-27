@@ -184,7 +184,7 @@ br_permission_check := doxie.best_records(did, doSuppress:=false, modAccess := m
   END;
   br := doxie.best_records (did, doSuppress:=false, modAccess := mod_access_unrestricted);
 
-header_recs_wo_permission_check := doxie.mod_header_records(false,true,,,true,ModAccess := mod_access).results(project(did,doxie.layout_references_hh));
+header_recs_wo_permission_check := doxie.mod_header_records(false,true,,,true,ModAccess := mod_access_unrestricted).results(project(did,doxie.layout_references_hh));
 for_permission_check := project(header_recs_wo_permission_check, doxie.layout_header_records);
 Header.MAC_GlbClean_Header(for_permission_check,pre_header_recs_w_permission_check, , , mod_access)
 header_recs_w_permission_check := project(pre_header_recs_w_permission_check, doxie.layout_presentation);

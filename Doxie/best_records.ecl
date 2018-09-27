@@ -22,7 +22,7 @@ mod_access := modAccess;
 d := modAccess.isValidDPPA (checkRNA);
 g := modAccess.isValidGLB (checkRNA);
 
-DRM := modAccess.DataPermissionMask;
+DRM := modAccess.DataRestrictionMask;
 
 doxie.mac_best_records(di,did,o,d,g,useNonBlankKey,DRM,,,,includeDOD);
 
