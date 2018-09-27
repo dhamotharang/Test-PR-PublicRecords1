@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVA711_0_0(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -731,7 +731,7 @@ end;
 		corrections := ((INTEGER)rc_hrisksic=2225);
 
 		rva711_0_0_b := map(
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2                      => 222,
+			riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid)    => 222,
 			RVA711_0_0_a>680 and (ssndead=1 or ssnprior_x or criminal_flag or corrections ) => 680,
 			RVA711_0_0_a
 		);

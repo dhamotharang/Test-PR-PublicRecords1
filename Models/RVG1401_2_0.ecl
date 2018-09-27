@@ -1,6 +1,6 @@
-//Strategic Link Consulting Score - FCRA 4.1
+﻿//Strategic Link Consulting Score - FCRA 4.1
 
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 
 export RVG1401_2_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -1790,7 +1790,7 @@ export RVG1401_2_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 
 	rvg1401_2_0 := map(
 			ssn_deceased		                                                                => 200,
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s) => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 
 																																												 _rvg1401_2_0);
 

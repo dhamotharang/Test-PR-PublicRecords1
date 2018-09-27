@@ -1,4 +1,4 @@
-import risk_indicators, ut, easi, std;
+﻿import risk_indicators, ut, easi, std, riskview;
 
 export IE912_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := FUNCTION
 	IE_DEBUG := false;
@@ -436,7 +436,7 @@ export IE912_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := F
 		/* changes to min/max overrides and 222 being changed to 0 are per 2010-03-09 email from Mike Woodberry:
 			0 = Unable to calculate predicted annual income
 			19,999 = Predicted annual income less than $20,000 annually
-			20,000 – 250,000 = Predicted annual income amount
+			20,000 - 250,000 = Predicted annual income amount
 			250,999 = Predicted annual income greater than $250,000 annually
 		*/
 		estinc_bounded := map(
@@ -446,7 +446,7 @@ export IE912_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := F
 		);
   
 
-		estimated_income_2 :=  if((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2)), 0, estinc_bounded);
+		estimated_income_2 :=  if(riskview.Constants.noscore(nas_summary, nap_summary, add1_naprop, le.truedid), 0, estinc_bounded);
 
 
 		#if(IE_DEBUG)

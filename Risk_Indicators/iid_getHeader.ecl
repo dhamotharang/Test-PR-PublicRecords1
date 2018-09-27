@@ -150,7 +150,7 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 #ELSE
 	header_corr := header_corr_roxie;
 #END
-
+																		
 // get full header	
 header_key := if(isFCRA, doxie.key_fcra_header, doxie.key_header);
 
@@ -313,7 +313,7 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 #ELSE
 	j_quickpre := j_quickpre_roxie;
 #END
-							 
+			   
 real_header_all_roxie := group( sort( ungroup(j_pre + j_quickpre), seq ,did), seq, did);	 
 real_header_all_thor := group( sort( distribute( ungroup(j_pre + j_quickpre), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
@@ -937,8 +937,18 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
 	
 	
-	SELF.trueDID := le.h.did<>0;
-	
+	trueDID_original := le.h.did<>0;
+	    
+  // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
+  // for id_theft_flag, don't set the truedid=false because we'll return a real score for that person, just return the alert code of 100G
+	self.truedid := if(
+  (le.ConsumerFlags.consumer_statement_flag  and bsversion < 50) or  
+  le.ConsumerFlags.security_alert or  
+  le.ConsumerFlags.legal_hold_alert or  
+  (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
+    false, trueDID_original);
+    
+    
 	// FYI, if we add any new sources to this list or modify this mapping, let Jesse Shaw know about it so that he can update KEL attribute IdentityReport.graph
 	converted_src := map(
 				 utilityRecord => 'U',  // new for shell 5.0.  UtilityRecord will only be set to true in shell versions 50 and higher
@@ -1539,8 +1549,15 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 
 	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=ri_dob[1..8], true);
 		
-	
-	SELF.trueDID := ri.did<>0;
+  trueDID_original := ri.did<>0;
+	    
+  // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
+  // for id_theft_flag, don't set the truedid=false because we'll return a real score for that person, just return the alert code of 100G
+	self.truedid := if(le.ConsumerFlags.consumer_statement_flag or  
+  le.ConsumerFlags.security_alert or  
+  le.ConsumerFlags.legal_hold_alert or  
+  (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
+    false, trueDID_original);
 	
 	// if input social is 4 bytes then use full social from header if last4 match
 	ssnLength := length(trim(le.ssn));

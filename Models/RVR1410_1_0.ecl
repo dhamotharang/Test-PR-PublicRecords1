@@ -1,6 +1,6 @@
-// RVR1410_1_0 - Blue Stem - 4.1. shell - FCRA 
+﻿// RVR1410_1_0 - Blue Stem - 4.1. shell - FCRA 
 
-import risk_indicators, riskwise, RiskWiseFCRA, ut, std;
+import risk_indicators, riskwise, RiskWiseFCRA, ut, std, riskview;
 
 export RVR1410_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -230,7 +230,7 @@ iv_pots_phone := (telcordia_type in ['00', '50', '51', '52', '54']);
 
 iv_add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
 
-iv_riskview_222s := nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 and not(if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND combo_dobscore <= 100 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'L2', ',') > 0 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'LI', ',') > 0 or liens_recent_unreleased_count > 0 or liens_historical_unreleased_ct > 0 or criminal_count > 0 or (rc_bansflag in ['1', '2']) or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'BA', ',') > 0 or (integer)bankrupt = 1 or filing_count > 0 or bk_recent_count > 0 or (integer)rc_decsflag = 1 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or truedid);
+iv_riskview_222s := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 iv_db001_bankruptcy := map(
     not(truedid or (integer)ssnlength > 0)                                                                                               => '                 ',

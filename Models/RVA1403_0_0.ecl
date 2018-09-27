@@ -1,4 +1,4 @@
-IMPORT Models, UT, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT Models, UT, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT RVA1403_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -804,7 +804,7 @@ EXPORT RVA1403_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	
 	INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 	
-	sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, IF(LENGTH((STRING)le.historydate) = 6, ((string)le.historydate)[1..6]+'01', ((STRING)le.historydate)[1..8])));
+	sysdate := common.sas_date(if(le.historydate=999999, (string)std.date.today(), IF(LENGTH((STRING)le.historydate) = 6, ((string)le.historydate)[1..6]+'01', ((STRING)le.historydate)[1..8])));
 	
 	iv_add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != '' or out_sec_range != '';
 	
@@ -4432,7 +4432,7 @@ EXPORT RVA1403_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	
 	ov_corrections := rc_hrisksic = '2225';
 	
-	unscorable := NAS_Summary <= 4 AND NAP_Summary <= 4 AND Infutor_NAP <= 4 AND Add_Input_NAProp <= 3 AND TrueDID = FALSE;
+	unscorable := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 	
 	deceased := map(
 	    rc_decsflag = '1'                                                      => 1,

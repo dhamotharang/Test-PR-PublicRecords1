@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVT1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean PreScreenOptOut=false ) := FUNCTION
 
@@ -2459,7 +2459,7 @@ export RVT1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		estimated_income := max((real)0, round(pred_inc/1000)*1000);
 
-		estimated_income_2 :=  if((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2)), 222, estimated_income);
+		estimated_income_2 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, estimated_income);
 
 		pk_ssnchar_invalid_or_recent :=  if(inputssncharflag in ['1', '2', '3', '4'], 1, 0);
 
@@ -10075,7 +10075,7 @@ export RVT1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		scored_222s := ((if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0) OR (((90 <= combo_dobscore) AND (combo_dobscore <= 100)) or (((integer)input_dob_match_level >= 7) or (((integer)lien_flag > 0) or ((criminal_count > 0) or (((integer)bk_flag > 0) or (ssn_deceased or truedid)))))));
 
-		rvt1003_3 :=  if(((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2))) AND not(scored_222s), 222, rvt1003_2);
+		rvt1003_3 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvt1003_2);
 
 		#if(RVT_DEBUG)
 			self.seq := le.seq;

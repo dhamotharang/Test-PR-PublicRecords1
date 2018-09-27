@@ -1,4 +1,4 @@
-	import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿	import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 	export RVG1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean PreScreenOptOut=false ) := FUNCTION
 
@@ -2308,7 +2308,7 @@
 
 	estimated_income := max((real)0, round(pred_inc/1000)*1000);
 
-	estimated_income_2 :=  if((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2)), 222, estimated_income);
+	estimated_income_2 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, estimated_income);
 
 	pk_ssnchar_invalid_or_recent :=  if(inputssncharflag in ['1', '2', '3', '4'], 1, 0);
 
@@ -8735,7 +8735,7 @@
 		or ssn_deceased
 		or truedid;
 
-	rvg1003_3 :=  if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not scored_222s, 222, rvg1003_2);
+	rvg1003_3 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvg1003_2);
 
 
 			#if(RVG_DEBUG)

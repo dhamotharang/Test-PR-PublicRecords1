@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut, std;
+﻿IMPORT Risk_Indicators, RiskWise, RiskWiseFCRA, ut, std, riskview;
 	
 EXPORT RVA1007_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -668,7 +668,9 @@ temp_ri := map(
 temp_score := map
 (
 	riTemp[1].hri in ['91','92','93','94','95'] => (string3)((integer)riTemp[1].hri + 10),
-	le.rhode_island_insufficient_verification => '222',
+	le.rhode_island_insufficient_verification or 
+  riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid)
+  => '222',
 	temp_ri[1].hri='35' => '000',
 	intformat(rva1007_1_0,3,1)
 );

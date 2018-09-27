@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra, std;
+﻿import risk_indicators, ut, riskwise, riskwisefcra, std, riskview;
 
 IED_DEBUG := false;
 
@@ -323,7 +323,7 @@ export IED1106_1_0( dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isC
 				predicted_inc > 100000 => 101,
 																	round(predicted_inc/1000));
 
-		predicted_income := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2, 0, predicted_income_1);
+		predicted_income := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 0, predicted_income_1);
 
 
 		#if(IED_DEBUG)

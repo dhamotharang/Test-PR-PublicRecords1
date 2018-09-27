@@ -112,7 +112,9 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		END;
 // Bankruptcies................	
 		RiskWiseFCRA._Bankruptcy_data(dids_input, flagrecs, bankruptcy_search, bankruptcy_, bk_courts_, history_date, bk_withdraws_);
-		bankruptcies_info := join(bankruptcy_search, bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);
+    insurancemode := false;
+		bankruptcies_info := join(bankruptcy_search(trim(chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(BocaShellVersion, insurancemode) ),
+															bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);
 		bk_layout := recordOf(bankruptcies_info);
 	  bankruptcies := if(bs.bjl.bankrupt, bankruptcies_info, dataset([], bk_layout)); 
  
@@ -362,8 +364,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			
 			self.ConsumerStatement := ConsumerStatements[1].cs_text;  // after all products are turned on to use personContext, this will be changing
 			// self.ConsumerStatement := bocashell_in[1].ConsumerStatements(trim(StatementType)=PersonContext.Constants.RecordTypes.CS)[1].Content;  // after all products are turned on to use personContext function, this will also need to be updated and get rid of old search
-			self.ConfirmationSubjectFound := if(l.iid.nas_summary <= 4 and l.iid.nap_summary <= 4 and 
-				l.infutor_phone.infutor_nap <= 4 and l.address_verification.input_address_information.naprop <= 3 and l.truedid=false, 
+			self.ConfirmationSubjectFound := if(riskview.constants.noscore(l.iid.nas_summary,l.iid.nap_summary, l.address_verification.input_address_information.naprop, l.truedid),
 				'0',  // subject not found
 				'1');  // subject found
 			self := [];

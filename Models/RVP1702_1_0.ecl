@@ -1,4 +1,4 @@
-﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 export RVP1702_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -1352,10 +1352,7 @@ rv_c13_attr_addrs_recency :=  __common__(map(
     addrs_per_adl > 0 => 999,
                          0));
 
-iv_rv5_unscorable :=  __common__(if((NAS_Summary <= 4 and NAP_Summary <= 4 
-                        and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 
-                        // and TrueDID = 0, '1', '0'));f
-                        and not(TrueDID)) or not(TrueDID),'1', '0'));
+iv_rv5_unscorable :=  __common__(if(riskview.constants.noscore(nas_summary,nap_summary, add_input_naprop, le.truedid),'1', '0'));
                         
 
 //iv_f00_nas_summary :=  __common__(if(not(truedid and ssnlength > '0'), NULL, nas_summary));

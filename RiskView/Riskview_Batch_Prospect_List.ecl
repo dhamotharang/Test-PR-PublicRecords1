@@ -1,4 +1,4 @@
-// ** Min input check may still be needed, awaiting distribution of best-append data!
+﻿// ** Min input check may still be needed, awaiting distribution of best-append data!
 
 /*--SOAP--
 <message name="RiskView Riskview_Batch_Prospect_List">
@@ -111,6 +111,7 @@
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="FFDOptionsMask"      type="xsd:string"/>
 </message>
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
@@ -232,7 +233,8 @@ string    Custom_model98_name := ''  						: stored('Custom_model98_name');
 string    Custom_model99_name := ''  						: stored('Custom_model99_name');
 string    Custom_model100_name := ''  					: stored('Custom_model100_name');
 string    prescreen_score_threshold := '' 			: stored('prescreen_score_threshold');
-
+STRING  strFFDOptionsMask_in	 :=  '0' : STORED('FFDOptionsMask');
+boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';
 
 gateways_in := Gateway.Configuration.Get();
 
@@ -397,10 +399,13 @@ attrv5 := if(valid_attributes_requested,
 riskview5_attr_search_results := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5LITE_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
+	self.ConsumerStatements := project(left.ConsumerStatements, transform(
+		iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	self := right,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
 
+	
 // Get all of our model scores
 noModelResults := DATASET([], Models.Layout_ModelOut);
 
@@ -1763,6 +1768,7 @@ riskview5_search_results := JOIN(riskview5_search_results_preAcctNo, acctNo_map,
 																self.AcctNo := right.AcctNo;
 																self := left));
 
+
 // ===================================
 // 					for debugging
 // ===================================
@@ -1800,6 +1806,33 @@ search_Results := Models.LIB_RiskView_Models(clam, lib_in).ValidatingModel;
 #end
 
 output(search_Results, named('Results'));
+
+ConsumerStatementResults1 := project(riskview5_score_search_results.ConsumerStatements, 
+	transform(FFD.layouts.ConsumerStatementBatchFull,
+		self.UniqueId := (unsigned)left.uniqueId;
+		
+		self.dateAdded := // renamed timestamp to be dateAdded to match what krishna's team is doing
+			intformat(left.timestamp.year, 4, 1) + 
+			intformat(left.timestamp.month, 2, 1) + 
+			intformat(left.timestamp.day, 2, 1) +
+			' ' +
+			intformat(left.timestamp.hour24, 2, 1) + 
+			intformat(left.timestamp.minute, 2, 1) + 
+			intformat(left.timestamp.second, 2, 1);
+		self.recordtype := left.statementtype;	// renamed the statement type to be recordtype like krishna's team is doing instead to be more generic since it also includes disputes now as well
+		self := left,
+		self := []));
+
+empty_ds := dataset([], FFD.layouts.ConsumerStatementBatchFull);
+
+ConsumerStatementResults_temp := if(OutputConsumerStatements, ConsumerStatementResults1, empty_ds);
+		
+ConsumerStatementResults := join(search_Results, ConsumerStatementResults_temp, (unsigned)left.lexid=right.uniqueid, 
+			transform(FFD.layouts.ConsumerStatementBatchFull, 
+			self.acctno := left.acctno, self := right));
+
+			
+output(ConsumerStatementResults, named('CSDResults'));  
 
 //output(attributes_clam, named('attributes_clam'));
 

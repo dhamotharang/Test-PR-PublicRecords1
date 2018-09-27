@@ -1,7 +1,4 @@
-/*2017-01-18T16:20:11Z (mmarshik)
-C:\Users\marsmi01\AppData\Roaming\HPCC Systems\eclide\mmarshik\DataLand\Models\RVA1605_1_0\2017-01-18T16_20_11Z.ecl
-*/
-IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
 
 EXPORT RVA1605_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -348,7 +345,7 @@ jd_2seg := if(has_derog = 1, '0 DEROG', '1 OTHER');
 
 iv_add_apt_1 := if(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), '1', '0');
 
-iv_rv5_unscorable_2 := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not TrueDID , '1', '0');
+iv_rv5_unscorable_2 := if(riskview.constants.noscore(nas_summary,nap_summary, add_input_naprop, le.truedid) , '1', '0');
 
 rv_f00_addr_not_ver_w_ssn := if(not(truedid and (integer) ssnlength > 0), ' ', (String) (Integer) (nas_summary in [4, 7, 9]));
 
@@ -1078,7 +1075,7 @@ d_vl4 := rc_dataset_d_sorted[4].value;
 
 iv_add_apt := if(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), '1', '0');
 
-iv_rv5_unscorable_1 := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not TrueDID , '1', '0');
+iv_rv5_unscorable_1 := if(riskview.constants.noscore(nas_summary,nap_summary, add_input_naprop, le.truedid) , '1', '0');
 
 _header_first_seen := common.sas_date((string)(header_first_seen));
 
@@ -1495,7 +1492,7 @@ o_vl4 := rc_dataset_o_sorted[4].value;
 
 iv_rv5_deceased := rc_decsflag = '1' or rc_ssndod != 0 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',') > 0;
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not TrueDID , '1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) , '1', '0');
 
 base := 700;
 

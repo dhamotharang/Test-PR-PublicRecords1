@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT rvc1110_2_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia, BOOLEAN xmlPreScreenOptOut) := FUNCTION
 
@@ -984,7 +984,7 @@ EXPORT rvc1110_2_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isC
 	
 	scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or (INTEGER)input_dob_match_level >= 7 or (INTEGER)lien_flag > 0 or criminal_count > 0 or (INTEGER)bk_flag > 0 or truedid);
 	
-	rvc1110_2 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop_1 <= 2 and not(scored_222s), 222, rvc1110_2_1);
+	rvc1110_2 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvc1110_2_1);
 	
 	glrc16 := (INTEGER)hphnpop > 0 and (INTEGER)addrpop > 0;
 	
