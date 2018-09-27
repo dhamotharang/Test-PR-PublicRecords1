@@ -40,7 +40,7 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote(,'base').Buildfiles.Built2QA
 		,Promote(,'key',,,pKeyDatasetName).Buildfiles.Built2QA
-	) : success(Send_Emails(pversion,,not pIsTesting,pKeyDatasetName).roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
+	) : success(Send_Emails(pversion,,,pKeyDatasetName).roxie), failure(send_emails(pversion).buildfailure);
 	
 	return
 		if(tools.fun_IsValidVersion(pversion)
