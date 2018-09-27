@@ -1,12 +1,12 @@
 ﻿import prte2_sanctn, prof_license_mari, prte2,std, address, PromoteSupers, ut, aid;
 
 //uppercase and remove spaces from in files
-	PRTE2.CleanFields(files.incident_in, CleanIncident);
 	PRTE2.CleanFields(files.party_in, CleanParty);
 	PRTE2.CleanFields(files.license_in, CleanLicense);
 	PRTE2.CleanFields(files.party_aka_dba_in, CleanPartyAKA);
+	PRTE2.CleanFields(files.incident_in, CleanIncident);
 	PRTE2.CleanFields(files.rebuttal_in, CleanRebuttal);
-
+	
 	
 	tempLayout := record
 	PRTE2_sanctn.Layouts.party_ext;
@@ -29,7 +29,7 @@ prte2_sanctn.layouts.party_ext xform_clean(dAddressCleaned l) := transform
 		//Cleaning Full Name
 		  	is_company      			:= L.Party_Name[1..25] = L.Party_Firm[1..25];
 				
-				v_clean_name						:= if(not(is_company), Address.CleanPersonLFM73(L.party_name), '');
+				v_clean_name					:= if(not(is_company), Address.CleanPersonLFM73(L.party_name), '');
 			
 			// Reforrmattin Names that did not clean correctly the initial pass
 				v_last_name 					:= trim(l.party_name[1..STD.Str.Find(l.party_name, ', ', 1)-1], right);
@@ -37,7 +37,8 @@ prte2_sanctn.layouts.party_ext xform_clean(dAddressCleaned l) := transform
 				v_full_fml						:= v_first_mid +' '+ v_last_name;
 				
 				is_match							:= trim(l.party_name[1..STD.Str.Find(l.party_name, ', ', 1)-1], right) = trim(Address.CleanNameFields(v_clean_name).lname, right);
-				clean_name						:= if(is_match and not(is_company), v_clean_name, Address.CleanPersonFML73(v_full_fml));
+				clean_name						:= if(is_company, '',
+																		if(is_match, v_clean_name, Address.CleanPersonFML73(v_full_fml)));
 				
 				self.title 						:= Address.CleanNameFields(clean_name).title;
 				self.fname 						:= Address.CleanNameFields(clean_name).fname;
@@ -110,7 +111,7 @@ Layouts.Incident_ext  CleanDates(CleanIncident L) := transform
 		self := [];
 end;
 
-pIncidentBase := project(CleanIncident, cleanDates(left));
+pIncidentBase := project(CleanIncident(batch_number <> ''), cleanDates(left));
 
 
 layouts.License_ext	cleanLic(CleanLicense L) := transform
@@ -122,7 +123,7 @@ end;
 pLicenseBase := project(CleanLicense, cleanLic(left));
 
 
-pRebuttal := project(CleanPartyAKA, transform(layouts.Rebuttal_ext, self := left, self := []));
+pRebuttal := project(CleanRebuttal, transform(layouts.Rebuttal_ext, self := left, self := []));
 pPartyAka := project(CleanPartyAKA, layouts.Party_AKA_DBA_ext);
 
 PromoteSupers.MAC_SF_BuildProcess(pPartyBase, Constants.base_prefix_name + 'party', bld_base_party,,,true);

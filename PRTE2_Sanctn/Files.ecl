@@ -26,13 +26,12 @@ EXPORT Files := module
 	export linkids_new := project(base_party, transform(layouts.linkids_key, self := left, self := []));  																																																									
 
 layouts.MIDEX_RPT_NBR_Key 	tSANCTN_key(base_party L) := transform
-		// tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
-		// tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
-		// cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
-		// self.midex_rpt_nbr 	:= std.str.CleanSpaces(trim(L.BATCH_NUMBER)+'-' 
-																										// + tmp_incident_number +'-' 
-																										// + cln_party_number);
-		self.midex_rpt_nbr	:= functions.create_midex_rpt_nbr(l.batch_number, l.incident_number, l.party_number);
+		tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
+		tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
+		cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
+		self.midex_rpt_nbr 	:= std.str.CleanSpaces(trim(L.BATCH_NUMBER)+'-' 
+																										+ tmp_incident_number +'-' 
+																										+ cln_party_number);
 		self               := L;
 END;
 
@@ -45,20 +44,19 @@ SANCTN.layout_SANCTN_incident_clean tr(base_incident L) := transform
 	self := [];
 	end;
 
-	f_sanctn 				:= project(base_incident,tr(LEFT));
+	f_sanctn 				:= project(base_incident(batch_number <> ''),tr(LEFT));
 	 
 	export tbl_casenum 		:= dedup(sort(project(f_sanctn,layouts.casenum_key), case_number, batch_number,incident_number), record, all) ;	
 	export incident_new 	:= project(base_incident,layouts.Incident_Key);	
 	export f_sanctn_incident_new := project(base_incident, layouts.incident_midex_key);		
 	
 	layouts.license_midex_key			tLicenseMidex(base_license L) := transform
-		// tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
-		// tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
-		// cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
-		// self.midex_rpt_nbr 	:= StringLib.StringCleanSpaces(trim(L.BATCH_NUMBER)+'-' 
-																													// + tmp_incident_number +'-' 
-																													// + cln_party_number);
-		self.midex_rpt_nbr	:= functions.create_midex_rpt_nbr(l.batch_number, l.incident_number, l.party_number);
+		tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
+		tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
+		cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
+		self.midex_rpt_nbr 	:= StringLib.StringCleanSpaces(trim(L.BATCH_NUMBER)+'-' 
+																													+ tmp_incident_number +'-' 
+																													+ cln_party_number);
 		SELF := L;
 END;
 	export f_sanctn_license_new := project(base_license(cln_license_number <> '' and (NOT REGEXFIND('NMLS', TRIM(LICENSE_TYPE,LEFT,RIGHT),NOCASE))),  tLicenseMidex(LEFT));
@@ -67,10 +65,9 @@ END;
                                 TRANSFORM(layouts.License_Key, SELF := LEFT));
 
 layouts.NMLS_ID_Key 	populateMidex(base_license l) := transform
-  self.midex_rpt_nbr	:= functions.create_midex_rpt_nbr(l.batch_number, l.incident_number, l.party_number);
-  // self.MIDEX_RPT_NBR := TRIM(L.BATCH_NUMBER,LEFT,RIGHT) + '-' +
-													 	 // ut.rmv_ld_zeros(L.INCIDENT_NUMBER) + '-' +
-														 // ut.rmv_ld_zeros(L.PARTY_NUMBER);
+  self.MIDEX_RPT_NBR := TRIM(L.BATCH_NUMBER,LEFT,RIGHT) + '-' +
+													 	 ut.rmv_ld_zeros(L.INCIDENT_NUMBER) + '-' +
+														 ut.rmv_ld_zeros(L.PARTY_NUMBER);
 	SELF.NMLS_ID := L.CLN_LICENSE_NUMBER;
 	SELF.LICENSE_STATE := IF(TRIM(L.LICENSE_STATE)='NMLS','',TRIM(L.LICENSE_STATE));
 	SELF := L;
@@ -81,13 +78,12 @@ END;
 	
 	
 	layouts.NMLS_MIDEX_KEY		tNMLSLicenseMidex(base_license L) := transform
-		// tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
-		// tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
-		// cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
-		// self.midex_rpt_nbr 	:= StringLib.StringCleanSpaces(trim(L.BATCH_NUMBER)+'-' 
-																											// + tmp_incident_number +'-' 
-																											// + cln_party_number);
-    self.midex_rpt_nbr	:= functions.create_midex_rpt_nbr(l.batch_number, l.incident_number, l.party_number);		
+		tmp_incident_number := ut.rmv_ld_zeros(L.INCIDENT_NUMBER);
+		tmp_party_number 		:= ut.rmv_ld_zeros(L.PARTY_NUMBER);
+		cln_party_number 		:= if(trim(tmp_party_number) = '0','',tmp_party_number);
+		self.midex_rpt_nbr 	:= StringLib.StringCleanSpaces(trim(L.BATCH_NUMBER)+'-' 
+																											+ tmp_incident_number +'-' 
+																											+ cln_party_number);
 		SELF.NMLS_ID := L.CLN_LICENSE_NUMBER;
 		SELF.LICENSE_STATE := IF(TRIM(L.LICENSE_STATE)='NMLS','',TRIM(L.LICENSE_STATE));
 		SELF := L;
@@ -107,7 +103,7 @@ SANCTN.layout_SANCTN_party_clean_orig tParty_key(base_party L) := transform
 end;
 
 	export f_party_new   := project(base_party, tParty_key(LEFT));
-  export f_sanctn_rebuttal_new := project(base_rebuttal(party_text <> ''), TRANSFORM(layouts.Rebuttal_Key, SELF := LEFT));
+  export f_sanctn_rebuttal_new := project(base_rebuttal, TRANSFORM(layouts.Rebuttal_Key, SELF := LEFT));
 
 //ssn4 key
 layouts.ssn4_key 	tSSN_key(base_party L) := transform
@@ -119,9 +115,6 @@ end;
 
 // party_aka_dba key	
 	export f_sanctn_aka_dba_new := project(base_party_aka_dba, TRANSFORM(layouts.PARTY_AKA_DBA_Key , SELF := LEFT));	
-
-
-
 
 end;																																			
 	

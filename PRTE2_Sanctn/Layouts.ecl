@@ -68,7 +68,7 @@ end;
 
 export INCIDENT_base := record
 // SANCTN.layout_SANCTN_incident_clean AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
-Incident_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
+Incident_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM, REQ];
 end;
 
 
