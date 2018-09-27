@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -1022,7 +1022,7 @@ export RVG812_0_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 		ov_corrections := (rc_hrisksic = 2225);
 		mod7_RV_cap := min(900, max(501, mod7_rv));
 		mod7_rv_cap_2 :=  if((mod7_rv_cap > 610) and (ov_ssndead or (ov_ssnprior or (ov_criminal_flag or ov_corrections))), 610, mod7_rv_cap);
-		mod7_rv_cap_3 :=  if((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2)), 222, mod7_rv_cap_2);
+		mod7_rv_cap_3 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, mod7_rv_cap_2);
 		RVG812 := mod7_rv_cap_3;
 
 

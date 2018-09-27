@@ -1,5 +1,5 @@
-//used by FCRA only
-import risk_indicators, ut, easi, std;
+﻿//used by FCRA only
+import risk_indicators, ut, easi, std, riskview;
 
 export IED1002_0_6( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, unsigned1 BSversion=2) := FUNCTION
 	IE_DEBUG := FALSE;
@@ -426,7 +426,7 @@ export IED1002_0_6( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, uns
 			estimated_income > 250000 => 250999,
 													 round(estimated_income/1000)*1000);
 
-	estimated_income_2 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2, 0, estinc_bounded);
+	estimated_income_2 := if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 0, estinc_bounded);
 
 		#if(IE_DEBUG)
 			self.pk_wealth_index                  := pk_wealth_index;                                   

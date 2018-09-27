@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut;
+﻿import risk_indicators, riskwise, riskwisefcra, ut, riskview;
 
 export RVC1405_3_0( grouped dataset(risk_indicators.Layout_Boca_shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -152,7 +152,7 @@ iv_pots_phone := (telcordia_type in ['00', '50', '51', '52', '54']);
 
 iv_add_apt := StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or out_unit_desig != ' ' or out_sec_range != ' ';
 
-iv_riskview_222s := nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 and not(if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND combo_dobscore <= 100 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'L2', ',') > 0 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'LI', ',') > 0 or liens_recent_unreleased_count > 0 or liens_historical_unreleased_ct > 0 or criminal_count > 0 or (rc_bansflag in ['1', '2']) or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'BA', ',') > 0 or (Integer)bankrupt = 1 or filing_count > 0 or bk_recent_count > 0 or (Integer)rc_decsflag = 1 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or truedid);
+iv_riskview_222s := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 iv_mi001_adlperssn_count := map(
     not((Integer)ssnlength > 0)  => NULL,

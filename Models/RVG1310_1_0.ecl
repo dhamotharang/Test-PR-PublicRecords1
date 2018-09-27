@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+﻿import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 //4.1 FCRA Modeling Shell  
 export RVG1310_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -168,7 +168,7 @@ export RVG1310_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 
 	sysdate := common.sas_date(if(le.historydate=999999, (STRING8)Std.Date.Today(), (string6)le.historydate+'01'));
 
-	iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and add1_naprop <= 3 and ~TrueDID, '1', '0');
+	iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 
 	email_src_im := Models.Common.findw_cpp(email_source_list, 'IM' , ', ', 'E') > 0;
 

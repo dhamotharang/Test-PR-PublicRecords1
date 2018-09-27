@@ -1,7 +1,4 @@
-/*2011-10-10T21:28:53Z (Adam Shirey)
-Remove references to adl_category (88743)
-*/
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVR1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean xmlPreScreenOptOut=false ) := FUNCTION
 
@@ -1886,7 +1883,7 @@ export RVR1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-		pk_222_flag := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s), 1, 0);
+		pk_222_flag := if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 1, 0);
 
 		pk_segment_40 := map(
 			(integer)ssn_deceased > 0                            => 'X 200  ',
@@ -4647,7 +4644,7 @@ export RVR1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 		//can we use isRV3Unscorable here?
 		//scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-		rvr1103d := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s), 222, rvr1103c);
+		rvr1103d := if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, rvr1103c);
 
 		rvr1103 := if((integer)ssn_deceased > 0, 200, rvr1103d);
 

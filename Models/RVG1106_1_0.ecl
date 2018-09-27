@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVG1106_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut ) := FUNCTION
 
@@ -975,7 +975,7 @@ export RVG1106_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid;
 
-		_222 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not(scored_222s), 1, 0);
+		_222 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 1, 0);
 
 		rvg1106_1_0 := if(_222=1, 222, custom_40_compucredit_score);
 

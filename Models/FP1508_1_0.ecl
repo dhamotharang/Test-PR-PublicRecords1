@@ -636,7 +636,7 @@ export FP1508_1_0(dataset(risk_indicators.Layout_Boca_Shell) clam,
 NULL := -999999999;
 INTEGER contains_i( string haystack, string needle ) :=(INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate := common.sas_date(if(le.historydate=999999, (string)ut.getdate, (string6)le.historydate+'01'));
+sysdate := common.sas_date(if(le.historydate=999999, (string)risk_indicators.iid_constants.TodayDate, (string6)le.historydate+'01'));
 
 ver_src_ak_pos := Models.Common.findw_cpp(ver_sources, 'AK' , '  ,', 'ie');
 

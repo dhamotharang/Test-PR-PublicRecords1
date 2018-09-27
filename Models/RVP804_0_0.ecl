@@ -1,4 +1,4 @@
-/*  Modelers Notes
+﻿/*  Modelers Notes
 ************************************************************************************
 * RVP804.0.0                       Version 01                                BY PK *
 *                               Project ID:  ????                       09/05/2008 *
@@ -15,7 +15,7 @@
 ************************************************************************************
 */
 
-import risk_indicators, ut, std;
+import risk_indicators, ut, std, riskview;
 
 export RVP804_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -1629,7 +1629,7 @@ end;
      Mod_Capped_tmp2 := if(( Mod_Capped_tmp1>630 ) and (ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections ), 
 															630, Mod_Capped_tmp1);
 
-     Mod_Capped := Map(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 => 222,
+     Mod_Capped := Map(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 												noContent2 => 222,
 												Mod_Capped_tmp2);
 

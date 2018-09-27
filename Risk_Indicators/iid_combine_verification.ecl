@@ -32,6 +32,7 @@ end;
 temp combo(temp le, temp ri) := TRANSFORM
 	// these couple fields always need to be set from the result of the ssnrecs
 	self.did := le.did;
+  self.truedid := le.truedid;
 	self.firstscore := le.firstscore;
 	self.lastscore := le.lastscore;
 	self.addrscore := le.addrscore;
@@ -504,7 +505,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonfalse(chrono_eqfsaddrcount3);
 	nonfalse(chrono_dladdrcount3);
 	nonfalse(chrono_emaddrcount3);
-	nonfalse(trueDID);
+
 	
 	nonblank(idtheftflag);
 	

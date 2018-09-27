@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT RVC1112_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE) := FUNCTION
 
@@ -612,7 +612,7 @@ EXPORT RVC1112_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 																
 	_segment := map(
 	    (INTEGER)ssn_deceased_2 > 0                                                              => '0- 200',
-	    nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not(scored_222s) => '1 - 222',
+	    riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => '1 - 222',
 	    add1_naprop = 4 OR property_owned_total > 0                                     => '2 - Prop',
 	                                                                                       '3 - Nonprop');
 	

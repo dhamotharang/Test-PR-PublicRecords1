@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT rvc1110_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia, BOOLEAN xmlPreScreenOptOut) := FUNCTION
 
@@ -1213,7 +1213,7 @@ EXPORT rvc1110_1_0 (DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isC
 															(INTEGER)bk_flag > 0 or 
 															truedid);
 	
-	rvc1110_1 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not(scored_222s), 222, rvc1110_1_1);
+	rvc1110_1 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvc1110_1_1);
 	
 	ver_name := (nas_summary in [2, 5, 7, 8, 9, 11, 12]) OR (nap_summary in [2, 5, 7, 8, 9, 11, 12]);
 	

@@ -1,4 +1,4 @@
-/************************************************************************************/
+﻿/************************************************************************************/
 /* RVG903_1_0                       Version 01                                BY PK */
 /*                               Project ID:  1197                        4/02/2009 */
 /************************************************************************************/
@@ -7,7 +7,7 @@
 /* Returns the following score - RVG903                                             */
 /************************************************************************************/
 
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVG903_1_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -370,7 +370,7 @@ export RVG903_1_0(dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCal
 
        mod7_scr := if(( mod7_scr_tmp2 > 680 ) and ( ov_ssndead = 1 or ov_ssnprior = 1 ), 680, mod7_scr_tmp2);
 
-       RVG903 := if( (( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 )), 222, mod7_scr);
+       RVG903 := if( riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, mod7_scr);
 
 
 			self.seq := le.seq;

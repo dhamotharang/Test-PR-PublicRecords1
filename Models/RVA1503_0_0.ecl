@@ -1,8 +1,8 @@
-/*2016-04-05T22:00:09Z (laure fischer)
+﻿/*2016-04-05T22:00:09Z (laure fischer)
 changed reason code S69 to S65.
 */
 
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
+IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std, riskview;
 
 EXPORT RVA1503_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -781,7 +781,7 @@ Layout_Debug := RECORD
 //=             Set the Risk View indicators for this          =
 //=             consumer.                                      =
 //==============================================================		
-	iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(trueDID), '1', '0');
+	iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 	
 	rv_f00_addr_not_ver_w_ssn := if(not(truedid and (integer)ssnlength > 0), ' ', (String)(Integer)(nas_summary in [4, 7, 9]));
 	

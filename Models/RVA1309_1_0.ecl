@@ -1,6 +1,6 @@
-// RVA1309_1: SFG Finance
+﻿// RVA1309_1: SFG Finance
 
-import risk_indicators, riskwise, riskwisefcra, ut, std; 
+import risk_indicators, riskwise, riskwisefcra, ut, std, riskview; 
 
 export RVA1309_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -1162,7 +1162,7 @@ export RVA1309_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, 
 
 	rva1309_1_0 := map(
 			ssn_deceased                                                                => 200,
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not(scored_222s) => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 																																												 rva1309_1_0_1);
 
 	rc1_2 := '';

@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 
 export RVP1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut=false ) := FUNCTION
@@ -3661,31 +3661,7 @@ export RVP1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 		uv_EQ_only := (((integer)source_tot_EQ = 1) and (((integer)source_tot_total = 1) and ((integer)uv_gong_sourced = 0)));
 
 		// uv_RVP1003_content := ((uv_rv20_content or (uv_gong_sourced or (source_tot_EM or (source_tot_VO or (source_tot_P or (source_tot_V or ((add1_naprop > 2) or (prof_license_flag or (((real)add1_avm_land_use != NULL) or ((trim(ams_file_type, LEFT, RIGHT) != '') or ((criminal_count > 0) or ((liens_historical_unreleased_ct > 0) or (source_tot_L2 or (bankrupt or (source_tot_EB or (source_tot_W or ((watercraft_count > 0) or ((if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0) or (((90 <= combo_dobscore) AND (combo_dobscore <= 100)) or (((integer)input_dob_match_level >= 7) or (((integer)combine_lien_flag > 0) or ((criminal_count > 0) or (((integer)bk_flag > 0) or (((integer)rc_decsflag = 1) or (((integer)source_tot_DS = 1) or truedid))))))))))))))))))))))))) and ((integer)uv_EQ_only = 0));
-		uv_RVP1003_content := ( (uv_rv20_content
-                         or uv_gong_sourced                                       
-                         or source_tot_EM or source_tot_VO
-                         or source_tot_P
-                         or source_tot_V
-                         or add1_naprop>2                                             
-                         or prof_license_flag
-                         or trim(add1_avm_land_use)!=''                                        
-                         or trim(ams_file_type) != ''                                  
-                         or criminal_count>0
-                         or liens_historical_unreleased_ct>0 
-                         or source_tot_L2
-                         or bankrupt
-                         or source_tot_EB  or source_tot_w
-                         or watercraft_count>0          
-                         or sum(property_owned_total,property_sold_total)>0 
-                         or combo_dobscore between 90 and 100 
-                         or (integer)input_dob_match_level >= 7 
-                         or combine_lien_flag 
-                         or criminal_count > 0 
-                         or bk_flag 
-                         or (integer)rc_decsflag=1
-						 or source_tot_ds
-                         or truedid   )
-                         and not uv_EQ_only     );
+		uv_RVP1003_content := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 		ov_ssndead := (((integer)ssnlength > 0) and ((integer)rc_decsflag = 1));
 		ov_ssnprior := (((integer)rc_ssndobflag = 1) or ((integer)rc_pwssndobflag = 1));
@@ -3694,7 +3670,7 @@ export RVP1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 		ov_impulse := (impulse_count > 0);
 
 		rvp1003_cap :=  map(
-			(integer)uv_RVP1003_content = 0 or PreScreenOptOut => 222,
+			(integer)uv_RVP1003_content = 1 or PreScreenOptOut => 222,
 			(ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections or ov_impulse) and rvp1003_raw > 700 => 700,
 			max(501, min(900, rvp1003_raw ))
 		);

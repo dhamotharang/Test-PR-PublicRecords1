@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA, personcontext;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -103,7 +103,7 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
     self.addr_status 	:= '';
     self.county 			:= '';
     self.geo_blk 			:= '';
-    self.country 			:= '';
+	self.country 			:= '';
 	#ELSE
     self.prim_range   := address.cleanFields(clean_addr).prim_range;
     self.predir 			:= address.cleanFields(clean_addr).predir;
@@ -124,7 +124,7 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
     self.geo_blk 			:= address.cleanFields(clean_addr).geo_blk;
     self.country 			:= '';
   #END
-  
+	
 	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
 	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
 	history_date := if(le.historydateTimeStamp='', risk_indicators.iid_constants.default_history_date, (unsigned)le.historydateTimeStamp[1..6]);
@@ -211,7 +211,7 @@ end;
 LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 											bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '');
-                    
+										
 Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
 
 bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
@@ -605,7 +605,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean hasSecurityFreeze := rt.consumerFlags.security_freeze;
 	
 	//security fraud alert, return alert code 100B
-	boolean hasSecurityFraudAlert := rt.consumerFlags.security_alert or rt.consumerFlags.id_theft_flag ;
+	boolean hasSecurityFraudAlert := rt.consumerFlags.security_alert;
 
 	//consumer statement alert, return alert code 100C
 	boolean hasConsumerStatement := rt.consumerFlags.consumer_statement_flag;
@@ -629,7 +629,10 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	
 	// Regulatory Condition 100F, on the FCRA Prescreen OptOut File
 	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
-	
+  
+	boolean hasLegalHold :=  rt.consumerflags.legal_hold_alert;  
+	boolean hasIdentityFraudAlert := rt.consumerflags.id_theft_flag  ;
+	  
 	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score;
 	
 	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
@@ -648,11 +651,11 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	
 	hasBankruptcyAlert := chapter7bankruptcy or chapter9bankruptcy or chapter11bankruptcy or chapter12bankruptcy or chapter13bankruptcy or chapter15bankruptcy;
 		
-	// currently there are only 6 conditions to trigger an alert, but leaving room in the batch layout for up to 10 alerts to be returned.
 	ds_alerts_temp1 := dataset([
 		{if(hasSecurityFreeze and isCollectionsPurpose, '100A', '')},  // only include securityFreeze alert in this dataset if the purpose is collections
-		{if(hasSecurityFraudAlert, '100B', '')},
+    {if(hasSecurityFraudAlert, '100B', '')},
 		{if(hasConsumerStatement, '100C', '')},
+		{if(hasIdentityFraudAlert, '100G', '')},
 		{if(has200Score, '200A', '')},
 		{if(chapter7bankruptcy, '300A', '')},
 		{if(chapter9bankruptcy, '300B', '')},
@@ -665,20 +668,25 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	// when confirmationSubjectFound = 0, the only alert to come back should be the 222A.  all other alert conditions are ignored
 	// when state exeption, just return a 100D and no other alerts
 	ds_alert_subject_not_found := dataset([{'222A'}],{string4 alert_code});
+  ds_alert_SecurityFreeze := dataset([{'100A'}],{string4 alert_code});  // comes back by itself if purpose is not collections
+  ds_alert_Security_Fraud := dataset([{'100B'}],{string4 alert_code});  
+	ds_alert_consumer_statement := dataset([{'100C'}],{string4 alert_code});
 	ds_alert_state_exception := dataset([{'100D'}],{string4 alert_code});
 	ds_alert_tooYoungForPrescreen := dataset([{'100E'}],{string4 alert_code});
 	ds_alert_PrescreenOptOut := dataset([{'100F'}],{string4 alert_code});
-	ds_alert_SecurityFreeze := dataset([{'100A'}],{string4 alert_code});  // comes back by itself if purpose is not collections
-					
+  ds_alert_Legal_Hold := dataset([{'100H'}],{string4 alert_code}); 
+ 			
 	ds_alerts_temp := map(isStateException 																=> ds_alert_state_exception,  // because the state exceptions are also coming through as 222, Brad wants to put this first in map so allert of 100D
-												le.ConfirmationSubjectFound='0' or has222score 	=> ds_alert_subject_not_found,
-												TooYoungForPrescreen														=> ds_alert_tooYoungForPrescreen,
-												PrescreenOptOut																	=> ds_alert_PrescreenOptOut,
-												hasSecurityFreeze and ~isCollectionsPurpose			=> ds_alert_SecurityFreeze,
+                        TooYoungForPrescreen														=> ds_alert_tooYoungForPrescreen,
+                        PrescreenOptOut																	=> ds_alert_PrescreenOptOut,
+                        hasLegalHold 	                                  => ds_alert_legal_hold, 
+                        hasSecurityFreeze and ~isCollectionsPurpose			=> ds_alert_SecurityFreeze,
+                        hasSecurityFraudAlert                           => ds_alert_security_fraud,
+                        le.ConfirmationSubjectFound='0' or has222score 	=> ds_alert_subject_not_found,
 																																					 ds_alerts_temp1);
 	
 	// Only 100B, 100C, 200A, 222A alert codes allow for valid RiskView Scores to return, if it's the others override the score to a 100.  100A allows for a score to return if this is a collections purpose.
-	score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
+	score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F', '100H'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
 	
 	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
 	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
@@ -902,21 +910,20 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason5);
   
 	AlertRegulatoryCondition := map(
-		le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 
-						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR prescreen_score_scenario_teleco OR prescreen_score_scenario_Crossindustry OR prescreen_score_scenario_custom => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
+						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR 
+            prescreen_score_scenario_teleco OR prescreen_score_scenario_Crossindustry OR prescreen_score_scenario_custom OR
+            hasLegalHold            => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
 		hasSecurityFreeze and isCollectionsPurpose => '2',  // security freeze isn't a regulatory condition to blank everything out if the purpose is collections	
-		hasConsumerStatement or hasSecurityFraudAlert or hasBankruptcyAlert=> '2',  // Subject has an alert on their file that does not impact the return of their information
+		hasConsumerStatement or hasSecurityFraudAlert or hasBankruptcyAlert or hasIdentityFraudAlert=> '2',  // Subject has an alert on their file that does not impact the return of their information
+    le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		'1');
 	
 	self.AlertRegulatoryCondition := if(valid_attributes_requested, AlertRegulatoryCondition, '');
 	
-	// TODO:  eventually when PersonContext is turned on across the boardh, we can remove these 2 searches and use PersonContext dataset instead
-	did_statement := choosen(Consumerstatement.key.fcra.lexid(keyed(lexid=rt.did)), 1);
-	ssn_statement := choosen(Consumerstatement.key.fcra.ssn(keyed(ssn=rt.shell_input.ssn) and 
-													datalib.NameMatch (rt.shell_Input.fname,  '',  rt.shell_Input.lname, fname, '', lname) < 3),  // make sure the name on statement also matches the input name
-													1);
-	statementText := if(did_statement[1].cs_text<>'', did_statement[1].cs_text, ssn_statement[1].cs_text); 
+  cs_statements := rt.consumerstatements(StatementType in [personcontext.constants.RecordTypes.CS, personcontext.constants.RecordTypes.RS]);
+  
+	statementText := trim(cs_statements[1].content); 
 	// don't even search the statements for scenarios of 222A, 100D, 100E, 100A
 	self.ConsumerStatementText := if(hasConsumerStatement, statementText, ''); 
 	

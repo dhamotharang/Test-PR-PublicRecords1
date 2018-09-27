@@ -124,6 +124,7 @@ transform(layout_pcr,
 	SELF.ConsumerFlags.security_alert := (right.dbrecords[1].security_fraud_alert=1);
 	SELF.ConsumerFlags.negative_alert := (right.dbrecords[1].negative_alert=1);
 	SELF.ConsumerFlags.id_theft_flag := (right.dbrecords[1].id_theft_flag=1);
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)(stringlib.stringfilterout((right.dbrecords[1].date_added[1..10]), '-')) ) );
 
 
@@ -136,6 +137,7 @@ layout_pcr add_flags_by_did(risk_indicators.Layout_BocaShell_Neutral le, fcra.Ke
 	SELF.ConsumerFlags.security_alert := (ri.security_alert='1');
 	SELF.ConsumerFlags.negative_alert := (ri.negative_alert='1');
 	SELF.ConsumerFlags.id_theft_flag := (ri.id_theft_flag='1');
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)ri.date_created;
 	SELF := le;
 END;
@@ -164,6 +166,7 @@ layout_pcr add_flags_by_ssn(risk_indicators.Layout_BocaShell_Neutral le, fcra.Ke
 	SELF.ConsumerFlags.security_alert := (ri.security_alert='1');
 	SELF.ConsumerFlags.negative_alert := (ri.negative_alert='1');
 	SELF.ConsumerFlags.id_theft_flag := (ri.id_theft_flag='1');
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)ri.date_created;
 	SELF := le;
 END;
@@ -206,6 +209,8 @@ risk_indicators.Layout_BocaShell_Neutral add_flags(risk_indicators.Layout_BocaSh
 	SELF.ConsumerFlags.security_alert := le.ConsumerFlags.security_alert or ri.ConsumerFlags.security_alert;
 	SELF.ConsumerFlags.negative_alert := le.ConsumerFlags.negative_alert or ri.ConsumerFlags.negative_alert;
 	SELF.ConsumerFlags.id_theft_flag := le.ConsumerFlags.id_theft_flag or ri.ConsumerFlags.id_theft_flag;
+	SELF.ConsumerFlags.legal_hold_alert := le.ConsumerFlags.legal_hold_alert or ri.ConsumerFlags.legal_hold_alert;
+
 	SELF.ConsumerStatements := le.ConsumerStatements;  // these always come from PersonContext, searched earlier within Risk_Indicators.checkPersonContext
 	
 	self.seq := le.seq;

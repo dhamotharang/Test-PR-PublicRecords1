@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVB609_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := 
 
@@ -411,7 +411,7 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 				 bankcard1 < 501 => 501,
 				 bankcard1);
 				 
-	bankcard2 := if(le.iid.nas_summary < 5 and le.iid.nap_summary < 5 and le.address_verification.input_address_information.naprop < 3, 222, bankcard);
+	bankcard2 := if( riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, bankcard);
 	
 	
 	riTemp := RiskWiseFCRA.corrReasonCodes(le.consumerflags, 4);
