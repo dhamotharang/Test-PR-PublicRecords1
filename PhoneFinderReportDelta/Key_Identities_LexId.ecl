@@ -4,7 +4,7 @@
 
 inFile := project(PhoneFinderReportDelta.File_PhoneFinder.Identities_Main, PhoneFinderReportDelta.Layout_PhoneFinder.Identities_Main-date_file_loaded);
 
-EXPORT Key_Identities	:= index(inFile
-																,{transaction_id}
-																,{inFile}
-																,'~thor_data400::key::phonefinderreportdelta::identities_'+doxie.Version_SuperKey);
+EXPORT Key_Identities_LexId	:= index(inFile
+																			,{lexid, transaction_id}
+																			,{inFile}
+																			,'~thor_data400::key::phonefinderreportdelta::identities_lexid_'+doxie.Version_SuperKey);
