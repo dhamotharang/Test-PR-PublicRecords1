@@ -43,7 +43,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.TransactionId := (STRING)L.transaction_id;
 				SELF.DeceitfulConfidenceId := (INTEGER)L.classification_Activity.Confidence_that_activity_was_deceitful_id;
 				SELF.HouseHoldId := L.Investigation_Referral_Case_ID;
-				SELF.CustomerPersonId := L.uid;
+				SELF.CustomerPersonId := (STRING)L.uid;
 				SELF.EventType1 := L.Event_Type_1;
 				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
 				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
@@ -105,12 +105,12 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(deltabase_recs L, 
 																																			mbs_delta_key R) := TRANSFORM
 				// SELF.Record_ID := (INTEGER)L.cust_transaction_id;
-				SELF.transaction_id := (INTEGER)L.cust_transaction_id;
+				SELF.transaction_id := L.cust_transaction_id;
 				SELF.Customer_ID := L.gc_id;
 				SELF.Event_Date := L.date_added[1..4] + L.date_added[6..7] + L.date_added[9..10];
 				SELF.Investigation_Referral_Case_ID := L.case_id;
 				// SELF.Customer_Person_ID := L.client_uid;
-				SELF.uid := L.client_uid;
+				SELF.uid := (INTEGER)L.client_uid;
 				SELF.Type_of_Referral := L.inquiry_source;
 				SELF.Referral_Reason := L.reason_description;
 				SELF.SSN := L.SSN;

@@ -154,8 +154,8 @@ EXPORT SearchService() := MACRO
 	delta_log_input := PROJECT(first_row,
 														TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRequest,
 																SELF.SearchBy.UniqueId := MAP(
-																		LEFT.SearchBy.UniqueId = '' AND adlDIDFound = TRUE => (STRING)ds_adl_in[1].did,
-																		LEFT.SearchBy.UniqueId = '' AND useRINID = TRUE => 
+																		LEFT.SearchBy.UniqueId = '' AND ~useRINID => (STRING)ds_adl_in[1].did,
+																		LEFT.SearchBy.UniqueId = '' AND useRINID => 
 																				search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)[1].ElementValue,
 																		LEFT.SearchBy.UniqueId),
 																SELF := LEFT
