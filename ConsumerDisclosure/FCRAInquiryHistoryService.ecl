@@ -1,4 +1,4 @@
-﻿IMPORT iesp, doxie, InquiryHistory, WSInput;
+﻿IMPORT iesp, doxie, InquiryHistory, STD, WSInput;
 
 EXPORT FCRAInquiryHistoryService() := FUNCTION
 
@@ -34,6 +34,7 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
                                           SELF.LexID := (STRING) L.UniqueId,
                                           SELF := LEFT)),
                                  iesp.Constants.FCRAInqHist.MAX_RECORDS);
+    SELF.RoxieCluster := STD.System.Thorlib.Cluster();                             
   END;
   outfile := PROJECT(IHResponse,xform(LEFT));
 

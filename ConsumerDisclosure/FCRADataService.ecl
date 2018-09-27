@@ -10,7 +10,7 @@
 
 EXPORT FCRADataService :=
 MACRO
-  IMPORT doxie,ConsumerDisclosure,iesp,WSInput;
+  IMPORT doxie,ConsumerDisclosure,iesp,STD,WSInput;
   
   WSInput.MAC_FCRA_DataService();
   
@@ -40,6 +40,7 @@ MACRO
     SELF._Header.Exceptions    := rpt.Exceptions;
     SELF.Results      := rpt.Records;
     SELF.LexId        := report_by.LexID;
+    SELF.RoxieCluster := STD.System.Thorlib.Cluster();                             
   END;
   outfile := DATASET([xform()]);
   
