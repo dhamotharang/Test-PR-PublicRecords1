@@ -559,7 +559,8 @@ EXPORT Functions := MODULE
 			SELF.file_type := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
 			
 			#IF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.REPORT)
-				SELF.customer_county_code := L.options.AgencyCounty;
+				//SELF.customer_county_code := L.options.AgencyCounty;
+				SELF.customer_county_code :=  Address.County_Names(state_alpha=L.options.AgencyState,county_name=L.options.AgencyCounty);
 				SELF.customer_state := L.options.AgencyState;
 				SELF.customer_vertical_code := L.options.AgencyVerticalType;
 				SELF.client_uid := '';

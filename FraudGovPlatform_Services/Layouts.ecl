@@ -220,7 +220,7 @@ EXPORT Layouts := MODULE
 		STRING10 geo_lat;
 		STRING11 geo_long;
 		STRING20 date_added;
-		UNSIGNED4 file_type;
+		UNSIGNED3 file_type;
 		STRING10 deceitful_confidence;
 		STRING30 user_added;
 		STRING250 reason_description;

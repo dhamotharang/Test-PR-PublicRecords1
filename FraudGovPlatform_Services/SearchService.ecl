@@ -136,6 +136,9 @@ EXPORT SearchService() := MACRO
 	adlDIDFound := tmp.adlDIDFound;
 	ds_adl_in := tmp.ds_adl_in;
 	
+	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
+	// as search criteria and we couldn't resolve to a lexid from publicrecords
+	// but we found a SINGLE identity record in the contributory data
 	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND 
 							isMinimumForRINID AND ~adlDIDFound;
 

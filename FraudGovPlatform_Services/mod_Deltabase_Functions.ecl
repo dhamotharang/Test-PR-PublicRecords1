@@ -40,10 +40,10 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.IsRecentActivity := TRUE;
 				SELF.FileType := L.classification_Permissible_use_access.file_type;
 				SELF.GlobalCompanyId := (INTEGER)L.Customer_ID;
-				SELF.TransactionId := (STRING)L.Record_ID;
+				SELF.TransactionId := (STRING)L.transaction_id;
 				SELF.DeceitfulConfidenceId := (INTEGER)L.classification_Activity.Confidence_that_activity_was_deceitful_id;
 				SELF.HouseHoldId := L.Investigation_Referral_Case_ID;
-				SELF.CustomerPersonId := L.Customer_Person_ID;
+				SELF.CustomerPersonId := L.uid;
 				SELF.EventType1 := L.Event_Type_1;
 				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
 				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
@@ -54,7 +54,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
 				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
 				SELF.ActivityReason := L.Referral_reason;
-				SELF.UniqueId := (STRING)L.UID;
+				SELF.UniqueId := (STRING)L.did;
 				SELF.Name.Full := L.raw_Full_name;
 				SELF.Name.First := L.raw_first_name;
 				SELF.Name.Middle := L.raw_middle_name;
@@ -84,6 +84,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.BankInformation1.BankRoutingNumber := L.bank_routing_number_1;
 				SELF.IpAddress := L.ip_address;
 				SELF.DeviceId := L.device_id;
+				
+				//The new input format (FraudShared_Services.Layouts.Raw_Payload_rec) record
+				//stores the geo lat long information in one field with "," as the separator
 				SELF.GeoLocation.Latitude := regexfind('(.*),(.*)$',L.GPS_coordinates,1);
 				SELF.GeoLocation.Longitude := regexfind('(.*),(.*)$',L.GPS_coordinates,2);
 				SELF := [];
@@ -101,16 +104,19 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			//Transform into input format of FraudShared_Services.FilterThruMBS function
 			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(deltabase_recs L, 
 																																			mbs_delta_key R) := TRANSFORM
-				SELF.Record_ID := (INTEGER)L.cust_transaction_id;
+				// SELF.Record_ID := (INTEGER)L.cust_transaction_id;
+				SELF.transaction_id := (INTEGER)L.cust_transaction_id;
 				SELF.Customer_ID := L.gc_id;
 				SELF.Event_Date := L.date_added[1..4] + L.date_added[6..7] + L.date_added[9..10];
 				SELF.Investigation_Referral_Case_ID := L.case_id;
-				SELF.Customer_Person_ID := L.client_uid;
+				// SELF.Customer_Person_ID := L.client_uid;
+				SELF.uid := L.client_uid;
 				SELF.Type_of_Referral := L.inquiry_source;
 				SELF.Referral_Reason := L.reason_description;
 				SELF.SSN := L.SSN;
 				SELF.DOB := L.DOB;
-				SELF.UID := L.lex_id;
+				// SELF.UID := L.lex_id;
+				SELF.did := L.lex_id;
 				SELF.raw_Full_name := L.name_full;
 				SELF.raw_title := L.name_prefix;
 				SELF.raw_first_name := L.name_first;
