@@ -8,9 +8,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	SHARED Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 	SHARED File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;
 	
-	SHARED TodaysDate := STD.date.today();
-	SHARED YesterdayDate := STD.Date.AdjustDate(TodaysDate,0,0,-1);
-
 	// **************************************************************************************
 	// Getting the payload records from FraudGov Payload key.
 	// **************************************************************************************
@@ -75,17 +72,17 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	ds_combinedfreg_recs := IF(adlDIDFound, ds_batch_in, ds_batch_in + ds_elements_dids);
 
-	ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params);
+	ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params, TRUE);
 	
 	FraudGovPlatform_Services.Layouts.fragment_w_value_recs do_Rollup(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L, dataset(FraudGovPlatform_Services.Layouts.fragment_w_value_recs) R) := TRANSFORM
 		identity_recs := R(file_type = File_Type_Const.IdentityActivity);
 		knownrisk_recs := R(file_type = File_Type_Const.KnownFraud);
-		SELF.LastActivityDate := MAX(identity_recs[1].date);
-		SELF.LastKnownRiskDate := MAX(knownrisk_recs[1].date);
+		SELF.LastActivityDate := identity_recs[1].date;
+		SELF.LastKnownRiskDate := knownrisk_recs[1].date;
 		SELF := L;
 	END;	
 
-	ds_fragment_recs_sorted := SORT(ds_fragment_recs_w_value, fragment_value, fragment, file_type -date);
+	ds_fragment_recs_sorted := SORT(ds_fragment_recs_w_value, fragment_value, fragment, file_type, -date);
 	ds_fragment_recs_grouped := GROUP(ds_fragment_recs_sorted, fragment_value, fragment);
 	ds_fragment_recs_rolled := ROLLUP(ds_fragment_recs_grouped, GROUP, do_Rollup(LEFT, ROWS(LEFT)));
 
@@ -93,7 +90,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		ds_fragment_recs_sorted.fragment;
 		ds_fragment_recs_sorted.fragment_value;
 		unsigned2 NoOfTransactions := COUNT(GROUP, ds_fragment_recs_sorted.file_type = File_Type_Const.IdentityActivity);
-		unsigned2 NoOfRecentTransactions := COUNT(GROUP , ds_fragment_recs_sorted(ds_fragment_recs_sorted.file_type = File_Type_Const.IdentityActivity).date >= YesterdayDate);
+		unsigned2 NoOfRecentTransactions := COUNT(GROUP , ds_fragment_recs_sorted(ds_fragment_recs_sorted.file_type = File_Type_Const.IdentityActivity).date >= FraudGovPlatform_Services.Utilities.yesterday);
 		unsigned2 NoOfKnownRisks := COUNT(GROUP , ds_fragment_recs_sorted.file_type = File_Type_Const.KnownFraud); 
 	END;
 
@@ -222,14 +219,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 															LEFT.fragment = RIGHT.fragment,
 															ElementsNIdentities_trans(LEFT, RIGHT),
 														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-																		
-	EXPORT ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
-	
+
 	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
 	// output(adlDIDFound, named('adlDIDFound'));
-	 //output(ds_adl_in, named('ds_adl_in'));
+	// output(ds_adl_in, named('ds_adl_in'));
 	// output(ds_contributory_in, named('ds_contributory_in'));
 	// output(ds_contributory_in_dedup, named('ds_contributory_in_dedup'));
 	// output(ds_dids_to_use, named('ds_dids_to_use'));
@@ -242,7 +237,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
 	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
-	 //output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
+	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
+	
+	EXPORT ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
 END;

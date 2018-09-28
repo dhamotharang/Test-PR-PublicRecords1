@@ -4,7 +4,7 @@
 </message>
 */
 
-IMPORT BatchShare,FraudShared_Services,iesp,WSInput;
+IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -143,6 +143,9 @@ EXPORT ReportService() := MACRO
 																															Options.IsIdentityTestRequest, //This is not used as of now, left for future use.
 																															Options.IsElementTestRequest //This is not used as of now, left for future use.
 																															);
+																															
+	// Fail the Report service for API customer when record count is > 1. JIRA : GRP-2061
+	IF(count(ds_reportrecords.esdl_out) > 1 AND ~Options.IsOnline ,FAIL(203,doxie.ErrorCodes(203)));
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ds_reportrecords.esdl_out, results, iesp.fraudgovreport.t_FraudGovReportResponse);
