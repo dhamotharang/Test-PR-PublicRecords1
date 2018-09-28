@@ -27,5 +27,9 @@ END;
 
 dAlreadyDone:=project(ChangedDataSets,tAlreadyDone(Left));
 
-return dAlreadyDone(Updated=true);
+ConfigurationList:=dataset('~thor_data400::DeltaStats::AlertConfigurations',DOPSGrowthCheck.layouts.Configuration_Layout,thor,opt);
+
+SelectedConfigurations:=join(ConfigurationList,dAlreadyDone(Updated=true),left.packagename=right.packagename,transform(left));
+
+return SelectedConfigurations;
 end;
