@@ -80,7 +80,9 @@
 			EXPORT CUSTOMER_VERTICAL := 'CUSTOMER_VERTICAL';
 	END;
 
-  //Mapping the FDN file type field above to our usage of the field for FraudGov
+  // Mapping the FDN file type field above to our usage of the field for FraudGov
+	// file_type 2 is reserved for Applicable Public Records, not used for FraudGov.
+	// file_type 4 is reserved for Relationship Analytics, not used for FraudGov.
   EXPORT PayloadFileTypeEnum := ENUM(unsigned1,KnownFraud=1,IdentityActivity=3);
   
 	EXPORT Red_Flag_Alerts := MODULE
@@ -195,11 +197,17 @@
 	END;
 	
 	SHARED ClassificationActivity_Enum := ENUM(UNSIGNED2,
-			POTENTIAL = 1,
-			PROBABLE = 2,
+			PROBABLE = 1,
+			POTENTIAL = 2,
+			KNOWNGOOD = 3,
+			NEUTRAL = 4,
 			PROVEN = 5);
 			
-	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
+	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.PROBABLE, 
+																			 ClassificationActivity_Enum.POTENTIAL, 
+																			 ClassificationActivity_Enum.KNOWNGOOD, 
+																			 ClassificationActivity_Enum.NEUTRAL, 
+																			 ClassificationActivity_Enum.PROVEN];
 
 	EXPORT ServiceType := MODULE
 		EXPORT REPORT := 'FraudGovReport';

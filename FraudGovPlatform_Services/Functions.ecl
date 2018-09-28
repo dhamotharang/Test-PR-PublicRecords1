@@ -643,12 +643,13 @@ EXPORT Functions := MODULE
 	
 	EXPORT GetFragmentRecs (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_freg_recs_in,
 													DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
-													FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+													FraudGovPlatform_Services.IParam.BatchParams batch_params,
+													Boolean skip_autokey_ds_matching = FALSE) := FUNCTION
 
 		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 		File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;													
 	
-		ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload);
+		ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload, skip_autokey_ds_matching);
 
 		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
 																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
