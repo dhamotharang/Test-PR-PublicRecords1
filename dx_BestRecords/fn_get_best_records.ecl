@@ -1,4 +1,4 @@
-export fn_get_best_records(did_ds, did_field, perm_type) := functionmacro
+export fn_get_best_records(did_ds, did_field, permission_type) := functionmacro
 
 	import ut, watchdog, Infutor, doxie, dx_BestRecords;
 
@@ -25,23 +25,23 @@ export fn_get_best_records(did_ds, did_field, perm_type) := functionmacro
 	// select correct join based on the input flag
 	// NOTE: we expect a valid value of type dx_BestRecords.Constants.perm_type
 	local br_output := map(
-		perm_type = dx_BestRecords.Constants.perm_type.glb => out_glb, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonexperian => out_glb_nonexp, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonequifax => out_glb_noneq, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax => out_glb_nonexp_noneq, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonblank => out_glb_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonblank => out_glb_nonexp_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonequifax_nonblank => out_glb_noneq_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax_nonblank => out_glb_nonexp_noneq_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonutil => out_glb_nonutil, 
-		perm_type = dx_BestRecords.Constants.perm_type.glb_nonutil_nonblank => out_glb_nonutil_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.nonglb => out_nonglb, 
-		perm_type = dx_BestRecords.Constants.perm_type.nonglb_preglb => out_nonglb_preglb, 
-		perm_type = dx_BestRecords.Constants.perm_type.nonglb_nonblank => out_nonglb_nonblank, 
-		perm_type = dx_BestRecords.Constants.perm_type.nonglb_nonblank_preglb => out_nonglb_nonblank_preglb, 
-		perm_type = dx_BestRecords.Constants.perm_type.marketing => out_marketing, 
-		perm_type = dx_BestRecords.Constants.perm_type.marketing_preglb => out_marketing_preglb, 
-		perm_type = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr);
+		permission_type = dx_BestRecords.Constants.perm_type.glb => out_glb, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian => out_glb_nonexp, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonequifax => out_glb_noneq, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax => out_glb_nonexp_noneq, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonblank => out_glb_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonblank => out_glb_nonexp_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonequifax_nonblank => out_glb_noneq_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian_nonequifax_nonblank => out_glb_nonexp_noneq_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonutil => out_glb_nonutil, 
+		permission_type = dx_BestRecords.Constants.perm_type.glb_nonutil_nonblank => out_glb_nonutil_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.nonglb => out_nonglb, 
+		permission_type = dx_BestRecords.Constants.perm_type.nonglb_preglb => out_nonglb_preglb, 
+		permission_type = dx_BestRecords.Constants.perm_type.nonglb_nonblank => out_nonglb_nonblank, 
+		permission_type = dx_BestRecords.Constants.perm_type.nonglb_nonblank_preglb => out_nonglb_nonblank_preglb, 
+		permission_type = dx_BestRecords.Constants.perm_type.marketing => out_marketing, 
+		permission_type = dx_BestRecords.Constants.perm_type.marketing_preglb => out_marketing_preglb, 
+		permission_type = dx_BestRecords.Constants.perm_type.infutor => out_cnsmr);
 
 	return br_output;
 
