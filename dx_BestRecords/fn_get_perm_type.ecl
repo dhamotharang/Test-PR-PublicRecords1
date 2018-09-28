@@ -7,7 +7,7 @@ export Constants.perm_type fn_get_perm_type(boolean glb_flag = false, boolean no
 
 	ptype_val := 
 		IF(marketing_flag, 
-			IF(pre_glb_flag, Constants.perm_type.marketing_v2, Constants.perm_type.marketing),
+			IF(pre_glb_flag, Constants.perm_type.marketing_preglb, Constants.perm_type.marketing),
 			IF(cnsmr_flag, 
 				Constants.perm_type.infutor,
 				IF(nonblank_flag,
@@ -18,7 +18,7 @@ export Constants.perm_type fn_get_perm_type(boolean glb_flag = false, boolean no
 							filter_eq_flag => Constants.perm_type.glb_nonequifax_nonblank,		
 							Constants.perm_type.glb_nonblank),
 						IF(pre_glb_flag,
-							Constants.perm_type.nonglb_nonblank_v2,
+							Constants.perm_type.nonglb_nonblank_preglb,
 							Constants.perm_type.nonglb_nonblank)
 					),
 					IF(glb_flag,
@@ -28,7 +28,7 @@ export Constants.perm_type fn_get_perm_type(boolean glb_flag = false, boolean no
 							filter_eq_flag => Constants.perm_type.glb_nonequifax,
 							Constants.perm_type.glb),
 						IF(pre_glb_flag,
-							Constants.perm_type.nonglb_v2,
+							Constants.perm_type.nonglb_preglb,
 							Constants.perm_type.nonglb)
 					)
 		)));

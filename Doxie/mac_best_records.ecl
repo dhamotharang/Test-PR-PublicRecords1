@@ -12,7 +12,7 @@ export mac_best_records(
 												include_dod = false
 												) := macro
 
-IMPORT ut, watchdog, dx_BestRecords, doxie_files, Infutor, DeathV2_Services, AutoStandardI;
+IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI;
 #uniquename(deathparams)
 %deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 //If no minors_field value is set, use glb permission to determine if minors should be kept in record set.
