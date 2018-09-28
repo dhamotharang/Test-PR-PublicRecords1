@@ -1,4 +1,4 @@
-import bipv2,fieldstats,business_header,business_header_ss,did_add,didville,fair_isaac,ut,census_data,STRATA,address,header_slimsort,mdr,tools,PromoteSupers;
+﻿import bipv2,fieldstats,business_header,business_header_ss,did_add,didville,fair_isaac,ut,census_data,STRATA,address,header_slimsort,mdr,tools,PromoteSupers;
 
 export proc_build_base(string filedate) := function
 
@@ -222,7 +222,7 @@ export proc_build_base(string filedate) := function
   //Add the source_rec_id
   UT.MAC_Append_Rcid(final_update_ds, source_rec_id, full_file_recid);
 				
-  PromoteSupers.MAC_SF_BuildProcess(full_file_recid,'~thor_data400::base::fcc',out_base);
+  PromoteSupers.MAC_SF_BuildProcess(full_file_recid,'~thor_data400::base::fcc',out_base,pCompress:=true);
 
   return sequential(out_base);
 
