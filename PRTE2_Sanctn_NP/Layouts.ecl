@@ -1,133 +1,250 @@
-﻿import prte2_sanctn_np, prte_csv, bipv2, sanctn_mari;
+﻿import prte2_sanctn_np, prte_csv, bipv2, sanctn_mari, standard,aid;
 
 EXPORT Layouts := module
+//Raw Layouts		
+	export recIncident := record
+		STRING8 	BATCH;
+		STRING10 	BATCH_DATE;					// Date loaded to MIDEX. fmt MM/DD/YYYY
+		STRING1 	DBCODE;							// N=Non-public, F=FreddieMac
+		STRING8 	INCIDENT_NUM;				// Use to link to PARTYDATA
+		STRING10 	INCIDENT_DATE;							// fmt MM/DD/YY does not contain leading zeroes for month or day
+		INTEGER		INT_KEY;	
+		STRING5		srce_cd;	
+		STRING8 	BILLING_CODE;				// Feddie Mac only field
+		STRING20 	CASE_NUM;						// Feddie Mac only field
+		STRING70 	JURISDICTION;				// Feddie Mac only field
+		STRING70 	AGENCY;							// Feddie Mac only field
+		STRING70 	SOURCE_DOC;					// Feddie Mac only field
+		STRING17 	SOURCE_REF;					// Non-Public only field		
+		STRING70 	ADDITIONAL_INFO;		// Text field: Feddie Mac only field
+		STRING10 	MODIFIED_DATE;				// Last Modified Date, fmt MM/DD/YYYY
+		STRING10 	ENTRY_DATE;					// Date the incident was entered: Non-Public only field		
+		STRING45	MEMBER_NAME;				// Name of submitting institution; Non-Public only field
+		STRING45	SUBMITTER_NAME;			// Name of submitter; Non-Public only field	
+		STRING20	SUBMITTER_NICKNAME;
+		STRING10	SUBMITTER_PHONE;		// Non-Public only field	
+		STRING10	SUBMITTER_FAX;			// Non-Public only field
+		STRING80	SUBMITTER_EMAIL;		// Non-Public only field	
+		STRING100	PROP_ADDR;					// Address of the property the incident is referencing; Non-Public only field
+		STRING45	PROP_CITY;					// Non-Public only field
+		STRING2		PROP_STATE;					// Non-Public only field
+		STRING9		PROP_ZIP;						// Non-Public only field	
+		AID.Common.xAID AID 		:= 0;
+		UNSIGNED6		DID					:= 0; 
+		UNSIGNED6		DID_SCORE 	:= 0;
+		UNSIGNED6		BDID				:= 0;
+		UNSIGNED6		BDID_SCORE	:= 0;
+		BIPV2.IDlayouts.l_xlink_ids;  //Added for BIP project
+		unsigned8 source_rec_id := 0; //Added for BIP project		
+		Standard.Name;
+		string70    cname;
+		Standard.L_Address.detailed;	
+		UNSIGNED8 __internal_fpos__;
+		STRING8		LINK_DOB;
+		STRING9		LINK_SSN;
+		STRING9		LINK_FEIN;
+		STRING8		LINK_INC_DATE;
+		STRING10	CUST_NAME;
+		STRING10  BUG_NUM;
+end;
 
-	export rKeySanctn__key__sanctn__np__autokey__address	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__address;
-	END;
 
-	export rKeySanctn__key__sanctn__np__autokey__addressb2	:=
-	record
-	PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__addressb2;
-	END;
+export recParty := record
+		STRING8 	BATCH;
+		STRING1 	DBCODE;
+		STRING8 	INCIDENT_NUM;
+		STRING7 	PARTY_NUM;								// Originator designated by NUMBER=0
+		STRING 		SANCTIONS;								// Feddie Mac Only
+		STRING 		ADDITIONAL_INFO;					// Text field: Feddie Mac only
+		STRING150 PARTY_FIRM;
+		STRING10 	TIN;
+		STRING50 	NAME_FIRST;
+		STRING50 	NAME_LAST;
+		STRING50 	NAME_MIDDLE;
+		STRING10 	SUFFIX;
+		string20	NICKNAME;
+		STRING45 	PARTY_POSITION;
+		STRING150 PARTY_EMPLOYER;
+		STRING11 	SSN;
+		STRING10 	DOB;
+		STRING45 	ADDRESS;
+		STRING30 	CITY;
+		STRING2 	STATE;
+		STRING10 	ZIP;
+		STRING		PARTY_TYPE;
+		INTEGER 	PARTY_KEY;					 					// Link to PROFESSIONCODE,LICENSECODE
+		INTEGER 	INT_KEY;	
+		STRING20	PHONE;								// new field
+		STRING500 AKANAME;							// new field
+		STRING500	DBANAME;							// new field
+		unsigned8	AID;
+		unsigned6	did;
+		unsigned3 did_score;
+		unsigned6 bdid;
+		unsigned3 bdid_score;
+		STRING1		enh_did_src:='';			//Ehanced did source; M for Mari, S for SANCTN, N for SANCTN Non-public
+		bipv2.IDlayouts.l_xlink_ids;		//Added for BIP project
+		unsigned8 source_rec_id := 0;
+	//clean fields
+		Standard.Name;
+		string150		 ename;
+		string150    cname;
+		Standard.L_Address.detailed;
+		UNSIGNED8 __internal_fpos__;
+		STRING8		LINK_DOB;
+		STRING9		LINK_SSN; 
+		STRING9		LINK_FEIN;
+		STRING8		LINK_INC_DATE;
+		STRING10	CUST_NAME;
+		STRING10  BUG_NUM;
+		STRING10	REQ;
+end;
 
-	export rKeySanctn__key__sanctn__np__autokey__citystname	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__citystname;
-	END;
 
-	export rKeySanctn__key__sanctn__np__autokey__citystnameb2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__citystnameb2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__fein2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__fein2;
-	END;
-
-	rKeySanctn__key__sanctn__np__autokey__name	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__name;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__nameb2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__nameb2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__namewords2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__namewords2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__payload	:=
-	record
-	PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__payload;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__phone2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__phone2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__phoneb2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__phoneb2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__ssn2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__ssn2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__stname	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__stname;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__stnameb2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__stnameb2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__zip	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__zip;
-	END;
-
-	export rKeySanctn__key__sanctn__np__autokey__zipb2	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__autokey__zipb2;
-	END;
-
-	export rKeySanctn__key__sanctn__np__bdid	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__bdid;
-	END;
-
-	export rKeySanctn__key__sanctn__np__did	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__did;
-	END;
-
-	// export rKeySanctn__key__sanctn__np__incident	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__incident;
-	// END;
-
+export recCode := record
+		SANCTN_MARI.layouts_SANCTN_common.Midex_cd; 
+		UNSIGNED8 __internal_fpos__;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+/*		
+		STRING8 	BATCH;
+		STRING1 	DBCODE;
+		INTEGER 	PRIMARY_KEY;										
+		INTEGER 	FOREIGN_KEY;								// Party PK or IntPK link to INTERNALCODE; also can use INCIDENT_NUMER + NUMBER
+		INTEGER 	INCIDENT_NO;				// Link to INCIDENTDATA
+		STRING7 	NUMBER;
+		STRING20 	FIELDNAME;					// LICENSECODE, INTERNALCODE, PROFESSIONCODE
+		STRING20 	CODETYPE;						// LICENSECODE(license type), INTERNALCODE(verification or incident; do not display), PROFESSIONCODE(blank)
+		STRING20 	CODEVALUE;					// LICENSECODE(license_number), INTERNALCODE('verfication','incident'),PROFESSIONCODE(profession ocde) 
+		STRING10 	CODESTATE;					// LICENSECODE(license state)
+		STRING500 OTHERDESC;					// PROFESSIONCODE(addl information for CODEVALUE), INTERNALCODE(addl info for Verification/Incident code)
+		STRING		STD_TYPE_DESC;
+		STRING		CLN_LICENSE_NUMBER;
+*/		
 		
-	// export rKeySanctn__key__sanctn__np__incidentcode	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__incidentcode;
-	//	END;
-	
-	export IncidentCode_Base := record
-			sanctn_mari.layouts_SANCTN_common.Midex_cd;
-	end;		
+end;
 
-	export Incident_Base := record
-		sanctn_mari.layouts_SANCTN_common.SANCTN_incident_base;
-	end;	
+export recIncidentText := record
+		SANCTN_MARI.layouts_SANCTN_common.SANCTN_incident_text;
+		UNSIGNED8 __internal_fpos__;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+/*		
+		STRING8 	BATCH;
+		STRING1 	DBCODE;
+		INTEGER 	INCIDENT_NO;			// Link to INCIDENTDATA
+		STRING3  	SEQ;							// Order to display the text of this FIELDNAME
+		STRING20 	FIELDNAME;				// INCIDENT_TEXT, OTHERINFO, INCIDENT_RESPONSE
+		STRING 		TXT;							//There will be a tilde(~) at the end of the paragrapj if there was a CR in the text
+*/	
+end;
+
+export recPartyText := record
+		SANCTN_MARI.layouts_SANCTN_common.SANCTN_party_text;
+		UNSIGNED8 __internal_fpos__;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+		
+end;
+
+
+export recPartyAkaDba := record
+		SANCTN_MARI.layouts_SANCTN_common.PARTY_AKA_DBA;
+		UNSIGNED8 __internal_fpos__;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+end;
+
+
+
+//Base Layouts
+	export incident_base := record
+		SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_bip;
+		STRING10	CUST_NAME;
+		STRING10  BUG_NUM;
+		STRING8		LINK_DOB;
+		STRING9		LINK_SSN;
+		STRING9		LINK_FEIN;
+		STRING8		LINK_INC_DATE;
+	end;
 	
-	// export rKeySanctn__key__sanctn__np__incidenttext	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__incidenttext;
-	// END;
+	export incidentcode_base := record
+		SANCTN_Mari.layouts_SANCTN_common.Midex_cd;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+	end;	
+		
+	export incidenttext_base := record
+		SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_text;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+		end;	
+		
+	export party_base := record
+		SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_bip;
+		STRING8		LINK_DOB;
+		STRING9		LINK_SSN;
+		STRING9		LINK_FEIN;
+		STRING8		LINK_INC_DATE;
+		STRING10	CUST_NAME;
+		STRING10  BUG_NUM;
+		STRING10	REQ;
+	end;	
+		
+	export partytext_base := record
+		SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_text;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+	end;
+	
+	export party_aka_dba_base := record
+		SANCTN_Mari.layouts_SANCTN_common.party_aka_dba;
+		STRING10 	CUST_NAME;
+		STRING10	BUG_NUM;
+	end;
+		
+
+
+// Key Layouts
+// BDID KEY
+	export bdid_key		:= record
+		UNSIGNED6  	BDID;
+		STRING8 		BATCH;
+		string8 	incident_num;
+		STRING7 		PARTY_NUM;		
+	end;
+
+// DID KEY																																			
+	export did_key := record
+		UNSIGNED6  DID;	
+		STRING8 	BATCH;
+		string8 	incident_num;
+		STRING7 	PARTY_NUM;		
+		
+	end;
+
+	export incident_key			:= sanctn_mari.layouts_SANCTN_common.SANCTN_incident_base;
+	
+	export layout_Midex_cd	:= sanctn_mari.layouts_SANCTN_common.Midex_cd;
 	
 	export IncidentText_Key := record, MAXLENGTH(9000)
 		sanctn_mari.layouts_SANCTN_common.SANCTN_incident_text;
 	end;
 		
 
-	// export rKeySanctn__key__sanctn__np__license_midex	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__license_midex;
-	// END;
+// License NBR Key
+	export License_Key := record
+		STRING8  BATCH;
+		string8 	incident_num;
+		STRING7  PARTY_NUM;
+		string20 LICENSE_NBR;
+		STRING2  LICENSE_STATE;
+		STRING80 LICENSE_TYPE;
+		string20 CLN_LICENSE_NUMBER;
+end;
 
 
-// Licnese MIDEX Key
+// License MIDEX Key
 	export License_Midex_Key := record
 		STRING8		BATCH;
 		STRING1	 	DBCODE;
@@ -142,61 +259,21 @@ EXPORT Layouts := module
 		STRING20	CLN_LICENSE_NUMBER;
 		STRING26 	MIDEX_RPT_NBR;
 end;
+
 	
-	export Party_Midex_Key := record
-		SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_srch;
-		string26 midex_rpt_nbr;
-		BIPV2.IDlayouts.l_xlink_ids;
-	end;
-
-
-	// export rKeySanctn__key__sanctn__np__license_nbr	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__license_nbr;
-	// END;
-// License NBR Key
-	export License_Key := record
-		files.sample_incidentcode.BATCH;
-		files.sample_incidentcode.INCIDENT_NUM;
-		STRING7 	PARTY_NUM;
-		STRING20 LICENSE_NBR;
-		STRING2  LICENSE_STATE;
-		STRING80 LICENSE_TYPE;
-		files.sample_incidentcode.CLN_LICENSE_NUMBER;
-end;
-
-
-
-	// export rKeySanctn__key__sanctn__np__midex_rpt_nbr	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__midex_rpt_nbr_new;
-		
-	// END;
-	
-	
-	// export rKeySanctn__key__sanctn__np__nmls_id	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__nmls_id;
-	// END;
-
-	// NMLS ID Key
+// NMLS ID Key
 	export NMLS_ID_key := record
-		files.sample_incidentcode.BATCH;
-		files.sample_incidentcode.INCIDENT_NUM;
+		STRING8  BATCH;
+		string8 	incident_num;
 		STRING7 	PARTY_NUM;
 		STRING2  	LICENSE_STATE;
 		STRING80 	LICENSE_TYPE;
 		STRING20 	NMLS_ID;
 		STRING26 	MIDEX_RPT_NBR;
 	end;
-	
-	
-	// export rKeySanctn__key__sanctn__np__nmls_midex	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__nmls_midex;
-	// END;
-	
-	// NMLS MIDEX Key
+
+
+// NMLS MIDEX Key
 	export NMLS_MIDEX_Key := record
 		STRING8		BATCH;
 		STRING1	 	DBCODE;
@@ -210,68 +287,94 @@ end;
 		STRING80  STD_TYPE_DESC;   	
 		STRING20	NMLS_ID;
 		STRING26 	MIDEX_RPT_NBR;
-end;
+end;	
 
-	// export rKeySanctn__key__sanctn__np__party	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__party;
-	// END;
+//Party Key
 	export Party_Key := record
 			SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_base - enh_did_src;
 	end;		
+
+
+// PaRTY AKE Key
+	export PARTY_AKA_DBA_Key := record
+  SANCTN_Mari.layouts_SANCTN_common.party_aka_dba AND NOT [FIRST_NAME,MIDDLE_NAME,LAST_NAME,PARTY_KEY];
+	end;
+
 	
-	export rKeySanctn__key__sanctn__np__partytext	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__partytext;
+// Party Midex Key	
+	export Party_Midex_Key := record
+		SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_srch;
+		string26 midex_rpt_nbr;
+		BIPV2.IDlayouts.l_xlink_ids;
+	end;
+
+
+// Party Text Key
+	export PartyText_key	:= 	record
+		SANCTN_MARI.layouts_SANCTN_common.SANCTN_party_text;
 	END;
 
-	// export rKeySanctn__key__sanctn__np__ssn4	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__ssn4;
-	// END;
-	
+
+// SSN4 Key
 	export SSN4_key := record
 		STRING4 ssn4;
 		STRING8 batch;
 		STRING8 incident_num;
 		STRING7 party_num;
-		// UNSIGNED8 __internal_fpos__;
 	end;
 
-	// export rKeySanctn__key__sanctn__np__tin	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__tin;
-	// END;
-	
+// TIN Key	
 	export TIN_Key := record
-		files.sample_party.TIN;
-		files.sample_party.BATCH;
-		files.sample_party.INCIDENT_NUM;
-		files.sample_party.PARTY_NUM;
+		STRING10 TIN;
+		STRING8 BATCH;
+		STRING8 INCIDENT_NUM;
+		STRING7 PARTY_NUM;
 	end;
 
 
+// Creating Search File needed for creating AUTOKEYS
+export autokeys := record
+    unsigned6 did;
+		unsigned6 bdid;
+		unsigned6 aid;
+		unsigned4 lookups;
+		STRING10 	BATCH;
+		STRING8 	INCIDENT_NUM;
+		STRING7		PARTY_NUM;
+		STRING50	NAME_FIRST;
+		STRING50	NAME_LAST;
+		STRING50	NAME_MIDDLE;
+		STRING10	SUFFIX;
+		STRING150	PARTY_FIRM;
+		STRING45	ADDRESS;
+		STRING45	CITY;
+		STRING2		STATE;
+		STRING9		ZIP;
+		standard.addr addr;
+		standard.name name;
+    string100 company;
+		string8   DOB;
+		string10  PHONE;
+		string9   SSN_TIN;
+		string11	SSN;
+		string10	TIN;
+		string5   SRCE_CD;
+		STRING1		DBCODE;
+		unsigned1 zero := 0;
+		string1   blank:='';
+end;
 
-	// export rKeySanctn__key__sanctn__np__party_aka_dba	:=
-	// record
-		// PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__party_aka_dba;
-	// END;
+	export autokeys2 := record
+		SANCTN_Mari.layouts_SANCTN_common.party_aka_dba;
+		string5		title;
+		string20 	fname;
+		string20 	mname;
+		string20 	lname;
+		string5  	name_suffix;
+		string3  	name_score;
+		string100 cname;
+end;
 	
-	// PaRTY AKE Key
-	export PARTY_AKA_DBA_Key := record
-  SANCTN_Mari.layouts_SANCTN_common.party_aka_dba AND NOT [FIRST_NAME,MIDDLE_NAME,LAST_NAME,PARTY_KEY];
-	end;
-
-
-	export rKeySanctn__key__sanctn__np__linkids_incident	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__linkids_incident;
-	END;
-
-
-	export rKeySanctn__key__sanctn__np__linkids_party	:=
-	record
-		PRTE_CSV.Sanctn_NP.rthor_data400__key__sanctn__np__linkids_party;
-	END;
-
+	
+	
 end;
