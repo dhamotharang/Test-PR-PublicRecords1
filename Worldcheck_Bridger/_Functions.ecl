@@ -1184,6 +1184,7 @@
 				trim(kword, left, right) = 'AIIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_AIIB,
 				trim(kword, left, right) = 'FRCNIL' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRCNIL,
 				trim(kword, left, right) = 'PECG' =>SubGroup_Constants.numKeywordsID.KEYWORD_PECG,
+				trim(kword, left, right) = 'INFIU' =>SubGroup_Constants.numKeywordsID.KEYWORD_INFIU,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
