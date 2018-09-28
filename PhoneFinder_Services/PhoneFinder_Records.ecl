@@ -107,11 +107,9 @@ MODULE
       																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
       																												,dZum_final);	
 
- inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR inMod.IncludeEquifax OR
-                     inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR inMod.NameAddressValidation OR 
-                     inMod.NameAddressInfo OR inMod.AccountInfo OR 
-                     inMod.CallHandlingInfo OR inMod.DeviceInfo OR inMod.DeviceChangeInfo OR 
-                     inMod.DeviceHistory OR inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing;
+ inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR 
+                     inMod.IncludeEquifax OR inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR 
+                     inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.InputZumigoOptions;
                   
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
