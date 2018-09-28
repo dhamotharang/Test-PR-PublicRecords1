@@ -1,6 +1,6 @@
-﻿emailimport entiera, emailservice, mdr, _validate;
+﻿import entiera, emailservice, mdr, _validate;
 export Map_Entiera_As_Email(version) := function
-with_email := entiera.File_Entiera_Base(length(trim(orig_email,left, right)) > 4 and StringLib.StringFindCount(orig_email,  '@') > 0 and current_rec = TRUE);
+with_email := entiera.File_Entiera_Base(length(trim(orig_email,left, right)) > 4 and StringLib.StringFindCount(orig_email,  '@') > 0);
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,orig_email);
@@ -11,7 +11,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.rec_src_all      						:= translation_codes.source_bitmap_code(mdr.sourceTools.src_entiera);
 	self.email_src_all    						:= translation_codes.source_bitmap_code(mdr.sourceTools.src_entiera);
 	self.email_src_num 								:= 1;
-	self.current_rec      						:= input.current_rec;
+	self.current_rec      						:= true;
 	self.activecode       						:= '';
   self.orig_login_date  							:= if(input.ln_login_date <> '', input.ln_login_date, _validate.date.fCorrectedDateString(StringLib.StringFindReplace(input.orig_login_date, '-', '')[..8]));
 	self.orig_email										:= stringlib.stringtouppercase(input.orig_email);
