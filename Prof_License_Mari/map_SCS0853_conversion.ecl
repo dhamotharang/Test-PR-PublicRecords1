@@ -13,7 +13,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
-	CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE |^.* LLC)';
+	CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE .*|^.*ASSESSOR|ENTERPRISE*|^.* LLC)';
 	C_O_Ind    := '(C/O |C/O:|ATTN:|ATTN: |ATTN|ATTENTION:|ATT:|CO/)';
 	AddressSet := '(SUITE|DRIVE| DR$| ROAD| RD$|BLVD| STREET$| ST$|APT |APT.| AVE | AVE$| AVENUE| COURT| LANE| PLACE | PLACE$| SUITE| PL$| PL.| WAY$| TER$|' +
                 'CIRCLE$| ISLE | PARKWAY| PIKE|PO BOX|LN$| NW$| NE$| CT$| CT.| DR.|CENTURY 21| HIGHWAY| NW$)';
@@ -31,8 +31,9 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(ClnUnprintable);
 	
 	//Filtering out BAD RECORDS
-	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+SLNUM+LAST_NAME+FULL_NAME) != '');
-	GoodNameRec							:= NonBlankName(OFFICENAME<>'NAME' AND NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
+	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+LAST_NAME+FULL_NAME) != '');
+	GoodNameRec							:= NonBlankName(ut.CleanSpacesAndUpper(OFFICENAME)<>'NAME' AND ut.CleanSpacesAndUpper(FULL_NAME)<>'NAME' AND 
+	                                        NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
 	
 	//Real Estate License to common MARIBASE layout
 	Prof_License_Mari.layouts.base			xformToCommon(GoodNameRec pInput) := TRANSFORM
