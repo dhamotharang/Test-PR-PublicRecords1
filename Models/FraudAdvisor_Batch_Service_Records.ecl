@@ -199,7 +199,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
     skiptrace_call := riskwise.skip_trace(skiptrace_Prep, args.DPPA, args.GLB, args.DataRestriction, '', args.DataPermission);
     								
     easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
-                        keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN ['msn1803_1','rsn804_1','msnrsn_1'],
+                        keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN Models.FraudAdvisor_Constants.Paro_models,
                         transform(easi.layout_census, 
                               self.state:= left.st,
                               self.county:=left.county,
@@ -217,9 +217,10 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 
 		red_flags_ret := if(args.RedFlag_version<>0, risk_indicators.Red_Flags_Function(iid), dataset([], combined_layouts));
 
+    model_indicator := IF(doParo, Models.FraudAdvisor_Constants.attrvparo, model_name);
 
 		attr := if(doVersion1 or doVersion2 or doParo,
-			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_name),
+			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator),
 			project(group(clam), transform(Models.Layout_FraudAttributes, self.input.seq:=left.seq, self := []) )
 		);
 

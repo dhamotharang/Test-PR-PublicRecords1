@@ -1858,10 +1858,21 @@ self := left), keep(1), left outer);
 // output(with_MSN610_0_0, named('with_MSN610_0_0'));
 
 
+MSN1803_1_0_score := Models.MSN1803_1_0(UNGROUP(clam));
+// output(MSN610_0_0_score, named('MSN610_0_0_score'));
+    
+with_MSN1803_1_0	:= join(with_MSN610_0_0, MSN1803_1_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.MSN1803_1_0_score := right.score;
+self := left), keep(1), left outer);
+// output(with_MSN1803_1_0, named('with_MSN1803_1_0'));
+
+
 MV361006_0_0_score := Models.MV361006_0_0(UNGROUP(clam));
 // output(MV361006_0_0_score, named('MV361006_0_0_score'));
     
-with_MV361006_0_0	:= join(with_MSN610_0_0, MV361006_0_0_score,
+with_MV361006_0_0	:= join(with_MSN1803_1_0, MV361006_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.MV361006_0_0_score := right.score;
@@ -4803,6 +4814,8 @@ self.MSN1106_0_0_reason4	:= if(model_environment in [1,3], left.MSN1106_0_0_reas
 self.MSN605_1_0_score	:= if(model_environment in [1,3], left.MSN605_1_0_score	, '');
 
 self.MSN610_0_0_score	:= if(model_environment in [1,3], left.MSN610_0_0_score	, '');
+
+self.MSN1803_1_0_score	:= if(model_environment in [1,3], left.MSN1803_1_0_score	, '');
 
 self.MV361006_0_0_score	:= if(model_environment in [1,2], left.MV361006_0_0_score	, 0);
 

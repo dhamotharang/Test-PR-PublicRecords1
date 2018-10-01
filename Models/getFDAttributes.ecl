@@ -4,7 +4,7 @@ export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
 	grouped DATASET(Risk_Indicators.Layout_Output) iid,
 	string30 account_value,
 	dataset(riskwise.Layout_IP2O) ips,
-	string model_name='',
+	string model_name='', //we are passing in attribute group name if paro attributes are requested instead of model name
 	boolean suppressCompromisedDLs=false,
   unsigned1 DPPA=0, unsigned1 GLB=0,
   string DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
@@ -963,7 +963,7 @@ Models.Layout_FraudAttributes intoParoAttrs(wIPs le, skiptrace_call rt) := TRANS
   self.ParoAttributes.paro_banslast          := rt.banslast;
   self.ParoAttributes.paro_banscnty          := rt.banscnty;
   self.ParoAttributes.paro_bansecoaflag      := rt.bansecoaflag;
-  self.ParoAttributes.paro_decsflag          := rt.decsflag;
+  self.ParoAttributes.paro_decsflag          := IF(rt.decsflag='0', '', rt.decsflag);
   self.ParoAttributes.paro_decsdob           := rt.decsdob;
   self.ParoAttributes.paro_decszip           := rt.decszip;
   self.ParoAttributes.paro_decszip2          := rt.decszip2;
@@ -983,7 +983,7 @@ Models.Layout_FraudAttributes intoParoAttrs(wIPs le, skiptrace_call rt) := TRANS
                                                   dwelltype(clean_input_addr[139]));
   self.ParoAttributes.paro_inputsocscharflag := le.ssn_verification.validation.inputsocscharflag;
   self.ParoAttributes.paro_correctsocs       := le.iid.correctssn;
-  self.ParoAttributes.paro_phonestatusflag   := (String)le.iid_out.chronoaddrscore;
+  self.ParoAttributes.paro_phonestatusflag   := IF(le.iid_out.chronoaddrscore = 0, '', (String)le.iid_out.chronoaddrscore);
   self.ParoAttributes.paro_phone             := le.iid_out.chronophone;
   self.ParoAttributes.paro_altareacode       := le.iid_out.altareacode;
   self.ParoAttributes.paro_splitdate         := le.iid_out.areacodesplitdate;
@@ -1027,10 +1027,7 @@ ParoAttrs := JOIN(ParoAttrsTemp, wHouseHold,
                   get_estincome(LEFT, RIGHT),
                   ATMOST(RiskWise.max_atmost));
 
-//The way this is structured, Paro will never be able to request other versions of attributes
-//and no one else can request Paro attributes.
-AttrVersion := IF(model_name IN ['msn1803_1','rsn804_1','msnrsn_1'], ParoAttrs, Version1Temp);
-
+AttrVersion := IF(model_name = Models.FraudAdvisor_Constants.attrvparo, ParoAttrs, Version1Temp);
 
 Layout_WorkingCombo := RECORD
 	Models.Layout_FraudAttributes;
