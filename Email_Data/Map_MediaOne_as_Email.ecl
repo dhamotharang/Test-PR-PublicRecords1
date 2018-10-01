@@ -1,7 +1,7 @@
 ﻿import MediaOne, address, ut,emailservice, mdr, _validate, Entiera;
 export Map_MediaOne_as_Email(version) := function
 //************Acquireweb is under develoment.  AID and other fields will be mapped when available
-with_email := MediaOne.file_base.file(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 and current_rec = TRUE);
+with_email := MediaOne.file_base.file(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0);
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,email);
@@ -12,7 +12,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.rec_src_all      					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_MediaOne);
 	self.email_src_all    					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_MediaOne);
 	self.email_src_num 							:= 1;
-	self.current_rec      					:= input.current_rec;
+	self.current_rec      					:= true;
 	self.activecode     							:= '';
 	self.did_type         					:= '';
 	self.orig_pmghousehold_id  			:= '';
