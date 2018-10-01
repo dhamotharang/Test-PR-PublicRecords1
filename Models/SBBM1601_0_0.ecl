@@ -977,27 +977,14 @@ EXPORT SBBM1601_0_0 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, 
 	 *             Model Input Variable Assignments              *
 	 ************************************************************* */
 			MaxSASLength := 1000; // Max length for the list fields to be imported into SAS (Technically SAS can handle up to 32,767 - but modeling only wants 1,000 to help with speed of imports)
-		// The following function takes a comma-delimited string of any length, and a numeric
-		// length to truncate the string to. Since the resulting string will often have an 
-		// incomplete value at the end, the function trims it off, leaving complete values only.
-		truncate_list(STRING str, UNSIGNED len) :=
-			FUNCTION
-				delimiter := ',';		
-				rec_word  := {STRING word};
-				string_as_dataset := DATASET( [{str}], {STRING text} );
-				norm_lettrs    := NORMALIZE( string_as_dataset, len + 1, TRANSFORM( rec_word, SELF.word := LEFT.text[COUNTER] ) );		
-				words_rolled   := ROLLUP( norm_lettrs, RIGHT.word != delimiter, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) );
-				no_partials    := CHOOSEN( words_rolled, COUNT(words_rolled)-1 );
-				str_trunc_list := ROLLUP( no_partials, TRUE, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) )[1].word;
-				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
-			END;
+		
 			
-  ver_src_list                     := truncate_list(le.Verification.sourcelist, MaxSASLength);
+  ver_src_list                     := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelist, MaxSASLength);
 	history_date                     := le.Input_Echo.historydate;
 	history_datetime                 := le.Input_Echo.historydatetime;
-	ver_src_id_firstseen_list        := truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
-	ver_src_id_list                  := truncate_list(le.Verification.sourcelistID, MaxSASLength);
-	ver_src_id_lastseen_list         := truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
+	ver_src_id_firstseen_list        := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
+	ver_src_id_list                  := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelistID, MaxSASLength);
+	ver_src_id_lastseen_list         := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
 	ver_src_id_count                 := le.Verification.SourceCountID;
 	id_seleid                        := le.Verification.inputidmatchseleid;
 	sbfe_acct_cnt                    := le.SBFE.SBFEAccountCount;

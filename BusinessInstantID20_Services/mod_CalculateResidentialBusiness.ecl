@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP, Models, STD;
+﻿IMPORT Business_Risk_BIP, Models, STD;
 
 EXPORT mod_CalculateResidentialBusiness( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE ) :=
 	MODULE
@@ -7,24 +7,11 @@ EXPORT mod_CalculateResidentialBusiness( Business_Risk_BIP.Layouts.Shell le, BOO
 		// up to 32,767 - but modeling only wants 1,000 to help with speed of imports).
 		SHARED MaxSASLength := 1000; 
 		
-		// The following function takes a comma-delimited string of any length, and a numeric
-		// length to truncate the string to. Since the resulting string will often have an 
-		// incomplete value at the end, the function trims it off, leaving complete values only.
-		SHARED truncate_list(STRING str, UNSIGNED len) :=
-			FUNCTION
-				delimiter := ',';		
-				rec_word  := {STRING word};
-				string_as_dataset := DATASET( [{str}], {STRING text} );
-				norm_lettrs    := NORMALIZE( string_as_dataset, len + 1, TRANSFORM( rec_word, SELF.word := LEFT.text[COUNTER] ) );		
-				words_rolled   := ROLLUP( norm_lettrs, RIGHT.word != delimiter, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) );
-				no_partials    := CHOOSEN( words_rolled, COUNT(words_rolled)-1 );
-				str_trunc_list := ROLLUP( no_partials, TRUE, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) )[1].word;
-				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
-			END;
+		
 			
 
 		// Fields from Business Shell 2.2 with SBFE
-		SHARED ver_src_list            := truncate_list( STD.Str.ToUpperCase(le.Verification.sourcelist), MaxSASLength );
+		SHARED ver_src_list            := Business_Risk_BIP.Common.truncate_list( STD.Str.ToUpperCase(le.Verification.sourcelist), MaxSASLength );
 		SHARED addr_input_type_advo    := le.Input_Characteristics.InputAddrType;
 		SHARED cons_record_match_addr  := le.Business_To_Person_Link.BusFEINPersonAddrOverlap;
 		SHARED tin_match_cons_name     := le.Verification.FEINPersonNameMatch;
