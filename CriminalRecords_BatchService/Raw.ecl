@@ -289,10 +289,10 @@ EXPORT Raw := MODULE
 		recs_grp  := GROUP(DEDUP(SORT(recs
 															,acctno, did,offender_key,-off_date,-arr_date,case_num,
 															off_desc_1, arr_disp_desc_1,
-															process_date)
+                              process_date)
 												 ,acctno, did,offender_key,off_date,arr_date,case_num,
 												 off_desc_1, arr_disp_desc_1,
-												 process_date)
+                         process_date)
 										,acctno, did,offender_key);
 											
 		recs_final :=  ROLLUP(recs_grp,group,CriminalRecords_BatchService.Transforms.makeOutputOffenses(LEFT,ROWS(LEFT)));		
@@ -356,11 +356,11 @@ EXPORT Raw := MODULE
 		
 		recs_grp := GROUP(DEDUP(SORT(recs,
 																 acctno, did, offender_key, -off_date, -arr_date, court_case_number, 
-																 court_off_desc_1, arr_off_desc_1,
-																 process_date),
+																 court_off_desc_1, arr_off_desc_1,sent_jail,court_disp_desc_1,
+																 court_statute, process_date),
 													 acctno, did, offender_key, off_date, arr_date, court_case_number, 
-													 court_off_desc_1, arr_off_desc_1,
-													 process_date),
+													 court_off_desc_1, arr_off_desc_1,sent_jail,court_disp_desc_1,
+													 court_statute, process_date),
 										 acctno, //this is currently missing, but shouldn't it be here???
 										 // see similar coding above in getOffensesRecords GROUP(DEDUP(SORT(...
 										 // plus acctno was the first field in the dedup & sort portions???
