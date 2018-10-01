@@ -761,6 +761,8 @@ String3 MSN605_1_0_score := '';
 
 String3 MSN610_0_0_score := '';
 
+String3 MSN1803_1_0_score := '';
+
 Real MV361006_0_0_score := 0;
 
 Real MV361006_1_0_score := 0;
