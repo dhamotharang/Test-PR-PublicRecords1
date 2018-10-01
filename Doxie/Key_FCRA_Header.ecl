@@ -1,8 +1,8 @@
 import mdr,ut,header,_control,data_services,strata;
 
-rm_score1 := doxie.FCRA_header_pre_keybuild;
+rm_score0 := doxie.FCRA_header_pre_keybuild;
 
-// ut.MAC_CLEAR_FIELDS(rm_score0,rm_score1,'death_code');
+ut.MAC_CLEAR_FIELDS(rm_score0,rm_score1,'death_code');
 
 report_blanks := output(strata.macf_pops(rm_score1,,,,,,FALSE,['death_code']),named('verify_fcra_suppression_key_data'));
 

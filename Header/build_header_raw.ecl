@@ -81,8 +81,8 @@ updateLatest := sequential(
                                             if(incremental,basenamei, basename)+'_'+filedate));
                                             
 return sequential( 
-                   // Header.fn_blanked_pii(filedate)
-				  if(incremental,incremental_,full_)
+                   Header.fn_blanked_pii(filedate)
+				  ,if(incremental,incremental_,full_)
 				  ,updateLatest);
 
 end;
