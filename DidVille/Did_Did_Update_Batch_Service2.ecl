@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="DID_Did_Update_Batch_Service">
   <part name="did_batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
@@ -63,6 +63,7 @@ ba_format := record
 	string10	prim_range := '';
 	string8		sec_range := '';
 	string5		z5 := '';  
+	string4  zip4 := '';
 	string10 best_phone := '';
 	string9  best_ssn := '';
 	string9  max_ssn := '';
