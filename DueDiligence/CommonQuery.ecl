@@ -112,7 +112,7 @@ EXPORT CommonQuery := MODULE
         STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
 				
         //since the initial version can be defaulted, default options for person and business reports only; attributes need to be requested
-        defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)),
+        defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)),
                               serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                               serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
                               DueDiligence.Constants.EMPTY);
