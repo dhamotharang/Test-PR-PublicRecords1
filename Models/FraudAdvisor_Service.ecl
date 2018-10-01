@@ -641,7 +641,7 @@ clam_BtSt :=
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
     /* This is for ROUND 2 Validation ONLY */
- 	  ModelValidationResults := Models.FP1710_1_0(ungroup(clam), 6);
+ 	  ModelValidationResults := Models.FP1803_1_0(ungroup(clam), 6);
  	  OUTPUT(ModelValidationResults, named('Results'));
     
 #ELSE
@@ -2070,6 +2070,7 @@ ret_fraudpoint3 := case( model_name,
   'fp1801_1' => Models.FP1801_1_0( ungroup(clam), 6),
   'fp1806_1' => Models.FP1806_1_0( ungroup(clam), 6),
 	'fp1710_1' => Models.FP1710_1_0( ungroup(clam), 6),
+	'fp1803_1' => Models.FP1803_1_0( ungroup(clam), 6),
 	dataset( [], Models.Layouts.layout_fp1109 )
 );
 
