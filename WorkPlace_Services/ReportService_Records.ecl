@@ -1,4 +1,4 @@
-﻿import BatchServices,DCA,doxie,doxie_cbrs,iesp,MDR,POE,PSS,Prof_LicenseV2,risk_indicators,spoke,ut,suppress,AutoStandardI;
+﻿import BatchServices,DCA,doxie,doxie_cbrs,iesp,MDR,POE,PSS,Prof_LicenseV2,risk_indicators,spoke,ut,suppress,AutoStandardI,Std;
 
 export ReportService_Records := module
 
@@ -36,7 +36,7 @@ export ReportService_Records := module
     ds_excluded_sources := 
 	     if(in_excluded_sources_edited = '',
 	        dataset([], layout_source),
-			    dataset(ut.Stringsplit(in_excluded_sources_edited, ','), layout_source));
+			    dataset(Std.Str.SplitWords(in_excluded_sources_edited, ','), layout_source));
 
     // 2. Use the input to create a dataset of 1 record in the layout needed by the  
 	  //    getPoeRecs function.
@@ -151,7 +151,7 @@ export ReportService_Records := module
     // 11.4 Match all complete recs for a did to the most current one for a did to keep 
 	  //      any recs for the did that have the same bdid/company name & phone1 as the 
 	  //      most current one and are within 14 days of the most current dt_last_seen.
-    ds_best_recs_for_did := join(ds_most_complete_srtd,ds_most_current1,
+    ds_best_recs_for_did := join(ds_most_complete_srtd(~from_PAW),ds_most_current1,
 	                               left.did = right.did                            and 
 	                               // check for bdids the same in case company names are slightly different
 	                               ((left.bdid !=0 and left.bdid = right.bdid) or
@@ -242,12 +242,12 @@ export ReportService_Records := module
     // 17.2 Next sort/dedup the filtered recs to only keep the recs with a  
 	  //      unique company_name.
     ds_most_complete_unique_compname := dedup(sort(ds_most_complete_fltrd,
-		                                               company_name, -dt_last_seen, source_order, record),
+		                                               company_name, from_PAW, -dt_last_seen, source_order, record),
 	                                            company_name);
 
     // 17.3 Next sort/dedup again to only keep 1 rec for each unique bdid.
     ds_most_complete_unique_bdid := dedup(sort(ds_most_complete_unique_compname,
-		                                           bdid, -dt_last_seen, source_order, record),
+		                                           bdid, from_PAW, -dt_last_seen, source_order, record),
 	                                        bdid);		
 	
     // 17.4 Next do a left only join to remove the current rec from the 
@@ -263,7 +263,7 @@ export ReportService_Records := module
 
     // 17.5 Next sort/dedup the remaining recs to keep the 4 next most current recs.
     ds_addl_4recs := dedup(sort(ds_most_complete_addl,
-		                            did, -dt_last_seen, source_order, record),
+		                            did, from_PAW, -dt_last_seen, source_order, record),
 	                         did, dt_last_seen, source_order,
 	                         KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_HIST));
 
@@ -288,8 +288,8 @@ export ReportService_Records := module
 											              left outer,  // keep all the recs from the left ds
 												            atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
 	
-    ds_best_cand_wcorpstat_srted := CHOOSEN(SORT(ds_addl_4recs_wcorpstat,
-	                                        did,-dt_last_seen, source_order, RECORD), BatchServices.WorkPlace_Constants.Limits.KEEP_HIST);
+    ds_best_cand_wcorpstat_srted := TOPN(ds_addl_4recs_wcorpstat, BatchServices.WorkPlace_Constants.Limits.KEEP_HIST,
+	                                        did, from_PAW, -dt_last_seen, source_order, RECORD);
 		
 		// 18. Get some additional detailed POE data for specific sources from the 
 		//     individual sources' did key file.
