@@ -1008,4 +1008,18 @@ EXPORT fn_isFoundInCompanyName( STRING CompanyName, STRING PersonName ) := FUNCT
 		RETURN isFoundInCompanyName AND hasAtLeastTwoChars;
 	END;
 	
+  // The following function takes a comma-delimited string of any length, and a numeric
+		// length to truncate the string to. Since the resulting string will often have an 
+		// incomplete value at the end, the function trims it off, leaving complete values only.
+    
+  EXPORT truncate_list (STRING str, UNSIGNED max_len) := FUNCTION //
+    strt := TRIM (str); 
+    str_temp := str[1..max_len+1]; 
+    cm := STD.Str.Find (str_temp, ',', STD.Str.CountWords (str_temp, ',')-1); 
+    strt_trimmed := IF (STD.Str.EndsWith (str_temp, ','), str_temp[1..max_len], str_temp[1..cm-1]); 
+    RETURN IF (length (strt) < max_len, strt, strt_trimmed); 
+  END;
+	
+  
+  
 END;
