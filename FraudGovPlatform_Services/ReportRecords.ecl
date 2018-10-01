@@ -36,12 +36,12 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		FraudGovPlatform_Services.Layouts.fragment_w_value_recs do_Rollup(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L, dataset(FraudGovPlatform_Services.Layouts.fragment_w_value_recs) R) := TRANSFORM
 			identity_recs := R(file_type = File_Type_Const.IdentityActivity);
 			knownrisk_recs := R(file_type = File_Type_Const.KnownFraud);
-			SELF.LastActivityDate := MAX(identity_recs[1].date);
-			SELF.LastKnownRiskDate := MAX(knownrisk_recs[1].date);
+			SELF.LastActivityDate := identity_recs[1].date;
+			SELF.LastKnownRiskDate := knownrisk_recs[1].date;
 			SELF := L;
 		END;	
 
-		ds_fragment_recs_sorted := SORT(ds_fragment_recs_w_value, fragment_value, fragment, file_type -date);
+		ds_fragment_recs_sorted := SORT(ds_fragment_recs_w_value, fragment_value, fragment, file_type, -date);
 		ds_fragment_recs_grouped := GROUP(ds_fragment_recs_sorted, fragment_value, fragment);
 		ds_fragment_recs_rolled := ROLLUP(ds_fragment_recs_grouped, GROUP, do_Rollup(LEFT, ROWS(LEFT)));
 	

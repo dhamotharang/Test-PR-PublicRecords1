@@ -204,10 +204,15 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		relatives:=L.relative_records(hasAddrMatch);
 		SELF.relative_addr_match:=IF(EXISTS(relatives),'Y','N');
 
+		// ONLY REPORT ADDRESS MATCHES FOR PROPERTIES RANKED BETWEEN 10 AND 30
+		hasAddrMatchRank := L.property_rank BETWEEN HomesteadExemptionV2_Services.Constants.INPUT_ADDR
+			AND HomesteadExemptionV2_Services.Constants.HAS_EXMPTNS;
+
 		// VEHICLES
 		vehicleCurrent:=DEDUP(SORT(L.vehicle_records(isCurrent),VIN,-DataSource),VIN);
 		vehicleAddrMatch:=DEDUP(SORT(L.vehicle_records(hasCurrAddrMatch),VIN,-DataSource),VIN);
 		SELF.vehicle_reg_addr_match:=MAP(
+			NOT hasAddrMatchRank => '',
 			NOT EXISTS(vehicleCurrent) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO CURRENT VEHICLE RECORDS
 			EXISTS(vehicleAddrMatch) => 'Y', // CURRENT VEHICLE RECORD WITH ADDR MATCH
 			'N'); // CURRENT VEHICLE NO ADDR MATCH
@@ -216,12 +221,14 @@ EXPORT fn_getBatchOutput(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) 
 		// DRIVER
 		driverAddrMatch:=SORT(L.driver_records(hasCurrAddrMatch),-lic_issue_date);
 		SELF.driver_addr_match:=MAP(
+			NOT hasAddrMatchRank => '',
 			NOT EXISTS(L.driver_records) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO DRIVER RECORDS
 			EXISTS(driverAddrMatch) => 'Y', // CURRENT DRIVER RECORD WITH ADDR MATCH
 			'N'); // DRIVER RECORDS CURRENT AND/OR EXPIRED
 
 		// VOTER
 		SELF.voter_reg_addr_match:=MAP(
+			NOT hasAddrMatchRank => '',
 			NOT EXISTS(L.voter_records) => HomesteadExemptionV2_Services.Constants.NO_INFO, // NO VOTER RECORDS
 			EXISTS(L.voter_records(hasAddrMatch)) => 'Y', // HAS VOTER RECORD WITH ADDR MATCH
  			'N');

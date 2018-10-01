@@ -46,6 +46,7 @@ EXPORT AutoKey_IDs(
 
 	ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
     export BOOLEAN useAllLookups := TRUE;
+    export BOOLEAN workhard := TRUE;
 	END;
 
 	ds_fids := Autokey_batch.get_fids(ds_ak_batch_in, ak_keyname, ak_config_data);

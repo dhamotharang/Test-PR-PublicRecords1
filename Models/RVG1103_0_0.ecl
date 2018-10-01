@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVG1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean xmlPreScreenOptOut ) := FUNCTION
 
@@ -2666,7 +2666,7 @@ export RVG1103_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		rvg1103_cap2 := if(rvg1103_cap > 610 and (ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections or ov_impulse), 610, rvg1103_cap);
 
-		rvg1103_cap3 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s), 222, rvg1103_cap2);
+		rvg1103_cap3 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvg1103_cap2);
 
 		rvg1103 := if(ssn_deceased, 200, rvg1103_cap3);
 

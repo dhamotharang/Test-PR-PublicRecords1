@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra, std;
+﻿import risk_indicators, ut, riskwise, riskwisefcra, std, riskview;
 
 export RVB705_1_0(
 	dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean isCalifornia ) := FUNCTION
@@ -250,7 +250,11 @@ export RVB705_1_0(
 			RVB705_1_0c := Max(RVB705_1_0b, 501);
 			override := deceased or (ssnpop and not ssn_valid) or phn_corrections or corrections or (age between 1 and 17);
 			
-			RVB705_1_0 := if( override, Min( 610, RVB705_1_0c ), RVB705_1_0c );
+			RVB705_1_0_tmp := if( override, Min( 610, RVB705_1_0c ), RVB705_1_0c );
+      
+      RVB705_1_0 := if( riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, RVB705_1_0_tmp);
+	
+  
 		// END CALC SCORE
 		
 		// self.score := intformat(RVB705_1_0,3,1);

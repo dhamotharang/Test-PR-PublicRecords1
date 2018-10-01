@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 RVG_DEBUG := FALSE;
 
 export RVG904_1_0( dataset(risk_indicators.layout_boca_shell) clam, boolean isCalifornia ) := FUNCTION
@@ -287,7 +287,7 @@ export RVG904_1_0( dataset(risk_indicators.layout_boca_shell) clam, boolean isCa
 		ov_corrections   := ( rc_hrisksic = 2225 );
 
 		PDO_CUSTOM2 := map(
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 => 222,
+			riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid) => 222,
 			PDO_CUSTOM > 610 and (ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections ) => 610,
 			PDO_CUSTOM
 		);

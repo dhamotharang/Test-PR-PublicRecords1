@@ -1,4 +1,4 @@
-﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
 
 EXPORT rvd1801_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -371,7 +371,8 @@ rc4_1 := r_rc4;
 
 iv_rv5_deceased := rc_decsflag = '1' or rc_ssndod != 0 or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',')  or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',');
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Add_Input_NAProp <= 3 or not TrueDID , '1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(nas_summary,nap_summary, Add_Input_NAProp, truedid), '1', '0');
+
 
 base := 700;
 

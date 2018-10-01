@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVA1008_2_0(dataset(risk_indicators.Layout_Boca_Shell) clam,boolean isCalifornia) := FUNCTION	
 	
@@ -1337,7 +1337,7 @@ scored_222s := if(max(property_owned_total, property_sold_total) = NULL,
 											or (integer)indexw(StringLib.StringToUpperCase(trim(rc_sources, ALL)), 'BA', ',') > 0 
 											or bankrupt or filing_count > 0 or bk_recent_count > 0 or rc_decsflag = '1' or truedid;
 
-rva1008_2_0 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not(scored_222s), 222, _rva1008);
+rva1008_2_0 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, _rva1008);
 #if (RVA_debug)
 		self.clam                         		:= le;
 		self.truedid                         := truedid;

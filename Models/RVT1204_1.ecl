@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 export RVT1204_1( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE) := FUNCTION
 
@@ -667,7 +667,7 @@ export RVT1204_1( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLE
 	
 	rvt1204_1_2 := map(
 	    ssn_deceased                                                                    => 200,
-	    nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not(scored_222s) => 222,
+	    riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 	 max(
 	 min(if(round(point * (ln(f_probscore / (1 - f_probscore)) - ln(odds)) / ln(2) + base) = NULL, 
 	 -NULL, round(point * (ln(f_probscore / (1 - f_probscore)) - ln(odds)) / ln(2) + base)), 

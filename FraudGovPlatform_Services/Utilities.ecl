@@ -110,4 +110,6 @@ EXPORT Utilities := MODULE
 											'');
 		return risk_level;
 	END;
+
+	EXPORT Yesterday := STD.Date.AdjustDate(STD.Date.Today(),0,0,-1);
 END;

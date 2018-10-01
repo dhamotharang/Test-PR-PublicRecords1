@@ -1,4 +1,4 @@
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
+﻿IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std, riskview;
 
 EXPORT RVG1511_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -159,7 +159,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 
 sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
-iv_rv5_unscorable_1 := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and (Integer)TrueDID = 0, '1', '0');
+iv_rv5_unscorable_1 := if(riskview.constants.noscore(nas_summary,nap_summary, Add_Input_NAProp, le.truedid), '1', '0');
 
 rv_f00_dob_score := if(not(truedid and dobpop), NULL, min(if(combo_dobscore = NULL, -NULL, combo_dobscore), 999));
 
@@ -537,7 +537,7 @@ p__rcvaluec14 := (integer)(p__aacd_0 = 'C14') * p__dist_0 +
 
 iv_rv5_deceased := (Integer)rc_decsflag = 1 or rc_ssndod != 0 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or (Integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',') > 0;
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and (Integer)TrueDID = 0, '1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 
 base := 700;
 

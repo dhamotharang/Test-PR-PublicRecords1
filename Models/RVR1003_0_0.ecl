@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVR1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean PreScreenOptOut=false, boolean useRVReasons1=false ) := FUNCTION
 
@@ -2923,7 +2923,7 @@ add1_avm_med :=  __common__(map(
 
 		estimated_income := __common__(max((real)0, round(pred_inc/1000)*1000));
 
-		estimated_income_2 :=  __common__(if((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2)), 222, estimated_income));
+		estimated_income_2 :=  __common__(if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, estimated_income));
 
 		pk_ssnchar_invalid_or_recent :=  __common__(if(inputssncharflag in ['1', '2', '3', '4'], 1, 0));
 
@@ -11630,7 +11630,7 @@ pk2_add1_avm_to_med_ratio :=  __common__(map(pk_add1_avm_to_med_ratio_2 <= NULL 
 		// if (( RVR1003 > 680 ) and ( ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections or ov_impulse )) then RVR1003 = 680;
 
 		RVR1003_2 := __common__(map(
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not scored_222s                      => 222,
+			riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid)                      	=> 222,
 			rvr1003 > 680 and ( ov_ssndead or ov_ssnprior or ov_criminal_flag or ov_corrections or ov_impulse ) => 680,
 			rvr1003 >= 900 => 900,
 			rvr1003 <= 501 => 501,

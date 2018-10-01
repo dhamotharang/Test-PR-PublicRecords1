@@ -1,5 +1,4 @@
-﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, 
-						 FraudShared_Services, iesp, lib_thorlib, Patriot, risk_indicators, STD;
+﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared_Services, iesp, Patriot, risk_indicators;
 
 EXPORT Transforms := MODULE
 	
@@ -427,12 +426,10 @@ EXPORT Transforms := MODULE
 					SELF.geo_lat := L.geo_lat;
 					SELF.geo_long := L.geo_long;
 					
-					yesterday := STD.Date.AdjustDate(STD.Date.Today(),0,0,-1);
-					
 					//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
 					//Also added failsafe...if we can't get the environment variable, we default it to yesterday
 					SELF.date_added := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
-																											(STRING)yesterday)[1..8] + '000000');
+																											(STRING)FraudGovPlatform_Services.Utilities.Yesterday)[1..8] + '000000');
 
 				END;
 	

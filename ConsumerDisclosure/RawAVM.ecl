@@ -5,8 +5,18 @@ layout_avm_base_raw := RECORD  // recordof(AVM_V2.Key_AVM_Address_FCRA) - has hi
 	avm_v2.layouts.layout_base_with_history;
 END;
 
+layout_avm_valuation := RECORD
+	UNSIGNED AutomatedValuationCurrent := 0;	
+	UNSIGNED AutomatedValuation1 := 0;
+	UNSIGNED AutomatedValuation2 := 0;
+	UNSIGNED AutomatedValuation3 := 0;
+	UNSIGNED AutomatedValuation4 := 0;
+	UNSIGNED AutomatedValuation5 := 0;
+END;
+
 layout_avm_base_rawrec := RECORD(layout_avm_base_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
+    layout_avm_valuation SnapshotData;
 END;
 	
 layout_avm_medians_raw := RECORD
@@ -50,11 +60,13 @@ layout_avm_medians_raw_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
 	layout_avm_medians_raw;
 END;
 
+STRING8 history_date := '99999901';	// for use with risk_indicators macros - it is not meant to be run in historical mode
 	
 EXPORT RawAVM := MODULE
 
 	EXPORT layout_avm_address_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
 		layout_avm_base_raw;
+    layout_avm_valuation SnapshotData;
 	END;
 
 	EXPORT layout_avm_medians_out := RECORD
@@ -106,7 +118,7 @@ EXPORT RawAVM := MODULE
 		layout_avm_medians_working getMedians(layout_avm_medians_working le, avm_v2.Key_AVM_Medians_fcra rt) := 
 		TRANSFORM
 			
-			AVM_V2.MOD_get_AVM_from_History.MAC_get_Medians(rt, '99999901', median_record);
+			AVM_V2.MOD_get_AVM_from_History.MAC_get_Medians(rt, history_date, median_record);
 
 			SELF.median_valuation := median_record.median_valuation;
 			SELF.raw_payload := rt;
@@ -304,12 +316,21 @@ EXPORT RawAVM := MODULE
 															LEFT.sec_range = RIGHT.sec_range),
 													TRANSFORM(layout_avm_base_rawrec,
 																		rec_id := TRIM(RIGHT.prim_range) + TRIM(RIGHT.prim_name) + TRIM(RIGHT.sec_range);
+                                    AVM_V2.MOD_get_AVM_from_History.MAC_get_AVM(RIGHT, history_date, avm_with_valuations);	 
+                                    
 																		SELF.compliance_flags.IsOverwritten := (rec_id IN override_ids), 
 																		SELF.compliance_flags.IsSuppressed := (rec_id IN suppressed_ids), 
 																		SELF.subject_did := LEFT.subject_did,
 																		SELF.record_ids.RecId1 := (STRING) RIGHT.prim_range,
 																		SELF.record_ids.RecId2 := (STRING) RIGHT.prim_name,
 																		SELF.record_ids.RecId3 := (STRING) RIGHT.sec_range,
+                                    SELF.SnapshotData.AutomatedValuationCurrent := avm_with_valuations.automated_valuation;
+                                    SELF.SnapshotData.AutomatedValuation1 := avm_with_valuations.automated_valuation2;
+                                    SELF.SnapshotData.AutomatedValuation2 := avm_with_valuations.automated_valuation3;
+                                    SELF.SnapshotData.AutomatedValuation3 := avm_with_valuations.automated_valuation4;
+                                    SELF.SnapshotData.AutomatedValuation4 := avm_with_valuations.automated_valuation5;
+                                    SELF.SnapshotData.AutomatedValuation5 := avm_with_valuations.automated_valuation6;
+
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),

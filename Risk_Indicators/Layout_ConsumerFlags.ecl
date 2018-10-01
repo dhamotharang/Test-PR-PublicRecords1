@@ -1,4 +1,4 @@
-export Layout_ConsumerFlags :=
+﻿export Layout_ConsumerFlags :=
 RECORD
 	boolean corrected_flag;
 	boolean consumer_statement_flag;
@@ -7,4 +7,5 @@ RECORD
 	boolean security_alert;
 	boolean negative_alert;
 	boolean id_theft_flag;
+  boolean legal_hold_alert;
 END;

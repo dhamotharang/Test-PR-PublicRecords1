@@ -1,6 +1,6 @@
-// RVA1311_1 Coastal Credit 4534 - 4.1. shell - FCRA
+﻿// RVA1311_1 Coastal Credit 4534 - 4.1. shell - FCRA
 
-import risk_indicators, riskwise, RiskWiseFCRA, ut, std;
+import risk_indicators, riskwise, RiskWiseFCRA, ut, std, riskview;
 
 export RVA1311_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -322,7 +322,7 @@ export RVA1311_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 	iv_ssn_deceased := rc_decsflag = '1' or 
 			indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',');
 
-	iv_riskview_222s := nas_summary <= 4 and 
+	iv_riskview_222s := (nas_summary <= 4 and 
 		nap_summary <= 4 AND
 		add1_naprop <= 3 and 
 		not(if(max(property_owned_total, property_sold_total) = NULL, NULL, 
@@ -339,7 +339,8 @@ export RVA1311_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 		bk_recent_count > 0 or
 		rc_decsflag = '1' or 
 		indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') or
-		truedid);
+		truedid)) 
+    or le.truedid=false;
 
 	iv_vs099_addr_not_ver_w_ssn := if(not(truedid and (integer) ssnlength > 0), null, (integer)(nas_summary in [4, 7, 9]));
 
@@ -906,7 +907,7 @@ export RVA1311_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 
 	rva1311_1_0 := map(
 			ssn_deceased 		                                                                => 200,
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s) => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 																																												 rva1311_1_0_1);
 
 	glrc24 := (integer) iv_vs099_addr_not_ver_w_ssn > 0;

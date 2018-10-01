@@ -490,6 +490,7 @@ export layout_riskview5LITE_search_results := record
 	string3   Custom100_score;
 	layout_riskview_attributes_5_slimList;
   layout_riskview5_alerts;
+	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
 
 export Layout_Riskview_Batch_In := RECORD

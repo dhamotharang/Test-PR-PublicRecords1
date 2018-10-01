@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVT612_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := 
 
@@ -452,19 +452,18 @@ Layout_ModelOut doModel(clam le) := TRANSFORM
 
 
 
-     RiskView := (integer)(point*(log(phat/(1-phat)) - log(odds))/log(2) + base);
+     RiskViewbase := (integer)(point*(log(phat/(1-phat)) - log(odds))/log(2) + base);
 
 
-	RiskView6 := map(RiskView < 501 => 501,
-    				   RiskView > 900 => 900,
-    				   RiskView);
+	RiskView6 := map(RiskViewbase < 501 => 501,
+    				   RiskViewbase > 900 => 900,
+    				   RiskViewbase);
 
 
 
      RiskView612 := if(RiskView6 > 680 and (ssndead or ssnprior or le.bjl.criminal_count > 0 or le.address_validation.corrections), 680, RiskView6);
 
-
-     RVT612 := if(le.iid.nas_summary >= 5 or le.iid.nap_summary >= 5 or le.address_verification.input_address_information.naprop >= 3, RiskView612, 222);
+     RVT612 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, RiskView612);
 
 
 	riTemp := RiskWiseFCRA.corrReasonCodes(le.consumerflags, 4);

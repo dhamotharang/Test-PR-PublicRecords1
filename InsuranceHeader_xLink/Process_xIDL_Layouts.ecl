@@ -79,10 +79,6 @@ EXPORT FullBuildDelta(DATASET(RECORDOF(Key)) keyPayloadExisting = Config.Payload
   resultRecs       := SALT37.MAC_PoisonRecords(snapshotExisting, snapshotNewFull, 'DID,RID', DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, 'YYYYMMDD');
   RETURN resultRecs;
 END;
-EXPORT layout_ZIP_cases := RECORD
-  TYPEOF(h.ZIP) ZIP;
-  INTEGER2 Weight; // we now always store weight in _cases
-END;
 EXPORT id_stream_layout := RECORD
     SALT37.UIDType UniqueId;
     INTEGER2 Weight;
@@ -222,7 +218,7 @@ EXPORT InputLayout := RECORD
   h.SEC_RANGE;
   h.CITY;
   h.ST;
-  DATASET(layout_ZIP_cases) ZIP_cases;
+  h.ZIP;
   h.SSN5;
   h.SSN4;
   h.DOB;
@@ -249,7 +245,7 @@ EXPORT InputLayout := RECORD
   SALT37.UIDType Entered_DID := 0; // Allow user to enter DID to pull data
 END;
  
-EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.ST <> (TYPEOF(le.ST))'' AND Fields.InValid_ST((SALT37.StrType)le.ST)=0 OR le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND EXISTS(le.ZIP_cases) OR le.SSN5 <> (TYPEOF(le.SSN5))'' AND Fields.InValid_SSN5((SALT37.StrType)le.SSN5)=0 AND le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 OR le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 OR EXISTS(le.ZIP_cases) AND le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 OR le.SRC <> (TYPEOF(le.SRC))'' AND Fields.InValid_SRC((SALT37.StrType)le.SRC)=0 AND le.SOURCE_RID <> (TYPEOF(le.SOURCE_RID))'' AND Fields.InValid_SOURCE_RID((SALT37.StrType)le.SOURCE_RID)=0 OR le.DL_NBR <> (TYPEOF(le.DL_NBR))'' AND Fields.InValid_DL_NBR((SALT37.StrType)le.DL_NBR)=0 AND le.DL_STATE <> (TYPEOF(le.DL_STATE))'' AND Fields.InValid_DL_STATE((SALT37.StrType)le.DL_STATE)=0 OR le.PHONE <> (TYPEOF(le.PHONE))'' AND Fields.InValid_PHONE((SALT37.StrType)le.PHONE)=0 OR le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND EXISTS(le.ZIP_cases) OR le.fname2 <> (TYPEOF(le.fname2))'' AND Fields.InValid_fname2((SALT37.StrType)le.fname2)=0 AND le.lname2 <> (TYPEOF(le.lname2))'' AND Fields.InValid_lname2((SALT37.StrType)le.lname2)=0;
+EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.ST <> (TYPEOF(le.ST))'' AND Fields.InValid_ST((SALT37.StrType)le.ST)=0 OR le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 AND le.PRIM_NAME <> (TYPEOF(le.PRIM_NAME))'' AND Fields.InValid_PRIM_NAME((SALT37.StrType)le.PRIM_NAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.SSN5 <> (TYPEOF(le.SSN5))'' AND Fields.InValid_SSN5((SALT37.StrType)le.SSN5)=0 AND le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 OR le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 OR le.DOB <> (TYPEOF(le.DOB))'' AND Fields.InValid_DOB((SALT37.StrType)le.DOB)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 OR le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 AND le.PRIM_RANGE <> (TYPEOF(le.PRIM_RANGE))'' AND Fields.InValid_PRIM_RANGE((SALT37.StrType)le.PRIM_RANGE)=0 OR le.SRC <> (TYPEOF(le.SRC))'' AND Fields.InValid_SRC((SALT37.StrType)le.SRC)=0 AND le.SOURCE_RID <> (TYPEOF(le.SOURCE_RID))'' AND Fields.InValid_SOURCE_RID((SALT37.StrType)le.SOURCE_RID)=0 OR le.DL_NBR <> (TYPEOF(le.DL_NBR))'' AND Fields.InValid_DL_NBR((SALT37.StrType)le.DL_NBR)=0 AND le.DL_STATE <> (TYPEOF(le.DL_STATE))'' AND Fields.InValid_DL_STATE((SALT37.StrType)le.DL_STATE)=0 OR le.PHONE <> (TYPEOF(le.PHONE))'' AND Fields.InValid_PHONE((SALT37.StrType)le.PHONE)=0 OR le.LNAME <> (TYPEOF(le.LNAME))'' AND Fields.InValid_LNAME((SALT37.StrType)le.LNAME)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.ZIP <> (TYPEOF(le.ZIP))'' AND Fields.InValid_ZIP((SALT37.StrType)le.ZIP)=0 OR le.fname2 <> (TYPEOF(le.fname2))'' AND Fields.InValid_fname2((SALT37.StrType)le.fname2)=0 AND le.lname2 <> (TYPEOF(le.lname2))'' AND Fields.InValid_lname2((SALT37.StrType)le.lname2)=0;
 EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not have field
   h.DID;
   INTEGER2 Weight; // Specificity attached to this match
@@ -287,7 +283,7 @@ EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not h
   TYPEOF(h.ST) ST := (TYPEOF(h.ST))'';
   INTEGER2 STWeight := 0;
   INTEGER1 ST_match_code := 0;
-  DATASET(layout_ZIP_cases) ZIP_cases := DATASET([],layout_ZIP_cases);
+  TYPEOF(h.ZIP) ZIP := (TYPEOF(h.ZIP))'';
   INTEGER2 ZIPWeight := 0;
   INTEGER1 ZIP_match_code := 0;
   TYPEOF(h.SSN5) SSN5 := (TYPEOF(h.SSN5))'';
@@ -421,8 +417,9 @@ EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch r
   SELF.STWeight := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.STWeight, ri.STWeight );
   SELF.ST := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.ST, ri.ST );
   SELF.ST_match_code := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.ST_match_code, ri.ST_match_code );
-  SELF.ZIP_cases := DEDUP(SORT(le.ZIP_cases & ri.ZIP_cases, ZIP,-weight ),ZIP);
-  SELF.ZIPWeight := MAX(SELF.ZIP_cases,weight); // KEEP(1) means you can take the maximum value
+  BOOLEAN ZIPWeightForcedDown := IF ( isWeightForcedDown(le.ZIPWeight,ri.ZIPWeight,le.ZIP_match_code,ri.ZIP_match_code),TRUE,FALSE );
+  SELF.ZIPWeight := IF ( isLeftWinner(le.ZIPWeight,ri.ZIPWeight,le.ZIP_match_code,ri.ZIP_match_code ), le.ZIPWeight, ri.ZIPWeight );
+  SELF.ZIP := IF ( isLeftWinner(le.ZIPWeight,ri.ZIPWeight,le.ZIP_match_code,ri.ZIP_match_code ), le.ZIP, ri.ZIP );
   SELF.ZIP_match_code := IF ( isLeftWinner(le.ZIPWeight,ri.ZIPWeight,le.ZIP_match_code,ri.ZIP_match_code ), le.ZIP_match_code, ri.ZIP_match_code );
   BOOLEAN SSN5WeightForcedDown := IF ( isWeightForcedDown(le.SSN5Weight,ri.SSN5Weight,le.SSN5_match_code,ri.SSN5_match_code),TRUE,FALSE );
   SELF.SSN5Weight := IF ( isLeftWinner(le.SSN5Weight,ri.SSN5Weight,le.SSN5_match_code,ri.SSN5_match_code ), le.SSN5Weight, ri.SSN5Weight );
@@ -517,7 +514,7 @@ EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch r
       ADDR1WeightForcedDown AND (le.ADDR1_match_code = ri.ADDR1_match_code) AND MIN(le.ADDR1Weight, ri.ADDR1Weight)=ri.ADDR1Weight => ri.ADDR1_match_code,
       IF ( isLeftWinner(le.ADDR1Weight,ri.ADDR1Weight,le.ADDR1_match_code,ri.ADDR1_match_code ), le.ADDR1_match_code, ri.ADDR1_match_code ));
   BOOLEAN DirectLOCALEWeightForcedDown := IF ( isWeightForcedDown(le.LOCALEWeight,ri.LOCALEWeight,le.LOCALE_match_code,ri.LOCALE_match_code),TRUE,FALSE );
-  BOOLEAN LOCALEWeightForcedDown := CITYWeightForcedDown OR STWeightForcedDown;
+  BOOLEAN LOCALEWeightForcedDown := CITYWeightForcedDown OR STWeightForcedDown OR ZIPWeightForcedDown;
   SELF.LOCALEWeight := MAP (
       DirectLOCALEWeightForcedDown => IF ( isLeftWinner(le.LOCALEWeight,ri.LOCALEWeight,le.LOCALE_match_code,ri.LOCALE_match_code ), le.LOCALEWeight, ri.LOCALEWeight ),
       LOCALEWeightForcedDown AND (le.LOCALE_match_code = ri.LOCALE_match_code) => MIN(le.LOCALEWeight, ri.LOCALEWeight),

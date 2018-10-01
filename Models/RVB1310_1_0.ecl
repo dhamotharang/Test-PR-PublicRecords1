@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVB1310_1_0(  grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -536,7 +536,7 @@ BOOLEAN indexw(string source, string target, string delim) :=
 
 sysdate := common.sas_date(if(le.historydate=999999, (STRING)Std.Date.Today(), (string6)le.historydate+'01'));
 
-iv_riskview_222s := nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 and not(if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND combo_dobscore <= 100 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'L2', ',') > 0 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'LI', ',') > 0 or liens_recent_unreleased_count > 0 or liens_historical_unreleased_ct > 0 or criminal_count > 0 or (rc_bansflag in ['1', '2']) or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'BA', ',') > 0 or (integer)bankrupt =  1 or filing_count > 0 or bk_recent_count > 0 or rc_decsflag = '1' or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or truedid);
+iv_riskview_222s := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 ssn_deceased := rc_decsflag = '1';
 

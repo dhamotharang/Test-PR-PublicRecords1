@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra, std;
+﻿import risk_indicators, ut, riskwise, riskwisefcra, std, riskview;
 
 export RVB711_0_0(
 	dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -797,8 +797,8 @@ temp	doModel( clam le ) := TRANSFORM
 		corrections       := (rc_hrisksic=2225);
 
 		rvb711_0 := map(
-			RVB711_0_0_a >785 and (ssndead_override or ssnprior_override or criminal_flag=1 or corrections ) => 785,
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2                                       => 222,
+			RVB711_0_0_a >785 and (ssndead_override or ssnprior_override or criminal_flag=1 or corrections ) 	=> 785,
+			riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid)                			=> 222,
 			rvb711_0_0_a
 		);
 
