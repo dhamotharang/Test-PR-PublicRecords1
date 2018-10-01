@@ -287,6 +287,7 @@ EXPORT Transforms := MODULE
 		SELF.GlobalCompanyId := L.classification_permissible_use_access.gc_id;
 		SELF.TransactionId := L.transaction_id;
 		SELF.HouseholdId := L.household_id;
+		SELF.DeceitfulConfidenceId := L.classification_Activity.Confidence_that_activity_was_deceitful_id;
 		SELF.CustomerPersonId := L.customer_person_id;
 		SELF.CustomerEventId := L.customer_event_id;
 		SELF.ReportedDateTime :=  iesp.ECL2ESP.toTimeStamp(reported_date_time);

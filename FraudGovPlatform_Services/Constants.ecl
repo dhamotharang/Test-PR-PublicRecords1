@@ -83,7 +83,7 @@
   // Mapping the FDN file type field above to our usage of the field for FraudGov
 	// file_type 2 is reserved for Applicable Public Records, not used for FraudGov.
 	// file_type 4 is reserved for Relationship Analytics, not used for FraudGov.
-  EXPORT PayloadFileTypeEnum := ENUM(unsigned1,KnownFraud=1,IdentityActivity=3);
+  EXPORT PayloadFileTypeEnum := ENUM(unsigned1,KnownFraud=1,IdentityActivity=3,StatusUpdate=5);
   
 	EXPORT Red_Flag_Alerts := MODULE
 		EXPORT Codes := MODULE
