@@ -1,11 +1,16 @@
-﻿import BIPV2_LGID3,tools;
+﻿import BIPV2_LGID3,tools,BIPV2_Files;
 export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := module
 		
 	export BasicSamp := module
 		shared s := BIPV2_LGID3.specificities(ih).Specificities[1];
 		basicAsMatch := project(ENTH(BIPV2_LGID3.BasicMatch(ih).patch_file,1000), transform(BIPV2_LGID3.match_candidates(ih).layout_matches,self.rule:=99,self.conf:=99,self:=left));
 		inputAsCandidates := project(BIPV2_LGID3.specificities(ih).input_file, transform(BIPV2_LGID3.match_candidates(ih).layout_candidates,self:=left,self:=[]));
-		shared BasicMatchSampleRecords := BIPV2_LGID3.Debug(ih,s).AnnotateMatchesFromData(inputAsCandidates,basicAsMatch);
+		setLgid3s := set(inputAsCandidates, LGID3);
+		BIPV2_LGID3.match_candidates(dataset([],BIPV2_Files.files_lgid3.Layout_LGID3)).layout_attribute_matches ainto(BIPV2_LGID3.Keys(dataset([],BIPV2_Files.files_lgid3.Layout_LGID3)).Attribute_Matches le) := TRANSFORM
+			SELF := le;
+		END;
+		am := PROJECT(BIPV2_LGID3.Keys(dataset([],BIPV2_Files.files_lgid3.Layout_LGID3)).Attribute_Matches(LGID31 in setLgid3s and LGID32 in setLgid3s),ainto(LEFT));
+		shared BasicMatchSampleRecords := BIPV2_LGID3.Debug(ih,s).AnnotateMatchesFromData(inputAsCandidates,basicAsMatch,am);
 		export out := OUTPUT(BasicMatchSampleRecords,NAMED('BasicMatchSampleRecords'),ALL);
 	end;
 	export ReviewSamples := module
