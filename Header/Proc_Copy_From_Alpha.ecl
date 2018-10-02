@@ -113,7 +113,7 @@ EXPORT MoveToQA :=sequential(
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
     ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true)) // Restore the incremental keys into the qa superfiles
-    ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta','Dataland') // Copy and update new full keys in dataland
+    ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
 );
 // ************************************************************************************************************************************
 
